@@ -1185,3 +1185,32 @@ export type {
   LabSignalBridgeResult,
   WiringDiagnostic,
 } from "./ops/productionWiring.js";
+
+// ── Timing Side-Channel Pack ──────────────────────────────────────────
+export { timingSideChannelPack } from "./assurance/packs/timingSideChannelPack.js";
+
+// ── Studio OpenAPI ────────────────────────────────────────────────────
+export { generateFullOpenApiSpec, renderOpenApiYaml, openapiGenerateCli } from "./studio/openapi.js";
+
+// ── Plugin Sandbox Limits ─────────────────────────────────────────────
+export {
+  sandboxLimitsSchema,
+  DEFAULT_SANDBOX_LIMITS,
+  withCpuTimeout,
+  assertNetworkAllowed,
+  buildProcessResourceArgs,
+  checkUsageViolations,
+  resolveSandboxLimits,
+  formatSandboxLimits,
+  pluginResourceMetric,
+  PluginSandboxError,
+} from "./plugins/sandboxLimits.js";
+export type { SandboxLimits, PluginResourceUsage, LimitViolation } from "./plugins/sandboxLimits.js";
+
+// ── Semantic Code Edges ───────────────────────────────────────────────
+export {
+  scanCodeGraph,
+  propagateCodeChanges,
+  renderCodeGraphMarkdown,
+} from "./cgx/semanticCodeEdges.js";
+export type { CodeNode, CodeEdge, CodeGraph, CodeNodeType, CodeEdgeType } from "./cgx/semanticCodeEdges.js";

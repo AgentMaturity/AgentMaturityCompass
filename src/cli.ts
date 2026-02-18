@@ -11034,6 +11034,50 @@ program
     }
   });
 
+// ── OpenAPI Generate (Full Spec) ────────────────────────────────────────
+program
+  .command("openapi-generate")
+  .description("Generate full OpenAPI spec (Studio + Bridge + Gateway)")
+  .option("--out <file>", "output file path (yaml/json)")
+  .option("--json", "output raw JSON to stdout", false)
+  .action((opts: { out?: string; json: boolean }) => {
+    const { openapiGenerateCli, renderOpenApiYaml } = require("./studio/openapi.js") as typeof import("./studio/openapi.js");
+    const result = openapiGenerateCli({ out: opts.out });
+    if (opts.out) {
+      console.log(chalk.green(`OpenAPI spec written to ${result.path}`));
+    } else if (opts.json) {
+      console.log(JSON.stringify(result.spec, null, 2));
+    } else {
+      console.log(renderOpenApiYaml());
+    }
+  });
+
+// ── Plugin Sandbox Limits ───────────────────────────────────────────────
+plugin
+  .command("limits")
+  .description("Show current plugin sandbox resource limits")
+  .action(() => {
+    const { resolveSandboxLimits, formatSandboxLimits } = require("./plugins/sandboxLimits.js") as typeof import("./plugins/sandboxLimits.js");
+    const limits = resolveSandboxLimits();
+    console.log(chalk.bold("\nPlugin Sandbox Resource Limits\n"));
+    console.log(formatSandboxLimits(limits));
+    console.log("");
+  });
+
+// ── CGX Code Scan ───────────────────────────────────────────────────────
+cgx
+  .command("code-scan")
+  .description("Scan repository for semantic code edges")
+  .requiredOption("--agent <agentId>", "agent ID")
+  .requiredOption("--path <repoPath>", "repository path to scan")
+  .action((opts: { agent: string; path: string }) => {
+    const { scanCodeGraph, renderCodeGraphMarkdown } = require("./cgx/semanticCodeEdges.js") as typeof import("./cgx/semanticCodeEdges.js");
+    const repoPath = resolve(opts.path);
+    console.log(chalk.dim(`Scanning ${repoPath}...`));
+    const graph = scanCodeGraph(opts.agent, repoPath);
+    console.log(renderCodeGraphMarkdown(graph));
+  });
+
 // ── Claim Expiry & Staleness CLI ────────────────────────────────────────
 program
   .command("claims-stale")
