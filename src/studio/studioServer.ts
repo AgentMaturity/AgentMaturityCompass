@@ -451,25 +451,41 @@ function ipAllowedByCidrs(ip: string, cidrs: string[]): boolean {
   return false;
 }
 
-function extractClientIp(req: IncomingMessage, trustedProxyHops: number): string {
-  if (trustedProxyHops > 0) {
-    const forwarded = req.headers["x-forwarded-for"];
-    if (typeof forwarded === "string" && forwarded.trim().length > 0) {
-      const chain = forwarded
-        .split(",")
-        .map((value) => value.trim())
-        .filter((value) => value.length > 0);
-      if (chain.length > 0) {
-        const index = Math.max(0, chain.length - trustedProxyHops - 1);
-        return chain[index] ?? chain[0] ?? "127.0.0.1";
-      }
-    }
-  }
-  const remote = req.socket.remoteAddress ?? "127.0.0.1";
+function extractSocketIp(remoteAddress: string | undefined): string {
+  const remote = remoteAddress ?? "127.0.0.1";
   if (remote.startsWith("::ffff:")) {
     return remote.slice("::ffff:".length);
   }
   return remote;
+}
+
+function extractForwardedClientIp(req: IncomingMessage, trustedProxyHops: number): string | null {
+  if (trustedProxyHops <= 0) {
+    return null;
+  }
+  const forwarded = req.headers["x-forwarded-for"];
+  if (typeof forwarded !== "string" || forwarded.trim().length === 0) {
+    return null;
+  }
+  const chain = forwarded
+    .split(",")
+    .map((value) => value.trim())
+    .filter((value) => value.length > 0);
+  if (chain.length === 0) {
+    return null;
+  }
+  const index = Math.max(0, chain.length - trustedProxyHops - 1);
+  return chain[index] ?? chain[0] ?? null;
+}
+
+function extractClientIp(req: IncomingMessage, trustedProxyHops: number, trustForwarded: boolean): string {
+  if (trustForwarded) {
+    const forwarded = extractForwardedClientIp(req, trustedProxyHops);
+    if (forwarded) {
+      return forwarded;
+    }
+  }
+  return extractSocketIp(req.socket.remoteAddress);
 }
 
 function allowCors(req: IncomingMessage, res: ServerResponse, options: StudioApiOptions): boolean {
@@ -1617,7 +1633,9 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         return;
       }
 
-      const clientIp = extractClientIp(req, options.trustedProxyHops ?? 0);
+      const remoteIp = extractSocketIp(req.socket.remoteAddress);
+      const trustForwarded = (options.trustedProxyHops ?? 0) > 0 && allowByIp(remoteIp);
+      const clientIp = extractClientIp(req, options.trustedProxyHops ?? 0, trustForwarded);
       if (!allowByIp(clientIp)) {
         json(res, 403, { error: "client IP not allowed", ip: clientIp });
         return;

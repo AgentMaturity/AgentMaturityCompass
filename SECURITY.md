@@ -2,6 +2,8 @@
 
 ## Threat Model
 
+See also: `docs/THREAT_MODEL.md` for expanded STRIDE coverage, attack-path mapping, and enforceable controls.
+
 AMC assumes three actors:
 
 1. Evaluated agent (untrusted): can produce claims but cannot be trusted as evidence writer.
