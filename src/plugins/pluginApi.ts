@@ -483,6 +483,12 @@ export function executePluginRequest(params: {
     if (verified.manifest.plugin.id !== pending.pluginId || verified.manifest.plugin.version !== pending.version) {
       throw new Error("pending plugin package does not match approved request");
     }
+    if (pending.publisherFingerprint && verified.publisherFingerprint && pending.publisherFingerprint !== verified.publisherFingerprint) {
+      throw new Error("pending plugin package publisher fingerprint mismatch");
+    }
+    if (pending.riskCategory && pending.riskCategory !== verified.manifest.plugin.risk.category) {
+      throw new Error("pending plugin package risk category mismatch");
+    }
     if (pending.packageSha256 && pending.packageSha256 !== sha256Hex(readFileSync(pendingPkg))) {
       throw new Error("pending plugin package sha mismatch");
     }
@@ -499,7 +505,7 @@ export function executePluginRequest(params: {
       version: pending.version!,
       sha256: artifactSha,
       registryFingerprint: pending.registryFingerprint ?? "0".repeat(64),
-      publisherFingerprint: pending.publisherFingerprint ?? "0".repeat(64),
+      publisherFingerprint: verified.publisherFingerprint ?? pending.publisherFingerprint ?? "0".repeat(64),
       installedTs: Date.now()
     });
     lock.installed = retained.sort((a, b) => a.id.localeCompare(b.id) || a.version.localeCompare(b.version));

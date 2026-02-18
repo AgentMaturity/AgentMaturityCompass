@@ -1,3 +1,4 @@
+import { createPrivateKey, sign } from "node:crypto";
 import { createServer, type Server } from "node:http";
 import { copyFileSync, mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
@@ -8,8 +9,9 @@ import { initWorkspace } from "../src/workspace.js";
 import { pluginKeygen, pluginPack, verifyPluginPackage } from "../src/plugins/pluginPackage.js";
 import { initPluginRegistry, publishPluginToRegistry, servePluginRegistry, verifyPluginRegistry } from "../src/plugins/pluginRegistry.js";
 import { initPluginWorkspace, requestPluginInstall, executePluginRequest } from "../src/plugins/pluginApi.js";
-import { savePluginRegistriesConfig, defaultInstalledPluginsLock, pluginInstalledPackagePath, saveInstalledPluginsLock, verifyInstalledPluginsLock, savePluginOverrides } from "../src/plugins/pluginStore.js";
+import { savePluginRegistriesConfig, defaultInstalledPluginsLock, pendingActionPath, pluginInstalledPackagePath, saveInstalledPluginsLock, verifyInstalledPluginsLock, savePluginOverrides } from "../src/plugins/pluginStore.js";
 import { sha256Hex } from "../src/utils/hash.js";
+import { canonicalize } from "../src/utils/json.js";
 import { decideApprovalForIntent } from "../src/approvals/approvalEngine.js";
 import { startStudioApiServer } from "../src/studio/studioServer.js";
 import { loadInstalledPluginAssets } from "../src/plugins/pluginLoader.js";
@@ -106,6 +108,23 @@ async function httpGet(url: string): Promise<{ status: number; body: string }> {
     status: response.status,
     body: await response.text()
   };
+}
+
+function reSignRegistryIndex(registryDir: string): void {
+  const indexPath = join(registryDir, "index.json");
+  const keyPath = join(registryDir, "registry.key");
+  const index = JSON.parse(readUtf8(indexPath)) as unknown;
+  const payload = Buffer.from(canonicalize(index), "utf8");
+  const signature = sign(null, payload, createPrivateKey(readUtf8(keyPath))).toString("base64");
+  writeFileSync(
+    join(registryDir, "index.sig"),
+    `${JSON.stringify({
+      digestSha256: sha256Hex(payload),
+      signature,
+      signedTs: Date.now(),
+      signer: "registry"
+    })}\n`
+  );
 }
 
 function installPackageDirect(params: {
@@ -216,6 +235,63 @@ describe("plugin marketplace", () => {
     }
   });
 
+  test("install rejects registry publisher metadata mismatch", async () => {
+    const ws = workspace();
+    initPluginWorkspace({ workspace: ws });
+    const keys = pluginKeygen({ outDir: join(ws, "keys") });
+    const source = pluginSource({
+      root: ws,
+      pluginId: "amc.plugin.fixture.registry-mismatch",
+      version: "1.0.0",
+      contentFiles: [{ path: "learn/questions/AMC-M.1.md", content: "# mismatch\n" }]
+    });
+    const packageFile = join(ws, "registry-mismatch.amcplug");
+    const packed = pluginPack({ inputDir: source, keyPath: keys.privateKeyPath, outFile: packageFile });
+
+    const registryDir = join(ws, "registry");
+    const registryInit = initPluginRegistry({ dir: registryDir, registryId: "local", registryName: "Local Registry" });
+    publishPluginToRegistry({
+      dir: registryDir,
+      pluginFile: packageFile,
+      registryKeyPath: join(registryDir, "registry.key")
+    });
+
+    const indexPath = join(registryDir, "index.json");
+    const index = JSON.parse(readUtf8(indexPath)) as {
+      plugins: Array<{ id: string; versions: Array<{ version: string; publisherFingerprint: string }> }>;
+    };
+    index.plugins[0]!.versions[0]!.publisherFingerprint = "b".repeat(64);
+    writeFileSync(indexPath, `${JSON.stringify(index, null, 2)}\n`);
+    reSignRegistryIndex(registryDir);
+
+    savePluginRegistriesConfig(ws, {
+      pluginRegistries: {
+        version: 1,
+        registries: [
+          {
+            id: "local",
+            type: "file",
+            base: registryDir,
+            pinnedRegistryPubkeyFingerprint: registryInit.fingerprint,
+            allowPluginPublishers: ["b".repeat(64)],
+            allowRiskCategories: ["LOW", "MEDIUM", "HIGH", "CRITICAL"],
+            autoUpdate: false
+          }
+        ]
+      }
+    });
+
+    await expect(
+      requestPluginInstall({
+        workspace: ws,
+        agentId: "default",
+        registryId: "local",
+        pluginRef: `${packed.manifest.plugin.id}@${packed.manifest.plugin.version}`,
+        action: "install"
+      })
+    ).rejects.toThrow(/publisher fingerprint mismatch/i);
+  });
+
   test("workspace install is dual-control and tamper breaks readiness", async () => {
     const ws = workspace();
     initPluginWorkspace({ workspace: ws });
@@ -315,6 +391,90 @@ describe("plugin marketplace", () => {
     } finally {
       await api.close();
     }
+  });
+
+  test("pending action tampering cannot bypass publisher/risk checks", async () => {
+    const ws = workspace();
+    initPluginWorkspace({ workspace: ws });
+    const keys = pluginKeygen({ outDir: join(ws, "keys") });
+    const source = pluginSource({
+      root: ws,
+      pluginId: "amc.plugin.fixture.pending-tamper",
+      version: "1.0.0",
+      contentFiles: [{ path: "learn/questions/AMC-P.1.md", content: "# pending tamper\n" }],
+      risk: "HIGH",
+      touches: ["learn"]
+    });
+    const packageFile = join(ws, "pending-tamper-plugin.amcplug");
+    const packed = pluginPack({ inputDir: source, keyPath: keys.privateKeyPath, outFile: packageFile });
+
+    const registryDir = join(ws, "registry");
+    const registryInit = initPluginRegistry({ dir: registryDir, registryId: "local", registryName: "Local Registry" });
+    publishPluginToRegistry({
+      dir: registryDir,
+      pluginFile: packageFile,
+      registryKeyPath: join(registryDir, "registry.key")
+    });
+    savePluginRegistriesConfig(ws, {
+      pluginRegistries: {
+        version: 1,
+        registries: [
+          {
+            id: "local",
+            type: "file",
+            base: registryDir,
+            pinnedRegistryPubkeyFingerprint: registryInit.fingerprint,
+            allowPluginPublishers: [packed.manifest.signing.pubkeyFingerprint],
+            allowRiskCategories: ["LOW", "MEDIUM", "HIGH", "CRITICAL"],
+            autoUpdate: false
+          }
+        ]
+      }
+    });
+
+    const requested = await requestPluginInstall({
+      workspace: ws,
+      agentId: "default",
+      registryId: "local",
+      pluginRef: "amc.plugin.fixture.pending-tamper@1.0.0",
+      action: "install"
+    });
+
+    decideApprovalForIntent({
+      workspace: ws,
+      agentId: "default",
+      approvalId: requested.approvalRequestId,
+      decision: "APPROVED",
+      mode: "EXECUTE",
+      reason: "owner approval",
+      userId: "owner-1",
+      username: "owner-1",
+      userRoles: ["OWNER"]
+    });
+    decideApprovalForIntent({
+      workspace: ws,
+      agentId: "default",
+      approvalId: requested.approvalRequestId,
+      decision: "APPROVED",
+      mode: "EXECUTE",
+      reason: "auditor approval",
+      userId: "auditor-1",
+      username: "auditor-1",
+      userRoles: ["AUDITOR"]
+    });
+
+    const pendingPath = pendingActionPath(ws, requested.approvalRequestId);
+    const pending = JSON.parse(readUtf8(pendingPath)) as Record<string, unknown>;
+    pending.publisherFingerprint = "a".repeat(64);
+    pending.riskCategory = "LOW";
+    writeFileSync(pendingPath, JSON.stringify(pending, null, 2));
+
+    expect(() =>
+      executePluginRequest({
+        workspace: ws,
+        approvalRequestId: requested.approvalRequestId
+      })
+    ).toThrow(/publisher fingerprint mismatch|risk category mismatch/i);
   });
 
   test("override denied by default and allowed with signed overrides", () => {

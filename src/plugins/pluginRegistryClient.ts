@@ -1,7 +1,7 @@
 import { createPublicKey, verify } from "node:crypto";
 import { mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { dirname, join, resolve } from "node:path";
+import { dirname, join, posix, resolve } from "node:path";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
@@ -21,6 +21,18 @@ function isHttp(base: string): boolean {
 function joinUrl(base: string, rel: string): string {
   const normalized = rel.replace(/^\/+/, "");
   return `${base.replace(/\/+$/, "")}/${normalized}`;
+}
+
+function assertSafeRegistryRelativePath(relPath: string): string {
+  const normalized = relPath.replace(/\\/g, "/").trim();
+  if (!normalized || normalized.startsWith("/") || normalized.includes("://")) {
+    throw new Error(`registry entry url must be a relative path: ${relPath}`);
+  }
+  const clean = posix.normalize(normalized);
+  if (clean === "." || clean.startsWith("../") || clean.includes("/../") || clean.endsWith("/..")) {
+    throw new Error(`registry entry url escapes registry root: ${relPath}`);
+  }
+  return clean;
 }
 
 function compareVersions(a: string, b: string): number {
@@ -165,6 +177,7 @@ export async function resolveRegistryPackage(params: {
     throw new Error("registry fingerprint mismatch with pinned fingerprint");
   }
   const selected = selectVersion(index, pluginId, requestedVersion);
+  const packageUrl = assertSafeRegistryRelativePath(selected.url);
   if (params.allowPluginPublishers && params.allowPluginPublishers.length > 0) {
     if (!params.allowPluginPublishers.includes(selected.publisherFingerprint)) {
       throw new Error(`plugin publisher not allowlisted: ${selected.publisherFingerprint}`);
@@ -175,7 +188,7 @@ export async function resolveRegistryPackage(params: {
       throw new Error(`plugin risk category not allowed: ${selected.riskCategory}`);
     }
   }
-  const bytes = await readBytesFromRegistry(base, selected.url);
+  const bytes = await readBytesFromRegistry(base, packageUrl);
   const digest = sha256Hex(bytes);
   if (digest !== selected.sha256) {
     throw new Error("plugin package sha256 mismatch with registry index");
@@ -184,11 +197,17 @@ export async function resolveRegistryPackage(params: {
   const packagePath = join(temp, "plugin.amcplug");
   writeFileAtomic(packagePath, bytes, 0o644);
   const verifyResult = verifyPluginPackage({ file: packagePath });
-  if (!verifyResult.ok || !verifyResult.manifest) {
+  if (!verifyResult.ok || !verifyResult.manifest || !verifyResult.publisherFingerprint) {
     throw new Error(`plugin verification failed: ${verifyResult.errors.join("; ")}`);
   }
   if (verifyResult.manifest.plugin.id !== pluginId || verifyResult.manifest.plugin.version !== selected.version) {
     throw new Error("plugin manifest id/version mismatch with registry entry");
+  }
+  if (verifyResult.publisherFingerprint !== selected.publisherFingerprint) {
+    throw new Error("plugin publisher fingerprint mismatch with registry entry");
+  }
+  if (verifyResult.manifest.plugin.risk.category !== selected.riskCategory) {
+    throw new Error("plugin risk category mismatch with registry entry");
   }
   return {
     registryId: index.registry.id,
