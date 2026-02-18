@@ -66,6 +66,7 @@ Go-live references:
 - [`docs/AMC_MASTER_REFERENCE.md`](docs/AMC_MASTER_REFERENCE.md)
 - [`docs/SYSTEM_CAPABILITIES.md`](docs/SYSTEM_CAPABILITIES.md)
 - [`docs/LAUNCH.md`](docs/LAUNCH.md)
+- [`docs/GO_TO_MARKET_PACK.md`](docs/GO_TO_MARKET_PACK.md)
 - [`docs/OPERATIONS.md`](docs/OPERATIONS.md)
 - [`docs/ARCHITECTURE_MAP.md`](docs/ARCHITECTURE_MAP.md)
 - [`docs/MECHANIC_MODE.md`](docs/MECHANIC_MODE.md)
