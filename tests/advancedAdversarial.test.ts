@@ -16,9 +16,9 @@ const defaultContext: AssurancePromptContext = {
 // Pack registry
 // ---------------------------------------------------------------------------
 describe("advanced adversarial packs registration", () => {
-  test("all 14 packs are registered", () => {
+  test("all 19 packs are registered", () => {
     const packs = listAssurancePacks();
-    expect(packs.length).toBe(14);
+    expect(packs.length).toBe(19);
   });
 
   test("new packs are retrievable by ID", () => {

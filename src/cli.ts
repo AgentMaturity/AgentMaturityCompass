@@ -10802,6 +10802,216 @@ program
     }
   });
 
+// ── Claim Expiry & Staleness CLI ────────────────────────────────────────
+program
+  .command("claims-stale")
+  .description("List stale claims for an agent")
+  .option("--agent <agentId>", "agent ID (overrides global --agent)")
+  .action((opts: { agent?: string }) => {
+    const { findStaleClaims, renderStaleClaimsMarkdown } = require("./claims/claimExpiry.js") as typeof import("./claims/claimExpiry.js");
+    const ledger = openLedger(process.cwd());
+    const db = (ledger as any).db as import("better-sqlite3").Database;
+    const agentId = opts.agent ?? activeAgent(program) ?? "default";
+    const stale = findStaleClaims(db, agentId);
+    ledger.close();
+    console.log(renderStaleClaimsMarkdown(stale, agentId));
+  });
+
+program
+  .command("claims-sweep")
+  .description("Process all stale claims for an agent (auto-demote to PROVISIONAL)")
+  .option("--agent <agentId>", "agent ID (overrides global --agent)")
+  .action((opts: { agent?: string }) => {
+    const { sweepStaleClaims, renderSweepResultMarkdown } = require("./claims/claimExpiry.js") as typeof import("./claims/claimExpiry.js");
+    const ledger = openLedger(process.cwd());
+    const db = (ledger as any).db as import("better-sqlite3").Database;
+    const agentId = opts.agent ?? activeAgent(program) ?? "default";
+    const result = sweepStaleClaims(db, agentId, process.cwd());
+    ledger.close();
+    console.log(renderSweepResultMarkdown(result, agentId));
+  });
+
+// ── Confidence Drift CLI ────────────────────────────────────────────────
+program
+  .command("confidence-drift")
+  .description("Track confidence drift per question across diagnostic runs")
+  .option("--agent <agentId>", "agent ID (overrides global --agent)")
+  .option("--window <window>", "time window (e.g., 30d)", "30d")
+  .action((opts: { agent?: string; window: string }) => {
+    const { analyzeAgentConfidenceDrift, renderConfidenceDriftMarkdown } = require("./claims/confidenceDrift.js") as typeof import("./claims/confidenceDrift.js");
+    const ledger = openLedger(process.cwd());
+    const db = (ledger as any).db as import("better-sqlite3").Database;
+    const agentId = opts.agent ?? activeAgent(program) ?? "default";
+    const windowMs = parseWindowToMs(opts.window);
+    const report = analyzeAgentConfidenceDrift(db, agentId, windowMs);
+    ledger.close();
+    console.log(renderConfidenceDriftMarkdown(report));
+  });
+
+// ── Lessons Learned CLI ─────────────────────────────────────────────────
+program
+  .command("lessons-list")
+  .description("List lessons learned from corrections")
+  .option("--scope <scope>", "fleet or agent", "fleet")
+  .option("--agent <agentId>", "agent ID (for scope=agent)")
+  .action((opts: { scope: string; agent?: string }) => {
+    const { listLessons, renderLessonsMarkdown } = require("./corrections/lessonStore.js") as typeof import("./corrections/lessonStore.js");
+    const scope = opts.scope === "agent" ? "agent" : "fleet";
+    const agentId = opts.agent ?? activeAgent(program) ?? "default";
+    const lessons = listLessons(process.cwd(), scope as any, agentId);
+    console.log(renderLessonsMarkdown(lessons, scope));
+  });
+
+program
+  .command("lessons-promote")
+  .description("Promote a correction to a reusable lesson")
+  .argument("<correctionId>", "correction ID to promote")
+  .action((correctionId: string) => {
+    const { promoteCorrection } = require("./corrections/lessonStore.js") as typeof import("./corrections/lessonStore.js");
+    const ledger = openLedger(process.cwd());
+    const db = (ledger as any).db as import("better-sqlite3").Database;
+    const result = promoteCorrection(db, correctionId, process.cwd());
+    ledger.close();
+    if (result.isNew) {
+      console.log(chalk.green(`New lesson created: ${result.lesson.lessonId}`));
+    } else {
+      console.log(chalk.green(`Merged into existing lesson: ${result.lesson.lessonId} (${result.lesson.occurrenceCount} occurrences)`));
+    }
+    console.log(`  Pattern: ${result.lesson.patternDescription}`);
+    console.log(`  Questions: ${result.lesson.affectedQuestions.join(", ")}`);
+  });
+
+// ── Receipt Chain CLI ───────────────────────────────────────────────────
+program
+  .command("receipts-chain")
+  .description("Show full delegation chain for a receipt")
+  .argument("<receiptId>", "receipt ID to trace")
+  .action((receiptId: string) => {
+    const { verifyDelegationChain, renderDelegationChainMarkdown } = require("./receipts/receiptChain.js") as typeof import("./receipts/receiptChain.js");
+    // In practice, public keys would be loaded from workspace
+    const publicKeys: string[] = [];
+    try {
+      const { getPublicKeyHistory } = require("./crypto/keys.js") as typeof import("./crypto/keys.js");
+      const keys = getPublicKeyHistory(process.cwd(), "monitor");
+      publicKeys.push(...keys);
+    } catch { /* no keys */ }
+    const result = verifyDelegationChain(receiptId, publicKeys);
+    console.log(renderDelegationChainMarkdown(result));
+  });
+
+// ── Policy Canary Mode CLI ──────────────────────────────────────────────
+program
+  .command("policy-canary-start")
+  .description("Start policy canary mode (observation-only)")
+  .option("--agent <agentId>", "agent ID (overrides global --agent)")
+  .requiredOption("--pack <packId>", "policy pack ID to canary")
+  .option("--duration <duration>", "canary duration (e.g., 7d)", "7d")
+  .action((opts: { agent?: string; pack: string; duration: string }) => {
+    const { startCanaryMode } = require("./governor/policyCanaryMode.js") as typeof import("./governor/policyCanaryMode.js");
+    const agentId = opts.agent ?? activeAgent(program) ?? "default";
+    const durationMs = parseWindowToMs(opts.duration);
+    const config = startCanaryMode(agentId, opts.pack, durationMs);
+    console.log(chalk.green(`Canary mode started: ${config.canaryId}`));
+    console.log(`  Agent: ${agentId}`);
+    console.log(`  Policy pack: ${opts.pack}`);
+    console.log(`  Duration: ${opts.duration}`);
+    console.log(`  Expires: ${new Date(config.expiresTs).toISOString()}`);
+  });
+
+program
+  .command("policy-canary-report")
+  .description("Generate canary mode report for an agent")
+  .option("--agent <agentId>", "agent ID (overrides global --agent)")
+  .action((opts: { agent?: string }) => {
+    const { generateCanaryReportForAgent, renderCanaryModeReportMarkdown } = require("./governor/policyCanaryMode.js") as typeof import("./governor/policyCanaryMode.js");
+    const agentId = opts.agent ?? activeAgent(program) ?? "default";
+    const report = generateCanaryReportForAgent(agentId);
+    if (!report) {
+      console.log(chalk.yellow("No canary mode active or found for this agent."));
+      return;
+    }
+    console.log(renderCanaryModeReportMarkdown(report));
+  });
+
+// ── Policy Debt Register CLI ────────────────────────────────────────────
+program
+  .command("debt-add")
+  .description("Add a policy debt entry (waiver/override/exception)")
+  .option("--agent <agentId>", "agent ID (overrides global --agent)")
+  .requiredOption("--type <type>", "waiver|override|exception")
+  .requiredOption("--reason <reason>", "reason for the debt")
+  .option("--expiry <expiry>", "expiry (e.g., 7d or epoch ms)", "7d")
+  .option("--policies <policies>", "comma-separated affected policy IDs", "")
+  .option("--risk <risk>", "LOW|MEDIUM|HIGH|CRITICAL", "MEDIUM")
+  .option("--created-by <who>", "who created this", "operator")
+  .action((opts: { agent?: string; type: string; reason: string; expiry: string; policies: string; risk: string; createdBy: string }) => {
+    const { addDebtEntry } = require("./governor/policyDebt.js") as typeof import("./governor/policyDebt.js");
+    const agentId = opts.agent ?? activeAgent(program) ?? "default";
+    let expiryTs: number;
+    if (/^\d+$/.test(opts.expiry)) {
+      expiryTs = parseInt(opts.expiry, 10);
+    } else {
+      expiryTs = Date.now() + parseWindowToMs(opts.expiry);
+    }
+    const entry = addDebtEntry(process.cwd(), {
+      type: opts.type as any,
+      reason: opts.reason,
+      expiryTs,
+      affectedPolicies: opts.policies ? opts.policies.split(",").map((s: string) => s.trim()) : [],
+      riskAssessment: opts.risk as any,
+      agentId,
+      createdBy: opts.createdBy,
+    });
+    console.log(chalk.yellow(`Policy debt added: ${entry.debtId}`));
+    console.log(`  Type: ${entry.type} | Risk: ${entry.riskAssessment}`);
+    console.log(`  Expires: ${new Date(entry.expiryTs).toISOString()}`);
+  });
+
+program
+  .command("debt-list")
+  .description("List policy debt entries")
+  .option("--agent <agentId>", "agent ID (overrides global --agent)")
+  .action((opts: { agent?: string }) => {
+    const { buildDebtDashboard, renderDebtDashboardMarkdown } = require("./governor/policyDebt.js") as typeof import("./governor/policyDebt.js");
+    const agentId = opts.agent ?? activeAgent(program) ?? "default";
+    const dashboard = buildDebtDashboard(process.cwd(), agentId);
+    console.log(renderDebtDashboardMarkdown(dashboard));
+  });
+
+// ── Emergency Override CLI ──────────────────────────────────────────────
+program
+  .command("governor-override")
+  .description("Activate an emergency governance override with TTL")
+  .option("--agent <agentId>", "agent ID (overrides global --agent)")
+  .requiredOption("--reason <reason>", "reason for the emergency override (>= 10 chars)")
+  .option("--ttl <ttl>", "TTL (e.g., 4h)", "4h")
+  .option("--mode <mode>", "execute or dry-run", "dry-run")
+  .action((opts: { agent?: string; reason: string; ttl: string; mode: string }) => {
+    const { activateOverride, renderOverrideMarkdown } = require("./governor/emergencyOverride.js") as typeof import("./governor/emergencyOverride.js");
+    const agentId = opts.agent ?? activeAgent(program) ?? "default";
+    const ttlMs = parseWindowToMs(opts.ttl);
+    const entry = activateOverride(process.cwd(), {
+      agentId,
+      reason: opts.reason,
+      ttlMs,
+      mode: opts.mode as any,
+    });
+    console.log(chalk.yellow(`Emergency override activated: ${entry.overrideId}`));
+    console.log(renderOverrideMarkdown(entry));
+    console.log(chalk.red("⚠  Postmortem required within 48h of override expiry."));
+  });
+
+program
+  .command("governor-override-alerts")
+  .description("Show alerts for active/expired overrides")
+  .option("--agent <agentId>", "agent ID (overrides global --agent)")
+  .action((opts: { agent?: string }) => {
+    const { getOverrideAlerts, renderOverrideAlertsMarkdown } = require("./governor/emergencyOverride.js") as typeof import("./governor/emergencyOverride.js");
+    const agentId = opts.agent ?? activeAgent(program) ?? "default";
+    const alerts = getOverrideAlerts(process.cwd(), agentId);
+    console.log(renderOverrideAlertsMarkdown(alerts));
+  });
+
 program.action(() => {
   program.help();
 });

@@ -5,9 +5,9 @@ import { listAssurancePacks, getAssurancePack } from "../src/assurance/packs/ind
 // New pack registration
 // ---------------------------------------------------------------------------
 describe("new adversarial packs registration", () => {
-  test("pack list now includes 14 packs", () => {
+  test("pack list now includes 19 packs", () => {
     const packs = listAssurancePacks();
-    expect(packs.length).toBe(14);
+    expect(packs.length).toBe(19);
   });
 
   test("role-specific support fraud pack is registered", () => {
@@ -28,7 +28,7 @@ describe("new adversarial packs registration", () => {
     expect(pack.scenarios.length).toBe(10);
   });
 
-  test("total scenarios across all 14 packs >= 138", () => {
+  test("total scenarios across all 19 packs >= 138", () => {
     const total = listAssurancePacks().reduce((sum, p) => sum + p.scenarios.length, 0);
     expect(total).toBeGreaterThanOrEqual(138);
   });
