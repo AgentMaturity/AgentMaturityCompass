@@ -16,8 +16,8 @@
 │   │  Turn your AI agents    │  │   Needle drifting →   │    │
 │   │  into an auditable,     │  │   → settling to       │    │
 │   │  scalable system —      │  │   true north          │    │
-│   │  not a science          │  └──────────────────────┘    │
-│   │  experiment.            │                               │
+│   │  not a science          │  │                       │    │
+│   │  experiment.            │  └──────────────────────┘    │
 │   │                         │                               │
 │   │  [subhead text]         │                               │
 │   │                         │                               │
@@ -25,7 +25,8 @@
 │   │  [See sample →]         │                               │
 │   └─────────────────────────┘                               │
 │                                                             │
-│  Built for teams deploying agents where failures are expensive  │
+│  ─────────────────────────────────────────────────────────  │
+│  Built for teams where agent failures are expensive         │
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -74,8 +75,8 @@
 │   [1] ──────────────── [2] ──────────────── [3]            │
 │   ASSESS            SCORE              ROADMAP              │
 │   Map your          Evidence-backed    30/60/90             │
-│   agent system       scoring across     day plan +           │
-│   + workflows        7 dimensions       exec deck            │
+│   agent system      scoring across     day plan +           │
+│   + workflows       7 dimensions       exec deck            │
 │                                                             │
 └─────────────────────────────────────────────────────────────┘
 ```
@@ -100,18 +101,100 @@
 ```
 
 ### [SECTION 6: WHO IT'S FOR / NOT FOR]
+```
+┌─────────────────────────────────────────────────────────────┐
+│                                                             │
+│  ┌──────────────────────────┐ ┌──────────────────────────┐ │
+│  │       WHO IT'S FOR       │ │     WHO IT'S NOT FOR     │ │
+│  │                          │ │                          │ │
+│  │ ✓ Production agent teams │ │ ✗ "Just experimenting"   │ │
+│  │ ✓ Governance-needs orgs  │ │ ✗ Guaranteed ROI seekers │ │
+│  │ ✓ CTOs needing clarity   │ │ ✗ Context-unwilling orgs │ │
+│  │ ✓ Compliance-pressured   │ │ ✗ One-size-fits-all      │ │
+│  └──────────────────────────┘ └──────────────────────────┘ │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
 ### [SECTION 7: FAQ]
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    FREQUENTLY ASKED                         │
+│                                                             │
+│  ▼ Does this replace our internal team?                     │
+│    [accordion content]                                      │
+│                                                             │
+│  ▼ Do you guarantee results?                                │
+│    [accordion content]                                      │
+│                                                             │
+│  ▼ What do you need from us?                                │
+│    [accordion content]                                      │
+│                                                             │
+│  ▼ How is AMC different from a consultant?                  │
+│    [accordion content]                                      │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
 ### [SECTION 8: FINAL CTA]
+```
+┌─────────────────────────────────────────────────────────────┐
+│                                                             │
+│     Get a clear maturity baseline in 5 business days.       │
+│                                                             │
+│     Book a call → confirm fit → start the Sprint.           │
+│     If we're not a fit, we'll tell you in 15 minutes.       │
+│                                                             │
+│          [BOOK A DISCOVERY CALL]                            │
+│          [Request a Sample Scorecard →]                     │
+│                                                             │
+│  ─────────────────────────────────────────────────────────  │
+│  AMC — Agent Maturity Compass                               │
+│  Measure what matters. Scale what's safe.                   │
+└─────────────────────────────────────────────────────────────┘
+```
 
 ---
 
 ## MOBILE LAYOUT (375px)
+
 - Single column throughout
 - Sticky CTA bar (bottom) on mobile: "Book a Call"
-- Problem cards: 2x2 grid, no crowded UI
+- Compress 4-card problem section to 2x2 grid
 - Score bars stack vertically
 - Nav: hamburger menu, slides in from right
-- CTA always visible once viewport is short
+
+### Mobile Hero
+```
+┌────────────────────────┐
+│ [☰]    AMC     [CTA]   │
+├────────────────────────┤
+│                        │
+│  [COMPASS ANIMATION]   │
+│  (centered, smaller)   │
+│                        │
+│  Turn your AI agents   │
+│  into an auditable,    │
+│  scalable system.      │
+│                        │
+│  [GET COMPASS SPRINT]  │
+│  [See sample →]        │
+│                        │
+└────────────────────────┘
+```
+
+### Mobile Problem (2x2 grid)
+```
+┌────────────────────────┐
+│ ┌──────────┬─────────┐ │
+│ │ Shallow  │ Silent  │ │
+│ │  evals   │  drift  │ │
+│ ├──────────┼─────────┤ │
+│ │  Cost    │Unclear  │ │
+│ │  creep   │  gov    │ │
+│ └──────────┴─────────┘ │
+└────────────────────────┘
+```
 
 ---
 
@@ -123,3 +206,5 @@
 | Nav links | White 60% | White 100% + gold underline | Gold |
 | Dimension cards | Navy bg | translateY(-2px) + border glow | pressed |
 | Sample preview | Blurred | "Request full sample" overlay | - |
+| FAQ accordion | Closed | Cursor pointer | Expanded |
+| Score bars | 0% fill | — | Animate fill on enter viewport |
