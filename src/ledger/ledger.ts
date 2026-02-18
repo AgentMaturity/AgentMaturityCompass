@@ -97,6 +97,25 @@ interface Migration {
   sql: string;
 }
 
+function hasTable(db: Database.Database, tableName: string): boolean {
+  const row = db
+    .prepare("SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = ? LIMIT 1")
+    .get(tableName) as { 1: number } | undefined;
+  return row !== undefined;
+}
+
+function tableColumns(db: Database.Database, tableName: string): Set<string> {
+  if (!hasTable(db, tableName)) {
+    return new Set();
+  }
+  const rows = db.prepare(`PRAGMA table_info(${tableName})`).all() as Array<{ name: string }>;
+  return new Set(rows.map((row) => row.name));
+}
+
+function markMigrationAppliedIfMissing(db: Database.Database, version: number): void {
+  db.prepare("INSERT OR IGNORE INTO schema_migrations(version, applied_ts) VALUES (?, ?)").run(version, Date.now());
+}
+
 const migrations: Migration[] = [
   {
     version: 1,
@@ -394,6 +413,31 @@ const migrations: Migration[] = [
   }
 ];
 
+function reconcileLegacyMigrationState(db: Database.Database): void {
+  if (!hasTable(db, "schema_migrations")) {
+    return;
+  }
+
+  // Migration 5 used ALTER TABLE statements. Older/partially migrated installs can
+  // already contain these columns while missing schema_migrations row 5. Mark it
+  // applied to keep startup idempotent and avoid "duplicate column name" failures.
+  const evidenceColumns = tableColumns(db, "evidence_events");
+  const migration5Columns = [
+    "canonical_payload_path",
+    "canonical_payload_inline",
+    "blob_ref",
+    "archived",
+    "archive_segment_id",
+    "archive_manifest_sha256",
+    "payload_pruned",
+    "payload_pruned_ts"
+  ];
+  const migration5AlreadyApplied = migration5Columns.every((column) => evidenceColumns.has(column));
+  if (migration5AlreadyApplied) {
+    markMigrationAppliedIfMissing(db, 5);
+  }
+}
+
 function runMigrations(db: Database.Database): void {
   db.exec(`
     CREATE TABLE IF NOT EXISTS schema_migrations (
@@ -402,15 +446,16 @@ function runMigrations(db: Database.Database): void {
     );
   `);
 
-  const appliedRows = db.prepare("SELECT version FROM schema_migrations").all() as Array<{ version: number }>;
-  const appliedVersions = new Set(appliedRows.map((row) => row.version));
+  reconcileLegacyMigrationState(db);
 
   for (const migration of migrations) {
-    if (appliedVersions.has(migration.version)) {
-      continue;
-    }
-
     const tx = db.transaction(() => {
+      const alreadyApplied = db
+        .prepare("SELECT 1 FROM schema_migrations WHERE version = ? LIMIT 1")
+        .get(migration.version) as { 1: number } | undefined;
+      if (alreadyApplied) {
+        return;
+      }
       try {
         db.exec(migration.sql);
       } catch (error) {
@@ -476,6 +521,7 @@ export class Ledger {
     this.db = new Database(ledgerPath(workspace));
     this.db.pragma("journal_mode = WAL");
     this.db.pragma("foreign_keys = ON");
+    this.db.pragma("busy_timeout = 5000");
     runMigrations(this.db);
   }
 
