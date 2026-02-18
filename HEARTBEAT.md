@@ -1,7 +1,12 @@
-# HEARTBEAT.md
+# HEARTBEAT.md — AMC Command Pulse
 
-# Check trading bot status
-- Check if crypto bot is running: `ps aux | grep bot.py`
-- Check latest trades: `tail -20 /Users/sid/crypto-bot/data/bot.log`
-- If bot crashed, restart it: `bash /Users/sid/crypto-bot/start.sh`
-- Report any trades or issues to Sid
+## On every heartbeat:
+- Check crypto bot: `ps aux | grep bot.py` + `tail -5 ~/crypto-bot/data/bot.log`
+- Review AMC_OS/HQ/SCOREBOARD.md — pipeline vs target
+- Review AMC_OS/HQ/DAILY_STANDUP.md — blockers
+- If pipeline stale (no new leads/calls today): spawn REV_SDR_SMB + REV_HEAD_OF_SALES
+- If delivery behind: spawn REV_IMPLEMENTATION_SPECIALIST + REV_QA_LEAD
+- If insights stale (>24h): spawn INNO_FORUM_LISTENER_HN + INNO_PAINPOINT_SYNTHESIZER
+- If score/product issue: add to AMC_OS/HQ/BLOCKERS.md
+- Agents must use SPIN + StoryBrand + JTBD + Da Vinci QA (see ROLEBOOKS)
+- If nothing urgent: reply HEARTBEAT_OK

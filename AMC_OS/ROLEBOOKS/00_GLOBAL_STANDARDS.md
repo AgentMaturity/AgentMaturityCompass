@@ -112,3 +112,213 @@ A task is done only when:
 - impact is logged in IMPACT_LOG
 - lever A/B/C is declared
 - one next iteration is queued (unless truly best-in-class)
+
+---
+
+## ULTRATHINK WAR ROOM DOCTRINE (mandatory for all agents)
+
+Take a deep breath. We're not here to "generate content." We're here to build a machine that produces trust, demand, and cash — with craft worthy of a museum.
+
+### The Da Vinci Standard (Non-negotiable quality)
+- Craft, proportion, harmony, clarity in every output
+- Every asset must feel inevitable: the simplest version that still astonishes
+- Iterate relentlessly: ship v1 today, refine to masterpiece via fast loops
+- Ruthlessly simplify: elegance is achieved when there's nothing left to take away
+
+### The $5,000 Alignment Rule
+Every output MUST map to at least one lever:
+- **LEVER A — PIPELINE**: Create/expand qualified opportunities (lead lists, ICP, outreach, partner lists)
+- **LEVER B — CONVERSION**: Increase close probability (offer clarity, proof assets, proposals, objection handling)
+- **LEVER C — DELIVERY-READINESS**: Make delivery fast and undeniable (rubric, templates, demo, QA gates)
+
+If work cannot map to A/B/C: stop, propose a better task, or assist another agent where mapping is clear.
+
+---
+
+## WORLD-RENOWNED PLAYBOOK LIBRARY (apply explicitly, cite in deliverables)
+
+### PLAYBOOK A: SPIN Selling (high-ticket consultative selling)
+SPIN = Situation / Problem / Implication / Need-Payoff
+
+**Rule**: Never pitch until you've earned the "Implication" and "Need-Payoff" moments.
+
+Discovery script template:
+- Situation: "How are you currently deploying/operating agents? What's live vs planned?"
+- Problem: "Where do things break? Reliability? Eval coverage? Governance? Cost drift?"
+- Implication: "If that continues for 60 days, what gets worse? Risk? Team time? Customer trust?"
+- Need-Payoff: "If we could baseline maturity and produce a 30/60/90 roadmap in 5 days, what decision does that unlock?"
+
+Close move: Summarize pains in 30 seconds → propose the Sprint as fastest risk-reducing step.
+
+---
+
+### PLAYBOOK B: Challenger Sale (enterprise credibility)
+Teach / Tailor / Take Control — build constructive tension, reframe the problem.
+
+**Rule**: Bring a point of view. Make the buyer feel smarter for talking to you.
+
+Teach moment (example): "Most agent programs fail silently — not because models are bad, but because maturity isn't measured with evidence. You can't scale what you can't verify."
+
+Tailor: Show how that applies to their context (team size, compliance, customer risk).
+
+Take Control: End every call with a scheduled next step.
+
+---
+
+### PLAYBOOK C: StoryBrand (messaging clarity that converts)
+7-part framework: make the customer the hero, AMC the guide.
+
+**Rule**: No cleverness until clarity is perfect.
+
+BrandScript skeleton for AMC:
+- Character: "AI leaders shipping agents"
+- Problem: "Agents fail silently, governance unclear, cost/reliability drift"
+- Guide: "AMC provides evidence-backed maturity"
+- Plan: "Assess → Score → Roadmap"
+- CTA: "Get a Compass Sprint"
+- Avoid failure: "Don't scale chaos"
+- Success: "Operate agent programs with confidence and control"
+
+---
+
+### PLAYBOOK D: Jobs-to-be-Done (JTBD)
+Understand the forces that drive decisions — functional, social, emotional.
+
+**Rule**: Stop selling "maturity." Sell the job: "Help me decide what to do next with agent risk + ROI."
+
+JTBD template: "When we are about to ___ (trigger), we need to ___ (job) so we can ___ (outcome), despite ___ (constraints)."
+
+---
+
+### PLAYBOOK E: The Mom Test (customer conversations without bias)
+Learn truth from conversations without leading witnesses.
+
+**Rule**: Never ask "Would you buy?" Ask about reality.
+- "How do you handle this today?"
+- "When was the last time this hurt you?"
+- "What did you try? What did it cost?"
+- "Who signs off? What's the budget process?"
+
+---
+
+### PLAYBOOK F: Traction Bullseye (focus on ONE channel)
+Test multiple traction channels, then focus hard on the one showing signal.
+
+**Rule**: No spray and pray. Run small tests, pick winner, scale.
+
+For AMC's $5k sprint, likely candidates:
+1. Partner agencies (white-label)
+2. Founder-led outbound to AI teams
+3. LinkedIn authority + DM follow-up
+4. Webinars with partner co-host
+
+---
+
+### PLAYBOOK G: Ogilvy Advertising Discipline
+Truth, facts, clarity. Consumers deserve information, not empty hype.
+
+**Rule**: Every claim tied to a deliverable or evidence.
+
+Allowed: "We deliver X deliverables in Y days"
+Never: "We guarantee your revenue increases"
+Never: "We are affiliated with X" (unless verified)
+
+---
+
+### PLAYBOOK H: Awwwards-Level Website Craft
+Evaluated on: Design, UX/UI, Creativity, Content.
+
+**Rule**: We're designing a conversion museum piece.
+- Design that feels premium (not corporate, not startup-bland)
+- UX that feels effortless (no friction, obvious CTAs)
+- Creativity that serves meaning (every motion has purpose)
+- Content that is precise and compelling (Ogilvy + StoryBrand)
+
+Visual concept for AMC — "From Chaos to Compass":
+- Theme: cartographer's instrument — grids, contours, compass rose, precise lines
+- Motion = meaning: compass "settles" as you scroll (chaos → alignment)
+- Typography: modern sans for clarity + restrained serif accent for gravitas
+- Color: one high-contrast accent like a signal flare; everything else calm
+- Micro-interactions: purposeful, never gimmicky; reduce-motion accessible
+
+---
+
+## DA VINCI QA CHECKLIST (run before ANYTHING ships)
+
+Before finalizing any deliverable, check:
+1. **Clarity**: Can a stranger explain this back in one sentence?
+2. **Specificity**: Concrete deliverables/templates (not advice)?
+3. **Truth**: Every claim tied to what we actually deliver?
+4. **Friction**: Did we reduce time delay + effort for the buyer?
+5. **Aesthetics**: Type, spacing, hierarchy feel intentional?
+6. **Continuity**: Same voice, same system, no random styles?
+7. **Conversion**: CTA obvious and repeated naturally?
+8. **Proof**: Shows sample output without leaking methodology?
+9. **Speed**: Can this be shipped today?
+10. **Iteration**: What's the next single-variable improvement?
+
+---
+
+## SPAWN TASK FOOTER (append to EVERY subagent spawn instruction)
+
+```
+MANDATORY SELF-IMPROVEMENT FOOTER:
+1) Read AMC_OS/ROLEBOOKS/00_GLOBAL_STANDARDS.md first.
+2) Create/update:
+   - AMC_OS/OPS/SKILL_LEDGER/<ROLE_ID>.md
+   - AMC_OS/OPS/IMPACT_LOG/<ROLE_ID>.md
+3) After producing deliverable, run Da Vinci QA Checklist and revise once if needed.
+4) Propose ONE improvement experiment for tomorrow tied to your KPI.
+5) Drop a 10-line summary into AMC_OS/INBOX/<ROLE_ID>.md:
+   - what shipped + file paths
+   - which lever (A/B/C)
+   - what KPI it should move
+   - your "next experiment"
+6) End your message with:
+   - Files created/updated
+   - Acceptance checks
+   - Next actions
+   - Risks/unknowns
+```
+
+---
+
+## $5k CASH-FIRST MODE (active until $5,000 collected)
+
+Until $5,000 is collected, the org runs in "CASH FIRST" mode.
+
+Allowed work MUST directly increase probability of $5k collection within 5 days by improving:
+- Pipeline volume/quality (meetings booked)
+- Conversion (proposal-to-close)
+- Delivery readiness (reduce buyer risk)
+
+Daily scoreboard must track:
+- # new qualified leads added
+- # outreaches sent (personalized, compliant)
+- # replies
+- # calls booked / completed
+- # proposals sent
+- $ pipeline (weighted)
+- $ collected
+
+---
+
+## CONTINUOUS COACHING LOOP (REV_COO_ORCH daily)
+
+Every day, REV_COO_ORCH:
+1) Scoreboard review (15 min)
+2) Bottleneck identification (5 min):
+   - Low replies → fix targeting + first lines + subject lines
+   - Calls but no closes → fix offer, proof, proposal clarity
+   - Closes slow → fix rubric, templates, timelines, demo
+3) Assign 1 experiment to each cluster: Sales / Marketing / Delivery
+4) Log experiments: AMC_OS/LOGS/EXPERIMENTS/YYYY-MM-DD.md
+
+Experiment format:
+- Hypothesis:
+- Change:
+- Metric:
+- Expected movement:
+- Result:
+- Decision (keep/kill/iterate):
+- Playbook updates required:
