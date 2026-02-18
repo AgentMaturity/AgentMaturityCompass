@@ -459,6 +459,11 @@ import {
 import { bootstrapHostFromEnv } from "./workspaces/hostBootstrap.js";
 import { canonInitCli, canonPrintCli, canonVerifyCli } from "./canon/canonCli.js";
 import { cgxBuildCli, cgxInitCli, cgxShowCli, cgxVerifyCli } from "./cgx/cgxCli.js";
+import { simulateImpact, renderSimulationMarkdown } from "./cgx/cgxSimulator.js";
+import { loadAndDiffSnapshots, renderGraphDiffMarkdown } from "./cgx/cgxDiff.js";
+import { loadLatestCgxGraph } from "./cgx/cgxStore.js";
+import { saveL5DeltaReport } from "./diagnostic/l5DeltaReport.js";
+import { classifyControls, renderControlClassificationMarkdown } from "./diagnostic/controlClassification.js";
 import { diagnosticBankInitCli, diagnosticBankVerifyCli } from "./diagnostic/bank/bankCli.js";
 import { contextualizedDiagnosticRenderCli } from "./diagnostic/contextualizer/contextualizerCli.js";
 import { truthguardValidateCli } from "./truthguard/truthguardCli.js";
@@ -2833,6 +2838,100 @@ cgx
     console.log(JSON.stringify(out, null, 2));
   });
 
+cgx
+  .command("simulate")
+  .description("Simulate impact propagation when a node changes")
+  .requiredOption("--change <nodeId>", "node ID to simulate change on")
+  .option("--scope <scope>", "workspace|agent", "workspace")
+  .option("--id <id>", "agent id when scope=agent")
+  .option("--max-depth <n>", "max propagation depth", "6")
+  .option("--json", "emit JSON output", false)
+  .action((opts: { change: string; scope: string; id?: string; maxDepth: string; json: boolean }) => {
+    const scope = opts.scope.toLowerCase() === "agent"
+      ? { type: "agent" as const, id: opts.id ?? "default" }
+      : { type: "workspace" as const, id: "workspace" };
+    const graph = loadLatestCgxGraph(process.cwd(), scope);
+    if (!graph) {
+      console.log(chalk.yellow("No CGX graph found. Run `amc cgx build` first."));
+      process.exit(1);
+      return;
+    }
+    const result = simulateImpact(graph, opts.change, {
+      maxDepth: Number(opts.maxDepth) || 6,
+    });
+    if (opts.json) {
+      console.log(JSON.stringify(result, null, 2));
+    } else {
+      console.log(renderSimulationMarkdown(result));
+    }
+  });
+
+cgx
+  .command("diff")
+  .description("Diff two CGX graph snapshots")
+  .requiredOption("--run-a <id>", "first snapshot ID or timestamp")
+  .requiredOption("--run-b <id>", "second snapshot ID or timestamp")
+  .option("--scope <scope>", "workspace|agent", "workspace")
+  .option("--id <id>", "agent id when scope=agent")
+  .option("--json", "emit JSON output", false)
+  .action((opts: { runA: string; runB: string; scope: string; id?: string; json: boolean }) => {
+    const scopeType = opts.scope.toLowerCase() === "agent" ? "agent" as const : "workspace" as const;
+    const scopeId = scopeType === "agent" ? (opts.id ?? "default") : "workspace";
+    const diff = loadAndDiffSnapshots({
+      workspace: process.cwd(),
+      scopeType,
+      scopeId,
+      runA: opts.runA,
+      runB: opts.runB,
+    });
+    if (opts.json) {
+      console.log(JSON.stringify(diff, null, 2));
+    } else {
+      console.log(renderGraphDiffMarkdown(diff));
+    }
+  });
+
+program
+  .command("delta-to-l5")
+  .description("Generate L4→L5 delta report showing what separates current state from L5")
+  .requiredOption("--agent <id>", "agent ID")
+  .option("--out <path>", "output file path", ".amc/reports/l5-delta.md")
+  .option("--format <format>", "json|markdown|both", "both")
+  .option("--json", "emit JSON to stdout", false)
+  .action((opts: { agent: string; out: string; format: string; json: boolean }) => {
+    if (opts.json) {
+      const { generateL5DeltaReport } = require("./diagnostic/l5DeltaReport.js") as typeof import("./diagnostic/l5DeltaReport.js");
+      const report = generateL5DeltaReport({ workspace: process.cwd(), agentId: opts.agent });
+      console.log(JSON.stringify(report, null, 2));
+      return;
+    }
+    const format = (opts.format === "json" || opts.format === "markdown" || opts.format === "both")
+      ? opts.format : "both";
+    const result = saveL5DeltaReport({
+      workspace: process.cwd(),
+      agentId: opts.agent,
+      outPath: join(process.cwd(), opts.out),
+      format,
+    });
+    console.log(chalk.green("L5 delta report generated"));
+    for (const p of result.paths) {
+      console.log(`- ${p}`);
+    }
+  });
+
+program
+  .command("control-classification")
+  .description("Show control enforcement classification (ARCHITECTURAL/POLICY_ENFORCED/CONVENTION)")
+  .option("--json", "emit JSON output", false)
+  .action((opts: { json: boolean }) => {
+    const report = classifyControls();
+    if (opts.json) {
+      console.log(JSON.stringify(report, null, 2));
+    } else {
+      console.log(renderControlClassificationMarkdown(report));
+    }
+  });
+
 const prompt = program.command("prompt").description("Northstar prompt policy + pack operations");
 
 prompt
@@ -3249,7 +3348,7 @@ standard
     console.log(JSON.stringify(standardListCli(process.cwd()), null, 2));
   });
 
-const diagnosticBank = diagnostic.command("bank").description("Signed diagnostic 42-question bank operations");
+const diagnosticBank = diagnostic.command("bank").description("Signed diagnostic 48-question bank operations");
 
 diagnosticBank
   .command("init")
@@ -3280,7 +3379,7 @@ diagnosticBank
 
 diagnostic
   .command("render")
-  .description("Render contextualized 42-question diagnostic for an agent")
+  .description("Render contextualized 48-question diagnostic for an agent")
   .requiredOption("--agent <agentId>", "agent id")
   .option("--format <format>", "md|json", "json")
   .option("--out <file>", "output file")

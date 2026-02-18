@@ -2,8 +2,8 @@ import { describe, expect, test } from "vitest";
 import { questionBank } from "../src/diagnostic/questionBank.js";
 
 describe("question bank", () => {
-  test("has exactly 42 questions", () => {
-    expect(questionBank).toHaveLength(42);
+  test("has exactly 48 questions", () => {
+    expect(questionBank).toHaveLength(48);
   });
 
   test("has expected layer distribution 9/5/16/7/5", () => {
@@ -15,7 +15,7 @@ describe("question bank", () => {
       L5: questionBank.filter((q) => q.id.startsWith("AMC-5.")).length
     };
 
-    expect(counts).toEqual({ L1: 9, L2: 5, L3: 16, L4: 7, L5: 5 });
+    expect(counts).toEqual({ L1: 11, L2: 5, L3: 16, L4: 9, L5: 7 });
   });
 
   test("each question has six options levels 0..5 and six gates", () => {

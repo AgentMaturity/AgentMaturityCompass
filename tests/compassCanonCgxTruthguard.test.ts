@@ -115,11 +115,11 @@ describe("compass canon + cgx + truthguard", () => {
     }
   });
 
-  test("bank completeness has 5 dimensions and 42 fully-rubriced questions", () => {
+  test("bank completeness has 5 dimensions and 48 fully-rubriced questions", () => {
     const workspace = newWorkspace();
     const bank = loadDiagnosticBank(workspace);
     expect(bank.diagnosticBank.dimensions).toHaveLength(5);
-    expect(bank.diagnosticBank.questions).toHaveLength(42);
+    expect(bank.diagnosticBank.questions).toHaveLength(48);
     for (const question of bank.diagnosticBank.questions) {
       expect(question.rubrics).toHaveLength(6);
       for (const rubric of question.rubrics) {
@@ -192,7 +192,7 @@ describe("compass canon + cgx + truthguard", () => {
         }
       }
     });
-    expect(baseline.questions).toHaveLength(42);
+    expect(baseline.questions).toHaveLength(48);
     const baselineIds = baseline.questions.map((row) => row.qId);
 
     for (const agentType of ["code-agent", "support-agent", "ops-agent", "research-agent", "sales-agent", "other"] as const) {
@@ -203,7 +203,7 @@ describe("compass canon + cgx + truthguard", () => {
           agentType
         }
       });
-      expect(rendered.questions).toHaveLength(42);
+      expect(rendered.questions).toHaveLength(48);
       expect(rendered.questions.map((row) => row.qId)).toEqual(baselineIds);
     }
     const support = renderContextualizedDiagnostic({
@@ -253,7 +253,7 @@ describe("compass canon + cgx + truthguard", () => {
       const parsed = JSON.parse(res.body) as {
         measuredScores?: Record<string, number>;
       };
-      expect(Object.keys(parsed.measuredScores ?? {}).length).toBe(42);
+      expect(Object.keys(parsed.measuredScores ?? {}).length).toBe(48);
       const entries = tailTransparencyEntries(workspace, 20);
       expect(entries.some((row) => row.type === "DIAGNOSTIC_SELF_RUN")).toBe(true);
     } finally {

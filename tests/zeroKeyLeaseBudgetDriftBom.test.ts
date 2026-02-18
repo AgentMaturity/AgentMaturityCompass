@@ -102,7 +102,7 @@ function writeRunFixture(params: {
   correlation: number;
 }): void {
   const paths = getAgentPaths(params.workspace, "default");
-  const questionScores = Array.from({ length: 42 }, (_unused, idx) => ({
+  const questionScores = Array.from({ length: 48 }, (_unused, idx) => ({
     questionId: `Q${idx + 1}`,
     claimedLevel: 5,
     supportedMaxLevel: 5,

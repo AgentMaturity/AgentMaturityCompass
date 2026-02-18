@@ -81,7 +81,7 @@ function renderFleetMarkdown(params: {
     "## Model Usage",
     modelLines || "- none",
     "",
-    "## Cross-Agent Heatmap (42 Questions)",
+    "## Cross-Agent Heatmap (48 Questions)",
     heatmapHeader,
     heatmapRows,
     "",

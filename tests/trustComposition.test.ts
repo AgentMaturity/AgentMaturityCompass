@@ -49,7 +49,7 @@ function setupFleetWithAgents(workspace: string, agentIds: string[]): void {
 }
 
 function makeMockReport(agentId: string, integrityIndex: number, overallAvg: number): DiagnosticReport {
-  const questionScores = Array.from({ length: 42 }, (_, i) => ({
+  const questionScores = Array.from({ length: 48 }, (_, i) => ({
     questionId: `AMC-${Math.floor(i / 10 + 1)}.${(i % 10) + 1}`,
     claimedLevel: Math.round(overallAvg),
     supportedMaxLevel: Math.round(overallAvg),

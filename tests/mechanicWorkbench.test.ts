@@ -159,7 +159,7 @@ describe("mechanic workbench", () => {
     }
   });
 
-  test("profile application sets exactly 42 targets and writes transparency event", () => {
+  test("profile application sets exactly 48 targets and writes transparency event", () => {
     const workspace = newWorkspace();
     const applied = mechanicProfileApplyForApi({
       workspace,
@@ -171,7 +171,7 @@ describe("mechanic workbench", () => {
       actor: "owner"
     });
     const targets = loadMechanicTargets(workspace);
-    expect(Object.keys(targets.mechanicTargets.targets)).toHaveLength(42);
+    expect(Object.keys(targets.mechanicTargets.targets)).toHaveLength(48);
     expect(applied.profile.id).toBe("code-agent-excellence");
     const entries = tailTransparencyEntries(workspace, 20);
     expect(entries.some((row) => row.type === "MECHANIC_PROFILE_APPLIED")).toBe(true);
