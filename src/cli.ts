@@ -15,6 +15,7 @@ import { runTuneWizard, runUpgradeWizard } from "./tuning/tuneWizard.js";
 import { loadContextGraph } from "./context/contextGraph.js";
 import { initWorkspace, loadAMCConfig, quickstartWizard, runDoctor } from "./workspace.js";
 import { runDoctorCli } from "./doctor/doctorCli.js";
+import { cliDiscoverabilityFooter, flattenCommandPaths, parseUnknownCommandToken, suggestCommandPaths } from "./cliUx.js";
 import {
   bindAgentRoute,
   initGatewayConfig,
@@ -375,6 +376,12 @@ import {
   experimentSetCandidateCli
 } from "./experiments/experimentCli.js";
 import {
+  experimentGateComparisonRows,
+  experimentGatePolicyPreset,
+  type ExperimentGatePreset
+} from "./experiments/experimentGatePolicy.js";
+import { experimentGateSchema } from "./experiments/experimentSchema.js";
+import {
   orgAddNodeCli,
   orgAssignCli,
   orgCommitCli,
@@ -417,6 +424,14 @@ import {
   loadTrustConfig,
   verifyTrustConfigSignature
 } from "./trust/trustConfig.js";
+import {
+  computeTemporalDecayReport,
+  decayConfigSchema,
+  deriveTemporalEvidenceFromRuns,
+  renderFreshnessMarkdown,
+  renderTemporalDecayMarkdown,
+  type TemporalDecaySourceRun
+} from "./trust/temporalDecay.js";
 import {
   adaptersConfigureCli,
   adaptersDetectCli,
@@ -889,12 +904,94 @@ function latestRunSummary(workspace: string, agentId: string): { runId: string; 
   }
 }
 
+function loadTemporalDecayRuns(workspace: string, agentId: string, lookbackDays: number, nowTs: number): TemporalDecaySourceRun[] {
+  const runsDir = join(workspace, ".amc", "agents", agentId, "runs");
+  if (!pathExists(runsDir)) {
+    return [];
+  }
+  const minTs = nowTs - Math.max(1, lookbackDays) * 24 * 60 * 60 * 1000;
+  const files = readdirSync(runsDir)
+    .filter((name) => name.endsWith(".json"))
+    .sort((a, b) => a.localeCompare(b));
+
+  const rows: TemporalDecaySourceRun[] = [];
+  for (const file of files) {
+    try {
+      const parsed = JSON.parse(readUtf8(join(runsDir, file))) as {
+        runId?: string;
+        ts?: number;
+        integrityIndex?: number;
+        evidenceTrustCoverage?: {
+          observed?: number;
+          attested?: number;
+          selfReported?: number;
+        };
+      };
+      if (!parsed.runId || typeof parsed.ts !== "number") {
+        continue;
+      }
+      if (parsed.ts < minTs) {
+        continue;
+      }
+      rows.push({
+        runId: parsed.runId,
+        ts: parsed.ts,
+        integrityIndex: typeof parsed.integrityIndex === "number" ? parsed.integrityIndex : 0,
+        evidenceTrustCoverage: parsed.evidenceTrustCoverage
+      });
+    } catch {
+      continue;
+    }
+  }
+  return rows;
+}
+
 const program = new Command();
 program
   .name("amc")
   .description("Agent Maturity Compass")
-  .version("1.0.0");
+  .version("1.0.0")
+  .showSuggestionAfterError(true)
+  .showHelpAfterError("\nTip: add '--help' after any command to see available options.")
+  .addHelpText("afterAll", cliDiscoverabilityFooter());
 program.option("--agent <agentId>", "agent ID (defaults to .amc/current-agent)");
+program
+  .command("help [commandPath...]")
+  .description("Show help for a command (for example: amc help run)")
+  .action((commandPath?: string[]) => {
+    if (!commandPath || commandPath.length === 0) {
+      program.outputHelp();
+      return;
+    }
+    const query = commandPath.join(" ").trim();
+    const target = flattenCommandPaths(program).find((path) => path === query);
+    if (!target) {
+      const suggestions = suggestCommandPaths(query, flattenCommandPaths(program), 5);
+      console.error(chalk.red(`Unknown command path: ${query}`));
+      if (suggestions.length > 0) {
+        console.error(chalk.yellow("Did you mean:"));
+        for (const s of suggestions) {
+          console.error(`  amc ${s}`);
+        }
+      }
+      process.exitCode = 1;
+      return;
+    }
+
+    let cursor: Command | undefined = program;
+    for (const part of query.split(" ")) {
+      cursor = cursor.commands.find((child: Command) => child.name() === part);
+      if (!cursor) {
+        break;
+      }
+    }
+
+    if (!cursor) {
+      process.exitCode = 1;
+      return;
+    }
+    cursor.outputHelp();
+  });
 program.hook("preAction", (_thisCommand, actionCommand) => {
   const opts = actionCommand.optsWithGlobals<{ agent?: string }>();
   if (opts.agent && opts.agent.trim().length > 0) {
@@ -6648,21 +6745,42 @@ experiment
   .requiredOption("--policy <path>", "experiment gate policy JSON")
   .option("--agent <agentId>", "agent ID (overrides global --agent)")
   .action((opts: { experiment: string; policy: string; agent?: string }) => {
+    const policyPath = resolve(process.cwd(), opts.policy);
+    const policy = experimentGateSchema.parse(JSON.parse(readUtf8(policyPath)) as unknown);
     const out = experimentGateCli({
       workspace: process.cwd(),
       agentId: opts.agent ?? activeAgent(program),
       experimentId: opts.experiment,
-      policyPath: resolve(process.cwd(), opts.policy)
+      policyPath
     });
     if (out.pass) {
       console.log(chalk.green("Experiment gate PASSED"));
-      return;
+    } else {
+      console.log(chalk.red("Experiment gate FAILED"));
     }
-    console.log(chalk.red("Experiment gate FAILED"));
-    for (const reason of out.reasons) {
-      console.log(`- ${reason}`);
+    console.log("Threshold checks:");
+    for (const row of experimentGateComparisonRows(out.report, policy)) {
+      console.log(row);
     }
-    process.exit(1);
+    if (!out.pass) {
+      for (const reason of out.reasons) {
+        console.log(`- ${reason}`);
+      }
+      process.exit(1);
+    }
+  });
+
+experiment
+  .command("gate-template")
+  .description("Write an experiment gate policy template")
+  .requiredOption("--out <path>", "output policy JSON")
+  .option("--preset <preset>", "strict|balanced|exploratory", "balanced")
+  .action((opts: { out: string; preset: ExperimentGatePreset }) => {
+    const policy = experimentGatePolicyPreset(opts.preset);
+    const outPath = resolve(process.cwd(), opts.out);
+    ensureDir(dirname(outPath));
+    writeFileAtomic(outPath, `${JSON.stringify(policy, null, 2)}\n`, 0o644);
+    console.log(chalk.green(`Experiment gate template written: ${outPath}`));
   });
 
 experiment
@@ -9696,31 +9814,68 @@ benchmark
 
 benchmark
   .command("list")
-  .action(() => {
+  .option("--sort <field>", "benchId|overall|integrity|created", "overall")
+  .option("--limit <n>", "max rows to print", "50")
+  .action((opts: { sort: "benchId" | "overall" | "integrity" | "created"; limit: string }) => {
     const rows = listImportedBenchmarks(process.cwd());
     if (rows.length === 0) {
       console.log("No benchmarks imported.");
       return;
     }
-    for (const row of rows) {
-      console.log(`${row.bench.benchId} | overall=${row.bench.run.overall.toFixed(3)} | trust=${row.bench.run.trustLabel}`);
+    const overallValues = rows.map((row) => row.bench.run.overall);
+    const percentile = (value: number): number => {
+      const rank = overallValues.filter((item) => item <= value).length;
+      return Number(((rank / overallValues.length) * 100).toFixed(2));
+    };
+    const sorted = rows.slice().sort((a, b) => {
+      if (opts.sort === "benchId") {
+        return a.bench.benchId.localeCompare(b.bench.benchId);
+      }
+      if (opts.sort === "integrity") {
+        return b.bench.run.integrityIndex - a.bench.run.integrityIndex || a.bench.benchId.localeCompare(b.bench.benchId);
+      }
+      if (opts.sort === "created") {
+        return b.bench.createdTs - a.bench.createdTs || a.bench.benchId.localeCompare(b.bench.benchId);
+      }
+      return b.bench.run.overall - a.bench.run.overall || a.bench.benchId.localeCompare(b.bench.benchId);
+    });
+    const limit = Math.max(1, Number.parseInt(opts.limit, 10) || 50);
+    for (const row of sorted.slice(0, limit)) {
+      console.log(
+        `${row.bench.benchId} | overall=${row.bench.run.overall.toFixed(3)} | integrity=${row.bench.run.integrityIndex.toFixed(3)} | pctl=${percentile(row.bench.run.overall).toFixed(2)} | trust=${row.bench.run.trustLabel}`
+      );
     }
   });
 
 benchmark
   .command("report")
   .requiredOption("--out <file>", "output markdown file")
-  .action((opts: { out: string }) => {
+  .option("--group-by <groupBy>", "archetype|riskTier|trustLabel", "riskTier")
+  .action((opts: { out: string; groupBy: "archetype" | "riskTier" | "trustLabel" }) => {
     const rows = listImportedBenchmarks(process.cwd());
+    const stats = benchmarkStats({
+      workspace: process.cwd(),
+      groupBy: opts.groupBy
+    });
+    const sortedByOverall = rows.slice().sort((a, b) => b.bench.run.overall - a.bench.run.overall || a.bench.benchId.localeCompare(b.bench.benchId));
     const lines = [
       "# AMC Benchmark Report",
       "",
       `Imported benchmarks: ${rows.length}`,
-      ""
+      `Group-by: ${opts.groupBy}`,
+      "",
+      "## Distribution",
+      ...stats.groups
+        .slice()
+        .sort((a, b) => b.overallMedian - a.overallMedian || a.key.localeCompare(b.key))
+        .map((group) => `- ${group.key}: count=${group.count}, medianOverall=${group.overallMedian.toFixed(3)}, medianIntegrity=${group.integrityMedian.toFixed(3)}`),
+      "",
+      "## Top Overall",
+      ...sortedByOverall.slice(0, 10).map((row) => `- ${row.bench.benchId}: overall ${row.bench.run.overall.toFixed(3)}, integrity ${row.bench.run.integrityIndex.toFixed(3)}, trust ${row.bench.run.trustLabel}`),
+      "",
+      "## Full List",
+      ...rows.map((row) => `- ${row.bench.benchId}: overall ${row.bench.run.overall.toFixed(3)}, integrity ${row.bench.run.integrityIndex.toFixed(3)}, trust ${row.bench.run.trustLabel}`)
     ];
-    for (const row of rows) {
-      lines.push(`- ${row.bench.benchId}: overall ${row.bench.run.overall.toFixed(3)}, integrity ${row.bench.run.integrityIndex.toFixed(3)}, trust ${row.bench.run.trustLabel}`);
-    }
     const outFile = resolve(process.cwd(), opts.out);
     ensureDir(dirname(outFile));
     writeFileAtomic(outFile, lines.join("\n"), 0o644);
@@ -11451,11 +11606,42 @@ program
     console.log(renderComponentConfidenceMarkdown(cc));
   });
 
-program.action(() => {
+program.action((_opts, command: Command) => {
+  const rootArgs = command.args ?? [];
+  if (rootArgs.length > 0) {
+    const unknownToken = String(rootArgs[0]);
+    console.error(chalk.red(`error: unknown command '${unknownToken}'`));
+    const suggestions = suggestCommandPaths(unknownToken, flattenCommandPaths(program), 6);
+    if (suggestions.length > 0) {
+      console.error(chalk.yellow("Closest command paths:"));
+      for (const suggestion of suggestions) {
+        console.error(`  amc ${suggestion}`);
+      }
+    }
+    console.error(chalk.cyan("Run 'amc --help' to explore top-level commands."));
+    process.exit(1);
+    return;
+  }
   program.help();
 });
 
-program.parseAsync(process.argv).catch((error) => {
-  console.error(chalk.red(String(error)));
+program.parseAsync(process.argv).catch((error: unknown) => {
+  const message = error instanceof Error ? error.message : String(error);
+  const unknownToken = parseUnknownCommandToken(message);
+  if (unknownToken) {
+    console.error(chalk.red(message));
+    const commandPaths = flattenCommandPaths(program);
+    const suggestions = suggestCommandPaths(unknownToken, commandPaths, 6);
+    if (suggestions.length > 0) {
+      console.error(chalk.yellow("Closest command paths:"));
+      for (const suggestion of suggestions) {
+        console.error(`  amc ${suggestion}`);
+      }
+    }
+    console.error(chalk.cyan("Run 'amc --help' to explore top-level commands."));
+    process.exit(1);
+    return;
+  }
+  console.error(chalk.red(message));
   process.exit(1);
 });

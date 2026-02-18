@@ -17,6 +17,7 @@ amc experiment set-baseline --agent <agentId> --experiment <expId> --config curr
 amc experiment set-candidate --agent <agentId> --experiment <expId> --candidate-file ./candidate.yaml
 amc experiment run --agent <agentId> --experiment <expId> --mode sandbox
 amc experiment analyze --agent <agentId> --experiment <expId> --out ./experiment-report.md
+amc experiment gate-template --preset balanced --out ./experimentGate.json
 amc experiment gate --agent <agentId> --experiment <expId> --policy ./experimentGate.json
 ```
 
@@ -33,6 +34,16 @@ Experiment analysis is deterministic and reproducible:
 - deterministic effect-size difference
 
 No stochastic model judge is used.
+
+## Gate Ergonomics
+
+`amc experiment gate-template` scaffolds a policy JSON for consistent simulation gate setup:
+
+- `strict`: tighter uplift/cost expectations
+- `balanced`: sensible default for most upgrades
+- `exploratory`: allows wider cost headroom while learning
+
+`amc experiment gate` now prints threshold-by-threshold comparisons (uplift success, uplift value, cost ratio, regression policy) so pass/fail decisions are immediately interpretable in CI logs.
 
 ## Interpreting Uplift Responsibly
 

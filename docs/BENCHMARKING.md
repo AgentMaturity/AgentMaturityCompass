@@ -18,9 +18,9 @@ No transcripts, raw tool outputs, secrets, or evidence DB are included.
 amc benchmark export --agent <agentId> --run <runId> --out ./benchmarks/<name>.amcbench
 amc benchmark verify ./benchmarks/<name>.amcbench
 amc benchmark ingest ./benchmarks
-amc benchmark list
+amc benchmark list --sort overall --limit 25
 amc benchmark stats --group-by riskTier
-amc benchmark report --out ./benchmarks/summary.md
+amc benchmark report --group-by riskTier --out ./benchmarks/summary.md
 ```
 
 ## Privacy Rules
@@ -29,6 +29,11 @@ amc benchmark report --out ./benchmarks/summary.md
 - no raw prompts/responses
 - no lease/admin/provider tokens
 - no source IP metadata
+
+## Comparability Ergonomics
+
+- `benchmark list` supports deterministic sorting (`benchId|overall|integrity|created`) and percentile output for quick peer positioning.
+- `benchmark report` includes grouped medians and top-overall snapshot, improving run-to-run comparability in review docs.
 
 ## Comparative Views
 
