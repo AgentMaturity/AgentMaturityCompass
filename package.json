@@ -26,6 +26,7 @@
     "version-packages": "changeset version",
     "release": "changeset publish",
     "release:prepack-check": "node scripts/prepack-release-check.mjs",
+    "check:incident-readiness": "node scripts/incident-readiness-check.mjs",
     "prepack": "npm run typecheck && npm test && npm run build && npm run release:prepack-check"
   },
   "keywords": [

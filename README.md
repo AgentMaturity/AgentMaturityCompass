@@ -48,6 +48,20 @@ amc verify all --json
 
 Open the dashboard/console URLs printed by `amc up`.
 
+### CLI Discoverability Tips
+
+```bash
+# Top-level and grouped command help
+amc --help
+amc help adapters
+amc help adapters run
+
+# Equivalent direct path help
+amc adapters run --help
+```
+
+If you mistype a command, AMC now prints closest command path suggestions to help you recover quickly.
+
 Go-live references:
 - [`docs/AMC_MASTER_REFERENCE.md`](docs/AMC_MASTER_REFERENCE.md)
 - [`docs/SYSTEM_CAPABILITIES.md`](docs/SYSTEM_CAPABILITIES.md)
