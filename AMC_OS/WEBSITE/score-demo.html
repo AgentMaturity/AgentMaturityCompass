@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AMC Score Demo — Agent Maturity Card</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0A0F1E;--bg2:#111827;--bg3:#1a2235;--gold:#C9A84C;--gold2:#e0c36a;--text:#F8F8F0;--text2:#a0a8b8;--radius:12px;--ease:cubic-bezier(.4,0,.2,1)}
+html{font-size:16px}
+body{background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px 16px;line-height:1.5}
+.container{width:100%;max-width:720px}
+
+/* Progress */
+.progress-wrap{margin-bottom:32px;opacity:1;transition:opacity .4s var(--ease)}
+.progress-wrap.hidden{opacity:0;pointer-events:none;position:absolute}
+.progress-label{display:flex;justify-content:space-between;font-size:.8rem;color:var(--text2);margin-bottom:8px}
+.progress-bar{height:6px;background:var(--bg3);border-radius:3px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--gold2));border-radius:3px;transition:width .5s var(--ease)}
+
+/* Score pill */
+.score-pill{position:fixed;top:20px;right:20px;background:var(--bg2);border:1px solid var(--gold);border-radius:24px;padding:8px 20px;font-size:.85rem;color:var(--gold);font-weight:600;transition:transform .3s var(--ease),opacity .3s var(--ease);z-index:10}
+.score-pill.hidden{transform:translateY(-20px);opacity:0;pointer-events:none}
+.score-pill span{color:var(--text)}
+
+/* Card shared */
+.card{background:var(--bg2);border:1px solid rgba(201,168,76,.15);border-radius:var(--radius);padding:40px 32px;position:relative;overflow:hidden}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+
+/* Question */
+.question-card{transition:opacity .35s var(--ease),transform .35s var(--ease)}
+.question-card.exit{opacity:0;transform:translateX(-40px)}
+.question-card.enter{opacity:0;transform:translateX(40px)}
+.question-card h2{font-size:1.35rem;font-weight:700;margin-bottom:8px;color:var(--text)}
+.dim-badge{display:inline-block;font-size:.7rem;text-transform:uppercase;letter-spacing:.08em;color:var(--gold);background:rgba(201,168,76,.12);padding:4px 12px;border-radius:20px;margin-bottom:16px;font-weight:600}
+.question-card p.q-text{font-size:1.05rem;color:var(--text);margin-bottom:24px}
+
+/* Options */
+.options{display:flex;flex-direction:column;gap:10px}
+.opt-btn{background:var(--bg3);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:14px 18px;text-align:left;color:var(--text);font-size:.92rem;cursor:pointer;transition:all .2s var(--ease);display:flex;align-items:baseline;gap:12px;line-height:1.4}
+.opt-btn:hover{border-color:var(--gold);background:rgba(201,168,76,.08);transform:translateX(4px)}
+.opt-btn .lvl{color:var(--gold);font-weight:700;font-size:.78rem;flex-shrink:0;min-width:24px}
+.opt-btn.selected{border-color:var(--gold);background:rgba(201,168,76,.15);transform:translateX(4px)}
+
+/* Result */
+.result-wrap{display:none}
+.result-wrap.show{display:block;animation:fadeUp .6s var(--ease) both}
+@keyframes fadeUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+.result-card{text-align:center}
+.result-card h2{font-size:1.6rem;margin-bottom:8px}
+.result-card .level-label{font-size:1.1rem;color:var(--gold);font-weight:700;margin-bottom:32px}
+
+/* Compass */
+.compass-wrap{display:flex;justify-content:center;margin-bottom:32px}
+.compass-wrap svg{filter:drop-shadow(0 0 20px rgba(201,168,76,.2))}
+
+/* Dimension bars */
+.dim-bars{text-align:left;margin:0 auto 32px;max-width:400px;display:flex;flex-direction:column;gap:14px}
+.dim-row label{display:flex;justify-content:space-between;font-size:.82rem;margin-bottom:4px;color:var(--text2)}
+.dim-row label span:last-child{color:var(--gold);font-weight:600}
+.dim-bar{height:8px;background:var(--bg);border-radius:4px;overflow:hidden}
+.dim-bar-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--gold),var(--gold2));width:0;transition:width 1s var(--ease)}
+
+/* CTA */
+.cta-group{display:flex;flex-direction:column;align-items:center;gap:12px;margin-top:8px}
+.cta-btn{display:inline-block;background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--bg);font-weight:700;font-size:1rem;padding:14px 36px;border-radius:10px;text-decoration:none;transition:transform .2s var(--ease),box-shadow .2s var(--ease)}
+.cta-btn:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(201,168,76,.3)}
+.back-link{color:var(--text2);font-size:.85rem;text-decoration:none;transition:color .2s}
+.back-link:hover{color:var(--gold)}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="score-pill hidden" id="scorePill">Score: <span id="runScore">0</span></div>
+
+  <div class="progress-wrap" id="progressWrap">
+    <div class="progress-label"><span id="progLabel">Question 1 of 5</span><span id="progPct">0%</span></div>
+    <div class="progress-bar"><div class="progress-fill" id="progFill" style="width:0%"></div></div>
+  </div>
+
+  <div id="questionArea"></div>
+  <div class="result-wrap" id="resultWrap"></div>
+</div>
+
+<script>
+const Q=[
+{dim:"Governance",q:"How is ownership of your AI agents defined?",opts:["No defined ownership","Informal ownership by the team that built it","Documented RACI for each agent","Formal governance board with regular reviews","Automated governance with policy-as-code enforcement"]},
+{dim:"Evaluation",q:"How do you evaluate your agents' output quality?",opts:["No systematic evaluation","Manual spot-checking","Automated test suites on key scenarios","Continuous evaluation with regression detection","Multi-layered eval (unit, integration, adversarial, human-in-loop)"]},
+{dim:"Reliability",q:"What happens when an agent fails in production?",opts:["We find out from users","Basic error logging exists","Automated alerts with runbook responses","Self-healing with fallback chains and circuit breakers","Chaos-tested with proven recovery SLAs"]},
+{dim:"Cost Efficiency",q:"How do you track and control agent operational costs?",opts:["We don't track per-agent costs","Monthly cloud bill review","Per-agent cost attribution dashboards","Automated budget alerts with cost optimization","Dynamic model routing based on cost/quality tradeoffs"]},
+{dim:"Security",q:"How do you manage agent access to tools and data?",opts:["Agents have broad access, no restrictions","Basic API key management","Principle of least privilege with documented permissions","Runtime permission boundaries with audit logging","Zero-trust agent identity with cryptographic attestation"]}
+];
+
+const scores=[];
+let cur=0;
+const $=id=>document.getElementById(id);
+
+function renderQ(i,dir){
+  const area=$('questionArea');
+  const old=area.querySelector('.card');
+  if(old){old.classList.add('exit');setTimeout(()=>old.remove(),350)}
+  setTimeout(()=>{
+    const d=Q[i];
+    const card=document.createElement('div');
+    card.className='card question-card enter';
+    card.innerHTML=`<div class="dim-badge">${d.dim}</div><p class="q-text">${d.q}</p><div class="options">${d.opts.map((o,j)=>`<button class="opt-btn" data-v="${j+1}"><span class="lvl">L${j+1}</span>${o}</button>`).join('')}</div>`;
+    area.appendChild(card);
+    requestAnimationFrame(()=>requestAnimationFrame(()=>card.classList.remove('enter')));
+    card.querySelectorAll('.opt-btn').forEach(b=>b.addEventListener('click',()=>pick(b,+b.dataset.v)));
+  },old?200:0);
+  $('progLabel').textContent=`Question ${i+1} of 5`;
+  const pct=Math.round((i/5)*100);
+  $('progPct').textContent=pct+'%';
+  $('progFill').style.width=pct+'%';
+}
+
+function pick(btn,v){
+  btn.closest('.options').querySelectorAll('.opt-btn').forEach(b=>b.classList.remove('selected'));
+  btn.classList.add('selected');
+  scores[cur]=v;
+  updatePill();
+  setTimeout(()=>{
+    cur++;
+    if(cur<5){renderQ(cur,1)}else{showResult()}
+  },400);
+}
+
+function updatePill(){
+  const pill=$('scorePill');
+  pill.classList.remove('hidden');
+  const avg=(scores.reduce((a,b)=>a+b,0)/scores.length).toFixed(1);
+  $('runScore').textContent=avg;
+}
+
+function showResult(){
+  $('progressWrap').classList.add('hidden');
+  $('scorePill').classList.add('hidden');
+  $('questionArea').innerHTML='';
+  $('progFill').style.width='100%';
+
+  const avg=scores.reduce((a,b)=>a+b,0)/scores.length;
+  const lvl=avg<1.5?1:avg<2.5?2:avg<3.5?3:avg<4.5?4:5;
+  const labels=['','Ad Hoc','Developing','Defined','Managed','Optimized'];
+
+  // Build compass SVG
+  const needleAngle=-90+(avg-1)*45; // maps 1-5 to -90..90
+  const compass=`<svg width="220" height="220" viewBox="0 0 220 220">
+    <defs><linearGradient id="gr" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#C9A84C"/><stop offset="100%" stop-color="#e0c36a"/></linearGradient></defs>
+    <circle cx="110" cy="110" r="100" fill="none" stroke="#1a2235" stroke-width="8"/>
+    <path d="M 30 110 A 80 80 0 0 1 190 110" fill="none" stroke="#1a2235" stroke-width="14" stroke-linecap="round"/>
+    <path d="M 30 110 A 80 80 0 0 1 190 110" fill="none" stroke="url(#gr)" stroke-width="14" stroke-linecap="round" stroke-dasharray="251" stroke-dashoffset="${251-251*((avg-1)/4)}" style="transition:stroke-dashoffset 1.2s cubic-bezier(.4,0,.2,1)"/>
+    ${[1,2,3,4,5].map((n,i)=>{const a=Math.PI+Math.PI*(i/4);const x=110+80*Math.cos(a);const y=110+80*Math.sin(a);return`<text x="${x}" y="${y-14}" text-anchor="middle" fill="#a0a8b8" font-size="11" font-family="system-ui">L${n}</text>`}).join('')}
+    <g transform="rotate(${needleAngle},110,110)" style="transition:transform 1s cubic-bezier(.4,0,.2,1)">
+      <line x1="110" y1="110" x2="110" y2="40" stroke="#C9A84C" stroke-width="3" stroke-linecap="round"/>
+      <circle cx="110" cy="110" r="6" fill="#C9A84C"/>
+    </g>
+    <text x="110" y="155" text-anchor="middle" fill="#F8F8F0" font-size="28" font-weight="700" font-family="system-ui">${avg.toFixed(1)}</text>
+    <text x="110" y="175" text-anchor="middle" fill="#a0a8b8" font-size="12" font-family="system-ui">out of 5.0</text>
+  </svg>`;
+
+  const dims=Q.map((d,i)=>`<div class="dim-row"><label><span>${d.dim}</span><span>L${scores[i]}</span></label><div class="dim-bar"><div class="dim-bar-fill" data-w="${scores[i]*20}"></div></div></div>`).join('');
+
+  const wrap=$('resultWrap');
+  wrap.innerHTML=`<div class="card result-card">
+    <h2>Your AMC Maturity Score</h2>
+    <div class="level-label">Level ${lvl}: ${labels[lvl]}</div>
+    <div class="compass-wrap">${compass}</div>
+    <div class="dim-bars">${dims}</div>
+    <div class="cta-group">
+      <a class="cta-btn" href="mailto:hello@agentmaturity.com?subject=Full%20AMC%20Assessment&body=I%20scored%20${avg.toFixed(1)}%2F5%20on%20the%20demo.%20I'd%20like%20a%20full%20assessment.">Get Your Full AMC Score →</a>
+      <a class="back-link" href="index.html">← Back to Home</a>
+    </div>
+  </div>`;
+  wrap.classList.add('show');
+
+  // Animate bars
+  setTimeout(()=>{wrap.querySelectorAll('.dim-bar-fill').forEach(el=>{el.style.width=el.dataset.w+'%'})},200);
+}
+
+renderQ(0);
+</script>
+</body>
+</html>

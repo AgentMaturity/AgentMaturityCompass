@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AMC — Agent Maturity Compass</title>
+<meta name="description" content="Evidence-backed maturity scoring and 30/60/90 roadmaps for AI agent programs. Governance, evaluation, reliability, and cost control.">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+--navy:#0A0F1E;--gold:#C9A84C;--white:#F8F8F0;--gray:#4A5568;--green:#10B981;--red:#EF4444;--amber:#F59E0B;
+--gold-20:rgba(201,168,76,0.2);--gold-10:rgba(201,168,76,0.1);--navy-light:#111827;--navy-mid:#1a2332;
+--font:system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+--max:1280px;--sp:8px;
+}
+html{scroll-behavior:smooth;scroll-padding-top:80px}
+body{font-family:var(--font);font-size:16px;line-height:1.6;color:var(--white);background:var(--navy);-webkit-font-smoothing:antialiased}
+img,svg{display:block;max-width:100%}
+a{color:var(--gold);text-decoration:none;transition:opacity .2s}
+a:hover{opacity:.85}
+.container{max-width:var(--max);margin:0 auto;padding:0 calc(var(--sp)*3)}
+h1{font-size:clamp(40px,5.5vw,72px);line-height:1.08;font-weight:800;letter-spacing:-0.03em}
+h2{font-size:clamp(30px,4vw,48px);line-height:1.15;font-weight:700;letter-spacing:-0.02em}
+h3{font-size:clamp(20px,2.5vw,32px);line-height:1.25;font-weight:600}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:16px 32px;border-radius:8px;font-weight:700;font-size:17px;border:none;cursor:pointer;transition:transform .2s,box-shadow .2s}
+.btn-primary{background:var(--gold);color:var(--navy)}.btn-primary:hover{transform:scale(1.04);box-shadow:0 0 40px rgba(201,168,76,.35);opacity:1}
+.btn-secondary{background:transparent;color:var(--gold);border:2px solid var(--gold)}.btn-secondary:hover{background:var(--gold-10);opacity:1;transform:scale(1.02)}
+.section{padding:calc(var(--sp)*14) 0}
+.section-label{text-transform:uppercase;font-size:13px;font-weight:700;letter-spacing:.12em;color:var(--gold);margin-bottom:calc(var(--sp)*2)}
+.section-desc{color:var(--gray);font-size:18px;max-width:640px;margin-top:calc(var(--sp)*2)}
+
+/* Animations */
+[data-animate]{opacity:0;transform:translateY(32px);transition:opacity .7s ease,transform .7s ease}
+[data-animate].visible{opacity:1;transform:translateY(0)}
+@media(prefers-reduced-motion:reduce){[data-animate]{opacity:1;transform:none;transition:none}.compass-needle{animation:none!important;transform:rotate(0)!important}.score-fill{transition:none!important}}
+
+/* NAV */
+.nav{position:fixed;top:0;left:0;right:0;z-index:100;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);background:rgba(10,15,30,.82);border-bottom:1px solid var(--gold-10)}
+.nav-inner{display:flex;align-items:center;justify-content:space-between;height:64px;max-width:var(--max);margin:0 auto;padding:0 24px}
+.nav-logo{font-size:20px;font-weight:800;color:var(--white);letter-spacing:.04em}
+.nav-logo span{color:var(--gold)}
+.nav-links{display:flex;align-items:center;gap:32px;list-style:none}
+.nav-links a{color:var(--white);font-size:14px;font-weight:500;opacity:.75;transition:opacity .2s}.nav-links a:hover{opacity:1}
+.nav-links .btn{padding:10px 22px;font-size:14px}
+.hamburger{display:none;background:none;border:none;cursor:pointer;padding:8px}
+.hamburger span{display:block;width:24px;height:2px;background:var(--white);margin:5px 0;transition:transform .3s,opacity .3s}
+.mobile-menu{display:none;position:fixed;inset:0;top:64px;background:var(--navy);z-index:99;flex-direction:column;align-items:center;justify-content:center;gap:32px}
+.mobile-menu.open{display:flex}
+.mobile-menu a{color:var(--white);font-size:20px;font-weight:600}
+.mobile-cta{display:none;position:fixed;bottom:0;left:0;right:0;z-index:100;padding:12px 16px;background:var(--navy);border-top:1px solid var(--gold-20)}
+.mobile-cta .btn{width:100%;justify-content:center;padding:14px}
+@media(max-width:768px){
+.nav-links{display:none}.hamburger{display:block}
+.mobile-cta{display:block}
+.section{padding:calc(var(--sp)*10) 0}
+}
+
+/* HERO */
+.hero{min-height:100vh;display:flex;align-items:center;padding-top:80px;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 50% at 50% 40%,rgba(201,168,76,.06),transparent)}
+.hero-grid{display:grid;grid-template-columns:1fr 1fr;gap:calc(var(--sp)*8);align-items:center}
+.hero-copy{z-index:1}
+.hero h1 span{color:var(--gold)}
+.hero-sub{font-size:clamp(16px,1.8vw,20px);line-height:1.6;color:rgba(248,248,240,.7);margin:calc(var(--sp)*4) 0 calc(var(--sp)*5);max-width:560px}
+.hero-btns{display:flex;gap:16px;flex-wrap:wrap}
+.trust-line{margin-top:calc(var(--sp)*5);font-size:14px;color:var(--gray);display:flex;align-items:center;gap:8px}
+.trust-line::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--green);flex-shrink:0}
+@media(max-width:900px){.hero-grid{grid-template-columns:1fr}.hero-compass{max-width:320px;margin:0 auto}}
+
+/* Compass SVG */
+.hero-compass{position:relative;width:100%;max-width:440px;margin:0 auto}
+.compass-needle{transform-origin:50% 50%;animation:settle 2.4s cubic-bezier(.34,1.2,.64,1) forwards}
+@keyframes settle{0%{transform:rotate(-120deg)}15%{transform:rotate(45deg)}35%{transform:rotate(-25deg)}55%{transform:rotate(12deg)}75%{transform:rotate(-5deg)}100%{transform:rotate(0deg)}}
+.compass-ring{animation:fadeScale 1s ease forwards;opacity:0}
+@keyframes fadeScale{to{opacity:1}}
+.compass-glow{filter:drop-shadow(0 0 40px rgba(201,168,76,.2))}
+
+/* PROBLEM */
+.problem{background:var(--navy-light)}
+.problem-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:24px;margin:calc(var(--sp)*6) 0}
+.problem-card{background:var(--navy);border:1px solid var(--gold-20);border-radius:12px;padding:32px;transition:border-color .3s,transform .3s}
+.problem-card:hover{border-color:var(--gold);transform:translateY(-4px)}
+.problem-card .icon{width:48px;height:48px;border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:20px;font-size:24px}
+.problem-card h3{font-size:20px;margin-bottom:12px}
+.problem-card p{color:var(--gray);font-size:15px;line-height:1.6}
+.pc-red .icon{background:rgba(239,68,68,.12);color:var(--red)}
+.pc-amber .icon{background:rgba(245,158,11,.12);color:var(--amber)}
+.problem-closing{margin-top:calc(var(--sp)*6);font-size:20px;font-weight:600;color:var(--gold);text-align:center}
+
+/* SOLUTION / SCORECARD */
+.scorecard-wrapper{position:relative;margin:calc(var(--sp)*6) 0;background:var(--navy-light);border:1px solid var(--gold-20);border-radius:16px;padding:40px;overflow:hidden}
+.scorecard-wrapper::after{content:'SAMPLE';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(-25deg);font-size:80px;font-weight:900;color:rgba(201,168,76,.07);pointer-events:none;white-space:nowrap;letter-spacing:.1em}
+.score-row{display:flex;align-items:center;gap:16px;margin-bottom:20px}
+.score-label{width:150px;font-size:14px;font-weight:600;flex-shrink:0}
+.score-track{flex:1;height:12px;background:rgba(255,255,255,.06);border-radius:6px;overflow:hidden;position:relative}
+.score-fill{height:100%;border-radius:6px;width:0;transition:width 1.2s cubic-bezier(.22,.61,.36,1)}
+.score-level{width:32px;font-size:13px;font-weight:700;color:var(--gold);text-align:right;flex-shrink:0}
+.sf-green{background:var(--green)}.sf-amber{background:var(--amber)}.sf-gold{background:var(--gold)}
+
+/* HOW IT WORKS */
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:32px;margin-top:calc(var(--sp)*8)}
+.step{text-align:center;padding:40px 24px;border-radius:16px;background:var(--navy-light);border:1px solid var(--gold-10);position:relative}
+.step-num{width:56px;height:56px;border-radius:50%;border:2px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:800;color:var(--gold);margin:0 auto 24px}
+.step h3{font-size:22px;margin-bottom:12px}
+.step p{color:var(--gray);font-size:15px}
+.step-connector{display:none}
+@media(max-width:768px){.steps{grid-template-columns:1fr;max-width:400px;margin-left:auto;margin-right:auto}}
+
+/* DIMENSIONS */
+.dim-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:20px;margin-top:calc(var(--sp)*6)}
+.dim-card{padding:28px;border-radius:12px;border:1px solid var(--gold-20);background:var(--navy-light);text-align:center;transition:border-color .3s,transform .3s}
+.dim-card:hover{border-color:var(--gold);transform:translateY(-2px)}
+.dim-icon{font-size:32px;margin-bottom:16px}
+.dim-card h3{font-size:18px;margin-bottom:8px}
+.dim-card p{font-size:14px;color:var(--gray);line-height:1.5}
+
+/* PRICING */
+.pricing{background:var(--navy-light)}
+.pricing-grid{display:grid;grid-template-columns:1fr 1fr;gap:32px;margin-top:calc(var(--sp)*8);max-width:900px}
+.price-card{border:1px solid var(--gold-20);border-radius:16px;padding:40px;position:relative;background:var(--navy)}
+.price-card.featured{border-color:var(--gold);box-shadow:0 0 60px rgba(201,168,76,.1)}
+.price-card .badge{position:absolute;top:-14px;left:32px;background:var(--gold);color:var(--navy);font-size:12px;font-weight:800;padding:4px 16px;border-radius:20px;text-transform:uppercase;letter-spacing:.06em}
+.price-amt{font-size:48px;font-weight:800;margin:16px 0 4px}
+.price-amt span{font-size:18px;font-weight:400;color:var(--gray)}
+.price-period{color:var(--gray);font-size:14px;margin-bottom:24px}
+.price-list{list-style:none;margin-bottom:32px}
+.price-list li{padding:8px 0;font-size:15px;color:rgba(248,248,240,.8);display:flex;align-items:flex-start;gap:10px}
+.price-list li::before{content:'✓';color:var(--green);font-weight:700;flex-shrink:0}
+@media(max-width:768px){.pricing-grid{grid-template-columns:1fr}}
+
+/* SOCIAL PROOF */
+.proof-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:calc(var(--sp)*6)}
+.proof-card{padding:32px;border-radius:12px;border:1px solid var(--gold-10);background:var(--navy-light)}
+.proof-stat{font-size:40px;font-weight:800;color:var(--gold);margin-bottom:8px}
+.proof-card p{color:var(--gray);font-size:15px}
+@media(max-width:768px){.proof-grid{grid-template-columns:1fr}}
+
+/* FAQ */
+.faq-list{max-width:800px;margin:calc(var(--sp)*6) auto 0}
+.faq-item{border-bottom:1px solid var(--gold-10)}
+.faq-q{width:100%;background:none;border:none;color:var(--white);font-size:18px;font-weight:600;padding:24px 0;text-align:left;cursor:pointer;display:flex;justify-content:space-between;align-items:center;font-family:var(--font);transition:color .2s}
+.faq-q:hover{color:var(--gold)}
+.faq-q::after{content:'+';font-size:24px;color:var(--gold);transition:transform .3s;flex-shrink:0;margin-left:16px}
+.faq-item.open .faq-q::after{transform:rotate(45deg)}
+.faq-a{max-height:0;overflow:hidden;transition:max-height .4s ease,padding .3s}
+.faq-a-inner{padding:0 0 24px;color:var(--gray);font-size:16px;line-height:1.7}
+.faq-item.open .faq-a{max-height:400px}
+
+/* FINAL CTA */
+.final-cta{text-align:center;background:linear-gradient(180deg,var(--navy) 0%,var(--navy-light) 100%);position:relative}
+.final-cta::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:200px;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+.final-cta h2{max-width:700px;margin:0 auto calc(var(--sp)*3)}
+.final-cta .section-desc{margin:0 auto calc(var(--sp)*5);text-align:center}
+
+/* FOOTER */
+.footer{padding:calc(var(--sp)*6) 0;border-top:1px solid var(--gold-10);text-align:center}
+.footer-brand{font-size:14px;color:var(--gray);margin-bottom:8px}
+.footer-brand strong{color:var(--white)}
+.footer-tag{font-size:13px;color:rgba(74,85,104,.6)}
+.footer-links{display:flex;justify-content:center;gap:24px;margin-top:16px}
+.footer-links a{font-size:13px;color:var(--gray)}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav" role="navigation" aria-label="Main">
+<div class="nav-inner">
+<a href="#" class="nav-logo">A<span>M</span>C</a>
+<ul class="nav-links">
+<li><a href="#how">How It Works</a></li>
+<li><a href="#dimensions">Dimensions</a></li>
+<li><a href="#pricing">Pricing</a></li>
+<li><a href="#faq">FAQ</a></li>
+<li><a href="score-demo.html">Score Demo</a></li>
+<li><a href="mailto:hello@agentmaturity.com" class="btn btn-primary" style="padding:10px 22px;font-size:14px">Get the Compass Sprint</a></li>
+</ul>
+<button class="hamburger" aria-label="Menu" onclick="document.querySelector('.mobile-menu').classList.toggle('open');this.classList.toggle('active')">
+<span></span><span></span><span></span>
+</button>
+</div>
+</nav>
+<div class="mobile-menu" role="navigation" aria-label="Mobile">
+<a href="#how" onclick="this.parentElement.classList.remove('open')">How It Works</a>
+<a href="#dimensions" onclick="this.parentElement.classList.remove('open')">Dimensions</a>
+<a href="#pricing" onclick="this.parentElement.classList.remove('open')">Pricing</a>
+<a href="#faq" onclick="this.parentElement.classList.remove('open')">FAQ</a>
+<a href="score-demo.html">Score Demo</a>
+</div>
+
+<!-- HERO -->
+<section class="hero section">
+<div class="container">
+<div class="hero-grid">
+<div class="hero-copy" data-animate>
+<p class="section-label">Agent Maturity Compass</p>
+<h1>Turn your AI agents into an auditable, scalable system — <span>not a science experiment.</span></h1>
+<p class="hero-sub">Agent Maturity Compass gives you an evidence-backed maturity score and a 30/60/90 roadmap across governance, evaluation, reliability, and cost control — so you know exactly what to fix before you scale.</p>
+<div class="hero-btns">
+<a href="mailto:hello@agentmaturity.com" class="btn btn-primary">Get the Compass Sprint</a>
+<a href="sample-report.html" class="btn btn-secondary">See a sample scorecard →</a>
+</div>
+<p class="trust-line">Built for teams deploying agents in production where failures are expensive.</p>
+</div>
+<div class="hero-compass compass-glow" data-animate>
+<svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Compass illustration">
+<!-- Outer ring -->
+<circle cx="200" cy="200" r="180" fill="none" stroke="rgba(201,168,76,0.15)" stroke-width="2" class="compass-ring" style="animation-delay:.2s"/>
+<circle cx="200" cy="200" r="160" fill="none" stroke="rgba(201,168,76,0.25)" stroke-width="1" class="compass-ring" style="animation-delay:.4s"/>
+<circle cx="200" cy="200" r="140" fill="none" stroke="rgba(201,168,76,0.1)" stroke-width="1" class="compass-ring" style="animation-delay:.6s"/>
+<!-- Cardinal ticks -->
+<text x="200" y="38" text-anchor="middle" fill="#C9A84C" font-size="16" font-weight="700" font-family="system-ui" class="compass-ring" style="animation-delay:.3s">N</text>
+<text x="200" y="380" text-anchor="middle" fill="rgba(201,168,76,0.4)" font-size="14" font-family="system-ui" class="compass-ring" style="animation-delay:.3s">S</text>
+<text x="380" y="205" text-anchor="middle" fill="rgba(201,168,76,0.4)" font-size="14" font-family="system-ui" class="compass-ring" style="animation-delay:.3s">E</text>
+<text x="22" y="205" text-anchor="middle" fill="rgba(201,168,76,0.4)" font-size="14" font-family="system-ui" class="compass-ring" style="animation-delay:.3s">W</text>
+<!-- Tick marks -->
+<g stroke="rgba(201,168,76,0.3)" stroke-width="1" class="compass-ring" style="animation-delay:.5s">
+<line x1="200" y1="24" x2="200" y2="44"/><line x1="200" y1="356" x2="200" y2="376"/>
+<line x1="376" y1="200" x2="356" y2="200"/><line x1="44" y1="200" x2="24" y2="200"/>
+</g>
+<!-- Degree marks -->
+<g stroke="rgba(201,168,76,0.12)" stroke-width="1" class="compass-ring" style="animation-delay:.5s">
+<line x1="327" y1="73" x2="316" y2="84"/><line x1="73" y1="327" x2="84" y2="316"/>
+<line x1="327" y1="327" x2="316" y2="316"/><line x1="73" y1="73" x2="84" y2="84"/>
+</g>
+<!-- Center dot -->
+<circle cx="200" cy="200" r="6" fill="#C9A84C" class="compass-ring" style="animation-delay:.7s"/>
+<!-- Needle -->
+<g class="compass-needle">
+<polygon points="200,60 208,195 192,195" fill="#C9A84C" opacity="0.9"/>
+<polygon points="200,340 208,205 192,205" fill="rgba(201,168,76,0.25)"/>
+</g>
+<!-- Inner labels -->
+<g font-family="system-ui" font-size="10" fill="rgba(201,168,76,0.35)" class="compass-ring" style="animation-delay:.8s">
+<text x="200" y="100" text-anchor="middle">GOVERNANCE</text>
+<text x="290" y="160" text-anchor="middle">SECURITY</text>
+<text x="290" y="250" text-anchor="middle">EVALUATION</text>
+<text x="200" y="310" text-anchor="middle">RELIABILITY</text>
+<text x="110" y="250" text-anchor="middle">COST</text>
+<text x="110" y="160" text-anchor="middle">OBSERVABILITY</text>
+</g>
+</svg>
+</div>
+</div>
+</div>
+</section>
+
+<!-- PROBLEM -->
+<section class="section problem" id="problem">
+<div class="container">
+<p class="section-label" data-animate>The Problem</p>
+<h2 data-animate>Agent programs rarely fail loudly.<br>They fail quietly.</h2>
+<div class="problem-cards">
+<div class="problem-card pc-red" data-animate>
+<div class="icon">⚠</div>
+<h3>Shallow Evals</h3>
+<p>You're testing outputs, not outcomes. Vibes-based evaluation masks systemic failure modes until they compound.</p>
+</div>
+<div class="problem-card pc-amber" data-animate>
+<div class="icon">📉</div>
+<h3>Silent Drift</h3>
+<p>Model updates, prompt rot, and data shifts erode performance gradually — with no alarm until something breaks visibly.</p>
+</div>
+<div class="problem-card pc-red" data-animate>
+<div class="icon">💸</div>
+<h3>Cost Creep</h3>
+<p>Token usage, redundant calls, and unoptimized chains inflate spend. Without unit economics, you can't forecast or defend budgets.</p>
+</div>
+<div class="problem-card pc-amber" data-animate>
+<div class="icon">🔓</div>
+<h3>Unclear Governance</h3>
+<p>Who owns the agent? Who approves changes? Who's accountable when it hallucinates in production? Usually, nobody.</p>
+</div>
+</div>
+<p class="problem-closing" data-animate>If you can't verify your maturity, you can't safely scale.</p>
+</div>
+</section>
+
+<!-- SOLUTION / SCORECARD -->
+<section class="section" id="scorecard">
+<div class="container">
+<p class="section-label" data-animate>The Solution</p>
+<h2 data-animate>AMC is not a slide deck.<br>It's a working compass.</h2>
+<p class="section-desc" data-animate>A structured maturity assessment across 7 dimensions — scored with evidence, not opinions.</p>
+<div class="scorecard-wrapper" data-animate>
+<div class="score-row"><span class="score-label">Governance</span><div class="score-track"><div class="score-fill sf-green" data-width="80"></div></div><span class="score-level">L4</span></div>
+<div class="score-row"><span class="score-label">Security</span><div class="score-track"><div class="score-fill sf-amber" data-width="60"></div></div><span class="score-level">L3</span></div>
+<div class="score-row"><span class="score-label">Evaluation</span><div class="score-track"><div class="score-fill sf-gold" data-width="40"></div></div><span class="score-level">L2</span></div>
+<div class="score-row"><span class="score-label">Reliability</span><div class="score-track"><div class="score-fill sf-amber" data-width="60"></div></div><span class="score-level">L3</span></div>
+<div class="score-row"><span class="score-label">Cost Efficiency</span><div class="score-track"><div class="score-fill sf-gold" data-width="40"></div></div><span class="score-level">L2</span></div>
+<div class="score-row"><span class="score-label">Observability</span><div class="score-track"><div class="score-fill sf-amber" data-width="60"></div></div><span class="score-level">L3</span></div>
+<div class="score-row"><span class="score-label">Operating Model</span><div class="score-track"><div class="score-fill sf-green" data-width="80"></div></div><span class="score-level">L4</span></div>
+</div>
+<div style="text-align:center;margin-top:32px" data-animate>
+<a href="sample-report.html" class="btn btn-secondary">See Sample Report →</a>
+</div>
+</div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="section" id="how" style="background:var(--navy-light)">
+<div class="container">
+<p class="section-label" data-animate>How It Works</p>
+<h2 data-animate>Three steps to clarity.</h2>
+<div class="steps">
+<div class="step" data-animate>
+<div class="step-num">1</div>
+<h3>Assess</h3>
+<p>We interview your team, review architecture, inspect prompts, evals, guardrails, and cost data across your agent stack.</p>
+</div>
+<div class="step" data-animate>
+<div class="step-num">2</div>
+<h3>Score</h3>
+<p>Each of 7 dimensions is scored L1–L5 with evidence citations. No guesswork — every rating is backed by artifacts.</p>
+</div>
+<div class="step" data-animate>
+<div class="step-num">3</div>
+<h3>Roadmap</h3>
+<p>You get a prioritized 30/60/90-day plan with specific actions, owners, and success criteria to level up where it matters most.</p>
+</div>
+</div>
+</div>
+</section>
+
+<!-- DIMENSIONS -->
+<section class="section" id="dimensions">
+<div class="container">
+<p class="section-label" data-animate>7 Dimensions</p>
+<h2 data-animate>What we measure.</h2>
+<p class="section-desc" data-animate>Each dimension is scored independently on a 5-level maturity scale with evidence requirements.</p>
+<div class="dim-grid">
+<div class="dim-card" data-animate><div class="dim-icon">🏛</div><h3>Governance</h3><p>Ownership, change control, approval workflows, and accountability structures.</p></div>
+<div class="dim-card" data-animate><div class="dim-icon">🛡</div><h3>Security</h3><p>Input validation, output filtering, secrets management, and adversarial robustness.</p></div>
+<div class="dim-card" data-animate><div class="dim-icon">📊</div><h3>Evaluation</h3><p>Test coverage, regression suites, human-in-loop review, and continuous eval pipelines.</p></div>
+<div class="dim-card" data-animate><div class="dim-icon">⚙</div><h3>Reliability</h3><p>Error handling, fallback chains, SLA tracking, and graceful degradation.</p></div>
+<div class="dim-card" data-animate><div class="dim-icon">💰</div><h3>Cost Efficiency</h3><p>Unit economics, token optimization, caching strategy, and budget governance.</p></div>
+<div class="dim-card" data-animate><div class="dim-icon">🔍</div><h3>Observability</h3><p>Logging, tracing, alerting, dashboards, and anomaly detection across the agent lifecycle.</p></div>
+<div class="dim-card" data-animate><div class="dim-icon">🧩</div><h3>Operating Model</h3><p>Team structure, deployment cadence, documentation, and cross-functional coordination.</p></div>
+</div>
+</div>
+</section>
+
+<!-- PRICING -->
+<section class="section pricing" id="pricing">
+<div class="container">
+<p class="section-label" data-animate>Pricing</p>
+<h2 data-animate>Transparent. No surprises.</h2>
+<div class="pricing-grid">
+<div class="price-card featured" data-animate>
+<div class="badge">Most Popular</div>
+<h3>Compass Sprint</h3>
+<div class="price-amt">$5,000 <span>one-time</span></div>
+<p class="price-period">Delivered in 5 business days</p>
+<ul class="price-list">
+<li>Full 7-dimension maturity assessment</li>
+<li>Evidence-backed L1–L5 scoring</li>
+<li>30/60/90-day prioritized roadmap</li>
+<li>Executive summary &amp; team briefing</li>
+<li>Architecture review &amp; gap analysis</li>
+<li>90-minute findings walkthrough</li>
+<li>Stakeholder-ready PDF report</li>
+</ul>
+<a href="mailto:hello@agentmaturity.com" class="btn btn-primary" style="width:100%;justify-content:center">Get the Compass Sprint</a>
+</div>
+<div class="price-card" data-animate>
+<h3>Advisory Retainer</h3>
+<div class="price-amt">$3k–$15k <span>/mo</span></div>
+<p class="price-period">Ongoing partnership</p>
+<ul class="price-list">
+<li>Monthly maturity re-assessment</li>
+<li>Roadmap execution support</li>
+<li>Architecture advisory</li>
+<li>Eval pipeline design &amp; review</li>
+<li>Cost optimization coaching</li>
+<li>On-call Slack/async support</li>
+<li>Quarterly executive briefings</li>
+</ul>
+<a href="mailto:hello@agentmaturity.com" class="btn btn-secondary" style="width:100%;justify-content:center">Contact Us</a>
+</div>
+</div>
+</div>
+</section>
+
+<!-- SOCIAL PROOF -->
+<section class="section">
+<div class="container">
+<p class="section-label" data-animate>Why Teams Trust AMC</p>
+<div class="proof-grid">
+<div class="proof-card" data-animate>
+<div class="proof-stat">7</div>
+<p>Dimensions scored with evidence — not vibes, not vendor demos, not gut feelings.</p>
+</div>
+<div class="proof-card" data-animate>
+<div class="proof-stat">5 days</div>
+<p>From kickoff to a complete maturity baseline with actionable roadmap in hand.</p>
+</div>
+<div class="proof-card" data-animate>
+<div class="proof-stat">30/60/90</div>
+<p>Prioritized day plans with owners, success metrics, and clear sequencing.</p>
+</div>
+</div>
+</div>
+</section>
+
+<!-- FAQ -->
+<section class="section" id="faq" style="background:var(--navy-light)">
+<div class="container">
+<p class="section-label" data-animate>FAQ</p>
+<h2 data-animate>Common questions.</h2>
+<div class="faq-list">
+<div class="faq-item" data-animate>
+<button class="faq-q">Does this replace our internal team?</button>
+<div class="faq-a"><div class="faq-a-inner">No. AMC augments your team with an independent, structured lens. We assess and advise — your team builds and operates. Think of us as the audit function, not the engineering team. We make your people more effective by giving them a clear, prioritized map.</div></div>
+</div>
+<div class="faq-item" data-animate>
+<button class="faq-q">Do you guarantee results?</button>
+<div class="faq-a"><div class="faq-a-inner">We guarantee a rigorous, evidence-backed assessment and a concrete roadmap. Outcomes depend on execution — which is your team's domain. What we do guarantee: you'll know exactly where you stand and what to do next. No ambiguity, no hand-waving.</div></div>
+</div>
+<div class="faq-item" data-animate>
+<button class="faq-q">What do you need from us?</button>
+<div class="faq-a"><div class="faq-a-inner">Access to 2–4 key people (engineering lead, product owner, ops) for interviews. Read access to relevant repos, dashboards, and documentation. Typically 4–6 hours of your team's time total across the sprint. We handle the rest.</div></div>
+</div>
+<div class="faq-item" data-animate>
+<button class="faq-q">Can we keep this confidential?</button>
+<div class="faq-a"><div class="faq-a-inner">Absolutely. Every engagement is covered by NDA. Your architecture, prompts, data, and scores are never shared, published, or used for benchmarking without explicit written consent. Confidentiality is non-negotiable.</div></div>
+</div>
+<div class="faq-item" data-animate>
+<button class="faq-q">How is AMC different from just hiring a consultant?</button>
+<div class="faq-a"><div class="faq-a-inner">Consultants give you opinions. AMC gives you a structured framework with repeatable scoring, evidence requirements, and level definitions. It's a system — not a person's hunch. You can re-run the assessment quarterly and track progress objectively.</div></div>
+</div>
+<div class="faq-item" data-animate>
+<button class="faq-q">What if we're not ready?</button>
+<div class="faq-a"><div class="faq-a-inner">That's exactly when to do it. The assessment tells you what "ready" actually looks like for your context. Most teams think they're further behind than they are in some dimensions and further ahead than they are in others. Either way, you'll stop guessing.</div></div>
+</div>
+</div>
+</div>
+</section>
+
+<!-- FINAL CTA -->
+<section class="section final-cta">
+<div class="container">
+<p class="section-label" data-animate>Get Started</p>
+<h2 data-animate>Get a clear maturity baseline<br>in 5 business days.</h2>
+<p class="section-desc" data-animate>One sprint. Seven dimensions. A roadmap you can actually execute.</p>
+<div data-animate>
+<a href="mailto:hello@agentmaturity.com" class="btn btn-primary">Get the Compass Sprint</a>
+</div>
+</div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+<div class="container">
+<p class="footer-brand"><strong>AMC</strong> — Agent Maturity Compass</p>
+<p class="footer-tag">Measure what matters. Scale what's safe.</p>
+<div class="footer-links">
+<a href="#how">How It Works</a>
+<a href="#dimensions">Dimensions</a>
+<a href="#pricing">Pricing</a>
+<a href="#faq">FAQ</a>
+<a href="score-demo.html">Score Demo</a>
+<a href="sample-report.html">Sample Report</a>
+<a href="mailto:hello@agentmaturity.com">Contact</a>
+</div>
+</div>
+</footer>
+
+<!-- MOBILE CTA -->
+<div class="mobile-cta">
+<a href="mailto:hello@agentmaturity.com" class="btn btn-primary">Get the Compass Sprint</a>
+</div>
+
+<script>
+// Scroll animations with Intersection Observer
+const io = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); }});
+}, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
+document.querySelectorAll('[data-animate]').forEach(el => io.observe(el));
+
+// Score bar animation
+const sio = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.querySelectorAll('.score-fill').forEach(bar => {
+        bar.style.width = bar.dataset.width + '%';
+      });
+      sio.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.3 });
+const sc = document.querySelector('.scorecard-wrapper');
+if (sc) sio.observe(sc);
+
+// FAQ accordion
+document.querySelectorAll('.faq-q').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const item = btn.parentElement;
+    const wasOpen = item.classList.contains('open');
+    document.querySelectorAll('.faq-item.open').forEach(i => i.classList.remove('open'));
+    if (!wasOpen) item.classList.add('open');
+  });
+});
+
+// Mobile hamburger close on link click
+document.querySelectorAll('.mobile-menu a').forEach(a => {
+  a.addEventListener('click', () => {
+    document.querySelector('.mobile-menu').classList.remove('open');
+    document.querySelector('.hamburger').classList.remove('active');
+  });
+});
+</script>
+</body>
+</html>

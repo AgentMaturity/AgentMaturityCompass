@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sample Assessment Report — Agent Maturity Compass</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0A0F1E;--surface:#111827;--border:#1E293B;--gold:#C9A84C;--gold-dim:#8B7533;--text:#F8F8F0;--text-muted:#94A3B8;--green:#34D399;--green-bg:rgba(52,211,153,.12);--amber:#FBBF24;--amber-bg:rgba(251,191,36,.12);--red:#F87171;--font:system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}
+html{font-size:16px;scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--font);line-height:1.6;min-height:100vh}
+.container{max-width:960px;margin:0 auto;padding:32px 24px}
+
+/* Watermark */
+.watermarked{position:relative;overflow:hidden}
+.watermarked::before{content:"SAMPLE — agentmaturity.com";position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(-35deg);font-size:3.2rem;font-weight:800;color:rgba(201,168,76,.07);white-space:nowrap;pointer-events:none;z-index:1;letter-spacing:4px;text-transform:uppercase}
+
+/* Cards */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:32px;margin-bottom:24px;position:relative;overflow:hidden}
+.card::before{content:"SAMPLE — agentmaturity.com";position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(-35deg);font-size:2rem;font-weight:800;color:rgba(201,168,76,.06);white-space:nowrap;pointer-events:none;z-index:0;letter-spacing:3px}
+.card>*{position:relative;z-index:1}
+
+/* Header */
+.report-header{text-align:center;padding:48px 32px}
+.report-header h1{font-size:1.5rem;color:var(--gold);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;font-weight:600}
+.report-header .subtitle{font-size:.9rem;color:var(--text-muted);margin-bottom:32px}
+.meta-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:480px;margin:0 auto 32px;text-align:left}
+.meta-label{font-size:.75rem;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted)}
+.meta-value{font-size:1rem;color:var(--text);font-weight:500}
+
+/* Compass SVG */
+.compass-wrap{margin:32px auto 16px;width:200px;height:200px}
+.overall-score-label{font-size:.85rem;color:var(--text-muted);text-align:center;margin-bottom:4px}
+.overall-score-value{font-size:2.4rem;font-weight:700;color:var(--gold);text-align:center}
+.overall-score-max{font-size:1rem;color:var(--text-muted);font-weight:400}
+
+/* Section headings */
+.section-title{font-size:1.15rem;font-weight:700;color:var(--gold);margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid var(--border);text-transform:uppercase;letter-spacing:1.5px}
+
+/* Executive summary */
+.summary p{margin-bottom:16px;color:var(--text-muted);line-height:1.75}
+
+/* Dimension cards */
+.dim-card{margin-bottom:20px}
+.dim-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px}
+.dim-name{font-size:1.1rem;font-weight:700;color:var(--text)}
+.dim-score{font-size:1.4rem;font-weight:800;color:var(--gold);min-width:64px;text-align:right}
+.score-bar-bg{height:8px;background:var(--border);border-radius:4px;overflow:hidden;margin-bottom:16px}
+.score-bar-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--gold-dim),var(--gold));transition:width .6s ease}
+
+.badge-section{margin-bottom:12px}
+.badge-section-label{font-size:.7rem;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-bottom:6px;font-weight:600}
+.badge{display:inline-block;padding:4px 12px;border-radius:20px;font-size:.8rem;margin:3px 4px 3px 0;line-height:1.4}
+.badge-green{background:var(--green-bg);color:var(--green);border:1px solid rgba(52,211,153,.2)}
+.badge-amber{background:var(--amber-bg);color:var(--amber);border:1px solid rgba(251,191,36,.2)}
+
+/* Roadmap */
+.roadmap-phase{margin-bottom:24px}
+.phase-header{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.phase-badge{background:var(--gold);color:var(--bg);font-weight:700;font-size:.8rem;padding:4px 14px;border-radius:20px;white-space:nowrap}
+.phase-title{font-weight:600;color:var(--text)}
+.roadmap-list{list-style:none;padding-left:0}
+.roadmap-list li{padding:6px 0 6px 24px;position:relative;color:var(--text-muted);font-size:.95rem}
+.roadmap-list li::before{content:"→";position:absolute;left:0;color:var(--gold)}
+
+/* CTA */
+.cta-section{text-align:center;padding:40px 32px}
+.cta-section p{color:var(--text-muted);margin-bottom:24px;font-size:1rem}
+.btn{display:inline-block;padding:14px 40px;background:var(--gold);color:var(--bg);font-weight:700;font-size:1rem;border-radius:8px;text-decoration:none;letter-spacing:.5px;transition:opacity .2s}
+.btn:hover{opacity:.85}
+.btn-outline{background:transparent;border:1px solid var(--border);color:var(--text-muted);padding:10px 24px;font-size:.85rem;margin-left:12px}
+.btn-outline:hover{border-color:var(--gold);color:var(--gold)}
+
+/* Print button */
+.print-btn{position:fixed;bottom:24px;right:24px;background:var(--surface);border:1px solid var(--border);color:var(--text-muted);padding:10px 20px;border-radius:8px;cursor:pointer;font-size:.85rem;font-family:var(--font);z-index:100;transition:all .2s}
+.print-btn:hover{border-color:var(--gold);color:var(--gold)}
+
+/* Print styles */
+@media print{
+  body{background:#fff;color:#111}
+  .card{border:1px solid #ddd;background:#fff;break-inside:avoid}
+  .card::before,.watermarked::before{display:none!important}
+  .print-btn{display:none}
+  .btn{color:#111;border:2px solid #111}
+  .dim-score,.overall-score-value,.section-title,.report-header h1{color:#8B7533!important}
+  .score-bar-bg{background:#e5e7eb}
+  .badge-green{background:#ecfdf5;color:#065f46;border-color:#a7f3d0}
+  .badge-amber{background:#fffbeb;color:#92400e;border-color:#fde68a}
+  .meta-label,.summary p,.roadmap-list li,.badge-section-label,.cta-section p{color:#444!important}
+  .meta-value,.dim-name,.phase-title{color:#111!important}
+}
+@media(max-width:600px){
+  .container{padding:16px}
+  .card{padding:20px}
+  .meta-grid{grid-template-columns:1fr}
+  .compass-wrap{width:160px;height:160px}
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+<!-- HEADER -->
+<div class="card report-header watermarked">
+  <h1>Agent Maturity Compass — Assessment Report</h1>
+  <p class="subtitle">Confidential — Prepared by AMC Framework v2.1</p>
+
+  <div class="meta-grid">
+    <div><div class="meta-label">Agent</div><div class="meta-value">InvoiceBot v2</div></div>
+    <div><div class="meta-label">Organization</div><div class="meta-value">Acme Corp</div></div>
+    <div><div class="meta-label">Assessment Date</div><div class="meta-value">January 2025</div></div>
+    <div><div class="meta-label">Assessor</div><div class="meta-value">AMC Framework v2.1</div></div>
+  </div>
+
+  <!-- Compass Dial SVG -->
+  <div class="compass-wrap">
+    <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="gArc" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stop-color="#8B7533"/>
+          <stop offset="100%" stop-color="#C9A84C"/>
+        </linearGradient>
+      </defs>
+      <!-- Outer ring -->
+      <circle cx="100" cy="100" r="90" fill="none" stroke="#1E293B" stroke-width="6"/>
+      <!-- Score arc: 3.2/5 = 64% of 270deg = 172.8deg, start at 135deg -->
+      <circle cx="100" cy="100" r="90" fill="none" stroke="url(#gArc)" stroke-width="6"
+        stroke-dasharray="271.4 565" stroke-dashoffset="-106"
+        stroke-linecap="round" transform="rotate(0 100 100)"/>
+      <!-- Tick marks -->
+      <g stroke="#1E293B" stroke-width="1.5">
+        <line x1="100" y1="16" x2="100" y2="28" transform="rotate(-135 100 100)"/>
+        <line x1="100" y1="16" x2="100" y2="28" transform="rotate(-81 100 100)"/>
+        <line x1="100" y1="16" x2="100" y2="28" transform="rotate(-27 100 100)"/>
+        <line x1="100" y1="16" x2="100" y2="28" transform="rotate(27 100 100)"/>
+        <line x1="100" y1="16" x2="100" y2="28" transform="rotate(81 100 100)"/>
+        <line x1="100" y1="16" x2="100" y2="28" transform="rotate(135 100 100)"/>
+      </g>
+      <!-- Labels -->
+      <text x="28" y="170" fill="#94A3B8" font-size="11" font-family="system-ui">L1</text>
+      <text x="14" y="105" fill="#94A3B8" font-size="11" font-family="system-ui">L2</text>
+      <text x="52" y="36" fill="#94A3B8" font-size="11" font-family="system-ui">L3</text>
+      <text x="132" y="36" fill="#94A3B8" font-size="11" font-family="system-ui">L4</text>
+      <text x="170" y="105" fill="#94A3B8" font-size="11" font-family="system-ui">L5</text>
+      <!-- Needle -->
+      <line x1="100" y1="100" x2="100" y2="30" stroke="#C9A84C" stroke-width="2.5" stroke-linecap="round"
+        transform="rotate(37.8 100 100)"/>
+      <circle cx="100" cy="100" r="6" fill="#C9A84C"/>
+      <circle cx="100" cy="100" r="3" fill="#0A0F1E"/>
+      <!-- Center score -->
+      <text x="100" y="145" text-anchor="middle" fill="#C9A84C" font-size="28" font-weight="800" font-family="system-ui">L3.2</text>
+      <text x="100" y="162" text-anchor="middle" fill="#94A3B8" font-size="12" font-family="system-ui">of 5.0</text>
+    </svg>
+  </div>
+  <p class="overall-score-label">Overall Maturity Score</p>
+</div>
+
+<!-- EXECUTIVE SUMMARY -->
+<div class="card watermarked">
+  <div class="section-title">Executive Summary</div>
+  <div class="summary">
+    <p>InvoiceBot v2 demonstrates solid operational foundations with strong governance and operating model practices, achieving Level 4.0 in both dimensions. The agent processes approximately 2,400 invoices per day with a 94.2% automation rate, reflecting mature deployment and operational workflows. Security and reliability are well-established at Level 3.5, with appropriate access controls and monitoring in place.</p>
+    <p>Key gaps exist in evaluation coverage (Level 2.0) and cost efficiency monitoring (Level 2.5). Evaluation is limited to 42 happy-path test cases with no adversarial testing or regression detection. Cost attribution remains at the aggregate level, preventing optimization of routing decisions and per-transaction economics.</p>
+    <p>Primary recommendation: establish a continuous evaluation pipeline with 200+ test cases and implement per-transaction cost tracking within 30 days. These two interventions address the most significant risk vectors — undetected failure modes and unoptimized spend — and form the foundation for achieving Level 4+ maturity across all dimensions within 90 days.</p>
+  </div>
+</div>
+
+<!-- DIMENSIONS -->
+<div class="card watermarked">
+  <div class="section-title">Dimension Scores</div>
+
+  <!-- 1. Governance -->
+  <div class="dim-card">
+    <div class="dim-header"><span class="dim-name">1. Governance</span><span class="dim-score">L4.0</span></div>
+    <div class="score-bar-bg"><div class="score-bar-fill" style="width:80%"></div></div>
+    <div class="badge-section">
+      <div class="badge-section-label">✓ Evidence</div>
+      <span class="badge badge-green">Documented RACI matrix</span>
+      <span class="badge badge-green">Quarterly review cadence</span>
+      <span class="badge badge-green">Change management with approval gates</span>
+    </div>
+    <div class="badge-section">
+      <div class="badge-section-label">⚠ Gaps</div>
+      <span class="badge badge-amber">No automated policy enforcement</span>
+      <span class="badge badge-amber">Governance decisions are manual</span>
+    </div>
+  </div>
+
+  <!-- 2. Security -->
+  <div class="dim-card">
+    <div class="dim-header"><span class="dim-name">2. Security</span><span class="dim-score">L3.5</span></div>
+    <div class="score-bar-bg"><div class="score-bar-fill" style="width:70%"></div></div>
+    <div class="badge-section">
+      <div class="badge-section-label">✓ Evidence</div>
+      <span class="badge badge-green">Least-privilege tool access</span>
+      <span class="badge badge-green">API key rotation every 90 days</span>
+      <span class="badge badge-green">Audit logging on all tool calls</span>
+    </div>
+    <div class="badge-section">
+      <div class="badge-section-label">⚠ Gaps</div>
+      <span class="badge badge-amber">No runtime permission boundaries</span>
+      <span class="badge badge-amber">No cryptographic attestation</span>
+    </div>
+  </div>
+
+  <!-- 3. Evaluation -->
+  <div class="dim-card">
+    <div class="dim-header"><span class="dim-name">3. Evaluation</span><span class="dim-score">L2.0</span></div>
+    <div class="score-bar-bg"><div class="score-bar-fill" style="width:40%"></div></div>
+    <div class="badge-section">
+      <div class="badge-section-label">✓ Evidence</div>
+      <span class="badge badge-green">42 test cases covering core scenarios</span>
+    </div>
+    <div class="badge-section">
+      <div class="badge-section-label">⚠ Gaps</div>
+      <span class="badge badge-amber">No adversarial testing</span>
+      <span class="badge badge-amber">No regression detection</span>
+      <span class="badge badge-amber">No human-in-loop eval pipeline</span>
+    </div>
+  </div>
+
+  <!-- 4. Reliability -->
+  <div class="dim-card">
+    <div class="dim-header"><span class="dim-name">4. Reliability</span><span class="dim-score">L3.5</span></div>
+    <div class="score-bar-bg"><div class="score-bar-fill" style="width:70%"></div></div>
+    <div class="badge-section">
+      <div class="badge-section-label">✓ Evidence</div>
+      <span class="badge badge-green">Automated alerts</span>
+      <span class="badge badge-green">Runbook for top 5 failure modes</span>
+      <span class="badge badge-green">99.2% uptime last 90 days</span>
+    </div>
+    <div class="badge-section">
+      <div class="badge-section-label">⚠ Gaps</div>
+      <span class="badge badge-amber">No chaos testing</span>
+      <span class="badge badge-amber">No formal SLA</span>
+      <span class="badge badge-amber">Fallback chain covers 3 of 7 failure modes</span>
+    </div>
+  </div>
+
+  <!-- 5. Observability -->
+  <div class="dim-card">
+    <div class="dim-header"><span class="dim-name">5. Observability</span><span class="dim-score">L3.0</span></div>
+    <div class="score-bar-bg"><div class="score-bar-fill" style="width:60%"></div></div>
+    <div class="badge-section">
+      <div class="badge-section-label">✓ Evidence</div>
+      <span class="badge badge-green">Structured logging</span>
+      <span class="badge badge-green">Basic dashboards</span>
+      <span class="badge badge-green">Trace IDs on all requests</span>
+    </div>
+    <div class="badge-section">
+      <div class="badge-section-label">⚠ Gaps</div>
+      <span class="badge badge-amber">No distributed tracing across agent chains</span>
+      <span class="badge badge-amber">No anomaly detection</span>
+    </div>
+  </div>
+
+  <!-- 6. Cost Efficiency -->
+  <div class="dim-card">
+    <div class="dim-header"><span class="dim-name">6. Cost Efficiency</span><span class="dim-score">L2.5</span></div>
+    <div class="score-bar-bg"><div class="score-bar-fill" style="width:50%"></div></div>
+    <div class="badge-section">
+      <div class="badge-section-label">✓ Evidence</div>
+      <span class="badge badge-green">Monthly cost review</span>
+      <span class="badge badge-green">Aggregate cloud billing tracked</span>
+    </div>
+    <div class="badge-section">
+      <div class="badge-section-label">⚠ Gaps</div>
+      <span class="badge badge-amber">No per-transaction cost attribution</span>
+      <span class="badge badge-amber">No dynamic model routing</span>
+      <span class="badge badge-amber">No budget alerts</span>
+    </div>
+  </div>
+
+  <!-- 7. Operating Model -->
+  <div class="dim-card">
+    <div class="dim-header"><span class="dim-name">7. Operating Model</span><span class="dim-score">L4.0</span></div>
+    <div class="score-bar-bg"><div class="score-bar-fill" style="width:80%"></div></div>
+    <div class="badge-section">
+      <div class="badge-section-label">✓ Evidence</div>
+      <span class="badge badge-green">Dedicated team</span>
+      <span class="badge badge-green">Defined on-call rotation</span>
+      <span class="badge badge-green">Documented deployment process</span>
+      <span class="badge badge-green">Rollback procedures</span>
+    </div>
+    <div class="badge-section">
+      <div class="badge-section-label">⚠ Gaps</div>
+      <span class="badge badge-amber">No automated canary deployments</span>
+      <span class="badge badge-amber">Post-incident reviews ad-hoc</span>
+    </div>
+  </div>
+</div>
+
+<!-- ROADMAP -->
+<div class="card watermarked">
+  <div class="section-title">30 / 60 / 90 Day Roadmap</div>
+
+  <div class="roadmap-phase">
+    <div class="phase-header"><span class="phase-badge">30 DAYS</span><span class="phase-title">Foundation & Quick Wins</span></div>
+    <ul class="roadmap-list">
+      <li>Establish continuous eval pipeline (target: 200+ test cases)</li>
+      <li>Implement per-transaction cost tracking</li>
+      <li>Add runtime permission boundaries</li>
+    </ul>
+  </div>
+
+  <div class="roadmap-phase">
+    <div class="phase-header"><span class="phase-badge">60 DAYS</span><span class="phase-title">Hardening & Detection</span></div>
+    <ul class="roadmap-list">
+      <li>Deploy adversarial test suite</li>
+      <li>Implement budget alerts + cost anomaly detection</li>
+      <li>Formalize SLA with chaos testing plan</li>
+    </ul>
+  </div>
+
+  <div class="roadmap-phase">
+    <div class="phase-header"><span class="phase-badge">90 DAYS</span><span class="phase-title">Excellence & Automation</span></div>
+    <ul class="roadmap-list">
+      <li>Achieve L4+ across all dimensions</li>
+      <li>Implement policy-as-code governance</li>
+      <li>Dynamic model routing for cost optimization</li>
+      <li>Full distributed tracing</li>
+    </ul>
+  </div>
+</div>
+
+<!-- CTA -->
+<div class="card cta-section watermarked">
+  <p>This is a sample report. Get your actual AMC assessment at <strong>agentmaturity.com</strong></p>
+  <a href="mailto:hello@agentmaturity.com" class="btn">Get Your AMC Score</a>
+  <a href="index.html" class="btn btn-outline">← Back to Home</a>
+</div>
+
+</div><!-- /container -->
+
+<button class="print-btn" onclick="window.print()">🖨 Print Report</button>
+</body>
+</html>

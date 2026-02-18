@@ -10,3 +10,11 @@
 - If score/product issue: note in AMC_OS/HQ/BLOCKERS.md
 - All agents use playbooks: SPIN + StoryBrand + JTBD + Da Vinci QA (see ROLEBOOKS)
 - If nothing urgent: reply HEARTBEAT_OK
+
+## Launch status (2026-02-19):
+- Stress test: 60/60 ✅ DEPLOY READY (commit 3952480)
+- 1600 tests: ✅ passing
+- Self-score demo: subagent running → AMC_OS/PLATFORM/AMC_SELF_SCORE_REPORT.md
+- Website: subagent running → AMC_OS/WEBSITE/
+- GTM content: subagent running → AMC_OS/GTM/
+- Sales engine: subagent running → AMC_OS/SALES/
