@@ -11,7 +11,8 @@ export interface AdapterDetectionResult {
   detail: string;
 }
 
-const DEFAULT_DETECTION_TIMEOUT_MS = 1200;
+const DEFAULT_DETECTION_TIMEOUT_MS = 400;
+const parseRegexCache = new Map<string, RegExp>();
 
 interface ProbeResult {
   ok: boolean;
@@ -35,12 +36,20 @@ function probeVersion(command: string, args: string[], timeoutMs: number): Probe
   };
 }
 
+const commandExistsCache = new Map<string, boolean>();
+
 function commandExistsInPath(command: string): boolean {
+  const pathEnv = process.env.PATH ?? "";
+  const cacheKey = `${pathEnv}\u0000${command}`;
+  const cached = commandExistsCache.get(cacheKey);
+  if (cached !== undefined) {
+    return cached;
+  }
+
   const candidates: string[] = [];
   if (command.includes("/") || isAbsolute(command)) {
     candidates.push(command);
   } else {
-    const pathEnv = process.env.PATH ?? "";
     for (const root of pathEnv.split(delimiter)) {
       if (!root) {
         continue;
@@ -48,14 +57,18 @@ function commandExistsInPath(command: string): boolean {
       candidates.push(join(root, command));
     }
   }
+
   for (const candidatePath of candidates) {
     try {
       accessSync(candidatePath, fsConstants.X_OK);
+      commandExistsCache.set(cacheKey, true);
       return true;
     } catch {
       // continue
     }
   }
+
+  commandExistsCache.set(cacheKey, false);
   return false;
 }
 
@@ -72,7 +85,9 @@ export function detectAdapter(definition: AdapterDefinition, options?: { timeout
       failedCandidates.push(`${candidate}(${reason})`);
       continue;
     }
-    const version = (new RegExp(definition.detection.parseVersionRegex).exec(probe.output)?.[1] ?? probe.output) || "unknown";
+    const parseRegex = parseRegexCache.get(definition.detection.parseVersionRegex) ?? new RegExp(definition.detection.parseVersionRegex);
+    parseRegexCache.set(definition.detection.parseVersionRegex, parseRegex);
+    const version = (parseRegex.exec(probe.output)?.[1] ?? probe.output) || "unknown";
     return {
       adapterId: definition.id,
       installed: true,
