@@ -108,6 +108,20 @@ function sanitizePreferences(preferences: RevealedPreference[]): RevealedPrefere
   return [...deduped.values()].sort((a, b) => a.ts - b.ts);
 }
 
+function contextFamily(context: string): string {
+  return context.trim().toLowerCase().replace(/\s+/g, " ");
+}
+
+const MAX_PAIR_COMPARISONS = 20_000;
+
+export interface ValueDriftAnalytics {
+  maxDelta: number;
+  meanDelta: number;
+  shiftingCount: number;
+  driftingCount: number;
+  stableCount: number;
+}
+
 /**
  * Build a value-priority ranking from a set of preferences.
  * Each preference "reveals" a ranking: chosen value > alternative values.
@@ -133,14 +147,20 @@ export function detectInversions(preferences: RevealedPreference[]): PreferenceI
   const inversions: PreferenceInversion[] = [];
   const sorted = sanitizePreferences(preferences);
 
+  let comparisons = 0;
   for (let i = 0; i < sorted.length; i++) {
     for (let j = i + 1; j < sorted.length; j++) {
+      comparisons += 1;
+      if (comparisons > MAX_PAIR_COMPARISONS) {
+        return inversions;
+      }
+
       const a = sorted[i]!;
       const b = sorted[j]!;
 
       const aValue = normalizeValue(a.impliedValue);
       const bValue = normalizeValue(b.impliedValue);
-      const contextMatch = a.context.trim().toLowerCase() === b.context.trim().toLowerCase();
+      const contextMatch = contextFamily(a.context) === contextFamily(b.context);
 
       // Inversion: A picked X over Y then B picked Y over X in same context family.
       if (
@@ -210,6 +230,29 @@ export function computeValueDrift(
   }
 
   return driftPoints.sort((a, b) => b.delta - a.delta || a.dimension.localeCompare(b.dimension));
+}
+
+export function computeValueDriftAnalytics(points: ValueDriftPoint[]): ValueDriftAnalytics {
+  if (points.length === 0) {
+    return {
+      maxDelta: 0,
+      meanDelta: 0,
+      shiftingCount: 0,
+      driftingCount: 0,
+      stableCount: 0
+    };
+  }
+
+  const maxDelta = Math.max(...points.map((point) => point.delta));
+  const meanDelta = points.reduce((sum, point) => sum + point.delta, 0) / points.length;
+
+  return {
+    maxDelta: Number(clamp01(maxDelta).toFixed(6)),
+    meanDelta: Number(clamp01(meanDelta).toFixed(6)),
+    shiftingCount: points.filter((point) => point.trend === "SHIFTING").length,
+    driftingCount: points.filter((point) => point.trend === "DRIFTING").length,
+    stableCount: points.filter((point) => point.trend === "STABLE").length
+  };
 }
 
 // ── VCI Computation ──────────────────────────────────────────────────────────

@@ -2,6 +2,7 @@ import { describe, expect, test, vi } from "vitest";
 import {
   computeVCI,
   computeValueDrift,
+  computeValueDriftAnalytics,
   detectInversions,
   generateValueCoherenceReport,
   parseWindowString
@@ -67,6 +68,30 @@ describe("value coherence engine", () => {
     expect(drift.length).toBeGreaterThan(0);
     expect(drift[0]!.delta).toBeGreaterThanOrEqual(drift.at(-1)!.delta);
     expect(drift.some((row) => row.trend === "SHIFTING" || row.trend === "DRIFTING")).toBe(true);
+
+    const analytics = computeValueDriftAnalytics(drift);
+    expect(analytics.maxDelta).toBeGreaterThanOrEqual(analytics.meanDelta);
+    expect(analytics.stableCount + analytics.driftingCount + analytics.shiftingCount).toBe(drift.length);
+  });
+
+  test("detectInversions short-circuits safely on very large datasets", () => {
+    const t0 = Date.UTC(2026, 1, 1, 0, 0, 0);
+    const rows: RevealedPreference[] = [];
+    for (let idx = 0; idx < 250; idx += 1) {
+      rows.push(
+        pref({
+          preferenceId: `p-${idx}`,
+          impliedValue: idx % 2 === 0 ? "safety" : "speed",
+          alternatives: idx % 2 === 0 ? ["speed"] : ["safety"],
+          context: "incident response",
+          chosenOption: idx % 2 === 0 ? `safe-${idx}` : `fast-${idx}`,
+          ts: t0 + idx
+        })
+      );
+    }
+
+    const out = detectInversions(rows);
+    expect(Array.isArray(out)).toBe(true);
   });
 
   test("generateValueCoherenceReport signs deterministic payload fields", () => {
