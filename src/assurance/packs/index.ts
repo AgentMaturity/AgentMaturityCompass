@@ -18,6 +18,7 @@ import { tocTouPack } from "./tocTouPack.js";
 import { resourceExhaustionPack } from "./resourceExhaustionPack.js";
 import { compoundThreatPack } from "./compoundThreatPack.js";
 import { memoryPoisoningPack } from "./memoryPoisoningPack.js";
+import { timingSideChannelPack } from "./timingSideChannelPack.js";
 
 const assurancePacks: AssurancePackDefinition[] = [
   injectionPack,
@@ -38,7 +39,8 @@ const assurancePacks: AssurancePackDefinition[] = [
   tocTouPack,
   resourceExhaustionPack,
   compoundThreatPack,
-  memoryPoisoningPack
+  memoryPoisoningPack,
+  timingSideChannelPack
 ];
 
 export function listAssurancePacks(): AssurancePackDefinition[] {

@@ -1077,6 +1077,105 @@ export {
   getLabBridgeResults,
   renderWiringDiagnosticsMarkdown,
 } from "./ops/productionWiring.js";
+// Community Governance
+export {
+  initCommunityPlatform,
+  addCommunitySignal,
+  detectGamingPatterns,
+  scoreCommunityGovernance,
+  renderCommunityGovernanceMarkdown,
+  communitySignalSchema,
+  communityPlatformConfigSchema,
+  COMMUNITY_TRUST_TIERS,
+  COMMUNITY_DIMENSIONS,
+  GAMING_PATTERNS,
+} from "./org/communityGovernance.js";
+export type {
+  CommunityTrustTier,
+  CommunityDimension,
+  GamingPattern,
+  CommunitySignal,
+  GamingDetection,
+  DimensionScore,
+  CommunityGovernanceReport,
+  CommunityPlatformConfig,
+} from "./org/communityGovernance.js";
+
+// Agent Discovery & Reputation Portability
+export {
+  createDiscoveryRegistry,
+  ensureAgentEntry,
+  addCapability,
+  linkPlatform,
+  searchCapabilities,
+  exportPortableReputation,
+  verifyPortableReputation,
+  capabilityDeclarationSchema,
+  platformLinkSchema,
+} from "./passport/agentDiscovery.js";
+export type {
+  CapabilityDeclaration,
+  PlatformLink,
+  CapabilitySearchQuery,
+  CapabilitySearchResult,
+  PortableReputationBundle,
+  AgentDiscoveryRegistry,
+  AgentDiscoveryEntry,
+} from "./passport/agentDiscovery.js";
+
+// Known Unknowns
+export {
+  analyzeQuestionUnknowns,
+  generateKnownUnknownsReport,
+  renderKnownUnknownsMarkdown,
+  UNKNOWN_CATEGORIES,
+} from "./diagnostic/knownUnknowns.js";
+export type {
+  UnknownCategory,
+  KnownUnknown,
+  KnownUnknownsReport,
+} from "./diagnostic/knownUnknowns.js";
+
+// Meta-Confidence
+export {
+  computeQuestionMetaConfidence,
+  computeDiagnosticMetaConfidence,
+  renderMetaConfidenceMarkdown,
+} from "./diagnostic/metaConfidence.js";
+export type {
+  QuestionMetaConfidence,
+  DiagnosticMetaConfidence,
+  ConfidenceHeatmapCell,
+  MetaConfidenceOptions,
+} from "./diagnostic/metaConfidence.js";
+
+// Confidence-Threshold Governor
+export {
+  computeEffectiveLevel,
+  confidenceCheck,
+  renderConfidenceGovernorMarkdown,
+  DEFAULT_CONFIDENCE_GOVERNOR_CONFIG,
+} from "./governor/confidenceGovernor.js";
+export type {
+  ConfidenceGovernorConfig,
+  ConfidenceGovernorDecision,
+  ConfidenceCheckInput,
+} from "./governor/confidenceGovernor.js";
+
+// Per-Component Confidence
+export {
+  computeComponentConfidence,
+  renderComponentConfidenceMarkdown,
+  CONFIDENCE_COMPONENTS,
+} from "./diagnostic/componentConfidence.js";
+export type {
+  ConfidenceComponentName,
+  ConfidenceTrend,
+  ConfidenceComponent,
+  ComponentConfidenceReport,
+  ComponentHeatmapCell,
+} from "./diagnostic/componentConfidence.js";
+
 export type {
   AuditEventInput,
   AppendEvidenceFn,

@@ -947,6 +947,22 @@ program
   });
 
 program
+  .command("doctor-fix")
+  .description("Auto-repair common setup issues")
+  .option("--dry-run", "Preview fixes without applying", false)
+  .option("--json", "Emit structured JSON output", false)
+  .action(async (opts: { dryRun: boolean; json: boolean }) => {
+    const { runDoctorFix, renderDoctorFixReport } = require("./doctor/doctorFix.js") as typeof import("./doctor/doctorFix.js");
+    const report = await runDoctorFix(process.cwd(), { dryRun: opts.dryRun });
+    if (opts.json) {
+      console.log(JSON.stringify(report, null, 2));
+    } else {
+      console.log(renderDoctorFixReport(report));
+    }
+    process.exit(report.failed > 0 ? 1 : 0);
+  });
+
+program
   .command("quickstart")
   .description("One-command setup wizard")
   .action(async () => {
@@ -2731,6 +2747,64 @@ ops
       console.log(`${status} ${entry.id} circuit=${entry.circuitId} retries=${entry.retryCount}`);
       console.log(`  Error: ${entry.error}`);
     }
+  });
+
+ops
+  .command("mode")
+  .description("Show or set degradation mode")
+  .option("--set <mode>", "Set mode: FULL, REDUCED, MINIMAL")
+  .option("--reason <reason>", "Reason for mode change")
+  .option("--ttl <duration>", "TTL for mode override (e.g. 4h, 30m)")
+  .action((opts: { set?: string; reason?: string; ttl?: string }) => {
+    const dm = require("./ops/degradationMode.js") as typeof import("./ops/degradationMode.js");
+    if (opts.set) {
+      const mode = opts.set.toUpperCase() as "FULL" | "REDUCED" | "MINIMAL";
+      if (!["FULL", "REDUCED", "MINIMAL"].includes(mode)) {
+        console.log(chalk.red("Invalid mode. Use FULL, REDUCED, or MINIMAL."));
+        process.exit(1);
+      }
+      let ttlMs: number | null = null;
+      if (opts.ttl) {
+        const match = opts.ttl.match(/^(\d+)(h|m|s)$/);
+        if (match) {
+          const val = parseInt(match[1]!, 10);
+          ttlMs = match[2] === "h" ? val * 3600000 : match[2] === "m" ? val * 60000 : val * 1000;
+        }
+      }
+      const event = dm.setMode(mode, opts.reason ?? "manual override", ttlMs);
+      console.log(chalk.green(`Mode changed: ${event.fromMode} → ${event.toMode}`));
+      if (event.expiresAt) console.log(`Expires: ${new Date(event.expiresAt).toISOString()}`);
+    } else {
+      console.log(dm.renderDegradationStatus());
+    }
+  });
+
+ops
+  .command("backpressure")
+  .description("Show backpressure pipeline health")
+  .action(() => {
+    const bp = require("./ops/backpressure.js") as typeof import("./ops/backpressure.js");
+    console.log(bp.renderBackpressureStatus());
+  });
+
+ops
+  .command("slo")
+  .description("Show governance SLO dashboard")
+  .option("--window <hours>", "Window in hours", "1")
+  .action((opts: { window: string }) => {
+    const slo = require("./ops/governanceSlo.js") as typeof import("./ops/governanceSlo.js");
+    const windowMs = parseFloat(opts.window) * 3600000;
+    console.log(slo.renderSloStatus(windowMs));
+  });
+
+ops
+  .command("latency")
+  .description("Show latency accounting report")
+  .option("--window <hours>", "Window in hours", "24")
+  .action((opts: { window: string }) => {
+    const la = require("./ops/latencyAccounting.js") as typeof import("./ops/latencyAccounting.js");
+    const windowMs = parseFloat(opts.window) * 3600000;
+    console.log(la.renderLatencyReport(windowMs));
   });
 
 canon
@@ -11039,6 +11113,19 @@ program
     console.log(`  Questions: ${result.lesson.affectedQuestions.join(", ")}`);
   });
 
+program
+  .command("corrections-verify-closure")
+  .description("Show open feedback loops that need closure")
+  .requiredOption("--agent <id>", "Agent ID")
+  .action((opts: { agent: string }) => {
+    const { generateFeedbackClosureReport, renderFeedbackClosureReport } = require("./corrections/feedbackClosure.js") as typeof import("./corrections/feedbackClosure.js");
+    const ledger = openLedger(process.cwd());
+    const db = (ledger as any).db as import("better-sqlite3").Database;
+    const report = generateFeedbackClosureReport(db, opts.agent);
+    ledger.close();
+    console.log(renderFeedbackClosureReport(report));
+  });
+
 // ── Receipt Chain CLI ───────────────────────────────────────────────────
 program
   .command("receipts-chain")
@@ -11168,6 +11255,156 @@ program
     const agentId = opts.agent ?? activeAgent(program) ?? "default";
     const alerts = getOverrideAlerts(process.cwd(), agentId);
     console.log(renderOverrideAlertsMarkdown(alerts));
+  });
+
+// ── Community Governance ────────────────────────────────────────────────────
+const orgCommunity = org.command("community").description("Community/platform governance scoring");
+
+orgCommunity
+  .command("init")
+  .requiredOption("--platform <name>", "platform name")
+  .action((opts: { platform: string }) => {
+    const { initCommunityPlatform } = require("./org/communityGovernance.js") as typeof import("./org/communityGovernance.js");
+    const config = initCommunityPlatform(opts.platform);
+    console.log(JSON.stringify(config, null, 2));
+    console.log(chalk.green(`Community platform "${opts.platform}" initialized`));
+  });
+
+orgCommunity
+  .command("score")
+  .requiredOption("--platform <name>", "platform name")
+  .action((opts: { platform: string }) => {
+    const { initCommunityPlatform, scoreCommunityGovernance, renderCommunityGovernanceMarkdown } = require("./org/communityGovernance.js") as typeof import("./org/communityGovernance.js");
+    const config = initCommunityPlatform(opts.platform);
+    const report = scoreCommunityGovernance(config);
+    console.log(renderCommunityGovernanceMarkdown(report));
+  });
+
+// ── Agent Discovery ────────────────────────────────────────────────────────
+passport
+  .command("capabilities-add")
+  .description("Add capability declaration to agent passport")
+  .requiredOption("--agent <id>", "agent ID")
+  .requiredOption("--capability <name>", "capability name")
+  .option("--evidence <eventId>", "evidence event ID")
+  .action((opts: { agent: string; capability: string; evidence?: string }) => {
+    const { createDiscoveryRegistry, addCapability } = require("./passport/agentDiscovery.js") as typeof import("./passport/agentDiscovery.js");
+    const registry = createDiscoveryRegistry();
+    const decl = addCapability(registry, opts.agent, opts.capability, opts.evidence ? [opts.evidence] : []);
+    console.log(JSON.stringify(decl, null, 2));
+    console.log(chalk.green(`Capability "${opts.capability}" added for agent ${opts.agent}`));
+  });
+
+passport
+  .command("search")
+  .description("Search agents by capability and minimum maturity level")
+  .requiredOption("--capability <name>", "capability to search for")
+  .option("--min-level <n>", "minimum maturity level", "0")
+  .action((opts: { capability: string; minLevel: string }) => {
+    const { createDiscoveryRegistry, searchCapabilities } = require("./passport/agentDiscovery.js") as typeof import("./passport/agentDiscovery.js");
+    const registry = createDiscoveryRegistry();
+    const results = searchCapabilities(registry, { capability: opts.capability, minLevel: Number(opts.minLevel) });
+    console.log(JSON.stringify(results, null, 2));
+  });
+
+passport
+  .command("link")
+  .description("Link agent passport to external platform identity")
+  .requiredOption("--agent <id>", "agent ID")
+  .requiredOption("--platform <name>", "platform name")
+  .requiredOption("--identity <handle>", "identity handle on platform")
+  .action((opts: { agent: string; platform: string; identity: string }) => {
+    const { createDiscoveryRegistry, linkPlatform } = require("./passport/agentDiscovery.js") as typeof import("./passport/agentDiscovery.js");
+    const registry = createDiscoveryRegistry();
+    const link = linkPlatform(registry, opts.agent, opts.platform, opts.identity);
+    console.log(JSON.stringify(link, null, 2));
+    console.log(chalk.green(`Agent ${opts.agent} linked to ${opts.platform}:${opts.identity}`));
+  });
+
+// ── Known Unknowns ─────────────────────────────────────────────────────────
+program
+  .command("unknowns")
+  .description("List known unknowns for an agent's latest diagnostic run")
+  .option("--agent <id>", "agent ID")
+  .action((opts: { agent?: string }) => {
+    const agentId = opts.agent ?? activeAgent(program) ?? "default";
+    const { generateKnownUnknownsReport, renderKnownUnknownsMarkdown } = require("./diagnostic/knownUnknowns.js") as typeof import("./diagnostic/knownUnknowns.js");
+    const workspace = process.cwd();
+    const report = loadRunReport(workspace, agentId);
+    if (!report) {
+      console.log(chalk.yellow("No diagnostic run found."));
+      return;
+    }
+    const unknownsReport = generateKnownUnknownsReport(report);
+    console.log(renderKnownUnknownsMarkdown(unknownsReport));
+    console.log(JSON.stringify(unknownsReport.summary, null, 2));
+  });
+
+// ── Meta-Confidence ────────────────────────────────────────────────────────
+program
+  .command("meta-confidence")
+  .description("Report confidence in the maturity score itself")
+  .option("--agent <id>", "agent ID")
+  .option("--run <runId>", "specific run ID")
+  .action((opts: { agent?: string; run?: string }) => {
+    const agentId = opts.agent ?? activeAgent(program) ?? "default";
+    const { computeDiagnosticMetaConfidence, renderMetaConfidenceMarkdown } = require("./diagnostic/metaConfidence.js") as typeof import("./diagnostic/metaConfidence.js");
+    const workspace = process.cwd();
+    const report = loadRunReport(workspace, agentId);
+    if (!report) {
+      console.log(chalk.yellow("No diagnostic run found."));
+      return;
+    }
+    const mc = computeDiagnosticMetaConfidence(report);
+    console.log(renderMetaConfidenceMarkdown(mc));
+  });
+
+// ── Confidence Governor ────────────────────────────────────────────────────
+governor
+  .command("confidence-check")
+  .description("Check if action is allowed given confidence-adjusted maturity")
+  .requiredOption("--action <class>", "ActionClass")
+  .option("--agent <id>", "agent ID")
+  .option("--required-level <n>", "required maturity level", "3")
+  .action((opts: { action: string; agent?: string; requiredLevel: string }) => {
+    const agentId = opts.agent ?? activeAgent(program) ?? "default";
+    const { confidenceCheck, renderConfidenceGovernorMarkdown } = require("./governor/confidenceGovernor.js") as typeof import("./governor/confidenceGovernor.js");
+    const workspace = process.cwd();
+    const report = loadRunReport(workspace, agentId);
+    if (!report) {
+      console.log(chalk.yellow("No diagnostic run found."));
+      return;
+    }
+    const decision = confidenceCheck({
+      agentId,
+      actionClass: normalizeActionClass(opts.action),
+      diagnosticReport: report,
+      requiredLevel: Number(opts.requiredLevel),
+    });
+    console.log(renderConfidenceGovernorMarkdown(decision));
+  });
+
+// ── Component Confidence ───────────────────────────────────────────────────
+program
+  .command("confidence")
+  .description("Per-component confidence breakdown")
+  .action(() => { program.commands.find((c: any) => c.name() === "confidence")?.help(); });
+
+program
+  .command("confidence-components")
+  .description("Show per-component confidence breakdown")
+  .option("--agent <id>", "agent ID")
+  .action((opts: { agent?: string }) => {
+    const agentId = opts.agent ?? activeAgent(program) ?? "default";
+    const { computeComponentConfidence, renderComponentConfidenceMarkdown } = require("./diagnostic/componentConfidence.js") as typeof import("./diagnostic/componentConfidence.js");
+    const workspace = process.cwd();
+    const report = loadRunReport(workspace, agentId);
+    if (!report) {
+      console.log(chalk.yellow("No diagnostic run found."));
+      return;
+    }
+    const cc = computeComponentConfidence(report);
+    console.log(renderComponentConfidenceMarkdown(cc));
   });
 
 program.action(() => {

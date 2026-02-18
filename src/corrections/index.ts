@@ -21,3 +21,13 @@ export {
   computeEffectivenessReport,
   type VerificationResult
 } from "./correctionTracker.js";
+
+export {
+  checkClosureEligibility,
+  getOpenFeedbackLoops,
+  generateFeedbackClosureReport,
+  renderFeedbackClosureReport,
+  type FeedbackLoopStatus,
+  type FeedbackClosureReport,
+  type ClosureVerificationResult
+} from "./feedbackClosure.js";
