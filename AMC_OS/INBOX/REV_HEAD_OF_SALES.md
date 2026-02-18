@@ -67,3 +67,41 @@ Immediate request:
 1. Approve top-10 criteria as this week’s prioritization standard.
 2. Enforce decision-date lock before proposal send.
 3. Require EOD scoreboard update tied to close-sprint cohort.
+
+---
+
+## 2026-02-19 Sales salvage pass (30/60-min)
+
+### Why execution lagged (hard stop)
+- `AMC_OS/HQ/SCOREBOARD.md` is still at **0/40 outbound, 0/8 replies, 0/3 calls booked**.
+- `AMC_OS/LEADS/LEADS_MASTER.csv` is very small and contact-incomplete: primary outreach fields (emails/decision makers) are not verified, so sequence throughput cannot hold quality.
+- `AMC_OS/INBOX/REV_SDR_SMB.md` shows no booked call pipeline; pacing controls are not yet connected to call booking handoff.
+
+### 30-min call-booking salvage sequence (execute now)
+1. **5 min:** Pull the top 10 warmest opportunities from the SDR queue.
+2. **10 min:** Filter to replies already indicating pain + timeline; tag each as `Reply-to-Call`.
+3. **15 min:** Send **single-touch response** per qualified reply:
+   - Restate pain + impact in one sentence.
+   - Offer 2 concrete time options (next 2 business days).
+   - Ask for best-fit attendee count + stakeholder list.
+4. **20 min:** For each positive response, capture **decision date** and **next step due** before booking.
+5. **30 min:** If 0–1 calls booked, trigger `REV_HEAD_OF_SALES` assisted booking block and reassign top 5 leads to fast-follow.
+
+### 60-min hardening sequence
+- **30–40 min:** Draft/attach meeting agenda and pre-read for each booked slot.
+- **40–50 min:** Run conversion clean-up on CRM fields (`owner`, `next_step`, `next_step_due_date`, `economic_buyer`, `decision_date`).
+- **50–60 min:** Confirm 3 calls in-flight or explicitly escalate:
+  - 1–2 booked but unconfirmed → recontact with one final 2-slot follow-up.
+  - <3 booked → 15-min escalation with SDR lead and RevOps for assisted calling.
+
+### Immediate blockers + owners (today)
+- **Contact enrichment (SMB top 10):** `REV_SDR_SMB` + `REV_HEAD_OF_SALES` — verify decision-maker names and channels; complete before minute 30.
+- **CRM field compliance for conversion:** `REV_REVOPS_CRM` — block any stage move until `next_step_due_date` + `source_cta` exist.
+- **Proof snippets / trust anchors:** `REV_COPYWRITER_DIRECT_RESPONSE` + `REV_COMPLIANCE_OFFICER` — approve 2 short proof-backed templates before minute 60.
+- **Call-booking cadence ownership:** `REV_HEAD_OF_SALES` — hold decision-date lock + stakeholder confirmation on every booked call.
+
+### Execution checkpoint owners (to mirror standup)
+- `REV_COO_ORCH`: overall cadence control, blockers escalation.
+- `REV_HEAD_OF_SALES`: call booking, warm-reply conversion, decision-date capture.
+- `REV_REVOPS_CRM`: field hygiene and CRM audit.
+- `REV_SDR_SMB`: outreach volume and warm reply attribution.

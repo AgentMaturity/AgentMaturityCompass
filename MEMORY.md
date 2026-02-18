@@ -53,12 +53,21 @@
 
 ---
 
-## Latest session checkpoint (2026-02-18, 22:02 IST)
-- AMC platform fully built through wave-4. All 3 wave-4 squads completed and merged.
-- **849 tests passing, 0 failing** (commit `4de4ff9`).
-- **120/175 features implemented as real code (69%)**; 45 roadmap-only remain as wave-5 target.
-- Total: ~113 real Python modules under `AMC_OS/PLATFORM/`.
-- Crypto bot: running, futures ETH SHORT open; Binance IP whitelist issue unresolved (new IP 10.0.0.1, Sid to fix).
-- Full session log: memory/2026-02-18.md.
+## Latest session checkpoint (2026-02-19, 03:20 IST)
+- **1600 tests passing, 0 failing** (wave-5 complete, commit `0854db7`)
+- **26/26 validation harness passing** (run_full_validation.py, 6 phases)
+- Wave-5 all 5 subagents completed (tool-intelligence, devx-knowledge, orchestration, product-ux, output-memory)
+- ChatGPT AI Army 9-task content merged (commit `d37ea21`) — ROLEBOOKS, MARKETING, IP playbook, ULTRATHINK all live
+- **Stress test v2**: 48/62 pass — 13 failures are API contract mismatches in test harness (not real bugs), 2 are real gaps (enforce router `allowed=None`, score route 404)
+- Exact fixes needed documented in `memory/2026-02-19.md`
+- Crypto bot: RUNNING (pid 92420, Cycle 50), PnL today $-10.54, 1 DOGEUSDT SHORT open, 0% win rate; Binance IP whitelist still needed (10.0.0.1 — Sid must fix)
+- Full session log: memory/2026-02-19.md
 
-*Last updated: 2026-02-18*
+### Critical API contracts (confirmed)
+- `PolicyResult.decision` → `PolicyDecision` enum (allow/deny/stepup…), NOT `.allowed` bool
+- `ReceiptsLedger.init/append/verify_chain` are ALL async — must use `asyncio.run()`
+- `VersionControlStore(history_file=...)` not `db_path`
+- `QuestionnaireEngine.questions` is a list property, not callable
+- `RiskLevel` values are lowercase (`high` not `HIGH`)
+
+*Last updated: 2026-02-19*
