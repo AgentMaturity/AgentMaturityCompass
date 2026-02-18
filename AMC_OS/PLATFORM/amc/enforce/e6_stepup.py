@@ -46,13 +46,13 @@ log = structlog.get_logger(__name__)
 
 
 def _coerce_risk_level(value: "RiskLevel | str") -> "RiskLevel":
-    """Coerce string → RiskLevel, handling Python 3.12+ 'ClassName.MEMBER' format."""
+    """Coerce string → RiskLevel, handling Python 3.12+ 'ClassName.MEMBER' format and case variants."""
     if isinstance(value, RiskLevel):
         return value
     s = str(value)
     if "." in s:
-        s = s.split(".")[-1].lower()
-    return RiskLevel(s)
+        s = s.split(".")[-1]
+    return RiskLevel(s.lower())
 
 
 class ApprovalRequest(BaseModel):

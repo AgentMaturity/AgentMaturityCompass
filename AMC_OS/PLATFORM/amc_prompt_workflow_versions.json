@@ -1575,9 +1575,55 @@
         "note": "rollback-to-v1",
         "parent_version": 100,
         "version": 101
+      },
+      {
+        "artifact_id": "onboarding",
+        "artifact_type": "prompt",
+        "content": {
+          "steps": [
+            "a",
+            "b"
+          ],
+          "v": 1
+        },
+        "created_at": "2026-02-18T21:58:52.145974+00:00",
+        "note": "init",
+        "parent_version": 101,
+        "version": 102
+      },
+      {
+        "artifact_id": "onboarding",
+        "artifact_type": "prompt",
+        "content": {
+          "steps": [
+            "a",
+            "b",
+            "c"
+          ],
+          "v": 2
+        },
+        "created_at": "2026-02-18T21:58:52.147447+00:00",
+        "note": "add c",
+        "parent_version": 102,
+        "version": 103
+      },
+      {
+        "artifact_id": "onboarding",
+        "artifact_type": "prompt",
+        "content": {
+          "steps": [
+            "a",
+            "b"
+          ],
+          "v": 1
+        },
+        "created_at": "2026-02-18T21:58:52.150748+00:00",
+        "note": "rollback-to-v1",
+        "parent_version": 103,
+        "version": 104
       }
     ]
   },
-  "updated_at": "2026-02-18T18:04:17.854882+00:00",
+  "updated_at": "2026-02-18T21:58:52.150751+00:00",
   "workflow": {}
 }

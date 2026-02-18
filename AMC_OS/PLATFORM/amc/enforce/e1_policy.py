@@ -174,6 +174,26 @@ BUILTIN_RULES: list[PolicyRule] = [
         decision=PolicyDecision.DENY,
         remediation="Session is flagged as hostile; no exec permitted",
     ),
+    PolicyRule(
+        id="EXEC-006",
+        description="Block all exec for untrusted sessions (enterprise-secure default)",
+        risk_level=RiskLevel.HIGH,
+        applies_to_categories={ToolCategory.EXEC},
+        applies_to_trusts={SessionTrust.UNTRUSTED},
+        evaluator=lambda t, p, c: "Exec blocked: untrusted sessions may not run arbitrary commands",
+        decision=PolicyDecision.DENY,
+        remediation="Elevate session trust level or use a read-only alternative",
+    ),
+    PolicyRule(
+        id="NET-003",
+        description="Block network/messaging tools for untrusted sessions",
+        risk_level=RiskLevel.HIGH,
+        applies_to_categories={ToolCategory.NETWORK, ToolCategory.MESSAGING},
+        applies_to_trusts={SessionTrust.UNTRUSTED, SessionTrust.HOSTILE},
+        evaluator=lambda t, p, c: "Network access blocked: untrusted/hostile session",
+        decision=PolicyDecision.DENY,
+        remediation="Network tools require at least SEMI_TRUSTED session level",
+    ),
 
     # --- CONTROL PLANE rules ---
     PolicyRule(

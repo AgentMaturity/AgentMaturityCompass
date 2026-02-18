@@ -59,6 +59,7 @@ class EvaluatePolicyResponse(BaseModel):
     session_id: str
     tool_name: str
     decision: str
+    allowed: bool = False
     reasons: list[str] = Field(default_factory=list)
 
 
@@ -87,6 +88,7 @@ async def evaluate_policy(req: EvaluatePolicyRequest) -> EvaluatePolicyResponse:
             session_id=req.session_id,
             tool_name=req.tool_name,
             decision=result.decision.value,
+            allowed=(result.decision.value == "allow"),
             reasons=result.reasons,
         )
     except Exception as exc:
