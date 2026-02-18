@@ -40,6 +40,7 @@ class MaturityLevel(str, Enum):
     L2 = "L2"  # Defined
     L3 = "L3"  # Managed
     L4 = "L4"  # Optimized
+    L5 = "L5"  # Autonomous & Self-Improving
 
 
 class DimensionScore(BaseModel):
@@ -109,8 +110,43 @@ DIMENSION_RUBRICS: dict[Dimension, list[dict[str, Any]]] = {
         {"qid": "ops_3", "yes": ["self-serve", "portal", "api", "developer"], "no": ["ticket", "manual", "no"], "evidence": ["developer-portal", "self-serve", "api-catalog"], "points": 25, "gap": "No self-serve developer experience"},
         {"qid": "ops_4", "yes": ["multi-agent", "orchestrat", "coordinate", "workflow"], "no": ["single", "no"], "evidence": ["multi-agent", "orchestration", "dag", "workflow"], "points": 25, "gap": "No multi-agent orchestration capability"},
         {"qid": "ops_5", "yes": ["training", "playbook", "adoption", "enablement"], "no": ["none", "not", "manual"], "evidence": ["enablement", "training", "playbook", "onboarding"], "points": 25, "gap": "No adoption playbook for AI agents"},
+        # L5 — Autonomous & Self-Improving
+        {"qid": "ops_6", "yes": ["automated-runbook", "auto-remediation", "self-service-ops", "runbook-automation"], "no": ["manual", "no", "none"], "evidence": ["automated-runbook", "auto-remediation", "runbook-automation", "self-service-ops"], "points": 25, "gap": "No automated runbook execution for known incident types"},
+        {"qid": "ops_7", "yes": ["okr", "continuous-improvement", "quarterly-review", "measured-improvement"], "no": ["no", "none", "ad-hoc"], "evidence": ["okr", "quarterly-review", "continuous-improvement", "measured-improvement"], "points": 25, "gap": "No OKR framework with measured continuous improvement cadence"},
     ],
 }
+
+# L5 rubric additions: inject into each dimension
+_L5_RUBRICS: dict[Dimension, list[dict[str, Any]]] = {
+    Dimension.GOVERNANCE: [
+        {"qid": "gov_6", "yes": ["automated", "continuous-governance", "ai-policy", "self-review"], "no": ["manual", "no", "none"], "evidence": ["automated", "continuous-governance", "ai-policy", "self-review"], "points": 25, "gap": "No automated governance review loop"},
+        {"qid": "gov_7", "yes": ["feedback-loop", "incident-learning", "policy-improvement", "retrospective"], "no": ["no", "none"], "evidence": ["feedback-loop", "incident-learning", "policy-improvement", "retrospective"], "points": 25, "gap": "No incident-driven governance feedback loop"},
+    ],
+    Dimension.SECURITY: [
+        {"qid": "sec_5", "yes": ["automated-threat", "adaptive-security", "self-healing", "threat-intelligence"], "no": ["manual", "no", "none"], "evidence": ["automated-threat", "adaptive-security", "threat-intelligence", "self-healing"], "points": 25, "gap": "No automated adaptive threat modeling"},
+        {"qid": "sec_6", "yes": ["continuous-red-team", "adversarial-simulation", "attack-simulation", "pentest-automation"], "no": ["no", "never", "none"], "evidence": ["continuous-red-team", "adversarial-simulation", "attack-simulation", "pentest-automation"], "points": 25, "gap": "No continuous red-team or adversarial simulation"},
+    ],
+    Dimension.RELIABILITY: [
+        {"qid": "rel_5", "yes": ["self-healing", "auto-recovery", "autonomous-recovery", "chaos-engineering"], "no": ["manual", "no", "none"], "evidence": ["self-healing", "auto-recovery", "autonomous-recovery", "chaos-engineering"], "points": 25, "gap": "No self-healing autonomous recovery"},
+        {"qid": "rel_6", "yes": ["predictive", "ml-reliability", "proactive-alert", "anomaly-detection"], "no": ["reactive", "no", "none"], "evidence": ["predictive", "ml-reliability", "proactive-alert", "anomaly-detection"], "points": 25, "gap": "No predictive reliability with proactive alerting"},
+    ],
+    Dimension.EVALUATION: [
+        {"qid": "eval_5", "yes": ["shadow-eval", "production-eval", "continuous-eval", "online-eval"], "no": ["offline", "no", "none"], "evidence": ["shadow-eval", "production-eval", "continuous-eval", "online-eval"], "points": 25, "gap": "No continuous evaluation on production traffic"},
+        {"qid": "eval_6", "yes": ["auto-improvement", "self-improving", "eval-driven-update", "feedback-loop"], "no": ["manual", "no", "none"], "evidence": ["auto-improvement", "self-improving", "eval-driven-update", "feedback-loop"], "points": 25, "gap": "No automated eval-driven improvement loop"},
+    ],
+    Dimension.OBSERVABILITY: [
+        {"qid": "obs_5", "yes": ["ml-anomaly", "ai-ops", "intelligent-alerting", "predictive-observability"], "no": ["manual", "no", "none"], "evidence": ["ml-anomaly", "ai-ops", "intelligent-alerting", "predictive-observability"], "points": 25, "gap": "No AI-powered anomaly detection on observability data"},
+        {"qid": "obs_6", "yes": ["distributed-tracing", "root-cause", "opentelemetry", "jaeger"], "no": ["no", "none"], "evidence": ["distributed-tracing", "root-cause", "opentelemetry", "jaeger"], "points": 25, "gap": "No distributed tracing with root cause analysis"},
+    ],
+    Dimension.COST_EFFICIENCY: [
+        {"qid": "cost_5", "yes": ["auto-routing", "cost-optimization", "model-arbitrage", "dynamic-routing"], "no": ["manual", "no", "none"], "evidence": ["auto-routing", "cost-optimization", "model-arbitrage", "dynamic-routing"], "points": 25, "gap": "No automated cost-optimized model routing"},
+        {"qid": "cost_6", "yes": ["budget-enforcement", "auto-throttle", "cost-circuit-breaker", "spend-limit"], "no": ["no", "none"], "evidence": ["budget-enforcement", "auto-throttle", "cost-circuit-breaker", "spend-limit"], "points": 25, "gap": "No automated budget enforcement for runaway agents"},
+    ],
+}
+
+# Merge L5 rubrics into DIMENSION_RUBRICS
+for _dim, _extras in _L5_RUBRICS.items():
+    DIMENSION_RUBRICS[_dim].extend(_extras)
 
 # Module recommendations: which AMC platform modules address gaps in each dimension
 MODULE_RECOMMENDATIONS: dict[Dimension, list[str]] = {
@@ -190,7 +226,9 @@ class ScoringEngine:
         score = min(100, int((total_points / max(max_points, 1)) * 100)) if max_points else 0
 
         # Determine level
-        if score >= 80:
+        if score >= 95:
+            level = MaturityLevel.L5
+        elif score >= 80:
             level = MaturityLevel.L4
         elif score >= 55:
             level = MaturityLevel.L3
@@ -246,7 +284,9 @@ class ScoringEngine:
 
         # Overall score = average
         avg = int(sum(ds.score for ds in dim_scores) / len(dim_scores)) if dim_scores else 0
-        if avg >= 80:
+        if avg >= 95:
+            overall = MaturityLevel.L5
+        elif avg >= 80:
             overall = MaturityLevel.L4
         elif avg >= 55:
             overall = MaturityLevel.L3

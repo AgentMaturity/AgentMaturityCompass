@@ -1,0 +1,15 @@
+{
+  "request_id": "c74b55f8-0a79-4369-8690-6a7264771542",
+  "requester_email": "alice@example.com",
+  "request_type": "access",
+  "generated_at": "2026-02-18T16:43:43.641559+00:00",
+  "counts_by_system": {
+    "crm": 2
+  },
+  "items": {
+    "crm": [
+      "crm-record-1",
+      "crm-record-2"
+    ]
+  }
+}

@@ -53,13 +53,12 @@
 
 ---
 
-## Latest session checkpoint (2026-02-18)
-- Continued AMC build from prior context and completed remaining Watch modules W6–W10.
-- Added `w6_output_attestation.py`, `w7_explainability_packet.py`, `w8_host_hardening.py`, `w9_multi_tenant_verifier.py`, `w10_policy_packs.py`.
-- Local platform test suite now reports **371 passing**.
-
-*Last updated: 2026-02-18*
-
----
+## Latest session checkpoint (2026-02-18, 22:02 IST)
+- AMC platform fully built through wave-4. All 3 wave-4 squads completed and merged.
+- **849 tests passing, 0 failing** (commit `4de4ff9`).
+- **120/175 features implemented as real code (69%)**; 45 roadmap-only remain as wave-5 target.
+- Total: ~113 real Python modules under `AMC_OS/PLATFORM/`.
+- Crypto bot: running, futures ETH SHORT open; Binance IP whitelist issue unresolved (new IP 10.0.0.1, Sid to fix).
+- Full session log: memory/2026-02-18.md.
 
 *Last updated: 2026-02-18*

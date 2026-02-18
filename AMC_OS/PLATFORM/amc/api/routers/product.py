@@ -166,6 +166,188 @@ from amc.product.conversation_state import (
     get_state_manager,
 )
 
+# ── Wave-2 output/memory/intelligence module imports ─────────────────────
+from amc.product.structured_output import (
+    OutputFormat,
+    OutputSchema,
+    EnforceRequest as _StructuredEnforceRequest,
+    StructuredOutputEnforcer,
+    get_structured_output_enforcer,
+)
+from amc.product.output_diff import (
+    OutputDiffTracker,
+    get_output_diff_tracker,
+)
+from amc.product.instruction_formatter import (
+    AudienceRole,
+    Tone,
+    StructureStyle,
+    FormatRequest as _FormatRequest,
+    get_instruction_formatter,
+)
+from amc.product.plan_generator import (
+    PlanRequest as _PlanRequest,
+    get_plan_generator,
+)
+from amc.product.conversation_summarizer import (
+    MessageRole,
+    ConversationMessage as _ConvMessage,
+    SummarizeRequest as _SummarizeRequest,
+    get_conversation_summarizer,
+)
+from amc.product.long_term_memory import (
+    MemoryEntry as _LTMemoryEntry,
+    get_long_term_memory_store,
+)
+from amc.product.context_optimizer import (
+    SelectionStrategy,
+    TokenEstimateMode,
+    ContextItem as _ContextItem,
+    OptimizeRequest as _OptimizeRequest,
+    get_context_optimizer,
+)
+from amc.product.chunking_pipeline import (
+    ChunkStrategy,
+    ChunkRequest as _ChunkRequest,
+    get_chunking_pipeline,
+)
+from amc.product.reasoning_coach import (
+    Severity as CoachSeverity,
+    CoachRequest as _CoachRequest,
+    get_reasoning_coach,
+)
+
+# Wave-2 Tool Intelligence imports
+from amc.product.task_spec import TaskSpecCompiler, get_task_spec_compiler
+from amc.product.clarification_optimizer import (
+    ClarificationOptimizer,
+    get_clarification_optimizer,
+)
+from amc.product.task_splitter import MultiAgentTaskSplitter, get_task_splitter
+from amc.product.dependency_graph import DependencyGraphResolver, get_dependency_graph_resolver
+from amc.product.param_autofiller import ToolParamAutoFiller, get_param_autofiller
+from amc.product.response_validator import ToolResponseValidator, get_response_validator
+from amc.product.tool_cost_estimator import CostModel, ToolCostEstimator, get_tool_cost_estimator
+from amc.product.tool_chain_builder import ToolChainBuilder, get_tool_chain_builder
+from amc.product.tool_fallback import ToolFallbackManager, get_tool_fallback_manager
+from amc.product.tool_rate_limiter import ToolRateLimiter, get_tool_rate_limiter
+
+# ── Wave-5: Knowledge + DevX module imports ──────────────────────────────
+from amc.product.sop_compiler import (
+    SOPCompileRequest,
+    get_sop_compiler,
+)
+from amc.product.api_wrapper_generator import (
+    WrapperGenerateRequest,
+    get_api_wrapper_generator,
+)
+from amc.product.autodoc_generator import (
+    DocGenerateRequest,
+    get_autodoc_generator,
+)
+from amc.product.docs_ingestion import (
+    IngestRequest as DocsIngestRequest,
+    WeeklySummaryRequest,
+    get_docs_ingestion_manager,
+)
+from amc.product.kb_builder import (
+    TicketInput,
+    KBSearchRequest,
+    get_kb_builder,
+)
+from amc.product.workflow_templates import (
+    TemplateCreateRequest,
+    TemplateUpdateRequest,
+    TemplateInstallRequest,
+    TemplateSearchRequest,
+    get_workflow_template_marketplace,
+)
+from amc.product.async_callback import (
+    CallbackRegisterRequest,
+    TriggerRequest,
+    RetryRequest,
+    get_async_callback_manager,
+)
+from amc.product.output_corrector import (
+    CorrectRequest,
+    CorrectionRuleCreate,
+    SectionOrderConfigCreate,
+    NamingNormCreate,
+    get_output_corrector,
+)
+
+# ── Wave-Final: Product/UX/Channel modules ────────────────────────────────
+from amc.product.onboarding_wizard import (
+    StartSessionInput as OnboardStartInput,
+    StepAdvanceInput,
+    OAuthConnectionInput,
+    WorkflowSelectionInput,
+    FirstRunInput,
+    PreferencesInput,
+    get_onboarding_wizard,
+)
+from amc.product.portal import (
+    JobSubmitInput,
+    JobStatusUpdateInput,
+    ProgressEventInput,
+    ResultFileInput,
+    JobStatus,
+    get_portal_manager,
+)
+from amc.product.approval_workflow import (
+    DraftCreateInput,
+    DraftUpdateInput,
+    SubmitForApprovalInput,
+    ApprovalDecisionInput,
+    RevisionInput,
+    SendInput,
+    get_approval_manager,
+)
+from amc.product.collaboration import (
+    TaskCreateInput,
+    TaskUpdateInput,
+    AssignInput,
+    HandoffInput,
+    HandoffAckInput,
+    CommentInput,
+    get_collaboration_manager,
+)
+from amc.product.retention_autopilot import (
+    UsageSignalInput,
+    ChurnScoreInput,
+    WinbackTriggerInput,
+    FlowEventInput,
+    get_retention_autopilot,
+)
+from amc.product.personalized_output import (
+    StyleProfileInput,
+    StyleProfileUpdateInput,
+    ApplyStyleInput,
+    get_output_manager,
+)
+from amc.product.proactive_reminders import (
+    SubscriptionInput,
+    ReminderCreateInput,
+    SnoozeInput,
+    get_reminder_manager,
+)
+from amc.product.outcome_pricing import (
+    ContractCreateInput,
+    ContractUpdateInput,
+    OutcomeRecordInput,
+    OutcomeVerifyInput,
+    BillingEventInput,
+    BillingStatusUpdateInput,
+    get_outcome_manager,
+)
+from amc.product.white_label import (
+    TemplateCreateInput as WLTemplateCreateInput,
+    TemplateUpdateInput as WLTemplateUpdateInput,
+    EnvironmentProvisionInput,
+    BrandingAssetInput,
+    get_white_label_manager,
+)
+
 router = APIRouter(prefix="/api/v1/product", tags=["product"])
 features_router = APIRouter(prefix="/api/v1/product", tags=["product", "product-features"])
 metering_router = APIRouter(prefix="/api/v1/product", tags=["product", "product-metering"])
@@ -191,6 +373,16 @@ prompt_modules_router = APIRouter(prefix="/api/v1/product", tags=["product", "pr
 tool_docs_router = APIRouter(prefix="/api/v1/product", tags=["product", "product-tool-docs"])
 tool_parallel_router = APIRouter(prefix="/api/v1/product", tags=["product", "product-tool-parallel"])
 
+# Wave-5: Knowledge + DevX routers
+sop_router = APIRouter(prefix="/api/v1/product", tags=["product", "product-sop"])
+api_wrapper_router = APIRouter(prefix="/api/v1/product", tags=["product", "product-api-wrapper"])
+autodoc_router = APIRouter(prefix="/api/v1/product", tags=["product", "product-autodoc"])
+docs_ingest_router = APIRouter(prefix="/api/v1/product", tags=["product", "product-docs-ingest"])
+kb_router = APIRouter(prefix="/api/v1/product", tags=["product", "product-kb"])
+templates_router = APIRouter(prefix="/api/v1/product", tags=["product", "product-templates"])
+callbacks_router = APIRouter(prefix="/api/v1/product", tags=["product", "product-callbacks"])
+output_corrector_router = APIRouter(prefix="/api/v1/product", tags=["product", "product-output-corrector"])
+
 tool_discovery_router  = APIRouter(prefix="/api/v1/product", tags=["product", "product-tool-discovery"])
 tool_reliability_router = APIRouter(prefix="/api/v1/product", tags=["product", "product-tool-reliability"])
 error_translator_router = APIRouter(prefix="/api/v1/product", tags=["product", "product-error-translator"])
@@ -203,6 +395,40 @@ goals_router = APIRouter(prefix="/api/v1/product", tags=["product", "product-goa
 loops_router = APIRouter(prefix="/api/v1/product", tags=["product", "product-loops"])
 confidence_router = APIRouter(prefix="/api/v1/product", tags=["product", "product-confidence"])
 state_router = APIRouter(prefix="/api/v1/product", tags=["product", "product-state"])
+
+# Wave-2 output/memory/intelligence routers
+structured_output_router = APIRouter(prefix="/api/v1/product", tags=["product", "product-structured-output"])
+output_diff_router = APIRouter(prefix="/api/v1/product", tags=["product", "product-output-diff"])
+instruction_fmt_router = APIRouter(prefix="/api/v1/product", tags=["product", "product-instruction-fmt"])
+plan_router = APIRouter(prefix="/api/v1/product", tags=["product", "product-plan"])
+conv_summarizer_router = APIRouter(prefix="/api/v1/product", tags=["product", "product-conv-summarizer"])
+lt_memory_router = APIRouter(prefix="/api/v1/product", tags=["product", "product-lt-memory"])
+ctx_optimizer_router = APIRouter(prefix="/api/v1/product", tags=["product", "product-ctx-optimizer"])
+chunking_router = APIRouter(prefix="/api/v1/product", tags=["product", "product-chunking"])
+reasoning_coach_router = APIRouter(prefix="/api/v1/product", tags=["product", "product-reasoning-coach"])
+
+# Wave-2 Tool Intelligence routers
+task_spec_router = APIRouter(prefix="/api/v1/product", tags=["product", "product-task-spec"])
+clarify_router = APIRouter(prefix="/api/v1/product", tags=["product", "product-clarify"])
+task_split_router = APIRouter(prefix="/api/v1/product", tags=["product", "product-task-split"])
+dep_graph_router = APIRouter(prefix="/api/v1/product", tags=["product", "product-dep-graph"])
+param_autofill_router = APIRouter(prefix="/api/v1/product", tags=["product", "product-param-autofill"])
+resp_validator_router = APIRouter(prefix="/api/v1/product", tags=["product", "product-resp-validator"])
+tool_cost_router = APIRouter(prefix="/api/v1/product", tags=["product", "product-tool-cost"])
+tool_chain_router = APIRouter(prefix="/api/v1/product", tags=["product", "product-tool-chain"])
+tool_fallback_router = APIRouter(prefix="/api/v1/product", tags=["product", "product-tool-fallback"])
+tool_rate_router = APIRouter(prefix="/api/v1/product", tags=["product", "product-tool-rate"])
+
+# Wave-Final: Product/UX/Channel routers
+onboarding_router = APIRouter(prefix="/api/v1/product", tags=["product", "product-onboarding"])
+portal_router = APIRouter(prefix="/api/v1/product", tags=["product", "product-portal"])
+approvals_router = APIRouter(prefix="/api/v1/product", tags=["product", "product-approvals"])
+collab_router = APIRouter(prefix="/api/v1/product", tags=["product", "product-collab"])
+retention_router = APIRouter(prefix="/api/v1/product", tags=["product", "product-retention"])
+output_style_router = APIRouter(prefix="/api/v1/product", tags=["product", "product-output-style"])
+reminders_router = APIRouter(prefix="/api/v1/product", tags=["product", "product-reminders"])
+outcome_pricing_router = APIRouter(prefix="/api/v1/product", tags=["product", "product-outcome-pricing"])
+white_label_router = APIRouter(prefix="/api/v1/product", tags=["product", "product-white-label"])
 
 
 def register_product_routes(app: FastAPI) -> None:
@@ -248,6 +474,56 @@ def register_product_routes(app: FastAPI) -> None:
         (prompt_modules_router, getattr(settings, "module_product_prompts_enabled", True)),
         (tool_docs_router, getattr(settings, "module_product_tool_docs_enabled", True)),
         (tool_parallel_router, getattr(settings, "module_product_tool_parallel_enabled", True)),
+        # Wave-5: Knowledge + DevX
+        (sop_router, getattr(settings, "module_product_sop_enabled", True)),
+        (api_wrapper_router, getattr(settings, "module_product_api_wrapper_enabled", True)),
+        (autodoc_router, getattr(settings, "module_product_autodoc_enabled", True)),
+        (docs_ingest_router, getattr(settings, "module_product_docs_ingest_enabled", True)),
+        (kb_router, getattr(settings, "module_product_kb_enabled", True)),
+        (templates_router, getattr(settings, "module_product_templates_enabled", True)),
+        (callbacks_router, getattr(settings, "module_product_callbacks_enabled", True)),
+        (output_corrector_router, getattr(settings, "module_product_output_corrector_enabled", True)),
+        # Wave-2 Tool Intelligence
+        (task_spec_router, getattr(settings, "module_product_task_spec_enabled", True)),
+        (clarify_router, getattr(settings, "module_product_clarify_enabled", True)),
+        (task_split_router, getattr(settings, "module_product_task_split_enabled", True)),
+        (dep_graph_router, getattr(settings, "module_product_dep_graph_enabled", True)),
+        (param_autofill_router, getattr(settings, "module_product_param_autofill_enabled", True)),
+        (resp_validator_router, getattr(settings, "module_product_resp_validator_enabled", True)),
+        (tool_cost_router, getattr(settings, "module_product_tool_cost_enabled", True)),
+        (tool_chain_router, getattr(settings, "module_product_tool_chain_enabled", True)),
+        (tool_fallback_router, getattr(settings, "module_product_tool_fallback_enabled", True)),
+        (tool_rate_router, getattr(settings, "module_product_tool_rate_enabled", True)),
+        # Wave-2: output/memory/intelligence
+        (structured_output_router, getattr(settings, "module_product_structured_output_enabled", True)),
+        (output_diff_router, getattr(settings, "module_product_output_diff_enabled", True)),
+        (instruction_fmt_router, getattr(settings, "module_product_instruction_fmt_enabled", True)),
+        (plan_router, getattr(settings, "module_product_plan_enabled", True)),
+        (conv_summarizer_router, getattr(settings, "module_product_conv_summarizer_enabled", True)),
+        (lt_memory_router, getattr(settings, "module_product_lt_memory_enabled", True)),
+        (ctx_optimizer_router, getattr(settings, "module_product_ctx_optimizer_enabled", True)),
+        (chunking_router, getattr(settings, "module_product_chunking_enabled", True)),
+        (reasoning_coach_router, getattr(settings, "module_product_reasoning_coach_enabled", True)),
+        # Wave-Final: Orchestration + Reliability
+        (workflow_engine_router, getattr(settings, "module_product_workflow_engine_enabled", True)),
+        (event_router_r, getattr(settings, "module_product_event_router_enabled", True)),
+        (retry_engine_router, getattr(settings, "module_product_retry_engine_enabled", True)),
+        (compensation_router, getattr(settings, "module_product_compensation_enabled", True)),
+        (rate_limits_router, getattr(settings, "module_product_rate_limits_enabled", True)),
+        (sync_router, getattr(settings, "module_product_sync_enabled", True)),
+        (graph_router, getattr(settings, "module_product_graph_enabled", True)),
+        (doc_assemble_router, getattr(settings, "module_product_doc_assemble_enabled", True)),
+        (batch_router, getattr(settings, "module_product_batch_enabled", True)),
+        # Wave-Final: Product/UX/Channel
+        (onboarding_router, getattr(settings, "module_product_onboarding_enabled", True)),
+        (portal_router, getattr(settings, "module_product_portal_enabled", True)),
+        (approvals_router, getattr(settings, "module_product_approvals_enabled", True)),
+        (collab_router, getattr(settings, "module_product_collab_enabled", True)),
+        (retention_router, getattr(settings, "module_product_retention_enabled", True)),
+        (output_style_router, getattr(settings, "module_product_output_style_enabled", True)),
+        (reminders_router, getattr(settings, "module_product_reminders_enabled", True)),
+        (outcome_pricing_router, getattr(settings, "module_product_outcome_pricing_enabled", True)),
+        (white_label_router, getattr(settings, "module_product_white_label_enabled", True)),
     ]
     for route, enabled in module_routes:
         if enabled:
@@ -3590,3 +3866,3879 @@ def build_parallel_plan(payload: ParallelPlanRequest) -> dict:
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
     return plan.dict
+
+
+# =============================================================================
+# Wave-5: Knowledge + DevX Routes
+# =============================================================================
+
+# ---------------------------------------------------------------------------
+# SOP Compiler — /api/v1/product/sop/*
+# ---------------------------------------------------------------------------
+
+
+@sop_router.post("/sop/compile", response_model=dict)
+def compile_sop(payload: SOPCompileRequest) -> dict:
+    """Compile an SOP document into a structured workflow."""
+    try:
+        result = get_sop_compiler().compile(payload)
+        return result.model_dump()
+    except Exception as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+
+@sop_router.get("/sop/history", response_model=list)
+def list_sop_history(limit: int = 20) -> list:
+    """Return recent SOP compile history."""
+    return get_sop_compiler().get_history(limit=limit)
+
+
+# ---------------------------------------------------------------------------
+# API Wrapper Generator — /api/v1/product/tools/generate
+# ---------------------------------------------------------------------------
+
+
+@api_wrapper_router.post("/tools/generate", response_model=dict)
+def generate_api_wrapper(payload: WrapperGenerateRequest) -> dict:
+    """Generate a typed Python tool wrapper from an OpenAPI or Postman spec."""
+    try:
+        result = get_api_wrapper_generator().generate(payload)
+        return result.model_dump()
+    except Exception as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+
+@api_wrapper_router.get("/tools/generate/history", response_model=list)
+def list_wrapper_history(limit: int = 20) -> list:
+    """Return recent wrapper generation history."""
+    return get_api_wrapper_generator().get_history(limit=limit)
+
+
+# ---------------------------------------------------------------------------
+# AutoDoc Generator — /api/v1/product/docs/generate
+# ---------------------------------------------------------------------------
+
+
+@autodoc_router.post("/docs/generate", response_model=dict)
+def generate_docs(payload: DocGenerateRequest) -> dict:
+    """Generate README/documentation from workflow + test definitions."""
+    try:
+        result = get_autodoc_generator().generate(payload)
+        return result.model_dump()
+    except Exception as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+
+@autodoc_router.get("/docs/history", response_model=list)
+def list_doc_history(limit: int = 20) -> list:
+    """Return recent doc generation history."""
+    return get_autodoc_generator().get_history(limit=limit)
+
+
+@autodoc_router.get("/docs/{doc_id}", response_model=dict)
+def get_generated_doc(doc_id: str) -> dict:
+    """Retrieve a previously generated doc by ID."""
+    doc = get_autodoc_generator().get_doc(doc_id)
+    if not doc:
+        raise HTTPException(status_code=404, detail=f"Doc {doc_id!r} not found")
+    return doc
+
+
+# ---------------------------------------------------------------------------
+# Docs Ingestion — /api/v1/product/docs/ingest/*
+# ---------------------------------------------------------------------------
+
+
+@docs_ingest_router.post("/docs/ingest", response_model=dict)
+def ingest_doc(payload: DocsIngestRequest) -> dict:
+    """Ingest a document, detect changes, and generate diff summary."""
+    try:
+        result = get_docs_ingestion_manager().ingest(payload)
+        return result.model_dump()
+    except Exception as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+
+@docs_ingest_router.get("/docs/ingest/sources", response_model=list)
+def list_doc_sources() -> list:
+    """List all registered doc sources."""
+    return [s.model_dump() for s in get_docs_ingestion_manager().list_sources()]
+
+
+@docs_ingest_router.get("/docs/ingest/sources/{source_id}/versions", response_model=list)
+def get_doc_versions(source_id: str, limit: int = 10) -> list:
+    """Get version history for a doc source."""
+    return [v.model_dump() for v in get_docs_ingestion_manager().get_versions(source_id, limit=limit)]
+
+
+@docs_ingest_router.post("/docs/ingest/summary", response_model=dict)
+def generate_weekly_summary(payload: WeeklySummaryRequest) -> dict:
+    """Generate a weekly change summary across ingested docs."""
+    try:
+        summary = get_docs_ingestion_manager().generate_weekly_summary(payload)
+        return summary.model_dump()
+    except Exception as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+
+# ---------------------------------------------------------------------------
+# KB Builder — /api/v1/product/kb/*
+# ---------------------------------------------------------------------------
+
+
+@kb_router.post("/kb/ingest", response_model=dict)
+def ingest_kb_ticket(payload: TicketInput) -> dict:
+    """Ingest a support ticket/email into the KB."""
+    try:
+        result = get_kb_builder().ingest_ticket(payload)
+        return result.model_dump()
+    except Exception as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+
+@kb_router.post("/kb/search", response_model=dict)
+def search_kb(payload: KBSearchRequest) -> dict:
+    """Full-text search the KB."""
+    try:
+        result = get_kb_builder().search(payload)
+        return result.model_dump()
+    except Exception as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+
+@kb_router.get("/kb/faq", response_model=dict)
+def get_kb_faq(categories: str = "") -> dict:
+    """Return KB entries organized as FAQ sections."""
+    cats = [c.strip() for c in categories.split(",") if c.strip()] if categories else None
+    return get_kb_builder().get_faq(categories=cats).model_dump()
+
+
+@kb_router.get("/kb/entries", response_model=list)
+def list_kb_entries(limit: int = 50, offset: int = 0) -> list:
+    """List all KB entries."""
+    return [e.model_dump() for e in get_kb_builder().list_entries(limit=limit, offset=offset)]
+
+
+@kb_router.get("/kb/entries/{entry_id}", response_model=dict)
+def get_kb_entry(entry_id: str) -> dict:
+    """Get a specific KB entry."""
+    entry = get_kb_builder().get_entry(entry_id)
+    if not entry:
+        raise HTTPException(status_code=404, detail=f"KB entry {entry_id!r} not found")
+    return entry.model_dump()
+
+
+@kb_router.post("/kb/entries/{entry_id}/vote", response_model=dict)
+def vote_kb_entry(entry_id: str, helpful: bool = True) -> dict:
+    """Vote on whether a KB entry is helpful."""
+    ok = get_kb_builder().vote(entry_id, helpful=helpful)
+    return {"success": ok, "entry_id": entry_id, "helpful": helpful}
+
+
+# ---------------------------------------------------------------------------
+# Workflow Templates — /api/v1/product/templates/*
+# ---------------------------------------------------------------------------
+
+
+@templates_router.post("/templates", response_model=dict)
+def create_template(payload: TemplateCreateRequest) -> dict:
+    """Create a new workflow template."""
+    try:
+        t = get_workflow_template_marketplace().create_template(payload)
+        return t.model_dump()
+    except Exception as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+
+@templates_router.get("/templates", response_model=list)
+def search_templates(
+    query: str = "",
+    category: str = "",
+    min_rating: float = 0.0,
+    limit: int = 20,
+    offset: int = 0,
+) -> list:
+    """Search workflow templates."""
+    req = TemplateSearchRequest(
+        query=query, category=category, min_rating=min_rating,
+        limit=limit, offset=offset,
+    )
+    return [t.model_dump() for t in get_workflow_template_marketplace().search_templates(req)]
+
+
+@templates_router.get("/templates/categories", response_model=list)
+def list_template_categories() -> list:
+    """List all template categories."""
+    return get_workflow_template_marketplace().list_categories()
+
+
+@templates_router.get("/templates/{template_id}", response_model=dict)
+def get_template(template_id: str) -> dict:
+    """Get a workflow template by ID."""
+    t = get_workflow_template_marketplace().get_template(template_id)
+    if not t:
+        raise HTTPException(status_code=404, detail=f"Template {template_id!r} not found")
+    return t.model_dump()
+
+
+@templates_router.patch("/templates/{template_id}", response_model=dict)
+def update_template(template_id: str, payload: TemplateUpdateRequest) -> dict:
+    """Update a workflow template."""
+    t = get_workflow_template_marketplace().update_template(template_id, payload)
+    if not t:
+        raise HTTPException(status_code=404, detail=f"Template {template_id!r} not found")
+    return t.model_dump()
+
+
+@templates_router.delete("/templates/{template_id}", response_model=dict)
+def delete_template(template_id: str) -> dict:
+    """Delete a workflow template."""
+    ok = get_workflow_template_marketplace().delete_template(template_id)
+    return {"deleted": ok, "template_id": template_id}
+
+
+@templates_router.post("/templates/{template_id}/publish", response_model=dict)
+def publish_template(template_id: str) -> dict:
+    """Publish a template to the marketplace."""
+    ok = get_workflow_template_marketplace().publish_template(template_id)
+    return {"published": ok, "template_id": template_id}
+
+
+@templates_router.post("/templates/{template_id}/rate", response_model=dict)
+def rate_template(template_id: str, rating: float) -> dict:
+    """Rate a template (0.0–5.0)."""
+    if not 0.0 <= rating <= 5.0:
+        raise HTTPException(status_code=422, detail="Rating must be between 0.0 and 5.0")
+    ok = get_workflow_template_marketplace().rate_template(template_id, rating)
+    return {"success": ok, "template_id": template_id, "rating": rating}
+
+
+@templates_router.get("/templates/{template_id}/versions", response_model=list)
+def get_template_versions(template_id: str) -> list:
+    """Get version history of a template."""
+    return get_workflow_template_marketplace().get_versions(template_id)
+
+
+@templates_router.post("/templates/install", response_model=dict)
+def install_template(payload: TemplateInstallRequest) -> dict:
+    """Install a template for a tenant."""
+    try:
+        install = get_workflow_template_marketplace().install_template(payload)
+        return install.model_dump()
+    except Exception as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+
+@templates_router.delete("/templates/installs/{install_id}", response_model=dict)
+def uninstall_template(install_id: str) -> dict:
+    """Uninstall a template."""
+    ok = get_workflow_template_marketplace().uninstall_template(install_id)
+    return {"uninstalled": ok, "install_id": install_id}
+
+
+@templates_router.get("/templates/installs/tenant/{tenant_id}", response_model=list)
+def list_tenant_installs(tenant_id: str) -> list:
+    """List all template installs for a tenant."""
+    return [i.model_dump() for i in get_workflow_template_marketplace().list_installs(tenant_id)]
+
+
+# ---------------------------------------------------------------------------
+# Async Callback Manager — /api/v1/product/callbacks/*
+# ---------------------------------------------------------------------------
+
+
+@callbacks_router.post("/callbacks", response_model=dict)
+def register_callback_route(payload: CallbackRegisterRequest) -> dict:
+    """Register a new callback."""
+    try:
+        reg = get_async_callback_manager().register(payload)
+        return reg.model_dump()
+    except Exception as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+
+@callbacks_router.get("/callbacks", response_model=list)
+def list_callbacks(trigger: str = "", active_only: bool = True) -> list:
+    """List registered callbacks."""
+    regs = get_async_callback_manager().list_registrations(
+        trigger=trigger or None, active_only=active_only
+    )
+    return [r.model_dump() for r in regs]
+
+
+@callbacks_router.get("/callbacks/{callback_id}", response_model=dict)
+def get_callback(callback_id: str) -> dict:
+    """Get a specific callback registration."""
+    reg = get_async_callback_manager().get_registration(callback_id)
+    if not reg:
+        raise HTTPException(status_code=404, detail=f"Callback {callback_id!r} not found")
+    return reg.model_dump()
+
+
+@callbacks_router.delete("/callbacks/{callback_id}", response_model=dict)
+def unregister_callback_route(callback_id: str) -> dict:
+    """Unregister a callback."""
+    ok = get_async_callback_manager().unregister(callback_id)
+    return {"unregistered": ok, "callback_id": callback_id}
+
+
+@callbacks_router.post("/callbacks/trigger", response_model=dict)
+def trigger_callbacks(payload: TriggerRequest) -> dict:
+    """Trigger callbacks for an event."""
+    try:
+        result = get_async_callback_manager().trigger(payload)
+        return result.model_dump()
+    except Exception as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+
+@callbacks_router.post("/callbacks/retry", response_model=dict)
+def retry_callback_delivery(payload: RetryRequest) -> dict:
+    """Manually retry a failed delivery."""
+    delivery = get_async_callback_manager().retry_delivery(payload)
+    if not delivery:
+        raise HTTPException(status_code=404, detail=f"Delivery {payload.delivery_id!r} not found")
+    return delivery.model_dump()
+
+
+@callbacks_router.post("/callbacks/retry-pending", response_model=dict)
+def retry_pending_callbacks() -> dict:
+    """Retry all eligible pending/failed deliveries."""
+    count = get_async_callback_manager().retry_pending()
+    return {"retried_count": count}
+
+
+@callbacks_router.get("/callbacks/deliveries", response_model=list)
+def list_callback_deliveries(
+    callback_id: str = "",
+    status: str = "",
+    limit: int = 50,
+) -> list:
+    """List callback deliveries."""
+    deliveries = get_async_callback_manager().list_deliveries(
+        callback_id=callback_id or None,
+        status=status or None,
+        limit=limit,
+    )
+    return [d.model_dump() for d in deliveries]
+
+
+@callbacks_router.get("/callbacks/deliveries/{delivery_id}", response_model=dict)
+def get_delivery(delivery_id: str) -> dict:
+    """Get a specific delivery record."""
+    d = get_async_callback_manager().get_delivery(delivery_id)
+    if not d:
+        raise HTTPException(status_code=404, detail=f"Delivery {delivery_id!r} not found")
+    return d.model_dump()
+
+
+@callbacks_router.get("/callbacks/status/summary", response_model=dict)
+def get_callback_status_summary() -> dict:
+    """Get callback delivery status summary."""
+    return get_async_callback_manager().get_status_summary().model_dump()
+
+
+# ---------------------------------------------------------------------------
+# Output Corrector — /api/v1/product/output/correct
+# ---------------------------------------------------------------------------
+
+
+@output_corrector_router.post("/output/correct", response_model=dict)
+def correct_output(payload: CorrectRequest) -> dict:
+    """Correct and normalize output text (formatting, ordering, naming, consistency)."""
+    try:
+        result = get_output_corrector().correct(payload)
+        return result.model_dump()
+    except Exception as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+
+@output_corrector_router.post("/output/rules", response_model=dict)
+def create_correction_rule(payload: CorrectionRuleCreate) -> dict:
+    """Create a custom correction rule."""
+    try:
+        rule = get_output_corrector().create_rule(payload)
+        return rule.model_dump()
+    except Exception as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+
+@output_corrector_router.get("/output/rules", response_model=list)
+def list_correction_rules(rule_type: str = "", active_only: bool = True) -> list:
+    """List all correction rules."""
+    rules = get_output_corrector().list_rules(
+        rule_type=rule_type or None, active_only=active_only
+    )
+    return [r.model_dump() for r in rules]
+
+
+@output_corrector_router.delete("/output/rules/{rule_id}", response_model=dict)
+def delete_correction_rule(rule_id: str) -> dict:
+    """Delete a correction rule."""
+    ok = get_output_corrector().delete_rule(rule_id)
+    return {"deleted": ok, "rule_id": rule_id}
+
+
+@output_corrector_router.post("/output/section-configs", response_model=dict)
+def create_section_config(payload: SectionOrderConfigCreate) -> dict:
+    """Create a section ordering config."""
+    try:
+        config = get_output_corrector().create_section_config(payload)
+        return config.model_dump()
+    except Exception as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+
+@output_corrector_router.get("/output/section-configs", response_model=list)
+def list_section_configs() -> list:
+    """List all section order configs."""
+    return [c.model_dump() for c in get_output_corrector().list_section_configs()]
+
+
+@output_corrector_router.post("/output/naming-norms", response_model=dict)
+def add_naming_norm(payload: NamingNormCreate) -> dict:
+    """Add a naming normalization rule."""
+    try:
+        norm = get_output_corrector().add_naming_norm(payload)
+        return norm.model_dump()
+    except Exception as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+
+@output_corrector_router.get("/output/naming-norms", response_model=list)
+def list_naming_norms() -> list:
+    """List all naming normalization rules."""
+    return [n.model_dump() for n in get_output_corrector().list_naming_norms()]
+
+
+@output_corrector_router.get("/output/history", response_model=list)
+def get_output_correction_history(limit: int = 20) -> list:
+    """Return recent output correction history."""
+    return get_output_corrector().get_history(limit=limit)
+
+
+# ===========================================================================
+# WAVE-2 TOOL INTELLIGENCE ROUTES
+# ===========================================================================
+
+# ---------------------------------------------------------------------------
+# 1. Task Spec — /api/v1/product/task/spec
+# ---------------------------------------------------------------------------
+
+
+class TaskSpecCompileRequest(BaseModel):
+    raw_request: str
+    session_id: str = ""
+    tenant_id: str = ""
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class TaskSpecListRequest(BaseModel):
+    tenant_id: str | None = None
+    session_id: str | None = None
+    limit: int = 50
+
+
+@task_spec_router.post("/task/spec", response_model=dict)
+def compile_task_spec(payload: TaskSpecCompileRequest) -> dict:
+    """Compile a natural-language task request into a formal structured spec."""
+    compiler = get_task_spec_compiler()
+    spec = compiler.compile(
+        raw_request=payload.raw_request,
+        session_id=payload.session_id,
+        tenant_id=payload.tenant_id,
+        metadata=payload.metadata,
+    )
+    return spec.dict
+
+
+@task_spec_router.get("/task/spec/{spec_id}", response_model=dict)
+def get_task_spec(spec_id: str) -> dict:
+    """Retrieve a compiled task spec by ID."""
+    spec = get_task_spec_compiler().get(spec_id)
+    if not spec:
+        raise HTTPException(status_code=404, detail="Spec not found")
+    return spec.dict
+
+
+@task_spec_router.get("/task/specs", response_model=list)
+def list_task_specs(
+    tenant_id: str | None = None,
+    session_id: str | None = None,
+    limit: int = Query(50, ge=1, le=500),
+) -> list:
+    """List compiled task specs with optional filters."""
+    return [s.dict for s in get_task_spec_compiler().list_specs(tenant_id=tenant_id, session_id=session_id, limit=limit)]
+
+
+@task_spec_router.delete("/task/spec/{spec_id}", response_model=dict)
+def delete_task_spec(spec_id: str) -> dict:
+    ok = get_task_spec_compiler().delete(spec_id)
+    if not ok:
+        raise HTTPException(status_code=404, detail="Spec not found")
+    return {"spec_id": spec_id, "deleted": True}
+
+
+# ---------------------------------------------------------------------------
+# 2. Clarification Optimizer — /api/v1/product/task/clarify
+# ---------------------------------------------------------------------------
+
+
+class ClarifyRequest(BaseModel):
+    candidates: list[str]
+    context: dict[str, Any] = Field(default_factory=dict)
+    task_summary: str = ""
+    max_questions: int = Field(3, ge=1, le=3)
+    tenant_id: str = ""
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class ClarifyResolveRequest(BaseModel):
+    question: str
+    answer: str
+
+
+@clarify_router.post("/task/clarify", response_model=dict)
+def optimize_clarifications(payload: ClarifyRequest) -> dict:
+    """Select the 1-3 highest-information clarification questions from candidates."""
+    optimizer = get_clarification_optimizer()
+    result = optimizer.optimize(
+        candidates=payload.candidates,
+        context=payload.context,
+        task_summary=payload.task_summary,
+        max_questions=payload.max_questions,
+        tenant_id=payload.tenant_id,
+        metadata=payload.metadata,
+    )
+    return result.dict
+
+
+@clarify_router.post("/task/clarify/{session_id}/resolve", response_model=dict)
+def resolve_clarification(session_id: str, payload: ClarifyResolveRequest) -> dict:
+    """Record a user's answer to a clarification question."""
+    resolution = get_clarification_optimizer().record_resolution(
+        session_id=session_id, question=payload.question, answer=payload.answer
+    )
+    return resolution.dict
+
+
+@clarify_router.get("/task/clarify/{session_id}", response_model=dict)
+def get_clarification_session(session_id: str) -> dict:
+    session = get_clarification_optimizer().get_session(session_id)
+    if not session:
+        raise HTTPException(status_code=404, detail="Session not found")
+    return session.dict
+
+
+@clarify_router.get("/task/clarify/{session_id}/resolutions", response_model=list)
+def list_clarification_resolutions(session_id: str) -> list:
+    return [r.dict for r in get_clarification_optimizer().list_resolutions(session_id)]
+
+
+# ---------------------------------------------------------------------------
+# 3. Task Splitter — /api/v1/product/task/split
+# ---------------------------------------------------------------------------
+
+
+class TaskSplitRequest(BaseModel):
+    parent_task: str
+    manual_sub_tasks: list[dict[str, Any]] | None = None
+    session_id: str = ""
+    tenant_id: str = ""
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+@task_split_router.post("/task/split", response_model=dict)
+def split_task(payload: TaskSplitRequest) -> dict:
+    """Decompose a complex task into sub-tasks assignable to different agents."""
+    split = get_task_splitter().split(
+        parent_task=payload.parent_task,
+        manual_sub_tasks=payload.manual_sub_tasks,
+        session_id=payload.session_id,
+        tenant_id=payload.tenant_id,
+        metadata=payload.metadata,
+    )
+    return split.dict
+
+
+@task_split_router.get("/task/split/{split_id}", response_model=dict)
+def get_task_split(split_id: str) -> dict:
+    split = get_task_splitter().get(split_id)
+    if not split:
+        raise HTTPException(status_code=404, detail="Split not found")
+    return split.dict
+
+
+@task_split_router.get("/task/splits", response_model=list)
+def list_task_splits(
+    tenant_id: str | None = None,
+    session_id: str | None = None,
+    limit: int = Query(50, ge=1, le=500),
+) -> list:
+    return [s.dict for s in get_task_splitter().list_splits(tenant_id=tenant_id, session_id=session_id, limit=limit)]
+
+
+# ---------------------------------------------------------------------------
+# 4. Dependency Graph — /api/v1/product/task/deps
+# ---------------------------------------------------------------------------
+
+
+class DepNodeRequest(BaseModel):
+    node_id: str
+    label: str = ""
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class DepEdgeRequest(BaseModel):
+    from_node: str
+    to_node: str
+    label: str = ""
+
+
+class DepsResolveRequest(BaseModel):
+    nodes: list[DepNodeRequest]
+    edges: list[DepEdgeRequest]
+    name: str = ""
+    tenant_id: str = ""
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+@dep_graph_router.post("/task/deps", response_model=dict)
+def resolve_deps(payload: DepsResolveRequest) -> dict:
+    """Resolve dependencies, detect cycles, and produce execution order."""
+    resolver = get_dependency_graph_resolver()
+    graph = resolver.resolve(
+        nodes=[n.model_dump() for n in payload.nodes],
+        edges=[e.model_dump() for e in payload.edges],
+        name=payload.name,
+        tenant_id=payload.tenant_id,
+        metadata=payload.metadata,
+    )
+    return graph.dict
+
+
+@dep_graph_router.get("/task/deps/{graph_id}", response_model=dict)
+def get_dep_graph(graph_id: str) -> dict:
+    g = get_dependency_graph_resolver().get(graph_id)
+    if not g:
+        raise HTTPException(status_code=404, detail="Graph not found")
+    return g.dict
+
+
+@dep_graph_router.get("/task/deps", response_model=list)
+def list_dep_graphs(
+    tenant_id: str | None = None,
+    limit: int = Query(50, ge=1, le=500),
+) -> list:
+    return [g.dict for g in get_dependency_graph_resolver().list_graphs(tenant_id=tenant_id, limit=limit)]
+
+
+@dep_graph_router.delete("/task/deps/{graph_id}", response_model=dict)
+def delete_dep_graph(graph_id: str) -> dict:
+    ok = get_dependency_graph_resolver().delete(graph_id)
+    if not ok:
+        raise HTTPException(status_code=404, detail="Graph not found")
+    return {"graph_id": graph_id, "deleted": True}
+
+
+# ---------------------------------------------------------------------------
+# 5. Param Auto-Filler — /api/v1/product/tools/autofill
+# ---------------------------------------------------------------------------
+
+
+class ParamAutofillRequest(BaseModel):
+    tool_name: str
+    tool_schema: dict[str, Any]
+    existing_params: dict[str, Any] = Field(default_factory=dict)
+    context: dict[str, Any] = Field(default_factory=dict)
+    tenant_id: str = ""
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+@param_autofill_router.post("/tools/autofill", response_model=dict)
+def autofill_params(payload: ParamAutofillRequest) -> dict:
+    """Suggest and fill missing tool parameters from schema defaults and context."""
+    result = get_param_autofiller().autofill(
+        tool_name=payload.tool_name,
+        tool_schema=payload.tool_schema,
+        existing_params=payload.existing_params,
+        context=payload.context,
+        tenant_id=payload.tenant_id,
+        metadata=payload.metadata,
+    )
+    return result.dict
+
+
+@param_autofill_router.get("/tools/autofill/{session_id}", response_model=dict)
+def get_autofill_session(session_id: str) -> dict:
+    result = get_param_autofiller().get_session(session_id)
+    if not result:
+        raise HTTPException(status_code=404, detail="Session not found")
+    return result.dict
+
+
+@param_autofill_router.get("/tools/autofill", response_model=list)
+def list_autofill_sessions(
+    tool_name: str | None = None,
+    tenant_id: str | None = None,
+    limit: int = Query(50, ge=1, le=500),
+) -> list:
+    return [r.dict for r in get_param_autofiller().list_sessions(tool_name=tool_name, tenant_id=tenant_id, limit=limit)]
+
+
+# ---------------------------------------------------------------------------
+# 6. Response Validator — /api/v1/product/tools/validate-response
+# ---------------------------------------------------------------------------
+
+
+class ValidateResponseRequest(BaseModel):
+    tool_name: str
+    response: Any
+    expected_schema: dict[str, Any] = Field(default_factory=dict, alias="schema")
+    constraints: list[dict[str, Any]] = Field(default_factory=list)
+    tenant_id: str = ""
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+    model_config = {"populate_by_name": True}
+
+
+@resp_validator_router.post("/tools/validate-response", response_model=dict)
+def validate_tool_response(payload: ValidateResponseRequest) -> dict:
+    """Validate a tool response against expected schema and constraints."""
+    report = get_response_validator().validate(
+        tool_name=payload.tool_name,
+        response=payload.response,
+        schema=payload.expected_schema,
+        constraints=payload.constraints or None,
+        tenant_id=payload.tenant_id,
+        metadata=payload.metadata,
+    )
+    return report.dict
+
+
+@resp_validator_router.get("/tools/validate-response/reports", response_model=list)
+def list_validation_reports(
+    tool_name: str | None = None,
+    valid_only: bool | None = None,
+    tenant_id: str | None = None,
+    limit: int = Query(100, ge=1, le=1000),
+) -> list:
+    return [r.dict for r in get_response_validator().list_reports(
+        tool_name=tool_name, valid_only=valid_only, tenant_id=tenant_id, limit=limit
+    )]
+
+
+@resp_validator_router.get("/tools/validate-response/summary", response_model=dict)
+def validation_summary(tool_name: str | None = None) -> dict:
+    return get_response_validator().summary(tool_name=tool_name)
+
+
+@resp_validator_router.get("/tools/validate-response/reports/{validation_id}", response_model=dict)
+def get_validation_report(validation_id: str) -> dict:
+    report = get_response_validator().get_report(validation_id)
+    if not report:
+        raise HTTPException(status_code=404, detail="Report not found")
+    return report.dict
+
+
+# ---------------------------------------------------------------------------
+# 7. Tool Cost Estimator — /api/v1/product/tools/cost
+# ---------------------------------------------------------------------------
+
+
+class CostModelRegisterRequest(BaseModel):
+    tool_name: str
+    cost_per_call_usd: float = 0.0
+    cost_per_1k_input_tokens_usd: float = 0.0025
+    cost_per_1k_output_tokens_usd: float = 0.010
+    avg_latency_ms: int = 1200
+    avg_input_tokens: int = 0
+    avg_output_tokens: int = 0
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class CostEstimateRequest(BaseModel):
+    tool_name: str
+    input_text: str | None = None
+    output_text: str | None = None
+    estimated_input_tokens: int | None = None
+    estimated_output_tokens: int | None = None
+    budget_cap_usd: float | None = None
+    tenant_id: str = ""
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class CostChainRequest(BaseModel):
+    tools: list[str]
+    budget_cap_usd: float | None = None
+    tenant_id: str = ""
+
+
+@tool_cost_router.post("/tools/cost/models", response_model=dict)
+def register_cost_model(payload: CostModelRegisterRequest) -> dict:
+    """Register or update the cost model for a tool."""
+    model = CostModel(
+        tool_name=payload.tool_name,
+        cost_per_call_usd=payload.cost_per_call_usd,
+        cost_per_1k_input_tokens_usd=payload.cost_per_1k_input_tokens_usd,
+        cost_per_1k_output_tokens_usd=payload.cost_per_1k_output_tokens_usd,
+        avg_latency_ms=payload.avg_latency_ms,
+        avg_input_tokens=payload.avg_input_tokens,
+        avg_output_tokens=payload.avg_output_tokens,
+        metadata=payload.metadata,
+    )
+    get_tool_cost_estimator().register_model(model)
+    return {"tool_name": payload.tool_name, "registered": True}
+
+
+@tool_cost_router.get("/tools/cost/models", response_model=list)
+def list_cost_models() -> list:
+    return [m.dict for m in get_tool_cost_estimator().list_models()]
+
+
+@tool_cost_router.post("/tools/cost", response_model=dict)
+def estimate_tool_cost(payload: CostEstimateRequest) -> dict:
+    """Estimate token/API/time cost before calling a tool."""
+    est = get_tool_cost_estimator().estimate(
+        tool_name=payload.tool_name,
+        input_text=payload.input_text,
+        output_text=payload.output_text,
+        estimated_input_tokens=payload.estimated_input_tokens,
+        estimated_output_tokens=payload.estimated_output_tokens,
+        budget_cap_usd=payload.budget_cap_usd,
+        tenant_id=payload.tenant_id,
+        metadata=payload.metadata,
+    )
+    return est.dict
+
+
+@tool_cost_router.post("/tools/cost/chain", response_model=dict)
+def estimate_chain_cost(payload: CostChainRequest) -> dict:
+    """Estimate total cost for a chain of tool calls."""
+    return get_tool_cost_estimator().estimate_chain(
+        tools=payload.tools,
+        budget_cap_usd=payload.budget_cap_usd,
+        tenant_id=payload.tenant_id,
+    )
+
+
+@tool_cost_router.get("/tools/cost/estimates", response_model=list)
+def list_cost_estimates(
+    tool_name: str | None = None,
+    tenant_id: str | None = None,
+    limit: int = Query(100, ge=1, le=1000),
+) -> list:
+    return [e.dict for e in get_tool_cost_estimator().list_estimates(tool_name=tool_name, tenant_id=tenant_id, limit=limit)]
+
+
+# ---------------------------------------------------------------------------
+# 8. Tool Chain Builder — /api/v1/product/tools/chain
+# ---------------------------------------------------------------------------
+
+
+class ChainToolRegisterRequest(BaseModel):
+    tool_name: str
+    capabilities: list[str]
+    input_types: list[str] = Field(default_factory=list)
+    output_types: list[str] = Field(default_factory=list)
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class ChainBuildRequest(BaseModel):
+    goal: str
+    max_steps: int = Field(6, ge=1, le=10)
+    tenant_id: str = ""
+    session_id: str = ""
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+@tool_chain_router.post("/tools/chain/catalog", response_model=dict)
+def register_chain_tool(payload: ChainToolRegisterRequest) -> dict:
+    """Register a tool in the chain builder catalog."""
+    tool = get_tool_chain_builder().register_tool(
+        tool_name=payload.tool_name,
+        capabilities=payload.capabilities,
+        input_types=payload.input_types,
+        output_types=payload.output_types,
+        metadata=payload.metadata,
+    )
+    return tool.dict
+
+
+@tool_chain_router.get("/tools/chain/catalog", response_model=list)
+def list_chain_catalog(active_only: bool = True) -> list:
+    return [t.dict for t in get_tool_chain_builder().list_catalog(active_only=active_only)]
+
+
+@tool_chain_router.post("/tools/chain", response_model=dict)
+def build_tool_chain(payload: ChainBuildRequest) -> dict:
+    """Synthesize a minimal tool sequence to satisfy a goal."""
+    chain = get_tool_chain_builder().build(
+        goal=payload.goal,
+        max_steps=payload.max_steps,
+        tenant_id=payload.tenant_id,
+        session_id=payload.session_id,
+        metadata=payload.metadata,
+    )
+    return chain.dict
+
+
+@tool_chain_router.get("/tools/chain/{chain_id}", response_model=dict)
+def get_tool_chain(chain_id: str) -> dict:
+    chain = get_tool_chain_builder().get_chain(chain_id)
+    if not chain:
+        raise HTTPException(status_code=404, detail="Chain not found")
+    return chain.dict
+
+
+@tool_chain_router.get("/tools/chains", response_model=list)
+def list_tool_chains(
+    tenant_id: str | None = None,
+    session_id: str | None = None,
+    limit: int = Query(50, ge=1, le=500),
+) -> list:
+    return [c.dict for c in get_tool_chain_builder().list_chains(tenant_id=tenant_id, session_id=session_id, limit=limit)]
+
+
+# ---------------------------------------------------------------------------
+# 9. Tool Fallback Manager — /api/v1/product/tools/fallback
+# ---------------------------------------------------------------------------
+
+
+class FallbackChainRegisterRequest(BaseModel):
+    primary_tool: str
+    fallbacks: list[dict[str, Any]]
+    error_triggers: list[str] = Field(default_factory=list)
+    max_attempts: int = 3
+    escalate_after: int = 3
+    tenant_id: str = ""
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class FallbackDecideRequest(BaseModel):
+    primary_tool: str
+    failed_tool: str
+    error_type: str = ""
+    attempt_number: int = 0
+    session_id: str = ""
+    tenant_id: str = ""
+
+
+class FallbackAttemptLogRequest(BaseModel):
+    chain_id: str
+    primary_tool: str
+    attempted_tool: str
+    position: int = 0
+    error_type: str = ""
+    error_message: str = ""
+    succeeded: bool = False
+    latency_ms: int = 0
+    session_id: str = ""
+    tenant_id: str = ""
+
+
+class EquivalenceGroupRequest(BaseModel):
+    name: str
+    tool_names: list[str]
+    description: str = ""
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+@tool_fallback_router.post("/tools/fallback/chains", response_model=dict)
+def register_fallback_chain(payload: FallbackChainRegisterRequest) -> dict:
+    """Register or update a fallback chain for a primary tool."""
+    chain = get_tool_fallback_manager().register_chain(
+        primary_tool=payload.primary_tool,
+        fallbacks=payload.fallbacks,
+        error_triggers=payload.error_triggers,
+        max_attempts=payload.max_attempts,
+        escalate_after=payload.escalate_after,
+        tenant_id=payload.tenant_id,
+        metadata=payload.metadata,
+    )
+    return chain.dict
+
+
+@tool_fallback_router.get("/tools/fallback/chains", response_model=list)
+def list_fallback_chains(
+    tenant_id: str | None = None,
+    active_only: bool = True,
+    limit: int = Query(100, ge=1, le=500),
+) -> list:
+    return [c.dict for c in get_tool_fallback_manager().list_chains(tenant_id=tenant_id, active_only=active_only, limit=limit)]
+
+
+@tool_fallback_router.get("/tools/fallback/chains/{primary_tool}", response_model=dict)
+def get_fallback_chain(primary_tool: str, tenant_id: str = "") -> dict:
+    chain = get_tool_fallback_manager().get_chain(primary_tool, tenant_id=tenant_id)
+    if not chain:
+        raise HTTPException(status_code=404, detail="Chain not found")
+    return chain.dict
+
+
+@tool_fallback_router.delete("/tools/fallback/chains/{chain_id}", response_model=dict)
+def deactivate_fallback_chain(chain_id: str) -> dict:
+    ok = get_tool_fallback_manager().deactivate_chain(chain_id)
+    if not ok:
+        raise HTTPException(status_code=404, detail="Chain not found")
+    return {"chain_id": chain_id, "deactivated": True}
+
+
+@tool_fallback_router.post("/tools/fallback/decide", response_model=dict)
+def decide_fallback(payload: FallbackDecideRequest) -> dict:
+    """Get the next tool to try after a failure, or escalation recommendation."""
+    decision = get_tool_fallback_manager().decide_next(
+        primary_tool=payload.primary_tool,
+        failed_tool=payload.failed_tool,
+        error_type=payload.error_type,
+        attempt_number=payload.attempt_number,
+        session_id=payload.session_id,
+        tenant_id=payload.tenant_id,
+    )
+    return decision.dict
+
+
+@tool_fallback_router.post("/tools/fallback/attempts", response_model=dict)
+def log_fallback_attempt(payload: FallbackAttemptLogRequest) -> dict:
+    """Log a tool attempt (success or failure) for audit."""
+    attempt = get_tool_fallback_manager().log_attempt(
+        chain_id=payload.chain_id,
+        primary_tool=payload.primary_tool,
+        attempted_tool=payload.attempted_tool,
+        position=payload.position,
+        error_type=payload.error_type,
+        error_message=payload.error_message,
+        succeeded=payload.succeeded,
+        latency_ms=payload.latency_ms,
+        session_id=payload.session_id,
+        tenant_id=payload.tenant_id,
+    )
+    return attempt.dict
+
+
+@tool_fallback_router.get("/tools/fallback/attempts", response_model=list)
+def list_fallback_attempts(
+    chain_id: str | None = None,
+    session_id: str | None = None,
+    tenant_id: str | None = None,
+    limit: int = Query(100, ge=1, le=1000),
+) -> list:
+    return [a.dict for a in get_tool_fallback_manager().list_attempts(
+        chain_id=chain_id, session_id=session_id, tenant_id=tenant_id, limit=limit
+    )]
+
+
+@tool_fallback_router.post("/tools/fallback/equivalence-groups", response_model=dict)
+def register_equivalence_group(payload: EquivalenceGroupRequest) -> dict:
+    """Register a semantic equivalence group for tools."""
+    group = get_tool_fallback_manager().register_equivalence_group(
+        name=payload.name, tool_names=payload.tool_names,
+        description=payload.description, metadata=payload.metadata,
+    )
+    return group.dict
+
+
+@tool_fallback_router.get("/tools/fallback/equivalence-groups", response_model=list)
+def list_equivalence_groups() -> list:
+    return [g.dict for g in get_tool_fallback_manager().list_equivalence_groups()]
+
+
+# ---------------------------------------------------------------------------
+# 10. Tool Rate Limiter — /api/v1/product/tools/rate-limit
+# ---------------------------------------------------------------------------
+
+
+class RateLimitPolicyRequest(BaseModel):
+    tool_name: str
+    calls_per_minute: int = Field(60, ge=1)
+    calls_per_hour: int = Field(1000, ge=1)
+    burst_capacity: int = Field(10, ge=1)
+    queue_max_depth: int = Field(50, ge=0)
+    tenant_id: str = ""
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class RateLimitCheckRequest(BaseModel):
+    tool_name: str
+    tenant_id: str = ""
+    session_id: str = ""
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+@tool_rate_router.post("/tools/rate-limit/policies", response_model=dict)
+def set_rate_limit_policy(payload: RateLimitPolicyRequest) -> dict:
+    """Create or update a rate limit policy for a tool."""
+    policy = get_tool_rate_limiter().set_policy(
+        tool_name=payload.tool_name,
+        calls_per_minute=payload.calls_per_minute,
+        calls_per_hour=payload.calls_per_hour,
+        burst_capacity=payload.burst_capacity,
+        queue_max_depth=payload.queue_max_depth,
+        tenant_id=payload.tenant_id,
+        metadata=payload.metadata,
+    )
+    return policy.dict
+
+
+@tool_rate_router.get("/tools/rate-limit/policies", response_model=list)
+def list_rate_limit_policies(
+    tenant_id: str | None = None,
+    active_only: bool = True,
+) -> list:
+    return [p.dict for p in get_tool_rate_limiter().list_policies(tenant_id=tenant_id, active_only=active_only)]
+
+
+@tool_rate_router.get("/tools/rate-limit/policies/{tool_name}", response_model=dict)
+def get_rate_limit_policy(tool_name: str, tenant_id: str = "") -> dict:
+    policy = get_tool_rate_limiter().get_policy(tool_name, tenant_id=tenant_id)
+    if not policy:
+        raise HTTPException(status_code=404, detail="Policy not found")
+    return policy.dict
+
+
+@tool_rate_router.delete("/tools/rate-limit/policies/{policy_id}", response_model=dict)
+def deactivate_rate_limit_policy(policy_id: str) -> dict:
+    ok = get_tool_rate_limiter().deactivate_policy(policy_id)
+    if not ok:
+        raise HTTPException(status_code=404, detail="Policy not found")
+    return {"policy_id": policy_id, "deactivated": True}
+
+
+@tool_rate_router.post("/tools/rate-limit/check", response_model=dict)
+def check_rate_limit(payload: RateLimitCheckRequest) -> dict:
+    """Consume one token for a tool call. Returns allowed/denied + wait_ms."""
+    decision = get_tool_rate_limiter().check_and_consume(
+        tool_name=payload.tool_name,
+        tenant_id=payload.tenant_id,
+        session_id=payload.session_id,
+        metadata=payload.metadata,
+    )
+    return decision.dict
+
+
+@tool_rate_router.get("/tools/rate-limit/bucket/{tool_name}", response_model=dict)
+def get_rate_limit_bucket(tool_name: str, tenant_id: str = "") -> dict:
+    """Get current token bucket state for a tool."""
+    bucket = get_tool_rate_limiter().get_bucket(tool_name, tenant_id=tenant_id)
+    if not bucket:
+        raise HTTPException(status_code=404, detail="Bucket not found (no policy registered)")
+    return bucket.dict
+
+
+@tool_rate_router.get("/tools/rate-limit/events", response_model=list)
+def list_rate_limit_events(
+    tool_name: str | None = None,
+    tenant_id: str | None = None,
+    allowed_only: bool | None = None,
+    limit: int = Query(200, ge=1, le=2000),
+) -> list:
+    return [e.dict for e in get_tool_rate_limiter().list_events(
+        tool_name=tool_name, tenant_id=tenant_id,
+        allowed_only=allowed_only, limit=limit
+    )]
+
+
+@tool_rate_router.get("/tools/rate-limit/stats", response_model=dict)
+def rate_limit_stats(
+    tool_name: str | None = None,
+    tenant_id: str | None = None,
+) -> dict:
+    """Aggregate rate limit usage statistics."""
+    return get_tool_rate_limiter().stats(tool_name=tool_name, tenant_id=tenant_id)
+
+
+# =============================================================================
+# Wave-Final: Orchestration + Reliability Routes
+# =============================================================================
+
+# ── imports ───────────────────────────────────────────────────────────────────
+from amc.product.workflow_engine import (
+    WorkflowStatus,
+    StepStatus as WFStepStatus,
+    StepDefinition,
+    WorkflowEngine,
+    _get_engine as get_workflow_engine,
+    reset_engine as reset_workflow_engine,
+)
+from amc.product.event_router import (
+    EventType,
+    TargetType,
+    DeliveryStatus,
+    EventPayload,
+    _get_router as get_event_router,
+)
+from amc.product.retry_engine import (
+    RetryStrategy,
+    RetryJobStatus,
+    RetryEngine,
+    _get_retry_engine as get_retry_engine,
+)
+from amc.product.compensation import (
+    CompensationStatus,
+    CompensationEngine,
+    get_compensation_engine,
+)
+from amc.product.rate_limiter import (
+    QuotaPeriod,
+    RateLimitManager,
+    get_rate_limit_manager,
+)
+from amc.product.sync_connector import (
+    SyncStatus,
+    ChangeType,
+    SourceType as SyncSourceType,
+    SyncManager,
+    get_sync_manager,
+)
+from amc.product.knowledge_graph import (
+    EntityType,
+    RelType,
+    KnowledgeGraph,
+    get_knowledge_graph,
+)
+from amc.product.document_assembler import (
+    AssemblyStatus,
+    OutputFormat as DocOutputFormat,
+    DocumentAssembler,
+    get_document_assembler,
+)
+from amc.product.batch_processor import (
+    BatchStatus,
+    ItemStatus,
+    BatchProcessor,
+    get_batch_processor,
+)
+
+# ── routers ───────────────────────────────────────────────────────────────────
+workflow_engine_router = APIRouter(prefix="/api/v1/product", tags=["product", "product-workflow-engine"])
+event_router_r = APIRouter(prefix="/api/v1/product", tags=["product", "product-events"])
+retry_engine_router = APIRouter(prefix="/api/v1/product", tags=["product", "product-retry"])
+compensation_router = APIRouter(prefix="/api/v1/product", tags=["product", "product-compensation"])
+rate_limits_router = APIRouter(prefix="/api/v1/product", tags=["product", "product-rate-limits"])
+sync_router = APIRouter(prefix="/api/v1/product", tags=["product", "product-sync"])
+graph_router = APIRouter(prefix="/api/v1/product", tags=["product", "product-graph"])
+doc_assemble_router = APIRouter(prefix="/api/v1/product", tags=["product", "product-doc-assemble"])
+batch_router = APIRouter(prefix="/api/v1/product", tags=["product", "product-batch"])
+
+
+# ==========================================================================
+# 1. Workflow Engine — /api/v1/product/workflows/*
+# ==========================================================================
+
+class WFCreateRequest(BaseModel):
+    name: str
+    description: str = ""
+    steps: list[dict[str, Any]] = Field(default_factory=list)
+    input_data: dict[str, Any] = Field(default_factory=dict)
+
+
+class WFCheckpointRequest(BaseModel):
+    step_id: str
+    state: dict[str, Any] = Field(default_factory=dict)
+
+
+class WFStepResultRequest(BaseModel):
+    output_data: dict[str, Any] = Field(default_factory=dict)
+    error: str = ""
+
+
+@workflow_engine_router.post("/workflows", response_model=dict)
+def create_workflow(payload: WFCreateRequest) -> dict:
+    """Create a new durable workflow."""
+    steps = [StepDefinition(**s) for s in payload.steps]
+    wf = get_workflow_engine().create_workflow(
+        name=payload.name,
+        description=payload.description,
+        steps=steps,
+        input_data=payload.input_data,
+    )
+    return wf.dict
+
+
+@workflow_engine_router.post("/workflows/{workflow_id}/start", response_model=dict)
+def start_workflow(workflow_id: str) -> dict:
+    """Start a workflow run."""
+    try:
+        wf = get_workflow_engine().start_workflow(workflow_id)
+        return wf.dict
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+
+@workflow_engine_router.post("/workflows/{workflow_id}/resume", response_model=dict)
+def resume_workflow(workflow_id: str) -> dict:
+    """Resume a paused/interrupted workflow from its last checkpoint."""
+    try:
+        wf = get_workflow_engine().resume_workflow(workflow_id)
+        return wf.dict
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+
+@workflow_engine_router.post("/workflows/{workflow_id}/complete", response_model=dict)
+def complete_workflow(workflow_id: str, payload: WFStepResultRequest = WFStepResultRequest()) -> dict:
+    """Mark a workflow as completed."""
+    try:
+        wf = get_workflow_engine().complete_workflow(workflow_id, payload.output_data)
+        return wf.dict
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+
+@workflow_engine_router.post("/workflows/{workflow_id}/fail", response_model=dict)
+def fail_workflow(workflow_id: str, payload: WFStepResultRequest = WFStepResultRequest()) -> dict:
+    """Mark a workflow as failed."""
+    try:
+        wf = get_workflow_engine().fail_workflow(workflow_id, payload.error)
+        return wf.dict
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+
+@workflow_engine_router.post("/workflows/{workflow_id}/checkpoint", response_model=dict)
+def checkpoint_workflow(workflow_id: str, payload: WFCheckpointRequest) -> dict:
+    """Save a checkpoint for a workflow step."""
+    cp = get_workflow_engine().checkpoint(workflow_id, payload.step_id, payload.state)
+    return cp.dict
+
+
+@workflow_engine_router.post("/workflows/{workflow_id}/steps/{step_id}/complete", response_model=dict)
+def complete_step(workflow_id: str, step_id: str, payload: WFStepResultRequest = WFStepResultRequest()) -> dict:
+    """Mark a workflow step as completed."""
+    try:
+        step = get_workflow_engine().complete_step(workflow_id, step_id, payload.output_data)
+        return step.dict
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+
+@workflow_engine_router.post("/workflows/{workflow_id}/steps/{step_id}/fail", response_model=dict)
+def fail_step(workflow_id: str, step_id: str, payload: WFStepResultRequest = WFStepResultRequest()) -> dict:
+    """Mark a workflow step as failed."""
+    try:
+        step = get_workflow_engine().fail_step(workflow_id, step_id, payload.error)
+        return step.dict
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+
+@workflow_engine_router.get("/workflows/{workflow_id}", response_model=dict)
+def get_workflow(workflow_id: str) -> dict:
+    """Get a workflow by ID."""
+    wf = get_workflow_engine().get_workflow(workflow_id)
+    if not wf:
+        raise HTTPException(status_code=404, detail=f"Workflow {workflow_id!r} not found")
+    return wf.dict
+
+
+@workflow_engine_router.get("/workflows", response_model=list)
+def list_workflows(status: str = "", limit: int = 50) -> list:
+    """List workflows, optionally filtered by status."""
+    wfs = get_workflow_engine().list_workflows(status=status or None, limit=limit)
+    return [w.dict for w in wfs]
+
+
+@workflow_engine_router.get("/workflows/{workflow_id}/steps", response_model=list)
+def get_workflow_steps(workflow_id: str) -> list:
+    """List all steps for a workflow."""
+    return [s.dict for s in get_workflow_engine().get_steps(workflow_id)]
+
+
+@workflow_engine_router.get("/workflows/{workflow_id}/checkpoints", response_model=list)
+def get_workflow_checkpoints(workflow_id: str) -> list:
+    """List all checkpoints for a workflow."""
+    return [c.dict for c in get_workflow_engine().get_checkpoints(workflow_id)]
+
+
+# ==========================================================================
+# 2. Event Router — /api/v1/product/events/*
+# ==========================================================================
+
+class RouteCreateRequest(BaseModel):
+    name: str
+    event_type: str
+    source_filter: dict[str, Any] = Field(default_factory=dict)
+    target_type: str = "log"
+    target_config: dict[str, Any] = Field(default_factory=dict)
+    enrichment: dict[str, Any] = Field(default_factory=dict)
+    priority: int = 0
+
+
+class RouteUpdateRequest(BaseModel):
+    name: str | None = None
+    enabled: bool | None = None
+    priority: int | None = None
+    target_config: dict[str, Any] | None = None
+    enrichment: dict[str, Any] | None = None
+
+
+class EventDispatchRequest(BaseModel):
+    event_type: str
+    source: str = ""
+    data: dict[str, Any] = Field(default_factory=dict)
+
+
+@event_router_r.post("/events/routes", response_model=dict)
+def create_event_route(payload: RouteCreateRequest) -> dict:
+    """Create an event routing rule."""
+    try:
+        route = get_event_router().create_route(
+            name=payload.name,
+            event_type=payload.event_type,
+            source_filter=payload.source_filter,
+            target_type=payload.target_type,
+            target_config=payload.target_config,
+            enrichment=payload.enrichment,
+            priority=payload.priority,
+        )
+        return route.dict
+    except Exception as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+
+@event_router_r.get("/events/routes", response_model=list)
+def list_event_routes(event_type: str = "", enabled: str = "") -> list:
+    """List event routing rules."""
+    en = None if enabled == "" else (enabled.lower() == "true")
+    routes = get_event_router().list_routes(event_type=event_type or None, enabled=en)
+    return [r.dict for r in routes]
+
+
+@event_router_r.get("/events/routes/{route_id}", response_model=dict)
+def get_event_route(route_id: str) -> dict:
+    """Get a specific event route."""
+    route = get_event_router().get_route(route_id)
+    if not route:
+        raise HTTPException(status_code=404, detail=f"Route {route_id!r} not found")
+    return route.dict
+
+
+@event_router_r.patch("/events/routes/{route_id}", response_model=dict)
+def update_event_route(route_id: str, payload: RouteUpdateRequest) -> dict:
+    """Update an event routing rule."""
+    updates = {k: v for k, v in payload.model_dump().items() if v is not None}
+    try:
+        route = get_event_router().update_route(route_id, **updates)
+        return route.dict
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+
+@event_router_r.delete("/events/routes/{route_id}", response_model=dict)
+def delete_event_route(route_id: str) -> dict:
+    """Delete an event routing rule."""
+    ok = get_event_router().delete_route(route_id)
+    return {"deleted": ok, "route_id": route_id}
+
+
+@event_router_r.post("/events/dispatch", response_model=list)
+def dispatch_event(payload: EventDispatchRequest) -> list:
+    """Dispatch an event through the router."""
+    event = EventPayload(
+        event_type=payload.event_type,
+        source=payload.source,
+        data=payload.data,
+    )
+    deliveries = get_event_router().route_event(event)
+    return [d.dict for d in deliveries]
+
+
+@event_router_r.get("/events/log", response_model=list)
+def get_event_delivery_log(route_id: str = "", status: str = "", limit: int = 50) -> list:
+    """Get event delivery log."""
+    records = get_event_router().get_delivery_log(
+        route_id=route_id or None,
+        status=status or None,
+        limit=limit,
+    )
+    return [r.dict for r in records]
+
+
+@event_router_r.post("/events/log/{log_id}/retry", response_model=dict)
+def retry_event_delivery(log_id: str) -> dict:
+    """Retry a failed event delivery."""
+    try:
+        record = get_event_router().retry_delivery(log_id)
+        return record.dict
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+
+# ==========================================================================
+# 3. Retry Engine — /api/v1/product/retry/*
+# ==========================================================================
+
+class RetryPolicyCreateRequest(BaseModel):
+    name: str
+    strategy: str = "exponential"
+    max_attempts: int = 5
+    base_delay_s: float = 1.0
+    max_delay_s: float = 300.0
+    multiplier: float = 2.0
+    jitter: bool = True
+
+
+class RetryJobSubmitRequest(BaseModel):
+    policy_id: str
+    segment_id: str
+    context: dict[str, Any] = Field(default_factory=dict)
+
+
+class RetryContextUpdateRequest(BaseModel):
+    context_update: dict[str, Any]
+
+
+@retry_engine_router.post("/retry/policies", response_model=dict)
+def create_retry_policy(payload: RetryPolicyCreateRequest) -> dict:
+    """Create a retry policy."""
+    try:
+        policy = get_retry_engine().create_policy(
+            name=payload.name,
+            strategy=payload.strategy,
+            max_attempts=payload.max_attempts,
+            base_delay_s=payload.base_delay_s,
+            max_delay_s=payload.max_delay_s,
+            multiplier=payload.multiplier,
+            jitter=payload.jitter,
+        )
+        return policy.dict
+    except Exception as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+
+@retry_engine_router.get("/retry/policies", response_model=list)
+def list_retry_policies() -> list:
+    """List all retry policies."""
+    return [p.dict for p in get_retry_engine().list_policies()]
+
+
+@retry_engine_router.get("/retry/policies/{policy_id}", response_model=dict)
+def get_retry_policy(policy_id: str) -> dict:
+    """Get a retry policy by ID."""
+    p = get_retry_engine().get_policy(policy_id)
+    if not p:
+        raise HTTPException(status_code=404, detail=f"Policy {policy_id!r} not found")
+    return p.dict
+
+
+@retry_engine_router.post("/retry/jobs", response_model=dict)
+def submit_retry_job(payload: RetryJobSubmitRequest) -> dict:
+    """Submit a segment-level retry job."""
+    try:
+        job = get_retry_engine().submit_job(
+            policy_id=payload.policy_id,
+            segment_id=payload.segment_id,
+            context=payload.context,
+        )
+        return job.dict
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+
+@retry_engine_router.get("/retry/jobs", response_model=list)
+def list_retry_jobs(status: str = "", segment_id: str = "", limit: int = 50) -> list:
+    """List retry jobs."""
+    jobs = get_retry_engine().list_jobs(
+        status=status or None,
+        segment_id=segment_id or None,
+        limit=limit,
+    )
+    return [j.dict for j in jobs]
+
+
+@retry_engine_router.get("/retry/jobs/{job_id}", response_model=dict)
+def get_retry_job(job_id: str) -> dict:
+    """Get a retry job by ID."""
+    job = get_retry_engine().get_job(job_id)
+    if not job:
+        raise HTTPException(status_code=404, detail=f"Job {job_id!r} not found")
+    return job.dict
+
+
+@retry_engine_router.post("/retry/jobs/{job_id}/attempt", response_model=dict)
+def attempt_retry_job(job_id: str) -> dict:
+    """Mark a retry job as running (attempt)."""
+    try:
+        job = get_retry_engine().attempt_job(job_id)
+        return job.dict
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+
+@retry_engine_router.post("/retry/jobs/{job_id}/complete", response_model=dict)
+def complete_retry_job(job_id: str) -> dict:
+    """Mark a retry job as completed."""
+    try:
+        job = get_retry_engine().complete_job(job_id)
+        return job.dict
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+
+@retry_engine_router.post("/retry/jobs/{job_id}/fail", response_model=dict)
+def fail_retry_attempt(job_id: str, error: str = "") -> dict:
+    """Record a failed attempt and schedule the next retry."""
+    try:
+        job = get_retry_engine().fail_attempt(job_id, error=error)
+        return job.dict
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+
+@retry_engine_router.patch("/retry/jobs/{job_id}/context", response_model=dict)
+def update_retry_context(job_id: str, payload: RetryContextUpdateRequest) -> dict:
+    """Preserve/merge context for a retry job."""
+    try:
+        job = get_retry_engine().preserve_context(job_id, payload.context_update)
+        return job.dict
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+
+@retry_engine_router.get("/retry/jobs/{job_id}/log", response_model=list)
+def get_retry_job_log(job_id: str) -> list:
+    """Get retry log entries for a job."""
+    return [e.dict for e in get_retry_engine().get_retry_log(job_id)]
+
+
+@retry_engine_router.get("/retry/due", response_model=list)
+def get_due_retry_jobs() -> list:
+    """Get all retry jobs that are due for execution."""
+    return [j.dict for j in get_retry_engine().get_due_jobs()]
+
+
+# ==========================================================================
+# 4. Compensation Engine — /api/v1/product/compensation/*
+# ==========================================================================
+
+class CompPlanCreateRequest(BaseModel):
+    name: str
+    description: str = ""
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class CompStepRegisterRequest(BaseModel):
+    name: str
+    seq: int = 0
+    action_fn: str = ""
+    compensate_fn: str = ""
+    input_data: dict[str, Any] = Field(default_factory=dict)
+
+
+class CompStepResultRequest(BaseModel):
+    output_data: dict[str, Any] = Field(default_factory=dict)
+    error: str = ""
+
+
+@compensation_router.post("/compensation/plans", response_model=dict)
+def create_compensation_plan(payload: CompPlanCreateRequest) -> dict:
+    """Create a compensation plan."""
+    plan = get_compensation_engine().create_plan(
+        name=payload.name,
+        description=payload.description,
+        metadata=payload.metadata,
+    )
+    return plan.dict
+
+
+@compensation_router.get("/compensation/plans", response_model=list)
+def list_compensation_plans(status: str = "") -> list:
+    """List compensation plans."""
+    plans = get_compensation_engine().list_plans(status=status or None)
+    return [p.dict for p in plans]
+
+
+@compensation_router.get("/compensation/plans/{plan_id}", response_model=dict)
+def get_compensation_plan(plan_id: str) -> dict:
+    """Get a compensation plan by ID."""
+    plan = get_compensation_engine().get_plan(plan_id)
+    if not plan:
+        raise HTTPException(status_code=404, detail=f"Plan {plan_id!r} not found")
+    return plan.dict
+
+
+@compensation_router.post("/compensation/plans/{plan_id}/steps", response_model=dict)
+def register_compensation_step(plan_id: str, payload: CompStepRegisterRequest) -> dict:
+    """Register a step with its compensating action."""
+    try:
+        step = get_compensation_engine().register_step(
+            plan_id=plan_id,
+            name=payload.name,
+            seq=payload.seq,
+            action_fn=payload.action_fn,
+            compensate_fn=payload.compensate_fn,
+            input_data=payload.input_data,
+        )
+        return step.dict
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+
+@compensation_router.post("/compensation/plans/{plan_id}/steps/{step_id}/execute", response_model=dict)
+def execute_compensation_step(plan_id: str, step_id: str, payload: CompStepResultRequest = CompStepResultRequest()) -> dict:
+    """Mark a step as executed."""
+    try:
+        step = get_compensation_engine().execute_step(plan_id, step_id, payload.output_data)
+        return step.dict
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+
+@compensation_router.post("/compensation/plans/{plan_id}/steps/{step_id}/fail", response_model=dict)
+def fail_compensation_step(plan_id: str, step_id: str, payload: CompStepResultRequest = CompStepResultRequest()) -> dict:
+    """Mark a step as failed (triggers compensation chain)."""
+    try:
+        step = get_compensation_engine().fail_step(plan_id, step_id, payload.error)
+        return step.dict
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+
+@compensation_router.post("/compensation/plans/{plan_id}/steps/{step_id}/compensate", response_model=dict)
+def compensate_step(plan_id: str, step_id: str) -> dict:
+    """Run compensating action for a specific step."""
+    try:
+        step = get_compensation_engine().compensate_step(plan_id, step_id)
+        return step.dict
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+
+@compensation_router.post("/compensation/plans/{plan_id}/compensate-from/{failed_step_id}", response_model=list)
+def compensate_from(plan_id: str, failed_step_id: str) -> list:
+    """Run partial failure recovery from the failed step backwards."""
+    try:
+        steps = get_compensation_engine().compensate_from(plan_id, failed_step_id)
+        return [s.dict for s in steps]
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+
+@compensation_router.get("/compensation/plans/{plan_id}/steps", response_model=list)
+def get_compensation_steps(plan_id: str) -> list:
+    """Get all steps for a compensation plan."""
+    return [s.dict for s in get_compensation_engine().get_steps(plan_id)]
+
+
+@compensation_router.get("/compensation/plans/{plan_id}/log", response_model=list)
+def get_compensation_log(plan_id: str) -> list:
+    """Get execution log for a compensation plan."""
+    return [e.dict for e in get_compensation_engine().get_log(plan_id)]
+
+
+@compensation_router.post("/compensation/plans/{plan_id}/complete", response_model=dict)
+def complete_compensation_plan(plan_id: str) -> dict:
+    """Mark a compensation plan as completed."""
+    try:
+        plan = get_compensation_engine().complete_plan(plan_id)
+        return plan.dict
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+
+# ==========================================================================
+# 5. Rate Limiter — /api/v1/product/rate-limits/*
+# ==========================================================================
+
+class RLConfigCreateRequest(BaseModel):
+    connector_id: str
+    name: str
+    requests_per_window: int = 100
+    window_s: float = 60.0
+    burst_limit: int = 0
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class QuotaCreateRequest(BaseModel):
+    connector_id: str
+    period: str = "day"
+    quota_limit: int = 1000
+    reset_at: str = ""
+
+
+class QueueCallRequest(BaseModel):
+    payload: dict[str, Any] = Field(default_factory=dict)
+    priority: int = 0
+
+
+@rate_limits_router.post("/rate-limits/configs", response_model=dict)
+def create_rate_limit_config(payload: RLConfigCreateRequest) -> dict:
+    """Create a rate limit config for a connector."""
+    cfg = get_rate_limit_manager().create_config(
+        connector_id=payload.connector_id,
+        name=payload.name,
+        requests_per_window=payload.requests_per_window,
+        window_s=payload.window_s,
+        burst_limit=payload.burst_limit,
+    )
+    return cfg.dict
+
+
+@rate_limits_router.get("/rate-limits/configs", response_model=list)
+def list_rate_limit_configs() -> list:
+    """List all rate limit configs."""
+    return [c.dict for c in get_rate_limit_manager().list_configs()]
+
+
+@rate_limits_router.get("/rate-limits/configs/{config_id}", response_model=dict)
+def get_rate_limit_config(config_id: str) -> dict:
+    """Get a rate limit config by ID."""
+    cfg = get_rate_limit_manager().get_config(config_id)
+    if not cfg:
+        raise HTTPException(status_code=404, detail=f"Config {config_id!r} not found")
+    return cfg.dict
+
+
+@rate_limits_router.get("/rate-limits/connectors/{connector_id}/check", response_model=dict)
+def check_rate_limit(connector_id: str) -> dict:
+    """Check if a connector is within its rate limit."""
+    return get_rate_limit_manager().check_limit(connector_id)
+
+
+@rate_limits_router.post("/rate-limits/connectors/{connector_id}/record", response_model=dict)
+def record_rate_limit_call(connector_id: str) -> dict:
+    """Record a call against the connector's rate limit."""
+    try:
+        window = get_rate_limit_manager().record_call(connector_id)
+        return window.dict
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+
+@rate_limits_router.post("/rate-limits/connectors/{connector_id}/enqueue", response_model=dict)
+def enqueue_rate_limited_call(connector_id: str, payload: QueueCallRequest) -> dict:
+    """Enqueue a call to be executed when rate limit allows."""
+    try:
+        call = get_rate_limit_manager().enqueue_call(
+            connector_id=connector_id,
+            payload=payload.payload,
+            priority=payload.priority,
+        )
+        return call.dict
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+
+@rate_limits_router.get("/rate-limits/connectors/{connector_id}/queue", response_model=list)
+def get_rate_limit_queue(connector_id: str, status: str = "") -> list:
+    """Get queued calls for a connector."""
+    calls = get_rate_limit_manager().get_queue(
+        connector_id=connector_id, status=status or None
+    )
+    return [c.dict for c in calls]
+
+
+@rate_limits_router.get("/rate-limits/connectors/{connector_id}/summary", response_model=dict)
+def get_rate_limit_summary(connector_id: str) -> dict:
+    """Get usage summary for a connector."""
+    return get_rate_limit_manager().get_usage_summary(connector_id)
+
+
+@rate_limits_router.post("/rate-limits/quotas", response_model=dict)
+def track_quota(payload: QuotaCreateRequest) -> dict:
+    """Create/update a quota tracker for a connector."""
+    from datetime import datetime, timezone
+    reset_at = (
+        datetime.fromisoformat(payload.reset_at)
+        if payload.reset_at
+        else datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)
+    )
+    quota = get_rate_limit_manager().track_quota(
+        connector_id=payload.connector_id,
+        period=payload.period,
+        quota_limit=payload.quota_limit,
+        reset_at=reset_at,
+    )
+    return quota.dict
+
+
+@rate_limits_router.post("/rate-limits/connectors/{connector_id}/quotas/{period}/consume", response_model=dict)
+def consume_quota(connector_id: str, period: str, amount: int = 1) -> dict:
+    """Consume quota for a connector."""
+    try:
+        quota = get_rate_limit_manager().consume_quota(connector_id, period, amount)
+        return quota.dict
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+
+@rate_limits_router.get("/rate-limits/connectors/{connector_id}/quotas/{period}", response_model=dict)
+def get_quota(connector_id: str, period: str) -> dict:
+    """Get quota status for a connector."""
+    quota = get_rate_limit_manager().get_quota(connector_id, period)
+    if not quota:
+        raise HTTPException(status_code=404, detail=f"Quota not found for {connector_id}/{period}")
+    return quota.dict
+
+
+# ==========================================================================
+# 6. Sync Connector — /api/v1/product/sync/*
+# ==========================================================================
+
+class SyncConnectorCreateRequest(BaseModel):
+    name: str
+    source_type: str = "api"
+    config: dict[str, Any] = Field(default_factory=dict)
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class SyncRunStartRequest(BaseModel):
+    cursor_start: str = ""
+
+
+class SyncDetectChangesRequest(BaseModel):
+    records: list[dict[str, Any]]
+    id_field: str = "id"
+
+
+class SyncRunCompleteRequest(BaseModel):
+    cursor_end: str = ""
+    records_synced: int = 0
+    records_failed: int = 0
+
+
+@sync_router.post("/sync/connectors", response_model=dict)
+def register_sync_connector(payload: SyncConnectorCreateRequest) -> dict:
+    """Register a new sync connector."""
+    connector = get_sync_manager().register_connector(
+        name=payload.name,
+        source_type=payload.source_type,
+        config=payload.config,
+        metadata=payload.metadata,
+    )
+    return connector.dict
+
+
+@sync_router.get("/sync/connectors", response_model=list)
+def list_sync_connectors(status: str = "") -> list:
+    """List sync connectors."""
+    return [c.dict for c in get_sync_manager().list_connectors(status=status or None)]
+
+
+@sync_router.get("/sync/connectors/{connector_id}", response_model=dict)
+def get_sync_connector(connector_id: str) -> dict:
+    """Get a sync connector by ID."""
+    c = get_sync_manager().get_connector(connector_id)
+    if not c:
+        raise HTTPException(status_code=404, detail=f"Connector {connector_id!r} not found")
+    return c.dict
+
+
+@sync_router.delete("/sync/connectors/{connector_id}", response_model=dict)
+def delete_sync_connector(connector_id: str) -> dict:
+    """Delete a sync connector."""
+    ok = get_sync_manager().delete_connector(connector_id)
+    return {"deleted": ok, "connector_id": connector_id}
+
+
+@sync_router.post("/sync/connectors/{connector_id}/runs", response_model=dict)
+def start_sync_run(connector_id: str, payload: SyncRunStartRequest = SyncRunStartRequest()) -> dict:
+    """Start a sync run for a connector."""
+    try:
+        run = get_sync_manager().start_run(connector_id, cursor_start=payload.cursor_start or None)
+        return run.dict
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+
+@sync_router.post("/sync/runs/{run_id}/detect-changes", response_model=list)
+def detect_sync_changes(run_id: str, payload: SyncDetectChangesRequest) -> list:
+    """Detect changes in a batch of records (delta sync)."""
+    changes = get_sync_manager().detect_changes(run_id, payload.records, id_field=payload.id_field)
+    return [c.dict for c in changes]
+
+
+@sync_router.post("/sync/runs/{run_id}/complete", response_model=dict)
+def complete_sync_run(run_id: str, payload: SyncRunCompleteRequest = SyncRunCompleteRequest()) -> dict:
+    """Mark a sync run as completed."""
+    try:
+        run = get_sync_manager().complete_run(
+            run_id,
+            cursor_end=payload.cursor_end or None,
+            records_synced=payload.records_synced,
+            records_failed=payload.records_failed,
+        )
+        return run.dict
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+
+@sync_router.post("/sync/runs/{run_id}/fail", response_model=dict)
+def fail_sync_run(run_id: str, error: str = "") -> dict:
+    """Mark a sync run as failed."""
+    try:
+        run = get_sync_manager().fail_run(run_id, error)
+        return run.dict
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+
+@sync_router.get("/sync/runs", response_model=list)
+def list_sync_runs(connector_id: str = "", status: str = "", limit: int = 20) -> list:
+    """List sync runs."""
+    return [r.dict for r in get_sync_manager().list_runs(
+        connector_id=connector_id or None,
+        status=status or None,
+        limit=limit,
+    )]
+
+
+@sync_router.get("/sync/runs/{run_id}", response_model=dict)
+def get_sync_run(run_id: str) -> dict:
+    """Get a sync run by ID."""
+    run = get_sync_manager().get_run(run_id)
+    if not run:
+        raise HTTPException(status_code=404, detail=f"Run {run_id!r} not found")
+    return run.dict
+
+
+@sync_router.get("/sync/changes", response_model=list)
+def get_sync_changes(run_id: str = "", connector_id: str = "", change_type: str = "", limit: int = 100) -> list:
+    """Get sync change records."""
+    return [c.dict for c in get_sync_manager().get_changes(
+        run_id=run_id or None,
+        connector_id=connector_id or None,
+        change_type=change_type or None,
+        limit=limit,
+    )]
+
+
+@sync_router.get("/sync/log", response_model=list)
+def get_sync_log(connector_id: str = "", run_id: str = "", limit: int = 100) -> list:
+    """Get sync log entries."""
+    return [e.dict for e in get_sync_manager().get_log(
+        connector_id=connector_id or None,
+        run_id=run_id or None,
+        limit=limit,
+    )]
+
+
+# ==========================================================================
+# 7. Knowledge Graph — /api/v1/product/graph/*
+# ==========================================================================
+
+class EntityCreateRequest(BaseModel):
+    entity_type: str
+    name: str
+    properties: dict[str, Any] = Field(default_factory=dict)
+    tenant_id: str = ""
+
+
+class EntityUpdateRequest(BaseModel):
+    name: str | None = None
+    properties: dict[str, Any] | None = None
+
+
+class RelationshipCreateRequest(BaseModel):
+    from_entity_id: str
+    to_entity_id: str
+    rel_type: str
+    properties: dict[str, Any] = Field(default_factory=dict)
+    weight: float = 1.0
+
+
+class CustomerContractInvoiceLinkRequest(BaseModel):
+    customer_id: str
+    contract_id: str
+    invoice_id: str
+
+
+class TypeChainQueryRequest(BaseModel):
+    types: list[str]
+    tenant_id: str = ""
+
+
+@graph_router.post("/graph/entities", response_model=dict)
+def add_graph_entity(payload: EntityCreateRequest) -> dict:
+    """Add an entity to the knowledge graph."""
+    entity = get_knowledge_graph().add_entity(
+        entity_type=payload.entity_type,
+        name=payload.name,
+        properties=payload.properties,
+        tenant_id=payload.tenant_id,
+    )
+    return entity.dict
+
+
+@graph_router.get("/graph/entities", response_model=list)
+def find_graph_entities(entity_type: str = "", name: str = "", tenant_id: str = "", limit: int = 50) -> list:
+    """Find entities by type/name/tenant."""
+    return [e.dict for e in get_knowledge_graph().find_entities(
+        entity_type=entity_type or None,
+        name=name or None,
+        tenant_id=tenant_id or None,
+        limit=limit,
+    )]
+
+
+@graph_router.get("/graph/entities/{entity_id}", response_model=dict)
+def get_graph_entity(entity_id: str) -> dict:
+    """Get an entity by ID."""
+    entity = get_knowledge_graph().get_entity(entity_id)
+    if not entity:
+        raise HTTPException(status_code=404, detail=f"Entity {entity_id!r} not found")
+    return entity.dict
+
+
+@graph_router.patch("/graph/entities/{entity_id}", response_model=dict)
+def update_graph_entity(entity_id: str, payload: EntityUpdateRequest) -> dict:
+    """Update an entity."""
+    try:
+        entity = get_knowledge_graph().update_entity(
+            entity_id, name=payload.name, properties=payload.properties
+        )
+        return entity.dict
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+
+@graph_router.delete("/graph/entities/{entity_id}", response_model=dict)
+def delete_graph_entity(entity_id: str) -> dict:
+    """Delete an entity and its relationships."""
+    ok = get_knowledge_graph().delete_entity(entity_id)
+    return {"deleted": ok, "entity_id": entity_id}
+
+
+@graph_router.post("/graph/relationships", response_model=dict)
+def add_graph_relationship(payload: RelationshipCreateRequest) -> dict:
+    """Add a relationship between entities."""
+    try:
+        rel = get_knowledge_graph().add_relationship(
+            from_entity_id=payload.from_entity_id,
+            to_entity_id=payload.to_entity_id,
+            rel_type=payload.rel_type,
+            properties=payload.properties,
+            weight=payload.weight,
+        )
+        return rel.dict
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+
+@graph_router.get("/graph/relationships", response_model=list)
+def find_graph_relationships(from_entity_id: str = "", to_entity_id: str = "", rel_type: str = "") -> list:
+    """Find relationships."""
+    return [r.dict for r in get_knowledge_graph().find_relationships(
+        from_entity_id=from_entity_id or None,
+        to_entity_id=to_entity_id or None,
+        rel_type=rel_type or None,
+    )]
+
+
+@graph_router.delete("/graph/relationships/{rel_id}", response_model=dict)
+def delete_graph_relationship(rel_id: str) -> dict:
+    """Delete a relationship."""
+    ok = get_knowledge_graph().delete_relationship(rel_id)
+    return {"deleted": ok, "rel_id": rel_id}
+
+
+@graph_router.get("/graph/entities/{entity_id}/neighbors", response_model=list)
+def get_graph_neighbors(entity_id: str, rel_type: str = "", direction: str = "both") -> list:
+    """Get neighbors of an entity."""
+    return [e.dict for e in get_knowledge_graph().get_neighbors(
+        entity_id, rel_type=rel_type or None, direction=direction
+    )]
+
+
+@graph_router.get("/graph/entities/{entity_id}/subgraph", response_model=dict)
+def get_subgraph(entity_id: str, depth: int = 2) -> dict:
+    """Get a subgraph centered on an entity."""
+    return get_knowledge_graph().get_subgraph(entity_id, depth=depth)
+
+
+@graph_router.get("/graph/path", response_model=dict)
+def get_shortest_path(from_entity_id: str, to_entity_id: str, max_depth: int = 5) -> dict:
+    """Get shortest path between two entities."""
+    path = get_knowledge_graph().shortest_path(from_entity_id, to_entity_id, max_depth=max_depth)
+    return path.dict if path else {"found": False, "path": []}
+
+
+@graph_router.post("/graph/link/customer-contract-invoice", response_model=dict)
+def link_customer_contract_invoice(payload: CustomerContractInvoiceLinkRequest) -> dict:
+    """Convenience: link customer → contract → invoice."""
+    return get_knowledge_graph().link_customer_contract_invoice(
+        payload.customer_id, payload.contract_id, payload.invoice_id
+    )
+
+
+@graph_router.post("/graph/query/type-chain", response_model=list)
+def query_type_chain(payload: TypeChainQueryRequest) -> list:
+    """Query a chain of entity types (e.g. customer→contract→invoice)."""
+    return get_knowledge_graph().query_by_type_chain(
+        payload.types, tenant_id=payload.tenant_id or None
+    )
+
+
+@graph_router.get("/graph/stats", response_model=dict)
+def get_graph_stats(tenant_id: str = "") -> dict:
+    """Get knowledge graph statistics."""
+    return get_knowledge_graph().get_graph_stats(tenant_id=tenant_id or None)
+
+
+# ==========================================================================
+# 8. Document Assembler — /api/v1/product/docs/assemble/*
+# ==========================================================================
+
+class DocTemplateCreateRequest(BaseModel):
+    name: str
+    description: str = ""
+    format: str = "markdown"
+    sections: list[dict[str, Any]] = Field(default_factory=list)
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class DocAssemblyCreateRequest(BaseModel):
+    name: str
+    template_id: str = ""
+    output_format: str = "markdown"
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class DocSectionAddRequest(BaseModel):
+    title: str
+    seq: int = 0
+    level: int = 1
+    content: str = ""
+    source_type: str = "manual"
+    source_ref: str = ""
+
+
+class DocSectionUpdateRequest(BaseModel):
+    content: str | None = None
+    status: str | None = None
+    source_type: str | None = None
+    source_ref: str | None = None
+
+
+class DocArtifactAddRequest(BaseModel):
+    section_id: str = ""
+    artifact_type: str = "text"
+    content: str = ""
+    source_url: str = ""
+
+
+@doc_assemble_router.post("/docs/assemble/templates", response_model=dict)
+def create_doc_template(payload: DocTemplateCreateRequest) -> dict:
+    """Create a document assembly template."""
+    tpl = get_document_assembler().create_template(
+        name=payload.name,
+        description=payload.description,
+        format=payload.format,
+        sections=payload.sections,
+    )
+    return tpl.dict
+
+
+@doc_assemble_router.get("/docs/assemble/templates", response_model=list)
+def list_doc_templates() -> list:
+    """List all document templates."""
+    return [t.dict for t in get_document_assembler().list_templates()]
+
+
+@doc_assemble_router.get("/docs/assemble/templates/{template_id}", response_model=dict)
+def get_doc_template(template_id: str) -> dict:
+    """Get a document template."""
+    tpl = get_document_assembler().get_template(template_id)
+    if not tpl:
+        raise HTTPException(status_code=404, detail=f"Template {template_id!r} not found")
+    return tpl.dict
+
+
+@doc_assemble_router.post("/docs/assemble/assemblies", response_model=dict)
+def create_doc_assembly(payload: DocAssemblyCreateRequest) -> dict:
+    """Create a new document assembly."""
+    assembly = get_document_assembler().create_assembly(
+        name=payload.name,
+        template_id=payload.template_id or None,
+        output_format=payload.output_format,
+        metadata=payload.metadata,
+    )
+    return assembly.dict
+
+
+@doc_assemble_router.get("/docs/assemble/assemblies", response_model=list)
+def list_doc_assemblies(status: str = "") -> list:
+    """List document assemblies."""
+    return [a.dict for a in get_document_assembler().list_assemblies(status=status or None)]
+
+
+@doc_assemble_router.get("/docs/assemble/assemblies/{assembly_id}", response_model=dict)
+def get_doc_assembly(assembly_id: str) -> dict:
+    """Get a document assembly."""
+    assembly = get_document_assembler().get_assembly(assembly_id)
+    if not assembly:
+        raise HTTPException(status_code=404, detail=f"Assembly {assembly_id!r} not found")
+    return assembly.dict
+
+
+@doc_assemble_router.post("/docs/assemble/assemblies/{assembly_id}/sections", response_model=dict)
+def add_doc_section(assembly_id: str, payload: DocSectionAddRequest) -> dict:
+    """Add a section to a document assembly."""
+    section = get_document_assembler().add_section(
+        assembly_id=assembly_id,
+        title=payload.title,
+        seq=payload.seq,
+        level=payload.level,
+        content=payload.content,
+        source_type=payload.source_type,
+        source_ref=payload.source_ref,
+    )
+    return section.dict
+
+
+@doc_assemble_router.patch("/docs/assemble/sections/{section_id}", response_model=dict)
+def update_doc_section(section_id: str, payload: DocSectionUpdateRequest) -> dict:
+    """Update a document section."""
+    try:
+        section = get_document_assembler().update_section(
+            section_id,
+            content=payload.content,
+            status=payload.status,
+            source_type=payload.source_type,
+            source_ref=payload.source_ref,
+        )
+        return section.dict
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+
+@doc_assemble_router.get("/docs/assemble/assemblies/{assembly_id}/sections", response_model=list)
+def get_doc_sections(assembly_id: str) -> list:
+    """Get all sections for an assembly (ordered)."""
+    return [s.dict for s in get_document_assembler().get_sections(assembly_id)]
+
+
+@doc_assemble_router.post("/docs/assemble/assemblies/{assembly_id}/artifacts", response_model=dict)
+def add_doc_artifact(assembly_id: str, payload: DocArtifactAddRequest) -> dict:
+    """Add a sourced artifact to an assembly."""
+    artifact = get_document_assembler().add_artifact(
+        assembly_id=assembly_id,
+        section_id=payload.section_id or None,
+        artifact_type=payload.artifact_type,
+        content=payload.content,
+        source_url=payload.source_url,
+    )
+    return artifact.dict
+
+
+@doc_assemble_router.get("/docs/assemble/assemblies/{assembly_id}/artifacts", response_model=list)
+def get_doc_artifacts(assembly_id: str) -> list:
+    """Get all artifacts for an assembly."""
+    return [a.dict for a in get_document_assembler().get_artifacts(assembly_id=assembly_id)]
+
+
+@doc_assemble_router.get("/docs/assemble/assemblies/{assembly_id}/toc", response_model=list)
+def get_doc_toc(assembly_id: str) -> list:
+    """Generate table of contents for an assembly."""
+    return get_document_assembler().generate_toc(assembly_id)
+
+
+@doc_assemble_router.post("/docs/assemble/assemblies/{assembly_id}/compile", response_model=dict)
+def compile_doc_assembly(assembly_id: str) -> dict:
+    """Compile all sections into the final document."""
+    try:
+        document = get_document_assembler().assemble_document(assembly_id)
+        return {"assembly_id": assembly_id, "document": document}
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+
+@doc_assemble_router.post("/docs/assemble/assemblies/{assembly_id}/complete", response_model=dict)
+def complete_doc_assembly(assembly_id: str) -> dict:
+    """Mark a document assembly as completed."""
+    try:
+        assembly = get_document_assembler().complete_assembly(assembly_id)
+        return assembly.dict
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+
+@doc_assemble_router.get("/docs/assemble/assemblies/{assembly_id}/word-counts", response_model=dict)
+def get_doc_word_counts(assembly_id: str) -> dict:
+    """Get per-section and total word counts."""
+    return get_document_assembler().get_word_counts(assembly_id)
+
+
+# ==========================================================================
+# 9. Batch Processor — /api/v1/product/batch/*
+# ==========================================================================
+
+class BatchCreateRequest(BaseModel):
+    name: str
+    concurrency_limit: int = 5
+    priority: int = 0
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class BatchItemAddRequest(BaseModel):
+    payload: dict[str, Any] = Field(default_factory=dict)
+    seq: int | None = None
+
+
+class BatchItemsBulkRequest(BaseModel):
+    payloads: list[dict[str, Any]]
+
+
+class BatchClaimRequest(BaseModel):
+    worker_id: str
+    count: int = 1
+
+
+class BatchItemResultRequest(BaseModel):
+    result: dict[str, Any] = Field(default_factory=dict)
+    error: str = ""
+    retry: bool = False
+
+
+@batch_router.post("/batch/batches", response_model=dict)
+def create_batch(payload: BatchCreateRequest) -> dict:
+    """Create a new batch."""
+    batch = get_batch_processor().create_batch(
+        name=payload.name,
+        concurrency_limit=payload.concurrency_limit,
+        priority=payload.priority,
+        metadata=payload.metadata,
+    )
+    return batch.dict
+
+
+@batch_router.get("/batch/batches", response_model=list)
+def list_batches(status: str = "", limit: int = 50) -> list:
+    """List batches."""
+    return [b.dict for b in get_batch_processor().list_batches(
+        status=status or None, limit=limit
+    )]
+
+
+@batch_router.get("/batch/batches/{batch_id}", response_model=dict)
+def get_batch(batch_id: str) -> dict:
+    """Get a batch by ID."""
+    batch = get_batch_processor().get_batch(batch_id)
+    if not batch:
+        raise HTTPException(status_code=404, detail=f"Batch {batch_id!r} not found")
+    return batch.dict
+
+
+@batch_router.post("/batch/batches/{batch_id}/items", response_model=dict)
+def add_batch_item(batch_id: str, payload: BatchItemAddRequest) -> dict:
+    """Add a single item to a batch."""
+    try:
+        item = get_batch_processor().add_item(batch_id, payload.payload, seq=payload.seq)
+        return item.dict
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+
+@batch_router.post("/batch/batches/{batch_id}/items/bulk", response_model=list)
+def add_batch_items_bulk(batch_id: str, payload: BatchItemsBulkRequest) -> list:
+    """Add multiple items to a batch in bulk."""
+    try:
+        items = get_batch_processor().add_items(batch_id, payload.payloads)
+        return [i.dict for i in items]
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+
+@batch_router.get("/batch/batches/{batch_id}/items", response_model=list)
+def get_batch_items(batch_id: str, status: str = "") -> list:
+    """Get all items for a batch."""
+    return [i.dict for i in get_batch_processor().get_items(
+        batch_id, status=status or None
+    )]
+
+
+@batch_router.post("/batch/batches/{batch_id}/start", response_model=dict)
+def start_batch(batch_id: str) -> dict:
+    """Start processing a batch."""
+    try:
+        batch = get_batch_processor().start_batch(batch_id)
+        return batch.dict
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+
+@batch_router.post("/batch/batches/{batch_id}/claim", response_model=list)
+def claim_batch_items(batch_id: str, payload: BatchClaimRequest) -> list:
+    """Claim pending batch items for a worker."""
+    items = get_batch_processor().claim_items(
+        batch_id, worker_id=payload.worker_id, count=payload.count
+    )
+    return [i.dict for i in items]
+
+
+@batch_router.post("/batch/items/{item_id}/complete", response_model=dict)
+def complete_batch_item(item_id: str, payload: BatchItemResultRequest) -> dict:
+    """Mark a batch item as completed."""
+    try:
+        item = get_batch_processor().complete_item(item_id, payload.result)
+        return item.dict
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+
+@batch_router.post("/batch/items/{item_id}/fail", response_model=dict)
+def fail_batch_item(item_id: str, payload: BatchItemResultRequest) -> dict:
+    """Mark a batch item as failed."""
+    try:
+        item = get_batch_processor().fail_item(item_id, payload.error, retry=payload.retry)
+        return item.dict
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+
+@batch_router.post("/batch/batches/{batch_id}/pause", response_model=dict)
+def pause_batch(batch_id: str) -> dict:
+    """Pause a running batch."""
+    try:
+        batch = get_batch_processor().pause_batch(batch_id)
+        return batch.dict
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+
+@batch_router.post("/batch/batches/{batch_id}/resume", response_model=dict)
+def resume_batch(batch_id: str) -> dict:
+    """Resume a paused batch."""
+    try:
+        batch = get_batch_processor().resume_batch(batch_id)
+        return batch.dict
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+
+@batch_router.post("/batch/batches/{batch_id}/cancel", response_model=dict)
+def cancel_batch(batch_id: str) -> dict:
+    """Cancel a batch."""
+    try:
+        batch = get_batch_processor().cancel_batch(batch_id)
+        return batch.dict
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+
+@batch_router.post("/batch/batches/{batch_id}/aggregate", response_model=dict)
+def aggregate_batch_results(batch_id: str) -> dict:
+    """Aggregate all item results for a batch."""
+    try:
+        result = get_batch_processor().aggregate_results(batch_id)
+        return result.dict
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+
+@batch_router.get("/batch/batches/{batch_id}/progress", response_model=dict)
+def get_batch_progress(batch_id: str) -> dict:
+    """Get batch progress (completion %, ETA)."""
+    try:
+        return get_batch_processor().get_progress(batch_id)
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+
+@batch_router.get("/batch/batches/{batch_id}/result", response_model=dict)
+def get_batch_result(batch_id: str) -> dict:
+    """Get aggregated result for a completed batch."""
+    result = get_batch_processor().get_result(batch_id)
+    if not result:
+        raise HTTPException(status_code=404, detail=f"No result for batch {batch_id!r}")
+    return result.dict
+
+
+# ==========================================================================
+# Wave-2: Structured Output Enforcer — /api/v1/product/output/enforce
+# ==========================================================================
+
+
+class OutputSchemaRequest(BaseModel):
+    format: str = OutputFormat.JSON.value
+    fields: dict[str, str] = Field(default_factory=dict)
+    required_headings: list[str] = Field(default_factory=list)
+    required_columns: list[str] = Field(default_factory=list)
+    strict: bool = False
+
+
+class StructuredOutputEnforceRequest(BaseModel):
+    raw_output: str
+    schema_def: OutputSchemaRequest
+    max_repair_attempts: int = Field(2, ge=1, le=5)
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+@structured_output_router.post("/output/enforce", response_model=dict)
+def enforce_structured_output(payload: StructuredOutputEnforceRequest) -> dict:
+    """Validate and auto-repair LLM output against a declared schema."""
+    from amc.product.structured_output import OutputSchema as _OSchema
+    try:
+        fmt = OutputFormat(payload.schema_def.format)
+    except ValueError:
+        raise HTTPException(status_code=422, detail=f"Invalid format: {payload.schema_def.format}")
+    schema = _OSchema(
+        format=fmt,
+        fields=payload.schema_def.fields,
+        required_headings=payload.schema_def.required_headings,
+        required_columns=payload.schema_def.required_columns,
+        strict=payload.schema_def.strict,
+    )
+    result = get_structured_output_enforcer().enforce(
+        _StructuredEnforceRequest(
+            raw_output=payload.raw_output,
+            schema=schema,
+            max_repair_attempts=payload.max_repair_attempts,
+            metadata=payload.metadata,
+        )
+    )
+    return result.dict
+
+
+# ==========================================================================
+# Wave-2: Output Diff Tracker — /api/v1/product/output/diff/*
+# ==========================================================================
+
+
+class OutputRunRecordRequest(BaseModel):
+    output_text: str
+    workflow_id: str = ""
+    prompt_key: str = ""
+    tenant_id: str = ""
+    session_id: str = ""
+    run_id: str | None = None
+    auto_diff: bool = True
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class OutputDiffComputeRequest(BaseModel):
+    run_a_id: str
+    run_b_id: str
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+@output_diff_router.post("/output/diff/runs", response_model=dict)
+def record_output_run(payload: OutputRunRecordRequest) -> dict:
+    """Record an LLM output run (optionally auto-diff against previous)."""
+    tracker = get_output_diff_tracker()
+    rec = tracker.record_run(
+        output_text=payload.output_text,
+        workflow_id=payload.workflow_id,
+        prompt_key=payload.prompt_key,
+        tenant_id=payload.tenant_id,
+        session_id=payload.session_id,
+        run_id=payload.run_id,
+        metadata=payload.metadata,
+        auto_diff=payload.auto_diff,
+    )
+    return rec.dict
+
+
+@output_diff_router.get("/output/diff/runs/{run_id}", response_model=dict)
+def get_output_run(run_id: str) -> dict:
+    rec = get_output_diff_tracker().get_run(run_id)
+    if not rec:
+        raise HTTPException(status_code=404, detail="Run not found")
+    return rec.dict
+
+
+@output_diff_router.get("/output/diff/runs", response_model=list)
+def list_output_runs(
+    workflow_id: str | None = None,
+    prompt_key: str | None = None,
+    tenant_id: str | None = None,
+    limit: int = Query(50, ge=1, le=500),
+) -> list:
+    """List recorded output runs."""
+    return [r.dict for r in get_output_diff_tracker().list_runs(
+        workflow_id=workflow_id, prompt_key=prompt_key, tenant_id=tenant_id, limit=limit
+    )]
+
+
+@output_diff_router.post("/output/diff/compute", response_model=dict)
+def compute_output_diff(payload: OutputDiffComputeRequest) -> dict:
+    """Compute a diff between two output runs."""
+    try:
+        diff = get_output_diff_tracker().compute_diff(
+            run_a_id=payload.run_a_id,
+            run_b_id=payload.run_b_id,
+            metadata=payload.metadata,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+    return diff.dict
+
+
+@output_diff_router.get("/output/diff/diffs", response_model=list)
+def list_output_diffs(
+    workflow_id: str | None = None,
+    prompt_key: str | None = None,
+    regressions_only: bool = False,
+    limit: int = Query(50, ge=1, le=500),
+) -> list:
+    return [d.dict for d in get_output_diff_tracker().list_diffs(
+        workflow_id=workflow_id, prompt_key=prompt_key,
+        regressions_only=regressions_only, limit=limit
+    )]
+
+
+@output_diff_router.get("/output/diff/regression-summary", response_model=dict)
+def output_regression_summary(
+    workflow_id: str = Query(...),
+    prompt_key: str = Query(""),
+) -> dict:
+    """Return regression statistics for a workflow/prompt pair."""
+    return get_output_diff_tracker().regression_summary(workflow_id, prompt_key).dict
+
+
+# ==========================================================================
+# Wave-2: Instruction Formatter — /api/v1/product/instructions/format
+# ==========================================================================
+
+
+class InstructionFormatRequest(BaseModel):
+    instruction: str
+    audience_role: str = AudienceRole.GENERIC.value
+    tone: str | None = None
+    structure: str | None = None
+    context: str = ""
+    include_rationale: bool = False
+    max_length: int = 0
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+@instruction_fmt_router.post("/instructions/format", response_model=dict)
+def format_instruction(payload: InstructionFormatRequest) -> dict:
+    """Format an instruction for a specific persona/role/audience."""
+    try:
+        role = AudienceRole(payload.audience_role)
+    except ValueError:
+        raise HTTPException(status_code=422, detail=f"Invalid role: {payload.audience_role}")
+    tone = None
+    if payload.tone:
+        try:
+            tone = Tone(payload.tone)
+        except ValueError:
+            raise HTTPException(status_code=422, detail=f"Invalid tone: {payload.tone}")
+    structure = None
+    if payload.structure:
+        try:
+            structure = StructureStyle(payload.structure)
+        except ValueError:
+            raise HTTPException(status_code=422, detail=f"Invalid structure: {payload.structure}")
+    result = get_instruction_formatter().format(
+        _FormatRequest(
+            instruction=payload.instruction,
+            audience_role=role,
+            tone=tone,
+            structure=structure,
+            context=payload.context,
+            include_rationale=payload.include_rationale,
+            max_length=payload.max_length,
+            metadata=payload.metadata,
+        )
+    )
+    return result.dict
+
+
+@instruction_fmt_router.get("/instructions/roles", response_model=list)
+def list_instruction_roles() -> list:
+    return get_instruction_formatter().list_roles()
+
+
+@instruction_fmt_router.get("/instructions/roles/{role}/preset", response_model=dict)
+def get_instruction_role_preset(role: str) -> dict:
+    try:
+        role_enum = AudienceRole(role)
+    except ValueError:
+        raise HTTPException(status_code=404, detail=f"Role not found: {role}")
+    return get_instruction_formatter().role_preset(role_enum)
+
+
+# ==========================================================================
+# Wave-2: Plan Generator — /api/v1/product/plan/generate
+# ==========================================================================
+
+
+class PlanGenerateRequest(BaseModel):
+    goal: str
+    context: str = ""
+    available_tools: list[str] = Field(default_factory=list)
+    constraints: list[str] = Field(default_factory=list)
+    max_steps: int = Field(10, ge=1, le=20)
+    include_human_review_steps: bool = True
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+@plan_router.post("/plan/generate", response_model=dict)
+def generate_plan(payload: PlanGenerateRequest) -> dict:
+    """Generate a structured execution plan from a goal."""
+    plan = get_plan_generator().generate(
+        _PlanRequest(
+            goal=payload.goal,
+            context=payload.context,
+            available_tools=payload.available_tools,
+            constraints=payload.constraints,
+            max_steps=payload.max_steps,
+            include_human_review_steps=payload.include_human_review_steps,
+            metadata=payload.metadata,
+        )
+    )
+    return plan.dict
+
+
+# ==========================================================================
+# Wave-2: Conversation Summarizer — /api/v1/product/conversation/summarize
+# ==========================================================================
+
+
+class ConvMessageRequest(BaseModel):
+    role: str = MessageRole.USER.value
+    content: str
+    turn: int = 0
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class ConvSummarizeRequest(BaseModel):
+    messages: list[ConvMessageRequest]
+    max_summary_length: int = 500
+    extract_tasks: bool = True
+    extract_decisions: bool = True
+    extract_open_items: bool = True
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+@conv_summarizer_router.post("/conversation/summarize", response_model=dict)
+def summarize_conversation(payload: ConvSummarizeRequest) -> dict:
+    """Summarize conversation history into structured state."""
+    messages = []
+    for m in payload.messages:
+        try:
+            role = MessageRole(m.role)
+        except ValueError:
+            role = MessageRole.USER
+        messages.append(_ConvMessage(role=role, content=m.content, turn=m.turn, metadata=m.metadata))
+    result = get_conversation_summarizer().summarize(
+        _SummarizeRequest(
+            messages=messages,
+            max_summary_length=payload.max_summary_length,
+            extract_tasks=payload.extract_tasks,
+            extract_decisions=payload.extract_decisions,
+            extract_open_items=payload.extract_open_items,
+            metadata=payload.metadata,
+        )
+    )
+    return result.dict
+
+
+# ==========================================================================
+# Wave-2: Long-Term Memory Store — /api/v1/product/memory/long-term/*
+# ==========================================================================
+
+
+class LTMemoryStoreRequest(BaseModel):
+    content: str
+    tenant_id: str
+    session_id: str = ""
+    key: str = ""
+    content_type: str = "fact"
+    importance: float = Field(0.5, ge=0.0, le=1.0)
+    confidence: float = Field(1.0, ge=0.0, le=1.0)
+    tags: list[str] = Field(default_factory=list)
+    source: str = ""
+    ttl_seconds: int | None = None
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class LTMemoryRetrieveRequest(BaseModel):
+    query: str
+    tenant_id: str
+    top_k: int = Field(5, ge=1, le=50)
+    content_type: str | None = None
+    tags: list[str] | None = None
+
+
+@lt_memory_router.post("/memory/long-term", response_model=dict)
+def store_lt_memory(payload: LTMemoryStoreRequest) -> dict:
+    """Store a long-term memory entry."""
+    store = get_long_term_memory_store()
+    rec = store.store(
+        _LTMemoryEntry(
+            content=payload.content,
+            tenant_id=payload.tenant_id,
+            session_id=payload.session_id,
+            key=payload.key,
+            content_type=payload.content_type,
+            importance=payload.importance,
+            confidence=payload.confidence,
+            tags=payload.tags,
+            source=payload.source,
+            ttl_seconds=payload.ttl_seconds,
+            metadata=payload.metadata,
+        )
+    )
+    return rec.dict
+
+
+@lt_memory_router.get("/memory/long-term/{memory_id}", response_model=dict)
+def get_lt_memory(memory_id: str) -> dict:
+    rec = get_long_term_memory_store().get(memory_id)
+    if not rec:
+        raise HTTPException(status_code=404, detail="Memory not found or expired")
+    return rec.dict
+
+
+@lt_memory_router.get("/memory/long-term", response_model=list)
+def list_lt_memories(
+    tenant_id: str = Query(...),
+    session_id: str | None = None,
+    content_type: str | None = None,
+    include_expired: bool = False,
+    limit: int = Query(50, ge=1, le=500),
+    min_importance: float = Query(0.0, ge=0.0, le=1.0),
+) -> list:
+    return [r.dict for r in get_long_term_memory_store().list(
+        tenant_id=tenant_id,
+        session_id=session_id,
+        content_type=content_type,
+        include_expired=include_expired,
+        limit=limit,
+        min_importance=min_importance,
+    )]
+
+
+@lt_memory_router.post("/memory/long-term/retrieve", response_model=dict)
+def retrieve_lt_memories(payload: LTMemoryRetrieveRequest) -> dict:
+    """Keyword-ranked retrieval from long-term memory."""
+    result = get_long_term_memory_store().retrieve(
+        query=payload.query,
+        tenant_id=payload.tenant_id,
+        top_k=payload.top_k,
+        content_type=payload.content_type,
+        tags=payload.tags,
+    )
+    return result.dict
+
+
+@lt_memory_router.delete("/memory/long-term/{memory_id}", response_model=dict)
+def delete_lt_memory(memory_id: str) -> dict:
+    ok = get_long_term_memory_store().delete(memory_id)
+    if not ok:
+        raise HTTPException(status_code=404, detail="Memory not found")
+    return {"memory_id": memory_id, "deleted": True}
+
+
+@lt_memory_router.post("/memory/long-term/purge-expired", response_model=dict)
+def purge_expired_lt_memories() -> dict:
+    count = get_long_term_memory_store().purge_expired()
+    return {"purged": count}
+
+
+@lt_memory_router.get("/memory/long-term/stats/{tenant_id}", response_model=dict)
+def lt_memory_stats(tenant_id: str) -> dict:
+    return get_long_term_memory_store().stats(tenant_id)
+
+
+# ==========================================================================
+# Wave-2: Context Window Optimizer — /api/v1/product/context/optimize
+# ==========================================================================
+
+
+class ContextItemRequest(BaseModel):
+    item_id: str
+    source_type: str = "document"
+    title: str = ""
+    content: str
+    token_count: int = 0
+    relevance_score: float = Field(1.0, ge=0.0, le=1.0)
+    recency_score: float = Field(1.0, ge=0.0, le=1.0)
+    importance: float = Field(0.5, ge=0.0, le=1.0)
+    tags: list[str] = Field(default_factory=list)
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class ContextOptimizeRequest(BaseModel):
+    query: str
+    items: list[ContextItemRequest]
+    token_budget: int = Field(4000, ge=100)
+    strategy: str = SelectionStrategy.BALANCED.value
+    token_estimate_mode: str = TokenEstimateMode.CHAR.value
+    weight_relevance: float = Field(0.50, ge=0.0, le=1.0)
+    weight_recency: float = Field(0.25, ge=0.0, le=1.0)
+    weight_importance: float = Field(0.25, ge=0.0, le=1.0)
+    max_items: int = Field(20, ge=1, le=200)
+    max_per_source_type: int = Field(5, ge=1)
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+@ctx_optimizer_router.post("/context/optimize", response_model=dict)
+def optimize_context(payload: ContextOptimizeRequest) -> dict:
+    """Select and rank context items within a token budget."""
+    try:
+        strategy = SelectionStrategy(payload.strategy)
+    except ValueError:
+        raise HTTPException(status_code=422, detail=f"Invalid strategy: {payload.strategy}")
+    try:
+        mode = TokenEstimateMode(payload.token_estimate_mode)
+    except ValueError:
+        mode = TokenEstimateMode.CHAR
+    items = [
+        _ContextItem(
+            item_id=i.item_id,
+            source_type=i.source_type,
+            title=i.title,
+            content=i.content,
+            token_count=i.token_count,
+            relevance_score=i.relevance_score,
+            recency_score=i.recency_score,
+            importance=i.importance,
+            tags=i.tags,
+            metadata=i.metadata,
+        )
+        for i in payload.items
+    ]
+    result = get_context_optimizer().optimize(
+        _OptimizeRequest(
+            query=payload.query,
+            items=items,
+            token_budget=payload.token_budget,
+            strategy=strategy,
+            token_estimate_mode=mode,
+            weight_relevance=payload.weight_relevance,
+            weight_recency=payload.weight_recency,
+            weight_importance=payload.weight_importance,
+            max_items=payload.max_items,
+            max_per_source_type=payload.max_per_source_type,
+            metadata=payload.metadata,
+        )
+    )
+    return result.dict
+
+
+# ==========================================================================
+# Wave-2: Chunking Pipeline — /api/v1/product/docs/chunk
+# ==========================================================================
+
+
+class DocChunkRequest(BaseModel):
+    doc_id: str
+    content: str
+    strategy: str = ChunkStrategy.HYBRID.value
+    max_chunk_tokens: int = Field(512, ge=10)
+    overlap_tokens: int = Field(64, ge=0)
+    min_chunk_tokens: int = Field(20, ge=1)
+    generate_summaries: bool = True
+    max_summary_length: int = Field(150, ge=20)
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+@chunking_router.post("/docs/chunk", response_model=dict)
+def chunk_document(payload: DocChunkRequest) -> dict:
+    """Split a document into chunks with optional per-chunk summaries."""
+    try:
+        strategy = ChunkStrategy(payload.strategy)
+    except ValueError:
+        raise HTTPException(status_code=422, detail=f"Invalid strategy: {payload.strategy}")
+    manifest = get_chunking_pipeline().chunk(
+        _ChunkRequest(
+            doc_id=payload.doc_id,
+            content=payload.content,
+            strategy=strategy,
+            max_chunk_tokens=payload.max_chunk_tokens,
+            overlap_tokens=payload.overlap_tokens,
+            min_chunk_tokens=payload.min_chunk_tokens,
+            generate_summaries=payload.generate_summaries,
+            max_summary_length=payload.max_summary_length,
+            metadata=payload.metadata,
+        )
+    )
+    return manifest.dict
+
+
+@chunking_router.get("/docs/chunk/strategies", response_model=list)
+def list_chunk_strategies() -> list:
+    """List available chunking strategies."""
+    return [s.value for s in ChunkStrategy]
+
+
+# ==========================================================================
+# Wave-2: Reasoning Coach — /api/v1/product/reasoning/coach
+# ==========================================================================
+
+
+class ReasoningCoachRequest(BaseModel):
+    output_text: str
+    available_tools: list[str] = Field(default_factory=list)
+    min_severity: str = CoachSeverity.MEDIUM.value
+    grounding_window: int = Field(150, ge=50, le=500)
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+@reasoning_coach_router.post("/reasoning/coach", response_model=dict)
+def coach_reasoning(payload: ReasoningCoachRequest) -> dict:
+    """Detect unsupported claims and suggest tool calls to ground them."""
+    try:
+        severity = CoachSeverity(payload.min_severity)
+    except ValueError:
+        raise HTTPException(status_code=422, detail=f"Invalid severity: {payload.min_severity}")
+    report = get_reasoning_coach().coach(
+        _CoachRequest(
+            output_text=payload.output_text,
+            available_tools=payload.available_tools,
+            min_severity=severity,
+            grounding_window=payload.grounding_window,
+            metadata=payload.metadata,
+        )
+    )
+    return report.dict
+
+
+# =============================================================================
+# Wave-Final: Product/UX/Channel API Routes
+# =============================================================================
+
+# ---------------------------------------------------------------------------
+# Onboarding Wizard — /api/v1/product/onboarding/*
+# ---------------------------------------------------------------------------
+
+@onboarding_router.post("/onboarding/sessions", response_model=dict)
+def start_onboarding_session(payload: OnboardStartInput) -> dict:
+    """Start a new agent onboarding session."""
+    sess = get_onboarding_wizard().start_session(payload)
+    return sess.model_dump()
+
+
+@onboarding_router.get("/onboarding/sessions/{session_id}", response_model=dict)
+def get_onboarding_session(session_id: str) -> dict:
+    sess = get_onboarding_wizard().get_session(session_id)
+    if sess is None:
+        raise HTTPException(status_code=404, detail=f"Session {session_id!r} not found")
+    return sess.model_dump()
+
+
+@onboarding_router.post("/onboarding/sessions/{session_id}/advance", response_model=dict)
+def advance_onboarding_step(session_id: str, payload: StepAdvanceInput) -> dict:
+    """Advance the onboarding session to the next step."""
+    payload.session_id = session_id
+    try:
+        sess = get_onboarding_wizard().advance_step(payload)
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+    return sess.model_dump()
+
+
+@onboarding_router.post("/onboarding/sessions/{session_id}/abandon", response_model=dict)
+def abandon_onboarding_session(session_id: str) -> dict:
+    sess = get_onboarding_wizard().abandon_session(session_id)
+    return sess.model_dump()
+
+
+@onboarding_router.get("/onboarding/sessions", response_model=list)
+def list_onboarding_sessions(
+    tenant_id: str | None = None,
+    status: str | None = None,
+    limit: int = 50,
+) -> list:
+    return [s.model_dump() for s in get_onboarding_wizard().list_sessions(
+        tenant_id=tenant_id, status=status, limit=limit
+    )]
+
+
+@onboarding_router.post("/onboarding/sessions/{session_id}/oauth", response_model=dict)
+def add_oauth_connection(session_id: str, payload: OAuthConnectionInput) -> dict:
+    payload.session_id = session_id
+    conn = get_onboarding_wizard().add_oauth_connection(payload)
+    return conn.model_dump()
+
+
+@onboarding_router.get("/onboarding/sessions/{session_id}/oauth", response_model=list)
+def list_oauth_connections(session_id: str) -> list:
+    return [c.model_dump() for c in get_onboarding_wizard().list_oauth_connections(session_id)]
+
+
+@onboarding_router.post("/onboarding/sessions/{session_id}/workflows", response_model=dict)
+def select_workflow(session_id: str, payload: WorkflowSelectionInput) -> dict:
+    payload.session_id = session_id
+    sel = get_onboarding_wizard().select_workflow(payload)
+    return sel.model_dump()
+
+
+@onboarding_router.get("/onboarding/sessions/{session_id}/workflows", response_model=list)
+def list_workflow_selections(session_id: str) -> list:
+    return [s.model_dump() for s in get_onboarding_wizard().list_workflow_selections(session_id)]
+
+
+@onboarding_router.post("/onboarding/sessions/{session_id}/first-run", response_model=dict)
+def record_first_run(session_id: str, payload: FirstRunInput) -> dict:
+    payload.session_id = session_id
+    result = get_onboarding_wizard().record_first_run(payload)
+    return result.model_dump()
+
+
+@onboarding_router.get("/onboarding/sessions/{session_id}/first-run", response_model=dict)
+def get_first_run_result(session_id: str) -> dict:
+    result = get_onboarding_wizard().get_first_run_result(session_id)
+    if result is None:
+        raise HTTPException(status_code=404, detail="No first-run result found")
+    return result.model_dump()
+
+
+# ---------------------------------------------------------------------------
+# Self-Serve Portal — /api/v1/product/portal/*
+# ---------------------------------------------------------------------------
+
+@portal_router.post("/portal/jobs", response_model=dict)
+def submit_portal_job(payload: JobSubmitInput) -> dict:
+    """Submit a new job via the self-serve portal."""
+    job = get_portal_manager().submit_job(payload)
+    return job.model_dump()
+
+
+@portal_router.get("/portal/jobs/{job_id}", response_model=dict)
+def get_portal_job(job_id: str) -> dict:
+    job = get_portal_manager().get_job(job_id)
+    if job is None:
+        raise HTTPException(status_code=404, detail=f"Job {job_id!r} not found")
+    return job.model_dump()
+
+
+@portal_router.get("/portal/jobs", response_model=list)
+def list_portal_jobs(
+    tenant_id: str | None = None,
+    submitter_id: str | None = None,
+    status: str | None = None,
+    limit: int = 50,
+) -> list:
+    return [j.model_dump() for j in get_portal_manager().list_jobs(
+        tenant_id=tenant_id, submitter_id=submitter_id,
+        status=status, limit=limit,
+    )]
+
+
+@portal_router.patch("/portal/jobs/{job_id}/status", response_model=dict)
+def update_portal_job_status(job_id: str, payload: JobStatusUpdateInput) -> dict:
+    payload.job_id = job_id
+    try:
+        job = get_portal_manager().update_status(payload)
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+    return job.model_dump()
+
+
+@portal_router.post("/portal/jobs/{job_id}/cancel", response_model=dict)
+def cancel_portal_job(job_id: str, reason: str = "") -> dict:
+    try:
+        job = get_portal_manager().cancel_job(job_id, reason=reason)
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+    return job.model_dump()
+
+
+@portal_router.post("/portal/jobs/{job_id}/progress", response_model=dict)
+def record_job_progress(job_id: str, payload: ProgressEventInput) -> dict:
+    payload.job_id = job_id
+    ev = get_portal_manager().record_progress(payload)
+    return ev.model_dump()
+
+
+@portal_router.get("/portal/jobs/{job_id}/progress", response_model=list)
+def get_job_progress(job_id: str, limit: int = 100) -> list:
+    return [e.model_dump() for e in get_portal_manager().get_progress_events(job_id, limit=limit)]
+
+
+@portal_router.post("/portal/jobs/{job_id}/files", response_model=dict)
+def attach_result_file(job_id: str, payload: ResultFileInput) -> dict:
+    payload.job_id = job_id
+    f = get_portal_manager().attach_result_file(payload)
+    return f.model_dump()
+
+
+@portal_router.get("/portal/jobs/{job_id}/files", response_model=list)
+def list_result_files(job_id: str) -> list:
+    return [f.model_dump() for f in get_portal_manager().list_result_files(job_id)]
+
+
+# ---------------------------------------------------------------------------
+# Approval Workflow — /api/v1/product/approvals/*
+# ---------------------------------------------------------------------------
+
+@approvals_router.post("/approvals/drafts", response_model=dict)
+def create_draft(payload: DraftCreateInput) -> dict:
+    """Create a new draft for approval."""
+    draft = get_approval_manager().create_draft(payload)
+    return draft.model_dump()
+
+
+@approvals_router.get("/approvals/drafts/{draft_id}", response_model=dict)
+def get_draft(draft_id: str) -> dict:
+    draft = get_approval_manager().get_draft(draft_id)
+    if draft is None:
+        raise HTTPException(status_code=404, detail=f"Draft {draft_id!r} not found")
+    return draft.model_dump()
+
+
+@approvals_router.patch("/approvals/drafts/{draft_id}", response_model=dict)
+def update_draft(draft_id: str, payload: DraftUpdateInput) -> dict:
+    payload.draft_id = draft_id
+    try:
+        draft = get_approval_manager().update_draft(payload)
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+    return draft.model_dump()
+
+
+@approvals_router.get("/approvals/drafts", response_model=list)
+def list_drafts(
+    tenant_id: str | None = None,
+    author_id: str | None = None,
+    status: str | None = None,
+    limit: int = 50,
+) -> list:
+    return [d.model_dump() for d in get_approval_manager().list_drafts(
+        tenant_id=tenant_id, author_id=author_id, status=status, limit=limit
+    )]
+
+
+@approvals_router.post("/approvals/drafts/{draft_id}/submit", response_model=list)
+def submit_for_approval(draft_id: str, payload: SubmitForApprovalInput) -> list:
+    payload.draft_id = draft_id
+    try:
+        reqs = get_approval_manager().submit_for_approval(payload)
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+    return [r.model_dump() for r in reqs]
+
+
+@approvals_router.post("/approvals/requests/{request_id}/decide", response_model=dict)
+def decide_approval(request_id: str, payload: ApprovalDecisionInput) -> dict:
+    payload.request_id = request_id
+    try:
+        req = get_approval_manager().decide(payload)
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+    return req.model_dump()
+
+
+@approvals_router.get("/approvals/requests", response_model=list)
+def list_approval_requests(
+    draft_id: str | None = None,
+    approver_id: str | None = None,
+    status: str | None = None,
+    limit: int = 50,
+) -> list:
+    return [r.model_dump() for r in get_approval_manager().list_requests(
+        draft_id=draft_id, approver_id=approver_id, status=status, limit=limit
+    )]
+
+
+@approvals_router.post("/approvals/drafts/{draft_id}/revise", response_model=dict)
+def submit_revision(draft_id: str, payload: RevisionInput) -> dict:
+    payload.draft_id = draft_id
+    try:
+        rev = get_approval_manager().submit_revision(payload)
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+    return rev.model_dump()
+
+
+@approvals_router.post("/approvals/drafts/{draft_id}/send", response_model=dict)
+def send_draft(draft_id: str, payload: SendInput) -> dict:
+    payload.draft_id = draft_id
+    try:
+        send_ev = get_approval_manager().send_draft(payload)
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+    return send_ev.model_dump()
+
+
+@approvals_router.get("/approvals/drafts/{draft_id}/send-events", response_model=list)
+def get_send_events(draft_id: str) -> list:
+    return [e.model_dump() for e in get_approval_manager().get_send_events(draft_id)]
+
+
+# ---------------------------------------------------------------------------
+# Collaboration — /api/v1/product/collab/*
+# ---------------------------------------------------------------------------
+
+@collab_router.post("/collab/tasks", response_model=dict)
+def create_collab_task(payload: TaskCreateInput) -> dict:
+    task = get_collaboration_manager().create_task(payload)
+    return task.model_dump()
+
+
+@collab_router.get("/collab/tasks/{task_id}", response_model=dict)
+def get_collab_task(task_id: str) -> dict:
+    task = get_collaboration_manager().get_task(task_id)
+    if task is None:
+        raise HTTPException(status_code=404, detail=f"Task {task_id!r} not found")
+    return task.model_dump()
+
+
+@collab_router.patch("/collab/tasks/{task_id}", response_model=dict)
+def update_collab_task(task_id: str, payload: TaskUpdateInput) -> dict:
+    payload.task_id = task_id
+    task = get_collaboration_manager().update_task(payload)
+    return task.model_dump()
+
+
+@collab_router.post("/collab/tasks/{task_id}/assign", response_model=dict)
+def assign_collab_task(task_id: str, payload: AssignInput) -> dict:
+    payload.task_id = task_id
+    task = get_collaboration_manager().assign_task(payload)
+    return task.model_dump()
+
+
+@collab_router.get("/collab/tasks", response_model=list)
+def list_collab_tasks(
+    tenant_id: str | None = None,
+    owner_id: str | None = None,
+    assignee_id: str | None = None,
+    status: str | None = None,
+    limit: int = 50,
+) -> list:
+    return [t.model_dump() for t in get_collaboration_manager().list_tasks(
+        tenant_id=tenant_id, owner_id=owner_id,
+        assignee_id=assignee_id, status=status, limit=limit,
+    )]
+
+
+@collab_router.post("/collab/tasks/{task_id}/handoffs", response_model=dict)
+def create_handoff(task_id: str, payload: HandoffInput) -> dict:
+    payload.task_id = task_id
+    handoff = get_collaboration_manager().create_handoff(payload)
+    return handoff.model_dump()
+
+
+@collab_router.post("/collab/handoffs/{handoff_id}/acknowledge", response_model=dict)
+def acknowledge_handoff(handoff_id: str, payload: HandoffAckInput) -> dict:
+    payload.handoff_id = handoff_id
+    handoff = get_collaboration_manager().acknowledge_handoff(payload)
+    return handoff.model_dump()
+
+
+@collab_router.get("/collab/tasks/{task_id}/handoffs", response_model=list)
+def list_handoffs(task_id: str) -> list:
+    return [h.model_dump() for h in get_collaboration_manager().list_handoffs(task_id)]
+
+
+@collab_router.post("/collab/tasks/{task_id}/comments", response_model=dict)
+def add_comment(task_id: str, payload: CommentInput) -> dict:
+    payload.task_id = task_id
+    comment = get_collaboration_manager().add_comment(payload)
+    return comment.model_dump()
+
+
+@collab_router.get("/collab/tasks/{task_id}/comments", response_model=list)
+def list_comments(task_id: str) -> list:
+    return [c.model_dump() for c in get_collaboration_manager().list_comments(task_id)]
+
+
+@collab_router.get("/collab/notifications", response_model=list)
+def get_collab_notifications(
+    recipient_id: str, unread_only: bool = False, limit: int = 50
+) -> list:
+    return [n.model_dump() for n in get_collaboration_manager().get_notifications(
+        recipient_id=recipient_id, unread_only=unread_only, limit=limit
+    )]
+
+
+@collab_router.post("/collab/notifications/{notif_id}/delivered", response_model=dict)
+def mark_notif_delivered(notif_id: str) -> dict:
+    get_collaboration_manager().mark_notification_delivered(notif_id)
+    return {"notif_id": notif_id, "delivered": True}
+
+
+# ---------------------------------------------------------------------------
+# Retention Autopilot — /api/v1/product/retention/*
+# ---------------------------------------------------------------------------
+
+@retention_router.post("/retention/signals", response_model=dict)
+def record_usage_signal(payload: UsageSignalInput) -> dict:
+    sig = get_retention_autopilot().record_signal(payload)
+    return sig.model_dump()
+
+
+@retention_router.get("/retention/signals", response_model=list)
+def list_usage_signals(
+    tenant_id: str, signal_type: str | None = None, limit: int = 100
+) -> list:
+    return [s.model_dump() for s in get_retention_autopilot().get_signals(
+        tenant_id, signal_type=signal_type, limit=limit
+    )]
+
+
+@retention_router.post("/retention/scores", response_model=dict)
+def compute_churn_score(payload: ChurnScoreInput) -> dict:
+    score = get_retention_autopilot().compute_churn_score(payload)
+    return score.model_dump()
+
+
+@retention_router.get("/retention/scores/latest", response_model=dict)
+def get_latest_churn_score(tenant_id: str) -> dict:
+    score = get_retention_autopilot().get_latest_score(tenant_id)
+    if score is None:
+        raise HTTPException(status_code=404, detail="No score found for tenant")
+    return score.model_dump()
+
+
+@retention_router.get("/retention/scores", response_model=list)
+def list_churn_scores(tenant_id: str, limit: int = 10) -> list:
+    return [s.model_dump() for s in get_retention_autopilot().list_scores(tenant_id, limit=limit)]
+
+
+@retention_router.post("/retention/winback", response_model=dict)
+def trigger_winback_flow(payload: WinbackTriggerInput) -> dict:
+    flow = get_retention_autopilot().trigger_winback(payload)
+    return flow.model_dump()
+
+
+@retention_router.get("/retention/winback", response_model=list)
+def list_winback_flows(tenant_id: str, status: str | None = None, limit: int = 50) -> list:
+    return [f.model_dump() for f in get_retention_autopilot().list_flows(
+        tenant_id, status=status, limit=limit
+    )]
+
+
+@retention_router.post("/retention/winback/{flow_id}/events", response_model=dict)
+def record_winback_event(flow_id: str, payload: FlowEventInput) -> dict:
+    payload.flow_id = flow_id
+    ev = get_retention_autopilot().record_flow_event(payload)
+    return ev.model_dump()
+
+
+@retention_router.post("/retention/winback/{flow_id}/complete", response_model=dict)
+def complete_winback_flow(flow_id: str, outcome: str = "retained") -> dict:
+    flow = get_retention_autopilot().complete_flow(flow_id, outcome=outcome)
+    return flow.model_dump()
+
+
+# ---------------------------------------------------------------------------
+# Personalized Output Styles — /api/v1/product/output/style/*
+# ---------------------------------------------------------------------------
+
+@output_style_router.post("/output/style/profiles", response_model=dict)
+def create_style_profile(payload: StyleProfileInput) -> dict:
+    try:
+        profile = get_output_manager().create_profile(payload)
+    except ValueError as exc:
+        raise HTTPException(status_code=409, detail=str(exc)) from exc
+    return profile.model_dump()
+
+
+@output_style_router.get("/output/style/profiles/{profile_id}", response_model=dict)
+def get_style_profile(profile_id: str) -> dict:
+    p = get_output_manager().get_profile(profile_id)
+    if p is None:
+        raise HTTPException(status_code=404, detail=f"Profile {profile_id!r} not found")
+    return p.model_dump()
+
+
+@output_style_router.patch("/output/style/profiles/{profile_id}", response_model=dict)
+def update_style_profile(profile_id: str, payload: StyleProfileUpdateInput) -> dict:
+    payload.profile_id = profile_id
+    try:
+        p = get_output_manager().update_profile(payload)
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+    return p.model_dump()
+
+
+@output_style_router.get("/output/style/profiles", response_model=list)
+def list_style_profiles(
+    tenant_id: str, active_only: bool = True, limit: int = 100
+) -> list:
+    return [p.model_dump() for p in get_output_manager().list_profiles(
+        tenant_id, active_only=active_only, limit=limit
+    )]
+
+
+@output_style_router.delete("/output/style/profiles/{profile_id}", response_model=dict)
+def delete_style_profile(profile_id: str) -> dict:
+    ok = get_output_manager().delete_profile(profile_id)
+    if not ok:
+        raise HTTPException(status_code=404, detail=f"Profile {profile_id!r} not found")
+    return {"profile_id": profile_id, "deleted": True}
+
+
+@output_style_router.post("/output/style/apply", response_model=dict)
+def apply_style(payload: ApplyStyleInput) -> dict:
+    try:
+        result = get_output_manager().apply_style(payload)
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+    return result.model_dump()
+
+
+@output_style_router.get("/output/style/profiles/{profile_id}/history", response_model=list)
+def get_style_history(profile_id: str, limit: int = 50) -> list:
+    return [a.model_dump() for a in get_output_manager().get_application_history(
+        profile_id, limit=limit
+    )]
+
+
+# ---------------------------------------------------------------------------
+# Proactive Reminders — /api/v1/product/reminders/*
+# ---------------------------------------------------------------------------
+
+@reminders_router.post("/reminders/subscriptions", response_model=dict)
+def subscribe_reminders(payload: SubscriptionInput) -> dict:
+    sub = get_reminder_manager().subscribe(payload)
+    return sub.model_dump()
+
+
+@reminders_router.post("/reminders/subscriptions/unsubscribe", response_model=dict)
+def unsubscribe_reminders(
+    tenant_id: str, owner_id: str, reminder_type: str
+) -> dict:
+    ok = get_reminder_manager().unsubscribe(tenant_id, owner_id, reminder_type)
+    return {"unsubscribed": ok}
+
+
+@reminders_router.get("/reminders/subscriptions", response_model=list)
+def list_reminder_subscriptions(
+    tenant_id: str, owner_id: str | None = None, opt_in_only: bool = True
+) -> list:
+    return [s.model_dump() for s in get_reminder_manager().list_subscriptions(
+        tenant_id, owner_id=owner_id, opt_in_only=opt_in_only
+    )]
+
+
+@reminders_router.post("/reminders", response_model=dict)
+def create_reminder(payload: ReminderCreateInput) -> dict:
+    rem = get_reminder_manager().create_reminder(payload)
+    return rem.model_dump()
+
+
+@reminders_router.get("/reminders/due", response_model=list)
+def get_due_reminders(as_of: str | None = None) -> list:
+    return [r.model_dump() for r in get_reminder_manager().get_due_reminders(as_of=as_of)]
+
+
+@reminders_router.post("/reminders/{reminder_id}/sent", response_model=dict)
+def mark_reminder_sent(reminder_id: str) -> dict:
+    rem = get_reminder_manager().mark_sent(reminder_id)
+    return rem.model_dump()
+
+
+@reminders_router.post("/reminders/{reminder_id}/cancel", response_model=dict)
+def cancel_reminder(reminder_id: str) -> dict:
+    rem = get_reminder_manager().cancel_reminder(reminder_id)
+    return rem.model_dump()
+
+
+@reminders_router.post("/reminders/{reminder_id}/snooze", response_model=dict)
+def snooze_reminder(reminder_id: str, payload: SnoozeInput) -> dict:
+    payload.reminder_id = reminder_id
+    rem = get_reminder_manager().snooze_reminder(payload)
+    return rem.model_dump()
+
+
+@reminders_router.get("/reminders", response_model=list)
+def list_reminders(
+    tenant_id: str,
+    owner_id: str | None = None,
+    status: str | None = None,
+    reminder_type: str | None = None,
+    limit: int = 100,
+) -> list:
+    return [r.model_dump() for r in get_reminder_manager().list_reminders(
+        tenant_id, owner_id=owner_id, status=status,
+        reminder_type=reminder_type, limit=limit,
+    )]
+
+
+# ---------------------------------------------------------------------------
+# Outcome-Based Pricing — /api/v1/product/outcome-pricing/*
+# ---------------------------------------------------------------------------
+
+@outcome_pricing_router.post("/outcome-pricing/contracts", response_model=dict)
+def create_outcome_contract(payload: ContractCreateInput) -> dict:
+    contract = get_outcome_manager().create_contract(payload)
+    return contract.model_dump()
+
+
+@outcome_pricing_router.get("/outcome-pricing/contracts/{contract_id}", response_model=dict)
+def get_outcome_contract(contract_id: str) -> dict:
+    c = get_outcome_manager().get_contract(contract_id)
+    if c is None:
+        raise HTTPException(status_code=404, detail=f"Contract {contract_id!r} not found")
+    return c.model_dump()
+
+
+@outcome_pricing_router.patch("/outcome-pricing/contracts/{contract_id}", response_model=dict)
+def update_outcome_contract(contract_id: str, payload: ContractUpdateInput) -> dict:
+    payload.contract_id = contract_id
+    c = get_outcome_manager().update_contract(payload)
+    return c.model_dump()
+
+
+@outcome_pricing_router.get("/outcome-pricing/contracts", response_model=list)
+def list_outcome_contracts(tenant_id: str, active_only: bool = True) -> list:
+    return [c.model_dump() for c in get_outcome_manager().list_contracts(
+        tenant_id, active_only=active_only
+    )]
+
+
+@outcome_pricing_router.post("/outcome-pricing/outcomes", response_model=dict)
+def record_outcome(payload: OutcomeRecordInput) -> dict:
+    try:
+        outcome = get_outcome_manager().record_outcome(payload)
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+    return outcome.model_dump()
+
+
+@outcome_pricing_router.get("/outcome-pricing/outcomes/{outcome_id}", response_model=dict)
+def get_outcome(outcome_id: str) -> dict:
+    o = get_outcome_manager().get_outcome(outcome_id)
+    if o is None:
+        raise HTTPException(status_code=404, detail=f"Outcome {outcome_id!r} not found")
+    return o.model_dump()
+
+
+@outcome_pricing_router.post("/outcome-pricing/outcomes/{outcome_id}/verify", response_model=dict)
+def verify_outcome(outcome_id: str, payload: OutcomeVerifyInput) -> dict:
+    payload.outcome_id = outcome_id
+    outcome = get_outcome_manager().verify_outcome(payload)
+    return outcome.model_dump()
+
+
+@outcome_pricing_router.get("/outcome-pricing/outcomes", response_model=list)
+def list_outcomes(
+    tenant_id: str, contract_id: str | None = None,
+    status: str | None = None, limit: int = 100
+) -> list:
+    return [o.model_dump() for o in get_outcome_manager().list_outcomes(
+        tenant_id, contract_id=contract_id, status=status, limit=limit
+    )]
+
+
+@outcome_pricing_router.post("/outcome-pricing/billing/events", response_model=dict)
+def emit_billing_event(payload: BillingEventInput) -> dict:
+    try:
+        event = get_outcome_manager().emit_billing_event(payload)
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+    return event.model_dump()
+
+
+@outcome_pricing_router.patch("/outcome-pricing/billing/events/{event_id}", response_model=dict)
+def update_billing_status(event_id: str, payload: BillingStatusUpdateInput) -> dict:
+    payload.event_id = event_id
+    event = get_outcome_manager().update_billing_status(payload)
+    return event.model_dump()
+
+
+@outcome_pricing_router.get("/outcome-pricing/billing/events", response_model=list)
+def list_billing_events(
+    tenant_id: str, billing_status: str | None = None, limit: int = 100
+) -> list:
+    return [e.model_dump() for e in get_outcome_manager().list_billing_events(
+        tenant_id, billing_status=billing_status, limit=limit
+    )]
+
+
+@outcome_pricing_router.get("/outcome-pricing/billing/summary", response_model=dict)
+def billing_summary(tenant_id: str) -> dict:
+    return get_outcome_manager().billing_summary(tenant_id)
+
+
+# ---------------------------------------------------------------------------
+# White-Label Agency Launcher — /api/v1/product/white-label/*
+# ---------------------------------------------------------------------------
+
+@white_label_router.post("/white-label/templates", response_model=dict)
+def create_wl_template(payload: WLTemplateCreateInput) -> dict:
+    try:
+        tmpl = get_white_label_manager().create_template(payload)
+    except ValueError as exc:
+        raise HTTPException(status_code=409, detail=str(exc)) from exc
+    return tmpl.model_dump()
+
+
+@white_label_router.get("/white-label/templates/{template_id}", response_model=dict)
+def get_wl_template(template_id: str) -> dict:
+    t = get_white_label_manager().get_template(template_id)
+    if t is None:
+        raise HTTPException(status_code=404, detail=f"Template {template_id!r} not found")
+    return t.model_dump()
+
+
+@white_label_router.patch("/white-label/templates/{template_id}", response_model=dict)
+def update_wl_template(template_id: str, payload: WLTemplateUpdateInput) -> dict:
+    payload.template_id = template_id
+    tmpl = get_white_label_manager().update_template(payload)
+    return tmpl.model_dump()
+
+
+@white_label_router.get("/white-label/templates", response_model=list)
+def list_wl_templates(agency_id: str, active_only: bool = True) -> list:
+    return [t.model_dump() for t in get_white_label_manager().list_templates(
+        agency_id, active_only=active_only
+    )]
+
+
+@white_label_router.post("/white-label/environments", response_model=dict)
+def provision_wl_environment(payload: EnvironmentProvisionInput) -> dict:
+    try:
+        env = get_white_label_manager().provision_environment(payload)
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+    return env.model_dump()
+
+
+@white_label_router.get("/white-label/environments/{env_id}", response_model=dict)
+def get_wl_environment(env_id: str) -> dict:
+    env = get_white_label_manager().get_environment(env_id)
+    if env is None:
+        raise HTTPException(status_code=404, detail=f"Environment {env_id!r} not found")
+    return env.model_dump()
+
+
+@white_label_router.post("/white-label/environments/{env_id}/activate", response_model=dict)
+def activate_wl_environment(env_id: str, actor_id: str = "system") -> dict:
+    env = get_white_label_manager().activate_environment(env_id, actor_id=actor_id)
+    return env.model_dump()
+
+
+@white_label_router.post("/white-label/environments/{env_id}/suspend", response_model=dict)
+def suspend_wl_environment(env_id: str, actor_id: str = "system", reason: str = "") -> dict:
+    env = get_white_label_manager().suspend_environment(env_id, actor_id=actor_id, reason=reason)
+    return env.model_dump()
+
+
+@white_label_router.post("/white-label/environments/{env_id}/terminate", response_model=dict)
+def terminate_wl_environment(env_id: str, actor_id: str = "system") -> dict:
+    env = get_white_label_manager().terminate_environment(env_id, actor_id=actor_id)
+    return env.model_dump()
+
+
+@white_label_router.get("/white-label/environments", response_model=list)
+def list_wl_environments(
+    agency_id: str, status: str | None = None, limit: int = 100
+) -> list:
+    return [e.model_dump() for e in get_white_label_manager().list_environments(
+        agency_id, status=status, limit=limit
+    )]
+
+
+@white_label_router.post("/white-label/environments/{env_id}/branding", response_model=dict)
+def upsert_branding_asset(env_id: str, payload: BrandingAssetInput) -> dict:
+    payload.env_id = env_id
+    asset = get_white_label_manager().upsert_branding_asset(payload)
+    return asset.model_dump()
+
+
+@white_label_router.get("/white-label/environments/{env_id}/branding", response_model=list)
+def list_branding_assets(env_id: str, asset_type: str | None = None) -> list:
+    return [a.model_dump() for a in get_white_label_manager().list_branding_assets(
+        env_id, asset_type=asset_type
+    )]
+
+
+@white_label_router.get("/white-label/environments/{env_id}/log", response_model=list)
+def get_provision_log(env_id: str, limit: int = 50) -> list:
+    return [e.model_dump() for e in get_white_label_manager().get_provision_log(env_id, limit=limit)]
+
+
+@white_label_router.get("/white-label/environments/by-tenant/{tenant_id}", response_model=dict)
+def get_wl_env_by_tenant(tenant_id: str) -> dict:
+    env = get_white_label_manager().get_environment_by_tenant(tenant_id)
+    if env is None:
+        raise HTTPException(status_code=404, detail=f"No environment for tenant {tenant_id!r}")
+    return env.model_dump()
