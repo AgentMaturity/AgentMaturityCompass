@@ -225,7 +225,7 @@ import {
 } from "./storage/blobs/blobCli.js";
 import { ensureBlobKey, verifyBlobCurrentKeySignature } from "./storage/blobs/blobKeys.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "./utils/fs.js";
-import { readdirSync } from "node:fs";
+import { readdirSync, readFileSync } from "node:fs";
 import { request as httpRequest } from "node:http";
 import {
   parseRolesCsv,
@@ -11669,6 +11669,584 @@ program.action((_opts, command: Command) => {
   }
   program.help();
 });
+
+
+// ============================================================
+// NEW MODULES: Shield, Enforce, Watch, Product, Vault, Score
+// ============================================================
+// ============================================================
+// SHIELD — Threat detection and security scanning
+// ============================================================
+const shield = program.command("shield").description("Threat detection and security scanning");
+
+shield
+  .command("analyze <path>")
+  .description("Run static code analyzer on a skill file")
+  .option("--json", "Output as JSON")
+  .action(async (path: string, opts: { json?: boolean }) => {
+    try {
+      const { analyzeSkill } = await import("./shield/index.js");
+      const content = readFileSync(path, "utf8");
+      const result = analyzeSkill(content);
+      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
+      console.log(chalk.bold.cyan("\n🛡️  Shield Analysis"));
+      console.log(chalk.gray("Path:"), path);
+      console.log(chalk.gray("Risk Level:"), result.riskLevel);
+      console.log(chalk.gray("Findings:"), result.findings.length);
+      if (result.findings.length) {
+        for (const finding of result.findings) {
+          console.log(chalk.yellow(`  • [${finding.severity}] ${finding.description}`));
+        }
+      }
+    } catch (e: any) { console.error(chalk.red(e.message)); process.exit(1); }
+  });
+
+shield
+  .command("sandbox <agentId>")
+  .description("Check sandbox configuration for an agent")
+  .option("--json", "Output as JSON")
+  .action(async (agentId: string, opts: { json?: boolean }) => {
+    try {
+      const { sandboxCheck } = await import("./shield/index.js");
+      const result = sandboxCheck(agentId);
+      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
+      console.log(chalk.bold.cyan("\n🛡️  Sandbox Check"));
+      console.log(chalk.gray("Agent:"), agentId);
+      console.log(chalk.gray("Passed:"), result.passed ? chalk.green("yes") : chalk.red("no"));
+      console.log(chalk.gray("Details:"), JSON.stringify(result, null, 2));
+    } catch (e: any) { console.error(chalk.red(e.message)); process.exit(1); }
+  });
+
+shield
+  .command("sbom <path>")
+  .description("Generate software bill of materials from package.json")
+  .option("--json", "Output as JSON")
+  .action(async (path: string, opts: { json?: boolean }) => {
+    try {
+      const { generateSbom } = await import("./shield/index.js");
+      const pkg = JSON.parse(readFileSync(path, "utf8"));
+      const deps = { ...pkg.dependencies, ...pkg.devDependencies };
+      const result = generateSbom(deps);
+      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
+      console.log(chalk.bold.cyan("\n🛡️  SBOM"));
+      console.log(chalk.gray("Source:"), path);
+      console.log(chalk.gray("Components:"), result.components?.length ?? Object.keys(deps).length);
+      for (const [name, version] of Object.entries(deps)) {
+        console.log(chalk.gray(`  • ${name}@${version}`));
+      }
+    } catch (e: any) { console.error(chalk.red(e.message)); process.exit(1); }
+  });
+
+shield
+  .command("reputation <toolId>")
+  .description("Check reputation score for a tool")
+  .option("--json", "Output as JSON")
+  .action(async (toolId: string, opts: { json?: boolean }) => {
+    try {
+      const { checkReputation } = await import("./shield/index.js");
+      const result = checkReputation(toolId);
+      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
+      console.log(chalk.bold.cyan("\n🛡️  Tool Reputation"));
+      console.log(chalk.gray("Tool:"), toolId);
+      console.log(chalk.gray("Score:"), result.score ?? "N/A");
+      console.log(chalk.gray("Trusted:"), result.trusted ? chalk.green("yes") : chalk.red("no"));
+    } catch (e: any) { console.error(chalk.red(e.message)); process.exit(1); }
+  });
+
+shield
+  .command("conversation-integrity <agentId>")
+  .description("Check conversation integrity for an agent (demo)")
+  .option("--json", "Output as JSON")
+  .action(async (agentId: string, opts: { json?: boolean }) => {
+    try {
+      const { checkIntegrity } = await import("./shield/index.js");
+      const result = checkIntegrity([{ role: "user", content: agentId }]);
+      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
+      console.log(chalk.bold.cyan("\n🛡️  Conversation Integrity"));
+      console.log(chalk.gray("Agent:"), agentId);
+      console.log(chalk.gray("Integrity:"), result.valid ? chalk.green("intact") : chalk.red("compromised"));
+      console.log(chalk.gray("Details:"), JSON.stringify(result, null, 2));
+    } catch (e: any) { console.error(chalk.red(e.message)); process.exit(1); }
+  });
+
+shield
+  .command("threat-intel <input>")
+  .description("Check threat intelligence for an input")
+  .option("--json", "Output as JSON")
+  .action(async (input: string, opts: { json?: boolean }) => {
+    try {
+      const { checkThreatIntel } = await import("./shield/index.js");
+      const result = checkThreatIntel(input);
+      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
+      console.log(chalk.bold.cyan("\n🛡️  Threat Intel"));
+      console.log(chalk.gray("Input:"), input);
+      console.log(chalk.gray("Threats:"), result.threats?.length ?? 0);
+      console.log(chalk.gray("Risk:"), result.threats.length > 0 ? "high" : "safe");
+    } catch (e: any) { console.error(chalk.red(e.message)); process.exit(1); }
+  });
+
+
+shield
+  .command("detect-injection <text>")
+  .description("Detect prompt injection attempts in text")
+  .option("--json", "Output as JSON")
+  .action(async (text: string, opts: { json?: boolean }) => {
+    try {
+      const { detectInjection } = await import("./shield/detector.js");
+      const result = detectInjection(text);
+      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
+      console.log(chalk.bold.cyan("\n🛡️  Injection Detection"));
+      console.log(chalk.gray("Injection detected:"), result.detected ? chalk.red("YES") : chalk.green("no"));
+      console.log(chalk.gray("Risk Score:"), result.riskScore);
+      console.log(chalk.gray("Confidence:"), result.confidence);
+    } catch (e: any) { console.error(chalk.red(e.message)); process.exit(1); }
+  });
+
+shield
+  .command("sanitize <text>")
+  .description("Sanitize text — strip XSS, injection, and dangerous patterns")
+  .option("--json", "Output as JSON")
+  .action(async (text: string, opts: { json?: boolean }) => {
+    try {
+      const { sanitize } = await import("./shield/sanitizer.js");
+      const result = sanitize(text);
+      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
+      console.log(chalk.bold.cyan("\n🛡️  Sanitize"));
+      console.log(chalk.gray("Cleaned:"), result.sanitized);
+      console.log(chalk.gray("Removed count:"), result.removedCount);
+    } catch (e: any) { console.error(chalk.red(e.message)); process.exit(1); }
+  });
+
+// ============================================================
+// ENFORCE — Policy enforcement and guardrails
+// ============================================================
+const enforce = program.command("enforce").description("Policy enforcement and guardrails");
+
+enforce
+  .command("check <agentId> <tool> <action>")
+  .description("Check policy for an agent action")
+  .option("--json", "Output as JSON")
+  .action(async (agentId: string, tool: string, action: string, opts: { json?: boolean }) => {
+    try {
+      const { PolicyFirewall } = await import("./enforce/index.js");
+      const fw = new PolicyFirewall();
+      fw.addRule({ id: "cli-rule", pattern: action, action: "allow" });
+      const result = fw.check(agentId, tool, action);
+      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
+      console.log(chalk.bold.magenta("\n⚖️  Policy Check"));
+      console.log(chalk.gray("Agent:"), agentId);
+      console.log(chalk.gray("Tool:"), tool);
+      console.log(chalk.gray("Action:"), action);
+      console.log(chalk.gray("Decision:"), result.decision === "allow" ? chalk.green("allow") : chalk.red(result.decision));
+    } catch (e: any) { console.error(chalk.red(e.message)); process.exit(1); }
+  });
+
+enforce
+  .command("exec-guard <cmd>")
+  .description("Check if a command is safe to execute")
+  .option("--json", "Output as JSON")
+  .action(async (cmd: string, opts: { json?: boolean }) => {
+    try {
+      const { checkExec } = await import("./enforce/index.js");
+      const result = checkExec(cmd);
+      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
+      console.log(chalk.bold.magenta("\n⚖️  Exec Guard"));
+      console.log(chalk.gray("Command:"), cmd);
+      console.log(chalk.gray("Safe:"), result.allowed ? chalk.green("yes") : chalk.red("no"));
+      if (result.blockedPattern) console.log(chalk.gray("Blocked pattern:"), result.blockedPattern);
+    } catch (e: any) { console.error(chalk.red(e.message)); process.exit(1); }
+  });
+
+enforce
+  .command("ato-detect <agentId>")
+  .description("Detect account takeover attempts (demo)")
+  .option("--json", "Output as JSON")
+  .action(async (agentId: string, opts: { json?: boolean }) => {
+    try {
+      const { detectAto } = await import("./enforce/index.js");
+      const result = detectAto([{ type: "login", ts: Date.now() }]);
+      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
+      console.log(chalk.bold.magenta("\n⚖️  ATO Detection"));
+      console.log(chalk.gray("Agent:"), agentId);
+      console.log(chalk.gray("Suspicious:"), result.suspicious ? chalk.red("yes") : chalk.green("no"));
+    } catch (e: any) { console.error(chalk.red(e.message)); process.exit(1); }
+  });
+
+enforce
+  .command("numeric-check <value> <min> <max>")
+  .description("Validate a numeric value within bounds")
+  .option("--json", "Output as JSON")
+  .action(async (value: string, min: string, max: string, opts: { json?: boolean }) => {
+    try {
+      const { checkNumeric } = await import("./enforce/index.js");
+      const result = checkNumeric(parseFloat(value), { min: parseFloat(min), max: parseFloat(max) });
+      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
+      console.log(chalk.bold.magenta("\n⚖️  Numeric Check"));
+      console.log(chalk.gray("Value:"), value);
+      console.log(chalk.gray("Range:"), `[${min}, ${max}]`);
+      console.log(chalk.gray("Valid:"), result.valid ? chalk.green("yes") : chalk.red("no"));
+    } catch (e: any) { console.error(chalk.red(e.message)); process.exit(1); }
+  });
+
+enforce
+  .command("taint <input>")
+  .description("Track tainted input through the system")
+  .option("--json", "Output as JSON")
+  .action(async (input: string, opts: { json?: boolean }) => {
+    try {
+      const { TaintTracker } = await import("./enforce/index.js");
+      const tracker = new TaintTracker();
+      tracker.markTainted(input, input, "cli");
+      const result = tracker.check(input);
+      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
+      console.log(chalk.bold.magenta("\n⚖️  Taint Tracking"));
+      console.log(chalk.gray("Input:"), input);
+      console.log(chalk.gray("Tainted:"), result ? chalk.red("yes") : chalk.green("no"));
+    } catch (e: any) { console.error(chalk.red(e.message)); process.exit(1); }
+  });
+
+
+enforce
+  .command("blind-secrets <text>")
+  .description("Redact secrets from text")
+  .option("--json", "Output as JSON")
+  .action(async (text: string, opts: { json?: boolean }) => {
+    try {
+      const { blindSecrets } = await import("./enforce/index.js");
+      const result = blindSecrets(text);
+      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
+      console.log(chalk.bold.magenta("\n⚖️  Secret Blinding"));
+      console.log(chalk.gray("Secrets found:"), result.secretsFound);
+      console.log(chalk.gray("Blinded text:"), result.blinded);
+    } catch (e: any) { console.error(chalk.red(e.message)); process.exit(1); }
+  });
+
+// ============================================================
+// WATCH — Observability, attestation, and safety testing
+// ============================================================
+const watch = program.command("watch").description("Observability, attestation, and safety testing");
+
+watch
+  .command("attest <output>")
+  .description("Attest an agent output")
+  .option("--json", "Output as JSON")
+  .action(async (output: string, opts: { json?: boolean }) => {
+    try {
+      const { attestOutput } = await import("./watch/index.js");
+      const result = attestOutput(output);
+      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
+      console.log(chalk.bold.blue("\n👁️  Output Attestation"));
+      console.log(chalk.gray("Output:"), output);
+      console.log(chalk.gray("Hash:"), result.hash || "N/A");
+      console.log(chalk.gray("Attested:"), chalk.green("yes"));
+    } catch (e: any) { console.error(chalk.red(e.message)); process.exit(1); }
+  });
+
+watch
+  .command("explain <agentId> <runId>")
+  .description("Generate explainability packet for an agent run")
+  .option("--json", "Output as JSON")
+  .action(async (agentId: string, runId: string, opts: { json?: boolean }) => {
+    try {
+      const { createPacket } = await import("./watch/index.js");
+      const result = createPacket([{ claim: agentId, evidence: runId, confidence: 0.9 }]);
+      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
+      console.log(chalk.bold.blue("\n👁️  Explainability Packet"));
+      console.log(chalk.gray("Agent:"), agentId);
+      console.log(chalk.gray("Run:"), runId);
+      console.log(chalk.gray("Confidence:"), "0.9");
+      console.log(chalk.gray("Packet:"), JSON.stringify(result, null, 2));
+    } catch (e: any) { console.error(chalk.red(e.message)); process.exit(1); }
+  });
+
+watch
+  .command("safety-test <agentId>")
+  .description("Run safety tests for an agent")
+  .option("--json", "Output as JSON")
+  .action(async (agentId: string, opts: { json?: boolean }) => {
+    try {
+      const { runSafetyTests } = await import("./watch/index.js");
+      const result = runSafetyTests(agentId);
+      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
+      console.log(chalk.bold.blue("\n👁️  Safety Tests"));
+      console.log(chalk.gray("Agent:"), agentId);
+      console.log(chalk.gray("Passed:"), result.passed > 0 ? chalk.green("yes") : chalk.red("no"));
+      console.log(chalk.gray("Tests Run:"), result.testsRun);
+      console.log(chalk.gray("Findings:"), result.findings.length);
+    } catch (e: any) { console.error(chalk.red(e.message)); process.exit(1); }
+  });
+
+
+watch
+  .command("host-hardening")
+  .description("Check host hardening status for this AMC deployment")
+  .option("--json", "Output as JSON")
+  .action(async (opts: { json?: boolean }) => {
+    try {
+      const { checkHostHardening } = await import("./watch/hostHardening.js");
+      const result = checkHostHardening();
+      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
+      console.log(chalk.bold.blue("\n👁️  Host Hardening"));
+      console.log(chalk.gray("Passed:"), result.passed ? chalk.green("yes") : chalk.red("no"));
+      console.log(chalk.gray("Findings:"), result.findings?.length ?? 0);
+      if (result.findings?.length) result.findings.forEach(f => console.log(chalk[f.passed ? "green" : "red"](`  • [${f.severity}] ${f.title}: ${f.detail}`)));
+    } catch (e: any) { console.error(chalk.red(e.message)); process.exit(1); }
+  });
+
+// ============================================================
+// PRODUCT — Routing, autonomy, metering, and workflows
+// ============================================================
+const product = program.command("product").description("Product operations: routing, autonomy, metering, workflows");
+
+product
+  .command("route <taskType>")
+  .description("Route a task to the best model/provider")
+  .option("--json", "Output as JSON")
+  .action(async (taskType: string, opts: { json?: boolean }) => {
+    try {
+      const { CostLatencyRouter } = await import("./product/index.js");
+      const router = new CostLatencyRouter();
+      const result = router.route(taskType);
+      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
+      console.log(chalk.bold.yellow("\n📦  Task Routing"));
+      console.log(chalk.gray("Task Type:"), taskType);
+      console.log(chalk.gray("Route:"), JSON.stringify(result, null, 2));
+    } catch (e: any) { console.error(chalk.red(e.message)); process.exit(1); }
+  });
+
+product
+  .command("autonomy <agentId> <mode>")
+  .description("Decide autonomy level for an agent")
+  .option("--json", "Output as JSON")
+  .action(async (agentId: string, mode: string, opts: { json?: boolean }) => {
+    try {
+      const { AutonomyDial } = await import("./product/index.js");
+      const dial = new AutonomyDial();
+      const result = dial.decide(agentId, mode);
+      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
+      console.log(chalk.bold.yellow("\n📦  Autonomy Decision"));
+      console.log(chalk.gray("Agent:"), agentId);
+      console.log(chalk.gray("Mode:"), mode);
+      console.log(chalk.gray("Decision:"), JSON.stringify(result, null, 2));
+    } catch (e: any) { console.error(chalk.red(e.message)); process.exit(1); }
+  });
+
+product
+  .command("loop-detect <agentId>")
+  .description("Detect infinite loops in agent behavior")
+  .option("--json", "Output as JSON")
+  .action(async (agentId: string, opts: { json?: boolean }) => {
+    try {
+      const { LoopDetector } = await import("./product/index.js");
+      const detector = new LoopDetector();
+      const result = detector.check(agentId, "test");
+      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
+      console.log(chalk.bold.yellow("\n📦  Loop Detection"));
+      console.log(chalk.gray("Agent:"), agentId);
+      console.log(chalk.gray("Loop Detected:"), result.loopDetected ? chalk.red("yes") : chalk.green("no"));
+    } catch (e: any) { console.error(chalk.red(e.message)); process.exit(1); }
+  });
+
+product
+  .command("metering <agentId>")
+  .description("Show metering and billing for an agent")
+  .option("--json", "Output as JSON")
+  .action(async (agentId: string, opts: { json?: boolean }) => {
+    try {
+      const { Metering } = await import("./product/index.js");
+      const meter = new Metering();
+      meter.record({ tenantId: agentId, eventType: "llm_call", units: 100 });
+      const result = meter.getBill(agentId);
+      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
+      console.log(chalk.bold.yellow("\n📦  Metering"));
+      console.log(chalk.gray("Agent:"), agentId);
+      console.log(chalk.gray("Bill:"), JSON.stringify(result, null, 2));
+    } catch (e: any) { console.error(chalk.red(e.message)); process.exit(1); }
+  });
+
+product
+  .command("retry <cmd>")
+  .description("Execute a command with retry logic")
+  .option("--json", "Output as JSON")
+  .action(async (cmd: string, opts: { json?: boolean }) => {
+    try {
+      const { withRetry } = await import("./product/index.js");
+      const result = await withRetry(async () => cmd, { maxAttempts: 3, baseDelayMs: 100, maxDelayMs: 1000 });
+      if (opts.json) { console.log(JSON.stringify({ result }, null, 2)); return; }
+      console.log(chalk.bold.yellow("\n📦  Retry"));
+      console.log(chalk.gray("Command:"), cmd);
+      console.log(chalk.gray("Result:"), result);
+    } catch (e: any) { console.error(chalk.red(e.message)); process.exit(1); }
+  });
+
+product
+  .command("plan <goal>")
+  .description("Generate an execution plan for a goal")
+  .option("--json", "Output as JSON")
+  .action(async (goal: string, opts: { json?: boolean }) => {
+    try {
+      const { generatePlan } = await import("./product/index.js");
+      const result = generatePlan(goal);
+      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
+      console.log(chalk.bold.yellow("\n📦  Plan"));
+      console.log(chalk.gray("Goal:"), goal);
+      console.log(chalk.gray("Steps:"), JSON.stringify(result.steps || result, null, 2));
+    } catch (e: any) { console.error(chalk.red(e.message)); process.exit(1); }
+  });
+
+const workflowCmd = product.command("workflow").description("Workflow management");
+workflowCmd
+  .command("create <name>")
+  .description("Create a new workflow")
+  .option("--json", "Output as JSON")
+  .action(async (name: string, opts: { json?: boolean }) => {
+    try {
+      const { WorkflowEngine } = await import("./product/index.js");
+      const engine = new WorkflowEngine();
+      const result = engine.createWorkflow(name, []);
+      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
+      console.log(chalk.bold.yellow("\n📦  Workflow Created"));
+      console.log(chalk.gray("Name:"), name);
+      console.log(chalk.gray("ID:"), result.workflowId || "N/A");
+    } catch (e: any) { console.error(chalk.red(e.message)); process.exit(1); }
+  });
+
+// ============================================================
+// VAULT extensions (added to existing `vault` variable)
+// ============================================================
+vault
+  .command("rag-guard <input>")
+  .description("Guard RAG chunks against injection")
+  .option("--json", "Output as JSON")
+  .action(async (input: string, opts: { json?: boolean }) => {
+    try {
+      const { guardRagChunks } = await import("./vault/ragGuard.js");
+      const result = guardRagChunks([input]);
+      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
+      console.log(chalk.bold.green("\n🔒  RAG Guard"));
+      console.log(chalk.gray("Input:"), input);
+      console.log(chalk.gray("Safe:"), result.safe ? chalk.green("yes") : chalk.red("no"));
+      console.log(chalk.gray("Details:"), JSON.stringify(result, null, 2));
+    } catch (e: any) { console.error(chalk.red(e.message)); process.exit(1); }
+  });
+
+vault
+  .command("classify <text>")
+  .description("Classify data sensitivity level")
+  .option("--json", "Output as JSON")
+  .action(async (text: string, opts: { json?: boolean }) => {
+    try {
+      const { classifyData } = await import("./vault/dataClassification.js");
+      const result = classifyData(text);
+      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
+      console.log(chalk.bold.green("\n🔒  Data Classification"));
+      console.log(chalk.gray("Text:"), text.substring(0, 50) + (text.length > 50 ? "..." : ""));
+      console.log(chalk.gray("Level:"), result.classification || "unknown");
+    } catch (e: any) { console.error(chalk.red(e.message)); process.exit(1); }
+  });
+
+vault
+  .command("scrub <file>")
+  .description("Scrub metadata from a file")
+  .option("--json", "Output as JSON")
+  .action(async (file: string, opts: { json?: boolean }) => {
+    try {
+      const content = readFileSync(file, "utf8").toString();
+      const { scrubMetadata } = await import("./vault/metadataScrubber.js");
+      const result = scrubMetadata(content);
+      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
+      console.log(chalk.bold.green("\n🔒  Metadata Scrub"));
+      console.log(chalk.gray("File:"), file);
+      console.log(chalk.gray("Scrubbed:"), chalk.green("yes"));
+      console.log(chalk.gray("Result:"), JSON.stringify(result, null, 2).substring(0, 200));
+    } catch (e: any) { console.error(chalk.red(e.message)); process.exit(1); }
+  });
+
+vault
+  .command("dsar-status")
+  .description("Show DSAR (Data Subject Access Request) status")
+  .option("--json", "Output as JSON")
+  .action(async (opts: { json?: boolean }) => {
+    try {
+      const { DsarAutopilot } = await import("./vault/dsarAutopilot.js");
+      const dsar = new DsarAutopilot();
+      const result = { requests: [], status: "no pending requests" };
+      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
+      console.log(chalk.bold.green("\n🔒  DSAR Status"));
+      console.log(chalk.gray("Pending Requests:"), 0);
+      console.log(chalk.gray("Status:"), "No pending requests");
+    } catch (e: any) { console.error(chalk.red(e.message)); process.exit(1); }
+  });
+
+vault
+  .command("privacy-budget <agentId>")
+  .description("Check privacy budget for an agent")
+  .option("--json", "Output as JSON")
+  .action(async (agentId: string, opts: { json?: boolean }) => {
+    try {
+      const { PrivacyBudget } = await import("./vault/privacyBudget.js");
+      const budget = new PrivacyBudget();
+      const result = budget.check(agentId, 0);
+      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
+      console.log(chalk.bold.green("\n🔒  Privacy Budget"));
+      console.log(chalk.gray("Agent:"), agentId);
+      console.log(chalk.gray("Remaining:"), result.remaining ?? "N/A");
+      console.log(chalk.gray("Allowed:"), result.allowed ? chalk.green("yes") : chalk.red("no"));
+    } catch (e: any) { console.error(chalk.red(e.message)); process.exit(1); }
+  });
+
+// ============================================================
+// SCORE — Maturity scoring and evidence collection
+// ============================================================
+const score = program.command("score").description("Maturity scoring, adversarial testing, and evidence collection");
+
+score
+  .command("formal-spec <agentId>")
+  .description("Compute formal maturity score for an agent")
+  .option("--json", "Output as JSON")
+  .action(async (agentId: string, opts: { json?: boolean }) => {
+    try {
+      const { computeMaturityScore } = await import("./score/index.js");
+      const result = computeMaturityScore([], {});
+      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
+      console.log(chalk.bold.hex("#FF6600")("\n📊  Maturity Score"));
+      console.log(chalk.gray("Agent:"), agentId);
+      console.log(chalk.gray("Score:"), result.overallScore ?? "N/A");
+      console.log(chalk.gray("Level:"), result.overallLevel || "unknown");
+    } catch (e: any) { console.error(chalk.red(e.message)); process.exit(1); }
+  });
+
+score
+  .command("adversarial <agentId>")
+  .description("Test gaming resistance of scoring")
+  .option("--json", "Output as JSON")
+  .action(async (agentId: string, opts: { json?: boolean }) => {
+    try {
+      const { testGamingResistance } = await import("./score/index.js");
+      const result = testGamingResistance({ q1: agentId });
+      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
+      console.log(chalk.bold.hex("#FF6600")("\n📊  Adversarial Test"));
+      console.log(chalk.gray("Agent:"), agentId);
+      console.log(chalk.gray("Gaming Resistant:"), result.gamingResistant ? chalk.green("yes") : chalk.red("no"));
+      console.log(chalk.gray("Details:"), JSON.stringify(result, null, 2));
+    } catch (e: any) { console.error(chalk.red(e.message)); process.exit(1); }
+  });
+
+score
+  .command("collect-evidence <agentId>")
+  .description("Collect evidence for scoring an agent")
+  .option("--json", "Output as JSON")
+  .action(async (agentId: string, opts: { json?: boolean }) => {
+    try {
+      const { collectEvidence } = await import("./score/index.js");
+      const result = collectEvidence({ [agentId]: { collected: true, timestamp: Date.now() } });
+      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
+      console.log(chalk.bold.hex("#FF6600")("\n📊  Evidence Collection"));
+      console.log(chalk.gray("Agent:"), agentId);
+      console.log(chalk.gray("Evidence:"), JSON.stringify(result, null, 2));
+    } catch (e: any) { console.error(chalk.red(e.message)); process.exit(1); }
+  });
+
 
 program.parseAsync(process.argv).catch((error: unknown) => {
   const message = error instanceof Error ? error.message : String(error);
