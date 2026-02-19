@@ -1,0 +1,62 @@
+promptPolicy:
+  version: 1
+  enforcement:
+    mode: ENFORCE
+    stripUserSystemMessages: true
+    rejectIfUserTriesToOverride: true
+    overridePatterns:
+      - ignore previous
+      - disregard system
+      - developer message says
+      - reveal hidden prompt
+      - bypass policy
+      - jailbreak
+    maxClockSkewSeconds: 120
+    requirePackSignatureValid: true
+    failClosedOnLintFail: true
+    requireNotarySigner: false
+  templates:
+    defaultTemplate: generic_northstar_v1
+    byAgentType:
+      code-agent: code_northstar_v1
+      support-agent: support_northstar_v1
+      ops-agent: ops_northstar_v1
+      research-agent: research_northstar_v1
+      sales-agent: sales_northstar_v1
+      other: generic_northstar_v1
+    providerOverrides:
+      openai: openai_northstar_v1
+      anthropic: anthropic_northstar_v1
+      gemini: gemini_northstar_v1
+      xai: xai_northstar_v1
+      openrouter: openrouter_northstar_v1
+  truth:
+    requireTruthguardForBridgeResponses: true
+    enforcementMode: WARN
+    requireEvidenceRefsForStrongClaims: true
+    strongClaimRegexes:
+      - \bI (did|completed|executed|deployed|ran)\b
+      - \bVerified\b
+      - \bGuaranteed\b
+    allowedOutputContractSchemaIds:
+      - amc.output.v1
+    structuredOutput:
+      prefer: true
+      openaiResponseFormatJson: true
+  recurrence:
+    refreshCadenceHours: 24
+    refreshOnEvents:
+      - CGX_PACK_UPDATED
+      - MECHANIC_TARGETS_UPDATED
+      - POLICY_APPLIED
+      - PLUGIN_INSTALLED
+      - TRANSFORM_PLAN_CREATED
+      - ADVISORY_CREATED
+  privacy:
+    includeNumericTargetsInPrompt: false
+    includeMaturityScoreInPrompt: false
+    includeOnlyTopTasksCount: 3
+    allowIncludeToolNames: true
+    allowIncludeModelNames: true
+    redactAllFilePaths: true
+    redactAllEmails: true

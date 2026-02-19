@@ -1,0 +1,38 @@
+auditPolicy:
+  version: 1
+  privacy:
+    exportAllowlistOnly: true
+    redactAllFreeText: true
+    allowFreeTextFields: []
+    exportAgentIdsHashed: true
+    hashTruncBytes: 8
+    anonymizeWorkspaceIdDefault: true
+    forbidPromptAndRawIO: true
+    forbidPII: true
+    forbidSecrets: true
+  gates:
+    minRunsForStrongClaims: 4
+    minIntegrityIndexForStrongClaims: 0.9
+    minCorrelationRatioForStrongClaims: 0.9
+    honestMode: STRICT
+  export:
+    requireOwnerRole: true
+    requireDualControlForExternalSharing: true
+    approvalActionClass: GOVERNANCE
+    defaultFormat: AMCAUDIT
+    allowPdfSummary: true
+    pdfSummaryNoChartsIfUntrusted: true
+  retention:
+    keepExportsDays: 180
+    keepCachesDays: 30
+  recurrence:
+    refreshCadenceHours: 24
+    refreshOnEvents:
+      - DIAGNOSTIC_COMPLETED
+      - FORECAST_CREATED
+      - ASSURANCE_CERT_ISSUED
+      - BENCH_CREATED
+      - PLUGIN_INSTALLED
+      - POLICY_APPLIED
+      - APPROVAL_DECIDED
+      - NOTARY_ATTESTATION_OBSERVED

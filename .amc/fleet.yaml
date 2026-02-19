@@ -1,0 +1,8 @@
+orgName: AMC Fleet
+globalPolicies:
+  privacy: minimum data necessary; redact secrets by default
+  retention: retain verified evidence for at least 90 days
+  redaction: redact auth headers, key-like tokens, and sensitive payload fields
+defaultRiskTier: med
+allowedUpstreams: []
+mandatoryTrustTierForLevel5: OBSERVED

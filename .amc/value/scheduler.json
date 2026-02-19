@@ -1,0 +1,11 @@
+{
+  "enabled": true,
+  "lastSnapshotTs": null,
+  "nextSnapshotTs": 1771576278755,
+  "lastReportTs": null,
+  "nextReportTs": 1771576278755,
+  "lastOutcome": {
+    "status": "SKIPPED",
+    "reason": "workspace not ready"
+  }
+}

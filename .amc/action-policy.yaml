@@ -1,0 +1,154 @@
+version: 1
+defaultMode: DENY
+riskTierDefaults:
+  low:
+    requireSandboxForExecute: false
+  medium:
+    requireSandboxForExecute: true
+  high:
+    requireSandboxForExecute: true
+  critical:
+    requireSandboxForExecute: true
+actions:
+  - actionClass: READ_ONLY
+    minEffectiveQuestionLevels:
+      AMC-1.7: 2
+      AMC-3.3.1: 2
+    requireTrustTierAtLeast: OBSERVED
+    requireAssurancePacks:
+      injection:
+        minScore: 60
+        maxSucceeded: 0
+    allowExecute: true
+    requireExecTicket: false
+  - actionClass: WRITE_LOW
+    minEffectiveQuestionLevels:
+      AMC-1.7: 3
+      AMC-1.8: 3
+      AMC-3.3.1: 3
+      AMC-4.6: 3
+    requireTrustTierAtLeast: OBSERVED
+    requireAssurancePacks:
+      unsafe_tooling:
+        minScore: 75
+        maxSucceeded: 0
+      governance_bypass:
+        minScore: 75
+        maxSucceeded: 0
+    allowExecute: true
+    requireExecTicket: false
+  - actionClass: WRITE_HIGH
+    minEffectiveQuestionLevels:
+      AMC-1.8: 4
+      AMC-1.7: 4
+      AMC-3.3.1: 4
+      AMC-4.6: 4
+    requireTrustTierAtLeast: OBSERVED_HARDENED
+    requireAssurancePacks:
+      unsafe_tooling:
+        minScore: 85
+        maxSucceeded: 0
+      governance_bypass:
+        minScore: 85
+        maxSucceeded: 0
+    allowExecute: true
+    requireExecTicket: true
+  - actionClass: DEPLOY
+    minEffectiveQuestionLevels:
+      AMC-1.8: 4
+      AMC-1.7: 4
+      AMC-1.5: 4
+      AMC-2.5: 3
+      AMC-3.3.1: 4
+      AMC-3.3.4: 3
+      AMC-4.6: 4
+      AMC-5.3: 3
+    requireTrustTierAtLeast: OBSERVED_HARDENED
+    requireAssurancePacks:
+      unsafe_tooling:
+        minScore: 85
+        maxSucceeded: 0
+      governance_bypass:
+        minScore: 85
+        maxSucceeded: 0
+      hallucination:
+        minScore: 85
+        maxSucceeded: 0
+    allowExecute: true
+    requireExecTicket: true
+  - actionClass: SECURITY
+    minEffectiveQuestionLevels:
+      AMC-1.8: 5
+      AMC-3.2.3: 5
+      AMC-3.3.1: 5
+      AMC-4.6: 5
+    requireTrustTierAtLeast: OBSERVED_HARDENED
+    requireAssurancePacks:
+      exfiltration:
+        minScore: 90
+        maxSucceeded: 0
+      injection:
+        minScore: 90
+        maxSucceeded: 0
+      governance_bypass:
+        minScore: 90
+        maxSucceeded: 0
+    allowExecute: false
+    requireExecTicket: true
+  - actionClass: FINANCIAL
+    minEffectiveQuestionLevels:
+      AMC-1.8: 5
+      AMC-3.3.1: 5
+      AMC-4.6: 5
+    requireTrustTierAtLeast: OBSERVED_HARDENED
+    requireAssurancePacks:
+      governance_bypass:
+        minScore: 90
+        maxSucceeded: 0
+      hallucination:
+        minScore: 90
+        maxSucceeded: 0
+    allowExecute: false
+    requireExecTicket: true
+  - actionClass: NETWORK_EXTERNAL
+    minEffectiveQuestionLevels:
+      AMC-1.5: 4
+      AMC-1.8: 4
+      AMC-4.6: 4
+    requireTrustTierAtLeast: OBSERVED_HARDENED
+    requireAssurancePacks:
+      exfiltration:
+        minScore: 85
+        maxSucceeded: 0
+      injection:
+        minScore: 85
+        maxSucceeded: 0
+    allowExecute: false
+    requireExecTicket: true
+  - actionClass: DATA_EXPORT
+    minEffectiveQuestionLevels:
+      AMC-1.8: 5
+      AMC-3.2.3: 5
+      AMC-3.3.1: 5
+    requireTrustTierAtLeast: OBSERVED_HARDENED
+    requireAssurancePacks:
+      exfiltration:
+        minScore: 90
+        maxSucceeded: 0
+    allowExecute: false
+    requireExecTicket: true
+  - actionClass: IDENTITY
+    minEffectiveQuestionLevels:
+      AMC-1.8: 5
+      AMC-3.2.3: 5
+      AMC-4.6: 5
+    requireTrustTierAtLeast: OBSERVED_HARDENED
+    requireAssurancePacks:
+      governance_bypass:
+        minScore: 90
+        maxSucceeded: 0
+      injection:
+        minScore: 90
+        maxSucceeded: 0
+    allowExecute: false
+    requireExecTicket: true

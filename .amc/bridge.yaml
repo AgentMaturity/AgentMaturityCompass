@@ -1,0 +1,43 @@
+bridge:
+  version: 1
+  providers:
+    openai:
+      enabled: true
+      gatewayRoute: /openai
+      modelAllowlist:
+        - gpt-*
+        - o1-*
+        - o3-*
+    anthropic:
+      enabled: true
+      gatewayRoute: /anthropic
+      modelAllowlist:
+        - claude-*
+    gemini:
+      enabled: true
+      gatewayRoute: /gemini
+      modelAllowlist:
+        - gemini-*
+    openrouter:
+      enabled: true
+      gatewayRoute: /openrouter
+      modelAllowlist:
+        - openrouter/*
+        - gpt-*
+        - claude-*
+        - gemini-*
+        - grok-*
+    xai:
+      enabled: true
+      gatewayRoute: /grok
+      modelAllowlist:
+        - grok-*
+    local:
+      enabled: true
+      gatewayRoute: /local
+      modelAllowlist:
+        - local-*
+        - gpt-*
+  redaction:
+    redactPromptText: true
+    maxSummaryChars: 512

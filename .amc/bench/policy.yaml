@@ -1,0 +1,53 @@
+benchPolicy:
+  version: 1
+  privacy:
+    exportAllowlistOnly: true
+    redactAllFreeText: true
+    allowFreeTextFields: []
+    exportAgentIdsHashed: true
+    hashTruncBytes: 8
+    anonymizeWorkspaceIdDefault: true
+    minKAnonymityForAgentBench: 10
+    minRunsForAnyExport: 4
+    minDaysCoverage: 7
+  integrityGates:
+    minIntegrityIndexForPublish: 0.9
+    minCorrelationRatioForPublish: 0.9
+    requireTrustLevelForPublish: HIGH
+    allowExportWhenInsufficientEvidence: true
+  publishing:
+    requireDualControlApprovals: true
+    approvalActionClass: SECURITY
+    requireExplicitOwnerAck: true
+  includedMetrics:
+    maturity:
+      includeOverall: true
+      includeByFiveLayers: true
+      includeByFiveDimensions: true
+      includeBy42Questions: false
+    strategyFailureRisks:
+      includeAllFive: true
+    valueDimensions:
+      includeAllFive: true
+    operatingHealth:
+      includeApprovals: true
+      includeBudgets: true
+      includeToolhubDenials: true
+      includeFreezeEvents: true
+      includeAssuranceScores: true
+      includeNotaryStatus: true
+      includePluginIntegrity: true
+    forecasting:
+      includeForecastSummary: true
+  weights:
+    ecosystemAlignment:
+      ecosystemFocusRisk: 0.4
+      emotionalValue: 0.3
+      brandValue: 0.3
+    riskAssurance:
+      riskAssuranceRisk: 0.4
+      integrityIndex: 0.3
+      correlationRatio: 0.3
+    digitalDuality:
+      digitalDualityRisk: 0.5
+      toolGovernanceMaturity: 0.5

@@ -1,0 +1,13 @@
+{
+  "v": 1,
+  "updatedTs": 1771489818514,
+  "installed": [],
+  "policySnapshot": {
+    "actionPolicySha256": "9c8c51f1a6162459d67eb349abbbc3ac7e1253eea1ae7975a41bd4b2c87fa104",
+    "toolsSha256": "2acab6884886e49f7263b4f9482a56d594ea56227de9da39e1f3f435750a142a",
+    "budgetsSha256": "eadcd79d9ac72fa608dcbeb5b9ffa2f77430dcd687d0ec96d2f45e87d1cbea52",
+    "approvalPolicySha256": "84c7541e85c2a4812cb6401767e37fce73db004cfe96e03af1c79aa0bb4c09f1",
+    "opsPolicySha256": "b3554faece681eae3fec9e8bc19bb62a5dfe2e9979fa6f9e05e3fb32ba877a06",
+    "registriesSha256": "bdf1ed79163580151c1c43ea120560ec1e4f02a4ee7348f0c3539b12862d173f"
+  }
+}

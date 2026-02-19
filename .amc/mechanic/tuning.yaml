@@ -1,0 +1,46 @@
+mechanicTuning:
+  version: 1
+  scope:
+    type: WORKSPACE
+    id: workspace
+  knobs:
+    maxTokensPerRun: 12000
+    maxCostPerDayUsd: 50
+    maxToolCallsPerRun: 100
+    maxNetworkCallsPerRun: 50
+    requireApprovalFor:
+      - HIGH_RISK_TOOLS
+      - DATA_EXPORT
+      - PLUGIN_INSTALL
+      - POLICY_CHANGE
+    approvalQuorum:
+      owners: 1
+      auditors: 1
+    allowedProviders:
+      - openai
+      - anthropic
+      - google
+      - xai
+      - openrouter
+      - local
+    allowedModelPatterns:
+      - gpt-*
+      - claude-*
+      - gemini-*
+      - grok-*
+      - openrouter/*
+      - local/*
+    allowedTools:
+      - fs.read
+      - git.status
+      - http.fetch
+    deniedTools:
+      - shell.exec
+      - secrets.read
+    requireTruthguardForFinalOutputs: true
+    minObservedEvidenceShareForScoreIncrease: 0.6
+    forbidSelfReportScoreIncrease: true
+    diagnosticCadenceHours: 24
+    forecastCadenceHours: 24
+    benchCadenceDays: 30
+  updatedTs: 1771489818218

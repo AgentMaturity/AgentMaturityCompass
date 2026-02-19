@@ -1,0 +1,54 @@
+tools:
+  version: 1
+  denyByDefault: true
+  allowedTools:
+    - name: fs.read
+      actionClass: READ_ONLY
+      allow:
+        paths:
+          - ./workspace/**
+      deny:
+        paths:
+          - "**/.amc/**"
+          - "**/.git/**"
+      maxBytes: 200000
+      requireExecTicket: false
+    - name: fs.write
+      actionClass: WRITE_LOW
+      allow:
+        paths:
+          - ./workspace/output/**
+      deny:
+        paths:
+          - "**/.amc/**"
+          - "**/.git/**"
+      requireExecTicket: false
+    - name: git.status
+      actionClass: READ_ONLY
+    - name: git.commit
+      actionClass: WRITE_LOW
+      requireExecTicket: true
+    - name: git.push
+      actionClass: DEPLOY
+      requireExecTicket: true
+    - name: http.fetch
+      actionClass: NETWORK_EXTERNAL
+      allow:
+        hostAllowlist:
+          - api.github.com
+          - hooks.slack.com
+      denyByDefault: true
+    - name: process.spawn
+      actionClass: WRITE_HIGH
+      allow:
+        binariesAllowlist:
+          - node
+          - python
+          - git
+      deny:
+        argvRegexDenylist:
+          - (^|\s)rm(\s|$)
+          - (^|\s)sudo(\s|$)
+          - (^|\s)chmod(\s|$)
+          - (^|\s)chown(\s|$)
+      requireExecTicket: true

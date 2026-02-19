@@ -1,0 +1,383 @@
+mechanicProfiles:
+  version: 1
+  profiles:
+    - id: safety-first-governor
+      name: Safety-First Governor
+      description: Prioritizes risk assurance, approvals discipline, and truthguard rigor.
+      targets:
+        AMC-1.1: 4
+        AMC-1.10: 4
+        AMC-1.11: 4
+        AMC-1.2: 4
+        AMC-1.3: 4
+        AMC-1.4: 4
+        AMC-1.5: 4
+        AMC-1.6: 4
+        AMC-1.7: 4
+        AMC-1.8: 4
+        AMC-1.9: 4
+        AMC-2.1: 4
+        AMC-2.2: 4
+        AMC-2.3: 4
+        AMC-2.4: 4
+        AMC-2.5: 4
+        AMC-3.1.1: 5
+        AMC-3.1.2: 5
+        AMC-3.1.3: 5
+        AMC-3.1.4: 5
+        AMC-3.1.5: 5
+        AMC-3.1.6: 5
+        AMC-3.2.1: 5
+        AMC-3.2.2: 5
+        AMC-3.2.3: 5
+        AMC-3.2.4: 5
+        AMC-3.2.5: 5
+        AMC-3.3.1: 5
+        AMC-3.3.2: 5
+        AMC-3.3.3: 5
+        AMC-3.3.4: 5
+        AMC-3.3.5: 5
+        AMC-4.1: 5
+        AMC-4.2: 5
+        AMC-4.3: 5
+        AMC-4.4: 5
+        AMC-4.5: 5
+        AMC-4.6: 5
+        AMC-4.7: 5
+        AMC-4.8: 5
+        AMC-4.9: 5
+        AMC-5.1: 4
+        AMC-5.2: 4
+        AMC-5.3: 4
+        AMC-5.4: 4
+        AMC-5.5: 4
+        AMC-5.6: 4
+        AMC-5.7: 4
+      recommended:
+        policyPacks:
+          - code-agent.high
+        budgetsBaseline: conservative
+        toolAllowlistHints:
+          - fs.read
+          - git.status
+          - http.fetch
+      riskNotes:
+        - Lower autonomy for faster mitigation of high-impact mistakes.
+        - Increases approval load for security-sensitive changes.
+    - id: high-autonomy-builder
+      name: High-Autonomy Builder
+      description: Balances autonomy with strict budgets, lease scopes, and evidence gates.
+      targets:
+        AMC-1.1: 5
+        AMC-1.10: 5
+        AMC-1.11: 5
+        AMC-1.2: 5
+        AMC-1.3: 5
+        AMC-1.4: 5
+        AMC-1.5: 5
+        AMC-1.6: 5
+        AMC-1.7: 5
+        AMC-1.8: 5
+        AMC-1.9: 5
+        AMC-2.1: 4
+        AMC-2.2: 4
+        AMC-2.3: 4
+        AMC-2.4: 4
+        AMC-2.5: 4
+        AMC-3.1.1: 4
+        AMC-3.1.2: 4
+        AMC-3.1.3: 4
+        AMC-3.1.4: 4
+        AMC-3.1.5: 4
+        AMC-3.1.6: 4
+        AMC-3.2.1: 4
+        AMC-3.2.2: 4
+        AMC-3.2.3: 4
+        AMC-3.2.4: 4
+        AMC-3.2.5: 4
+        AMC-3.3.1: 4
+        AMC-3.3.2: 4
+        AMC-3.3.3: 4
+        AMC-3.3.4: 4
+        AMC-3.3.5: 4
+        AMC-4.1: 4
+        AMC-4.2: 4
+        AMC-4.3: 4
+        AMC-4.4: 4
+        AMC-4.5: 4
+        AMC-4.6: 4
+        AMC-4.7: 4
+        AMC-4.8: 4
+        AMC-4.9: 4
+        AMC-5.1: 5
+        AMC-5.2: 5
+        AMC-5.3: 5
+        AMC-5.4: 5
+        AMC-5.5: 5
+        AMC-5.6: 5
+        AMC-5.7: 5
+      recommended:
+        policyPacks:
+          - code-agent.high
+        budgetsBaseline: balanced
+        toolAllowlistHints:
+          - fs.read
+          - fs.write
+          - git.status
+          - git.commit
+      riskNotes:
+        - Requires stronger monitoring and rapid freeze pathways.
+        - Execution freedom is conditional on observed evidence growth.
+    - id: support-cx-agent
+      name: Support & CX Agent
+      description: Optimizes support quality, empathy delivery, and safe escalation
+        pathways.
+      targets:
+        AMC-1.1: 4
+        AMC-1.10: 4
+        AMC-1.11: 4
+        AMC-1.2: 4
+        AMC-1.3: 4
+        AMC-1.4: 4
+        AMC-1.5: 4
+        AMC-1.6: 4
+        AMC-1.7: 4
+        AMC-1.8: 4
+        AMC-1.9: 4
+        AMC-2.1: 4
+        AMC-2.2: 4
+        AMC-2.3: 4
+        AMC-2.4: 4
+        AMC-2.5: 4
+        AMC-3.1.1: 5
+        AMC-3.1.2: 5
+        AMC-3.1.3: 5
+        AMC-3.1.4: 5
+        AMC-3.1.5: 5
+        AMC-3.1.6: 5
+        AMC-3.2.1: 5
+        AMC-3.2.2: 5
+        AMC-3.2.3: 5
+        AMC-3.2.4: 5
+        AMC-3.2.5: 5
+        AMC-3.3.1: 5
+        AMC-3.3.2: 5
+        AMC-3.3.3: 5
+        AMC-3.3.4: 5
+        AMC-3.3.5: 5
+        AMC-4.1: 4
+        AMC-4.2: 4
+        AMC-4.3: 4
+        AMC-4.4: 4
+        AMC-4.5: 4
+        AMC-4.6: 4
+        AMC-4.7: 4
+        AMC-4.8: 4
+        AMC-4.9: 4
+        AMC-5.1: 4
+        AMC-5.2: 4
+        AMC-5.3: 4
+        AMC-5.4: 4
+        AMC-5.5: 4
+        AMC-5.6: 4
+        AMC-5.7: 4
+      recommended:
+        policyPacks:
+          - support-agent.high
+        budgetsBaseline: support
+        toolAllowlistHints:
+          - fs.read
+          - http.fetch
+      riskNotes:
+        - Strong guardrails against over-claiming in customer communication.
+        - May reduce aggressive automation for edge cases.
+    - id: code-agent-excellence
+      name: Code Agent Excellence
+      description: Focuses on secure engineering velocity, reproducibility, and
+        compliance-ready output.
+      targets:
+        AMC-1.1: 5
+        AMC-1.10: 5
+        AMC-1.11: 5
+        AMC-1.2: 5
+        AMC-1.3: 5
+        AMC-1.4: 5
+        AMC-1.5: 5
+        AMC-1.6: 5
+        AMC-1.7: 5
+        AMC-1.8: 5
+        AMC-1.9: 5
+        AMC-2.1: 4
+        AMC-2.2: 4
+        AMC-2.3: 4
+        AMC-2.4: 4
+        AMC-2.5: 4
+        AMC-3.1.1: 4
+        AMC-3.1.2: 4
+        AMC-3.1.3: 4
+        AMC-3.1.4: 4
+        AMC-3.1.5: 4
+        AMC-3.1.6: 4
+        AMC-3.2.1: 4
+        AMC-3.2.2: 4
+        AMC-3.2.3: 4
+        AMC-3.2.4: 4
+        AMC-3.2.5: 4
+        AMC-3.3.1: 4
+        AMC-3.3.2: 4
+        AMC-3.3.3: 4
+        AMC-3.3.4: 4
+        AMC-3.3.5: 4
+        AMC-4.1: 5
+        AMC-4.2: 5
+        AMC-4.3: 5
+        AMC-4.4: 5
+        AMC-4.5: 5
+        AMC-4.6: 5
+        AMC-4.7: 5
+        AMC-4.8: 5
+        AMC-4.9: 5
+        AMC-5.1: 5
+        AMC-5.2: 5
+        AMC-5.3: 5
+        AMC-5.4: 5
+        AMC-5.5: 5
+        AMC-5.6: 5
+        AMC-5.7: 5
+      recommended:
+        policyPacks:
+          - code-agent.high
+        budgetsBaseline: engineering
+        toolAllowlistHints:
+          - fs.read
+          - fs.write
+          - git.status
+          - git.commit
+          - git.push
+      riskNotes:
+        - Requires frequent assurance runs to prevent silent regressions.
+        - High bar for deployment governance and evidence integrity.
+    - id: research-agent
+      name: Research Agent
+      description: Optimizes inquiry rigor, source traceability, and uncertainty discipline.
+      targets:
+        AMC-1.1: 4
+        AMC-1.10: 4
+        AMC-1.11: 4
+        AMC-1.2: 4
+        AMC-1.3: 4
+        AMC-1.4: 4
+        AMC-1.5: 4
+        AMC-1.6: 4
+        AMC-1.7: 4
+        AMC-1.8: 4
+        AMC-1.9: 4
+        AMC-2.1: 4
+        AMC-2.2: 4
+        AMC-2.3: 4
+        AMC-2.4: 4
+        AMC-2.5: 4
+        AMC-3.1.1: 5
+        AMC-3.1.2: 5
+        AMC-3.1.3: 5
+        AMC-3.1.4: 5
+        AMC-3.1.5: 5
+        AMC-3.1.6: 5
+        AMC-3.2.1: 5
+        AMC-3.2.2: 5
+        AMC-3.2.3: 5
+        AMC-3.2.4: 5
+        AMC-3.2.5: 5
+        AMC-3.3.1: 5
+        AMC-3.3.2: 5
+        AMC-3.3.3: 5
+        AMC-3.3.4: 5
+        AMC-3.3.5: 5
+        AMC-4.1: 4
+        AMC-4.2: 4
+        AMC-4.3: 4
+        AMC-4.4: 4
+        AMC-4.5: 4
+        AMC-4.6: 4
+        AMC-4.7: 4
+        AMC-4.8: 4
+        AMC-4.9: 4
+        AMC-5.1: 5
+        AMC-5.2: 5
+        AMC-5.3: 5
+        AMC-5.4: 5
+        AMC-5.5: 5
+        AMC-5.6: 5
+        AMC-5.7: 5
+      recommended:
+        policyPacks:
+          - research-agent.high
+        budgetsBaseline: research
+        toolAllowlistHints:
+          - fs.read
+          - http.fetch
+      riskNotes:
+        - Stricter citation and uncertainty controls may slow response speed.
+        - Higher instrumentation burden to preserve trust in findings.
+    - id: sales-rev-agent
+      name: Sales/Rev Agent
+      description: Optimizes economic and brand value outcomes with strict claim governance.
+      targets:
+        AMC-1.1: 4
+        AMC-1.10: 4
+        AMC-1.11: 4
+        AMC-1.2: 4
+        AMC-1.3: 4
+        AMC-1.4: 4
+        AMC-1.5: 4
+        AMC-1.6: 4
+        AMC-1.7: 4
+        AMC-1.8: 4
+        AMC-1.9: 4
+        AMC-2.1: 5
+        AMC-2.2: 5
+        AMC-2.3: 5
+        AMC-2.4: 5
+        AMC-2.5: 5
+        AMC-3.1.1: 4
+        AMC-3.1.2: 4
+        AMC-3.1.3: 4
+        AMC-3.1.4: 4
+        AMC-3.1.5: 4
+        AMC-3.1.6: 4
+        AMC-3.2.1: 4
+        AMC-3.2.2: 4
+        AMC-3.2.3: 4
+        AMC-3.2.4: 4
+        AMC-3.2.5: 4
+        AMC-3.3.1: 4
+        AMC-3.3.2: 4
+        AMC-3.3.3: 4
+        AMC-3.3.4: 4
+        AMC-3.3.5: 4
+        AMC-4.1: 4
+        AMC-4.2: 4
+        AMC-4.3: 4
+        AMC-4.4: 4
+        AMC-4.5: 4
+        AMC-4.6: 4
+        AMC-4.7: 4
+        AMC-4.8: 4
+        AMC-4.9: 4
+        AMC-5.1: 4
+        AMC-5.2: 4
+        AMC-5.3: 4
+        AMC-5.4: 4
+        AMC-5.5: 4
+        AMC-5.6: 4
+        AMC-5.7: 4
+      recommended:
+        policyPacks:
+          - sales-agent.high
+        budgetsBaseline: revenue
+        toolAllowlistHints:
+          - fs.read
+          - http.fetch
+      riskNotes:
+        - Hard limits on unsupported claims and outbound data handling.
+        - Requires approval rigor for customer-impacting automations.

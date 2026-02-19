@@ -1,0 +1,8 @@
+adapters:
+  version: 1
+  defaults:
+    gatewayBase: http://127.0.0.1:3210
+    proxyBase: http://127.0.0.1:3211
+    leaseTtlMinutes: 60
+    modelDefault: gpt-4o-mini
+  perAgent: {}

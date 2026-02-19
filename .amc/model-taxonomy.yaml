@@ -1,0 +1,58 @@
+taxonomy:
+  version: 1
+  providers:
+    - provider: openai
+      families:
+        - pattern: gpt-*
+          tags:
+            - chat
+            - json
+            - tools
+        - pattern: o1-*
+          tags:
+            - reasoning
+        - pattern: o3-*
+          tags:
+            - reasoning
+    - provider: anthropic
+      families:
+        - pattern: claude-*
+          tags:
+            - chat
+            - tools
+    - provider: gemini
+      families:
+        - pattern: gemini-*
+          tags:
+            - chat
+            - multimodal
+    - provider: xai
+      families:
+        - pattern: grok-*
+          tags:
+            - chat
+    - provider: openrouter
+      families:
+        - pattern: openrouter/*
+          tags:
+            - aggregator
+        - pattern: gpt-*
+          tags:
+            - aggregator
+        - pattern: claude-*
+          tags:
+            - aggregator
+        - pattern: gemini-*
+          tags:
+            - aggregator
+        - pattern: grok-*
+          tags:
+            - aggregator
+    - provider: local
+      families:
+        - pattern: local-*
+          tags:
+            - local
+        - pattern: gpt-*
+          tags:
+            - local

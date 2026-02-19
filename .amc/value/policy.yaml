@@ -1,0 +1,46 @@
+valuePolicy:
+  version: 1
+  cadence:
+    snapshotEveryHours: 24
+    reportEveryHours: 24
+    refreshOnEvents:
+      - DIAGNOSTIC_COMPLETED
+      - PROMPT_PACK_CREATED
+      - ASSURANCE_CERT_ISSUED
+      - PLUGIN_INSTALLED
+      - RELEASE_BUNDLE_VERIFIED
+      - APPROVAL_DECIDED
+  evidenceGates:
+    minIntegrityIndexForStrongClaims: 0.9
+    minCorrelationRatioForStrongClaims: 0.9
+    minObservedShareForStrongClaims: 0.7
+    maxSelfReportedShare: 0.2
+    requireNotaryForStrongClaimsWhenEnabled: true
+  privacy:
+    exportAllowlistOnly: true
+    redactAllFreeText: true
+    allowFreeTextFields: []
+    forbidPII: true
+    forbidSecrets: true
+    forbidRawPromptsAndModelIO: true
+    hashTruncBytes: 8
+  enforceSignedInputs: true
+  allowSelfReportedInputs: true
+  formulas:
+    dimensionWeights:
+      emotional: 0.15
+      functional: 0.25
+      economic: 0.3
+      brand: 0.15
+      lifetime: 0.15
+    economicSignificance:
+      benefitWeight: 0.55
+      costWeight: 0.25
+      riskWeight: 0.2
+    riskIndices:
+      economicSignificanceRisk:
+        base: 50
+        penaltyIfNoValueEventsLast30d: 20
+        penaltyIfValueRegressing: 15
+        penaltyIfCostRising: 10
+        penaltyIfEvidenceInsufficient: 25

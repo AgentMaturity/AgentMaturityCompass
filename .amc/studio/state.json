@@ -1,0 +1,17 @@
+{
+  "pid": 81260,
+  "startedTs": 1771489818687,
+  "apiPort": 3212,
+  "gatewayPort": 3210,
+  "proxyPort": 0,
+  "dashboardPort": 4173,
+  "metricsPort": 9464,
+  "metricsHost": "127.0.0.1",
+  "host": "127.0.0.1",
+  "lanEnabled": false,
+  "pairingRequired": false,
+  "currentAgent": "default",
+  "vaultUnlocked": true,
+  "untrustedConfig": true,
+  "logFile": "/Users/sid/AgentMaturityCompass/.amc/studio/logs/studio.log"
+}

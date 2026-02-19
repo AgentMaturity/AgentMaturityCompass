@@ -1,0 +1,30 @@
+budgets:
+  version: 1
+  perAgent:
+    default:
+      daily:
+        maxLlmRequests: 500
+        maxLlmTokens: 5000000
+        maxCostUsd: 50
+        maxToolExecutes:
+          READ_ONLY: 500
+          WRITE_LOW: 50
+          WRITE_HIGH: 5
+          DEPLOY: 3
+          SECURITY: 0
+          FINANCIAL: 0
+          NETWORK_EXTERNAL: 20
+          DATA_EXPORT: 2
+          IDENTITY: 2
+      perMinute:
+        maxLlmRequests: 60
+        maxLlmTokens: 200000
+      consequences:
+        onExceed:
+          - action: DOWNGRADE_TO_SIMULATE
+          - action: FREEZE_EXECUTE
+            actionClasses:
+              - DEPLOY
+              - WRITE_HIGH
+              - SECURITY
+          - action: ALERT_OWNER

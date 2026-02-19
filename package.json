@@ -16,7 +16,8 @@
     "node": ">=20"
   },
   "scripts": {
-    "build": "tsc -p tsconfig.json && chmod +x dist/cli.js",
+    "build": "tsc -p tsconfig.json && chmod +x dist/cli.js && npm run copy-assets",
+    "copy-assets": "cp -r src/console/pages dist/console/pages && cp -r src/console/assets dist/console/assets && cp -r src/dashboard/templates dist/dashboard/templates",
     "dev": "tsx src/cli.ts",
     "lint": "npm run typecheck",
     "typecheck": "tsc -p tsconfig.json --noEmit",

@@ -1,0 +1,21 @@
+id: default
+agentName: Default Agent
+role: assistant
+domain: general
+primaryTasks:
+  - support
+stakeholders:
+  - owner
+  - users
+riskTier: med
+provider:
+  templateId: openai
+  routePrefix: /openai
+  upstreamId: openai
+  baseUrl: https://api.openai.com
+  openaiCompatible: true
+  auth:
+    type: bearer_env
+    env: OPENAI_API_KEY
+createdTs: 1771489818226
+updatedTs: 1771489818226

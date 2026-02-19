@@ -1,0 +1,10 @@
+{
+  "enabled": true,
+  "lastRunTs": null,
+  "nextRunTs": null,
+  "lastOutcome": {
+    "status": "SKIPPED",
+    "reason": "workspace not ready"
+  },
+  "lastCertStatus": "NONE"
+}

@@ -1,0 +1,21 @@
+cgxPolicy:
+  version: 1
+  buildCadenceHours: 24
+  rebuildOnEvents:
+    - POLICY_APPLIED
+    - PLUGIN_INSTALLED
+    - APPROVAL_DECIDED
+    - DIAGNOSTIC_COMPLETED
+    - FORECAST_CREATED
+    - BENCH_CREATED
+  maxGraphNodes: 50000
+  pruning:
+    maxEdges: 120000
+    maxEvidenceRefsPerNode: 16
+  privacy:
+    hashAgentIds: true
+    hashWorkspaceId: true
+    noSecrets: true
+  evidenceGates:
+    minIntegrityIndex: 0.85
+    minCorrelationRatio: 0.9

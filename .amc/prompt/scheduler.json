@@ -1,0 +1,10 @@
+{
+  "v": 1,
+  "enabled": true,
+  "lastRefreshTs": null,
+  "nextRefreshTs": null,
+  "lastOutcome": {
+    "status": "ERROR",
+    "reason": "workspace not ready"
+  }
+}

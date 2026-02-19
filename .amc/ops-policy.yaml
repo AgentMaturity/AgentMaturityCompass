@@ -1,0 +1,32 @@
+opsPolicy:
+  version: 1
+  retention:
+    prunePayloadsAfterDays: 14
+    archivePayloadsAfterDays: 7
+    keepArchiveSegmentsDays: 3650
+    maxPayloadBytesPerEvent: 65536
+    maxBlobBytes: 10485760
+    tombstoneInsteadOfDelete: true
+  encryption:
+    blobEncryptionEnabled: true
+    algorithm: AES-256-GCM
+    keyRotationDays: 90
+    reencryptOnRotate: false
+    aadMode: BLOB_ID_AND_VERSION
+  backups:
+    requireEncryptedBackups: true
+    defaultBackupEncryption: PASSPHRASE_AES_256_GCM
+    maxBackupAgeDaysWarning: 7
+    excludePaths:
+      - .amc/studio/sessions
+      - .amc/studio/tmp
+      - .amc/cache
+    includePaths:
+      - .amc
+  maintenance:
+    autoVacuumOnRetention: true
+    vacuumAtMostOnceHours: 24
+    rotateLogsDays: 14
+    maxLogFileMb: 50
+    pruneConsoleSnapshotsDays: 30
+    pruneTransformSnapshotsDays: 180

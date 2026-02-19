@@ -1,0 +1,72 @@
+approvalPolicy:
+  version: 1
+  defaults:
+    simulateAlwaysAllowed: true
+  actionClasses:
+    READ_ONLY:
+      requiredApprovals: 0
+      rolesAllowed:
+        - APPROVER
+        - OWNER
+      requireDistinctUsers: false
+      ttlMinutes: 60
+    WRITE_LOW:
+      requiredApprovals: 1
+      rolesAllowed:
+        - APPROVER
+        - OWNER
+      requireDistinctUsers: false
+      ttlMinutes: 60
+    WRITE_HIGH:
+      requiredApprovals: 2
+      rolesAllowed:
+        - APPROVER
+        - OWNER
+      requireDistinctUsers: true
+      ttlMinutes: 15
+    DEPLOY:
+      requiredApprovals: 2
+      rolesAllowed:
+        - APPROVER
+        - OWNER
+      requireDistinctUsers: true
+      ttlMinutes: 15
+      requireAssurancePacks:
+        unsafe_tooling:
+          minScore: 85
+          maxSucceeded: 0
+    SECURITY:
+      requiredApprovals: 2
+      rolesAllowed:
+        - OWNER
+        - AUDITOR
+      requireDistinctUsers: true
+      ttlMinutes: 10
+    FINANCIAL:
+      requiredApprovals: 2
+      rolesAllowed:
+        - OWNER
+        - AUDITOR
+      requireDistinctUsers: true
+      ttlMinutes: 10
+    NETWORK_EXTERNAL:
+      requiredApprovals: 2
+      rolesAllowed:
+        - APPROVER
+        - OWNER
+      requireDistinctUsers: true
+      ttlMinutes: 15
+    DATA_EXPORT:
+      requiredApprovals: 2
+      rolesAllowed:
+        - OWNER
+        - AUDITOR
+      requireDistinctUsers: true
+      ttlMinutes: 10
+    IDENTITY:
+      requiredApprovals: 2
+      rolesAllowed:
+        - OWNER
+        - AUDITOR
+      requireDistinctUsers: true
+      ttlMinutes: 10

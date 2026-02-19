@@ -3,5 +3,10 @@
     "createdTs": 1770745237715,
     "fingerprint": "4110a0c6fef2cc28555c81f494bd1b4fd22c1d0af1cbe0c88a9f3426b9f9d7f8",
     "publicKeyPem": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEA4tuPeXtDHcz4ySwgtDj2jh1cgmFuruLCugzTwsqK+Bk=\n-----END PUBLIC KEY-----\n"
+  },
+  {
+    "createdTs": 1771489813872,
+    "fingerprint": "cf3ac252f345cf8203220f9c1420361dc14b1fc7bcc536bdaf4e5a0e4d00fd41",
+    "publicKeyPem": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEARnHlUzjGZ5W4qE6OjbyPe7oQKQM1uWTnt/Ue9qrkMik=\n-----END PUBLIC KEY-----\n"
   }
 ]

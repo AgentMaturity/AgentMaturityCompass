@@ -1,0 +1,39 @@
+forecastPolicy:
+  version: 1
+  cadence:
+    defaultRefreshHours: 24
+    refreshAfterRun: true
+    refreshAfterEvents:
+      - POLICY_APPLIED
+      - APPROVAL_DECIDED
+      - FREEZE_CHANGED
+      - PLUGIN_INSTALLED
+      - NOTARY_ATTESTATION_OBSERVED
+  horizons:
+    shortDays: 7
+    midDays: 30
+    longDays: 90
+  evidenceGates:
+    minIntegrityIndex: 0.85
+    minCorrelationRatio: 0.9
+    minObservedRuns: 4
+    maxSelfReportedShare: 0.2
+  anomaly:
+    maturityJumpRobustZ: 4
+    integrityDropRobustZ: 3
+    approvalsBacklogJumpRobustZ: 3
+  drift:
+    nRunsWindow: 6
+    driftWarnPoints: 0.25
+    driftCriticalPoints: 0.5
+  advisories:
+    enable: true
+    thresholds:
+      riskScoreWarn: 60
+      riskScoreCritical: 80
+    dispatch:
+      warnEvents: true
+      criticalEvents: true
+  privacy:
+    exportAgentIdsHashed: true
+    hashTruncBytes: 8

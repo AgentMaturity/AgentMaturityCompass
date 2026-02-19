@@ -1,0 +1,133 @@
+:root {
+  --bg: #f4f6f4;
+  --card: #ffffff;
+  --ink: #112018;
+  --muted: #47614f;
+  --accent: #0c7b5a;
+  --border: #d4e2da;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+  background: radial-gradient(circle at 20% 10%, #e0f1e7, transparent 40%), var(--bg);
+  color: var(--ink);
+}
+
+.hero {
+  padding: 1.25rem;
+  border-bottom: 1px solid var(--border);
+  background: linear-gradient(130deg, #e8f4ed, #f6faf7);
+}
+
+.hero h1 {
+  margin: 0 0 0.4rem;
+  font-size: clamp(1.3rem, 2.5vw, 2rem);
+}
+
+.hero p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.grid {
+  display: grid;
+  gap: 0.9rem;
+  grid-template-columns: 1fr;
+  padding: 0.9rem;
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 0.9rem;
+  box-shadow: 0 4px 10px rgba(10, 50, 30, 0.06);
+}
+
+.card h2 {
+  margin: 0 0 0.8rem;
+  font-size: 1rem;
+}
+
+.card.full {
+  grid-column: 1 / -1;
+}
+
+#heatmap table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8rem;
+}
+
+#heatmap th,
+#heatmap td {
+  border: 1px solid var(--border);
+  padding: 0.4rem;
+  text-align: center;
+}
+
+#heatmap td button {
+  width: 100%;
+  border: none;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  padding: 0;
+}
+
+.badge {
+  display: inline-block;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 0.2rem 0.6rem;
+  margin-right: 0.35rem;
+  margin-bottom: 0.3rem;
+}
+
+.list {
+  margin: 0;
+  padding-left: 1rem;
+}
+
+#studio-home p {
+  margin: 0 0 0.6rem;
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+#studio-qr {
+  margin-top: 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: #fff;
+}
+
+.plan-grid {
+  display: grid;
+  gap: 0.8rem;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 720px) {
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .plan-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1080px) {
+  .grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .card.full {
+    grid-column: span 3;
+  }
+}

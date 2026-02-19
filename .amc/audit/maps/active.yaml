@@ -1,0 +1,587 @@
+auditMap:
+  version: 1
+  id: amc.audit.map.builtin.v1
+  name: AMC Control Families v1
+  controlFamilies:
+    - familyId: ACCESS_CONTROL
+      title: Access Control & Identity
+      frameworks:
+        soc2Like:
+          - CC6
+        iso27001Like:
+          - A.5
+          - A.6
+          - A.8
+        nistLike:
+          - AC
+      controls:
+        - controlId: ACCESS_CONTROL.SSO_SCIM
+          title: SSO/SCIM configured and enforced
+          evidenceRequirements:
+            requiredKinds:
+              - IDENTITY_CONFIG_SIGNED
+              - SSO_LOGIN_EVENT
+              - SCIM_USER_PROVISIONED
+            strongClaimGates:
+              minIntegrityIndex: 0.9
+              minCorrelationRatio: 0.9
+          satisfiedBy:
+            - source: identity
+              check: identityYamlSignedAndValid
+            - source: events
+              check: hasSsoLoginsLast30d
+            - source: events
+              check: hasScimWritesLast30d
+          remediationActions:
+            - kind: MECHANIC_ACTION
+              id: enable_sso_scim
+            - kind: DOC_LINK
+              id: docs/SSO_OIDC.md
+        - controlId: ACCESS_CONTROL.WORKSPACE_MEMBERSHIP
+          title: Workspace membership and RBAC enforced
+          evidenceRequirements:
+            requiredKinds:
+              - RBAC_MEMBERSHIP_EVENT
+              - SESSION_AUTH
+            strongClaimGates:
+              minIntegrityIndex: 0.9
+              minCorrelationRatio: 0.9
+          satisfiedBy:
+            - source: host
+              check: workspaceMembershipsConfigured
+            - source: events
+              check: hasApprovalDecisionsLast30d
+          remediationActions:
+            - kind: DOC_LINK
+              id: docs/MULTI_TENANCY.md
+        - controlId: ACCESS_CONTROL.LEASE_SCOPING
+          title: Leases are workspace-scoped and least-privilege
+          evidenceRequirements:
+            requiredKinds:
+              - LEASE_ISSUED
+              - LEASE_SCOPE_ENFORCED
+            strongClaimGates:
+              minIntegrityIndex: 0.9
+              minCorrelationRatio: 0.9
+          satisfiedBy:
+            - source: leases
+              check: leasesIncludeWorkspaceClaim
+            - source: events
+              check: leaseScopeDenialsTracked
+          remediationActions:
+            - kind: MECHANIC_ACTION
+              id: tighten_lease_scopes
+        - controlId: ACCESS_CONTROL.APPROVALS
+          title: Dual-control approvals protect high-risk actions
+          evidenceRequirements:
+            requiredKinds:
+              - APPROVAL_POLICY_SIGNED
+              - APPROVAL_DECIDED
+            strongClaimGates:
+              minIntegrityIndex: 0.9
+              minCorrelationRatio: 0.9
+          satisfiedBy:
+            - source: approvals
+              check: approvalPolicySigned
+            - source: events
+              check: hasApprovalDecisionsLast30d
+          remediationActions:
+            - kind: DOC_LINK
+              id: docs/MECHANIC_WORKBENCH.md
+    - familyId: CHANGE_MANAGEMENT
+      title: Change Management
+      frameworks:
+        soc2Like:
+          - CC8
+        iso27001Like:
+          - A.8
+          - A.12
+        nistLike:
+          - CM
+      controls:
+        - controlId: CHANGE_MANAGEMENT.POLICY_SIGNING
+          title: Policy changes are signed and auditable
+          evidenceRequirements:
+            requiredKinds:
+              - POLICY_APPLIED
+              - SIGNED_CONFIG
+            strongClaimGates:
+              minIntegrityIndex: 0.9
+              minCorrelationRatio: 0.9
+          satisfiedBy:
+            - source: ops
+              check: opsPolicySigned
+            - source: events
+              check: policyChangesSigned
+          remediationActions: []
+        - controlId: CHANGE_MANAGEMENT.APPROVAL_GATES
+          title: High-risk changes require approvals
+          evidenceRequirements:
+            requiredKinds:
+              - APPROVAL_DECIDED
+              - WORK_ORDER
+            strongClaimGates:
+              minIntegrityIndex: 0.9
+              minCorrelationRatio: 0.9
+          satisfiedBy:
+            - source: events
+              check: hasApprovalDecisionsLast30d
+            - source: approvals
+              check: approvalPolicySigned
+          remediationActions: []
+        - controlId: CHANGE_MANAGEMENT.TRANSFORM_PLANS
+          title: Transformation plans are signed and tracked
+          evidenceRequirements:
+            requiredKinds:
+              - TRANSFORM_PLAN_CREATED
+              - TRANSFORM_TASK_ATTESTED
+            strongClaimGates:
+              minIntegrityIndex: 0.9
+              minCorrelationRatio: 0.9
+          satisfiedBy:
+            - source: transform
+              check: transformPlansSigned
+            - source: events
+              check: changeEventsObserved
+          remediationActions: []
+        - controlId: CHANGE_MANAGEMENT.RELEASE_MANIFESTS
+          title: Release manifests are signed and verified
+          evidenceRequirements:
+            requiredKinds:
+              - RELEASE_MANIFEST
+              - RELEASE_BUNDLE_VERIFIED
+            strongClaimGates:
+              minIntegrityIndex: 0.9
+              minCorrelationRatio: 0.9
+          satisfiedBy:
+            - source: release
+              check: releaseManifestSigned
+            - source: events
+              check: changeEventsObserved
+          remediationActions: []
+    - familyId: LOGGING_MONITORING
+      title: Logging & Monitoring
+      frameworks:
+        soc2Like:
+          - CC7
+        iso27001Like:
+          - A.12
+          - A.16
+        nistLike:
+          - AU
+      controls:
+        - controlId: LOGGING_MONITORING.TRANSPARENCY_SEAL
+          title: Transparency log seal verifies
+          evidenceRequirements:
+            requiredKinds:
+              - TRANSPARENCY_ROOT
+            strongClaimGates:
+              minIntegrityIndex: 0.9
+              minCorrelationRatio: 0.9
+          satisfiedBy:
+            - source: transparency
+              check: transparencySealValid
+          remediationActions: []
+        - controlId: LOGGING_MONITORING.MERKLE_ROOT
+          title: Merkle root and proofs verify
+          evidenceRequirements:
+            requiredKinds:
+              - MERKLE_ROOT
+            strongClaimGates:
+              minIntegrityIndex: 0.9
+              minCorrelationRatio: 0.9
+          satisfiedBy:
+            - source: transparency
+              check: merkleRootValid
+          remediationActions: []
+        - controlId: LOGGING_MONITORING.LEDGER_CHAIN
+          title: Evidence ledger hash-chain continuity
+          evidenceRequirements:
+            requiredKinds:
+              - EVIDENCE_HASH_CHAIN
+            strongClaimGates:
+              minIntegrityIndex: 0.9
+              minCorrelationRatio: 0.9
+          satisfiedBy:
+            - source: ledger
+              check: ledgerHashChainValid
+          remediationActions: []
+        - controlId: LOGGING_MONITORING.SSE_ACTIVITY
+          title: Realtime telemetry stream is active
+          evidenceRequirements:
+            requiredKinds:
+              - SSE_EVENT
+            strongClaimGates:
+              minIntegrityIndex: 0.9
+              minCorrelationRatio: 0.9
+          satisfiedBy:
+            - source: events
+              check: sseOrgEventsObserved
+          remediationActions: []
+    - familyId: SECURE_CONFIGURATION
+      title: Secure Configuration
+      frameworks:
+        soc2Like:
+          - CC6
+          - CC8
+        iso27001Like:
+          - A.5
+          - A.8
+          - A.12
+        nistLike:
+          - CM
+          - SC
+      controls:
+        - controlId: SECURE_CONFIGURATION.OPS_POLICY
+          title: Ops policy is signed
+          evidenceRequirements:
+            requiredKinds:
+              - OPS_POLICY
+            strongClaimGates:
+              minIntegrityIndex: 0.9
+              minCorrelationRatio: 0.9
+          satisfiedBy:
+            - source: ops
+              check: opsPolicySigned
+          remediationActions: []
+        - controlId: SECURE_CONFIGURATION.TRUST_CONFIG
+          title: Trust config is signed
+          evidenceRequirements:
+            requiredKinds:
+              - TRUST_CONFIG
+            strongClaimGates:
+              minIntegrityIndex: 0.9
+              minCorrelationRatio: 0.9
+          satisfiedBy:
+            - source: trust
+              check: trustConfigSigned
+          remediationActions: []
+        - controlId: SECURE_CONFIGURATION.TOOLS_POLICY
+          title: Tools policy is signed
+          evidenceRequirements:
+            requiredKinds:
+              - TOOLS_POLICY_SIGNED
+            strongClaimGates:
+              minIntegrityIndex: 0.9
+              minCorrelationRatio: 0.9
+          satisfiedBy:
+            - source: tools
+              check: toolsPolicySigned
+          remediationActions: []
+        - controlId: SECURE_CONFIGURATION.BUDGETS_POLICY
+          title: Budgets policy is signed
+          evidenceRequirements:
+            requiredKinds:
+              - BUDGETS_POLICY_SIGNED
+            strongClaimGates:
+              minIntegrityIndex: 0.9
+              minCorrelationRatio: 0.9
+          satisfiedBy:
+            - source: budgets
+              check: budgetsPolicySigned
+          remediationActions: []
+    - familyId: SUPPLY_CHAIN_INTEGRITY
+      title: Supply Chain Integrity
+      frameworks:
+        soc2Like:
+          - CC8
+        iso27001Like:
+          - A.15
+        nistLike:
+          - SR
+      controls:
+        - controlId: SUPPLY_CHAIN_INTEGRITY.PLUGINS
+          title: Plugin signatures and lock integrity verified
+          evidenceRequirements:
+            requiredKinds:
+              - PLUGIN_INSTALLED
+              - INSTALLED_LOCK
+            strongClaimGates:
+              minIntegrityIndex: 0.9
+              minCorrelationRatio: 0.9
+          satisfiedBy:
+            - source: plugins
+              check: pluginsIntegrityValid
+          remediationActions: []
+        - controlId: SUPPLY_CHAIN_INTEGRITY.RELEASES
+          title: Release bundles verify successfully
+          evidenceRequirements:
+            requiredKinds:
+              - RELEASE_MANIFEST
+              - RELEASE_BUNDLE_VERIFIED
+            strongClaimGates:
+              minIntegrityIndex: 0.9
+              minCorrelationRatio: 0.9
+          satisfiedBy:
+            - source: release
+              check: releaseBundlesVerified
+          remediationActions: []
+        - controlId: SUPPLY_CHAIN_INTEGRITY.BACKUPS
+          title: Backup manifests are signed
+          evidenceRequirements:
+            requiredKinds:
+              - BACKUP_MANIFEST
+            strongClaimGates:
+              minIntegrityIndex: 0.9
+              minCorrelationRatio: 0.9
+          satisfiedBy:
+            - source: backup
+              check: backupManifestSigned
+          remediationActions: []
+        - controlId: SUPPLY_CHAIN_INTEGRITY.REGISTRY_ALLOWLIST
+          title: Registry allowlists are signed
+          evidenceRequirements:
+            requiredKinds:
+              - REGISTRY_ALLOWLIST
+            strongClaimGates:
+              minIntegrityIndex: 0.9
+              minCorrelationRatio: 0.9
+          satisfiedBy:
+            - source: registry
+              check: registryAllowlistSigned
+          remediationActions: []
+    - familyId: INCIDENT_RESPONSE_PREPAREDNESS
+      title: Incident Response Preparedness
+      frameworks:
+        soc2Like:
+          - CC7
+        iso27001Like:
+          - A.16
+        nistLike:
+          - IR
+      controls:
+        - controlId: INCIDENT_RESPONSE_PREPAREDNESS.ASSURANCE_RUNS
+          title: Assurance runs execute on recurrence
+          evidenceRequirements:
+            requiredKinds:
+              - ASSURANCE_RUN_COMPLETED
+            strongClaimGates:
+              minIntegrityIndex: 0.9
+              minCorrelationRatio: 0.9
+          satisfiedBy:
+            - source: assurance
+              check: assuranceRecentRun
+          remediationActions: []
+        - controlId: INCIDENT_RESPONSE_PREPAREDNESS.ADVISORIES
+          title: Advisory workflow is active
+          evidenceRequirements:
+            requiredKinds:
+              - ADVISORY_CREATED
+              - ADVISORY_ACKNOWLEDGED
+            strongClaimGates:
+              minIntegrityIndex: 0.9
+              minCorrelationRatio: 0.9
+          satisfiedBy:
+            - source: forecast
+              check: advisoryFlowActive
+          remediationActions: []
+        - controlId: INCIDENT_RESPONSE_PREPAREDNESS.FREEZE_CONTROLS
+          title: Freeze controls are tracked
+          evidenceRequirements:
+            requiredKinds:
+              - FREEZE_CHANGED
+            strongClaimGates:
+              minIntegrityIndex: 0.9
+              minCorrelationRatio: 0.9
+          satisfiedBy:
+            - source: events
+              check: freezeEventsTracked
+          remediationActions: []
+        - controlId: INCIDENT_RESPONSE_PREPAREDNESS.RETENTION
+          title: Retention lifecycle is operational
+          evidenceRequirements:
+            requiredKinds:
+              - RETENTION_RUN
+            strongClaimGates:
+              minIntegrityIndex: 0.9
+              minCorrelationRatio: 0.9
+          satisfiedBy:
+            - source: ops
+              check: retentionStatusHealthy
+          remediationActions: []
+    - familyId: RISK_ASSURANCE_AND_TESTING
+      title: Risk Assurance & Testing
+      frameworks:
+        soc2Like:
+          - CC7
+        iso27001Like:
+          - A.12
+          - A.14
+        nistLike:
+          - RA
+      controls:
+        - controlId: RISK_ASSURANCE_AND_TESTING.POLICY
+          title: Assurance policy is signed
+          evidenceRequirements:
+            requiredKinds:
+              - ASSURANCE_POLICY_APPLIED
+            strongClaimGates:
+              minIntegrityIndex: 0.9
+              minCorrelationRatio: 0.9
+          satisfiedBy:
+            - source: assurance
+              check: assurancePolicySigned
+          remediationActions: []
+        - controlId: RISK_ASSURANCE_AND_TESTING.CERTIFICATE
+          title: Assurance certificate is present and current
+          evidenceRequirements:
+            requiredKinds:
+              - ASSURANCE_CERT_ISSUED
+            strongClaimGates:
+              minIntegrityIndex: 0.9
+              minCorrelationRatio: 0.9
+          satisfiedBy:
+            - source: assurance
+              check: assuranceCertificateFresh
+          remediationActions: []
+        - controlId: RISK_ASSURANCE_AND_TESTING.SCORE_THRESHOLD
+          title: Risk assurance score meets threshold
+          evidenceRequirements:
+            requiredKinds:
+              - ASSURANCE_SCORE
+            strongClaimGates:
+              minIntegrityIndex: 0.9
+              minCorrelationRatio: 0.9
+          satisfiedBy:
+            - source: assurance
+              check: assuranceScoreAboveThreshold
+          remediationActions: []
+        - controlId: RISK_ASSURANCE_AND_TESTING.BREACH_HANDLING
+          title: Assurance threshold breach is absent or waived
+          evidenceRequirements:
+            requiredKinds:
+              - ASSURANCE_THRESHOLD_BREACH
+            strongClaimGates:
+              minIntegrityIndex: 0.9
+              minCorrelationRatio: 0.9
+          satisfiedBy:
+            - source: assurance
+              check: assuranceThresholdBreachAbsent
+          remediationActions: []
+    - familyId: DATA_PROTECTION_AND_PRIVACY
+      title: Data Protection & Privacy
+      frameworks:
+        soc2Like:
+          - CC6
+          - CC8
+        iso27001Like:
+          - A.5
+          - A.8
+          - A.18
+        nistLike:
+          - PR
+          - IP
+      controls:
+        - controlId: DATA_PROTECTION_AND_PRIVACY.REDACTION
+          title: Redaction defaults are active
+          evidenceRequirements:
+            requiredKinds:
+              - REDACTION_POLICY
+            strongClaimGates:
+              minIntegrityIndex: 0.9
+              minCorrelationRatio: 0.9
+          satisfiedBy:
+            - source: policy
+              check: promptPolicySigned
+          remediationActions: []
+        - controlId: DATA_PROTECTION_AND_PRIVACY.TRUTHGUARD
+          title: Truthguard validations are recorded
+          evidenceRequirements:
+            requiredKinds:
+              - OUTPUT_VALIDATED
+            strongClaimGates:
+              minIntegrityIndex: 0.9
+              minCorrelationRatio: 0.9
+          satisfiedBy:
+            - source: events
+              check: truthguardValidationObserved
+          remediationActions: []
+        - controlId: DATA_PROTECTION_AND_PRIVACY.NO_SECRET_LEAKS
+          title: No secret leakage findings are recorded
+          evidenceRequirements:
+            requiredKinds:
+              - SECRET_SCAN
+            strongClaimGates:
+              minIntegrityIndex: 0.9
+              minCorrelationRatio: 0.9
+          satisfiedBy:
+            - source: events
+              check: noSecretLeakAudit
+          remediationActions: []
+        - controlId: DATA_PROTECTION_AND_PRIVACY.ENCRYPTED_STORAGE
+          title: Encrypted blob storage is enabled
+          evidenceRequirements:
+            requiredKinds:
+              - BLOB_ENCRYPTION
+            strongClaimGates:
+              minIntegrityIndex: 0.9
+              minCorrelationRatio: 0.9
+          satisfiedBy:
+            - source: ops
+              check: blobEncryptionEnabled
+          remediationActions: []
+    - familyId: MODEL_TOOL_GOVERNANCE
+      title: Model & Tool Governance
+      frameworks:
+        soc2Like:
+          - CC6
+        iso27001Like:
+          - A.8
+          - A.12
+        nistLike:
+          - GV
+          - MS
+      controls:
+        - controlId: MODEL_TOOL_GOVERNANCE.BRIDGE_CONFIG
+          title: Bridge policy/enforcement is configured
+          evidenceRequirements:
+            requiredKinds:
+              - BRIDGE_POLICY
+            strongClaimGates:
+              minIntegrityIndex: 0.9
+              minCorrelationRatio: 0.9
+          satisfiedBy:
+            - source: bridge
+              check: bridgeConfigSigned
+          remediationActions: []
+        - controlId: MODEL_TOOL_GOVERNANCE.ADAPTER_ALLOWLIST
+          title: Provider/model allowlists are configured
+          evidenceRequirements:
+            requiredKinds:
+              - ADAPTERS_CONFIG_SIGNED
+            strongClaimGates:
+              minIntegrityIndex: 0.9
+              minCorrelationRatio: 0.9
+          satisfiedBy:
+            - source: adapters
+              check: adapterConfigSigned
+            - source: events
+              check: providerAllowlistEnforced
+          remediationActions: []
+        - controlId: MODEL_TOOL_GOVERNANCE.TOOL_BOUNDARY
+          title: Denied tools are blocked and audited
+          evidenceRequirements:
+            requiredKinds:
+              - TOOL_DENIED
+            strongClaimGates:
+              minIntegrityIndex: 0.9
+              minCorrelationRatio: 0.9
+          satisfiedBy:
+            - source: events
+              check: toolDenialsObserved
+          remediationActions: []
+        - controlId: MODEL_TOOL_GOVERNANCE.HIGH_RISK_APPROVALS
+          title: High-risk tool actions require approvals
+          evidenceRequirements:
+            requiredKinds:
+              - APPROVAL_DECIDED
+              - TOOL_ACTION
+            strongClaimGates:
+              minIntegrityIndex: 0.9
+              minCorrelationRatio: 0.9
+          satisfiedBy:
+            - source: approvals
+              check: approvalPolicySigned
+            - source: events
+              check: hasApprovalDecisionsLast30d
+          remediationActions: []
