@@ -3,181 +3,590 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AMC Score Demo — Agent Maturity Card</title>
+<title>Agent Maturity Compass — Self-Assessment</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{--bg:#0A0F1E;--bg2:#111827;--bg3:#1a2235;--gold:#C9A84C;--gold2:#e0c36a;--text:#F8F8F0;--text2:#a0a8b8;--radius:12px;--ease:cubic-bezier(.4,0,.2,1)}
-html{font-size:16px}
-body{background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px 16px;line-height:1.5}
-.container{width:100%;max-width:720px}
+:root{--navy:#0A0F1E;--gold:#C9A84C;--white:#F8F8F0;--gray:#4A5568;--gold-dim:rgba(201,168,76,.15);--gold-glow:rgba(201,168,76,.3);--radius:12px;--transition:0.4s cubic-bezier(.4,0,.2,1)}
+@media(prefers-reduced-motion:reduce){:root{--transition:0.01s}}
+html{font-size:16px;scroll-behavior:smooth}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--navy);color:var(--white);min-height:100vh;overflow-x:hidden;line-height:1.6}
+.serif{font-family:Georgia,'Times New Roman',serif;font-style:italic}
 
-/* Progress */
-.progress-wrap{margin-bottom:32px;opacity:1;transition:opacity .4s var(--ease)}
-.progress-wrap.hidden{opacity:0;pointer-events:none;position:absolute}
-.progress-label{display:flex;justify-content:space-between;font-size:.8rem;color:var(--text2);margin-bottom:8px}
-.progress-bar{height:6px;background:var(--bg3);border-radius:3px;overflow:hidden}
-.progress-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--gold2));border-radius:3px;transition:width .5s var(--ease)}
+/* ─── Background texture ─── */
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 20% 50%,rgba(201,168,76,.06) 0%,transparent 60%),radial-gradient(ellipse at 80% 20%,rgba(201,168,76,.04) 0%,transparent 50%);pointer-events:none;z-index:0}
 
-/* Score pill */
-.score-pill{position:fixed;top:20px;right:20px;background:var(--bg2);border:1px solid var(--gold);border-radius:24px;padding:8px 20px;font-size:.85rem;color:var(--gold);font-weight:600;transition:transform .3s var(--ease),opacity .3s var(--ease);z-index:10}
-.score-pill.hidden{transform:translateY(-20px);opacity:0;pointer-events:none}
-.score-pill span{color:var(--text)}
+/* ─── Layout ─── */
+.container{max-width:800px;margin:0 auto;padding:2rem 1.5rem;position:relative;z-index:1}
+@media(max-width:600px){.container{padding:1.25rem 1rem}}
 
-/* Card shared */
-.card{background:var(--bg2);border:1px solid rgba(201,168,76,.15);border-radius:var(--radius);padding:40px 32px;position:relative;overflow:hidden}
-.card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+/* ─── Header ─── */
+.header{text-align:center;padding:3rem 0 2rem}
+.header .compass-icon{width:56px;height:56px;margin:0 auto 1.25rem;border:2px solid var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.5rem;color:var(--gold);animation:spin-slow 20s linear infinite}
+@keyframes spin-slow{to{transform:rotate(360deg)}}
+@media(prefers-reduced-motion:reduce){.header .compass-icon{animation:none}}
+.header h1{font-size:clamp(1.75rem,4vw,2.5rem);font-weight:800;letter-spacing:-.03em;margin-bottom:.5rem}
+.header h1 span{color:var(--gold)}
+.header p{color:var(--gray);max-width:480px;margin:0 auto;font-size:.95rem}
 
-/* Question */
-.question-card{transition:opacity .35s var(--ease),transform .35s var(--ease)}
-.question-card.exit{opacity:0;transform:translateX(-40px)}
-.question-card.enter{opacity:0;transform:translateX(40px)}
-.question-card h2{font-size:1.35rem;font-weight:700;margin-bottom:8px;color:var(--text)}
-.dim-badge{display:inline-block;font-size:.7rem;text-transform:uppercase;letter-spacing:.08em;color:var(--gold);background:rgba(201,168,76,.12);padding:4px 12px;border-radius:20px;margin-bottom:16px;font-weight:600}
-.question-card p.q-text{font-size:1.05rem;color:var(--text);margin-bottom:24px}
+/* ─── Progress ─── */
+.progress-wrap{margin:2rem 0 1.5rem}
+.progress-meta{display:flex;justify-content:space-between;font-size:.8rem;color:var(--gray);margin-bottom:.5rem}
+.progress-bar{height:4px;background:rgba(255,255,255,.08);border-radius:99px;overflow:hidden}
+.progress-fill{height:100%;width:0%;background:linear-gradient(90deg,var(--gold),#E8D48B);border-radius:99px;transition:width var(--transition)}
 
-/* Options */
-.options{display:flex;flex-direction:column;gap:10px}
-.opt-btn{background:var(--bg3);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:14px 18px;text-align:left;color:var(--text);font-size:.92rem;cursor:pointer;transition:all .2s var(--ease);display:flex;align-items:baseline;gap:12px;line-height:1.4}
-.opt-btn:hover{border-color:var(--gold);background:rgba(201,168,76,.08);transform:translateX(4px)}
-.opt-btn .lvl{color:var(--gold);font-weight:700;font-size:.78rem;flex-shrink:0;min-width:24px}
-.opt-btn.selected{border-color:var(--gold);background:rgba(201,168,76,.15);transform:translateX(4px)}
+/* ─── Dimension pills ─── */
+.dim-pills{display:flex;flex-wrap:wrap;gap:.5rem;justify-content:center;margin-bottom:2rem}
+.dim-pill{font-size:.7rem;font-weight:600;padding:.3rem .7rem;border-radius:99px;background:rgba(255,255,255,.05);color:var(--gray);border:1px solid rgba(255,255,255,.06);transition:all var(--transition);text-transform:uppercase;letter-spacing:.04em}
+.dim-pill.active{color:var(--gold);border-color:var(--gold);background:var(--gold-dim)}
+.dim-pill.done{color:var(--white);border-color:rgba(201,168,76,.4);background:rgba(201,168,76,.12)}
+.dim-pill .score-badge{margin-left:.35rem;font-weight:700}
 
-/* Result */
-.result-wrap{display:none}
-.result-wrap.show{display:block;animation:fadeUp .6s var(--ease) both}
-@keyframes fadeUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
-.result-card{text-align:center}
-.result-card h2{font-size:1.6rem;margin-bottom:8px}
-.result-card .level-label{font-size:1.1rem;color:var(--gold);font-weight:700;margin-bottom:32px}
+/* ─── Question card ─── */
+.question-card{background:linear-gradient(145deg,rgba(255,255,255,.04),rgba(255,255,255,.01));border:1px solid rgba(255,255,255,.06);border-radius:var(--radius);padding:2rem;transition:opacity var(--transition),transform var(--transition);min-height:360px}
+.question-card.fade-out{opacity:0;transform:translateY(12px)}
+.question-card.fade-in{opacity:1;transform:translateY(0)}
+.q-dimension{font-size:.7rem;text-transform:uppercase;letter-spacing:.1em;color:var(--gold);font-weight:700;margin-bottom:.75rem}
+.q-number{color:var(--gray);font-weight:400}
+.q-text{font-size:1.15rem;font-weight:600;line-height:1.5;margin-bottom:1.75rem}
 
-/* Compass */
-.compass-wrap{display:flex;justify-content:center;margin-bottom:32px}
-.compass-wrap svg{filter:drop-shadow(0 0 20px rgba(201,168,76,.2))}
+/* ─── Options ─── */
+.options{display:flex;flex-direction:column;gap:.6rem}
+.option{display:flex;align-items:flex-start;gap:.85rem;padding:.9rem 1.1rem;border:1px solid rgba(255,255,255,.08);border-radius:var(--radius);cursor:pointer;transition:all var(--transition);background:transparent;text-align:left;width:100%;color:var(--white);font:inherit;font-size:.88rem;line-height:1.5}
+.option:hover,.option:focus-visible{border-color:var(--gold);background:var(--gold-dim);outline:none}
+.option .level-tag{flex-shrink:0;width:28px;height:28px;border-radius:50%;border:1.5px solid rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;font-size:.65rem;font-weight:700;color:var(--gray);transition:all var(--transition)}
+.option:hover .level-tag,.option:focus-visible .level-tag{border-color:var(--gold);color:var(--gold)}
+.option .option-text{flex:1}
 
-/* Dimension bars */
-.dim-bars{text-align:left;margin:0 auto 32px;max-width:400px;display:flex;flex-direction:column;gap:14px}
-.dim-row label{display:flex;justify-content:space-between;font-size:.82rem;margin-bottom:4px;color:var(--text2)}
-.dim-row label span:last-child{color:var(--gold);font-weight:600}
-.dim-bar{height:8px;background:var(--bg);border-radius:4px;overflow:hidden}
-.dim-bar-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--gold),var(--gold2));width:0;transition:width 1s var(--ease)}
+/* ─── Nav ─── */
+.nav-row{display:flex;justify-content:space-between;align-items:center;margin-top:1.5rem}
+.btn{padding:.7rem 1.6rem;border-radius:99px;font:inherit;font-size:.85rem;font-weight:600;cursor:pointer;border:none;transition:all var(--transition)}
+.btn-ghost{background:transparent;color:var(--gray);border:1px solid rgba(255,255,255,.1)}
+.btn-ghost:hover{color:var(--white);border-color:rgba(255,255,255,.25)}
+.btn-gold{background:linear-gradient(135deg,var(--gold),#B8973F);color:var(--navy)}
+.btn-gold:hover{filter:brightness(1.1);transform:translateY(-1px)}
+.btn-gold:disabled{opacity:.35;cursor:not-allowed;transform:none;filter:none}
 
-/* CTA */
-.cta-group{display:flex;flex-direction:column;align-items:center;gap:12px;margin-top:8px}
-.cta-btn{display:inline-block;background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--bg);font-weight:700;font-size:1rem;padding:14px 36px;border-radius:10px;text-decoration:none;transition:transform .2s var(--ease),box-shadow .2s var(--ease)}
-.cta-btn:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(201,168,76,.3)}
-.back-link{color:var(--text2);font-size:.85rem;text-decoration:none;transition:color .2s}
-.back-link:hover{color:var(--gold)}
+/* ─── Results ─── */
+.results{display:none}
+.results.visible{display:block}
+.results-header{text-align:center;padding:2rem 0}
+.composite-score{font-size:5rem;font-weight:800;background:linear-gradient(135deg,var(--gold),#E8D48B);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1}
+.maturity-label{font-size:1.3rem;font-weight:600;margin-top:.5rem;color:var(--gold)}
+.maturity-desc{color:var(--gray);margin-top:.5rem;max-width:500px;margin-left:auto;margin-right:auto;font-size:.9rem}
+
+/* ─── Radar chart (pure CSS) ─── */
+.radar-section{margin:3rem 0}
+.radar-section h3{text-align:center;font-size:1rem;margin-bottom:1.5rem;font-weight:600}
+.radar-wrap{position:relative;width:320px;height:320px;margin:0 auto}
+@media(max-width:400px){.radar-wrap{width:260px;height:260px}}
+.radar-wrap svg{width:100%;height:100%}
+.radar-grid{fill:none;stroke:rgba(255,255,255,.06);stroke-width:1}
+.radar-axis{stroke:rgba(255,255,255,.06);stroke-width:1}
+.radar-shape{fill:rgba(201,168,76,.15);stroke:var(--gold);stroke-width:2;transition:all var(--transition)}
+.radar-dot{fill:var(--gold);r:4}
+.radar-label{fill:var(--white);font-size:11px;font-family:'Inter',sans-serif;font-weight:600}
+@media(max-width:400px){.radar-label{font-size:9px}}
+
+/* ─── Dimension breakdown ─── */
+.dim-breakdown{margin:2.5rem 0}
+.dim-breakdown h3{font-size:1rem;font-weight:600;margin-bottom:1.25rem;text-align:center}
+.dim-row{display:flex;align-items:center;gap:1rem;padding:.75rem 0;border-bottom:1px solid rgba(255,255,255,.04)}
+.dim-row:last-child{border:none}
+.dim-name{width:140px;font-size:.82rem;font-weight:600;flex-shrink:0}
+@media(max-width:500px){.dim-name{width:90px;font-size:.75rem}}
+.dim-bar-wrap{flex:1;height:8px;background:rgba(255,255,255,.06);border-radius:99px;overflow:hidden}
+.dim-bar-fill{height:100%;border-radius:99px;transition:width 1s ease}
+.dim-score-val{width:40px;text-align:right;font-size:.85rem;font-weight:700;color:var(--gold)}
+
+/* ─── Gap analysis ─── */
+.gap-section{margin:2.5rem 0;padding:1.5rem;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:var(--radius)}
+.gap-section h3{font-size:1rem;font-weight:600;margin-bottom:1rem}
+.gap-item{display:flex;align-items:flex-start;gap:.75rem;padding:.6rem 0;font-size:.88rem}
+.gap-icon{color:var(--gold);font-size:1.1rem;flex-shrink:0;margin-top:.1rem}
+.gap-item strong{color:var(--gold)}
+
+/* ─── CTA ─── */
+.cta-section{text-align:center;margin:3rem 0 2rem;padding:2.5rem 1.5rem;border:1px solid rgba(201,168,76,.2);border-radius:var(--radius);background:linear-gradient(145deg,rgba(201,168,76,.06),transparent)}
+.cta-section h3{font-size:1.25rem;font-weight:700;margin-bottom:.5rem}
+.cta-section p{color:var(--gray);font-size:.9rem;margin-bottom:1.5rem}
+.cta-section .btn-gold{font-size:1rem;padding:.85rem 2.2rem}
+
+/* ─── Assessment container visibility ─── */
+.assessment{transition:opacity var(--transition)}
+.assessment.hidden{display:none}
+
+/* ─── Footer ─── */
+.footer{text-align:center;padding:2rem 0;font-size:.75rem;color:var(--gray);border-top:1px solid rgba(255,255,255,.04);margin-top:2rem}
+
+/* ─── Focus ─── */
+:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+
+/* ─── Accessibility ─── */
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}
 </style>
 </head>
 <body>
 <div class="container">
-  <div class="score-pill hidden" id="scorePill">Score: <span id="runScore">0</span></div>
+  <header class="header">
+    <div class="compass-icon" aria-hidden="true">◈</div>
+    <h1>Agent Maturity <span>Compass</span></h1>
+    <p class="serif">Discover where your AI agent operations stand — and where to aim next.</p>
+  </header>
 
-  <div class="progress-wrap" id="progressWrap">
-    <div class="progress-label"><span id="progLabel">Question 1 of 5</span><span id="progPct">0%</span></div>
-    <div class="progress-bar"><div class="progress-fill" id="progFill" style="width:0%"></div></div>
+  <!-- ─── Assessment ─── -->
+  <div class="assessment" id="assessment">
+    <div class="progress-wrap">
+      <div class="progress-meta">
+        <span id="progress-text">Question 1 of 21</span>
+        <span id="progress-pct">0%</span>
+      </div>
+      <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+        <div class="progress-fill" id="progress-fill"></div>
+      </div>
+    </div>
+
+    <div class="dim-pills" id="dim-pills" aria-label="Dimension progress"></div>
+
+    <div class="question-card fade-in" id="question-card">
+      <div class="q-dimension" id="q-dim"></div>
+      <h2 class="q-text" id="q-text"></h2>
+      <div class="options" id="options" role="radiogroup"></div>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn btn-ghost" id="btn-prev" onclick="prevQuestion()">← Back</button>
+      <button class="btn btn-gold" id="btn-next" onclick="nextQuestion()" disabled>Next →</button>
+    </div>
   </div>
 
-  <div id="questionArea"></div>
-  <div class="result-wrap" id="resultWrap"></div>
+  <!-- ─── Results ─── -->
+  <div class="results" id="results">
+    <div class="results-header">
+      <p class="serif" style="color:var(--gray);margin-bottom:.5rem">Your composite score</p>
+      <div class="composite-score" id="composite-score">0.0</div>
+      <div class="maturity-label" id="maturity-label"></div>
+      <p class="maturity-desc" id="maturity-desc"></p>
+    </div>
+
+    <div class="radar-section">
+      <h3>Capability Radar</h3>
+      <div class="radar-wrap" id="radar-wrap"></div>
+    </div>
+
+    <div class="dim-breakdown">
+      <h3>Dimension Scores</h3>
+      <div id="dim-breakdown-rows"></div>
+    </div>
+
+    <div class="gap-section">
+      <h3>⚠ Priority Gaps</h3>
+      <div id="gap-items"></div>
+    </div>
+
+    <div class="cta-section">
+      <h3>Ready to close the gaps?</h3>
+      <p>Our Compass Sprint delivers a custom roadmap, governance playbook, and implementation plan — in 5 focused days.</p>
+      <a href="index.html" class="btn btn-gold" style="display:inline-block;text-decoration:none">Get the full Compass Sprint — $5,000 / 5 days</a>
+    </div>
+
+    <div style="text-align:center;margin:1rem 0">
+      <button class="btn btn-ghost" onclick="restart()">↻ Retake Assessment</button>
+    </div>
+  </div>
+
+  <footer class="footer">© 2026 Agent Maturity Compass. All rights reserved.</footer>
 </div>
 
 <script>
-const Q=[
-{dim:"Governance",q:"How is ownership of your AI agents defined?",opts:["No defined ownership","Informal ownership by the team that built it","Documented RACI for each agent","Formal governance board with regular reviews","Automated governance with policy-as-code enforcement"]},
-{dim:"Evaluation",q:"How do you evaluate your agents' output quality?",opts:["No systematic evaluation","Manual spot-checking","Automated test suites on key scenarios","Continuous evaluation with regression detection","Multi-layered eval (unit, integration, adversarial, human-in-loop)"]},
-{dim:"Reliability",q:"What happens when an agent fails in production?",opts:["We find out from users","Basic error logging exists","Automated alerts with runbook responses","Self-healing with fallback chains and circuit breakers","Chaos-tested with proven recovery SLAs"]},
-{dim:"Cost Efficiency",q:"How do you track and control agent operational costs?",opts:["We don't track per-agent costs","Monthly cloud bill review","Per-agent cost attribution dashboards","Automated budget alerts with cost optimization","Dynamic model routing based on cost/quality tradeoffs"]},
-{dim:"Security",q:"How do you manage agent access to tools and data?",opts:["Agents have broad access, no restrictions","Basic API key management","Principle of least privilege with documented permissions","Runtime permission boundaries with audit logging","Zero-trust agent identity with cryptographic attestation"]}
+const DIMS = [
+  { key:'governance', name:'Governance' },
+  { key:'security', name:'Security' },
+  { key:'reliability', name:'Reliability' },
+  { key:'evaluation', name:'Evaluation' },
+  { key:'observability', name:'Observability' },
+  { key:'cost', name:'Cost Efficiency' },
+  { key:'operating', name:'Operating Model' }
 ];
 
-const scores=[];
-let cur=0;
-const $=id=>document.getElementById(id);
+const QUESTIONS = [
+  // ── Governance ──
+  { dim:0, text:"How are decisions about deploying new AI agents made in your organization?", opts:[
+    "Whoever builds it ships it — no approval needed",
+    "We have informal check-ins with a manager before launch",
+    "A lightweight review process exists with documented criteria",
+    "A cross-functional governance board reviews all agent deployments",
+    "Automated policy gates enforce deployment standards with continuous auditing"
+  ]},
+  { dim:0, text:"How do you manage and version your AI agent policies and guardrails?", opts:[
+    "There are no written policies for AI agents",
+    "Some teams have ad-hoc guidelines in shared docs",
+    "Centralized policy docs exist but updates are manual and infrequent",
+    "Policies are versioned in source control with change-request workflows",
+    "Policies are codified, auto-enforced at runtime, and continuously updated from incident learnings"
+  ]},
+  { dim:0, text:"How is accountability assigned when an AI agent produces a harmful or incorrect output?", opts:[
+    "Nobody really knows who's responsible — it's a gray area",
+    "The person who last touched it takes the blame informally",
+    "Ownership is loosely documented per agent or team",
+    "Clear RACI matrices exist for every agent, reviewed quarterly",
+    "Accountability is embedded in the agent lifecycle with automated escalation paths and post-incident reviews"
+  ]},
 
-function renderQ(i,dir){
-  const area=$('questionArea');
-  const old=area.querySelector('.card');
-  if(old){old.classList.add('exit');setTimeout(()=>old.remove(),350)}
-  setTimeout(()=>{
-    const d=Q[i];
-    const card=document.createElement('div');
-    card.className='card question-card enter';
-    card.innerHTML=`<div class="dim-badge">${d.dim}</div><p class="q-text">${d.q}</p><div class="options">${d.opts.map((o,j)=>`<button class="opt-btn" data-v="${j+1}"><span class="lvl">L${j+1}</span>${o}</button>`).join('')}</div>`;
-    area.appendChild(card);
-    requestAnimationFrame(()=>requestAnimationFrame(()=>card.classList.remove('enter')));
-    card.querySelectorAll('.opt-btn').forEach(b=>b.addEventListener('click',()=>pick(b,+b.dataset.v)));
-  },old?200:0);
-  $('progLabel').textContent=`Question ${i+1} of 5`;
-  const pct=Math.round((i/5)*100);
-  $('progPct').textContent=pct+'%';
-  $('progFill').style.width=pct+'%';
+  // ── Security ──
+  { dim:1, text:"How do you control what data and systems your AI agents can access?", opts:[
+    "Agents often run with broad credentials or shared API keys",
+    "We try to limit access but don't enforce it consistently",
+    "Role-based access is defined but not audited regularly",
+    "Least-privilege policies are enforced, with regular access reviews",
+    "Zero-trust architecture with just-in-time credentials, continuous verification, and automated anomaly detection"
+  ]},
+  { dim:1, text:"How do you protect against prompt injection and adversarial inputs?", opts:[
+    "We haven't considered this threat yet",
+    "We know it's a risk but rely on the model provider's defaults",
+    "Input validation and basic filtering are in place for critical agents",
+    "Layered defenses including input sanitization, output validation, and red-team testing",
+    "Continuous adversarial testing, real-time threat detection, and automated circuit breakers on suspicious patterns"
+  ]},
+  { dim:1, text:"How do you handle sensitive data (PII, secrets) flowing through AI agents?", opts:[
+    "We haven't mapped where sensitive data flows through agents",
+    "Teams are aware but there's no systematic data classification",
+    "Data classification exists; sensitive fields are masked in some pipelines",
+    "Automated PII detection and redaction across all agent I/O with audit logs",
+    "End-to-end data governance with differential privacy, encryption at rest and in transit, and compliance certifications"
+  ]},
+
+  // ── Reliability ──
+  { dim:2, text:"What happens when one of your AI agents fails or produces an error?", opts:[
+    "We find out when a user complains — no monitoring in place",
+    "Some agents log errors, but there's no alerting or on-call rotation",
+    "Alerting exists for critical agents; someone investigates within hours",
+    "Automated failover and retry logic; on-call responds within minutes with runbooks",
+    "Self-healing systems with graceful degradation, chaos testing, and SLO-driven reliability targets"
+  ]},
+  { dim:2, text:"How do you test AI agents before they go to production?", opts:[
+    "We test manually by trying a few prompts and eyeballing outputs",
+    "Some unit tests exist but coverage is low and inconsistent",
+    "Structured test suites cover common scenarios with CI integration",
+    "Comprehensive testing including edge cases, regression suites, and staging environments",
+    "Automated test generation, continuous canary deployments, and shadow-mode validation against production traffic"
+  ]},
+  { dim:2, text:"How do you handle model updates or provider changes for your agents?", opts:[
+    "We update models ad-hoc and hope nothing breaks",
+    "We test new models manually before switching",
+    "A documented process exists for model migration with rollback plans",
+    "Automated compatibility testing and gradual rollout with performance comparison",
+    "Multi-model orchestration with automatic failover, A/B testing, and vendor-agnostic abstraction layers"
+  ]},
+
+  // ── Evaluation ──
+  { dim:3, text:"How do you measure the quality of your AI agents' outputs?", opts:[
+    "We don't — we assume the model is good enough",
+    "Occasional spot-checks by team members",
+    "Regular human evaluation using rubrics on sampled outputs",
+    "Automated evaluation pipelines with domain-specific metrics and human-in-the-loop review",
+    "Continuous eval with custom benchmarks, LLM-as-judge, user feedback loops, and statistical significance testing"
+  ]},
+  { dim:3, text:"How do you detect and respond to model drift or quality degradation?", opts:[
+    "We don't track output quality over time",
+    "We notice when users report problems",
+    "Basic dashboards track key metrics but drift detection is manual",
+    "Statistical drift detection triggers alerts with automated investigation",
+    "Real-time quality monitoring with automated rollback, root-cause analysis, and model retraining triggers"
+  ]},
+  { dim:3, text:"How do you benchmark new agents against your quality standards?", opts:[
+    "No benchmarks exist — we go by gut feeling",
+    "Informal comparisons with previous versions using a few examples",
+    "Documented benchmark suites exist for major agent capabilities",
+    "Standardized eval harnesses run automatically in CI/CD with pass/fail gates",
+    "Living benchmark suites that evolve from production data, with competitive leaderboards and automatic regression detection"
+  ]},
+
+  // ── Observability ──
+  { dim:4, text:"What visibility do you have into your AI agents' behavior in production?", opts:[
+    "Minimal — we see final outputs but not the reasoning or intermediate steps",
+    "Basic logging of inputs and outputs for some agents",
+    "Structured tracing of agent chains with searchable logs",
+    "Full observability stack: traces, metrics, and logs correlated across agent workflows",
+    "Real-time dashboards with distributed tracing, token-level attribution, semantic search over traces, and anomaly detection"
+  ]},
+  { dim:4, text:"How do you track costs and resource consumption per agent?", opts:[
+    "We see the total API bill but can't attribute costs to specific agents",
+    "Rough estimates per team or project based on usage patterns",
+    "Per-agent cost tagging with monthly reports",
+    "Real-time cost dashboards with per-request attribution and budget alerts",
+    "Predictive cost modeling, automated optimization recommendations, and chargeback to business units"
+  ]},
+  { dim:4, text:"How do you understand why an agent made a specific decision?", opts:[
+    "We can't — it's a black box",
+    "We manually inspect prompts and outputs case by case",
+    "Logging captures chain-of-thought and tool calls for review",
+    "Automated explainability reports with decision audit trails",
+    "Interactive debugging tools with counterfactual analysis, attention visualization, and stakeholder-friendly explanations"
+  ]},
+
+  // ── Cost Efficiency ──
+  { dim:5, text:"How do you optimize the cost of running AI agents?", opts:[
+    "We don't — we use the most capable model for everything",
+    "We've switched some low-stakes tasks to cheaper models ad-hoc",
+    "A tiered model strategy exists based on task complexity",
+    "Automated model routing optimizes cost-quality tradeoffs per request",
+    "ML-driven optimization with caching, batching, model distillation, and continuous cost-quality Pareto analysis"
+  ]},
+  { dim:5, text:"How do you forecast and budget for AI agent operational costs?", opts:[
+    "No forecasting — costs are a surprise each month",
+    "Rough quarterly estimates based on historical spend",
+    "Bottom-up cost models per agent with monthly variance analysis",
+    "Predictive budgeting with scenario modeling and automated alerts on trajectory changes",
+    "FinOps discipline with real-time unit economics, marginal cost analysis, and ROI-driven investment decisions"
+  ]},
+  { dim:5, text:"How do you measure the business ROI of your AI agents?", opts:[
+    "We don't measure ROI — agents are seen as experimental",
+    "Anecdotal evidence of time saved or tasks automated",
+    "Basic before/after metrics for major agent deployments",
+    "Structured ROI framework with quantified impact on revenue, cost, and quality metrics",
+    "Continuous value measurement with attribution modeling, counterfactual analysis, and automated portfolio optimization"
+  ]},
+
+  // ── Operating Model ──
+  { dim:6, text:"How is your team organized to build and operate AI agents?", opts:[
+    "Individual contributors build agents as side projects",
+    "A small dedicated team handles AI agents but is siloed from the business",
+    "Cross-functional squads own specific agents with clear product ownership",
+    "Platform team provides shared infrastructure; product teams own agent logic with SLAs",
+    "Fully integrated AI engineering function with career ladders, centers of excellence, and embedded AI product managers"
+  ]},
+  { dim:6, text:"How do you share knowledge and best practices for AI agents across teams?", opts:[
+    "Knowledge lives in individual heads — tribal knowledge only",
+    "Occasional presentations or Slack threads share learnings informally",
+    "Internal wiki or playbook documents common patterns and lessons learned",
+    "Active community of practice with regular reviews, shared component libraries, and mentorship",
+    "Systematic knowledge management with searchable pattern catalogs, automated best-practice enforcement, and external thought leadership"
+  ]},
+  { dim:6, text:"How do you handle the lifecycle of an AI agent from idea to retirement?", opts:[
+    "No lifecycle process — agents appear and disappear organically",
+    "Informal stages but no documented process or criteria",
+    "Defined lifecycle stages (proposal → build → deploy → monitor → retire) with light governance",
+    "Automated lifecycle management with stage gates, health checks, and sunset criteria",
+    "Continuous lifecycle optimization with automated discovery of underperforming agents, rebalancing, and portfolio-level health scoring"
+  ]}
+];
+
+// ── State ──
+let current = 0;
+const answers = new Array(QUESTIONS.length).fill(-1);
+
+// ── Init ──
+function init() {
+  buildPills();
+  renderQuestion();
+  updateProgress();
 }
 
-function pick(btn,v){
-  btn.closest('.options').querySelectorAll('.opt-btn').forEach(b=>b.classList.remove('selected'));
-  btn.classList.add('selected');
-  scores[cur]=v;
-  updatePill();
-  setTimeout(()=>{
-    cur++;
-    if(cur<5){renderQ(cur,1)}else{showResult()}
-  },400);
+function buildPills() {
+  const wrap = document.getElementById('dim-pills');
+  wrap.innerHTML = DIMS.map((d,i) =>
+    `<span class="dim-pill" id="pill-${i}">${d.name}<span class="score-badge" id="pill-score-${i}"></span></span>`
+  ).join('');
 }
 
-function updatePill(){
-  const pill=$('scorePill');
-  pill.classList.remove('hidden');
-  const avg=(scores.reduce((a,b)=>a+b,0)/scores.length).toFixed(1);
-  $('runScore').textContent=avg;
+function renderQuestion() {
+  const q = QUESTIONS[current];
+  const card = document.getElementById('question-card');
+  card.classList.remove('fade-in');
+  card.classList.add('fade-out');
+  setTimeout(() => {
+    document.getElementById('q-dim').innerHTML = `${DIMS[q.dim].name} <span class="q-number">— Q${(current % 3) + 1}/3</span>`;
+    document.getElementById('q-text').textContent = q.text;
+    const optsEl = document.getElementById('options');
+    optsEl.innerHTML = q.opts.map((o,i) =>
+      `<button class="option${answers[current]===i?' selected':''}" onclick="selectOption(${i})" role="radio" aria-checked="${answers[current]===i}" aria-label="Level ${i+1}: ${o}">
+        <span class="level-tag">L${i+1}</span>
+        <span class="option-text">${o}</span>
+      </button>`
+    ).join('');
+    card.classList.remove('fade-out');
+    card.classList.add('fade-in');
+    updateNav();
+    highlightPills();
+  }, 200);
 }
 
-function showResult(){
-  $('progressWrap').classList.add('hidden');
-  $('scorePill').classList.add('hidden');
-  $('questionArea').innerHTML='';
-  $('progFill').style.width='100%';
-
-  const avg=scores.reduce((a,b)=>a+b,0)/scores.length;
-  const lvl=avg<1.5?1:avg<2.5?2:avg<3.5?3:avg<4.5?4:5;
-  const labels=['','Ad Hoc','Developing','Defined','Managed','Optimized'];
-
-  // Build compass SVG
-  const needleAngle=-90+(avg-1)*45; // maps 1-5 to -90..90
-  const compass=`<svg width="220" height="220" viewBox="0 0 220 220">
-    <defs><linearGradient id="gr" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#C9A84C"/><stop offset="100%" stop-color="#e0c36a"/></linearGradient></defs>
-    <circle cx="110" cy="110" r="100" fill="none" stroke="#1a2235" stroke-width="8"/>
-    <path d="M 30 110 A 80 80 0 0 1 190 110" fill="none" stroke="#1a2235" stroke-width="14" stroke-linecap="round"/>
-    <path d="M 30 110 A 80 80 0 0 1 190 110" fill="none" stroke="url(#gr)" stroke-width="14" stroke-linecap="round" stroke-dasharray="251" stroke-dashoffset="${251-251*((avg-1)/4)}" style="transition:stroke-dashoffset 1.2s cubic-bezier(.4,0,.2,1)"/>
-    ${[1,2,3,4,5].map((n,i)=>{const a=Math.PI+Math.PI*(i/4);const x=110+80*Math.cos(a);const y=110+80*Math.sin(a);return`<text x="${x}" y="${y-14}" text-anchor="middle" fill="#a0a8b8" font-size="11" font-family="system-ui">L${n}</text>`}).join('')}
-    <g transform="rotate(${needleAngle},110,110)" style="transition:transform 1s cubic-bezier(.4,0,.2,1)">
-      <line x1="110" y1="110" x2="110" y2="40" stroke="#C9A84C" stroke-width="3" stroke-linecap="round"/>
-      <circle cx="110" cy="110" r="6" fill="#C9A84C"/>
-    </g>
-    <text x="110" y="155" text-anchor="middle" fill="#F8F8F0" font-size="28" font-weight="700" font-family="system-ui">${avg.toFixed(1)}</text>
-    <text x="110" y="175" text-anchor="middle" fill="#a0a8b8" font-size="12" font-family="system-ui">out of 5.0</text>
-  </svg>`;
-
-  const dims=Q.map((d,i)=>`<div class="dim-row"><label><span>${d.dim}</span><span>L${scores[i]}</span></label><div class="dim-bar"><div class="dim-bar-fill" data-w="${scores[i]*20}"></div></div></div>`).join('');
-
-  const wrap=$('resultWrap');
-  wrap.innerHTML=`<div class="card result-card">
-    <h2>Your AMC Maturity Score</h2>
-    <div class="level-label">Level ${lvl}: ${labels[lvl]}</div>
-    <div class="compass-wrap">${compass}</div>
-    <div class="dim-bars">${dims}</div>
-    <div class="cta-group">
-      <a class="cta-btn" href="mailto:hello@agentmaturity.com?subject=Full%20AMC%20Assessment&body=I%20scored%20${avg.toFixed(1)}%2F5%20on%20the%20demo.%20I'd%20like%20a%20full%20assessment.">Get Your Full AMC Score →</a>
-      <a class="back-link" href="index.html">← Back to Home</a>
-    </div>
-  </div>`;
-  wrap.classList.add('show');
-
-  // Animate bars
-  setTimeout(()=>{wrap.querySelectorAll('.dim-bar-fill').forEach(el=>{el.style.width=el.dataset.w+'%'})},200);
+function selectOption(i) {
+  answers[current] = i;
+  document.querySelectorAll('.option').forEach((el,idx) => {
+    el.classList.toggle('selected', idx===i);
+    el.setAttribute('aria-checked', idx===i);
+    if(idx===i){
+      el.style.borderColor='var(--gold)';
+      el.style.background='var(--gold-dim)';
+      el.querySelector('.level-tag').style.borderColor='var(--gold)';
+      el.querySelector('.level-tag').style.color='var(--gold)';
+    } else {
+      el.style.borderColor='';el.style.background='';
+      el.querySelector('.level-tag').style.borderColor='';
+      el.querySelector('.level-tag').style.color='';
+    }
+  });
+  updateNav();
+  updateProgress();
+  updatePillScores();
 }
 
-renderQ(0);
+function nextQuestion() {
+  if(answers[current]===-1) return;
+  if(current < QUESTIONS.length - 1) { current++; renderQuestion(); updateProgress(); }
+  else showResults();
+}
+
+function prevQuestion() {
+  if(current > 0) { current--; renderQuestion(); updateProgress(); }
+}
+
+function updateNav() {
+  document.getElementById('btn-prev').style.visibility = current===0?'hidden':'visible';
+  const btn = document.getElementById('btn-next');
+  btn.disabled = answers[current]===-1;
+  btn.textContent = current===QUESTIONS.length-1?'See Results':'Next →';
+}
+
+function updateProgress() {
+  const answered = answers.filter(a=>a>=0).length;
+  const pct = Math.round(answered/QUESTIONS.length*100);
+  document.getElementById('progress-fill').style.width = pct+'%';
+  document.getElementById('progress-text').textContent = `Question ${current+1} of ${QUESTIONS.length}`;
+  document.getElementById('progress-pct').textContent = pct+'%';
+}
+
+function highlightPills() {
+  DIMS.forEach((_,i) => {
+    const pill = document.getElementById('pill-'+i);
+    const qs = QUESTIONS.map((q,qi)=>({dim:q.dim,qi})).filter(x=>x.dim===i);
+    const allDone = qs.every(x=>answers[x.qi]>=0);
+    const isActive = QUESTIONS[current].dim===i;
+    pill.className='dim-pill'+(isActive?' active':'')+(allDone?' done':'');
+  });
+}
+
+function updatePillScores() {
+  DIMS.forEach((_,i) => {
+    const qs = QUESTIONS.map((q,qi)=>({dim:q.dim,qi})).filter(x=>x.dim===i);
+    const answered = qs.filter(x=>answers[x.qi]>=0);
+    if(answered.length===0){document.getElementById('pill-score-'+i).textContent='';return;}
+    const avg = answered.reduce((s,x)=>s+answers[x.qi]+1,0)/answered.length;
+    document.getElementById('pill-score-'+i).textContent=' '+avg.toFixed(1);
+  });
+}
+
+// ── Dimension scores ──
+function dimScores() {
+  return DIMS.map((_,i) => {
+    const qs = QUESTIONS.map((q,qi)=>({dim:q.dim,qi})).filter(x=>x.dim===i);
+    return qs.reduce((s,x)=>s+answers[x.qi]+1,0)/qs.length;
+  });
+}
+
+// ── Results ──
+function showResults() {
+  document.getElementById('assessment').classList.add('hidden');
+  const res = document.getElementById('results');
+  res.classList.add('visible');
+  const scores = dimScores();
+  const composite = scores.reduce((a,b)=>a+b,0)/scores.length;
+
+  // Animate composite
+  let c=0;
+  const target = composite;
+  const iv = setInterval(()=>{c+=0.1;if(c>=target){c=target;clearInterval(iv)}
+    document.getElementById('composite-score').textContent=c.toFixed(1);},30);
+
+  // Maturity label
+  const levels = [
+    [0,'Ad Hoc','Your AI agent operations are informal and reactive. Significant risk exposure.'],
+    [2,'Emerging','Some structure exists but practices are inconsistent across teams.'],
+    [3,'Defined','Standardized processes are in place. You're building a solid foundation.'],
+    [4,'Managed','Quantitative management and proactive optimization. Strong operational maturity.'],
+    [4.5,'Optimized','Industry-leading practices with continuous improvement. Exceptional maturity.']
+  ];
+  let lvl = levels[0];
+  for(const l of levels) if(composite>=l[0]) lvl=l;
+  document.getElementById('maturity-label').textContent='Level: '+lvl[1];
+  document.getElementById('maturity-desc').textContent=lvl[2];
+
+  // Radar
+  drawRadar(scores);
+
+  // Breakdown bars
+  const rows = document.getElementById('dim-breakdown-rows');
+  rows.innerHTML = scores.map((s,i) => {
+    const pct = s/5*100;
+    const hue = pct<40?0:pct<70?45:120;
+    const color = pct>60?'var(--gold)':`hsl(${hue},70%,55%)`;
+    return `<div class="dim-row"><span class="dim-name">${DIMS[i].name}</span><div class="dim-bar-wrap"><div class="dim-bar-fill" style="width:${pct}%;background:${color}"></div></div><span class="dim-score-val">${s.toFixed(1)}</span></div>`;
+  }).join('');
+
+  // Gap analysis
+  const sorted = scores.map((s,i)=>({s,i})).sort((a,b)=>a.s-b.s);
+  const gaps = sorted.slice(0,3);
+  const gapEl = document.getElementById('gap-items');
+  const gapAdvice = {
+    governance:'Establish a governance board and codify agent deployment policies.',
+    security:'Implement least-privilege access and adversarial testing for agents.',
+    reliability:'Add automated failover, structured testing, and SLO targets.',
+    evaluation:'Build automated eval pipelines with domain-specific quality metrics.',
+    observability:'Deploy distributed tracing and per-agent cost attribution.',
+    cost:'Introduce tiered model routing and FinOps budgeting practices.',
+    operating:'Create cross-functional squads with clear agent ownership and lifecycle management.'
+  };
+  gapEl.innerHTML = gaps.map(g =>
+    `<div class="gap-item"><span class="gap-icon">◈</span><div><strong>${DIMS[g.i].name}</strong> (${g.s.toFixed(1)}/5) — ${gapAdvice[DIMS[g.i].key]}</div></div>`
+  ).join('');
+
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// ── Radar (SVG) ──
+function drawRadar(scores) {
+  const n=7, cx=160, cy=160, R=120;
+  const angles = Array.from({length:n},(_,i)=> -Math.PI/2 + (2*Math.PI*i/n));
+
+  function poly(r) { return angles.map(a=>`${cx+r*Math.cos(a)},${cy+r*Math.sin(a)}`).join(' '); }
+
+  const gridRings = [1,2,3,4,5].map(l => `<polygon class="radar-grid" points="${poly(R*l/5)}"/>`).join('');
+  const axisLines = angles.map(a => `<line class="radar-axis" x1="${cx}" y1="${cy}" x2="${cx+R*Math.cos(a)}" y2="${cy+R*Math.sin(a)}"/>`).join('');
+
+  const dataPoints = scores.map((s,i)=>{
+    const r=R*s/5;
+    return {x:cx+r*Math.cos(angles[i]),y:cy+r*Math.sin(angles[i])};
+  });
+  const shapePts = dataPoints.map(p=>`${p.x},${p.y}`).join(' ');
+  const dots = dataPoints.map(p=>`<circle class="radar-dot" cx="${p.x}" cy="${p.y}"/>`).join('');
+
+  const labelOffset=18;
+  const labels = DIMS.map((d,i)=>{
+    const x=cx+(R+labelOffset)*Math.cos(angles[i]);
+    const y=cy+(R+labelOffset)*Math.sin(angles[i]);
+    const anchor = Math.abs(Math.cos(angles[i]))<0.1?'middle':Math.cos(angles[i])>0?'start':'end';
+    const dy = Math.sin(angles[i])>0.3?'1em':Math.sin(angles[i])<-0.3?'-0.3em':'0.4em';
+    return `<text class="radar-label" x="${x}" y="${y}" text-anchor="${anchor}" dy="${dy}">${d.name}</text>`;
+  }).join('');
+
+  document.getElementById('radar-wrap').innerHTML =
+    `<svg viewBox="0 0 320 320" role="img" aria-label="Radar chart of dimension scores">${gridRings}${axisLines}<polygon class="radar-shape" points="${shapePts}"/>${dots}${labels}</svg>`;
+}
+
+function restart() {
+  answers.fill(-1);
+  current=0;
+  document.getElementById('results').classList.remove('visible');
+  document.getElementById('assessment').classList.remove('hidden');
+  buildPills();
+  renderQuestion();
+  updateProgress();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+init();
 </script>
 </body>
 </html>

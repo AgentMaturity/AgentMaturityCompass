@@ -140,6 +140,11 @@ class BillingInvoice:
     total_billing_units: float
     lines: list[UsageBillingLine] = field(default_factory=list)
 
+    @property
+    def invoice_id(self) -> str:
+        """Deterministic invoice ID based on tenant and date range."""
+        return str(uuid5(_USAGE_NAMESPACE, f"invoice:{self.tenant_id}:{self.since_iso}:{self.until_iso}"))
+
 
 @dataclass(frozen=True)
 class UsageRates:

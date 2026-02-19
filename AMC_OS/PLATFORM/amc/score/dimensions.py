@@ -317,3 +317,130 @@ class ScoringEngine:
             dimensions_scored=len(dim_scores),
         )
         return composite
+
+    # ------------------------------------------------------------------
+    # Evidence-based scoring (anti-gaming)
+    # ------------------------------------------------------------------
+
+    def score_with_evidence(
+        self, evidence: list[Any],
+    ) -> CompositeScore:
+        """
+        Score all dimensions using EvidenceArtifacts instead of free-text answers.
+
+        Each artifact's trust_score (derived from EvidenceKind) determines the
+        fraction of full points awarded, replacing keyword matching entirely.
+
+        Scoring rules:
+          KEYWORD_CLAIM:       40% of full points
+          CODE_PRESENT:        55% of full points
+          IMPORT_VERIFIED:     70% of full points
+          EXECUTION_VERIFIED: 100% of full points
+          CONTINUOUS_VERIFIED: 110% of full points (bonus)
+          execution_error set:   0% regardless of kind
+
+        Args:
+            evidence: list of EvidenceArtifact objects.
+
+        Returns:
+            CompositeScore with per-dimension scores and recommendations.
+        """
+        from amc.score.evidence import EvidenceArtifact as _EA, TRUST_MULTIPLIERS
+
+        PREFIX_MAP: dict[str, Dimension] = {
+            "gov_": Dimension.GOVERNANCE,
+            "sec_": Dimension.SECURITY,
+            "rel_": Dimension.RELIABILITY,
+            "eval_": Dimension.EVALUATION,
+            "obs_": Dimension.OBSERVABILITY,
+            "cost_": Dimension.COST_EFFICIENCY,
+            "ops_": Dimension.OPERATING_MODEL,
+        }
+
+        # Index evidence by qid (take highest-trust artifact per qid)
+        best: dict[str, _EA] = {}
+        for art in evidence:
+            if not isinstance(art, _EA):
+                continue
+            existing = best.get(art.qid)
+            if existing is None or art.trust_score > existing.trust_score:
+                best[art.qid] = art
+
+        dim_scores: list[DimensionScore] = []
+
+        for dim in Dimension:
+            rubrics = DIMENSION_RUBRICS.get(dim, [])
+            total_points = 0
+            max_points = 0
+            ev_list: list[str] = []
+            gaps: list[str] = []
+
+            for rubric in rubrics:
+                qid = rubric["qid"]
+                max_points += rubric["points"]
+                art = best.get(qid)
+
+                if art is None:
+                    gaps.append(rubric["gap"])
+                    continue
+
+                # Failed execution → 0 points
+                if art.execution_error:
+                    gaps.append(rubric["gap"])
+                    ev_list.append(f"{qid}: execution FAILED — {art.execution_error[:80]}")
+                    continue
+
+                multiplier = TRUST_MULTIPLIERS.get(art.kind, 0.4)
+                earned = rubric["points"] * multiplier
+                total_points += earned
+                ev_list.append(f"{qid}: {art.kind.value} (trust={art.trust_score:.2f})")
+
+                if multiplier < 1.0:
+                    gaps.append(f"{rubric['gap']} (partial: {art.kind.value})")
+
+            score = min(100, int((total_points / max(max_points, 1)) * 100)) if max_points else 0
+            if score >= 95:
+                level = MaturityLevel.L5
+            elif score >= 80:
+                level = MaturityLevel.L4
+            elif score >= 55:
+                level = MaturityLevel.L3
+            elif score >= 30:
+                level = MaturityLevel.L2
+            else:
+                level = MaturityLevel.L1
+
+            dim_scores.append(DimensionScore(
+                dimension=dim, level=level, score=score, evidence=ev_list, gaps=gaps,
+            ))
+
+        avg = int(sum(ds.score for ds in dim_scores) / len(dim_scores)) if dim_scores else 0
+        if avg >= 95:
+            overall = MaturityLevel.L5
+        elif avg >= 80:
+            overall = MaturityLevel.L4
+        elif avg >= 55:
+            overall = MaturityLevel.L3
+        elif avg >= 30:
+            overall = MaturityLevel.L2
+        else:
+            overall = MaturityLevel.L1
+
+        recommendations: dict[str, list[str]] = {}
+        for ds in dim_scores:
+            if ds.gaps:
+                modules = MODULE_RECOMMENDATIONS.get(ds.dimension, [])
+                if modules:
+                    recommendations[ds.dimension.value] = modules
+
+        composite = CompositeScore(
+            overall_level=overall, overall_score=avg,
+            dimension_scores=dim_scores,
+            recommended_platform_modules=recommendations,
+        )
+        log.info(
+            "scoring.evidence_complete",
+            overall_level=overall, overall_score=avg,
+            evidence_count=len(evidence), dimensions_scored=len(dim_scores),
+        )
+        return composite

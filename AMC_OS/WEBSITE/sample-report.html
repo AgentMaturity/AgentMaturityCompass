@@ -3,335 +3,318 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sample Assessment Report — Agent Maturity Compass</title>
+<title>AMC Compass Sprint — Sample Report</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{--bg:#0A0F1E;--surface:#111827;--border:#1E293B;--gold:#C9A84C;--gold-dim:#8B7533;--text:#F8F8F0;--text-muted:#94A3B8;--green:#34D399;--green-bg:rgba(52,211,153,.12);--amber:#FBBF24;--amber-bg:rgba(251,191,36,.12);--red:#F87171;--font:system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}
-html{font-size:16px;scroll-behavior:smooth}
-body{background:var(--bg);color:var(--text);font-family:var(--font);line-height:1.6;min-height:100vh}
-.container{max-width:960px;margin:0 auto;padding:32px 24px}
-
-/* Watermark */
-.watermarked{position:relative;overflow:hidden}
-.watermarked::before{content:"SAMPLE — agentmaturity.com";position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(-35deg);font-size:3.2rem;font-weight:800;color:rgba(201,168,76,.07);white-space:nowrap;pointer-events:none;z-index:1;letter-spacing:4px;text-transform:uppercase}
-
-/* Cards */
-.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:32px;margin-bottom:24px;position:relative;overflow:hidden}
-.card::before{content:"SAMPLE — agentmaturity.com";position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(-35deg);font-size:2rem;font-weight:800;color:rgba(201,168,76,.06);white-space:nowrap;pointer-events:none;z-index:0;letter-spacing:3px}
-.card>*{position:relative;z-index:1}
+:root{--navy:#0A0F1E;--gold:#C9A84C;--white:#F8F8F0;--gray:#4A5568;--bg:#0D1117;--card:#141B2D;--border:#1E2A3A;--gold-dim:rgba(201,168,76,.15)}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--white);line-height:1.7;overflow-x:hidden;position:relative}
+.watermark{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) rotate(-35deg);font-family:Georgia,serif;font-size:clamp(2.5rem,6vw,5rem);font-weight:700;color:rgba(201,168,76,.06);white-space:nowrap;pointer-events:none;z-index:1000;letter-spacing:.15em;text-transform:uppercase;user-select:none}
+.container{max-width:900px;margin:0 auto;padding:2rem 1.5rem;position:relative;z-index:1}
 
 /* Header */
-.report-header{text-align:center;padding:48px 32px}
-.report-header h1{font-size:1.5rem;color:var(--gold);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;font-weight:600}
-.report-header .subtitle{font-size:.9rem;color:var(--text-muted);margin-bottom:32px}
-.meta-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:480px;margin:0 auto 32px;text-align:left}
-.meta-label{font-size:.75rem;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted)}
-.meta-value{font-size:1rem;color:var(--text);font-weight:500}
+.report-header{border-bottom:2px solid var(--gold);padding-bottom:2rem;margin-bottom:3rem;text-align:center}
+.report-header .logo-mark{display:inline-flex;align-items:center;justify-content:center;width:56px;height:56px;border:2px solid var(--gold);border-radius:50%;margin-bottom:1rem;position:relative}
+.logo-mark::before{content:'◇';color:var(--gold);font-size:1.5rem}
+.report-header h1{font-family:Georgia,serif;font-size:clamp(1.5rem,4vw,2.2rem);font-weight:700;color:var(--white);letter-spacing:.02em}
+.report-header h1 span{color:var(--gold)}
+.report-meta{display:flex;flex-wrap:wrap;justify-content:center;gap:2rem;margin-top:1rem;font-size:.85rem;color:var(--gray)}
+.report-meta strong{color:var(--gold);font-weight:600}
+.badge{display:inline-block;background:var(--gold-dim);color:var(--gold);border:1px solid rgba(201,168,76,.3);border-radius:4px;padding:.15rem .6rem;font-size:.7rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;margin-top:.75rem}
+.confidential{color:#e53e3e;border-color:rgba(229,62,62,.3);background:rgba(229,62,62,.08)}
 
-/* Compass SVG */
-.compass-wrap{margin:32px auto 16px;width:200px;height:200px}
-.overall-score-label{font-size:.85rem;color:var(--text-muted);text-align:center;margin-bottom:4px}
-.overall-score-value{font-size:2.4rem;font-weight:700;color:var(--gold);text-align:center}
-.overall-score-max{font-size:1rem;color:var(--text-muted);font-weight:400}
+/* Sections */
+section{margin-bottom:3rem}
+.section-label{font-size:.65rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);margin-bottom:.5rem}
+h2{font-family:Georgia,serif;font-size:1.35rem;color:var(--white);margin-bottom:1rem;padding-bottom:.5rem;border-bottom:1px solid var(--border)}
+h3{font-size:1.05rem;color:var(--gold);margin:1.5rem 0 .75rem;font-weight:600}
+p,li{color:rgba(248,248,240,.82);font-size:.92rem}
+p+p{margin-top:.75rem}
 
-/* Section headings */
-.section-title{font-size:1.15rem;font-weight:700;color:var(--gold);margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid var(--border);text-transform:uppercase;letter-spacing:1.5px}
+/* Table */
+.table-wrap{overflow-x:auto;margin:1rem 0;border:1px solid var(--border);border-radius:8px}
+table{width:100%;border-collapse:collapse;font-size:.82rem}
+thead{background:rgba(201,168,76,.1)}
+th{text-align:left;padding:.7rem .9rem;color:var(--gold);font-weight:600;font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;border-bottom:1px solid var(--border)}
+td{padding:.65rem .9rem;border-bottom:1px solid var(--border);vertical-align:top}
+tr:last-child td{border-bottom:none}
+tbody tr:hover{background:rgba(201,168,76,.04)}
+.score{display:inline-block;background:var(--gold-dim);color:var(--gold);border-radius:4px;padding:.1rem .45rem;font-weight:700;font-size:.78rem;min-width:2rem;text-align:center}
+.score.high{background:rgba(72,187,120,.15);color:#48bb78}
+.priority-high{color:#fc8181;font-weight:600}
+.priority-med{color:var(--gold);font-weight:600}
+.priority-low{color:#68d391;font-weight:600}
 
-/* Executive summary */
-.summary p{margin-bottom:16px;color:var(--text-muted);line-height:1.75}
+/* Cards */
+.finding-card{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:1.5rem;margin:1rem 0}
+.finding-card h4{font-size:.9rem;color:var(--white);margin-bottom:.5rem;font-weight:600}
+.finding-card ul{padding-left:1.2rem;margin-top:.5rem}
+.finding-card li{margin-bottom:.35rem;font-size:.85rem}
+.rec{border-left:3px solid var(--gold);padding-left:1rem;margin:1rem 0;font-style:italic;color:rgba(248,248,240,.7);font-size:.88rem}
 
-/* Dimension cards */
-.dim-card{margin-bottom:20px}
-.dim-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px}
-.dim-name{font-size:1.1rem;font-weight:700;color:var(--text)}
-.dim-score{font-size:1.4rem;font-weight:800;color:var(--gold);min-width:64px;text-align:right}
-.score-bar-bg{height:8px;background:var(--border);border-radius:4px;overflow:hidden;margin-bottom:16px}
-.score-bar-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--gold-dim),var(--gold));transition:width .6s ease}
-
-.badge-section{margin-bottom:12px}
-.badge-section-label{font-size:.7rem;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-bottom:6px;font-weight:600}
-.badge{display:inline-block;padding:4px 12px;border-radius:20px;font-size:.8rem;margin:3px 4px 3px 0;line-height:1.4}
-.badge-green{background:var(--green-bg);color:var(--green);border:1px solid rgba(52,211,153,.2)}
-.badge-amber{background:var(--amber-bg);color:var(--amber);border:1px solid rgba(251,191,36,.2)}
+/* Blur overlay */
+.blurred{position:relative;filter:blur(5px);user-select:none;pointer-events:none}
+.blur-overlay{position:relative}
+.blur-overlay::after{content:'🔒 Full report available with Compass Sprint engagement';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(10,15,30,.92);border:1px solid var(--gold);color:var(--gold);padding:.75rem 1.5rem;border-radius:6px;font-size:.82rem;font-weight:600;text-align:center;white-space:nowrap;z-index:10;pointer-events:auto}
+.partial-blur .phase{margin-bottom:1rem}
+.partial-blur .phase.locked{filter:blur(5px);user-select:none;pointer-events:none}
 
 /* Roadmap */
-.roadmap-phase{margin-bottom:24px}
-.phase-header{display:flex;align-items:center;gap:12px;margin-bottom:10px}
-.phase-badge{background:var(--gold);color:var(--bg);font-weight:700;font-size:.8rem;padding:4px 14px;border-radius:20px;white-space:nowrap}
-.phase-title{font-weight:600;color:var(--text)}
-.roadmap-list{list-style:none;padding-left:0}
-.roadmap-list li{padding:6px 0 6px 24px;position:relative;color:var(--text-muted);font-size:.95rem}
-.roadmap-list li::before{content:"→";position:absolute;left:0;color:var(--gold)}
+.roadmap-phase{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:1.25rem;margin:.75rem 0}
+.roadmap-phase .phase-title{font-weight:700;color:var(--gold);margin-bottom:.5rem;font-size:.9rem}
+.roadmap-phase ul{padding-left:1.2rem}
+.roadmap-phase li{font-size:.85rem;margin-bottom:.3rem}
 
 /* CTA */
-.cta-section{text-align:center;padding:40px 32px}
-.cta-section p{color:var(--text-muted);margin-bottom:24px;font-size:1rem}
-.btn{display:inline-block;padding:14px 40px;background:var(--gold);color:var(--bg);font-weight:700;font-size:1rem;border-radius:8px;text-decoration:none;letter-spacing:.5px;transition:opacity .2s}
-.btn:hover{opacity:.85}
-.btn-outline{background:transparent;border:1px solid var(--border);color:var(--text-muted);padding:10px 24px;font-size:.85rem;margin-left:12px}
-.btn-outline:hover{border-color:var(--gold);color:var(--gold)}
+.cta{text-align:center;padding:3rem 1.5rem;background:linear-gradient(135deg,rgba(201,168,76,.08),rgba(10,15,30,.95));border:1px solid rgba(201,168,76,.25);border-radius:12px;margin-top:3rem}
+.cta h2{border:none;font-size:1.5rem;margin-bottom:.5rem}
+.cta .price{font-size:2rem;font-weight:800;color:var(--gold);margin:.75rem 0 .25rem}
+.cta .price-sub{color:var(--gray);font-size:.85rem;margin-bottom:1.5rem}
+.cta-btn{display:inline-block;background:var(--gold);color:var(--navy);padding:.85rem 2.5rem;border-radius:6px;font-weight:700;font-size:.95rem;text-decoration:none;letter-spacing:.03em;transition:all .2s}
+.cta-btn:hover{background:#d4b65e;transform:translateY(-1px);box-shadow:0 4px 20px rgba(201,168,76,.3)}
 
-/* Print button */
-.print-btn{position:fixed;bottom:24px;right:24px;background:var(--surface);border:1px solid var(--border);color:var(--text-muted);padding:10px 20px;border-radius:8px;cursor:pointer;font-size:.85rem;font-family:var(--font);z-index:100;transition:all .2s}
-.print-btn:hover{border-color:var(--gold);color:var(--gold)}
+/* Compass rose decoration */
+.compass-divider{text-align:center;margin:2rem 0;color:rgba(201,168,76,.25);font-size:1.5rem;letter-spacing:1rem}
 
-/* Print styles */
-@media print{
-  body{background:#fff;color:#111}
-  .card{border:1px solid #ddd;background:#fff;break-inside:avoid}
-  .card::before,.watermarked::before{display:none!important}
-  .print-btn{display:none}
-  .btn{color:#111;border:2px solid #111}
-  .dim-score,.overall-score-value,.section-title,.report-header h1{color:#8B7533!important}
-  .score-bar-bg{background:#e5e7eb}
-  .badge-green{background:#ecfdf5;color:#065f46;border-color:#a7f3d0}
-  .badge-amber{background:#fffbeb;color:#92400e;border-color:#fde68a}
-  .meta-label,.summary p,.roadmap-list li,.badge-section-label,.cta-section p{color:#444!important}
-  .meta-value,.dim-name,.phase-title{color:#111!important}
-}
-@media(max-width:600px){
-  .container{padding:16px}
-  .card{padding:20px}
-  .meta-grid{grid-template-columns:1fr}
-  .compass-wrap{width:160px;height:160px}
+/* Footer */
+footer{text-align:center;padding:2rem 0;color:var(--gray);font-size:.75rem;border-top:1px solid var(--border);margin-top:2rem}
+footer a{color:var(--gold);text-decoration:none}
+
+@media(max-width:640px){
+  .report-meta{flex-direction:column;gap:.5rem}
+  .blur-overlay::after{white-space:normal;width:80%;font-size:.75rem}
+  .cta .price{font-size:1.5rem}
+  th,td{padding:.5rem}
 }
 </style>
 </head>
 <body>
+
+<div class="watermark">SAMPLE — AMC POLARIS</div>
+
 <div class="container">
 
-<!-- HEADER -->
-<div class="card report-header watermarked">
-  <h1>Agent Maturity Compass — Assessment Report</h1>
-  <p class="subtitle">Confidential — Prepared by AMC Framework v2.1</p>
+  <!-- HEADER -->
+  <header class="report-header">
+    <div class="logo-mark"></div>
+    <h1>AMC <span>Compass Sprint</span> — Sample Report</h1>
+    <div class="report-meta">
+      <div><strong>Client:</strong> [CLIENT NAME]</div>
+      <div><strong>Date:</strong> February 2026</div>
+      <div><strong>Sprint Duration:</strong> 5 business days</div>
+      <div><strong>Lead Analyst:</strong> AMC Polaris Team</div>
+    </div>
+    <div>
+      <span class="badge">Compass Sprint v2.0</span>
+      <span class="badge confidential">Sample — Not Confidential</span>
+    </div>
+  </header>
 
-  <div class="meta-grid">
-    <div><div class="meta-label">Agent</div><div class="meta-value">InvoiceBot v2</div></div>
-    <div><div class="meta-label">Organization</div><div class="meta-value">Acme Corp</div></div>
-    <div><div class="meta-label">Assessment Date</div><div class="meta-value">January 2025</div></div>
-    <div><div class="meta-label">Assessor</div><div class="meta-value">AMC Framework v2.1</div></div>
-  </div>
+  <!-- EXECUTIVE SUMMARY -->
+  <section>
+    <div class="section-label">Section 01</div>
+    <h2>Executive Summary</h2>
+    <p>The client operates a mid-scale AI agent program spanning customer support automation, internal knowledge retrieval, and lead qualification — deployed across three business units with approximately 14 active agent workflows. Our Compass Sprint assessment reveals a program at <strong>early-to-mid maturity (weighted average L2.7)</strong>, with notable strength in evaluation practices but significant gaps in governance, cost management, and cross-team orchestration.</p>
+    <p>The program has achieved meaningful production deployments and clear business value in its support automation vertical. However, the absence of a centralized governance framework and inconsistent evaluation standards across teams create compounding risk as the organization scales from 14 to a projected 40+ agent workflows over the next two quarters.</p>
+    <p>This report provides a dimension-by-dimension maturity assessment, prioritized gaps, and a concrete 30/60/90-day roadmap to advance the program from reactive to structured maturity — unlocking the operational leverage needed for the next phase of growth.</p>
+  </section>
 
-  <!-- Compass Dial SVG -->
-  <div class="compass-wrap">
-    <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <linearGradient id="gArc" x1="0%" y1="0%" x2="100%" y2="0%">
-          <stop offset="0%" stop-color="#8B7533"/>
-          <stop offset="100%" stop-color="#C9A84C"/>
-        </linearGradient>
-      </defs>
-      <!-- Outer ring -->
-      <circle cx="100" cy="100" r="90" fill="none" stroke="#1E293B" stroke-width="6"/>
-      <!-- Score arc: 3.2/5 = 64% of 270deg = 172.8deg, start at 135deg -->
-      <circle cx="100" cy="100" r="90" fill="none" stroke="url(#gArc)" stroke-width="6"
-        stroke-dasharray="271.4 565" stroke-dashoffset="-106"
-        stroke-linecap="round" transform="rotate(0 100 100)"/>
-      <!-- Tick marks -->
-      <g stroke="#1E293B" stroke-width="1.5">
-        <line x1="100" y1="16" x2="100" y2="28" transform="rotate(-135 100 100)"/>
-        <line x1="100" y1="16" x2="100" y2="28" transform="rotate(-81 100 100)"/>
-        <line x1="100" y1="16" x2="100" y2="28" transform="rotate(-27 100 100)"/>
-        <line x1="100" y1="16" x2="100" y2="28" transform="rotate(27 100 100)"/>
-        <line x1="100" y1="16" x2="100" y2="28" transform="rotate(81 100 100)"/>
-        <line x1="100" y1="16" x2="100" y2="28" transform="rotate(135 100 100)"/>
-      </g>
-      <!-- Labels -->
-      <text x="28" y="170" fill="#94A3B8" font-size="11" font-family="system-ui">L1</text>
-      <text x="14" y="105" fill="#94A3B8" font-size="11" font-family="system-ui">L2</text>
-      <text x="52" y="36" fill="#94A3B8" font-size="11" font-family="system-ui">L3</text>
-      <text x="132" y="36" fill="#94A3B8" font-size="11" font-family="system-ui">L4</text>
-      <text x="170" y="105" fill="#94A3B8" font-size="11" font-family="system-ui">L5</text>
-      <!-- Needle -->
-      <line x1="100" y1="100" x2="100" y2="30" stroke="#C9A84C" stroke-width="2.5" stroke-linecap="round"
-        transform="rotate(37.8 100 100)"/>
-      <circle cx="100" cy="100" r="6" fill="#C9A84C"/>
-      <circle cx="100" cy="100" r="3" fill="#0A0F1E"/>
-      <!-- Center score -->
-      <text x="100" y="145" text-anchor="middle" fill="#C9A84C" font-size="28" font-weight="800" font-family="system-ui">L3.2</text>
-      <text x="100" y="162" text-anchor="middle" fill="#94A3B8" font-size="12" font-family="system-ui">of 5.0</text>
-    </svg>
-  </div>
-  <p class="overall-score-label">Overall Maturity Score</p>
+  <div class="compass-divider">◇ ◇ ◇</div>
+
+  <!-- MATURITY SCORECARD -->
+  <section>
+    <div class="section-label">Section 02</div>
+    <h2>Maturity Scorecard</h2>
+    <p>Each dimension is scored on the AMC Agent Maturity Model (L1–L5), from <em>Ad-hoc</em> to <em>Optimizing</em>.</p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Dimension</th><th>Score</th><th>Evidence Summary</th><th>Priority</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Evaluation</strong></td>
+            <td><span class="score high">L4</span></td>
+            <td>Automated eval suites for 9/14 agents; regression testing on PR merge; custom rubrics for support quality</td>
+            <td class="priority-low">Maintain</td>
+          </tr>
+          <tr>
+            <td><strong>Governance</strong></td>
+            <td><span class="score">L2</span></td>
+            <td>No centralized policy; ad-hoc approval via Slack threads; no audit trail for production changes</td>
+            <td class="priority-high">Critical</td>
+          </tr>
+          <tr>
+            <td><strong>Architecture</strong></td>
+            <td><span class="score">L3</span></td>
+            <td>Shared LLM gateway; inconsistent tool-use patterns; no standard agent template across teams</td>
+            <td class="priority-med">High</td>
+          </tr>
+          <tr>
+            <td><strong>Orchestration</strong></td>
+            <td><span class="score">L2</span></td>
+            <td>Linear chains only; no multi-agent coordination; manual handoffs between agent stages</td>
+            <td class="priority-high">Critical</td>
+          </tr>
+          <tr>
+            <td><strong>Observability</strong></td>
+            <td><span class="score">L3</span></td>
+            <td>Traces via LangSmith for 60% of agents; no unified dashboard; latency monitoring gaps</td>
+            <td class="priority-med">High</td>
+          </tr>
+          <tr>
+            <td><strong>Cost Management</strong></td>
+            <td><span class="score">L2</span></td>
+            <td>No per-agent cost attribution; monthly aggregate billing only; no budget thresholds or alerts</td>
+            <td class="priority-high">Critical</td>
+          </tr>
+          <tr>
+            <td><strong>Human-in-the-Loop</strong></td>
+            <td><span class="score">L3</span></td>
+            <td>Escalation paths defined for support agents; missing for internal tools; no confidence-based routing</td>
+            <td class="priority-med">Medium</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <div class="compass-divider">◇ ◇ ◇</div>
+
+  <!-- DEEP DIVE: EVALUATION (readable) -->
+  <section>
+    <div class="section-label">Section 03</div>
+    <h2>Dimension Deep-Dive: Evaluation</h2>
+    <p>Evaluation is the client's strongest dimension, reflecting early investment by the ML platform team in automated testing infrastructure.</p>
+
+    <div class="finding-card">
+      <h4>Current State</h4>
+      <ul>
+        <li>9 of 14 production agents have automated evaluation suites running on every pull request</li>
+        <li>Custom rubric-based scoring for support ticket quality (accuracy, tone, resolution completeness)</li>
+        <li>Regression test sets maintained with ~200 golden examples per agent vertical</li>
+        <li>Eval results surfaced in GitHub PR comments with pass/fail gating</li>
+      </ul>
+    </div>
+
+    <div class="finding-card">
+      <h4>Identified Gaps</h4>
+      <ul>
+        <li>5 agents (lead qualification, 2× internal knowledge, 2× data extraction) have zero automated evaluation</li>
+        <li>No adversarial or red-team evaluation for any agent — prompt injection and jailbreak resilience untested</li>
+        <li>Eval datasets are static; no mechanism to incorporate production failures into test sets</li>
+        <li>Cross-agent evaluation (e.g., handoff quality between support triage → specialist agent) not measured</li>
+      </ul>
+    </div>
+
+    <h3>Recommendations</h3>
+    <div class="rec">
+      <strong>R-EVAL-01:</strong> Extend eval coverage to all 14 agents within 30 days. Prioritize lead qualification agent given revenue impact.
+    </div>
+    <div class="rec">
+      <strong>R-EVAL-02:</strong> Implement adversarial eval suite using OWASP LLM Top 10 as baseline. Target: 60-day delivery.
+    </div>
+    <div class="rec">
+      <strong>R-EVAL-03:</strong> Build production-feedback loop — auto-flag low-confidence or user-escalated interactions for eval set inclusion.
+    </div>
+    <div class="rec">
+      <strong>R-EVAL-04:</strong> Define cross-agent handoff metrics: context preservation score, latency at boundary, user satisfaction delta.
+    </div>
+  </section>
+
+  <div class="compass-divider">◇ ◇ ◇</div>
+
+  <!-- DEEP DIVE: GOVERNANCE (blurred) -->
+  <section>
+    <div class="section-label">Section 04</div>
+    <h2>Dimension Deep-Dive: Governance</h2>
+    <div class="blur-overlay">
+      <div class="blurred">
+        <p>Governance represents the most critical gap in the client's agent program. Without centralized oversight, the organization faces escalating compliance risk as agent count grows.</p>
+        <div class="finding-card">
+          <h4>Current State</h4>
+          <ul>
+            <li>No formal agent deployment approval process — teams self-deploy to production</li>
+            <li>System prompts stored inconsistently: some in version control, others in platform UIs</li>
+            <li>No change audit trail — unable to reconstruct what prompt or model version was live on any given date</li>
+            <li>Data access permissions granted at team level, not agent level — over-provisioned by default</li>
+          </ul>
+        </div>
+        <div class="finding-card">
+          <h4>Identified Gaps</h4>
+          <ul>
+            <li>Zero documentation of agent capabilities, boundaries, or authorized actions</li>
+            <li>No incident response playbook for agent failures or harmful outputs</li>
+            <li>Regulatory exposure: customer-facing agents process PII without documented data handling policies</li>
+            <li>No periodic review cadence — agents deployed 8+ months ago have never been re-evaluated</li>
+          </ul>
+        </div>
+        <h3>Recommendations</h3>
+        <div class="rec"><strong>R-GOV-01:</strong> Establish Agent Registry as single source of truth for all deployed agents within 14 days.</div>
+        <div class="rec"><strong>R-GOV-02:</strong> Implement mandatory deployment gates: eval pass, security review, data classification check.</div>
+        <div class="rec"><strong>R-GOV-03:</strong> Create Agent Cards (model cards adapted for agents) documenting capabilities, limitations, and authorized scope.</div>
+        <div class="rec"><strong>R-GOV-04:</strong> Define quarterly agent review cadence with mandatory re-evaluation against updated benchmarks.</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="compass-divider">◇ ◇ ◇</div>
+
+  <!-- 30/60/90 ROADMAP -->
+  <section>
+    <div class="section-label">Section 05</div>
+    <h2>30 / 60 / 90-Day Roadmap</h2>
+
+    <div class="roadmap-phase">
+      <div class="phase-title">📍 Days 1–30 — Foundation</div>
+      <ul>
+        <li><strong>Week 1:</strong> Launch Agent Registry — catalog all 14 agents with owner, status, data access, model version</li>
+        <li><strong>Week 2:</strong> Implement per-agent cost tagging via LLM gateway; deploy budget alert thresholds</li>
+        <li><strong>Week 3:</strong> Extend eval coverage to remaining 5 agents; prioritize lead qualification</li>
+        <li><strong>Week 4:</strong> Draft governance policy v1 — deployment gates, change management, incident response template</li>
+      </ul>
+    </div>
+
+    <div class="blur-overlay">
+      <div class="roadmap-phase blurred">
+        <div class="phase-title">📍 Days 31–60 — Hardening</div>
+        <ul>
+          <li><strong>Week 5–6:</strong> Deploy unified observability dashboard; consolidate LangSmith + custom traces</li>
+          <li><strong>Week 6–7:</strong> Implement adversarial eval suite; run first red-team exercise across all customer-facing agents</li>
+          <li><strong>Week 7–8:</strong> Build confidence-based routing for human-in-the-loop escalation; pilot on support vertical</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="blur-overlay">
+      <div class="roadmap-phase blurred">
+        <div class="phase-title">📍 Days 61–90 — Scale</div>
+        <ul>
+          <li><strong>Week 9–10:</strong> Deploy multi-agent orchestration framework; migrate linear chains to DAG-based coordination</li>
+          <li><strong>Week 10–11:</strong> Launch agent template library — standardized patterns for common agent types</li>
+          <li><strong>Week 11–12:</strong> Conduct first quarterly agent review; update maturity scores; set Q2 targets</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <div class="compass-divider">◇ ◇ ◇</div>
+
+  <!-- CTA -->
+  <section class="cta">
+    <div class="section-label">Get Started</div>
+    <h2>Want Your Own <span style="color:var(--gold)">Compass Sprint</span>?</h2>
+    <div class="price">$5,000 / 5 Days</div>
+    <div class="price-sub">Full maturity assessment · Prioritized roadmap · Executive-ready deliverable</div>
+    <a href="index.html" class="cta-btn">Book Your Compass Sprint →</a>
+  </section>
+
+  <footer>
+    <p>© 2026 AMC Polaris. All rights reserved. This sample report is for demonstration purposes only.</p>
+    <p style="margin-top:.5rem"><a href="index.html">← Back to AMC Home</a></p>
+  </footer>
+
 </div>
 
-<!-- EXECUTIVE SUMMARY -->
-<div class="card watermarked">
-  <div class="section-title">Executive Summary</div>
-  <div class="summary">
-    <p>InvoiceBot v2 demonstrates solid operational foundations with strong governance and operating model practices, achieving Level 4.0 in both dimensions. The agent processes approximately 2,400 invoices per day with a 94.2% automation rate, reflecting mature deployment and operational workflows. Security and reliability are well-established at Level 3.5, with appropriate access controls and monitoring in place.</p>
-    <p>Key gaps exist in evaluation coverage (Level 2.0) and cost efficiency monitoring (Level 2.5). Evaluation is limited to 42 happy-path test cases with no adversarial testing or regression detection. Cost attribution remains at the aggregate level, preventing optimization of routing decisions and per-transaction economics.</p>
-    <p>Primary recommendation: establish a continuous evaluation pipeline with 200+ test cases and implement per-transaction cost tracking within 30 days. These two interventions address the most significant risk vectors — undetected failure modes and unoptimized spend — and form the foundation for achieving Level 4+ maturity across all dimensions within 90 days.</p>
-  </div>
-</div>
-
-<!-- DIMENSIONS -->
-<div class="card watermarked">
-  <div class="section-title">Dimension Scores</div>
-
-  <!-- 1. Governance -->
-  <div class="dim-card">
-    <div class="dim-header"><span class="dim-name">1. Governance</span><span class="dim-score">L4.0</span></div>
-    <div class="score-bar-bg"><div class="score-bar-fill" style="width:80%"></div></div>
-    <div class="badge-section">
-      <div class="badge-section-label">✓ Evidence</div>
-      <span class="badge badge-green">Documented RACI matrix</span>
-      <span class="badge badge-green">Quarterly review cadence</span>
-      <span class="badge badge-green">Change management with approval gates</span>
-    </div>
-    <div class="badge-section">
-      <div class="badge-section-label">⚠ Gaps</div>
-      <span class="badge badge-amber">No automated policy enforcement</span>
-      <span class="badge badge-amber">Governance decisions are manual</span>
-    </div>
-  </div>
-
-  <!-- 2. Security -->
-  <div class="dim-card">
-    <div class="dim-header"><span class="dim-name">2. Security</span><span class="dim-score">L3.5</span></div>
-    <div class="score-bar-bg"><div class="score-bar-fill" style="width:70%"></div></div>
-    <div class="badge-section">
-      <div class="badge-section-label">✓ Evidence</div>
-      <span class="badge badge-green">Least-privilege tool access</span>
-      <span class="badge badge-green">API key rotation every 90 days</span>
-      <span class="badge badge-green">Audit logging on all tool calls</span>
-    </div>
-    <div class="badge-section">
-      <div class="badge-section-label">⚠ Gaps</div>
-      <span class="badge badge-amber">No runtime permission boundaries</span>
-      <span class="badge badge-amber">No cryptographic attestation</span>
-    </div>
-  </div>
-
-  <!-- 3. Evaluation -->
-  <div class="dim-card">
-    <div class="dim-header"><span class="dim-name">3. Evaluation</span><span class="dim-score">L2.0</span></div>
-    <div class="score-bar-bg"><div class="score-bar-fill" style="width:40%"></div></div>
-    <div class="badge-section">
-      <div class="badge-section-label">✓ Evidence</div>
-      <span class="badge badge-green">42 test cases covering core scenarios</span>
-    </div>
-    <div class="badge-section">
-      <div class="badge-section-label">⚠ Gaps</div>
-      <span class="badge badge-amber">No adversarial testing</span>
-      <span class="badge badge-amber">No regression detection</span>
-      <span class="badge badge-amber">No human-in-loop eval pipeline</span>
-    </div>
-  </div>
-
-  <!-- 4. Reliability -->
-  <div class="dim-card">
-    <div class="dim-header"><span class="dim-name">4. Reliability</span><span class="dim-score">L3.5</span></div>
-    <div class="score-bar-bg"><div class="score-bar-fill" style="width:70%"></div></div>
-    <div class="badge-section">
-      <div class="badge-section-label">✓ Evidence</div>
-      <span class="badge badge-green">Automated alerts</span>
-      <span class="badge badge-green">Runbook for top 5 failure modes</span>
-      <span class="badge badge-green">99.2% uptime last 90 days</span>
-    </div>
-    <div class="badge-section">
-      <div class="badge-section-label">⚠ Gaps</div>
-      <span class="badge badge-amber">No chaos testing</span>
-      <span class="badge badge-amber">No formal SLA</span>
-      <span class="badge badge-amber">Fallback chain covers 3 of 7 failure modes</span>
-    </div>
-  </div>
-
-  <!-- 5. Observability -->
-  <div class="dim-card">
-    <div class="dim-header"><span class="dim-name">5. Observability</span><span class="dim-score">L3.0</span></div>
-    <div class="score-bar-bg"><div class="score-bar-fill" style="width:60%"></div></div>
-    <div class="badge-section">
-      <div class="badge-section-label">✓ Evidence</div>
-      <span class="badge badge-green">Structured logging</span>
-      <span class="badge badge-green">Basic dashboards</span>
-      <span class="badge badge-green">Trace IDs on all requests</span>
-    </div>
-    <div class="badge-section">
-      <div class="badge-section-label">⚠ Gaps</div>
-      <span class="badge badge-amber">No distributed tracing across agent chains</span>
-      <span class="badge badge-amber">No anomaly detection</span>
-    </div>
-  </div>
-
-  <!-- 6. Cost Efficiency -->
-  <div class="dim-card">
-    <div class="dim-header"><span class="dim-name">6. Cost Efficiency</span><span class="dim-score">L2.5</span></div>
-    <div class="score-bar-bg"><div class="score-bar-fill" style="width:50%"></div></div>
-    <div class="badge-section">
-      <div class="badge-section-label">✓ Evidence</div>
-      <span class="badge badge-green">Monthly cost review</span>
-      <span class="badge badge-green">Aggregate cloud billing tracked</span>
-    </div>
-    <div class="badge-section">
-      <div class="badge-section-label">⚠ Gaps</div>
-      <span class="badge badge-amber">No per-transaction cost attribution</span>
-      <span class="badge badge-amber">No dynamic model routing</span>
-      <span class="badge badge-amber">No budget alerts</span>
-    </div>
-  </div>
-
-  <!-- 7. Operating Model -->
-  <div class="dim-card">
-    <div class="dim-header"><span class="dim-name">7. Operating Model</span><span class="dim-score">L4.0</span></div>
-    <div class="score-bar-bg"><div class="score-bar-fill" style="width:80%"></div></div>
-    <div class="badge-section">
-      <div class="badge-section-label">✓ Evidence</div>
-      <span class="badge badge-green">Dedicated team</span>
-      <span class="badge badge-green">Defined on-call rotation</span>
-      <span class="badge badge-green">Documented deployment process</span>
-      <span class="badge badge-green">Rollback procedures</span>
-    </div>
-    <div class="badge-section">
-      <div class="badge-section-label">⚠ Gaps</div>
-      <span class="badge badge-amber">No automated canary deployments</span>
-      <span class="badge badge-amber">Post-incident reviews ad-hoc</span>
-    </div>
-  </div>
-</div>
-
-<!-- ROADMAP -->
-<div class="card watermarked">
-  <div class="section-title">30 / 60 / 90 Day Roadmap</div>
-
-  <div class="roadmap-phase">
-    <div class="phase-header"><span class="phase-badge">30 DAYS</span><span class="phase-title">Foundation & Quick Wins</span></div>
-    <ul class="roadmap-list">
-      <li>Establish continuous eval pipeline (target: 200+ test cases)</li>
-      <li>Implement per-transaction cost tracking</li>
-      <li>Add runtime permission boundaries</li>
-    </ul>
-  </div>
-
-  <div class="roadmap-phase">
-    <div class="phase-header"><span class="phase-badge">60 DAYS</span><span class="phase-title">Hardening & Detection</span></div>
-    <ul class="roadmap-list">
-      <li>Deploy adversarial test suite</li>
-      <li>Implement budget alerts + cost anomaly detection</li>
-      <li>Formalize SLA with chaos testing plan</li>
-    </ul>
-  </div>
-
-  <div class="roadmap-phase">
-    <div class="phase-header"><span class="phase-badge">90 DAYS</span><span class="phase-title">Excellence & Automation</span></div>
-    <ul class="roadmap-list">
-      <li>Achieve L4+ across all dimensions</li>
-      <li>Implement policy-as-code governance</li>
-      <li>Dynamic model routing for cost optimization</li>
-      <li>Full distributed tracing</li>
-    </ul>
-  </div>
-</div>
-
-<!-- CTA -->
-<div class="card cta-section watermarked">
-  <p>This is a sample report. Get your actual AMC assessment at <strong>agentmaturity.com</strong></p>
-  <a href="mailto:hello@agentmaturity.com" class="btn">Get Your AMC Score</a>
-  <a href="index.html" class="btn btn-outline">← Back to Home</a>
-</div>
-
-</div><!-- /container -->
-
-<button class="print-btn" onclick="window.print()">🖨 Print Report</button>
 </body>
 </html>

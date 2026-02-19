@@ -266,7 +266,9 @@ def _row_to_checkpoint(row: sqlite3.Row) -> CheckpointRecord:
 class WorkflowEngine:
     """Durable workflow engine with SQLite-backed checkpoints."""
 
-    def __init__(self, db_path: str) -> None:
+    def __init__(self, db_path: str | None = None) -> None:
+        if db_path is None:
+            db_path = str(product_db_path("workflow_engine.db"))
         self._db_path = db_path
         self._lock = threading.Lock()
         self._init_db()
@@ -289,10 +291,26 @@ class WorkflowEngine:
     def create_workflow(
         self,
         name: str,
-        description: str,
-        steps: list[StepDefinition],
+        description: str | list | None = None,
+        steps: list[StepDefinition] | None = None,
         input_data: dict[str, Any] | None = None,
     ) -> WorkflowRecord:
+        # Support shorthand: create_workflow("name", ["step1", "step2"])
+        if isinstance(description, list):
+            steps = description
+            description = ""
+        if description is None:
+            description = ""
+        if steps is None:
+            steps = []
+        # Auto-convert string step names to StepDefinition objects
+        converted_steps: list[StepDefinition] = []
+        for i, s in enumerate(steps):
+            if isinstance(s, str):
+                converted_steps.append(StepDefinition(name=s, fn_name=s, seq=i))
+            else:
+                converted_steps.append(s)
+        steps = converted_steps
         now = _now()
         workflow_id = _make_workflow_id(name, now)
         input_json = json.dumps(input_data) if input_data is not None else None

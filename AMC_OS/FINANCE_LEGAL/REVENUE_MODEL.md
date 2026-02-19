@@ -1,150 +1,150 @@
-# REVENUE MODEL (REV_CFO_FINANCE)
-
-## 1) Business model summary
-AMC operates a **productized B2B AI implementation + growth execution** model with two primary revenue streams:
-1. **Implementation Sprint (one-time setup)**
-2. **Managed Growth Retainer (ongoing execution + optimization)**
-
-Secondary streams:
-- Add-on automation scopes
-- Partner/referral sourced deals
-- Upsell from SMB to Mid-Market plans
+# REVENUE MODEL — Honest Math
+**Owner:** REV_CFO_FINANCE | **CEO:** POLARIS
+**Created:** 2026-02-19 | **Lever:** B (Conversion)
 
 ---
 
-## 2) Pricing architecture (INR)
-
-### Core offers
-- **Starter Sprint (SMB):** ₹1,20,000 one-time (2–3 weeks)
-- **Growth Sprint (Mid-Market):** ₹2,40,000 one-time (3–4 weeks)
-- **SMB Retainer:** ₹75,000 / month
-- **Mid-Market Retainer:** ₹1,50,000 / month
-
-### Typical contract mix assumption
-- 60% SMB logos, 40% Mid-Market logos
-- 70% of sprint clients convert to retainer within 30 days
-- 15% of retained clients purchase one add-on per quarter (avg ₹60,000)
+## Product: Compass Sprint
+- **Price:** $5,000 (standard) / $2,500 (sub-100 employees or intro)
+- **Delivery:** 5 business days
+- **Client time:** ~2 hours (intake call + review call)
+- **Our cost:** ~15-20 hours of assessment work (rubric scoring, evidence gathering, roadmap creation)
+- **Gross margin:** ~70-80% (labor is the primary cost, and it's AI-augmented)
 
 ---
 
-## 3) Unit economics assumptions (realistic baseline)
+## Scenario 1: $5,000 in 5 Days
 
-### Funnel + conversion assumptions
-- Avg qualified opportunities/month: 18
-- Win rate from qualified: 22%
-- New clients/month: ~4
-- Deal mix per month: 2 SMB sprint + 2 Mid-Market sprint
+**What it takes:** 1 Compass Sprint close at $5,000
 
-### Delivery capacity assumptions
-- Active sprint capacity at quality bar: 6 concurrent
-- Active retainer capacity per pod: 14 clients
-- Gross margin target:
-  - Sprint: 52–58%
-  - Retainer: 60–68%
+| Metric | Required | Realistic? |
+|---|---:|---|
+| Outreaches sent | 20 | ✅ Day 1-2 |
+| Reply rate | 20% (4 replies) | ✅ Achievable with personalized SPIN messages |
+| Reply → Call | 50% (2 calls) | ✅ If value prop is clear |
+| Call → Proposal | 100% (2 proposals) | ✅ Same-day proposal rule |
+| Proposal → Close | 50% (1 close) | ⚠️ Tight but possible |
+| Days to close | 3-4 | ⚠️ Fast for B2B, possible with urgency |
 
-### Collection assumptions
-- Sprint payment terms: 70% upfront, 30% at delivery signoff
-- Retainer terms: monthly advance (1st–5th), 7-day grace
-- Realized collections vs billed (net of delays/disputes): 92–95%
+**Verdict: Achievable.** Requires flawless execution on Day 0-2 and a prospect with active pain + budget authority. The 5-day timeline is tight but not impossible for a $5K purchase with a clear ROI story.
 
----
-
-## 4) 6-month target ladder (bookings, billings, cash)
-
-> All numbers are planning assumptions, not guarantees.
-
-| Month | New Sprints (count) | New MRR Added | Total MRR Exit | One-time Sprint Billings | Total Billings | Target Cash Collections |
-|---|---:|---:|---:|---:|---:|---:|
-| M1 | 4 | ₹2,25,000 | ₹2,25,000 | ₹7,20,000 | ₹9,45,000 | ₹8,40,000 |
-| M2 | 5 | ₹3,00,000 | ₹5,25,000 | ₹9,00,000 | ₹14,25,000 | ₹12,80,000 |
-| M3 | 6 | ₹3,75,000 | ₹9,00,000 | ₹10,80,000 | ₹19,80,000 | ₹18,00,000 |
-| M4 | 6 | ₹3,75,000 | ₹12,75,000 | ₹10,80,000 | ₹23,55,000 | ₹21,60,000 |
-| M5 | 7 | ₹4,50,000 | ₹17,25,000 | ₹12,60,000 | ₹29,85,000 | ₹27,30,000 |
-| M6 | 8 | ₹5,25,000 | ₹22,50,000 | ₹14,40,000 | ₹36,90,000 | ₹33,70,000 |
-
-### Ladder gates (must-hit checkpoints)
-1. **Gate A (by end M2):** ₹5L MRR exit + >90% on-time collections
-2. **Gate B (by end M4):** ₹12L+ MRR exit + DSO < 18 days
-3. **Gate C (by end M6):** ₹20L+ MRR exit + 3-month cash runway visibility
+**Risk factors:**
+- Weekend (Days 3-4 = Sat/Sun) may slow enterprise response
+- No case study yet — first close requires pure trust in methodology
+- Payment collection speed depends on client's procurement process
 
 ---
 
-## 5) Weekly cashflow checkpoint system
+## Scenario 2: $1M MRR in 25 Days
 
-### Weekly operating cadence (Friday CFO checkpoint)
-Track each week:
-1. **Opening cash balance**
-2. **Inflow (actual collected this week)**
-3. **Outflow (payroll, tools, contractors, ads, tax reserves)**
-4. **Net weekly burn / net generation**
-5. **Closing cash balance**
-6. **Receivables aging (0–7 / 8–15 / 16–30 / 31+)**
-7. **Next 14-day committed inflow vs committed outflow**
+**What it would require:**
 
-### Weekly threshold rules
-- **Green:** Next 14-day inflow >= 1.3x outflow
-- **Amber:** Next 14-day inflow 1.0x–1.29x outflow
-- **Red:** Next 14-day inflow < outflow
+| Path | Clients Needed | Avg MRR/Client | Total Clients in 25 Days |
+|---|---:|---:|---:|
+| Direct only | 200 | $5,000/mo | 200 (8/day) |
+| Agency only | 20 agencies × 10 clients | $5,000/mo | 200 via partners |
+| Hybrid | 50 direct + 10 agencies × 15 | 50×$5K + 150×$5K | 200 total |
 
-### Mandatory actions by status
-- **Green:** continue planned hiring/spend
-- **Amber:** freeze discretionary spend; pull forward collections
-- **Red:** no new discretionary spend; founder-level collection calls within 24h; payment-plan negotiations on payable side
+**Verdict: Not achievable in 25 days.** This requires:
+- A fully built sales team (we have AI roles, not humans)
+- Product-market fit proven at scale (we have 0 clients)
+- Agency partnerships operational (0 signed)
+- Self-serve product (not built)
+- Inbound demand engine (not generating leads yet)
+
+**$1M MRR is a 12-18 month target**, not a 25-day target. Pursuing it in 25 days would lead to bad decisions: spammy outreach, false promises, or underpriced deals.
 
 ---
 
-## 6) Revenue risk controls
-- No delivery start without signed SoW + initial payment proof
-- Credit terms only for approved accounts (max 15 days, one invoice cycle)
-- Client concentration cap: no single client >18% of monthly billings
-- Minimum gross margin floor per new deal: 50%
-- Tax reserve ringfence: 12% of gross collections moved weekly
+## Scenario 3: Most Likely 25-Day Outcome
+
+| Week | Clients | Revenue Collected | MRR Started |
+|---|---:|---:|---:|
+| 1 | 1 | $5,000 | $0 (one-time) |
+| 2 | 1-2 | $5,000-$10,000 | $0 |
+| 3 | 1-2 | $5,000-$10,000 | $5,000 (first retainer) |
+| 4 | 1 + agency pipeline | $5,000 | $5,000 |
+| **Total** | **3-5** | **$15,000-$30,000** | **$5,000-$10,000** |
+
+**This assumes:**
+- Outbound works (20%+ reply rate)
+- 1-2 agency conversations progress (but likely don't close in 25 days)
+- First client delivery goes well → testimonial → accelerates trust for clients 2-5
+- At least 1 client converts to retainer ($5K/mo ongoing monitoring)
 
 ---
 
-## 7) KPI dashboard (weekly + monthly)
+## Scenario 4: Realistic First Milestone — $50K MRR in 90 Days
 
-### Weekly
-- New bookings (₹)
-- Cash collected (₹)
-- Collection efficiency (%) = collected / due
-- DSO (days)
-- Gross margin realized (%)
-- Cash runway (months)
+**Path to $50K MRR:**
 
-### Monthly
-- MRR opening, expansion, churn, closing
-- Sprint-to-retainer conversion (%)
-- Revenue by channel (direct, partner, referral)
-- CAC payback estimate
-- Net revenue retention (when historical base stabilizes)
+| Source | Clients | MRR/Client | Total MRR |
+|---|---:|---:|---:|
+| Direct retainers | 5 | $5,000/mo | $25,000 |
+| Agency partners (3 agencies × 2 clients each) | 6 | $3,000/mo (our share) | $18,000 |
+| Assessment-only pipeline | 2 | $3,500/mo | $7,000 |
+| **Total** | **13** | | **$50,000** |
+
+**What needs to be true by Day 90:**
+1. Proven delivery: 5+ completed Sprints with documented outcomes
+2. 2-3 case studies / testimonials published
+3. 3+ agency partners actively selling white-label
+4. Inbound channel producing 5+ leads/week (content + community + SEO)
+5. Self-serve assessment (light version) driving awareness
+6. Retainer offer proven: clients see ongoing value in maturity monitoring
+
+**90-day investment required:**
+- Full-time founder effort on sales + delivery (Months 1-2)
+- Part-time on product improvement (Month 2-3)
+- Agency partner program operational by Month 2
+- Content engine running by Month 1 (LinkedIn + blog + community)
 
 ---
 
-## 8) Finance operating assumptions to review monthly
-- Win rate variance by segment
-- Discount leakage (% vs list price)
-- Delivery cost creep by account type
-- Payment delay pattern by client cohort
-- Capacity utilization vs quality SLA
+## Pricing Strategy
+
+| Offer | Price | Target Buyer | Use Case |
+|---|---:|---|---|
+| Compass Sprint (one-time) | $5,000 | AI team leads, CTOs | Initial maturity baseline |
+| Compass Sprint (small team) | $2,500 | Startups <100 people | Lower barrier to entry |
+| Maturity Monitoring (retainer) | $5,000/mo | Post-Sprint clients | Ongoing quarterly assessments + advisory |
+| White-Label Sprint (agency) | $3,000 | Agency partners | Agency brands and delivers, charges $5-8K |
+| Enterprise Program Assessment | $15,000-$25,000 | 500+ employee companies | Multi-agent fleet assessment |
 
 ---
 
-## Files created/updated
-- `AMC_OS/FINANCE_LEGAL/REVENUE_MODEL.md`
+## Unit Economics
 
-## Acceptance checks
-- Contains explicit pricing, funnel, and margin assumptions
-- Includes a month-by-month target ladder with numeric billings and cash collections
-- Defines weekly cashflow checkpoint fields and escalation triggers
+| Metric | Value |
+|---|---|
+| Compass Sprint price | $5,000 |
+| Delivery cost (labor, ~20h) | $1,000-$1,500 |
+| Gross margin | 70-80% |
+| CAC target | <$500 (founder-led sales) |
+| LTV (if 30% convert to retainer) | $5,000 + (0.3 × $5,000 × 6 months) = $14,000 |
+| LTV:CAC | 28:1 (excellent, but founder-led — won't scale linearly) |
 
-## Next actions
-1. Align this model with `AMC_OS/SALES/PRICING.md` and `AMC_OS/SALES/OFFERS.md` for one source of truth.
-2. Create a live weekly cash tracker in sheet format using these fields.
-3. Validate collection assumptions against first 8–12 signed invoices.
-4. Recalibrate conversion and margin assumptions at month-end.
+---
 
-## Risks/unknowns
-- Early-stage data is thin; assumptions may shift materially in first 60 days.
-- Mid-Market sales cycles can delay MRR ramp timing.
-- Collection cycle risk increases if enterprise terms are extended without controls.
+## Acceptance Checks
+- [x] Honest math on all 4 scenarios
+- [x] $1M/25-day target explicitly called unrealistic
+- [x] Most likely outcome modeled conservatively
+- [x] $50K/90-day milestone with specific requirements
+- [x] Pricing strategy with multiple offers
+- [x] Unit economics calculated
+- [x] No guaranteed income claims
+
+## Next Actions
+1. Set up Stripe payment link for $5,000 and $2,500
+2. Create invoice template for enterprise/agency clients
+3. Track actual vs. modeled conversion rates from Day 1
+4. Revisit model weekly — adjust based on real data
+5. Build retainer offer doc once first Sprint is delivered
+
+## Risks/Unknowns
+- All conversion rates are assumptions until proven with data
+- Enterprise procurement may extend close times beyond 5 days
+- Agency economics depend on white-label quality being high enough
+- Retainer conversion rate (30%) is aspirational — could be 10-50%
+- Founder bandwidth is the real constraint — AI roles augment but don't replace human effort

@@ -154,6 +154,13 @@ class SecretsBroker(ABC):
     rather than appending to ``_usage_log`` directly.
     """
 
+    def __new__(cls, *args, **kwargs):
+        if cls is SecretsBroker:
+            # Return a concrete EnvVaultBackend when instantiating the abstract class directly
+            from amc.vault.v1_secrets_broker import EnvVaultBackend
+            return object.__new__(EnvVaultBackend)
+        return object.__new__(cls)
+
     def __init__(self) -> None:
         self._usage_log: list[UsageLogEntry] = []
 

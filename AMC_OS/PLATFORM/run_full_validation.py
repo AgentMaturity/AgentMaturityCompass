@@ -4,6 +4,13 @@ Covers: pytest suite, module imports, correct API calls, L5 scoring, BUG regress
 """
 import sys, os, time, tempfile, shutil, subprocess, asyncio
 sys.path.insert(0, '.')
+# Inject venv site-packages so importlib.import_module works with venv deps
+_venv_site = os.path.join(os.path.dirname(__file__), '.venv', 'lib')
+if os.path.isdir(_venv_site):
+    for _d in os.listdir(_venv_site):
+        _sp = os.path.join(_venv_site, _d, 'site-packages')
+        if os.path.isdir(_sp) and _sp not in sys.path:
+            sys.path.insert(1, _sp)
 
 START = time.time()
 passed = 0; failed = 0; results = []
@@ -278,6 +285,78 @@ def test_invoicebot_l5():
     dim_levels = {s.dimension.value: s.level.value for s in result.dimension_scores}
     return f"overall={result.overall_level}, dims={dim_levels}"
 check("invoicebot_l5_profile", test_invoicebot_l5)
+
+# ─────────────────────────────────────────
+print("\n=== PHASE 7: Evidence Scoring System ===")
+# ─────────────────────────────────────────
+def test_evidence_scoring():
+    from amc.score.evidence import EvidenceArtifact, EvidenceKind, TRUST_MULTIPLIERS
+    from amc.score.evidence_collector import EvidenceCollector
+    from amc.score.dimensions import ScoringEngine, DIMENSION_RUBRICS
+    from pathlib import Path
+    import datetime
+
+    engine = ScoringEngine()
+
+    # 1. EvidenceArtifact model works
+    art = EvidenceArtifact(
+        qid="sec_1", kind=EvidenceKind.EXECUTION_VERIFIED,
+        claim="ToolPolicyFirewall instantiated",
+        execution_result="instance created", verified_at=datetime.datetime.now(datetime.timezone.utc).isoformat(),
+        trust_score=EvidenceArtifact.trust_for_kind(EvidenceKind.EXECUTION_VERIFIED),
+    )
+    assert art.trust_score == 1.0, f"EXECUTION_VERIFIED should be 1.0, got {art.trust_score}"
+
+    # 2. Failed execution → 0 trust
+    failed_art = EvidenceArtifact(
+        qid="sec_2", kind=EvidenceKind.EXECUTION_VERIFIED,
+        claim="InjectionDetector failed",
+        execution_error="ImportError", verified_at=datetime.datetime.now(datetime.timezone.utc).isoformat(),
+        trust_score=EvidenceArtifact.trust_for_kind(EvidenceKind.EXECUTION_VERIFIED, has_error=True),
+    )
+    assert failed_art.trust_score == 0.0, f"Failed execution should be 0.0"
+
+    # 3. score_with_evidence works end-to-end
+    now = datetime.datetime.now(datetime.timezone.utc).isoformat()
+    evidence = [
+        EvidenceArtifact(qid="sec_1", kind=EvidenceKind.EXECUTION_VERIFIED, claim="ok",
+                         verified_at=now, trust_score=1.0),
+        EvidenceArtifact(qid="sec_2", kind=EvidenceKind.KEYWORD_CLAIM, claim="claimed",
+                         verified_at=now, trust_score=0.4),
+    ]
+    result = engine.score_with_evidence(evidence)
+    assert result.overall_score >= 0
+    assert len(result.dimension_scores) == 7
+
+    # 4. Keyword gaming produces lower score than execution proof
+    keyword_answers = {}
+    for dim, rubrics in DIMENSION_RUBRICS.items():
+        for rubric in rubrics:
+            keyword_answers[rubric["qid"]] = " ".join(rubric["yes"] + rubric["evidence"])
+    keyword_score = engine.score_all(keyword_answers)
+
+    # Evidence with only keyword claims for same qids
+    keyword_evidence = []
+    for dim, rubrics in DIMENSION_RUBRICS.items():
+        for rubric in rubrics:
+            keyword_evidence.append(EvidenceArtifact(
+                qid=rubric["qid"], kind=EvidenceKind.KEYWORD_CLAIM,
+                claim="keyword only", verified_at=now, trust_score=0.4,
+            ))
+    evidence_score = engine.score_with_evidence(keyword_evidence)
+    assert evidence_score.overall_score < keyword_score.overall_score, \
+        f"KEYWORD_CLAIM evidence ({evidence_score.overall_score}) should score lower than keyword-stuffed answers ({keyword_score.overall_score})"
+
+    # 5. EvidenceCollector works
+    collector = EvidenceCollector()
+    cmb_path = Path(__file__).resolve().parent / "amc" / "agents" / "content_moderation_bot.py"
+    if cmb_path.exists():
+        artifacts = collector.collect_all(cmb_path)
+        assert len(artifacts) > 0
+
+    return f"evidence_model=ok, scoring=ok, anti_gaming=ok (keyword={keyword_score.overall_score} > evidence={evidence_score.overall_score})"
+
+check("evidence_scoring_works", test_evidence_scoring)
 
 # ─────────────────────────────────────────
 print(f"\n{'='*60}")

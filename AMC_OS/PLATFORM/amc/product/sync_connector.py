@@ -134,16 +134,16 @@ class SourceType(str, Enum):
 
 @dataclass
 class SyncConnector:
-    connector_id: str
-    name: str
-    source_type: SourceType
-    config: dict[str, Any]
-    last_sync_at: str | None
-    last_cursor: str | None
-    status: SyncStatus
-    metadata: dict[str, Any]
-    created_at: str
-    updated_at: str
+    connector_id: str = ""
+    name: str = ""
+    source_type: SourceType = SourceType.CUSTOM
+    config: dict[str, Any] = field(default_factory=dict)
+    last_sync_at: str | None = None
+    last_cursor: str | None = None
+    status: SyncStatus = SyncStatus.IDLE
+    metadata: dict[str, Any] = field(default_factory=dict)
+    created_at: str = ""
+    updated_at: str = ""
 
     @property
     def dict(self) -> dict[str, Any]:

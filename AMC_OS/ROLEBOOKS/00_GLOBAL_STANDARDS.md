@@ -138,6 +138,8 @@ If work cannot map to A/B/C: stop, propose a better task, or assist another agen
 ## WORLD-RENOWNED PLAYBOOK LIBRARY (apply explicitly, cite in deliverables)
 
 ### PLAYBOOK A: SPIN Selling (high-ticket consultative selling)
+**Applies to:** REV_SDR_SMB, REV_SDR_MIDMARKET, REV_SDR_AGENCY, REV_ACCOUNT_EXEC_CLOSER, REV_HEAD_OF_SALES
+
 SPIN = Situation / Problem / Implication / Need-Payoff
 
 **Rule**: Never pitch until you've earned the "Implication" and "Need-Payoff" moments.
@@ -153,6 +155,8 @@ Close move: Summarize pains in 30 seconds → propose the Sprint as fastest risk
 ---
 
 ### PLAYBOOK B: Challenger Sale (enterprise credibility)
+**Applies to:** REV_ACCOUNT_EXEC_CLOSER, REV_SALES_ENGINEER_DEMOS (enterprise deals)
+
 Teach / Tailor / Take Control — build constructive tension, reframe the problem.
 
 **Rule**: Bring a point of view. Make the buyer feel smarter for talking to you.
@@ -166,6 +170,8 @@ Take Control: End every call with a scheduled next step.
 ---
 
 ### PLAYBOOK C: StoryBrand (messaging clarity that converts)
+**Applies to:** REV_BRAND_MESSAGING, REV_COPYWRITER_DIRECT_RESPONSE, REV_COPYWRITER_TECHNICAL, REV_CONTENT_STRATEGIST, REV_LANDING_PAGE_BUILDER
+
 7-part framework: make the customer the hero, AMC the guide.
 
 **Rule**: No cleverness until clarity is perfect.
@@ -182,15 +188,29 @@ BrandScript skeleton for AMC:
 ---
 
 ### PLAYBOOK D: Jobs-to-be-Done (JTBD)
+**Applies to:** REV_PRODUCT_MANAGER, REV_BRAND_MESSAGING, INNO_PAINPOINT_SYNTHESIZER
+
 Understand the forces that drive decisions — functional, social, emotional.
 
 **Rule**: Stop selling "maturity." Sell the job: "Help me decide what to do next with agent risk + ROI."
 
 JTBD template: "When we are about to ___ (trigger), we need to ___ (job) so we can ___ (outcome), despite ___ (constraints)."
 
+**Forces Analysis** (map all four before positioning):
+| Force | Direction | Example (AMC) |
+|-------|-----------|---------------|
+| **Push of current situation** | Drives switch | "Agents failing silently, no visibility into reliability or cost drift" |
+| **Pull of new solution** | Attracts switch | "Evidence-based maturity score + clear 30/60/90 roadmap" |
+| **Anxiety of new solution** | Resists switch | "Will the assessment disrupt production? Is the vendor credible?" |
+| **Habit of current behavior** | Resists switch | "We've been winging it and nothing has blown up yet" |
+
+**Rule**: Reduce anxiety and break habit explicitly in every pitch, landing page, and proposal. If you can't name the buyer's habit and anxiety, you haven't done the JTBD work.
+
 ---
 
 ### PLAYBOOK E: The Mom Test (customer conversations without bias)
+**Applies to:** All INNO_* roles, REV_SDR_SMB, REV_SDR_MIDMARKET, REV_SDR_AGENCY, REV_ACCOUNT_EXEC_CLOSER
+
 Learn truth from conversations without leading witnesses.
 
 **Rule**: Never ask "Would you buy?" Ask about reality.
@@ -202,6 +222,7 @@ Learn truth from conversations without leading witnesses.
 ---
 
 ### PLAYBOOK F: Traction Bullseye (focus on ONE channel)
+**Applies to:** REV_HEAD_OF_GROWTH, REV_HEAD_OF_SALES, REV_COO_ORCH
 Test multiple traction channels, then focus hard on the one showing signal.
 
 **Rule**: No spray and pray. Run small tests, pick winner, scale.
@@ -215,9 +236,14 @@ For AMC's $5k sprint, likely candidates:
 ---
 
 ### PLAYBOOK G: Ogilvy Advertising Discipline
-Truth, facts, clarity. Consumers deserve information, not empty hype.
+**Applies to:** REV_COPYWRITER_DIRECT_RESPONSE, REV_COPYWRITER_TECHNICAL, REV_CONTENT_STRATEGIST, REV_EMAIL_NEWSLETTER
 
-**Rule**: Every claim tied to a deliverable or evidence.
+Truthful, factual, helpful, not boring. Consumers deserve information, not empty hype.
+
+**Rules**:
+- Every claim tied to a deliverable or evidence
+- No hype, no empty superlatives, no guaranteed outcomes
+- Write to inform and persuade with facts, never to manipulate
 
 Allowed: "We deliver X deliverables in Y days"
 Never: "We guarantee your revenue increases"
@@ -226,6 +252,8 @@ Never: "We are affiliated with X" (unless verified)
 ---
 
 ### PLAYBOOK H: Awwwards-Level Website Craft
+**Applies to:** REV_UX_UI_DESIGNER, REV_LANDING_PAGE_BUILDER, REV_BRAND_MESSAGING
+
 Evaluated on: Design, UX/UI, Creativity, Content.
 
 **Rule**: We're designing a conversion museum piece.
@@ -244,6 +272,7 @@ Visual concept for AMC — "From Chaos to Compass":
 ---
 
 ## DA VINCI QA CHECKLIST (run before ANYTHING ships)
+**Applies to:** ALL roles (mandatory)
 
 Before finalizing any deliverable, check:
 1. **Clarity**: Can a stranger explain this back in one sentence?

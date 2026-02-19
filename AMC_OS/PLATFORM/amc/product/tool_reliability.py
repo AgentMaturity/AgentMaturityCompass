@@ -253,6 +253,9 @@ class ToolReliabilityPredictor:
         self._refresh_cache(record.tool_name)
         return call_id
 
+    # Alias for backward compatibility
+    record = record_call
+
     def predict(
         self,
         tool_name: str,

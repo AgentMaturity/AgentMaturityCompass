@@ -227,7 +227,9 @@ def _row_to_delivery(row: sqlite3.Row) -> DeliveryRecord:
 class EventRouter:
     """Event router: matches events to route rules and logs delivery."""
 
-    def __init__(self, db_path: str) -> None:
+    def __init__(self, db_path: str | None = None) -> None:
+        if db_path is None:
+            db_path = str(product_db_path("event_router.db"))
         self._db_path = db_path
         self._lock = threading.Lock()
         self._init_db()

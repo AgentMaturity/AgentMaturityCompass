@@ -106,6 +106,11 @@ class LintResult(BaseModel):
         description="UTC timestamp when the lint was performed"
     )
 
+    @property
+    def overall_risk(self) -> str:
+        """Alias for risk_level for backward compatibility."""
+        return self.risk_level
+
 
 # ---------------------------------------------------------------------------
 # Severity weights used for score computation
@@ -710,3 +715,7 @@ def lint_startup_env(lint_config: LintConfig | None = None) -> LintResult:
         LintResult.
     """
     return ConfigRiskLinter(lint_config).lint_startup_env()
+
+
+# Alias for backward compatibility
+ConfigLinter = ConfigRiskLinter

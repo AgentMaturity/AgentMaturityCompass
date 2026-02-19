@@ -82,8 +82,8 @@ class ParameterContract:
 class ToolContract(BaseModel):
     """Normalized contract for one tool."""
 
-    tool_name: str
-    parameters: dict[str, ParameterContract]
+    tool_name: str = ""
+    parameters: dict[str, ParameterContract] = Field(default_factory=dict)
     allow_extra: bool = False
 
 

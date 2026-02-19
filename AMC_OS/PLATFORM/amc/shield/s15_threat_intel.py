@@ -188,7 +188,10 @@ class ThreatIntelFeed:
         Configuration including path to the SQLite DB.
     """
 
-    def __init__(self, config: FeedConfig) -> None:
+    def __init__(self, config: FeedConfig | None = None) -> None:
+        if config is None:
+            import tempfile
+            config = FeedConfig(local_cache_path=Path(tempfile.mkdtemp()) / "threat_intel.db")
         self.config = config
         self._db_path = str(config.local_cache_path)
         self._init_db()

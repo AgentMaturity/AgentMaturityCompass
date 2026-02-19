@@ -81,9 +81,11 @@ class ReverseProxyGuard:
 
     def __init__(
         self,
-        config: ProxyConfig,
+        config: ProxyConfig | None = None,
         db_path: str = "reverse_proxy_guard.db",
     ) -> None:
+        if config is None:
+            config = ProxyConfig()
         self.config = config
         self._db_path = Path(db_path)
         self._init_db()

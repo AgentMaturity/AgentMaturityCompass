@@ -199,7 +199,10 @@ class OutputCorrector:
       5. Custom (user-specified) DB rules
     """
 
-    def __init__(self, db_path: str) -> None:
+    def __init__(self, db_path: str | None = None) -> None:
+        if db_path is None:
+            from amc.product.persistence import product_db_path
+            db_path = str(product_db_path("output_corrector.db"))
         self._db_path = db_path
         self._conn = sqlite3.connect(db_path, check_same_thread=False)
         self._conn.row_factory = sqlite3.Row

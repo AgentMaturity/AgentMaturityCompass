@@ -130,18 +130,18 @@ def _auto_done_criteria(goal: str, outputs: list[str]) -> list[str]:
 
 @dataclass
 class TaskSpec:
-    spec_id: str
-    raw_request: str
-    goal: str
-    inputs: list[str]
-    outputs: list[str]
-    constraints: list[str]
-    done_criteria: list[str]
-    confidence: float
-    session_id: str
-    tenant_id: str
-    metadata: dict[str, Any]
-    created_at: str
+    spec_id: str = ""
+    raw_request: str = ""
+    goal: str = ""
+    inputs: list[str] = field(default_factory=list)
+    outputs: list[str] = field(default_factory=list)
+    constraints: list[str] = field(default_factory=list)
+    done_criteria: list[str] = field(default_factory=list)
+    confidence: float = 0.0
+    session_id: str = ""
+    tenant_id: str = ""
+    metadata: dict[str, Any] = field(default_factory=dict)
+    created_at: str = ""
 
     @property
     def dict(self) -> dict[str, Any]:

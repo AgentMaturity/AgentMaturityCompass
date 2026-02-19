@@ -236,9 +236,13 @@ class AutonomyDial:
             ).fetchone()
         return self._row_to_policy(row) if row else None
 
-    def list_policies(self, tenant_id: str, active_only: bool = True) -> list[PolicyRecord]:
-        q = "SELECT * FROM autonomy_policies WHERE tenant_id=?"
-        params: list[Any] = [tenant_id]
+    def list_policies(self, tenant_id: str | None = None, active_only: bool = True) -> list[PolicyRecord]:
+        if tenant_id is not None:
+            q = "SELECT * FROM autonomy_policies WHERE tenant_id=?"
+            params: list[Any] = [tenant_id]
+        else:
+            q = "SELECT * FROM autonomy_policies WHERE 1=1"
+            params = []
         if active_only:
             q += " AND active=1"
         with self._conn() as conn:
@@ -259,9 +263,13 @@ class AutonomyDial:
         self,
         tenant_id: str,
         task_type: str,
-        confidence: float = 1.0,
+        confidence: float | dict[str, Any] = 1.0,
         context: dict[str, Any] | None = None,
     ) -> AutonomyDecision:
+        # Handle case where confidence is actually a context dict
+        if isinstance(confidence, dict):
+            context = confidence
+            confidence = 1.0
         """Resolve the autonomy mode for a task and return a decision record."""
         policy = self.get_policy_for(tenant_id, task_type)
         if policy is None:

@@ -257,7 +257,10 @@ def _row_to_log_entry(row: sqlite3.Row) -> RetryLogEntry:
 class RetryEngine:
     """Segment-level retry engine with configurable backoff policies."""
 
-    def __init__(self, db_path: str) -> None:
+    def __init__(self, db_path: str | None = None) -> None:
+        if db_path is None:
+            from amc.product.persistence import product_db_path
+            db_path = str(product_db_path("retry_engine.db"))
         self._db_path = db_path
         self._lock = threading.Lock()
         self._init_db()

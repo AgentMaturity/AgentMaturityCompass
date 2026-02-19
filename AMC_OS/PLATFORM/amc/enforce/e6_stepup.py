@@ -35,7 +35,6 @@ from pathlib import Path
 from typing import Any, Callable
 from uuid import uuid4
 
-import httpx
 import structlog
 from pydantic import BaseModel, Field, field_validator
 from pydantic import ValidationError
@@ -230,6 +229,7 @@ class StepUpAuth:
         try:
             payload = req.model_dump()
             payload["risk_level"] = req.risk_level.value
+            import httpx
             with httpx.Client(timeout=10.0) as client:
                 resp = client.post(self.config.webhook_url, json=payload)
                 log.info("stepup.webhook", request_id=req.request_id, status=resp.status_code)

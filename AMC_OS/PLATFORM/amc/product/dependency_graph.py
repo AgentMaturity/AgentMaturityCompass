@@ -73,18 +73,18 @@ class DepEdge:
 
 @dataclass
 class DependencyGraph:
-    graph_id: str
-    name: str
-    nodes: list[DepNode]
-    edges: list[DepEdge]
-    has_cycle: bool
-    cycle_path: list[str]
-    execution_order: list[str]      # node_ids in topo order
-    layers: list[list[str]]         # parallel execution layers
-    critical_path: list[str]        # longest path
-    tenant_id: str
-    metadata: dict[str, Any]
-    created_at: str
+    graph_id: str = ""
+    name: str = ""
+    nodes: list[DepNode] = field(default_factory=list)
+    edges: list[DepEdge] = field(default_factory=list)
+    has_cycle: bool = False
+    cycle_path: list[str] = field(default_factory=list)
+    execution_order: list[str] = field(default_factory=list)      # node_ids in topo order
+    layers: list[list[str]] = field(default_factory=list)         # parallel execution layers
+    critical_path: list[str] = field(default_factory=list)        # longest path
+    tenant_id: str = ""
+    metadata: dict[str, Any] = field(default_factory=dict)
+    created_at: str = ""
 
     @property
     def dict(self) -> dict[str, Any]:
