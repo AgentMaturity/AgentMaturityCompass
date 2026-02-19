@@ -1,8 +1,19 @@
-# LAUNCH RUNBOOK
+# LAUNCH RUNBOOK (CODE-VALIDATED)
 
-This runbook is the final go-live flow after all AMC packs are integrated.
+This runbook is aligned to the current CLI surfaces in `src/cli.ts` and deployment assets under `deploy/`.
 
-## 1) Local Deployment
+## Scope and Preconditions
+
+- Node.js `>=20` (from `package.json`)
+- Build/test gate is green:
+
+```bash
+npm ci
+npm test
+npm run build
+```
+
+## 1) Local Go-Live (single workspace)
 
 ```bash
 npm i -g agent-maturity-compass
@@ -12,35 +23,49 @@ amc doctor --json
 amc verify all --json
 ```
 
-Use the console URL printed by `amc up` (pair LAN devices when enabled).
+Health checks:
+
+```bash
+curl -fsS http://127.0.0.1:3212/healthz
+curl -fsS http://127.0.0.1:3212/readyz
+```
+
+Notes:
+- Default API port `3212` is defined in runtime/env config.
+- `amc up` readiness preflight fails closed when required trust checks fail.
 
 ## 2) Docker Compose Deployment
 
 ```bash
-cd /Users/thewisecrab/AMC/deploy/compose
+cd deploy/compose
 cp .env.example .env
 docker compose up -d --build
 docker compose ps
 curl -fsS http://127.0.0.1:3212/readyz
 ```
 
-For TLS, use `docker-compose.tls.yml` and follow `/Users/thewisecrab/AMC/deploy/compose/README.md`.
-
-## 3) Kubernetes Helm Deployment
+TLS variant:
 
 ```bash
-helm lint /Users/thewisecrab/AMC/deploy/helm/amc
-helm template amc /Users/thewisecrab/AMC/deploy/helm/amc > /tmp/amc-rendered.yaml
-helm upgrade --install amc /Users/thewisecrab/AMC/deploy/helm/amc
+docker compose -f docker-compose.tls.yml up -d --build
 ```
 
-Validate:
-- `/healthz` and `/readyz`
-- ingress TLS
-- PVC binding
-- NetworkPolicy and hardened securityContext
+Reference: `deploy/compose/README.md`.
 
-## 4) Notary Enablement (Anti-Cheat Boundary)
+## 3) Helm Deployment
+
+```bash
+helm lint deploy/helm/amc
+helm template amc deploy/helm/amc > /tmp/amc-rendered.yaml
+helm upgrade --install amc deploy/helm/amc
+```
+
+Post-deploy checks:
+- service/ingress health (`/healthz`, `/readyz`)
+- PVC binding
+- securityContext + NetworkPolicy rendering as expected
+
+## 4) Notary Trust Boundary (recommended for production)
 
 ```bash
 amc notary init
@@ -49,9 +74,9 @@ amc trust enable-notary --base-url http://127.0.0.1:4343 --pin /path/to/notary.p
 amc trust status
 ```
 
-If NOTARY mode is required and notary is unavailable, readiness must fail closed.
+Notary server exposes `/healthz` and `/readyz`.
 
-## 5) SSO/SCIM Enablement
+## 5) Identity + SCIM
 
 ```bash
 amc identity init --host-dir /path/to/host
@@ -60,61 +85,63 @@ amc identity mapping add --host-dir /path/to/host --group amc-ws-default-owner -
 amc scim token create --host-dir /path/to/host --name idp-scim --out /secure/scim-token.txt
 ```
 
-## 6) Backup + Restore Drill
+## 6) Backup / Restore Drill (required before prod cutover)
 
 ```bash
 amc backup create --out .amc/backups/drill.amcbackup
 amc backup verify .amc/backups/drill.amcbackup
 amc backup restore .amc/backups/drill.amcbackup --to /tmp/amc-restore --force
-```
-
-Post-restore:
-
-```bash
 AMC_WORKSPACE_DIR=/tmp/amc-restore amc verify all --json
 ```
 
-## 7) Routine Maintenance + Retention
+## 7) Retention + Maintenance Baseline
 
 ```bash
 amc retention status
 amc retention run --dry-run
 amc retention run
+amc retention verify
+
 amc maintenance stats
 amc maintenance vacuum
 amc maintenance rotate-logs
 amc maintenance prune-cache
 ```
 
-## 8) Monitoring + Metrics
+## 8) Metrics + Runtime Observability
 
 ```bash
 amc metrics status
 curl -fsS http://127.0.0.1:9464/metrics
 ```
 
-Track at minimum:
-- HTTP request rate/latency
-- lease issuance
-- toolhub intents/exec outcomes
-- retention/blob/db size metrics
-- transparency root changes
-- integrity gauges
+Minimum operational telemetry:
+- request rate/latency
+- lease issuance and auth failures
+- retention/archive/blob/db size trends
+- transparency root/merkle root progression
 
 ## Day 0 / Day 7 / Day 30 Cadence
 
 ### Day 0
-- Run setup/bootstrap.
-- Validate `amc doctor --json`, `amc verify all --json`, and `amc e2e smoke --mode local --json`.
-- Enable backup schedule and metrics scraping.
+- `setup` + `up`
+- `doctor --json`, `verify all --json`, `e2e smoke --mode local --json`
+- Enable backup schedule + metrics scraping
 
 ### Day 7
-- Run retention + maintenance pass.
-- Verify latest backup age and restore drill.
-- Review advisories/forecast drift and regenerate transform plans.
+- Retention/maintenance run
+- Verify backup freshness + restore drill sample
+- Review forecast/advisory deltas and outstanding risks
 
 ### Day 30
-- Perform full verify-all gate and release verification.
-- Re-run docker/helm smoke checks.
-- Rotate signing/SCIM/notary credentials per policy.
-- Review ecosystem benchmark percentile movement and systemic risk deltas.
+- Full verify-all gate and release verification
+- Re-run deployment smoke path (compose/helm template)
+- Rotate high-risk credentials (notary/identity/scim) per policy
+
+## Evidence Pointers (source of truth)
+
+- CLI command registration: `src/cli.ts`
+- Studio readiness/health endpoints: `src/studio/studioServer.ts`
+- Default Studio ports + metrics wiring: `src/studio/studioSupervisor.ts`, `src/config/envSchema.ts`
+- Notary readiness endpoints/default port: `src/notary/notaryServer.ts`, `src/notary/notaryConfigSchema.ts`
+- Deployment assets: `deploy/compose/`, `deploy/helm/amc/`

@@ -85,7 +85,8 @@ export function getCurrentMode(): DegradationMode {
 }
 
 export function setMode(mode: DegradationMode, reason: string, ttlMs: number | null): ModeChangeEvent {
-  return changeMode(mode, "MANUAL", reason, ttlMs);
+  const safeTtlMs = normalizeTtlMs(ttlMs);
+  return changeMode(mode, "MANUAL", reason, safeTtlMs);
 }
 
 /**
@@ -108,21 +109,23 @@ export function isFeatureActive(feature: "evidence" | "scoring" | "governance" |
  */
 export function evaluateHealth(snapshot: HealthSnapshot): ModeChangeEvent | null {
   const mode = state.currentMode;
+  const safeLatencyMs = Number.isFinite(snapshot.p95LatencyMs) ? Math.max(0, snapshot.p95LatencyMs) : 0;
+  const safeErrorRate = Number.isFinite(snapshot.errorRate) ? Math.min(1, Math.max(0, snapshot.errorRate)) : 0;
 
   // Check for auto-degrade
-  if (snapshot.errorRate > MINIMAL_ERROR_RATE_THRESHOLD && mode !== "MINIMAL") {
+  if (safeErrorRate > MINIMAL_ERROR_RATE_THRESHOLD && mode !== "MINIMAL") {
     healthyStartTs = null;
-    return changeMode("MINIMAL", "AUTO_ERROR_RATE", `Error rate ${(snapshot.errorRate * 100).toFixed(1)}% exceeds ${MINIMAL_ERROR_RATE_THRESHOLD * 100}% threshold`, null);
+    return changeMode("MINIMAL", "AUTO_ERROR_RATE", `Error rate ${(safeErrorRate * 100).toFixed(1)}% exceeds ${MINIMAL_ERROR_RATE_THRESHOLD * 100}% threshold`, null);
   }
 
-  if (snapshot.p95LatencyMs > REDUCED_LATENCY_THRESHOLD_MS && mode === "FULL") {
+  if (safeLatencyMs > REDUCED_LATENCY_THRESHOLD_MS && mode === "FULL") {
     healthyStartTs = null;
-    return changeMode("REDUCED", "AUTO_LATENCY", `P95 latency ${snapshot.p95LatencyMs}ms exceeds ${REDUCED_LATENCY_THRESHOLD_MS}ms threshold`, null);
+    return changeMode("REDUCED", "AUTO_LATENCY", `P95 latency ${safeLatencyMs}ms exceeds ${REDUCED_LATENCY_THRESHOLD_MS}ms threshold`, null);
   }
 
   // Check for auto-recovery
   if (mode !== "FULL" && state.trigger !== "MANUAL") {
-    const isHealthy = snapshot.p95LatencyMs <= REDUCED_LATENCY_THRESHOLD_MS && snapshot.errorRate <= MINIMAL_ERROR_RATE_THRESHOLD;
+    const isHealthy = safeLatencyMs <= REDUCED_LATENCY_THRESHOLD_MS && safeErrorRate <= MINIMAL_ERROR_RATE_THRESHOLD;
 
     if (isHealthy) {
       if (!healthyStartTs) {
@@ -150,6 +153,21 @@ export function evaluateHealth(snapshot: HealthSnapshot): ModeChangeEvent | null
 // ---------------------------------------------------------------------------
 
 function changeMode(to: DegradationMode, trigger: ModeChangeEvent["trigger"], reason: string, ttlMs: number | null): ModeChangeEvent {
+  const safeTtlMs = normalizeTtlMs(ttlMs);
+
+  if (state.currentMode === to && state.trigger === trigger && state.reason === reason && state.ttlMs === safeTtlMs) {
+    return {
+      eventId: `dm_${randomUUID().slice(0, 12)}`,
+      ts: Date.now(),
+      fromMode: state.currentMode,
+      toMode: to,
+      trigger,
+      reason,
+      ttlMs: safeTtlMs,
+      expiresAt: safeTtlMs !== null ? Date.now() + safeTtlMs : null,
+    };
+  }
+
   const event: ModeChangeEvent = {
     eventId: `dm_${randomUUID().slice(0, 12)}`,
     ts: Date.now(),
@@ -157,8 +175,8 @@ function changeMode(to: DegradationMode, trigger: ModeChangeEvent["trigger"], re
     toMode: to,
     trigger,
     reason,
-    ttlMs,
-    expiresAt: ttlMs ? Date.now() + ttlMs : null,
+    ttlMs: safeTtlMs,
+    expiresAt: safeTtlMs !== null ? Date.now() + safeTtlMs : null,
   };
 
   state.history.push(event);
@@ -169,7 +187,7 @@ function changeMode(to: DegradationMode, trigger: ModeChangeEvent["trigger"], re
   state.since = Date.now();
   state.trigger = trigger;
   state.reason = reason;
-  state.ttlMs = ttlMs;
+  state.ttlMs = safeTtlMs;
   state.expiresAt = event.expiresAt;
 
   if (to === "FULL") {
@@ -178,6 +196,13 @@ function changeMode(to: DegradationMode, trigger: ModeChangeEvent["trigger"], re
   }
 
   return event;
+}
+
+function normalizeTtlMs(ttlMs: number | null): number | null {
+  if (ttlMs === null) return null;
+  if (!Number.isFinite(ttlMs)) return null;
+  const normalized = Math.floor(ttlMs);
+  return normalized > 0 ? normalized : null;
 }
 
 // ---------------------------------------------------------------------------

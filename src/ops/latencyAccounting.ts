@@ -51,6 +51,7 @@ export interface LatencyReport {
   ts: number;
   windowMs: number;
   totalMeasurements: number;
+  droppedInvalidMeasurements: number;
   buckets: LatencyBucket[];
   costOfTrust: CostOfTrustSummary;
 }
@@ -61,6 +62,7 @@ export interface LatencyReport {
 
 const measurements: LatencyMeasurement[] = [];
 const MAX_MEASUREMENTS = 100000;
+let droppedInvalidMeasurements = 0;
 
 // ---------------------------------------------------------------------------
 // Recording
@@ -72,12 +74,32 @@ export function recordLatency(params: {
   latencyMs: number;
   governanceOverheadMs?: number;
 }): LatencyMeasurement {
+  const safeLabel = params.label?.trim() || "unknown";
+  const safeLatencyMs = Number.isFinite(params.latencyMs) ? Math.max(0, params.latencyMs) : Number.NaN;
+  const requestedGovOverhead = params.governanceOverheadMs ?? 0;
+  const safeGovernanceOverheadMs = Number.isFinite(requestedGovOverhead)
+    ? Math.max(0, requestedGovOverhead)
+    : Number.NaN;
+
+  if (!Number.isFinite(safeLatencyMs) || !Number.isFinite(safeGovernanceOverheadMs)) {
+    droppedInvalidMeasurements++;
+    const fallback: LatencyMeasurement = {
+      id: `lat_${randomUUID().slice(0, 12)}`,
+      category: params.category,
+      label: safeLabel,
+      latencyMs: 0,
+      governanceOverheadMs: 0,
+      ts: Date.now(),
+    };
+    return fallback;
+  }
+
   const m: LatencyMeasurement = {
     id: `lat_${randomUUID().slice(0, 12)}`,
     category: params.category,
-    label: params.label,
-    latencyMs: params.latencyMs,
-    governanceOverheadMs: params.governanceOverheadMs ?? 0,
+    label: safeLabel,
+    latencyMs: safeLatencyMs,
+    governanceOverheadMs: safeGovernanceOverheadMs,
     ts: Date.now(),
   };
   measurements.push(m);
@@ -166,6 +188,7 @@ export function generateLatencyReport(windowMs = 86400000): LatencyReport {
     ts: Date.now(),
     windowMs,
     totalMeasurements: recent.length,
+    droppedInvalidMeasurements,
     buckets: computeLatencyBuckets(windowMs),
     costOfTrust: computeCostOfTrust(windowMs),
   };
@@ -182,7 +205,8 @@ export function renderLatencyReport(windowMs = 86400000): string {
     "",
     `- Window: ${(report.windowMs / 3600000).toFixed(1)}h`,
     `- Total measurements: ${report.totalMeasurements}`,
-    "",
+    `- Dropped invalid measurements: ${report.droppedInvalidMeasurements}`,
+    "", 
     "## Cost of Trust",
     "",
     `- Raw execution: ${report.costOfTrust.totalExecutionMs.toFixed(0)}ms`,
@@ -219,4 +243,5 @@ export function renderLatencyReport(windowMs = 86400000): string {
 
 export function resetLatencyAccounting(): void {
   measurements.length = 0;
+  droppedInvalidMeasurements = 0;
 }

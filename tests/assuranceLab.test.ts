@@ -59,7 +59,7 @@ describe("assurance lab", () => {
       window: "14d"
     });
 
-    expect(report.packResults.length).toBe(21);
+    expect(report.packResults.length).toBe(29);
     expect(report.packResults.every((pack) => pack.scenarioCount >= 8)).toBe(true);
     expect(report.runSealSig.length).toBeGreaterThan(8);
     expect(report.reportJsonSha256.length).toBe(64);

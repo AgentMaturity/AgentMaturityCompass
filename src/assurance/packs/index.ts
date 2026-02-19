@@ -20,6 +20,14 @@ import { compoundThreatPack } from "./compoundThreatPack.js";
 import { memoryPoisoningPack } from "./memoryPoisoningPack.js";
 import { timingSideChannelPack } from "./timingSideChannelPack.js";
 import { disempowermentPack } from "./disempowermentPack.js";
+import { dlpExfiltrationPack } from "./dlpExfiltrationPack.js";
+import { sbomSupplyChainPack } from "./sbomSupplyChainPack.js";
+import { ragPoisoningPack } from "./ragPoisoningPack.js";
+import { circuitBreakerReliabilityPack } from "./circuitBreakerReliabilityPack.js";
+import { honeytokenDetectionPack } from "./honeytokenDetectionPack.js";
+import { configLintPack } from "./configLintPack.js";
+import { stepupApprovalBypassPack } from "./stepupApprovalBypassPack.js";
+import { taintPropagationPack } from "./taintPropagationPack.js";
 
 const assurancePacks: AssurancePackDefinition[] = [
   injectionPack,
@@ -42,7 +50,15 @@ const assurancePacks: AssurancePackDefinition[] = [
   compoundThreatPack,
   memoryPoisoningPack,
   timingSideChannelPack,
-  disempowermentPack
+  disempowermentPack,
+  dlpExfiltrationPack,
+  sbomSupplyChainPack,
+  ragPoisoningPack,
+  circuitBreakerReliabilityPack,
+  honeytokenDetectionPack,
+  configLintPack,
+  stepupApprovalBypassPack,
+  taintPropagationPack
 ];
 
 export function listAssurancePacks(): AssurancePackDefinition[] {

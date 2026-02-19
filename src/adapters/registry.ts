@@ -12,6 +12,7 @@ import { langgraphPythonAdapter } from "./builtins/langgraphPython.js";
 import { llamaindexPythonAdapter } from "./builtins/llamaindexPython.js";
 import { semanticKernelAdapter } from "./builtins/semanticKernel.js";
 import { openaiAgentsSdkAdapter } from "./builtins/openaiAgentsSdk.js";
+import { pythonAmcSdkAdapter } from "./builtins/pythonAmcSdk.js";
 
 const BUILTINS = [
   genericCliAdapter,
@@ -26,7 +27,8 @@ const BUILTINS = [
   langgraphPythonAdapter,
   llamaindexPythonAdapter,
   semanticKernelAdapter,
-  openaiAgentsSdkAdapter
+  openaiAgentsSdkAdapter,
+  pythonAmcSdkAdapter
 ].map((row) => adapterDefinitionSchema.parse(row));
 
 export function listBuiltInAdapters(): AdapterDefinition[] {

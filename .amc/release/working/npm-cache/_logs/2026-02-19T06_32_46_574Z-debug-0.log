@@ -7,8 +7,8 @@
 6 silly config load:file:/opt/homebrew/etc/npmrc
 7 verbose title npm pack
 8 verbose argv "pack" "--json" "--ignore-scripts"
-9 verbose logfile logs-max:10 dir:/Users/sid/AgentMaturityCompass/.amc/release/working/npm-cache/_logs/2026-02-18T07_27_18_094Z-
-10 verbose logfile /Users/sid/AgentMaturityCompass/.amc/release/working/npm-cache/_logs/2026-02-18T07_27_18_094Z-debug-0.log
+9 verbose logfile logs-max:10 dir:/Users/sid/AgentMaturityCompass/.amc/release/working/npm-cache/_logs/2026-02-19T06_32_46_574Z-
+10 verbose logfile /Users/sid/AgentMaturityCompass/.amc/release/working/npm-cache/_logs/2026-02-19T06_32_46_574Z-debug-0.log
 11 silly logfile start cleaning logs, removing 1 files
 12 silly logfile done cleaning log files
 13 silly packumentCache heap:4496293888 maxSize:1124073472 maxEntrySize:562036736

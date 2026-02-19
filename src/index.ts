@@ -257,6 +257,12 @@ export { inspectSignatures, fixSignatures } from "./studio/signatures.js";
 export { startStudioApiServer } from "./studio/studioServer.js";
 export { runStudioForeground, startStudioDaemon, stopStudioDaemon, studioStatus } from "./studio/studioSupervisor.js";
 export { createVault, unlockVault, lockVault, vaultStatus, ensureVaultAndPublicKeys, rotateMonitorKeyInVault } from "./vault/vault.js";
+export { scanForPII } from "./vault/dlp.js";
+export type { ScanResult } from "./vault/dlp.js";
+export { generateHoneytoken, isHoneytoken } from "./vault/honeytokens.js";
+export type { HoneytokenResult } from "./vault/honeytokens.js";
+export { getAmcPolicy, listAmcPolicies, AMC_POLICIES } from "./governor/amcPolicies.js";
+export type { AmcPolicy } from "./governor/amcPolicies.js";
 export {
   notaryInitCli,
   notaryInitInteractiveCli,

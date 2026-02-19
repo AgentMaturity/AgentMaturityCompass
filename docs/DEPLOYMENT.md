@@ -11,7 +11,7 @@ AMC Studio can run as a production service with persistence, TLS, and hardened d
 2. Start local deployment:
 
 ```bash
-cd /Users/thewisecrab/AMC/deploy/compose
+cd deploy/compose
 cp .env.example .env
 docker compose up -d --build
 ```
@@ -22,7 +22,7 @@ docker compose up -d --build
 ## Docker + TLS (Caddy)
 
 ```bash
-cd /Users/thewisecrab/AMC/deploy/compose
+cd deploy/compose
 docker compose -f docker-compose.tls.yml up -d --build
 ```
 
@@ -32,17 +32,17 @@ Open:
 ## Kubernetes (Helm)
 
 ```bash
-helm lint /Users/thewisecrab/AMC/deploy/helm/amc
-helm template amc /Users/thewisecrab/AMC/deploy/helm/amc
-helm install amc /Users/thewisecrab/AMC/deploy/helm/amc
+helm lint deploy/helm/amc
+helm template amc deploy/helm/amc
+helm install amc deploy/helm/amc
 ```
 
 Example values profiles:
 
 ```bash
-helm template amc /Users/thewisecrab/AMC/deploy/helm/amc -f /Users/thewisecrab/AMC/deploy/helm/amc/examples/values-internal-only.yaml
-helm template amc /Users/thewisecrab/AMC/deploy/helm/amc -f /Users/thewisecrab/AMC/deploy/helm/amc/examples/values-ingress-tls.yaml
-helm template amc /Users/thewisecrab/AMC/deploy/helm/amc -f /Users/thewisecrab/AMC/deploy/helm/amc/examples/values-persistent-bootstrap.yaml
+helm template amc deploy/helm/amc -f deploy/helm/amc/examples/values-internal-only.yaml
+helm template amc deploy/helm/amc -f deploy/helm/amc/examples/values-ingress-tls.yaml
+helm template amc deploy/helm/amc -f deploy/helm/amc/examples/values-persistent-bootstrap.yaml
 ```
 
 ## Bootstrap for Empty Volumes
@@ -64,7 +64,7 @@ Bootstrap creates and signs required configs, initializes transparency + Merkle 
 
 - Liveness: `/healthz`
 - Readiness: `/readyz`
-- CLI probe: `amc studio healthcheck --workspace /data/amc`
+- CLI probe: `amc studio healthcheck`
 
 ## LAN Access
 

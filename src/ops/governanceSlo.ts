@@ -72,7 +72,7 @@ let targets: SloTarget[] = [
 // ---------------------------------------------------------------------------
 
 export function configureSloTargets(newTargets: SloTarget[]): void {
-  targets = [...newTargets];
+  targets = newTargets.map((t) => normalizeTarget(t));
 }
 
 export function getSloTargets(): SloTarget[] {
@@ -84,12 +84,20 @@ export function getSloTargets(): SloTarget[] {
 // ---------------------------------------------------------------------------
 
 export function recordSloMeasurement(metric: SloMetricName, value: number, labels: Record<string, string> = {}): SloMeasurement {
+  const safeValue = normalizeSloValue(metric, value);
+  const safeLabels: Record<string, string> = {};
+  for (const [k, v] of Object.entries(labels)) {
+    if (typeof k === "string" && typeof v === "string" && k.length > 0) {
+      safeLabels[k] = v;
+    }
+  }
+
   const m: SloMeasurement = {
     id: `slo_${randomUUID().slice(0, 12)}`,
     metric,
-    value,
+    value: safeValue,
     ts: Date.now(),
-    labels,
+    labels: safeLabels,
   };
   measurements.push(m);
   while (measurements.length > MAX_MEASUREMENTS) measurements.shift();
@@ -111,6 +119,28 @@ function computeStatus(p95: number, target: SloTarget): SloStatus {
   if (p95 <= target.targetP95) return "HEALTHY";
   if (p95 <= target.degradedThreshold) return "DEGRADED";
   return "VIOLATED";
+}
+
+function normalizeSloValue(metric: SloMetricName, value: number): number {
+  if (!Number.isFinite(value)) return 0;
+  if (metric.includes("RATE")) return Math.min(1, Math.max(0, value));
+  return Math.max(0, value);
+}
+
+function normalizeTarget(target: SloTarget): SloTarget {
+  const isRate = target.metric.includes("RATE");
+  const safeTarget = Number.isFinite(target.targetP95)
+    ? (isRate ? Math.min(1, Math.max(0, target.targetP95)) : Math.max(0, target.targetP95))
+    : 0;
+  const safeDegraded = Number.isFinite(target.degradedThreshold)
+    ? (isRate ? Math.min(1, Math.max(0, target.degradedThreshold)) : Math.max(0, target.degradedThreshold))
+    : safeTarget;
+
+  return {
+    ...target,
+    targetP95: Math.min(safeTarget, safeDegraded),
+    degradedThreshold: Math.max(safeTarget, safeDegraded),
+  };
 }
 
 export function generateSloReport(windowMs = 3600000): SloReport {

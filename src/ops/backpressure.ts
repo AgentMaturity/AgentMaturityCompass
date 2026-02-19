@@ -39,11 +39,13 @@ export interface BackpressureEvent {
 // State
 // ---------------------------------------------------------------------------
 
-let config: BackpressureConfig = {
+const DEFAULT_CONFIG: BackpressureConfig = {
   maxQueueDepth: 1000,
   warningThresholdPct: 0.8,
   retryAfterSeconds: 5,
 };
+
+let config: BackpressureConfig = { ...DEFAULT_CONFIG };
 
 let queueDepth = 0;
 let eventsTotal = 0;
@@ -57,7 +59,8 @@ const eventLog: BackpressureEvent[] = [];
 // ---------------------------------------------------------------------------
 
 export function configureBackpressure(partial: Partial<BackpressureConfig>): BackpressureConfig {
-  config = { ...config, ...partial };
+  config = normalizeConfig({ ...config, ...partial });
+  checkThreshold();
   return { ...config };
 }
 
@@ -98,16 +101,16 @@ export function setQueueDepth(depth: number): void {
 // ---------------------------------------------------------------------------
 
 function checkThreshold(): void {
-  const threshold = Math.floor(config.maxQueueDepth * config.warningThresholdPct);
-  const shouldSignal = queueDepth >= threshold;
+  const threshold = Math.max(1, Math.floor(config.maxQueueDepth * config.warningThresholdPct));
+  const clearThreshold = Math.max(0, Math.floor(threshold * 0.9)); // hysteresis to reduce flapping
 
-  if (shouldSignal && !signalActive) {
+  if (!signalActive && queueDepth >= threshold) {
     signalActive = true;
     lastSignalTs = Date.now();
     logEvent("SIGNAL_ON", `Queue depth ${queueDepth} >= ${threshold} (${(config.warningThresholdPct * 100).toFixed(0)}% of ${config.maxQueueDepth})`);
-  } else if (!shouldSignal && signalActive) {
+  } else if (signalActive && queueDepth <= clearThreshold) {
     signalActive = false;
-    logEvent("SIGNAL_OFF", `Queue depth ${queueDepth} < ${threshold}`);
+    logEvent("SIGNAL_OFF", `Queue depth ${queueDepth} <= ${clearThreshold}`);
   }
 }
 
@@ -194,6 +197,24 @@ export function renderBackpressureStatus(): string {
 // Internal
 // ---------------------------------------------------------------------------
 
+function normalizeConfig(input: BackpressureConfig): BackpressureConfig {
+  const maxQueueDepth = Number.isFinite(input.maxQueueDepth) && input.maxQueueDepth > 0
+    ? Math.floor(input.maxQueueDepth)
+    : DEFAULT_CONFIG.maxQueueDepth;
+  const warningThresholdPct = Number.isFinite(input.warningThresholdPct)
+    ? Math.min(0.99, Math.max(0.1, input.warningThresholdPct))
+    : DEFAULT_CONFIG.warningThresholdPct;
+  const retryAfterSeconds = Number.isFinite(input.retryAfterSeconds) && input.retryAfterSeconds > 0
+    ? Math.max(1, Math.floor(input.retryAfterSeconds))
+    : DEFAULT_CONFIG.retryAfterSeconds;
+
+  return {
+    maxQueueDepth,
+    warningThresholdPct,
+    retryAfterSeconds,
+  };
+}
+
 function logEvent(type: BackpressureEvent["type"], detail: string): void {
   eventLog.push({
     eventId: `bp_${randomUUID().slice(0, 12)}`,
@@ -216,5 +237,5 @@ export function resetBackpressure(): void {
   signalActive = false;
   lastSignalTs = null;
   eventLog.length = 0;
-  config = { maxQueueDepth: 1000, warningThresholdPct: 0.8, retryAfterSeconds: 5 };
+  config = { ...DEFAULT_CONFIG };
 }
