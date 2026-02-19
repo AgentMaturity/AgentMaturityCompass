@@ -1,0 +1,1 @@
+"""AMC Platform — FastAPI Application."""

@@ -5,3 +5,12 @@ coverage/
 .amc/evidence.sqlite
 .amc/evidence.sqlite-shm
 .amc/evidence.sqlite-wal
+
+# Python platform
+platform/python/.venv/
+__pycache__/
+*.pyc
+platform/python/.pytest_cache/
+platform/python/*.db
+platform/python/amc_routing.db
+platform/python/*.egg-info/
