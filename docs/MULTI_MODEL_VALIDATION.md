@@ -36,7 +36,7 @@ An AI agent system consists of three layers:
 └─────────────────────────────────────────────────────────────┘
 ```
 
-AMC's 67 questions exclusively target Layers 2 and 3. They ask about *your governance policies*, *your security modules*, *your circuit breakers*, *your observability stack* — none of which are model-dependent.
+AMC's 111 questions exclusively target Layers 2 and 3. They ask about *your governance policies*, *your security modules*, *your circuit breakers*, *your observability stack* — none of which are model-dependent.
 
 ---
 
@@ -330,7 +330,7 @@ A: No. Fine-tuning modifies model weights and behavior — both of which are bel
 | AMC evaluates agent behavior, not model internals | ✅ Confirmed by architecture |
 | Evidence collection works regardless of underlying LLM | ✅ Confirmed by module design |
 | AMC works with OpenAI, Anthropic, Google, Meta, Mistral, open-source | ✅ Confirmed by compatibility matrix |
-| The 67 questions assess organizational/architectural maturity | ✅ Confirmed by dimension-by-dimension analysis |
+| The 111 questions assess organizational/architectural maturity | ✅ Confirmed by dimension-by-dimension analysis |
 | Case studies used AMC controls that are model-independent | ✅ Confirmed by CMB/DPB module list |
 | AMC can score the same agent using different models identically | ✅ Confirmed by execution-proof evidence design |
 

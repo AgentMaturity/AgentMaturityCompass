@@ -37,7 +37,7 @@ AMC wraps your AI agent with an observer that writes **execution-proof evidence*
 ```
 Agent (untrusted) → AMC Gateway (trusted observer) → Evidence Ledger (signed, hash-chained)
                                                              ↓
-                                               Scoring Engine (89 questions, 5 layers)
+                                               Scoring Engine (111 questions, 5 layers)
                                                              ↓
                                               AMC Studio (localhost:3212)
 ```
@@ -158,7 +158,7 @@ amc history                              # score history
 | L4: Resilience | 16 | Accountability, learning, incident resilience, and risk assurance |
 | L5: Skills | 20 | Design, interaction quality, architecture, domain, and digital mastery |
 
-Current implementation total: **89 questions**.
+Current implementation total: **111 questions**.
 
 **Evidence Gates** (must be passed before level unlocks):
 
@@ -642,7 +642,7 @@ Covers:
 - Empirical benchmark: +84pt keyword inflation vs execution-verified scoring
 - Autonomous self-improvement loop: L1→L4 (94/100 human-guided), L1→L4 (80/100 autonomous)
 - Comparison to NIST AI RMF, ISO/IEC 42001, CMMI v2.0
-- Initial 42-question core rubric and full scoring methodology (v1 baseline)
+- Initial 42-question core rubric (now 111 questions) and full scoring methodology (v1 baseline)
 
 ---
 

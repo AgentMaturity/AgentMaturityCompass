@@ -55,7 +55,7 @@ This document provides an honest, comprehensive comparison of AMC against compet
 - Only framework purpose-built for AI *agent* systems (not just AI models or software processes)
 - Execution-proof evidence: modules are tested, not self-reported
 - Self-improvement loop: FixGenerator reads gaps and proposes executable remediations
-- 7 dimensions including cost efficiency — unique to AMC
+- 5 dimensions including cost efficiency — unique to AMC
 - Free tier available; open-source enforcement/shield modules planned
 - Anti-gaming: cannot score high without actually building controls
 

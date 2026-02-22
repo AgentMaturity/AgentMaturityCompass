@@ -20,7 +20,7 @@ This document presents the scientific validity framework for AMC across five dim
 
 AMC defines **agent maturity** as: *the degree to which an AI agent system exhibits governed, secure, reliable, observable, evaluated, cost-efficient, and operationally sustainable behavior in production.*
 
-This construct is operationalized through 7 dimensions and 67 questions, each mapped to observable, executable evidence artifacts.
+This construct is operationalized through 5 dimensions and 111 questions, each mapped to observable, executable evidence artifacts.
 
 ### Empirical Evidence
 
@@ -121,7 +121,7 @@ Novel dimensions added for AI agent systems specifically:
 | Cost Efficiency | 6 (COST-1–6) | 14.3% | Enterprise discovery |
 | Operating Model | 6 (OPS-1–6) | 14.3% | CMMI, enterprise discovery |
 
-**Coverage verdict:** Equal weighting across 7 dimensions reflects the view that governance debt is as dangerous as security debt in agent systems. No dimension is structurally privileged — enterprise judgment determines which dimension to invest in first.
+**Coverage verdict:** Equal weighting across 5 dimensions reflects the view that governance debt is as dangerous as security debt in agent systems. No dimension is structurally privileged — enterprise judgment determines which dimension to invest in first.
 
 ### Content Gap Analysis
 

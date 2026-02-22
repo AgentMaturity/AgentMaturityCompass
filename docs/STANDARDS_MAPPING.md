@@ -231,7 +231,7 @@ All new controls require L3+ question-scoped compliance evidence and L4/L5 obser
 | **GOVERN** | GV-4.1 Team structures | Governance | GOV-4 |
 | **GOVERN** | GV-6.1 Policies | Governance, Observability | GOV-1, OBS-4 |
 | **MAP** | MP-2.3 Risk categorization | Governance | GOV-5 |
-| **MAP** | MP-3.1 AI system context | All 7 dimensions | All 42 questions |
+| **MAP** | MP-3.1 AI system context | All 5 dimensions | All 111 questions |
 | **MAP** | MP-5.1 Likelihood & impact | Security, Reliability | SEC-2, REL-1 |
 | **MEASURE** | MS-1.3 Metrics & feedback | Evaluation | EVAL-1, EVAL-3 |
 | **MEASURE** | MS-2.1 Evaluation methods | Evaluation | EVAL-1, EVAL-2 |
@@ -257,7 +257,7 @@ All new controls require L3+ question-scoped compliance evidence and L4/L5 obser
 | **Art 14** — Human Oversight | Ability for humans to monitor, override, stop | GOV-4, EVAL-3 |
 | **Art 15** — Accuracy, Robustness & Cybersecurity | Performance metrics, resilience, cybersecurity | REL-1–6, SEC-1–6 |
 | **Art 4** — AI Literacy | Organizations ensure staff AI competence | OPS-5 |
-| **Art 17** — Quality Management | QMS covering lifecycle stages | All 7 dimensions |
+| **Art 17** — Quality Management | QMS covering lifecycle stages | All 5 dimensions |
 
 ---
 
@@ -271,7 +271,7 @@ All new controls require L3+ question-scoped compliance evidence and L4/L5 obser
 | **Clause 7** — Support | Resources, competence, documented info | Operating Model, Observability | OPS-5, OBS-1 |
 | **Clause 8** — Operation | AI system lifecycle, risk treatment | Security, Reliability, Evaluation | SEC-1–6, REL-1–6, EVAL-1–6 |
 | **Clause 9** — Performance | Monitoring, measurement, internal audit | Observability, Evaluation | OBS-1–6, EVAL-1–6 |
-| **Clause 10** — Improvement | Nonconformity, corrective action, continual improvement | All 7 (self-improvement loop) | All 42 questions |
+| **Clause 10** — Improvement | Nonconformity, corrective action, continual improvement | All 7 (self-improvement loop) | All 111 questions |
 
 ---
 

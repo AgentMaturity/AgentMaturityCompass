@@ -19,7 +19,7 @@ This document describes the active diagnostic question bank used by AMC scoring.
   - Resilience
   - Skills
 - 6 rubric levels per question (`0..5`)
-- 89 questions in current repository state
+- 111 questions in current repository state
 - Each question includes:
   - prompt template
   - evidence gate hints
