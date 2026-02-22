@@ -146,6 +146,14 @@ export {
   createZipArchive
 } from "./evidence/index.js";
 export {
+  artifactProvenanceManifestSchema,
+  artifactProvenanceSignatureSchema,
+  signArtifactProvenance,
+  signArtifactOutput,
+  verifyArtifactProvenance,
+  detectArtifactTampering
+} from "./artifact/artifactProvenance.js";
+export {
   defaultGatePolicy,
   parseGatePolicy,
   writeSignedGatePolicy,

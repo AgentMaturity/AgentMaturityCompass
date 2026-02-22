@@ -89,6 +89,10 @@ import {
   verifyEvidenceBundle
 } from "./bundles/bundle.js";
 import { defaultEvidenceExportPath, exportVerifierEvidence, generateAuditPacket } from "./evidence/index.js";
+import {
+  signArtifactProvenance,
+  verifyArtifactProvenance
+} from "./artifact/artifactProvenance.js";
 import { initCiForAgent, printCiSteps, runBundleGate } from "./ci/gate.js";
 import { applyArchetype, describeArchetype, listArchetypes, previewArchetypeApply } from "./archetypes/index.js";
 import { exportBadge, exportPolicyPack } from "./exports/policyExport.js";
@@ -188,7 +192,6 @@ import { verifyBenchmarkArtifact } from "./benchmarks/benchVerify.js";
 import { ingestBenchmarks } from "./benchmarks/benchImport.js";
 import { listImportedBenchmarks } from "./benchmarks/benchStore.js";
 import { benchmarkStats } from "./benchmarks/benchStats.js";
-import { evalImportCli } from "./eval/evalCli.js";
 import {
   benchCompareCli,
   benchComparisonLatestCli,
@@ -297,7 +300,6 @@ import {
   integrationsTestCli,
   integrationsVerifyCli
 } from "./integrations/integrationsCli.js";
-import { noCodeAdapterAddCli } from "./integrations/noCodeGovernanceCli.js";
 import {
   outcomesAttestCli,
   outcomesDiffCli,
@@ -950,6 +952,10 @@ function loadTemporalDecayRuns(workspace: string, agentId: string, lookbackDays:
     }
   }
   return rows;
+}
+
+function collectOption(value: string, previous: string[]): string[] {
+  return [...previous, value];
 }
 
 const program = new Command();
@@ -2036,30 +2042,6 @@ adapters
     }
   );
 
-const adapter = program.command("adapter").description("No-code governance webhook adapter registry");
-
-adapter
-  .command("add")
-  .description("Register a no-code webhook source for governance evidence capture")
-  .requiredOption("--type <type>", "n8n|make|zapier")
-  .requiredOption("--webhook-url <url>", "source webhook URL")
-  .action((opts: { type: string; webhookUrl: string }) => {
-    const normalizedType = String(opts.type).trim().toLowerCase();
-    if (normalizedType !== "n8n" && normalizedType !== "make" && normalizedType !== "zapier") {
-      throw new Error(`Invalid adapter type: ${opts.type}. Expected one of: n8n, make, zapier`);
-    }
-    const out = noCodeAdapterAddCli({
-      workspace: process.cwd(),
-      type: normalizedType,
-      webhookUrl: opts.webhookUrl
-    });
-    console.log(chalk.green(`${out.created ? "Added" : "Updated"} no-code adapter ${out.adapter.id}`));
-    console.log(`type: ${out.adapter.type}`);
-    console.log(`webhook: ${out.adapter.webhookUrl}`);
-    console.log(`config: ${out.configPath}`);
-    console.log(`signature: ${out.sigPath}`);
-  });
-
 const plugin = program.command("plugin").description("Signed content-only extension marketplace");
 
 plugin
@@ -2616,15 +2598,16 @@ verifyCmd
 
 const target = program.command("target").description("Target profile operations");
 const evidence = program.command("evidence").description("Evidence lifecycle workflows");
-const evalCmd = program.command("eval").description("External eval framework import operations");
 const incidents = program.command("incidents").description("Incident operations and dispatch workflows");
 const policy = program.command("policy").description("Policy-as-code operations");
 const governor = program.command("governor").description("Autonomy Governor checks");
 const tools = program.command("tools").description("ToolHub tools config");
+const artifact = program.command("artifact").description("Content provenance signing and verification");
 const workorder = program.command("workorder").description("Signed work order operations");
 const ticket = program.command("ticket").description("Execution ticket operations");
 const gateway = program.command("gateway").description("AMC universal LLM proxy gateway");
 const bundle = program.command("bundle").description("Portable evidence bundle operations");
+const evidence = program.command("evidence").description("Verifier-ready evidence export operations");
 const ci = program.command("ci").description("CI/CD release gate helpers");
 const archetype = program.command("archetype").description("Archetype packs");
 const exportGroup = program.command("export").description("Export policy packs and badges");
@@ -2766,37 +2749,143 @@ evidence
     }
   });
 
-evalCmd
-  .command("import")
-  .description("Import external eval framework results as signed AMC evidence")
-  .requiredOption("--format <format>", "eval framework format: openai|langsmith|deepeval|promptfoo")
-  .requiredOption("--file <file>", "path to eval results JSON/JSONL")
-  .option("--agent <agentId>", "agent ID override")
-  .option("--trust-tier <trustTier>", "trust tier override (default SELF_REPORTED)")
-  .option("--json", "emit JSON output", false)
-  .action((opts: { format: string; file: string; agent?: string; trustTier?: string; json: boolean }) => {
-    const result = evalImportCli({
+artifact
+  .command("sign")
+  .description("Sign an agent-generated artifact with AMC monitor key provenance")
+  .requiredOption("--file <path>", "artifact file path")
+  .requiredOption("--agent <agentId>", "agent ID")
+  .requiredOption("--model <modelId>", "model ID")
+  .option("--provider <provider>", "model provider")
+  .option("--session <sessionId>", "agent session ID")
+  .option("--runtime <runtime>", "runtime name")
+  .option("--prompt <text>", "prompt text used to generate the artifact")
+  .option("--prompt-file <path>", "path to prompt text file")
+  .option("--prompt-id <id>", "prompt ID")
+  .option("--prompt-ref <ref>", "prompt reference (template/file/url)")
+  .option("--prompt-hash <sha256>", "precomputed prompt sha256")
+  .option("--evidence-event <eventId>", "evidence event ID (repeatable)", collectOption, [] as string[])
+  .option("--evidence-ref <eventId[:eventHash]>", "evidence reference (repeatable)", collectOption, [] as string[])
+  .option("--dataset-sha <sha256>", "evidence dataset sha256")
+  .option("--manifest <path>", "provenance manifest output path override")
+  .option("--signature <path>", "provenance signature output path override")
+  .action((opts: {
+    file: string;
+    agent: string;
+    model: string;
+    provider?: string;
+    session?: string;
+    runtime?: string;
+    prompt?: string;
+    promptFile?: string;
+    promptId?: string;
+    promptRef?: string;
+    promptHash?: string;
+    evidenceEvent: string[];
+    evidenceRef: string[];
+    datasetSha?: string;
+    manifest?: string;
+    signature?: string;
+  }) => {
+    assertOwnerMode(process.cwd(), "artifact sign");
+    const promptText =
+      opts.promptFile && opts.promptFile.trim().length > 0
+        ? readUtf8(resolve(process.cwd(), opts.promptFile))
+        : opts.prompt;
+    const evidenceRefs = opts.evidenceRef
+      .map((entry) => {
+        const [rawEventId, rawHash] = entry.split(":", 2);
+        const eventId = rawEventId?.trim() ?? "";
+        if (!eventId) {
+          return null;
+        }
+        const eventHash = rawHash?.trim();
+        return {
+          eventId,
+          eventHash: eventHash && eventHash.length > 0 ? eventHash : undefined
+        };
+      })
+      .filter((row): row is { eventId: string; eventHash?: string } => row !== null);
+
+    const out = signArtifactProvenance({
       workspace: process.cwd(),
-      format: opts.format,
       file: opts.file,
       agentId: opts.agent,
-      trustTier: opts.trustTier
+      modelId: opts.model,
+      provider: opts.provider,
+      sessionId: opts.session,
+      runtime: opts.runtime,
+      promptText,
+      promptId: opts.promptId,
+      promptRef: opts.promptRef,
+      promptTextSha256: opts.promptHash,
+      evidenceEventIds: opts.evidenceEvent,
+      evidenceRefs,
+      evidenceDatasetSha256: opts.datasetSha,
+      manifestFile: opts.manifest,
+      signatureFile: opts.signature
     });
+
+    console.log(chalk.green("Artifact provenance signed"));
+    console.log(`file: ${out.file}`);
+    console.log(`sha256: ${out.fileSha256}`);
+    console.log(`manifest: ${out.manifestPath}`);
+    console.log(`signature: ${out.signaturePath}`);
+  });
+
+artifact
+  .command("verify")
+  .description("Verify artifact provenance sidecars and detect tampering")
+  .requiredOption("--file <path>", "artifact file path")
+  .option("--manifest <path>", "provenance manifest file path override")
+  .option("--signature <path>", "provenance signature file path override")
+  .option("--prompt <text>", "prompt text to verify against signed prompt hash")
+  .option("--prompt-file <path>", "path to prompt text file for verification")
+  .option("--no-ledger", "skip ledger evidence reference checks")
+  .option("--json", "emit JSON output", false)
+  .action((opts: {
+    file: string;
+    manifest?: string;
+    signature?: string;
+    prompt?: string;
+    promptFile?: string;
+    ledger: boolean;
+    json: boolean;
+  }) => {
+    const promptText =
+      opts.promptFile && opts.promptFile.trim().length > 0
+        ? readUtf8(resolve(process.cwd(), opts.promptFile))
+        : opts.prompt;
+    const result = verifyArtifactProvenance({
+      workspace: process.cwd(),
+      file: opts.file,
+      manifestFile: opts.manifest,
+      signatureFile: opts.signature,
+      promptText,
+      requireLedgerEvidence: opts.ledger
+    });
+
     if (opts.json) {
       console.log(JSON.stringify(result, null, 2));
-      return;
+    } else {
+      console.log(result.ok ? chalk.green("Artifact provenance verification PASSED") : chalk.red("Artifact provenance verification FAILED"));
+      console.log(`file: ${resolve(process.cwd(), opts.file)}`);
+      console.log(`tampered: ${result.tampered ? "yes" : "no"}`);
+      console.log(`manifest: ${result.manifestPath}`);
+      console.log(`signature: ${result.signaturePath}`);
+      if (result.fileSha256) {
+        console.log(`sha256: ${result.fileSha256}`);
+      }
+      if (result.issues.length > 0) {
+        console.log("issues:");
+        for (const issue of result.issues) {
+          console.log(`- [${issue.code}] ${issue.message}`);
+        }
+      }
     }
-    console.log(chalk.green(`Imported ${result.caseCount} eval case(s) from ${result.format}`));
-    console.log(`session: ${result.sessionId}`);
-    console.log(`runId: ${result.runId ?? "n/a"}`);
-    console.log(`events: ${result.eventIds.length}`);
-    console.log(`passed: ${result.passedCount}`);
-    console.log(`failed: ${result.failedCount}`);
-    const questions = Object.entries(result.questionCoverage)
-      .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
-      .slice(0, 8)
-      .map(([id, count]) => `${id}:${count}`);
-    console.log(`question coverage: ${questions.length > 0 ? questions.join(", ") : "none"}`);
+
+    if (!result.ok) {
+      process.exit(1);
+    }
   });
 
 incidents
@@ -13109,11 +13198,6 @@ score
       console.log(chalk.gray("Escalation rate:"), `${result.escalationRate}%`);
       console.log(chalk.gray("Drift events:"), result.driftEvents);
       console.log(chalk.gray("Quality held:"), result.qualityHeld ? "yes" : "no");
-      console.log(chalk.gray("External dependencies:"), result.externalDependencyInventory.totalDependencies);
-      console.log(chalk.gray("Dependency drift stability:"), `${result.dependencyDrift.score} (${result.dependencyDrift.status})`);
-      console.log(chalk.gray("Graceful degradation:"), result.gracefulDegradation.score);
-      console.log(chalk.gray("Vendor lock-in risk:"), `${result.vendorLockInRisk.score} (${result.vendorLockInRisk.riskLevel})`);
-      console.log(chalk.gray("Reduced external access:"), result.reducedExternalAccessScore);
     } catch (e: any) {
       console.error(chalk.red(e.message));
       process.exit(1);

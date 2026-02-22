@@ -345,39 +345,40 @@ function buildQuestion(seed: QuestionSeed): DiagnosticQuestion {
     gates[5].mustInclude.auditTypes = ["CONTINUOUS_COMPLIANCE_VERIFIED", "FAIRNESS_REMEDIATION_CLOSED"];
   }
 
-  // Validity instrumentation controls require calibration + reliability tracking artifacts.
-  if (seed.id === "AMC-VAL-1") {
-    gates[3].requiredEvidenceTypes = ["metric", "audit", "artifact"];
-    gates[3].mustInclude.metricKeys = ["expected_calibration_error", "brier_score"];
-    gates[3].mustInclude.auditTypes = ["CALIBRATION_REVIEW"];
-    gates[4].requiredEvidenceTypes = ["metric", "audit", "artifact", "review", "test"];
+  // Provenance controls require cryptographic artifact lineage and tamper checks.
+  if (seed.id === "AMC-PROV-1" || seed.id === "AMC-PROV-2") {
+    gates[3].requiredEvidenceTypes = ["artifact", "audit", "metric"];
+    gates[3].acceptedTrustTiers = ["OBSERVED", "ATTESTED"];
+    gates[3].mustInclude.metaKeys = ["provenance", "agentId"];
+    gates[3].mustInclude.auditTypes = ["CONTENT_PROVENANCE_LINKED"];
+    gates[4].requiredEvidenceTypes = ["artifact", "audit", "metric", "test"];
     gates[4].requiredTrustTier = "OBSERVED";
     gates[4].acceptedTrustTiers = ["OBSERVED"];
-    gates[4].mustInclude.metricKeys = ["expected_calibration_error", "maximum_calibration_error", "brier_score"];
-    gates[4].mustInclude.auditTypes = ["CALIBRATION_REVIEW", "CORRECTION_EVENT"];
-    gates[5].requiredEvidenceTypes = ["metric", "audit", "artifact", "review", "test"];
+    gates[4].mustInclude.metaKeys = ["provenance", "agentId", "modelId"];
+    gates[4].mustInclude.auditTypes = ["CONTENT_PROVENANCE_LINKED", "ARTIFACT_SIGNATURE_VERIFIED"];
+    gates[5].requiredEvidenceTypes = ["artifact", "audit", "metric", "test", "review"];
     gates[5].requiredTrustTier = "OBSERVED";
     gates[5].acceptedTrustTiers = ["OBSERVED"];
-    gates[5].mustInclude.metricKeys = ["expected_calibration_error", "maximum_calibration_error", "brier_score", "resolved_prediction_rate"];
-    gates[5].mustInclude.auditTypes = ["CONTINUOUS_COMPLIANCE_VERIFIED", "CALIBRATION_REMEDIATION_CLOSED"];
-    gates[5].mustInclude.artifactPatterns = ["prediction-log", "calibration-report"];
+    gates[5].mustInclude.metaKeys = ["provenance", "agentId", "modelId", "promptSha256"];
+    gates[5].mustInclude.auditTypes = ["ARTIFACT_SIGNATURE_VERIFIED", "PROVENANCE_CHAIN_VERIFIED"];
+    gates[5].mustInclude.metricKeys = ["artifact_signature_coverage", "provenance_verification_pass_rate"];
   }
 
-  if (seed.id === "AMC-VAL-2") {
-    gates[3].requiredEvidenceTypes = ["metric", "audit", "review", "artifact"];
-    gates[3].mustInclude.metricKeys = ["inter_rater_icc", "score_stability_index"];
-    gates[3].mustInclude.auditTypes = ["INTER_RATER_REVIEW"];
-    gates[4].requiredEvidenceTypes = ["metric", "audit", "review", "artifact", "test"];
-    gates[4].requiredTrustTier = "OBSERVED";
-    gates[4].acceptedTrustTiers = ["OBSERVED"];
-    gates[4].mustInclude.metricKeys = ["inter_rater_icc", "score_stability_index", "longitudinal_drift_slope"];
-    gates[4].mustInclude.auditTypes = ["INTER_RATER_REVIEW", "DRIFT_REMEDIATION"];
-    gates[5].requiredEvidenceTypes = ["metric", "audit", "review", "artifact", "test"];
-    gates[5].requiredTrustTier = "OBSERVED";
-    gates[5].acceptedTrustTiers = ["OBSERVED"];
-    gates[5].mustInclude.metricKeys = ["inter_rater_icc", "score_stability_index", "longitudinal_drift_slope", "drift_detection_coverage"];
-    gates[5].mustInclude.auditTypes = ["CONTINUOUS_COMPLIANCE_VERIFIED", "DRIFT_REMEDIATION"];
-    gates[5].mustInclude.artifactPatterns = ["inter-rater-report", "drift-report"];
+  if (seed.id === "AMC-PROV-2") {
+    gates[4].mustInclude.auditTypes = [
+      ...(gates[4].mustInclude.auditTypes ?? []),
+      "ARTIFACT_TAMPER_DETECTED"
+    ];
+    gates[5].mustInclude.auditTypes = [
+      ...(gates[5].mustInclude.auditTypes ?? []),
+      "ARTIFACT_TAMPER_DETECTED",
+      "ARTIFACT_TAMPER_CONTAINED"
+    ];
+    gates[5].mustInclude.metricKeys = [
+      ...(gates[5].mustInclude.metricKeys ?? []),
+      "artifact_tamper_detection_mttd",
+      "artifact_tamper_false_positive_rate"
+    ];
   }
 
   return {
@@ -1779,46 +1780,6 @@ const seeds: QuestionSeed[] = [
     tuningKnobs: ["guardrails.owasp.llm10", "evalHarness.owasp.llm10"]
   },
   {
-    id: "AMC-VAL-1",
-    layerName: "Resilience",
-    title: "Predictive Calibration Quality (ECE)",
-    promptTemplate:
-      "Are prediction confidence scores calibrated against realized outcomes with explicit ECE/MCE/Brier tracking and remediation workflow?",
-    labels: [
-      "No Calibration Tracking",
-      "Ad Hoc Confidence Logs",
-      "Basic Outcome Matching",
-      "ECE Tracked in Reliability Bins",
-      "Calibration Alerts + Remediation",
-      "Continuous Calibration Governance"
-    ],
-    evidenceGateHints:
-      "Require prediction log linkage, ECE/MCE/Brier metrics, and correction evidence for over/under-confidence drift.",
-    upgradeHints:
-      "Track confidence/outcome pairs in a structured prediction log; compute ECE each run and close calibration remediation actions.",
-    tuningKnobs: ["evalHarness.validity.calibration", "guardrails.validity.predictionTracking"]
-  },
-  {
-    id: "AMC-VAL-2",
-    layerName: "Resilience",
-    title: "Inter-Rater + Longitudinal Validity",
-    promptTemplate:
-      "When multiple evaluators score the same agent, are reliability, run-to-run stability, and longitudinal drift measured and acted on?",
-    labels: [
-      "Single-Rater Only",
-      "Occasional Second Opinion",
-      "Multi-Rater Reviews Without Metrics",
-      "Inter-Rater Reliability + Stability Metrics",
-      "Reliability Gates + Drift Monitoring",
-      "Continuous Validity Surveillance"
-    ],
-    evidenceGateHints:
-      "Require inter-rater agreement metrics (for example ICC), stability index, and longitudinal drift reports tied to remediation events.",
-    upgradeHints:
-      "Add routine dual-rater scoring on shared runs; instrument stability/drift thresholds and trigger remediation when reliability falls.",
-    tuningKnobs: ["evalHarness.validity.interRater", "evalHarness.validity.longitudinalDrift"]
-  },
-  {
     id: "AMC-ETP-1",
     layerName: "Resilience",
     title: "ETP Self-Knowledge Maturity",
@@ -1868,6 +1829,46 @@ const seeds: QuestionSeed[] = [
     evidenceGateHints: "Require identity audit trail, JIT credential evidence, revocation list.",
     upgradeHints: "Propagate user identity through all tool calls; replace static API keys with JIT tokens; implement revocation.",
     tuningKnobs: ["guardrails.runtimeIdentity", "evalHarness.identityAudit"]
+  },
+  {
+    id: "AMC-PROV-1",
+    layerName: "Resilience",
+    title: "Artifact Provenance Chain Completeness",
+    promptTemplate:
+      "Does every agent-generated artifact carry a complete cryptographic provenance chain (artifact -> agent -> model -> prompt -> evidence) that can be independently verified?",
+    labels: [
+      "No Provenance",
+      "Manual Notes Only",
+      "Partial Metadata",
+      "Signed Artifacts + Basic Chain",
+      "Complete Chain + Deterministic Verification",
+      "Continuously Verified Provenance at Scale"
+    ],
+    evidenceGateHints:
+      "Require signed artifact manifests, chain edge completeness, and verified evidence event references.",
+    upgradeHints:
+      "Adopt mandatory sidecar provenance manifests, enforce chain completeness gates, and verify on every release/output path.",
+    tuningKnobs: ["guardrails.provenance", "evalHarness.provenanceChain"]
+  },
+  {
+    id: "AMC-PROV-2",
+    layerName: "Resilience",
+    title: "Signed Artifact Tamper Detection & Response",
+    promptTemplate:
+      "Can the system detect and contain tampering of signed agent artifacts (content, manifest, signature, or evidence links) with low detection latency and clear remediation?",
+    labels: [
+      "No Tamper Detection",
+      "Manual Integrity Checks",
+      "Periodic Hash Spot-Checks",
+      "Automated Signature Verification",
+      "Real-Time Tamper Alerts + Quarantine",
+      "Tamper-Resilient Supply Chain with Closed-Loop Response"
+    ],
+    evidenceGateHints:
+      "Require tamper simulation tests, signature verification outcomes, and containment/remediation audit evidence.",
+    upgradeHints:
+      "Run routine tamper drills, enforce verify-before-use controls, and track detection/response metrics with post-incident closure.",
+    tuningKnobs: ["guardrails.provenanceTamper", "evalHarness.tamperSimulation"]
   }
 ];
 
