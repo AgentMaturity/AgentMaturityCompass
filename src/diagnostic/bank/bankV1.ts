@@ -125,7 +125,7 @@ export function defaultDiagnosticBankV1(): DiagnosticBank {
       dimensions: [
         { id: 1, name: "Strategic Agent Operations", questionCount: 15 },
         { id: 2, name: "Agent Leadership", questionCount: 19 },
-        { id: 3, name: "Agent Culture", questionCount: 24 },
+        { id: 3, name: "Agent Culture", questionCount: 27 },
         { id: 4, name: "Agent Resilience", questionCount: 16 },
         { id: 5, name: "Agent Skills", questionCount: 20 }
       ],
