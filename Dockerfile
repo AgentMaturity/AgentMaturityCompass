@@ -1,4 +1,6 @@
-FROM node:20-bookworm-slim AS build
+ARG NODE_IMAGE=node:20-bookworm-slim
+
+FROM ${NODE_IMAGE} AS build
 WORKDIR /app
 
 COPY package.json package-lock.json tsconfig.json ./
@@ -9,7 +11,7 @@ RUN npm ci
 RUN npm run build
 RUN npm prune --omit=dev
 
-FROM node:20-bookworm-slim AS runtime
+FROM ${NODE_IMAGE} AS runtime
 ENV NODE_ENV=production
 ENV AMC_WORKSPACE_DIR=/data/amc
 ENV AMC_BIND=0.0.0.0
@@ -34,6 +36,7 @@ RUN chmod +x /app/docker/entrypoint.sh \
 
 USER 10001:10001
 VOLUME ["/data/amc"]
+STOPSIGNAL SIGTERM
 
 EXPOSE 3210 3211 3212 3213 4173
 

@@ -1,4 +1,4 @@
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { studioEnvSchema, type StudioEnv } from "./envSchema.js";
 import type { StudioRuntimeConfig } from "./configTypes.js";
@@ -29,6 +29,90 @@ function parseAllowedOrigins(raw: string): string[] {
     .split(",")
     .map((value) => value.trim())
     .filter((value) => value.length > 0);
+}
+
+function assertIntegerInRange(
+  value: unknown,
+  label: string,
+  min: number,
+  max: number
+): string | null {
+  if (typeof value !== "number" || !Number.isFinite(value) || !Number.isInteger(value)) {
+    return `${label} must be an integer`;
+  }
+  if (value < min || value > max) {
+    return `${label} must be between ${min} and ${max}`;
+  }
+  return null;
+}
+
+function validateRuntimeConfig(config: StudioRuntimeConfig, env: NodeJS.ProcessEnv): void {
+  const errors: string[] = [];
+
+  const numericChecks: Array<[unknown, string, number, number]> = [
+    [config.hostPort, "AMC_HOST_PORT", 1, 65535],
+    [config.studioPort, "AMC_STUDIO_PORT", 1, 65535],
+    [config.gatewayPort, "AMC_GATEWAY_PORT", 1, 65535],
+    [config.proxyPort, "AMC_PROXY_PORT", 1, 65535],
+    [config.toolhubPort, "AMC_TOOLHUB_PORT", 1, 65535],
+    [config.metricsPort, "AMC_METRICS_PORT", 1, 65535],
+    [config.trustedProxyHops, "AMC_TRUSTED_PROXY_HOPS", 0, 32],
+    [config.dataRetentionDays, "AMC_DATA_RETENTION_DAYS", 1, 3650],
+    [config.minFreeDiskMb, "AMC_MIN_FREE_DISK_MB", 1, Number.MAX_SAFE_INTEGER],
+    [config.maxRequestBytes, "AMC_MAX_REQUEST_BYTES", 1024, 268_435_456]
+  ];
+
+  for (const [value, label, min, max] of numericChecks) {
+    const maybeError = assertIntegerInRange(value, label, min, max);
+    if (maybeError) {
+      errors.push(maybeError);
+    }
+  }
+
+  if (config.hostDir) {
+    if (config.hostPort === config.metricsPort) {
+      errors.push("AMC_HOST_PORT and AMC_METRICS_PORT must be different in host mode");
+    }
+  } else {
+    const runtimePorts = new Map<number, string[]>();
+    const portRows: Array<[number, string]> = [
+      [config.studioPort, "AMC_STUDIO_PORT"],
+      [config.gatewayPort, "AMC_GATEWAY_PORT"],
+      [config.proxyPort, "AMC_PROXY_PORT"],
+      [config.toolhubPort, "AMC_TOOLHUB_PORT"],
+      [config.metricsPort, "AMC_METRICS_PORT"]
+    ];
+    for (const [port, key] of portRows) {
+      const current = runtimePorts.get(port);
+      if (current) {
+        current.push(key);
+      } else {
+        runtimePorts.set(port, [key]);
+      }
+    }
+    for (const [port, keys] of runtimePorts.entries()) {
+      if (keys.length > 1) {
+        errors.push(`port ${port} is assigned to multiple services (${keys.join(", ")})`);
+      }
+    }
+  }
+
+  if (config.bootstrap) {
+    const passphraseFile = env.AMC_VAULT_PASSPHRASE_FILE?.trim() ?? "";
+    if (passphraseFile.length === 0) {
+      errors.push("AMC_BOOTSTRAP=true requires AMC_VAULT_PASSPHRASE_FILE");
+    } else if (!existsSync(resolve(passphraseFile))) {
+      errors.push(`AMC_VAULT_PASSPHRASE_FILE not found: ${resolve(passphraseFile)}`);
+    }
+  }
+
+  if (config.bootstrap && config.enableNotary && !config.notaryAuthSecret) {
+    errors.push("AMC_ENABLE_NOTARY=true with AMC_BOOTSTRAP=true requires AMC_NOTARY_AUTH_SECRET_FILE (or AMC_NOTARY_AUTH_SECRET)");
+  }
+
+  if (errors.length > 0) {
+    throw new Error(`Invalid AMC runtime configuration:\n- ${errors.join("\n- ")}`);
+  }
 }
 
 export function loadStudioRuntimeConfig(
@@ -129,12 +213,15 @@ export function loadStudioRuntimeConfig(
     }
   }
 
-  return {
+  const resolved: StudioRuntimeConfig = {
     ...base,
     ...cleanOverrides,
     allowedCidrs: cleanOverrides.allowedCidrs ?? base.allowedCidrs,
     corsAllowedOrigins: cleanOverrides.corsAllowedOrigins ?? base.corsAllowedOrigins
   };
+
+  validateRuntimeConfig(resolved, env);
+  return resolved;
 }
 
 export function isPublicBind(host: string): boolean {

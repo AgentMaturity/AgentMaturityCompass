@@ -17,7 +17,7 @@ describe("deployment pack assets", () => {
     expect(existsSync(resolve(workspace, "docker/.dockerignore"))).toBe(true);
 
     const dockerfile = read("Dockerfile");
-    expect(dockerfile).toContain("FROM node:20");
+    expect(dockerfile).toMatch(/FROM (\$\{NODE_IMAGE\}|node:20)/);
     expect(dockerfile).toContain("USER 10001:10001");
     expect(dockerfile).toContain("HEALTHCHECK");
     expect(dockerfile).toContain("\"studio\", \"healthcheck\"");
@@ -90,6 +90,34 @@ describe("deployment pack assets", () => {
     expect(config.allowedCidrs).toEqual(["127.0.0.1/32", "10.0.0.0/8"]);
     expect(config.corsAllowedOrigins).toEqual(["https://example.test"]);
     expect(config.lanMode).toBe(true);
+  });
+
+  it("rejects duplicate runtime port assignments", () => {
+    expect(() =>
+      loadStudioRuntimeConfig({
+        AMC_WORKSPACE_DIR: "/tmp/amc",
+        AMC_STUDIO_PORT: "3212",
+        AMC_GATEWAY_PORT: "3212"
+      })
+    ).toThrow(/assigned to multiple services/i);
+  });
+
+  it("rejects invalid boolean env values", () => {
+    expect(() =>
+      loadStudioRuntimeConfig({
+        AMC_WORKSPACE_DIR: "/tmp/amc",
+        AMC_LAN_MODE: "maybe"
+      })
+    ).toThrow(/invalid boolean/i);
+  });
+
+  it("requires passphrase file when bootstrap mode is enabled", () => {
+    expect(() =>
+      loadStudioRuntimeConfig({
+        AMC_WORKSPACE_DIR: "/tmp/amc",
+        AMC_BOOTSTRAP: "true"
+      })
+    ).toThrow(/AMC_VAULT_PASSPHRASE_FILE/i);
   });
 
   it("helm template renders when helm binary is available", () => {

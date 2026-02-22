@@ -1,0 +1,22 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: amc-studio
+  labels:
+    app.kubernetes.io/name: amc
+    app.kubernetes.io/component: control-plane
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: "4m"
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: amc.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: amc-studio
+                port:
+                  name: studio

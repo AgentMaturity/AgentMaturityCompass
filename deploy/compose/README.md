@@ -9,6 +9,7 @@
   - `amc_owner_password.txt`
   - `amc_notary_passphrase.txt`
   - `amc_notary_auth_secret.txt`
+- Replace all `change-me-*` placeholder values before first deployment.
 
 ## Local/Private Deployment (HTTP)
 

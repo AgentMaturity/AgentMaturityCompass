@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: amc-config
+  labels:
+    app.kubernetes.io/name: amc
+    app.kubernetes.io/component: control-plane
+data:
+  AMC_WORKSPACE_DIR: /data/amc
+  AMC_BIND: "0.0.0.0"
+  AMC_STUDIO_PORT: "3212"
+  AMC_GATEWAY_PORT: "3210"
+  AMC_PROXY_PORT: "3211"
+  AMC_TOOLHUB_PORT: "3213"
+  AMC_LAN_MODE: "true"
+  AMC_ALLOWED_CIDRS: "10.0.0.0/8,172.16.0.0/12,192.168.0.0/16,127.0.0.1/32,::1/128"
+  AMC_QUERY_LEASE_CARRIER_ENABLED: "false"
+  AMC_TRUSTED_PROXY_HOPS: "1"
+  AMC_DATA_RETENTION_DAYS: "30"
+  AMC_METRICS_BIND: "127.0.0.1"
+  AMC_METRICS_PORT: "9464"
+  AMC_ENABLE_NOTARY: "false"
+  AMC_NOTARY_BASE_URL: "http://amc-notary:4343"
+  AMC_NOTARY_REQUIRED_ATTESTATION: "SOFTWARE"

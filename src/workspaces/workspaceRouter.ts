@@ -731,13 +731,16 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
       if (pathname === "/host/readyz" || pathname === "/readyz" || pathname === "/healthz") {
         const ids = manager.listWorkspaceIds();
         const workspaces = ids.map((workspaceId) => summarizeWorkspaceReadiness(manager, workspaceId));
-        json(res, 200, {
-          status: "READY",
+        const readyCount = workspaces.filter((row) => row.ready).length;
+        const notReadyCount = workspaces.length - readyCount;
+        const hostReady = notReadyCount === 0;
+        json(res, hostReady ? 200 : 503, {
+          status: hostReady ? "READY" : "NOT_READY",
           mode: "host",
           summary: {
             total: workspaces.length,
-            ready: workspaces.filter((row) => row.ready).length,
-            notReady: workspaces.filter((row) => !row.ready).length
+            ready: readyCount,
+            notReady: notReadyCount
           },
           workspaces
         });

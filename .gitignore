@@ -40,6 +40,11 @@ AMC_ARMY_ROLES.md
 qualification.md
 sales_playbook.md
 AMC_OS/
+!AMC_OS/
+AMC_OS/*
+!AMC_OS/DEVOPS/
+AMC_OS/DEVOPS/*
+!AMC_OS/DEVOPS/wave4-deployment-audit.md
 memory/
 amc_ai_army/
 ASSETS/

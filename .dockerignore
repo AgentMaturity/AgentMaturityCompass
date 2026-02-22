@@ -3,7 +3,17 @@
 node_modules
 dist
 .amc
+.claude
+.changeset
+.openclaw
 coverage
 *.log
 tmp
 deploy/helm/**/charts
+deploy/compose/secrets
+docs
+examples
+tests
+website
+whitepaper
+security-audit
