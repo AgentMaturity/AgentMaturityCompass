@@ -74,6 +74,29 @@ export type { DomainPackResult, DomainPackAssessment } from "./domainPacks.js";
 export { computeTrajectory, analyzePopulationRisk } from "./predictiveMaturity.js";
 export type { MaturityTrajectory, PopulationRiskReport } from "./predictiveMaturity.js";
 
+export {
+  parsePredictionLogMarkdown,
+  computeCalibrationScore,
+  computeInterRaterReliability,
+  computeScoreStability,
+  detectLongitudinalDrift,
+  analyzePredictionLog,
+  trackPredictionLog,
+} from "./predictiveValidity.js";
+export type {
+  ValidityPredictionEntry,
+  CalibrationBin as PredictiveCalibrationBin,
+  CalibrationScore,
+  InterRaterScore,
+  InterRaterTargetAgreement,
+  InterRaterReliabilityReport,
+  ScoreObservation,
+  ScoreStabilityReport,
+  LongitudinalDriftReport,
+  PredictionLogAnalysis,
+  PredictionLogTrackingReport,
+} from "./predictiveValidity.js";
+
 export { generateFrameworkReport, listSupportedFrameworks } from "./crossFrameworkMapping.js";
 export type { FrameworkComplianceReport } from "./crossFrameworkMapping.js";
 

@@ -21,6 +21,12 @@ describe("question bank", () => {
     });
   });
 
+  test("includes predictive validity diagnostics", () => {
+    const ids = new Set(questionBank.map((question) => question.id));
+    expect(ids.has("AMC-VAL-1")).toBe(true);
+    expect(ids.has("AMC-VAL-2")).toBe(true);
+  });
+
   test("each question has six options levels 0..5 and six gates", () => {
     for (const question of questionBank) {
       expect(question.options).toHaveLength(6);
