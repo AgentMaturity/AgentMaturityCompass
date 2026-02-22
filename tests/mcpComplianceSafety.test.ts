@@ -195,11 +195,14 @@ describe("mcp compliance scoring", () => {
 });
 
 describe("mcp diagnostics and packs", () => {
-  test("question bank includes AMC-MCP-1/2/3", () => {
+  test("question bank includes AMC-MCP and supply-chain integrity controls", () => {
     const lookup = new Map(questionBank.map((row) => [row.id, row]));
     expect(lookup.get("AMC-MCP-1")?.layerName).toBe("Skills");
     expect(lookup.get("AMC-MCP-2")?.layerName).toBe("Skills");
     expect(lookup.get("AMC-MCP-3")?.layerName).toBe("Skills");
+    expect(lookup.get("AMC-SCI-1")?.layerName).toBe("Skills");
+    expect(lookup.get("AMC-SCI-2")?.layerName).toBe("Skills");
+    expect(lookup.get("AMC-SCI-3")?.layerName).toBe("Skills");
   });
 
   test("core policy packs expose mcp-safety", () => {
@@ -209,6 +212,9 @@ describe("mcp diagnostics and packs", () => {
     expect(pack?.targetAdjustments["AMC-MCP-1"]).toBe(5);
     expect(pack?.targetAdjustments["AMC-MCP-2"]).toBe(5);
     expect(pack?.targetAdjustments["AMC-MCP-3"]).toBe(5);
+    expect(pack?.targetAdjustments["AMC-SCI-1"]).toBe(5);
+    expect(pack?.targetAdjustments["AMC-SCI-2"]).toBe(5);
+    expect(pack?.targetAdjustments["AMC-SCI-3"]).toBe(5);
   });
 
   test("assurance policy pack registry exposes mcp-safety", () => {

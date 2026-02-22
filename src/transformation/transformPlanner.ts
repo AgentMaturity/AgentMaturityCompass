@@ -289,7 +289,17 @@ function phaseForTask(params: {
   integrityIndex: number;
   correlationRatio: number;
 }): "phase0" | "phase1" | "phase2" | "phase3" {
-  const governanceQuestions = new Set(["AMC-1.5", "AMC-1.8", "AMC-3.2.3", "AMC-4.6", "AMC-2.5", "AMC-3.3.1"]);
+  const governanceQuestions = new Set([
+    "AMC-1.5",
+    "AMC-1.8",
+    "AMC-3.2.3",
+    "AMC-4.6",
+    "AMC-2.5",
+    "AMC-3.3.1",
+    "AMC-SCI-1",
+    "AMC-SCI-2",
+    "AMC-SCI-3"
+  ]);
   const evidenceFoundation = new Set(["AMC-1.7", "AMC-2.3", "AMC-3.3.1", "AMC-3.3.5", "AMC-4.3"]);
   if ((params.integrityIndex < 0.85 || params.correlationRatio < 0.9) && evidenceFoundation.has(params.questionId)) {
     return "phase0";
