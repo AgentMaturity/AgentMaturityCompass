@@ -120,6 +120,19 @@ export {
   loadBundleRunAndTrustMap
 } from "./bundles/bundle.js";
 export {
+  collectVerifierEvidence,
+  renderVerifierEvidence,
+  renderVerifierEvidenceCsv,
+  renderVerifierEvidenceJson,
+  renderVerifierEvidencePdf,
+  defaultEvidenceExportPath,
+  exportVerifierEvidence,
+  canonicalEvidenceDatasetHash,
+  hashFile,
+  generateAuditPacket,
+  createZipArchive
+} from "./evidence/index.js";
+export {
   defaultGatePolicy,
   parseGatePolicy,
   writeSignedGatePolicy,

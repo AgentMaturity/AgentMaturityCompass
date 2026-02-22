@@ -88,6 +88,7 @@ import {
   loadBundleRunAndTrustMap,
   verifyEvidenceBundle
 } from "./bundles/bundle.js";
+import { defaultEvidenceExportPath, exportVerifierEvidence, generateAuditPacket } from "./evidence/index.js";
 import { initCiForAgent, printCiSteps, runBundleGate } from "./ci/gate.js";
 import { applyArchetype, describeArchetype, listArchetypes, previewArchetypeApply } from "./archetypes/index.js";
 import { exportBadge, exportPolicyPack } from "./exports/policyExport.js";
@@ -2593,6 +2594,7 @@ const workorder = program.command("workorder").description("Signed work order op
 const ticket = program.command("ticket").description("Execution ticket operations");
 const gateway = program.command("gateway").description("AMC universal LLM proxy gateway");
 const bundle = program.command("bundle").description("Portable evidence bundle operations");
+const evidence = program.command("evidence").description("Verifier-ready evidence export operations");
 const ci = program.command("ci").description("CI/CD release gate helpers");
 const archetype = program.command("archetype").description("Archetype packs");
 const exportGroup = program.command("export").description("Export policy packs and badges");
@@ -4559,6 +4561,66 @@ bundle
   .action((bundleA: string, bundleB: string) => {
     const diff = diffEvidenceBundles(resolve(process.cwd(), bundleA), resolve(process.cwd(), bundleB));
     console.log(JSON.stringify(diff, null, 2));
+  });
+
+evidence
+  .command("export")
+  .description("Export verifier-ready evidence (json|csv|pdf)")
+  .option("--format <format>", "json|csv|pdf", "json")
+  .option("--out <file>", "output file path")
+  .option("--agent <agentId>", "agent ID (filter evidence by agent)")
+  .option("--include-chain", "include hash chain verification fields")
+  .option("--include-rationale", "include rationale fields")
+  .action((opts: {
+    format: string;
+    out?: string;
+    agent?: string;
+    includeChain?: boolean;
+    includeRationale?: boolean;
+  }) => {
+    const normalizedFormat = String(opts.format ?? "json").toLowerCase();
+    if (normalizedFormat !== "json" && normalizedFormat !== "csv" && normalizedFormat !== "pdf") {
+      console.log(chalk.red(`Unsupported format: ${opts.format}`));
+      process.exit(1);
+    }
+    const outFile = opts.out ?? defaultEvidenceExportPath(process.cwd(), normalizedFormat);
+    const exported = exportVerifierEvidence({
+      workspace: process.cwd(),
+      format: normalizedFormat,
+      outFile,
+      agentId: opts.agent,
+      includeChain: Boolean(opts.includeChain),
+      includeRationale: Boolean(opts.includeRationale)
+    });
+    console.log(chalk.green(`Evidence exported: ${exported.outFile}`));
+    console.log(`format=${exported.format} events=${exported.eventCount} chainInvalid=${exported.chainInvalidCount}`);
+    console.log(`sha256=${exported.sha256}`);
+  });
+
+program
+  .command("audit-packet")
+  .description("Generate external-auditor packet with verifier-ready evidence")
+  .option("--output <file>", "output zip file", `./audit-${new Date().toISOString().slice(0, 10)}.zip`)
+  .option("--agent <agentId>", "agent ID (filter evidence by agent)")
+  .option("--no-include-chain", "omit hash chain fields from evidence export")
+  .option("--no-include-rationale", "omit rationale fields from evidence export")
+  .action(async (opts: {
+    output: string;
+    agent?: string;
+    includeChain: boolean;
+    includeRationale: boolean;
+  }) => {
+    const packet = await generateAuditPacket({
+      workspace: process.cwd(),
+      outputFile: opts.output,
+      agentId: opts.agent,
+      includeChain: opts.includeChain,
+      includeRationale: opts.includeRationale
+    });
+    console.log(chalk.green(`Audit packet generated: ${packet.outFile}`));
+    console.log(`sha256=${packet.sha256}`);
+    console.log(`files=${packet.fileCount} events=${packet.eventCount} chainInvalid=${packet.chainInvalidCount}`);
+    console.log(`integrity=${packet.integrityOk ? "PASS" : "FAIL"}`);
   });
 
 program

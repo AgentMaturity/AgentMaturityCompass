@@ -1,10 +1,52 @@
 import Database from "better-sqlite3";
 import { randomUUID } from "node:crypto";
+import { sha256Hex } from "../utils/hash.js";
+import { canonicalize } from "../utils/json.js";
+import { getPrivateKeyPem, signHexDigest } from "../crypto/keys.js";
 import type { CorrectionEvent, CorrectionStatus } from "./correctionTypes.js";
 
 /**
  * SQLite store for corrections and effectiveness tracking
  */
+
+function tableExists(db: Database.Database, tableName: string): boolean {
+  const row = db
+    .prepare("SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = ? LIMIT 1")
+    .get(tableName) as { 1: number } | undefined;
+  return row !== undefined;
+}
+
+function ensureEvidenceCorrectionTables(db: Database.Database): void {
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS evidence_corrections (
+      link_id TEXT PRIMARY KEY,
+      evidence_event_id TEXT NOT NULL,
+      correction_id TEXT NOT NULL,
+      status TEXT NOT NULL,
+      verified_ts INTEGER,
+      verified_by TEXT,
+      source TEXT NOT NULL,
+      created_ts INTEGER NOT NULL,
+      signature TEXT NOT NULL
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_evidence_corrections_event ON evidence_corrections(evidence_event_id, created_ts);
+    CREATE INDEX IF NOT EXISTS idx_evidence_corrections_correction ON evidence_corrections(correction_id, created_ts);
+    CREATE UNIQUE INDEX IF NOT EXISTS idx_evidence_corrections_unique ON evidence_corrections(evidence_event_id, correction_id, status);
+
+    CREATE TRIGGER IF NOT EXISTS protect_evidence_corrections_immutable
+    BEFORE UPDATE ON evidence_corrections
+    BEGIN
+      SELECT RAISE(ABORT, 'evidence_corrections are append-only');
+    END;
+
+    CREATE TRIGGER IF NOT EXISTS no_delete_evidence_corrections
+    BEFORE DELETE ON evidence_corrections
+    BEGIN
+      SELECT RAISE(ABORT, 'evidence_corrections cannot be deleted');
+    END;
+  `);
+}
 
 export function initCorrectionTables(db: Database.Database): void {
   db.exec(`
@@ -36,48 +78,29 @@ export function initCorrectionTables(db: Database.Database): void {
     CREATE INDEX IF NOT EXISTS idx_corrections_trigger ON corrections(trigger_type);
     CREATE INDEX IF NOT EXISTS idx_corrections_created_ts ON corrections(created_ts);
 
-    CREATE TABLE IF NOT EXISTS corrections_verification (
-      verification_event_id TEXT PRIMARY KEY,
-      correction_id TEXT NOT NULL,
-      verification_run_id TEXT NOT NULL,
-      verification_levels_json TEXT NOT NULL,
-      effectiveness_score REAL NOT NULL,
-      status TEXT NOT NULL,
-      verified_ts INTEGER NOT NULL,
-      verified_by TEXT NOT NULL,
-      created_ts INTEGER NOT NULL,
-      correction_hash TEXT NOT NULL,
-      signature TEXT NOT NULL,
-      FOREIGN KEY (correction_id) REFERENCES corrections(correction_id)
-    );
-
-    CREATE INDEX IF NOT EXISTS idx_corrections_verification_correction
-      ON corrections_verification(correction_id, created_ts DESC);
-    CREATE INDEX IF NOT EXISTS idx_corrections_verification_created_ts
-      ON corrections_verification(created_ts);
-
+    DROP TRIGGER IF EXISTS protect_corrections_immutable;
     CREATE TRIGGER IF NOT EXISTS protect_corrections_immutable
     BEFORE UPDATE ON corrections
+    WHEN
+      OLD.correction_id != NEW.correction_id OR
+      OLD.agent_id != NEW.agent_id OR
+      OLD.trigger_type != NEW.trigger_type OR
+      OLD.trigger_id != NEW.trigger_id OR
+      COALESCE(OLD.question_ids_json, '') != COALESCE(NEW.question_ids_json, '') OR
+      COALESCE(OLD.correction_description, '') != COALESCE(NEW.correction_description, '') OR
+      COALESCE(OLD.applied_action, '') != COALESCE(NEW.applied_action, '') OR
+      COALESCE(OLD.baseline_run_id, '') != COALESCE(NEW.baseline_run_id, '') OR
+      COALESCE(OLD.baseline_levels_json, '') != COALESCE(NEW.baseline_levels_json, '') OR
+      COALESCE(OLD.prev_correction_hash, '') != COALESCE(NEW.prev_correction_hash, '') OR
+      OLD.created_ts != NEW.created_ts
     BEGIN
-      SELECT RAISE(ABORT, 'corrections are append-only');
+      SELECT RAISE(ABORT, 'corrections immutable fields changed');
     END;
 
     CREATE TRIGGER IF NOT EXISTS no_delete_corrections
     BEFORE DELETE ON corrections
     BEGIN
       SELECT RAISE(ABORT, 'corrections cannot be deleted');
-    END;
-
-    CREATE TRIGGER IF NOT EXISTS protect_corrections_verification_immutable
-    BEFORE UPDATE ON corrections_verification
-    BEGIN
-      SELECT RAISE(ABORT, 'corrections_verification is append-only');
-    END;
-
-    CREATE TRIGGER IF NOT EXISTS no_delete_corrections_verification
-    BEFORE DELETE ON corrections_verification
-    BEGIN
-      SELECT RAISE(ABORT, 'corrections_verification cannot be deleted');
     END;
   `);
 }
@@ -133,7 +156,7 @@ export function insertCorrection(db: Database.Database, correction: CorrectionEv
 }
 
 /**
- * Update correction verification via append-only shadow events.
+ * Update verification fields for a correction while preserving immutable fields.
  */
 export function updateCorrectionVerification(
   db: Database.Database,
@@ -145,89 +168,174 @@ export function updateCorrectionVerification(
   verifiedTs: number,
   verifiedBy: string,
   correctionHash: string,
-  signature: string
+  signature: string,
+  opts?: { workspace?: string }
 ): void {
-  // Ensure the correction exists before appending verification state.
-  const existing = db
-    .prepare("SELECT correction_id FROM corrections WHERE correction_id = ?")
-    .get(correctionId) as { correction_id: string } | undefined;
+  const updatedTs = Date.now();
+  const updated = db
+    .prepare(
+      `UPDATE corrections
+       SET status = ?,
+           verification_run_id = ?,
+           verification_levels_json = ?,
+           effectiveness_score = ?,
+           verified_ts = ?,
+           verified_by = ?,
+           updated_ts = ?,
+           correction_hash = ?,
+           signature = ?
+       WHERE correction_id = ?`
+    )
+    .run(
+      status,
+      verificationRunId,
+      JSON.stringify(verificationLevels),
+      effectivenessScore,
+      verifiedTs,
+      verifiedBy,
+      updatedTs,
+      correctionHash,
+      signature,
+      correctionId
+    );
 
-  if (!existing) {
+  if ((updated.changes ?? 0) <= 0) {
     throw new Error(`Correction not found: ${correctionId}`);
   }
 
-  const stmt = db.prepare(`
-    INSERT INTO corrections_verification (
-      verification_event_id,
-      correction_id,
-      verification_run_id,
-      verification_levels_json,
-      effectiveness_score,
+  if (
+    opts?.workspace &&
+    (status === "VERIFIED_EFFECTIVE" || status === "VERIFIED_INEFFECTIVE")
+  ) {
+    markLinkedEvidenceAsCorrected(db, {
+      correctionId,
       status,
-      verified_ts,
-      verified_by,
-      created_ts,
-      correction_hash,
-      signature
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-  `);
-
-  stmt.run(
-    randomUUID(),
-    correctionId,
-    verificationRunId,
-    JSON.stringify(verificationLevels),
-    effectivenessScore,
-    status,
-    verifiedTs,
-    verifiedBy,
-    Date.now(),
-    correctionHash,
-    signature
-  );
+      verifiedTs,
+      verifiedBy,
+      workspace: opts.workspace
+    });
+  }
 }
 
-const CORRECTIONS_WITH_EFFECTIVE_STATE = `
-  SELECT
-    c.correction_id,
-    c.agent_id,
-    c.trigger_type,
-    c.trigger_id,
-    c.question_ids_json,
-    c.correction_description,
-    c.applied_action,
-    COALESCE(v.status, c.status) AS status,
-    c.baseline_run_id,
-    c.baseline_levels_json,
-    COALESCE(v.verification_run_id, c.verification_run_id) AS verification_run_id,
-    COALESCE(v.verification_levels_json, c.verification_levels_json) AS verification_levels_json,
-    COALESCE(v.effectiveness_score, c.effectiveness_score) AS effectiveness_score,
-    COALESCE(v.verified_ts, c.verified_ts) AS verified_ts,
-    COALESCE(v.verified_by, c.verified_by) AS verified_by,
-    c.created_ts,
-    COALESCE(v.created_ts, c.updated_ts) AS updated_ts,
-    c.prev_correction_hash,
-    COALESCE(v.correction_hash, c.correction_hash) AS correction_hash,
-    COALESCE(v.signature, c.signature) AS signature
-  FROM corrections c
-  LEFT JOIN corrections_verification v
-    ON v.verification_event_id = (
-      SELECT cv.verification_event_id
-      FROM corrections_verification cv
-      WHERE cv.correction_id = c.correction_id
-      ORDER BY cv.created_ts DESC, cv.rowid DESC
-      LIMIT 1
-    )
-`;
+function linkedEvidenceIdsForCorrection(db: Database.Database, correction: CorrectionEvent): string[] {
+  const linked = new Set<string>();
+  if (!tableExists(db, "evidence_events")) {
+    return [];
+  }
 
-function selectCorrections(
+  const eventExists = db.prepare("SELECT 1 FROM evidence_events WHERE id = ? LIMIT 1");
+  if (eventExists.get(correction.triggerId)) {
+    linked.add(correction.triggerId);
+  }
+
+  if (tableExists(db, "evidence_incident_links")) {
+    const rows = db
+      .prepare("SELECT event_id FROM evidence_incident_links WHERE incident_id = ? ORDER BY created_ts ASC")
+      .all(correction.triggerId) as Array<{ event_id: string }>;
+    for (const row of rows) {
+      if (row.event_id && row.event_id.length > 0) {
+        linked.add(row.event_id);
+      }
+    }
+  }
+
+  if (tableExists(db, "causal_edges")) {
+    const rows = db
+      .prepare("SELECT from_event_id, to_event_id FROM causal_edges WHERE incident_id = ? ORDER BY added_ts ASC")
+      .all(correction.triggerId) as Array<{ from_event_id: string; to_event_id: string }>;
+    for (const row of rows) {
+      if (row.from_event_id && eventExists.get(row.from_event_id)) {
+        linked.add(row.from_event_id);
+      }
+      if (row.to_event_id && eventExists.get(row.to_event_id)) {
+        linked.add(row.to_event_id);
+      }
+    }
+  }
+
+  return [...linked].sort((a, b) => a.localeCompare(b));
+}
+
+export interface MarkLinkedEvidenceResult {
+  correctionId: string;
+  linkedEvidenceIds: string[];
+  markedCount: number;
+}
+
+export function markLinkedEvidenceAsCorrected(
   db: Database.Database,
-  whereClause: string,
-  params: any[],
-  orderByClause: string
-): Array<Record<string, unknown>> {
-  const query = `${CORRECTIONS_WITH_EFFECTIVE_STATE} ${whereClause} ${orderByClause}`;
-  return db.prepare(query).all(...params) as Array<Record<string, unknown>>;
+  params: {
+    correctionId: string;
+    status: CorrectionStatus;
+    verifiedTs: number;
+    verifiedBy: string;
+    workspace: string;
+  }
+): MarkLinkedEvidenceResult {
+  if (params.status !== "VERIFIED_EFFECTIVE" && params.status !== "VERIFIED_INEFFECTIVE") {
+    return {
+      correctionId: params.correctionId,
+      linkedEvidenceIds: [],
+      markedCount: 0
+    };
+  }
+
+  const correction = getCorrectionById(db, params.correctionId);
+  if (!correction) {
+    throw new Error(`Correction not found: ${params.correctionId}`);
+  }
+
+  ensureEvidenceCorrectionTables(db);
+  const linkedEvidenceIds = linkedEvidenceIdsForCorrection(db, correction);
+  if (linkedEvidenceIds.length === 0) {
+    return {
+      correctionId: params.correctionId,
+      linkedEvidenceIds,
+      markedCount: 0
+    };
+  }
+
+  const privateKey = getPrivateKeyPem(params.workspace, "monitor");
+  const insert = db.prepare(
+    `INSERT OR IGNORE INTO evidence_corrections
+     (link_id, evidence_event_id, correction_id, status, verified_ts, verified_by, source, created_ts, signature)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
+  );
+
+  let markedCount = 0;
+  for (const evidenceEventId of linkedEvidenceIds) {
+    const createdTs = Date.now();
+    const linkId = `evcorr_${randomUUID().replace(/-/g, "")}`;
+    const payload = canonicalize({
+      link_id: linkId,
+      evidence_event_id: evidenceEventId,
+      correction_id: params.correctionId,
+      status: params.status,
+      verified_ts: params.verifiedTs,
+      verified_by: params.verifiedBy,
+      source: "CORRECTION_VERIFICATION",
+      created_ts: createdTs
+    });
+    const signature = signHexDigest(sha256Hex(payload), privateKey);
+    const result = insert.run(
+      linkId,
+      evidenceEventId,
+      params.correctionId,
+      params.status,
+      params.verifiedTs,
+      params.verifiedBy,
+      "CORRECTION_VERIFICATION",
+      createdTs,
+      signature
+    );
+    markedCount += Number(result.changes ?? 0);
+  }
+
+  return {
+    correctionId: params.correctionId,
+    linkedEvidenceIds,
+    markedCount
+  };
 }
 
 function rowToCorrection(row: Record<string, unknown>): CorrectionEvent {
@@ -263,17 +371,19 @@ export function getCorrectionsByAgent(
   agentId: string,
   status?: CorrectionStatus
 ): CorrectionEvent[] {
-  const rows = selectCorrections(
-    db,
-    "WHERE c.agent_id = ?",
-    [agentId],
-    "ORDER BY c.created_ts DESC"
-  );
-  const corrections = rows.map(rowToCorrection);
-  if (!status) {
-    return corrections;
+  let query = "SELECT * FROM corrections WHERE agent_id = ?";
+  const params: any[] = [agentId];
+
+  if (status) {
+    query += " AND status = ?";
+    params.push(status);
   }
-  return corrections.filter((correction) => correction.status === status);
+
+  query += " ORDER BY created_ts DESC";
+
+  const stmt = db.prepare(query);
+  const rows = stmt.all(...params) as Array<Record<string, unknown>>;
+  return rows.map(rowToCorrection);
 }
 
 /**
@@ -284,12 +394,13 @@ export function getCorrectionsByQuestion(
   agentId: string,
   questionId: string
 ): CorrectionEvent[] {
-  const rows = selectCorrections(
-    db,
-    "WHERE c.agent_id = ? AND c.question_ids_json LIKE ?",
-    [agentId, `%"${questionId}"%`],
-    "ORDER BY c.created_ts DESC"
-  );
+  const stmt = db.prepare(`
+    SELECT * FROM corrections
+    WHERE agent_id = ? AND question_ids_json LIKE ?
+    ORDER BY created_ts DESC
+  `);
+
+  const rows = stmt.all(agentId, `%"${questionId}"%`) as Array<Record<string, unknown>>;
   return rows.map(rowToCorrection);
 }
 
@@ -297,12 +408,13 @@ export function getCorrectionsByQuestion(
  * Get all pending corrections (APPLIED or PENDING_VERIFICATION status)
  */
 export function getPendingCorrections(db: Database.Database, agentId: string): CorrectionEvent[] {
-  const rows = selectCorrections(
-    db,
-    `WHERE c.agent_id = ? AND COALESCE(v.status, c.status) IN ('APPLIED', 'PENDING_VERIFICATION')`,
-    [agentId],
-    "ORDER BY c.created_ts ASC"
-  );
+  const stmt = db.prepare(`
+    SELECT * FROM corrections
+    WHERE agent_id = ? AND (status = 'APPLIED' OR status = 'PENDING_VERIFICATION')
+    ORDER BY created_ts ASC
+  `);
+
+  const rows = stmt.all(agentId) as Array<Record<string, unknown>>;
   return rows.map(rowToCorrection);
 }
 
@@ -311,22 +423,8 @@ export function getPendingCorrections(db: Database.Database, agentId: string): C
  */
 export function getLastCorrectionHash(db: Database.Database, agentId: string): string {
   const row = db
-    .prepare(`
-      SELECT correction_hash
-      FROM (
-        SELECT c.correction_hash AS correction_hash, c.created_ts AS ts, c.rowid AS ord
-        FROM corrections c
-        WHERE c.agent_id = ?
-        UNION ALL
-        SELECT cv.correction_hash AS correction_hash, cv.created_ts AS ts, cv.rowid AS ord
-        FROM corrections_verification cv
-        JOIN corrections c ON c.correction_id = cv.correction_id
-        WHERE c.agent_id = ?
-      )
-      ORDER BY ts DESC, ord DESC
-      LIMIT 1
-    `)
-    .get(agentId, agentId) as { correction_hash: string } | undefined;
+    .prepare("SELECT correction_hash FROM corrections WHERE agent_id = ? ORDER BY rowid DESC LIMIT 1")
+    .get(agentId) as { correction_hash: string } | undefined;
   return row?.correction_hash ?? "GENESIS_CORRECTION";
 }
 
@@ -334,13 +432,8 @@ export function getLastCorrectionHash(db: Database.Database, agentId: string): s
  * Get a single correction by ID
  */
 export function getCorrectionById(db: Database.Database, correctionId: string): CorrectionEvent | null {
-  const rows = selectCorrections(
-    db,
-    "WHERE c.correction_id = ?",
-    [correctionId],
-    "ORDER BY c.created_ts DESC"
-  );
-  const row = rows[0];
+  const stmt = db.prepare("SELECT * FROM corrections WHERE correction_id = ?");
+  const row = stmt.get(correctionId) as Record<string, unknown> | undefined;
   return row ? rowToCorrection(row) : null;
 }
 
@@ -348,12 +441,13 @@ export function getCorrectionById(db: Database.Database, correctionId: string): 
  * Get all verified corrections (those with verification results)
  */
 export function getVerifiedCorrections(db: Database.Database, agentId: string): CorrectionEvent[] {
-  const rows = selectCorrections(
-    db,
-    `WHERE c.agent_id = ? AND COALESCE(v.status, c.status) IN ('VERIFIED_EFFECTIVE', 'VERIFIED_INEFFECTIVE')`,
-    [agentId],
-    "ORDER BY COALESCE(v.verified_ts, c.verified_ts) DESC, c.created_ts DESC"
-  );
+  const stmt = db.prepare(`
+    SELECT * FROM corrections
+    WHERE agent_id = ? AND (status = 'VERIFIED_EFFECTIVE' OR status = 'VERIFIED_INEFFECTIVE')
+    ORDER BY verified_ts DESC
+  `);
+
+  const rows = stmt.all(agentId) as Array<Record<string, unknown>>;
   return rows.map(rowToCorrection);
 }
 
@@ -365,12 +459,13 @@ export function getCorrectionsByTriggerType(
   agentId: string,
   triggerType: string
 ): CorrectionEvent[] {
-  const rows = selectCorrections(
-    db,
-    "WHERE c.agent_id = ? AND c.trigger_type = ?",
-    [agentId, triggerType],
-    "ORDER BY c.created_ts DESC"
-  );
+  const stmt = db.prepare(`
+    SELECT * FROM corrections
+    WHERE agent_id = ? AND trigger_type = ?
+    ORDER BY created_ts DESC
+  `);
+
+  const rows = stmt.all(agentId, triggerType) as Array<Record<string, unknown>>;
   return rows.map(rowToCorrection);
 }
 
@@ -383,11 +478,12 @@ export function getCorrectionsByWindow(
   windowStartTs: number,
   windowEndTs: number
 ): CorrectionEvent[] {
-  const rows = selectCorrections(
-    db,
-    "WHERE c.agent_id = ? AND c.created_ts >= ? AND c.created_ts <= ?",
-    [agentId, windowStartTs, windowEndTs],
-    "ORDER BY c.created_ts DESC"
-  );
+  const stmt = db.prepare(`
+    SELECT * FROM corrections
+    WHERE agent_id = ? AND created_ts >= ? AND created_ts <= ?
+    ORDER BY created_ts DESC
+  `);
+
+  const rows = stmt.all(agentId, windowStartTs, windowEndTs) as Array<Record<string, unknown>>;
   return rows.map(rowToCorrection);
 }

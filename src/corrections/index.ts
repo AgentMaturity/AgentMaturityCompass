@@ -4,6 +4,7 @@ export {
   initCorrectionTables,
   insertCorrection,
   updateCorrectionVerification,
+  markLinkedEvidenceAsCorrected,
   getCorrectionsByAgent,
   getCorrectionsByQuestion,
   getPendingCorrections,

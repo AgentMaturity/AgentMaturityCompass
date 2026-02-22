@@ -25,6 +25,8 @@ import { canonicalize } from "../utils/json.js";
 import { mintReceipt, verifyReceipt, type ReceiptKind } from "../receipts/receipt.js";
 import { loadOpsPolicy } from "../ops/policy.js";
 import { loadBlobMetadata, storeEncryptedBlob } from "../storage/blobs/blobStore.js";
+import { createIncidentStore } from "../incidents/incidentStore.js";
+import type { Incident, CausalRelationship } from "../incidents/incidentTypes.js";
 
 export interface AppendEvidenceInput {
   sessionId: string;
@@ -410,6 +412,67 @@ const migrations: Migration[] = [
         SELECT RAISE(ABORT, 'claim_transitions cannot be deleted');
       END;
     `
+  },
+  {
+    version: 7,
+    sql: `
+      CREATE TABLE IF NOT EXISTS evidence_incident_links (
+        link_id TEXT PRIMARY KEY,
+        event_id TEXT NOT NULL,
+        incident_id TEXT NOT NULL,
+        relationship TEXT NOT NULL,
+        confidence REAL NOT NULL,
+        reason TEXT,
+        source TEXT NOT NULL,
+        created_ts INTEGER NOT NULL,
+        created_by TEXT NOT NULL,
+        signature TEXT NOT NULL
+      );
+
+      CREATE INDEX IF NOT EXISTS idx_evidence_incident_links_event ON evidence_incident_links(event_id, created_ts);
+      CREATE INDEX IF NOT EXISTS idx_evidence_incident_links_incident ON evidence_incident_links(incident_id, created_ts);
+      CREATE UNIQUE INDEX IF NOT EXISTS idx_evidence_incident_links_unique ON evidence_incident_links(event_id, incident_id);
+
+      CREATE TRIGGER IF NOT EXISTS protect_evidence_incident_links_immutable
+      BEFORE UPDATE ON evidence_incident_links
+      BEGIN
+        SELECT RAISE(ABORT, 'evidence_incident_links are append-only');
+      END;
+
+      CREATE TRIGGER IF NOT EXISTS no_delete_evidence_incident_links
+      BEFORE DELETE ON evidence_incident_links
+      BEGIN
+        SELECT RAISE(ABORT, 'evidence_incident_links cannot be deleted');
+      END;
+
+      CREATE TABLE IF NOT EXISTS evidence_corrections (
+        link_id TEXT PRIMARY KEY,
+        evidence_event_id TEXT NOT NULL,
+        correction_id TEXT NOT NULL,
+        status TEXT NOT NULL,
+        verified_ts INTEGER,
+        verified_by TEXT,
+        source TEXT NOT NULL,
+        created_ts INTEGER NOT NULL,
+        signature TEXT NOT NULL
+      );
+
+      CREATE INDEX IF NOT EXISTS idx_evidence_corrections_event ON evidence_corrections(evidence_event_id, created_ts);
+      CREATE INDEX IF NOT EXISTS idx_evidence_corrections_correction ON evidence_corrections(correction_id, created_ts);
+      CREATE UNIQUE INDEX IF NOT EXISTS idx_evidence_corrections_unique ON evidence_corrections(evidence_event_id, correction_id, status);
+
+      CREATE TRIGGER IF NOT EXISTS protect_evidence_corrections_immutable
+      BEFORE UPDATE ON evidence_corrections
+      BEGIN
+        SELECT RAISE(ABORT, 'evidence_corrections are append-only');
+      END;
+
+      CREATE TRIGGER IF NOT EXISTS no_delete_evidence_corrections
+      BEFORE DELETE ON evidence_corrections
+      BEGIN
+        SELECT RAISE(ABORT, 'evidence_corrections cannot be deleted');
+      END;
+    `
   }
 ];
 
@@ -506,9 +569,78 @@ function canonicalMetadataForHash(params: {
   });
 }
 
+function firstString(
+  source: Record<string, unknown>,
+  keys: string[]
+): string | null {
+  for (const key of keys) {
+    const value = source[key];
+    if (typeof value === "string" && value.trim().length > 0) {
+      return value.trim();
+    }
+  }
+  return null;
+}
+
+function stringArray(value: unknown): string[] {
+  if (Array.isArray(value)) {
+    return value
+      .filter((entry): entry is string => typeof entry === "string" && entry.trim().length > 0)
+      .map((entry) => entry.trim());
+  }
+  if (typeof value === "string" && value.trim().length > 0) {
+    return [value.trim()];
+  }
+  return [];
+}
+
+function contextFromEvidenceMeta(meta: Record<string, unknown>): {
+  agentId: string | null;
+  explicitIncidentIds: string[];
+  triggerIds: string[];
+  questionIds: string[];
+} {
+  const explicitIncidentIds = [
+    ...stringArray(meta.incidentId),
+    ...stringArray(meta.incident_id),
+    ...stringArray(meta.incidentIds),
+    ...stringArray(meta.incident_ids)
+  ];
+  const triggerIds = [
+    ...stringArray(meta.triggerId),
+    ...stringArray(meta.trigger_id)
+  ];
+  const questionIds = [
+    ...stringArray(meta.questionId),
+    ...stringArray(meta.question_id),
+    ...stringArray(meta.questionIds),
+    ...stringArray(meta.question_ids),
+    ...stringArray(meta.affectedQuestionIds),
+    ...stringArray(meta.affected_question_ids)
+  ];
+  return {
+    agentId: firstString(meta, ["agentId", "agent_id"]),
+    explicitIncidentIds: [...new Set(explicitIncidentIds)],
+    triggerIds: [...new Set(triggerIds)],
+    questionIds: [...new Set(questionIds)]
+  };
+}
+
+const AUTO_INCIDENT_FALLBACK_EVENT_TYPES = new Set<EvidenceEventType>([
+  "audit",
+  "review",
+  "test",
+  "metric",
+  "artifact",
+  "tool_action",
+  "tool_result",
+  "outcome"
+]);
+
 export class Ledger {
   readonly workspace: string;
   readonly db: Database.Database;
+  private incidentStoreInitialized = false;
 
   constructor(workspace: string) {
     this.workspace = workspace;
@@ -579,6 +711,169 @@ export class Ledger {
       sha: stored.payloadSha256,
       blobRef: stored.blobId
     };
+  }
+
+  private ensureIncidentStore() {
+    const store = createIncidentStore(this.db);
+    if (!this.incidentStoreInitialized) {
+      store.initTables();
+      this.incidentStoreInitialized = true;
+    }
+    return store;
+  }
+
+  private appendEvidenceIncidentLink(params: {
+    eventId: string;
+    incidentId: string;
+    relationship: CausalRelationship;
+    confidence: number;
+    reason: string;
+    createdTs: number;
+  }): void {
+    if (!hasTable(this.db, "evidence_incident_links")) {
+      return;
+    }
+    const existing = this.db
+      .prepare("SELECT 1 FROM evidence_incident_links WHERE event_id = ? AND incident_id = ? LIMIT 1")
+      .get(params.eventId, params.incidentId);
+    if (existing) {
+      return;
+    }
+
+    const linkId = `eil_${randomUUID().replace(/-/g, "")}`;
+    const canonical = canonicalize({
+      link_id: linkId,
+      event_id: params.eventId,
+      incident_id: params.incidentId,
+      relationship: params.relationship,
+      confidence: params.confidence,
+      reason: params.reason,
+      source: "AUTO_OPEN_INCIDENT_MATCH",
+      created_ts: params.createdTs,
+      created_by: "AUTO"
+    });
+    const signature = signHexDigest(sha256Hex(canonical), this.monitorPrivateKey());
+
+    this.db
+      .prepare(
+        `INSERT INTO evidence_incident_links
+         (link_id, event_id, incident_id, relationship, confidence, reason, source, created_ts, created_by, signature)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+      )
+      .run(
+        linkId,
+        params.eventId,
+        params.incidentId,
+        params.relationship,
+        params.confidence,
+        params.reason,
+        "AUTO_OPEN_INCIDENT_MATCH",
+        params.createdTs,
+        "AUTO",
+        signature
+      );
+
+    if (!hasTable(this.db, "causal_edges")) {
+      return;
+    }
+
+    const existingEdge = this.db
+      .prepare("SELECT 1 FROM causal_edges WHERE incident_id = ? AND from_event_id = ? AND to_event_id = ? LIMIT 1")
+      .get(params.incidentId, params.eventId, params.incidentId);
+    if (existingEdge) {
+      return;
+    }
+
+    const edgeId = `edge_${randomUUID().replace(/-/g, "")}`;
+    const edgePayload = canonicalize({
+      edge_id: edgeId,
+      from_event_id: params.eventId,
+      to_event_id: params.incidentId,
+      relationship: params.relationship,
+      confidence: params.confidence,
+      evidence: [params.eventId],
+      added_ts: params.createdTs,
+      added_by: "AUTO"
+    });
+    const edgeSig = signHexDigest(sha256Hex(edgePayload), this.monitorPrivateKey());
+    this.db
+      .prepare(
+        `INSERT INTO causal_edges
+         (edge_id, incident_id, from_event_id, to_event_id, relationship, confidence, evidence_json, added_ts, added_by, signature)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+      )
+      .run(
+        edgeId,
+        params.incidentId,
+        params.eventId,
+        params.incidentId,
+        params.relationship,
+        params.confidence,
+        JSON.stringify([params.eventId]),
+        params.createdTs,
+        "AUTO",
+        edgeSig
+      );
+  }
+
+  private autoLinkEvidenceToOpenIncidents(params: {
+    eventId: string;
+    eventType: EvidenceEventType;
+    meta: Record<string, unknown>;
+    ts: number;
+  }): void {
+    const context = contextFromEvidenceMeta(params.meta);
+    if (!context.agentId) {
+      return;
+    }
+
+    let open: Incident[] = [];
+    try {
+      const store = this.ensureIncidentStore();
+      open = store.getOpenIncidents(context.agentId);
+    } catch {
+      return;
+    }
+    if (open.length === 0) {
+      return;
+    }
+
+    for (const incident of open) {
+      const reasons: string[] = [];
+      let confidence = 0.5;
+
+      if (context.explicitIncidentIds.includes(incident.incidentId)) {
+        reasons.push("meta.incidentId match");
+        confidence = Math.max(confidence, 1);
+      }
+      if (context.triggerIds.includes(incident.triggerId)) {
+        reasons.push("meta.triggerId match");
+        confidence = Math.max(confidence, 0.9);
+      }
+      if (context.questionIds.some((questionId) => incident.affectedQuestionIds.includes(questionId))) {
+        reasons.push("affected question overlap");
+        confidence = Math.max(confidence, 0.75);
+      }
+      if (
+        reasons.length === 0 &&
+        open.length === 1 &&
+        AUTO_INCIDENT_FALLBACK_EVENT_TYPES.has(params.eventType)
+      ) {
+        reasons.push("single open incident fallback");
+        confidence = Math.max(confidence, 0.4);
+      }
+      if (reasons.length === 0) {
+        continue;
+      }
+      this.appendEvidenceIncidentLink({
+        eventId: params.eventId,
+        incidentId: incident.incidentId,
+        relationship: "CORRELATED",
+        confidence,
+        reason: reasons.join("; "),
+        createdTs: params.ts
+      });
+    }
   }
 
   appendEvidenceDetailed(input: AppendEvidenceInput): AppendEvidenceResult {
@@ -655,6 +950,13 @@ export class Ledger {
         payload_pruned: 0,
         payload_pruned_ts: null
       });
+
+    this.autoLinkEvidenceToOpenIncidents({
+      eventId: id,
+      eventType: input.eventType,
+      meta: input.meta ?? {},
+      ts
+    });
 
     return {
       id,
@@ -781,6 +1083,13 @@ export class Ledger {
         payload_pruned: 0,
         payload_pruned_ts: null
       });
+
+    this.autoLinkEvidenceToOpenIncidents({
+      eventId: id,
+      eventType: input.eventType,
+      meta: baseMeta,
+      ts
+    });
 
     return {
       id,

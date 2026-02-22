@@ -142,7 +142,8 @@ export function autoVerifyPendingCorrections(
       latestReport.ts,
       latestReport.runId,
       correctionHash,
-      signature
+      signature,
+      { workspace }
     );
 
     const updated_correction = getCorrectionById(db, correction.correctionId);
