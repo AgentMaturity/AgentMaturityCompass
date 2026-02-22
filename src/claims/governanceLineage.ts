@@ -646,12 +646,13 @@ export function generateGovernanceLineageReport(
 
   // Count claims by state
   const states: ClaimLifecycleState[] = [
-    "QUARANTINE", "PROVISIONAL", "PROMOTED", "DEPRECATED", "REVOKED",
+    "QUARANTINE", "PROVISIONAL", "PROMOTED", "EXPIRED", "DEPRECATED", "REVOKED",
   ];
   const claimsByState: Record<ClaimLifecycleState, number> = {
     QUARANTINE: 0,
     PROVISIONAL: 0,
     PROMOTED: 0,
+    EXPIRED: 0,
     DEPRECATED: 0,
     REVOKED: 0,
   };

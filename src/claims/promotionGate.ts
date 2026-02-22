@@ -121,9 +121,10 @@ export function evaluatePromotion(
 
   // Helper: check if transition is valid
   const validTransitions: Record<ClaimLifecycleState, ClaimLifecycleState[]> = {
-    QUARANTINE: ["PROVISIONAL", "REVOKED"],
-    PROVISIONAL: ["PROMOTED", "QUARANTINE", "DEPRECATED", "REVOKED"],
-    PROMOTED: ["DEPRECATED", "REVOKED"],
+    QUARANTINE: ["PROVISIONAL", "EXPIRED", "REVOKED"],
+    PROVISIONAL: ["PROMOTED", "QUARANTINE", "EXPIRED", "DEPRECATED", "REVOKED"],
+    PROMOTED: ["EXPIRED", "DEPRECATED", "REVOKED"],
+    EXPIRED: ["REVOKED"],
     DEPRECATED: ["REVOKED"],
     REVOKED: []
   };
@@ -181,10 +182,12 @@ export function evaluatePromotion(
     };
   }
 
-  // Check 4: Terminal states (DEPRECATED, REVOKED) always allowed
-  if (requestedState === "DEPRECATED" || requestedState === "REVOKED") {
+  // Check 4: terminal transitions to EXPIRED/DEPRECATED/REVOKED are always allowed
+  if (requestedState === "EXPIRED" || requestedState === "DEPRECATED" || requestedState === "REVOKED") {
     if (requestedState === "REVOKED") {
       reasons.push("Revocation is always allowed");
+    } else if (requestedState === "EXPIRED") {
+      reasons.push("Expiry is always allowed");
     } else {
       reasons.push("Deprecation is always allowed");
     }
@@ -326,7 +329,11 @@ export function checkStaleClaims(
 
   for (const claim of claims) {
     // Skip terminal states
-    if (claim.lifecycleState === "REVOKED" || claim.lifecycleState === "DEPRECATED") {
+    if (
+      claim.lifecycleState === "REVOKED"
+      || claim.lifecycleState === "DEPRECATED"
+      || claim.lifecycleState === "EXPIRED"
+    ) {
       continue;
     }
 

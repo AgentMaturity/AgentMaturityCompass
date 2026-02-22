@@ -1,14 +1,14 @@
 /**
  * Claim Expiry & Staleness Detection
  *
- * Configurable TTL per provenance tag with auto-demotion of stale claims.
- * Stale claims are demoted to PROVISIONAL and flagged for re-verification.
+ * Configurable TTL per provenance tag with append-only stale claim expiry.
+ * Stale claims are expired by appending a new EXPIRED claim record.
  */
 
 import { randomUUID } from "node:crypto";
 import Database from "better-sqlite3";
 import type { Claim, ClaimLifecycleState, ClaimProvenanceTag, ClaimTransition } from "./claimTypes.js";
-import { getClaimsByAgent, getClaimById, insertClaimTransition, getLastClaimHash } from "./claimStore.js";
+import { getClaimsByAgent, insertClaim, insertClaimTransition, getLastClaimHash } from "./claimStore.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { signHexDigest, getPrivateKeyPem } from "../crypto/keys.js";
@@ -84,7 +84,11 @@ export function effectiveTtl(claim: Claim, config?: ExpiryConfig): number {
 export function isClaimStale(claim: Claim, now?: number, config?: ExpiryConfig): StaleClaim | null {
   const ts = now ?? Date.now();
   // Skip terminal states
-  if (claim.lifecycleState === "REVOKED" || claim.lifecycleState === "DEPRECATED") {
+  if (
+    claim.lifecycleState === "REVOKED"
+    || claim.lifecycleState === "DEPRECATED"
+    || claim.lifecycleState === "EXPIRED"
+  ) {
     return null;
   }
   const ttl = effectiveTtl(claim, config);
@@ -122,11 +126,11 @@ export function findStaleClaims(
 }
 
 // ---------------------------------------------------------------------------
-// Auto-Demotion (Sweep)
+// Auto-Expiry Sweep
 // ---------------------------------------------------------------------------
 
 export interface SweepResult {
-  demoted: string[];      // claimIds that were demoted
+  demoted: string[];      // original claimIds that were expired
   alreadyProvisional: string[];
   skipped: string[];
   errors: string[];
@@ -134,10 +138,9 @@ export interface SweepResult {
 
 /**
  * Process all stale claims for an agent:
- * - PROMOTED → PROVISIONAL
- * - QUARANTINE → PROVISIONAL (and flag for re-verification)
- * Non-PROVISIONAL stale claims are demoted to PROVISIONAL.
- * Already-PROVISIONAL stale claims are flagged but not changed.
+ * - Non-PROVISIONAL stale claims are expired by appending an EXPIRED claim record.
+ * - Already-PROVISIONAL stale claims are flagged but not changed.
+ * No in-place mutation is performed.
  */
 export function sweepStaleClaims(
   db: Database.Database,
@@ -157,36 +160,95 @@ export function sweepStaleClaims(
   for (const stale of staleClaims) {
     const { claim } = stale;
     try {
+      const alreadyExpired = db
+        .prepare(
+          "SELECT 1 FROM claim_transitions WHERE claim_id = ? AND to_state = 'EXPIRED' LIMIT 1"
+        )
+        .get(claim.claimId) as { 1: number } | undefined;
+      if (alreadyExpired) {
+        result.skipped.push(claim.claimId);
+        continue;
+      }
+
       if (claim.lifecycleState === "PROVISIONAL") {
         result.alreadyProvisional.push(claim.claimId);
         continue;
       }
 
-      // Demote to PROVISIONAL via transition
+      // Record transition to EXPIRED for auditability.
       const transitionId = randomUUID();
       const ts = now ?? Date.now();
       const transitionBody = {
         transitionId,
         claimId: claim.claimId,
         fromState: claim.lifecycleState,
-        toState: "PROVISIONAL" as ClaimLifecycleState,
-        reason: `Auto-demoted: ${stale.reason}`,
+        toState: "EXPIRED" as ClaimLifecycleState,
+        reason: `Auto-expired: ${stale.reason}`,
         evidenceRefs: [] as string[],
         ts,
       };
       const digest = sha256Hex(canonicalize(transitionBody));
-      let signature = "unsigned";
+      let transitionSignature = "unsigned";
       try {
-        signature = signHexDigest(digest, getPrivateKeyPem(workspace, "monitor"));
+        transitionSignature = signHexDigest(digest, getPrivateKeyPem(workspace, "monitor"));
       } catch { /* no key available */ }
 
-      const transition: ClaimTransition = { ...transitionBody, signature };
+      const transition: ClaimTransition = { ...transitionBody, signature: transitionSignature };
       insertClaimTransition(db, transition);
 
-      // Update claim lifecycle_state in DB
-      db.prepare(
-        "UPDATE claims SET lifecycle_state = ?, last_verified_ts = ? WHERE claim_id = ?"
-      ).run("PROVISIONAL", ts, claim.claimId);
+      // Append an EXPIRED claim record instead of mutating the existing row.
+      const expiredClaimBody: Omit<Claim, "claim_hash" | "signature"> = {
+        claimId: randomUUID(),
+        agentId: claim.agentId,
+        runId: claim.runId,
+        questionId: claim.questionId,
+        assertionText: claim.assertionText,
+        claimedLevel: claim.claimedLevel,
+        provenanceTag: claim.provenanceTag,
+        lifecycleState: "EXPIRED",
+        confidence: claim.confidence,
+        evidenceRefs: [...claim.evidenceRefs],
+        trustTier: claim.trustTier,
+        promotedFromClaimId: claim.claimId,
+        promotionEvidence: [...claim.promotionEvidence],
+        supersededByClaimId: null,
+        createdTs: ts,
+        lastVerifiedTs: ts,
+        expiryTs: claim.expiryTs,
+        prev_claim_hash: getLastClaimHash(db, claim.agentId),
+      };
+
+      const expiredClaimHash = sha256Hex(canonicalize({
+        claim_id: expiredClaimBody.claimId,
+        agent_id: expiredClaimBody.agentId,
+        run_id: expiredClaimBody.runId,
+        question_id: expiredClaimBody.questionId,
+        assertion_text: expiredClaimBody.assertionText,
+        claimed_level: expiredClaimBody.claimedLevel,
+        provenance_tag: expiredClaimBody.provenanceTag,
+        lifecycle_state: expiredClaimBody.lifecycleState,
+        confidence: expiredClaimBody.confidence,
+        evidence_refs: expiredClaimBody.evidenceRefs,
+        trust_tier: expiredClaimBody.trustTier,
+        promoted_from_claim_id: expiredClaimBody.promotedFromClaimId,
+        promotion_evidence: expiredClaimBody.promotionEvidence,
+        superseded_by_claim_id: expiredClaimBody.supersededByClaimId,
+        created_ts: expiredClaimBody.createdTs,
+        last_verified_ts: expiredClaimBody.lastVerifiedTs,
+        expiry_ts: expiredClaimBody.expiryTs,
+        prev_claim_hash: expiredClaimBody.prev_claim_hash,
+      }));
+
+      let expiredClaimSignature = "unsigned";
+      try {
+        expiredClaimSignature = signHexDigest(expiredClaimHash, getPrivateKeyPem(workspace, "monitor"));
+      } catch { /* no key available */ }
+
+      insertClaim(db, {
+        ...expiredClaimBody,
+        claim_hash: expiredClaimHash,
+        signature: expiredClaimSignature,
+      });
 
       result.demoted.push(claim.claimId);
     } catch (err) {
@@ -242,7 +304,7 @@ export function renderSweepResultMarkdown(result: SweepResult, agentId: string):
   ];
 
   if (result.demoted.length > 0) {
-    lines.push("## Demoted to PROVISIONAL");
+    lines.push("## Expired via append-only events");
     for (const id of result.demoted) {
       lines.push(`- ${id}`);
     }

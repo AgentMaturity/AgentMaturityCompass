@@ -20,6 +20,7 @@ export type ClaimProvenanceTag =
  * - QUARANTINE: New claim, not yet promoted
  * - PROVISIONAL: Partially verified, limited trust
  * - PROMOTED: Fully verified, cross-session evidence
+ * - EXPIRED: Stale claim replaced by an append-only expiry event
  * - DEPRECATED: Superseded by newer claim
  * - REVOKED: Explicitly invalidated
  */
@@ -27,6 +28,7 @@ export type ClaimLifecycleState =
   | "QUARANTINE"
   | "PROVISIONAL"
   | "PROMOTED"
+  | "EXPIRED"
   | "DEPRECATED"
   | "REVOKED";
 

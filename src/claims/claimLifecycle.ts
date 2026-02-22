@@ -23,9 +23,10 @@ import type { EvidenceEvent } from "../types.js";
  * Deprecation terminal: DEPRECATED → REVOKED
  */
 const VALID_TRANSITIONS: Record<ClaimLifecycleState, ClaimLifecycleState[]> = {
-  QUARANTINE: ["PROVISIONAL", "REVOKED"],
-  PROVISIONAL: ["PROMOTED", "QUARANTINE", "DEPRECATED", "REVOKED"],
-  PROMOTED: ["DEPRECATED", "REVOKED"],
+  QUARANTINE: ["PROVISIONAL", "EXPIRED", "REVOKED"],
+  PROVISIONAL: ["PROMOTED", "QUARANTINE", "EXPIRED", "DEPRECATED", "REVOKED"],
+  PROMOTED: ["EXPIRED", "DEPRECATED", "REVOKED"],
+  EXPIRED: ["REVOKED"],
   DEPRECATED: ["REVOKED"],
   REVOKED: [] // terminal
 };
