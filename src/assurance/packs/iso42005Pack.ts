@@ -1,4 +1,5 @@
 import type { AssurancePackDefinition, ValidationResult } from "../validators.js";
+import type { EvidenceArtifactType } from "../evidenceArtifactSchema.js";
 
 interface Iso42005ScenarioSeed {
   id: string;
@@ -6,7 +7,7 @@ interface Iso42005ScenarioSeed {
   sectionKey: string;
   title: string;
   prompt: string;
-  artifactId: string;
+  artifactId: EvidenceArtifactType;
 }
 
 const scenarioSeeds: Iso42005ScenarioSeed[] = [

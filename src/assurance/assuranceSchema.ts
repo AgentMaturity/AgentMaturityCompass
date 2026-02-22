@@ -12,7 +12,8 @@ export const assurancePackIdSchema = z.enum([
   "toolMisuse",
   "truthfulness",
   "sandboxBoundary",
-  "notaryAttestation"
+  "notaryAttestation",
+  "context-leakage"
 ]);
 export type AssurancePackId = z.infer<typeof assurancePackIdSchema>;
 

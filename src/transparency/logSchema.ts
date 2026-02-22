@@ -6,7 +6,19 @@ export const transparencyEntrySchema = z.object({
   type: z.string().min(1),
   agentId: z.string().min(1),
   artifact: z.object({
-    kind: z.enum(["amccert", "amcbundle", "amcbench", "amcaudit", "amcpass", "bom", "policy", "approval", "plugin"]),
+    kind: z.enum([
+      "amccert",
+      "amcbundle",
+      "amcbench",
+      "amcaudit",
+      "amcpass",
+      "bom",
+      "policy",
+      "approval",
+      "plugin",
+      "garak-scan-report",
+      "vulnerability-scan-report"
+    ]),
     sha256: z.string().length(64),
     id: z.string().min(1).optional()
   }),

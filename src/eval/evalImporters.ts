@@ -95,6 +95,8 @@ const OWASP_LLM_TOP10_IDS = [
   "AMC-5.16",
   "AMC-5.17"
 ];
+const PROMPTFOO_SECURITY_EXTENSION_IDS = ["AMC-5.18", "AMC-5.19"];
+const PROMPTFOO_SECURITY_IDS = [...OWASP_LLM_TOP10_IDS, ...PROMPTFOO_SECURITY_EXTENSION_IDS];
 const OPENAI_BEHAVIORAL_BASE_IDS = ["AMC-BCON-1", "AMC-1.8"];
 const DEEPEVAL_CONFIDENCE_QUESTION_IDS = ["AMC-3.3.4", "AMC-HOQ-2", "AMC-OINT-1"];
 
@@ -111,7 +113,11 @@ const GENERIC_SIGNAL_MAP: SignalQuestionMap = [
   },
   {
     pattern: /(privacy|pii|secret|exfil|leak|sensitive)/i,
-    questionIds: ["AMC-1.8", "AMC-5.13"]
+    questionIds: ["AMC-1.8", "AMC-5.13", "AMC-5.18"]
+  },
+  {
+    pattern: /(echoleak|cve-2025-32711|context leak|prompt leak|system prompt leak|garak|pyrit|vulnerability scan)/i,
+    questionIds: ["AMC-5.18", "AMC-5.19"]
   },
   {
     pattern: /(bias|fair|stereotype|demographic|parity|disparate impact|counterfactual)/i,
@@ -222,7 +228,9 @@ const PROMPTFOO_OWASP_SIGNAL_MAP: SignalQuestionMap = [
   { pattern: /(llm07|insecure plugin|tool abuse|function call abuse|schema bypass)/i, questionIds: ["AMC-5.14"] },
   { pattern: /(llm08|excessive agency|autonomy abuse|unauthorized action)/i, questionIds: ["AMC-5.15"] },
   { pattern: /(llm09|overreliance|blind trust|automation bias|oversight bypass)/i, questionIds: ["AMC-5.16"] },
-  { pattern: /(llm10|model theft|model extraction|prompt stealing|weight theft)/i, questionIds: ["AMC-5.17"] }
+  { pattern: /(llm10|model theft|model extraction|prompt stealing|weight theft)/i, questionIds: ["AMC-5.17"] },
+  { pattern: /(echoleak|cve-2025-32711|context leak|system prompt leak|prompt echo)/i, questionIds: ["AMC-5.18"] },
+  { pattern: /(garak|pyrit|vulnerability scan|scanner pipeline|llm vuln scan)/i, questionIds: ["AMC-5.19"] }
 ];
 
 const WANDB_PERFORMANCE_SIGNAL_MAP: SignalQuestionMap = [
@@ -592,7 +600,7 @@ function inferPromptfooOwaspQuestionIds(params: {
   metricNames: string[];
   additionalSignals: string[];
 }): string[] {
-  const explicit = params.explicitQuestionIds.filter((questionId) => OWASP_LLM_TOP10_IDS.includes(questionId));
+  const explicit = params.explicitQuestionIds.filter((questionId) => PROMPTFOO_SECURITY_IDS.includes(questionId));
   if (explicit.length > 0) {
     return unique(explicit);
   }

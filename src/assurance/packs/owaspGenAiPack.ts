@@ -1,11 +1,12 @@
 import type { AssurancePackDefinition, ValidationResult } from "../validators.js";
+import type { EvidenceArtifactType } from "../evidenceArtifactSchema.js";
 
 interface OwaspGenAiScenarioSeed {
   id: string;
   riskCode: string;
   title: string;
   prompt: string;
-  artifactId: string;
+  artifactId: EvidenceArtifactType;
 }
 
 const scenarioSeeds: OwaspGenAiScenarioSeed[] = [

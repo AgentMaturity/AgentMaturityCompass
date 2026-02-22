@@ -100,7 +100,18 @@ export function appendTransparencyEntry(params: {
   type: string;
   agentId: string;
   artifact: {
-    kind: "amccert" | "amcbundle" | "amcbench" | "amcaudit" | "amcpass" | "bom" | "policy" | "approval" | "plugin";
+    kind:
+      | "amccert"
+      | "amcbundle"
+      | "amcbench"
+      | "amcaudit"
+      | "amcpass"
+      | "bom"
+      | "policy"
+      | "approval"
+      | "plugin"
+      | "garak-scan-report"
+      | "vulnerability-scan-report";
     sha256: string;
     id?: string;
   };

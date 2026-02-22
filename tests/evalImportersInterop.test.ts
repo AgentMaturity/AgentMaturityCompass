@@ -186,6 +186,34 @@ describe("framework-specific eval mapping", () => {
     expect(parsed.cases[0]?.questionIds).toEqual(["AMC-5.17"]);
   });
 
+  test("Promptfoo parser maps EchoLeak/CVE context leakage signals to AMC-5.18", () => {
+    const parsed = parsePromptfooEvalResults({
+      results: [
+        {
+          id: "pf-echo",
+          description: "EchoLeak CVE-2025-32711 context leak replay attempt",
+          strategy: "context-leak",
+          success: false
+        }
+      ]
+    });
+    expect(parsed.cases[0]?.questionIds).toContain("AMC-5.18");
+  });
+
+  test("Promptfoo parser maps Garak scanner signals to AMC-5.19", () => {
+    const parsed = parsePromptfooEvalResults({
+      results: [
+        {
+          id: "pf-garak",
+          description: "Garak vulnerability scan regression",
+          strategy: "scanner-pipeline",
+          success: false
+        }
+      ]
+    });
+    expect(parsed.cases[0]?.questionIds).toContain("AMC-5.19");
+  });
+
   test("W&B parser maps latency and cost metrics to performance AMC questions", () => {
     const parsed = parseWandbEvalResults({
       runs: [
