@@ -225,6 +225,24 @@ export const BUILT_IN_POLICY_PACKS: PolicyPack[] = [
     targetOverrides: { "AMC-1.8": 5, "AMC-3.2.3": 5, "AMC-3.3.1": 5, "AMC-4.6": 5, "AMC-5.5": 5 }
   }),
   packTemplate({
+    id: "mcp-safety",
+    name: "MCP Safety Assurance",
+    description: "Assurance pack for MCP tool safety validation, trusted servers, injection detection, and permission scopes.",
+    archetypeId: "interop-agent",
+    riskTier: "high",
+    targetBase: 4,
+    targetOverrides: {
+      "AMC-MCP-1": 5,
+      "AMC-MCP-2": 5,
+      "AMC-MCP-3": 5,
+      "AMC-1.5": 5,
+      "AMC-1.8": 5,
+      "AMC-3.2.3": 5,
+      "AMC-5.8": 5,
+      "AMC-5.14": 5
+    }
+  }),
+  packTemplate({
     id: "security-agent.critical",
     name: "Security Agent Critical Risk",
     description: "Critical-risk security pack with maximum governance posture.",

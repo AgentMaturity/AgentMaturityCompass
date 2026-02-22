@@ -22,8 +22,15 @@ export type { EvidenceCoverageReport } from "./evidenceCoverageGap.js";
 export { auditVibeCode, auditVibeCodeFiles } from "./vibeCodeAudit.js";
 export type { VibeCodeAuditResult, VibeCodeFinding } from "./vibeCodeAudit.js";
 
-export { scoreMcpCompliance, getMcpComplianceGuide } from "./mcpCompliance.js";
-export type { MCPComplianceResult, MCPCapabilityDeclaration } from "./mcpCompliance.js";
+export { scoreMcpCompliance, getMcpComplianceGuide, detectMcpPromptInjection } from "./mcpCompliance.js";
+export type {
+  MCPComplianceResult,
+  MCPCapabilityDeclaration,
+  MCPSafetyDimensionResult,
+  MCPSafetyScorecard,
+  MCPPromptInjectionSignal,
+  MCPPromptInjectionDetectionResult
+} from "./mcpCompliance.js";
 
 export { scoreRAGMaturity } from "./ragMaturity.js";
 export type { RAGMaturityResult, RAGCapabilityProfile } from "./ragMaturity.js";

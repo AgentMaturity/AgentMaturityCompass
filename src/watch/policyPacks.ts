@@ -19,6 +19,17 @@ const builtInPacks: PolicyPack[] = [
   { packId: 'strict', name: 'Strict', description: 'Full compliance and audit trail', modules: ['safety', 'audit', 'explainability', 'vault', 'attestation'], config: { strictness: 'high' } },
   { packId: 'financial', name: 'Financial Services', description: 'SOX/PCI-DSS compliance pack', modules: ['safety', 'audit', 'explainability', 'vault', 'attestation', 'residency'], config: { strictness: 'high', compliance: ['SOX', 'PCI-DSS'] } },
   { packId: 'healthcare', name: 'Healthcare', description: 'HIPAA compliance pack', modules: ['safety', 'audit', 'explainability', 'vault', 'attestation', 'residency', 'redaction'], config: { strictness: 'high', compliance: ['HIPAA'] } },
+  {
+    packId: 'mcp-safety',
+    name: 'MCP Safety Assurance',
+    description: 'MCP-focused controls for tool validation, trusted servers, injection defense, and scope enforcement',
+    modules: ['safety', 'audit', 'explainability', 'mcp-trust', 'mcp-injection-defense', 'mcp-permission-scope'],
+    config: {
+      strictness: 'high',
+      compliance: ['MCP'],
+      controls: ['tool_validation', 'server_trust', 'prompt_injection_detection', 'permission_scope_enforcement']
+    }
+  },
 ];
 
 export class PolicyPackRegistry {

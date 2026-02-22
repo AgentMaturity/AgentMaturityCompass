@@ -1,57 +1,52 @@
-# FIX-10 Handoff — Production Readiness & Integration
+# W2-3 Handoff — MCP Compliance & Interoperability
 
-## Scope Completed
-Implemented production-readiness improvements in `/tmp/amc-wave1/agent-10` for:
+## Scope Delivered
+Implemented first-class MCP compliance and safety scoring in `/tmp/amc-wave2/agent-3` with:
 
-1. Persistent storage for score/session APIs (TypeScript + Python) using SQLite.
-2. Native Slack webhook integration support for incidents/alerts.
-3. Health endpoint payload upgrade: `GET /health -> { status, version, uptime, dbStatus }`.
-4. Graceful shutdown hardening (in-flight request draining + DB close on shutdown).
-5. Basic API endpoint rate limiting in Studio API middleware path.
-6. `amc up` startup UX upgrade to explicitly include Bridge endpoint and one-command control-plane description.
-7. CLI help reorganization with logical namespace grouping (`evidence`, `score`, `incidents`, `audit`, `admin`).
+1. MCP compliance scoring expanded to include:
+   - Tool call safety validation (input + output validation)
+   - MCP server trust scoring (identity/trust policy/signed metadata)
+   - Prompt injection detection via MCP channels
+   - Tool permission scope enforcement (declared + enforced + deny-by-default + least privilege)
+2. Added AMC diagnostic questions:
+   - `AMC-MCP-1`
+   - `AMC-MCP-2`
+   - `AMC-MCP-3`
+3. Added policy pack:
+   - Core policy packs: `mcp-safety`
+   - Assurance registry packs: `mcp-safety`
+4. Added tests (13 new tests in one new file) and updated question-bank tests.
 
 ## Key File Changes
-- TypeScript score/session persistence:
-  - `src/api/scoreStore.ts` (new SQLite store)
-  - `src/api/scoreRouter.ts`
-  - `src/api/index.ts`
-  - `src/api/health.ts` (new)
-- Studio health/rate-limit/shutdown:
-  - `src/studio/studioServer.ts`
-- Integrations (Slack native channel):
-  - `src/integrations/integrationSchema.ts`
-  - `src/integrations/integrationStore.ts`
-  - `src/integrations/integrationDispatcher.ts`
-- CLI UX and namespace grouping:
-  - `src/cli.ts`
-  - `src/cliUx.ts`
-- Python API persistence + health + shutdown:
-  - `platform/python/amc/api/routers/score.py`
-  - `platform/python/amc/api/main.py`
-- Tests added:
-  - `tests/scoreStorePersistence.test.ts`
-  - `tests/integrationSlackWebhook.test.ts`
+- MCP scoring engine:
+  - `src/score/mcpCompliance.ts`
+  - `src/score/index.ts`
+- Diagnostic bank updates:
+  - `src/diagnostic/questionBank.ts`
+  - `tests/questionBank.test.ts`
+- Policy pack updates:
+  - `src/policyPacks/builtInPacks.ts`
+  - `src/watch/policyPacks.ts`
+- New tests:
+  - `tests/mcpComplianceSafety.test.ts`
 
-## Verification
-### Typecheck
-- `npm run typecheck` passed.
+## Behavioral Notes
+- `scoreMcpCompliance` now returns additional fields:
+  - `safety` (subscores + per-dimension pass/fail)
+  - `promptInjection` (detection result from observed MCP messages)
+- Added `detectMcpPromptInjection(messages)` helper with heuristic pattern matching for common injection payloads.
+- Compliance level thresholds now factor in safety subscores for `full` and `partial` levels.
 
-### Requested test command
-Executed requested command pattern:
-- `npm test -- --reporter=verbose 2>&1 | tail -30`
+## Validation
+Executed:
+- `npm test -- tests/mcpComplianceSafety.test.ts tests/questionBank.test.ts`
+  - Result: 17 tests passed
 
-Observed in this sandbox:
-- Command does not complete in allotted runtime and times out before yielding tail output.
-- Local test runs that bind `127.0.0.1` can fail in this environment with `listen EPERM` (sandbox constraint), so full suite completion is environment-limited here.
+Attempted:
+- `npm run typecheck`
+  - Blocked by pre-existing unrelated errors in `src/cli.ts`:
+    - `TS2451: Cannot redeclare block-scoped variable 'evidence'` (lines ~2592 and ~2601)
 
-## Commit Status
-Requested commit message:
-- `feat(production): persistent storage, health check, graceful shutdown, rate limiting, amc up command`
-
-Could not create commit in this sandbox because git index lock creation is denied for the worktree metadata path:
-- `fatal: Unable to create '.../.git/worktrees/agent-10/index.lock': Operation not permitted`
-
-## Notes
-- No changes were made outside `/tmp/amc-wave1/agent-10`.
-- Slack channel support is native via `type: slack_webhook` with `webhookUrlRef` vault secret.
+## Commit
+Planned commit message:
+- `feat(mcp): MCP compliance scoring, tool safety, injection detection, permission enforcement`
