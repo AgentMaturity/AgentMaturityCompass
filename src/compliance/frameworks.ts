@@ -1,4 +1,4 @@
-export type ComplianceFramework = "SOC2" | "NIST_AI_RMF" | "ISO_27001";
+export type ComplianceFramework = "SOC2" | "NIST_AI_RMF" | "ISO_27001" | "ISO_42001";
 
 export interface ComplianceFrameworkFamily {
   framework: ComplianceFramework;
@@ -32,6 +32,21 @@ export const complianceFrameworkFamilies: ComplianceFrameworkFamily[] = [
       "Incident Management",
       "Supplier Security",
       "Risk Management"
+    ]
+  },
+  {
+    framework: "ISO_42001",
+    displayName: "ISO/IEC 42001:2023 + ISO/IEC 42005:2025 + ISO/IEC 42006:2025",
+    categories: [
+      "Clause 4 Context",
+      "Clause 5 Leadership",
+      "Clause 6 Planning",
+      "Clause 7 Support",
+      "Clause 8 Operation",
+      "Clause 9 Performance Evaluation",
+      "Clause 10 Improvement",
+      "ISO 42005 Impact Assessment",
+      "ISO 42006 Conformity Evidence"
     ]
   }
 ];
