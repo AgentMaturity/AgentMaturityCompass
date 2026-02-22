@@ -505,6 +505,49 @@ const migrations: Migration[] = [
       CREATE INDEX IF NOT EXISTS idx_claims_agent_state_created_ts ON claims(agent_id, lifecycle_state, created_ts DESC);
       CREATE INDEX IF NOT EXISTS idx_claims_state_last_verified_ts ON claims(lifecycle_state, last_verified_ts DESC);
     `
+  },
+  {
+    version: 9,
+    sql: `
+      DROP TRIGGER IF EXISTS no_update_sessions;
+      DROP TRIGGER IF EXISTS no_delete_sessions;
+
+      CREATE TRIGGER IF NOT EXISTS protect_sessions_core_immutable
+      BEFORE UPDATE ON sessions
+      WHEN
+        OLD.session_id != NEW.session_id OR
+        OLD.started_ts != NEW.started_ts OR
+        OLD.runtime != NEW.runtime OR
+        COALESCE(OLD.binary_path, '') != COALESCE(NEW.binary_path, '') OR
+        COALESCE(OLD.binary_sha256, '') != COALESCE(NEW.binary_sha256, '')
+      BEGIN
+        SELECT RAISE(ABORT, 'sessions core fields are immutable');
+      END;
+
+      CREATE TRIGGER IF NOT EXISTS protect_sessions_seal_consistency
+      BEFORE UPDATE ON sessions
+      WHEN
+        (NEW.session_final_event_hash IS NULL AND NEW.session_seal_sig IS NOT NULL) OR
+        (NEW.session_final_event_hash IS NOT NULL AND NEW.session_seal_sig IS NULL) OR
+        (NEW.session_final_event_hash IS NOT NULL AND NEW.ended_ts IS NULL)
+      BEGIN
+        SELECT RAISE(ABORT, 'invalid session seal state');
+      END;
+
+      CREATE TRIGGER IF NOT EXISTS protect_sessions_sealed_immutable
+      BEFORE UPDATE ON sessions
+      WHEN
+        OLD.session_final_event_hash IS NOT NULL OR OLD.session_seal_sig IS NOT NULL
+      BEGIN
+        SELECT RAISE(ABORT, 'sealed sessions are immutable');
+      END;
+
+      CREATE TRIGGER IF NOT EXISTS no_delete_sessions
+      BEFORE DELETE ON sessions
+      BEGIN
+        SELECT RAISE(ABORT, 'sessions are append-only');
+      END;
+    `
   }
 ];
 
@@ -1771,11 +1814,29 @@ function verifyEvents(ledger: Ledger, workspace: string, errors: string[]): void
 function verifySessions(ledger: Ledger, workspace: string, errors: string[]): void {
   const monitorKeys = getPublicKeyHistory(workspace, "monitor");
   const sessions = ledger.getAllSessions();
+  const events = ledger.getAllEvents();
+  const lastEventHashBySession = new Map<string, string>();
+  for (const event of events) {
+    lastEventHashBySession.set(event.session_id, event.event_hash);
+  }
+  const knownSessionIds = new Set(sessions.map((session) => session.session_id));
+  for (const event of events) {
+    if (!knownSessionIds.has(event.session_id)) {
+      errors.push(`Event ${event.id} references missing session ${event.session_id}`);
+    }
+  }
 
   for (const session of sessions) {
+    if (session.ended_ts !== null && session.ended_ts < session.started_ts) {
+      errors.push(`Session ${session.session_id} has ended_ts earlier than started_ts`);
+    }
+    const expectedFinalHash = lastEventHashBySession.get(session.session_id) ?? sha256Hex("EMPTY_SESSION");
     if (!session.session_final_event_hash || !session.session_seal_sig) {
       errors.push(`Session ${session.session_id} missing seal`);
       continue;
+    }
+    if (session.session_final_event_hash !== expectedFinalHash) {
+      errors.push(`Session ${session.session_id} final hash mismatch`);
     }
 
     if (!verifyHexDigestAny(session.session_final_event_hash, session.session_seal_sig, monitorKeys)) {

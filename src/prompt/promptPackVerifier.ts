@@ -102,7 +102,13 @@ export function verifyPromptSignatureObject(params: {
   }
   if (parsed.data.envelope) {
     try {
-      return verifySignatureEnvelope(params.digestHex, parsed.data.envelope);
+      if (parsed.data.signature !== parsed.data.envelope.sigB64) {
+        return false;
+      }
+      return verifySignatureEnvelope(params.digestHex, parsed.data.envelope, {
+        trustedPublicKeys: [params.signerPub],
+        requireTrustedKey: true
+      });
     } catch {
       return false;
     }

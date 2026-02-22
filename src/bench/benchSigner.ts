@@ -33,18 +33,30 @@ export function verifyBenchDigestSignature(params: {
   signature: ReturnType<typeof signBenchJson>;
   publicKeyPem?: string;
 }): boolean {
+  const trustedKeys = params.publicKeyPem
+    ? [params.publicKeyPem]
+    : params.workspace
+      ? getPublicKeyHistory(params.workspace, "auditor")
+      : [];
   if (params.signature.envelope) {
     try {
-      return verifySignatureEnvelope(params.digestHex, params.signature.envelope);
+      if (params.signature.signature !== params.signature.envelope.sigB64) {
+        return false;
+      }
+      if (
+        verifySignatureEnvelope(params.digestHex, params.signature.envelope, {
+          trustedPublicKeys: trustedKeys,
+          requireTrustedKey: true
+        })
+      ) {
+        return true;
+      }
     } catch {
       // fallback to legacy key verification below
     }
   }
-  if (params.publicKeyPem) {
-    return verifyHexDigestAny(params.digestHex, params.signature.signature, [params.publicKeyPem]);
-  }
-  if (params.workspace) {
-    return verifyHexDigestAny(params.digestHex, params.signature.signature, getPublicKeyHistory(params.workspace, "auditor"));
+  if (trustedKeys.length > 0) {
+    return verifyHexDigestAny(params.digestHex, params.signature.signature, trustedKeys);
   }
   return false;
 }
@@ -52,4 +64,3 @@ export function verifyBenchDigestSignature(params: {
 export function digestFile(path: string): string {
   return sha256Hex(readFileSync(path));
 }
-

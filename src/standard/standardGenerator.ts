@@ -287,7 +287,12 @@ export function verifyStandardSchemas(workspace: string): {
   let bundleOk = false;
   if (bundleSig.envelope) {
     try {
-      bundleOk = verifySignatureEnvelope(bundleSignedDigest, bundleSig.envelope);
+      bundleOk =
+        bundleSig.signature === bundleSig.envelope.sigB64 &&
+        verifySignatureEnvelope(bundleSignedDigest, bundleSig.envelope, {
+          trustedPublicKeys: getPublicKeyHistory(workspace, "auditor"),
+          requireTrustedKey: true
+        });
     } catch {
       bundleOk = false;
     }

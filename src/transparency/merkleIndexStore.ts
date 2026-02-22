@@ -10,6 +10,7 @@ import { buildMerkleProofFromEntryHashes, buildMerkleRootFromEntryHashes, merkle
 import { transparencyEntrySchema } from "./logSchema.js";
 import { merkleProofPayloadSchema, merkleProofSignatureSchema, type MerkleProofPayload } from "./proofSchema.js";
 import { signDigestWithPolicy, verifySignedDigest } from "../crypto/signing/signer.js";
+import { verifySignatureEnvelope } from "../crypto/signing/signatureEnvelope.js";
 
 const merkleLeafRowSchema = z.object({
   v: z.literal(1),
@@ -339,13 +340,10 @@ export function verifyTransparencyProofBundle(bundleFile: string): {
       } else {
         const pub = readUtf8(pubFile);
         const ok = sig.envelope
-          ? verifySignedDigest({
-              workspace: process.cwd(),
-              digestHex: digest,
-              signed: {
-                signature: sig.signature,
-                envelope: sig.envelope
-              }
+          ? sig.signature === sig.envelope.sigB64 &&
+            verifySignatureEnvelope(digest, sig.envelope, {
+              trustedPublicKeys: [pub],
+              requireTrustedKey: true
             })
           : verifyHexDigestAny(digest, sig.signature, [pub]);
         if (!ok) {

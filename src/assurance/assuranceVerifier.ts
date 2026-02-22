@@ -97,18 +97,24 @@ export function verifyAssuranceCertificateFile(params: {
       errors.push("cert digest mismatch");
     }
 
+    const pubPem = params.publicKeyPath
+      ? readUtf8(resolve(params.publicKeyPath))
+      : pathExists(join(root, "signer.pub"))
+        ? readUtf8(join(root, "signer.pub"))
+        : "";
+    if (!pubPem) {
+      errors.push("missing signer public key for cert signature verification");
+    }
     let sigOk = false;
     if (sig.envelope) {
-      sigOk = verifySignatureEnvelope(digest, sig.envelope);
+      sigOk =
+        sig.signature === sig.envelope.sigB64 &&
+        verifySignatureEnvelope(digest, sig.envelope, {
+          trustedPublicKeys: pubPem ? [pubPem] : [],
+          requireTrustedKey: true
+        });
     } else {
-      const pubPem = params.publicKeyPath
-        ? readUtf8(resolve(params.publicKeyPath))
-        : pathExists(join(root, "signer.pub"))
-          ? readUtf8(join(root, "signer.pub"))
-          : "";
-      if (!pubPem) {
-        errors.push("missing signer public key for cert signature verification");
-      } else {
+      if (pubPem) {
         sigOk = verifyHexDigest(digest, sig.signature, pubPem);
       }
     }

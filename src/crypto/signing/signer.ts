@@ -117,6 +117,16 @@ function signWithNotary(params: {
   if (!verified.ok || !verified.parsed) {
     throw new Error(`notary signature verification failed: ${verified.error ?? "unknown"}`);
   }
+  if (verified.parsed.pubkeyFingerprint !== trust.trust.notary.pinnedPubkeyFingerprint) {
+    throw new Error("notary signer fingerprint does not match pinned trust config fingerprint");
+  }
+  if (trust.trust.notary.requiredAttestationLevel === "HARDWARE" && verified.parsed.attestationLevel !== "HARDWARE") {
+    throw new Error("notary attestation level below required HARDWARE");
+  }
+  const signedSkewMs = Math.abs(Date.now() - verified.parsed.signedTs);
+  if (signedSkewMs > trust.trust.enforcement.notaryMaxClockSkewSeconds * 1000) {
+    throw new Error("notary signed timestamp outside allowed clock skew");
+  }
   addPublicKeyToHistory(params.workspace, "auditor", verified.parsed.pubkeyPem);
   return {
     digestSha256: params.digestHex,
@@ -173,12 +183,20 @@ export function verifySignedDigest(params: {
   digestHex: string;
   signed: { signature: string; envelope?: unknown };
 }): boolean {
+  const trustedAuditorKeys = getPublicKeyHistory(params.workspace, "auditor");
   if (params.signed.envelope && typeof params.signed.envelope === "object") {
     try {
-      return verifySignatureEnvelope(params.digestHex, params.signed.envelope as never);
+      const envelope = params.signed.envelope as { sigB64?: unknown };
+      if (typeof envelope.sigB64 === "string" && envelope.sigB64 !== params.signed.signature) {
+        return false;
+      }
+      return verifySignatureEnvelope(params.digestHex, params.signed.envelope as never, {
+        trustedPublicKeys: trustedAuditorKeys,
+        requireTrustedKey: true
+      });
     } catch {
       return false;
     }
   }
-  return verifyHexDigestAny(params.digestHex, params.signed.signature, getPublicKeyHistory(params.workspace, "auditor"));
+  return verifyHexDigestAny(params.digestHex, params.signed.signature, trustedAuditorKeys);
 }

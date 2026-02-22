@@ -96,6 +96,19 @@ export async function signDigestWithNotary(params: {
   if (!verified.ok || !verified.parsed) {
     throw new Error(`notary response verification failed: ${verified.error ?? "unknown"}`);
   }
+  if (verified.parsed.pubkeyFingerprint !== params.trust.trust.notary.pinnedPubkeyFingerprint) {
+    throw new Error("notary signer fingerprint does not match pinned trust config fingerprint");
+  }
+  if (
+    params.trust.trust.notary.requiredAttestationLevel === "HARDWARE" &&
+    verified.parsed.attestationLevel !== "HARDWARE"
+  ) {
+    throw new Error("notary attestation level below required HARDWARE");
+  }
+  const signedSkewMs = Math.abs(Date.now() - verified.parsed.signedTs);
+  if (signedSkewMs > params.trust.trust.enforcement.notaryMaxClockSkewSeconds * 1000) {
+    throw new Error("notary signed timestamp outside allowed clock skew");
+  }
   addPublicKeyToHistory(params.workspace, "auditor", verified.parsed.pubkeyPem);
   const envelope: SignatureEnvelope = {
     v: 1,
@@ -118,4 +131,3 @@ export async function signDigestWithNotary(params: {
     envelope
   };
 }
-

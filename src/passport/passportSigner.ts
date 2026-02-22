@@ -34,18 +34,30 @@ export function verifyPassportDigestSignature(params: {
   signature: ReturnType<typeof signPassportJson>;
   publicKeyPem?: string;
 }): boolean {
+  const trustedKeys = params.publicKeyPem
+    ? [params.publicKeyPem]
+    : params.workspace
+      ? getPublicKeyHistory(params.workspace, "auditor")
+      : [];
   if (params.signature.envelope) {
     try {
-      return verifySignatureEnvelope(params.digestHex, params.signature.envelope);
+      if (params.signature.signature !== params.signature.envelope.sigB64) {
+        return false;
+      }
+      if (
+        verifySignatureEnvelope(params.digestHex, params.signature.envelope, {
+          trustedPublicKeys: trustedKeys,
+          requireTrustedKey: true
+        })
+      ) {
+        return true;
+      }
     } catch {
       // fallback below
     }
   }
-  if (params.publicKeyPem) {
-    return verifyHexDigestAny(params.digestHex, params.signature.signature, [params.publicKeyPem]);
-  }
-  if (params.workspace) {
-    return verifyHexDigestAny(params.digestHex, params.signature.signature, getPublicKeyHistory(params.workspace, "auditor"));
+  if (trustedKeys.length > 0) {
+    return verifyHexDigestAny(params.digestHex, params.signature.signature, trustedKeys);
   }
   return false;
 }
