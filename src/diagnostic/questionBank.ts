@@ -1744,6 +1744,66 @@ const seeds: QuestionSeed[] = [
     tuningKnobs: ["guardrails.owasp.llm10", "evalHarness.owasp.llm10"]
   },
   {
+    id: "AMC-ARCH-1",
+    layerName: "Skills",
+    title: "Architecture-Task Fit Scoring",
+    promptTemplate:
+      "Does the system score whether architecture complexity is proportional to task complexity and risk before execution?",
+    labels: [
+      "No Fit Model",
+      "Ad Hoc Fit Judgement",
+      "Coarse Fit Bands",
+      "Measured Fit Score",
+      "Adaptive Fit Routing",
+      "Continuous Fit Optimization"
+    ],
+    evidenceGateHints:
+      "Require task-complexity features, architecture-fit score logs, and pre-execution route decisions.",
+    upgradeHints:
+      "Implement deterministic architecture-task fit scoring and block mismatched routes for high-risk tasks.",
+    tuningKnobs: ["guardrails.architectureTaskFit", "evalHarness.architectureTaskFit"]
+  },
+  {
+    id: "AMC-ARCH-2",
+    layerName: "Skills",
+    title: "Error Amplification Containment",
+    promptTemplate:
+      "Does the architecture detect and contain error amplification across multi-step pipelines before errors cascade?",
+    labels: [
+      "No Amplification Visibility",
+      "Incident-Only Awareness",
+      "Stage Error Logging",
+      "Amplification Detection + Gates",
+      "Automated Containment",
+      "Bounded Error Propagation Verified"
+    ],
+    evidenceGateHints:
+      "Require stage-level error telemetry, propagation ratio metrics, and rollback/checkpoint evidence.",
+    upgradeHints:
+      "Add propagation-aware checkpoints, per-stage rollback, and hard gates on amplification ratio breaches.",
+    tuningKnobs: ["guardrails.errorAmplification", "evalHarness.pipelineErrorPropagation"]
+  },
+  {
+    id: "AMC-ARCH-3",
+    layerName: "Skills",
+    title: "Complexity Tax and Redundancy Balance",
+    promptTemplate:
+      "Does the architecture continuously score complexity tax, failure modes, and redundancy so resilience improves without unnecessary overhead?",
+    labels: [
+      "No Tax or Redundancy Scoring",
+      "Aware but Unmanaged",
+      "Periodic Review",
+      "Scored with Mitigation Actions",
+      "Continuously Optimized",
+      "Minimal Complexity with Verified Resilience"
+    ],
+    evidenceGateHints:
+      "Require complexity-tax reports, ranked failure-mode analysis, and fallback drill outcomes.",
+    upgradeHints:
+      "Track complexity tax per task class and enforce redundancy thresholds for critical-path dependencies.",
+    tuningKnobs: ["guardrails.complexityTax", "evalHarness.redundancyDrills"]
+  },
+  {
     id: "AMC-ETP-1",
     layerName: "Resilience",
     title: "ETP Self-Knowledge Maturity",

@@ -126,7 +126,7 @@ export function defaultDiagnosticBankV1(): DiagnosticBank {
         { id: 2, name: "Agent Leadership", questionCount: 18 },
         { id: 3, name: "Agent Culture", questionCount: 20 },
         { id: 4, name: "Agent Resilience", questionCount: 16 },
-        { id: 5, name: "Agent Skills", questionCount: 20 }
+        { id: 5, name: "Agent Skills", questionCount: 23 }
       ],
       questions
     }

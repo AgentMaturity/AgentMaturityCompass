@@ -73,6 +73,30 @@ export type { Lesson, LessonDatabase } from "./lessonLearnedDatabase.js";
 export { assessSimplicity } from "./simplicityScoring.js";
 export type { SimplicityProfile } from "./simplicityScoring.js";
 
+export {
+  scoreArchitectureTaskFit,
+  detectErrorAmplification,
+  scoreComplexityTax,
+  analyzeFailureModes,
+  scoreRedundancy,
+  evaluateArchitectureTaskAlignment
+} from "./architectureTaskAlignment.js";
+export type {
+  TaskRiskTier,
+  TaskComplexityProfile,
+  ArchitectureProfile,
+  PipelineStageProfile,
+  ArchitectureTaskFitScore,
+  ErrorAmplificationHotspot,
+  ErrorAmplificationResult,
+  ComplexityTaxScore,
+  FailureModeRisk,
+  FailureModeAnalysisResult,
+  RedundancyScore,
+  ArchitectureTaskAlignmentInput,
+  ArchitectureTaskAlignmentReport
+} from "./architectureTaskAlignment.js";
+
 export { assessIdentityContinuity } from "./identityContinuity.js";
 export type { IdentityContinuityProfile } from "./identityContinuity.js";
 
