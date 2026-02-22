@@ -186,10 +186,52 @@ export function applyGlobalCherryPickDefense(level: number, events: ParsedEviden
   return level;
 }
 
-function selectRelevantEvents(questionId: string, events: ParsedEvidenceEvent[]): ParsedEvidenceEvent[] {
-  const tagged = events.filter((event) => event.meta.questionId === questionId);
+const STRICT_EVIDENCE_BINDING_FALSY = new Set(["0", "false", "off", "no"]);
+const STRICT_EVIDENCE_BINDING_LEVEL = 3;
+
+export function isStrictEvidenceBindingEnabled(): boolean {
+  const raw = process.env.STRICT_EVIDENCE_BINDING;
+  if (raw === undefined) {
+    return true;
+  }
+  return !STRICT_EVIDENCE_BINDING_FALSY.has(raw.trim().toLowerCase());
+}
+
+export function selectRelevantEvents(
+  questionId: string,
+  events: ParsedEvidenceEvent[],
+  level: number,
+  warningState?: Set<string>
+): ParsedEvidenceEvent[] {
+  const tagged = events.filter(
+    (event) => typeof event.meta.questionId === "string" && event.meta.questionId === questionId
+  );
   if (tagged.length > 0) {
     return tagged;
+  }
+
+  if (events.length === 0) {
+    return events;
+  }
+
+  const warnings = warningState ?? new Set<string>();
+  if (isStrictEvidenceBindingEnabled() && level >= STRICT_EVIDENCE_BINDING_LEVEL) {
+    const warningKey = `strict-binding:${questionId}`;
+    if (!warnings.has(warningKey)) {
+      console.warn(
+        `[diagnostic] STRICT_EVIDENCE_BINDING=true blocked fallback for ${questionId} at L${level}; meta.questionId is required for L3+ scoring.`
+      );
+      warnings.add(warningKey);
+    }
+    return [];
+  }
+
+  const warningKey = `fallback:${questionId}`;
+  if (!warnings.has(warningKey)) {
+    console.warn(
+      `[diagnostic] Falling back to unbound evidence for ${questionId} at L${level}; add meta.questionId tagging to avoid score inflation.`
+    );
+    warnings.add(warningKey);
   }
   return events;
 }
@@ -609,9 +651,10 @@ export async function runDiagnostic(input: RunDiagnosticInput, outputMarkdownPat
     const inflationAttempts: { questionId: string; claimed: number; supported: number }[] = [];
     const unsupportedClaimFindings: AuditFinding[] = [];
     const assuranceMissingQuestions = new Set<string>();
+    const relevanceWarnings = new Set<string>();
 
     for (const question of questionBank) {
-      const relevant = selectRelevantEvents(question.id, events);
+      let relevant = selectRelevantEvents(question.id, events, 0, relevanceWarnings);
 
       let supportedMaxLevel = 0;
       let matchedIds: string[] = [];
@@ -619,16 +662,18 @@ export async function runDiagnostic(input: RunDiagnosticInput, outputMarkdownPat
       let gateEvidenceTypes: EvidenceEventType[] = [];
       let missingLlmCapApplied = false;
       for (let level = 5; level >= 0; level -= 1) {
+        const levelRelevant = selectRelevantEvents(question.id, events, level, relevanceWarnings);
         const gate = question.gates[level]!;
         if (level === 5 && gate.requiredTrustTier === undefined) {
           gate.requiredTrustTier = mandatoryTier;
         }
-        const evaluation = evaluateGate(gate, relevant);
+        const evaluation = evaluateGate(gate, levelRelevant);
         if (evaluation.pass) {
           supportedMaxLevel = level;
           matchedIds = evaluation.matchedEventIds.slice(0, 64);
           gateMinDays = gate.minDistinctDays;
           gateEvidenceTypes = gate.requiredEvidenceTypes;
+          relevant = levelRelevant;
           break;
         }
       }
