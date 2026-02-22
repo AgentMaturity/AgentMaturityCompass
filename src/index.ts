@@ -30,6 +30,18 @@ export {
 export { getAgentPaths, resolveAgentId, setCurrentAgent, getCurrentAgent } from "./fleet/paths.js";
 export { generateFleetReport } from "./fleet/report.js";
 export {
+  normalizeFleetEnvironment,
+  parseFleetSloObjective,
+  defineFleetSlo,
+  listFleetSlos,
+  listFleetGovernancePolicies,
+  tagFleetAgentEnvironment,
+  applyFleetGovernancePolicy,
+  buildFleetHealthDashboard,
+  fleetSloStatus,
+  generateFleetComplianceReport
+} from "./fleet/governance.js";
+export {
   initTrustComposition,
   loadTrustCompositionConfig,
   saveTrustCompositionConfig,

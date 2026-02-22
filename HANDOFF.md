@@ -1,50 +1,68 @@
-# W2-4 Handoff — RAG Maturity Scoring
+# W3-12 Handoff — Fleet & Multi-Agent Governance
 
 ## Scope Completed
-Implemented production RAG maturity scoring in `/tmp/amc-wave2/agent-4` covering:
+Implemented fleet-level governance hardening for enterprise multi-agent operations:
 
-1. Retrieval quality scoring using precision/recall/F1 from labeled retrieved-vs-relevant chunks.
-2. Metadata quality scoring for chunk attribution/source completeness.
-3. Retrieval drift detection over time (improving/stable/degrading/insufficient data).
-4. Hallucination risk scoring for RAG outputs (unsupported claims, citation coverage, contradictions, confidence behavior).
-5. Citation integrity scoring (accuracy, verifiability, source validity).
-6. New diagnostic questions:
-   - `AMC-RAG-1` Retrieval Quality
-   - `AMC-RAG-2` Metadata Attribution Quality
-   - `AMC-RAG-3` Retrieval Drift Monitoring
-   - `AMC-RAG-4` Hallucination & Citation Integrity
+1. Fleet health dashboard aggregation with drift and SLO status.
+2. Fleet policy enforcement to all agents (or per environment).
+3. Fleet drift detection against persistent fleet baseline.
+4. Fleet compliance report generation in markdown and PDF.
+5. Agent environment grouping/tagging (`development` / `staging` / `production`).
+6. Fleet SLO definition + status evaluation with breach/recovery alerting.
+7. API endpoint for fleet health data.
+8. CLI surface for policy enforcement, health, tagging, and SLO operations.
 
 ## Key File Changes
-- RAG scoring implementation:
-  - `src/score/ragMaturity.ts`
-  - `src/score/index.ts` (exports for new RAG diagnostics/types)
-- Diagnostic question bank:
-  - `src/diagnostic/questionBank.ts`
-- Canon/bank/mechanic schema count alignment for expanded question bank:
-  - `src/canon/canonBuiltin.ts`
-  - `src/canon/canonSchema.ts`
-  - `src/diagnostic/bank/bankSchema.ts`
-  - `src/diagnostic/bank/bankV1.ts`
-  - `src/mechanic/mechanicSchema.ts`
-- Tests:
-  - `tests/ragMaturity.test.ts` (12 tests)
-  - `tests/questionBank.test.ts` (updated counts + AMC-RAG presence test)
 
-## Verification
-Executed:
+- New fleet governance engine:
+  - `src/fleet/governance.ts`
+- New API route handler:
+  - `src/api/fleetRouter.ts`
+- API dispatch wiring:
+  - `src/api/index.ts`
+- Fleet registry environment support:
+  - `src/fleet/registry.ts`
+- Public exports:
+  - `src/index.ts`
+- CLI commands and wiring:
+  - `src/cli.ts`
+- New tests (14 tests):
+  - `tests/fleetGovernance.test.ts`
 
-- `npm test -- tests/ragMaturity.test.ts tests/questionBank.test.ts`
-  - Passed: `2` files, `16` tests total.
+## New/Updated Interfaces
 
-Attempted:
+- `GET /api/v1/fleet/health`
+  - Returns aggregate fleet health payload across agents, including:
+    - average integrity / overall level
+    - dimension averages
+    - baseline + drift indicators
+    - fleet alerts
+    - SLO statuses
 
+- CLI additions:
+  - `amc fleet health [--json]`
+  - `amc fleet report --format pdf --output <path>`
+  - `amc fleet policy apply --policy-id <id> --description <text> [--env production]`
+  - `amc fleet policy list`
+  - `amc fleet tag <agent-id> --env production`
+  - `amc fleet slo define --objective "95% of production agents must score L3+ on dimension 2"`
+  - `amc fleet slo status`
+  - `amc fleet slo list`
+
+## Verification Performed
+
+### Passed
 - `npm run typecheck`
-  - Fails due pre-existing duplicate variable declarations in `src/cli.ts`:
-    - `src/cli.ts(2592,7): Cannot redeclare block-scoped variable 'evidence'.`
-    - `src/cli.ts(2601,7): Cannot redeclare block-scoped variable 'evidence'.`
-  - This is unrelated to RAG scoring changes and was not modified in this task.
+- `npm test -- tests/fleetGovernance.test.ts`
+- `npm test -- tests/apiRouters.test.ts tests/fleetGovernance.test.ts`
+
+### Full suite status
+- Attempted: `npm test`
+- Result: fails in this sandbox due environment constraints (many existing integration tests require binding local listeners; sandbox returns `listen EPERM` and downstream timeouts).
+- The failures are broad across pre-existing network-heavy integration suites and are not isolated to fleet governance changes.
 
 ## Notes
-- Question bank grew from 87 to 91 total questions.
-- Layer distribution updated from `13/18/20/16/20` to `13/18/20/16/24`.
-- Canon and diagnostic bank schemas were updated accordingly to avoid validation mismatches.
+
+- `src/cli.ts` had a pre-existing duplicate `const evidence` declaration preventing typecheck; this was corrected during this task so the CLI compiles cleanly.
+- Fleet governance state persists under:
+  - `.amc/fleet/governance-state.json`

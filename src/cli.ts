@@ -48,6 +48,16 @@ import { runSandboxCommand } from "./sandbox/sandbox.js";
 import { attestIngestSession, ingestEvidence, type IngestType } from "./ingest/ingest.js";
 import { generateFleetReport } from "./fleet/report.js";
 import {
+  applyFleetGovernancePolicy,
+  buildFleetHealthDashboard,
+  defineFleetSlo,
+  fleetSloStatus,
+  generateFleetComplianceReport,
+  listFleetGovernancePolicies,
+  listFleetSlos,
+  tagFleetAgentEnvironment
+} from "./fleet/governance.js";
+import {
   initTrustComposition,
   addDelegationEdge,
   removeDelegationEdge,
@@ -2599,7 +2609,6 @@ const workorder = program.command("workorder").description("Signed work order op
 const ticket = program.command("ticket").description("Execution ticket operations");
 const gateway = program.command("gateway").description("AMC universal LLM proxy gateway");
 const bundle = program.command("bundle").description("Portable evidence bundle operations");
-const evidence = program.command("evidence").description("Verifier-ready evidence export operations");
 const ci = program.command("ci").description("CI/CD release gate helpers");
 const archetype = program.command("archetype").description("Archetype packs");
 const exportGroup = program.command("export").description("Export policy packs and badges");
@@ -7597,6 +7606,24 @@ const agent = program.command("agent").description("Agent registry operations");
 const provider = program.command("provider").description("Provider template operations");
 const sandbox = program.command("sandbox").description("Hardened sandbox execution");
 
+function parseDimensionThresholds(raw: string | undefined): Partial<Record<1 | 2 | 3 | 4 | 5, number>> {
+  if (!raw || raw.trim().length === 0) {
+    return {};
+  }
+  const out: Partial<Record<1 | 2 | 3 | 4 | 5, number>> = {};
+  const parts = raw.split(",").map((part) => part.trim()).filter((part) => part.length > 0);
+  for (const part of parts) {
+    const [dimensionRaw, levelRaw] = part.split(":");
+    const dimension = Number.parseInt(dimensionRaw ?? "", 10);
+    const level = Number.parseFloat(levelRaw ?? "");
+    if (!Number.isFinite(dimension) || !Number.isFinite(level) || dimension < 1 || dimension > 5) {
+      throw new Error(`Invalid --dimension-min value "${part}". Expected comma list like "2:3,5:4".`);
+    }
+    out[dimension as 1 | 2 | 3 | 4 | 5] = level;
+  }
+  return out;
+}
+
 fleet
   .command("init")
   .description("Create and sign .amc/fleet.yaml")
@@ -7609,10 +7636,31 @@ fleet
 
 fleet
   .command("report")
-  .description("Generate cross-agent fleet maturity report")
+  .description("Generate fleet maturity report (md) or fleet compliance report (pdf)")
   .option("--window <window>", "evidence window", "30d")
-  .option("--output <path>", "output markdown path", ".amc/reports/fleet.md")
-  .action(async (opts: { window: string; output: string }) => {
+  .option("--format <format>", "md|pdf", "md")
+  .option("--output <path>", "output path", ".amc/reports/fleet.md")
+  .action(async (opts: { window: string; format: string; output: string }) => {
+    const format = opts.format.toLowerCase();
+    if (format === "pdf") {
+      const resolvedOut = opts.output.toLowerCase().endsWith(".pdf")
+        ? opts.output
+        : opts.output.toLowerCase().endsWith(".md")
+          ? opts.output.replace(/\.md$/i, ".pdf")
+          : `${opts.output}.pdf`;
+      const report = generateFleetComplianceReport({
+        workspace: process.cwd(),
+        format: "pdf",
+        outFile: resolve(process.cwd(), resolvedOut)
+      });
+      console.log(chalk.green(`Fleet compliance report written: ${report.outFile}`));
+      console.log(`Agents included: ${report.agentCount}`);
+      console.log(`sha256=${report.sha256}`);
+      return;
+    }
+    if (format !== "md") {
+      throw new Error(`Unsupported format: ${opts.format}. Use md or pdf.`);
+    }
     const report = await generateFleetReport({
       workspace: process.cwd(),
       window: opts.window,
@@ -7620,6 +7668,150 @@ fleet
     });
     console.log(chalk.green(`Fleet report written: ${report.reportPath}`));
     console.log(`Agents included: ${report.agentCount}`);
+  });
+
+fleet
+  .command("health")
+  .description("Show fleet health dashboard aggregates")
+  .option("--json", "print full JSON payload", false)
+  .action((opts: { json?: boolean }) => {
+    const health = buildFleetHealthDashboard({ workspace: process.cwd() });
+    if (opts.json) {
+      console.log(JSON.stringify(health, null, 2));
+      return;
+    }
+    console.log(`Fleet baseline integrity: ${health.baselineIntegrityIndex.toFixed(3)}`);
+    console.log(`Agents: ${health.agentCount} (scored ${health.scoredAgentCount})`);
+    console.log(`Average integrity: ${health.averageIntegrityIndex.toFixed(3)}`);
+    console.log(`Average overall level: ${health.averageOverallLevel.toFixed(2)}`);
+    console.log(`Dimension 2 average: ${health.dimensionAverages[2].toFixed(2)}`);
+    const activeDrift = health.agents.filter((agent) => agent.belowBaseline).map((agent) => agent.agentId);
+    console.log(`Drift below baseline: ${activeDrift.length > 0 ? activeDrift.join(", ") : "none"}`);
+  });
+
+const fleetPolicy = fleet.command("policy").description("Fleet governance policy operations");
+const fleetSlo = fleet.command("slo").description("Fleet governance SLO operations");
+
+fleetPolicy
+  .command("apply")
+  .description("Apply a governance policy to all fleet agents or one environment")
+  .requiredOption("--policy-id <id>", "policy ID")
+  .requiredOption("--description <text>", "policy description")
+  .option("--min-integrity <n>", "minimum integrity index (0-1)", "0.6")
+  .option("--dimension-min <rules>", "dimension minimums, e.g. 2:3,5:4")
+  .option("--env <environment>", "dev|staging|production (default: all environments)")
+  .action((opts: {
+    policyId: string;
+    description: string;
+    minIntegrity: string;
+    dimensionMin?: string;
+    env?: string;
+  }) => {
+    const result = applyFleetGovernancePolicy({
+      workspace: process.cwd(),
+      policyId: opts.policyId,
+      description: opts.description,
+      minimumIntegrityIndex: Number.parseFloat(opts.minIntegrity),
+      minimumDimensionLevel: parseDimensionThresholds(opts.dimensionMin),
+      environment: opts.env
+    });
+    console.log(chalk.green(`Fleet policy applied: ${result.policy.policyId}`));
+    console.log(`Scope: ${result.environment}`);
+    console.log(`Agents updated: ${result.updatedAgentIds.length}`);
+    if (result.updatedAgentIds.length > 0) {
+      console.log(`- ${result.updatedAgentIds.join(", ")}`);
+    }
+    console.log(`State: ${result.statePath}`);
+  });
+
+fleetPolicy
+  .command("list")
+  .description("List effective fleet governance policies")
+  .action(() => {
+    const policies = listFleetGovernancePolicies(process.cwd());
+    if (policies.globalPolicy) {
+      console.log(`global: ${policies.globalPolicy.policyId} minIntegrity=${policies.globalPolicy.minimumIntegrityIndex.toFixed(3)}`);
+    } else {
+      console.log("global: none");
+    }
+    for (const env of ["development", "staging", "production"] as const) {
+      const policy = policies.byEnvironment[env];
+      if (policy) {
+        console.log(`${env}: ${policy.policyId} minIntegrity=${policy.minimumIntegrityIndex.toFixed(3)}`);
+      }
+    }
+  });
+
+fleet
+  .command("tag")
+  .description("Tag an agent with an environment")
+  .argument("<agentId>")
+  .requiredOption("--env <environment>", "dev|staging|production")
+  .action((agentId: string, opts: { env: string }) => {
+    const result = tagFleetAgentEnvironment({
+      workspace: process.cwd(),
+      agentId,
+      environment: opts.env
+    });
+    console.log(chalk.green(`Agent ${result.agentId} tagged as ${result.environment}`));
+    console.log(`Config: ${result.configPath}`);
+    console.log(`Signature: ${result.sigPath}`);
+    if (result.appliedPolicyId) {
+      console.log(`Applied policy: ${result.appliedPolicyId}`);
+    }
+  });
+
+fleetSlo
+  .command("define")
+  .description('Define a fleet SLO, e.g. "95% of production agents must score L3+ on dimension 2"')
+  .requiredOption("--objective <text>", "SLO objective")
+  .option("--id <sloId>", "optional stable SLO ID")
+  .action((opts: { objective: string; id?: string }) => {
+    const slo = defineFleetSlo({
+      workspace: process.cwd(),
+      objective: opts.objective,
+      sloId: opts.id
+    });
+    console.log(chalk.green(`Fleet SLO defined: ${slo.sloId}`));
+    console.log(`Environment: ${slo.environment}`);
+    console.log(`Target: ${(slo.requiredPercent * 100).toFixed(1)}% of agents must score L${slo.minimumLevel}+ on dimension ${slo.dimension}`);
+  });
+
+fleetSlo
+  .command("status")
+  .description("Show fleet SLO compliance status")
+  .action(() => {
+    const status = fleetSloStatus(process.cwd());
+    const color = status.overallStatus === "BREACHED" ? chalk.red : chalk.green;
+    console.log(color(`Overall SLO status: ${status.overallStatus}`));
+    if (status.statuses.length === 0) {
+      console.log("No fleet SLOs defined.");
+      return;
+    }
+    for (const row of status.statuses) {
+      const rowColor = row.status === "BREACHED" ? chalk.red : chalk.green;
+      console.log(
+        rowColor(
+          `- ${row.sloId}: ${row.status} ${(row.complianceRatio * 100).toFixed(1)}% (target ${(row.requiredPercent * 100).toFixed(
+            1
+          )}%) env=${row.environment} dim=${row.dimension} L${row.minimumLevel}+`
+        )
+      );
+    }
+  });
+
+fleetSlo
+  .command("list")
+  .description("List fleet SLO definitions")
+  .action(() => {
+    const slos = listFleetSlos(process.cwd());
+    if (slos.length === 0) {
+      console.log("No fleet SLOs defined.");
+      return;
+    }
+    for (const slo of slos) {
+      console.log(`- ${slo.sloId}: ${slo.objective}`);
+    }
   });
 
 fleet
