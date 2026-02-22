@@ -22,16 +22,24 @@ export { checkPayee } from './payeeGuard.js';
 export type { PayeeCheckResult } from './payeeGuard.js';
 export { ModelSwitchboard } from './modelSwitchboard.js';
 export type { EnforceRouteDecision, EnforceRoutingProfile } from './modelSwitchboard.js';
-export {
-  scanMdns, checkProxy, checkPhishing, blindSecrets,
-  createEvidenceContract, checkTemporalAccess, checkGeoFence,
-  guardClipboard, renderTemplate,
-} from './stubs.js';
-export type {
-  MdnsResult, ProxyGuardResult, PhishingResult, SecretBlindResult,
-  EvidenceContract, TemporalResult, GeoFenceResult,
-  ClipboardResult, TemplateResult,
-} from './stubs.js';
+export { scanMdns } from './mdnsController.js';
+export type { MdnsResult } from './mdnsController.js';
+export { checkProxy } from './reverseProxyGuard.js';
+export type { ProxyGuardResult } from './reverseProxyGuard.js';
+export { checkPhishing } from './antiPhishing.js';
+export type { PhishingResult } from './antiPhishing.js';
+export { blindSecrets } from './secretBlind.js';
+export type { SecretBlindResult } from './secretBlind.js';
+export { createEvidenceContract } from './evidenceContract.js';
+export type { EvidenceContract } from './evidenceContract.js';
+export { checkTemporalAccess } from './temporalControls.js';
+export type { TemporalResult } from './temporalControls.js';
+export { checkGeoFence } from './geoFence.js';
+export type { GeoFenceResult } from './geoFence.js';
+export { guardClipboard } from './clipboardGuard.js';
+export type { ClipboardResult } from './clipboardGuard.js';
+export { renderTemplate } from './templateEngine.js';
+export type { TemplateResult } from './templateEngine.js';
 
 // ── AgentSpec-style declarative safety DSL ────────────────────────
 export { SafetyEngine, parseDSLRule, parseDSLRules } from './safetyDSL.js';

@@ -17,6 +17,13 @@ export interface RegistryEntry {
   revoked: boolean;
 }
 
+export interface RegistryCheckResult {
+  registered: boolean;
+  version: string;
+  trusted: boolean;
+  revoked: boolean;
+}
+
 export class SkillRegistry {
   private store = new Map<string, RegistryEntry>();
 
@@ -59,4 +66,25 @@ export class SkillRegistry {
     entry.verified = false;
     return true;
   }
+}
+
+const defaultRegistry = new SkillRegistry();
+
+export function checkRegistry(skillId: string, registry: SkillRegistry = defaultRegistry): RegistryCheckResult {
+  const entry = registry.lookup(skillId);
+  const result: RegistryCheckResult = {
+    registered: Boolean(entry),
+    version: entry?.metadata.version ?? '0.0.0',
+    trusted: Boolean(entry && entry.verified && !entry.revoked),
+    revoked: Boolean(entry?.revoked),
+  };
+  emitGuardEvent({
+    agentId: 'system',
+    moduleCode: 'S7',
+    decision: result.trusted ? 'allow' : 'warn',
+    reason: result.registered ? `Registry lookup for ${skillId}` : `Skill not found: ${skillId}`,
+    severity: result.trusted ? 'low' : 'medium',
+    meta: { skillId, ...result },
+  });
+  return result;
 }

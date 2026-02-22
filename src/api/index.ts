@@ -18,6 +18,7 @@ export async function handleApiRoute(
   method: string,
   req: IncomingMessage,
   res: ServerResponse,
+  workspace?: string,
 ): Promise<boolean> {
   if (!pathname.startsWith('/api/v1/')) return false;
 
@@ -26,7 +27,7 @@ export async function handleApiRoute(
     if (pathname.startsWith('/api/v1/shield/'))  return await handleShieldRoute(pathname, method, req, res);
     if (pathname.startsWith('/api/v1/enforce/')) return await handleEnforceRoute(pathname, method, req, res);
     if (pathname.startsWith('/api/v1/vault/'))   return await handleVaultRoute(pathname, method, req, res);
-    if (pathname.startsWith('/api/v1/watch/'))   return await handleWatchRoute(pathname, method, req, res);
+    if (pathname.startsWith('/api/v1/watch/'))   return await handleWatchRoute(pathname, method, req, res, { workspace });
     if (pathname.startsWith('/api/v1/score/'))   return await handleScoreRoute(pathname, method, req, res);
     if (pathname.startsWith('/api/v1/product/')) return await handleProductRoute(pathname, method, req, res);
 
