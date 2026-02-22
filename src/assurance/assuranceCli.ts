@@ -14,7 +14,7 @@ import {
   assuranceWaiverRequestForApi,
   assuranceWaiverRevokeForApi,
   assuranceWaiverStatusForApi
-} from "./assuranceApi.js";
+} from "./assuranceControlPlane.js";
 import { initAssurancePolicy, verifyAssurancePolicySignature } from "./assurancePolicyStore.js";
 import { verifyAssuranceCertificateFile, verifyAssuranceWorkspace } from "./assuranceVerifier.js";
 
@@ -51,7 +51,7 @@ export async function assuranceRunCli(params: {
   workspace: string;
   scope: "workspace" | "node" | "agent";
   id?: string;
-  pack?: "all" | "injection" | "exfiltration" | "toolMisuse" | "truthfulness" | "sandboxBoundary" | "notaryAttestation";
+  pack?: "all" | string;
   windowDays?: number;
 }) {
   return assuranceRunForApi({

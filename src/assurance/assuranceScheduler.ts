@@ -5,27 +5,24 @@ import {
   verifyAssurancePolicySignature,
   verifyAssuranceSchedulerSignature
 } from "./assurancePolicyStore.js";
-import { runAssuranceLab } from "./assuranceEngine.js";
 import { issueAssuranceCertificate } from "./assuranceCertificates.js";
-import type { AssuranceScopeType, AssurancePackId } from "./assuranceSchema.js";
-import type { AssuranceSchedulerState, AssuranceStatus } from "./assuranceSchema.js";
+import { runAssurance } from "./assuranceRunner.js";
+import type { AssuranceSchedulerState } from "./assuranceSchema.js";
 
 function nextRunTs(nowTs: number, defaultRunHours: number): number {
   const hours = Math.max(1, defaultRunHours);
   return nowTs + hours * 60 * 60 * 1000;
 }
 
-function toSchedulerCertStatus(status: AssuranceStatus, pass: boolean): AssuranceSchedulerState["lastCertStatus"] {
-  if (status === "INSUFFICIENT_EVIDENCE") {
-    return "INSUFFICIENT_EVIDENCE";
-  }
-  if (status === "PASS") {
-    return "PASS";
-  }
-  if (status === "FAIL") {
+function toSchedulerCertStatus(params: {
+  reportStatus: "VALID" | "INVALID";
+  overallScore0to100: number;
+  minRiskAssuranceScore: number;
+}): AssuranceSchedulerState["lastCertStatus"] {
+  if (params.reportStatus !== "VALID") {
     return "FAIL";
   }
-  return pass ? "PASS" : "FAIL";
+  return params.overallScore0to100 >= params.minRiskAssuranceScore ? "PASS" : "FAIL";
 }
 
 export function assuranceSchedulerStatus(workspace: string) {
@@ -53,9 +50,9 @@ export function assuranceSchedulerSetEnabled(params: {
 
 export async function assuranceSchedulerRunNow(params: {
   workspace: string;
-  scopeType?: AssuranceScopeType;
+  scopeType?: "WORKSPACE" | "NODE" | "AGENT";
   scopeId?: string;
-  selectedPack?: AssurancePackId | "all";
+  selectedPack?: "all" | string;
 }) {
   const policySig = verifyAssurancePolicySignature(params.workspace);
   if (!policySig.valid) {
@@ -63,25 +60,27 @@ export async function assuranceSchedulerRunNow(params: {
   }
   const currentState = loadAssuranceSchedulerState(params.workspace);
   const policy = loadAssurancePolicy(params.workspace);
-  const run = await runAssuranceLab({
+  const selected = params.selectedPack ?? "all";
+
+  const report = await runAssurance({
     workspace: params.workspace,
-    scopeType: params.scopeType ?? "WORKSPACE",
-    scopeId: params.scopeId,
-    selectedPack: params.selectedPack ?? "all"
+    agentId: params.scopeType === "AGENT" ? params.scopeId : undefined,
+    packId: selected === "all" ? undefined : selected,
+    runAll: selected === "all",
+    mode: "sandbox",
+    window: `${Math.max(1, policy.assurancePolicy.cadence.defaultRunHours)}h`
   });
 
   let cert:
     | Awaited<ReturnType<typeof issueAssuranceCertificate>>
     | null = null;
-  if (run.run.score.status !== "INSUFFICIENT_EVIDENCE") {
-    try {
-      cert = await issueAssuranceCertificate({
-        workspace: params.workspace,
-        runId: run.run.runId
-      });
-    } catch {
-      cert = null;
-    }
+  try {
+    cert = await issueAssuranceCertificate({
+      workspace: params.workspace,
+      runId: report.assuranceRunId
+    });
+  } catch {
+    cert = null;
   }
 
   const nowTs = Date.now();
@@ -93,12 +92,16 @@ export async function assuranceSchedulerRunNow(params: {
       status: "OK" as const,
       reason: ""
     },
-    lastCertStatus: toSchedulerCertStatus(run.run.score.status, run.run.score.pass)
+    lastCertStatus: toSchedulerCertStatus({
+      reportStatus: report.status,
+      overallScore0to100: report.overallScore0to100,
+      minRiskAssuranceScore: policy.assurancePolicy.thresholds.minRiskAssuranceScore
+    })
   };
   saveAssuranceSchedulerState(params.workspace, next);
 
   return {
-    run,
+    run: report,
     cert,
     scheduler: next
   };
@@ -156,7 +159,7 @@ export async function assuranceSchedulerTick(params: {
   });
   return {
     ran: true,
-    runId: result.run.run.runId,
+    runId: result.run.assuranceRunId,
     certIssued: Boolean(result.cert)
   };
 }
