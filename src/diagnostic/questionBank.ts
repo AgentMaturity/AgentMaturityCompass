@@ -1375,6 +1375,40 @@ const seeds: QuestionSeed[] = [
     tuningKnobs: ["guardrails.costEfficiency", "promptAddendum.modelRouting", "evalHarness.costOptimization"]
   },
   {
+    id: "AMC-SLO-1",
+    layerName: "Strategic Agent Operations",
+    title: "Governance SLO Compliance",
+    promptTemplate: "Are governance SLOs defined with measurable objectives (for example, high-risk review within one hour) and continuously tracked with alerts?",
+    labels: [
+      "No Governance SLOs",
+      "SLOs Documented Only",
+      "Periodic Manual SLO Checks",
+      "Automated SLO Tracking",
+      "Alerting + Incident Workflow",
+      "Predictive SLO Governance with Auto-Remediation"
+    ],
+    evidenceGateHints: "Require governance SLO report, compliance trend snapshots, and alert audit evidence.",
+    upgradeHints: "Define explicit SLO targets for high-risk review and policy latency; attach alerting and remediation playbooks.",
+    tuningKnobs: ["guardrails.governanceSlo", "evalHarness.governanceSloCompliance", "ops.governanceAlerting"]
+  },
+  {
+    id: "AMC-SLO-2",
+    layerName: "Strategic Agent Operations",
+    title: "Cost-of-Trust and ROI Governance",
+    promptTemplate: "Does the system quantify cost-of-trust overhead (latency/cost per decision) and compare it to risk-reduction value using trust ROI?",
+    labels: [
+      "No Cost-of-Trust Tracking",
+      "Manual Cost Estimates",
+      "Latency or Cost Tracked in Isolation",
+      "Cost-per-Decision Tracked",
+      "Trust ROI Reported with Risk Reduction",
+      "Portfolio-Level Trust ROI Optimization with Guardrails"
+    ],
+    evidenceGateHints: "Require cost-of-trust analytics output, per-decision cost records, and trust ROI trend evidence.",
+    upgradeHints: "Track governance latency + cost per decision and calculate ROI from avoided-risk value versus governance cost.",
+    tuningKnobs: ["guardrails.trustEconomics", "evalHarness.trustRoi", "ops.costOfTrust"]
+  },
+  {
     id: "AMC-RES-1",
     layerName: "Resilience",
     title: "Model Switching Resilience",

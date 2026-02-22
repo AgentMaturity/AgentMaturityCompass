@@ -2705,6 +2705,7 @@ const retention = program.command("retention").description("Retention/archive pa
 const backup = program.command("backup").description("Signed encrypted backup/restore operations");
 const maintenance = program.command("maintenance").description("Operational maintenance operations");
 const metrics = program.command("metrics").description("Prometheus metrics endpoint helpers");
+const slo = program.command("slo").description("Governance SLO status and trust economics");
 const transparencyMerkle = transparency.command("merkle").description("Merkle transparency root/proof operations");
 const policyAction = policy.command("action").description("Signed autonomy action policy");
 const policyApproval = policy.command("approval").description("Signed dual-control approval policy");
@@ -3464,9 +3465,25 @@ ops
   .description("Show governance SLO dashboard")
   .option("--window <hours>", "Window in hours", "1")
   .action((opts: { window: string }) => {
-    const slo = require("./ops/governanceSlo.js") as typeof import("./ops/governanceSlo.js");
-    const windowMs = parseFloat(opts.window) * 3600000;
-    console.log(slo.renderSloStatus(windowMs));
+    const sloOps = require("./ops/governanceSlo.js") as typeof import("./ops/governanceSlo.js");
+    const parsedHours = parseFloat(opts.window);
+    const windowMs = (Number.isFinite(parsedHours) && parsedHours > 0 ? parsedHours : 1) * 3600000;
+    sloOps.trackSloCompliance(windowMs);
+    sloOps.evaluateSloAlerts(windowMs);
+    console.log(sloOps.renderSloStatus(windowMs));
+  });
+
+slo
+  .command("status")
+  .description("Show governance SLO status with compliance, alerts, and trust ROI")
+  .option("--window <hours>", "Window in hours", "1")
+  .action((opts: { window: string }) => {
+    const sloOps = require("./ops/governanceSlo.js") as typeof import("./ops/governanceSlo.js");
+    const parsedHours = parseFloat(opts.window);
+    const windowMs = (Number.isFinite(parsedHours) && parsedHours > 0 ? parsedHours : 1) * 3600000;
+    sloOps.trackSloCompliance(windowMs);
+    sloOps.evaluateSloAlerts(windowMs);
+    console.log(sloOps.renderSloStatus(windowMs));
   });
 
 ops

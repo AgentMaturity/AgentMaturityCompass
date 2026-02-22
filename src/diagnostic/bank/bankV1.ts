@@ -5,6 +5,7 @@ import { diagnosticBankSchema, type DiagnosticBank } from "./bankSchema.js";
 function dimensionIdForQuestionId(qId: string): 1 | 2 | 3 | 4 | 5 {
   if (qId.startsWith("AMC-1.")) return 1;
   if (qId.startsWith("AMC-COST-")) return 1;
+  if (qId.startsWith("AMC-SLO-")) return 1;
   if (qId.startsWith("AMC-SPORT-")) return 1;
   if (qId.startsWith("AMC-2.")) return 2;
   if (qId.startsWith("AMC-HOQ-")) return 2;
@@ -122,7 +123,7 @@ export function defaultDiagnosticBankV1(): DiagnosticBank {
     diagnosticBank: {
       version: 1,
       dimensions: [
-        { id: 1, name: "Strategic Agent Operations", questionCount: 13 },
+        { id: 1, name: "Strategic Agent Operations", questionCount: 15 },
         { id: 2, name: "Agent Leadership", questionCount: 18 },
         { id: 3, name: "Agent Culture", questionCount: 20 },
         { id: 4, name: "Agent Resilience", questionCount: 16 },
