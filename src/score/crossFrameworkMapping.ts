@@ -65,7 +65,7 @@ const EU_AI_ACT_CONTROLS: FrameworkControl[] = [
   { id: 'EU-11', name: 'Technical Documentation', description: 'Technical documentation before market placement', amcQIDs: ['AMC-2.9'], amcModules: ['docs', 'audit', 'passport'], automatable: true },
   { id: 'EU-12', name: 'Record-Keeping', description: 'Automatic logging of events', amcQIDs: ['AMC-1.6'], amcModules: ['ledger', 'transparency', 'receipts'], automatable: true },
   { id: 'EU-13', name: 'Transparency to Deployers', description: 'Instructions for use provided', amcQIDs: ['AMC-2.4'], amcModules: ['passport', 'docs'], automatable: true },
-  { id: 'EU-14', name: 'Human Oversight', description: 'Human oversight measures built in', amcQIDs: ['AMC-2.10', 'AMC-HOQ-1', 'AMC-HOQ-2'], amcModules: ['governor', 'approvals', 'workorders'], automatable: true },
+  { id: 'EU-14', name: 'Human Oversight', description: 'Human oversight measures built in', amcQIDs: ['AMC-2.10', 'AMC-HOQ-1', 'AMC-HOQ-2', 'AMC-HOQ-3', 'AMC-HOQ-4'], amcModules: ['governor', 'approvals', 'workorders'], automatable: true },
   { id: 'EU-15', name: 'Accuracy, Robustness, Cybersecurity', description: 'Appropriate accuracy and resilience', amcQIDs: ['AMC-2.1', 'AMC-4.5'], amcModules: ['enforce', 'shield', 'assurance'], automatable: true },
   { id: 'EU-FRIA', name: 'Fundamental Rights Impact Assessment', description: 'FRIA completed and maintained for high-risk deployment contexts', amcQIDs: ['AMC-2.6'], amcModules: ['governor', 'docs', 'audit'], automatable: false },
   { id: 'EU-INCIDENT', name: 'Serious Incident Lifecycle', description: 'Serious incidents detected, reported, and closed with evidence', amcQIDs: ['AMC-2.7'], amcModules: ['watch', 'incidents', 'audit'], automatable: true },
