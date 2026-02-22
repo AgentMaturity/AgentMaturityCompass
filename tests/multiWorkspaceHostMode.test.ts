@@ -195,7 +195,7 @@ describe("multi-workspace host mode", () => {
     }
   }, 30_000);
 
-  test("lease workspace claim wins over URL workspace and audit is written only in claimed workspace", async () => {
+  test("lease workspace mismatch is denied and audited only in requested workspace", async () => {
     const { hostDir, workspaceA, workspaceB } = setupHostWithTwoWorkspaces();
     const port = await pickFreePort();
     const host = await startWorkspaceRouter({
@@ -229,7 +229,7 @@ describe("multi-workspace host mode", () => {
           args: {}
         }
       });
-      expect([200, 400]).toContain(response.status);
+      expect(response.status).toBe(403);
 
       const ledgerA = openLedger(workspaceA);
       const ledgerB = openLedger(workspaceB);
@@ -253,8 +253,8 @@ describe("multi-workspace host mode", () => {
           return false;
         }
       });
-      expect(suspiciousInA.length).toBeGreaterThan(0);
-      expect(suspiciousInB.length).toBe(0);
+      expect(suspiciousInA.length).toBe(0);
+      expect(suspiciousInB.length).toBeGreaterThan(0);
     } finally {
       await host.close();
     }
@@ -296,7 +296,7 @@ describe("multi-workspace host mode", () => {
     }
   }, 30_000);
 
-  test("host and workspace console paths serve and workspace HTML avoids absolute /console links", async () => {
+  test("workspace console requires host/workspace session and still serves relative assets", async () => {
     const { hostDir } = setupHostWithTwoWorkspaces();
     const port = await pickFreePort();
     const host = await startWorkspaceRouter({
@@ -311,16 +311,47 @@ describe("multi-workspace host mode", () => {
         url: `http://127.0.0.1:${port}/host/console/host.html`,
         method: "GET"
       });
-      const workspaceConsole = await httpRaw({
+      const deniedWorkspaceConsole = await httpRaw({
         url: `http://127.0.0.1:${port}/w/ws-a/console`,
         method: "GET"
       });
+      const hostLogin = await httpRaw({
+        url: `http://127.0.0.1:${port}/host/api/login`,
+        method: "POST",
+        body: {
+          username: "admin",
+          password: "admin-pass-123"
+        }
+      });
+      expect(hostLogin.status).toBe(200);
+      const hostCookie = Array.isArray(hostLogin.headers["set-cookie"])
+        ? hostLogin.headers["set-cookie"][0] ?? ""
+        : String(hostLogin.headers["set-cookie"] ?? "");
+
+      const workspaceBootstrap = await httpRaw({
+        url: `http://127.0.0.1:${port}/w/ws-a/console`,
+        method: "GET",
+        cookie: hostCookie
+      });
+      expect(workspaceBootstrap.status).toBe(302);
+      const workspaceCookie = Array.isArray(workspaceBootstrap.headers["set-cookie"])
+        ? workspaceBootstrap.headers["set-cookie"][0] ?? ""
+        : String(workspaceBootstrap.headers["set-cookie"] ?? "");
+      const combinedCookie = `${hostCookie.split(";")[0] ?? ""}; ${workspaceCookie.split(";")[0] ?? ""}`;
+
+      const workspaceConsole = await httpRaw({
+        url: `http://127.0.0.1:${port}/w/ws-a/console`,
+        method: "GET",
+        cookie: combinedCookie
+      });
       const workspaceJs = await httpRaw({
         url: `http://127.0.0.1:${port}/w/ws-a/console/assets/app.js`,
-        method: "GET"
+        method: "GET",
+        cookie: combinedCookie
       });
 
       expect(hostConsole.status).toBe(200);
+      expect(deniedWorkspaceConsole.status).toBe(401);
       expect(workspaceConsole.status).toBe(200);
       expect(workspaceConsole.body.includes('href="/console')).toBe(false);
       expect(workspaceConsole.body.includes('src="/console')).toBe(false);

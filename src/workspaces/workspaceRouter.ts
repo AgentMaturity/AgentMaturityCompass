@@ -20,8 +20,10 @@ import {
   setWorkspaceStatus
 } from "./hostDb.js";
 import { issueHostSessionToken, verifyHostSessionToken } from "./hostAuth.js";
-import { parseCookieHeader, issueSessionToken, type SessionPayload } from "../auth/sessionTokens.js";
+import { parseCookieHeader, issueSessionToken, verifySessionToken, type SessionPayload } from "../auth/sessionTokens.js";
 import { extractLeaseCarrier } from "../leases/leaseCarriers.js";
+import { verifyLeaseToken } from "../leases/leaseVerifier.js";
+import { loadLeaseRevocations, verifyLeaseRevocationsSignature } from "../leases/leaseStore.js";
 import { openLedger } from "../ledger/ledger.js";
 import { sha256Hex } from "../utils/hash.js";
 import { initWorkspace } from "../workspace.js";
@@ -565,6 +567,74 @@ function parseUrlEncodedForm(raw: string): Record<string, string> {
     out[decodeURIComponent(key)] = decodeURIComponent(value.replace(/\+/g, " "));
   }
   return out;
+}
+
+function hasValidWorkspaceSession(
+  manager: WorkspaceManager,
+  workspaceId: string,
+  cookieHeader: string | undefined
+): boolean {
+  const token = parseCookieHeader(cookieHeader, "amc_session");
+  if (!token) {
+    return false;
+  }
+  try {
+    const workspace = manager.withWorkspace(workspaceId, (context) => context.workspaceDir);
+    return verifySessionToken({
+      workspace,
+      token
+    }).ok;
+  } catch {
+    return false;
+  }
+}
+
+function verifyWorkspaceLeaseToken(
+  manager: WorkspaceManager,
+  workspaceId: string,
+  leaseToken: string
+): { ok: boolean; error?: string; status: number } {
+  try {
+    return manager.withWorkspace(workspaceId, (context) => {
+      const revocationSig = verifyLeaseRevocationsSignature(context.workspaceDir);
+      if (!revocationSig.valid) {
+        return {
+          ok: false,
+          error: `lease revocation signature invalid: ${revocationSig.reason ?? "unknown"}`,
+          status: 401
+        };
+      }
+      const revokedLeaseIds = new Set(loadLeaseRevocations(context.workspaceDir).revocations.map((row) => row.leaseId));
+      const verification = verifyLeaseToken({
+        workspace: context.workspaceDir,
+        token: leaseToken,
+        expectedWorkspaceId: workspaceId,
+        revokedLeaseIds
+      });
+      if (verification.ok) {
+        return { ok: true, status: 200 };
+      }
+      const error = verification.error ?? "lease verification failed";
+      const status = error.includes("scope denied") ||
+        error.includes("route denied") ||
+        error.includes("model denied") ||
+        error.includes("agent mismatch") ||
+        error.includes("workspace mismatch")
+        ? 403
+        : 401;
+      return {
+        ok: false,
+        error,
+        status
+      };
+    });
+  } catch (error) {
+    return {
+      ok: false,
+      error: String(error),
+      status: 401
+    };
+  }
 }
 
 async function proxyToWorkspace(
@@ -1422,7 +1492,7 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
         return;
       }
 
-      let effectiveWorkspaceId = urlWorkspaceId;
+      const workspaceSessionValid = hasValidWorkspaceSession(manager, urlWorkspaceId, req.headers.cookie);
       const lease = extractLeaseCarrier({
         headers: req.headers,
         url,
@@ -1431,52 +1501,63 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
       if (lease.leaseToken) {
         const claimWorkspaceId = workspaceFromLeaseToken(lease.leaseToken);
         if (claimWorkspaceId && claimWorkspaceId !== urlWorkspaceId) {
-          effectiveWorkspaceId = claimWorkspaceId;
           try {
-            manager.withWorkspace(claimWorkspaceId, (context) => {
+            manager.withWorkspace(urlWorkspaceId, (context) => {
               const ledger = openLedger(context.workspaceDir);
-              const sessionId = `host-router-${Date.now()}`;
-              const payload = JSON.stringify({
-                auditType: "SUSPICIOUS_WORKSPACE_OVERRIDE_ATTEMPT",
-                severity: "HIGH",
-                leaseWorkspaceId: claimWorkspaceId,
-                requestedWorkspaceId: urlWorkspaceId,
-                path: pathname
-              });
-              ledger.startSession({
-                sessionId,
-                runtime: "unknown",
-                binaryPath: "amc-host-router",
-                binarySha256: sha256Hex("amc-host-router")
-              });
-              ledger.appendEvidenceWithReceipt({
-                sessionId,
-                runtime: "unknown",
-                eventType: "audit",
-                payload,
-                inline: true,
-                payloadExt: "json",
-                meta: {
+              try {
+                const sessionId = `host-router-${Date.now()}`;
+                const payload = JSON.stringify({
                   auditType: "SUSPICIOUS_WORKSPACE_OVERRIDE_ATTEMPT",
                   severity: "HIGH",
                   leaseWorkspaceId: claimWorkspaceId,
                   requestedWorkspaceId: urlWorkspaceId,
-                  trustTier: "OBSERVED"
-                },
-                receipt: {
-                  kind: "guard_check",
-                  agentId: "unknown",
-                  providerId: "host-router",
-                  model: null,
-                  bodySha256: sha256Hex(Buffer.from(payload, "utf8"))
-                }
-              });
-              ledger.sealSession(sessionId);
-              ledger.close();
+                  path: pathname
+                });
+                ledger.startSession({
+                  sessionId,
+                  runtime: "unknown",
+                  binaryPath: "amc-host-router",
+                  binarySha256: sha256Hex("amc-host-router")
+                });
+                ledger.appendEvidenceWithReceipt({
+                  sessionId,
+                  runtime: "unknown",
+                  eventType: "audit",
+                  payload,
+                  inline: true,
+                  payloadExt: "json",
+                  meta: {
+                    auditType: "SUSPICIOUS_WORKSPACE_OVERRIDE_ATTEMPT",
+                    severity: "HIGH",
+                    leaseWorkspaceId: claimWorkspaceId,
+                    requestedWorkspaceId: urlWorkspaceId,
+                    trustTier: "OBSERVED"
+                  },
+                  receipt: {
+                    kind: "guard_check",
+                    agentId: "unknown",
+                    providerId: "host-router",
+                    model: null,
+                    bodySha256: sha256Hex(Buffer.from(payload, "utf8"))
+                  }
+                });
+                ledger.sealSession(sessionId);
+              } finally {
+                ledger.close();
+              }
             });
           } catch {
-            // best effort; deny-by-default remains inside target API lease checks
+            // best effort audit logging
           }
+          json(res, 403, { error: "lease workspace mismatch" });
+          return;
+        }
+        const leaseVerify = verifyWorkspaceLeaseToken(manager, urlWorkspaceId, lease.leaseToken);
+        if (!leaseVerify.ok) {
+          json(res, leaseVerify.status, {
+            error: leaseVerify.error ?? "lease verification failed"
+          });
+          return;
         }
       }
 
@@ -1488,9 +1569,8 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
             json(res, 403, { error: "membership required" });
             return;
           }
-          const hasWorkspaceSession = Boolean(parseCookieHeader(req.headers.cookie, "amc_session"));
           const canMintWorkspaceSession = hostAccess.username && hostAccess.userId;
-          if (!hasWorkspaceSession && canMintWorkspaceSession && (workspacePath === "/" || workspacePath.startsWith("/console"))) {
+          if (!workspaceSessionValid && canMintWorkspaceSession && (workspacePath === "/" || workspacePath.startsWith("/console"))) {
             const issued = issueSessionToken({
               workspace: manager.withWorkspace(urlWorkspaceId, (context) => context.workspaceDir),
               userId: hostAccess.userId!,
@@ -1504,10 +1584,13 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
             res.end();
             return;
           }
+        } else if (!workspaceSessionValid) {
+          json(res, 401, { error: "missing workspace session" });
+          return;
         }
       }
 
-      const runtime = await ensureWorkspaceApi(effectiveWorkspaceId);
+      const runtime = await ensureWorkspaceApi(urlWorkspaceId);
       await proxyToWorkspace(req, res, runtime, workspacePath);
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
