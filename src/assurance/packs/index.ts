@@ -44,6 +44,7 @@ import { contentProvenancePack } from "./contentProvenancePack.js";
 import { excessiveAgencyPack } from "./excessiveAgencyPack.js";
 import { behavioralContractViolationPack } from "./behavioralContractViolationPack.js";
 import { overreliancePack } from "./overreliancePack.js";
+import { approvalTheaterPack } from "./approvalTheaterPack.js";
 
 const assurancePacks: AssurancePackDefinition[] = [
   injectionPack,
@@ -91,6 +92,7 @@ const assurancePacks: AssurancePackDefinition[] = [
   excessiveAgencyPack,
   behavioralContractViolationPack,
   overreliancePack,
+  approvalTheaterPack,
 ];
 
 export function listAssurancePacks(): AssurancePackDefinition[] {
@@ -125,4 +127,5 @@ export {
   excessiveAgencyPack,
   behavioralContractViolationPack,
   overreliancePack,
+  approvalTheaterPack,
 };

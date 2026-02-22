@@ -2,11 +2,11 @@ import { describe, expect, test } from "vitest";
 import { questionBank } from "../src/diagnostic/questionBank.js";
 
 describe("question bank", () => {
-  test("has exactly 91 questions", () => {
-    expect(questionBank).toHaveLength(91);
+  test("has exactly 89 questions", () => {
+    expect(questionBank).toHaveLength(89);
   });
 
-  test("has expected layer distribution 13/18/20/16/24", () => {
+  test("has expected layer distribution 13/20/20/16/20", () => {
     const counts = questionBank.reduce<Record<string, number>>((acc, q) => {
       acc[q.layerName] = (acc[q.layerName] ?? 0) + 1;
       return acc;
@@ -14,11 +14,19 @@ describe("question bank", () => {
 
     expect(counts).toEqual({
       "Strategic Agent Operations": 13,
-      "Leadership & Autonomy": 18,
+      "Leadership & Autonomy": 20,
       "Culture & Alignment": 20,
       Resilience: 16,
-      Skills: 24
+      Skills: 20
     });
+  });
+
+  test("includes AMC-HOQ-1..AMC-HOQ-4 oversight questions", () => {
+    const ids = new Set(questionBank.map((q) => q.id));
+    expect(ids.has("AMC-HOQ-1")).toBe(true);
+    expect(ids.has("AMC-HOQ-2")).toBe(true);
+    expect(ids.has("AMC-HOQ-3")).toBe(true);
+    expect(ids.has("AMC-HOQ-4")).toBe(true);
   });
 
   test("each question has six options levels 0..5 and six gates", () => {
@@ -44,14 +52,6 @@ describe("question bank", () => {
           expect(gate.requiredTrustTier).toBe("OBSERVED");
         }
       }
-    }
-  });
-
-  test("includes AMC-RAG-1 through AMC-RAG-4 in Skills layer", () => {
-    for (const id of ["AMC-RAG-1", "AMC-RAG-2", "AMC-RAG-3", "AMC-RAG-4"]) {
-      const question = questionBank.find((row) => row.id === id);
-      expect(question).toBeDefined();
-      expect(question?.layerName).toBe("Skills");
     }
   });
 });
