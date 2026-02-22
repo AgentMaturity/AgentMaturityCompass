@@ -113,6 +113,19 @@ export { listProviderTemplates, getProviderTemplateById } from "./providers/prov
 export { runSandboxCommand, buildSandboxDockerArgs } from "./sandbox/sandbox.js";
 export { ingestEvidence, attestIngestSession } from "./ingest/ingest.js";
 export {
+  importEvalResults,
+  parseEvalImport,
+  parseOpenAIEvalResults,
+  parseLangSmithEvalResults,
+  parseDeepEvalResults,
+  parsePromptfooEvalResults,
+  type EvalImportFormat,
+  type EvalImportCase,
+  type ParsedEvalImport,
+  type EvalImportResult
+} from "./eval/evalImporters.js";
+export { evalImportCli, parseEvalImportFormat, parseEvalImportTrustTier } from "./eval/evalCli.js";
+export {
   exportEvidenceBundle,
   verifyEvidenceBundle,
   inspectEvidenceBundle,

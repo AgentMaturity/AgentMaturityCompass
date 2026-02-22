@@ -188,6 +188,7 @@ import { verifyBenchmarkArtifact } from "./benchmarks/benchVerify.js";
 import { ingestBenchmarks } from "./benchmarks/benchImport.js";
 import { listImportedBenchmarks } from "./benchmarks/benchStore.js";
 import { benchmarkStats } from "./benchmarks/benchStats.js";
+import { evalImportCli } from "./eval/evalCli.js";
 import {
   benchCompareCli,
   benchComparisonLatestCli,
@@ -2590,6 +2591,7 @@ verifyCmd
 
 const target = program.command("target").description("Target profile operations");
 const evidence = program.command("evidence").description("Evidence lifecycle workflows");
+const evalCmd = program.command("eval").description("External eval framework import operations");
 const incidents = program.command("incidents").description("Incident operations and dispatch workflows");
 const policy = program.command("policy").description("Policy-as-code operations");
 const governor = program.command("governor").description("Autonomy Governor checks");
@@ -2738,6 +2740,39 @@ evidence
     if (out.status !== "PASS") {
       process.exit(1);
     }
+  });
+
+evalCmd
+  .command("import")
+  .description("Import external eval framework results as signed AMC evidence")
+  .requiredOption("--format <format>", "eval framework format: openai|langsmith|deepeval|promptfoo")
+  .requiredOption("--file <file>", "path to eval results JSON/JSONL")
+  .option("--agent <agentId>", "agent ID override")
+  .option("--trust-tier <trustTier>", "trust tier override (default SELF_REPORTED)")
+  .option("--json", "emit JSON output", false)
+  .action((opts: { format: string; file: string; agent?: string; trustTier?: string; json: boolean }) => {
+    const result = evalImportCli({
+      workspace: process.cwd(),
+      format: opts.format,
+      file: opts.file,
+      agentId: opts.agent,
+      trustTier: opts.trustTier
+    });
+    if (opts.json) {
+      console.log(JSON.stringify(result, null, 2));
+      return;
+    }
+    console.log(chalk.green(`Imported ${result.caseCount} eval case(s) from ${result.format}`));
+    console.log(`session: ${result.sessionId}`);
+    console.log(`runId: ${result.runId ?? "n/a"}`);
+    console.log(`events: ${result.eventIds.length}`);
+    console.log(`passed: ${result.passedCount}`);
+    console.log(`failed: ${result.failedCount}`);
+    const questions = Object.entries(result.questionCoverage)
+      .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+      .slice(0, 8)
+      .map(([id, count]) => `${id}:${count}`);
+    console.log(`question coverage: ${questions.length > 0 ? questions.join(", ") : "none"}`);
   });
 
 incidents
