@@ -1342,3 +1342,32 @@ export * from "./vault/privacyBudget.js";
 // ── NL Policy authoring (2026-02-21) ─────────────────────────────────
 export { parseNLPolicy, validateParsedPolicy, POLICY_TEMPLATES } from "./governor/nlPolicy.js";
 export type { NLPolicyInput, ParsedPolicy, PolicyRule, PolicyValidationResult } from "./governor/nlPolicy.js";
+
+// ── Lifecycle responsibility mapping ───────────────────────────────────
+export {
+  lifecycleStages,
+  lifecycleRoles,
+  lifecycleStageDefinitions,
+  lifecycleResponsibilityMatrix,
+  lifecycleGovernanceGatesByTargetStage,
+  lifecyclePath,
+  lifecycleStatus,
+  advanceLifecycleStage,
+  requiredControlsForStage,
+  parseLifecycleStage,
+  parseLifecycleRole
+} from "./lifecycle/lifecycle.js";
+export type {
+  AgentLifecycleStage,
+  LifecycleRole,
+  LifecycleStageDefinition,
+  LifecycleResponsibilityAssignment,
+  GovernanceGateRequirement,
+  LifecycleTransitionRecord,
+  AgentLifecycleState,
+  AgentLifecycleStatus,
+  AdvanceLifecycleInput,
+  AdvanceLifecycleResult
+} from "./lifecycle/lifecycle.js";
+export { lifecycleStatusCli, lifecycleAdvanceCli, parseControlsCsv } from "./lifecycle/lifecycleCli.js";
+export type { LifecycleStatusCliInput, LifecycleAdvanceCliInput } from "./lifecycle/lifecycleCli.js";

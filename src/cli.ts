@@ -2696,10 +2696,114 @@ const retention = program.command("retention").description("Retention/archive pa
 const backup = program.command("backup").description("Signed encrypted backup/restore operations");
 const maintenance = program.command("maintenance").description("Operational maintenance operations");
 const metrics = program.command("metrics").description("Prometheus metrics endpoint helpers");
+const lifecycle = program.command("lifecycle").description("Agent lifecycle responsibility and governance mapping");
 const transparencyMerkle = transparency.command("merkle").description("Merkle transparency root/proof operations");
 const policyAction = policy.command("action").description("Signed autonomy action policy");
 const policyApproval = policy.command("approval").description("Signed dual-control approval policy");
 const policyPack = policy.command("pack").description("Policy packs by archetype and risk tier");
+
+lifecycle
+  .command("status")
+  .description("Show lifecycle stage, accountability matrix, governance gates, and transition trail")
+  .option("--agent <agentId>", "agent ID (overrides global --agent)")
+  .option("--json", "emit JSON output", false)
+  .action((opts: { agent?: string; json: boolean }) => {
+    const { lifecycleStatusCli } = require("./lifecycle/lifecycleCli.js") as typeof import("./lifecycle/lifecycleCli.js");
+    const status = lifecycleStatusCli({
+      workspace: process.cwd(),
+      agentId: opts.agent ?? activeAgent(program)
+    });
+
+    if (opts.json) {
+      console.log(JSON.stringify(status, null, 2));
+      return;
+    }
+
+    console.log(chalk.bold(`Lifecycle status — ${status.agentId}`));
+    console.log(`  Current stage: ${status.currentStage}`);
+    console.log(`  Stage entered: ${new Date(status.stageEnteredTs[status.currentStage] ?? Date.now()).toISOString()}`);
+
+    const currentAssignment = status.responsibilityMatrix[status.currentStage];
+    console.log(`  Accountable role: ${currentAssignment.accountable}`);
+    console.log(`  Supporting roles: ${currentAssignment.supports.join(", ")}`);
+    console.log(`  Scope: ${currentAssignment.decisionScope}`);
+
+    if (status.nextAllowedStages.length === 0) {
+      console.log("  Next allowed stages: none (terminal stage)");
+    } else {
+      console.log(`  Next allowed stages: ${status.nextAllowedStages.join(", ")}`);
+      for (const stage of status.nextAllowedStages) {
+        const controls = status.governanceGatesByTargetStage[stage].map((gate) => gate.controlId);
+        console.log(
+          `    ${stage}: ${controls.length > 0 ? controls.join(", ") : "no additional controls required"}`
+        );
+      }
+    }
+
+    if (status.transitionTrail.length === 0) {
+      console.log("  Transition audit trail: no transitions recorded.");
+      return;
+    }
+
+    console.log("  Transition audit trail:");
+    for (const transition of status.transitionTrail) {
+      console.log(
+        `    ${new Date(transition.ts).toISOString()} ${transition.fromStage} -> ${transition.toStage} by ${transition.actorRole}:${transition.actor}`
+      );
+    }
+  });
+
+lifecycle
+  .command("advance")
+  .description("Advance lifecycle stage after governance gate confirmation")
+  .option("--agent <agentId>", "agent ID (overrides global --agent)")
+  .requiredOption("--to <stage>", "target stage: development|testing|staging|production|deprecated")
+  .option("--actor <actor>", "actor identifier", "owner-cli")
+  .option("--actor-role <role>", "actor role: developer|deployer|operator")
+  .option("--controls <list>", "comma-separated governance control IDs satisfied for this advance")
+  .option("--note <text>", "transition note")
+  .option("--json", "emit JSON output", false)
+  .action((opts: {
+    agent?: string;
+    to: string;
+    actor: string;
+    actorRole?: string;
+    controls?: string;
+    note?: string;
+    json: boolean;
+  }) => {
+    const { lifecycleAdvanceCli, parseControlsCsv } = require("./lifecycle/lifecycleCli.js") as typeof import("./lifecycle/lifecycleCli.js");
+    try {
+      const out = lifecycleAdvanceCli({
+        workspace: process.cwd(),
+        agentId: opts.agent ?? activeAgent(program),
+        to: opts.to,
+        actor: opts.actor,
+        actorRole: opts.actorRole,
+        controls: parseControlsCsv(opts.controls),
+        note: opts.note
+      });
+
+      if (opts.json) {
+        console.log(JSON.stringify(out, null, 2));
+        return;
+      }
+
+      console.log(chalk.green(`Lifecycle advanced for ${out.agentId}: ${out.fromStage} -> ${out.toStage}`));
+      console.log(`  Transition ID: ${out.transition.transitionId}`);
+      console.log(`  Timestamp: ${new Date(out.transition.ts).toISOString()}`);
+      if (out.requiredControls.length > 0) {
+        console.log(`  Required controls: ${out.requiredControls.join(", ")}`);
+      }
+      if (out.transition.controlsSatisfied.length > 0) {
+        console.log(`  Confirmed controls: ${out.transition.controlsSatisfied.join(", ")}`);
+      }
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      console.error(chalk.red(message));
+      process.exit(1);
+    }
+  });
 
 evidence
   .command("help")
