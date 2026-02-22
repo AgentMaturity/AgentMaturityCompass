@@ -22,6 +22,7 @@ import { startFakeAnthropic } from "../src/bridge/tests/fakeProviders/fakeAnthro
 import { startFakeGemini } from "../src/bridge/tests/fakeProviders/fakeGemini.js";
 import { startFakeXAI } from "../src/bridge/tests/fakeProviders/fakeXAI.js";
 import { startFakeOpenRouter } from "../src/bridge/tests/fakeProviders/fakeOpenRouter.js";
+import { questionBank } from "../src/diagnostic/questionBank.js";
 
 const roots: string[] = [];
 
@@ -734,7 +735,7 @@ describe("universal agent integration layer", () => {
         unknownReasons?: unknown[];
       };
       expect(autoPayload.measuredScores).toBeTruthy();
-      expect(Object.keys(autoPayload.measuredScores ?? {}).length).toBe(67);
+      expect(Object.keys(autoPayload.measuredScores ?? {}).length).toBe(questionBank.length);
       expect(Array.isArray(autoPayload.unknownReasons)).toBe(true);
 
       const runAuto = await httpJson({

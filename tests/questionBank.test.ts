@@ -2,27 +2,23 @@ import { describe, expect, test } from "vitest";
 import { questionBank } from "../src/diagnostic/questionBank.js";
 
 describe("question bank", () => {
-  test("has exactly 67 questions", () => {
-    expect(questionBank).toHaveLength(67);
+  test("has exactly 87 questions", () => {
+    expect(questionBank).toHaveLength(87);
   });
 
-  test("has expected layer distribution 9/5/16/7/5", () => {
-    const counts = {
-      L1: questionBank.filter((q) => q.id.startsWith("AMC-1.")).length
-        + questionBank.filter((q) => q.id.startsWith("AMC-COST-")).length,
-      L2: questionBank.filter((q) => q.id.startsWith("AMC-2.")).length
-        + questionBank.filter((q) => q.id.startsWith("AMC-HOQ-")).length
-        + questionBank.filter((q) => q.id.startsWith("AMC-GOV-PROACTIVE-")).length,
-      L3: questionBank.filter((q) => q.id.startsWith("AMC-3.")).length
-        + questionBank.filter((q) => q.id.startsWith("AMC-SOCIAL-")).length,
-      L4: questionBank.filter((q) => q.id.startsWith("AMC-4.")).length
-        + questionBank.filter((q) => q.id.startsWith("AMC-MEM-")).length
-        + questionBank.filter((q) => q.id.startsWith("AMC-OPS-")).length
-        + questionBank.filter((q) => q.id.startsWith("AMC-RES-")).length,
-      L5: questionBank.filter((q) => q.id.startsWith("AMC-5.")).length
-    };
+  test("has expected layer distribution 13/18/20/16/20", () => {
+    const counts = questionBank.reduce<Record<string, number>>((acc, q) => {
+      acc[q.layerName] = (acc[q.layerName] ?? 0) + 1;
+      return acc;
+    }, {});
 
-    expect(counts).toEqual({ L1: 12, L2: 8, L3: 17, L4: 14, L5: 7 });
+    expect(counts).toEqual({
+      "Strategic Agent Operations": 13,
+      "Leadership & Autonomy": 18,
+      "Culture & Alignment": 20,
+      Resilience: 16,
+      Skills: 20
+    });
   });
 
   test("each question has six options levels 0..5 and six gates", () => {

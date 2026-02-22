@@ -15,6 +15,7 @@ import { simulateMechanicPlan } from "../src/mechanic/simulator.js";
 import { mechanicPlanRequestApprovalForApi, mechanicPlanExecuteForApi } from "../src/mechanic/mechanicApi.js";
 import { decideApprovalForIntent } from "../src/approvals/approvalEngine.js";
 import { listApprovalDecisions } from "../src/approvals/approvalChainStore.js";
+import { questionBank } from "../src/diagnostic/questionBank.js";
 
 const roots: string[] = [];
 
@@ -159,7 +160,7 @@ describe("mechanic workbench", () => {
     }
   });
 
-  test("profile application sets exactly 67 targets and writes transparency event", () => {
+  test("profile application sets targets for all questions and writes transparency event", () => {
     const workspace = newWorkspace();
     const applied = mechanicProfileApplyForApi({
       workspace,
@@ -171,7 +172,7 @@ describe("mechanic workbench", () => {
       actor: "owner"
     });
     const targets = loadMechanicTargets(workspace);
-    expect(Object.keys(targets.mechanicTargets.targets)).toHaveLength(67);
+    expect(Object.keys(targets.mechanicTargets.targets)).toHaveLength(questionBank.length);
     expect(applied.profile.id).toBe("code-agent-excellence");
     const entries = tailTransparencyEntries(workspace, 20);
     expect(entries.some((row) => row.type === "MECHANIC_PROFILE_APPLIED")).toBe(true);

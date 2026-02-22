@@ -15,6 +15,7 @@ import { workspaceIdFromDirectory } from "../src/workspaces/workspaceId.js";
 import { tailTransparencyEntries } from "../src/transparency/logCli.js";
 import { openLedger } from "../src/ledger/ledger.js";
 import { validateTruthguardForWorkspace } from "../src/truthguard/truthguardApi.js";
+import { questionBank } from "../src/diagnostic/questionBank.js";
 
 const roots: string[] = [];
 
@@ -115,11 +116,11 @@ describe("compass canon + cgx + truthguard", () => {
     }
   });
 
-  test("bank completeness has 5 dimensions and 67 fully-rubriced questions", () => {
+  test("bank completeness has 5 dimensions and all fully-rubriced questions", () => {
     const workspace = newWorkspace();
     const bank = loadDiagnosticBank(workspace);
     expect(bank.diagnosticBank.dimensions).toHaveLength(5);
-    expect(bank.diagnosticBank.questions).toHaveLength(67);
+    expect(bank.diagnosticBank.questions).toHaveLength(questionBank.length);
     for (const question of bank.diagnosticBank.questions) {
       expect(question.rubrics).toHaveLength(6);
       for (const rubric of question.rubrics) {
@@ -192,7 +193,7 @@ describe("compass canon + cgx + truthguard", () => {
         }
       }
     });
-    expect(baseline.questions).toHaveLength(67);
+    expect(baseline.questions).toHaveLength(questionBank.length);
     const baselineIds = baseline.questions.map((row) => row.qId);
 
     for (const agentType of ["code-agent", "support-agent", "ops-agent", "research-agent", "sales-agent", "other"] as const) {
@@ -203,7 +204,7 @@ describe("compass canon + cgx + truthguard", () => {
           agentType
         }
       });
-      expect(rendered.questions).toHaveLength(67);
+      expect(rendered.questions).toHaveLength(questionBank.length);
       expect(rendered.questions.map((row) => row.qId)).toEqual(baselineIds);
     }
     const support = renderContextualizedDiagnostic({
@@ -253,7 +254,7 @@ describe("compass canon + cgx + truthguard", () => {
       const parsed = JSON.parse(res.body) as {
         measuredScores?: Record<string, number>;
       };
-      expect(Object.keys(parsed.measuredScores ?? {}).length).toBe(67);
+      expect(Object.keys(parsed.measuredScores ?? {}).length).toBe(questionBank.length);
       const entries = tailTransparencyEntries(workspace, 20);
       expect(entries.some((row) => row.type === "DIAGNOSTIC_SELF_RUN")).toBe(true);
     } finally {

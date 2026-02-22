@@ -57,7 +57,7 @@ export const canonSchema = z
     compassCanon: z.object({
       version: z.literal(1),
       dimensions: z.array(canonDimensionSchema).length(5),
-      questions: z.array(canonQuestionSchema).length(67),
+      questions: z.array(canonQuestionSchema).length(87),
       fourCs: z.array(canon4CSchema).length(4),
       strategyFailureRisks: z.array(canonRiskSchema).length(5),
       valueDimensions: z.array(canonValueDimensionSchema).length(5),
