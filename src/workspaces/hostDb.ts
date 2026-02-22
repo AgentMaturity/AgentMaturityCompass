@@ -26,27 +26,29 @@ function updateHostDbDigest(hostDir: string): void {
 function migrate(db: Database.Database): void {
   db.exec(`
     PRAGMA journal_mode=WAL;
+    PRAGMA foreign_keys=ON;
     CREATE TABLE IF NOT EXISTS users (
       user_id TEXT PRIMARY KEY,
       username TEXT NOT NULL UNIQUE,
       username_lc TEXT NOT NULL UNIQUE,
       password_hash TEXT NOT NULL,
       created_ts INTEGER NOT NULL,
-      disabled INTEGER NOT NULL DEFAULT 0,
-      is_host_admin INTEGER NOT NULL DEFAULT 0,
+      disabled INTEGER NOT NULL DEFAULT 0 CHECK (disabled IN (0, 1)),
+      is_host_admin INTEGER NOT NULL DEFAULT 0 CHECK (is_host_admin IN (0, 1)),
       auth_type TEXT NOT NULL DEFAULT 'LOCAL',
       provider_id TEXT,
       subject TEXT,
       email TEXT,
       display_name TEXT,
-      external_id TEXT
+      external_id TEXT,
+      CHECK (auth_type IN ('LOCAL', 'OIDC', 'SAML', 'SCIM'))
     );
     CREATE TABLE IF NOT EXISTS workspaces (
       workspace_id TEXT PRIMARY KEY,
       name TEXT NOT NULL,
       created_ts INTEGER NOT NULL,
       updated_ts INTEGER NOT NULL,
-      status TEXT NOT NULL
+      status TEXT NOT NULL CHECK (status IN ('ACTIVE', 'SUSPENDED', 'DELETED'))
     );
     CREATE TABLE IF NOT EXISTS memberships (
       user_id TEXT NOT NULL,
@@ -54,8 +56,8 @@ function migrate(db: Database.Database): void {
       roles_json TEXT NOT NULL,
       created_ts INTEGER NOT NULL,
       PRIMARY KEY (user_id, workspace_id),
-      FOREIGN KEY (user_id) REFERENCES users(user_id),
-      FOREIGN KEY (workspace_id) REFERENCES workspaces(workspace_id)
+      FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+      FOREIGN KEY (workspace_id) REFERENCES workspaces(workspace_id) ON DELETE CASCADE
     );
     CREATE TABLE IF NOT EXISTS host_audit (
       event_id TEXT PRIMARY KEY,
@@ -73,8 +75,11 @@ function migrate(db: Database.Database): void {
       issued_ts INTEGER NOT NULL,
       exp_ts INTEGER NOT NULL,
       last_seen_ts INTEGER NOT NULL,
-      revoked INTEGER NOT NULL DEFAULT 0,
-      FOREIGN KEY (user_id) REFERENCES users(user_id)
+      revoked INTEGER NOT NULL DEFAULT 0 CHECK (revoked IN (0, 1)),
+      FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+      CHECK (auth_type IN ('LOCAL', 'OIDC', 'SAML', 'SCIM')),
+      CHECK (exp_ts >= issued_ts),
+      CHECK (last_seen_ts >= issued_ts)
     );
     CREATE TABLE IF NOT EXISTS membership_sources (
       user_id TEXT NOT NULL,
@@ -84,8 +89,9 @@ function migrate(db: Database.Database): void {
       source_id TEXT NOT NULL,
       created_ts INTEGER NOT NULL,
       PRIMARY KEY (user_id, workspace_id, role, source_type, source_id),
-      FOREIGN KEY (user_id) REFERENCES users(user_id),
-      FOREIGN KEY (workspace_id) REFERENCES workspaces(workspace_id)
+      FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+      FOREIGN KEY (workspace_id) REFERENCES workspaces(workspace_id) ON DELETE CASCADE,
+      CHECK (role IN ('OWNER', 'OPERATOR', 'AUDITOR', 'VIEWER'))
     );
     CREATE TABLE IF NOT EXISTS scim_groups (
       group_id TEXT PRIMARY KEY,
@@ -99,16 +105,81 @@ function migrate(db: Database.Database): void {
       user_id TEXT NOT NULL,
       created_ts INTEGER NOT NULL,
       PRIMARY KEY (group_id, user_id),
-      FOREIGN KEY (group_id) REFERENCES scim_groups(group_id),
-      FOREIGN KEY (user_id) REFERENCES users(user_id)
+      FOREIGN KEY (group_id) REFERENCES scim_groups(group_id) ON DELETE CASCADE,
+      FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
     );
     CREATE INDEX IF NOT EXISTS idx_memberships_workspace ON memberships(workspace_id);
+    CREATE INDEX IF NOT EXISTS idx_memberships_user ON memberships(user_id);
     CREATE INDEX IF NOT EXISTS idx_users_username_lc ON users(username_lc);
     CREATE INDEX IF NOT EXISTS idx_users_provider_subject ON users(provider_id, subject);
     CREATE INDEX IF NOT EXISTS idx_users_external_id ON users(external_id);
     CREATE INDEX IF NOT EXISTS idx_host_sessions_user ON host_sessions(user_id);
+    CREATE INDEX IF NOT EXISTS idx_host_sessions_exp_revoked ON host_sessions(revoked, exp_ts);
+    CREATE INDEX IF NOT EXISTS idx_workspaces_status ON workspaces(status);
     CREATE INDEX IF NOT EXISTS idx_membership_sources_source ON membership_sources(source_type, source_id);
     CREATE INDEX IF NOT EXISTS idx_scim_group_members_user ON scim_group_members(user_id);
+
+    CREATE TRIGGER IF NOT EXISTS users_provider_subject_unique_insert
+    BEFORE INSERT ON users
+    WHEN NEW.provider_id IS NOT NULL
+      AND NEW.subject IS NOT NULL
+      AND EXISTS(
+        SELECT 1 FROM users
+        WHERE provider_id = NEW.provider_id
+          AND subject = NEW.subject
+      )
+    BEGIN
+      SELECT RAISE(ABORT, 'users provider_id + subject must be unique');
+    END;
+
+    CREATE TRIGGER IF NOT EXISTS users_provider_subject_unique_update
+    BEFORE UPDATE ON users
+    WHEN NEW.provider_id IS NOT NULL
+      AND NEW.subject IS NOT NULL
+      AND EXISTS(
+        SELECT 1 FROM users
+        WHERE provider_id = NEW.provider_id
+          AND subject = NEW.subject
+          AND user_id != NEW.user_id
+      )
+    BEGIN
+      SELECT RAISE(ABORT, 'users provider_id + subject must be unique');
+    END;
+
+    CREATE TRIGGER IF NOT EXISTS users_external_id_unique_insert
+    BEFORE INSERT ON users
+    WHEN NEW.external_id IS NOT NULL
+      AND EXISTS(
+        SELECT 1 FROM users
+        WHERE external_id = NEW.external_id
+      )
+    BEGIN
+      SELECT RAISE(ABORT, 'users external_id must be unique');
+    END;
+
+    CREATE TRIGGER IF NOT EXISTS users_external_id_unique_update
+    BEFORE UPDATE ON users
+    WHEN NEW.external_id IS NOT NULL
+      AND EXISTS(
+        SELECT 1 FROM users
+        WHERE external_id = NEW.external_id
+          AND user_id != NEW.user_id
+      )
+    BEGIN
+      SELECT RAISE(ABORT, 'users external_id must be unique');
+    END;
+
+    CREATE TRIGGER IF NOT EXISTS host_audit_append_only_update
+    BEFORE UPDATE ON host_audit
+    BEGIN
+      SELECT RAISE(ABORT, 'host_audit rows are append-only');
+    END;
+
+    CREATE TRIGGER IF NOT EXISTS host_audit_append_only_delete
+    BEFORE DELETE ON host_audit
+    BEGIN
+      SELECT RAISE(ABORT, 'host_audit rows cannot be deleted');
+    END;
   `);
 
   // Backward-compatible migrations for older host.db files.
@@ -138,6 +209,9 @@ function migrate(db: Database.Database): void {
 export function openHostDb(hostDir: string): HostDbHandle {
   ensureHostDirLayout(hostDir);
   const db = new Database(hostDbPath(hostDir));
+  db.pragma("journal_mode = WAL");
+  db.pragma("foreign_keys = ON");
+  db.pragma("busy_timeout = 5000");
   migrate(db);
   return {
     db,
