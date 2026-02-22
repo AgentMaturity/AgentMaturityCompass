@@ -24,6 +24,7 @@ import { disempowermentPack } from "./disempowermentPack.js";
 import { dlpExfiltrationPack } from "./dlpExfiltrationPack.js";
 import { sbomSupplyChainPack } from "./sbomSupplyChainPack.js";
 import { supplyChainIntegrityPack } from "./supply-chain-integrity.js";
+import { operationalDisciplinePack } from "./operational-discipline.js";
 import { ragPoisoningPack } from "./ragPoisoningPack.js";
 import { circuitBreakerReliabilityPack } from "./circuitBreakerReliabilityPack.js";
 import { honeytokenDetectionPack } from "./honeytokenDetectionPack.js";
@@ -88,6 +89,7 @@ const assurancePacks: AssurancePackDefinition[] = [
   dlpExfiltrationPack,
   sbomSupplyChainPack,
   supplyChainIntegrityPack,
+  operationalDisciplinePack,
   ragPoisoningPack,
   circuitBreakerReliabilityPack,
   honeytokenDetectionPack,
@@ -164,4 +166,5 @@ export {
   iso42005Pack,
   owaspGenAiPack,
   supplyChainIntegrityPack,
+  operationalDisciplinePack,
 };

@@ -110,6 +110,19 @@ function makeClaim(
   return claim;
 }
 
+function makePolicyIntent(db: Database.Database, intentId: string): void {
+  db.prepare(`
+    INSERT OR IGNORE INTO policy_change_intents (
+      intent_id, agent_id, policy_file_path, policy_file_sha256_before,
+      policy_file_sha256_after, category, rationale, impact_summary,
+      claim_ids_json, evidence_refs_json, reversible, created_ts,
+      created_by, prev_intent_hash, intent_hash, signature
+    ) VALUES (?, 'agent-1', 'policy.yaml', '${"a".repeat(64)}', '${"b".repeat(64)}',
+      'EVIDENCE_DRIVEN', 'test rationale', 'test impact', '[]', '[]', 1, ?,
+      'test-user', '${"c".repeat(64)}', '${"d".repeat(64)}', 'sig-test')
+  `).run(intentId, Date.now());
+}
+
 function makeTransition(
   db: Database.Database,
   overrides: Partial<ClaimTransition> = {},
@@ -412,6 +425,7 @@ describe("claim-policy link operations", () => {
   test("linkClaimToPolicy creates bidirectional link", () => {
     const { db } = freshDb();
     makeClaim(db, { claimId: "cl-cpl1" });
+    makePolicyIntent(db, "pci-1");
 
     const link = linkClaimToPolicy(db, "cl-cpl1", "pci-1", "POLICY_DROVE_CLAIM");
     expect(link.linkId).toMatch(/^cpl_/);
@@ -446,6 +460,7 @@ describe("buildClaimLineageView", () => {
       toState: "PROVISIONAL",
     });
     linkTransitionToTransparency(db, tr, "g".repeat(64), dir);
+    makePolicyIntent(db, "pci-view1");
     linkClaimToPolicy(db, "cl-view1", "pci-view1", "CLAIM_DROVE_POLICY");
 
     const view = buildClaimLineageView(db, "cl-view1");
@@ -567,6 +582,7 @@ describe("renderClaimLineageMarkdown", () => {
     makeClaim(db, { claimId: "cl-clmd1", questionId: "Q1", claimedLevel: 4 });
     const tr = makeTransition(db, { claimId: "cl-clmd1", transitionId: "tr-clmd1" });
     linkTransitionToTransparency(db, tr, "j".repeat(64), dir);
+    makePolicyIntent(db, "pci-clmd1");
     linkClaimToPolicy(db, "cl-clmd1", "pci-clmd1", "CLAIM_DROVE_POLICY");
 
     const view = buildClaimLineageView(db, "cl-clmd1");

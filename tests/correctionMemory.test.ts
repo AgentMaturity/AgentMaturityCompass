@@ -501,7 +501,7 @@ describe("buildLessonAdvisories", () => {
   test("excludes expired lessons", () => {
     const { db } = freshDb();
     const pastExpiry = Date.now() - 1000; // already expired
-    makeLesson(db, { lessonId: "lsn_exp1", expiryTs: pastExpiry });
+    makeLesson(db, { lessonId: "lsn_exp1", createdTs: pastExpiry - 1000, expiryTs: pastExpiry });
 
     const advisories = buildLessonAdvisories(db, "agent-1");
     expect(advisories.length).toBe(0);
@@ -534,7 +534,7 @@ describe("expireStaleLessons", () => {
   test("expires lessons past TTL", () => {
     const { db } = freshDb();
     const pastExpiry = Date.now() - 1000;
-    makeLesson(db, { lessonId: "lsn_stale1", expiryTs: pastExpiry });
+    makeLesson(db, { lessonId: "lsn_stale1", createdTs: pastExpiry - 1000, expiryTs: pastExpiry });
     makeLesson(db, { lessonId: "lsn_active1", expiryTs: Date.now() + 999999 });
 
     const expired = expireStaleLessons(db, "agent-1");

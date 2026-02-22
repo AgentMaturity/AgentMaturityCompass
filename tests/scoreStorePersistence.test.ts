@@ -36,18 +36,18 @@ describe("scoreStore persistence", () => {
     const updated = recordScoreAnswer({
       workspace,
       sessionId: session.id,
-      questionId: "q1",
+      questionId: "AMC-1.1",
       value: 4,
       notes: "good control coverage"
     });
     expect(updated).not.toBeNull();
-    expect(updated?.answers.q1?.value).toBe(4);
+    expect(updated?.answers["AMC-1.1"]?.value).toBe(4);
     expect(countActiveScoreSessions(workspace)).toBe(1);
 
     closeScoreSessionStores(workspace);
     const reloaded = getScoreSession(workspace, session.id);
     expect(reloaded).not.toBeNull();
-    expect(reloaded?.answers.q1?.notes).toBe("good control coverage");
+    expect(reloaded?.answers["AMC-1.1"]?.notes).toBe("good control coverage");
 
     markScoreSessionCompleted(workspace, session.id);
     expect(countActiveScoreSessions(workspace)).toBe(0);

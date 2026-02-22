@@ -170,8 +170,8 @@ describe("corrections coverage", () => {
 
   test("getVerifiedCorrections returns both verified states ordered by verifiedTs desc", () => {
     const db = freshDb();
-    insertCorrection(db, makeCorrection({ correctionId: "corr-ineff", status: "VERIFIED_INEFFECTIVE", verifiedTs: 1000 }));
-    insertCorrection(db, makeCorrection({ correctionId: "corr-eff", status: "VERIFIED_EFFECTIVE", verifiedTs: 2000 }));
+    insertCorrection(db, makeCorrection({ correctionId: "corr-ineff", status: "VERIFIED_INEFFECTIVE", verifiedTs: 1000, verifiedBy: "reviewer-1" }));
+    insertCorrection(db, makeCorrection({ correctionId: "corr-eff", status: "VERIFIED_EFFECTIVE", verifiedTs: 2000, verifiedBy: "reviewer-1" }));
     insertCorrection(db, makeCorrection({ correctionId: "corr-pending", status: "PENDING_VERIFICATION" }));
     const verified = getVerifiedCorrections(db, "agent-1");
     expect(verified.map((c) => c.correctionId)).toEqual(["corr-eff", "corr-ineff"]);
@@ -334,6 +334,7 @@ describe("corrections coverage", () => {
           baselineLevels: { "AMC-4.2": 2 },
           verificationLevels: score === null ? null : { "AMC-4.2": score > 0.5 ? 4 : 2 },
           verifiedTs: score === null ? null : now,
+          verifiedBy: score === null ? null : "reviewer-1",
           createdTs: now - 1000
         })
       );

@@ -48,7 +48,9 @@ describe('ScratchpadManager', () => {
 
   it('expire removes TTL entries', async () => {
     const sp = new ScratchpadManager();
-    sp.set('sess-4', 'temp', 'data', { ttlSeconds: -1 }); // already expired
+    sp.set('sess-4', 'temp', 'data', { ttlSeconds: 1 }); // 1 second TTL
+    // Wait for TTL to expire
+    await new Promise((resolve) => setTimeout(resolve, 1100));
     const count = sp.expire('sess-4');
     expect(count).toBe(1);
   });
