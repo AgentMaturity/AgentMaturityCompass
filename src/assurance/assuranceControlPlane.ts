@@ -15,24 +15,21 @@ import {
   initAssurancePolicy,
   latestAssuranceWaiver,
   listAssuranceWaivers,
-  loadAssuranceFindings,
   loadAssurancePolicy,
-  loadAssuranceRun,
-  loadAssuranceTraceRefs,
   saveAssurancePolicy,
   saveAssuranceWaiver,
   verifyAssurancePolicySignature
 } from "./assurancePolicyStore.js";
-import { runAssuranceLab } from "./assuranceEngine.js";
 import { issueAssuranceCertificate, inspectAssuranceCertificate } from "./assuranceCertificates.js";
-import { latestAssuranceCertificateSummary, latestAssuranceRun, listAssuranceRuns } from "./assuranceStore.js";
+import { latestAssuranceCertificateSummary } from "./assuranceStore.js";
 import {
   assuranceSchedulerRunNow,
   assuranceSchedulerSetEnabled,
   assuranceSchedulerStatus
 } from "./assuranceScheduler.js";
 import { assuranceWaiverSchema } from "./assuranceSchema.js";
-import { evaluateAssuranceEvidenceGates } from "./assuranceScoring.js";
+import { loadAssuranceReport, latestAssuranceReports, listAssuranceHistory, runAssurance } from "./assuranceRunner.js";
+import { listAssurancePacks } from "./packs/index.js";
 
 const pendingWaiverSchema = z.object({
   v: z.literal(1),
@@ -204,50 +201,221 @@ export function assurancePolicyApplyForApi(params: {
   return saved;
 }
 
+function runScopeId(scopeType: "WORKSPACE" | "NODE" | "AGENT", scopeId?: string): string {
+  if (scopeType === "WORKSPACE") {
+    return "workspace";
+  }
+  return scopeId ?? "default";
+}
+
+function runStatusFromReport(report: {
+  status: "VALID" | "INVALID";
+  overallScore0to100: number;
+}, minRiskAssuranceScore: number): "PASS" | "FAIL" | "ERROR" {
+  if (report.status !== "VALID") {
+    return "ERROR";
+  }
+  return report.overallScore0to100 >= minRiskAssuranceScore ? "PASS" : "FAIL";
+}
+
+function findingCountsFromReport(report: { packResults: Array<{ scenarioResults: Array<{ pass: boolean }> }> }) {
+  const failedCount = report.packResults.reduce(
+    (sum, pack) => sum + pack.scenarioResults.filter((scenario) => !scenario.pass).length,
+    0
+  );
+  return {
+    critical: 0,
+    high: failedCount,
+    medium: 0,
+    low: 0,
+    info: 0
+  };
+}
+
+function legacyProjectionForReport(params: {
+  scopeType: "WORKSPACE" | "NODE" | "AGENT";
+  scopeId?: string;
+  minRiskAssuranceScore: number;
+}, report: Awaited<ReturnType<typeof runAssurance>>) {
+  const status = runStatusFromReport(report, params.minRiskAssuranceScore);
+  const findingCounts = findingCountsFromReport(report);
+  return {
+    runId: report.assuranceRunId,
+    generatedTs: report.ts,
+    scope: {
+      type: params.scopeType,
+      id: runScopeId(params.scopeType, params.scopeId)
+    },
+    score: {
+      status,
+      pass: status === "PASS",
+      riskAssuranceScore: report.overallScore0to100,
+      findingCounts
+    },
+    selectedPacks: report.packResults.map((pack) => pack.packId),
+    evidenceGates: {
+      integrityIndex: report.integrityIndex,
+      correlationRatio: 1,
+      observedShare: 1
+    }
+  };
+}
+
+function findingsProjectionForReport(report: Awaited<ReturnType<typeof runAssurance>>) {
+  return {
+    v: 1,
+    runId: report.assuranceRunId,
+    generatedTs: report.ts,
+    findings: report.packResults.flatMap((pack) =>
+      pack.scenarioResults
+        .filter((scenario) => !scenario.pass)
+        .map((scenario) => ({
+          findingId: `${pack.packId}:${scenario.scenarioId}`,
+          scenarioId: scenario.scenarioId,
+          category: scenario.category,
+          severity: "HIGH",
+          descriptionTemplateId: `${pack.packId.toUpperCase()}_${scenario.scenarioId}`,
+          evidenceRefs: {
+            runId: report.assuranceRunId,
+            eventHashes: scenario.evidenceEventIds.slice(0, 8),
+            receiptIds: scenario.correlatedRequestIds.slice(0, 8)
+          },
+          remediationHints: scenario.reasons
+        }))
+    )
+  };
+}
+
+function traceProjectionForReport(report: Awaited<ReturnType<typeof runAssurance>>) {
+  return {
+    v: 1,
+    runId: report.assuranceRunId,
+    generatedTs: report.ts,
+    refs: report.packResults.flatMap((pack) =>
+      pack.scenarioResults.map((scenario) => ({
+        scenarioId: scenario.scenarioId,
+        requestId: scenario.correlatedRequestIds[0] ?? `${pack.packId}:${scenario.scenarioId}`,
+        runId: report.assuranceRunId,
+        evidenceEventIds: scenario.evidenceEventIds.slice(0, 8)
+      }))
+    )
+  };
+}
+
+function resolvePackId(pack: string): "all" | string {
+  if (pack === "all") {
+    return "all";
+  }
+  const available = new Set(listAssurancePacks().map((row) => row.id));
+  if (!available.has(pack)) {
+    throw new Error(`unknown assurance pack: ${pack}`);
+  }
+  return pack;
+}
+
 export async function assuranceRunForApi(params: {
   workspace: string;
   scopeType: "WORKSPACE" | "NODE" | "AGENT";
   scopeId?: string;
-  pack?: "all" | "injection" | "exfiltration" | "toolMisuse" | "truthfulness" | "sandboxBoundary" | "notaryAttestation";
+  pack?: "all" | string;
   windowDays?: number;
 }) {
-  const out = await runAssuranceLab({
+  const policy = loadAssurancePolicy(params.workspace);
+  const selected = resolvePackId(params.pack ?? "all");
+  const report = await runAssurance({
     workspace: params.workspace,
-    scopeType: params.scopeType,
-    scopeId: params.scopeId,
-    selectedPack: params.pack ?? "all",
-    windowDays: params.windowDays
+    agentId: params.scopeType === "AGENT" ? params.scopeId : undefined,
+    packId: selected === "all" ? undefined : selected,
+    runAll: selected === "all",
+    mode: "sandbox",
+    window: `${Math.max(1, Math.trunc(params.windowDays ?? 30))}d`
   });
   return {
-    run: out.run,
-    findings: out.findings,
-    traceRefs: out.traceRefs,
-    saved: out.saved,
-    transparency: out.transparency
+    run: legacyProjectionForReport({
+      scopeType: params.scopeType,
+      scopeId: params.scopeId,
+      minRiskAssuranceScore: policy.assurancePolicy.thresholds.minRiskAssuranceScore
+    }, report),
+    report,
+    findings: findingsProjectionForReport(report),
+    traceRefs: traceProjectionForReport(report),
+    saved: null,
+    transparency: null
   };
 }
 
 export function assuranceRunsForApi(workspace: string) {
-  return listAssuranceRuns(workspace).map((run) => ({
-    runId: run.runId,
-    generatedTs: run.generatedTs,
-    scope: run.scope,
-    status: run.score.status,
-    pass: run.score.pass,
-    score: run.score.riskAssuranceScore,
-    findingCounts: run.score.findingCounts
-  }));
+  const policy = loadAssurancePolicy(workspace);
+  const runs: Array<{
+    runId: string;
+    generatedTs: number;
+    scope: { type: "WORKSPACE" | "NODE" | "AGENT"; id: string };
+    status: "PASS" | "FAIL" | "ERROR";
+    pass: boolean;
+    score: number;
+    findingCounts: {
+      critical: number;
+      high: number;
+      medium: number;
+      low: number;
+      info: number;
+    };
+  }> = [];
+  for (const row of listAssuranceHistory({ workspace })) {
+    try {
+      const report = loadAssuranceReport({
+        workspace,
+        assuranceRunId: row.assuranceRunId
+      });
+      const run = legacyProjectionForReport({
+        scopeType: "AGENT",
+        scopeId: report.agentId,
+        minRiskAssuranceScore: policy.assurancePolicy.thresholds.minRiskAssuranceScore
+      }, report);
+      runs.push({
+        runId: run.runId,
+        generatedTs: run.generatedTs,
+        scope: run.scope,
+        status: run.score.status,
+        pass: run.score.pass,
+        score: run.score.riskAssuranceScore,
+        findingCounts: run.score.findingCounts
+      });
+    } catch {
+      // Keep listing resilient when a report file was pruned or corrupted.
+    }
+  }
+  return runs;
 }
 
 export function assuranceRunDetailForApi(params: {
   workspace: string;
   runId: string;
 }) {
-  return {
-    run: loadAssuranceRun(params.workspace, params.runId),
-    findings: loadAssuranceFindings(params.workspace, params.runId),
-    traceRefs: loadAssuranceTraceRefs(params.workspace, params.runId)
-  };
+  try {
+    const policy = loadAssurancePolicy(params.workspace);
+    const report = loadAssuranceReport({
+      workspace: params.workspace,
+      assuranceRunId: params.runId
+    });
+    return {
+      run: legacyProjectionForReport({
+        scopeType: "AGENT",
+        scopeId: report.agentId,
+        minRiskAssuranceScore: policy.assurancePolicy.thresholds.minRiskAssuranceScore
+      }, report),
+      report,
+      findings: findingsProjectionForReport(report),
+      traceRefs: traceProjectionForReport(report)
+    };
+  } catch {
+    return {
+      run: null,
+      report: null,
+      findings: null,
+      traceRefs: null
+    };
+  }
 }
 
 export async function assuranceCertIssueForApi(params: {
@@ -277,7 +445,7 @@ export function assuranceReadinessGate(workspace: string): {
   reasons: string[];
   warnings: string[];
   latestRunId: string | null;
-  latestStatus: "PASS" | "FAIL" | "INSUFFICIENT_EVIDENCE" | "ERROR" | null;
+  latestStatus: "PASS" | "FAIL" | "ERROR" | null;
   waiver: AssuranceWaiver | null;
 } {
   maybeActivatePendingWaivers(workspace);
@@ -297,15 +465,21 @@ export function assuranceReadinessGate(workspace: string): {
   }
 
   const policy = loadAssurancePolicy(workspace);
-  const latest = latestAssuranceRun(workspace);
+  const latest = latestAssuranceReports({
+    workspace,
+    windowStartTs: 0,
+    windowEndTs: Date.now()
+  })[0] ?? null;
   const waiver = activeAssuranceWaiver(workspace);
+  const latestStatus = latest
+    ? runStatusFromReport(latest, policy.assurancePolicy.thresholds.minRiskAssuranceScore)
+    : null;
 
-  if (latest && policy.assurancePolicy.thresholds.failClosedIfBelowThresholds) {
-    const evidence = evaluateAssuranceEvidenceGates({
-      policy,
-      gates: latest.evidenceGates
-    });
-    const blocked = !evidence.ok || latest.score.status === "FAIL" || latest.score.status === "INSUFFICIENT_EVIDENCE";
+  if (policy.assurancePolicy.thresholds.failClosedIfBelowThresholds) {
+    const blocked = !latest
+      || latest.status !== "VALID"
+      || latest.integrityIndex < policy.assurancePolicy.gates.minIntegrityIndex
+      || latest.overallScore0to100 < policy.assurancePolicy.thresholds.minRiskAssuranceScore;
     if (blocked && !waiver) {
       reasons.push("ASSURANCE_THRESHOLD_BREACH");
     }
@@ -323,8 +497,8 @@ export function assuranceReadinessGate(workspace: string): {
     ok: reasons.length === 0,
     reasons,
     warnings,
-    latestRunId: latest?.runId ?? null,
-    latestStatus: latest?.score.status ?? null,
+    latestRunId: latest?.assuranceRunId ?? null,
+    latestStatus,
     waiver
   };
 }

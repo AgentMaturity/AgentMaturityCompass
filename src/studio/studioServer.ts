@@ -70,10 +70,11 @@ import {
   assuranceWaiverRequestForApi,
   assuranceWaiverRevokeForApi,
   assuranceWaiverStatusForApi
-} from "../assurance/assuranceApi.js";
+} from "../assurance/assuranceControlPlane.js";
 import { verifyAssurancePolicySignature } from "../assurance/assurancePolicyStore.js";
 import { assuranceSchedulerTick } from "../assurance/assuranceScheduler.js";
 import { emitAssuranceSse } from "../assurance/assuranceSse.js";
+import { listAssurancePacks } from "../assurance/packs/index.js";
 import { buildDashboard } from "../dashboard/build.js";
 import { exportEvidenceBundle } from "../bundles/bundle.js";
 import { exportPolicyPack } from "../exports/policyExport.js";
@@ -3899,15 +3900,18 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           return;
         }
         const packRaw = String(parsed.pack ?? "all");
-        if (!["all", "injection", "exfiltration", "toolMisuse", "truthfulness", "sandboxBoundary", "notaryAttestation"].includes(packRaw)) {
-          json(res, 400, { error: "pack must be all|injection|exfiltration|toolMisuse|truthfulness|sandboxBoundary|notaryAttestation" });
+        const availablePackIds = new Set(listAssurancePacks().map((pack) => pack.id));
+        if (packRaw !== "all" && !availablePackIds.has(packRaw)) {
+          json(res, 400, {
+            error: `pack must be all or one of: ${[...availablePackIds].sort((a, b) => a.localeCompare(b)).join("|")}`
+          });
           return;
         }
         const out = await assuranceRunForApi({
           workspace: options.workspace,
           scopeType: scopeRaw.toUpperCase() as "WORKSPACE" | "NODE" | "AGENT",
           scopeId: typeof parsed.id === "string" ? parsed.id : undefined,
-          pack: packRaw as "all" | "injection" | "exfiltration" | "toolMisuse" | "truthfulness" | "sandboxBoundary" | "notaryAttestation",
+          pack: packRaw,
           windowDays: Number.isFinite(Number(parsed.windowDays)) ? Number(parsed.windowDays) : undefined
         });
         writeStudioAuditEvent({
@@ -4125,7 +4129,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
             type: "ASSURANCE_CERT_UPDATED"
           });
         }
-        if (!out.run.run.score.pass) {
+        if (out.scheduler.lastCertStatus !== "PASS") {
           emitAssuranceSse({
             hub: orgSse,
             type: "ASSURANCE_THRESHOLD_BREACH"

@@ -12,7 +12,7 @@ import { verifyCgxPolicySignature } from "../cgx/cgxStore.js";
 import { verifyPromptPackFile } from "../prompt/promptPackVerifier.js";
 import { listPromptAgentsWithPacks, verifyPromptLintSignature } from "../prompt/promptPackStore.js";
 import { promptLatestPackPath, verifyPromptPolicySignature } from "../prompt/promptPolicyStore.js";
-import { assuranceReadinessGate } from "../assurance/assuranceApi.js";
+import { assuranceReadinessGate } from "../assurance/assuranceControlPlane.js";
 import { verifyAuditMapActiveSignature } from "../audit/auditMapStore.js";
 import { verifyAuditPolicySignature } from "../audit/auditPolicyStore.js";
 import { verifyAuditWorkspace } from "../audit/binderVerifier.js";

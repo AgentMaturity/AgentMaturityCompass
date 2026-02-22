@@ -110,6 +110,11 @@ describe('API Router imports', () => {
     expect(typeof mod.handleProductRoute).toBe('function');
   });
 
+  test('assuranceRouter exports handleAssuranceRoute', async () => {
+    const mod = await import('../src/api/assuranceRouter.js');
+    expect(typeof mod.handleAssuranceRoute).toBe('function');
+  });
+
   test('api/index exports handleApiRoute', async () => {
     const mod = await import('../src/api/index.js');
     expect(typeof mod.handleApiRoute).toBe('function');

@@ -46,10 +46,18 @@ import { behavioralContractViolationPack } from "./behavioralContractViolationPa
 import { overreliancePack } from "./overreliancePack.js";
 import { advancedThreatsPack } from "./advancedThreatsPack.js";
 import { approvalTheaterPack } from "./approvalTheaterPack.js";
+import { toolMisusePack } from "./toolMisusePack.js";
+import { truthfulnessPack } from "./truthfulnessPack.js";
+import { sandboxBoundaryPack } from "./sandboxBoundaryPack.js";
+import { notaryAttestationPack } from "./notaryAttestationPack.js";
 
 const assurancePacks: AssurancePackDefinition[] = [
   injectionPack,
   exfiltrationPack,
+  toolMisusePack,
+  truthfulnessPack,
+  sandboxBoundaryPack,
+  notaryAttestationPack,
   unsafeToolPack,
   hallucinationPack,
   governanceBypassPack,
@@ -113,6 +121,10 @@ export function getAssurancePack(packId: string): AssurancePackDefinition {
 }
 
 export {
+  toolMisusePack,
+  truthfulnessPack,
+  sandboxBoundaryPack,
+  notaryAttestationPack,
   healthcarePHIPack,
   financialModelRiskPack,
   safetyCriticalSILPack,

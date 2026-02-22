@@ -5280,7 +5280,7 @@ assuranceScheduler
   .description("Run assurance scheduler immediately")
   .action(async () => {
     const out = await assuranceSchedulerRunNowCli(process.cwd());
-    console.log(chalk.green(`Assurance scheduler run completed: ${out.run.run.runId}`));
+    console.log(chalk.green(`Assurance scheduler run completed: ${out.run.assuranceRunId}`));
     console.log(`certIssued=${out.cert ? "yes" : "no"}`);
   });
 
