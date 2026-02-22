@@ -1111,9 +1111,117 @@ program
     console.log(`- ops policy: ${out.sanity.opsPolicyValid ? "PASS" : "FAIL"}`);
     console.log(`- plugin integrity: ${out.sanity.pluginIntegrityValid ? "PASS" : "FAIL"}`);
     console.log("");
+    console.log(chalk.cyan("Smart onboarding:"));
+    if (out.onboarding.detectedFrameworks.length === 0) {
+      console.log("- detected frameworks: none (manual adapter selection will be used)");
+    } else {
+      const frameworks = out.onboarding.detectedFrameworks
+        .map((row) => `${row.framework} -> ${row.adapterId}`)
+        .join(", ");
+      console.log(`- detected frameworks: ${frameworks}`);
+    }
+    if (out.onboarding.configuredAdapters.length === 0) {
+      console.log("- adapter auto-config: no compatible framework detected");
+    } else {
+      console.log(
+        `- adapter auto-config: ${out.onboarding.configuredAdapters
+          .map((row) => `${row.agentId}:${row.adapterId}`)
+          .join(", ")}`
+      );
+    }
+    console.log(
+      `- estimated time to L3: ${out.onboarding.etaToL3.hours.toFixed(1)} hours (readiness ${out.onboarding.etaToL3.readinessScore}/100)`
+    );
+    console.log(`- onboarding priority: ${out.onboarding.priority}`);
+    console.log("  Your first week with AMC:");
+    for (const item of out.onboarding.firstWeekPlan) {
+      console.log(`  - Day ${item.day}: ${item.focus} -> ${item.action} [${item.command}]`);
+    }
+    console.log("");
     console.log(chalk.cyan("Next steps:"));
     for (const step of out.nextSteps) {
       console.log(`- ${step}`);
+    }
+  });
+
+program
+  .command("quickscore")
+  .description("Zero-config 5-question rapid assessment (<2 minutes)")
+  .option("--json", "emit JSON output", false)
+  .action(async (opts: { json: boolean }) => {
+    const { getRapidQuestions, scoreRapidAssessment } = await import("./diagnostic/rapidQuickscore.js");
+    const questions = getRapidQuestions();
+    const answers: Record<string, number> = {};
+
+    if (process.stdin.isTTY) {
+      for (const question of questions) {
+        const { level } = await inquirer.prompt<{ level: number }>([
+          {
+            type: "list",
+            name: "level",
+            message: `${question.id}: ${question.title}`,
+            choices: question.options.map((option) => ({
+              name: `L${option.level} - ${option.label}`,
+              value: option.level
+            }))
+          }
+        ]);
+        answers[question.id] = level;
+      }
+    }
+
+    const result = scoreRapidAssessment(answers);
+    if (opts.json) {
+      console.log(JSON.stringify(result, null, 2));
+      return;
+    }
+
+    console.log(chalk.bold("AMC Rapid Quickscore"));
+    console.log("No ledger setup required. This is a preliminary score from 5 high-signal questions.");
+    console.log(`Score: ${result.totalScore}/${result.maxScore} (${result.percentage}%)`);
+    console.log(`Preliminary maturity: ${result.preliminaryLevel}`);
+    if (result.recommendations.length === 0) {
+      console.log("Top recommendations: none (all rapid questions are at L3+).");
+      return;
+    }
+    console.log("Top 3 improvement recommendations:");
+    for (const recommendation of result.recommendations) {
+      console.log(
+        `- ${recommendation.questionId} ${recommendation.title}: L${recommendation.currentLevel} -> L${recommendation.targetLevel}`
+      );
+      console.log(`  Why it matters: ${recommendation.whyItMatters}`);
+      console.log(`  How to improve: ${recommendation.howToImprove}`);
+    }
+  });
+
+program
+  .command("explain <questionId>")
+  .description("Plain-English explanation for a diagnostic question (example: AMC-2.1)")
+  .option("--json", "emit JSON output", false)
+  .action(async (questionId: string, opts: { json: boolean }) => {
+    const { explainDiagnosticQuestion } = await import("./diagnostic/questionExplain.js");
+    const explanation = explainDiagnosticQuestion(questionId);
+    if (opts.json) {
+      console.log(JSON.stringify(explanation, null, 2));
+      return;
+    }
+    console.log(chalk.bold(`${explanation.questionId} - ${explanation.title}`));
+    console.log(`Layer: ${explanation.layerName}`);
+    console.log("");
+    console.log(chalk.cyan("What it measures:"));
+    console.log(explanation.whatItMeasures);
+    console.log("");
+    console.log(chalk.cyan("Why it matters:"));
+    console.log(explanation.whyItMatters);
+    console.log("");
+    console.log(chalk.cyan("How to improve:"));
+    for (const item of explanation.howToImprove) {
+      console.log(`- ${item}`);
+    }
+    console.log("");
+    console.log(chalk.cyan("Example evidence:"));
+    for (const evidence of explanation.exampleEvidence) {
+      console.log(`- ${evidence}`);
     }
   });
 
