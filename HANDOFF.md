@@ -1,50 +1,59 @@
-# W2-4 Handoff — RAG Maturity Scoring
+# W3-9 Handoff — Enterprise Integrations
 
 ## Scope Completed
-Implemented production RAG maturity scoring in `/tmp/amc-wave2/agent-4` covering:
+Implemented enterprise-focused integration scaffolding and security controls in `/tmp/amc-wave3/agent-9`:
 
-1. Retrieval quality scoring using precision/recall/F1 from labeled retrieved-vs-relevant chunks.
-2. Metadata quality scoring for chunk attribution/source completeness.
-3. Retrieval drift detection over time (improving/stable/degrading/insufficient data).
-4. Hallucination risk scoring for RAG outputs (unsupported claims, citation coverage, contradictions, confidence behavior).
-5. Citation integrity scoring (accuracy, verifiability, source validity).
-6. New diagnostic questions:
-   - `AMC-RAG-1` Retrieval Quality
-   - `AMC-RAG-2` Metadata Attribution Quality
-   - `AMC-RAG-3` Retrieval Drift Monitoring
-   - `AMC-RAG-4` Hallucination & Citation Integrity
+1. SCIM/SSO scaffold:
+   - New SCIM 2.0 adapter with `POST /scim/v2/Users` handling.
+   - New SSO configuration model supporting OIDC/SAML and enterprise role resolution.
+   - Role mapping support for `admin`, `auditor`, `developer`, `viewer`.
+2. Enterprise audit export:
+   - New exporter for `splunk` (HEC-style events), `datadog` (JSON logs), `cloudtrail` (AWS-style `Records`), and `azure` (Azure Monitor-style JSON).
+   - New CLI command:
+     - `amc audit export --format splunk|datadog|cloudtrail|azure --output audit.json`
+3. Reliable webhook delivery:
+   - Exponential backoff with configurable attempts/backoff/jitter.
+   - HMAC-SHA256 webhook signing and signature verification helpers.
+   - Delivery receipt model + in-memory receipt tracker.
+4. Enterprise API key management:
+   - Scoped keys: `read-only`, `write`, `admin`.
+   - Rotation with grace period.
+   - Per-key usage tracking and summary reporting.
 
 ## Key File Changes
-- RAG scoring implementation:
-  - `src/score/ragMaturity.ts`
-  - `src/score/index.ts` (exports for new RAG diagnostics/types)
-- Diagnostic question bank:
-  - `src/diagnostic/questionBank.ts`
-- Canon/bank/mechanic schema count alignment for expanded question bank:
-  - `src/canon/canonBuiltin.ts`
-  - `src/canon/canonSchema.ts`
-  - `src/diagnostic/bank/bankSchema.ts`
-  - `src/diagnostic/bank/bankV1.ts`
-  - `src/mechanic/mechanicSchema.ts`
+- New auth modules:
+  - `src/auth/ssoConfig.ts`
+  - `src/auth/apiKeyManager.ts`
+- New integration modules:
+  - `src/integrations/scimAdapter.ts`
+  - `src/integrations/webhookDelivery.ts`
+- New audit exporter:
+  - `src/audit/enterpriseAuditExport.ts`
+- CLI and export wiring:
+  - `src/audit/auditCli.ts`
+  - `src/cli.ts`
+  - `src/integrations/index.ts`
+  - `src/index.ts`
 - Tests:
-  - `tests/ragMaturity.test.ts` (12 tests)
-  - `tests/questionBank.test.ts` (updated counts + AMC-RAG presence test)
+  - `tests/enterpriseIntegrations.test.ts` (23 tests)
 
 ## Verification
-Executed:
+Executed and passed:
 
-- `npm test -- tests/ragMaturity.test.ts tests/questionBank.test.ts`
-  - Passed: `2` files, `16` tests total.
+- `npm test -- tests/enterpriseIntegrations.test.ts`
+  - Passed: `1` file, `23` tests.
 
-Attempted:
+Executed (environment-constrained failure):
 
-- `npm run typecheck`
-  - Fails due pre-existing duplicate variable declarations in `src/cli.ts`:
-    - `src/cli.ts(2592,7): Cannot redeclare block-scoped variable 'evidence'.`
-    - `src/cli.ts(2601,7): Cannot redeclare block-scoped variable 'evidence'.`
-  - This is unrelated to RAG scoring changes and was not modified in this task.
+- `npm test`
+  - Fails in this sandbox due broad pre-existing integration/network constraints (multiple `listen EPERM` server-bind failures and long-running timeout failures across existing suites), not isolated to the new modules.
+
+Additional check:
+
+- `npm run typecheck -- --pretty false`
+  - Fails on pre-existing duplicate declarations in `src/cli.ts`:
+    - `Cannot redeclare block-scoped variable 'evidence'`.
 
 ## Notes
-- Question bank grew from 87 to 91 total questions.
-- Layer distribution updated from `13/18/20/16/20` to `13/18/20/16/24`.
-- Canon and diagnostic bank schemas were updated accordingly to avoid validation mismatches.
+- The new `audit export` command is wired under the existing `audit` command tree and emits JSON payloads tailored by `--format`.
+- New enterprise modules are exported through both `src/integrations/index.ts` and top-level `src/index.ts` for SDK/consumer access.

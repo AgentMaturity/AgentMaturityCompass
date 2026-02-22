@@ -20,3 +20,30 @@ export type {
   ParsedNoCodeExecutionEvent
 } from "./noCodeWebhookAdapters.js";
 export type { NoCodeAdapterType, WebhookPlatform, NoCodeAdapterRecord, NoCodeGovernanceConfig } from "./noCodeGovernanceSchema.js";
+export { createScimAdapter, handleScimRequest, InMemoryScimUserStore } from "./scimAdapter.js";
+export type {
+  ScimAdapterOptions,
+  ScimProvisionedUser,
+  ScimRequest,
+  ScimResponse,
+  ScimUserStore
+} from "./scimAdapter.js";
+export {
+  buildWebhookHeaders,
+  computeBackoffDelayMs,
+  defaultWebhookHttpClient,
+  deliverTrackedWebhook,
+  deliverWebhookWithRetry,
+  signWebhookPayload,
+  verifyWebhookSignature,
+  WebhookDeliveryTracker
+} from "./webhookDelivery.js";
+export type {
+  WebhookAttemptReceipt,
+  WebhookDeliveryDependencies,
+  WebhookDeliveryPolicy,
+  WebhookDeliveryReceipt,
+  WebhookDeliveryRequest,
+  WebhookHttpClient,
+  WebhookHttpResponse
+} from "./webhookDelivery.js";

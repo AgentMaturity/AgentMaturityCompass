@@ -486,6 +486,71 @@ export type {
   ParsedNoCodeExecutionEvent
 } from "./integrations/noCodeWebhookAdapters.js";
 export type { NoCodeAdapterType, WebhookPlatform, NoCodeAdapterRecord, NoCodeGovernanceConfig } from "./integrations/noCodeGovernanceSchema.js";
+export { createScimAdapter, handleScimRequest, InMemoryScimUserStore } from "./integrations/scimAdapter.js";
+export type {
+  ScimAdapterOptions,
+  ScimProvisionedUser,
+  ScimRequest,
+  ScimResponse,
+  ScimUserStore
+} from "./integrations/scimAdapter.js";
+export {
+  buildWebhookHeaders,
+  computeBackoffDelayMs,
+  defaultWebhookHttpClient,
+  deliverTrackedWebhook,
+  deliverWebhookWithRetry,
+  signWebhookPayload,
+  verifyWebhookSignature,
+  WebhookDeliveryTracker
+} from "./integrations/webhookDelivery.js";
+export type {
+  WebhookAttemptReceipt,
+  WebhookDeliveryDependencies,
+  WebhookDeliveryPolicy,
+  WebhookDeliveryReceipt,
+  WebhookDeliveryRequest,
+  WebhookHttpClient,
+  WebhookHttpResponse
+} from "./integrations/webhookDelivery.js";
+export { defaultSsoConfig, mapSsoGroupsToRole, normalizeEnterpriseRole, resolveSsoRole } from "./auth/ssoConfig.js";
+export type {
+  EnterpriseRole,
+  OidcSsoConfig,
+  SamlSsoConfig,
+  SsoConfig,
+  SsoRoleMapping,
+  SsoRoleMappingRule
+} from "./auth/ssoConfig.js";
+export { ApiKeyManager, scopeAllows } from "./auth/apiKeyManager.js";
+export type {
+  ApiKeyAuthResult,
+  ApiKeyIssueResult,
+  ApiKeyRecord,
+  ApiKeyRotateResult,
+  ApiKeyScope,
+  ApiKeyStatus,
+  ApiKeyUsageEvent,
+  ApiKeyUsageSummary
+} from "./auth/apiKeyManager.js";
+export {
+  buildEnterpriseAuditPayload,
+  collectEnterpriseAuditRecords,
+  eventToEnterpriseAuditRecord,
+  exportEnterpriseAudit,
+  exportEnterpriseAuditFromRecords
+} from "./audit/enterpriseAuditExport.js";
+export type {
+  AzureMonitorEvent,
+  CloudTrailEvent,
+  CloudTrailExportPayload,
+  DatadogLogEvent,
+  EnterpriseAuditExportFormat,
+  EnterpriseAuditExportPayload,
+  EnterpriseAuditOutcome,
+  EnterpriseAuditRecord,
+  SplunkHecEvent
+} from "./audit/enterpriseAuditExport.js";
 export {
   configureCircuitBreaker,
   getCircuitBreakerPolicy,
