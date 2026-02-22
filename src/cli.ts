@@ -2659,6 +2659,24 @@ assurance
     }
   });
 
+assurance
+  .command("advanced-threats")
+  .description("Run advanced threats assurance pack")
+  .requiredOption("--agent <agentId>", "agent ID")
+  .option("--json", "Output as JSON")
+  .action(async (opts: { agent: string; json?: boolean }) => {
+    try {
+      const { runAdvancedThreatsPack } = await import("./lab/packs/advancedThreatsPack.js");
+      const result = await runAdvancedThreatsPack(opts.agent);
+      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
+      console.log(chalk.bold.yellow("\n🧪 Advanced Threats Pack"));
+      console.log(JSON.stringify(result, null, 2));
+    } catch (e: any) {
+      console.error(chalk.red(e.message));
+      process.exit(1);
+    }
+  });
+
 const cert = program.command("cert").description("Certificate operations");
 const dashboard = program.command("dashboard").description("Device-first Compass dashboard");
 const vault = program.command("vault").description("Encrypted key vault operations");
