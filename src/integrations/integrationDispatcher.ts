@@ -13,6 +13,7 @@ import {
   processIntegrationChannelQueue,
   type IntegrationQueueItemInput
 } from "./integrationDeliveryQueue.js";
+import { appendIntegrationDeadLetter } from "./integrationDeadLetters.js";
 import {
   addIntegrationDeadLetter,
   nextIntegrationChannelSequence,
@@ -174,9 +175,9 @@ async function withChannelProcessingLock<T>(
 ): Promise<T> {
   const key = `${workspace}::${channelId}`;
   const previous = channelProcessingLocks.get(key) ?? Promise.resolve();
-  let release: (() => void) | null = null;
+  let release!: () => void;
   const gate = new Promise<void>((resolvePromise) => {
-    release = () => resolvePromise();
+    release = resolvePromise;
   });
   const chain = previous
     .catch(() => {
@@ -190,7 +191,7 @@ async function withChannelProcessingLock<T>(
   try {
     return await task();
   } finally {
-    release?.();
+    release();
     if (channelProcessingLocks.get(key) === chain) {
       channelProcessingLocks.delete(key);
     }
@@ -269,8 +270,6 @@ function buildQueueDeliveries(params: {
       });
       continue;
     }
-
-    params.skipped.push(`${channel.id}:unsupported-channel-type`);
   }
 
   return {
@@ -400,6 +399,20 @@ export async function dispatchIntegrationEvent(params: {
           sequence,
           payloadSha256: status.payloadSha256,
           receipt: status.deliveryReceipt
+        });
+        appendIntegrationDeadLetter(params.workspace, {
+          v: 1,
+          deadLetterId: `idl_${status.queueId}`,
+          ts: Date.now(),
+          channelId: status.channelId,
+          eventName: status.eventName,
+          agentId: status.agentId,
+          url: status.deliveryReceipt.url,
+          orderedSequence: sequence,
+          payloadSha256: status.payloadSha256,
+          attemptCount: status.deliveryReceipt.attempts.length,
+          lastHttpStatus: status.lastHttpStatus,
+          reason: status.lastError ?? "dead-letter"
         });
       }
     }

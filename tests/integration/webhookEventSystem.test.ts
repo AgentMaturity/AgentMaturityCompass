@@ -57,6 +57,7 @@ function applyWebhookOnlyConfig(params: {
   delivery?: {
     ordered?: boolean;
     recordDeadLetters?: boolean;
+    maxRounds?: number;
     retry?: {
       maxAttempts?: number;
       initialBackoffMs?: number;
@@ -185,6 +186,7 @@ describe("integration webhook event system", () => {
         delivery: {
           ordered: true,
           recordDeadLetters: true,
+          maxRounds: 1,
           retry: {
             maxAttempts: 2,
             initialBackoffMs: 1,
@@ -211,6 +213,74 @@ describe("integration webhook event system", () => {
       expect(journal.deadLetters).toHaveLength(1);
       expect(journal.deadLetters[0]?.resolved).toBe(false);
 
+    } finally {
+      await new Promise<void>((resolvePromise) => server.close(() => resolvePromise()));
+    }
+  });
+
+  test("preserves ordered sequence under concurrent dispatch requests", async () => {
+    const workspace = newWorkspace();
+    setVaultSecret(workspace, "integrations/ops-webhook", "concurrency-secret");
+    const seen: Array<{ sequence: string; summary: string }> = [];
+    let requestCount = 0;
+    const server = await listenServer((req, res) => {
+      requestCount += 1;
+      const chunks: Buffer[] = [];
+      req.on("data", (chunk) => chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk)));
+      req.on("end", () => {
+        const payload = JSON.parse(Buffer.concat(chunks).toString("utf8")) as { summary?: string };
+        seen.push({
+          sequence: String(req.headers["x-amc-ordered-sequence"] ?? ""),
+          summary: payload.summary ?? ""
+        });
+        const delay = requestCount === 1 ? 60 : 0;
+        setTimeout(() => {
+          res.statusCode = 200;
+          res.end("ok");
+        }, delay);
+      });
+    });
+
+    try {
+      const addr = server.address();
+      if (!addr || typeof addr === "string") {
+        throw new Error("missing server address");
+      }
+      applyWebhookOnlyConfig({
+        workspace,
+        webhookUrl: `http://127.0.0.1:${addr.port}/hooks/concurrent`,
+        delivery: {
+          ordered: true,
+          recordDeadLetters: true,
+          retry: {
+            maxAttempts: 1,
+            initialBackoffMs: 1,
+            maxBackoffMs: 1,
+            jitterFactor: 0,
+            timeoutMs: 1_000
+          }
+        }
+      });
+
+      const first = dispatchIntegrationEvent({
+        workspace,
+        eventName: "INTEGRATION_TEST",
+        agentId: "agent-concurrent",
+        summary: "first concurrent"
+      });
+      await new Promise<void>((resolvePromise) => setTimeout(() => resolvePromise(), 0));
+      const second = dispatchIntegrationEvent({
+        workspace,
+        eventName: "INTEGRATION_TEST",
+        agentId: "agent-concurrent",
+        summary: "second concurrent"
+      });
+      const [firstResult, secondResult] = await Promise.all([first, second]);
+
+      expect(firstResult.skipped).toHaveLength(0);
+      expect(secondResult.skipped).toHaveLength(0);
+      expect(seen.map((row) => row.sequence)).toEqual(["1", "2"]);
+      expect(seen.map((row) => row.summary)).toEqual(["first concurrent", "second concurrent"]);
     } finally {
       await new Promise<void>((resolvePromise) => server.close(() => resolvePromise()));
     }
