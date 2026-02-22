@@ -45,6 +45,9 @@ export const fleetSchema = z.object({
 
 export type FleetConfig = z.infer<typeof fleetSchema>;
 
+export const fleetEnvironmentSchema = z.enum(["development", "staging", "production"]);
+export type FleetEnvironment = z.infer<typeof fleetEnvironmentSchema>;
+
 export const agentConfigSchema = z.object({
   id: z.string().min(1),
   agentName: z.string().min(1),
@@ -61,6 +64,7 @@ export const agentConfigSchema = z.object({
     openaiCompatible: z.boolean(),
     auth: authSchema
   }),
+  environment: fleetEnvironmentSchema.default("development"),
   createdTs: z.number(),
   updatedTs: z.number()
 });
@@ -290,6 +294,7 @@ export function buildAgentConfig(params: {
   primaryTasks: string[];
   stakeholders: string[];
   riskTier: RiskTier;
+  environment?: FleetEnvironment;
   templateId: string;
   baseUrl: string;
   routePrefix: string;
@@ -317,6 +322,7 @@ export function buildAgentConfig(params: {
       openaiCompatible: template.openaiCompatible,
       auth: params.auth
     },
+    environment: params.environment ?? "development",
     createdTs: now,
     updatedTs: now
   });

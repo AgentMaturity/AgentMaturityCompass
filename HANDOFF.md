@@ -1,48 +1,68 @@
-# W3-11 Handoff — Passport Public Verification & Sharing
+# W3-12 Handoff — Fleet & Multi-Agent Governance
 
-## Scope Delivered
-- Added public passport API surface:
-  - `GET /api/v1/passports` (paginated public registry)
-  - `GET /api/v1/passport/:id` (public passport payload/share URL target)
-  - `GET /api/v1/passport/:id/verify` (public verification endpoint)
-  - `POST /api/v1/passport/:id/revoke` (admin-token protected revocation)
-- Added passport expiry model:
-  - Passports now carry `expiresTs` and expire after 90 days.
-  - Verification fails closed for expired passports.
-- Added passport revocation model:
-  - Persistent revocation store at `.amc/passport/revocations.json`.
-  - Verification fails closed for revoked passports.
-- Added share support:
-  - `amc passport share --agent <id> --format url|qr|json|pdf`
-  - URL + verification URL + QR URL generation.
-  - PDF share artifact generation.
-- Added comparison support:
-  - `amc passport compare <agent-id-1> <agent-id-2>`
-  - Side-by-side overall + five-dimension maturity score output.
+## Scope Completed
+Implemented fleet-level governance hardening for enterprise multi-agent operations:
 
-## Main File Changes
-- API routing:
-  - `src/api/passportRouter.ts` (new)
+1. Fleet health dashboard aggregation with drift and SLO status.
+2. Fleet policy enforcement to all agents (or per environment).
+3. Fleet drift detection against persistent fleet baseline.
+4. Fleet compliance report generation in markdown and PDF.
+5. Agent environment grouping/tagging (`development` / `staging` / `production`).
+6. Fleet SLO definition + status evaluation with breach/recovery alerting.
+7. API endpoint for fleet health data.
+8. CLI surface for policy enforcement, health, tagging, and SLO operations.
+
+## Key File Changes
+
+- New fleet governance engine:
+  - `src/fleet/governance.ts`
+- New API route handler:
+  - `src/api/fleetRouter.ts`
+- API dispatch wiring:
   - `src/api/index.ts`
-  - `src/studio/studioServer.ts`
-- Passport core:
-  - `src/passport/passportConstants.ts` (new)
-  - `src/passport/passportSchema.ts`
-  - `src/passport/passportCollector.ts`
-  - `src/passport/passportStore.ts`
-  - `src/passport/passportVerifier.ts`
-  - `src/passport/passportApi.ts`
-  - `src/passport/passportCli.ts`
-- CLI wiring:
+- Fleet registry environment support:
+  - `src/fleet/registry.ts`
+- Public exports:
+  - `src/index.ts`
+- CLI commands and wiring:
   - `src/cli.ts`
-- Tests:
-  - `tests/passportPublicApiAndCli.test.ts` (new, 13 tests)
+- New tests (14 tests):
+  - `tests/fleetGovernance.test.ts`
 
-## Verification Run
-- `npm run typecheck` ✅ pass
-- `npx vitest run tests/passportPublicApiAndCli.test.ts tests/apiRouters.test.ts` ✅ pass (31 tests)
-- `npm test` ❌ does not pass in this environment due large pre-existing suite failures/timeouts and `EPERM` socket binds unrelated to this change set.
+## New/Updated Interfaces
+
+- `GET /api/v1/fleet/health`
+  - Returns aggregate fleet health payload across agents, including:
+    - average integrity / overall level
+    - dimension averages
+    - baseline + drift indicators
+    - fleet alerts
+    - SLO statuses
+
+- CLI additions:
+  - `amc fleet health [--json]`
+  - `amc fleet report --format pdf --output <path>`
+  - `amc fleet policy apply --policy-id <id> --description <text> [--env production]`
+  - `amc fleet policy list`
+  - `amc fleet tag <agent-id> --env production`
+  - `amc fleet slo define --objective "95% of production agents must score L3+ on dimension 2"`
+  - `amc fleet slo status`
+  - `amc fleet slo list`
+
+## Verification Performed
+
+### Passed
+- `npm run typecheck`
+- `npm test -- tests/fleetGovernance.test.ts`
+- `npm test -- tests/apiRouters.test.ts tests/fleetGovernance.test.ts`
+
+### Full suite status
+- Attempted: `npm test`
+- Result: fails in this sandbox due environment constraints (many existing integration tests require binding local listeners; sandbox returns `listen EPERM` and downstream timeouts).
+- The failures are broad across pre-existing network-heavy integration suites and are not isolated to fleet governance changes.
 
 ## Notes
-- Revoke endpoint auth is enforced via `x-amc-admin-token` match when API token is configured.
-- QR output is generated as a shareable QR image URL that encodes the verification endpoint URL.
+
+- `src/cli.ts` had a pre-existing duplicate `const evidence` declaration preventing typecheck; this was corrected during this task so the CLI compiles cleanly.
+- Fleet governance state persists under:
+  - `.amc/fleet/governance-state.json`
