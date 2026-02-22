@@ -48,7 +48,7 @@ export function builtInCanon(): CompassCanon {
         { id: "D1", name: "Strategic Agent Operations", questionCount: 13 },
         { id: "D2", name: "Agent Leadership", questionCount: 18 },
         { id: "D3", name: "Agent Culture", questionCount: 20 },
-        { id: "D4", name: "Agent Resilience", questionCount: 16 },
+        { id: "D4", name: "Agent Resilience", questionCount: 20 },
         { id: "D5", name: "Agent Skills", questionCount: 20 }
       ],
       questions,

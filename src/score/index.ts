@@ -46,8 +46,28 @@ export type { PlatformDependencyScore, PlatformDependencyProfile } from "./platf
 export { verifyAgentClaim, createAgentClaim } from "./crossAgentTrust.js";
 export type { AgentIdentityClaim, TrustVerificationResult } from "./crossAgentTrust.js";
 
-export { assessMemoryMaturity, scoreMemoryDimension } from "./memoryMaturity.js";
-export type { MemoryMaturityProfile } from "./memoryMaturity.js";
+export {
+  assessMemoryMaturity,
+  scoreMemoryDimension,
+  verifyMemoryPersistence,
+  verifyMemoryHashChain,
+  computeMemoryEntryHash,
+  detectMemoryPoisoning,
+  scoreMemoryContinuity
+} from "./memoryMaturity.js";
+export type {
+  MemoryMaturityProfile,
+  MemoryMaturityInput,
+  MemoryHashChainEntry,
+  MemoryPersistenceProbe,
+  MemoryContinuityCheckpoint,
+  MemoryPoisoningOptions,
+  MemoryPersistenceAssessment,
+  MemoryHashChainAssessment,
+  MemoryPoisoningAssessment,
+  MemoryPoisoningAnomaly,
+  MemoryContinuityAssessment
+} from "./memoryMaturity.js";
 
 export { assessOversightQuality } from "./humanOversightQuality.js";
 export type { OversightQualityProfile } from "./humanOversightQuality.js";
