@@ -10,6 +10,7 @@ import { initGatewayConfig, presetGatewayConfigForProvider } from "../gateway/co
 import { verifyTrustConfigSignature } from "../trust/trustConfig.js";
 import { verifyOpsPolicySignature } from "../ops/policy.js";
 import { verifyPluginWorkspace } from "../plugins/pluginApi.js";
+import { runSetupWizard, type SetupWizardResult } from "./setupWizard.js";
 
 function randomPassphrase(): string {
   return `amc-${randomBytes(12).toString("hex")}`;
@@ -28,6 +29,7 @@ export interface SetupResult {
     opsPolicyValid: boolean;
     pluginIntegrityValid: boolean;
   };
+  onboarding: SetupWizardResult;
   nextSteps: string[];
 }
 
@@ -140,6 +142,10 @@ export async function runSetupCli(params: {
   const trustSig = verifyTrustConfigSignature(workspaceDir);
   const opsSig = verifyOpsPolicySignature(workspaceDir);
   const plugin = verifyPluginWorkspace({ workspace: workspaceDir });
+  const onboarding = await runSetupWizard({
+    workspace: workspaceDir,
+    interactive: !params.nonInteractive
+  });
 
   const consolePath = hostMode ? "/host/console" : "/console";
   const consoleUrl = `http://${host}:${port}${consolePath}`;
@@ -159,6 +165,7 @@ export async function runSetupCli(params: {
       opsPolicyValid: opsSig.valid,
       pluginIntegrityValid: plugin.ok
     },
+    onboarding,
     nextSteps: [
       "amc up",
       hostMode ? `Open ${consoleUrl}` : `Open ${consoleUrl}`,
