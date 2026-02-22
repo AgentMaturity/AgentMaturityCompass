@@ -1,6 +1,6 @@
 # Equalizer Targets
 
-Equalizer targets define the desired maturity state (`0..5`) for all 42 diagnostic questions.
+Equalizer targets define the desired maturity state (`0..5`) for all 67 diagnostic questions.
 
 ## Principles
 
@@ -37,7 +37,7 @@ amc mechanic targets verify
 
 ## Excellence mode
 
-Excellence sets all 42 target values to `5`. This still requires explicit apply + signature + audit trail.
+Excellence sets all 67 target values to `5`. This still requires explicit apply + signature + audit trail.
 
 ## Profile examples
 

@@ -30,7 +30,7 @@ amc status
 - `Home`: service health, fleet summary, trust/integrity tiles.
 - `Login`: credential sign-in + optional pairing workflow.
 - `Agent`: score, radar, heatmap, provider/model last-seen, evidence coverage.
-- `Equalizer`: 42 sliders with deterministic what-if preview and signed apply.
+- `Equalizer`: 67 sliders with deterministic what-if preview and signed apply.
 - `Governor`: action-class allow/deny matrix with reasons.
 - `ToolHub`: allowed tools, recent executions, denials, receipt verify actions.
 - `Approvals`: quorum progress, dual-control decisions, single-shot consumption.

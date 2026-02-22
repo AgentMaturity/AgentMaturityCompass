@@ -28,7 +28,7 @@ amc dashboard serve --agent <agentId> --port 4173
 - QR tile for dashboard URL (mobile handoff)
 - overall score + IntegrityIndex + trust label
 - 5-layer radar
-- 42-question current-vs-target heatmap
+- 67-question current-vs-target heatmap
 - trend timeline across recent runs
 - assurance pack summary
 - failure-risk indices

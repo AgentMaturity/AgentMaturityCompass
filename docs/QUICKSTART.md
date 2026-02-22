@@ -53,7 +53,7 @@ Output includes the 5-layer maturity score (L1–L5), per-question breakdown, in
 ## 5. View in Console
 
 Open `http://localhost:3212/console` in your browser. You'll see:
-- **Maturity radar** — 42 questions across 5 layers
+- **Maturity radar** — 67 questions across 5 layers
 - **Evidence timeline** — what was observed vs self-reported
 - **Trust tier badges** — OBSERVED, ATTESTED, SELF_REPORTED
 - **Integrity index** — anti-gaming confidence score

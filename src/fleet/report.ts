@@ -81,7 +81,7 @@ function renderFleetMarkdown(params: {
     "## Model Usage",
     modelLines || "- none",
     "",
-    "## Cross-Agent Heatmap (48 Questions)",
+    "## Cross-Agent Heatmap (67 Questions)",
     heatmapHeader,
     heatmapRows,
     "",
@@ -148,4 +148,3 @@ export async function generateFleetReport(params: {
     agentCount: effectiveAgents.length
   };
 }
-

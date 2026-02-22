@@ -12,17 +12,16 @@ const QUICK_QUESTION_IDS: string[] = [
   "AMC-5.1", "AMC-5.5",   // Skills
 ];
 
-// Standard: first 42 questions (original rubric)
-const STANDARD_COUNT = 42;
+// Canonical standard/deep assessments use the full signed bank.
+const CANONICAL_BANK_COUNT = questionBank.length;
 
 export function getQuestionsForTier(tier: ScoringTier): DiagnosticQuestion[] {
   switch (tier) {
     case "quick":
       return questionBank.filter(q => QUICK_QUESTION_IDS.includes(q.id));
     case "standard":
-      return questionBank.slice(0, STANDARD_COUNT);
     case "deep":
-      return questionBank;
+      return questionBank.slice(0, CANONICAL_BANK_COUNT);
   }
 }
 

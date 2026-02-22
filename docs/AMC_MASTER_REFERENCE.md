@@ -350,7 +350,7 @@ Complete reference for every `amc` command organized by category.
 |---------|-------------|
 | `amc canon init\|verify` | Compass Canon signed content |
 | `amc cgx init\|build` | Context Graph build/verify |
-| `amc diagnostic render` | Contextualized 42-question view |
+| `amc diagnostic render` | Contextualized 67-question view |
 | `amc truthguard` | Deterministic output truth validator |
 
 ## Prompt Engine

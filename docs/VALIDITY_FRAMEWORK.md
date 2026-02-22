@@ -20,7 +20,7 @@ This document presents the scientific validity framework for AMC across five dim
 
 AMC defines **agent maturity** as: *the degree to which an AI agent system exhibits governed, secure, reliable, observable, evaluated, cost-efficient, and operationally sustainable behavior in production.*
 
-This construct is operationalized through 7 dimensions and 42 questions, each mapped to observable, executable evidence artifacts.
+This construct is operationalized through 7 dimensions and 67 questions, each mapped to observable, executable evidence artifacts.
 
 ### Empirical Evidence
 
@@ -76,7 +76,7 @@ This is intentional: AMC measures *organizational and architectural maturity*, n
 
 ## 2. Content Validity
 
-**Definition:** Do the 42 questions comprehensively cover the content domain of agent maturity?
+**Definition:** Do the 67 questions comprehensively cover the content domain of agent maturity?
 
 ### Domain Derivation Methodology
 
@@ -320,7 +320,7 @@ The clearest test of discriminant validity is whether AMC separates genuinely di
 
 | Quarter | Milestone |
 |---|---|
-| Q2 2026 | External expert panel review of 42-question content validity |
+| Q2 2026 | External expert panel review of 67-question content validity |
 | Q3 2026 | Longitudinal study launch (n=70 organizations recruited) |
 | Q4 2026 | First inter-rater reliability study with independent assessors (n=5 pairs) |
 | Q1 2027 | 6-month longitudinal data; first predictive validity report |

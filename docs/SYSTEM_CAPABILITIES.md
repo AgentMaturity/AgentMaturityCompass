@@ -34,7 +34,7 @@ This is the go-live contract for AMC integration state.
 | Compare | `/w/:id/console/compare.html` | Workspace | Node-vs-node deltas and gap/win lists |
 | Systemic | `/w/:id/console/systemic.html` | Workspace | 5 strategy-failure risks + contributors |
 | Transform | `/w/:id/console/transform.html` | Workspace | 4C progress + kanban tasks |
-| Mechanic Mode | `/w/:id/console/mechanic.html` | Workspace | 42-question equalizer + what-if + target apply |
+| Mechanic Mode | `/w/:id/console/mechanic.html` | Workspace | 67-question equalizer + what-if + target apply |
 | Forecast | `/w/:id/console/forecast*.html` | Workspace | Trend bands, drift/anomaly warnings, ETA |
 | Advisories | `/w/:id/console/advisories.html` | Workspace | Evidence-bound warnings and acknowledgements |
 | Benchmarks | `/w/:id/console/bench*.html` | Workspace + Host | Exports/imports, registry browse, percentiles, portfolio compare |

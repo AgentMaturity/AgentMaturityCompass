@@ -357,6 +357,7 @@ export function collectForecastSignals(params: {
   let observedRuns = 0;
   let latestIntegrityIndex = 0;
   let latestCorrelationRatio = 0;
+  let orgQuestionCount = 67;
   let targetProgress = {
     gapPoints: 0,
     remainingEffort: 0,
@@ -468,6 +469,9 @@ export function collectForecastSignals(params: {
       });
 
       const questionMap = new Map(node.questionScores.map((row) => [row.questionId, row.median] as const));
+      if (node.questionScores.length > 0) {
+        orgQuestionCount = node.questionScores.length;
+      }
       const transformMap = loadTransformMap(params.workspace);
       const fourCValues: Record<"Concept" | "Culture" | "Capabilities" | "Configuration", number[]> = {
         Concept: [],
@@ -549,7 +553,7 @@ export function collectForecastSignals(params: {
     targetProgress = {
       gapPoints: Number(
         (points.maturityOverall.length > 0
-          ? Math.max(0, 5 - points.maturityOverall[points.maturityOverall.length - 1]!.value) * 42
+          ? Math.max(0, 5 - points.maturityOverall[points.maturityOverall.length - 1]!.value) * orgQuestionCount
           : 0).toFixed(6)
       ),
       remainingEffort: Number(

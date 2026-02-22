@@ -485,7 +485,7 @@ export function enforceHighRiskSandboxRequirement(params: {
 function markdownHeatmap(diff: Array<{ questionId: string; current: number; target: number; gap: number }>): string {
   const header = "| Question | Current | Target | Gap |\n|---|---:|---:|---:|";
   const rows = diff
-    .slice(0, 48)
+    .slice(0, questionBank.length)
     .map((row) => `| ${row.questionId} | ${row.current} | ${row.target} | ${row.gap} |`)
     .join("\n");
   return `${header}\n${rows}`;
@@ -987,7 +987,8 @@ export async function runDiagnostic(input: RunDiagnosticInput, outputMarkdownPat
     const traceBodyMismatchCount = countAudit(events, "TRACE_BODY_HASH_MISMATCH");
     const traceAgentMismatchCount = countAudit(events, "TRACE_AGENT_MISMATCH");
     const traceCorrelationLowCount = countAudit(events, "TRACE_CORRELATION_LOW");
-    const evidenceCoverage = questionScores.filter((score) => score.evidenceEventIds.length > 0).length / 48;
+    const evidenceCoverage =
+      questionScores.filter((score) => score.evidenceEventIds.length > 0).length / Math.max(questionBank.length, 1);
     const trustCoverage = computeEvidenceTrustCoverage(events);
 
     const contradictionPenalty = Math.min(0.5, contradictionCount * 0.05);

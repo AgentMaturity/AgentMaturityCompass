@@ -607,8 +607,8 @@ export async function quickstartWizard(workspace = process.cwd()): Promise<{
   });
 
   // sanity: ensure mapping still spans all questions
-  if (questionIds.length !== 48) {
-    throw new Error(`Question bank invalid during quickstart: expected 48 got ${questionIds.length}`);
+  if (questionIds.length !== 67) {
+    throw new Error(`Question bank invalid during quickstart: expected 67 got ${questionIds.length}`);
   }
 
   let gatewayConfig: GatewayConfig;

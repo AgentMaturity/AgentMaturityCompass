@@ -3584,7 +3584,7 @@ standard
     console.log(JSON.stringify(standardListCli(process.cwd()), null, 2));
   });
 
-const diagnosticBank = diagnostic.command("bank").description("Signed diagnostic 48-question bank operations");
+const diagnosticBank = diagnostic.command("bank").description("Signed diagnostic 67-question bank operations");
 
 diagnosticBank
   .command("init")
@@ -3615,7 +3615,7 @@ diagnosticBank
 
 diagnostic
   .command("render")
-  .description("Render contextualized 48-question diagnostic for an agent")
+  .description("Render contextualized 67-question diagnostic for an agent")
   .requiredOption("--agent <agentId>", "agent id")
   .option("--format <format>", "md|json", "json")
   .option("--out <file>", "output file")
@@ -13202,7 +13202,7 @@ program
     for (const line of result.roadmap) { console.log(chalk.cyan(`  ${line}`)); }
 
     console.log(chalk.bold.hex("#FF6600")("\n📋  Next Steps:"));
-    console.log("  amc score tier --tier standard   Full 42-question assessment");
+    console.log("  amc score tier --tier standard   Full 67-question assessment");
     console.log("  amc scan --local .               Scan your codebase");
     console.log("  amc dashboard open               Open web dashboard");
     console.log("  amc playground run               Run scenario tests");

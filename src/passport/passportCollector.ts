@@ -20,6 +20,7 @@ import { loadToolsConfig, verifyToolsConfigSignature } from "../toolhub/toolhubV
 import { verifyApprovalPolicySignature } from "../approvals/approvalPolicyEngine.js";
 import { verifyLeaseRevocationsSignature } from "../leases/leaseStore.js";
 import { verifyPluginWorkspace } from "../plugins/pluginApi.js";
+import { questionBank } from "../diagnostic/questionBank.js";
 import { hashPassportId } from "./passportRedaction.js";
 import type { PassportPolicy } from "./passportPolicySchema.js";
 import { passportJsonSchema, type PassportJson } from "./passportSchema.js";
@@ -224,7 +225,7 @@ export function collectPassportData(params: {
   const overall = avg([layers.strategicOps, layers.leadership, layers.culture, layers.resilience, layers.skills]);
   const unknownQuestionsCount = report
     ? report.questionScores.filter((row) => !Array.isArray(row.evidenceEventIds) || row.evidenceEventIds.length === 0).length
-    : 42;
+    : questionBank.length;
 
   const valueSnapshot = loadValueSnapshot(params.workspace, {
     type: scope.type,

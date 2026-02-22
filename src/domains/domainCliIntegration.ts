@@ -1,5 +1,6 @@
 import type { AssurancePromptContext } from "../assurance/validators.js";
 import { listAssurancePacks } from "../assurance/packs/index.js";
+import { questionBank } from "../diagnostic/questionBank.js";
 import { getDomainPackQuestions } from "../score/domainPacks.js";
 import { writeFileAtomic } from "../utils/fs.js";
 import { assessDomain, type DomainAssessmentInput, type DomainAssessmentResult } from "./domainAssessmentEngine.js";
@@ -62,8 +63,8 @@ function pseudoRandomScore(seed: string, min = 45, max = 92): number {
 
 function buildSyntheticBaseScores(agentId: string, domain: Domain): Record<string, number> {
   const scores: Record<string, number> = {};
-  for (let index = 1; index <= 42; index += 1) {
-    scores[`AMC-${index}`] = pseudoRandomScore(`${agentId}:${domain}:base:${index}`);
+  for (const question of questionBank) {
+    scores[question.id] = pseudoRandomScore(`${agentId}:${domain}:base:${question.id}`);
   }
   return scores;
 }

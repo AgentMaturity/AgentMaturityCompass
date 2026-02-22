@@ -251,7 +251,7 @@ AMC supports three assessment depths to match your time and rigor needs:
 
 ### 🟡 Standard Assessment (1–2 hours)
 
-- **Questions**: All 48 core questions (Layers 1–5)
+- **Questions**: All 67 core questions (Layers 1–5)
 - **Who**: Cross-functional team of 3–5 people
 - **When**: Quarterly reviews, planning cycles
 - **Output**: Layer-by-layer scores, gap analysis, prioritized improvement plan
@@ -259,7 +259,7 @@ AMC supports three assessment depths to match your time and rigor needs:
 
 ### 🔴 Deep Assessment (Half-day to full day)
 
-- **Questions**: All 48 core + all extended dimensions (~58–68 questions)
+- **Questions**: All 67 core + optional domain extensions (~67–90 questions)
 - **Who**: 5–7 people including external advisors or auditors
 - **When**: Annual strategic reviews, pre-audit preparation, board presentations
 - **Output**: Comprehensive maturity report, benchmark comparisons, detailed remediation roadmap, standards mapping

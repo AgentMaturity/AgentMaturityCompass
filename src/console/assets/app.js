@@ -419,7 +419,7 @@ async function renderEqualizer() {
   const rows = targetResp.questions || [];
   root.innerHTML = `
     ${card(`Equalizer What-If (${agentId})`, `
-      <p class="muted">Tune 42 sliders and preview policy impact before signing target.</p>
+      <p class="muted">Tune 67 sliders and preview policy impact before signing target.</p>
       <div id="sliderList" class="scroll" style="max-height:420px;"></div>
       <div class="row">
         <button id="whatifBtn">Preview What-If</button>
@@ -1000,7 +1000,7 @@ async function renderOrg() {
           <ul id="orgGapList"></ul>
         </div>
       </div>
-      <h4>42-Question Heatmap (median vs target)</h4>
+      <h4>67-Question Heatmap (median vs target)</h4>
       <div class="scroll">
         <table>
           <thead><tr><th>Question</th><th>Median</th><th>Target</th><th>Gap</th></tr></thead>

@@ -1,6 +1,6 @@
 # AMC Domain Packs
 
-AMC domain packs extend the base 42-question AMC rubric.
+AMC domain packs extend the base 67-question AMC rubric.
 
 - Base AMC remains mandatory for every agent.
 - Domain packs add regulated vertical controls.
@@ -23,7 +23,7 @@ AMC domain packs extend the base 42-question AMC rubric.
 
 ## Composition Model
 
-1. Run base AMC scoring (42-question rubric).
+1. Run base AMC scoring (67-question rubric).
 2. Run domain pack scoring (domain-specific questions).
 3. Run domain assurance pack(s) for evidence generation.
 4. Evaluate compliance gaps + module activation state.

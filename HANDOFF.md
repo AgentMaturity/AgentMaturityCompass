@@ -1,70 +1,79 @@
-# FIX-2 Handoff
+# FIX-3 Handoff
+
+Date: 2026-02-22
+Owner: FIX-3 (Scoring Schema Unification Engineer)
 
 ## Scope Completed
-Implemented all requested stub-elimination and API wiring fixes in this repo:
 
-1. `src/enforce/index.ts`
-- Replaced all exports from `./stubs.js` with real module exports:
-  - `scanMdns` -> `mdnsController.ts`
-  - `checkProxy` -> `reverseProxyGuard.ts`
-  - `checkPhishing` -> `antiPhishing.ts`
-  - `blindSecrets` -> `secretBlind.ts`
-  - `createEvidenceContract` -> `evidenceContract.ts`
-  - `checkTemporalAccess` -> `temporalControls.ts`
-  - `checkGeoFence` -> `geoFence.ts`
-  - `guardClipboard` -> `clipboardGuard.ts`
-  - `renderTemplate` -> `templateEngine.ts`
+### 1) Audit of hardcoded question-count references
+- Audited `src/` and `docs/` with:
+  - `rg -n "\\b(42|48|67)\\b" src docs`
+  - `rg -n "\\b(42|48)\\b" src docs`
+- Remaining `42/48` in `src/` are non-question-count values only (CSS color channel, time window, route-length normalization, migration ETA text).
 
-2. `src/shield/index.ts`
-- Replaced all exports from `./stubs.js` with real module exports:
-  - `validateManifest` -> `manifest.ts`
-  - `checkRegistry` -> `registry.ts`
-  - `checkIngress` -> `ingress.ts`
-  - `sanitize` -> `sanitizer.ts`
-  - `detect` -> `detector.ts`
-  - `checkOAuthScopes` -> `oauthScope.ts`
-- Added missing real-function compatibility helpers:
-  - `src/shield/registry.ts`: added `RegistryCheckResult` + `checkRegistry(...)`
-  - `src/shield/ingress.ts`: added `checkIngress(...)` wrapper
-  - `src/shield/detector.ts`: added `detect(...)` wrapper
+### 2) Canonicalized scoring schema to 67Q
+Updated code paths and UX/report text that previously referenced 42/48 question assumptions:
+- `src/cli.ts`
+- `src/diagnostic/quickScore.ts`
+- `src/diagnostic/runner.ts`
+- `src/workspace.ts`
+- `src/fleet/report.ts`
+- `src/forecast/forecastSignals.ts`
+- `src/domains/domainCliIntegration.ts`
+- `src/passport/passportCollector.ts`
+- `src/console/assets/app.js`
+- `src/console/assets/equalizer.js`
+- `src/dashboard/templates/index.html`
+- `src/score/domainPacks.ts`
 
-3. `src/api/enforceRouter.ts`
-- Removed allow-by-default placeholder behavior.
-- Wired `/api/v1/enforce/evaluate` to the real `PolicyFirewall` engine.
-- Added baseline policy rules and now returns real `PolicyDecision` values (`allow|deny|stepup|sanitize|quarantine`) with matched rules/reasons.
+### 3) Fixed cross-framework mapping invalid QIDs
+`src/score/crossFrameworkMapping.ts`:
+- Replaced non-existent QIDs:
+  - `AMC-3.1` -> valid IDs (`AMC-3.1.2`, etc.)
+  - `AMC-3.2` -> valid IDs (`AMC-3.2.1`, etc.)
+  - `AMC-3.4` -> valid IDs (`AMC-3.1.2`, `AMC-EUAI-1`)
+- Added runtime mapping guard `assertValidMappedQids(...)` so future invalid QIDs fail fast.
 
-4. `src/api/watchRouter.ts`
-- Replaced receipts placeholder with real ledger-backed receipt retrieval:
-  - pulls evidence-event receipts from ledger `evidence_events`
-  - pulls outcome-event receipts from ledger `outcome_events`
-  - filters by requested `agentId`
-  - supports `?limit=` (default 50, max 500)
+### 4) Added specialized gates for additional high-priority security/compliance questions
+Extended `src/diagnostic/questionBank.ts` with specialized gate logic for 12 more high-priority questions:
+- `AMC-1.8`
+- `AMC-3.1.2`
+- `AMC-3.2.1`
+- `AMC-4.6`
+- `AMC-4.9`
+- `AMC-HOQ-1`
+- `AMC-HOQ-2`
+- `AMC-FSEC-1`
+- `AMC-EUAI-1`
+- `AMC-OWASP-1`
+- `AMC-KSAND-1`
+- `AMC-RID-1`
 
-5. API plumbing for workspace-aware watch retrieval
-- `src/api/index.ts`: added optional `workspace` argument and passed it into `handleWatchRoute(...)`
-- `src/studio/studioServer.ts`: passes `options.workspace` into `handleApiRoute(...)`
+This is in addition to existing specialized gates (e.g. `AMC-1.1`, `AMC-1.5`, `AMC-1.7`, `AMC-1.9`, `AMC-2.5`, `AMC-3.2.3`, `AMC-3.3.1`).
 
-## Test Command Run
-Executed exactly as requested:
+### 5) Docs updated to 67Q canonical
+Required docs updated:
+- `docs/DIAGNOSTIC_BANK.md`
+- `docs/STANDARDS_MAPPING.md` (rewritten to canonical 67Q/5-dimension runtime model)
 
-```bash
-npm test -- --reporter=verbose 2>&1 | tail -30
-```
+Also normalized stale references in related docs (console, fleet, quickstart, rubric, validity, etc.) so question-count messaging is consistently 67Q.
 
-Result:
+## Validation Run
 
-```text
-> agent-maturity-compass@1.0.0 test
-> vitest run --reporter=verbose
+Executed required command:
+- `npm test -- --reporter=verbose 2>&1 | tail -30`
 
-sh: vitest: command not found
-```
+Observed result (tail):
+- Test run completed, but many tests fail in this sandbox due socket bind restriction:
+  - `Error: listen EPERM: operation not permitted 127.0.0.1`
+  - Originating from `tests/enterpriseSsoScim.test.ts`
+- Summary from tail:
+  - `Test Files  27 failed | 81 passed (108)`
+  - `Tests  78 failed | 1744 passed (1822)`
+  - `Errors  66 errors`
 
-## Commit Status
-Requested commit could not be created due sandbox write restrictions on the worktree git metadata path:
+Additional check:
+- `npm run typecheck` passes.
 
-```text
-fatal: Unable to create '/Users/sid/AgentMaturityCompass/.git/worktrees/agent-2/index.lock': Operation not permitted
-```
-
-All code changes are present in the working tree.
+## Notes
+- `npm install` was run to install `vitest` so the required test command could execute.

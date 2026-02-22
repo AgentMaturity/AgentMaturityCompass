@@ -50,7 +50,7 @@ async function main() {
 
   root.innerHTML = `
     ${card(
-      "Equalizer Targets (42 Questions)",
+      "Equalizer Targets (67 Questions)",
       `
       <p class="muted">
         Measured scores are evidence-derived. Target sliders define desired state only.
@@ -104,4 +104,3 @@ async function main() {
 }
 
 void main();
-

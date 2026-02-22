@@ -17,6 +17,6 @@ AMC maturity scoring is evidence-derived. Agents cannot raise their own scores b
 
 ## Anti-Cheat Guarantees
 
-- Agents cannot submit 42-question scores directly.
+- Agents cannot submit 67-question scores directly.
 - Auto-answering derives measured levels from ledger events, receipts, approvals, policy checks, assurance runs, and signed config state.
 - All critical artifacts and state transitions are signed and auditable.

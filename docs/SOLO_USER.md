@@ -38,7 +38,7 @@ After one or more sessions:
 amc run --agent my-claude --window 7d
 ```
 
-This produces a maturity score across AMC's 5 layers and 42 questions.
+This produces a maturity score across AMC's 5 layers and 67 questions.
 
 ## Understanding Your Score
 

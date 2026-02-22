@@ -4,7 +4,7 @@ Mechanic Mode is the owner-controlled equalizer for target setting and upgrade p
 
 ## What it controls
 
-- 42-question equalizer targets (`0..5`) for an agent or org node.
+- 67-question equalizer targets (`0..5`) for an agent or org node.
 - Target modes:
   - signed equalizer targets
   - excellence profile (`5` with evidence gates)

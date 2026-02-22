@@ -1,7 +1,7 @@
 /**
  * Domain-Specific AMC Rubric Packs
  *
- * Vertical extensions of the base 42-question AMC rubric.
+ * Vertical extensions of the base 67-question AMC rubric.
  * Every pack is additive and domain-specific.
  */
 

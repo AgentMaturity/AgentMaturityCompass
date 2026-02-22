@@ -1,6 +1,6 @@
-# Diagnostic Bank (5 Dimensions, 42 Questions)
+# Diagnostic Bank (5 Dimensions, 67 Questions)
 
-AMC diagnostic bank is a signed, explicit 42-question rubric for agents.
+AMC diagnostic bank is a signed, explicit 67-question rubric for agents.
 
 Files:
 - `.amc/diagnostic/bank/bank.yaml`
@@ -16,7 +16,7 @@ amc diagnostic render --agent default --format md
 
 Hard guarantees:
 - exactly 5 dimensions
-- exactly 42 questions
+- exactly 67 questions
 - each question has 6 rubric levels (0..5)
 - each question has explicit evidence mapping and minimum coverage logic
 

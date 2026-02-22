@@ -192,7 +192,7 @@
 
 | Status | Count |
 |---|---|
-| ✅ OG AMC (pre-existing) | 42 |
+| ✅ OG AMC (pre-existing) | 67 |
 | 🔧 Ported + CLI (newly implemented) | 93 |
 | ❌ N/A (superseded) | 10 |
 | **Total** | **145** |

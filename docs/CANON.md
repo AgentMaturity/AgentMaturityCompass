@@ -4,7 +4,7 @@ The Compass Canon is the signed, versioned core taxonomy for AMC.
 
 It defines:
 - 5 dimensions (Strategic Agent Operations, Agent Leadership, Agent Culture, Agent Resilience, Agent Skills)
-- 42-question structure and stable IDs
+- 67-question structure and stable IDs
 - 4Cs (Concept, Culture, Capabilities, Configuration)
 - 5 strategy-failure risks
 - 5 value dimensions

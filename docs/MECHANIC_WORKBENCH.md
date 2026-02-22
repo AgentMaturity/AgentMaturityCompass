@@ -5,7 +5,7 @@ Mechanic Workbench is the owner/operator control surface for moving from measure
 ## Core model
 
 - `measured` is computed from OBSERVED and ATTESTED evidence only.
-- `desired` is the signed equalizer target (`0..5`) for each of the 42 questions.
+- `desired` is the signed equalizer target (`0..5`) for each of the 67 questions.
 - `gap` is deterministic (`desired - measured`) and highlights `UNKNOWN` evidence coverage explicitly.
 - `plans` are deterministic and generated from the signed diagnostic bank and transform mappings (no LLM planner).
 
