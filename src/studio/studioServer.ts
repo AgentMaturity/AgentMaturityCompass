@@ -1675,6 +1675,35 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
 
       // ── AMC REST API v1 ─────────────────────────────────────────────
       if (pathname.startsWith("/api/v1/")) {
+        const auth = authenticate(req, options.workspace, options.token);
+        if (!auth) {
+          json(res, 401, { error: "missing or invalid token" });
+          return;
+        }
+        const bridgeRedirect =
+          pathname === "/api/v1/chat/completions"
+            ? "/bridge/openai/v1/chat/completions"
+            : pathname === "/api/v1/evidence"
+              ? "/bridge/evidence"
+              : pathname === "/api/v1/lease/verify"
+                ? "/bridge/lease/verify"
+                : null;
+        if (bridgeRedirect) {
+          res.statusCode = 308;
+          res.setHeader("location", `${bridgeRedirect}${url.search}`);
+          res.setHeader("deprecation", "true");
+          res.setHeader("warning", `299 amc "Deprecated bridge endpoint ${pathname}; use ${bridgeRedirect}"`);
+          res.setHeader("link", `<${bridgeRedirect}>; rel="successor-version"`);
+          json(res, 308, {
+            error: "deprecated_endpoint",
+            message: `${pathname} is deprecated; use ${bridgeRedirect}`,
+            replacement: `${bridgeRedirect}${url.search}`
+          });
+          return;
+        }
+        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
+          return;
+        }
         const { handleApiRoute } = await import("../api/index.js");
         const handled = await handleApiRoute(pathname, req.method ?? "GET", req, res, options.workspace);
         if (handled) return;

@@ -1,5 +1,6 @@
 import { createServer, type IncomingMessage, type Server, type ServerResponse } from "node:http";
 import { randomUUID } from "node:crypto";
+import { once } from "node:events";
 import { openLedger, hashBinaryOrPath } from "../ledger/ledger.js";
 import { appendTransparencyEntry } from "../transparency/logChain.js";
 import { bridgeConfigSchema } from "./bridgeConfigSchema.js";
@@ -34,6 +35,32 @@ async function readBody(req: IncomingMessage, maxBytes: number): Promise<Buffer>
       throw new Error("PAYLOAD_TOO_LARGE");
     }
     chunks.push(buf);
+  }
+  return Buffer.concat(chunks);
+}
+
+async function readUpstreamBody(
+  body: ReadableStream<Uint8Array> | null,
+  onChunk?: (chunk: Buffer) => void | Promise<void>
+): Promise<Buffer> {
+  if (!body) {
+    return Buffer.alloc(0);
+  }
+  const reader = body.getReader();
+  const chunks: Buffer[] = [];
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) {
+      break;
+    }
+    if (!value || value.byteLength === 0) {
+      continue;
+    }
+    const chunk = Buffer.from(value);
+    chunks.push(chunk);
+    if (onChunk) {
+      await onChunk(chunk);
+    }
   }
   return Buffer.concat(chunks);
 }
@@ -84,6 +111,16 @@ function promptProviderForBridge(provider: string): PromptPackProvider {
     return provider;
   }
   return "generic";
+}
+
+function isStreamingBridgeRequest(req: IncomingMessage, body: unknown): boolean {
+  const row = typeof body === "object" && body !== null ? (body as Record<string, unknown>) : null;
+  if (row?.stream === true) {
+    return true;
+  }
+  const accept = req.headers.accept;
+  const acceptValue = typeof accept === "string" ? accept : "";
+  return acceptValue.toLowerCase().includes("text/event-stream");
 }
 
 function auditDeniedBridgeCall(params: {
@@ -138,7 +175,7 @@ async function forwardToGateway(params: {
 }): Promise<{
   status: number;
   headers: Headers;
-  body: Buffer<ArrayBufferLike>;
+  body: ReadableStream<Uint8Array> | null;
 }> {
   const target = `${params.gatewayBaseUrl}${params.gatewayPath}${params.search}`;
   const headers = new Headers();
@@ -157,17 +194,155 @@ async function forwardToGateway(params: {
     headers,
     body: params.requestBody.byteLength > 0 ? new Uint8Array(params.requestBody) : undefined
   });
-  const body = Buffer.from(await response.arrayBuffer());
   return {
     status: response.status,
     headers: response.headers,
-    body
+    body: response.body
   };
 }
 
 export async function handleBridgeRequest(options: HandleBridgeRequestOptions): Promise<boolean> {
   if (!options.pathname.startsWith("/bridge/")) {
     return false;
+  }
+
+  if (options.pathname === "/bridge/health") {
+    if ((options.req.method ?? "GET").toUpperCase() !== "GET") {
+      writeJson(options.res, 405, { error: "method not allowed" });
+      return true;
+    }
+    writeJson(options.res, 200, { ok: true, status: "ok", ts: Date.now() });
+    return true;
+  }
+
+  if (options.pathname === "/bridge/lease/verify") {
+    if ((options.req.method ?? "POST").toUpperCase() !== "POST") {
+      writeJson(options.res, 405, { error: "method not allowed" });
+      return true;
+    }
+    let raw: Buffer<ArrayBufferLike> = Buffer.alloc(0);
+    let parsed: unknown = {};
+    try {
+      raw = await readBody(options.req, options.maxRequestBytes);
+      parsed = parseJsonBody(raw);
+    } catch (error) {
+      if (String(error).includes("PAYLOAD_TOO_LARGE")) {
+        writeJson(options.res, 413, { error: "payload too large" });
+        return true;
+      }
+      writeJson(options.res, 400, { error: `invalid bridge request: ${String(error)}` });
+      return true;
+    }
+    const row = typeof parsed === "object" && parsed !== null ? (parsed as Record<string, unknown>) : {};
+    const token = typeof row.token === "string" ? row.token.trim() : "";
+    if (!token) {
+      writeJson(options.res, 400, { error: "token is required" });
+      return true;
+    }
+    const headers: Record<string, string | string[] | undefined> = {
+      ...options.req.headers,
+      authorization: `Bearer ${token}`
+    };
+    const verification = verifyBridgeLease({
+      workspace: options.workspace,
+      requestUrl: options.url,
+      headers,
+      model: null
+    });
+    if (!verification.ok || !verification.payload) {
+      writeJson(options.res, verification.status, {
+        ok: false,
+        valid: false,
+        error: verification.error ?? "invalid lease"
+      });
+      return true;
+    }
+    writeJson(options.res, 200, {
+      ok: true,
+      valid: true,
+      leaseCarrier: verification.leaseCarrier ?? null,
+      payload: {
+        leaseId: verification.payload.leaseId,
+        agentId: verification.payload.agentId,
+        workspaceId: verification.payload.workspaceId,
+        scopes: verification.payload.scopes,
+        routeAllowlist: verification.payload.routeAllowlist,
+        modelAllowlist: verification.payload.modelAllowlist,
+        issuedTs: verification.payload.issuedTs,
+        expiresTs: verification.payload.expiresTs,
+        maxRequestsPerMinute: verification.payload.maxRequestsPerMinute,
+        maxTokensPerMinute: verification.payload.maxTokensPerMinute,
+        maxCostUsdPerDay: verification.payload.maxCostUsdPerDay
+      }
+    });
+    return true;
+  }
+
+  if (options.pathname === "/bridge/evidence") {
+    if ((options.req.method ?? "POST").toUpperCase() !== "POST") {
+      writeJson(options.res, 405, { error: "method not allowed" });
+      return true;
+    }
+    const auth = verifyBridgeLease({
+      workspace: options.workspace,
+      requestUrl: options.url,
+      headers: options.req.headers,
+      model: null
+    });
+    if (!auth.ok || !auth.payload) {
+      writeJson(options.res, auth.status, { error: auth.error ?? "unauthorized" });
+      return true;
+    }
+    try {
+      const raw = await readBody(options.req, options.maxRequestBytes);
+      const parsed = parseJsonBody(raw);
+      const row = typeof parsed === "object" && parsed !== null ? (parsed as Record<string, unknown>) : {};
+      const eventType = typeof row.event_type === "string" ? row.event_type.trim() : "";
+      const sessionId = typeof row.session_id === "string" ? row.session_id.trim() : "";
+      const payload = row.payload;
+      if (!eventType || !sessionId || payload === undefined) {
+        writeJson(options.res, 400, { error: "event_type, session_id, and payload are required" });
+        return true;
+      }
+      const ledger = openLedger(options.workspace);
+      try {
+        try {
+          ledger.startSession({
+            sessionId,
+            runtime: "any",
+            binaryPath: "amc-wrap",
+            binarySha256: hashBinaryOrPath("amc-wrap", "1")
+          });
+        } catch {
+          // Session may already exist.
+        }
+        const eventId = ledger.appendEvidence({
+          sessionId,
+          runtime: "any",
+          eventType: "agent_process_started",
+          payload: JSON.stringify({
+            event_type: eventType,
+            payload
+          }),
+          payloadExt: "json",
+          inline: false,
+          meta: {
+            trustTier: "OBSERVED",
+            agentId: auth.payload.agentId
+          }
+        });
+        writeJson(options.res, 200, { received: true, eventId, sessionId });
+      } finally {
+        ledger.close();
+      }
+    } catch (error) {
+      if (String(error).includes("PAYLOAD_TOO_LARGE")) {
+        writeJson(options.res, 413, { error: "payload too large" });
+        return true;
+      }
+      writeJson(options.res, 400, { error: String(error) });
+    }
+    return true;
   }
 
   if (options.pathname === "/bridge/telemetry") {
@@ -446,17 +621,109 @@ export async function handleBridgeRequest(options: HandleBridgeRequestOptions): 
       correlationId,
       runId
     });
+    const streamPassthrough = isStreamingBridgeRequest(options.req, preparedBodyJson);
 
+    if (streamPassthrough) {
+      options.res.statusCode = response.status;
+      const contentType = response.headers.get("content-type");
+      if (contentType) {
+        options.res.setHeader("content-type", contentType);
+      }
+      const upstreamTrailer = response.headers.get("trailer");
+      options.res.setHeader(
+        "Trailer",
+        typeof upstreamTrailer === "string" && upstreamTrailer.trim().length > 0
+          ? `${upstreamTrailer}, x-amc-receipt-trailer`
+          : "x-amc-receipt-trailer"
+      );
+      options.res.setHeader("x-amc-receipt-mode", "trailer");
+      options.res.setHeader("x-amc-bridge-request-id", requestId);
+      options.res.setHeader("x-amc-correlation-id", correlationId);
+      if (promptBinding) {
+        options.res.setHeader("x-amc-prompt-pack-sha256", promptBinding.packSha256);
+        options.res.setHeader("x-amc-prompt-pack-id", promptBinding.packId);
+      }
+
+      const streamedBody = await readUpstreamBody(response.body, async (chunk) => {
+        if (!options.res.write(chunk)) {
+          await once(options.res, "drain");
+        }
+      });
+      let responseJson: unknown = {};
+      try {
+        responseJson = streamedBody.byteLength > 0 ? JSON.parse(streamedBody.toString("utf8")) : {};
+      } catch {
+        responseJson = {};
+      }
+      const usage = extractUsage(responseJson);
+      const responseModel = extractModel(responseJson) ?? intent.model;
+
+      if (promptPolicy) {
+        appendBridgeAudit({
+          ledger,
+          sessionId,
+          auditType: "BRIDGE_STREAM_VALIDATION_SKIPPED",
+          severity: "LOW",
+          details: {
+            requestId,
+            agentId: lease.payload.agentId,
+            provider: route.provider,
+            model: responseModel,
+            reason: "streaming passthrough"
+          }
+        });
+      }
+
+      const responseReceipt = appendBridgeResponseReceipt({
+        ledger,
+        sessionId,
+        agentId: lease.payload.agentId,
+        payload: {
+          requestId,
+          correlationId,
+          runId,
+          provider: route.provider,
+          model: responseModel,
+          statusCode: response.status,
+          usage,
+          bodySha256: bridgeSha256(streamedBody),
+          promptPackSha256: promptBinding?.packSha256,
+          promptPackId: promptBinding?.packId,
+          promptTemplateId: promptBinding?.templateId,
+          cgxPackSha256: promptBinding?.cgxPackSha256,
+          durationMs: Date.now() - started,
+          summary: summarizeBridgeBody({
+            payload: {
+              statusCode: response.status,
+              model: responseModel,
+              usage,
+              promptPackId: promptBinding?.packId
+            },
+            maxChars: bridgeConfig.bridge.redaction.maxSummaryChars,
+            redactPromptText: true
+          })
+        }
+      });
+
+      ledger.sealSession(sessionId);
+      options.res.addTrailers({
+        "x-amc-receipt-trailer": responseReceipt.receipt
+      });
+      options.res.end();
+      return true;
+    }
+
+    const responseBody = await readUpstreamBody(response.body);
     let responseJson: unknown = {};
     try {
-      responseJson = response.body.byteLength > 0 ? JSON.parse(response.body.toString("utf8")) : {};
+      responseJson = responseBody.byteLength > 0 ? JSON.parse(responseBody.toString("utf8")) : {};
     } catch {
       responseJson = {};
     }
     const usage = extractUsage(responseJson);
     const responseModel = extractModel(responseJson) ?? intent.model;
     let finalStatus = response.status;
-    let finalBody = response.body;
+    let finalBody = responseBody;
     if (promptPolicy) {
       const truthguard = validateBridgeResponseWithPromptPolicy({
         workspace: options.workspace,

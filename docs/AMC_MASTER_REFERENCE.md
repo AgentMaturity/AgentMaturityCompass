@@ -469,8 +469,7 @@ Complete reference for every `amc` command organized by category.
 | `amc role-presets` | Dashboard role presets |
 | `amc wiring-status` | Production wiring status |
 | `amc python-sdk` | Generate Python SDK package |
-| `amc openapi-spec` | Generate OpenAPI spec for bridge API |
-| `amc openapi-generate` | Full OpenAPI spec (Studio + Bridge + Gateway) |
+| `amc openapi-generate` | Live OpenAPI spec (Studio + Bridge + Gateway) |
 | `amc integrate --framework <name>` | Integration scaffold |
 | `amc integrate-list` | Available integration frameworks |
 | `amc contract-tests` | Contract test suite for bridge API |

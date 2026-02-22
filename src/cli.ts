@@ -11540,36 +11540,10 @@ program
     }
   });
 
-program
-  .command("openapi-spec")
-  .description("Generate OpenAPI spec for bridge API endpoints")
-  .option("--json", "output raw JSON instead of formatted", false)
-  .action((opts: { json: boolean }) => {
-    const is = require("./setup/integrationScaffold.js") as typeof import("./setup/integrationScaffold.js");
-    const spec = is.generateBridgeOpenApiSpec();
-    if (opts.json) {
-      console.log(JSON.stringify(spec));
-    } else {
-      console.log(chalk.bold(`\n${spec.info.title} v${spec.info.version}\n`));
-      console.log(spec.info.description);
-      console.log(chalk.bold("\nEndpoints:"));
-      for (const [path, methods] of Object.entries(spec.paths)) {
-        for (const [method, detail] of Object.entries(methods as Record<string, any>)) {
-          console.log(`  ${chalk.green(method.toUpperCase().padEnd(6))} ${path} — ${detail.summary}`);
-        }
-      }
-      console.log(chalk.bold("\nSchemas:"));
-      for (const name of Object.keys(spec.components.schemas)) {
-        console.log(`  ${chalk.yellow(name)}`);
-      }
-      console.log(chalk.dim(`\nUse --json for raw OpenAPI 3.1.0 JSON output.`));
-    }
-  });
-
 // ── OpenAPI Generate (Full Spec) ────────────────────────────────────────
 program
   .command("openapi-generate")
-  .description("Generate full OpenAPI spec (Studio + Bridge + Gateway)")
+  .description("Generate live OpenAPI spec (Studio + Bridge + Gateway)")
   .option("--out <file>", "output file path (yaml/json)")
   .option("--json", "output raw JSON to stdout", false)
   .action((opts: { out?: string; json: boolean }) => {

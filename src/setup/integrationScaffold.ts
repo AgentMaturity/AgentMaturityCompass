@@ -155,7 +155,7 @@ function generateExpressScaffold(): IntegrationScaffold {
           "    res.send = function(body: any) {",
           "      const latency = Date.now() - start;",
           "      // Log evidence to AMC bridge",
-          '      fetch(`${bridgeUrl}/api/v1/evidence`, {',
+          '      fetch(`${bridgeUrl}/bridge/evidence`, {',
           '        method: "POST",',
           '        headers: { "Content-Type": "application/json" },',
           "        body: JSON.stringify({",
@@ -184,7 +184,7 @@ function generateExpressScaffold(): IntegrationScaffold {
           '      return res.status(401).json({ error: "Missing AMC lease token" });',
           "    }",
           "    try {",
-          '      const resp = await fetch(`${bridgeUrl}/api/v1/lease/verify`, {',
+          '      const resp = await fetch(`${bridgeUrl}/bridge/lease/verify`, {',
           '        method: "POST",',
           '        headers: { "Content-Type": "application/json" },',
           "        body: JSON.stringify({ token: leaseToken }),",
@@ -207,7 +207,7 @@ function generateExpressScaffold(): IntegrationScaffold {
       "Import amcEvidenceMiddleware in your Express app",
       "app.use(amcEvidenceMiddleware('http://localhost:4100'))",
       "Set AMC_BRIDGE_URL environment variable",
-      "Run amc bridge start to start the bridge server",
+      "Run amc up to start Studio + Bridge endpoints",
     ],
     createdTs: Date.now(),
   };
@@ -239,7 +239,7 @@ function generateFastApiScaffold(): IntegrationScaffold {
           "        try:",
           "            async with httpx.AsyncClient() as client:",
           "                await client.post(",
-          "                    f'{AMC_BRIDGE_URL}/api/v1/evidence',",
+          "                    f'{AMC_BRIDGE_URL}/bridge/evidence',",
           "                    json={",
           "                        'event_type': 'http_request',",
           "                        'session_id': request.headers.get('x-session-id', 'unknown'),",
@@ -263,7 +263,7 @@ function generateFastApiScaffold(): IntegrationScaffold {
       "Import AMCEvidenceMiddleware in your FastAPI app",
       "app.add_middleware(AMCEvidenceMiddleware)",
       "Set AMC_BRIDGE_URL environment variable",
-      "Run amc bridge start to start the bridge server",
+      "Run amc up to start Studio + Bridge endpoints",
     ],
     createdTs: Date.now(),
   };
@@ -292,7 +292,7 @@ function generateFlaskScaffold(): IntegrationScaffold {
           "    latency_ms = int((time.time() - getattr(g, 'amc_start_time', time.time())) * 1000)",
           "    try:",
           "        requests.post(",
-          "            f'{AMC_BRIDGE_URL}/api/v1/evidence',",
+          "            f'{AMC_BRIDGE_URL}/bridge/evidence',",
           "            json={",
           "                'event_type': 'http_request',",
           "                'session_id': request.headers.get('X-Session-Id', 'unknown'),",
@@ -321,7 +321,7 @@ function generateFlaskScaffold(): IntegrationScaffold {
       "from middleware.amc_flask import init_amc",
       "init_amc(app)",
       "Set AMC_BRIDGE_URL environment variable",
-      "Run amc bridge start to start the bridge server",
+      "Run amc up to start Studio + Bridge endpoints",
     ],
     createdTs: Date.now(),
   };
@@ -356,7 +356,7 @@ function generateLangchainScaffold(): IntegrationScaffold {
           "    def _log_event(self, event_type: str, payload: dict):",
           "        try:",
           "            httpx.post(",
-          "                f'{AMC_BRIDGE_URL}/api/v1/evidence',",
+          "                f'{AMC_BRIDGE_URL}/bridge/evidence',",
           "                json={'event_type': event_type, 'payload': payload},",
           "                timeout=1,",
           "            )",
@@ -403,7 +403,7 @@ function generateLlamaIndexScaffold(): IntegrationScaffold {
           "    def _log(self, phase, event_type, payload):",
           "        try:",
           "            httpx.post(",
-          "                f'{AMC_BRIDGE_URL}/api/v1/evidence',",
+          "                f'{AMC_BRIDGE_URL}/bridge/evidence',",
           "                json={'event_type': f'llamaindex_{phase}_{event_type}', 'payload': str(payload)[:500]},",
           "                timeout=1,",
           "            )",
@@ -435,24 +435,24 @@ function generateGenericHttpScaffold(): IntegrationScaffold {
           "# AMC Integration Guide (Generic HTTP)",
           "",
           "## Evidence Endpoint",
-          "POST {AMC_BRIDGE_URL}/api/v1/evidence",
+          "POST {AMC_BRIDGE_URL}/bridge/evidence",
           '{"event_type": "...", "session_id": "...", "payload": {...}}',
           "",
           "## Lease Verification",
-          "POST {AMC_BRIDGE_URL}/api/v1/lease/verify",
+          "POST {AMC_BRIDGE_URL}/bridge/lease/verify",
           '{"token": "..."}',
           "",
           "## Health Check",
-          "GET {AMC_BRIDGE_URL}/api/v1/health",
+          "GET {AMC_BRIDGE_URL}/bridge/health",
         ].join("\n"),
         description: "Generic HTTP integration guide",
       },
     ],
     instructions: [
       "Set AMC_BRIDGE_URL environment variable",
-      "POST evidence events to /api/v1/evidence",
-      "Verify lease tokens via /api/v1/lease/verify",
-      "Run amc bridge start to start the bridge server",
+      "POST evidence events to /bridge/evidence",
+      "Verify lease tokens via /bridge/lease/verify",
+      "Run amc up to start Studio + Bridge endpoints",
     ],
     createdTs: Date.now(),
   };
@@ -479,7 +479,7 @@ export function generateContractTests(): ContractTestSuite {
         name: "Health check returns OK",
         description: "Bridge health endpoint should return 200 with status",
         method: "GET",
-        path: "/api/v1/health",
+        path: "/bridge/health",
         expectedStatus: 200,
         requiredFields: ["status"],
         validators: [{ field: "status", rule: "exists" }],
@@ -489,7 +489,7 @@ export function generateContractTests(): ContractTestSuite {
         name: "Evidence ingestion accepts valid payload",
         description: "Evidence endpoint should accept well-formed evidence",
         method: "POST",
-        path: "/api/v1/evidence",
+        path: "/bridge/evidence",
         requestBody: {
           event_type: "test",
           session_id: "test-session",
@@ -504,7 +504,7 @@ export function generateContractTests(): ContractTestSuite {
         name: "Evidence endpoint rejects empty payload",
         description: "Should return 400 for missing required fields",
         method: "POST",
-        path: "/api/v1/evidence",
+        path: "/bridge/evidence",
         requestBody: {},
         expectedStatus: 400,
         requiredFields: ["error"],
@@ -515,9 +515,9 @@ export function generateContractTests(): ContractTestSuite {
         name: "Lease verification endpoint responds",
         description: "Should accept or reject lease tokens",
         method: "POST",
-        path: "/api/v1/lease/verify",
+        path: "/bridge/lease/verify",
         requestBody: { token: "test-token" },
-        expectedStatus: 200,
+        expectedStatus: 401,
         requiredFields: ["valid"],
         validators: [{ field: "valid", rule: "type_boolean" }],
       },
@@ -670,25 +670,55 @@ export function generateBridgeOpenApiSpec(): OpenApiSpec {
     info: {
       title: "AMC Bridge API",
       version: "1.0.0",
-      description: "API for the AMC Bridge server — evidence collection, lease management, and model routing.",
+      description: "Live AMC Bridge routes for lease validation, telemetry/evidence, and provider-shaped model proxying.",
     },
     paths: {
-      "/api/v1/health": {
+      "/bridge/health": {
         get: {
-          summary: "Health check",
+          summary: "Bridge health check",
           tags: ["system"],
-          responses: { "200": { description: "OK", content: { "application/json": { schema: { type: "object", properties: { status: { type: "string" } } } } } } },
+          responses: {
+            "200": {
+              description: "OK",
+              content: {
+                "application/json": {
+                  schema: {
+                    type: "object",
+                    properties: {
+                      ok: { type: "boolean" },
+                      status: { type: "string" },
+                      ts: { type: "number" }
+                    }
+                  }
+                }
+              }
+            }
+          },
         },
       },
-      "/api/v1/evidence": {
+      "/bridge/evidence": {
         post: {
           summary: "Ingest evidence event",
           tags: ["evidence"],
-          requestBody: { content: { "application/json": { schema: { type: "object", required: ["event_type", "session_id", "payload"], properties: { event_type: { type: "string" }, session_id: { type: "string" }, payload: { type: "object" } } } } } },
+          requestBody: {
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  required: ["event_type", "session_id", "payload"],
+                  properties: {
+                    event_type: { type: "string" },
+                    session_id: { type: "string" },
+                    payload: { type: "object" }
+                  }
+                }
+              }
+            }
+          },
           responses: { "200": { description: "Evidence accepted" }, "400": { description: "Invalid payload" } },
         },
       },
-      "/api/v1/lease/verify": {
+      "/bridge/lease/verify": {
         post: {
           summary: "Verify lease token",
           tags: ["lease"],
@@ -696,12 +726,76 @@ export function generateBridgeOpenApiSpec(): OpenApiSpec {
           responses: { "200": { description: "Verification result" } },
         },
       },
-      "/api/v1/chat/completions": {
+      "/bridge/telemetry": {
         post: {
-          summary: "Proxied chat completions",
+          summary: "Append telemetry event to bridge ledger",
+          tags: ["telemetry"],
+          requestBody: {
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  required: ["sessionId", "eventType", "payload"],
+                  properties: {
+                    sessionId: { type: "string" },
+                    eventType: { type: "string" },
+                    payload: { oneOf: [{ type: "string" }, { type: "object" }] }
+                  }
+                }
+              }
+            }
+          },
+          responses: { "200": { description: "Telemetry accepted" }, "400": { description: "Invalid payload" } },
+        },
+      },
+      "/bridge/openai/v1/chat/completions": {
+        post: {
+          summary: "OpenAI Chat Completions (bridge passthrough)",
           tags: ["model"],
-          requestBody: { content: { "application/json": { schema: { type: "object", required: ["model", "messages"], properties: { model: { type: "string" }, messages: { type: "array" } } } } } },
-          responses: { "200": { description: "Chat completion response" } },
+          responses: { "200": { description: "Provider response" } },
+        },
+      },
+      "/bridge/openai/v1/responses": {
+        post: {
+          summary: "OpenAI Responses (bridge passthrough)",
+          tags: ["model"],
+          responses: { "200": { description: "Provider response" } },
+        },
+      },
+      "/bridge/anthropic/v1/messages": {
+        post: {
+          summary: "Anthropic Messages (bridge passthrough)",
+          tags: ["model"],
+          responses: { "200": { description: "Provider response" } },
+        },
+      },
+      "/bridge/gemini/v1beta/models/{model}:generateContent": {
+        post: {
+          summary: "Gemini Generate Content (bridge passthrough)",
+          tags: ["model"],
+          parameters: [{ name: "model", in: "path", required: true, schema: { type: "string" } }],
+          responses: { "200": { description: "Provider response" } },
+        },
+      },
+      "/bridge/openrouter/v1/chat/completions": {
+        post: {
+          summary: "OpenRouter Chat Completions (bridge passthrough)",
+          tags: ["model"],
+          responses: { "200": { description: "Provider response" } },
+        },
+      },
+      "/bridge/xai/v1/chat/completions": {
+        post: {
+          summary: "xAI Chat Completions (bridge passthrough)",
+          tags: ["model"],
+          responses: { "200": { description: "Provider response" } },
+        },
+      },
+      "/bridge/local/v1/chat/completions": {
+        post: {
+          summary: "Local OpenAI-compatible Chat Completions (bridge passthrough)",
+          tags: ["model"],
+          responses: { "200": { description: "Provider response" } },
         },
       },
     },

@@ -1,4 +1,4 @@
-import { request as httpRequest } from "node:http";
+import { createServer as createHttpServer, request as httpRequest, type Server as HttpServer } from "node:http";
 import { createServer as createNetServer } from "node:net";
 import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
@@ -81,6 +81,51 @@ function httpJson(params: {
             status: res.statusCode ?? 0,
             body: data,
             headers: res.headers as Record<string, string | string[] | undefined>
+          });
+        });
+      }
+    );
+    req.once("error", rejectPromise);
+    if (body.length > 0) {
+      req.write(body);
+    }
+    req.end();
+  });
+}
+
+function httpJsonWithTrailers(params: {
+  method?: "GET" | "POST";
+  url: string;
+  payload?: Record<string, unknown>;
+  headers?: Record<string, string>;
+}): Promise<{ status: number; body: string; headers: Record<string, string | string[] | undefined>; trailers: Record<string, string> }> {
+  const body = params.payload ? JSON.stringify(params.payload) : "";
+  return new Promise((resolvePromise, rejectPromise) => {
+    const req = httpRequest(
+      params.url,
+      {
+        method: params.method ?? "GET",
+        headers: {
+          ...(params.payload
+            ? {
+                "content-type": "application/json",
+                "content-length": Buffer.byteLength(body)
+              }
+            : {}),
+          ...(params.headers ?? {})
+        }
+      },
+      (res) => {
+        let data = "";
+        res.on("data", (chunk) => {
+          data += chunk.toString("utf8");
+        });
+        res.on("end", () => {
+          resolvePromise({
+            status: res.statusCode ?? 0,
+            body: data,
+            headers: res.headers as Record<string, string | string[] | undefined>,
+            trailers: res.trailers as Record<string, string>
           });
         });
       }
@@ -275,7 +320,155 @@ describe("universal agent integration layer", () => {
       await new Promise<void>((resolvePromise) => fakeXai.server.close(() => resolvePromise()));
       await new Promise<void>((resolvePromise) => fakeOpenRouter.server.close(() => resolvePromise()));
     }
-  }, 20_000);
+  }, 30_000);
+
+  test("security: /api/v1 is auth-gated and legacy bridge paths emit deprecation redirects", async () => {
+    const workspace = newWorkspace();
+    const token = "studio-admin-token";
+    const server = await startStudioApiServer({
+      workspace,
+      host: "127.0.0.1",
+      port: await pickFreePort(),
+      token
+    });
+    try {
+      const unauthorized = await httpJson({
+        method: "GET",
+        url: `${server.url}/api/v1/health`
+      });
+      expect(unauthorized.status).toBe(401);
+
+      const authorized = await httpJson({
+        method: "GET",
+        url: `${server.url}/api/v1/health`,
+        headers: {
+          "x-amc-admin-token": token
+        }
+      });
+      expect(authorized.status).toBe(200);
+
+      const lease = issueLeaseForCli({
+        workspace,
+        agentId: "default",
+        ttl: "30m",
+        scopes: "gateway:llm",
+        routes: "/openai",
+        models: "*",
+        rpm: 1000,
+        tpm: 1_000_000,
+        maxCostUsdPerDay: null
+      }).token;
+      const redirected = await httpJson({
+        method: "POST",
+        url: `${server.url}/api/v1/chat/completions`,
+        headers: {
+          authorization: `Bearer ${lease}`
+        },
+        payload: {
+          model: "gpt-test",
+          messages: [{ role: "user", content: "hello" }]
+        }
+      });
+      expect(redirected.status).toBe(308);
+      expect(redirected.headers.location).toBe("/bridge/openai/v1/chat/completions");
+      expect(redirected.headers.deprecation).toBe("true");
+      expect(String(redirected.headers.warning ?? "")).toContain("Deprecated bridge endpoint");
+    } finally {
+      await server.close();
+    }
+  });
+
+  test("bridge streaming passthrough uses trailer receipts instead of buffering responses first", async () => {
+    const workspace = newWorkspace();
+    process.env.AMC_VAULT_PASSPHRASE = "universal-test-passphrase";
+    const upstream = await new Promise<{ server: HttpServer; port: number }>((resolvePromise) => {
+      const s = createHttpServer((req, res) => {
+        if ((req.method ?? "POST").toUpperCase() !== "POST") {
+          res.statusCode = 405;
+          res.end();
+          return;
+        }
+        req.resume();
+        req.once("end", () => {
+          res.statusCode = 200;
+          res.setHeader("content-type", "application/json");
+          res.setHeader("transfer-encoding", "chunked");
+          res.write('{"id":"resp-stream","model":"gpt-stream","choices":[{"message":{"role":"assistant","content":"');
+          setTimeout(() => {
+            res.write('stream-ok');
+            setTimeout(() => {
+              res.end('"}}]}');
+            }, 5);
+          }, 5);
+        });
+      });
+      s.listen(0, "127.0.0.1", () => {
+        const address = s.address();
+        if (!address || typeof address === "string") {
+          throw new Error("upstream failed to bind");
+        }
+        resolvePromise({ server: s, port: address.port });
+      });
+    });
+
+    initGatewayConfig(workspace, {
+      listen: { host: "127.0.0.1", port: 0 },
+      redaction: {
+        headerKeysDenylist: ["authorization", "x-amc-lease"],
+        jsonPathsDenylist: ["$.api_key", "$.key", "$.token"],
+        textRegexDenylist: ["(?i)sk-[A-Za-z0-9]{12,}"]
+      },
+      upstreams: {
+        openaiFake: { baseUrl: `http://127.0.0.1:${upstream.port}`, auth: { type: "none" }, allowLocalhost: true }
+      },
+      routes: [{ prefix: "/openai", upstream: "openaiFake", stripPrefix: true, openaiCompatible: true }],
+      lease: { allowQueryCarrier: false },
+      streamPassthrough: true,
+      proxy: { enabled: false, port: 3211, allowlistHosts: [], denyByDefault: true }
+    });
+
+    const runtime = await runStudioForeground({
+      workspace,
+      apiPort: await pickFreePort(),
+      dashboardPort: await pickFreePort(),
+      gatewayPort: await pickFreePort(),
+      proxyPort: await pickFreePort(),
+      metricsPort: await pickFreePort()
+    });
+    const base = `http://${runtime.state.host}:${runtime.state.apiPort}`;
+    const lease = issueLeaseForCli({
+      workspace,
+      agentId: "default",
+      ttl: "30m",
+      scopes: "gateway:llm",
+      routes: "/openai",
+      models: "*",
+      rpm: 1000,
+      tpm: 1_000_000,
+      maxCostUsdPerDay: null
+    }).token;
+    try {
+      const streamed = await httpJsonWithTrailers({
+        method: "POST",
+        url: `${base}/bridge/openai/v1/chat/completions`,
+        headers: {
+          authorization: `Bearer ${lease}`
+        },
+        payload: {
+          model: "gpt-stream",
+          stream: true,
+          messages: [{ role: "user", content: "hello" }]
+        }
+      });
+      expect(streamed.status).toBe(200);
+      expect(streamed.body).toContain("stream-ok");
+      expect(streamed.headers["x-amc-receipt-mode"]).toBe("trailer");
+      expect(typeof streamed.trailers["x-amc-receipt-trailer"]).toBe("string");
+    } finally {
+      await runtime.stop();
+      await new Promise<void>((resolvePromise) => upstream.server.close(() => resolvePromise()));
+    }
+  }, 30_000);
 
   test("pairing create/redeem is single-use, expires, and records audits", async () => {
     const workspace = newWorkspace();

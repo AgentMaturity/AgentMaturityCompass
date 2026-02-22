@@ -33,6 +33,11 @@ Token file:
 Header required for protected endpoints:
 - `x-amc-admin-token: <token>`
 
+API surface boundaries:
+- Internal control plane: `/api/v1/*` (RBAC-gated, internal-only surface)
+- Public bridge surface: `/bridge/*` (lease-auth integration surface)
+- Reference: [API_SURFACES.md](./API_SURFACES.md)
+
 CLI helper:
 
 ```bash

@@ -1,97 +1,71 @@
-# FIX-4 Handoff: Incidents Integration
+# FIX-5 Handoff
 
-## What was wired
+## Scope completed
+Implemented API auth/security and bridge routing fixes in `/tmp/amc-wave1/agent-5`.
 
-### 1) Public exports (`src/index.ts`)
-Added incidents subsystem exports so incidents are reachable from package root:
-- `IncidentStore` namespace (store API)
-- `IncidentModel` namespace (incident types/model)
-- `IncidentGraph`
-- `IncidentTimeline`
-- auto-assembly exports (`IncidentAutoAssembly`, plus `assembleFrom*` and `autoDetectAndAssemble`)
-- direct incident store/type exports (`createIncidentStore`, `computeIncidentHash`, `verifyIncidentSignature`, `Incident*` types)
+## What was fixed
 
-### 2) CLI command group (`src/cli.ts`)
-Added top-level `incident` group with requested commands:
-- `amc incident list [--status open|closed] [--limit N] [--agent <id>]`
-- `amc incident show <id>`
-- `amc incident create --title "..." --severity low|medium|high|critical [--agent <id>]`
-- `amc incident link <incident-id> --evidence <evidence-id>`
-- `amc incident close <id> --resolution "..."`
+1. `/api/v1/*` auth gap in Studio
+- Moved `/api/v1/*` handling behind auth in `src/studio/studioServer.ts`.
+- Added RBAC enforcement for internal `/api/v1/*` routes (VIEWER/OPERATOR/APPROVER/AUDITOR/OWNER).
+- Added authenticated deprecation redirects (308 + headers) for legacy bridge-style endpoints:
+  - `/api/v1/chat/completions` -> `/bridge/openai/v1/chat/completions`
+  - `/api/v1/evidence` -> `/bridge/evidence`
+  - `/api/v1/lease/verify` -> `/bridge/lease/verify`
 
-Implementation notes:
-- Uses ledger-backed SQLite via `openLedger(...).db` + `createIncidentStore`.
-- Handles append-only behavior by recording transitions/causal-edge links rather than mutating existing incident rows.
-- `list --status` derives open/closed state from latest transition.
+2. Single live OpenAPI generation command
+- Removed deprecated CLI command `openapi-spec` from `src/cli.ts`.
+- Kept `openapi-generate` as the canonical command.
+- Updated CLI/OpenAPI comments in `src/studio/openapi.ts`.
 
-### 3) API routes (`src/api/incidentRouter.ts`, `src/api/index.ts`)
-Added incidents router and dispatcher wiring:
-- `GET /api/v1/incidents`
-  - query: `agent`, `status=open|closed`, `limit`
-- `POST /api/v1/incidents`
-  - body: `{ agentId?, title, description?, severity, triggerType?, triggerId? }`
-- `GET /api/v1/incidents/:id`
-- `PATCH /api/v1/incidents/:id`
-  - supports state/resolution transition and/or evidence linking via `evidenceId`
+3. Bridge streaming passthrough
+- Replaced upstream buffering (`response.arrayBuffer()`) with stream-reader passthrough in `src/bridge/bridgeServer.ts`.
+- Added chunked passthrough path for streaming requests (`stream: true` or `Accept: text/event-stream`).
+- Added trailer receipt mode for streamed responses:
+  - `x-amc-receipt-mode: trailer`
+  - trailer `x-amc-receipt-trailer`
+- Kept buffered path for non-stream responses where output-contract enforcement can still block/transform.
 
-### 4) Tests (15 new tests)
-Added direct incident subsystem coverage:
-- `tests/incidentsStore.test.ts` (8 tests)
-  - store init/CRUD retrieval/filtering
-  - transitions and causal edge ordering
-  - hash determinism and signature verification
-- `tests/incidentsApiRoutes.test.ts` (7 tests)
-  - list/create/show/patch(close)/patch(link)/filtered list
-  - dispatcher integration via `handleApiRoute`
+4. Bridge endpoint deprecation + live replacements
+- Added live bridge routes in `src/bridge/bridgeServer.ts`:
+  - `GET /bridge/health`
+  - `POST /bridge/evidence`
+  - `POST /bridge/lease/verify`
+- Legacy `/api/v1/*` bridge-style calls now redirect to these `/bridge/*` routes with deprecation headers.
 
-## Commands executed
+5. API surface documentation
+- Added `docs/API_SURFACES.md` clarifying:
+  - Internal-only surface: `/api/v1/*` (RBAC-gated Studio control plane)
+  - Public surface: `/bridge/*` (lease-auth integrations)
+  - Legacy deprecation mapping
+- Linked from `docs/STUDIO.md` and `docs/BRIDGE.md`.
+- Updated command reference in `docs/AMC_MASTER_REFERENCE.md`.
 
-### Focused incident tests (pass)
-- `npm run typecheck` ✅
-- `npm test -- tests/incidentsStore.test.ts tests/incidentsApiRoutes.test.ts --reporter=verbose` ✅
+## OpenAPI + scaffold alignment changes
+- Updated `src/setup/integrationScaffold.ts` so generated snippets, contract tests, and bridge OpenAPI spec use live `/bridge/*` endpoints only.
+- `generateBridgeOpenApiSpec()` now emits live bridge routes (health, evidence, lease verify, telemetry, provider routes).
 
-### Requested full-suite command
-Attempted exact command:
+## Tests/validation
+
+Targeted checks run:
+- `npm run typecheck` -> pass
+- `npm test -- tests/integrationScaffold.test.ts tests/openapiContracts.test.ts --reporter=verbose` -> pass (35 tests)
+
+Required full-suite command requested by task (captured via capped log run):
 - `npm test -- --reporter=verbose 2>&1 | tail -30`
+- Tail output (last lines) showed multiple environment-related failures/timeouts in this sandbox, including `listen EPERM: operation not permitted 127.0.0.1` and test timeouts in long integration suites.
 
-In this sandbox it did not stream lines reliably from the direct pipeline, so a bounded log-capture fallback was run to obtain the final tail output.
+## Files changed
+- `src/studio/studioServer.ts`
+- `src/bridge/bridgeServer.ts`
+- `src/setup/integrationScaffold.ts`
+- `src/cli.ts`
+- `src/studio/openapi.ts`
+- `docs/API_SURFACES.md` (new)
+- `docs/STUDIO.md`
+- `docs/BRIDGE.md`
+- `docs/AMC_MASTER_REFERENCE.md`
+- `tests/integrationScaffold.test.ts`
+- `tests/openapiContracts.test.ts`
+- `tests/universalAgentIntegrationLayer.test.ts`
 
-Tail output captured:
-```
-× tests/enterpriseSsoScim.test.ts > enterprise identity (OIDC/SAML/SCIM) > OIDC rejects bad state, bad nonce/signature, and missing email 40300ms
-  → Test timed out in 40000ms.
-If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
-× tests/consoleApprovalsWhatifBenchmarks.test.ts > console + approvals + what-if + benchmarks > LAN pairing requires one-time code before login and code is single-use 20391ms
-  → Test timed out in 20000ms.
-If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
-✓ tests/consoleApprovalsWhatifBenchmarks.test.ts > console + approvals + what-if + benchmarks > transparency log records issuance events and detects tampering 638ms
-✓ tests/consoleApprovalsWhatifBenchmarks.test.ts > console + approvals + what-if + benchmarks > policy pack diff is deterministic and apply writes signed configs
-× tests/multiWorkspaceHostMode.test.ts > multi-workspace host mode > workspace readiness fails independently while host readiness remains available 30441ms
-  → Test timed out in 30000ms.
-If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
-× tests/consoleApprovalsWhatifBenchmarks.test.ts > console + approvals + what-if + benchmarks > console pages are served and contain no external CDN references 20171ms
-  → Test timed out in 20000ms.
-If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
-× tests/enterpriseSsoScim.test.ts > enterprise identity (OIDC/SAML/SCIM) > SAML ACS path verifies signed compact assertion and grants mapped roles 40231ms
-  → Test timed out in 40000ms.
-If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
-× tests/multiWorkspaceHostMode.test.ts > multi-workspace host mode > host and workspace console paths serve and workspace HTML avoids absolute /console links 30367ms
-  → Test timed out in 30000ms.
-If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
-✓ tests/multiWorkspaceHostMode.test.ts > multi-workspace host mode > host migrate imports single-workspace repo into host mode and preserves signatures
-× tests/enterpriseSsoScim.test.ts > enterprise identity (OIDC/SAML/SCIM) > SCIM users/groups provisioning applies and revokes workspace memberships by group source 40140ms
-  → Test timed out in 40000ms.
-If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
-× tests/multiWorkspaceHostMode.test.ts > multi-workspace host mode > lease-auth agents cannot access host endpoints 30308ms
-  → Test timed out in 30000ms.
-If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
-× tests/enterpriseSsoScim.test.ts > enterprise identity (OIDC/SAML/SCIM) > lease-auth cannot call host identity/scim endpoints and users without membership cannot access workspace routes 40250ms
-  → Test timed out in 40000ms.
-If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
-```
-
-## Commit status
-Could not create commit in this sandbox because git metadata is mounted outside writable roots:
-- `fatal: Unable to create '/Users/sid/AgentMaturityCompass/.git/worktrees/agent-4/index.lock': Operation not permitted`
-
-All code changes are present in the working tree and ready to commit once git write access is available.

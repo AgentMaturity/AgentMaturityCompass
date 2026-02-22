@@ -289,10 +289,10 @@ describe("OpenAPI spec generation", () => {
 
   test("includes all bridge endpoints", () => {
     const spec = generateBridgeOpenApiSpec();
-    expect(spec.paths).toHaveProperty("/api/v1/health");
-    expect(spec.paths).toHaveProperty("/api/v1/evidence");
-    expect(spec.paths).toHaveProperty("/api/v1/lease/verify");
-    expect(spec.paths).toHaveProperty("/api/v1/chat/completions");
+    expect(spec.paths).toHaveProperty("/bridge/health");
+    expect(spec.paths).toHaveProperty("/bridge/evidence");
+    expect(spec.paths).toHaveProperty("/bridge/lease/verify");
+    expect(spec.paths).toHaveProperty("/bridge/openai/v1/chat/completions");
   });
 
   test("includes component schemas", () => {
@@ -303,14 +303,14 @@ describe("OpenAPI spec generation", () => {
 
   test("health endpoint uses GET method", () => {
     const spec = generateBridgeOpenApiSpec();
-    const healthPath = spec.paths["/api/v1/health"] as Record<string, any>;
+    const healthPath = spec.paths["/bridge/health"] as Record<string, any>;
     expect(healthPath).toHaveProperty("get");
-    expect(healthPath.get.summary).toBe("Health check");
+    expect(healthPath.get.summary).toBe("Bridge health check");
   });
 
   test("evidence endpoint uses POST method", () => {
     const spec = generateBridgeOpenApiSpec();
-    const evidencePath = spec.paths["/api/v1/evidence"] as Record<string, any>;
+    const evidencePath = spec.paths["/bridge/evidence"] as Record<string, any>;
     expect(evidencePath).toHaveProperty("post");
     expect(evidencePath.post.tags).toContain("evidence");
   });

@@ -15,6 +15,9 @@ AMC Bridge is the universal compatibility layer for agent/model traffic. It expo
 
 In single-workspace mode, the same endpoints are also reachable at `/bridge/*`.
 
+Bridge is the public integration surface. Internal Studio control-plane APIs remain under `/api/v1/*`.
+See [API_SURFACES.md](./API_SURFACES.md) for the boundary and deprecation mapping.
+
 ## Trust and Anti-Cheat
 
 - Lease auth is required for all bridge calls.

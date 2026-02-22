@@ -5,7 +5,7 @@
  * endpoints, Gateway routes, and authentication documentation.
  *
  * Usage:
- *   CLI:   amc openapi generate --out openapi.yaml
+ *   CLI:   amc openapi-generate --out openapi.yaml
  *   HTTP:  GET /openapi.yaml from Studio server
  */
 
@@ -582,7 +582,7 @@ export function renderOpenApiYaml(): string {
 }
 
 /**
- * CLI handler for `amc openapi generate`.
+ * CLI handler for `amc openapi-generate`.
  */
 export function openapiGenerateCli(options: { out?: string }): { path: string | null; spec: OpenApiSpec } {
   const spec = generateFullOpenApiSpec();
