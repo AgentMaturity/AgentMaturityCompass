@@ -28,6 +28,28 @@ export { detect } from './detector.js';
 export type { DetectorResult } from './detector.js';
 export { checkOAuthScopes } from './oauthScope.js';
 export type { OAuthScopeResult } from './oauthScope.js';
+export {
+  analyzeAdvancedThreats,
+  assessCompoundThreat,
+  assessTocTou,
+  assessDecompositionAttack,
+  assessShutdownResistance,
+  assessCorrigibility
+} from "./advancedThreats.js";
+export type {
+  ThreatSeverity,
+  ThreatSignal,
+  DecisionFlowEvent,
+  ShutdownEvent,
+  CorrectionEvent,
+  AdvancedThreatInput,
+  CompoundThreatAssessment,
+  TocTouAssessment,
+  DecompositionAssessment,
+  ShutdownResistanceAssessment,
+  CorrigibilityAssessment,
+  AdvancedThreatAssessment
+} from "./advancedThreats.js";
 
 // ── Validator library (2026-02-21) ────────────────────────────────────
 export {

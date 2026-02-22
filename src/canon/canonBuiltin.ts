@@ -18,6 +18,7 @@ function dimensionIdForQuestion(qid: string): "D1" | "D2" | "D3" | "D4" | "D5" {
   if (qid.startsWith("AMC-RES-")) return "D4";
   if (qid.startsWith("AMC-OINT-")) return "D4";
   if (qid.startsWith("AMC-ETP-")) return "D4";
+  if (qid.startsWith("AMC-THR-")) return "D4";
   return "D5";
 }
 
@@ -48,7 +49,7 @@ export function builtInCanon(): CompassCanon {
         { id: "D1", name: "Strategic Agent Operations", questionCount: 13 },
         { id: "D2", name: "Agent Leadership", questionCount: 18 },
         { id: "D3", name: "Agent Culture", questionCount: 20 },
-        { id: "D4", name: "Agent Resilience", questionCount: 16 },
+        { id: "D4", name: "Agent Resilience", questionCount: 19 },
         { id: "D5", name: "Agent Skills", questionCount: 20 }
       ],
       questions,
