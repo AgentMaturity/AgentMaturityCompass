@@ -1343,19 +1343,53 @@ const seeds: QuestionSeed[] = [
   {
     id: "AMC-OPS-1",
     layerName: "Resilience",
-    title: "Operational Independence Score",
-    promptTemplate: "How long can this agent run at acceptable quality without human intervention?",
+    title: "External Dependency Inventory & Drift",
+    promptTemplate: "Does the agent maintain a current external dependency inventory and detect dependency drift (version/SLA) before outages?",
     labels: [
-      "Requires Intervention Every Session",
-      "1-2 Sessions Autonomous",
-      "Days of Autonomous Operation",
-      "Weeks with Automated Monitoring",
-      "Continuous with Self-Correction",
-      "90-Day Verified Autonomous Operation"
+      "No Dependency Visibility",
+      "Manual Dependency List",
+      "Automated Inventory Only",
+      "Inventory + Version Drift Alerts",
+      "Inventory + Version/SLA Drift Detection",
+      "Continuously Verified Dependency Drift Governance"
     ],
-    evidenceGateHints: "Require operational run log, quality metrics over time, incident log.",
-    upgradeHints: "Track autonomous run duration; add quality monitoring and drift detection.",
-    tuningKnobs: ["guardrails.operationalIndependence", "evalHarness.autonomousDuration"]
+    evidenceGateHints: "Require dependency inventory snapshots, provider/version telemetry, SLA trend reports, and drift alerts.",
+    upgradeHints: "Add automatic dependency discovery from traces, compare version/SLA baselines, and alert on degradations.",
+    tuningKnobs: ["guardrails.operationalDependencyInventory", "evalHarness.dependencyDrift"]
+  },
+  {
+    id: "AMC-OPS-2",
+    layerName: "Resilience",
+    title: "Graceful Degradation Readiness",
+    promptTemplate: "When key dependencies fail, does the agent degrade gracefully while preserving safe core functionality?",
+    labels: [
+      "Hard Failure on Dependency Loss",
+      "Manual Recovery Playbook",
+      "Basic Retry/Fallback",
+      "Automated Degraded Modes",
+      "Measured Recovery & Error Budgets",
+      "Proven Graceful Degradation with Regular Drills"
+    ],
+    evidenceGateHints: "Require fallback-chain traces, degraded-mode activation logs, and recovery time metrics.",
+    upgradeHints: "Implement dependency-aware fallbacks, degraded operation modes, and recurring failover validation.",
+    tuningKnobs: ["guardrails.gracefulDegradation", "evalHarness.failoverDrills", "guardrails.dependencyFallbacks"]
+  },
+  {
+    id: "AMC-OPS-3",
+    layerName: "Resilience",
+    title: "Vendor Lock-In & Operational Independence",
+    promptTemplate: "Can the agent continue acceptable operation under reduced external access with manageable vendor lock-in risk?",
+    labels: [
+      "Single-Vendor Lock-In",
+      "Limited Portability Planning",
+      "Portable Data but Single Runtime",
+      "Multi-Provider for Critical Paths",
+      "Portability Tested with Reduced Access",
+      "Provider-Agnostic Operations with Verified Independence Score"
+    ],
+    evidenceGateHints: "Require portability test evidence, multi-provider routing receipts, and reduced-access operation scorecard.",
+    upgradeHints: "Reduce single points of failure, increase provider portability, and verify operation under constrained external connectivity.",
+    tuningKnobs: ["guardrails.vendorPortability", "guardrails.operationalIndependence", "evalHarness.reducedExternalAccess"]
   },
   {
     id: "AMC-COST-1",

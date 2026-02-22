@@ -99,7 +99,7 @@ export const diagnosticBankSchema = z
       1: 13,
       2: 20,
       3: 20,
-      4: 16,
+      4: 18,
       5: 20
     };
 

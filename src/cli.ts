@@ -13050,6 +13050,11 @@ score
       console.log(chalk.gray("Escalation rate:"), `${result.escalationRate}%`);
       console.log(chalk.gray("Drift events:"), result.driftEvents);
       console.log(chalk.gray("Quality held:"), result.qualityHeld ? "yes" : "no");
+      console.log(chalk.gray("External dependencies:"), result.externalDependencyInventory.totalDependencies);
+      console.log(chalk.gray("Dependency drift stability:"), `${result.dependencyDrift.score} (${result.dependencyDrift.status})`);
+      console.log(chalk.gray("Graceful degradation:"), result.gracefulDegradation.score);
+      console.log(chalk.gray("Vendor lock-in risk:"), `${result.vendorLockInRisk.score} (${result.vendorLockInRisk.riskLevel})`);
+      console.log(chalk.gray("Reduced external access:"), result.reducedExternalAccessScore);
     } catch (e: any) {
       console.error(chalk.red(e.message));
       process.exit(1);

@@ -10,8 +10,24 @@ export type { CollectedEvidence } from "./evidenceCollector.js";
 export { assessProductionReadiness } from "./productionReadiness.js";
 export type { ProductionReadinessResult } from "./productionReadiness.js";
 
-export { scoreOperationalIndependence } from "./operationalIndependence.js";
-export type { OperationalIndependenceScore } from "./operationalIndependence.js";
+export {
+  scoreOperationalIndependence,
+  scoreOperationalIndependenceFromEvents,
+  buildExternalDependencyInventory,
+  detectDependencyDrift,
+  scoreGracefulDegradation,
+  scoreVendorLockInRisk
+} from "./operationalIndependence.js";
+export type {
+  OperationalIndependenceScore,
+  ExternalDependencyKind,
+  ExternalDependencyInventoryEntry,
+  ExternalDependencyInventory,
+  DependencyDriftSignal,
+  DependencyDriftReport,
+  GracefulDegradationScore,
+  VendorLockInRiskScore
+} from "./operationalIndependence.js";
 
 export { getLeanAMCProfile } from "./leanAMC.js";
 export type { LeanAMCProfile } from "./leanAMC.js";

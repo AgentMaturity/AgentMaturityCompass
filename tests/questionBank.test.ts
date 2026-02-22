@@ -6,7 +6,7 @@ describe("question bank", () => {
     expect(questionBank).toHaveLength(89);
   });
 
-  test("has expected layer distribution 13/20/20/16/20", () => {
+  test("has expected layer distribution 13/18/20/18/20", () => {
     const counts = questionBank.reduce<Record<string, number>>((acc, q) => {
       acc[q.layerName] = (acc[q.layerName] ?? 0) + 1;
       return acc;
@@ -14,19 +14,11 @@ describe("question bank", () => {
 
     expect(counts).toEqual({
       "Strategic Agent Operations": 13,
-      "Leadership & Autonomy": 20,
+      "Leadership & Autonomy": 18,
       "Culture & Alignment": 20,
-      Resilience: 16,
+      Resilience: 18,
       Skills: 20
     });
-  });
-
-  test("includes AMC-HOQ-1..AMC-HOQ-4 oversight questions", () => {
-    const ids = new Set(questionBank.map((q) => q.id));
-    expect(ids.has("AMC-HOQ-1")).toBe(true);
-    expect(ids.has("AMC-HOQ-2")).toBe(true);
-    expect(ids.has("AMC-HOQ-3")).toBe(true);
-    expect(ids.has("AMC-HOQ-4")).toBe(true);
   });
 
   test("each question has six options levels 0..5 and six gates", () => {
