@@ -89,6 +89,10 @@ import {
   verifyEvidenceBundle
 } from "./bundles/bundle.js";
 import { defaultEvidenceExportPath, exportVerifierEvidence, generateAuditPacket } from "./evidence/index.js";
+import {
+  signArtifactProvenance,
+  verifyArtifactProvenance
+} from "./artifact/artifactProvenance.js";
 import { initCiForAgent, printCiSteps, runBundleGate } from "./ci/gate.js";
 import { applyArchetype, describeArchetype, listArchetypes, previewArchetypeApply } from "./archetypes/index.js";
 import { exportBadge, exportPolicyPack } from "./exports/policyExport.js";
@@ -948,6 +952,10 @@ function loadTemporalDecayRuns(workspace: string, agentId: string, lookbackDays:
     }
   }
   return rows;
+}
+
+function collectOption(value: string, previous: string[]): string[] {
+  return [...previous, value];
 }
 
 const program = new Command();
@@ -2594,6 +2602,7 @@ const incidents = program.command("incidents").description("Incident operations 
 const policy = program.command("policy").description("Policy-as-code operations");
 const governor = program.command("governor").description("Autonomy Governor checks");
 const tools = program.command("tools").description("ToolHub tools config");
+const artifact = program.command("artifact").description("Content provenance signing and verification");
 const workorder = program.command("workorder").description("Signed work order operations");
 const ticket = program.command("ticket").description("Execution ticket operations");
 const gateway = program.command("gateway").description("AMC universal LLM proxy gateway");
@@ -2736,6 +2745,145 @@ evidence
       }
     }
     if (out.status !== "PASS") {
+      process.exit(1);
+    }
+  });
+
+artifact
+  .command("sign")
+  .description("Sign an agent-generated artifact with AMC monitor key provenance")
+  .requiredOption("--file <path>", "artifact file path")
+  .requiredOption("--agent <agentId>", "agent ID")
+  .requiredOption("--model <modelId>", "model ID")
+  .option("--provider <provider>", "model provider")
+  .option("--session <sessionId>", "agent session ID")
+  .option("--runtime <runtime>", "runtime name")
+  .option("--prompt <text>", "prompt text used to generate the artifact")
+  .option("--prompt-file <path>", "path to prompt text file")
+  .option("--prompt-id <id>", "prompt ID")
+  .option("--prompt-ref <ref>", "prompt reference (template/file/url)")
+  .option("--prompt-hash <sha256>", "precomputed prompt sha256")
+  .option("--evidence-event <eventId>", "evidence event ID (repeatable)", collectOption, [] as string[])
+  .option("--evidence-ref <eventId[:eventHash]>", "evidence reference (repeatable)", collectOption, [] as string[])
+  .option("--dataset-sha <sha256>", "evidence dataset sha256")
+  .option("--manifest <path>", "provenance manifest output path override")
+  .option("--signature <path>", "provenance signature output path override")
+  .action((opts: {
+    file: string;
+    agent: string;
+    model: string;
+    provider?: string;
+    session?: string;
+    runtime?: string;
+    prompt?: string;
+    promptFile?: string;
+    promptId?: string;
+    promptRef?: string;
+    promptHash?: string;
+    evidenceEvent: string[];
+    evidenceRef: string[];
+    datasetSha?: string;
+    manifest?: string;
+    signature?: string;
+  }) => {
+    assertOwnerMode(process.cwd(), "artifact sign");
+    const promptText =
+      opts.promptFile && opts.promptFile.trim().length > 0
+        ? readUtf8(resolve(process.cwd(), opts.promptFile))
+        : opts.prompt;
+    const evidenceRefs = opts.evidenceRef
+      .map((entry) => {
+        const [rawEventId, rawHash] = entry.split(":", 2);
+        const eventId = rawEventId?.trim() ?? "";
+        if (!eventId) {
+          return null;
+        }
+        const eventHash = rawHash?.trim();
+        return {
+          eventId,
+          eventHash: eventHash && eventHash.length > 0 ? eventHash : undefined
+        };
+      })
+      .filter((row): row is { eventId: string; eventHash?: string } => row !== null);
+
+    const out = signArtifactProvenance({
+      workspace: process.cwd(),
+      file: opts.file,
+      agentId: opts.agent,
+      modelId: opts.model,
+      provider: opts.provider,
+      sessionId: opts.session,
+      runtime: opts.runtime,
+      promptText,
+      promptId: opts.promptId,
+      promptRef: opts.promptRef,
+      promptTextSha256: opts.promptHash,
+      evidenceEventIds: opts.evidenceEvent,
+      evidenceRefs,
+      evidenceDatasetSha256: opts.datasetSha,
+      manifestFile: opts.manifest,
+      signatureFile: opts.signature
+    });
+
+    console.log(chalk.green("Artifact provenance signed"));
+    console.log(`file: ${out.file}`);
+    console.log(`sha256: ${out.fileSha256}`);
+    console.log(`manifest: ${out.manifestPath}`);
+    console.log(`signature: ${out.signaturePath}`);
+  });
+
+artifact
+  .command("verify")
+  .description("Verify artifact provenance sidecars and detect tampering")
+  .requiredOption("--file <path>", "artifact file path")
+  .option("--manifest <path>", "provenance manifest file path override")
+  .option("--signature <path>", "provenance signature file path override")
+  .option("--prompt <text>", "prompt text to verify against signed prompt hash")
+  .option("--prompt-file <path>", "path to prompt text file for verification")
+  .option("--no-ledger", "skip ledger evidence reference checks")
+  .option("--json", "emit JSON output", false)
+  .action((opts: {
+    file: string;
+    manifest?: string;
+    signature?: string;
+    prompt?: string;
+    promptFile?: string;
+    ledger: boolean;
+    json: boolean;
+  }) => {
+    const promptText =
+      opts.promptFile && opts.promptFile.trim().length > 0
+        ? readUtf8(resolve(process.cwd(), opts.promptFile))
+        : opts.prompt;
+    const result = verifyArtifactProvenance({
+      workspace: process.cwd(),
+      file: opts.file,
+      manifestFile: opts.manifest,
+      signatureFile: opts.signature,
+      promptText,
+      requireLedgerEvidence: opts.ledger
+    });
+
+    if (opts.json) {
+      console.log(JSON.stringify(result, null, 2));
+    } else {
+      console.log(result.ok ? chalk.green("Artifact provenance verification PASSED") : chalk.red("Artifact provenance verification FAILED"));
+      console.log(`file: ${resolve(process.cwd(), opts.file)}`);
+      console.log(`tampered: ${result.tampered ? "yes" : "no"}`);
+      console.log(`manifest: ${result.manifestPath}`);
+      console.log(`signature: ${result.signaturePath}`);
+      if (result.fileSha256) {
+        console.log(`sha256: ${result.fileSha256}`);
+      }
+      if (result.issues.length > 0) {
+        console.log("issues:");
+        for (const issue of result.issues) {
+          console.log(`- [${issue.code}] ${issue.message}`);
+        }
+      }
+    }
+
+    if (!result.ok) {
       process.exit(1);
     }
   });

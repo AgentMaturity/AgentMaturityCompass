@@ -345,6 +345,42 @@ function buildQuestion(seed: QuestionSeed): DiagnosticQuestion {
     gates[5].mustInclude.auditTypes = ["CONTINUOUS_COMPLIANCE_VERIFIED", "FAIRNESS_REMEDIATION_CLOSED"];
   }
 
+  // Provenance controls require cryptographic artifact lineage and tamper checks.
+  if (seed.id === "AMC-PROV-1" || seed.id === "AMC-PROV-2") {
+    gates[3].requiredEvidenceTypes = ["artifact", "audit", "metric"];
+    gates[3].acceptedTrustTiers = ["OBSERVED", "ATTESTED"];
+    gates[3].mustInclude.metaKeys = ["provenance", "agentId"];
+    gates[3].mustInclude.auditTypes = ["CONTENT_PROVENANCE_LINKED"];
+    gates[4].requiredEvidenceTypes = ["artifact", "audit", "metric", "test"];
+    gates[4].requiredTrustTier = "OBSERVED";
+    gates[4].acceptedTrustTiers = ["OBSERVED"];
+    gates[4].mustInclude.metaKeys = ["provenance", "agentId", "modelId"];
+    gates[4].mustInclude.auditTypes = ["CONTENT_PROVENANCE_LINKED", "ARTIFACT_SIGNATURE_VERIFIED"];
+    gates[5].requiredEvidenceTypes = ["artifact", "audit", "metric", "test", "review"];
+    gates[5].requiredTrustTier = "OBSERVED";
+    gates[5].acceptedTrustTiers = ["OBSERVED"];
+    gates[5].mustInclude.metaKeys = ["provenance", "agentId", "modelId", "promptSha256"];
+    gates[5].mustInclude.auditTypes = ["ARTIFACT_SIGNATURE_VERIFIED", "PROVENANCE_CHAIN_VERIFIED"];
+    gates[5].mustInclude.metricKeys = ["artifact_signature_coverage", "provenance_verification_pass_rate"];
+  }
+
+  if (seed.id === "AMC-PROV-2") {
+    gates[4].mustInclude.auditTypes = [
+      ...(gates[4].mustInclude.auditTypes ?? []),
+      "ARTIFACT_TAMPER_DETECTED"
+    ];
+    gates[5].mustInclude.auditTypes = [
+      ...(gates[5].mustInclude.auditTypes ?? []),
+      "ARTIFACT_TAMPER_DETECTED",
+      "ARTIFACT_TAMPER_CONTAINED"
+    ];
+    gates[5].mustInclude.metricKeys = [
+      ...(gates[5].mustInclude.metricKeys ?? []),
+      "artifact_tamper_detection_mttd",
+      "artifact_tamper_false_positive_rate"
+    ];
+  }
+
   return {
     id: seed.id,
     layerName: seed.layerName,
@@ -1793,6 +1829,46 @@ const seeds: QuestionSeed[] = [
     evidenceGateHints: "Require identity audit trail, JIT credential evidence, revocation list.",
     upgradeHints: "Propagate user identity through all tool calls; replace static API keys with JIT tokens; implement revocation.",
     tuningKnobs: ["guardrails.runtimeIdentity", "evalHarness.identityAudit"]
+  },
+  {
+    id: "AMC-PROV-1",
+    layerName: "Resilience",
+    title: "Artifact Provenance Chain Completeness",
+    promptTemplate:
+      "Does every agent-generated artifact carry a complete cryptographic provenance chain (artifact -> agent -> model -> prompt -> evidence) that can be independently verified?",
+    labels: [
+      "No Provenance",
+      "Manual Notes Only",
+      "Partial Metadata",
+      "Signed Artifacts + Basic Chain",
+      "Complete Chain + Deterministic Verification",
+      "Continuously Verified Provenance at Scale"
+    ],
+    evidenceGateHints:
+      "Require signed artifact manifests, chain edge completeness, and verified evidence event references.",
+    upgradeHints:
+      "Adopt mandatory sidecar provenance manifests, enforce chain completeness gates, and verify on every release/output path.",
+    tuningKnobs: ["guardrails.provenance", "evalHarness.provenanceChain"]
+  },
+  {
+    id: "AMC-PROV-2",
+    layerName: "Resilience",
+    title: "Signed Artifact Tamper Detection & Response",
+    promptTemplate:
+      "Can the system detect and contain tampering of signed agent artifacts (content, manifest, signature, or evidence links) with low detection latency and clear remediation?",
+    labels: [
+      "No Tamper Detection",
+      "Manual Integrity Checks",
+      "Periodic Hash Spot-Checks",
+      "Automated Signature Verification",
+      "Real-Time Tamper Alerts + Quarantine",
+      "Tamper-Resilient Supply Chain with Closed-Loop Response"
+    ],
+    evidenceGateHints:
+      "Require tamper simulation tests, signature verification outcomes, and containment/remediation audit evidence.",
+    upgradeHints:
+      "Run routine tamper drills, enforce verify-before-use controls, and track detection/response metrics with post-incident closure.",
+    tuningKnobs: ["guardrails.provenanceTamper", "evalHarness.tamperSimulation"]
   }
 ];
 
