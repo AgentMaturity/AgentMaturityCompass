@@ -119,6 +119,7 @@ import {
   auditBinderCreateCli,
   auditBinderExportExecuteCli,
   auditBinderExportRequestCli,
+  auditEnterpriseExportCli,
   auditBinderVerifyCli,
   auditBindersCli,
   auditInitCli,
@@ -9747,6 +9748,33 @@ audit
     console.log(chalk.green("Audit policy signature verified"));
     console.log(`Path: ${verify.path}`);
     console.log(`Signature: ${verify.sigPath}`);
+  });
+
+audit
+  .command("export")
+  .description("Export enterprise audit logs for Splunk, Datadog, CloudTrail, or Azure Monitor")
+  .requiredOption("--format <format>", "splunk|datadog|cloudtrail|azure")
+  .requiredOption("--output <path>", "output JSON file path")
+  .option("--limit <n>", "maximum events to export", "1000")
+  .action((opts: { format: string; output: string; limit: string }) => {
+    const format = opts.format.toLowerCase();
+    if (!["splunk", "datadog", "cloudtrail", "azure"].includes(format)) {
+      throw new Error("format must be splunk|datadog|cloudtrail|azure");
+    }
+    const limit = Number.parseInt(opts.limit, 10);
+    if (!Number.isFinite(limit) || limit <= 0) {
+      throw new Error("limit must be a positive integer");
+    }
+    const out = auditEnterpriseExportCli({
+      workspace: process.cwd(),
+      format: format as "splunk" | "datadog" | "cloudtrail" | "azure",
+      output: opts.output,
+      limit
+    });
+    console.log(chalk.green("Enterprise audit export complete"));
+    console.log(`format: ${out.format}`);
+    console.log(`output: ${out.outputPath}`);
+    console.log(`events: ${out.eventCount}`);
   });
 
 const auditPolicy = audit.command("policy").description("Audit binder policy operations");

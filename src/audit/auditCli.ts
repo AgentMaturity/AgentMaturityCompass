@@ -1,6 +1,7 @@
 import { resolve } from "node:path";
 import YAML from "yaml";
 import { readUtf8 } from "../utils/fs.js";
+import { exportEnterpriseAudit, type EnterpriseAuditExportFormat } from "./enterpriseAuditExport.js";
 import {
   auditBinderCreateForApi,
   auditBinderExportExecuteForApi,
@@ -232,4 +233,13 @@ export function auditVerifyWorkspaceCli(workspace: string) {
   return verifyAuditWorkspace({
     workspace
   });
+}
+
+export function auditEnterpriseExportCli(params: {
+  workspace: string;
+  format: EnterpriseAuditExportFormat;
+  output: string;
+  limit?: number;
+}) {
+  return exportEnterpriseAudit(params);
 }
