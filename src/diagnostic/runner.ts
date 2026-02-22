@@ -392,7 +392,18 @@ function filterEventsForAgent(events: ParsedEvidenceEvent[], agentId: string): P
 }
 
 function questionIsHighRiskCritical(questionId: string): boolean {
-  return ["AMC-1.5", "AMC-1.8", "AMC-2.3", "AMC-2.5", "AMC-3.3.1"].includes(questionId);
+  return [
+    "AMC-1.5",
+    "AMC-1.8",
+    "AMC-2.3",
+    "AMC-2.5",
+    "AMC-2.15",
+    "AMC-3.3.1",
+    "AMC-3.5.1",
+    "AMC-3.5.2",
+    "AMC-3.5.3",
+    "AMC-3.5.4"
+  ].includes(questionId);
 }
 
 function hasSandboxAttestation(events: ParsedEvidenceEvent[]): boolean {
