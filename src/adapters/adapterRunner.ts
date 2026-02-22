@@ -12,7 +12,7 @@ import { issueLeaseToken } from "../leases/leaseSigner.js";
 import { workspaceIdFromDirectory } from "../workspaces/workspaceId.js";
 import { ensureDir } from "../utils/fs.js";
 import { studioStatus } from "../studio/studioSupervisor.js";
-import { getBuiltInAdapter } from "./registry.js";
+import { getAdapterDefinition } from "./catalog.js";
 import { detectAdapter } from "./adapterDetection.js";
 import { loadAdaptersConfig, verifyAdaptersConfigSignature } from "./adapterConfigStore.js";
 import { assembleAdapterEnv, redactSecretsInText } from "./envAssembler.js";
@@ -101,7 +101,7 @@ export async function runAdapterCommand(input: AdapterRunInput): Promise<Adapter
   const adaptersSig = verifyAdaptersConfigSignature(workspace);
   const profile = adaptersCfg.adapters.perAgent[agentId];
   const adapterId = input.adapterId ?? profile?.preferredAdapter ?? "generic-cli";
-  const adapter = getBuiltInAdapter(adapterId);
+  const adapter = getAdapterDefinition(workspace, adapterId);
   const detection = detectAdapter(adapter);
   const runtimeConfig = loadAMCConfig(workspace);
   const gatewayConfig = loadGatewayConfig(workspace);
@@ -341,7 +341,7 @@ export function initAdapterProjectSample(params: {
   agentId?: string;
   providerRoute?: string;
 }): { dir: string; entry: string } {
-  const adapter = getBuiltInAdapter(params.adapterId);
+  const adapter = getAdapterDefinition(params.workspace, params.adapterId);
   const agentId = resolveAgentId(params.workspace, params.agentId);
   const config = loadAdaptersConfig(params.workspace);
   const route = params.providerRoute ?? config.adapters.perAgent[agentId]?.preferredProviderRoute ?? "/openai";

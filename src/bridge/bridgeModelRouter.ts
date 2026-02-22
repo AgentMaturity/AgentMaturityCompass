@@ -3,6 +3,7 @@ import type { BridgeProvider } from "./bridgeConfigSchema.js";
 export type BridgeRequestKind =
   | "chat_completions"
   | "responses"
+  | "batches"
   | "embeddings"
   | "images"
   | "audio"
@@ -45,6 +46,17 @@ export function matchBridgeRoute(pathname: string): BridgeRouteMatch | null {
     return {
       provider: "openai",
       requestKind: "responses",
+      incomingPath: pathname,
+      gatewayPath: `/openai${stripBridgePrefix(pathname, "openai")}`,
+      modelFromPath: null
+    };
+  }
+
+  const openaiBatches = /^\/bridge\/openai\/v1\/batches$/;
+  if (openaiBatches.test(pathname)) {
+    return {
+      provider: "openai",
+      requestKind: "batches",
       incomingPath: pathname,
       gatewayPath: `/openai${stripBridgePrefix(pathname, "openai")}`,
       modelFromPath: null

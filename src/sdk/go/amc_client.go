@@ -27,6 +27,11 @@ import (
 	"github.com/google/uuid"
 )
 
+const (
+	SDKName    = "amc-go-sdk"
+	SDKVersion = "0.1.0"
+)
+
 // Config holds configuration for the AMC client.
 type Config struct {
 	BridgeURL   string
@@ -42,6 +47,9 @@ type BridgeResponse struct {
 	RequestID     string
 	Receipt       string
 	CorrelationID string
+	Deprecated    bool
+	Sunset        string
+	Warning       string
 }
 
 // OK returns true if the response status is 2xx.
@@ -110,6 +118,8 @@ func (c *Client) callBridge(ctx context.Context, path string, payload any, corre
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", "Bearer "+c.cfg.Token)
 	req.Header.Set("X-Amc-Correlation-Id", correlationID)
+	req.Header.Set("X-Amc-Sdk-Name", SDKName)
+	req.Header.Set("X-Amc-Sdk-Version", SDKVersion)
 	if c.cfg.WorkspaceID != "" {
 		req.Header.Set("X-Amc-Workspace-Id", c.cfg.WorkspaceID)
 	}
@@ -131,6 +141,9 @@ func (c *Client) callBridge(ctx context.Context, path string, payload any, corre
 		RequestID:     resp.Header.Get("X-Amc-Bridge-Request-Id"),
 		Receipt:       resp.Header.Get("X-Amc-Receipt"),
 		CorrelationID: resp.Header.Get("X-Amc-Correlation-Id"),
+		Deprecated:    strings.EqualFold(resp.Header.Get("Deprecation"), "true"),
+		Sunset:        resp.Header.Get("Sunset"),
+		Warning:       resp.Header.Get("Warning"),
 	}, nil
 }
 
@@ -150,6 +163,14 @@ func (c *Client) OpenAIResponses(ctx context.Context, payload map[string]any) (*
 		return nil, err
 	}
 	return c.callBridge(ctx, "/bridge/openai/v1/responses", payload, "")
+}
+
+// OpenAIBatches sends a request to the OpenAI batches endpoint.
+func (c *Client) OpenAIBatches(ctx context.Context, payload map[string]any) (*BridgeResponse, error) {
+	if err := assertNoSelfScoring(payload); err != nil {
+		return nil, err
+	}
+	return c.callBridge(ctx, "/bridge/openai/v1/batches", payload, "")
 }
 
 // AnthropicMessages sends a messages request via the Anthropic provider.

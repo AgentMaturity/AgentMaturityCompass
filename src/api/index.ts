@@ -14,6 +14,7 @@ import { handleProductRoute } from './productRouter.js';
 import { handleAgentTimelineRoute } from './agentTimelineRouter.js';
 import { apiError } from './apiHelpers.js';
 import { buildHealthPayload } from './health.js';
+import { deprecatedBridgeRoute, sdkVersionPolicy } from '../sdk/versioning.js';
 
 export async function handleApiRoute(
   pathname: string,
@@ -36,20 +37,24 @@ export async function handleApiRoute(
     if (pathname.startsWith('/api/v1/agents/'))  return await handleAgentTimelineRoute(pathname, method, req, res, workspace);
 
     // Legacy bridge endpoint redirects — 308 permanent redirect with deprecation headers
-    const LEGACY_BRIDGE_REDIRECTS: Record<string, string> = {
-      '/api/v1/chat/completions': '/bridge/openai/v1/chat/completions',
-      '/api/v1/completions': '/bridge/openai/v1/completions',
-      '/api/v1/embeddings': '/bridge/openai/v1/embeddings',
-    };
-    if (pathname in LEGACY_BRIDGE_REDIRECTS) {
-      const target = LEGACY_BRIDGE_REDIRECTS[pathname];
+    const deprecated = deprecatedBridgeRoute(pathname);
+    if (deprecated) {
+      const sunset = new Date(`${deprecated.sunsetOn}T00:00:00.000Z`).toUTCString();
       res.writeHead(308, {
-        'Location': target,
+        'Location': deprecated.replacementPath,
         'Deprecation': 'true',
-        'Warning': '299 - "Deprecated bridge endpoint; use ' + target + ' instead"',
+        'Sunset': sunset,
+        'Link': `<${sdkVersionPolicy.policyDocPath}>; rel="deprecation"`,
+        'Warning': '299 - "Deprecated bridge endpoint; use ' + deprecated.replacementPath + ' instead"',
         'Content-Type': 'application/json',
       });
-      res.end(JSON.stringify({ error: 'Deprecated endpoint', redirect: target }));
+      res.end(JSON.stringify({
+        error: 'Deprecated endpoint',
+        redirect: deprecated.replacementPath,
+        announcedOn: deprecated.announcedOn,
+        sunsetOn: deprecated.sunsetOn,
+        policy: sdkVersionPolicy.policyDocPath
+      }));
       return true;
     }
 

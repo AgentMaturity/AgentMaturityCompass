@@ -293,6 +293,7 @@ describe("OpenAPI spec generation", () => {
     expect(spec.paths).toHaveProperty("/bridge/telemetry");
     expect(spec.paths).toHaveProperty("/bridge/openai/v1/chat/completions");
     expect(spec.paths).toHaveProperty("/bridge/openai/v1/responses");
+    expect(spec.paths).toHaveProperty("/bridge/openai/v1/batches");
   });
 
   test("includes component schemas", () => {

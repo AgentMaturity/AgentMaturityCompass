@@ -307,6 +307,7 @@ import {
 } from "./federation/federationCli.js";
 import {
   integrationsDispatchCli,
+  integrationsExportJournalCli,
   integrationsInitCli,
   integrationsStatusCli,
   integrationsTestCli,
@@ -7041,6 +7042,19 @@ integrations
       summary: opts.summary
     });
     console.log(JSON.stringify(out, null, 2));
+  });
+
+integrations
+  .command("export-journal")
+  .description("Export integration delivery journal (receipts + dead letters)")
+  .requiredOption("--out <file>", "output JSON file path")
+  .action((opts: { out: string }) => {
+    const out = integrationsExportJournalCli({
+      workspace: process.cwd(),
+      outFile: opts.out
+    });
+    console.log(chalk.green(`Integration delivery journal exported: ${out.outFile}`));
+    console.log(`receipts=${out.receiptCount} deadLetters=${out.deadLetterCount}`);
   });
 
 outcomes

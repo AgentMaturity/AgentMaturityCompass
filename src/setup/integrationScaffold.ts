@@ -711,6 +711,14 @@ export function generateBridgeOpenApiSpec(): OpenApiSpec {
           responses: { "200": { description: "Responses API output" }, "401": { description: "Missing or invalid lease/auth" } },
         },
       },
+      "/bridge/openai/v1/batches": {
+        post: {
+          summary: "OpenAI batch processing via bridge",
+          tags: ["model"],
+          requestBody: { content: { "application/json": { schema: { type: "object" } } } },
+          responses: { "200": { description: "Batch accepted" }, "401": { description: "Missing or invalid lease/auth" } },
+        },
+      },
     },
     components: {
       schemas: {

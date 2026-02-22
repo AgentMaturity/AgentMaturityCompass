@@ -41,6 +41,9 @@ class AMCBridgeResponse:
     request_id: Optional[str] = None
     receipt: Optional[str] = None
     correlation_id: Optional[str] = None
+    deprecated: bool = False
+    sunset: Optional[str] = None
+    warning: Optional[str] = None
 
     @property
     def ok(self) -> bool:
@@ -146,6 +149,8 @@ class AMCClient:
             "Content-Type": "application/json",
             "Authorization": f"Bearer {self.token}",
             "x-amc-correlation-id": correlation_id or str(uuid.uuid4()),
+            "x-amc-sdk-name": "amc-python-sdk",
+            "x-amc-sdk-version": "0.1.0",
         }
         if self.workspace_id:
             headers["x-amc-workspace-id"] = self.workspace_id
@@ -190,6 +195,9 @@ class AMCClient:
                     request_id=resp.headers.get("x-amc-bridge-request-id"),
                     receipt=resp.headers.get("x-amc-receipt"),
                     correlation_id=resp.headers.get("x-amc-correlation-id"),
+                    deprecated=(resp.headers.get("deprecation", "").lower() == "true"),
+                    sunset=resp.headers.get("sunset"),
+                    warning=resp.headers.get("warning"),
                 )
         except urllib.error.HTTPError as e:
             body_bytes = e.read()
@@ -204,6 +212,9 @@ class AMCClient:
                 request_id=e.headers.get("x-amc-bridge-request-id") if e.headers else None,
                 receipt=e.headers.get("x-amc-receipt") if e.headers else None,
                 correlation_id=e.headers.get("x-amc-correlation-id") if e.headers else None,
+                deprecated=((e.headers.get("deprecation", "").lower() == "true") if e.headers else False),
+                sunset=e.headers.get("sunset") if e.headers else None,
+                warning=e.headers.get("warning") if e.headers else None,
             )
 
     # ── Provider methods ──────────────────────────────────────────────
@@ -217,6 +228,11 @@ class AMCClient:
         """Send a request to the OpenAI responses endpoint."""
         _assert_no_self_scoring(payload)
         return self._call_bridge("/bridge/openai/v1/responses", payload, **kwargs)
+
+    def openai_batches(self, payload: dict, **kwargs) -> AMCBridgeResponse:
+        """Send a request to the OpenAI batches endpoint."""
+        _assert_no_self_scoring(payload)
+        return self._call_bridge("/bridge/openai/v1/batches", payload, **kwargs)
 
     def anthropic_messages(self, payload: dict, **kwargs) -> AMCBridgeResponse:
         """Send a messages request via Anthropic provider."""

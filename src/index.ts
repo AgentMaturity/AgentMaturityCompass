@@ -510,9 +510,17 @@ export {
   integrationsVerifyCli,
   integrationsStatusCli,
   integrationsTestCli,
-  integrationsDispatchCli
+  integrationsDispatchCli,
+  integrationsDispatchBatchCli,
+  integrationsRequeueDeadLettersCli,
+  integrationsExportJournalCli,
+  integrationsExportDeliverySnapshotCli
 } from "./integrations/integrationsCli.js";
-export { dispatchIntegrationEvent, dispatchIntegrationTest } from "./integrations/integrationDispatcher.js";
+export {
+  dispatchIntegrationEvent,
+  dispatchIntegrationEventsBatch,
+  dispatchIntegrationTest
+} from "./integrations/integrationDispatcher.js";
 export { verifyOpsReceipt, verifyOpsReceiptForEvent } from "./integrations/opsReceipt.js";
 export { noCodeAdapterAddCli } from "./integrations/noCodeGovernanceCli.js";
 export {
@@ -561,6 +569,42 @@ export type {
   WebhookHttpClient,
   WebhookHttpResponse
 } from "./integrations/webhookDelivery.js";
+export {
+  addIntegrationDeadLetter,
+  exportIntegrationDeliveryJournal,
+  integrationDeliveryJournalPath,
+  listIntegrationDeadLetters,
+  listIntegrationDeliveries,
+  loadIntegrationDeliveryJournal,
+  nextIntegrationChannelSequence,
+  recordIntegrationDelivery,
+  resolveIntegrationDeadLetter
+} from "./integrations/integrationDeliveryStore.js";
+export type {
+  IntegrationDeadLetter,
+  IntegrationDeliveryJournal,
+  IntegrationDeliveryRecord
+} from "./integrations/integrationDeliveryStore.js";
+export {
+  enqueueIntegrationDeliveries,
+  exportIntegrationDeliverySnapshot,
+  getIntegrationDeliveryStatusByQueueId,
+  getIntegrationDeliveryStatusByQueueIds,
+  integrationQueueStats,
+  listIntegrationDeadLetters as listQueueIntegrationDeadLetters,
+  processIntegrationChannelQueue,
+  requeueIntegrationDeadLetters
+} from "./integrations/integrationDeliveryQueue.js";
+export type {
+  IntegrationChannelType,
+  IntegrationDeliveryArtifacts,
+  IntegrationQueueDeliveryStatus,
+  IntegrationQueueItemInput,
+  IntegrationQueueState,
+  IntegrationQueueStats,
+  ProcessIntegrationQueueResult,
+  QueuedIntegrationDelivery
+} from "./integrations/integrationDeliveryQueue.js";
 export { defaultSsoConfig, mapSsoGroupsToRole, normalizeEnterpriseRole, resolveSsoRole } from "./auth/ssoConfig.js";
 export type {
   EnterpriseRole,

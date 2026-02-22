@@ -1,5 +1,3 @@
-import { request as httpRequest } from "node:http";
-import { request as httpsRequest } from "node:https";
 import { randomUUID } from "node:crypto";
 import { canonicalize } from "../utils/json.js";
 import { sha256Hex } from "../utils/hash.js";
@@ -9,6 +7,18 @@ import {
   resolveSecretRef,
   verifyIntegrationsConfigSignature
 } from "./integrationStore.js";
+import {
+  enqueueIntegrationDeliveries,
+  getIntegrationDeliveryStatusByQueueIds,
+  processIntegrationChannelQueue,
+  type IntegrationQueueItemInput
+} from "./integrationDeliveryQueue.js";
+import { appendIntegrationDeadLetter } from "./integrationDeadLetters.js";
+import {
+  addIntegrationDeadLetter,
+  nextIntegrationChannelSequence,
+  recordIntegrationDelivery
+} from "./integrationDeliveryStore.js";
 
 export interface IntegrationDispatchPayload {
   type: "AMC_OPS_EVENT";
@@ -23,44 +33,13 @@ export interface IntegrationDispatchResult {
   channelId: string;
   eventName: string;
   payloadSha256: string;
+  orderedSequence: number | null;
+  attempts: number;
+  deliveryId: string;
   httpStatus: number;
   eventId: string;
   receiptId: string;
   receipt: string;
-}
-
-function requestImpl(url: URL) {
-  return url.protocol === "https:" ? httpsRequest : httpRequest;
-}
-
-const WEBHOOK_TIMEOUT_MS = 10_000;
-
-async function postJson(urlRaw: string, body: string, headers: Record<string, string> = {}): Promise<number> {
-  const url = new URL(urlRaw);
-  return new Promise<number>((resolvePromise, rejectPromise) => {
-    const req = requestImpl(url)(
-      url,
-      {
-        method: "POST",
-        headers: {
-          "content-type": "application/json",
-          "content-length": Buffer.byteLength(body),
-          ...headers
-        }
-      },
-      (res) => {
-        const status = res.statusCode ?? 0;
-        res.resume();
-        res.on("end", () => resolvePromise(status));
-      }
-    );
-    req.setTimeout(WEBHOOK_TIMEOUT_MS, () => {
-      req.destroy(new Error(`integration webhook timeout after ${WEBHOOK_TIMEOUT_MS}ms`));
-    });
-    req.on("error", rejectPromise);
-    req.write(body);
-    req.end();
-  });
 }
 
 function slackWebhookPayload(body: IntegrationDispatchPayload, channel?: string): string {
@@ -103,6 +82,8 @@ function writeIntegrationEvidence(params: {
   agentId: string;
   payloadBody: string;
   payloadSha256: string;
+  orderedSequence: number | null;
+  attempts: number;
   httpStatus: number;
 }): {
   eventId: string;
@@ -131,6 +112,8 @@ function writeIntegrationEvidence(params: {
         channelId: params.channelId,
         eventName: params.eventName,
         payloadSha256: params.payloadSha256,
+        orderedSequence: params.orderedSequence,
+        attempts: params.attempts,
         httpStatus: params.httpStatus,
         agentId: params.agentId
       },
@@ -151,6 +134,148 @@ function writeIntegrationEvidence(params: {
   } finally {
     ledger.close();
   }
+}
+
+const DEFAULT_QUEUE_MAX_ROUNDS = 3;
+const channelProcessingLocks = new Map<string, Promise<void>>();
+
+interface ChannelDeliveryPolicy {
+  ordered: boolean;
+  recordDeadLetters: boolean;
+  maxRounds: number;
+  retry: {
+    maxAttempts?: number;
+    initialBackoffMs?: number;
+    maxBackoffMs?: number;
+    jitterFactor?: number;
+    timeoutMs?: number;
+  };
+}
+
+function mergeChannelDeliveryPolicy(params: {
+  defaults: ReturnType<typeof loadIntegrationsConfig>["integrations"]["defaults"]["delivery"];
+  channel: ReturnType<typeof loadIntegrationsConfig>["integrations"]["channels"][number];
+}): ChannelDeliveryPolicy {
+  const maxRoundsRaw = params.channel.delivery?.maxRounds ?? params.defaults.maxRounds ?? DEFAULT_QUEUE_MAX_ROUNDS;
+  return {
+    ordered: params.channel.delivery?.ordered ?? params.defaults.ordered,
+    recordDeadLetters: params.channel.delivery?.recordDeadLetters ?? params.defaults.recordDeadLetters,
+    maxRounds: Math.max(1, Math.min(20, Math.floor(maxRoundsRaw))),
+    retry: {
+      ...params.defaults.retry,
+      ...(params.channel.delivery?.retry ?? {})
+    }
+  };
+}
+
+async function withChannelProcessingLock<T>(
+  workspace: string,
+  channelId: string,
+  task: () => Promise<T>
+): Promise<T> {
+  const key = `${workspace}::${channelId}`;
+  const previous = channelProcessingLocks.get(key) ?? Promise.resolve();
+  let release!: () => void;
+  const gate = new Promise<void>((resolvePromise) => {
+    release = resolvePromise;
+  });
+  const chain = previous
+    .catch(() => {
+      // Continue processing queue after prior failure.
+    })
+    .then(() => gate);
+  channelProcessingLocks.set(key, chain);
+  await previous.catch(() => {
+    // Preserve strict ordering even after failures.
+  });
+  try {
+    return await task();
+  } finally {
+    release();
+    if (channelProcessingLocks.get(key) === chain) {
+      channelProcessingLocks.delete(key);
+    }
+  }
+}
+
+function buildQueueDeliveries(params: {
+  workspace: string;
+  config: ReturnType<typeof loadIntegrationsConfig>;
+  payload: IntegrationDispatchPayload;
+  standardPayloadBody: string;
+  channels: ReturnType<typeof loadIntegrationsConfig>["integrations"]["channels"];
+  skipped: string[];
+}): {
+  deliveries: IntegrationQueueItemInput[];
+  policiesByChannelId: Map<string, ChannelDeliveryPolicy>;
+} {
+  const deliveries: IntegrationQueueItemInput[] = [];
+  const policiesByChannelId = new Map<string, ChannelDeliveryPolicy>();
+
+  for (const channel of params.channels) {
+    if (!channel.enabled) {
+      params.skipped.push(`${channel.id}:disabled`);
+      continue;
+    }
+    const deliveryPolicy = mergeChannelDeliveryPolicy({
+      defaults: params.config.integrations.defaults.delivery,
+      channel
+    });
+    policiesByChannelId.set(channel.id, deliveryPolicy);
+    const orderedSequence = deliveryPolicy.ordered
+      ? nextIntegrationChannelSequence(params.workspace, channel.id)
+      : null;
+
+    if (channel.type === "webhook") {
+      const secret = resolveSecretRef(params.workspace, channel.secretRef);
+      if (!secret) {
+        params.skipped.push(`${channel.id}:missing-secret`);
+        continue;
+      }
+      deliveries.push({
+        channelId: channel.id,
+        channelType: "webhook",
+        eventName: params.payload.eventName,
+        agentId: params.payload.agentId,
+        payloadBody: params.standardPayloadBody,
+        orderedSequence,
+        destinationUrl: channel.url,
+        secretRef: channel.secretRef,
+        extraHeaders: {
+          "x-amc-channel-id": channel.id
+        },
+        maxRounds: deliveryPolicy.maxRounds
+      });
+      continue;
+    }
+
+    if (channel.type === "slack_webhook") {
+      const webhookUrl = resolveSecretRef(params.workspace, channel.webhookUrlRef);
+      if (!webhookUrl) {
+        params.skipped.push(`${channel.id}:missing-slack-webhook-url`);
+        continue;
+      }
+      deliveries.push({
+        channelId: channel.id,
+        channelType: "slack_webhook",
+        eventName: params.payload.eventName,
+        agentId: params.payload.agentId,
+        payloadBody: slackWebhookPayload(params.payload, channel.channel),
+        orderedSequence,
+        destinationRef: channel.webhookUrlRef,
+        extraHeaders: {
+          "x-amc-channel-id": channel.id
+        },
+        maxRounds: deliveryPolicy.maxRounds
+      });
+      continue;
+    }
+  }
+
+  return {
+    deliveries,
+    policiesByChannelId
+  };
 }
 
 export async function dispatchIntegrationEvent(params: {
@@ -174,6 +299,7 @@ export async function dispatchIntegrationEvent(params: {
     : config.integrations.routing[params.eventName] ?? [];
   const routedSet = new Set(routed);
   const channels = config.integrations.channels.filter((channel) => routedSet.has(channel.id));
+
   const payload: IntegrationDispatchPayload = {
     type: "AMC_OPS_EVENT",
     eventName: params.eventName,
@@ -183,67 +309,191 @@ export async function dispatchIntegrationEvent(params: {
     details: params.details ?? {}
   };
   const standardPayloadBody = canonicalize(payload);
+
   const skipped: string[] = [];
-  const dispatched: IntegrationDispatchResult[] = [];
-  for (const channel of channels) {
-    const channelId = channel.id;
-    if (!channel.enabled) {
-      skipped.push(`${channelId}:disabled`);
-      continue;
-    }
-    try {
-      let payloadBody = standardPayloadBody;
-      let httpStatus = 0;
+  const prepared = buildQueueDeliveries({
+    workspace: params.workspace,
+    config,
+    payload,
+    standardPayloadBody,
+    channels,
+    skipped
+  });
+  const deliveries = prepared.deliveries;
+  const policiesByChannelId = prepared.policiesByChannelId;
 
-      if (channel.type === "webhook") {
-        const secret = resolveSecretRef(params.workspace, channel.secretRef);
-        if (!secret) {
-          skipped.push(`${channelId}:missing-secret`);
-          continue;
-        }
-        httpStatus = await postJson(channel.url, payloadBody, {
-          "x-amc-integration-secret": secret
-        });
-      } else if (channel.type === "slack_webhook") {
-        const webhookUrl = resolveSecretRef(params.workspace, channel.webhookUrlRef);
-        if (!webhookUrl) {
-          skipped.push(`${channelId}:missing-slack-webhook-url`);
-          continue;
-        }
-        payloadBody = slackWebhookPayload(payload, channel.channel);
-        httpStatus = await postJson(webhookUrl, payloadBody);
-      } else {
-        skipped.push(`${channelId}:unsupported-channel-type`);
-        continue;
-      }
+  if (deliveries.length === 0) {
+    return {
+      dispatched: [],
+      skipped
+    };
+  }
 
-      const payloadSha256 = sha256Hex(Buffer.from(payloadBody, "utf8"));
-      const evidence = writeIntegrationEvidence({
-        workspace: params.workspace,
-        channelId,
-        eventName: params.eventName,
-        agentId: params.agentId,
-        payloadBody,
-        payloadSha256,
-        httpStatus
-      });
-      dispatched.push({
-        channelId,
-        eventName: params.eventName,
-        payloadSha256,
-        httpStatus,
-        eventId: evidence.eventId,
-        receiptId: evidence.receiptId,
-        receipt: evidence.receipt
-      });
-    } catch (error) {
-      const reason = error instanceof Error ? error.message : String(error);
-      skipped.push(`${channelId}:dispatch-failed:${reason}`);
+  const queued = enqueueIntegrationDeliveries({
+    workspace: params.workspace,
+    deliveries
+  });
+
+  const channelOrder: string[] = [];
+  for (const delivery of queued) {
+    if (!channelOrder.includes(delivery.channelId)) {
+      channelOrder.push(delivery.channelId);
     }
   }
+
+  for (const channelId of channelOrder) {
+    const channelPolicy = policiesByChannelId.get(channelId);
+    await withChannelProcessingLock(params.workspace, channelId, async () => {
+      await processIntegrationChannelQueue({
+        workspace: params.workspace,
+        channelId,
+        deliveryPolicy: channelPolicy?.retry ?? {},
+        onDelivered: async (input) => {
+          return writeIntegrationEvidence({
+            workspace: params.workspace,
+            channelId: input.channelId,
+            eventName: input.eventName,
+            agentId: input.agentId,
+            payloadBody: input.payloadBody,
+            payloadSha256: input.payloadSha256,
+            orderedSequence: input.orderedSequence,
+            attempts: input.receipt.attempts.length,
+            httpStatus: input.httpStatus
+          });
+        }
+      });
+    });
+  }
+
+  const statuses = getIntegrationDeliveryStatusByQueueIds(
+    params.workspace,
+    queued.map((row) => row.queueId)
+  );
+  const statusByQueueId = new Map(statuses.map((row) => [row.queueId, row]));
+
+  const dispatched: IntegrationDispatchResult[] = [];
+  for (const queuedRow of queued) {
+    const status = statusByQueueId.get(queuedRow.queueId);
+    if (!status) {
+      skipped.push(`${queuedRow.channelId}:dispatch-status-missing`);
+      continue;
+    }
+
+    if (status.deliveryReceipt && (status.state === "DELIVERED" || status.state === "DEAD_LETTER")) {
+      const sequence = status.orderedSequence ?? status.seq;
+      recordIntegrationDelivery({
+        workspace: params.workspace,
+        channelId: status.channelId,
+        eventName: status.eventName,
+        agentId: status.agentId,
+        sequence,
+        payloadSha256: status.payloadSha256,
+        receipt: status.deliveryReceipt
+      });
+      if (status.state === "DEAD_LETTER" && (policiesByChannelId.get(status.channelId)?.recordDeadLetters ?? true)) {
+        addIntegrationDeadLetter({
+          workspace: params.workspace,
+          channelId: status.channelId,
+          eventName: status.eventName,
+          agentId: status.agentId,
+          sequence,
+          payloadSha256: status.payloadSha256,
+          receipt: status.deliveryReceipt
+        });
+        appendIntegrationDeadLetter(params.workspace, {
+          v: 1,
+          deadLetterId: `idl_${status.queueId}`,
+          ts: Date.now(),
+          channelId: status.channelId,
+          eventName: status.eventName,
+          agentId: status.agentId,
+          url: status.deliveryReceipt.url,
+          orderedSequence: sequence,
+          payloadSha256: status.payloadSha256,
+          attemptCount: status.deliveryReceipt.attempts.length,
+          lastHttpStatus: status.lastHttpStatus,
+          reason: status.lastError ?? "dead-letter"
+        });
+      }
+    }
+
+    if (status.state === "DELIVERED") {
+      if (!status.eventId || !status.receiptId || !status.receipt) {
+        skipped.push(`${status.channelId}:dispatch-artifacts-missing`);
+        continue;
+      }
+      dispatched.push({
+        channelId: status.channelId,
+        eventName: status.eventName,
+        payloadSha256: status.payloadSha256,
+        orderedSequence: status.orderedSequence,
+        attempts: status.deliveryReceipt?.attempts.length ?? status.attemptRound,
+        deliveryId: status.deliveryReceipt?.deliveryId ?? `int_${status.queueId}`,
+        httpStatus: status.lastHttpStatus ?? 200,
+        eventId: status.eventId,
+        receiptId: status.receiptId,
+        receipt: status.receipt
+      });
+      continue;
+    }
+
+    if (status.state === "DEAD_LETTER") {
+      skipped.push(`${status.channelId}:dispatch-failed:${status.lastError ?? "dead-letter"}`);
+      continue;
+    }
+
+    skipped.push(`${status.channelId}:queued-pending-ordering`);
+  }
+
   return {
     dispatched,
     skipped
+  };
+}
+
+export async function dispatchIntegrationEventsBatch(params: {
+  workspace: string;
+  events: Array<{
+    eventName: string;
+    agentId: string;
+    summary: string;
+    details?: Record<string, unknown>;
+    forceChannelId?: string;
+  }>;
+}): Promise<{
+  results: Array<{
+    eventName: string;
+    agentId: string;
+    dispatched: IntegrationDispatchResult[];
+    skipped: string[];
+  }>;
+}> {
+  const results: Array<{
+    eventName: string;
+    agentId: string;
+    dispatched: IntegrationDispatchResult[];
+    skipped: string[];
+  }> = [];
+
+  for (const event of params.events) {
+    const out = await dispatchIntegrationEvent({
+      workspace: params.workspace,
+      eventName: event.eventName,
+      agentId: event.agentId,
+      summary: event.summary,
+      details: event.details,
+      forceChannelId: event.forceChannelId
+    });
+    results.push({
+      eventName: event.eventName,
+      agentId: event.agentId,
+      dispatched: out.dispatched,
+      skipped: out.skipped
+    });
+  }
+
+  return {
+    results
   };
 }
 

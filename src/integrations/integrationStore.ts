@@ -48,6 +48,20 @@ function defaultIntegrationsConfig(): IntegrationsConfig {
           enabled: false
         }
       ],
+      defaults: {
+        delivery: {
+          ordered: true,
+          recordDeadLetters: true,
+          maxRounds: 3,
+          retry: {
+            maxAttempts: 5,
+            initialBackoffMs: 250,
+            maxBackoffMs: 10_000,
+            jitterFactor: 0.2,
+            timeoutMs: 10_000
+          }
+        }
+      },
       routing: {
         APPROVAL_REQUEST_CREATED: ["ops-webhook"],
         APPROVAL_QUORUM_MET: ["ops-webhook"],

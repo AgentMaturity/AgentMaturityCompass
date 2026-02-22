@@ -47,3 +47,39 @@ export type {
   WebhookHttpClient,
   WebhookHttpResponse
 } from "./webhookDelivery.js";
+export {
+  addIntegrationDeadLetter,
+  exportIntegrationDeliveryJournal,
+  integrationDeliveryJournalPath,
+  listIntegrationDeadLetters,
+  listIntegrationDeliveries,
+  loadIntegrationDeliveryJournal,
+  nextIntegrationChannelSequence,
+  recordIntegrationDelivery,
+  resolveIntegrationDeadLetter
+} from "./integrationDeliveryStore.js";
+export type {
+  IntegrationDeadLetter,
+  IntegrationDeliveryJournal,
+  IntegrationDeliveryRecord
+} from "./integrationDeliveryStore.js";
+export {
+  enqueueIntegrationDeliveries,
+  exportIntegrationDeliverySnapshot,
+  getIntegrationDeliveryStatusByQueueId,
+  getIntegrationDeliveryStatusByQueueIds,
+  integrationQueueStats,
+  listIntegrationDeadLetters as listQueueDeadLetters,
+  processIntegrationChannelQueue,
+  requeueIntegrationDeadLetters
+} from "./integrationDeliveryQueue.js";
+export type {
+  IntegrationChannelType,
+  IntegrationDeliveryArtifacts,
+  IntegrationQueueDeliveryStatus,
+  IntegrationQueueItemInput,
+  IntegrationQueueState,
+  IntegrationQueueStats,
+  ProcessIntegrationQueueResult,
+  QueuedIntegrationDelivery
+} from "./integrationDeliveryQueue.js";

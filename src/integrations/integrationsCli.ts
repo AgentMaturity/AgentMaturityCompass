@@ -1,4 +1,16 @@
-import { dispatchIntegrationEvent, dispatchIntegrationTest } from "./integrationDispatcher.js";
+import { dispatchIntegrationEvent, dispatchIntegrationEventsBatch, dispatchIntegrationTest } from "./integrationDispatcher.js";
+import {
+  exportIntegrationDeliveryJournal,
+  integrationDeliveryJournalPath,
+  listIntegrationDeadLetters,
+  listIntegrationDeliveries
+} from "./integrationDeliveryStore.js";
+import {
+  exportIntegrationDeliverySnapshot,
+  integrationQueueStats,
+  listIntegrationDeadLetters as listQueueDeadLetters,
+  requeueIntegrationDeadLetters
+} from "./integrationDeliveryQueue.js";
 import {
   initIntegrationsConfig,
   loadIntegrationsConfig,
@@ -24,6 +36,11 @@ export function integrationsVerifyCli(workspace: string): {
 
 export function integrationsStatusCli(workspace: string): {
   signature: ReturnType<typeof verifyIntegrationsConfigSignature>;
+  deliveryJournalPath: string;
+  queueStats: ReturnType<typeof integrationQueueStats>;
+  queueDeadLetters: ReturnType<typeof listQueueDeadLetters>;
+  recentDeliveries: ReturnType<typeof listIntegrationDeliveries>;
+  unresolvedDeadLetters: ReturnType<typeof listIntegrationDeadLetters>;
   channels: Array<{
     id: string;
     type: string;
@@ -44,6 +61,15 @@ export function integrationsStatusCli(workspace: string): {
   }));
   return {
     signature,
+    deliveryJournalPath: integrationDeliveryJournalPath(workspace),
+    queueStats: integrationQueueStats(workspace),
+    queueDeadLetters: listQueueDeadLetters(workspace, { limit: 20 }),
+    recentDeliveries: listIntegrationDeliveries(workspace, 20),
+    unresolvedDeadLetters: listIntegrationDeadLetters({
+      workspace,
+      unresolvedOnly: true,
+      limit: 20
+    }),
     channels
   };
 }
@@ -68,5 +94,61 @@ export async function integrationsDispatchCli(params: {
     agentId: params.agentId,
     summary: params.summary ?? `AMC integration dispatch for ${params.eventName}`,
     details: params.details
+  });
+}
+
+export async function integrationsDispatchBatchCli(params: {
+  workspace: string;
+  events: Array<{
+    eventName: string;
+    agentId: string;
+    summary: string;
+    details?: Record<string, unknown>;
+    forceChannelId?: string;
+  }>;
+}): Promise<ReturnType<typeof dispatchIntegrationEventsBatch>> {
+  return dispatchIntegrationEventsBatch({
+    workspace: params.workspace,
+    events: params.events
+  });
+}
+
+export function integrationsRequeueDeadLettersCli(params: {
+  workspace: string;
+  channelId?: string;
+  limit?: number;
+}): ReturnType<typeof requeueIntegrationDeadLetters> {
+  return requeueIntegrationDeadLetters({
+    workspace: params.workspace,
+    channelId: params.channelId,
+    limit: params.limit
+  });
+}
+
+export function integrationsExportJournalCli(params: {
+  workspace: string;
+  outFile: string;
+}): ReturnType<typeof exportIntegrationDeliveryJournal> {
+  return exportIntegrationDeliveryJournal({
+    workspace: params.workspace,
+    outFile: params.outFile
+  });
+}
+
+export function integrationsExportDeliverySnapshotCli(params: {
+  workspace: string;
+  outFile: string;
+  includeDelivered?: boolean;
+  includePending?: boolean;
+  includeDeadLetters?: boolean;
+  limit?: number;
+}): ReturnType<typeof exportIntegrationDeliverySnapshot> {
+  return exportIntegrationDeliverySnapshot({
+    workspace: params.workspace,
+    outFile: params.outFile,
+    includeDelivered: params.includeDelivered,
+    includePending: params.includePending,
+    includeDeadLetters: params.includeDeadLetters,
+    limit: params.limit
   });
 }

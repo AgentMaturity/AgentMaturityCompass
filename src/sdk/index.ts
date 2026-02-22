@@ -29,6 +29,13 @@ export { createVercelAIFetchBridge } from "./integrations/vercelAiSdk.js";
 export { createLangChainJsBridge } from "./integrations/langchainJs.js";
 export { createLangGraphJsBridge } from "./integrations/langgraphJs.js";
 export { instrumentOpenAIAgentsSdk } from "./integrations/openaiAgentsSdk.js";
+export {
+  deprecatedBridgeRoute,
+  deprecatedBridgeRoutes,
+  sdkVersionPolicy,
+  type DeprecatedBridgeRoute,
+  type SdkVersionPolicy
+} from "./versioning.js";
 
 // ── Framework adapters ────────────────────────────────────────────
 export { FrameworkAdapter, LangChainAdapter, CrewAIAdapter, OpenAIAgentsAdapter, createAdapter } from "./frameworkAdapters.js";

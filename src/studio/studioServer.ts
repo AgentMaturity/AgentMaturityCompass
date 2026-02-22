@@ -927,6 +927,61 @@ function makeRateLimiter(limit: number, intervalMs: number): (key: string) => bo
   };
 }
 
+interface RateLimitDecision {
+  allowed: boolean;
+  limit: number;
+  remaining: number;
+  resetTs: number;
+  retryAfterSeconds: number;
+}
+
+function makeRateLimiterDetailed(limit: number, intervalMs: number): (key: string) => RateLimitDecision {
+  const buckets = new Map<string, { count: number; resetTs: number }>();
+  return (key: string): RateLimitDecision => {
+    const now = Date.now();
+    let bucket = buckets.get(key);
+    if (!bucket || bucket.resetTs <= now) {
+      bucket = {
+        count: 0,
+        resetTs: now + intervalMs
+      };
+      buckets.set(key, bucket);
+    }
+    if (bucket.count >= limit) {
+      return {
+        allowed: false,
+        limit,
+        remaining: 0,
+        resetTs: bucket.resetTs,
+        retryAfterSeconds: Math.max(1, Math.ceil((bucket.resetTs - now) / 1000))
+      };
+    }
+    bucket.count += 1;
+    return {
+      allowed: true,
+      limit,
+      remaining: Math.max(0, limit - bucket.count),
+      resetTs: bucket.resetTs,
+      retryAfterSeconds: 0
+    };
+  };
+}
+
+function setRateLimitHeaders(res: ServerResponse, decision: RateLimitDecision): void {
+  const now = Date.now();
+  const resetAfterSeconds = Math.max(0, Math.ceil((decision.resetTs - now) / 1000));
+  const resetEpochSeconds = Math.max(0, Math.floor(decision.resetTs / 1000));
+  res.setHeader("x-ratelimit-limit", String(decision.limit));
+  res.setHeader("x-ratelimit-remaining", String(decision.remaining));
+  res.setHeader("x-ratelimit-reset", String(resetEpochSeconds));
+  res.setHeader("ratelimit-limit", String(decision.limit));
+  res.setHeader("ratelimit-remaining", String(decision.remaining));
+  res.setHeader("ratelimit-reset", String(resetAfterSeconds));
+  if (!decision.allowed && decision.retryAfterSeconds > 0) {
+    res.setHeader("retry-after", String(decision.retryAfterSeconds));
+  }
+}
+
 function leaseQueryCarrierEnabled(workspace: string): boolean {
   try {
     return loadGatewayConfig(workspace).lease.allowQueryCarrier === true;
@@ -1497,7 +1552,8 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
   const authLimiter = makeRateLimiter(20, 60_000);
   const writeLimiter = makeRateLimiter(180, 60_000);
   const pairRedeemLimiter = makeRateLimiter(40, 60_000);
-  const apiLimiter = makeRateLimiter(240, 60_000);
+  const apiLimiter = makeRateLimiterDetailed(240, 60_000);
+  const privilegedApiLimiter = makeRateLimiterDetailed(600, 60_000);
 
   const emitOrgEvent = (type: Parameters<OrgSseHub["emit"]>[0]["type"], nodeIds?: string[]): void => {
     const config = (() => {
@@ -1715,7 +1771,12 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
 
       // ── AMC REST API v1 ─────────────────────────────────────────────
       if (pathname.startsWith("/api/v1/")) {
-        if (!apiLimiter(`api:${clientIp}`)) {
+        const quotaAuth = authenticate(req, options.workspace, options.token);
+        const quotaKey = quotaAuth?.username ?? quotaAuth?.agentId ?? `ip:${clientIp}`;
+        const privileged = quotaAuth?.isAdmin === true || (quotaAuth?.roles.has("OWNER") ?? false);
+        const quota = (privileged ? privilegedApiLimiter : apiLimiter)(`api:${quotaKey}`);
+        setRateLimitHeaders(res, quota);
+        if (!quota.allowed) {
           json(res, 429, { error: "API rate limit exceeded" });
           return;
         }

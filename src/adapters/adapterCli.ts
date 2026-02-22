@@ -1,6 +1,7 @@
 import { resolve } from "node:path";
 import { resolveAgentId } from "../fleet/paths.js";
-import { listBuiltInAdapters, getBuiltInAdapter, hasBuiltInAdapter } from "./registry.js";
+import { listBuiltInAdapters } from "./registry.js";
+import { getAdapterDefinition, hasAdapterDefinition, listAvailableAdapters } from "./catalog.js";
 import { detectAdapter, type AdapterDetectionResult } from "./adapterDetection.js";
 import { initAdaptersConfig, loadAdaptersConfig, setAgentAdapterProfile, verifyAdaptersConfigSignature } from "./adapterConfigStore.js";
 import { runAdapterCommand, initAdapterProjectSample } from "./adapterRunner.js";
@@ -17,6 +18,7 @@ export function adaptersVerifyCli(workspace: string): ReturnType<typeof verifyAd
 
 export function adaptersListCli(workspace: string): {
   builtins: ReturnType<typeof listBuiltInAdapters>;
+  available: ReturnType<typeof listAvailableAdapters>;
   configured: Array<{ agentId: string; adapterId: string; route: string; model: string; mode: AdapterRunMode }>;
 } {
   const config = loadAdaptersConfig(workspace);
@@ -31,12 +33,14 @@ export function adaptersListCli(workspace: string): {
     .sort((a, b) => a.agentId.localeCompare(b.agentId));
   return {
     builtins: listBuiltInAdapters(),
+    available: listAvailableAdapters(workspace),
     configured
   };
 }
 
-export function adaptersDetectCli(options?: { timeoutMs?: number }): AdapterDetectionResult[] {
-  return listBuiltInAdapters().map((adapter) => detectAdapter(adapter, { timeoutMs: options?.timeoutMs }));
+export function adaptersDetectCli(options?: { workspace?: string; timeoutMs?: number }): AdapterDetectionResult[] {
+  const workspace = options?.workspace ?? process.cwd();
+  return listAvailableAdapters(workspace).map((adapter) => detectAdapter(adapter, { timeoutMs: options?.timeoutMs }));
 }
 
 export function adaptersConfigureCli(params: {
@@ -47,7 +51,7 @@ export function adaptersConfigureCli(params: {
   model: string;
   mode: AdapterRunMode;
 }): { configPath: string; sigPath: string; agentId: string } {
-  if (!hasBuiltInAdapter(params.adapterId)) {
+  if (!hasAdapterDefinition(params.workspace, params.adapterId)) {
     throw new Error(`Unknown adapter: ${params.adapterId}`);
   }
   const agentId = resolveAgentId(params.workspace, params.agentId);
@@ -101,7 +105,7 @@ export function adaptersEnvCli(params: {
   const adapterId = params.adapterId ?? profile?.preferredAdapter ?? "generic-cli";
   const route = profile?.preferredProviderRoute ?? "/openai";
   const model = profile?.preferredModel ?? config.adapters.defaults.modelDefault;
-  const adapter = getBuiltInAdapter(adapterId);
+  const adapter = getAdapterDefinition(params.workspace, adapterId);
   const env = assembleAdapterEnv({
     adapter,
     lease: "${AMC_LEASE}",

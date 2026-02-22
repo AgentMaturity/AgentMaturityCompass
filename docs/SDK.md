@@ -94,6 +94,21 @@ log.Printf("status=%d request_id=%s correlation_id=%s", resp.Status, resp.Reques
 
 ---
 
+## Versioning And Deprecation
+
+- Versioning model:
+  - Node SDK follows the main `agent-maturity-compass` package version.
+  - Python SDK follows `amc-sdk` package SemVer.
+  - Go SDK follows `github.com/anthropic/amc-go-sdk` SemVer tags.
+- Deprecation policy:
+  - Deprecated SDK methods/endpoints receive a `Deprecation: true` response header and warning text.
+  - Sunset date is communicated with `Sunset` response header when applicable.
+  - AMC provides a minimum 180-day migration window before removal of a deprecated API surface.
+  - Breaking removals only happen in the next major SDK/API version.
+- Runtime visibility:
+  - SDK requests send `x-amc-sdk-name` and `x-amc-sdk-version` for version-aware diagnostics.
+  - Response metadata includes deprecation fields (`deprecated`, `warning`, `sunset`) in SDK response wrappers.
+
 ## Exposed Integrations (Node)
 
 - `instrumentOpenAIClient`
@@ -103,6 +118,8 @@ log.Printf("status=%d request_id=%s correlation_id=%s", resp.Status, resp.Reques
 - `createVercelAIFetchBridge`
 - `createLangChainJsBridge`
 - `createLangGraphJsBridge`
+
+Bridge client methods also include `openaiBatches(...)` for OpenAI batch-processing workflows.
 
 ## Safety Defaults
 
