@@ -1620,6 +1620,8 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
             });
           }
         }
+      }).catch(() => {
+        // Scheduler loop is best effort; failures are surfaced via explicit endpoints and subsequent ticks.
       });
     } catch {
       // Scheduler is best effort; readiness and explicit refresh endpoints remain authoritative.

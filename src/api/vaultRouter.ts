@@ -3,7 +3,17 @@
  */
 
 import type { IncomingMessage, ServerResponse } from 'node:http';
-import { bodyJson, apiSuccess, apiError } from './apiHelpers.js';
+import { z } from "zod";
+import { bodyJsonSchema, apiSuccess, apiError, isRequestBodyError } from './apiHelpers.js';
+
+const vaultRedactBodySchema = z.object({
+  text: z.string().min(1),
+  categories: z.array(z.string().trim().min(1)).optional()
+}).strict();
+
+const vaultClassifyBodySchema = z.object({
+  content: z.string().min(1)
+}).strict();
 
 export async function handleVaultRoute(
   pathname: string,
@@ -18,12 +28,15 @@ export async function handleVaultRoute(
 
   if (pathname === '/api/v1/vault/redact' && method === 'POST') {
     try {
-      const body = await bodyJson<{ text: string; categories?: string[] }>(req);
-      if (!body.text) { apiError(res, 400, 'Missing required field: text'); return true; }
+      const body = await bodyJsonSchema(req, vaultRedactBodySchema);
       const { scanForPII } = await import('../vault/dlp.js');
       const scanResult = scanForPII(body.text);
       apiSuccess(res, scanResult);
     } catch (err) {
+      if (isRequestBodyError(err)) {
+        apiError(res, err.statusCode, err.message);
+        return true;
+      }
       apiError(res, 500, err instanceof Error ? err.message : 'Internal error');
     }
     return true;
@@ -31,8 +44,7 @@ export async function handleVaultRoute(
 
   if (pathname === '/api/v1/vault/classify' && method === 'POST') {
     try {
-      const body = await bodyJson<{ content: string }>(req);
-      if (!body.content) { apiError(res, 400, 'Missing required field: content'); return true; }
+      const body = await bodyJsonSchema(req, vaultClassifyBodySchema);
       // Simple classification
       const hasEmail = /[\w.-]+@[\w.-]+\.\w+/.test(body.content);
       const hasPhone = /\b\d{3}[-.]?\d{3}[-.]?\d{4}\b/.test(body.content);
@@ -40,6 +52,10 @@ export async function handleVaultRoute(
       const classification = hasSSN ? 'RESTRICTED' : hasEmail || hasPhone ? 'INTERNAL' : 'PUBLIC';
       apiSuccess(res, { classification, piiDetected: { email: hasEmail, phone: hasPhone, ssn: hasSSN } });
     } catch (err) {
+      if (isRequestBodyError(err)) {
+        apiError(res, err.statusCode, err.message);
+        return true;
+      }
       apiError(res, 500, err instanceof Error ? err.message : 'Internal error');
     }
     return true;

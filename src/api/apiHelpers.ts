@@ -3,23 +3,110 @@
  */
 
 import type { IncomingMessage, ServerResponse } from 'node:http';
+import { ZodError, type ZodType } from "zod";
+
+const MAX_JSON_BODY_BYTES = 1_048_576;
+const DANGEROUS_JSON_KEYS = new Set(["__proto__", "constructor", "prototype"]);
+
+export class RequestBodyError extends Error {
+  readonly statusCode: number;
+
+  constructor(message: string, statusCode = 400) {
+    super(message);
+    this.name = "RequestBodyError";
+    this.statusCode = statusCode;
+  }
+}
+
+export function isRequestBodyError(value: unknown): value is RequestBodyError {
+  return value instanceof RequestBodyError;
+}
+
+function sanitizeParsedJson(value: unknown): unknown {
+  if (Array.isArray(value)) {
+    return value.map((item) => sanitizeParsedJson(item));
+  }
+  if (value && typeof value === "object") {
+    const out: Record<string, unknown> = {};
+    for (const [key, nested] of Object.entries(value as Record<string, unknown>)) {
+      if (DANGEROUS_JSON_KEYS.has(key)) {
+        continue;
+      }
+      out[key] = sanitizeParsedJson(nested);
+    }
+    return out;
+  }
+  return value;
+}
+
+function readBody(req: IncomingMessage): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const chunks: Buffer[] = [];
+    let totalBytes = 0;
+    let settled = false;
+
+    const rejectOnce = (error: unknown): void => {
+      if (settled) {
+        return;
+      }
+      settled = true;
+      reject(error);
+    };
+
+    req.on("data", (chunk: Buffer | string) => {
+      if (settled) {
+        return;
+      }
+      const buf = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk, "utf8");
+      totalBytes += buf.length;
+      if (totalBytes > MAX_JSON_BODY_BYTES) {
+        rejectOnce(new RequestBodyError(`JSON body exceeds ${MAX_JSON_BODY_BYTES} bytes`, 413));
+        req.destroy();
+        return;
+      }
+      chunks.push(buf);
+    });
+
+    req.on("end", () => {
+      if (settled) {
+        return;
+      }
+      settled = true;
+      resolve(Buffer.concat(chunks).toString("utf8"));
+    });
+
+    req.on("error", (error) => {
+      rejectOnce(error);
+    });
+  });
+}
 
 /* ── Parse JSON body ─────────────────────────────────────────────── */
 
 export async function bodyJson<T = unknown>(req: IncomingMessage): Promise<T> {
-  return new Promise((resolve, reject) => {
-    const chunks: Buffer[] = [];
-    req.on('data', (chunk: Buffer) => chunks.push(chunk));
-    req.on('end', () => {
-      try {
-        const raw = Buffer.concat(chunks).toString('utf-8');
-        resolve(raw.length > 0 ? JSON.parse(raw) : ({} as T));
-      } catch (err) {
-        reject(new Error('Invalid JSON body'));
-      }
-    });
-    req.on('error', reject);
-  });
+  const raw = await readBody(req);
+  if (raw.trim().length === 0) {
+    return {} as T;
+  }
+  try {
+    const parsed = JSON.parse(raw) as unknown;
+    return sanitizeParsedJson(parsed) as T;
+  } catch {
+    throw new RequestBodyError("Invalid JSON body");
+  }
+}
+
+export async function bodyJsonSchema<T>(req: IncomingMessage, schema: ZodType<T>): Promise<T> {
+  try {
+    const parsed = await bodyJson<unknown>(req);
+    return schema.parse(parsed);
+  } catch (error) {
+    if (error instanceof ZodError) {
+      const detail = error.issues[0]?.message ?? "request schema mismatch";
+      throw new RequestBodyError(`Invalid request body: ${detail}`);
+    }
+    throw error;
+  }
 }
 
 /* ── Query parameter extraction ──────────────────────────────────── */

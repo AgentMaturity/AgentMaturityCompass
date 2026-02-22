@@ -3,7 +3,20 @@
  */
 
 import type { IncomingMessage, ServerResponse } from 'node:http';
-import { bodyJson, apiSuccess, apiError, pathParam } from './apiHelpers.js';
+import { z } from "zod";
+import { bodyJsonSchema, apiSuccess, apiError, isRequestBodyError, pathParam } from './apiHelpers.js';
+
+const createBatchBodySchema = z.object({
+  name: z.string().trim().min(1),
+  items: z.array(z.unknown()).min(1)
+}).strict();
+
+const submitPortalBodySchema = z.object({
+  name: z.string().trim().min(1),
+  type: z.string().trim().min(1),
+  submittedBy: z.string().trim().min(1),
+  payload: z.record(z.unknown()).optional()
+}).strict();
 
 export async function handleProductRoute(
   pathname: string,
@@ -20,16 +33,16 @@ export async function handleProductRoute(
 
   if (pathname === '/api/v1/product/batch/create' && method === 'POST') {
     try {
-      const body = await bodyJson<{ name: string; items: unknown[] }>(req);
-      if (!body.name || !body.items) {
-        apiError(res, 400, 'Missing required fields: name, items');
-        return true;
-      }
+      const body = await bodyJsonSchema(req, createBatchBodySchema);
       const { BatchProcessor } = await import('../product/batchProcessor.js');
       const bp = new BatchProcessor();
       const batch = bp.createBatch(body.name, body.items);
       apiSuccess(res, batch, 201);
     } catch (err) {
+      if (isRequestBodyError(err)) {
+        apiError(res, err.statusCode, err.message);
+        return true;
+      }
       apiError(res, 500, err instanceof Error ? err.message : 'Internal error');
     }
     return true;
@@ -65,16 +78,16 @@ export async function handleProductRoute(
 
   if (pathname === '/api/v1/product/portal/submit' && method === 'POST') {
     try {
-      const body = await bodyJson<{ name: string; type: string; submittedBy: string; payload?: Record<string, unknown> }>(req);
-      if (!body.name || !body.type || !body.submittedBy) {
-        apiError(res, 400, 'Missing required fields: name, type, submittedBy');
-        return true;
-      }
+      const body = await bodyJsonSchema(req, submitPortalBodySchema);
       const { PortalManager } = await import('../product/portal.js');
       const pm = new PortalManager();
       const job = pm.submitJob(body.name, body.type, body.submittedBy, body.payload);
       apiSuccess(res, job, 201);
     } catch (err) {
+      if (isRequestBodyError(err)) {
+        apiError(res, err.statusCode, err.message);
+        return true;
+      }
       apiError(res, 500, err instanceof Error ? err.message : 'Internal error');
     }
     return true;

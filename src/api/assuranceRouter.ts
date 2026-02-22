@@ -3,13 +3,23 @@
  */
 
 import type { IncomingMessage, ServerResponse } from "node:http";
+import { z } from "zod";
 import {
   assuranceRunDetailForApi,
   assuranceRunForApi,
   assuranceRunsForApi
 } from "../assurance/assuranceControlPlane.js";
 import { listAssurancePacks } from "../assurance/packs/index.js";
-import { apiError, apiSuccess, bodyJson, pathParam } from "./apiHelpers.js";
+import { apiError, apiSuccess, bodyJsonSchema, isRequestBodyError, pathParam } from "./apiHelpers.js";
+
+const assuranceRunBodySchema = z.object({
+  scopeType: z.unknown().optional(),
+  scope: z.unknown().optional(),
+  scopeId: z.unknown().optional(),
+  id: z.unknown().optional(),
+  pack: z.unknown().optional(),
+  windowDays: z.unknown().optional()
+}).strict();
 
 function parseScopeType(raw: unknown): "WORKSPACE" | "NODE" | "AGENT" {
   const normalized = String(raw ?? "WORKSPACE").toUpperCase();
@@ -72,14 +82,7 @@ export async function handleAssuranceRoute(
 
   if (pathname === "/api/v1/assurance" && method === "POST") {
     try {
-      const body = await bodyJson<{
-        scopeType?: unknown;
-        scope?: unknown;
-        scopeId?: unknown;
-        id?: unknown;
-        pack?: unknown;
-        windowDays?: unknown;
-      }>(req);
+      const body = await bodyJsonSchema(req, assuranceRunBodySchema);
       const scopeType = parseScopeType(body.scopeType ?? body.scope);
       const scopeIdRaw = body.scopeId ?? body.id;
       const scopeId = typeof scopeIdRaw === "string" && scopeIdRaw.trim().length > 0 ? scopeIdRaw.trim() : undefined;
@@ -94,6 +97,10 @@ export async function handleAssuranceRoute(
       });
       apiSuccess(res, out);
     } catch (err) {
+      if (isRequestBodyError(err)) {
+        apiError(res, err.statusCode, err.message);
+        return true;
+      }
       apiError(res, 400, err instanceof Error ? err.message : "invalid request");
     }
     return true;

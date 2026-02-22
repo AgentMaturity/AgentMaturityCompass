@@ -25,6 +25,27 @@ interface VaultSession {
 }
 
 const sessions = new Map<string, VaultSession>();
+const UNSAFE_SECRET_KEYS = new Set(["__proto__", "constructor", "prototype"]);
+
+function assertSafeSecretKey(secretKey: string): void {
+  if (!secretKey || secretKey.trim().length === 0) {
+    throw new Error("Secret key is required.");
+  }
+  if (UNSAFE_SECRET_KEYS.has(secretKey)) {
+    throw new Error(`Unsafe secret key: ${secretKey}`);
+  }
+}
+
+function toSafeSecretMap(input: Record<string, string>): Record<string, string> {
+  const out = Object.create(null) as Record<string, string>;
+  for (const [key, value] of Object.entries(input)) {
+    if (UNSAFE_SECRET_KEYS.has(key)) {
+      continue;
+    }
+    out[key] = value;
+  }
+  return out;
+}
 
 export function vaultPaths(workspace: string): {
   vaultFile: string;
@@ -82,7 +103,9 @@ function parseVaultPayload(raw: string): VaultPayload {
     auditorPrivateKeyPem: parsed.auditorPrivateKeyPem,
     leasePrivateKeyPem: typeof parsed.leasePrivateKeyPem === "string" ? parsed.leasePrivateKeyPem : "",
     sessionPrivateKeyPem: typeof parsed.sessionPrivateKeyPem === "string" ? parsed.sessionPrivateKeyPem : "",
-    secrets: typeof parsed.secrets === "object" && parsed.secrets !== null ? (parsed.secrets as Record<string, string>) : {}
+    secrets: typeof parsed.secrets === "object" && parsed.secrets !== null
+      ? toSafeSecretMap(parsed.secrets as Record<string, string>)
+      : (Object.create(null) as Record<string, string>)
   };
 }
 
@@ -164,7 +187,7 @@ export function createVault(params: {
     auditorPrivateKeyPem: params.auditorPrivateKeyPem,
     leasePrivateKeyPem: params.leasePrivateKeyPem,
     sessionPrivateKeyPem: params.sessionPrivateKeyPem,
-    secrets: params.secrets ?? {}
+    secrets: toSafeSecretMap(params.secrets ?? (Object.create(null) as Record<string, string>))
   };
   const encrypted = encryptVaultPayload(Buffer.from(JSON.stringify(payload), "utf8"), passphrase);
   writeFileAtomic(paths.vaultFile, JSON.stringify(encrypted, null, 2), 0o600);
@@ -446,9 +469,7 @@ function rewriteUnlockedVault(workspace: string, payload: VaultPayload): void {
 }
 
 export function setVaultSecret(workspace: string, secretKey: string, value: string): void {
-  if (!secretKey || secretKey.trim().length === 0) {
-    throw new Error("Secret key is required.");
-  }
+  assertSafeSecretKey(secretKey);
   const payload = requireUnlockedPayload(workspace);
   payload.secrets[secretKey] = value;
   rewriteUnlockedVault(workspace, payload);
@@ -457,6 +478,7 @@ export function setVaultSecret(workspace: string, secretKey: string, value: stri
 }
 
 export function getVaultSecret(workspace: string, secretKey: string): string | null {
+  assertSafeSecretKey(secretKey);
   const payload = requireUnlockedPayload(workspace);
   const value = payload.secrets[secretKey];
   return typeof value === "string" ? value : null;

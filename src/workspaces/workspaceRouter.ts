@@ -138,6 +138,30 @@ async function readBody(req: IncomingMessage, maxBytes = 1_048_576): Promise<str
   return Buffer.concat(chunks).toString("utf8");
 }
 
+function readJsonBody<T extends Record<string, unknown>>(raw: string): T {
+  const trimmed = raw.trim();
+  if (trimmed.length === 0) {
+    return Object.create(null) as T;
+  }
+  try {
+    const parsed = JSON.parse(trimmed) as unknown;
+    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+      throw new Error("JSON body must be an object");
+    }
+    return parsed as T;
+  } catch {
+    throw new Error("INVALID_JSON_BODY");
+  }
+}
+
+async function readRequestJsonBody<T extends Record<string, unknown>>(req: IncomingMessage, maxBytes = 1_048_576): Promise<T> {
+  return readJsonBody<T>(await readBody(req, maxBytes));
+}
+
+function isUnsafeObjectKey(key: string): boolean {
+  return key === "__proto__" || key === "constructor" || key === "prototype";
+}
+
 function json(res: ServerResponse, status: number, payload: unknown): void {
   res.statusCode = status;
   res.setHeader("content-type", "application/json");
@@ -525,7 +549,7 @@ function resolveWorkspaceRolesForHostAccess(hostDir: string, workspaceId: string
 }
 
 function parseUrlEncodedForm(raw: string): Record<string, string> {
-  const out: Record<string, string> = {};
+  const out = Object.create(null) as Record<string, string>;
   for (const part of raw.split("&")) {
     if (!part) {
       continue;
@@ -534,7 +558,15 @@ function parseUrlEncodedForm(raw: string): Record<string, string> {
     if (!key) {
       continue;
     }
-    out[decodeURIComponent(key)] = decodeURIComponent(value.replace(/\+/g, " "));
+    try {
+      const decodedKey = decodeURIComponent(key.replace(/\+/g, " "));
+      if (isUnsafeObjectKey(decodedKey)) {
+        continue;
+      }
+      out[decodedKey] = decodeURIComponent(value.replace(/\+/g, " "));
+    } catch {
+      continue;
+    }
   }
   return out;
 }
@@ -681,10 +713,10 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
       }
 
       if ((pathname === "/host/api/login" || pathname === "/host/api/auth/login") && req.method === "POST") {
-        const body = JSON.parse(await readBody(req, options.maxRequestBytes ?? 1_048_576)) as {
+        const body = await readRequestJsonBody<{
           username?: unknown;
           password?: unknown;
-        };
+        }>(req, options.maxRequestBytes ?? 1_048_576);
         const username = typeof body.username === "string" ? body.username : "";
         const password = typeof body.password === "string" ? body.password : "";
 
@@ -1099,10 +1131,10 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
           json(res, auth.status, { error: auth.error ?? "host admin required" });
           return;
         }
-        const body = JSON.parse(await readBody(req, options.maxRequestBytes ?? 1_048_576)) as {
+        const body = await readRequestJsonBody<{
           workspaceId?: unknown;
           name?: unknown;
-        };
+        }>(req, options.maxRequestBytes ?? 1_048_576);
         const workspaceId = normalizeWorkspaceId(typeof body.workspaceId === "string" ? body.workspaceId : "");
         const name = typeof body.name === "string" && body.name.trim().length > 0 ? body.name.trim() : workspaceId;
         const created = createWorkspaceRecord({
@@ -1147,7 +1179,7 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
           json(res, auth.status, { error: auth.error ?? "host admin required" });
           return;
         }
-        const body = JSON.parse(await readBody(req, options.maxRequestBytes ?? 1_048_576)) as { workspaceId?: unknown };
+        const body = await readRequestJsonBody<{ workspaceId?: unknown }>(req, options.maxRequestBytes ?? 1_048_576);
         const workspaceId = normalizeWorkspaceId(typeof body.workspaceId === "string" ? body.workspaceId : "");
         const from = hostWorkspaceDir(options.hostDir, workspaceId);
         const to = `${hostDeletedWorkspacesDir(options.hostDir)}/${workspaceId}_${Date.now()}`;
@@ -1175,11 +1207,11 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
           json(res, auth.status, { error: auth.error ?? "host admin required" });
           return;
         }
-        const body = JSON.parse(await readBody(req, options.maxRequestBytes ?? 1_048_576)) as {
+        const body = await readRequestJsonBody<{
           username?: unknown;
           password?: unknown;
           isHostAdmin?: unknown;
-        };
+        }>(req, options.maxRequestBytes ?? 1_048_576);
         const created = createHostUser({
           hostDir: options.hostDir,
           username: typeof body.username === "string" ? body.username : "",
@@ -1200,7 +1232,7 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
           json(res, auth.status, { error: auth.error ?? "host admin required" });
           return;
         }
-        const body = JSON.parse(await readBody(req, options.maxRequestBytes ?? 1_048_576)) as { username?: unknown };
+        const body = await readRequestJsonBody<{ username?: unknown }>(req, options.maxRequestBytes ?? 1_048_576);
         const username = typeof body.username === "string" ? body.username : "";
         disableHostUser(options.hostDir, username);
         appendHostAudit(options.hostDir, "USER_DISABLED", auth.username, { username });
@@ -1214,11 +1246,11 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
           json(res, auth.status, { error: auth.error ?? "host admin required" });
           return;
         }
-        const body = JSON.parse(await readBody(req, options.maxRequestBytes ?? 1_048_576)) as {
+        const body = await readRequestJsonBody<{
           username?: unknown;
           workspaceId?: unknown;
           role?: unknown;
-        };
+        }>(req, options.maxRequestBytes ?? 1_048_576);
         grantMembership({
           hostDir: options.hostDir,
           username: typeof body.username === "string" ? body.username : "",
@@ -1240,11 +1272,11 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
           json(res, auth.status, { error: auth.error ?? "host admin required" });
           return;
         }
-        const body = JSON.parse(await readBody(req, options.maxRequestBytes ?? 1_048_576)) as {
+        const body = await readRequestJsonBody<{
           username?: unknown;
           workspaceId?: unknown;
           role?: unknown;
-        };
+        }>(req, options.maxRequestBytes ?? 1_048_576);
         revokeMembershipRole({
           hostDir: options.hostDir,
           username: typeof body.username === "string" ? body.username : "",
@@ -1332,7 +1364,10 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
           username = hostAccess.username;
           roles = resolveWorkspaceRolesForHostAccess(options.hostDir, urlWorkspaceId, hostAccess);
         } else {
-          const body = JSON.parse(await readBody(req, options.maxRequestBytes ?? 1_048_576)) as { username?: unknown; password?: unknown };
+          const body = await readRequestJsonBody<{ username?: unknown; password?: unknown }>(
+            req,
+            options.maxRequestBytes ?? 1_048_576
+          );
           const inputUsername = typeof body.username === "string" ? body.username : "";
           const inputPassword = typeof body.password === "string" ? body.password : "";
           const auth = authenticateHostUser({
@@ -1471,7 +1506,16 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
       const runtime = await ensureWorkspaceApi(effectiveWorkspaceId);
       await proxyToWorkspace(req, res, runtime, workspacePath);
     } catch (error) {
-      json(res, 500, { error: String(error) });
+      const message = error instanceof Error ? error.message : String(error);
+      if (message === "PAYLOAD_TOO_LARGE") {
+        json(res, 413, { error: "payload too large" });
+        return;
+      }
+      if (message === "INVALID_JSON_BODY") {
+        json(res, 400, { error: "invalid JSON body" });
+        return;
+      }
+      json(res, 500, { error: message });
     }
   });
 

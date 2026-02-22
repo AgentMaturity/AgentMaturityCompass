@@ -89,6 +89,18 @@ const MODULE_MITRE_MAP: Record<string, MITRECategory> = {
   S3: MITRECategory.lateral_movement,
 };
 
+function parseMetaJson(metaJson: string): Record<string, unknown> | undefined {
+  try {
+    const parsed = JSON.parse(metaJson) as unknown;
+    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+      return undefined;
+    }
+    return parsed as Record<string, unknown>;
+  } catch {
+    return undefined;
+  }
+}
+
 export function mapToMITRE(moduleCode: string, _decision: string): MITRECategory {
   return MODULE_MITRE_MAP[moduleCode] ?? MITRECategory.execution;
 }
@@ -148,6 +160,6 @@ export function readRecentGuardEvents(windowHours: number): AuditEvent[] {
     resource: r.module_code,
     outcome: r.decision,
     severity: r.severity,
-    metadata: r.meta_json ? JSON.parse(r.meta_json) : undefined,
+    metadata: r.meta_json ? parseMetaJson(r.meta_json) : undefined,
   }));
 }

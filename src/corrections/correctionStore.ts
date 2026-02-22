@@ -1,5 +1,6 @@
 import Database from "better-sqlite3";
 import { randomUUID } from "node:crypto";
+import { z } from "zod";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { getPrivateKeyPem, signHexDigest } from "../crypto/keys.js";
@@ -262,6 +263,64 @@ export interface MarkLinkedEvidenceResult {
   markedCount: number;
 }
 
+const correctionTriggerTypeSchema = z.enum([
+  "OWNER_MANUAL",
+  "ASSURANCE_FAILURE",
+  "DRIFT_EVENT",
+  "EXPERIMENT_RESULT",
+  "INCIDENT_RESPONSE",
+  "POLICY_CHANGE"
+]);
+
+const correctionStatusSchema = z.enum([
+  "APPLIED",
+  "PENDING_VERIFICATION",
+  "VERIFIED_EFFECTIVE",
+  "VERIFIED_INEFFECTIVE",
+  "SUPERSEDED"
+]);
+
+const correctionDbRowSchema = z.object({
+  correction_id: z.string(),
+  agent_id: z.string(),
+  trigger_type: correctionTriggerTypeSchema,
+  trigger_id: z.string(),
+  question_ids_json: z.string(),
+  correction_description: z.string(),
+  applied_action: z.string(),
+  status: correctionStatusSchema,
+  baseline_run_id: z.string(),
+  baseline_levels_json: z.string(),
+  verification_run_id: z.string().nullable(),
+  verification_levels_json: z.string().nullable(),
+  effectiveness_score: z.number().nullable(),
+  verified_ts: z.number().nullable(),
+  verified_by: z.string().nullable(),
+  created_ts: z.number(),
+  updated_ts: z.number(),
+  prev_correction_hash: z.string(),
+  correction_hash: z.string(),
+  signature: z.string()
+});
+
+const correctionQuestionIdsSchema = z.array(z.string());
+const correctionLevelsSchema = z.record(z.number());
+
+function parseJsonField<T>(fieldName: string, raw: string, schema: z.ZodType<T>): T {
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(raw) as unknown;
+  } catch {
+    throw new Error(`Invalid ${fieldName}: malformed JSON`);
+  }
+  const result = schema.safeParse(parsed);
+  if (!result.success) {
+    const detail = result.error.issues[0]?.message ?? "schema mismatch";
+    throw new Error(`Invalid ${fieldName}: ${detail}`);
+  }
+  return result.data;
+}
+
 export function markLinkedEvidenceAsCorrected(
   db: Database.Database,
   params: {
@@ -339,27 +398,30 @@ export function markLinkedEvidenceAsCorrected(
 }
 
 function rowToCorrection(row: Record<string, unknown>): CorrectionEvent {
+  const parsedRow = correctionDbRowSchema.parse(row);
   return {
-    correctionId: row.correction_id as string,
-    agentId: row.agent_id as string,
-    triggerType: row.trigger_type as any,
-    triggerId: row.trigger_id as string,
-    questionIds: JSON.parse(row.question_ids_json as string),
-    correctionDescription: row.correction_description as string,
-    appliedAction: row.applied_action as string,
-    status: row.status as CorrectionStatus,
-    baselineRunId: row.baseline_run_id as string,
-    baselineLevels: JSON.parse(row.baseline_levels_json as string),
-    verificationRunId: row.verification_run_id as string | null,
-    verificationLevels: row.verification_levels_json ? JSON.parse(row.verification_levels_json as string) : null,
-    effectivenessScore: row.effectiveness_score as number | null,
-    verifiedTs: row.verified_ts as number | null,
-    verifiedBy: row.verified_by as string | null,
-    createdTs: row.created_ts as number,
-    updatedTs: row.updated_ts as number,
-    prev_correction_hash: row.prev_correction_hash as string,
-    correction_hash: row.correction_hash as string,
-    signature: row.signature as string
+    correctionId: parsedRow.correction_id,
+    agentId: parsedRow.agent_id,
+    triggerType: parsedRow.trigger_type,
+    triggerId: parsedRow.trigger_id,
+    questionIds: parseJsonField("question_ids_json", parsedRow.question_ids_json, correctionQuestionIdsSchema),
+    correctionDescription: parsedRow.correction_description,
+    appliedAction: parsedRow.applied_action,
+    status: parsedRow.status as CorrectionStatus,
+    baselineRunId: parsedRow.baseline_run_id,
+    baselineLevels: parseJsonField("baseline_levels_json", parsedRow.baseline_levels_json, correctionLevelsSchema),
+    verificationRunId: parsedRow.verification_run_id,
+    verificationLevels: parsedRow.verification_levels_json
+      ? parseJsonField("verification_levels_json", parsedRow.verification_levels_json, correctionLevelsSchema)
+      : null,
+    effectivenessScore: parsedRow.effectiveness_score,
+    verifiedTs: parsedRow.verified_ts,
+    verifiedBy: parsedRow.verified_by,
+    createdTs: parsedRow.created_ts,
+    updatedTs: parsedRow.updated_ts,
+    prev_correction_hash: parsedRow.prev_correction_hash,
+    correction_hash: parsedRow.correction_hash,
+    signature: parsedRow.signature
   };
 }
 
@@ -372,7 +434,7 @@ export function getCorrectionsByAgent(
   status?: CorrectionStatus
 ): CorrectionEvent[] {
   let query = "SELECT * FROM corrections WHERE agent_id = ?";
-  const params: any[] = [agentId];
+  const params: unknown[] = [agentId];
 
   if (status) {
     query += " AND status = ?";

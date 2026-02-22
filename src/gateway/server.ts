@@ -61,7 +61,7 @@ interface ParsedJsonInfo {
 }
 
 function toHeaderObject(headers: IncomingHttpHeaders): Record<string, string | string[] | undefined> {
-  const out: Record<string, string | string[] | undefined> = {};
+  const out = Object.create(null) as Record<string, string | string[] | undefined>;
   for (const [key, value] of Object.entries(headers)) {
     out[key] = value;
   }
@@ -132,7 +132,7 @@ function routePath(pathname: string, route: GatewayConfig["routes"][number]): st
 }
 
 function normalizeResponseHeaders(headers: IncomingHttpHeaders): Record<string, string> {
-  const out: Record<string, string> = {};
+  const out = Object.create(null) as Record<string, string>;
   for (const [key, value] of Object.entries(headers)) {
     if (typeof value === "undefined") {
       continue;

@@ -1,11 +1,17 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
-import { apiError, apiSuccess, bodyJson, pathParam } from "./apiHelpers.js";
+import { z } from "zod";
+import { apiError, apiSuccess, bodyJsonSchema, isRequestBodyError, pathParam } from "./apiHelpers.js";
 import {
   passportPublicForApi,
   passportRegistryForApi,
   passportRevokeForApi,
   passportVerifyPublicForApi
 } from "../passport/passportApi.js";
+
+const passportRevokeBodySchema = z.object({
+  reason: z.string().trim().min(1).optional(),
+  revokedBy: z.string().trim().min(1).optional()
+}).strict();
 
 function firstHeader(value: string | string[] | undefined): string | null {
   if (Array.isArray(value)) {
@@ -71,17 +77,20 @@ export async function handlePassportRoute(
         return true;
       }
     }
-    let body: { reason?: string; revokedBy?: string } = {};
+    let body: z.infer<typeof passportRevokeBodySchema> = {};
     try {
-      body = await bodyJson<{ reason?: string; revokedBy?: string }>(req);
-    } catch {
-      body = {};
+      body = await bodyJsonSchema(req, passportRevokeBodySchema);
+    } catch (error) {
+      if (isRequestBodyError(error)) {
+        apiError(res, error.statusCode, error.message);
+        return true;
+      }
     }
     const result = passportRevokeForApi({
       workspace,
       passportId: decodeURIComponent(revokeParams.id ?? ""),
-      reason: typeof body.reason === "string" ? body.reason : null,
-      revokedBy: typeof body.revokedBy === "string" ? body.revokedBy : null
+      reason: body.reason ?? null,
+      revokedBy: body.revokedBy ?? null
     });
     if (!result) {
       apiError(res, 404, "Passport not found");

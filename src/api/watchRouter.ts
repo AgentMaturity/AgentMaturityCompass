@@ -3,7 +3,8 @@
  */
 
 import type { IncomingMessage, ServerResponse } from 'node:http';
-import { bodyJson, apiSuccess, apiError, pathParam, queryParam } from './apiHelpers.js';
+import { z } from "zod";
+import { bodyJsonSchema, apiSuccess, apiError, isRequestBodyError, pathParam, queryParam } from './apiHelpers.js';
 
 interface WatchRouteOptions {
   workspace?: string;
@@ -31,6 +32,12 @@ interface OutcomeReceiptRow {
   receipt_id: string;
   receipt: string;
 }
+
+const attestBodySchema = z.object({
+  output: z.string().min(1),
+  agentId: z.string().trim().min(1),
+  metadata: z.record(z.unknown()).optional()
+}).strict();
 
 function parseMeta(metaJson: string): Record<string, unknown> {
   try {
@@ -61,15 +68,15 @@ export async function handleWatchRoute(
 
   if (pathname === '/api/v1/watch/attest' && method === 'POST') {
     try {
-      const body = await bodyJson<{ output: string; agentId: string; metadata?: Record<string, unknown> }>(req);
-      if (!body.output || !body.agentId) {
-        apiError(res, 400, 'Missing required fields: output, agentId');
-        return true;
-      }
+      const body = await bodyJsonSchema(req, attestBodySchema);
       const { attestOutput } = await import('../watch/outputAttestation.js');
       const result = attestOutput(body.output);
       apiSuccess(res, { ...result, agentId: body.agentId });
     } catch (err) {
+      if (isRequestBodyError(err)) {
+        apiError(res, err.statusCode, err.message);
+        return true;
+      }
       apiError(res, 500, err instanceof Error ? err.message : 'Internal error');
     }
     return true;

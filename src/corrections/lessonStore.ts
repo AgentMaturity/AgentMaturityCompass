@@ -8,11 +8,12 @@
 import Database from "better-sqlite3";
 import { randomUUID } from "node:crypto";
 import { join } from "node:path";
+import { z } from "zod";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { signHexDigest, getPrivateKeyPem } from "../crypto/keys.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
-import type { CorrectionEvent } from "./correctionTypes.js";
+import { getCorrectionById } from "./correctionStore.js";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -40,6 +41,37 @@ export interface LessonPromotionResult {
   merged: boolean;
 }
 
+const lessonSchema = z.object({
+  lessonId: z.string(),
+  patternDescription: z.string(),
+  affectedQuestions: z.array(z.string()),
+  remediationSteps: z.array(z.string()),
+  effectivenessScore: z.number(),
+  occurrenceCount: z.number().int().nonnegative(),
+  agentsAffected: z.array(z.string()),
+  sourceCorrectionIds: z.array(z.string()),
+  createdTs: z.number(),
+  updatedTs: z.number(),
+  prev_lesson_hash: z.string(),
+  lesson_hash: z.string(),
+  signature: z.string()
+}).strict();
+
+function parseLessonJson(raw: string, source: string): Lesson {
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(raw) as unknown;
+  } catch {
+    throw new Error(`Invalid lesson JSON in ${source}`);
+  }
+  const result = lessonSchema.safeParse(parsed);
+  if (!result.success) {
+    const detail = result.error.issues[0]?.message ?? "schema mismatch";
+    throw new Error(`Invalid lesson format in ${source}: ${detail}`);
+  }
+  return result.data;
+}
+
 // ---------------------------------------------------------------------------
 // File-based Lesson Store (.amc/corrections/lessons/)
 // ---------------------------------------------------------------------------
@@ -59,14 +91,14 @@ export function loadAllLessons(workspace: string): Lesson[] {
   const files = readdirSync(dir).filter((f: string) => f.endsWith(".json"));
   return files.map((f: string) => {
     const content = readUtf8(join(dir, f));
-    return JSON.parse(content) as Lesson;
+    return parseLessonJson(content, join(dir, f));
   });
 }
 
 export function loadLesson(workspace: string, lessonId: string): Lesson | null {
   const file = lessonFilePath(workspace, lessonId);
   if (!pathExists(file)) return null;
-  return JSON.parse(readUtf8(file)) as Lesson;
+  return parseLessonJson(readUtf8(file), file);
 }
 
 function getLastLessonHash(workspace: string): string {
@@ -110,34 +142,10 @@ export function promoteCorrection(
   correctionId: string,
   workspace: string,
 ): LessonPromotionResult {
-  const stmt = db.prepare("SELECT * FROM corrections WHERE correction_id = ?");
-  const row = stmt.get(correctionId) as Record<string, unknown> | undefined;
-  if (!row) {
+  const correction = getCorrectionById(db, correctionId);
+  if (!correction) {
     throw new Error(`Correction not found: ${correctionId}`);
   }
-
-  const correction: CorrectionEvent = {
-    correctionId: row.correction_id as string,
-    agentId: row.agent_id as string,
-    triggerType: row.trigger_type as any,
-    triggerId: row.trigger_id as string,
-    questionIds: JSON.parse(row.question_ids_json as string),
-    correctionDescription: row.correction_description as string,
-    appliedAction: row.applied_action as string,
-    status: row.status as any,
-    baselineRunId: row.baseline_run_id as string,
-    baselineLevels: JSON.parse(row.baseline_levels_json as string),
-    verificationRunId: row.verification_run_id as string | null,
-    verificationLevels: row.verification_levels_json ? JSON.parse(row.verification_levels_json as string) : null,
-    effectivenessScore: row.effectiveness_score as number | null,
-    verifiedTs: row.verified_ts as number | null,
-    verifiedBy: row.verified_by as string | null,
-    createdTs: row.created_ts as number,
-    updatedTs: row.updated_ts as number,
-    prev_correction_hash: row.prev_correction_hash as string,
-    correction_hash: row.correction_hash as string,
-    signature: row.signature as string,
-  };
 
   // Check if an existing lesson covers similar questions
   const existingLessons = loadAllLessons(workspace);

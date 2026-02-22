@@ -3,7 +3,8 @@
  */
 
 import type { IncomingMessage, ServerResponse } from 'node:http';
-import { bodyJson, apiSuccess, apiError, pathParam } from './apiHelpers.js';
+import { z } from "zod";
+import { bodyJsonSchema, apiSuccess, apiError, isRequestBodyError, pathParam } from './apiHelpers.js';
 import {
   countActiveScoreSessions,
   createScoreSession,
@@ -12,6 +13,17 @@ import {
   recordScoreAnswer,
 } from './scoreStore.js';
 import { queueScoreComputationMetric } from '../observability/otelExporter.js';
+
+const createScoreSessionBodySchema = z.object({
+  agentId: z.string().trim().min(1)
+}).strict();
+
+const scoreAnswerBodySchema = z.object({
+  sessionId: z.string().trim().min(1),
+  questionId: z.string().trim().min(1),
+  value: z.number().finite(),
+  notes: z.string().optional()
+}).strict();
 
 export async function handleScoreRoute(
   pathname: string,
@@ -28,11 +40,14 @@ export async function handleScoreRoute(
   // POST /api/v1/score/session — create diagnostic session
   if (pathname === '/api/v1/score/session' && method === 'POST') {
     try {
-      const body = await bodyJson<{ agentId: string }>(req);
-      if (!body.agentId) { apiError(res, 400, 'Missing required field: agentId'); return true; }
+      const body = await bodyJsonSchema(req, createScoreSessionBodySchema);
       const session = createScoreSession(workspace, body.agentId);
       apiSuccess(res, { sessionId: session.id, agentId: session.agentId }, 201);
     } catch (err) {
+      if (isRequestBodyError(err)) {
+        apiError(res, err.statusCode, err.message);
+        return true;
+      }
       apiError(res, 500, err instanceof Error ? err.message : 'Internal error');
     }
     return true;
@@ -61,11 +76,7 @@ export async function handleScoreRoute(
   // POST /api/v1/score/answer
   if (pathname === '/api/v1/score/answer' && method === 'POST') {
     try {
-      const body = await bodyJson<{ sessionId: string; questionId: string; value: number; notes?: string }>(req);
-      if (!body.sessionId || !body.questionId || body.value === undefined) {
-        apiError(res, 400, 'Missing required fields: sessionId, questionId, value');
-        return true;
-      }
+      const body = await bodyJsonSchema(req, scoreAnswerBodySchema);
       const session = recordScoreAnswer({
         workspace,
         sessionId: body.sessionId,
@@ -76,6 +87,10 @@ export async function handleScoreRoute(
       if (!session) { apiError(res, 404, 'Session not found'); return true; }
       apiSuccess(res, { recorded: true, answeredCount: Object.keys(session.answers).length });
     } catch (err) {
+      if (isRequestBodyError(err)) {
+        apiError(res, err.statusCode, err.message);
+        return true;
+      }
       apiError(res, 500, err instanceof Error ? err.message : 'Internal error');
     }
     return true;

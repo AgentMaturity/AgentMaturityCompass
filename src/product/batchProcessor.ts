@@ -58,6 +58,25 @@ export interface BatchResult {
   durationMs: number;
 }
 
+function parseJsonUnknown(raw: unknown): unknown {
+  if (typeof raw !== "string" || raw.trim().length === 0) {
+    return undefined;
+  }
+  try {
+    return JSON.parse(raw);
+  } catch {
+    return undefined;
+  }
+}
+
+function parseJsonRecord(raw: unknown): Record<string, unknown> {
+  const parsed = parseJsonUnknown(raw);
+  if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+    return {};
+  }
+  return parsed as Record<string, unknown>;
+}
+
 /* ── Schema ──────────────────────────────────────────────────────── */
 
 function ensureSchema(): void {
@@ -131,7 +150,7 @@ export class BatchProcessor {
       createdAt: row.created_at as string,
       startedAt: row.started_at as string | undefined,
       completedAt: row.completed_at as string | undefined,
-      metadata: JSON.parse((row.metadata as string) || '{}'),
+      metadata: parseJsonRecord(row.metadata),
     };
   }
 
@@ -264,7 +283,7 @@ export class BatchProcessor {
       failedItems: batch.failedItems,
       results: items.map(i => ({
         itemId: i.id as string,
-        result: i.result ? JSON.parse(i.result as string) : undefined,
+        result: parseJsonUnknown(i.result),
         error: i.error as string | undefined,
       })),
       durationMs: endMs - startMs,

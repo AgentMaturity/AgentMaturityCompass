@@ -4,6 +4,7 @@
 
 import { randomUUID } from "node:crypto";
 import type { IncomingMessage, ServerResponse } from "node:http";
+import { z } from "zod";
 import { getPrivateKeyPem, signHexDigest } from "../crypto/keys.js";
 import { createIncidentStore, computeIncidentHash } from "../incidents/incidentStore.js";
 import type { Incident, IncidentSeverity, IncidentState } from "../incidents/incidentTypes.js";
@@ -11,7 +12,7 @@ import { openLedger } from "../ledger/ledger.js";
 import { queueIncidentLog } from "../observability/otelExporter.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
-import { apiError, apiSuccess, bodyJson, pathParam, queryParam } from "./apiHelpers.js";
+import { RequestBodyError, apiError, apiSuccess, bodyJsonSchema, isRequestBodyError, pathParam, queryParam } from "./apiHelpers.js";
 
 const CLOSED_INCIDENT_STATES = new Set<IncidentState>(["RESOLVED", "POSTMORTEM"]);
 const VALID_INCIDENT_STATES = new Set<IncidentState>(["OPEN", "INVESTIGATING", "MITIGATED", "RESOLVED", "POSTMORTEM"]);
@@ -24,6 +25,30 @@ const VALID_TRIGGER_TYPES = new Set<Incident["triggerType"]>([
   "MANUAL"
 ]);
 
+const incidentTriggerTypeSchema = z.enum([
+  "DRIFT",
+  "ASSURANCE_FAILURE",
+  "FREEZE",
+  "BUDGET_EXCEEDED",
+  "GOVERNANCE_VIOLATION",
+  "MANUAL"
+]);
+
+const createIncidentBodySchema = z.object({
+  agentId: z.string().trim().min(1).optional(),
+  title: z.string().trim().min(1),
+  description: z.string().trim().min(1).optional(),
+  severity: z.string().trim().min(1),
+  triggerType: incidentTriggerTypeSchema.optional(),
+  triggerId: z.string().trim().min(1).optional()
+}).strict();
+
+const patchIncidentBodySchema = z.object({
+  state: z.string().trim().min(1).optional(),
+  resolution: z.string().trim().min(1).optional(),
+  evidenceId: z.string().trim().min(1).optional()
+}).strict();
+
 function parseSeverity(value: string): IncidentSeverity {
   const normalized = value.trim().toLowerCase();
   if (normalized === "low" || normalized === "info") {
@@ -35,7 +60,7 @@ function parseSeverity(value: string): IncidentSeverity {
   if (normalized === "high" || normalized === "critical") {
     return "CRITICAL";
   }
-  throw new Error("severity must be low|medium|high|critical");
+  throw new RequestBodyError("severity must be low|medium|high|critical");
 }
 
 function parseIncidentState(value: string): IncidentState {
@@ -44,7 +69,7 @@ function parseIncidentState(value: string): IncidentState {
     return "RESOLVED";
   }
   if (!VALID_INCIDENT_STATES.has(normalized as IncidentState)) {
-    throw new Error("state must be OPEN|INVESTIGATING|MITIGATED|RESOLVED|POSTMORTEM");
+    throw new RequestBodyError("state must be OPEN|INVESTIGATING|MITIGATED|RESOLVED|POSTMORTEM");
   }
   return normalized as IncidentState;
 }
@@ -111,28 +136,13 @@ export async function handleIncidentRoute(
 
   if (pathname === "/api/v1/incidents" && method === "POST") {
     try {
-      const body = await bodyJson<{
-        agentId?: string;
-        title?: string;
-        description?: string;
-        severity?: string;
-        triggerType?: Incident["triggerType"];
-        triggerId?: string;
-      }>(req);
-      if (!body.title || !body.severity) {
-        apiError(res, 400, "Missing required fields: title, severity");
-        return true;
-      }
+      const body = await bodyJsonSchema(req, createIncidentBodySchema);
 
       const severity = parseSeverity(body.severity);
       const agentId = body.agentId ?? currentAgentFromReqUrl(req);
       const triggerType = body.triggerType ?? "MANUAL";
       if (!VALID_TRIGGER_TYPES.has(triggerType)) {
-        apiError(
-          res,
-          400,
-          "triggerType must be DRIFT|ASSURANCE_FAILURE|FREEZE|BUDGET_EXCEEDED|GOVERNANCE_VIOLATION|MANUAL"
-        );
+        apiError(res, 400, "triggerType must be DRIFT|ASSURANCE_FAILURE|FREEZE|BUDGET_EXCEEDED|GOVERNANCE_VIOLATION|MANUAL");
         return true;
       }
 
@@ -177,6 +187,10 @@ export async function handleIncidentRoute(
         ledger.close();
       }
     } catch (err) {
+      if (isRequestBodyError(err)) {
+        apiError(res, err.statusCode, err.message);
+        return true;
+      }
       apiError(res, 500, err instanceof Error ? err.message : "Internal error");
     }
     return true;
@@ -222,7 +236,7 @@ export async function handleIncidentRoute(
       return true;
     }
     try {
-      const body = await bodyJson<{ state?: string; resolution?: string; evidenceId?: string }>(req);
+      const body = await bodyJsonSchema(req, patchIncidentBodySchema);
       const workspace = process.cwd();
       const ledger = openLedger(workspace);
       try {
@@ -322,6 +336,10 @@ export async function handleIncidentRoute(
         ledger.close();
       }
     } catch (err) {
+      if (isRequestBodyError(err)) {
+        apiError(res, err.statusCode, err.message);
+        return true;
+      }
       apiError(res, 500, err instanceof Error ? err.message : "Internal error");
     }
     return true;

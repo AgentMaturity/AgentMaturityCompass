@@ -3,7 +3,8 @@
  */
 
 import type { IncomingMessage, ServerResponse } from 'node:http';
-import { bodyJson, apiSuccess, apiError } from './apiHelpers.js';
+import { z } from "zod";
+import { bodyJsonSchema, apiSuccess, apiError, isRequestBodyError } from './apiHelpers.js';
 import { PolicyFirewall } from '../enforce/policyFirewall.js';
 import type { PolicyDecision, PolicyRule } from '../enforce/policyFirewall.js';
 
@@ -45,12 +46,14 @@ for (const rule of DEFAULT_POLICY_RULES) {
   policyEngine.addRule(rule);
 }
 
-interface EnforceEvaluateBody {
-  action: string;
-  tool?: string;
-  agentId?: string;
-  context?: Record<string, unknown>;
-}
+const enforceEvaluateBodySchema = z.object({
+  action: z.string().trim().min(1),
+  tool: z.string().trim().min(1).optional(),
+  agentId: z.string().trim().min(1).optional(),
+  context: z.record(z.unknown()).optional()
+}).strict();
+
+type EnforceEvaluateBody = z.infer<typeof enforceEvaluateBodySchema>;
 
 export async function handleEnforceRoute(
   pathname: string,
@@ -65,12 +68,10 @@ export async function handleEnforceRoute(
 
   if (pathname === '/api/v1/enforce/evaluate' && method === 'POST') {
     try {
-      const body = await bodyJson<EnforceEvaluateBody>(req);
-      if (!body.action) { apiError(res, 400, 'Missing required field: action'); return true; }
-      const action = body.action.trim();
-      if (!action) { apiError(res, 400, 'Field action must be a non-empty string'); return true; }
+      const body: EnforceEvaluateBody = await bodyJsonSchema(req, enforceEvaluateBodySchema);
+      const action = body.action;
 
-      const toolName = typeof body.tool === 'string' && body.tool.trim().length > 0 ? body.tool.trim() : action;
+      const toolName = body.tool ?? action;
       const context = body.context ?? {};
       const evaluation = policyEngine.evaluate(
         toolName,
@@ -90,6 +91,10 @@ export async function handleEnforceRoute(
         evaluatedAt: new Date().toISOString(),
       });
     } catch (err) {
+      if (isRequestBodyError(err)) {
+        apiError(res, err.statusCode, err.message);
+        return true;
+      }
       apiError(res, 500, err instanceof Error ? err.message : 'Internal error');
     }
     return true;

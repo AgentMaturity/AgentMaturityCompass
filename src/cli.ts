@@ -5939,10 +5939,16 @@ notary
       process.exit(0);
     };
     process.on("SIGINT", () => {
-      void stop();
+      void stop().catch((error: unknown) => {
+        console.error(chalk.red(error instanceof Error ? error.message : String(error)));
+        process.exit(1);
+      });
     });
     process.on("SIGTERM", () => {
-      void stop();
+      void stop().catch((error: unknown) => {
+        console.error(chalk.red(error instanceof Error ? error.message : String(error)));
+        process.exit(1);
+      });
     });
     await new Promise<void>(() => {
       // hold foreground process

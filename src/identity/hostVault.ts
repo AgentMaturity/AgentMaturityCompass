@@ -25,6 +25,27 @@ interface HostVaultSession {
 }
 
 const sessions = new Map<string, HostVaultSession>();
+const UNSAFE_SECRET_KEYS = new Set(["__proto__", "constructor", "prototype"]);
+
+function assertSafeSecretKey(key: string): void {
+  if (!key || key.trim().length === 0) {
+    throw new Error("Host vault secret key is required.");
+  }
+  if (UNSAFE_SECRET_KEYS.has(key)) {
+    throw new Error(`Unsafe host vault secret key: ${key}`);
+  }
+}
+
+function toSafeSecretMap(input: Record<string, string>): Record<string, string> {
+  const out = Object.create(null) as Record<string, string>;
+  for (const [key, value] of Object.entries(input)) {
+    if (UNSAFE_SECRET_KEYS.has(key)) {
+      continue;
+    }
+    out[key] = value;
+  }
+  return out;
+}
 
 function sessionFor(hostDir: string): HostVaultSession {
   const existing = sessions.get(hostDir);
@@ -82,7 +103,11 @@ function readEnvelope(hostDir: string): VaultEnvelope {
 function readPayload(hostDir: string, passphrase: string): HostVaultPayload {
   const envelope = readEnvelope(hostDir);
   const decrypted = decryptVaultPayload(envelope, passphrase).toString("utf8");
-  return payloadSchema.parse(JSON.parse(decrypted) as unknown);
+  const parsed = payloadSchema.parse(JSON.parse(decrypted) as unknown);
+  return {
+    ...parsed,
+    secrets: toSafeSecretMap(parsed.secrets)
+  };
 }
 
 function writePayload(hostDir: string, payload: HostVaultPayload, passphrase: string, auditorPub: string, sessionPub: string): void {
@@ -137,7 +162,7 @@ export function initHostVault(hostDir: string, passphrase?: string): {
     createdTs: Date.now(),
     auditorPrivateKeyPem,
     sessionPrivateKeyPem,
-    secrets: {}
+    secrets: Object.create(null) as Record<string, string>
   };
   writePayload(hostDir, payload, phrase, auditorPublicKeyPem, sessionPublicKeyPem);
   unlockHostVault(hostDir, phrase);
@@ -218,12 +243,14 @@ function persistCurrentPayload(hostDir: string): void {
 }
 
 export function setHostVaultSecret(hostDir: string, key: string, value: string): void {
+  assertSafeSecretKey(key);
   const payload = unlockedPayload(hostDir);
   payload.secrets[key] = value;
   persistCurrentPayload(hostDir);
 }
 
 export function getHostVaultSecret(hostDir: string, key: string): string | null {
+  assertSafeSecretKey(key);
   const payload = unlockedPayload(hostDir);
   return Object.prototype.hasOwnProperty.call(payload.secrets, key) ? payload.secrets[key]! : null;
 }
@@ -234,6 +261,7 @@ export function listHostVaultSecrets(hostDir: string): string[] {
 }
 
 export function deleteHostVaultSecret(hostDir: string, key: string): void {
+  assertSafeSecretKey(key);
   const payload = unlockedPayload(hostDir);
   delete payload.secrets[key];
   persistCurrentPayload(hostDir);

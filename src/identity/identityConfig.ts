@@ -369,6 +369,32 @@ export function resolveIdentitySecretRef(hostDir: string, ref: string): string {
   return secret;
 }
 
+const UNSAFE_SCIM_INDEX_KEYS = new Set(["__proto__", "constructor", "prototype"]);
+
+function isSafeScimIndexKey(key: string): boolean {
+  return key.length > 0 && !UNSAFE_SCIM_INDEX_KEYS.has(key);
+}
+
+function parseScimTokenIndex(raw: string): Record<string, string> {
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(raw) as unknown;
+  } catch {
+    return Object.create(null) as Record<string, string>;
+  }
+  if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+    return Object.create(null) as Record<string, string>;
+  }
+  const out = Object.create(null) as Record<string, string>;
+  for (const [key, value] of Object.entries(parsed as Record<string, unknown>)) {
+    if (!isSafeScimIndexKey(key) || typeof value !== "string" || value.length === 0) {
+      continue;
+    }
+    out[key] = value;
+  }
+  return out;
+}
+
 export function createScimToken(hostDir: string, tokenId: string): {
   tokenId: string;
   token: string;
@@ -378,13 +404,16 @@ export function createScimToken(hostDir: string, tokenId: string): {
   if (!sanitized) {
     throw new Error("token id is required");
   }
+  if (!isSafeScimIndexKey(sanitized)) {
+    throw new Error("token id contains unsafe key name");
+  }
   unlockHostVault(hostDir);
   const token = randomBytes(32).toString("base64url");
   const tokenHash = sha256Hex(Buffer.from(token, "utf8"));
   const secretKey = `scim/tokens/${sanitized}`;
   const manifestKey = "scim/tokens/_index";
   const existingRaw = getHostVaultSecret(hostDir, manifestKey);
-  const existing = existingRaw ? (JSON.parse(existingRaw) as Record<string, string>) : {};
+  const existing = existingRaw ? parseScimTokenIndex(existingRaw) : (Object.create(null) as Record<string, string>);
   existing[sanitized] = tokenHash;
   // set secret index and hash in host vault
   // secret storage is keyed by ref suffix (without vault:)
@@ -403,12 +432,8 @@ export function listScimTokenIds(hostDir: string): string[] {
   if (!raw) {
     return [];
   }
-  try {
-    const parsed = JSON.parse(raw) as Record<string, string>;
-    return Object.keys(parsed).sort((a, b) => a.localeCompare(b));
-  } catch {
-    return [];
-  }
+  const parsed = parseScimTokenIndex(raw);
+  return Object.keys(parsed).sort((a, b) => a.localeCompare(b));
 }
 
 export function validateScimBearerToken(hostDir: string, token: string): { ok: boolean; tokenId: string | null } {
@@ -421,16 +446,12 @@ export function validateScimBearerToken(hostDir: string, token: string): { ok: b
     return { ok: false, tokenId: null };
   }
   const digest = sha256Hex(Buffer.from(token, "utf8"));
-  try {
-    const parsed = JSON.parse(raw) as Record<string, string>;
-    const tokenId = Object.entries(parsed).find(([, hash]) => hash === digest)?.[0] ?? null;
-    return {
-      ok: tokenId !== null,
-      tokenId
-    };
-  } catch {
-    return { ok: false, tokenId: null };
-  }
+  const parsed = parseScimTokenIndex(raw);
+  const tokenId = Object.entries(parsed).find(([, hash]) => hash === digest)?.[0] ?? null;
+  return {
+    ok: tokenId !== null,
+    tokenId
+  };
 }
 
 export function canonicalIdentityConfigJson(hostDir: string): string {

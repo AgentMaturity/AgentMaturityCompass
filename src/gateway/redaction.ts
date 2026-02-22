@@ -22,7 +22,7 @@ export function redactHeaders(
   denylist: string[]
 ): { headers: Record<string, string>; wasRedacted: boolean } {
   const deny = new Set(denylist.map((key) => key.toLowerCase()));
-  const out: Record<string, string> = {};
+  const out = Object.create(null) as Record<string, string>;
   let redacted = false;
 
   for (const [rawKey, value] of Object.entries(headers)) {

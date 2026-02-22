@@ -43,6 +43,36 @@ export interface ResultFile {
   createdAt: string;
 }
 
+function parseJsonUnknown(raw: unknown): unknown {
+  if (typeof raw !== "string" || raw.trim().length === 0) {
+    return undefined;
+  }
+  try {
+    return JSON.parse(raw);
+  } catch {
+    return undefined;
+  }
+}
+
+function parseJsonRecord(raw: unknown): Record<string, unknown> {
+  const parsed = parseJsonUnknown(raw);
+  if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+    return {};
+  }
+  return parsed as Record<string, unknown>;
+}
+
+function parseOptionalJsonRecord(raw: unknown): Record<string, unknown> | undefined {
+  if (typeof raw !== "string" || raw.trim().length === 0) {
+    return undefined;
+  }
+  const parsed = parseJsonUnknown(raw);
+  if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+    return undefined;
+  }
+  return parsed as Record<string, unknown>;
+}
+
 /* ── Valid state transitions ─────────────────────────────────────── */
 
 const VALID_TRANSITIONS: Record<JobStatus, JobStatus[]> = {
@@ -222,8 +252,8 @@ export class PortalManager {
       type: row.type as string,
       status: row.status as JobStatus,
       submittedBy: row.submitted_by as string,
-      payload: JSON.parse((row.payload as string) || '{}'),
-      result: row.result ? JSON.parse(row.result as string) : undefined,
+      payload: parseJsonRecord(row.payload),
+      result: parseOptionalJsonRecord(row.result),
       error: row.error as string | undefined,
       progress: row.progress as number,
       createdAt: row.created_at as string,

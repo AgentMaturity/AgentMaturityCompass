@@ -9,7 +9,7 @@ function sortDeep(value: unknown): unknown {
   if (value && typeof value === "object") {
     const input = value as Record<string, unknown>;
     const sortedKeys = Object.keys(input).sort();
-    const out: Record<string, unknown> = {};
+    const out = Object.create(null) as Record<string, unknown>;
     for (const key of sortedKeys) {
       out[key] = sortDeep(input[key]);
     }
