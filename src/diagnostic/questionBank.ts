@@ -45,6 +45,17 @@ const OWASP_LLM_TOP10_IDS = new Set([
   "AMC-5.17"
 ]);
 
+const AGENTIC_ECOSYSTEM_PATTERN_IDS = new Set([
+  "AMC-5.18",
+  "AMC-5.19",
+  "AMC-5.20",
+  "AMC-5.21",
+  "AMC-5.22",
+  "AMC-5.23",
+  "AMC-5.24",
+  "AMC-5.25"
+]);
+
 const FAIRNESS_METRIC_KEYS: Record<string, string> = {
   "AMC-3.4.1": "demographic_parity_gap",
   "AMC-3.4.2": "counterfactual_flip_rate",
@@ -76,6 +87,24 @@ const FAIRNESS_PROGRESS_LABELS: QuestionSeed["labels"] = [
   "Regular Measurement with Thresholds",
   "Continuous Monitoring with Remediation",
   "Pre-Deployment + Runtime Governance with Audit Trail"
+];
+
+const AGENTIC_PATTERN_PROGRESS_LABELS: QuestionSeed["labels"] = [
+  "No Agentic Control",
+  "Ad Hoc Practice",
+  "Baseline Policy + Manual Checks",
+  "Operationalized with Measured Checks",
+  "Continuous Monitoring + Guardrails",
+  "Provably Governed with Signed Evidence"
+];
+
+const AGENTIC_RISK_PROGRESS_LABELS: QuestionSeed["labels"] = [
+  "Risk Unmanaged",
+  "Risk Acknowledged",
+  "Documented Controls, Inconsistent",
+  "Runtime-Enforced Controls",
+  "Adversarially Tested + Monitored",
+  "Self-Correcting Risk Governance"
 ];
 
 function defaultEvidenceTypes(level: number): EvidenceEventType[] {
