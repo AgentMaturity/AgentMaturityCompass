@@ -123,6 +123,10 @@ const DEFAULT_CONFIG: ObservabilityOTELConfig = {
   maxBufferSize: 1024
 };
 
+const DEFAULT_FLUSH_TIMEOUT_MS = 5_000;
+const DEFAULT_FLUSH_MAX_RETRIES = 1;
+const DEFAULT_FLUSH_RETRY_BASE_DELAY_MS = 200;
+
 const TRUST_TIER_ORDER: TrustTier[] = ["SELF_REPORTED", "ATTESTED", "OBSERVED", "OBSERVED_HARDENED"];
 
 function attr(key: string, value: string | number | boolean | undefined | null): OTelAttribute | null {
@@ -274,11 +278,44 @@ function sortByTs<T extends { ts: number }>(items: T[]): T[] {
   return [...items].sort((a, b) => a.ts - b.ts);
 }
 
+function isRetryableStatus(status: number): boolean {
+  return status === 429 || status === 502 || status === 503 || status === 504 || status >= 500;
+}
+
+function isRetryableError(error: unknown): boolean {
+  if (!(error instanceof Error)) {
+    return false;
+  }
+  if (error.name === "AbortError" || error.name === "TimeoutError") {
+    return true;
+  }
+  const message = error.message.toLowerCase();
+  return (
+    message.includes("timeout") ||
+    message.includes("fetch failed") ||
+    message.includes("network") ||
+    message.includes("econnreset") ||
+    message.includes("etimedout") ||
+    message.includes("econnrefused")
+  );
+}
+
+function backoffMs(baseDelayMs: number, attempt: number): number {
+  const factor = Math.pow(2, Math.max(0, attempt - 1));
+  const jitter = 0.8 + Math.random() * 0.4;
+  return Math.floor(baseDelayMs * factor * jitter);
+}
+
+async function sleep(ms: number): Promise<void> {
+  await new Promise<void>((resolvePromise) => setTimeout(resolvePromise, ms));
+}
+
 export class ObservabilityOTELExporter {
   private readonly config: ObservabilityOTELConfig;
   private spans: BufferedSpan[] = [];
   private metrics: BufferedMetric[] = [];
   private logs: BufferedLog[] = [];
+  private inFlightFlush: Promise<ObservabilityFlushResult> | null = null;
 
   constructor(config: Partial<ObservabilityOTELConfig> = {}) {
     this.config = {
@@ -430,6 +467,21 @@ export class ObservabilityOTELExporter {
   }
 
   async flush(): Promise<ObservabilityFlushResult> {
+    if (this.inFlightFlush) {
+      return this.inFlightFlush;
+    }
+    const run = this.flushInternal();
+    this.inFlightFlush = run;
+    try {
+      return await run;
+    } finally {
+      if (this.inFlightFlush === run) {
+        this.inFlightFlush = null;
+      }
+    }
+  }
+
+  private async flushInternal(): Promise<ObservabilityFlushResult> {
     const requests = this.buildDispatchRequests();
     const exported = {
       traces: this.spans.length,
@@ -455,28 +507,59 @@ export class ObservabilityOTELExporter {
     }
 
     const out: ObservabilityDispatchResult[] = [];
+    const flushTimeoutMs = toInt(process.env.AMC_OTEL_FLUSH_TIMEOUT_MS, DEFAULT_FLUSH_TIMEOUT_MS);
+    const maxRetries = toInt(process.env.AMC_OTEL_FLUSH_MAX_RETRIES, DEFAULT_FLUSH_MAX_RETRIES);
+    const retryBaseDelayMs = toInt(
+      process.env.AMC_OTEL_FLUSH_RETRY_BASE_DELAY_MS,
+      DEFAULT_FLUSH_RETRY_BASE_DELAY_MS
+    );
     for (const request of requests) {
-      try {
-        const response = await fetch(request.endpoint, {
-          method: "POST",
-          headers: request.headers,
-          body: JSON.stringify(request.payload)
-        });
-        out.push({
-          targetKind: request.targetKind,
-          signal: request.signal,
-          endpoint: request.endpoint,
-          ok: response.ok,
-          status: response.status,
-          error: response.ok ? undefined : `HTTP ${response.status}`
-        });
-      } catch (error) {
+      const totalAttempts = maxRetries + 1;
+      let dispatched = false;
+      let lastError: string | undefined;
+      for (let attempt = 1; attempt <= totalAttempts; attempt += 1) {
+        try {
+          const response = await fetch(request.endpoint, {
+            method: "POST",
+            headers: request.headers,
+            body: JSON.stringify(request.payload),
+            signal: AbortSignal.timeout(flushTimeoutMs)
+          });
+          if (attempt < totalAttempts && isRetryableStatus(response.status)) {
+            try {
+              await response.body?.cancel();
+            } catch {
+              // best effort cleanup before retry
+            }
+            await sleep(backoffMs(retryBaseDelayMs, attempt));
+            continue;
+          }
+          out.push({
+            targetKind: request.targetKind,
+            signal: request.signal,
+            endpoint: request.endpoint,
+            ok: response.ok,
+            status: response.status,
+            error: response.ok ? undefined : `HTTP ${response.status}`
+          });
+          dispatched = true;
+          break;
+        } catch (error) {
+          lastError = error instanceof Error ? error.message : String(error);
+          if (attempt < totalAttempts && isRetryableError(error)) {
+            await sleep(backoffMs(retryBaseDelayMs, attempt));
+            continue;
+          }
+          break;
+        }
+      }
+      if (!dispatched) {
         out.push({
           targetKind: request.targetKind,
           signal: request.signal,
           endpoint: request.endpoint,
           ok: false,
-          error: error instanceof Error ? error.message : String(error)
+          error: lastError ?? "dispatch failed"
         });
       }
     }

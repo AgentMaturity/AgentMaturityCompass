@@ -28,6 +28,7 @@ import { verifyLeaseToken } from "../leases/leaseVerifier.js";
 import { loadLeaseRevocations, verifyLeaseRevocationsSignature } from "../leases/leaseStore.js";
 import { extractLeaseCarrier } from "../leases/leaseCarriers.js";
 import { evaluateBudgetStatus } from "../budgets/budgets.js";
+import { CircuitOpenError, TimeoutError, withCircuitBreaker } from "../ops/circuitBreaker.js";
 
 export interface StartGatewayOptions {
   workspace: string;
@@ -140,6 +141,169 @@ function normalizeResponseHeaders(headers: IncomingHttpHeaders): Record<string, 
     out[key] = Array.isArray(value) ? value.join(",") : value;
   }
   return out;
+}
+
+interface GatewayResilienceConfig {
+  upstreamTimeoutMs: number;
+  upstreamMaxRetries: number;
+  upstreamRetryBaseDelayMs: number;
+  retryNonIdempotent: boolean;
+  proxyConnectTimeoutMs: number;
+}
+
+const DEFAULT_UPSTREAM_TIMEOUT_MS = 30_000;
+const DEFAULT_UPSTREAM_MAX_RETRIES = 1;
+const DEFAULT_UPSTREAM_RETRY_BASE_DELAY_MS = 250;
+const DEFAULT_PROXY_CONNECT_TIMEOUT_MS = 60_000;
+
+function parsePositiveIntEnv(raw: string | undefined, fallback: number): number {
+  if (!raw) {
+    return fallback;
+  }
+  const parsed = Number.parseInt(raw, 10);
+  if (!Number.isFinite(parsed) || parsed <= 0) {
+    return fallback;
+  }
+  return parsed;
+}
+
+function parseBooleanEnv(raw: string | undefined, fallback: boolean): boolean {
+  if (!raw) {
+    return fallback;
+  }
+  const normalized = raw.trim().toLowerCase();
+  if (normalized === "1" || normalized === "true" || normalized === "yes" || normalized === "on") {
+    return true;
+  }
+  if (normalized === "0" || normalized === "false" || normalized === "no" || normalized === "off") {
+    return false;
+  }
+  return fallback;
+}
+
+function gatewayResilienceConfig(): GatewayResilienceConfig {
+  return {
+    upstreamTimeoutMs: parsePositiveIntEnv(process.env.AMC_GATEWAY_UPSTREAM_TIMEOUT_MS, DEFAULT_UPSTREAM_TIMEOUT_MS),
+    upstreamMaxRetries: parsePositiveIntEnv(process.env.AMC_GATEWAY_UPSTREAM_MAX_RETRIES, DEFAULT_UPSTREAM_MAX_RETRIES),
+    upstreamRetryBaseDelayMs: parsePositiveIntEnv(
+      process.env.AMC_GATEWAY_UPSTREAM_RETRY_BASE_DELAY_MS,
+      DEFAULT_UPSTREAM_RETRY_BASE_DELAY_MS
+    ),
+    retryNonIdempotent: parseBooleanEnv(process.env.AMC_GATEWAY_RETRY_NON_IDEMPOTENT, false),
+    proxyConnectTimeoutMs: parsePositiveIntEnv(process.env.AMC_GATEWAY_PROXY_CONNECT_TIMEOUT_MS, DEFAULT_PROXY_CONNECT_TIMEOUT_MS)
+  };
+}
+
+function isRetryableMethod(method: string, retryNonIdempotent: boolean): boolean {
+  if (retryNonIdempotent) {
+    return true;
+  }
+  const normalized = method.toUpperCase();
+  return normalized === "GET" || normalized === "HEAD" || normalized === "OPTIONS" || normalized === "DELETE";
+}
+
+function isRetryableTransportError(error: unknown): boolean {
+  if (!(error instanceof Error)) {
+    return false;
+  }
+  if (error instanceof CircuitOpenError || error instanceof TimeoutError) {
+    return true;
+  }
+  const message = error.message.toLowerCase();
+  return (
+    message.includes("timeout") ||
+    message.includes("socket hang up") ||
+    message.includes("econnreset") ||
+    message.includes("etimedout") ||
+    message.includes("econnrefused") ||
+    message.includes("network")
+  );
+}
+
+function backoffMs(baseDelayMs: number, attempt: number): number {
+  const factor = Math.pow(2, Math.max(0, attempt - 1));
+  const jitter = 0.8 + Math.random() * 0.4;
+  return Math.floor(baseDelayMs * factor * jitter);
+}
+
+async function sleep(ms: number): Promise<void> {
+  await new Promise<void>((resolvePromise) => setTimeout(resolvePromise, ms));
+}
+
+function gatewayErrorStatusCode(error: unknown): number {
+  if (error instanceof CircuitOpenError) {
+    return 503;
+  }
+  if (error instanceof TimeoutError) {
+    return 504;
+  }
+  if (error instanceof Error && error.message.toLowerCase().includes("timeout")) {
+    return 504;
+  }
+  return 502;
+}
+
+function gatewayErrorBody(error: unknown): { error: string } {
+  if (error instanceof CircuitOpenError) {
+    return { error: "upstream circuit is open; dependency is unhealthy" };
+  }
+  if (error instanceof TimeoutError || (error instanceof Error && error.message.toLowerCase().includes("timeout"))) {
+    return { error: "upstream timeout" };
+  }
+  return { error: "gateway proxy failure" };
+}
+
+async function requestUpstreamWithResilience(params: {
+  targetUrl: URL;
+  method: string;
+  headers: Record<string, string>;
+  body: Buffer;
+  circuitName: string;
+  timeoutMs: number;
+  maxRetries: number;
+  retryBaseDelayMs: number;
+  retryNonIdempotent: boolean;
+}): Promise<IncomingMessage> {
+  const totalAttempts = params.maxRetries + 1;
+  const canRetry = isRetryableMethod(params.method, params.retryNonIdempotent);
+  let lastError: unknown;
+
+  for (let attempt = 1; attempt <= totalAttempts; attempt += 1) {
+    try {
+      const response = await withCircuitBreaker(
+        params.circuitName,
+        () =>
+          new Promise<IncomingMessage>((resolvePromise, rejectPromise) => {
+            const impl = params.targetUrl.protocol === "https:" ? httpsRequest : httpRequest;
+            const outgoing = impl(
+              params.targetUrl,
+              {
+                method: params.method,
+                headers: params.headers
+              },
+              (res) => resolvePromise(res)
+            );
+            outgoing.setTimeout(params.timeoutMs, () => {
+              outgoing.destroy(new Error(`upstream timeout after ${params.timeoutMs}ms`));
+            });
+            outgoing.on("error", rejectPromise);
+            outgoing.write(params.body);
+            outgoing.end();
+          }),
+        { timeoutMs: params.timeoutMs + 1000 }
+      );
+      return response;
+    } catch (error) {
+      lastError = error;
+      if (attempt < totalAttempts && canRetry && isRetryableTransportError(error)) {
+        await sleep(backoffMs(params.retryBaseDelayMs, attempt));
+        continue;
+      }
+      throw error;
+    }
+  }
+
+  throw (lastError instanceof Error ? lastError : new Error("upstream request failed"));
 }
 
 function isLocalhostUrl(url: string): boolean {
@@ -538,6 +702,7 @@ function createProxyServer(params: {
     meta: Record<string, unknown>;
   }) => void;
 }): Server {
+  const resilience = gatewayResilienceConfig();
   const proxy = createServer(async (req, res) => {
     const requestId = randomUUID();
     const method = (req.method ?? "GET").toUpperCase();
@@ -679,7 +844,6 @@ function createProxyServer(params: {
     }
 
     const body = await readAll(req);
-    const requestImpl = targetUrl.protocol === "https:" ? httpsRequest : httpRequest;
     const outboundHeaders = normalizeResponseHeaders(req.headers);
     delete outboundHeaders.host;
     delete outboundHeaders["x-amc-agent-id"];
@@ -692,19 +856,49 @@ function createProxyServer(params: {
         : undefined
     );
     const startedTs = Date.now();
-    const upstream = await new Promise<IncomingMessage>((resolvePromise, rejectPromise) => {
-      const outbound = requestImpl(
+    let upstream: IncomingMessage;
+    try {
+      upstream = await requestUpstreamWithResilience({
         targetUrl,
-        {
+        method,
+        headers: outboundHeaders,
+        body,
+        circuitName: `gateway-proxy-http:${host}:${port}`,
+        timeoutMs: resilience.upstreamTimeoutMs,
+        maxRetries: resilience.upstreamMaxRetries,
+        retryBaseDelayMs: resilience.upstreamRetryBaseDelayMs,
+        retryNonIdempotent: resilience.retryNonIdempotent
+      });
+    } catch (error) {
+      const status = gatewayErrorStatusCode(error);
+      res.statusCode = status;
+      res.setHeader("content-type", "application/json");
+      res.end(JSON.stringify(gatewayErrorBody(error)));
+      params.appendEvidence({
+        eventType: "gateway",
+        payload: JSON.stringify({
+          request_id: requestId,
+          proxyType: "http",
+          destinationHost: host,
+          destinationPort: port,
           method,
-          headers: outboundHeaders
-        },
-        (resp) => resolvePromise(resp)
-      );
-      outbound.on("error", rejectPromise);
-      outbound.write(body);
-      outbound.end();
-    });
+          stage: "request_error",
+          status,
+          error: error instanceof Error ? error.message : String(error)
+        }),
+        meta: {
+          request_id: requestId,
+          proxyMode: true,
+          destinationHost: host,
+          destinationPort: port,
+          method,
+          stage: "request_error",
+          status,
+          trustTier: "OBSERVED"
+        }
+      });
+      return;
+    }
     const responseBody = await readAll(upstream);
     res.statusCode = upstream.statusCode ?? 502;
     for (const [headerKey, headerValue] of Object.entries(upstream.headers)) {
@@ -926,6 +1120,8 @@ function createProxyServer(params: {
       socket.destroy();
     };
 
+    upstreamSocket.setTimeout(resilience.proxyConnectTimeoutMs, () => onSocketError(clientSocket, "upstream_timeout"));
+    clientSocket.setTimeout(resilience.proxyConnectTimeoutMs, () => onSocketError(upstreamSocket, "client_timeout"));
     upstreamSocket.on("error", () => onSocketError(clientSocket, "upstream_error"));
     clientSocket.on("error", () => onSocketError(upstreamSocket, "client_error"));
     upstreamSocket.on("close", () => finalize("upstream_close"));
@@ -950,6 +1146,7 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
   const runtimeProxyPort = options.proxyPort ?? config.proxy.port;
   const signature = verifyGatewayConfigSignature(options.workspace, options.configPath);
   const missingEnvs = extractMissingAuthEnvVars(config);
+  const resilience = gatewayResilienceConfig();
 
   const ledger = openLedger(options.workspace);
   const monitorPubFingerprint = monitorPublicKeyFingerprint(getPublicKeyPem(options.workspace, "monitor"));
@@ -1383,19 +1580,16 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
         }
       });
 
-      const requestImpl = targetUrl.protocol === "https:" ? httpsRequest : httpRequest;
-      const upstreamResponse = await new Promise<IncomingMessage>((resolvePromise, rejectPromise) => {
-        const outgoing = requestImpl(
-          targetUrl,
-          {
-            method,
-            headers: outboundHeaders
-          },
-          (response) => resolvePromise(response)
-        );
-        outgoing.on("error", rejectPromise);
-        outgoing.write(requestBody);
-        outgoing.end();
+      const upstreamResponse = await requestUpstreamWithResilience({
+        targetUrl,
+        method,
+        headers: outboundHeaders,
+        body: requestBody,
+        circuitName: `gateway-upstream:${route.upstream}`,
+        timeoutMs: resilience.upstreamTimeoutMs,
+        maxRetries: resilience.upstreamMaxRetries,
+        retryBaseDelayMs: resilience.upstreamRetryBaseDelayMs,
+        retryNonIdempotent: resilience.retryNonIdempotent
       });
 
       const responseHeaders = normalizeResponseHeaders(upstreamResponse.headers);
@@ -1511,17 +1705,24 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
       }
     } catch (error) {
       logger.error(`gateway error: ${String(error)}`);
+      const status = gatewayErrorStatusCode(error);
+      const body = gatewayErrorBody(error);
       appendEvidence({
         eventType: "gateway",
-        payload: JSON.stringify({ request_id: requestId, error: String(error) }),
+        payload: JSON.stringify({
+          request_id: requestId,
+          status,
+          error: error instanceof Error ? error.message : String(error)
+        }),
         meta: {
           stage: "request_error",
-          request_id: requestId
+          request_id: requestId,
+          status
         }
       });
-      res.statusCode = 502;
+      res.statusCode = status;
       res.setHeader("content-type", "application/json");
-      res.end(JSON.stringify({ error: "gateway proxy failure" }));
+      res.end(JSON.stringify(body));
     }
   });
 

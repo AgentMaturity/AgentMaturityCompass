@@ -252,7 +252,8 @@ export async function withCircuitBreaker<T>(
   options?: { timeoutMs?: number },
 ): Promise<T> {
   const circuit = registerCircuit(circuitName);
-  const timeoutMs = options?.timeoutMs ?? currentPolicy.perHookTimeoutMs;
+  const requestedTimeoutMs = options?.timeoutMs ?? currentPolicy.perHookTimeoutMs;
+  const timeoutMs = Math.max(1, Math.min(requestedTimeoutMs, currentPolicy.globalTimeoutMs));
 
   // Check circuit state
   if (circuit.state === "OPEN") {
@@ -272,12 +273,16 @@ export async function withCircuitBreaker<T>(
   }
 
   // Execute with timeout
+  let timeoutHandle: ReturnType<typeof setTimeout> | null = null;
   try {
     const result = await Promise.race([
       fn(),
-      new Promise<never>((_, reject) =>
-        setTimeout(() => reject(new TimeoutError(circuit.circuitId, timeoutMs)), timeoutMs),
-      ),
+      new Promise<never>((_, reject) => {
+        timeoutHandle = setTimeout(() => reject(new TimeoutError(circuit.circuitId, timeoutMs)), timeoutMs);
+        if (timeoutHandle && typeof timeoutHandle.unref === "function") {
+          timeoutHandle.unref();
+        }
+      }),
     ]);
 
     // Success
@@ -301,8 +306,11 @@ export async function withCircuitBreaker<T>(
     } else if (circuit.consecutiveFailures >= currentPolicy.failureThreshold) {
       transitionToOpen(circuit);
     }
-
     throw error;
+  } finally {
+    if (timeoutHandle) {
+      clearTimeout(timeoutHandle);
+    }
   }
 }
 

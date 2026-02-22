@@ -175,40 +175,52 @@ export function recordScoreAnswer(params: {
   notes?: string;
 }): DiagSession | null {
   return withScoreDb(params.workspace, (db) => {
-    const row = db
-      .prepare(
-        `SELECT session_id, agent_id, answers_json, created_at, completed_at
-         FROM score_sessions
-         WHERE session_id = ?`
-      )
-      .get(params.sessionId) as
-      | {
-          session_id: string;
-          agent_id: string;
-          answers_json: string;
-          created_at: string;
-          completed_at: string | null;
-        }
-      | undefined;
-    if (!row) {
-      return null;
+    db.exec("BEGIN IMMEDIATE");
+    try {
+      const row = db
+        .prepare(
+          `SELECT session_id, agent_id, answers_json, created_at, completed_at
+           FROM score_sessions
+           WHERE session_id = ?`
+        )
+        .get(params.sessionId) as
+        | {
+            session_id: string;
+            agent_id: string;
+            answers_json: string;
+            created_at: string;
+            completed_at: string | null;
+          }
+        | undefined;
+      if (!row) {
+        db.exec("ROLLBACK");
+        return null;
+      }
+
+      const session = hydrateSession(row);
+      session.answers[params.questionId] = {
+        value: params.value,
+        notes: params.notes
+      };
+
+      db.prepare(
+        `UPDATE score_sessions
+         SET answers_json = @answersJson
+         WHERE session_id = @sessionId`
+      ).run({
+        sessionId: session.id,
+        answersJson: JSON.stringify(session.answers)
+      });
+      db.exec("COMMIT");
+      return session;
+    } catch (error) {
+      try {
+        db.exec("ROLLBACK");
+      } catch {
+        // no-op: rollback best effort
+      }
+      throw error;
     }
-
-    const session = hydrateSession(row);
-    session.answers[params.questionId] = {
-      value: params.value,
-      notes: params.notes
-    };
-
-    db.prepare(
-      `UPDATE score_sessions
-       SET answers_json = @answersJson
-       WHERE session_id = @sessionId`
-    ).run({
-      sessionId: session.id,
-      answersJson: JSON.stringify(session.answers)
-    });
-    return session;
   });
 }
 
