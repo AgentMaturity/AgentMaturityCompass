@@ -14,6 +14,9 @@ export function appendBridgeRequestReceipt(params: {
     leaseCarrier: string | null;
     bodySha256: string;
     summary: string;
+    traceparent?: string;
+    tracestate?: string;
+    traceId?: string;
     promptPackSha256?: string;
     promptPackId?: string;
     promptTemplateId?: string;
@@ -68,6 +71,9 @@ export function appendBridgeResponseReceipt(params: {
     bodySha256: string;
     durationMs: number;
     summary: string;
+    traceparent?: string;
+    tracestate?: string;
+    traceId?: string;
     promptPackSha256?: string;
     promptPackId?: string;
     promptTemplateId?: string;

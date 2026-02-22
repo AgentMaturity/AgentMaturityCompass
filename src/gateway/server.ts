@@ -28,6 +28,11 @@ import { verifyLeaseToken } from "../leases/leaseVerifier.js";
 import { loadLeaseRevocations, verifyLeaseRevocationsSignature } from "../leases/leaseStore.js";
 import { extractLeaseCarrier } from "../leases/leaseCarriers.js";
 import { evaluateBudgetStatus } from "../budgets/budgets.js";
+import {
+  recordGatewayFailureMetric,
+  recordGatewayRequestMetric,
+  recordGatewayTraceContextMetric
+} from "../ops/metrics/metricsMiddleware.js";
 
 export interface StartGatewayOptions {
   workspace: string;
@@ -157,6 +162,160 @@ function firstString(value: string | string[] | undefined): string | undefined {
     return value[0];
   }
   return value;
+}
+
+function sanitizeLogString(value: string): string {
+  return value
+    .replace(/[\r\n\t]/g, " ")
+    .replace(/[\u0000-\u001f\u007f]/g, "")
+    .trim();
+}
+
+function sanitizeLogField(value: unknown): string | number | boolean | null {
+  if (value === null || value === undefined) {
+    return null;
+  }
+  if (typeof value === "string") {
+    return sanitizeLogString(value);
+  }
+  if (typeof value === "number") {
+    return Number.isFinite(value) ? value : null;
+  }
+  if (typeof value === "boolean") {
+    return value;
+  }
+  try {
+    return sanitizeLogString(JSON.stringify(value));
+  } catch {
+    return sanitizeLogString(String(value));
+  }
+}
+
+function logGatewayEvent(
+  logger: Pick<Console, "log" | "error">,
+  level: "log" | "error",
+  event: string,
+  fields: Record<string, unknown>
+): void {
+  const payload: Record<string, unknown> = {
+    component: "amc-gateway",
+    event
+  };
+  for (const [key, value] of Object.entries(fields)) {
+    payload[key] = sanitizeLogField(value);
+  }
+  const line = JSON.stringify(payload);
+  if (level === "error") {
+    logger.error(line);
+    return;
+  }
+  logger.log(line);
+}
+
+function classifyGatewayError(error: unknown): string {
+  if (error && typeof error === "object" && "code" in error && typeof (error as { code?: unknown }).code === "string") {
+    return (error as { code: string }).code.toUpperCase();
+  }
+  if (error instanceof Error) {
+    const normalized = error.name.trim().toUpperCase();
+    return normalized.length > 0 ? normalized : "ERROR";
+  }
+  return "UNKNOWN";
+}
+
+function normalizeGatewayMetricRoute(pathname: string): string {
+  if (!pathname || pathname === "/") {
+    return "/";
+  }
+  const parts = pathname
+    .split("/")
+    .filter((part) => part.length > 0)
+    .map((part) => {
+      if (/^[0-9a-f]{16,}$/i.test(part) || /^[0-9a-f-]{24,}$/i.test(part)) {
+        return ":id";
+      }
+      if (part.length > 48) {
+        return ":id";
+      }
+      return part;
+    });
+  return `/${parts.join("/")}`;
+}
+
+interface GatewayTraceContext {
+  traceparent: string;
+  traceId: string;
+  spanId: string;
+  parentSpanId: string | null;
+  traceFlags: string;
+  tracestate?: string;
+  source: "propagated" | "generated" | "invalid";
+}
+
+function randomHex(bytes: number): string {
+  const raw = randomUUID().replace(/-/g, "").toLowerCase();
+  const expectedLength = bytes * 2;
+  if (raw.length >= expectedLength) {
+    return raw.slice(0, expectedLength);
+  }
+  return `${raw}${"0".repeat(expectedLength - raw.length)}`;
+}
+
+function parseTraceparentHeader(
+  traceparent: string | undefined
+): { traceId: string; parentSpanId: string; traceFlags: string } | null {
+  if (!traceparent || traceparent.trim().length === 0) {
+    return null;
+  }
+  const trimmed = traceparent.trim();
+  const match = trimmed.match(/^00-([0-9a-f]{32})-([0-9a-f]{16})-([0-9a-f]{2})$/i);
+  if (!match) {
+    return null;
+  }
+  const traceId = match[1]!.toLowerCase();
+  const parentSpanId = match[2]!.toLowerCase();
+  const traceFlags = match[3]!.toLowerCase();
+  if (traceId === "00000000000000000000000000000000" || parentSpanId === "0000000000000000") {
+    return null;
+  }
+  return {
+    traceId,
+    parentSpanId,
+    traceFlags
+  };
+}
+
+function sanitizeTracestate(value: string | undefined): string | undefined {
+  if (!value || value.trim().length === 0) {
+    return undefined;
+  }
+  const cleaned = value
+    .replace(/[\r\n\t]/g, "")
+    .replace(/[\u0000-\u001f\u007f]/g, "")
+    .trim();
+  if (cleaned.length === 0) {
+    return undefined;
+  }
+  return cleaned.slice(0, 512);
+}
+
+function resolveTraceContext(headers: IncomingHttpHeaders): GatewayTraceContext {
+  const incomingTraceparent = firstString(headers.traceparent);
+  const parsed = parseTraceparentHeader(incomingTraceparent);
+  const spanId = randomHex(8);
+  const traceFlags = parsed?.traceFlags ?? "01";
+  const traceId = parsed?.traceId ?? randomHex(16);
+  const traceparent = `00-${traceId}-${spanId}-${traceFlags}`;
+  const tracestate = sanitizeTracestate(firstString(headers.tracestate));
+  return {
+    traceparent,
+    traceId,
+    spanId,
+    parentSpanId: parsed?.parentSpanId ?? null,
+    traceFlags,
+    tracestate,
+    source: parsed ? "propagated" : incomingTraceparent ? "invalid" : "generated"
+  };
 }
 
 function ipToInt(ip: string): number | null {
@@ -1031,13 +1190,48 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
     const requestId = randomUUID();
     const method = (req.method ?? "GET").toUpperCase();
     const clientIp = normalizeRemoteIp(req.socket.remoteAddress);
+    const trace = resolveTraceContext(req.headers);
+    const requestStartedAt = Date.now();
+    let metricRoute = "/unknown";
+    let metricUpstream = "unknown";
+    const suppliedCorrelationId = firstString(req.headers["x-amc-correlation-id"]) ?? requestId;
+    let requestCorrelationId = sanitizeLogString(suppliedCorrelationId).slice(0, 128);
+    if (!requestCorrelationId) {
+      requestCorrelationId = requestId;
+    }
+    let requestAgentId = "unknown";
+    recordGatewayTraceContextMetric(trace.source);
+    res.setHeader("x-amc-request-id", requestId);
+    res.setHeader("x-amc-trace-id", trace.traceId);
+    res.setHeader("traceparent", trace.traceparent);
+    if (trace.tracestate) {
+      res.setHeader("tracestate", trace.tracestate);
+    }
+    res.setHeader("x-amc-correlation-id", requestCorrelationId);
+    res.once("finish", () => {
+      recordGatewayRequestMetric(metricRoute, method, res.statusCode || 0, Date.now() - requestStartedAt, metricUpstream);
+      logGatewayEvent(logger, (res.statusCode || 0) >= 500 ? "error" : "log", "gateway.request.completed", {
+        request_id: requestId,
+        trace_id: trace.traceId,
+        correlation_id: requestCorrelationId,
+        agent_id: requestAgentId,
+        method,
+        route: metricRoute,
+        upstream: metricUpstream,
+        status: res.statusCode || 0,
+        duration_ms: Date.now() - requestStartedAt
+      });
+    });
+
     if (!ipAllowedByCidrs(clientIp, options.allowedCidrs ?? [])) {
+      recordGatewayFailureMetric("ingress", "unknown", "CLIENT_CIDR_DENIED");
       appendEvidence({
         eventType: "audit",
         payload: JSON.stringify({
           auditType: "NETWORK_EGRESS_BLOCKED",
           severity: "HIGH",
           request_id: requestId,
+          trace_id: trace.traceId,
           reason: "client_cidr_denied",
           clientIp
         }),
@@ -1045,6 +1239,7 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
           auditType: "NETWORK_EGRESS_BLOCKED",
           severity: "HIGH",
           request_id: requestId,
+          trace_id: trace.traceId,
           reason: "client_cidr_denied",
           clientIp
         }
@@ -1058,6 +1253,7 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
     try {
       const hostForUrl = req.headers.host ?? `${resolvedConfig.listen.host}:${resolvedConfig.listen.port}`;
       const incomingUrl = new URL(req.url ?? "/", `http://${hostForUrl}`);
+      metricRoute = normalizeGatewayMetricRoute(incomingUrl.pathname);
 
       if (incomingUrl.pathname === "/__amc/health") {
         const body = JSON.stringify({
@@ -1080,15 +1276,18 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
 
       const route = selectRoute(incomingUrl.pathname, resolvedConfig);
       if (!route) {
+        recordGatewayFailureMetric("routing", "unknown", "ROUTE_NOT_FOUND");
         res.statusCode = 404;
         res.setHeader("content-type", "application/json");
         res.end(JSON.stringify({ error: `no route configured for ${incomingUrl.pathname}` }));
         return;
       }
+      metricUpstream = route.upstream;
 
       const upstreamResolved = resolvedConfig.upstreams[route.upstream];
       const upstreamConfigured = config.upstreams[route.upstream];
       if (!upstreamResolved || !upstreamConfigured) {
+        recordGatewayFailureMetric("routing", route.upstream, "UPSTREAM_INVALID");
         res.statusCode = 500;
         res.setHeader("content-type", "application/json");
         res.end(JSON.stringify({ error: `invalid upstream ${route.upstream}` }));
@@ -1096,6 +1295,7 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
       }
 
       if (!upstreamResolved.baseUrl) {
+        recordGatewayFailureMetric("routing", route.upstream, "UPSTREAM_URL_MISSING");
         res.statusCode = 500;
         res.setHeader("content-type", "application/json");
         res.end(JSON.stringify({ error: `missing resolved baseUrl for upstream ${route.upstream}` }));
@@ -1111,6 +1311,7 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
       const requestBody = await readAll(req);
       const requestInfo = bestEffortJsonInfo(requestBody, incomingUrl.pathname, route.openaiCompatible);
       const attributedAgentId = extractAgentId(route, req.headers);
+      requestAgentId = attributedAgentId;
       const leaseCarrier = extractLeaseCarrier({
         headers: req.headers,
         url: incomingUrl,
@@ -1164,12 +1365,14 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
         model: requestInfo.model ?? null
       });
       if (!leaseVerification.ok) {
+        recordGatewayFailureMetric("lease", route.upstream, leaseVerification.auditType);
         appendEvidence({
           eventType: "audit",
           payload: JSON.stringify({
             auditType: leaseVerification.auditType,
             severity: "HIGH",
             request_id: requestId,
+            trace_id: trace.traceId,
             upstreamId: route.upstream,
             agentId: attributedAgentId,
             message: leaseVerification.message
@@ -1178,6 +1381,7 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
             auditType: leaseVerification.auditType,
             severity: "HIGH",
             request_id: requestId,
+            trace_id: trace.traceId,
             upstreamId: route.upstream,
             agentId: attributedAgentId
           }
@@ -1193,12 +1397,14 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
         minuteUsage.llmRequests >= (leaseVerification.payload?.maxRequestsPerMinute ?? Number.MAX_SAFE_INTEGER) ||
         minuteUsage.llmTokens >= (leaseVerification.payload?.maxTokensPerMinute ?? Number.MAX_SAFE_INTEGER)
       ) {
+        recordGatewayFailureMetric("rate_limit", route.upstream, "LEASE_RATE_LIMITED");
         appendEvidence({
           eventType: "audit",
           payload: JSON.stringify({
             auditType: "LEASE_RATE_LIMITED",
             severity: "HIGH",
             request_id: requestId,
+            trace_id: trace.traceId,
             agentId: attributedAgentId,
             leaseId: leaseVerification.payload?.leaseId ?? null,
             maxRequestsPerMinute: leaseVerification.payload?.maxRequestsPerMinute ?? null,
@@ -1209,6 +1415,7 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
             auditType: "LEASE_RATE_LIMITED",
             severity: "HIGH",
             request_id: requestId,
+            trace_id: trace.traceId,
             agentId: attributedAgentId,
             leaseId: leaseVerification.payload?.leaseId ?? null
           }
@@ -1219,6 +1426,7 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
             auditType: "BUDGET_EXCEEDED",
             severity: "HIGH",
             request_id: requestId,
+            trace_id: trace.traceId,
             agentId: attributedAgentId,
             reason: "lease per-minute limit exceeded",
             minuteUsage
@@ -1227,6 +1435,7 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
             auditType: "BUDGET_EXCEEDED",
             severity: "HIGH",
             request_id: requestId,
+            trace_id: trace.traceId,
             agentId: attributedAgentId
           }
         });
@@ -1238,12 +1447,14 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
 
       const budgetStatus = evaluateBudgetStatus(options.workspace, attributedAgentId);
       if (!budgetStatus.ok && budgetStatus.reasons.some((reason) => reason.includes("llm "))) {
+        recordGatewayFailureMetric("budget", route.upstream, "BUDGET_EXCEEDED");
         appendEvidence({
           eventType: "audit",
           payload: JSON.stringify({
             auditType: "BUDGET_EXCEEDED",
             severity: "HIGH",
             request_id: requestId,
+            trace_id: trace.traceId,
             agentId: attributedAgentId,
             reasons: budgetStatus.reasons
           }),
@@ -1251,6 +1462,7 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
             auditType: "BUDGET_EXCEEDED",
             severity: "HIGH",
             request_id: requestId,
+            trace_id: trace.traceId,
             agentId: attributedAgentId
           }
         });
@@ -1267,6 +1479,8 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
       delete outboundHeaders["x-amc-agent-id"];
       delete outboundHeaders["x-amc-workorder-id"];
       delete outboundHeaders["x-amc-client-process"];
+      delete outboundHeaders["x-amc-correlation-id"];
+      delete outboundHeaders["x-amc-run-id"];
       const strippedAuth = stripAgentProvidedCredentials(
         outboundHeaders,
         targetUrl,
@@ -1293,9 +1507,16 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
           }
         });
       }
+      outboundHeaders.traceparent = trace.traceparent;
+      if (trace.tracestate) {
+        outboundHeaders.tracestate = trace.tracestate;
+      } else {
+        delete outboundHeaders.tracestate;
+      }
       const authResult = applyAuth(targetUrl, outboundHeaders, upstreamResolved.auth, process.env);
 
       if (!authResult.ok) {
+        recordGatewayFailureMetric("upstream_auth", route.upstream, "UPSTREAM_AUTH_MISSING");
         res.statusCode = 500;
         res.setHeader("content-type", "application/json");
         res.end(JSON.stringify({ error: authResult.error }));
@@ -1306,6 +1527,7 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
             auditType: "UPSTREAM_AUTH_MISSING",
             severity: "HIGH",
             request_id: requestId,
+            trace_id: trace.traceId,
             upstreamId: route.upstream,
             agentId: attributedAgentId,
             message: authResult.error
@@ -1314,6 +1536,7 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
             auditType: "UPSTREAM_AUTH_MISSING",
             severity: "HIGH",
             request_id: requestId,
+            trace_id: trace.traceId,
             upstreamId: route.upstream,
             agentId: attributedAgentId
           }
@@ -1326,11 +1549,18 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
       const workOrderId = firstString(req.headers["x-amc-workorder-id"]);
       const providerId = upstreamConfigured.providerId ?? route.upstream;
       const clientProcess = firstString(req.headers["x-amc-client-process"]);
-      const correlationId = firstString(req.headers["x-amc-correlation-id"]);
+      const correlationId = requestCorrelationId;
       const runId = firstString(req.headers["x-amc-run-id"]);
 
       const llmRequestMeta: Record<string, unknown> = {
         request_id: requestId,
+        trace_id: trace.traceId,
+        span_id: trace.spanId,
+        parent_span_id: trace.parentSpanId,
+        trace_flags: trace.traceFlags,
+        trace_source: trace.source,
+        traceparent: trace.traceparent,
+        tracestate: trace.tracestate ?? null,
         upstreamId: route.upstream,
         providerId,
         upstreamBaseUrl: upstreamConfigured.baseUrl,
@@ -1417,6 +1647,8 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
             : "x-amc-receipt-trailer";
         res.setHeader("Trailer", trailerHeader);
         res.setHeader("x-amc-request-id", requestId);
+        res.setHeader("x-amc-trace-id", trace.traceId);
+        res.setHeader("x-amc-traceparent", trace.traceparent);
         res.setHeader("x-amc-request-receipt", requestEvent.receipt);
         res.setHeader("x-amc-monitor-pub-fpr", monitorPubFingerprint);
         res.setHeader("x-amc-receipt-mode", "trailer");
@@ -1441,6 +1673,13 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
 
       const llmResponseMeta: Record<string, unknown> = {
         request_id: requestId,
+        trace_id: trace.traceId,
+        span_id: trace.spanId,
+        parent_span_id: trace.parentSpanId,
+        trace_flags: trace.traceFlags,
+        traceparent: trace.traceparent,
+        tracestate: trace.tracestate ?? null,
+        upstream_traceparent: firstString(upstreamResponse.headers.traceparent),
         upstreamId: route.upstream,
         providerId,
         upstreamBaseUrl: upstreamConfigured.baseUrl,
@@ -1504,24 +1743,54 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
           }
         }
         res.setHeader("x-amc-request-id", requestId);
+        res.setHeader("x-amc-trace-id", trace.traceId);
+        res.setHeader("x-amc-traceparent", trace.traceparent);
         res.setHeader("x-amc-receipt", responseEvent.receipt);
         res.setHeader("x-amc-request-receipt", requestEvent.receipt);
         res.setHeader("x-amc-monitor-pub-fpr", monitorPubFingerprint);
         res.end(responseBody);
       }
     } catch (error) {
-      logger.error(`gateway error: ${String(error)}`);
+      const errorClass = classifyGatewayError(error);
+      const errorMessage = sanitizeLogString(String(error));
+      recordGatewayFailureMetric("request_error", metricUpstream, errorClass);
+      logGatewayEvent(logger, "error", "gateway.request.error", {
+        request_id: requestId,
+        trace_id: trace.traceId,
+        correlation_id: requestCorrelationId,
+        agent_id: requestAgentId,
+        method,
+        route: metricRoute,
+        upstream: metricUpstream,
+        error_class: errorClass,
+        error: errorMessage
+      });
       appendEvidence({
         eventType: "gateway",
-        payload: JSON.stringify({ request_id: requestId, error: String(error) }),
+        payload: JSON.stringify({
+          request_id: requestId,
+          trace_id: trace.traceId,
+          correlation_id: requestCorrelationId,
+          error_class: errorClass,
+          error: errorMessage
+        }),
         meta: {
           stage: "request_error",
-          request_id: requestId
+          request_id: requestId,
+          trace_id: trace.traceId,
+          correlation_id: requestCorrelationId,
+          error_class: errorClass
         }
       });
       res.statusCode = 502;
       res.setHeader("content-type", "application/json");
-      res.end(JSON.stringify({ error: "gateway proxy failure" }));
+      res.end(
+        JSON.stringify({
+          error: "gateway proxy failure",
+          request_id: requestId,
+          trace_id: trace.traceId
+        })
+      );
     }
   });
 

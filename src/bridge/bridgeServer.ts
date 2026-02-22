@@ -172,6 +172,8 @@ async function forwardToGateway(params: {
   workOrderId: string | null;
   correlationId: string;
   runId: string;
+  traceparent?: string;
+  tracestate?: string;
 }): Promise<{
   status: number;
   headers: Headers;
@@ -183,6 +185,12 @@ async function forwardToGateway(params: {
   headers.set("x-amc-agent-id", params.agentId);
   headers.set("x-amc-correlation-id", params.correlationId);
   headers.set("x-amc-run-id", params.runId);
+  if (params.traceparent) {
+    headers.set("traceparent", params.traceparent);
+  }
+  if (params.tracestate) {
+    headers.set("tracestate", params.tracestate);
+  }
   if (params.workOrderId) {
     headers.set("x-amc-workorder-id", params.workOrderId);
   }
@@ -539,6 +547,27 @@ export async function handleBridgeRequest(options: HandleBridgeRequestOptions): 
   const requestId = randomUUID();
   const correlationId = (options.req.headers["x-amc-correlation-id"] as string | undefined) ?? randomUUID();
   const runId = (options.req.headers["x-amc-run-id"] as string | undefined) ?? `run_${Date.now()}`;
+  const incomingTraceparentHeader = options.req.headers.traceparent;
+  const traceparent =
+    typeof incomingTraceparentHeader === "string"
+      ? incomingTraceparentHeader
+      : Array.isArray(incomingTraceparentHeader)
+        ? incomingTraceparentHeader[0]
+        : undefined;
+  const incomingTracestateHeader = options.req.headers.tracestate;
+  const tracestate =
+    typeof incomingTracestateHeader === "string"
+      ? incomingTracestateHeader
+      : Array.isArray(incomingTracestateHeader)
+        ? incomingTracestateHeader[0]
+        : undefined;
+  const traceId = (() => {
+    if (!traceparent) {
+      return undefined;
+    }
+    const match = traceparent.match(/^00-([0-9a-f]{32})-[0-9a-f]{16}-[0-9a-f]{2}$/i);
+    return match ? match[1]!.toLowerCase() : undefined;
+  })();
   const started = Date.now();
   const sessionId = `bridge-${requestId}`;
   const ledger = openLedger(options.workspace);
@@ -563,6 +592,9 @@ export async function handleBridgeRequest(options: HandleBridgeRequestOptions): 
         requestKind: intent.requestKind,
         leaseCarrier: lease.leaseCarrier ?? null,
         bodySha256: bridgeSha256(preparedRequestBody),
+        traceparent,
+        tracestate,
+        traceId,
         promptPackSha256: promptBinding?.packSha256,
         promptPackId: promptBinding?.packId,
         promptTemplateId: promptBinding?.templateId,
@@ -619,8 +651,21 @@ export async function handleBridgeRequest(options: HandleBridgeRequestOptions): 
       agentId: lease.payload.agentId,
       workOrderId: lease.payload.workOrderId ?? null,
       correlationId,
-      runId
+      runId,
+      traceparent,
+      tracestate
     });
+    const gatewayTraceparent = response.headers.get("x-amc-traceparent") ?? response.headers.get("traceparent") ?? traceparent;
+    const gatewayTracestate = response.headers.get("tracestate") ?? tracestate;
+    const gatewayTraceId =
+      response.headers.get("x-amc-trace-id")
+      ?? (() => {
+        if (!gatewayTraceparent) {
+          return undefined;
+        }
+        const match = gatewayTraceparent.match(/^00-([0-9a-f]{32})-[0-9a-f]{16}-[0-9a-f]{2}$/i);
+        return match ? match[1]!.toLowerCase() : undefined;
+      })();
     const streamPassthrough = isStreamingBridgeRequest(options.req, preparedBodyJson);
 
     if (streamPassthrough) {
@@ -639,6 +684,16 @@ export async function handleBridgeRequest(options: HandleBridgeRequestOptions): 
       options.res.setHeader("x-amc-receipt-mode", "trailer");
       options.res.setHeader("x-amc-bridge-request-id", requestId);
       options.res.setHeader("x-amc-correlation-id", correlationId);
+      if (gatewayTraceparent) {
+        options.res.setHeader("x-amc-traceparent", gatewayTraceparent);
+        options.res.setHeader("traceparent", gatewayTraceparent);
+      }
+      if (gatewayTracestate) {
+        options.res.setHeader("tracestate", gatewayTracestate);
+      }
+      if (gatewayTraceId) {
+        options.res.setHeader("x-amc-trace-id", gatewayTraceId);
+      }
       if (promptBinding) {
         options.res.setHeader("x-amc-prompt-pack-sha256", promptBinding.packSha256);
         options.res.setHeader("x-amc-prompt-pack-id", promptBinding.packId);
@@ -687,6 +742,9 @@ export async function handleBridgeRequest(options: HandleBridgeRequestOptions): 
           statusCode: response.status,
           usage,
           bodySha256: bridgeSha256(streamedBody),
+          traceparent: gatewayTraceparent,
+          tracestate: gatewayTracestate,
+          traceId: gatewayTraceId,
           promptPackSha256: promptBinding?.packSha256,
           promptPackId: promptBinding?.packId,
           promptTemplateId: promptBinding?.templateId,
@@ -796,6 +854,9 @@ export async function handleBridgeRequest(options: HandleBridgeRequestOptions): 
         statusCode: finalStatus,
         usage,
         bodySha256: bridgeSha256(finalBody),
+        traceparent: gatewayTraceparent,
+        tracestate: gatewayTracestate,
+        traceId: gatewayTraceId,
         promptPackSha256: promptBinding?.packSha256,
         promptPackId: promptBinding?.packId,
         promptTemplateId: promptBinding?.templateId,
@@ -827,6 +888,16 @@ export async function handleBridgeRequest(options: HandleBridgeRequestOptions): 
     }
     options.res.setHeader("x-amc-bridge-request-id", requestId);
     options.res.setHeader("x-amc-correlation-id", correlationId);
+    if (gatewayTraceparent) {
+      options.res.setHeader("x-amc-traceparent", gatewayTraceparent);
+      options.res.setHeader("traceparent", gatewayTraceparent);
+    }
+    if (gatewayTracestate) {
+      options.res.setHeader("tracestate", gatewayTracestate);
+    }
+    if (gatewayTraceId) {
+      options.res.setHeader("x-amc-trace-id", gatewayTraceId);
+    }
     options.res.setHeader("x-amc-receipt", responseReceipt.receipt);
     if (promptBinding) {
       options.res.setHeader("x-amc-prompt-pack-sha256", promptBinding.packSha256);
@@ -847,6 +918,18 @@ export async function handleBridgeRequest(options: HandleBridgeRequestOptions): 
       }
     });
     ledger.sealSession(sessionId);
+    options.res.setHeader("x-amc-bridge-request-id", requestId);
+    options.res.setHeader("x-amc-correlation-id", correlationId);
+    if (traceparent) {
+      options.res.setHeader("x-amc-traceparent", traceparent);
+      options.res.setHeader("traceparent", traceparent);
+    }
+    if (tracestate) {
+      options.res.setHeader("tracestate", tracestate);
+    }
+    if (traceId) {
+      options.res.setHeader("x-amc-trace-id", traceId);
+    }
     writeJson(options.res, 502, { error: "bridge upstream failure" });
   } finally {
     ledger.close();
