@@ -3,6 +3,9 @@ import type { BridgeProvider } from "./bridgeConfigSchema.js";
 export type BridgeRequestKind =
   | "chat_completions"
   | "responses"
+  | "embeddings"
+  | "images"
+  | "audio"
   | "messages"
   | "generate_content";
 
@@ -42,6 +45,39 @@ export function matchBridgeRoute(pathname: string): BridgeRouteMatch | null {
     return {
       provider: "openai",
       requestKind: "responses",
+      incomingPath: pathname,
+      gatewayPath: `/openai${stripBridgePrefix(pathname, "openai")}`,
+      modelFromPath: null
+    };
+  }
+
+  const openaiEmbeddings = /^\/bridge\/openai\/v1\/embeddings$/;
+  if (openaiEmbeddings.test(pathname)) {
+    return {
+      provider: "openai",
+      requestKind: "embeddings",
+      incomingPath: pathname,
+      gatewayPath: `/openai${stripBridgePrefix(pathname, "openai")}`,
+      modelFromPath: null
+    };
+  }
+
+  const openaiImageGenerations = /^\/bridge\/openai\/v1\/images\/generations$/;
+  if (openaiImageGenerations.test(pathname)) {
+    return {
+      provider: "openai",
+      requestKind: "images",
+      incomingPath: pathname,
+      gatewayPath: `/openai${stripBridgePrefix(pathname, "openai")}`,
+      modelFromPath: null
+    };
+  }
+
+  const openaiAudioSpeech = /^\/bridge\/openai\/v1\/audio\/speech$/;
+  if (openaiAudioSpeech.test(pathname)) {
+    return {
+      provider: "openai",
+      requestKind: "audio",
       incomingPath: pathname,
       gatewayPath: `/openai${stripBridgePrefix(pathname, "openai")}`,
       modelFromPath: null

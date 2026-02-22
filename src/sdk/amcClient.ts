@@ -77,6 +77,18 @@ export class AMCClient {
     return this.callBridge("/bridge/openai/v1/responses", payload);
   }
 
+  async openaiEmbeddings(payload: Record<string, unknown>): Promise<AMCBridgeResponse> {
+    return this.callBridge("/bridge/openai/v1/embeddings", payload);
+  }
+
+  async openaiImages(payload: Record<string, unknown>): Promise<AMCBridgeResponse> {
+    return this.callBridge("/bridge/openai/v1/images/generations", payload);
+  }
+
+  async openaiAudioSpeech(payload: Record<string, unknown>): Promise<AMCBridgeResponse> {
+    return this.callBridge("/bridge/openai/v1/audio/speech", payload);
+  }
+
   async anthropicMessages(payload: Record<string, unknown>): Promise<AMCBridgeResponse> {
     return this.callBridge("/bridge/anthropic/v1/messages", payload);
   }

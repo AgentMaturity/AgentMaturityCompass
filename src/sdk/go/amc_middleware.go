@@ -16,7 +16,7 @@ import (
 //
 //	mux := http.NewServeMux()
 //	handler := amc.Middleware(amc.MiddlewareConfig{
-//	    BridgeURL: "http://localhost:4100",
+//	    BridgeURL: "http://localhost:3212",
 //	    Token:     "your-token",
 //	})(mux)
 //	http.ListenAndServe(":8080", handler)

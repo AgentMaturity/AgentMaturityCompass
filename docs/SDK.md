@@ -7,7 +7,7 @@ They do **not** allow self-scoring payloads.
 
 1. Start Bridge.
 2. Set env vars:
-   - `AMC_BRIDGE_URL` (default: `http://127.0.0.1:3212` for Node SDK helper, `http://localhost:4100` for Python/Go)
+   - `AMC_BRIDGE_URL` (default: `http://127.0.0.1:3212` for Node SDK helper and `http://localhost:3212` for Python/Go)
    - `AMC_TOKEN`
 3. Make your first routed call.
 4. Capture `x-amc-correlation-id` / `x-amc-receipt` for traceability.

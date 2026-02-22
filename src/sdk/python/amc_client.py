@@ -8,12 +8,12 @@ telemetry reporting, evidence hashing, and secret redaction.
 Usage:
     from amc_client import AMCClient
 
-    client = AMCClient(bridge_url="http://localhost:4100", token="your-token")
+    client = AMCClient(bridge_url="http://localhost:3212", token="your-token")
     response = client.openai_chat({"model": "gpt-4", "messages": [{"role": "user", "content": "Hello"}]})
     print(response.body)
 
 Environment variables:
-    AMC_BRIDGE_URL: Bridge server URL (default: http://localhost:4100)
+    AMC_BRIDGE_URL: Bridge server URL (default: http://localhost:3212)
     AMC_TOKEN: Authentication token
     AMC_WORKSPACE_ID: Optional workspace identifier
 """
@@ -124,7 +124,7 @@ class AMCClient:
         timeout: float = 30.0,
         verify_ssl: bool = True,
     ):
-        self.bridge_url = (bridge_url or os.getenv("AMC_BRIDGE_URL", "http://localhost:4100")).rstrip("/")
+        self.bridge_url = (bridge_url or os.getenv("AMC_BRIDGE_URL", "http://localhost:3212")).rstrip("/")
         self.token = token or os.getenv("AMC_TOKEN", "")
         self.workspace_id = workspace_id or os.getenv("AMC_WORKSPACE_ID")
         self.timeout = timeout

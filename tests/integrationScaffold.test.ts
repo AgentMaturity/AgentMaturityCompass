@@ -129,13 +129,13 @@ describe("contract tests", () => {
     expect(suite.ts).toBeGreaterThan(0);
   });
 
-  test("suite includes health, evidence-post, evidence-reject, and lease tests", () => {
+  test("suite includes health and bridge auth tests", () => {
     const suite = generateContractTests();
     const ids = suite.tests.map((t) => t.testId);
     expect(ids).toContain("ct-health");
-    expect(ids).toContain("ct-evidence-post");
-    expect(ids).toContain("ct-evidence-reject");
-    expect(ids).toContain("ct-lease-verify");
+    expect(ids).toContain("ct-bridge-chat-auth");
+    expect(ids).toContain("ct-telemetry-auth");
+    expect(ids).toContain("ct-bridge-route-missing");
   });
 
   test("validates passing contract test", () => {
@@ -143,7 +143,7 @@ describe("contract tests", () => {
     const healthTest = suite.tests.find((t) => t.testId === "ct-health")!;
     const result = validateContractTest(healthTest, {
       status: 200,
-      body: { status: "ok" },
+      body: { ok: true },
     });
     expect(result.passed).toBe(true);
     expect(result.missingFields.length).toBe(0);
@@ -169,45 +169,45 @@ describe("contract tests", () => {
       body: {},
     });
     expect(result.passed).toBe(false);
-    expect(result.missingFields).toContain("status");
+    expect(result.missingFields).toContain("ok");
   });
 
-  test("validates evidence-post with boolean type check", () => {
+  test("validates bridge-chat-auth response shape", () => {
     const suite = generateContractTests();
-    const evTest = suite.tests.find((t) => t.testId === "ct-evidence-post")!;
-    const result = validateContractTest(evTest, {
-      status: 200,
-      body: { received: true },
+    const authTest = suite.tests.find((t) => t.testId === "ct-bridge-chat-auth")!;
+    const result = validateContractTest(authTest, {
+      status: 401,
+      body: { error: "missing lease token" },
     });
     expect(result.passed).toBe(true);
   });
 
-  test("validates evidence-post fails with non-boolean", () => {
+  test("validates bridge-chat-auth fails when error is empty", () => {
     const suite = generateContractTests();
-    const evTest = suite.tests.find((t) => t.testId === "ct-evidence-post")!;
-    const result = validateContractTest(evTest, {
-      status: 200,
-      body: { received: "yes" },
+    const authTest = suite.tests.find((t) => t.testId === "ct-bridge-chat-auth")!;
+    const result = validateContractTest(authTest, {
+      status: 401,
+      body: { error: "" },
     });
     expect(result.passed).toBe(false);
     expect(result.validationErrors.length).toBeGreaterThan(0);
   });
 
-  test("validates evidence-reject with non_empty check", () => {
+  test("validates telemetry-auth with non_empty check", () => {
     const suite = generateContractTests();
-    const rejectTest = suite.tests.find((t) => t.testId === "ct-evidence-reject")!;
+    const rejectTest = suite.tests.find((t) => t.testId === "ct-telemetry-auth")!;
     const result = validateContractTest(rejectTest, {
-      status: 400,
-      body: { error: "Missing required fields" },
+      status: 401,
+      body: { error: "missing lease token" },
     });
     expect(result.passed).toBe(true);
   });
 
-  test("validates evidence-reject fails on empty error", () => {
+  test("validates telemetry-auth fails on empty error", () => {
     const suite = generateContractTests();
-    const rejectTest = suite.tests.find((t) => t.testId === "ct-evidence-reject")!;
+    const rejectTest = suite.tests.find((t) => t.testId === "ct-telemetry-auth")!;
     const result = validateContractTest(rejectTest, {
-      status: 400,
+      status: 401,
       body: { error: "" },
     });
     expect(result.passed).toBe(false);
@@ -289,29 +289,29 @@ describe("OpenAPI spec generation", () => {
 
   test("includes all bridge endpoints", () => {
     const spec = generateBridgeOpenApiSpec();
-    expect(spec.paths).toHaveProperty("/api/v1/health");
-    expect(spec.paths).toHaveProperty("/api/v1/evidence");
-    expect(spec.paths).toHaveProperty("/api/v1/lease/verify");
-    expect(spec.paths).toHaveProperty("/api/v1/chat/completions");
+    expect(spec.paths).toHaveProperty("/healthz");
+    expect(spec.paths).toHaveProperty("/bridge/telemetry");
+    expect(spec.paths).toHaveProperty("/bridge/openai/v1/chat/completions");
+    expect(spec.paths).toHaveProperty("/bridge/openai/v1/responses");
   });
 
   test("includes component schemas", () => {
     const spec = generateBridgeOpenApiSpec();
-    expect(spec.components.schemas).toHaveProperty("EvidenceEvent");
-    expect(spec.components.schemas).toHaveProperty("LeaseToken");
+    expect(spec.components.schemas).toHaveProperty("TelemetryEvent");
+    expect(spec.components.schemas).toHaveProperty("BridgeChatRequest");
   });
 
   test("health endpoint uses GET method", () => {
     const spec = generateBridgeOpenApiSpec();
-    const healthPath = spec.paths["/api/v1/health"] as Record<string, any>;
+    const healthPath = spec.paths["/healthz"] as Record<string, any>;
     expect(healthPath).toHaveProperty("get");
     expect(healthPath.get.summary).toBe("Health check");
   });
 
-  test("evidence endpoint uses POST method", () => {
+  test("telemetry endpoint uses POST method", () => {
     const spec = generateBridgeOpenApiSpec();
-    const evidencePath = spec.paths["/api/v1/evidence"] as Record<string, any>;
-    expect(evidencePath).toHaveProperty("post");
-    expect(evidencePath.post.tags).toContain("evidence");
+    const telemetryPath = spec.paths["/bridge/telemetry"] as Record<string, any>;
+    expect(telemetryPath).toHaveProperty("post");
+    expect(telemetryPath.post.tags).toContain("telemetry");
   });
 });

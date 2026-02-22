@@ -60,13 +60,13 @@ class TestAMCBridgeResponse:
 
 class TestClientConstruction:
     def test_creates_with_explicit_params(self):
-        client = AMCClient(bridge_url="http://localhost:4100", token="test-token")
-        assert client.bridge_url == "http://localhost:4100"
+        client = AMCClient(bridge_url="http://localhost:3212", token="test-token")
+        assert client.bridge_url == "http://localhost:3212"
         assert client.token == "test-token"
 
     def test_strips_trailing_slash(self):
-        client = AMCClient(bridge_url="http://localhost:4100/", token="t")
-        assert client.bridge_url == "http://localhost:4100"
+        client = AMCClient(bridge_url="http://localhost:3212/", token="t")
+        assert client.bridge_url == "http://localhost:3212"
 
     def test_uses_env_vars(self, monkeypatch):
         monkeypatch.setenv("AMC_BRIDGE_URL", "http://env-bridge:9999")
@@ -83,22 +83,22 @@ class TestClientConstruction:
         assert client.bridge_url == "http://explicit:1234"
 
     def test_factory_function(self):
-        client = create_amc_client(bridge_url="http://localhost:4100", token="t")
+        client = create_amc_client(bridge_url="http://localhost:3212", token="t")
         assert isinstance(client, AMCClient)
 
     def test_from_env_classmethod(self, monkeypatch):
-        monkeypatch.setenv("AMC_BRIDGE_URL", "http://bridge-from-env:4100")
+        monkeypatch.setenv("AMC_BRIDGE_URL", "http://bridge-from-env:3212")
         monkeypatch.setenv("AMC_TOKEN", "token-from-env")
         client = AMCClient.from_env()
-        assert client.bridge_url == "http://bridge-from-env:4100"
+        assert client.bridge_url == "http://bridge-from-env:3212"
         assert client.token == "token-from-env"
 
     def test_default_timeout(self):
-        client = AMCClient(bridge_url="http://localhost:4100", token="t")
+        client = AMCClient(bridge_url="http://localhost:3212", token="t")
         assert client.timeout == 30.0
 
     def test_custom_timeout(self):
-        client = AMCClient(bridge_url="http://localhost:4100", token="t", timeout=10.0)
+        client = AMCClient(bridge_url="http://localhost:3212", token="t", timeout=10.0)
         assert client.timeout == 10.0
 
 
@@ -164,7 +164,7 @@ class TestHashing:
 
 class TestSelfScoring:
     def test_rejects_self_scoring_payload(self):
-        client = AMCClient(bridge_url="http://localhost:4100", token="t")
+        client = AMCClient(bridge_url="http://localhost:3212", token="t")
         payload = {
             "messages": [{"role": "user", "content": "amc_self_score: rate this output"}]
         }
@@ -188,33 +188,33 @@ class TestSelfScoring:
 
 class TestHeaders:
     def test_includes_auth_header(self):
-        client = AMCClient(bridge_url="http://localhost:4100", token="my-token")
+        client = AMCClient(bridge_url="http://localhost:3212", token="my-token")
         headers = client._headers()
         assert headers["Authorization"] == "Bearer my-token"
 
     def test_includes_correlation_id(self):
-        client = AMCClient(bridge_url="http://localhost:4100", token="t")
+        client = AMCClient(bridge_url="http://localhost:3212", token="t")
         headers = client._headers()
         assert "x-amc-correlation-id" in headers
         assert len(headers["x-amc-correlation-id"]) > 0
 
     def test_custom_correlation_id(self):
-        client = AMCClient(bridge_url="http://localhost:4100", token="t")
+        client = AMCClient(bridge_url="http://localhost:3212", token="t")
         headers = client._headers(correlation_id="custom-id")
         assert headers["x-amc-correlation-id"] == "custom-id"
 
     def test_workspace_header(self):
-        client = AMCClient(bridge_url="http://localhost:4100", token="t", workspace_id="ws-1")
+        client = AMCClient(bridge_url="http://localhost:3212", token="t", workspace_id="ws-1")
         headers = client._headers()
         assert headers["x-amc-workspace-id"] == "ws-1"
 
     def test_no_workspace_header_when_none(self):
-        client = AMCClient(bridge_url="http://localhost:4100", token="t")
+        client = AMCClient(bridge_url="http://localhost:3212", token="t")
         headers = client._headers()
         assert "x-amc-workspace-id" not in headers
 
     def test_extra_headers_merged(self):
-        client = AMCClient(bridge_url="http://localhost:4100", token="t")
+        client = AMCClient(bridge_url="http://localhost:3212", token="t")
         headers = client._headers(extra={"x-custom": "value"})
         assert headers["x-custom"] == "value"
 

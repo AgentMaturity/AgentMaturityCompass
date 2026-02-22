@@ -42,6 +42,8 @@ Studio starts the full local control plane:
 - **Gateway proxy** — `http://localhost:3210`
 - **Compass Console** — `http://localhost:3212/console`
 
+Bridge routes are served by Studio on the same API port (`/bridge/*`), so there is no separate `amc bridge start` command.
+
 ## 4. Score Your First Agent
 
 ```bash

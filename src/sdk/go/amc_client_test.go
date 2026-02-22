@@ -10,7 +10,7 @@ import (
 
 func TestNewClientDefaults(t *testing.T) {
 	c := NewClient(Config{})
-	if c.cfg.BridgeURL != "http://localhost:4100" {
+	if c.cfg.BridgeURL != "http://localhost:3212" {
 		t.Errorf("expected default bridge URL, got %s", c.cfg.BridgeURL)
 	}
 	if c.cfg.Timeout.Seconds() != 30 {
@@ -99,6 +99,38 @@ func TestOpenAIChat(t *testing.T) {
 	}
 	if resp.RequestID != "req-123" {
 		t.Errorf("expected request ID req-123, got %s", resp.RequestID)
+	}
+}
+
+func TestLeaseRoutes(t *testing.T) {
+	var seenIssue bool
+	var seenRevoke bool
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch r.URL.Path {
+		case "/leases/issue":
+			seenIssue = true
+		case "/leases/revoke":
+			seenRevoke = true
+		default:
+			t.Errorf("unexpected path: %s", r.URL.Path)
+		}
+		w.WriteHeader(200)
+		_ = json.NewEncoder(w).Encode(map[string]any{"ok": true})
+	}))
+	defer server.Close()
+
+	c := NewClient(Config{BridgeURL: server.URL, Token: "test-token"})
+	if _, err := c.RequestLease(context.Background(), "agent-1", []string{"gateway:llm"}, 600); err != nil {
+		t.Fatalf("request lease failed: %v", err)
+	}
+	if _, err := c.RevokeLease(context.Background(), "lease-1"); err != nil {
+		t.Fatalf("revoke lease failed: %v", err)
+	}
+	if !seenIssue {
+		t.Error("expected /leases/issue to be called")
+	}
+	if !seenRevoke {
+		t.Error("expected /leases/revoke to be called")
 	}
 }
 

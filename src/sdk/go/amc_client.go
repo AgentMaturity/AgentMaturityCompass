@@ -5,7 +5,7 @@
 //
 // Usage:
 //
-//	client := amc.NewClient(amc.Config{BridgeURL: "http://localhost:4100", Token: "your-token"})
+//	client := amc.NewClient(amc.Config{BridgeURL: "http://localhost:3212", Token: "your-token"})
 //	resp, err := client.OpenAIChat(ctx, map[string]any{"model": "gpt-4", "messages": []any{...}})
 package amc
 
@@ -67,7 +67,7 @@ func NewClient(cfg Config) *Client {
 		cfg.BridgeURL = os.Getenv("AMC_BRIDGE_URL")
 	}
 	if cfg.BridgeURL == "" {
-		cfg.BridgeURL = "http://localhost:4100"
+		cfg.BridgeURL = "http://localhost:3212"
 	}
 	cfg.BridgeURL = strings.TrimRight(cfg.BridgeURL, "/")
 
@@ -302,20 +302,27 @@ type LeaseInfo struct {
 	Scopes    []string `json:"scopes"`
 }
 
-// RequestLease requests a new lease from the Bridge.
+// RequestLease requests a new lease from Studio lease routes.
 func (c *Client) RequestLease(ctx context.Context, agentID string, scopes []string, durationSec int) (*BridgeResponse, error) {
-	body := map[string]any{
-		"agentId":     agentID,
-		"scopes":      scopes,
-		"durationSec": durationSec,
+	if durationSec <= 0 {
+		durationSec = 3600
 	}
-	return c.callBridge(ctx, "/bridge/lease/request", body, "")
+	scopeList := strings.Join(scopes, ",")
+	if scopeList == "" {
+		scopeList = "gateway:llm,toolhub:intent,toolhub:execute"
+	}
+	body := map[string]any{
+		"agentId": agentID,
+		"ttl":     fmt.Sprintf("%ds", durationSec),
+		"scopes":  scopeList,
+	}
+	return c.callBridge(ctx, "/leases/issue", body, "")
 }
 
 // RevokeLease revokes an active lease.
 func (c *Client) RevokeLease(ctx context.Context, leaseID string) (*BridgeResponse, error) {
 	body := map[string]any{"leaseId": leaseID}
-	return c.callBridge(ctx, "/bridge/lease/revoke", body, "")
+	return c.callBridge(ctx, "/leases/revoke", body, "")
 }
 
 // --- Diagnostic ---

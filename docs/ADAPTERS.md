@@ -30,7 +30,7 @@ Evidence captured: input/output tokens, tool calls, model used, response time, r
 Configure as default for an agent:
 
 ```bash
-amc adapters configure --agent my-claude --adapter claude-cli
+amc adapters configure --agent my-claude --adapter claude-cli --route /anthropic --model claude-sonnet-4-6
 ```
 
 ## Gemini CLI (Google)
@@ -170,7 +170,7 @@ amc adapters env --agent my-agent --adapter claude-cli
 Create a runnable local sample for library-based frameworks:
 
 ```bash
-amc adapters init-project --agent my-agent --adapter openai-sdk --out ./sample-project
+amc adapters init-project --agent my-agent --adapter openai-agents-sdk
 ```
 
 ## Lease Compatibility

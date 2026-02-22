@@ -9,14 +9,14 @@ FastAPI usage:
     from amc_middleware import AMCFastAPIMiddleware
 
     app = FastAPI()
-    app.add_middleware(AMCFastAPIMiddleware, bridge_url="http://localhost:4100", token="your-token")
+    app.add_middleware(AMCFastAPIMiddleware, bridge_url="http://localhost:3212", token="your-token")
 
 Flask usage:
     from flask import Flask
     from amc_middleware import AMCFlaskMiddleware
 
     app = Flask(__name__)
-    AMCFlaskMiddleware(app, bridge_url="http://localhost:4100", token="your-token")
+    AMCFlaskMiddleware(app, bridge_url="http://localhost:3212", token="your-token")
 """
 
 from __future__ import annotations

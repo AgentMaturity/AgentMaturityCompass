@@ -39,7 +39,7 @@ const client = new OpenAI({
 **Zero-key agents:** AMC holds the API key in the vault. Agents never see it. Configure with:
 ```bash
 amc vault unlock
-amc provider add --name openai --key-from-stdin
+amc provider add --agent my-openai-agent
 ```
 
 ## Google Gemini
@@ -114,7 +114,7 @@ globalThis.fetch = wrapFetch(globalThis.fetch, {
 
 Generate the Python SDK bridge:
 ```bash
-amc python-sdk --out ./python-sdk
+amc python-sdk
 ```
 
 Or use the HTTP bridge API directly from any language.
