@@ -1744,6 +1744,32 @@ const seeds: QuestionSeed[] = [
     tuningKnobs: ["guardrails.owasp.llm10", "evalHarness.owasp.llm10"]
   },
   {
+    id: "AMC-VIBE-1",
+    layerName: "Skills",
+    title: "Vibe-Code Static Safety Audit",
+    promptTemplate:
+      "Do AI-generated code artifacts pass static safety checks for common LLM coding mistakes before merge/deploy?",
+    labels: OWASP_PROGRESS_LABELS,
+    evidenceGateHints:
+      "Require static-analysis findings on generated code, severity trend metrics, and CI gate outcomes for L3+.",
+    upgradeHints:
+      "Run vibe-code static analysis in CI, enforce severity thresholds, and require remediation evidence before release.",
+    tuningKnobs: ["guardrails.vibeAudit.static", "evalHarness.vibeAudit.static"]
+  },
+  {
+    id: "AMC-VIBE-2",
+    layerName: "Skills",
+    title: "Vibe-Code Secret & Injection Hygiene",
+    promptTemplate:
+      "Are AI-generated code artifacts scanned for secret leakage, dependency-injection risk, and prompt-injection comments before deployment?",
+    labels: OWASP_PROGRESS_LABELS,
+    evidenceGateHints:
+      "Require secret scan reports, dependency-injection risk findings, prompt-injection comment checks, and blocked deployment evidence for high severity findings.",
+    upgradeHints:
+      "Add automated secret scanning and injection-risk detectors for generated code; fail closed on critical/high findings.",
+    tuningKnobs: ["guardrails.vibeAudit.secrets", "guardrails.vibeAudit.injection", "evalHarness.vibeAudit.hygiene"]
+  },
+  {
     id: "AMC-ETP-1",
     layerName: "Resilience",
     title: "ETP Self-Knowledge Maturity",

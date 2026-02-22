@@ -12414,6 +12414,66 @@ enforce
   });
 
 // ============================================================
+// VIBE AUDIT — AI-generated code safety audit
+// ============================================================
+program
+  .command("vibe-audit")
+  .description("Audit AI-generated code for secrets, injection risks, and unsafe patterns")
+  .requiredOption("--file <path>", "Path to generated code file (e.g., generated_code.py)")
+  .option("--json", "Output full result as JSON")
+  .action(async (opts: { file: string; json?: boolean }) => {
+    try {
+      const { auditVibeCode } = await import("./score/vibeCodeAudit.js");
+      const code = readFileSync(opts.file, "utf8");
+      const result = auditVibeCode(code, opts.file);
+
+      if (opts.json) {
+        console.log(JSON.stringify(result, null, 2));
+      } else {
+        const scoreColor = result.score >= 85 ? chalk.green : result.score >= 70 ? chalk.yellow : chalk.red;
+        const readyText = result.deploymentReady ? chalk.green("yes") : chalk.red("no");
+
+        console.log(chalk.bold.hex("#FF6600")("\n🧪  Vibe Code Audit"));
+        console.log(chalk.gray("File:"), opts.file);
+        console.log(chalk.gray("Safety Score:"), scoreColor(`${result.score}/100`));
+        console.log(chalk.gray("Grade:"), result.grade);
+        console.log(chalk.gray("Deployment Ready:"), readyText);
+        console.log(
+          chalk.gray("Findings:"),
+          `${result.criticalCount} critical, ${result.highCount} high, ${result.mediumCount} medium, ${result.lowCount} low`
+        );
+        console.log(chalk.gray("Summary:"), result.summary);
+
+        if (result.findings.length > 0) {
+          console.log(chalk.yellow("\nTop Findings:"));
+          const severityWeight: Record<string, number> = { critical: 4, high: 3, medium: 2, low: 1 };
+          const sorted = [...result.findings]
+            .sort((a, b) => (severityWeight[b.severity] ?? 0) - (severityWeight[a.severity] ?? 0))
+            .slice(0, 12);
+          for (const finding of sorted) {
+            const lineSuffix = typeof finding.line === "number" ? `:${finding.line}` : "";
+            console.log(`  [${finding.severity}] ${finding.category}${lineSuffix} — ${finding.description}`);
+          }
+        }
+
+        if (result.quickFixes.length > 0) {
+          console.log(chalk.cyan("\nQuick Fixes:"));
+          for (const fix of result.quickFixes) {
+            console.log(`  • ${fix}`);
+          }
+        }
+      }
+
+      if (!result.deploymentReady) {
+        process.exitCode = 2;
+      }
+    } catch (error: any) {
+      console.error(chalk.red(error?.message ?? String(error)));
+      process.exit(1);
+    }
+  });
+
+// ============================================================
 // WATCH — Observability, attestation, and safety testing
 // ============================================================
 const watch = program.command("watch").description("Observability, attestation, and safety testing");

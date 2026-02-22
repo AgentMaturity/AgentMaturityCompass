@@ -1,13 +1,9 @@
 /**
- * Vibe Code Audit — "Claude built it. AMC validates it's safe."
- *
- * For the 164K+ vibe coders building production apps with AI tools,
- * with zero security awareness. Scans AI-generated code for critical
- * issues before going live.
+ * Vibe Code Audit — targeted static safety checks for AI-generated code artifacts.
  */
 
 export interface VibeCodeFinding {
-  severity: 'critical' | 'high' | 'medium' | 'low';
+  severity: "critical" | "high" | "medium" | "low";
   category: string;
   description: string;
   line?: number;
@@ -16,172 +12,411 @@ export interface VibeCodeFinding {
 
 export interface VibeCodeAuditResult {
   safe: boolean;
-  score: number; // 0–100, higher = safer
-  grade: 'A' | 'B' | 'C' | 'D' | 'F';
+  score: number; // 0-100, higher = safer
+  grade: "A" | "B" | "C" | "D" | "F";
   findings: VibeCodeFinding[];
   criticalCount: number;
   highCount: number;
+  mediumCount: number;
+  lowCount: number;
   summary: string;
   deploymentReady: boolean;
   quickFixes: string[];
 }
 
-// Patterns that indicate security issues in AI-generated code
-const CRITICAL_PATTERNS: { pattern: RegExp; category: string; description: string; recommendation: string }[] = [
+type Severity = VibeCodeFinding["severity"];
+
+interface PatternRule {
+  severity: Severity;
+  category: string;
+  description: string;
+  recommendation: string;
+  pattern: RegExp;
+}
+
+interface CommentLine {
+  line: number;
+  text: string;
+}
+
+const PLACEHOLDER_VALUES = new Set([
+  "changeme",
+  "change_me",
+  "your-key-here",
+  "your_key_here",
+  "insert-key-here",
+  "example",
+  "example_key",
+  "test",
+  "token",
+  "secret",
+  "password",
+  "api_key",
+  "apikey",
+  "xxx"
+]);
+
+const STATIC_MISTAKE_RULES: PatternRule[] = [
   {
-    pattern: /process\.env\.(?!NODE_ENV|PORT|HOST)\w+.*(?:console\.log|res\.send|res\.json|return)/,
-    category: 'Secret Exposure',
-    description: 'Environment variable (likely a secret/API key) may be sent to client or logged',
-    recommendation: 'Never expose process.env secrets in responses or logs. Use server-side only.',
+    severity: "critical",
+    category: "Code Injection",
+    description: "Dynamic code execution on user-influenced input.",
+    recommendation: "Remove eval/exec for untrusted input and use a strict parser or allowlist.",
+    pattern: /(?:eval|Function|exec)\s*\([^)]*(?:req\.|request\.|query|params|body|input|argv|user)/i
   },
   {
-    pattern: /(?:password|secret|token|apikey|api_key)\s*[:=]\s*["'][^"']{4,}/i,
-    category: 'Hardcoded Credential',
-    description: 'Hardcoded credential found in source code',
-    recommendation: 'Move all credentials to environment variables. Never hardcode secrets.',
+    severity: "high",
+    category: "Command Injection",
+    description: "Shell command execution appears to include user-controlled input.",
+    recommendation: "Use parameterized APIs and strict input validation. Avoid shell interpolation.",
+    pattern: /(?:exec|execSync|spawn|spawnSync|subprocess\.(?:run|Popen))\s*\([^)]*(?:req\.|request\.|query|params|body|input|argv|user|\$\{)/i
   },
   {
-    pattern: /eval\s*\([^)]*(?:req\.|request\.|body\.|query\.|params\.)/,
-    category: 'Code Injection',
-    description: 'eval() called with user-controlled input — remote code execution risk',
-    recommendation: 'Never use eval() with user input. Use safe alternatives.',
+    severity: "high",
+    category: "TLS Verification Disabled",
+    description: "Network call disables TLS certificate verification.",
+    recommendation: "Enable TLS verification and pin/validate certificates in production paths.",
+    pattern: /(?:verify\s*=\s*False|rejectUnauthorized\s*:\s*false|NODE_TLS_REJECT_UNAUTHORIZED\s*=\s*["']?0["']?)/i
   },
   {
-    pattern: /(?:exec|execSync|spawn|spawnSync)\s*\([^)]*(?:req\.|request\.|body\.|query\.|params\.|\$\{)/,
-    category: 'Command Injection',
-    description: 'Shell command executed with user-controlled input',
-    recommendation: 'Sanitize all input before shell commands, or use parameterized alternatives.',
+    severity: "high",
+    category: "Unsafe Deserialization",
+    description: "Potential unsafe deserialization from untrusted input.",
+    recommendation: "Avoid unsafe deserialization (pickle/yaml.load) on untrusted data.",
+    pattern: /(?:pickle\.loads|yaml\.load)\s*\([^)]*(?:request|req|body|input|data)/i
   },
   {
-    pattern: /innerHTML\s*=\s*(?!['"`]<)/,
-    category: 'XSS Risk',
-    description: 'innerHTML assignment without sanitization — cross-site scripting risk',
-    recommendation: 'Use textContent or DOMPurify to sanitize HTML before insertion.',
+    severity: "medium",
+    category: "Broad Exception Swallow",
+    description: "Broad catch/except that likely hides security failures.",
+    recommendation: "Catch specific exception types and log/handle failures explicitly.",
+    pattern: /(?:except\s+Exception\s*:\s*(?:pass|return\s+None|continue)|catch\s*\(\s*(?:_|err|error)\s*\)\s*\{\s*\})/i
   },
   {
-    pattern: /SELECT\s+[\w*,\s]+FROM\s+\w+\s+WHERE\s+[\w.]+\s*=\s*['"]\s*\+/i,
-    category: 'SQL Injection',
-    description: 'SQL query built with string concatenation — SQL injection risk',
-    recommendation: 'Use parameterized queries or a query builder. Never concatenate user input into SQL.',
+    severity: "medium",
+    category: "Insecure Randomness",
+    description: "Non-cryptographic random source used around token/secret generation.",
+    recommendation: "Use cryptographically secure RNG (`crypto.randomBytes`, `secrets.token_*`).",
+    pattern: /(?:Math\.random\(|random\.(?:random|randint)\().*(?:token|secret|password|otp|code)/i
   },
   {
-    pattern: /app\.use\s*\(\s*(?:cors\(\)|\bexpress\.static)/,
-    category: 'CORS/Static Misconfiguration',
-    description: 'CORS enabled for all origins or static files served without configuration',
-    recommendation: 'Restrict CORS to known origins. Configure static file serving explicitly.',
+    severity: "medium",
+    category: "Debug Mode Enabled",
+    description: "Debug mode appears enabled in application runtime.",
+    recommendation: "Disable debug mode outside local development.",
+    pattern: /(?:debug\s*=\s*True|app\.run\([^)]*debug\s*=\s*True|NODE_ENV\s*!==?\s*["']production["'])/i
   },
   {
-    pattern: /(?:fs\.read|readFile|createReadStream)\s*\([^)]*(?:req\.|request\.|body\.|query\.|params\.|\$\{)/,
-    category: 'Path Traversal',
-    description: 'File read using user-controlled path — directory traversal risk',
-    recommendation: 'Validate and sanitize file paths. Use path.resolve() and check it stays in allowed directory.',
-  },
+    severity: "low",
+    category: "Security TODO Left In Code",
+    description: "Security-sensitive TODO/FIXME marker found in generated code.",
+    recommendation: "Resolve security TODOs before deployment and gate with tests.",
+    pattern: /(?:TODO|FIXME).*(?:auth|security|sanitize|validate|secret|token|injection)/i
+  }
 ];
 
-const HIGH_PATTERNS: { pattern: RegExp; category: string; description: string; recommendation: string }[] = [
+const DEPENDENCY_INJECTION_RULES: PatternRule[] = [
   {
-    pattern: /(?:app\.post|router\.post|app\.put|router\.put)\s*\([^)]+\)[\s\S]{0,200}(?!authenticate|authorize|auth|middleware|protect)/,
-    category: 'Missing Auth Check',
-    description: 'POST/PUT endpoint may lack authentication middleware',
-    recommendation: 'Add authentication middleware to all mutation endpoints.',
+    severity: "high",
+    category: "Dependency Injection Risk",
+    description: "Dynamic dependency/module import appears user-influenced.",
+    recommendation: "Use a fixed allowlist of dependencies/modules and reject dynamic untrusted imports.",
+    pattern: /(?:require|import)\s*\(\s*(?:req|request|query|params|body|input|user|argv|process\.env)/i
   },
   {
-    pattern: /password\s*===?\s*req\.|req\.body\.password\s*===?\s*(?!hash|bcrypt)/i,
-    category: 'Plain-Text Password Comparison',
-    description: 'Password compared in plain text — should use bcrypt/argon2',
-    recommendation: 'Use bcrypt.compare() or argon2.verify() for password verification. Never store plain text.',
+    severity: "high",
+    category: "Dependency Injection Risk",
+    description: "Python dynamic import appears user-influenced.",
+    recommendation: "Avoid dynamic imports from runtime input. Map allowed module names explicitly.",
+    pattern: /(?:importlib\.import_module|__import__)\s*\(\s*(?:request|req|query|params|body|input|user|os\.getenv)/i
   },
   {
-    pattern: /(?:localStorage|sessionStorage)\.setItem\s*\([^)]*(?:token|password|secret|key)/i,
-    category: 'Sensitive Data in Browser Storage',
-    description: 'Token or credential stored in localStorage/sessionStorage',
-    recommendation: 'Use httpOnly cookies for tokens. Never store secrets in localStorage.',
-  },
-  {
-    pattern: /console\.log\s*\([^)]*(?:password|token|secret|key|credential)/i,
-    category: 'Secret Logging',
-    description: 'Sensitive data logged to console — visible in server logs',
-    recommendation: 'Remove console.log statements containing sensitive data.',
-  },
-  {
-    pattern: /https?:\/\/0\.0\.0\.0|listen\s*\(\s*(?:0|'0\.0\.0\.0')/,
-    category: 'Open Binding',
-    description: 'Server bound to 0.0.0.0 — exposed on all network interfaces',
-    recommendation: "In production, bind to specific interface or use environment variable for host.",
-  },
+    severity: "high",
+    category: "Dependency Injection Risk",
+    description: "Service/container resolution appears based on untrusted request input.",
+    recommendation: "Resolve dependencies by static keys only and validate against an allowlist.",
+    pattern: /(?:container\.resolve|getService|injector\.get)\s*\(\s*(?:req|request|query|params|body|input|user)/i
+  }
 ];
 
-const MEDIUM_PATTERNS: { pattern: RegExp; category: string; description: string; recommendation: string }[] = [
+const SECRET_RULES: PatternRule[] = [
   {
-    pattern: /app\.use\s*\(\s*express\.json\s*\(\s*\)\s*\)/,
-    category: 'Missing Body Size Limit',
-    description: 'JSON body parser without size limit — DoS via large payloads',
-    recommendation: "Add size limit: express.json({ limit: '10kb' })",
+    severity: "critical",
+    category: "Private Key Material",
+    description: "Private key material appears embedded in source code.",
+    recommendation: "Delete embedded private keys and rotate compromised credentials immediately.",
+    pattern: /-----BEGIN (?:RSA |EC |DSA |OPENSSH )?PRIVATE KEY-----/g
   },
   {
-    pattern: /new Date\(\s*req\.|Date\.parse\s*\(\s*req\./,
-    category: 'Date Injection',
-    description: 'Date constructed from user input without validation',
-    recommendation: 'Validate date strings before parsing. Use a date validation library.',
+    severity: "critical",
+    category: "AWS Access Key",
+    description: "AWS access key detected in source code.",
+    recommendation: "Move AWS credentials to secret manager and rotate exposed keys.",
+    pattern: /AKIA[0-9A-Z]{16}/g
   },
   {
-    pattern: /require\s*\(\s*(?:req\.|request\.|body\.|`)/,
-    category: 'Dynamic Require',
-    description: 'Dynamic module require with user-controlled input',
-    recommendation: 'Never use require() with user-controlled paths. Use a whitelist.',
+    severity: "critical",
+    category: "OpenAI Key Exposure",
+    description: "OpenAI API key token detected in source code.",
+    recommendation: "Remove leaked key from code, rotate it, and load from environment or vault.",
+    pattern: /sk-[A-Za-z0-9]{20,}/g
   },
+  {
+    severity: "high",
+    category: "GitHub Token Exposure",
+    description: "GitHub token detected in source code.",
+    recommendation: "Remove token from source control and rotate token immediately.",
+    pattern: /gh[opsu]_[A-Za-z0-9]{30,}/g
+  },
+  {
+    severity: "high",
+    category: "Slack Token Exposure",
+    description: "Slack token or webhook appears embedded in source code.",
+    recommendation: "Move Slack credentials to secure storage and rotate all leaked tokens.",
+    pattern: /(?:xox[baprs]-[A-Za-z0-9-]{10,}|hooks\.slack\.com\/services\/T[A-Z0-9]+\/B[A-Z0-9]+\/[A-Za-z0-9]+)/g
+  },
+  {
+    severity: "high",
+    category: "Hardcoded Credential",
+    description: "Likely credential literal assigned directly in code.",
+    recommendation: "Use a secret manager or environment variables for credentials.",
+    pattern: /(?:api[_-]?key|secret|token|password|passwd)\s*[:=]\s*["'][^"'\n]{8,}["']/gi
+  }
 ];
 
-function scanCode(code: string, patterns: typeof CRITICAL_PATTERNS, severity: VibeCodeFinding['severity']): VibeCodeFinding[] {
-  const findings: VibeCodeFinding[] = [];
-  const lines = code.split('\n');
+const COMMENT_INJECTION_PATTERNS: RegExp[] = [
+  /ignore\s+(?:all\s+)?previous\s+(?:instructions|prompts?)/i,
+  /disregard\s+(?:all\s+)?(?:prior|above|previous)\s+(?:instructions|prompts?)/i,
+  /you\s+are\s+now\s+/i,
+  /bypass\s+(?:safety|guardrails?|policy|filters?)/i,
+  /override\s+(?:security|policy|safety)/i,
+  /jailbreak|dan\s+mode|developer\s+mode/i
+];
 
-  for (const { pattern, category, description, recommendation } of patterns) {
-    for (let i = 0; i < lines.length; i++) {
-      if (pattern.test(lines[i] ?? '')) {
-        findings.push({ severity, category, description, line: i + 1, recommendation });
-        break; // one finding per pattern
-      }
+const SCORE_PENALTY: Record<Severity, number> = {
+  critical: 28,
+  high: 14,
+  medium: 6,
+  low: 2
+};
+
+function countLineNumber(text: string, index: number): number {
+  let line = 1;
+  for (let i = 0; i < index; i++) {
+    if (text.charCodeAt(i) === 10) {
+      line += 1;
     }
-    // Also test full code for multi-line patterns
-    if (!findings.find(f => f.category === category) && pattern.test(code)) {
-      findings.push({ severity, category, description, recommendation });
+  }
+  return line;
+}
+
+function firstLineMatch(line: string, pattern: RegExp): boolean {
+  const nonGlobalFlags = pattern.flags.replaceAll("g", "");
+  return new RegExp(pattern.source, nonGlobalFlags).test(line);
+}
+
+function normalizeSecretLiteral(raw: string): string {
+  const quoted = raw.match(/["']([^"']+)["']/);
+  return (quoted?.[1] ?? raw).trim().toLowerCase();
+}
+
+function shouldSkipHardcodedCredential(match: string): boolean {
+  const normalized = normalizeSecretLiteral(match);
+  for (const placeholder of PLACEHOLDER_VALUES) {
+    if (normalized.includes(placeholder)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function scanLineRules(code: string, rules: PatternRule[]): VibeCodeFinding[] {
+  const findings: VibeCodeFinding[] = [];
+  const lines = code.split("\n");
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i] ?? "";
+    for (const rule of rules) {
+      if (!firstLineMatch(line, rule.pattern)) {
+        continue;
+      }
+      findings.push({
+        severity: rule.severity,
+        category: rule.category,
+        description: rule.description,
+        line: i + 1,
+        recommendation: rule.recommendation
+      });
     }
   }
   return findings;
 }
 
-export function auditVibeCode(code: string, filename?: string): VibeCodeAuditResult {
-  void filename; // reserved for future per-file context
-  const findings: VibeCodeFinding[] = [
-    ...scanCode(code, CRITICAL_PATTERNS, 'critical'),
-    ...scanCode(code, HIGH_PATTERNS, 'high'),
-    ...scanCode(code, MEDIUM_PATTERNS, 'medium'),
-  ];
+function scanSecrets(code: string): VibeCodeFinding[] {
+  const findings: VibeCodeFinding[] = [];
+  for (const rule of SECRET_RULES) {
+    const regex = new RegExp(rule.pattern.source, rule.pattern.flags.includes("g") ? rule.pattern.flags : `${rule.pattern.flags}g`);
+    let match: RegExpExecArray | null;
+    while ((match = regex.exec(code)) !== null) {
+      const raw = match[0] ?? "";
+      if (rule.category === "Hardcoded Credential" && shouldSkipHardcodedCredential(raw)) {
+        continue;
+      }
+      findings.push({
+        severity: rule.severity,
+        category: rule.category,
+        description: rule.description,
+        line: countLineNumber(code, match.index),
+        recommendation: rule.recommendation
+      });
+      if (rule.category === "Hardcoded Credential") {
+        break;
+      }
+    }
+  }
+  return findings;
+}
 
-  const criticalCount = findings.filter(f => f.severity === 'critical').length;
-  const highCount = findings.filter(f => f.severity === 'high').length;
-  const mediumCount = findings.filter(f => f.severity === 'medium').length;
+function extractCommentLines(code: string): CommentLine[] {
+  const commentLines: CommentLine[] = [];
+  const lines = code.split("\n");
+  let inBlockComment = false;
 
-  // Score: start at 100, deduct per finding
-  const score = Math.max(0, 100 - criticalCount * 30 - highCount * 15 - mediumCount * 5);
+  for (let i = 0; i < lines.length; i++) {
+    const lineNumber = i + 1;
+    const line = lines[i] ?? "";
+    const trimmed = line.trim();
 
-  const grade: VibeCodeAuditResult['grade'] =
-    score >= 90 ? 'A' : score >= 75 ? 'B' : score >= 60 ? 'C' : score >= 40 ? 'D' : 'F';
+    if (inBlockComment) {
+      commentLines.push({ line: lineNumber, text: trimmed });
+      if (trimmed.includes("*/")) {
+        inBlockComment = false;
+      }
+      continue;
+    }
 
+    if (trimmed.startsWith("/*")) {
+      inBlockComment = !trimmed.includes("*/");
+      commentLines.push({ line: lineNumber, text: trimmed });
+      continue;
+    }
+
+    if (trimmed.startsWith("//") || trimmed.startsWith("#") || trimmed.startsWith("--")) {
+      commentLines.push({ line: lineNumber, text: trimmed });
+      continue;
+    }
+
+    const inlineJs = line.indexOf("//");
+    if (inlineJs >= 0) {
+      commentLines.push({ line: lineNumber, text: line.slice(inlineJs) });
+      continue;
+    }
+    const inlinePy = line.indexOf("#");
+    if (inlinePy >= 0 && !line.slice(0, inlinePy).includes("http")) {
+      commentLines.push({ line: lineNumber, text: line.slice(inlinePy) });
+    }
+  }
+
+  return commentLines;
+}
+
+function scanPromptInjectionInComments(code: string): VibeCodeFinding[] {
+  const findings: VibeCodeFinding[] = [];
+  const comments = extractCommentLines(code);
+  for (const comment of comments) {
+    for (const pattern of COMMENT_INJECTION_PATTERNS) {
+      if (!firstLineMatch(comment.text, pattern)) {
+        continue;
+      }
+      findings.push({
+        severity: "high",
+        category: "Prompt Injection in Comments",
+        description: "Comment appears to embed prompt-injection style instruction.",
+        line: comment.line,
+        recommendation: "Remove instruction-like comments that can influence model behavior in tooling pipelines."
+      });
+      break;
+    }
+  }
+  return findings;
+}
+
+function dedupeFindings(findings: VibeCodeFinding[]): VibeCodeFinding[] {
+  const unique = new Map<string, VibeCodeFinding>();
+  for (const finding of findings) {
+    const key = `${finding.severity}|${finding.category}|${finding.line ?? 0}|${finding.description}`;
+    if (!unique.has(key)) {
+      unique.set(key, finding);
+    }
+  }
+  return [...unique.values()];
+}
+
+function computeScore(findings: VibeCodeFinding[]): number {
+  const penalty = findings.reduce((sum, finding) => sum + SCORE_PENALTY[finding.severity], 0);
+  return Math.max(0, 100 - penalty);
+}
+
+function scoreToGrade(score: number): VibeCodeAuditResult["grade"] {
+  if (score >= 90) return "A";
+  if (score >= 78) return "B";
+  if (score >= 62) return "C";
+  if (score >= 45) return "D";
+  return "F";
+}
+
+function summarize(result: {
+  score: number;
+  grade: VibeCodeAuditResult["grade"];
+  criticalCount: number;
+  highCount: number;
+  mediumCount: number;
+  lowCount: number;
+  deploymentReady: boolean;
+}): string {
+  if (result.deploymentReady) {
+    return `Vibe audit passed (grade ${result.grade}, score ${result.score}).`;
+  }
+  return `Vibe audit blocked: ${result.criticalCount} critical, ${result.highCount} high, ${result.mediumCount} medium, ${result.lowCount} low findings.`;
+}
+
+function computeResultFromFindings(findings: VibeCodeFinding[]): VibeCodeAuditResult {
+  const criticalCount = findings.filter((finding) => finding.severity === "critical").length;
+  const highCount = findings.filter((finding) => finding.severity === "high").length;
+  const mediumCount = findings.filter((finding) => finding.severity === "medium").length;
+  const lowCount = findings.filter((finding) => finding.severity === "low").length;
+  const score = computeScore(findings);
+  const grade = scoreToGrade(score);
   const safe = criticalCount === 0 && highCount === 0;
-  const deploymentReady = criticalCount === 0 && highCount <= 1 && score >= 70;
-
+  const deploymentReady = criticalCount === 0 && highCount <= 1 && score >= 75;
   const quickFixes = findings
-    .filter(f => f.severity === 'critical' || f.severity === 'high')
-    .slice(0, 5)
-    .map(f => `[${f.category}] ${f.recommendation}`);
+    .filter((finding) => finding.severity === "critical" || finding.severity === "high")
+    .slice(0, 8)
+    .map((finding) => `[${finding.category}] ${finding.recommendation}`);
 
-  const summary = deploymentReady
-    ? `Code passed vibe audit with grade ${grade}. ${mediumCount} low-priority issues to review.`
-    : `⚠️ ${criticalCount} critical and ${highCount} high severity issues must be fixed before deployment.`;
+  return {
+    safe,
+    score,
+    grade,
+    findings,
+    criticalCount,
+    highCount,
+    mediumCount,
+    lowCount,
+    summary: summarize({ score, grade, criticalCount, highCount, mediumCount, lowCount, deploymentReady }),
+    deploymentReady,
+    quickFixes
+  };
+}
 
-  return { safe, score, grade, findings, criticalCount, highCount, summary, deploymentReady, quickFixes };
+export function auditVibeCode(code: string, filename?: string): VibeCodeAuditResult {
+  void filename;
+  const findings = dedupeFindings([
+    ...scanLineRules(code, STATIC_MISTAKE_RULES),
+    ...scanLineRules(code, DEPENDENCY_INJECTION_RULES),
+    ...scanSecrets(code),
+    ...scanPromptInjectionInComments(code)
+  ]);
+  return computeResultFromFindings(findings);
 }
 
 export function auditVibeCodeFiles(files: Record<string, string>): {
@@ -190,28 +425,13 @@ export function auditVibeCodeFiles(files: Record<string, string>): {
 } {
   const byFile: Record<string, VibeCodeAuditResult> = {};
   const allFindings: VibeCodeFinding[] = [];
-
   for (const [filename, code] of Object.entries(files)) {
     const result = auditVibeCode(code, filename);
     byFile[filename] = result;
-    allFindings.push(...result.findings);
+    allFindings.push(...result.findings.map((finding) => ({ ...finding, category: `${filename}: ${finding.category}` })));
   }
-
-  const criticalCount = allFindings.filter(f => f.severity === 'critical').length;
-  const highCount = allFindings.filter(f => f.severity === 'high').length;
-  const mediumCount = allFindings.filter(f => f.severity === 'medium').length;
-  const score = Math.max(0, 100 - criticalCount * 30 - highCount * 15 - mediumCount * 5);
-  const grade: VibeCodeAuditResult['grade'] =
-    score >= 90 ? 'A' : score >= 75 ? 'B' : score >= 60 ? 'C' : score >= 40 ? 'D' : 'F';
-  const safe = criticalCount === 0 && highCount === 0;
-  const deploymentReady = criticalCount === 0 && highCount <= 1 && score >= 70;
-  const quickFixes = allFindings.filter(f => f.severity === 'critical').slice(0, 5).map(f => f.recommendation);
-  const summary = deploymentReady
-    ? `All files passed vibe audit (grade ${grade}).`
-    : `${criticalCount} critical issues across ${Object.keys(files).length} files. Not ready for deployment.`;
-
   return {
-    overall: { safe, score, grade, findings: allFindings, criticalCount, highCount, summary, deploymentReady, quickFixes },
-    byFile,
+    overall: computeResultFromFindings(allFindings),
+    byFile
   };
 }
