@@ -445,6 +445,26 @@ export {
 } from "./integrations/integrationsCli.js";
 export { dispatchIntegrationEvent, dispatchIntegrationTest } from "./integrations/integrationDispatcher.js";
 export { verifyOpsReceipt, verifyOpsReceiptForEvent } from "./integrations/opsReceipt.js";
+export { noCodeAdapterAddCli } from "./integrations/noCodeGovernanceCli.js";
+export {
+  addNoCodeAdapter,
+  initNoCodeGovernanceConfig,
+  loadNoCodeGovernanceConfig,
+  noCodeGovernanceConfigPath,
+  noCodeGovernanceConfigSigPath,
+  signNoCodeGovernanceConfig,
+  verifyNoCodeGovernanceConfigSignature
+} from "./integrations/noCodeGovernanceStore.js";
+export {
+  ingestNoCodeWebhookEvent,
+  parseNoCodeExecutionEvent
+} from "./integrations/noCodeWebhookAdapters.js";
+export type {
+  NoCodeWebhookIngestResult,
+  NoCodeAgentAction,
+  ParsedNoCodeExecutionEvent
+} from "./integrations/noCodeWebhookAdapters.js";
+export type { NoCodeAdapterType, WebhookPlatform, NoCodeAdapterRecord, NoCodeGovernanceConfig } from "./integrations/noCodeGovernanceSchema.js";
 export {
   configureCircuitBreaker,
   getCircuitBreakerPolicy,

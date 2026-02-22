@@ -296,6 +296,7 @@ import {
   integrationsTestCli,
   integrationsVerifyCli
 } from "./integrations/integrationsCli.js";
+import { noCodeAdapterAddCli } from "./integrations/noCodeGovernanceCli.js";
 import {
   outcomesAttestCli,
   outcomesDiffCli,
@@ -2034,6 +2035,30 @@ adapters
     }
   );
 
+const adapter = program.command("adapter").description("No-code governance webhook adapter registry");
+
+adapter
+  .command("add")
+  .description("Register a no-code webhook source for governance evidence capture")
+  .requiredOption("--type <type>", "n8n|make|zapier")
+  .requiredOption("--webhook-url <url>", "source webhook URL")
+  .action((opts: { type: string; webhookUrl: string }) => {
+    const normalizedType = String(opts.type).trim().toLowerCase();
+    if (normalizedType !== "n8n" && normalizedType !== "make" && normalizedType !== "zapier") {
+      throw new Error(`Invalid adapter type: ${opts.type}. Expected one of: n8n, make, zapier`);
+    }
+    const out = noCodeAdapterAddCli({
+      workspace: process.cwd(),
+      type: normalizedType,
+      webhookUrl: opts.webhookUrl
+    });
+    console.log(chalk.green(`${out.created ? "Added" : "Updated"} no-code adapter ${out.adapter.id}`));
+    console.log(`type: ${out.adapter.type}`);
+    console.log(`webhook: ${out.adapter.webhookUrl}`);
+    console.log(`config: ${out.configPath}`);
+    console.log(`signature: ${out.sigPath}`);
+  });
+
 const plugin = program.command("plugin").description("Signed content-only extension marketplace");
 
 plugin
@@ -2598,7 +2623,6 @@ const workorder = program.command("workorder").description("Signed work order op
 const ticket = program.command("ticket").description("Execution ticket operations");
 const gateway = program.command("gateway").description("AMC universal LLM proxy gateway");
 const bundle = program.command("bundle").description("Portable evidence bundle operations");
-const evidence = program.command("evidence").description("Verifier-ready evidence export operations");
 const ci = program.command("ci").description("CI/CD release gate helpers");
 const archetype = program.command("archetype").description("Archetype packs");
 const exportGroup = program.command("export").description("Export policy packs and badges");
