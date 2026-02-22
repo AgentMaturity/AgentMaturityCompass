@@ -16,8 +16,18 @@ export { checkThreatIntel, getStats as getThreatIntelStats } from './threatIntel
 export type { ThreatMatch, ThreatIntelResult } from './threatIntel.js';
 export { fingerprint } from './uiFingerprint.js';
 export type { FingerprintResult } from './uiFingerprint.js';
-export { validateManifest, checkRegistry, checkIngress, sanitize, detect, checkOAuthScopes } from './stubs.js';
-export type { ManifestResult, RegistryCheckResult, IngressResult, SanitizeResult, DetectorResult, OAuthScopeResult } from './stubs.js';
+export { validateManifest } from './manifest.js';
+export type { ManifestValidation as ManifestResult } from './manifest.js';
+export { checkRegistry } from './registry.js';
+export type { RegistryCheckResult } from './registry.js';
+export { checkIngress } from './ingress.js';
+export type { IngressResult } from './ingress.js';
+export { sanitize } from './sanitizer.js';
+export type { SanitizeResult } from './sanitizer.js';
+export { detect } from './detector.js';
+export type { DetectorResult } from './detector.js';
+export { checkOAuthScopes } from './oauthScope.js';
+export type { OAuthScopeResult } from './oauthScope.js';
 
 // ── Validator library (2026-02-21) ────────────────────────────────────
 export {

@@ -1676,7 +1676,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       // ── AMC REST API v1 ─────────────────────────────────────────────
       if (pathname.startsWith("/api/v1/")) {
         const { handleApiRoute } = await import("../api/index.js");
-        const handled = await handleApiRoute(pathname, req.method ?? "GET", req, res);
+        const handled = await handleApiRoute(pathname, req.method ?? "GET", req, res, options.workspace);
         if (handled) return;
       }
 

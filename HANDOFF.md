@@ -1,54 +1,70 @@
-# FIX-1 Handoff
+# FIX-2 Handoff
 
-## Summary of fixes
+## Scope Completed
+Implemented all requested stub-elimination and API wiring fixes in this repo:
 
-### 1) Correction verification path repaired for append-only ledger
-- Updated `src/corrections/correctionStore.ts` to stop deleting/reinserting rows in `updateCorrectionVerification`.
-- Added append-only shadow table `corrections_verification` with immutable triggers:
-  - `protect_corrections_verification_immutable`
-  - `no_delete_corrections_verification`
-- `updateCorrectionVerification(...)` now appends verification events to `corrections_verification`.
-- All correction read APIs now overlay latest verification state from the shadow table:
-  - `getCorrectionsByAgent`
-  - `getCorrectionsByQuestion`
-  - `getPendingCorrections`
-  - `getCorrectionById`
-  - `getVerifiedCorrections`
-  - `getCorrectionsByTriggerType`
-  - `getCorrectionsByWindow`
-- `getLastCorrectionHash(...)` now resolves latest hash across both base correction rows and verification shadow events.
+1. `src/enforce/index.ts`
+- Replaced all exports from `./stubs.js` with real module exports:
+  - `scanMdns` -> `mdnsController.ts`
+  - `checkProxy` -> `reverseProxyGuard.ts`
+  - `checkPhishing` -> `antiPhishing.ts`
+  - `blindSecrets` -> `secretBlind.ts`
+  - `createEvidenceContract` -> `evidenceContract.ts`
+  - `checkTemporalAccess` -> `temporalControls.ts`
+  - `checkGeoFence` -> `geoFence.ts`
+  - `guardClipboard` -> `clipboardGuard.ts`
+  - `renderTemplate` -> `templateEngine.ts`
 
-Lifecycle result: correction flow now works as append-only create -> verify -> confirmed state readout (without UPDATE/DELETE on immutable corrections rows).
+2. `src/shield/index.ts`
+- Replaced all exports from `./stubs.js` with real module exports:
+  - `validateManifest` -> `manifest.ts`
+  - `checkRegistry` -> `registry.ts`
+  - `checkIngress` -> `ingress.ts`
+  - `sanitize` -> `sanitizer.ts`
+  - `detect` -> `detector.ts`
+  - `checkOAuthScopes` -> `oauthScope.ts`
+- Added missing real-function compatibility helpers:
+  - `src/shield/registry.ts`: added `RegistryCheckResult` + `checkRegistry(...)`
+  - `src/shield/ingress.ts`: added `checkIngress(...)` wrapper
+  - `src/shield/detector.ts`: added `detect(...)` wrapper
 
-### 2) Claim stale-sweep repaired for append-only ledger
-- Updated `src/claims/claimExpiry.ts` to remove forbidden `UPDATE claims SET lifecycle_state ...`.
-- `sweepStaleClaims(...)` now:
-  - appends a transition to `EXPIRED` in `claim_transitions`
-  - appends a new `claims` row with `lifecycle_state = EXPIRED` and lineage link (`promoted_from_claim_id = original claim_id`)
-- Added duplicate-expiry protection: if an `EXPIRED` transition already exists for a claim, sweep skips it.
-- Updated stale detection to treat `EXPIRED` as terminal (`isClaimStale`).
+3. `src/api/enforceRouter.ts`
+- Removed allow-by-default placeholder behavior.
+- Wired `/api/v1/enforce/evaluate` to the real `PolicyFirewall` engine.
+- Added baseline policy rules and now returns real `PolicyDecision` values (`allow|deny|stepup|sanitize|quarantine`) with matched rules/reasons.
 
-### 3) Type/model alignment for EXPIRED state
-- Added `EXPIRED` to `ClaimLifecycleState` in `src/claims/claimTypes.ts`.
-- Updated typed state maps for compatibility:
-  - `src/claims/claimLifecycle.ts`
-  - `src/claims/promotionGate.ts`
-  - `src/claims/governanceLineage.ts`
+4. `src/api/watchRouter.ts`
+- Replaced receipts placeholder with real ledger-backed receipt retrieval:
+  - pulls evidence-event receipts from ledger `evidence_events`
+  - pulls outcome-event receipts from ledger `outcome_events`
+  - filters by requested `agentId`
+  - supports `?limit=` (default 50, max 500)
 
-### 4) Regression tests added
-- Added `tests/appendOnlyLifecycleFixes.test.ts` covering:
-  - correction verification append-only behavior with immutable triggers
-  - stale claim sweep append-only expiry behavior (`EXPIRED` record insertion, no in-place updates, idempotent re-sweep behavior)
+5. API plumbing for workspace-aware watch retrieval
+- `src/api/index.ts`: added optional `workspace` argument and passed it into `handleWatchRoute(...)`
+- `src/studio/studioServer.ts`: passes `options.workspace` into `handleApiRoute(...)`
 
-## Verification run
-- Executed required command:
-  - `npm test -- --reporter=verbose 2>&1 | tail -30`
-- Result in this sandbox: suite does not fully pass due existing environment/socket restrictions (`listen EPERM: operation not permitted 127.0.0.1`) in integration tests (e.g., `tests/enterpriseSsoScim.test.ts`).
-- New targeted regression suite passes:
-  - `tests/appendOnlyLifecycleFixes.test.ts` -> 2/2 tests passing.
+## Test Command Run
+Executed exactly as requested:
 
-## Remaining issues
-- Full-suite failures are dominated by existing network bind restrictions in this environment, not by these lifecycle changes.
-- Unrelated workspace drift observed during test/install steps (outside the fix scope):
-  - deleted `.amc/guard_events.sqlite`
-  - modified `package-lock.json`
+```bash
+npm test -- --reporter=verbose 2>&1 | tail -30
+```
+
+Result:
+
+```text
+> agent-maturity-compass@1.0.0 test
+> vitest run --reporter=verbose
+
+sh: vitest: command not found
+```
+
+## Commit Status
+Requested commit could not be created due sandbox write restrictions on the worktree git metadata path:
+
+```text
+fatal: Unable to create '/Users/sid/AgentMaturityCompass/.git/worktrees/agent-2/index.lock': Operation not permitted
+```
+
+All code changes are present in the working tree.

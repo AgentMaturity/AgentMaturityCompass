@@ -72,3 +72,7 @@ export function detectInjection(prompt: string): DetectorResult {
   });
   return result;
 }
+
+export function detect(input: string): DetectorResult {
+  return detectInjection(input);
+}

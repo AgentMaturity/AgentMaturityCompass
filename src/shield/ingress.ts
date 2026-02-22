@@ -68,3 +68,9 @@ export class IngressFilter {
     return result;
   }
 }
+
+const defaultIngressFilter = new IngressFilter();
+
+export function checkIngress(input: string, source = 'system', rules: IngressRules = {}): IngressResult {
+  return defaultIngressFilter.checkIngress(input, source, rules);
+}
