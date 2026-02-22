@@ -557,6 +557,42 @@ const seeds: QuestionSeed[] = [
     tuningKnobs: ["guardrails.memoryIntegrity", "promptAddendum.memoryProtection", "evalHarness.memoryTamper"]
   },
   {
+    id: "AMC-LC-1",
+    layerName: "Strategic Agent Operations",
+    title: "Lifecycle Responsibility Mapping",
+    promptTemplate:
+      "Are lifecycle stages (development, testing, staging, production, deprecated) explicitly mapped with accountable roles (developer, deployer, operator)?",
+    labels: [
+      "No Lifecycle Ownership",
+      "Implicit Roles, Untracked",
+      "Stages Defined, Ownership Partial",
+      "Responsibility Matrix Documented",
+      "Role Accountability Enforced",
+      "Continuously Audited Accountability"
+    ],
+    evidenceGateHints: "Require a stage-by-stage accountability matrix and signed ownership references for L3+.",
+    upgradeHints: "Define stage owners first, then enforce role checks and transition approvals in workflow tooling.",
+    tuningKnobs: ["guardrails.lifecycleResponsibility", "evalHarness.lifecycleOwnership"]
+  },
+  {
+    id: "AMC-LC-2",
+    layerName: "Strategic Agent Operations",
+    title: "Lifecycle Governance Gate Enforcement",
+    promptTemplate:
+      "Before each lifecycle stage advance, are governance gates (tests, approvals, monitoring, rollback readiness) enforced and logged?",
+    labels: [
+      "No Gates",
+      "Manual Checklist Only",
+      "Basic Stage Gates",
+      "Automated Gate Validation",
+      "Risk-Calibrated Gate Enforcement",
+      "Signed, Auditable Transition Controls"
+    ],
+    evidenceGateHints: "Require explicit gate outcomes, stage transition timestamps, and reviewer/operator evidence for L3+.",
+    upgradeHints: "Attach control IDs to each stage transition and block promotion when required controls are missing.",
+    tuningKnobs: ["guardrails.lifecycleGates", "evalHarness.lifecycleTransitions"]
+  },
+  {
     id: "AMC-2.1",
     layerName: "Leadership & Autonomy",
     title: "Aspiration Surfacing",

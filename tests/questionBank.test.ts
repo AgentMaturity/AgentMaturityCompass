@@ -6,18 +6,18 @@ describe("question bank", () => {
     expect(questionBank).toHaveLength(89);
   });
 
-  test("has expected layer distribution 13/18/20/16/22", () => {
+  test("has expected layer distribution 15/18/20/16/20", () => {
     const counts = questionBank.reduce<Record<string, number>>((acc, q) => {
       acc[q.layerName] = (acc[q.layerName] ?? 0) + 1;
       return acc;
     }, {});
 
     expect(counts).toEqual({
-      "Strategic Agent Operations": 13,
+      "Strategic Agent Operations": 15,
       "Leadership & Autonomy": 18,
       "Culture & Alignment": 20,
       Resilience: 16,
-      Skills: 22
+      Skills: 20
     });
   });
 
