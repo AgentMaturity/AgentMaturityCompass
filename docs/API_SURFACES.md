@@ -13,8 +13,9 @@ Auth and stability:
 - treat as internal; keep Studio network-restricted
 
 Response envelope:
-- success: `{ "ok": true, "data": ... }`
-- error: `{ "ok": false, "error": "..." }`
+- most `/api/v1` routes return success as `{ "ok": true, "data": ... }`
+- most `/api/v1` routes return errors as `{ "ok": false, "error": "..." }`
+- exception: `GET /api/v1/health` returns the raw health payload
 
 Implemented routes:
 - `GET /api/v1/health`
@@ -127,3 +128,4 @@ Legacy bridge-style paths under `/api/v1/*` redirect with `308` + deprecation he
 - `/api/v1/embeddings` -> `/bridge/openai/v1/embeddings`
 
 Use `/bridge/*` directly for all new integrations.
+Treat legacy paths as deprecated compatibility shims.

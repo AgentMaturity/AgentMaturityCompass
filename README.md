@@ -98,7 +98,7 @@ AMC does that for AI agents.
 
 ## What AMC Does (Full Platform)
 
-AMC is a **25-module trust and safety platform** covering the full agent lifecycle:
+AMC is a **multi-module trust and safety platform** covering the full agent lifecycle:
 
 ### 1. Evidence Capture — Connect Any Agent
 
@@ -107,15 +107,15 @@ AMC is a **25-module trust and safety platform** covering the full agent lifecyc
 amc adapters run --agent my-agent --adapter claude-cli      -- claude
 amc adapters run --agent my-agent --adapter gemini-cli      -- gemini
 amc adapters run --agent my-agent --adapter openclaw-cli    -- openclaw run
-amc adapters run --agent my-agent --adapter openai-sdk      -- node ./gpt-agent.js
-amc adapters run --agent my-agent --adapter xai-grok        -- node ./grok-agent.js
-amc adapters run --agent my-agent --adapter openrouter      -- node ./my-agent.js
-amc adapters run --agent my-agent --adapter ollama          -- ollama run mistral
+amc adapters run --agent my-agent --adapter openai-agents-sdk -- node ./gpt-agent.js
 amc adapters run --agent my-agent --adapter langchain-node  -- node ./lc-agent.js
 amc adapters run --agent my-agent --adapter langchain-python -- python agent.py
+amc adapters run --agent my-agent --adapter langgraph-python -- python graph_agent.py
+amc adapters run --agent my-agent --adapter llamaindex-python -- python llamaindex_agent.py
 amc adapters run --agent my-agent --adapter autogen-cli     -- python autogen_agent.py
 amc adapters run --agent my-agent --adapter crewai-cli      -- python crew.py
 amc adapters run --agent my-agent --adapter semantic-kernel -- dotnet run
+amc adapters run --agent my-agent --adapter python-amc-sdk  -- python sdk_agent.py
 amc adapters run --agent my-agent --adapter generic-cli     -- ./my-bot
 
 # SDK — wrap fetch for automatic evidence capture

@@ -30,12 +30,15 @@ Contextualization:
 - question semantics remain fixed
 - phrasing/examples are adapted by agent profile (`code-agent` / `support-agent` / `ops-agent` / `research-agent` / `sales-agent` / `other`)
 
-Studio API endpoints (session/admin auth):
+Studio API endpoints:
 - `GET /diagnostic/bank`
 - `GET /diagnostic/bank/verify`
 - `POST /diagnostic/bank/apply`
-- `GET /diagnostic/render?agentId=<id>&agentType=<profile>`
-- `POST /diagnostic/self-run`
+- `GET /diagnostic/render?agentId=<id>`
+
+Auth model:
+- `/diagnostic/bank*` and `/diagnostic/render` use session/admin-token auth with RBAC.
+- `/diagnostic/self-run` is lease-auth only (`diagnostic:self-run` scope). Any submitted answer payload is ignored; scoring is evidence-derived server-side.
 
 Lightweight score API (`/api/v1/*`, operational surface):
 - `GET /api/v1/score/status`
