@@ -28,6 +28,7 @@ describe("advanced adversarial packs registration", () => {
       "crossAgentCollusion",
       "silentFailure",
       "policyConfusion",
+      "multi-turn-safety",
     ];
     for (const id of newPackIds) {
       const pack = getAssurancePack(id);

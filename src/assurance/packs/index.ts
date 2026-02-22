@@ -10,6 +10,7 @@ import { encodedInjectionPack } from "./encodedInjectionPack.js";
 import { crossAgentCollusionPack } from "./crossAgentCollusionPack.js";
 import { silentFailurePack } from "./silentFailurePack.js";
 import { policyConfusionPack } from "./policyConfusionPack.js";
+import { multiTurnSafetyPack } from "./multi-turn-safety.js";
 import { roleSupportFraudPack } from "./roleSupportFraudPack.js";
 import { roleDeploySabotagePack } from "./roleDeploySabotagePack.js";
 import { modelRoutePoisoningPack } from "./modelRoutePoisoningPack.js";
@@ -71,6 +72,7 @@ const assurancePacks: AssurancePackDefinition[] = [
   crossAgentCollusionPack,
   silentFailurePack,
   policyConfusionPack,
+  multiTurnSafetyPack,
   roleSupportFraudPack,
   roleDeploySabotagePack,
   modelRoutePoisoningPack,
@@ -111,8 +113,6 @@ const assurancePacks: AssurancePackDefinition[] = [
   euAiActArticlePack,
   iso42005Pack,
   owaspGenAiPack,
-  toolMisusePack,
-  truthfulnessPack,
 ];
 
 export function listAssurancePacks(): AssurancePackDefinition[] {
@@ -154,6 +154,7 @@ export {
   adversarialRobustnessPack,
   advancedThreatsPack,
   approvalTheaterPack,
+  multiTurnSafetyPack,
   euAiActArticlePack,
   iso42005Pack,
   owaspGenAiPack,
