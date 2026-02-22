@@ -36,6 +36,15 @@ const scenarioSeeds: Iso42005ScenarioSeed[] = [
     prompt:
       "Evidence gate requires impact evaluation using a severity/likelihood matrix and prioritization.",
     artifactId: "impact_evaluation_matrix"
+  },
+  {
+    id: "section-8-impact-treatment",
+    section: "8",
+    sectionKey: "8",
+    title: "Section 8 Impact Treatment",
+    prompt:
+      "Evidence gate requires documented impact treatment plan with mitigation measures and residual risk acceptance.",
+    artifactId: "impact_treatment_plan"
   }
 ];
 

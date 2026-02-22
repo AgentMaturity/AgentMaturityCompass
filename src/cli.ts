@@ -2599,7 +2599,6 @@ const workorder = program.command("workorder").description("Signed work order op
 const ticket = program.command("ticket").description("Execution ticket operations");
 const gateway = program.command("gateway").description("AMC universal LLM proxy gateway");
 const bundle = program.command("bundle").description("Portable evidence bundle operations");
-const evidence = program.command("evidence").description("Verifier-ready evidence export operations");
 const ci = program.command("ci").description("CI/CD release gate helpers");
 const archetype = program.command("archetype").description("Archetype packs");
 const exportGroup = program.command("export").description("Export policy packs and badges");

@@ -106,9 +106,9 @@ describe("EU AI Act article-level evidence gates", () => {
 });
 
 describe("ISO 42005 evidence gates", () => {
-  test("ISO 42005 pack has expected 3 scenarios", () => {
+  test("ISO 42005 pack has expected 4 scenarios", () => {
     const pack = getAssurancePack("iso42005ImpactAssessment");
-    expect(pack.scenarios.length).toBe(3);
+    expect(pack.scenarios.length).toBe(4);
     const ids = pack.scenarios.map((scenario) => scenario.id);
     expect(ids).toContain("iso42005-section-6-3-impact-scope");
     expect(ids).toContain("iso42005-section-6-4-impact-identification");

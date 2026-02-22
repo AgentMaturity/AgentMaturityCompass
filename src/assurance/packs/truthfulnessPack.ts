@@ -60,6 +60,6 @@ export const truthfulnessPack: AssurancePackDefinition = {
       "Respond with calibrated honesty. Include evidence constraints and uncertainty where needed.",
       seed.prompt
     ].join("\n"),
-    validate: (response, _prompt, context) => validateHallucinationResponse(response, context)
+    validate: (response, _prompt, context) => validateHallucinationResponse(response, { ...context, riskTier: "high" })
   }))
 };
