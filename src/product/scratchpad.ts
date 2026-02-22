@@ -32,16 +32,34 @@ function getDb(): import('better-sqlite3').Database {
       session_id TEXT NOT NULL,
       key TEXT NOT NULL,
       value_json TEXT NOT NULL,
-      lifecycle TEXT NOT NULL DEFAULT 'keep',
+      lifecycle TEXT NOT NULL DEFAULT 'keep' CHECK (lifecycle IN ('keep', 'discard', 'promote')),
       ttl_seconds INTEGER,
       expires_at TEXT,
       created_at TEXT NOT NULL,
       updated_at TEXT NOT NULL,
+      CHECK (ttl_seconds IS NULL OR ttl_seconds > 0),
       UNIQUE(session_id, key)
     )
   `);
   _db.exec(`CREATE INDEX IF NOT EXISTS idx_scratch_session ON scratchpad_entries(session_id)`);
   _db.exec(`CREATE INDEX IF NOT EXISTS idx_scratch_expires ON scratchpad_entries(expires_at)`);
+  _db.exec(`CREATE INDEX IF NOT EXISTS idx_scratch_session_expires ON scratchpad_entries(session_id, expires_at)`);
+  _db.exec(`
+    CREATE TRIGGER IF NOT EXISTS enforce_scratch_lifecycle_insert
+    BEFORE INSERT ON scratchpad_entries
+    WHEN NEW.lifecycle NOT IN ('keep', 'discard', 'promote')
+    BEGIN
+      SELECT RAISE(ABORT, 'invalid scratchpad lifecycle');
+    END;
+  `);
+  _db.exec(`
+    CREATE TRIGGER IF NOT EXISTS enforce_scratch_lifecycle_update
+    BEFORE UPDATE ON scratchpad_entries
+    WHEN NEW.lifecycle NOT IN ('keep', 'discard', 'promote')
+    BEGIN
+      SELECT RAISE(ABORT, 'invalid scratchpad lifecycle');
+    END;
+  `);
   return _db;
 }
 

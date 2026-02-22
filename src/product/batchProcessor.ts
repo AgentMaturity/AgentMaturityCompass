@@ -66,10 +66,10 @@ function ensureSchema(): void {
     CREATE TABLE IF NOT EXISTS batches (
       id TEXT PRIMARY KEY,
       name TEXT NOT NULL,
-      status TEXT NOT NULL DEFAULT 'pending',
-      total_items INTEGER NOT NULL DEFAULT 0,
-      completed_items INTEGER NOT NULL DEFAULT 0,
-      failed_items INTEGER NOT NULL DEFAULT 0,
+      status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'running', 'paused', 'completed', 'failed', 'cancelled')),
+      total_items INTEGER NOT NULL DEFAULT 0 CHECK (total_items >= 0),
+      completed_items INTEGER NOT NULL DEFAULT 0 CHECK (completed_items >= 0),
+      failed_items INTEGER NOT NULL DEFAULT 0 CHECK (failed_items >= 0),
       created_at TEXT NOT NULL DEFAULT (datetime('now')),
       started_at TEXT,
       completed_at TEXT,
@@ -77,9 +77,9 @@ function ensureSchema(): void {
     );
     CREATE TABLE IF NOT EXISTS batch_items (
       id TEXT PRIMARY KEY,
-      batch_id TEXT NOT NULL REFERENCES batches(id),
+      batch_id TEXT NOT NULL REFERENCES batches(id) ON DELETE CASCADE,
       payload TEXT NOT NULL,
-      status TEXT NOT NULL DEFAULT 'pending',
+      status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'processing', 'completed', 'failed')),
       result TEXT,
       error TEXT,
       claimed_by TEXT,
@@ -87,6 +87,37 @@ function ensureSchema(): void {
       processed_at TEXT
     );
     CREATE INDEX IF NOT EXISTS idx_batch_items_batch ON batch_items(batch_id, status);
+    CREATE INDEX IF NOT EXISTS idx_batch_items_batch_created ON batch_items(batch_id, created_at);
+    CREATE INDEX IF NOT EXISTS idx_batch_items_claimed_status ON batch_items(claimed_by, status);
+    CREATE INDEX IF NOT EXISTS idx_batches_status_created ON batches(status, created_at DESC);
+
+    CREATE TRIGGER IF NOT EXISTS enforce_batches_status_insert
+    BEFORE INSERT ON batches
+    WHEN NEW.status NOT IN ('pending', 'running', 'paused', 'completed', 'failed', 'cancelled')
+    BEGIN
+      SELECT RAISE(ABORT, 'invalid batches.status');
+    END;
+
+    CREATE TRIGGER IF NOT EXISTS enforce_batches_status_update
+    BEFORE UPDATE ON batches
+    WHEN NEW.status NOT IN ('pending', 'running', 'paused', 'completed', 'failed', 'cancelled')
+    BEGIN
+      SELECT RAISE(ABORT, 'invalid batches.status');
+    END;
+
+    CREATE TRIGGER IF NOT EXISTS enforce_batch_items_status_insert
+    BEFORE INSERT ON batch_items
+    WHEN NEW.status NOT IN ('pending', 'processing', 'completed', 'failed')
+    BEGIN
+      SELECT RAISE(ABORT, 'invalid batch_items.status');
+    END;
+
+    CREATE TRIGGER IF NOT EXISTS enforce_batch_items_status_update
+    BEFORE UPDATE ON batch_items
+    WHEN NEW.status NOT IN ('pending', 'processing', 'completed', 'failed')
+    BEGIN
+      SELECT RAISE(ABORT, 'invalid batch_items.status');
+    END;
   `);
 }
 

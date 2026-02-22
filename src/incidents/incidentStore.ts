@@ -10,11 +10,11 @@ function initIncidentTables(db: Database.Database): void {
     CREATE TABLE IF NOT EXISTS incidents (
       incident_id TEXT PRIMARY KEY,
       agent_id TEXT NOT NULL,
-      severity TEXT NOT NULL,
-      state TEXT NOT NULL,
+      severity TEXT NOT NULL CHECK (severity IN ('INFO', 'WARN', 'CRITICAL')),
+      state TEXT NOT NULL CHECK (state IN ('OPEN', 'INVESTIGATING', 'MITIGATED', 'RESOLVED', 'POSTMORTEM')),
       title TEXT NOT NULL,
       description TEXT NOT NULL,
-      trigger_type TEXT NOT NULL,
+      trigger_type TEXT NOT NULL CHECK (trigger_type IN ('DRIFT', 'ASSURANCE_FAILURE', 'FREEZE', 'BUDGET_EXCEEDED', 'GOVERNANCE_VIOLATION', 'MANUAL')),
       trigger_id TEXT NOT NULL,
       root_cause_claim_ids_json TEXT NOT NULL DEFAULT '[]',
       affected_question_ids_json TEXT NOT NULL DEFAULT '[]',
@@ -32,8 +32,8 @@ function initIncidentTables(db: Database.Database): void {
     CREATE TABLE IF NOT EXISTS incident_transitions (
       transition_id TEXT PRIMARY KEY,
       incident_id TEXT NOT NULL,
-      from_state TEXT NOT NULL,
-      to_state TEXT NOT NULL,
+      from_state TEXT NOT NULL CHECK (from_state IN ('OPEN', 'INVESTIGATING', 'MITIGATED', 'RESOLVED', 'POSTMORTEM')),
+      to_state TEXT NOT NULL CHECK (to_state IN ('OPEN', 'INVESTIGATING', 'MITIGATED', 'RESOLVED', 'POSTMORTEM')),
       reason TEXT NOT NULL,
       ts INTEGER NOT NULL,
       signature TEXT NOT NULL,
@@ -45,11 +45,11 @@ function initIncidentTables(db: Database.Database): void {
       incident_id TEXT NOT NULL,
       from_event_id TEXT NOT NULL,
       to_event_id TEXT NOT NULL,
-      relationship TEXT NOT NULL,
-      confidence REAL NOT NULL,
+      relationship TEXT NOT NULL CHECK (relationship IN ('CAUSED', 'ENABLED', 'BLOCKED', 'MITIGATED', 'FIXED', 'CORRELATED')),
+      confidence REAL NOT NULL CHECK (confidence >= 0 AND confidence <= 1),
       evidence_json TEXT NOT NULL DEFAULT '[]',
       added_ts INTEGER NOT NULL,
-      added_by TEXT NOT NULL,
+      added_by TEXT NOT NULL CHECK (added_by IN ('AUTO', 'OWNER', 'AUDITOR')),
       signature TEXT NOT NULL,
       FOREIGN KEY (incident_id) REFERENCES incidents(incident_id)
     );
@@ -57,11 +57,55 @@ function initIncidentTables(db: Database.Database): void {
     CREATE INDEX IF NOT EXISTS idx_incidents_agent ON incidents(agent_id);
     CREATE INDEX IF NOT EXISTS idx_incidents_state ON incidents(state);
     CREATE INDEX IF NOT EXISTS idx_incidents_severity ON incidents(severity);
+    CREATE INDEX IF NOT EXISTS idx_incidents_agent_created ON incidents(agent_id, created_ts DESC);
+    CREATE INDEX IF NOT EXISTS idx_incidents_agent_state_created ON incidents(agent_id, state, created_ts DESC);
     CREATE INDEX IF NOT EXISTS idx_incident_transitions_incident ON incident_transitions(incident_id);
     CREATE INDEX IF NOT EXISTS idx_incident_transitions_ts ON incident_transitions(ts);
+    CREATE INDEX IF NOT EXISTS idx_incident_transitions_incident_ts ON incident_transitions(incident_id, ts);
     CREATE INDEX IF NOT EXISTS idx_causal_edges_incident ON causal_edges(incident_id);
+    CREATE INDEX IF NOT EXISTS idx_causal_edges_incident_added ON causal_edges(incident_id, added_ts);
     CREATE INDEX IF NOT EXISTS idx_causal_edges_from_event ON causal_edges(from_event_id);
     CREATE INDEX IF NOT EXISTS idx_causal_edges_to_event ON causal_edges(to_event_id);
+    CREATE TRIGGER IF NOT EXISTS enforce_incident_transition_state_change
+    BEFORE INSERT ON incident_transitions
+    WHEN NEW.from_state = NEW.to_state
+    BEGIN
+      SELECT RAISE(ABORT, 'incident transition must change state');
+    END;
+
+    CREATE TRIGGER IF NOT EXISTS enforce_incident_severity_domain
+    BEFORE INSERT ON incidents
+    WHEN NEW.severity NOT IN ('INFO', 'WARN', 'CRITICAL')
+    BEGIN
+      SELECT RAISE(ABORT, 'incident severity out of range');
+    END;
+
+    CREATE TRIGGER IF NOT EXISTS enforce_incident_state_domain
+    BEFORE INSERT ON incidents
+    WHEN NEW.state NOT IN ('OPEN', 'INVESTIGATING', 'MITIGATED', 'RESOLVED', 'POSTMORTEM')
+    BEGIN
+      SELECT RAISE(ABORT, 'incident state out of range');
+    END;
+
+    CREATE TRIGGER IF NOT EXISTS enforce_causal_edge_confidence
+    BEFORE INSERT ON causal_edges
+    WHEN NEW.confidence < 0 OR NEW.confidence > 1
+    BEGIN
+      SELECT RAISE(ABORT, 'causal edge confidence out of range');
+    END;
+
+    CREATE TRIGGER IF NOT EXISTS enforce_causal_edge_uniqueness
+    BEFORE INSERT ON causal_edges
+    WHEN EXISTS(
+      SELECT 1 FROM causal_edges
+      WHERE incident_id = NEW.incident_id
+        AND from_event_id = NEW.from_event_id
+        AND to_event_id = NEW.to_event_id
+        AND relationship = NEW.relationship
+    )
+    BEGIN
+      SELECT RAISE(ABORT, 'duplicate causal edge');
+    END;
 
     CREATE TRIGGER IF NOT EXISTS protect_incidents_immutable
     BEFORE UPDATE ON incidents

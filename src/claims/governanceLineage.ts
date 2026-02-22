@@ -167,17 +167,21 @@ export function initGovernanceLineageTables(db: Database.Database): void {
       claim_id TEXT NOT NULL,
       transition_id TEXT NOT NULL,
       transparency_entry_hash TEXT NOT NULL,
-      from_state TEXT NOT NULL,
-      to_state TEXT NOT NULL,
+      from_state TEXT NOT NULL CHECK (from_state IN ('QUARANTINE', 'PROVISIONAL', 'PROMOTED', 'EXPIRED', 'DEPRECATED', 'REVOKED')),
+      to_state TEXT NOT NULL CHECK (to_state IN ('QUARANTINE', 'PROVISIONAL', 'PROMOTED', 'EXPIRED', 'DEPRECATED', 'REVOKED')),
       reason TEXT NOT NULL,
       evidence_refs_json TEXT NOT NULL,
       ts INTEGER NOT NULL,
-      signature TEXT NOT NULL
+      signature TEXT NOT NULL,
+      FOREIGN KEY (claim_id) REFERENCES claims(claim_id),
+      FOREIGN KEY (transition_id) REFERENCES claim_transitions(transition_id),
+      CHECK (length(transparency_entry_hash) = 64)
     );
 
     CREATE INDEX IF NOT EXISTS idx_ctl_claim ON claim_transparency_links(claim_id);
     CREATE INDEX IF NOT EXISTS idx_ctl_transition ON claim_transparency_links(transition_id);
     CREATE INDEX IF NOT EXISTS idx_ctl_transparency ON claim_transparency_links(transparency_entry_hash);
+    CREATE INDEX IF NOT EXISTS idx_ctl_claim_ts ON claim_transparency_links(claim_id, ts);
 
     CREATE TABLE IF NOT EXISTS policy_change_intents (
       intent_id TEXT PRIMARY KEY,
@@ -185,33 +189,114 @@ export function initGovernanceLineageTables(db: Database.Database): void {
       policy_file_path TEXT NOT NULL,
       policy_file_sha256_before TEXT NOT NULL,
       policy_file_sha256_after TEXT NOT NULL,
-      category TEXT NOT NULL,
+      category TEXT NOT NULL CHECK (category IN (
+        'RISK_MITIGATION',
+        'COMPLIANCE_REQUIREMENT',
+        'PERFORMANCE_OPTIMIZATION',
+        'EVIDENCE_DRIVEN',
+        'INCIDENT_RESPONSE',
+        'SCHEDULED_REVIEW',
+        'MANUAL_OVERRIDE'
+      )),
       rationale TEXT NOT NULL,
       impact_summary TEXT NOT NULL,
       claim_ids_json TEXT NOT NULL DEFAULT '[]',
       evidence_refs_json TEXT NOT NULL DEFAULT '[]',
-      reversible INTEGER NOT NULL DEFAULT 1,
+      reversible INTEGER NOT NULL DEFAULT 1 CHECK (reversible IN (0, 1)),
       rollback_instructions TEXT,
       created_ts INTEGER NOT NULL,
       created_by TEXT NOT NULL,
       prev_intent_hash TEXT NOT NULL,
       intent_hash TEXT NOT NULL,
-      signature TEXT NOT NULL
+      signature TEXT NOT NULL,
+      CHECK (length(policy_file_sha256_before) = 64),
+      CHECK (length(policy_file_sha256_after) = 64),
+      CHECK (length(prev_intent_hash) > 0),
+      CHECK (length(intent_hash) = 64)
     );
 
     CREATE INDEX IF NOT EXISTS idx_pci_agent ON policy_change_intents(agent_id);
     CREATE INDEX IF NOT EXISTS idx_pci_category ON policy_change_intents(category);
+    CREATE INDEX IF NOT EXISTS idx_pci_agent_created_ts ON policy_change_intents(agent_id, created_ts DESC);
 
     CREATE TABLE IF NOT EXISTS claim_policy_links (
       link_id TEXT PRIMARY KEY,
       claim_id TEXT NOT NULL,
       intent_id TEXT NOT NULL,
-      direction TEXT NOT NULL,
-      ts INTEGER NOT NULL
+      direction TEXT NOT NULL CHECK (direction IN ('CLAIM_DROVE_POLICY', 'POLICY_DROVE_CLAIM')),
+      ts INTEGER NOT NULL,
+      FOREIGN KEY (claim_id) REFERENCES claims(claim_id),
+      FOREIGN KEY (intent_id) REFERENCES policy_change_intents(intent_id)
     );
 
     CREATE INDEX IF NOT EXISTS idx_cpl_claim ON claim_policy_links(claim_id);
     CREATE INDEX IF NOT EXISTS idx_cpl_intent ON claim_policy_links(intent_id);
+    CREATE INDEX IF NOT EXISTS idx_cpl_claim_ts ON claim_policy_links(claim_id, ts);
+
+    CREATE TRIGGER IF NOT EXISTS enforce_ctl_unique_transition
+    BEFORE INSERT ON claim_transparency_links
+    WHEN EXISTS(
+      SELECT 1 FROM claim_transparency_links
+      WHERE transition_id = NEW.transition_id
+    )
+    BEGIN
+      SELECT RAISE(ABORT, 'claim transition already linked to transparency');
+    END;
+
+    CREATE TRIGGER IF NOT EXISTS enforce_cpl_unique_direction
+    BEFORE INSERT ON claim_policy_links
+    WHEN EXISTS(
+      SELECT 1 FROM claim_policy_links
+      WHERE claim_id = NEW.claim_id
+        AND intent_id = NEW.intent_id
+        AND direction = NEW.direction
+    )
+    BEGIN
+      SELECT RAISE(ABORT, 'duplicate claim-policy linkage');
+    END;
+
+    CREATE TRIGGER IF NOT EXISTS enforce_policy_intent_rationale_min_length
+    BEFORE INSERT ON policy_change_intents
+    WHEN length(trim(NEW.rationale)) < 10
+    BEGIN
+      SELECT RAISE(ABORT, 'policy rationale must be at least 10 characters');
+    END;
+
+    CREATE TRIGGER IF NOT EXISTS protect_claim_transparency_links_immutable
+    BEFORE UPDATE ON claim_transparency_links
+    BEGIN
+      SELECT RAISE(ABORT, 'claim_transparency_links are append-only');
+    END;
+
+    CREATE TRIGGER IF NOT EXISTS no_delete_claim_transparency_links
+    BEFORE DELETE ON claim_transparency_links
+    BEGIN
+      SELECT RAISE(ABORT, 'claim_transparency_links cannot be deleted');
+    END;
+
+    CREATE TRIGGER IF NOT EXISTS protect_policy_change_intents_immutable
+    BEFORE UPDATE ON policy_change_intents
+    BEGIN
+      SELECT RAISE(ABORT, 'policy_change_intents are append-only');
+    END;
+
+    CREATE TRIGGER IF NOT EXISTS no_delete_policy_change_intents
+    BEFORE DELETE ON policy_change_intents
+    BEGIN
+      SELECT RAISE(ABORT, 'policy_change_intents cannot be deleted');
+    END;
+
+    CREATE TRIGGER IF NOT EXISTS protect_claim_policy_links_immutable
+    BEFORE UPDATE ON claim_policy_links
+    BEGIN
+      SELECT RAISE(ABORT, 'claim_policy_links are append-only');
+    END;
+
+    CREATE TRIGGER IF NOT EXISTS no_delete_claim_policy_links
+    BEFORE DELETE ON claim_policy_links
+    BEGIN
+      SELECT RAISE(ABORT, 'claim_policy_links cannot be deleted');
+    END;
   `);
 }
 

@@ -63,26 +63,26 @@ function ensureSchema(): void {
       id TEXT PRIMARY KEY,
       name TEXT NOT NULL,
       type TEXT NOT NULL,
-      status TEXT NOT NULL DEFAULT 'submitted',
+      status TEXT NOT NULL DEFAULT 'submitted' CHECK (status IN ('submitted', 'queued', 'running', 'completed', 'failed', 'cancelled')),
       submitted_by TEXT NOT NULL,
       payload TEXT NOT NULL DEFAULT '{}',
       result TEXT,
       error TEXT,
-      progress REAL NOT NULL DEFAULT 0,
+      progress REAL NOT NULL DEFAULT 0 CHECK (progress >= 0 AND progress <= 100),
       created_at TEXT NOT NULL DEFAULT (datetime('now')),
       started_at TEXT,
       completed_at TEXT
     );
     CREATE TABLE IF NOT EXISTS portal_progress_events (
       id TEXT PRIMARY KEY,
-      job_id TEXT NOT NULL REFERENCES portal_jobs(id),
-      progress REAL NOT NULL,
+      job_id TEXT NOT NULL REFERENCES portal_jobs(id) ON DELETE CASCADE,
+      progress REAL NOT NULL CHECK (progress >= 0 AND progress <= 100),
       message TEXT NOT NULL,
       timestamp TEXT NOT NULL DEFAULT (datetime('now'))
     );
     CREATE TABLE IF NOT EXISTS portal_result_files (
       id TEXT PRIMARY KEY,
-      job_id TEXT NOT NULL REFERENCES portal_jobs(id),
+      job_id TEXT NOT NULL REFERENCES portal_jobs(id) ON DELETE CASCADE,
       filename TEXT NOT NULL,
       mime_type TEXT NOT NULL DEFAULT 'application/octet-stream',
       size_bytes INTEGER NOT NULL DEFAULT 0,
@@ -90,7 +90,48 @@ function ensureSchema(): void {
       created_at TEXT NOT NULL DEFAULT (datetime('now'))
     );
     CREATE INDEX IF NOT EXISTS idx_portal_progress ON portal_progress_events(job_id);
+    CREATE INDEX IF NOT EXISTS idx_portal_progress_job_ts ON portal_progress_events(job_id, timestamp);
     CREATE INDEX IF NOT EXISTS idx_portal_files ON portal_result_files(job_id);
+    CREATE INDEX IF NOT EXISTS idx_portal_files_job_created ON portal_result_files(job_id, created_at);
+    CREATE INDEX IF NOT EXISTS idx_portal_jobs_created ON portal_jobs(created_at DESC);
+    CREATE INDEX IF NOT EXISTS idx_portal_jobs_status_created ON portal_jobs(status, created_at DESC);
+    CREATE INDEX IF NOT EXISTS idx_portal_jobs_type_created ON portal_jobs(type, created_at DESC);
+    CREATE INDEX IF NOT EXISTS idx_portal_jobs_submitter_created ON portal_jobs(submitted_by, created_at DESC);
+
+    CREATE TRIGGER IF NOT EXISTS enforce_portal_job_status_insert
+    BEFORE INSERT ON portal_jobs
+    WHEN NEW.status NOT IN ('submitted', 'queued', 'running', 'completed', 'failed', 'cancelled')
+    BEGIN
+      SELECT RAISE(ABORT, 'invalid portal_jobs.status');
+    END;
+
+    CREATE TRIGGER IF NOT EXISTS enforce_portal_job_status_update
+    BEFORE UPDATE ON portal_jobs
+    WHEN NEW.status NOT IN ('submitted', 'queued', 'running', 'completed', 'failed', 'cancelled')
+    BEGIN
+      SELECT RAISE(ABORT, 'invalid portal_jobs.status');
+    END;
+
+    CREATE TRIGGER IF NOT EXISTS enforce_portal_job_progress_insert
+    BEFORE INSERT ON portal_jobs
+    WHEN NEW.progress < 0 OR NEW.progress > 100
+    BEGIN
+      SELECT RAISE(ABORT, 'invalid portal_jobs.progress');
+    END;
+
+    CREATE TRIGGER IF NOT EXISTS enforce_portal_job_progress_update
+    BEFORE UPDATE ON portal_jobs
+    WHEN NEW.progress < 0 OR NEW.progress > 100
+    BEGIN
+      SELECT RAISE(ABORT, 'invalid portal_jobs.progress');
+    END;
+
+    CREATE TRIGGER IF NOT EXISTS enforce_portal_progress_event_range
+    BEFORE INSERT ON portal_progress_events
+    WHEN NEW.progress < 0 OR NEW.progress > 100
+    BEGIN
+      SELECT RAISE(ABORT, 'invalid portal_progress_events.progress');
+    END;
   `);
 }
 
@@ -140,13 +181,15 @@ export class PortalManager {
     }
 
     const db = openProductDb();
-    const updates: string[] = [`status = '${newStatus}'`];
-    if (newStatus === 'running') updates.push(`started_at = datetime('now')`);
-    if (newStatus === 'completed' || newStatus === 'failed' || newStatus === 'cancelled') {
-      updates.push(`completed_at = datetime('now')`);
+    if (newStatus === 'running') {
+      db.prepare(`UPDATE portal_jobs SET status = ?, started_at = datetime('now') WHERE id = ?`).run(newStatus, jobId);
+    } else if (newStatus === 'completed' || newStatus === 'failed' || newStatus === 'cancelled') {
+      db
+        .prepare(`UPDATE portal_jobs SET status = ?, completed_at = datetime('now') WHERE id = ?`)
+        .run(newStatus, jobId);
+    } else {
+      db.prepare(`UPDATE portal_jobs SET status = ? WHERE id = ?`).run(newStatus, jobId);
     }
-
-    db.prepare(`UPDATE portal_jobs SET ${updates.join(', ')} WHERE id = ?`).run(jobId);
     return this.getJob(jobId)!;
   }
 

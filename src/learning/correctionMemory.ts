@@ -123,24 +123,27 @@ export function initLessonTables(db: Database.Database): void {
       correction_id TEXT NOT NULL,
       question_ids_json TEXT NOT NULL,
       lesson_text TEXT NOT NULL,
-      advisory_severity TEXT NOT NULL,
+      advisory_severity TEXT NOT NULL CHECK (advisory_severity IN ('INFO', 'WARN', 'CRITICAL')),
       advisory_category TEXT NOT NULL,
       created_ts INTEGER NOT NULL,
       expiry_ts INTEGER NOT NULL,
-      status TEXT NOT NULL DEFAULT 'ACTIVE',
-      injection_count INTEGER NOT NULL DEFAULT 0,
+      status TEXT NOT NULL DEFAULT 'ACTIVE' CHECK (status IN ('ACTIVE', 'STALE', 'REVOKED', 'SUPERSEDED')),
+      injection_count INTEGER NOT NULL DEFAULT 0 CHECK (injection_count >= 0),
       last_injected_ts INTEGER,
       post_injection_run_ids_json TEXT NOT NULL DEFAULT '[]',
       avg_improvement_post_injection REAL,
-      drift_detected INTEGER NOT NULL DEFAULT 0,
+      drift_detected INTEGER NOT NULL DEFAULT 0 CHECK (drift_detected IN (0, 1)),
       prev_lesson_hash TEXT NOT NULL,
       lesson_hash TEXT NOT NULL,
-      signature TEXT NOT NULL
+      signature TEXT NOT NULL,
+      CHECK (expiry_ts >= created_ts)
     );
 
     CREATE INDEX IF NOT EXISTS idx_lessons_agent ON correction_lessons(agent_id);
     CREATE INDEX IF NOT EXISTS idx_lessons_status ON correction_lessons(status);
     CREATE INDEX IF NOT EXISTS idx_lessons_expiry ON correction_lessons(expiry_ts);
+    CREATE INDEX IF NOT EXISTS idx_lessons_agent_status_expiry ON correction_lessons(agent_id, status, expiry_ts);
+    CREATE INDEX IF NOT EXISTS idx_lessons_correction ON correction_lessons(correction_id);
   `);
 }
 

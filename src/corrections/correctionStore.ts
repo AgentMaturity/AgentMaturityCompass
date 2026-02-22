@@ -22,17 +22,43 @@ function ensureEvidenceCorrectionTables(db: Database.Database): void {
       link_id TEXT PRIMARY KEY,
       evidence_event_id TEXT NOT NULL,
       correction_id TEXT NOT NULL,
-      status TEXT NOT NULL,
+      status TEXT NOT NULL CHECK (status IN (
+        'APPLIED',
+        'PENDING_VERIFICATION',
+        'VERIFIED_EFFECTIVE',
+        'VERIFIED_INEFFECTIVE',
+        'SUPERSEDED',
+        'CORRECTED_EFFECTIVE',
+        'CORRECTED_INEFFECTIVE'
+      )),
       verified_ts INTEGER,
       verified_by TEXT,
       source TEXT NOT NULL,
       created_ts INTEGER NOT NULL,
-      signature TEXT NOT NULL
+      signature TEXT NOT NULL,
+      CHECK ((verified_ts IS NULL AND verified_by IS NULL) OR (verified_ts IS NOT NULL AND verified_by IS NOT NULL))
     );
 
     CREATE INDEX IF NOT EXISTS idx_evidence_corrections_event ON evidence_corrections(evidence_event_id, created_ts);
     CREATE INDEX IF NOT EXISTS idx_evidence_corrections_correction ON evidence_corrections(correction_id, created_ts);
+    CREATE INDEX IF NOT EXISTS idx_evidence_corrections_correction_status ON evidence_corrections(correction_id, status, created_ts);
     CREATE UNIQUE INDEX IF NOT EXISTS idx_evidence_corrections_unique ON evidence_corrections(evidence_event_id, correction_id, status);
+
+    CREATE TRIGGER IF NOT EXISTS enforce_evidence_correction_event_exists
+    BEFORE INSERT ON evidence_corrections
+    WHEN EXISTS(SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'evidence_events')
+      AND NOT EXISTS(SELECT 1 FROM evidence_events WHERE id = NEW.evidence_event_id)
+    BEGIN
+      SELECT RAISE(ABORT, 'evidence event does not exist');
+    END;
+
+    CREATE TRIGGER IF NOT EXISTS enforce_evidence_correction_parent_exists
+    BEFORE INSERT ON evidence_corrections
+    WHEN EXISTS(SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'corrections')
+      AND NOT EXISTS(SELECT 1 FROM corrections WHERE correction_id = NEW.correction_id)
+    BEGIN
+      SELECT RAISE(ABORT, 'correction does not exist');
+    END;
 
     CREATE TRIGGER IF NOT EXISTS protect_evidence_corrections_immutable
     BEFORE UPDATE ON evidence_corrections
@@ -53,12 +79,25 @@ export function initCorrectionTables(db: Database.Database): void {
     CREATE TABLE IF NOT EXISTS corrections (
       correction_id TEXT PRIMARY KEY,
       agent_id TEXT NOT NULL,
-      trigger_type TEXT NOT NULL,
+      trigger_type TEXT NOT NULL CHECK (trigger_type IN (
+        'OWNER_MANUAL',
+        'ASSURANCE_FAILURE',
+        'DRIFT_EVENT',
+        'EXPERIMENT_RESULT',
+        'INCIDENT_RESPONSE',
+        'POLICY_CHANGE'
+      )),
       trigger_id TEXT NOT NULL,
       question_ids_json TEXT NOT NULL,
       correction_description TEXT NOT NULL,
       applied_action TEXT NOT NULL,
-      status TEXT NOT NULL,
+      status TEXT NOT NULL CHECK (status IN (
+        'APPLIED',
+        'PENDING_VERIFICATION',
+        'VERIFIED_EFFECTIVE',
+        'VERIFIED_INEFFECTIVE',
+        'SUPERSEDED'
+      )),
       baseline_run_id TEXT NOT NULL,
       baseline_levels_json TEXT NOT NULL,
       verification_run_id TEXT,
@@ -70,13 +109,16 @@ export function initCorrectionTables(db: Database.Database): void {
       updated_ts INTEGER NOT NULL,
       prev_correction_hash TEXT NOT NULL,
       correction_hash TEXT NOT NULL,
-      signature TEXT NOT NULL
+      signature TEXT NOT NULL,
+      CHECK (effectiveness_score IS NULL OR (effectiveness_score >= 0 AND effectiveness_score <= 1)),
+      CHECK ((verified_ts IS NULL AND verified_by IS NULL) OR (verified_ts IS NOT NULL AND verified_by IS NOT NULL))
     );
 
     CREATE INDEX IF NOT EXISTS idx_corrections_agent ON corrections(agent_id);
     CREATE INDEX IF NOT EXISTS idx_corrections_status ON corrections(status);
     CREATE INDEX IF NOT EXISTS idx_corrections_trigger ON corrections(trigger_type);
     CREATE INDEX IF NOT EXISTS idx_corrections_created_ts ON corrections(created_ts);
+    CREATE INDEX IF NOT EXISTS idx_corrections_agent_status_created ON corrections(agent_id, status, created_ts DESC);
 
     DROP TRIGGER IF EXISTS protect_corrections_immutable;
     CREATE TRIGGER IF NOT EXISTS protect_corrections_immutable
@@ -101,6 +143,27 @@ export function initCorrectionTables(db: Database.Database): void {
     BEFORE DELETE ON corrections
     BEGIN
       SELECT RAISE(ABORT, 'corrections cannot be deleted');
+    END;
+
+    CREATE TRIGGER IF NOT EXISTS enforce_correction_status_domain_insert
+    BEFORE INSERT ON corrections
+    WHEN NEW.status NOT IN ('APPLIED', 'PENDING_VERIFICATION', 'VERIFIED_EFFECTIVE', 'VERIFIED_INEFFECTIVE', 'SUPERSEDED')
+    BEGIN
+      SELECT RAISE(ABORT, 'invalid correction status');
+    END;
+
+    CREATE TRIGGER IF NOT EXISTS enforce_correction_score_range_insert
+    BEFORE INSERT ON corrections
+    WHEN NEW.effectiveness_score IS NOT NULL AND (NEW.effectiveness_score < 0 OR NEW.effectiveness_score > 1)
+    BEGIN
+      SELECT RAISE(ABORT, 'invalid correction effectiveness_score');
+    END;
+
+    CREATE TRIGGER IF NOT EXISTS enforce_correction_score_range_update
+    BEFORE UPDATE ON corrections
+    WHEN NEW.effectiveness_score IS NOT NULL AND (NEW.effectiveness_score < 0 OR NEW.effectiveness_score > 1)
+    BEGIN
+      SELECT RAISE(ABORT, 'invalid correction effectiveness_score');
     END;
   `);
 }
