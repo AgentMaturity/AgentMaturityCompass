@@ -76,6 +76,10 @@ export async function handleScoreRoute(
       if (!session) { apiError(res, 404, 'Session not found'); return true; }
       apiSuccess(res, { recorded: true, answeredCount: Object.keys(session.answers).length });
     } catch (err) {
+      if (err instanceof Error && err.message.startsWith("Invalid score answer:")) {
+        apiError(res, 400, err.message);
+        return true;
+      }
       apiError(res, 500, err instanceof Error ? err.message : 'Internal error');
     }
     return true;

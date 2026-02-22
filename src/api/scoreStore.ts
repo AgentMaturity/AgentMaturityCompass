@@ -3,6 +3,7 @@ import { join, resolve } from "node:path";
 import type Database from "better-sqlite3";
 import { ensureDir } from "../utils/fs.js";
 import { closeSqlitePool, getOrCreateSqlitePool } from "../storage/sqlitePool.js";
+import { questionBank } from "../diagnostic/questionBank.js";
 
 export interface DiagAnswerRecord {
   value: number;
@@ -18,6 +19,10 @@ export interface DiagSession {
 }
 
 const poolKeys = new Map<string, string>();
+const VALID_QUESTION_IDS = new Set(questionBank.map((question) => question.id));
+const MIN_SCORE_VALUE = 0;
+const MAX_SCORE_VALUE = 5;
+const MAX_NOTES_LENGTH = 2000;
 
 function normalizedWorkspace(workspace?: string): string {
   const raw = workspace && workspace.trim().length > 0 ? workspace : process.cwd();
@@ -87,22 +92,52 @@ function parseAnswers(raw: string): Record<string, DiagAnswerRecord> {
     const parsed = JSON.parse(raw) as Record<string, unknown>;
     const out: Record<string, DiagAnswerRecord> = {};
     for (const [key, value] of Object.entries(parsed)) {
+      if (!VALID_QUESTION_IDS.has(key)) {
+        continue;
+      }
       if (typeof value !== "object" || value === null) {
         continue;
       }
       const row = value as Record<string, unknown>;
-      if (typeof row.value !== "number") {
+      if (
+        typeof row.value !== "number" ||
+        !Number.isInteger(row.value) ||
+        row.value < MIN_SCORE_VALUE ||
+        row.value > MAX_SCORE_VALUE
+      ) {
         continue;
       }
+      const notes = typeof row.notes === "string" ? row.notes : undefined;
       out[key] = {
         value: row.value,
-        notes: typeof row.notes === "string" ? row.notes : undefined
+        notes: notes && notes.length > 0 ? notes.slice(0, MAX_NOTES_LENGTH) : undefined
       };
     }
     return out;
   } catch {
     return {};
   }
+}
+
+function assertValidScoreAnswer(params: {
+  questionId: string;
+  value: number;
+  notes?: string;
+}): { questionId: string; value: number; notes?: string } {
+  if (!VALID_QUESTION_IDS.has(params.questionId)) {
+    throw new Error(`Invalid score answer: unknown questionId '${params.questionId}'`);
+  }
+  if (!Number.isInteger(params.value) || params.value < MIN_SCORE_VALUE || params.value > MAX_SCORE_VALUE) {
+    throw new Error(`Invalid score answer: value must be an integer between ${MIN_SCORE_VALUE} and ${MAX_SCORE_VALUE}`);
+  }
+  if (typeof params.notes === "string" && params.notes.length > MAX_NOTES_LENGTH) {
+    throw new Error(`Invalid score answer: notes exceeds max length of ${MAX_NOTES_LENGTH}`);
+  }
+  return {
+    questionId: params.questionId,
+    value: params.value,
+    notes: typeof params.notes === "string" ? params.notes : undefined
+  };
 }
 
 function hydrateSession(row: {
@@ -174,6 +209,12 @@ export function recordScoreAnswer(params: {
   value: number;
   notes?: string;
 }): DiagSession | null {
+  const sanitized = assertValidScoreAnswer({
+    questionId: params.questionId,
+    value: params.value,
+    notes: params.notes
+  });
+
   return withScoreDb(params.workspace, (db) => {
     const row = db
       .prepare(
@@ -195,9 +236,9 @@ export function recordScoreAnswer(params: {
     }
 
     const session = hydrateSession(row);
-    session.answers[params.questionId] = {
-      value: params.value,
-      notes: params.notes
+    session.answers[sanitized.questionId] = {
+      value: sanitized.value,
+      notes: sanitized.notes
     };
 
     db.prepare(

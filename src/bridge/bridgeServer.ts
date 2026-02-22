@@ -123,6 +123,19 @@ function isStreamingBridgeRequest(req: IncomingMessage, body: unknown): boolean 
   return acceptValue.toLowerCase().includes("text/event-stream");
 }
 
+export function shouldBlockStreamingForTruthguard(params: {
+  streamPassthrough: boolean;
+  promptPolicy: PromptPolicy | null;
+}): boolean {
+  if (!params.streamPassthrough || !params.promptPolicy) {
+    return false;
+  }
+  return (
+    params.promptPolicy.promptPolicy.truth.requireTruthguardForBridgeResponses === true &&
+    params.promptPolicy.promptPolicy.truth.enforcementMode === "ENFORCE"
+  );
+}
+
 function auditDeniedBridgeCall(params: {
   workspace: string;
   agentId: string;
@@ -608,6 +621,34 @@ export async function handleBridgeRequest(options: HandleBridgeRequestOptions): 
       });
     }
 
+    const streamPassthrough = isStreamingBridgeRequest(options.req, preparedBodyJson);
+    if (
+      shouldBlockStreamingForTruthguard({
+        streamPassthrough,
+        promptPolicy
+      })
+    ) {
+      appendBridgeAudit({
+        ledger,
+        sessionId,
+        auditType: "BRIDGE_STREAM_VALIDATION_SKIPPED",
+        severity: "HIGH",
+        details: {
+          requestId,
+          agentId: lease.payload.agentId,
+          provider: route.provider,
+          model: intent.model,
+          reason: "streaming disabled while truthguard enforcement mode is ENFORCE"
+        }
+      });
+      ledger.sealSession(sessionId);
+      writeJson(options.res, 400, {
+        error: "STREAMING_TRUTHGUARD_ENFORCE_CONFLICT",
+        reason: "Disable streaming or set promptPolicy.truth.enforcementMode to WARN/OFF."
+      });
+      return true;
+    }
+
     const response = await forwardToGateway({
       gatewayBaseUrl: options.gatewayBaseUrl,
       gatewayPath: route.gatewayPath,
@@ -621,7 +662,6 @@ export async function handleBridgeRequest(options: HandleBridgeRequestOptions): 
       correlationId,
       runId
     });
-    const streamPassthrough = isStreamingBridgeRequest(options.req, preparedBodyJson);
 
     if (streamPassthrough) {
       options.res.statusCode = response.status;

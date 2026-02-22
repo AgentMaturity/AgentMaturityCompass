@@ -12,6 +12,15 @@ async function loadJson(path) {
   return res.json();
 }
 
+function esc(value) {
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 function renderSummary(data) {
   const summary = document.getElementById("summary");
   summary.textContent = `Agent ${data.agentId} | Overall ${data.overall.toFixed(2)} | Integrity ${data.latestRun.integrityIndex.toFixed(3)} (${data.latestRun.trustLabel})`;
@@ -22,7 +31,7 @@ function renderIndices(data) {
   el.innerHTML = "";
   for (const index of data.indices.indices) {
     const row = document.createElement("div");
-    row.innerHTML = `<strong>${index.id}</strong>: ${index.score0to100.toFixed(2)}/100`;
+    row.innerHTML = `<strong>${esc(index.id)}</strong>: ${index.score0to100.toFixed(2)}/100`;
     el.appendChild(row);
   }
 }
@@ -36,7 +45,7 @@ function renderAssurance(data) {
   }
   for (const pack of data.assurance) {
     const row = document.createElement("div");
-    row.innerHTML = `<span class="badge">${pack.packId}</span> score ${pack.score0to100.toFixed(1)}`;
+    row.innerHTML = `<span class="badge">${esc(pack.packId)}</span> score ${pack.score0to100.toFixed(1)}`;
     el.appendChild(row);
   }
 }
@@ -53,7 +62,7 @@ function renderValueSummary(data) {
     <div>ValueScore: <strong>${Number(row.valueScore || 0).toFixed(2)}</strong></div>
     <div>EconomicSignificanceIndex: <strong>${Number(row.economicSignificanceIndex || 0).toFixed(2)}</strong></div>
     <div>ValueRegressionRisk: <strong>${Number(row.valueRegressionRisk || 0).toFixed(2)}</strong></div>
-    <div>Trust Label: <strong>${row.trustLabel || "UNTRUSTED CONFIG"}</strong></div>
+    <div>Trust Label: <strong>${esc(row.trustLabel || "UNTRUSTED CONFIG")}</strong></div>
   `;
   const trend = Array.isArray(data.valueTrend) ? data.valueTrend : [];
   const values = trend.length > 0 ? trend.map((rowItem) => Number(rowItem.valueScore || 0)) : [Number(row.valueScore || 0)];
@@ -98,7 +107,9 @@ function renderSimpleTeamView(data) {
   const run = data.latestRun;
   const gaps = Array.isArray(data.evidenceGaps) ? data.evidenceGaps : [];
   if (view === "exec") {
-    mount.innerHTML = `<h3>Executive Summary</h3><p>Overall: ${Number(data.overall || 0).toFixed(2)} | Trust: ${run?.trustLabel || "N/A"}</p><p>Top Risks: ${gaps.slice(0, 3).map((g) => g.questionId).join(", ") || "none"}</p>`;
+    const trust = esc(run?.trustLabel || "N/A");
+    const topRisks = gaps.slice(0, 3).map((g) => esc(g.questionId)).join(", ") || "none";
+    mount.innerHTML = `<h3>Executive Summary</h3><p>Overall: ${Number(data.overall || 0).toFixed(2)} | Trust: ${trust}</p><p>Top Risks: ${topRisks}</p>`;
     return;
   }
   if (view === "product") {
@@ -106,7 +117,7 @@ function renderSimpleTeamView(data) {
     return;
   }
   if (view === "ciso") {
-    mount.innerHTML = `<h3>Risk View</h3><p>Trust Label: ${run?.trustLabel || "N/A"}</p><p>Failure risk: ${Number(data.indices?.overallFailureRisk || 0).toFixed(3)}</p>`;
+    mount.innerHTML = `<h3>Risk View</h3><p>Trust Label: ${esc(run?.trustLabel || "N/A")}</p><p>Failure risk: ${Number(data.indices?.overallFailureRisk || 0).toFixed(3)}</p>`;
     return;
   }
   mount.innerHTML = `<h3>Engineer View</h3><p>Overall: ${Number(data.overall || 0).toFixed(2)}</p><p>Questions: ${run?.questionScores?.length || 0}</p>`;
@@ -117,7 +128,7 @@ function renderSimpleDomainBreakdown(data) {
   if (!mount) return;
   const layers = Array.isArray(data.latestRun?.layerScores) ? data.latestRun.layerScores : [];
   mount.innerHTML = layers
-    .map((layer) => `<div class="domain-row"><span class="domain-name">${layer.layerName}</span><div class="domain-bar"><div class="domain-fill" style="width:${(Number(layer.avgFinalLevel || 0) / 5) * 100}%"></div></div><span class="domain-score">${Number(layer.avgFinalLevel || 0).toFixed(1)}/5</span></div>`)
+    .map((layer) => `<div class="domain-row"><span class="domain-name">${esc(layer.layerName)}</span><div class="domain-bar"><div class="domain-fill" style="width:${(Number(layer.avgFinalLevel || 0) / 5) * 100}%"></div></div><span class="domain-score">${Number(layer.avgFinalLevel || 0).toFixed(1)}/5</span></div>`)
     .join("");
 }
 
@@ -220,20 +231,20 @@ function renderStudioHome(data) {
   const rows = agents
     .map((agent) => {
       const overall = typeof agent.overall === "number" ? agent.overall.toFixed(2) : "n/a";
-      const trust = agent.trustLabel || "n/a";
-      const provider = agent.lastProvider || "unknown";
-      const model = agent.lastModel || "unknown";
-      return `<li><strong>${agent.id}</strong> score ${overall} trust ${trust} provider ${provider} model ${model}</li>`;
+      const trust = esc(agent.trustLabel || "n/a");
+      const provider = esc(agent.lastProvider || "unknown");
+      const model = esc(agent.lastModel || "unknown");
+      return `<li><strong>${esc(agent.id)}</strong> score ${overall} trust ${trust} provider ${provider} model ${model}</li>`;
     })
     .join("");
   const executions = Array.isArray(studio.toolhubExecutions) ? studio.toolhubExecutions : [];
   const executionRows = executions
     .map((row) => {
       const when = row.ts ? new Date(row.ts).toISOString() : "unknown";
-      return `<li><strong>${row.toolName || "tool"}</strong> ${row.effectiveMode || "SIMULATE"} (requested ${row.requestedMode || "n/a"}) @ ${when}</li>`;
+      return `<li><strong>${esc(row.toolName || "tool")}</strong> ${esc(row.effectiveMode || "SIMULATE")} (requested ${esc(row.requestedMode || "n/a")}) @ ${esc(when)}</li>`;
     })
     .join("");
-  el.innerHTML = `<p>${lines.join(" | ")}</p><ul class="list">${rows || "<li>No agents</li>"}</ul><h3>Recent ToolHub Executions</h3><ul class="list">${executionRows || "<li>No recent executions</li>"}</ul>`;
+  el.innerHTML = `<p>${lines.map((line) => esc(line)).join(" | ")}</p><ul class="list">${rows || "<li>No agents</li>"}</ul><h3>Recent ToolHub Executions</h3><ul class="list">${executionRows || "<li>No recent executions</li>"}</ul>`;
   const qrCanvas = document.getElementById("studio-qr");
   drawQrLike(qrCanvas, studio.dashboardUrl || window.location.href);
 }
