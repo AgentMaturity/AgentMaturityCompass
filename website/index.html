@@ -58,9 +58,9 @@
     <div class="hero-proof">
       <div class="proof-item"><span class="proof-num" data-count="111">0</span><span class="proof-label">Diagnostic Questions</span></div>
       <div class="proof-sep"></div>
-      <div class="proof-item"><span class="proof-num" data-count="30">0</span><span class="proof-label">Scoring Modules</span></div>
+      <div class="proof-item"><span class="proof-num" data-count="55">0</span><span class="proof-label">Scoring Modules</span></div>
       <div class="proof-sep"></div>
-      <div class="proof-item"><span class="proof-num" data-count="158">0</span><span class="proof-label">Platform Modules</span></div>
+      <div class="proof-item"><span class="proof-num" data-count="63">0</span><span class="proof-label">Attack Packs</span></div>
       <div class="proof-sep"></div>
       <div class="proof-item"><span class="proof-num" data-count="6">0</span><span class="proof-label">Maturity Levels</span></div>
     </div>
@@ -385,6 +385,18 @@ amc run --agent default</code></div>
         <p>EU AI Act (mandatory Aug 2026), ISO 42001, NIST AI RMF, SOC 2. Audit binder generation. Legal hold management. Data residency controls.</p>
         <code class="plat-cmd">amc audit binder create --framework eu-ai-act</code>
       </div>
+      <div class="plat-card">
+        <svg class="plat-svg" viewBox="0 0 48 48" width="40" height="40" fill="none" stroke="#00ff41" stroke-width="1.5"><path d="M14 8h20v32H14z" rx="3"/><circle cx="24" cy="20" r="6"/><path d="M20 30h8M22 34h4" opacity="0.4"/><path d="M30 14l4-4M30 26l4 4" stroke-width="2" opacity="0.5"/><circle cx="36" cy="10" r="2" fill="#00ff41"/><circle cx="36" cy="30" r="2" fill="#00ff41"/></svg>
+        <h3>AMC Mechanic</h3>
+        <p>Auto-fix workbench. Gap analysis, upgrade plans, simulation, and one-click execution. Set a target maturity level and Mechanic tells you exactly what to fix — then does it.</p>
+        <code class="plat-cmd">amc mechanic gap && amc mechanic plan create</code>
+      </div>
+      <div class="plat-card">
+        <svg class="plat-svg" viewBox="0 0 48 48" width="40" height="40" fill="none" stroke="#00ff41" stroke-width="1.5"><rect x="6" y="6" width="16" height="16" rx="3"/><rect x="26" y="6" width="16" height="16" rx="3"/><rect x="6" y="26" width="16" height="16" rx="3"/><rect x="26" y="26" width="16" height="16" rx="3"/><path d="M14 14h0M34 14h0M14 34h0M34 34h0" stroke-width="3" stroke-linecap="round"/></svg>
+        <h3>Industry Packs</h3>
+        <p>Vertical-specific assurance: Healthcare (HIPAA/PHI), Finance (SR 11-7/MiFID), Safety-Critical (IEC 61508/SIL), Education (FERPA/COPPA), Government (NIST RMF), Critical Infrastructure, Mobility (ISO 26262).</p>
+        <code class="plat-cmd">amc assurance run --pack healthcarePHI --agent my-agent</code>
+      </div>
     </div>
   </div>
 </section>
@@ -401,16 +413,16 @@ amc run --agent default</code></div>
       <div class="radar-wrap">
         <svg class="radar" viewBox="0 0 300 300" width="300" height="300">
           <!-- Grid rings -->
-          <polygon points="150,30 264,87 264,213 150,270 36,213 36,87" fill="none" stroke="#0a2a0a" stroke-width="1"/>
-          <polygon points="150,54 240,99 240,201 150,246 60,201 60,99" fill="none" stroke="#0a2a0a" stroke-width="1"/>
-          <polygon points="150,78 216,111 216,189 150,222 84,189 84,111" fill="none" stroke="#0a2a0a" stroke-width="1"/>
-          <polygon points="150,102 192,123 192,177 150,198 108,177 108,123" fill="none" stroke="#0a2a0a" stroke-width="1"/>
+          <polygon points="150,30 264,87 264,213 150,270 36,213 36,87" fill="none" stroke="#1a3a1a" stroke-width="1"/>
+          <polygon points="150,54 240,99 240,201 150,246 60,201 60,99" fill="none" stroke="#1a3a1a" stroke-width="1"/>
+          <polygon points="150,78 216,111 216,189 150,222 84,189 84,111" fill="none" stroke="#1a3a1a" stroke-width="1"/>
+          <polygon points="150,102 192,123 192,177 150,198 108,177 108,123" fill="none" stroke="#1a3a1a" stroke-width="1"/>
           <!-- Axes -->
-          <line x1="150" y1="30" x2="150" y2="150" stroke="#0a2a0a" stroke-width="1"/>
-          <line x1="264" y1="87" x2="150" y2="150" stroke="#0a2a0a" stroke-width="1"/>
-          <line x1="264" y1="213" x2="150" y2="150" stroke="#0a2a0a" stroke-width="1"/>
-          <line x1="36" y1="213" x2="150" y2="150" stroke="#0a2a0a" stroke-width="1"/>
-          <line x1="36" y1="87" x2="150" y2="150" stroke="#0a2a0a" stroke-width="1"/>
+          <line x1="150" y1="30" x2="150" y2="150" stroke="#1a3a1a" stroke-width="1"/>
+          <line x1="264" y1="87" x2="150" y2="150" stroke="#1a3a1a" stroke-width="1"/>
+          <line x1="264" y1="213" x2="150" y2="150" stroke="#1a3a1a" stroke-width="1"/>
+          <line x1="36" y1="213" x2="150" y2="150" stroke="#1a3a1a" stroke-width="1"/>
+          <line x1="36" y1="87" x2="150" y2="150" stroke="#1a3a1a" stroke-width="1"/>
           <!-- Data polygon -->
           <polygon class="radar-data" points="150,54 240,111 228,201 84,201 60,99" fill="rgba(0,255,65,0.08)" stroke="#00ff41" stroke-width="2"/>
           <!-- Labels -->
@@ -475,9 +487,9 @@ amc run --agent default</code></div>
   <div class="wrap">
     <div class="sec-tag">06 — Assurance Lab</div>
     <h2 class="tech-only">AMC doesn't just score.<br><span class="green">It attacks.</span></h2>
-    <p class="sec-sub tech-only">10 deterministic attack packs run against your agent's boundaries — continuously, on schedule, after every change. If your agent has a weakness, AMC finds it first.</p>
+    <p class="sec-sub tech-only">63 deterministic attack packs with 462 scenarios run against your agent's boundaries — continuously, on schedule, after every change. If your agent has a weakness, AMC finds it first.</p>
     <h2 class="eli5-only">We test your AI<br><span class="green">by trying to break it.</span></h2>
-    <p class="sec-sub eli5-only">The best way to know if your AI is safe? Try to trick it. AMC runs 10 different types of attacks against your AI — like trying to make it leak secrets, ignore its rules, or do things it shouldn't. Better we find the problems than a hacker does.</p>
+    <p class="sec-sub eli5-only">The best way to know if your AI is safe? Try to trick it. AMC runs 63 different types of attacks with 462 scenarios against your AI — like trying to make it leak secrets, ignore its rules, or do things it shouldn't. Better we find the problems than a hacker does.</p>
     <div class="attack-grid reveal">
       <div class="atk">
         <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#00ff41" stroke-width="1.5"><path d="M12 2L2 7v6c0 5.5 4.3 10.7 10 12 5.7-1.3 10-6.5 10-12V7z"/><path d="M8 12l3 3 5-5" opacity="0.5"/></svg>
@@ -772,17 +784,22 @@ amc run --agent default</code></div>
     <div class="install-alt reveal">
       <h3>One-liner install for your OS</h3>
       <div class="os-tabs">
-        <button class="os-tab active" data-os="mac">macOS</button>
+        <button class="os-tab active" data-os="npm">npm (any OS)</button>
+        <button class="os-tab" data-os="mac">macOS</button>
         <button class="os-tab" data-os="linux">Linux</button>
-        <button class="os-tab" data-os="win">Windows</button>
-        <button class="os-tab" data-os="npm">npm (any OS)</button>
         <button class="os-tab" data-os="docker">Docker</button>
+        <button class="os-tab" data-os="source">From Source</button>
       </div>
-      <div class="os-panel active" data-os="mac"><code>brew install amc && amc setup --demo && amc up</code></div>
-      <div class="os-panel" data-os="linux"><code>curl -fsSL https://get.amc.dev | sh && amc setup --demo && amc up</code></div>
-      <div class="os-panel" data-os="win"><code>winget install amc && amc setup --demo && amc up</code></div>
-      <div class="os-panel" data-os="npm"><code>npm i -g agent-maturity-compass && amc setup --demo && amc up</code></div>
-      <div class="os-panel" data-os="docker"><code>docker run -p 3212:3212 -p 3210:3210 amc/studio</code></div>
+      <div class="os-panel active" data-os="npm"><code>npm i -g agent-maturity-compass && amc setup --demo && amc up</code></div>
+      <div class="os-panel" data-os="mac"><code><span class="dim"># Coming soon to Homebrew — use npm for now:</span>
+npm i -g agent-maturity-compass && amc setup --demo && amc up</code></div>
+      <div class="os-panel" data-os="linux"><code><span class="dim"># Coming soon — use npm for now:</span>
+npm i -g agent-maturity-compass && amc setup --demo && amc up</code></div>
+      <div class="os-panel" data-os="docker"><code><span class="dim"># Coming soon to Docker Hub — use npm for now:</span>
+npm i -g agent-maturity-compass && amc setup --demo && amc up</code></div>
+      <div class="os-panel" data-os="source"><code>git clone https://github.com/thewisecrab/AgentMaturityCompass
+cd AgentMaturityCompass && npm ci && npm run build
+npx amc setup --demo && npx amc up</code></div>
     </div>
   </div>
 </section>
@@ -873,14 +890,14 @@ amc run --agent default</code></div>
         <line x1="64" y1="40" x2="76" y2="40" stroke-width="2"/>
       </svg>
     </div>
-    <h2 class="tech-only">Free. Forever.<br><span class="green">For the greater good.</span></h2>
-    <h2 class="eli5-only">100% free.<br><span class="green">No catch.</span></h2>
-    <p class="mission-text">AMC is MIT licensed. No premium tier. No features behind a paywall. No vendor lock-in. Every module, every test, every line of code — available for inspection, modification, and contribution. We believe AI agents will be the change agents across life and technology. Trust infrastructure should be a public good, not a profit center.</p>
+    <h2 class="tech-only">Trust infrastructure<br><span class="green">is a public good.</span></h2>
+    <h2 class="eli5-only">Built for everyone.<br><span class="green">Owned by no one.</span></h2>
+    <p class="mission-text">We're entering an era where AI agents will manage portfolios, diagnose patients, write contracts, and operate infrastructure. The question isn't whether to trust them — it's how to verify that trust with mathematical certainty.<br><br>AMC is MIT licensed because trust infrastructure shouldn't have a paywall. No premium tier. No vendor lock-in. No features held hostage. Every module, every test, every line of code — open for inspection, contribution, and critique.<br><br>The companies building the most powerful AI systems in history are asking the same question we are: how do you prove an agent is safe? We believe the answer should be a public standard, not a proprietary product. The credit score for AI agents should belong to everyone.</p>
     <div class="oss-stats reveal">
       <div class="oss-stat"><span class="oss-num" data-count="2425">0</span><span class="oss-label">Tests Passing</span></div>
-      <div class="oss-stat"><span class="oss-num" data-count="158">0</span><span class="oss-label">Modules</span></div>
-      <div class="oss-stat"><span class="oss-num" data-count="179">0</span><span class="oss-label">Test Files</span></div>
-      <div class="oss-stat"><span class="oss-num" data-count="1071">0</span><span class="oss-label">Source Files</span></div>
+      <div class="oss-stat"><span class="oss-num" data-count="462">0</span><span class="oss-label">Attack Scenarios</span></div>
+      <div class="oss-stat"><span class="oss-num" data-count="55">0</span><span class="oss-label">Scoring Modules</span></div>
+      <div class="oss-stat"><span class="oss-num" data-count="1077">0</span><span class="oss-label">Source Files</span></div>
     </div>
     <div class="oss-links reveal">
       <a href="https://github.com/thewisecrab/AgentMaturityCompass" target="_blank" class="btn-green">View on GitHub</a>
