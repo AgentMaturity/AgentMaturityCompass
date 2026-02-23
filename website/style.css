@@ -33,7 +33,7 @@ nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; display: flex; a
 /* HERO */
 .hero { position: relative; z-index: 1; height: 100vh; min-height: 700px; display: flex; align-items: center; justify-content: center; padding: 0 40px; }
 .hero-grid { position: absolute; inset: 0; background-image: linear-gradient(var(--border) 1px, transparent 1px), linear-gradient(90deg, var(--border) 1px, transparent 1px); background-size: 60px 60px; opacity: 0.4; }
-.hero-content { max-width: 900px; text-align: center; position: relative; z-index: 2; }
+.hero-content { max-width: 900px; text-align: center; position: relative; z-index: 2; padding-top: 100px; }
 .hero-tag { display: inline-flex; align-items: center; justify-content: center; gap: 10px; font-family: var(--mono); font-size: 11px; color: var(--green2); margin-bottom: 48px; letter-spacing: 0.06em; padding: 8px 20px; border: 1px solid var(--border2); border-radius: 100px; background: rgba(0,255,65,0.03); }
 .tag-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); box-shadow: 0 0 10px var(--green); animation: pulse 2s ease infinite; }
 @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
