@@ -217,9 +217,8 @@ footer { position: relative; z-index: 1; padding: 80px 0 40px; border-top: 1px s
 .foot-col a:hover { color: var(--green); }
 .foot-bottom { display: flex; justify-content: space-between; padding-top: 20px; border-top: 1px solid var(--border); font-size: 12px; color: var(--text3); font-family: var(--mono); }
 
-/* REVEALS */
-.reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.7s var(--ease), transform 0.7s var(--ease); }
-.reveal.vis { opacity: 1; transform: translateY(0); }
+/* GSAP autoAlpha initial state — elements start visible, GSAP handles hide/show */
+/* No manual .reveal class needed — GSAP autoAlpha manages visibility */
 
 /* RESPONSIVE */
 @media (max-width: 1000px) {

@@ -1,4 +1,4 @@
-/* AMC v12 — Awwwards-level GSAP animations */
+/* AMC v13 — Fixed rendering + Awwwards GSAP */
 
 // ─── MATRIX RAIN ───
 const canvas = document.getElementById('matrix');
@@ -26,217 +26,163 @@ drawMatrix();
 // ─── GSAP SETUP ───
 gsap.registerPlugin(ScrollTrigger);
 
-// ─── SMOOTH LENIS-STYLE SCROLL (via GSAP) ───
-// ScrollTrigger defaults
-ScrollTrigger.defaults({ toggleActions: 'play none none reverse' });
-
-// ─── HERO ANIMATIONS ───
+// ─── HERO ANIMATIONS (immediate, no ScrollTrigger) ───
 const heroTl = gsap.timeline({ defaults: { ease: 'power3.out' } });
 heroTl
-  .from('.hero-tag', { y: 30, opacity: 0, duration: 0.8, delay: 0.3 })
-  .from('.h1-line', { y: 80, opacity: 0, duration: 1, stagger: 0.15 }, '-=0.4')
-  .from('.hero-sub', { y: 30, opacity: 0, duration: 0.8 }, '-=0.5')
-  .from('.hero-ctas', { y: 30, opacity: 0, duration: 0.8 }, '-=0.5')
-  .from('.proof-item', { y: 40, opacity: 0, duration: 0.6, stagger: 0.1 }, '-=0.3')
-  .from('.proof-sep', { scaleY: 0, opacity: 0, duration: 0.4, stagger: 0.1 }, '-=0.6');
+  .from('.hero-tag', { y: 30, autoAlpha: 0, duration: 0.8, delay: 0.3 })
+  .from('.h1-line', { y: 80, autoAlpha: 0, duration: 1, stagger: 0.15 }, '-=0.4')
+  .from('.hero-sub', { y: 30, autoAlpha: 0, duration: 0.8 }, '-=0.5')
+  .from('.hero-ctas', { y: 30, autoAlpha: 0, duration: 0.8 }, '-=0.5')
+  .from('.proof-item', { y: 40, autoAlpha: 0, duration: 0.6, stagger: 0.1 }, '-=0.3')
+  .from('.proof-sep', { scaleY: 0, autoAlpha: 0, duration: 0.4, stagger: 0.1 }, '-=0.6');
+
+// Hero counters — animate immediately after hero timeline
+heroTl.add(() => {
+  document.querySelectorAll('.proof-num').forEach(el => {
+    const target = parseInt(el.dataset.count);
+    gsap.fromTo(el, { textContent: 0 }, {
+      textContent: target, duration: 2, ease: 'power2.out',
+      snap: { textContent: 1 },
+      onUpdate: function() { el.textContent = Math.round(gsap.getProperty(el, 'textContent')); }
+    });
+  });
+}, '-=0.3');
 
 // Hero parallax on scroll
 gsap.to('.hero-content', {
   scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: 1.5 },
-  y: -150, opacity: 0, scale: 0.95
-});
-gsap.to('.hero-grid', {
-  scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: 1 },
-  y: -80, opacity: 0
+  y: -150, scale: 0.95
 });
 
-// ─── SECTION TAG + HEADING REVEALS ───
+// ─── UTILITY: scroll-triggered reveal ───
+function reveal(selector, props, triggerEl) {
+  const els = document.querySelectorAll(selector);
+  if (!els.length) return;
+  gsap.from(els, Object.assign({
+    autoAlpha: 0,
+    duration: 0.8,
+    ease: 'power3.out',
+    scrollTrigger: {
+      trigger: triggerEl || els[0].closest('.sec') || els[0],
+      start: 'top 85%',
+      toggleActions: 'play none none none'
+    }
+  }, props));
+}
+
+// ─── SECTION TAGS + HEADINGS ───
 document.querySelectorAll('.sec-tag').forEach(tag => {
-  gsap.from(tag, {
-    scrollTrigger: { trigger: tag, start: 'top 85%' },
-    x: -30, opacity: 0, duration: 0.6
-  });
+  gsap.from(tag, { scrollTrigger: { trigger: tag, start: 'top 88%', toggleActions: 'play none none none' }, x: -30, autoAlpha: 0, duration: 0.6 });
 });
-
 document.querySelectorAll('.sec h2').forEach(h2 => {
-  gsap.from(h2, {
-    scrollTrigger: { trigger: h2, start: 'top 85%' },
-    y: 60, opacity: 0, duration: 1, ease: 'power3.out'
-  });
+  gsap.from(h2, { scrollTrigger: { trigger: h2, start: 'top 88%', toggleActions: 'play none none none' }, y: 50, autoAlpha: 0, duration: 0.9 });
 });
-
 document.querySelectorAll('.sec-sub').forEach(sub => {
-  gsap.from(sub, {
-    scrollTrigger: { trigger: sub, start: 'top 85%' },
-    y: 30, opacity: 0, duration: 0.8, delay: 0.2
-  });
+  gsap.from(sub, { scrollTrigger: { trigger: sub, start: 'top 88%', toggleActions: 'play none none none' }, y: 25, autoAlpha: 0, duration: 0.7, delay: 0.15 });
 });
 
-// ─── COMPARE SECTION — SLIDE IN FROM SIDES ───
-gsap.from('.compare-bad', {
-  scrollTrigger: { trigger: '.compare', start: 'top 80%' },
-  x: -80, opacity: 0, duration: 1, ease: 'power3.out'
-});
-gsap.from('.compare-good', {
-  scrollTrigger: { trigger: '.compare', start: 'top 80%' },
-  x: 80, opacity: 0, duration: 1, ease: 'power3.out'
-});
-gsap.from('.compare-vs', {
-  scrollTrigger: { trigger: '.compare', start: 'top 80%' },
-  scale: 0, opacity: 0, duration: 0.6, delay: 0.4, ease: 'back.out(2)'
-});
+// ─── COMPARE ───
+gsap.from('.compare-bad', { scrollTrigger: { trigger: '.compare', start: 'top 82%', toggleActions: 'play none none none' }, x: -60, autoAlpha: 0, duration: 0.9 });
+gsap.from('.compare-good', { scrollTrigger: { trigger: '.compare', start: 'top 82%', toggleActions: 'play none none none' }, x: 60, autoAlpha: 0, duration: 0.9 });
+gsap.from('.compare-vs', { scrollTrigger: { trigger: '.compare', start: 'top 82%', toggleActions: 'play none none none' }, scale: 0, autoAlpha: 0, duration: 0.5, delay: 0.4, ease: 'back.out(2)' });
 
-// ─── PROBLEM CARDS — STAGGER UP ───
-gsap.from('.p-card', {
-  scrollTrigger: { trigger: '.problem-cards', start: 'top 85%' },
-  y: 60, opacity: 0, duration: 0.8, stagger: 0.15, ease: 'power3.out'
-});
+// ─── PROBLEM CARDS ───
+reveal('.p-card', { y: 50, stagger: 0.12 }, '.problem-cards');
 
-// ─── FLOW STEPS — STAGGER WITH ARROWS ───
-gsap.from('.flow-step', {
-  scrollTrigger: { trigger: '.flow', start: 'top 80%' },
-  y: 50, opacity: 0, duration: 0.8, stagger: 0.2, ease: 'power3.out'
-});
-gsap.from('.flow-arrow', {
-  scrollTrigger: { trigger: '.flow', start: 'top 80%' },
-  scale: 0, opacity: 0, duration: 0.4, stagger: 0.2, delay: 0.3, ease: 'back.out(2)'
-});
+// ─── FLOW ───
+reveal('.flow-step', { y: 40, stagger: 0.15 }, '.flow');
+reveal('.flow-arrow', { scale: 0, stagger: 0.15, delay: 0.2, ease: 'back.out(2)' }, '.flow');
 
-// ─── TRUST TIERS — SLIDE IN + BAR FILL ───
-gsap.from('.tier', {
-  scrollTrigger: { trigger: '.trust-tiers', start: 'top 80%' },
-  x: -40, opacity: 0, duration: 0.6, stagger: 0.1, ease: 'power3.out'
-});
-
-// Tier bar fills
+// ─── TRUST TIERS ───
+reveal('.tier', { x: -30, stagger: 0.08 }, '.trust-tiers');
 document.querySelectorAll('.tier').forEach(tier => {
   const fill = tier.querySelector('.tier-fill');
   if (fill) {
     ScrollTrigger.create({
-      trigger: tier, start: 'top 85%',
-      onEnter: () => { fill.style.width = getComputedStyle(fill).getPropertyValue('--tw'); }
+      trigger: tier, start: 'top 88%',
+      onEnter: () => { fill.style.width = fill.style.getPropertyValue('--tw') || getComputedStyle(fill).getPropertyValue('--tw'); },
+      once: true
     });
   }
 });
 
-// ─── PLATFORM CARDS — STAGGER GRID ───
-gsap.from('.plat-card', {
-  scrollTrigger: { trigger: '.platform-grid', start: 'top 85%' },
-  y: 60, opacity: 0, rotation: 2, duration: 0.8, stagger: { amount: 0.6, grid: [2, 4], from: 'start' }, ease: 'power3.out'
-});
+// ─── PLATFORM CARDS ───
+reveal('.plat-card', { y: 50, stagger: 0.08 }, '.platform-grid');
 
-// ─── DIMENSIONS — RADAR DRAW + LIST ───
+// ─── DIMENSIONS ───
 if (document.querySelector('.radar-data')) {
   gsap.from('.radar-data', {
-    scrollTrigger: { trigger: '.dim-visual', start: 'top 80%' },
-    scale: 0, opacity: 0, duration: 1.2, ease: 'elastic.out(1, 0.5)', transformOrigin: 'center center'
+    scrollTrigger: { trigger: '.dim-visual', start: 'top 82%', toggleActions: 'play none none none' },
+    scale: 0, autoAlpha: 0, duration: 1.2, ease: 'elastic.out(1, 0.5)', transformOrigin: '150px 150px'
   });
 }
-gsap.from('.dim-item', {
-  scrollTrigger: { trigger: '.dim-list', start: 'top 85%' },
-  x: 40, opacity: 0, duration: 0.6, stagger: 0.1, ease: 'power3.out'
-});
+reveal('.dim-item', { x: 30, stagger: 0.08 }, '.dim-list');
 
-// ─── MATURITY LEVELS — BAR FILL ───
+// ─── MATURITY LEVELS ───
 document.querySelectorAll('.lvl').forEach((lvl, i) => {
   gsap.from(lvl, {
-    scrollTrigger: { trigger: lvl, start: 'top 90%' },
-    x: -30, opacity: 0, duration: 0.5, delay: i * 0.08
+    scrollTrigger: { trigger: lvl, start: 'top 92%', toggleActions: 'play none none none' },
+    x: -25, autoAlpha: 0, duration: 0.5, delay: i * 0.06
   });
   const fill = lvl.querySelector('.lvl-fill');
   if (fill) {
     ScrollTrigger.create({
-      trigger: lvl, start: 'top 90%',
-      onEnter: () => { fill.style.width = getComputedStyle(fill).getPropertyValue('--tw'); }
+      trigger: lvl, start: 'top 92%',
+      onEnter: () => { fill.style.width = getComputedStyle(fill).getPropertyValue('--tw'); },
+      once: true
     });
   }
 });
 
-// ─── ATTACK GRID — STAGGER ───
-gsap.from('.atk', {
-  scrollTrigger: { trigger: '.attack-grid', start: 'top 85%' },
-  y: 30, opacity: 0, duration: 0.5, stagger: { amount: 0.5, grid: [5, 2], from: 'start' }, ease: 'power3.out'
-});
+// ─── ATTACK GRID ───
+reveal('.atk', { y: 25, stagger: 0.06 }, '.attack-grid');
 
-// ─── USE CASES — STAGGER GRID ───
-gsap.from('.uc', {
-  scrollTrigger: { trigger: '.uc-grid', start: 'top 85%' },
-  y: 50, opacity: 0, duration: 0.7, stagger: { amount: 0.5, grid: [2, 3], from: 'start' }, ease: 'power3.out'
-});
+// ─── USE CASES ───
+reveal('.uc', { y: 40, stagger: 0.1 }, '.uc-grid');
 
-// ─── EVIDENCE CHAIN — SEQUENTIAL ───
-gsap.from('.chain-block', {
-  scrollTrigger: { trigger: '.chain', start: 'top 80%' },
-  y: 40, opacity: 0, scale: 0.9, duration: 0.7, stagger: 0.15, ease: 'power3.out'
-});
-gsap.from('.chain-link', {
-  scrollTrigger: { trigger: '.chain', start: 'top 80%' },
-  scale: 0, opacity: 0, duration: 0.3, stagger: 0.15, delay: 0.3, ease: 'back.out(2)'
-});
+// ─── EVIDENCE CHAIN ───
+reveal('.chain-block', { y: 35, scale: 0.95, stagger: 0.12 }, '.chain');
+reveal('.chain-link', { scale: 0, stagger: 0.12, delay: 0.2, ease: 'back.out(2)' }, '.chain');
 
-// ─── TERMINAL — TYPE EFFECT ───
+// ─── TERMINAL ───
 const termBody = document.querySelector('.term-body');
 if (termBody) {
-  gsap.from(termBody, {
-    scrollTrigger: { trigger: '.terminal', start: 'top 80%' },
-    opacity: 0, y: 20, duration: 0.8
-  });
-  // Terminal glow pulse
-  gsap.to('.terminal', {
-    scrollTrigger: { trigger: '.terminal', start: 'top 80%' },
-    boxShadow: '0 0 120px rgba(0,255,65,0.08)', duration: 2, yoyo: true, repeat: -1, ease: 'sine.inOut'
+  gsap.from('.terminal', {
+    scrollTrigger: { trigger: '.terminal', start: 'top 82%', toggleActions: 'play none none none' },
+    autoAlpha: 0, y: 30, duration: 0.8
   });
 }
 
-// ─── DOC CARDS — STAGGER ───
-gsap.from('.doc-card', {
-  scrollTrigger: { trigger: '.docs-grid', start: 'top 85%' },
-  y: 40, opacity: 0, duration: 0.5, stagger: { amount: 0.6, grid: [3, 4], from: 'random' }, ease: 'power3.out'
-});
+// ─── DOC CARDS ───
+reveal('.doc-card', { y: 35, stagger: 0.06 }, '.docs-grid');
 
-// ─── INTEGRATION ITEMS ───
-if (document.querySelector('.int-grid')) {
-  gsap.from('.int-item', {
-    scrollTrigger: { trigger: '.int-grid', start: 'top 85%' },
-    x: -30, opacity: 0, duration: 0.5, stagger: 0.08, ease: 'power3.out'
-  });
-}
-
-// ─── COMPLIANCE CARDS ───
-if (document.querySelector('.comply-grid')) {
-  gsap.from('.comply-card', {
-    scrollTrigger: { trigger: '.comply-grid', start: 'top 85%' },
-    y: 40, opacity: 0, duration: 0.7, stagger: 0.12, ease: 'power3.out'
-  });
-}
-
-// ─── MISSION SECTION ───
+// ─── MISSION ───
 if (document.querySelector('.mission-wrap')) {
   gsap.from('.mission-icon', {
-    scrollTrigger: { trigger: '.mission-wrap', start: 'top 80%' },
-    scale: 0, rotation: -180, opacity: 0, duration: 1.2, ease: 'elastic.out(1, 0.5)'
+    scrollTrigger: { trigger: '.mission-wrap', start: 'top 82%', toggleActions: 'play none none none' },
+    scale: 0, rotation: -180, autoAlpha: 0, duration: 1.2, ease: 'elastic.out(1, 0.5)'
   });
   gsap.from('.mission-text', {
-    scrollTrigger: { trigger: '.mission-wrap', start: 'top 80%' },
-    y: 30, opacity: 0, duration: 0.8, delay: 0.3
+    scrollTrigger: { trigger: '.mission-wrap', start: 'top 82%', toggleActions: 'play none none none' },
+    y: 25, autoAlpha: 0, duration: 0.7, delay: 0.3
   });
 }
 
-// ─── OSS STATS ───
-gsap.from('.oss-stat', {
-  scrollTrigger: { trigger: '.oss-stats', start: 'top 85%' },
-  y: 40, opacity: 0, duration: 0.6, stagger: 0.1, ease: 'power3.out'
-});
-
-// ─── COUNTERS — GSAP-POWERED ───
-function animateCounter(el) {
+// ─── OSS STATS + COUNTERS ───
+reveal('.oss-stat', { y: 35, stagger: 0.08 }, '.oss-stats');
+document.querySelectorAll('.oss-num').forEach(el => {
   const target = parseInt(el.dataset.count);
-  gsap.fromTo(el, { textContent: 0 }, {
-    textContent: target, duration: 2.5, ease: 'power2.out', snap: { textContent: 1 },
-    scrollTrigger: { trigger: el, start: 'top 90%' }
+  ScrollTrigger.create({
+    trigger: el, start: 'top 90%', once: true,
+    onEnter: () => {
+      gsap.fromTo(el, { textContent: 0 }, {
+        textContent: target, duration: 2.5, ease: 'power2.out',
+        snap: { textContent: 1 },
+        onUpdate: function() { el.textContent = Math.round(gsap.getProperty(el, 'textContent')); }
+      });
+    }
   });
-}
-document.querySelectorAll('.proof-num, .oss-num').forEach(animateCounter);
+});
 
 // ─── MAGNETIC BUTTONS ───
 document.querySelectorAll('.btn-green, .btn-dim').forEach(btn => {
@@ -244,48 +190,44 @@ document.querySelectorAll('.btn-green, .btn-dim').forEach(btn => {
     const rect = btn.getBoundingClientRect();
     const x = e.clientX - rect.left - rect.width / 2;
     const y = e.clientY - rect.top - rect.height / 2;
-    gsap.to(btn, { x: x * 0.2, y: y * 0.2, duration: 0.3, ease: 'power2.out' });
+    gsap.to(btn, { x: x * 0.15, y: y * 0.15, duration: 0.3, ease: 'power2.out' });
   });
   btn.addEventListener('mouseleave', () => {
     gsap.to(btn, { x: 0, y: 0, duration: 0.5, ease: 'elastic.out(1, 0.5)' });
   });
 });
 
-// ─── NAV SCROLL EFFECT ───
+// ─── NAV AUTO-HIDE ───
+let lastScroll = 0;
 ScrollTrigger.create({
-  start: 'top -80',
   onUpdate: self => {
     const nav = document.getElementById('nav');
-    if (self.direction === 1 && self.scroll() > 200) {
+    const scroll = self.scroll();
+    if (scroll > 200 && scroll > lastScroll) {
       gsap.to(nav, { y: -80, duration: 0.3 });
     } else {
       gsap.to(nav, { y: 0, duration: 0.3 });
     }
+    lastScroll = scroll;
   }
 });
 
 // ─── SCROLL PROGRESS BAR ───
 const progressBar = document.createElement('div');
-progressBar.style.cssText = 'position:fixed;top:0;left:0;height:2px;background:#00ff41;z-index:9999;width:0;box-shadow:0 0 10px rgba(0,255,65,0.5);transition:none;';
+progressBar.style.cssText = 'position:fixed;top:0;left:0;height:2px;background:#00ff41;z-index:9999;width:0;box-shadow:0 0 10px rgba(0,255,65,0.5);';
 document.body.appendChild(progressBar);
 gsap.to(progressBar, {
   width: '100%',
-  scrollTrigger: { trigger: 'body', start: 'top top', end: 'bottom bottom', scrub: 0.3 }
+  scrollTrigger: { trigger: document.body, start: 'top top', end: 'bottom bottom', scrub: 0.3 }
 });
 
 // ─── SMOOTH SCROLL ───
 document.querySelectorAll('a[href^="#"]').forEach(a => {
   a.addEventListener('click', e => {
-    const t = document.querySelector(a.getAttribute('href'));
+    const href = a.getAttribute('href');
+    if (href === '#') return;
+    const t = document.querySelector(href);
     if (t) { e.preventDefault(); gsap.to(window, { scrollTo: { y: t, offsetY: 80 }, duration: 1, ease: 'power3.inOut' }); }
-  });
-});
-
-// ─── PARALLAX SECTIONS ───
-document.querySelectorAll('.sec-dark').forEach(sec => {
-  gsap.fromTo(sec, { backgroundPosition: '50% 0%' }, {
-    backgroundPosition: '50% 20%',
-    scrollTrigger: { trigger: sec, start: 'top bottom', end: 'bottom top', scrub: 1 }
   });
 });
 
@@ -295,7 +237,7 @@ document.querySelectorAll('.plat-card, .uc, .doc-card').forEach(card => {
     const rect = card.getBoundingClientRect();
     const x = (e.clientX - rect.left) / rect.width - 0.5;
     const y = (e.clientY - rect.top) / rect.height - 0.5;
-    gsap.to(card, { rotateY: x * 8, rotateX: -y * 8, duration: 0.3, ease: 'power2.out', transformPerspective: 800 });
+    gsap.to(card, { rotateY: x * 6, rotateX: -y * 6, duration: 0.3, ease: 'power2.out', transformPerspective: 800 });
   });
   card.addEventListener('mouseleave', () => {
     gsap.to(card, { rotateY: 0, rotateX: 0, duration: 0.5, ease: 'elastic.out(1, 0.5)' });
@@ -309,3 +251,9 @@ if (glow && window.matchMedia('(pointer: fine)').matches) {
     gsap.to(glow, { x: e.clientX, y: e.clientY, duration: 0.8, ease: 'power2.out' });
   });
 }
+
+// ─── TERMINAL GLOW PULSE ───
+gsap.to('.terminal', {
+  boxShadow: '0 0 80px rgba(0,255,65,0.06)',
+  duration: 2, yoyo: true, repeat: -1, ease: 'sine.inOut'
+});
