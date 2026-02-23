@@ -15,6 +15,8 @@ AMC compliance reports are **evidence-linked signals**, not legal certifications
 - `SOC2` (Trust Services categories)
 - `NIST_AI_RMF` (Govern/Map/Measure/Manage)
 - `ISO_27001` (high-level control families)
+- `ISO_42001` (ISO/IEC 42001:2023 AIMS clauses 4-10 + ISO 42005 Impact Assessment + ISO 42006 Conformity Evidence)
+- `EU_AI_ACT` (Regulation (EU) 2024/1689 — high-risk AI obligations: Arts. 9-15, 17, 27, 72, 73, 86)
 
 AMC intentionally avoids legal-claim language and does not infer unseen controls.
 

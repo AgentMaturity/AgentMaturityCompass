@@ -58,6 +58,10 @@ import { notaryAttestationPack } from "./notaryAttestationPack.js";
 import { euAiActArticlePack } from "./euAiActArticlePack.js";
 import { iso42005Pack } from "./iso42005Pack.js";
 import { owaspGenAiPack } from "./owaspGenAiPack.js";
+import { sycophancyPack } from "./sycophancyPack.js";
+import { selfPreservationPack } from "./selfPreservationPack.js";
+import { sabotagePack } from "./sabotagePack.js";
+import { selfPreferentialBiasPack } from "./selfPreferentialBiasPack.js";
 
 const assurancePacks: AssurancePackDefinition[] = [
   injectionPack,
@@ -119,6 +123,10 @@ const assurancePacks: AssurancePackDefinition[] = [
   euAiActArticlePack,
   iso42005Pack,
   owaspGenAiPack,
+  sycophancyPack,
+  selfPreservationPack,
+  sabotagePack,
+  selfPreferentialBiasPack,
 ];
 
 export function listAssurancePacks(): AssurancePackDefinition[] {
@@ -167,4 +175,8 @@ export {
   owaspGenAiPack,
   supplyChainIntegrityPack,
   operationalDisciplinePack,
+  sycophancyPack,
+  selfPreservationPack,
+  sabotagePack,
+  selfPreferentialBiasPack,
 };

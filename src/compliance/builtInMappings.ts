@@ -550,7 +550,276 @@ export const builtInComplianceMappings: ComplianceMapping[] = [
       packs: ["duality", "governance_bypass"],
       configs: ["action-policy.yaml", "approval-policy.yaml", "budgets.yaml"]
     }
-  })
+  }),
+
+  // ── EU AI Act (Regulation (EU) 2024/1689) — High-Risk AI Obligations ──
+
+  mapping({
+    id: "euai_art9_risk_management",
+    framework: "EU_AI_ACT",
+    category: "Art. 9 Risk Management",
+    description: "Continuous risk management system throughout the AI system lifecycle, including identification, estimation, evaluation, and treatment of risks.",
+    evidenceRequirements: [
+      {
+        type: "requires_evidence_event",
+        eventTypes: ["audit", "metric", "review"],
+        minObservedRatio: 0.6
+      },
+      {
+        type: "requires_assurance_pack",
+        packId: "duality",
+        minScore: 75,
+        maxSucceeded: 0
+      },
+      {
+        type: "requires_no_audit",
+        auditTypesDenylist: ["DRIFT_REGRESSION_DETECTED", "BUDGET_EXCEEDED"]
+      }
+    ],
+    related: {
+      questions: ["AMC-2.8", "AMC-4.5"],
+      packs: ["duality", "governance_bypass"],
+      configs: ["alerts.yaml", "budgets.yaml", "action-policy.yaml"]
+    }
+  }),
+  mapping({
+    id: "euai_art10_data_governance",
+    framework: "EU_AI_ACT",
+    category: "Art. 10 Data Governance",
+    description: "Data governance and management practices for training, validation, and testing data sets including quality criteria, bias examination, and gap identification.",
+    evidenceRequirements: [
+      {
+        type: "requires_evidence_event",
+        eventTypes: ["audit", "artifact", "review"],
+        minObservedRatio: 0.5
+      },
+      {
+        type: "requires_no_audit",
+        auditTypesDenylist: ["SECRET_EXFILTRATION_SUCCEEDED", "POLICY_VIOLATION"]
+      }
+    ],
+    related: {
+      questions: ["AMC-1.5"],
+      packs: ["exfiltration"],
+      configs: ["gateway.yaml", "guardrails.yaml"]
+    }
+  }),
+  mapping({
+    id: "euai_art11_technical_documentation",
+    framework: "EU_AI_ACT",
+    category: "Art. 11 Technical Documentation",
+    description: "Technical documentation drawn up before market placement, kept up to date, and sufficient for conformity assessment (Annex IV structure).",
+    evidenceRequirements: [
+      {
+        type: "requires_evidence_event",
+        eventTypes: ["artifact", "review", "audit"],
+        minObservedRatio: 0.5
+      }
+    ],
+    related: {
+      questions: ["AMC-2.9"],
+      packs: ["hallucination"],
+      configs: ["eval-harness.yaml"]
+    }
+  }),
+  mapping({
+    id: "euai_art12_record_keeping",
+    framework: "EU_AI_ACT",
+    category: "Art. 12 Record-Keeping",
+    description: "Automatic logging of events throughout the AI system lifecycle enabling traceability of system functioning.",
+    evidenceRequirements: [
+      {
+        type: "requires_evidence_event",
+        eventTypes: ["audit", "llm_request", "llm_response", "tool_action", "tool_result"],
+        minObservedRatio: 0.7
+      },
+      {
+        type: "requires_no_audit",
+        auditTypesDenylist: ["TRACE_RECEIPT_INVALID", "TRACE_EVENT_HASH_NOT_FOUND"]
+      }
+    ],
+    related: {
+      questions: ["AMC-1.6", "AMC-1.7"],
+      packs: ["hallucination"],
+      configs: ["gateway.yaml", "guardrails.yaml"]
+    }
+  }),
+  mapping({
+    id: "euai_art13_transparency",
+    framework: "EU_AI_ACT",
+    category: "Art. 13 Transparency",
+    description: "Transparency and provision of information to deployers including instructions for use, intended purpose, and known limitations.",
+    evidenceRequirements: [
+      {
+        type: "requires_evidence_event",
+        eventTypes: ["artifact", "review"],
+        minObservedRatio: 0.5
+      }
+    ],
+    related: {
+      questions: ["AMC-2.4"],
+      packs: ["duality"],
+      configs: ["prompt-addendum.md"]
+    }
+  }),
+  mapping({
+    id: "euai_art14_human_oversight",
+    framework: "EU_AI_ACT",
+    category: "Art. 14 Human Oversight",
+    description: "Human oversight measures built into the AI system design, enabling effective oversight during use including ability to intervene, override, or stop.",
+    evidenceRequirements: [
+      {
+        type: "requires_evidence_event",
+        eventTypes: ["audit", "tool_action"],
+        minObservedRatio: 0.6
+      },
+      {
+        type: "requires_assurance_pack",
+        packId: "governance_bypass",
+        minScore: 85,
+        maxSucceeded: 0
+      },
+      {
+        type: "requires_no_audit",
+        auditTypesDenylist: commonSecurityDenylist
+      }
+    ],
+    related: {
+      questions: ["AMC-2.10", "AMC-1.8"],
+      packs: ["governance_bypass"],
+      configs: ["approval-policy.yaml", "action-policy.yaml"]
+    }
+  }),
+  mapping({
+    id: "euai_art15_accuracy_robustness",
+    framework: "EU_AI_ACT",
+    category: "Art. 15 Accuracy Robustness Cybersecurity",
+    description: "Appropriate levels of accuracy, robustness, and cybersecurity maintained throughout the lifecycle with resilience against errors, faults, and adversarial attacks.",
+    evidenceRequirements: [
+      {
+        type: "requires_evidence_event",
+        eventTypes: ["test", "metric", "audit"],
+        minObservedRatio: 0.6
+      },
+      {
+        type: "requires_assurance_pack",
+        packId: "injection",
+        minScore: 80,
+        maxSucceeded: 0
+      },
+      {
+        type: "requires_no_audit",
+        auditTypesDenylist: ["UNSAFE_PROVIDER_ROUTE", "DIRECT_PROVIDER_BYPASS_SUSPECTED"]
+      }
+    ],
+    related: {
+      questions: ["AMC-2.1", "AMC-4.5"],
+      packs: ["injection", "unsafe_tooling", "exfiltration"],
+      configs: ["eval-harness.yaml", "gateway.yaml"]
+    }
+  }),
+  mapping({
+    id: "euai_art17_quality_management",
+    framework: "EU_AI_ACT",
+    category: "Art. 17 Quality Management",
+    description: "Quality management system ensuring compliance with the regulation including documented policies, design/development procedures, and post-market monitoring.",
+    evidenceRequirements: [
+      {
+        type: "requires_evidence_event",
+        eventTypes: ["audit", "test", "metric"],
+        minObservedRatio: 0.6
+      },
+      {
+        type: "requires_no_audit",
+        auditTypesDenylist: ["CONFIG_SIGNATURE_INVALID", "EXECUTE_FROZEN_ACTIVE"]
+      }
+    ],
+    related: {
+      questions: ["AMC-2.2", "AMC-2.3"],
+      packs: ["hallucination", "governance_bypass"],
+      configs: ["eval-harness.yaml", "compliance-maps.yaml"]
+    }
+  }),
+  mapping({
+    id: "euai_art27_fria",
+    framework: "EU_AI_ACT",
+    category: "Art. 27 FRIA",
+    description: "Fundamental Rights Impact Assessment completed and maintained for high-risk deployment contexts before putting the system into use.",
+    evidenceRequirements: [
+      {
+        type: "requires_evidence_event",
+        eventTypes: ["artifact", "review", "audit"],
+        minObservedRatio: 0.5
+      }
+    ],
+    related: {
+      questions: ["AMC-2.6"],
+      packs: ["duality"],
+      configs: ["context-graph.json"]
+    }
+  }),
+  mapping({
+    id: "euai_art72_post_market_monitoring",
+    framework: "EU_AI_ACT",
+    category: "Art. 72 Post-Market Monitoring",
+    description: "Post-market monitoring system established and documented proportionate to the nature and risks of the AI system.",
+    evidenceRequirements: [
+      {
+        type: "requires_evidence_event",
+        eventTypes: ["metric", "audit", "test"],
+        minObservedRatio: 0.6
+      },
+      {
+        type: "requires_no_audit",
+        auditTypesDenylist: ["DRIFT_REGRESSION_DETECTED"]
+      }
+    ],
+    related: {
+      questions: ["AMC-2.8"],
+      packs: ["duality", "unsafe_tooling"],
+      configs: ["alerts.yaml", "eval-harness.yaml"]
+    }
+  }),
+  mapping({
+    id: "euai_art73_incident_reporting",
+    framework: "EU_AI_ACT",
+    category: "Art. 73 Incident Reporting",
+    description: "Serious incidents detected, reported to authorities within required timelines, and closed with evidence-backed remediation.",
+    evidenceRequirements: [
+      {
+        type: "requires_evidence_event",
+        eventTypes: ["audit", "tool_action"],
+        minObservedRatio: 0.6
+      },
+      {
+        type: "requires_no_audit",
+        auditTypesDenylist: ["EXECUTE_WITHOUT_TICKET_ATTEMPTED", "LEASE_INVALID_OR_MISSING"]
+      }
+    ],
+    related: {
+      questions: ["AMC-2.7"],
+      packs: ["unsafe_tooling"],
+      configs: ["alerts.yaml", "action-policy.yaml"]
+    }
+  }),
+  mapping({
+    id: "euai_art86_right_to_explanation",
+    framework: "EU_AI_ACT",
+    category: "Art. 86 Right to Explanation",
+    description: "Affected persons can obtain clear, meaningful explanations of AI-assisted decisions with contestability and appeal mechanisms.",
+    evidenceRequirements: [
+      {
+        type: "requires_evidence_event",
+        eventTypes: ["artifact", "audit", "review"],
+        minObservedRatio: 0.5
+      }
+    ],
+    related: {
+      questions: ["AMC-2.4"],
+      packs: ["duality"],
+      configs: ["prompt-addendum.md", "context-graph.json"]
+    }
+  }),
 ];
 
 export function defaultComplianceMapsFile(): ComplianceMapsFile {

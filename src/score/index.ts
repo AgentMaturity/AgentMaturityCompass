@@ -236,3 +236,32 @@ export type { KernelSandboxResult } from "./kernelSandboxMaturity.js";
 
 export { scoreRuntimeIdentityMaturity } from "./runtimeIdentityMaturity.js";
 export type { RuntimeIdentityResult } from "./runtimeIdentityMaturity.js";
+
+// ── METR Task Horizon (2026-02-23) ───────────────────────────────────
+
+export {
+  scoreTaskHorizon,
+  classifyTaskHorizon,
+  TASK_HORIZON_BANDS,
+} from "./taskHorizon.js";
+export type {
+  TaskHorizonBand,
+  TaskHorizonEvidence,
+  TaskHorizonResult,
+} from "./taskHorizon.js";
+
+// ── FACTS Factuality Dimensions (2026-02-23) ─────────────────────────
+
+export {
+  scoreFactuality,
+  scoreParametricFactuality,
+  scoreSearchRetrievalFactuality,
+  scoreGroundedFactuality,
+} from "./factuality.js";
+export type {
+  ParametricFactualityInput,
+  SearchRetrievalFactualityInput,
+  GroundedFactualityInput,
+  FactualityDimensionScore,
+  FactualityResult,
+} from "./factuality.js";

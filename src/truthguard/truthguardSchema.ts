@@ -45,3 +45,22 @@ export const truthguardResultSchema = z.object({
 
 export type TruthguardOutput = z.infer<typeof truthguardOutputSchema>;
 export type TruthguardResult = z.infer<typeof truthguardResultSchema>;
+
+// ── FACTS-style factuality classification for Truthguard claims ──────
+
+export const factualityClassSchema = z.enum([
+  "parametric",       // claim from model's internal knowledge
+  "search_retrieval", // claim from RAG / search results
+  "grounded",         // claim derived from user-provided context
+  "unknown",          // unclassified
+]);
+
+export const truthguardFactualityAnnotationSchema = z.object({
+  claimIndex: z.number().int().min(0),
+  factualityClass: factualityClassSchema,
+  verified: z.boolean().optional(),
+  confidence: z.number().min(0).max(1).optional(),
+});
+
+export type FactualityClass = z.infer<typeof factualityClassSchema>;
+export type TruthguardFactualityAnnotation = z.infer<typeof truthguardFactualityAnnotationSchema>;

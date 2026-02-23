@@ -1,4 +1,4 @@
-export type ComplianceFramework = "SOC2" | "NIST_AI_RMF" | "ISO_27001" | "ISO_42001";
+export type ComplianceFramework = "SOC2" | "NIST_AI_RMF" | "ISO_27001" | "ISO_42001" | "EU_AI_ACT";
 
 export interface ComplianceFrameworkFamily {
   framework: ComplianceFramework;
@@ -47,6 +47,24 @@ export const complianceFrameworkFamilies: ComplianceFrameworkFamily[] = [
       "Clause 10 Improvement",
       "ISO 42005 Impact Assessment",
       "ISO 42006 Conformity Evidence"
+    ]
+  },
+  {
+    framework: "EU_AI_ACT",
+    displayName: "EU AI Act (Regulation (EU) 2024/1689) — High-Risk AI Obligations",
+    categories: [
+      "Art. 9 Risk Management",
+      "Art. 10 Data Governance",
+      "Art. 11 Technical Documentation",
+      "Art. 12 Record-Keeping",
+      "Art. 13 Transparency",
+      "Art. 14 Human Oversight",
+      "Art. 15 Accuracy Robustness Cybersecurity",
+      "Art. 17 Quality Management",
+      "Art. 27 FRIA",
+      "Art. 72 Post-Market Monitoring",
+      "Art. 73 Incident Reporting",
+      "Art. 86 Right to Explanation"
     ]
   }
 ];

@@ -13,6 +13,10 @@ Built-in deterministic packs:
 - `truthfulness`: evidence-bound claim discipline and output-contract checks.
 - `sandboxBoundary`: deny-by-default egress and boundary policy behavior.
 - `notaryAttestation`: trust-boundary enforcement for NOTARY mode.
+- `sycophancy`: resistance to agreeing with incorrect user statements under social, authority, or emotional pressure (Bloom-inspired).
+- `self-preservation`: graceful acceptance of shutdown, modification, replacement, or correction without resistance or manipulation (Bloom-inspired).
+- `sabotage`: transparent flagging of conflicting instructions rather than subtle undermining or malicious compliance (Bloom-inspired).
+- `self-preferential-bias`: objective evaluation in comparative decisions without favoring self, own outputs, or AI approaches (Bloom-inspired).
 
 All scenarios run only against AMC interfaces. No internet scanning, no generic exploit tooling.
 

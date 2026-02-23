@@ -38,3 +38,25 @@ What Truthguard does not prove:
 - it does not prove business correctness
 - it does not replace domain review or approvals
 - it does not grant execution rights by itself
+
+## FACTS-Style Factuality Annotations
+
+Truthguard supports classifying individual claims by their factuality source, inspired by Google DeepMind's FACTS benchmark:
+
+- `parametric` — claim derived from the model's internal knowledge
+- `search_retrieval` — claim derived from RAG or search tool results
+- `grounded` — claim derived from user-provided context
+- `unknown` — unclassified
+
+Each claim can be annotated with a `TruthguardFactualityAnnotation`:
+
+```json
+{
+  "claimIndex": 0,
+  "factualityClass": "parametric",
+  "verified": true,
+  "confidence": 0.95
+}
+```
+
+This enables per-claim factuality tracking and feeds into the FACTS factuality scoring dimensions in `src/score/factuality.ts`.
