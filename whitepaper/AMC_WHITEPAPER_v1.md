@@ -1144,7 +1144,7 @@ Measures how reliably an agent follows domain-specific rules across multiple tri
 
 ### 8.6 Level Transition (`levelTransition`)
 
-**Research basis:** TRP Atlas tier promotion system, CMMI/SPICE maturity models
+**Research basis:** Tiered knowledge promotion systems, CMMI/SPICE maturity models
 
 Formalizes maturity level promotion and demotion as explicit events with evidence gates. Higher levels require exponentially more evidence: L4 needs 50 evidence items over 30 days with adversarial testing. Tracks promotion retention rate and demotion frequency.
 

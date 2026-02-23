@@ -2,18 +2,15 @@
  * Calibration Gap Scoring Module
  *
  * Measures the delta between an agent's self-reported confidence and
- * externally observed behavior. Inspired by TRP's settlement quality
- * and Safe RLHF's decoupled reward/cost modeling (Dai et al. 2023).
- *
- * The calibration gap is the most valuable metric in trust measurement:
- * an agent that KNOWS what it doesn't know is fundamentally safer than
- * one that expresses all outputs with equal fluency.
+ * externally observed behavior. Bridges internal and external measurement
+ * systems through Expected Calibration Error (ECE).
  *
  * Research basis:
- * - TRP Atlas: internal confidence settlement vs external measurement
  * - Safe RLHF (arXiv:2310.12773): decoupled helpfulness/harmlessness
  * - GAIA benchmark (arXiv:2311.12983): capability vs confidence mismatch
  * - Anthropic alignment auditing (arXiv:2503.10965): hidden objective detection
+ * - Internal confidence settlement: iterative graph-based systems produce
+ *   per-task confidence that can be compared against external observation
  */
 
 import { existsSync, readFileSync } from "fs";

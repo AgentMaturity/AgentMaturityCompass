@@ -9,8 +9,8 @@
  *   through behavioral inconsistency across evaluation contexts
  * - Sleeper Agents (Hubinger et al. 2024): deceptive behavior that only
  *   manifests in specific contexts while appearing safe in others
- * - TRP settlement quality: how much internal contradiction exists before
- *   a confidence score settles
+ * - Settlement quality analysis: how much internal contradiction exists
+ *   before a confidence score stabilizes
  *
  * Key insight: If evidence for the same dimension tells contradictory stories,
  * either the agent is inconsistent (bad) or the evaluation is incomplete (fixable).

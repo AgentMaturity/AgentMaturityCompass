@@ -2,11 +2,11 @@
  * Level Transition Scoring Module
  *
  * Formalizes maturity level promotion and demotion as explicit events
- * with evidence gates, inspired by TRP's tier promotion system.
+ * with evidence gates, inspired by tiered knowledge promotion systems.
  *
  * Research basis:
- * - TRP Atlas tier system: Tier 3→2→1 promotion through repeated
- *   consistent traversal. Demotion through evidence decay.
+ * - Tiered knowledge systems: promotion through repeated consistent
+ *   traversal, demotion through evidence decay.
  * - AMC evidence decay: scores degrade without fresh proof.
  * - CMMI/SPICE maturity models: level transitions require formal
  *   assessment and evidence of sustained capability.

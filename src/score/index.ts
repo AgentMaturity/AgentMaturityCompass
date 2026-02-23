@@ -313,3 +313,9 @@ export type { LevelTransition, LevelTransitionReport } from "./levelTransition.j
 
 export { scoreGamingResistance } from "./gamingResistance.js";
 export type { GamingResistanceReport } from "./gamingResistance.js";
+
+export { buildDensityMap, scanDensityMapInfra } from "./densityMap.js";
+export type { DensityCell, DimensionDensity, DensityMapReport, EvidenceRecord } from "./densityMap.js";
+
+export { ingestEvidence, TRUST_WEIGHTS } from "./evidenceIngestion.js";
+export type { TrustTier, IngestFormat, IngestInput, NormalizedEvidence, IngestReport } from "./evidenceIngestion.js";
