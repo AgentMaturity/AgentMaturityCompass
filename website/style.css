@@ -244,3 +244,98 @@ footer { position: relative; z-index: 1; padding: 80px 0 40px; border-top: 1px s
   .oss-stats { flex-wrap: wrap; gap: 24px; } .oss-links { flex-direction: column; align-items: center; }
 }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; } .reveal { opacity: 1; transform: none; } }
+
+/* ═══ v12 AWWWARDS ENHANCEMENTS ═══ */
+
+/* Smooth will-change for animated elements */
+.plat-card, .uc, .doc-card, .p-card, .atk, .chain-block {
+  will-change: transform;
+  transform-style: preserve-3d;
+}
+
+/* Card glow on hover */
+.plat-card:hover, .uc:hover, .doc-card:hover {
+  box-shadow: 0 0 60px rgba(0,255,65,0.06), 0 20px 40px rgba(0,0,0,0.3);
+}
+
+/* Score ring animation */
+.ring-anim {
+  animation: ringDraw 2s ease-out forwards;
+  animation-play-state: paused;
+}
+
+.compare.vis .ring-anim { animation-play-state: running; }
+
+@keyframes ringDraw {
+  from { stroke-dashoffset: 327; }
+}
+
+/* Cursor glow follower */
+.cursor-glow {
+  position: fixed; width: 400px; height: 400px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(0,255,65,0.03) 0%, transparent 70%);
+  pointer-events: none; z-index: 0;
+  transform: translate(-50%, -50%);
+  transition: opacity 0.3s;
+}
+
+/* Nav hide/show transition */
+nav { transition: transform 0.3s ease; }
+
+/* Smooth section transitions */
+.sec { overflow: hidden; }
+
+/* Terminal cursor blink */
+.term-body::after {
+  content: '█'; color: var(--green); animation: blink 1s step-end infinite;
+}
+
+@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+/* Green line accent on sections */
+.sec-tag::before {
+  content: ''; display: inline-block;
+  width: 24px; height: 1px; background: var(--green3);
+  margin-right: 12px; vertical-align: middle;
+}
+
+/* Hover glow for trust tiers */
+.tier:hover .tier-mult {
+  text-shadow: 0 0 20px rgba(0,255,65,0.5);
+}
+
+/* Platform card icon glow */
+.plat-card:hover .plat-svg {
+  filter: drop-shadow(0 0 8px rgba(0,255,65,0.3));
+  transition: filter 0.3s;
+}
+
+/* Doc card hover arrow */
+.doc-card::after {
+  content: '→'; position: absolute; right: 16px; top: 50%;
+  transform: translateY(-50%) translateX(10px);
+  opacity: 0; color: var(--green); font-size: 16px;
+  transition: all 0.3s var(--ease);
+}
+
+.doc-card { position: relative; }
+.doc-card:hover::after { opacity: 1; transform: translateY(-50%) translateX(0); }
+
+/* Smooth gradient borders on hover */
+.chain-block:hover {
+  border-color: var(--border3);
+  box-shadow: 0 0 30px rgba(0,255,65,0.04);
+}
+
+/* Attack grid icon pulse on hover */
+.atk:hover svg { animation: iconPulse 0.6s ease; }
+@keyframes iconPulse { 0% { transform: scale(1); } 50% { transform: scale(1.15); } 100% { transform: scale(1); } }
+
+/* Footer link underline animation */
+.foot-col a { position: relative; }
+.foot-col a::after {
+  content: ''; position: absolute; bottom: 0; left: 0;
+  width: 0; height: 1px; background: var(--green);
+  transition: width 0.3s var(--ease);
+}
+.foot-col a:hover::after { width: 100%; }
