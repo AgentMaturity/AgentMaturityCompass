@@ -1,7 +1,7 @@
 /**
  * metricTemplates.ts — Pre-built evaluation metric templates for agent assessment.
  *
- * Inspired by evaluation platform's validated metric library, this provides a library
+ * Provides a validated metric library
  * of reusable, composable metrics that can be applied to any agent trace or output.
  *
  * Metric types:

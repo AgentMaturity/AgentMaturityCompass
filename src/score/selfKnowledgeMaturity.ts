@@ -2,7 +2,7 @@
  * prior art Self-Knowledge Maturity
  * Scores whether an agent knows what it knows — confidence calibration,
  * typed relationships, trace-based learning, and self-modifying inference.
- * Source: prior art — The External Trust Protocol (example.com, 2026)
+ * Source: AMC research — self-knowledge maturity analysis
  *
  * Four prior art architectures:
  * 1. Typed Attention — labeled relationships (REQUIRES, USES), not just magnitudes

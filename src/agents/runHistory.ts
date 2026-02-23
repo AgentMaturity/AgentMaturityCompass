@@ -1,7 +1,7 @@
 /**
  * runHistory.ts — Persists harness run results for regression tracking and A/B comparison.
  *
- * Inspired by evaluation platform's run history and A/B comparison features.
+ * Run history and A/B comparison module.
  * Tracks all harness runs over time to detect regressions, compare
  * agent versions, and visualize maturity trends.
  *

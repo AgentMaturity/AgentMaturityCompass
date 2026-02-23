@@ -7,7 +7,7 @@
  *  - ModelDrift detection
  *  - Shield Validators (Guardrails AI gap)
  *  - NL Policy authoring (enterprise UX gap)
- *  - AgentSimulator (evaluation platform gap)
+ *  - AgentSimulator (simulation gap)
  */
 
 import { describe, it, expect, beforeEach } from 'vitest';

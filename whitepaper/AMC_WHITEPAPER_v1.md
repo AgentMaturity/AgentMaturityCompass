@@ -525,9 +525,9 @@ AMC can ingest the prior art's JSONL artifacts as `SELF_REPORTED` evidence (0.4�
 
 ### 7.6 Positioning Against Evaluation Platforms
 
-Platforms like evaluation platform focus on LLM testing and evaluation — measuring whether an agent produces correct outputs for given inputs. This is capability evaluation, not maturity assessment. The distinction matters:
+Evaluation platforms focus on LLM testing and evaluation — measuring whether an agent produces correct outputs for given inputs. This is capability evaluation, not maturity assessment. The distinction matters:
 
-| Aspect | Evaluation Platforms (evaluation platform, etc.) | AMC |
+| Aspect | Evaluation Platforms | AMC |
 |--------|------------------------------------------|-----|
 | What they measure | Output correctness on test cases | Operational maturity across 5 dimensions |
 | Evidence model | Test results (pass/fail) | Execution-proof evidence with trust tiers |
@@ -537,7 +537,7 @@ Platforms like evaluation platform focus on LLM testing and evaluation — measu
 | Multi-agent | Limited | Fleet composition, delegation receipts |
 | Compliance mapping | None | SOC2, NIST AI RMF, ISO/IEC 42001 |
 
-Evaluation platforms and AMC are complementary: test results from evaluation platform or similar platforms can be ingested as evidence into AMC's scoring pipeline, contributing to the Evaluation & Growth dimension. AMC provides the governance, trust, and compliance wrapper that evaluation platforms lack.
+Evaluation platforms and AMC are complementary: test results from evaluation platforms can be ingested as evidence into AMC's scoring pipeline, contributing to the Evaluation & Growth dimension. AMC provides the governance, trust, and compliance wrapper that evaluation platforms lack.
 
 ### 7.7 Bloom Behavioral Evaluation Integration
 

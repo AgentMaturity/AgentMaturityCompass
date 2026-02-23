@@ -1,7 +1,7 @@
 /**
  * agentSimulator.ts — Pre-deployment scenario simulation for AMC
  *
- * Inspired by evaluation platform's "run 10,000 scenarios before you ship" concept.
+ * Agent simulation module for large-scale scenario testing.
  * Extends AMC's existing assurance lab with a lightweight, deterministic
  * simulation layer that tests agent responses against known scenarios
  * before production deployment.

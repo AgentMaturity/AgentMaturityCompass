@@ -1,5 +1,5 @@
 /**
- * scorecardInspired.test.ts — Tests for all evaluation platform-inspired improvements:
+ * scorecardInspired.test.ts — Tests for agent evaluation improvements:
  *   1. MetricTemplates — pre-built evaluation metrics
  *   2. SimAgent — multi-turn simulation testing
  *   3. RunHistory — A/B comparison, regression tracking, testcase management

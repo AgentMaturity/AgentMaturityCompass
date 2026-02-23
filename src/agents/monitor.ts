@@ -1,7 +1,7 @@
 /**
  * monitor.ts — Production monitoring with configurable evaluation rules.
  *
- * Inspired by evaluation platform's production monitoring feature. Monitors
+ * Production monitoring module. Monitors
  * periodically score agent outputs against metric templates and track
  * quality trends in real-time.
  *

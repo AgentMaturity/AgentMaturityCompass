@@ -1,7 +1,7 @@
 /**
  * simAgent.ts — Multi-turn simulation testing for AMC agents.
  *
- * Inspired by evaluation platform's Sim Agents feature, this module creates
+ * Simulation agent module. Creates
  * configurable AI personas that interact with agents under test in
  * realistic multi-turn conversations.
  *
