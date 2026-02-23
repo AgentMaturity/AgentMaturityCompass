@@ -217,8 +217,7 @@ footer { position: relative; z-index: 1; padding: 80px 0 40px; border-top: 1px s
 .foot-col a:hover { color: var(--green); }
 .foot-bottom { display: flex; justify-content: space-between; padding-top: 20px; border-top: 1px solid var(--border); font-size: 12px; color: var(--text3); font-family: var(--mono); }
 
-/* GSAP autoAlpha initial state — elements start visible, GSAP handles hide/show */
-/* No manual .reveal class needed — GSAP autoAlpha manages visibility */
+/* Scroll reveal handled by IntersectionObserver + .reveal/.vis classes */
 
 /* RESPONSIVE */
 @media (max-width: 1000px) {
@@ -244,96 +243,83 @@ footer { position: relative; z-index: 1; padding: 80px 0 40px; border-top: 1px s
 }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; } .reveal { opacity: 1; transform: none; } }
 
-/* ═══ v12 AWWWARDS ENHANCEMENTS ═══ */
 
-/* Smooth will-change for animated elements */
-.plat-card, .uc, .doc-card, .p-card, .atk, .chain-block {
-  will-change: transform;
-  transform-style: preserve-3d;
+/* ═══ v15 — Pure CSS Animations (no GSAP) ═══ */
+
+/* Scroll reveal — elements start hidden, fade+slide in when .vis added */
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.reveal.vis {
+  opacity: 1;
+  transform: translateY(0);
 }
 
-/* Card glow on hover */
-.plat-card:hover, .uc:hover, .doc-card:hover {
-  box-shadow: 0 0 60px rgba(0,255,65,0.06), 0 20px 40px rgba(0,0,0,0.3);
+/* Nav auto-hide */
+nav { transition: transform 0.3s ease; }
+.nav-hidden { transform: translateY(-100%); }
+
+/* Scroll progress bar */
+.scroll-bar {
+  position: fixed; top: 0; left: 0; height: 2px;
+  background: var(--green); z-index: 9999; width: 0;
+  box-shadow: 0 0 10px rgba(0,255,65,0.5);
 }
 
-/* Score ring animation */
-.ring-anim {
-  animation: ringDraw 2s ease-out forwards;
-  animation-play-state: paused;
-}
-
-.compare.vis .ring-anim { animation-play-state: running; }
-
-@keyframes ringDraw {
-  from { stroke-dashoffset: 327; }
-}
-
-/* Cursor glow follower */
+/* Cursor glow */
 .cursor-glow {
   position: fixed; width: 400px; height: 400px; border-radius: 50%;
   background: radial-gradient(circle, rgba(0,255,65,0.03) 0%, transparent 70%);
   pointer-events: none; z-index: 0;
-  transform: translate(-50%, -50%);
-  transition: opacity 0.3s;
+  transition: none; will-change: transform;
 }
-
-/* Nav hide/show transition */
-nav { transition: transform 0.3s ease; }
-
-/* Sections — NO overflow hidden (breaks GSAP animations) */
 
 /* Terminal cursor blink */
 .term-body::after {
   content: '█'; color: var(--green); animation: blink 1s step-end infinite;
 }
-
 @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
 
-/* Green line accent on sections */
+/* Section tag green line */
 .sec-tag::before {
   content: ''; display: inline-block;
   width: 24px; height: 1px; background: var(--green3);
   margin-right: 12px; vertical-align: middle;
 }
 
-/* Hover glow for trust tiers */
-.tier:hover .tier-mult {
-  text-shadow: 0 0 20px rgba(0,255,65,0.5);
+/* Card hover effects */
+.plat-card:hover, .uc:hover, .doc-card:hover {
+  box-shadow: 0 0 60px rgba(0,255,65,0.06), 0 20px 40px rgba(0,0,0,0.3);
 }
+.plat-card:hover .plat-svg { filter: drop-shadow(0 0 8px rgba(0,255,65,0.3)); }
+.tier:hover .tier-mult { text-shadow: 0 0 20px rgba(0,255,65,0.5); }
 
-/* Platform card icon glow */
-.plat-card:hover .plat-svg {
-  filter: drop-shadow(0 0 8px rgba(0,255,65,0.3));
-  transition: filter 0.3s;
-}
-
-/* Doc card hover arrow */
+/* Doc card arrow */
 .doc-card::after {
   content: '→'; position: absolute; right: 16px; bottom: 16px;
   opacity: 0; color: var(--green); font-size: 14px;
-  transform: translateX(10px);
-  transition: all 0.3s var(--ease);
+  transform: translateX(8px);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
-
-.doc-card { position: relative; }
 .doc-card:hover::after { opacity: 1; transform: translateX(0); }
 
-/* Smooth gradient borders on hover */
-.chain-block:hover {
-  border-color: var(--border3);
-  box-shadow: 0 0 30px rgba(0,255,65,0.04);
-}
+/* Attack icon pulse */
+.atk:hover svg { animation: iconPulse 0.5s ease; }
+@keyframes iconPulse { 0% { transform: scale(1); } 50% { transform: scale(1.12); } 100% { transform: scale(1); } }
 
-/* Attack grid icon pulse on hover */
-.atk:hover svg { animation: iconPulse 0.6s ease; }
-@keyframes iconPulse { 0% { transform: scale(1); } 50% { transform: scale(1.15); } 100% { transform: scale(1); } }
-
-/* Footer link underline animation */
+/* Footer link underline */
 .foot-col a { position: relative; }
 .foot-col a::after {
   content: ''; position: absolute; bottom: 0; left: 0;
   width: 0; height: 1px; background: var(--green);
-  transition: width 0.3s var(--ease);
+  transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .foot-col a:hover::after { width: 100%; }
+
+/* Chain block hover */
+.chain-block:hover { border-color: var(--border3); box-shadow: 0 0 30px rgba(0,255,65,0.04); }
+
+/* Card 3D tilt base */
+.plat-card, .uc, .doc-card { transform-style: preserve-3d; }
