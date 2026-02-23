@@ -4,421 +4,340 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AMC — The Credit Score for AI Agents</title>
-  <meta name="description" content="Agent Maturity Compass: open-source trust framework that proves AI agents are safe, reliable, and production-ready.">
-  <meta property="og:title" content="AMC — The Credit Score for AI Agents">
-  <meta property="og:description" content="Would you trust an AI agent with your data, your money, your decisions? AMC tells you if you should.">
+  <meta name="description" content="Agent Maturity Compass: open-source trust framework with cryptographic proof for AI agent safety and reliability.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300..900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧭</text></svg>">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<div class="grain" aria-hidden="true"></div>
-<div class="glow-cursor" id="glowCursor" aria-hidden="true"></div>
+<!-- CUSTOM CURSOR -->
+<div class="cursor-ring" id="cursorRing"></div>
+<div class="cursor-dot" id="cursorDot"></div>
+
+<!-- LOADER -->
+<div class="loader" id="loader">
+  <svg class="loader-compass" viewBox="0 0 100 100">
+    <circle cx="50" cy="50" r="45" fill="none" stroke="rgba(207,168,104,0.1)" stroke-width="0.5"/>
+    <line x1="50" y1="10" x2="50" y2="40" stroke="rgba(207,168,104,0.8)" stroke-width="1.5" class="loader-needle"/>
+  </svg>
+  <div class="loader-text">AMC</div>
+</div>
 
 <!-- NAV -->
 <nav id="nav">
-  <div class="nav-inner">
-    <a href="#" class="logo">
-      <span class="logo-icon">🧭</span>
-      <span class="logo-text">AMC</span>
-    </a>
-    <div class="nav-links">
-      <a href="#why">Why</a>
-      <a href="#how">How</a>
-      <a href="#dimensions">Dimensions</a>
-      <a href="#demo">Demo</a>
-    </div>
-    <div class="nav-actions">
-      <a href="https://github.com/thewisecrab/AgentMaturityCompass" target="_blank" rel="noopener" class="nav-github" aria-label="GitHub">
-        <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
-      </a>
-      <a href="#start" class="btn-primary">Get Started</a>
-    </div>
+  <a href="#" class="nav-logo">AMC</a>
+  <div class="nav-center">
+    <a href="#manifesto">Manifesto</a>
+    <a href="#anatomy">Anatomy</a>
+    <a href="#dimensions">Dimensions</a>
+    <a href="#proof">Proof</a>
   </div>
+  <a href="https://github.com/thewisecrab/AgentMaturityCompass" target="_blank" rel="noopener" class="nav-cta">
+    GitHub <span class="arrow">↗</span>
+  </a>
 </nav>
 
-<!-- HERO -->
+<!-- ═══ HERO ═══ -->
 <section class="hero" id="hero">
-  <div class="hero-bg">
-    <canvas id="compassCanvas" aria-hidden="true"></canvas>
-    <div class="hero-gradient"></div>
-  </div>
+  <canvas id="heroCanvas"></canvas>
   <div class="hero-content">
-    <div class="hero-badge">
-      <span class="badge-dot"></span>
-      Open Source · 2,333 Tests Passing
+    <div class="hero-eyebrow">
+      <span class="eyebrow-line"></span>
+      <span>Open Source Framework</span>
+      <span class="eyebrow-line"></span>
     </div>
-    <h1 class="hero-title">
-      <span class="line">The credit score</span>
-      <span class="line accent">for AI agents</span>
+    <h1>
+      <span class="hero-line" data-delay="0">Would you trust</span>
+      <span class="hero-line" data-delay="1">an AI agent with</span>
+      <span class="hero-line hero-line-accent" data-delay="2">your money?</span>
     </h1>
-    <p class="hero-sub">
-      Would you trust an AI agent with your data, your money, your decisions?<br>
-      AMC tells you if you should — with cryptographic proof, not promises.
+    <p class="hero-p">
+      AMC is the credit score for AI agents. Not promises.<br>
+      Cryptographic proof of safety, reliability, and maturity.
     </p>
-    <div class="hero-cta">
-      <a href="#start" class="btn-primary btn-lg">
-        <span>Start Scoring</span>
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+    <div class="hero-actions">
+      <a href="#start" class="btn-main">
+        <span class="btn-bg"></span>
+        <span class="btn-text">Start Scoring</span>
       </a>
-      <a href="#demo" class="btn-ghost btn-lg">See it work</a>
+      <a href="#manifesto" class="btn-outline">Read the Manifesto</a>
     </div>
-    <div class="hero-stats">
-      <div class="stat">
-        <span class="stat-num" data-target="111">0</span>
-        <span class="stat-label">Diagnostic Questions</span>
+  </div>
+  <div class="hero-scroll">
+    <div class="scroll-line"></div>
+    <span>Scroll</span>
+  </div>
+</section>
+
+<!-- ═══ TICKER ═══ -->
+<div class="ticker">
+  <div class="ticker-track">
+    <span>111 Diagnostic Questions</span>
+    <span class="ticker-sep">◆</span>
+    <span>25 Scoring Modules</span>
+    <span class="ticker-sep">◆</span>
+    <span>6 Maturity Levels</span>
+    <span class="ticker-sep">◆</span>
+    <span>Ed25519 Signatures</span>
+    <span class="ticker-sep">◆</span>
+    <span>Merkle Evidence Chains</span>
+    <span class="ticker-sep">◆</span>
+    <span>2,333 Tests Passing</span>
+    <span class="ticker-sep">◆</span>
+    <span>5 Trust Dimensions</span>
+    <span class="ticker-sep">◆</span>
+    <span>Tamper-Evident Scoring</span>
+    <span class="ticker-sep">◆</span>
+    <span>111 Diagnostic Questions</span>
+    <span class="ticker-sep">◆</span>
+    <span>25 Scoring Modules</span>
+    <span class="ticker-sep">◆</span>
+    <span>6 Maturity Levels</span>
+    <span class="ticker-sep">◆</span>
+    <span>Ed25519 Signatures</span>
+    <span class="ticker-sep">◆</span>
+    <span>Merkle Evidence Chains</span>
+    <span class="ticker-sep">◆</span>
+    <span>2,333 Tests Passing</span>
+    <span class="ticker-sep">◆</span>
+    <span>5 Trust Dimensions</span>
+    <span class="ticker-sep">◆</span>
+    <span>Tamper-Evident Scoring</span>
+    <span class="ticker-sep">◆</span>
+  </div>
+</div>
+
+<!-- ═══ MANIFESTO ═══ -->
+<section class="manifesto" id="manifesto">
+  <div class="manifesto-inner">
+    <div class="manifesto-left">
+      <span class="label">01 — Manifesto</span>
+      <h2>
+        Trust is not<br>
+        a feature.<br>
+        <em>It's evidence.</em>
+      </h2>
+    </div>
+    <div class="manifesto-right">
+      <div class="manifesto-block">
+        <h3>The Problem</h3>
+        <p>Every AI agent claims to be trustworthy. None can prove it. Self-reported safety is like a restaurant grading its own hygiene — the incentives are wrong and the evidence is missing.</p>
       </div>
-      <div class="stat">
-        <span class="stat-num" data-target="25">0</span>
-        <span class="stat-label">Scoring Modules</span>
+      <div class="manifesto-block">
+        <h3>The Principle</h3>
+        <p>A credit score doesn't ask if you're good with money — it looks at evidence. AMC does the same for AI agents. Signed, hash-chained, tamper-evident evidence that anyone can verify independently.</p>
       </div>
-      <div class="stat">
-        <span class="stat-num" data-target="6">0</span>
-        <span class="stat-label">Maturity Levels</span>
+      <div class="manifesto-block">
+        <h3>The Difference</h3>
+        <p>Other frameworks use convention. AMC uses cryptography. If someone changes a score, the Merkle chain breaks. No exceptions. No workarounds. Math, not promises.</p>
       </div>
     </div>
   </div>
 </section>
 
-<!-- WHY -->
-<section class="section" id="why">
-  <div class="wrap">
-    <div class="section-label">The Problem</div>
-    <h2 class="section-title">
-      Every AI agent claims to be<br>
-      <span class="accent">trustworthy.</span> None can prove it.
-    </h2>
-    <p class="section-desc">
-      Today's AI agents operate on vibes. They say they're safe. They say they're reliable.
-      But when things go wrong — and they will — there's no evidence trail, no audit log,
-      no way to know what happened or why.
-    </p>
-
-    <div class="problem-grid">
-      <div class="problem-card">
-        <div class="problem-icon">🎭</div>
-        <h3>The Trust Theater</h3>
-        <p>"Our AI is safe" means nothing without evidence. Self-reported safety is like a restaurant grading its own hygiene.</p>
+<!-- ═══ ANATOMY — HORIZONTAL SCROLL ═══ -->
+<section class="anatomy" id="anatomy">
+  <div class="anatomy-header">
+    <span class="label">02 — Anatomy of a Score</span>
+    <h2>Three steps.<br><em>Zero trust required.</em></h2>
+  </div>
+  <div class="anatomy-track">
+    <div class="anatomy-card">
+      <div class="card-num">01</div>
+      <div class="card-visual">
+        <svg viewBox="0 0 200 200" class="card-svg">
+          <circle cx="100" cy="100" r="80" fill="none" stroke="rgba(207,168,104,0.15)" stroke-width="1"/>
+          <circle cx="100" cy="100" r="60" fill="none" stroke="rgba(207,168,104,0.1)" stroke-width="1"/>
+          <circle cx="100" cy="100" r="40" fill="none" stroke="rgba(207,168,104,0.08)" stroke-width="1"/>
+          <text x="100" y="105" text-anchor="middle" fill="rgba(207,168,104,0.6)" font-size="32">?</text>
+        </svg>
       </div>
-      <div class="problem-card">
-        <div class="problem-icon">🕳️</div>
-        <h3>The Evidence Gap</h3>
-        <p>When an agent makes a bad decision, can you trace why? Most can't. The decision chain is a black box.</p>
+      <h3>Diagnose</h3>
+      <p>111 questions across 5 dimensions probe every aspect — error handling, data protection, decision tracing, cost efficiency, and continuous improvement. No hand-waving allowed.</p>
+    </div>
+    <div class="anatomy-card">
+      <div class="card-num">02</div>
+      <div class="card-visual">
+        <svg viewBox="0 0 200 200" class="card-svg">
+          <rect x="30" y="60" width="140" height="80" rx="4" fill="none" stroke="rgba(207,168,104,0.15)" stroke-width="1"/>
+          <line x1="50" y1="85" x2="150" y2="85" stroke="rgba(207,168,104,0.2)" stroke-width="1"/>
+          <line x1="50" y1="105" x2="130" y2="105" stroke="rgba(207,168,104,0.15)" stroke-width="1"/>
+          <line x1="50" y1="125" x2="110" y2="125" stroke="rgba(207,168,104,0.1)" stroke-width="1"/>
+          <text x="100" y="45" text-anchor="middle" fill="rgba(207,168,104,0.5)" font-size="14" font-family="monospace">3.7 / 5.0</text>
+        </svg>
       </div>
-      <div class="problem-card">
-        <div class="problem-icon">📊</div>
-        <h3>The Maturity Illusion</h3>
-        <p>A chatbot and an autonomous trading agent both call themselves "AI agents." They're not the same. Maturity matters.</p>
+      <h3>Score</h3>
+      <p>25 modules calculate maturity from Absent (0) to Optimizing (5). Each score maps to concrete evidence requirements — not subjective judgment, but verifiable criteria.</p>
+    </div>
+    <div class="anatomy-card">
+      <div class="card-num">03</div>
+      <div class="card-visual">
+        <svg viewBox="0 0 200 200" class="card-svg">
+          <rect x="20" y="70" width="50" height="60" rx="3" fill="none" stroke="rgba(207,168,104,0.2)" stroke-width="1"/>
+          <line x1="70" y1="100" x2="80" y2="100" stroke="rgba(207,168,104,0.15)" stroke-width="1" stroke-dasharray="3 2"/>
+          <rect x="80" y="70" width="50" height="60" rx="3" fill="none" stroke="rgba(207,168,104,0.2)" stroke-width="1"/>
+          <line x1="130" y1="100" x2="140" y2="100" stroke="rgba(207,168,104,0.15)" stroke-width="1" stroke-dasharray="3 2"/>
+          <rect x="140" y="70" width="50" height="60" rx="3" fill="none" stroke="rgba(207,168,104,0.2)" stroke-width="1"/>
+          <text x="100" y="160" text-anchor="middle" fill="rgba(207,168,104,0.4)" font-size="10" font-family="monospace">✓ verified</text>
+        </svg>
       </div>
+      <h3>Prove</h3>
+      <p>Every score ships with a Merkle-tree evidence chain. Ed25519 signed. Tamper-evident. Anyone can verify the assessment independently — no trust in the assessor required.</p>
     </div>
   </div>
 </section>
 
-<!-- HOW -->
-<section class="section section-dark" id="how">
-  <div class="wrap">
-    <div class="section-label">The Solution</div>
-    <h2 class="section-title">
-      Think credit score,<br>
-      <span class="accent">but for AI agents.</span>
-    </h2>
-    <p class="section-desc">
-      A credit score doesn't ask you if you're good with money — it looks at evidence.
-      AMC does the same for AI agents. Evidence over claims. Math over vibes.
-    </p>
+<!-- ═══ DIMENSIONS ═══ -->
+<section class="dimensions" id="dimensions">
+  <div class="dimensions-inner">
+    <span class="label">03 — Five Dimensions</span>
+    <h2>What gets<br><em>measured.</em></h2>
 
-    <div class="how-steps">
-      <div class="step">
-        <div class="step-num">01</div>
-        <div class="step-content">
-          <h3>Diagnose</h3>
-          <p>111 questions across 5 dimensions probe every aspect of your agent — from how it handles errors to how it protects user data. No hand-waving.</p>
+    <div class="dim-list">
+      <div class="dim-item" data-dim="1">
+        <div class="dim-number">01</div>
+        <div class="dim-name">Strategic Operations</div>
+        <div class="dim-count">22 questions</div>
+        <div class="dim-expand">
+          <p>Mission clarity, scope boundaries, channel consistency, stakeholder alignment, and decision traceability.</p>
         </div>
       </div>
-      <div class="step">
-        <div class="step-num">02</div>
-        <div class="step-content">
-          <h3>Score</h3>
-          <p>25 scoring modules calculate a maturity level from Absent (0) to Optimizing (5). Each score is backed by cryptographic evidence chains — tamper-evident and verifiable.</p>
+      <div class="dim-item" data-dim="2">
+        <div class="dim-number">02</div>
+        <div class="dim-name">Reliability & Safety</div>
+        <div class="dim-count">24 questions</div>
+        <div class="dim-expand">
+          <p>Error handling, graceful degradation, fail-secure defaults, circuit breakers, recovery protocols, and self-healing.</p>
         </div>
       </div>
-      <div class="step">
-        <div class="step-num">03</div>
-        <div class="step-content">
-          <h3>Prove</h3>
-          <p>Every score comes with a Merkle-tree evidence chain. Anyone can verify the assessment independently. No trust required — just math.</p>
+      <div class="dim-item" data-dim="3">
+        <div class="dim-number">03</div>
+        <div class="dim-name">Security & Compliance</div>
+        <div class="dim-count">23 questions</div>
+        <div class="dim-expand">
+          <p>Data protection, injection defense, audit trails, regulatory alignment, DLP, and zero-trust architecture.</p>
         </div>
       </div>
-    </div>
-  </div>
-</section>
-
-<!-- MATURITY SCALE -->
-<section class="section" id="dimensions">
-  <div class="wrap">
-    <div class="section-label">The Scale</div>
-    <h2 class="section-title">
-      Six levels of<br>
-      <span class="accent">agent maturity.</span>
-    </h2>
-    <p class="section-desc">
-      Not every agent needs to be Level 5. A personal assistant and an autonomous trading bot
-      have different maturity requirements. AMC helps you understand where you are and where you need to be.
-    </p>
-
-    <div class="maturity-scale">
-      <div class="maturity-level" data-level="0">
-        <div class="level-bar"><div class="level-fill"></div></div>
-        <div class="level-info">
-          <span class="level-name">Absent</span>
-          <span class="level-desc">No structure. Reactive. Fragile.</span>
+      <div class="dim-item" data-dim="4">
+        <div class="dim-number">04</div>
+        <div class="dim-name">Observability & Cost</div>
+        <div class="dim-count">21 questions</div>
+        <div class="dim-expand">
+          <p>Monitoring, structured logging, cost tracking, performance budgets, SLO monitoring, and operational visibility.</p>
         </div>
       </div>
-      <div class="maturity-level" data-level="1">
-        <div class="level-bar"><div class="level-fill"></div></div>
-        <div class="level-info">
-          <span class="level-name">Initial</span>
-          <span class="level-desc">Intent exists but isn't operational.</span>
-        </div>
-      </div>
-      <div class="maturity-level" data-level="2">
-        <div class="level-bar"><div class="level-fill"></div></div>
-        <div class="level-info">
-          <span class="level-name">Developing</span>
-          <span class="level-desc">Partial structure. Works in normal cases.</span>
-        </div>
-      </div>
-      <div class="maturity-level" data-level="3">
-        <div class="level-bar"><div class="level-fill"></div></div>
-        <div class="level-info">
-          <span class="level-name">Defined</span>
-          <span class="level-desc">Repeatable. Measurable. Auditable.</span>
-        </div>
-      </div>
-      <div class="maturity-level" data-level="4">
-        <div class="level-bar"><div class="level-fill"></div></div>
-        <div class="level-info">
-          <span class="level-name">Managed</span>
-          <span class="level-desc">Proactive controls. Risk-calibrated.</span>
-        </div>
-      </div>
-      <div class="maturity-level" data-level="5">
-        <div class="level-bar"><div class="level-fill"></div></div>
-        <div class="level-info">
-          <span class="level-name">Optimizing</span>
-          <span class="level-desc">Self-correcting. Continuously verified.</span>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- FIVE DIMENSIONS -->
-<section class="section section-dark" id="five-dims">
-  <div class="wrap">
-    <div class="section-label">The Framework</div>
-    <h2 class="section-title">
-      Five dimensions of<br>
-      <span class="accent">agent trust.</span>
-    </h2>
-
-    <div class="dims-grid">
-      <div class="dim-card">
-        <div class="dim-num">01</div>
-        <h3>Strategic Operations</h3>
-        <p>Mission clarity, scope boundaries, channel consistency, and stakeholder alignment.</p>
-        <span class="dim-count">22 questions</span>
-      </div>
-      <div class="dim-card">
-        <div class="dim-num">02</div>
-        <h3>Reliability & Safety</h3>
-        <p>Error handling, graceful degradation, fail-secure defaults, and recovery protocols.</p>
-        <span class="dim-count">24 questions</span>
-      </div>
-      <div class="dim-card">
-        <div class="dim-num">03</div>
-        <h3>Security & Compliance</h3>
-        <p>Data protection, injection defense, audit trails, and regulatory alignment.</p>
-        <span class="dim-count">23 questions</span>
-      </div>
-      <div class="dim-card">
-        <div class="dim-num">04</div>
-        <h3>Observability & Cost</h3>
-        <p>Monitoring, logging, cost tracking, performance budgets, and operational visibility.</p>
-        <span class="dim-count">21 questions</span>
-      </div>
-      <div class="dim-card">
-        <div class="dim-num">05</div>
-        <h3>Evaluation & Growth</h3>
-        <p>Testing harnesses, benchmark tracking, feedback loops, and continuous improvement.</p>
-        <span class="dim-count">21 questions</span>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- EVIDENCE CHAIN -->
-<section class="section" id="evidence">
-  <div class="wrap">
-    <div class="section-label">The Proof</div>
-    <h2 class="section-title">
-      Convention is not enough.<br>
-      <span class="accent">Math is.</span>
-    </h2>
-    <p class="section-desc">
-      Most frameworks rely on self-assessment. AMC uses cryptographic evidence chains —
-      Ed25519 signatures, Merkle trees, and tamper-evident logs. If someone changes a score,
-      the chain breaks. No exceptions.
-    </p>
-
-    <div class="evidence-visual">
-      <div class="chain">
-        <div class="chain-block">
-          <div class="block-header">Evidence Block #1</div>
-          <div class="block-body">
-            <code>agent: customer-support-v3</code>
-            <code>dimension: security</code>
-            <code>score: 3.7 / 5.0</code>
-            <code>hash: 7a2d...f8b1</code>
-          </div>
-        </div>
-        <div class="chain-link">
-          <svg width="40" height="24" viewBox="0 0 40 24"><path d="M0 12h40" stroke="var(--gold)" stroke-width="2" stroke-dasharray="4 4"/><circle cx="20" cy="12" r="4" fill="var(--gold)" opacity=".3"/></svg>
-        </div>
-        <div class="chain-block">
-          <div class="block-header">Evidence Block #2</div>
-          <div class="block-body">
-            <code>agent: customer-support-v3</code>
-            <code>dimension: reliability</code>
-            <code>score: 4.1 / 5.0</code>
-            <code>hash: 1f9a...c3d2</code>
-          </div>
-        </div>
-        <div class="chain-link">
-          <svg width="40" height="24" viewBox="0 0 40 24"><path d="M0 12h40" stroke="var(--gold)" stroke-width="2" stroke-dasharray="4 4"/><circle cx="20" cy="12" r="4" fill="var(--gold)" opacity=".3"/></svg>
-        </div>
-        <div class="chain-block">
-          <div class="block-header">Merkle Root</div>
-          <div class="block-body">
-            <code>root: 9c4e...a7f0</code>
-            <code>blocks: 5</code>
-            <code>signature: Ed25519</code>
-            <code>verified: ✓</code>
-          </div>
+      <div class="dim-item" data-dim="5">
+        <div class="dim-number">05</div>
+        <div class="dim-name">Evaluation & Growth</div>
+        <div class="dim-count">21 questions</div>
+        <div class="dim-expand">
+          <p>Test harnesses, benchmark tracking, feedback loops, A/B testing, and continuous improvement pipelines.</p>
         </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- INTERACTIVE DEMO -->
-<section class="section section-dark" id="demo">
-  <div class="wrap">
-    <div class="section-label">Try It</div>
-    <h2 class="section-title">
-      Score an agent<br>
-      <span class="accent">right now.</span>
-    </h2>
-    <p class="section-desc">
-      Answer a few questions. See your maturity score instantly.
-      This is a simplified demo — the full framework has 111 questions across 5 dimensions.
-    </p>
+<!-- ═══ MATURITY LEVELS ═══ -->
+<section class="levels" id="levels">
+  <div class="levels-inner">
+    <span class="label">04 — Maturity Scale</span>
+    <h2>Six levels.<br><em>No shortcuts.</em></h2>
+    <div class="levels-visual">
+      <div class="level-row" data-level="0"><span class="lv-tag">L0</span><span class="lv-name">Absent</span><span class="lv-bar"><span class="lv-fill"></span></span><span class="lv-desc">No structure. Reactive. Fragile.</span></div>
+      <div class="level-row" data-level="1"><span class="lv-tag">L1</span><span class="lv-name">Initial</span><span class="lv-bar"><span class="lv-fill"></span></span><span class="lv-desc">Intent exists, not operational.</span></div>
+      <div class="level-row" data-level="2"><span class="lv-tag">L2</span><span class="lv-name">Developing</span><span class="lv-bar"><span class="lv-fill"></span></span><span class="lv-desc">Partial structure. Normal cases work.</span></div>
+      <div class="level-row" data-level="3"><span class="lv-tag">L3</span><span class="lv-name">Defined</span><span class="lv-bar"><span class="lv-fill"></span></span><span class="lv-desc">Repeatable. Measurable. Auditable.</span></div>
+      <div class="level-row" data-level="4"><span class="lv-tag">L4</span><span class="lv-name">Managed</span><span class="lv-bar"><span class="lv-fill"></span></span><span class="lv-desc">Proactive. Risk-calibrated.</span></div>
+      <div class="level-row" data-level="5"><span class="lv-tag">L5</span><span class="lv-name">Optimizing</span><span class="lv-bar"><span class="lv-fill"></span></span><span class="lv-desc">Self-correcting. Continuously verified.</span></div>
+    </div>
+  </div>
+</section>
 
-    <div class="demo-container">
-      <div class="demo-question" id="demoQuestion">
-        <div class="demo-progress">
-          <div class="demo-progress-bar" id="demoProgressBar"></div>
-        </div>
-        <div class="demo-q-num" id="demoQNum">Question 1 of 5</div>
-        <div class="demo-q-text" id="demoQText"></div>
-        <div class="demo-options" id="demoOptions"></div>
+<!-- ═══ PROOF ═══ -->
+<section class="proof" id="proof">
+  <div class="proof-inner">
+    <span class="label">05 — The Proof Layer</span>
+    <h2>Convention vs.<br><em>Cryptography.</em></h2>
+    <div class="proof-compare">
+      <div class="proof-col proof-old">
+        <div class="proof-header">Other Frameworks</div>
+        <ul>
+          <li><span class="x">✕</span> Self-reported scores</li>
+          <li><span class="x">✕</span> Trust the assessor</li>
+          <li><span class="x">✕</span> Scores can be changed</li>
+          <li><span class="x">✕</span> No evidence chain</li>
+          <li><span class="x">✕</span> Convention-based</li>
+        </ul>
       </div>
-      <div class="demo-result" id="demoResult" style="display:none">
-        <div class="result-score" id="resultScore">0</div>
-        <div class="result-level" id="resultLevel">Absent</div>
-        <div class="result-desc" id="resultDesc"></div>
-        <div class="result-dims" id="resultDims"></div>
-        <button class="btn-primary" onclick="resetDemo()">Try Again</button>
+      <div class="proof-col proof-new">
+        <div class="proof-header">AMC</div>
+        <ul>
+          <li><span class="check">✓</span> Evidence-backed scores</li>
+          <li><span class="check">✓</span> Independently verifiable</li>
+          <li><span class="check">✓</span> Tamper-evident chains</li>
+          <li><span class="check">✓</span> Merkle tree proofs</li>
+          <li><span class="check">✓</span> Ed25519 signatures</li>
+        </ul>
       </div>
     </div>
   </div>
 </section>
 
-<!-- INSTALL -->
-<section class="section" id="start">
-  <div class="wrap">
-    <div class="section-label">Get Started</div>
-    <h2 class="section-title">
-      Three commands.<br>
-      <span class="accent">That's it.</span>
-    </h2>
+<!-- ═══ TERMINAL ═══ -->
+<section class="install" id="start">
+  <div class="install-inner">
+    <span class="label">06 — Get Started</span>
+    <h2>Three commands.<br><em>That's it.</em></h2>
+    <div class="term">
+      <div class="term-chrome">
+        <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+        <span class="term-title">~/projects</span>
+      </div>
+      <pre class="term-code"><span class="prompt">❯</span> git clone https://github.com/thewisecrab/AgentMaturityCompass.git
+<span class="prompt">❯</span> cd AgentMaturityCompass && npm install
+<span class="prompt">❯</span> npm run score -- --agent my-agent
 
-    <div class="terminal">
-      <div class="terminal-bar">
-        <span class="terminal-dot red"></span>
-        <span class="terminal-dot yellow"></span>
-        <span class="terminal-dot green"></span>
-        <span class="terminal-title">terminal</span>
-      </div>
-      <div class="terminal-body">
-        <div class="terminal-line"><span class="prompt">$</span> <span class="cmd">git clone https://github.com/thewisecrab/AgentMaturityCompass.git</span></div>
-        <div class="terminal-line"><span class="prompt">$</span> <span class="cmd">cd AgentMaturityCompass && npm install</span></div>
-        <div class="terminal-line"><span class="prompt">$</span> <span class="cmd">npm run score -- --agent my-agent</span></div>
-        <div class="terminal-line output">
-          <span class="output-text">🧭 AMC Score: 3.7/5.0 (Defined)</span>
-        </div>
-        <div class="terminal-line output">
-          <span class="output-text">   Strategic Operations: 3.2</span>
-        </div>
-        <div class="terminal-line output">
-          <span class="output-text">   Reliability & Safety: 4.1</span>
-        </div>
-        <div class="terminal-line output">
-          <span class="output-text">   Security & Compliance: 3.8</span>
-        </div>
-        <div class="terminal-line output">
-          <span class="output-text">   Observability & Cost: 3.5</span>
-        </div>
-        <div class="terminal-line output">
-          <span class="output-text">   Evaluation & Growth: 3.9</span>
-        </div>
-        <div class="terminal-line output">
-          <span class="output-text">   Evidence chain: ✓ verified (Merkle root: 9c4e...a7f0)</span>
-        </div>
-      </div>
+<span class="out">🧭 AMC Score: 3.7 / 5.0 — Defined</span>
+<span class="dim-out">   Strategic Operations ···· 3.2</span>
+<span class="dim-out">   Reliability & Safety ···· 4.1</span>
+<span class="dim-out">   Security & Compliance ··· 3.8</span>
+<span class="dim-out">   Observability & Cost ···· 3.5</span>
+<span class="dim-out">   Evaluation & Growth ····· 3.9</span>
+<span class="out">   Evidence: ✓ Merkle root 9c4e…a7f0 (Ed25519)</span></pre>
     </div>
   </div>
 </section>
 
-<!-- FOOTER -->
-<footer class="footer">
-  <div class="wrap">
-    <div class="footer-top">
-      <div class="footer-brand">
-        <span class="logo"><span class="logo-icon">🧭</span> AMC</span>
-        <p>The open-source trust framework for AI agents.</p>
+<!-- ═══ FOOTER ═══ -->
+<footer class="foot">
+  <div class="foot-inner">
+    <div class="foot-top">
+      <div class="foot-brand">
+        <span class="foot-logo">AMC</span>
+        <p>The open-source trust framework<br>for AI agents.</p>
       </div>
-      <div class="footer-links">
-        <div class="footer-col">
+      <div class="foot-cols">
+        <div class="foot-col">
           <h4>Framework</h4>
-          <a href="#why">Why AMC</a>
-          <a href="#how">How It Works</a>
+          <a href="#manifesto">Manifesto</a>
+          <a href="#anatomy">How It Works</a>
           <a href="#dimensions">Dimensions</a>
-          <a href="#demo">Try Demo</a>
+          <a href="#proof">Proof Layer</a>
         </div>
-        <div class="footer-col">
+        <div class="foot-col">
           <h4>Resources</h4>
           <a href="https://github.com/thewisecrab/AgentMaturityCompass" target="_blank">GitHub</a>
-          <a href="https://github.com/thewisecrab/AgentMaturityCompass/blob/main/docs/AMC_MASTER_REFERENCE.md" target="_blank">Documentation</a>
+          <a href="https://github.com/thewisecrab/AgentMaturityCompass/blob/main/docs/AMC_MASTER_REFERENCE.md" target="_blank">Docs</a>
           <a href="https://github.com/thewisecrab/AgentMaturityCompass/blob/main/whitepaper/AMC_WHITEPAPER_v1.md" target="_blank">White Paper</a>
         </div>
       </div>
     </div>
-    <div class="footer-bottom">
-      <span>© 2026 Agent Maturity Compass. Open source under MIT.</span>
+    <div class="foot-bottom">
+      <span>© 2026 Agent Maturity Compass · MIT License</span>
       <span>Built with evidence, not vibes.</span>
     </div>
   </div>
