@@ -4,13 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AMC — The Credit Score for AI Agents</title>
-  <meta name="description" content="Agent Maturity Compass: execution-proof trust scoring for AI agents. 111 diagnostic questions. Tamper-evident evidence.">
+  <meta name="description" content="Agent Maturity Compass: execution-proof trust scoring for AI agents. 111 diagnostic questions. Tamper-evident evidence. Zero trust theater.">
   <meta property="og:title" content="AMC — Execution-Proof Trust Scoring for AI Agents">
   <meta property="og:description" content="111 questions. 25 modules. Cryptographic proof. The credit score for AI agents.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300..900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛡️</text></svg>">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧭</text></svg>">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -19,177 +19,175 @@
 <div class="cursor-glow" id="cursorGlow" aria-hidden="true"></div>
 <a href="#hero" class="skip-link">Skip to content</a>
 
-<!-- Announcement Banner -->
-<div class="announce-bar" id="announceBar">
-  <div class="container announce-inner">
-    <span class="announce-badge">New</span>
-    <span>AMC v1.0 — 111 diagnostic questions, 25 modules, cryptographic evidence chains</span>
-    <a href="./docs/" class="announce-link">Read the docs →</a>
-    <button class="announce-close" id="announceClose" aria-label="Close">&times;</button>
-  </div>
-</div>
-
-<!-- Nav -->
-<nav id="nav" role="navigation" aria-label="Main">
+<!-- ═══ NAV ═══ -->
+<nav id="nav">
   <div class="container nav-inner">
-    <a href="#" class="nav-logo" aria-label="AMC Home">
-      <div class="logo-compass" aria-hidden="true"><svg width="28" height="28" viewBox="0 0 28 28"><circle cx="14" cy="14" r="12" fill="none" stroke="currentColor" stroke-width="1.5" opacity=".3"/><circle cx="14" cy="14" r="8" fill="none" stroke="currentColor" stroke-width="1" opacity=".2"/><path d="M14 2 L15.5 12 L14 14 L12.5 12Z" fill="url(#navNeedle)"/><path d="M14 26 L12.5 16 L14 14 L15.5 16Z" fill="currentColor" opacity=".3"/><defs><linearGradient id="navNeedle" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#818cf8"/><stop offset="100%" stop-color="#6366f1"/></linearGradient></defs></svg></div>
-      <span class="logo-text">AMC</span>
+    <a href="#" class="nav-brand">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10" opacity=".3"/><circle cx="12" cy="12" r="6" opacity=".15"/><path d="M12 2 L13 10.5 L12 12 L11 10.5Z" fill="url(#ng)" stroke="none"/><path d="M12 22 L11 13.5 L12 12 L13 13.5Z" fill="currentColor" fill-opacity=".2" stroke="none"/><defs><linearGradient id="ng" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#818cf8"/><stop offset="100%" stop-color="#6366f1"/></linearGradient></defs></svg>
+      AMC
     </a>
-    <div class="nav-center" id="navCenter">
+    <div class="nav-links" id="navLinks">
       <a href="#problem">Problem</a>
-      <a href="#solution">Solution</a>
+      <a href="#solution">How It Works</a>
       <a href="#platform">Platform</a>
-      <a href="#start">Get Started</a>
+      <a href="#start">Install</a>
       <a href="./docs/">Docs</a>
     </div>
-    <div class="nav-right">
-      <a href="https://github.com/thewisecrab/AgentMaturityCompass" target="_blank" rel="noopener" class="nav-gh" data-magnetic>
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+    <div class="nav-actions">
+      <a href="https://github.com/thewisecrab/AgentMaturityCompass" target="_blank" rel="noopener" class="nav-gh" aria-label="GitHub">
+        <svg width="18" height="18" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
       </a>
-      <a href="#start" class="nav-cta" data-magnetic><span>Get Started</span></a>
-      <button class="nav-hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button>
+      <a href="#start" class="nav-cta">Get Started</a>
+      <button class="nav-toggle" id="navToggle" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></button>
     </div>
   </div>
 </nav>
-
-<!-- Mobile menu -->
 <div class="mobile-menu" id="mobileMenu" aria-hidden="true">
-  <a href="#problem">Problem</a><a href="#solution">Solution</a><a href="#platform">Platform</a><a href="#start">Get Started</a><a href="./docs/">Docs</a>
+  <a href="#problem">Problem</a><a href="#solution">How It Works</a><a href="#platform">Platform</a><a href="#start">Install</a><a href="./docs/">Docs</a>
   <a href="https://github.com/thewisecrab/AgentMaturityCompass" target="_blank" rel="noopener">GitHub</a>
 </div>
 
-<!-- Hero -->
+<!-- ═══ HERO ═══ -->
 <section class="hero" id="hero">
-  <canvas id="heroCanvas" aria-hidden="true"></canvas>
-  <div class="hero-grid-bg" aria-hidden="true"></div>
-  <div class="hero-radial" aria-hidden="true"></div>
+  <canvas class="hero-canvas" id="heroCanvas" aria-hidden="true"></canvas>
+  <div class="hero-gradient" aria-hidden="true"></div>
+  <div class="hero-grid" aria-hidden="true"></div>
+
   <div class="container hero-content">
-    <div class="hero-badge anim-reveal">
-      <span class="badge-pulse"></span>
+    <div class="hero-eyebrow reveal">
+      <span class="hero-eyebrow-dot"></span>
       Open Source · MIT License
     </div>
-    <h1 class="hero-title anim-reveal anim-d1">
-      Trust scores<br>that can't be<br><span class="hero-gradient">faked.</span>
+
+    <h1 class="reveal reveal-d1">
+      The credit score<br>for <span class="accent">AI agents.</span>
     </h1>
-    <p class="hero-sub anim-reveal anim-d2">
-      The only AI agent framework with cryptographically signed,<br class="hide-mobile"> tamper-evident execution evidence. 111 questions. 25 modules. Zero trust theater.
+
+    <p class="hero-sub reveal reveal-d2">
+      Execution-proof trust scoring with cryptographically signed evidence.<br class="hide-mobile">
+      111 questions. 25 modules. Tamper-evident. Zero trust theater.
     </p>
-    <div class="hero-actions anim-reveal anim-d3">
-      <a href="#start" class="btn-primary" data-magnetic><span>Get Started</span><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 7h12M8 2l5 5-5 5"/></svg></a>
-      <a href="./docs/" class="btn-ghost" data-magnetic>Documentation</a>
+
+    <div class="hero-buttons reveal reveal-d3">
+      <a href="#start" class="btn btn-fill" data-magnetic>
+        <span>Get Started</span>
+        <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 7h12M8 2l5 5-5 5"/></svg>
+      </a>
+      <a href="./docs/" class="btn btn-outline" data-magnetic>Read the Docs</a>
     </div>
-    <div class="hero-terminal anim-reveal anim-d4">
-      <div class="term-chrome"><div class="term-dots"><i></i><i></i><i></i></div><span class="term-title">Terminal</span></div>
-      <div class="term-body" id="termBody">
-        <div class="term-line" data-delay="0"><span class="term-prompt">$</span> <span class="term-cmd">pip install agent-maturity-compass</span></div>
-        <div class="term-line" data-delay="800"><span class="term-muted">✓ Installed amc@1.0.0</span></div>
-        <div class="term-line" data-delay="1400"><span class="term-prompt">$</span> <span class="term-cmd">amc quickscore --agent my-agent</span></div>
-        <div class="term-line" data-delay="2200"><span class="term-muted">⠋ Running 111 diagnostic checks...</span></div>
-        <div class="term-line" data-delay="2800"><span class="term-accent">┌─────────────────────────────────┐</span></div>
-        <div class="term-line" data-delay="3000"><span class="term-accent">│ AMC Score: 72/100 — Level L3    │</span></div>
-        <div class="term-line" data-delay="3200"><span class="term-accent">│ Maturity: Defined               │</span></div>
-        <div class="term-line" data-delay="3400"><span class="term-accent">└─────────────────────────────────┘</span></div>
-        <div class="term-line" data-delay="3800"><span class="term-green">✓ Evidence chain verified (Merkle root: 7f3a...c2d1)</span></div>
-        <div class="term-line" data-delay="4200"><span class="term-green">✓ Agent Passport exported → passport.json</span></div>
+
+    <div class="terminal reveal reveal-d4">
+      <div class="terminal-bar">
+        <div class="terminal-dots"><i></i><i></i><i></i></div>
+        <span class="terminal-title">Terminal</span>
+      </div>
+      <div class="terminal-body" id="termBody">
+        <div class="tl" data-delay="0"><span class="t-prompt">$</span> <span class="t-cmd">pip install agent-maturity-compass</span></div>
+        <div class="tl" data-delay="700"><span class="t-dim">✓ Installed amc@1.0.0</span></div>
+        <div class="tl" data-delay="1200"><span class="t-prompt">$</span> <span class="t-cmd">amc score --agent my-agent</span></div>
+        <div class="tl" data-delay="2000"><span class="t-dim">⠋ Running 111 diagnostic checks…</span></div>
+        <div class="tl" data-delay="2800"><span class="t-accent">  Score    72 / 100</span></div>
+        <div class="tl" data-delay="3100"><span class="t-accent">  Level    L3 — Defined</span></div>
+        <div class="tl" data-delay="3400"><span class="t-green">  ✓ Evidence chain verified</span></div>
+        <div class="tl" data-delay="3700"><span class="t-cyan">  ✓ Agent Passport → passport.json</span></div>
       </div>
     </div>
   </div>
-  <div class="hero-stats anim-reveal anim-d4">
-    <div class="stat-card glass"><strong data-count="111">0</strong><span>Diagnostic Questions</span></div>
-    <div class="stat-card glass"><strong data-count="25">0</strong><span>Scoring Modules</span></div>
-    <div class="stat-card glass"><strong data-count="2333">0</strong><span>Passing Tests</span></div>
-    <div class="stat-card glass"><strong>L0–L5</strong><span>Maturity Levels</span></div>
+
+  <div class="hero-metrics reveal reveal-d4">
+    <div class="metric"><strong data-count="111">0</strong><span>Questions</span></div>
+    <div class="metric"><strong data-count="25">0</strong><span>Modules</span></div>
+    <div class="metric"><strong data-count="2333">0</strong><span>Tests</span></div>
+    <div class="metric"><strong>L0–L5</strong><span>Levels</span></div>
   </div>
 </section>
 
-<!-- Problem -->
+<!-- ═══ PROBLEM ═══ -->
 <section id="problem" class="section">
   <div class="container">
-    <div class="section-header">
-      <span class="pill anim-reveal"><span class="pill-dot"></span>The Problem</span>
-      <h2 class="section-title anim-reveal anim-d1">Every agent says<br>it's trustworthy.</h2>
-      <p class="section-sub anim-reveal anim-d2">The data says otherwise.</p>
-    </div>
-    <div class="bento anim-reveal anim-d3">
-      <div class="bento-card bento-wide glass">
-        <div class="bento-icon">📊</div>
-        <div class="bento-num">+84<small>pt</small></div>
-        <h3>The Self-Report Gap</h3>
-        <p>Average difference between what agents claim and what execution evidence shows. Measured across 200+ production agents.</p>
-        <div class="bento-bar"><div class="bento-bar-fill" data-width="84"></div></div>
+    <div class="section-label reveal">The Problem</div>
+    <h2 class="section-title reveal reveal-d1">Every agent says<br>it's trustworthy.</h2>
+    <p class="section-desc reveal reveal-d2">Self-reported maturity is meaningless. Here's the data.</p>
+
+    <div class="bento" style="margin-top:48px">
+      <div class="bento-hero glass reveal reveal-d3">
+        <div class="bento-hero-text">
+          <div class="bento-stat">+84<small>pt</small></div>
+          <h3>The Self-Report Gap</h3>
+          <p>Average difference between what agents claim and what execution evidence shows. Measured across 200+ production agents.</p>
+        </div>
+        <div class="bento-hero-viz">
+          <div class="gap-bar">
+            <div class="gap-row"><span class="gap-label">Claimed</span><div class="gap-track"><div class="gap-fill gap-fill-claim" data-w="91"></div></div></div>
+            <div class="gap-row"><span class="gap-label">Actual</span><div class="gap-track"><div class="gap-fill gap-fill-actual" data-w="7"></div></div></div>
+          </div>
+        </div>
       </div>
-      <div class="bento-card glass">
-        <div class="bento-icon">🎭</div>
-        <div class="bento-num">91<small>%</small></div>
+      <div class="bento-card glass reveal">
+        <div class="num">91<small>%</small></div>
         <h3>Claim L3+</h3>
         <p>Nine out of ten agents self-report as "managed" or higher. Under evidence-gated scoring, most are L0–L1.</p>
       </div>
-      <div class="bento-card glass">
-        <div class="bento-icon">🔓</div>
-        <div class="bento-num">0</div>
-        <h3>Tamper-Proof Frameworks</h3>
+      <div class="bento-card glass reveal reveal-d1">
+        <div class="num">0</div>
+        <h3>Tamper-Proof Alternatives</h3>
         <p>Before AMC, no framework used cryptographic evidence to prevent score manipulation.</p>
       </div>
-      <div class="bento-card bento-wide glass bento-dark">
-        <div class="bento-quote">
-          <span class="bento-quote-mark">"</span>
-          <p>Trust without evidence is just marketing. AMC makes the invisible visible.</p>
-        </div>
-      </div>
     </div>
   </div>
 </section>
 
-<!-- Solution -->
+<!-- ═══ SOLUTION ═══ -->
 <section id="solution" class="section section-alt">
   <div class="container">
-    <div class="section-header">
-      <span class="pill anim-reveal"><span class="pill-dot"></span>The Solution</span>
-      <h2 class="section-title anim-reveal anim-d1">Evidence you can<br><span class="gradient-text">mathematically verify.</span></h2>
-    </div>
-    <div class="solution-flow">
-      <div class="flow-step anim-reveal">
-        <div class="flow-num">01</div>
-        <div class="flow-content">
-          <h3>Observe</h3>
-          <p>AMC sits between your agent and its LLM provider. Every API call, every decision, every tool use — captured as signed evidence.</p>
+    <div class="section-label reveal">How It Works</div>
+    <h2 class="section-title reveal reveal-d1">Evidence you can<br><span class="text-gradient">mathematically verify.</span></h2>
+
+    <div class="steps">
+      <div class="step reveal">
+        <div class="step-text">
+          <div class="step-num">Observe</div>
+          <h3>Capture every decision</h3>
+          <p>AMC sits between your agent and its LLM provider. Every API call, every tool use, every decision — captured as cryptographically signed evidence.</p>
         </div>
-        <div class="flow-visual glass">
-          <div class="flow-diagram">
-            <div class="flow-node"><span class="flow-icon">🤖</span>Agent</div>
-            <div class="flow-connector"><svg width="60" height="2"><line x1="0" y1="1" x2="60" y2="1" stroke="currentColor" stroke-dasharray="4 4" opacity=".3"/></svg><span class="flow-pulse"></span></div>
-            <div class="flow-node flow-node-accent"><span class="flow-icon">🛡️</span>AMC</div>
-            <div class="flow-connector"><svg width="60" height="2"><line x1="0" y1="1" x2="60" y2="1" stroke="currentColor" stroke-dasharray="4 4" opacity=".3"/></svg><span class="flow-pulse"></span></div>
-            <div class="flow-node"><span class="flow-icon">🧠</span>LLM</div>
+        <div class="step-visual glass">
+          <div class="flow">
+            <div class="flow-node"><span class="flow-node-icon">🤖</span>Agent</div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-node flow-node-active"><span class="flow-node-icon">🛡️</span>AMC</div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-node"><span class="flow-node-icon">🧠</span>LLM</div>
           </div>
         </div>
       </div>
-      <div class="flow-step anim-reveal">
-        <div class="flow-num">02</div>
-        <div class="flow-content">
-          <h3>Score</h3>
-          <p>111 diagnostic questions across 5 dimensions. Each answer is evidence-gated — you can't claim a level without proving it.</p>
+
+      <div class="step reveal">
+        <div class="step-text">
+          <div class="step-num">Score</div>
+          <h3>111 evidence-gated questions</h3>
+          <p>Five dimensions of maturity. Each answer requires proof — you can't claim a level without the execution evidence to back it up.</p>
         </div>
-        <div class="flow-visual glass">
-          <div class="score-radar" id="scoreRadar">
-            <canvas id="radarCanvas" width="240" height="240"></canvas>
+        <div class="step-visual glass">
+          <div class="radar-wrap">
+            <canvas id="radarCanvas" width="220" height="220"></canvas>
           </div>
         </div>
       </div>
-      <div class="flow-step anim-reveal">
-        <div class="flow-num">03</div>
-        <div class="flow-content">
-          <h3>Prove</h3>
-          <p>Every score is backed by a Merkle-tree ledger. Tamper with one entry and the entire chain breaks. Export an Agent Passport as portable proof.</p>
+
+      <div class="step reveal">
+        <div class="step-text">
+          <div class="step-num">Prove</div>
+          <h3>Tamper-evident ledger</h3>
+          <p>Every score is backed by a Merkle-tree chain. Tamper with one entry and the entire chain breaks. Export an Agent Passport as portable proof.</p>
         </div>
-        <div class="flow-visual glass">
-          <div class="merkle-viz">
-            <div class="merkle-row"><span class="merkle-node merkle-root" data-glow>Root Hash</span></div>
-            <div class="merkle-lines"><svg width="200" height="30"><line x1="100" y1="0" x2="50" y2="30" stroke="rgba(99,102,241,.3)" stroke-width="1"/><line x1="100" y1="0" x2="150" y2="30" stroke="rgba(99,102,241,.3)" stroke-width="1"/></svg></div>
-            <div class="merkle-row"><span class="merkle-node">H(1,2)</span><span class="merkle-node">H(3,4)</span></div>
-            <div class="merkle-lines"><svg width="200" height="30"><line x1="50" y1="0" x2="25" y2="30" stroke="rgba(99,102,241,.2)" stroke-width="1"/><line x1="50" y1="0" x2="75" y2="30" stroke="rgba(99,102,241,.2)" stroke-width="1"/><line x1="150" y1="0" x2="125" y2="30" stroke="rgba(99,102,241,.2)" stroke-width="1"/><line x1="150" y1="0" x2="175" y2="30" stroke="rgba(99,102,241,.2)" stroke-width="1"/></svg></div>
-            <div class="merkle-row"><span class="merkle-node merkle-leaf">E1</span><span class="merkle-node merkle-leaf">E2</span><span class="merkle-node merkle-leaf">E3</span><span class="merkle-node merkle-leaf">E4</span></div>
+        <div class="step-visual glass">
+          <div class="merkle">
+            <div class="merkle-row"><span class="merkle-node merkle-root">Root Hash</span></div>
+            <div class="merkle-connector"></div>
+            <div class="merkle-branch">
+              <div style="text-align:center"><span class="merkle-node">H(1,2)</span><div class="merkle-connector"></div><div class="merkle-row"><span class="merkle-node">E₁</span><span class="merkle-node">E₂</span></div></div>
+              <div style="text-align:center"><span class="merkle-node">H(3,4)</span><div class="merkle-connector"></div><div class="merkle-row"><span class="merkle-node">E₃</span><span class="merkle-node">E₄</span></div></div>
+            </div>
           </div>
         </div>
       </div>
@@ -197,51 +195,79 @@
   </div>
 </section>
 
-<!-- Platform -->
+<!-- ═══ PLATFORM ═══ -->
 <section id="platform" class="section">
   <div class="container">
-    <div class="section-header">
-      <span class="pill anim-reveal"><span class="pill-dot"></span>The Platform</span>
-      <h2 class="section-title anim-reveal anim-d1">25 modules.<br><span class="gradient-text">One mission.</span></h2>
-      <p class="section-sub anim-reveal anim-d2">Everything you need to measure, enforce, and prove agent trustworthiness.</p>
-    </div>
-    <div class="module-grid">
-      <div class="module-card glass anim-reveal"><div class="module-glow" aria-hidden="true"></div><div class="module-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 3v18h18"/><path d="M7 16l4-8 4 4 5-9"/></svg></div><h4>AMC Score</h4><p>111-question diagnostic with evidence-gated 6-level scoring and anti-gaming protections.</p><span class="module-tag">Core</span></div>
-      <div class="module-card glass anim-reveal"><div class="module-glow" aria-hidden="true"></div><div class="module-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div><h4>AMC Shield</h4><p>Threat detection, prompt injection defense, and real-time anomaly scanning.</p><span class="module-tag">Security</span></div>
-      <div class="module-card glass anim-reveal"><div class="module-glow" aria-hidden="true"></div><div class="module-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></div><h4>AMC Vault</h4><p>AES-256-GCM encrypted storage for signing keys, credentials, and secrets.</p><span class="module-tag">Crypto</span></div>
-      <div class="module-card glass anim-reveal"><div class="module-glow" aria-hidden="true"></div><div class="module-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></div><h4>AMC Watch</h4><p>Observability, attestation, and continuous safety testing for production agents.</p><span class="module-tag">Monitoring</span></div>
-      <div class="module-card glass anim-reveal"><div class="module-glow" aria-hidden="true"></div><div class="module-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></div><h4>AMC Enforce</h4><p>Policy-as-code guardrails with real-time enforcement and audit trails.</p><span class="module-tag">Governance</span></div>
-      <div class="module-card glass anim-reveal"><div class="module-glow" aria-hidden="true"></div><div class="module-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/></svg></div><h4>Bridge</h4><p>Adapters for OpenAI, Anthropic, Gemini, Grok, OpenRouter, and local models.</p><span class="module-tag">Integration</span></div>
+    <div class="section-label reveal">The Platform</div>
+    <h2 class="section-title reveal reveal-d1">25 modules.<br><span class="text-gradient">One mission.</span></h2>
+    <p class="section-desc reveal reveal-d2">Everything you need to measure, enforce, and prove agent trustworthiness.</p>
+
+    <div class="modules" style="margin-top:48px">
+      <div class="mod glass reveal">
+        <div class="mod-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 3v18h18"/><path d="M7 16l4-8 4 4 5-9"/></svg></div>
+        <h4>AMC Score</h4>
+        <p>111-question diagnostic with evidence-gated 6-level scoring and anti-gaming protections.</p>
+        <span class="mod-tag">Core</span>
+      </div>
+      <div class="mod glass reveal reveal-d1">
+        <div class="mod-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+        <h4>AMC Shield</h4>
+        <p>Threat detection, prompt injection defense, and real-time anomaly scanning.</p>
+        <span class="mod-tag">Security</span>
+      </div>
+      <div class="mod glass reveal reveal-d2">
+        <div class="mod-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></div>
+        <h4>AMC Vault</h4>
+        <p>AES-256-GCM encrypted storage for signing keys, credentials, and secrets.</p>
+        <span class="mod-tag">Crypto</span>
+      </div>
+      <div class="mod glass reveal">
+        <div class="mod-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></div>
+        <h4>AMC Watch</h4>
+        <p>Observability, attestation, and continuous safety testing for production agents.</p>
+        <span class="mod-tag">Monitoring</span>
+      </div>
+      <div class="mod glass reveal reveal-d1">
+        <div class="mod-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></div>
+        <h4>AMC Enforce</h4>
+        <p>Policy-as-code guardrails with real-time enforcement and audit trails.</p>
+        <span class="mod-tag">Governance</span>
+      </div>
+      <div class="mod glass reveal reveal-d2">
+        <div class="mod-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/></svg></div>
+        <h4>Bridge</h4>
+        <p>Adapters for OpenAI, Anthropic, Gemini, Grok, OpenRouter, and local models.</p>
+        <span class="mod-tag">Integration</span>
+      </div>
     </div>
   </div>
 </section>
 
-<!-- Audience -->
+<!-- ═══ AUDIENCE ═══ -->
 <section class="section section-alt">
   <div class="container">
-    <div class="section-header">
-      <span class="pill anim-reveal"><span class="pill-dot"></span>Two Interfaces</span>
-      <h2 class="section-title anim-reveal anim-d1">Built for humans.<br><span class="gradient-text">Built for agents.</span></h2>
-    </div>
-    <div class="audience-split">
-      <div class="audience-panel glass anim-reveal">
-        <div class="audience-header"><span class="audience-emoji">👤</span><h3>For Humans & Teams</h3></div>
-        <p class="audience-desc">Visual Studio UI with dashboards, radar charts, heatmaps, and one-click exports.</p>
-        <div class="audience-cmd"><code>amc up</code><span class="audience-arrow">→</span><code>localhost:3212/console</code></div>
-        <ul class="audience-features">
+    <div class="section-label reveal">Two Interfaces</div>
+    <h2 class="section-title reveal reveal-d1">Built for humans.<br><span class="text-gradient">Built for agents.</span></h2>
+
+    <div class="split" style="margin-top:48px">
+      <div class="panel glass reveal">
+        <div class="panel-head"><span class="panel-emoji">👤</span><h3>For Humans & Teams</h3></div>
+        <p class="panel-desc">Visual Studio UI with dashboards, radar charts, heatmaps, and one-click exports.</p>
+        <div class="panel-cmd"><code>amc up</code><span class="arrow">→</span><code>localhost:3212/console</code></div>
+        <ul class="panel-list">
           <li>52-page Compass Console</li>
           <li>111-question interactive heatmap</li>
-          <li>Radar charts & timelines</li>
+          <li>Radar charts & trend timelines</li>
           <li>PDF & Markdown export</li>
           <li>Agent Passport badges</li>
           <li>Multi-workspace host mode</li>
         </ul>
       </div>
-      <div class="audience-panel glass anim-reveal anim-d1">
-        <div class="audience-header"><span class="audience-emoji">🤖</span><h3>For Agents & AI</h3></div>
-        <p class="audience-desc">Full CLI + REST API. Agents self-assess, prove trust, and integrate into CI/CD.</p>
-        <div class="audience-cmd"><code>amc score --json</code><span class="audience-arrow">→</span><code>{"level":"L3"}</code></div>
-        <ul class="audience-features">
+      <div class="panel glass reveal reveal-d1">
+        <div class="panel-head"><span class="panel-emoji">🤖</span><h3>For Agents & AI</h3></div>
+        <p class="panel-desc">Full CLI + REST API. Agents self-assess, prove trust, and integrate into CI/CD.</p>
+        <div class="panel-cmd"><code>amc score --json</code><span class="arrow">→</span><code>{"level":"L3"}</code></div>
+        <ul class="panel-list">
           <li>Complete CLI for every operation</li>
           <li>REST API on all endpoints</li>
           <li>6 provider bridge adapters</li>
@@ -254,70 +280,72 @@
   </div>
 </section>
 
-<!-- Marquee -->
-<div class="marquee-section" aria-hidden="true">
-  <div class="marquee-track"><div class="marquee-content">
+<!-- ═══ MARQUEE ═══ -->
+<div class="marquee" aria-hidden="true">
+  <div class="marquee-track"><div class="marquee-inner">
     <span>ISO 42001</span><span class="marquee-dot">·</span><span>OWASP LLM Top 10</span><span class="marquee-dot">·</span><span>EU AI Act</span><span class="marquee-dot">·</span><span>SOC 2</span><span class="marquee-dot">·</span><span>NIST AI RMF</span><span class="marquee-dot">·</span><span>OpenAI</span><span class="marquee-dot">·</span><span>Anthropic</span><span class="marquee-dot">·</span><span>Google Gemini</span><span class="marquee-dot">·</span><span>xAI Grok</span><span class="marquee-dot">·</span><span>OpenRouter</span><span class="marquee-dot">·</span><span>Ollama</span><span class="marquee-dot">·</span>
     <span>ISO 42001</span><span class="marquee-dot">·</span><span>OWASP LLM Top 10</span><span class="marquee-dot">·</span><span>EU AI Act</span><span class="marquee-dot">·</span><span>SOC 2</span><span class="marquee-dot">·</span><span>NIST AI RMF</span><span class="marquee-dot">·</span><span>OpenAI</span><span class="marquee-dot">·</span><span>Anthropic</span><span class="marquee-dot">·</span><span>Google Gemini</span><span class="marquee-dot">·</span><span>xAI Grok</span><span class="marquee-dot">·</span><span>OpenRouter</span><span class="marquee-dot">·</span><span>Ollama</span><span class="marquee-dot">·</span>
   </div></div>
 </div>
 
-<!-- Get Started -->
+<!-- ═══ INSTALL ═══ -->
 <section id="start" class="section">
-  <div class="container">
-    <div class="section-header center">
-      <span class="pill anim-reveal"><span class="pill-dot"></span>Get Started</span>
-      <h2 class="section-title anim-reveal anim-d1">Four commands.<br><span class="gradient-text">Zero to scored.</span></h2>
-    </div>
-    <div class="install-steps">
-      <div class="install-step anim-reveal">
-        <div class="install-num">01</div>
-        <div class="install-info"><h4>Install</h4><p>Works on macOS, Linux, Windows (WSL). Python 3.10+ required.</p></div>
+  <div class="container" style="text-align:center">
+    <div class="section-label reveal">Get Started</div>
+    <h2 class="section-title reveal reveal-d1" style="margin:0 auto">Four commands.<br><span class="text-gradient">Zero to scored.</span></h2>
+
+    <div class="install" style="margin-top:48px">
+      <div class="install-row reveal">
+        <div class="install-n">01</div>
+        <div class="install-info"><h4>Install</h4><p>macOS, Linux, Windows (WSL). Python 3.10+.</p></div>
         <div class="install-cmd glass"><code>pip install agent-maturity-compass</code><button class="copy-btn" onclick="copyCmd(this)">Copy</button></div>
       </div>
-      <div class="install-step anim-reveal">
-        <div class="install-num">02</div>
-        <div class="install-info"><h4>Setup</h4><p>Creates workspace, generates signing keys, initializes encrypted vault.</p></div>
+      <div class="install-row reveal">
+        <div class="install-n">02</div>
+        <div class="install-info"><h4>Setup</h4><p>Creates workspace, signing keys, encrypted vault.</p></div>
         <div class="install-cmd glass"><code>amc setup</code><button class="copy-btn" onclick="copyCmd(this)">Copy</button></div>
       </div>
-      <div class="install-step anim-reveal">
-        <div class="install-num">03</div>
-        <div class="install-info"><h4>Score</h4><p>Rapid 5-question assessment. Full 111-question diagnostic also available.</p></div>
+      <div class="install-row reveal">
+        <div class="install-n">03</div>
+        <div class="install-info"><h4>Score</h4><p>Quick 5-question or full 111-question diagnostic.</p></div>
         <div class="install-cmd glass"><code>amc quickscore</code><button class="copy-btn" onclick="copyCmd(this)">Copy</button></div>
       </div>
-      <div class="install-step anim-reveal">
-        <div class="install-num">04</div>
-        <div class="install-info"><h4>Launch UI</h4><p>Starts Studio with Console, Dashboard, Gateway, and REST API.</p></div>
+      <div class="install-row reveal">
+        <div class="install-n">04</div>
+        <div class="install-info"><h4>Launch</h4><p>Console, Dashboard, Gateway, and REST API.</p></div>
         <div class="install-cmd glass"><code>amc up</code><button class="copy-btn" onclick="copyCmd(this)">Copy</button></div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- CTA -->
-<section class="cta-section">
-  <div class="cta-orbs" aria-hidden="true"></div>
-  <div class="container cta-content">
-    <h2 class="section-title anim-reveal">Stop trusting claims.<br><span class="gradient-text">Start verifying evidence.</span></h2>
-    <p class="section-sub anim-reveal anim-d1">Free. Open source. Runs on your infrastructure.<br>No telemetry. No cloud dependencies.</p>
-    <div class="hero-actions anim-reveal anim-d2">
-      <a href="./docs/#installation" class="btn-primary" data-magnetic><span>Get Started Free</span></a>
-      <a href="https://github.com/thewisecrab/AgentMaturityCompass" target="_blank" rel="noopener" class="btn-ghost" data-magnetic>View on GitHub</a>
+<!-- ═══ CTA ═══ -->
+<section class="cta">
+  <div class="cta-glow" aria-hidden="true"></div>
+  <div class="cta-inner container">
+    <h2 class="section-title reveal" style="margin:0 auto">Stop trusting claims.<br><span class="text-gradient">Start verifying evidence.</span></h2>
+    <p class="section-desc reveal reveal-d1" style="margin:20px auto 40px;max-width:440px;text-align:center">Free. Open source. Runs on your infrastructure. No telemetry. No cloud dependencies.</p>
+    <div class="hero-buttons reveal reveal-d2">
+      <a href="./docs/#installation" class="btn btn-fill" data-magnetic><span>Get Started Free</span></a>
+      <a href="https://github.com/thewisecrab/AgentMaturityCompass" target="_blank" rel="noopener" class="btn btn-outline" data-magnetic>View on GitHub</a>
     </div>
   </div>
 </section>
 
-<!-- Footer -->
+<!-- ═══ FOOTER ═══ -->
 <footer>
   <div class="container">
-    <div class="footer-top">
+    <div class="footer-grid">
       <div class="footer-brand">
-        <a href="#" class="nav-logo"><div class="logo-compass" aria-hidden="true"><svg width="24" height="24" viewBox="0 0 28 28"><circle cx="14" cy="14" r="12" fill="none" stroke="currentColor" stroke-width="1.5" opacity=".3"/><path d="M14 2 L15.5 12 L14 14 L12.5 12Z" fill="currentColor" opacity=".6"/><path d="M14 26 L12.5 16 L14 14 L15.5 16Z" fill="currentColor" opacity=".2"/></svg></div><span class="logo-text">AMC</span></a>
-        <p class="footer-tagline">Execution-proof trust scoring for AI agents.</p>
+        <a href="#" class="nav-brand">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10" opacity=".3"/><path d="M12 2 L13 10.5 L12 12 L11 10.5Z" fill="currentColor" fill-opacity=".5" stroke="none"/><path d="M12 22 L11 13.5 L12 12 L13 13.5Z" fill="currentColor" fill-opacity=".15" stroke="none"/></svg>
+          AMC
+        </a>
+        <p>Execution-proof trust scoring for AI agents.</p>
       </div>
-      <div class="footer-links">
+      <div class="footer-cols">
         <div class="footer-col"><h5>Product</h5><a href="#solution">How It Works</a><a href="#platform">Platform</a><a href="#start">Install</a></div>
-        <div class="footer-col"><h5>Resources</h5><a href="./docs/">Documentation</a><a href="./docs/#cli-commands">CLI Reference</a><a href="./docs/#api-reference">API</a><a href="./docs/#faq">FAQ</a></div>
+        <div class="footer-col"><h5>Resources</h5><a href="./docs/">Documentation</a><a href="./docs/#cli-commands">CLI Reference</a><a href="./docs/#api-reference">API</a></div>
         <div class="footer-col"><h5>Community</h5><a href="https://github.com/thewisecrab/AgentMaturityCompass" target="_blank" rel="noopener">GitHub</a><a href="https://github.com/thewisecrab/AgentMaturityCompass/issues" target="_blank" rel="noopener">Issues</a></div>
       </div>
     </div>
