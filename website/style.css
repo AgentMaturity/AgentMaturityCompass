@@ -323,3 +323,46 @@ nav { transition: transform 0.3s ease; }
 
 /* Card 3D tilt base */
 .plat-card, .uc, .doc-card { transform-style: preserve-3d; }
+
+/* ═══ MODE TOGGLE ═══ */
+.mode-toggle {
+  display: flex; align-items: center; gap: 6px;
+  background: none; border: 1px solid var(--border); border-radius: 20px;
+  padding: 4px 12px; cursor: pointer; font-size: 11px;
+  color: var(--dim); transition: all 0.3s;
+  margin-left: 12px;
+}
+.mode-toggle:hover { border-color: var(--green3); }
+.mode-switch {
+  width: 28px; height: 16px; background: var(--bg3); border-radius: 8px;
+  position: relative; transition: background 0.3s;
+}
+.mode-dot {
+  width: 12px; height: 12px; background: var(--green); border-radius: 50%;
+  position: absolute; top: 2px; left: 2px; transition: transform 0.3s;
+}
+.mode-label { font-family: var(--mono); text-transform: uppercase; letter-spacing: 0.5px; }
+.mode-tech-label { color: var(--green); }
+.mode-eli5-label { color: var(--dim); }
+
+/* ELI5 mode active */
+body.eli5-mode .mode-dot { transform: translateX(12px); }
+body.eli5-mode .mode-tech-label { color: var(--dim); }
+body.eli5-mode .mode-eli5-label { color: var(--green); }
+body.eli5-mode .mode-switch { background: var(--green3); }
+
+/* Content switching */
+.eli5-only { display: none; }
+body.eli5-mode .tech-only { display: none; }
+body.eli5-mode .eli5-only { display: block; }
+body.eli5-mode .eli5-only.eli5-inline { display: inline; }
+body.eli5-mode .eli5-only.eli5-flex { display: flex; }
+body.eli5-mode .eli5-only.eli5-grid { display: grid; }
+
+/* ELI5 mode — softer, friendlier feel */
+body.eli5-mode .sec-tag { font-size: 13px; }
+body.eli5-mode h2 { font-size: clamp(1.4rem, 3vw, 2rem); }
+body.eli5-mode .hero-sub { font-size: 16px; line-height: 1.7; }
+body.eli5-mode code, body.eli5-mode .term-body { display: none; }
+body.eli5-mode .terminal { display: none; }
+body.eli5-mode .plat-cmd { display: none; }

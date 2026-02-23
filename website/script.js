@@ -119,3 +119,17 @@ if (glow && window.matchMedia('(pointer: fine)').matches) {
     glow.style.transform = 'translate(' + (e.clientX - 200) + 'px,' + (e.clientY - 200) + 'px)';
   });
 }
+
+// ─── MODE TOGGLE (Technical / ELI5) ───
+var toggle = document.getElementById('modeToggle');
+if (toggle) {
+  // Check saved preference
+  var saved = localStorage.getItem('amc-mode');
+  if (saved === 'eli5') document.body.classList.add('eli5-mode');
+
+  toggle.addEventListener('click', function() {
+    document.body.classList.toggle('eli5-mode');
+    var isEli5 = document.body.classList.contains('eli5-mode');
+    localStorage.setItem('amc-mode', isEli5 ? 'eli5' : 'tech');
+  });
+}

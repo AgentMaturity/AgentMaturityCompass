@@ -32,6 +32,11 @@
     <svg width="18" height="18" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
     GitHub
   </a>
+  <button id="modeToggle" class="mode-toggle" aria-label="Switch between Technical and Simple view">
+    <span class="mode-label mode-tech-label">Technical</span>
+    <span class="mode-switch"><span class="mode-dot"></span></span>
+    <span class="mode-label mode-eli5-label">Simple</span>
+  </button>
 </nav>
 
 <!-- ═══ 1. HERO ═══ -->
@@ -44,7 +49,8 @@
       <span class="h1-line">it's trustworthy.</span>
       <span class="h1-line h1-green">Prove it.</span>
     </h1>
-    <p class="hero-sub">AMC is the credit score for AI agents. It doesn't ask if your agent is safe — it watches what the agent does, captures cryptographic evidence, and scores maturity from execution, not claims.</p>
+    <p class="hero-sub tech-only">AMC is the credit score for AI agents. It doesn't ask if your agent is safe — it watches what the agent does, captures cryptographic evidence, and scores maturity from execution, not claims.</p>
+    <p class="hero-sub eli5-only">Think of AMC like a credit score, but for AI. Instead of trusting an AI that says "I'm safe," AMC actually watches what it does and gives it a real score based on proof. No more taking AI's word for it.</p>
     <div class="hero-ctas">
       <a href="#start" class="btn-green">Get Started →</a>
       <a href="#how" class="btn-dim">See how it works</a>
@@ -65,8 +71,10 @@
 <section class="sec" id="problem">
   <div class="wrap">
     <div class="sec-tag">01 — The Problem</div>
-    <h2>Documentation inflation<br>is an <span class="green">84-point lie.</span></h2>
-    <p class="sec-sub">Every AI governance framework has the same fatal flaw: the agent being evaluated provides the evidence. AMC is the first framework that closes this gap.</p>
+    <h2 class="tech-only">Documentation inflation<br>is an <span class="green">84-point lie.</span></h2>
+    <h2 class="eli5-only">AI safety scores are<br><span class="green">mostly made up.</span></h2>
+    <p class="sec-sub tech-only">Every AI governance framework has the same fatal flaw: the agent being evaluated provides the evidence. AMC is the first framework that closes this gap.</p>
+    <p class="sec-sub eli5-only">Right now, when someone says their AI is "safe" or "trustworthy," they're grading their own homework. Imagine a restaurant giving itself a 5-star health rating — that's what AI safety looks like today. AMC changes that by actually checking.</p>
 
     <div class="compare reveal">
       <div class="compare-side compare-bad">
@@ -138,8 +146,10 @@
 <section class="sec sec-dark" id="how">
   <div class="wrap">
     <div class="sec-tag">02 — How It Works</div>
-    <h2>Think credit score,<br><span class="green">but for AI agents.</span></h2>
-    <p class="sec-sub">A credit score doesn't ask if you're good with money — it looks at evidence. AMC does the same. Every tool call, every decision, every action — captured, signed, and scored.</p>
+    <h2 class="tech-only">Think credit score,<br><span class="green">but for AI agents.</span></h2>
+    <p class="sec-sub tech-only">A credit score doesn't ask if you're good with money — it looks at evidence. AMC does the same. Every tool call, every decision, every action — captured, signed, and scored.</p>
+    <h2 class="eli5-only">How does AMC<br><span class="green">actually work?</span></h2>
+    <p class="sec-sub eli5-only">Just like your credit score tracks your financial behavior without asking you, AMC watches what an AI actually does. It records every action, checks if the AI followed the rules, and gives it a score from 0 to 5. Simple as that.</p>
 
     <!-- VISUAL: Flow diagram with SVG -->
     <div class="flow reveal">
@@ -212,7 +222,8 @@
 <section class="sec" id="platform">
   <div class="wrap">
     <div class="sec-tag">03 — The Platform</div>
-    <h2>Not a checklist.<br><span class="green">A full trust stack.</span></h2>
+    <h2 class="tech-only">Not a checklist.<br><span class="green">A full trust stack.</span></h2>
+    <h2 class="eli5-only">Everything you need<br><span class="green">to trust your AI.</span></h2>
     <p class="sec-sub">158 modules across scoring, governance, security, observability, and compliance. Everything you need to prove your agent is production-ready.</p>
     <div class="platform-grid reveal">
       <div class="plat-card">
@@ -352,8 +363,10 @@
 <section class="sec sec-dark" id="assurance">
   <div class="wrap">
     <div class="sec-tag">06 — Assurance Lab</div>
-    <h2>AMC doesn't just score.<br><span class="green">It attacks.</span></h2>
-    <p class="sec-sub">10 deterministic attack packs run against your agent's boundaries — continuously, on schedule, after every change. If your agent has a weakness, AMC finds it first.</p>
+    <h2 class="tech-only">AMC doesn't just score.<br><span class="green">It attacks.</span></h2>
+    <p class="sec-sub tech-only">10 deterministic attack packs run against your agent's boundaries — continuously, on schedule, after every change. If your agent has a weakness, AMC finds it first.</p>
+    <h2 class="eli5-only">We test your AI<br><span class="green">by trying to break it.</span></h2>
+    <p class="sec-sub eli5-only">The best way to know if your AI is safe? Try to trick it. AMC runs 10 different types of attacks against your AI — like trying to make it leak secrets, ignore its rules, or do things it shouldn't. Better we find the problems than a hacker does.</p>
     <div class="attack-grid reveal">
       <div class="atk">
         <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#00ff41" stroke-width="1.5"><path d="M12 2L2 7v6c0 5.5 4.3 10.7 10 12 5.7-1.3 10-6.5 10-12V7z"/><path d="M8 12l3 3 5-5" opacity="0.5"/></svg>
@@ -460,8 +473,10 @@
 <section class="sec sec-dark" id="evidence">
   <div class="wrap">
     <div class="sec-tag">08 — The Proof Layer</div>
-    <h2>Convention is not enough.<br><span class="green">Cryptography is.</span></h2>
-    <p class="sec-sub">Most frameworks rely on trust. AMC replaces trust with math. Every score is backed by a cryptographic evidence chain that anyone can verify independently.</p>
+    <h2 class="tech-only">Convention is not enough.<br><span class="green">Cryptography is.</span></h2>
+    <p class="sec-sub tech-only">Most frameworks rely on trust. AMC replaces trust with math. Every score is backed by a cryptographic evidence chain that anyone can verify independently.</p>
+    <h2 class="eli5-only">Every score comes<br><span class="green">with proof.</span></h2>
+    <p class="sec-sub eli5-only">When AMC gives your AI a score, it's not just a number — it comes with a tamper-proof receipt. Think of it like a blockchain for AI behavior. Nobody can fake it, and anyone can check it.</p>
 
     <div class="chain reveal">
       <div class="chain-block">
@@ -642,7 +657,8 @@
         <line x1="64" y1="40" x2="76" y2="40" stroke-width="2"/>
       </svg>
     </div>
-    <h2>Free. Forever.<br><span class="green">For the greater good.</span></h2>
+    <h2 class="tech-only">Free. Forever.<br><span class="green">For the greater good.</span></h2>
+    <h2 class="eli5-only">100% free.<br><span class="green">No catch.</span></h2>
     <p class="mission-text">AMC is MIT licensed. No premium tier. No features behind a paywall. No vendor lock-in. Every module, every test, every line of code — available for inspection, modification, and contribution. We believe AI agents will be the change agents across life and technology. Trust infrastructure should be a public good, not a profit center.</p>
     <div class="oss-stats reveal">
       <div class="oss-stat"><span class="oss-num" data-count="2425">0</span><span class="oss-label">Tests Passing</span></div>
