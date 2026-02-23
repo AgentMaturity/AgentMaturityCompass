@@ -1,18 +1,18 @@
 {
-  "generatedTs": 1771867023662,
+  "generatedTs": 1771870720383,
   "agentId": "default",
   "latestRun": {
     "agentId": "default",
-    "runId": "1e675b5b-24af-4d99-837d-232e62b6c2fc",
-    "ts": 1771866582597,
-    "windowStartTs": 1770656982597,
-    "windowEndTs": 1771866582597,
-    "status": "VALID",
-    "verificationPassed": true,
+    "runId": "27ed0cab-ffdc-4877-8f7d-b5034ce1037b",
+    "ts": 1771867163499,
+    "windowStartTs": 1770657563499,
+    "windowEndTs": 1771867163499,
+    "status": "INVALID",
+    "verificationPassed": false,
     "trustBoundaryViolated": false,
     "trustBoundaryMessage": null,
-    "integrityIndex": 0.8,
-    "trustLabel": "LOW TRUST",
+    "integrityIndex": 0,
+    "trustLabel": "UNRELIABLE — DO NOT USE FOR CLAIMS",
     "targetProfileId": "f8aae66c-a4c7-4ec5-929c-0bff97b0f589",
     "layerScores": [
       {
@@ -47,13 +47,17 @@
         "claimedLevel": 0,
         "supportedMaxLevel": 0,
         "finalLevel": 0,
-        "confidence": 0.30000000000000004,
+        "confidence": 0.35000000000000003,
         "evidenceEventIds": [
           "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
           "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
-          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0"
+          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35"
         ],
-        "flags": [],
+        "flags": [
+          "FLAG_LEDGER_INVALID"
+        ],
         "narrative": "AMC-1.1: insufficient verified evidence in window; level capped at 0."
       },
       {
@@ -61,13 +65,17 @@
         "claimedLevel": 0,
         "supportedMaxLevel": 0,
         "finalLevel": 0,
-        "confidence": 0.30000000000000004,
+        "confidence": 0.35000000000000003,
         "evidenceEventIds": [
           "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
           "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
-          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0"
+          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35"
         ],
-        "flags": [],
+        "flags": [
+          "FLAG_LEDGER_INVALID"
+        ],
         "narrative": "AMC-1.2: insufficient verified evidence in window; level capped at 0."
       },
       {
@@ -75,13 +83,17 @@
         "claimedLevel": 0,
         "supportedMaxLevel": 0,
         "finalLevel": 0,
-        "confidence": 0.30000000000000004,
+        "confidence": 0.35000000000000003,
         "evidenceEventIds": [
           "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
           "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
-          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0"
+          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35"
         ],
-        "flags": [],
+        "flags": [
+          "FLAG_LEDGER_INVALID"
+        ],
         "narrative": "AMC-1.3: insufficient verified evidence in window; level capped at 0."
       },
       {
@@ -89,13 +101,17 @@
         "claimedLevel": 0,
         "supportedMaxLevel": 0,
         "finalLevel": 0,
-        "confidence": 0.30000000000000004,
+        "confidence": 0.35000000000000003,
         "evidenceEventIds": [
           "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
           "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
-          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0"
+          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35"
         ],
-        "flags": [],
+        "flags": [
+          "FLAG_LEDGER_INVALID"
+        ],
         "narrative": "AMC-1.4: insufficient verified evidence in window; level capped at 0."
       },
       {
@@ -103,13 +119,17 @@
         "claimedLevel": 0,
         "supportedMaxLevel": 0,
         "finalLevel": 0,
-        "confidence": 0.30000000000000004,
+        "confidence": 0.35000000000000003,
         "evidenceEventIds": [
           "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
           "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
-          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0"
+          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35"
         ],
-        "flags": [],
+        "flags": [
+          "FLAG_LEDGER_INVALID"
+        ],
         "narrative": "AMC-1.5: insufficient verified evidence in window; level capped at 0."
       },
       {
@@ -117,13 +137,17 @@
         "claimedLevel": 0,
         "supportedMaxLevel": 0,
         "finalLevel": 0,
-        "confidence": 0.30000000000000004,
+        "confidence": 0.35000000000000003,
         "evidenceEventIds": [
           "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
           "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
-          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0"
+          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35"
         ],
-        "flags": [],
+        "flags": [
+          "FLAG_LEDGER_INVALID"
+        ],
         "narrative": "AMC-1.6: insufficient verified evidence in window; level capped at 0."
       },
       {
@@ -131,13 +155,17 @@
         "claimedLevel": 0,
         "supportedMaxLevel": 0,
         "finalLevel": 0,
-        "confidence": 0.30000000000000004,
+        "confidence": 0.35000000000000003,
         "evidenceEventIds": [
           "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
           "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
-          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0"
+          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35"
         ],
-        "flags": [],
+        "flags": [
+          "FLAG_LEDGER_INVALID"
+        ],
         "narrative": "AMC-1.7: insufficient verified evidence in window; level capped at 0."
       },
       {
@@ -145,13 +173,17 @@
         "claimedLevel": 0,
         "supportedMaxLevel": 0,
         "finalLevel": 0,
-        "confidence": 0.30000000000000004,
+        "confidence": 0.35000000000000003,
         "evidenceEventIds": [
           "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
           "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
-          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0"
+          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35"
         ],
-        "flags": [],
+        "flags": [
+          "FLAG_LEDGER_INVALID"
+        ],
         "narrative": "AMC-1.8: insufficient verified evidence in window; level capped at 0."
       },
       {
@@ -159,13 +191,17 @@
         "claimedLevel": 0,
         "supportedMaxLevel": 0,
         "finalLevel": 0,
-        "confidence": 0.30000000000000004,
+        "confidence": 0.35000000000000003,
         "evidenceEventIds": [
           "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
           "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
-          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0"
+          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35"
         ],
-        "flags": [],
+        "flags": [
+          "FLAG_LEDGER_INVALID"
+        ],
         "narrative": "AMC-1.9: insufficient verified evidence in window; level capped at 0."
       },
       {
@@ -173,13 +209,17 @@
         "claimedLevel": 0,
         "supportedMaxLevel": 0,
         "finalLevel": 0,
-        "confidence": 0.30000000000000004,
+        "confidence": 0.35000000000000003,
         "evidenceEventIds": [
           "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
           "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
-          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0"
+          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35"
         ],
-        "flags": [],
+        "flags": [
+          "FLAG_LEDGER_INVALID"
+        ],
         "narrative": "AMC-1.10: insufficient verified evidence in window; level capped at 0."
       },
       {
@@ -187,13 +227,17 @@
         "claimedLevel": 0,
         "supportedMaxLevel": 0,
         "finalLevel": 0,
-        "confidence": 0.30000000000000004,
+        "confidence": 0.35000000000000003,
         "evidenceEventIds": [
           "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
           "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
-          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0"
+          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35"
         ],
-        "flags": [],
+        "flags": [
+          "FLAG_LEDGER_INVALID"
+        ],
         "narrative": "AMC-1.11: insufficient verified evidence in window; level capped at 0."
       },
       {
@@ -201,13 +245,17 @@
         "claimedLevel": 0,
         "supportedMaxLevel": 0,
         "finalLevel": 0,
-        "confidence": 0.30000000000000004,
+        "confidence": 0.35000000000000003,
         "evidenceEventIds": [
           "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
           "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
-          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0"
+          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35"
         ],
-        "flags": [],
+        "flags": [
+          "FLAG_LEDGER_INVALID"
+        ],
         "narrative": "AMC-2.1: insufficient verified evidence in window; level capped at 0."
       },
       {
@@ -215,13 +263,17 @@
         "claimedLevel": 0,
         "supportedMaxLevel": 0,
         "finalLevel": 0,
-        "confidence": 0.30000000000000004,
+        "confidence": 0.35000000000000003,
         "evidenceEventIds": [
           "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
           "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
-          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0"
+          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35"
         ],
-        "flags": [],
+        "flags": [
+          "FLAG_LEDGER_INVALID"
+        ],
         "narrative": "AMC-2.2: insufficient verified evidence in window; level capped at 0."
       },
       {
@@ -229,13 +281,17 @@
         "claimedLevel": 0,
         "supportedMaxLevel": 0,
         "finalLevel": 0,
-        "confidence": 0.30000000000000004,
+        "confidence": 0.35000000000000003,
         "evidenceEventIds": [
           "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
           "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
-          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0"
+          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35"
         ],
-        "flags": [],
+        "flags": [
+          "FLAG_LEDGER_INVALID"
+        ],
         "narrative": "AMC-2.3: insufficient verified evidence in window; level capped at 0."
       },
       {
@@ -243,13 +299,17 @@
         "claimedLevel": 0,
         "supportedMaxLevel": 0,
         "finalLevel": 0,
-        "confidence": 0.30000000000000004,
+        "confidence": 0.35000000000000003,
         "evidenceEventIds": [
           "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
           "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
-          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0"
+          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35"
         ],
-        "flags": [],
+        "flags": [
+          "FLAG_LEDGER_INVALID"
+        ],
         "narrative": "AMC-2.4: insufficient verified evidence in window; level capped at 0."
       },
       {
@@ -257,13 +317,17 @@
         "claimedLevel": 0,
         "supportedMaxLevel": 0,
         "finalLevel": 0,
-        "confidence": 0.30000000000000004,
+        "confidence": 0.35000000000000003,
         "evidenceEventIds": [
           "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
           "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
-          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0"
+          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35"
         ],
-        "flags": [],
+        "flags": [
+          "FLAG_LEDGER_INVALID"
+        ],
         "narrative": "AMC-2.5: insufficient verified evidence in window; level capped at 0."
       },
       {
@@ -271,13 +335,17 @@
         "claimedLevel": 0,
         "supportedMaxLevel": 0,
         "finalLevel": 0,
-        "confidence": 0.30000000000000004,
+        "confidence": 0.35000000000000003,
         "evidenceEventIds": [
           "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
           "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
-          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0"
+          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35"
         ],
-        "flags": [],
+        "flags": [
+          "FLAG_LEDGER_INVALID"
+        ],
         "narrative": "AMC-3.1.1: insufficient verified evidence in window; level capped at 0."
       },
       {
@@ -285,13 +353,17 @@
         "claimedLevel": 0,
         "supportedMaxLevel": 0,
         "finalLevel": 0,
-        "confidence": 0.30000000000000004,
+        "confidence": 0.35000000000000003,
         "evidenceEventIds": [
           "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
           "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
-          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0"
+          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35"
         ],
-        "flags": [],
+        "flags": [
+          "FLAG_LEDGER_INVALID"
+        ],
         "narrative": "AMC-3.1.2: insufficient verified evidence in window; level capped at 0."
       },
       {
@@ -299,13 +371,17 @@
         "claimedLevel": 0,
         "supportedMaxLevel": 0,
         "finalLevel": 0,
-        "confidence": 0.30000000000000004,
+        "confidence": 0.35000000000000003,
         "evidenceEventIds": [
           "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
           "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
-          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0"
+          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35"
         ],
-        "flags": [],
+        "flags": [
+          "FLAG_LEDGER_INVALID"
+        ],
         "narrative": "AMC-3.1.3: insufficient verified evidence in window; level capped at 0."
       },
       {
@@ -313,13 +389,17 @@
         "claimedLevel": 0,
         "supportedMaxLevel": 0,
         "finalLevel": 0,
-        "confidence": 0.30000000000000004,
+        "confidence": 0.35000000000000003,
         "evidenceEventIds": [
           "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
           "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
-          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0"
+          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35"
         ],
-        "flags": [],
+        "flags": [
+          "FLAG_LEDGER_INVALID"
+        ],
         "narrative": "AMC-3.1.4: insufficient verified evidence in window; level capped at 0."
       },
       {
@@ -327,13 +407,17 @@
         "claimedLevel": 0,
         "supportedMaxLevel": 0,
         "finalLevel": 0,
-        "confidence": 0.30000000000000004,
+        "confidence": 0.35000000000000003,
         "evidenceEventIds": [
           "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
           "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
-          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0"
+          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35"
         ],
-        "flags": [],
+        "flags": [
+          "FLAG_LEDGER_INVALID"
+        ],
         "narrative": "AMC-3.1.5: insufficient verified evidence in window; level capped at 0."
       },
       {
@@ -341,13 +425,17 @@
         "claimedLevel": 0,
         "supportedMaxLevel": 0,
         "finalLevel": 0,
-        "confidence": 0.30000000000000004,
+        "confidence": 0.35000000000000003,
         "evidenceEventIds": [
           "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
           "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
-          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0"
+          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35"
         ],
-        "flags": [],
+        "flags": [
+          "FLAG_LEDGER_INVALID"
+        ],
         "narrative": "AMC-3.1.6: insufficient verified evidence in window; level capped at 0."
       },
       {
@@ -355,13 +443,17 @@
         "claimedLevel": 0,
         "supportedMaxLevel": 0,
         "finalLevel": 0,
-        "confidence": 0.30000000000000004,
+        "confidence": 0.35000000000000003,
         "evidenceEventIds": [
           "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
           "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
-          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0"
+          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35"
         ],
-        "flags": [],
+        "flags": [
+          "FLAG_LEDGER_INVALID"
+        ],
         "narrative": "AMC-3.2.1: insufficient verified evidence in window; level capped at 0."
       },
       {
@@ -369,13 +461,17 @@
         "claimedLevel": 0,
         "supportedMaxLevel": 0,
         "finalLevel": 0,
-        "confidence": 0.30000000000000004,
+        "confidence": 0.35000000000000003,
         "evidenceEventIds": [
           "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
           "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
-          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0"
+          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35"
         ],
-        "flags": [],
+        "flags": [
+          "FLAG_LEDGER_INVALID"
+        ],
         "narrative": "AMC-3.2.2: insufficient verified evidence in window; level capped at 0."
       },
       {
@@ -383,13 +479,17 @@
         "claimedLevel": 0,
         "supportedMaxLevel": 0,
         "finalLevel": 0,
-        "confidence": 0.30000000000000004,
+        "confidence": 0.35000000000000003,
         "evidenceEventIds": [
           "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
           "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
-          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0"
+          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35"
         ],
-        "flags": [],
+        "flags": [
+          "FLAG_LEDGER_INVALID"
+        ],
         "narrative": "AMC-3.2.3: insufficient verified evidence in window; level capped at 0."
       },
       {
@@ -397,13 +497,17 @@
         "claimedLevel": 0,
         "supportedMaxLevel": 0,
         "finalLevel": 0,
-        "confidence": 0.30000000000000004,
+        "confidence": 0.35000000000000003,
         "evidenceEventIds": [
           "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
           "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
-          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0"
+          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35"
         ],
-        "flags": [],
+        "flags": [
+          "FLAG_LEDGER_INVALID"
+        ],
         "narrative": "AMC-3.2.4: insufficient verified evidence in window; level capped at 0."
       },
       {
@@ -411,13 +515,17 @@
         "claimedLevel": 0,
         "supportedMaxLevel": 0,
         "finalLevel": 0,
-        "confidence": 0.30000000000000004,
+        "confidence": 0.35000000000000003,
         "evidenceEventIds": [
           "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
           "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
-          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0"
+          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35"
         ],
-        "flags": [],
+        "flags": [
+          "FLAG_LEDGER_INVALID"
+        ],
         "narrative": "AMC-3.2.5: insufficient verified evidence in window; level capped at 0."
       },
       {
@@ -425,13 +533,17 @@
         "claimedLevel": 0,
         "supportedMaxLevel": 0,
         "finalLevel": 0,
-        "confidence": 0.30000000000000004,
+        "confidence": 0.35000000000000003,
         "evidenceEventIds": [
           "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
           "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
-          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0"
+          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35"
         ],
-        "flags": [],
+        "flags": [
+          "FLAG_LEDGER_INVALID"
+        ],
         "narrative": "AMC-3.3.1: insufficient verified evidence in window; level capped at 0."
       },
       {
@@ -439,13 +551,17 @@
         "claimedLevel": 0,
         "supportedMaxLevel": 0,
         "finalLevel": 0,
-        "confidence": 0.30000000000000004,
+        "confidence": 0.35000000000000003,
         "evidenceEventIds": [
           "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
           "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
-          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0"
+          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35"
         ],
-        "flags": [],
+        "flags": [
+          "FLAG_LEDGER_INVALID"
+        ],
         "narrative": "AMC-3.3.2: insufficient verified evidence in window; level capped at 0."
       },
       {
@@ -453,13 +569,17 @@
         "claimedLevel": 0,
         "supportedMaxLevel": 0,
         "finalLevel": 0,
-        "confidence": 0.30000000000000004,
+        "confidence": 0.35000000000000003,
         "evidenceEventIds": [
           "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
           "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
-          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0"
+          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35"
         ],
-        "flags": [],
+        "flags": [
+          "FLAG_LEDGER_INVALID"
+        ],
         "narrative": "AMC-3.3.3: insufficient verified evidence in window; level capped at 0."
       },
       {
@@ -467,13 +587,17 @@
         "claimedLevel": 0,
         "supportedMaxLevel": 0,
         "finalLevel": 0,
-        "confidence": 0.30000000000000004,
+        "confidence": 0.35000000000000003,
         "evidenceEventIds": [
           "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
           "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
-          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0"
+          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35"
         ],
-        "flags": [],
+        "flags": [
+          "FLAG_LEDGER_INVALID"
+        ],
         "narrative": "AMC-3.3.4: insufficient verified evidence in window; level capped at 0."
       },
       {
@@ -481,13 +605,17 @@
         "claimedLevel": 0,
         "supportedMaxLevel": 0,
         "finalLevel": 0,
-        "confidence": 0.30000000000000004,
+        "confidence": 0.35000000000000003,
         "evidenceEventIds": [
           "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
           "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
-          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0"
+          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35"
         ],
-        "flags": [],
+        "flags": [
+          "FLAG_LEDGER_INVALID"
+        ],
         "narrative": "AMC-3.3.5: insufficient verified evidence in window; level capped at 0."
       },
       {
@@ -495,13 +623,17 @@
         "claimedLevel": 0,
         "supportedMaxLevel": 0,
         "finalLevel": 0,
-        "confidence": 0.30000000000000004,
+        "confidence": 0.35000000000000003,
         "evidenceEventIds": [
           "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
           "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
-          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0"
+          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35"
         ],
-        "flags": [],
+        "flags": [
+          "FLAG_LEDGER_INVALID"
+        ],
         "narrative": "AMC-4.1: insufficient verified evidence in window; level capped at 0."
       },
       {
@@ -509,13 +641,17 @@
         "claimedLevel": 0,
         "supportedMaxLevel": 0,
         "finalLevel": 0,
-        "confidence": 0.30000000000000004,
+        "confidence": 0.35000000000000003,
         "evidenceEventIds": [
           "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
           "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
-          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0"
+          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35"
         ],
-        "flags": [],
+        "flags": [
+          "FLAG_LEDGER_INVALID"
+        ],
         "narrative": "AMC-4.2: insufficient verified evidence in window; level capped at 0."
       },
       {
@@ -523,13 +659,17 @@
         "claimedLevel": 0,
         "supportedMaxLevel": 0,
         "finalLevel": 0,
-        "confidence": 0.30000000000000004,
+        "confidence": 0.35000000000000003,
         "evidenceEventIds": [
           "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
           "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
-          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0"
+          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35"
         ],
-        "flags": [],
+        "flags": [
+          "FLAG_LEDGER_INVALID"
+        ],
         "narrative": "AMC-4.3: insufficient verified evidence in window; level capped at 0."
       },
       {
@@ -537,13 +677,17 @@
         "claimedLevel": 0,
         "supportedMaxLevel": 0,
         "finalLevel": 0,
-        "confidence": 0.30000000000000004,
+        "confidence": 0.35000000000000003,
         "evidenceEventIds": [
           "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
           "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
-          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0"
+          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35"
         ],
-        "flags": [],
+        "flags": [
+          "FLAG_LEDGER_INVALID"
+        ],
         "narrative": "AMC-4.4: insufficient verified evidence in window; level capped at 0."
       },
       {
@@ -551,13 +695,17 @@
         "claimedLevel": 0,
         "supportedMaxLevel": 0,
         "finalLevel": 0,
-        "confidence": 0.30000000000000004,
+        "confidence": 0.35000000000000003,
         "evidenceEventIds": [
           "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
           "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
-          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0"
+          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35"
         ],
-        "flags": [],
+        "flags": [
+          "FLAG_LEDGER_INVALID"
+        ],
         "narrative": "AMC-4.5: insufficient verified evidence in window; level capped at 0."
       },
       {
@@ -565,13 +713,17 @@
         "claimedLevel": 0,
         "supportedMaxLevel": 0,
         "finalLevel": 0,
-        "confidence": 0.30000000000000004,
+        "confidence": 0.35000000000000003,
         "evidenceEventIds": [
           "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
           "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
-          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0"
+          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35"
         ],
-        "flags": [],
+        "flags": [
+          "FLAG_LEDGER_INVALID"
+        ],
         "narrative": "AMC-4.6: insufficient verified evidence in window; level capped at 0."
       },
       {
@@ -579,13 +731,17 @@
         "claimedLevel": 0,
         "supportedMaxLevel": 0,
         "finalLevel": 0,
-        "confidence": 0.30000000000000004,
+        "confidence": 0.35000000000000003,
         "evidenceEventIds": [
           "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
           "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
-          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0"
+          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35"
         ],
-        "flags": [],
+        "flags": [
+          "FLAG_LEDGER_INVALID"
+        ],
         "narrative": "AMC-4.7: insufficient verified evidence in window; level capped at 0."
       },
       {
@@ -593,13 +749,17 @@
         "claimedLevel": 0,
         "supportedMaxLevel": 0,
         "finalLevel": 0,
-        "confidence": 0.30000000000000004,
+        "confidence": 0.35000000000000003,
         "evidenceEventIds": [
           "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
           "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
-          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0"
+          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35"
         ],
-        "flags": [],
+        "flags": [
+          "FLAG_LEDGER_INVALID"
+        ],
         "narrative": "AMC-4.8: insufficient verified evidence in window; level capped at 0."
       },
       {
@@ -607,13 +767,17 @@
         "claimedLevel": 0,
         "supportedMaxLevel": 0,
         "finalLevel": 0,
-        "confidence": 0.30000000000000004,
+        "confidence": 0.35000000000000003,
         "evidenceEventIds": [
           "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
           "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
-          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0"
+          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35"
         ],
-        "flags": [],
+        "flags": [
+          "FLAG_LEDGER_INVALID"
+        ],
         "narrative": "AMC-4.9: insufficient verified evidence in window; level capped at 0."
       },
       {
@@ -621,13 +785,17 @@
         "claimedLevel": 0,
         "supportedMaxLevel": 0,
         "finalLevel": 0,
-        "confidence": 0.30000000000000004,
+        "confidence": 0.35000000000000003,
         "evidenceEventIds": [
           "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
           "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
-          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0"
+          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35"
         ],
-        "flags": [],
+        "flags": [
+          "FLAG_LEDGER_INVALID"
+        ],
         "narrative": "AMC-5.1: insufficient verified evidence in window; level capped at 0."
       },
       {
@@ -635,13 +803,17 @@
         "claimedLevel": 0,
         "supportedMaxLevel": 0,
         "finalLevel": 0,
-        "confidence": 0.30000000000000004,
+        "confidence": 0.35000000000000003,
         "evidenceEventIds": [
           "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
           "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
-          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0"
+          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35"
         ],
-        "flags": [],
+        "flags": [
+          "FLAG_LEDGER_INVALID"
+        ],
         "narrative": "AMC-5.2: insufficient verified evidence in window; level capped at 0."
       },
       {
@@ -649,13 +821,17 @@
         "claimedLevel": 0,
         "supportedMaxLevel": 0,
         "finalLevel": 0,
-        "confidence": 0.30000000000000004,
+        "confidence": 0.35000000000000003,
         "evidenceEventIds": [
           "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
           "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
-          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0"
+          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35"
         ],
-        "flags": [],
+        "flags": [
+          "FLAG_LEDGER_INVALID"
+        ],
         "narrative": "AMC-5.3: insufficient verified evidence in window; level capped at 0."
       },
       {
@@ -663,13 +839,17 @@
         "claimedLevel": 0,
         "supportedMaxLevel": 0,
         "finalLevel": 0,
-        "confidence": 0.30000000000000004,
+        "confidence": 0.35000000000000003,
         "evidenceEventIds": [
           "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
           "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
-          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0"
+          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35"
         ],
-        "flags": [],
+        "flags": [
+          "FLAG_LEDGER_INVALID"
+        ],
         "narrative": "AMC-5.4: insufficient verified evidence in window; level capped at 0."
       },
       {
@@ -677,13 +857,17 @@
         "claimedLevel": 0,
         "supportedMaxLevel": 0,
         "finalLevel": 0,
-        "confidence": 0.30000000000000004,
+        "confidence": 0.35000000000000003,
         "evidenceEventIds": [
           "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
           "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
-          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0"
+          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35"
         ],
-        "flags": [],
+        "flags": [
+          "FLAG_LEDGER_INVALID"
+        ],
         "narrative": "AMC-5.5: insufficient verified evidence in window; level capped at 0."
       },
       {
@@ -691,13 +875,17 @@
         "claimedLevel": 0,
         "supportedMaxLevel": 0,
         "finalLevel": 0,
-        "confidence": 0.30000000000000004,
+        "confidence": 0.35000000000000003,
         "evidenceEventIds": [
           "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
           "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
-          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0"
+          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35"
         ],
-        "flags": [],
+        "flags": [
+          "FLAG_LEDGER_INVALID"
+        ],
         "narrative": "AMC-5.6: insufficient verified evidence in window; level capped at 0."
       },
       {
@@ -705,13 +893,17 @@
         "claimedLevel": 0,
         "supportedMaxLevel": 0,
         "finalLevel": 0,
-        "confidence": 0.30000000000000004,
+        "confidence": 0.35000000000000003,
         "evidenceEventIds": [
           "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
           "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
-          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0"
+          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35"
         ],
-        "flags": [],
+        "flags": [
+          "FLAG_LEDGER_INVALID"
+        ],
         "narrative": "AMC-5.7: insufficient verified evidence in window; level capped at 0."
       },
       {
@@ -719,13 +911,17 @@
         "claimedLevel": 0,
         "supportedMaxLevel": 0,
         "finalLevel": 0,
-        "confidence": 0.30000000000000004,
+        "confidence": 0.35000000000000003,
         "evidenceEventIds": [
           "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
           "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
-          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0"
+          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35"
         ],
-        "flags": [],
+        "flags": [
+          "FLAG_LEDGER_INVALID"
+        ],
         "narrative": "AMC-MEM-1.1: insufficient verified evidence in window; level capped at 0."
       },
       {
@@ -733,13 +929,17 @@
         "claimedLevel": 0,
         "supportedMaxLevel": 0,
         "finalLevel": 0,
-        "confidence": 0.30000000000000004,
+        "confidence": 0.35000000000000003,
         "evidenceEventIds": [
           "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
           "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
-          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0"
+          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35"
         ],
-        "flags": [],
+        "flags": [
+          "FLAG_LEDGER_INVALID"
+        ],
         "narrative": "AMC-MEM-1.2: insufficient verified evidence in window; level capped at 0."
       },
       {
@@ -747,13 +947,17 @@
         "claimedLevel": 0,
         "supportedMaxLevel": 0,
         "finalLevel": 0,
-        "confidence": 0.30000000000000004,
+        "confidence": 0.35000000000000003,
         "evidenceEventIds": [
           "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
           "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
-          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0"
+          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35"
         ],
-        "flags": [],
+        "flags": [
+          "FLAG_LEDGER_INVALID"
+        ],
         "narrative": "AMC-MEM-2.1: insufficient verified evidence in window; level capped at 0."
       },
       {
@@ -761,13 +965,17 @@
         "claimedLevel": 0,
         "supportedMaxLevel": 0,
         "finalLevel": 0,
-        "confidence": 0.30000000000000004,
+        "confidence": 0.35000000000000003,
         "evidenceEventIds": [
           "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
           "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
-          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0"
+          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35"
         ],
-        "flags": [],
+        "flags": [
+          "FLAG_LEDGER_INVALID"
+        ],
         "narrative": "AMC-HOQ-1: insufficient verified evidence in window; level capped at 0."
       },
       {
@@ -775,13 +983,17 @@
         "claimedLevel": 0,
         "supportedMaxLevel": 0,
         "finalLevel": 0,
-        "confidence": 0.30000000000000004,
+        "confidence": 0.35000000000000003,
         "evidenceEventIds": [
           "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
           "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
-          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0"
+          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35"
         ],
-        "flags": [],
+        "flags": [
+          "FLAG_LEDGER_INVALID"
+        ],
         "narrative": "AMC-HOQ-2: insufficient verified evidence in window; level capped at 0."
       },
       {
@@ -789,13 +1001,17 @@
         "claimedLevel": 0,
         "supportedMaxLevel": 0,
         "finalLevel": 0,
-        "confidence": 0.30000000000000004,
+        "confidence": 0.35000000000000003,
         "evidenceEventIds": [
           "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
           "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
-          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0"
+          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35"
         ],
-        "flags": [],
+        "flags": [
+          "FLAG_LEDGER_INVALID"
+        ],
         "narrative": "AMC-OPS-1: insufficient verified evidence in window; level capped at 0."
       },
       {
@@ -803,13 +1019,17 @@
         "claimedLevel": 0,
         "supportedMaxLevel": 0,
         "finalLevel": 0,
-        "confidence": 0.30000000000000004,
+        "confidence": 0.35000000000000003,
         "evidenceEventIds": [
           "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
           "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
-          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0"
+          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35"
         ],
-        "flags": [],
+        "flags": [
+          "FLAG_LEDGER_INVALID"
+        ],
         "narrative": "AMC-COST-1: insufficient verified evidence in window; level capped at 0."
       },
       {
@@ -817,13 +1037,17 @@
         "claimedLevel": 0,
         "supportedMaxLevel": 0,
         "finalLevel": 0,
-        "confidence": 0.30000000000000004,
+        "confidence": 0.35000000000000003,
         "evidenceEventIds": [
           "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
           "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
-          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0"
+          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35"
         ],
-        "flags": [],
+        "flags": [
+          "FLAG_LEDGER_INVALID"
+        ],
         "narrative": "AMC-GOV-PROACTIVE-1: insufficient verified evidence in window; level capped at 0."
       },
       {
@@ -831,13 +1055,17 @@
         "claimedLevel": 0,
         "supportedMaxLevel": 0,
         "finalLevel": 0,
-        "confidence": 0.30000000000000004,
+        "confidence": 0.35000000000000003,
         "evidenceEventIds": [
           "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
           "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
-          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0"
+          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35"
         ],
-        "flags": [],
+        "flags": [
+          "FLAG_LEDGER_INVALID"
+        ],
         "narrative": "AMC-OPDISC-1: insufficient verified evidence in window; level capped at 0."
       },
       {
@@ -845,13 +1073,17 @@
         "claimedLevel": 0,
         "supportedMaxLevel": 0,
         "finalLevel": 0,
-        "confidence": 0.30000000000000004,
+        "confidence": 0.35000000000000003,
         "evidenceEventIds": [
           "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
           "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
-          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0"
+          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35"
         ],
-        "flags": [],
+        "flags": [
+          "FLAG_LEDGER_INVALID"
+        ],
         "narrative": "AMC-OPDISC-2: insufficient verified evidence in window; level capped at 0."
       },
       {
@@ -859,13 +1091,17 @@
         "claimedLevel": 0,
         "supportedMaxLevel": 0,
         "finalLevel": 0,
-        "confidence": 0.30000000000000004,
+        "confidence": 0.35000000000000003,
         "evidenceEventIds": [
           "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
           "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
-          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0"
+          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35"
         ],
-        "flags": [],
+        "flags": [
+          "FLAG_LEDGER_INVALID"
+        ],
         "narrative": "AMC-OPDISC-3: insufficient verified evidence in window; level capped at 0."
       },
       {
@@ -873,13 +1109,17 @@
         "claimedLevel": 0,
         "supportedMaxLevel": 0,
         "finalLevel": 0,
-        "confidence": 0.30000000000000004,
+        "confidence": 0.35000000000000003,
         "evidenceEventIds": [
           "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
           "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
-          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0"
+          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35"
         ],
-        "flags": [],
+        "flags": [
+          "FLAG_LEDGER_INVALID"
+        ],
         "narrative": "AMC-OPDISC-4: insufficient verified evidence in window; level capped at 0."
       },
       {
@@ -887,13 +1127,17 @@
         "claimedLevel": 0,
         "supportedMaxLevel": 0,
         "finalLevel": 0,
-        "confidence": 0.30000000000000004,
+        "confidence": 0.35000000000000003,
         "evidenceEventIds": [
           "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
           "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
-          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0"
+          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35"
         ],
-        "flags": [],
+        "flags": [
+          "FLAG_LEDGER_INVALID"
+        ],
         "narrative": "AMC-OPDISC-5: insufficient verified evidence in window; level capped at 0."
       },
       {
@@ -901,13 +1145,17 @@
         "claimedLevel": 0,
         "supportedMaxLevel": 0,
         "finalLevel": 0,
-        "confidence": 0.30000000000000004,
+        "confidence": 0.35000000000000003,
         "evidenceEventIds": [
           "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
           "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
-          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0"
+          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35"
         ],
-        "flags": [],
+        "flags": [
+          "FLAG_LEDGER_INVALID"
+        ],
         "narrative": "AMC-OPDISC-6: insufficient verified evidence in window; level capped at 0."
       },
       {
@@ -915,13 +1163,17 @@
         "claimedLevel": 0,
         "supportedMaxLevel": 0,
         "finalLevel": 0,
-        "confidence": 0.30000000000000004,
+        "confidence": 0.35000000000000003,
         "evidenceEventIds": [
           "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
           "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
-          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0"
+          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35"
         ],
-        "flags": [],
+        "flags": [
+          "FLAG_LEDGER_INVALID"
+        ],
         "narrative": "AMC-OPDISC-7: insufficient verified evidence in window; level capped at 0."
       },
       {
@@ -929,13 +1181,17 @@
         "claimedLevel": 0,
         "supportedMaxLevel": 0,
         "finalLevel": 0,
-        "confidence": 0.30000000000000004,
+        "confidence": 0.35000000000000003,
         "evidenceEventIds": [
           "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
           "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
-          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0"
+          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35"
         ],
-        "flags": [],
+        "flags": [
+          "FLAG_LEDGER_INVALID"
+        ],
         "narrative": "AMC-OPDISC-8: insufficient verified evidence in window; level capped at 0."
       },
       {
@@ -943,13 +1199,17 @@
         "claimedLevel": 0,
         "supportedMaxLevel": 0,
         "finalLevel": 0,
-        "confidence": 0.30000000000000004,
+        "confidence": 0.35000000000000003,
         "evidenceEventIds": [
           "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
           "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
-          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0"
+          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35"
         ],
-        "flags": [],
+        "flags": [
+          "FLAG_LEDGER_INVALID"
+        ],
         "narrative": "AMC-SOCIAL-1: insufficient verified evidence in window; level capped at 0."
       },
       {
@@ -957,13 +1217,17 @@
         "claimedLevel": 0,
         "supportedMaxLevel": 0,
         "finalLevel": 0,
-        "confidence": 0.30000000000000004,
+        "confidence": 0.35000000000000003,
         "evidenceEventIds": [
           "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
           "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
-          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0"
+          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35"
         ],
-        "flags": [],
+        "flags": [
+          "FLAG_LEDGER_INVALID"
+        ],
         "narrative": "AMC-THR-1: insufficient verified evidence in window; level capped at 0."
       },
       {
@@ -971,13 +1235,17 @@
         "claimedLevel": 0,
         "supportedMaxLevel": 0,
         "finalLevel": 0,
-        "confidence": 0.30000000000000004,
+        "confidence": 0.35000000000000003,
         "evidenceEventIds": [
           "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
           "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
-          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0"
+          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35"
         ],
-        "flags": [],
+        "flags": [
+          "FLAG_LEDGER_INVALID"
+        ],
         "narrative": "AMC-THR-2: insufficient verified evidence in window; level capped at 0."
       },
       {
@@ -985,13 +1253,17 @@
         "claimedLevel": 0,
         "supportedMaxLevel": 0,
         "finalLevel": 0,
-        "confidence": 0.30000000000000004,
+        "confidence": 0.35000000000000003,
         "evidenceEventIds": [
           "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
           "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
-          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0"
+          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35"
         ],
-        "flags": [],
+        "flags": [
+          "FLAG_LEDGER_INVALID"
+        ],
         "narrative": "AMC-THR-3: insufficient verified evidence in window; level capped at 0."
       },
       {
@@ -999,13 +1271,17 @@
         "claimedLevel": 0,
         "supportedMaxLevel": 0,
         "finalLevel": 0,
-        "confidence": 0.30000000000000004,
+        "confidence": 0.35000000000000003,
         "evidenceEventIds": [
           "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
           "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
-          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0"
+          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35"
         ],
-        "flags": [],
+        "flags": [
+          "FLAG_LEDGER_INVALID"
+        ],
         "narrative": "AMC-BCON-1: insufficient verified evidence in window; level capped at 0."
       },
       {
@@ -1013,13 +1289,17 @@
         "claimedLevel": 0,
         "supportedMaxLevel": 0,
         "finalLevel": 0,
-        "confidence": 0.30000000000000004,
+        "confidence": 0.35000000000000003,
         "evidenceEventIds": [
           "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
           "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
-          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0"
+          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35"
         ],
-        "flags": [],
+        "flags": [
+          "FLAG_LEDGER_INVALID"
+        ],
         "narrative": "AMC-MCP-1: insufficient verified evidence in window; level capped at 0."
       },
       {
@@ -1027,13 +1307,17 @@
         "claimedLevel": 0,
         "supportedMaxLevel": 0,
         "finalLevel": 0,
-        "confidence": 0.30000000000000004,
+        "confidence": 0.35000000000000003,
         "evidenceEventIds": [
           "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
           "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
-          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0"
+          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35"
         ],
-        "flags": [],
+        "flags": [
+          "FLAG_LEDGER_INVALID"
+        ],
         "narrative": "AMC-OINT-1: insufficient verified evidence in window; level capped at 0."
       },
       {
@@ -1041,13 +1325,17 @@
         "claimedLevel": 0,
         "supportedMaxLevel": 0,
         "finalLevel": 0,
-        "confidence": 0.30000000000000004,
+        "confidence": 0.35000000000000003,
         "evidenceEventIds": [
           "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
           "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
-          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0"
+          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35"
         ],
-        "flags": [],
+        "flags": [
+          "FLAG_LEDGER_INVALID"
+        ],
         "narrative": "AMC-SPORT-1: insufficient verified evidence in window; level capped at 0."
       },
       {
@@ -1055,13 +1343,17 @@
         "claimedLevel": 0,
         "supportedMaxLevel": 0,
         "finalLevel": 0,
-        "confidence": 0.30000000000000004,
+        "confidence": 0.35000000000000003,
         "evidenceEventIds": [
           "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
           "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
-          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0"
+          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35"
         ],
-        "flags": [],
+        "flags": [
+          "FLAG_LEDGER_INVALID"
+        ],
         "narrative": "AMC-2.6: insufficient verified evidence in window; level capped at 0."
       },
       {
@@ -1069,13 +1361,17 @@
         "claimedLevel": 0,
         "supportedMaxLevel": 0,
         "finalLevel": 0,
-        "confidence": 0.30000000000000004,
+        "confidence": 0.35000000000000003,
         "evidenceEventIds": [
           "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
           "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
-          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0"
+          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35"
         ],
-        "flags": [],
+        "flags": [
+          "FLAG_LEDGER_INVALID"
+        ],
         "narrative": "AMC-2.7: insufficient verified evidence in window; level capped at 0."
       },
       {
@@ -1083,13 +1379,17 @@
         "claimedLevel": 0,
         "supportedMaxLevel": 0,
         "finalLevel": 0,
-        "confidence": 0.30000000000000004,
+        "confidence": 0.35000000000000003,
         "evidenceEventIds": [
           "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
           "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
-          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0"
+          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35"
         ],
-        "flags": [],
+        "flags": [
+          "FLAG_LEDGER_INVALID"
+        ],
         "narrative": "AMC-2.8: insufficient verified evidence in window; level capped at 0."
       },
       {
@@ -1097,13 +1397,17 @@
         "claimedLevel": 0,
         "supportedMaxLevel": 0,
         "finalLevel": 0,
-        "confidence": 0.30000000000000004,
+        "confidence": 0.35000000000000003,
         "evidenceEventIds": [
           "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
           "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
-          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0"
+          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35"
         ],
-        "flags": [],
+        "flags": [
+          "FLAG_LEDGER_INVALID"
+        ],
         "narrative": "AMC-2.9: insufficient verified evidence in window; level capped at 0."
       },
       {
@@ -1111,13 +1415,17 @@
         "claimedLevel": 0,
         "supportedMaxLevel": 0,
         "finalLevel": 0,
-        "confidence": 0.30000000000000004,
+        "confidence": 0.35000000000000003,
         "evidenceEventIds": [
           "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
           "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
-          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0"
+          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35"
         ],
-        "flags": [],
+        "flags": [
+          "FLAG_LEDGER_INVALID"
+        ],
         "narrative": "AMC-2.10: insufficient verified evidence in window; level capped at 0."
       },
       {
@@ -1125,13 +1433,17 @@
         "claimedLevel": 0,
         "supportedMaxLevel": 0,
         "finalLevel": 0,
-        "confidence": 0.30000000000000004,
+        "confidence": 0.35000000000000003,
         "evidenceEventIds": [
           "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
           "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
-          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0"
+          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35"
         ],
-        "flags": [],
+        "flags": [
+          "FLAG_LEDGER_INVALID"
+        ],
         "narrative": "AMC-2.11: insufficient verified evidence in window; level capped at 0."
       },
       {
@@ -1139,13 +1451,17 @@
         "claimedLevel": 0,
         "supportedMaxLevel": 0,
         "finalLevel": 0,
-        "confidence": 0.30000000000000004,
+        "confidence": 0.35000000000000003,
         "evidenceEventIds": [
           "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
           "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
-          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0"
+          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35"
         ],
-        "flags": [],
+        "flags": [
+          "FLAG_LEDGER_INVALID"
+        ],
         "narrative": "AMC-2.12: insufficient verified evidence in window; level capped at 0."
       },
       {
@@ -1153,13 +1469,17 @@
         "claimedLevel": 0,
         "supportedMaxLevel": 0,
         "finalLevel": 0,
-        "confidence": 0.30000000000000004,
+        "confidence": 0.35000000000000003,
         "evidenceEventIds": [
           "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
           "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
-          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0"
+          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35"
         ],
-        "flags": [],
+        "flags": [
+          "FLAG_LEDGER_INVALID"
+        ],
         "narrative": "AMC-2.13: insufficient verified evidence in window; level capped at 0."
       },
       {
@@ -1167,13 +1487,17 @@
         "claimedLevel": 0,
         "supportedMaxLevel": 0,
         "finalLevel": 0,
-        "confidence": 0.30000000000000004,
+        "confidence": 0.35000000000000003,
         "evidenceEventIds": [
           "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
           "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
-          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0"
+          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35"
         ],
-        "flags": [],
+        "flags": [
+          "FLAG_LEDGER_INVALID"
+        ],
         "narrative": "AMC-2.14: insufficient verified evidence in window; level capped at 0."
       },
       {
@@ -1181,13 +1505,17 @@
         "claimedLevel": 0,
         "supportedMaxLevel": 0,
         "finalLevel": 0,
-        "confidence": 0.30000000000000004,
+        "confidence": 0.35000000000000003,
         "evidenceEventIds": [
           "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
           "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
-          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0"
+          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35"
         ],
-        "flags": [],
+        "flags": [
+          "FLAG_LEDGER_INVALID"
+        ],
         "narrative": "AMC-3.4.1: insufficient verified evidence in window; level capped at 0."
       },
       {
@@ -1195,13 +1523,17 @@
         "claimedLevel": 0,
         "supportedMaxLevel": 0,
         "finalLevel": 0,
-        "confidence": 0.30000000000000004,
+        "confidence": 0.35000000000000003,
         "evidenceEventIds": [
           "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
           "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
-          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0"
+          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35"
         ],
-        "flags": [],
+        "flags": [
+          "FLAG_LEDGER_INVALID"
+        ],
         "narrative": "AMC-3.4.2: insufficient verified evidence in window; level capped at 0."
       },
       {
@@ -1209,13 +1541,17 @@
         "claimedLevel": 0,
         "supportedMaxLevel": 0,
         "finalLevel": 0,
-        "confidence": 0.30000000000000004,
+        "confidence": 0.35000000000000003,
         "evidenceEventIds": [
           "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
           "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
-          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0"
+          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35"
         ],
-        "flags": [],
+        "flags": [
+          "FLAG_LEDGER_INVALID"
+        ],
         "narrative": "AMC-3.4.3: insufficient verified evidence in window; level capped at 0."
       },
       {
@@ -1223,13 +1559,17 @@
         "claimedLevel": 0,
         "supportedMaxLevel": 0,
         "finalLevel": 0,
-        "confidence": 0.30000000000000004,
+        "confidence": 0.35000000000000003,
         "evidenceEventIds": [
           "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
           "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
-          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0"
+          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35"
         ],
-        "flags": [],
+        "flags": [
+          "FLAG_LEDGER_INVALID"
+        ],
         "narrative": "AMC-5.8: insufficient verified evidence in window; level capped at 0."
       },
       {
@@ -1237,13 +1577,17 @@
         "claimedLevel": 0,
         "supportedMaxLevel": 0,
         "finalLevel": 0,
-        "confidence": 0.30000000000000004,
+        "confidence": 0.35000000000000003,
         "evidenceEventIds": [
           "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
           "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
-          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0"
+          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35"
         ],
-        "flags": [],
+        "flags": [
+          "FLAG_LEDGER_INVALID"
+        ],
         "narrative": "AMC-5.9: insufficient verified evidence in window; level capped at 0."
       },
       {
@@ -1251,13 +1595,17 @@
         "claimedLevel": 0,
         "supportedMaxLevel": 0,
         "finalLevel": 0,
-        "confidence": 0.30000000000000004,
+        "confidence": 0.35000000000000003,
         "evidenceEventIds": [
           "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
           "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
-          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0"
+          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35"
         ],
-        "flags": [],
+        "flags": [
+          "FLAG_LEDGER_INVALID"
+        ],
         "narrative": "AMC-5.10: insufficient verified evidence in window; level capped at 0."
       },
       {
@@ -1265,13 +1613,17 @@
         "claimedLevel": 0,
         "supportedMaxLevel": 0,
         "finalLevel": 0,
-        "confidence": 0.30000000000000004,
+        "confidence": 0.35000000000000003,
         "evidenceEventIds": [
           "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
           "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
-          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0"
+          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35"
         ],
-        "flags": [],
+        "flags": [
+          "FLAG_LEDGER_INVALID"
+        ],
         "narrative": "AMC-5.11: insufficient verified evidence in window; level capped at 0."
       },
       {
@@ -1279,13 +1631,17 @@
         "claimedLevel": 0,
         "supportedMaxLevel": 0,
         "finalLevel": 0,
-        "confidence": 0.30000000000000004,
+        "confidence": 0.35000000000000003,
         "evidenceEventIds": [
           "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
           "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
-          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0"
+          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35"
         ],
-        "flags": [],
+        "flags": [
+          "FLAG_LEDGER_INVALID"
+        ],
         "narrative": "AMC-5.12: insufficient verified evidence in window; level capped at 0."
       },
       {
@@ -1293,13 +1649,17 @@
         "claimedLevel": 0,
         "supportedMaxLevel": 0,
         "finalLevel": 0,
-        "confidence": 0.30000000000000004,
+        "confidence": 0.35000000000000003,
         "evidenceEventIds": [
           "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
           "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
-          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0"
+          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35"
         ],
-        "flags": [],
+        "flags": [
+          "FLAG_LEDGER_INVALID"
+        ],
         "narrative": "AMC-5.13: insufficient verified evidence in window; level capped at 0."
       },
       {
@@ -1307,13 +1667,17 @@
         "claimedLevel": 0,
         "supportedMaxLevel": 0,
         "finalLevel": 0,
-        "confidence": 0.30000000000000004,
+        "confidence": 0.35000000000000003,
         "evidenceEventIds": [
           "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
           "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
-          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0"
+          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35"
         ],
-        "flags": [],
+        "flags": [
+          "FLAG_LEDGER_INVALID"
+        ],
         "narrative": "AMC-5.14: insufficient verified evidence in window; level capped at 0."
       },
       {
@@ -1321,13 +1685,17 @@
         "claimedLevel": 0,
         "supportedMaxLevel": 0,
         "finalLevel": 0,
-        "confidence": 0.30000000000000004,
+        "confidence": 0.35000000000000003,
         "evidenceEventIds": [
           "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
           "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
-          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0"
+          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35"
         ],
-        "flags": [],
+        "flags": [
+          "FLAG_LEDGER_INVALID"
+        ],
         "narrative": "AMC-5.15: insufficient verified evidence in window; level capped at 0."
       },
       {
@@ -1335,13 +1703,17 @@
         "claimedLevel": 0,
         "supportedMaxLevel": 0,
         "finalLevel": 0,
-        "confidence": 0.30000000000000004,
+        "confidence": 0.35000000000000003,
         "evidenceEventIds": [
           "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
           "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
-          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0"
+          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35"
         ],
-        "flags": [],
+        "flags": [
+          "FLAG_LEDGER_INVALID"
+        ],
         "narrative": "AMC-5.16: insufficient verified evidence in window; level capped at 0."
       },
       {
@@ -1349,13 +1721,17 @@
         "claimedLevel": 0,
         "supportedMaxLevel": 0,
         "finalLevel": 0,
-        "confidence": 0.30000000000000004,
+        "confidence": 0.35000000000000003,
         "evidenceEventIds": [
           "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
           "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
-          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0"
+          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35"
         ],
-        "flags": [],
+        "flags": [
+          "FLAG_LEDGER_INVALID"
+        ],
         "narrative": "AMC-5.17: insufficient verified evidence in window; level capped at 0."
       },
       {
@@ -1363,13 +1739,17 @@
         "claimedLevel": 0,
         "supportedMaxLevel": 0,
         "finalLevel": 0,
-        "confidence": 0.30000000000000004,
+        "confidence": 0.35000000000000003,
         "evidenceEventIds": [
           "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
           "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
-          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0"
+          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35"
         ],
-        "flags": [],
+        "flags": [
+          "FLAG_LEDGER_INVALID"
+        ],
         "narrative": "AMC-5.18: insufficient verified evidence in window; level capped at 0."
       },
       {
@@ -1377,13 +1757,17 @@
         "claimedLevel": 0,
         "supportedMaxLevel": 0,
         "finalLevel": 0,
-        "confidence": 0.30000000000000004,
+        "confidence": 0.35000000000000003,
         "evidenceEventIds": [
           "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
           "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
-          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0"
+          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35"
         ],
-        "flags": [],
+        "flags": [
+          "FLAG_LEDGER_INVALID"
+        ],
         "narrative": "AMC-5.19: insufficient verified evidence in window; level capped at 0."
       },
       {
@@ -1391,13 +1775,17 @@
         "claimedLevel": 0,
         "supportedMaxLevel": 0,
         "finalLevel": 0,
-        "confidence": 0.30000000000000004,
+        "confidence": 0.35000000000000003,
         "evidenceEventIds": [
           "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
           "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
-          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0"
+          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35"
         ],
-        "flags": [],
+        "flags": [
+          "FLAG_LEDGER_INVALID"
+        ],
         "narrative": "AMC-5.20: insufficient verified evidence in window; level capped at 0."
       },
       {
@@ -1405,13 +1793,17 @@
         "claimedLevel": 0,
         "supportedMaxLevel": 0,
         "finalLevel": 0,
-        "confidence": 0.30000000000000004,
+        "confidence": 0.35000000000000003,
         "evidenceEventIds": [
           "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
           "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
-          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0"
+          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35"
         ],
-        "flags": [],
+        "flags": [
+          "FLAG_LEDGER_INVALID"
+        ],
         "narrative": "AMC-MEM-3.1: insufficient verified evidence in window; level capped at 0."
       },
       {
@@ -1419,13 +1811,17 @@
         "claimedLevel": 0,
         "supportedMaxLevel": 0,
         "finalLevel": 0,
-        "confidence": 0.30000000000000004,
+        "confidence": 0.35000000000000003,
         "evidenceEventIds": [
           "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
           "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
-          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0"
+          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35"
         ],
-        "flags": [],
+        "flags": [
+          "FLAG_LEDGER_INVALID"
+        ],
         "narrative": "AMC-MEM-3.2: insufficient verified evidence in window; level capped at 0."
       },
       {
@@ -1433,13 +1829,17 @@
         "claimedLevel": 0,
         "supportedMaxLevel": 0,
         "finalLevel": 0,
-        "confidence": 0.30000000000000004,
+        "confidence": 0.35000000000000003,
         "evidenceEventIds": [
           "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
           "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
-          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0"
+          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35"
         ],
-        "flags": [],
+        "flags": [
+          "FLAG_LEDGER_INVALID"
+        ],
         "narrative": "AMC-MEM-3.3: insufficient verified evidence in window; level capped at 0."
       },
       {
@@ -1447,13 +1847,17 @@
         "claimedLevel": 0,
         "supportedMaxLevel": 0,
         "finalLevel": 0,
-        "confidence": 0.30000000000000004,
+        "confidence": 0.35000000000000003,
         "evidenceEventIds": [
           "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
           "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
-          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0"
+          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35"
         ],
-        "flags": [],
+        "flags": [
+          "FLAG_LEDGER_INVALID"
+        ],
         "narrative": "AMC-MEM-3.4: insufficient verified evidence in window; level capped at 0."
       },
       {
@@ -1461,13 +1865,17 @@
         "claimedLevel": 0,
         "supportedMaxLevel": 0,
         "finalLevel": 0,
-        "confidence": 0.30000000000000004,
+        "confidence": 0.35000000000000003,
         "evidenceEventIds": [
           "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
           "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
-          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0"
+          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35"
         ],
-        "flags": [],
+        "flags": [
+          "FLAG_LEDGER_INVALID"
+        ],
         "narrative": "AMC-MCP-2: insufficient verified evidence in window; level capped at 0."
       },
       {
@@ -1475,13 +1883,17 @@
         "claimedLevel": 0,
         "supportedMaxLevel": 0,
         "finalLevel": 0,
-        "confidence": 0.30000000000000004,
+        "confidence": 0.35000000000000003,
         "evidenceEventIds": [
           "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
           "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
-          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0"
+          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35"
         ],
-        "flags": [],
+        "flags": [
+          "FLAG_LEDGER_INVALID"
+        ],
         "narrative": "AMC-MCP-3: insufficient verified evidence in window; level capped at 0."
       },
       {
@@ -1489,13 +1901,17 @@
         "claimedLevel": 0,
         "supportedMaxLevel": 0,
         "finalLevel": 0,
-        "confidence": 0.30000000000000004,
+        "confidence": 0.35000000000000003,
         "evidenceEventIds": [
           "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
           "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
-          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0"
+          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35"
         ],
-        "flags": [],
+        "flags": [
+          "FLAG_LEDGER_INVALID"
+        ],
         "narrative": "AMC-5.21: insufficient verified evidence in window; level capped at 0."
       },
       {
@@ -1503,13 +1919,17 @@
         "claimedLevel": 0,
         "supportedMaxLevel": 0,
         "finalLevel": 0,
-        "confidence": 0.30000000000000004,
+        "confidence": 0.35000000000000003,
         "evidenceEventIds": [
           "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
           "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
-          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0"
+          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35"
         ],
-        "flags": [],
+        "flags": [
+          "FLAG_LEDGER_INVALID"
+        ],
         "narrative": "AMC-5.22: insufficient verified evidence in window; level capped at 0."
       },
       {
@@ -1517,13 +1937,17 @@
         "claimedLevel": 0,
         "supportedMaxLevel": 0,
         "finalLevel": 0,
-        "confidence": 0.30000000000000004,
+        "confidence": 0.35000000000000003,
         "evidenceEventIds": [
           "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
           "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
-          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0"
+          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35"
         ],
-        "flags": [],
+        "flags": [
+          "FLAG_LEDGER_INVALID"
+        ],
         "narrative": "AMC-5.23: insufficient verified evidence in window; level capped at 0."
       },
       {
@@ -1531,13 +1955,17 @@
         "claimedLevel": 0,
         "supportedMaxLevel": 0,
         "finalLevel": 0,
-        "confidence": 0.30000000000000004,
+        "confidence": 0.35000000000000003,
         "evidenceEventIds": [
           "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
           "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
-          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0"
+          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35"
         ],
-        "flags": [],
+        "flags": [
+          "FLAG_LEDGER_INVALID"
+        ],
         "narrative": "AMC-5.24: insufficient verified evidence in window; level capped at 0."
       },
       {
@@ -1545,13 +1973,17 @@
         "claimedLevel": 0,
         "supportedMaxLevel": 0,
         "finalLevel": 0,
-        "confidence": 0.30000000000000004,
+        "confidence": 0.35000000000000003,
         "evidenceEventIds": [
           "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
           "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
-          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0"
+          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35"
         ],
-        "flags": [],
+        "flags": [
+          "FLAG_LEDGER_INVALID"
+        ],
         "narrative": "AMC-5.25: insufficient verified evidence in window; level capped at 0."
       },
       {
@@ -1559,13 +1991,17 @@
         "claimedLevel": 0,
         "supportedMaxLevel": 0,
         "finalLevel": 0,
-        "confidence": 0.30000000000000004,
+        "confidence": 0.35000000000000003,
         "evidenceEventIds": [
           "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
           "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
-          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0"
+          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35"
         ],
-        "flags": [],
+        "flags": [
+          "FLAG_LEDGER_INVALID"
+        ],
         "narrative": "AMC-SCI-1: insufficient verified evidence in window; level capped at 0."
       },
       {
@@ -1573,13 +2009,17 @@
         "claimedLevel": 0,
         "supportedMaxLevel": 0,
         "finalLevel": 0,
-        "confidence": 0.30000000000000004,
+        "confidence": 0.35000000000000003,
         "evidenceEventIds": [
           "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
           "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
-          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0"
+          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35"
         ],
-        "flags": [],
+        "flags": [
+          "FLAG_LEDGER_INVALID"
+        ],
         "narrative": "AMC-SCI-2: insufficient verified evidence in window; level capped at 0."
       },
       {
@@ -1587,13 +2027,17 @@
         "claimedLevel": 0,
         "supportedMaxLevel": 0,
         "finalLevel": 0,
-        "confidence": 0.30000000000000004,
+        "confidence": 0.35000000000000003,
         "evidenceEventIds": [
           "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
           "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
-          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0"
+          "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35"
         ],
-        "flags": [],
+        "flags": [
+          "FLAG_LEDGER_INVALID"
+        ],
         "narrative": "AMC-SCI-3: insufficient verified evidence in window; level capped at 0."
       }
     ],
@@ -2337,8 +2781,8 @@
       "AMC-3.1.3: capture multi-session evidence with audit + metric events.",
       "AMC-3.1.4: capture multi-session evidence with audit + metric events."
     ],
-    "runSealSig": "MFMOlWseR4UScd54pq9bdnMGNIFl3/nRSy11Y01W27omJTkvxCI5jXvdp8N/Tg1qRnoZTBvwS33n4MlMNUZPCg==",
-    "reportJsonSha256": "1f28f37dcd9f004ddb7974241532ccdd6d436d26389edeebba461e7d179ff1d6"
+    "runSealSig": "+o+JXHIPTbm71Mhp5E6NP1kiaZ4aSyTxxq7gMXk2ihvSTLERhtqUgRlH6mk5sfZ/jCQQNHQXVxA+EEqQni4FAg==",
+    "reportJsonSha256": "be4b4424f7f05e0584c8447e3870c0711c06b34ff6f2c906b4bac442ae01b5f5"
   },
   "overall": 0,
   "targetId": "f8aae66c-a4c7-4ec5-929c-0bff97b0f589",
@@ -2406,6 +2850,13 @@
       "integrityIndex": 0.8,
       "overall": 0,
       "trustLabel": "LOW TRUST"
+    },
+    {
+      "runId": "27ed0cab-ffdc-4877-8f7d-b5034ce1037b",
+      "ts": 1771867163499,
+      "integrityIndex": 0,
+      "overall": 0,
+      "trustLabel": "UNRELIABLE — DO NOT USE FOR CLAIMS"
     }
   ],
   "assurance": [],
@@ -2431,10 +2882,10 @@
   "topValueGaps": [],
   "indices": {
     "agentId": "default",
-    "runId": "1e675b5b-24af-4d99-837d-232e62b6c2fc",
-    "generatedTs": 1771867023661,
-    "integrityIndex": 0.8,
-    "trustLabel": "LOW TRUST",
+    "runId": "27ed0cab-ffdc-4877-8f7d-b5034ce1037b",
+    "generatedTs": 1771870720383,
+    "integrityIndex": 0,
+    "trustLabel": "UNRELIABLE — DO NOT USE FOR CLAIMS",
     "indices": [
       {
         "id": "EcosystemFocusRisk",
@@ -2715,7 +3166,7 @@
       {
         "id": "default",
         "overall": 0,
-        "trustLabel": "LOW TRUST",
+        "trustLabel": "UNRELIABLE — DO NOT USE FOR CLAIMS",
         "lastProvider": null,
         "lastModel": null,
         "freezeActive": false

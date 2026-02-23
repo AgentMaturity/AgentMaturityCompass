@@ -14529,6 +14529,92 @@ agent
     console.log(`  Duration: ${result.durationMs}ms`);
   });
 
+// ── Demo ─────────────────────────────────────────────────────────────────────
+const demo = program.command("demo").description("Run interactive demos of AMC capabilities");
+
+demo
+  .command("run")
+  .description("Run a simulated agent through the AMC gateway and produce a real score (~30s)")
+  .option("--gateway <url>", "Gateway URL (default: auto-detect running instance)")
+  .option("--json", "Output as JSON")
+  .action(async (opts: { gateway?: string; json?: boolean }) => {
+    const { runDemo, startDemoUpstream } = await import("./demo/demoRun.js");
+    const { issueLeaseForCli } = await import("./leases/leaseCli.js");
+    const { ensureLeaseRevocationStore } = await import("./leases/leaseCli.js");
+
+    // Start demo upstream server
+    console.log(chalk.bold("\n🎮  AMC Live Demo\n"));
+    console.log(chalk.gray("  Starting demo upstream server..."));
+    const upstream = await startDemoUpstream();
+    console.log(chalk.gray(`  Demo upstream: ${upstream.baseUrl}`));
+
+    // Detect or use provided gateway
+    let gatewayUrl = opts.gateway ?? "http://127.0.0.1:3210";
+
+    // Check if gateway is running
+    try {
+      await fetch(`${gatewayUrl.replace(/\/$/, "")}/local/v1/models`);
+    } catch {
+      console.log(chalk.yellow("\n⚠  Gateway not running. Start it with:"));
+      console.log(chalk.gray(`  LOCAL_OPENAI_BASE_URL=${upstream.baseUrl} amc up`));
+      console.log(chalk.gray("  Then re-run: amc demo run"));
+      await upstream.close();
+      process.exit(1);
+    }
+
+    // Issue a lease token for the demo
+    console.log(chalk.gray("  Issuing demo lease token..."));
+    const workspace = process.cwd();
+    ensureLeaseRevocationStore(workspace);
+    const wsId = (await import("./workspaces/workspaceId.js")).workspaceIdFromDirectory(workspace);
+    const lease = issueLeaseForCli({
+      workspace,
+      workspaceId: wsId,
+      agentId: "default",
+      ttl: "15m",
+      scopes: "gateway:llm,proxy:connect,toolhub:intent,toolhub:execute,governor:check,receipt:verify",
+      routes: "/local",
+      models: "*",
+      rpm: 60,
+      tpm: 200000,
+      maxCostUsdPerDay: null,
+      workOrderId: undefined,
+    });
+    console.log(chalk.gray(`  Lease issued (15m TTL)`));
+
+    console.log(chalk.gray(`  Gateway: ${gatewayUrl}`));
+    console.log(chalk.gray("  Simulating a multi-turn AI agent through the AMC gateway...\n"));
+
+    const steps = [
+      "Sending research task conversation...",
+      "Sending data analysis with tool calls...",
+      "Sending security audit scenario...",
+      "Sending code review request...",
+      "Sending financial escalation scenario...",
+      "Sending error recovery scenario...",
+    ];
+
+    const result = await runDemo(gatewayUrl, lease.token);
+
+    console.log(chalk.green(`\n✓ Demo complete in ${(result.durationMs / 1000).toFixed(1)}s`));
+    console.log(chalk.gray(`  ${result.requestsSent} requests sent through gateway`));
+    console.log(chalk.gray(`  ~${result.evidenceItems} evidence items captured\n`));
+
+    // Cleanup
+    await upstream.close();
+
+    // Now run the diagnostic
+    console.log(chalk.bold("📊  Running diagnostic...\n"));
+
+    if (opts.json) {
+      console.log(JSON.stringify(result, null, 2));
+    } else {
+      console.log(chalk.gray("  Run 'amc run --agent default' to see the full scored report."));
+      console.log(chalk.gray("  Run 'amc score evidence-coverage default' to see evidence gaps."));
+      console.log(chalk.gray("  Open http://127.0.0.1:3212/console for the dashboard.\n"));
+    }
+  });
+
 program.parseAsync(process.argv).catch((error: unknown) => {
   const message = normalizeCliErrorMessage(error);
   const unknownToken = parseUnknownCommandToken(message);

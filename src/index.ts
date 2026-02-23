@@ -1507,7 +1507,9 @@ export * from "./score/index.js";
 export * from "./domains/index.js";
 
 // ── Product modules ───────────────────────────────────────────────────
-export * from "./product/index.js";
+// AutonomyMode conflicts with score/graduatedAutonomy — skip product barrel, import directly
+export { type AutonomyMode as ProductAutonomyMode, type AutonomyDecision } from "./product/autonomyDial.js";
+
 
 // ── Agent harnesses ───────────────────────────────────────────────────
 export * from "./agents/index.js";

@@ -1,6 +1,6 @@
 {
-  "configSha256": "35e09fa8e40281ea6a8a35f84a8071619c2aad75c07f07c0f5c8ca4a73c6498d",
-  "signature": "k6EtOr6u/i4kjLC/GRp3m4V9lyFLNKdte4nTtyXvygdzRD8n6vYKodIhdF1uy9gyRXWk1cmdWdOv5d4GeGzADg==",
-  "signedTs": 1770747644738,
+  "configSha256": "5070f3ca3e96dabef9c87155e4220ed81c9255335d91e9d9332103825a10c98a",
+  "signature": "88FqzBny2rMClD4xB0hbTISWsjTxKd/fBLXfNM9Yps20aoPnahx43aZMZJFAbonCeBMzbyKqYvOBfOZSMjKlBQ==",
+  "signedTs": 1771867016795,
   "signer": "auditor"
 }

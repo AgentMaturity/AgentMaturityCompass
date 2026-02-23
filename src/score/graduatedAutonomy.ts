@@ -137,7 +137,7 @@ export function assessAutonomy(
   if (successRate < 0.85) deescalationTriggers.push("Success rate below 85% — recommend de-escalation");
   if (successRate < 0.70) deescalationTriggers.push("Success rate critical — drop to SUPERVISED");
 
-  const recommendedMode = eligible.length > 0 ? eligible[0].to : currentMode;
+  const recommendedMode = eligible.length > 0 ? eligible[0]!.to : currentMode;
 
   const domainCap = domain ? DOMAIN_RISK_CAPS[domain] : undefined;
   const riskAdjustedMode = domainCap

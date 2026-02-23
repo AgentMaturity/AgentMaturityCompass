@@ -1,0 +1,14 @@
+{
+  "v": 1,
+  "ts": 1771867016787,
+  "workspace": "/Users/sid/AgentMaturityCompass",
+  "vaultCreated": false,
+  "ownerCreated": false,
+  "vaultUnlocked": true,
+  "createdConfigs": {},
+  "requirements": {
+    "passphraseFromFileRequired": true,
+    "ownerCredentialsFromFileRequiredOnFirstRun": true,
+    "notaryEnabled": false
+  }
+}

@@ -19,5 +19,19 @@
     "sessionId": "studio-lifecycle-1771590342171-studio_runtime_stopped",
     "runtime": "unknown",
     "trustTier": "OBSERVED"
+  },
+  "008a35a2-7e22-4bcf-b78a-27fd01a3c32a": {
+    "ts": 1771866883178,
+    "eventType": "audit",
+    "sessionId": "d0e56de7-ae53-4df8-9d8f-de5cd058f685",
+    "runtime": "unknown",
+    "trustTier": "OBSERVED"
+  },
+  "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35": {
+    "ts": 1771867023716,
+    "eventType": "audit",
+    "sessionId": "studio-lifecycle-1771867023716-studio_runtime_started",
+    "runtime": "unknown",
+    "trustTier": "OBSERVED"
   }
 }

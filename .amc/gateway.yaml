@@ -14,12 +14,26 @@ redaction:
     - (?i)sk-[A-Za-z0-9]{10,}
     - (?i)bearer\s+[A-Za-z0-9._-]{10,}
 upstreams:
-  openai:
-    baseUrl: ${OPENAI_BASE_URL:-https://api.openai.com}
+  local_openai:
+    baseUrl: ${LOCAL_OPENAI_BASE_URL:-http://127.0.0.1:8000}
     auth:
-      type: bearer_env
-      env: OPENAI_API_KEY
+      type: none
+    allowLocalhost: true
+    providerId: local_openai
 routes:
-  - prefix: /openai
-    upstream: openai
+  - prefix: /local
+    upstream: local_openai
     stripPrefix: true
+    openaiCompatible: true
+lease:
+  allowQueryCarrier: false
+streamPassthrough: false
+proxy:
+  enabled: true
+  port: 3211
+  allowlistHosts:
+    - api.openai.com
+    - api.anthropic.com
+    - openrouter.ai
+    - generativelanguage.googleapis.com
+  denyByDefault: true

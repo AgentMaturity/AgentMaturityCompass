@@ -218,6 +218,109 @@
   </div>
 </section>
 
+<!-- ═══ GATEWAY LIVE DEMO VISUAL ═══ -->
+<section class="sec" id="gateway-demo">
+  <div class="wrap">
+    <div class="sec-tag">02b — The Gateway</div>
+    <h2 class="tech-only">One line of config.<br><span class="green">Total observability.</span></h2>
+    <p class="sec-sub tech-only">Point your agent at AMC's gateway instead of the API directly. AMC proxies every request, captures evidence, enforces policies — and your agent doesn't even know.</p>
+    <h2 class="eli5-only">It works like<br><span class="green">a security camera.</span></h2>
+    <p class="sec-sub eli5-only">Imagine putting a security camera between your AI and the internet. AMC watches everything the AI does, records it, and gives it a trust score. The AI doesn't even notice — it just works normally.</p>
+
+    <!-- Animated gateway proxy flow -->
+    <div class="gw-flow reveal">
+      <div class="gw-node gw-agent">
+        <div class="gw-icon">
+          <svg viewBox="0 0 48 48" width="36" height="36" fill="none" stroke="#00ff41" stroke-width="1.5"><rect x="8" y="4" width="32" height="40" rx="4"/><circle cx="24" cy="20" r="6"/><path d="M14 38c0-5.5 4.5-10 10-10s10 4.5 10 10"/></svg>
+        </div>
+        <span class="gw-label">Your Agent</span>
+        <span class="gw-url">OPENAI_BASE_URL=<br>localhost:3210</span>
+      </div>
+
+      <div class="gw-pipe">
+        <div class="gw-packet gw-packet-1"></div>
+        <div class="gw-packet gw-packet-2"></div>
+        <div class="gw-packet gw-packet-3"></div>
+        <svg class="gw-pipe-line" viewBox="0 0 120 2" preserveAspectRatio="none"><line x1="0" y1="1" x2="120" y2="1" stroke="#1a3a1a" stroke-width="2"/></svg>
+      </div>
+
+      <div class="gw-node gw-gateway">
+        <div class="gw-icon gw-icon-active">
+          <svg viewBox="0 0 48 48" width="36" height="36" fill="none" stroke="#00ff41" stroke-width="1.5"><rect x="6" y="8" width="36" height="32" rx="4"/><line x1="6" y1="16" x2="42" y2="16"/><circle cx="12" cy="12" r="2" fill="#00ff41"/><circle cx="18" cy="12" r="2" fill="#00ff41"/><circle cx="24" cy="12" r="2" fill="#00ff41"/><path d="M12 24h24M12 30h18M12 36h12" opacity="0.5"/></svg>
+        </div>
+        <span class="gw-label green">AMC Gateway</span>
+        <span class="gw-url">:3210 proxy → :3212 studio</span>
+        <div class="gw-actions">
+          <span class="gw-action">📋 Log</span>
+          <span class="gw-action">🔒 Enforce</span>
+          <span class="gw-action">✍️ Sign</span>
+          <span class="gw-action">📊 Score</span>
+        </div>
+      </div>
+
+      <div class="gw-pipe">
+        <div class="gw-packet gw-packet-4"></div>
+        <div class="gw-packet gw-packet-5"></div>
+        <svg class="gw-pipe-line" viewBox="0 0 120 2" preserveAspectRatio="none"><line x1="0" y1="1" x2="120" y2="1" stroke="#1a3a1a" stroke-width="2"/></svg>
+      </div>
+
+      <div class="gw-node gw-provider">
+        <div class="gw-icon">
+          <svg viewBox="0 0 48 48" width="36" height="36" fill="none" stroke="#4a7a52" stroke-width="1.5"><circle cx="24" cy="24" r="18"/><path d="M24 6v36M6 24h36" opacity="0.3"/><path d="M10 14c4 4 10 6 14 6s10-2 14-6" opacity="0.5"/><path d="M10 34c4-4 10-6 14-6s10 2 14 6" opacity="0.5"/></svg>
+        </div>
+        <span class="gw-label" style="color:#4a7a52">LLM Provider</span>
+        <span class="gw-url" style="color:#2a4a2a">OpenAI / Anthropic / etc.</span>
+      </div>
+    </div>
+
+    <!-- Live terminal showing what happens -->
+    <div class="gw-terminal reveal">
+      <div class="term-bar"><span class="term-dot red"></span><span class="term-dot yellow"></span><span class="term-dot green"></span><span class="term-title">gateway-log — live</span></div>
+      <div class="term-body gw-term-scroll" id="gwTerminal">
+        <div class="gw-line gw-line-1"><span class="dim">$</span> amc up</div>
+        <div class="gw-line gw-line-2"><span class="green">✓</span> Gateway listening on <span class="green">http://localhost:3210</span></div>
+        <div class="gw-line gw-line-3"><span class="green">✓</span> Studio API on <span class="green">http://localhost:3212</span></div>
+        <div class="gw-line gw-line-4"><span class="dim">$</span> export OPENAI_BASE_URL=http://localhost:3210/openai</div>
+        <div class="gw-line gw-line-5"><span class="dim">$</span> python my_agent.py</div>
+        <div class="gw-line gw-line-6"><span class="dim">[gateway]</span> <span class="green">→</span> POST /openai/chat/completions <span class="dim">model=gpt-4o</span></div>
+        <div class="gw-line gw-line-7"><span class="dim">[evidence]</span> <span class="green">✍</span> Signed event <span style="color:#00cc33">e7a3f...</span> → Merkle leaf <span style="color:#00cc33">#1847</span></div>
+        <div class="gw-line gw-line-8"><span class="dim">[policy]</span> <span class="green">✓</span> Action ALLOWED — tool_call:web_search within policy bounds</div>
+        <div class="gw-line gw-line-9"><span class="dim">[gateway]</span> <span class="green">→</span> POST /openai/chat/completions <span class="dim">tool_result</span></div>
+        <div class="gw-line gw-line-10"><span class="dim">[evidence]</span> <span class="green">✍</span> Signed event <span style="color:#00cc33">b2c9d...</span> → Merkle leaf <span style="color:#00cc33">#1848</span></div>
+        <div class="gw-line gw-line-11"><span class="dim">[score]</span> Agent <span class="green">default</span> — 14 new evidence items — integrity <span class="green">0.847</span></div>
+        <div class="gw-line gw-line-12"><span class="dim">$</span> amc run</div>
+        <div class="gw-line gw-line-13"><span class="green">✓</span> Overall: <span class="green">L3 Defined</span> | Integrity: <span class="green">0.847</span> | Trust: <span class="green">OBSERVED</span></div>
+        <div class="gw-line gw-line-14"><span class="dim">$</span> <span class="cursor-blink">_</span></div>
+      </div>
+    </div>
+
+    <!-- Quick start for demo -->
+    <div class="gw-quickstart reveal tech-only">
+      <h3 class="sub-heading">Try It — 60 Seconds to Your First Score</h3>
+      <div class="terminal">
+        <div class="term-bar"><span class="term-dot red"></span><span class="term-dot yellow"></span><span class="term-dot green"></span><span class="term-title">quickstart</span></div>
+        <div class="term-body"><code><span class="dim"># Install</span>
+npm i -g agent-maturity-compass
+
+<span class="dim"># Setup + start gateway</span>
+amc setup --demo --non-interactive
+amc up
+
+<span class="dim"># Run the built-in demo agent through the gateway</span>
+amc demo run
+
+<span class="dim"># See your real score</span>
+amc run --agent default</code></div>
+      </div>
+    </div>
+
+    <div class="gw-quickstart reveal eli5-only">
+      <h3 class="sub-heading">Want to try it?</h3>
+      <p class="sec-sub">Install AMC, run the demo, and see a real trust score in under a minute. No AI expertise needed — just copy-paste four commands.</p>
+    </div>
+  </div>
+</section>
+
 <!-- ═══ 4. THE PLATFORM ═══ -->
 <section class="sec" id="platform">
   <div class="wrap">

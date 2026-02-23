@@ -1,1 +1,11 @@
 AMC gateway listening on http://127.0.0.1:3210
+blob key material missing for version 1
+blob key material missing for version 1
+blob key material missing for version 1
+AMC gateway listening on http://127.0.0.1:3210
+AMC gateway proxy listening on http://127.0.0.1:3211
+AMC gateway listening on http://127.0.0.1:3210
+AMC gateway proxy listening on http://127.0.0.1:3211
+gateway error: Error: connect ECONNREFUSED 127.0.0.1:9999
+AMC gateway listening on http://127.0.0.1:3210
+AMC gateway proxy listening on http://127.0.0.1:3211
