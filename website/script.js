@@ -9,6 +9,21 @@ const RM = matchMedia('(prefers-reduced-motion:reduce)').matches;
 const FP = matchMedia('(pointer:fine)').matches;
 gsap.registerPlugin(ScrollTrigger);
 
+/* roundRect polyfill for Safari <16 / older browsers */
+function roundedRect(ctx, x, y, w, h, r) {
+  if (ctx.roundRect) { ctx.roundRect(x, y, w, h, r); return; }
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
+}
+
 /* ─── TEXT SPLITTING — letter-by-letter hero ─── */
 document.querySelectorAll('[data-word]').forEach(w => {
   const text = w.textContent;
@@ -316,13 +331,13 @@ if (vc && !RM) {
       ctx.globalAlpha = np;
       const w = n.root ? 70 : 50, h = 28;
       ctx.beginPath();
-      ctx.roundRect(n.x - w/2, n.y - h/2, w, h, 6);
+      roundedRect(ctx, n.x - w/2, n.y - h/2, w, h, 6);
       ctx.fillStyle = n.root ? 'rgba(124,58,237,.06)' : 'rgba(255,255,255,.02)';
       ctx.strokeStyle = n.root ? 'rgba(124,58,237,.2)' : 'rgba(255,255,255,.05)';
       ctx.lineWidth = 1; ctx.fill(); ctx.stroke();
       if (n.root) {
         ctx.beginPath();
-        ctx.roundRect(n.x - w/2 - 3, n.y - h/2 - 3, w + 6, h + 6, 8);
+        roundedRect(ctx, n.x - w/2 - 3, n.y - h/2 - 3, w + 6, h + 6, 8);
         ctx.strokeStyle = `rgba(124,58,237,${.06 + Math.sin(t * .003) * .03})`;
         ctx.stroke();
       }
@@ -375,18 +390,23 @@ if (!RM) {
   const track = document.getElementById('hscrollTrack');
   if (track) {
     const sec = track.closest('.hscroll-sec');
-    const totalScroll = track.scrollWidth - window.innerWidth;
-    gsap.to(track, {
-      x: () => -totalScroll,
-      ease: 'none',
-      scrollTrigger: {
-        trigger: sec,
-        start: 'top top',
-        end: () => '+=' + totalScroll,
-        pin: true,
-        scrub: .8,
-        invalidateOnRefresh: true,
-        anticipatePin: 1
+    // Delay to ensure layout is settled
+    requestAnimationFrame(() => {
+      const totalScroll = track.scrollWidth - window.innerWidth;
+      if (totalScroll > 0) {
+        gsap.to(track, {
+          x: () => -(track.scrollWidth - window.innerWidth),
+          ease: 'none',
+          scrollTrigger: {
+            trigger: sec,
+            start: 'top top',
+            end: () => '+=' + (track.scrollWidth - window.innerWidth),
+            pin: true,
+            scrub: .8,
+            invalidateOnRefresh: true,
+            anticipatePin: 1
+          }
+        });
       }
     });
   }

@@ -95,15 +95,21 @@ nav.scrolled{padding:12px 0;background:rgba(5,5,5,.85);backdrop-filter:blur(24px
 .nav-gh:hover{color:var(--fg);background:rgba(255,255,255,.04)}
 
 /* ═══ GRADIENT BORDER BUTTON — animated conic ═══ */
-.btn-glow{position:relative;padding:12px 28px;border-radius:var(--r-sm);font-size:.85rem;font-weight:600;color:#fff;background:var(--bg);z-index:1;overflow:hidden;isolation:isolate;transition:transform .3s var(--ease),box-shadow .3s}
+.btn-glow{display:inline-flex;align-items:center;gap:8px;position:relative;padding:12px 28px;border-radius:var(--r-sm);font-size:.85rem;font-weight:600;color:#fff;background:var(--bg);z-index:1;overflow:hidden;isolation:isolate;transition:transform .3s var(--ease),box-shadow .3s}
 .btn-glow::before{content:'';position:absolute;inset:-2px;border-radius:inherit;background:conic-gradient(from var(--angle,0deg),var(--v),var(--cy),var(--v-l),var(--v));z-index:-2;animation:spin 3s linear infinite}
 .btn-glow::after{content:'';position:absolute;inset:2px;border-radius:calc(var(--r-sm) - 2px);background:var(--bg);z-index:-1;transition:background .3s}
 .btn-glow:hover{transform:translateY(-2px);box-shadow:0 8px 40px var(--glow-v)}
 .btn-glow:hover::after{background:rgba(124,58,237,.08)}
 @keyframes spin{to{--angle:360deg}}
 @property --angle{syntax:'<angle>';initial-value:0deg;inherits:false}
+/* Firefox fallback: static gradient border since @property unsupported */
+@supports not (background: paint(something)) {
+  @supports (-moz-appearance:none) {
+    .btn-glow::before{background:linear-gradient(135deg,var(--v),var(--cy),var(--v-l),var(--v));animation:none}
+  }
+}
 
-.btn-ghost{padding:12px 28px;border-radius:var(--r-sm);font-size:.85rem;font-weight:600;color:var(--fg-2);border:1px solid var(--border);transition:all .3s var(--ease)}
+.btn-ghost{display:inline-flex;align-items:center;gap:8px;padding:12px 28px;border-radius:var(--r-sm);font-size:.85rem;font-weight:600;color:var(--fg-2);border:1px solid var(--border);transition:all .3s var(--ease)}
 .btn-ghost:hover{color:var(--fg);border-color:var(--border-h);background:rgba(255,255,255,.02);transform:translateY(-2px)}
 .btn-ghost svg{width:14px;height:14px;transition:transform .3s}
 .btn-ghost:hover svg{transform:translateX(3px)}
@@ -182,9 +188,9 @@ nav.scrolled{padding:12px 0;background:rgba(5,5,5,.85);backdrop-filter:blur(24px
 .bar-actual{background:linear-gradient(to top,rgba(124,58,237,.15),rgba(124,58,237,.5))}
 
 /* ═══ STICKY SCROLL — How It Works ═══ */
-.sticky-sec{position:relative;min-height:300vh}
-.sticky-left{position:sticky;top:0;height:100vh;display:flex;align-items:center;width:45%;float:left;padding-right:48px}
-.sticky-right{width:55%;float:right;padding:25vh 0}
+.sticky-sec{position:relative;display:grid;grid-template-columns:45% 55%;min-height:300vh}
+.sticky-left{position:sticky;top:0;height:100vh;display:flex;align-items:center;padding-right:48px}
+.sticky-right{padding:25vh 0}
 .sticky-step{min-height:80vh;display:flex;align-items:center;padding:48px 0}
 .sticky-step-inner{opacity:.15;transform:translateY(20px);transition:all .6s var(--ease)}
 .sticky-step-inner.active{opacity:1;transform:translateY(0)}
@@ -292,9 +298,9 @@ footer{border-top:1px solid var(--border);padding:56px 0 32px}
 
 /* ═══ RESPONSIVE ═══ */
 @media(max-width:1024px){
-  .sticky-sec{min-height:auto}
-  .sticky-left{position:relative;width:100%;float:none;height:auto;padding:0 0 32px}
-  .sticky-right{width:100%;float:none;padding:0}
+  .sticky-sec{display:block;min-height:auto}
+  .sticky-left{position:relative;height:auto;padding:0 0 32px}
+  .sticky-right{padding:0}
   .sticky-step{min-height:auto;padding:32px 0}
   .sticky-step-inner{opacity:1;transform:none}
   .demo-wrap{grid-template-columns:1fr}
@@ -338,5 +344,4 @@ footer{border-top:1px solid var(--border);padding:56px 0 32px}
 .mob-menu a{font-size:1.4rem;font-weight:700;color:var(--fg);transition:color .2s}
 .mob-menu a:hover{color:var(--v-l)}
 
-/* Clearfix for sticky float layout */
-.sticky-sec::after{content:'';display:table;clear:both}
+/* Grid-based sticky layout — no clearfix needed */
