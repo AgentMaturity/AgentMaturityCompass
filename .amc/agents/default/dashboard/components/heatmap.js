@@ -1,15 +1,29 @@
 function shade(current, target) {
   const gap = target - current;
   if (gap <= 0) {
-    return "#dff3e6";
+    return "#0d2b0d";
   }
   if (gap === 1) {
-    return "#fff3cd";
+    return "#1a3a1a";
   }
   if (gap === 2) {
-    return "#ffe4b5";
+    return "#2a1a0a";
   }
-  return "#ffd2d2";
+  return "#3a0a0a";
+}
+
+function textColor(current, target) {
+  const gap = target - current;
+  if (gap <= 0) {
+    return "#00ff41";
+  }
+  if (gap === 1) {
+    return "#00cc33";
+  }
+  if (gap === 2) {
+    return "#ff9933";
+  }
+  return "#ff4444";
 }
 
 export function renderHeatmap(container, questionScores, targetMapping, onSelect) {
@@ -22,6 +36,7 @@ export function renderHeatmap(container, questionScores, targetMapping, onSelect
     const gap = target - score.finalLevel;
     const tr = document.createElement("tr");
     tr.style.background = shade(score.finalLevel, target);
+    tr.style.color = textColor(score.finalLevel, target);
     tr.innerHTML = [
       `<td><button type="button" data-qid="${score.questionId}">${score.questionId}</button></td>`,
       `<td>${score.finalLevel}</td>`,

@@ -1,1 +1,23 @@
-{}
+{
+  "cc5c7f16-f649-4b42-935b-bd0bb3c565f0": {
+    "ts": 1771489818686,
+    "eventType": "audit",
+    "sessionId": "studio-config-1771489818686",
+    "runtime": "unknown",
+    "trustTier": "OBSERVED"
+  },
+  "37eef13c-1e36-40bd-a4b5-75a5f0b77db0": {
+    "ts": 1771489818707,
+    "eventType": "audit",
+    "sessionId": "studio-lifecycle-1771489818707-studio_runtime_started",
+    "runtime": "unknown",
+    "trustTier": "OBSERVED"
+  },
+  "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0": {
+    "ts": 1771590342172,
+    "eventType": "audit",
+    "sessionId": "studio-lifecycle-1771590342171-studio_runtime_stopped",
+    "runtime": "unknown",
+    "trustTier": "OBSERVED"
+  }
+}

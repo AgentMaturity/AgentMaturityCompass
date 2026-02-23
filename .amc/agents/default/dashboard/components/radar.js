@@ -12,6 +12,7 @@ export function renderRadar(canvas, layerScores) {
     return;
   }
 
+  // Grid rings — dark green lines
   for (let ring = 1; ring <= 5; ring += 1) {
     const r = (radius / 5) * ring;
     ctx.beginPath();
@@ -26,10 +27,23 @@ export function renderRadar(canvas, layerScores) {
       }
     }
     ctx.closePath();
-    ctx.strokeStyle = "#d4e2da";
+    ctx.strokeStyle = "#1a3a1a";
+    ctx.lineWidth = 1;
     ctx.stroke();
   }
 
+  // Spoke lines
+  for (let i = 0; i < points; i += 1) {
+    const angle = (Math.PI * 2 * i) / points - Math.PI / 2;
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.lineTo(cx + Math.cos(angle) * radius, cy + Math.sin(angle) * radius);
+    ctx.strokeStyle = "#1a3a1a";
+    ctx.lineWidth = 1;
+    ctx.stroke();
+  }
+
+  // Data polygon — bright green fill
   ctx.beginPath();
   for (let i = 0; i < points; i += 1) {
     const score = layerScores[i].avgFinalLevel;
@@ -44,14 +58,28 @@ export function renderRadar(canvas, layerScores) {
     }
   }
   ctx.closePath();
-  ctx.fillStyle = "rgba(12,123,90,0.25)";
-  ctx.strokeStyle = "#0c7b5a";
+  ctx.fillStyle = "rgba(0, 255, 65, 0.15)";
+  ctx.strokeStyle = "#00ff41";
   ctx.lineWidth = 2;
   ctx.fill();
   ctx.stroke();
 
-  ctx.fillStyle = "#112018";
-  ctx.font = "12px IBM Plex Sans, sans-serif";
+  // Data points — green dots with glow
+  for (let i = 0; i < points; i += 1) {
+    const score = layerScores[i].avgFinalLevel;
+    const angle = (Math.PI * 2 * i) / points - Math.PI / 2;
+    const r = (radius * score) / 5;
+    const x = cx + Math.cos(angle) * r;
+    const y = cy + Math.sin(angle) * r;
+    ctx.beginPath();
+    ctx.arc(x, y, 3, 0, Math.PI * 2);
+    ctx.fillStyle = "#00ff41";
+    ctx.fill();
+  }
+
+  // Labels — muted green
+  ctx.fillStyle = "#4a7a52";
+  ctx.font = "11px 'JetBrains Mono', monospace";
   for (let i = 0; i < points; i += 1) {
     const angle = (Math.PI * 2 * i) / points - Math.PI / 2;
     const x = cx + Math.cos(angle) * (radius + 18);

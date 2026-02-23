@@ -4,79 +4,96 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>AMC Compass Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
     <header class="hero">
-      <h1>Agent Maturity Compass</h1>
+      <h1>⬡ Agent Maturity Compass</h1>
       <p id="summary"></p>
     </header>
 
     <main class="grid">
       <section class="card full">
-        <h2>Studio Home</h2>
+        <h2>⚡ Exports</h2>
+        <div class="export-actions">
+          <a href="/export.md">📄 Export Markdown</a>
+          <a href="/export.pdf">🧾 Export PDF (print)</a>
+        </div>
+      </section>
+      <section class="card full">
+        <h2>🖥 Studio Home</h2>
         <div id="studio-home"></div>
+        <div id="team-view" class="card-sub"></div>
+        <div id="export-actions"></div>
         <canvas id="studio-qr" width="196" height="196"></canvas>
       </section>
 
       <section class="card">
-        <h2>Layer Radar</h2>
+        <h2>◎ Layer Radar</h2>
         <canvas id="radar" width="420" height="320"></canvas>
       </section>
 
+      <section class="card full">
+        <h2>▦ Domain Breakdown</h2>
+        <div id="domain-breakdown"></div>
+      </section>
+
       <section class="card">
-        <h2>Timeline</h2>
+        <h2>⏱ Timeline</h2>
         <canvas id="timeline" width="420" height="320"></canvas>
       </section>
 
       <section class="card full">
-        <h2>42-Question Heatmap</h2>
+        <h2>▤ 111-Question Heatmap</h2>
         <div id="heatmap"></div>
       </section>
 
       <section class="card">
-        <h2>Failure-Risk Indices</h2>
+        <h2>⚠ Failure-Risk Indices</h2>
         <div id="indices"></div>
       </section>
 
       <section class="card">
-        <h2>Assurance Packs</h2>
+        <h2>🛡 Assurance Packs</h2>
         <div id="assurance"></div>
       </section>
 
       <section class="card">
-        <h2>Value Summary</h2>
+        <h2>◈ Value Summary</h2>
         <div id="value-summary"></div>
         <canvas id="value-trend" width="420" height="140"></canvas>
       </section>
 
       <section class="card">
-        <h2>Top 5 Value Gaps</h2>
+        <h2>△ Top 5 Value Gaps</h2>
         <ul id="value-gaps"></ul>
       </section>
 
       <section class="card">
-        <h2>Approvals Summary</h2>
+        <h2>✓ Approvals Summary</h2>
         <div id="approvals-summary"></div>
       </section>
 
       <section class="card">
-        <h2>Benchmarks Summary</h2>
+        <h2>⊞ Benchmarks Summary</h2>
         <div id="benchmark-summary"></div>
       </section>
 
       <section class="card">
-        <h2>Evidence Gaps</h2>
+        <h2>⚑ Evidence Gaps</h2>
         <ul id="evidence-gaps"></ul>
       </section>
 
       <section class="card full">
-        <h2>Question Detail</h2>
+        <h2>⊡ Question Detail</h2>
         <div id="question-detail"></div>
       </section>
 
       <section class="card full">
-        <h2>Education → Ownership → Commitment</h2>
+        <h2>▸ Education → Ownership → Commitment</h2>
         <div id="eoc"></div>
       </section>
     </main>

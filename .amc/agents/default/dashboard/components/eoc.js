@@ -6,6 +6,7 @@ function list(items) {
 export function renderEoc(container, eoc) {
   if (!eoc) {
     container.textContent = "No E/O/C data available.";
+    container.style.color = "#4a7a52";
     return;
   }
   container.innerHTML = [

@@ -5,7 +5,8 @@ export function renderTimeline(canvas, trends) {
   ctx.clearRect(0, 0, width, height);
 
   if (!trends || trends.length === 0) {
-    ctx.fillStyle = "#47614f";
+    ctx.fillStyle = "#4a7a52";
+    ctx.font = "12px 'JetBrains Mono', monospace";
     ctx.fillText("No trend data", 10, 20);
     return;
   }
@@ -16,12 +17,31 @@ export function renderTimeline(canvas, trends) {
     y: height - margin - ((row.overall ?? 0) / 5) * (height - margin * 2)
   }));
 
-  ctx.strokeStyle = "#d4e2da";
+  // Axis line — dark green
+  ctx.strokeStyle = "#1a3a1a";
   ctx.beginPath();
   ctx.moveTo(margin, height - margin);
   ctx.lineTo(width - margin, height - margin);
   ctx.stroke();
 
+  // Vertical axis
+  ctx.beginPath();
+  ctx.moveTo(margin, margin);
+  ctx.lineTo(margin, height - margin);
+  ctx.stroke();
+
+  // Area fill under line
+  ctx.beginPath();
+  ctx.moveTo(points[0].x, height - margin);
+  for (const p of points) {
+    ctx.lineTo(p.x, p.y);
+  }
+  ctx.lineTo(points[points.length - 1].x, height - margin);
+  ctx.closePath();
+  ctx.fillStyle = "rgba(0, 255, 65, 0.08)";
+  ctx.fill();
+
+  // Line — bright green
   ctx.beginPath();
   for (let i = 0; i < points.length; i += 1) {
     const p = points[i];
@@ -31,14 +51,15 @@ export function renderTimeline(canvas, trends) {
       ctx.lineTo(p.x, p.y);
     }
   }
-  ctx.strokeStyle = "#0c7b5a";
+  ctx.strokeStyle = "#00ff41";
   ctx.lineWidth = 2;
   ctx.stroke();
 
+  // Data points — green dots
   for (const p of points) {
     ctx.beginPath();
     ctx.arc(p.x, p.y, 3, 0, Math.PI * 2);
-    ctx.fillStyle = "#0c7b5a";
+    ctx.fillStyle = "#00ff41";
     ctx.fill();
   }
 }
