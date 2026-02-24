@@ -89,7 +89,7 @@ export class TransparencyLog {
     const index = this.entries.length;
     const timestamp = Date.now();
     const payloadHash = createHash("sha256").update(JSON.stringify(payload)).digest("hex");
-    const previousHash = index > 0 ? this.entries[index - 1].entryHash : "0".repeat(64);
+    const previousHash = index > 0 ? this.entries[index - 1]!.entryHash : "0".repeat(64);
 
     const preimage = `${index}:${entryType}:${agentId}:${timestamp}:${payloadHash}:${previousHash}`;
     const entryHash = createHmac("sha256", this.signingKey).update(preimage).digest("hex");
@@ -110,16 +110,16 @@ export class TransparencyLog {
   }
 
   head(): string {
-    return this.entries.length > 0 ? this.entries[this.entries.length - 1].entryHash : "0".repeat(64);
+    return this.entries.length > 0 ? this.entries[this.entries.length - 1]!.entryHash : "0".repeat(64);
   }
 
   verifyChain(): { intact: boolean; brokenAt?: number } {
     for (let i = 1; i < this.entries.length; i++) {
-      if (this.entries[i].previousHash !== this.entries[i - 1].entryHash) {
+      if (this.entries[i]!.previousHash !== this.entries[i - 1]!.entryHash) {
         return { intact: false, brokenAt: i };
       }
       // Re-derive hash
-      const e = this.entries[i];
+      const e = this.entries[i]!;
       const preimage = `${e.index}:${e.entryType}:${e.agentId}:${e.timestamp}:${e.payloadHash}:${e.previousHash}`;
       const expected = createHmac("sha256", this.signingKey).update(preimage).digest("hex");
       if (expected !== e.entryHash) {
@@ -159,7 +159,7 @@ export class TransparencyLog {
     while (leaves.length > 1) {
       const next: MerkleNode[] = [];
       for (let i = 0; i < leaves.length; i += 2) {
-        const left = leaves[i];
+        const left = leaves[i]!;
         const right = leaves[i + 1] ?? { hash: "0".repeat(64) };
         const combined = createHash("sha256").update(left.hash + right.hash).digest("hex");
         next.push({ hash: combined, left, right });
@@ -167,7 +167,7 @@ export class TransparencyLog {
       leaves = next;
     }
 
-    return leaves[0];
+    return leaves[0] ?? null;
   }
 
   getMerkleRoot(): string {
@@ -178,7 +178,7 @@ export class TransparencyLog {
   generateInclusionProof(index: number): InclusionProof | null {
     if (index < 0 || index >= this.entries.length) return null;
 
-    const entry = this.entries[index];
+    const entry = this.entries[index]!;
     let leaves: { hash: string; index?: number }[] = this.entries.map((e, i) => ({
       hash: e.entryHash,
       index: i,
@@ -196,7 +196,7 @@ export class TransparencyLog {
     while (currentLevel.length > 1) {
       const nextLevel: string[] = [];
       for (let i = 0; i < currentLevel.length; i += 2) {
-        const left = currentLevel[i];
+        const left = currentLevel[i]!;
         const right = currentLevel[i + 1] ?? "0".repeat(64);
         nextLevel.push(createHash("sha256").update(left + right).digest("hex"));
 
@@ -216,7 +216,7 @@ export class TransparencyLog {
       entryIndex: index,
       entryHash: entry.entryHash,
       proof,
-      rootHash: currentLevel[0],
+      rootHash: currentLevel[0]!,
       logSize: this.entries.length,
     };
   }
