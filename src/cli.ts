@@ -15041,6 +15041,88 @@ agent
 const demo = program.command("demo").description("Run interactive demos of AMC capabilities");
 
 demo
+  .command("gap")
+  .description("The 84-point documentation inflation gap — keyword vs execution scoring")
+  .option("--json", "Output as JSON")
+  .option("--fast", "Skip the dramatic reveal (instant output)")
+  .action(async (opts: { json?: boolean; fast?: boolean }) => {
+    const { runGapDemo } = await import("./demo/gapDemo.js");
+    const result = runGapDemo();
+
+    if (opts.json) {
+      console.log(JSON.stringify(result, null, 2));
+      return;
+    }
+
+    const delay = opts.fast ? 0 : 80;
+    const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+    console.log("");
+    console.log(chalk.bold("  🧭 AMC — The 84-Point Documentation Inflation Gap"));
+    console.log(chalk.gray("  Same agent. Two scoring methods. Very different results."));
+    console.log("");
+
+    // Phase 1: Keyword scoring
+    console.log(chalk.bold.green("  ━━━ Phase 1: Keyword / Self-Reported Scoring ━━━"));
+    console.log(chalk.gray("  Method: Check if the agent's documentation mentions the right keywords."));
+    console.log("");
+
+    for (const test of result.tests) {
+      await sleep(delay);
+      console.log(chalk.green(`  ✅ ${test.question}`));
+      console.log(chalk.gray(`     Claim: "${test.claim}" → Keywords found → 5/5`));
+    }
+
+    console.log("");
+    console.log(chalk.bold.green(`  Keyword Score: ${result.keywordScore}/${result.keywordMax} (${result.keywordPercent}%) ✅`));
+    console.log(chalk.green("  Verdict: Agent is fully mature! Ship it! 🚀"));
+    console.log("");
+
+    await sleep(delay * 5);
+
+    // Phase 2: Execution scoring
+    console.log(chalk.bold.red("  ━━━ Phase 2: AMC Execution-Verified Scoring ━━━"));
+    console.log(chalk.gray("  Method: Actually test each claim. Watch what the agent does, not what it says."));
+    console.log("");
+
+    for (const test of result.tests) {
+      await sleep(delay);
+      const icon = test.passed ? chalk.yellow("⚠") : chalk.red("✗");
+      const scoreColor = test.executionScore === 0 ? chalk.red : test.executionScore <= 1 ? chalk.yellow : chalk.green;
+      console.log(`  ${icon} ${chalk.white(test.question)}`);
+      console.log(chalk.gray(`     Test: ${test.test}`));
+      console.log(`     ${scoreColor(`${test.executionScore}/5`)} ${chalk.gray(test.finding)}`);
+    }
+
+    console.log("");
+    console.log(chalk.bold.red(`  Execution Score: ${result.executionScore}/${result.executionMax} (${result.executionPercent}%) ❌`));
+    console.log("");
+
+    await sleep(delay * 3);
+
+    // The gap
+    console.log(chalk.bold("  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"));
+    console.log("");
+    console.log(chalk.bold(`  📊 The Gap`));
+    console.log("");
+    console.log(chalk.green(`     Keyword scoring:   ${result.keywordPercent}%`) + chalk.gray("  (what the agent says)"));
+    console.log(chalk.red(`     Execution scoring: ${result.executionPercent}%`) + chalk.gray("  (what the agent does)"));
+    console.log(chalk.bold.yellow(`     Gap:               ${result.gap} points`));
+    console.log("");
+    console.log(chalk.gray("  Every claim checked out on paper. Every claim failed in practice."));
+    console.log(chalk.gray("  This is why AMC scores from execution evidence, not documentation."));
+    console.log("");
+    console.log(chalk.bold("  AMC closes this gap with:"));
+    console.log(chalk.white("  • Execution-verified evidence (not self-reported claims)"));
+    console.log(chalk.white("  • Cryptographic proof chains (can't be faked)"));
+    console.log(chalk.white("  • Trust-tiered scoring (self-reported evidence is capped at 0.4×)"));
+    console.log(chalk.white("  • Adversarial testing (66 attack packs that actually probe behavior)"));
+    console.log("");
+    console.log(chalk.gray("  Start scoring your agent:"), chalk.cyan("amc init"));
+    console.log("");
+  });
+
+demo
   .command("run")
   .description("Run a simulated agent through the AMC gateway and produce a real score (~30s)")
   .option("--gateway <url>", "Gateway URL (default: auto-detect running instance)")
