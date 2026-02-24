@@ -319,3 +319,12 @@ export type { DensityCell, DimensionDensity, DensityMapReport, EvidenceRecord } 
 
 export { ingestEvidence, TRUST_WEIGHTS } from "./evidenceIngestion.js";
 export type { TrustTier, IngestFormat, IngestInput, NormalizedEvidence, IngestReport } from "./evidenceIngestion.js";
+
+export { createAttestation, verifyAttestation, scoreOutputAttestation } from "./outputAttestation.js";
+export type { AttestationInput, Attestation, AttestationVerification, OutputAttestationReport } from "./outputAttestation.js";
+
+export { createChallenge, respondToChallenge, verifyMutualTrust, scoreMutualVerification } from "./mutualVerification.js";
+export type { AgentIdentity, VerificationChallenge, VerificationResponse, MutualTrustResult, MutualVerificationReport } from "./mutualVerification.js";
+
+export { TransparencyLog } from "./networkTransparencyLog.js";
+export type { LogEntry, LogEntryType, InclusionProof, TransparencyLogReport } from "./networkTransparencyLog.js";

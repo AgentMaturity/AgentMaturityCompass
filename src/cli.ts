@@ -14047,6 +14047,386 @@ score
     } catch (e: any) { console.error(chalk.red(e.message)); process.exit(1); }
   });
 
+// ── Research-backed scoring modules (2026-02-24) ─────────────────────────────
+
+score
+  .command("calibration-gap")
+  .description("Measure delta between agent self-reported confidence and observed behavior (ECE scoring)")
+  .option("--json", "Output as JSON")
+  .option("--dimension <dim>", "Filter to specific dimension")
+  .action(async (opts: { json?: boolean; dimension?: string }) => {
+    try {
+      const { scoreCalibrationGap, scanCalibrationInfrastructure } = await import("./score/calibrationGap.js");
+      const infra = scanCalibrationInfrastructure();
+      const input = { agentReports: [], observedResults: [], dimensions: opts.dimension ? [opts.dimension] : undefined };
+      const result = scoreCalibrationGap(input);
+      if (opts.json) { console.log(JSON.stringify({ ...result, infrastructure: infra }, null, 2)); return; }
+      console.log(chalk.bold.hex("#FF6600")("\n🎯  Calibration Gap Analysis"));
+      console.log(chalk.gray("ECE Score:"), result.expectedCalibrationError.toFixed(4));
+      console.log(chalk.gray("Overconfidence ratio:"), result.overconfidenceRatio.toFixed(2));
+      console.log(chalk.gray("Underconfidence ratio:"), result.underconfidenceRatio.toFixed(2));
+      console.log(chalk.gray("Infrastructure:"), infra.hasConfidenceEndpoint ? chalk.green("confidence endpoint ✓") : chalk.yellow("no confidence endpoint"));
+      if (result.perDimension) {
+        for (const [dim, gap] of Object.entries(result.perDimension)) {
+          console.log(chalk.gray(`  ${dim}:`), (gap as number).toFixed(4));
+        }
+      }
+    } catch (e: any) { console.error(chalk.red(e.message)); process.exit(1); }
+  });
+
+score
+  .command("evidence-conflict")
+  .description("Measure internal consistency of evidence — detect conflicting signals across dimensions")
+  .option("--json", "Output as JSON")
+  .action(async (opts: { json?: boolean }) => {
+    try {
+      const { scoreEvidenceConflict, scanEvidenceConflicts } = await import("./score/evidenceConflict.js");
+      const conflicts = scanEvidenceConflicts();
+      const result = scoreEvidenceConflict({ evidence: [] });
+      if (opts.json) { console.log(JSON.stringify({ ...result, scan: conflicts }, null, 2)); return; }
+      console.log(chalk.bold.hex("#FF6600")("\n⚡  Evidence Conflict Analysis"));
+      console.log(chalk.gray("Conflict ratio:"), result.conflictRatio.toFixed(4));
+      console.log(chalk.gray("Temporal instability:"), result.temporalInstability.toFixed(4));
+      console.log(chalk.gray("Sleeper behavior detected:"), result.sleeperBehaviorDetected ? chalk.red("yes") : chalk.green("no"));
+      if (result.perDimension) {
+        for (const [dim, ratio] of Object.entries(result.perDimension)) {
+          const r = ratio as number;
+          console.log(chalk.gray(`  ${dim}:`), r > 0.3 ? chalk.red(r.toFixed(2)) : chalk.green(r.toFixed(2)));
+        }
+      }
+    } catch (e: any) { console.error(chalk.red(e.message)); process.exit(1); }
+  });
+
+score
+  .command("density-map")
+  .description("Heatmap of evidence density per question per dimension — reveals blind spots")
+  .option("--json", "Output as JSON")
+  .action(async (opts: { json?: boolean }) => {
+    try {
+      const { buildDensityMap, scanDensityMapInfra } = await import("./score/densityMap.js");
+      const infra = scanDensityMapInfra();
+      const result = buildDensityMap({ evidence: [], questions: [], dimensions: [] });
+      if (opts.json) { console.log(JSON.stringify({ ...result, infrastructure: infra }, null, 2)); return; }
+      console.log(chalk.bold.hex("#FF6600")("\n🗺️   Evidence Density Map"));
+      console.log(chalk.gray("Total cells:"), result.totalCells);
+      console.log(chalk.gray("Covered cells:"), result.coveredCells);
+      console.log(chalk.gray("Blind spots:"), result.blindSpots);
+      console.log(chalk.gray("Coverage:"), `${((result.coveredCells / Math.max(result.totalCells, 1)) * 100).toFixed(1)}%`);
+      console.log(chalk.gray("Cluster pattern:"), result.clusterPattern);
+      if (result.dimensions) {
+        for (const d of result.dimensions) {
+          const bar = "█".repeat(Math.round(d.density * 20)) + "░".repeat(20 - Math.round(d.density * 20));
+          console.log(chalk.gray(`  ${d.dimension}:`), bar, `${(d.density * 100).toFixed(0)}%`);
+        }
+      }
+    } catch (e: any) { console.error(chalk.red(e.message)); process.exit(1); }
+  });
+
+score
+  .command("evidence-ingest")
+  .description("Ingest evidence from external systems (openai-evals, langsmith, mlflow, custom)")
+  .option("--json", "Output as JSON")
+  .option("--format <fmt>", "Source format: openai-evals, langsmith, mlflow, weights-biases, custom")
+  .option("--file <path>", "Path to evidence file")
+  .action(async (opts: { json?: boolean; format?: string; file?: string }) => {
+    try {
+      const { ingestEvidence, TRUST_WEIGHTS } = await import("./score/evidenceIngestion.js");
+      const format = (opts.format || "custom") as any;
+      const result = ingestEvidence({ format, rawRecords: [], agentId: "default" });
+      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
+      console.log(chalk.bold.hex("#FF6600")("\n📥  Evidence Ingestion"));
+      console.log(chalk.gray("Format:"), format);
+      console.log(chalk.gray("Records ingested:"), result.accepted);
+      console.log(chalk.gray("Records rejected:"), result.rejected);
+      console.log(chalk.gray("Trust tier:"), result.trustTier, chalk.gray(`(weight: ${TRUST_WEIGHTS[result.trustTier as keyof typeof TRUST_WEIGHTS]}×)`));
+      console.log(chalk.gray("\nTrust weights:"));
+      for (const [tier, weight] of Object.entries(TRUST_WEIGHTS)) {
+        console.log(chalk.gray(`  ${tier}:`), `${weight}×`);
+      }
+    } catch (e: any) { console.error(chalk.red(e.message)); process.exit(1); }
+  });
+
+score
+  .command("level-transition")
+  .description("Track formal promotion/demotion events with evidence gates and retention rates")
+  .option("--json", "Output as JSON")
+  .action(async (opts: { json?: boolean }) => {
+    try {
+      const { scoreLevelTransitions, scanLevelTransitionInfra } = await import("./score/levelTransition.js");
+      const infra = scanLevelTransitionInfra();
+      const result = scoreLevelTransitions({ transitions: [] });
+      if (opts.json) { console.log(JSON.stringify({ ...result, infrastructure: infra }, null, 2)); return; }
+      console.log(chalk.bold.hex("#FF6600")("\n📈  Level Transition Quality"));
+      console.log(chalk.gray("Promotions:"), result.promotions);
+      console.log(chalk.gray("Demotions:"), result.demotions);
+      console.log(chalk.gray("Retention rate:"), `${(result.retentionRate * 100).toFixed(1)}%`);
+      console.log(chalk.gray("Avg sustained days:"), result.avgSustainedDays.toFixed(1));
+      console.log(chalk.gray("Adversarial tested:"), result.adversarialTested ? chalk.green("yes") : chalk.yellow("no"));
+    } catch (e: any) { console.error(chalk.red(e.message)); process.exit(1); }
+  });
+
+score
+  .command("gaming-resistance")
+  .description("Test whether adversarial evidence injection can inflate scores (meta-assurance)")
+  .option("--json", "Output as JSON")
+  .action(async (opts: { json?: boolean }) => {
+    try {
+      const { scoreGamingResistance } = await import("./score/gamingResistance.js");
+      const result = scoreGamingResistance({ evidence: [], scoringFn: () => 0 });
+      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
+      console.log(chalk.bold.hex("#FF6600")("\n🛡️   Gaming Resistance"));
+      console.log(chalk.gray("Resistance score:"), result.resistanceScore.toFixed(2));
+      console.log(chalk.gray("Vectors tested:"), result.vectorsTested);
+      console.log(chalk.gray("Vectors resisted:"), result.vectorsResisted);
+      for (const v of result.vectors || []) {
+        const icon = v.resisted ? chalk.green("✓") : chalk.red("✗");
+        console.log(`  ${icon} ${v.name}: ${v.description || ""}`);
+      }
+    } catch (e: any) { console.error(chalk.red(e.message)); process.exit(1); }
+  });
+
+score
+  .command("sleeper-detection")
+  .description("Detect context-dependent behavioral inconsistencies (sleeper agent patterns)")
+  .option("--json", "Output as JSON")
+  .action(async (opts: { json?: boolean }) => {
+    try {
+      const { scoreSleeperDetection } = await import("./score/sleeperDetection.js");
+      const result = scoreSleeperDetection({ behaviorSamples: [] });
+      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
+      console.log(chalk.bold.hex("#FF6600")("\n🕵️   Sleeper Detection"));
+      console.log(chalk.gray("Risk score:"), result.riskScore.toFixed(2));
+      console.log(chalk.gray("Behavioral variance:"), result.behavioralVariance.toFixed(4));
+      console.log(chalk.gray("Context sensitivity:"), result.contextSensitivity.toFixed(4));
+      console.log(chalk.gray("Sleeper detected:"), result.sleeperDetected ? chalk.red("YES") : chalk.green("no"));
+    } catch (e: any) { console.error(chalk.red(e.message)); process.exit(1); }
+  });
+
+score
+  .command("audit-depth")
+  .description("Score audit trail depth and completeness")
+  .option("--json", "Output as JSON")
+  .action(async (opts: { json?: boolean }) => {
+    try {
+      const { scoreAuditDepth } = await import("./score/auditDepth.js");
+      const result = scoreAuditDepth({ auditEntries: [] });
+      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
+      console.log(chalk.bold.hex("#FF6600")("\n📝  Audit Depth"));
+      console.log(chalk.gray("Depth score:"), result.depthScore.toFixed(2));
+      console.log(chalk.gray("Coverage:"), `${(result.coverage * 100).toFixed(1)}%`);
+      console.log(chalk.gray("Tamper evidence:"), result.hasTamperEvidence ? chalk.green("yes") : chalk.red("no"));
+    } catch (e: any) { console.error(chalk.red(e.message)); process.exit(1); }
+  });
+
+score
+  .command("policy-consistency")
+  .description("Test policy enforcement consistency across repeated trials (pass^k)")
+  .option("--json", "Output as JSON")
+  .option("--trials <n>", "Number of trials", "10")
+  .action(async (opts: { json?: boolean; trials?: string }) => {
+    try {
+      const { scorePolicyConsistency, scanPolicyConsistency } = await import("./score/policyConsistency.js");
+      const scan = scanPolicyConsistency();
+      const result = scorePolicyConsistency({ trials: [], k: parseInt(opts.trials || "10") });
+      if (opts.json) { console.log(JSON.stringify({ ...result, scan }, null, 2)); return; }
+      console.log(chalk.bold.hex("#FF6600")("\n⚖️   Policy Consistency (pass^k)"));
+      console.log(chalk.gray("Consistency score:"), result.consistencyScore.toFixed(4));
+      console.log(chalk.gray("Pass rate:"), `${(result.passRate * 100).toFixed(1)}%`);
+      console.log(chalk.gray("Pass^k:"), result.passK.toFixed(6));
+      console.log(chalk.gray("Trials:"), result.totalTrials);
+    } catch (e: any) { console.error(chalk.red(e.message)); process.exit(1); }
+  });
+
+score
+  .command("autonomy-duration")
+  .description("Track time between human checkpoints with domain risk profiles")
+  .option("--json", "Output as JSON")
+  .action(async (opts: { json?: boolean }) => {
+    try {
+      const { scoreAutonomyDuration } = await import("./score/autonomyDuration.js");
+      const result = scoreAutonomyDuration({ sessions: [], domainRiskProfile: "standard" });
+      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
+      console.log(chalk.bold.hex("#FF6600")("\n⏱️   Autonomy Duration"));
+      console.log(chalk.gray("Score:"), result.score.toFixed(2));
+      console.log(chalk.gray("Avg duration (min):"), result.avgDurationMinutes.toFixed(1));
+      console.log(chalk.gray("Max duration (min):"), result.maxDurationMinutes.toFixed(1));
+      console.log(chalk.gray("Checkpoint quality:"), result.checkpointQuality.toFixed(2));
+      console.log(chalk.gray("Risk profile:"), result.domainRiskProfile);
+    } catch (e: any) { console.error(chalk.red(e.message)); process.exit(1); }
+  });
+
+score
+  .command("pause-quality")
+  .description("Score quality of agent-initiated pauses (reason, timing, context)")
+  .option("--json", "Output as JSON")
+  .action(async (opts: { json?: boolean }) => {
+    try {
+      const { scorePauseQuality } = await import("./score/pauseQuality.js");
+      const result = scorePauseQuality({ pauses: [] });
+      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
+      console.log(chalk.bold.hex("#FF6600")("\n⏸️   Pause Quality"));
+      console.log(chalk.gray("Score:"), result.score.toFixed(2));
+      console.log(chalk.gray("Total pauses:"), result.totalPauses);
+      console.log(chalk.gray("Appropriate pauses:"), result.appropriatePauses);
+      console.log(chalk.gray("Missed pauses:"), result.missedPauses);
+    } catch (e: any) { console.error(chalk.red(e.message)); process.exit(1); }
+  });
+
+score
+  .command("task-horizon")
+  .description("Score task-completion time horizon (METR-inspired)")
+  .option("--json", "Output as JSON")
+  .action(async (opts: { json?: boolean }) => {
+    try {
+      const { scoreTaskHorizon } = await import("./score/taskHorizon.js");
+      const result = scoreTaskHorizon({ tasks: [] });
+      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
+      console.log(chalk.bold.hex("#FF6600")("\n🎯  Task Horizon"));
+      console.log(chalk.gray("Score:"), result.score.toFixed(2));
+      console.log(chalk.gray("Avg horizon (min):"), result.avgHorizonMinutes.toFixed(1));
+      console.log(chalk.gray("Max horizon (min):"), result.maxHorizonMinutes.toFixed(1));
+      console.log(chalk.gray("Completion rate:"), `${(result.completionRate * 100).toFixed(1)}%`);
+    } catch (e: any) { console.error(chalk.red(e.message)); process.exit(1); }
+  });
+
+score
+  .command("factuality")
+  .description("Score factuality across parametric, retrieval, and grounded dimensions (FACTS/DeepMind)")
+  .option("--json", "Output as JSON")
+  .action(async (opts: { json?: boolean }) => {
+    try {
+      const { scoreFactuality } = await import("./score/factuality.js");
+      const result = scoreFactuality({ claims: [] });
+      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
+      console.log(chalk.bold.hex("#FF6600")("\n📚  Factuality"));
+      console.log(chalk.gray("Score:"), result.score.toFixed(2));
+      console.log(chalk.gray("Parametric:"), result.parametric.toFixed(2));
+      console.log(chalk.gray("Retrieval:"), result.retrieval.toFixed(2));
+      console.log(chalk.gray("Grounded:"), result.grounded.toFixed(2));
+      console.log(chalk.gray("Claims verified:"), result.claimsVerified);
+      console.log(chalk.gray("Claims refuted:"), result.claimsRefuted);
+    } catch (e: any) { console.error(chalk.red(e.message)); process.exit(1); }
+  });
+
+score
+  .command("alignment-index")
+  .description("Compute composite alignment index across safety, honesty, helpfulness, harm-avoidance")
+  .option("--json", "Output as JSON")
+  .action(async (opts: { json?: boolean }) => {
+    try {
+      const { computeAlignmentIndex } = await import("./score/alignmentIndex.js");
+      const result = computeAlignmentIndex({ dimensions: [] });
+      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
+      console.log(chalk.bold.hex("#FF6600")("\n🧭  Alignment Index"));
+      console.log(chalk.gray("Composite:"), result.composite.toFixed(2), chalk.gray(`(${result.grade})`));
+      for (const d of result.dimensions || []) {
+        console.log(chalk.gray(`  ${d.name}:`), d.score.toFixed(2));
+      }
+    } catch (e: any) { console.error(chalk.red(e.message)); process.exit(1); }
+  });
+
+score
+  .command("interpretability")
+  .description("Score structural transparency and explainability (DeepMind-inspired)")
+  .option("--json", "Output as JSON")
+  .action(async (opts: { json?: boolean }) => {
+    try {
+      const { scoreInterpretability } = await import("./score/interpretability.js");
+      const result = scoreInterpretability({ events: [] });
+      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
+      console.log(chalk.bold.hex("#FF6600")("\n🔍  Interpretability"));
+      console.log(chalk.gray("Score:"), result.score.toFixed(2));
+      console.log(chalk.gray("Explanation coverage:"), `${(result.explanationCoverage * 100).toFixed(1)}%`);
+      console.log(chalk.gray("Reasoning traces:"), result.hasReasoningTraces ? chalk.green("yes") : chalk.red("no"));
+    } catch (e: any) { console.error(chalk.red(e.message)); process.exit(1); }
+  });
+
+score
+  .command("memory-integrity")
+  .description("Score memory correction persistence and poisoning resistance")
+  .option("--json", "Output as JSON")
+  .action(async (opts: { json?: boolean }) => {
+    try {
+      const { scoreMemoryIntegrity } = await import("./score/memoryIntegrity.js");
+      const result = scoreMemoryIntegrity({ events: [] });
+      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
+      console.log(chalk.bold.hex("#FF6600")("\n🧠  Memory Integrity"));
+      console.log(chalk.gray("Score:"), result.score.toFixed(2));
+      console.log(chalk.gray("Correction persistence:"), `${(result.correctionPersistence * 100).toFixed(1)}%`);
+      console.log(chalk.gray("Poisoning resistance:"), result.poisoningResistance.toFixed(2));
+    } catch (e: any) { console.error(chalk.red(e.message)); process.exit(1); }
+  });
+
+score
+  .command("output-attestation")
+  .description("Score output signing and trust metadata for receiving agents (bidirectional trust)")
+  .option("--json", "Output as JSON")
+  .action(async (opts: { json?: boolean }) => {
+    try {
+      const { scoreOutputAttestation } = await import("./score/outputAttestation.js");
+      const result = scoreOutputAttestation({});
+      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
+      console.log(chalk.bold.hex("#FF6600")("\n📜  Output Attestation"));
+      console.log(chalk.gray("Score:"), result.score, chalk.gray(`(L${result.level})`));
+      console.log(chalk.gray("Output signing:"), result.hasOutputSigning ? chalk.green("yes") : chalk.red("no"));
+      console.log(chalk.gray("Trust level binding:"), result.hasTrustLevelBinding ? chalk.green("yes") : chalk.red("no"));
+      console.log(chalk.gray("Delegation chain tracking:"), result.hasDelegationChainTracking ? chalk.green("yes") : chalk.red("no"));
+      console.log(chalk.gray("Shield result binding:"), result.hasShieldResultBinding ? chalk.green("yes") : chalk.red("no"));
+      console.log(chalk.gray("Evidence decay:"), result.hasEvidenceDecay ? chalk.green("yes") : chalk.red("no"));
+      console.log(chalk.gray("Receiving agent verification:"), result.hasReceivingAgentVerification ? chalk.green("yes") : chalk.red("no"));
+      console.log(chalk.gray("Attestations issued:"), result.attestationsIssued);
+      console.log(chalk.gray("Avg effective trust:"), result.avgEffectiveTrust.toFixed(2));
+    } catch (e: any) { console.error(chalk.red(e.message)); process.exit(1); }
+  });
+
+score
+  .command("mutual-verification")
+  .description("Score agent-to-agent trust verification (challenge-response, weakest-link)")
+  .option("--json", "Output as JSON")
+  .action(async (opts: { json?: boolean }) => {
+    try {
+      const { scoreMutualVerification } = await import("./score/mutualVerification.js");
+      const result = scoreMutualVerification({});
+      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
+      console.log(chalk.bold.hex("#FF6600")("\n🤝  Mutual Verification"));
+      console.log(chalk.gray("Score:"), result.score, chalk.gray(`(L${result.level})`));
+      console.log(chalk.gray("Challenge-response:"), result.hasChallengeResponse ? chalk.green("yes") : chalk.red("no"));
+      console.log(chalk.gray("Nonce verification:"), result.hasNonceVerification ? chalk.green("yes") : chalk.red("no"));
+      console.log(chalk.gray("Protocol version check:"), result.hasProtocolVersionCheck ? chalk.green("yes") : chalk.red("no"));
+      console.log(chalk.gray("Score freshness check:"), result.hasScoreFreshnessCheck ? chalk.green("yes") : chalk.red("no"));
+      console.log(chalk.gray("Evidence chain verification:"), result.hasEvidenceChainVerification ? chalk.green("yes") : chalk.red("no"));
+      console.log(chalk.gray("Bidirectional attestation:"), result.hasBidirectionalAttestation ? chalk.green("yes") : chalk.red("no"));
+      console.log(chalk.gray("Weakest-link enforcement:"), result.hasWeakestLinkEnforcement ? chalk.green("yes") : chalk.red("no"));
+      console.log(chalk.gray("Verifications completed:"), result.verificationsCompleted);
+      console.log(chalk.gray("Avg mutual trust:"), result.avgMutualTrust.toFixed(2));
+    } catch (e: any) { console.error(chalk.red(e.message)); process.exit(1); }
+  });
+
+score
+  .command("transparency-log")
+  .description("Score network transparency log (Merkle tree, inclusion proofs, cross-agent verification)")
+  .option("--json", "Output as JSON")
+  .action(async (opts: { json?: boolean }) => {
+    try {
+      const { TransparencyLog } = await import("./score/networkTransparencyLog.js");
+      const log = new TransparencyLog();
+      const result = log.score();
+      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
+      console.log(chalk.bold.hex("#FF6600")("\n🌐  Network Transparency Log"));
+      console.log(chalk.gray("Score:"), result.score, chalk.gray(`(L${result.level})`));
+      console.log(chalk.gray("Append-only log:"), result.hasAppendOnlyLog ? chalk.green("yes") : chalk.red("no"));
+      console.log(chalk.gray("Hash chaining:"), result.hasHashChaining ? chalk.green("yes") : chalk.red("no"));
+      console.log(chalk.gray("Merkle tree:"), result.hasMerkleTree ? chalk.green("yes") : chalk.red("no"));
+      console.log(chalk.gray("Inclusion proofs:"), result.hasInclusionProofs ? chalk.green("yes") : chalk.red("no"));
+      console.log(chalk.gray("Consistency proofs:"), result.hasConsistencyProofs ? chalk.green("yes") : chalk.red("no"));
+      console.log(chalk.gray("Timestamp binding:"), result.hasTimestampBinding ? chalk.green("yes") : chalk.red("no"));
+      console.log(chalk.gray("Cross-agent verification:"), result.hasCrossAgentVerification ? chalk.green("yes") : chalk.red("no"));
+      console.log(chalk.gray("Log size:"), result.logSize);
+      console.log(chalk.gray("Chain intact:"), result.chainIntact ? chalk.green("yes") : chalk.red("no"));
+      console.log(chalk.gray("Merkle root:"), result.merkleRoot.slice(0, 16) + "...");
+    } catch (e: any) { console.error(chalk.red(e.message)); process.exit(1); }
+  });
+
 // Memory commands
 const memory = program.command("memory").description("Memory maturity assessment and management");
 memory.command("assess <agentId>").description("Full memory maturity assessment").option("--json", "JSON output").action(async (agentId: string, opts: { json?: boolean }) => {
