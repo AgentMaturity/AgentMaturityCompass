@@ -1,109 +1,34 @@
-version: "3.9"
+# AMC Full Stack — Docker Compose
+#
+# Usage:
+#   docker compose up
+#   Open http://localhost:3212 for Studio
+#
+# Services:
+#   - studio: AMC Studio dashboard + API (port 3212)
+#   - gateway: AMC Gateway proxy (port 3210)
 
 services:
-  amc-notary:
+  studio:
     build:
       context: ../..
-      dockerfile: Dockerfile
-    image: amc-studio:local
-    container_name: amc-notary
-    restart: unless-stopped
-    command: ["node", "dist/cli.js", "notary", "start", "--notary-dir", "/data/notary", "--workspace", "/data/amc"]
-    environment:
-      AMC_NOTARY_DIR: /data/notary
-      AMC_NOTARY_PASSPHRASE_FILE: /run/secrets/amc_notary_passphrase
-      AMC_NOTARY_AUTH_SECRET_FILE: /run/secrets/amc_notary_auth_secret
-    expose:
-      - "4343"
-    volumes:
-      - amc_notary_data:/data/notary
-      - amc_data:/data/amc:ro
-    secrets:
-      - amc_notary_passphrase
-      - amc_notary_auth_secret
-    healthcheck:
-      test:
-        [
-          "CMD",
-          "node",
-          "-e",
-          "const http=require('node:http');const req=http.request({host:'127.0.0.1',port:4343,path:'/readyz',method:'GET'},(r)=>process.exit(r.statusCode>=200&&r.statusCode<300?0:1));req.on('error',()=>process.exit(1));req.end();"
-        ]
-      interval: 20s
-      timeout: 5s
-      retries: 5
-      start_period: 20s
-    read_only: true
-    tmpfs:
-      - /tmp
-    cap_drop:
-      - ALL
-
-  amc-studio:
-    build:
-      context: ../..
-      dockerfile: Dockerfile
-    image: amc-studio:local
-    container_name: amc-studio
-    restart: unless-stopped
-    environment:
-      AMC_BOOTSTRAP: ${AMC_BOOTSTRAP:-1}
-      AMC_WORKSPACE_DIR: /data/amc
-      AMC_BIND: 0.0.0.0
-      AMC_STUDIO_PORT: ${AMC_STUDIO_PORT:-3212}
-      AMC_GATEWAY_PORT: ${AMC_GATEWAY_PORT:-3210}
-      AMC_PROXY_PORT: ${AMC_PROXY_PORT:-3211}
-      AMC_TOOLHUB_PORT: ${AMC_TOOLHUB_PORT:-3213}
-      AMC_LAN_MODE: "true"
-      AMC_ALLOWED_CIDRS: ${AMC_ALLOWED_CIDRS:-127.0.0.1/32,192.168.0.0/16,10.0.0.0/8,172.16.0.0/12,::1/128}
-      AMC_QUERY_LEASE_CARRIER_ENABLED: ${AMC_QUERY_LEASE_CARRIER_ENABLED:-false}
-      AMC_ENABLE_NOTARY: ${AMC_ENABLE_NOTARY:-0}
-      AMC_NOTARY_BASE_URL: ${AMC_NOTARY_BASE_URL:-http://amc-notary:4343}
-      AMC_NOTARY_REQUIRED_ATTESTATION: ${AMC_NOTARY_REQUIRED_ATTESTATION:-SOFTWARE}
-      AMC_NOTARY_AUTH_SECRET_FILE: /run/secrets/amc_notary_auth_secret
-      AMC_VAULT_PASSPHRASE_FILE: /run/secrets/amc_vault_passphrase
-      AMC_BOOTSTRAP_OWNER_USERNAME_FILE: /run/secrets/amc_owner_username
-      AMC_BOOTSTRAP_OWNER_PASSWORD_FILE: /run/secrets/amc_owner_password
-    depends_on:
-      amc-notary:
-        condition: service_healthy
+      dockerfile: deploy/compose/Dockerfile
     ports:
-      - "${AMC_GATEWAY_PORT:-3210}:${AMC_GATEWAY_PORT:-3210}"
-      - "${AMC_PROXY_PORT:-3211}:${AMC_PROXY_PORT:-3211}"
-      - "${AMC_STUDIO_PORT:-3212}:${AMC_STUDIO_PORT:-3212}"
+      - "3212:3212"
+      - "3210:3210"
     volumes:
-      - amc_data:/data/amc
-    secrets:
-      - amc_vault_passphrase
-      - amc_owner_username
-      - amc_owner_password
-      - amc_notary_auth_secret
+      - amc-data:/root/.amc
+    environment:
+      - AMC_STUDIO_PORT=3212
+      - AMC_GATEWAY_PORT=3210
+      - NODE_ENV=production
+    command: ["node", "dist/cli.js", "up", "--non-interactive"]
     healthcheck:
-      test: ["CMD", "node", "dist/cli.js", "studio", "healthcheck", "--workspace", "/data/amc"]
+      test: ["CMD", "curl", "-f", "http://localhost:3212/health"]
       interval: 30s
-      timeout: 5s
-      retries: 5
-      start_period: 20s
-    read_only: true
-    tmpfs:
-      - /tmp
-    cap_drop:
-      - ALL
+      timeout: 10s
+      retries: 3
+      start_period: 10s
 
 volumes:
-  amc_data:
-    name: amc_data
-  amc_notary_data:
-    name: amc_notary_data
-
-secrets:
-  amc_vault_passphrase:
-    file: ./secrets/amc_vault_passphrase.txt
-  amc_owner_username:
-    file: ./secrets/amc_owner_username.txt
-  amc_owner_password:
-    file: ./secrets/amc_owner_password.txt
-  amc_notary_passphrase:
-    file: ./secrets/amc_notary_passphrase.txt
-  amc_notary_auth_secret:
-    file: ./secrets/amc_notary_auth_secret.txt
+  amc-data:
