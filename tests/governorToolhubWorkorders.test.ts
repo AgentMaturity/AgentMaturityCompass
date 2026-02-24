@@ -475,6 +475,7 @@ describe("governor + toolhub + workorders", () => {
 
     const cfg = defaultGatewayConfig();
     cfg.listen.port = await pickFreePort();
+    cfg.proxy.port = await pickFreePort();
     cfg.routes = [{ prefix: "/openai", upstream: "openai", stripPrefix: true, openaiCompatible: true }];
     cfg.upstreams = {
       openai: {
