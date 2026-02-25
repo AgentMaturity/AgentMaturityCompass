@@ -281,7 +281,7 @@ svg { display: block; }
    ════════════════════════════════════════════════════ */
 .dim-row { display: flex; align-items: center; gap: 10px; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,.025); }
 .dim-row:last-child { border-bottom: none; }
-.dim-nm { width: 120px; flex-shrink: 0; font: 400 11px/1.2 var(--sans); color: var(--t2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dim-nm { flex: 0 0 auto; max-width: 160px; font: 400 11px/1.2 var(--sans); color: var(--t2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: help; }
 .dim-trk { flex: 1; height: 6px; background: var(--inset); border-radius: 3px; position: relative; overflow: visible; }
 .dim-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg, var(--g3) 0%, var(--g2) 50%, var(--g) 100%); box-shadow: 0 0 8px var(--g-glow); transition: width 1.4s cubic-bezier(.4,0,.2,1); }
 .dim-tgt { position: absolute; top: -4px; bottom: -4px; width: 2px; background: var(--amber); border-radius: 1px; opacity: .8; transition: left 1.4s cubic-bezier(.4,0,.2,1); }
@@ -290,10 +290,10 @@ svg { display: block; }
 /* ════════════════════════════════════════════════════
    STAT STRIP — differentiated by importance
    ════════════════════════════════════════════════════ */
-.stat { background: var(--card); border: 1px solid var(--bdr); border-radius: var(--r2); padding: 14px 16px; transition: border-color var(--ease); }
-.stat:hover { border-color: var(--bdr2); }
+.stat { background: var(--card); border: 1px solid var(--bdr); border-radius: var(--r2); padding: 14px 16px; transition: border-color var(--ease), transform var(--ease), box-shadow var(--ease); cursor: default; }
+.stat:hover { border-color: var(--bdr2); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,.3); }
 .stat-n { font: 700 20px/1 var(--mono); color: var(--t0); }
-.stat-l { font: 400 10px/1 var(--sans); color: var(--t3); text-transform: uppercase; letter-spacing: .07em; margin-top: 3px; }
+.stat-l { font: 400 10px/1 var(--sans); color: var(--t3); text-transform: uppercase; letter-spacing: .08em; margin-top: 3px; }
 /* Risk stat gets amber treatment */
 .stat.risk .stat-n { color: var(--amber); }
 .stat.risk { border-color: var(--a-line); background: var(--a-dim); }
@@ -301,11 +301,11 @@ svg { display: block; }
 /* ════════════════════════════════════════════════════
    RADAR SVG
    ════════════════════════════════════════════════════ */
-.radar-shape { fill: rgba(0,255,65,.07); stroke: var(--g); stroke-width: 1.5; stroke-linejoin: round; filter: drop-shadow(0 0 6px rgba(0,255,65,.25)); opacity: 0; transition: opacity .8s ease; }
+.radar-shape { fill: rgba(0,255,65,.07); stroke: var(--g); stroke-width: 1.5; stroke-linejoin: round; opacity: 0; transition: opacity .8s ease; }
 .radar-shape.show { opacity: 1; }
 .radar-grid-ring { fill: none; stroke: var(--bdr2); stroke-width: .8; }
 .radar-axis-line { stroke: var(--bdr); stroke-width: .8; }
-.radar-dot { fill: var(--g); filter: drop-shadow(0 0 3px var(--g-glow)); }
+.radar-dot { fill: var(--g); }
 .radar-lbl { font: 500 10px var(--sans); fill: var(--t2); }
 
 /* ════════════════════════════════════════════════════
@@ -332,11 +332,21 @@ svg { display: block; }
 .tl-tip.v { opacity: 1; }
 
 /* ════════════════════════════════════════════════════
-   ASSURANCE CARDS
+   ASSURANCE SUMMARY BARS (overview — replaces donuts for legibility)
+   ════════════════════════════════════════════════════ */
+.asr-bar-item { display: flex; align-items: center; gap: 10px; padding: 7px 0; border-bottom: 1px solid rgba(255,255,255,.025); }
+.asr-bar-item:last-child { border-bottom: none; }
+.asr-bar-nm { width: 150px; flex-shrink: 0; font: 500 11px/1.2 var(--sans); color: var(--t1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.asr-bar-trk { flex: 1; height: 5px; background: var(--inset); border-radius: 3px; overflow: hidden; }
+.asr-bar-fill { height: 100%; border-radius: 3px; transition: width 1s cubic-bezier(.4,0,.2,1); }
+.asr-bar-pct { width: 36px; text-align: right; flex-shrink: 0; font: 600 11px/1 var(--mono); }
+
+/* ════════════════════════════════════════════════════
+   ASSURANCE CARDS (full page — keeps donuts)
    ════════════════════════════════════════════════════ */
 .asr-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px,1fr)); gap: 8px; }
-.asr-card { background: var(--inset); border: 1px solid var(--bdr); border-radius: var(--r); padding: 12px; display: flex; align-items: center; gap: 12px; transition: all var(--ease); }
-.asr-card:hover { border-color: var(--bdr2); background: var(--card2); }
+.asr-card { background: var(--inset); border: 1px solid var(--bdr); border-radius: var(--r); padding: 12px; display: flex; align-items: center; gap: 12px; transition: all var(--ease); cursor: pointer; }
+.asr-card:hover { border-color: var(--bdr2); background: var(--card2); transform: translateY(-1px); }
 .asr-donut { width: 44px; height: 44px; flex-shrink: 0; }
 .donut-bg { fill: none; stroke: var(--inset); }
 .donut-fill { fill: none; stroke-linecap: round; transition: stroke-dashoffset .9s cubic-bezier(.4,0,.2,1); }
@@ -451,6 +461,19 @@ svg { display: block; }
    ════════════════════════════════════════════════════ */
 @keyframes up { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:none; } }
 .fade { animation: up .3s cubic-bezier(.4,0,.2,1) both; }
+
+/* Skeleton loading */
+@keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+.skel {
+  background: linear-gradient(90deg, var(--inset) 25%, rgba(255,255,255,.04) 50%, var(--inset) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+  border-radius: var(--r);
+}
+.skel-ring { width: 148px; height: 148px; border-radius: 50%; }
+.skel-bar { height: 6px; border-radius: 3px; margin: 10px 0; }
+.skel-stat { height: 52px; border-radius: var(--r2); }
+.skel-chart { height: 170px; border-radius: var(--r2); }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration:.01ms!important; transition-duration:.01ms!important; }

@@ -75,7 +75,7 @@ function renderDims(d) {
   if(!layers.length){el.innerHTML='<div class="empty"><span class="empty-i">📊</span><span class="empty-t">No data</span></div>';return;}
   el.innerHTML=layers.map(l=>{
     const pct=(l.avgFinalLevel/5)*100;
-    const short=l.layerName.split(' ').slice(0,2).join(' ');
+    const short=l.layerName.replace(/ & .*$/, '').replace(/ Agent.*$/, '').replace(/ Operations.*$/, '');
     return `<div class="dim-row">
       <span class="dim-nm" title="${esc(l.layerName)}">${esc(short)}</span>
       <div class="dim-trk">
@@ -110,7 +110,7 @@ function renderRadar(d) {
   const layers=d.latestRun?.layerScores||[];
   if(!layers.length)return;
   const el=document.getElementById('radar-mount');
-  const W=260,H=240,cx=W/2,cy=H/2,R=78,n=layers.length;
+  const W=260,H=280,cx=W/2,cy=H/2+4,R=100,n=layers.length;
   const angle=(i)=>(2*Math.PI*i/n)-Math.PI/2;
   const pt=(r,i)=>[cx+Math.cos(angle(i))*r, cy+Math.sin(angle(i))*r];
 
@@ -136,10 +136,11 @@ function renderRadar(d) {
   }).join('');
 
   const labels=layers.map((l,i)=>{
-    const [x,y]=pt(R+24,i);
+    const [x,y]=pt(R+26,i);
     const anch=x<cx-4?'end':x>cx+4?'start':'middle';
     const short=l.layerName.split(' ')[0];
-    return `<text class="radar-lbl" x="${x}" y="${y+3}" text-anchor="${anch}">${esc(short)}</text>`;
+    return `<text class="radar-lbl" x="${x}" y="${y+3}" text-anchor="${anch}">${esc(short)}</text>
+      <text x="${x}" y="${y+14}" text-anchor="${anch}" font-size="9" font-family="JetBrains Mono,monospace" fill="var(--g)" opacity=".7">${l.avgFinalLevel.toFixed(1)}</text>`;
   }).join('');
 
   // Ring level numbers
@@ -148,7 +149,7 @@ function renderRadar(d) {
     return `<text x="${cx+3}" y="${cy-rr-2}" font-size="8" font-family="JetBrains Mono,monospace" fill="rgba(0,255,65,.3)" text-anchor="start">${r}</text>`;
   }).join('');
 
-  el.innerHTML=`<svg viewBox="-24 -20 ${W+48} ${H+40}" style="width:100%;max-height:230px;overflow:visible">
+  el.innerHTML=`<svg viewBox="-28 -12 ${W+56} ${H+28}" style="width:100%;max-height:290px;overflow:visible">
     ${rings}${axes}
     <polygon class="radar-shape" id="radar-poly" points="${dpts.join(' ')}"/>
     ${rnums}${dots}${labels}
@@ -214,50 +215,57 @@ function renderTimeline(d) {
   });
 }
 
-/* ── ASSURANCE SUMMARY ────────────────────────────── */
-function asrCard(p){
-  const pct=p.score0to100/100, circ=2*Math.PI*17, off=circ*(1-pct);
-  const col=pct>=.8?'var(--g)':pct>=.6?'var(--amber)':'var(--red)';
-  const short=p.packId.replace(/Pack$/,'').replace(/([A-Z])/g,' $1').trim();
-  return `<div class="asr-card">
-    <svg class="asr-donut" viewBox="0 0 40 40">
-      <circle class="donut-bg" cx="20" cy="20" r="17" stroke-width="5"/>
-      <circle class="donut-fill" cx="20" cy="20" r="17" stroke-width="5" stroke="${col}"
-        stroke-dasharray="${circ.toFixed(2)}" stroke-dashoffset="${off.toFixed(2)}"
-        transform="rotate(-90 20 20)"/>
-      <text class="donut-pct" x="20" y="21">${Math.round(pct*100)}%</text>
-    </svg>
-    <div class="asr-info">
-      <div class="asr-name" title="${esc(p.packId)}">${esc(short)}</div>
-      <div class="asr-sub">✓${p.passCount} ✗${p.failCount}</div>
-    </div>
-  </div>`;
-}
+/* ── ASSURANCE SUMMARY (overview — horizontal bars) ── */
 function renderAsrSummary(d){
   const el=document.getElementById('asr-summary');
   const packs=d.assurance||[];
   if(!packs.length){el.innerHTML='<div class="empty"><span class="empty-i">🛡️</span><span class="empty-t">No assurance runs</span></div>';return;}
-  el.innerHTML=`<div class="asr-grid">${packs.map(asrCard).join('')}</div>`;
+  el.innerHTML=packs.map(p=>{
+    const pct=p.score0to100;
+    const col=pct>=80?'var(--g)':pct>=60?'var(--amber)':'var(--red)';
+    const short=p.packId.replace(/Pack$/,'').replace(/([A-Z])/g,' $1').trim();
+    return `<div class="asr-bar-item">
+      <span class="asr-bar-nm" title="${esc(p.packId)}">${esc(short)}</span>
+      <div class="asr-bar-trk"><div class="asr-bar-fill" style="width:${pct}%;background:${col}"></div></div>
+      <span class="asr-bar-pct" style="color:${col}">${Math.round(pct)}%</span>
+    </div>`;
+  }).join('');
 }
 
 /* ── APPROVALS ────────────────────────────────────── */
 function renderApprovals(d){
   const a=d.approvalsSummary||{};
+  const denied=a.denied||0;
+  const action=denied>0?`<div style="margin-top:10px;text-align:center"><a href="#evidence" class="sb-link" data-s="evidence" style="display:inline;padding:4px 10px;font:500 10px/1 var(--sans);color:var(--amber);border:1px solid var(--a-line);border-radius:4px;background:var(--a-dim)">${denied} denied → Review</a></div>`:'';
   document.getElementById('ap-mount').innerHTML=`<div class="ap-row">
     <div class="ap-c"><div class="ap-n">${a.approved||0}</div><div class="ap-l">Approved</div></div>
-    <div class="ap-c"><div class="ap-n" style="color:var(--red)">${a.denied||0}</div><div class="ap-l">Denied</div></div>
+    <div class="ap-c"><div class="ap-n" style="color:var(--red)">${denied}</div><div class="ap-l">Denied</div></div>
     <div class="ap-c"><div class="ap-n" style="color:var(--amber)">${a.replayAttempts||0}</div><div class="ap-l">Replays</div></div>
-  </div>`;
+  </div>${action}`;
+  // Wire up the review link
+  const link=document.querySelector('#ap-mount a[data-s]');
+  if(link) link.addEventListener('click',e=>{e.preventDefault();nav('evidence');});
 }
 
 /* ── VALUE ────────────────────────────────────────── */
 function renderValue(d){
   const v=d.valueSummary||{};
-  const keys=[['valueScore','Value Score'],['economicSignificanceIndex','Economic Sig.'],['valueRegressionRisk','Regression Risk']];
-  document.getElementById('val-mount').innerHTML=keys.map(([k,lbl])=>{
+  const keys=[
+    ['valueScore','Value Score'],
+    ['economicSignificanceIndex','Economic Sig.'],
+    ['valueRegressionRisk','Regression Risk'],
+  ];
+  const rows=keys.map(([k,lbl])=>{
     const val=typeof v[k]==='number'?v[k].toFixed(2):'—';
-    return `<div class="val-row"><span class="val-k">${esc(lbl)}</span><span class="val-v">${esc(val)}</span></div>`;
+    const col=k==='valueRegressionRisk'?(parseFloat(val)>0.3?'var(--amber)':'var(--g)'):'var(--t0)';
+    return `<div class="val-row"><span class="val-k">${esc(lbl)}</span><span class="val-v" style="color:${col}">${esc(val)}</span></div>`;
   }).join('');
+  // Add a mini bar for value score
+  const vs=typeof v.valueScore==='number'?v.valueScore:0;
+  const vsPct=Math.min(100,vs);
+  const vsCol=vs>=70?'var(--g)':vs>=40?'var(--amber)':'var(--red)';
+  document.getElementById('val-mount').innerHTML=rows+
+    `<div style="margin-top:8px"><div class="asr-bar-trk"><div class="asr-bar-fill" style="width:${vsPct}%;background:${vsCol}"></div></div></div>`;
 }
 
 /* ── HEATMAP ──────────────────────────────────────── */
@@ -324,6 +332,24 @@ function selQ(qid){
 }
 
 /* ── ASSURANCE FULL ───────────────────────────────── */
+function asrCard(p){
+  const pct=p.score0to100/100, circ=2*Math.PI*17, off=circ*(1-pct);
+  const col=pct>=.8?'var(--g)':pct>=.6?'var(--amber)':'var(--red)';
+  const short=p.packId.replace(/Pack$/,'').replace(/([A-Z])/g,' $1').trim();
+  return `<div class="asr-card">
+    <svg class="asr-donut" viewBox="0 0 40 40">
+      <circle class="donut-bg" cx="20" cy="20" r="17" stroke-width="5"/>
+      <circle class="donut-fill" cx="20" cy="20" r="17" stroke-width="5" stroke="${col}"
+        stroke-dasharray="${circ.toFixed(2)}" stroke-dashoffset="${off.toFixed(2)}"
+        transform="rotate(-90 20 20)"/>
+      <text class="donut-pct" x="20" y="21">${Math.round(pct*100)}%</text>
+    </svg>
+    <div class="asr-info">
+      <div class="asr-name" title="${esc(p.packId)}">${esc(short)}</div>
+      <div class="asr-sub">✓${p.passCount} ✗${p.failCount}</div>
+    </div>
+  </div>`;
+}
 function buildAf(){
   G.af=true;
   const packs=G.data.assurance||[];
