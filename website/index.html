@@ -69,22 +69,67 @@ body::before{content:'';position:fixed;inset:0;z-index:9990;
   will-change:left,top}
 
 /* NAV */
-#nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:.9rem 0;transition:background .3s,border-color .3s}
-#nav.s{background:rgba(1,8,1,.94);backdrop-filter:blur(20px);border-bottom:1px solid var(--bdr)}
+#nav{position:fixed;top:0;left:0;right:0;z-index:9996;padding:0;transition:background .3s,border-color .3s;
+  border-bottom:1px solid rgba(0,255,65,.06)}
+#nav.s{background:rgba(1,8,1,.95);backdrop-filter:blur(20px);border-bottom:1px solid var(--bdr)}
 .nw{max-width:var(--max);margin:0 auto;padding:0 clamp(1.25rem,4vw,2.5rem);
-  display:flex;align-items:center;justify-content:space-between}
-.nlogo{font:700 .88rem/1 var(--mono);color:var(--g);letter-spacing:.15em;
-  text-transform:uppercase;text-shadow:var(--gsm)}
-.nlogo span{color:var(--t3);font-weight:400}
-.nlinks{display:flex;align-items:center;gap:1.75rem;list-style:none}
-.nlinks a{font:500 .68rem/1 var(--mono);color:var(--t3);letter-spacing:.1em;
-  text-transform:uppercase;transition:color .2s}
+  display:flex;align-items:center;justify-content:space-between;height:60px}
+.nlogo{font:700 1rem/1 var(--mono);color:var(--g);letter-spacing:.15em;
+  text-transform:uppercase;text-shadow:var(--gsm);display:flex;align-items:center;gap:.5rem}
+.nlogo span{color:var(--t2);font-weight:400;font-size:.75rem}
+.nlinks{display:flex;align-items:center;gap:2rem;list-style:none}
+.nlinks a{font:500 .78rem/1 var(--mono);color:var(--t1);letter-spacing:.1em;
+  text-transform:uppercase;transition:color .2s;padding:.5rem 0}
 .nlinks a:hover{color:var(--g);opacity:1}
-.nbtn{color:var(--g)!important;border:1px solid var(--bdr2)!important;
-  padding:.45rem 1rem!important;letter-spacing:.1em;text-transform:uppercase;
-  transition:box-shadow .2s,border-color .2s!important;font-size:.68rem!important;font-family:var(--mono)!important;font-weight:600!important}
-.nbtn:hover{box-shadow:var(--gsm);border-color:var(--g)!important;opacity:1!important}
-@media(max-width:700px){.nh{display:none}}
+.nbtn{color:var(--black)!important;background:var(--g)!important;border:none!important;
+  padding:.55rem 1.25rem!important;letter-spacing:.1em;text-transform:uppercase;
+  transition:box-shadow .2s,background .2s!important;font-size:.68rem!important;font-family:var(--mono)!important;font-weight:700!important;
+  border-radius:3px!important;text-shadow:none!important}
+.nbtn:hover{box-shadow:0 0 16px rgba(0,255,65,.3);background:#00dd38!important;opacity:1!important}
+
+/* Hamburger menu button */
+.menu-btn{display:none;background:none;border:1px solid var(--bdr2);padding:.5rem;
+  cursor:pointer;width:44px;height:44px;align-items:center;justify-content:center;border-radius:3px;flex-shrink:0;
+  transition:border-color .2s}
+.menu-btn:hover{border-color:var(--g)}
+.menu-btn span{display:block;width:20px;height:2px;background:var(--g);position:relative;transition:transform .2s}
+.menu-btn span::before,.menu-btn span::after{content:'';position:absolute;left:0;width:20px;height:2px;background:var(--g);transition:transform .2s}
+.menu-btn span::before{top:-7px}
+.menu-btn span::after{top:7px}
+.menu-btn.open span{background:transparent}
+.menu-btn.open span::before{transform:rotate(45deg);top:0}
+.menu-btn.open span::after{transform:rotate(-45deg);top:0}
+
+/* Mobile nav overlay */
+.nav-mobile{display:none;position:fixed;top:0;left:0;right:0;bottom:0;
+  background:rgba(0,3,0,.98);z-index:9995;
+  flex-direction:column;align-items:center;justify-content:center;gap:2.5rem;
+  padding:2rem}
+.nav-mobile.open{display:flex!important}
+.nav-mobile a{font:600 1.15rem/1 var(--mono);color:rgba(255,255,255,.9);letter-spacing:.15em;
+  text-transform:uppercase;padding:1rem 2rem;transition:color .2s;text-align:center;
+  min-height:52px;display:flex;align-items:center;border-bottom:1px solid rgba(255,255,255,.05);width:100%;justify-content:center;max-width:280px}
+.nav-mobile a:hover{color:var(--g)}
+.nav-mobile .nbtn{font-size:.88rem!important;padding:1rem 2.5rem!important;margin-top:1.5rem;
+  min-height:52px;width:auto;border-bottom:none!important}
+.nm-top{position:absolute;top:0;left:0;right:0;height:52px;display:flex;align-items:center;
+  justify-content:space-between;padding:0 1.25rem;border-bottom:1px solid rgba(255,255,255,.06)}
+.nm-logo{font:700 1rem/1 var(--mono);color:var(--g);letter-spacing:.15em;text-transform:uppercase}
+.nm-close{background:none;border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.7);
+  width:40px;height:40px;display:flex;align-items:center;justify-content:center;
+  cursor:pointer;font-size:1.1rem;border-radius:3px;transition:color .2s,border-color .2s}
+.nm-close:hover{color:#fff;border-color:rgba(255,255,255,.4)}
+
+@media(max-width:700px){
+  .nh{display:none}
+  .menu-btn{display:flex}
+  .nlogo span{display:none}
+  .nlogo{font-size:.9rem}
+  .nw{height:52px}
+  .nlinks{gap:1rem}
+  .nlinks .nbtn{display:none}
+  .nav-mobile{top:52px}
+}
 
 /* TOGGLE */
 .toggle-wrap{display:flex;justify-content:center;margin-bottom:3rem}
@@ -669,9 +714,14 @@ a:focus-visible,.bp:focus-visible,.bg:focus-visible,.nbtn:focus-visible,
   /* Nav */
   .nlinks{gap:.75rem}
   .nh{display:none}
-  .nlogo{font-size:.82rem}
+  .nlogo{font-size:1rem}
+  .nlogo span{display:none}
   .nbtn{padding:.45rem .875rem!important;font-size:.62rem!important}
-  #nav{padding:.7rem 0}
+  #nav{padding:0}
+  .nw{height:52px}
+  .menu-btn{display:flex}
+  .nlinks .nbtn{display:none}
+  .nav-mobile{top:52px}
   
   /* Hero */
   .h1s{font-size:clamp(1.8rem,8vw,2.6rem)!important;letter-spacing:-.02em}
@@ -932,8 +982,21 @@ a:focus-visible,.bp:focus-visible,.bg:focus-visible,.nbtn:focus-visible,
       <li class="nh"><a href="#euact">EU AI Act</a></li>
       <li><a href="https://github.com/thewisecrab/AgentMaturityCompass" class="nbtn" target="_blank" rel="noopener">GitHub ↗</a></li>
     </ul>
+    <button class="menu-btn" id="menu-btn" aria-label="Toggle menu" aria-expanded="false"><span></span></button>
   </div>
 </nav>
+<div class="nav-mobile" id="nav-mobile" aria-hidden="true">
+  <div class="nm-top">
+    <span class="nm-logo">🧭 AMC</span>
+    <button class="nm-close" id="nm-close" aria-label="Close menu">✕</button>
+  </div>
+  <a href="#platform">Platform</a>
+  <a href="#how">How It Works</a>
+  <a href="#scale">Maturity Scale</a>
+  <a href="#research">Research</a>
+  <a href="#euact">EU AI Act</a>
+  <a href="https://github.com/thewisecrab/AgentMaturityCompass" class="nbtn" target="_blank" rel="noopener">View on GitHub ↗</a>
+</div>
 
 <main>
 
@@ -1639,6 +1702,39 @@ window.addEventListener('resize', () => {
     el.addEventListener('mouseenter', () => { ring.style.width='46px'; ring.style.height='46px'; ring.style.borderColor='rgba(0,255,65,.65)'; });
     el.addEventListener('mouseleave', () => { ring.style.width='32px'; ring.style.height='32px'; ring.style.borderColor='rgba(0,255,65,.35)'; });
   });
+})();
+
+/* ── HAMBURGER MENU TOGGLE ──────────────────────── */
+(function(){
+  const btn = document.getElementById('menu-btn');
+  const overlay = document.getElementById('nav-mobile');
+  const closeBtn = document.getElementById('nm-close');
+  if(!btn || !overlay) return;
+
+  function openMenu(){
+    btn.classList.add('open');
+    overlay.style.display = 'flex';
+    overlay.classList.add('open');
+    overlay.setAttribute('aria-hidden', 'false');
+    btn.setAttribute('aria-expanded', 'true');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeMenu(){
+    btn.classList.remove('open');
+    overlay.classList.remove('open');
+    overlay.style.display = 'none';
+    overlay.setAttribute('aria-hidden', 'true');
+    btn.setAttribute('aria-expanded', 'false');
+    document.body.style.overflow = '';
+  }
+
+  btn.addEventListener('click', () => btn.classList.contains('open') ? closeMenu() : openMenu());
+  if(closeBtn) closeBtn.addEventListener('click', closeMenu);
+
+  overlay.querySelectorAll('a').forEach(a => a.addEventListener('click', closeMenu));
+
+  // Close on Escape
+  document.addEventListener('keydown', e => { if(e.key === 'Escape') closeMenu(); });
 })();
 
 /* ── NAV SCROLL + STICKY + PROGRESS ─────────────── */
