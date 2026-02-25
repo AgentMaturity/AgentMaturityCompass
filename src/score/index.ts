@@ -331,3 +331,18 @@ export type { LogEntry, LogEntryType, InclusionProof, TransparencyLogReport } fr
 
 export { scoreReasoningEfficiency } from "./reasoningEfficiency.js";
 export type { ReasoningEfficiencyResult } from "./reasoningEfficiency.js";
+
+export { scoreTrustAuthorizationSync } from "./trustAuthorizationSync.js";
+export type { TrustAuthorizationSyncResult } from "./trustAuthorizationSync.js";
+
+export { scoreMonitorBypassResistance } from "./monitorBypassResistance.js";
+export type { MonitorBypassResistanceResult } from "./monitorBypassResistance.js";
+
+export { scoreAdaptiveAccessControl } from "./adaptiveAccessControl.js";
+export type { AdaptiveAccessControlResult } from "./adaptiveAccessControl.js";
+
+export { scoreMemorySecurityArchitecture } from "./memorySecurityArchitecture.js";
+export type { MemorySecurityArchitectureResult } from "./memorySecurityArchitecture.js";
+
+export { scoreAgentProtocolSecurity } from "./agentProtocolSecurity.js";
+export type { AgentProtocolSecurityResult } from "./agentProtocolSecurity.js";

@@ -19,6 +19,14 @@ function dimensionIdForQuestion(qid: string): "D1" | "D2" | "D3" | "D4" | "D5" {
   if (qid.startsWith("AMC-RES-")) return "D4";
   if (qid.startsWith("AMC-SK-")) return "D4";
   if (qid.startsWith("AMC-THR-")) return "D4";
+  // 2026 research-derived questions
+  if (qid.startsWith("AMC-TAS-")) return "D4";
+  if (qid.startsWith("AMC-MBR-")) return "D4";
+  if (qid.startsWith("AMC-AAC-")) return "D4";
+  if (qid.startsWith("AMC-MSA-")) return "D4";
+  if (qid.startsWith("AMC-APS-")) return "D4";
+  if (qid.startsWith("AMC-ZAP-")) return "D4";
+  if (qid.startsWith("AMC-EAM-")) return "D4";
   return "D5";
 }
 
@@ -49,7 +57,7 @@ export function builtInCanon(): CompassCanon {
         { id: "D1", name: "Strategic Agent Operations", questionCount: 15 },
         { id: "D2", name: "Agent Leadership", questionCount: 18 },
         { id: "D3", name: "Agent Culture", questionCount: 20 },
-        { id: "D4", name: "Agent Resilience", questionCount: 19 },
+        { id: "D4", name: "Agent Resilience", questionCount: 26 },
         { id: "D5", name: "Agent Skills", questionCount: 39 }
       ],
       questions,

@@ -25,7 +25,7 @@ export const mechanicGapReportSchema = z.object({
   generatedTs: z.number().int().nonnegative(),
   scope: mechanicScopeSchema,
   readiness: z.enum(["READY", "NEEDS_EVIDENCE", "UNTRUSTED"]),
-  perQuestion: z.array(mechanicGapQuestionSchema).length(111),
+  perQuestion: z.array(mechanicGapQuestionSchema).length(118),
   perDimension: z.array(mechanicGapDimensionSchema).length(5),
   global: z.object({
     upgradeReadiness: z.enum(["READY", "NEEDS_EVIDENCE", "UNTRUSTED"]),

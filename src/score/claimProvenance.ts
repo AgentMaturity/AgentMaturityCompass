@@ -295,6 +295,8 @@ export class ClaimProvenanceRegistry implements ClaimProvenanceStore {
     quarantined: number;
     readyToPromote: number;
     trustWeightedScore: number;
+    independentVerificationRate: number;
+    narrativeLockInRisk: boolean;
   } {
     const agentClaims = this.getByAgent(agentId);
     const byTier = {
@@ -314,12 +316,22 @@ export class ClaimProvenanceRegistry implements ClaimProvenanceStore {
       }
     }
 
+    // Independent verification: USER_VERIFIED and DERIVED are independently verified;
+    // HYPOTHESIS, SESSION_LOCAL, REFERENCE_ONLY are self-reported
+    const independentlyVerified = byTier.USER_VERIFIED + byTier.DERIVED;
+    const independentVerificationRate = agentClaims.length > 0
+      ? independentlyVerified / agentClaims.length
+      : 0;
+    const narrativeLockInRisk = agentClaims.length > 0 && independentVerificationRate < 0.5;
+
     return {
       total: agentClaims.length,
       byTier,
       quarantined: agentClaims.filter(c => c.quarantined).length,
       readyToPromote,
       trustWeightedScore: agentClaims.length > 0 ? weightedSum / agentClaims.length : 0,
+      independentVerificationRate,
+      narrativeLockInRisk,
     };
   }
 

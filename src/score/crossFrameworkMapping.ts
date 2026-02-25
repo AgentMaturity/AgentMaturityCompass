@@ -5,7 +5,7 @@
  * compliance artifacts automatically from AMC assessment results."
  */
 
-export type ComplianceFramework = 'NIST_AI_RMF' | 'ISO_42001' | 'EU_AI_ACT' | 'SOC2_TYPE2' | 'GDPR';
+export type ComplianceFramework = 'NIST_AI_RMF' | 'ISO_42001' | 'EU_AI_ACT' | 'SOC2_TYPE2' | 'GDPR' | 'FORESIGHT_SAFETY' | 'AGENTIC_4C';
 
 export interface FrameworkControl {
   id: string;
@@ -73,12 +73,32 @@ const EU_AI_ACT_CONTROLS: FrameworkControl[] = [
   { id: 'EU-61', name: 'Conformity Assessment', description: 'Third-party conformity assessment', amcQIDs: ['AMC-2.11'], amcModules: ['assurance', 'certify'], automatable: false },
 ];
 
+// ForesightSafety Bench control mapping (94 risk dimensions, top 6 AMC-relevant)
+const FORESIGHT_SAFETY_CONTROLS: FrameworkControl[] = [
+  { id: 'FS-1', name: 'Autonomous Goal Pursuit Risk', description: 'Agent pursues goals beyond intended scope', amcQIDs: ['AMC-1.1', 'AMC-1.3'], amcModules: ['governor', 'graduatedAutonomy'], automatable: true },
+  { id: 'FS-2', name: 'Deceptive Alignment', description: 'Agent appears aligned during eval but diverges in deployment', amcQIDs: ['AMC-2.1', 'AMC-2.2'], amcModules: ['assurance', 'sleeperDetection'], automatable: true },
+  { id: 'FS-3', name: 'Cascading Failure Propagation', description: 'Single agent failure cascades through multi-agent system', amcQIDs: ['AMC-4.5'], amcModules: ['multiAgent', 'forecast'], automatable: true },
+  { id: 'FS-4', name: 'Resource Acquisition Beyond Mandate', description: 'Agent acquires compute/data/access beyond task needs', amcQIDs: ['AMC-1.5'], amcModules: ['enforce', 'costPredictability'], automatable: true },
+  { id: 'FS-5', name: 'Self-Replication Risk', description: 'Agent can spawn copies or persist beyond session', amcQIDs: ['AMC-2.5'], amcModules: ['sandbox', 'enforce'], automatable: true },
+  { id: 'FS-6', name: 'Manipulation of Oversight', description: 'Agent manipulates human oversight mechanisms', amcQIDs: ['AMC-HOQ-1', 'AMC-HOQ-2'], amcModules: ['humanOversight', 'transparency'], automatable: true },
+];
+
+// Agentic 4C Framework control mapping
+const AGENTIC_4C_CONTROLS: FrameworkControl[] = [
+  { id: '4C-CODE', name: 'Code of Conduct', description: 'Agent has explicit behavioral norms and ethical guidelines', amcQIDs: ['AMC-1.1', 'AMC-1.3'], amcModules: ['governor', 'policyPacks'], automatable: true },
+  { id: '4C-CONSTITUTION', name: 'Constitutional Constraints', description: 'Hard limits on agent capabilities enforced at system level', amcQIDs: ['AMC-1.5', 'AMC-2.5'], amcModules: ['enforce', 'sandbox'], automatable: true },
+  { id: '4C-COMPLIANCE', name: 'Regulatory Compliance', description: 'Agent operations comply with applicable regulations', amcQIDs: ['AMC-2.6', 'AMC-2.11'], amcModules: ['certify', 'audit'], automatable: true },
+  { id: '4C-COLLABORATION', name: 'Multi-Agent Collaboration Security', description: 'Secure protocols for inter-agent communication and trust', amcQIDs: ['AMC-3.1', 'AMC-3.2'], amcModules: ['multiAgent', 'crossAgentTrust'], automatable: true },
+];
+
 const FRAMEWORK_CONTROLS: Record<ComplianceFramework, FrameworkControl[]> = {
   NIST_AI_RMF: NIST_AI_RMF_CONTROLS,
   ISO_42001: ISO_42001_CONTROLS,
   EU_AI_ACT: EU_AI_ACT_CONTROLS,
   SOC2_TYPE2: [], // uses existing AMC audit binder
   GDPR: [],       // uses AMC Vault DSAR + data residency
+  FORESIGHT_SAFETY: FORESIGHT_SAFETY_CONTROLS,
+  AGENTIC_4C: AGENTIC_4C_CONTROLS,
 };
 
 const FRAMEWORK_ARTIFACTS: Record<ComplianceFramework, string[]> = {
@@ -87,6 +107,8 @@ const FRAMEWORK_ARTIFACTS: Record<ComplianceFramework, string[]> = {
   EU_AI_ACT: ['*.amcaudit (EU AI Act mapping)', 'Technical_Documentation.pdf', '*.amcpass (conformity)'],
   SOC2_TYPE2: ['*.amcaudit (SOC2 controls)', 'Trust_Service_Criteria.xlsx'],
   GDPR: ['DSAR_Report.pdf', 'Data_Residency_Proof.pdf', 'Privacy_Impact_Assessment.pdf'],
+  FORESIGHT_SAFETY: ['*.amcaudit (ForesightSafety mapping)', 'ForesightSafety_Risk_Matrix.pdf', '*.amcbundle (evidence)'],
+  AGENTIC_4C: ['*.amcaudit (4C mapping)', 'Agentic_4C_Compliance.pdf', '*.amcbundle (evidence)'],
 };
 
 export function generateFrameworkReport(
@@ -144,5 +166,7 @@ export function listSupportedFrameworks(): { framework: ComplianceFramework; con
     { framework: 'EU_AI_ACT', controlCount: EU_AI_ACT_CONTROLS.length, description: 'EU AI Act — High-Risk AI System requirements' },
     { framework: 'SOC2_TYPE2', controlCount: 5, description: 'SOC 2 Type II — Trust Service Criteria' },
     { framework: 'GDPR', controlCount: 3, description: 'GDPR — Data Protection & Privacy' },
+    { framework: 'FORESIGHT_SAFETY', controlCount: FORESIGHT_SAFETY_CONTROLS.length, description: 'ForesightSafety Bench — 94 risk dimensions for autonomous agent safety' },
+    { framework: 'AGENTIC_4C', controlCount: AGENTIC_4C_CONTROLS.length, description: 'Agentic 4C Framework — Code, Constitution, Compliance, Collaboration' },
   ];
 }

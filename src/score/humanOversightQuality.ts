@@ -39,6 +39,8 @@ export interface OversightQualityInput {
   reviewerApprovals?: Record<string, number>;
   overrideCount?: number;
   reviewedDecisions?: number;
+  hasIndependentVerificationChannel?: boolean; // oversight doesn't rely solely on CoT inspection
+  hasMultiModalOversight?: boolean; // uses multiple oversight methods (CoT + output audit + behavioral baseline)
 }
 
 export interface OversightQualityProfile {
@@ -60,6 +62,8 @@ export interface OversightQualityProfile {
   escalationVerificationRate: number;
   overallScore: number;
   confidence: number;
+  hasIndependentVerificationChannel: boolean;
+  hasMultiModalOversight: boolean;
   gaps: string[];
   recommendations: string[];
 }
@@ -83,6 +87,8 @@ interface NormalizedInput {
   reviewerApprovals: Record<string, number>;
   overrideCount?: number;
   reviewedDecisions?: number;
+  hasIndependentVerificationChannel?: boolean;
+  hasMultiModalOversight?: boolean;
 }
 
 const FAST_APPROVAL_MS = 2_000;
@@ -148,7 +154,9 @@ function normalizeInput(input: Record<string, number> | OversightQualityInput): 
       highRiskReviewed: input.highRiskReviewed,
       reviewerApprovals: input.reviewerApprovals ?? {},
       overrideCount: input.overrideCount,
-      reviewedDecisions: input.reviewedDecisions
+      reviewedDecisions: input.reviewedDecisions,
+      hasIndependentVerificationChannel: input.hasIndependentVerificationChannel,
+      hasMultiModalOversight: input.hasMultiModalOversight
     };
   }
   return {
@@ -156,7 +164,9 @@ function normalizeInput(input: Record<string, number> | OversightQualityInput): 
     scores: input,
     approvals: [],
     escalations: [],
-    reviewerApprovals: {}
+    reviewerApprovals: {},
+    hasIndependentVerificationChannel: undefined,
+    hasMultiModalOversight: undefined
   };
 }
 
@@ -301,7 +311,14 @@ export function assessOversightQuality(input: Record<string, number> | Oversight
       overrideDisciplineScore * 0.1 +
       escalationVerificationRate * 0.15
   );
-  const overallScore = Math.round(clamp01(questionnaireScore * 0.35 + operationalScore * 0.65) * 100);
+  let overallScore = Math.round(clamp01(questionnaireScore * 0.35 + operationalScore * 0.65) * 100);
+
+  // Agent-as-a-Proxy enhancement: multi-modal oversight bonus
+  const hasIndependentVerificationChannel = normalized.hasIndependentVerificationChannel === true;
+  const hasMultiModalOversight = normalized.hasMultiModalOversight === true;
+  if (hasIndependentVerificationChannel && hasMultiModalOversight) {
+    overallScore = Math.min(100, overallScore + 5);
+  }
 
   const evidenceSignals = [
     Object.keys(scoreMap).length > 0 ? 1 : 0,
@@ -398,6 +415,10 @@ export function assessOversightQuality(input: Record<string, number> | Oversight
     pushUnique(gaps, "Approval quality is low — rubber-stamping risk");
     pushUnique(recommendations, "Require reviewers to provide rationale and checklist evidence with each approval.");
   }
+  if (!hasIndependentVerificationChannel && !hasMultiModalOversight) {
+    pushUnique(gaps, "Oversight relies on single-channel inspection — vulnerable to proxy attacks.");
+    pushUnique(recommendations, "Add independent verification channels (output audit, behavioral baseline) beyond CoT inspection.");
+  }
 
   return {
     agentId: normalized.agentId,
@@ -418,6 +439,8 @@ export function assessOversightQuality(input: Record<string, number> | Oversight
     escalationVerificationRate,
     overallScore,
     confidence,
+    hasIndependentVerificationChannel,
+    hasMultiModalOversight,
     gaps,
     recommendations
   };

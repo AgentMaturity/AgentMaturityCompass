@@ -20,6 +20,14 @@ function dimensionIdForQuestionId(qId: string): 1 | 2 | 3 | 4 | 5 {
   if (qId.startsWith("AMC-RES-")) return 4;
   if (qId.startsWith("AMC-SK-")) return 4;
   if (qId.startsWith("AMC-THR-")) return 4;
+  // 2026 research-derived questions → Dimension 4 (Agent Resilience)
+  if (qId.startsWith("AMC-TAS-")) return 4;
+  if (qId.startsWith("AMC-MBR-")) return 4;
+  if (qId.startsWith("AMC-AAC-")) return 4;
+  if (qId.startsWith("AMC-MSA-")) return 4;
+  if (qId.startsWith("AMC-APS-")) return 4;
+  if (qId.startsWith("AMC-ZAP-")) return 4;
+  if (qId.startsWith("AMC-EAM-")) return 4;
   return 5;
 }
 
@@ -126,7 +134,7 @@ export function defaultDiagnosticBankV1(): DiagnosticBank {
         { id: 1, name: "Strategic Agent Operations", questionCount: 15 },
         { id: 2, name: "Agent Leadership", questionCount: 18 },
         { id: 3, name: "Agent Culture", questionCount: 20 },
-        { id: 4, name: "Agent Resilience", questionCount: 19 },
+        { id: 4, name: "Agent Resilience", questionCount: 26 },
         { id: 5, name: "Agent Skills", questionCount: 39 }
       ],
       questions

@@ -100,6 +100,11 @@ export interface MCPCapabilityDeclaration {
   emitsReceiptsOnToolCall: boolean;      // AMC: signs every tool call with receipt
   supportsPolicyGates: boolean;          // AMC: Governor can block tool calls
   hasAuditLog: boolean;                  // AMC: tool calls are audit-logged
+
+  // MCP Security Bench + Securing MCP paper additions
+  hasSupplyChainGovernance?: boolean;    // MCP server provenance verified
+  hasToolDescriptionIntegrity?: boolean; // tool descriptions verified against actual behavior
+  hasDynamicTrustCalibration?: boolean;  // trust level adjusts based on server behavior
 }
 
 interface WeightedMCPComplianceCheck extends MCPComplianceCheck {
@@ -282,6 +287,13 @@ export function scoreMcpCompliance(capabilities: MCPCapabilityDeclaration): MCPC
 
   const score = Math.round((earnedWeight / totalWeight) * 100);
 
+  // MCP Security Bench bonus scoring
+  let securityBenchBonus = 0;
+  if (capabilities.hasSupplyChainGovernance === true) securityBenchBonus += 3;
+  if (capabilities.hasToolDescriptionIntegrity === true) securityBenchBonus += 3;
+  if (capabilities.hasDynamicTrustCalibration === true) securityBenchBonus += 3;
+  const adjustedScore = Math.min(100, score + securityBenchBonus);
+
   const requiredPassed = COMPLIANCE_CHECKS.filter(c => c.required).every(c => capMap[c.id]);
   const corePassed = passed.includes('mcp-protocol') && passed.includes('tool-manifest') && passed.includes('tool-schemas');
   const safety: MCPSafetyScorecard = {
@@ -325,8 +337,8 @@ export function scoreMcpCompliance(capabilities: MCPCapabilityDeclaration): MCPC
   }
 
   const level: MCPComplianceResult['level'] =
-    score >= 90 && requiredPassed && safety.overall >= 85 ? 'full' :
-    score >= 65 && requiredPassed && safety.overall >= 60 ? 'partial' :
+    adjustedScore >= 90 && requiredPassed && safety.overall >= 85 ? 'full' :
+    adjustedScore >= 65 && requiredPassed && safety.overall >= 60 ? 'partial' :
     corePassed ? 'minimal' :
     'non-compliant';
 
@@ -357,7 +369,7 @@ export function scoreMcpCompliance(capabilities: MCPCapabilityDeclaration): MCPC
 
   const warnings = [...warningSet];
 
-  return { score, level, passed, failed, warnings, recommendations: recommendations.slice(0, 8), badge, safety, promptInjection };
+  return { score: adjustedScore, level, passed, failed, warnings, recommendations: recommendations.slice(0, 8), badge, safety, promptInjection };
 }
 
 export function getMcpComplianceGuide(): string {

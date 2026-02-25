@@ -12,6 +12,8 @@ export interface CostPredictabilityInput {
   actualCostSeriesUsd?: number[];
   predictedCostSeriesUsd?: number[];
   spikeRunCount?: number;
+  hasTrajectoryAnomalyDetection?: boolean; // detects when task cost deviates from baseline
+  amplificationFactor?: number; // ratio of actual to expected tool calls
 }
 
 export interface CostPredictabilityMetrics {
@@ -298,7 +300,14 @@ export function scoreCostPredictability(input: CostPredictabilityInput = {}): Co
     spikeControl * 5;
 
   const requiredGateFailures = evidenceGates.filter((gate) => gate.required && !gate.passed).length;
-  const score = Math.round(clamp100(rawScore - requiredGateFailures * 8));
+  let adjustedRaw = rawScore;
+
+  // Trajectory anomaly detection bonus (Beyond Max Tokens paper)
+  if (input.hasTrajectoryAnomalyDetection === true) {
+    adjustedRaw += 5;
+  }
+
+  const score = Math.round(clamp100(adjustedRaw - requiredGateFailures * 8));
 
   const gaps: string[] = [];
   const recommendations: string[] = [];
@@ -320,6 +329,14 @@ export function scoreCostPredictability(input: CostPredictabilityInput = {}): Co
   }
   if (metrics.spikeRunRate > 0.1) {
     pushUnique(recommendations, "Add alerts and automatic fallback routing when run cost exceeds spike threshold.");
+  }
+
+  // Amplification factor check (Beyond Max Tokens paper)
+  const amplificationFactor = typeof input.amplificationFactor === "number" && Number.isFinite(input.amplificationFactor)
+    ? input.amplificationFactor : 0;
+  if (amplificationFactor > 3) {
+    pushUnique(gaps, `Critical: Tool call amplification factor is ${amplificationFactor.toFixed(1)}x — actual tool calls far exceed expected baseline.`);
+    pushUnique(recommendations, "Implement trajectory anomaly detection to cap runaway tool call chains.");
   }
 
   if (recommendations.length === 0) {

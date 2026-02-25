@@ -2,11 +2,11 @@ import { describe, expect, test } from "vitest";
 import { questionBank } from "../src/diagnostic/questionBank.js";
 
 describe("question bank", () => {
-  test("has exactly 111 questions", () => {
-    expect(questionBank).toHaveLength(111);
+  test("has exactly 118 questions", () => {
+    expect(questionBank).toHaveLength(118);
   });
 
-  test("has expected layer distribution 17/21/20/20/33", () => {
+  test("has expected layer distribution 17/21/20/27/33", () => {
     const counts = questionBank.reduce<Record<string, number>>((acc, q) => {
       acc[q.layerName] = (acc[q.layerName] ?? 0) + 1;
       return acc;
@@ -16,7 +16,7 @@ describe("question bank", () => {
       "Strategic Agent Operations": 17,
       "Leadership & Autonomy": 21,
       "Culture & Alignment": 20,
-      Resilience: 20,
+      Resilience: 27,
       Skills: 33
     });
   });

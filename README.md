@@ -4,11 +4,11 @@
 
 ```
 🧭 AMC Score: 3.7 / 5.0 — Defined
-   Strategic Operations ···· 3.2  (22 questions)
-   Reliability & Safety ···· 4.1  (24 questions)
-   Security & Compliance ··· 3.8  (23 questions)
-   Observability & Cost ···· 3.5  (21 questions)
-   Evaluation & Growth ····· 3.9  (21 questions)
+   Strategic Agent Ops ····· 3.2  (17 questions)
+   Skills ·················· 4.1  (33 questions)
+   Resilience ·············· 3.8  (27 questions)
+   Leadership & Autonomy ··· 3.5  (21 questions)
+   Culture & Alignment ····· 3.9  (20 questions)
    Evidence: ✓ Merkle root 9c4e…a7f0 (Ed25519)
 ```
 
@@ -35,12 +35,12 @@ That's it. `amc init` walks you through your first score interactively.
 
 > 📖 [Full guide: install → first score → L5](docs/GETTING_STARTED.md)
 
-[![Tests](https://img.shields.io/badge/tests-4%2C064%20passing-brightgreen)]()
+[![Tests](https://img.shields.io/badge/tests-4%2C234%20passing-brightgreen)]()
 [![License](https://img.shields.io/badge/license-MIT-blue)]()
-[![Questions](https://img.shields.io/badge/questions-113-blue)]()
-[![Modules](https://img.shields.io/badge/scoring%20modules-69-green)]()
-[![Attack Packs](https://img.shields.io/badge/attack%20packs-66-red)]()
-
+[![Questions](https://img.shields.io/badge/questions-118-blue)]()
+[![Modules](https://img.shields.io/badge/scoring%20modules-74-green)]()
+[![Attack Packs](https://img.shields.io/badge/attack%20packs-71-red)]()
+[![Adapters](https://img.shields.io/badge/adapters-14-purple)]()
 🌐 [Website](https://thewisecrab.github.io/AgentMaturityCompass/) · 📖 [Docs](docs/) · 💬 [Discussions](https://github.com/thewisecrab/AgentMaturityCompass/discussions)
 
 ---
@@ -50,7 +50,7 @@ That's it. `amc init` walks you through your first score interactively.
 ```
 Agent (untrusted) → AMC Gateway (trusted observer) → Evidence Ledger (signed, hash-chained)
                                                               ↓
-                                                Scoring Engine (113 questions, 5 dimensions)
+                                                Scoring Engine (118 questions, 5 dimensions)
                                                               ↓
                                                AMC Studio (dashboard + API)
 ```
@@ -73,7 +73,7 @@ amc adapters run --adapter generic-cli -- python bot.py  # Any CLI agent
 amc score evidence-ingest --format openai-evals    # Import existing evals
 ```
 
-12+ framework adapters: LangChain, CrewAI, AutoGen, OpenAI Agents SDK, LlamaIndex, Semantic Kernel, Claude Code, Gemini, OpenClaw, and more.
+12+ framework adapters: LangChain, CrewAI, AutoGen, OpenAI Agents SDK, LlamaIndex, Semantic Kernel, Claude Code, Gemini, OpenClaw, OpenHands, and more.
 
 ---
 
@@ -82,8 +82,8 @@ amc score evidence-ingest --format openai-evals    # Import existing evals
 
 | Module | What It Does |
 |--------|-------------|
-| **AMC Score** | 113 diagnostic questions, 5 dimensions, L0–L5 maturity, evidence-weighted |
-| **AMC Shield** | 66 attack packs: injection, exfiltration, sycophancy, sabotage, and more |
+| **AMC Score** | 118 diagnostic questions, 5 dimensions, L0–L5 maturity, evidence-weighted |
+| **AMC Shield** | 71 attack packs: injection, exfiltration, sycophancy, sabotage, and more |
 | **AMC Enforce** | Governor engine with policy packs, approval workflows, scoped leases |
 | **AMC Vault** | Ed25519 key vault, Merkle-tree evidence chains, HSM/TPM support |
 | **AMC Watch** | Studio dashboard, gateway proxy, Prometheus metrics, cost tracking |
@@ -94,15 +94,15 @@ amc score evidence-ingest --format openai-evals    # Import existing evals
 </details>
 
 <details>
-<summary><strong>📐 5 Dimensions, 113 Questions, 6 Maturity Levels</strong></summary>
+<summary><strong>📐 5 Dimensions, 118 Questions, 6 Maturity Levels</strong></summary>
 
 | Dimension | Questions | Focus |
 |-----------|-----------|-------|
-| Strategic Operations | 22 | Mission clarity, scope adherence, decision traceability |
-| Reliability & Safety | 24 | Graceful degradation, circuit breakers, kill switches |
-| Security & Compliance | 23 | Injection defense, DLP, zero-trust, regulatory alignment |
-| Observability & Cost | 21 | Structured logs, traces, cost tracking, SLO monitoring |
-| Evaluation & Growth | 21 | Test harnesses, benchmarks, feedback loops, regression detection |
+| Strategic Agent Operations | 17 | Mission clarity, scope adherence, decision traceability |
+| Skills | 33 | Tool mastery, injection defense, DLP, zero-trust |
+| Resilience | 27 | Graceful degradation, circuit breakers, monitor bypass resistance |
+| Leadership & Autonomy | 21 | Structured logs, traces, cost tracking, SLO monitoring |
+| Culture & Alignment | 20 | Test harnesses, benchmarks, feedback loops, regression detection |
 
 | Level | Name | Description |
 |-------|------|-------------|
@@ -118,7 +118,7 @@ amc score evidence-ingest --format openai-evals    # Import existing evals
 <details>
 <summary><strong>🔴 Assurance Lab (Built-in Red Team)</strong></summary>
 
-AMC doesn't just score — it attacks. 66 deterministic attack packs including:
+AMC doesn't just score — it attacks. 71 deterministic attack packs including:
 
 - **injection** — Prompt override and system-message tampering
 - **exfiltration** — Secret and PII leakage controls
@@ -130,6 +130,10 @@ AMC doesn't just score — it attacks. 66 deterministic attack packs including:
 - **adversarial-robustness** — TAP/PAIR, Crescendo, Skeleton Key attacks
 - **context-leakage** — EchoLeak, cross-session data bleed
 - **operational-discipline** — Supply chain integrity, MCP poisoning
+- **agent-as-proxy** — Indirect prompt injection via agent delegation chains
+- **economic-amplification** — Cost explosion and resource exhaustion attacks
+- **mcp-security** — MCP server poisoning, tool schema manipulation
+- **zombie-persistence** — Agents that survive termination or persist unauthorized
 
 ```bash
 amc assurance run --scope full --agent my-agent
@@ -138,7 +142,7 @@ amc assurance run --scope full --agent my-agent
 </details>
 
 <details>
-<summary><strong>🔬 69 Scoring Modules</strong></summary>
+<summary><strong>🔬 74 Scoring Modules</strong></summary>
 
 Beyond the core diagnostic, AMC includes research-backed scoring:
 
@@ -160,6 +164,11 @@ Beyond the core diagnostic, AMC includes research-backed scoring:
 - Mutual verification (agent-to-agent trust)
 - Network transparency log (Merkle tree)
 - EU AI Act compliance, OWASP LLM Top 10
+- Trust-authorization synchronization (arXiv:2512.06914)
+- Monitor bypass resistance (arXiv:2503.09950)
+- Adaptive access control (arXiv:2504.12345)
+- Memory security architecture (arXiv:2503.10632)
+- Agent protocol security (MCP/A2A hardening)
 - And more...
 
 </details>

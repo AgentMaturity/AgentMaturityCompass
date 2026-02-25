@@ -4,13 +4,15 @@ import { generateFrameworkReport, listSupportedFrameworks } from "../src/score/c
 describe("score crossFrameworkMapping", () => {
   test("listSupportedFrameworks returns all expected framework entries", () => {
     const supported = listSupportedFrameworks();
-    expect(supported).toHaveLength(5);
+    expect(supported).toHaveLength(7);
     expect(supported.map((s) => s.framework)).toEqual([
       "NIST_AI_RMF",
       "ISO_42001",
       "EU_AI_ACT",
       "SOC2_TYPE2",
-      "GDPR"
+      "GDPR",
+      "FORESIGHT_SAFETY",
+      "AGENTIC_4C"
     ]);
   });
 
@@ -144,7 +146,9 @@ describe("score crossFrameworkMapping", () => {
       "ISO_42001",
       "EU_AI_ACT",
       "SOC2_TYPE2",
-      "GDPR"
+      "GDPR",
+      "FORESIGHT_SAFETY",
+      "AGENTIC_4C"
     ];
     for (const framework of frameworks) {
       const report = generateFrameworkReport(framework, { passedQIDs: [], activeModules: [] });
