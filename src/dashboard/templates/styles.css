@@ -306,7 +306,17 @@ svg { display: block; }
 .na-body { flex: 1; }
 .na-title { font: 600 12px/1.3 var(--sans); color: var(--t0); }
 .na-sub { font: 400 10px/1.4 var(--sans); color: var(--t2); margin-top: 2px; }
-.na-cmd { font: 500 10px/1 var(--mono); color: var(--g); margin-top: 4px; }
+.na-cmd { font: 500 10px/1 var(--mono); color: var(--g); margin-top: 4px; display: flex; align-items: center; gap: 8px; }
+.na-run {
+  font: 600 9px/1 var(--sans); color: var(--bg); background: var(--g);
+  padding: 3px 8px; border-radius: 3px; cursor: pointer;
+  text-transform: uppercase; letter-spacing: .06em;
+  transition: all var(--ease); border: none;
+}
+.na-run:hover { background: var(--g2); transform: scale(1.02); }
+.na-run.running { background: var(--amber); color: #000; pointer-events: none; }
+.na-run.done { background: var(--g3); }
+.na-run.err { background: var(--red); color: #fff; }
 
 /* ════════════════════════════════════════════════════
    STATS STRIP — 3+3 two-row on wide, 6-col on very wide
@@ -460,6 +470,40 @@ svg { display: block; }
 .idx-trk { width: 100px; height: 4px; background: var(--inset); border-radius: 2px; overflow: hidden; }
 .idx-fill { height: 100%; border-radius: 2px; transition: width .8s ease; }
 .idx-pct { width: 40px; text-align: right; font: 600 10px/1 var(--mono); }
+
+/* ════════════════════════════════════════════════════
+   CLI TERMINAL (in-dashboard command execution)
+   ════════════════════════════════════════════════════ */
+.cli-term { display: flex; flex-direction: column; gap: 8px; }
+.cli-input-row { display: flex; gap: 6px; align-items: center; }
+.cli-prompt { font: 600 12px/1 var(--mono); color: var(--g); flex-shrink: 0; }
+.cli-input {
+  flex: 1; font: 400 12px/1.4 var(--mono); color: var(--t0);
+  background: var(--bg); border: 1px solid var(--bdr2); border-radius: var(--r);
+  padding: 8px 10px; outline: none;
+  transition: border-color var(--ease);
+}
+.cli-input:focus { border-color: var(--g-line); box-shadow: 0 0 0 2px var(--g-dim); }
+.cli-input::placeholder { color: var(--t3); }
+.cli-run-btn {
+  font: 600 11px/1 var(--sans); color: var(--bg); background: var(--g);
+  padding: 8px 14px; border-radius: var(--r); cursor: pointer;
+  border: none; text-transform: uppercase; letter-spacing: .06em;
+  transition: all var(--ease); flex-shrink: 0;
+}
+.cli-run-btn:hover { background: var(--g2); }
+.cli-run-btn:disabled { background: var(--t3); cursor: not-allowed; }
+.cli-output {
+  font: 400 11px/1.5 var(--mono); color: var(--t1);
+  background: var(--bg); border: 1px solid var(--bdr); border-radius: var(--r);
+  padding: 10px 12px; max-height: 300px; overflow-y: auto;
+  white-space: pre-wrap; word-break: break-all;
+  display: none;
+}
+.cli-output.v { display: block; }
+.cli-output .cli-ok { color: var(--g); }
+.cli-output .cli-err { color: var(--red); }
+.cli-output .cli-time { color: var(--t3); font-size: 10px; }
 
 /* ════════════════════════════════════════════════════
    EMPTY STATE
