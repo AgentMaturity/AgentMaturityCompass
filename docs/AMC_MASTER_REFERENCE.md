@@ -60,6 +60,56 @@ Complete reference for every `amc` command organized by category.
 | `amc ingest` | Ingest external logs as SELF_REPORTED evidence |
 | `amc attest` | Auditor-attest ingest to upgrade trust to ATTESTED |
 
+## Quickscore & Sharing
+
+| Command | Description |
+|---------|-------------|
+| `amc quickscore` | 2-minute rapid self-assessment (no gateway required) |
+| `amc quickscore --share` | Generate shareable markdown summary + badge after scoring |
+| `amc quickscore --json` | Machine-readable quickscore output |
+
+`--share` outputs a markdown snippet you can paste directly into a GitHub README or issue:
+
+```markdown
+## My Agent — AMC Maturity Score
+![AMC L3](https://img.shields.io/badge/AMC-L3%20Defined-blue)
+
+**Overall: L3 — Defined** (62% — 31/50)
+
+| Dimension | Question | Level |
+|-----------|----------|-------|
+| Resilience | Monitor Bypass Resistance | L3 |
+...
+```
+
+After scoring, AMC automatically shows the top 3 actions to reach the next level.
+
+## Badge
+
+| Command | Description |
+|---------|-------------|
+| `amc badge` | Generate maturity badge for current agent (markdown, HTML, or URL) |
+| `amc badge --level <0-5>` | Generate badge for a specific level |
+| `amc badge --format html` | HTML `<img>` tag output |
+| `amc badge --format url` | Raw shields.io URL only |
+
+Paste into your README to show your agent's verified maturity:
+
+```bash
+amc badge
+# ![AMC L3](https://img.shields.io/badge/AMC-L3%20Defined-blue)
+```
+
+## Telemetry
+
+| Command | Description |
+|---------|-------------|
+| `amc telemetry on` | Enable anonymous opt-in telemetry |
+| `amc telemetry off` | Disable telemetry |
+| `amc telemetry status` | Show current telemetry config + what is/isn't collected |
+
+Telemetry is **off by default**. When enabled, only sends: OS, Node version, AMC version, command name, score level (L0–L5), adapter name. **Never**: agent data, evidence, API keys, scores, file paths, or any PII.
+
 ## Scoring & Diagnostics
 
 | Command | Description |

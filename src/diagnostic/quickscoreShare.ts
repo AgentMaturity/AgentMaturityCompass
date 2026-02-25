@@ -52,7 +52,7 @@ export function generateShareableSummary(result: RapidQuickscoreResult, agentNam
 
 function levelNumber(level: string): number {
   const match = level.match(/L(\d)/);
-  return match ? parseInt(match[1], 10) : 0;
+  return match?.[1] ? parseInt(match[1], 10) : 0;
 }
 
 /**
@@ -76,7 +76,7 @@ export function formatPostQuickscoreFlow(result: RapidQuickscoreResult): string 
   lines.push("");
 
   for (let i = 0; i < result.recommendations.length; i++) {
-    const rec = result.recommendations[i];
+    const rec = result.recommendations[i]!;
     lines.push(`${i + 1}. **${rec.title}** (currently L${rec.currentLevel} → target L${rec.targetLevel})`);
     lines.push(`   Why: ${rec.whyItMatters}`);
     lines.push(`   How: ${rec.howToImprove}`);

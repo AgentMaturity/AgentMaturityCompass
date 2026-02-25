@@ -125,8 +125,8 @@ export function pearsonCorrelation(x: number[], y: number[]): number {
 
   let sumXY = 0, sumX2 = 0, sumY2 = 0;
   for (let i = 0; i < n; i++) {
-    const dx = x[i] - meanX;
-    const dy = y[i] - meanY;
+    const dx = x[i]! - meanX;
+    const dy = y[i]! - meanY;
     sumXY += dx * dy;
     sumX2 += dx * dx;
     sumY2 += dy * dy;

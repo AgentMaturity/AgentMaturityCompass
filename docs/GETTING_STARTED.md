@@ -25,6 +25,30 @@ amc quickscore
 
 That's it. You now have a baseline maturity level (L0–L5).
 
+After scoring, AMC automatically shows what your agent needs to reach the next level.
+
+**Share your score** — generate a README badge and markdown summary:
+
+```bash
+amc quickscore --share
+# Outputs a markdown snippet + shields.io badge you can paste anywhere
+```
+
+**Add a badge to your README:**
+
+```bash
+amc badge
+# ![AMC L3](https://img.shields.io/badge/AMC-L3%20Defined-blue)
+```
+
+**Anonymous telemetry** (off by default — opt-in only):
+
+```bash
+amc telemetry on    # help improve AMC — only sends OS, version, command, level
+amc telemetry off   # disable at any time
+amc telemetry status # see exactly what is and isn't collected
+```
+
 ---
 
 ## Understanding Your Score

@@ -33,6 +33,13 @@ amc init
 
 That's it. `amc init` walks you through your first score interactively.
 
+**Share your score** — paste a badge into your README:
+
+```bash
+amc quickscore --share   # markdown summary + next-level action plan
+amc badge                # ![AMC L3](https://img.shields.io/badge/AMC-L3%20Defined-blue)
+```
+
 > 📖 [Full guide: install → first score → L5](docs/GETTING_STARTED.md)
 
 [![Tests](https://img.shields.io/badge/tests-4%2C234%20passing-brightgreen)]()
@@ -73,7 +80,7 @@ amc adapters run --adapter generic-cli -- python bot.py  # Any CLI agent
 amc score evidence-ingest --format openai-evals    # Import existing evals
 ```
 
-12+ framework adapters: LangChain, CrewAI, AutoGen, OpenAI Agents SDK, LlamaIndex, Semantic Kernel, Claude Code, Gemini, OpenClaw, OpenHands, and more.
+14 framework adapters: LangChain, LangGraph, CrewAI, AutoGen, OpenAI Agents SDK, LlamaIndex, Semantic Kernel, Claude Code, Gemini, OpenClaw, OpenHands, and more.
 
 ---
 

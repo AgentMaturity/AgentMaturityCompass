@@ -130,6 +130,7 @@ export function buildEvent(opts: {
     amcVersion: opts.amcVersion,
     nodeVersion: versions.node ?? "unknown",
     os: `${platform()}/${arch()}`,
+    arch: arch(),
     command: opts.command,
     scoreLevel: opts.scoreLevel,
     adapterName: opts.adapterName,
