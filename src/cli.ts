@@ -1075,18 +1075,17 @@ program
   .option("--trust-boundary <mode>", "isolated|shared", "shared")
   .action(async (opts: { trustBoundary: "isolated" | "shared" }) => {
     const init = initWorkspace({ trustBoundaryMode: opts.trustBoundary });
-    console.log("");
-    console.log(chalk.green("  ✅ AMC workspace initialized"));
-    console.log(chalk.gray(`  Location: ${init.workspacePath}`));
-    console.log("");
-    console.log(chalk.bold("  What's next?"));
-    console.log("");
-    console.log(chalk.white("  1."), chalk.cyan("amc quickscore"), chalk.gray("— Get your first maturity score (2 min, interactive)"));
-    console.log(chalk.white("  2."), chalk.cyan("amc setup --demo"), chalk.gray("— Load demo data and explore all features"));
-    console.log(chalk.white("  3."), chalk.cyan("amc doctor"), chalk.gray("— Check what's available in your environment"));
-    console.log(chalk.white("  4."), chalk.cyan("amc up"), chalk.gray("— Start Studio (web dashboard)"));
-    console.log("");
-    console.log(chalk.gray("  Full guide:"), chalk.underline("https://github.com/thewisecrab/AgentMaturityCompass/blob/main/docs/GETTING_STARTED.md"));
+    const fmt = await import("./cliFormat.js");
+    console.log(fmt.logo());
+    console.log(fmt.pass("Workspace initialized"));
+    console.log(fmt.info(`Location: ${init.workspacePath}`));
+    console.log(fmt.nextSteps([
+      { cmd: "amc quickscore", desc: "Get your first maturity score (2 min, interactive)" },
+      { cmd: "amc setup --demo", desc: "Load demo data and explore all features" },
+      { cmd: "amc doctor", desc: "Check what's available in your environment" },
+      { cmd: "amc up", desc: "Start Studio (web dashboard)" },
+    ]));
+    console.log(fmt.colors.dim("  Full guide: https://github.com/thewisecrab/AgentMaturityCompass/blob/main/docs/GETTING_STARTED.md"));
     console.log("");
 
     // Offer to run quickscore immediately if interactive
@@ -1118,20 +1117,23 @@ program
           answers[question.id] = level;
         }
         const result = scoreRapidAssessment(answers);
+        const fmt = await import("./cliFormat.js");
         console.log("");
-        console.log(chalk.bold(`  🧭 Your AMC Score: ${result.totalScore}/${result.maxScore} (${result.percentage}%)`));
-        console.log(chalk.bold(`  Preliminary maturity: ${result.preliminaryLevel}`));
+        console.log(fmt.scoreBox(result.totalScore, result.maxScore, "AMC Quickscore", result.preliminaryLevel));
         console.log("");
         if (result.recommendations.length > 0) {
-          console.log(chalk.bold("  Top improvements:"));
+          console.log(fmt.colors.dim("  Top improvements:"));
           for (const rec of result.recommendations.slice(0, 3)) {
-            console.log(chalk.yellow(`  → ${rec.questionId}: ${rec.title}`));
-            console.log(chalk.gray(`    ${rec.howToImprove}`));
+            console.log(fmt.gap(rec.questionId, rec.title));
+            console.log(fmt.colors.dim(`    ${rec.howToImprove}`));
           }
           console.log("");
         }
-        console.log(chalk.gray("  Run"), chalk.cyan("amc score formal-spec <agentId>"), chalk.gray("for a full diagnostic."));
-        console.log("");
+        console.log(fmt.nextSteps([
+          { cmd: "amc score formal-spec <agentId>", desc: "Full diagnostic with evidence" },
+          { cmd: "amc mechanic gap", desc: "See exactly what to fix" },
+          { cmd: "amc up", desc: "Open the dashboard" },
+        ]));
       }
     }
   });
@@ -1165,17 +1167,19 @@ program
       console.log(line);
     }
     console.log("");
+    const fmt = await import("./cliFormat.js");
     if (!result.ok || !legacy.ok) {
-      console.log(chalk.yellow("━━━ What to do next ━━━"));
-      console.log(chalk.white("  1. Run"), chalk.cyan("amc doctor-fix"), chalk.white("to auto-repair common issues"));
-      console.log(chalk.white("  2. Run"), chalk.cyan("amc up"), chalk.white("to start Studio (the local control plane)"));
-      console.log(chalk.white("  3. Run"), chalk.cyan("amc quickscore"), chalk.white("for a 2-minute health check"));
-      console.log(chalk.white("  4. See"), chalk.cyan("amc help"), chalk.white("for all available commands"));
-      console.log("");
+      console.log(fmt.nextSteps([
+        { cmd: "amc doctor-fix", desc: "Auto-repair common issues" },
+        { cmd: "amc up", desc: "Start Studio (the local control plane)" },
+        { cmd: "amc quickscore", desc: "2-minute health check" },
+        { cmd: "amc help", desc: "All available commands" },
+      ]));
     } else {
-      console.log(chalk.green("✅ All checks passed. Your workspace is ready."));
-      console.log(chalk.white("  Run"), chalk.cyan("amc quickscore"), chalk.white("to get your first maturity score."));
-      console.log("");
+      console.log(fmt.pass("All checks passed. Your workspace is ready."));
+      console.log(fmt.nextSteps([
+        { cmd: "amc quickscore", desc: "Get your first maturity score" },
+      ]));
     }
     process.exit(result.ok && legacy.ok ? 0 : 1);
   });
