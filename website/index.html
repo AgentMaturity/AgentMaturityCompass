@@ -654,6 +654,265 @@ a:focus-visible,.bp:focus-visible,.bg:focus-visible,.nbtn:focus-visible,
   .danger-zone{border-color:LinkText!important}
   .prod-card.feat{border-color:Highlight!important}
 }
+
+/* ── MOBILE RESPONSIVE ──────────────────────────── */
+@media(max-width:480px){
+  /* Global */
+  html,body{overflow-x:hidden;max-width:100vw;font-size:16px}
+  *{box-sizing:border-box}
+  section{padding:clamp(48px,8vw,80px) 0}
+  .w{padding:0 1.25rem}
+  
+  /* Hide custom cursor on touch */
+  #cur,#cur-ring{display:none!important}
+  
+  /* Nav */
+  .nlinks{gap:.75rem}
+  .nh{display:none}
+  .nlogo{font-size:.82rem}
+  .nbtn{padding:.45rem .875rem!important;font-size:.62rem!important}
+  #nav{padding:.7rem 0}
+  
+  /* Hero */
+  .h1s{font-size:clamp(1.8rem,8vw,2.6rem)!important;letter-spacing:-.02em}
+  .h1t{font-size:clamp(1.6rem,7vw,2.2rem)!important;letter-spacing:-.02em}
+  .subs{font-size:1rem!important;line-height:1.65}
+  .subt{font-size:.95rem!important;line-height:1.6}
+  .hero-tag{font-size:.6rem;padding:.35rem .7rem}
+  .hstats{gap:1.5rem 1.25rem}
+  .hnum{font-size:1.4rem}
+  .hlabel{font-size:.6rem;line-height:1.3}
+  .ctas{flex-direction:column;gap:.75rem}
+  .ctas .bp,.ctas .bg{width:100%;text-align:center;justify-content:center;min-height:48px;font-size:.8rem}
+  #hero{padding-top:80px}
+  
+  /* Toggle */
+  .toggle-wrap{margin-bottom:2rem}
+  .tbtn{padding:.5rem 1rem;font-size:.65rem}
+  
+  /* Section labels + headings */
+  .slabel{font-size:.62rem;margin-bottom:1rem}
+  
+  /* ALL grids — force single column */
+  .prod-grid,.jour-grid,.steps3,.pgrid,.papers-mini,.bento{grid-template-columns:1fr!important;gap:1rem}
+  .gap-split,.arch-split,.dims-split,.eu-split{grid-template-columns:1fr!important;gap:2rem}
+  .sgrid{grid-template-columns:repeat(2,1fr)!important}
+  .egrid{grid-template-columns:1fr!important}
+  
+  /* Capability strip — stack */
+  .cap-strip{flex-direction:column}
+  .cap-item{padding:.75rem;border-right:none;border-bottom:1px solid var(--bdr);text-align:left;display:flex;align-items:center;gap:.75rem}
+  .cap-item:last-child{border-bottom:none}
+  .cap-num{font-size:1.2rem;display:inline;margin-bottom:0;margin-right:.5rem}
+  .cap-label{display:inline;font-size:.55rem}
+  
+  /* Journey grid — single column */
+  .jour-grid{grid-template-columns:1fr!important;gap:1rem}
+  .jour-card{padding:1.25rem}
+  .jour-cmds{font-size:.6rem;word-break:break-all}
+  
+  /* Gap section */
+  .gap-split{grid-template-columns:1fr!important;gap:2rem}
+  .scomp{padding:1.25rem}
+  .srow{flex-direction:column;gap:.5rem;align-items:flex-start}
+  .sbar-wrap{width:100%}
+  .sgap-num,.gauge-num{font-size:2rem}
+  .gauge-ring{width:140px;height:140px}
+  .danger-zone{padding:1rem 1.25rem}
+  .danger-zone p{font-size:.82rem}
+  
+  /* How it works */
+  .steps3{grid-template-columns:1fr!important;gap:1rem}
+  .step3{padding:1.25rem}
+  .arch-split{grid-template-columns:1fr!important;gap:2rem}
+  .anode{padding:.75rem .875rem}
+  
+  /* Dimensions */
+  .dims-split{grid-template-columns:1fr!important;gap:2rem}
+  .dims-h2{font-size:clamp(1.3rem,5vw,1.8rem)}
+  .rwrap{width:100%!important;height:auto!important;aspect-ratio:1}
+  
+  /* Scale — maturity levels */
+  .sgrid{grid-template-columns:repeat(2,1fr)!important}
+  .scard{padding:1rem .875rem}
+  .slev{font-size:1.5rem;padding:.15rem .4rem}
+  .sname{font-size:.65rem}
+  .sdesc{font-size:.78rem}
+  
+  /* EPES */
+  .egrid{grid-template-columns:1fr!important}
+  .ecard{padding:1.25rem}
+  
+  /* Arsenal — attack packs */
+  .bento{grid-template-columns:1fr!important}
+  .bc{padding:1.25rem}
+  
+  /* Adapters */
+  .pgrid{grid-template-columns:1fr!important;gap:1rem}
+  .pcard{padding:1rem}
+  
+  /* Research papers */
+  .papers-mini{grid-template-columns:1fr!important}
+  .pfull{padding:1.25rem}
+  .pfull-title{font-size:.82rem}
+  
+  /* EU AI Act */
+  .eu-split{grid-template-columns:1fr!important;gap:2rem}
+  .eubar-name{font-size:.72rem}
+  
+  /* CTA */
+  .cta-h2{font-size:clamp(1.5rem,6vw,2.2rem)!important}
+  .cta-sub{font-size:.85rem}
+  .cta-btns{flex-direction:column;gap:.75rem}
+  .cta-btns .bp,.cta-btns .bg{width:100%;text-align:center;justify-content:center;min-height:48px}
+  
+  /* Footer */
+  footer{padding:1.5rem 0 4rem}
+  
+  /* Sticky bar */
+  #sticky{padding:.6rem 0}
+  #sticky .bp{font-size:.65rem;padding:.5rem 1rem;min-height:40px}
+  
+  /* Code blocks */
+  .cl{font-size:.65rem;padding:.75rem 1rem;overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .co{font-size:.62rem}
+  
+  /* Body text readability — 16px minimum */
+  .gap-body,.how-lead,.dims-lead,.scale-lead,.epes-lead,.ars-lead,.adp-lead,.res-lead,.eu-lead,.plat-lead,.jour-lead{font-size:1rem!important;line-height:1.7!important}
+  .ddesc,.edesc,.bc-body,.pfull-insight,.citem,.step3-body,.astep-body,.how-step-body,.sdesc,.prod-body,.jour-body{font-size:.95rem!important;line-height:1.65!important}
+  p{font-size:.95rem;line-height:1.65}
+  .prod-body{font-size:.92rem!important}
+  .jour-body{font-size:.92rem!important}
+  .pfull-insight{font-size:.92rem!important}
+  .danger-zone p{font-size:.92rem!important}
+  
+  /* Section headings */
+  h2{font-size:clamp(1.4rem,5.5vw,1.9rem)!important;line-height:1.15!important}
+  
+  /* Product cards */
+  .prod-card{padding:1.5rem}
+  .prod-card.feat{padding:1.5rem}
+  .prod-title{font-size:.72rem}
+  .prod-body{font-size:.88rem!important;line-height:1.6!important}
+  .prod-cmd{font-size:.7rem}
+  
+  /* Capability strip — stack vertically */
+  .cap-strip{flex-direction:column}
+  .cap-item{padding:.875rem 1rem;border-right:none;border-bottom:1px solid var(--bdr);text-align:left;display:flex;align-items:center;gap:.75rem;flex-direction:row}
+  .cap-item:last-child{border-bottom:none}
+  .cap-num{font-size:1.3rem;display:inline;margin-bottom:0;min-width:3.5rem}
+  .cap-label{display:inline;font-size:.6rem}
+  
+  /* Journey */
+  .jour-card{padding:1.5rem}
+  .jour-num{font-size:2rem}
+  .jour-title{font-size:.7rem}
+  .jour-body{font-size:.88rem!important;line-height:1.6!important}
+  .jour-cmds{font-size:.65rem;word-break:break-all}
+  
+  /* Gap section */
+  .scomp{padding:1.25rem}
+  .scomp-head{font-size:.7rem}
+  .sm-label{font-size:.78rem}
+  .sm-desc{font-size:.68rem}
+  .sbar-wrap{width:100%}
+  .sbadge{font-size:.78rem;min-width:2rem}
+  .gauge-ring{width:150px;height:150px}
+  .gauge-num{font-size:2.2rem}
+  .gauge-unit{font-size:.6rem}
+  .sgap-note{font-size:.85rem}
+  .danger-zone{padding:1.125rem 1.25rem}
+  .danger-zone p{font-size:.88rem!important;line-height:1.6!important}
+  
+  /* How it works */
+  .step3{padding:1.5rem}
+  .step3-title{font-size:.72rem}
+  .step3-body{font-size:.88rem!important}
+  .step3-code{font-size:.7rem}
+  .anode{padding:.875rem 1rem}
+  .anode-label{font-size:.72rem}
+  .anode-sub{font-size:.68rem}
+  
+  /* Dimensions */
+  .dims-h2{font-size:clamp(1.3rem,5vw,1.8rem)}
+  .dims-lead{font-size:.95rem!important}
+  .rwrap{width:300px!important;height:300px!important;margin:0 auto}
+  .rlabel{font-size:9px}
+  
+  /* Scale — maturity levels */
+  .scard{padding:1.125rem .875rem}
+  .slev{font-size:1.4rem;padding:.15rem .4rem}
+  .sname{font-size:.68rem}
+  .sdesc{font-size:.82rem!important;line-height:1.55!important}
+  
+  /* EPES */
+  .ecard{padding:1.25rem}
+  .edesc{font-size:.88rem!important}
+  
+  /* Arsenal */
+  .bc{padding:1.25rem}
+  .bc-title{font-size:.72rem}
+  .bc-body{font-size:.88rem!important}
+  
+  /* Adapters */
+  .pcard{padding:1.125rem}
+  .pcard-name{font-size:.78rem}
+  
+  /* Research papers */
+  .pfull{padding:1.25rem}
+  .pfull-id{font-size:.58rem}
+  .pfull-title{font-size:.88rem}
+  .pfull-authors{font-size:.7rem}
+  .pfull-insight{font-size:.88rem!important;line-height:1.6!important}
+  .pfull-gap{font-size:.78rem}
+  
+  /* EU AI Act */
+  .eubar-name{font-size:.78rem}
+  .eubar-status{font-size:.62rem}
+  .citem{font-size:.88rem!important;line-height:1.6!important}
+  
+  /* CTA */
+  .cta-h2{font-size:clamp(1.5rem,6vw,2.2rem)!important}
+  .cta-sub{font-size:.95rem!important;line-height:1.65!important}
+  .cta-btns{flex-direction:column;gap:.75rem}
+  .cta-btns .bp,.cta-btns .bg{width:100%;text-align:center;justify-content:center;min-height:48px}
+  
+  /* Footer */
+  footer{padding:1.5rem 0 4.5rem}
+  
+  /* Sticky bar */
+  #sticky{padding:.6rem 0}
+  #sticky .bp{font-size:.7rem;padding:.5rem 1.25rem;min-height:42px}
+  
+  /* Code blocks — scrollable */
+  .cl{font-size:.72rem;padding:.875rem 1rem;overflow-x:auto;-webkit-overflow-scrolling:touch;white-space:nowrap}
+  .co{font-size:.68rem}
+  
+  /* Install tabs */
+  .install-tabs{flex-wrap:wrap;gap:.25rem}
+  .install-tab{font-size:.58rem;padding:.4rem .65rem}
+  .install-code{font-size:.72rem;padding:.875rem 1rem}
+  
+  /* Dividers */
+  .dv{padding:0 1rem}
+  .dv i{width:4px;height:4px;margin:0 .75rem}
+  
+  /* Section transitions — shorter on mobile */
+  section::before{height:40px}
+}
+
+/* Tablet tweaks (481-768px) */
+@media(min-width:481px) and (max-width:768px){
+  .prod-grid{grid-template-columns:repeat(2,1fr)!important}
+  .jour-grid{grid-template-columns:repeat(2,1fr)!important}
+  .sgrid{grid-template-columns:repeat(3,1fr)!important}
+  .egrid{grid-template-columns:repeat(2,1fr)!important}
+  .bento{grid-template-columns:repeat(2,1fr)!important}
+  .h1s{font-size:clamp(2rem,6vw,3rem)!important}
+  .h1t{font-size:clamp(1.8rem,5vw,2.5rem)!important}
+  .ctas{flex-direction:row}
+  #cur,#cur-ring{display:none!important}
+}
 </style>
 </head>
 <body class="mt" id="body">
