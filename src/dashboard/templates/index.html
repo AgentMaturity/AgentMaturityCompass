@@ -54,6 +54,7 @@
       </button>
       <div class="tb-agent">
         <span class="tb-agent-id" id="tb-id">—</span>
+        <span class="tb-freshness" id="tb-freshness"></span>
       </div>
     </div>
     <div class="tb-r">
@@ -105,7 +106,11 @@
 
       <div class="row c6" id="stats-strip"></div>
 
-      <div class="row c1">
+      <div class="row c2" style="grid-template-columns:300px 1fr">
+        <div class="card">
+          <div class="ch"><span class="ch-dot" style="background:var(--amber);box-shadow:0 0 6px rgba(245,158,11,.4)"></span>Recommended Actions</div>
+          <div id="next-actions-mount" class="next-actions"></div>
+        </div>
         <div class="card">
           <div class="ch"><span class="ch-dot"></span>Overall Score Trend</div>
           <div id="tl-mount"></div>

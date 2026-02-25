@@ -191,6 +191,7 @@ svg { display: block; }
   padding: 3px 8px; border-radius: 99px;
   text-transform: uppercase; letter-spacing: .07em;
 }
+.tb-freshness { font: 400 10px/1 var(--sans); color: var(--t3); padding-left: 8px; border-left: 1px solid var(--bdr2); margin-left: 4px; }
 .tb-badge.hi { color: var(--g); background: var(--g-dim); border: 1px solid var(--g-line); }
 .tb-badge.md { color: var(--amber); background: var(--a-dim); border: 1px solid var(--a-line); }
 .tb-badge.lo { color: var(--red); background: var(--r-dim); border: 1px solid var(--r-line); }
@@ -230,9 +231,10 @@ svg { display: block; }
 .c1 { grid-template-columns: 1fr; }
 .c2 { grid-template-columns: 1fr 1fr; }
 .c3 { grid-template-columns: 1fr 1fr 1fr; }
-.c6 { grid-template-columns: repeat(6, 1fr); }
+.c6 { grid-template-columns: repeat(3, 1fr); }
 .hero-row { grid-template-columns: 260px 1fr 260px; }
 .full { grid-column: 1 / -1; }
+@media (min-width: 1400px) { .c6 { grid-template-columns: repeat(6, 1fr); } }
 
 /* ── CARD ────────────────────────────────────────── */
 .card {
@@ -288,7 +290,26 @@ svg { display: block; }
 .dim-v { width: 40px; text-align: right; flex-shrink: 0; font: 700 12px/1 var(--mono); color: var(--g); }
 
 /* ════════════════════════════════════════════════════
-   STAT STRIP — differentiated by importance
+   NEXT ACTIONS (Lena Torres recommendation)
+   ════════════════════════════════════════════════════ */
+.next-actions { display: flex; flex-direction: column; gap: 8px; }
+.na-item { display: flex; align-items: flex-start; gap: 10px; padding: 10px 12px; border-radius: var(--r); background: var(--inset); border: 1px solid var(--bdr); transition: all var(--ease); cursor: pointer; position: relative; }
+.na-item::after { content: '→'; position: absolute; right: 12px; top: 50%; transform: translateY(-50%); font-size: 11px; color: var(--t3); opacity: 0; transition: opacity var(--ease), right var(--ease); }
+.na-item:hover::after { opacity: 1; right: 10px; }
+.na-item:hover { border-color: var(--bdr2); background: var(--card2); transform: translateX(2px); }
+.na-item.crit { border-color: var(--r-line); background: var(--r-dim); }
+.na-item.warn { border-color: var(--a-line); background: var(--a-dim); }
+.na-priority { width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font: 600 9px/1 var(--sans); flex-shrink: 0; margin-top: 1px; }
+.na-priority.crit { background: var(--red); color: #fff; }
+.na-priority.warn { background: var(--amber); color: #000; }
+.na-priority.info { background: var(--g3); color: #fff; }
+.na-body { flex: 1; }
+.na-title { font: 600 12px/1.3 var(--sans); color: var(--t0); }
+.na-sub { font: 400 10px/1.4 var(--sans); color: var(--t2); margin-top: 2px; }
+.na-cmd { font: 500 10px/1 var(--mono); color: var(--g); margin-top: 4px; }
+
+/* ════════════════════════════════════════════════════
+   STATS STRIP — 3+3 two-row on wide, 6-col on very wide
    ════════════════════════════════════════════════════ */
 .stat { background: var(--card); border: 1px solid var(--bdr); border-radius: var(--r2); padding: 14px 16px; transition: border-color var(--ease), transform var(--ease), box-shadow var(--ease); cursor: default; }
 .stat:hover { border-color: var(--bdr2); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,.3); }

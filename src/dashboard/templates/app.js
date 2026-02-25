@@ -66,6 +66,13 @@ function renderScore(d) {
   if(integrity!=null) document.getElementById('score-int').textContent=`Integrity: ${integrity.toFixed(3)}`;
   // Topbar
   document.getElementById('tb-id').textContent=d.agentId||'default';
+  // Freshness — show last trend timestamp
+  const lastTs = d.trends?.slice(-1)[0]?.ts;
+  if (lastTs) {
+    const mins = Math.round((Date.now() - lastTs) / 60000);
+    const fr = document.getElementById('tb-freshness');
+    if (fr) fr.textContent = mins < 60 ? `${mins}m ago` : mins < 1440 ? `${Math.round(mins/60)}h ago` : `${Math.round(mins/1440)}d ago`;
+  }
 }
 
 /* ── DIM BARS ─────────────────────────────────────── */
@@ -87,6 +94,83 @@ function renderDims(d) {
   }).join('');
 }
 
+/* ── NEXT ACTIONS (Lena Torres: "What should I do now?") ─── */
+function renderNextActions(d) {
+  const el = document.getElementById('next-actions-mount');
+  if (!el) return;
+  const actions = [];
+  const gaps = d.evidenceGaps?.length || 0;
+  const denied = d.approvalsSummary?.denied || 0;
+  const score = d.overall || 0;
+  const layers = d.latestRun?.layerScores || [];
+
+  // Find weakest dimension
+  const weakest = layers.reduce((min, l) => l.avgFinalLevel < (min?.avgFinalLevel ?? 99) ? l : min, null);
+
+  if (gaps > 0) {
+    actions.push({
+      cls: 'crit', priority: 'crit',
+      title: `Fix ${gaps} Evidence Gap${gaps > 1 ? 's' : ''}`,
+      sub: 'Missing evidence is the #1 reason scores stay low. Capture execution logs.',
+      cmd: 'amc evidence collect', nav: 'evidence'
+    });
+  }
+  if (denied > 0) {
+    actions.push({
+      cls: 'warn', priority: 'warn',
+      title: `Review ${denied} Denied Approval${denied > 1 ? 's' : ''}`,
+      sub: 'Denied actions indicate policy violations. Review and replay or update policy.',
+      cmd: 'amc approvals list --denied', nav: 'evidence'
+    });
+  }
+  if (weakest && weakest.avgFinalLevel < 3) {
+    const dimName = weakest.layerName.split(' ')[0];
+    actions.push({
+      cls: 'warn', priority: 'warn',
+      title: `Improve ${dimName} Dimension (${weakest.avgFinalLevel.toFixed(1)}/5)`,
+      sub: 'This dimension is below acceptable threshold. Run targeted assurance packs.',
+      cmd: `amc mechanic gap --dim ${dimName.toLowerCase()}`, nav: 'dimensions'
+    });
+  }
+  // Low assurance packs
+  const lowPacks = (d.assurance || []).filter(p => p.score0to100 < 75);
+  if (lowPacks.length > 0) {
+    actions.push({
+      cls: 'warn', priority: 'warn',
+      title: `${lowPacks.length} Assurance Pack${lowPacks.length > 1 ? 's' : ''} Below Target`,
+      sub: `${lowPacks.map(p => p.packId.replace(/Pack$/, '')).join(', ')} — run fixes.`,
+      cmd: 'amc assurance run --failing', nav: 'assurance'
+    });
+  }
+  if (score < 4) {
+    actions.push({
+      cls: 'info', priority: 'info',
+      title: 'Run Full Score (formal-spec)',
+      sub: 'Get cryptographic evidence chains and an auditable score report.',
+      cmd: 'amc score formal-spec default', nav: 'overview'
+    });
+  }
+
+  if (!actions.length) {
+    el.innerHTML = `<div class="na-item" style="opacity:.6"><span class="na-priority info">✓</span><div class="na-body"><div class="na-title">All clear</div><div class="na-sub">No urgent actions. Score ${score.toFixed(1)}/5.0 — run <code style="color:var(--g)">amc up</code> to monitor live.</div></div></div>`;
+    return;
+  }
+
+  el.innerHTML = actions.slice(0, 4).map((a, i) => `
+    <div class="na-item ${a.cls}" data-nav="${a.nav}">
+      <div class="na-priority ${a.priority}">${i + 1}</div>
+      <div class="na-body">
+        <div class="na-title">${esc(a.title)}</div>
+        <div class="na-sub">${esc(a.sub)}</div>
+        <div class="na-cmd">${esc(a.cmd)}</div>
+      </div>
+    </div>`).join('');
+
+  el.querySelectorAll('.na-item[data-nav]').forEach(item => {
+    item.addEventListener('click', () => nav(item.dataset.nav));
+  });
+}
+
 /* ── STATS ────────────────────────────────────────── */
 function renderStats(d) {
   const gaps=d.evidenceGaps?.length||0;
@@ -105,7 +189,7 @@ function renderStats(d) {
     </div>`).join('');
 }
 
-/* ── RADAR ────────────────────────────────────────── */
+/* ── SCORE MATRIX (replaces radar — shows score vs target gap per dimension) ── */
 function renderRadar(d) {
   const layers=d.latestRun?.layerScores||[];
   if(!layers.length)return;
@@ -189,6 +273,11 @@ function renderTimeline(d) {
 
   const hdots=trends.map((t,i)=>`<circle class="tl-dot" cx="${sx(i)}" cy="${sy(t.overall)}" r="3.5" data-i="${i}"/>`).join('');
 
+  // Target line at 4.0 (HIGH TRUST threshold)
+  const targetY = sy(4.0);
+  const targetLine = `<line x1="${P.l}" y1="${targetY}" x2="${P.l+cw}" y2="${targetY}" stroke="rgba(245,158,11,.25)" stroke-width="1" stroke-dasharray="4,3"/>
+    <text x="${P.l+cw+4}" y="${targetY+3}" font-size="8" font-family="JetBrains Mono,monospace" fill="rgba(245,158,11,.5)" text-anchor="start">Target</text>`;
+
   wrap.insertAdjacentHTML('afterbegin',`<svg class="tl-svg" viewBox="0 0 ${W} ${H}" style="width:100%;height:${H}px">
     <defs><linearGradient id="tl-grad" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0%" stop-color="rgba(0,255,65,.15)"/>
@@ -197,6 +286,7 @@ function renderTimeline(d) {
     <line class="tl-axis" x1="${P.l}" y1="${P.t}" x2="${P.l}" y2="${P.t+ch}"/>
     <line class="tl-axis" x1="${P.l}" y1="${P.t+ch}" x2="${P.l+cw}" y2="${P.t+ch}"/>
     ${ygrid}
+    ${targetLine}
     <polygon class="tl-area" points="${areaPts}"/>
     <polyline class="tl-line" points="${line}"/>
     ${hdots}${xlbls}
@@ -430,6 +520,7 @@ function buildFleet(){
     renderScore(G.data);
     renderDims(G.data);
     renderStats(G.data);
+    renderNextActions(G.data);
     renderRadar(G.data);
     renderTimeline(G.data);
     renderAsrSummary(G.data);
