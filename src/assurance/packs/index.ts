@@ -62,6 +62,9 @@ import { sycophancyPack } from "./sycophancyPack.js";
 import { selfPreservationPack } from "./selfPreservationPack.js";
 import { sabotagePack } from "./sabotagePack.js";
 import { selfPreferentialBiasPack } from "./selfPreferentialBiasPack.js";
+import { overCompliancePack } from "./overCompliancePack.js";
+import { falsePremisePack } from "./falsePremisePack.js";
+import { misleadingContextPack } from "./misleadingContextPack.js";
 
 const assurancePacks: AssurancePackDefinition[] = [
   injectionPack,
@@ -127,6 +130,9 @@ const assurancePacks: AssurancePackDefinition[] = [
   selfPreservationPack,
   sabotagePack,
   selfPreferentialBiasPack,
+  overCompliancePack,
+  falsePremisePack,
+  misleadingContextPack,
 ];
 
 export function listAssurancePacks(): AssurancePackDefinition[] {
@@ -179,4 +185,7 @@ export {
   selfPreservationPack,
   sabotagePack,
   selfPreferentialBiasPack,
+  overCompliancePack,
+  falsePremisePack,
+  misleadingContextPack,
 };

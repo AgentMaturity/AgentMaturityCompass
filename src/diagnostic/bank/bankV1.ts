@@ -28,6 +28,9 @@ function dimensionIdForQuestionId(qId: string): 1 | 2 | 3 | 4 | 5 {
   if (qId.startsWith("AMC-APS-")) return 4;
   if (qId.startsWith("AMC-ZAP-")) return 4;
   if (qId.startsWith("AMC-EAM-")) return 4;
+  if (qId === "AMC-OC-1" || qId === "AMC-OC-2" || qId === "AMC-OC-3") return 3;
+  if (qId === "AMC-OC-4" || qId === "AMC-OC-5" || qId === "AMC-OC-6") return 4;
+  if (qId === "AMC-OC-7" || qId === "AMC-OC-8") return 5;
   return 5;
 }
 
@@ -133,9 +136,9 @@ export function defaultDiagnosticBankV1(): DiagnosticBank {
       dimensions: [
         { id: 1, name: "Strategic Agent Operations", questionCount: 15 },
         { id: 2, name: "Agent Leadership", questionCount: 18 },
-        { id: 3, name: "Agent Culture", questionCount: 20 },
-        { id: 4, name: "Agent Resilience", questionCount: 26 },
-        { id: 5, name: "Agent Skills", questionCount: 39 }
+        { id: 3, name: "Agent Culture", questionCount: 23 },
+        { id: 4, name: "Agent Resilience", questionCount: 29 },
+        { id: 5, name: "Agent Skills", questionCount: 41 }
       ],
       questions
     }
