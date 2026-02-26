@@ -977,6 +977,7 @@ a:focus-visible,.bp:focus-visible,.bg:focus-visible,.nbtn:focus-visible,
     <ul class="nlinks" role="list">
       <li class="nh"><a href="#platform">Platform</a></li>
       <li class="nh"><a href="#how">How It Works</a></li>
+      <li class="nh"><a href="#improve">Improve</a></li>
       <li class="nh"><a href="#scale">Maturity Scale</a></li>
       <li class="nh"><a href="#research">Research</a></li>
       <li class="nh"><a href="#euact">EU AI Act</a></li>
@@ -992,6 +993,7 @@ a:focus-visible,.bp:focus-visible,.bg:focus-visible,.nbtn:focus-visible,
   </div>
   <a href="#platform">Platform</a>
   <a href="#how">How It Works</a>
+  <a href="#improve">Improve</a>
   <a href="#scale">Maturity Scale</a>
   <a href="#research">Research</a>
   <a href="#euact">EU AI Act</a>
@@ -1017,7 +1019,7 @@ a:focus-visible,.bp:focus-visible,.bg:focus-visible,.nbtn:focus-visible,
     </div>
   </div>
 
-  <div class="hero-tag">MIT Open Source · 4,234 Tests Passing · LangChain + 13 More</div>
+  <div class="hero-tag">MIT Open Source · 2,656 Tests Passing · LangChain + 13 More</div>
 
   <!-- SIMPLE HERO -->
   <div class="so rv">
@@ -1046,8 +1048,8 @@ a:focus-visible,.bp:focus-visible,.bg:focus-visible,.nbtn:focus-visible,
       <div class="hstat"><span class="hnum" data-target="2656">0</span><span class="hlabel">Tests Passing</span></div>
       <div class="hstat"><span class="hnum" data-target="126">0</span><span class="hlabel">Diagnostic Questions</span></div>
       <div class="hstat"><span class="hnum" data-target="74">0</span><span class="hlabel">Scoring Modules</span></div>
-      <div class="hstat"><span class="hnum" data-target="71">0</span><span class="hlabel">Attack Packs</span></div>
-      <div class="hstat"><span class="hnum" data-target="481">0</span><span class="hlabel">CLI Commands</span></div>
+      <div class="hstat"><span class="hnum" data-target="74">0</span><span class="hlabel">Assurance Packs</span></div>
+      <div class="hstat"><span class="hnum" data-target="482">0</span><span class="hlabel">CLI Commands</span></div>
     </div>
   </div>
 
@@ -1076,7 +1078,7 @@ a:focus-visible,.bp:focus-visible,.bg:focus-visible,.nbtn:focus-visible,
     <div class="os-panel on" id="os-npm" role="tabpanel">
       <span class="co g">$ npm i -g agent-maturity-compass</span>
       <span class="co d" style="display:block;margin-top:.3rem">Works on macOS, Linux, Windows. Node 18+ required.</span>
-      <span class="co d" style="display:block">Includes: CLI (481 commands) + Studio + Gateway + Dashboard</span>
+      <span class="co d" style="display:block">Includes: CLI (482 commands) + Studio + Gateway + Dashboard</span>
     </div>
     <div class="os-panel" id="os-mac" role="tabpanel">
       <span class="co g">$ brew install thewisecrab/tap/amc</span>
@@ -1124,9 +1126,9 @@ a:focus-visible,.bp:focus-visible,.bg:focus-visible,.nbtn:focus-visible,
 
   <!-- CAPABILITY NUMBERS -->
   <div class="cap-strip">
-    <div class="cap-item"><span class="cap-num" data-target="481">0</span><span class="cap-label">CLI Commands</span></div>
+    <div class="cap-item"><span class="cap-num" data-target="482">0</span><span class="cap-label">CLI Commands</span></div>
     <div class="cap-item"><span class="cap-num" data-target="74">0</span><span class="cap-label">Score Modules</span></div>
-    <div class="cap-item"><span class="cap-num" data-target="71">0</span><span class="cap-label">Attack Packs</span></div>
+    <div class="cap-item"><span class="cap-num" data-target="74">0</span><span class="cap-label">Assurance Packs</span></div>
     <div class="cap-item"><span class="cap-num" data-target="126">0</span><span class="cap-label">Questions</span></div>
     <div class="cap-item"><span class="cap-num" data-target="14">0</span><span class="cap-label">Adapters</span></div>
     <div class="cap-item"><span class="cap-num" data-target="2656">0</span><span class="cap-label">Tests Passing</span></div>
@@ -1341,6 +1343,83 @@ a:focus-visible,.bp:focus-visible,.bg:focus-visible,.nbtn:focus-visible,
 
 <div class="dv"><i aria-hidden="true"></i></div>
 
+<!-- IMPROVEMENT JOURNEY -->
+<section id="improve" aria-labelledby="improve-h">
+<div class="w">
+
+  <!-- SIMPLE -->
+  <div class="so">
+    <div class="slabel"><span class="slabel-num">04½</span><em>Getting Better</em></div>
+    <h2 class="how-h2" id="improve-h">AMC doesn't just score.<br>It shows you <strong>how to improve.</strong></h2>
+    <p class="how-lead">Every gap in your score comes with the exact command to fix it. Run the command, re-score, watch the number go up. No guesswork.</p>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1.25rem;margin-top:2rem">
+      <div class="step3 rv" data-n="L1→L2" style="border-top:2px solid var(--a)">
+        <div class="step3-title" style="color:var(--a)">Turn on the lights</div>
+        <p class="step3-body">Most agents jump a full level just by enabling logging and evidence collection. One command.</p>
+        <span class="step3-code">amc evidence collect</span>
+      </div>
+      <div class="step3 rv d1" data-n="L2→L3" style="border-top:2px solid var(--g2)">
+        <div class="step3-title" style="color:var(--g2)">Prove it's safe</div>
+        <p class="step3-body">Run the assurance packs — injection attacks, boundary tests, error recovery. Fix what fails. Your agent earns its score.</p>
+        <span class="step3-code">amc assurance run</span>
+      </div>
+      <div class="step3 rv d2" data-n="L3→L4" style="border-top:2px solid var(--g)">
+        <div class="step3-title" style="color:var(--g)">Battle-tested</div>
+        <p class="step3-body">Advanced packs: zombie persistence, over-compliance, economic DoS. 80%+ evidence coverage. This is production-ready.</p>
+        <span class="step3-code">amc assurance run --scope all</span>
+      </div>
+      <div class="step3 rv d3" data-n="L4→L5" style="border-top:2px solid var(--g)">
+        <div class="step3-title" style="color:var(--g)">Self-governing</div>
+        <p class="step3-body">The agent monitors its own trust score, auto-remediates drift, and maintains evidence chains autonomously. The gold standard.</p>
+        <span class="step3-code">amc loop start --auto-remediate</span>
+      </div>
+    </div>
+
+    <div style="margin-top:2rem;padding:1.25rem;background:var(--g4);border:1px solid rgba(0,255,65,.15);border-radius:.75rem">
+      <p style="font:500 .95rem/1.6 var(--sans);color:var(--t1);margin:0"><strong style="color:var(--g)">The improvement loop:</strong> Score → see what's broken → run the fix command → re-score → repeat. Each cycle takes minutes, not days. AMC doesn't write code for you, but it closes 90% of the gap between "I don't know what's wrong" and "here's exactly what to do."</p>
+    </div>
+  </div>
+
+  <!-- TECH -->
+  <div class="to">
+    <div class="slabel"><span class="slabel-num">04½</span><em>Remediation Loop</em></div>
+    <h2 class="how-h2" id="improve-h">Evidence-Gated Improvement Path</h2>
+    <p class="how-lead">AMC's level caps are evidence-gated — you cannot score above what the evidence supports. Each level requires progressively stronger proof of trustworthy behavior.</p>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1.25rem;margin-top:2rem">
+      <div class="step3 rv" data-n="L1→L2" style="border-top:2px solid var(--a)">
+        <div class="step3-title" style="color:var(--a)">Evidence Collection</div>
+        <p class="step3-body">Enable the trusted gateway proxy. Capture execution logs with Ed25519 signatures. Basic error handling and retry policies. Evidence coverage ≥20%.</p>
+        <span class="step3-code">amc evidence collect --sign</span>
+      </div>
+      <div class="step3 rv d1" data-n="L2→L3" style="border-top:2px solid var(--g2)">
+        <div class="step3-title" style="color:var(--g2)">Core Assurance</div>
+        <p class="step3-body">Pass injection, boundary, and recovery packs. Documented guardrails. EPES provenance tier ≥ T2 (gateway-observed). Evidence coverage ≥50%.</p>
+        <span class="step3-code">amc assurance run --scope security,resilience</span>
+      </div>
+      <div class="step3 rv d2" data-n="L3→L4" style="border-top:2px solid var(--g)">
+        <div class="step3-title" style="color:var(--g)">Advanced Packs + Full Coverage</div>
+        <p class="step3-body">Zombie persistence, over-compliance (H-Neurons), economic DoS, trust-auth sync. Evidence coverage ≥80%. Merkle-sealed run history.</p>
+        <span class="step3-code">amc assurance run --scope all --seal</span>
+      </div>
+      <div class="step3 rv d3" data-n="L4→L5" style="border-top:2px solid var(--g)">
+        <div class="step3-title" style="color:var(--g)">Autonomous Governance</div>
+        <p class="step3-body">Continuous scoring loop with auto-remediation. Drift detection triggers re-assessment. Self-maintaining evidence chains. Full EPES T3 provenance.</p>
+        <span class="step3-code">amc loop start --auto-remediate --drift-threshold 0.3</span>
+      </div>
+    </div>
+
+    <div style="margin-top:2rem;padding:1.25rem;background:rgba(99,102,241,.06);border:1px solid rgba(99,102,241,.15);border-radius:.75rem">
+      <p style="font:400 .85rem/1.6 var(--mono);color:var(--t2);margin:0"><strong style="color:var(--g)">Key constraint:</strong> Evidence-gated level caps mean an agent scoring 5.0 on questions but with only 30% evidence coverage is capped at L2. The score reflects what you can <em>prove</em>, not what you can <em>claim</em>. This is by design — it's the structural fix for documentation inflation.</p>
+    </div>
+  </div>
+
+</div>
+</section>
+
+<div class="dv"><i aria-hidden="true"></i></div>
+
 <!-- DIMENSIONS -->
 <section id="dims" aria-labelledby="dims-h">
 <div class="w">
@@ -1440,7 +1519,7 @@ a:focus-visible,.bp:focus-visible,.bg:focus-visible,.nbtn:focus-visible,
 <div class="w">
   <div class="slabel"><span class="slabel-num">08</span><em>Coverage</em></div>
   <div class="so"><h2 class="ars-h2" id="ars-h">74 Ways Your Agent Can Fail.<br>AMC Tests All of Them.</h2><p class="ars-lead">From prompt injection to zombie agent persistence, over-compliance detection, economic DoS, and cross-session memory poisoning — grounded in peer-reviewed research.</p></div>
-  <div class="to"><h2 class="ars-h2" id="ars-h">69 Modules. 66 Attack Packs.<br>12 New Gaps from 2026 Research.</h2><p class="ars-lead">Comprehensive coverage of the agentic threat landscape — including 12 new gaps identified from 20 recent arXiv papers cross-referenced against all existing modules.</p></div>
+  <div class="to"><h2 class="ars-h2" id="ars-h">74 Modules. 74 Assurance Packs.<br>Including Over-Compliance Detection from 2026 Research.</h2><p class="ars-lead">Comprehensive coverage of the agentic threat landscape — including 12 new gaps identified from 20 recent arXiv papers cross-referenced against all existing modules.</p></div>
   <div class="bento">
     <div class="bc rv"><span class="bc-icon">💉</span><div class="bc-title">Prompt Injection</div><p class="bc-body">Direct, indirect, multi-step, encoded injection. The promptware kill chain (arXiv 2601.09625) where injection is just the entry point to persistence and exfiltration.</p><span class="bc-tag">66 scenarios</span></div>
     <div class="bc rv d1"><span class="bc-icon">🧟</span><div class="bc-title">Zombie Agent Persistence</div><p class="bc-body">Cross-session memory injection that survives compaction (arXiv 2602.15654). Payload embedded in session N triggers unauthorized actions in session N+5.</p><span class="bc-tag">New · 2026</span></div>
