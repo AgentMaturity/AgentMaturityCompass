@@ -1,5 +1,5 @@
-# NEW_GAPS_RESEARCH.md — AMC Coverage Gap Analysis (Feb 2026)
-> Cross-referenced against 74 score modules, 74 assurance packs, 42+ diagnostic questions
+# NEW_GAPS_RESEARCH.md — Emerging AI Agent Risks: Research Sweep (Feb 2026)
+> Cross-referenced against 74 score modules, 74 assurance packs, 126 diagnostic questions
 > Sources: OWASP GenAI 2025, Agentic Security Initiative, r/AI_Agents, Moltbook, HN, Simon Willison
 
 ---

@@ -270,6 +270,6 @@ AMC is MIT licensed and open source. Contributions welcome.
 
 ## License
 
-MIT — free forever.
+MIT — public infrastructure for the age of AI agents.
 
-AI agents will be the change agents across life and technology. Trust infrastructure should be a public good, not a profit center.
+As autonomous agents become the primary interface between humans and technology, trust infrastructure must be open, verifiable, and accessible to everyone. AMC exists to make that real.

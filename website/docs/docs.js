@@ -1643,7 +1643,7 @@ PAGES["faq"] = `
 <p>Agent Maturity Compass (AMC) is an open-source platform that measures how mature, safe, and trustworthy AI agents actually are — using cryptographically signed execution evidence rather than self-reported claims.</p>
 
 <h3>Is AMC free?</h3>
-<p>Yes. AMC is open source under the MIT license. The core platform with all 126 questions, 74 scoring modules, and full CLI/UI is completely free.</p>
+<p>Yes. AMC is open source under the MIT license. The core platform with all 126 questions, 74 scoring modules, and full CLI/UI is open-source public infrastructure — MIT licensed, fully featured, no paywalls.</p>
 
 <h3>What makes AMC different from other frameworks?</h3>
 <ul>
