@@ -28,6 +28,189 @@ export async function handleScoreRoute(
     return true;
   }
 
+  // POST /api/v1/score/run — trigger a full diagnostic run (CLI: amc run)
+  if (pathname === '/api/v1/score/run' && method === 'POST') {
+    try {
+      const body = await bodyJson<{
+        agentId?: string;
+        window?: string;
+        targetName?: string;
+        claimMode?: 'auto' | 'owner' | 'harness';
+        runtimeForHarness?: string;
+      }>(req);
+      const agentId = body.agentId ?? 'default';
+      const { runDiagnostic } = await import('../diagnostic/runner.js');
+      const result = await runDiagnostic({
+        workspace,
+        agentId,
+        window: body.window ?? '14d',
+        targetName: body.targetName,
+        claimMode: body.claimMode ?? 'auto',
+        runtimeForHarness: body.runtimeForHarness as import('../types.js').RuntimeName | undefined,
+      });
+      queueScoreComputationMetric({
+        agentId,
+        runId: result.runId,
+        sessionId: result.runId,
+        score: result.layerScores?.reduce((s: number, l: { avgFinalLevel: number }) => s + l.avgFinalLevel, 0) ?? 0,
+        maxScore: (result.layerScores?.length ?? 0) * 5,
+        percentage: result.layerScores?.length
+          ? Math.round((result.layerScores.reduce((s: number, l: { avgFinalLevel: number }) => s + l.avgFinalLevel, 0) / (result.layerScores.length * 5)) * 100)
+          : 0,
+        level: result.layerScores?.length
+          ? Math.round(result.layerScores.reduce((s: number, l: { avgFinalLevel: number }) => s + l.avgFinalLevel, 0) / result.layerScores.length)
+          : 0,
+        ts: Date.now(),
+        source: 'api.score.run',
+      });
+      apiSuccess(res, result, 200);
+    } catch (err) {
+      apiError(res, 500, err instanceof Error ? err.message : 'Diagnostic run failed');
+    }
+    return true;
+  }
+
+  // POST /api/v1/score/quickscore — rapid 5-question assessment (CLI: amc quickscore)
+  if (pathname === '/api/v1/score/quickscore' && method === 'POST') {
+    try {
+      const body = await bodyJson<{ answers: Record<string, number> }>(req);
+      if (!body.answers || typeof body.answers !== 'object') {
+        apiError(res, 400, 'Missing required field: answers (Record<questionId, level>)');
+        return true;
+      }
+      const { getRapidQuestions, scoreRapidAssessment } = await import('../diagnostic/rapidQuickscore.js');
+      const questions = getRapidQuestions();
+      const result = scoreRapidAssessment(body.answers);
+      apiSuccess(res, { questions: questions.map((q: { id: string; title: string }) => ({ id: q.id, title: q.title })), result });
+    } catch (err) {
+      apiError(res, 500, err instanceof Error ? err.message : 'Quickscore failed');
+    }
+    return true;
+  }
+
+  // GET /api/v1/score/quickscore/questions — get the 5 rapid questions
+  if (pathname === '/api/v1/score/quickscore/questions' && method === 'GET') {
+    try {
+      const { getRapidQuestions } = await import('../diagnostic/rapidQuickscore.js');
+      const questions = getRapidQuestions();
+      apiSuccess(res, { questions });
+    } catch (err) {
+      apiError(res, 500, err instanceof Error ? err.message : 'Could not load quickscore questions');
+    }
+    return true;
+  }
+
+  // POST /api/v1/score/quick — tiered quick score (CLI: amc score --tier)
+  if (pathname === '/api/v1/score/quick' && method === 'POST') {
+    try {
+      const body = await bodyJson<{ answers: Record<string, number>; tier?: string }>(req);
+      if (!body.answers || typeof body.answers !== 'object') {
+        apiError(res, 400, 'Missing required field: answers (Record<questionId, level>)');
+        return true;
+      }
+      const tier = (body.tier ?? 'quick') as 'quick' | 'standard' | 'deep';
+      if (tier !== 'quick' && tier !== 'standard' && tier !== 'deep') {
+        apiError(res, 400, 'Invalid tier. Use quick, standard, or deep.');
+        return true;
+      }
+      const { getQuestionsForTier, computeQuickScore } = await import('../diagnostic/quickScore.js');
+      const questions = getQuestionsForTier(tier);
+      const result = computeQuickScore(body.answers, tier);
+      apiSuccess(res, { tier, questions: questions.map((q: { id: string; title: string }) => ({ id: q.id, title: q.title })), result });
+    } catch (err) {
+      apiError(res, 500, err instanceof Error ? err.message : 'Quick score failed');
+    }
+    return true;
+  }
+
+  // GET /api/v1/score/quick/questions — get questions for a tier
+  if (pathname === '/api/v1/score/quick/questions' && method === 'GET') {
+    try {
+      const tier = (queryParam(req.url ?? '', 'tier') ?? 'quick') as 'quick' | 'standard' | 'deep';
+      if (tier !== 'quick' && tier !== 'standard' && tier !== 'deep') {
+        apiError(res, 400, 'Invalid tier. Use quick, standard, or deep.');
+        return true;
+      }
+      const { getQuestionsForTier } = await import('../diagnostic/quickScore.js');
+      const questions = getQuestionsForTier(tier);
+      apiSuccess(res, { tier, questions });
+    } catch (err) {
+      apiError(res, 500, err instanceof Error ? err.message : 'Could not load questions');
+    }
+    return true;
+  }
+
+  // GET /api/v1/score/latest — get latest run report (convenience)
+  if (pathname === '/api/v1/score/latest' && method === 'GET') {
+    try {
+      const agentId = queryParam(req.url ?? '', 'agentId') ?? 'default';
+      const { getAgentPaths } = await import('../fleet/paths.js');
+      const { readdirSync, existsSync } = await import('node:fs');
+      const paths = getAgentPaths(workspace, agentId);
+      const runsDir = paths.runsDir;
+      if (!existsSync(runsDir)) { apiError(res, 404, 'No runs found'); return true; }
+      const files = readdirSync(runsDir).filter((f: string) => f.endsWith('.json')).sort().reverse();
+      if (files.length === 0) { apiError(res, 404, 'No runs found'); return true; }
+      const latestRunId = files[0]!.replace('.json', '');
+      const { loadRunReport } = await import('../diagnostic/runner.js');
+      const report = loadRunReport(workspace, latestRunId, agentId);
+      apiSuccess(res, report);
+    } catch (err) {
+      apiError(res, 500, err instanceof Error ? err.message : 'Could not load latest run');
+    }
+    return true;
+  }
+
+  // GET /api/v1/score/history — list run history from ledger (CLI: amc history)
+  if (pathname === '/api/v1/score/history' && method === 'GET') {
+    try {
+      const agentId = queryParam(req.url ?? '', 'agentId');
+      const limit = parseInt(queryParam(req.url ?? '', 'limit') ?? '50', 10);
+      const { openLedger } = await import('../ledger/ledger.js');
+      const { resolveAgentId } = await import('../fleet/paths.js');
+      const { loadRunReport } = await import('../diagnostic/runner.js');
+      const ledger = openLedger(workspace);
+      try {
+        let runs = ledger.listRuns();
+        if (agentId) {
+          const resolved = resolveAgentId(workspace, agentId);
+          runs = runs.filter((run) => {
+            try {
+              const report = loadRunReport(workspace, run.run_id, agentId);
+              return report.agentId === resolved;
+            } catch {
+              return false;
+            }
+          });
+        }
+        const limited = runs.slice(0, limit);
+        apiSuccess(res, { runs: limited, total: limited.length });
+      } finally {
+        ledger.close();
+      }
+    } catch (err) {
+      apiError(res, 500, err instanceof Error ? err.message : 'Could not list history');
+    }
+    return true;
+  }
+
+  // POST /api/v1/score/compare — compare two runs via POST body
+  if (pathname === '/api/v1/score/compare' && method === 'POST') {
+    try {
+      const body = await bodyJson<{ runA: string; runB: string; agentId?: string }>(req);
+      if (!body.runA || !body.runB) { apiError(res, 400, 'Missing required fields: runA, runB'); return true; }
+      const agentId = body.agentId ?? 'default';
+      const { loadRunReport, compareRuns } = await import('../diagnostic/runner.js');
+      const a = loadRunReport(workspace, body.runA, agentId);
+      const b = loadRunReport(workspace, body.runB, agentId);
+      const comparison = compareRuns(a, b);
+      apiSuccess(res, comparison);
+    } catch (err) {
+      apiError(res, 500, err instanceof Error ? err.message : 'Comparison failed');
+    }
+    return true;
+  }
+
   // POST /api/v1/score/formal-spec — run full formal-spec diagnostic score
   if (pathname === '/api/v1/score/formal-spec' && method === 'POST') {
     try {
@@ -120,7 +303,27 @@ export async function handleScoreRoute(
     return true;
   }
 
-  // GET /api/v1/score/report — generate report
+  // GET /api/v1/score/report/:runId — generate report by path param
+  const reportPathParams = pathParam(pathname, '/api/v1/score/report/:runId');
+  if (reportPathParams && method === 'GET') {
+    try {
+      const agentId = queryParam(req.url ?? '', 'agentId') ?? 'default';
+      const format = (queryParam(req.url ?? '', 'format') ?? 'json') as 'json' | 'md';
+      const { loadRunReport, generateReport } = await import('../diagnostic/runner.js');
+      const report = loadRunReport(workspace, reportPathParams.runId!, agentId);
+      if (format === 'md') {
+        res.writeHead(200, { 'Content-Type': 'text/markdown; charset=utf-8' });
+        res.end(generateReport(report, 'md'));
+        return true;
+      }
+      apiSuccess(res, report);
+    } catch (err) {
+      apiError(res, 404, err instanceof Error ? err.message : 'Run not found');
+    }
+    return true;
+  }
+
+  // GET /api/v1/score/report — generate report (query param version)
   if (pathname === '/api/v1/score/report' && method === 'GET') {
     try {
       const agentId = queryParam(req.url ?? '', 'agentId') ?? 'default';

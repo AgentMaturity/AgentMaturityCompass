@@ -34,6 +34,9 @@ import { handleIdentityRoute } from './identityRouter.js';
 import { handleCryptoRoute } from './cryptoRouter.js';
 import { handleBomRoute } from './bomRouter.js';
 import { handleComplianceRoute } from './complianceRouter.js';
+import { handleMemoryRoute } from './memoryRouter.js';
+import { handleMetricsRoute } from './metricsRouter.js';
+import { handleExportRoute } from './exportRouter.js';
 import { apiError } from './apiHelpers.js';
 import { buildHealthPayload } from './health.js';
 import { deprecatedBridgeRoute, sdkVersionPolicy } from '../sdk/versioning.js';
@@ -160,6 +163,18 @@ export async function handleApiRoute(
     // ── Compliance, policy, waiver, regulatory ───────────────────
     if (pathname.startsWith('/api/v1/compliance') || pathname.startsWith('/api/v1/policy') || pathname.startsWith('/api/v1/waiver') || pathname.startsWith('/api/v1/regulatory'))
       return await handleComplianceRoute(pathname, method, req, res, workspace);
+
+    // ── Memory: maturity, integrity, correction memory ───────────
+    if (pathname.startsWith('/api/v1/memory'))
+      return await handleMemoryRoute(pathname, method, req, res, workspace);
+
+    // ── Metrics, SLO, failure-risk indices ────────────────────────
+    if (pathname.startsWith('/api/v1/metrics') || pathname.startsWith('/api/v1/slo') || pathname.startsWith('/api/v1/indices'))
+      return await handleMetricsRoute(pathname, method, req, res, workspace);
+
+    // ── Export, attestation, badge ────────────────────────────────
+    if (pathname.startsWith('/api/v1/export') || pathname.startsWith('/api/v1/attest'))
+      return await handleExportRoute(pathname, method, req, res, workspace);
 
     // ── Legacy bridge redirects ───────────────────────────────────
     const deprecated = deprecatedBridgeRoute(pathname);

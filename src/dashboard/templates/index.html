@@ -7,16 +7,48 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
-<link rel="stylesheet" href="./styles.css"/>
+<link rel="stylesheet" href="./styles.css?v=4"/>
+<script>
+  // Apply theme before first paint to prevent flash
+  (function(){
+    var t=localStorage.getItem('amc_theme')||'dark';
+    document.documentElement.setAttribute('data-theme',t);
+  })();
+</script>
 </head>
 <body>
 
+<!-- Skip to content (a11y) -->
+<a class="skip-link" href="#content">Skip to main content</a>
+
+<!-- ONBOARDING OVERLAY -->
+<div class="onboard-overlay" id="onboard" role="dialog" aria-modal="true" aria-label="Welcome to AMC">
+  <div class="onboard-modal">
+    <div class="onboard-header">
+      <div class="onboard-logo">🧭</div>
+      <h1 class="onboard-title">Welcome to AMC</h1>
+      <p class="onboard-subtitle">Agent Maturity Compass — The credit score for AI agents</p>
+    </div>
+    <div class="onboard-body" id="onboard-body">
+      <!-- Steps rendered by JS -->
+    </div>
+    <div class="onboard-footer">
+      <div class="onboard-dots" id="onboard-dots"></div>
+      <div class="onboard-actions">
+        <button class="onboard-skip" id="onboard-skip">Skip tour</button>
+        <button class="onboard-btn" id="onboard-next">Get Started →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SIDEBAR -->
 <aside class="sidebar" id="sb">
   <div class="sb-logo">
     <div class="sb-logo-icon">🧭</div>
     <span class="sb-logo-text">AMC</span>
   </div>
-  <nav class="sb-nav">
+  <nav class="sb-nav" role="navigation" aria-label="Main navigation">
     <div class="sb-label">Agent Trust</div>
     <a class="sb-link on" data-s="overview" href="#overview" tabindex="0">
       <svg viewBox="0 0 20 20" fill="currentColor"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"/></svg>
@@ -38,7 +70,29 @@
       <svg viewBox="0 0 20 20" fill="currentColor"><path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z"/></svg>
       <span class="lbl">Fleet</span>
     </a>
+    <a class="sb-link" data-s="settings" href="#settings" tabindex="0">
+      <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"/></svg>
+      <span class="lbl">Settings</span>
+    </a>
+
+    <!-- Getting Started progress -->
+    <div class="sb-section" aria-label="Getting started progress">
+      <div class="sb-label">Getting Started</div>
+      <div class="sb-progress" id="sb-progress">
+        <div class="sb-progress-bar"><div class="sb-progress-fill" id="sb-progress-fill" style="width:0%"></div></div>
+        <span class="sb-progress-text" id="sb-progress-text">0 / 4 steps</span>
+      </div>
+    </div>
   </nav>
+
+  <!-- Quick Score CTA -->
+  <div class="sb-cta">
+    <button class="sb-quickscore" id="sb-quickscore" aria-label="Run quick score">
+      <svg viewBox="0 0 20 20" fill="currentColor" width="14" height="14"><path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.381z" clip-rule="evenodd"/></svg>
+      <span class="lbl">Quick Score</span>
+    </button>
+  </div>
+
   <div class="sb-foot">
     <button class="sb-tog" id="sb-tog" aria-label="Collapse sidebar">
       <svg viewBox="0 0 20 20" fill="currentColor" width="14" height="14"><path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
@@ -46,6 +100,7 @@
   </div>
 </aside>
 
+<!-- MAIN -->
 <div class="main" id="main">
   <header class="topbar">
     <div class="tb-l">
@@ -57,6 +112,13 @@
         <span class="tb-freshness" id="tb-freshness"></span>
       </div>
     </div>
+    <div class="tb-c">
+      <button class="tb-search" id="tb-search" aria-label="Search or command palette">
+        <svg viewBox="0 0 20 20" fill="currentColor" width="14" height="14"><path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"/></svg>
+        <span class="tb-search-label">Search…</span>
+        <kbd class="tb-kbd">⌘K</kbd>
+      </button>
+    </div>
     <div class="tb-r">
       <div class="tb-views" role="tablist">
         <button class="tb-v on" data-v="engineer" aria-selected="true" role="tab">Engineer</button>
@@ -67,11 +129,17 @@
       <div class="tb-acts">
         <a href="/export.md" class="tb-act" title="Export Markdown">📄</a>
         <a href="/export.pdf" class="tb-act" title="Export PDF">🖨️</a>
+        <button class="tb-act tb-notif" id="tb-notif" aria-label="Notifications" title="Notifications">
+          <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16"><path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z"/></svg>
+          <span class="tb-notif-dot" id="tb-notif-dot"></span>
+        </button>
+        <button class="tb-act tb-help" id="tb-help" aria-label="Help — restart onboarding tour" title="Help">?</button>
+        <button class="tb-theme" id="tb-theme" aria-label="Toggle dark/light mode" title="Toggle theme">🌙</button>
       </div>
     </div>
   </header>
 
-  <main class="content" id="content">
+  <main class="content" id="content" role="main">
 
     <!-- OVERVIEW -->
     <section class="sec" id="s-overview">
@@ -101,6 +169,19 @@
         <div class="card radar-card">
           <div class="ch"><span class="ch-dot"></span>Trust Radar</div>
           <div id="radar-mount"></div>
+        </div>
+        <!-- Getting Started card for new users -->
+        <div class="card getting-started-card" id="getting-started-card">
+          <div class="ch"><span class="ch-dot" style="background:var(--amber);box-shadow:0 0 6px rgba(245,158,11,.4)"></span>Getting Started</div>
+          <div class="gs-steps" id="gs-steps">
+            <div class="gs-step" data-gs="init"><span class="gs-check">○</span><span class="gs-text">Run <code>amc init</code></span></div>
+            <div class="gs-step" data-gs="quickscore"><span class="gs-check">○</span><span class="gs-text">Run <code>amc quickscore</code></span></div>
+            <div class="gs-step" data-gs="evidence"><span class="gs-check">○</span><span class="gs-text">Attach first evidence</span></div>
+            <div class="gs-step" data-gs="assurance"><span class="gs-check">○</span><span class="gs-text">Run an assurance pack</span></div>
+          </div>
+          <div class="gs-cta">
+            <button class="gs-btn" id="gs-run-init">Run amc init →</button>
+          </div>
         </div>
       </div>
 
@@ -220,10 +301,46 @@
       </div>
     </section>
 
+    <!-- SETTINGS -->
+    <section class="sec h" id="s-settings">
+      <div class="row c2">
+        <div class="card">
+          <div class="ch"><span class="ch-dot"></span>Preferences</div>
+          <div id="settings-prefs">
+            <div class="settings-group">
+              <label class="settings-label">Default View</label>
+              <select class="settings-select" id="settings-view">
+                <option value="engineer">Engineer</option>
+                <option value="product">Product</option>
+                <option value="ciso">CISO</option>
+                <option value="exec">Executive</option>
+              </select>
+            </div>
+            <div class="settings-group">
+              <label class="settings-label">Theme</label>
+              <div class="theme-toggle" role="group" aria-label="Theme selection">
+                <button class="theme-opt on" data-t="dark">🌙 Dark</button>
+                <button class="theme-opt" data-t="light">☀️ Light</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="ch"><span class="ch-dot"></span>About AMC</div>
+          <div id="settings-about">
+            <p class="settings-version">Version <span id="settings-ver">—</span></p>
+            <p class="settings-desc">Agent Maturity Compass — The credit score for AI agents. Open-source, MIT licensed.</p>
+            <a class="settings-link" href="https://github.com/thewisecrab/AgentMaturityCompass" target="_blank" rel="noopener">GitHub →</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
   </main>
 </div>
 
-<nav class="bnav">
+<!-- BOTTOM NAV (mobile) -->
+<nav class="bnav" aria-label="Mobile navigation">
   <div class="bnav-i">
     <a class="bn on" data-s="overview" href="#overview"><svg viewBox="0 0 20 20" fill="currentColor"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"/></svg><span>Overview</span></a>
     <a class="bn" data-s="dimensions" href="#dimensions"><svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 4a1 1 0 011-1h4a1 1 0 010 2H6.414l2.293 2.293a1 1 0 01-1.414 1.414L5 6.414V8a1 1 0 01-2 0V4zm9 1a1 1 0 010-2h4a1 1 0 011 1v4a1 1 0 01-2 0V6.414l-2.293 2.293a1 1 0 11-1.414-1.414L13.586 5H12zm-9 7a1 1 0 012 0v1.586l2.293-2.293a1 1 0 011.414 1.414L6.414 15H8a1 1 0 010 2H4a1 1 0 01-1-1v-4zm13-1a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 010-2h1.586l-2.293-2.293a1 1 0 011.414-1.414L15 13.586V12a1 1 0 011-1z" clip-rule="evenodd"/></svg><span>Dims</span></a>
@@ -233,6 +350,6 @@
   </div>
 </nav>
 
-<script type="module" src="./app.js"></script>
+<script type="module" src="./app.js?v=4"></script>
 </body>
 </html>
