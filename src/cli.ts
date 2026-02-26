@@ -1353,6 +1353,10 @@ program
   .option("--interactive", "mechanic mode — choose which gaps to fix", false)
   .option("--watch", "continuous monitoring — re-generate guide on trust drift", false)
   .option("--watch-interval <seconds>", "interval for watch mode in seconds", "300")
+  .option("--diff", "show what changed since last guide generation", false)
+  .option("--frameworks", "list all supported frameworks", false)
+  .option("--ci", "CI gate mode — exit non-zero if below --target level", false)
+  .option("--dry-run", "preview --apply changes without writing files", false)
   .option("--agent <id>", "agent ID", "default")
   .option("--framework <name>", "framework name for tailored instructions")
   .option("--json", "emit JSON output", false)
@@ -1365,6 +1369,10 @@ program
     interactive: boolean;
     watch: boolean;
     watchInterval: string;
+    diff: boolean;
+    frameworks: boolean;
+    ci: boolean;
+    dryRun: boolean;
     agent: string;
     framework?: string;
     json: boolean;
@@ -1375,12 +1383,33 @@ program
       guideToHumanMarkdown,
       guideToAgentMarkdown,
       guideToGuardrails,
+      guideToJSON,
+      diffGuides,
+      listSupportedFrameworks,
       applyGuardrails,
       KNOWN_AGENT_CONFIGS,
     } = await import("./guide/guideGenerator.js");
     const { questionBank } = await import("./diagnostic/questionBank.js");
     const fs = await import("fs");
     const path = await import("path");
+
+    /* ── --frameworks: list supported frameworks ─── */
+    if (opts.frameworks) {
+      const fws = listSupportedFrameworks();
+      if (opts.json) {
+        console.log(JSON.stringify(fws, null, 2));
+        return;
+      }
+      console.log("");
+      console.log(chalk.bold("  🔌 Supported Frameworks"));
+      console.log(chalk.gray("  Use --framework <name> for tailored instructions.\n"));
+      for (const fw of fws) {
+        console.log(`  ${chalk.cyan(fw.name)} ${chalk.gray(`(${fw.aliases.join(", ")})`)}`);
+        console.log(`    ${chalk.gray("Language:")} ${fw.language} ${chalk.gray("| Config:")} ${fw.configFile}`);
+        console.log("");
+      }
+      return;
+    }
 
     /* ── Helper: run assessment and build guide ──── */
     async function buildGuide() {
@@ -1446,6 +1475,26 @@ program
         agentId: opts.agent,
         framework: opts.framework,
       });
+    }
+
+    /* ── CI gate mode ────────────────────────────── */
+    if (opts.ci) {
+      const guide = await buildGuide();
+      const minLevel = opts.target ? parseInt(opts.target, 10) : 3;
+      const jsonOut = guideToJSON(guide, opts.framework);
+
+      if (opts.json) {
+        console.log(JSON.stringify({ ...jsonOut, ciPass: guide.currentLevel >= minLevel, minLevel }, null, 2));
+      } else {
+        if (guide.currentLevel >= minLevel) {
+          console.log(chalk.green(`\n  ✓ CI PASS — Agent at L${guide.currentLevel} (minimum: L${minLevel})\n`));
+        } else {
+          console.log(chalk.red(`\n  ✗ CI FAIL — Agent at L${guide.currentLevel} (minimum: L${minLevel})`));
+          console.log(chalk.gray(`  ${guide.sections.length} gaps to close. Run: amc guide --export\n`));
+        }
+      }
+
+      process.exit(guide.currentLevel >= minLevel ? 0 : 1);
     }
 
     /* ── Interactive mechanic mode ───────────────── */
@@ -1572,6 +1621,53 @@ program
     /* ── Standard guide generation ───────────────── */
     const guide = await buildGuide();
 
+    /* ── --diff: compare with previous guide ─────── */
+    if (opts.diff) {
+      const guidesDir = path.join(process.cwd(), ".amc", "guides");
+      const prevPath = path.join(guidesDir, "guide-previous.json");
+      let hasPrevious = false;
+      try {
+        const prevRaw = fs.readFileSync(prevPath, "utf-8");
+        const prevGuide = JSON.parse(prevRaw) as ReturnType<typeof generateGuide>;
+        const diff = diffGuides(prevGuide, guide);
+
+        if (opts.json) {
+          console.log(JSON.stringify(diff, null, 2));
+        } else {
+          console.log("");
+          console.log(chalk.bold(`  📊 Guide Diff: ${diff.summary}`));
+          console.log("");
+          if (diff.closedGaps.length > 0) {
+            console.log(chalk.green(`  ✓ Closed gaps (${diff.closedGaps.length}):`));
+            for (const g of diff.closedGaps) console.log(chalk.green(`    - ${g}`));
+            console.log("");
+          }
+          if (diff.newGaps.length > 0) {
+            console.log(chalk.red(`  ✗ New gaps (${diff.newGaps.length}):`));
+            for (const g of diff.newGaps) console.log(chalk.red(`    - ${g}`));
+            console.log("");
+          }
+          if (diff.unchangedGaps.length > 0) {
+            console.log(chalk.gray(`  ○ Unchanged gaps: ${diff.unchangedGaps.length}`));
+            console.log("");
+          }
+        }
+        hasPrevious = true;
+      } catch {
+        if (!opts.json) {
+          console.log(chalk.gray("\n  No previous guide found. Run amc guide --export first to establish a baseline.\n"));
+        }
+      }
+
+      // Save current as previous for next diff
+      fs.mkdirSync(guidesDir, { recursive: true });
+      fs.writeFileSync(prevPath, JSON.stringify(guide, null, 2), "utf-8");
+      if (!opts.json && hasPrevious) {
+        console.log(chalk.gray("  Previous guide updated for next diff.\n"));
+      }
+      return;
+    }
+
     if (opts.json) {
       console.log(JSON.stringify(guide, null, 2));
       return;
@@ -1630,6 +1726,17 @@ program
         console.log(chalk.green(`  ✓ Guardrails:`), chalk.cyan(guardrailsPath));
       }
 
+      // Always save JSON for future diffs and CI/CD
+      const jsonPath = path.join(guidesDir, "guide-previous.json");
+      fs.writeFileSync(jsonPath, JSON.stringify(guide, null, 2), "utf-8");
+
+      // Also save structured JSON for CI/CD
+      if (opts.export) {
+        const ciPath = path.join(guidesDir, `guide-l${guide.currentLevel}-to-l${guide.targetLevel}.json`);
+        fs.writeFileSync(ciPath, JSON.stringify(guideToJSON(guide, opts.framework), null, 2), "utf-8");
+        console.log(chalk.green(`  ✓ CI/CD JSON:`), chalk.cyan(ciPath));
+      }
+
       console.log("");
       console.log(chalk.gray("  Apply guardrails to agent config:"), chalk.cyan("amc guide --apply"));
       console.log(chalk.gray("  Interactive mechanic mode:"), chalk.cyan("amc guide --interactive"));
@@ -1641,6 +1748,8 @@ program
       console.log(chalk.gray("  Apply to agent config:"), chalk.cyan("amc guide --apply"));
       console.log(chalk.gray("  Mechanic mode (pick & choose):"), chalk.cyan("amc guide --interactive"));
       console.log(chalk.gray("  Continuous monitoring:"), chalk.cyan("amc guide --watch"));
+      console.log(chalk.gray("  Compare with previous:"), chalk.cyan("amc guide --diff"));
+      console.log(chalk.gray("  List supported frameworks:"), chalk.cyan("amc guide --frameworks"));
       console.log(chalk.gray("  Target specific level:"), chalk.cyan("amc guide --target 4"));
       console.log("");
     }
@@ -1653,18 +1762,23 @@ program
       pathModule: typeof path,
     ) {
       const guardrailsContent = guideToGuardrails(guide, opts.framework);
+      const isDryRun = opts.dryRun;
+
+      const readFn = (p: string) => { try { return fsModule.readFileSync(p, "utf-8"); } catch { return null; } };
+      const writeFn = isDryRun
+        ? (_p: string, _c: string) => {} // no-op for dry run
+        : (p: string, c: string) => { fsModule.mkdirSync(pathModule.dirname(p), { recursive: true }); fsModule.writeFileSync(p, c, "utf-8"); };
 
       if (targetFile) {
-        // Apply to specified file
         const fullPath = pathModule.resolve(process.cwd(), targetFile);
-        const result = applyGuardrails(
-          fullPath,
-          guardrailsContent,
-          (p) => { try { return fsModule.readFileSync(p, "utf-8"); } catch { return null; } },
-          (p, c) => { fsModule.mkdirSync(pathModule.dirname(p), { recursive: true }); fsModule.writeFileSync(p, c, "utf-8"); },
-        );
-        console.log(chalk.green(`  ✓ Guardrails ${result.action}:`), chalk.cyan(result.path));
-        console.log("");
+        const result = applyGuardrails(fullPath, guardrailsContent, readFn, writeFn);
+        if (isDryRun) {
+          console.log(chalk.yellow(`  [DRY RUN] Would ${result.action}:`), chalk.cyan(result.path));
+          console.log(chalk.gray("  Remove --dry-run to apply.\n"));
+        } else {
+          console.log(chalk.green(`  ✓ Guardrails ${result.action}:`), chalk.cyan(result.path));
+          console.log("");
+        }
         return;
       }
 
@@ -1709,15 +1823,15 @@ program
       }
 
       const fullPath = pathModule.resolve(process.cwd(), finalPath);
-      const result = applyGuardrails(
-        fullPath,
-        guardrailsContent,
-        (p) => { try { return fsModule.readFileSync(p, "utf-8"); } catch { return null; } },
-        (p, c) => { fsModule.mkdirSync(pathModule.dirname(p), { recursive: true }); fsModule.writeFileSync(p, c, "utf-8"); },
-      );
-      console.log(chalk.green(`\n  ✓ Guardrails ${result.action}:`), chalk.cyan(result.path));
-      console.log(chalk.gray("  Re-running the guide will update the guardrails section automatically."));
-      console.log(chalk.gray("  Your agent now has operational trust rules from AMC.\n"));
+      const result = applyGuardrails(fullPath, guardrailsContent, readFn, writeFn);
+      if (isDryRun) {
+        console.log(chalk.yellow(`\n  [DRY RUN] Would ${result.action}:`), chalk.cyan(result.path));
+        console.log(chalk.gray("  Remove --dry-run to apply.\n"));
+      } else {
+        console.log(chalk.green(`\n  ✓ Guardrails ${result.action}:`), chalk.cyan(result.path));
+        console.log(chalk.gray("  Re-running the guide will update the guardrails section automatically."));
+        console.log(chalk.gray("  Your agent now has operational trust rules from AMC.\n"));
+      }
     }
   });
 

@@ -4,6 +4,9 @@ import {
   guideToHumanMarkdown,
   guideToAgentMarkdown,
   guideToGuardrails,
+  guideToJSON,
+  diffGuides,
+  listSupportedFrameworks,
   applyGuardrails,
   KNOWN_AGENT_CONFIGS,
 } from "../src/guide/guideGenerator.js";
@@ -200,6 +203,120 @@ describe("guideGenerator", () => {
     expect(paths).toContain("AGENTS.md");
     expect(paths).toContain(".cursorrules");
     expect(paths).toContain("CLAUDE.md");
-    expect(paths.length).toBeGreaterThanOrEqual(5);
+    expect(paths).toContain(".kiro/steering/guide.md");
+    expect(paths).toContain(".gemini/style.md");
+    expect(paths).toContain(".openhands/instructions.md");
+    expect(paths).toContain(".devin/guidelines.md");
+    expect(paths.length).toBeGreaterThanOrEqual(12);
+  });
+
+  it("agent markdown includes framework-specific setup for langchain", () => {
+    const scores = questionBank.slice(0, 5).map(q => makeScore(q.id, 1));
+    const guide = generateGuide({ overall: 1.0, questionScores: scores, targetLevel: 3 });
+    const md = guideToAgentMarkdown(guide, "langchain");
+
+    expect(md).toContain("LangChain");
+    expect(md).toContain("Setup: Connect to AMC");
+    expect(md).toContain("python");
+    expect(md).toContain("Framework-Specific Notes");
+  });
+
+  it("agent markdown includes framework-specific setup for semantic kernel", () => {
+    const scores = questionBank.slice(0, 5).map(q => makeScore(q.id, 1));
+    const guide = generateGuide({ overall: 1.0, questionScores: scores, targetLevel: 3 });
+    const md = guideToAgentMarkdown(guide, "semantic-kernel");
+
+    expect(md).toContain("Semantic Kernel");
+    expect(md).toContain("csharp");
+  });
+
+  it("agent markdown works with unknown framework (no crash)", () => {
+    const scores = questionBank.slice(0, 5).map(q => makeScore(q.id, 1));
+    const guide = generateGuide({ overall: 1.0, questionScores: scores, targetLevel: 3 });
+    const md = guideToAgentMarkdown(guide, "some-unknown-framework");
+
+    expect(md).toContain("some-unknown-framework");
+    expect(md).not.toContain("Setup: Connect to AMC"); // No framework-specific section
+  });
+
+  it("guideToJSON produces valid structured output", () => {
+    const scores = questionBank.slice(0, 10).map(q => makeScore(q.id, 1));
+    const guide = generateGuide({ overall: 1.0, questionScores: scores, targetLevel: 3 });
+    const json = guideToJSON(guide, "crewai");
+
+    expect(json.version).toBe("1.0");
+    expect(json.currentLevel).toBe(1);
+    expect(json.targetLevel).toBe(3);
+    expect(json.gapCount).toBeGreaterThan(0);
+    expect(json.gaps.length).toBe(json.gapCount);
+    expect(json.framework).toBe("crewai");
+    expect(json.supportedFrameworks).toContain("langchain");
+    expect(json.supportedFrameworks).toContain("crewai");
+    expect(json.supportedFrameworks).toContain("claudecode");
+    expect(json.supportedFrameworks.length).toBeGreaterThanOrEqual(10);
+
+    for (const gap of json.gaps) {
+      expect(gap.questionId).toBeTruthy();
+      expect(gap.title).toBeTruthy();
+      expect(gap.layer).toBeTruthy();
+    }
+  });
+
+  it("diffGuides detects closed and new gaps", () => {
+    const scores1 = [
+      makeScore(questionBank[0]!.id, 1),
+      makeScore(questionBank[1]!.id, 1),
+      makeScore(questionBank[2]!.id, 1),
+    ];
+    const scores2 = [
+      makeScore(questionBank[0]!.id, 3), // fixed
+      makeScore(questionBank[1]!.id, 1), // unchanged
+      makeScore(questionBank[3]!.id, 0), // new gap (different question)
+    ];
+
+    const guide1 = generateGuide({ overall: 1.0, questionScores: scores1, targetLevel: 3 });
+    const guide2 = generateGuide({ overall: 1.5, questionScores: scores2, targetLevel: 3 });
+    const diff = diffGuides(guide1, guide2);
+
+    expect(diff.closedGaps.length).toBeGreaterThanOrEqual(1);
+    expect(diff.closedGaps).toContain(questionBank[0]!.id);
+    expect(diff.summary).toBeTruthy();
+  });
+
+  it("diffGuides detects level improvement", () => {
+    const scores1 = questionBank.slice(0, 5).map(q => makeScore(q.id, 1));
+    const scores2 = questionBank.slice(0, 5).map(q => makeScore(q.id, 3));
+
+    const guide1 = generateGuide({ overall: 1.0, questionScores: scores1, targetLevel: 4 });
+    const guide2 = generateGuide({ overall: 3.0, questionScores: scores2, targetLevel: 4 });
+    const diff = diffGuides(guide1, guide2);
+
+    expect(diff.levelChange).toBe("improved");
+    expect(diff.previousLevel).toBe(1);
+    expect(diff.currentLevel).toBe(3);
+    expect(diff.summary).toContain("Improved");
+  });
+
+  it("listSupportedFrameworks returns all frameworks", () => {
+    const fws = listSupportedFrameworks();
+    const names = fws.map(f => f.name);
+
+    expect(names).toContain("LangChain");
+    expect(names).toContain("CrewAI");
+    expect(names).toContain("AutoGen");
+    expect(names).toContain("OpenAI Agents SDK");
+    expect(names).toContain("LlamaIndex");
+    expect(names).toContain("Semantic Kernel");
+    expect(names).toContain("Claude Code");
+    expect(names).toContain("Gemini");
+    expect(names).toContain("Cursor");
+    expect(names).toContain("Kiro");
+    expect(fws.length).toBeGreaterThanOrEqual(10);
+
+    for (const fw of fws) {
+      expect(fw.language).toBeTruthy();
+      expect(fw.configFile).toBeTruthy();
+      expect(fw.aliases.length).toBeGreaterThan(0);
+    }
   });
 });

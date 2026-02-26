@@ -11,6 +11,169 @@
 import type { LayerName, DiagnosticQuestion, QuestionScore } from "../types.js";
 import { questionBank } from "../diagnostic/questionBank.js";
 
+/* ── Framework-specific hints ──────────────────────── */
+
+interface FrameworkHint {
+  name: string;
+  aliases: string[];
+  language: string;
+  configFile: string;
+  evidenceSetup: string;
+  guardrailSnippet: string;
+  monitorSnippet: string;
+}
+
+const FRAMEWORK_HINTS: Record<string, FrameworkHint> = {
+  langchain: {
+    name: "LangChain",
+    aliases: ["langchain", "lc"],
+    language: "python",
+    configFile: "langchain.config.py or agent.py",
+    evidenceSetup: `# LangChain: Enable AMC evidence collection
+from langchain.callbacks import AMCCallbackHandler
+handler = AMCCallbackHandler(workspace=".amc")
+chain = LLMChain(llm=llm, callbacks=[handler])`,
+    guardrailSnippet: `# LangChain: Add guardrails from AMC guide
+from langchain.tools import StructuredTool
+# AMC will observe tool usage, error handling, and output quality
+# Ensure your chain logs reasoning steps and escalates on uncertainty`,
+    monitorSnippet: `# LangChain: Continuous monitoring
+# Set OPENAI_BASE_URL=http://localhost:4200/v1 to route through AMC gateway
+# AMC captures every LLM call with Ed25519 signatures`,
+  },
+  crewai: {
+    name: "CrewAI",
+    aliases: ["crewai", "crew"],
+    language: "python",
+    configFile: "crew.py or agents.yaml",
+    evidenceSetup: `# CrewAI: Enable AMC evidence collection
+# Set the base URL to route through AMC gateway
+import os
+os.environ["OPENAI_BASE_URL"] = "http://localhost:4200/v1"`,
+    guardrailSnippet: `# CrewAI: Add guardrails
+# In your Agent definition, add:
+agent = Agent(
+    role="...",
+    goal="...",
+    backstory="...",
+    verbose=True,  # AMC needs execution logs
+    allow_delegation=False,  # Explicit delegation control
+)`,
+    monitorSnippet: `# CrewAI: AMC monitors all crew interactions
+# Each agent's decisions are captured in the evidence ledger`,
+  },
+  autogen: {
+    name: "AutoGen",
+    aliases: ["autogen", "ag2", "autogen2"],
+    language: "python",
+    configFile: "OAI_CONFIG_LIST or autogen config",
+    evidenceSetup: `# AutoGen: Route through AMC gateway
+OAI_CONFIG_LIST = [{
+    "model": "gpt-4",
+    "base_url": "http://localhost:4200/v1",
+    "api_key": "your-key"
+}]`,
+    guardrailSnippet: `# AutoGen: Add guardrails
+# Enable logging for AMC evidence capture
+import autogen
+autogen.runtime_logging.start(logger_type="file")`,
+    monitorSnippet: `# AutoGen: AMC captures multi-agent conversations
+# Each agent turn is a separate evidence event`,
+  },
+  openai: {
+    name: "OpenAI Agents SDK",
+    aliases: ["openai", "openai-agents", "swarm"],
+    language: "python",
+    configFile: "agent.py or swarm config",
+    evidenceSetup: `# OpenAI Agents SDK: Route through AMC gateway
+from openai import OpenAI
+client = OpenAI(base_url="http://localhost:4200/v1")`,
+    guardrailSnippet: `# OpenAI: Add guardrails via function definitions
+# AMC observes tool calls, function outputs, and error handling`,
+    monitorSnippet: `# OpenAI: AMC captures all completions and tool calls`,
+  },
+  llamaindex: {
+    name: "LlamaIndex",
+    aliases: ["llamaindex", "llama-index", "llama"],
+    language: "python",
+    configFile: "settings.py or llama config",
+    evidenceSetup: `# LlamaIndex: Route through AMC gateway
+from llama_index.llms.openai import OpenAI
+llm = OpenAI(api_base="http://localhost:4200/v1")`,
+    guardrailSnippet: `# LlamaIndex: AMC observes query engine behavior
+# Ensure your index logs retrieval steps and source citations`,
+    monitorSnippet: `# LlamaIndex: AMC captures retrieval + generation pipeline`,
+  },
+  semantickernel: {
+    name: "Semantic Kernel",
+    aliases: ["semantic-kernel", "sk", "semantickernel"],
+    language: "csharp",
+    configFile: "Program.cs or kernel config",
+    evidenceSetup: `// Semantic Kernel: Route through AMC gateway
+var builder = Kernel.CreateBuilder();
+builder.AddOpenAIChatCompletion("gpt-4", new Uri("http://localhost:4200/v1"), "your-key");`,
+    guardrailSnippet: `// Semantic Kernel: Add guardrails via filters
+// AMC observes function calls, planning steps, and error handling
+kernel.FunctionInvocationFilters.Add(new AMCFilter());`,
+    monitorSnippet: `// Semantic Kernel: AMC captures all kernel function invocations`,
+  },
+  claudecode: {
+    name: "Claude Code",
+    aliases: ["claude-code", "claude", "claudecode"],
+    language: "markdown",
+    configFile: "CLAUDE.md or AGENTS.md",
+    evidenceSetup: `# Claude Code: Add to CLAUDE.md
+# AMC guardrails are applied via amc guide --apply CLAUDE.md
+# Claude Code reads this file automatically on every session`,
+    guardrailSnippet: `# Claude Code reads CLAUDE.md as system instructions
+# AMC guardrails become Claude Code's operating rules automatically`,
+    monitorSnippet: `# Claude Code: Use amc guide --watch --apply CLAUDE.md
+# Guardrails auto-update when your trust score changes`,
+  },
+  gemini: {
+    name: "Gemini",
+    aliases: ["gemini", "gemini-cli"],
+    language: "markdown",
+    configFile: ".gemini/style.md",
+    evidenceSetup: `# Gemini CLI: Add to .gemini/style.md
+# AMC guardrails are applied via amc guide --apply .gemini/style.md`,
+    guardrailSnippet: `# Gemini reads .gemini/style.md as behavioral instructions
+# AMC guardrails become Gemini's operating rules`,
+    monitorSnippet: `# Gemini: Use amc guide --watch --apply .gemini/style.md`,
+  },
+  cursor: {
+    name: "Cursor",
+    aliases: ["cursor"],
+    language: "markdown",
+    configFile: ".cursorrules or .cursor/rules",
+    evidenceSetup: `# Cursor: Add to .cursorrules
+# AMC guardrails are applied via amc guide --apply .cursorrules`,
+    guardrailSnippet: `# Cursor reads .cursorrules as system instructions
+# AMC guardrails become Cursor's operating rules automatically`,
+    monitorSnippet: `# Cursor: Use amc guide --watch --apply .cursorrules`,
+  },
+  kiro: {
+    name: "Kiro",
+    aliases: ["kiro"],
+    language: "markdown",
+    configFile: ".kiro/steering/guide.md",
+    evidenceSetup: `# Kiro: Add to .kiro/steering/guide.md
+# AMC guardrails are applied via amc guide --apply .kiro/steering/guide.md`,
+    guardrailSnippet: `# Kiro reads steering files as behavioral instructions
+# AMC guardrails become Kiro's operating rules`,
+    monitorSnippet: `# Kiro: Use amc guide --watch --apply .kiro/steering/guide.md`,
+  },
+};
+
+function resolveFramework(name?: string): FrameworkHint | undefined {
+  if (!name) return undefined;
+  const lower = name.toLowerCase().replace(/[\s_-]+/g, "");
+  for (const [, hint] of Object.entries(FRAMEWORK_HINTS)) {
+    if (hint.aliases.some(a => a.replace(/[\s_-]+/g, "") === lower)) return hint;
+  }
+  return undefined;
+}
+
 /* ── Types ─────────────────────────────────────────── */
 
 export interface GuideInput {
@@ -281,6 +444,7 @@ export function guideToHumanMarkdown(guide: Guide): string {
 
 export function guideToAgentMarkdown(guide: Guide, framework?: string): string {
   const lines: string[] = [];
+  const fw = resolveFramework(framework);
 
   lines.push("# AMC Trust Improvement Instructions");
   lines.push("");
@@ -289,7 +453,10 @@ export function guideToAgentMarkdown(guide: Guide, framework?: string): string {
   lines.push(`> Generated: ${new Date(guide.generatedAt).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}`);
   lines.push("");
 
-  if (framework) {
+  if (fw) {
+    lines.push(`**Framework:** ${fw.name} | **Language:** ${fw.language} | **Config:** ${fw.configFile}`);
+    lines.push("");
+  } else if (framework) {
     lines.push(`**Framework:** ${framework}`);
     lines.push("");
   }
@@ -304,6 +471,16 @@ export function guideToAgentMarkdown(guide: Guide, framework?: string): string {
     return lines.join("\n");
   }
 
+  // Framework-specific setup instructions
+  if (fw) {
+    lines.push("## Setup: Connect to AMC");
+    lines.push("");
+    lines.push("```" + fw.language);
+    lines.push(fw.evidenceSetup);
+    lines.push("```");
+    lines.push("");
+  }
+
   lines.push("## Required Behavioral Changes");
   lines.push("");
   lines.push("Implement these changes in order of priority. Each section describes what");
@@ -312,6 +489,18 @@ export function guideToAgentMarkdown(guide: Guide, framework?: string): string {
 
   for (const s of guide.sections) {
     lines.push(s.agentInstruction);
+  }
+
+  // Framework-specific monitoring
+  if (fw) {
+    lines.push("---");
+    lines.push("");
+    lines.push("## Framework-Specific Notes");
+    lines.push("");
+    lines.push("```" + fw.language);
+    lines.push(fw.monitorSnippet);
+    lines.push("```");
+    lines.push("");
   }
 
   lines.push("---");
@@ -490,11 +679,20 @@ export interface ApplyTarget {
 /** Well-known agent config file locations */
 export const KNOWN_AGENT_CONFIGS: Array<{ path: string; kind: ApplyTarget["kind"]; label: string }> = [
   { path: "AGENTS.md", kind: "agents-md", label: "AGENTS.md (Claude Code, Codex, generic)" },
-  { path: ".cursorrules", kind: "cursorrules", label: ".cursorrules (Cursor)" },
-  { path: ".github/copilot-instructions.md", kind: "agents-md", label: "Copilot Instructions" },
   { path: "CLAUDE.md", kind: "agents-md", label: "CLAUDE.md (Claude Code)" },
+  { path: ".cursorrules", kind: "cursorrules", label: ".cursorrules (Cursor)" },
+  { path: ".cursor/rules", kind: "cursorrules", label: ".cursor/rules (Cursor v2)" },
+  { path: ".github/copilot-instructions.md", kind: "agents-md", label: "Copilot Instructions (GitHub)" },
   { path: ".clinerules", kind: "agents-md", label: ".clinerules (Cline)" },
   { path: ".windsurfrules", kind: "agents-md", label: ".windsurfrules (Windsurf)" },
+  { path: ".kiro/steering/guide.md", kind: "agents-md", label: ".kiro/steering (Kiro)" },
+  { path: ".aider.conf.yml", kind: "custom", label: ".aider.conf.yml (Aider)" },
+  { path: ".amazonq/rules", kind: "agents-md", label: ".amazonq/rules (Amazon Q)" },
+  { path: ".gemini/style.md", kind: "agents-md", label: ".gemini/style.md (Gemini CLI)" },
+  { path: ".openhands/instructions.md", kind: "agents-md", label: ".openhands/instructions.md (OpenHands)" },
+  { path: ".devin/guidelines.md", kind: "agents-md", label: ".devin/guidelines.md (Devin)" },
+  { path: ".roo/rules.md", kind: "agents-md", label: ".roo/rules.md (Roo Code)" },
+  { path: "CONVENTIONS.md", kind: "agents-md", label: "CONVENTIONS.md (generic)" },
 ];
 
 const GUARDRAILS_START = "<!-- AMC-GUARDRAILS-START -->";
@@ -532,5 +730,130 @@ export function applyGuardrails(
   const separator = existing.endsWith("\n") ? "\n" : "\n\n";
   writeFile(filePath, existing + separator + wrapped + "\n");
   return { action: "appended", path: filePath };
+}
+
+/* ── JSON Schema export (for CI/CD) ────────────────── */
+
+export interface GuideJSON {
+  version: "1.0";
+  agentId: string;
+  currentLevel: number;
+  targetLevel: number;
+  generatedAt: string;
+  gapCount: number;
+  passingCount: number;
+  totalQuestions: number;
+  framework?: string;
+  gaps: Array<{
+    questionId: string;
+    title: string;
+    layer: string;
+    currentLevel: number;
+    targetLevel: number;
+    cliCommands: string[];
+    evidenceTypes: string[];
+  }>;
+  prohibitedBehaviors: string[];
+  supportedFrameworks: string[];
+}
+
+export function guideToJSON(guide: Guide, framework?: string): GuideJSON {
+  const prohibitions: string[] = [];
+  for (const s of guide.sections) {
+    const q = questionBank.find(bq => bq.id === s.questionId);
+    if (!q) continue;
+    const targetGate = q.gates.find(g => g.level === s.targetLevel);
+    if (targetGate?.mustNotInclude?.auditTypes?.length) {
+      for (const t of targetGate.mustNotInclude.auditTypes) {
+        if (!prohibitions.includes(t)) prohibitions.push(t);
+      }
+    }
+  }
+
+  return {
+    version: "1.0",
+    agentId: guide.agentId,
+    currentLevel: guide.currentLevel,
+    targetLevel: guide.targetLevel,
+    generatedAt: guide.generatedAt,
+    gapCount: guide.sections.length,
+    passingCount: guide.sections.length > 0
+      ? Math.max(0, 126 - guide.sections.length) // approximate
+      : 126,
+    totalQuestions: 126,
+    framework: framework ?? undefined,
+    gaps: guide.sections.map(s => ({
+      questionId: s.questionId,
+      title: s.title,
+      layer: s.layerName,
+      currentLevel: s.currentLevel,
+      targetLevel: s.targetLevel,
+      cliCommands: s.cliCommands,
+      evidenceTypes: s.evidenceNeeded,
+    })),
+    prohibitedBehaviors: prohibitions,
+    supportedFrameworks: Object.keys(FRAMEWORK_HINTS),
+  };
+}
+
+/* ── Guide diff ────────────────────────────────────── */
+
+export interface GuideDiff {
+  previousLevel: number;
+  currentLevel: number;
+  targetLevel: number;
+  newGaps: string[];
+  closedGaps: string[];
+  unchangedGaps: string[];
+  levelChange: "improved" | "regressed" | "unchanged";
+  summary: string;
+}
+
+export function diffGuides(previous: Guide, current: Guide): GuideDiff {
+  const prevIds = new Set(previous.sections.map(s => s.questionId));
+  const currIds = new Set(current.sections.map(s => s.questionId));
+
+  const newGaps = [...currIds].filter(id => !prevIds.has(id));
+  const closedGaps = [...prevIds].filter(id => !currIds.has(id));
+  const unchangedGaps = [...currIds].filter(id => prevIds.has(id));
+
+  const levelChange = current.currentLevel > previous.currentLevel
+    ? "improved"
+    : current.currentLevel < previous.currentLevel
+      ? "regressed"
+      : "unchanged";
+
+  const parts: string[] = [];
+  if (levelChange === "improved") {
+    parts.push(`Improved from L${previous.currentLevel} to L${current.currentLevel}.`);
+  } else if (levelChange === "regressed") {
+    parts.push(`Regressed from L${previous.currentLevel} to L${current.currentLevel}.`);
+  } else {
+    parts.push(`Level unchanged at L${current.currentLevel}.`);
+  }
+  if (closedGaps.length > 0) parts.push(`${closedGaps.length} gap${closedGaps.length === 1 ? "" : "s"} closed.`);
+  if (newGaps.length > 0) parts.push(`${newGaps.length} new gap${newGaps.length === 1 ? "" : "s"} appeared.`);
+
+  return {
+    previousLevel: previous.currentLevel,
+    currentLevel: current.currentLevel,
+    targetLevel: current.targetLevel,
+    newGaps,
+    closedGaps,
+    unchangedGaps,
+    levelChange,
+    summary: parts.join(" "),
+  };
+}
+
+/* ── List supported frameworks ─────────────────────── */
+
+export function listSupportedFrameworks(): Array<{ name: string; aliases: string[]; language: string; configFile: string }> {
+  return Object.values(FRAMEWORK_HINTS).map(fw => ({
+    name: fw.name,
+    aliases: fw.aliases,
+    language: fw.language,
+    configFile: fw.configFile,
+  }));
 }
 
