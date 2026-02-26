@@ -1,337 +1,307 @@
 /**
- * incidentRouter.ts — Incident API routes.
+ * incidentRouter.ts — Incident API routes backed by SQLite incident store.
  */
 
-import { randomUUID } from "node:crypto";
-import type { IncomingMessage, ServerResponse } from "node:http";
-import { z } from "zod";
-import { getPrivateKeyPem, signHexDigest } from "../crypto/keys.js";
-import { createIncidentStore, computeIncidentHash } from "../incidents/incidentStore.js";
-import type { Incident, IncidentSeverity, IncidentState } from "../incidents/incidentTypes.js";
-import { openLedger } from "../ledger/ledger.js";
-import { queueIncidentLog } from "../observability/otelExporter.js";
-import { sha256Hex } from "../utils/hash.js";
-import { canonicalize } from "../utils/json.js";
-import { RequestBodyError, apiError, apiSuccess, bodyJsonSchema, isRequestBodyError, pathParam, queryParam } from "./apiHelpers.js";
+import type { IncomingMessage, ServerResponse } from 'node:http';
+import { randomUUID } from 'node:crypto';
+import { bodyJson, apiSuccess, apiError, pathParam, queryParam } from './apiHelpers.js';
+import { openLedger } from '../ledger/ledger.js';
+import { createIncidentStore, computeIncidentHash } from '../incidents/incidentStore.js';
+import type { Incident, IncidentSeverity, IncidentState } from '../incidents/incidentTypes.js';
+import { signHexDigest, getPrivateKeyPem } from '../crypto/keys.js';
+import { sha256Hex } from '../utils/hash.js';
+import { canonicalize } from '../utils/json.js';
 
-const CLOSED_INCIDENT_STATES = new Set<IncidentState>(["RESOLVED", "POSTMORTEM"]);
-const VALID_INCIDENT_STATES = new Set<IncidentState>(["OPEN", "INVESTIGATING", "MITIGATED", "RESOLVED", "POSTMORTEM"]);
-const VALID_TRIGGER_TYPES = new Set<Incident["triggerType"]>([
-  "DRIFT",
-  "ASSURANCE_FAILURE",
-  "FREEZE",
-  "BUDGET_EXCEEDED",
-  "GOVERNANCE_VIOLATION",
-  "MANUAL"
-]);
-
-const incidentTriggerTypeSchema = z.enum([
-  "DRIFT",
-  "ASSURANCE_FAILURE",
-  "FREEZE",
-  "BUDGET_EXCEEDED",
-  "GOVERNANCE_VIOLATION",
-  "MANUAL"
-]);
-
-const createIncidentBodySchema = z.object({
-  agentId: z.string().trim().min(1).optional(),
-  title: z.string().trim().min(1),
-  description: z.string().trim().min(1).optional(),
-  severity: z.string().trim().min(1),
-  triggerType: incidentTriggerTypeSchema.optional(),
-  triggerId: z.string().trim().min(1).optional()
-}).strict();
-
-const patchIncidentBodySchema = z.object({
-  state: z.string().trim().min(1).optional(),
-  resolution: z.string().trim().min(1).optional(),
-  evidenceId: z.string().trim().min(1).optional()
-}).strict();
-
-function parseSeverity(value: string): IncidentSeverity {
-  const normalized = value.trim().toLowerCase();
-  if (normalized === "low" || normalized === "info") {
-    return "INFO";
-  }
-  if (normalized === "medium" || normalized === "warn") {
-    return "WARN";
-  }
-  if (normalized === "high" || normalized === "critical") {
-    return "CRITICAL";
-  }
-  throw new RequestBodyError("severity must be low|medium|high|critical");
-}
-
-function parseIncidentState(value: string): IncidentState {
-  const normalized = value.trim().toUpperCase();
-  if (normalized === "CLOSED") {
-    return "RESOLVED";
-  }
-  if (!VALID_INCIDENT_STATES.has(normalized as IncidentState)) {
-    throw new RequestBodyError("state must be OPEN|INVESTIGATING|MITIGATED|RESOLVED|POSTMORTEM");
-  }
-  return normalized as IncidentState;
-}
-
-function currentAgentFromReqUrl(req: IncomingMessage): string {
-  return queryParam(req.url ?? "", "agent") ?? process.env.AMC_AGENT_ID ?? "default";
+function normalizeSeverity(raw: string | undefined): IncidentSeverity {
+  if (!raw) return 'WARN';
+  const upper = raw.toUpperCase();
+  if (upper === 'INFO' || upper === 'LOW') return 'INFO';
+  if (upper === 'WARN' || upper === 'MEDIUM') return 'WARN';
+  if (upper === 'CRITICAL' || upper === 'HIGH') return 'CRITICAL';
+  return 'WARN';
 }
 
 export async function handleIncidentRoute(
   pathname: string,
   method: string,
   req: IncomingMessage,
-  res: ServerResponse
+  res: ServerResponse,
+  workspace = process.cwd(),
 ): Promise<boolean> {
-  if (pathname === "/api/v1/incidents" && method === "GET") {
-    const statusParam = queryParam(req.url ?? "", "status")?.toLowerCase();
-    if (statusParam && statusParam !== "open" && statusParam !== "closed") {
-      apiError(res, 400, "status must be open|closed");
-      return true;
-    }
+  if (!pathname.startsWith('/api/v1/incidents')) return false;
 
-    const limitParam = queryParam(req.url ?? "", "limit");
-    const limit = limitParam ? Number.parseInt(limitParam, 10) : 50;
-    if (!Number.isFinite(limit) || limit <= 0) {
-      apiError(res, 400, "limit must be a positive integer");
-      return true;
-    }
-
-    const ledger = openLedger(process.cwd());
+  // GET /api/v1/incidents — list incidents
+  if (pathname === '/api/v1/incidents' && method === 'GET') {
+    const ledger = openLedger(workspace);
     try {
       const store = createIncidentStore(ledger.db);
       store.initTables();
-      const agentId = currentAgentFromReqUrl(req);
-      const incidentRows = store.getIncidentsByAgent(agentId);
-      const latestStates = store.getLatestIncidentStates(incidentRows.map((row) => row.incidentId));
-      const incidents = incidentRows
-        .map((row) => ({ ...row, state: latestStates.get(row.incidentId) ?? row.state }))
-        .filter((row) => {
-          if (!statusParam) {
-            return true;
-          }
-          const isClosed = CLOSED_INCIDENT_STATES.has(row.state);
-          return statusParam === "closed" ? isClosed : !isClosed;
-        })
-        .slice(0, Math.min(limit, 500));
-      apiSuccess(res, { agentId, count: incidents.length, incidents });
+
+      const agentId = queryParam(req.url ?? '', 'agent') ?? 'default';
+      const status = queryParam(req.url ?? '', 'status');
+      const limit = parseInt(queryParam(req.url ?? '', 'limit') ?? '50', 10);
+
+      // Always fetch all incidents for this agent, then resolve latest state from transitions
+      const incidents = store.getIncidentsByAgent(agentId);
+      const incidentIds = incidents.map(i => i.incidentId);
+      const latestStates = store.getLatestIncidentStates(incidentIds);
+
+      let mapped = incidents.map(i => {
+        const currentState = latestStates.get(i.incidentId) ?? i.state;
+        return {
+          incidentId: i.incidentId,
+          agentId: i.agentId,
+          severity: i.severity,
+          state: currentState,
+          title: i.title,
+          createdTs: i.createdTs,
+        };
+      });
+
+      // Apply status filter on resolved state
+      if (status === 'closed') {
+        mapped = mapped.filter(i => i.state === 'RESOLVED');
+      } else if (status === 'open') {
+        mapped = mapped.filter(i => i.state === 'OPEN');
+      }
+
+      const limited = mapped.slice(0, limit);
+      apiSuccess(res, { count: limited.length, incidents: limited });
     } catch (err) {
-      apiError(res, 500, err instanceof Error ? err.message : "Internal error");
+      apiError(res, 500, err instanceof Error ? err.message : 'Could not list incidents');
     } finally {
       ledger.close();
     }
     return true;
   }
 
-  if (pathname === "/api/v1/incidents" && method === "POST") {
+  // POST /api/v1/incidents — create incident
+  if (pathname === '/api/v1/incidents' && method === 'POST') {
+    const ledger = openLedger(workspace);
     try {
-      const body = await bodyJsonSchema(req, createIncidentBodySchema);
+      const store = createIncidentStore(ledger.db);
+      store.initTables();
 
-      const severity = parseSeverity(body.severity);
-      const agentId = body.agentId ?? currentAgentFromReqUrl(req);
-      const triggerType = body.triggerType ?? "MANUAL";
-      if (!VALID_TRIGGER_TYPES.has(triggerType)) {
-        apiError(res, 400, "triggerType must be DRIFT|ASSURANCE_FAILURE|FREEZE|BUDGET_EXCEEDED|GOVERNANCE_VIOLATION|MANUAL");
-        return true;
-      }
+      const body = await bodyJson<{
+        agentId?: string;
+        title: string;
+        severity?: string;
+        description?: string;
+      }>(req);
 
+      if (!body.title) { apiError(res, 400, 'title required'); return true; }
+
+      const agentId = body.agentId ?? 'default';
+      const incidentId = `incident_${randomUUID().replace(/-/g, '')}`;
       const now = Date.now();
-      const workspace = process.cwd();
-      const ledger = openLedger(workspace);
-      try {
-        const store = createIncidentStore(ledger.db);
-        store.initTables();
-        const incidentId = `incident_${randomUUID().replace(/-/g, "")}`;
-        const incidentBase = {
-          incidentId,
-          agentId,
-          severity,
-          state: "OPEN" as const,
-          title: body.title,
-          description: body.description ?? body.title,
-          triggerType,
-          triggerId: body.triggerId ?? `manual_${incidentId}`,
-          rootCauseClaimIds: [] as string[],
-          affectedQuestionIds: [] as string[],
-          causalEdges: [] as Incident["causalEdges"],
-          timelineEventIds: [] as string[],
-          createdTs: now,
-          updatedTs: now,
-          resolvedTs: null as number | null,
-          postmortemRef: null as string | null,
-          prev_incident_hash: store.getLastIncidentHash(agentId)
-        };
-        const incidentHash = computeIncidentHash(incidentBase);
-        const digest = sha256Hex(canonicalize({ ...incidentBase, incident_hash: incidentHash }));
-        const signature = signHexDigest(digest, getPrivateKeyPem(workspace, "monitor"));
-        const incident: Incident = {
-          ...incidentBase,
-          incident_hash: incidentHash,
-          signature
-        };
-        store.insertIncident(incident);
-        queueIncidentLog(incident);
-        apiSuccess(res, incident, 201);
-      } finally {
-        ledger.close();
-      }
+      const severity = normalizeSeverity(body.severity);
+      const prevHash = store.getLastIncidentHash(agentId);
+
+      const partial: Omit<Incident, 'incident_hash' | 'signature'> = {
+        incidentId,
+        agentId,
+        severity,
+        state: 'OPEN',
+        title: body.title,
+        description: body.description ?? body.title,
+        triggerType: 'MANUAL',
+        triggerId: 'manual',
+        rootCauseClaimIds: [],
+        affectedQuestionIds: [],
+        causalEdges: [],
+        timelineEventIds: [],
+        createdTs: now,
+        updatedTs: now,
+        resolvedTs: null,
+        postmortemRef: null,
+        prev_incident_hash: prevHash,
+      };
+
+      const incident_hash = computeIncidentHash(partial);
+      const privateKey = getPrivateKeyPem(workspace, 'monitor');
+      const signature = signHexDigest(incident_hash, privateKey);
+
+      const incident: Incident = {
+        ...partial,
+        incident_hash,
+        signature,
+      };
+
+      store.insertIncident(incident);
+
+      apiSuccess(res, {
+        incidentId,
+        agentId,
+        state: 'OPEN',
+      }, 201);
     } catch (err) {
-      if (isRequestBodyError(err)) {
-        apiError(res, err.statusCode, err.message);
-        return true;
-      }
-      apiError(res, 500, err instanceof Error ? err.message : "Internal error");
+      apiError(res, 500, err instanceof Error ? err.message : 'Could not create incident');
+    } finally {
+      ledger.close();
     }
     return true;
   }
 
-  const incidentParams = pathParam(pathname, "/api/v1/incidents/:id");
-  if (incidentParams && method === "GET") {
-    const incidentId = incidentParams.id;
-    if (!incidentId) {
-      apiError(res, 400, "Missing incident id");
-      return true;
-    }
-    const ledger = openLedger(process.cwd());
+  // Match /:id routes
+  const incParams = pathParam(pathname, '/api/v1/incidents/:id');
+  if (!incParams || !incParams.id) return false;
+
+  const incidentId: string = incParams.id;
+
+  // GET /api/v1/incidents/:id — get incident details
+  if (method === 'GET') {
+    const ledger = openLedger(workspace);
     try {
       const store = createIncidentStore(ledger.db);
       store.initTables();
+
       const incident = store.getIncident(incidentId);
-      if (!incident) {
-        apiError(res, 404, "Incident not found");
-        return true;
-      }
+      if (!incident) { apiError(res, 404, 'Incident not found'); return true; }
+
       const transitions = store.getIncidentTransitions(incidentId);
       const causalEdges = store.getCausalEdges(incidentId);
-      const state = transitions.length > 0 ? transitions[transitions.length - 1]!.toState : incident.state;
+
+      // Determine current state from transitions
+      const currentState = transitions.length > 0
+        ? transitions[transitions.length - 1]!.toState
+        : incident.state;
+
       apiSuccess(res, {
-        ...incident,
-        state,
-        transitions,
-        causalEdges
+        incidentId: incident.incidentId,
+        agentId: incident.agentId,
+        severity: incident.severity,
+        state: currentState,
+        title: incident.title,
+        description: incident.description,
+        createdTs: incident.createdTs,
+        transitions: transitions.map(t => ({
+          transitionId: t.transitionId,
+          fromState: t.fromState,
+          toState: t.toState,
+          reason: t.reason,
+          ts: t.ts,
+        })),
+        causalEdges: causalEdges.map(e => ({
+          edgeId: e.edgeId,
+          fromEventId: e.fromEventId,
+          toEventId: e.toEventId,
+          relationship: e.relationship,
+          confidence: e.confidence,
+        })),
       });
     } catch (err) {
-      apiError(res, 500, err instanceof Error ? err.message : "Internal error");
+      apiError(res, 500, err instanceof Error ? err.message : 'Could not load incident');
     } finally {
       ledger.close();
     }
     return true;
   }
 
-  if (incidentParams && method === "PATCH") {
-    const incidentId = incidentParams.id;
-    if (!incidentId) {
-      apiError(res, 400, "Missing incident id");
-      return true;
-    }
+  // PATCH /api/v1/incidents/:id — update incident
+  if (method === 'PATCH') {
+    const ledger = openLedger(workspace);
     try {
-      const body = await bodyJsonSchema(req, patchIncidentBodySchema);
-      const workspace = process.cwd();
-      const ledger = openLedger(workspace);
-      try {
-        const store = createIncidentStore(ledger.db);
-        store.initTables();
-        const incident = store.getIncident(incidentId);
-        if (!incident) {
-          apiError(res, 404, "Incident not found");
-          return true;
-        }
+      const store = createIncidentStore(ledger.db);
+      store.initTables();
 
-        let changed = false;
-        if (body.evidenceId && body.evidenceId.trim().length > 0) {
-          const edgeId = `edge_${randomUUID().replace(/-/g, "")}`;
-          const now = Date.now();
-          const edgeDigest = sha256Hex(
-            canonicalize({
-              edge_id: edgeId,
-              from_event_id: body.evidenceId,
-              to_event_id: incidentId,
-              relationship: "CAUSED",
-              confidence: 0.9,
-              evidence: [body.evidenceId],
-              added_ts: now,
-              added_by: "OWNER"
-            })
-          );
-          store.insertCausalEdge(incidentId, {
-            edgeId,
-            fromEventId: body.evidenceId,
-            toEventId: incidentId,
-            relationship: "CAUSED",
-            confidence: 0.9,
-            evidence: [body.evidenceId],
-            addedTs: now,
-            addedBy: "OWNER",
-            signature: signHexDigest(edgeDigest, getPrivateKeyPem(workspace, "monitor"))
-          });
-          changed = true;
-        }
+      const incident = store.getIncident(incidentId);
+      if (!incident) { apiError(res, 404, 'Incident not found'); return true; }
 
-        if (body.state || body.resolution) {
-          const transitions = store.getIncidentTransitions(incidentId);
-          const fromState = transitions.length > 0 ? transitions[transitions.length - 1]!.toState : incident.state;
-          const targetState = body.state ? parseIncidentState(body.state) : "RESOLVED";
-          if (targetState !== fromState) {
-            const ts = Date.now();
-            const transitionId = `itr_${randomUUID().replace(/-/g, "")}`;
-            const transitionDigest = sha256Hex(
-              canonicalize({
-                transition_id: transitionId,
-                incident_id: incidentId,
-                from_state: fromState,
-                to_state: targetState,
-                reason: body.resolution ?? `state change to ${targetState}`,
-                ts
-              })
-            );
-            store.insertIncidentTransition({
-              transitionId,
-              incidentId,
-              fromState,
-              toState: targetState,
-              reason: body.resolution ?? `state change to ${targetState}`,
-              ts,
-              signature: signHexDigest(transitionDigest, getPrivateKeyPem(workspace, "monitor"))
-            });
-            changed = true;
-          }
-        }
+      const body = await bodyJson<{
+        resolution?: string;
+        evidenceId?: string;
+      }>(req);
 
-        if (!changed) {
-          apiError(res, 400, "No patch operations requested (supported: state, resolution, evidenceId)");
-          return true;
-        }
+      const privateKey = getPrivateKeyPem(workspace, 'monitor');
+      const now = Date.now();
 
-        const transitions = store.getIncidentTransitions(incidentId);
-        const causalEdges = store.getCausalEdges(incidentId);
-        const state = transitions.length > 0 ? transitions[transitions.length - 1]!.toState : incident.state;
-        queueIncidentLog({
-          incidentId,
-          agentId: incident.agentId,
-          severity: incident.severity,
-          state,
-          title: incident.title,
-          description: body.resolution ?? incident.description,
-          triggerType: incident.triggerType,
-          triggerId: incident.triggerId,
-          ts: Date.now()
+      // Handle resolution → close incident
+      if (body.resolution) {
+        // Determine current state from transitions
+        const existingTransitions = store.getIncidentTransitions(incidentId);
+        const currentState: IncidentState = existingTransitions.length > 0
+          ? existingTransitions[existingTransitions.length - 1]!.toState
+          : incident.state;
+
+        const transitionId = `tr_${randomUUID().replace(/-/g, '')}`;
+        const transitionPayload = canonicalize({
+          transition_id: transitionId,
+          incident_id: incidentId,
+          from_state: currentState,
+          to_state: 'RESOLVED',
+          reason: body.resolution,
+          ts: now,
         });
-        apiSuccess(res, {
+        const transitionSig = signHexDigest(sha256Hex(transitionPayload), privateKey);
+
+        store.insertIncidentTransition({
+          transitionId,
           incidentId,
-          state,
-          transitions,
-          causalEdges
+          fromState: currentState,
+          toState: 'RESOLVED',
+          reason: body.resolution,
+          ts: now,
+          signature: transitionSig,
         });
-      } finally {
-        ledger.close();
       }
+
+      // Handle evidenceId → add causal edge
+      if (body.evidenceId) {
+        const edgeId = `edge_${randomUUID().replace(/-/g, '')}`;
+        const edgePayload = canonicalize({
+          edge_id: edgeId,
+          from_event_id: body.evidenceId,
+          to_event_id: incidentId,
+          relationship: 'CORRELATED',
+          confidence: 0.8,
+          evidence: [body.evidenceId],
+          added_ts: now,
+          added_by: 'OWNER',
+        });
+        const edgeSig = signHexDigest(sha256Hex(edgePayload), privateKey);
+
+        store.insertCausalEdge(incidentId, {
+          edgeId,
+          fromEventId: body.evidenceId,
+          toEventId: incidentId,
+          relationship: 'CORRELATED',
+          confidence: 0.8,
+          evidence: [body.evidenceId],
+          addedTs: now,
+          addedBy: 'OWNER',
+          signature: edgeSig,
+        });
+      }
+
+      // Return updated state
+      const transitions = store.getIncidentTransitions(incidentId);
+      const causalEdges = store.getCausalEdges(incidentId);
+      const currentState: IncidentState = transitions.length > 0
+        ? transitions[transitions.length - 1]!.toState
+        : incident.state;
+
+      apiSuccess(res, {
+        incidentId: incident.incidentId,
+        state: currentState,
+        transitions: transitions.map(t => ({
+          transitionId: t.transitionId,
+          fromState: t.fromState,
+          toState: t.toState,
+          reason: t.reason,
+          ts: t.ts,
+        })),
+        causalEdges: causalEdges.map(e => ({
+          edgeId: e.edgeId,
+          fromEventId: e.fromEventId,
+          toEventId: e.toEventId,
+          relationship: e.relationship,
+          confidence: e.confidence,
+        })),
+      });
     } catch (err) {
-      if (isRequestBodyError(err)) {
-        apiError(res, err.statusCode, err.message);
-        return true;
-      }
-      apiError(res, 500, err instanceof Error ? err.message : "Internal error");
+      apiError(res, 500, err instanceof Error ? err.message : 'Could not update incident');
+    } finally {
+      ledger.close();
     }
     return true;
   }
