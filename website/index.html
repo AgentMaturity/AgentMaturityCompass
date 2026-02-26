@@ -12,7 +12,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://thewisecrab.github.io/AgentMaturityCompass/og-card.png">
 <title>Agent Maturity Compass — AI Agent Trust Scoring</title>
-<meta name="description" content="AMC scores AI agents on trustworthiness from actual execution behavior — not self-reported claims. Cryptographic evidence chains. 2,693 tests. Zero to first score in 2 minutes. MIT licensed.">
+<meta name="description" content="AMC scores AI agents on trustworthiness from actual execution behavior — not self-reported claims. Cryptographic evidence chains. 2,699 tests. Zero to first score in 2 minutes. MIT licensed.">
 <meta name="keywords" content="AI agent trust scoring, agent maturity model, LLM governance, agent security, LangChain evaluation, CrewAI scoring, EU AI Act compliance, prompt injection testing, agent benchmark, cryptographic evidence">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Agent Maturity Compass — The Credit Score for AI Agents">
@@ -1045,7 +1045,7 @@ a:focus-visible,.bp:focus-visible,.bg:focus-visible,.nbtn:focus-visible,
       <a href="#how" class="bg">Architecture →</a>
     </div>
     <div class="hstats">
-      <div class="hstat"><span class="hnum" data-target="2693">0</span><span class="hlabel">Tests Passing</span></div>
+      <div class="hstat"><span class="hnum" data-target="2699">0</span><span class="hlabel">Tests Passing</span></div>
       <div class="hstat"><span class="hnum" data-target="126">0</span><span class="hlabel">Diagnostic Questions</span></div>
       <div class="hstat"><span class="hnum" data-target="74">0</span><span class="hlabel">Scoring Modules</span></div>
       <div class="hstat"><span class="hnum" data-target="74">0</span><span class="hlabel">Assurance Packs</span></div>
@@ -1104,7 +1104,7 @@ a:focus-visible,.bp:focus-visible,.bg:focus-visible,.nbtn:focus-visible,
     <div class="os-panel" id="os-source" role="tabpanel">
       <span class="co g">$ git clone https://github.com/thewisecrab/AgentMaturityCompass.git</span>
       <span class="co g" style="display:block">$ cd AgentMaturityCompass && npm ci && npm run build && npm link</span>
-      <span class="co d" style="display:block;margin-top:.3rem">Full source. 2,693 tests: npm test + pytest platform/python/tests/</span>
+      <span class="co d" style="display:block;margin-top:.3rem">Full source. 2,699 tests: npm test + pytest platform/python/tests/</span>
     </div>
   </div>
 
@@ -1132,7 +1132,7 @@ a:focus-visible,.bp:focus-visible,.bg:focus-visible,.nbtn:focus-visible,
     <div class="cap-item"><span class="cap-num" data-target="74">0</span><span class="cap-label">Assurance Packs</span></div>
     <div class="cap-item"><span class="cap-num" data-target="126">0</span><span class="cap-label">Questions</span></div>
     <div class="cap-item"><span class="cap-num" data-target="14">0</span><span class="cap-label">Adapters</span></div>
-    <div class="cap-item"><span class="cap-num" data-target="2693">0</span><span class="cap-label">Tests Passing</span></div>
+    <div class="cap-item"><span class="cap-num" data-target="2699">0</span><span class="cap-label">Tests Passing</span></div>
   </div>
 </div>
 </section>
@@ -1361,6 +1361,7 @@ a:focus-visible,.bp:focus-visible,.bg:focus-visible,.nbtn:focus-visible,
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:.75rem">
         <div style="padding:.75rem;background:rgba(0,0,0,.3);border-radius:.5rem;font:.8rem/1.5 var(--sans);color:var(--t2)"><strong style="color:var(--g)">10 frameworks</strong><br>LangChain, CrewAI, AutoGen, OpenAI, LlamaIndex, Semantic Kernel, Claude Code, Gemini, Cursor, Kiro</div>
         <div style="padding:.75rem;background:rgba(0,0,0,.3);border-radius:.5rem;font:.8rem/1.5 var(--sans);color:var(--t2)"><strong style="color:var(--g)">15 config targets</strong><br>AGENTS.md, CLAUDE.md, .cursorrules, .kiro/steering, .gemini/style.md, .devin/guidelines.md, and more</div>
+        <div style="padding:.75rem;background:rgba(0,0,0,.3);border-radius:.5rem;font:.8rem/1.5 var(--sans);color:var(--t2)"><strong style="color:var(--g)">5 compliance frameworks</strong><br>EU AI Act, ISO 42001, NIST AI RMF, SOC 2, ISO 27001 — maps gaps to regulatory obligations</div>
         <div style="padding:.75rem;background:rgba(0,0,0,.3);border-radius:.5rem;font:.8rem/1.5 var(--sans);color:var(--t2)"><strong style="color:var(--g)">Severity-tagged</strong><br>🔴 Critical, 🟡 High, 🔵 Medium — so you know what to fix first</div>
       </div>
     </div>
@@ -1421,6 +1422,11 @@ a:focus-visible,.bp:focus-visible,.bg:focus-visible,.nbtn:focus-visible,
         <div style="font:700 .8rem/1 var(--mono);color:var(--r);letter-spacing:.08em;text-transform:uppercase;margin-bottom:.5rem">CI Gate</div>
         <div style="font:500 .85rem/1.4 var(--mono);color:var(--t0);margin-bottom:.5rem">amc guide --ci --target 3</div>
         <p style="font:400 .8rem/1.5 var(--sans);color:var(--t2);margin:0">Exit non-zero if below target level. JSON schema output. Severity-tagged gaps. Block deploys below your trust threshold.</p>
+      </div>
+      <div style="padding:1rem;background:var(--card);border:1px solid var(--bdr);border-radius:.75rem;border-top:2px solid #f59e0b">
+        <div style="font:700 .8rem/1 var(--mono);color:#f59e0b;letter-spacing:.08em;text-transform:uppercase;margin-bottom:.5rem">Compliance</div>
+        <div style="font:500 .85rem/1.4 var(--mono);color:var(--t0);margin-bottom:.5rem">amc guide --compliance EU_AI_ACT</div>
+        <p style="font:400 .8rem/1.5 var(--sans);color:var(--t2);margin:0">Maps maturity gaps to regulatory obligations. EU AI Act, ISO 42001, NIST AI RMF, SOC 2, ISO 27001. Per-article remediation.</p>
       </div>
     </div>
 
@@ -1724,7 +1730,7 @@ a:focus-visible,.bp:focus-visible,.bg:focus-visible,.nbtn:focus-visible,
   </div>
   <div class="to rv" style="text-align:center">
     <h2 class="cta-h2" id="cta-h">Your Agent Claims L4.<br><strong>The evidence doesn't lie.</strong></h2>
-    <p class="cta-sub">2,693 tests. 126 questions. 74 assurance packs. 10 framework adapters. Auto-apply guardrails. Cryptographic proof chains. MIT licensed. Your score is waiting.</p>
+    <p class="cta-sub">2,699 tests. 126 questions. 74 assurance packs. 10 framework adapters. Auto-apply guardrails. Cryptographic proof chains. MIT licensed. Your score is waiting.</p>
     <div class="cta-row">
       <a href="https://github.com/thewisecrab/AgentMaturityCompass" class="bp" target="_blank" rel="noopener">npm i -g agent-maturity-compass</a>
       <a href="https://github.com/thewisecrab/AgentMaturityCompass/blob/main/docs/GETTING_STARTED.md" class="bg" target="_blank" rel="noopener">Read the Docs →</a>

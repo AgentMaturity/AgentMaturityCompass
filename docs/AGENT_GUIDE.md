@@ -186,6 +186,9 @@ amc guide --interactive            # Cherry-pick gaps to fix
 amc guide --guardrails             # Generate guardrails only
 amc guide --agent-instructions     # Generate agent instructions only
 amc guide --export                 # Generate human guide
+amc guide --compliance             # Compliance guardrails (all 5 frameworks)
+amc guide --compliance EU_AI_ACT   # EU AI Act compliance guardrails only
+amc guide --compliance EU_AI_ACT,ISO_42001  # Multiple frameworks
 amc guide --apply                  # Apply guardrails to config file
 amc guide --apply --dry-run        # Preview apply without writing
 amc guide --ci --target 3          # CI gate mode
@@ -198,6 +201,48 @@ amc guide --target 4               # Set target level (default: 3)
 amc guide --agent my-agent         # Specify agent ID
 amc guide --json                   # JSON output
 ```
+
+## Compliance Guardrails
+
+AMC maps your maturity gaps to 5 regulatory frameworks:
+
+| Framework | Standard | Key Articles/Clauses |
+|-----------|----------|---------------------|
+| `EU_AI_ACT` | EU AI Act (Regulation 2024/1689) | Art. 9 (Risk), 10 (Data), 11 (Docs), 12 (Logging), 13 (Transparency), 14 (Oversight), 15 (Robustness), 17 (QMS), 27 (FRIA), 72 (Monitoring), 73 (Incidents), 86 (Explanation) |
+| `ISO_42001` | ISO/IEC 42001:2023 | Clauses 4-10 (AI Management System) |
+| `NIST_AI_RMF` | NIST AI RMF 1.0 | GOVERN, MAP, MEASURE, MANAGE functions |
+| `SOC2` | SOC 2 Type II | Security, Availability, Processing Integrity, Confidentiality, Privacy |
+| `ISO_27001` | ISO/IEC 27001:2022 | Information Security Management |
+
+### Usage
+
+```bash
+# All frameworks
+amc guide --compliance
+
+# EU AI Act only (deadline: August 2, 2026)
+amc guide --compliance EU_AI_ACT
+
+# Multiple frameworks
+amc guide --compliance EU_AI_ACT,ISO_42001,SOC2
+
+# Combined with other flags
+amc guide --go --compliance EU_AI_ACT
+```
+
+### What You Get
+
+Compliance guardrails include:
+- **Per-framework obligation mapping** — which articles/clauses your gaps violate
+- **Severity-tagged rules** — 🔴 Critical / 🟡 High / 🔵 Medium
+- **Required assurance packs** — which packs to run for each obligation
+- **Required evidence types** — what AMC needs to observe
+- **Verification commands** — `amc compliance report --framework <fw>`
+- **Agent-readable rules** — your agent can follow these to become compliant
+
+### EU AI Act Deadline
+
+The EU AI Act's high-risk obligations (Articles 9-15, 17) become fully applicable on **August 2, 2026**. Running `amc guide --compliance EU_AI_ACT` shows exactly which obligations your agent doesn't yet satisfy and what to fix.
 
 ## Integration with AMC Ecosystem
 

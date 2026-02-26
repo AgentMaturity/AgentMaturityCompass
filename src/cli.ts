@@ -1361,6 +1361,7 @@ program
   .option("--auto-detect", "auto-detect framework from project files", false)
   .option("--status", "one-line status: current level, gap count, severities", false)
   .option("--go", "all-in-one: quick + auto-detect + export + apply (zero friction)", false)
+  .option("--compliance [frameworks]", "generate compliance guardrails (EU_AI_ACT,ISO_42001,NIST_AI_RMF,SOC2,ISO_27001 or 'all')")
   .option("--agent <id>", "agent ID", "default")
   .option("--framework <name>", "framework name for tailored instructions")
   .option("--json", "emit JSON output", false)
@@ -1381,6 +1382,7 @@ program
     autoDetect: boolean;
     status: boolean;
     go: boolean;
+    compliance: string | boolean;
     agent: string;
     framework?: string;
     json: boolean;
@@ -1396,6 +1398,8 @@ program
       listSupportedFrameworks,
       detectFramework,
       guideStatusLine,
+      guideToComplianceGuardrails,
+      SUPPORTED_COMPLIANCE_FRAMEWORKS,
       applyGuardrails,
       KNOWN_AGENT_CONFIGS,
     } = await import("./guide/guideGenerator.js");
@@ -1518,12 +1522,17 @@ program
       const overall = (result.totalScore / result.maxScore) * 5;
       const targetLevel = opts.target ? parseInt(opts.target, 10) : undefined;
 
+      const complianceFws = typeof opts.compliance === "string" && opts.compliance !== "true"
+        ? opts.compliance.split(",").map((s: string) => s.trim().toUpperCase())
+        : opts.compliance ? SUPPORTED_COMPLIANCE_FRAMEWORKS : undefined;
+
       return generateGuide({
         overall,
         questionScores,
         targetLevel,
         agentId: opts.agent,
         framework: opts.framework,
+        complianceFrameworks: complianceFws,
       });
     }
 
@@ -1775,7 +1784,7 @@ program
     }
 
     /* ── Export modes ─────────────────────────────── */
-    const shouldExport = opts.export || opts.agentInstructions || opts.guardrails;
+    const shouldExport = opts.export || opts.agentInstructions || opts.guardrails || opts.compliance;
     if (shouldExport) {
       const guidesDir = path.join(process.cwd(), ".amc", "guides");
       fs.mkdirSync(guidesDir, { recursive: true });
@@ -1796,6 +1805,15 @@ program
         const guardrailsPath = path.join(guidesDir, `guardrails-l${guide.currentLevel}-to-l${guide.targetLevel}.md`);
         fs.writeFileSync(guardrailsPath, guideToGuardrails(guide, opts.framework), "utf-8");
         console.log(chalk.green(`  ✓ Guardrails:`), chalk.cyan(guardrailsPath));
+      }
+
+      if (opts.compliance || opts.export) {
+        const complianceFws = typeof opts.compliance === "string" && opts.compliance !== "true"
+          ? opts.compliance.split(",").map((s: string) => s.trim().toUpperCase())
+          : undefined;
+        const compliancePath = path.join(guidesDir, `compliance-guardrails-l${guide.currentLevel}-to-l${guide.targetLevel}.md`);
+        fs.writeFileSync(compliancePath, guideToComplianceGuardrails(guide, complianceFws), "utf-8");
+        console.log(chalk.green(`  ✓ Compliance guardrails:`), chalk.cyan(compliancePath));
       }
 
       // Always save JSON for future diffs and CI/CD

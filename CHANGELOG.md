@@ -16,6 +16,9 @@ All notable changes to AMC are documented here.
   - `--dry-run` mode: preview apply without writing files
   - `--auto-detect` mode: detect framework from project files
   - `--frameworks` mode: list supported frameworks
+  - `--compliance` mode: generate compliance-specific guardrails mapped to regulatory obligations
+  - 5 compliance frameworks: EU AI Act, ISO 42001, NIST AI RMF, SOC 2, ISO 27001
+  - Per-question compliance gap mapping from 37 built-in compliance mappings
   - Severity tagging: 🔴 Critical (gap ≥ 3), 🟡 High (gap ≥ 2), 🔵 Medium (gap = 1)
   - 10 framework-specific instruction sets (LangChain, CrewAI, AutoGen, OpenAI, LlamaIndex, Semantic Kernel, Claude Code, Gemini, Cursor, Kiro)
   - 15 agent config targets with idempotent AMC-GUARDRAILS markers

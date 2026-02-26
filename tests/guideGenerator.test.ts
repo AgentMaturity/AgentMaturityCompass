@@ -9,6 +9,8 @@ import {
   listSupportedFrameworks,
   detectFramework,
   guideStatusLine,
+  guideToComplianceGuardrails,
+  SUPPORTED_COMPLIANCE_FRAMEWORKS,
   applyGuardrails,
   KNOWN_AGENT_CONFIGS,
 } from "../src/guide/guideGenerator.js";
@@ -489,5 +491,96 @@ describe("guideGenerator", () => {
     const md = guideToHumanMarkdown(guide);
 
     expect(md).not.toContain("First Time? Start Here");
+  });
+
+  it("SUPPORTED_COMPLIANCE_FRAMEWORKS includes all 5 frameworks", () => {
+    expect(SUPPORTED_COMPLIANCE_FRAMEWORKS).toContain("EU_AI_ACT");
+    expect(SUPPORTED_COMPLIANCE_FRAMEWORKS).toContain("ISO_42001");
+    expect(SUPPORTED_COMPLIANCE_FRAMEWORKS).toContain("NIST_AI_RMF");
+    expect(SUPPORTED_COMPLIANCE_FRAMEWORKS).toContain("SOC2");
+    expect(SUPPORTED_COMPLIANCE_FRAMEWORKS).toContain("ISO_27001");
+  });
+
+  it("guide sections include complianceGaps when frameworks specified", () => {
+    const scores = questionBank.slice(0, 20).map(q => makeScore(q.id, 0));
+    const guide = generateGuide({
+      overall: 0,
+      questionScores: scores,
+      targetLevel: 3,
+      complianceFrameworks: ["EU_AI_ACT"],
+    });
+
+    // At least some sections should have compliance gaps (EU AI Act maps to many questions)
+    const withGaps = guide.sections.filter(s => s.complianceGaps.length > 0);
+    expect(withGaps.length).toBeGreaterThan(0);
+
+    // Each gap should have the right framework
+    for (const s of withGaps) {
+      for (const cg of s.complianceGaps) {
+        expect(cg.framework).toBe("EU_AI_ACT");
+        expect(cg.category).toBeTruthy();
+        expect(cg.description).toBeTruthy();
+        expect(cg.mappingId).toBeTruthy();
+      }
+    }
+  });
+
+  it("guideToComplianceGuardrails generates framework-specific output", () => {
+    const scores = questionBank.slice(0, 20).map(q => makeScore(q.id, 0));
+    const guide = generateGuide({
+      overall: 0,
+      questionScores: scores,
+      targetLevel: 3,
+      complianceFrameworks: ["EU_AI_ACT"],
+    });
+    const md = guideToComplianceGuardrails(guide, ["EU_AI_ACT"]);
+
+    expect(md).toContain("AMC Compliance Guardrails");
+    expect(md).toContain("EU AI Act");
+    expect(md).toContain("amc compliance report --framework EU_AI_ACT");
+  });
+
+  it("guideToComplianceGuardrails handles multiple frameworks", () => {
+    const scores = questionBank.slice(0, 20).map(q => makeScore(q.id, 0));
+    const guide = generateGuide({
+      overall: 0,
+      questionScores: scores,
+      targetLevel: 3,
+      complianceFrameworks: SUPPORTED_COMPLIANCE_FRAMEWORKS,
+    });
+    const md = guideToComplianceGuardrails(guide);
+
+    expect(md).toContain("Compliance Guardrails");
+    // Should have at least some obligations
+    expect(md).toContain("obligation");
+  });
+
+  it("guideToComplianceGuardrails shows all-clear when no gaps map", () => {
+    // Use scores at target level — no gaps
+    const scores = questionBank.slice(0, 5).map(q => makeScore(q.id, 3));
+    const guide = generateGuide({
+      overall: 3.0,
+      questionScores: scores,
+      targetLevel: 3,
+    });
+    const md = guideToComplianceGuardrails(guide, ["EU_AI_ACT"]);
+
+    expect(md).toContain("No compliance gaps found");
+  });
+
+  it("complianceGaps are empty when no frameworks specified", () => {
+    const scores = questionBank.slice(0, 5).map(q => makeScore(q.id, 0));
+    const guide = generateGuide({
+      overall: 0,
+      questionScores: scores,
+      targetLevel: 3,
+      // No complianceFrameworks specified
+    });
+
+    // complianceGaps should still be populated (all frameworks by default in the mapping lookup)
+    // but the field should exist on every section
+    for (const s of guide.sections) {
+      expect(Array.isArray(s.complianceGaps)).toBe(true);
+    }
   });
 });

@@ -98,6 +98,7 @@ amc guide --go
 - **Severity-tagged** — 🔴 Critical, 🟡 High, 🔵 Medium — so you know what to fix first
 - **Idempotent** — re-running `--apply` updates only the guardrails section (AMC-GUARDRAILS markers)
 - **CI gate** — `amc guide --ci --target 3` exits non-zero if below threshold
+- **Compliance** — `amc guide --compliance EU_AI_ACT` maps gaps to regulatory obligations (EU AI Act, ISO 42001, NIST AI RMF, SOC 2, ISO 27001)
 
 ```bash
 amc guide --status              # One-line health check

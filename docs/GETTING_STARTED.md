@@ -105,6 +105,8 @@ amc guide --status              # One-line health check
 amc guide --interactive         # Cherry-pick which gaps to fix
 amc guide --watch --apply       # Continuous monitoring + auto-update
 amc guide --ci --target 3       # CI gate — exit non-zero if below threshold
+amc guide --compliance EU_AI_ACT  # EU AI Act compliance guardrails
+amc guide --compliance          # All 5 frameworks (EU AI Act, ISO 42001, NIST, SOC 2, ISO 27001)
 ```
 
 ### Check what needs work
@@ -303,6 +305,8 @@ amc score evidence-ingest --format weights-biases
 | `amc guide --ci --target 3` | CI gate mode |
 | `amc guide --watch --apply` | Continuous monitoring |
 | `amc guide --diff` | Compare with previous run |
+| `amc guide --compliance EU_AI_ACT` | EU AI Act compliance guardrails |
+| `amc guide --compliance` | All 5 regulatory frameworks |
 | `amc guide --frameworks` | List supported frameworks |
 
 ### Research-Backed Modules
