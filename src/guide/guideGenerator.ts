@@ -243,10 +243,16 @@ function cliCommandsForGap(q: DiagnosticQuestion, currentLevel: number, targetLe
     "Culture & Alignment": "alignment",
     "Resilience": "resilience",
     "Skills": "skills",
+    "Evaluation & Growth": "evaluation",
   };
   const scope = layerScopeMap[q.layerName];
   if (scope && targetLevel >= 3) {
     cmds.push(`amc assurance run --scope ${scope}`);
+  }
+
+  // Over-compliance questions get specific pack
+  if (q.id.startsWith("AMC-OC")) {
+    cmds.push("amc assurance run --pack overCompliance,falsePremise,misleadingContext");
   }
 
   // Specific commands based on tuning knobs
@@ -281,6 +287,13 @@ function generateAgentInstruction(q: DiagnosticQuestion, currentLevel: number, t
   parts.push("");
   parts.push(`**Current:** L${currentLevel} | **Target:** L${targetLevel}`);
   parts.push("");
+
+  // What AMC is evaluating (from the prompt template)
+  if (q.promptTemplate) {
+    const cleanPrompt = q.promptTemplate.replace(/\{\{[^}]+\}\}/g, "[your context]");
+    parts.push(`> *AMC evaluates:* ${cleanPrompt}`);
+    parts.push("");
+  }
 
   // What the agent should do
   parts.push("### What you must do");
@@ -544,8 +557,28 @@ export function guideToGuardrails(guide: Guide, framework?: string): string {
   lines.push("");
 
   if (framework) {
-    lines.push(`**Framework:** ${framework}`);
+    const fw = resolveFramework(framework);
+    lines.push(`**Framework:** ${fw?.name ?? framework}`);
     lines.push("");
+  }
+
+  // Quick Start — top 3 most critical rules for immediate impact
+  if (guide.sections.length > 0) {
+    const top3 = guide.sections.slice(0, 3);
+    lines.push("## ⚡ Quick Start (Top 3 Priorities)");
+    lines.push("");
+    for (let i = 0; i < top3.length; i++) {
+      const s = top3[i]!;
+      const q = questionBank.find(bq => bq.id === s.questionId);
+      if (!q) continue;
+      const hint = q.upgradeHints.split(".")[0] ?? q.upgradeHints;
+      lines.push(`${i + 1}. **${s.questionId}** (${s.layerName}): ${hint}.`);
+    }
+    lines.push("");
+    if (top3[0]?.cliCommands[0]) {
+      lines.push(`Start here: \`${top3[0].cliCommands[0]}\``);
+      lines.push("");
+    }
   }
 
   // Group sections by layer
@@ -778,9 +811,9 @@ export function guideToJSON(guide: Guide, framework?: string): GuideJSON {
     generatedAt: guide.generatedAt,
     gapCount: guide.sections.length,
     passingCount: guide.sections.length > 0
-      ? Math.max(0, 126 - guide.sections.length) // approximate
-      : 126,
-    totalQuestions: 126,
+      ? Math.max(0, questionBank.length - guide.sections.length)
+      : questionBank.length,
+    totalQuestions: questionBank.length,
     framework: framework ?? undefined,
     gaps: guide.sections.map(s => ({
       questionId: s.questionId,
@@ -805,17 +838,37 @@ export interface GuideDiff {
   newGaps: string[];
   closedGaps: string[];
   unchangedGaps: string[];
+  improvedGaps: Array<{ questionId: string; from: number; to: number }>;
+  regressedGaps: Array<{ questionId: string; from: number; to: number }>;
   levelChange: "improved" | "regressed" | "unchanged";
   summary: string;
 }
 
 export function diffGuides(previous: Guide, current: Guide): GuideDiff {
-  const prevIds = new Set(previous.sections.map(s => s.questionId));
-  const currIds = new Set(current.sections.map(s => s.questionId));
+  const prevMap = new Map(previous.sections.map(s => [s.questionId, s]));
+  const currMap = new Map(current.sections.map(s => [s.questionId, s]));
+  const prevIds = new Set(prevMap.keys());
+  const currIds = new Set(currMap.keys());
 
   const newGaps = [...currIds].filter(id => !prevIds.has(id));
   const closedGaps = [...prevIds].filter(id => !currIds.has(id));
-  const unchangedGaps = [...currIds].filter(id => prevIds.has(id));
+  const unchangedGaps: string[] = [];
+  const improvedGaps: Array<{ questionId: string; from: number; to: number }> = [];
+  const regressedGaps: Array<{ questionId: string; from: number; to: number }> = [];
+
+  // Track per-question level changes for gaps that exist in both
+  for (const id of currIds) {
+    if (!prevIds.has(id)) continue;
+    const prev = prevMap.get(id)!;
+    const curr = currMap.get(id)!;
+    if (curr.currentLevel > prev.currentLevel) {
+      improvedGaps.push({ questionId: id, from: prev.currentLevel, to: curr.currentLevel });
+    } else if (curr.currentLevel < prev.currentLevel) {
+      regressedGaps.push({ questionId: id, from: prev.currentLevel, to: curr.currentLevel });
+    } else {
+      unchangedGaps.push(id);
+    }
+  }
 
   const levelChange = current.currentLevel > previous.currentLevel
     ? "improved"
@@ -833,6 +886,8 @@ export function diffGuides(previous: Guide, current: Guide): GuideDiff {
   }
   if (closedGaps.length > 0) parts.push(`${closedGaps.length} gap${closedGaps.length === 1 ? "" : "s"} closed.`);
   if (newGaps.length > 0) parts.push(`${newGaps.length} new gap${newGaps.length === 1 ? "" : "s"} appeared.`);
+  if (improvedGaps.length > 0) parts.push(`${improvedGaps.length} gap${improvedGaps.length === 1 ? "" : "s"} partially improved.`);
+  if (regressedGaps.length > 0) parts.push(`${regressedGaps.length} gap${regressedGaps.length === 1 ? "" : "s"} regressed.`);
 
   return {
     previousLevel: previous.currentLevel,
@@ -841,6 +896,8 @@ export function diffGuides(previous: Guide, current: Guide): GuideDiff {
     newGaps,
     closedGaps,
     unchangedGaps,
+    improvedGaps,
+    regressedGaps,
     levelChange,
     summary: parts.join(" "),
   };

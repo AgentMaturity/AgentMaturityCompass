@@ -1651,6 +1651,16 @@ program
             console.log(chalk.gray(`  ○ Unchanged gaps: ${diff.unchangedGaps.length}`));
             console.log("");
           }
+          if (diff.improvedGaps.length > 0) {
+            console.log(chalk.cyan(`  ↗ Partially improved (${diff.improvedGaps.length}):`));
+            for (const g of diff.improvedGaps) console.log(chalk.cyan(`    - ${g.questionId}: L${g.from} → L${g.to}`));
+            console.log("");
+          }
+          if (diff.regressedGaps.length > 0) {
+            console.log(chalk.yellow(`  ↘ Regressed (${diff.regressedGaps.length}):`));
+            for (const g of diff.regressedGaps) console.log(chalk.yellow(`    - ${g.questionId}: L${g.from} → L${g.to}`));
+            console.log("");
+          }
         }
         hasPrevious = true;
       } catch {

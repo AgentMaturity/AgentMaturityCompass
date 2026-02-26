@@ -126,7 +126,7 @@ describe("guideGenerator", () => {
 
     expect(md).toContain("# AMC Trust Guardrails");
     expect(md).toContain("Non-Negotiable Rules");
-    expect(md).toContain("crewai");
+    expect(md).toContain("CrewAI");
     expect(md).toContain("Evidence Requirements");
     expect(md).toContain("Verification");
     expect(md).toContain("amc quickscore");
@@ -317,6 +317,65 @@ describe("guideGenerator", () => {
       expect(fw.language).toBeTruthy();
       expect(fw.configFile).toBeTruthy();
       expect(fw.aliases.length).toBeGreaterThan(0);
+    }
+  });
+
+  it("guardrails include Quick Start section", () => {
+    const scores = questionBank.slice(0, 10).map(q => makeScore(q.id, 1));
+    const guide = generateGuide({ overall: 1.0, questionScores: scores, targetLevel: 3 });
+    const md = guideToGuardrails(guide);
+
+    expect(md).toContain("Quick Start");
+    expect(md).toContain("Top 3 Priorities");
+  });
+
+  it("agent instructions include prompt template context", () => {
+    const scores = questionBank.slice(0, 3).map(q => makeScore(q.id, 1));
+    const guide = generateGuide({ overall: 1.0, questionScores: scores, targetLevel: 3 });
+    const md = guideToAgentMarkdown(guide);
+
+    expect(md).toContain("AMC evaluates:");
+  });
+
+  it("guideToJSON uses dynamic question count", () => {
+    const scores = questionBank.slice(0, 5).map(q => makeScore(q.id, 3));
+    const guide = generateGuide({ overall: 3.0, questionScores: scores, targetLevel: 3 });
+    const json = guideToJSON(guide);
+
+    expect(json.totalQuestions).toBe(questionBank.length);
+    expect(json.totalQuestions).toBeGreaterThanOrEqual(126);
+  });
+
+  it("diffGuides tracks per-question level improvements", () => {
+    const scores1 = [
+      makeScore(questionBank[0]!.id, 1),
+      makeScore(questionBank[1]!.id, 1),
+    ];
+    const scores2 = [
+      makeScore(questionBank[0]!.id, 2), // improved but still below target
+      makeScore(questionBank[1]!.id, 1), // unchanged
+    ];
+
+    const guide1 = generateGuide({ overall: 1.0, questionScores: scores1, targetLevel: 4 });
+    const guide2 = generateGuide({ overall: 1.5, questionScores: scores2, targetLevel: 4 });
+    const diff = diffGuides(guide1, guide2);
+
+    expect(diff.improvedGaps.length).toBeGreaterThanOrEqual(1);
+    expect(diff.improvedGaps[0]!.from).toBe(1);
+    expect(diff.improvedGaps[0]!.to).toBe(2);
+    expect(diff.summary).toContain("partially improved");
+  });
+
+  it("cliCommands include over-compliance packs for AMC-OC questions", () => {
+    // Find an over-compliance question if it exists
+    const ocQuestion = questionBank.find(q => q.id.startsWith("AMC-OC"));
+    if (ocQuestion) {
+      const scores = [makeScore(ocQuestion.id, 0)];
+      const guide = generateGuide({ overall: 0, questionScores: scores, targetLevel: 3 });
+      const ocSection = guide.sections.find(s => s.questionId === ocQuestion.id);
+      if (ocSection) {
+        expect(ocSection.cliCommands.some(c => c.includes("overCompliance"))).toBe(true);
+      }
     }
   });
 });
