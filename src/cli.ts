@@ -1343,6 +1343,144 @@ program
   });
 
 program
+  .command("guide")
+  .description("Generate personalized improvement guide with exportable agent instructions")
+  .option("--target <level>", "target maturity level (1-5)", "")
+  .option("--export", "export markdown files to .amc/guides/", false)
+  .option("--agent-instructions", "export agent-consumable instructions (for AGENTS.md / system prompts)", false)
+  .option("--agent <id>", "agent ID", "default")
+  .option("--framework <name>", "framework name for tailored instructions")
+  .option("--json", "emit JSON output", false)
+  .action(async (opts: { target: string; export: boolean; agentInstructions: boolean; agent: string; framework?: string; json: boolean }) => {
+    const { getRapidQuestions, scoreRapidAssessment } = await import("./diagnostic/rapidQuickscore.js");
+    const { generateGuide, guideToHumanMarkdown, guideToAgentMarkdown } = await import("./guide/guideGenerator.js");
+    const { questionBank } = await import("./diagnostic/questionBank.js");
+    const fs = await import("fs");
+    const path = await import("path");
+
+    // Run a quick assessment to get scores
+    let answers: Record<string, number> = {};
+    const questions = getRapidQuestions();
+
+    if (process.stdin.isTTY && !opts.json) {
+      console.log("");
+      console.log(chalk.bold("  🧭 AMC Guide — Personalized improvement plan"));
+      console.log(chalk.gray("  Answer 5 quick questions to generate your guide."));
+      console.log("");
+
+      for (const question of questions) {
+        const { level } = await inquirer.prompt<{ level: number }>([{
+          type: "list",
+          name: "level",
+          message: `${question.id}: ${question.title}`,
+          choices: question.options.map((option) => ({
+            name: `L${option.level} - ${option.label}`,
+            value: option.level
+          }))
+        }]);
+        answers[question.id] = level;
+      }
+    }
+
+    const result = scoreRapidAssessment(answers);
+
+    // Build QuestionScore-compatible array from rapid assessment
+    const questionScores = result.questionScores.map(qs => ({
+      questionId: qs.questionId,
+      claimedLevel: qs.level,
+      supportedMaxLevel: qs.level,
+      finalLevel: qs.level,
+      confidence: 1,
+      evidenceEventIds: [] as string[],
+      flags: [] as string[],
+      narrative: "",
+    }));
+
+    // Also include all other questions at L0 (unscored)
+    const scoredIds = new Set(questionScores.map(q => q.questionId));
+    for (const q of questionBank) {
+      if (!scoredIds.has(q.id)) {
+        questionScores.push({
+          questionId: q.id,
+          claimedLevel: 0,
+          supportedMaxLevel: 0,
+          finalLevel: 0,
+          confidence: 0,
+          evidenceEventIds: [],
+          flags: ["unscored"],
+          narrative: "",
+        });
+      }
+    }
+
+    const overall = (result.totalScore / result.maxScore) * 5;
+    const targetLevel = opts.target ? parseInt(opts.target, 10) : undefined;
+
+    const guide = generateGuide({
+      overall,
+      questionScores,
+      targetLevel,
+      agentId: opts.agent,
+      framework: opts.framework,
+    });
+
+    if (opts.json) {
+      console.log(JSON.stringify(guide, null, 2));
+      return;
+    }
+
+    // Display human-readable summary
+    console.log("");
+    console.log(chalk.bold(`  🧭 ${guide.summary}`));
+    console.log("");
+
+    const topSections = guide.sections.slice(0, 8);
+    for (let i = 0; i < topSections.length; i++) {
+      const s = topSections[i]!;
+      console.log(chalk.bold.yellow(`  ${i + 1}. ${s.questionId}: ${s.title}`));
+      console.log(chalk.gray(`     ${s.layerName} · L${s.currentLevel} → L${s.targetLevel}`));
+      console.log(chalk.white(`     ${s.whatToFix}`));
+      if (s.cliCommands.length > 0) {
+        console.log(chalk.gray(`     Run:`), chalk.cyan(s.cliCommands[0]));
+      }
+      console.log("");
+    }
+
+    if (guide.sections.length > 8) {
+      console.log(chalk.gray(`  ... and ${guide.sections.length - 8} more gaps. Use --export to see all.`));
+      console.log("");
+    }
+
+    // Export if requested
+    if (opts.export || opts.agentInstructions) {
+      const guidesDir = path.join(process.cwd(), ".amc", "guides");
+      fs.mkdirSync(guidesDir, { recursive: true });
+
+      if (opts.export) {
+        const humanPath = path.join(guidesDir, `improvement-guide-l${guide.currentLevel}-to-l${guide.targetLevel}.md`);
+        fs.writeFileSync(humanPath, guideToHumanMarkdown(guide), "utf-8");
+        console.log(chalk.green(`  ✓ Human guide:`), chalk.cyan(humanPath));
+      }
+
+      if (opts.agentInstructions || opts.export) {
+        const agentPath = path.join(guidesDir, `agent-instructions-l${guide.currentLevel}-to-l${guide.targetLevel}.md`);
+        fs.writeFileSync(agentPath, guideToAgentMarkdown(guide, opts.framework), "utf-8");
+        console.log(chalk.green(`  ✓ Agent instructions:`), chalk.cyan(agentPath));
+        console.log("");
+        console.log(chalk.gray("  Feed the agent instructions into your agent's system prompt,"));
+        console.log(chalk.gray("  AGENTS.md, or framework config. Then re-score with:"));
+        console.log(chalk.cyan("  amc quickscore"));
+      }
+      console.log("");
+    } else {
+      console.log(chalk.gray("  Export guides:"), chalk.cyan("amc guide --export"));
+      console.log(chalk.gray("  Agent-ready instructions:"), chalk.cyan("amc guide --agent-instructions"));
+      console.log(chalk.gray("  Target specific level:"), chalk.cyan("amc guide --target 4"));
+      console.log("");
+    }
+  });
+
+program
   .command("quickscore")
   .description("Zero-config 5-question rapid assessment (<2 minutes)")
   .option("--json", "emit JSON output", false)
