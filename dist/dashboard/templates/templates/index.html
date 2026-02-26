@@ -1,103 +1,447 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AMC Compass Dashboard</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="./styles.css" />
-  </head>
-  <body>
-    <header class="hero">
-      <h1>⬡ Agent Maturity Compass</h1>
-      <p id="summary"></p>
-    </header>
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>AMC Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@200;400;500;600;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="./styles.css"/>
+<script>
+  (function(){
+    var t=localStorage.getItem('amc_theme')||'dark';
+    document.documentElement.setAttribute('data-theme',t);
+  })();
+</script>
+</head>
+<body>
 
-    <main class="grid">
-      <section class="card full">
-        <h2>⚡ Exports</h2>
-        <div class="export-actions">
-          <a href="/export.md">📄 Export Markdown</a>
-          <a href="/export.pdf">🧾 Export PDF (print)</a>
+<a class="skip-link" href="#content">Skip to main content</a>
+
+<!-- ONBOARDING OVERLAY -->
+<div class="onboard-overlay" id="onboard" role="dialog" aria-modal="true" aria-label="Welcome to AMC">
+  <div class="onboard-modal">
+    <div class="onboard-header">
+      <div class="onboard-logo">🧭</div>
+      <h1 class="onboard-title">Welcome to AMC</h1>
+      <p class="onboard-subtitle">Agent Maturity Compass — The credit score for AI agents</p>
+    </div>
+    <div class="onboard-body" id="onboard-body"></div>
+    <div class="onboard-footer">
+      <div class="onboard-dots" id="onboard-dots"></div>
+      <div class="onboard-actions">
+        <button class="onboard-skip" id="onboard-skip">Skip tour</button>
+        <button class="onboard-btn" id="onboard-next">Get Started →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sb">
+  <div class="sb-logo">
+    <div class="sb-logo-icon">🧭</div>
+    <span class="sb-logo-text">AMC</span>
+  </div>
+
+  <nav class="sb-nav" role="navigation" aria-label="Main navigation">
+    <div class="sb-label">Navigation</div>
+
+    <a class="sb-link on" data-s="overview" href="#overview">
+      <svg viewBox="0 0 20 20" fill="currentColor"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"/></svg>
+      <span class="lbl">Overview</span>
+    </a>
+
+    <a class="sb-link" data-s="dimensions" href="#dimensions">
+      <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 4a1 1 0 011-1h4a1 1 0 010 2H6.414l2.293 2.293a1 1 0 01-1.414 1.414L5 6.414V8a1 1 0 01-2 0V4zm9 1a1 1 0 010-2h4a1 1 0 011 1v4a1 1 0 01-2 0V6.414l-2.293 2.293a1 1 0 11-1.414-1.414L13.586 5H12zm-9 7a1 1 0 012 0v1.586l2.293-2.293a1 1 0 011.414 1.414L6.414 15H8a1 1 0 010 2H4a1 1 0 01-1-1v-4zm13-1a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 010-2h1.586l-2.293-2.293a1 1 0 011.414-1.414L15 13.586V12a1 1 0 011-1z" clip-rule="evenodd"/></svg>
+      <span class="lbl">Dimensions</span>
+    </a>
+
+    <a class="sb-link" data-s="assurance" href="#assurance">
+      <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5C17.944 5.66 18 6.326 18 7c0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.674.056-1.34.166-1.999zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+      <span class="lbl">Assurance</span>
+    </a>
+
+    <a class="sb-link" data-s="evidence" href="#evidence">
+      <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd"/></svg>
+      <span class="lbl">Evidence</span>
+    </a>
+
+    <a class="sb-link" data-s="fleet" href="#fleet">
+      <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M2 5a2 2 0 012-2h12a2 2 0 012 2v10a2 2 0 01-2 2H4a2 2 0 01-2-2V5zm3.293 1.293a1 1 0 011.414 0l3 3a1 1 0 010 1.414l-3 3a1 1 0 01-1.414-1.414L7.586 10 5.293 7.707a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
+      <span class="lbl">Terminal</span>
+    </a>
+
+    <a class="sb-link" data-s="settings" href="#settings">
+      <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"/></svg>
+      <span class="lbl">Settings</span>
+    </a>
+
+    <!-- Getting started — only shown when score = 0 -->
+    <div class="sb-section" id="sb-getstarted" style="display:none">
+      <div class="sb-label" style="margin-top:12px">Get Started</div>
+      <div class="sb-gs-steps">
+        <div class="sb-gs-step"><span class="sb-gs-num">1</span><code>amc init</code></div>
+        <div class="sb-gs-step"><span class="sb-gs-num">2</span><code>amc quickscore</code></div>
+        <div class="sb-gs-step"><span class="sb-gs-num">3</span><span class="lbl" style="font-size:11px">Open dashboard</span></div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="sb-cta">
+    <button class="sb-quickscore sb-quick-score" aria-label="Run quick score">
+      <svg viewBox="0 0 20 20" fill="currentColor" width="14" height="14"><path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.381z" clip-rule="evenodd"/></svg>
+      <span class="lbl">Quick Score</span>
+    </button>
+  </div>
+
+  <div class="sb-foot">
+    <button class="sb-tog" id="sb-tog" aria-label="Collapse sidebar">
+      <svg viewBox="0 0 20 20" fill="currentColor" width="14" height="14"><path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+    </button>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main" id="main">
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div class="tb-l">
+      <button class="tb-ham" id="tb-ham" aria-label="Toggle sidebar">
+        <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16"><path fill-rule="evenodd" d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"/></svg>
+      </button>
+      <div class="tb-agent">
+        <span class="tb-agent-id" id="tb-id">default</span>
+        <span class="tb-freshness" id="tb-freshness"></span>
+      </div>
+    </div>
+
+    <div class="tb-c">
+      <button class="tb-search" id="tb-cmd-trigger" aria-label="Command palette">
+        <svg viewBox="0 0 20 20" fill="currentColor" width="14" height="14"><path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"/></svg>
+        <span class="tb-search-label">Search…</span>
+        <kbd class="tb-kbd">⌘K</kbd>
+      </button>
+    </div>
+
+    <div class="tb-r">
+      <div class="tb-views" role="tablist" aria-label="View mode">
+        <button class="tb-v on" data-v="engineer" aria-selected="true" role="tab">Engineer</button>
+        <button class="tb-v" data-v="ciso" aria-selected="false" role="tab">CISO</button>
+        <button class="tb-v" data-v="exec" aria-selected="false" role="tab">Exec</button>
+      </div>
+      <div class="tb-acts">
+        <button class="tb-act tb-help" id="tb-help" aria-label="Help" title="Help / Tour">?</button>
+        <button class="tb-act tb-theme" id="tb-theme" aria-label="Toggle theme" title="Toggle dark/light">🌙</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- CONTENT -->
+  <main class="content" id="content" role="main">
+
+    <!-- ══════════════════════════════════════════════════
+         OVERVIEW
+    ══════════════════════════════════════════════════ -->
+    <section class="sec" id="s-overview">
+
+      <!-- Onboarding banner -->
+      <div class="orient-banner" id="orient-banner" style="display:none" role="alert">
+        <span>🧭</span>
+        <span><strong>AMC</strong> scores your AI agent's trustworthiness from actual behavior — not claims. Think: credit score for AI.&nbsp;&nbsp;Get started: <code>amc quickscore</code></span>
+        <button class="orient-dismiss" id="orient-dismiss" aria-label="Dismiss">×</button>
+      </div>
+
+      <!-- ROW 1: Score Card -->
+      <div class="row c1" style="margin-bottom:16px">
+        <div class="card card-enter" style="animation-delay:0ms">
+          <div class="score-card-v2" id="score-card-inner">
+            <!-- Left: Big number -->
+            <div class="score-left">
+              <div class="score-big" id="score-num">—</div>
+              <div class="score-divider"></div>
+              <div class="score-meta-row">
+                <div class="score-label-text" id="score-label">—</div>
+                <div class="score-out-of">out of 5.0</div>
+                <div class="score-agent-id" id="score-agent-id">default</div>
+              </div>
+              <div class="score-badges">
+                <span class="tb-badge md" id="score-trust-badge">—</span>
+                <span class="score-trend-badge" id="score-trend"></span>
+              </div>
+              <span id="score-last" style="font-size:11px;color:var(--text-tertiary);margin-top:2px"></span>
+            </div>
+            <!-- Right: Dimension bars -->
+            <div class="score-right" id="score-dim-bars">
+              <!-- Populated by JS -->
+            </div>
+          </div>
         </div>
-      </section>
-      <section class="card full">
-        <h2>🖥 Studio Home</h2>
-        <div id="studio-home"></div>
-        <div id="team-view" class="card-sub"></div>
-        <div id="export-actions"></div>
-        <canvas id="studio-qr" width="196" height="196"></canvas>
-      </section>
+      </div>
 
-      <section class="card">
-        <h2>◎ Layer Radar</h2>
-        <canvas id="radar" width="420" height="320"></canvas>
-      </section>
+      <!-- ROW 2: Next Steps -->
+      <div class="row c1" style="margin-bottom:16px">
+        <div class="card card-enter" style="animation-delay:80ms">
+          <div class="next-steps-header">
+            <div class="next-steps-title">What to do next</div>
+            <div class="next-steps-sub">Prioritized by impact on your trust score.</div>
+          </div>
+          <!-- Task cards -->
+          <div class="task-grid" id="task-grid-mount">
+            <!-- Populated by JS -->
+          </div>
+          <!-- Meta line -->
+          <div class="task-meta" id="stats-strip" style="margin-top:14px"></div>
+          <!-- Legacy next-actions-mount (hidden compat) -->
+          <div id="next-actions-mount" style="display:none"></div>
+        </div>
+      </div>
 
-      <section class="card full">
-        <h2>▦ Domain Breakdown</h2>
-        <div id="domain-breakdown"></div>
-      </section>
+      <!-- ROW 3: Details (collapsible) -->
+      <div class="section-divider" id="details-toggle">
+        <span class="section-divider-label">Details</span>
+        <div class="section-divider-line"></div>
+        <span class="section-divider-chevron">▾</span>
+      </div>
 
-      <section class="card">
-        <h2>⏱ Timeline</h2>
-        <canvas id="timeline" width="420" height="320"></canvas>
-      </section>
+      <div class="details-body" id="details-body">
+        <!-- Trend chart -->
+        <div class="row c1" style="margin-bottom:16px">
+          <div class="card card-enter" style="animation-delay:160ms">
+            <div class="ch"><span class="ch-dot"></span>Score Trend</div>
+            <div class="ch-sub">Your trust score over time — spot regressions and improvements</div>
+            <div id="tl-mount" style="flex:1;position:relative;min-height:80px"></div>
+          </div>
+        </div>
 
-      <section class="card full">
-        <h2>▤ 111-Question Heatmap</h2>
-        <div id="heatmap"></div>
-      </section>
+        <!-- 3-col row: Assurance / Approvals / Value -->
+        <div class="row c3">
+          <div class="card detail-card card-enter" style="animation-delay:200ms">
+            <div class="ch"><span class="ch-dot"></span>Assurance</div>
+            <div class="ch-sub">Pack pass rates</div>
+            <div id="asr-summary"></div>
+          </div>
+          <div class="card detail-card card-enter" style="animation-delay:240ms">
+            <div class="ch"><span class="ch-dot"></span>Approvals</div>
+            <div class="ch-sub">Human-reviewed decisions</div>
+            <div id="ap-mount"></div>
+          </div>
+          <div class="card detail-card card-enter" style="animation-delay:280ms">
+            <div class="ch"><span class="ch-dot"></span>Value</div>
+            <div class="ch-sub">Business outcomes</div>
+            <div id="val-mount"></div>
+          </div>
+        </div>
+      </div>
 
-      <section class="card">
-        <h2>⚠ Failure-Risk Indices</h2>
-        <div id="indices"></div>
-      </section>
+      <!-- Hidden legacy ring (app.js compatibility) -->
+      <div style="display:none">
+        <div class="ring-wrap">
+          <svg class="score-svg" viewBox="0 0 148 148">
+            <circle class="r-bg" cx="74" cy="74" r="65"/>
+            <circle class="r-track" cx="74" cy="74" r="65"/>
+            <circle class="r-fill" cx="74" cy="74" r="65"/>
+          </svg>
+          <div class="ring-center">
+            <span class="ring-n">0.0</span>
+            <span class="ring-d">/ 5.0</span>
+          </div>
+        </div>
+        <!-- Legacy dim bars for compat -->
+        <div id="dim-bars"></div>
+        <!-- Legacy score badge -->
+        <span class="score-badge tb-badge md"></span>
+        <!-- Legacy score-int -->
+        <span id="score-int"></span>
+      </div>
+      <!-- Getting started card (legacy compat — hidden) -->
+      <div id="getting-started-card" style="display:none"></div>
+    </section>
 
-      <section class="card">
-        <h2>🛡 Assurance Packs</h2>
-        <div id="assurance"></div>
-      </section>
+    <!-- ══════════════════════════════════════════════════
+         DIMENSIONS
+    ══════════════════════════════════════════════════ -->
+    <section class="sec h" id="s-dimensions">
+      <div class="dim-page-header">
+        <div class="dim-page-title">Dimensions</div>
+        <div class="dim-page-sub">How your agent scores across each trust area</div>
+      </div>
 
-      <section class="card">
-        <h2>◈ Value Summary</h2>
-        <div id="value-summary"></div>
-        <canvas id="value-trend" width="420" height="140"></canvas>
-      </section>
+      <!-- 5 dimension cards in 2-col grid -->
+      <div class="dim-cards-grid" id="dim-cards-grid">
+        <!-- Populated by JS -->
+      </div>
 
-      <section class="card">
-        <h2>△ Top 5 Value Gaps</h2>
-        <ul id="value-gaps"></ul>
-      </section>
+      <!-- Radar chart -->
+      <div class="row c1" style="margin-bottom:16px">
+        <div class="card">
+          <div class="ch"><span class="ch-dot"></span>Trust Radar</div>
+          <div class="ch-sub">Visual map across all 5 dimensions — a perfect agent fills the pentagon</div>
+          <div id="radar-mount" style="position:relative;display:flex;justify-content:center"></div>
+        </div>
+      </div>
 
-      <section class="card">
-        <h2>✓ Approvals Summary</h2>
-        <div id="approvals-summary"></div>
-      </section>
+      <!-- Question heatmap -->
+      <div class="row c1" style="margin-bottom:16px">
+        <div class="card">
+          <div class="ch"><span class="ch-dot"></span>Question Heatmap</div>
+          <div class="ch-sub">113 behavioral questions grouped by dimension — click any row to inspect</div>
+          <div id="hm-mount" style="margin-top:8px"></div>
+        </div>
+      </div>
 
-      <section class="card">
-        <h2>⊞ Benchmarks Summary</h2>
-        <div id="benchmark-summary"></div>
-      </section>
+      <!-- Question detail -->
+      <div class="row c1">
+        <div class="card">
+          <div class="ch"><span class="ch-dot"></span>Question Detail</div>
+          <div id="qd-mount"><div class="empty"><span class="empty-i">🔍</span><span class="empty-t">Click a question above to inspect it</span></div></div>
+        </div>
+      </div>
+    </section>
 
-      <section class="card">
-        <h2>⚑ Evidence Gaps</h2>
-        <ul id="evidence-gaps"></ul>
-      </section>
+    <!-- ══════════════════════════════════════════════════
+         ASSURANCE
+    ══════════════════════════════════════════════════ -->
+    <section class="sec h" id="s-assurance">
+      <div class="dim-page-header">
+        <div class="dim-page-title">Assurance</div>
+        <div class="dim-page-sub">Automated behavioral tests that verify your agent works correctly</div>
+      </div>
 
-      <section class="card full">
-        <h2>⊡ Question Detail</h2>
-        <div id="question-detail"></div>
-      </section>
+      <div class="row c1" style="margin-bottom:16px">
+        <div class="card">
+          <div class="ch"><span class="ch-dot"></span>Assurance Packs</div>
+          <div class="ch-sub">Each pack tests a specific failure mode — green means your agent passes</div>
+          <div id="af-mount" style="margin-top:12px"></div>
+        </div>
+      </div>
 
-      <section class="card full">
-        <h2>▸ Education → Ownership → Commitment</h2>
-        <div id="eoc"></div>
-      </section>
-    </main>
+      <div class="row c1">
+        <div class="card">
+          <div class="ch"><span class="ch-dot"></span>Failure-Risk Indices</div>
+          <div class="ch-sub">Composite risk scores across behavioral categories</div>
+          <div id="idx-mount" style="margin-top:8px"></div>
+        </div>
+      </div>
+    </section>
 
-    <script type="module" src="./app.js"></script>
-  </body>
+    <!-- ══════════════════════════════════════════════════
+         EVIDENCE
+    ══════════════════════════════════════════════════ -->
+    <section class="sec h" id="s-evidence">
+      <div class="dim-page-header">
+        <div class="dim-page-title">Evidence</div>
+        <div class="dim-page-sub">Execution proof that makes your trust score cryptographically verifiable</div>
+      </div>
+
+      <div class="row c1" style="margin-bottom:16px">
+        <div class="card">
+          <div class="ch"><span class="ch-dot"></span>Evidence Gaps</div>
+          <div class="ch-sub">Missing execution proof — fixing these gives the biggest score jump</div>
+          <div id="ev-mount" style="margin-top:8px"></div>
+        </div>
+      </div>
+
+      <div class="row c1">
+        <div class="card">
+          <div class="ch"><span class="ch-dot"></span>Improvement Plan</div>
+          <div class="ch-sub">Step-by-step checklist to close your evidence gaps</div>
+          <div id="eoc-mount" style="margin-top:8px"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════
+         TERMINAL (fleet)
+    ══════════════════════════════════════════════════ -->
+    <section class="sec h" id="s-fleet">
+      <div class="dim-page-header">
+        <div class="dim-page-title">Terminal</div>
+        <div class="dim-page-sub">Run AMC commands, manage agents, and view studio status</div>
+      </div>
+
+      <div class="row c1" style="margin-bottom:16px">
+        <div class="card">
+          <div class="ch"><span class="ch-dot"></span>Command Terminal</div>
+          <div class="cli-term">
+            <div class="cli-input-row">
+              <span class="cli-prompt">amc</span>
+              <input class="cli-input" id="cli-input" type="text" placeholder="doctor --json" autocomplete="off" spellcheck="false"/>
+              <button class="cli-run-btn" id="cli-run">Run</button>
+            </div>
+            <div class="cli-output" id="cli-output"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row c1" style="margin-bottom:16px">
+        <div class="card">
+          <div class="ch"><span class="ch-dot"></span>Studio Status</div>
+          <div id="studio-mount" style="margin-top:8px"></div>
+        </div>
+      </div>
+
+      <div class="row c1" style="margin-bottom:16px">
+        <div class="card">
+          <div class="ch"><span class="ch-dot"></span>Fleet Agents</div>
+          <div id="fleet-mount" style="margin-top:8px"></div>
+        </div>
+      </div>
+
+      <div class="row c2">
+        <div class="card">
+          <div class="ch"><span class="ch-dot"></span>Benchmarks</div>
+          <div id="bm-mount" style="margin-top:8px"></div>
+        </div>
+        <div class="card">
+          <div class="ch"><span class="ch-dot"></span>Recent ToolHub</div>
+          <div id="th-mount" style="margin-top:8px"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════
+         SETTINGS
+    ══════════════════════════════════════════════════ -->
+    <section class="sec h" id="s-settings">
+      <div class="dim-page-header">
+        <div class="dim-page-title">Settings</div>
+        <div class="dim-page-sub">Preferences, export, and information</div>
+      </div>
+      <div id="settings-mount"></div>
+    </section>
+
+  </main>
+</div>
+
+<!-- MOBILE BOTTOM NAV -->
+<nav class="bnav" aria-label="Mobile navigation">
+  <div class="bnav-i">
+    <a class="bn on" data-s="overview" href="#overview">
+      <svg viewBox="0 0 20 20" fill="currentColor"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"/></svg>
+      <span>Overview</span>
+    </a>
+    <a class="bn" data-s="dimensions" href="#dimensions">
+      <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 4a1 1 0 011-1h4a1 1 0 010 2H6.414l2.293 2.293a1 1 0 01-1.414 1.414L5 6.414V8a1 1 0 01-2 0V4zm9 1a1 1 0 010-2h4a1 1 0 011 1v4a1 1 0 01-2 0V6.414l-2.293 2.293a1 1 0 11-1.414-1.414L13.586 5H12zm-9 7a1 1 0 012 0v1.586l2.293-2.293a1 1 0 011.414 1.414L6.414 15H8a1 1 0 010 2H4a1 1 0 01-1-1v-4zm13-1a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 010-2h1.586l-2.293-2.293a1 1 0 011.414-1.414L15 13.586V12a1 1 0 011-1z" clip-rule="evenodd"/></svg>
+      <span>Dims</span>
+    </a>
+    <a class="bn" data-s="assurance" href="#assurance">
+      <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5C17.944 5.66 18 6.326 18 7c0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.674.056-1.34.166-1.999z" clip-rule="evenodd"/></svg>
+      <span>Assurance</span>
+    </a>
+    <a class="bn" data-s="evidence" href="#evidence">
+      <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clip-rule="evenodd"/></svg>
+      <span>Evidence</span>
+    </a>
+    <a class="bn" data-s="fleet" href="#fleet">
+      <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M2 5a2 2 0 012-2h12a2 2 0 012 2v10a2 2 0 01-2 2H4a2 2 0 01-2-2V5zm3.293 1.293a1 1 0 011.414 0l3 3a1 1 0 010 1.414l-3 3a1 1 0 01-1.414-1.414L7.586 10 5.293 7.707a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
+      <span>Terminal</span>
+    </a>
+  </div>
+</nav>
+
+<script type="module" src="./app.js"></script>
+</body>
 </html>

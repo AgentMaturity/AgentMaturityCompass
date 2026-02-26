@@ -7,6 +7,7 @@ import {
   guideToJSON,
   diffGuides,
   listSupportedFrameworks,
+  detectFramework,
   applyGuardrails,
   KNOWN_AGENT_CONFIGS,
 } from "../src/guide/guideGenerator.js";
@@ -367,7 +368,6 @@ describe("guideGenerator", () => {
   });
 
   it("cliCommands include over-compliance packs for AMC-OC questions", () => {
-    // Find an over-compliance question if it exists
     const ocQuestion = questionBank.find(q => q.id.startsWith("AMC-OC"));
     if (ocQuestion) {
       const scores = [makeScore(ocQuestion.id, 0)];
@@ -377,5 +377,66 @@ describe("guideGenerator", () => {
         expect(ocSection.cliCommands.some(c => c.includes("overCompliance"))).toBe(true);
       }
     }
+  });
+
+  it("guide sections include severity levels", () => {
+    const scores = [
+      makeScore(questionBank[0]!.id, 0), // gap of 3 → critical
+      makeScore(questionBank[1]!.id, 1), // gap of 2 → high
+      makeScore(questionBank[2]!.id, 2), // gap of 1 → medium
+    ];
+    const guide = generateGuide({ overall: 1.0, questionScores: scores, targetLevel: 3 });
+
+    const criticals = guide.sections.filter(s => s.severity === "critical");
+    const highs = guide.sections.filter(s => s.severity === "high");
+    const mediums = guide.sections.filter(s => s.severity === "medium");
+
+    expect(criticals.length).toBeGreaterThanOrEqual(1);
+    expect(highs.length).toBeGreaterThanOrEqual(1);
+    expect(mediums.length).toBeGreaterThanOrEqual(1);
+  });
+
+  it("guardrails include severity indicators", () => {
+    const scores = questionBank.slice(0, 5).map(q => makeScore(q.id, 0));
+    const guide = generateGuide({ overall: 0, questionScores: scores, targetLevel: 3 });
+    const md = guideToGuardrails(guide);
+
+    // Should contain at least one severity indicator
+    expect(md.includes("🔴") || md.includes("🟡") || md.includes("🔵")).toBe(true);
+  });
+
+  it("detectFramework finds langchain from pyproject.toml", () => {
+    const result = detectFramework(
+      (p) => p === "pyproject.toml",
+      (p) => p === "pyproject.toml" ? '[tool.poetry.dependencies]\nlangchain = "^0.1"' : null,
+    );
+    expect(result).not.toBeNull();
+    expect(result!.name).toBe("langchain");
+    expect(result!.confidence).toBe("high");
+  });
+
+  it("detectFramework finds crewai from requirements.txt", () => {
+    const result = detectFramework(
+      (p) => p === "requirements.txt",
+      (p) => p === "requirements.txt" ? "crewai>=0.28\nopenai" : null,
+    );
+    expect(result).not.toBeNull();
+    expect(result!.name).toBe("crewai");
+  });
+
+  it("detectFramework finds cursor from .cursorrules", () => {
+    const result = detectFramework(
+      (p) => p === ".cursorrules",
+    );
+    expect(result).not.toBeNull();
+    expect(result!.name).toBe("cursor");
+  });
+
+  it("detectFramework returns null when no framework detected", () => {
+    const result = detectFramework(
+      () => false,
+      () => null,
+    );
+    expect(result).toBeNull();
   });
 });

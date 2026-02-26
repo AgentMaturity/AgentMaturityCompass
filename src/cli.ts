@@ -1357,6 +1357,8 @@ program
   .option("--frameworks", "list all supported frameworks", false)
   .option("--ci", "CI gate mode — exit non-zero if below --target level", false)
   .option("--dry-run", "preview --apply changes without writing files", false)
+  .option("--quick", "instant guide from defaults — no interactive questions", false)
+  .option("--auto-detect", "auto-detect framework from project files", false)
   .option("--agent <id>", "agent ID", "default")
   .option("--framework <name>", "framework name for tailored instructions")
   .option("--json", "emit JSON output", false)
@@ -1373,6 +1375,8 @@ program
     frameworks: boolean;
     ci: boolean;
     dryRun: boolean;
+    quick: boolean;
+    autoDetect: boolean;
     agent: string;
     framework?: string;
     json: boolean;
@@ -1386,12 +1390,27 @@ program
       guideToJSON,
       diffGuides,
       listSupportedFrameworks,
+      detectFramework,
       applyGuardrails,
       KNOWN_AGENT_CONFIGS,
     } = await import("./guide/guideGenerator.js");
     const { questionBank } = await import("./diagnostic/questionBank.js");
     const fs = await import("fs");
     const path = await import("path");
+
+    /* ── Auto-detect framework if requested ──────── */
+    if (opts.autoDetect && !opts.framework) {
+      const detected = detectFramework(
+        (p) => { try { fs.accessSync(path.join(process.cwd(), p)); return true; } catch { return false; } },
+        (p) => { try { return fs.readFileSync(path.join(process.cwd(), p), "utf-8"); } catch { return null; } },
+      );
+      if (detected) {
+        opts.framework = detected.name;
+        if (!opts.json) {
+          console.log(chalk.gray(`  Auto-detected framework: ${detected.name} (from ${detected.detectedFrom})`));
+        }
+      }
+    }
 
     /* ── --frameworks: list supported frameworks ─── */
     if (opts.frameworks) {
@@ -1416,7 +1435,7 @@ program
       let answers: Record<string, number> = {};
       const questions = getRapidQuestions();
 
-      if (process.stdin.isTTY && !opts.json) {
+      if (!opts.quick && process.stdin.isTTY && !opts.json) {
         console.log("");
         console.log(chalk.bold("  🧭 AMC Guide — Personalized improvement plan"));
         console.log(chalk.gray("  Answer 5 quick questions to generate your guide."));

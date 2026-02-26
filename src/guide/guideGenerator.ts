@@ -195,6 +195,7 @@ export interface GuideSection {
   layerName: LayerName;
   currentLevel: number;
   targetLevel: number;
+  severity: "critical" | "high" | "medium";
   whatToFix: string;
   howToFix: string[];
   evidenceNeeded: string[];
@@ -347,12 +348,16 @@ export function generateGuide(input: GuideInput): Guide {
     const targetOption = q.options.find(o => o.level === targetLevel);
     const currentOption = q.options.find(o => o.level === qs.finalLevel);
 
+    const gap = targetLevel - qs.finalLevel;
+    const severity: "critical" | "high" | "medium" = gap >= 3 ? "critical" : gap >= 2 ? "high" : "medium";
+
     gaps.push({
       questionId: qs.questionId,
       title: q.title,
       layerName: q.layerName as LayerName,
       currentLevel: qs.finalLevel,
       targetLevel,
+      severity,
       whatToFix: currentOption
         ? `Currently at "${currentOption.label}". Need "${targetOption?.label ?? `L${targetLevel}`}".`
         : `Currently at L${qs.finalLevel}. Need L${targetLevel}.`,
@@ -608,11 +613,13 @@ export function guideToGuardrails(guide: Guide, framework?: string): string {
 
       if (signals.length > 0) {
         for (const signal of signals) {
-          lines.push(`${ruleNum}. **${s.questionId}**: ${signal}`);
+          const sev = s.severity === "critical" ? "🔴" : s.severity === "high" ? "🟡" : "🔵";
+          lines.push(`${ruleNum}. ${sev} **${s.questionId}**: ${signal}`);
           ruleNum++;
         }
       } else {
-        lines.push(`${ruleNum}. **${s.questionId}**: ${q.upgradeHints}`);
+        const sev = s.severity === "critical" ? "🔴" : s.severity === "high" ? "🟡" : "🔵";
+        lines.push(`${ruleNum}. ${sev} **${s.questionId}**: ${q.upgradeHints}`);
         ruleNum++;
       }
     }
@@ -912,5 +919,69 @@ export function listSupportedFrameworks(): Array<{ name: string; aliases: string
     language: fw.language,
     configFile: fw.configFile,
   }));
+}
+
+/* ── Auto-detect framework from project files ──────── */
+
+export interface DetectedFramework {
+  name: string;
+  confidence: "high" | "medium" | "low";
+  detectedFrom: string;
+}
+
+/**
+ * Detect the agent framework from project files.
+ * Pass a function that checks if a file exists and optionally reads its content.
+ */
+export function detectFramework(
+  fileExists: (path: string) => boolean,
+  readFile?: (path: string) => string | null,
+): DetectedFramework | null {
+  // Check for framework-specific config files first (high confidence)
+  if (fileExists("CLAUDE.md") || fileExists("AGENTS.md")) {
+    return { name: "claudecode", confidence: "high", detectedFrom: "CLAUDE.md or AGENTS.md" };
+  }
+  if (fileExists(".cursorrules") || fileExists(".cursor/rules")) {
+    return { name: "cursor", confidence: "high", detectedFrom: ".cursorrules" };
+  }
+  if (fileExists(".kiro/steering/guide.md")) {
+    return { name: "kiro", confidence: "high", detectedFrom: ".kiro/steering/" };
+  }
+  if (fileExists(".gemini/style.md")) {
+    return { name: "gemini", confidence: "high", detectedFrom: ".gemini/style.md" };
+  }
+
+  // Check package.json for Python/JS dependencies (medium confidence)
+  if (readFile) {
+    const pyproject = readFile("pyproject.toml");
+    if (pyproject) {
+      if (pyproject.includes("langchain")) return { name: "langchain", confidence: "high", detectedFrom: "pyproject.toml" };
+      if (pyproject.includes("crewai")) return { name: "crewai", confidence: "high", detectedFrom: "pyproject.toml" };
+      if (pyproject.includes("autogen") || pyproject.includes("ag2")) return { name: "autogen", confidence: "high", detectedFrom: "pyproject.toml" };
+      if (pyproject.includes("llama-index") || pyproject.includes("llama_index")) return { name: "llamaindex", confidence: "high", detectedFrom: "pyproject.toml" };
+      if (pyproject.includes("openai")) return { name: "openai", confidence: "medium", detectedFrom: "pyproject.toml" };
+    }
+
+    const requirements = readFile("requirements.txt");
+    if (requirements) {
+      if (requirements.includes("langchain")) return { name: "langchain", confidence: "high", detectedFrom: "requirements.txt" };
+      if (requirements.includes("crewai")) return { name: "crewai", confidence: "high", detectedFrom: "requirements.txt" };
+      if (requirements.includes("autogen") || requirements.includes("ag2")) return { name: "autogen", confidence: "high", detectedFrom: "requirements.txt" };
+      if (requirements.includes("llama-index") || requirements.includes("llama_index")) return { name: "llamaindex", confidence: "high", detectedFrom: "requirements.txt" };
+    }
+
+    const packageJson = readFile("package.json");
+    if (packageJson) {
+      if (packageJson.includes("langchain")) return { name: "langchain", confidence: "medium", detectedFrom: "package.json" };
+      if (packageJson.includes("@langchain")) return { name: "langchain", confidence: "high", detectedFrom: "package.json" };
+    }
+
+    const csproj = readFile("*.csproj");
+    if (csproj && csproj.includes("Microsoft.SemanticKernel")) {
+      return { name: "semantickernel", confidence: "high", detectedFrom: "*.csproj" };
+    }
+  }
+
+  return null;
 }
 
