@@ -6,9 +6,28 @@ import { signHexDigest, verifyHexDigestAny, getPublicKeyHistory } from "../crypt
 import type { CausalEdge, Incident, IncidentTransition, IncidentState } from "./incidentTypes.js";
 
 /** Typed DB row for incident records — matches the incidents table schema */
-type IncidentRow = Incident;
-/** Typed DB row for incident transitions */
-type TransitionRow = IncidentTransition;
+/** Raw SQLite row — snake_case DB columns */
+type IncidentRow = {
+  incident_id: string; agent_id: string; severity: string; state: string;
+  title: string; description: string; trigger_type: string; trigger_id: string;
+  root_cause_claim_ids_json: string; affected_question_ids_json: string;
+  causal_edges_json: string; timeline_event_ids_json: string;
+  created_ts: number; updated_ts: number; resolved_ts: number | null;
+  postmortem_ref: string | null; prev_incident_hash: string;
+  incident_hash: string; signature: string;
+};
+/** Raw SQLite row for incident transitions */
+type TransitionRow = {
+  transition_id: string; incident_id: string; from_state: string | null;
+  to_state: string; reason: string; ts: number; operator_id: string | null;
+  signature: string;
+};
+/** Raw SQLite row for causal edges */
+type CausalEdgeRow = {
+  edge_id: string; incident_id: string; from_event_id: string;
+  to_event_id: string; relationship: string; confidence: number;
+  evidence_json: string; added_ts: number; added_by: string; signature: string;
+};
 
 function initIncidentTables(db: Database.Database): void {
   db.exec(`
@@ -238,11 +257,11 @@ function getIncident(db: Database.Database, incidentId: string): Incident | null
   return {
     incidentId: row.incident_id,
     agentId: row.agent_id,
-    severity: row.severity,
-    state: row.state,
+    severity: row.severity as Incident["severity"],
+    state: row.state as Incident["state"],
     title: row.title,
     description: row.description,
-    triggerType: row.trigger_type,
+    triggerType: row.trigger_type as Incident["triggerType"],
     triggerId: row.trigger_id,
     rootCauseClaimIds: JSON.parse(row.root_cause_claim_ids_json) as string[],
     affectedQuestionIds: JSON.parse(row.affected_question_ids_json) as string[],
@@ -274,11 +293,11 @@ function getIncidentsByAgent(db: Database.Database, agentId: string, state?: Inc
   return rows.map((row) => ({
     incidentId: row.incident_id,
     agentId: row.agent_id,
-    severity: row.severity,
-    state: row.state,
+    severity: row.severity as Incident["severity"],
+    state: row.state as Incident["state"],
     title: row.title,
     description: row.description,
-    triggerType: row.trigger_type,
+    triggerType: row.trigger_type as Incident["triggerType"],
     triggerId: row.trigger_id,
     rootCauseClaimIds: JSON.parse(row.root_cause_claim_ids_json) as string[],
     affectedQuestionIds: JSON.parse(row.affected_question_ids_json) as string[],
@@ -303,11 +322,11 @@ function getOpenIncidents(db: Database.Database, agentId: string): Incident[] {
   return rows.map((row) => ({
     incidentId: row.incident_id,
     agentId: row.agent_id,
-    severity: row.severity,
-    state: row.state,
+    severity: row.severity as Incident["severity"],
+    state: row.state as Incident["state"],
     title: row.title,
     description: row.description,
-    triggerType: row.trigger_type,
+    triggerType: row.trigger_type as Incident["triggerType"],
     triggerId: row.trigger_id,
     rootCauseClaimIds: JSON.parse(row.root_cause_claim_ids_json) as string[],
     affectedQuestionIds: JSON.parse(row.affected_question_ids_json) as string[],
@@ -331,8 +350,8 @@ function getIncidentTransitions(db: Database.Database, incidentId: string): Inci
   return rows.map((row) => ({
     transitionId: row.transition_id,
     incidentId: row.incident_id,
-    fromState: row.from_state,
-    toState: row.to_state,
+    fromState: row.from_state as IncidentTransition["fromState"],
+    toState: row.to_state as IncidentTransition["toState"],
     reason: row.reason,
     ts: row.ts,
     signature: row.signature
@@ -369,17 +388,17 @@ function getLatestIncidentStates(db: Database.Database, incidentIds: string[]): 
 function getCausalEdges(db: Database.Database, incidentId: string): CausalEdge[] {
   const rows = db
     .prepare("SELECT * FROM causal_edges WHERE incident_id = ? ORDER BY added_ts ASC")
-    .all(incidentId) as TransitionRow[];
+    .all(incidentId) as CausalEdgeRow[];
 
   return rows.map((row) => ({
     edgeId: row.edge_id,
     fromEventId: row.from_event_id,
     toEventId: row.to_event_id,
-    relationship: row.relationship,
+    relationship: row.relationship as CausalEdge["relationship"],
     confidence: row.confidence,
     evidence: JSON.parse(row.evidence_json) as string[],
     addedTs: row.added_ts,
-    addedBy: row.added_by,
+    addedBy: row.added_by as CausalEdge["addedBy"],
     signature: row.signature
   }));
 }

@@ -504,7 +504,7 @@ export class LLMJudge {
     return {
       judgeId: randomUUID(),
       templateId: 'pairwise',
-      winner: sim.winner === 'a' ? 'A' as any : sim.winner === 'b' ? 'B' as any : 'tie' as any,
+      winner: (sim.winner === "tie" ? "tie" : sim.winner.toUpperCase()) as PairwiseResult["winner"],
       scoreA: sim.scoreA / 5,
       scoreB: sim.scoreB / 5,
       reasoning: sim.reasoning,

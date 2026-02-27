@@ -45,7 +45,7 @@ export class PromptModuleRegistry {
     const db = getDb();
     const parts: string[] = [];
     for (const mid of moduleIds) {
-      const row = db.prepare('SELECT content FROM pm_modules WHERE id = ? OR name = ?').get(mid, mid) as any;
+      const row = db.prepare('SELECT content FROM pm_modules WHERE id = ? OR name = ?').get(mid, mid) as { content: string } | undefined;
       if (row) parts.push(row.content);
     }
     return parts.join('\n\n');
@@ -61,7 +61,7 @@ export class PromptModuleRegistry {
 
   getVersion(versionId: string): string | null {
     const db = getDb();
-    const row = db.prepare('SELECT composed_text FROM pm_versions WHERE id = ?').get(versionId) as any;
+    const row = db.prepare('SELECT composed_text FROM pm_versions WHERE id = ?').get(versionId) as { composed_text: string } | undefined;
     return row?.composed_text ?? null;
   }
 }

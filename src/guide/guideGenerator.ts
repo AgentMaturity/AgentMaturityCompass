@@ -232,7 +232,7 @@ function complianceMappingsForQuestion(questionId: string, frameworks?: string[]
   const gaps: ComplianceGap[] = [];
   for (const m of builtInComplianceMappings) {
     if (frameworks && frameworks.length > 0 && !frameworks.includes(m.framework)) continue;
-    if (!m.related.questions.includes(questionId as any)) continue;
+    if (!m.related.questions.includes(questionId as never)) continue;
     gaps.push({
       framework: m.framework,
       category: m.category,
@@ -241,7 +241,7 @@ function complianceMappingsForQuestion(questionId: string, frameworks?: string[]
       requiredPacks: m.related.packs,
       requiredEvidenceTypes: m.evidenceRequirements
         .filter(e => e.type === "requires_evidence_event")
-        .flatMap(e => (e as any).eventTypes ?? []),
+        .flatMap(e => ((e as Record<string, unknown>).eventTypes ?? []) as string[]),
     });
   }
   return gaps;

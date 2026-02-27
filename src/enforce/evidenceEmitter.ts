@@ -100,7 +100,7 @@ export function readGuardEvents(agentId?: string, windowHours?: number): Array<{
     }
     if (clauses.length) sql += ' WHERE ' + clauses.join(' AND ');
     sql += ' ORDER BY created_at DESC';
-    return db.prepare(sql).all(...params) as any[];
+    return db.prepare(sql).all(...params) as Array<{ id: string; agent_id: string; module_code: string; decision: string; reason: string; severity: string; meta_json: string | null; created_at: string; }>;
   } catch (_e) {
     return [];
   }

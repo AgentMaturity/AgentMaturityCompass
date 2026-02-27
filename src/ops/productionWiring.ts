@@ -443,10 +443,10 @@ export function fpTrackerHook(
 export function getWiringDiagnostics(): WiringDiagnostic[] {
   const modules: Array<{ name: string; hookKey: string; events: Array<{ ts?: number }> }> = [
     { name: "overheadAccounting", hookKey: "gatewayOverhead", events: state.overheadEvents },
-    { name: "dataResidency", hookKey: "bridgeResidency", events: state.residencyChecks as any },
+    { name: "dataResidency", hookKey: "bridgeResidency", events: state.residencyChecks as Array<{ ts?: number }> },
     { name: "operatorUx", hookKey: "diagnosticOperator", events: [] },
     { name: "insiderRisk", hookKey: "insiderRisk", events: state.insiderCaptures },
-    { name: "cognitionLab", hookKey: "labSignal", events: state.labBridgeResults as any },
+    { name: "cognitionLab", hookKey: "labSignal", events: state.labBridgeResults as Array<{ ts?: number }> },
     { name: "fpTracker", hookKey: "fpTracker", events: state.fpEvents },
   ];
 
@@ -454,7 +454,7 @@ export function getWiringDiagnostics(): WiringDiagnostic[] {
     const hookCount = state.hookActivations.get(m.hookKey) ?? 0;
     const eventCount = m.events.length;
     const lastTs = m.events.length > 0
-      ? Math.max(...m.events.map((e) => (e as any).ts ?? Date.now()))
+      ? Math.max(...m.events.map((e) => e.ts ?? Date.now()))
       : 0;
 
     return {

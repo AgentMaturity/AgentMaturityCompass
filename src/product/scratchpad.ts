@@ -88,7 +88,7 @@ export class ScratchpadManager {
 
   get(sessionId: string, key: string): unknown | null {
     const db = getDb();
-    const row = db.prepare('SELECT value_json, expires_at FROM scratchpad_entries WHERE session_id = ? AND key = ?').get(sessionId, key) as any;
+    const row = db.prepare('SELECT value_json, expires_at FROM scratchpad_entries WHERE session_id = ? AND key = ?').get(sessionId, key) as { value_json: string; expires_at: string | null } | undefined;
     if (!row) return null;
     if (row.expires_at && new Date(row.expires_at) < new Date()) {
       db.prepare('DELETE FROM scratchpad_entries WHERE session_id = ? AND key = ?').run(sessionId, key);
@@ -99,13 +99,13 @@ export class ScratchpadManager {
 
   list(sessionId: string): ScratchpadEntry[] {
     const db = getDb();
-    const rows = db.prepare('SELECT * FROM scratchpad_entries WHERE session_id = ?').all(sessionId) as any[];
+    const rows = db.prepare('SELECT * FROM scratchpad_entries WHERE session_id = ?').all(sessionId) as Array<{ entry_id: string; session_id: string; key: string; value_json: string; lifecycle: string; ttl_seconds: number | null; expires_at: string | null; created_at: string; updated_at: string }>;
     return rows.map(r => ({
       entryId: r.entry_id,
       sessionId: r.session_id,
       key: r.key,
       value: JSON.parse(r.value_json),
-      lifecycle: r.lifecycle,
+      lifecycle: r.lifecycle as ScratchpadEntry["lifecycle"],
       ttlSeconds: r.ttl_seconds ?? undefined,
       expiresAt: r.expires_at ?? undefined,
       createdAt: r.created_at,

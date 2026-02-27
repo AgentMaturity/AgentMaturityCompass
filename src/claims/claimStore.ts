@@ -1,5 +1,6 @@
 import Database from "better-sqlite3";
-import type { Claim, ClaimTransition, ClaimLifecycleState } from "./claimTypes.js";
+import type { Claim, ClaimTransition, ClaimLifecycleState, ClaimProvenanceTag } from "./claimTypes.js";
+import type { TrustTier } from "../types.js";
 
 /**
  * SQLite store for claims and claim transitions using better-sqlite3
@@ -245,11 +246,11 @@ function rowToClaim(row: Record<string, unknown>): Claim {
     questionId: row.question_id as string,
     assertionText: row.assertion_text as string,
     claimedLevel: row.claimed_level as number,
-    provenanceTag: row.provenance_tag as any,
+    provenanceTag: row.provenance_tag as ClaimProvenanceTag,
     lifecycleState: row.lifecycle_state as ClaimLifecycleState,
     confidence: row.confidence as number,
     evidenceRefs: JSON.parse(row.evidence_refs_json as string) as string[],
-    trustTier: row.trust_tier as any,
+    trustTier: row.trust_tier as TrustTier,
     promotedFromClaimId: (row.promoted_from_claim_id as string | null) || null,
     promotionEvidence: JSON.parse(row.promotion_evidence_json as string) as string[],
     supersededByClaimId: (row.superseded_by_claim_id as string | null) || null,
