@@ -70,11 +70,11 @@ AMC scores agents on a 5-level scale:
 
 AMC evaluates 5 dimensions, each with specific questions:
 
-1. **Purpose & Boundaries** — Does the agent know what it should and shouldn't do?
-2. **Autonomy & Oversight** — How much freedom does it have, and who's watching?
-3. **Trustworthiness** — Is it honest, safe, and consistent?
-4. **Operational Maturity** — Can it handle failures, scale, and recover?
-5. **Ecosystem & Compliance** — Does it play well with others and follow the rules?
+1. **Strategic Agent Operations** (17 questions) — Mission clarity, scope adherence, decision traceability
+2. **Skills** (35 questions) — Tool mastery, injection defense, DLP, zero-trust
+3. **Resilience** (30 questions) — Graceful degradation, circuit breakers, monitor bypass resistance
+4. **Leadership & Autonomy** (21 questions) — Structured logs, traces, cost tracking, SLO monitoring
+5. **Culture & Alignment** (23 questions) — Test harnesses, benchmarks, feedback loops, over-compliance detection
 
 
 ---
@@ -419,5 +419,20 @@ cd platform/python && python3 -m pytest tests/ -q
 4. **Run `amc setup --demo`** — explore with sample data
 5. **Run `amc guide --diff`** — see what improved after your agent works with guardrails
 6. **Set up evidence collection** — move from questionnaires to proof
+
+## New: Transparency Reports & MCP Server
+
+**Generate an Agent Transparency Report (SBOM for agents):**
+```bash
+amc transparency report --agent default
+amc transparency report --format json > agent-report.json
+```
+
+**Connect to IDE via MCP:**
+```bash
+amc mcp serve --workspace .
+# Then add to Claude Code / Cursor / Windsurf config
+amc mcp install-config --ide claude-code
+```
 
 Questions? Issues? [GitHub](https://github.com/thewisecrab/AgentMaturityCompass)

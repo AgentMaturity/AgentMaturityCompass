@@ -9,6 +9,13 @@ Get from zero to your first agent maturity score in under 5 minutes.
 
 ## 1. Install & Setup
 
+**Fastest (npm global):**
+```bash
+npm i -g agent-maturity-compass
+amc init
+```
+
+**From source (development/contribution):**
 ```bash
 git clone https://github.com/thewisecrab/AgentMaturityCompass.git
 cd AgentMaturityCompass
