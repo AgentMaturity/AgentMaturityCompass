@@ -1035,7 +1035,7 @@ a:focus-visible,.bp:focus-visible,.bg:focus-visible,.nbtn:focus-visible,
 
   <div class="hero-tag">MIT Open Source · 2,722 Tests Passing · 14 Frameworks Supported</div>
   <div class="rv" style="margin-bottom:1.5rem;display:flex;align-items:center;gap:1.5rem;flex-wrap:wrap">
-    <a href="https://github.com/thewisecrab/AgentMaturityCompass" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:.5rem;font:.7rem/1 var(--mono);color:var(--t2);border:1px solid var(--bdr);padding:.35rem .75rem;text-decoration:none;transition:border-color .2s" onmouseover="this.style.borderColor='rgba(0,255,65,.4)'" onmouseout="this.style.borderColor='rgba(0,255,65,.1)'">⭐ Star on GitHub</a>
+    <a href="https://github.com/thewisecrab/AgentMaturityCompass" target="_blank" rel="noopener" id="gh-star-btn" style="display:inline-flex;align-items:center;gap:.5rem;font:.7rem/1 var(--mono);color:var(--t2);border:1px solid var(--bdr);padding:.35rem .75rem;text-decoration:none;transition:border-color .2s" onmouseover="this.style.borderColor='rgba(0,255,65,.4)'" onmouseout="this.style.borderColor='rgba(0,255,65,.1)'">⭐ Star on GitHub <span id="gh-stars" style="color:var(--g);margin-left:.25rem"></span></a>
     <span style="font:.68rem/1 var(--mono);color:var(--t3)">MIT · Open source public infrastructure for AI agent trust</span>
   </div>
 
@@ -1085,41 +1085,41 @@ a:focus-visible,.bp:focus-visible,.bg:focus-visible,.nbtn:focus-visible,
 
   <!-- OS INSTALL TABS -->
   <div>
-    <div class="os-tabs" role="tablist">
-      <button class="os-tab on" role="tab" onclick="showOS('npm')" id="tab-npm">npm</button>
-      <button class="os-tab" role="tab" onclick="showOS('mac')" id="tab-mac">macOS</button>
-      <button class="os-tab" role="tab" onclick="showOS('linux')" id="tab-linux">Linux</button>
-      <button class="os-tab" role="tab" onclick="showOS('win')" id="tab-win">Windows</button>
-      <button class="os-tab" role="tab" onclick="showOS('docker')" id="tab-docker">Docker</button>
-      <button class="os-tab" role="tab" onclick="showOS('source')" id="tab-source">Source</button>
+    <div class="os-tabs" role="tablist" aria-label="Installation method">
+      <button class="os-tab on" role="tab" onclick="showOS('npm')" id="tab-npm" aria-selected="true" aria-controls="os-npm">npm</button>
+      <button class="os-tab" role="tab" onclick="showOS('mac')" id="tab-mac" aria-selected="false" aria-controls="os-mac">macOS</button>
+      <button class="os-tab" role="tab" onclick="showOS('linux')" id="tab-linux" aria-selected="false" aria-controls="os-linux">Linux</button>
+      <button class="os-tab" role="tab" onclick="showOS('win')" id="tab-win" aria-selected="false" aria-controls="os-win">Windows</button>
+      <button class="os-tab" role="tab" onclick="showOS('docker')" id="tab-docker" aria-selected="false" aria-controls="os-docker">Docker</button>
+      <button class="os-tab" role="tab" onclick="showOS('source')" id="tab-source" aria-selected="false" aria-controls="os-source">Source</button>
     </div>
-    <div class="os-panel on" id="os-npm" role="tabpanel">
+    <div class="os-panel on" id="os-npm" role="tabpanel" aria-labelledby="tab-npm">
       <span class="co g">$ npm i -g agent-maturity-compass</span>
       <span class="co d" style="display:block;margin-top:.3rem">Works on macOS, Linux, Windows. Node 18+ required.</span>
       <span class="co d" style="display:block">Includes: CLI (482+ commands) + Studio + Gateway + Dashboard</span>
       <span class="co d" style="display:block">Verify: <a href="https://www.npmjs.com/package/agent-maturity-compass" target="_blank" rel="noopener" style="color:var(--g)">npmjs.com/package/agent-maturity-compass ↗</a></span>
     </div>
-    <div class="os-panel" id="os-mac" role="tabpanel">
+    <div class="os-panel" id="os-mac" role="tabpanel" aria-labelledby="tab-mac">
       <span class="co d">$ brew install thewisecrab/tap/amc  <span style="color:var(--a)"># Coming soon</span></span>
       <span class="co d" style="display:block;margin-top:.3rem">Homebrew formula (in progress). For now, use npm:</span>
       <span class="co g" style="display:block">$ npm i -g agent-maturity-compass</span>
     </div>
-    <div class="os-panel" id="os-linux" role="tabpanel">
+    <div class="os-panel" id="os-linux" role="tabpanel" aria-labelledby="tab-linux">
       <span class="co g">$ npm i -g agent-maturity-compass</span>
       <span class="co d" style="display:block;margin-top:.3rem">Ubuntu, Debian, Fedora, Arch — any distro with Node 18+.</span>
       <span class="co d" style="display:block">For air-gapped: amc release pack → offline .amcrelease bundle</span>
     </div>
-    <div class="os-panel" id="os-win" role="tabpanel">
+    <div class="os-panel" id="os-win" role="tabpanel" aria-labelledby="tab-win">
       <span class="co g">$ npm i -g agent-maturity-compass</span>
       <span class="co d" style="display:block;margin-top:.3rem">Windows 10/11. PowerShell or CMD. WSL also supported.</span>
       <span class="co d" style="display:block">Note: Docker sandbox mode recommended for hardened isolation.</span>
     </div>
-    <div class="os-panel" id="os-docker" role="tabpanel">
+    <div class="os-panel" id="os-docker" role="tabpanel" aria-labelledby="tab-docker">
       <span class="co d">$ docker run -p 3212:3212 -p 3210:3210 amc/studio  <span style="color:var(--a)"># Coming soon</span></span>
       <span class="co d" style="display:block;margin-top:.3rem">Docker image in progress. For now, use npm:</span>
       <span class="co g" style="display:block">$ npm i -g agent-maturity-compass && amc up</span>
     </div>
-    <div class="os-panel" id="os-source" role="tabpanel">
+    <div class="os-panel" id="os-source" role="tabpanel" aria-labelledby="tab-source">
       <span class="co g">$ git clone https://github.com/thewisecrab/AgentMaturityCompass.git</span>
       <span class="co g" style="display:block">$ cd AgentMaturityCompass && npm ci && npm run build && npm link</span>
       <span class="co d" style="display:block;margin-top:.3rem">Full source. 2,722 tests: npm test + pytest platform/python/tests/</span>
@@ -1363,7 +1363,7 @@ a:focus-visible,.bp:focus-visible,.bg:focus-visible,.nbtn:focus-visible,
 <div class="dv"><i aria-hidden="true"></i></div>
 
 <!-- IMPROVEMENT JOURNEY -->
-<section id="improve" aria-labelledby="improve-h">
+<section id="improve" aria-label="Getting Better — Agent Improvement">
 <div class="w">
 
   <!-- SIMPLE -->
@@ -1552,14 +1552,14 @@ a:focus-visible,.bp:focus-visible,.bg:focus-visible,.nbtn:focus-visible,
   <div class="bento" style="grid-template-columns:repeat(auto-fit,minmax(200px,1fr));margin:2rem 0">
     <div class="bc rv"><span class="bc-title">40 Packs</span><p class="bc-body">Across 7 industry stations</p></div>
     <div class="bc rv d1"><span class="bc-title">382 Questions</span><p class="bc-body">With specific regulatory article refs</p></div>
-    <div class="bc rv d2"><span class="bc-title">4 Risk Tiers</span><p class="bc-body">high / very-high / critical</p></div>
+    <div class="bc rv d2"><span class="bc-title">4 Risk Tiers</span><p class="bc-body">elevated / high / very-high / critical</p></div>
     <div class="bc rv d1"><span class="bc-title">EU AI Act Mapped</span><p class="bc-body">Exact Annex III classification per pack</p></div>
     <div class="bc rv d2"><span class="bc-title">SDG Aligned</span><p class="bc-body">UN Sustainable Development Goals per pack</p></div>
     <div class="bc rv"><span class="bc-title">L1→L5 Maturity</span><p class="bc-body">Industry-specific descriptors per question</p></div>
   </div>
 
   <p style="text-align:center;margin-top:2rem">
-    <a class="bp" href="docs/SECTOR_PACKS.md" style="display:inline-block;padding:.75rem 2rem;background:var(--g);color:#000;font:700 .8rem/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;text-decoration:none;border-radius:3px">Read Sector Packs Docs →</a>
+    <a class="bp" href="https://github.com/thewisecrab/AgentMaturityCompass/blob/main/docs/SECTOR_PACKS.md" style="display:inline-block;padding:.75rem 2rem;background:var(--g);color:#000;font:700 .8rem/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;text-decoration:none;border-radius:3px">Read Sector Packs Docs →</a>
   </p>
 </div>
 </section>
@@ -1607,6 +1607,13 @@ a:focus-visible,.bp:focus-visible,.bg:focus-visible,.nbtn:focus-visible,
           <text class="rlabel" x="74" y="320" text-anchor="end">OBSERVABILITY</text>
           <text class="rlabel" x="30" y="122" text-anchor="end">GROWTH</text>
         </svg>
+      <div style="margin-top:.75rem;display:grid;grid-template-columns:1fr 1fr;gap:.2rem .75rem" aria-label="Radar axis legend">
+        <div style="font:.6rem/1.4 var(--mono);color:var(--t3)"><span style="color:var(--g)">↑ INTEGRITY</span> = Strategic Agent Ops</div>
+        <div style="font:.6rem/1.4 var(--mono);color:var(--t3)"><span style="color:var(--g)">↗ AUTONOMY</span> = Leadership &amp; Autonomy</div>
+        <div style="font:.6rem/1.4 var(--mono);color:var(--t3)"><span style="color:var(--g)">↘ SECURITY</span> = Skills</div>
+        <div style="font:.6rem/1.4 var(--mono);color:var(--t3)"><span style="color:var(--g)">↙ OBSERVABILITY</span> = Resilience</div>
+        <div style="font:.6rem/1.4 var(--mono);color:var(--t3)"><span style="color:var(--g)">↖ GROWTH</span> = Culture &amp; Alignment</div>
+      </div>
       </div>
     </div>
   </div>
@@ -2052,9 +2059,14 @@ window.addEventListener('resize', () => {
 
 /* ── OS TABS ─────────────────────────────────────── */
 function showOS(id) {
-  document.querySelectorAll('.os-tab').forEach(t => t.classList.remove('on'));
+  document.querySelectorAll('.os-tab').forEach(t => {
+    t.classList.remove('on');
+    t.setAttribute('aria-selected', 'false');
+  });
   document.querySelectorAll('.os-panel').forEach(p => p.classList.remove('on'));
-  document.getElementById('tab-' + id).classList.add('on');
+  const tab = document.getElementById('tab-' + id);
+  tab.classList.add('on');
+  tab.setAttribute('aria-selected', 'true');
   document.getElementById('os-' + id).classList.add('on');
 }
 
@@ -2124,6 +2136,19 @@ function showOS(id) {
     });
   }, { threshold: 0.3 });
   document.querySelectorAll('.gauge-ring').forEach(el => io.observe(el));
+})();
+
+/* ── GITHUB STARS ───────────────────────────────── */
+(function(){
+  fetch('https://api.github.com/repos/thewisecrab/AgentMaturityCompass')
+    .then(r => r.json())
+    .then(d => {
+      const el = document.getElementById('gh-stars');
+      if(el && d.stargazers_count !== undefined) {
+        const n = d.stargazers_count;
+        el.textContent = n >= 1000 ? (n/1000).toFixed(1)+'k' : n;
+      }
+    }).catch(() => {}); // silent fail
 })();
 
 /* ── SCROLL EXIT FADE ───────────────────────────── */
