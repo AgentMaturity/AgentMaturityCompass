@@ -11,6 +11,7 @@ import { z } from "zod";
 import { randomUUID } from "node:crypto";
 import { join } from "node:path";
 import { readFileSync } from "node:fs";
+import YAML from "yaml";
 import { ensureDir, pathExists, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 
@@ -486,7 +487,6 @@ export function loadCircuitBreakerPolicy(workspace: string): CircuitBreakerPolic
     return currentPolicy;
   }
   try {
-    const YAML = require("yaml") as typeof import("yaml");
     const raw = YAML.parse(readFileSync(file, "utf8")) as unknown;
     const policy = circuitBreakerPolicySchema.parse(raw);
     currentPolicy = policy;
@@ -497,7 +497,6 @@ export function loadCircuitBreakerPolicy(workspace: string): CircuitBreakerPolic
 }
 
 export function saveCircuitBreakerPolicy(workspace: string, policy?: CircuitBreakerPolicy): void {
-  const YAML = require("yaml") as typeof import("yaml");
   const toSave = policy ?? currentPolicy;
   ensureDir(join(workspace, ".amc"));
   writeFileAtomic(

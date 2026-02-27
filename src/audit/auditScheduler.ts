@@ -17,6 +17,7 @@ import {
 } from "./auditPolicyStore.js";
 import { collectAuditBinderData } from "./binderCollector.js";
 import { saveBinderCache } from "./binderStore.js";
+import { includes } from "../utils/typeGuards.js";
 
 function nextRefreshTs(nowTs: number, cadenceHours: number): number {
   return nowTs + Math.max(1, cadenceHours) * 60 * 60 * 1000;
@@ -171,7 +172,7 @@ export async function auditSchedulerTick(params: {
   const nowTs = Date.now();
   const eventTriggered = Boolean(
     params.eventType &&
-      policy.auditPolicy.recurrence.refreshOnEvents.includes(params.eventType as never)
+      includes(policy.auditPolicy.recurrence.refreshOnEvents, params.eventType)
   );
   const due = !state.nextRefreshTs || state.nextRefreshTs <= nowTs;
   if (!eventTriggered && !due) {

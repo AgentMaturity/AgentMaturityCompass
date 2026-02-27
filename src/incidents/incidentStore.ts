@@ -18,7 +18,7 @@ type IncidentRow = {
 };
 /** Raw SQLite row for incident transitions */
 type TransitionRow = {
-  transition_id: string; incident_id: string; from_state: string | null;
+  transition_id: string; incident_id: string; from_state: string;
   to_state: string; reason: string; ts: number; operator_id: string | null;
   signature: string;
 };
@@ -279,7 +279,7 @@ function getIncident(db: Database.Database, incidentId: string): Incident | null
 
 function getIncidentsByAgent(db: Database.Database, agentId: string, state?: IncidentState): Incident[] {
   let query = "SELECT * FROM incidents WHERE agent_id = ?";
-  const params: any[] = [agentId];
+  const params: (string | number)[] = [agentId];
 
   if (state) {
     query += " AND state = ?";

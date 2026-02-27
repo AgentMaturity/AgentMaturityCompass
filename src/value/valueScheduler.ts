@@ -5,6 +5,7 @@ import {
   verifyValuePolicySignature
 } from "./valueStore.js";
 import { valueSchedulerRunNowForApi } from "./valueApi.js";
+import { includes } from "../utils/typeGuards.js";
 
 function nextTs(nowTs: number, hours: number): number {
   return nowTs + Math.max(1, hours) * 60 * 60 * 1000;
@@ -49,7 +50,7 @@ export async function valueSchedulerTick(params: {
   const dueSnapshot = !state.nextSnapshotTs || state.nextSnapshotTs <= nowTs;
   const dueReport = !state.nextReportTs || state.nextReportTs <= nowTs;
   const eventTriggered = Boolean(
-    params.eventType && policy.valuePolicy.cadence.refreshOnEvents.includes(params.eventType as never)
+    params.eventType && includes(policy.valuePolicy.cadence.refreshOnEvents, params.eventType)
   );
 
   if (!eventTriggered && !dueSnapshot && !dueReport) {

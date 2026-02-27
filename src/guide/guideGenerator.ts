@@ -12,6 +12,7 @@ import type { LayerName, DiagnosticQuestion, QuestionScore } from "../types.js";
 import { questionBank } from "../diagnostic/questionBank.js";
 import { builtInComplianceMappings } from "../compliance/builtInMappings.js";
 import type { ComplianceMapping } from "../compliance/mappingSchema.js";
+import { includes } from "../utils/typeGuards.js";
 
 /* ── Framework-specific hints ──────────────────────── */
 
@@ -232,7 +233,7 @@ function complianceMappingsForQuestion(questionId: string, frameworks?: string[]
   const gaps: ComplianceGap[] = [];
   for (const m of builtInComplianceMappings) {
     if (frameworks && frameworks.length > 0 && !frameworks.includes(m.framework)) continue;
-    if (!m.related.questions.includes(questionId as never)) continue;
+    if (!includes(m.related.questions, questionId)) continue;
     gaps.push({
       framework: m.framework,
       category: m.category,

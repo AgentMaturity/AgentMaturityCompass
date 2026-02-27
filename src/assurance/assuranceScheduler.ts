@@ -8,6 +8,7 @@ import {
 import { issueAssuranceCertificate } from "./assuranceCertificates.js";
 import { runAssurance } from "./assuranceRunner.js";
 import type { AssuranceSchedulerState } from "./assuranceSchema.js";
+import { includes } from "../utils/typeGuards.js";
 
 function nextRunTs(nowTs: number, defaultRunHours: number): number {
   const hours = Math.max(1, defaultRunHours);
@@ -146,7 +147,7 @@ export async function assuranceSchedulerTick(params: {
 
   const policy = loadAssurancePolicy(params.workspace);
   const nowTs = Date.now();
-  const eventTriggered = Boolean(params.eventType && policy.assurancePolicy.cadence.runAfterEvents.includes(params.eventType as never));
+  const eventTriggered = Boolean(params.eventType && includes(policy.assurancePolicy.cadence.runAfterEvents, params.eventType));
   const due = !state.nextRunTs || state.nextRunTs <= nowTs;
   if (!eventTriggered && !due) {
     return { ran: false, reason: "not_due" };

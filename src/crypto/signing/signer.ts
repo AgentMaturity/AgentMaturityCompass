@@ -13,6 +13,7 @@ import {
 import { buildNotaryAuthSignature } from "../../notary/notaryAuth.js";
 import { verifyNotarySignResponse } from "../../notary/notaryVerify.js";
 import { verifySignatureEnvelope } from "./signatureEnvelope.js";
+import type { SignatureEnvelope } from "./signerTypes.js";
 
 function postNotarySync(params: {
   baseUrl: string;
@@ -190,7 +191,7 @@ export function verifySignedDigest(params: {
       if (typeof envelope.sigB64 === "string" && envelope.sigB64 !== params.signed.signature) {
         return false;
       }
-      return verifySignatureEnvelope(params.digestHex, params.signed.envelope as never, {
+      return verifySignatureEnvelope(params.digestHex, params.signed.envelope as SignatureEnvelope, {
         trustedPublicKeys: trustedAuditorKeys,
         requireTrustedKey: true
       });

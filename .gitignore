@@ -15,7 +15,6 @@ Thumbs.db
 # IDE / Agent workspace files
 .claude/
 .openclaw/
-.changeset/
 
 # AMC runtime data (generated at runtime, not source)
 .amc/evidence.sqlite

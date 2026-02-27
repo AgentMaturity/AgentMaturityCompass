@@ -50,9 +50,18 @@ class RateLimiter {
     this.timestamps.push(now);
     return true;
   }
+
+  reset(): void {
+    this.timestamps = [];
+  }
 }
 
 const rateLimiter = new RateLimiter(60_000, 60); // 60 requests per minute
+
+/** Reset rate limiter state (for test isolation). */
+export function resetRateLimiter(): void {
+  rateLimiter.reset();
+}
 
 function enforceRateLimit(): void {
   if (!rateLimiter.check()) {

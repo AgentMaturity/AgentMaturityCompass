@@ -8,8 +8,7 @@
    Skills ·················· 4.1  (33 questions)
    Resilience ·············· 3.8  (27 questions)
    Leadership & Autonomy ··· 3.5  (21 questions)
-   Culture & Alignment ····· 3.9  (20 questions)
-   Evaluation & Growth ····· 3.4  (8 questions)
+   Culture & Alignment ····· 3.9  (28 questions)
    Evidence: ✓ Merkle root 9c4e…a7f0 (Ed25519)
 ```
 
@@ -145,7 +144,7 @@ amc sector report --pack drug-discovery --output reports/drug.md
 
 | Module | What It Does |
 |--------|-------------|
-| **AMC Score** | 126 diagnostic questions, 6 dimensions, L0–L5 maturity, evidence-weighted |
+| **AMC Score** | 126 diagnostic questions, 5 dimensions, L0–L5 maturity, evidence-weighted |
 | **AMC Shield** | 74 attack packs: injection, exfiltration, sycophancy, sabotage, over-compliance, and more |
 | **AMC Enforce** | Governor engine with policy packs, approval workflows, scoped leases |
 | **AMC Vault** | Ed25519 key vault, Merkle-tree evidence chains, HSM/TPM support |
