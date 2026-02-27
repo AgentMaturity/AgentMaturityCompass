@@ -8,6 +8,8 @@ AMC (Agent Maturity Compass) scores your AI agent's trustworthiness from actual 
 
 ## Install
 
+**Prerequisites:** Node.js ≥ 20. AMC uses `better-sqlite3` which includes prebuilt binaries for most platforms. If prebuilds aren't available for your OS/arch, you'll need Python 3 and a C++ compiler (`build-essential` on Linux, Xcode CLI tools on macOS).
+
 ```bash
 npm i -g agent-maturity-compass
 ```
@@ -66,7 +68,7 @@ AMC scores agents on a 5-level scale:
 
 ## What Gets Scored
 
-AMC evaluates 6 dimensions, each with specific questions:
+AMC evaluates 5 dimensions, each with specific questions:
 
 1. **Purpose & Boundaries** — Does the agent know what it should and shouldn't do?
 2. **Autonomy & Oversight** — How much freedom does it have, and who's watching?

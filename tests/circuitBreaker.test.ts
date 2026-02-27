@@ -45,7 +45,7 @@ beforeEach(() => {
     globalTimeoutMs: 10_000,
     perHookTimeoutMs: 2_000,
     failureThreshold: 3,
-    recoveryWindowMs: 1000,
+    recoveryWindowMs: 50, // Short for test speed — avoids 1100ms wall-clock wait
     halfOpenMaxAttempts: 2,
     backpressure: { maxPendingWrites: 5, maxQueueLatencyMs: 1000, degradeOnExceed: true },
     deadLetter: { enabled: true, maxEntries: 10, retryIntervalMs: 1000, maxRetries: 2 },
@@ -166,8 +166,8 @@ describe("Circuit Breaker State Machine", () => {
       }
     }
 
-    // Wait for recovery window (1000ms)
-    await new Promise((resolve) => setTimeout(resolve, 1100));
+    // Wait for recovery window (50ms in test config)
+    await new Promise((resolve) => setTimeout(resolve, 100));
 
     // This should succeed in half-open
     const result = await withCircuitBreaker("test", async () => "recovered");

@@ -5,6 +5,11 @@ import { canonicalize } from "../utils/json.js";
 import { signHexDigest, verifyHexDigestAny, getPublicKeyHistory } from "../crypto/keys.js";
 import type { CausalEdge, Incident, IncidentTransition, IncidentState } from "./incidentTypes.js";
 
+/** Typed DB row for incident records — matches the incidents table schema */
+type IncidentRow = Incident;
+/** Typed DB row for incident transitions */
+type TransitionRow = IncidentTransition;
+
 function initIncidentTables(db: Database.Database): void {
   db.exec(`
     CREATE TABLE IF NOT EXISTS incidents (
@@ -224,7 +229,7 @@ function insertCausalEdge(db: Database.Database, incidentId: string, edge: Causa
 function getIncident(db: Database.Database, incidentId: string): Incident | null {
   const row = db
     .prepare("SELECT * FROM incidents WHERE incident_id = ?")
-    .get(incidentId) as any;
+    .get(incidentId) as IncidentRow | undefined;
 
   if (!row) {
     return null;
@@ -264,7 +269,7 @@ function getIncidentsByAgent(db: Database.Database, agentId: string, state?: Inc
 
   query += " ORDER BY created_ts DESC";
 
-  const rows = db.prepare(query).all(...params) as any[];
+  const rows = db.prepare(query).all(...params) as IncidentRow[];
 
   return rows.map((row) => ({
     incidentId: row.incident_id,
@@ -293,7 +298,7 @@ function getOpenIncidents(db: Database.Database, agentId: string): Incident[] {
   const states = ["OPEN", "INVESTIGATING", "MITIGATED"];
   const rows = db
     .prepare(`SELECT * FROM incidents WHERE agent_id = ? AND state IN (?, ?, ?) ORDER BY created_ts DESC`)
-    .all(agentId, ...states) as any[];
+    .all(agentId, ...states) as IncidentRow[];
 
   return rows.map((row) => ({
     incidentId: row.incident_id,
@@ -321,7 +326,7 @@ function getOpenIncidents(db: Database.Database, agentId: string): Incident[] {
 function getIncidentTransitions(db: Database.Database, incidentId: string): IncidentTransition[] {
   const rows = db
     .prepare("SELECT * FROM incident_transitions WHERE incident_id = ? ORDER BY ts ASC")
-    .all(incidentId) as any[];
+    .all(incidentId) as TransitionRow[];
 
   return rows.map((row) => ({
     transitionId: row.transition_id,
@@ -364,7 +369,7 @@ function getLatestIncidentStates(db: Database.Database, incidentIds: string[]): 
 function getCausalEdges(db: Database.Database, incidentId: string): CausalEdge[] {
   const rows = db
     .prepare("SELECT * FROM causal_edges WHERE incident_id = ? ORDER BY added_ts ASC")
-    .all(incidentId) as any[];
+    .all(incidentId) as TransitionRow[];
 
   return rows.map((row) => ({
     edgeId: row.edge_id,

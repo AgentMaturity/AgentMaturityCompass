@@ -93,6 +93,7 @@ function setupHostWithTwoWorkspaces(): {
   workspaceA: string;
   workspaceB: string;
 } {
+  const _savedVaultPass = process.env.AMC_VAULT_PASSPHRASE;
   process.env.AMC_VAULT_PASSPHRASE = "host-mode-passphrase";
   const hostDir = newDir("amc-host-mode-");
   initHostDb(hostDir);

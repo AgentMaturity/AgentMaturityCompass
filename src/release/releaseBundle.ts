@@ -70,14 +70,24 @@ function verifyNpmTgzSafety(tgzPath: string): void {
 }
 
 function npmPack(workspace: string, npmEnv: Record<string, string>): NpmPackResult {
-  const parsed = JSON.parse(runChecked("npm", ["pack", "--json", "--ignore-scripts"], workspace, npmEnv).stdout) as Array<{ filename: string }>;
-  if (!Array.isArray(parsed) || parsed.length === 0 || !parsed[0]?.filename) {
-    throw new Error("npm pack did not return filename");
+  // Use --pack-destination to avoid conflicts when multiple tests run npm pack concurrently
+  const packDest = mkTmp("amc-npm-pack-");
+  try {
+    const parsed = JSON.parse(
+      runChecked("npm", ["pack", "--json", "--ignore-scripts", "--pack-destination", packDest], workspace, npmEnv).stdout
+    ) as Array<{ filename: string }>;
+    if (!Array.isArray(parsed) || parsed.length === 0 || !parsed[0]?.filename) {
+      throw new Error("npm pack did not return filename");
+    }
+    const tgzPath = join(packDest, parsed[0].filename);
+    return {
+      tgzPath,
+      fileName: parsed[0].filename
+    };
+  } catch (err) {
+    cleanupDir(packDest);
+    throw err;
   }
-  return {
-    tgzPath: join(workspace, parsed[0].filename),
-    fileName: parsed[0].filename
-  };
 }
 
 function writeDockerMetadata(stageRoot: string): { path: string; sha: string } {

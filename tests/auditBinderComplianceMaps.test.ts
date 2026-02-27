@@ -21,6 +21,7 @@ import {
 import { decideApprovalForIntent } from "../src/approvals/approvalEngine.js";
 
 const roots: string[] = [];
+const _originalVaultPassphrase = process.env.AMC_VAULT_PASSPHRASE;
 
 function workspace(): string {
   const dir = mkdtempSync(join(tmpdir(), "amc-audit-binder-"));
@@ -55,6 +56,12 @@ afterEach(() => {
     if (dir) {
       rmSync(dir, { recursive: true, force: true });
     }
+  }
+  // Restore vault passphrase to prevent env pollution across tests
+  if (_originalVaultPassphrase === undefined) {
+    delete process.env.AMC_VAULT_PASSPHRASE;
+  } else {
+    process.env.AMC_VAULT_PASSPHRASE = _originalVaultPassphrase;
   }
 });
 

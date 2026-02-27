@@ -71,6 +71,10 @@ export interface IndustryPack {
   questions: IndustryPackQuestion[];
   certificationThreshold: number;
   complianceFrameworks: string[];
+  /**
+   * Industry-specific risk tier — distinct from core RiskTier ("low"|"med"|"high"|"critical").
+   * Sector packs use regulatory-aligned tiers: critical > very-high > high > elevated.
+   */
   riskTier: "critical" | "very-high" | "high" | "elevated";
   euAIActClassification: string;
   sdgAlignment: string[];

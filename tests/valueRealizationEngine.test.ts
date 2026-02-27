@@ -29,6 +29,7 @@ const roots: string[] = [];
 function newWorkspace(): string {
   const dir = mkdtempSync(join(tmpdir(), "amc-value-engine-"));
   roots.push(dir);
+  const _savedVaultPass = process.env.AMC_VAULT_PASSPHRASE;
   process.env.AMC_VAULT_PASSPHRASE = "value-engine-passphrase";
   initWorkspace({ workspacePath: dir, trustBoundaryMode: "isolated" });
   valueInitForApi(dir);

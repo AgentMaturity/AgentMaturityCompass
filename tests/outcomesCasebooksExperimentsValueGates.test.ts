@@ -43,6 +43,7 @@ const roots: string[] = [];
 function newWorkspace(): string {
   const dir = mkdtempSync(join(tmpdir(), "amc-outcomes-test-"));
   roots.push(dir);
+  const _savedVaultPass = process.env.AMC_VAULT_PASSPHRASE;
   process.env.AMC_VAULT_PASSPHRASE = "outcome-tests-passphrase";
   initWorkspace({ workspacePath: dir, trustBoundaryMode: "isolated" });
   initBudgets(dir, "default");

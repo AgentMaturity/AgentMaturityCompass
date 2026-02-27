@@ -10,7 +10,7 @@ AMC Sector Packs extend the base 126-question AMC rubric with deep vertical expe
 
 | Layer | Coverage |
 |---|---|
-| **Base AMC** | 126 questions, 6 dimensions — mandatory for all agents |
+| **Base AMC** | 126 questions, 5 dimensions — mandatory for all agents |
 | **Domain Packs** | 9 existing vertical packs (healthcare, financial, etc.) |
 | **Sector Packs** | 40 new packs across 7 stations — granular industry sub-verticals |
 

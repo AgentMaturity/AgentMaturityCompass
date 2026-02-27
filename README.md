@@ -59,7 +59,7 @@ amc badge                # ![AMC L3](https://img.shields.io/badge/AMC-L3%20Defin
 ```
 Agent (untrusted) → AMC Gateway (trusted observer) → Evidence Ledger (signed, hash-chained)
                                                               ↓
-                                                Scoring Engine (126 questions, 6 dimensions)
+                                                Scoring Engine (126 questions, 5 dimensions)
                                                               ↓
                                                AMC Studio (dashboard + API)
 ```

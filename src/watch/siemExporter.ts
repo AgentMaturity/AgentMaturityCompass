@@ -69,13 +69,20 @@ export function exportToSiem(events: Array<{ action: string; risk: string }>, fo
 }
 
 /** MITRE ATT&CK category mapping */
-export enum MITRECategory {
-  execution = 'execution',
-  credential_access = 'credential_access',
-  exfiltration_risk = 'exfiltration_risk',
-  defense_evasion = 'defense_evasion',
-  lateral_movement = 'lateral_movement',
-}
+export type MITRECategory =
+  | 'execution'
+  | 'credential_access'
+  | 'exfiltration_risk'
+  | 'defense_evasion'
+  | 'lateral_movement';
+
+export const MITRECategory = {
+  execution: 'execution' as const,
+  credential_access: 'credential_access' as const,
+  exfiltration_risk: 'exfiltration_risk' as const,
+  defense_evasion: 'defense_evasion' as const,
+  lateral_movement: 'lateral_movement' as const,
+};
 
 const MODULE_MITRE_MAP: Record<string, MITRECategory> = {
   E1: MITRECategory.execution,

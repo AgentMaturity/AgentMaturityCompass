@@ -30,6 +30,36 @@ import {
 } from "../transparency/transparencyReport.js";
 import { INDUSTRY_PACKS, scoreIndustryPack, type IndustryPackId } from "../domains/industryPacks.js";
 
+// ---------------------------------------------------------------------------
+// Simple in-process rate limiter
+// ---------------------------------------------------------------------------
+class RateLimiter {
+  private readonly windowMs: number;
+  private readonly maxRequests: number;
+  private timestamps: number[] = [];
+
+  constructor(windowMs: number, maxRequests: number) {
+    this.windowMs = windowMs;
+    this.maxRequests = maxRequests;
+  }
+
+  check(): boolean {
+    const now = Date.now();
+    this.timestamps = this.timestamps.filter((t) => now - t < this.windowMs);
+    if (this.timestamps.length >= this.maxRequests) return false;
+    this.timestamps.push(now);
+    return true;
+  }
+}
+
+const rateLimiter = new RateLimiter(60_000, 60); // 60 requests per minute
+
+function enforceRateLimit(): void {
+  if (!rateLimiter.check()) {
+    throw new Error("Rate limit exceeded — max 60 requests per minute. Please slow down.");
+  }
+}
+
 function getPackageVersion(): string {
   try {
     const pkgPath = join(dirname(fileURLToPath(import.meta.url)), "../../package.json");
@@ -83,6 +113,7 @@ export async function startMcpServer(workspace?: string): Promise<void> {
         .describe("Path to the AMC workspace (defaults to current directory)"),
     },
     async ({ workspace }) => {
+      enforceRateLimit();
       const ws = validateWorkspace(workspace ?? process.cwd());
       try {
         const agents = listAgents(ws);
@@ -130,6 +161,7 @@ export async function startMcpServer(workspace?: string): Promise<void> {
         .describe("Path to the AMC workspace (defaults to current directory)"),
     },
     async ({ agentId, workspace }) => {
+      enforceRateLimit();
       const ws = validateWorkspace(workspace ?? process.cwd());
       try {
         const report = generateTransparencyReport(agentId, ws);
@@ -184,6 +216,7 @@ export async function startMcpServer(workspace?: string): Promise<void> {
         .describe("Path to the AMC workspace (defaults to current directory)"),
     },
     async ({ agentId, workspace }) => {
+      enforceRateLimit();
       const ws = validateWorkspace(workspace ?? process.cwd());
       try {
         const report = generateTransparencyReport(agentId, ws);
@@ -246,6 +279,7 @@ export async function startMcpServer(workspace?: string): Promise<void> {
         .describe("Path to the AMC workspace"),
     },
     async ({ agentId, frameworks, workspace }) => {
+      enforceRateLimit();
       const ws = validateWorkspace(workspace ?? process.cwd());
       const fwList = frameworks?.length
         ? frameworks.join(", ")
@@ -305,6 +339,7 @@ export async function startMcpServer(workspace?: string): Promise<void> {
         .describe("Path to the AMC workspace"),
     },
     async ({ agentId, format, workspace }) => {
+      enforceRateLimit();
       const ws = validateWorkspace(workspace ?? process.cwd());
       try {
         const report = generateTransparencyReport(agentId, ws);
@@ -348,6 +383,7 @@ export async function startMcpServer(workspace?: string): Promise<void> {
         ),
     },
     async ({ packId, responses }) => {
+      enforceRateLimit();
       if (!INDUSTRY_PACKS[packId as IndustryPackId]) {
         const available = Object.keys(INDUSTRY_PACKS).join(", ");
         return {

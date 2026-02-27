@@ -25,7 +25,7 @@ export const circuitBreakerPolicySchema = z.object({
   globalTimeoutMs: z.number().int().min(100).default(10_000),
   perHookTimeoutMs: z.number().int().min(100).default(5_000),
   failureThreshold: z.number().int().min(1).default(5),
-  recoveryWindowMs: z.number().int().min(1000).default(60_000),
+  recoveryWindowMs: z.number().int().min(50).default(60_000),
   halfOpenMaxAttempts: z.number().int().min(1).default(3),
   backpressure: z.object({
     maxPendingWrites: z.number().int().min(1).default(100),
