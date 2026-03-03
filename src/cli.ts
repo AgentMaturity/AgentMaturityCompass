@@ -1902,6 +1902,21 @@ program
         detected.push({ path: "AGENTS.md", label: "AGENTS.md (create new)" });
       }
 
+      // Non-interactive: auto-pick first detected config (or AGENTS.md)
+      if (!process.stdin.isTTY) {
+        const autoTarget = (detected[0] ?? { path: "AGENTS.md" }).path;
+        const fullPath = pathModule.resolve(process.cwd(), autoTarget);
+        const result = applyGuardrails(fullPath, guardrailsContent, readFn, writeFn);
+        if (isDryRun) {
+          console.log(chalk.yellow(`  [DRY RUN] Would ${result.action}:`), chalk.cyan(result.path));
+          console.log(chalk.gray("  Remove --dry-run to apply.\n"));
+        } else {
+          console.log(chalk.green(`  ✓ Guardrails ${result.action}:`), chalk.cyan(result.path));
+          console.log("");
+        }
+        return;
+      }
+
       const choices = [
         ...detected.map(d => ({ name: `${d.label} (${d.path})`, value: d.path })),
         { name: "Custom path...", value: "__custom__" },
@@ -14238,7 +14253,7 @@ vault
 // SCORE — Maturity scoring and evidence collection
 // ============================================================
 const productGlossary = program.command("glossary").description("Domain terminology management");
-const domainCmd = program.command("domain").description("Domain-specific architecture and compliance operations");
+const domainCmd = program.command("domain").alias("sector").description("Domain-specific architecture and compliance operations");
 
 product
   .command("features")

@@ -8,7 +8,7 @@
 [![Modules](https://img.shields.io/badge/scoring%20modules-75-green)]()
 [![Assurance Packs](https://img.shields.io/badge/assurance%20packs-85-red)]()
 [![Adapters](https://img.shields.io/badge/adapters-14-purple)]()
-[![Sector Packs](https://img.shields.io/badge/sector%20packs-40-orange)]()
+[![Domain Packs](https://img.shields.io/badge/domain%20packs-40-orange)]()
 
 🌐 [Website](https://thewisecrab.github.io/AgentMaturityCompass/) · 📖 [Docs](docs/) · 💬 [Discussions](https://github.com/thewisecrab/AgentMaturityCompass/discussions)
 
@@ -47,10 +47,11 @@ npm i -g agent-maturity-compass
 
 # Create a project and get your first score
 mkdir my-agent && cd my-agent
+export AMC_VAULT_PASSPHRASE='pick-a-passphrase'   # needed for cryptographic evidence chain
 amc init
 ```
 
-That's it. `amc init` walks you through everything interactively. No config files. No PhD required.
+That's it. `amc init` walks you through everything interactively. The passphrase protects your agent's cryptographic evidence vault — pick something memorable.
 
 ### What You Get
 
@@ -133,15 +134,15 @@ Zero code changes. One environment variable.
 
 ---
 
-## 🏭 Sector Packs — Industry-Specific Assessment
+## 🏭 Domain Packs — Industry-Specific Assessment
 
-**40 packs** across 7 industry sectors with **593 sector-specific diagnostic questions**. Each question references specific regulatory articles, not vague guidelines.
+**40 packs** across 7 industry domains with **593 domain-specific diagnostic questions**. Each question references specific regulatory articles, not vague guidelines.
 
 ```bash
-amc sector packs list                                              # See all 40 packs
-amc sector score --pack clinical-trials --agent my-agent           # Score against a pack
-amc sector gaps --pack digital-payments --agent my-agent           # Find compliance gaps
-amc sector report --pack farm-to-fork --output reports/env.md      # Generate report
+amc domain list                                                    # See all 7 domains + packs
+amc domain assess --domain health --agent my-agent                 # Assess against a domain
+amc domain gaps --domain wealth --agent my-agent                   # Find compliance gaps
+amc domain report --domain environment --output reports/env.md     # Generate report
 ```
 
 | Sector | Packs | Questions | Key Regulations |
@@ -156,7 +157,7 @@ amc sector report --pack farm-to-fork --output reports/env.md      # Generate re
 
 Every pack includes risk tier, EU AI Act classification, SDG alignment, certification path, and key risks.
 
-> 📖 [Sector Packs docs](docs/SECTOR_PACKS.md)
+> 📖 [Domain Packs docs](docs/SECTOR_PACKS.md)
 
 ---
 
@@ -278,7 +279,7 @@ Beyond the core diagnostic, AMC includes research-backed scoring modules:
 
 ```bash
 amc audit binder create --framework eu-ai-act    # Export compliance evidence
-amc comply check --framework iso-42001            # Check compliance gaps
+amc compliance report --framework iso-42001      # Generate compliance report
 ```
 
 ---
@@ -324,7 +325,7 @@ curl -fsSL https://raw.githubusercontent.com/thewisecrab/AgentMaturityCompass/ma
 | [Getting Started](docs/GETTING_STARTED.md) | Install → first score → L5 |
 | [Quickstart Guide](docs/QUICKSTART.md) | 5-minute walkthrough |
 | [Agent Guide System](docs/AGENT_GUIDE.md) | Guardrails, auto-detect, CI gates |
-| [Sector Packs](docs/SECTOR_PACKS.md) | 40 industry-specific packs |
+| [Domain Packs](docs/SECTOR_PACKS.md) | 40 industry-specific domain packs |
 | [CLI Reference](docs/AMC_MASTER_REFERENCE.md) | All 482+ commands |
 | [Architecture Map](docs/ARCHITECTURE_MAP.md) | System design |
 | [Assurance Lab](docs/ASSURANCE_LAB.md) | Attack packs & red teaming |
@@ -358,6 +359,6 @@ As autonomous agents become the primary interface between humans and technology,
 ---
 
 <p align="center">
-  <strong>733 questions · 75 scoring modules · 85 assurance packs · 40 sector packs · 14 adapters · 2,723 tests</strong><br>
+  <strong>733 questions · 75 scoring modules · 85 assurance packs · 40 domain packs · 14 adapters · 2,723 tests</strong><br>
   <em>Stop trusting. Start verifying.</em>
 </p>

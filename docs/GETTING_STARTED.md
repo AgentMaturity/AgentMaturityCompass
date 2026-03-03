@@ -19,13 +19,20 @@ npm i -g agent-maturity-compass
 ```bash
 # 1. Create a workspace
 mkdir my-agent && cd my-agent
+
+# 2. Set a vault passphrase (protects your evidence chain)
+export AMC_VAULT_PASSPHRASE='pick-a-passphrase'
+
+# 3. Initialize and get your first maturity score
 amc init
 
-# 2. Get your first maturity score (interactive, 5 questions)
+# 4. Get your first maturity score (interactive, 5 questions)
 amc quickscore
 ```
 
 That's it. You now have a baseline maturity level (L0–L5).
+
+> **Why a passphrase?** AMC creates a cryptographic evidence vault (Ed25519 keys) that signs all your scores and evidence. The passphrase encrypts the vault so your signing keys stay protected. Pick something memorable — you'll need it each session.
 
 After scoring, AMC automatically shows what your agent needs to reach the next level.
 
