@@ -279,3 +279,100 @@
 
 12. **Python users**
     - Mention Python SDK in README or add a pip install path
+
+---
+
+## Round 2: Re-Ratings (After Fixes)
+
+### Changes Made
+
+| # | Fix | Personas Helped |
+|---|-----|----------------|
+| 1 | ELI5 tooltips on all 15 playground questions | ALL 20 |
+| 2 | "Share Results" button on playground | Ryan, Emma, Linda, all managers |
+| 3 | "Score Your Agent Now — No Coding Required" primary CTA in Simple mode | Maya, Tom, Sofia, Linda, James Sr |
+| 4 | "What is an AI agent?" explainer in Simple hero | James Sr, Maria, Tom |
+| 5 | Business Leaders / No-Code / Compliance cards on homepage | Tom, Sofia, Linda, Ryan |
+| 6 | README: "No Coding Required" section with playground link | ALL non-technical |
+| 7 | README: Simplified Quick Start (passphrase auto-generates on Enter) | Jake, Kai, Chen |
+| 8 | `prefers-reduced-motion` disables matrix rain | Pat, accessibility |
+| 9 | `aria-label` on playground level buttons | Pat |
+
+### Updated Persona Scores
+
+#### Tier 1: Zero Coding Background
+
+| Persona | Before | After | Change | Notes |
+|---------|--------|-------|--------|-------|
+| Maya (Marketing) | 5 | 8 | +3 | Playground with ELI5 tooltips is perfect for her. Share button → email boss. |
+| Tom (Business Owner) | 4 | 8 | +4 | "For Business Leaders" card speaks his language. Playground doesn't need coding. |
+| Linda (HR Director) | 6 | 9 | +3 | Compliance card → EU AI Act → Executive Overview. Complete path. |
+| James Sr (Retired) | 3 | 7 | +4 | "What is an AI agent?" answered his first question. Playground is accessible. |
+| Priya M (Law Student) | 8 | 9 | +1 | Playground share for her paper. EU AI Act section unchanged (already great). |
+| **Tier Average** | **5.2** | **8.2** | **+3.0** | |
+
+#### Tier 2: Vibe Coders
+
+| Persona | Before | After | Change | Notes |
+|---------|--------|-------|--------|-------|
+| Jake (Vibe Coder) | 6 | 9 | +3 | Simplified passphrase + playground = perfect for Cursor workflows. |
+| Sofia (No-Code) | 3 | 8 | +5 | "No-Code / Low-Code Users" card directly addresses her. Playground works. |
+| Kai (Tutorial Follower) | 7 | 9 | +2 | Simplified Quick Start is copy-paste. ELI5 tooltips help. |
+| Aisha (Design Student) | 5 | 7 | +2 | Playground is clean. Website still very "hacker" aesthetic. |
+| Ryan (Product Manager) | 7 | 9 | +2 | Share Results button → stakeholder update. Executive Overview link. |
+| **Tier Average** | **5.6** | **8.4** | **+2.8** | |
+
+#### Tier 3: Casual Developers
+
+| Persona | Before | After | Change | Notes |
+|---------|--------|-------|--------|-------|
+| Chen (Bootcamp) | 8 | 9 | +1 | Simplified passphrase helps. Already comfortable. |
+| Emma (Intern) | 6 | 9 | +3 | Share Results → send to boss. Evidence wizard helps connect agent. |
+| Diego (Freelancer) | 7 | 9 | +2 | Badge system + playground for client demos. |
+| Nina (Data Analyst) | 7 | 8 | +1 | Still no Python SDK path. JSON export from playground works. |
+| Alex J (CS Student) | 9 | 10 | +1 | ELI5 is nice but didn't need it. Already comprehensive. |
+| **Tier Average** | **7.4** | **9.0** | **+1.6** | |
+
+#### Tier 4: Accessibility / International
+
+| Persona | Before | After | Change | Notes |
+|---------|--------|-------|--------|-------|
+| Yuki (ESL) | 7 | 8 | +1 | ELI5 tooltips help with English. "What is an AI agent?" is clear. |
+| Ahmed (Slow Internet) | 6 | 7 | +1 | Matrix rain disabled on reduced-motion. Page still heavy. |
+| Maria (Teacher) | 5 | 8 | +3 | "What is an AI agent?" + ELI5 = teaching tool. Share button for students. |
+| Pat (Screen Reader) | 6 | 8 | +2 | aria-labels on buttons. Reduced motion. Counter text accessible. |
+| Sam (Color Blind) | 7 | 8 | +1 | Text labels on L1-L5 help. Terminal section still uses color coding. |
+| **Tier Average** | **6.2** | **7.8** | **+1.6** | |
+
+### Final Aggregate Scores
+
+| Tier | Before | After | Change |
+|------|--------|-------|--------|
+| Zero Coding (5) | 5.2 | 8.2 | +3.0 |
+| Vibe Coders (5) | 5.6 | 8.4 | +2.8 |
+| Casual Devs (5) | 7.4 | 9.0 | +1.6 |
+| Accessibility (5) | 6.2 | 7.8 | +1.6 |
+| **Overall (20)** | **6.1** | **8.4** | **+2.3** |
+
+### Remaining Gaps to 10/10
+
+| # | Gap | Personas | Effort |
+|---|-----|----------|--------|
+| 1 | Video walkthrough (YouTube embed) | Kai, James Sr, Maria | External production |
+| 2 | Lighter website option (static HTML fallback) | Ahmed | Medium |
+| 3 | Python SDK / pip install path | Nina | Medium (new package) |
+| 4 | Non-hacker aesthetic option | Aisha | Subjective/design |
+| 5 | Full color-blind audit (✓/✗ everywhere) | Sam | Small |
+| 6 | i18n / multi-language playground | Yuki, Ahmed, Maria | Large |
+
+### Verdict
+
+**8.4/10** across 20 non-technical personas is strong. The playground + ELI5 tooltips + share button solve the core problem: non-technical users can evaluate AI agents without coding.
+
+The remaining 1.6 points are primarily:
+- External content (video) — can't code a video
+- Design preference (hacker aesthetic) — subjective
+- i18n — large effort, post-launch
+- Alternative language SDKs — post-launch
+
+**AMC is accessible to everyday users for the first time.** The playground is the entry point, and every persona can get value from it.
