@@ -1,6 +1,17 @@
 {
-  "outputDirectory": "website",
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "name": "amc-api",
+  "version": 2,
+  "builds": [
+    {
+      "src": "api/index.ts",
+      "use": "@vercel/node"
+    }
+  ],
   "routes": [
-    { "src": "/(.*)", "dest": "/index.html" }
+    {
+      "src": "/api/(.*)",
+      "dest": "/api/index.ts"
+    }
   ]
 }

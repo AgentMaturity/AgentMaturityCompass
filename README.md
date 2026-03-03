@@ -349,6 +349,17 @@ curl -fsSL https://raw.githubusercontent.com/thewisecrab/AgentMaturityCompass/ma
 
 ---
 
+## 🚀 Deploy AMC API (One-Click)
+
+| Platform | Deploy |
+|----------|--------|
+| Vercel | [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/thewisecrab/AgentMaturityCompass) |
+| Railway | [![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/template?referralCode=amc&repo=https://github.com/thewisecrab/AgentMaturityCompass) |
+
+> Deploy the AMC REST API (`POST /api/quickscore`, `GET /api/badge/:agentId`) to the cloud in 60 seconds.
+
+---
+
 ## 🤝 Contributing
 
 AMC is MIT licensed and open source. Contributions welcome.

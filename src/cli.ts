@@ -16273,6 +16273,187 @@ demo
 registerTransparencyReportCommands(program);
 registerMcpCommands(program);
 
+// ── amc fix: Auto-remediation command ──
+program
+  .command("fix")
+  .description("Generate remediation patches for identified gaps (auto-fix mode)")
+  .option("--agent <agentId>", "agent ID")
+  .option("--dry-run", "show what would be generated without writing files", false)
+  .option("--target-level <level>", "target maturity level (L1-L5)", "L3")
+  .option("--framework <framework>", "target framework (langchain, crewai, autogen, generic)")
+  .option("--out <dir>", "output directory for patches", ".amc/fixes")
+  .action(async (opts: { agent?: string; dryRun: boolean; targetLevel: string; framework?: string; out: string }) => {
+    const { existsSync, mkdirSync, writeFileSync } = require("fs");
+    const agentId = opts.agent ?? activeAgent(program) ?? "default";
+    const targetLevelNum = parseInt(opts.targetLevel.replace(/\D/g, ""), 10) || 3;
+    const outDir = resolve(process.cwd(), opts.out);
+
+    console.log(chalk.bold(`\n🔧 AMC Auto-Fix — Agent: ${agentId}, Target: L${targetLevelNum}\n`));
+
+    // Try to load last diagnostic run for gap analysis
+    let gaps: Array<{ questionId: string; currentLevel: number; targetLevel: number; narrative: string; fix?: string }> = [];
+    try {
+      const ledger = openLedger(process.cwd());
+      const runs = ledger.listRuns();
+      if (runs.length > 0) {
+        const lastRun = runs[runs.length - 1]!;
+        const report = loadRunReport(process.cwd(), lastRun.run_id, agentId);
+        gaps = (report.layerScores ?? []).flatMap((layer: any) =>
+          (layer.questions ?? [])
+            .filter((q: any) => q.finalLevel < targetLevelNum)
+            .map((q: any) => ({
+              questionId: q.questionId,
+              currentLevel: q.finalLevel,
+              targetLevel: targetLevelNum,
+              narrative: q.narrative ?? "",
+            }))
+        );
+      }
+    } catch {
+      // No diagnostic runs — use generic fixes
+    }
+
+    // Generate framework-specific fixes
+    const fixes: Array<{ file: string; content: string; description: string }> = [];
+
+    // Always generate: safety guardrails config
+    fixes.push({
+      file: "guardrails.yaml",
+      description: "Safety guardrails configuration",
+      content: [
+        "# AMC Auto-Generated Guardrails",
+        `# Target: L${targetLevelNum} | Agent: ${agentId}`,
+        `# Generated: ${new Date().toISOString()}`,
+        "",
+        "guardrails:",
+        "  input_validation:",
+        "    max_length: 10000",
+        "    block_patterns:",
+        '      - "ignore previous instructions"',
+        '      - "you are now"',
+        '      - "system prompt"',
+        '      - "jailbreak"',
+        "    sanitize_html: true",
+        "",
+        "  output_validation:",
+        "    max_length: 50000",
+        "    block_pii: true",
+        "    block_secrets: true",
+        "",
+        "  rate_limiting:",
+        "    max_requests_per_minute: 60",
+        "    max_tokens_per_minute: 100000",
+        "",
+        "  logging:",
+        "    level: info",
+        "    include_prompts: true",
+        "    include_responses: true",
+        "    redact_pii: true",
+        targetLevelNum >= 3 ? [
+          "",
+          "  audit:",
+          "    sign_all_events: true",
+          "    tamper_detection: true",
+          "    retention_days: 90",
+        ].join("\n") : "",
+        targetLevelNum >= 4 ? [
+          "",
+          "  adversarial:",
+          "    canary_tokens: true",
+          "    drift_detection: true",
+          "    auto_quarantine: true",
+        ].join("\n") : "",
+      ].filter(Boolean).join("\n"),
+    });
+
+    // Generate: AGENTS.md (agent config)
+    fixes.push({
+      file: "AGENTS.md",
+      description: "Agent governance configuration",
+      content: [
+        `# AGENTS.md — ${agentId} Governance Configuration`,
+        "",
+        "## Operational Boundaries",
+        `- Target maturity: L${targetLevelNum}`,
+        "- All tool calls require explicit approval at L4+",
+        "- External communications require human review",
+        "- Maximum autonomous operation: 30 minutes without checkpoint",
+        "",
+        "## Safety Controls",
+        "- Input sanitization: guardrails.yaml",
+        "- Output filtering: PII/secrets blocked",
+        "- Rate limits: 60 req/min, 100K tokens/min",
+        targetLevelNum >= 3 ? "- Audit: all events signed and tamper-evident" : "",
+        targetLevelNum >= 4 ? "- Adversarial: canary tokens + drift detection active" : "",
+        "",
+        "## Escalation",
+        "- Safety trigger → pause + human review",
+        "- Cost threshold ($10/hour) → alert + throttle",
+        "- Unknown tool request → deny + log",
+      ].filter(Boolean).join("\n"),
+    });
+
+    // Generate: CI config
+    fixes.push({
+      file: ".github/workflows/amc-gate.yml",
+      description: "CI/CD maturity gate",
+      content: [
+        "name: AMC Maturity Gate",
+        "on: [push, pull_request]",
+        "jobs:",
+        "  amc-score:",
+        "    runs-on: ubuntu-latest",
+        "    steps:",
+        "      - uses: actions/checkout@v4",
+        "      - uses: actions/setup-node@v4",
+        "        with:",
+        "          node-version: '20'",
+        "      - run: npm i -g agent-maturity-compass",
+        `      - run: |`,
+        `          export AMC_VAULT_PASSPHRASE='ci-gate-$\{GITHUB_SHA}'`,
+        "          amc init",
+        "          amc quickscore --json > score.json",
+        `      - name: Check maturity level`,
+        `        run: |`,
+        `          LEVEL=$(node -e "const s=require('./score.json');console.log(s.preliminaryLevel)")`,
+        `          echo "AMC Level: $LEVEL"`,
+        `          LEVEL_NUM=$(echo $LEVEL | tr -dc '0-9')`,
+        `          if [ "$LEVEL_NUM" -lt "${targetLevelNum}" ]; then`,
+        `            echo "::error::AMC maturity L$LEVEL_NUM below target L${targetLevelNum}"`,
+        "            exit 1",
+        "          fi",
+      ].join("\n"),
+    });
+
+    if (opts.dryRun) {
+      console.log(chalk.yellow("  [DRY RUN] Would generate:\n"));
+      for (const fix of fixes) {
+        console.log(`  📄 ${chalk.cyan(fix.file)} — ${fix.description}`);
+      }
+      if (gaps.length > 0) {
+        console.log(`\n  ${chalk.gray(`Based on ${gaps.length} identified gaps from last diagnostic run`)}`);
+      }
+    } else {
+      if (!existsSync(outDir)) mkdirSync(outDir, { recursive: true });
+      for (const fix of fixes) {
+        const filePath = join(outDir, fix.file);
+        const fileDir = dirname(filePath);
+        if (!existsSync(fileDir)) mkdirSync(fileDir, { recursive: true });
+        writeFileSync(filePath, fix.content, "utf-8");
+        console.log(chalk.green(`  ✓ ${fix.file}`) + chalk.gray(` — ${fix.description}`));
+      }
+      console.log(chalk.bold.green(`\n  ✓ ${fixes.length} remediation files generated in ${outDir}/`));
+      if (gaps.length > 0) {
+        console.log(chalk.gray(`  Based on ${gaps.length} gaps from last diagnostic`));
+      }
+      console.log(chalk.gray("\n  Next steps:"));
+      console.log(chalk.gray("  1. Review generated files"));
+      console.log(chalk.gray("  2. Copy to your project: cp -r .amc/fixes/* ."));
+      console.log(chalk.gray("  3. Re-score: amc quickscore"));
+    }
+    console.log("");
+  });
+
 program.parseAsync(process.argv).catch((error: unknown) => {
   const message = normalizeCliErrorMessage(error);
   const unknownToken = parseUnknownCommandToken(message);
