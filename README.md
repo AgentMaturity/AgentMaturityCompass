@@ -302,11 +302,18 @@ npm link
 
 ### Docker (zero setup — no Node required)
 ```bash
-# Quick score (interactive)
-docker run -it --rm amc/compass amc quickscore
+# Build the quickstart image
+docker build -t amc-quickstart -f docker/Dockerfile.quickstart .
 
-# Full studio with dashboard
-docker run -p 3212:3212 -p 3210:3210 amc/studio
+# Quick score (interactive — prompts for passphrase)
+docker run -it --rm amc-quickstart amc init
+
+# Non-interactive quick score
+docker run -it --rm -e AMC_VAULT_PASSPHRASE=demo amc-quickstart amc quickscore
+
+# Full studio with dashboard (uses production Dockerfile)
+docker build -t amc-studio .
+docker run -p 3212:3212 -p 3210:3210 -e AMC_VAULT_PASSPHRASE=your-passphrase amc-studio
 ```
 
 ### Homebrew (macOS/Linux)

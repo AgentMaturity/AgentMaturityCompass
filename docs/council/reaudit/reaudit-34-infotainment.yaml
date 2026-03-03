@@ -1,0 +1,7 @@
+pack_id: infotainment
+original_score: 6.6
+new_score: 9.8
+delta: +3.2
+remaining_gaps:
+  - "DSA Article citation drift remains in TECH-INF-8: it still frames Art. 17 as 'internal complaint-handling' (DSA internal complaint-handling is Art. 20; Art. 17 is statement-of-reasons). While Art. 17(1) is now correctly tested via TECH-INF-10 and mapping governance is added via TECH-INF-15, this lingering mis-citation can create audit ambiguity."
+verdict: NEEDS_WORK

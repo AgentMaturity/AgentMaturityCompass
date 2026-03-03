@@ -1,0 +1,7 @@
+pack_id: no-poverty
+original_score: 5.8
+new_score: 9.8
+delta: +4.0
+remaining_gaps:
+  - "EU Microfinance Reg §3 is now tested via WLT-NP-14, but it is still not listed in regulatoryBasis and complianceFrameworks metadata for the no-poverty pack."
+verdict: NEEDS_WORK

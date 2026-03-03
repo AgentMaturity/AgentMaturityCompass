@@ -1,0 +1,6 @@
+pack_id: patient-lifecycle
+original_score: 7.2
+new_score: 10.0
+delta: +2.8
+remaining_gaps: []
+verdict: PASS

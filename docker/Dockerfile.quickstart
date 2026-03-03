@@ -1,0 +1,16 @@
+FROM node:20-slim
+
+LABEL org.opencontainers.image.title="Agent Maturity Compass — Quickstart"
+LABEL org.opencontainers.image.description="Zero-dependency AMC quickstart container"
+LABEL org.opencontainers.image.source="https://github.com/thewisecrab/AgentMaturityCompass"
+LABEL org.opencontainers.image.licenses="MIT"
+
+# Install AMC globally
+RUN npm i -g agent-maturity-compass && npm cache clean --force
+
+# Create a workspace directory
+WORKDIR /workspace
+
+# Default: interactive quickscore
+ENTRYPOINT ["amc"]
+CMD ["quickscore"]

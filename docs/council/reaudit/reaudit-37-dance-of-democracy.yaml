@@ -1,0 +1,7 @@
+pack_id: dance-of-democracy
+original_score: 6.2
+new_score: 9.8
+delta: +3.6
+remaining_gaps:
+  - "Pack metadata still contains GDPR shorthand (e.g., regulatoryBasis/complianceFrameworks list 'GDPR Art. 9(d)') even though the questions now correctly anchor Art. 9(1) and Art. 9(2)(d). This can still create audit friction/citation drift outside the questions array."
+verdict: NEEDS_WORK

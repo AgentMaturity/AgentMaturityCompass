@@ -1,0 +1,8 @@
+pack_id: life-technology
+original_score: 7.1
+new_score: 9.0
+delta: +1.9
+remaining_gaps:
+  - "Questions array contains duplicate IDs HLT-LT-12 through HLT-LT-16 (gap-fix block appears twice), which can break assessment response mapping and distort scoring/weighting."
+  - "regulatoryBasis/complianceFrameworks do not list newly added key authorities referenced in questions (EU IVDR 2017/746 Art. 25; IEEE 11073-10201), risking incomplete basis disclosure for the pack."
+verdict: NEEDS_WORK

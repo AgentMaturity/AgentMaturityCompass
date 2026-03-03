@@ -1,0 +1,9 @@
+pack_id: digital-citizens-rights
+original_score: 6.3
+new_score: 9.5
+delta: 3.2
+remaining_gaps:
+  - "Assurance-level anchor ambiguity remains: GOV-DCR-7 is still framed as ISO/IEC 29115 §7.3 LoA4 + NIST AAL3, while the council-required ISO/IEC 29115:2013 §7 AL3 anchor is now covered in GOV-DCR-13. Keeping both can confuse auditors/implementers about the intended target assurance level for the pack."
+  - "eIDAS anchor split persists: GOV-DCR-1 still cites Art. 6a/8 for wallet requirements, while the council-required Art. 5a (wallet assurance level high) is now correctly covered by GOV-DCR-10. GOV-DCR-14 mitigates citation drift via mapping governance, but reviewers may still question why Art. 6a remains the primary anchor in GOV-DCR-1."
+  - "EU AI Act Annex III §8 labeling: the pack’s classification string includes 'biometric identification' alongside §8; tightening this wording to match §8’s scope would reduce misclassification/confusion during conformity-assessment-style reviews."
+verdict: PASS

@@ -1,0 +1,8 @@
+pack_id: source-to-sustenance
+original_score: 5.5
+new_score: 9.1
+delta: +3.6
+remaining_gaps:
+  - "Questions array contains duplicate IDs ENV-SS-10 through ENV-SS-15 (gap-fix block appears twice), which can break assessment response mapping and distort weighting."
+  - "regulatoryBasis/complianceFrameworks do not list newly added key authorities referenced in questions (EU IUU Reg 1005/2008 Art. 12, Nagoya Protocol Art. 5, FAO Code of Conduct Art. 7.2), risking incomplete basis disclosure."
+verdict: NEEDS_WORK
