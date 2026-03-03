@@ -16,11 +16,19 @@
 
 ## 🟢 Simple Version — What Is This?
 
+> **What's an AI agent?** Any AI tool that takes actions for you — writing emails, booking meetings, editing code, answering customers, handling money. If your AI does more than just chat, it's an agent.
+
 **AI agents can do amazing things.** They write code, manage your calendar, send emails, handle customer support, make financial decisions. But here's the problem:
 
 **How do you know if an AI agent is actually safe and trustworthy?**
 
 Today, agents grade themselves. That's like letting students grade their own exams. AMC fixes this.
+
+### 🎯 No Coding Required
+
+**Don't want to install anything?** [Try the Web Playground →](https://thewisecrab.github.io/AgentMaturityCompass/playground.html)
+
+Answer 15 questions about your AI tool. Get an instant trust score. Share it with your team. Zero install, zero coding, works in your browser.
 
 ### What AMC Does (in plain English)
 
@@ -42,16 +50,15 @@ That's an **84-point gap** between what agents claim and what they actually do.
 ### Quick Start (2 Minutes)
 
 ```bash
-# Install
+# Install (requires Node.js 20+)
 npm i -g agent-maturity-compass
 
 # Create a project and get your first score
 mkdir my-agent && cd my-agent
-export AMC_VAULT_PASSPHRASE='pick-a-passphrase'   # needed for cryptographic evidence chain
-amc init
+amc init    # walks you through setup interactively
 ```
 
-That's it. `amc init` walks you through everything interactively. The passphrase protects your agent's cryptographic evidence vault — pick something memorable.
+That's it. `amc init` asks you a few questions and sets up everything. It'll prompt for a passphrase to protect your evidence vault — just pick something memorable (or press Enter to auto-generate one).
 
 ### What You Get
 

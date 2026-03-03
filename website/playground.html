@@ -35,6 +35,9 @@
   .btn-outline:hover { background: rgba(0,255,65,.1); }
   .badge-output { text-align: center; margin-top: 1rem; padding: 1rem; border: 1px dashed var(--bdr); border-radius: 3px; display: none; }
   .badge-output code { color: var(--g); font-size: .7rem; word-break: break-all; }
+  .q-eli5 { color: var(--t2); font-size: .7rem; margin: .25rem 0 .5rem; font-style: italic; opacity: .8; line-height: 1.4; }
+  .share-result { background: rgba(0,255,65,.08); border: 1px dashed var(--g); border-radius: 6px; padding: 1rem; margin-top: 1rem; display: none; text-align: center; }
+  .share-result textarea { width: 100%; background: #000; color: var(--g); border: 1px solid var(--bdr); border-radius: 3px; padding: .5rem; font: .7rem var(--mono); resize: none; height: 80px; }
   .nav-back { color: var(--g); text-decoration: none; font-size: .8rem; display: inline-block; margin-bottom: 1rem; }
   .progress-bar { height: 4px; background: var(--bdr); border-radius: 2px; margin-bottom: 1rem; }
   .progress-fill { height: 100%; background: var(--g); border-radius: 2px; transition: width .3s; }
@@ -58,6 +61,12 @@
       <button class="btn" onclick="copyBadge()">📋 Copy Badge</button>
       <button class="btn btn-outline" onclick="exportJSON()">📄 Export JSON</button>
       <button class="btn btn-outline" onclick="resetAll()">🔄 Reset</button>
+      <button class="btn btn-outline" onclick="shareResults()">📤 Share Results</button>
+    </div>
+    <div class="share-result" id="shareResult">
+      <p style="color:var(--t2);font-size:.75rem;margin-bottom:.5rem">Copy and share your assessment:</p>
+      <textarea id="shareText" readonly></textarea>
+      <button class="btn" style="margin-top:.5rem;font-size:.65rem" onclick="navigator.clipboard.writeText(document.getElementById('shareText').value)">📋 Copy to Clipboard</button>
     </div>
     <div class="badge-output" id="badgeOutput">
       <code id="badgeCode"></code>
@@ -70,43 +79,58 @@
 <script>
 const QUESTIONS = [
   // Strategic Agent Ops (3 questions)
-  { id: 'SO-01', dim: 'Strategic Agent Ops', text: 'Does your agent have a clear mission statement and defined operational boundaries?', 
+  { id: 'SO-01', dim: 'Strategic Agent Ops', text: 'Does your agent have a clear mission statement and defined operational boundaries?',
+    eli5: '💡 In plain English: Does your AI know what it\'s supposed to do — and what it\'s NOT supposed to do?',
     levels: ['No boundaries defined', 'Informal scope', 'Documented scope', 'Enforced scope with monitoring', 'Self-auditing scope compliance'] },
   { id: 'SO-02', dim: 'Strategic Agent Ops', text: 'Does the agent have human oversight and escalation paths?',
+    eli5: '💡 In plain English: Can a human step in and take over if the AI makes a mistake?',
     levels: ['No human oversight', 'Ad-hoc oversight', 'Defined escalation rules', 'Measured escalation effectiveness', 'Autonomous oversight with human ratification'] },
   { id: 'SO-03', dim: 'Strategic Agent Ops', text: 'Are all agent decisions logged with audit trails?',
+    eli5: '💡 In plain English: Can you go back and see exactly what the AI did and why?',
     levels: ['No logging', 'Console output only', 'Structured logs', 'Queryable audit trail', 'Immutable cryptographic audit log'] },
   
   // Skills (3 questions)
   { id: 'SK-01', dim: 'Skills', text: 'How does the agent handle prompt injection attempts?',
+    eli5: '💡 In plain English: If someone tries to trick the AI into doing something bad, can it resist?',
     levels: ['No injection defense', 'Basic input filtering', 'Documented defenses', 'Active injection detection + blocking', 'Adversarial-tested + auto-updating defenses'] },
   { id: 'SK-02', dim: 'Skills', text: 'Does the agent follow least-privilege principles for tool access?',
+    eli5: '💡 In plain English: Does the AI only access what it absolutely needs, or does it have keys to everything?',
     levels: ['Unrestricted tool access', 'Manual permission lists', 'Documented tool policy', 'Runtime permission enforcement', 'Dynamic scoping with audit'] },
   { id: 'SK-03', dim: 'Skills', text: 'Does the agent prevent data leakage (PII, secrets, credentials)?',
+    eli5: '💡 In plain English: Can the AI accidentally share your passwords, personal info, or private data?',
     levels: ['No DLP controls', 'Ad-hoc filtering', 'Pattern-based DLP', 'Measured DLP with false positive tracking', 'Zero-trust output pipeline'] },
   
   // Resilience (3 questions)
   { id: 'RS-01', dim: 'Resilience', text: 'What happens when the primary model/API is unavailable?',
+    eli5: '💡 In plain English: If the AI\'s brain goes offline, does it crash or switch to a backup?',
     levels: ['Agent crashes', 'Unhandled error', 'Documented fallback', 'Tested failover with SLA', 'Auto-routing to alternatives'] },
   { id: 'RS-02', dim: 'Resilience', text: 'Does the agent have budget/cost controls?',
+    eli5: '💡 In plain English: Can the AI accidentally run up a huge bill, or are there spending limits?',
     levels: ['No cost awareness', 'Manual budget checks', 'Hard spending limits', 'Cost-per-task tracking + alerts', 'Auto-optimization across model tiers'] },
   { id: 'RS-03', dim: 'Resilience', text: 'How does the agent handle unexpected or out-of-scope inputs?',
+    eli5: '💡 In plain English: If you ask the AI something weird or outside its job, does it freak out or politely decline?',
     levels: ['Attempts everything', 'Informal scope limits', 'OOD detection documented', 'Automated OOD detection', 'Self-identifying novel inputs'] },
   
   // Leadership & Autonomy (3 questions)
   { id: 'LA-01', dim: 'Leadership & Autonomy', text: 'Can you reconstruct the agent\'s reasoning from production logs?',
+    eli5: '💡 In plain English: If the AI makes a weird decision, can you figure out WHY it did that?',
     levels: ['Black box', 'Partial logs', 'Structured traces', 'Full reasoning chain reconstruction', 'Auto-generated explanations'] },
   { id: 'LA-02', dim: 'Leadership & Autonomy', text: 'Does the agent have defined autonomy levels (supervised → autonomous)?',
+    eli5: '💡 In plain English: Is there a dial for how much freedom the AI has — from "ask permission for everything" to "handle it yourself"?',
     levels: ['No autonomy model', 'Implicit autonomy', 'Documented tiers', 'Enforced graduated autonomy', 'Self-adjusting autonomy by risk'] },
   { id: 'LA-03', dim: 'Leadership & Autonomy', text: 'Are agent interactions traceable across multi-step workflows?',
+    eli5: '💡 In plain English: If the AI does 10 things in a row, can you follow the trail of each step?',
     levels: ['No tracing', 'Request IDs only', 'Distributed traces', 'Full workflow visualization', 'Auto-anomaly detection in traces'] },
   
   // Culture & Alignment (3 questions)
   { id: 'CA-01', dim: 'Culture & Alignment', text: 'Is the agent regularly tested against adversarial scenarios?',
+    eli5: '💡 In plain English: Does someone regularly try to break the AI on purpose to find weaknesses?',
     levels: ['Never tested', 'One-time tests', 'Scheduled testing', 'Continuous red team testing', 'Auto-generated attack scenarios'] },
   { id: 'CA-02', dim: 'Culture & Alignment', text: 'Does the agent demonstrate truthfulness (refusing to make claims without evidence)?',
+    eli5: '💡 In plain English: Does the AI make stuff up, or does it say "I don\'t know" when it doesn\'t?',
     levels: ['No truthfulness controls', 'Ad-hoc fact-checking', 'Evidence-bound claims policy', 'Measured truthfulness with citations', 'Self-verifying with confidence calibration'] },
   { id: 'CA-03', dim: 'Culture & Alignment', text: 'Does the agent have feedback loops (user feedback → improvement)?',
+    eli5: '💡 In plain English: When users say the AI got something wrong, does that actually make it better next time?',
     levels: ['No feedback mechanism', 'Informal feedback', 'Structured feedback collection', 'Feedback-driven improvements tracked', 'Autonomous improvement from feedback'] },
 ];
 
@@ -134,9 +158,10 @@ function render() {
     }
     html += `<div class="question">
       <div class="q-text"><span class="q-id">${q.id}</span> ${q.text}</div>
+      ${q.eli5 ? `<div class="q-eli5">${q.eli5}</div>` : ''}
       <div class="levels">
         ${q.levels.map((l, li) => `<button class="level-btn ${responses[q.id] === li+1 ? 'active' : ''}" 
-          onclick="setLevel('${q.id}', ${li+1}, this)" title="L${li+1}: ${l}">L${li+1}</button>`).join('')}
+          onclick="setLevel('${q.id}', ${li+1}, this)" title="L${li+1}: ${l}" aria-label="Level ${li+1}: ${l}">L${li+1}</button>`).join('')}
       </div>
     </div>`;
   });
@@ -217,9 +242,35 @@ function exportJSON() {
   a.click();
 }
 
+function shareResults() {
+  const level = document.getElementById('compositeScore').textContent;
+  const score = document.getElementById('compositeNum').textContent;
+  const dims = {};
+  for (const [dimName] of Object.entries(DIM_MAP)) {
+    const qs = QUESTIONS.filter(q => q.dim === dimName);
+    const answered = qs.filter(q => responses[q.id]);
+    const avg = answered.length > 0 ? answered.reduce((s, q) => s + (responses[q.id] / 5) * 100, 0) / answered.length : 0;
+    const dimLevel = avg >= 90 ? 'L5' : avg >= 70 ? 'L4' : avg >= 50 ? 'L3' : avg >= 30 ? 'L2' : avg >= 10 ? 'L1' : 'L0';
+    dims[dimName] = `${dimLevel} (${Math.round(avg)}/100)`;
+  }
+  const text = `🧭 AMC Agent Trust Score: ${level} (${score}/100)
+
+Dimensions:
+${Object.entries(dims).map(([k, v]) => `  • ${k}: ${v}`).join('\n')}
+
+Assessed ${Object.keys(responses).length}/15 questions.
+Date: ${new Date().toLocaleDateString()}
+
+Score your own agent → https://thewisecrab.github.io/AgentMaturityCompass/playground.html
+Learn more → https://github.com/thewisecrab/AgentMaturityCompass`;
+  document.getElementById('shareText').value = text;
+  document.getElementById('shareResult').style.display = 'block';
+}
+
 function resetAll() {
   Object.keys(responses).forEach(k => delete responses[k]);
   answered = 0;
+  document.getElementById('shareResult').style.display = 'none';
   render();
 }
 

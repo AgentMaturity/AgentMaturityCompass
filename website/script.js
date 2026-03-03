@@ -1,8 +1,9 @@
 /* AMC v15 — Pure CSS animations, no GSAP */
 
 // ─── MATRIX RAIN ───
+const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const canvas = document.getElementById('matrix');
-if (canvas) {
+if (canvas && !prefersReducedMotion) {
   const ctx = canvas.getContext('2d');
   function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
   resizeCanvas(); window.addEventListener('resize', resizeCanvas);
