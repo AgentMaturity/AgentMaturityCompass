@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AMC vs Everything Else — Agent Maturity Compass</title>
+<meta name="description" content="Compare Agent Maturity Compass against self-reported docs, MTEB benchmarks, model cards, SOC2 audits, manual red-teaming, AgentBench, and HELM.">
+<meta property="og:title" content="AMC vs Everything Else — How AMC Compares">
+<meta property="og:description" content="Side-by-side comparison of AI agent evaluation approaches. See why execution evidence beats self-reported claims.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://thewisecrab.github.io/AgentMaturityCompass/compare.html">
+<meta property="og:image" content="https://thewisecrab.github.io/AgentMaturityCompass/og-card.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23000'/%3E%3Ccircle cx='16' cy='16' r='11' fill='none' stroke='%2300ff41' stroke-width='1.5'/%3E%3Cpath d='M16 5L17.5 14.5 16 18 14.5 14.5Z' fill='%2300ff41'/%3E%3Ccircle cx='16' cy='16' r='2' fill='%2300ff41'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#000;--bg2:#060d06;--bg3:#0a140a;--fg:#e0ffe0;--fg2:#b0d8b0;--muted:#5a8a5a;--green:#00ff41;--green2:#00cc33;--green3:#006622;--border:rgba(0,255,65,.12);--border2:rgba(0,255,65,.25);--amber:#f59e0b;--red:#ff3355;--cyan:#00e5ff;--mono:'JetBrains Mono',monospace;--sans:'Inter',system-ui,sans-serif}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--sans);background:var(--bg);color:var(--fg);line-height:1.7;min-height:100vh}
+a{color:var(--green);text-decoration:none}a:hover{text-decoration:underline}
+
+.nav{background:var(--bg2);border-bottom:1px solid var(--border);padding:14px 24px;display:flex;align-items:center;gap:20px;font-family:var(--mono);font-size:.85rem;position:sticky;top:0;z-index:100}
+.nav a{color:var(--muted)}
+.nav a:hover{color:var(--green);text-decoration:none}
+.nav .logo{color:var(--green);font-weight:600;font-size:1rem}
+
+.hero{text-align:center;padding:80px 24px 48px;max-width:800px;margin:0 auto}
+.hero h1{font-family:var(--mono);font-size:2.4rem;color:var(--green);margin-bottom:12px}
+.hero .sub{color:var(--fg2);font-size:1.1rem;margin-bottom:8px}
+.hero .sub2{color:var(--muted);font-size:.9rem}
+
+.container{max-width:1100px;margin:0 auto;padding:0 24px 80px}
+
+.table-wrap{overflow-x:auto;margin:40px 0;border:1px solid var(--border2);border-radius:12px}
+table{width:100%;border-collapse:collapse;font-size:.88rem}
+th,td{padding:12px 16px;border:1px solid var(--border);text-align:left}
+th{background:var(--bg3);color:var(--green2);font-family:var(--mono);font-weight:600;font-size:.78rem;text-transform:uppercase;letter-spacing:.05em;white-space:nowrap}
+td{color:var(--fg2)}
+tr:hover td{background:rgba(0,255,65,.03)}
+td:first-child{font-weight:500;color:var(--fg);font-family:var(--mono);font-size:.82rem;white-space:nowrap}
+.yes{color:var(--green);font-weight:600}
+.no{color:var(--red);opacity:.7}
+.partial{color:var(--amber)}
+.best{background:rgba(0,255,65,.06) !important}
+
+.legend{display:flex;gap:24px;justify-content:center;margin:20px 0 40px;font-size:.82rem;flex-wrap:wrap}
+.legend span{display:flex;align-items:center;gap:6px}
+.legend .dot{width:10px;height:10px;border-radius:50%;display:inline-block}
+
+.section{margin:48px 0}
+.section h2{font-family:var(--mono);font-size:1.3rem;color:var(--green);margin-bottom:16px;border-bottom:1px solid var(--border);padding-bottom:8px}
+.section p{color:var(--fg2);margin-bottom:12px;max-width:700px}
+
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-top:24px}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:20px}
+.card h3{font-family:var(--mono);font-size:.95rem;color:var(--green2);margin-bottom:8px}
+.card p{color:var(--muted);font-size:.88rem;margin:0}
+
+.cta{text-align:center;margin:60px 0 40px;padding:40px;background:var(--bg2);border:1px solid var(--border2);border-radius:12px}
+.cta h2{font-family:var(--mono);color:var(--green);margin-bottom:12px}
+.cta p{color:var(--fg2);margin-bottom:20px}
+.cta a.btn{display:inline-block;background:var(--green3);color:var(--green);padding:10px 28px;border-radius:6px;font-family:var(--mono);font-weight:600;border:1px solid var(--green);transition:all .2s}
+.cta a.btn:hover{background:var(--green);color:#000;text-decoration:none}
+
+.footer{text-align:center;padding:24px;color:var(--muted);font-size:.78rem;border-top:1px solid var(--border);font-family:var(--mono)}
+
+@media(max-width:768px){
+  .hero h1{font-size:1.6rem}
+  th,td{padding:8px 10px;font-size:.8rem}
+  .nav{flex-wrap:wrap;gap:10px}
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="./" class="logo">🛡️ AMC</a>
+  <a href="./">Home</a>
+  <a href="docs/">Docs</a>
+  <a href="compare.html" style="color:var(--green)">Compare</a>
+  <a href="blog.html">Blog</a>
+  <a href="changelog.html">Changelog</a>
+  <a href="https://github.com/thewisecrab/AgentMaturityCompass" target="_blank">GitHub</a>
+</nav>
+
+<div class="hero">
+  <h1>AMC vs Everything Else</h1>
+  <p class="sub">How does Agent Maturity Compass compare to existing AI evaluation approaches?</p>
+  <p class="sub2">Spoiler: most approaches let the agent grade its own homework.</p>
+</div>
+
+<div class="container">
+
+  <div class="legend">
+    <span><span class="dot" style="background:var(--green)"></span> Full support</span>
+    <span><span class="dot" style="background:var(--amber)"></span> Partial / limited</span>
+    <span><span class="dot" style="background:var(--red)"></span> Not supported</span>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Dimension</th>
+          <th class="best">AMC</th>
+          <th>Self-Reported Docs</th>
+          <th>MTEB / Benchmarks</th>
+          <th>Model Cards</th>
+          <th>SOC2 Audits</th>
+          <th>Manual Red-Teaming</th>
+          <th>AgentBench</th>
+          <th>HELM</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Evidence Source</td>
+          <td class="best"><span class="yes">Execution evidence (observed)</span></td>
+          <td><span class="no">Self-reported</span></td>
+          <td><span class="partial">Synthetic benchmarks</span></td>
+          <td><span class="no">Vendor-authored</span></td>
+          <td><span class="partial">Point-in-time audit</span></td>
+          <td><span class="partial">Manual testing</span></td>
+          <td><span class="partial">Synthetic tasks</span></td>
+          <td><span class="partial">Synthetic scenarios</span></td>
+        </tr>
+        <tr>
+          <td>Tamper Resistance</td>
+          <td class="best"><span class="yes">Ed25519 + Merkle tree</span></td>
+          <td><span class="no">None</span></td>
+          <td><span class="no">None</span></td>
+          <td><span class="no">None</span></td>
+          <td><span class="partial">Auditor independence</span></td>
+          <td><span class="partial">Human judgment</span></td>
+          <td><span class="no">None</span></td>
+          <td><span class="no">None</span></td>
+        </tr>
+        <tr>
+          <td>Continuous Monitoring</td>
+          <td class="best"><span class="yes">Real-time + drift detection</span></td>
+          <td><span class="no">Static docs</span></td>
+          <td><span class="no">One-time run</span></td>
+          <td><span class="no">Static document</span></td>
+          <td><span class="no">Annual audit</span></td>
+          <td><span class="no">Periodic testing</span></td>
+          <td><span class="no">One-time eval</span></td>
+          <td><span class="no">One-time eval</span></td>
+        </tr>
+        <tr>
+          <td>Framework Coverage</td>
+          <td class="best"><span class="yes">14 adapters (LangChain, CrewAI, etc.)</span></td>
+          <td><span class="partial">Framework-specific</span></td>
+          <td><span class="no">Model-level only</span></td>
+          <td><span class="no">Model-level only</span></td>
+          <td><span class="partial">Org-level</span></td>
+          <td><span class="partial">Single agent</span></td>
+          <td><span class="partial">Limited frameworks</span></td>
+          <td><span class="no">Model-level only</span></td>
+        </tr>
+        <tr>
+          <td>EU AI Act Ready</td>
+          <td class="best"><span class="yes">Full compliance mapping</span></td>
+          <td><span class="no">No mapping</span></td>
+          <td><span class="no">Not designed for it</span></td>
+          <td><span class="partial">Some transparency</span></td>
+          <td><span class="partial">Partial overlap</span></td>
+          <td><span class="no">No compliance focus</span></td>
+          <td><span class="no">Not designed for it</span></td>
+          <td><span class="partial">Transparency focus</span></td>
+        </tr>
+        <tr>
+          <td>Cost</td>
+          <td class="best"><span class="yes">Free (MIT licensed)</span></td>
+          <td><span class="yes">Free</span></td>
+          <td><span class="yes">Free</span></td>
+          <td><span class="yes">Free</span></td>
+          <td><span class="no">$50K–$200K/year</span></td>
+          <td><span class="no">$10K–$100K/engagement</span></td>
+          <td><span class="yes">Free</span></td>
+          <td><span class="yes">Free</span></td>
+        </tr>
+        <tr>
+          <td>Time to First Score</td>
+          <td class="best"><span class="yes">2 minutes</span></td>
+          <td><span class="partial">Hours to write</span></td>
+          <td><span class="partial">Minutes to run</span></td>
+          <td><span class="no">Weeks to prepare</span></td>
+          <td><span class="no">3–6 months</span></td>
+          <td><span class="no">Days to weeks</span></td>
+          <td><span class="partial">Hours to setup</span></td>
+          <td><span class="partial">Hours to setup</span></td>
+        </tr>
+        <tr>
+          <td>Anti-Gaming</td>
+          <td class="best"><span class="yes">Temporal + cross-ref + freshness</span></td>
+          <td><span class="no">Easily gamed</span></td>
+          <td><span class="partial">Data contamination risk</span></td>
+          <td><span class="no">Cherry-picked results</span></td>
+          <td><span class="partial">Scope limitations</span></td>
+          <td><span class="partial">Evaluator bias</span></td>
+          <td><span class="partial">Limited checks</span></td>
+          <td><span class="partial">Limited checks</span></td>
+        </tr>
+        <tr>
+          <td>Agent-Level (not Model)</td>
+          <td class="best"><span class="yes">Full agent evaluation</span></td>
+          <td><span class="partial">Depends on docs</span></td>
+          <td><span class="no">Model only</span></td>
+          <td><span class="no">Model only</span></td>
+          <td><span class="partial">Org-level</span></td>
+          <td><span class="yes">Agent-level</span></td>
+          <td><span class="yes">Agent-level</span></td>
+          <td><span class="no">Model only</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section">
+    <h2>The Core Problem</h2>
+    <p>When you evaluate an AI agent using self-reported documentation, you get a score of <strong style="color:var(--green)">100/100</strong>. When AMC evaluates the same agent from execution evidence — watching what it actually does — the real score is <strong style="color:var(--red)">16/100</strong>.</p>
+    <p>That <strong style="color:var(--amber)">84-point gap</strong> is documentation inflation. Every approach on this page except AMC suffers from some form of it, because they either let the agent provide its own evidence, test only at the model level, or evaluate at a single point in time.</p>
+  </div>
+
+  <div class="section">
+    <h2>Why AMC Wins</h2>
+    <div class="cards">
+      <div class="card">
+        <h3>🔐 Cryptographic Evidence</h3>
+        <p>Ed25519 signatures + Merkle tree ledger. Evidence is tamper-evident by design — you can't fake your way to L5.</p>
+      </div>
+      <div class="card">
+        <h3>📡 Continuous, Not Point-in-Time</h3>
+        <p>AMC monitors continuously with drift detection. SOC2 audits give you a snapshot; AMC gives you a movie.</p>
+      </div>
+      <div class="card">
+        <h3>🤖 Agent-Level, Not Model-Level</h3>
+        <p>MTEB and HELM evaluate models. AMC evaluates the full agent — tools, memory, governance, the whole stack.</p>
+      </div>
+      <div class="card">
+        <h3>🔌 14 Framework Adapters</h3>
+        <p>LangChain, CrewAI, AutoGen, OpenAI Agents SDK, and more. One env var change. Zero code modifications.</p>
+      </div>
+      <div class="card">
+        <h3>⚖️ EU AI Act Mapped</h3>
+        <p>Full compliance mapping to EU AI Act articles. August 2026 deadline is coming — AMC gets you ready now.</p>
+      </div>
+      <div class="card">
+        <h3>💰 Free & Open Source</h3>
+        <p>MIT licensed. No $200K SOC2 audits. No $100K red-team engagements. Zero to first score in 2 minutes.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="cta">
+    <h2>Ready to close the gap?</h2>
+    <p>Install AMC and get your first score in under 2 minutes.</p>
+    <pre style="background:var(--bg);padding:12px 20px;border-radius:6px;display:inline-block;margin-bottom:16px;border:1px solid var(--border);font-family:var(--mono);color:var(--green);font-size:.9rem">npm i -g agent-maturity-compass && amc quickscore</pre>
+    <br>
+    <a href="docs/#GETTING_STARTED" class="btn">Read the Docs →</a>
+  </div>
+
+</div>
+
+<footer class="footer">
+  <p>Agent Maturity Compass — MIT Licensed — <a href="https://github.com/thewisecrab/AgentMaturityCompass">GitHub</a> · <a href="docs/">Docs</a> · <a href="changelog.html">Changelog</a></p>
+</footer>
+
+</body>
+</html>

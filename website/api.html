@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AMC API Playground — Agent Maturity Compass</title>
+<meta name="description" content="Interactive API explorer for the Agent Maturity Compass REST API. Test endpoints, explore schemas, and integrate with your AMC instance.">
+<link rel="manifest" href="manifest.json">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui.css">
+<style>
+  :root {
+    --bg: #050505;
+    --green: #00ff41;
+    --green-dim: #00661a;
+    --text: #b0b0b0;
+    --text2: #8cc88c;
+    --border: rgba(0,255,65,0.1);
+    --mono: 'JetBrains Mono', monospace;
+  }
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  *:focus-visible { outline: 2px solid var(--green); outline-offset: 2px; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--mono), monospace;
+    min-height: 100vh;
+  }
+  .top-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+    padding: 1rem 2rem;
+    border-bottom: 1px solid var(--border);
+    background: rgba(5,5,5,0.95);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .top-bar a {
+    color: var(--green);
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+  .top-bar a:hover { text-shadow: 0 0 10px rgba(0,255,65,0.4); }
+  .top-bar h1 {
+    color: var(--green);
+    font-size: 1.2rem;
+    font-weight: 700;
+  }
+  .base-url-form {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .base-url-form label {
+    font-size: 0.75rem;
+    color: var(--text2);
+  }
+  .base-url-form input {
+    background: #0a0a0a;
+    border: 1px solid var(--border);
+    color: var(--green);
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    padding: 0.4rem 0.8rem;
+    border-radius: 3px;
+    width: 280px;
+  }
+  .base-url-form button {
+    background: var(--green);
+    color: #000;
+    border: none;
+    padding: 0.4rem 1rem;
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    font-weight: 700;
+    border-radius: 3px;
+    cursor: pointer;
+  }
+  .base-url-form button:hover { opacity: 0.9; }
+
+  /* Swagger UI overrides for hacker theme */
+  .swagger-ui {
+    font-family: var(--mono), monospace !important;
+  }
+  .swagger-ui .topbar { display: none !important; }
+  .swagger-ui .wrapper { padding: 0 !important; }
+  .swagger-ui .info { margin: 20px 2rem !important; }
+  .swagger-ui .info .title { color: var(--green) !important; font-family: var(--mono) !important; }
+  .swagger-ui .info .description p { color: var(--text) !important; }
+  .swagger-ui .info a { color: var(--green) !important; }
+  .swagger-ui .scheme-container {
+    background: #0a0a0a !important;
+    border-bottom: 1px solid var(--border) !important;
+    box-shadow: none !important;
+    padding: 10px 2rem !important;
+  }
+  .swagger-ui .opblock-tag {
+    color: var(--green) !important;
+    font-family: var(--mono) !important;
+    border-bottom: 1px solid rgba(0,255,65,0.05) !important;
+  }
+  .swagger-ui .opblock-tag:hover { background: rgba(0,255,65,0.02) !important; }
+  .swagger-ui .opblock-tag small { color: var(--text2) !important; }
+  .swagger-ui .opblock {
+    border: 1px solid var(--border) !important;
+    border-radius: 4px !important;
+    background: #0a0a0a !important;
+    box-shadow: none !important;
+  }
+  .swagger-ui .opblock .opblock-summary {
+    border-bottom: 1px solid var(--border) !important;
+  }
+  .swagger-ui .opblock .opblock-summary-method {
+    font-family: var(--mono) !important;
+    font-weight: 700 !important;
+    border-radius: 3px !important;
+  }
+  .swagger-ui .opblock.opblock-get { border-color: rgba(0,255,65,0.15) !important; }
+  .swagger-ui .opblock.opblock-get .opblock-summary-method { background: #009926 !important; }
+  .swagger-ui .opblock.opblock-post .opblock-summary-method { background: #1a6a1a !important; }
+  .swagger-ui .opblock.opblock-put .opblock-summary-method { background: #554400 !important; }
+  .swagger-ui .opblock.opblock-delete .opblock-summary-method { background: #661111 !important; }
+  .swagger-ui .opblock.opblock-patch .opblock-summary-method { background: #335533 !important; }
+  .swagger-ui .opblock .opblock-summary-path { color: var(--text) !important; font-family: var(--mono) !important; }
+  .swagger-ui .opblock .opblock-summary-description { color: var(--text2) !important; }
+  .swagger-ui .opblock-body {
+    background: var(--bg) !important;
+  }
+  .swagger-ui .opblock-description-wrapper p,
+  .swagger-ui .opblock-external-docs-wrapper p {
+    color: var(--text) !important;
+  }
+  .swagger-ui .tab li { color: var(--text) !important; }
+  .swagger-ui .tab li.active { color: var(--green) !important; }
+  .swagger-ui .response-col_status { color: var(--green) !important; font-family: var(--mono) !important; }
+  .swagger-ui .response-col_description p { color: var(--text) !important; }
+  .swagger-ui table thead tr th { color: var(--text2) !important; border-bottom: 1px solid var(--border) !important; }
+  .swagger-ui table tbody tr td { color: var(--text) !important; border-bottom: 1px solid rgba(0,255,65,0.03) !important; }
+  .swagger-ui .parameters-col_description p { color: var(--text) !important; }
+  .swagger-ui .parameter__name { color: var(--green) !important; font-family: var(--mono) !important; }
+  .swagger-ui .parameter__type { color: var(--text2) !important; }
+  .swagger-ui .parameter__in { color: var(--text2) !important; }
+  .swagger-ui input[type=text] {
+    background: #0f0f0f !important;
+    color: var(--green) !important;
+    border: 1px solid var(--border) !important;
+    font-family: var(--mono) !important;
+  }
+  .swagger-ui textarea {
+    background: #0f0f0f !important;
+    color: var(--green) !important;
+    border: 1px solid var(--border) !important;
+    font-family: var(--mono) !important;
+  }
+  .swagger-ui select {
+    background: #0f0f0f !important;
+    color: var(--text) !important;
+    border: 1px solid var(--border) !important;
+  }
+  .swagger-ui .btn {
+    font-family: var(--mono) !important;
+    border-radius: 3px !important;
+  }
+  .swagger-ui .btn.execute {
+    background: var(--green) !important;
+    color: #000 !important;
+    border: none !important;
+  }
+  .swagger-ui .btn.execute:hover { opacity: 0.9 !important; }
+  .swagger-ui .btn.cancel { border-color: #993333 !important; color: #ff3333 !important; }
+  .swagger-ui .model-box {
+    background: #0a0a0a !important;
+    border: 1px solid var(--border) !important;
+  }
+  .swagger-ui .model { color: var(--text) !important; font-family: var(--mono) !important; }
+  .swagger-ui .model-title { color: var(--green) !important; }
+  .swagger-ui .prop-type { color: var(--text2) !important; }
+  .swagger-ui section.models {
+    border: 1px solid var(--border) !important;
+    border-radius: 4px !important;
+  }
+  .swagger-ui section.models h4 { color: var(--green) !important; }
+  .swagger-ui .highlight-code > .microlight {
+    background: #050505 !important;
+    color: var(--green) !important;
+    font-family: var(--mono) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: 3px !important;
+  }
+  .swagger-ui .curl { color: var(--green) !important; }
+  .swagger-ui .responses-inner h4 { color: var(--text) !important; }
+  .swagger-ui .copy-to-clipboard { background: #0f0f0f !important; }
+  .swagger-ui .authorization__btn { fill: var(--green) !important; }
+  .swagger-ui .unlocked svg { fill: var(--green) !important; }
+  .swagger-ui .locked svg { fill: #ff3333 !important; }
+  .swagger-ui .dialog-ux .modal-ux { background: #0a0a0a !important; border: 1px solid var(--border) !important; }
+  .swagger-ui .dialog-ux .modal-ux-header { border-bottom: 1px solid var(--border) !important; }
+  .swagger-ui .dialog-ux .modal-ux-header h3 { color: var(--green) !important; }
+  .swagger-ui .dialog-ux .modal-ux-content p { color: var(--text) !important; }
+  .swagger-ui .auth-container input { background: #0f0f0f !important; color: var(--green) !important; border: 1px solid var(--border) !important; }
+  .swagger-ui .loading-container .loading::after { color: var(--green) !important; }
+</style>
+</head>
+<body>
+  <div class="top-bar">
+    <div style="display:flex;align-items:center;gap:1.5rem">
+      <a href="index.html">← Back to AMC</a>
+      <h1>🔌 API Playground</h1>
+    </div>
+    <div class="base-url-form">
+      <label for="baseUrl">Base URL:</label>
+      <input type="text" id="baseUrl" value="http://localhost:3000/api" placeholder="http://localhost:3000/api">
+      <button onclick="updateBaseUrl()">Apply</button>
+    </div>
+  </div>
+  <div id="swagger-ui"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui-bundle.js"></script>
+  <script>
+    let ui;
+    function initSwagger(baseUrl) {
+      ui = SwaggerUIBundle({
+        url: 'openapi.yaml',
+        dom_id: '#swagger-ui',
+        presets: [SwaggerUIBundle.presets.apis, SwaggerUIBundle.SwaggerUIStandalonePreset],
+        layout: 'BaseLayout',
+        deepLinking: true,
+        defaultModelsExpandDepth: -1,
+        docExpansion: 'list',
+        filter: true,
+        onComplete: function() {
+          if (baseUrl && baseUrl !== 'http://localhost:3000/api') {
+            // Update server URL dynamically if changed
+          }
+        }
+      });
+    }
+    function updateBaseUrl() {
+      const val = document.getElementById('baseUrl').value.trim();
+      if (val) {
+        // Reinitialize with new base URL by modifying spec
+        fetch('openapi.yaml')
+          .then(r => r.text())
+          .then(txt => {
+            const modified = txt.replace(/url:\s*http:\/\/localhost:3000\/api/, 'url: ' + val);
+            const blob = new Blob([modified], {type: 'text/yaml'});
+            const url = URL.createObjectURL(blob);
+            ui = SwaggerUIBundle({
+              url: url,
+              dom_id: '#swagger-ui',
+              presets: [SwaggerUIBundle.presets.apis, SwaggerUIBundle.SwaggerUIStandalonePreset],
+              layout: 'BaseLayout',
+              deepLinking: true,
+              defaultModelsExpandDepth: -1,
+              docExpansion: 'list',
+              filter: true
+            });
+          });
+      }
+    }
+    initSwagger();
+  </script>
+</body>
+</html>

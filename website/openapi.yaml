@@ -1,0 +1,3941 @@
+openapi: 3.0.3
+info:
+  title: Agent Maturity Compass API
+  description: |
+    REST API for the Agent Maturity Compass (AMC) — score, govern, and assure AI agent deployments.
+    Every endpoint requires a Bearer token unless noted otherwise.
+  version: 1.0.0
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: http://localhost:3000/api
+    description: Local AMC Studio instance
+
+security:
+  - bearerAuth: []
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    ApiResponse:
+      type: object
+      properties:
+        ok:
+          type: boolean
+        data:
+          type: object
+        error:
+          type: string
+
+    ScoreResult:
+      type: object
+      properties:
+        runId:
+          type: string
+        agentId:
+          type: string
+        layerScores:
+          type: array
+          items:
+            type: object
+        trustLabel:
+          type: string
+        integrityIndex:
+          type: number
+
+    Incident:
+      type: object
+      properties:
+        incidentId:
+          type: string
+        agentId:
+          type: string
+        severity:
+          type: string
+          enum: [INFO, WARN, CRITICAL]
+        state:
+          type: string
+          enum: [OPEN, INVESTIGATING, RESOLVED]
+        title:
+          type: string
+        createdTs:
+          type: integer
+
+    WorkOrder:
+      type: object
+      properties:
+        workOrderId:
+          type: string
+        title:
+          type: string
+        riskTier:
+          type: string
+        mode:
+          type: string
+
+tags:
+  - name: health
+    description: Health and readiness checks
+  - name: score
+    description: Scoring, diagnostics, quickscore, and session-based assessment
+  - name: fleet
+    description: Fleet and agent management
+  - name: governor
+    description: Governor, oversight, and autonomy mode
+  - name: compliance
+    description: Compliance frameworks, policy packs, waivers, and regulatory scoring
+  - name: evidence
+    description: Evidence lifecycle — ingest, list, gaps, bundles, attestation
+  - name: crypto
+    description: Notary, certificates, Merkle transparency, receipts chain
+  - name: drift
+    description: Drift detection, freeze management, and alerts
+  - name: enforce
+    description: Policy firewall and action evaluation
+  - name: export
+    description: Export, badge generation, and attestation
+  - name: canary
+    description: Canary deployments — policy canary, micro-canary, policy-mode
+  - name: ci
+    description: CI/CD gate — init, steps, gate evaluation, policy signing
+  - name: config
+    description: Runtime config, logs, doctor, version, and status
+  - name: gateway
+    description: Gateway/LLM proxy — config, init, bind, sign, verify, providers
+  - name: identity
+    description: Identity, SCIM tokens, OIDC/SAML providers, group mapping
+  - name: adapters
+    description: Adapter management — init, verify, list, detect, configure
+  - name: assurance
+    description: Assurance packs — list, run, cert issue/verify, scheduler, waivers, false-positive tracking
+  - name: benchmark
+    description: Benchmark import/export and statistics
+  - name: bom
+    description: BOM generation, signing, verification, SBOM, and bundles
+  - name: incidents
+    description: Incident creation, listing, and state transitions
+  - name: memory
+    description: Memory maturity assessment, correction memory, lessons, advisories
+  - name: metrics
+    description: Metrics status, SLO, and failure-risk indices
+  - name: security
+    description: ATO detection, secret blinding, taint tracking, threat intel, injection detection, insider risk
+  - name: shield
+    description: Shield — skill scan, injection detection, input sanitization
+  - name: vault
+    description: Vault — secrets, DLP scan, key management, redaction, classification
+  - name: tools
+    description: ToolHub, guardrails, and plugin management
+  - name: watch
+    description: Watch/observability — guard, attest, safety test, explainability, oversight
+  - name: workflow
+    description: Work orders, execution tickets, and lifecycle management
+  - name: sandbox
+    description: Hardened Docker sandbox execution
+  - name: product
+    description: Batch processor and portal
+  - name: passport
+    description: Agent passport — public profile, verification, revocation
+  - name: timeline
+    description: Agent timeline data
+  - name: agentTimeline
+    description: Agent timeline events
+
+paths:
+  # ── Health ─────────────────────────────────────────────────────
+  /v1/health:
+    get:
+      tags: [health]
+      summary: Health check
+      description: Returns service health, version, uptime, and database status.
+      responses:
+        '200':
+          description: Health payload
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum: [ok, degraded]
+                  version:
+                    type: string
+                  uptime:
+                    type: number
+                  dbStatus:
+                    type: string
+
+  # ── Score ──────────────────────────────────────────────────────
+  /v1/score/status:
+    get:
+      tags: [score]
+      summary: Score module status
+      responses:
+        '200':
+          description: Status and active session count
+
+  /v1/score/run:
+    post:
+      tags: [score]
+      summary: Run full diagnostic
+      description: Trigger a full diagnostic run (CLI equivalent of `amc run`).
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                agentId:
+                  type: string
+                window:
+                  type: string
+                  default: '14d'
+                targetName:
+                  type: string
+                claimMode:
+                  type: string
+                  enum: [auto, owner, harness]
+      responses:
+        '200':
+          description: Diagnostic result with layer scores
+
+  /v1/score/quickscore:
+    post:
+      tags: [score]
+      summary: Rapid 5-question quickscore
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [answers]
+              properties:
+                answers:
+                  type: object
+                  additionalProperties:
+                    type: integer
+      responses:
+        '200':
+          description: Quickscore result
+
+  /v1/score/quickscore/questions:
+    get:
+      tags: [score]
+      summary: Get rapid quickscore questions
+      responses:
+        '200':
+          description: List of 5 rapid questions
+
+  /v1/score/quick:
+    post:
+      tags: [score]
+      summary: Tiered quick score
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [answers]
+              properties:
+                answers:
+                  type: object
+                  additionalProperties:
+                    type: integer
+                tier:
+                  type: string
+                  enum: [quick, standard, deep]
+      responses:
+        '200':
+          description: Quick score result
+
+  /v1/score/quick/questions:
+    get:
+      tags: [score]
+      summary: Get questions for a tier
+      parameters:
+        - name: tier
+          in: query
+          schema:
+            type: string
+            enum: [quick, standard, deep]
+      responses:
+        '200':
+          description: Questions for tier
+
+  /v1/score/latest:
+    get:
+      tags: [score]
+      summary: Get latest run report
+      parameters:
+        - name: agentId
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Latest run report
+
+  /v1/score/history:
+    get:
+      tags: [score]
+      summary: List run history from ledger
+      parameters:
+        - name: agentId
+          in: query
+          schema:
+            type: string
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 50
+      responses:
+        '200':
+          description: Run history
+
+  /v1/score/compare:
+    get:
+      tags: [score]
+      summary: Compare two runs (GET)
+      parameters:
+        - name: runA
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: runB
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: agentId
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Comparison result
+    post:
+      tags: [score]
+      summary: Compare two runs (POST)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [runA, runB]
+              properties:
+                runA:
+                  type: string
+                runB:
+                  type: string
+                agentId:
+                  type: string
+      responses:
+        '200':
+          description: Comparison result
+
+  /v1/score/formal-spec:
+    post:
+      tags: [score]
+      summary: Full formal-spec diagnostic score
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                agentId:
+                  type: string
+                window:
+                  type: string
+      responses:
+        '200':
+          description: Full diagnostic result
+
+  /v1/score/adversarial:
+    post:
+      tags: [score]
+      summary: Test gaming resistance
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                agentId:
+                  type: string
+      responses:
+        '200':
+          description: Adversarial test result
+
+  /v1/score/runs:
+    get:
+      tags: [score]
+      summary: List all runs for agent
+      parameters:
+        - name: agentId
+          in: query
+          schema:
+            type: string
+        - name: limit
+          in: query
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Run ID list
+
+  /v1/score/run/{runId}:
+    get:
+      tags: [score]
+      summary: Get specific run report
+      parameters:
+        - name: runId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: agentId
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Run report
+
+  /v1/score/report/{runId}:
+    get:
+      tags: [score]
+      summary: Generate report for a run
+      parameters:
+        - name: runId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: agentId
+          in: query
+          schema:
+            type: string
+        - name: format
+          in: query
+          schema:
+            type: string
+            enum: [json, md]
+      responses:
+        '200':
+          description: Report (JSON or Markdown)
+
+  /v1/score/report:
+    get:
+      tags: [score]
+      summary: Generate report (query param)
+      parameters:
+        - name: runId
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: agentId
+          in: query
+          schema:
+            type: string
+        - name: format
+          in: query
+          schema:
+            type: string
+            enum: [json, md]
+      responses:
+        '200':
+          description: Report
+
+  /v1/score/session:
+    post:
+      tags: [score]
+      summary: Create interactive scoring session
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [agentId]
+              properties:
+                agentId:
+                  type: string
+      responses:
+        '201':
+          description: Session created
+
+  /v1/score/question/{sessionId}:
+    get:
+      tags: [score]
+      summary: Get next question for session
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Next question or completion status
+
+  /v1/score/answer:
+    post:
+      tags: [score]
+      summary: Record answer for session
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [sessionId, questionId, value]
+              properties:
+                sessionId:
+                  type: string
+                questionId:
+                  type: string
+                value:
+                  type: integer
+                notes:
+                  type: string
+      responses:
+        '200':
+          description: Answer recorded
+
+  /v1/score/result/{sessionId}:
+    get:
+      tags: [score]
+      summary: Get session result
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Session score result
+
+  # ── Fleet ──────────────────────────────────────────────────────
+  /v1/fleet/health:
+    get:
+      tags: [fleet]
+      summary: Fleet health dashboard
+      responses:
+        '200':
+          description: Fleet health overview
+
+  /v1/fleet/agents:
+    get:
+      tags: [fleet]
+      summary: List all agents
+      responses:
+        '200':
+          description: Agent list
+    post:
+      tags: [fleet]
+      summary: Add agent
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [agentId]
+              properties:
+                agentId:
+                  type: string
+                agentName:
+                  type: string
+                role:
+                  type: string
+                domain:
+                  type: string
+                templateId:
+                  type: string
+                riskTier:
+                  type: string
+                  enum: [low, med, high, critical]
+      responses:
+        '201':
+          description: Agent created
+
+  /v1/fleet/agents/{agentId}:
+    get:
+      tags: [fleet]
+      summary: Get agent config
+      parameters:
+        - name: agentId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Agent configuration
+    delete:
+      tags: [fleet]
+      summary: Remove agent
+      parameters:
+        - name: agentId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Agent removed
+
+  /v1/fleet/report:
+    get:
+      tags: [fleet]
+      summary: Fleet maturity report
+      parameters:
+        - name: format
+          in: query
+          schema:
+            type: string
+            enum: [json, md]
+        - name: window
+          in: query
+          schema:
+            type: string
+            default: '30d'
+      responses:
+        '200':
+          description: Fleet report
+
+  /v1/fleet/init:
+    post:
+      tags: [fleet]
+      summary: Initialize fleet
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                org:
+                  type: string
+      responses:
+        '200':
+          description: Fleet initialized
+
+  /v1/fleet/config:
+    get:
+      tags: [fleet]
+      summary: Fleet configuration
+      responses:
+        '200':
+          description: Fleet config
+
+  /v1/fleet/freeze/status:
+    get:
+      tags: [fleet]
+      summary: Execution freeze status
+      parameters:
+        - name: agentId
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Freeze status
+
+  /v1/fleet/freeze/lift:
+    post:
+      tags: [fleet]
+      summary: Lift execution freeze
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [agentId, incidentId, reason]
+              properties:
+                agentId:
+                  type: string
+                incidentId:
+                  type: string
+                reason:
+                  type: string
+      responses:
+        '200':
+          description: Freeze lifted
+
+  # ── Governor ───────────────────────────────────────────────────
+  /v1/governor/check:
+    post:
+      tags: [governor]
+      summary: Evaluate action permission
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [action, risk, mode]
+              properties:
+                action:
+                  type: string
+                risk:
+                  type: string
+                mode:
+                  type: string
+                agentId:
+                  type: string
+      responses:
+        '200':
+          description: Governor decision
+
+  /v1/governor/explain:
+    post:
+      tags: [governor]
+      summary: Explain policy for action class
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [action]
+              properties:
+                action:
+                  type: string
+                agentId:
+                  type: string
+      responses:
+        '200':
+          description: Explanation
+
+  /v1/governor/report:
+    get:
+      tags: [governor]
+      summary: Governor matrix report
+      parameters:
+        - name: agentId
+          in: query
+          schema:
+            type: string
+        - name: format
+          in: query
+          schema:
+            type: string
+            enum: [json, md]
+      responses:
+        '200':
+          description: Governor report
+
+  /v1/governor/policy/init:
+    post:
+      tags: [governor]
+      summary: Initialize action policy
+      responses:
+        '200':
+          description: Policy initialized
+
+  /v1/governor/policy/verify:
+    post:
+      tags: [governor]
+      summary: Verify action policy signature
+      responses:
+        '200':
+          description: Verification result
+
+  /v1/oversight/assess:
+    get:
+      tags: [governor]
+      summary: Assess human oversight quality
+      parameters:
+        - name: agentId
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Oversight assessment
+
+  /v1/mode:
+    get:
+      tags: [governor]
+      summary: Get current mode
+      responses:
+        '200':
+          description: Current mode (owner/agent)
+    put:
+      tags: [governor]
+      summary: Set mode
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [mode]
+              properties:
+                mode:
+                  type: string
+                  enum: [owner, agent]
+      responses:
+        '200':
+          description: Mode set
+
+  # ── Compliance ─────────────────────────────────────────────────
+  /v1/compliance/init:
+    post:
+      tags: [compliance]
+      summary: Create and sign compliance maps
+      responses:
+        '201':
+          description: Compliance maps initialized
+
+  /v1/compliance/verify:
+    get:
+      tags: [compliance]
+      summary: Verify compliance maps signature
+      responses:
+        '200':
+          description: Verification result
+
+  /v1/compliance/report:
+    post:
+      tags: [compliance]
+      summary: Generate evidence-linked compliance report
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [framework, window, outFile]
+              properties:
+                framework:
+                  type: string
+                window:
+                  type: string
+                outFile:
+                  type: string
+                format:
+                  type: string
+                agentId:
+                  type: string
+      responses:
+        '201':
+          description: Report generated
+
+  /v1/compliance/fleet:
+    post:
+      tags: [compliance]
+      summary: Fleet compliance summary
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [framework, window]
+              properties:
+                framework:
+                  type: string
+                window:
+                  type: string
+      responses:
+        '200':
+          description: Fleet compliance report
+
+  /v1/compliance/diff:
+    post:
+      tags: [compliance]
+      summary: Diff two compliance report JSON files
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reportA, reportB]
+              properties:
+                reportA:
+                  type: string
+                reportB:
+                  type: string
+      responses:
+        '200':
+          description: Diff result
+
+  /v1/policy/action/init:
+    post:
+      tags: [compliance]
+      summary: Create and sign action policy
+      responses:
+        '201':
+          description: Action policy created
+
+  /v1/policy/action/verify:
+    get:
+      tags: [compliance]
+      summary: Verify action policy signature
+      responses:
+        '200':
+          description: Verification result
+
+  /v1/policy/approval/init:
+    post:
+      tags: [compliance]
+      summary: Create and sign approval policy
+      responses:
+        '201':
+          description: Approval policy created
+
+  /v1/policy/approval/verify:
+    get:
+      tags: [compliance]
+      summary: Verify approval policy signature
+      responses:
+        '200':
+          description: Verification result
+
+  /v1/policy/pack/list:
+    get:
+      tags: [compliance]
+      summary: List built-in policy packs
+      responses:
+        '200':
+          description: Policy pack list
+
+  /v1/policy/pack/describe/{packId}:
+    get:
+      tags: [compliance]
+      summary: Describe a policy pack
+      parameters:
+        - name: packId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Policy pack details
+
+  /v1/policy/pack/diff:
+    post:
+      tags: [compliance]
+      summary: Show diff for applying a policy pack
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [packId]
+              properties:
+                packId:
+                  type: string
+                agentId:
+                  type: string
+      responses:
+        '200':
+          description: Diff result
+
+  /v1/policy/pack/apply:
+    post:
+      tags: [compliance]
+      summary: Apply policy pack
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [packId]
+              properties:
+                packId:
+                  type: string
+                agentId:
+                  type: string
+      responses:
+        '200':
+          description: Policy pack applied
+
+  /v1/policy/debt/add:
+    post:
+      tags: [compliance]
+      summary: Register policy debt
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [requirement, justification, expires]
+              properties:
+                agentId:
+                  type: string
+                requirement:
+                  type: string
+                justification:
+                  type: string
+                expires:
+                  type: string
+                createdBy:
+                  type: string
+      responses:
+        '201':
+          description: Policy debt registered
+
+  /v1/policy/debt/list:
+    get:
+      tags: [compliance]
+      summary: List active policy debt
+      parameters:
+        - name: agentId
+          in: query
+          schema:
+            type: string
+        - name: all
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Active and expired policy debt
+
+  /v1/policy/ops/init:
+    post:
+      tags: [compliance]
+      summary: Create and sign ops policy
+      responses:
+        '201':
+          description: Ops policy created
+
+  /v1/policy/ops/verify:
+    get:
+      tags: [compliance]
+      summary: Verify ops policy signature
+      responses:
+        '200':
+          description: Verification result
+
+  /v1/policy/ops/print:
+    get:
+      tags: [compliance]
+      summary: Print effective ops policy
+      responses:
+        '200':
+          description: Ops policy
+
+  /v1/waiver/request:
+    post:
+      tags: [compliance]
+      summary: Request time-limited readiness waiver
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [hours, reason]
+              properties:
+                hours:
+                  type: integer
+                reason:
+                  type: string
+                agentId:
+                  type: string
+      responses:
+        '201':
+          description: Waiver granted
+
+  /v1/waiver/status:
+    get:
+      tags: [compliance]
+      summary: Show waiver status
+      responses:
+        '200':
+          description: Waiver status
+
+  /v1/waiver/revoke:
+    post:
+      tags: [compliance]
+      summary: Revoke active waiver
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                waiverId:
+                  type: string
+      responses:
+        '200':
+          description: Waiver revoked
+
+  /v1/regulatory/eu-ai-act:
+    get:
+      tags: [compliance]
+      summary: Score EU AI Act compliance
+      responses:
+        '200':
+          description: EU AI Act score
+
+  /v1/regulatory/owasp-llm:
+    get:
+      tags: [compliance]
+      summary: Score OWASP LLM Top 10 coverage
+      responses:
+        '200':
+          description: OWASP LLM score
+
+  /v1/regulatory/readiness:
+    get:
+      tags: [compliance]
+      summary: Weighted regulatory readiness score
+      parameters:
+        - name: agentId
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Regulatory readiness result
+
+  # ── Evidence ───────────────────────────────────────────────────
+  /v1/evidence/status:
+    get:
+      tags: [evidence]
+      summary: Evidence module status
+      responses:
+        '200':
+          description: Status
+
+  /v1/evidence/list:
+    get:
+      tags: [evidence]
+      summary: List evidence files for agent
+      parameters:
+        - name: agentId
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Evidence file list
+
+  /v1/evidence/gaps:
+    get:
+      tags: [evidence]
+      summary: Evidence gaps for agent
+      parameters:
+        - name: agentId
+          in: query
+          schema:
+            type: string
+        - name: runId
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Evidence gaps
+
+  /v1/evidence/ingest:
+    post:
+      tags: [evidence]
+      summary: Ingest evidence from content string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [type, content]
+              properties:
+                agentId:
+                  type: string
+                type:
+                  type: string
+                content:
+                  type: string
+                filename:
+                  type: string
+      responses:
+        '201':
+          description: Evidence ingested
+
+  /v1/evidence/collect:
+    post:
+      tags: [evidence]
+      summary: Collect evidence from a path
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [inputPath, type]
+              properties:
+                agentId:
+                  type: string
+                inputPath:
+                  type: string
+                type:
+                  type: string
+      responses:
+        '201':
+          description: Evidence collected
+
+  /v1/evidence/export:
+    get:
+      tags: [evidence]
+      summary: Export evidence bundle
+      parameters:
+        - name: agentId
+          in: query
+          schema:
+            type: string
+        - name: format
+          in: query
+          schema:
+            type: string
+            enum: [json, csv]
+      responses:
+        '200':
+          description: Evidence export
+
+  /v1/evidence/attest:
+    post:
+      tags: [evidence]
+      summary: Attest an ingest session
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [ingestSessionId]
+              properties:
+                agentId:
+                  type: string
+                ingestSessionId:
+                  type: string
+      responses:
+        '200':
+          description: Attestation result
+
+  /v1/evidence/bundle:
+    post:
+      tags: [evidence]
+      summary: Create portable evidence bundle
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [runId]
+              properties:
+                agentId:
+                  type: string
+                runId:
+                  type: string
+      responses:
+        '200':
+          description: Bundle created
+
+  # ── Crypto ─────────────────────────────────────────────────────
+  /v1/crypto/notary/status:
+    get:
+      tags: [crypto]
+      summary: Notary backend and log status
+      parameters:
+        - name: notaryDir
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Notary status
+
+  /v1/crypto/notary/pubkey:
+    get:
+      tags: [crypto]
+      summary: Notary public key and fingerprint
+      responses:
+        '200':
+          description: Public key info
+
+  /v1/crypto/notary/attest:
+    post:
+      tags: [crypto]
+      summary: Generate signed attestation bundle
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [outFile]
+              properties:
+                outFile:
+                  type: string
+                notaryDir:
+                  type: string
+      responses:
+        '201':
+          description: Attestation bundle
+
+  /v1/crypto/notary/verify-attest:
+    post:
+      tags: [crypto]
+      summary: Verify .amcattest bundle
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [file]
+              properties:
+                file:
+                  type: string
+      responses:
+        '200':
+          description: Verification result
+
+  /v1/crypto/notary/sign:
+    post:
+      tags: [crypto]
+      summary: Sign a payload file using Notary
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [kind, inFile, outFile]
+              properties:
+                kind:
+                  type: string
+                inFile:
+                  type: string
+                outFile:
+                  type: string
+      responses:
+        '201':
+          description: Signed payload
+
+  /v1/crypto/notary/log-verify:
+    get:
+      tags: [crypto]
+      summary: Verify notary append-only log
+      responses:
+        '200':
+          description: Log verification result
+
+  /v1/crypto/cert/generate:
+    post:
+      tags: [crypto]
+      summary: Generate trust certificate
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [agentId, outputPath]
+              properties:
+                agentId:
+                  type: string
+                outputPath:
+                  type: string
+                validityDays:
+                  type: integer
+      responses:
+        '201':
+          description: Certificate generated
+
+  /v1/crypto/cert/issue:
+    post:
+      tags: [crypto]
+      summary: Issue signed certificate bundle
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [runId, policyPath, outFile]
+              properties:
+                runId:
+                  type: string
+                policyPath:
+                  type: string
+                outFile:
+                  type: string
+                agentId:
+                  type: string
+      responses:
+        '201':
+          description: Certificate issued
+
+  /v1/crypto/cert/verify:
+    post:
+      tags: [crypto]
+      summary: Verify certificate bundle offline
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [certFile]
+              properties:
+                certFile:
+                  type: string
+      responses:
+        '200':
+          description: Verification result
+
+  /v1/crypto/cert/inspect:
+    post:
+      tags: [crypto]
+      summary: Inspect certificate bundle contents
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [certFile]
+              properties:
+                certFile:
+                  type: string
+      responses:
+        '200':
+          description: Certificate details
+
+  /v1/crypto/cert/revoke:
+    post:
+      tags: [crypto]
+      summary: Create signed revocation file
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [certFile, reason, outFile]
+              properties:
+                certFile:
+                  type: string
+                reason:
+                  type: string
+                outFile:
+                  type: string
+      responses:
+        '201':
+          description: Revocation file created
+
+  /v1/crypto/cert/verify-revocation:
+    post:
+      tags: [crypto]
+      summary: Verify revocation file
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [file]
+              properties:
+                file:
+                  type: string
+      responses:
+        '200':
+          description: Revocation verification
+
+  /v1/crypto/merkle/rebuild:
+    post:
+      tags: [crypto]
+      summary: Rebuild Merkle leaves/roots
+      responses:
+        '200':
+          description: Merkle rebuilt
+
+  /v1/crypto/merkle/root:
+    get:
+      tags: [crypto]
+      summary: Current Merkle root and history
+      responses:
+        '200':
+          description: Merkle root
+
+  /v1/crypto/merkle/prove:
+    post:
+      tags: [crypto]
+      summary: Export signed inclusion proof
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [entryHash, outFile]
+              properties:
+                entryHash:
+                  type: string
+                outFile:
+                  type: string
+      responses:
+        '201':
+          description: Proof exported
+
+  /v1/crypto/merkle/verify-proof:
+    post:
+      tags: [crypto]
+      summary: Verify signed inclusion proof
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [file]
+              properties:
+                file:
+                  type: string
+      responses:
+        '200':
+          description: Proof verification
+
+  /v1/crypto/receipts-chain/{receiptId}:
+    get:
+      tags: [crypto]
+      summary: Delegation chain for a receipt
+      parameters:
+        - name: receiptId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Chain result
+
+  # ── Drift ──────────────────────────────────────────────────────
+  /v1/drift/check:
+    post:
+      tags: [drift]
+      summary: Run drift detection
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                agentId:
+                  type: string
+                against:
+                  type: string
+                  default: previous
+      responses:
+        '200':
+          description: Drift check result
+
+  /v1/drift/report:
+    get:
+      tags: [drift]
+      summary: Drift/regression markdown report
+      parameters:
+        - name: agentId
+          in: query
+          schema:
+            type: string
+        - name: format
+          in: query
+          schema:
+            type: string
+            enum: [json, md]
+      responses:
+        '200':
+          description: Drift report
+
+  /v1/drift/summary:
+    get:
+      tags: [drift]
+      summary: Last drift check summary
+      parameters:
+        - name: agentId
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Drift summary
+
+  /v1/drift/freeze/status:
+    get:
+      tags: [drift]
+      summary: Execution freeze status
+      parameters:
+        - name: agentId
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Freeze status
+
+  /v1/drift/freeze/lift:
+    post:
+      tags: [drift]
+      summary: Lift execution freeze
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [agentId, incidentId, reason]
+              properties:
+                agentId:
+                  type: string
+                incidentId:
+                  type: string
+                reason:
+                  type: string
+      responses:
+        '200':
+          description: Freeze lifted
+
+  /v1/drift/alerts/init:
+    post:
+      tags: [drift]
+      summary: Initialize alerts config
+      responses:
+        '200':
+          description: Alerts initialized
+
+  /v1/drift/alerts/verify:
+    get:
+      tags: [drift]
+      summary: Verify alerts config signature
+      responses:
+        '200':
+          description: Verification result
+
+  /v1/drift/alerts/test:
+    post:
+      tags: [drift]
+      summary: Send test alert
+      responses:
+        '200':
+          description: Test alert sent
+
+  # ── Enforce ────────────────────────────────────────────────────
+  /v1/enforce/status:
+    get:
+      tags: [enforce]
+      summary: Enforce module status
+      responses:
+        '200':
+          description: Enforce status
+
+  /v1/enforce/evaluate:
+    post:
+      tags: [enforce]
+      summary: Evaluate action against policy firewall
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [action]
+              properties:
+                action:
+                  type: string
+                tool:
+                  type: string
+                agentId:
+                  type: string
+                context:
+                  type: object
+      responses:
+        '200':
+          description: Policy decision (allow/deny/stepup/sanitize/quarantine)
+
+  # ── Export ─────────────────────────────────────────────────────
+  /v1/export/policy:
+    post:
+      tags: [export]
+      summary: Export policy pack
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [target, outDir]
+              properties:
+                target:
+                  type: string
+                outDir:
+                  type: string
+                agentId:
+                  type: string
+      responses:
+        '200':
+          description: Policy exported
+
+  /v1/export/badge:
+    post:
+      tags: [export]
+      summary: Export maturity badge SVG
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [runId, outFile]
+              properties:
+                runId:
+                  type: string
+                outFile:
+                  type: string
+                agentId:
+                  type: string
+      responses:
+        '200':
+          description: Badge exported
+
+  /v1/export/badge/url:
+    get:
+      tags: [export]
+      summary: Generate badge URL
+      parameters:
+        - name: level
+          in: query
+          required: true
+          schema:
+            type: integer
+        - name: label
+          in: query
+          schema:
+            type: string
+        - name: format
+          in: query
+          schema:
+            type: string
+            enum: [markdown, html, url]
+      responses:
+        '200':
+          description: Badge URL
+
+  /v1/export/badge/generate:
+    get:
+      tags: [export]
+      summary: Generate badge markup
+      parameters:
+        - name: level
+          in: query
+          required: true
+          schema:
+            type: integer
+        - name: label
+          in: query
+          schema:
+            type: string
+        - name: format
+          in: query
+          schema:
+            type: string
+            enum: [markdown, html, url]
+      responses:
+        '200':
+          description: Badge and formatted output
+
+  /v1/attest/notary:
+    post:
+      tags: [export]
+      summary: Generate signed notary attestation bundle
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [outFile]
+              properties:
+                outFile:
+                  type: string
+                notaryDir:
+                  type: string
+      responses:
+        '200':
+          description: Attestation
+
+  /v1/attest/notary/verify:
+    post:
+      tags: [export]
+      summary: Verify .amcattest bundle
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [file]
+              properties:
+                file:
+                  type: string
+      responses:
+        '200':
+          description: Verification
+
+  /v1/attest/outcome:
+    post:
+      tags: [export]
+      summary: Record manual attested outcome signal
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [metricId, value, reason]
+              properties:
+                metricId:
+                  type: string
+                value:
+                  type: string
+                reason:
+                  type: string
+                workOrderId:
+                  type: string
+                unit:
+                  type: string
+                agentId:
+                  type: string
+      responses:
+        '200':
+          description: Outcome attested
+
+  # ── Canary ─────────────────────────────────────────────────────
+  /v1/canary/start:
+    post:
+      tags: [canary]
+      summary: Start a policy canary
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [candidateSha, stableSha]
+              properties:
+                candidateSha:
+                  type: string
+                stableSha:
+                  type: string
+                enforcePct:
+                  type: integer
+                duration:
+                  type: integer
+                failureThreshold:
+                  type: number
+                autoPromote:
+                  type: boolean
+      responses:
+        '201':
+          description: Canary started
+
+  /v1/canary/status:
+    get:
+      tags: [canary]
+      summary: Current canary status and stats
+      responses:
+        '200':
+          description: Canary status
+
+  /v1/canary/stop:
+    post:
+      tags: [canary]
+      summary: Stop the active canary
+      responses:
+        '200':
+          description: Canary stopped
+
+  /v1/canary/report:
+    get:
+      tags: [canary]
+      summary: Full policy canary report
+      parameters:
+        - name: agentId
+          in: query
+          schema:
+            type: string
+        - name: format
+          in: query
+          schema:
+            type: string
+            enum: [json, md]
+      responses:
+        '200':
+          description: Canary report
+
+  /v1/canary/micro/run:
+    post:
+      tags: [canary]
+      summary: Run all micro-canary probes
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                agentId:
+                  type: string
+      responses:
+        '200':
+          description: Probe results
+
+  /v1/canary/micro/report:
+    get:
+      tags: [canary]
+      summary: Micro-canary status report
+      parameters:
+        - name: window
+          in: query
+          schema:
+            type: string
+        - name: format
+          in: query
+          schema:
+            type: string
+            enum: [json, md]
+      responses:
+        '200':
+          description: Micro-canary report
+
+  /v1/canary/micro/alerts:
+    get:
+      tags: [canary]
+      summary: Active micro-canary alerts
+      responses:
+        '200':
+          description: Alert list
+
+  /v1/canary/micro/alerts/ack:
+    post:
+      tags: [canary]
+      summary: Acknowledge all micro-canary alerts
+      responses:
+        '200':
+          description: Alerts acknowledged
+
+  /v1/canary/policy-mode/start:
+    post:
+      tags: [canary]
+      summary: Start policy canary observation mode
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [packId]
+              properties:
+                agentId:
+                  type: string
+                packId:
+                  type: string
+                duration:
+                  type: string
+      responses:
+        '201':
+          description: Policy canary mode started
+
+  /v1/canary/policy-mode/report:
+    get:
+      tags: [canary]
+      summary: Policy canary mode report
+      parameters:
+        - name: agentId
+          in: query
+          schema:
+            type: string
+        - name: format
+          in: query
+          schema:
+            type: string
+            enum: [json, md]
+      responses:
+        '200':
+          description: Policy canary mode report
+
+  # ── CI ─────────────────────────────────────────────────────────
+  /v1/ci/init:
+    post:
+      tags: [ci]
+      summary: Initialize CI for an agent
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                agentId:
+                  type: string
+      responses:
+        '201':
+          description: CI initialized
+
+  /v1/ci/steps:
+    get:
+      tags: [ci]
+      summary: List CI steps for an agent
+      parameters:
+        - name: agentId
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: CI steps
+
+  /v1/ci/gate:
+    post:
+      tags: [ci]
+      summary: Run bundle gate evaluation
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [bundlePath, policyPath]
+              properties:
+                bundlePath:
+                  type: string
+                policyPath:
+                  type: string
+      responses:
+        '200':
+          description: Gate result
+
+  /v1/ci/policy/default:
+    get:
+      tags: [ci]
+      summary: Get default gate policy
+      responses:
+        '200':
+          description: Default policy
+
+  /v1/ci/policy/sign:
+    post:
+      tags: [ci]
+      summary: Write and sign a gate policy
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [policyPath, policy]
+              properties:
+                policyPath:
+                  type: string
+                policy:
+                  type: object
+      responses:
+        '200':
+          description: Policy signed
+
+  /v1/ci/policy/verify:
+    post:
+      tags: [ci]
+      summary: Verify gate policy signature
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [policyPath]
+              properties:
+                policyPath:
+                  type: string
+      responses:
+        '200':
+          description: Verification result
+
+  /v1/ci/predict:
+    post:
+      tags: [ci]
+      summary: Predict CI gate outcome (what-if)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [agentId, runId]
+              properties:
+                agentId:
+                  type: string
+                runId:
+                  type: string
+      responses:
+        '200':
+          description: Prediction result
+
+  # ── Config ─────────────────────────────────────────────────────
+  /v1/config:
+    get:
+      tags: [config]
+      summary: Resolved runtime config (secrets redacted)
+      responses:
+        '200':
+          description: Config
+
+  /v1/config/logs:
+    get:
+      tags: [config]
+      summary: Latest studio logs
+      parameters:
+        - name: lines
+          in: query
+          schema:
+            type: integer
+            default: 100
+      responses:
+        '200':
+          description: Log entries
+
+  /v1/config/doctor:
+    get:
+      tags: [config]
+      summary: Run doctor checks
+      responses:
+        '200':
+          description: Doctor result
+
+  /v1/config/version:
+    get:
+      tags: [config]
+      summary: Version info
+      responses:
+        '200':
+          description: Version
+
+  /v1/config/status:
+    get:
+      tags: [config]
+      summary: Workspace status overview
+      responses:
+        '200':
+          description: Status overview
+
+  # ── Gateway ────────────────────────────────────────────────────
+  /v1/gateway/status:
+    get:
+      tags: [gateway]
+      summary: Gateway status
+      responses:
+        '200':
+          description: Gateway status
+
+  /v1/gateway/config:
+    get:
+      tags: [gateway]
+      summary: Get gateway config (redacted)
+      responses:
+        '200':
+          description: Gateway config
+
+  /v1/gateway/init:
+    post:
+      tags: [gateway]
+      summary: Initialize gateway with defaults
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                provider:
+                  type: string
+      responses:
+        '200':
+          description: Gateway initialized
+
+  /v1/gateway/bind:
+    post:
+      tags: [gateway]
+      summary: Bind agent to a route
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [agentId]
+              properties:
+                agentId:
+                  type: string
+                routePrefix:
+                  type: string
+      responses:
+        '200':
+          description: Agent bound
+
+  /v1/gateway/sign:
+    post:
+      tags: [gateway]
+      summary: Sign gateway config
+      responses:
+        '200':
+          description: Config signed
+
+  /v1/gateway/verify:
+    get:
+      tags: [gateway]
+      summary: Verify gateway config signature
+      responses:
+        '200':
+          description: Verification
+
+  /v1/gateway/providers:
+    get:
+      tags: [gateway]
+      summary: List available provider templates
+      responses:
+        '200':
+          description: Provider list
+
+  # ── Identity ───────────────────────────────────────────────────
+  /v1/identity/init:
+    post:
+      tags: [identity]
+      summary: Create and sign host-level identity.yaml
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [hostDir]
+              properties:
+                hostDir:
+                  type: string
+      responses:
+        '201':
+          description: Identity created
+
+  /v1/identity/verify:
+    post:
+      tags: [identity]
+      summary: Verify identity.yaml signature
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [hostDir]
+              properties:
+                hostDir:
+                  type: string
+      responses:
+        '200':
+          description: Verification
+
+  /v1/identity/provider/add-oidc:
+    post:
+      tags: [identity]
+      summary: Add OIDC identity provider
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [hostDir, providerId, issuer, clientId, clientSecretFile, redirectUri]
+              properties:
+                hostDir:
+                  type: string
+                providerId:
+                  type: string
+                issuer:
+                  type: string
+                clientId:
+                  type: string
+                clientSecretFile:
+                  type: string
+                redirectUri:
+                  type: string
+      responses:
+        '201':
+          description: OIDC provider added
+
+  /v1/identity/provider/add-saml:
+    post:
+      tags: [identity]
+      summary: Add SAML identity provider
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [hostDir, providerId, entryPoint, issuer, idpCertFile, spEntityId, acsUrl]
+              properties:
+                hostDir:
+                  type: string
+                providerId:
+                  type: string
+                entryPoint:
+                  type: string
+                issuer:
+                  type: string
+                idpCertFile:
+                  type: string
+                spEntityId:
+                  type: string
+                acsUrl:
+                  type: string
+      responses:
+        '201':
+          description: SAML provider added
+
+  /v1/identity/mapping/add:
+    post:
+      tags: [identity]
+      summary: Add group-to-role mapping rule
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [hostDir, group]
+              properties:
+                hostDir:
+                  type: string
+                group:
+                  type: string
+                providerId:
+                  type: string
+                roles:
+                  type: array
+                  items:
+                    type: string
+                    enum: [OWNER, OPERATOR, AUDITOR, VIEWER]
+      responses:
+        '201':
+          description: Mapping added
+
+  /v1/identity/scim/token/create:
+    post:
+      tags: [identity]
+      summary: Create SCIM bearer token
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [hostDir, name]
+              properties:
+                hostDir:
+                  type: string
+                name:
+                  type: string
+                outFile:
+                  type: string
+      responses:
+        '201':
+          description: Token created
+
+  # ── Adapters ───────────────────────────────────────────────────
+  /v1/adapters/init:
+    post:
+      tags: [adapters]
+      summary: Create signed adapters.yaml defaults
+      responses:
+        '201':
+          description: Adapters initialized
+
+  /v1/adapters/verify:
+    get:
+      tags: [adapters]
+      summary: Verify adapters.yaml signature
+      responses:
+        '200':
+          description: Verification
+
+  /v1/adapters/list:
+    get:
+      tags: [adapters]
+      summary: List built-in adapters and per-agent preferences
+      responses:
+        '200':
+          description: Adapter list
+
+  /v1/adapters/detect:
+    get:
+      tags: [adapters]
+      summary: Detect installed adapter runtimes
+      parameters:
+        - name: timeoutMs
+          in: query
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Detected adapters
+
+  /v1/adapters/configure:
+    post:
+      tags: [adapters]
+      summary: Set adapter profile for an agent
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [adapterId, route, model, mode]
+              properties:
+                agentId:
+                  type: string
+                adapterId:
+                  type: string
+                route:
+                  type: string
+                model:
+                  type: string
+                mode:
+                  type: string
+                  enum: [SUPERVISE, SANDBOX]
+      responses:
+        '200':
+          description: Adapter configured
+
+  # ── Assurance ──────────────────────────────────────────────────
+  /v1/assurance/packs:
+    get:
+      tags: [assurance]
+      summary: List assurance packs
+      responses:
+        '200':
+          description: Pack list
+
+  /v1/assurance/packs/{packId}:
+    get:
+      tags: [assurance]
+      summary: Describe assurance pack
+      parameters:
+        - name: packId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Pack details
+
+  /v1/assurance/run:
+    post:
+      tags: [assurance]
+      summary: Run assurance pack
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                scopeType:
+                  type: string
+                  enum: [WORKSPACE, NODE, AGENT]
+                scope:
+                  type: string
+                pack:
+                  type: string
+                windowDays:
+                  type: integer
+      responses:
+        '200':
+          description: Assurance run result
+
+  /v1/assurance/runs:
+    get:
+      tags: [assurance]
+      summary: List assurance runs
+      responses:
+        '200':
+          description: Run history
+
+  /v1/assurance/init:
+    post:
+      tags: [assurance]
+      summary: Initialize assurance workspace
+      responses:
+        '200':
+          description: Assurance initialized
+
+  /v1/assurance/readiness:
+    get:
+      tags: [assurance]
+      summary: Readiness gate check
+      responses:
+        '200':
+          description: Readiness status
+
+  # ── Benchmark ──────────────────────────────────────────────────
+  /v1/benchmarks:
+    get:
+      tags: [benchmark]
+      summary: List imported benchmarks
+      responses:
+        '200':
+          description: Benchmark list
+
+  /v1/benchmarks/stats:
+    get:
+      tags: [benchmark]
+      summary: Benchmark statistics
+      parameters:
+        - name: groupBy
+          in: query
+          schema:
+            type: string
+            enum: [archetype, riskTier, trustLabel]
+      responses:
+        '200':
+          description: Stats
+
+  /v1/benchmarks/export:
+    post:
+      tags: [benchmark]
+      summary: Export benchmark artifact
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [runId, outFile]
+              properties:
+                runId:
+                  type: string
+                outFile:
+                  type: string
+                agentId:
+                  type: string
+      responses:
+        '200':
+          description: Benchmark exported
+
+  /v1/benchmarks/import:
+    post:
+      tags: [benchmark]
+      summary: Import benchmark artifact(s)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [path]
+              properties:
+                path:
+                  type: string
+      responses:
+        '200':
+          description: Benchmark imported
+
+  # ── BOM ────────────────────────────────────────────────────────
+  /v1/bom/generate:
+    post:
+      tags: [bom]
+      summary: Generate maturity BOM
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [runId, outFile]
+              properties:
+                runId:
+                  type: string
+                outFile:
+                  type: string
+                agentId:
+                  type: string
+      responses:
+        '201':
+          description: BOM generated
+
+  /v1/bom/sign:
+    post:
+      tags: [bom]
+      summary: Sign a BOM file
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [inputFile]
+              properties:
+                inputFile:
+                  type: string
+                outputSigFile:
+                  type: string
+      responses:
+        '200':
+          description: BOM signed
+
+  # ── Incidents ──────────────────────────────────────────────────
+  /v1/incidents:
+    get:
+      tags: [incidents]
+      summary: List incidents
+      parameters:
+        - name: agent
+          in: query
+          schema:
+            type: string
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [open, closed]
+        - name: limit
+          in: query
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Incident list
+    post:
+      tags: [incidents]
+      summary: Create incident
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [title]
+              properties:
+                agentId:
+                  type: string
+                title:
+                  type: string
+                severity:
+                  type: string
+                  enum: [INFO, WARN, CRITICAL]
+                description:
+                  type: string
+      responses:
+        '201':
+          description: Incident created
+
+  /v1/incidents/{id}:
+    get:
+      tags: [incidents]
+      summary: Get incident details
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Incident with transitions and causal edges
+    patch:
+      tags: [incidents]
+      summary: Update incident (resolve or add evidence)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                resolution:
+                  type: string
+                evidenceId:
+                  type: string
+      responses:
+        '200':
+          description: Incident updated
+
+  # ── Memory ─────────────────────────────────────────────────────
+  /v1/memory/assess/{agentId}:
+    get:
+      tags: [memory]
+      summary: Full memory maturity assessment
+      parameters:
+        - name: agentId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Memory maturity assessment
+
+  /v1/memory/integrity:
+    get:
+      tags: [memory]
+      summary: Score memory integrity (default)
+      responses:
+        '200':
+          description: Integrity score
+    post:
+      tags: [memory]
+      summary: Score memory integrity with provided events
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                events:
+                  type: array
+                  items:
+                    type: object
+                sessionCount:
+                  type: integer
+                totalDurationMs:
+                  type: integer
+      responses:
+        '200':
+          description: Integrity score
+
+  /v1/memory/extract:
+    post:
+      tags: [memory]
+      summary: Extract lessons from corrections
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                agentId:
+                  type: string
+                minEffectiveness:
+                  type: number
+      responses:
+        '200':
+          description: Extracted lessons
+
+  /v1/memory/advisories:
+    get:
+      tags: [memory]
+      summary: Get lesson advisories
+      parameters:
+        - name: agentId
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Advisories
+
+  /v1/memory/report:
+    get:
+      tags: [memory]
+      summary: Correction memory report
+      parameters:
+        - name: agentId
+          in: query
+          schema:
+            type: string
+        - name: window
+          in: query
+          schema:
+            type: string
+        - name: format
+          in: query
+          schema:
+            type: string
+            enum: [json, md]
+      responses:
+        '200':
+          description: Memory report
+
+  /v1/memory/expire:
+    post:
+      tags: [memory]
+      summary: Expire stale lessons
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                agentId:
+                  type: string
+      responses:
+        '200':
+          description: Expired lessons
+
+  # ── Metrics ────────────────────────────────────────────────────
+  /v1/metrics/status:
+    get:
+      tags: [metrics]
+      summary: Metrics endpoint config
+      responses:
+        '200':
+          description: Metrics host/port
+
+  /v1/slo/status:
+    get:
+      tags: [metrics]
+      summary: Governance SLO dashboard
+      parameters:
+        - name: window
+          in: query
+          schema:
+            type: number
+        - name: format
+          in: query
+          schema:
+            type: string
+            enum: [json, md]
+      responses:
+        '200':
+          description: SLO status
+
+  /v1/slo/targets:
+    get:
+      tags: [metrics]
+      summary: List SLO targets
+      responses:
+        '200':
+          description: SLO targets
+    put:
+      tags: [metrics]
+      summary: Update SLO targets
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [targets]
+              properties:
+                targets:
+                  type: array
+                  items:
+                    type: object
+      responses:
+        '200':
+          description: Targets updated
+
+  /v1/indices/agent:
+    get:
+      tags: [metrics]
+      summary: Failure-risk indices for agent run
+      parameters:
+        - name: runId
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: agentId
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Agent indices
+
+  /v1/indices/fleet:
+    get:
+      tags: [metrics]
+      summary: Fleet failure-risk indices
+      parameters:
+        - name: window
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Fleet indices
+
+  # ── Security ───────────────────────────────────────────────────
+  /v1/security/ato-detect:
+    post:
+      tags: [security]
+      summary: Detect account takeover attempts
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [agentId]
+              properties:
+                agentId:
+                  type: string
+                events:
+                  type: array
+                  items:
+                    type: object
+      responses:
+        '200':
+          description: ATO detection result
+
+  /v1/security/blind-secrets:
+    post:
+      tags: [security]
+      summary: Redact secrets from text
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [text]
+              properties:
+                text:
+                  type: string
+      responses:
+        '200':
+          description: Blinded text
+
+  /v1/security/taint:
+    post:
+      tags: [security]
+      summary: Track tainted input
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [input]
+              properties:
+                input:
+                  type: string
+                source:
+                  type: string
+      responses:
+        '200':
+          description: Taint result
+
+  /v1/security/threat-intel:
+    post:
+      tags: [security]
+      summary: Check threat intelligence
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [input]
+              properties:
+                input:
+                  type: string
+      responses:
+        '200':
+          description: Threat intel result
+
+  /v1/security/detect-injection:
+    post:
+      tags: [security]
+      summary: Detect prompt injection
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [text]
+              properties:
+                text:
+                  type: string
+      responses:
+        '200':
+          description: Detection result
+
+  /v1/security/sleeper-detection:
+    get:
+      tags: [security]
+      summary: Detect behavioral inconsistencies
+      responses:
+        '200':
+          description: Sleeper detection result
+
+  /v1/security/gaming-resistance:
+    get:
+      tags: [security]
+      summary: Test adversarial evidence injection
+      responses:
+        '200':
+          description: Gaming resistance result
+
+  /v1/security/insider/report:
+    get:
+      tags: [security]
+      summary: Insider risk report
+      parameters:
+        - name: window
+          in: query
+          schema:
+            type: string
+        - name: format
+          in: query
+          schema:
+            type: string
+            enum: [json, md]
+      responses:
+        '200':
+          description: Insider risk report
+
+  /v1/security/insider/alerts:
+    get:
+      tags: [security]
+      summary: Insider risk alerts
+      parameters:
+        - name: actorId
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Insider alerts
+
+  /v1/security/insider/alerts/ack:
+    post:
+      tags: [security]
+      summary: Acknowledge insider alert
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [alertId]
+              properties:
+                alertId:
+                  type: string
+      responses:
+        '200':
+          description: Alert acknowledged
+
+  /v1/security/insider/scores:
+    get:
+      tags: [security]
+      summary: Insider risk scores by actor
+      responses:
+        '200':
+          description: Risk scores
+
+  /v1/security/advanced-threats:
+    post:
+      tags: [security]
+      summary: Run advanced threats pack
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [agentId]
+              properties:
+                agentId:
+                  type: string
+      responses:
+        '200':
+          description: Advanced threats result
+
+  /v1/security/compound-threats:
+    post:
+      tags: [security]
+      summary: Run compound threat pack
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [agentId]
+              properties:
+                agentId:
+                  type: string
+      responses:
+        '200':
+          description: Compound threats result
+
+  /v1/security/adversarial:
+    post:
+      tags: [security]
+      summary: Test gaming resistance of scoring
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [agentId]
+              properties:
+                agentId:
+                  type: string
+      responses:
+        '200':
+          description: Adversarial test result
+
+  # ── Shield ─────────────────────────────────────────────────────
+  /v1/shield/status:
+    get:
+      tags: [shield]
+      summary: Shield module status
+      responses:
+        '200':
+          description: Shield status
+
+  /v1/shield/scan/skill:
+    post:
+      tags: [shield]
+      summary: Scan skill code for vulnerabilities
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [code]
+              properties:
+                code:
+                  type: string
+                language:
+                  type: string
+      responses:
+        '200':
+          description: Scan result
+
+  /v1/shield/detect/injection:
+    post:
+      tags: [shield]
+      summary: Detect prompt injection in input
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [input]
+              properties:
+                input:
+                  type: string
+      responses:
+        '200':
+          description: Detection result
+
+  /v1/shield/sanitize:
+    post:
+      tags: [shield]
+      summary: Sanitize input
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [input]
+              properties:
+                input:
+                  type: string
+      responses:
+        '200':
+          description: Sanitized output
+
+  # ── Vault ──────────────────────────────────────────────────────
+  /v1/vault/status:
+    get:
+      tags: [vault]
+      summary: Vault status
+      responses:
+        '200':
+          description: Vault status
+
+  /v1/vault/unlock:
+    post:
+      tags: [vault]
+      summary: Unlock vault with passphrase
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                passphrase:
+                  type: string
+      responses:
+        '200':
+          description: Vault unlocked
+
+  /v1/vault/seal:
+    post:
+      tags: [vault]
+      summary: Lock vault
+      responses:
+        '200':
+          description: Vault sealed
+
+  /v1/vault/keys:
+    get:
+      tags: [vault]
+      summary: List public key history
+      parameters:
+        - name: kind
+          in: query
+          schema:
+            type: string
+            enum: [monitor, auditor, lease, session]
+      responses:
+        '200':
+          description: Key history
+
+  /v1/vault/keys/rotate:
+    post:
+      tags: [vault]
+      summary: Rotate vault keys
+      responses:
+        '200':
+          description: Keys rotated
+
+  /v1/vault/secret/set:
+    post:
+      tags: [vault]
+      summary: Set a vault secret
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [key, value]
+              properties:
+                key:
+                  type: string
+                value:
+                  type: string
+      responses:
+        '200':
+          description: Secret set
+
+  /v1/vault/redact:
+    post:
+      tags: [vault]
+      summary: Redact PII from text
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [text]
+              properties:
+                text:
+                  type: string
+      responses:
+        '200':
+          description: Redacted text
+
+  /v1/vault/classify:
+    post:
+      tags: [vault]
+      summary: Classify content sensitivity
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [content]
+              properties:
+                content:
+                  type: string
+      responses:
+        '200':
+          description: Classification
+
+  /v1/vault/dlp-scan:
+    post:
+      tags: [vault]
+      summary: DLP scan content
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [content]
+              properties:
+                content:
+                  type: string
+      responses:
+        '200':
+          description: DLP scan result
+
+  # ── Tools/Guardrails/Plugins ───────────────────────────────────
+  /v1/tools/init:
+    post:
+      tags: [tools]
+      summary: Create and sign tools.yaml
+      responses:
+        '201':
+          description: Tools initialized
+
+  /v1/tools/verify:
+    get:
+      tags: [tools]
+      summary: Verify tools.yaml signature
+      responses:
+        '200':
+          description: Verification
+
+  /v1/tools/list:
+    get:
+      tags: [tools]
+      summary: List allowed ToolHub tools
+      responses:
+        '200':
+          description: Tool list
+
+  /v1/guardrails/list:
+    get:
+      tags: [tools]
+      summary: List guardrails with status
+      responses:
+        '200':
+          description: Guardrail list
+
+  /v1/guardrails/enable:
+    post:
+      tags: [tools]
+      summary: Enable a guardrail
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name]
+              properties:
+                name:
+                  type: string
+      responses:
+        '200':
+          description: Guardrail enabled
+
+  /v1/guardrails/disable:
+    post:
+      tags: [tools]
+      summary: Disable a guardrail
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name]
+              properties:
+                name:
+                  type: string
+      responses:
+        '200':
+          description: Guardrail disabled
+
+  /v1/guardrails/profile:
+    post:
+      tags: [tools]
+      summary: Apply a guardrail profile
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name]
+              properties:
+                name:
+                  type: string
+      responses:
+        '200':
+          description: Profile applied
+
+  /v1/plugins/list:
+    get:
+      tags: [tools]
+      summary: List installed plugins
+      responses:
+        '200':
+          description: Plugin list
+
+  /v1/plugins/keygen:
+    post:
+      tags: [tools]
+      summary: Generate plugin publisher keypair
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [outDir]
+              properties:
+                outDir:
+                  type: string
+      responses:
+        '201':
+          description: Keypair generated
+
+  /v1/plugins/verify:
+    post:
+      tags: [tools]
+      summary: Verify plugin package signature
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [file]
+              properties:
+                file:
+                  type: string
+      responses:
+        '200':
+          description: Verification
+
+  /v1/plugins/install:
+    post:
+      tags: [tools]
+      summary: Install plugin from registry
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [registryId, pluginRef]
+              properties:
+                registryId:
+                  type: string
+                pluginRef:
+                  type: string
+                agentId:
+                  type: string
+      responses:
+        '201':
+          description: Plugin installed
+
+  # ── Watch ──────────────────────────────────────────────────────
+  /v1/watch/status:
+    get:
+      tags: [watch]
+      summary: Watch module status
+      responses:
+        '200':
+          description: Status
+
+  /v1/watch/guard:
+    post:
+      tags: [watch]
+      summary: Run guardrail check against proposed output
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [proposedOutput]
+              properties:
+                agentId:
+                  type: string
+                proposedOutput:
+                  type: string
+                riskTier:
+                  type: string
+                actionType:
+                  type: string
+      responses:
+        '200':
+          description: Guard check result
+
+  /v1/watch/attest:
+    post:
+      tags: [watch]
+      summary: Attest agent output via ledger
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [output]
+              properties:
+                agentId:
+                  type: string
+                output:
+                  type: string
+                sessionId:
+                  type: string
+      responses:
+        '200':
+          description: Attestation result
+
+  /v1/watch/safety-test:
+    post:
+      tags: [watch]
+      summary: Run safety assurance pack
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                agentId:
+                  type: string
+                packId:
+                  type: string
+                window:
+                  type: string
+      responses:
+        '200':
+          description: Safety test result
+
+  /v1/watch/explain:
+    post:
+      tags: [watch]
+      summary: Explainability packet for a run
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [runId]
+              properties:
+                agentId:
+                  type: string
+                runId:
+                  type: string
+      responses:
+        '200':
+          description: Explanation
+
+  /v1/watch/governor:
+    get:
+      tags: [watch]
+      summary: Autonomy governor status check
+      parameters:
+        - name: agentId
+          in: query
+          schema:
+            type: string
+        - name: actionClass
+          in: query
+          schema:
+            type: string
+        - name: riskTier
+          in: query
+          schema:
+            type: string
+        - name: mode
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Governor check result
+
+  /v1/watch/host-hardening:
+    get:
+      tags: [watch]
+      summary: Host hardening status
+      responses:
+        '200':
+          description: Hardening check result
+
+  /v1/watch/oversight:
+    post:
+      tags: [watch]
+      summary: Log an oversight event
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [event]
+              properties:
+                agentId:
+                  type: string
+                event:
+                  type: string
+                metadata:
+                  type: object
+      responses:
+        '200':
+          description: Oversight logged
+
+  # ── Workflow ───────────────────────────────────────────────────
+  /v1/workorders:
+    post:
+      tags: [workflow]
+      summary: Create work order
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [title, description, riskTier, mode]
+              properties:
+                title:
+                  type: string
+                description:
+                  type: string
+                riskTier:
+                  type: string
+                mode:
+                  type: string
+                allowedActionClasses:
+                  type: array
+                  items:
+                    type: string
+                agentId:
+                  type: string
+      responses:
+        '201':
+          description: Work order created
+    get:
+      tags: [workflow]
+      summary: List work orders
+      parameters:
+        - name: agentId
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Work order list
+
+  /v1/workorders/{workOrderId}:
+    get:
+      tags: [workflow]
+      summary: Show work order
+      parameters:
+        - name: workOrderId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Work order details
+
+  /v1/workorders/{workOrderId}/verify:
+    post:
+      tags: [workflow]
+      summary: Verify work order signature
+      parameters:
+        - name: workOrderId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Verification
+
+  /v1/workorders/{workOrderId}/expire:
+    post:
+      tags: [workflow]
+      summary: Expire/revoke work order
+      parameters:
+        - name: workOrderId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reason:
+                  type: string
+                agentId:
+                  type: string
+      responses:
+        '200':
+          description: Work order expired
+
+  /v1/tickets/issue:
+    post:
+      tags: [workflow]
+      summary: Issue execution ticket
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [workOrderId, action]
+              properties:
+                workOrderId:
+                  type: string
+                action:
+                  type: string
+                tool:
+                  type: string
+                ttl:
+                  type: string
+                agentId:
+                  type: string
+      responses:
+        '201':
+          description: Ticket issued
+
+  /v1/tickets/verify:
+    post:
+      tags: [workflow]
+      summary: Verify execution ticket
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [ticket]
+              properties:
+                ticket:
+                  type: string
+      responses:
+        '200':
+          description: Verification result
+
+  /v1/lifecycle/status:
+    get:
+      tags: [workflow]
+      summary: Lifecycle status
+      parameters:
+        - name: agentId
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Lifecycle status
+
+  /v1/lifecycle/advance:
+    post:
+      tags: [workflow]
+      summary: Advance lifecycle stage
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [to]
+              properties:
+                to:
+                  type: string
+                agentId:
+                  type: string
+                actor:
+                  type: string
+                actorRole:
+                  type: string
+                controls:
+                  type: array
+                  items:
+                    type: string
+                note:
+                  type: string
+      responses:
+        '200':
+          description: Stage advanced
+
+  # ── Sandbox ────────────────────────────────────────────────────
+  /v1/sandbox/run:
+    post:
+      tags: [sandbox]
+      summary: Run command in hardened Docker sandbox
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [command]
+              properties:
+                agentId:
+                  type: string
+                command:
+                  type: string
+                args:
+                  type: array
+                  items:
+                    type: string
+                image:
+                  type: string
+      responses:
+        '200':
+          description: Sandbox session
+
+  /v1/sandbox/docker-args:
+    post:
+      tags: [sandbox]
+      summary: Preview Docker args without executing
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [command]
+              properties:
+                command:
+                  type: string
+      responses:
+        '200':
+          description: Docker args preview
+
+  # ── Product ────────────────────────────────────────────────────
+  /v1/product/status:
+    get:
+      tags: [product]
+      summary: Product module status
+      responses:
+        '200':
+          description: Status
+
+  /v1/product/batch/create:
+    post:
+      tags: [product]
+      summary: Create batch
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, items]
+              properties:
+                name:
+                  type: string
+                items:
+                  type: array
+                  items:
+                    type: object
+      responses:
+        '201':
+          description: Batch created
+
+  /v1/product/batch/{id}/start:
+    post:
+      tags: [product]
+      summary: Start batch processing
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Batch started
+
+  /v1/product/batch/{id}/progress:
+    get:
+      tags: [product]
+      summary: Get batch progress
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Batch progress
+
+  /v1/product/portal/submit:
+    post:
+      tags: [product]
+      summary: Submit portal job
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, type, submittedBy]
+              properties:
+                name:
+                  type: string
+                type:
+                  type: string
+                submittedBy:
+                  type: string
+                payload:
+                  type: object
+      responses:
+        '201':
+          description: Job submitted
+
+  /v1/product/portal/{jobId}:
+    get:
+      tags: [product]
+      summary: Get portal job
+      parameters:
+        - name: jobId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Job details
+
+  # ── Passport ───────────────────────────────────────────────────
+  /v1/passports:
+    get:
+      tags: [passport]
+      summary: List passports
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+        - name: pageSize
+          in: query
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Passport registry
+
+  /v1/passport/{id}:
+    get:
+      tags: [passport]
+      summary: Get public passport
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Public passport data
+
+  /v1/passport/{id}/verify:
+    get:
+      tags: [passport]
+      summary: Verify passport
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Verification result
+
+  /v1/passport/{id}/revoke:
+    post:
+      tags: [passport]
+      summary: Revoke passport
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reason:
+                  type: string
+                revokedBy:
+                  type: string
+      responses:
+        '200':
+          description: Passport revoked
+
+  # ── Agent Timeline ─────────────────────────────────────────────
+  /v1/agents/{id}/timeline:
+    get:
+      tags: [agentTimeline]
+      summary: Agent timeline data
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: maxRuns
+          in: query
+          schema:
+            type: integer
+        - name: maxEvidenceEvents
+          in: query
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Timeline data

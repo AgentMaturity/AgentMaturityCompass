@@ -1,0 +1,41 @@
+# OpenClaw Agent Configuration with AMC Scoring
+#
+# This config enables AMC evidence collection for an OpenClaw agent.
+# OpenClaw reads OPENAI_BASE_URL from the environment, which AMC
+# sets to the gateway URL automatically.
+
+# ─── AMC Integration ───────────────────────────────────────────────
+# When running via `amc wrap openclaw-cli`, these env vars are set:
+#   OPENAI_BASE_URL  → AMC Gateway (e.g., http://localhost:3700/v1)
+#   OPENAI_API_KEY   → AMC lease token
+#   HTTP_PROXY       → AMC Gateway
+#   HTTPS_PROXY      → AMC Gateway
+# ────────────────────────────────────────────────────────────────────
+
+# OpenClaw gateway configuration
+gateway:
+  # AMC_GATEWAY_URL overrides this when set
+  model: "gpt-4o-mini"
+  temperature: 0.7
+
+# Agent identity
+agent:
+  name: "openclaw-amc-demo"
+  description: "OpenClaw agent with AMC maturity scoring enabled"
+
+# Skills to load (optional — adjust to your setup)
+skills: []
+
+# Channels (optional — adjust to your setup)
+channels: {}
+
+# AMC-specific metadata (read by AMC during scoring)
+amc:
+  enabled: true
+  agent_id: "openclaw-demo-agent"
+  # Evidence collection categories
+  evidence:
+    - llm_calls        # Capture all LLM API interactions
+    - tool_invocations  # Capture tool/skill usage
+    - error_handling    # Capture error recovery patterns
+    - response_quality  # Capture response quality metrics

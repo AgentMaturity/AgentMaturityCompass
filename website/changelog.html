@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Changelog — Agent Maturity Compass</title>
+<meta name="description" content="Version history and changelog for Agent Maturity Compass. Track every release, feature, and fix.">
+<meta property="og:title" content="AMC Changelog — Version History">
+<meta property="og:description" content="Track every release of Agent Maturity Compass.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://thewisecrab.github.io/AgentMaturityCompass/changelog.html">
+<meta property="og:image" content="https://thewisecrab.github.io/AgentMaturityCompass/og-card.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23000'/%3E%3Ccircle cx='16' cy='16' r='11' fill='none' stroke='%2300ff41' stroke-width='1.5'/%3E%3Cpath d='M16 5L17.5 14.5 16 18 14.5 14.5Z' fill='%2300ff41'/%3E%3Ccircle cx='16' cy='16' r='2' fill='%2300ff41'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#000;--bg2:#060d06;--bg3:#0a140a;--fg:#e0ffe0;--fg2:#b0d8b0;--muted:#5a8a5a;--green:#00ff41;--green2:#00cc33;--green3:#006622;--border:rgba(0,255,65,.12);--border2:rgba(0,255,65,.25);--mono:'JetBrains Mono',monospace;--sans:'Inter',system-ui,sans-serif}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--sans);background:var(--bg);color:var(--fg);line-height:1.7}
+a{color:var(--green);text-decoration:none}a:hover{text-decoration:underline}
+code,pre{font-family:var(--mono)}
+
+.nav{background:var(--bg2);border-bottom:1px solid var(--border);padding:14px 24px;display:flex;align-items:center;gap:20px;font-family:var(--mono);font-size:.85rem;position:sticky;top:0;z-index:100}
+.nav a{color:var(--muted)}.nav a:hover{color:var(--green);text-decoration:none}
+.nav .logo{color:var(--green);font-weight:600;font-size:1rem}
+
+.hero{text-align:center;padding:60px 24px 32px}
+.hero h1{font-family:var(--mono);font-size:2rem;color:var(--green);margin-bottom:8px}
+.hero p{color:var(--muted);font-size:.95rem}
+
+.container{max-width:800px;margin:0 auto;padding:0 24px 80px}
+.loading{text-align:center;padding:60px;color:var(--muted);font-family:var(--mono)}
+
+/* Timeline */
+.timeline{position:relative;padding-left:32px}
+.timeline::before{content:'';position:absolute;left:8px;top:0;bottom:0;width:2px;background:var(--border2)}
+.version{margin-bottom:40px;position:relative}
+.version::before{content:'';position:absolute;left:-28px;top:6px;width:14px;height:14px;border-radius:50%;background:var(--green3);border:2px solid var(--green);z-index:1}
+.version h2{font-family:var(--mono);font-size:1.3rem;color:var(--green);margin-bottom:4px}
+.version .date{font-size:.82rem;color:var(--muted);font-family:var(--mono);margin-bottom:12px}
+.version ul{padding-left:20px;color:var(--fg2)}
+.version li{margin-bottom:4px;font-size:.9rem}
+.version li code{background:var(--bg3);padding:1px 5px;border-radius:3px;font-size:.84em;color:var(--green);border:1px solid var(--border)}
+.version h3{font-size:1rem;color:var(--green2);margin:12px 0 6px}
+.version p{color:var(--fg2);font-size:.9rem;margin-bottom:8px}
+
+.error{text-align:center;padding:60px;color:var(--muted)}
+.error h2{color:#ff3355;font-family:var(--mono)}
+
+.footer{text-align:center;padding:24px;color:var(--muted);font-size:.78rem;border-top:1px solid var(--border);font-family:var(--mono)}
+
+@media(max-width:768px){.hero h1{font-size:1.5rem}}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="./" class="logo">🛡️ AMC</a>
+  <a href="./">Home</a>
+  <a href="docs/">Docs</a>
+  <a href="compare.html">Compare</a>
+  <a href="blog.html">Blog</a>
+  <a href="changelog.html" style="color:var(--green)">Changelog</a>
+  <a href="https://github.com/thewisecrab/AgentMaturityCompass" target="_blank">GitHub</a>
+</nav>
+
+<div class="hero">
+  <h1>📋 Changelog</h1>
+  <p>Version history — every feature, fix, and improvement.</p>
+</div>
+
+<div class="container">
+  <div id="changelog-content">
+    <div class="loading">Loading changelog...</div>
+  </div>
+</div>
+
+<footer class="footer">
+  <p>Agent Maturity Compass — MIT Licensed — <a href="https://github.com/thewisecrab/AgentMaturityCompass">GitHub</a> · <a href="docs/">Docs</a></p>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script>
+(async function() {
+  const container = document.getElementById('changelog-content');
+  try {
+    const resp = await fetch('https://raw.githubusercontent.com/thewisecrab/AgentMaturityCompass/main/CHANGELOG.md');
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    const md = await resp.text();
+
+    // Parse into timeline
+    const html = marked.parse(md, { gfm: true });
+
+    // Wrap in timeline structure
+    // Split by h2 (## headers = versions)
+    const sections = md.split(/^## /m).filter(Boolean);
+    let timelineHtml = '<div class="timeline">';
+
+    sections.forEach((section, i) => {
+      const lines = section.trim().split('\n');
+      const header = lines[0].replace(/^#+ /, '').trim();
+
+      // Try to extract date from header or next lines
+      let dateMatch = header.match(/\((\d{4}-\d{2}-\d{2})\)/) ||
+                      header.match(/(\d{4}-\d{2}-\d{2})/) ||
+                      lines.slice(0, 3).join(' ').match(/(\d{4}-\d{2}-\d{2})/);
+      const date = dateMatch ? dateMatch[1] : '';
+
+      const body = lines.slice(1).join('\n');
+      const bodyHtml = marked.parse(body, { gfm: true });
+
+      // Skip the main title section
+      if (i === 0 && header.toLowerCase().includes('changelog') && !header.match(/\d+\.\d+/)) {
+        return;
+      }
+
+      timelineHtml += `
+        <div class="version">
+          <h2>${header.replace(/\(.*?\)/, '').trim()}</h2>
+          ${date ? `<div class="date">${date}</div>` : ''}
+          ${bodyHtml}
+        </div>
+      `;
+    });
+
+    timelineHtml += '</div>';
+    container.innerHTML = timelineHtml;
+
+  } catch (err) {
+    container.innerHTML = `<div class="error">
+      <h2>⚠️ Failed to load changelog</h2>
+      <p>${err.message}</p>
+      <p style="margin-top:12px"><a href="https://github.com/thewisecrab/AgentMaturityCompass/blob/main/CHANGELOG.md" target="_blank">View on GitHub →</a></p>
+    </div>`;
+  }
+})();
+</script>
+</body>
+</html>
