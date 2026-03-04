@@ -1295,6 +1295,7 @@ a:focus-visible,.bp:focus-visible,.bg:focus-visible,.nbtn:focus-visible,
 </style>
 </head>
 <body class="mt" id="body">
+<script>try{var s=localStorage.getItem('amc-theme'),m=localStorage.getItem('amc-mode');if(s==='clean')document.body.classList.add('clean-theme');if(m==='s'){document.body.classList.remove('mt');document.body.classList.add('ms')}}catch(e){}</script>
 <a href="#main-content" class="skip-link">Skip to main content</a>
 <div id="scroll-prog" aria-hidden="true"></div>
 <div id="cur" aria-hidden="true"></div>
@@ -2314,9 +2315,8 @@ function positionSlide(mode) {
 }
 
 function setMode(m) {
-  const isClean = body.classList.contains('clean-theme');
-  body.className = m === 's' ? 'ms' : 'mt';
-  if(isClean) body.classList.add('clean-theme');
+  body.classList.remove('ms', 'mt');
+  body.classList.add(m === 's' ? 'ms' : 'mt');
   document.getElementById('tbtn-s').classList.toggle('on', m === 's');
   document.getElementById('tbtn-t').classList.toggle('on', m === 't');
   document.getElementById('tbtn-s').setAttribute('aria-checked', m === 's');
