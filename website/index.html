@@ -707,6 +707,50 @@ footer{background:var(--black);border-top:1px solid var(--bdr);padding:2.25rem 0
   body{font-size:11pt}
 }
 
+/* ── CLEAN THEME ────────────────────────────────── */
+body.clean-theme { --black:#ffffff;--bg:#f9fafb;--bg2:#f3f4f6;--bg3:#e5e7eb;--card:#ffffff;--card2:#f9fafb;
+  --g:#2563eb;--g2:#1d4ed8;--g3:#93c5fd;--g4:rgba(37,99,235,.06);
+  --a:#d97706;--a2:rgba(217,119,6,.08);--a3:rgba(217,119,6,.2);
+  --c:#0284c7;--c2:rgba(2,132,199,.1);
+  --r:#dc2626;--r2:rgba(220,38,38,.08);
+  --t0:#1a1a1a;--t1:#374151;--t2:#6b7280;--t3:#9ca3af;--t4:#d1d5db;
+  --bdr:rgba(37,99,235,.12);--bdr2:rgba(37,99,235,.2);--bdr3:rgba(37,99,235,.35);
+  --glow:none;--gsm:none;--aglow:none;--rglow:none;
+  --mono:'Inter',system-ui,sans-serif;--sans:'Inter',system-ui,sans-serif;
+  font-family:'Inter',system-ui,sans-serif }
+body.clean-theme #rain { display:none!important }
+body.clean-theme::before { display:none!important }
+body.clean-theme #cur,body.clean-theme #cur-ring { display:none!important }
+body.clean-theme .scomp { border-color:rgba(37,99,235,.15) }
+body.clean-theme .nbtn { background:#2563eb!important;color:#fff!important }
+body.clean-theme .nbtn:hover { background:#1d4ed8!important }
+body.clean-theme .bp { background:#2563eb;color:#fff }
+body.clean-theme .bp:hover { background:#1d4ed8 }
+body.clean-theme .bg:hover { border-color:#2563eb }
+body.clean-theme .level-btn.active { background:#2563eb;color:#fff;border-color:#2563eb }
+body.clean-theme .hero-tag::before { background:#2563eb }
+body.clean-theme ::selection { background:rgba(37,99,235,.15);color:#2563eb }
+body.clean-theme .sbar.g { background:linear-gradient(90deg,#1d4ed8,#2563eb) }
+body.clean-theme .gauge-fill-r { stroke:#dc2626 }
+body.clean-theme #scroll-prog { background:#2563eb }
+body.clean-theme .prod-card.feat { border-left-color:#2563eb }
+body.clean-theme .chip { color:#2563eb;border-color:rgba(37,99,235,.2);background:rgba(37,99,235,.05) }
+body.clean-theme footer { background:#f9fafb }
+body.clean-theme #sticky { background:rgba(249,250,251,.96) }
+body.clean-theme #nav.s { background:rgba(249,250,251,.95) }
+body.clean-theme .nav-mobile { background:rgba(255,255,255,.98) }
+body.clean-theme .nav-mobile a { color:#374151 }
+body.clean-theme .nav-mobile a:hover { color:#2563eb }
+
+/* Language switcher in nav */
+.lang-switcher { display:flex;gap:2px }
+.lang-btn { background:transparent;border:1px solid var(--bdr);color:var(--t2);padding:.2rem .35rem;font:600 .55rem/1 var(--mono);cursor:pointer;transition:all .2s }
+.lang-btn:first-child { border-radius:3px 0 0 3px }
+.lang-btn:last-child { border-radius:0 3px 3px 0 }
+.lang-btn.active { background:var(--g);color:var(--black);border-color:var(--g) }
+.lang-btn:hover { border-color:var(--g) }
+body.clean-theme .lang-btn.active { color:#fff }
+
 /* ── FOCUS VISIBLE — accessibility ──────────────── */
 a:focus-visible,.bp:focus-visible,.bg:focus-visible,.nbtn:focus-visible,
 .nlinks a:focus-visible,.prod-card:focus-visible{
@@ -1005,7 +1049,9 @@ a:focus-visible,.bp:focus-visible,.bg:focus-visible,.nbtn:focus-visible,
       <li class="nh"><a href="#scale">Maturity Scale</a></li>
       <li class="nh"><a href="#research">Research</a></li>
       <li class="nh"><a href="#euact">EU AI Act</a></li>
+      <li class="nh"><div id="langSwitcherNav"></div></li>
       <li><a href="https://github.com/thewisecrab/AgentMaturityCompass" class="nbtn" target="_blank" rel="noopener">GitHub ↗</a></li>
+      <li><button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" aria-label="Toggle theme" style="background:transparent;border:1px solid var(--bdr2);color:var(--t2);padding:.3rem .5rem;font-size:.9rem;cursor:pointer;border-radius:3px;transition:all .2s;line-height:1">🖥️</button></li>
     </ul>
     <button class="menu-btn" id="menu-btn" aria-label="Toggle menu" aria-expanded="false"><span></span></button>
   </div>
@@ -1894,7 +1940,7 @@ a:focus-visible,.bp:focus-visible,.bg:focus-visible,.nbtn:focus-visible,
       <li><a href="https://github.com/thewisecrab/AgentMaturityCompass/discussions" target="_blank" rel="noopener">Community</a></li>
       <li><a href="https://github.com/thewisecrab/AgentMaturityCompass/blob/main/SECURITY.md" target="_blank" rel="noopener">Security</a></li>
     </ul>
-    <div class="fcopy">MIT License · Open Source · <a href="#" style="color:var(--t3)" aria-label="Back to top">↑ Top</a></div>
+    <div class="fcopy">MIT License · Open Source · <a href="lite.html" style="color:var(--t3)">Low bandwidth? Try our lite version</a> · <a href="#" style="color:var(--t3)" aria-label="Back to top">↑ Top</a></div>
   </div>
 </footer>
 </main>
@@ -2203,6 +2249,26 @@ function showOS(id) {
     }).catch(() => {}); // silent fail
 })();
 
+/* ── THEME TOGGLE ───────────────────────────────── */
+function toggleTheme() {
+  const isClean = document.body.classList.toggle('clean-theme');
+  document.getElementById('themeToggle').textContent = isClean ? '☀️' : '🖥️';
+  try { localStorage.setItem('amc-theme', isClean ? 'clean' : 'terminal'); } catch(e) {}
+  // Stop rain animation in clean theme
+  if(isClean) { document.getElementById('rain').style.display = 'none'; }
+  else { document.getElementById('rain').style.display = ''; }
+}
+(function initTheme() {
+  try {
+    const saved = localStorage.getItem('amc-theme');
+    if (saved === 'clean') {
+      document.body.classList.add('clean-theme');
+      const btn = document.getElementById('themeToggle');
+      if(btn) btn.textContent = '☀️';
+    }
+  } catch(e) {}
+})();
+
 /* ── SCROLL EXIT FADE ───────────────────────────── */
 (function(){
   const io = new IntersectionObserver(entries => {
@@ -2216,6 +2282,11 @@ function showOS(id) {
   }, { threshold: 0, rootMargin: '-10% 0px -10% 0px' });
   document.querySelectorAll('section > .w > .slabel, section > .w > h2, section > .w > .dims-split, section > .w > .gap-split').forEach(el => io.observe(el));
 })();
+</script>
+<script src="i18n.js"></script>
+<script>
+  AMC_I18N.createSwitcher(document.getElementById('langSwitcherNav'));
+  AMC_I18N.setLang(AMC_I18N.getLang());
 </script>
 </body>
 </html>

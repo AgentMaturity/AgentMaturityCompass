@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agent Maturity Compass — Lite</title>
+<meta name="description" content="AMC scores AI agents on trustworthiness from actual execution behavior. Lite version for slow connections.">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;line-height:1.6;color:#e0ffe0;background:#010801;max-width:800px;margin:0 auto;padding:1rem}
+a{color:#00ff41;text-decoration:none}a:hover{text-decoration:underline}
+h1{font-size:1.8rem;color:#00ff41;margin-bottom:.5rem}
+h2{font-size:1.3rem;color:#00ff41;margin:2rem 0 .75rem;border-bottom:1px solid rgba(0,255,65,.15);padding-bottom:.5rem}
+h3{font-size:1rem;color:#00cc33;margin:1rem 0 .5rem}
+p{margin-bottom:.75rem;color:#b8d8b8}
+.hero{text-align:center;padding:3rem 0 2rem}
+.hero p{max-width:500px;margin:0 auto .75rem}
+.btn{display:inline-block;background:#00ff41;color:#000;font-weight:700;padding:.6rem 1.5rem;margin:.25rem;font-size:.9rem}
+.btn-o{background:transparent;border:1px solid #00ff41;color:#00ff41}
+.stats{display:flex;flex-wrap:wrap;gap:1rem;justify-content:center;margin:1.5rem 0}
+.stat{text-align:center;min-width:100px}
+.stat b{display:block;font-size:1.5rem;color:#00ff41}
+.stat span{font-size:.75rem;color:#7aaa7a}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem;margin:1.5rem 0}
+.card{border:1px solid rgba(0,255,65,.12);padding:1rem;background:rgba(0,20,0,.5)}
+.card h3{margin-top:0}
+.scale{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:.5rem;margin:1rem 0}
+.level{padding:.75rem;border:1px solid rgba(0,255,65,.12);text-align:center}
+.level b{display:block;font-size:1.2rem;margin-bottom:.25rem}
+.l0 b{color:#ff3355}.l1 b{color:#ff6622}.l2 b{color:#f59e0b}.l3 b{color:#b0d020}.l4 b{color:#00cc33}.l5 b{color:#00ff41}
+details{margin:.75rem 0;border:1px solid rgba(0,255,65,.12);padding:.75rem}
+summary{cursor:pointer;color:#00ff41;font-weight:600}
+details p{margin:.5rem 0 0;font-size:.9rem}
+.chips{display:flex;flex-wrap:wrap;gap:.4rem;margin:1rem 0}
+.chip{font-size:.75rem;padding:.25rem .5rem;border:1px solid rgba(0,255,65,.12);color:#00cc33}
+footer{margin-top:3rem;padding:1.5rem 0;border-top:1px solid rgba(0,255,65,.12);text-align:center;font-size:.8rem;color:#7aaa7a}
+nav{display:flex;justify-content:space-between;align-items:center;padding:.5rem 0;border-bottom:1px solid rgba(0,255,65,.12);margin-bottom:1rem;flex-wrap:wrap;gap:.5rem}
+nav a{font-size:.8rem;color:#7aaa7a}nav a:hover{color:#00ff41}
+.nav-brand{font-weight:700;color:#00ff41;font-size:1rem}
+@media(max-width:480px){body{padding:.75rem}h1{font-size:1.4rem}.stats{flex-direction:column;align-items:center}}
+</style>
+</head>
+<body>
+
+<nav>
+  <span class="nav-brand">🧭 AMC</span>
+  <div>
+    <a href="./">← Full version (with animations)</a> ·
+    <a href="playground.html">Playground</a> ·
+    <a href="https://github.com/thewisecrab/AgentMaturityCompass">GitHub</a>
+  </div>
+</nav>
+
+<div class="hero">
+  <h1>🧭 Agent Maturity Compass</h1>
+  <p>Your AI agent says it's safe. AMC proves whether it is — from execution evidence, not documentation. MIT licensed, open source.</p>
+  <div>
+    <a href="playground.html" class="btn">🎯 Score Your Agent</a>
+    <a href="https://github.com/thewisecrab/AgentMaturityCompass" class="btn btn-o">GitHub →</a>
+  </div>
+  <div class="stats">
+    <div class="stat"><b>84pt</b><span>Average gap between<br>claimed & real score</span></div>
+    <div class="stat"><b>2 min</b><span>Zero to first<br>verified score</span></div>
+    <div class="stat"><b>14+</b><span>Frameworks<br>supported</span></div>
+    <div class="stat"><b>2,723</b><span>Tests<br>passing</span></div>
+  </div>
+</div>
+
+<h2>👥 Who Is This For?</h2>
+<div class="cards">
+  <div class="card">
+    <h3>👔 Business Leaders</h3>
+    <p>Your company uses AI. Your board asks "is it safe?" AMC gives you a number — L0 (dangerous) to L5 (trustworthy) — backed by proof, not promises.</p>
+  </div>
+  <div class="card">
+    <h3>🎨 No-Code Users</h3>
+    <p>Built a chatbot with Bubble, Zapier, or Make? <a href="playground.html">Use the playground</a> to score your AI's safety — just answer 15 questions.</p>
+  </div>
+  <div class="card">
+    <h3>⚖️ Compliance Officers</h3>
+    <p>EU AI Act mandates L3+ for high-risk AI by August 2026. AMC maps directly to Articles 9, 12, 13, 14, and 17.</p>
+  </div>
+</div>
+
+<h2>⚡ How It Works</h2>
+<div class="cards">
+  <div class="card">
+    <h3>1. Connect</h3>
+    <p>Run <code>amc init</code> in your project. AMC sets up a proxy between your agent and the AI API. One environment variable, no code changes.</p>
+  </div>
+  <div class="card">
+    <h3>2. Observe</h3>
+    <p>AMC captures every API call, tool use, and decision with cryptographic signatures. The agent can't forge its own evidence.</p>
+  </div>
+  <div class="card">
+    <h3>3. Score</h3>
+    <p>140 diagnostic questions across 5 trust dimensions produce an L0–L5 maturity score. Cryptographically sealed and verifiable offline.</p>
+  </div>
+</div>
+
+<h2>📐 Five Trust Dimensions</h2>
+<div class="cards">
+  <div class="card"><h3>🏛️ Strategic Agent Ops</h3><p>Mission clarity, scope adherence, decision traceability. 18 questions.</p></div>
+  <div class="card"><h3>🛡️ Skills</h3><p>Injection defense, DLP, least-privilege execution. 38 questions.</p></div>
+  <div class="card"><h3>🔄 Resilience</h3><p>Graceful degradation, circuit breakers, error recovery. 33 questions.</p></div>
+  <div class="card"><h3>📊 Leadership & Autonomy</h3><p>Structured logs, traces, cost tracking, human oversight. 23 questions.</p></div>
+  <div class="card"><h3>🧬 Culture & Alignment</h3><p>Testing, benchmarks, feedback loops, truthfulness. 26 questions.</p></div>
+</div>
+
+<h2>📏 Maturity Scale</h2>
+<div class="scale">
+  <div class="level l0"><b>L0</b>Running With Scissors</div>
+  <div class="level l1"><b>L1</b>Basic Guardrails</div>
+  <div class="level l2"><b>L2</b>Managed</div>
+  <div class="level l3"><b>L3</b>Defined (EU minimum)</div>
+  <div class="level l4"><b>L4</b>Verified</div>
+  <div class="level l5"><b>L5</b>Optimizing</div>
+</div>
+
+<h2>🔌 Supported Frameworks</h2>
+<div class="chips">
+  <span class="chip">LangChain</span><span class="chip">LangGraph</span><span class="chip">CrewAI</span>
+  <span class="chip">AutoGen</span><span class="chip">OpenAI Agents SDK</span><span class="chip">LlamaIndex</span>
+  <span class="chip">Semantic Kernel</span><span class="chip">Claude Code</span><span class="chip">Gemini</span>
+  <span class="chip">OpenClaw</span><span class="chip">OpenHands</span><span class="chip">Python AMC SDK</span>
+  <span class="chip">Any CLI Agent</span><span class="chip">OpenAI-Compatible</span>
+</div>
+
+<h2>🛠️ Quick Start</h2>
+<div class="card" style="background:#020e02;font-family:monospace;font-size:.85rem;line-height:1.8">
+  <code style="color:#00ff41">$ npm i -g agent-maturity-compass</code><br>
+  <code style="color:#7aaa7a">$ amc init</code><br>
+  <code style="color:#7aaa7a">$ amc quickscore</code><br>
+  <code style="color:#00ff41">✓ AMC Score: 3.5 / 5.0 — Defined (L3)</code>
+</div>
+
+<h2>❓ FAQ</h2>
+<details>
+  <summary>What is AMC?</summary>
+  <p>Agent Maturity Compass is an open-source framework for scoring AI agent trustworthiness from execution evidence — not self-reported claims. It uses cryptographic evidence chains and 140 diagnostic questions.</p>
+</details>
+<details>
+  <summary>What is the 84-point gap?</summary>
+  <p>When scored using keyword matching, an AI agent scores 100/100. When AMC evaluates the same agent using execution-verified evidence, the real score is 16/100. That 84-point gap is documentation inflation.</p>
+</details>
+<details>
+  <summary>Is AMC free?</summary>
+  <p>Yes. MIT licensed, fully open source. Free forever.</p>
+</details>
+<details>
+  <summary>Do I need to code?</summary>
+  <p>No! Use the <a href="playground.html">playground</a> to score your agent by answering 15 questions. No installation needed.</p>
+</details>
+
+<footer>
+  <p>🧭 Agent Maturity Compass · MIT License · Open Source</p>
+  <p>
+    <a href="./">Full Version</a> · 
+    <a href="playground.html">Playground</a> · 
+    <a href="https://github.com/thewisecrab/AgentMaturityCompass">GitHub</a> · 
+    <a href="https://github.com/thewisecrab/AgentMaturityCompass/blob/main/docs/GETTING_STARTED.md">Docs</a>
+  </p>
+</footer>
+
+</body>
+</html>

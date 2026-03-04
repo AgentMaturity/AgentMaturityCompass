@@ -5,12 +5,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AMC Playground — Score Your AI Agent</title>
 <style>
-  :root { --bg: #020802; --g: #00ff41; --t1: #e0ffe0; --t2: #88aa88; --mono: 'JetBrains Mono', monospace; --bdr: rgba(0,255,65,.12); }
+  :root { --bg: #020802; --g: #00ff41; --t1: #e0ffe0; --t2: #88aa88; --mono: 'JetBrains Mono', monospace; --bdr: rgba(0,255,65,.12); --t0: #1a1a1a; }
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { background: var(--bg); color: var(--t1); font-family: var(--mono), monospace; min-height: 100vh; padding: 2rem; }
+  body { background: var(--bg); color: var(--t1); font-family: var(--mono), monospace; min-height: 100vh; padding: 2rem; transition: background .4s, color .4s; }
   .container { max-width: 900px; margin: 0 auto; }
   h1 { color: var(--g); font-size: 1.8rem; margin-bottom: .5rem; }
   .subtitle { color: var(--t2); margin-bottom: 2rem; font-size: .85rem; }
+  .top-bar { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: .5rem; margin-bottom: 1rem; }
+  .top-bar-left { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
   .dim-section { border: 1px solid var(--bdr); border-radius: 6px; padding: 1.5rem; margin-bottom: 1.5rem; }
   .dim-title { color: var(--g); font-size: 1rem; font-weight: 700; margin-bottom: .75rem; }
   .dim-desc { color: var(--t2); font-size: .75rem; margin-bottom: 1rem; }
@@ -38,30 +40,78 @@
   .q-eli5 { color: var(--t2); font-size: .7rem; margin: .25rem 0 .5rem; font-style: italic; opacity: .8; line-height: 1.4; }
   .share-result { background: rgba(0,255,65,.08); border: 1px dashed var(--g); border-radius: 6px; padding: 1rem; margin-top: 1rem; display: none; text-align: center; }
   .share-result textarea { width: 100%; background: #000; color: var(--g); border: 1px solid var(--bdr); border-radius: 3px; padding: .5rem; font: .7rem var(--mono); resize: none; height: 80px; }
-  .nav-back { color: var(--g); text-decoration: none; font-size: .8rem; display: inline-block; margin-bottom: 1rem; }
+  .nav-back { color: var(--g); text-decoration: none; font-size: .8rem; display: inline-block; }
   .progress-bar { height: 4px; background: var(--bdr); border-radius: 2px; margin-bottom: 1rem; }
   .progress-fill { height: 100%; background: var(--g); border-radius: 2px; transition: width .3s; }
   @media (max-width: 600px) { .dim-scores { grid-template-columns: 1fr; } .score-big { font-size: 2rem; } }
+
+  /* Language switcher */
+  .lang-switcher { display: flex; gap: 2px; }
+  .lang-btn { background: transparent; border: 1px solid var(--bdr); color: var(--t2); padding: .2rem .4rem; font: 600 .6rem var(--mono); cursor: pointer; transition: all .2s; }
+  .lang-btn:first-child { border-radius: 3px 0 0 3px; }
+  .lang-btn:last-child { border-radius: 0 3px 3px 0; }
+  .lang-btn.active { background: var(--g); color: #000; border-color: var(--g); }
+  .lang-btn:hover { border-color: var(--g); }
+
+  /* Theme toggle */
+  .theme-toggle { background: transparent; border: 1px solid var(--bdr); color: var(--t2); padding: .3rem .6rem; font-size: 1rem; cursor: pointer; border-radius: 3px; transition: all .2s; line-height: 1; }
+  .theme-toggle:hover { border-color: var(--g); }
+
+  /* Clean theme overrides */
+  body.clean-theme { --bg: #ffffff; --g: #2563eb; --t1: #1a1a1a; --t2: #6b7280; --bdr: rgba(37,99,235,.15); --t0: #1a1a1a; font-family: 'Inter', system-ui, sans-serif; }
+  body.clean-theme .score-panel { background: rgba(255,255,255,.95); border-color: #2563eb; }
+  body.clean-theme .share-result textarea { background: #f9fafb; color: #1a1a1a; border-color: rgba(37,99,235,.2); }
+  body.clean-theme .level-btn.active { background: #2563eb; color: #fff; }
+  body.clean-theme .btn { background: #2563eb; color: #fff; }
+  body.clean-theme .btn-outline { border-color: #2563eb; color: #2563eb; background: transparent; }
+  body.clean-theme .btn-outline:hover { background: rgba(37,99,235,.08); }
+
+  /* Tour overlay */
+  .tour-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.7); z-index: 9998; display: none; }
+  .tour-overlay.active { display: block; }
+  .tour-highlight { position: relative; z-index: 9999; box-shadow: 0 0 0 4px var(--g), 0 0 20px rgba(0,255,65,.3); border-radius: 6px; }
+  .tour-tooltip { position: fixed; z-index: 10000; background: var(--bg); border: 2px solid var(--g); border-radius: 8px; padding: 1.25rem; max-width: 360px; box-shadow: 0 4px 30px rgba(0,0,0,.5); }
+  .tour-tooltip h3 { color: var(--g); font-size: .9rem; margin-bottom: .5rem; }
+  .tour-tooltip p { color: var(--t1); font-size: .8rem; line-height: 1.5; margin-bottom: 1rem; }
+  .tour-controls { display: flex; gap: .5rem; justify-content: flex-end; }
+  .tour-controls button { font: 600 .7rem var(--mono); padding: .3rem .8rem; border-radius: 3px; cursor: pointer; border: 1px solid var(--bdr); background: transparent; color: var(--t2); transition: all .2s; }
+  .tour-controls button:hover { border-color: var(--g); color: var(--t1); }
+  .tour-controls .tour-next { background: var(--g); color: #000; border-color: var(--g); }
+  .tour-step-indicator { color: var(--t2); font-size: .65rem; margin-bottom: .5rem; }
+  body.clean-theme .tour-tooltip { background: #fff; border-color: #2563eb; }
+  body.clean-theme .tour-highlight { box-shadow: 0 0 0 4px #2563eb, 0 0 20px rgba(37,99,235,.3); }
 </style>
 </head>
 <body>
 
+<div class="tour-overlay" id="tourOverlay"></div>
+<div class="tour-tooltip" id="tourTooltip" style="display:none"></div>
+
 <div class="container">
-  <a href="./" class="nav-back">← Back to AMC</a>
-  <h1>🧭 AMC Playground</h1>
-  <p class="subtitle">Rate your AI agent on 15 key questions. Get an instant maturity score. No install required.</p>
+  <div class="top-bar">
+    <div class="top-bar-left">
+      <a href="./" class="nav-back" data-i18n="navBack">← Back to AMC</a>
+      <button class="btn btn-outline" onclick="startTour()" style="font-size:.7rem;padding:.3rem .8rem;text-transform:none" data-i18n="btnTakeTour">🎓 Take the Tour</button>
+    </div>
+    <div style="display:flex;align-items:center;gap:.5rem">
+      <div id="langSwitcherPlayground"></div>
+      <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" aria-label="Toggle theme">🖥️</button>
+    </div>
+  </div>
+  <h1 data-i18n="playgroundTitle">🧭 AMC Playground</h1>
+  <p class="subtitle" data-i18n="playgroundSubtitle">Rate your AI agent on 15 key questions. Get an instant maturity score. No install required.</p>
   
   <div class="progress-bar"><div class="progress-fill" id="progress" style="width:0%"></div></div>
   
   <div class="score-panel" id="scorePanel">
     <div class="score-big" id="compositeScore">L0</div>
-    <div class="score-label">AMC Maturity Level · <span id="compositeNum">0</span>/100</div>
+    <div class="score-label"><span data-i18n="scoreLabel">AMC Maturity Level</span> · <span id="compositeNum">0</span>/100</div>
     <div class="dim-scores" id="dimScores"></div>
-    <div class="actions">
-      <button class="btn" onclick="copyBadge()">📋 Copy Badge</button>
-      <button class="btn btn-outline" onclick="exportJSON()">📄 Export JSON</button>
-      <button class="btn btn-outline" onclick="resetAll()">🔄 Reset</button>
-      <button class="btn btn-outline" onclick="shareResults()">📤 Share Results</button>
+    <div class="actions" id="actionButtons">
+      <button class="btn" onclick="copyBadge()" data-i18n="btnCopyBadge">📋 Copy Badge</button>
+      <button class="btn btn-outline" onclick="exportJSON()" data-i18n="btnExportJSON">📄 Export JSON</button>
+      <button class="btn btn-outline" onclick="resetAll()" data-i18n="btnReset">🔄 Reset</button>
+      <button class="btn btn-outline" onclick="shareResults()" data-i18n="btnShare">📤 Share Results</button>
     </div>
     <div class="share-result" id="shareResult">
       <p style="color:var(--t2);font-size:.75rem;margin-bottom:.5rem">Copy and share your assessment:</p>
@@ -275,6 +325,117 @@ function resetAll() {
 }
 
 render();
+</script>
+<script src="i18n.js"></script>
+<script>
+/* ── i18n integration ─────────────────────────── */
+AMC_I18N.createSwitcher(document.getElementById('langSwitcherPlayground'));
+window.addEventListener('amc-lang-change', () => render());
+
+/* ── THEME TOGGLE ─────────────────────────────── */
+function toggleTheme() {
+  const isClean = document.body.classList.toggle('clean-theme');
+  document.getElementById('themeToggle').textContent = isClean ? '☀️' : '🖥️';
+  try { localStorage.setItem('amc-theme', isClean ? 'clean' : 'terminal'); } catch(e) {}
+}
+(function initTheme() {
+  try {
+    const saved = localStorage.getItem('amc-theme');
+    if (saved === 'clean') {
+      document.body.classList.add('clean-theme');
+      document.getElementById('themeToggle').textContent = '☀️';
+    }
+  } catch(e) {}
+})();
+
+/* ── GUIDED TOUR ──────────────────────────────── */
+const TOUR_STEPS = [
+  { target: 'h1', titleKey: 'tourStep1Title', bodyKey: 'tourStep1Body' },
+  { target: '.dim-section', titleKey: 'tourStep2Title', bodyKey: 'tourStep2Body' },
+  { target: '.question', titleKey: 'tourStep3Title', bodyKey: 'tourStep3Body' },
+  { target: '#scorePanel', titleKey: 'tourStep4Title', bodyKey: 'tourStep4Body' },
+  { target: '#actionButtons', titleKey: 'tourStep5Title', bodyKey: 'tourStep5Body' },
+];
+
+let tourStep = 0;
+let tourActive = false;
+let prevHighlight = null;
+
+function startTour() {
+  tourStep = 0;
+  tourActive = true;
+  showTourStep();
+}
+
+function showTourStep() {
+  const overlay = document.getElementById('tourOverlay');
+  const tooltip = document.getElementById('tourTooltip');
+
+  // Remove old highlight
+  if (prevHighlight) prevHighlight.classList.remove('tour-highlight');
+
+  if (tourStep >= TOUR_STEPS.length) {
+    endTour();
+    return;
+  }
+
+  const step = TOUR_STEPS[tourStep];
+  const el = document.querySelector(step.target);
+  if (!el) { tourStep++; showTourStep(); return; }
+
+  overlay.classList.add('active');
+  el.classList.add('tour-highlight');
+  prevHighlight = el;
+  el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+  const rect = el.getBoundingClientRect();
+  const t = AMC_I18N.t.bind(AMC_I18N);
+
+  tooltip.innerHTML = `
+    <div class="tour-step-indicator">Step ${tourStep + 1} / ${TOUR_STEPS.length}</div>
+    <h3>${AMC_I18N.t(step.titleKey)}</h3>
+    <p>${AMC_I18N.t(step.bodyKey)}</p>
+    <div class="tour-controls">
+      ${tourStep > 0 ? `<button onclick="tourPrev()">${AMC_I18N.t('tourBack')}</button>` : ''}
+      <button onclick="endTour()">${AMC_I18N.t('tourSkip')}</button>
+      <button class="tour-next" onclick="tourNext()">${tourStep < TOUR_STEPS.length - 1 ? AMC_I18N.t('tourNext') : AMC_I18N.t('tourFinish')}</button>
+    </div>
+  `;
+  tooltip.style.display = 'block';
+
+  // Position tooltip
+  const ttRect = tooltip.getBoundingClientRect();
+  let top = rect.bottom + 12;
+  let left = rect.left + (rect.width / 2) - (ttRect.width / 2);
+  if (top + ttRect.height > window.innerHeight) top = rect.top - ttRect.height - 12;
+  if (left < 8) left = 8;
+  if (left + ttRect.width > window.innerWidth - 8) left = window.innerWidth - ttRect.width - 8;
+  tooltip.style.top = top + 'px';
+  tooltip.style.left = left + 'px';
+}
+
+function tourNext() { tourStep++; showTourStep(); }
+function tourPrev() { if (tourStep > 0) { tourStep--; showTourStep(); } }
+
+function endTour() {
+  tourActive = false;
+  document.getElementById('tourOverlay').classList.remove('active');
+  document.getElementById('tourTooltip').style.display = 'none';
+  if (prevHighlight) { prevHighlight.classList.remove('tour-highlight'); prevHighlight = null; }
+  try { localStorage.setItem('amc-tour-done', '1'); } catch(e) {}
+}
+
+// Auto-start tour for first-time visitors
+(function() {
+  try {
+    if (!localStorage.getItem('amc-tour-done')) {
+      setTimeout(startTour, 800);
+    }
+  } catch(e) {}
+})();
+
+// Apply i18n on load
+AMC_I18N.setLang(AMC_I18N.getLang());
 </script>
 </body>
 </html>
