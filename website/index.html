@@ -330,7 +330,7 @@ footer{background:var(--black);border-top:1px solid var(--bdr);padding:2.25rem 0
 
 .hstats{display:flex;flex-wrap:wrap;gap:1.5rem 2.5rem}
 .hstat{}
-.hnum{font:700 1.8rem/1 var(--mono);color:var(--g);text-shadow:var(--gsm);display:block;margin-bottom:.3rem}
+.hnum{font:700 1.6rem/1 var(--mono);color:var(--g);text-shadow:var(--gsm);display:block;margin-bottom:.3rem}
 .hlabel{font:500 .65rem/1 var(--mono);color:var(--t3);letter-spacing:.12em;text-transform:uppercase}
 
 /* GAP SECTION */
@@ -898,6 +898,15 @@ body.clean-theme .feat-card-cmd{color:#1d4ed8;background:#f3f4f6}
 @media(max-width:700px){.more-grid.open{grid-template-columns:1fr}}
 body.clean-theme .more-toggle{border-color:#e5e7eb;color:#9ca3af}
 body.clean-theme .more-toggle:hover{color:#374151;border-color:#d1d5db}
+
+/* ── SMOOTH HOVER + CARD LIFT ── */
+.feat-card,.bc,.prod-card,.jour-card{transition:transform .25s ease,box-shadow .25s ease}
+body:not(.clean-theme) .feat-card:hover,body:not(.clean-theme) .bc:hover,body:not(.clean-theme) .prod-card:hover{box-shadow:0 0 20px rgba(0,255,65,.08)}
+body.clean-theme .feat-card:hover,body.clean-theme .bc:hover,body.clean-theme .prod-card:hover{box-shadow:0 8px 32px rgba(0,0,0,.1)}
+
+/* ── SECTION HEADING STAGGER ── */
+.slabel{transition:opacity .5s ease,transform .5s ease}
+.section-visible .slabel{opacity:1;transform:translateY(0)}
 
 /* Gap section */
 body.clean-theme .gap-alert { background:rgba(220,38,38,.05);border-color:rgba(220,38,38,.2) }
@@ -1820,6 +1829,11 @@ a:focus-visible,.bp:focus-visible,.bg:focus-visible,.nbtn:focus-visible,
   </div>
 
   <!-- Category: Academic Research (2025-2026) -->
+  <button class="more-toggle" onclick="toggleVoices()" id="voices-more-btn" aria-expanded="false" style="margin:1.5rem auto 0;display:flex">
+    <span class="chevron">▼</span> <span id="voices-more-text">Research &amp; policy citations (5 more)</span>
+  </button>
+  <div id="voices-more-grid" style="display:none;max-width:1000px;margin:1.5rem auto 0">
+
   <div style="font:.65rem/1 var(--mono);color:var(--t3);text-transform:uppercase;letter-spacing:.15em;margin-bottom:1rem;padding-left:.5rem">Peer-Reviewed Research (2025–2026)</div>
   <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1rem;max-width:1000px;margin:0 auto 1.75rem">
     <blockquote style="background:var(--card);border:1px solid var(--bdr);border-left:3px solid var(--r);border-radius:6px;padding:1.25rem;margin:0">
@@ -1847,6 +1861,8 @@ a:focus-visible,.bp:focus-visible,.bg:focus-visible,.nbtn:focus-visible,
       <p style="color:var(--t0);font:.9rem/1.7 var(--sans);margin-bottom:1rem;font-style:italic">"Static permissions are structurally decoupled from runtime trust states. This trust-authorization mismatch is the root cause of prompt injection, tool poisoning, and delegation attacks."</p>
       <footer style="color:var(--t3);font:.75rem/1.4 var(--mono)">— Shi, Du, Wang et al.<br><span style="color:var(--t4)">arXiv 2512.06914 · Trust-Auth SoK, Dec 2025</span></footer>
     </blockquote>
+  </div>
+
   </div>
 
   <p style="text-align:center;margin-top:2rem;color:var(--t2);font:.8rem/1.6 var(--sans)">
@@ -1928,9 +1944,12 @@ a:focus-visible,.bp:focus-visible,.bg:focus-visible,.nbtn:focus-visible,
     </div>
   </div>
 
-  <!-- TECH ARCHITECTURE -->
+  <!-- TECH ARCHITECTURE — collapsible -->
   <div class="to">
-    <div class="arch-split">
+    <button class="more-toggle" onclick="toggleArch()" id="arch-more-btn" aria-expanded="false" style="margin:1rem 0">
+      <span class="chevron">▼</span> <span id="arch-more-text">Detailed architecture diagram</span>
+    </button>
+    <div class="arch-split" id="arch-detail" style="display:none">
       <div>
         <div class="adiag" aria-label="AMC system architecture">
           <div class="anode"><span class="anode-icon">🤖</span><div><div class="anode-label">Your Agent (untrusted)</div><div class="anode-sub">LangChain / CrewAI / OpenAI SDK / any framework</div></div></div>
@@ -2186,21 +2205,12 @@ a:focus-visible,.bp:focus-visible,.bg:focus-visible,.nbtn:focus-visible,
       <button class="copy-btn" onclick="copyCode(this)" aria-label="Copy command">Copy</button>
       <div class="clibar"><div class="cdot" style="background:#ff5f57"></div><div class="cdot" style="background:#febc2e"></div><div class="cdot" style="background:#28c840"></div><span style="font:500 .65rem/1 var(--mono);color:var(--t3);margin-left:.5rem">amc assurance run</span></div>
       <div class="cbody">
-        <div class="cl"><span class="cp">$</span><span class="cc">amc assurance run --scope security --pack injection,zombie,economic-dos</span></div>
-        <span class="co g">✓ Loaded 3 packs — 28 scenarios total</span>
-        <span class="co d">  Running injection scenarios (12)...</span>
-        <span class="co g">  direct_injection           PASS   3ms</span>
-        <span class="co g">  indirect_injection         PASS   5ms</span>
-        <span class="co a">  encoded_injection          FAIL   agent decoded + executed</span>
-        <span class="co a">  cache_poisoning            FAIL   cross-turn persistence detected</span>
-        <span class="co d">  Running zombie persistence (8)...</span>
-        <span class="co a">  session_n5_trigger         FAIL   payload survived compaction</span>
-        <span class="co d">  Running economic-dos (8)...</span>
-        <span class="co g">  tool_chain_cost_cap        PASS   within 2x baseline</span>
-        <span class="co a">  mcp_amplification_658x     FAIL   cost inflated 312x, answer correct</span>
-        <span class="co" style="margin-top:.5rem;color:var(--t4)">  ──────────────────────────────────────────────────────</span>
-        <span class="co b">→ 21/28 passed  |  7 failures  |  Evidence: sealed #9c4e…a7f0 (Ed25519)</span>
-        <span class="co b">  Run: amc report latest  |  Share: amc quickscore --share</span>
+        <div class="cl"><span class="cp">$</span><span class="cc">amc assurance run --pack injection,zombie,economic-dos</span></div>
+        <span class="co g">✓ 3 packs · 28 scenarios</span>
+        <span class="co a">  encoded_injection    FAIL  agent decoded + executed</span>
+        <span class="co a">  session_n5_trigger   FAIL  payload survived compaction</span>
+        <span class="co a">  mcp_amplification    FAIL  cost inflated 312×</span>
+        <span class="co b" style="margin-top:.25rem">→ 21/28 passed | Evidence: #9c4e…a7f0 (Ed25519)</span>
       </div>
     </div>
   </div>
@@ -2210,37 +2220,12 @@ a:focus-visible,.bp:focus-visible,.bg:focus-visible,.nbtn:focus-visible,
 <div class="dv"><i aria-hidden="true"></i></div>
 
 <!-- ADAPTERS + QUICKSTART -->
-<section id="adapters" aria-labelledby="adp-h">
-<div class="w">
-  <div class="slabel"><span class="slabel-num">11</span><em>Integrations</em></div>
-  <h2 class="adp-h2" id="adp-h">Works With Any Agent. Wraps Any Framework.</h2>
-  <p class="adp-lead">14 adapters. Any OpenAI-compatible API. Zero code changes to your agent. One environment variable.</p>
-  <div class="chips" role="list" aria-label="Supported frameworks">
-    <span class="chip" role="listitem">LangChain</span><span class="chip" role="listitem">LangGraph</span><span class="chip" role="listitem">CrewAI</span><span class="chip" role="listitem">AutoGen</span><span class="chip" role="listitem">OpenAI Agents SDK</span><span class="chip" role="listitem">LlamaIndex</span><span class="chip" role="listitem">Semantic Kernel</span><span class="chip" role="listitem">Claude Code</span><span class="chip" role="listitem">Gemini</span><span class="chip" role="listitem">OpenClaw</span><span class="chip" role="listitem">OpenHands</span><span class="chip" role="listitem">Python AMC SDK</span><span class="chip" role="listitem">Any CLI Agent</span><span class="chip" role="listitem">OpenAI-Compatible</span>
-  </div>
-  <div class="term" role="region" aria-label="Quick start terminal">
-    <button class="copy-btn" onclick="copyCode(this,'npm i -g agent-maturity-compass')" aria-label="Copy install command">Copy</button>
-    <div class="tbar"><div class="cdot" style="background:#ff5f57"></div><div class="cdot" style="background:#febc2e"></div><div class="cdot" style="background:#28c840"></div><span style="font:500 .65rem/1 var(--mono);color:var(--t3);margin-left:.5rem">Zero to first score — 2 minutes</span></div>
-    <div class="tbody">
-      <div class="cl"><span class="cp">$</span><span class="cc">npm i -g agent-maturity-compass</span></div>
-      <span class="co g">✓ Installed agent-maturity-compass@latest</span>
-      <div class="cl" style="margin-top:.7rem"><span class="cp">$</span><span class="cc">mkdir my-agent && cd my-agent && amc init</span></div>
-      <span class="co g">🧭 AMC workspace initialized</span>
-      <span class="co d">   Generating Ed25519 keypair... done</span>
-      <span class="co d">   Gateway config signed...     done</span>
-      <span class="co d">   Set OPENAI_BASE_URL=http://localhost:4200/v1</span>
-      <div class="cl" style="margin-top:.7rem"><span class="cp">$</span><span class="cc">amc quickscore</span></div>
-      <span class="co d">   Running 140 diagnostic questions...</span>
-      <span class="co g">✓ Strategic Agent Ops    ···· 3.8 / 5.0</span>
-      <span class="co g">✓ Skills                 ···· 4.1 / 5.0</span>
-      <span class="co g">✓ Resilience             ···· 3.4 / 5.0</span>
-      <span class="co g">✓ Leadership &amp; Autonomy  ···· 3.5 / 5.0</span>
-      <span class="co a">⚠ Culture &amp; Alignment    ···· 2.3 / 5.0  ← needs attention</span>
-      <span class="co d">   ───────────────────────────────────────</span>
-      <span class="co g">   AMC Score: 3.5 / 5.0  —  Defined (L3)</span>
-      <span class="co b">   Evidence: ✓ Merkle root 9c4e…a7f0 (Ed25519)</span>
-      <span class="co b">   Share: amc quickscore --share  →  generates shareable report link</span>
-    </div>
+<section id="adapters" aria-labelledby="adp-h" style="padding:clamp(32px,4vw,56px) 0">
+<div class="w" style="text-align:center">
+  <h2 style="font:700 1.1rem/1.3 var(--mono);color:var(--g);margin-bottom:.5rem" id="adp-h">Works With Any Agent</h2>
+  <p style="color:var(--t2);font:.82rem/1.5 var(--sans);margin-bottom:1.5rem">14 adapters. Any OpenAI-compatible API. Zero code changes. One env var.</p>
+  <div class="chips" role="list" aria-label="Supported frameworks" style="justify-content:center">
+    <span class="chip" role="listitem">LangChain</span><span class="chip" role="listitem">CrewAI</span><span class="chip" role="listitem">AutoGen</span><span class="chip" role="listitem">OpenAI SDK</span><span class="chip" role="listitem">LlamaIndex</span><span class="chip" role="listitem">Semantic Kernel</span><span class="chip" role="listitem">Claude Code</span><span class="chip" role="listitem">Gemini</span><span class="chip" role="listitem">OpenClaw</span><span class="chip" role="listitem">OpenHands</span><span class="chip" role="listitem">Python SDK</span><span class="chip" role="listitem">Any CLI Agent</span>
   </div>
 </div>
 </section>
@@ -2325,7 +2310,7 @@ a:focus-visible,.bp:focus-visible,.bg:focus-visible,.nbtn:focus-visible,
     <ul class="flinks" role="list">
       <li><a href="#platform">Platform</a></li>
       <li><a href="#how">How It Works</a></li>
-      <li><a href="#sector-packs">Domain Packs</a></li>
+      <li><a href="#arsenal">Coverage</a></li>
       <li><a href="#scale">Maturity Scale</a></li>
       <li><a href="#euact">EU AI Act</a></li>
       <li><a href="https://github.com/thewisecrab/AgentMaturityCompass" target="_blank" rel="noopener">GitHub</a></li>
@@ -2563,6 +2548,28 @@ function showTab(id) {
   if(btn) { btn.classList.add('on'); btn.setAttribute('aria-selected', 'true'); }
   const pane = document.getElementById('ipane-' + id);
   if(pane) pane.classList.add('on');
+}
+
+function toggleArch() {
+  const d = document.getElementById('arch-detail');
+  const btn = document.getElementById('arch-more-btn');
+  const txt = document.getElementById('arch-more-text');
+  const open = d.style.display === 'none';
+  d.style.display = open ? '' : 'none';
+  btn.classList.toggle('open', open);
+  btn.setAttribute('aria-expanded', open);
+  txt.textContent = open ? 'Hide architecture diagram' : 'Detailed architecture diagram';
+}
+
+function toggleVoices() {
+  const grid = document.getElementById('voices-more-grid');
+  const btn = document.getElementById('voices-more-btn');
+  const txt = document.getElementById('voices-more-text');
+  const open = grid.style.display === 'none';
+  grid.style.display = open ? 'block' : 'none';
+  btn.classList.toggle('open', open);
+  btn.setAttribute('aria-expanded', open);
+  txt.textContent = open ? 'Show fewer' : 'Research & policy citations (5 more)';
 }
 
 function toggleArsenal() {
