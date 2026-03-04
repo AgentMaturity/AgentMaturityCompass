@@ -1,0 +1,35 @@
+# Agent Maturity Compass (AMC)
+
+> The credit score for AI agents. Open-source framework for scoring AI agent trustworthiness from execution evidence.
+
+## Docs
+- [Getting Started](https://thewisecrab.github.io/AgentMaturityCompass/docs/#GETTING_STARTED)
+- [Architecture](https://thewisecrab.github.io/AgentMaturityCompass/docs/#ARCHITECTURE_MAP)
+- [CLI Reference](https://thewisecrab.github.io/AgentMaturityCompass/docs/#CLI_WRAPPERS)
+- [API Reference](https://thewisecrab.github.io/AgentMaturityCompass/docs/#API_SURFACES)
+- [Adapters](https://thewisecrab.github.io/AgentMaturityCompass/docs/#ADAPTERS)
+- [Security](https://thewisecrab.github.io/AgentMaturityCompass/docs/#SECURITY)
+- [EU AI Act Compliance](https://thewisecrab.github.io/AgentMaturityCompass/docs/#EU_AI_ACT_COMPLIANCE)
+- [Scoring & Dimensions](https://thewisecrab.github.io/AgentMaturityCompass/docs/#DIAGNOSTIC_BANK)
+- [Governance](https://thewisecrab.github.io/AgentMaturityCompass/docs/#GOVERNANCE)
+
+## Install
+npm i -g agent-maturity-compass
+
+## Quick Score
+amc init && amc quickscore --share
+
+## Key Concepts
+- L0-L5 maturity scale based on execution evidence
+- Ed25519 + Merkle tree cryptographic proof chains
+- 140 core diagnostic questions, 5 trust dimensions
+- 14 framework adapters (LangChain, CrewAI, AutoGen, etc.)
+- Evidence trust tiers: SELF_REPORTED (0.4x), OBSERVED (1.0x), CRYPTOGRAPHIC (1.0x)
+
+## Links
+- [Website](https://thewisecrab.github.io/AgentMaturityCompass/)
+- [GitHub](https://github.com/thewisecrab/AgentMaturityCompass)
+- [npm](https://www.npmjs.com/package/agent-maturity-compass)
+- [Comparison](https://thewisecrab.github.io/AgentMaturityCompass/compare.html)
+- [Blog](https://thewisecrab.github.io/AgentMaturityCompass/blog.html)
+- [Changelog](https://thewisecrab.github.io/AgentMaturityCompass/changelog.html)

@@ -7,7 +7,8 @@
 <link rel="manifest" href="manifest.json">
 <script defer data-domain="thewisecrab.github.io" src="https://plausible.io/js/script.js"></script>
 <style>
-  :root { --bg: #020802; --g: #00ff41; --t1: #e0ffe0; --t2: #88aa88; --mono: 'JetBrains Mono', monospace; --bdr: rgba(0,255,65,.12); --t0: #1a1a1a; }
+  :root { --bg: #020802; --g: #00ff41; --t1: #e0ffe0; --t2: #8cc88c; --mono: 'JetBrains Mono', monospace; --bdr: rgba(0,255,65,.12); --t0: #1a1a1a; }
+  *:focus-visible { outline: 2px solid var(--g); outline-offset: 2px; }
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { background: var(--bg); color: var(--t1); font-family: var(--mono), monospace; min-height: 100vh; padding: 2rem; transition: background .4s, color .4s; }
   .container { max-width: 900px; margin: 0 auto; }
@@ -462,5 +463,6 @@ function endTour() {
 // Apply i18n on load
 AMC_I18N.setLang(AMC_I18N.getLang());
 </script>
+<script>if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');</script>
 </body>
 </html>

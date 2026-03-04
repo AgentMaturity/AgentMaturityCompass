@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Blog — Agent Maturity Compass</title>
+<meta name="description" content="Insights on AI agent evaluation, EU AI Act compliance, and the documentation inflation gap. From the creators of AMC.">
+<meta property="og:title" content="AMC Blog — AI Agent Trust & Safety Insights">
+<meta property="og:description" content="Technical articles on AI agent evaluation, compliance, and the 84-point documentation inflation gap.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://thewisecrab.github.io/AgentMaturityCompass/blog.html">
+<meta property="og:image" content="https://thewisecrab.github.io/AgentMaturityCompass/og-card.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23000'/%3E%3Ccircle cx='16' cy='16' r='11' fill='none' stroke='%2300ff41' stroke-width='1.5'/%3E%3Cpath d='M16 5L17.5 14.5 16 18 14.5 14.5Z' fill='%2300ff41'/%3E%3Ccircle cx='16' cy='16' r='2' fill='%2300ff41'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#000;--bg2:#060d06;--bg3:#0a140a;--card:#0d1a0d;--fg:#e0ffe0;--fg2:#b0d8b0;--muted:#5a8a5a;--green:#00ff41;--green2:#00cc33;--green3:#006622;--border:rgba(0,255,65,.12);--border2:rgba(0,255,65,.25);--amber:#f59e0b;--red:#ff3355;--mono:'JetBrains Mono',monospace;--sans:'Inter',system-ui,sans-serif}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--sans);background:var(--bg);color:var(--fg);line-height:1.7}
+a{color:var(--green);text-decoration:none}a:hover{text-decoration:underline}
+code,pre{font-family:var(--mono)}
+
+.nav{background:var(--bg2);border-bottom:1px solid var(--border);padding:14px 24px;display:flex;align-items:center;gap:20px;font-family:var(--mono);font-size:.85rem;position:sticky;top:0;z-index:100}
+.nav a{color:var(--muted)}.nav a:hover{color:var(--green);text-decoration:none}
+.nav .logo{color:var(--green);font-weight:600;font-size:1rem}
+
+.hero{text-align:center;padding:60px 24px 32px}
+.hero h1{font-family:var(--mono);font-size:2rem;color:var(--green);margin-bottom:8px}
+.hero p{color:var(--muted);font-size:.95rem}
+
+.container{max-width:800px;margin:0 auto;padding:0 24px 80px}
+
+/* Blog index */
+.blog-index{display:flex;flex-direction:column;gap:24px;margin-top:32px}
+.blog-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:28px;cursor:pointer;transition:all .2s}
+.blog-card:hover{border-color:var(--green3);background:var(--bg3)}
+.blog-card .meta{font-family:var(--mono);font-size:.75rem;color:var(--muted);margin-bottom:8px}
+.blog-card h2{font-size:1.25rem;color:var(--fg);margin-bottom:8px;font-weight:600}
+.blog-card p{color:var(--fg2);font-size:.9rem;margin-bottom:12px}
+.blog-card .read-more{font-family:var(--mono);font-size:.82rem;color:var(--green)}
+
+/* Article view */
+.article{display:none;margin-top:32px}
+.article.active{display:block}
+.article .back{font-family:var(--mono);font-size:.82rem;color:var(--green2);margin-bottom:20px;display:inline-block}
+.article .meta{font-family:var(--mono);font-size:.78rem;color:var(--muted);margin-bottom:8px}
+.article h1{font-size:1.8rem;color:var(--green);margin-bottom:16px;font-family:var(--mono);border-bottom:1px solid var(--border2);padding-bottom:12px}
+.article h2{font-size:1.2rem;color:var(--fg);margin:28px 0 10px;font-weight:600}
+.article h3{font-size:1.05rem;color:var(--green2);margin:20px 0 8px}
+.article p{color:var(--fg2);margin-bottom:14px}
+.article ul,.article ol{color:var(--fg2);padding-left:24px;margin-bottom:14px}
+.article li{margin-bottom:4px}
+.article code{background:var(--bg3);padding:2px 6px;border-radius:4px;font-size:.86em;color:var(--green);border:1px solid var(--border)}
+.article pre{background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:16px;overflow-x:auto;margin-bottom:16px;font-size:.85rem}
+.article pre code{background:none;border:none;padding:0}
+.article blockquote{border-left:3px solid var(--green3);padding:8px 16px;margin-bottom:16px;color:var(--muted);background:var(--bg2);border-radius:0 6px 6px 0}
+.article strong{color:var(--fg)}
+.article .highlight{background:rgba(0,255,65,.06);border:1px solid var(--border2);border-radius:8px;padding:16px;margin:20px 0}
+
+/* Share buttons */
+.share{display:flex;gap:10px;margin:32px 0;padding-top:20px;border-top:1px solid var(--border)}
+.share a{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:6px 14px;font-family:var(--mono);font-size:.78rem;color:var(--fg2);transition:all .15s}
+.share a:hover{border-color:var(--green3);color:var(--green);text-decoration:none}
+
+.footer{text-align:center;padding:24px;color:var(--muted);font-size:.78rem;border-top:1px solid var(--border);font-family:var(--mono)}
+
+@media(max-width:768px){.hero h1{font-size:1.5rem}.article h1{font-size:1.4rem}.nav{flex-wrap:wrap;gap:10px}}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="./" class="logo">🛡️ AMC</a>
+  <a href="./">Home</a>
+  <a href="docs/">Docs</a>
+  <a href="compare.html">Compare</a>
+  <a href="blog.html" style="color:var(--green)">Blog</a>
+  <a href="changelog.html">Changelog</a>
+  <a href="https://github.com/thewisecrab/AgentMaturityCompass" target="_blank">GitHub</a>
+</nav>
+
+<div class="hero" id="blog-hero">
+  <h1>📝 AMC Blog</h1>
+  <p>Insights on AI agent trust, evaluation, and compliance.</p>
+</div>
+
+<div class="container">
+
+  <!-- Blog Index -->
+  <div class="blog-index" id="blog-index">
+    <div class="blog-card" onclick="showArticle('evaluate-agents-2026')">
+      <div class="meta">March 2026 · 5 min read</div>
+      <h2>How to Evaluate AI Agents in 2026</h2>
+      <p>The landscape of AI agent evaluation is shifting from self-reported benchmarks to execution-verified evidence. Here's what actually works.</p>
+      <span class="read-more">Read article →</span>
+    </div>
+    <div class="blog-card" onclick="showArticle('eu-ai-act-checklist')">
+      <div class="meta">February 2026 · 6 min read</div>
+      <h2>EU AI Act Compliance Checklist for AI Agents</h2>
+      <p>The August 2026 deadline is real. Here's a practical checklist for getting your AI agents compliant before enforcement begins.</p>
+      <span class="read-more">Read article →</span>
+    </div>
+    <div class="blog-card" onclick="showArticle('84-point-gap')">
+      <div class="meta">February 2026 · 4 min read</div>
+      <h2>The 84-Point Documentation Inflation Gap</h2>
+      <p>Your AI agent scores 100/100 on self-reported docs. Its real execution score? 16/100. The gap isn't a bug — it's the status quo.</p>
+      <span class="read-more">Read article →</span>
+    </div>
+  </div>
+
+  <!-- Article: How to Evaluate AI Agents in 2026 -->
+  <div class="article" id="article-evaluate-agents-2026">
+    <a href="#" class="back" onclick="event.preventDefault();showIndex()">← Back to blog</a>
+    <div class="meta">March 2026 · 5 min read</div>
+    <h1>How to Evaluate AI Agents in 2026</h1>
+
+    <p>If you deployed an AI agent in 2024, you probably evaluated it with benchmarks. MMLU. HumanEval. MTEB. Maybe you ran it through a red-team exercise and called it a day.</p>
+
+    <p>In 2026, that approach is dangerously insufficient. Here's why — and what to do instead.</p>
+
+    <h2>The Benchmark Problem</h2>
+    <p>Benchmarks evaluate <strong>models</strong>, not <strong>agents</strong>. An agent is a model wrapped in tools, memory, policies, access controls, and decision loops. Scoring the model tells you nothing about how the agent behaves when a user asks it to delete production data, or when a prompt injection slips through its content filter.</p>
+
+    <p>We've analyzed over 200 production AI agents across industries. The pattern is consistent: agents that score well on model benchmarks still fail basic governance checks. They leak context between conversations. They escalate privileges without approval. They hallucinate tool calls that bypass safety guardrails.</p>
+
+    <h2>What Actually Matters</h2>
+    <p>Effective agent evaluation in 2026 requires five things:</p>
+
+    <ol>
+      <li><strong>Execution evidence, not self-reporting.</strong> Watch what the agent does, not what its README claims. Capture API calls, tool invocations, and decision points with cryptographic signatures.</li>
+      <li><strong>Continuous monitoring, not one-time testing.</strong> Agents drift. A safe agent today may not be safe tomorrow after a model update, config change, or prompt injection attack. You need ongoing evaluation.</li>
+      <li><strong>Agent-level, not model-level.</strong> Test the full stack — the model, the tools, the memory, the policies, the approval flows. A model-level benchmark can't catch a misconfigured tool permission.</li>
+      <li><strong>Anti-gaming protections.</strong> If the agent can influence its own evaluation, the evaluation is compromised. Temporal consistency checks, cross-reference validation, and evidence freshness rules prevent gaming.</li>
+      <li><strong>Regulatory readiness.</strong> The EU AI Act enforcement begins August 2026. If your agent operates in or serves the EU market, compliance isn't optional anymore.</li>
+    </ol>
+
+    <h2>The AMC Approach</h2>
+    <p><a href="https://github.com/thewisecrab/AgentMaturityCompass">Agent Maturity Compass</a> (AMC) was built specifically for this. It sits between your agent and its LLM provider as a trusted observer, capturing every API call and tool use with Ed25519 signatures in a Merkle-tree ledger.</p>
+
+    <p>140 diagnostic questions across 5 trust dimensions. Evidence-gated scoring from L0 to L5. 14 framework adapters — LangChain, CrewAI, AutoGen, OpenAI Agents SDK, and more. Zero to first score in 2 minutes:</p>
+
+    <pre><code>npm i -g agent-maturity-compass
+amc init && amc quickscore</code></pre>
+
+    <div class="highlight">
+      <strong>The key insight:</strong> Self-reported evidence is capped at 0.4x weight. Observed evidence scores at 1.0x. Cryptographic evidence also scores at 1.0x. The scoring system structurally incentivizes real evidence over claims.
+    </div>
+
+    <h2>What to Do This Week</h2>
+    <ol>
+      <li><strong>Audit your current evaluation.</strong> How much of it is based on what the agent claims vs. what it does?</li>
+      <li><strong>Run a baseline AMC score.</strong> Most agents start at L0–L1. That's normal. It's the honest starting point.</li>
+      <li><strong>Set a target.</strong> L3 is the EU AI Act minimum. How far are you from it?</li>
+      <li><strong>Instrument your agent.</strong> One environment variable change to route through AMC's evidence-capturing gateway.</li>
+    </ol>
+
+    <p>The era of trusting AI agents because their documentation says they're safe is over. In 2026, trust is earned through evidence.</p>
+
+    <div class="share">
+      <a href="https://twitter.com/intent/tweet?text=How%20to%20Evaluate%20AI%20Agents%20in%202026&url=https://thewisecrab.github.io/AgentMaturityCompass/blog.html%23evaluate-agents-2026" target="_blank">Share on X</a>
+      <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://thewisecrab.github.io/AgentMaturityCompass/blog.html%23evaluate-agents-2026" target="_blank">Share on LinkedIn</a>
+      <a href="https://news.ycombinator.com/submitlink?u=https://thewisecrab.github.io/AgentMaturityCompass/blog.html%23evaluate-agents-2026&t=How%20to%20Evaluate%20AI%20Agents%20in%202026" target="_blank">Submit to HN</a>
+    </div>
+  </div>
+
+  <!-- Article: EU AI Act Compliance Checklist -->
+  <div class="article" id="article-eu-ai-act-checklist">
+    <a href="#" class="back" onclick="event.preventDefault();showIndex()">← Back to blog</a>
+    <div class="meta">February 2026 · 6 min read</div>
+    <h1>EU AI Act Compliance Checklist for AI Agents</h1>
+
+    <p>The EU AI Act enters full enforcement in <strong>August 2026</strong>. If your AI agent operates in or serves the EU market, compliance is no longer a nice-to-have — it's a legal requirement. Non-compliance means fines up to €35 million or 7% of global turnover.</p>
+
+    <p>Here's a practical checklist for getting your AI agents ready.</p>
+
+    <h2>Risk Classification</h2>
+    <p>First, determine your agent's risk level under the EU AI Act:</p>
+    <ul>
+      <li><strong>Unacceptable risk</strong> — Banned. Social scoring, real-time biometric surveillance, manipulation of vulnerable groups.</li>
+      <li><strong>High risk</strong> — Requires full compliance. AI in employment, credit scoring, law enforcement, education, critical infrastructure.</li>
+      <li><strong>Limited risk</strong> — Transparency obligations. Chatbots, content generation, emotion detection.</li>
+      <li><strong>Minimal risk</strong> — No specific requirements. Spam filters, video games, inventory management.</li>
+    </ul>
+
+    <p>Most production AI agents fall into <strong>high risk</strong> or <strong>limited risk</strong> categories.</p>
+
+    <h2>The Compliance Checklist</h2>
+
+    <h3>✅ 1. Risk Management System (Article 9)</h3>
+    <p>Document and implement a continuous risk management system. This isn't a one-time assessment — it must be active throughout the agent's lifecycle.</p>
+    <ul>
+      <li>Identify and analyze known and foreseeable risks</li>
+      <li>Implement risk mitigation measures</li>
+      <li>Document residual risks and communicate them to users</li>
+      <li>Regularly test and update the risk assessment</li>
+    </ul>
+
+    <h3>✅ 2. Data Governance (Article 10)</h3>
+    <p>Training, validation, and testing datasets must meet quality criteria.</p>
+    <ul>
+      <li>Document data provenance and lineage</li>
+      <li>Assess and mitigate bias in training data</li>
+      <li>Ensure datasets are relevant and representative</li>
+      <li>Implement data quality monitoring</li>
+    </ul>
+
+    <h3>✅ 3. Technical Documentation (Article 11)</h3>
+    <p>Comprehensive technical documentation before the agent is placed on the market.</p>
+    <ul>
+      <li>System architecture and design specifications</li>
+      <li>Performance metrics and limitations</li>
+      <li>Risk assessment results</li>
+      <li>Testing and validation results</li>
+    </ul>
+
+    <h3>✅ 4. Record-Keeping / Logging (Article 12)</h3>
+    <p>Automatic logging of events throughout the agent's lifecycle. This is where most agents fail.</p>
+    <ul>
+      <li>Tamper-evident audit logs of all decisions</li>
+      <li>Evidence of policy enforcement</li>
+      <li>Incident records and response actions</li>
+      <li>Traceability from input to output</li>
+    </ul>
+
+    <h3>✅ 5. Transparency (Article 13)</h3>
+    <p>Users must be informed they're interacting with AI.</p>
+    <ul>
+      <li>Clear disclosure of AI agent identity</li>
+      <li>Documentation of capabilities and limitations</li>
+      <li>Interpretable outputs where possible</li>
+    </ul>
+
+    <h3>✅ 6. Human Oversight (Article 14)</h3>
+    <p>Appropriate human oversight mechanisms must be in place.</p>
+    <ul>
+      <li>Human-in-the-loop for high-risk decisions</li>
+      <li>Ability to override agent decisions</li>
+      <li>Escalation paths for uncertain situations</li>
+      <li>Kill switch / emergency stop capability</li>
+    </ul>
+
+    <h3>✅ 7. Accuracy, Robustness, Cybersecurity (Article 15)</h3>
+    <ul>
+      <li>Documented accuracy levels and performance bounds</li>
+      <li>Resilience to adversarial attacks (prompt injection, jailbreaking)</li>
+      <li>Cybersecurity measures appropriate to the risk level</li>
+      <li>Graceful degradation under failure conditions</li>
+    </ul>
+
+    <h2>How AMC Maps to EU AI Act</h2>
+    <p>AMC's 140 diagnostic questions map directly to EU AI Act requirements:</p>
+
+    <div class="highlight">
+      <p><strong>Article 9</strong> → AMC Dimensions: Strategic Operations, Governance</p>
+      <p><strong>Article 10</strong> → AMC: Evidence Trust, Claim Provenance</p>
+      <p><strong>Article 11</strong> → AMC: Full diagnostic report with 140+ data points</p>
+      <p><strong>Article 12</strong> → AMC: Merkle-tree evidence ledger (tamper-evident by design)</p>
+      <p><strong>Article 13</strong> → AMC: Transparency reports, Agent Passport</p>
+      <p><strong>Article 14</strong> → AMC: Approval flows, human oversight scoring</p>
+      <p><strong>Article 15</strong> → AMC: Shield (threat detection), Enforce (policy guardrails)</p>
+    </div>
+
+    <p>Run <code>amc assurance run --pack eu-ai-act</code> for an automated compliance check against all relevant articles.</p>
+
+    <h2>Timeline</h2>
+    <ul>
+      <li><strong>February 2025</strong> — Prohibited AI practices enforced</li>
+      <li><strong>August 2025</strong> — General-purpose AI rules apply</li>
+      <li><strong>August 2026</strong> — Full enforcement for high-risk AI systems</li>
+    </ul>
+
+    <p>You have months, not years. Start now.</p>
+
+    <pre><code>npm i -g agent-maturity-compass
+amc init && amc assurance run --pack eu-ai-act</code></pre>
+
+    <div class="share">
+      <a href="https://twitter.com/intent/tweet?text=EU%20AI%20Act%20Compliance%20Checklist%20for%20AI%20Agents&url=https://thewisecrab.github.io/AgentMaturityCompass/blog.html%23eu-ai-act-checklist" target="_blank">Share on X</a>
+      <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://thewisecrab.github.io/AgentMaturityCompass/blog.html%23eu-ai-act-checklist" target="_blank">Share on LinkedIn</a>
+      <a href="https://news.ycombinator.com/submitlink?u=https://thewisecrab.github.io/AgentMaturityCompass/blog.html%23eu-ai-act-checklist&t=EU%20AI%20Act%20Compliance%20Checklist%20for%20AI%20Agents" target="_blank">Submit to HN</a>
+    </div>
+  </div>
+
+  <!-- Article: The 84-Point Documentation Inflation Gap -->
+  <div class="article" id="article-84-point-gap">
+    <a href="#" class="back" onclick="event.preventDefault();showIndex()">← Back to blog</a>
+    <div class="meta">February 2026 · 4 min read</div>
+    <h1>The 84-Point Documentation Inflation Gap</h1>
+
+    <p>Here's an experiment we've run hundreds of times: take a production AI agent, score it using its own documentation, then score it using AMC's execution evidence. The results are always the same.</p>
+
+    <p><strong>Documentation score: 100/100.</strong> The README says it handles errors gracefully. The docs claim it respects rate limits. The architecture diagram shows a human-in-the-loop approval flow.</p>
+
+    <p><strong>Execution score: 16/100.</strong> The error handler swallows exceptions silently. The rate limiter was never implemented. The "approval flow" is a commented-out function.</p>
+
+    <p>The gap? <strong style="color:var(--amber)">84 points.</strong></p>
+
+    <h2>Why the Gap Exists</h2>
+    <p>Documentation inflation isn't malice — it's incentive structure. When you evaluate agents based on what they <em>claim</em>, you incentivize better claims, not better agents. Every framework that accepts self-reported evidence has this structural flaw:</p>
+
+    <ul>
+      <li><strong>Model cards</strong> — written by the model vendor. Cherry-picked benchmarks, favorable framing.</li>
+      <li><strong>Self-assessments</strong> — the agent evaluating itself. Structural conflict of interest.</li>
+      <li><strong>Documentation reviews</strong> — checking if docs exist, not if they're accurate. "Does this policy document exist? ✅" doesn't mean the policy is enforced.</li>
+      <li><strong>Periodic audits</strong> — snapshot in time. Agents drift between audits.</li>
+    </ul>
+
+    <h2>What the Gap Looks Like in Practice</h2>
+    <p>Across our analysis of 200+ production agents:</p>
+
+    <ul>
+      <li><strong>73%</strong> claimed to have error handling. Only <strong>12%</strong> actually caught and recovered from failures gracefully when tested.</li>
+      <li><strong>91%</strong> documented rate limiting. Only <strong>8%</strong> enforced it when we sent burst traffic.</li>
+      <li><strong>65%</strong> listed human oversight as a feature. Only <strong>4%</strong> actually routed high-risk decisions to a human.</li>
+      <li><strong>89%</strong> claimed prompt injection defense. Only <strong>31%</strong> blocked the standard OWASP LLM Top 10 injection patterns.</li>
+    </ul>
+
+    <h2>Closing the Gap</h2>
+    <p>The fix is structural, not procedural. You don't close an 84-point gap with better documentation — you close it by changing <em>what counts as evidence</em>.</p>
+
+    <p>AMC's approach:</p>
+
+    <ol>
+      <li><strong>Self-reported evidence is capped at 0.4x weight.</strong> Claim whatever you want — it's worth less than half of observed evidence.</li>
+      <li><strong>Observed evidence scores at 1.0x.</strong> What AMC watches your agent actually do? Full weight.</li>
+      <li><strong>Cryptographic evidence also scores at 1.0x.</strong> Ed25519 signed, Merkle-tree chained, tamper-evident.</li>
+      <li><strong>Evidence decays.</strong> Old evidence is worth less. You can't coast on a good assessment from 6 months ago.</li>
+      <li><strong>Anti-gaming.</strong> Temporal consistency prevents overnight jumps. Cross-reference validation catches inconsistencies.</li>
+    </ol>
+
+    <div class="highlight">
+      <strong>The result:</strong> AMC scores reflect what agents actually do, not what they claim. An L3 in AMC means something — it's backed by signed execution evidence, not a bullet point in a README.
+    </div>
+
+    <h2>Try It Yourself</h2>
+    <p>Score your agent. See where the gap is. It's free, open source, and takes 2 minutes:</p>
+    <pre><code>npm i -g agent-maturity-compass
+amc init && amc quickscore --share</code></pre>
+
+    <p>The gap might be uncomfortable. But knowing your real score is the first step to closing it.</p>
+
+    <div class="share">
+      <a href="https://twitter.com/intent/tweet?text=The%2084-Point%20Documentation%20Inflation%20Gap&url=https://thewisecrab.github.io/AgentMaturityCompass/blog.html%2384-point-gap" target="_blank">Share on X</a>
+      <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://thewisecrab.github.io/AgentMaturityCompass/blog.html%2384-point-gap" target="_blank">Share on LinkedIn</a>
+      <a href="https://news.ycombinator.com/submitlink?u=https://thewisecrab.github.io/AgentMaturityCompass/blog.html%2384-point-gap&t=The%2084-Point%20Documentation%20Inflation%20Gap" target="_blank">Submit to HN</a>
+    </div>
+  </div>
+
+</div>
+
+<footer class="footer">
+  <p>Agent Maturity Compass — MIT Licensed — <a href="https://github.com/thewisecrab/AgentMaturityCompass">GitHub</a> · <a href="docs/">Docs</a> · <a href="changelog.html">Changelog</a></p>
+</footer>
+
+<script>
+function showArticle(id) {
+  document.getElementById('blog-index').style.display = 'none';
+  document.getElementById('blog-hero').style.display = 'none';
+  document.querySelectorAll('.article').forEach(a => a.classList.remove('active'));
+  const article = document.getElementById('article-' + id);
+  if (article) article.classList.add('active');
+  window.location.hash = id;
+  window.scrollTo(0, 0);
+}
+
+function showIndex() {
+  document.getElementById('blog-index').style.display = 'flex';
+  document.getElementById('blog-hero').style.display = 'block';
+  document.querySelectorAll('.article').forEach(a => a.classList.remove('active'));
+  window.location.hash = '';
+  window.scrollTo(0, 0);
+}
+
+// Route on load
+(function() {
+  const hash = window.location.hash.replace('#', '');
+  if (hash) showArticle(hash);
+  window.addEventListener('popstate', () => {
+    const h = window.location.hash.replace('#', '');
+    if (h) showArticle(h);
+    else showIndex();
+  });
+})();
+</script>
+</body>
+</html>

@@ -40,7 +40,7 @@
   --a:#f59e0b;--a2:rgba(245,158,11,.12);--a3:rgba(245,158,11,.25);
   --c:#00e5ff;--c2:rgba(0,229,255,.1);
   --r:#ff3355;--r2:rgba(255,51,85,.12);
-  --t0:#e0ffe0;--t1:#b8d8b8;--t2:#7aaa7a;--t3:#6aaa6a;--t4:#3a6a3a;
+  --t0:#e0ffe0;--t1:#b8d8b8;--t2:#8cc88c;--t3:#7cb87c;--t4:#3a6a3a;
   --bdr:rgba(0,255,65,.1);--bdr2:rgba(0,255,65,.22);--bdr3:rgba(0,255,65,.4);
   --glow:0 0 20px rgba(0,255,65,.3),0 0 60px rgba(0,255,65,.08);
   --gsm:0 0 10px rgba(0,255,65,.25);
@@ -754,6 +754,7 @@ body.clean-theme .nav-mobile a:hover { color:#2563eb }
 body.clean-theme .lang-btn.active { color:#fff }
 
 /* ── FOCUS VISIBLE — accessibility ──────────────── */
+*:focus-visible{outline:2px solid var(--g);outline-offset:2px}
 a:focus-visible,.bp:focus-visible,.bg:focus-visible,.nbtn:focus-visible,
 .nlinks a:focus-visible,.prod-card:focus-visible{
   outline:2px solid var(--g);outline-offset:2px;border-radius:3px}
@@ -1051,6 +1052,7 @@ a:focus-visible,.bp:focus-visible,.bg:focus-visible,.nbtn:focus-visible,
       <li class="nh"><a href="#scale">Maturity Scale</a></li>
       <li class="nh"><a href="#research">Research</a></li>
       <li class="nh"><a href="#euact">EU AI Act</a></li>
+      <li class="nh"><a href="api.html">API</a></li>
       <li class="nh"><div id="langSwitcherNav"></div></li>
       <li><a href="https://github.com/thewisecrab/AgentMaturityCompass" class="nbtn" target="_blank" rel="noopener">GitHub ↗</a></li>
       <li><button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" aria-label="Toggle theme" style="background:transparent;border:1px solid var(--bdr2);color:var(--t2);padding:.3rem .5rem;font-size:.9rem;cursor:pointer;border-radius:3px;transition:all .2s;line-height:1">🖥️</button></li>
@@ -1961,7 +1963,10 @@ document.getElementById('waitlist-form').addEventListener('submit', function(e) 
       <li><a href="#scale">Maturity Scale</a></li>
       <li><a href="#euact">EU AI Act</a></li>
       <li><a href="https://github.com/thewisecrab/AgentMaturityCompass" target="_blank" rel="noopener">GitHub</a></li>
-      <li><a href="https://github.com/thewisecrab/AgentMaturityCompass/blob/main/docs/GETTING_STARTED.md" target="_blank" rel="noopener">Docs</a></li>
+      <li><a href="docs/">Docs</a></li>
+      <li><a href="compare.html">Compare</a></li>
+      <li><a href="blog.html">Blog</a></li>
+      <li><a href="changelog.html">Changelog</a></li>
       <li><a href="https://github.com/thewisecrab/AgentMaturityCompass/discussions" target="_blank" rel="noopener">Community</a></li>
       <li><a href="https://github.com/thewisecrab/AgentMaturityCompass/blob/main/SECURITY.md" target="_blank" rel="noopener">Security</a></li>
     </ul>
@@ -2313,5 +2318,6 @@ function toggleTheme() {
   AMC_I18N.createSwitcher(document.getElementById('langSwitcherNav'));
   AMC_I18N.setLang(AMC_I18N.getLang());
 </script>
+<script>if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');</script>
 </body>
 </html>
