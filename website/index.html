@@ -1489,9 +1489,18 @@ a:focus-visible,.bp:focus-visible,.bg:focus-visible,.nbtn:focus-visible,
       <div class="hstat"><span class="hnum">2 min</span><span class="hlabel">Zero to first<br>verified score</span></div>
       <div class="hstat"><span class="hnum" data-target="14" data-suffix="+">0+</span><span class="hlabel">Frameworks<br>supported</span></div>
     </div>
-    <!-- What is an AI agent? (Simple mode only) -->
-    <div style="margin-top:1.5rem;padding:1rem 1.5rem;background:rgba(0,255,65,.05);border:1px solid rgba(0,255,65,.15);border-radius:6px;font:.85rem/1.6 var(--sans);color:var(--t2)">
-      <strong style="color:var(--g)">What's an AI agent?</strong> Any AI tool that takes actions on your behalf — writing emails, booking meetings, editing code, answering customer questions, handling money. If your AI does more than just chat, it's an agent. And it needs a trust score.
+    <!-- Before/After comparison visual -->
+    <div style="display:flex;gap:1.5rem;margin-top:2rem;flex-wrap:wrap">
+      <div style="flex:1;min-width:200px;padding:1.25rem;background:rgba(220,38,38,.06);border:1px solid rgba(220,38,38,.2);border-radius:8px;text-align:center">
+        <div style="font:.6rem/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--t3);margin-bottom:.75rem">Without AMC</div>
+        <div style="font:700 2rem/1 var(--mono);color:#ef4444;margin-bottom:.25rem">100/100</div>
+        <div style="font:.7rem/1.3 var(--mono);color:var(--t3)">Self-reported · No proof<br>Documentation says "safe"</div>
+      </div>
+      <div style="flex:1;min-width:200px;padding:1.25rem;background:rgba(0,255,65,.06);border:1px solid rgba(0,255,65,.2);border-radius:8px;text-align:center">
+        <div style="font:.6rem/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--t3);margin-bottom:.75rem">With AMC</div>
+        <div style="font:700 2rem/1 var(--mono);color:var(--g);margin-bottom:.25rem">L3 · 3.5/5</div>
+        <div style="font:.7rem/1.3 var(--mono);color:var(--t3)">Execution-verified · Ed25519 signed<br>Cryptographic proof of behavior</div>
+      </div>
     </div>
   </div>
 
