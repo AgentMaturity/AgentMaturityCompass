@@ -328,7 +328,7 @@ footer{background:var(--black);border-top:1px solid var(--bdr);padding:2.25rem 0
   cursor:pointer;transition:box-shadow .2s,border-color .2s,transform .15s}
 .bg:hover{box-shadow:var(--gsm);border-color:var(--g);transform:translateY(-2px);opacity:1}
 
-.hstats{display:flex;flex-wrap:wrap;gap:2.5rem}
+.hstats{display:flex;flex-wrap:wrap;gap:1.5rem 2.5rem}
 .hstat{}
 .hnum{font:700 1.8rem/1 var(--mono);color:var(--g);text-shadow:var(--gsm);display:block;margin-bottom:.3rem}
 .hlabel{font:500 .65rem/1 var(--mono);color:var(--t3);letter-spacing:.12em;text-transform:uppercase}
@@ -827,7 +827,7 @@ body.clean-theme .step3-code { background:#f3f4f6!important;color:#1d4ed8!import
 .score-card-dim-label{color:var(--t3);min-width:5.5rem}
 .score-card-hash{font:.6rem/1 var(--mono);color:var(--t3);border-top:1px solid var(--bdr);padding-top:.75rem;letter-spacing:.04em}
 /* light mode score card */
-body.clean-theme .score-card{background:#fff;border-color:#e5e7eb}
+body.clean-theme .score-card{background:#fff;border-color:#d1d5db;box-shadow:0 4px 24px rgba(0,0,0,.08)}
 body.clean-theme .score-card::before{background:radial-gradient(ellipse 80% 60% at 50% -10%,rgba(37,99,235,.04),transparent 70%)}
 body.clean-theme .score-card-level{color:#2563eb}
 body.clean-theme .score-card-name{color:#2563eb}
@@ -1447,7 +1447,7 @@ a:focus-visible,.bp:focus-visible,.bg:focus-visible,.nbtn:focus-visible,
 
   <!-- TOGGLE - prominently centered -->
   <div class="toggle-wrap">
-    <p style="text-align:center;font:.72rem/1 var(--mono);color:var(--t2);margin-bottom:.75rem;letter-spacing:.06em;text-transform:uppercase">Choose your view</p>
+
     <div class="toggle" role="radiogroup" aria-label="View mode" id="tgl">
       <div class="tslide" id="tslide"></div>
       <button class="tbtn" id="tbtn-s" onclick="setMode('s')" role="radio" aria-checked="false" title="Plain language — what AMC does and why it matters">
@@ -1458,8 +1458,7 @@ a:focus-visible,.bp:focus-visible,.bg:focus-visible,.nbtn:focus-visible,
       </button>
     </div>
   </div>
-  <p style="text-align:center;font:.72rem/1.5 var(--sans);color:var(--t3);margin-top:.5rem;margin-bottom:0" id="toggle-hint-s" class="so">Plain language — what AMC does and why it matters</p>
-  <p style="text-align:center;font:.72rem/1.5 var(--sans);color:var(--t3);margin-top:.5rem;margin-bottom:0" id="toggle-hint-t" class="to">CLI commands, architecture, and implementation details</p>
+
 
   <div class="hero-tag">MIT Open Source · 2,723 Tests Passing · 14 Frameworks Supported</div>
   <div class="rv" style="margin-bottom:1.5rem;display:flex;align-items:center;gap:1.5rem;flex-wrap:wrap">
@@ -1621,19 +1620,19 @@ a:focus-visible,.bp:focus-visible,.bg:focus-visible,.nbtn:focus-visible,
   <!-- PRODUCT SURFACE GRID -->
   <!-- Featured 3 modules -->
   <div class="feat3">
-    <div class="feat-card rv">
+    <div class="feat-card">
       <div class="feat-card-icon">🖥️</div>
       <div class="feat-card-title">AMC Studio</div>
       <p class="feat-card-body">Local control plane with real-time dashboard, API monitoring, and fleet management. One command spins up everything.</p>
       <span class="feat-card-cmd">amc up</span>
     </div>
-    <div class="feat-card rv d1">
+    <div class="feat-card d1">
       <div class="feat-card-icon">🛡️</div>
       <div class="feat-card-title">Gateway Proxy</div>
       <p class="feat-card-body">Transparent MITM proxy that captures every LLM API call with Ed25519 signatures. Your agent doesn't know it's being watched.</p>
       <span class="feat-card-cmd">amc gateway start</span>
     </div>
-    <div class="feat-card rv d2">
+    <div class="feat-card d2">
       <div class="feat-card-icon">🧭</div>
       <div class="feat-card-title">Agent Guide</div>
       <p class="feat-card-body">Personalized guardrails auto-generated from your score. One command applies them to AGENTS.md, CLAUDE.md, .cursorrules — 15 targets.</p>
