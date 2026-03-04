@@ -40,7 +40,7 @@
   --a:#f59e0b;--a2:rgba(245,158,11,.12);--a3:rgba(245,158,11,.25);
   --c:#00e5ff;--c2:rgba(0,229,255,.1);
   --r:#ff3355;--r2:rgba(255,51,85,.12);
-  --t0:#e0ffe0;--t1:#b8d8b8;--t2:#8cc88c;--t3:#7cb87c;--t4:#3a6a3a;
+  --t0:#e0ffe0;--t1:#b8d8b8;--t2:#8cc88c;--t3:#7cb87c;--t4:#5a9a5a;
   --bdr:rgba(0,255,65,.1);--bdr2:rgba(0,255,65,.22);--bdr3:rgba(0,255,65,.4);
   --glow:0 0 20px rgba(0,255,65,.3),0 0 60px rgba(0,255,65,.08);
   --gsm:0 0 10px rgba(0,255,65,.25);
@@ -715,11 +715,10 @@ body.clean-theme { --black:#ffffff;--bg:#f9fafb;--bg2:#f3f4f6;--bg3:#e5e7eb;--ca
   --a:#d97706;--a2:rgba(217,119,6,.08);--a3:rgba(217,119,6,.2);
   --c:#0284c7;--c2:rgba(2,132,199,.1);
   --r:#dc2626;--r2:rgba(220,38,38,.08);
-  --t0:#1a1a1a;--t1:#374151;--t2:#6b7280;--t3:#9ca3af;--t4:#d1d5db;
+  --t0:#111827;--t1:#374151;--t2:#6b7280;--t3:#9ca3af;--t4:#d1d5db;
   --bdr:rgba(37,99,235,.12);--bdr2:rgba(37,99,235,.2);--bdr3:rgba(37,99,235,.35);
   --glow:none;--gsm:none;--aglow:none;--rglow:none;
-  --mono:'Inter',system-ui,sans-serif;--sans:'Inter',system-ui,sans-serif;
-  font-family:'Inter',system-ui,sans-serif }
+  --mono:'JetBrains Mono',monospace;--sans:'Inter',system-ui,sans-serif }
 body.clean-theme #rain { display:none!important }
 body.clean-theme::before { display:none!important }
 body.clean-theme #cur,body.clean-theme #cur-ring { display:none!important }
@@ -728,21 +727,40 @@ body.clean-theme .nbtn { background:#2563eb!important;color:#fff!important }
 body.clean-theme .nbtn:hover { background:#1d4ed8!important }
 body.clean-theme .bp { background:#2563eb;color:#fff }
 body.clean-theme .bp:hover { background:#1d4ed8 }
+body.clean-theme .bg { background:#fff;border-color:rgba(37,99,235,.15) }
 body.clean-theme .bg:hover { border-color:#2563eb }
+body.clean-theme .level-btn { background:#f3f4f6;color:#374151;border-color:#e5e7eb }
 body.clean-theme .level-btn.active { background:#2563eb;color:#fff;border-color:#2563eb }
 body.clean-theme .hero-tag::before { background:#2563eb }
 body.clean-theme ::selection { background:rgba(37,99,235,.15);color:#2563eb }
 body.clean-theme .sbar.g { background:linear-gradient(90deg,#1d4ed8,#2563eb) }
 body.clean-theme .gauge-fill-r { stroke:#dc2626 }
 body.clean-theme #scroll-prog { background:#2563eb }
+body.clean-theme .prod-card { background:#fff;border-color:#e5e7eb;color:#374151 }
 body.clean-theme .prod-card.feat { border-left-color:#2563eb }
+body.clean-theme .prod-card h3 { color:#111827 }
 body.clean-theme .chip { color:#2563eb;border-color:rgba(37,99,235,.2);background:rgba(37,99,235,.05) }
-body.clean-theme footer { background:#f9fafb }
+body.clean-theme footer { background:#f9fafb;border-top:1px solid #e5e7eb;color:#6b7280 }
+body.clean-theme footer a { color:#2563eb }
 body.clean-theme #sticky { background:rgba(249,250,251,.96) }
-body.clean-theme #nav.s { background:rgba(249,250,251,.95) }
-body.clean-theme .nav-mobile { background:rgba(255,255,255,.98) }
+body.clean-theme #nav { border-bottom-color:#e5e7eb }
+body.clean-theme #nav.s { background:rgba(249,250,251,.95);border-bottom-color:#e5e7eb }
+body.clean-theme .nlogo { color:#2563eb;text-shadow:none }
+body.clean-theme .nlogo span { color:#6b7280 }
+body.clean-theme .nlinks a { color:#374151 }
+body.clean-theme .nlinks a:hover { color:#2563eb }
+body.clean-theme .nav-mobile { background:rgba(255,255,255,.98);border-color:#e5e7eb }
 body.clean-theme .nav-mobile a { color:#374151 }
 body.clean-theme .nav-mobile a:hover { color:#2563eb }
+body.clean-theme pre,body.clean-theme code { background:#f3f4f6;color:#1e40af;border-color:#e5e7eb }
+body.clean-theme .hero h1,body.clean-theme .hero .h1 { color:#111827 }
+body.clean-theme .sec-title { color:#111827 }
+body.clean-theme .sec-sub { color:#6b7280 }
+body.clean-theme table { border-color:#e5e7eb }
+body.clean-theme th { background:#f3f4f6;color:#374151;border-color:#e5e7eb }
+body.clean-theme td { border-color:#e5e7eb;color:#374151 }
+body.clean-theme .menu-btn { border-color:#d1d5db }
+body.clean-theme .menu-btn span,body.clean-theme .menu-btn span::before,body.clean-theme .menu-btn span::after { background:#374151 }
 
 /* Language switcher in nav */
 .lang-switcher { display:flex;gap:2px }
@@ -1045,17 +1063,13 @@ a:focus-visible,.bp:focus-visible,.bg:focus-visible,.nbtn:focus-visible,
   <div class="nw">
     <a href="#" class="nlogo" aria-label="AMC Home">🧭 AMC <span>/ AGENT MATURITY COMPASS</span></a>
     <ul class="nlinks" role="list">
-      <li class="nh"><a href="#platform">Platform</a></li>
       <li class="nh"><a href="#how">How It Works</a></li>
-      <li class="nh"><a href="#improve">Improve</a></li>
-      <li class="nh"><a href="#sector-packs">Domain Packs</a></li>
       <li class="nh"><a href="#scale">Maturity Scale</a></li>
-      <li class="nh"><a href="#research">Research</a></li>
       <li class="nh"><a href="#euact">EU AI Act</a></li>
-      <li class="nh"><a href="api.html">API</a></li>
-      <li class="nh"><div id="langSwitcherNav"></div></li>
+      <li class="nh"><a href="docs/">Docs</a></li>
+      <li class="nh"><a href="blog.html">Blog</a></li>
       <li><a href="https://github.com/thewisecrab/AgentMaturityCompass" class="nbtn" target="_blank" rel="noopener">GitHub ↗</a></li>
-      <li><button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" aria-label="Toggle theme" style="background:transparent;border:1px solid var(--bdr2);color:var(--t2);padding:.3rem .5rem;font-size:.9rem;cursor:pointer;border-radius:3px;transition:all .2s;line-height:1">🖥️</button></li>
+      <li><button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" aria-label="Toggle theme" style="background:transparent;border:1px solid var(--bdr2);color:var(--t2);padding:.3rem .5rem;font-size:.9rem;cursor:pointer;border-radius:3px;transition:all .2s;line-height:1">🌙</button></li>
     </ul>
     <button class="menu-btn" id="menu-btn" aria-label="Toggle menu" aria-expanded="false"><span></span></button>
   </div>
@@ -1065,13 +1079,13 @@ a:focus-visible,.bp:focus-visible,.bg:focus-visible,.nbtn:focus-visible,
     <span class="nm-logo">🧭 AMC</span>
     <button class="nm-close" id="nm-close" aria-label="Close menu">✕</button>
   </div>
-  <a href="#platform">Platform</a>
   <a href="#how">How It Works</a>
-  <a href="#improve">Improve</a>
-  <a href="#sector-packs">Domain Packs</a>
   <a href="#scale">Maturity Scale</a>
-  <a href="#research">Research</a>
   <a href="#euact">EU AI Act</a>
+  <a href="docs/">Docs</a>
+  <a href="blog.html">Blog</a>
+  <a href="api.html">API</a>
+  <a href="compare.html">Compare</a>
   <a href="https://github.com/thewisecrab/AgentMaturityCompass" class="nbtn" target="_blank" rel="noopener">View on GitHub ↗</a>
 </div>
 
@@ -2281,22 +2295,37 @@ function showOS(id) {
 })();
 
 /* ── THEME TOGGLE ───────────────────────────────── */
+function applyTheme(theme) {
+  const isClean = theme === 'clean';
+  if(isClean) { document.body.classList.add('clean-theme'); } else { document.body.classList.remove('clean-theme'); }
+  const btn = document.getElementById('themeToggle');
+  if(btn) btn.textContent = isClean ? '☀️' : '🌙';
+  const rain = document.getElementById('rain');
+  if(rain) rain.style.display = isClean ? 'none' : '';
+  // Update meta theme-color for mobile browser chrome
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if(meta) meta.setAttribute('content', isClean ? '#ffffff' : '#000000');
+}
 function toggleTheme() {
-  const isClean = document.body.classList.toggle('clean-theme');
-  document.getElementById('themeToggle').textContent = isClean ? '☀️' : '🖥️';
+  const isClean = !document.body.classList.contains('clean-theme');
+  applyTheme(isClean ? 'clean' : 'terminal');
   try { localStorage.setItem('amc-theme', isClean ? 'clean' : 'terminal'); } catch(e) {}
-  // Stop rain animation in clean theme
-  if(isClean) { document.getElementById('rain').style.display = 'none'; }
-  else { document.getElementById('rain').style.display = ''; }
 }
 (function initTheme() {
   try {
     const saved = localStorage.getItem('amc-theme');
-    if (saved === 'clean') {
-      document.body.classList.add('clean-theme');
-      const btn = document.getElementById('themeToggle');
-      if(btn) btn.textContent = '☀️';
+    if (saved === 'clean') { applyTheme('clean'); return; }
+    if (saved === 'terminal') { applyTheme('terminal'); return; }
+    // No saved preference — auto-detect from system
+    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
+      applyTheme('clean');
     }
+    // Listen for system theme changes
+    window.matchMedia('(prefers-color-scheme: light)').addEventListener('change', function(e) {
+      // Only auto-switch if user hasn't manually chosen
+      try { if(localStorage.getItem('amc-theme')) return; } catch(ex) {}
+      applyTheme(e.matches ? 'clean' : 'terminal');
+    });
   } catch(e) {}
 })();
 

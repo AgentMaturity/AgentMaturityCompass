@@ -1994,10 +1994,71 @@ program
 
 program
   .command("quickscore")
-  .description("Zero-config 5-question rapid assessment (<2 minutes)")
+  .description("Zero-config rapid assessment — auto-scores from evidence, or interactive 5-question fallback")
   .option("--json", "emit JSON output", false)
   .option("--eu-ai-act", "show EU AI Act risk classification mapping", false)
-  .action(async (opts: { json: boolean; euAiAct: boolean }) => {
+  .option("--auto", "auto-score from ledger evidence (no questions asked)", false)
+  .option("--agent <agentId>", "agent ID for auto mode")
+  .action(async (opts: { json: boolean; euAiAct: boolean; auto: boolean; agent?: string }) => {
+    // Auto mode: score from actual evidence in the ledger
+    if (opts.auto) {
+      try {
+        const agentId = opts.agent ?? activeAgent(program) ?? "default";
+        ensureWorkspaceReadyForAgent(process.cwd(), agentId);
+        const report = await runDiagnostic({ workspace: process.cwd(), window: "30d", agentId });
+        if (opts.json) { console.log(JSON.stringify(report, null, 2)); return; }
+        const avgLevel = report.layerScores.length > 0
+          ? report.layerScores.reduce((s, l) => s + l.avgFinalLevel, 0) / report.layerScores.length
+          : 0;
+        const overallLevel = Math.min(5, Math.floor(avgLevel));
+        console.log(chalk.bold("\n🧭 AMC Auto-Score — from execution evidence"));
+        console.log(chalk.gray(`Agent: ${agentId} | Status: ${report.status} | Integrity: ${report.integrityIndex.toFixed(3)}`));
+        console.log("");
+        console.log(chalk.bold(`  Overall: L${overallLevel} (${report.trustLabel})`));
+        console.log("");
+        for (const layer of report.layerScores) {
+          const lv = Math.floor(layer.avgFinalLevel);
+          const bar = "█".repeat(lv) + "░".repeat(5 - lv);
+          console.log(`  ${layer.layerName.padEnd(28)} L${lv} ${bar} (${layer.avgFinalLevel.toFixed(2)})`);
+        }
+        console.log("");
+        if (report.questionScores.length > 0) {
+          const gaps = report.questionScores.filter(q => q.finalLevel < 3).slice(0, 5);
+          if (gaps.length > 0) {
+            console.log(chalk.yellow("  Top gaps:"));
+            for (const gap of gaps) {
+              console.log(chalk.gray(`    ${gap.questionId}: L${gap.finalLevel}`));
+            }
+            console.log("");
+          }
+        }
+        console.log(chalk.gray("  Next: amc guide --go    # generate improvement plan"));
+        console.log(chalk.gray("        amc assurance run --all  # run red-team packs"));
+        if (opts.euAiAct) {
+          const euMapping: Record<number, { classification: string; status: string }> = {
+            0: { classification: "Unclassified / Unacceptable Risk", status: "❌ NOT COMPLIANT" },
+            1: { classification: "High Risk — Gaps Identified", status: "⚠️  PARTIALLY COMPLIANT" },
+            2: { classification: "High Risk — Controls Developing", status: "⚠️  IN PROGRESS" },
+            3: { classification: "High Risk — EU AI Act Minimum", status: "✅ COMPLIANT (baseline)" },
+            4: { classification: "High Risk — Exceeds Requirements", status: "✅ FULLY COMPLIANT" },
+            5: { classification: "High Risk — Gold Standard", status: "✅ EXEMPLARY" },
+          };
+          const m = euMapping[overallLevel] ?? euMapping[0]!;
+          console.log("");
+          console.log(chalk.bold("  EU AI Act: ") + m.status + chalk.gray(` (${m.classification})`));
+        }
+        console.log("");
+        return;
+      } catch (e: unknown) {
+        console.error(chalk.red(toErrorMessage(e)));
+        console.log(chalk.gray("\n  No evidence found. Run your agent through AMC first:"));
+        console.log(chalk.gray("    amc adapters run --agent <id> -- <command>"));
+        console.log(chalk.gray("    amc wrap <runtime> -- <command>"));
+        console.log(chalk.gray("\n  Or use interactive mode: amc quickscore (without --auto)"));
+        process.exit(1);
+      }
+    }
+
     const { getRapidQuestions, scoreRapidAssessment } = await import("./diagnostic/rapidQuickscore.js");
     const questions = getRapidQuestions();
     const answers: Record<string, number> = {};
