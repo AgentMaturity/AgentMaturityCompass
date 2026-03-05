@@ -1,3 +1,4 @@
+import { randomBytes } from "node:crypto";
 import { join, resolve } from "node:path";
 import inquirer from "inquirer";
 import { presetGatewayConfigForProvider, saveGatewayConfig, type GatewayConfig } from "../gateway/config.js";
@@ -207,6 +208,10 @@ export async function runQuickSetup(options: QuickSetupOptions): Promise<QuickSe
 
   let bootstrapped = false;
   if (!pathExists(join(workspace, ".amc"))) {
+    // Auto-generate vault passphrase if not set — quick setup should "just work"
+    if (!process.env.AMC_VAULT_PASSPHRASE) {
+      process.env.AMC_VAULT_PASSPHRASE = `amc-${randomBytes(16).toString("hex")}`;
+    }
     initWorkspace({ workspacePath: workspace });
     bootstrapped = true;
     logger.log("Initialized AMC workspace (.amc/)");
