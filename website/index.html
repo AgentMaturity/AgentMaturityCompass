@@ -155,7 +155,7 @@ body.mt .so{display:none!important}
 /* LAYOUT */
 main{position:relative;z-index:10}
 .w{max-width:var(--max);margin:0 auto;padding:0 clamp(1.25rem,4vw,2.5rem)}
-section{padding:clamp(72px,9vw,130px) 0;position:relative}
+section{padding:clamp(56px,7vw,96px) 0;position:relative}
 /* Soft gradient bleed between sections */
 section::before{content:'';position:absolute;top:0;left:0;right:0;height:60px;
   background:linear-gradient(to bottom,rgba(0,0,0,.4),transparent);pointer-events:none;z-index:1}
@@ -770,7 +770,8 @@ body.clean-theme .menu-btn span,body.clean-theme .menu-btn span::before,body.cle
 body.clean-theme section { border-color:#e5e7eb }
 body.clean-theme section:nth-child(even) { background:#f8f9fb }
 body.clean-theme .dv { border-color:#e5e7eb }
-body.clean-theme .dv i { background:#e5e7eb;box-shadow:none }
+body.clean-theme .dv::before { background:linear-gradient(90deg,transparent,rgba(37,99,235,.06) 20%,rgba(37,99,235,.12) 50%,rgba(37,99,235,.06) 80%,transparent)!important }
+body.clean-theme .dv i { background:#c7d2fe;box-shadow:none }
 body.clean-theme .w { color:#374151 }
 
 /* ALL headings */
@@ -834,7 +835,7 @@ body.clean-theme .step3-code { background:#f3f4f6!important;color:#1d4ed8!import
 .score-card-dim-label{color:var(--t3);min-width:5.5rem}
 .score-card-hash{font:.6rem/1 var(--mono);color:var(--t3);border-top:1px solid var(--bdr);padding-top:.75rem;letter-spacing:.04em}
 /* light mode score card */
-body.clean-theme .score-card{background:#fff;border-color:#d1d5db;box-shadow:0 4px 24px rgba(0,0,0,.08)}
+body.clean-theme .score-card{background:#fff;border-color:#c7d2fe;box-shadow:0 8px 32px rgba(37,99,235,.12),0 2px 8px rgba(0,0,0,.06)}
 body.clean-theme .score-card::before{background:radial-gradient(ellipse 80% 60% at 50% -10%,rgba(37,99,235,.04),transparent 70%)}
 body.clean-theme .score-card-level{color:#2563eb}
 body.clean-theme .score-card-name{color:#2563eb}
@@ -1049,7 +1050,7 @@ body.clean-theme .papers-mini .pcard { background:#fff }
 /* Bottom sticky bar */
 body.clean-theme #sticky { background:rgba(249,250,251,.97)!important;border-top:1px solid #e5e7eb }
 body.clean-theme #sticky strong { color:#2563eb }
-body.clean-theme #sticky a { color:#2563eb }
+body.clean-theme #sticky a:not(.bp) { color:#2563eb }
 
 /* Inline style overrides for elements using rgba(0,255,65,...) */
 body.clean-theme [style*="rgba(0,255,65"] { border-color:rgba(37,99,235,.2)!important;background-color:rgba(37,99,235,.04)!important }
