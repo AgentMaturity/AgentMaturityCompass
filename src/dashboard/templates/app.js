@@ -538,6 +538,16 @@ function renderScore(d) {
     return;
   }
 
+  /* Animate score ring */
+  const ringFill = document.getElementById('score-ring-fill');
+  if (ringFill) {
+    const pct = Math.min(overall / 5, 1);
+    const circ = 2 * Math.PI * 52; // 326.73
+    const offset = circ * (1 - pct);
+    ringFill.style.transition = 'stroke-dashoffset 1.5s cubic-bezier(.16,1,.3,1)';
+    requestAnimationFrame(() => { ringFill.style.strokeDashoffset = offset.toFixed(2); });
+  }
+
   /* Big number */
   const numEl = document.getElementById('score-num');
   if (numEl) animateCount(numEl, overall);
@@ -1537,8 +1547,24 @@ function removeLoadingSkeleton() {
   if (scoreCard && scoreCard._hadSkeleton) {
     scoreCard.innerHTML = `
       <div class="score-left">
-        <div class="score-big" id="score-num">—</div>
-        <div class="score-divider"></div>
+        <div class="score-ring-wrap">
+          <svg class="score-ring-svg" viewBox="0 0 120 120">
+            <defs>
+              <linearGradient id="ring-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="var(--accent)"/>
+                <stop offset="100%" stop-color="var(--green)"/>
+              </linearGradient>
+            </defs>
+            <circle class="score-ring-bg" cx="60" cy="60" r="52" fill="none" stroke="var(--border)" stroke-width="4"/>
+            <circle class="score-ring-fill" id="score-ring-fill" cx="60" cy="60" r="52" fill="none" stroke="url(#ring-grad)" stroke-width="4" stroke-linecap="round" stroke-dasharray="326.73" stroke-dashoffset="326.73" transform="rotate(-90 60 60)"/>
+            <circle class="score-ring-orbit" cx="60" cy="8" r="3" fill="var(--accent)" opacity=".6">
+              <animateTransform attributeName="transform" type="rotate" from="0 60 60" to="360 60 60" dur="12s" repeatCount="indefinite"/>
+            </circle>
+          </svg>
+          <div class="score-ring-inner">
+            <div class="score-big" id="score-num">—</div>
+          </div>
+        </div>
         <div class="score-meta-row">
           <div class="score-label-text" id="score-label">—</div>
           <div class="score-out-of">out of 5.0</div>
