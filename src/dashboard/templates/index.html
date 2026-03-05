@@ -162,68 +162,89 @@
         <button class="orient-dismiss" id="orient-dismiss" aria-label="Dismiss">×</button>
       </div>
 
-      <!-- ROW 1: Score Card -->
-      <div class="row c1" style="margin-bottom:16px">
-        <div class="card card--hero card-enter" style="animation-delay:0ms">
-          <div class="score-card-v2" id="score-card-inner">
-            <!-- Left: Score ring + number -->
-            <div class="score-left">
-              <div class="score-ring-wrap">
-                <svg class="score-ring-svg" viewBox="0 0 120 120">
-                  <defs>
-                    <linearGradient id="ring-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-                      <stop offset="0%" stop-color="var(--accent)"/>
-                      <stop offset="100%" stop-color="var(--green)"/>
-                    </linearGradient>
-                  </defs>
-                  <circle class="score-ring-bg" cx="60" cy="60" r="52" fill="none" stroke="var(--border)" stroke-width="4"/>
-                  <circle class="score-ring-fill" id="score-ring-fill" cx="60" cy="60" r="52" fill="none" stroke="url(#ring-grad)" stroke-width="4" stroke-linecap="round" stroke-dasharray="326.73" stroke-dashoffset="326.73" transform="rotate(-90 60 60)"/>
-                  <circle class="score-ring-orbit" cx="60" cy="8" r="3" fill="var(--accent)" opacity=".6">
-                    <animateTransform attributeName="transform" type="rotate" from="0 60 60" to="360 60 60" dur="12s" repeatCount="indefinite"/>
-                  </circle>
-                </svg>
-                <div class="score-ring-inner">
-                  <div class="score-big" id="score-num">—</div>
-                </div>
-              </div>
-              <div class="score-meta-row">
-                <div class="score-label-text" id="score-label">—</div>
-                <div class="score-out-of">out of 5.0</div>
-                <div class="score-agent-id" id="score-agent-id">default</div>
-              </div>
-              <div class="score-badges">
-                <span class="tb-badge md" id="score-trust-badge">—</span>
-                <span class="score-trend-badge" id="score-trend"></span>
-              </div>
-              <span id="score-last" style="font-size:11px;color:var(--text-tertiary);margin-top:2px"></span>
-            </div>
-            <!-- Right: Dimension bars -->
-            <div class="score-right" id="score-dim-bars">
-              <!-- Populated by JS -->
+      <!-- HERO: Score + Level + Journey -->
+      <div class="hero-panel card card--hero card-enter" style="animation-delay:0ms" id="score-card-inner">
+        <!-- Score ring column -->
+        <div class="hero-ring-col">
+          <div class="score-ring-wrap">
+            <svg class="score-ring-svg" viewBox="0 0 160 160" role="img" aria-label="Trust score ring">
+              <defs>
+                <linearGradient id="ring-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="var(--accent)"/>
+                  <stop offset="100%" stop-color="var(--green)"/>
+                </linearGradient>
+                <filter id="ring-glow">
+                  <feGaussianBlur stdDeviation="3" result="blur"/>
+                  <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                </filter>
+              </defs>
+              <circle class="score-ring-bg" cx="80" cy="80" r="68" fill="none" stroke="var(--border)" stroke-width="5"/>
+              <circle class="score-ring-fill" id="score-ring-fill" cx="80" cy="80" r="68" fill="none" stroke="url(#ring-grad)" stroke-width="5" stroke-linecap="round" stroke-dasharray="427.26" stroke-dashoffset="427.26" transform="rotate(-90 80 80)" filter="url(#ring-glow)"/>
+              <circle cx="80" cy="12" r="4" fill="var(--accent)" opacity=".8">
+                <animateTransform attributeName="transform" type="rotate" from="0 80 80" to="360 80 80" dur="14s" repeatCount="indefinite"/>
+              </circle>
+              <circle cx="80" cy="12" r="2" fill="var(--green)" opacity=".5">
+                <animateTransform attributeName="transform" type="rotate" from="180 80 80" to="540 80 80" dur="22s" repeatCount="indefinite"/>
+              </circle>
+            </svg>
+            <div class="score-ring-inner">
+              <div class="score-big" id="score-num">—</div>
+              <div class="score-denom">/ 5.0</div>
             </div>
           </div>
         </div>
-      </div>
 
-      <!-- ROW 2: Next Steps -->
-      <div class="row c1" style="margin-bottom:16px">
-        <div class="card card-enter" style="animation-delay:80ms">
-          <div class="next-steps-header">
-            <div class="next-steps-title">What to do next</div>
-            <div class="next-steps-sub">Prioritized by impact on your trust score.</div>
+        <!-- Level + journey column -->
+        <div class="hero-body-col">
+          <div class="hero-level-row">
+            <span class="hero-level-name" id="score-label">—</span>
+            <span class="tb-badge md" id="score-trust-badge">—</span>
+            <span class="score-trend-badge" id="score-trend"></span>
           </div>
-          <!-- Task cards -->
-          <div class="task-grid" id="task-grid-mount">
-            <!-- Populated by JS -->
+          <div class="hero-agent-row">
+            <span class="hero-agent-id" id="score-agent-id">default</span>
+            <span class="hero-scored-at" id="score-last"></span>
           </div>
-          <!-- Meta line -->
-          <div class="task-meta" id="stats-strip" style="margin-top:14px"></div>
-          <!-- Legacy next-actions-mount (hidden compat) -->
-          <div id="next-actions-mount" style="display:none"></div>
+
+          <!-- L0–L5 maturity journey track -->
+          <div class="maturity-track">
+            <div class="mt-labels">
+              <span>L0</span><span>L1</span><span>L2</span><span>L3</span><span>L4</span><span>L5</span>
+            </div>
+            <div class="mt-bar">
+              <div class="mt-fill" id="mt-fill"></div>
+              <div class="mt-thumb" id="mt-thumb"></div>
+              <div class="mt-segments">
+                <div class="mt-seg"></div><div class="mt-seg"></div><div class="mt-seg"></div>
+                <div class="mt-seg"></div><div class="mt-seg"></div>
+              </div>
+            </div>
+            <div class="mt-names">
+              <span>Unverified</span><span>Basic</span><span>Trusted</span><span>High Trust</span><span>Autonomous</span><span>Certified</span>
+            </div>
+          </div>
+
+          <!-- Dimension bars -->
+          <div class="score-right" id="score-dim-bars"></div>
+        </div>
+
+        <!-- Stats column -->
+        <div class="hero-stats-col" id="hero-kpis">
+          <!-- Populated by JS -->
         </div>
       </div>
 
-      <!-- ROW 3: Details (collapsible) -->
+      <!-- PRIORITY ACTIONS — horizontal list not boxes -->
+      <div class="card card-enter actions-panel" style="animation-delay:60ms">
+        <div class="actions-header">
+          <div class="actions-title">Priority Actions</div>
+          <div id="stats-strip" class="actions-stats"></div>
+        </div>
+        <div class="actions-list" id="task-grid-mount"></div>
+        <div id="next-actions-mount" style="display:none"></div>
+      </div>
+
+      <!-- DETAILS DIVIDER -->
       <div class="section-divider" id="details-toggle">
         <span class="section-divider-label">Details</span>
         <div class="section-divider-line"></div>
@@ -231,31 +252,38 @@
       </div>
 
       <div class="details-body" id="details-body">
-        <!-- Trend chart -->
-        <div class="row c1" style="margin-bottom:16px">
-          <div class="card card-enter" style="animation-delay:160ms">
+        <!-- Trend chart + 3-col side by side -->
+        <div class="row" style="grid-template-columns:1fr 1fr 1fr 1fr;gap:14px;margin-bottom:14px">
+          <!-- Trend spans 2 cols -->
+          <div class="card card-enter" style="grid-column:span 2;animation-delay:120ms">
             <div class="ch"><span class="ch-dot"></span>Score Trend</div>
-            <div class="ch-sub">Your trust score over time — spot regressions and improvements</div>
-            <div id="tl-mount" style="flex:1;position:relative;min-height:80px"></div>
+            <div class="ch-sub">Trust score over time</div>
+            <div id="tl-mount" style="position:relative;min-height:80px"></div>
           </div>
-        </div>
-
-        <!-- 3-col row: Assurance / Approvals / Value -->
-        <div class="row c3">
-          <div class="card detail-card card-enter" style="animation-delay:200ms">
+          <!-- Assurance mini -->
+          <div class="card detail-card card-enter" style="animation-delay:160ms">
             <div class="ch"><span class="ch-dot"></span>Assurance</div>
-            <div class="ch-sub">Pack pass rates</div>
+            <div class="ch-sub">Behavioral test packs</div>
             <div id="asr-summary"></div>
           </div>
-          <div class="card detail-card card-enter" style="animation-delay:240ms">
-            <div class="ch"><span class="ch-dot"></span>Approvals</div>
-            <div class="ch-sub">Human-reviewed decisions</div>
-            <div id="ap-mount"></div>
+          <!-- Approvals + Value stacked -->
+          <div style="display:flex;flex-direction:column;gap:14px">
+            <div class="card detail-card card-enter" style="animation-delay:200ms;flex:1">
+              <div class="ch"><span class="ch-dot"></span>Approvals</div>
+              <div id="ap-mount"></div>
+            </div>
+            <div class="card detail-card card-enter" style="animation-delay:240ms;flex:1">
+              <div class="ch"><span class="ch-dot"></span>Value</div>
+              <div id="val-mount"></div>
+            </div>
           </div>
-          <div class="card detail-card card-enter" style="animation-delay:280ms">
-            <div class="ch"><span class="ch-dot"></span>Value</div>
-            <div class="ch-sub">Business outcomes</div>
-            <div id="val-mount"></div>
+        </div>
+        <!-- Failure-risk indices -->
+        <div class="row c1" style="margin-bottom:14px">
+          <div class="card card-enter" style="animation-delay:280ms">
+            <div class="ch"><span class="ch-dot"></span>Failure-Risk Indices</div>
+            <div class="ch-sub">Composite risk scores across behavioral categories</div>
+            <div id="idx-mount" style="margin-top:10px"></div>
           </div>
         </div>
       </div>

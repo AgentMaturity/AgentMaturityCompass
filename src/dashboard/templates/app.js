@@ -638,6 +638,45 @@ function renderScore(d) {
     dimBarContainer.innerHTML = `<div style="font-size:12px;color:var(--text-tertiary);padding:8px 0">No dimension scores yet — run <code style="color:var(--accent)">amc quickscore</code></div>`;
   }
 
+  /* Maturity journey track L0–L5 */
+  const LEVEL_PCT = [0, 20, 40, 60, 80, 100]; // L0 thru L5
+  const levelIndex = Math.min(Math.floor(overall / 5 * 6), 5);
+  const levelPct = Math.min((overall / 5) * 100, 100);
+  const mtFill = document.getElementById('mt-fill');
+  const mtThumb = document.getElementById('mt-thumb');
+  if (mtFill && mtThumb) {
+    const col = scoreColor(overall);
+    mtFill.style.background = `linear-gradient(90deg, var(--accent), ${col})`;
+    requestAnimationFrame(() => {
+      mtFill.style.transition = 'width 1.6s cubic-bezier(.16,1,.3,1)';
+      mtFill.style.width = levelPct + '%';
+      mtThumb.style.transition = 'left 1.6s cubic-bezier(.16,1,.3,1)';
+      mtThumb.style.left = levelPct + '%';
+      mtThumb.style.background = col;
+      mtThumb.style.boxShadow = `0 0 10px ${col}`;
+    });
+  }
+
+  /* KPI sidebar column */
+  const kpiCol = document.getElementById('hero-kpis');
+  if (kpiCol) {
+    const gaps = d.evidenceGaps?.length ?? 0;
+    const packs = d.assurance?.length ?? 0;
+    const questions = d.latestRun?.questionScores?.length ?? 0;
+    const approved = d.approvalsSummary?.approved ?? 0;
+    const kpis = [
+      { label: 'Questions', value: questions, icon: '❓', color: 'var(--accent)' },
+      { label: 'Evidence Gaps', value: gaps, icon: '🔍', color: gaps > 0 ? 'var(--red)' : 'var(--green)' },
+      { label: 'Packs Run', value: packs, icon: '🛡️', color: 'var(--amber)' },
+      { label: 'Approved', value: approved, icon: '✅', color: 'var(--green)' },
+    ];
+    kpiCol.innerHTML = kpis.map(k => `
+      <div class="hero-kpi">
+        <div class="hero-kpi-value" style="color:${k.color}">${k.value}</div>
+        <div class="hero-kpi-label">${k.label}</div>
+      </div>`).join('');
+  }
+
   /* Legacy ring compat (hidden) */
   const ringN = document.querySelector('.ring-n');
   if (ringN) { ringN.style.color = scoreColor(overall); animateCount(ringN, overall); }
@@ -913,22 +952,20 @@ function renderNextActions(d) {
     return;
   }
 
-  const cols = actions.length >= 3 ? 3 : actions.length === 2 ? 2 : 1;
-  taskGrid.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+  const PRIORITY_COLORS = ['var(--red)', 'var(--amber)', 'var(--accent)', 'var(--text-tertiary)'];
 
-  taskGrid.innerHTML = actions.slice(0, 4).map((a, i) => `
-    <div class="task-card ${i === 0 ? 'priority-1' : ''}" data-nav="${a.nav}" style="cursor:pointer">
-      <div class="task-num">${i + 1}</div>
-      <div class="task-title">${esc(a.title)}</div>
-      <div class="task-body">${esc(a.body)}</div>
-      <div class="task-cmd">
+  taskGrid.innerHTML = actions.slice(0, 5).map((a, i) => `
+    <div class="action-row ${i === 0 ? 'action-row--hot' : ''}" onclick="nav('${escJs(a.nav)}')">
+      <div class="action-num" style="background:${PRIORITY_COLORS[i] ?? 'var(--text-tertiary)'}22;color:${PRIORITY_COLORS[i] ?? 'var(--text-tertiary)'};">${i + 1}</div>
+      <div class="action-content">
+        <div class="action-title">${esc(a.title)}</div>
+        <div class="action-body">${esc(a.body)}</div>
+      </div>
+      <div class="action-cta">
         <button class="action-btn" onclick="event.stopPropagation();executeAction('${escJs(a.action)}', this, '${escJs(a.cmd)}')">${esc(a.button)}</button>
       </div>
     </div>`).join('');
 
-  taskGrid.querySelectorAll('.task-card[data-nav]').forEach(card => {
-    card.addEventListener('click', () => nav(card.dataset.nav));
-  });
 }
 
 /* ── STATS STRIP ──────────────────────────────────── */
@@ -1516,20 +1553,8 @@ function buildSettings() {
 function showLoadingSkeleton() {
   const scoreCard = document.getElementById('score-card-inner');
   if (scoreCard) {
-    scoreCard.innerHTML = `
-      <div class="score-left">
-        <div class="skeleton" style="width:120px;height:72px;margin-bottom:8px"></div>
-        <div class="skeleton" style="width:32px;height:1px;margin-bottom:8px"></div>
-        <div class="skeleton" style="width:180px;height:16px;margin-bottom:6px"></div>
-        <div class="skeleton" style="width:100px;height:12px"></div>
-      </div>
-      <div class="score-right" style="display:flex;flex-direction:column;gap:14px;padding-top:4px">
-        <div class="skeleton" style="width:100%;height:5px"></div>
-        <div class="skeleton" style="width:100%;height:5px"></div>
-        <div class="skeleton" style="width:100%;height:5px"></div>
-        <div class="skeleton" style="width:100%;height:5px"></div>
-        <div class="skeleton" style="width:100%;height:5px"></div>
-      </div>`;
+    /* Dim the hero while loading */
+    scoreCard.style.opacity = '0.5';
     scoreCard._hadSkeleton = true;
   }
   const taskGrid = document.getElementById('task-grid-mount');
@@ -1545,38 +1570,7 @@ function removeLoadingSkeleton() {
   /* Restore original score card structure so renderScore can populate it */
   const scoreCard = document.getElementById('score-card-inner');
   if (scoreCard && scoreCard._hadSkeleton) {
-    scoreCard.innerHTML = `
-      <div class="score-left">
-        <div class="score-ring-wrap">
-          <svg class="score-ring-svg" viewBox="0 0 120 120">
-            <defs>
-              <linearGradient id="ring-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stop-color="var(--accent)"/>
-                <stop offset="100%" stop-color="var(--green)"/>
-              </linearGradient>
-            </defs>
-            <circle class="score-ring-bg" cx="60" cy="60" r="52" fill="none" stroke="var(--border)" stroke-width="4"/>
-            <circle class="score-ring-fill" id="score-ring-fill" cx="60" cy="60" r="52" fill="none" stroke="url(#ring-grad)" stroke-width="4" stroke-linecap="round" stroke-dasharray="326.73" stroke-dashoffset="326.73" transform="rotate(-90 60 60)"/>
-            <circle class="score-ring-orbit" cx="60" cy="8" r="3" fill="var(--accent)" opacity=".6">
-              <animateTransform attributeName="transform" type="rotate" from="0 60 60" to="360 60 60" dur="12s" repeatCount="indefinite"/>
-            </circle>
-          </svg>
-          <div class="score-ring-inner">
-            <div class="score-big" id="score-num">—</div>
-          </div>
-        </div>
-        <div class="score-meta-row">
-          <div class="score-label-text" id="score-label">—</div>
-          <div class="score-out-of">out of 5.0</div>
-          <div class="score-agent-id" id="score-agent-id">default</div>
-        </div>
-        <div class="score-badges">
-          <span class="tb-badge md" id="score-trust-badge">—</span>
-          <span class="score-trend-badge" id="score-trend"></span>
-        </div>
-        <span id="score-last" style="font-size:11px;color:var(--text-tertiary);margin-top:2px"></span>
-      </div>
-      <div class="score-right" id="score-dim-bars"></div>`;
+    scoreCard.style.opacity = '';
     delete scoreCard._hadSkeleton;
   }
   /* Task grid will be overwritten by renderNextActions */
