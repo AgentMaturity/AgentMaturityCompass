@@ -106,8 +106,16 @@ async function getGuide(agent = 'default') {
   );
 }
 
+async function execCommand(command) {
+  return amcApiWithFallback(
+    ['/exec', '/studio/exec'],
+    { method: 'POST', body: JSON.stringify({ command }) }
+  );
+}
+
 window.AMC_API = AMC_API;
 window.amcApi = amcApi;
+window.execCommand = execCommand;
 window.checkStudio = checkStudio;
 window.runQuickscore = runQuickscore;
 window.runAssurancePack = runAssurancePack;

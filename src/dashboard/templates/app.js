@@ -259,6 +259,8 @@ function showViewToast(text, tone = 'info') {
   if (!toast) {
     toast = document.createElement('div');
     toast.id = 'view-toast';
+    toast.setAttribute('role', 'status');
+    toast.setAttribute('aria-live', 'polite');
     toast.style.cssText = `
       position:fixed;top:64px;left:50%;transform:translateX(-50%) translateY(-8px);
       background:var(--bg-overlay);border:1px solid var(--border-strong);border-radius:8px;
@@ -581,7 +583,7 @@ function renderScore(d) {
   const lastTs = d.trends?.slice(-1)[0]?.ts;
   if (lastTs) {
     const mins = Math.round((Date.now() - lastTs) / 60000);
-    const agoStr = mins < 60 ? `${mins}m ago` : mins < 1440 ? `${Math.round(mins/60)}h ago` : `${Math.round(mins/1440)}d ago`;
+    const agoStr = mins < 1 ? 'just now' : mins < 60 ? `${mins}m ago` : mins < 1440 ? `${Math.round(mins/60)}h ago` : `${Math.round(mins/1440)}d ago`;
     const fr = document.getElementById('tb-freshness');
     if (fr) fr.textContent = agoStr;
     const sl = document.getElementById('score-last');
@@ -1263,6 +1265,7 @@ function asrCard(p) {
     <div class="asr-info">
       <div class="asr-name" title="${esc(p.packId)}">${esc(short)}</div>
       <div class="asr-sub" style="color:var(--text-tertiary)">✓${p.passCount}&nbsp;✗${p.failCount}</div>
+      <button class="action-btn" style="margin-top:6px;font-size:10px;padding:4px 8px" onclick="event.stopPropagation();executeAction('assurance:${escJs(p.packId)}', this, 'amc assurance run ${escJs(p.packId)}')">Run Pack ▸</button>
     </div>
   </div>`;
 }
@@ -1272,9 +1275,15 @@ function buildAf() {
   const packs = G.data.assurance || [];
   const el = document.getElementById('af-mount');
   if (!el) return;
-  el.innerHTML = packs.length
-    ? `<div class="asr-grid">${packs.map(asrCard).join('')}</div>`
-    : '<div class="empty"><span class="empty-i">🛡️</span><span class="empty-t">No assurance runs yet</span></div>';
+  if (packs.length) {
+    const failing = packs.filter(p => p.score0to100 < 75);
+    const headerAction = failing.length
+      ? `<button class="action-btn" style="font-size:10px;padding:5px 10px" onclick="event.stopPropagation();(async()=>{for(const p of ${esc(JSON.stringify(failing.map(p=>p.packId)))}){await executeAction('assurance:'+p,this,'amc assurance run '+p);}})()">Run ${failing.length} Failing ▸</button>`
+      : '';
+    el.innerHTML = `<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px"><span style="font-size:12px;color:var(--text-secondary)">${packs.length} packs scored</span>${headerAction}</div><div class="asr-grid">${packs.map(asrCard).join('')}</div>`;
+  } else {
+    el.innerHTML = '<div class="empty"><span class="empty-i">🛡️</span><span class="empty-t">No assurance runs yet</span><button class="action-btn" style="margin-top:10px" onclick="executeAction(\'assurance:sycophancy\', this, \'amc assurance run sycophancy\')">Run First Pack ▸</button></div>';
+  }
   const idx = G.data.indices?.indices || [];
   const idxEl = document.getElementById('idx-mount');
   if (!idxEl) return;
@@ -1293,11 +1302,18 @@ function buildEv() {
   const gaps = G.data.evidenceGaps || [];
   const el = document.getElementById('ev-mount');
   if (!el) return;
-  el.innerHTML = gaps.length ? gaps.map(g => `<div class="ev-item">
-    <div class="ev-dot" style="background:var(--red)"></div>
-    <span class="ev-qid">${esc(g.questionId)}</span>
-    <span class="ev-r">${esc(g.reason)}</span>
-  </div>`).join('') : '<div class="empty"><span class="empty-i">✅</span><span class="empty-t">No evidence gaps — full execution proof for all scored questions.</span></div>';
+  if (gaps.length) {
+    el.innerHTML = `<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+      <span style="font-size:12px;color:var(--text-secondary)">${gaps.length} evidence gap${gaps.length > 1 ? 's' : ''} found</span>
+      <button class="action-btn" style="font-size:10px;padding:5px 10px" onclick="executeAction('manual', this, 'amc evidence collect')">Collect Evidence ▸</button>
+    </div>${gaps.map(g => `<div class="ev-item">
+      <div class="ev-dot" style="background:var(--red)"></div>
+      <span class="ev-qid">${esc(g.questionId)}</span>
+      <span class="ev-r">${esc(g.reason)}</span>
+    </div>`).join('')}`;
+  } else {
+    el.innerHTML = '<div class="empty"><span class="empty-i">✅</span><span class="empty-t">No evidence gaps — full execution proof for all scored questions.</span></div>';
+  }
   const eoc = G.data.eoc || {};
   const cols = [['Education', eoc.education || []], ['Ownership', eoc.ownership || []], [`Commitment (${eoc.days || 14}d)`, eoc.commitment || []]];
   const eocEl = document.getElementById('eoc-mount');
@@ -1310,9 +1326,69 @@ function buildEv() {
     </div>`).join('')}</div>`;
 }
 
+/* ── TERMINAL COMMAND EXECUTION ────────────────────── */
+function initTerminal() {
+  const input = document.getElementById('cli-input');
+  const runBtn = document.getElementById('cli-run');
+  const output = document.getElementById('cli-output');
+  if (!input || !runBtn || !output) return;
+
+  const history = [];
+  let histIdx = -1;
+
+  async function runCommand() {
+    const cmd = input.value.trim();
+    if (!cmd) return;
+    history.unshift(cmd);
+    histIdx = -1;
+    input.value = '';
+
+    const fullCmd = cmd.startsWith('amc ') ? cmd : `amc ${cmd}`;
+    const ts = new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    output.innerHTML += `<div class="cli-entry"><span class="cli-ts">${ts}</span> <span class="cli-cmd-echo">$ ${esc(fullCmd)}</span></div>`;
+
+    const spinner = document.createElement('div');
+    spinner.className = 'cli-entry cli-running';
+    spinner.innerHTML = '<span class="spin" style="display:inline-block;width:10px;height:10px;border:2px solid rgba(99,102,241,.3);border-top-color:var(--accent);border-radius:50%;animation:spin .6s linear infinite"></span> Running…';
+    output.appendChild(spinner);
+    output.scrollTop = output.scrollHeight;
+
+    try {
+      const res = await amcApi('/exec', {
+        method: 'POST',
+        body: JSON.stringify({ command: fullCmd })
+      });
+      spinner.remove();
+      const text = typeof res === 'string' ? res : (res.output || res.stdout || res.raw || JSON.stringify(res, null, 2));
+      const exitCode = res.exitCode ?? res.code ?? 0;
+      const cls = exitCode === 0 ? 'cli-ok' : 'cli-err';
+      output.innerHTML += `<div class="cli-entry ${cls}"><pre class="cli-pre">${esc(text)}</pre></div>`;
+      if (exitCode !== 0) {
+        output.innerHTML += `<div class="cli-entry cli-err" style="font-size:10px;opacity:.7">exit ${exitCode}</div>`;
+      }
+    } catch (err) {
+      spinner.remove();
+      const msg = err instanceof Error ? err.message : String(err);
+      output.innerHTML += `<div class="cli-entry cli-err"><pre class="cli-pre">${esc(msg)}</pre><div style="font-size:10px;color:var(--text-tertiary);margin-top:4px">Tip: Start Studio with <code>amc up</code> to enable remote execution</div></div>`;
+    }
+    output.scrollTop = output.scrollHeight;
+  }
+
+  runBtn.addEventListener('click', runCommand);
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') { e.preventDefault(); runCommand(); }
+    if (e.key === 'ArrowUp') { e.preventDefault(); if (history.length) { histIdx = Math.min(histIdx + 1, history.length - 1); input.value = history[histIdx] ?? ''; } }
+    if (e.key === 'ArrowDown') { e.preventDefault(); histIdx = Math.max(histIdx - 1, -1); input.value = histIdx >= 0 ? (history[histIdx] ?? '') : ''; }
+  });
+
+  /* Show helpful commands on first load */
+  output.innerHTML = `<div class="cli-entry" style="color:var(--text-tertiary);font-size:11px">Type a command (e.g. <code style="color:var(--accent)">quickscore</code>, <code style="color:var(--accent)">doctor --json</code>, <code style="color:var(--accent)">domain assess --domain health</code>)</div>`;
+}
+
 /* ── FLEET ────────────────────────────────────────── */
 function buildFleet() {
   G.ff = true;
+  initTerminal();
   const st = G.data.studioHome || {};
   const sfields = [
     { l: 'Studio', v: st.running ? 'Running' : 'Stopped', c: st.running ? 'ok' : 'bad' },

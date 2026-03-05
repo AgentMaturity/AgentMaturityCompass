@@ -125,12 +125,21 @@
     `;
   }
 
+  const SECURITY_GUARDRAILS = ['prompt-injection-detection', 'data-exfiltration-guard', 'rate-limiter', 'output-toxicity-filter'];
+
   async function onToggle(id, button) {
     const guardrails = window.__amcGuardrailsCache || [];
     const item = guardrails.find((row) => row.id === id);
     if (!item) return;
 
     const nextEnabled = !item.enabled;
+
+    /* Confirm before disabling security-critical guardrails */
+    if (!nextEnabled && SECURITY_GUARDRAILS.includes(id)) {
+      const ok = confirm(`⚠️ Disable "${item.name}"?\n\nThis is a security guardrail. Disabling it may expose your agent to risks.`);
+      if (!ok) return;
+    }
+
     const originalText = button.textContent;
     button.disabled = true;
     button.textContent = '…';
