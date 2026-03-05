@@ -470,6 +470,7 @@ import { configExplainCli, configPrintCli } from "./config/configCli.js";
 import { runBootstrap } from "./bootstrap/bootstrap.js";
 import { registerQuickSetupCommand } from "./setup/quickSetupCli.js";
 import { registerDomainApplyCommand } from "./domains/domainApplyCli.js";
+import { registerReplCommand } from "./repl/replCli.js";
 import {
   defaultReleaseKeyPaths,
   releaseInitCli,
@@ -1259,6 +1260,7 @@ program
 
 
 registerQuickSetupCommand(program);
+registerReplCommand(program);
 
 program
   .command("improve")
@@ -14083,7 +14085,7 @@ program
     console.log(renderComponentConfidenceMarkdown(cc));
   });
 
-program.action((_opts, command: Command) => {
+program.action(async (_opts, command: Command) => {
   const rootArgs = command.args ?? [];
   if (rootArgs.length > 0) {
     const unknownToken = String(rootArgs[0]);
@@ -14100,7 +14102,14 @@ program.action((_opts, command: Command) => {
     return;
   }
 
-  // Welcome screen — shown when user just types `amc`
+  // Interactive REPL when TTY
+  if (process.stdin.isTTY) {
+    const { startRepl } = await import("./repl/amcRepl.js");
+    await startRepl();
+    return;
+  }
+
+  // Welcome screen — shown when piped/non-interactive
   const hasWorkspace = existsSync(".amc");
 
   console.log("");
