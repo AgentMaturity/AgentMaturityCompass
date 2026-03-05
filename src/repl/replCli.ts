@@ -9,7 +9,11 @@ export function registerReplCommand(program: Command): void {
     .command("shell")
     .description("Interactive AMC session — natural language + commands")
     .option("--agent <id>", "Agent to use", "default")
-    .action(async (opts: { agent?: string }) => {
+    .option("--no-color", "Disable colored output")
+    .action(async (opts: { agent?: string; color?: boolean }) => {
+      if (opts.color === false) {
+        process.env["NO_COLOR"] = "1";
+      }
       const { startRepl } = await import("./amcRepl.js");
       await startRepl({ agent: opts.agent });
     });
