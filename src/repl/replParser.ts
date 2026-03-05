@@ -250,8 +250,8 @@ const NATURAL_MAPPINGS: NaturalMapping[] = [
   },
   {
     patterns: [/^compare$/i, /^diff$/i, /^what.*changed/i, /^delta$/i, /^before.*after/i],
-    command: "compare",
-    description: "Comparing scoring runs",
+    command: "history",
+    description: "Showing run history (use 'amc compare <runA> <runB>' with specific IDs)",
   },
 
   // ════════════════════════════════════════════════════
@@ -313,9 +313,14 @@ const NATURAL_MAPPINGS: NaturalMapping[] = [
     description: "Showing target profile",
   },
   {
-    patterns: [/^glossary$/i, /^define\s+(\w+)/i, /^what.*(?:mean|definition)/i],
-    command: "glossary",
-    description: "Opening glossary",
+    patterns: [/^glossary$/i, /^what.*(?:mean|definition)/i],
+    command: "glossary --help",
+    description: "Opening glossary (use 'glossary lookup <term>' to search)",
+  },
+  {
+    patterns: [/^define\s+(.+)/i, /^glossary\s+lookup\s+(.+)/i, /^look\s*up\s+(.+)/i],
+    command: "glossary lookup $1",
+    description: "Looking up term",
   },
   {
     patterns: [/^version$/i, /^what.*version/i, /^v$/i],

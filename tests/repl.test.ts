@@ -215,11 +215,11 @@ describe("REPL parser — reports & history", () => {
   });
 
   it("parses 'compare' as compare", () => {
-    expect(parseInput("compare").command).toBe("compare");
+    expect(parseInput("compare").command).toBe("history");
   });
 
   it("parses 'what changed' as compare", () => {
-    expect(parseInput("what changed").command).toBe("compare");
+    expect(parseInput("what changed").command).toBe("history");
   });
 
   it("parses 'how am I progressing' as history", () => {
