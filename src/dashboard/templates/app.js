@@ -137,6 +137,12 @@ function buildCommandPalette() {
         <span style="font:400 11px/1 'JetBrains Mono',monospace;color:var(--text-tertiary)">ESC</span>
       </div>
       <div id="cmd-results" style="max-height:340px;overflow-y:auto;padding:6px"></div>
+      <div style="padding:8px 16px 12px;border-top:1px solid var(--border);display:flex;gap:16px;flex-wrap:wrap">
+        <span style="font:400 10px/1 'JetBrains Mono',monospace;color:var(--text-tertiary)"><kbd style="background:var(--bg-overlay);border:1px solid var(--border);border-radius:3px;padding:1px 4px;font-size:9px">1</kbd>–<kbd style="background:var(--bg-overlay);border:1px solid var(--border);border-radius:3px;padding:1px 4px;font-size:9px">5</kbd> navigate</span>
+        <span style="font:400 10px/1 'JetBrains Mono',monospace;color:var(--text-tertiary)"><kbd style="background:var(--bg-overlay);border:1px solid var(--border);border-radius:3px;padding:1px 4px;font-size:9px">D</kbd> toggle theme</span>
+        <span style="font:400 10px/1 'JetBrains Mono',monospace;color:var(--text-tertiary)"><kbd style="background:var(--bg-overlay);border:1px solid var(--border);border-radius:3px;padding:1px 4px;font-size:9px">S</kbd> settings</span>
+        <span style="font:400 10px/1 'JetBrains Mono',monospace;color:var(--text-tertiary)"><kbd style="background:var(--bg-overlay);border:1px solid var(--border);border-radius:3px;padding:1px 4px;font-size:9px">?</kbd> tour</span>
+      </div>
     </div>
   `;
   document.body.appendChild(modal);
@@ -405,6 +411,54 @@ function animateCount(el, target, duration = 1100) {
 }
 
 /* ── KEYBOARD SHORTCUTS PANEL ─────────────────────── */
+/* ── MOBILE GESTURES ──────────────────────────────── */
+function initMobileGestures() {
+  const SECTIONS = ['overview','dimensions','assurance','evidence','fleet'];
+  let touchStartX = 0, touchStartY = 0, touchStartTime = 0;
+  const content = document.getElementById('content');
+  if (!content) return;
+
+  content.addEventListener('touchstart', e => {
+    touchStartX = e.changedTouches[0].clientX;
+    touchStartY = e.changedTouches[0].clientY;
+    touchStartTime = Date.now();
+  }, { passive: true });
+
+  content.addEventListener('touchend', e => {
+    const dx = e.changedTouches[0].clientX - touchStartX;
+    const dy = e.changedTouches[0].clientY - touchStartY;
+    const dt = Date.now() - touchStartTime;
+    /* Must be a fast horizontal swipe (>80px, <300ms, more horizontal than vertical) */
+    if (Math.abs(dx) > 80 && Math.abs(dx) > Math.abs(dy) * 1.5 && dt < 300) {
+      const curIdx = SECTIONS.indexOf(G.section);
+      if (curIdx < 0) return;
+      if (dx < 0 && curIdx < SECTIONS.length - 1) {
+        nav(SECTIONS[curIdx + 1]); /* swipe left → next */
+      } else if (dx > 0 && curIdx > 0) {
+        nav(SECTIONS[curIdx - 1]); /* swipe right → prev */
+      }
+    }
+  }, { passive: true });
+
+  /* Pull-to-refresh */
+  let pullStartY = 0, pulling = false;
+  content.addEventListener('touchstart', e => {
+    if (content.scrollTop === 0) {
+      pullStartY = e.changedTouches[0].clientY;
+      pulling = true;
+    }
+  }, { passive: true });
+  content.addEventListener('touchmove', e => {
+    if (!pulling) return;
+    const dy = e.changedTouches[0].clientY - pullStartY;
+    if (dy > 120) {
+      pulling = false;
+      location.reload();
+    }
+  }, { passive: true });
+  content.addEventListener('touchend', () => { pulling = false; }, { passive: true });
+}
+
 function buildShortcutsPanel() {
   if (document.getElementById('kb-panel')) return;
   const shortcuts = [
@@ -773,8 +827,11 @@ function renderRadar(d) {
       <text x="${x}" y="${y + 14}" text-anchor="${anch}" font-size="9" font-family="'JetBrains Mono',monospace" fill="${vc}" opacity=".8">${l.avgFinalLevel.toFixed(1)}</text>`;
   }).join('');
 
+  const ariaRadar = layers.map(l => `${DIM_SHORT[l.layerName]||l.layerName}: ${l.avgFinalLevel.toFixed(1)}/5`).join(', ');
   el.innerHTML = `<div class="radar-tip" id="radar-tip"></div>
-    <svg viewBox="-32 -16 ${W + 64} ${H + 32}" style="width:100%;max-width:380px;max-height:320px;overflow:visible">
+    <svg viewBox="-32 -16 ${W + 64} ${H + 32}" style="width:100%;max-width:380px;max-height:320px;overflow:visible"
+      role="img" aria-label="Trust radar chart showing 5 dimensions: ${ariaRadar}">
+    <title>Trust Radar — ${ariaRadar}</title>
     ${rings}${axes}
     <polygon class="radar-shape" id="radar-poly" points="${dpts.join(' ')}"
       style="fill:color-mix(in srgb, ${overallColor} 10%, transparent);stroke:${overallColor};stroke-opacity:.6;"/>
@@ -852,7 +909,8 @@ function renderTimeline(d) {
   const targetLine = `<line x1="${P.l}" y1="${targetY}" x2="${P.l + cw}" y2="${targetY}" stroke="rgba(245,158,11,.2)" stroke-width="1" stroke-dasharray="4,3"/>
     <text x="${P.l + cw + 4}" y="${targetY + 3}" font-size="8" font-family="'JetBrains Mono',monospace" fill="rgba(245,158,11,.4)" text-anchor="start">3.0</text>`;
 
-  wrap.insertAdjacentHTML('afterbegin', `<svg class="tl-svg" viewBox="0 0 ${W} ${H}" style="width:100%;height:${H}px">
+  const ariaTimeline = `Score trend chart with ${n} data point${n>1?'s':''}. Latest score: ${trends[n-1].overall.toFixed(2)} out of 5.0${n>1?`. Previous: ${trends[n-2].overall.toFixed(2)}`:''}`;
+  wrap.insertAdjacentHTML('afterbegin', `<svg class="tl-svg" viewBox="0 0 ${W} ${H}" style="width:100%;height:${H}px" role="img" aria-label="${ariaTimeline}"><title>${ariaTimeline}</title>
     <line class="tl-axis" x1="${P.l}" y1="${P.t}" x2="${P.l}" y2="${P.t + ch}"/>
     <line class="tl-axis" x1="${P.l}" y1="${P.t + ch}" x2="${P.l + cw}" y2="${P.t + ch}"/>
     ${ygrid}${targetLine}
@@ -1209,6 +1267,60 @@ function buildSettings() {
   });
 }
 
+/* ── LOADING SKELETON ─────────────────────────────── */
+function showLoadingSkeleton() {
+  const scoreCard = document.getElementById('score-card-inner');
+  if (scoreCard) {
+    scoreCard.innerHTML = `
+      <div class="score-left">
+        <div class="skeleton" style="width:120px;height:72px;margin-bottom:8px"></div>
+        <div class="skeleton" style="width:32px;height:1px;margin-bottom:8px"></div>
+        <div class="skeleton" style="width:180px;height:16px;margin-bottom:6px"></div>
+        <div class="skeleton" style="width:100px;height:12px"></div>
+      </div>
+      <div class="score-right" style="display:flex;flex-direction:column;gap:14px;padding-top:4px">
+        <div class="skeleton" style="width:100%;height:5px"></div>
+        <div class="skeleton" style="width:100%;height:5px"></div>
+        <div class="skeleton" style="width:100%;height:5px"></div>
+        <div class="skeleton" style="width:100%;height:5px"></div>
+        <div class="skeleton" style="width:100%;height:5px"></div>
+      </div>`;
+    scoreCard._hadSkeleton = true;
+  }
+  const taskGrid = document.getElementById('task-grid-mount');
+  if (taskGrid) {
+    taskGrid.innerHTML = `
+      <div class="skeleton" style="width:100%;height:120px;border-radius:12px"></div>
+      <div class="skeleton" style="width:100%;height:120px;border-radius:12px"></div>
+      <div class="skeleton" style="width:100%;height:120px;border-radius:12px"></div>`;
+    taskGrid._hadSkeleton = true;
+  }
+}
+function removeLoadingSkeleton() {
+  /* Restore original score card structure so renderScore can populate it */
+  const scoreCard = document.getElementById('score-card-inner');
+  if (scoreCard && scoreCard._hadSkeleton) {
+    scoreCard.innerHTML = `
+      <div class="score-left">
+        <div class="score-big" id="score-num">—</div>
+        <div class="score-divider"></div>
+        <div class="score-meta-row">
+          <div class="score-label-text" id="score-label">—</div>
+          <div class="score-out-of">out of 5.0</div>
+          <div class="score-agent-id" id="score-agent-id">default</div>
+        </div>
+        <div class="score-badges">
+          <span class="tb-badge md" id="score-trust-badge">—</span>
+          <span class="score-trend-badge" id="score-trend"></span>
+        </div>
+        <span id="score-last" style="font-size:11px;color:var(--text-tertiary);margin-top:2px"></span>
+      </div>
+      <div class="score-right" id="score-dim-bars"></div>`;
+    delete scoreCard._hadSkeleton;
+  }
+  /* Task grid will be overwritten by renderNextActions */
+}
+
 /* ── INIT ─────────────────────────────────────────── */
 (async function init() {
   try {
@@ -1216,9 +1328,16 @@ function buildSettings() {
     initTooltip();
     buildCommandPalette();
     buildShortcutsPanel();
+    initMobileGestures();
     initNav();
 
+    /* Show loading skeletons while fetching */
+    showLoadingSkeleton();
+
     G.data = await xfetch('./data.json');
+
+    /* Remove skeletons */
+    removeLoadingSkeleton();
 
     renderScore(G.data);
     renderDims(G.data);

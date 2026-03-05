@@ -1,6 +1,24 @@
 /* ═══════════════════════════════════════════════════════════════
-   AMC Dashboard — v14 State-of-the-Art
+   AMC Dashboard — v15 State-of-the-Art
    ═══════════════════════════════════════════════════════════════ */
+
+/* ── SELF-HOSTED FONTS (GDPR safe, no external deps) ───────── */
+@font-face {
+  font-family: 'Inter';
+  src: url('./fonts/inter-latin.woff2') format('woff2');
+  font-weight: 200 700;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'JetBrains Mono';
+  src: url('./fonts/jbmono-latin.woff2') format('woff2');
+  font-weight: 400 700;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
 
 /* ── DESIGN TOKENS ─────────────────────────────────────────── */
 :root {
@@ -13,7 +31,7 @@
 
   --text-primary:   #f4f4f5;
   --text-secondary: rgba(244,244,245,.55);
-  --text-tertiary:  rgba(244,244,245,.35);
+  --text-tertiary:  rgba(244,244,245,.42);
 
   --accent:        #6366f1;
   --accent-dim:    rgba(99,102,241,.12);
@@ -1863,8 +1881,8 @@ html { scroll-behavior: smooth; }
 
 /* ── LIGHT MODE REFINEMENTS ─────────────────────────────────── */
 [data-theme="light"] .sidebar {
-  background: #e9ecef;
-  border-right: 1px solid rgba(0,0,0,.12);
+  background: #f0f0f5;
+  border-right: 1px solid rgba(0,0,0,.08);
 }
 [data-theme="light"] .topbar {
   background: rgba(248,249,250,.92);
@@ -1897,9 +1915,11 @@ html { scroll-behavior: smooth; }
   :root { --sidebar-w: 0px; }
   .sidebar { transform: translateX(-224px); width: 224px; }
   .sidebar.open { transform: translateX(0); }
+  .sidebar.open .sb-link { min-height: 44px; padding: 10px 12px; }
   .main { margin-left: 0; }
   .tb-ham { display: flex; }
   .bnav { display: block; }
+  .bn { min-height: 44px; min-width: 44px; }
   .content { padding: 16px; padding-bottom: 80px; }
   .row.c3 { grid-template-columns: 1fr; }
   .row.c2 { grid-template-columns: 1fr; }

@@ -1,3 +1,4 @@
+import { copyFileSync, existsSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { readdirSync } from "node:fs";
@@ -449,6 +450,18 @@ export function buildDashboard(input: DashboardBuildInput): DashboardBuildResult
   const outDir = resolve(input.workspace, input.outDir);
   ensureDir(outDir);
   ensureDir(join(outDir, "components"));
+  ensureDir(join(outDir, "fonts"));
+
+  /* Copy self-hosted font files (binary — can't use readAsset) */
+  for (const fontFile of ["inter-latin.woff2", "jbmono-latin.woff2"]) {
+    const candidates = [
+      join(moduleDir(), "templates", "fonts", fontFile),
+      join(process.cwd(), "src", "dashboard", "templates", "fonts", fontFile),
+    ];
+    for (const src of candidates) {
+      if (existsSync(src)) { copyFileSync(src, join(outDir, "fonts", fontFile)); break; }
+    }
+  }
 
   const html = readAsset(join("templates", "index.html"), "<html><body><h1>AMC Dashboard</h1></body></html>");
   const appJs = readAsset(join("templates", "app.js"), "console.log('AMC dashboard');");
