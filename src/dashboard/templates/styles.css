@@ -2600,6 +2600,7 @@ code { font-family: 'JetBrains Mono', monospace; }
 /* ── ANIMATIONS ─────────────────────────────────────────────── */
 .card-enter {
   animation: cardIn .5s cubic-bezier(.16,1,.3,1) both;
+  will-change: transform, opacity;
 }
 @keyframes cardIn {
   from { opacity: 0; transform: translateY(16px) scale(.98); filter: blur(2px); }
@@ -2698,6 +2699,24 @@ html { scroll-behavior: smooth; }
   .row.c3 { grid-template-columns: 1fr; }
   .row.c2 { grid-template-columns: 1fr; }
   .score-card-v2 { grid-template-columns: 1fr; gap: 20px; }
+  .hero-panel {
+    grid-template-columns: 1fr;
+    gap: 20px;
+    padding: 20px;
+    text-align: center;
+  }
+  .hero-ring-col { justify-content: center; }
+  .score-ring-wrap { width: 140px; height: 140px; }
+  .hero-body-col { align-items: center; }
+  .hero-level-row { justify-content: center; flex-wrap: wrap; }
+  .hero-agent-row { justify-content: center; }
+  .hero-stats-col { min-width: 0; width: 100%; }
+  .maturity-track { width: 100%; }
+  .mt-names { font-size: 7px; }
+  .score-right { width: 100%; }
+  .actions-panel .action-row { grid-template-columns: 28px 1fr; gap: 10px; }
+  .action-cta { grid-column: 1 / -1; justify-self: start; margin-top: 4px; }
+  .actions-stats { display: none; }
   .task-grid { grid-template-columns: 1fr; }
   .domain-grid { grid-template-columns: 1fr; }
   .pack-grid { grid-template-columns: 1fr; }
@@ -2712,5 +2731,11 @@ html { scroll-behavior: smooth; }
 @media (max-width: 600px) {
   .tb-search { min-width: 0; width: 40px; }
   .tb-search-label, .tb-kbd { display: none; }
-  .score-big { font-size: 56px; }
+  .score-big { font-size: 36px; letter-spacing: -1.5px; }
+  .hero-level-name { font-size: 16px; }
+  .hero-kpi-value { font-size: 20px; }
+  .hero-kpi-label { font-size: 8px; }
+  .hero-panel::after { display: none; }
+  .details-body .row { grid-template-columns: 1fr !important; }
+  .details-body .row > div[style*="flex-direction:column"] { flex-direction: column; }
 }

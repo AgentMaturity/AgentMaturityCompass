@@ -284,6 +284,42 @@ function showViewToast(text, tone = 'info') {
   }, 1200);
 }
 
+/* ── ROLE-BASED VIEW FILTERING ─────────────────────── */
+function applyViewFilter(view) {
+  /* Sidebar nav: show/hide sections based on role */
+  const ROLE_SECTIONS = {
+    engineer: ['overview','dimensions','assurance','evidence','domains','guardrails','fleet','settings'],
+    ciso:     ['overview','domains','guardrails','assurance','evidence','settings'],
+    exec:     ['overview','assurance','settings'],
+  };
+  const allowed = ROLE_SECTIONS[view] || ROLE_SECTIONS.engineer;
+  document.querySelectorAll('.sb-link[data-s]').forEach(link => {
+    const sec = link.dataset.s;
+    link.style.display = allowed.includes(sec) ? '' : 'none';
+  });
+
+  /* Overview: filter detail cards by role */
+  const details = document.getElementById('details-body');
+  if (details) details.style.display = view === 'exec' ? 'none' : '';
+
+  /* Hero KPIs: exec sees only score + approved */
+  document.querySelectorAll('.hero-kpi').forEach((kpi, i) => {
+    if (view === 'exec') kpi.style.display = (i === 0 || i === 3) ? '' : 'none';
+    else kpi.style.display = '';
+  });
+
+  /* Maturity track: always visible for all roles */
+  /* Dim bars: hide for exec */
+  const dimBars = document.getElementById('score-dim-bars');
+  if (dimBars) dimBars.style.display = view === 'exec' ? 'none' : '';
+
+  /* Actions: CISO sees compliance-focused, exec sees summary */
+  /* (action list regenerated dynamically by renderNextActions — roles affect which items appear) */
+
+  /* If current section is hidden by new view, navigate to overview */
+  if (!allowed.includes(G.section)) nav('overview');
+}
+
 /* ── NAV ──────────────────────────────────────────── */
 function nav(section) {
   document.querySelectorAll('.sec').forEach(s => {
@@ -340,6 +376,7 @@ function initNav() {
       G.view = b.dataset.v;
       const labels = { engineer: 'Engineering view', product: 'Product view', ciso: 'Governance view', exec: 'Executive view' };
       showViewToast(labels[b.dataset.v] || b.dataset.v);
+      applyViewFilter(b.dataset.v);
     });
   });
 
@@ -1415,6 +1452,31 @@ function buildEv() {
 }
 
 /* ── TERMINAL COMMAND EXECUTION ────────────────────── */
+/* ANSI escape code → HTML span converter */
+function ansiToHtml(text) {
+  const COLORS = {
+    '30':'#6b7280','31':'#f87171','32':'#34d399','33':'#fbbf24','34':'#60a5fa',
+    '35':'#c084fc','36':'#22d3ee','37':'#e5e7eb','90':'#9ca3af','91':'#fca5a5',
+    '92':'#6ee7b7','93':'#fde68a','94':'#93c5fd','95':'#d8b4fe','96':'#67e8f9','97':'#f9fafb'
+  };
+  let out = '', openSpans = 0;
+  const parts = text.split(/\x1b\[([0-9;]*)m/);
+  for (let i = 0; i < parts.length; i++) {
+    if (i % 2 === 0) { out += esc(parts[i]); continue; }
+    const codes = parts[i].split(';');
+    for (const c of codes) {
+      if (c === '0' || c === '') { while (openSpans > 0) { out += '</span>'; openSpans--; } }
+      else if (COLORS[c]) { out += `<span style="color:${COLORS[c]}">`; openSpans++; }
+      else if (c === '1') { out += '<span style="font-weight:700">'; openSpans++; }
+      else if (c === '2') { out += '<span style="opacity:.6">'; openSpans++; }
+      else if (c === '3') { out += '<span style="font-style:italic">'; openSpans++; }
+      else if (c === '4') { out += '<span style="text-decoration:underline">'; openSpans++; }
+    }
+  }
+  while (openSpans > 0) { out += '</span>'; openSpans--; }
+  return out;
+}
+
 function initTerminal() {
   const input = document.getElementById('cli-input');
   const runBtn = document.getElementById('cli-run');
@@ -1450,7 +1512,7 @@ function initTerminal() {
       const text = typeof res === 'string' ? res : (res.output || res.stdout || res.raw || JSON.stringify(res, null, 2));
       const exitCode = res.exitCode ?? res.code ?? 0;
       const cls = exitCode === 0 ? 'cli-ok' : 'cli-err';
-      output.innerHTML += `<div class="cli-entry ${cls}"><pre class="cli-pre">${esc(text)}</pre></div>`;
+      output.innerHTML += `<div class="cli-entry ${cls}"><pre class="cli-pre">${ansiToHtml(text)}</pre></div>`;
       if (exitCode !== 0) {
         output.innerHTML += `<div class="cli-entry cli-err" style="font-size:10px;opacity:.7">exit ${exitCode}</div>`;
       }
