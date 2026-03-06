@@ -4,9 +4,8 @@
 
 [![Tests](https://img.shields.io/badge/tests-2%2C822%20passing-brightgreen)]()
 [![License](https://img.shields.io/badge/license-MIT-blue)]()
-[![Questions](https://img.shields.io/badge/questions-733-blue)]()
-[![Modules](https://img.shields.io/badge/scoring%20modules-75-green)]()
-[![Assurance Packs](https://img.shields.io/badge/assurance%20packs-85-red)]()
+[![Questions](https://img.shields.io/badge/questions-730-blue)]()
+[![Assurance Packs](https://img.shields.io/badge/assurance%20packs-78-red)]()
 [![Adapters](https://img.shields.io/badge/adapters-14-purple)]()
 [![Domain Packs](https://img.shields.io/badge/domain%20packs-40-orange)]()
 
@@ -89,7 +88,7 @@ amc badge                    # ![AMC L3](https://img.shields.io/badge/AMC-L3-blu
 ```
 Agent (untrusted) → AMC Gateway (transparent MITM proxy) → Evidence Ledger (Ed25519 + Merkle tree)
                                                                     ↓
-                                                      Scoring Engine (140 core questions, 5 dimensions)
+                                                      Scoring Engine (138 core questions, 5 dimensions)
                                                                     ↓
                                                        AMC Studio (dashboard + API + CLI)
 ```
@@ -148,7 +147,7 @@ Zero code changes. One environment variable.
 
 ## 🏭 Domain Packs — Industry-Specific Assessment
 
-**40 packs** across 7 industry domains with **593 domain-specific diagnostic questions**. Each question references specific regulatory articles, not vague guidelines.
+**40 packs** across 7 industry domains with **592 domain-specific diagnostic questions**. Each question references specific regulatory articles, not vague guidelines.
 
 ```bash
 amc domain list                                                    # See all 7 domains + packs
@@ -412,6 +411,6 @@ As autonomous agents become the primary interface between humans and technology,
 ---
 
 <p align="center">
-  <strong>733 questions · 75 scoring modules · 85 assurance packs · 40 domain packs · 14 adapters · 2,723 tests</strong><br>
+  <strong>730 questions · 78 assurance packs · 40 domain packs · 14 adapters · 2,822 tests</strong><br>
   <em>Stop trusting. Start verifying.</em>
 </p>

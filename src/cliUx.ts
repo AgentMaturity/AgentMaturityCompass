@@ -252,7 +252,7 @@ export function renderGroupedHelp(program: Command): string {
   lines.push("");
   lines.push("Discoverability:");
   lines.push("  amc help <command>                 Detailed help for any command path");
-  lines.push("  amc completion bash|zsh|fish       Generate shell completion scripts");
+  lines.push("  amc shell                          Interactive REPL session");
   return lines.join("\n");
 }
 
@@ -386,7 +386,7 @@ export function cliDiscoverabilityFooter(): string {
     "Discoverability:",
     "  • Use 'amc help <command>' for detailed subcommand docs",
     "  • Use '--help' after any command path (for example: 'amc run --help')",
-    "  • Use 'amc completion bash|zsh|fish' to install shell completions",
+    "  • Use 'amc shell' for an interactive REPL with natural language support",
     "  • Namespace shortcuts:",
     "      - evidence  → verify, bundle, transparency, receipts",
     "      - score     → score, diagnostic, compare",
