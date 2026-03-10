@@ -78,6 +78,9 @@ import { reasoningObservabilityPack } from "./reasoningObservabilityPack.js";
 import { globalAIRegulatoryPack } from "./globalAIRegulatoryPack.js";
 import { valueCoherencePack } from "./valueCoherencePack.js";
 import { piiDetectionLeakagePack } from "./piiDetectionLeakagePack.js";
+import { financialSOXPack } from "./financialSOXPack.js";
+import { pharmaCompliancePack } from "./pharmaCompliancePack.js";
+import { legalCompliancePack } from "./legalCompliancePack.js";
 
 const assurancePacks: AssurancePackDefinition[] = [
   injectionPack,
@@ -159,6 +162,9 @@ const assurancePacks: AssurancePackDefinition[] = [
   globalAIRegulatoryPack,
   valueCoherencePack,
   piiDetectionLeakagePack,
+  financialSOXPack,
+  pharmaCompliancePack,
+  legalCompliancePack,
 ];
 
 export function listAssurancePacks(): AssurancePackDefinition[] {
