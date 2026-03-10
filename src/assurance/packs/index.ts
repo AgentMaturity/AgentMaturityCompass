@@ -77,6 +77,7 @@ import { agentIdentitySpoofingPack } from "./agentIdentitySpoofingPack.js";
 import { reasoningObservabilityPack } from "./reasoningObservabilityPack.js";
 import { globalAIRegulatoryPack } from "./globalAIRegulatoryPack.js";
 import { valueCoherencePack } from "./valueCoherencePack.js";
+import { piiDetectionLeakagePack } from "./piiDetectionLeakagePack.js";
 
 const assurancePacks: AssurancePackDefinition[] = [
   injectionPack,
@@ -157,6 +158,7 @@ const assurancePacks: AssurancePackDefinition[] = [
   reasoningObservabilityPack,
   globalAIRegulatoryPack,
   valueCoherencePack,
+  piiDetectionLeakagePack,
 ];
 
 export function listAssurancePacks(): AssurancePackDefinition[] {

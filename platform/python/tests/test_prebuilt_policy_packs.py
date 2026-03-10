@@ -6,6 +6,8 @@ from amc.watch.prebuilt_policy_packs import (
     soc2_policy_pack,
     iso42001_policy_pack,
     gdpr_policy_pack,
+    mitre_atlas_policy_pack,
+    owasp_api_top10_policy_pack,
     get_all_prebuilt_packs,
 )
 from amc.watch.w10_policy_packs import PolicyPackRegistry
@@ -55,17 +57,39 @@ def test_gdpr_pack_valid():
     assert "data-protection" in pack.tags
 
 
+def test_mitre_atlas_pack_valid():
+    pack = mitre_atlas_policy_pack()
+    assert pack.name == "MITRE ATLAS"
+    assert pack.version == "1.0"
+    assert len(pack.modules) >= 5
+    assert len(pack.rules) >= 6
+    assert pack.verify_digest()
+    assert "mitre-atlas" in pack.tags
+    assert "adversarial-ml" in pack.tags
+
+
+def test_owasp_api_top10_pack_valid():
+    pack = owasp_api_top10_policy_pack()
+    assert pack.name == "OWASP API Security Top 10 (2023)"
+    assert pack.version == "1.0"
+    assert len(pack.modules) >= 5
+    assert len(pack.rules) >= 7
+    assert pack.verify_digest()
+    assert "owasp" in pack.tags
+    assert "api-security" in pack.tags
+
+
 def test_all_packs_installable():
     reg = PolicyPackRegistry()
     packs = get_all_prebuilt_packs()
-    assert len(packs) == 4
+    assert len(packs) == 6
     
     for pack in packs:
         pack_id = reg.install(pack)
         assert pack_id == pack.pack_id
         assert pack.verify_digest()
     
-    assert len(reg.list()) == 4
+    assert len(reg.list()) == 6
 
 
 def test_all_packs_activatable():

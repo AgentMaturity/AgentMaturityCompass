@@ -1087,6 +1087,420 @@ export const builtInComplianceMappings: ComplianceMapping[] = [
       configs: ["context-graph.json"]
     }
   }),
+
+  // ── MITRE ATLAS (Adversarial Threat Landscape for AI Systems) ──
+
+  mapping({
+    id: "atlas_reconnaissance",
+    framework: "MITRE_ATLAS",
+    category: "Reconnaissance",
+    description: "Adversary gathers information about ML system architecture, capabilities, and attack surface.",
+    evidenceRequirements: [
+      {
+        type: "requires_evidence_event",
+        eventTypes: ["audit", "llm_request"],
+        minObservedRatio: 0.5
+      },
+      {
+        type: "requires_no_audit",
+        auditTypesDenylist: ["UNSAFE_PROVIDER_ROUTE", "MODEL_ROUTE_MISMATCH"]
+      }
+    ],
+    related: {
+      questions: ["AMC-1.5", "AMC-2.4"],
+      packs: ["injection", "exfiltration"],
+      configs: ["gateway.yaml", "tools.yaml"]
+    }
+  }),
+  mapping({
+    id: "atlas_supply_chain_compromise",
+    framework: "MITRE_ATLAS",
+    category: "Resource Development",
+    description: "Adversary compromises ML supply chain including poisoned models, libraries, and datasets (AML.T0010, AML.T0019).",
+    evidenceRequirements: [
+      {
+        type: "requires_evidence_event",
+        eventTypes: ["audit", "artifact"],
+        minObservedRatio: 0.5
+      },
+      {
+        type: "requires_no_audit",
+        auditTypesDenylist: ["UNSAFE_PROVIDER_ROUTE", "DIRECT_PROVIDER_BYPASS_SUSPECTED"]
+      }
+    ],
+    related: {
+      questions: ["AMC-2.5", "AMC-4.5"],
+      packs: ["unsafe_tooling"],
+      configs: ["gateway.yaml", "amc.config.yaml"]
+    }
+  }),
+  mapping({
+    id: "atlas_prompt_injection",
+    framework: "MITRE_ATLAS",
+    category: "Initial Access",
+    description: "Adversary injects malicious prompts to manipulate LLM behavior and bypass safety controls (AML.T0048).",
+    evidenceRequirements: [
+      {
+        type: "requires_evidence_event",
+        eventTypes: ["audit", "llm_request", "llm_response"],
+        minObservedRatio: 0.7
+      },
+      {
+        type: "requires_assurance_pack",
+        packId: "injection",
+        minScore: 80,
+        maxSucceeded: 0
+      }
+    ],
+    related: {
+      questions: ["AMC-3.3.1", "AMC-3.3.4"],
+      packs: ["injection"],
+      configs: ["guardrails.yaml", "gateway.yaml"]
+    }
+  }),
+  mapping({
+    id: "atlas_model_evasion",
+    framework: "MITRE_ATLAS",
+    category: "Evasion",
+    description: "Adversary crafts inputs to evade ML detection or cause misclassification (AML.T0015, AML.T0043).",
+    evidenceRequirements: [
+      {
+        type: "requires_evidence_event",
+        eventTypes: ["test", "metric", "audit"],
+        minObservedRatio: 0.6
+      },
+      {
+        type: "requires_assurance_pack",
+        packId: "injection",
+        minScore: 75,
+        maxSucceeded: 0
+      }
+    ],
+    related: {
+      questions: ["AMC-2.1", "AMC-4.5"],
+      packs: ["injection", "unsafe_tooling"],
+      configs: ["eval-harness.yaml", "guardrails.yaml"]
+    }
+  }),
+  mapping({
+    id: "atlas_llm_jailbreak",
+    framework: "MITRE_ATLAS",
+    category: "Evasion",
+    description: "Adversary bypasses LLM safety guardrails through crafted multi-turn or encoded prompts (AML.T0051).",
+    evidenceRequirements: [
+      {
+        type: "requires_evidence_event",
+        eventTypes: ["audit", "llm_request", "llm_response"],
+        minObservedRatio: 0.7
+      },
+      {
+        type: "requires_assurance_pack",
+        packId: "injection",
+        minScore: 85,
+        maxSucceeded: 0
+      }
+    ],
+    related: {
+      questions: ["AMC-3.3.1", "AMC-3.3.4", "AMC-4.5"],
+      packs: ["injection"],
+      configs: ["guardrails.yaml", "action-policy.yaml"]
+    }
+  }),
+  mapping({
+    id: "atlas_data_exfiltration",
+    framework: "MITRE_ATLAS",
+    category: "Exfiltration",
+    description: "Adversary extracts training data, model parameters, or sensitive info via inference API (AML.T0025, AML.T0054).",
+    evidenceRequirements: [
+      {
+        type: "requires_evidence_event",
+        eventTypes: ["audit", "llm_response"],
+        minObservedRatio: 0.7
+      },
+      {
+        type: "requires_assurance_pack",
+        packId: "exfiltration",
+        minScore: 80,
+        maxSucceeded: 0
+      },
+      {
+        type: "requires_no_audit",
+        auditTypesDenylist: ["SECRET_EXFILTRATION_SUCCEEDED"]
+      }
+    ],
+    related: {
+      questions: ["AMC-3.1.2", "AMC-1.5"],
+      packs: ["exfiltration"],
+      configs: ["gateway.yaml", "guardrails.yaml"]
+    }
+  }),
+  mapping({
+    id: "atlas_cost_harvesting",
+    framework: "MITRE_ATLAS",
+    category: "Impact",
+    description: "Adversary exploits ML APIs to consume compute resources and inflate costs (AML.T0034).",
+    evidenceRequirements: [
+      {
+        type: "requires_evidence_event",
+        eventTypes: ["metric", "audit"],
+        minObservedRatio: 0.6
+      },
+      {
+        type: "requires_no_audit",
+        auditTypesDenylist: ["BUDGET_EXCEEDED", "EXECUTE_FROZEN_ACTIVE"]
+      }
+    ],
+    related: {
+      questions: ["AMC-4.2"],
+      packs: ["unsafe_tooling"],
+      configs: ["budgets.yaml", "gateway.yaml"]
+    }
+  }),
+  mapping({
+    id: "atlas_model_access_control",
+    framework: "MITRE_ATLAS",
+    category: "ML Model Access",
+    description: "Adversary gains unauthorized access to ML model inference or training endpoints (AML.T0040, AML.T0044).",
+    evidenceRequirements: [
+      {
+        type: "requires_evidence_event",
+        eventTypes: ["audit", "tool_action"],
+        minObservedRatio: 0.6
+      },
+      {
+        type: "requires_no_audit",
+        auditTypesDenylist: commonSecurityDenylist
+      }
+    ],
+    related: {
+      questions: ["AMC-1.5", "AMC-1.8"],
+      packs: ["governance_bypass"],
+      configs: ["action-policy.yaml", "tools.yaml"]
+    }
+  }),
+
+  // ── OWASP API Security Top 10 (2023) ──
+
+  mapping({
+    id: "owasp_api1_bola",
+    framework: "OWASP_API_TOP10",
+    category: "API1 Broken Object Level Authorization",
+    description: "APIs expose endpoints handling object identifiers without verifying the requesting user has access to the target object.",
+    evidenceRequirements: [
+      {
+        type: "requires_evidence_event",
+        eventTypes: ["audit", "tool_action"],
+        minObservedRatio: 0.6
+      },
+      {
+        type: "requires_no_audit",
+        auditTypesDenylist: commonSecurityDenylist
+      }
+    ],
+    related: {
+      questions: ["AMC-1.5", "AMC-3.2.3"],
+      packs: ["governance_bypass"],
+      configs: ["action-policy.yaml", "tools.yaml"]
+    }
+  }),
+  mapping({
+    id: "owasp_api2_broken_auth",
+    framework: "OWASP_API_TOP10",
+    category: "API2 Broken Authentication",
+    description: "Authentication mechanisms implemented incorrectly allowing identity compromise or token theft.",
+    evidenceRequirements: [
+      {
+        type: "requires_evidence_event",
+        eventTypes: ["audit", "tool_action"],
+        minObservedRatio: 0.7
+      },
+      {
+        type: "requires_no_audit",
+        auditTypesDenylist: ["LEASE_INVALID_OR_MISSING", "GOVERNANCE_BYPASS_SUCCEEDED"]
+      }
+    ],
+    related: {
+      questions: ["AMC-1.8", "AMC-3.2.3"],
+      packs: ["governance_bypass"],
+      configs: ["gateway.yaml", "action-policy.yaml"]
+    }
+  }),
+  mapping({
+    id: "owasp_api3_bopla",
+    framework: "OWASP_API_TOP10",
+    category: "API3 Broken Object Property Level Authorization",
+    description: "Lack of or improper authorization validation at object property level enabling mass assignment or excessive data exposure.",
+    evidenceRequirements: [
+      {
+        type: "requires_evidence_event",
+        eventTypes: ["audit", "tool_action", "tool_result"],
+        minObservedRatio: 0.6
+      },
+      {
+        type: "requires_no_audit",
+        auditTypesDenylist: commonSecurityDenylist
+      }
+    ],
+    related: {
+      questions: ["AMC-1.5", "AMC-3.2.3"],
+      packs: ["governance_bypass", "exfiltration"],
+      configs: ["action-policy.yaml", "tools.yaml"]
+    }
+  }),
+  mapping({
+    id: "owasp_api4_resource_consumption",
+    framework: "OWASP_API_TOP10",
+    category: "API4 Unrestricted Resource Consumption",
+    description: "API requests consume excessive resources without rate limiting, leading to denial of service or cost exploitation.",
+    evidenceRequirements: [
+      {
+        type: "requires_evidence_event",
+        eventTypes: ["metric", "audit"],
+        minObservedRatio: 0.6
+      },
+      {
+        type: "requires_no_audit",
+        auditTypesDenylist: ["BUDGET_EXCEEDED", "EXECUTE_FROZEN_ACTIVE"]
+      }
+    ],
+    related: {
+      questions: ["AMC-4.2", "AMC-1.7"],
+      packs: ["unsafe_tooling"],
+      configs: ["budgets.yaml", "gateway.yaml"]
+    }
+  }),
+  mapping({
+    id: "owasp_api5_bfla",
+    framework: "OWASP_API_TOP10",
+    category: "API5 Broken Function Level Authorization",
+    description: "Complex access control policies with unclear separation between administrative and regular functions.",
+    evidenceRequirements: [
+      {
+        type: "requires_evidence_event",
+        eventTypes: ["audit", "tool_action"],
+        minObservedRatio: 0.6
+      },
+      {
+        type: "requires_assurance_pack",
+        packId: "governance_bypass",
+        minScore: 85,
+        maxSucceeded: 0
+      }
+    ],
+    related: {
+      questions: ["AMC-1.5", "AMC-1.8"],
+      packs: ["governance_bypass"],
+      configs: ["action-policy.yaml", "approval-policy.yaml"]
+    }
+  }),
+  mapping({
+    id: "owasp_api6_sensitive_flows",
+    framework: "OWASP_API_TOP10",
+    category: "API6 Unrestricted Access to Sensitive Business Flows",
+    description: "APIs expose business-critical flows without compensating controls to prevent automated abuse.",
+    evidenceRequirements: [
+      {
+        type: "requires_evidence_event",
+        eventTypes: ["audit", "tool_action"],
+        minObservedRatio: 0.6
+      },
+      {
+        type: "requires_no_audit",
+        auditTypesDenylist: ["EXECUTE_WITHOUT_TICKET_ATTEMPTED", "GOVERNANCE_BYPASS_SUCCEEDED"]
+      }
+    ],
+    related: {
+      questions: ["AMC-1.3", "AMC-2.4"],
+      packs: ["governance_bypass", "unsafe_tooling"],
+      configs: ["action-policy.yaml", "approval-policy.yaml"]
+    }
+  }),
+  mapping({
+    id: "owasp_api7_ssrf",
+    framework: "OWASP_API_TOP10",
+    category: "API7 Server Side Request Forgery",
+    description: "API fetches remote resources without validating user-supplied URIs, enabling SSRF attacks.",
+    evidenceRequirements: [
+      {
+        type: "requires_evidence_event",
+        eventTypes: ["audit", "tool_action", "tool_result"],
+        minObservedRatio: 0.7
+      },
+      {
+        type: "requires_assurance_pack",
+        packId: "injection",
+        minScore: 80,
+        maxSucceeded: 0
+      }
+    ],
+    related: {
+      questions: ["AMC-1.5", "AMC-3.3.4"],
+      packs: ["injection", "unsafe_tooling"],
+      configs: ["tools.yaml", "gateway.yaml"]
+    }
+  }),
+  mapping({
+    id: "owasp_api8_misconfiguration",
+    framework: "OWASP_API_TOP10",
+    category: "API8 Security Misconfiguration",
+    description: "Improper security hardening, missing patches, overly permissive settings, or unnecessary features enabled.",
+    evidenceRequirements: [
+      {
+        type: "requires_evidence_event",
+        eventTypes: ["audit", "metric"],
+        minObservedRatio: 0.6
+      },
+      {
+        type: "requires_no_audit",
+        auditTypesDenylist: ["CONFIG_SIGNATURE_INVALID", "UNSAFE_PROVIDER_ROUTE"]
+      }
+    ],
+    related: {
+      questions: ["AMC-1.5", "AMC-4.6"],
+      packs: ["unsafe_tooling"],
+      configs: ["gateway.yaml", "amc.config.yaml"]
+    }
+  }),
+  mapping({
+    id: "owasp_api9_inventory",
+    framework: "OWASP_API_TOP10",
+    category: "API9 Improper Inventory Management",
+    description: "APIs lack proper inventory, versioning, and lifecycle management leading to shadow or deprecated endpoints.",
+    evidenceRequirements: [
+      {
+        type: "requires_evidence_event",
+        eventTypes: ["artifact", "audit"],
+        minObservedRatio: 0.5
+      }
+    ],
+    related: {
+      questions: ["AMC-2.9", "AMC-1.7"],
+      packs: ["hallucination"],
+      configs: ["eval-harness.yaml"]
+    }
+  }),
+  mapping({
+    id: "owasp_api10_unsafe_consumption",
+    framework: "OWASP_API_TOP10",
+    category: "API10 Unsafe Consumption of APIs",
+    description: "Developers trust third-party APIs without proper validation, enabling supply chain attacks through upstream dependencies.",
+    evidenceRequirements: [
+      {
+        type: "requires_evidence_event",
+        eventTypes: ["audit", "llm_request", "tool_action"],
+        minObservedRatio: 0.7
+      },
+      {
+        type: "requires_no_audit",
+        auditTypesDenylist: ["UNSAFE_PROVIDER_ROUTE", "DIRECT_PROVIDER_BYPASS_SUSPECTED"]
+      }
+    ],
+    related: {
+      questions: ["AMC-2.5", "AMC-1.5"],
+      packs: ["unsafe_tooling", "injection"],
+      configs: ["gateway.yaml", "tools.yaml"]
+    }
+  }),
 ];
 
 export function defaultComplianceMapsFile(): ComplianceMapsFile {

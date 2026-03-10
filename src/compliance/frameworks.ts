@@ -1,4 +1,4 @@
-export type ComplianceFramework = "SOC2" | "NIST_AI_RMF" | "ISO_27001" | "ISO_42001" | "EU_AI_ACT" | "GDPR";
+export type ComplianceFramework = "SOC2" | "NIST_AI_RMF" | "ISO_27001" | "ISO_42001" | "EU_AI_ACT" | "GDPR" | "MITRE_ATLAS" | "OWASP_API_TOP10";
 
 export interface ComplianceFrameworkFamily {
   framework: ComplianceFramework;
@@ -83,6 +83,39 @@ export const complianceFrameworkFamilies: ComplianceFrameworkFamily[] = [
       "Art. 32 Security of Processing",
       "Art. 33-34 Breach Notification",
       "Art. 35 DPIA"
+    ]
+  },
+  {
+    framework: "MITRE_ATLAS",
+    displayName: "MITRE ATLAS (Adversarial Threat Landscape for AI Systems)",
+    categories: [
+      "Reconnaissance",
+      "Resource Development",
+      "Initial Access",
+      "ML Model Access",
+      "Execution",
+      "Persistence",
+      "Evasion",
+      "Discovery",
+      "Collection",
+      "Exfiltration",
+      "Impact"
+    ]
+  },
+  {
+    framework: "OWASP_API_TOP10",
+    displayName: "OWASP API Security Top 10 (2023)",
+    categories: [
+      "API1 Broken Object Level Authorization",
+      "API2 Broken Authentication",
+      "API3 Broken Object Property Level Authorization",
+      "API4 Unrestricted Resource Consumption",
+      "API5 Broken Function Level Authorization",
+      "API6 Unrestricted Access to Sensitive Business Flows",
+      "API7 Server Side Request Forgery",
+      "API8 Security Misconfiguration",
+      "API9 Improper Inventory Management",
+      "API10 Unsafe Consumption of APIs"
     ]
   }
 ];

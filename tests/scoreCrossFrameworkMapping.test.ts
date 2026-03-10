@@ -4,7 +4,7 @@ import { generateFrameworkReport, listSupportedFrameworks } from "../src/score/c
 describe("score crossFrameworkMapping", () => {
   test("listSupportedFrameworks returns all expected framework entries", () => {
     const supported = listSupportedFrameworks();
-    expect(supported).toHaveLength(7);
+    expect(supported).toHaveLength(9);
     expect(supported.map((s) => s.framework)).toEqual([
       "NIST_AI_RMF",
       "ISO_42001",
@@ -12,7 +12,9 @@ describe("score crossFrameworkMapping", () => {
       "SOC2_TYPE2",
       "GDPR",
       "FORESIGHT_SAFETY",
-      "AGENTIC_4C"
+      "AGENTIC_4C",
+      "MITRE_ATLAS",
+      "OWASP_API_TOP10"
     ]);
   });
 
@@ -24,18 +26,52 @@ describe("score crossFrameworkMapping", () => {
     }
   });
 
-  test("SOC2 framework uses built-in fallback report behavior", () => {
+  test("SOC2 framework has article-level controls and zero coverage with no evidence", () => {
     const report = generateFrameworkReport("SOC2_TYPE2", { passedQIDs: [], activeModules: [] });
-    expect(report.coveragePercent).toBe(80);
-    expect(report.coveredControls).toEqual(["existing-amc-modules"]);
-    expect(report.certificationReadiness).toBe(true);
+    expect(report.coveragePercent).toBe(0);
+    expect(report.coveredControls).toHaveLength(0);
+    expect(report.gapControls.length).toBe(10);
+    expect(report.certificationReadiness).toBe(false);
   });
 
-  test("GDPR framework uses built-in fallback report behavior", () => {
+  test("GDPR framework has article-level controls and zero coverage with no evidence", () => {
     const report = generateFrameworkReport("GDPR", { passedQIDs: [], activeModules: [] });
-    expect(report.coveragePercent).toBe(80);
-    expect(report.automatedControls).toEqual(["existing-amc-modules"]);
-    expect(report.certificationReadiness).toBe(true);
+    expect(report.coveragePercent).toBe(0);
+    expect(report.coveredControls).toHaveLength(0);
+    expect(report.gapControls.length).toBe(16);
+    expect(report.certificationReadiness).toBe(false);
+  });
+
+  test("MITRE ATLAS has technique-level controls and zero coverage with no evidence", () => {
+    const report = generateFrameworkReport("MITRE_ATLAS", { passedQIDs: [], activeModules: [] });
+    expect(report.coveragePercent).toBe(0);
+    expect(report.gapControls.length).toBe(15);
+    expect(report.certificationReadiness).toBe(false);
+  });
+
+  test("OWASP API Top 10 has all 10 controls and zero coverage with no evidence", () => {
+    const report = generateFrameworkReport("OWASP_API_TOP10", { passedQIDs: [], activeModules: [] });
+    expect(report.coveragePercent).toBe(0);
+    expect(report.gapControls.length).toBe(10);
+    expect(report.certificationReadiness).toBe(false);
+  });
+
+  test("MITRE ATLAS coverage via prompt injection question", () => {
+    const report = generateFrameworkReport("MITRE_ATLAS", {
+      passedQIDs: ["AMC-3.3.1"],
+      activeModules: []
+    });
+    expect(report.coveredControls).toContain("AML.T0048");
+    expect(report.coveredControls).toContain("AML.T0051");
+  });
+
+  test("OWASP API coverage via security question", () => {
+    const report = generateFrameworkReport("OWASP_API_TOP10", {
+      passedQIDs: ["AMC-1.5"],
+      activeModules: []
+    });
+    expect(report.coveredControls).toContain("OWASP-API1");
+    expect(report.coveredControls).toContain("OWASP-API8");
   });
 
   test("NIST report with no evidence has zero coverage and all controls as gaps", () => {
@@ -148,7 +184,9 @@ describe("score crossFrameworkMapping", () => {
       "SOC2_TYPE2",
       "GDPR",
       "FORESIGHT_SAFETY",
-      "AGENTIC_4C"
+      "AGENTIC_4C",
+      "MITRE_ATLAS",
+      "OWASP_API_TOP10"
     ];
     for (const framework of frameworks) {
       const report = generateFrameworkReport(framework, { passedQIDs: [], activeModules: [] });

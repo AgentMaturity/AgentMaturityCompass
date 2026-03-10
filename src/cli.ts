@@ -15855,6 +15855,32 @@ score
   });
 
 score
+  .command("faithfulness")
+  .description("Score how well LLM output is grounded in provided context")
+  .option("--json", "Output as JSON")
+  .option("--context <text>", "Context to evaluate against")
+  .option("--output <text>", "LLM output to evaluate")
+  .option("--threshold <n>", "Overlap threshold (0-1)", parseFloat)
+  .action(async (opts: { json?: boolean; context?: string; output?: string; threshold?: number }) => {
+    try {
+      const { scoreFaithfulness } = await import("./score/faithfulness.js");
+      const result = scoreFaithfulness(
+        { context: opts.context ?? "", output: opts.output ?? "" },
+        { overlapThreshold: opts.threshold },
+      );
+      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
+      console.log(chalk.bold.hex("#FF6600")("\n🎯  Faithfulness"));
+      console.log(chalk.gray("Score:"), result.score.toFixed(3));
+      console.log(chalk.gray("Claims:"), `${result.supportedClaims}/${result.totalClaims} supported`);
+      console.log(chalk.gray("Explanation:"), result.explanation);
+      if (result.recommendations.length > 0) {
+        console.log(chalk.yellow("\n💡 Recommendations:"));
+        for (const r of result.recommendations) console.log(chalk.yellow(`  - ${r}`));
+      }
+    } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
+  });
+
+score
   .command("memory-integrity")
   .description("Score memory correction persistence and poisoning resistance")
   .option("--json", "Output as JSON")

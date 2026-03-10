@@ -280,6 +280,140 @@ def gdpr_policy_pack() -> PolicyPack:
     ).with_digest()
 
 
+def mitre_atlas_policy_pack() -> PolicyPack:
+    """MITRE ATLAS adversarial threat landscape policy pack."""
+    return PolicyPack(
+        name="MITRE ATLAS",
+        version="1.0",
+        description="MITRE ATLAS (Adversarial Threat Landscape for AI Systems) policy pack covering ML supply chain, prompt injection, model evasion, data exfiltration, and cost harvesting threats.",
+        modules=[
+            "e1_policy",
+            "e4_egress_proxy",
+            "e10_gateway_scanner",
+            "s1_analyzer",
+            "s9_sanitizer",
+            "w1_receipts",
+            "w2_assurance",
+            "w4_safety_testkit",
+        ],
+        rules=[
+            {
+                "id": "ATLAS_T0048_PROMPT_INJECTION",
+                "action": "deny",
+                "target": "llm_input",
+                "condition": "prompt_injection_detected",
+                "remediation": "Block prompt injection attempts per AML.T0048",
+            },
+            {
+                "id": "ATLAS_T0051_JAILBREAK",
+                "action": "deny",
+                "target": "llm_input",
+                "condition": "jailbreak_attempt_detected",
+                "remediation": "Block LLM jailbreak attempts per AML.T0051",
+            },
+            {
+                "id": "ATLAS_T0025_EXFILTRATION",
+                "action": "deny",
+                "target": "data_exfiltration",
+                "condition": "secret_exfiltration_succeeded",
+                "remediation": "Prevent data exfiltration via inference API per AML.T0025",
+            },
+            {
+                "id": "ATLAS_T0010_SUPPLY_CHAIN",
+                "action": "audit",
+                "target": "model_loading",
+                "condition": "unsafe_provider_route",
+                "remediation": "Verify ML supply chain integrity per AML.T0010",
+            },
+            {
+                "id": "ATLAS_T0034_COST_HARVESTING",
+                "action": "deny",
+                "target": "execution",
+                "condition": "budget_exceeded_or_frozen",
+                "remediation": "Prevent cost harvesting via compute abuse per AML.T0034",
+            },
+            {
+                "id": "ATLAS_T0015_EVASION",
+                "action": "audit",
+                "target": "llm_response",
+                "condition": "adversarial_input_detected",
+                "remediation": "Detect and log model evasion attempts per AML.T0015",
+            },
+        ],
+        tags=["security", "mitre-atlas", "adversarial-ml", "threat-landscape"],
+    ).with_digest()
+
+
+def owasp_api_top10_policy_pack() -> PolicyPack:
+    """OWASP API Security Top 10 (2023) policy pack."""
+    return PolicyPack(
+        name="OWASP API Security Top 10 (2023)",
+        version="1.0",
+        description="OWASP API Security Top 10 (2023) policy pack covering broken authorization, authentication, resource consumption, SSRF, and API inventory controls.",
+        modules=[
+            "e1_policy",
+            "e4_egress_proxy",
+            "e5_circuit_breaker",
+            "e10_gateway_scanner",
+            "s1_analyzer",
+            "w1_receipts",
+            "w2_assurance",
+        ],
+        rules=[
+            {
+                "id": "OWASP_API1_BOLA",
+                "action": "deny",
+                "target": "tool_execution",
+                "condition": "governance_bypass_succeeded",
+                "remediation": "Enforce object-level authorization per OWASP API1:2023",
+            },
+            {
+                "id": "OWASP_API2_AUTH",
+                "action": "deny",
+                "target": "authentication",
+                "condition": "lease_invalid_or_missing",
+                "remediation": "Enforce authentication controls per OWASP API2:2023",
+            },
+            {
+                "id": "OWASP_API4_RESOURCE",
+                "action": "deny",
+                "target": "execution",
+                "condition": "budget_exceeded_or_frozen",
+                "remediation": "Enforce rate limits and resource caps per OWASP API4:2023",
+            },
+            {
+                "id": "OWASP_API5_BFLA",
+                "action": "deny",
+                "target": "tool_execution",
+                "condition": "execute_without_ticket_attempted",
+                "remediation": "Enforce function-level authorization per OWASP API5:2023",
+            },
+            {
+                "id": "OWASP_API7_SSRF",
+                "action": "deny",
+                "target": "outbound_request",
+                "condition": "ssrf_or_unsafe_url_detected",
+                "remediation": "Validate URIs and block SSRF per OWASP API7:2023",
+            },
+            {
+                "id": "OWASP_API8_MISCONFIG",
+                "action": "audit",
+                "target": "configuration",
+                "condition": "config_signature_invalid",
+                "remediation": "Audit security configuration per OWASP API8:2023",
+            },
+            {
+                "id": "OWASP_API10_UNSAFE_CONSUMPTION",
+                "action": "deny",
+                "target": "outbound_request",
+                "condition": "unsafe_provider_route",
+                "remediation": "Validate third-party API responses per OWASP API10:2023",
+            },
+        ],
+        tags=["security", "owasp", "api-security", "top-10"],
+    ).with_digest()
+
+
 def get_all_prebuilt_packs() -> list[PolicyPack]:
     """Return all pre-built compliance policy packs."""
     return [
@@ -287,4 +421,6 @@ def get_all_prebuilt_packs() -> list[PolicyPack]:
         soc2_policy_pack(),
         iso42001_policy_pack(),
         gdpr_policy_pack(),
+        mitre_atlas_policy_pack(),
+        owasp_api_top10_policy_pack(),
     ]
