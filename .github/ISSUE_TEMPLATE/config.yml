@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: 💬 Questions & Discussion
+    url: https://github.com/thewisecrab/AgentMaturityCompass/discussions
+    about: Ask questions or share ideas in GitHub Discussions
+  - name: 🔒 Security Vulnerability
+    url: https://github.com/thewisecrab/AgentMaturityCompass/security/advisories/new
+    about: Report security vulnerabilities privately

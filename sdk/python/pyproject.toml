@@ -1,0 +1,37 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "amc-sdk"
+version = "0.1.0"
+description = "Trust scoring for AI agents — Python SDK for Agent Maturity Compass"
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.9"
+authors = [
+    { name = "thewisecrab" },
+]
+keywords = ["ai", "agents", "trust", "security", "scoring", "maturity", "guardrails"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Security",
+    "Topic :: Software Development :: Testing",
+]
+
+[project.urls]
+Homepage = "https://github.com/thewisecrab/AgentMaturityCompass"
+Documentation = "https://github.com/thewisecrab/AgentMaturityCompass/tree/main/sdk/python"
+Repository = "https://github.com/thewisecrab/AgentMaturityCompass"
+Issues = "https://github.com/thewisecrab/AgentMaturityCompass/issues"
+
+[tool.hatch.build.targets.wheel]
+packages = ["amc_sdk"]

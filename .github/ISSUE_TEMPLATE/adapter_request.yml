@@ -1,0 +1,42 @@
+name: 🔌 Adapter Request
+description: Request support for a new agent framework
+labels: ["adapter", "enhancement"]
+body:
+  - type: input
+    id: framework
+    attributes:
+      label: Framework name
+      placeholder: "Dify, Haystack, SuperAGI..."
+    validations:
+      required: true
+  - type: input
+    id: url
+    attributes:
+      label: Framework URL
+      placeholder: "https://github.com/..."
+    validations:
+      required: true
+  - type: dropdown
+    id: kind
+    attributes:
+      label: Framework type
+      options:
+        - Python library
+        - Node.js library
+        - CLI tool
+        - API server
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: llm_config
+    attributes:
+      label: How does the framework configure LLM access?
+      description: What env vars or config files control the LLM endpoint?
+      placeholder: "Uses OPENAI_BASE_URL env var / config.yaml / ..."
+  - type: checkboxes
+    id: willing
+    attributes:
+      label: Contribution
+      options:
+        - label: I'm willing to implement this adapter (see CONTRIBUTING.md)

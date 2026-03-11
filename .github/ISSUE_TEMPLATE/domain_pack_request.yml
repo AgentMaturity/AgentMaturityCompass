@@ -1,0 +1,39 @@
+name: 🏥 Domain Pack Request
+description: Suggest a new industry-specific assessment pack
+labels: ["domain-pack", "enhancement"]
+body:
+  - type: input
+    id: industry
+    attributes:
+      label: Industry / Sector
+      placeholder: "Healthcare, Finance, Legal, Manufacturing..."
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: What should this pack assess?
+      description: What industry-specific risks, regulations, or requirements?
+      placeholder: "HIPAA §164.312 compliance for medical AI agents..."
+    validations:
+      required: true
+  - type: textarea
+    id: regulations
+    attributes:
+      label: Key regulations
+      description: List specific regulations, articles, or standards
+      placeholder: |
+        - HIPAA §164.312
+        - FDA 21 CFR Part 11
+        - EU MDR 2017/745
+  - type: textarea
+    id: questions
+    attributes:
+      label: Example diagnostic questions
+      description: Suggest 2-5 specific questions this pack should include
+  - type: checkboxes
+    id: willing
+    attributes:
+      label: Contribution
+      options:
+        - label: I'm willing to implement this pack (see CONTRIBUTING.md)

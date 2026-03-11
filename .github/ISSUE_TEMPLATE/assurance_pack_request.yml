@@ -1,0 +1,55 @@
+name: 🔬 Assurance Pack Request
+description: Suggest a new attack scenario or red-team pack
+labels: ["assurance-pack", "enhancement"]
+body:
+  - type: textarea
+    id: attack
+    attributes:
+      label: Attack vector description
+      description: What attack or failure mode should this pack test?
+      placeholder: "Test for [specific attack]..."
+    validations:
+      required: true
+  - type: dropdown
+    id: category
+    attributes:
+      label: Category
+      options:
+        - Prompt Injection
+        - Exfiltration
+        - Adversarial Robustness
+        - Context Leakage
+        - Supply Chain
+        - Behavioral (sycophancy, over-compliance, etc.)
+        - MCP/Tool Security
+        - Other
+    validations:
+      required: true
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Severity
+      options:
+        - Critical
+        - High
+        - Medium
+        - Low
+    validations:
+      required: true
+  - type: textarea
+    id: references
+    attributes:
+      label: References
+      description: Link to research papers, CVEs, blog posts, or real incidents
+      placeholder: "https://arxiv.org/abs/..."
+  - type: textarea
+    id: scenarios
+    attributes:
+      label: Example scenarios
+      description: Describe 1-3 specific test scenarios if you have them
+  - type: checkboxes
+    id: willing
+    attributes:
+      label: Contribution
+      options:
+        - label: I'm willing to implement this pack (see CONTRIBUTING.md)
