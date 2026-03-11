@@ -346,3 +346,56 @@ export type { MemorySecurityArchitectureResult } from "./memorySecurityArchitect
 
 export { scoreAgentProtocolSecurity } from "./agentProtocolSecurity.js";
 export type { AgentProtocolSecurityResult } from "./agentProtocolSecurity.js";
+
+export { tokenize, computeBLEU, computeROUGE, computeMETEOR, computePerplexity, computeLevenshtein } from "./nlpMetrics.js";
+export type {
+  BLEUInput, BLEUResult,
+  ROUGEInput, ROUGEScores, ROUGEResult,
+  METEORInput, METEORResult,
+  PerplexityInput, PerplexityResult,
+  LevenshteinInput, LevenshteinResult,
+} from "./nlpMetrics.js";
+
+// ── Safety Metrics (2026-03-11) ──────────────────────────────────────
+
+export {
+  scoreToxicity,
+  detectBias,
+  classifyHateSpeech,
+  gradeHarmfulContent,
+  generateLLMJudgePrompt,
+  generateAllLLMJudgePrompts,
+  parseLLMJudgeResponse,
+  assessSafety,
+} from "./safetyMetrics.js";
+export type {
+  SafetySeverity,
+  SafetyViolation,
+  ToxicityResult,
+  BiasCategory,
+  BiasSignal,
+  BiasDetectionResult,
+  HateSpeechClass,
+  HateSpeechResult,
+  HarmfulContentGrade,
+  LLMJudgeDimension,
+  LLMJudgePrompt,
+  LLMJudgeResponse,
+  SafetyAssessment,
+} from "./safetyMetrics.js";
+
+export {
+  scoreConfidenceInterval,
+  compareScores,
+  recommendSampleSize,
+  abTest,
+  maturityConfidenceIntervals,
+} from "./statisticalAnalysis.js";
+export type {
+  ConfidenceInterval,
+  ScoreComparisonResult,
+  SampleSizeRecommendation,
+  ABTestResult,
+  ABTestSummary,
+  ScoreSample,
+} from "./statisticalAnalysis.js";
