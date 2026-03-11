@@ -180,7 +180,7 @@ function selectRefinements(branchingFactor: number): RefinementStrategy[] {
   // Rotate through strategies; for branching > strategy count, repeat with variation
   const selected: RefinementStrategy[] = [];
   for (let i = 0; i < branchingFactor; i++) {
-    selected.push(refinements[i % refinements.length]);
+    selected.push(refinements[i % refinements.length]!);
   }
   return selected;
 }

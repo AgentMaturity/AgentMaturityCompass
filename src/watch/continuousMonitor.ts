@@ -163,7 +163,7 @@ export class ContinuousMonitor extends EventEmitter {
         const report = JSON.parse(readUtf8(join(runsDir, file))) as DiagnosticReport;
         this.scoreHistory.push({
           ts: report.ts,
-          score: report.overallScore,
+          score: report.integrityIndex,
           runId: report.runId
         });
       } catch {
@@ -203,12 +203,12 @@ export class ContinuousMonitor extends EventEmitter {
 
     // Update metrics
     this.metrics.previousScore = this.metrics.currentScore;
-    this.metrics.currentScore = report.overallScore;
+    this.metrics.currentScore = report.integrityIndex;
     this.metrics.lastScoredAt = ts;
     this.metrics.totalScores += 1;
 
     if (this.metrics.previousScore !== null) {
-      this.metrics.scoreDelta = this.metrics.currentScore - this.metrics.previousScore;
+      this.metrics.scoreDelta = this.metrics.currentScore - this.metrics.previousScore!;
 
       // Check for score drops
       if (this.metrics.scoreDelta < -this.config.scoreDropThreshold) {
@@ -219,7 +219,7 @@ export class ContinuousMonitor extends EventEmitter {
     // Add to history
     this.scoreHistory.push({
       ts,
-      score: report.overallScore,
+      score: report.integrityIndex,
       runId: report.runId
     });
 
@@ -236,7 +236,7 @@ export class ContinuousMonitor extends EventEmitter {
       ts,
       agentId: this.config.agentId,
       data: {
-        score: report.overallScore,
+        score: report.integrityIndex,
         runId: report.runId,
         delta: this.metrics.scoreDelta
       }
@@ -328,14 +328,14 @@ export class ContinuousMonitor extends EventEmitter {
     try {
       ledger.startSession({
         sessionId,
-        runtime: "continuous-monitor",
+        runtime: "unknown",
         binaryPath: "amc-watch",
         binarySha256: sha256Hex("amc-watch")
       });
 
       ledger.appendEvidence({
         sessionId,
-        runtime: "continuous-monitor",
+        runtime: "unknown",
         eventType: "audit",
         payload: JSON.stringify({
           auditType: "SCORE_DROP_DETECTED",

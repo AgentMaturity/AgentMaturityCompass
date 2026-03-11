@@ -26,7 +26,7 @@ import {
 } from "./packTypes.js";
 import { ensureDir, pathExists, readUtf8, writeUtf8 } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
-import { getPrivateKeyPem, signHexDigest, verifySignature } from "../crypto/keys.js";
+import { getPrivateKeyPem, signHexDigest, verifyHexDigest } from "../crypto/keys.js";
 
 /* ── Registry storage interface ──────────────────────────────── */
 
@@ -160,11 +160,11 @@ export class FileSystemPackRegistryStorage implements PackRegistryStorage {
     }
 
     // Sort results
-    this.sortResults(results, validated.sortBy);
+    this.sortResults(results, validated.sortBy ?? 'name');
 
     // Apply pagination
-    const start = validated.offset;
-    const end = start + validated.limit;
+    const start = validated.offset ?? 0;
+    const end = start + (validated.limit ?? 20);
     return results.slice(start, end);
   }
 
@@ -492,16 +492,22 @@ export function validatePackManifest(manifest: unknown): PackValidationResult {
       warnings.push("Assurance packs should define scenarios");
     }
     
-    if (validated.amcPack.riskLevel === "critical" && validated.amcPack.executionMode !== "isolated") {
-      errors.push("Critical risk packs must use isolated execution mode");
+    if (validated.amcPack.riskLevel === "high" && validated.amcPack.executionMode !== "sandbox") {
+      warnings.push("High risk packs should use sandbox execution mode");
     }
 
+    if (errors.length === 0) {
+      return {
+        valid: true as const,
+        warnings,
+        manifest: validated,
+        integrity: sha256Hex(JSON.stringify(validated))
+      };
+    }
     return {
-      valid: errors.length === 0,
+      valid: false as const,
       errors,
       warnings,
-      manifest: validated,
-      integrity: sha256Hex(JSON.stringify(validated))
     };
   } catch (error: any) {
     return {

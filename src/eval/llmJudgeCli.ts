@@ -16,7 +16,8 @@
 
 import { Command } from 'commander';
 import { readFile, writeFile } from 'node:fs/promises';
-import { ExtendedLLMJudgeEngine, JudgeContext, JudgeResult, aggregateMetricsByCategory, calculateOverallScore } from './extendedLLMJudge.js';
+import { ExtendedLLMJudgeEngine, aggregateMetricsByCategory, calculateOverallScore } from './extendedLLMJudge.js';
+import type { JudgeContext, JudgeResult } from './llmJudgeEngine.js';
 
 const program = new Command();
 
@@ -217,13 +218,13 @@ function formatAsTable(results: JudgeResult[]): string {
 
   // Simple table formatting
   const colWidths = headers.map((header, i) => 
-    Math.max(header.length, ...rows.map(row => row[i].length))
+    Math.max(header.length, ...rows.map(row => (row[i] ?? '').length))
   );
 
   const separator = colWidths.map(w => '-'.repeat(w)).join(' | ');
-  const headerRow = headers.map((h, i) => h.padEnd(colWidths[i])).join(' | ');
+  const headerRow = headers.map((h, i) => h.padEnd(colWidths[i]!)).join(' | ');
   const dataRows = rows.map(row => 
-    row.map((cell, i) => cell.padEnd(colWidths[i])).join(' | ')
+    row.map((cell, i) => cell.padEnd(colWidths[i]!)).join(' | ')
   );
 
   return [headerRow, separator, ...dataRows].join('\n');

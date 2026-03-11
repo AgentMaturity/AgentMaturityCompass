@@ -52,7 +52,7 @@ export class PackRegistryClient {
     for (const registry of sortedRegistries) {
       try {
         const registryResults = await this.searchRegistry(registry.url, params);
-        results.push(...registryResults.map(r => ({ ...r, registry: registry.name })));
+        results.push(...registryResults.map((r: any) => ({ ...r, registry: registry.name })));
       } catch (error) {
         console.warn(`Failed to search registry ${registry.name}: ${error}`);
       }
@@ -67,7 +67,7 @@ export class PackRegistryClient {
     });
 
     // Apply sorting
-    const sorted = this.sortSearchResults(deduped, params.sortBy);
+    const sorted = this.sortSearchResults(deduped, params.sortBy ?? 'relevance');
     
     // Apply pagination
     const start = params.offset || 0;
@@ -132,14 +132,14 @@ export class PackRegistryClient {
     
     // Verify integrity
     const integrity = createHash('sha256').update(tarball).digest('hex');
-    if (versionData._registry?.integrity && versionData._registry.integrity !== integrity) {
+    if ((versionData as any)._registry?.integrity && (versionData as any)._registry.integrity !== integrity) {
       throw new Error(`Integrity check failed for ${name}@${version}`);
     }
 
     return {
       tarball,
       integrity,
-      manifest: versionData
+      manifest: { ...versionData, category: (versionData as any).category ?? ('assurance' as const) } as PackManifest
     };
   }
 
@@ -287,8 +287,7 @@ export class PackRegistryClient {
     try {
       packManifestSchema.parse(manifest);
       return {
-        valid: true,
-        errors: [],
+        valid: true as const,
         warnings: [],
         manifest
       };

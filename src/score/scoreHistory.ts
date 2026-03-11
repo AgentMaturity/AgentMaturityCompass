@@ -293,6 +293,7 @@ export class ScoreHistoryStore {
     }
 
     const previous = history[1]; // Second most recent (first is current)
+    if (!previous) return [];
     const current = params.currentSnapshot;
     const alerts: RegressionAlert[] = [];
 
@@ -470,8 +471,8 @@ export class ScoreHistoryStore {
         };
       }
 
-      const startScore = dataPoints[0].score;
-      const endScore = dataPoints[dataPoints.length - 1].score;
+      const startScore = dataPoints[0]!.score;
+      const endScore = dataPoints[dataPoints.length - 1]!.score;
       const delta = endScore - startScore;
 
       // Calculate volatility (standard deviation)

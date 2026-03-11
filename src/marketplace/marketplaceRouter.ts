@@ -63,8 +63,8 @@ export async function handleMarketplaceRoute(
   /* ── GET /api/v1/marketplace/packs/:name ─────────────────── */
   const packInfoMatch = sub.match(/^\/packs\/(.+?)(?:\/|$)/);
   if (packInfoMatch && method === "GET") {
-    const name = decodeURIComponent(packInfoMatch[1]);
-    const subAfterName = sub.slice(`/packs/${packInfoMatch[1]}`.length) || "/";
+    const name = decodeURIComponent(packInfoMatch[1]!);
+    const subAfterName = sub.slice(`/packs/${packInfoMatch[1]!}`.length) || "/";
 
     /* GET /api/v1/marketplace/packs/:name/ratings ──────────── */
     if (subAfterName === "/ratings") {
@@ -91,7 +91,7 @@ export async function handleMarketplaceRoute(
   /* ── POST /api/v1/marketplace/packs/:name/ratings ────────── */
   const ratingMatch = sub.match(/^\/packs\/(.+?)\/ratings$/);
   if (ratingMatch && method === "POST") {
-    const name = decodeURIComponent(ratingMatch[1]);
+    const name = decodeURIComponent(ratingMatch[1]!);
     const body = await bodyJson<{ userId: string; score: number; review?: string }>(req);
     const rating = packRatingSchema.parse({
       packId: name,

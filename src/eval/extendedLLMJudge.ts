@@ -7,7 +7,9 @@
  * Issue: AMC-48 — BUILD: LLM-as-Judge Metrics (Extended Set)
  */
 
-import { JudgeContext, JudgeResult, LLMJudgeEngine } from './llmJudgeEngine.js';
+import { LLMJudgeEngine } from './llmJudgeEngine.js';
+export { JudgeContext, JudgeResult } from './llmJudgeEngine.js';
+import type { JudgeContext, JudgeResult } from './llmJudgeEngine.js';
 
 // ---------------------------------------------------------------------------
 // Extended Judge Prompts

@@ -94,7 +94,7 @@ export function checkRegressions(options: ScoreHistoryCliOptions & {
     return;
   }
 
-  const currentSnapshot = history[0];
+  const currentSnapshot = history[0]!;
   const alerts = store.detectRegressions({
     agentId: options.agentId,
     currentSnapshot,

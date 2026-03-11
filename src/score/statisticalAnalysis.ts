@@ -238,9 +238,9 @@ export function scoreConfidenceInterval(
 
   if (values.length === 1) {
     return {
-      estimate: values[0],
-      lower: values[0],
-      upper: values[0],
+      estimate: values[0]!,
+      lower: values[0]!,
+      upper: values[0]!,
       confidenceLevel,
       marginOfError: 0,
       sampleSize: 1,

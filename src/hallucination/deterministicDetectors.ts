@@ -70,7 +70,7 @@ export function detectFabricatedCitations(input: HallucinationDetectorInput): Ha
   JOURNAL_PATTERN.lastIndex = 0;
   let jMatch: RegExpExecArray | null;
   while ((jMatch = JOURNAL_PATTERN.exec(response)) !== null) {
-    const journalName = jMatch[1].trim();
+    const journalName = jMatch[1]!.trim();
     if (contextLower && !contextLower.includes(journalName.toLowerCase())) {
       findings.push({
         id: nextId(),
@@ -273,15 +273,15 @@ export function detectContradictions(input: HallucinationDetectorInput): Halluci
     const negativeSentences: Array<{ text: string; idx: number }> = [];
 
     for (let i = 0; i < sentences.length; i++) {
-      const s = sentences[i];
+      const s = sentences[i]!;
       if (pair.positive.test(s)) positiveSentences.push({ text: s.trim(), idx: i });
       if (pair.negative.test(s)) negativeSentences.push({ text: s.trim(), idx: i });
     }
 
     // If both positive and negative matches exist, it's a contradiction
     if (positiveSentences.length > 0 && negativeSentences.length > 0) {
-      const pos = positiveSentences[0];
-      const neg = negativeSentences[0];
+      const pos = positiveSentences[0]!;
+      const neg = negativeSentences[0]!;
       const span = `"${pos.text.substring(0, 60)}..." vs "${neg.text.substring(0, 60)}..."`;
 
       findings.push({

@@ -469,7 +469,7 @@ function emptyResult(mode: FaithfulnessMode, reason: 'empty_output' | 'empty_con
     totalClaims: 0,
     supportedClaims: 0,
     unsupportedClaims: 0,
-    explanation: explanations[reason],
+    explanation: explanations[reason] ?? '',
     mode,
     maturitySignals: reason === 'empty_output' ? ['vacuously_faithful'] : ['no_context_grounding'],
     recommendations: reason === 'empty_context'

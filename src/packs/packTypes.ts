@@ -486,9 +486,12 @@ export const packRatingSchema = z.object({
 export type PackManifestValidation = {
   valid: true;
   manifest: PackManifest;
+  warnings?: string[];
+  integrity?: string;
 } | {
   valid: false;
   errors: string[];
+  warnings?: string[];
   manifest?: undefined;
 };
 

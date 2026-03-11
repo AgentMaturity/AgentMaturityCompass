@@ -7,7 +7,8 @@
  * Issue: AMC-48 — BUILD: LLM-as-Judge Metrics (Test Integration)
  */
 
-import { ExtendedLLMJudgeEngine, JudgeContext, JudgeResult, MetricSummary, aggregateMetricsByCategory } from './extendedLLMJudge.js';
+import { ExtendedLLMJudgeEngine, MetricSummary, aggregateMetricsByCategory } from './extendedLLMJudge.js';
+import type { JudgeContext, JudgeResult } from './llmJudgeEngine.js';
 import { incCounter, setGauge, observeHistogram } from '../ops/metrics/metricsRegistry.js';
 
 // ---------------------------------------------------------------------------
@@ -176,7 +177,7 @@ export class AMCJudgeTestRunner {
     console.log(`Running LLM-as-Judge evaluation for ${testContexts.length} tests...`);
     
     for (let i = 0; i < testContexts.length; i++) {
-      const testContext = testContexts[i];
+      const testContext = testContexts[i]!;
       const result = await this.evaluateTest(testContext);
       results.push(result);
       

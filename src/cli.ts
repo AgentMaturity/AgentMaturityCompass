@@ -304,12 +304,12 @@ import {
   policyPackListCli
 } from "./policyPacks/packCli.js";
 import {
-  packSearchCli,
-  packInfoCli,
-  packInstallCli,
-  packUninstallCli,
+  packSearchCli as mpPackSearchCli,
+  packInfoCli as mpPackInfoCli,
+  packInstallCli as mpPackInstallCli,
+  packUninstallCli as mpPackUninstallCli,
   packRateCli,
-  packListCli,
+  packListCli as mpPackListCli,
   packFeaturedCli,
   packDeprecateCli,
   packUndeprecateCli
@@ -5010,7 +5010,7 @@ marketplace
   .option("--json", "JSON output")
   .action(async (opts: any) => {
     try {
-      const result = await packSearchCli({
+      const result: any = await mpPackSearchCli({
         workspace: process.cwd(),
         query: opts.query,
         category: opts.category,
@@ -5042,7 +5042,7 @@ marketplace
   .option("--json", "JSON output")
   .action(async (name: string, opts: { json?: boolean }) => {
     try {
-      const result = await packInfoCli({ workspace: process.cwd(), name });
+      const result: any = await mpPackInfoCli({ workspace: process.cwd(), name });
       if (!result) { console.error(chalk.red(`Pack "${name}" not found`)); process.exit(1); }
       if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
       const e = result.entry;
@@ -5074,12 +5074,12 @@ marketplace
   .option("--json", "JSON output")
   .action(async (name: string, opts: { version?: string; agent?: string; json?: boolean }) => {
     try {
-      const result = await packInstallCli({
+      const result = await mpPackInstallCli({
         workspace: process.cwd(),
         name,
         version: opts.version,
         agentId: opts.agent ?? activeAgent(program)
-      });
+      } as any);
       if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
       if (result.success) {
         console.log(chalk.green(`✅ ${result.message}`));
@@ -5097,11 +5097,11 @@ marketplace
   .option("--agent <agentId>", "agent ID")
   .action(async (name: string, opts: { agent?: string }) => {
     try {
-      const result = await packUninstallCli({
+      const result = await mpPackUninstallCli({
         workspace: process.cwd(),
         name,
         agentId: opts.agent ?? activeAgent(program)
-      });
+      } as any);
       if (result.success) { console.log(chalk.green(`✅ ${result.message}`)); }
       else { console.error(chalk.red(`❌ ${result.message}`)); process.exit(1); }
     } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
@@ -5136,10 +5136,11 @@ marketplace
   .option("--json", "JSON output")
   .action(async (opts: { json?: boolean }) => {
     try {
-      const packs = await packListCli({ workspace: process.cwd() });
-      if (opts.json) { console.log(JSON.stringify(packs, null, 2)); return; }
-      console.log(chalk.bold(`\n📦 Installed Packs (${packs.length})\n`));
-      for (const e of packs) {
+      const packsResult = await mpPackListCli({ workspace: process.cwd() }) as any;
+      const packsList = packsResult.packages ?? packsResult;
+      if (opts.json) { console.log(JSON.stringify(packsResult, null, 2)); return; }
+      console.log(chalk.bold(`\n📦 Installed Packs (${packsList.length})\n`));
+      for (const e of packsList) {
         console.log(`  ${chalk.cyan(e.id)} v${e.version} [${e.category}] — ${e.description}`);
       }
     } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }

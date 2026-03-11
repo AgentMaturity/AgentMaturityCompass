@@ -109,7 +109,7 @@ function summarizeAgent(report: DiagnosticReport): AgentScoreSummary {
   const overall = overallFromLayers(report.layerScores);
   const layers: Record<string, number> = {};
   for (const layer of report.layerScores) {
-    layers[layer.layer] = layer.avgFinalLevel;
+    layers[layer.layerName] = layer.avgFinalLevel;
   }
 
   const sorted = [...report.questionScores].sort((a, b) => a.finalLevel - b.finalLevel);

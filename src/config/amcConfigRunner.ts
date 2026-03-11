@@ -282,16 +282,16 @@ async function evaluateAgent(
       let packsPassedCount = 0;
 
       for (const pack of assuranceReport.packResults) {
-        const packPassed = pack.scenarios.every((s) => s.passed);
+        const packPassed = pack.scenarioResults.every((s) => s.pass);
         if (packPassed) packsPassedCount++;
-        for (const scenario of pack.scenarios) {
+        for (const scenario of pack.scenarioResults) {
           scenariosTotal++;
-          if (scenario.passed) scenariosPassed++;
+          if (scenario.pass) scenariosPassed++;
         }
       }
 
       assuranceResult = {
-        overallScore: assuranceReport.overallScore,
+        overallScore: assuranceReport.overallScore0to100,
         packsRun: assuranceReport.packResults.length,
         packsPassedCount,
         scenariosTotal,

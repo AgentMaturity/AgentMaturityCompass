@@ -188,10 +188,10 @@ export class AMCMasterEngine {
         trustTier: 'ATTESTED'
       },
       complianceStatus: {
-        euAIAct: detailedScores.euAIActCompliance > 0.8,
-        owaspLLM: detailedScores.owaspLLMCoverage > 0.8,
-        mcpCompliance: detailedScores.mcpCompliance > 0.8,
-        regulatoryReadiness: detailedScores.regulatoryReadiness > 0.8
+        euAIAct: (detailedScores.euAIActCompliance ?? 0) > 0.8,
+        owaspLLM: (detailedScores.owaspLLMCoverage ?? 0) > 0.8,
+        mcpCompliance: (detailedScores.mcpCompliance ?? 0) > 0.8,
+        regulatoryReadiness: (detailedScores.regulatoryReadiness ?? 0) > 0.8
       },
       predictiveAnalytics: {
         futureMaturity: [

@@ -235,9 +235,9 @@ export class LLMApiClient {
       'gpt-3.5-turbo': { input: 0.0015, output: 0.002 }
     };
 
-    const modelPricing = pricing[model] || pricing['gpt-4'];
-    const inputCost = (usage?.prompt_tokens || 0) / 1000 * modelPricing.input;
-    const outputCost = (usage?.completion_tokens || 0) / 1000 * modelPricing.output;
+    const modelPricing = pricing[model] ?? pricing['gpt-4']!;
+    const inputCost = (usage?.prompt_tokens || 0) / 1000 * modelPricing!.input;
+    const outputCost = (usage?.completion_tokens || 0) / 1000 * modelPricing!.output;
     
     return inputCost + outputCost;
   }
@@ -250,9 +250,9 @@ export class LLMApiClient {
       'claude-3-haiku-20240307': { input: 0.00025, output: 0.00125 }
     };
 
-    const modelPricing = pricing[model] || pricing['claude-3-sonnet-20240229'];
-    const inputCost = (usage?.input_tokens || 0) / 1000 * modelPricing.input;
-    const outputCost = (usage?.output_tokens || 0) / 1000 * modelPricing.output;
+    const modelPricing = pricing[model] ?? pricing['claude-3-sonnet-20240229']!;
+    const inputCost = (usage?.input_tokens || 0) / 1000 * modelPricing!.input;
+    const outputCost = (usage?.output_tokens || 0) / 1000 * modelPricing!.output;
     
     return inputCost + outputCost;
   }

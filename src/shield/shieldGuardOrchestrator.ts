@@ -88,11 +88,10 @@ export class ShieldGuardOrchestrator {
     const startTime = Date.now();
     const evidenceId = this.generateEvidenceId();
 
-    emitGuardEvent('protection_request_started', {
-      evidenceId,
-      sessionId: request.sessionId,
-      inputLength: request.input.length,
-      riskTier: request.riskTier
+    emitGuardEvent({
+      agentId: request.sessionId || 'system', moduleCode: 'protection_request_started',
+      decision: 'allow', reason: 'Protection request initiated', severity: 'low',
+      meta: { evidenceId, inputLength: request.input.length, riskTier: request.riskTier }
     });
 
     try {
@@ -123,19 +122,19 @@ export class ShieldGuardOrchestrator {
       // Update metrics
       this.updateMetrics(result);
 
-      emitGuardEvent('protection_request_completed', {
-        evidenceId,
-        allowed: result.allowed,
-        threatLevel: result.threatLevel,
-        responseTime: result.responseTime
+      emitGuardEvent({
+        agentId: request.sessionId || 'system', moduleCode: 'protection_request_completed',
+        decision: result.allowed ? 'allow' : 'deny', reason: `Threat level: ${result.threatLevel}`, severity: 'low',
+        meta: { evidenceId, allowed: result.allowed, threatLevel: result.threatLevel, responseTime: result.responseTime }
       });
 
       return result;
 
     } catch (error) {
-      emitGuardEvent('protection_request_failed', {
-        evidenceId,
-        error: error instanceof Error ? error.message : 'Unknown error'
+      emitGuardEvent({
+        agentId: 'system', moduleCode: 'protection_request_failed',
+        decision: 'deny', reason: error instanceof Error ? error.message : 'Unknown error', severity: 'high',
+        meta: { evidenceId }
       });
       
       // Fail-safe: allow request but log the failure
@@ -165,10 +164,10 @@ export class ShieldGuardOrchestrator {
       results.push(threatIntelDetection);
     }
 
-    emitGuardEvent('shield_detection_completed', {
-      evidenceId,
-      layersExecuted: results.length,
-      threatsDetected: results.reduce((sum, r) => sum + r.attacks.length, 0)
+    emitGuardEvent({
+      agentId: 'system', moduleCode: 'shield_detection_completed',
+      decision: 'allow', reason: 'Shield detection completed', severity: 'low',
+      meta: { evidenceId, layersExecuted: results.length, threatsDetected: results.reduce((sum, r) => sum + r.attacks.length, 0) }
     });
 
     return results;
@@ -190,11 +189,11 @@ export class ShieldGuardOrchestrator {
 
     const assessment = analyzeAdvancedThreats(threatInput);
 
-    emitGuardEvent('advanced_threat_analysis_completed', {
-      evidenceId,
-      overallRiskScore: assessment.overallRiskScore0to100,
-      threatDetected: assessment.threatDetected,
-      severityLevel: assessment.overallSeverity
+    emitGuardEvent({
+      agentId: 'system', moduleCode: 'advanced_threat_analysis_completed',
+      decision: assessment.threatDetected ? 'warn' : 'allow',
+      reason: `Risk score: ${assessment.overallRiskScore0to100}`, severity: assessment.threatDetected ? 'high' : 'low',
+      meta: { evidenceId, overallRiskScore: assessment.overallRiskScore0to100, threatDetected: assessment.threatDetected, severityLevel: assessment.overallSeverity }
     });
 
     return assessment;
@@ -420,7 +419,7 @@ export class ShieldGuardOrchestrator {
     );
 
     if (maxRisk >= 0.8) return 'high';
-    if (maxRisk >= 0.6) return 'medium';
+    if (maxRisk >= 0.6) return 'med';
     return 'low';
   }
 
@@ -520,10 +519,10 @@ export class ShieldGuardOrchestrator {
     // Update dynamic attack generator
     await dynamicAttackGenerator.updateThreatIntelligence(update.source, []);
     
-    emitGuardEvent('threat_intelligence_updated', {
-      source: update.source,
-      newVectors: update.newVectors.length,
-      emergingThreats: update.emergingThreats.length
+    emitGuardEvent({
+      agentId: 'system', moduleCode: 'threat_intelligence_updated',
+      decision: 'allow', reason: 'Threat intelligence updated', severity: 'low',
+      meta: { source: update.source, newVectors: update.newVectors.length, emergingThreats: update.emergingThreats.length }
     });
   }
 

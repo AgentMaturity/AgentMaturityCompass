@@ -339,7 +339,7 @@ export class LLMJudgeEngine {
     return prompt;
   }
 
-  private async callJudgeModel(prompt: string): Promise<string> {
+  protected async callJudgeModel(prompt: string): Promise<string> {
     // This would integrate with actual LLM APIs
     // For now, return a mock response for testing
     return JSON.stringify({
@@ -348,7 +348,7 @@ export class LLMJudgeEngine {
     });
   }
 
-  private parseJudgeResponse(metric: string, response: string): JudgeResult {
+  protected parseJudgeResponse(metric: string, response: string): JudgeResult {
     try {
       const parsed = JSON.parse(response);
       return {
