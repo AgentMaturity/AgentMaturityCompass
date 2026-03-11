@@ -16,8 +16,10 @@ from amc.enforce.e1_policy import PolicyRequest
 from amc.core.models import SessionTrust, ToolCategory
 from amc.shield import InjectionDetector, SkillAnalyzer
 from amc.watch import get_ledger
-from amc.score import start_questionnaire
+from amc.score.questionnaire import QuestionnaireEngine
+from amc.score.dimensions import ScoringEngine
 from amc.product import Relevance, count_features, get_features, select_high_impact
+from amc.web.viewer import AMCViewer, create_sample_results
 
 app = typer.Typer(help="AMC Platform CLI")
 shield_app = typer.Typer(help="Shield commands")
@@ -144,7 +146,7 @@ def product_features(
         True,
         help="Only show features marked as AMC-fit",
     ),
-    limit: int = typer.Option(0, ge=0, help="Limit number of returned rows"),
+    limit: int = typer.Option(0, help="Limit number of returned rows"),
 ) -> None:
     """List the 50 candidate product features with relevance tags."""
     rel = Relevance(relevance.lower()) if relevance else None
@@ -160,7 +162,7 @@ def product_features(
 
 
 @product_app.command("features-recommended")
-def product_features_recommended(limit: int = typer.Option(12, ge=1, le=50)) -> None:
+def product_features_recommended(limit: int = typer.Option(12, help="Limit to top N recommendations")) -> None:
     """Show top high-impact AMC-fit recommendations for phase 1."""
     for f in select_high_impact(limit=limit):
         print(f"[{f.feature_id:02d}] {f.title}")
@@ -224,12 +226,88 @@ app.add_typer(watch_app, name="watch")
 @score_app.command("start")
 def score_start() -> None:
     """Run interactive trust-and-safety questionnaire."""
-    result = start_questionnaire()
-    print(f"score={result['score']:.0f}")
-    print(f"answers={','.join(result['answers'])}")
+    configure_logging(debug=settings.debug, json_output=settings.log_json)
+    
+    engine = QuestionnaireEngine()
+    session = engine.start_session()
+    
+    print(f"\nAMC Maturity Assessment - {len(engine.questions)} questions")
+    print("=" * 50)
+    
+    while (question := engine.next_question(session)) is not None:
+        print(f"\n[{session.current_question + 1}/{len(engine.questions)}] {question.dimension.value.upper()}")
+        print(f"Q: {question.text}")
+        if question.evidence_prompt:
+            print(f"Evidence: {question.evidence_prompt}")
+        
+        answer = typer.prompt("Your answer")
+        session = engine.answer(session, question.id, answer)
+    
+    # Generate composite score
+    composite_score = engine.complete(session)
+    print(f"Assessment complete!")
+    print(f"Overall Level: {composite_score.overall_level.value}")
+    print(f"Overall Score: {composite_score.overall_score}/100")
 
 
 app.add_typer(score_app, name="score")
+
+
+# ---------------------------------------------------------------------------
+# view
+# ---------------------------------------------------------------------------
+
+@app.command("view")
+def view_results(
+    sample: bool = typer.Option(False, help="Show sample results for demo"),
+    port: int = typer.Option(8080, help="Port for web server"),
+    host: str = typer.Option("127.0.0.1", help="Host for web server"),
+    no_browser: bool = typer.Option(False, help="Don't open browser automatically")
+) -> None:
+    """Open browser-based results viewer with shareable reports."""
+    configure_logging(debug=settings.debug, json_output=settings.log_json)
+    
+    viewer = AMCViewer(host=host, port=port)
+    
+    if sample:
+        # Show sample results for demo
+        sample_results = create_sample_results()
+        url = viewer.view_results(sample_results, open_browser=not no_browser)
+        print(f"Sample results available at: {url}")
+    else:
+        # TODO: Load actual results from file or run questionnaire
+        print("Interactive questionnaire mode - generating results...")
+        
+        # Run questionnaire to generate results
+        engine = QuestionnaireEngine()
+        session = engine.start_session()
+        
+        print(f"\nAMC Maturity Assessment - {len(engine.questions)} questions")
+        print("=" * 50)
+        
+        while (question := engine.next_question(session)) is not None:
+            print(f"\n[{session.current_question + 1}/{len(engine.questions)}] {question.dimension.value.upper()}")
+            print(f"Q: {question.text}")
+            if question.evidence_prompt:
+                print(f"Evidence: {question.evidence_prompt}")
+            
+            answer = typer.prompt("Your answer")
+            session = engine.answer(session, question.id, answer)
+        
+        # Generate composite score
+        composite_score = engine.complete(session)
+        
+        # Show results in web viewer
+        url = viewer.view_results(composite_score, open_browser=not no_browser)
+        print(f"\nAssessment complete! Results available at: {url}")
+        print(f"Overall Level: {composite_score.overall_level.value}")
+        print(f"Overall Score: {composite_score.overall_score}/100")
+    
+    # Start the web server
+    try:
+        viewer.start_server(open_browser=False)  # Browser already opened above
+    except KeyboardInterrupt:
+        print("\nViewer stopped.")
 
 
 # ---------------------------------------------------------------------------

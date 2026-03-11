@@ -593,7 +593,7 @@ describe("universal agent integration layer", () => {
         wrappedScript
       ]);
       expect(ran.code, `stdout:\n${ran.stdout}\nstderr:\n${ran.stderr}`).toBe(0);
-      expect(`${ran.stdout}${ran.stderr}`).not.toContain("sk-ABCDEFGHIJKLMNOP");
+      expect(`${ran.stdout}${ran.stderr}`).not.toContain("sk-ABCDEFGHI");
 
       const ledger = openLedger(workspace);
       const allEvents = ledger.getAllEvents();

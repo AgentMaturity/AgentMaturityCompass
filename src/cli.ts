@@ -9,7 +9,7 @@ import YAML from "yaml";
 import { guardCheck } from "./guardrails/guardEngine.js";
 import { openLedger, verifyLedgerIntegrity } from "./ledger/ledger.js";
 import { startMonitor, superviseProcess, wrapAny, wrapRuntime } from "./ledger/monitor.js";
-import { compareRuns, generateReport, loadRunReport, runDiagnostic } from "./diagnostic/runner.js";
+import { compareRuns, compareModels, generateReport, loadRunReport, runDiagnostic } from "./diagnostic/runner.js";
 import { loadTargetProfile, loadTargetProfileFromFile, setTargetProfileInteractive, verifyTargetProfileSignature } from "./targets/targetProfile.js";
 import { runTuneWizard, runUpgradeWizard } from "./tuning/tuneWizard.js";
 import { loadContextGraph } from "./context/contextGraph.js";
@@ -247,6 +247,17 @@ import {
 import { ensureBlobKey, verifyBlobCurrentKeySignature } from "./storage/blobs/blobKeys.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "./utils/fs.js";
 import { existsSync, readdirSync, readFileSync } from "node:fs";
+import {
+  packInstallCli,
+  packPublishCli,
+  packSearchCli,
+  packInfoCli,
+  packUninstallCli,
+  packListCli,
+  packInitCli,
+  packRegistryServeCli,
+  packRegistryInitCli
+} from "./packs/packCli.js";
 import { request as httpRequest } from "node:http";
 import {
   parseRolesCsv,
@@ -3975,15 +3986,268 @@ program
 
 program
   .command("compare")
-  .description("Compare two runs")
-  .argument("<runIdA>")
-  .argument("<runIdB>")
-  .action((runIdA: string, runIdB: string) => {
-    const agentId = activeAgent(program);
-    const a = loadRunReport(process.cwd(), runIdA, agentId);
-    const b = loadRunReport(process.cwd(), runIdB, agentId);
-    const diff = compareRuns(a, b);
-    console.log(JSON.stringify(diff, null, 2));
+  .description("Compare two runs OR multiple models (side-by-side evaluation)")
+  .argument("<items...>", "run IDs (2) or model names (2+) to compare")
+  .option("--agent <agentId>", "agent ID (for model comparison)")
+  .option("--window <window>", "evidence window (for model comparison)", "14d")
+  .option("--target <name>", "target profile name (for model comparison)", "default")
+  .option("--iterations <n>", "number of iterations per model", "1")
+  .option("--output <path>", "save comparison report to file")
+  .option("--json", "output as JSON", false)
+  .action(async (items: string[], opts: {
+    agent?: string;
+    window: string;
+    target: string;
+    iterations: string;
+    output?: string;
+    json: boolean;
+  }) => {
+    if (items.length < 2) {
+      throw new Error("At least 2 items required for comparison");
+    }
+
+    // Detect if items are run IDs or model names
+    // Run IDs are typically UUIDs or timestamp-based, model names are descriptive
+    const isRunId = (item: string): boolean => {
+      // Check if it looks like a UUID or timestamp-based run ID
+      return /^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i.test(item) ||
+             /^run_\d+_[a-f0-9]+$/i.test(item) ||
+             /^\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}/.test(item);
+    };
+
+    const allRunIds = items.every(isRunId);
+    const allModelNames = items.every(item => !isRunId(item));
+
+    if (!allRunIds && !allModelNames) {
+      throw new Error("All items must be either run IDs or model names, not mixed");
+    }
+
+    if (allRunIds) {
+      // Legacy behavior: compare runs
+      if (items.length !== 2) {
+        throw new Error("Run comparison requires exactly 2 run IDs");
+      }
+      const agentId = opts.agent ?? activeAgent(program);
+      const a = loadRunReport(process.cwd(), items[0] as string, agentId);
+      const b = loadRunReport(process.cwd(), items[1] as string, agentId);
+      const diff = compareRuns(a, b);
+      
+      if (opts.output) {
+        const fs = await import("fs");
+        fs.writeFileSync(opts.output, JSON.stringify(diff, null, 2), "utf-8");
+        console.log(chalk.green(`✓ Comparison saved to: ${opts.output}`));
+      } else {
+        console.log(JSON.stringify(diff, null, 2));
+      }
+    } else {
+      // New behavior: compare models
+      const { compareModels } = await import("./diagnostic/runner.js");
+      
+      const agentId = opts.agent ?? activeAgent(program);
+      ensureWorkspaceReadyForAgent(process.cwd(), agentId);
+
+      console.log(chalk.cyan(`🔄 Running agent evaluation across ${items.length} models...`));
+      console.log(chalk.gray(`Agent: ${agentId} | Window: ${opts.window} | Target: ${opts.target}`));
+      console.log("");
+
+      const comparison = await compareModels(process.cwd(), items, {
+        agentId,
+        window: opts.window,
+        targetName: opts.target,
+        iterations: parseInt(opts.iterations, 10)
+      });
+
+      if (opts.json) {
+        const output = JSON.stringify(comparison, null, 2);
+        if (opts.output) {
+          const fs = await import("fs");
+          fs.writeFileSync(opts.output, output, "utf-8");
+          console.log(chalk.green(`✓ Comparison saved to: ${opts.output}`));
+        } else {
+          console.log(output);
+        }
+        return;
+      }
+
+      // Human-readable output
+      console.log(chalk.bold("🧭 Multi-Model Agent Evaluation Comparison"));
+      console.log("");
+      
+      // Comparison matrix
+      console.log(chalk.cyan("Model Performance Matrix:"));
+      const headers = ["Model", "Overall", "Integrity", "Trust Label"];
+      const rows = comparison.comparisonMatrix.map(result => [
+        result.model,
+        `L${Math.floor(result.overallScore)}`,
+        result.integrityIndex.toFixed(3),
+        result.trustLabel
+      ]);
+      
+      // Simple table formatting
+      const colWidths = headers.map((header, i) => 
+        Math.max(header.length, ...rows.map(row => (row[i] as string).length))
+      );
+      
+      const formatRow = (row: string[]) => 
+        row.map((cell, i) => cell.padEnd(colWidths[i] as number)).join(" | ");
+      
+      console.log(formatRow(headers));
+      console.log(colWidths.map(w => "-".repeat(w)).join("-|-"));
+      rows.forEach(row => console.log(formatRow(row)));
+      
+      console.log("");
+      console.log(chalk.cyan("Summary:"));
+      console.log(`Best model: ${chalk.green(comparison.summary.bestModel)}`);
+      console.log(`Worst model: ${chalk.red(comparison.summary.worstModel)}`);
+      console.log(`Average integrity: ${comparison.summary.avgIntegrityIndex.toFixed(3)}`);
+      
+      if (comparison.summary.significantDifferences.length > 0) {
+        console.log("");
+        console.log(chalk.cyan("Significant differences by layer:"));
+        comparison.summary.significantDifferences.forEach(diff => {
+          console.log(`- ${diff.layer}: ${chalk.green(diff.bestModel)} vs ${chalk.red(diff.worstModel)} (Δ${diff.delta.toFixed(2)})`);
+        });
+      }
+
+      if (opts.output) {
+        const fs = await import("fs");
+        fs.writeFileSync(opts.output, JSON.stringify(comparison, null, 2), "utf-8");
+        console.log("");
+        console.log(chalk.green(`✓ Full comparison data saved to: ${opts.output}`));
+      }
+    }
+  });
+
+program
+  .command("compare-models")
+  .description("Run the same agent evaluation across multiple models and show comparison matrix")
+  .argument("<models...>", "model names to compare (e.g., gpt-4 claude-3-opus gemini-pro)")
+  .option("--agent <agentId>", "agent ID")
+  .option("--window <window>", "evidence window", "14d")
+  .option("--target <name>", "target profile name", "default")
+  .option("--iterations <n>", "number of iterations per model", "1")
+  .option("--output <path>", "save comparison report to file")
+  .option("--json", "output as JSON", false)
+  .action(async (models: string[], opts: {
+    agent?: string;
+    window: string;
+    target: string;
+    iterations: string;
+    output?: string;
+    json: boolean;
+  }) => {
+    const { compareModels } = await import("./diagnostic/runner.js");
+    
+    if (models.length < 2) {
+      throw new Error("At least 2 models required for comparison");
+    }
+
+    const agentId = opts.agent ?? activeAgent(program);
+    ensureWorkspaceReadyForAgent(process.cwd(), agentId);
+
+    console.log(chalk.cyan(`🔄 Running agent evaluation across ${models.length} models...`));
+    console.log(chalk.gray(`Agent: ${agentId} | Window: ${opts.window} | Target: ${opts.target}`));
+    console.log("");
+
+    const comparison = await compareModels(process.cwd(), models, {
+      agentId,
+      window: opts.window,
+      targetName: opts.target,
+      iterations: parseInt(opts.iterations, 10)
+    });
+
+    if (opts.json) {
+      const output = JSON.stringify(comparison, null, 2);
+      if (opts.output) {
+        const fs = await import("fs");
+        fs.writeFileSync(opts.output, output, "utf-8");
+        console.log(chalk.green(`✓ Comparison saved to: ${opts.output}`));
+      } else {
+        console.log(output);
+      }
+      return;
+    }
+
+    // Human-readable output
+    console.log(chalk.bold("🧭 Multi-Model Agent Evaluation Comparison"));
+    console.log("");
+
+    // Comparison matrix table
+    console.log(chalk.cyan("Model Performance Matrix:"));
+    console.log("─".repeat(80));
+    
+    const headers = ["Model", "Overall Score", "Integrity Index", "Trust Label", "Run ID"];
+    const colWidths = [20, 15, 17, 12, 16];
+    
+    // Print header
+    let headerRow = "";
+    for (let i = 0; i < headers.length; i++) {
+      headerRow += headers[i]!.padEnd(colWidths[i]!);
+    }
+    console.log(headerRow);
+    console.log("─".repeat(80));
+
+    // Print results
+    for (const result of comparison.comparisonMatrix) {
+      const row = [
+        result.model.padEnd(colWidths[0]!),
+        result.overallScore.toFixed(2).padEnd(colWidths[1]!),
+        result.integrityIndex.toFixed(3).padEnd(colWidths[2]!),
+        result.trustLabel.padEnd(colWidths[3]!),
+        result.runId.slice(0, 14).padEnd(colWidths[4]!)
+      ].join("");
+      
+      // Color code based on performance
+      if (result.model === comparison.summary.bestModel) {
+        console.log(chalk.green(row));
+      } else if (result.model === comparison.summary.worstModel) {
+        console.log(chalk.red(row));
+      } else {
+        console.log(row);
+      }
+    }
+
+    console.log("");
+
+    // Summary
+    console.log(chalk.cyan("Summary:"));
+    console.log(`${chalk.green("Best performing model:")} ${comparison.summary.bestModel}`);
+    console.log(`${chalk.red("Worst performing model:")} ${comparison.summary.worstModel}`);
+    console.log(`Average integrity index: ${comparison.summary.avgIntegrityIndex}`);
+
+    // Significant differences
+    if (comparison.summary.significantDifferences.length > 0) {
+      console.log("");
+      console.log(chalk.cyan("Significant Layer Differences (>0.5 points):"));
+      for (const diff of comparison.summary.significantDifferences) {
+        console.log(`• ${diff.layer}: ${chalk.green(diff.bestModel)} outperforms ${chalk.red(diff.worstModel)} by ${diff.delta} points`);
+      }
+    }
+
+    // Save to file if requested
+    if (opts.output) {
+      const fs = await import("fs");
+      const report = {
+        timestamp: new Date().toISOString(),
+        agent: agentId,
+        models: models,
+        comparison: comparison,
+        humanReadable: {
+          summary: `Best: ${comparison.summary.bestModel}, Worst: ${comparison.summary.worstModel}`,
+          avgIntegrityIndex: comparison.summary.avgIntegrityIndex,
+          significantDifferences: comparison.summary.significantDifferences.length
+        }
+      };
+      fs.writeFileSync(opts.output, JSON.stringify(report, null, 2), "utf-8");
+      console.log("");
+      console.log(chalk.green(`✓ Full comparison report saved to: ${opts.output}`));
+    }
+
+    console.log("");
+    console.log(chalk.gray("Next steps:"));
+    console.log(chalk.gray("• Use the best-performing model for production"));
+    console.log(chalk.gray("• Investigate layer-specific differences"));
+    console.log(chalk.gray("• Run with --iterations 3 for more reliable results"));
   });
 
 const verifyCmd = program.command("verify").description("Verify integrity across AMC artifacts");
@@ -7032,6 +7296,62 @@ dashboard
     console.log(chalk.green(`Dashboard built: ${built.outDir}`));
     console.log(`Agent: ${built.agentId}`);
     console.log(`Latest run: ${built.latestRunId}`);
+  });
+
+dashboard
+  .command("view")
+  .description("Build and open web UI showing maturity scores, test results, and comparison matrix with shareable URLs")
+  .option("--agent <agentId>", "agent ID (overrides global --agent)")
+  .option("--port <port>", "port", "4173")
+  .option("--out <dir>", "dashboard directory override")
+  .option("--no-open", "don't automatically open browser")
+  .action(async (opts: { agent?: string; port: string; out?: string; open: boolean }) => {
+    const resolvedAgent = opts.agent ?? activeAgent(program);
+    const defaultOut = resolvedAgent ? `.amc/agents/${resolvedAgent}/dashboard` : ".amc/dashboard";
+    
+    // Build dashboard first
+    const built = buildDashboard({
+      workspace: process.cwd(),
+      agentId: resolvedAgent,
+      outDir: opts.out ?? defaultOut
+    });
+    
+    // Start server
+    const handle = await serveDashboard({
+      workspace: process.cwd(),
+      agentId: resolvedAgent,
+      port: Number(opts.port),
+      outDir: opts.out ?? defaultOut
+    });
+    
+    console.log(chalk.green(`AMC Web UI running: ${handle.url}`));
+    console.log(`Agent: ${handle.agentId}`);
+    console.log(`Latest run: ${built.latestRunId}`);
+    console.log("");
+    console.log(chalk.cyan("Available endpoints:"));
+    console.log(`  Dashboard: ${handle.url}`);
+    console.log(`  Export MD: ${handle.url}/export.md`);
+    console.log(`  Export PDF: ${handle.url}/export.pdf`);
+    console.log("");
+    console.log(chalk.gray("Press Ctrl+C to stop server"));
+    
+    // Open browser if requested
+    if (opts.open) {
+      const { spawn } = await import("node:child_process");
+      const platform = process.platform;
+      const cmd = platform === "darwin" ? "open" : platform === "win32" ? "start" : "xdg-open";
+      spawn(cmd, [handle.url], { detached: true, stdio: "ignore" }).unref();
+    }
+    
+    // Keep server running
+    process.on("SIGINT", async () => {
+      console.log(chalk.gray("\nStopping server..."));
+      await handle.close();
+      process.exit(0);
+    });
+    
+    // Keep process alive
+    await new Promise(() => {});
   });
 
 dashboard
@@ -16340,6 +16660,256 @@ scan
     for (const s of result.detection.signals) { console.log(`  → ${s}`); }
   });
 
+scan
+  .command("model-scan")
+  .description("Scan ML model files for security threats (malicious code, backdoors, supply chain attacks)")
+  .argument("[target]", "file path, directory, HuggingFace repo (user/repo), S3 URL, or HTTP URL")
+  .option("--format <formats>", "comma-separated list of formats to scan (pickle,pytorch,onnx,safetensors,keras,tensorflow,all)", "all")
+  .option("--max-size <mb>", "maximum file size to scan in MB", "100")
+  .option("--no-deep-scan", "skip deep content analysis (metadata only)")
+  .option("--no-hashes", "skip file hash computation")
+  .option("--timeout <ms>", "scan timeout per file in milliseconds", "30000")
+  .option("--output <format>", "output format: json, sarif, table", "table")
+  .option("--output-file <path>", "save results to file")
+  .option("--recursive", "recursively scan directories", false)
+  .option("--include-safe", "include files with no threats in output", false)
+  .action(async (target: string | undefined, opts: {
+    format: string;
+    maxSize: string;
+    deepScan: boolean;
+    hashes: boolean;
+    timeout: string;
+    output: "json" | "sarif" | "table";
+    outputFile?: string;
+    recursive: boolean;
+    includeSafe: boolean;
+  }) => {
+    const { scanModelFile, isModelFile, getSupportedFormats } = await import("./scanner/modelScanner.js");
+    const { readdirSync, statSync, writeFileSync } = await import("node:fs");
+    const { join, resolve } = await import("node:path");
+    const { pathExists } = await import("./utils/fs.js");
+
+    if (!target) {
+      console.log(chalk.bold("🔍 AMC Model Scanner"));
+      console.log("Scans ML model files for security threats, malicious code, and supply chain attacks.");
+      console.log("");
+      console.log(chalk.cyan("Supported formats:"));
+      const formats = getSupportedFormats();
+      for (let i = 0; i < formats.length; i += 4) {
+        const row = formats.slice(i, i + 4).join("  ");
+        console.log(`  ${row}`);
+      }
+      console.log("");
+      console.log(chalk.cyan("Usage examples:"));
+      console.log("  amc scan model-scan ./model.pkl");
+      console.log("  amc scan model-scan ./models/ --recursive");
+      console.log("  amc scan model-scan https://example.com/model.pth");
+      console.log("  amc scan model-scan user/repo-name  # HuggingFace");
+      console.log("  amc scan model-scan --format pickle,pytorch --output sarif");
+      console.log("");
+      return;
+    }
+
+    const maxSizeBytes = parseInt(opts.maxSize, 10) * 1024 * 1024;
+    const timeoutMs = parseInt(opts.timeout, 10);
+    const formatFilter = opts.format === "all" ? null : new Set(opts.format.split(",").map(f => f.trim().toLowerCase()));
+
+    const scanOptions = {
+      maxFileSize: maxSizeBytes,
+      deepScan: opts.deepScan,
+      includeHashes: opts.hashes,
+      timeoutMs,
+    };
+
+    const results: Array<Awaited<ReturnType<typeof scanModelFile>>> = [];
+
+    // Handle different target types
+    if (target.startsWith("http://") || target.startsWith("https://")) {
+      console.error(chalk.red("HTTP/HTTPS URLs not yet supported. Use local files or directories."));
+      process.exit(1);
+    } else if (target.includes("/") && !target.startsWith("./") && !target.startsWith("/")) {
+      // Assume HuggingFace repo format
+      console.error(chalk.red("HuggingFace repo scanning not yet supported. Use local files or directories."));
+      process.exit(1);
+    } else {
+      // Local file or directory
+      const targetPath = resolve(target);
+      
+      if (!pathExists(targetPath)) {
+        console.error(chalk.red(`Target not found: ${targetPath}`));
+        process.exit(1);
+      }
+
+      const stat = statSync(targetPath);
+      
+      if (stat.isFile()) {
+        if (!isModelFile(targetPath)) {
+          console.error(chalk.red(`File does not appear to be a supported model format: ${targetPath}`));
+          process.exit(1);
+        }
+        
+        console.log(chalk.gray(`Scanning file: ${targetPath}`));
+        const result = await scanModelFile(targetPath, scanOptions);
+        results.push(result);
+      } else if (stat.isDirectory()) {
+        const files: string[] = [];
+        
+        const collectFiles = (dir: string, depth = 0) => {
+          if (depth > (opts.recursive ? 10 : 0)) return;
+          
+          try {
+            const entries = readdirSync(dir);
+            for (const entry of entries) {
+              if (entry.startsWith(".")) continue;
+              
+              const fullPath = join(dir, entry);
+              const entryStat = statSync(fullPath);
+              
+              if (entryStat.isDirectory() && opts.recursive) {
+                collectFiles(fullPath, depth + 1);
+              } else if (entryStat.isFile() && isModelFile(fullPath)) {
+                if (!formatFilter || formatFilter.has(fullPath.split(".").pop()?.toLowerCase() || "")) {
+                  files.push(fullPath);
+                }
+              }
+            }
+          } catch (error) {
+            console.warn(chalk.yellow(`Warning: Could not read directory ${dir}: ${error}`));
+          }
+        };
+        
+        collectFiles(targetPath);
+        
+        if (files.length === 0) {
+          console.log(chalk.yellow("No model files found in the specified directory."));
+          return;
+        }
+        
+        console.log(chalk.gray(`Found ${files.length} model file(s) to scan...`));
+        
+        for (const file of files) {
+          console.log(chalk.gray(`Scanning: ${file}`));
+          const result = await scanModelFile(file, scanOptions);
+          results.push(result);
+        }
+      }
+    }
+
+    // Filter results if needed
+    const filteredResults = opts.includeSafe ? results : results.filter(r => r.threats.length > 0);
+
+    // Generate output
+    if (opts.output === "json") {
+      const output = {
+        scanTimestamp: new Date().toISOString(),
+        scannedFiles: results.length,
+        threatsFound: results.reduce((sum, r) => sum + r.threats.length, 0),
+        results: filteredResults,
+      };
+      
+      const jsonOutput = JSON.stringify(output, null, 2);
+      
+      if (opts.outputFile) {
+        writeFileSync(resolve(opts.outputFile), jsonOutput, "utf-8");
+        console.log(chalk.green(`Results saved to: ${opts.outputFile}`));
+      } else {
+        console.log(jsonOutput);
+      }
+    } else if (opts.output === "sarif") {
+      // SARIF format for CI/CD integration
+      const sarif = {
+        version: "2.1.0",
+        $schema: "https://json.schemastore.org/sarif-2.1.0.json",
+        runs: [{
+          tool: {
+            driver: {
+              name: "AMC Model Scanner",
+              version: "1.0.0",
+              informationUri: "https://github.com/thewisecrab/AgentMaturityCompass",
+            }
+          },
+          results: filteredResults.flatMap(result => 
+            result.threats.map(threat => ({
+              ruleId: threat.type,
+              level: threat.severity === "critical" ? "error" : threat.severity === "high" ? "error" : "warning",
+              message: { text: threat.description },
+              locations: [{
+                physicalLocation: {
+                  artifactLocation: { uri: result.filePath },
+                  region: threat.offset ? { startLine: 1, startColumn: threat.offset } : undefined,
+                }
+              }],
+              properties: {
+                evidence: threat.evidence,
+                fileSize: result.fileSize,
+                format: result.format,
+                riskLevel: result.riskLevel,
+              }
+            }))
+          )
+        }]
+      };
+      
+      const sarifOutput = JSON.stringify(sarif, null, 2);
+      
+      if (opts.outputFile) {
+        writeFileSync(resolve(opts.outputFile), sarifOutput, "utf-8");
+        console.log(chalk.green(`SARIF results saved to: ${opts.outputFile}`));
+      } else {
+        console.log(sarifOutput);
+      }
+    } else {
+      // Table format (default)
+      console.log(chalk.bold("\n🔍 Model Security Scan Results\n"));
+      
+      if (filteredResults.length === 0) {
+        console.log(chalk.green("✅ No threats detected in scanned files."));
+        console.log(chalk.gray(`Scanned ${results.length} file(s) in ${results.reduce((sum, r) => sum + r.scanDurationMs, 0)}ms`));
+        return;
+      }
+      
+      for (const result of filteredResults) {
+        const riskColor = result.riskLevel === "critical" ? chalk.red : 
+                         result.riskLevel === "high" ? chalk.red :
+                         result.riskLevel === "medium" ? chalk.yellow :
+                         result.riskLevel === "low" ? chalk.blue : chalk.green;
+        
+        console.log(riskColor(`${result.riskLevel.toUpperCase()} RISK: ${result.filePath}`));
+        console.log(chalk.gray(`  Format: ${result.format} | Size: ${Math.round(result.fileSize / 1024)}KB | Scan: ${result.scanDurationMs}ms`));
+        
+        if (result.sha256) {
+          console.log(chalk.gray(`  SHA256: ${result.sha256}`));
+        }
+        
+        for (const threat of result.threats) {
+          const severityColor = threat.severity === "critical" ? chalk.red :
+                               threat.severity === "high" ? chalk.red :
+                               threat.severity === "medium" ? chalk.yellow : chalk.blue;
+          
+          console.log(`  ${severityColor(`[${threat.severity.toUpperCase()}]`)} ${threat.description}`);
+          if (threat.evidence) {
+            console.log(chalk.gray(`    Evidence: ${threat.evidence}`));
+          }
+        }
+        console.log("");
+      }
+      
+      const totalThreats = results.reduce((sum, r) => sum + r.threats.length, 0);
+      const criticalCount = results.reduce((sum, r) => sum + r.threats.filter(t => t.severity === "critical").length, 0);
+      const highCount = results.reduce((sum, r) => sum + r.threats.filter(t => t.severity === "high").length, 0);
+      
+      console.log(chalk.bold("Summary:"));
+      console.log(`  Files scanned: ${results.length}`);
+      console.log(`  Threats found: ${totalThreats}`);
+      console.log(`  Critical: ${criticalCount} | High: ${highCount}`);
+      
+      if (criticalCount > 0 || highCount > 0) {
+        console.log(chalk.red("\n⚠️  High-risk threats detected. Review before deployment."));
+        process.exit(1);
+      }
+    }
+  });
+
 // ── Guardrails Simple Mode ───────────────────────────────────────────────────
 const guardrailsCmd = program.command("guardrails").description("Simple guardrail management");
 
@@ -17089,6 +17659,380 @@ redteamCmd
       for (const p of packs) {
         console.log(`  ${chalk.cyan(p.id.padEnd(36))} ${p.title} (${p.scenarios.length} scenarios)`);
       }
+    }
+  });
+
+/* ── Pack Registry: amc pack ──────────────────────────────────── */
+const pack = program.command("pack").description("Community assurance pack registry — NPM-style package management");
+
+pack
+  .command("install")
+  .description("Install a community assurance pack")
+  .argument("<name>", "pack name (e.g., red-team-basic, compliance-eu-ai-act)")
+  .option("--version <version>", "specific version to install")
+  .option("--save", "save to dependencies", false)
+  .option("--save-dev", "save to dev dependencies", false)
+  .option("--force", "force install despite conflicts", false)
+  .option("--dry-run", "show what would be installed without installing", false)
+  .option("--json", "JSON output", false)
+  .action(async (name: string, opts: {
+    version?: string;
+    save?: boolean;
+    saveDev?: boolean;
+    force?: boolean;
+    dryRun?: boolean;
+    json?: boolean;
+  }) => {
+    try {
+      const result = await packInstallCli({
+        workspace: process.cwd(),
+        name,
+        version: opts.version,
+        save: opts.save,
+        saveDev: opts.saveDev,
+        force: opts.force,
+        dryRun: opts.dryRun
+      });
+
+      if (opts.json) {
+        console.log(JSON.stringify(result, null, 2));
+        return;
+      }
+
+      if (result.success) {
+        console.log(chalk.green(`✅ ${result.message}`));
+        if (result.installed.length > 0) {
+          console.log(chalk.bold("\nInstalled packages:"));
+          for (const pkg of result.installed) {
+            console.log(`  ${chalk.cyan(pkg.name)}@${pkg.version}`);
+          }
+        }
+        if (result.conflicts.length > 0) {
+          console.log(chalk.yellow("\nConflicts resolved:"));
+          for (const conflict of result.conflicts) {
+            console.log(`  ${chalk.yellow(conflict.name)}: ${conflict.reason}`);
+          }
+        }
+      } else {
+        console.error(chalk.red(`❌ ${result.message}`));
+        process.exit(1);
+      }
+    } catch (error: any) {
+      console.error(chalk.red(`Install failed: ${error.message}`));
+      process.exit(1);
+    }
+  });
+
+pack
+  .command("publish")
+  .description("Publish a pack to the registry")
+  .argument("[directory]", "pack directory (defaults to current directory)")
+  .option("--registry <url>", "registry URL to publish to")
+  .option("--dry-run", "validate and show what would be published without publishing", false)
+  .option("--access <level>", "public or private", "public")
+  .option("--json", "JSON output", false)
+  .action(async (directory: string | undefined, opts: {
+    registry?: string;
+    dryRun?: boolean;
+    access?: "public" | "private";
+    json?: boolean;
+  }) => {
+    try {
+      const result = await packPublishCli({
+        workspace: process.cwd(),
+        packDir: directory,
+        registry: opts.registry,
+        dryRun: opts.dryRun,
+        access: opts.access
+      });
+
+      if (opts.json) {
+        console.log(JSON.stringify(result, null, 2));
+        return;
+      }
+
+      if (result.success) {
+        console.log(chalk.green(`✅ ${result.message}`));
+        console.log(`Package: ${chalk.cyan(result.name)}@${result.version}`);
+        console.log(`Registry: ${result.registry}`);
+      } else {
+        console.error(chalk.red(`❌ ${result.message}`));
+        process.exit(1);
+      }
+    } catch (error: any) {
+      console.error(chalk.red(`Publish failed: ${error.message}`));
+      process.exit(1);
+    }
+  });
+
+pack
+  .command("search")
+  .description("Search for packs in the registry")
+  .argument("[query]", "search query")
+  .option("--category <category>", "filter by category")
+  .option("--author <author>", "filter by author")
+  .option("--keywords <keywords>", "comma-separated keywords")
+  .option("--limit <n>", "number of results", "20")
+  .option("--offset <n>", "result offset", "0")
+  .option("--json", "JSON output", false)
+  .action(async (query: string | undefined, opts: {
+    category?: string;
+    author?: string;
+    keywords?: string;
+    limit?: string;
+    offset?: string;
+    json?: boolean;
+  }) => {
+    try {
+      const result = await packSearchCli({
+        workspace: process.cwd(),
+        query,
+        category: opts.category,
+        author: opts.author,
+        keywords: opts.keywords?.split(","),
+        limit: parseInt(opts.limit || "20"),
+        offset: parseInt(opts.offset || "0")
+      });
+
+      if (opts.json) {
+        console.log(JSON.stringify(result, null, 2));
+        return;
+      }
+
+      console.log(chalk.bold(`\n📦 Found ${result.total} packs\n`));
+      for (const pkg of result.results) {
+        console.log(`${chalk.cyan(pkg.name)}@${pkg.version}`);
+        console.log(`  ${pkg.description}`);
+        console.log(`  Author: ${pkg.author} | Downloads: ${pkg.downloads} | Updated: ${pkg.updated}`);
+        if (pkg.keywords.length > 0) {
+          console.log(`  Keywords: ${pkg.keywords.join(", ")}`);
+        }
+        console.log("");
+      }
+    } catch (error: any) {
+      console.error(chalk.red(`Search failed: ${error.message}`));
+      process.exit(1);
+    }
+  });
+
+pack
+  .command("info")
+  .description("Show detailed information about a pack")
+  .argument("<name>", "pack name")
+  .option("--json", "JSON output", false)
+  .action(async (name: string, opts: { json?: boolean }) => {
+    try {
+      const result = await packInfoCli({
+        workspace: process.cwd(),
+        name
+      });
+
+      if (opts.json) {
+        console.log(JSON.stringify(result, null, 2));
+        return;
+      }
+
+      if (!result.found) {
+        console.error(chalk.red(`Pack "${name}" not found`));
+        process.exit(1);
+      }
+
+      console.log(chalk.bold(`\n📦 ${result.name}`));
+      console.log(`Description: ${result.description}`);
+      console.log(`Latest: ${result.latest}`);
+      console.log(`Author: ${result.author}`);
+      console.log(`License: ${result.license}`);
+      console.log(`Downloads: ${result.downloads}`);
+      
+      if (result.versions.length > 0) {
+        console.log(`Versions: ${result.versions.join(", ")}`);
+      }
+      
+      if (result.keywords.length > 0) {
+        console.log(`Keywords: ${result.keywords.join(", ")}`);
+      }
+      
+      if (Object.keys(result.dependencies).length > 0) {
+        console.log(chalk.bold("\nDependencies:"));
+        for (const [dep, version] of Object.entries(result.dependencies)) {
+          console.log(`  ${dep}: ${version}`);
+        }
+      }
+      
+      if (result.repository) {
+        console.log(`Repository: ${result.repository}`);
+      }
+      
+      if (result.homepage) {
+        console.log(`Homepage: ${result.homepage}`);
+      }
+    } catch (error: any) {
+      console.error(chalk.red(`Info lookup failed: ${error.message}`));
+      process.exit(1);
+    }
+  });
+
+pack
+  .command("uninstall")
+  .description("Uninstall a pack")
+  .argument("<name>", "pack name")
+  .option("--save", "remove from dependencies", false)
+  .option("--json", "JSON output", false)
+  .action(async (name: string, opts: { save?: boolean; json?: boolean }) => {
+    try {
+      const result = await packUninstallCli({
+        workspace: process.cwd(),
+        name,
+        save: opts.save
+      });
+
+      if (opts.json) {
+        console.log(JSON.stringify(result, null, 2));
+        return;
+      }
+
+      if (result.success) {
+        console.log(chalk.green(`✅ ${result.message}`));
+      } else {
+        console.error(chalk.red(`❌ ${result.message}`));
+        process.exit(1);
+      }
+    } catch (error: any) {
+      console.error(chalk.red(`Uninstall failed: ${error.message}`));
+      process.exit(1);
+    }
+  });
+
+pack
+  .command("list")
+  .description("List installed packs")
+  .option("--global", "list global packs", false)
+  .option("--json", "JSON output", false)
+  .action(async (opts: { global?: boolean; json?: boolean }) => {
+    try {
+      const result = await packListCli({
+        workspace: process.cwd(),
+        global: opts.global
+      });
+
+      if (opts.json) {
+        console.log(JSON.stringify(result, null, 2));
+        return;
+      }
+
+      console.log(chalk.bold(`\n📦 Installed Packs (${result.packages.length})\n`));
+      for (const pkg of result.packages) {
+        console.log(`${chalk.cyan(pkg.name)}@${pkg.version}`);
+        console.log(`  ${pkg.description}`);
+        console.log(`  Path: ${pkg.path}`);
+        console.log("");
+      }
+    } catch (error: any) {
+      console.error(chalk.red(`List failed: ${error.message}`));
+      process.exit(1);
+    }
+  });
+
+pack
+  .command("init")
+  .description("Initialize a new pack in the current directory")
+  .option("--name <name>", "pack name")
+  .option("--version <version>", "initial version", "1.0.0")
+  .option("--description <desc>", "pack description")
+  .option("--author <author>", "author name")
+  .option("--license <license>", "license", "MIT")
+  .option("--type <type>", "pack type: assurance, policy, transform, adapter", "assurance")
+  .action((opts: {
+    name?: string;
+    version?: string;
+    description?: string;
+    author?: string;
+    license?: string;
+    type?: "assurance" | "policy" | "transform" | "adapter";
+  }) => {
+    try {
+      const result = packInitCli({
+        directory: process.cwd(),
+        name: opts.name,
+        version: opts.version,
+        description: opts.description,
+        author: opts.author,
+        license: opts.license,
+        type: opts.type
+      });
+
+      if (result.success) {
+        console.log(chalk.green(`✅ ${result.message}`));
+        console.log(`Manifest: ${result.manifestPath}`);
+        console.log("");
+        console.log(chalk.bold("Next steps:"));
+        console.log("1. Edit package.json to customize your pack");
+        console.log("2. Implement your pack logic in index.js");
+        console.log("3. Test your pack locally");
+        console.log("4. Run 'amc pack publish' to share with the community");
+      } else {
+        console.error(chalk.red(`❌ ${result.message}`));
+        process.exit(1);
+      }
+    } catch (error: any) {
+      console.error(chalk.red(`Init failed: ${error.message}`));
+      process.exit(1);
+    }
+  });
+
+const packRegistry = pack.command("registry").description("Pack registry management");
+
+packRegistry
+  .command("serve")
+  .description("Start a local pack registry server")
+  .option("--port <port>", "server port", "4873")
+  .option("--host <host>", "bind host", "127.0.0.1")
+  .action(async (opts: { port?: string; host?: string }) => {
+    try {
+      const result = await packRegistryServeCli({
+        workspace: process.cwd(),
+        port: opts.port ? parseInt(opts.port) : undefined,
+        host: opts.host
+      });
+
+      console.log(chalk.green(`✅ Pack registry server started`));
+      console.log(`URL: ${result.url}`);
+      console.log(`Host: ${result.host}`);
+      console.log(`Port: ${result.port}`);
+      console.log("");
+      console.log("Press Ctrl+C to stop the server");
+
+      // Keep the process alive
+      process.on("SIGINT", async () => {
+        console.log("\nStopping registry server...");
+        await result.server.stop();
+        console.log("Registry server stopped");
+        process.exit(0);
+      });
+
+      // Keep alive
+      await new Promise(() => {});
+    } catch (error: any) {
+      console.error(chalk.red(`Registry server failed: ${error.message}`));
+      process.exit(1);
+    }
+  });
+
+packRegistry
+  .command("init")
+  .description("Initialize local pack registry")
+  .action(() => {
+    try {
+      const result = packRegistryInitCli({
+        workspace: process.cwd()
+      });
+
+      console.log(chalk.green(`✅ ${result.message}`));
+      console.log(`Registry directory: ${result.registryDir}`);
+      console.log(`Config: ${result.configPath}`);
+    } catch (error: any) {
+      console.error(chalk.red(`Registry init failed: ${error.message}`));
+      process.exit(1);
     }
   });
 

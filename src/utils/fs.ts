@@ -26,6 +26,10 @@ export function readUtf8(path: string): string {
   return readFileSync(path, "utf8");
 }
 
+export function writeUtf8(path: string, data: string): void {
+  writeFileSync(path, data, "utf8");
+}
+
 export function pathExists(path: string): boolean {
   return existsSync(path);
 }

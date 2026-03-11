@@ -1,0 +1,1 @@
+import pickle; pickle.loads(b'malicious_code')

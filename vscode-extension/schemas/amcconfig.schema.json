@@ -1,0 +1,119 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "AMC Configuration",
+  "description": "Configuration file for Agent Maturity Compass",
+  "type": "object",
+  "properties": {
+    "version": {
+      "type": "string",
+      "description": "AMC configuration version",
+      "default": "1.0"
+    },
+    "agent": {
+      "type": "object",
+      "description": "Agent configuration",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Agent name"
+        },
+        "version": {
+          "type": "string",
+          "description": "Agent version"
+        },
+        "description": {
+          "type": "string",
+          "description": "Agent description"
+        }
+      },
+      "required": ["name"]
+    },
+    "evaluation": {
+      "type": "object",
+      "description": "Evaluation settings",
+      "properties": {
+        "dimensions": {
+          "type": "array",
+          "description": "Dimensions to evaluate",
+          "items": {
+            "type": "string",
+            "enum": ["governance", "reliability", "observability", "evaluation", "operating_model"]
+          }
+        },
+        "excludeQuestions": {
+          "type": "array",
+          "description": "Question IDs to exclude from evaluation",
+          "items": {
+            "type": "string"
+          }
+        },
+        "customWeights": {
+          "type": "object",
+          "description": "Custom weights for questions",
+          "patternProperties": {
+            "^[a-zA-Z0-9_-]+$": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            }
+          }
+        }
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "description": "Evidence collection settings",
+      "properties": {
+        "sources": {
+          "type": "array",
+          "description": "Evidence sources to collect from",
+          "items": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": ["file", "directory", "command", "api"]
+              },
+              "path": {
+                "type": "string",
+                "description": "Path or command to execute"
+              },
+              "pattern": {
+                "type": "string",
+                "description": "Pattern to match in evidence"
+              }
+            },
+            "required": ["type", "path"]
+          }
+        },
+        "outputPath": {
+          "type": "string",
+          "description": "Path to store evidence artifacts",
+          "default": ".amc/evidence"
+        }
+      }
+    },
+    "reporting": {
+      "type": "object",
+      "description": "Reporting configuration",
+      "properties": {
+        "format": {
+          "type": "string",
+          "enum": ["json", "yaml", "html", "markdown"],
+          "default": "json"
+        },
+        "outputPath": {
+          "type": "string",
+          "description": "Path to store reports",
+          "default": ".amc/reports"
+        },
+        "includeEvidence": {
+          "type": "boolean",
+          "description": "Include evidence artifacts in reports",
+          "default": true
+        }
+      }
+    }
+  },
+  "required": ["version", "agent"]
+}

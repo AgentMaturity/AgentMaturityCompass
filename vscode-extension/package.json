@@ -1,0 +1,90 @@
+{
+  "name": "amc-vscode-extension",
+  "displayName": "Agent Maturity Compass",
+  "description": "VS Code extension for inline AMC maturity score display and evaluation",
+  "version": "0.1.0",
+  "publisher": "amc",
+  "engines": {
+    "vscode": "^1.74.0"
+  },
+  "categories": [
+    "Other",
+    "Linters"
+  ],
+  "keywords": [
+    "agent",
+    "maturity",
+    "compass",
+    "amc",
+    "ai"
+  ],
+  "activationEvents": [
+    "onLanguage:typescript",
+    "onLanguage:javascript",
+    "onLanguage:python",
+    "onCommand:amc.score.refresh"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "amc.score.refresh",
+        "title": "Refresh AMC Score",
+        "category": "AMC"
+      },
+      {
+        "command": "amc.quickfix.apply",
+        "title": "Apply AMC Quick Fix",
+        "category": "AMC"
+      },
+      {
+        "command": "amc.run.evaluation",
+        "title": "Run AMC Evaluation",
+        "category": "AMC"
+      }
+    ],
+    "views": {
+      "explorer": [
+        {
+          "id": "amcResults",
+          "name": "AMC Results",
+          "when": "amcResultsVisible"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Agent Maturity Compass",
+      "properties": {
+        "amc.enableInlineScores": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show inline maturity scores in editor"
+        },
+        "amc.configPath": {
+          "type": "string",
+          "default": "amcconfig.yaml",
+          "description": "Path to AMC configuration file"
+        }
+      }
+    },
+    "jsonValidation": [
+      {
+        "fileMatch": "amcconfig.yaml",
+        "url": "./schemas/amcconfig.schema.json"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.74.0",
+    "@types/node": "16.x",
+    "typescript": "^4.9.4"
+  },
+  "dependencies": {
+    "yaml": "^2.7.0"
+  }
+}

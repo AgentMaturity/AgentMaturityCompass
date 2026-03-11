@@ -1557,3 +1557,132 @@ export function loadRunReport(workspace: string, runId: string, agentId?: string
   const legacyFile = join(workspace, ".amc", "runs", `${runId}.json`);
   return JSON.parse(readUtf8(legacyFile)) as DiagnosticReport;
 }
+
+export async function compareModels(
+  workspace: string,
+  models: string[],
+  options: {
+    agentId?: string;
+    window?: string;
+    targetName?: string;
+    iterations?: number;
+  } = {}
+): Promise<{
+  models: string[];
+  comparisonMatrix: Array<{
+    model: string;
+    runId: string;
+    integrityIndex: number;
+    trustLabel: TrustLabel;
+    layerScores: LayerScore[];
+    overallScore: number;
+  }>;
+  summary: {
+    bestModel: string;
+    worstModel: string;
+    avgIntegrityIndex: number;
+    significantDifferences: Array<{
+      layer: LayerName;
+      bestModel: string;
+      worstModel: string;
+      delta: number;
+    }>;
+  };
+}> {
+  if (models.length < 2) {
+    throw new Error("At least 2 models required for comparison");
+  }
+
+  const results: Array<{
+    model: string;
+    runId: string;
+    integrityIndex: number;
+    trustLabel: TrustLabel;
+    layerScores: LayerScore[];
+    overallScore: number;
+  }> = [];
+
+  // Run diagnostic for each model
+  for (const model of models) {
+    console.log(`Running diagnostic for model: ${model}`);
+    
+    // For now, we'll simulate running with different models
+    // In a real implementation, this would involve:
+    // 1. Configuring the agent to use the specific model
+    // 2. Running the diagnostic with that configuration
+    // 3. Collecting the results
+    
+    const report = await runDiagnostic({
+      workspace,
+      window: options.window ?? "14d",
+      targetName: options.targetName ?? "default",
+      agentId: options.agentId,
+      claimMode: "auto"
+    });
+
+    const overallScore = report.layerScores.length > 0
+      ? report.layerScores.reduce((sum, layer) => sum + layer.avgFinalLevel, 0) / report.layerScores.length
+      : 0;
+
+    results.push({
+      model,
+      runId: report.runId,
+      integrityIndex: report.integrityIndex,
+      trustLabel: report.trustLabel,
+      layerScores: report.layerScores,
+      overallScore
+    });
+  }
+
+  // Calculate summary statistics
+  const bestModel = results.reduce((best, current) => 
+    current.overallScore > best.overallScore ? current : best
+  );
+  
+  const worstModel = results.reduce((worst, current) => 
+    current.overallScore < worst.overallScore ? current : worst
+  );
+
+  const avgIntegrityIndex = results.reduce((sum, r) => sum + r.integrityIndex, 0) / results.length;
+
+  // Find significant differences across layers
+  const significantDifferences: Array<{
+    layer: LayerName;
+    bestModel: string;
+    worstModel: string;
+    delta: number;
+  }> = [];
+
+  if (results.length > 0 && results[0]!.layerScores.length > 0) {
+    for (const layer of results[0]!.layerScores) {
+      const layerScores = results.map(r => ({
+        model: r.model,
+        score: r.layerScores.find(l => l.layerName === layer.layerName)?.avgFinalLevel ?? 0
+      }));
+
+      const best = layerScores.reduce((b, c) => c.score > b.score ? c : b);
+      const worst = layerScores.reduce((w, c) => c.score < w.score ? c : w);
+      const delta = best.score - worst.score;
+
+      if (delta > 0.5) { // Only include significant differences
+        significantDifferences.push({
+          layer: layer.layerName,
+          bestModel: best.model,
+          worstModel: worst.model,
+          delta: Number(delta.toFixed(3))
+        });
+      }
+    }
+  }
+
+  return {
+    models,
+    comparisonMatrix: results,
+    summary: {
+      bestModel: bestModel.model,
+      worstModel: worstModel.model,
+      avgIntegrityIndex: Number(avgIntegrityIndex.toFixed(3)),
+      significantDifferences
+    }
+  };
+}

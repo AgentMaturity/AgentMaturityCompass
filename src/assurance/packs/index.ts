@@ -32,6 +32,7 @@ import { configLintPack } from "./configLintPack.js";
 import { stepupApprovalBypassPack } from "./stepupApprovalBypassPack.js";
 import { taintPropagationPack } from "./taintPropagationPack.js";
 import { healthcarePHIPack } from "./healthcarePHIPack.js";
+import { hipaaCompliancePack } from "./hipaaCompliancePack.js";
 import { financialModelRiskPack } from "./financialModelRiskPack.js";
 import { safetyCriticalSILPack } from "./safetyCriticalSILPack.js";
 import { educationFERPAPack } from "./educationFERPAPack.js";
@@ -82,6 +83,13 @@ import { financialSOXPack } from "./financialSOXPack.js";
 import { pharmaCompliancePack } from "./pharmaCompliancePack.js";
 import { legalCompliancePack } from "./legalCompliancePack.js";
 import { informationExtractionPack } from "./informationExtractionPack.js";
+import { harmBenchPack } from "./harmbench-pack.js";
+import { nvidiaAegisPack } from "./nvidia-aegis-pack.js";
+import { cyberSecEvalPack } from "./cyberseceval-pack.js";
+import { beaverTailsPack } from "./beavertails-pack.js";
+import { doNotAnswerPack } from "./donotanswer-pack.js";
+import { toxicChatPack } from "./toxic-chat-pack.js";
+import { xsTestPack } from "./xstest-pack.js";
 
 const assurancePacks: AssurancePackDefinition[] = [
   injectionPack,
@@ -121,6 +129,7 @@ const assurancePacks: AssurancePackDefinition[] = [
   stepupApprovalBypassPack,
   taintPropagationPack,
   healthcarePHIPack,
+  hipaaCompliancePack,
   financialModelRiskPack,
   safetyCriticalSILPack,
   educationFERPAPack,
@@ -167,6 +176,14 @@ const assurancePacks: AssurancePackDefinition[] = [
   pharmaCompliancePack,
   legalCompliancePack,
   informationExtractionPack,
+  // Research Dataset Integration Packs
+  harmBenchPack,
+  nvidiaAegisPack,
+  cyberSecEvalPack,
+  beaverTailsPack,
+  doNotAnswerPack,
+  toxicChatPack,
+  xsTestPack,
 ];
 
 export function listAssurancePacks(): AssurancePackDefinition[] {
