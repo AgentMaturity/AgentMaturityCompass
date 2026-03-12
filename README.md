@@ -357,7 +357,7 @@ Result: ![AMC Score](https://img.shields.io/badge/AMC-L3_(72.5)-green)
 
 ## 🧪 What AMC Tests
 
-### 730 Diagnostic Questions × 5 Dimensions
+### 138 Diagnostic Questions × 5 Dimensions
 
 | Dimension | Questions | What It Measures |
 |-----------|-----------|------------------|
@@ -367,7 +367,7 @@ Result: ![AMC Score](https://img.shields.io/badge/AMC-L3_(72.5)-green)
 | Leadership & Autonomy | 28 | Structured logs, traces, cost tracking, SLOs |
 | Culture & Alignment | 26 | Test harnesses, feedback loops, over-compliance detection |
 
-### 85 Red-Team Attack Packs
+### 86 Assurance Packs
 
 | Category | Examples |
 |----------|---------|
@@ -390,7 +390,7 @@ Result: ![AMC Score](https://img.shields.io/badge/AMC-L3_(72.5)-green)
 | 🌿 Environment | 6 | EU Farm-to-Fork, REACH, IEC 61850 |
 | 🏛️ Governance | 5 | EU eIDAS 2.0, UNCAC, UNGPs |
 
-### 75 Scoring Modules
+### 74+ Scoring Modules
 
 <details>
 <summary>See all modules</summary>
@@ -427,7 +427,7 @@ AMC Gateway ──── transparent proxy, agent doesn't know it's being watche
 Evidence Ledger ──── Ed25519 signatures + Merkle tree proof chains
     │
     ▼
-Scoring Engine ──── evidence-weighted diagnostics, 74+ modules, 86 assurance packs
+Scoring Engine ──── evidence-weighted diagnostics, 74+ scoring modules, 86 assurance packs
     │
     ▼
 AMC Studio ──── dashboard + API + CLI + reports
