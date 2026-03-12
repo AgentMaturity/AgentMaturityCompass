@@ -135,7 +135,8 @@ section{padding:clamp(5rem,10vw,8rem) 0}
 
 /* ═══ RESEARCH ═══ */
 .research-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1px;background:var(--border)}
-.research-item{background:var(--bg);padding:clamp(1.2rem,2.5vw,2rem);transition:background .2s}
+.research-item{background:var(--bg-alt);padding:clamp(1.2rem,2.5vw,2rem);transition:background .2s}
+.section-alt .research-item{background:var(--bg)}
 .research-item:hover{background:rgba(74,239,121,.03)}
 .research-tag{font-family:var(--mono);font-size:.6rem;color:var(--accent);text-transform:uppercase;letter-spacing:.08em;display:inline-block;margin-bottom:.5rem;border:1px solid rgba(74,239,121,.2);padding:.15rem .5rem}
 .research-item h4{font-size:.88rem;font-weight:700;color:var(--text);margin-bottom:.4rem;text-transform:none;letter-spacing:0}
@@ -145,7 +146,8 @@ section{padding:clamp(5rem,10vw,8rem) 0}
 
 /* ═══ PRICING ═══ */
 .pricing-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--border);max-width:800px;margin:0 auto}
-.pricing-card{background:var(--bg);padding:clamp(2rem,4vw,3rem)}
+.pricing-card{background:var(--bg-alt);padding:clamp(2rem,4vw,3rem)}
+.section-alt .pricing-card{background:var(--bg)}
 .pricing-card .tier{font-family:var(--mono);font-size:.65rem;color:var(--accent);text-transform:uppercase;letter-spacing:.12em;display:block;margin-bottom:1rem}
 .pricing-card h3{font-size:1.2rem;margin-bottom:.75rem;text-transform:none}
 .pricing-card p{font-size:.88rem;color:var(--text-muted);line-height:1.55;margin-bottom:1.5rem}
