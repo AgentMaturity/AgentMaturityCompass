@@ -180,13 +180,16 @@ jobs:
           helm template amc ./deploy/helm/amc > /tmp/amc-helm-rendered.yaml
           grep -q "kind: Deployment" /tmp/amc-helm-rendered.yaml
           grep -q "kind: Service" /tmp/amc-helm-rendered.yaml
-          grep -q "kind: Ingress" /tmp/amc-helm-rendered.yaml
           grep -q "kind: PersistentVolumeClaim" /tmp/amc-helm-rendered.yaml
           grep -q "kind: NetworkPolicy" /tmp/amc-helm-rendered.yaml
           grep -q "kind: PodDisruptionBudget" /tmp/amc-helm-rendered.yaml
           grep -q "runAsNonRoot: true" /tmp/amc-helm-rendered.yaml
           grep -q "readOnlyRootFilesystem: true" /tmp/amc-helm-rendered.yaml
           grep -q "allowPrivilegeEscalation: false" /tmp/amc-helm-rendered.yaml
+
+          # Ingress is optional by default; verify it via the shipped example overlay.
+          helm template amc ./deploy/helm/amc -f ./deploy/helm/amc/examples/values-ingress-tls.yaml > /tmp/amc-helm-ingress-rendered.yaml
+          grep -q "kind: Ingress" /tmp/amc-helm-ingress-rendered.yaml
 
       - name: Upload helm render artifact
         if: always()

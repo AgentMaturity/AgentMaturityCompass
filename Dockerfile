@@ -1,3 +1,17 @@
+FROM node:20-alpine AS build
+
+LABEL org.opencontainers.image.source="https://github.com/thewisecrab/AgentMaturityCompass"
+LABEL org.opencontainers.image.description="Agent Maturity Compass — The Credit Score for AI Agents"
+LABEL org.opencontainers.image.licenses="MIT"
+
+WORKDIR /amc
+
+COPY package.json package-lock.json ./
+RUN npm ci
+
+COPY . .
+RUN npm run build
+
 FROM node:20-alpine
 
 LABEL org.opencontainers.image.source="https://github.com/thewisecrab/AgentMaturityCompass"
@@ -6,12 +20,9 @@ LABEL org.opencontainers.image.licenses="MIT"
 
 WORKDIR /amc
 
-# Copy built package
 COPY package.json package-lock.json ./
-COPY dist/ ./dist/
 COPY README.md LICENSE ./
-
-# Install production deps only
+COPY --from=build /amc/dist/ ./dist/
 RUN npm ci --omit=dev 2>/dev/null || npm install --omit=dev
 
 # Make CLI available globally
