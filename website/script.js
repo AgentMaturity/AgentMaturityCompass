@@ -1,4 +1,4 @@
-/* AMC v3 — Clean JS. Content always visible. */
+/* AMC v4 — Evidence Forge. Clean JS. No carnival counters. */
 
 // ─── THEME ───
 (function(){
@@ -88,42 +88,13 @@ function toggleTheme(){
   els.forEach(function(el){observer.observe(el)});
 })();
 
-// ─── ANIMATED COUNTERS ───
-function animateCounter(el){
-  var target=parseInt(el.getAttribute('data-target'))||0;
-  var suffix=el.getAttribute('data-suffix')||'';
-  var dur=1800;
-  var start=performance.now();
-  function fmt(n){return n>=1000?n.toLocaleString():String(n)}
-  function tick(now){
-    var p=Math.min((now-start)/dur,1);
-    var e=1-Math.pow(1-p,3);
-    el.textContent=fmt(Math.round(target*e))+suffix;
-    if(p<1) requestAnimationFrame(tick);
-  }
-  requestAnimationFrame(tick);
-}
-
+// ─── STAT VALUES (instant — no carnival counters) ───
 (function(){
-  var obs=new IntersectionObserver(function(entries){
-    entries.forEach(function(entry){
-      if(entry.isIntersecting){
-        animateCounter(entry.target);
-        obs.unobserve(entry.target);
-      }
-    });
-  },{threshold:0.2});
-
-  document.querySelectorAll('[data-target]').forEach(function(el){obs.observe(el)});
-
-  // Safety: show final values after 4s if observer never fires
-  setTimeout(function(){
-    document.querySelectorAll('[data-target]').forEach(function(el){
-      if(el.textContent==='0'||el.textContent===''){
-        el.textContent=el.getAttribute('data-target')+(el.getAttribute('data-suffix')||'');
-      }
-    });
-  },4000);
+  document.querySelectorAll('[data-target]').forEach(function(el){
+    var n=parseInt(el.getAttribute('data-target'))||0;
+    var suffix=el.getAttribute('data-suffix')||'';
+    el.textContent=(n>=1000?n.toLocaleString():String(n))+suffix;
+  });
 })();
 
 // ─── FAQ ACCORDION ───
