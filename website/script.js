@@ -42,7 +42,7 @@
 
 // ─── SCROLL REVEALS ───
 (function(){
-  var els=document.querySelectorAll('.reveal');
+  var els=document.querySelectorAll('.reveal,.reveal-left,.reveal-right,.reveal-scale');
   if(!els.length) return;
 
   var safety=setTimeout(function(){

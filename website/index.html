@@ -70,7 +70,7 @@
           <div>
             <p class="label reveal" style="margin-bottom:1.2rem">trust scoring for ai agents</p>
             <h1 class="reveal">Score your agent<span class="accent">_</span><br>Find the gaps<span class="accent">.</span><br>Fix them<span class="accent">.</span></h1>
-            <p class="hero-sub reveal reveal-d1">138 diagnostics against actual execution behavior. Not documentation. Not self-reported claims. Evidence you can verify, sign, and audit.</p>
+            <p class="hero-sub reveal reveal-d1"><span class="highlight">138 diagnostics</span> against actual execution behavior. Not documentation. Not self-reported claims. <span class="highlight">Evidence</span> you can verify, sign, and audit.</p>
           </div>
           <div class="hero-meta reveal reveal-d2">
             <div class="hero-install" onclick="navigator.clipboard&&navigator.clipboard.writeText('npm i -g agent-maturity-compass')" title="Click to copy">
@@ -120,8 +120,8 @@
     <section class="big-number">
       <div class="container">
         <div class="reveal"><div class="big-number-value">84</div></div>
-        <p class="reveal reveal-d1">The gap between what your agent claims and what execution evidence shows.</p>
-        <p class="evidence reveal reveal-d2">documentation score: 100 &nbsp;→&nbsp; evidence-verified: 16 &nbsp;→&nbsp; gap: 84</p>
+        <p class="reveal reveal-d1">The gap between what your agent <span class="text-white">claims</span> and what <span class="highlight">execution evidence</span> shows.</p>
+        <p class="evidence reveal reveal-d2">documentation score: <span class="text-white">100</span> &nbsp;→&nbsp; evidence-verified: <span class="highlight">16</span> &nbsp;→&nbsp; gap: <span class="highlight">84</span></p>
 
         <div class="gap-compare reveal reveal-d3">
           <div class="gap-side">
@@ -234,7 +234,7 @@
           <p class="section-desc">A structured methodology that combines diagnostic rigor with developer speed to turn agents into trusted systems.</p>
         </div>
         <div class="steps">
-          <div class="steps-text reveal">
+          <div class="steps-text reveal-left">
             <div class="steps-visual">
               <svg viewBox="0 0 300 300" fill="none" stroke="rgba(74,239,121,0.12)" stroke-width="0.5" style="width:100%;max-width:300px">
                 <circle cx="150" cy="150" r="120"/><circle cx="150" cy="150" r="80"/><circle cx="150" cy="150" r="40"/>
@@ -245,21 +245,21 @@
             <a href="playground.html" class="btn btn-primary" style="margin-top:2rem">try in browser →</a>
           </div>
           <div class="step-list">
-            <div class="step reveal reveal-d1">
+            <div class="step reveal-right reveal-d1">
               <span class="step-num">01</span>
               <div>
                 <h4 class="underscore">Score and analyze</h4>
                 <p>Point AMC at any agent. 138 diagnostic questions run against execution evidence — observed API calls, tool usage, error handling, behavioral patterns. Get a trust score from L0 (dangerous) to L5 (production-ready) in under 2 minutes. No code changes required.</p>
               </div>
             </div>
-            <div class="step reveal reveal-d2">
+            <div class="step reveal-right reveal-d2">
               <span class="step-num">02</span>
               <div>
                 <h4 class="underscore">Fix and harden</h4>
                 <p>AMC generates targeted guardrails for your exact configuration — not generic advice, specific patches for 15 configuration targets. 86 assurance packs test prompt injection, exfiltration, context leakage, sycophancy, and other failure modes automatically.</p>
               </div>
             </div>
-            <div class="step reveal reveal-d3">
+            <div class="step reveal-right reveal-d3">
               <span class="step-num">03</span>
               <div>
                 <h4 class="underscore">Ship and monitor</h4>
@@ -278,7 +278,7 @@
           <h2>See it <strong>in action<span class="accent">_</span></strong></h2>
           <p class="section-desc">One command. No account. No API key. Your first trust score in 2 minutes.</p>
         </div>
-        <div class="terminal reveal reveal-d1">
+        <div class="terminal reveal-scale reveal-d1">
           <div class="terminal-bar">
             <div class="terminal-dot r"></div>
             <div class="terminal-dot y"></div>
@@ -416,7 +416,84 @@
       </div>
     </section>
 
-    <!-- ═══ 13. FAQ ═══ -->
+    <!-- ═══ 13. INDUSTRY DOMAINS ═══ -->
+    <section>
+      <div class="container">
+        <div class="domains-heading reveal">
+          <h2>Industry Packs for <strong>every regulated vertical<span class="accent">_</span></strong></h2>
+          <p class="section-desc" style="margin:1rem auto 0;text-align:center;max-width:550px">40 sector-specific domain packs. Each adds tailored diagnostics, compliance mappings, and trust scoring calibrated to your industry.</p>
+        </div>
+        <div class="domains-grid">
+          <div class="domain reveal">
+            <span class="domain-num">01</span>
+            <h4>Healthcare</h4>
+            <p>HIPAA compliance mapping, PHI handling verification, clinical decision support guardrails, patient safety diagnostics.</p>
+          </div>
+          <div class="domain reveal reveal-d1">
+            <span class="domain-num">02</span>
+            <h4>Financial Services</h4>
+            <p>SOX and PCI-DSS compliance, transaction integrity, market manipulation detection, fiduciary duty scoring.</p>
+          </div>
+          <div class="domain reveal reveal-d2">
+            <span class="domain-num">03</span>
+            <h4>Government</h4>
+            <p>FedRAMP alignment, classified data handling, FISMA controls, citizen privacy protections, audit trail requirements.</p>
+          </div>
+          <div class="domain reveal reveal-d3">
+            <span class="domain-num">04</span>
+            <h4>Education</h4>
+            <p>FERPA compliance, student data protection, age-appropriate content verification, academic integrity safeguards.</p>
+          </div>
+          <div class="domain reveal">
+            <span class="domain-num">05</span>
+            <h4>Insurance</h4>
+            <p>Actuarial fairness scoring, claims processing integrity, underwriting bias detection, regulatory filing compliance.</p>
+          </div>
+          <div class="domain reveal reveal-d1">
+            <span class="domain-num">06</span>
+            <h4>Legal</h4>
+            <p>Attorney-client privilege protection, eDiscovery compliance, confidentiality scoring, judicial decision support safeguards.</p>
+          </div>
+          <div class="domain reveal reveal-d2">
+            <span class="domain-num">07</span>
+            <h4>Energy</h4>
+            <p>Critical infrastructure protection, NERC CIP compliance, safety-critical system scoring, operational technology guardrails.</p>
+          </div>
+          <div class="domain reveal reveal-d3">
+            <span class="domain-num">08</span>
+            <h4>Autonomous Systems</h4>
+            <p>Safety-critical decision scoring, real-time monitoring requirements, fail-safe verification, ISO 26262 alignment.</p>
+          </div>
+        </div>
+        <p class="reveal" style="text-align:center;margin-top:2rem;font-family:'Space Mono',monospace;font-size:0.78rem;color:var(--text-dim)">+ 32 more verticals including defense, pharma, telecom, retail, manufacturing, logistics, media, real estate...</p>
+      </div>
+    </section>
+
+    <!-- ═══ 14. FIGURES ═══ -->
+    <section>
+      <div class="container">
+        <div class="figures">
+          <div class="figure-item reveal">
+            <span class="figure-val"><span class="accent">3,311</span></span>
+            <span class="figure-label">tests passing</span>
+          </div>
+          <div class="figure-item reveal reveal-d1">
+            <span class="figure-val"><span class="accent">481</span></span>
+            <span class="figure-label">cli commands</span>
+          </div>
+          <div class="figure-item reveal reveal-d2">
+            <span class="figure-val"><span class="accent">74</span>+</span>
+            <span class="figure-label">scoring modules</span>
+          </div>
+          <div class="figure-item reveal reveal-d3">
+            <span class="figure-val"><span class="accent">40</span></span>
+            <span class="figure-label">domain packs</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ 15. FAQ ═══ -->
     <section class="section-alt">
       <div class="container">
         <div class="section-heading reveal" style="text-align:center">
