@@ -299,10 +299,9 @@
   function render(now) {
     const elapsed = now - t0;
     const scrollFade = Math.max(0, 1 - scrollY / (heroH * 0.7));
-    if (scrollFade <= 0) { ctx.clearRect(0, 0, canvas.width, canvas.height); return; }
+    if (scrollFade <= 0) { ctx.setTransform(DPR, 0, 0, DPR, 0, 0); ctx.clearRect(0, 0, logW, logH); return; }
 
-    ctx.save();
-    ctx.scale(DPR, DPR);
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
     ctx.clearRect(0, 0, logW, logH);
     ctx.globalAlpha = scrollFade;
 
@@ -341,7 +340,7 @@
       drawScoreLabel(textFade);
     }
 
-    ctx.restore();
+    ctx.globalAlpha = 1;
   }
 
   function drawConnections(fade) {
@@ -425,11 +424,15 @@
   window.addEventListener('resize', resize);
 
   // Visibility: pause when hidden
+  let hiddenAt = 0;
   document.addEventListener('visibilitychange', function () {
     if (document.hidden) {
+      hiddenAt = performance.now();
       cancelAnimationFrame(raf);
     } else {
-      t0 += performance.now() - t0; // prevent jump
+      // Offset t0 by time hidden so animation doesn't jump
+      if (hiddenAt) t0 += performance.now() - hiddenAt;
+      hiddenAt = 0;
       loop();
     }
   });
