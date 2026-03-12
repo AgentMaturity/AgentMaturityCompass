@@ -6,12 +6,11 @@ function initReveals(){
   if(typeof gsap==='undefined'||typeof ScrollTrigger==='undefined')return;
   gsap.registerPlugin(ScrollTrigger);
 
-  // Batch all .gs elements — single pass, fast
-  ScrollTrigger.batch('.gs',{
-    onEnter:function(batch){
-      gsap.to(batch,{opacity:1,y:0,duration:0.6,ease:'power2.out',stagger:0.06,overwrite:true});
-    },
-    start:'top 92%'
+  // Instant reveal — no stagger lag, just fade in fast
+  gsap.utils.toArray('.gs').forEach(function(el){
+    gsap.to(el,{opacity:1,y:0,duration:0.45,ease:'power2.out',
+      scrollTrigger:{trigger:el,start:'top 95%',toggleActions:'play none none none'}
+    });
   });
 
   // Nav background on scroll

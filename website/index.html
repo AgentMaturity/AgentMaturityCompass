@@ -17,7 +17,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=8">
+  <link rel="stylesheet" href="style.css?v=9">
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js" defer></script>
 </head>
@@ -80,7 +80,7 @@
         <div class="stats-row">
           <div class="stat gs"><span class="stat-value">138</span><span class="stat-label">diagnostic questions</span></div>
           <div class="stat gs"><span class="stat-value">86</span><span class="stat-label">assurance packs</span></div>
-          <div class="stat gs"><span class="stat-value">592</span><span class="stat-label">industry questions</span></div>
+          <div class="stat gs"><span class="stat-value">1,013</span><span class="stat-label">total diagnostics</span></div>
           <div class="stat gs"><span class="stat-value">3,311</span><span class="stat-label">tests passing</span></div>
           <div class="stat gs"><span class="stat-value">14</span><span class="stat-label">framework adapters</span></div>
         </div>
@@ -129,23 +129,63 @@
         <div class="section-heading gs" style="text-align:center">
           <p class="label">integrations</p>
           <h2>Works with <strong>your stack<span class="accent">_</span></strong></h2>
-          <p class="section-desc" style="margin:1rem auto 0;text-align:center">14 built-in adapters. Zero code changes. One environment variable.</p>
+          <p class="section-desc" style="margin:1rem auto 0;text-align:center">14 built-in adapters. Works with any OpenAI-compatible endpoint. Zero code changes.</p>
         </div>
         <div class="logos-grid gs">
-          <div class="logo-item"><span class="logo-name">LangChain</span><span class="logo-type">Python + Node</span></div>
-          <div class="logo-item"><span class="logo-name">LangGraph</span><span class="logo-type">Python</span></div>
-          <div class="logo-item"><span class="logo-name">CrewAI</span><span class="logo-type">CLI</span></div>
-          <div class="logo-item"><span class="logo-name">OpenAI Agents SDK</span><span class="logo-type">Python</span></div>
-          <div class="logo-item"><span class="logo-name">AutoGen</span><span class="logo-type">CLI</span></div>
-          <div class="logo-item"><span class="logo-name">Claude Code</span><span class="logo-type">CLI</span></div>
-          <div class="logo-item"><span class="logo-name">Gemini</span><span class="logo-type">CLI</span></div>
-          <div class="logo-item"><span class="logo-name">LlamaIndex</span><span class="logo-type">Python</span></div>
-          <div class="logo-item"><span class="logo-name">Semantic Kernel</span><span class="logo-type">.NET</span></div>
-          <div class="logo-item"><span class="logo-name">OpenClaw</span><span class="logo-type">CLI</span></div>
-          <div class="logo-item"><span class="logo-name">OpenHands</span><span class="logo-type">CLI</span></div>
-          <div class="logo-item"><span class="logo-name">Python SDK</span><span class="logo-type">pip install</span></div>
-          <div class="logo-item"><span class="logo-name">CLI</span><span class="logo-type">any agent</span></div>
-          <div class="logo-item"><span class="logo-name">OpenAI-compatible</span><span class="logo-type">any endpoint</span></div>
+          <div class="logo-item has-adapter"><span class="logo-name">LangChain</span><span class="logo-type">adapter</span></div>
+          <div class="logo-item has-adapter"><span class="logo-name">LangGraph</span><span class="logo-type">adapter</span></div>
+          <div class="logo-item has-adapter"><span class="logo-name">CrewAI</span><span class="logo-type">adapter</span></div>
+          <div class="logo-item has-adapter"><span class="logo-name">OpenAI</span><span class="logo-type">adapter</span></div>
+          <div class="logo-item has-adapter"><span class="logo-name">AutoGen</span><span class="logo-type">adapter</span></div>
+          <div class="logo-item has-adapter"><span class="logo-name">Claude Code</span><span class="logo-type">adapter</span></div>
+          <div class="logo-item has-adapter"><span class="logo-name">Gemini</span><span class="logo-type">adapter</span></div>
+          <div class="logo-item has-adapter"><span class="logo-name">LlamaIndex</span><span class="logo-type">adapter</span></div>
+          <div class="logo-item has-adapter"><span class="logo-name">Semantic Kernel</span><span class="logo-type">adapter</span></div>
+          <div class="logo-item has-adapter"><span class="logo-name">OpenClaw</span><span class="logo-type">adapter</span></div>
+          <div class="logo-item has-adapter"><span class="logo-name">OpenHands</span><span class="logo-type">adapter</span></div>
+          <div class="logo-item has-adapter"><span class="logo-name">Python SDK</span><span class="logo-type">adapter</span></div>
+          <div class="logo-item has-adapter"><span class="logo-name">CLI</span><span class="logo-type">adapter</span></div>
+          <div class="logo-item has-adapter"><span class="logo-name">OpenAI-compat</span><span class="logo-type">adapter</span></div>
+          <div class="logo-item"><span class="logo-name">GPT-4o / GPT-5</span><span class="logo-type">via OpenAI</span></div>
+          <div class="logo-item"><span class="logo-name">Claude Opus / Sonnet</span><span class="logo-type">via Anthropic</span></div>
+          <div class="logo-item"><span class="logo-name">Gemini Pro</span><span class="logo-type">via Google</span></div>
+          <div class="logo-item"><span class="logo-name">Llama 3 / 4</span><span class="logo-type">via Meta</span></div>
+          <div class="logo-item"><span class="logo-name">Mistral</span><span class="logo-type">via Mistral AI</span></div>
+          <div class="logo-item"><span class="logo-name">Cohere Command</span><span class="logo-type">via Cohere</span></div>
+          <div class="logo-item"><span class="logo-name">DeepSeek</span><span class="logo-type">via DeepSeek</span></div>
+          <div class="logo-item"><span class="logo-name">Qwen</span><span class="logo-type">via Alibaba</span></div>
+          <div class="logo-item"><span class="logo-name">Codex</span><span class="logo-type">via OpenAI</span></div>
+          <div class="logo-item"><span class="logo-name">Cursor</span><span class="logo-type">compatible</span></div>
+          <div class="logo-item"><span class="logo-name">Windsurf</span><span class="logo-type">compatible</span></div>
+          <div class="logo-item"><span class="logo-name">Bolt.new</span><span class="logo-type">compatible</span></div>
+          <div class="logo-item"><span class="logo-name">v0</span><span class="logo-type">compatible</span></div>
+          <div class="logo-item"><span class="logo-name">Replit Agent</span><span class="logo-type">compatible</span></div>
+          <div class="logo-item"><span class="logo-name">Amazon Bedrock</span><span class="logo-type">compatible</span></div>
+          <div class="logo-item"><span class="logo-name">Azure OpenAI</span><span class="logo-type">compatible</span></div>
+          <div class="logo-item"><span class="logo-name">Google Vertex</span><span class="logo-type">compatible</span></div>
+          <div class="logo-item"><span class="logo-name">Hugging Face</span><span class="logo-type">compatible</span></div>
+          <div class="logo-item"><span class="logo-name">Together AI</span><span class="logo-type">compatible</span></div>
+          <div class="logo-item"><span class="logo-name">Groq</span><span class="logo-type">compatible</span></div>
+          <div class="logo-item"><span class="logo-name">Perplexity</span><span class="logo-type">compatible</span></div>
+          <div class="logo-item"><span class="logo-name">Fireworks</span><span class="logo-type">compatible</span></div>
+          <div class="logo-item"><span class="logo-name">Anyscale</span><span class="logo-type">compatible</span></div>
+          <div class="logo-item"><span class="logo-name">Replicate</span><span class="logo-type">compatible</span></div>
+          <div class="logo-item"><span class="logo-name">Modal</span><span class="logo-type">compatible</span></div>
+          <div class="logo-item"><span class="logo-name">Databricks</span><span class="logo-type">compatible</span></div>
+          <div class="logo-item"><span class="logo-name">Snowflake Cortex</span><span class="logo-type">compatible</span></div>
+          <div class="logo-item"><span class="logo-name">IBM watsonx</span><span class="logo-type">compatible</span></div>
+          <div class="logo-item"><span class="logo-name">SageMaker</span><span class="logo-type">compatible</span></div>
+          <div class="logo-item"><span class="logo-name">Dify</span><span class="logo-type">compatible</span></div>
+          <div class="logo-item"><span class="logo-name">n8n</span><span class="logo-type">compatible</span></div>
+          <div class="logo-item"><span class="logo-name">Zapier AI</span><span class="logo-type">compatible</span></div>
+          <div class="logo-item"><span class="logo-name">Flowise</span><span class="logo-type">compatible</span></div>
+          <div class="logo-item"><span class="logo-name">Haystack</span><span class="logo-type">compatible</span></div>
+          <div class="logo-item"><span class="logo-name">SuperAGI</span><span class="logo-type">compatible</span></div>
+          <div class="logo-item"><span class="logo-name">BabyAGI</span><span class="logo-type">compatible</span></div>
+          <div class="logo-item"><span class="logo-name">MetaGPT</span><span class="logo-type">compatible</span></div>
+          <div class="logo-item"><span class="logo-name">AgentGPT</span><span class="logo-type">compatible</span></div>
+          <div class="logo-item"><span class="logo-name">Phidata</span><span class="logo-type">compatible</span></div>
+          <div class="logo-item"><span class="logo-name">Composio</span><span class="logo-type">compatible</span></div>
         </div>
       </div>
     </section>
@@ -167,12 +207,64 @@
       </div>
     </section>
 
+    <!-- ═══ RESEARCH FOUNDATION ═══ -->
+    <section id="research">
+      <div class="container">
+        <div class="section-heading gs" style="text-align:center">
+          <p class="label">research foundation</p>
+          <h2>Built on <strong>primary sources<span class="accent">_</span></strong></h2>
+          <p class="section-desc" style="margin:1rem auto 0;text-align:center;max-width:600px">Every AMC module is grounded in peer-reviewed research. 21 papers analyzed, cross-referenced against 74 score modules and 86 assurance packs.</p>
+        </div>
+        <div class="research-grid">
+          <div class="research-item gs"><span class="research-tag">NIST</span><h4>NIST AI Risk Management Framework</h4><p>Core governance structure for trustworthy AI deployment and evaluation.</p><span class="research-maps">→ crossFrameworkMapping, governanceNISTRMF</span><a href="https://www.nist.gov/itl/ai-risk-management-framework" class="card-link" target="_blank" rel="noopener">nist.gov →</a></div>
+          <div class="research-item gs"><span class="research-tag">ICML 2024</span><h4>Levels of AGI — Operationalizing Progress</h4><p>Maturity levels framework for AI capabilities and autonomy.</p><span class="research-maps">→ L0-L5 maturity scale, autonomy scoring</span><a href="https://arxiv.org/abs/2311.02462" class="card-link" target="_blank" rel="noopener">arxiv 2311.02462 →</a></div>
+          <div class="research-item gs"><span class="research-tag">NeurIPS 2024</span><h4>Connecting the Dots — LLMs Infer Latent Info</h4><p>Frontier models infer information from distributed evidence.</p><span class="research-maps">→ contextLeakagePack, informationBarrier</span><a href="https://arxiv.org/abs/2406.14546" class="card-link" target="_blank" rel="noopener">arxiv 2406.14546 →</a></div>
+          <div class="research-item gs"><span class="research-tag">2026</span><h4>Zombie Agents — Persistent Memory Injection</h4><p>Cross-session memory poisoning via self-reinforcing payloads.</p><span class="research-maps">→ memoryIntegrity, zombieAgentPersistencePack</span><a href="https://arxiv.org/abs/2602.15654" class="card-link" target="_blank" rel="noopener">arxiv 2602.15654 →</a></div>
+          <div class="research-item gs"><span class="research-tag">2026</span><h4>Agent-as-a-Proxy Monitor Bypass</h4><p>Proves monitoring-based defenses are fundamentally fragile.</p><span class="research-maps">→ monitorBypassResistance, agentAsProxyPack</span><a href="https://arxiv.org/abs/2602.05066" class="card-link" target="_blank" rel="noopener">arxiv 2602.05066 →</a></div>
+          <div class="research-item gs"><span class="research-tag">2026</span><h4>SoK: Trust-Authorization Mismatch</h4><p>Static permissions vs dynamic trust — the root cause of agent failures.</p><span class="research-maps">→ trustAuthorizationSync, runtimeIdentityMaturity</span><a href="https://arxiv.org/abs/2512.06914" class="card-link" target="_blank" rel="noopener">arxiv 2512.06914 →</a></div>
+          <div class="research-item gs"><span class="research-tag">2026</span><h4>MCP Security Bench — 12 Attack Taxonomy</h4><p>First end-to-end evaluation of MCP-specific attack vectors.</p><span class="research-maps">→ mcpCompliance, mcpSecurityResiliencePack</span><a href="https://arxiv.org/abs/2510.15994" class="card-link" target="_blank" rel="noopener">arxiv 2510.15994 →</a></div>
+          <div class="research-item gs"><span class="research-tag">2026</span><h4>Beyond Max Tokens — Economic DoS</h4><p>Stealthy 658x cost amplification via tool-calling chains.</p><span class="research-maps">→ costPredictability, economicAmplificationPack</span><a href="https://arxiv.org/abs/2601.10955" class="card-link" target="_blank" rel="noopener">arxiv 2601.10955 →</a></div>
+          <div class="research-item gs"><span class="research-tag">2026</span><h4>ForesightSafety Bench — 94 Risk Dimensions</h4><p>Comprehensive 7-pillar safety evaluation covering 94 refined risk dimensions.</p><span class="research-maps">→ crossFrameworkMapping, catastrophicRiskIndicators</span><a href="https://arxiv.org/abs/2602.14135" class="card-link" target="_blank" rel="noopener">arxiv 2602.14135 →</a></div>
+          <div class="research-item gs"><span class="research-tag">2026</span><h4>The Promptware Kill Chain</h4><p>Formalizes multi-step malware delivery via prompt injection.</p><span class="research-maps">→ injectionPack, encodedInjectionPack</span><a href="https://arxiv.org/abs/2601.09625" class="card-link" target="_blank" rel="noopener">arxiv 2601.09625 →</a></div>
+          <div class="research-item gs"><span class="research-tag">2026</span><h4>MemTrust — Zero-Trust Memory Architecture</h4><p>Five-layer TEE-protected architecture for AI memory systems.</p><span class="research-maps">→ memoryMaturity, memorySecurityArchitecture</span><a href="https://arxiv.org/abs/2601.07004" class="card-link" target="_blank" rel="noopener">arxiv 2601.07004 →</a></div>
+          <div class="research-item gs"><span class="research-tag">2026</span><h4>Objective Decoupling in Social RL</h4><p>Sycophantic feedback permanently separates learned objective from ground truth.</p><span class="research-maps">→ sycophancyPack, alignmentIndex</span><a href="https://arxiv.org/abs/2602.08092" class="card-link" target="_blank" rel="noopener">arxiv 2602.08092 →</a></div>
+        </div>
+        <p class="gs" style="text-align:center;margin-top:2rem"><a href="docs/index.html#RESEARCH_PAPERS_2026" class="card-link">see all 21 papers + gap analysis →</a></p>
+      </div>
+    </section>
+
+    <!-- ═══ PRICING ═══ -->
+    <section id="pricing" class="section-alt">
+      <div class="container">
+        <div class="section-heading gs" style="text-align:center">
+          <p class="label">pricing</p>
+          <h2>Everything is <strong>free<span class="accent">_</span></strong></h2>
+        </div>
+        <div class="pricing-grid">
+          <div class="pricing-card gs">
+            <span class="tier">free / open source</span>
+            <h3>The entire trust stack</h3>
+            <p>Score, Shield, Enforce, Vault, Watch, Fleet, Passport, Comply. All <span class="hl">14 adapters</span>. <span class="hl">481 CLI commands</span>.</p>
+            <div class="items"><span class="hl">138</span> diagnostics · <span class="hl">86</span> assurance packs · <span class="hl">14</span> adapters · <span class="hl">3,311</span> tests · <span class="hl">MIT</span> licensed</div>
+            <a href="https://github.com/thewisecrab/AgentMaturityCompass" class="btn btn-primary btn-xl">get started →</a>
+          </div>
+          <div class="pricing-card gs">
+            <span class="tier">pro / enterprise</span>
+            <h3>Industry Packs</h3>
+            <p><span class="hl">40 industry packs</span> across 7 stations — 1,013 diagnostic questions for regulated verticals.</p>
+            <div class="items">Environment (6) · Health (9) · Wealth (5) · Education (5) · Mobility (5) · Technology (5) · Governance (5)</div>
+            <a href="docs/index.html#PRICING" class="btn btn-outline btn-xl">learn more →</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- ═══ INDUSTRY PACKS ═══ -->
     <section id="domains" class="section-alt">
       <div class="container">
         <div class="section-heading gs" style="text-align:center">
           <p class="label">industry packs</p>
-          <h2>7 stations<span class="accent">.</span> 40 packs<span class="accent">.</span><br><strong>592 diagnostic questions<span class="accent">_</span></strong></h2>
+          <h2>7 stations<span class="accent">.</span> 40 packs<span class="accent">.</span><br><strong>1,013 diagnostic questions<span class="accent">_</span></strong></h2>
           <p class="section-desc" style="margin:1rem auto 0;text-align:center;max-width:600px">Sector-specific diagnostics grounded in real regulations — EU AI Act, HIPAA, FDA, NERC CIP, CITES, ILO, ISO, and 40+ regulatory frameworks.</p>
         </div>
 
@@ -246,58 +338,6 @@
       </div>
     </section>
 
-    <!-- ═══ RESEARCH FOUNDATION ═══ -->
-    <section id="research">
-      <div class="container">
-        <div class="section-heading gs" style="text-align:center">
-          <p class="label">research foundation</p>
-          <h2>Built on <strong>primary sources<span class="accent">_</span></strong></h2>
-          <p class="section-desc" style="margin:1rem auto 0;text-align:center;max-width:600px">Every AMC module is grounded in peer-reviewed research. 21 papers analyzed, cross-referenced against 74 score modules and 86 assurance packs.</p>
-        </div>
-        <div class="research-grid">
-          <div class="research-item gs"><span class="research-tag">NIST</span><h4>NIST AI Risk Management Framework</h4><p>Core governance structure for trustworthy AI deployment and evaluation.</p><span class="research-maps">→ crossFrameworkMapping, governanceNISTRMF</span><a href="https://www.nist.gov/itl/ai-risk-management-framework" class="card-link" target="_blank" rel="noopener">nist.gov →</a></div>
-          <div class="research-item gs"><span class="research-tag">ICML 2024</span><h4>Levels of AGI — Operationalizing Progress</h4><p>Maturity levels framework for AI capabilities and autonomy.</p><span class="research-maps">→ L0-L5 maturity scale, autonomy scoring</span><a href="https://arxiv.org/abs/2311.02462" class="card-link" target="_blank" rel="noopener">arxiv 2311.02462 →</a></div>
-          <div class="research-item gs"><span class="research-tag">NeurIPS 2024</span><h4>Connecting the Dots — LLMs Infer Latent Info</h4><p>Frontier models infer information from distributed evidence.</p><span class="research-maps">→ contextLeakagePack, informationBarrier</span><a href="https://arxiv.org/abs/2406.14546" class="card-link" target="_blank" rel="noopener">arxiv 2406.14546 →</a></div>
-          <div class="research-item gs"><span class="research-tag">2026</span><h4>Zombie Agents — Persistent Memory Injection</h4><p>Cross-session memory poisoning via self-reinforcing payloads.</p><span class="research-maps">→ memoryIntegrity, zombieAgentPersistencePack</span><a href="https://arxiv.org/abs/2602.15654" class="card-link" target="_blank" rel="noopener">arxiv 2602.15654 →</a></div>
-          <div class="research-item gs"><span class="research-tag">2026</span><h4>Agent-as-a-Proxy Monitor Bypass</h4><p>Proves monitoring-based defenses are fundamentally fragile.</p><span class="research-maps">→ monitorBypassResistance, agentAsProxyPack</span><a href="https://arxiv.org/abs/2602.05066" class="card-link" target="_blank" rel="noopener">arxiv 2602.05066 →</a></div>
-          <div class="research-item gs"><span class="research-tag">2026</span><h4>SoK: Trust-Authorization Mismatch</h4><p>Static permissions vs dynamic trust — the root cause of agent failures.</p><span class="research-maps">→ trustAuthorizationSync, runtimeIdentityMaturity</span><a href="https://arxiv.org/abs/2512.06914" class="card-link" target="_blank" rel="noopener">arxiv 2512.06914 →</a></div>
-          <div class="research-item gs"><span class="research-tag">2026</span><h4>MCP Security Bench — 12 Attack Taxonomy</h4><p>First end-to-end evaluation of MCP-specific attack vectors.</p><span class="research-maps">→ mcpCompliance, mcpSecurityResiliencePack</span><a href="https://arxiv.org/abs/2510.15994" class="card-link" target="_blank" rel="noopener">arxiv 2510.15994 →</a></div>
-          <div class="research-item gs"><span class="research-tag">2026</span><h4>Beyond Max Tokens — Economic DoS</h4><p>Stealthy 658x cost amplification via tool-calling chains.</p><span class="research-maps">→ costPredictability, economicAmplificationPack</span><a href="https://arxiv.org/abs/2601.10955" class="card-link" target="_blank" rel="noopener">arxiv 2601.10955 →</a></div>
-          <div class="research-item gs"><span class="research-tag">2026</span><h4>ForesightSafety Bench — 94 Risk Dimensions</h4><p>Comprehensive 7-pillar safety evaluation covering 94 refined risk dimensions.</p><span class="research-maps">→ crossFrameworkMapping, catastrophicRiskIndicators</span><a href="https://arxiv.org/abs/2602.14135" class="card-link" target="_blank" rel="noopener">arxiv 2602.14135 →</a></div>
-          <div class="research-item gs"><span class="research-tag">2026</span><h4>The Promptware Kill Chain</h4><p>Formalizes multi-step malware delivery via prompt injection.</p><span class="research-maps">→ injectionPack, encodedInjectionPack</span><a href="https://arxiv.org/abs/2601.09625" class="card-link" target="_blank" rel="noopener">arxiv 2601.09625 →</a></div>
-          <div class="research-item gs"><span class="research-tag">2026</span><h4>MemTrust — Zero-Trust Memory Architecture</h4><p>Five-layer TEE-protected architecture for AI memory systems.</p><span class="research-maps">→ memoryMaturity, memorySecurityArchitecture</span><a href="https://arxiv.org/abs/2601.07004" class="card-link" target="_blank" rel="noopener">arxiv 2601.07004 →</a></div>
-          <div class="research-item gs"><span class="research-tag">2026</span><h4>Objective Decoupling in Social RL</h4><p>Sycophantic feedback permanently separates learned objective from ground truth.</p><span class="research-maps">→ sycophancyPack, alignmentIndex</span><a href="https://arxiv.org/abs/2602.08092" class="card-link" target="_blank" rel="noopener">arxiv 2602.08092 →</a></div>
-        </div>
-        <p class="gs" style="text-align:center;margin-top:2rem"><a href="docs/index.html#RESEARCH_PAPERS_2026" class="card-link">see all 21 papers + gap analysis →</a></p>
-      </div>
-    </section>
-
-    <!-- ═══ PRICING ═══ -->
-    <section id="pricing" class="section-alt">
-      <div class="container">
-        <div class="section-heading gs" style="text-align:center">
-          <p class="label">pricing</p>
-          <h2>Everything is <strong>free<span class="accent">_</span></strong></h2>
-        </div>
-        <div class="pricing-grid">
-          <div class="pricing-card gs">
-            <span class="tier">free / open source</span>
-            <h3>The entire trust stack</h3>
-            <p>Score, Shield, Enforce, Vault, Watch, Fleet, Passport, Comply. All <span class="hl">14 adapters</span>. <span class="hl">481 CLI commands</span>.</p>
-            <div class="items"><span class="hl">138</span> diagnostics · <span class="hl">86</span> assurance packs · <span class="hl">14</span> adapters · <span class="hl">3,311</span> tests · <span class="hl">MIT</span> licensed</div>
-            <a href="https://github.com/thewisecrab/AgentMaturityCompass" class="btn btn-primary btn-xl">get started →</a>
-          </div>
-          <div class="pricing-card gs">
-            <span class="tier">pro / enterprise</span>
-            <h3>Industry Packs</h3>
-            <p><span class="hl">40 industry packs</span> across 7 stations — 592 sector-specific questions for regulated verticals.</p>
-            <div class="items">Environment (6) · Health (9) · Wealth (5) · Education (5) · Mobility (5) · Technology (5) · Governance (5)</div>
-            <a href="docs/index.html#PRICING" class="btn btn-outline btn-xl">learn more →</a>
-          </div>
-        </div>
-      </div>
-    </section>
-
     <!-- ═══ FAQ ═══ -->
     <section>
       <div class="container">
@@ -308,6 +348,43 @@
           <div class="faq-item gs"><button class="faq-q" aria-expanded="false">Which frameworks does AMC support?<span class="faq-icon">+</span></button><div class="faq-a"><p><span class="hl">14 adapters</span>: LangChain, LangGraph, CrewAI, AutoGen, OpenAI Agents SDK, LlamaIndex, Semantic Kernel, Claude Code, Gemini, OpenClaw, OpenHands, Python SDK, CLI, and any OpenAI-compatible endpoint.</p></div></div>
           <div class="faq-item gs"><button class="faq-q" aria-expanded="false">Is AMC really free?<span class="faq-icon">+</span></button><div class="faq-a"><p>Yes. <span class="hl">MIT licensed forever</span>. The full trust stack is free. Only Industry Packs (40 sector-specific packs) are paid.</p></div></div>
           <div class="faq-item gs"><button class="faq-q" aria-expanded="false">Can I use AMC in CI/CD?<span class="faq-icon">+</span></button><div class="faq-a"><p>Yes. <code>amc gate --min-score L3</code> fails the pipeline if below threshold. Works with GitHub Actions, GitLab CI, Jenkins.</p></div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ MARQUEE (OSE-style pre-footer) ═══ -->
+    <section class="marquee-section">
+      <div class="marquee-track">
+        <div class="marquee-content">
+          <span>138 Diagnostics</span><span class="marquee-dot">·</span>
+          <span>86 Assurance Packs</span><span class="marquee-dot">·</span>
+          <span>40 Industry Packs</span><span class="marquee-dot">·</span>
+          <span>14 Framework Adapters</span><span class="marquee-dot">·</span>
+          <span>81 Score Modules</span><span class="marquee-dot">·</span>
+          <span>481 CLI Commands</span><span class="marquee-dot">·</span>
+          <span>3,311 Tests Passing</span><span class="marquee-dot">·</span>
+          <span>1,013 Total Diagnostics</span><span class="marquee-dot">·</span>
+          <span>Ed25519 Signatures</span><span class="marquee-dot">·</span>
+          <span>Merkle Evidence Chains</span><span class="marquee-dot">·</span>
+          <span>L0 to L5 Maturity</span><span class="marquee-dot">·</span>
+          <span>EU AI Act Mapping</span><span class="marquee-dot">·</span>
+          <span>ISO 42001 Ready</span><span class="marquee-dot">·</span>
+          <span>NIST AI RMF</span><span class="marquee-dot">·</span>
+          <span>Zero Code Changes</span><span class="marquee-dot">·</span>
+          <span>MIT Licensed</span><span class="marquee-dot">·</span>
+          <span>138 Diagnostics</span><span class="marquee-dot">·</span>
+          <span>86 Assurance Packs</span><span class="marquee-dot">·</span>
+          <span>40 Industry Packs</span><span class="marquee-dot">·</span>
+          <span>14 Framework Adapters</span><span class="marquee-dot">·</span>
+          <span>81 Score Modules</span><span class="marquee-dot">·</span>
+          <span>481 CLI Commands</span><span class="marquee-dot">·</span>
+          <span>3,311 Tests Passing</span><span class="marquee-dot">·</span>
+          <span>1,013 Total Diagnostics</span><span class="marquee-dot">·</span>
+          <span>Ed25519 Signatures</span><span class="marquee-dot">·</span>
+          <span>Merkle Evidence Chains</span><span class="marquee-dot">·</span>
+          <span>L0 to L5 Maturity</span><span class="marquee-dot">·</span>
+          <span>EU AI Act Mapping</span><span class="marquee-dot">·</span>
+          <span>MIT Licensed</span><span class="marquee-dot">·</span>
         </div>
       </div>
     </section>
@@ -346,7 +423,7 @@
     </div>
   </footer>
 
-  <script src="particles.js?v=8"></script>
-  <script src="script.js?v=8"></script>
+  <script src="particles.js?v=9"></script>
+  <script src="script.js?v=9"></script>
 </body>
 </html>
