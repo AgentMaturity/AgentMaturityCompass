@@ -1,98 +1,78 @@
-/* AMC v5 — Atmospheric particles. Subtle. OSE-inspired. */
+// AMC Token Animation — random tokens on right, streamlined through "AMC" on left
 (function(){
-  'use strict';
-  var canvas = document.getElementById('hero-canvas');
-  if (!canvas) return;
-  var ctx = canvas.getContext('2d');
-  var DPR = Math.min(window.devicePixelRatio || 1, 2);
-  var isMobile = window.innerWidth < 768;
-  var COUNT = isMobile ? 60 : 120;
-  var W, H, particles = [], raf, scrollY = 0, heroH = 0;
-  var ACCENT = [74, 239, 121];
-  var WHITE = [255, 255, 255];
+'use strict';
+var canvas=document.getElementById('hero-canvas');
+if(!canvas)return;
+var ctx=canvas.getContext('2d');
+var W,H,tokens=[],amcX,amcW;
+var TOKEN_TEXTS=['GPT','LLM','RAG','MCP','L3','L4','0.4×','1.0×','Ed25519','NIST','ISO','OWASP','EU AI','HIPAA','SOC2','CI/CD','FHIR','PII','DLP','RBAC','TEE','CoT','RL','RLHF','SaMD','FDA','GxP','NIS2','GDPR'];
 
-  function resize() {
-    var rect = canvas.getBoundingClientRect();
-    W = rect.width; H = rect.height;
-    canvas.width = W * DPR;
-    canvas.height = H * DPR;
-    canvas.style.width = W + 'px';
-    canvas.style.height = H + 'px';
-    heroH = document.querySelector('.hero')?.offsetHeight || H;
+function resize(){
+  W=canvas.width=canvas.parentElement.offsetWidth;
+  H=canvas.height=canvas.parentElement.offsetHeight;
+  amcX=W*0.15; amcW=W*0.35;
+}
+
+function Token(){
+  this.reset();
+}
+Token.prototype.reset=function(){
+  this.x=W*0.55+Math.random()*W*0.45;
+  this.y=Math.random()*H;
+  this.vx=-0.3-Math.random()*0.5;
+  this.vy=(Math.random()-0.5)*0.3;
+  this.text=TOKEN_TEXTS[Math.floor(Math.random()*TOKEN_TEXTS.length)];
+  this.alpha=0.08+Math.random()*0.12;
+  this.size=9+Math.random()*5;
+  this.streamlined=false;
+};
+Token.prototype.update=function(){
+  // When entering AMC zone, streamline (align to horizontal flow)
+  var inZone=this.x<amcX+amcW&&this.x>amcX;
+  if(inZone&&!this.streamlined){
+    this.streamlined=true;
+    this.vy=0;
+    this.vx=-0.8;
+    this.alpha=Math.min(this.alpha+0.05,0.25);
   }
-
-  function init() {
-    resize();
-    particles = [];
-    for (var i = 0; i < COUNT; i++) {
-      var isAccent = Math.random() > 0.85;
-      particles.push({
-        x: Math.random() * W,
-        y: Math.random() * H,
-        vx: (Math.random() - 0.5) * 0.3,
-        vy: (Math.random() - 0.5) * 0.2 - 0.1,
-        size: isAccent ? 1.5 + Math.random() * 1.5 : 0.8 + Math.random(),
-        opacity: isAccent ? 0.3 + Math.random() * 0.3 : 0.06 + Math.random() * 0.12,
-        color: isAccent ? ACCENT : WHITE,
-        seed: Math.random() * Math.PI * 2
-      });
-    }
-    loop();
+  if(this.x<amcX&&this.streamlined){
+    // Past AMC zone — fade out
+    this.alpha-=0.003;
   }
+  this.x+=this.vx;
+  this.y+=this.vy;
+  if(this.x<-50||this.alpha<=0)this.reset();
+};
+Token.prototype.draw=function(){
+  ctx.save();
+  ctx.globalAlpha=this.alpha;
+  ctx.font=this.size+'px "Space Mono",monospace';
+  ctx.fillStyle=this.streamlined?'#4AEF79':'#94B0BF';
+  ctx.fillText(this.text,this.x,this.y);
+  ctx.restore();
+};
 
-  function update(now) {
-    for (var i = 0; i < particles.length; i++) {
-      var p = particles[i];
-      p.x += p.vx + Math.sin(now * 0.0003 + p.seed) * 0.15;
-      p.y += p.vy + Math.cos(now * 0.0004 + p.seed) * 0.1;
-      if (p.x < -10) p.x = W + 10;
-      if (p.x > W + 10) p.x = -10;
-      if (p.y < -10) p.y = H + 10;
-      if (p.y > H + 10) p.y = -10;
-    }
-  }
+function init(){
+  resize();
+  for(var i=0;i<35;i++){tokens.push(new Token())}
+  loop();
+}
 
-  function render() {
-    var fade = Math.max(0, 1 - scrollY / (heroH * 0.6));
-    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
-    ctx.clearRect(0, 0, W, H);
-    if (fade <= 0) return;
-    ctx.globalAlpha = fade;
-    for (var i = 0; i < particles.length; i++) {
-      var p = particles[i];
-      if (p.opacity < 0.02) continue;
-      // Glow for accent particles
-      if (p.color === ACCENT && p.opacity > 0.2) {
-        var g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.size * 4);
-        g.addColorStop(0, 'rgba(' + p.color[0] + ',' + p.color[1] + ',' + p.color[2] + ',' + (p.opacity * 0.3) + ')');
-        g.addColorStop(1, 'rgba(' + p.color[0] + ',' + p.color[1] + ',' + p.color[2] + ',0)');
-        ctx.fillStyle = g;
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.size * 4, 0, Math.PI * 2);
-        ctx.fill();
-      }
-      ctx.fillStyle = 'rgba(' + p.color[0] + ',' + p.color[1] + ',' + p.color[2] + ',' + p.opacity + ')';
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-      ctx.fill();
-    }
-    ctx.globalAlpha = 1;
-  }
+function loop(){
+  ctx.clearRect(0,0,W,H);
+  // Draw AMC background text
+  ctx.save();
+  ctx.globalAlpha=0.04;
+  ctx.font='bold '+Math.min(W*0.22,200)+'px Inter,system-ui,sans-serif';
+  ctx.fillStyle='#4AEF79';
+  ctx.textAlign='center';
+  ctx.fillText('AMC',W*0.32,H*0.55);
+  ctx.restore();
 
-  function loop() {
-    var now = performance.now();
-    update(now);
-    render();
-    raf = requestAnimationFrame(loop);
-  }
+  for(var i=0;i<tokens.length;i++){tokens[i].update();tokens[i].draw()}
+  requestAnimationFrame(loop);
+}
 
-  window.addEventListener('scroll', function(){ scrollY = window.scrollY; }, {passive: true});
-  window.addEventListener('resize', resize);
-  document.addEventListener('visibilitychange', function(){
-    if (document.hidden) cancelAnimationFrame(raf);
-    else loop();
-  });
-
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  init();
+window.addEventListener('resize',resize);
+init();
 })();

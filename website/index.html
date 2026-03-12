@@ -17,7 +17,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=9">
+  <link rel="stylesheet" href="style.css?v=10">
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js" defer></script>
 </head>
@@ -57,12 +57,8 @@
     <!-- ═══ HERO ═══ -->
     <section class="hero">
       <canvas id="hero-canvas" aria-hidden="true"></canvas>
-      <div class="container hero-content">
-        <p class="label gs">trust scoring for ai agents</p>
-        <h1 class="gs">Score your agent<span class="accent">_</span></h1>
-        <h1 class="gs hero-h1-muted">Find the gaps<span class="accent">.</span> Fix them<span class="accent">.</span></h1>
-        <p class="hero-sub gs"><span class="hl">138 diagnostics</span> against actual execution behavior. Not documentation. Not self-reported claims. <span class="hl">Evidence</span> you can verify, sign, and audit.</p>
-        <div class="hero-actions gs">
+      <div class="container hero-grid">
+        <div class="hero-left gs">
           <div class="hero-install" onclick="navigator.clipboard&&navigator.clipboard.writeText('npm i -g agent-maturity-compass')" title="Click to copy">
             <span class="hi-prompt">$</span> npm i -g agent-maturity-compass
           </div>
@@ -70,6 +66,12 @@
             <a href="playground.html" class="btn btn-primary btn-xl">try in browser →</a>
             <a href="#products" class="btn btn-outline btn-xl">explore products →</a>
           </div>
+        </div>
+        <div class="hero-right gs">
+          <p class="label">trust scoring for ai agents</p>
+          <h1>Score your agent<span class="accent">_</span></h1>
+          <h1 class="hero-h1-muted">Find the gaps<span class="accent">.</span> Fix them<span class="accent">.</span></h1>
+          <p class="hero-sub"><span class="hl">1,013 diagnostics</span> against actual execution behavior. Not documentation. Not self-reported claims. <span class="hl">Evidence</span> you can verify, sign, and audit.</p>
         </div>
       </div>
     </section>
@@ -90,9 +92,23 @@
     <!-- ═══ THE GAP ═══ -->
     <section class="big-number">
       <div class="container">
-        <div class="big-number-value gs">84</div>
-        <p class="big-number-desc gs">The gap between what your agent <span class="text-w">claims</span> and what <span class="hl">execution evidence</span> shows.</p>
-        <p class="evidence gs">documentation score: <span class="text-w">100</span> → evidence-verified: <span class="hl">16</span> → gap: <span class="hl">84</span></p>
+        <div class="gap-visual gs">
+          <div class="gap-col">
+            <span class="gap-label">self-reported</span>
+            <div class="gap-bar gap-bar-full"><span>100</span></div>
+          </div>
+          <div class="gap-arrow">→</div>
+          <div class="gap-col">
+            <span class="gap-label">evidence-verified</span>
+            <div class="gap-bar gap-bar-real"><span>16</span></div>
+          </div>
+          <div class="gap-arrow">=</div>
+          <div class="gap-col gap-col-main">
+            <span class="gap-label">the gap</span>
+            <div class="big-number-value">84</div>
+          </div>
+        </div>
+        <p class="big-number-desc gs">The gap between what your agent <span class="text-w">claims</span> and what <span class="hl">execution evidence</span> shows. Self-reported claims capped at <span class="hl">0.4× weight</span>. Observed execution scores at <span class="hl">1.0×</span>.</p>
       </div>
     </section>
 
@@ -155,11 +171,6 @@
           <div class="logo-item"><span class="logo-name">DeepSeek</span><span class="logo-type">via DeepSeek</span></div>
           <div class="logo-item"><span class="logo-name">Qwen</span><span class="logo-type">via Alibaba</span></div>
           <div class="logo-item"><span class="logo-name">Codex</span><span class="logo-type">via OpenAI</span></div>
-          <div class="logo-item"><span class="logo-name">Cursor</span><span class="logo-type">compatible</span></div>
-          <div class="logo-item"><span class="logo-name">Windsurf</span><span class="logo-type">compatible</span></div>
-          <div class="logo-item"><span class="logo-name">Bolt.new</span><span class="logo-type">compatible</span></div>
-          <div class="logo-item"><span class="logo-name">v0</span><span class="logo-type">compatible</span></div>
-          <div class="logo-item"><span class="logo-name">Replit Agent</span><span class="logo-type">compatible</span></div>
           <div class="logo-item"><span class="logo-name">Amazon Bedrock</span><span class="logo-type">compatible</span></div>
           <div class="logo-item"><span class="logo-name">Azure OpenAI</span><span class="logo-type">compatible</span></div>
           <div class="logo-item"><span class="logo-name">Google Vertex</span><span class="logo-type">compatible</span></div>
@@ -168,24 +179,11 @@
           <div class="logo-item"><span class="logo-name">Groq</span><span class="logo-type">compatible</span></div>
           <div class="logo-item"><span class="logo-name">Perplexity</span><span class="logo-type">compatible</span></div>
           <div class="logo-item"><span class="logo-name">Fireworks</span><span class="logo-type">compatible</span></div>
-          <div class="logo-item"><span class="logo-name">Anyscale</span><span class="logo-type">compatible</span></div>
           <div class="logo-item"><span class="logo-name">Replicate</span><span class="logo-type">compatible</span></div>
-          <div class="logo-item"><span class="logo-name">Modal</span><span class="logo-type">compatible</span></div>
           <div class="logo-item"><span class="logo-name">Databricks</span><span class="logo-type">compatible</span></div>
-          <div class="logo-item"><span class="logo-name">Snowflake Cortex</span><span class="logo-type">compatible</span></div>
-          <div class="logo-item"><span class="logo-name">IBM watsonx</span><span class="logo-type">compatible</span></div>
-          <div class="logo-item"><span class="logo-name">SageMaker</span><span class="logo-type">compatible</span></div>
           <div class="logo-item"><span class="logo-name">Dify</span><span class="logo-type">compatible</span></div>
-          <div class="logo-item"><span class="logo-name">n8n</span><span class="logo-type">compatible</span></div>
-          <div class="logo-item"><span class="logo-name">Zapier AI</span><span class="logo-type">compatible</span></div>
-          <div class="logo-item"><span class="logo-name">Flowise</span><span class="logo-type">compatible</span></div>
           <div class="logo-item"><span class="logo-name">Haystack</span><span class="logo-type">compatible</span></div>
-          <div class="logo-item"><span class="logo-name">SuperAGI</span><span class="logo-type">compatible</span></div>
-          <div class="logo-item"><span class="logo-name">BabyAGI</span><span class="logo-type">compatible</span></div>
           <div class="logo-item"><span class="logo-name">MetaGPT</span><span class="logo-type">compatible</span></div>
-          <div class="logo-item"><span class="logo-name">AgentGPT</span><span class="logo-type">compatible</span></div>
-          <div class="logo-item"><span class="logo-name">Phidata</span><span class="logo-type">compatible</span></div>
-          <div class="logo-item"><span class="logo-name">Composio</span><span class="logo-type">compatible</span></div>
         </div>
       </div>
     </section>
@@ -352,40 +350,13 @@
       </div>
     </section>
 
-    <!-- ═══ MARQUEE (OSE-style pre-footer) ═══ -->
-    <section class="marquee-section">
-      <div class="marquee-track">
-        <div class="marquee-content">
-          <span>138 Diagnostics</span><span class="marquee-dot">·</span>
-          <span>86 Assurance Packs</span><span class="marquee-dot">·</span>
-          <span>40 Industry Packs</span><span class="marquee-dot">·</span>
-          <span>14 Framework Adapters</span><span class="marquee-dot">·</span>
-          <span>81 Score Modules</span><span class="marquee-dot">·</span>
-          <span>481 CLI Commands</span><span class="marquee-dot">·</span>
-          <span>3,311 Tests Passing</span><span class="marquee-dot">·</span>
-          <span>1,013 Total Diagnostics</span><span class="marquee-dot">·</span>
-          <span>Ed25519 Signatures</span><span class="marquee-dot">·</span>
-          <span>Merkle Evidence Chains</span><span class="marquee-dot">·</span>
-          <span>L0 to L5 Maturity</span><span class="marquee-dot">·</span>
-          <span>EU AI Act Mapping</span><span class="marquee-dot">·</span>
-          <span>ISO 42001 Ready</span><span class="marquee-dot">·</span>
-          <span>NIST AI RMF</span><span class="marquee-dot">·</span>
-          <span>Zero Code Changes</span><span class="marquee-dot">·</span>
-          <span>MIT Licensed</span><span class="marquee-dot">·</span>
-          <span>138 Diagnostics</span><span class="marquee-dot">·</span>
-          <span>86 Assurance Packs</span><span class="marquee-dot">·</span>
-          <span>40 Industry Packs</span><span class="marquee-dot">·</span>
-          <span>14 Framework Adapters</span><span class="marquee-dot">·</span>
-          <span>81 Score Modules</span><span class="marquee-dot">·</span>
-          <span>481 CLI Commands</span><span class="marquee-dot">·</span>
-          <span>3,311 Tests Passing</span><span class="marquee-dot">·</span>
-          <span>1,013 Total Diagnostics</span><span class="marquee-dot">·</span>
-          <span>Ed25519 Signatures</span><span class="marquee-dot">·</span>
-          <span>Merkle Evidence Chains</span><span class="marquee-dot">·</span>
-          <span>L0 to L5 Maturity</span><span class="marquee-dot">·</span>
-          <span>EU AI Act Mapping</span><span class="marquee-dot">·</span>
-          <span>MIT Licensed</span><span class="marquee-dot">·</span>
-        </div>
+    <!-- ═══ GRADIENT TRANSITION (OSE-style pre-footer) ═══ -->
+    <section class="gradient-cta">
+      <div class="gradient-cta-watermark" aria-hidden="true">AMC</div>
+      <div class="gradient-cta-content gs">
+        <p class="label">start today</p>
+        <h2>A single score <strong>can spark<br>trust in your agents<span class="accent">_</span></strong></h2>
+        <a href="playground.html" class="btn btn-primary btn-xl">try in browser →</a>
       </div>
     </section>
 
@@ -423,7 +394,7 @@
     </div>
   </footer>
 
-  <script src="particles.js?v=9"></script>
-  <script src="script.js?v=9"></script>
+  <script src="particles.js?v=10"></script>
+  <script src="script.js?v=10"></script>
 </body>
 </html>
