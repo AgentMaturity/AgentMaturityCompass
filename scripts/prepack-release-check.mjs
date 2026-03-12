@@ -1,18 +1,46 @@
 #!/usr/bin/env node
-import { mkdtempSync, rmSync } from "node:fs";
+import { existsSync, mkdtempSync, rmSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { spawnSync } from "node:child_process";
 import { generateKeyPairSync } from "node:crypto";
 
+function debugSnapshot(cwd, extraEnv = {}) {
+  const env = { ...process.env, ...extraEnv };
+  return {
+    cwd,
+    execPath: process.execPath,
+    argv: process.argv,
+    NODE_OPTIONS: env.NODE_OPTIONS ?? "",
+    npm_execpath: env.npm_execpath ?? "",
+    npm_node_execpath: env.npm_node_execpath ?? "",
+    yamlDistExists: existsSync(join(cwd, "node_modules/yaml/dist/index.js")),
+    chalkSourceExists: existsSync(join(cwd, "node_modules/chalk/source/index.js")),
+    yamlPkgExists: existsSync(join(cwd, "node_modules/yaml/package.json")),
+    chalkPkgExists: existsSync(join(cwd, "node_modules/chalk/package.json"))
+  };
+}
+
 function run(cmd, args, cwd, extraEnv = {}) {
+  const env = { ...process.env, ...extraEnv };
+  const before = debugSnapshot(cwd, extraEnv);
+  console.error(`[prepack] RUN ${cmd} ${args.join(" ")}`);
+  console.error(`[prepack] BEFORE ${JSON.stringify(before)}`);
   const out = spawnSync(cmd, args, {
     cwd,
-    env: { ...process.env, ...extraEnv },
+    env,
     encoding: "utf8"
   });
+  const after = debugSnapshot(cwd, extraEnv);
+  console.error(`[prepack] AFTER ${JSON.stringify(after)}`);
+  console.error(`[prepack] EXIT ${out.status}`);
   if (out.status !== 0) {
-    throw new Error(`Command failed: ${cmd} ${args.join(" ")}\n${(out.stdout ?? "") + (out.stderr ?? "")}`);
+    throw new Error(
+      `Command failed: ${cmd} ${args.join(" ")}\n` +
+      `Snapshot(before): ${JSON.stringify(before, null, 2)}\n` +
+      `Snapshot(after): ${JSON.stringify(after, null, 2)}\n` +
+      `${(out.stdout ?? "") + (out.stderr ?? "")}`
+    );
   }
   return out.stdout ?? "";
 }
