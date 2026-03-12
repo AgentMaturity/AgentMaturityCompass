@@ -29,37 +29,155 @@
 
 ## What is this?
 
-AMC is like **ESLint for AI agents** — it scores your agent's trustworthiness, finds the gaps, and auto-generates the fixes.
+AMC is a **trust score for AI agents**.
+
+It does three things fast:
+1. **Score** the agent from evidence, not claims
+2. **Find** the trust, safety, and governance gaps
+3. **Generate** fixes, guardrails, reports, and next actions
 
 ```bash
 npx agent-maturity-compass quickscore
 ```
 
-That's it. One command. No account. No API key. You get:
+One command. No account. No API key required for a first score.
 
-- **A trust score** from L0 (dangerous) to L5 (production-ready)
-- **A gap analysis** showing exactly what's wrong
-- **Auto-generated fixes** — guardrails, CI gates, compliance docs
+You get:
+
+- **A maturity score** from L0 (dangerous) to L5 (production-ready)
+- **A gap analysis** showing what is missing or weak
+- **Fix paths** — guardrails, CI gates, hardening steps, and compliance artifacts
 - **Trace and observability workflows** — timelines, anomalies, session inspection
 - **Evaluation workflows** — golden datasets, imported evals, lite scoring for non-agent apps
 - **Business and compliance outputs** — KPI correlation, leaderboards, audit binders
 
-Works with **LangChain, CrewAI, AutoGen, OpenAI Agents SDK, Claude Code, OpenClaw** — zero code changes.
+Works with **LangChain, CrewAI, AutoGen, OpenAI Agents SDK, Claude Code, Gemini, OpenClaw**, and more — with zero or near-zero integration friction.
 
 <details>
 <summary><strong>Why should I care?</strong></summary>
 
-Today, AI agents grade themselves. That's like letting students grade their own exams.
+Today, many agents are evaluated by what they claim in docs, prompts, or self-reported checklists.
+That is structurally weak.
 
-AMC tested real agents and found an **84-point gap** between what agents claim and what they actually do:
+AMC focuses on **execution-verified evidence**.
 
 | How agents are evaluated today | How AMC evaluates |
 |---|---|
-| Agent says "I'm safe" → Score: 100 ✅ | AMC secretly tests agent → Real score: 16 ❌ |
+| Agent says "I'm safe" → Score: 100 ✅ | AMC tests the agent and inspects evidence → Real score may be 16 ❌ |
 | Self-reported documentation | Execution-verified evidence |
+| Keyword matching | Weighted trust evidence |
 | "Trust me, bro" | Cryptographic proof chains |
 
+That is the entire thesis: **trust, but verify — with receipts**.
+
 </details>
+
+---
+
+## Product family
+
+AMC is one trust stack with eight named product surfaces:
+
+| Product | What it does |
+|---|---|
+| **Score** | Evidence-weighted maturity diagnostics and trust scoring |
+| **Shield** | Adversarial assurance packs and attack simulations |
+| **Enforce** | Policy controls, approvals, and governance workflows |
+| **Vault** | Signatures, keys, and tamper-evident proof infrastructure |
+| **Watch** | Traces, anomalies, monitoring, and operational drift detection |
+| **Fleet** | Multi-agent oversight, comparison, inventory, and governance |
+| **Passport** | Portable identity and credential artifacts for agents |
+| **Comply** | Compliance mappings, audit binders, and governance reporting |
+
+These names are intentional. AMC is not a single command with a long README — it is a trust stack you can grow into.
+
+---
+
+## Editions preview
+
+AMC is open source first, but the packaging direction is broader than a bare CLI:
+
+| Edition | Intended shape |
+|---|---|
+| **Free / Open Source** | Score, starter Shield packs, browser playground, CLI quickscore/fix |
+| **Team / Pro** | Stronger Score + Shield workflows, Watch, selected Comply outputs, small-team Fleet workflows |
+| **Enterprise / Regulated** | Full stack: Score, Shield, Enforce, Vault, Watch, Fleet, Passport, Comply |
+
+> Honest note: this is the product packaging direction, not fake finalized pricing. Exact pricing and tier limits should live on a dedicated pricing page.
+
+---
+
+## Choose your path
+
+### 1. Browser — fastest first look
+Use the existing browser playground to explore scoring logic, questions, and scenarios.
+
+**[→ Try the Web Playground](https://thewisecrab.github.io/AgentMaturityCompass/playground.html)**
+
+Best for:
+- first-touch evaluation
+- demos
+- lightweight exploration
+- understanding how scoring works
+
+### 2. CLI — real evidence workflows
+Use the CLI when you want actual execution evidence, traces, datasets, reports, and CI gates.
+
+```bash
+npx agent-maturity-compass quickscore
+```
+
+Best for:
+- real agent scoring
+- evidence capture
+- local trust workflows
+- shareable outputs
+
+### 3. CI — enforce standards continuously
+Use AMC in GitHub Actions or CI to prevent trust regressions.
+
+Best for:
+- release gates
+- score thresholds
+- drop detection
+- PR comments and artifact generation
+
+### 4. Deployment / enterprise path
+If you need self-hosted, managed, or enterprise deployment clarity, start here:
+
+- `docs/DEPLOYMENT_OPTIONS.md`
+- `docs/PRODUCT_EDITIONS.md`
+- `docs/PRICING.md`
+- `docs/ENTERPRISE.md`
+
+## Start by persona
+
+- **Solo builder / OSS maintainer** → `docs/SOLO_DEV_PATH.md`
+- **Platform / engineering team** → `docs/PLATFORM_PATH.md`
+- **Security / compliance** → `docs/SECURITY_PATH.md`
+
+## Support AMC
+
+Want to support the open project?
+
+- Sponsorship path: `SPONSORING.md`
+- Community/support routing: `docs/COMMUNITY_SUPPORT.md`
+
+## Core routing docs
+
+- `docs/INDEX.md`
+- `docs/START_HERE.md`
+- `docs/AFTER_QUICKSCORE.md`
+- `docs/EXAMPLES_INDEX.md`
+- `docs/RECIPES.md`
+- `docs/DEPLOYMENT_OPTIONS.md`
+- `docs/PRODUCT_EDITIONS.md`
+- `docs/PRICING.md`
+- `docs/BUYER_PACKAGES.md`
+- `docs/SERVICES_AND_SUPPORT.md`
+- `docs/COMMUNITY_SHOWCASE.md`
+- `docs/RELEASE_HIGHLIGHTS.md`
+- `docs/BENCHMARK_GALLERY.md`
 
 ---
 

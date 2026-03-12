@@ -10,24 +10,24 @@
     if(t)h.setAttribute('data-theme',t);
     else if(window.matchMedia('(prefers-color-scheme:dark)').matches)h.setAttribute('data-theme','dark')})();
   </script>
-  <title>Agent Maturity Compass — The Credit Score for AI Agents</title>
-  <meta name="description" content="AMC scores AI agents on trustworthiness from actual execution behavior — not self-reported claims. Cryptographic evidence chains. Zero to first score in 2 minutes. MIT licensed.">
+  <title>Agent Maturity Compass — Trust Score for AI Agents</title>
+  <meta name="description" content="AMC helps teams check whether an AI agent is safe, reliable, and ready for real use — from execution evidence, not self-reported claims. Zero to first score in 2 minutes. MIT licensed.">
   <meta name="keywords" content="AI agent trust scoring, agent maturity model, LLM governance, agent security, LangChain evaluation, CrewAI scoring, EU AI Act compliance, prompt injection testing, agent benchmark, cryptographic evidence">
   <meta name="robots" content="index, follow">
   <meta name="author" content="thewisecrab">
   <meta name="theme-color" content="#6366F1">
   <link rel="canonical" href="https://thewisecrab.github.io/AgentMaturityCompass/">
   <meta property="og:type" content="website">
-  <meta property="og:title" content="Agent Maturity Compass — The Credit Score for AI Agents">
-  <meta property="og:description" content="Your AI agent says it's safe. AMC proves whether it is — from execution evidence, not documentation. MIT licensed, zero to first score in 2 minutes.">
+  <meta property="og:title" content="Agent Maturity Compass — Trust Score for AI Agents">
+  <meta property="og:description" content="Your AI agent may look impressive in docs or demos. AMC checks whether it is actually safe, reliable, and ready — from execution evidence.">
   <meta property="og:url" content="https://thewisecrab.github.io/AgentMaturityCompass/">
   <meta property="og:image" content="https://thewisecrab.github.io/AgentMaturityCompass/og-card.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta property="og:image:alt" content="Agent Maturity Compass — AI Agent Trust Scoring">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="AMC — The Credit Score for AI Agents">
-  <meta name="twitter:description" content="The 84-point documentation inflation gap. Close it with cryptographic evidence.">
+  <meta name="twitter:title" content="AMC — Trust Score for AI Agents">
+  <meta name="twitter:description" content="Score AI agents from evidence. Find the gaps. Fix what matters.">
   <meta name="twitter:image" content="https://thewisecrab.github.io/AgentMaturityCompass/og-card.png">
 
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"SoftwareApplication","name":"Agent Maturity Compass","alternateName":"AMC","description":"Open-source framework for scoring AI agent trustworthiness from execution evidence. Uses cryptographic evidence chains, trust-weighted scoring, and L0-L5 maturity levels for agents and LLM apps.","url":"https://thewisecrab.github.io/AgentMaturityCompass/","downloadUrl":"https://www.npmjs.com/package/agent-maturity-compass","codeRepository":"https://github.com/thewisecrab/AgentMaturityCompass","license":"https://opensource.org/licenses/MIT","applicationCategory":"DeveloperApplication","operatingSystem":"macOS, Linux, Windows","featureList":["Execution-verified trust scoring","Cryptographic evidence chains","Observability and trace inspection","Golden datasets and lite scoring","L0-L5 maturity scale","14 framework adapters","EU AI Act compliance mapping","CI/CD gate mode","MIT licensed"],"author":{"@type":"Organization","name":"The Wise Crab","url":"https://github.com/thewisecrab"}}</script>
@@ -79,19 +79,24 @@
       <div class="dot-grid" aria-hidden="true"></div>
       <div class="hero-glow" aria-hidden="true"></div>
       <div class="hero-content">
-        <h1 class="reveal">The <span class="italic-accent">Credit Score</span><br>for <span class="gradient-text">AI Agents</span></h1>
+        <h1 class="reveal">A <span class="italic-accent">Trust Score</span><br>for <span class="gradient-text">AI Agents</span></h1>
         <p class="hero-subtitle reveal reveal-delay-1">Your AI agent says it's safe. AMC proves whether it is&thinsp;—&thinsp;from execution evidence, not documentation. Zero to first score in 2&nbsp;minutes.</p>
         <div class="hero-ctas reveal reveal-delay-2">
           <a href="playground.html" class="btn-primary">Try in Browser <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h10M9 4l4 4-4 4"/></svg></a>
-          <a href="https://github.com/thewisecrab/AgentMaturityCompass#quick-start" class="btn-outline">Install CLI</a>
-          <a href="https://github.com/thewisecrab/AgentMaturityCompass" class="btn-outline"><svg viewBox="0 0 16 16" fill="currentColor" style="width:14px;height:14px"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg> View on GitHub</a>
+          <a href="https://github.com/thewisecrab/AgentMaturityCompass#-quick-start" class="btn-outline">Run the CLI</a>
+          <a href="https://github.com/thewisecrab/AgentMaturityCompass/blob/main/.github/workflows/amc-score.yml" class="btn-outline">Add a CI Gate</a>
         </div>
-        <p class="hero-tagline" style="margin-top:1rem">Try in browser for instant scoring and scenario exploration. Use the CLI for execution evidence, traces, datasets, and CI gates.</p>
+        <p class="hero-tagline" style="margin-top:1rem">Browser try-now for instant scoring and exploration. CLI for execution evidence, traces, datasets, and CI gates.</p>
         <div class="reveal reveal-delay-3" style="text-align:center">
           <div class="hero-install" onclick="navigator.clipboard&&navigator.clipboard.writeText('npx agent-maturity-compass quickscore')" title="Click to copy">
             <span>$</span> npx agent-maturity-compass quickscore <span class="copy-hint">⎘</span>
           </div>
-          <p class="hero-tagline">Trust, but verify — with math.</p>
+          <p class="hero-tagline">Score agents from evidence. Find the gaps. Generate the fixes.</p>
+        </div>
+        <div class="hero-proof reveal reveal-delay-4">
+          <span>MIT licensed</span>
+          <span>Browser + CLI + CI</span>
+          <span>No API key required for first score</span>
         </div>
       </div>
     </section>
@@ -188,56 +193,96 @@
       </div>
     </section>
 
-    <!-- FEATURES -->
+    <!-- PRODUCT FAMILY -->
     <section id="features">
       <div class="dot-grid" aria-hidden="true"></div>
       <div class="container">
         <div class="features-header">
-          <span class="section-label reveal">Capabilities</span>
-          <h2 class="reveal">Built for <span class="italic-accent">real-world</span> trust</h2>
+          <span class="section-label reveal">Product Family</span>
+          <h2 class="reveal">One trust stack. <span class="italic-accent">Eight named surfaces.</span></h2>
+          <p class="section-subtitle reveal reveal-delay-1" style="margin:.75rem auto 0">Keep the names. Explain them faster. AMC is not one command with a fancy logo — it is a trust stack you can grow into.</p>
         </div>
-        <div class="features-grid">
-          <div class="glass-card feature-card reveal">
-            <div class="feature-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg></div>
-            <h3>Cryptographic Evidence Chains</h3>
-            <p>Merkle-tree evidence with Ed25519 signatures. The agent can't grade itself — AMC is the independent observer. Not vibes. Math.</p>
+        <div class="product-grid">
+          <div class="glass-card product-card reveal">
+            <h3>Score</h3>
+            <p>Evidence-weighted trust scoring, gap analysis, and maturity diagnostics from execution behavior instead of self-reported claims.</p>
           </div>
-          <div class="glass-card feature-card reveal reveal-delay-1">
-            <div class="feature-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg></div>
-            <h3>730 Diagnostic Questions</h3>
-            <p>138 core + 592 sector-specific across 5 trust dimensions. Self-reported evidence capped at 0.4×; observed at 1.0×. The receipts matter.</p>
+          <div class="glass-card product-card reveal reveal-delay-1">
+            <h3>Shield</h3>
+            <p>Adversarial assurance packs for prompt injection, exfiltration, context leakage, over-compliance, and other agent failure modes.</p>
           </div>
-          <div class="glass-card feature-card reveal reveal-delay-2">
-            <div class="feature-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
-            <h3>EU AI Act Ready</h3>
-            <p>Compliance mapping, audit binders, domain packs, and governance evidence for teams that need something stronger than "trust me, bro."</p>
+          <div class="glass-card product-card reveal reveal-delay-2">
+            <h3>Enforce</h3>
+            <p>Policy controls, approval workflows, scoped actions, and governance mechanisms for higher-trust execution environments.</p>
           </div>
-          <div class="glass-card feature-card reveal reveal-delay-3">
-            <div class="feature-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></div>
-            <h3>Zero Code Changes</h3>
-            <p>14 framework adapters — LangChain, CrewAI, AutoGen, OpenAI, Claude Code, Gemini, OpenClaw, and more. Wrap what you already run.</p>
+          <div class="glass-card product-card reveal reveal-delay-3">
+            <h3>Vault</h3>
+            <p>Signatures, keys, tamper-evident ledgers, and proof infrastructure for scores, reports, and audit-grade evidence chains.</p>
           </div>
-          <div class="glass-card feature-card reveal">
-            <div class="feature-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
-            <h3>Observability &amp; Trace Explorer</h3>
-            <p>Inspect timelines, anomalies, sessions, tool calls, trust tiers, and score volatility with <code>amc observe</code> and <code>amc trace</code>.</p>
+          <div class="glass-card product-card reveal">
+            <h3>Watch</h3>
+            <p>Traces, anomalies, timelines, monitoring, and operational drift detection so you can see what agents actually do over time.</p>
           </div>
-          <div class="glass-card feature-card reveal reveal-delay-1">
-            <div class="feature-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
-            <h3>Feedback Loops &amp; Corrections</h3>
-            <p>Track human corrections, closure reports, and effectiveness so the agent can actually improve instead of just collecting pretty PDFs.</p>
+          <div class="glass-card product-card reveal reveal-delay-1">
+            <h3>Fleet</h3>
+            <p>Compare, benchmark, inventory, and govern multiple agents, teams, and trust programs together instead of one-by-one chaos.</p>
           </div>
-          <div class="glass-card feature-card reveal reveal-delay-2">
-            <div class="feature-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div>
-            <h3>Golden Datasets &amp; Lite Scoring</h3>
-            <p>Create evaluation datasets, run business-specific test cases, and score vanilla chatbots or LLM apps even when they are not full-blown agents.</p>
+          <div class="glass-card product-card reveal reveal-delay-2">
+            <h3>Passport</h3>
+            <p>Portable identity, credential, and trust portability artifacts for agents that need continuity across environments and boundaries.</p>
           </div>
-          <div class="glass-card feature-card reveal reveal-delay-3">
-            <div class="feature-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg></div>
-            <h3>Business Impact &amp; Leaderboards</h3>
-            <p>Correlate maturity with KPI outcomes, track incidents and savings, compare agents, inventory AI assets, and publish benchmark leaderboards.</p>
+          <div class="glass-card product-card reveal reveal-delay-3">
+            <h3>Comply</h3>
+            <p>Regulatory mappings, audit binders, governance reports, and compliance outputs for frameworks like EU AI Act and ISO 42001.</p>
           </div>
         </div>
+      </div>
+    </section>
+
+    <!-- PRICING PREVIEW -->
+    <section class="pricing-preview" id="pricing">
+      <div class="container">
+        <div class="features-header">
+          <span class="section-label reveal">Editions</span>
+          <h2 class="reveal">Start free. <span class="italic-accent">Grow into teams and governance.</span></h2>
+          <p class="section-subtitle reveal reveal-delay-1" style="margin:.75rem auto 0">No fake numbers, no pretend enterprise theater. This is the packaging direction: open-source core, team workflows, and enterprise trust infrastructure.</p>
+        </div>
+        <div class="pricing-grid">
+          <div class="glass-card pricing-card reveal">
+            <div class="pricing-tier">Free / Open Source</div>
+            <h3>Get your first score</h3>
+            <p>For solo builders, open-source maintainers, and evaluation-first teams.</p>
+            <ul>
+              <li>Score</li>
+              <li>Starter Shield packs</li>
+              <li>Browser playground</li>
+              <li>CLI quickscore + fix</li>
+            </ul>
+          </div>
+          <div class="glass-card pricing-card reveal reveal-delay-1">
+            <div class="pricing-tier">Team / Pro</div>
+            <h3>Operational trust workflows</h3>
+            <p>For engineering teams that want repeatable scoring, richer monitoring, and shared trust workflows.</p>
+            <ul>
+              <li>Score + Shield</li>
+              <li>Watch</li>
+              <li>Selected Comply outputs</li>
+              <li>Small-team Fleet workflows</li>
+            </ul>
+          </div>
+          <div class="glass-card pricing-card reveal reveal-delay-2">
+            <div class="pricing-tier">Enterprise / Regulated</div>
+            <h3>Full governance stack</h3>
+            <p>For platform teams, regulated organizations, and high-trust deployments that need policy, evidence, and audit readiness.</p>
+            <ul>
+              <li>Score, Shield, Enforce</li>
+              <li>Vault + Watch + Fleet</li>
+              <li>Passport + Comply</li>
+              <li>Hosted / on-prem / support options</li>
+            </ul>
+          </div>
+        </div>
+        <p class="pricing-note reveal reveal-delay-3">Draft packaging direction — precise pricing and edition limits belong on a dedicated pricing page, not in made-up marketing numbers.</p>
       </div>
     </section>
 
@@ -250,6 +295,69 @@
           <div class="proof-item"><span class="proof-icon">📏</span> <strong>L0–L5</strong> maturity scale</div>
           <div class="proof-item"><span class="proof-icon">⚡</span> <strong>481</strong> CLI commands</div>
           <div class="proof-item"><span class="proof-icon">🏭</span> <strong>40</strong> industry packs</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CHOOSE YOUR PATH -->
+    <section class="path-section" id="paths">
+      <div class="container">
+        <div class="features-header">
+          <span class="section-label reveal">Choose Your Path</span>
+          <h2 class="reveal">Five ways in. <span class="italic-accent">Pick the one that matches reality.</span></h2>
+        </div>
+        <div class="path-grid">
+          <div class="glass-card path-card reveal"><h3>Browser</h3><p>Best for first-touch demos, quick exploration, and understanding how AMC scores.</p><a href="playground.html">Try now →</a></div>
+          <div class="glass-card path-card reveal reveal-delay-1"><h3>CLI</h3><p>Best for real evidence capture, scoring, fixes, traces, datasets, and local trust workflows.</p><a href="https://github.com/thewisecrab/AgentMaturityCompass#-quick-start">Run quickscore →</a></div>
+          <div class="glass-card path-card reveal reveal-delay-2"><h3>CI</h3><p>Best for score thresholds, release gates, regression prevention, and artifact generation.</p><a href="https://github.com/thewisecrab/AgentMaturityCompass/blob/main/.github/workflows/amc-score.yml">Add CI gate →</a></div>
+          <div class="glass-card path-card reveal reveal-delay-3"><h3>Self-hosted</h3><p>Best for teams that want shared internal workflows and control over deployment.</p><a href="docs/index.html#DEPLOYMENT_OPTIONS">See deployment paths →</a></div>
+          <div class="glass-card path-card reveal"><h3>Enterprise</h3><p>Best for regulated environments, governance-heavy teams, and higher-trust deployment needs.</p><a href="docs/index.html#ENTERPRISE">See enterprise path →</a></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PERSONA PATHS -->
+    <section class="persona-section">
+      <div class="container">
+        <div class="features-header">
+          <span class="section-label reveal">Start By Persona</span>
+          <h2 class="reveal">Different buyers need <span class="italic-accent">different first answers.</span></h2>
+        </div>
+        <div class="persona-grid">
+          <div class="glass-card persona-card reveal"><h3>Solo builder</h3><p>Get a first score fast, see the gaps, and add one CI gate without enterprise overhead.</p><a href="docs/index.html#SOLO_DEV_PATH">See solo path →</a></div>
+          <div class="glass-card persona-card reveal reveal-delay-1"><h3>Platform engineer</h3><p>Standardize scoring, monitoring, and trust workflows across real delivery pipelines.</p><a href="docs/index.html#PLATFORM_PATH">See platform path →</a></div>
+          <div class="glass-card persona-card reveal reveal-delay-2"><h3>Security / compliance</h3><p>Focus on assurance packs, governance controls, deployment clarity, and evidence quality.</p><a href="docs/index.html#SECURITY_PATH">See security path →</a></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SOCIAL / SUPPORT -->
+    <section class="support-section">
+      <div class="container">
+        <div class="features-header">
+          <span class="section-label reveal">Community + Support</span>
+          <h2 class="reveal">Open source first. <span class="italic-accent">Commercially legible.</span></h2>
+        </div>
+        <div class="support-grid">
+          <div class="glass-card support-card reveal"><h3>Community</h3><p>Contribute packs, adapters, docs, examples, and compatibility testing without needing occult repo knowledge.</p><a href="docs/index.html#COMMUNITY">See community →</a></div>
+          <div class="glass-card support-card reveal reveal-delay-1"><h3>Sponsor</h3><p>Support the open project separately from product pricing. Sustainability matters; muddy messaging sucks.</p><a href="https://github.com/thewisecrab/AgentMaturityCompass/blob/main/SPONSORING.md">See sponsorship →</a></div>
+          <div class="glass-card support-card reveal reveal-delay-2"><h3>Buy / deploy</h3><p>Use the pricing, editions, and deployment pages to understand what teams, regulated orgs, and enterprises would actually buy.</p><a href="docs/index.html#PRICING">See pricing path →</a></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- COMPATIBILITY STRIP -->
+    <section class="proof-strip compatibility-strip">
+      <div class="container">
+        <div class="proof-items">
+          <div class="proof-item"><strong>LangChain</strong></div>
+          <div class="proof-item"><strong>CrewAI</strong></div>
+          <div class="proof-item"><strong>AutoGen</strong></div>
+          <div class="proof-item"><strong>OpenAI Agents SDK</strong></div>
+          <div class="proof-item"><strong>Claude Code</strong></div>
+          <div class="proof-item"><strong>Gemini</strong></div>
+          <div class="proof-item"><strong>OpenClaw</strong></div>
+          <div class="proof-item"><strong>Generic CLI</strong></div>
         </div>
       </div>
     </section>
@@ -278,10 +386,29 @@
       <div class="dot-grid" aria-hidden="true"></div>
       <div class="container">
         <div class="cta-content">
-          <h2 class="reveal">Start Scoring in <span class="italic-accent" style="color:inherit">2 Minutes</span></h2>
-          <p class="cta-subtitle reveal reveal-delay-1">Open source. MIT licensed. 14 framework adapters.<br>Score, trace, red-team, monitor, and improve agents with actual evidence.</p>
-          <a href="https://github.com/thewisecrab/AgentMaturityCompass#quick-start" class="btn-cta-white reveal reveal-delay-2">Get Started <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><path d="M3 8h10M9 4l4 4-4 4"/></svg></a>
+          <h2 class="reveal">Start with a score. <span class="italic-accent" style="color:inherit">Keep going with trust.</span></h2>
+          <p class="cta-subtitle reveal reveal-delay-1">Use the browser for the fastest first look. Use the CLI for real evidence. Use CI when trust should affect releases. Use deployment and pricing docs when the project becomes a product.</p>
+          <div class="hero-ctas reveal reveal-delay-2" style="justify-content:center">
+            <a href="playground.html" class="btn-cta-white">Try in Browser</a>
+            <a href="https://github.com/thewisecrab/AgentMaturityCompass#-quick-start" class="btn-outline" style="border-color:rgba(255,255,255,0.35);color:#fff">Run the CLI</a>
+            <a href="docs/index.html#PRICING" class="btn-outline" style="border-color:rgba(255,255,255,0.35);color:#fff">See Pricing / Editions</a>
+          </div>
           <div class="cta-install reveal reveal-delay-3">npx agent-maturity-compass quickscore</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- RELEASE HIGHLIGHTS -->
+    <section class="persona-section">
+      <div class="container">
+        <div class="features-header">
+          <span class="section-label reveal">What’s New</span>
+          <h2 class="reveal">AMC is active. <span class="italic-accent">Not abandoned shelfware.</span></h2>
+        </div>
+        <div class="persona-grid">
+          <div class="glass-card persona-card reveal"><h3>Packaging improved</h3><p>Homepage, README, docs routing, pricing architecture, and product-family packaging were tightened for clearer first-touch adoption.</p><a href="docs/index.html#RELEASE_HIGHLIGHTS">See highlights →</a></div>
+          <div class="glass-card persona-card reveal reveal-delay-1"><h3>Docs pathing improved</h3><p>Start-here docs, persona paths, recipes, examples, and deployment/product pages now exist as clearer entry surfaces.</p><a href="docs/index.html#INDEX">See docs index →</a></div>
+          <div class="glass-card persona-card reveal reveal-delay-2"><h3>Engineering still strong</h3><p>AMC still ships with heavy automated validation and technical depth underneath the cleaner public face.</p><a href="https://github.com/thewisecrab/AgentMaturityCompass">See repo →</a></div>
         </div>
       </div>
     </section>
