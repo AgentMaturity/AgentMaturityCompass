@@ -167,6 +167,9 @@ Want to support the open project?
 
 - `docs/INDEX.md`
 - `docs/START_HERE.md`
+- `docs/WHY_AMC.md`
+- `docs/USE_CASES.md`
+- `docs/PERSONAS.md`
 - `docs/AFTER_QUICKSCORE.md`
 - `docs/EXAMPLES_INDEX.md`
 - `docs/RECIPES.md`
