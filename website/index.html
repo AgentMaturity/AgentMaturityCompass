@@ -17,7 +17,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=10">
+  <link rel="stylesheet" href="style.css?v=11">
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js" defer></script>
 </head>
@@ -59,6 +59,12 @@
       <canvas id="hero-canvas" aria-hidden="true"></canvas>
       <div class="container hero-grid">
         <div class="hero-left gs">
+          <p class="label">trust scoring for ai agents</p>
+          <h1>Score your agent<span class="accent">_</span></h1>
+          <h1 class="hero-h1-muted">Find the gaps<span class="accent">.</span> Fix them<span class="accent">.</span></h1>
+          <p class="hero-sub"><span class="hl">1,013 diagnostics</span> against actual execution behavior. Not documentation. Not self-reported claims. <span class="hl">Evidence</span> you can verify, sign, and audit.</p>
+        </div>
+        <div class="hero-right gs">
           <div class="hero-install" onclick="navigator.clipboard&&navigator.clipboard.writeText('npm i -g agent-maturity-compass')" title="Click to copy">
             <span class="hi-prompt">$</span> npm i -g agent-maturity-compass
           </div>
@@ -66,12 +72,6 @@
             <a href="playground.html" class="btn btn-primary btn-xl">try in browser →</a>
             <a href="#products" class="btn btn-outline btn-xl">explore products →</a>
           </div>
-        </div>
-        <div class="hero-right gs">
-          <p class="label">trust scoring for ai agents</p>
-          <h1>Score your agent<span class="accent">_</span></h1>
-          <h1 class="hero-h1-muted">Find the gaps<span class="accent">.</span> Fix them<span class="accent">.</span></h1>
-          <p class="hero-sub"><span class="hl">1,013 diagnostics</span> against actual execution behavior. Not documentation. Not self-reported claims. <span class="hl">Evidence</span> you can verify, sign, and audit.</p>
         </div>
       </div>
     </section>
@@ -108,7 +108,12 @@
             <div class="big-number-value">84</div>
           </div>
         </div>
-        <p class="big-number-desc gs">The gap between what your agent <span class="text-w">claims</span> and what <span class="hl">execution evidence</span> shows. Self-reported claims capped at <span class="hl">0.4× weight</span>. Observed execution scores at <span class="hl">1.0×</span>.</p>
+        <p class="big-number-desc gs">The gap between what your agent <span class="text-w">claims</span> and what <span class="hl">execution evidence</span> shows.</p>
+        <div class="gap-details gs">
+          <div class="gap-detail"><span class="gap-detail-val">0.4×</span><span class="gap-detail-label">self-reported weight</span></div>
+          <div class="gap-detail"><span class="gap-detail-val">1.0×</span><span class="gap-detail-label">observed evidence weight</span></div>
+          <div class="gap-detail"><span class="gap-detail-val">2.5×</span><span class="gap-detail-label">trust multiplier</span></div>
+        </div>
       </div>
     </section>
 
@@ -375,7 +380,7 @@
     </div>
   </footer>
 
-  <script src="particles.js?v=10"></script>
-  <script src="script.js?v=10"></script>
+  <script src="particles.js?v=11"></script>
+  <script src="script.js?v=11"></script>
 </body>
 </html>
