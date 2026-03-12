@@ -100,9 +100,9 @@ section{padding:clamp(5rem,10vw,8rem) 0}
 }
 
 /* ═══ LOGOS GRID ═══ */
-.logos-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:1px;background:var(--border)}
-.logo-item{background:var(--bg-alt);padding:1rem;text-align:center;transition:background .2s}
-.logo-item:hover{background:var(--bg-card)}
+.logos-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:0}
+.logo-item{padding:1rem;text-align:center;transition:background .2s;border:1px solid var(--border);border-top:none;border-left:none;background:transparent}
+.logo-item:hover{background:rgba(74,239,121,.03)}
 .logo-name{display:block;font-family:var(--mono);font-size:.72rem;color:var(--text);font-weight:600;margin-bottom:.2rem}
 .logo-type{font-family:var(--mono);font-size:.58rem;color:var(--text-dim);text-transform:lowercase}
 .logo-item.has-adapter{border-left:2px solid var(--accent)}
@@ -123,11 +123,11 @@ section{padding:clamp(5rem,10vw,8rem) 0}
 .station-meta{font-family:var(--mono);font-size:.65rem;color:var(--text-dim);text-transform:lowercase;letter-spacing:.04em;display:block;margin-top:.15rem}
 
 /* ═══ DOMAINS ═══ */
-.domains-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:1px;background:var(--border);margin-bottom:0}
-.domain{background:var(--bg);padding:clamp(1rem,2vw,1.5rem);transition:background .2s}
-.domain:hover{background:var(--bg-card)}
-.section-alt .domain{background:var(--bg-alt)}
-.section-alt .domain:hover{background:var(--bg-card)}
+.domains-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:0;margin-bottom:0}
+.domain{padding:clamp(1rem,2vw,1.5rem);transition:background .2s;border:1px solid var(--border);border-top:none;border-left:none;background:transparent}
+.domain:hover{background:rgba(74,239,121,.03)}
+.domains-grid .domain:nth-child(-n+4){border-top:1px solid var(--border)}
+.domains-grid .domain:first-child{border-left:1px solid var(--border)}
 .domain-num{font-family:var(--mono);font-size:.6rem;color:var(--text-dim);display:block;margin-bottom:.4rem}
 .domain h4{font-size:.82rem;font-weight:700;color:var(--text);text-transform:none;letter-spacing:0;margin-bottom:.3rem}
 .domain h4::after{content:'_';color:var(--accent)}
