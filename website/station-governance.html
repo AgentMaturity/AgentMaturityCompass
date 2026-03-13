@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AMC — Governance Station</title>
-  <meta name="description" content="AMC Governance Station: 5 packs · 71 questions · very-high risk · EU AI Act high-risk">
+  <meta name="description" content="AMC Governance Station: 5 packs · 71 questions">
   <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
@@ -13,7 +13,7 @@
 <body>
   <nav class="nav scrolled">
     <div class="nav-inner">
-      <a href="index.html" class="nav-brand">AMC_</a>
+      <a href="index.html" class="nav-brand">amc<span style="color:var(--accent)">_</span></a>
       <ul class="nav-links">
         <li><a href="index.html#products">products</a></li>
         <li><a href="index.html#domains">stations</a></li>
@@ -23,96 +23,126 @@
     </div>
   </nav>
 
-  <section class="station-hero">
-    <div class="container">
+  <section class="station-hero" style="background-image:url('https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=1600&q=80')">
+    <div class="station-hero-overlay"></div>
+    <div class="container" style="position:relative;z-index:2">
       <div class="station-nav gs">
-        <p class="label">navigate stations</p>
         <div class="station-nav-row">
-            <a href="station-environment.html" class="station-nav-item" title="Environment"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/><line x1="2" y1="12" x2="22" y2="12"/></svg></a>
-            <a href="station-health.html" class="station-nav-item" title="Health"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></a>
-            <a href="station-wealth.html" class="station-nav-item" title="Wealth"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg></a>
-            <a href="station-education.html" class="station-nav-item" title="Education"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg></a>
-            <a href="station-mobility.html" class="station-nav-item" title="Mobility"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg></a>
-            <a href="station-technology.html" class="station-nav-item" title="Technology"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/></svg></a>
-            <a href="#" class="station-nav-item station-nav-active" title="Governance"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/><path d="M9 21v-4h6v4"/></svg></a>
+              <a href="station-environment.html" class="station-nav-item" title="Environment"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/><line x1="2" y1="12" x2="22" y2="12"/></svg></a>
+              <a href="station-health.html" class="station-nav-item" title="Health"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></a>
+              <a href="station-wealth.html" class="station-nav-item" title="Wealth"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg></a>
+              <a href="station-education.html" class="station-nav-item" title="Education"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg></a>
+              <a href="station-mobility.html" class="station-nav-item" title="Mobility"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg></a>
+              <a href="station-technology.html" class="station-nav-item" title="Technology"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/></svg></a>
+              <a href="#" class="station-nav-item station-nav-active" title="Governance"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/><path d="M9 21v-4h6v4"/></svg></a>
         </div>
       </div>
-      <div class="station-hero-content gs">
-        <div class="station-hero-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/><path d="M9 21v-4h6v4"/></svg></div>
-        <h1>Governance<span class="accent">_</span></h1>
-        <p class="station-hero-meta">5 packs · 71 questions · very-high risk · EU AI Act high-risk</p>
-        <p class="station-hero-intro">Digital rights, democratic processes, legislative AI, citizen services, and public-private partnerships — grounded in GDPR, ePrivacy, FedRAMP, and democratic accountability frameworks.</p>
+      <h1 class="station-hero-title gs">GOVERNANCE<span class="accent">_</span></h1>
+    </div>
+  </section>
+
+  <section class="station-content">
+    <div class="container">
+      <div class="station-two-col gs">
+        <div class="station-left">
+          <p class="label">■ skills</p>
+          <h2 class="station-tagline">Digital rights, democratic processes, legislative AI, citizen services, and public-private partnerships — grounded in GDPR, ePrivacy, FedRAMP, and democratic accountability.</h2>
+          <p class="station-body">Digital rights, democratic processes, legislative AI, citizen services, and public-private partnerships — grounded in GDPR, ePrivacy, FedRAMP, and democratic accountability.</p>
+        </div>
+        <div class="station-right">
+          <div class="skills-accordion">
+            <div class="skill-item open">
+              <button class="skill-q">Digital Rights<span class="skill-toggle">—</span></button>
+              <div class="skill-a"><p>AMC diagnostic coverage for digital rights within the Governance station.</p></div>
+            </div>
+            <div class="skill-item">
+              <button class="skill-q">Election Integrity<span class="skill-toggle">+</span></button>
+              <div class="skill-a"><p>AMC diagnostic coverage for election integrity within the Governance station.</p></div>
+            </div>
+            <div class="skill-item">
+              <button class="skill-q">Legislative AI<span class="skill-toggle">+</span></button>
+              <div class="skill-a"><p>AMC diagnostic coverage for legislative ai within the Governance station.</p></div>
+            </div>
+            <div class="skill-item">
+              <button class="skill-q">E-Government<span class="skill-toggle">+</span></button>
+              <div class="skill-a"><p>AMC diagnostic coverage for e-government within the Governance station.</p></div>
+            </div>
+            <div class="skill-item">
+              <button class="skill-q">PPP Governance<span class="skill-toggle">+</span></button>
+              <div class="skill-a"><p>AMC diagnostic coverage for ppp governance within the Governance station.</p></div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </section>
 
   <section class="station-packs">
     <div class="container">
-      <div class="section-heading gs">
-        <p class="label">diagnostic packs</p>
-        <h2><strong>Governance packs<span class="accent blink-cursor">_</span></strong></h2>
-      </div>
-      
-        <div class="pack-block gs">
-          <div class="pack-header">
-            <span class="pack-num">36</span>
-            <div>
+      <p class="label">■ diagnostic packs</p>
+      <h2 class="gs">Our diagnostic packs<span class="accent blink-cursor">_</span></h2>
+      <div class="pack-articles">
+          <div class="pack-article gs">
+            <span class="pack-tag" style="color:#4AEF79">■DIGITAL RIGHTS</span>
+            <div class="pack-article-body">
               <h3>Digital Citizens &amp; Rights</h3>
+              <p>Digital citizenship AI governance for data subject rights and digital identity.</p>
               <span class="pack-frameworks">GDPR, ePrivacy, right to explanation</span>
             </div>
+            <span class="pack-arrow">↗</span>
           </div>
-          <p class="pack-detail">Digital citizenship and rights AI governance. Maps to GDPR data subject rights, ePrivacy Regulation, the right to explanation for automated decisions, and digital identity sovereignty.</p>
-        </div>
-        <div class="pack-block gs">
-          <div class="pack-header">
-            <span class="pack-num">37</span>
-            <div>
+          <div class="pack-article gs">
+            <span class="pack-tag" style="color:#3CD468">■ELECTIONS</span>
+            <div class="pack-article-body">
               <h3>Dance of Democracy</h3>
+              <p>Democratic process AI for election integrity and political advertising transparency.</p>
               <span class="pack-frameworks">Election integrity, algorithmic accountability</span>
             </div>
+            <span class="pack-arrow">↗</span>
           </div>
-          <p class="pack-detail">Democratic process AI governance. Covers election integrity protections against AI manipulation, algorithmic accountability in political advertising, and AI transparency requirements for democratic institutions.</p>
-        </div>
-        <div class="pack-block gs">
-          <div class="pack-header">
-            <span class="pack-num">38</span>
-            <div>
+          <div class="pack-article gs">
+            <span class="pack-tag" style="color:#5FA8FF">■LEGISLATIVE</span>
+            <div class="pack-article-body">
               <h3>Petition to Law</h3>
+              <p>Legislative and regulatory AI for automated drafting and compliance monitoring.</p>
               <span class="pack-frameworks">Legislative AI, regulatory drafting</span>
             </div>
+            <span class="pack-arrow">↗</span>
           </div>
-          <p class="pack-detail">Legislative and regulatory AI governance. Maps to AI-assisted legislative drafting standards, regulatory impact assessment frameworks, and automated compliance monitoring governance.</p>
-        </div>
-        <div class="pack-block gs">
-          <div class="pack-header">
-            <span class="pack-num">39</span>
-            <div>
+          <div class="pack-article gs">
+            <span class="pack-tag" style="color:#FF6B6B">■E-GOVERNMENT</span>
+            <div class="pack-article-body">
               <h3>Citizen Services</h3>
+              <p>Government service delivery AI for cloud authorization and accessibility.</p>
               <span class="pack-frameworks">E-government, FedRAMP, accessibility</span>
             </div>
+            <span class="pack-arrow">↗</span>
           </div>
-          <p class="pack-detail">Government service delivery AI. Covers e-government AI deployment standards, FedRAMP cloud authorization for government AI, and accessibility requirements for citizen-facing AI systems.</p>
-        </div>
-        <div class="pack-block gs">
-          <div class="pack-header">
-            <span class="pack-num">40</span>
-            <div>
+          <div class="pack-article gs">
+            <span class="pack-tag" style="color:#FFD93D">■PPP</span>
+            <div class="pack-article-body">
               <h3>Public &amp; Private Collaboration</h3>
+              <p>Public-private partnership AI for procurement standards and accountability.</p>
               <span class="pack-frameworks">PPP governance, procurement AI</span>
             </div>
+            <span class="pack-arrow">↗</span>
           </div>
-          <p class="pack-detail">Public-private partnership AI governance. Maps to PPP governance frameworks for AI projects, government procurement standards for AI systems, and accountability structures for joint public-private AI deployments.</p>
-        </div>
+      </div>
     </div>
   </section>
 
+  <div class="station-breadcrumb">
+    <div class="container">
+      <span>HOME</span> / <span>OUR STATIONS</span> / <strong>GOVERNANCE</strong>
+    </div>
+  </div>
+
   <section class="station-cta">
-    <div class="container" style="text-align:center">
-      <p class="label">ready to score</p>
-      <h2 class="gs">Run AMC on your <strong>governance agents<span class="accent blink-cursor">_</span></strong></h2>
-      <div class="cta-buttons gs">
-        <a href="index.html" class="btn btn-primary btn-xl">← back to home</a>
-        <a href="https://github.com/thewisecrab/AgentMaturityCompass" class="btn btn-outline btn-xl" target="_blank" rel="noopener">GitHub →</a>
+    <div class="gradient-cta-lines" aria-hidden="true"></div>
+    <div class="container" style="position:relative;z-index:1;text-align:center">
+      <h2 class="gs">A single score <strong>can spark<br>trust in your agents<span class="accent blink-cursor">_</span></strong></h2>
+      <div style="margin-top:2rem">
+        <a href="index.html" class="btn btn-primary btn-xl">try in browser →</a>
       </div>
     </div>
   </section>
@@ -120,11 +150,12 @@
   <footer class="footer">
     <div class="footer-inner">
       <div class="footer-top">
-        <div><div class="footer-brand">AMC_</div><div class="footer-tagline">Score, fix, ship AI agents.<br>Evidence over claims.</div></div>
-        <div class="footer-col"><h4>Product</h4><a href="index.html#products">Trust Stack</a><a href="index.html#domains">Industry Packs</a><a href="https://github.com/thewisecrab/AgentMaturityCompass" target="_blank" rel="noopener">GitHub</a></div>
-        <div class="footer-col"><h4>Resources</h4><a href="index.html">Documentation</a><a href="index.html">Research</a></div>
+        <div><div class="footer-brand">amc<span style="color:var(--accent)">_</span></div><p class="footer-tagline">Score, fix, ship AI agents.<br>Evidence over claims.</p></div>
+        <div class="footer-col"><h4>Our stations</h4><a href="station-environment.html">Environment</a><a href="station-health.html">Health</a><a href="station-wealth.html">Wealth</a><a href="station-education.html">Education</a><a href="station-mobility.html">Mobility</a><a href="station-technology.html">Technology</a><a href="station-governance.html">Governance</a></div>
+        <div class="footer-col"><h4>Product</h4><a href="docs/index.html">Documentation</a><a href="playground.html">Playground</a><a href="https://github.com/thewisecrab/AgentMaturityCompass">GitHub</a></div>
+        <div class="footer-col"><h4>Contact</h4><a href="https://github.com/thewisecrab/AgentMaturityCompass" target="_blank" rel="noopener">↗ GitHub</a></div>
       </div>
-      <div class="footer-bottom"><span class="footer-copy">© 2026 Agent Maturity Compass. MIT License.</span></div>
+      <div class="footer-bottom"><span class="footer-copy">© 2026 Agent Maturity Compass. MIT License.</span><span class="footer-copy">LEGAL NOTICES</span></div>
     </div>
   </footer>
 
@@ -137,11 +168,22 @@
       if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
         gsap.registerPlugin(ScrollTrigger);
         gsap.utils.toArray('.gs').forEach(function(el) {
-          gsap.fromTo(el, {opacity: 0, y: 20}, {opacity: 1, y: 0, duration: 0.45, ease: 'power2.out',
-            scrollTrigger: {trigger: el, start: 'top 95%', toggleActions: 'play none none none'}
+          gsap.fromTo(el, {opacity:0, y:20}, {opacity:1, y:0, duration:0.45, ease:'power2.out',
+            scrollTrigger: {trigger:el, start:'top 95%', toggleActions:'play none none none'}
           });
         });
       }
+      document.querySelectorAll('.skill-q').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          var item = btn.closest('.skill-item');
+          var wasOpen = item.classList.contains('open');
+          document.querySelectorAll('.skill-item.open').forEach(function(o) {
+            o.classList.remove('open');
+            o.querySelector('.skill-toggle').textContent = '+';
+          });
+          if (!wasOpen) { item.classList.add('open'); btn.querySelector('.skill-toggle').textContent = '—'; }
+        });
+      });
     });
   </script>
 </body>
