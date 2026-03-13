@@ -63,7 +63,8 @@
 .station-breadcrumb strong{color:var(--text)}
 
 /* CTA — same gradient as homepage */
-.station-cta{position:relative;padding:clamp(10rem,18vw,16rem) 0 clamp(6.5rem,12vw,9rem);background:linear-gradient(180deg,var(--bg) 0%,#111 15%,#222 35%,#444 55%,#888 75%,#ccc 90%,#f2f2f2 100%);overflow:hidden;z-index:1}
+.station-cta{position:relative;padding:clamp(10rem,18vw,16rem) 0 0;background:linear-gradient(180deg,var(--bg) 0%,#111 15%,#222 35%,#444 55%,#888 75%,#ccc 90%,#f2f2f2 100%);overflow:hidden;z-index:1}
+.station-cta .container{padding-bottom:clamp(6rem,12vw,9rem)}
 .station-cta .gradient-cta-lines{position:absolute;inset:0;pointer-events:none;overflow:hidden}
 .station-cta .gradient-cta-line{position:absolute;top:0;bottom:0;width:1px;background:rgba(255,255,255,.08)}
 .station-cta .gradient-cta-line::before{content:'';position:absolute;left:-2px;width:5px;height:24px;background:rgba(255,255,255,.18);border-radius:3px;animation:lineFloat var(--dur,6s) ease-in-out infinite alternate;animation-delay:var(--delay,0s)}
