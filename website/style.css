@@ -131,12 +131,10 @@ section{padding:clamp(5rem,10vw,8rem) 0;position:relative;z-index:1}
 .logo-type{font-family:var(--mono);font-size:.58rem;color:var(--text-dim);text-transform:lowercase}
 .logo-item.has-adapter{border-left:2px solid var(--accent)}
 .logo-item.has-adapter .logo-type{color:var(--accent)}
-.logos-grid-images{grid-template-columns:repeat(5,1fr);gap:0;border:none}
-.logo-item-img{display:flex;align-items:center;justify-content:center;padding:clamp(1.5rem,3vw,2.5rem);border:1px solid var(--border);border-top:none;border-left:none;background:transparent;transition:background .2s}
-.logo-item-img:hover{background:rgba(255,255,255,.03)}
-.logo-item-img img{width:clamp(32px,5vw,48px);height:auto;opacity:.5;filter:grayscale(1);transition:opacity .3s}
-.logo-item-img:hover img{opacity:.8}
-@media(max-width:768px){.logos-grid-images{grid-template-columns:repeat(3,1fr)}}
+.logos-grid-wordmarks{grid-template-columns:repeat(5,1fr);gap:0}
+.logo-wordmark{display:flex;align-items:center;justify-content:center;padding:clamp(1.8rem,3vw,2.8rem) 1rem;border:1px solid var(--border);border-top:none;border-left:none;font-family:var(--sans);font-size:clamp(.85rem,1.4vw,1.1rem);font-weight:700;color:var(--text);opacity:.45;letter-spacing:-.02em;transition:opacity .3s}
+.logo-wordmark:hover{opacity:.85}
+@media(max-width:768px){.logos-grid-wordmarks{grid-template-columns:repeat(3,1fr)}}
 
 /* ═══ STEPS ═══ */
 .step-list{display:flex;flex-direction:column;gap:2.5rem;max-width:700px}
