@@ -6,7 +6,7 @@
 
 /* Hero with background image — full viewport */
 .station-hero{position:relative;min-height:100vh;display:flex;align-items:flex-end;padding:0 0 clamp(3rem,6vw,5rem);background-size:cover;background-position:center;overflow:hidden}
-.station-hero-overlay{position:absolute;inset:0;background:linear-gradient(180deg,rgba(10,10,10,.3) 0%,rgba(10,10,10,.7) 50%,rgba(10,10,10,.95) 100%);z-index:1}
+.station-hero-overlay{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.6) 0%,rgba(0,0,0,.4) 30%,rgba(10,10,10,.7) 60%,rgba(10,10,10,.95) 100%);z-index:1}
 
 /* Hero scroll-away block effect */
 .station-hero-blocks{position:absolute;inset:0;z-index:2;opacity:0;pointer-events:none;
