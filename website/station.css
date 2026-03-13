@@ -66,10 +66,9 @@
 .station-cta{position:relative;padding:clamp(16rem,30vw,28rem) 0 0;background:linear-gradient(180deg,#0a0a0a 0%,#0f0f0f 8%,#1a1a1a 18%,#2a2a2a 30%,#4a4a4a 45%,#777 60%,#aaa 75%,#d0d0d0 88%,#f2f2f2 100%);overflow:hidden;z-index:1}
 .station-cta .container{padding-bottom:clamp(14rem,25vw,22rem)}
 .station-cta .gradient-cta-lines{position:absolute;inset:0;pointer-events:none;overflow:hidden}
-.station-cta .gradient-cta-line{position:absolute;top:0;bottom:0;width:0;background:none}
-.station-cta .gradient-cta-line::before,.station-cta .gradient-cta-line::after{content:'';position:absolute;left:-3px;width:6px;height:6px;border-radius:50%;animation:tokenFloat var(--dur,6s) ease-in-out infinite alternate}
-.station-cta .gradient-cta-line::before{background:rgba(255,255,255,.18);animation-delay:var(--delay,0s)}
-.station-cta .gradient-cta-line::after{width:4px;height:4px;left:-2px;background:rgba(255,255,255,.10);animation-direction:alternate-reverse;animation-delay:calc(var(--delay,0s) + 2.5s)}
+.station-cta .gradient-cta-line{position:absolute;top:0;bottom:0;width:auto;background:none;font-family:var(--mono);font-size:.55rem;letter-spacing:.04em;white-space:nowrap;color:rgba(255,255,255,.12);pointer-events:none}
+.station-cta .gradient-cta-line::before{content:var(--tk,'amc');position:absolute;animation:tokenFloat var(--dur,6s) ease-in-out infinite alternate;animation-delay:var(--delay,0s)}
+.station-cta .gradient-cta-line::after{content:var(--tk2,'_');position:absolute;left:4px;font-size:.45rem;color:rgba(255,255,255,.07);animation:tokenFloat var(--dur,6s) ease-in-out infinite alternate-reverse;animation-delay:calc(var(--delay,0s) + 3s)}
 @keyframes tokenFloat{0%{top:5%}100%{top:90%}}
 .station-cta .gradient-cta-watermark{position:absolute;bottom:12%;left:50%;transform:translateX(-50%);font-family:var(--sans);font-size:clamp(16rem,35vw,32rem);font-weight:900;color:rgba(0,0,0,.04);line-height:1;letter-spacing:-.06em;pointer-events:none;text-transform:lowercase;white-space:nowrap}
 .station-cta h2{text-transform:uppercase;color:var(--text);margin-bottom:2.5rem}
