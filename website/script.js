@@ -29,7 +29,6 @@ var PRODUCTS=[
     name:'amc score',
     headline:'Score trust before you ship',
     summary:'Evidence-weighted scoring across live execution behavior instead of brochure claims.',
-    badges:['138 diagnostics','L0-L5 maturity','2 min baseline'],
     info:[
       {label:'what it does',title:'Calculates the trust baseline',text:'Finds maturity gaps across governance, security, reliability, cost, and state.'},
       {label:'why it matters',title:'Kills documentation inflation',text:'Observed evidence carries full weight. Self-reported evidence is capped.'},
@@ -46,7 +45,6 @@ var PRODUCTS=[
     name:'amc shield',
     headline:'Attack your agent before attackers do',
     summary:'Runs adversarial packs against prompt injection, leakage, memory poisoning, and sycophancy.',
-    badges:['86 assurance packs','adversarial probes','guardrail output'],
     info:[
       {label:'what it does',title:'Pressure-tests the runtime',text:'Executes attack scenarios against your actual prompt, tool, and memory surface.'},
       {label:'why it matters',title:'Finds brittle defenses fast',text:'One missed path can turn a polished demo into a production incident.'},
@@ -63,7 +61,6 @@ var PRODUCTS=[
     name:'amc enforce',
     headline:'Wrap agent actions in policy',
     summary:'Approval gates, scoped permissions, and runtime controls for sensitive operations.',
-    badges:['policy engine','step-up auth','budget controls'],
     info:[
       {label:'what it does',title:'Constrains dangerous actions',text:'Puts hard rules around delete, send, deploy, spend, and prod access.'},
       {label:'why it matters',title:'Trust without enforcement is theater',text:'Policies must bite at runtime, not live as dead docs in a repo.'},
@@ -80,7 +77,6 @@ var PRODUCTS=[
     name:'amc vault',
     headline:'Cryptographically prove what happened',
     summary:'Signs evidence, verifies ledgers, and gives auditors a tamper-evident chain of custody.',
-    badges:['Ed25519 signing','Merkle chain','audit-ready'],
     info:[
       {label:'what it does',title:'Creates verifiable evidence',text:'Every artifact can be signed, chained, and checked independently.'},
       {label:'why it matters',title:'Because “trust me” is not evidence',text:'Teams need proof that survives handoffs, audits, and disputes.'},
@@ -97,7 +93,6 @@ var PRODUCTS=[
     name:'amc watch',
     headline:'See trust drift before it hurts you',
     summary:'Monitors posture over time and surfaces anomalies, regressions, and risky changes.',
-    badges:['drift alerts','timelines','anomaly review'],
     info:[
       {label:'what it does',title:'Tracks trust over time',text:'Continuously compares current behavior against prior baselines and thresholds.'},
       {label:'why it matters',title:'Most failures are regressions',text:'A safe launch can quietly rot after a few prompt or policy changes.'},
@@ -114,7 +109,6 @@ var PRODUCTS=[
     name:'amc comply',
     headline:'Map trust evidence to real frameworks',
     summary:'Turns technical evidence into regulator-readable artifacts for audits and risk reviews.',
-    badges:['EU AI Act','ISO 42001','NIST AI RMF'],
     info:[
       {label:'what it does',title:'Builds compliance binders',text:'Maps evidence and controls to the frameworks buyers and regulators care about.'},
       {label:'why it matters',title:'Compliance work is mostly evidence plumbing',text:'AMC shortens the gap between tests run and proof produced.'},
@@ -131,7 +125,6 @@ var PRODUCTS=[
     name:'amc fleet',
     headline:'Govern many agents like an actual platform',
     summary:'Benchmarks multiple agents, compares risk posture, and enforces org-wide trust baselines.',
-    badges:['fleet baselines','org policy','cross-agent compare'],
     info:[
       {label:'what it does',title:'Surfaces weakest links',text:'Puts every agent on one trust map so the laggards are obvious.'},
       {label:'why it matters',title:'Your stack fails at the weakest boundary',text:'One sloppy assistant can negate ten well-governed ones.'},
@@ -148,7 +141,6 @@ var PRODUCTS=[
     name:'amc passport',
     headline:'Make trust portable between environments',
     summary:'Issues a portable, signed trust identity that can move between tools, teams, and environments.',
-    badges:['portable identity','verifiable score','expiry controls'],
     info:[
       {label:'what it does',title:'Packages trust state',text:'Bundles score, evidence, validity window, and signature into a portable credential.'},
       {label:'why it matters',title:'Trust should travel with the agent',text:'Handoffs break when context and evidence get lost between systems.'},
@@ -163,63 +155,26 @@ var PRODUCTS=[
   }
 ];
 
-var currentProduct=0, cycleTimer=null;
-
-function renderProduct(idx){
-  var p=PRODUCTS[idx];
-  var body=document.getElementById('product-term');
-  var info=document.getElementById('product-info');
-  var title=document.getElementById('term-title');
-  var headline=document.getElementById('product-headline');
-  var summary=document.getElementById('product-summary');
-  var badges=document.getElementById('product-badges');
-  if(!body||!p) return;
-
-  document.querySelectorAll('.product-tab').forEach(function(t,i){ t.classList.toggle('active',i===idx); });
-  if(title) title.textContent=p.name;
-  if(headline) headline.textContent=p.headline||'';
-  if(summary) summary.textContent=p.summary||'';
-  if(badges) badges.innerHTML=(p.badges||[]).map(function(b){ return '<span class="product-badge">'+b+'</span>'; }).join('');
-  if(info) info.innerHTML='<div class="product-info-grid">'+(p.info||[]).map(function(card){
-    return '<div class="product-info-card"><span>'+card.label+'</span><strong>'+card.title+'</strong><p>'+card.text+'</p></div>';
-  }).join('')+'</div>';
-
-  body.innerHTML='<div class="terminal-cards">'+(p.panels||[]).map(function(panel){
-    return '<article class="terminal-panel">'
-      + '<div class="terminal-panel-head"><span class="terminal-kicker">'+panel.kicker+'</span><h4>'+panel.title+'</h4></div>'
-      + '<div class="terminal-code">'+panel.body+'</div>'
-      + '<div class="terminal-panel-foot">'+panel.foot+'</div>'
+function renderProductGrid(){
+  var grid=document.getElementById('product-grid');
+  if(!grid) return;
+  grid.innerHTML=PRODUCTS.map(function(p){
+    var info=(p.info||[]).map(function(card){
+      return '<div class="product-info-card"><span>'+card.label+'</span><strong>'+card.title+'</strong><p>'+card.text+'</p></div>';
+    }).join('');
+    var panel=(p.panels||[]).map(function(section){
+      return '<article class="terminal-panel">'
+        + '<div class="terminal-panel-head"><span class="terminal-kicker">'+section.kicker+'</span><h4>'+section.title+'</h4></div>'
+        + '<div class="terminal-code">'+section.body+'</div>'
+        + '<div class="terminal-panel-foot">'+section.foot+'</div>'
+        + '</article>';
+    }).join('');
+    return '<article class="product-terminal gs">'
+      + '<div class="terminal-bar"><div class="terminal-dot r"></div><div class="terminal-dot y"></div><div class="terminal-dot g"></div><div class="terminal-title">'+p.name+'</div></div>'
+      + '<div class="terminal-body">'+panel+'</div>'
+      + '<div class="product-info"><div class="product-info-grid">'+info+'</div></div>'
       + '</article>';
-  }).join('')+'</div>';
-}
-
-function startCycle(){
-  if(cycleTimer) clearInterval(cycleTimer);
-  cycleTimer=setInterval(function(){
-    currentProduct=(currentProduct+1)%PRODUCTS.length;
-    renderProduct(currentProduct);
-  },5000);
-}
-
-function initProducts(){
-  var tabs=document.getElementById('product-tabs');
-  if(!tabs) return;
-  tabs.addEventListener('click',function(e){
-    var btn=e.target.closest('.product-tab');
-    if(!btn) return;
-    currentProduct=parseInt(btn.dataset.idx,10);
-    renderProduct(currentProduct);
-    startCycle();
-  });
-  renderProduct(0);
-  if('IntersectionObserver' in window){
-    var obs=new IntersectionObserver(function(entries){
-      if(entries[0] && entries[0].isIntersecting){ startCycle(); obs.disconnect(); }
-    },{threshold:0.2});
-    obs.observe(tabs);
-  } else {
-    startCycle();
-  }
+  }).join('');
 }
 
 function initFAQ(){
@@ -260,8 +215,8 @@ function initMobileNav(){
 }
 
 function init(){
+  renderProductGrid();
   initReveals();
-  initProducts();
   initFAQ();
   initAnchors();
   initMobileNav();
