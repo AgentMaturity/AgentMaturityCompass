@@ -31,6 +31,40 @@ export interface ProtectionRequest {
   metadata?: Record<string, any>;
 }
 
+/**
+ * Pre-Action Trust Gate Request
+ * Based on: TrustBench (March 9, 2026) — runtime trust verification before each action.
+ * Validates trust conditions before tool calls, not just post-hoc.
+ */
+export interface PreActionTrustGateRequest {
+  action: string;                          // The action about to be executed
+  toolName: string;                        // Target tool
+  parameters: Record<string, unknown>;     // Parameters being passed
+  sessionId: string;
+  instructionSource: 'system' | 'developer' | 'user' | 'tool';  // IH-Challenge hierarchy
+  sensitiveDataFields?: string[];          // Fields containing PII/sensitive data
+  trustContext: {
+    lastVerifiedAt?: number;               // Timestamp of last trust verification
+    cumulativeConfidence?: number;          // Compounded confidence (UProp)
+    stepNumber?: number;                    // Current step in multi-step workflow
+    previousActions?: string[];            // Audit trail of prior actions
+  };
+}
+
+export interface PreActionTrustGateResult {
+  allowed: boolean;
+  reason: string;
+  trustScore: number;                      // 0-1 trust score for this action
+  checks: {
+    instructionHierarchyValid: boolean;    // IH-Challenge: source has authority
+    dataLeakageRisk: 'none' | 'low' | 'medium' | 'high';  // "You Told Me to Do It"
+    credentialFreshness: 'valid' | 'stale' | 'expired';
+    uncertaintyAcceptable: boolean;        // UProp: cumulative confidence above threshold
+  };
+  recommendations: string[];
+  evidenceId: string;
+}
+
 export interface ProtectionResult {
   allowed: boolean;
   confidence: number;
@@ -140,6 +174,108 @@ export class ShieldGuardOrchestrator {
       // Fail-safe: allow request but log the failure
       return this.createFailSafeResult(evidenceId, Date.now() - startTime);
     }
+  }
+
+  /**
+   * Pre-Action Trust Gate — Runtime trust verification before each tool call.
+   * Based on TrustBench (Mar 2026), IH-Challenge (Mar 2026), "You Told Me to Do It" (Mar 2026).
+   *
+   * Validates:
+   * 1. Instruction hierarchy: does the source have authority for this action?
+   * 2. Data leakage risk: are sensitive fields being sent to an external tool?
+   * 3. Credential freshness: are credentials stale?
+   * 4. Uncertainty threshold: is cumulative confidence acceptable for this action?
+   */
+  async preActionTrustGate(request: PreActionTrustGateRequest): Promise<PreActionTrustGateResult> {
+    const evidenceId = this.generateEvidenceId();
+    const recommendations: string[] = [];
+
+    // Check 1: Instruction Hierarchy (IH-Challenge)
+    const HIERARCHY_ORDER = { system: 4, developer: 3, user: 2, tool: 1 };
+    const sourceAuthority = HIERARCHY_ORDER[request.instructionSource] ?? 0;
+    // Tool-level instructions should not trigger sensitive actions
+    const instructionHierarchyValid = sourceAuthority >= 2; // At minimum user-level
+    if (!instructionHierarchyValid) {
+      recommendations.push(
+        `Action requested by ${request.instructionSource}-level instruction. ` +
+        `Sensitive actions require at least user-level authority.`
+      );
+    }
+
+    // Check 2: Data Leakage Risk ("You Told Me to Do It")
+    const sensitiveFields = request.sensitiveDataFields ?? [];
+    const hasSensitiveData = sensitiveFields.length > 0;
+    const isExternalTool = /external|webhook|api|analytics|third.?party/i.test(request.toolName);
+    let dataLeakageRisk: 'none' | 'low' | 'medium' | 'high' = 'none';
+    if (hasSensitiveData && isExternalTool) {
+      dataLeakageRisk = sensitiveFields.length > 3 ? 'high' : 'medium';
+      recommendations.push(
+        `${sensitiveFields.length} sensitive field(s) being sent to external tool "${request.toolName}". ` +
+        `Review data flow for instructional leakage risk.`
+      );
+    } else if (hasSensitiveData) {
+      dataLeakageRisk = 'low';
+    }
+
+    // Check 3: Credential Freshness
+    const now = Date.now();
+    const lastVerified = request.trustContext.lastVerifiedAt ?? 0;
+    const stalenessMs = now - lastVerified;
+    const STALE_THRESHOLD = 30 * 60 * 1000; // 30 minutes
+    const EXPIRED_THRESHOLD = 24 * 60 * 60 * 1000; // 24 hours
+    let credentialFreshness: 'valid' | 'stale' | 'expired' = 'valid';
+    if (stalenessMs > EXPIRED_THRESHOLD) {
+      credentialFreshness = 'expired';
+      recommendations.push('Credentials expired (>24h). Re-authentication required.');
+    } else if (stalenessMs > STALE_THRESHOLD) {
+      credentialFreshness = 'stale';
+      recommendations.push('Credentials stale (>30min). Re-validation recommended.');
+    }
+
+    // Check 4: Uncertainty Threshold (UProp)
+    const cumulativeConfidence = request.trustContext.cumulativeConfidence ?? 1.0;
+    const UNCERTAINTY_THRESHOLD = 0.6; // Below 60% cumulative confidence = defer to human
+    const uncertaintyAcceptable = cumulativeConfidence >= UNCERTAINTY_THRESHOLD;
+    if (!uncertaintyAcceptable) {
+      recommendations.push(
+        `Cumulative confidence (${(cumulativeConfidence * 100).toFixed(1)}%) ` +
+        `below threshold (${UNCERTAINTY_THRESHOLD * 100}%). Human deferral recommended.`
+      );
+    }
+
+    // Synthesize trust score
+    let trustScore = 1.0;
+    if (!instructionHierarchyValid) trustScore -= 0.3;
+    if (dataLeakageRisk === 'high') trustScore -= 0.4;
+    else if (dataLeakageRisk === 'medium') trustScore -= 0.2;
+    if (credentialFreshness === 'expired') trustScore -= 0.3;
+    else if (credentialFreshness === 'stale') trustScore -= 0.1;
+    if (!uncertaintyAcceptable) trustScore -= 0.2;
+    trustScore = Math.max(0, trustScore);
+
+    const allowed = trustScore >= 0.5 && credentialFreshness !== 'expired';
+
+    emitGuardEvent({
+      agentId: request.sessionId, moduleCode: 'pre_action_trust_gate',
+      decision: allowed ? 'allow' : 'deny',
+      reason: `Trust score: ${trustScore.toFixed(2)}, ` +
+              `hierarchy: ${instructionHierarchyValid}, ` +
+              `leakage: ${dataLeakageRisk}, ` +
+              `credentials: ${credentialFreshness}`,
+      severity: allowed ? 'low' : 'high',
+      meta: { evidenceId, action: request.action, toolName: request.toolName, trustScore }
+    });
+
+    return {
+      allowed,
+      reason: allowed
+        ? `Action permitted (trust: ${trustScore.toFixed(2)})`
+        : `Action blocked (trust: ${trustScore.toFixed(2)}). ${recommendations[0] || ''}`,
+      trustScore,
+      checks: { instructionHierarchyValid, dataLeakageRisk, credentialFreshness, uncertaintyAcceptable },
+      recommendations,
+      evidenceId,
+    };
   }
 
   /**

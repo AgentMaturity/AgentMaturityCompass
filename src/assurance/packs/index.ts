@@ -90,6 +90,17 @@ import { beaverTailsPack } from "./beavertails-pack.js";
 import { doNotAnswerPack } from "./donotanswer-pack.js";
 import { toxicChatPack } from "./toxic-chat-pack.js";
 import { xsTestPack } from "./xstest-pack.js";
+// Research Gap Packs (March 2026 papers)
+import { runtimeTrustGatePack } from "./runtimeTrustGatePack.js";
+import { instructionHierarchyPack } from "./instructionHierarchyPack.js";
+import { instructionalLeakagePack } from "./instructionalLeakagePack.js";
+import { emergentMultiAgentRiskPack } from "./emergentMultiAgentRiskPack.js";
+import { evaluationFreshnessPack } from "./evaluationFreshnessPack.js";
+import { uncertaintyPropagationPack } from "./uncertaintyPropagationPack.js";
+import { inputFaultResiliencePack } from "./inputFaultResiliencePack.js";
+import { thoughtSafetyAuditPack } from "./thoughtSafetyAuditPack.js";
+import { reasoningLockDetectionPack } from "./reasoningLockDetectionPack.js";
+import { multiTurnToolAttackPack } from "./multiTurnToolAttackPack.js";
 
 const assurancePacks: AssurancePackDefinition[] = [
   injectionPack,
@@ -184,6 +195,17 @@ const assurancePacks: AssurancePackDefinition[] = [
   doNotAnswerPack,
   toxicChatPack,
   xsTestPack,
+  // Research Gap Packs (March 2026 papers)
+  runtimeTrustGatePack,
+  instructionHierarchyPack,
+  instructionalLeakagePack,
+  emergentMultiAgentRiskPack,
+  evaluationFreshnessPack,
+  uncertaintyPropagationPack,
+  inputFaultResiliencePack,
+  thoughtSafetyAuditPack,
+  reasoningLockDetectionPack,
+  multiTurnToolAttackPack,
 ];
 
 export function listAssurancePacks(): AssurancePackDefinition[] {
