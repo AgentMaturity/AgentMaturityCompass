@@ -8,6 +8,16 @@
  */
 
 import { createHash, createHmac } from 'node:crypto';
+import { type MaturityLevel } from './formalSpec.js';
+
+function scoreToLevel(score: number): MaturityLevel {
+  if (score >= 0.9) return 'L5';
+  if (score >= 0.75) return 'L4';
+  if (score >= 0.55) return 'L3';
+  if (score >= 0.35) return 'L2';
+  if (score >= 0.15) return 'L1';
+  return 'L0';
+}
 
 export interface AgentIdentityClaim {
   agentId: string;
@@ -25,7 +35,8 @@ export interface TrustVerificationResult {
   trusted: boolean;
   trustLevel: 'full' | 'conditional' | 'limited' | 'untrusted';
   reasons: string[];
-  score: number;           // 0–100 composite trust score
+  score: number;           // 0–1 composite trust score
+  level: MaturityLevel;    // L0–L5 derived from score
   grantedScopes: string[]; // what this agent is allowed to do
   requiredActions?: string[];
 }
@@ -52,68 +63,69 @@ export function verifyAgentClaim(
   const reasons: string[] = [];
   let score = 0;
 
-  // 1. Signature check
+  // 1. Signature check (0.30)
   const payload = `${claim.agentId}:${claim.publicKeyHash}:${claim.issuingWorkspace}:${claim.issuedAt.toISOString()}`;
   const expectedSig = createHmac('sha256', sharedSecret).update(payload).digest('hex');
   const sigValid = claim.signature === expectedSig;
-  if (sigValid) { score += 30; reasons.push('Signature valid'); }
+  if (sigValid) { score += 0.30; reasons.push('Signature valid'); }
   else { reasons.push('SIGNATURE INVALID — claim may be forged'); }
 
-  // 2. Freshness check
+  // 2. Freshness check (0.15)
   const ageHours = (Date.now() - claim.issuedAt.getTime()) / 3600000;
   const expired = claim.expiresAt && claim.expiresAt < new Date();
   if (!policy.requireFreshness || (ageHours < 24 && !expired)) {
-    score += 15;
+    score += 0.15;
     reasons.push(`Claim is fresh (${ageHours.toFixed(1)}h old)`);
   } else {
     reasons.push(`Claim is stale (${ageHours.toFixed(1)}h old) — exceeds 24h freshness requirement`);
   }
 
-  // 3. AMC Score check
+  // 3. AMC Score check (0.20)
   if (policy.minAmcScore !== undefined) {
     const agentScore = claim.amcScore ?? 0;
     if (agentScore >= policy.minAmcScore) {
-      score += 20;
+      score += 0.20;
       reasons.push(`AMC score ${agentScore} meets minimum ${policy.minAmcScore}`);
     } else {
       reasons.push(`AMC score ${agentScore} below required ${policy.minAmcScore}`);
     }
   } else {
-    score += 20;
+    score += 0.20;
   }
 
-  // 4. AMC Level check
+  // 4. AMC Level check (0.15)
   if (policy.minAmcLevel && claim.amcLevel) {
     if (levelToNum(claim.amcLevel) >= levelToNum(policy.minAmcLevel)) {
-      score += 15;
+      score += 0.15;
       reasons.push(`AMC level ${claim.amcLevel} meets minimum ${policy.minAmcLevel}`);
     } else {
       reasons.push(`AMC level ${claim.amcLevel} below required ${policy.minAmcLevel}`);
     }
   } else {
-    score += 15;
+    score += 0.15;
   }
 
-  // 5. Passport check
+  // 5. Passport check (0.10)
   if (!policy.requirePassport || claim.amcPassportId) {
-    score += 10;
+    score += 0.10;
     if (claim.amcPassportId) reasons.push(`AMC Passport present: ${claim.amcPassportId}`);
   } else {
     reasons.push('AMC Passport required but not present');
   }
 
-  // 6. Workspace check
+  // 6. Workspace check (0.10)
   if (!policy.allowedWorkspaces || policy.allowedWorkspaces.includes(claim.issuingWorkspace)) {
-    score += 10;
+    score += 0.10;
   } else {
     reasons.push(`Workspace '${claim.issuingWorkspace}' not in trusted workspace list`);
   }
 
+  // Total possible: 1.0
   const trustLevel: TrustVerificationResult['trustLevel'] =
     !sigValid ? 'untrusted' :
-    score >= 80 ? 'full' :
-    score >= 60 ? 'conditional' :
-    score >= 40 ? 'limited' :
+    score >= 0.80 ? 'full' :
+    score >= 0.60 ? 'conditional' :
+    score >= 0.40 ? 'limited' :
     'untrusted';
 
   const grantedScopes =
@@ -129,6 +141,7 @@ export function verifyAgentClaim(
   return {
     trusted: trustLevel !== 'untrusted',
     trustLevel, reasons, score,
+    level: scoreToLevel(score),
     grantedScopes,
     requiredActions: requiredActions.length ? requiredActions : undefined,
   };
@@ -149,7 +162,7 @@ export function verifyAgentClaim(
 export interface TrustEdge {
   from: string;         // agent ID
   to: string;           // agent ID
-  score: number;        // 0–100
+  score: number;        // 0–1
   scopes: string[];
   establishedAt: number; // timestamp ms
   ttlMs?: number;        // time-to-live for this edge
@@ -162,7 +175,8 @@ export interface TrustGraph {
 export interface TransitiveTrustResult {
   from: string;
   to: string;
-  transitiveScore: number;
+  transitiveScore: number;       // 0–1
+  maturityLevel: MaturityLevel;  // L0–L5 derived from transitiveScore
   effectiveScopes: string[];
   path: string[];           // agent IDs in the trust chain
   hops: number;
@@ -206,10 +220,11 @@ export function computeTransitiveTrust(
     if (current.agent === to) {
       const hops = current.path.length - 1;
       const decay = Math.pow(decayPerHop, hops - 1); // First hop has no decay
-      const transitiveScore = current.score * decay / 100; // Normalize to 0–100
+      const transitiveScore = current.score * decay; // Already 0–1 scale
       const result: TransitiveTrustResult = {
         from, to,
-        transitiveScore: Math.round(transitiveScore * 100) / 100,
+        transitiveScore: Math.round(transitiveScore * 1000) / 1000,
+        maturityLevel: scoreToLevel(transitiveScore),
         effectiveScopes: current.scopes,
         path: current.path,
         hops,
@@ -230,7 +245,7 @@ export function computeTransitiveTrust(
     // Explore next hops
     for (const edge of graph.edges) {
       if (edge.from === current.agent && !visited.has(edge.to) && !isEdgeExpired(edge, now)) {
-        const combinedScore = (current.score * edge.score) / 100;
+        const combinedScore = current.score * edge.score;  // Both 0–1, product stays 0–1
         const intersectedScopes = current.scopes.filter(s => edge.scopes.includes(s));
         const weakest = edge.score < current.weakest.score ? edge : current.weakest;
 

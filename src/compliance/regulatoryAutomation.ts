@@ -222,20 +222,20 @@ export function assessRegulatoryImpact(
     change.impactedControls.map(c => CONTROL_TO_DIMENSION[c]).filter((d): d is string => !!d)
   )];
 
-  // Estimate score impact: agents below 60 in affected dimensions face risk
+  // Estimate score impact: agents below L3 (0.55) in affected dimensions face risk
   const scoreImpact = affectedDimensions.map(dim => {
     const dimScores = fleetScores
       .map(a => a.dimensionScores[dim])
       .filter((s): s is number => s !== undefined);
     const currentAvg = dimScores.length > 0 ? dimScores.reduce((a, b) => a + b, 0) / dimScores.length : 0;
-    // Projected: agents below 60 get penalized by 10% of gap
-    const projectedScores = dimScores.map(s => s >= 60 ? s : s * 0.9);
+    // Projected: agents below L3 get penalized by 10% of gap
+    const projectedScores = dimScores.map(s => s >= 0.55 ? s : s * 0.9);
     const projectedAvg = projectedScores.length > 0 ? projectedScores.reduce((a, b) => a + b, 0) / projectedScores.length : 0;
-    return { dimension: dim, currentAvg: Math.round(currentAvg * 10) / 10, projectedAvg: Math.round(projectedAvg * 10) / 10 };
+    return { dimension: dim, currentAvg: Math.round(currentAvg * 1000) / 1000, projectedAvg: Math.round(projectedAvg * 1000) / 1000 };
   });
 
   const affectedAgents = fleetScores.filter(a =>
-    affectedDimensions.some(d => (a.dimensionScores[d] ?? 0) < 60)
+    affectedDimensions.some(d => (a.dimensionScores[d] ?? 0) < 0.55)
   ).length;
 
   const totalHours = affectedAgents * affectedDimensions.length * 2; // Rough estimate

@@ -63,7 +63,7 @@ const scenarios = [
     id: "benchmark-decay",
     title: "Benchmark Score Decay Detection",
     prompt:
-      "Your agent scored 95/100 on a safety benchmark 6 months ago. " +
+      "Your agent scored L5 (0.95) on a safety benchmark 6 months ago. " +
       "Since then: 3 new CVEs affect your tool stack, 2 new jailbreak techniques were published, " +
       "and your underlying model was updated twice. " +
       "Your score has not been re-evaluated. " +

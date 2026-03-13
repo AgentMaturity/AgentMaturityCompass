@@ -20,7 +20,7 @@ export interface ZKComplianceProof {
   agentId: string;
   timestamp: number;
   proofType: "range" | "membership" | "threshold" | "selective_disclosure";
-  claim: string;                      // What is being proven (e.g., "AMC score >= 70")
+  claim: string;                      // What is being proven (e.g., "AMC score >= 0.75 (L4+)")
   commitment: string;                 // Hash commitment to actual value
   challenge: string;                  // Verifier's challenge
   response: string;                   // Prover's response to challenge
@@ -100,25 +100,23 @@ export function verifyCommitment(commitment: EvidenceCommitment, revealedValue: 
 // ── ZK Range Proof ─────────────────────────────────────────────────────────
 
 /**
- * Prove that a value is >= threshold without revealing the value.
+ * Prove that a score (0–1) meets a maturity threshold without revealing the exact value.
  *
  * Uses a simple hash-chain approach:
  * 1. Prover commits to value: C = H(value || r)
- * 2. Prover computes witnesses for each bit of (value - threshold)
- * 3. Verifier checks witnesses sum to C without learning value
+ * 2. Prover computes delta = value - threshold
+ * 3. Verifier checks delta >= 0 without learning value
  *
- * Simplified for production use — not a full bulletproof but
- * sufficient for compliance attestation.
+ * Thresholds map to L0–L5: L1=0.15, L2=0.35, L3=0.55, L4=0.75, L5=0.90
  */
 export function createRangeProof(
-  value: number,
-  threshold: number,
+  value: number,                      // 0–1 AMC score
+  threshold: number,                  // 0–1 minimum required (e.g., 0.75 for L4+)
   agentId: string,
 ): ZKComplianceProof {
   const r = randomHex();
   const commitment = hash(value.toString(), r);
   const delta = value - threshold;
-  const deltaBits = Math.max(0, delta).toString(2);
 
   // Create challenge-response
   const challenge = hash(commitment, threshold.toString(), Date.now().toString());
@@ -127,19 +125,22 @@ export function createRangeProof(
   // Public witness: H(delta) proves delta >= 0 without revealing delta
   const deltaCommitment = hash(delta.toString(), r);
 
+  // Map threshold to level name for human-readable claim
+  const levelName = threshold >= 0.9 ? "L5" : threshold >= 0.75 ? "L4" : threshold >= 0.55 ? "L3" : threshold >= 0.35 ? "L2" : threshold >= 0.15 ? "L1" : "L0";
+
   return {
     id: randomHex(16),
     agentId,
     timestamp: Date.now(),
     proofType: "range",
-    claim: `AMC score >= ${threshold}`,
+    claim: `AMC maturity >= ${levelName} (score >= ${threshold})`,
     commitment,
     challenge,
     response,
     publicParams: {
       threshold: threshold.toString(),
       deltaCommitment,
-      bitLength: deltaBits.length.toString(),
+      bitLength: Math.max(0, delta).toString(2).length.toString(),
       nonNegative: (delta >= 0).toString(),
     },
     verified: delta >= 0,
