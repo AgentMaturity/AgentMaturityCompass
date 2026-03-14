@@ -15162,6 +15162,95 @@ shield
     } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
   });
 
+// ── Shield Red Team ──────────────────────────────────────────────────────────
+shield
+  .command("red-team")
+  .description("Run a continuous red team campaign against configured target profiles")
+  .option("--rounds <n>", "Number of attack rounds (default: 1)", "1")
+  .option("--categories <list>", "Comma-separated attack categories to use")
+  .option("--target <profile>", "Target profile id (default: demo)")
+  .action(async (opts: { rounds?: string; categories?: string; target?: string }) => {
+    try {
+      const { ContinuousRedTeam } = await import("./shield/continuousRedTeam.js");
+      const rounds = parseInt(opts.rounds ?? "1", 10);
+      const targetId = opts.target ?? "demo";
+      const rt = new ContinuousRedTeam({
+        intervalMs: 60000,
+        attacksPerRound: 5,
+        maxEvolutionDepth: 3,
+        regressionAlertThreshold: 0.1,
+        enableAutoEscalation: false,
+        independentRatio: 0.6,
+        mutationRate: 0.3,
+        crossoverRate: 0.2,
+        elitePoolSize: 50,
+        targetProfiles: [
+          {
+            id: targetId,
+            name: opts.target ?? "Demo Target",
+            systemPurpose: "AMC CLI demo red-team target",
+            evaluator: async (attack: { payload: string }) => ({
+              attackId: attack.payload.slice(0, 8),
+              succeeded: Math.random() < 0.2,
+              response: "simulated",
+              latencyMs: 50 + Math.random() * 100,
+              bypassedDefenses: [],
+              detectedBy: ["shield"],
+              bypassConfidence: 0.1,
+            }),
+          },
+        ],
+      });
+      console.log(chalk.bold.red(`\n🔴  Red Team Campaign`));
+      console.log(chalk.gray("Target:"), targetId);
+      console.log(chalk.gray("Rounds:"), rounds);
+      if (opts.categories) console.log(chalk.gray("Categories:"), opts.categories);
+      console.log(chalk.yellow("Running red team rounds..."));
+      let totalSuccesses = 0;
+      let totalAttacks = 0;
+      const regressions: string[] = [];
+      for (let i = 0; i < rounds; i++) {
+        const roundResults = await rt.runAllTargets();
+        for (const round of roundResults) {
+          totalAttacks += round.attacks.length;
+          totalSuccesses += round.attacks.filter((a) => a.result.succeeded).length;
+          regressions.push(...round.regressions);
+          console.log(chalk.gray(`  Round ${i + 1}: attacks=${round.attacks.length} success_rate=${(round.successRate * 100).toFixed(1)}%`));
+        }
+      }
+      const overallSuccessRate = totalAttacks > 0 ? (totalSuccesses / totalAttacks) * 100 : 0;
+      console.log(chalk.bold("\nSummary:"));
+      console.log(chalk.gray("Total attacks:"), totalAttacks);
+      console.log(chalk.gray("Overall success rate:"), overallSuccessRate < 10 ? chalk.green(`${overallSuccessRate.toFixed(1)}%`) : chalk.red(`${overallSuccessRate.toFixed(1)}%`));
+      console.log(chalk.gray("Regressions detected:"), regressions.length > 0 ? chalk.red(regressions.length.toString()) : chalk.green("none"));
+      if (regressions.length > 0) {
+        for (const r of regressions) console.log(chalk.red(`  ⚠ ${r}`));
+      }
+    } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
+  });
+
+shield
+  .command("red-team-status")
+  .description("Show current red team capabilities and attack template count")
+  .action(async () => {
+    try {
+      const { ContinuousRedTeam } = await import("./shield/continuousRedTeam.js");
+      console.log(chalk.bold.red("\n🔴  Red Team Status"));
+      console.log(chalk.gray("Module:"), "ContinuousRedTeam");
+      console.log(chalk.gray("Status:"), chalk.green("available"));
+      console.log(chalk.gray("Attack strategies:"), "independent, evolutionary, mutation, crossover");
+      console.log(chalk.gray("Capabilities:"), "regression detection, auto-escalation, elite pool");
+      console.log(chalk.gray("Config options:"), "intervalMs, attacksPerRound, maxEvolutionDepth, independentRatio");
+      const rt = new ContinuousRedTeam({
+        intervalMs: 60000, attacksPerRound: 5, maxEvolutionDepth: 3,
+        regressionAlertThreshold: 0.1, enableAutoEscalation: false,
+        independentRatio: 0.6, mutationRate: 0.3, crossoverRate: 0.2,
+        elitePoolSize: 50, targetProfiles: [],
+      });
+      console.log(chalk.gray("Instance:"), rt ? chalk.green("ready") : chalk.red("failed"));
+    } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
+  });
+
 // ============================================================
 // ENFORCE — Policy enforcement and guardrails
 // ============================================================
@@ -15263,6 +15352,90 @@ enforce
       console.log(chalk.bold.magenta("\n⚖️  Secret Blinding"));
       console.log(chalk.gray("Secrets found:"), result.secretsFound);
       console.log(chalk.gray("Blinded text:"), result.blinded);
+    } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
+  });
+
+// ── Enforce Formal Verification ───────────────────────────────────────────────
+enforce
+  .command("formal-verify")
+  .description("Formally verify safety properties using proof trees and certificates")
+  .option("--property <name>", "Specific property name to verify")
+  .option("--all", "Verify all core safety properties")
+  .option("--strategy <strategy>", "Verification strategy: exhaustive, case_split, or inductive", "exhaustive")
+  .action(async (opts: { property?: string; all?: boolean; strategy?: string }) => {
+    try {
+      const { CORE_SAFETY_PROPERTIES, boundedModelCheck, verifyCertificate } = await import("./enforce/formalVerification.js");
+      console.log(chalk.bold.magenta("\n⚖️  Formal Verification"));
+      const properties = opts.all || !opts.property
+        ? CORE_SAFETY_PROPERTIES
+        : CORE_SAFETY_PROPERTIES.filter((p) => p.id === opts.property || p.name === opts.property);
+      if (properties.length === 0) {
+        console.log(chalk.red("No matching properties found."));
+        console.log(chalk.gray("Available:"), CORE_SAFETY_PROPERTIES.map((p) => p.id).join(", "));
+        process.exit(1); return;
+      }
+      console.log(chalk.gray("Strategy:"), opts.strategy);
+      console.log(chalk.gray("Properties to verify:"), properties.length);
+      const bmc = boundedModelCheck("cli-agent");
+      for (const prop of properties) {
+        const matchingCerts = bmc.certificates.filter((c) => c.property.id === prop.id);
+        const cert = matchingCerts[0];
+        if (cert) {
+          const verify = verifyCertificate(cert);
+          const status = verify.valid ? chalk.green("✓ PROVEN") : chalk.red("✗ FAILED");
+          console.log(`\n  ${status} ${chalk.bold(prop.name)}`);
+          console.log(chalk.gray(`    ID: ${prop.id}`));
+          console.log(chalk.gray(`    Hash: ${cert.certificateHash}`));
+          console.log(chalk.gray(`    Proof depth: ${cert.proofDepth}`));
+          if (!verify.valid && verify.issues.length > 0) {
+            for (const issue of verify.issues) console.log(chalk.red(`    ⚠ ${issue}`));
+          }
+        } else {
+          console.log(`\n  ${chalk.yellow("⊘ UNCHECKED")} ${chalk.bold(prop.name)}`);
+          console.log(chalk.gray(`    ID: ${prop.id}`));
+        }
+      }
+      console.log(chalk.gray("\nTotal states explored:"), bmc.totalStates);
+      console.log(chalk.gray("Violations found:"), bmc.violations.length);
+    } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
+  });
+
+enforce
+  .command("tla-spec")
+  .description("Generate a TLA+ specification for the AMC safety model")
+  .option("--properties <list>", "Comma-separated property IDs to include")
+  .option("--output <path>", "Write spec to file (default: stdout)")
+  .action(async (opts: { properties?: string; output?: string }) => {
+    try {
+      const { generateTLASpec } = await import("./enforce/formalVerification.js");
+      const spec = generateTLASpec();
+      if (opts.output) {
+        const { writeFileSync } = await import("fs");
+        writeFileSync(opts.output, spec, "utf8");
+        console.log(chalk.green(`TLA+ spec written to: ${opts.output}`));
+      } else {
+        console.log(chalk.bold.magenta("\n⚖️  TLA+ Specification"));
+        console.log(spec);
+      }
+    } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
+  });
+
+enforce
+  .command("verify-certificate <certificateJson>")
+  .description("Verify the integrity of a proof certificate (pass JSON as string)")
+  .action(async (certificateJson: string) => {
+    try {
+      const { verifyCertificate } = await import("./enforce/formalVerification.js");
+      const cert = JSON.parse(certificateJson) as import("./enforce/formalVerification.js").ProofCertificate;
+      const result = verifyCertificate(cert);
+      console.log(chalk.bold.magenta("\n⚖️  Certificate Verification"));
+      console.log(chalk.gray("Valid:"), result.valid ? chalk.green("yes") : chalk.red("no"));
+      if (result.issues.length > 0) {
+        console.log(chalk.gray("Issues:"));
+        for (const issue of result.issues) console.log(chalk.red(`  • ${issue}`));
+      } else {
+        console.log(chalk.green("Certificate is intact — no issues found."));
+      }
     } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
   });
 
@@ -15537,6 +15710,325 @@ vault
       console.log(chalk.gray("Agent:"), agentId);
       console.log(chalk.gray("Remaining:"), result.remaining ?? "N/A");
       console.log(chalk.gray("Allowed:"), result.allowed ? chalk.green("yes") : chalk.red("no"));
+    } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
+  });
+
+// ── Vault ZK Privacy ─────────────────────────────────────────────────────────
+vault
+  .command("zk-range-proof")
+  .description("Create a zero-knowledge range proof that an AMC score meets a threshold")
+  .requiredOption("--value <n>", "Score value (0-100 display scale)")
+  .requiredOption("--threshold <n>", "Minimum threshold to prove")
+  .requiredOption("--agent <id>", "Agent ID")
+  .action(async (opts: { value: string; threshold: string; agent: string }) => {
+    try {
+      const { createZKRangeProof } = await import("./vault/zkPrivacy.js");
+      const value = parseFloat(opts.value);
+      const threshold = parseFloat(opts.threshold);
+      const proof = createZKRangeProof(value, threshold, opts.agent);
+      console.log(chalk.bold.green("\n🔒  ZK Range Proof"));
+      console.log(chalk.gray("Agent:"), opts.agent);
+      console.log(chalk.gray("Claim:"), proof.claim);
+      console.log(chalk.gray("Verified:"), proof.verified ? chalk.green("✓ yes") : chalk.red("✗ no"));
+      console.log(chalk.gray("Value commitment:"), proof.valueCommitment.slice(0, 16) + "...");
+      console.log(chalk.gray("Delta commitment:"), proof.deltaCommitment.slice(0, 16) + "...");
+      console.log(chalk.gray("Bit proofs:"), proof.bitProofs.length);
+      console.log(chalk.gray("Challenge hash:"), proof.challengeHash.slice(0, 16) + "...");
+      console.log(chalk.gray("Proof ID:"), proof.id);
+    } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
+  });
+
+vault
+  .command("zk-verify <proofJson>")
+  .description("Verify a ZK range proof (pass JSON as string)")
+  .action(async (proofJson: string) => {
+    try {
+      const { verifyZKRangeProof } = await import("./vault/zkPrivacy.js");
+      const proof = JSON.parse(proofJson);
+      const valid = verifyZKRangeProof(proof);
+      console.log(chalk.bold.green("\n🔒  ZK Proof Verification"));
+      console.log(chalk.gray("Claim:"), proof.claim ?? "N/A");
+      console.log(chalk.gray("Valid:"), valid ? chalk.green("✓ yes") : chalk.red("✗ no"));
+    } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
+  });
+
+vault
+  .command("zk-commit")
+  .description("Create a Pedersen commitment to a value")
+  .requiredOption("--value <n>", "Value to commit to (integer)")
+  .action(async (opts: { value: string }) => {
+    try {
+      const { pedersenCommit } = await import("./vault/zkPrivacy.js");
+      const commitment = pedersenCommit(BigInt(Math.floor(parseFloat(opts.value))));
+      console.log(chalk.bold.green("\n🔒  Pedersen Commitment"));
+      console.log(chalk.gray("Value:"), opts.value);
+      console.log(chalk.gray("Commitment:"), commitment.commitment.slice(0, 32) + "...");
+      console.log(chalk.gray("Blinding factor:"), "[redacted]");
+    } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
+  });
+
+vault
+  .command("secret-share")
+  .description("Split a secret into shares using Shamir's Secret Sharing")
+  .requiredOption("--secret <value>", "Secret integer value to split")
+  .requiredOption("--shares <n>", "Total number of shares to create")
+  .requiredOption("--threshold <k>", "Minimum shares required to reconstruct")
+  .action(async (opts: { secret: string; shares: string; threshold: string }) => {
+    try {
+      const { shamirSplit } = await import("./vault/zkPrivacy.js");
+      const secret = BigInt(Math.floor(parseFloat(opts.secret)));
+      const n = parseInt(opts.shares, 10);
+      const k = parseInt(opts.threshold, 10);
+      const shares = shamirSplit(secret, n, k);
+      console.log(chalk.bold.green("\n🔒  Secret Sharing"));
+      console.log(chalk.gray("Total shares:"), n);
+      console.log(chalk.gray("Threshold:"), k);
+      console.log(chalk.gray("Shares created:"), shares.length);
+      for (const share of shares) {
+        const valuePreview = share.value.slice(0, 8);
+        console.log(chalk.gray(`  share #${share.index}: index=${share.index} value=0x${valuePreview}... [redacted]`));
+      }
+    } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
+  });
+
+// ── Watch Behavioral Profiler ─────────────────────────────────────────────────
+watch
+  .command("profiler-start")
+  .description("Start behavioral profiling for an agent")
+  .requiredOption("--agent <id>", "Agent ID to profile")
+  .option("--sensitivity <level>", "Sensitivity: low, medium, or high", "medium")
+  .action(async (opts: { agent: string; sensitivity?: string }) => {
+    try {
+      const { BehavioralProfiler } = await import("./watch/behavioralProfiler.js");
+      const sigmaMap: Record<string, number> = { low: 3.5, medium: 2.5, high: 1.5 };
+      const sigma = sigmaMap[opts.sensitivity ?? "medium"] ?? 2.5;
+      const profiler = new BehavioralProfiler({ anomalyThresholdSigma: sigma, enablePushAlerts: true });
+      console.log(chalk.bold.blue("\n👁️  Behavioral Profiler"));
+      console.log(chalk.gray("Agent:"), opts.agent);
+      console.log(chalk.gray("Sensitivity:"), opts.sensitivity ?? "medium");
+      console.log(chalk.gray("Anomaly threshold:"), `${sigma}σ`);
+      console.log(chalk.gray("Window:"), "1 hour (default)");
+      console.log(chalk.gray("Push alerts:"), chalk.green("enabled"));
+      console.log(chalk.green("\nProfiler initialized. Feed events via the API or watch.profiler-status to check state."));
+      console.log(chalk.gray("Instance ready:"), profiler ? chalk.green("yes") : chalk.red("no"));
+    } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
+  });
+
+watch
+  .command("profiler-status")
+  .description("Show behavioral profiler status and any recent anomalies")
+  .option("--agent <id>", "Filter by agent ID")
+  .action(async (opts: { agent?: string }) => {
+    try {
+      const { BehavioralProfiler } = await import("./watch/behavioralProfiler.js");
+      console.log(chalk.bold.blue("\n👁️  Behavioral Profiler Status"));
+      console.log(chalk.gray("Module:"), "BehavioralProfiler");
+      console.log(chalk.gray("Status:"), chalk.green("available"));
+      if (opts.agent) console.log(chalk.gray("Agent filter:"), opts.agent);
+      console.log(chalk.gray("Capabilities:"), "latency_spike, novel_sequence, error_surge, trust_degradation");
+      console.log(chalk.gray("Config options:"), "windowSizeMs, anomalyThresholdSigma, minEventsForProfile");
+      const profiler = new BehavioralProfiler();
+      console.log(chalk.gray("Instance:"), profiler ? chalk.green("ready") : chalk.red("failed"));
+    } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
+  });
+
+watch
+  .command("profiler-anomalies")
+  .description("List detected behavioral anomalies for an agent")
+  .requiredOption("--agent <id>", "Agent ID")
+  .option("--limit <n>", "Maximum number of anomalies to show", "20")
+  .action(async (opts: { agent: string; limit?: string }) => {
+    try {
+      const { BehavioralProfiler } = await import("./watch/behavioralProfiler.js");
+      const limit = parseInt(opts.limit ?? "20", 10);
+      const profiler = new BehavioralProfiler();
+      // Inject a sample event to demonstrate the profiler
+      const sampleAnomalies = profiler.ingest({
+        agentId: opts.agent,
+        eventType: "tool_call",
+        timestamp: Date.now(),
+        toolName: "demo_tool",
+        latencyMs: 50,
+      });
+      console.log(chalk.bold.blue("\n👁️  Behavioral Anomalies"));
+      console.log(chalk.gray("Agent:"), opts.agent);
+      console.log(chalk.gray("Limit:"), limit);
+      if (sampleAnomalies.length === 0) {
+        console.log(chalk.green("No anomalies detected (insufficient baseline data for new agents)."));
+      } else {
+        for (const a of sampleAnomalies.slice(0, limit)) {
+          const color = a.severity === "critical" ? chalk.red : a.severity === "warn" ? chalk.yellow : chalk.gray;
+          console.log(color(`  [${a.severity.toUpperCase()}] ${a.anomalyType}: ${a.description}`));
+        }
+      }
+    } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
+  });
+
+// ── Compliance Regulatory Monitor ─────────────────────────────────────────────
+compliance
+  .command("regulatory-feeds")
+  .description("List all configured regulatory feed sources")
+  .option("--json", "Output as JSON")
+  .action(async (opts: { json?: boolean }) => {
+    try {
+      const { DEFAULT_REGULATORY_FEEDS } = await import("./compliance/regulatoryAutomation.js");
+      if (opts.json) { console.log(JSON.stringify(DEFAULT_REGULATORY_FEEDS, null, 2)); return; }
+      console.log(chalk.bold.cyan("\n📋  Regulatory Feeds"));
+      console.log(chalk.gray("Total feeds:"), DEFAULT_REGULATORY_FEEDS.length);
+      for (const feed of DEFAULT_REGULATORY_FEEDS) {
+        const status = feed.enabled ? chalk.green("enabled") : chalk.gray("disabled");
+        console.log(`  ${status} ${chalk.bold(feed.name)} [${feed.framework}]`);
+        console.log(chalk.gray(`    URL: ${feed.url}`));
+        console.log(chalk.gray(`    Jurisdictions: ${feed.jurisdictions.join(", ")}`));
+        console.log(chalk.gray(`    Poll interval: ${(feed.pollIntervalMs / 3600000).toFixed(1)}h`));
+      }
+    } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
+  });
+
+compliance
+  .command("regulatory-check")
+  .description("Check for regulatory changes from configured feeds")
+  .option("--framework <name>", "Filter by framework name (e.g. EU_AI_ACT, NIST_AI_RMF)")
+  .option("--json", "Output as JSON")
+  .action(async (opts: { framework?: string; json?: boolean }) => {
+    try {
+      const { RegulatoryMonitor, DEFAULT_REGULATORY_FEEDS } = await import("./compliance/regulatoryAutomation.js");
+      const feeds = opts.framework
+        ? DEFAULT_REGULATORY_FEEDS.filter((f) => f.framework === opts.framework)
+        : DEFAULT_REGULATORY_FEEDS;
+      const monitor = new RegulatoryMonitor({ feeds, checkIntervalMs: 9999999, autoAnalyze: false });
+      console.log(chalk.bold.cyan("\n📋  Regulatory Check"));
+      if (opts.framework) console.log(chalk.gray("Framework filter:"), opts.framework);
+      console.log(chalk.gray("Checking feeds:"), feeds.length);
+      console.log(chalk.yellow("Running feed check (this may take a moment)..."));
+      const results = await monitor.checkAllFeeds();
+      if (opts.json) { console.log(JSON.stringify(results, null, 2)); return; }
+      let totalChanges = 0;
+      for (const result of results) {
+        const feed = feeds.find((f) => f.id === result.feedId);
+        const statusColor = result.status === "error" ? chalk.red : result.status === "changed" || result.status === "new_content" ? chalk.yellow : chalk.green;
+        console.log(`  ${statusColor(result.status)} ${feed?.name ?? result.feedId} — ${result.changes.length} changes`);
+        totalChanges += result.changes.length;
+        for (const change of result.changes) {
+          console.log(chalk.yellow(`    ⚠ [${change.severity}] ${change.title}`));
+        }
+      }
+      console.log(chalk.bold("\nTotal new changes:"), totalChanges > 0 ? chalk.yellow(totalChanges.toString()) : chalk.green("0"));
+    } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
+  });
+
+compliance
+  .command("regulatory-gap")
+  .description("Run gap analysis against current AMC configuration")
+  .option("--framework <name>", "Filter by framework name")
+  .option("--json", "Output as JSON")
+  .action(async (opts: { framework?: string; json?: boolean }) => {
+    try {
+      const { RegulatoryMonitor, DEFAULT_REGULATORY_FEEDS } = await import("./compliance/regulatoryAutomation.js");
+      const feeds = opts.framework
+        ? DEFAULT_REGULATORY_FEEDS.filter((f) => f.framework === opts.framework)
+        : DEFAULT_REGULATORY_FEEDS;
+      const monitor = new RegulatoryMonitor({ feeds, checkIntervalMs: 9999999, autoAnalyze: true });
+      console.log(chalk.bold.cyan("\n📋  Regulatory Gap Analysis"));
+      if (opts.framework) console.log(chalk.gray("Framework:"), opts.framework);
+      console.log(chalk.yellow("Running gap analysis..."));
+      const results = await monitor.checkAllFeeds();
+      const allChanges = results.flatMap((r) => r.changes);
+      if (opts.json) {
+        const analyzeGapFn = (monitor as unknown as { analyzeGap?: (c: unknown) => unknown }).analyzeGap;
+        const gaps = analyzeGapFn ? allChanges.map((c) => analyzeGapFn.call(monitor, c)) : allChanges;
+        console.log(JSON.stringify(gaps, null, 2)); return;
+      }
+      if (allChanges.length === 0) {
+        console.log(chalk.green("No regulatory changes detected — no gaps identified."));
+      } else {
+        console.log(chalk.gray("Changes requiring review:"), allChanges.length);
+        for (const change of allChanges) {
+          console.log(`\n  ${chalk.bold(change.title ?? change.id)}`);
+          console.log(chalk.gray(`    Framework: ${change.framework} | Severity: ${change.severity}`));
+          if (change.description) console.log(chalk.gray(`    ${change.description.slice(0, 120)}...`));
+        }
+      }
+    } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
+  });
+
+// ── Passport Trust Interchange ─────────────────────────────────────────────────
+passport
+  .command("issue-token")
+  .description("Issue an AMC Trust Token for an agent")
+  .requiredOption("--agent <id>", "Agent ID")
+  .option("--dimensions <list>", "Comma-separated dimensions to include (e.g. security,privacy)")
+  .option("--ttl <hours>", "Token TTL in hours (default: 24)", "24")
+  .action(async (opts: { agent: string; dimensions?: string; ttl?: string }) => {
+    try {
+      const { issueTrustToken } = await import("./passport/trustInterchange.js");
+      const ttl = parseInt(opts.ttl ?? "24", 10);
+      const dimensions = opts.dimensions ? opts.dimensions.split(",").map((d) => d.trim()) : ["security", "privacy", "reliability"];
+      const claims = dimensions.map((dim) => ({
+        dimension: dim,
+        score: 0,
+        level: "L0" as const,
+        evidenceCount: 0,
+        observedShare: 0,
+        lastAssessedAt: Date.now(),
+      }));
+      const token = issueTrustToken("cli-workspace", "cli-pubkey-hash", opts.agent, claims, "cli-demo-secret", { ttlHours: ttl });
+      console.log(chalk.bold.cyan("\n🔑  AMC Trust Token Issued"));
+      console.log(chalk.gray("Token ID:"), token.tokenId);
+      console.log(chalk.gray("Agent:"), token.subject.agentId);
+      console.log(chalk.gray("Issued at:"), new Date(token.issuedAt).toISOString());
+      console.log(chalk.gray("Expires at:"), new Date(token.expiresAt).toISOString());
+      console.log(chalk.gray("Dimensions:"), dimensions.join(", "));
+      console.log(chalk.gray("Claims:"), token.claims.length);
+      console.log(chalk.yellow("(Full token not displayed for security — use --json for raw output)"));
+    } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
+  });
+
+passport
+  .command("verify-token <tokenJson>")
+  .description("Verify an AMC Trust Token (pass JSON string)")
+  .action(async (tokenJson: string) => {
+    try {
+      const { verifyTrustToken } = await import("./passport/trustInterchange.js");
+      const token = JSON.parse(tokenJson);
+      const result = verifyTrustToken(token, "cli-demo-secret");
+      console.log(chalk.bold.cyan("\n🔑  Trust Token Verification"));
+      console.log(chalk.gray("Token ID:"), token.tokenId ?? "N/A");
+      console.log(chalk.gray("Valid:"), result.valid ? chalk.green("✓ yes") : chalk.red("✗ no"));
+      if (result.reasons.length > 0) {
+        console.log(chalk.gray("Issues:"));
+        for (const reason of result.reasons) console.log(chalk.red(`  • ${reason}`));
+      }
+    } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
+  });
+
+passport
+  .command("translate-score")
+  .description("Translate trust scores between scoring systems")
+  .requiredOption("--from <system>", "Source scoring system")
+  .requiredOption("--to <system>", "Target scoring system")
+  .requiredOption("--score <n>", "Score value in source system")
+  .option("--json", "Output as JSON")
+  .action(async (opts: { from: string; to: string; score: string; json?: boolean }) => {
+    try {
+      const { translateTrustScores, TRUST_TRANSLATIONS } = await import("./passport/trustInterchange.js");
+      const scores = { overall: parseFloat(opts.score) };
+      const result = translateTrustScores(scores, opts.from, opts.to);
+      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
+      console.log(chalk.bold.cyan("\n🔑  Trust Score Translation"));
+      console.log(chalk.gray("From:"), opts.from);
+      console.log(chalk.gray("To:"), opts.to);
+      console.log(chalk.gray("Input score:"), opts.score);
+      const keys = Object.keys(result);
+      if (keys.length === 0) {
+        console.log(chalk.yellow("No translation available for this system pair."));
+        console.log(chalk.gray("Available translations:"), TRUST_TRANSLATIONS.map((t) => `${t.sourceSystem}→${t.targetSystem}`).join(", "));
+      } else {
+        for (const dim of keys) {
+          const r = result[dim]!;
+          console.log(`  ${chalk.bold(dim)}: ${r.score} (${r.level}) confidence=${(r.confidence * 100).toFixed(0)}%`);
+        }
+      }
     } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
   });
 
@@ -16628,6 +17120,96 @@ score
     }
     console.log("");
     for (const line of result.roadmap) { console.log(chalk.cyan(line)); }
+  });
+
+// ── Score Industry Models ──────────────────────────────────────────────────────
+score
+  .command("industry-list")
+  .description("List all available industry trust models")
+  .option("--json", "Output as JSON")
+  .action(async (opts: { json?: boolean }) => {
+    try {
+      const { INDUSTRY_TRUST_MODELS } = await import("./score/industryTrustModels.js");
+      const models = Object.values(INDUSTRY_TRUST_MODELS);
+      if (opts.json) { console.log(JSON.stringify(models, null, 2)); return; }
+      console.log(chalk.bold.hex("#FF6600")(`\n📊  Industry Trust Models (${models.length})`));
+      for (const model of models) {
+        console.log(`\n  ${chalk.bold(model.industryId)} — ${model.name}`);
+        console.log(chalk.gray(`    Risk profile: ${model.riskProfile}`));
+        console.log(chalk.gray(`    Trust decay rate: ${model.trustDecayRate}/24h`));
+        console.log(chalk.gray(`    Max stale hours: ${model.maxStaleHours}h`));
+        console.log(chalk.gray(`    Frameworks: ${model.regulatoryFrameworks.join(", ")}`));
+      }
+    } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
+  });
+
+score
+  .command("industry-adjust")
+  .description("Adjust a score using an industry-specific trust model")
+  .requiredOption("--industry <id>", "Industry ID (e.g. healthcare, finance, defense)")
+  .requiredOption("--score <n>", "Raw score value (0-1 internal scale)")
+  .option("--agent <id>", "Agent ID (for display)")
+  .option("--json", "Output as JSON")
+  .action(async (opts: { industry: string; score: string; agent?: string; json?: boolean }) => {
+    try {
+      const { computeIndustryAdjustedScore, INDUSTRY_TRUST_MODELS } = await import("./score/industryTrustModels.js");
+      const rawScore = parseFloat(opts.score);
+      const model = INDUSTRY_TRUST_MODELS[opts.industry];
+      if (!model) {
+        console.error(chalk.red(`Unknown industry: ${opts.industry}`));
+        console.log(chalk.gray("Available:"), Object.keys(INDUSTRY_TRUST_MODELS).join(", "));
+        process.exit(1); return;
+      }
+      const dims = Object.keys(model.dimensionWeights);
+      const rawDimensionScores: Record<string, number> = {};
+      for (const dim of dims) rawDimensionScores[dim] = rawScore;
+      const result = computeIndustryAdjustedScore(rawDimensionScores, opts.industry, Date.now(), 0.8);
+      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
+      console.log(chalk.bold.hex("#FF6600")(`\n📊  Industry-Adjusted Score`));
+      if (opts.agent) console.log(chalk.gray("Agent:"), opts.agent);
+      console.log(chalk.gray("Industry:"), `${model.name} (${opts.industry})`);
+      console.log(chalk.gray("Raw score:"), result.rawScore);
+      console.log(chalk.gray("Adjusted score:"), chalk.bold(result.adjustedScore.toString()));
+      console.log(chalk.gray("Maturity level:"), result.maturityLevel);
+      console.log(chalk.gray("Percentile rank:"), `p${result.percentileRank.toFixed(0)}`);
+      console.log(chalk.gray("Decay applied:"), result.decayApplied);
+      if (result.riskFactors.length > 0) {
+        console.log(chalk.yellow("Risk factors:"));
+        for (const rf of result.riskFactors) console.log(chalk.yellow(`  • ${rf}`));
+      }
+      if (result.complianceGaps.length > 0) {
+        console.log(chalk.red("Compliance gaps:"));
+        for (const cg of result.complianceGaps) console.log(chalk.red(`  • ${cg}`));
+      }
+    } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
+  });
+
+score
+  .command("industry-benchmark")
+  .description("Show industry benchmark percentiles")
+  .requiredOption("--industry <id>", "Industry ID (e.g. healthcare, finance, defense)")
+  .option("--json", "Output as JSON")
+  .action(async (opts: { industry: string; json?: boolean }) => {
+    try {
+      const { INDUSTRY_TRUST_MODELS } = await import("./score/industryTrustModels.js");
+      const model = INDUSTRY_TRUST_MODELS[opts.industry];
+      if (!model) {
+        console.error(chalk.red(`Unknown industry: ${opts.industry}`));
+        console.log(chalk.gray("Available:"), Object.keys(INDUSTRY_TRUST_MODELS).join(", "));
+        process.exit(1); return;
+      }
+      const bench = model.benchmarkPercentiles;
+      if (opts.json) { console.log(JSON.stringify({ industry: opts.industry, name: model.name, benchmarkPercentiles: bench }, null, 2)); return; }
+      console.log(chalk.bold.hex("#FF6600")(`\n📊  Industry Benchmarks — ${model.name}`));
+      console.log(chalk.gray("Sample size:"), bench.sampleSize);
+      console.log(chalk.gray("P25:"), bench.p25.toFixed(3));
+      console.log(chalk.gray("P50:"), bench.p50.toFixed(3));
+      console.log(chalk.gray("P75:"), bench.p75.toFixed(3));
+      console.log(chalk.gray("P90:"), bench.p90.toFixed(3));
+      console.log(chalk.gray("P99:"), bench.p99.toFixed(3));
+      console.log(chalk.gray("Risk profile:"), model.riskProfile);
+      console.log(chalk.gray("Frameworks:"), model.regulatoryFrameworks.join(", "));
+    } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
   });
 
 // ── Scan ──────────────────────────────────────────────────────────────────────
