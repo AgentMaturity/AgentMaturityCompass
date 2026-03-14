@@ -16,3 +16,13 @@ export { exportEvent, exportBatch } from "./siemExporter.js";
 export type { AuditEvent, SiemExportResult, SiemBatchResult } from "./siemExporter.js";
 export { exportToSiem, verifyTenantBoundary, createPolicyPack } from "./stubs.js";
 export type { SiemEvent } from "./stubs.js";
+
+// ── Behavioral Profiler (ML anomaly detection, trust degradation alerts) ──
+export { BehavioralProfiler } from './behavioralProfiler.js';
+export type {
+  BehavioralEvent,
+  BehavioralProfile,
+  BehavioralAnomaly,
+  TrustDegradationAlert,
+  BehavioralProfilerConfig,
+} from './behavioralProfiler.js';

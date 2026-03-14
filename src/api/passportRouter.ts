@@ -115,5 +115,72 @@ export async function handlePassportRoute(
     return true;
   }
 
+  // POST /api/v1/passport/trust-token/issue — issue an AMC Trust Token
+  if (pathname === "/api/v1/passport/trust-token/issue" && method === "POST") {
+    try {
+      const body = await import("./apiHelpers.js").then(m => m.bodyJson<{
+        workspaceId?: string;
+        publicKeyHash?: string;
+        agentId?: string;
+        claims?: unknown[];
+        secret?: string;
+        ttlHours?: number;
+        displayName?: string;
+        passportId?: string;
+      }>(req));
+      if (!body.agentId || !body.claims || !body.secret) {
+        const { apiError: ae } = await import("./apiHelpers.js");
+        ae(res, 400, "agentId, claims, and secret required"); return true;
+      }
+      const { issueTrustToken } = await import("../passport/trustInterchange.js");
+      const token = issueTrustToken(
+        body.workspaceId ?? workspace,
+        body.publicKeyHash ?? "",
+        body.agentId,
+        body.claims as Parameters<typeof issueTrustToken>[3],
+        body.secret,
+        { ttlHours: body.ttlHours, displayName: body.displayName, passportId: body.passportId },
+      );
+      apiSuccess(res, token, 201);
+    } catch (err) {
+      apiError(res, 500, err instanceof Error ? err.message : "Trust token issuance failed");
+    }
+    return true;
+  }
+
+  // POST /api/v1/passport/trust-token/verify — verify a trust token
+  if (pathname === "/api/v1/passport/trust-token/verify" && method === "POST") {
+    try {
+      const body = await import("./apiHelpers.js").then(m => m.bodyJson<{ token?: Record<string, unknown>; secret?: string }>(req));
+      if (!body.token || !body.secret) { apiError(res, 400, "token and secret required"); return true; }
+      const { verifyTrustToken } = await import("../passport/trustInterchange.js");
+      const result = verifyTrustToken(body.token as unknown as Parameters<typeof verifyTrustToken>[0], body.secret);
+      apiSuccess(res, result);
+    } catch (err) {
+      apiError(res, 500, err instanceof Error ? err.message : "Trust token verification failed");
+    }
+    return true;
+  }
+
+  // POST /api/v1/passport/trust-token/translate — translate between scoring systems
+  if (pathname === "/api/v1/passport/trust-token/translate" && method === "POST") {
+    try {
+      const body = await import("./apiHelpers.js").then(m => m.bodyJson<{
+        scores?: Record<string, number>;
+        sourceSystem?: string;
+        targetSystem?: string;
+      }>(req));
+      if (!body.scores || !body.sourceSystem || !body.targetSystem) {
+        apiError(res, 400, "scores, sourceSystem, and targetSystem required"); return true;
+      }
+      const { translateTrustScores } = await import("../passport/trustInterchange.js");
+      const result = translateTrustScores(body.scores, body.sourceSystem, body.targetSystem);
+      apiSuccess(res, result);
+    } catch (err) {
+      apiError(res, 500, err instanceof Error ? err.message : "Trust score translation failed");
+    }
+    return true;
+  }
+
   return false;
 }

@@ -39,7 +39,7 @@ export type {
 
 export { RunHistoryStore } from './runHistory.js';
 export type {
-  RunRecord, ABComparison, RegressionAlert, TrendAnalysis, TrendPoint,
+  RunRecord, ABComparison, RegressionAlert as RunHistoryRegressionAlert, TrendAnalysis, TrendPoint,
   Testcase, TestsetResult,
 } from './runHistory.js';
 

@@ -420,5 +420,62 @@ export async function handleScoreRoute(
     return true;
   }
 
+  // POST /api/v1/score/industry/adjust — adjust score using industry-specific model
+  if (pathname === '/api/v1/score/industry/adjust' && method === 'POST') {
+    try {
+      const body = await bodyJson<{
+        rawDimensionScores?: Record<string, number>;
+        industryId?: string;
+        lastVerifiedAt?: number;
+        observedEvidenceShare?: number;
+      }>(req);
+      if (!body.rawDimensionScores || !body.industryId) {
+        apiError(res, 400, 'rawDimensionScores and industryId required'); return true;
+      }
+      const { computeIndustryAdjustedScore } = await import('../score/industryTrustModels.js');
+      const result = computeIndustryAdjustedScore(
+        body.rawDimensionScores,
+        body.industryId,
+        body.lastVerifiedAt ?? Date.now() - 3600000,
+        body.observedEvidenceShare ?? 0.5,
+      );
+      apiSuccess(res, result);
+    } catch (err) {
+      apiError(res, 500, err instanceof Error ? err.message : 'Industry score adjustment failed');
+    }
+    return true;
+  }
+
+  // GET /api/v1/score/industry/models — list available industry models
+  if (pathname === '/api/v1/score/industry/models' && method === 'GET') {
+    try {
+      const { INDUSTRY_TRUST_MODELS } = await import('../score/industryTrustModels.js');
+      const models = Object.values(INDUSTRY_TRUST_MODELS).map(m => ({
+        industryId: m.industryId,
+        name: m.name,
+        riskProfile: m.riskProfile,
+        regulatoryFrameworks: m.regulatoryFrameworks,
+      }));
+      apiSuccess(res, { models, count: models.length });
+    } catch (err) {
+      apiError(res, 500, err instanceof Error ? err.message : 'Failed to list industry models');
+    }
+    return true;
+  }
+
+  // GET /api/v1/score/industry/model/:industryId — get a specific industry model
+  const industryModelParams = pathParam(pathname, '/api/v1/score/industry/model/:industryId');
+  if (industryModelParams && method === 'GET') {
+    try {
+      const { INDUSTRY_TRUST_MODELS } = await import('../score/industryTrustModels.js');
+      const model = INDUSTRY_TRUST_MODELS[industryModelParams.industryId!];
+      if (!model) { apiError(res, 404, `Industry model not found: ${industryModelParams.industryId}`); return true; }
+      apiSuccess(res, model);
+    } catch (err) {
+      apiError(res, 500, err instanceof Error ? err.message : 'Failed to get industry model');
+    }
+    return true;
+  }
+
   return false;
 }

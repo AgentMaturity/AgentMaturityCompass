@@ -161,5 +161,65 @@ export async function handleVaultRoute(
     return true;
   }
 
+  // POST /api/v1/vault/zk/range-proof — create a ZK range proof
+  if (pathname === '/api/v1/vault/zk/range-proof' && method === 'POST') {
+    try {
+      const body = await bodyJson<{ value?: number; threshold?: number; agentId?: string }>(req);
+      if (body.value === undefined || body.threshold === undefined) {
+        apiError(res, 400, 'value and threshold required'); return true;
+      }
+      const { createZKRangeProof } = await import('../vault/zkPrivacy.js');
+      const proof = createZKRangeProof(body.value, body.threshold, body.agentId ?? 'api');
+      apiSuccess(res, proof);
+    } catch (err) {
+      apiError(res, 500, err instanceof Error ? err.message : 'ZK range proof failed');
+    }
+    return true;
+  }
+
+  // POST /api/v1/vault/zk/verify — verify a ZK range proof
+  if (pathname === '/api/v1/vault/zk/verify' && method === 'POST') {
+    try {
+      const body = await bodyJson<{ proof?: unknown }>(req);
+      if (!body.proof) { apiError(res, 400, 'proof required'); return true; }
+      const { verifyZKRangeProof } = await import('../vault/zkPrivacy.js');
+      const valid = verifyZKRangeProof(body.proof as unknown as Parameters<typeof verifyZKRangeProof>[0]);
+      apiSuccess(res, { valid });
+    } catch (err) {
+      apiError(res, 500, err instanceof Error ? err.message : 'ZK proof verification failed');
+    }
+    return true;
+  }
+
+  // POST /api/v1/vault/zk/commitment — create a Pedersen commitment
+  if (pathname === '/api/v1/vault/zk/commitment' && method === 'POST') {
+    try {
+      const body = await bodyJson<{ value?: number }>(req);
+      if (body.value === undefined) { apiError(res, 400, 'value required'); return true; }
+      const { pedersenCommit } = await import('../vault/zkPrivacy.js');
+      const commitment = pedersenCommit(BigInt(Math.round(body.value)));
+      apiSuccess(res, commitment);
+    } catch (err) {
+      apiError(res, 500, err instanceof Error ? err.message : 'Pedersen commitment failed');
+    }
+    return true;
+  }
+
+  // POST /api/v1/vault/zk/secret-share — split a secret via Shamir
+  if (pathname === '/api/v1/vault/zk/secret-share' && method === 'POST') {
+    try {
+      const body = await bodyJson<{ secret?: number; threshold?: number; totalShares?: number }>(req);
+      if (body.secret === undefined || body.threshold === undefined || body.totalShares === undefined) {
+        apiError(res, 400, 'secret, threshold, and totalShares required'); return true;
+      }
+      const { shamirSplit } = await import('../vault/zkPrivacy.js');
+      const shares = shamirSplit(BigInt(Math.round(body.secret)), body.threshold, body.totalShares);
+      apiSuccess(res, { shares: shares.map(s => ({ index: s.index, value: s.value, partyId: s.partyId })) });
+    } catch (err) {
+      apiError(res, 500, err instanceof Error ? err.message : 'Shamir secret sharing failed');
+    }
+    return true;
+  }
+
   return false;
 }

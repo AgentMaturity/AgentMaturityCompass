@@ -63,3 +63,14 @@ export {
   runAllValidators, aggregateValidationResults,
 } from "./validators/index.js";
 export type { ValidationResult as ShieldValidationResult, ValidationViolation, ValidatorConfig } from "./validators/index.js";
+
+// ── Continuous Red Team (evolutionary adversarial testing) ────────────────
+export { ContinuousRedTeam } from './continuousRedTeam.js';
+export type {
+  RedTeamConfig,
+  RedTeamTarget,
+  AttackResult,
+  RedTeamRound,
+  RedTeamReport,
+  RegressionAlert,
+} from './continuousRedTeam.js';

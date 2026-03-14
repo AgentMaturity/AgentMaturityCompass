@@ -76,5 +76,58 @@ export async function handleShieldRoute(
     return true;
   }
 
+  // POST /api/v1/shield/red-team/run — run a red team campaign
+  if (pathname === '/api/v1/shield/red-team/run' && method === 'POST') {
+    try {
+      const body = await bodyJsonSchema(req, z.object({
+        targetProfile: z.record(z.unknown()).optional(),
+        config: z.record(z.unknown()).optional(),
+      }).strict());
+      const { ContinuousRedTeam } = await import('../shield/continuousRedTeam.js');
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const rt = new ContinuousRedTeam(body.config as unknown as any);
+      const report = rt.generateReport();
+      apiSuccess(res, { status: 'initiated', report, targetProfile: body.targetProfile });
+    } catch (err) {
+      if (isRequestBodyError(err)) { apiError(res, err.statusCode, err.message); return true; }
+      apiError(res, 500, err instanceof Error ? err.message : 'Red team run failed');
+    }
+    return true;
+  }
+
+  // GET /api/v1/shield/red-team/status — get red team status/capabilities
+  if (pathname === '/api/v1/shield/red-team/status' && method === 'GET') {
+    apiSuccess(res, {
+      status: 'operational',
+      module: 'continuous-red-team',
+      capabilities: ['attack-generation', 'evolutionary-mutation', 'crossover', 'regression-detection'],
+    });
+    return true;
+  }
+
+  // POST /api/v1/shield/red-team/attack — generate a single attack
+  if (pathname === '/api/v1/shield/red-team/attack' && method === 'POST') {
+    try {
+      const body = await bodyJsonSchema(req, z.object({
+        targetProfile: z.record(z.unknown()).optional(),
+        attackType: z.string().optional(),
+      }).strict());
+      const { DynamicAttackGenerator } = await import('../shield/dynamicAttackGenerator.js');
+      const generator = new DynamicAttackGenerator();
+      const attacks = await generator.generateAttacks({
+        targetSystem: String(body.targetProfile?.systemPurpose ?? 'general'),
+        systemPurpose: String(body.targetProfile?.systemPurpose ?? 'general'),
+        knownVulnerabilities: [],
+        previousAttempts: [],
+        riskProfile: 'medium',
+      }, 'crescendo', 1);
+      apiSuccess(res, { attack: attacks[0] ?? null, generated: attacks.length });
+    } catch (err) {
+      if (isRequestBodyError(err)) { apiError(res, err.statusCode, err.message); return true; }
+      apiError(res, 500, err instanceof Error ? err.message : 'Attack generation failed');
+    }
+    return true;
+  }
+
   return false;
 }

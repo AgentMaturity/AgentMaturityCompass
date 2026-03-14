@@ -112,6 +112,45 @@ export async function handleComplianceRoute(
       return true;
     }
 
+    // GET /api/v1/compliance/regulatory/feeds — list configured regulatory feeds
+    if (pathname === '/api/v1/compliance/regulatory/feeds' && method === 'GET') {
+      try {
+        const { DEFAULT_REGULATORY_FEEDS } = await import('../compliance/regulatoryAutomation.js');
+        apiSuccess(res, { feeds: DEFAULT_REGULATORY_FEEDS, count: DEFAULT_REGULATORY_FEEDS.length });
+      } catch (err) {
+        apiError(res, 500, err instanceof Error ? err.message : 'Failed to list regulatory feeds');
+      }
+      return true;
+    }
+
+    // POST /api/v1/compliance/regulatory/check — check all feeds for regulatory changes
+    if (pathname === '/api/v1/compliance/regulatory/check' && method === 'POST') {
+      try {
+        const { RegulatoryMonitor } = await import('../compliance/regulatoryAutomation.js');
+        const monitor = new RegulatoryMonitor();
+        const results = await monitor.checkAllFeeds();
+        apiSuccess(res, { results, checkedAt: new Date().toISOString() });
+      } catch (err) {
+        apiError(res, 500, err instanceof Error ? err.message : 'Regulatory check failed');
+      }
+      return true;
+    }
+
+    // GET /api/v1/compliance/regulatory/changes — get recent regulatory changes
+    if (pathname === '/api/v1/compliance/regulatory/changes' && method === 'GET') {
+      try {
+        const { getRegulatoryChanges } = await import('../compliance/regulatoryAutomation.js');
+        const url = new URL(req.url ?? pathname, 'http://localhost');
+        const framework = url.searchParams.get('framework') ?? undefined;
+        const severity = url.searchParams.get('severity') ?? undefined;
+        const changes = getRegulatoryChanges([], { framework, severity });
+        apiSuccess(res, { changes, count: changes.length });
+      } catch (err) {
+        apiError(res, 500, err instanceof Error ? err.message : 'Failed to get regulatory changes');
+      }
+      return true;
+    }
+
     return false;
   }
 

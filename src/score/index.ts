@@ -399,3 +399,14 @@ export type {
   ABTestSummary,
   ScoreSample,
 } from "./statisticalAnalysis.js";
+
+// ── Industry Trust Models (sector-specific weights, decay, benchmarks) ────
+export {
+  INDUSTRY_TRUST_MODELS,
+  computeIndustryAdjustedScore,
+} from './industryTrustModels.js';
+export type {
+  IndustryTrustModel,
+  IndustryBenchmark,
+  IndustryAdjustedScore,
+} from './industryTrustModels.js';

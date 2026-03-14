@@ -174,5 +174,59 @@ export async function handleWatchRoute(
     return true;
   }
 
+  // POST /api/v1/watch/profiler/event — submit a behavioral event
+  if (pathname === '/api/v1/watch/profiler/event' && method === 'POST') {
+    try {
+      const body = await bodyJson<{ agentId?: string; eventType?: string; latencyMs?: number; toolName?: string; metadata?: Record<string, unknown> }>(req);
+      if (!body.agentId || !body.eventType) { apiError(res, 400, 'agentId and eventType required'); return true; }
+      const { BehavioralProfiler } = await import('../watch/behavioralProfiler.js');
+      const profiler = new BehavioralProfiler();
+      const anomalies = profiler.ingest({
+        agentId: body.agentId,
+        eventType: body.eventType as 'tool_call' | 'decision' | 'response' | 'error' | 'escalation',
+        latencyMs: body.latencyMs,
+        toolName: body.toolName,
+        metadata: body.metadata,
+        timestamp: Date.now(),
+      });
+      apiSuccess(res, { recorded: true, agentId: body.agentId, eventType: body.eventType, anomaliesDetected: anomalies.length, anomalies });
+    } catch (err) {
+      apiError(res, 500, err instanceof Error ? err.message : 'Behavioral event recording failed');
+    }
+    return true;
+  }
+
+  // GET /api/v1/watch/profiler/profile/:agentId — get an agent's behavioral profile
+  const profilerProfileParams = pathname.match(/^\/api\/v1\/watch\/profiler\/profile\/([^/]+)$/);
+  if (profilerProfileParams && method === 'GET') {
+    try {
+      const agentId = decodeURIComponent(profilerProfileParams[1] ?? '');
+      const { BehavioralProfiler } = await import('../watch/behavioralProfiler.js');
+      const profiler = new BehavioralProfiler();
+      const profile = profiler.getProfile(agentId);
+      if (!profile) { apiSuccess(res, { agentId, profile: null, message: 'No profile yet — submit events first' }); return true; }
+      apiSuccess(res, profile);
+    } catch (err) {
+      apiError(res, 500, err instanceof Error ? err.message : 'Profile retrieval failed');
+    }
+    return true;
+  }
+
+  // GET /api/v1/watch/profiler/anomalies/:agentId — get detected anomalies (submit a probe event)
+  const profilerAnomalyParams = pathname.match(/^\/api\/v1\/watch\/profiler\/anomalies\/([^/]+)$/);
+  if (profilerAnomalyParams && method === 'GET') {
+    try {
+      const agentId = decodeURIComponent(profilerAnomalyParams[1] ?? '');
+      const { BehavioralProfiler } = await import('../watch/behavioralProfiler.js');
+      const profiler = new BehavioralProfiler();
+      // Probe with a neutral event; return any detected anomalies
+      const anomalies = profiler.ingest({ agentId, eventType: 'response', timestamp: Date.now() });
+      apiSuccess(res, { agentId, anomalies });
+    } catch (err) {
+      apiError(res, 500, err instanceof Error ? err.message : 'Anomaly retrieval failed');
+    }
+    return true;
+  }
+
   return false;
 }

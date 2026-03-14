@@ -1641,3 +1641,71 @@ export type {
 } from "./lifecycle/lifecycle.js";
 export { lifecycleStatusCli, lifecycleAdvanceCli, parseControlsCsv } from "./lifecycle/lifecycleCli.js";
 export type { LifecycleStatusCliInput, LifecycleAdvanceCliInput } from "./lifecycle/lifecycleCli.js";
+
+// ── ZK Privacy (Pedersen commitments, Schnorr proofs, Shamir sharing) ─────
+export {
+  pedersenCommit,
+  pedersenVerify,
+  pedersenAdd,
+  schnorrProve,
+  schnorrVerify,
+  createZKRangeProof,
+  verifyZKRangeProof,
+  createSelectiveDisclosure,
+  verifySelectiveDisclosure,
+  shamirSplit,
+  shamirReconstruct,
+  createMultiPartyVerification,
+  reconstructMultiPartyResult,
+  commitToEvidence,
+  revealEvidence,
+} from "./vault/zkPrivacy.js";
+export type {
+  PedersenCommitment,
+  SchnorrProof,
+  ZKRangeProof,
+  BitProof,
+  SelectiveDisclosure,
+  MerkleProof,
+  ShamirShare,
+  MultiPartyVerification,
+  EvidenceCommitment,
+} from "./vault/zkPrivacy.js";
+
+// ── Trust Interchange (AMC Trust Token, cross-platform credential exchange) ─
+export {
+  issueTrustToken,
+  verifyTrustToken,
+  TRUST_TRANSLATIONS,
+  translateTrustScores,
+  createVerificationRequest,
+  processVerificationRequest,
+} from "./passport/trustInterchange.js";
+export type {
+  AMCTrustToken,
+  TrustClaim,
+  TrustTranslation,
+  DimensionMapping,
+  FederatedVerificationRequest,
+  FederatedVerificationResponse,
+  TrustNetwork,
+  TrustNetworkNode,
+  TrustNetworkEdge,
+} from "./passport/trustInterchange.js";
+
+// ── Regulatory Automation (RegulatoryMonitor, feed configs, gap analysis) ─
+export {
+  DEFAULT_REGULATORY_FEEDS,
+  RegulatoryMonitor,
+  getRegulatoryChanges,
+} from "./compliance/regulatoryAutomation.js";
+export type {
+  RegulatoryChange,
+  RegulatoryFeed,
+  FeedCheckResult,
+  ComplianceGapAnalysis,
+  ComplianceGap,
+  RemediationStep,
+  RegulatoryImpactAssessment,
+  RegulatoryMonitorConfig,
+} from "./compliance/regulatoryAutomation.js";

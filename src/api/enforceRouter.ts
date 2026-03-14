@@ -100,5 +100,59 @@ export async function handleEnforceRoute(
     return true;
   }
 
+  // POST /api/v1/enforce/formal/verify — verify a property formally
+  if (pathname === '/api/v1/enforce/formal/verify' && method === 'POST') {
+    try {
+      const body = await bodyJsonSchema(req, z.object({
+        property: z.object({
+          id: z.string(),
+          name: z.string(),
+          description: z.string(),
+          formula: z.string(),
+          kind: z.string(),
+          severity: z.string(),
+        }).passthrough().optional(),
+        agentState: z.record(z.unknown()).optional(),
+      }));
+      const { boundedModelCheck, CORE_SAFETY_PROPERTIES } = await import('../enforce/formalVerification.js');
+      const property = (body.property as unknown as Parameters<typeof boundedModelCheck>[0]) ?? CORE_SAFETY_PROPERTIES[0]!;
+      const state = body.agentState as unknown as Parameters<typeof boundedModelCheck>[1] | undefined;
+      const cert = boundedModelCheck(property, state as Parameters<typeof boundedModelCheck>[1]);
+      apiSuccess(res, cert);
+    } catch (err) {
+      if (isRequestBodyError(err)) { apiError(res, err.statusCode, err.message); return true; }
+      apiError(res, 500, err instanceof Error ? err.message : 'Formal verification failed');
+    }
+    return true;
+  }
+
+  // POST /api/v1/enforce/formal/tla-spec — generate TLA+ spec
+  if (pathname === '/api/v1/enforce/formal/tla-spec' && method === 'POST') {
+    try {
+      const { generateTLASpec } = await import('../enforce/formalVerification.js');
+      const spec = generateTLASpec();
+      apiSuccess(res, { spec });
+    } catch (err) {
+      apiError(res, 500, err instanceof Error ? err.message : 'TLA+ spec generation failed');
+    }
+    return true;
+  }
+
+  // POST /api/v1/enforce/formal/certificate — verify a proof certificate
+  if (pathname === '/api/v1/enforce/formal/certificate' && method === 'POST') {
+    try {
+      const body = await bodyJsonSchema(req, z.object({
+        certificate: z.record(z.unknown()),
+      }));
+      const { verifyCertificate } = await import('../enforce/formalVerification.js');
+      const result = verifyCertificate(body.certificate as unknown as Parameters<typeof verifyCertificate>[0]);
+      apiSuccess(res, result);
+    } catch (err) {
+      if (isRequestBodyError(err)) { apiError(res, err.statusCode, err.message); return true; }
+      apiError(res, 500, err instanceof Error ? err.message : 'Certificate verification failed');
+    }
+    return true;
+  }
+
   return false;
 }

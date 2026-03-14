@@ -55,3 +55,27 @@ export type {
   GuardrailConfig, GuardrailViolation, GuardrailResult,
   GuardrailAction, TopicCategory,
 } from './semanticGuardrails.js';
+
+// ── Formal Verification (proof trees, TLA+, certificates) ─────────────────
+export {
+  CORE_SAFETY_PROPERTIES,
+  checkInvariants,
+  boundedModelCheck,
+  verifyPolicyComposition,
+  generateTLASpec,
+  generateTLCConfig,
+  verifyCertificate,
+} from './formalVerification.js';
+export type {
+  ProofNode,
+  InferenceRule,
+  Proposition,
+  ProofCertificate,
+  SystemState,
+  FormalProperty,
+  InvariantCheckResult,
+  PolicyCompositionResult,
+  PolicyConflict,
+  ResolvedPolicy,
+  PolicyRule as FormalPolicyRule,
+} from './formalVerification.js';
