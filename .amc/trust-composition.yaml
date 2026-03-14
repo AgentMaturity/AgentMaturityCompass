@@ -1,0 +1,5 @@
+schemaVersion: 1
+defaultInheritanceMode: strict
+defaultWeight: 1
+blastRadiusThreshold: 0.3
+edges: []

@@ -2156,6 +2156,7 @@ program
     }
     console.log(chalk.bold(`${explanation.questionId} - ${explanation.title}`));
     console.log(`Layer: ${explanation.layerName}`);
+    console.log(chalk.dim("Maturity Levels: L0=Undocumented | L1=Documented | L2=Automated | L3=Evidence-backed | L4=Proactive | L5=Certifiable"));
     console.log("");
     console.log(chalk.cyan("What it measures:"));
     console.log(explanation.whatItMeasures);
@@ -7130,14 +7131,27 @@ ci
   .description("Generate GitHub workflow and signed gate policy")
   .option("--agent <agentId>", "agent ID (overrides global --agent)")
   .action((opts: { agent?: string }) => {
-    const created = initCiForAgent({
-      workspace: process.cwd(),
-      agentId: opts.agent ?? activeAgent(program)
-    });
-    console.log(chalk.green(`CI workflow created: ${created.workflowPath}`));
-    console.log(`Gate policy: ${created.policyPath}`);
-    console.log(`Gate policy signature: ${created.policySigPath}`);
-    console.log(`Expected bundle path: ${created.suggestedBundlePath}`);
+    try {
+      const created = initCiForAgent({
+        workspace: process.cwd(),
+        agentId: opts.agent ?? activeAgent(program)
+      });
+      console.log(chalk.green(`CI workflow created: ${created.workflowPath}`));
+      console.log(`Gate policy: ${created.policyPath}`);
+      console.log(`Gate policy signature: ${created.policySigPath}`);
+      console.log(`Expected bundle path: ${created.suggestedBundlePath}`);
+    } catch (e: unknown) {
+      const msg = toErrorMessage(e);
+      if (msg.includes("Vault locked") || msg.includes("Vault is locked")) {
+        console.error(chalk.red("❌ CI init requires a vault for policy signing."));
+        console.error(chalk.yellow("   The vault stores cryptographic keys used to sign your gate policy."));
+        console.error(chalk.yellow("   Run `amc setup` to create a vault, then re-run `amc ci init`."));
+        console.error(chalk.gray("   For CI environments, set the AMC_VAULT_PASSPHRASE env var."));
+      } else {
+        console.error(chalk.red(`❌ ${msg}`));
+      }
+      process.exit(1);
+    }
   });
 
 ci
@@ -15228,7 +15242,7 @@ shield
 // ── Shield Red Team ──────────────────────────────────────────────────────────
 shield
   .command("red-team")
-  .description("Run a continuous red team campaign against configured target profiles")
+  .description("Run a quick red team campaign (5 attacks on demo target). Tip: For full red-team suite with strategies, use `amc redteam run`")
   .option("--rounds <n>", "Number of attack rounds (default: 1)", "1")
   .option("--categories <list>", "Comma-separated attack categories to use")
   .option("--target <profile>", "Target profile id (default: demo)")
@@ -15265,6 +15279,7 @@ shield
         ],
       });
       console.log(chalk.bold.red(`\n🔴  Red Team Campaign`));
+      console.log(chalk.dim("Tip: For full red-team suite with strategies, use `amc redteam run`"));
       console.log(chalk.gray("Target:"), targetId);
       console.log(chalk.gray("Rounds:"), rounds);
       if (opts.categories) console.log(chalk.gray("Categories:"), opts.categories);

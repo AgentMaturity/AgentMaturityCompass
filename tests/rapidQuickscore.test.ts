@@ -11,11 +11,11 @@ describe("rapidQuickscore", () => {
     expect(uniqueLayers.size).toBe(5);
   });
 
-  test("computes L1 baseline and top recommendations for low scores", () => {
+  test("computes L0 baseline and top recommendations for zero scores (F11: 0% → L0)", () => {
     const result = scoreRapidAssessment({});
     expect(result.totalScore).toBe(0);
     expect(result.percentage).toBe(0);
-    expect(result.preliminaryLevel).toBe("L1");
+    expect(result.preliminaryLevel).toBe("L0");
     expect(result.recommendations).toHaveLength(3);
   });
 

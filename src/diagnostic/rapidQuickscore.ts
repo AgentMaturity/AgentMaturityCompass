@@ -47,7 +47,7 @@ function firstSentence(text: string): string {
   return `${parts[0] ?? normalized}.`;
 }
 
-function preliminaryLevelFromPercent(percentage: number): "L1" | "L2" | "L3" | "L4" | "L5" {
+function preliminaryLevelFromPercent(percentage: number): "L0" | "L1" | "L2" | "L3" | "L4" | "L5" {
   if (percentage >= 85) {
     return "L5";
   }
@@ -60,7 +60,10 @@ function preliminaryLevelFromPercent(percentage: number): "L1" | "L2" | "L3" | "
   if (percentage >= 30) {
     return "L2";
   }
-  return "L1";
+  if (percentage > 0) {
+    return "L1";
+  }
+  return "L0";
 }
 
 export interface RapidQuestionScore {
@@ -84,7 +87,7 @@ export interface RapidQuickscoreResult {
   totalScore: number;
   maxScore: number;
   percentage: number;
-  preliminaryLevel: "L1" | "L2" | "L3" | "L4" | "L5";
+  preliminaryLevel: "L0" | "L1" | "L2" | "L3" | "L4" | "L5";
   questionScores: RapidQuestionScore[];
   recommendations: RapidImprovementRecommendation[];
 }
