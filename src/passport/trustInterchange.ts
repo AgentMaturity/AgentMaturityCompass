@@ -166,7 +166,7 @@ export function verifyTrustToken(
 
   // Check claims integrity
   for (const claim of token.claims) {
-    if (claim.score < 0 || claim.score > 100) reasons.push(`Invalid score for ${claim.dimension}: ${claim.score}`);
+    if (claim.score < 0 || claim.score > getScoringConfig().scale) reasons.push(`Invalid score for ${claim.dimension}: ${claim.score}`);
     if (claim.observedShare < 0 || claim.observedShare > 1) reasons.push(`Invalid observedShare for ${claim.dimension}`);
   }
 

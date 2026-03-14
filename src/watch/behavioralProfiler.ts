@@ -13,6 +13,7 @@
 
 import { EventEmitter } from "node:events";
 import { randomUUID } from "node:crypto";
+import { toDisplayScore } from "../score/scoringScale.js";
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -254,12 +255,12 @@ export class BehavioralProfiler extends EventEmitter {
 
       const alert: TrustDegradationAlert = {
         id: randomUUID(), agentId, timestamp,
-        alertType: score < 30 ? "trust_critical" : "trust_degrading",
+        alertType: score < toDisplayScore(0.3) ? "trust_critical" : "trust_degrading",
         currentTrust: score, previousTrust: previous,
         degradationRate,
         triggeringAnomalies: [],
-        recommendedAction: score < 30
-          ? "IMMEDIATE: Agent below L2 (score < 30) — suspend operations and investigate."
+        recommendedAction: score < toDisplayScore(0.3)
+          ? `IMMEDIATE: Agent below L2 (score < ${toDisplayScore(0.3)}) — suspend operations and investigate.`
           : "REVIEW: Trust degrading — investigate cause within 1 hour.",
       };
 

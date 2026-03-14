@@ -13,7 +13,7 @@
  */
 
 import { createHash, randomBytes, createHmac } from "node:crypto";
-import { toInternalScore, toDisplayScore } from "../score/scoringScale.js";
+import { toInternalScore, toDisplayScore, getScoringConfig } from "../score/scoringScale.js";
 
 // ── Finite Field Arithmetic (mod p) ───────────────────────────────────────
 
@@ -280,7 +280,7 @@ export function createZKRangeProof(
     // Can't prove — value is below threshold
     return {
       id: randomHex(16), agentId, timestamp: Date.now(),
-      claim: `AMC score >= ${threshold}`,
+      claim: `AMC score >= ${threshold} (scale: 0-${getScoringConfig().scale})`,
       valueCommitment: "", deltaCommitment: "",
       bitCommitments: [], bitProofs: [],
       reconstructionProof: "", challengeHash: "",
@@ -336,7 +336,7 @@ export function createZKRangeProof(
 
   return {
     id: randomHex(16), agentId, timestamp: Date.now(),
-    claim: `AMC maturity >= ${levelName} (score >= ${threshold})`,
+    claim: `AMC maturity >= ${levelName} (score >= ${threshold}, scale: 0-${getScoringConfig().scale})`,
     valueCommitment: valueCommit.commitment,
     deltaCommitment: deltaCommit.commitment,
     bitCommitments,

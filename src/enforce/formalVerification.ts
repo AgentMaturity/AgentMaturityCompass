@@ -14,7 +14,7 @@
 
 import { createHash } from "node:crypto";
 import { type MaturityLevel } from "../score/formalSpec.js";
-import { scoreToLevel, toDisplayScore } from "../score/scoringScale.js";
+import { scoreToLevel, toDisplayScore, toInternalScore } from "../score/scoringScale.js";
 
 // ── Proof Tree Types ───────────────────────────────────────────────────────
 
@@ -527,7 +527,7 @@ export function boundedModelCheck(
               allStates.push({
                 agentId,
                 trustScore: trust,
-                maturityLevel: scoreToLevel(trust / 100),
+                maturityLevel: scoreToLevel(toInternalScore(trust)),
                 activeScopes: scopes,
                 pendingActions: [],
                 lastVerifiedAt: Date.now() - stale * 3600000,
@@ -651,7 +651,7 @@ export function verifyPolicyComposition(policies: PolicyRule[][]): PolicyComposi
     for (const scopes of [[], ["read"], ["read", "write"], ["read", "write", "execute"]]) {
       for (const fail of [0, 2, 3, 5]) {
         testStates.push({
-          agentId: "test", trustScore: trust, maturityLevel: scoreToLevel(trust / 100),
+          agentId: "test", trustScore: trust, maturityLevel: scoreToLevel(toInternalScore(trust)),
           activeScopes: scopes, pendingActions: [],
           lastVerifiedAt: Date.now(), evidenceCount: 5,
           selfReportedShare: 0.3, policyViolations: 0,
