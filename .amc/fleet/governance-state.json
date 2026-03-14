@@ -7,7 +7,9 @@
     "byEnvironment": {}
   },
   "slos": [],
-  "lastScores": {},
+  "lastScores": {
+    "default": 0
+  },
   "lastSloStatus": {},
   "alerts": []
 }

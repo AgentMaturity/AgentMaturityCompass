@@ -126,7 +126,24 @@ export function initBlobKey(workspace: string): BlobKeyCurrent {
   return current;
 }
 
+// Deterministic fallback key used in --no-sign / AMC_NO_SIGN=1 mode.
+// Not secret — only used when vault is intentionally bypassed for read-only/unsigned runs.
+const NO_SIGN_FALLBACK_KEY = Buffer.from("amc-no-sign-fallback-key-32bytes!", "utf8").subarray(0, 32);
+
+function makeFallbackBlobKey(): BlobKeyCurrent {
+  return blobKeyCurrentSchema.parse({
+    v: 1,
+    keyVersion: 1,
+    createdTs: 0,
+    algorithm: "AES-256-GCM"
+  });
+}
+
 export function ensureBlobKey(workspace: string): BlobKeyCurrent {
+  // In --no-sign mode, skip vault-dependent key init/load
+  if (process.env.AMC_NO_SIGN === "1") {
+    return makeFallbackBlobKey();
+  }
   if (!pathExists(blobCurrentKeyPath(workspace))) {
     return initBlobKey(workspace);
   }
@@ -147,6 +164,10 @@ export function rotateBlobKey(workspace: string): BlobKeyCurrent {
 }
 
 export function readBlobKeyMaterial(workspace: string, keyVersion: number): Buffer {
+  // In --no-sign mode, use fallback key so vault isn't required for blob ops
+  if (process.env.AMC_NO_SIGN === "1") {
+    return NO_SIGN_FALLBACK_KEY;
+  }
   const value = getVaultSecret(workspace, blobKeySecretName(keyVersion));
   if (!value) {
     throw new Error(`blob key material missing for version ${keyVersion}`);
