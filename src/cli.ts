@@ -4040,6 +4040,8 @@ program
   .option("--iterations <n>", "number of iterations per model", "1")
   .option("--output <path>", "save comparison report to file")
   .option("--json", "output as JSON", false)
+  .option("--badge", "generate comparison badge SVG alongside output", false)
+  .option("--format <fmt>", "output format: text | markdown", "text")
   .action(async (items: string[], opts: {
     agent?: string;
     window: string;
@@ -4047,6 +4049,8 @@ program
     iterations: string;
     output?: string;
     json: boolean;
+    badge: boolean;
+    format: string;
   }) => {
     if (items.length < 2) {
       throw new Error("At least 2 items required for comparison");
@@ -4115,7 +4119,139 @@ program
         return;
       }
 
-      // Human-readable output
+      // ── Helper: render ASCII radar chart ──────────────────────────────
+      function renderAsciiRadar(
+        labels: string[],
+        datasets: Array<{ label: string; values: number[] }>
+      ): string {
+        const width = 60;
+        const lines: string[] = [];
+        lines.push("  RADAR CHART (0–5 scale)");
+        lines.push("  " + "─".repeat(width));
+        for (let i = 0; i < labels.length; i++) {
+          const dim = (labels[i] ?? "").padEnd(20).slice(0, 20);
+          let bar = `  ${dim} │`;
+          for (const ds of datasets) {
+            const val = Math.max(0, Math.min(5, ds.values[i] ?? 0));
+            const blocks = Math.round(val * 6);
+            const color = ds.label === datasets[0]?.label ? "#4AEF79" : "#FFB347";
+            bar += " " + chalk.hex(color)("█".repeat(blocks)).padEnd(blocks < 30 ? 30 : blocks) + ` ${val.toFixed(1)}`;
+          }
+          lines.push(bar);
+        }
+        lines.push("  " + "─".repeat(width));
+        lines.push("  Legend: " + datasets.map((ds, i) => chalk.hex(i === 0 ? "#4AEF79" : "#FFB347")(`█ ${ds.label}`)).join("  "));
+        return lines.join("\n");
+      }
+
+      // ── Helper: build dimension breakdown table ───────────────────────
+      function buildDimensionBreakdown(): string[] {
+        const out: string[] = [];
+        const dims = comparison.comparisonMatrix[0]?.layerScores ?? [];
+        if (dims.length === 0) return out;
+
+        out.push(chalk.hex('#4AEF79')("Dimension-by-Dimension Breakdown:"));
+        const colW = Math.max(12, ...comparison.comparisonMatrix.map(r => r.model.length));
+        const header = ["Dimension".padEnd(22), ...comparison.comparisonMatrix.map(r => r.model.padEnd(colW)), "Winner".padEnd(colW), "Δ%"].join(" │ ");
+        out.push(header);
+        out.push("─".repeat(header.length));
+
+        for (const layer of dims) {
+          const scores = comparison.comparisonMatrix.map(r => {
+            const ls = r.layerScores.find(l => l.layerName === layer.layerName);
+            return ls?.avgFinalLevel ?? 0;
+          });
+          const maxScore = Math.max(...scores);
+          const minScore = Math.min(...scores);
+          const winnerIdx = scores.indexOf(maxScore);
+          const winner = comparison.comparisonMatrix[winnerIdx]?.model ?? "-";
+          const delta = maxScore > 0 ? ((maxScore - minScore) / maxScore * 100).toFixed(1) : "0.0";
+          const scoreCells = scores.map((s, idx) => {
+            const str = s.toFixed(2).padEnd(colW);
+            return idx === winnerIdx ? chalk.green(str) : str;
+          });
+          const dimName = (layer.layerName ?? "").slice(0, 22).padEnd(22);
+          out.push([dimName, ...scoreCells, winner.padEnd(colW), `+${delta}%`].join(" │ "));
+        }
+        return out;
+      }
+
+      // ── Helper: build markdown report ────────────────────────────────
+      function buildMarkdownReport(): string {
+        const lines: string[] = [
+          "# AMC Multi-Model Comparison Report",
+          "",
+          `Generated: ${new Date().toISOString()}`,
+          `Agent: ${agentId}`,
+          "",
+          "## Model Performance Matrix",
+          "",
+          `| Model | Overall | Integrity | Trust Label |`,
+          `|-------|---------|-----------|-------------|`
+        ];
+        for (const r of comparison.comparisonMatrix) {
+          lines.push(`| ${r.model} | L${Math.floor(r.overallScore)} | ${r.integrityIndex.toFixed(3)} | ${r.trustLabel} |`);
+        }
+        lines.push("");
+        lines.push("## Summary");
+        lines.push("");
+        lines.push(`- **Best model:** ${comparison.summary.bestModel}`);
+        lines.push(`- **Worst model:** ${comparison.summary.worstModel}`);
+        lines.push(`- **Average integrity:** ${comparison.summary.avgIntegrityIndex.toFixed(3)}`);
+        lines.push("");
+        if (comparison.summary.significantDifferences.length > 0) {
+          lines.push("## Significant Differences by Dimension");
+          lines.push("");
+          lines.push("| Dimension | Best Model | Worst Model | Δ Score |");
+          lines.push("|-----------|-----------|-------------|---------|");
+          for (const d of comparison.summary.significantDifferences) {
+            lines.push(`| ${d.layer} | ${d.bestModel} | ${d.worstModel} | ${d.delta.toFixed(2)} |`);
+          }
+          lines.push("");
+        }
+        lines.push("## Dimension Radar");
+        lines.push("");
+        const dims = comparison.comparisonMatrix[0]?.layerScores ?? [];
+        for (const layer of dims) {
+          lines.push(`### ${layer.layerName}`);
+          for (const r of comparison.comparisonMatrix) {
+            const ls = r.layerScores.find(l => l.layerName === layer.layerName);
+            const score = ls?.avgFinalLevel ?? 0;
+            const bar = "█".repeat(Math.round(score * 6));
+            lines.push(`- **${r.model}**: ${bar} (${score.toFixed(2)})`);
+          }
+          lines.push("");
+        }
+        return lines.join("\n");
+      }
+
+      if (opts.format === "markdown") {
+        const md = buildMarkdownReport();
+        if (opts.output) {
+          const fs = await import("fs");
+          fs.writeFileSync(opts.output, md, "utf-8");
+          console.log(chalk.green(`✓ Markdown comparison report saved to: ${opts.output}`));
+        } else {
+          console.log(md);
+        }
+        // Badge generation alongside markdown
+        if (opts.badge && opts.output) {
+          const { generateBadgeSvg, scoreToLevel } = await import("./cert/badgeGenerator.js");
+          const best = comparison.comparisonMatrix.find(r => r.model === comparison.summary.bestModel);
+          if (best) {
+            const score = best.overallScore * 20; // 0–5 → 0–100
+            const level = scoreToLevel(score);
+            const svg = generateBadgeSvg(score, level, `compare:${agentId}`);
+            const badgePath = opts.output.replace(/\.[^.]+$/, "") + "-badge.svg";
+            const fs = await import("fs");
+            fs.writeFileSync(badgePath, svg, "utf-8");
+            console.log(chalk.green(`✓ Comparison badge saved to: ${badgePath}`));
+          }
+        }
+        return;
+      }
+
+      // Human-readable text output
       console.log(chalk.bold("🧭 Multi-Model Agent Evaluation Comparison"));
       console.log("");
       
@@ -4140,6 +4276,26 @@ program
       console.log(formatRow(headers));
       console.log(colWidths.map(w => "-".repeat(w)).join("-|-"));
       rows.forEach(row => console.log(formatRow(row)));
+
+      // Dimension breakdown
+      console.log("");
+      const dimLines = buildDimensionBreakdown();
+      dimLines.forEach(l => console.log(l));
+
+      // ASCII Radar chart
+      console.log("");
+      const dims = comparison.comparisonMatrix[0]?.layerScores ?? [];
+      if (dims.length > 0) {
+        const radarLabels = dims.map(l => l.layerName);
+        const radarDatasets = comparison.comparisonMatrix.map(r => ({
+          label: r.model,
+          values: dims.map(d => {
+            const ls = r.layerScores.find(l => l.layerName === d.layerName);
+            return ls?.avgFinalLevel ?? 0;
+          })
+        }));
+        console.log(renderAsciiRadar(radarLabels, radarDatasets));
+      }
       
       console.log("");
       console.log(chalk.hex('#4AEF79')("Summary:"));
@@ -4160,6 +4316,21 @@ program
         fs.writeFileSync(opts.output, JSON.stringify(comparison, null, 2), "utf-8");
         console.log("");
         console.log(chalk.green(`✓ Full comparison data saved to: ${opts.output}`));
+      }
+
+      // Badge generation
+      if (opts.badge) {
+        const { generateBadgeSvg, scoreToLevel } = await import("./cert/badgeGenerator.js");
+        const best = comparison.comparisonMatrix.find(r => r.model === comparison.summary.bestModel);
+        if (best) {
+          const score = best.overallScore * 20; // 0–5 scale → 0–100
+          const level = scoreToLevel(score);
+          const svg = generateBadgeSvg(score, level, `compare:${agentId}`);
+          const badgePath = opts.output ? opts.output.replace(/\.[^.]+$/, "") + "-badge.svg" : "comparison-badge.svg";
+          const fs = await import("fs");
+          fs.writeFileSync(badgePath, svg, "utf-8");
+          console.log(chalk.green(`✓ Comparison badge saved to: ${badgePath}`));
+        }
       }
     }
   });
@@ -7882,7 +8053,10 @@ cert
   .requiredOption("--agent <id>", "agent ID")
   .requiredOption("--output <path>", "output certificate path (.pdf or .json)")
   .option("--valid-days <n>", "certificate validity period in days", "30")
-  .action((opts: { agent: string; output: string; validDays: string }) => {
+  .option("--badge", "also generate an SVG badge alongside the certificate", false)
+  .option("--url", "also generate a shareable verification URL", false)
+  .option("--base-url <url>", "base URL for shareable verification links", "https://amc.trust")
+  .action((opts: { agent: string; output: string; validDays: string; badge: boolean; url: boolean; baseUrl: string }) => {
     const validDays = Number(opts.validDays);
     if (!Number.isFinite(validDays) || validDays <= 0) {
       throw new Error("--valid-days must be a positive number.");
@@ -7900,6 +8074,26 @@ cert
     console.log(`headHash=${generated.envelope.payload.evidenceHashChain.headHash}`);
     if (generated.sidecarJsonPath) {
       console.log(`sidecar=${generated.sidecarJsonPath}`);
+    }
+
+    // Generate badge SVG
+    if (opts.badge) {
+      const { generateBadgeSvg, scoreToLevel } = require("./cert/badgeGenerator.js") as typeof import("./cert/badgeGenerator.js");
+      const score = generated.envelope.payload.score;
+      const level = scoreToLevel(score);
+      const svg = generateBadgeSvg(score, level, opts.agent);
+      const badgePath = opts.output.replace(/\.[^.]+$/, "") + "-badge.svg";
+      writeFileAtomic(badgePath, svg, 0o644);
+      console.log(chalk.green(`badge=${badgePath}`));
+    }
+
+    // Generate shareable verification URL
+    if (opts.url) {
+      const certId = generated.envelope.payload.certificateId;
+      const verificationUrl = `${opts.baseUrl}/verify/${certId}`;
+      const shareUrl = `${opts.baseUrl}/cert/${opts.agent}/${certId}`;
+      console.log(`verificationUrl=${verificationUrl}`);
+      console.log(`shareUrl=${shareUrl}`);
     }
   });
 
@@ -8996,6 +9190,192 @@ compliance
   .action((reportA: string, reportB: string) => {
     const diff = complianceDiffCli(readUtf8(resolve(process.cwd(), reportA)), readUtf8(resolve(process.cwd(), reportB)));
     console.log(JSON.stringify(diff, null, 2));
+  });
+
+compliance
+  .command("risk-classify")
+  .description("Classify agent into EU AI Act risk tiers (UNACCEPTABLE / HIGH / LIMITED / MINIMAL)")
+  .option("--agent <agentId>", "agent ID (overrides global --agent)")
+  .option("--capabilities <json>", "JSON object of agent capabilities (see docs)")
+  .option("--biometric", "agent performs biometric identification", false)
+  .option("--critical-infra", "agent manages critical infrastructure", false)
+  .option("--education", "agent makes education/assessment decisions", false)
+  .option("--employment", "agent makes employment decisions", false)
+  .option("--essential-services", "agent controls access to essential services", false)
+  .option("--law-enforcement", "agent assists law enforcement", false)
+  .option("--migration", "agent handles migration/border control", false)
+  .option("--justice", "agent assists judicial/democratic processes", false)
+  .option("--realtime-biometric", "agent performs real-time biometric ID in public spaces", false)
+  .option("--social-scoring", "agent performs social scoring", false)
+  .option("--subliminal", "agent uses subliminal manipulation techniques", false)
+  .option("--exploits-vulnerabilities", "agent exploits vulnerabilities (age, disability)", false)
+  .option("--emotion-recognition", "agent performs emotion recognition", false)
+  .option("--chatbot", "agent is a chatbot/conversational system", false)
+  .option("--synthetic-content", "agent generates synthetic audio/image/video/text", false)
+  .option("--human-interaction", "agent interacts with humans", false)
+  .option("--safety-component", "agent is a safety component of a regulated product", false)
+  .option("--json", "output as JSON", false)
+  .action((opts: {
+    agent?: string; capabilities?: string;
+    biometric: boolean; criticalInfra: boolean; education: boolean; employment: boolean;
+    essentialServices: boolean; lawEnforcement: boolean; migration: boolean; justice: boolean;
+    realtimeBiometric: boolean; socialScoring: boolean; subliminal: boolean;
+    exploitsVulnerabilities: boolean; emotionRecognition: boolean; chatbot: boolean;
+    syntheticContent: boolean; humanInteraction: boolean; safetyComponent: boolean;
+    json: boolean;
+  }) => {
+    const { classifyEuAiActRisk } = require("./compliance/euAiActClassifier.js") as typeof import("./compliance/euAiActClassifier.js");
+
+    let capabilities: import("./compliance/euAiActClassifier.js").AgentCapabilities = {};
+
+    if (opts.capabilities) {
+      try {
+        capabilities = JSON.parse(opts.capabilities) as typeof capabilities;
+      } catch {
+        console.error(chalk.red("Invalid --capabilities JSON"));
+        process.exit(1);
+      }
+    } else {
+      // Build from individual flags
+      capabilities = {
+        biometricIdentification: opts.biometric,
+        criticalInfrastructure: opts.criticalInfra,
+        education: opts.education,
+        employment: opts.employment,
+        essentialServices: opts.essentialServices,
+        lawEnforcement: opts.lawEnforcement,
+        migrationBorderControl: opts.migration,
+        justiceAdministration: opts.justice,
+        realtimeBiometricPublicSpaces: opts.realtimeBiometric,
+        socialScoring: opts.socialScoring,
+        subliminalManipulation: opts.subliminal,
+        exploitsVulnerabilities: opts.exploitsVulnerabilities,
+        emotionRecognition: opts.emotionRecognition,
+        chatbot: opts.chatbot,
+        syntheticContentGeneration: opts.syntheticContent,
+        humanInteraction: opts.humanInteraction,
+        safetyComponent: opts.safetyComponent
+      };
+    }
+
+    const result = classifyEuAiActRisk(capabilities);
+
+    if (opts.json) {
+      console.log(JSON.stringify(result, null, 2));
+      return;
+    }
+
+    const tierColors: Record<string, string> = {
+      UNACCEPTABLE: "#e05d44",
+      HIGH: "#e4811b",
+      LIMITED: "#dfb317",
+      MINIMAL: "#4c1"
+    };
+    const tierColor = tierColors[result.riskTier] ?? "#555";
+
+    console.log("");
+    console.log(chalk.bold("🇪🇺 EU AI Act Risk Classification"));
+    console.log("");
+    console.log(`Risk Tier: ${chalk.hex(tierColor).bold(result.riskTier)}`);
+    console.log(`Articles: ${result.articles.length > 0 ? result.articles.join(", ") : "none"}`);
+    console.log("");
+    console.log(result.summary);
+    console.log("");
+
+    if (result.findings.length > 0) {
+      console.log(chalk.bold("Findings:"));
+      for (const finding of result.findings) {
+        const sev = finding.severity === "CRITICAL" ? chalk.red(`[${finding.severity}]`)
+          : finding.severity === "HIGH" ? chalk.yellow(`[${finding.severity}]`)
+          : chalk.gray(`[${finding.severity}]`);
+        console.log(`  ${sev} ${finding.title} (${finding.article})`);
+        console.log(chalk.gray(`    ${finding.description}`));
+      }
+      console.log("");
+    }
+
+    if (result.remediation.length > 0) {
+      console.log(chalk.bold("Remediation Checklist:"));
+      for (const item of result.remediation) {
+        const pri = item.priority === "IMMEDIATE" ? chalk.red("⚡") : item.priority === "SHORT_TERM" ? chalk.yellow("🔶") : chalk.gray("🔷");
+        console.log(`  ${pri} [${item.priority}] ${item.action}`);
+        console.log(chalk.gray(`     ${item.article}`));
+      }
+    }
+    console.log("");
+    console.log(chalk.gray("Tip: amc comply roadmap --framework EU_AI_ACT to generate a compliance plan."));
+  });
+
+compliance
+  .command("roadmap")
+  .description("Generate step-by-step compliance plan for a framework")
+  .requiredOption("--framework <framework>", "compliance framework (currently: EU_AI_ACT)")
+  .option("--agent <agentId>", "agent ID (overrides global --agent)")
+  .option("--capabilities <json>", "JSON object of agent capabilities")
+  .option("--risk-tier <tier>", "override risk tier: UNACCEPTABLE|HIGH|LIMITED|MINIMAL")
+  .option("--out <path>", "save roadmap to JSON file")
+  .option("--json", "output as JSON", false)
+  .action((opts: {
+    framework: string; agent?: string; capabilities?: string;
+    riskTier?: string; out?: string; json: boolean;
+  }) => {
+    if (opts.framework.toUpperCase() !== "EU_AI_ACT") {
+      console.error(chalk.red("Currently only --framework EU_AI_ACT is supported for roadmap generation."));
+      process.exit(1);
+    }
+
+    const { classifyEuAiActRisk, generateEuAiActRoadmap } = require("./compliance/euAiActClassifier.js") as typeof import("./compliance/euAiActClassifier.js");
+
+    let classification: ReturnType<typeof classifyEuAiActRisk>;
+
+    if (opts.riskTier) {
+      // Use provided risk tier with empty findings
+      const tier = opts.riskTier.toUpperCase() as import("./compliance/euAiActClassifier.js").EuAiActRiskTier;
+      classification = { riskTier: tier, articles: [], findings: [], remediation: [], summary: "", classifiedAt: Date.now() };
+    } else {
+      let capabilities: import("./compliance/euAiActClassifier.js").AgentCapabilities = {};
+      if (opts.capabilities) {
+        try {
+          capabilities = JSON.parse(opts.capabilities) as typeof capabilities;
+        } catch {
+          console.error(chalk.red("Invalid --capabilities JSON"));
+          process.exit(1);
+        }
+      }
+      classification = classifyEuAiActRisk(capabilities);
+    }
+
+    const roadmap = generateEuAiActRoadmap(classification);
+
+    if (opts.json || opts.out) {
+      const output = JSON.stringify(roadmap, null, 2);
+      if (opts.out) {
+        writeFileAtomic(resolve(process.cwd(), opts.out), output, 0o644);
+        console.log(chalk.green(`EU AI Act compliance roadmap saved to: ${opts.out}`));
+      } else {
+        console.log(output);
+      }
+      return;
+    }
+
+    console.log("");
+    console.log(chalk.bold("🇪🇺 EU AI Act Compliance Roadmap"));
+    console.log(`Risk Tier: ${chalk.bold(roadmap.riskTier)}`);
+    console.log(`Steps: ${roadmap.totalSteps} | Estimated: ${roadmap.estimatedTotalWeeks} weeks`);
+    console.log("");
+
+    let currentPhase = "";
+    for (const step of roadmap.phases) {
+      if (step.phase !== currentPhase) {
+        currentPhase = step.phase;
+        console.log(chalk.hex('#4AEF79').bold(`\n${currentPhase}`));
+      }
+      const priIcon = step.priority === "CRITICAL" ? "🔴" : step.priority === "HIGH" ? "🟠" : "🟡";
+      console.log(`  ${priIcon} Step ${step.step}: ${chalk.bold(step.title)} (~${step.estimatedWeeks}w)`);
+      console.log(chalk.gray(`     ${step.description}`));
+      console.log(chalk.gray(`     Articles: ${step.articles.join(", ")}`));
+    }
+    console.log("");
   });
 
 federate
@@ -15404,6 +15784,73 @@ shield
     } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
   });
 
+shield
+  .command("analyze-mcp <path-or-url>")
+  .description("Scan an MCP server definition for security risks (score L0–L5)")
+  .option("--json", "Output as JSON")
+  .option("--out <path>", "Save scan report to JSON file")
+  .action(async (pathOrUrl: string, opts: { json?: boolean; out?: string }) => {
+    try {
+      const { analyzeMcpSecurity } = await import("./shield/mcpSecurityAnalyzer.js");
+      const result = analyzeMcpSecurity(pathOrUrl);
+
+      if (opts.out) {
+        writeFileAtomic(resolve(process.cwd(), opts.out), JSON.stringify(result, null, 2), 0o644);
+        console.log(chalk.green(`MCP security scan saved to: ${opts.out}`));
+      }
+
+      if (opts.json) {
+        console.log(JSON.stringify(result, null, 2));
+        return;
+      }
+
+      const levelColors: Record<string, string> = {
+        L5: "#4c1", L4: "#2ecc40", L3: "#3d9970", L2: "#ff851b", L1: "#e4811b", L0: "#e05d44"
+      };
+      const lc = levelColors[result.securityLevel] ?? "#555";
+
+      console.log(chalk.bold.cyan("\n🛡️  MCP Security Scan"));
+      console.log(chalk.gray("Path:"), pathOrUrl);
+      console.log(chalk.gray("Security Level:"), chalk.hex(lc).bold(`${result.securityLevel} — ${result.riskLabel}`));
+      console.log(chalk.gray("Score:"), `${result.securityScore}/100`);
+      if (result.serverInfo.name) {
+        console.log(chalk.gray("Server:"), result.serverInfo.name, result.serverInfo.version ? `v${result.serverInfo.version}` : "");
+      }
+      console.log(chalk.gray("Tools:"), result.serverInfo.toolCount);
+      console.log("");
+
+      const criticalFindings = result.findings.filter(f => f.severity === "CRITICAL");
+      const highFindings = result.findings.filter(f => f.severity === "HIGH");
+      const otherFindings = result.findings.filter(f => f.severity !== "CRITICAL" && f.severity !== "HIGH");
+
+      if (result.findings.length > 0) {
+        console.log(chalk.bold(`Findings (${result.findings.length}):`));
+        for (const finding of [...criticalFindings, ...highFindings, ...otherFindings]) {
+          const icon = finding.severity === "CRITICAL" ? chalk.red("🔴")
+            : finding.severity === "HIGH" ? chalk.yellow("🟠")
+            : finding.severity === "MEDIUM" ? chalk.gray("🟡")
+            : chalk.gray("🔵");
+          console.log(`  ${icon} [${finding.severity}] ${chalk.bold(finding.id)}: ${finding.title}`);
+          console.log(chalk.gray(`       ${finding.description}`));
+          console.log(chalk.cyan(`       → ${finding.recommendation}`));
+          if (finding.evidence) console.log(chalk.gray(`       Evidence: ${finding.evidence}`));
+          console.log("");
+        }
+      } else {
+        console.log(chalk.green("  ✓ No security findings detected."));
+        console.log("");
+      }
+
+      if (result.recommendations.length > 0) {
+        console.log(chalk.bold("Recommendations:"));
+        result.recommendations.forEach(r => console.log(`  ${r}`));
+        console.log("");
+      }
+
+      console.log(result.summary);
+    } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
+  });
+
 // ============================================================
 // ENFORCE — Policy enforcement and guardrails
 // ============================================================
@@ -15661,6 +16108,173 @@ watch
       console.log(chalk.gray("Passed:"), result.passed ? chalk.green("yes") : chalk.red("no"));
       console.log(chalk.gray("Findings:"), result.findings?.length ?? 0);
       if (result.findings?.length) result.findings.forEach(f => console.log(chalk[f.passed ? "green" : "red"](`  • [${f.severity}] ${f.title}: ${f.detail}`)));
+    } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
+  });
+
+watch
+  .command("start")
+  .description("Start continuous production monitoring for an agent")
+  .requiredOption("--agent <id>", "Agent ID to monitor")
+  .option("--interval <seconds>", "Re-scoring interval in seconds", "300")
+  .option("--alert-threshold <score>", "Alert when score drops below this (0-100)", "0")
+  .option("--score-drop-threshold <n>", "Alert when score drops by this fraction (0-1)", "0.1")
+  .option("--no-webhooks", "Disable webhook notifications")
+  .action(async (opts: {
+    agent: string;
+    interval: string;
+    alertThreshold: string;
+    scoreDropThreshold: string;
+    webhooks: boolean;
+  }) => {
+    try {
+      const { ContinuousMonitor } = await import("./watch/continuousMonitor.js");
+      const { globalDashboardFeed } = await import("./watch/index.js");
+      const workspace = process.cwd();
+      const agentId = opts.agent;
+      const intervalMs = Math.max(10000, parseInt(opts.interval, 10) * 1000);
+      const scoreDropThreshold = parseFloat(opts.scoreDropThreshold);
+
+      const monitor = new ContinuousMonitor({
+        workspace,
+        agentId,
+        scoringIntervalMs: intervalMs,
+        driftCheckIntervalMs: intervalMs * 3,
+        scoreDropThreshold: Number.isFinite(scoreDropThreshold) ? scoreDropThreshold : 0.1,
+        enableWebhooks: opts.webhooks
+      });
+
+      globalDashboardFeed.registerMonitor(agentId, monitor.getMetrics());
+
+      monitor.on("started", (data: { agentId: string }) => {
+        console.log(chalk.green(`  ✓ Monitoring started for agent: ${data.agentId}`));
+        console.log(chalk.gray(`  Interval: ${intervalMs / 1000}s | Score-drop alert: ${scoreDropThreshold * 100}%`));
+      });
+
+      monitor.on("score", (event: { data: { score: number; delta: number | null } }) => {
+        const d = event.data;
+        const deltaStr = d.delta !== null ? ` (${d.delta > 0 ? "+" : ""}${(d.delta * 100).toFixed(1)}%)` : "";
+        const icon = d.delta !== null && d.delta < -scoreDropThreshold ? chalk.red("📉") : chalk.hex('#4AEF79')("📊");
+        console.log(`${icon} Score: ${d.score.toFixed(3)}${deltaStr}  [${new Date().toISOString()}]`);
+        globalDashboardFeed.updateMetrics(agentId, monitor.getMetrics());
+        globalDashboardFeed.pushEvent(event as never);
+      });
+
+      monitor.on("drift", (event: { data: { triggered: boolean; reasons: string[] } }) => {
+        if (event.data.triggered) {
+          console.log(chalk.yellow(`  ⚠️  Drift detected: ${event.data.reasons.join(", ")}`));
+        }
+        globalDashboardFeed.pushEvent(event as never);
+      });
+
+      monitor.on("anomaly", (event: { data: { type: string; severity: string; message: string } }) => {
+        const icon = event.data.severity === "CRITICAL" || event.data.severity === "HIGH" ? chalk.red("🔍") : chalk.yellow("🔍");
+        console.log(`${icon} Anomaly [${event.data.severity}]: ${event.data.message}`);
+        globalDashboardFeed.pushEvent(event as never);
+      });
+
+      monitor.on("alert", (event: { data: { summary: string } }) => {
+        console.log(chalk.red(`  🚨 ALERT: ${event.data.summary}`));
+        globalDashboardFeed.pushEvent(event as never);
+      });
+
+      monitor.on("error", (event: { data: { code: string; message: string } }) => {
+        console.error(chalk.red(`  ❌ Error [${event.data.code}]: ${event.data.message}`));
+      });
+
+      await monitor.start();
+      console.log(chalk.gray("  Press Ctrl+C to stop..."));
+
+      process.on("SIGINT", async () => {
+        console.log(chalk.gray("\n  Stopping monitor..."));
+        await monitor.stop();
+        globalDashboardFeed.unregisterMonitor(agentId);
+        const metrics = monitor.getMetrics();
+        console.log(chalk.green(`  ✓ Monitor stopped. Total scores: ${metrics.totalScores}`));
+        process.exit(0);
+      });
+
+      await new Promise<never>(() => {});
+    } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
+  });
+
+watch
+  .command("status")
+  .description("Show all monitored agents and their current state")
+  .option("--json", "Output as JSON")
+  .action(async (opts: { json?: boolean }) => {
+    try {
+      const { globalDashboardFeed } = await import("./watch/index.js");
+      const snapshot = globalDashboardFeed.getSnapshot();
+
+      if (opts.json) {
+        console.log(JSON.stringify(snapshot, null, 2));
+        return;
+      }
+
+      console.log(chalk.bold.hex('#4AEF79')("\n👁️  Watch Status"));
+      console.log(chalk.gray(`Active monitors: ${snapshot.globalStats.activeMonitors}`));
+      console.log(chalk.gray(`Total incidents: ${snapshot.globalStats.totalIncidents}`));
+      console.log(chalk.gray(`Total anomalies: ${snapshot.globalStats.totalAnomalies}`));
+      console.log();
+
+      if (Object.keys(snapshot.agents).length === 0) {
+        console.log(chalk.gray("  No active monitors. Start one with: amc watch start --agent <id>"));
+        return;
+      }
+
+      for (const [agentId, metrics] of Object.entries(snapshot.agents)) {
+        const score = metrics.currentScore;
+        const scoreStr = score !== null ? score.toFixed(3) : "N/A";
+        const delta = metrics.scoreDelta;
+        const deltaStr = delta !== null ? ` (${delta > 0 ? "+" : ""}${(delta * 100).toFixed(1)}%)` : "";
+        const icon = score === null ? "⚪" : score >= 0.7 ? chalk.green("🟢") : score >= 0.5 ? chalk.yellow("🟡") : chalk.red("🔴");
+        console.log(`${icon} ${chalk.bold(agentId)}`);
+        console.log(`     Score: ${scoreStr}${deltaStr}`);
+        console.log(`     Incidents: ${metrics.activeIncidents}  Anomalies: ${metrics.anomaliesDetected}`);
+        console.log(`     Last scored: ${metrics.lastScoredAt ? new Date(metrics.lastScoredAt).toISOString() : "never"}`);
+        console.log(`     Uptime: ${(metrics.uptime / 1000 / 60).toFixed(1)} min`);
+        console.log();
+      }
+    } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
+  });
+
+watch
+  .command("alerts")
+  .description("Show recent alerts for a monitored agent")
+  .requiredOption("--agent <id>", "Agent ID")
+  .option("--limit <n>", "Number of events to show", "20")
+  .option("--json", "Output as JSON")
+  .action(async (opts: { agent: string; limit: string; json?: boolean }) => {
+    try {
+      const { globalDashboardFeed } = await import("./watch/index.js");
+      const limit = parseInt(opts.limit, 10) || 20;
+      const events = globalDashboardFeed.getRecentEvents(limit * 5);
+      const agentEvents = events.filter(
+        (e: { agentId: string; type: string }) =>
+          e.agentId === opts.agent && (e.type === "alert" || e.type === "drift" || e.type === "anomaly")
+      ).slice(-limit);
+
+      if (opts.json) {
+        console.log(JSON.stringify(agentEvents, null, 2));
+        return;
+      }
+
+      console.log(chalk.bold.hex('#4AEF79')(`\n🚨 Alerts for agent: ${opts.agent}`));
+      if (agentEvents.length === 0) {
+        console.log(chalk.gray("  No recent alerts."));
+        return;
+      }
+
+      for (const event of agentEvents) {
+        const ts = new Date((event as { ts: number }).ts).toISOString();
+        const type = (event as { type: string }).type.toUpperCase();
+        const data = (event as { data: unknown }).data;
+        const icon = type === "ALERT" ? chalk.red("🚨") : type === "DRIFT" ? chalk.yellow("⚠️ ") : chalk.gray("🔍");
+        const summary = typeof data === "object" && data !== null
+          ? (data as Record<string, unknown>)["summary"] ?? (data as Record<string, unknown>)["message"] ?? JSON.stringify(data)
+          : String(data);
+        console.log(`${icon} [${ts}] ${chalk.bold(type)}: ${summary}`);
+      }
     } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
   });
 
