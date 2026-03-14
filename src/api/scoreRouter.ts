@@ -477,5 +477,167 @@ export async function handleScoreRoute(
     return true;
   }
 
+  // ── Cross-Agent Trust Routes ───────────────────────────────────────────────
+
+  // POST /api/v1/score/trust/verify-claim — verify an agent identity claim against a policy
+  if (pathname === '/api/v1/score/trust/verify-claim' && method === 'POST') {
+    try {
+      const body = await bodyJson<{
+        claim: unknown;
+        policy: unknown;
+        sharedSecret?: string;
+      }>(req);
+      if (!body.claim || !body.policy) {
+        apiError(res, 400, 'Missing required fields: claim, policy');
+        return true;
+      }
+      const { verifyAgentClaim } = await import('../score/crossAgentTrust.js');
+      const secret = body.sharedSecret ?? process.env['AMC_TRUST_SECRET'] ?? 'amc-trust-default';
+      // Dates may arrive as strings — coerce issuedAt / expiresAt
+      const claim = body.claim as Record<string, unknown>;
+      if (typeof claim['issuedAt'] === 'string') claim['issuedAt'] = new Date(claim['issuedAt'] as string);
+      if (typeof claim['expiresAt'] === 'string') claim['expiresAt'] = new Date(claim['expiresAt'] as string);
+      const result = verifyAgentClaim(
+        claim as unknown as import('../score/crossAgentTrust.js').AgentIdentityClaim,
+        body.policy as unknown as import('../score/crossAgentTrust.js').TrustPolicyRule,
+        secret,
+      );
+      apiSuccess(res, result);
+    } catch (err) {
+      apiError(res, 500, err instanceof Error ? err.message : 'verify-claim failed');
+    }
+    return true;
+  }
+
+  // POST /api/v1/score/trust/create-claim — create a new agent identity claim
+  if (pathname === '/api/v1/score/trust/create-claim' && method === 'POST') {
+    try {
+      const body = await bodyJson<{
+        agentId: string;
+        publicKeyHash: string;
+        issuingWorkspace: string;
+        sharedSecret?: string;
+        amcScore?: number;
+        amcLevel?: string;
+        amcPassportId?: string;
+        ttlHours?: number;
+      }>(req);
+      if (!body.agentId || !body.publicKeyHash || !body.issuingWorkspace) {
+        apiError(res, 400, 'Missing required fields: agentId, publicKeyHash, issuingWorkspace');
+        return true;
+      }
+      const { createAgentClaim } = await import('../score/crossAgentTrust.js');
+      const secret = body.sharedSecret ?? process.env['AMC_TRUST_SECRET'] ?? 'amc-trust-default';
+      const result = createAgentClaim(
+        body.agentId,
+        body.publicKeyHash,
+        body.issuingWorkspace,
+        secret,
+        {
+          amcScore: body.amcScore,
+          amcLevel: body.amcLevel,
+          amcPassportId: body.amcPassportId,
+          ttlHours: body.ttlHours,
+        },
+      );
+      apiSuccess(res, result, 201);
+    } catch (err) {
+      apiError(res, 500, err instanceof Error ? err.message : 'create-claim failed');
+    }
+    return true;
+  }
+
+  // POST /api/v1/score/trust/transitive — compute transitive trust between two agents
+  if (pathname === '/api/v1/score/trust/transitive' && method === 'POST') {
+    try {
+      const body = await bodyJson<{
+        graph: unknown;
+        sourceAgent: string;
+        targetAgent: string;
+        opts?: { maxHops?: number; decayPerHop?: number; now?: number };
+      }>(req);
+      if (!body.graph || !body.sourceAgent || !body.targetAgent) {
+        apiError(res, 400, 'Missing required fields: graph, sourceAgent, targetAgent');
+        return true;
+      }
+      const { computeTransitiveTrust } = await import('../score/crossAgentTrust.js');
+      const result = computeTransitiveTrust(
+        body.graph as unknown as import('../score/crossAgentTrust.js').TrustGraph,
+        body.sourceAgent,
+        body.targetAgent,
+        body.opts,
+      );
+      apiSuccess(res, result ?? { found: false, message: 'No trust path found between agents' });
+    } catch (err) {
+      apiError(res, 500, err instanceof Error ? err.message : 'transitive trust computation failed');
+    }
+    return true;
+  }
+
+  // POST /api/v1/score/trust/decay — apply temporal decay to a trust score
+  if (pathname === '/api/v1/score/trust/decay' && method === 'POST') {
+    try {
+      const body = await bodyJson<{
+        originalScore: number;
+        establishedAt: number;
+        config: unknown;
+        now?: number;
+      }>(req);
+      if (body.originalScore === undefined || body.establishedAt === undefined || !body.config) {
+        apiError(res, 400, 'Missing required fields: originalScore, establishedAt, config');
+        return true;
+      }
+      const { applyTemporalDecay } = await import('../score/crossAgentTrust.js');
+      const decayedScore = applyTemporalDecay(
+        body.originalScore,
+        body.establishedAt,
+        body.config as unknown as import('../score/crossAgentTrust.js').TemporalDecayConfig,
+        body.now,
+      );
+      apiSuccess(res, { originalScore: body.originalScore, decayedScore, decayApplied: body.originalScore - decayedScore });
+    } catch (err) {
+      apiError(res, 500, err instanceof Error ? err.message : 'temporal decay failed');
+    }
+    return true;
+  }
+
+  // POST /api/v1/score/trust/inherited — compute inherited trust from parent delegation
+  if (pathname === '/api/v1/score/trust/inherited' && method === 'POST') {
+    try {
+      const body = await bodyJson<{
+        delegatorTrust: unknown;
+        delegateScore: number;
+        policy: unknown;
+        delegationDepth?: number;
+      }>(req);
+      if (!body.delegatorTrust || body.delegateScore === undefined || !body.policy) {
+        apiError(res, 400, 'Missing required fields: delegatorTrust, delegateScore, policy');
+        return true;
+      }
+      const { computeInheritedTrust } = await import('../score/crossAgentTrust.js');
+      const result = computeInheritedTrust(
+        body.delegatorTrust as unknown as import('../score/crossAgentTrust.js').TrustVerificationResult,
+        body.delegateScore,
+        body.policy as unknown as import('../score/crossAgentTrust.js').DelegationPolicy,
+        body.delegationDepth,
+      );
+      apiSuccess(res, result);
+    } catch (err) {
+      apiError(res, 500, err instanceof Error ? err.message : 'inherited trust computation failed');
+    }
+    return true;
+  }
+
+  // GET /api/v1/score/trust/decay-presets — list INDUSTRY_DECAY_PRESETS
+  if (pathname === '/api/v1/score/trust/decay-presets' && method === 'GET') {
+    try {
+      const { INDUSTRY_DECAY_PRESETS } = await import('../score/crossAgentTrust.js');
+      apiSuccess(res, { presets: INDUSTRY_DECAY_PRESETS, count: Object.keys(INDUSTRY_DECAY_PRESETS).length });
+    } catch (err) {
+      apiError(res, 500, err instanceof Error ? err.message : 'Failed to load decay presets');
+    }
+    return true;
+  }
+
   return false;
 }

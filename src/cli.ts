@@ -15251,6 +15251,45 @@ shield
     } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
   });
 
+shield
+  .command("trust-pipeline")
+  .description("Run end-to-end trust pipeline for an agent action")
+  .requiredOption("--agent <id>", "Agent ID")
+  .requiredOption("--action <action>", "Action to evaluate")
+  .requiredOption("--tool <tool>", "Tool name")
+  .option("--session <id>", "Session ID", "cli-session")
+  .option("--workspace <id>", "Workspace ID")
+  .option("--json", "Output as JSON")
+  .action(async (opts: { agent: string; action: string; tool: string; session: string; workspace?: string; json?: boolean }) => {
+    try {
+      const { runTrustPipeline } = await import("./shield/trustPipeline.js");
+      const result = await runTrustPipeline({
+        agentId: opts.agent,
+        action: opts.action,
+        toolName: opts.tool,
+        parameters: {},
+        sessionId: opts.session,
+        workspaceId: opts.workspace ?? process.cwd(),
+      });
+      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
+      console.log(chalk.bold.cyan("\n🛡️  Trust Pipeline"));
+      console.log(chalk.gray("Agent:"), opts.agent);
+      console.log(chalk.gray("Allowed:"), result.allowed ? chalk.green("yes") : chalk.red("no"));
+      console.log(chalk.gray("Overall Trust Score:"), result.overallTrustScore.toFixed(1));
+      console.log(chalk.gray("Processing Time:"), `${result.processingTimeMs}ms`);
+      console.log(chalk.gray("Stages:"));
+      const sg = result.stages.shieldGate;
+      console.log(chalk.gray("  Shield Gate:"), sg.passed ? chalk.green("passed") : chalk.red("failed"), `(score: ${sg.trustScore.toFixed(2)})`);
+      const fv = result.stages.formalVerification;
+      console.log(chalk.gray("  Formal Verification:"), fv.passed ? chalk.green("passed") : chalk.yellow("warnings"), `(${fv.propertiesVerified} properties verified)`);
+      const zk = result.stages.zkProof;
+      console.log(chalk.gray("  ZK Proof:"), zk.generated ? chalk.green("generated") : chalk.red("not generated"), zk.claim ? `(${zk.claim})` : "");
+      const tt = result.stages.trustToken;
+      console.log(chalk.gray("  Trust Token:"), tt.issued ? chalk.green("issued") : chalk.red("not issued"), tt.tokenId ? `(${tt.tokenId.slice(0, 12)}...)` : "");
+      console.log(chalk.gray("Evidence chain:"), result.evidenceChain.length, "hashes");
+    } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
+  });
+
 // ============================================================
 // ENFORCE — Policy enforcement and guardrails
 // ============================================================

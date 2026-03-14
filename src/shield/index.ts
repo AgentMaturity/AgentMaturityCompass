@@ -64,6 +64,10 @@ export {
 } from "./validators/index.js";
 export type { ValidationResult as ShieldValidationResult, ValidationViolation, ValidatorConfig } from "./validators/index.js";
 
+// ── Trust Pipeline (end-to-end trust orchestration) ──────────────────────
+export { runTrustPipeline } from './trustPipeline.js';
+export type { TrustPipelineInput, TrustPipelineResult } from './trustPipeline.js';
+
 // ── Continuous Red Team (evolutionary adversarial testing) ────────────────
 export { ContinuousRedTeam } from './continuousRedTeam.js';
 export type {

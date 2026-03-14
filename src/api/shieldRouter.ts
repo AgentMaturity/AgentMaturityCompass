@@ -105,6 +105,27 @@ export async function handleShieldRoute(
     return true;
   }
 
+  // POST /api/v1/shield/trust-pipeline/run — run end-to-end trust pipeline
+  if (pathname === '/api/v1/shield/trust-pipeline/run' && method === 'POST') {
+    try {
+      const body = await bodyJsonSchema(req, z.object({
+        agentId: z.string().min(1),
+        action: z.string().min(1),
+        toolName: z.string().min(1),
+        parameters: z.record(z.unknown()).default({}),
+        sessionId: z.string().min(1),
+        workspaceId: z.string().min(1),
+      }));
+      const { runTrustPipeline } = await import('../shield/trustPipeline.js');
+      const result = await runTrustPipeline({ ...body, parameters: body.parameters ?? {} });
+      apiSuccess(res, result);
+    } catch (err) {
+      if (isRequestBodyError(err)) { apiError(res, err.statusCode, err.message); return true; }
+      apiError(res, 500, err instanceof Error ? err.message : 'Trust pipeline failed');
+    }
+    return true;
+  }
+
   // POST /api/v1/shield/red-team/attack — generate a single attack
   if (pathname === '/api/v1/shield/red-team/attack' && method === 'POST') {
     try {
