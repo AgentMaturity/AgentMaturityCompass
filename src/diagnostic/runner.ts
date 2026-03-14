@@ -1370,7 +1370,7 @@ export async function runDiagnostic(input: RunDiagnosticInput, outputMarkdownPat
     };
 
     const reportJsonSha256 = sha256Hex(canonicalize(baseReport));
-    const runSealSig = ledger.signRunHash(reportJsonSha256);
+    const runSealSig = input.noSign ? "unsigned" : ledger.signRunHash(reportJsonSha256);
 
     const report: DiagnosticReport = {
       ...baseReport,

@@ -317,6 +317,18 @@ export function vaultStatus(workspace: string): {
   };
 }
 
+// Cache for ephemeral keys used in --no-sign mode (process lifetime only, not persisted)
+const ephemeralKeyCache = new Map<string, string>();
+
+function generateEphemeralKey(kind: VaultKeyKind): string {
+  const cached = ephemeralKeyCache.get(kind);
+  if (cached) return cached;
+  const { privateKey } = generateKeyPairSync("ed25519");
+  const pem = privateKey.export({ format: "pem", type: "pkcs8" }).toString();
+  ephemeralKeyCache.set(kind, pem);
+  return pem;
+}
+
 export function getVaultPrivateKeyPem(workspace: string, kind: VaultKeyKind): string {
   const session = sessionFor(workspace);
   if (!session.unlocked || !session.payload) {
@@ -327,6 +339,11 @@ export function getVaultPrivateKeyPem(workspace: string, kind: VaultKeyKind): st
   }
   const refreshed = sessionFor(workspace);
   if (!refreshed.unlocked || !refreshed.payload) {
+    // R2/R6: When --no-sign mode is active, use ephemeral (non-persistent) keys so operations
+    // can proceed without vault access. Signatures will be valid format but not verifiable later.
+    if (process.env.AMC_NO_SIGN === "1") {
+      return generateEphemeralKey(kind);
+    }
     throw new Error("🔐 Vault locked. Run `amc vault unlock` first, or `amc setup` for first-time setup. Use --no-sign to skip signing where supported.");
   }
   if (kind === "monitor") {

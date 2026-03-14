@@ -2112,7 +2112,7 @@ program
       console.log(chalk.yellow("💡 No evidence collected yet. Your score reflects default (L0) state."));
       console.log(chalk.gray("  To score a real agent, capture evidence first:"));
       console.log(chalk.white("  $"), chalk.cyan("amc wrap <runtime> -- <your-agent-command>"), chalk.gray("  # Capture agent behavior"));
-      console.log(chalk.white("  $"), chalk.cyan("amc evidence ingest --source <logfile>"), chalk.gray("  # Or import existing logs"));
+      console.log(chalk.white("  $"), chalk.cyan("amc evidence collect"), chalk.gray("               # Guided wizard to connect and capture evidence"));
       console.log(chalk.white("  $"), chalk.cyan("amc quickscore"), chalk.gray("  # Then re-score"));
     }
 
@@ -2257,9 +2257,17 @@ program
       } else {
         throw new Error(
           [
-            "amc up requires AMC_VAULT_PASSPHRASE in non-interactive shells.",
+            "🔐 Vault passphrase required in non-interactive shells.",
+            "",
+            "Option 1 — set passphrase (recommended):",
             "  export AMC_VAULT_PASSPHRASE='your-passphrase'",
-            "  amc up"
+            "  amc up",
+            "",
+            "Option 2 — first-time setup (generates passphrase):",
+            "  amc setup",
+            "",
+            "Option 3 — run without signing (view-only mode):",
+            "  AMC_VAULT_PASSPHRASE='' amc up  # scoring and viewing only, no artifact signing"
           ].join("\n")
         );
       }
@@ -7511,6 +7519,7 @@ assurance
   .option("--out <path>", "output markdown path")
   .option("--format <format>", "output format: text|sarif", "text")
   .option("--verbose", "show full scenario-level detail with payloads and reasons", false)
+  .option("--no-sign", "skip vault/artifact signing (packs still run)", false)
   .action(
     async (opts: {
       agent?: string;
@@ -7524,6 +7533,7 @@ assurance
       window: string;
       windowDays?: string;
       out?: string;
+      sign: boolean; // Commander inverts --no-sign to sign=false
     }) => {
       const scope = (opts.scope ?? "agent").toLowerCase();
       if (scope === "workspace" || scope === "node") {
@@ -7548,6 +7558,11 @@ assurance
         console.log(`Findings: ${run.findings.findings.length}`);
         return;
       }
+      const noSign = !opts.sign;
+      if (noSign) {
+        process.env.AMC_NO_SIGN = "1";
+        console.log(chalk.yellow("⚠️  Running without artifact signing (--no-sign). Results are valid but unsigned."));
+      }
       const report = await runAssurance({
         workspace: process.cwd(),
         agentId: opts.id ?? opts.agent ?? activeAgent(program),
@@ -7555,8 +7570,10 @@ assurance
         runAll: opts.all,
         mode: opts.mode,
         window: opts.window,
-        outputMarkdownPath: opts.out ? resolve(process.cwd(), opts.out) : undefined
+        outputMarkdownPath: opts.out ? resolve(process.cwd(), opts.out) : undefined,
+        noSign
       });
+      if (noSign) delete process.env.AMC_NO_SIGN;
       // SARIF output
       if (opts.format === "sarif") {
         const sarifRules = (report.packResults ?? []).map((p, i) => ({
@@ -8911,11 +8928,22 @@ compliance
 compliance
   .command("report")
   .description("Generate evidence-linked compliance report")
-  .requiredOption("--framework <framework>", `one of: ${frameworkChoices().join(", ")}`)
+  .option("--framework <framework>", `one of: ${frameworkChoices().join(", ")}`)
   .option("--window <window>", "window (e.g. 14d)", "30d")
   .option("--out <path>", "output path (.md or .json)")
   .option("--agent <agentId>", "agent ID (overrides global --agent)")
-  .action((opts: { framework: string; window: string; out?: string; agent?: string }) => {
+  .action((opts: { framework?: string; window: string; out?: string; agent?: string }) => {
+    // R3: If --framework is missing, list available frameworks and exit gracefully
+    if (!opts.framework) {
+      const available = frameworkChoices();
+      console.log(chalk.bold("\n📋 Available compliance frameworks:\n"));
+      for (const fw of available) {
+        console.log(`  ${chalk.cyan(fw)}`);
+      }
+      console.log(`\n${chalk.gray("Usage:")} amc comply report --framework ${chalk.cyan("EU_AI_ACT")}`);
+      console.log(chalk.gray("\nTip: use --out report.json for machine-readable output\n"));
+      process.exit(0);
+    }
     // Default to Markdown output to stdout-friendly file (F13)
     const defaultToMarkdown = !opts.out;
     if (!opts.out) {
@@ -10421,8 +10449,14 @@ fleet
   .description("Generate trust composition report across fleet")
   .option("--window <window>", "evidence window", "30d")
   .option("--output <path>", "output path")
-  .action(async (opts: { window: string; output?: string }) => {
+  .option("--no-sign", "skip vault/artifact signing (report still generates, just unsigned)")
+  .action(async (opts: { window: string; output?: string; sign: boolean }) => {
     const workspace = process.cwd();
+    const noSign = !opts.sign;
+    if (noSign) {
+      process.env.AMC_NO_SIGN = "1";
+      console.log(chalk.yellow("⚠️  Running without artifact signing (--no-sign). Report is valid but unsigned."));
+    }
     const agents = listAgents(workspace).map((r) => r.id);
     const effectiveAgents = agents.length > 0 ? agents : ["default"];
     const reports = [];
@@ -10433,6 +10467,7 @@ fleet
         targetName: "default",
         claimMode: "auto",
         agentId,
+        noSign,
       });
       reports.push(report);
     }
@@ -10456,6 +10491,7 @@ fleet
       const bounded = r.boundedBy ? ` (bounded by ${r.boundedBy})` : "";
       console.log(`  ${r.agentId}: own=${r.ownIntegrityIndex.toFixed(3)} composite=${r.compositeIntegrityIndex.toFixed(3)} [${r.compositeTrustLabel}]${bounded}`);
     }
+    if (noSign) delete process.env.AMC_NO_SIGN;
   });
 
 fleet
@@ -17784,6 +17820,17 @@ dashboard
     console.log(chalk.green(`\n🌐  Dashboard serving at ${handle.url}`));
     console.log(chalk.gray(`View: ${opts.view || "engineer"}`));
     console.log(chalk.gray("Press Ctrl+C to stop\n"));
+
+    // R5: Auto-open browser
+    try {
+      const { exec: execChild } = await import("node:child_process");
+      const platform = process.platform;
+      const openCmd = platform === "darwin" ? "open" : platform === "win32" ? "start" : "xdg-open";
+      execChild(`${openCmd} ${handle.url}`);
+    } catch {
+      // Ignore errors — browser open is best-effort
+    }
+
     await new Promise<void>((resolvePromise) => {
       const shutdown = async () => {
         process.off("SIGINT", shutdown);

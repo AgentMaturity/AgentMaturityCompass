@@ -179,6 +179,7 @@ export interface RunDiagnosticInput {
   claimMode?: "auto" | "owner" | "harness";
   runtimeForHarness?: RuntimeName;
   agentId?: string;
+  noSign?: boolean; // Skip vault/artifact signing — report still generates, just unsigned
 }
 
 export interface DiagnosticReport {

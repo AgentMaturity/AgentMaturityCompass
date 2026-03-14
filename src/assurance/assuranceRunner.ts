@@ -34,6 +34,7 @@ export interface RunAssuranceInput {
   mode: "supervise" | "sandbox";
   window: string;
   outputMarkdownPath?: string;
+  noSign?: boolean; // Skip vault/signing requirements — packs still run, no artifact signing
 }
 
 export interface VerifyAssuranceResult {
@@ -408,7 +409,7 @@ export async function runAssurance(input: RunAssuranceInput): Promise<AssuranceR
       runSealSig: ""
     };
     const reportHash = sha256Hex(canonicalize(baseReport));
-    const reportSig = ledger.signRunHash(reportHash);
+    const reportSig = input.noSign ? "unsigned" : ledger.signRunHash(reportHash);
     const report: AssuranceReport = {
       ...baseReport,
       reportJsonSha256: reportHash,

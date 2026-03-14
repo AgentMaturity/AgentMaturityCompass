@@ -1,4 +1,157 @@
 # AMC UX/UI Audit Report — 10 Novice User Personas
+
+---
+
+## Re-Audit (Post-Fix)
+**Re-audited:** 2026-03-14 (post commits 082144e + ea5a24b)  
+**Method:** Every command below was actually executed. No simulations.  
+**Baseline:** Original audit rated average **2.1/5** across 10 personas (30 friction points).
+
+---
+
+### Updated Ratings Table
+
+| # | Persona | Role | Before | After | Δ | Critical remaining issues |
+|---|---------|------|--------|-------|---|--------------------------|
+| 1 | Sarah | Junior Dev | ⭐⭐ 2/5 | ⭐⭐⭐ 3/5 | +1 | Non-interactive quickstart still useless; L-scale clearer now |
+| 2 | Jake | DevOps | ⭐⭐⭐ 3/5 | ⭐⭐⭐⭐ 4/5 | +1 | `ci init` still vault-blocked; `ci gate` alias works; `ci print` fixed |
+| 3 | Priya | Compliance | ⭐ 1/5 | ⭐⭐⭐ 3/5 | +2 | Defaults to .md now; coverage % shown; `comply report` still needs `--framework` prompt |
+| 4 | Marcus | Security | ⭐⭐ 2/5 | ⭐⭐⭐ 3/5 | +1 | Vault still blocks all assurance packs; red-team tip added; two-command confusion better labeled |
+| 5 | Elena | CTO | ⭐⭐ 2/5 | ⭐⭐⭐ 3/5 | +1 | `fleet status` works now; dashboard still no auto-open |
+| 6 | Tom | Data Scientist | ⭐⭐⭐ 3/5 | ⭐⭐⭐⭐ 4/5 | +1 | `--score` fallback hint added; `industry-adjust` output unchanged |
+| 7 | Aisha | Enterprise Arch | ⭐ 1/5 | ⭐⭐⭐ 3/5 | +2 | **Trust commands fully fixed** — no more "require is not defined"; trust-report still vault-blocked |
+| 8 | Carlos | API Dev | ⭐⭐ 2/5 | ⭐⭐⭐ 3/5 | +1 | `api routes` and `api docs` now work; `amc up` still requires vault passphrase |
+| 9 | Maya | PM | ⭐⭐ 2/5 | ⭐⭐⭐⭐ 4/5 | +2 | **Template variables fixed**; L-scale defined inline; improve roadmap clearer |
+| 10 | Ryan | Contributor | ⭐⭐⭐ 3/5 | ⭐⭐⭐⭐ 4/5 | +1 | Pack scaffold now ESM; `amc pack test .` documented; `evidence ingest` reference still broken |
+
+**New average: 3.4/5** (up from 2.1/5). +1.3 stars overall. Significant improvement — most critical bugs fixed — but 3 systemic issues remain unfixed.
+
+---
+
+### Resolved Friction Points (✅ Fixed in commits 082144e + ea5a24b)
+
+| ID | Was | Now |
+|----|-----|-----|
+| F1 | `trust-init`, `trust-add-edge`, `trust-edges` crash: "require is not defined" | ✅ All trust commands work. trust-init initializes, trust-add-edge returns edge IDs, trust-edges lists edges. |
+| F2 | `explain AMC-1.1` shows raw `{{stakeholders}}`, `{{primaryTasks}}` | ✅ Template variables resolved: "for stakeholders and decision-makers" |
+| F3 | `assurance run --scope full` documented but broken | ✅ Help footer now correctly says `amc assurance run --all` |
+| F4 | `amc fleet status` returned "unknown command 'status'" | ✅ Works: shows agents count, avg score, baseline, health |
+| F6 | Pack scaffold used CommonJS `module.exports` in ESM project | ✅ Scaffold now generates `index.mjs` with `export default {}` and full JSDoc |
+| F8 | L0-L5 scale never defined in CLI output | ✅ Inline legend added to `quickscore`: "L0=Undocumented \| L1=Documented \| L2=Automated \| L3=Evidence-backed \| L4=Proactive \| L5=Certifiable" |
+| F10 | Two competing red-team commands with no differentiation | ✅ `amc shield red-team` now shows: "Tip: For full red-team suite with strategies, use `amc redteam run`" |
+| F11 | 0% score = L1 maturity (contradictory) | ✅ Fixed: 0% score now correctly shows L0 |
+| F12 | `ci init` vault error: no explanation of what vault is | ✅ Better message: "The vault stores cryptographic keys. Run `amc setup` to create a vault... For CI environments, set the AMC_VAULT_PASSPHRASE env var." |
+| F15 | `ci print` outputs `node dist/cli.js` instead of `amc` | ✅ Output now uses `amc` commands correctly |
+| F16 | `amc ci gate` alias missing | ✅ `check\|gate` registered — both `amc ci gate` and `amc ci check` work |
+| F21 | `pack search` returns 0 with no guidance | ✅ Now shows: "Built-in packs: amc assurance list / Create your own: amc pack init" |
+| F23 | `pack init` without `--name` creates pack named "undefined" | ✅ Without `--name` in fresh dir, creates pack with dir name. In project dir: shows "❌ package.json already exists" |
+| F24 | No `amc pack test` command | ✅ `amc pack test .` documented in pack init next steps; runs correctly when cd'd to pack dir |
+| F25 | `fleet health` all zeros with no "how to add agents" path | ✅ Now shows: "No scored agents yet. Score your first agent: amc quickscore" |
+| F30 | `pack init` doesn't link to CONTRIBUTING.md or ASSURANCE_LAB.md | ✅ Next steps now include: "Pack authoring guide: docs/ASSURANCE_LAB.md / Contributing: CONTRIBUTING.md" |
+| F9 | 357 commands with no "start here" path | ✅ Role-based quick start block added to every help output. Format coverage: decimal → percentage |
+| QW3 | Compliance coverage shown as "0.458" | ✅ Now shown as "45.8% (INSUFFICIENT)" |
+| F7-partial | Quickstart silent L0 default | ✅ Now shows explicit warning: "⚠  No TTY detected — defaulting all answers to L0. For interactive assessment, run: amc quickscore" |
+
+---
+
+### Remaining Friction Points (❌ Still broken or insufficient)
+
+#### 🔴 CRITICAL
+
+**R1 — `evidence ingest` command doesn't exist (broken reference in quickscore output)**  
+`quickscore` tells users: `$ amc evidence ingest --source <logfile>`. Running `amc evidence ingest` returns `error: unknown command 'ingest'`. The `evidence` namespace has only: `collect`, `verify`, `export`. This is a dead-end command reference that every new user will hit after their first quickscore.  
+**Fix:** Either add `amc evidence ingest --source <file>` as an alias for `collect`, or update quickscore output to say `amc evidence collect`.
+
+#### 🟠 HIGH
+
+**R2 — Vault lock still blocks `assurance run --all` with no bypass**  
+The most prominent assurance command (`amc assurance run --all`) still returns: "🔐 Vault locked." The error message is better, but the outcome is the same — Marcus (and every security user) cannot run any of the 80+ assurance packs without completing vault setup first. There is still no `--demo`, `--dry-run`, or `--no-sign` bypass.  
+**Fix:** Add `amc assurance run --all --no-sign` to run packs without signing results. Or add an `amc demo` mode that runs a curated set of 3-5 packs with fake signing for evaluation purposes.
+
+**R3 — `comply report` still requires `--framework` flag with no interactive prompt**  
+Running `amc comply report` without arguments returns the same terse error as before: `error: required option '--framework <framework>' not specified`. Priya still has to guess the command structure. The fix would be one line: prompt interactively when framework is missing.  
+**Fix:**  
+```
+$ amc comply report
+? Select compliance framework: (Use arrow keys)
+  ❯ EU_AI_ACT   — EU AI Act (High-Risk AI)
+    SOC2        — SOC 2 Type II
+    NIST_AI_RMF — NIST AI Risk Management Framework
+    ISO_42001   — ISO/IEC 42001 AI Management
+    ...
+```
+
+**R4 — `amc up` still requires vault passphrase in non-interactive shells**  
+Carlos tries `amc up` and gets: "amc up requires AMC_VAULT_PASSPHRASE in non-interactive shells." No demo/dry-run mode. Carlos still can't start Studio to explore the API without completing vault setup.  
+**Fix:** Add `amc up --read-only` or `amc up --demo` that starts Studio in a restricted mode without requiring the vault.
+
+**R5 — `amc dashboard open` doesn't open the browser**  
+Elena runs `amc dashboard open`, the terminal blocks with "Dashboard serving at http://127.0.0.1:3210", and she has to manually open Chrome and type the URL. Every other "open" command in every other CLI tool opens the browser automatically.  
+**Fix:** `open http://127.0.0.1:3210` (macOS) / `xdg-open` (Linux) after server starts.
+
+**R6 — `fleet trust-report` still blocked by vault**  
+Aisha can now successfully initialize trust, add edges, and list them — but `trust-report` still returns "🔐 Vault locked." After spending time setting up the trust graph, the final report is inaccessible. This is the most frustrating type of UX failure: completing 80% of a workflow only to hit a wall at the end.  
+**Fix:** Allow `trust-report` to generate an unsigned report. Add `--no-sign` flag.
+
+#### 🟡 MEDIUM
+
+**R7 — `amc pack init` creates files in current directory, not a named subdirectory**  
+`amc pack init --name mypack` creates `index.mjs`, `package.json`, `src/`, `test/` in the current directory — not in a `mypack/` subdirectory. If Ryan runs this from his home directory or any existing project, it pollutes the directory. The `✅ Initialized assurance pack at /private/tmp` message makes it look correct, but a user running from their home dir would be confused.  
+**Fix:** Create files inside `<name>/` subdirectory, or add `--dir <path>` flag.
+
+**R8 — `amc pack test` must be run from inside the pack directory**  
+Ryan runs `amc pack test` from inside the AMC project and gets: "No index.js found in /Users/sid/AgentMaturityCompass." The command should either accept a path argument (and it does: `amc pack test .` only documented in next steps, not in help), or default to searching for any pack in the tree.  
+**Status:** Partially fixed — next steps say `amc pack test .` but `amc pack test --help` doesn't make the path argument obvious.
+
+**R9 — `score industry-adjust` still requires manual `--score` input**  
+When Tom runs `amc score industry-adjust --industry healthcare` without `--score`, he now gets: "No --score provided and no agent score available. Run `amc quickscore` first, or provide --score <0-1>". Better than the raw error before, but still requires a two-step process. The tool knows about the current agent score — it should just read it automatically.  
+**Fix:** Auto-read from `.amc/` agent score file: `const score = await readCurrentAgentScore(agentId) ?? promptForScore()`.
+
+**R10 — Compliance report still contains dense hash IDs and "Config trusted: NO" without fix guidance**  
+The generated `compliance-eu_ai_act.md` still contains: `hash=23941bf91946bdd7f7f6fcc818024fd798441c23507ccf68d6ed389c1adad7de` and `Config trusted: NO (compliance maps missing)` with no actionable next step.  
+**Fix:** Replace hash display with `[evidence ref]` links or truncated IDs. Add "Fix: `amc comply init`" inline next to "Config trusted: NO".
+
+**R11 — `--help` output grew from 357 to 409 lines**  
+The role-based quick-start and namespace shortcuts were added (good), but the main `--help` is now longer. The problem isn't the footer additions — it's the raw command list that still has no grouping, no categories, no "most common" section at the top.  
+**Fix:** Group commands under collapsible headers or a tiered display (`--help` for core commands, `--help --all` for full list).
+
+---
+
+### New Issues Found (Not in Original Audit)
+
+**N1 — `amc pack init` without `--name` creates a pack named after the directory with no warning**  
+In a fresh empty directory, `amc pack init` (no name) creates files with the directory name as the pack name. No confirmation prompt, no warning. A user running this from `/tmp/myproject` gets a pack named "myproject". In the original audit this was F23 (creates "undefined") — that was fixed, but the interactive prompt was not added.
+
+**N2 — `amc evidence collect` wizard exists but is not linked from `quickscore` next steps**  
+The `evidence collect` guided wizard is exactly what Sarah needs after her first quickscore, but quickscore's next steps still reference the non-existent `evidence ingest` command instead of pointing to `evidence collect`.
+
+---
+
+### Recommendations to Reach 5/5 on Every Persona
+
+| Persona | Gap to 5/5 | Estimated effort |
+|---------|------------|-----------------|
+| Sarah (⭐⭐⭐) | Force-interactive `quickscore` with a TTY; fix `evidence ingest` → `evidence collect` reference | 1 day |
+| Jake (⭐⭐⭐⭐) | Add `amc ci init --no-sign` bypass for vault-less CI setup | 2 hours |
+| Priya (⭐⭐⭐) | Interactive framework prompt for `comply report`; fix hash IDs and "Config trusted: NO" guidance | 1 day |
+| Marcus (⭐⭐⭐) | Add `--no-sign` to `assurance run`; create `amc demo` mode | 1-2 days |
+| Elena (⭐⭐⭐) | Auto-open browser in `dashboard open`; add `amc fleet overview` as one-shot exec summary | 2 hours |
+| Tom (⭐⭐⭐⭐) | Auto-read agent score in `industry-adjust`; explain when adjusted != raw | 2 hours |
+| Aisha (⭐⭐⭐) | Add `--no-sign` to `trust-report`; show trust graph visualization | 4 hours |
+| Carlos (⭐⭐⭐) | Add `amc up --demo` (no vault); start Studio auto-opens API docs | 1 day |
+| Maya (⭐⭐⭐⭐) | Connect `improve` roadmap to PM-readable language; add "what does L3 mean for my product?" | 4 hours |
+| Ryan (⭐⭐⭐⭐) | Create pack in named subdirectory; fix `pack test` path UX | 2 hours |
+
+**Single highest-impact fix:** R2 (vault bypass for assurance run) — unblocks Marcus, Aisha, Carlos, and Jake in one shot. ~1 day of work for +0.5 stars across 4 personas.
+
+**Second highest-impact fix:** R1 (fix `evidence ingest` reference) — it's one line of text change, fixes a dead-end for every new user. ~5 minutes.
+
+---
+
+_Re-audit performed 2026-03-14 by subagent. All commands executed live against commit ea5a24b._
+
+---
+
 **Audited:** 2026-03-14  
 **CLI Entry Point:** `npx tsx src/cli.ts`  
 **Method:** Live command execution — all outputs are real, not simulated  

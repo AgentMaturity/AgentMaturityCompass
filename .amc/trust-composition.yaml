@@ -2,4 +2,13 @@ schemaVersion: 1
 defaultInheritanceMode: strict
 defaultWeight: 1
 blastRadiusThreshold: 0.3
-edges: []
+edges:
+  - id: edge_cf9f430c-1c1
+    fromAgentId: agent-a
+    toAgentId: agent-b
+    handoffId: handoff_97fae551
+    purpose: task-delegation
+    riskTier: med
+    inheritanceMode: strict
+    weight: 1
+    createdTs: 1773474387520
