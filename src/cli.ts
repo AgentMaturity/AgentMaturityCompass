@@ -8056,7 +8056,7 @@ cert
   .option("--badge", "also generate an SVG badge alongside the certificate", false)
   .option("--url", "also generate a shareable verification URL", false)
   .option("--base-url <url>", "base URL for shareable verification links", "https://amc.trust")
-  .action((opts: { agent: string; output: string; validDays: string; badge: boolean; url: boolean; baseUrl: string }) => {
+  .action(async (opts: { agent: string; output: string; validDays: string; badge: boolean; url: boolean; baseUrl: string }) => {
     const validDays = Number(opts.validDays);
     if (!Number.isFinite(validDays) || validDays <= 0) {
       throw new Error("--valid-days must be a positive number.");
@@ -8078,7 +8078,7 @@ cert
 
     // Generate badge SVG
     if (opts.badge) {
-      const { generateBadgeSvg, scoreToLevel } = require("./cert/badgeGenerator.js") as typeof import("./cert/badgeGenerator.js");
+      const { generateBadgeSvg, scoreToLevel } = await import("./cert/badgeGenerator.js");
       const score = generated.envelope.payload.score;
       const level = scoreToLevel(score);
       const svg = generateBadgeSvg(score, level, opts.agent);
@@ -9215,7 +9215,7 @@ compliance
   .option("--human-interaction", "agent interacts with humans", false)
   .option("--safety-component", "agent is a safety component of a regulated product", false)
   .option("--json", "output as JSON", false)
-  .action((opts: {
+  .action(async (opts: {
     agent?: string; capabilities?: string;
     biometric: boolean; criticalInfra: boolean; education: boolean; employment: boolean;
     essentialServices: boolean; lawEnforcement: boolean; migration: boolean; justice: boolean;
@@ -9224,7 +9224,7 @@ compliance
     syntheticContent: boolean; humanInteraction: boolean; safetyComponent: boolean;
     json: boolean;
   }) => {
-    const { classifyEuAiActRisk } = require("./compliance/euAiActClassifier.js") as typeof import("./compliance/euAiActClassifier.js");
+    const { classifyEuAiActRisk } = await import("./compliance/euAiActClassifier.js");
 
     let capabilities: import("./compliance/euAiActClassifier.js").AgentCapabilities = {};
 
@@ -9315,7 +9315,7 @@ compliance
   .option("--risk-tier <tier>", "override risk tier: UNACCEPTABLE|HIGH|LIMITED|MINIMAL")
   .option("--out <path>", "save roadmap to JSON file")
   .option("--json", "output as JSON", false)
-  .action((opts: {
+  .action(async (opts: {
     framework: string; agent?: string; capabilities?: string;
     riskTier?: string; out?: string; json: boolean;
   }) => {
@@ -9324,7 +9324,7 @@ compliance
       process.exit(1);
     }
 
-    const { classifyEuAiActRisk, generateEuAiActRoadmap } = require("./compliance/euAiActClassifier.js") as typeof import("./compliance/euAiActClassifier.js");
+    const { classifyEuAiActRisk, generateEuAiActRoadmap } = await import("./compliance/euAiActClassifier.js");
 
     let classification: ReturnType<typeof classifyEuAiActRisk>;
 
