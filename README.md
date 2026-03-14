@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://img.shields.io/badge/🧭_AMC-Score_Fix_Ship_AI_Agents-blue?style=for-the-badge&labelColor=1a1a2e" alt="AMC" />
+  <img src="https://img.shields.io/badge/🧭_AMC-Score_Fix_Ship_AI_Agents-4AEF79?style=for-the-badge&labelColor=0a0a0a" alt="AMC" />
 </p>
 
 <h1 align="center">Agent Maturity Compass</h1>
@@ -10,11 +10,11 @@
 </p>
 
 <p align="center">
-  <a href="https://www.npmjs.com/package/agent-maturity-compass"><img src="https://img.shields.io/npm/v/agent-maturity-compass" alt="npm" /></a>
-  <a href="https://www.npmjs.com/package/agent-maturity-compass"><img src="https://img.shields.io/npm/dm/agent-maturity-compass" alt="downloads" /></a>
-  <a href="#"><img src="https://img.shields.io/badge/tests-3%2C311%20passing-brightgreen" alt="tests" /></a>
-  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue" alt="MIT" /></a>
-  <a href="docs/AMC_MASTER_REFERENCE.md"><img src="https://img.shields.io/badge/CLI%20commands-481-blue" alt="commands" /></a>
+  <a href="https://www.npmjs.com/package/agent-maturity-compass"><img src="https://img.shields.io/npm/v/agent-maturity-compass?labelColor=0a0a0a&color=4AEF79" alt="npm" /></a>
+  <a href="https://www.npmjs.com/package/agent-maturity-compass"><img src="https://img.shields.io/npm/dm/agent-maturity-compass?labelColor=0a0a0a&color=4AEF79" alt="downloads" /></a>
+  <a href="#"><img src="https://img.shields.io/badge/tests-3%2C488%20passing-4AEF79?labelColor=0a0a0a" alt="tests" /></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-4AEF79?labelColor=0a0a0a" alt="MIT" /></a>
+  <a href="docs/AMC_MASTER_REFERENCE.md"><img src="https://img.shields.io/badge/CLI%20commands-481-4AEF79?labelColor=0a0a0a" alt="commands" /></a>
 </p>
 
 <p align="center">

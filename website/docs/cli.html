@@ -16,7 +16,7 @@
     .ns-toggle.open + .ns-body, .ns-body.open { display: block; }
     .cmd-count { font-size: 0.75rem; color: var(--text-light); font-weight: 400; font-family: var(--mono); }
     .expand-all { font-size: 0.82rem; color: var(--teal); cursor: pointer; background: none; border: 1px solid var(--border); padding: 5px 14px; border-radius: 6px; font-family: var(--sans); }
-    .expand-all:hover { background: var(--teal-pale); }
+    .expand-all:hover { background: rgba(74,239,121,0.06); }
     #cmd-search { width: 100%; padding: 10px 16px; border: 1px solid var(--border); border-radius: 8px; font-size: 0.9rem; font-family: var(--mono); background: #fff; color: var(--text); outline: none; margin-bottom: 24px; }
     #cmd-search:focus { border-color: var(--teal); box-shadow: 0 0 0 3px rgba(13,110,110,0.08); }
     .highlight-match { background: var(--orange-pale); border-radius: 2px; }
@@ -87,7 +87,7 @@
       <h1 id="overview">CLI Reference</h1>
       <p class="subtitle">Complete reference for all <strong>amc</strong> commands — organized by namespace with examples, flags, and environment variables.</p>
 
-      <div class="callout callout-cream">
+      <div class="callout callout-green">
         <strong>📊 By the numbers</strong>
         The AMC CLI ships with 481 commands across 48 namespaces. Every command supports <code>--help</code> for inline documentation.
       </div>
