@@ -409,7 +409,7 @@ async function renderAgent() {
     )}
   `;
   if (report) {
-    renderBars(document.getElementById("layerBars"), (report.layerScores || []).map((rowItem) => rowItem.avgFinalLevel), "#0f766e");
+    renderBars(document.getElementById("layerBars"), (report.layerScores || []).map((rowItem) => rowItem.avgFinalLevel), "#4AEF79");
   }
 }
 
@@ -1027,7 +1027,7 @@ async function renderOrg() {
         : `<div class="card status-ok">Evidence coverage healthy: OBSERVED ${(observed * 100).toFixed(1)}%, median correlation ${corr.toFixed(3)}.</div>`;
     }
     const layerValues = (node.layerScores || []).map((row) => Number(row.median || 0));
-    renderBars(document.getElementById("orgLayerBars"), layerValues, "#0f766e");
+    renderBars(document.getElementById("orgLayerBars"), layerValues, "#4AEF79");
     renderLine(
       document.getElementById("orgDistLine"),
       [

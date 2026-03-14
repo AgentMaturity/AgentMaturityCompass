@@ -1,6 +1,6 @@
 import { renderLine } from "../charts.js";
 
-export function renderValueTrendChart(canvas, points, color = "#0f766e") {
+export function renderValueTrendChart(canvas, points, color = "#4AEF79") {
   const values = Array.isArray(points)
     ? points
         .map((row) => Number(row?.value))

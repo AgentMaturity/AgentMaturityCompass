@@ -26,7 +26,7 @@ function renderDimensionBars(rows) {
       return `
       <div class="card">
         <strong>${esc(row.dimensionId)}</strong>
-        <div class="bar"><span style="width:${measuredPct}; background:#0f766e"></span></div>
+        <div class="bar"><span style="width:${measuredPct}; background:#4AEF79"></span></div>
         <small>Measured ${measured.toFixed(2)}</small>
         <div class="bar"><span style="width:${targetPct}; background:#2563eb"></span></div>
         <small>Target ${target.toFixed(2)} | Unknown ${Number(row.unknownCount || 0)}</small>

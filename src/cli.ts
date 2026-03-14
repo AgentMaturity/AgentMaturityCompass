@@ -908,7 +908,7 @@ async function wrapWithBridgeToken(params: {
   }).catch(() => {});
   await Promise.allSettled(pendingTelemetry);
 
-  console.log(chalk.cyan("Unified Clarity"));
+  console.log(chalk.hex('#4AEF79')("Unified Clarity"));
   console.log(`agent=${decoded.agentId} workspace=${decoded.workspaceId} provider=${params.provider}`);
   console.log(`bridge=${base}`);
   console.log(`session=${wrapSessionId} exit=${exitCode}`);
@@ -1251,7 +1251,7 @@ program
     }
     console.log(result.text);
     console.log("");
-    console.log(chalk.cyan("Legacy runtime checks:"));
+    console.log(chalk.hex('#4AEF79')("Legacy runtime checks:"));
     for (const line of legacy.lines) {
       console.log(line);
     }
@@ -1352,7 +1352,7 @@ program
       console.log(chalk.bold.yellow(`  ${num}. ${rec.questionId}: ${rec.title}`));
       console.log(chalk.gray(`     Current: L${rec.currentLevel} → Target: L${rec.targetLevel}`));
       console.log(chalk.white(`     Why: ${rec.whyItMatters}`));
-      console.log(chalk.cyan(`     How: ${rec.howToImprove}`));
+      console.log(chalk.hex('#4AEF79')(`     How: ${rec.howToImprove}`));
 
       // Map to specific CLI commands (F28: include --agent <your-agent-id> for context)
       const cmdMap: Record<string, string> = {
@@ -1364,13 +1364,13 @@ program
       };
       const cmd = cmdMap[rec.questionId];
       if (cmd) {
-        console.log(chalk.gray(`     Run:`), chalk.cyan(cmd));
+        console.log(chalk.gray(`     Run:`), chalk.hex('#4AEF79')(cmd));
       }
       console.log("");
     }
 
-    console.log(chalk.gray("  Deep dive into any question:"), chalk.cyan("amc explain <questionId>"));
-    console.log(chalk.gray("  Full diagnostic:"), chalk.cyan("amc score formal-spec <agentId>"));
+    console.log(chalk.gray("  Deep dive into any question:"), chalk.hex('#4AEF79')("amc explain <questionId>"));
+    console.log(chalk.gray("  Full diagnostic:"), chalk.hex('#4AEF79')("amc score formal-spec <agentId>"));
     console.log("");
   });
 
@@ -1484,7 +1484,7 @@ program
       console.log(chalk.bold("  🔌 Supported Frameworks"));
       console.log(chalk.gray("  Use --framework <name> for tailored instructions.\n"));
       for (const fw of fws) {
-        console.log(`  ${chalk.cyan(fw.name)} ${chalk.gray(`(${fw.aliases.join(", ")})`)}`);
+        console.log(`  ${chalk.hex('#4AEF79')(fw.name)} ${chalk.gray(`(${fw.aliases.join(", ")})`)}`);
         console.log(`    ${chalk.gray("Language:")} ${fw.language} ${chalk.gray("| Config:")} ${fw.configFile}`);
         console.log("");
       }
@@ -1640,18 +1640,18 @@ program
 
       const humanPath = path.join(guidesDir, "custom-improvement-guide.md");
       fs.writeFileSync(humanPath, guideToHumanMarkdown(guide), "utf-8");
-      console.log(chalk.green(`\n  ✓ Human guide:`), chalk.cyan(humanPath));
+      console.log(chalk.green(`\n  ✓ Human guide:`), chalk.hex('#4AEF79')(humanPath));
 
       const agentPath = path.join(guidesDir, "custom-agent-instructions.md");
       fs.writeFileSync(agentPath, guideToAgentMarkdown(guide, opts.framework), "utf-8");
-      console.log(chalk.green(`  ✓ Agent instructions:`), chalk.cyan(agentPath));
+      console.log(chalk.green(`  ✓ Agent instructions:`), chalk.hex('#4AEF79')(agentPath));
 
       const guardrailsPath = path.join(guidesDir, "custom-guardrails.md");
       fs.writeFileSync(guardrailsPath, guideToGuardrails(guide, opts.framework), "utf-8");
-      console.log(chalk.green(`  ✓ Guardrails:`), chalk.cyan(guardrailsPath));
+      console.log(chalk.green(`  ✓ Guardrails:`), chalk.hex('#4AEF79')(guardrailsPath));
 
       console.log("");
-      console.log(chalk.gray("  Apply to your agent config:"), chalk.cyan("amc guide --apply"));
+      console.log(chalk.gray("  Apply to your agent config:"), chalk.hex('#4AEF79')("amc guide --apply"));
       console.log(chalk.gray("  Or copy the guardrails into your agent's instructions manually."));
       console.log("");
       return;
@@ -1755,8 +1755,8 @@ program
             console.log("");
           }
           if (diff.improvedGaps.length > 0) {
-            console.log(chalk.cyan(`  ↗ Partially improved (${diff.improvedGaps.length}):`));
-            for (const g of diff.improvedGaps) console.log(chalk.cyan(`    - ${g.questionId}: L${g.from} → L${g.to}`));
+            console.log(chalk.hex('#4AEF79')(`  ↗ Partially improved (${diff.improvedGaps.length}):`));
+            for (const g of diff.improvedGaps) console.log(chalk.hex('#4AEF79')(`    - ${g.questionId}: L${g.from} → L${g.to}`));
             console.log("");
           }
           if (diff.regressedGaps.length > 0) {
@@ -1798,7 +1798,7 @@ program
       console.log(chalk.gray(`     ${s.layerName} · L${s.currentLevel} → L${s.targetLevel}`));
       console.log(chalk.white(`     ${s.whatToFix}`));
       if (s.cliCommands.length > 0) {
-        console.log(chalk.gray(`     Run:`), chalk.cyan(s.cliCommands[0]));
+        console.log(chalk.gray(`     Run:`), chalk.hex('#4AEF79')(s.cliCommands[0]));
       }
       console.log("");
     }
@@ -1824,19 +1824,19 @@ program
       if (opts.export) {
         const humanPath = path.join(guidesDir, `improvement-guide-l${guide.currentLevel}-to-l${guide.targetLevel}.md`);
         fs.writeFileSync(humanPath, guideToHumanMarkdown(guide), "utf-8");
-        console.log(chalk.green(`  ✓ Human guide:`), chalk.cyan(humanPath));
+        console.log(chalk.green(`  ✓ Human guide:`), chalk.hex('#4AEF79')(humanPath));
       }
 
       if (opts.agentInstructions || opts.export) {
         const agentPath = path.join(guidesDir, `agent-instructions-l${guide.currentLevel}-to-l${guide.targetLevel}.md`);
         fs.writeFileSync(agentPath, guideToAgentMarkdown(guide, opts.framework), "utf-8");
-        console.log(chalk.green(`  ✓ Agent instructions:`), chalk.cyan(agentPath));
+        console.log(chalk.green(`  ✓ Agent instructions:`), chalk.hex('#4AEF79')(agentPath));
       }
 
       if (opts.guardrails || opts.export) {
         const guardrailsPath = path.join(guidesDir, `guardrails-l${guide.currentLevel}-to-l${guide.targetLevel}.md`);
         fs.writeFileSync(guardrailsPath, guideToGuardrails(guide, opts.framework), "utf-8");
-        console.log(chalk.green(`  ✓ Guardrails:`), chalk.cyan(guardrailsPath));
+        console.log(chalk.green(`  ✓ Guardrails:`), chalk.hex('#4AEF79')(guardrailsPath));
       }
 
       if (opts.compliance || opts.export) {
@@ -1845,7 +1845,7 @@ program
           : undefined;
         const compliancePath = path.join(guidesDir, `compliance-guardrails-l${guide.currentLevel}-to-l${guide.targetLevel}.md`);
         fs.writeFileSync(compliancePath, guideToComplianceGuardrails(guide, complianceFws), "utf-8");
-        console.log(chalk.green(`  ✓ Compliance guardrails:`), chalk.cyan(compliancePath));
+        console.log(chalk.green(`  ✓ Compliance guardrails:`), chalk.hex('#4AEF79')(compliancePath));
       }
 
       // Always save JSON for future diffs and CI/CD
@@ -1856,23 +1856,23 @@ program
       if (opts.export) {
         const ciPath = path.join(guidesDir, `guide-l${guide.currentLevel}-to-l${guide.targetLevel}.json`);
         fs.writeFileSync(ciPath, JSON.stringify(guideToJSON(guide, opts.framework), null, 2), "utf-8");
-        console.log(chalk.green(`  ✓ CI/CD JSON:`), chalk.cyan(ciPath));
+        console.log(chalk.green(`  ✓ CI/CD JSON:`), chalk.hex('#4AEF79')(ciPath));
       }
 
       console.log("");
-      console.log(chalk.gray("  Apply guardrails to agent config:"), chalk.cyan("amc guide --apply"));
-      console.log(chalk.gray("  Interactive mechanic mode:"), chalk.cyan("amc guide --interactive"));
-      console.log(chalk.gray("  Continuous monitoring:"), chalk.cyan("amc guide --watch"));
+      console.log(chalk.gray("  Apply guardrails to agent config:"), chalk.hex('#4AEF79')("amc guide --apply"));
+      console.log(chalk.gray("  Interactive mechanic mode:"), chalk.hex('#4AEF79')("amc guide --interactive"));
+      console.log(chalk.gray("  Continuous monitoring:"), chalk.hex('#4AEF79')("amc guide --watch"));
       console.log("");
     } else {
-      console.log(chalk.gray("  Export all guides:"), chalk.cyan("amc guide --export"));
-      console.log(chalk.gray("  Generate guardrails:"), chalk.cyan("amc guide --guardrails"));
-      console.log(chalk.gray("  Apply to agent config:"), chalk.cyan("amc guide --apply"));
-      console.log(chalk.gray("  Mechanic mode (pick & choose):"), chalk.cyan("amc guide --interactive"));
-      console.log(chalk.gray("  Continuous monitoring:"), chalk.cyan("amc guide --watch"));
-      console.log(chalk.gray("  Compare with previous:"), chalk.cyan("amc guide --diff"));
-      console.log(chalk.gray("  List supported frameworks:"), chalk.cyan("amc guide --frameworks"));
-      console.log(chalk.gray("  Target specific level:"), chalk.cyan("amc guide --target 4"));
+      console.log(chalk.gray("  Export all guides:"), chalk.hex('#4AEF79')("amc guide --export"));
+      console.log(chalk.gray("  Generate guardrails:"), chalk.hex('#4AEF79')("amc guide --guardrails"));
+      console.log(chalk.gray("  Apply to agent config:"), chalk.hex('#4AEF79')("amc guide --apply"));
+      console.log(chalk.gray("  Mechanic mode (pick & choose):"), chalk.hex('#4AEF79')("amc guide --interactive"));
+      console.log(chalk.gray("  Continuous monitoring:"), chalk.hex('#4AEF79')("amc guide --watch"));
+      console.log(chalk.gray("  Compare with previous:"), chalk.hex('#4AEF79')("amc guide --diff"));
+      console.log(chalk.gray("  List supported frameworks:"), chalk.hex('#4AEF79')("amc guide --frameworks"));
+      console.log(chalk.gray("  Target specific level:"), chalk.hex('#4AEF79')("amc guide --target 4"));
       console.log("");
     }
 
@@ -1895,10 +1895,10 @@ program
         const fullPath = pathModule.resolve(process.cwd(), targetFile);
         const result = applyGuardrails(fullPath, guardrailsContent, readFn, writeFn);
         if (isDryRun) {
-          console.log(chalk.yellow(`  [DRY RUN] Would ${result.action}:`), chalk.cyan(result.path));
+          console.log(chalk.yellow(`  [DRY RUN] Would ${result.action}:`), chalk.hex('#4AEF79')(result.path));
           console.log(chalk.gray("  Remove --dry-run to apply.\n"));
         } else {
-          console.log(chalk.green(`  ✓ Guardrails ${result.action}:`), chalk.cyan(result.path));
+          console.log(chalk.green(`  ✓ Guardrails ${result.action}:`), chalk.hex('#4AEF79')(result.path));
           console.log("");
         }
         return;
@@ -1927,10 +1927,10 @@ program
         const fullPath = pathModule.resolve(process.cwd(), autoTarget);
         const result = applyGuardrails(fullPath, guardrailsContent, readFn, writeFn);
         if (isDryRun) {
-          console.log(chalk.yellow(`  [DRY RUN] Would ${result.action}:`), chalk.cyan(result.path));
+          console.log(chalk.yellow(`  [DRY RUN] Would ${result.action}:`), chalk.hex('#4AEF79')(result.path));
           console.log(chalk.gray("  Remove --dry-run to apply.\n"));
         } else {
-          console.log(chalk.green(`  ✓ Guardrails ${result.action}:`), chalk.cyan(result.path));
+          console.log(chalk.green(`  ✓ Guardrails ${result.action}:`), chalk.hex('#4AEF79')(result.path));
           console.log("");
         }
         return;
@@ -1962,10 +1962,10 @@ program
       const fullPath = pathModule.resolve(process.cwd(), finalPath);
       const result = applyGuardrails(fullPath, guardrailsContent, readFn, writeFn);
       if (isDryRun) {
-        console.log(chalk.yellow(`\n  [DRY RUN] Would ${result.action}:`), chalk.cyan(result.path));
+        console.log(chalk.yellow(`\n  [DRY RUN] Would ${result.action}:`), chalk.hex('#4AEF79')(result.path));
         console.log(chalk.gray("  Remove --dry-run to apply.\n"));
       } else {
-        console.log(chalk.green(`\n  ✓ Guardrails ${result.action}:`), chalk.cyan(result.path));
+        console.log(chalk.green(`\n  ✓ Guardrails ${result.action}:`), chalk.hex('#4AEF79')(result.path));
         console.log(chalk.gray("  Re-running the guide will update the guardrails section automatically."));
         console.log(chalk.gray("  Your agent now has operational trust rules from AMC.\n"));
       }
@@ -2111,9 +2111,9 @@ program
       console.log("");
       console.log(chalk.yellow("💡 No evidence collected yet. Your score reflects default (L0) state."));
       console.log(chalk.gray("  To score a real agent, capture evidence first:"));
-      console.log(chalk.white("  $"), chalk.cyan("amc wrap <runtime> -- <your-agent-command>"), chalk.gray("  # Capture agent behavior"));
-      console.log(chalk.white("  $"), chalk.cyan("amc evidence collect"), chalk.gray("               # Guided wizard to connect and capture evidence"));
-      console.log(chalk.white("  $"), chalk.cyan("amc quickscore"), chalk.gray("  # Then re-score"));
+      console.log(chalk.white("  $"), chalk.hex('#4AEF79')("amc wrap <runtime> -- <your-agent-command>"), chalk.gray("  # Capture agent behavior"));
+      console.log(chalk.white("  $"), chalk.hex('#4AEF79')("amc evidence collect"), chalk.gray("               # Guided wizard to connect and capture evidence"));
+      console.log(chalk.white("  $"), chalk.hex('#4AEF79')("amc quickscore"), chalk.gray("  # Then re-score"));
     }
 
     // Post-quickscore "What Now?" flow
@@ -2132,14 +2132,14 @@ program
       const cmd = cmdMap[weakest.questionId] ?? "amc score formal-spec <agentId>";
       console.log(chalk.yellow(`Your weakest area: ${weakest.title} (L${weakest.currentLevel})`));
       console.log(chalk.gray(`  ${weakest.whyItMatters}`));
-      console.log(chalk.white("  Fix it:"), chalk.cyan(cmd));
+      console.log(chalk.white("  Fix it:"), chalk.hex('#4AEF79')(cmd));
     }
     console.log("");
     console.log(chalk.white("  Next steps:"));
-    console.log(chalk.white("  1."), chalk.cyan("amc improve"), chalk.gray("— Guided improvement roadmap"));
-    console.log(chalk.white("  2."), chalk.cyan("amc score formal-spec <agentId>"), chalk.gray("— Full 113-question diagnostic"));
-    console.log(chalk.white("  3."), chalk.cyan("amc demo gap"), chalk.gray("— See the 84-point documentation inflation gap"));
-    console.log(chalk.white("  4."), chalk.cyan("amc explain <questionId>"), chalk.gray("— Deep dive into any question"));
+    console.log(chalk.white("  1."), chalk.hex('#4AEF79')("amc improve"), chalk.gray("— Guided improvement roadmap"));
+    console.log(chalk.white("  2."), chalk.hex('#4AEF79')("amc score formal-spec <agentId>"), chalk.gray("— Full 113-question diagnostic"));
+    console.log(chalk.white("  3."), chalk.hex('#4AEF79')("amc demo gap"), chalk.gray("— See the 84-point documentation inflation gap"));
+    console.log(chalk.white("  4."), chalk.hex('#4AEF79')("amc explain <questionId>"), chalk.gray("— Deep dive into any question"));
     console.log("");
   });
 
@@ -2158,24 +2158,24 @@ program
     console.log(`Layer: ${explanation.layerName}`);
     console.log(chalk.dim("Maturity Levels: L0=Undocumented | L1=Documented | L2=Automated | L3=Evidence-backed | L4=Proactive | L5=Certifiable"));
     console.log("");
-    console.log(chalk.cyan("What it measures:"));
+    console.log(chalk.hex('#4AEF79')("What it measures:"));
     console.log(explanation.whatItMeasures);
     console.log("");
-    console.log(chalk.cyan("Why it matters:"));
+    console.log(chalk.hex('#4AEF79')("Why it matters:"));
     console.log(explanation.whyItMatters);
     console.log("");
-    console.log(chalk.cyan("How to improve:"));
+    console.log(chalk.hex('#4AEF79')("How to improve:"));
     for (const item of explanation.howToImprove) {
       console.log(`- ${item}`);
     }
     console.log("");
-    console.log(chalk.cyan("Example evidence:"));
+    console.log(chalk.hex('#4AEF79')("Example evidence:"));
     for (const evidence of explanation.exampleEvidence) {
       console.log(`- ${evidence}`);
     }
     // F27: inline glossary of technical terms that appear in AMC explain output
     console.log("");
-    console.log(chalk.cyan("Glossary (AMC terms used above):"));
+    console.log(chalk.hex('#4AEF79')("Glossary (AMC terms used above):"));
     console.log(chalk.gray("  context.mission    ") + "— your agent's stated purpose and scope (document it in AGENTS.md or a charter file)");
     console.log(chalk.gray("  guardrails.alignment") + "— rules that prevent the agent from acting outside its mission (e.g. topic filters, action limits)");
     console.log(chalk.gray("  evidence           ") + "— logged proof that a behavior actually occurred (not just claimed in docs)");
@@ -2548,11 +2548,11 @@ hostCmd
   .requiredOption("--dir <path>", "host directory")
   .action((opts: { dir: string }) => {
     const out = hostListCli(resolve(opts.dir));
-    console.log(chalk.cyan("Workspaces:"));
+    console.log(chalk.hex('#4AEF79')("Workspaces:"));
     for (const row of out.workspaces) {
       console.log(`- ${row.workspaceId} (${row.status}) ${row.name}`);
     }
-    console.log(chalk.cyan("Users:"));
+    console.log(chalk.hex('#4AEF79')("Users:"));
     for (const row of out.users) {
       console.log(`- ${row.username} hostAdmin=${row.isHostAdmin ? "yes" : "no"} disabled=${row.disabled ? "yes" : "no"}`);
     }
@@ -2668,7 +2668,7 @@ configCmd
   .action((name?: "dev" | "ci" | "prod") => {
     const current = loadAMCConfig(process.cwd());
     if (!name) {
-      console.log(chalk.cyan(`Active workspace config profile: ${current.profile ?? "dev"}`));
+      console.log(chalk.hex('#4AEF79')(`Active workspace config profile: ${current.profile ?? "dev"}`));
       console.log(`- trustBoundaryMode: ${current.security.trustBoundaryMode}`);
       console.log(`- includeProxyEnv: ${current.supervise.includeProxyEnv}`);
       console.log(`- extraEnv: ${Object.keys(current.supervise.extraEnv).length}`);
@@ -2694,7 +2694,7 @@ configCmd
       console.log(JSON.stringify(out, null, 2));
       return;
     }
-    console.log(chalk.cyan("Resolved config:"));
+    console.log(chalk.hex('#4AEF79')("Resolved config:"));
     for (const [key, value] of Object.entries(out.config)) {
       console.log(`- ${key}: ${Array.isArray(value) ? value.join(",") : String(value)}`);
     }
@@ -2712,12 +2712,12 @@ configCmd
       console.log(JSON.stringify(out, null, 2));
       return;
     }
-    console.log(chalk.cyan("Config sources:"));
+    console.log(chalk.hex('#4AEF79')("Config sources:"));
     for (const row of out.sources) {
       console.log(`- ${row.key}: ${row.source}`);
     }
     console.log("");
-    console.log(chalk.cyan("Signed configs:"));
+    console.log(chalk.hex('#4AEF79')("Signed configs:"));
     for (const row of out.signatures) {
       console.log(`- ${row.id}: ${row.valid ? "PASS" : `FAIL (${row.reason ?? "unknown"})`}`);
     }
@@ -2754,7 +2754,7 @@ program
       const full = join(logsPath, file);
       const lines = readUtf8(full).split(/\r?\n/);
       const slice = lines.slice(Math.max(0, lines.length - limit)).join("\n").trimEnd();
-      console.log(chalk.cyan(`== ${file} ==`));
+      console.log(chalk.hex('#4AEF79')(`== ${file} ==`));
       if (slice.length === 0) {
         console.log("(empty)");
       } else {
@@ -3013,25 +3013,25 @@ program
         }
         return;
       }
-      console.log(chalk.cyan(`Agent: ${output.agentId}`));
+      console.log(chalk.hex('#4AEF79')(`Agent: ${output.agentId}`));
       console.log(`Gateway route: ${output.routeUrl}`);
       console.log("");
-      console.log(chalk.cyan("Environment exports:"));
+      console.log(chalk.hex('#4AEF79')("Environment exports:"));
       for (const line of output.envLines) {
         console.log(line);
       }
       console.log("");
-      console.log(chalk.cyan("Recommended command:"));
+      console.log(chalk.hex('#4AEF79')("Recommended command:"));
       console.log(output.command);
       if (output.adapterId) {
-        console.log(chalk.cyan(`Adapter lease carrier:`));
+        console.log(chalk.hex('#4AEF79')(`Adapter lease carrier:`));
         console.log(output.leaseCarrierHint);
       }
       console.log("");
-      console.log(chalk.cyan("Node snippet:"));
+      console.log(chalk.hex('#4AEF79')("Node snippet:"));
       console.log(output.nodeSnippet);
       console.log("");
-      console.log(chalk.cyan("Python snippet:"));
+      console.log(chalk.hex('#4AEF79')("Python snippet:"));
       console.log(output.pythonSnippet);
     }
   );
@@ -3066,12 +3066,12 @@ adapters
   .description("List built-in adapters and per-agent preferences")
   .action(() => {
     const out = adaptersListCli(process.cwd());
-    console.log(chalk.cyan("Built-in adapters:"));
+    console.log(chalk.hex('#4AEF79')("Built-in adapters:"));
     for (const row of out.builtins) {
       console.log(`- ${row.id} (${row.kind}) defaultMode=${row.defaultRunMode} provider=${row.providerFamily}`);
     }
     console.log("");
-    console.log(chalk.cyan("Configured per-agent profiles:"));
+    console.log(chalk.hex('#4AEF79')("Configured per-agent profiles:"));
     if (out.configured.length === 0) {
       console.log("- none");
       return;
@@ -3125,7 +3125,7 @@ adapters
       agentId: opts.agent,
       adapterId: opts.adapter
     });
-    console.log(chalk.cyan(`Agent: ${out.agentId}`));
+    console.log(chalk.hex('#4AEF79')(`Agent: ${out.agentId}`));
     console.log(`Adapter: ${out.adapterId}`);
     console.log(`Route: ${out.routeUrl}`);
     console.log(`Model: ${out.model}`);
@@ -3176,7 +3176,7 @@ adapters
         command: cmd
       });
       console.log("");
-      console.log(chalk.cyan("Unified Clarity:"));
+      console.log(chalk.hex('#4AEF79')("Unified Clarity:"));
       console.log(`adapter: ${out.adapterId}`);
       console.log(`mode: ${out.mode}${out.forcedSimulate ? " (forced SIMULATE due unsigned adapters.yaml)" : ""}`);
       console.log(`route: ${out.routeUrl}`);
@@ -3860,7 +3860,7 @@ program
         resolvedOutput
       );
 
-      console.log(chalk.cyan(`Run ${report.runId} status: ${report.status}`));
+      console.log(chalk.hex('#4AEF79')(`Run ${report.runId} status: ${report.status}`));
       console.log(`IntegrityIndex: ${report.integrityIndex.toFixed(3)} (${report.trustLabel})`);
       if (report.trustBoundaryViolated && report.trustBoundaryMessage) {
         console.log(chalk.red(report.trustBoundaryMessage));
@@ -3900,7 +3900,7 @@ program
 <html lang="en"><head><meta charset="utf-8"><title>AMC Report — ${report.agentId ?? "Agent"}</title>
 <style>
   body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;max-width:800px;margin:40px auto;padding:0 20px;color:#1a1a1a;line-height:1.6}
-  h1{color:#0f172a;border-bottom:3px solid #6366f1;padding-bottom:12px}
+  h1{color:#0f172a;border-bottom:3px solid #4AEF79;padding-bottom:12px}
   h2{color:#334155;margin-top:32px}
   .score-box{background:#f8fafc;border:2px solid ${riskColor};border-radius:12px;padding:24px;text-align:center;margin:24px 0}
   .score-box .level{font-size:48px;font-weight:bold;color:${riskColor}}
@@ -4092,7 +4092,7 @@ program
       const agentId = opts.agent ?? activeAgent(program);
       ensureWorkspaceReadyForAgent(process.cwd(), agentId);
 
-      console.log(chalk.cyan(`🔄 Running agent evaluation across ${items.length} models...`));
+      console.log(chalk.hex('#4AEF79')(`🔄 Running agent evaluation across ${items.length} models...`));
       console.log(chalk.gray(`Agent: ${agentId} | Window: ${opts.window} | Target: ${opts.target}`));
       console.log("");
 
@@ -4120,7 +4120,7 @@ program
       console.log("");
       
       // Comparison matrix
-      console.log(chalk.cyan("Model Performance Matrix:"));
+      console.log(chalk.hex('#4AEF79')("Model Performance Matrix:"));
       const headers = ["Model", "Overall", "Integrity", "Trust Label"];
       const rows = comparison.comparisonMatrix.map(result => [
         result.model,
@@ -4142,14 +4142,14 @@ program
       rows.forEach(row => console.log(formatRow(row)));
       
       console.log("");
-      console.log(chalk.cyan("Summary:"));
+      console.log(chalk.hex('#4AEF79')("Summary:"));
       console.log(`Best model: ${chalk.green(comparison.summary.bestModel)}`);
       console.log(`Worst model: ${chalk.red(comparison.summary.worstModel)}`);
       console.log(`Average integrity: ${comparison.summary.avgIntegrityIndex.toFixed(3)}`);
       
       if (comparison.summary.significantDifferences.length > 0) {
         console.log("");
-        console.log(chalk.cyan("Significant differences by layer:"));
+        console.log(chalk.hex('#4AEF79')("Significant differences by layer:"));
         comparison.summary.significantDifferences.forEach(diff => {
           console.log(`- ${diff.layer}: ${chalk.green(diff.bestModel)} vs ${chalk.red(diff.worstModel)} (Δ${diff.delta.toFixed(2)})`);
         });
@@ -4191,7 +4191,7 @@ program
     const agentId = opts.agent ?? activeAgent(program);
     ensureWorkspaceReadyForAgent(process.cwd(), agentId);
 
-    console.log(chalk.cyan(`🔄 Running agent evaluation across ${models.length} models...`));
+    console.log(chalk.hex('#4AEF79')(`🔄 Running agent evaluation across ${models.length} models...`));
     console.log(chalk.gray(`Agent: ${agentId} | Window: ${opts.window} | Target: ${opts.target}`));
     console.log("");
 
@@ -4219,7 +4219,7 @@ program
     console.log("");
 
     // Comparison matrix table
-    console.log(chalk.cyan("Model Performance Matrix:"));
+    console.log(chalk.hex('#4AEF79')("Model Performance Matrix:"));
     console.log("─".repeat(80));
     
     const headers = ["Model", "Overall Score", "Integrity Index", "Trust Label", "Run ID"];
@@ -4256,7 +4256,7 @@ program
     console.log("");
 
     // Summary
-    console.log(chalk.cyan("Summary:"));
+    console.log(chalk.hex('#4AEF79')("Summary:"));
     console.log(`${chalk.green("Best performing model:")} ${comparison.summary.bestModel}`);
     console.log(`${chalk.red("Worst performing model:")} ${comparison.summary.worstModel}`);
     console.log(`Average integrity index: ${comparison.summary.avgIntegrityIndex}`);
@@ -4264,7 +4264,7 @@ program
     // Significant differences
     if (comparison.summary.significantDifferences.length > 0) {
       console.log("");
-      console.log(chalk.cyan("Significant Layer Differences (>0.5 points):"));
+      console.log(chalk.hex('#4AEF79')("Significant Layer Differences (>0.5 points):"));
       for (const diff of comparison.summary.significantDifferences) {
         console.log(`• ${diff.layer}: ${chalk.green(diff.bestModel)} outperforms ${chalk.red(diff.worstModel)} by ${diff.delta} points`);
       }
@@ -4720,7 +4720,7 @@ evidence
     }]);
 
     if (method === "quickscore") {
-      console.log(chalk.cyan("\n  Running quickscore...\n"));
+      console.log(chalk.hex('#4AEF79')("\n  Running quickscore...\n"));
       const { getRapidQuestions, scoreRapidAssessment } = await import("./diagnostic/rapidQuickscore.js");
       const questions = getRapidQuestions();
       const answers: Record<string, number> = {};
@@ -4765,7 +4765,7 @@ evidence
         message: "Path to your log/eval file:",
         validate: (v: string) => v.trim().length > 0 || "Please enter a file path"
       }]);
-      console.log(chalk.cyan(`\n  Importing ${source} data from: ${filePath}`));
+      console.log(chalk.hex('#4AEF79')(`\n  Importing ${source} data from: ${filePath}`));
       console.log(chalk.gray(`  Run: amc ingest import --source ${source} --file "${filePath}"`));
       console.log(chalk.gray("  Then: amc score          # to see your updated maturity score\n"));
       return;
@@ -4794,19 +4794,19 @@ evidence
       }]);
       console.log(chalk.bold.green("\n  ✓ Ready to capture evidence!\n"));
       console.log(chalk.white("  Run this command to start capturing:"));
-      console.log(chalk.cyan(`    amc wrap ${runtime} -- ${command}\n`));
+      console.log(chalk.hex('#4AEF79')(`    amc wrap ${runtime} -- ${command}\n`));
       console.log(chalk.gray("  AMC will intercept all LLM calls, tool invocations, and agent decisions."));
       console.log(chalk.gray("  Stop the agent with Ctrl+C when done, then run:"));
-      console.log(chalk.cyan("    amc score\n"));
+      console.log(chalk.hex('#4AEF79')("    amc score\n"));
       return;
     }
 
     if (method === "service") {
       console.log(chalk.bold("\n  For running services, use the AMC Bridge:\n"));
-      console.log(chalk.cyan("    amc up                        # Start AMC Studio + Bridge"));
-      console.log(chalk.cyan("    amc connect --adapter generic-cli"));
+      console.log(chalk.hex('#4AEF79')("    amc up                        # Start AMC Studio + Bridge"));
+      console.log(chalk.hex('#4AEF79')("    amc connect --adapter generic-cli"));
       console.log(chalk.gray("\n  Or point your agent's LLM calls through the AMC Gateway:"));
-      console.log(chalk.cyan("    export OPENAI_BASE_URL=http://localhost:3212/v1"));
+      console.log(chalk.hex('#4AEF79')("    export OPENAI_BASE_URL=http://localhost:3212/v1"));
       console.log(chalk.gray("\n  The gateway proxies all LLM traffic and captures evidence automatically."));
       console.log(chalk.gray("  When done, run: amc score\n"));
       return;
@@ -5012,7 +5012,7 @@ policyPack
       agentId: opts.agent ?? activeAgent(program),
       packId
     });
-    console.log(chalk.cyan(`Pack diff for ${packId}:`));
+    console.log(chalk.hex('#4AEF79')(`Pack diff for ${packId}:`));
     console.log(JSON.stringify(diff, null, 2));
     const confirm = await inquirer.prompt<{ proceed: boolean }>([
       {
@@ -5075,7 +5075,7 @@ marketplace
         const tag = e.installed ? chalk.green(" [installed]") : "";
         const feat = e.featured ? chalk.yellow(" ★featured") : "";
         const dep = e.deprecated ? chalk.red(" [deprecated]") : "";
-        console.log(`  ${chalk.cyan(e.id)} v${e.version}${stars}${tag}${feat}${dep}`);
+        console.log(`  ${chalk.hex('#4AEF79')(e.id)} v${e.version}${stars}${tag}${feat}${dep}`);
         console.log(`    ${e.description}`);
       }
     } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
@@ -5187,7 +5187,7 @@ marketplace
       if (opts.json) { console.log(JSON.stringify(packsResult, null, 2)); return; }
       console.log(chalk.bold(`\n📦 Installed Packs (${packsList.length})\n`));
       for (const e of packsList) {
-        console.log(`  ${chalk.cyan(e.id)} v${e.version} [${e.category}] — ${e.description}`);
+        console.log(`  ${chalk.hex('#4AEF79')(e.id)} v${e.version} [${e.category}] — ${e.description}`);
       }
     } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
   });
@@ -6908,10 +6908,10 @@ gateway
       configPath: opts.config
     });
 
-    console.log(chalk.cyan(`Gateway session: ${handle.gatewaySessionId}`));
-    console.log(chalk.cyan(`Gateway URL: http://${handle.host}:${handle.port}`));
+    console.log(chalk.hex('#4AEF79')(`Gateway session: ${handle.gatewaySessionId}`));
+    console.log(chalk.hex('#4AEF79')(`Gateway URL: http://${handle.host}:${handle.port}`));
     if (handle.proxyEnabled && handle.proxyPort) {
-      console.log(chalk.cyan(`Gateway Proxy URL: http://${handle.host}:${handle.proxyPort}`));
+      console.log(chalk.hex('#4AEF79')(`Gateway Proxy URL: http://${handle.host}:${handle.proxyPort}`));
     }
     if (!handle.signatureValid) {
       console.log(chalk.yellow("Gateway config signature is missing/invalid. Gateway will run but diagnostics will apply trust penalties."));
@@ -7262,7 +7262,7 @@ archetype
       archetypeId
     });
 
-    console.log(chalk.cyan(`Applying archetype: ${preview.archetype.name} (${preview.archetype.id})`));
+    console.log(chalk.hex('#4AEF79')(`Applying archetype: ${preview.archetype.name} (${preview.archetype.id})`));
     console.log("Context graph diff:");
     if (preview.contextDiff.length === 0) {
       console.log("- no top-level context changes detected");
@@ -7389,7 +7389,7 @@ dashboard
     console.log(`Agent: ${handle.agentId}`);
     console.log(`Latest run: ${built.latestRunId}`);
     console.log("");
-    console.log(chalk.cyan("Available endpoints:"));
+    console.log(chalk.hex('#4AEF79')("Available endpoints:"));
     console.log(`  Dashboard: ${handle.url}`);
     console.log(`  Export MD: ${handle.url}/export.md`);
     console.log(`  Export PDF: ${handle.url}/export.pdf`);
@@ -7615,7 +7615,7 @@ assurance
         for (const pack of report.packResults) {
           const passIcon = pack.failCount === 0 ? chalk.green("✓") : chalk.red("✗");
           const scoreColor = pack.score0to100 >= 70 ? chalk.green : pack.score0to100 >= 40 ? chalk.yellow : chalk.red;
-          console.log(`  ${passIcon} ${chalk.cyan(pack.packId.padEnd(30))} ${scoreColor(pack.score0to100.toFixed(0).padStart(3))}%  ${chalk.green(String(pack.passCount))} pass / ${chalk.red(String(pack.failCount))} fail  (${pack.scenarioCount} scenarios)`);
+          console.log(`  ${passIcon} ${chalk.hex('#4AEF79')(pack.packId.padEnd(30))} ${scoreColor(pack.score0to100.toFixed(0).padStart(3))}%  ${chalk.green(String(pack.passCount))} pass / ${chalk.red(String(pack.failCount))} fail  (${pack.scenarioCount} scenarios)`);
         }
         console.log("");
         const totalPass = report.packResults.reduce((s, p) => s + p.passCount, 0);
@@ -8938,9 +8938,9 @@ compliance
       const available = frameworkChoices();
       console.log(chalk.bold("\n📋 Available compliance frameworks:\n"));
       for (const fw of available) {
-        console.log(`  ${chalk.cyan(fw)}`);
+        console.log(`  ${chalk.hex('#4AEF79')(fw)}`);
       }
-      console.log(`\n${chalk.gray("Usage:")} amc comply report --framework ${chalk.cyan("EU_AI_ACT")}`);
+      console.log(`\n${chalk.gray("Usage:")} amc comply report --framework ${chalk.hex('#4AEF79')("EU_AI_ACT")}`);
       console.log(chalk.gray("\nTip: use --out report.json for machine-readable output\n"));
       process.exit(0);
     }
@@ -10235,8 +10235,8 @@ fleet
     // F25: guidance when all zeros
     if (health.scoredAgentCount === 0) {
       console.log("");
-      console.log(chalk.yellow("No scored agents yet. Score your first agent: ") + chalk.cyan("amc quickscore"));
-      console.log(chalk.gray("  Then run a full diagnostic:") + " " + chalk.cyan("amc score formal-spec <agentId>"));
+      console.log(chalk.yellow("No scored agents yet. Score your first agent: ") + chalk.hex('#4AEF79')("amc quickscore"));
+      console.log(chalk.gray("  Then run a full diagnostic:") + " " + chalk.hex('#4AEF79')("amc score formal-spec <agentId>"));
     }
   });
 
@@ -10997,7 +10997,7 @@ program
       questionId: opts.question
     });
     console.log(learned.output);
-    console.log(chalk.cyan(`Audit event: ${learned.auditEventId}`));
+    console.log(chalk.hex('#4AEF79')(`Audit event: ${learned.auditEventId}`));
   });
 
 // ── Governance Lineage CLI ──────────────────────────────────────────────
@@ -11074,7 +11074,7 @@ program
       return;
     }
     for (const intent of intents) {
-      console.log(chalk.cyan(`[${intent.intentId}] ${intent.category}`));
+      console.log(chalk.hex('#4AEF79')(`[${intent.intentId}] ${intent.category}`));
       console.log(`  Policy: ${intent.policyFilePath}`);
       console.log(`  Rationale: ${intent.rationale}`);
       console.log(`  Impact: ${intent.impactSummary}`);
@@ -11606,8 +11606,8 @@ program
       targetName: opts.target
     });
     console.log(ownership.output);
-    console.log(chalk.cyan(`Saved: ${ownership.outputFile}`));
-    console.log(chalk.cyan(`Audit event: ${ownership.auditEventId}`));
+    console.log(chalk.hex('#4AEF79')(`Saved: ${ownership.outputFile}`));
+    console.log(chalk.hex('#4AEF79')(`Audit event: ${ownership.auditEventId}`));
   });
 
 program
@@ -14210,7 +14210,7 @@ program
       const endpoints = gen.listPythonSdkEndpoints();
       console.log(chalk.bold("\nPython SDK Endpoints:\n"));
       for (const e of endpoints) {
-        console.log(`  ${chalk.cyan(e.method)} ${e.path} → ${chalk.green(e.sdkMethod)} (${e.provider})`);
+        console.log(`  ${chalk.hex('#4AEF79')(e.method)} ${e.path} → ${chalk.green(e.sdkMethod)} (${e.provider})`);
       }
       return;
     }
@@ -14229,7 +14229,7 @@ program
     console.log(chalk.bold(`\n${pkg.packageName} v${pkg.version}`));
     console.log(`  Files: ${pkg.files.length}`);
     for (const f of pkg.files) {
-      console.log(`    ${chalk.cyan(f.path)} — ${f.description}`);
+      console.log(`    ${chalk.hex('#4AEF79')(f.path)} — ${f.description}`);
     }
     console.log(`\n  Install: ${chalk.green(pkg.installCommand)}`);
     console.log(`  Test:    ${chalk.green(pkg.testCommand)}`);
@@ -14553,7 +14553,7 @@ program
       const adapter = createLangChainAdapter({ projectPath: resolve(opts.project || process.cwd()), autoCapture: true });
       console.log(chalk.green("✓ LangChain adapter configured"));
       console.log(chalk.gray(`Project: ${adapter.config.projectPath}`));
-      console.log(chalk.cyan("\nUsage in your code:"));
+      console.log(chalk.hex('#4AEF79')("\nUsage in your code:"));
       console.log('  import { createLangChainAdapter } from "@amc/integrations/langchainAdapter";');
       console.log('  const adapter = createLangChainAdapter({ projectPath: "." });');
       console.log('  const wrappedAgent = adapter.wrapAgent(yourAgent);');
@@ -14564,7 +14564,7 @@ program
       const adapter = createCrewAIAdapter({ projectPath: resolve(opts.project || process.cwd()), autoCapture: true });
       console.log(chalk.green("✓ CrewAI adapter configured"));
       console.log(chalk.gray(`Project: ${adapter.config.projectPath}`));
-      console.log(chalk.cyan("\nUsage in your code:"));
+      console.log(chalk.hex('#4AEF79')("\nUsage in your code:"));
       console.log('  import { createCrewAIAdapter } from "@amc/integrations/crewaiAdapter";');
       console.log('  const adapter = createCrewAIAdapter({ projectPath: "." });');
       console.log('  const wrappedCrew = adapter.wrapCrew(yourCrew);');
@@ -14575,7 +14575,7 @@ program
       const adapter = createAutoGenAdapter({ projectPath: resolve(opts.project || process.cwd()), autoCapture: true });
       console.log(chalk.green("✓ AutoGen adapter configured"));
       console.log(chalk.gray(`Project: ${adapter.config.projectPath}`));
-      console.log(chalk.cyan("\nUsage in your code:"));
+      console.log(chalk.hex('#4AEF79')("\nUsage in your code:"));
       console.log('  import { createAutoGenAdapter } from "@amc/integrations/autogenAdapter";');
       console.log('  const adapter = createAutoGenAdapter({ projectPath: "." });');
       console.log('  const wrappedAgent = adapter.wrapAgent(yourAgent);');
@@ -15079,7 +15079,7 @@ program.action(async (_opts, command: Command) => {
         console.error(`  amc ${suggestion}`);
       }
     }
-    console.error(chalk.cyan("Run 'amc --help' to explore top-level commands."));
+    console.error(chalk.hex('#4AEF79')("Run 'amc --help' to explore top-level commands."));
     process.exit(1);
     return;
   }
@@ -15095,15 +15095,15 @@ program.action(async (_opts, command: Command) => {
   const hasWorkspace = existsSync(".amc");
 
   console.log("");
-  console.log(chalk.bold.hex("#FF6600")("  🧭 Agent Maturity Compass"));
+  console.log(chalk.bold.hex('#4AEF79')("  🧭 Agent Maturity Compass"));
   console.log(chalk.gray("  The credit score for AI agents."));
   console.log("");
 
   if (!hasWorkspace) {
     console.log(chalk.white("  No workspace found. Get started:"));
     console.log("");
-    console.log(chalk.white("  $"), chalk.cyan("amc init"), chalk.gray("           Create workspace + get your first score"));
-    console.log(chalk.white("  $"), chalk.cyan("amc setup --demo"), chalk.gray("   Quick start with demo data"));
+    console.log(chalk.white("  $"), chalk.hex('#4AEF79')("amc init"), chalk.gray("           Create workspace + get your first score"));
+    console.log(chalk.white("  $"), chalk.hex('#4AEF79')("amc setup --demo"), chalk.gray("   Quick start with demo data"));
     console.log("");
     console.log(chalk.gray("  Guide:"), chalk.underline("https://github.com/thewisecrab/AgentMaturityCompass/blob/main/docs/GETTING_STARTED.md"));
   } else {
@@ -15111,19 +15111,19 @@ program.action(async (_opts, command: Command) => {
     console.log("");
     console.log(chalk.bold("  Common commands:"));
     console.log("");
-    console.log(chalk.white("  $"), chalk.cyan("amc quickscore"), chalk.gray("       2-minute maturity assessment"));
-    console.log(chalk.white("  $"), chalk.cyan("amc doctor"), chalk.gray("           Check environment health"));
-    console.log(chalk.white("  $"), chalk.cyan("amc up"), chalk.gray("               Start Studio (web dashboard)"));
-    console.log(chalk.white("  $"), chalk.cyan("amc score --help"), chalk.gray("     All scoring commands"));
-    console.log(chalk.white("  $"), chalk.cyan("amc status"), chalk.gray("           Show current status"));
+    console.log(chalk.white("  $"), chalk.hex('#4AEF79')("amc quickscore"), chalk.gray("       2-minute maturity assessment"));
+    console.log(chalk.white("  $"), chalk.hex('#4AEF79')("amc doctor"), chalk.gray("           Check environment health"));
+    console.log(chalk.white("  $"), chalk.hex('#4AEF79')("amc up"), chalk.gray("               Start Studio (web dashboard)"));
+    console.log(chalk.white("  $"), chalk.hex('#4AEF79')("amc score --help"), chalk.gray("     All scoring commands"));
+    console.log(chalk.white("  $"), chalk.hex('#4AEF79')("amc status"), chalk.gray("           Show current status"));
     console.log("");
     console.log(chalk.bold("  Improve your agent:"));
     console.log("");
-    console.log(chalk.white("  $"), chalk.cyan("amc score formal-spec <agent>"), chalk.gray("   Full diagnostic"));
-    console.log(chalk.white("  $"), chalk.cyan("amc score collect-evidence <agent>"), chalk.gray("Gather proof"));
-    console.log(chalk.white("  $"), chalk.cyan("amc explain <questionId>"), chalk.gray("        Learn about any question"));
+    console.log(chalk.white("  $"), chalk.hex('#4AEF79')("amc score formal-spec <agent>"), chalk.gray("   Full diagnostic"));
+    console.log(chalk.white("  $"), chalk.hex('#4AEF79')("amc score collect-evidence <agent>"), chalk.gray("Gather proof"));
+    console.log(chalk.white("  $"), chalk.hex('#4AEF79')("amc explain <questionId>"), chalk.gray("        Learn about any question"));
     console.log("");
-    console.log(chalk.gray("  All commands:"), chalk.cyan("amc --help"));
+    console.log(chalk.gray("  All commands:"), chalk.hex('#4AEF79')("amc --help"));
   }
   console.log("");
 });
@@ -15420,7 +15420,7 @@ enforce
       fw.addRule({ id: "cli-rule", pattern: action, action: "allow" });
       const result = fw.check(agentId, tool, action);
       if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
-      console.log(chalk.bold.magenta("\n⚖️  Policy Check"));
+      console.log(chalk.bold.hex('#4AEF79')("\n⚖️  Policy Check"));
       console.log(chalk.gray("Agent:"), agentId);
       console.log(chalk.gray("Tool:"), tool);
       console.log(chalk.gray("Action:"), action);
@@ -15437,7 +15437,7 @@ enforce
       const { checkExec } = await import("./enforce/index.js");
       const result = checkExec(cmd);
       if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
-      console.log(chalk.bold.magenta("\n⚖️  Exec Guard"));
+      console.log(chalk.bold.hex('#4AEF79')("\n⚖️  Exec Guard"));
       console.log(chalk.gray("Command:"), cmd);
       console.log(chalk.gray("Safe:"), result.allowed ? chalk.green("yes") : chalk.red("no"));
       if (result.blockedPattern) console.log(chalk.gray("Blocked pattern:"), result.blockedPattern);
@@ -15453,7 +15453,7 @@ enforce
       const { detectAto } = await import("./enforce/index.js");
       const result = detectAto([{ type: "login", ts: Date.now() }]);
       if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
-      console.log(chalk.bold.magenta("\n⚖️  ATO Detection"));
+      console.log(chalk.bold.hex('#4AEF79')("\n⚖️  ATO Detection"));
       console.log(chalk.gray("Agent:"), agentId);
       console.log(chalk.gray("Suspicious:"), result.suspicious ? chalk.red("yes") : chalk.green("no"));
     } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
@@ -15468,7 +15468,7 @@ enforce
       const { checkNumeric } = await import("./enforce/index.js");
       const result = checkNumeric(parseFloat(value), { min: parseFloat(min), max: parseFloat(max) });
       if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
-      console.log(chalk.bold.magenta("\n⚖️  Numeric Check"));
+      console.log(chalk.bold.hex('#4AEF79')("\n⚖️  Numeric Check"));
       console.log(chalk.gray("Value:"), value);
       console.log(chalk.gray("Range:"), `[${min}, ${max}]`);
       console.log(chalk.gray("Valid:"), result.valid ? chalk.green("yes") : chalk.red("no"));
@@ -15486,7 +15486,7 @@ enforce
       tracker.markTainted(input, input, "cli");
       const result = tracker.check(input);
       if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
-      console.log(chalk.bold.magenta("\n⚖️  Taint Tracking"));
+      console.log(chalk.bold.hex('#4AEF79')("\n⚖️  Taint Tracking"));
       console.log(chalk.gray("Input:"), input);
       console.log(chalk.gray("Tainted:"), result ? chalk.red("yes") : chalk.green("no"));
     } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
@@ -15502,7 +15502,7 @@ enforce
       const { blindSecrets } = await import("./enforce/index.js");
       const result = blindSecrets(text);
       if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
-      console.log(chalk.bold.magenta("\n⚖️  Secret Blinding"));
+      console.log(chalk.bold.hex('#4AEF79')("\n⚖️  Secret Blinding"));
       console.log(chalk.gray("Secrets found:"), result.secretsFound);
       console.log(chalk.gray("Blinded text:"), result.blinded);
     } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
@@ -15518,7 +15518,7 @@ enforce
   .action(async (opts: { property?: string; all?: boolean; strategy?: string }) => {
     try {
       const { CORE_SAFETY_PROPERTIES, boundedModelCheck, verifyCertificate } = await import("./enforce/formalVerification.js");
-      console.log(chalk.bold.magenta("\n⚖️  Formal Verification"));
+      console.log(chalk.bold.hex('#4AEF79')("\n⚖️  Formal Verification"));
       const properties = opts.all || !opts.property
         ? CORE_SAFETY_PROPERTIES
         : CORE_SAFETY_PROPERTIES.filter((p) => p.id === opts.property || p.name === opts.property);
@@ -15567,7 +15567,7 @@ enforce
         writeFileSync(opts.output, spec, "utf8");
         console.log(chalk.green(`TLA+ spec written to: ${opts.output}`));
       } else {
-        console.log(chalk.bold.magenta("\n⚖️  TLA+ Specification"));
+        console.log(chalk.bold.hex('#4AEF79')("\n⚖️  TLA+ Specification"));
         console.log(spec);
       }
     } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
@@ -15581,7 +15581,7 @@ enforce
       const { verifyCertificate } = await import("./enforce/formalVerification.js");
       const cert = JSON.parse(certificateJson) as import("./enforce/formalVerification.js").ProofCertificate;
       const result = verifyCertificate(cert);
-      console.log(chalk.bold.magenta("\n⚖️  Certificate Verification"));
+      console.log(chalk.bold.hex('#4AEF79')("\n⚖️  Certificate Verification"));
       console.log(chalk.gray("Valid:"), result.valid ? chalk.green("yes") : chalk.red("no"));
       if (result.issues.length > 0) {
         console.log(chalk.gray("Issues:"));
@@ -15606,7 +15606,7 @@ watch
       const { attestOutput } = await import("./watch/index.js");
       const result = attestOutput(output);
       if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
-      console.log(chalk.bold.blue("\n👁️  Output Attestation"));
+      console.log(chalk.bold.hex('#4AEF79')("\n👁️  Output Attestation"));
       console.log(chalk.gray("Output:"), output);
       console.log(chalk.gray("Hash:"), result.hash || "N/A");
       console.log(chalk.gray("Attested:"), chalk.green("yes"));
@@ -15622,7 +15622,7 @@ watch
       const { createPacket } = await import("./watch/index.js");
       const result = createPacket([{ claim: agentId, evidence: runId, confidence: 0.9 }]);
       if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
-      console.log(chalk.bold.blue("\n👁️  Explainability Packet"));
+      console.log(chalk.bold.hex('#4AEF79')("\n👁️  Explainability Packet"));
       console.log(chalk.gray("Agent:"), agentId);
       console.log(chalk.gray("Run:"), runId);
       console.log(chalk.gray("Confidence:"), "0.9");
@@ -15639,7 +15639,7 @@ watch
       const { runSafetyTests } = await import("./watch/index.js");
       const result = runSafetyTests(agentId);
       if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
-      console.log(chalk.bold.blue("\n👁️  Safety Tests"));
+      console.log(chalk.bold.hex('#4AEF79')("\n👁️  Safety Tests"));
       console.log(chalk.gray("Agent:"), agentId);
       console.log(chalk.gray("Passed:"), result.passed > 0 ? chalk.green("yes") : chalk.red("no"));
       console.log(chalk.gray("Tests Run:"), result.testsRun);
@@ -15657,7 +15657,7 @@ watch
       const { checkHostHardening } = await import("./watch/hostHardening.js");
       const result = checkHostHardening();
       if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
-      console.log(chalk.bold.blue("\n👁️  Host Hardening"));
+      console.log(chalk.bold.hex('#4AEF79')("\n👁️  Host Hardening"));
       console.log(chalk.gray("Passed:"), result.passed ? chalk.green("yes") : chalk.red("no"));
       console.log(chalk.gray("Findings:"), result.findings?.length ?? 0);
       if (result.findings?.length) result.findings.forEach(f => console.log(chalk[f.passed ? "green" : "red"](`  • [${f.severity}] ${f.title}: ${f.detail}`)));
@@ -15956,7 +15956,7 @@ watch
       const sigmaMap: Record<string, number> = { low: 3.5, medium: 2.5, high: 1.5 };
       const sigma = sigmaMap[opts.sensitivity ?? "medium"] ?? 2.5;
       const profiler = new BehavioralProfiler({ anomalyThresholdSigma: sigma, enablePushAlerts: true });
-      console.log(chalk.bold.blue("\n👁️  Behavioral Profiler"));
+      console.log(chalk.bold.hex('#4AEF79')("\n👁️  Behavioral Profiler"));
       console.log(chalk.gray("Agent:"), opts.agent);
       console.log(chalk.gray("Sensitivity:"), opts.sensitivity ?? "medium");
       console.log(chalk.gray("Anomaly threshold:"), `${sigma}σ`);
@@ -15974,7 +15974,7 @@ watch
   .action(async (opts: { agent?: string }) => {
     try {
       const { BehavioralProfiler } = await import("./watch/behavioralProfiler.js");
-      console.log(chalk.bold.blue("\n👁️  Behavioral Profiler Status"));
+      console.log(chalk.bold.hex('#4AEF79')("\n👁️  Behavioral Profiler Status"));
       console.log(chalk.gray("Module:"), "BehavioralProfiler");
       console.log(chalk.gray("Status:"), chalk.green("available"));
       if (opts.agent) console.log(chalk.gray("Agent filter:"), opts.agent);
@@ -16003,7 +16003,7 @@ watch
         toolName: "demo_tool",
         latencyMs: 50,
       });
-      console.log(chalk.bold.blue("\n👁️  Behavioral Anomalies"));
+      console.log(chalk.bold.hex('#4AEF79')("\n👁️  Behavioral Anomalies"));
       console.log(chalk.gray("Agent:"), opts.agent);
       console.log(chalk.gray("Limit:"), limit);
       if (sampleAnomalies.length === 0) {
@@ -16210,7 +16210,7 @@ product
       if (opts.json) { console.log(JSON.stringify(features, null, 2)); return; }
       console.log(chalk.bold.yellow(`\n📦  Product Features (${features.length})`));
       for (const f of features) {
-        console.log(`  ${chalk.cyan(f.id)} ${f.name} [${f.relevance}] ${f.amcFit ? chalk.green("✓ AMC") : ""}`);
+        console.log(`  ${chalk.hex('#4AEF79')(f.id)} ${f.name} [${f.relevance}] ${f.amcFit ? chalk.green("✓ AMC") : ""}`);
       }
     } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
   });
@@ -16226,7 +16226,7 @@ product
       const features = getRecommended(parseInt(opts.limit ?? "10", 10));
       if (opts.json) { console.log(JSON.stringify(features, null, 2)); return; }
       console.log(chalk.bold.yellow(`\n📦  Recommended Features (${features.length})`));
-      for (const f of features) console.log(`  ${chalk.cyan(f.id)} ${f.name} — ${f.pricingRange}`);
+      for (const f of features) console.log(`  ${chalk.hex('#4AEF79')(f.id)} ${f.name} — ${f.pricingRange}`);
     } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
   });
 
@@ -16287,7 +16287,7 @@ domainCmd
       console.log(chalk.bold.cyan(`\n🧭  Domain Catalog (${domains.length})`));
       for (const domain of domains) {
         const desc = domainDescriptions[domain.id] ?? "";
-        console.log(`  ${chalk.cyan(domain.id)}  ${domain.name}`);
+        console.log(`  ${chalk.hex('#4AEF79')(domain.id)}  ${domain.name}`);
         if (desc) console.log(`    ${chalk.gray(desc)}`);
         console.log(`    Risk: ${domain.riskLevel} | EU AI Act: ${domain.euAIActCategory} | Questions: ${domain.questionCount}`);
         console.log(`    Regulatory: ${domain.regulatoryBasis.join(", ")}`);
@@ -16335,7 +16335,7 @@ domainCmd
       console.log(chalk.bold.cyan(`\n🧭  Module Activation Map (${domain})`));
       console.log(chalk.gray(`Total modules: ${modules.length}`));
       for (const module of modules) {
-        console.log(`  ${chalk.cyan(module.moduleId)} ${module.moduleName} [${module.relevance}]`);
+        console.log(`  ${chalk.hex('#4AEF79')(module.moduleId)} ${module.moduleName} [${module.relevance}]`);
       }
     } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
   });
@@ -16408,7 +16408,7 @@ domainCmd
       console.log(chalk.bold.cyan(`\n🧭  Domain Assurance (${run.domain})`));
       console.log(chalk.gray("Agent:"), run.agentId);
       for (const pack of run.packRuns) {
-        console.log(`  ${chalk.cyan(pack.packId)} ${pack.title}`);
+        console.log(`  ${chalk.hex('#4AEF79')(pack.packId)} ${pack.title}`);
         console.log(`    scenarios=${pack.scenarioCount} passed=${pack.passed} failed=${pack.failed} passRate=${pack.passRate}%`);
       }
       console.log(chalk.gray("Totals:"), `scenarios=${run.totalScenarios} passed=${run.passed} failed=${run.failed}`);
@@ -16463,7 +16463,7 @@ const score = program.command("score").description("Maturity scoring, adversaria
       }
     }
     const result = computeQuickScore(answers, tier);
-    console.log(chalk.bold.hex("#FF6600")("\n📊  Assessment Result"));
+    console.log(chalk.bold.hex('#4AEF79')("\n📊  Assessment Result"));
     console.log(chalk.gray(`Tier: ${tier}`));
     console.log(chalk.gray(`Score: ${result.totalScore}/${result.maxScore} (${result.percentage}%)`));
     console.log(renderAsciiRadar(result.layerScores));
@@ -16489,7 +16489,7 @@ score
       const { computeMaturityScore } = await import("./score/index.js");
       const result = computeMaturityScore([], {});
       if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
-      console.log(chalk.bold.hex("#FF6600")("\n📊  Maturity Score"));
+      console.log(chalk.bold.hex('#4AEF79')("\n📊  Maturity Score"));
       console.log(chalk.gray("Agent:"), agentId);
       console.log(chalk.gray("Score:"), result.overallScore ?? "N/A");
       console.log(chalk.gray("Level:"), result.overallLevel || "unknown");
@@ -16505,7 +16505,7 @@ score
       const { testGamingResistance } = await import("./score/index.js");
       const result = testGamingResistance({ q1: agentId });
       if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
-      console.log(chalk.bold.hex("#FF6600")("\n📊  Adversarial Test"));
+      console.log(chalk.bold.hex('#4AEF79')("\n📊  Adversarial Test"));
       console.log(chalk.gray("Agent:"), agentId);
       console.log(chalk.gray("Gaming Resistant:"), result.gamingResistant ? chalk.green("yes") : chalk.red("no"));
       console.log(chalk.gray("Details:"), JSON.stringify(result, null, 2));
@@ -16521,7 +16521,7 @@ score
       const { collectEvidence } = await import("./score/index.js");
       const result = collectEvidence({ [agentId]: { collected: true, timestamp: Date.now() } });
       if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
-      console.log(chalk.bold.hex("#FF6600")("\n📊  Evidence Collection"));
+      console.log(chalk.bold.hex('#4AEF79')("\n📊  Evidence Collection"));
       console.log(chalk.gray("Agent:"), agentId);
       console.log(chalk.gray("Evidence:"), JSON.stringify(result, null, 2));
     } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
@@ -16537,7 +16537,7 @@ score
       const { assessProductionReadiness } = await import("./score/productionReadiness.js");
       const result = assessProductionReadiness(agentId, { strictMode: !!opts.strict });
       if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
-      console.log(chalk.bold.hex("#FF6600")("\n🛠  Production Readiness"));
+      console.log(chalk.bold.hex('#4AEF79')("\n🛠  Production Readiness"));
       console.log(chalk.gray("Agent:"), agentId);
       console.log(chalk.gray("Ready:"), result.ready ? chalk.green("yes") : chalk.red("no"));
       console.log(chalk.gray("Score:"), result.score);
@@ -16558,7 +16558,7 @@ score
       const { scoreOperationalIndependence } = await import("./score/operationalIndependence.js");
       const result = scoreOperationalIndependence(agentId, Number(opts.window));
       if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
-      console.log(chalk.bold.hex("#FF6600")("\n🕒  Operational Independence"));
+      console.log(chalk.bold.hex('#4AEF79')("\n🕒  Operational Independence"));
       console.log(chalk.gray("Agent:"), agentId);
       console.log(chalk.gray("Score:"), result.score);
       console.log(chalk.gray("Longest run days:"), result.longestRunDays);
@@ -16580,7 +16580,7 @@ score
       const { getEvidenceCoverageReport } = await import("./score/evidenceCoverageGap.js");
       const result = getEvidenceCoverageReport(agentId);
       if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
-      console.log(chalk.bold.hex("#FF6600")("\n🧩  Evidence Coverage"));
+      console.log(chalk.bold.hex('#4AEF79')("\n🧩  Evidence Coverage"));
       console.log(chalk.gray("Agent:"), agentId);
       console.log(chalk.gray("Coverage:"), `${result.coveragePercent}%`);
       console.log(chalk.gray("Automated:"), result.automatedCoverage);
@@ -16601,7 +16601,7 @@ score
       const { getLeanAMCProfile } = await import("./score/leanAMC.js");
       const result = getLeanAMCProfile();
       if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
-      console.log(chalk.bold.hex("#FF6600")("\n🧪  Lean AMC Profile"));
+      console.log(chalk.bold.hex('#4AEF79')("\n🧪  Lean AMC Profile"));
       console.log(chalk.gray("Required modules:"), result.requiredModules.join(", "));
       console.log(chalk.gray("Skippable modules:"), result.skippableModules.join(", "));
       console.log(chalk.gray("Estimated setup hours:"), result.estimatedSetupHours);
@@ -16629,7 +16629,7 @@ score
       const { scoreBehavioralContractMaturity } = await import("./score/behavioralContractMaturity.js");
       const result = scoreBehavioralContractMaturity();
       if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
-      console.log(chalk.bold.hex("#FF6600")("\n📋  Behavioral Contract Maturity"));
+      console.log(chalk.bold.hex('#4AEF79')("\n📋  Behavioral Contract Maturity"));
       console.log(chalk.gray("Score:"), result.score, chalk.gray(`(L${result.level})`));
       console.log(chalk.gray("Alignment card:"), result.hasAlignmentCard ? chalk.green("yes") : chalk.red("no"));
       console.log(chalk.gray("Permitted actions:"), result.hasPermittedActions ? chalk.green("yes") : chalk.red("no"));
@@ -16650,7 +16650,7 @@ score
       const { scoreFailSecureGovernance } = await import("./score/failSecureGovernance.js");
       const result = scoreFailSecureGovernance();
       if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
-      console.log(chalk.bold.hex("#FF6600")("\n🔒  Fail-Secure Governance"));
+      console.log(chalk.bold.hex('#4AEF79')("\n🔒  Fail-Secure Governance"));
       console.log(chalk.gray("Score:"), result.score, chalk.gray(`(L${result.level})`));
       console.log(chalk.gray("Fails closed:"), result.failsClosedByDefault ? chalk.green("yes") : chalk.red("no"));
       console.log(chalk.gray("Tool whitelist:"), result.hasToolCallWhitelist ? chalk.green("yes") : chalk.red("no"));
@@ -16670,7 +16670,7 @@ score
       const { scoreOutputIntegrityMaturity } = await import("./score/outputIntegrityMaturity.js");
       const result = scoreOutputIntegrityMaturity();
       if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
-      console.log(chalk.bold.hex("#FF6600")("\n✅  Output Integrity Maturity"));
+      console.log(chalk.bold.hex('#4AEF79')("\n✅  Output Integrity Maturity"));
       console.log(chalk.gray("Score:"), result.score, chalk.gray(`(L${result.level})`));
       console.log(chalk.gray("Output validation:"), result.hasOutputValidation ? chalk.green("yes") : chalk.red("no"));
       console.log(chalk.gray("Confidence calibration:"), result.hasConfidenceCalibration ? chalk.green("yes") : chalk.red("no"));
@@ -16689,7 +16689,7 @@ score
       const { scoreAgentStatePortability } = await import("./score/agentStatePortability.js");
       const result = scoreAgentStatePortability();
       if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
-      console.log(chalk.bold.hex("#FF6600")("\n📦  Agent State Portability"));
+      console.log(chalk.bold.hex('#4AEF79')("\n📦  Agent State Portability"));
       console.log(chalk.gray("Score:"), result.score, chalk.gray(`(L${result.level})`));
       console.log(chalk.gray("Serializable state:"), result.hasSerializableState ? chalk.green("yes") : chalk.red("no"));
       console.log(chalk.gray("Vendor-neutral format:"), result.hasVendorNeutralFormat ? chalk.green("yes") : chalk.red("no"));
@@ -16708,7 +16708,7 @@ score
       const { scoreEUAIActCompliance } = await import("./score/euAIActCompliance.js");
       const result = scoreEUAIActCompliance();
       if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
-      console.log(chalk.bold.hex("#FF6600")("\n🇪🇺  EU AI Act Compliance"));
+      console.log(chalk.bold.hex('#4AEF79')("\n🇪🇺  EU AI Act Compliance"));
       console.log(chalk.gray("Score:"), result.score, chalk.gray(`(L${result.level})`));
       console.log(chalk.gray("Risk class:"), result.riskClassification);
       console.log(chalk.gray("Risk management system:"), result.hasRiskManagementSystem ? chalk.green("yes") : chalk.red("no"));
@@ -16729,7 +16729,7 @@ score
       const { scoreOWASPLLMCoverage } = await import("./score/owaspLLMCoverage.js");
       const result = scoreOWASPLLMCoverage();
       if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
-      console.log(chalk.bold.hex("#FF6600")("\n🛡️  OWASP LLM Top 10 Coverage"));
+      console.log(chalk.bold.hex('#4AEF79')("\n🛡️  OWASP LLM Top 10 Coverage"));
       console.log(chalk.gray("Score:"), result.score, chalk.gray(`(L${result.level})`));
       console.log(chalk.gray("Covered:"), `${result.coveredCount}/10`);
       if (result.uncoveredRisks.length) console.log(chalk.yellow("Uncovered:"), result.uncoveredRisks.join(", "));
@@ -16752,7 +16752,7 @@ score
         console.log(JSON.stringify(result, null, 2));
         return;
       }
-      console.log(chalk.bold.hex("#FF6600")("\n🏛️  Regulatory Readiness"));
+      console.log(chalk.bold.hex('#4AEF79')("\n🏛️  Regulatory Readiness"));
       console.log(chalk.gray("Agent:"), result.agentId);
       console.log(chalk.gray("Score:"), `${result.score}/100`, chalk.gray(`(L${result.level})`));
       console.log(chalk.gray("Weighted composite:"), result.weightedComposite.toFixed(2));
@@ -16778,7 +16778,7 @@ score
       const { scoreSelfKnowledgeMaturity } = await import("./score/selfKnowledgeMaturity.js");
       const result = scoreSelfKnowledgeMaturity();
       if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
-      console.log(chalk.bold.hex("#FF6600")("\n🔍  prior art Self-Knowledge Maturity"));
+      console.log(chalk.bold.hex('#4AEF79')("\n🔍  prior art Self-Knowledge Maturity"));
       console.log(chalk.gray("Score:"), result.score, chalk.gray(`(L${result.level})`));
       console.log(chalk.gray("Typed relationships:"), result.hasTypedRelationships ? chalk.green("yes") : chalk.red("no"));
       console.log(chalk.gray("Trace layer:"), result.hasTraceLayer ? chalk.green("yes") : chalk.red("no"));
@@ -16797,7 +16797,7 @@ score
       const { scoreKernelSandboxMaturity } = await import("./score/kernelSandboxMaturity.js");
       const result = scoreKernelSandboxMaturity();
       if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
-      console.log(chalk.bold.hex("#FF6600")("\n🏗️  Kernel Sandbox Maturity"));
+      console.log(chalk.bold.hex('#4AEF79')("\n🏗️  Kernel Sandbox Maturity"));
       console.log(chalk.gray("Score:"), result.score, chalk.gray(`(L${result.level})`));
       console.log(chalk.gray("OS-level isolation:"), result.hasOSLevelIsolation ? chalk.green("yes") : chalk.red("no"));
       console.log(chalk.gray("Filesystem restrictions:"), result.hasFilesystemRestrictions ? chalk.green("yes") : chalk.red("no"));
@@ -16816,7 +16816,7 @@ score
       const { scoreRuntimeIdentityMaturity } = await import("./score/runtimeIdentityMaturity.js");
       const result = scoreRuntimeIdentityMaturity();
       if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
-      console.log(chalk.bold.hex("#FF6600")("\n🪪  Runtime Identity Maturity"));
+      console.log(chalk.bold.hex('#4AEF79')("\n🪪  Runtime Identity Maturity"));
       console.log(chalk.gray("Score:"), result.score, chalk.gray(`(L${result.level})`));
       console.log(chalk.gray("Agent identity binding:"), result.hasAgentIdentityBinding ? chalk.green("yes") : chalk.red("no"));
       console.log(chalk.gray("User identity propagation:"), result.hasUserIdentityPropagation ? chalk.green("yes") : chalk.red("no"));
@@ -16837,7 +16837,7 @@ score
       const { scanCalibrationInfrastructure } = await import("./score/calibrationGap.js");
       const result = scanCalibrationInfrastructure(process.cwd());
       if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
-      console.log(chalk.bold.hex("#FF6600")("\n🎯  Calibration Gap Analysis"));
+      console.log(chalk.bold.hex('#4AEF79')("\n🎯  Calibration Gap Analysis"));
       console.log(chalk.gray("ECE Score:"), result.expectedCalibrationError.toFixed(4));
       console.log(chalk.gray("Overconfidence ratio:"), result.overconfidenceRatio.toFixed(2));
       console.log(chalk.gray("Underconfidence ratio:"), result.underconfidenceRatio.toFixed(2));
@@ -16853,7 +16853,7 @@ score
       const { scanEvidenceConflicts } = await import("./score/evidenceConflict.js");
       const result = scanEvidenceConflicts(process.cwd());
       if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
-      console.log(chalk.bold.hex("#FF6600")("\n⚡  Evidence Conflict Analysis"));
+      console.log(chalk.bold.hex('#4AEF79')("\n⚡  Evidence Conflict Analysis"));
       console.log(chalk.gray("Conflict ratio:"), result.conflictRatio.toFixed(4));
       console.log(chalk.gray("Score:"), result.score);
       console.log(chalk.gray("Level:"), result.level);
@@ -16869,7 +16869,7 @@ score
       const { scanDensityMapInfra } = await import("./score/densityMap.js");
       const result = scanDensityMapInfra(process.cwd());
       if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
-      console.log(chalk.bold.hex("#FF6600")("\n🗺️   Evidence Density Map"));
+      console.log(chalk.bold.hex('#4AEF79')("\n🗺️   Evidence Density Map"));
       console.log(chalk.gray("Blind spots:"), result.blindSpots);
       console.log(chalk.gray("Coverage:"), `${(result.overallCoverage * 100).toFixed(1)}%`);
       console.log(chalk.gray("Cluster pattern:"), result.clusterPattern);
@@ -16888,7 +16888,7 @@ score
       const format = (opts.format || "custom") as never;
       const result = ingestEvidence({ format, data: {}, sourceSystem: "cli", timestamp: new Date().toISOString() });
       if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
-      console.log(chalk.bold.hex("#FF6600")("\n📥  Evidence Ingestion"));
+      console.log(chalk.bold.hex('#4AEF79')("\n📥  Evidence Ingestion"));
       console.log(chalk.gray("Format:"), format);
       console.log(chalk.gray("Ingested:"), result.totalIngested);
       console.log(chalk.gray("Unmapped:"), result.unmapped.length);
@@ -16906,7 +16906,7 @@ score
       const { scanLevelTransitionInfra } = await import("./score/levelTransition.js");
       const result = scanLevelTransitionInfra(process.cwd());
       if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
-      console.log(chalk.bold.hex("#FF6600")("\n📈  Level Transition Quality"));
+      console.log(chalk.bold.hex('#4AEF79')("\n📈  Level Transition Quality"));
       console.log(chalk.gray("Avg quality:"), result.avgTransitionQuality.toFixed(2));
       console.log(chalk.gray("Retention rate:"), `${(result.promotionRetentionRate * 100).toFixed(1)}%`);
       console.log(chalk.gray("Demotion rate:"), result.demotionRate.toFixed(4));
@@ -16923,7 +16923,7 @@ score
       const { scoreGamingResistance } = await import("./score/gamingResistance.js");
       const result = scoreGamingResistance(process.cwd());
       if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
-      console.log(chalk.bold.hex("#FF6600")("\n🛡️   Gaming Resistance"));
+      console.log(chalk.bold.hex('#4AEF79')("\n🛡️   Gaming Resistance"));
       console.log(chalk.gray("Score:"), result.score, chalk.gray(`(L${result.level})`));
       console.log(chalk.gray("Flooding:"), result.floodingResistance.score);
       console.log(chalk.gray("Selective:"), result.selectiveResistance.score);
@@ -16942,7 +16942,7 @@ score
       const { scoreSleeperDetection } = await import("./score/sleeperDetection.js");
       const result = scoreSleeperDetection(process.cwd());
       if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
-      console.log(chalk.bold.hex("#FF6600")("\n🕵️   Sleeper Detection"));
+      console.log(chalk.bold.hex('#4AEF79')("\n🕵️   Sleeper Detection"));
       console.log(chalk.gray("Consistency:"), result.consistencyScore.toFixed(2));
       console.log(chalk.gray("Score:"), result.score, chalk.gray(`(L${result.level})`));
     } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
@@ -16957,7 +16957,7 @@ score
       const { scoreAuditDepth } = await import("./score/auditDepth.js");
       const result = scoreAuditDepth(process.cwd());
       if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
-      console.log(chalk.bold.hex("#FF6600")("\n📝  Audit Depth"));
+      console.log(chalk.bold.hex('#4AEF79')("\n📝  Audit Depth"));
       console.log(chalk.gray("Score:"), result.score, chalk.gray(`(L${result.level})`));
       console.log(chalk.gray("Black-box:"), result.blackBox.score);
       console.log(chalk.gray("White-box:"), result.whiteBox.score);
@@ -16974,7 +16974,7 @@ score
       const { scanPolicyConsistency } = await import("./score/policyConsistency.js");
       const result = scanPolicyConsistency(process.cwd());
       if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
-      console.log(chalk.bold.hex("#FF6600")("\n⚖️   Policy Consistency (pass^k)"));
+      console.log(chalk.bold.hex('#4AEF79')("\n⚖️   Policy Consistency (pass^k)"));
       console.log(chalk.gray("Pass rate:"), `${(result.passRate * 100).toFixed(1)}%`);
       console.log(chalk.gray("Score:"), result.score, chalk.gray(`(L${result.level})`));
       for (const pk of result.passK) {
@@ -16992,7 +16992,7 @@ score
       const { scoreAutonomyDuration } = await import("./score/autonomyDuration.js");
       const result = scoreAutonomyDuration({ agentId: "default", domain: "general", interventionTimestamps: [], actionTimestamps: [], selfPauseTimestamps: [] });
       if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
-      console.log(chalk.bold.hex("#FF6600")("\n⏱️   Autonomy Duration"));
+      console.log(chalk.bold.hex('#4AEF79')("\n⏱️   Autonomy Duration"));
       console.log(chalk.gray("Autonomy score:"), result.autonomyScore.toFixed(2));
       console.log(chalk.gray("Oversight:"), result.oversightAdequacy);
       console.log(chalk.gray("Risk class:"), result.riskClass);
@@ -17008,7 +17008,7 @@ score
       const { scorePauseQuality } = await import("./score/pauseQuality.js");
       const result = scorePauseQuality({ pauses: [], totalActions: 0, totalErrors: 0, errorsWithoutPriorPause: 0, taskDurationMs: 0 });
       if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
-      console.log(chalk.bold.hex("#FF6600")("\n⏸️   Pause Quality"));
+      console.log(chalk.bold.hex('#4AEF79')("\n⏸️   Pause Quality"));
       console.log(chalk.gray("Score:"), result.overallScore.toFixed(2));
       console.log(chalk.gray("Total pauses:"), result.totalPauses);
       console.log(chalk.gray("Pause rate:"), `${(result.pauseRate * 100).toFixed(1)}%`);
@@ -17025,7 +17025,7 @@ score
       const { scoreTaskHorizon } = await import("./score/taskHorizon.js");
       const result = scoreTaskHorizon({ taskDurationMinutes: 0, completedAutonomously: false, activeGovernanceControls: [] });
       if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
-      console.log(chalk.bold.hex("#FF6600")("\n🎯  Task Horizon"));
+      console.log(chalk.bold.hex('#4AEF79')("\n🎯  Task Horizon"));
       console.log(chalk.gray("Score:"), result.score.toFixed(2));
       console.log(chalk.gray("Band:"), result.band.label);
       console.log(chalk.gray("Level:"), result.level);
@@ -17041,7 +17041,7 @@ score
       const { scoreFactuality } = await import("./score/factuality.js");
       const result = scoreFactuality({});
       if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
-      console.log(chalk.bold.hex("#FF6600")("\n📚  Factuality"));
+      console.log(chalk.bold.hex('#4AEF79')("\n📚  Factuality"));
       console.log(chalk.gray("Score:"), result.overallScore.toFixed(2));
       console.log(chalk.gray("  Parametric:"), result.parametric.score.toFixed(2));
       console.log(chalk.gray("  Search/Retrieval:"), result.searchRetrieval.score.toFixed(2));
@@ -17059,7 +17059,7 @@ score
       const { computeAlignmentIndex } = await import("./score/alignmentIndex.js");
       const result = computeAlignmentIndex({ truthfulnessScore: 0, instructionComplianceScore: 0, safetyScore: 0, behavioralConsistencyScore: 0 });
       if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
-      console.log(chalk.bold.hex("#FF6600")("\n🧭  Alignment Index"));
+      console.log(chalk.bold.hex('#4AEF79')("\n🧭  Alignment Index"));
       console.log(chalk.gray("Overall:"), result.overall.toFixed(2), chalk.gray(`(${result.grade})`));
       for (const d of result.dimensions) {
         console.log(chalk.gray(`  ${d.name}:`), d.score.toFixed(2));
@@ -17077,7 +17077,7 @@ score
       const { scoreInterpretability } = await import("./score/interpretability.js");
       const result = scoreInterpretability([]);
       if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
-      console.log(chalk.bold.hex("#FF6600")("\n🔍  Interpretability"));
+      console.log(chalk.bold.hex('#4AEF79')("\n🔍  Interpretability"));
       console.log(chalk.gray("Score:"), result.overallScore.toFixed(2));
       console.log(chalk.gray("Explanation coverage:"), `${(result.explanationCoverage * 100).toFixed(1)}%`);
       console.log(chalk.gray("Faithfulness:"), result.faithfulnessScore.toFixed(2));
@@ -17100,7 +17100,7 @@ score
         { overlapThreshold: opts.threshold },
       );
       if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
-      console.log(chalk.bold.hex("#FF6600")("\n🎯  Faithfulness"));
+      console.log(chalk.bold.hex('#4AEF79')("\n🎯  Faithfulness"));
       console.log(chalk.gray("Score:"), result.score.toFixed(3));
       console.log(chalk.gray("Claims:"), `${result.supportedClaims}/${result.totalClaims} supported`);
       console.log(chalk.gray("Explanation:"), result.explanation);
@@ -17120,7 +17120,7 @@ score
       const { scoreMemoryIntegrity } = await import("./score/memoryIntegrity.js");
       const result = scoreMemoryIntegrity({ events: [], sessionCount: 0, totalDurationMs: 0 });
       if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
-      console.log(chalk.bold.hex("#FF6600")("\n🧠  Memory Integrity"));
+      console.log(chalk.bold.hex('#4AEF79')("\n🧠  Memory Integrity"));
       console.log(chalk.gray("Score:"), result.overallScore.toFixed(2));
       console.log(chalk.gray("Consistency:"), result.consistencyScore.toFixed(2));
       console.log(chalk.gray("Poisoning resistance:"), result.poisoningResistanceScore.toFixed(2));
@@ -17137,7 +17137,7 @@ score
       const { scoreOutputAttestation } = await import("./score/outputAttestation.js");
       const result = scoreOutputAttestation({});
       if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
-      console.log(chalk.bold.hex("#FF6600")("\n📜  Output Attestation"));
+      console.log(chalk.bold.hex('#4AEF79')("\n📜  Output Attestation"));
       console.log(chalk.gray("Score:"), result.score, chalk.gray(`(L${result.level})`));
       console.log(chalk.gray("Output signing:"), result.hasOutputSigning ? chalk.green("yes") : chalk.red("no"));
       console.log(chalk.gray("Trust level binding:"), result.hasTrustLevelBinding ? chalk.green("yes") : chalk.red("no"));
@@ -17153,7 +17153,7 @@ score
       const { scoreMutualVerification } = await import("./score/mutualVerification.js");
       const result = scoreMutualVerification({});
       if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
-      console.log(chalk.bold.hex("#FF6600")("\n🤝  Mutual Verification"));
+      console.log(chalk.bold.hex('#4AEF79')("\n🤝  Mutual Verification"));
       console.log(chalk.gray("Score:"), result.score, chalk.gray(`(L${result.level})`));
       console.log(chalk.gray("Challenge-response:"), result.hasChallengeResponse ? chalk.green("yes") : chalk.red("no"));
     } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
@@ -17169,7 +17169,7 @@ score
       const log = new TransparencyLog();
       const result = log.score();
       if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
-      console.log(chalk.bold.hex("#FF6600")("\n🌐  Network Transparency Log"));
+      console.log(chalk.bold.hex('#4AEF79')("\n🌐  Network Transparency Log"));
       console.log(chalk.gray("Score:"), result.score, chalk.gray(`(L${result.level})`));
       console.log(chalk.gray("Log size:"), result.logSize);
     } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
@@ -17264,7 +17264,7 @@ score
 
     const result = computeQuickScore(answers, tier);
     if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
-    console.log(chalk.bold.hex("#FF6600")(`\n📊  ${tier.charAt(0).toUpperCase() + tier.slice(1)} Score Assessment`));
+    console.log(chalk.bold.hex('#4AEF79')(`\n📊  ${tier.charAt(0).toUpperCase() + tier.slice(1)} Score Assessment`));
     console.log(chalk.gray(`Score: ${result.totalScore}/${result.maxScore} (${result.percentage}%)`));
     console.log(renderAsciiRadar(result.layerScores));
     if (result.gaps.length > 0) {
@@ -17272,7 +17272,7 @@ score
       for (const g of result.gaps) { console.log(`  ${g.questionId}: ${g.title} (L${g.currentLevel} → L${g.targetLevel})`); }
     }
     console.log("");
-    for (const line of result.roadmap) { console.log(chalk.cyan(line)); }
+    for (const line of result.roadmap) { console.log(chalk.hex('#4AEF79')(line)); }
   });
 
 // ── Score Industry Models ──────────────────────────────────────────────────────
@@ -17285,7 +17285,7 @@ score
       const { INDUSTRY_TRUST_MODELS } = await import("./score/industryTrustModels.js");
       const models = Object.values(INDUSTRY_TRUST_MODELS);
       if (opts.json) { console.log(JSON.stringify(models, null, 2)); return; }
-      console.log(chalk.bold.hex("#FF6600")(`\n📊  Industry Trust Models (${models.length})`));
+      console.log(chalk.bold.hex('#4AEF79')(`\n📊  Industry Trust Models (${models.length})`));
       for (const model of models) {
         console.log(`\n  ${chalk.bold(model.industryId)} — ${model.name}`);
         console.log(chalk.gray(`    Risk profile: ${model.riskProfile}`));
@@ -17348,7 +17348,7 @@ score
       for (const dim of dims) rawDimensionScores[dim] = rawScore;
       const result = computeIndustryAdjustedScore(rawDimensionScores, industryId, Date.now(), 0.8);
       if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
-      console.log(chalk.bold.hex("#FF6600")(`\n📊  Industry-Adjusted Score`));
+      console.log(chalk.bold.hex('#4AEF79')(`\n📊  Industry-Adjusted Score`));
       if (opts.agent) console.log(chalk.gray("Agent:"), opts.agent);
       console.log(chalk.gray("Industry:"), `${model.name} (${industryId})`);
       console.log(chalk.gray("Raw score:"), result.rawScore);
@@ -17383,7 +17383,7 @@ score
       }
       const bench = model.benchmarkPercentiles;
       if (opts.json) { console.log(JSON.stringify({ industry: opts.industry, name: model.name, benchmarkPercentiles: bench }, null, 2)); return; }
-      console.log(chalk.bold.hex("#FF6600")(`\n📊  Industry Benchmarks — ${model.name}`));
+      console.log(chalk.bold.hex('#4AEF79')(`\n📊  Industry Benchmarks — ${model.name}`));
       console.log(chalk.gray("Sample size:"), bench.sampleSize);
       console.log(chalk.gray("P25:"), bench.p25.toFixed(3));
       console.log(chalk.gray("P50:"), bench.p50.toFixed(3));
@@ -17414,7 +17414,7 @@ scan
       const { probeEndpoint } = await import("./scanner/index.js");
       const result = await probeEndpoint(opts.url);
       if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
-      console.log(chalk.bold.hex("#FF6600")("\n🔍  Endpoint Probe Results"));
+      console.log(chalk.bold.hex('#4AEF79')("\n🔍  Endpoint Probe Results"));
       console.log(chalk.gray(`URL: ${result.url}`));
       console.log(chalk.gray(`Reachable: ${result.reachable}`));
       console.log(chalk.gray(`Response time: ${result.responseTimeMs}ms`));
@@ -17428,7 +17428,7 @@ scan
       console.log(chalk.gray("Cloning repository..."));
       const result = scanRepo(opts.repo);
       if (opts.json) { console.log(JSON.stringify(result, null, 2)); } else {
-        console.log(chalk.bold.hex("#FF6600")("\n🔍  Repo Scan Results"));
+        console.log(chalk.bold.hex('#4AEF79')("\n🔍  Repo Scan Results"));
         console.log(chalk.gray(`Repo: ${result.repoUrl}`));
         console.log(chalk.gray(`Files scanned: ${result.filesScanned}`));
         console.log(chalk.gray(`Framework: ${result.detection.framework}`));
@@ -17442,7 +17442,7 @@ scan
     const { scanLocal } = await import("./scanner/index.js");
     const result = scanLocal(opts.local!);
     if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
-    console.log(chalk.bold.hex("#FF6600")("\n🔍  Local Scan Results"));
+    console.log(chalk.bold.hex('#4AEF79')("\n🔍  Local Scan Results"));
     console.log(chalk.gray(`Path: ${result.path}`));
     console.log(chalk.gray(`Files scanned: ${result.filesScanned}`));
     console.log(chalk.gray(`Framework: ${result.detection.framework} (${(result.detection.confidence * 100).toFixed(0)}% confidence)`));
@@ -17486,14 +17486,14 @@ scan
       console.log(chalk.bold("🔍 AMC Model Scanner"));
       console.log("Scans ML model files for security threats, malicious code, and supply chain attacks.");
       console.log("");
-      console.log(chalk.cyan("Supported formats:"));
+      console.log(chalk.hex('#4AEF79')("Supported formats:"));
       const formats = getSupportedFormats();
       for (let i = 0; i < formats.length; i += 4) {
         const row = formats.slice(i, i + 4).join("  ");
         console.log(`  ${row}`);
       }
       console.log("");
-      console.log(chalk.cyan("Usage examples:"));
+      console.log(chalk.hex('#4AEF79')("Usage examples:"));
       console.log("  amc scan model-scan ./model.pkl");
       console.log("  amc scan model-scan ./models/ --recursive");
       console.log("  amc scan model-scan https://example.com/model.pth");
@@ -17882,10 +17882,10 @@ program
   .description("2-minute quickstart with Quick Score assessment")
   .option("--profile <name>", "workspace config profile: dev|ci|prod", "dev")
   .action(async (opts: { profile: "dev" | "ci" | "prod" }) => {
-    console.log(chalk.bold.hex("#FF6600")("\n🚀  AMC Quick Start — Agent Maturity in 2 Minutes\n"));
+    console.log(chalk.bold.hex('#4AEF79')("\n🚀  AMC Quick Start — Agent Maturity in 2 Minutes\n"));
 
     // Step 1: workspace init
-    console.log(chalk.cyan("Step 1: Setting up workspace..."));
+    console.log(chalk.hex('#4AEF79')("Step 1: Setting up workspace..."));
     try {
       const ws = await quickstartWizard(process.cwd());
       const profiled = applyAMCConfigProfile(opts.profile, loadAMCConfig(process.cwd()));
@@ -17896,7 +17896,7 @@ program
     } catch { console.log(chalk.green("  ✓ Workspace already configured")); }
 
     // Step 2: Quick Score
-    console.log(chalk.cyan("\nStep 2: Quick Score Assessment (10 questions)\n"));
+    console.log(chalk.hex('#4AEF79')("\nStep 2: Quick Score Assessment (10 questions)\n"));
     const { getQuestionsForTier, computeQuickScore, renderAsciiRadar } = await import("./diagnostic/quickScore.js");
     const questions = getQuestionsForTier("quick");
     const answers: Record<string, number> = {};
@@ -17919,7 +17919,7 @@ program
     const result = computeQuickScore(answers, "quick");
 
     // Step 3: Results
-    console.log(chalk.cyan("\nStep 3: Your Results\n"));
+    console.log(chalk.hex('#4AEF79')("\nStep 3: Your Results\n"));
     console.log(chalk.bold(`  Overall: ${result.totalScore}/${result.maxScore} (${result.percentage}%)`));
     console.log(renderAsciiRadar(result.layerScores));
 
@@ -17931,9 +17931,9 @@ program
     }
 
     console.log("");
-    for (const line of result.roadmap) { console.log(chalk.cyan(`  ${line}`)); }
+    for (const line of result.roadmap) { console.log(chalk.hex('#4AEF79')(`  ${line}`)); }
 
-    console.log(chalk.bold.hex("#FF6600")("\n📋  Next Steps:"));
+    console.log(chalk.bold.hex('#4AEF79')("\n📋  Next Steps:"));
     console.log("  amc score tier --tier standard   Full 126-question assessment");
     console.log("  amc scan --local .               Scan your codebase");
     console.log("  amc dashboard open               Open web dashboard");
@@ -18033,10 +18033,10 @@ apiCmd
     console.log("  Online:    https://github.com/your-org/amc/blob/main/docs/API_REFERENCE.md");
     console.log("");
     console.log(chalk.bold("  Quick start:"));
-    console.log(`  1. Start Studio:      ${chalk.cyan("amc up")}`);
-    console.log(`  2. Get a token:       ${chalk.cyan("amc user token")}`);
-    console.log(`  3. List agents:       ${chalk.cyan("curl -H 'Authorization: Bearer <token>' http://localhost:3212/api/v1/agents")}`);
-    console.log(`  4. List all routes:   ${chalk.cyan("amc api routes")}`);
+    console.log(`  1. Start Studio:      ${chalk.hex('#4AEF79')("amc up")}`);
+    console.log(`  2. Get a token:       ${chalk.hex('#4AEF79')("amc user token")}`);
+    console.log(`  3. List agents:       ${chalk.hex('#4AEF79')("curl -H 'Authorization: Bearer <token>' http://localhost:3212/api/v1/agents")}`);
+    console.log(`  4. List all routes:   ${chalk.hex('#4AEF79')("amc api routes")}`);
     console.log("");
     console.log(chalk.bold("  Authentication:"));
     console.log("  All endpoints require a Bearer token header.");
@@ -18179,7 +18179,7 @@ demo
     console.log(chalk.white("  • Trust-tiered scoring (self-reported evidence is capped at 0.4×)"));
     console.log(chalk.white("  • Adversarial testing (74 attack packs that actually probe behavior)"));
     console.log("");
-    console.log(chalk.gray("  Start scoring your agent:"), chalk.cyan("amc init"));
+    console.log(chalk.gray("  Start scoring your agent:"), chalk.hex('#4AEF79')("amc init"));
     console.log("");
   });
 
@@ -18441,7 +18441,7 @@ program
     if (opts.dryRun) {
       console.log(chalk.yellow("  [DRY RUN] Would generate:\n"));
       for (const fix of fixes) {
-        console.log(`  📄 ${chalk.cyan(fix.file)} — ${fix.description}`);
+        console.log(`  📄 ${chalk.hex('#4AEF79')(fix.file)} — ${fix.description}`);
       }
       if (gaps.length > 0) {
         console.log(`\n  ${chalk.gray(`Based on ${gaps.length} identified gaps from last diagnostic run`)}`);
@@ -18518,7 +18518,7 @@ redteamCmd
     } else {
       console.log(chalk.bold("Available Red-Team Strategies:\n"));
       for (const s of strats) {
-        console.log(`  ${chalk.cyan(s.id.padEnd(16))} ${s.name} — ${chalk.gray(s.description)}`);
+        console.log(`  ${chalk.hex('#4AEF79')(s.id.padEnd(16))} ${s.name} — ${chalk.gray(s.description)}`);
       }
     }
   });
@@ -18537,7 +18537,7 @@ redteamCmd
     } else {
       console.log(chalk.bold(`Available Red-Team Plugins (${packs.length}):\n`));
       for (const p of packs) {
-        console.log(`  ${chalk.cyan(p.id.padEnd(36))} ${p.title} (${p.scenarios.length} scenarios)`);
+        console.log(`  ${chalk.hex('#4AEF79')(p.id.padEnd(36))} ${p.title} (${p.scenarios.length} scenarios)`);
       }
     }
   });
@@ -18584,7 +18584,7 @@ pack
         if (result.installed.length > 0) {
           console.log(chalk.bold("\nInstalled packages:"));
           for (const pkg of result.installed) {
-            console.log(`  ${chalk.cyan(pkg.name)}@${pkg.version}`);
+            console.log(`  ${chalk.hex('#4AEF79')(pkg.name)}@${pkg.version}`);
           }
         }
         if (result.conflicts.length > 0) {
@@ -18633,7 +18633,7 @@ pack
 
       if (result.success) {
         console.log(chalk.green(`✅ ${result.message}`));
-        console.log(`Package: ${chalk.cyan(result.name)}@${result.version}`);
+        console.log(`Package: ${chalk.hex('#4AEF79')(result.name)}@${result.version}`);
         console.log(`Registry: ${result.registry}`);
       } else {
         console.error(chalk.red(`❌ ${result.message}`));
@@ -18683,13 +18683,13 @@ pack
       if (result.total === 0) {
         console.log(chalk.yellow("No community packs found."));
         console.log("");
-        console.log("  Built-in packs: " + chalk.cyan("amc assurance list"));
-        console.log("  Create your own: " + chalk.cyan("amc pack init"));
-        console.log("  Publish a pack:  " + chalk.cyan("amc pack publish"));
+        console.log("  Built-in packs: " + chalk.hex('#4AEF79')("amc assurance list"));
+        console.log("  Create your own: " + chalk.hex('#4AEF79')("amc pack init"));
+        console.log("  Publish a pack:  " + chalk.hex('#4AEF79')("amc pack publish"));
         console.log("");
       }
       for (const pkg of result.results) {
-        console.log(`${chalk.cyan(pkg.name)}@${pkg.version}`);
+        console.log(`${chalk.hex('#4AEF79')(pkg.name)}@${pkg.version}`);
         console.log(`  ${pkg.description}`);
         console.log(`  Author: ${pkg.author} | Downloads: ${pkg.downloads} | Updated: ${pkg.updated}`);
         if (pkg.keywords.length > 0) {
@@ -18810,7 +18810,7 @@ pack
 
       console.log(chalk.bold(`\n📦 Installed Packs (${result.packages.length})\n`));
       for (const pkg of result.packages) {
-        console.log(`${chalk.cyan(pkg.name)}@${pkg.version}`);
+        console.log(`${chalk.hex('#4AEF79')(pkg.name)}@${pkg.version}`);
         console.log(`  ${pkg.description}`);
         console.log(`  Path: ${pkg.path}`);
         console.log("");
@@ -18857,13 +18857,13 @@ pack
         console.log("1. Edit package.json to customize your pack");
         console.log("2. Implement your pack logic in index.mjs (ESM format)");
         console.log("3. Add tests in test/index.test.mjs");
-        console.log(`4. Test your pack locally: ${chalk.cyan("amc pack test .")}`);
+        console.log(`4. Test your pack locally: ${chalk.hex('#4AEF79')("amc pack test .")}`);
         console.log(`5. Run 'amc pack publish' to share with the community`);
         console.log("");
         console.log(chalk.bold("Documentation:"));
-        console.log(`  Pack authoring guide: ${chalk.cyan("docs/ASSURANCE_LAB.md")}`);
-        console.log(`  Contributing:         ${chalk.cyan("CONTRIBUTING.md")}`);
-        console.log(`  Built-in pack examples: ${chalk.cyan("amc assurance list")}`);
+        console.log(`  Pack authoring guide: ${chalk.hex('#4AEF79')("docs/ASSURANCE_LAB.md")}`);
+        console.log(`  Contributing:         ${chalk.hex('#4AEF79')("CONTRIBUTING.md")}`);
+        console.log(`  Built-in pack examples: ${chalk.hex('#4AEF79')("amc assurance list")}`);
       } else {
         console.error(chalk.red(`❌ ${result.message}`));
         process.exit(1);
@@ -19012,7 +19012,7 @@ program.parseAsync(process.argv).catch((error: unknown) => {
         console.error(`  amc ${suggestion}`);
       }
     }
-    console.error(chalk.cyan("Run 'amc --help' to explore top-level commands."));
+    console.error(chalk.hex('#4AEF79')("Run 'amc --help' to explore top-level commands."));
     process.exit(1);
     return;
   }

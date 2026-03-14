@@ -1,12 +1,12 @@
-/* AMC Docs — OSE-inspired deep teal + green accent */
+/* AMC Docs — Dark green on black design system */
 :root {
-  --bg: #071C26;
-  --bg2: #0A2230;
-  --bg3: #0D2A3A;
+  --bg: #0a0a0a;
+  --bg2: #111111;
+  --bg3: #1a1a1a;
   --card: rgba(74,239,121,0.04);
-  --fg: #F0F4F8;
-  --fg2: #A0B8C8;
-  --muted: #7394A4;
+  --fg: #FFFFFF;
+  --fg2: #a0a0a0;
+  --muted: #a0a0a0;
   --green: #4AEF79;
   --green2: #3CD468;
   --green3: #2A9D50;
@@ -42,7 +42,7 @@ code, pre { font-family: var(--mono); }
 .topbar {
   position: fixed; top: 0; left: 0; right: 0;
   height: var(--topbar-h);
-  background: rgba(7,28,38,0.95);
+  background: rgba(10,10,10,0.95);
   backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--border);
   display: flex; align-items: center;

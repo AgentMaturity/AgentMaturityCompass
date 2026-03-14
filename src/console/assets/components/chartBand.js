@@ -3,7 +3,7 @@ function clamp(n) {
   return Number(n);
 }
 
-export function renderChartBand(canvas, points, forecast, color = "#0f766e") {
+export function renderChartBand(canvas, points, forecast, color = "#4AEF79") {
   if (!canvas || typeof canvas.getContext !== "function") {
     return;
   }

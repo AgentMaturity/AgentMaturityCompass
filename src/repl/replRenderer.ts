@@ -7,7 +7,7 @@ import chalk from "chalk";
 import type { ReplContext } from "./replContext.js";
 import { getSuggestions, findClosest } from "./replParser.js";
 
-const ACCENT = chalk.hex("#6366f1");
+const ACCENT = chalk.hex("#4AEF79");
 const DIM = chalk.gray;
 const GREEN = chalk.green;
 const RED = chalk.red;

@@ -1,12 +1,21 @@
+/* ═══════════════════════════════════════════════════════════════
+   AMC Console — Dark Theme matching website
+   ═══════════════════════════════════════════════════════════════ */
+
 :root {
-  --bg: #f1f5f9;
-  --card: #ffffff;
-  --ink: #0f172a;
-  --muted: #475569;
-  --accent: #0f766e;
-  --danger: #b91c1c;
-  --ok: #166534;
-  --border: #dbe3ec;
+  --bg: #0a0a0a;
+  --bg-alt: #111111;
+  --card: #1a1a1a;
+  --ink: #FFFFFF;
+  --muted: #a0a0a0;
+  --accent: #4AEF79;
+  --accent2: #3CD468;
+  --danger: #f87171;
+  --ok: #4AEF79;
+  --border: rgba(255,255,255,0.08);
+  --border-strong: rgba(255,255,255,0.15);
+  --mono: 'Space Mono', monospace;
+  --sans: 'Inter', system-ui, sans-serif;
 }
 
 * {
@@ -15,8 +24,8 @@
 
 body {
   margin: 0;
-  font-family: "IBM Plex Sans", "Avenir Next", "Segoe UI", sans-serif;
-  background: linear-gradient(180deg, #e2e8f0, #f8fafc 30%, #eef2ff);
+  font-family: var(--sans);
+  background: var(--bg);
   color: var(--ink);
 }
 
@@ -27,31 +36,39 @@ body {
 }
 
 nav {
-  background: #0f172a;
-  color: #e2e8f0;
+  background: var(--bg-alt);
+  color: var(--ink);
   padding: 16px;
+  border-right: 1px solid var(--border);
 }
 
 nav h1 {
   font-size: 1rem;
   margin: 0 0 12px;
+  color: var(--accent);
+  font-family: var(--mono);
 }
 
 nav a {
   display: block;
-  color: #cbd5e1;
+  color: var(--muted);
   text-decoration: none;
   padding: 8px 10px;
   border-radius: 8px;
   margin-bottom: 4px;
+  transition: color 0.15s, background 0.15s;
+  font-size: 13px;
 }
 
-nav a:hover {
-  background: rgba(148, 163, 184, 0.2);
+nav a:hover,
+nav a.active {
+  background: rgba(74,239,121,0.08);
+  color: var(--accent);
 }
 
 main {
   padding: 16px;
+  background: var(--bg);
 }
 
 .card {
@@ -60,7 +77,7 @@ main {
   border-radius: 12px;
   padding: 14px;
   margin-bottom: 12px;
-  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.06);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.3);
 }
 
 .grid {
@@ -72,6 +89,7 @@ main {
 .tile-value {
   font-size: 1.4rem;
   font-weight: 700;
+  color: var(--ink);
 }
 
 .muted {
@@ -93,23 +111,42 @@ textarea {
   border: 1px solid var(--border);
   padding: 8px 10px;
   border-radius: 8px;
+  background: var(--bg-alt);
+  color: var(--ink);
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: rgba(74,239,121,0.4);
 }
 
 button {
   border: 0;
   border-radius: 8px;
   background: var(--accent);
-  color: #fff;
+  color: #0a0a0a;
   padding: 8px 12px;
   cursor: pointer;
+  font-weight: 600;
+  transition: opacity 0.15s;
+}
+
+button:hover {
+  opacity: 0.85;
 }
 
 button.secondary {
-  background: #334155;
+  background: var(--card);
+  border: 1px solid var(--border-strong);
+  color: var(--ink);
 }
 
 button.danger {
   background: var(--danger);
+  color: #fff;
 }
 
 .status-ok {
@@ -149,16 +186,40 @@ td {
   padding: 8px;
   border-bottom: 1px solid var(--border);
   vertical-align: top;
+  font-size: 13px;
+}
+
+th {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
 }
 
 code {
-  background: #e2e8f0;
-  padding: 1px 4px;
+  background: rgba(255,255,255,0.06);
+  color: var(--accent);
+  padding: 1px 6px;
   border-radius: 4px;
+  font-family: var(--mono);
+  font-size: 0.9em;
 }
 
 .banner {
   border-left: 4px solid var(--accent);
+  background: rgba(74,239,121,0.06);
+  padding: 10px 14px;
+  border-radius: 0 8px 8px 0;
+}
+
+a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+a:hover {
+  opacity: 0.8;
 }
 
 @media (max-width: 900px) {
@@ -169,6 +230,8 @@ code {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 6px;
+    border-right: none;
+    border-bottom: 1px solid var(--border);
   }
   nav h1 {
     grid-column: 1 / -1;

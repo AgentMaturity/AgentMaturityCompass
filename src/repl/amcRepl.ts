@@ -27,7 +27,7 @@ import {
   renderNoWorkspace, renderDidYouMean, renderTimer
 } from "./replRenderer.js";
 
-const PROMPT = chalk.hex("#6366f1").bold("> ");
+const PROMPT = chalk.hex("#4AEF79").bold("> ");
 const QUIT_COMMANDS = new Set(["exit", "quit", "q", ".exit", ".quit", "bye", "goodbye"]);
 const CLEAR_COMMANDS = new Set(["clear", "cls"]);
 const PRELOAD_TIMEOUT_MS = 5000;
