@@ -10,6 +10,7 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { z } from "zod";
+import * as YAML from "yaml";
 import { fleetRoot } from "./paths.js";
 import { ensureDir, pathExists, writeFileAtomic } from "../utils/fs.js";
 import type { TrustLabel } from "../types.js";
@@ -92,16 +93,12 @@ export function loadTrustInheritancePolicy(workspace: string): TrustInheritanceP
   if (!pathExists(file)) {
     return trustInheritancePolicySchema.parse({});
   }
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const YAML = require("yaml") as typeof import("yaml");
   const raw = YAML.parse(readFileSync(file, "utf8")) as unknown;
   return trustInheritancePolicySchema.parse(raw);
 }
 
 export function saveTrustInheritancePolicy(workspace: string, policy: TrustInheritancePolicy): string {
   ensureDir(fleetRoot(workspace));
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const YAML = require("yaml") as typeof import("yaml");
   const file = policyPath(workspace);
   writeFileAtomic(file, YAML.stringify(policy), 0o644);
   return file;

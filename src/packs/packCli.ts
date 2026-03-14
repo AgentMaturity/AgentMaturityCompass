@@ -446,7 +446,7 @@ export function packInitCli(params: {
     author: {
       name: params.author || "Unknown"
     },
-    main: "index.js",
+    main: "index.mjs",
     keywords: [],
     license: params.license || "MIT",
     dependencies: {},
@@ -479,33 +479,115 @@ export function packInitCli(params: {
     ensureDir(join(packDir, "src"));
     ensureDir(join(packDir, "test"));
     
-    // Create basic index.js
-    const indexPath = join(packDir, "index.js");
+    // Create main entry point (ESM format)
+    const indexPath = join(packDir, "index.mjs");
     if (!pathExists(indexPath)) {
       const indexContent = `/**
  * ${defaultName} - AMC ${params.type || 'assurance'} pack
- * 
+ *
  * ${params.description || `AMC ${params.type || 'assurance'} pack`}
+ *
+ * @see docs/ASSURANCE_LAB.md for full pack authoring guide
  */
 
-module.exports = {
+export default {
   name: '${defaultName}',
   version: '${params.version || '1.0.0'}',
-  
-  // Pack implementation goes here
+
+  /**
+   * execute(context) — called by AMC when running this pack.
+   * @param context.agentId   - The agent being assessed
+   * @param context.workspace - Path to the AMC workspace
+   * @param context.mode      - 'sandbox' (local test) | 'live' (production)
+   * @returns { success, results[] }
+   */
   async execute(context) {
-    console.log('Executing ${defaultName}...');
-    
+    const { agentId, workspace, mode } = context;
+    console.log(\`[\${this.name}] Running against agent: \${agentId} (mode: \${mode})\`);
+
+    const results = [];
+
+    // TODO: implement your pack scenarios here.
+    // Example: check that the agent has a charter document
+    results.push({
+      scenarioId: 'example-check',
+      passed: true,
+      detail: 'Replace this with a real check',
+    });
+
     return {
-      success: true,
-      results: []
+      success: results.every(r => r.passed),
+      results,
     };
-  }
+  },
 };
 `;
       writeUtf8(indexPath, indexContent);
     }
-    
+
+    // Create starter source helper
+    const srcHelperPath = join(packDir, "src", "helpers.mjs");
+    if (!pathExists(srcHelperPath)) {
+      const srcContent = `/**
+ * ${defaultName} — helper utilities
+ *
+ * Put reusable logic here and import from the top-level index.mjs.
+ */
+
+/**
+ * Example helper: checks that a value is non-empty.
+ * Replace with domain-specific logic.
+ * @param {unknown} value
+ * @returns {boolean}
+ */
+export function isNonEmpty(value) {
+  return value !== null && value !== undefined && value !== '';
+}
+`;
+      writeUtf8(srcHelperPath, srcContent);
+    }
+
+    // Create starter test file
+    const testFilePath = join(packDir, "test", "pack.test.mjs");
+    if (!pathExists(testFilePath)) {
+      const testContent = `/**
+ * ${defaultName} — test suite
+ *
+ * Run with:  node --test test/pack.test.mjs
+ * Or:        npx vitest run
+ */
+
+import { describe, it } from 'node:test';
+import assert from 'node:assert/strict';
+import pack from '../index.mjs';
+import { isNonEmpty } from '../src/helpers.mjs';
+
+describe('${defaultName} pack', () => {
+  it('has the correct name', () => {
+    assert.equal(pack.name, '${defaultName}');
+  });
+
+  it('execute() returns success in sandbox mode', async () => {
+    const context = { agentId: 'test-agent', workspace: '/tmp', mode: 'sandbox' };
+    const result = await pack.execute(context);
+    assert.ok(result.success, 'Pack should succeed in sandbox');
+    assert.ok(Array.isArray(result.results), 'results must be an array');
+  });
+});
+
+describe('helper utilities', () => {
+  it('isNonEmpty returns true for a non-empty string', () => {
+    assert.ok(isNonEmpty('hello'));
+  });
+
+  it('isNonEmpty returns false for empty string', () => {
+    assert.ok(!isNonEmpty(''));
+  });
+});
+`;
+      writeUtf8(testFilePath, testContent);
+    }
+
     return {
       success: true,
       manifestPath,

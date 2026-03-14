@@ -318,7 +318,7 @@ export async function runStudioForeground(params: {
   if (!status.unlocked) {
     const passphrase = process.env.AMC_VAULT_PASSPHRASE;
     if (!passphrase) {
-      throw new Error("Vault is locked. Run `amc vault unlock` (or set AMC_VAULT_PASSPHRASE for CI/non-interactive use).");
+      throw new Error("🔐 Vault locked. Run `amc vault unlock` first, or `amc setup` for first-time setup. For CI, set AMC_VAULT_PASSPHRASE env var.");
     }
     unlockVault(workspace, passphrase);
   }

@@ -1,0 +1,254 @@
+{
+  "cc5c7f16-f649-4b42-935b-bd0bb3c565f0": {
+    "ts": 1771489818686,
+    "eventType": "audit",
+    "sessionId": "studio-config-1771489818686",
+    "runtime": "unknown",
+    "trustTier": "OBSERVED"
+  },
+  "37eef13c-1e36-40bd-a4b5-75a5f0b77db0": {
+    "ts": 1771489818707,
+    "eventType": "audit",
+    "sessionId": "studio-lifecycle-1771489818707-studio_runtime_started",
+    "runtime": "unknown",
+    "trustTier": "OBSERVED"
+  },
+  "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0": {
+    "ts": 1771590342172,
+    "eventType": "audit",
+    "sessionId": "studio-lifecycle-1771590342171-studio_runtime_stopped",
+    "runtime": "unknown",
+    "trustTier": "OBSERVED"
+  },
+  "008a35a2-7e22-4bcf-b78a-27fd01a3c32a": {
+    "ts": 1771866883178,
+    "eventType": "audit",
+    "sessionId": "d0e56de7-ae53-4df8-9d8f-de5cd058f685",
+    "runtime": "unknown",
+    "trustTier": "OBSERVED"
+  },
+  "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35": {
+    "ts": 1771867023716,
+    "eventType": "audit",
+    "sessionId": "studio-lifecycle-1771867023716-studio_runtime_started",
+    "runtime": "unknown",
+    "trustTier": "OBSERVED"
+  },
+  "8e77c5ad-4c8c-4409-8805-64355e577852": {
+    "ts": 1771870405294,
+    "eventType": "audit",
+    "sessionId": "studio-lifecycle-1771870405294-studio_runtime_stopped",
+    "runtime": "unknown",
+    "trustTier": "OBSERVED"
+  },
+  "abb05e54-ef7d-4586-b46e-6d824f40e712": {
+    "ts": 1771870409062,
+    "eventType": "audit",
+    "sessionId": "studio-lifecycle-1771870409061-studio_runtime_started",
+    "runtime": "unknown",
+    "trustTier": "OBSERVED"
+  },
+  "e5eeb980-afb8-420f-a7a9-ec10b472606b": {
+    "ts": 1771870428660,
+    "eventType": "audit",
+    "sessionId": "b2e94cbd-778a-4980-af38-85a5489296ec",
+    "runtime": "gateway",
+    "trustTier": "OBSERVED"
+  },
+  "7a295732-c678-4648-9627-36ebe16d6a37": {
+    "ts": 1771870428666,
+    "eventType": "audit",
+    "sessionId": "b2e94cbd-778a-4980-af38-85a5489296ec",
+    "runtime": "gateway",
+    "trustTier": "OBSERVED"
+  },
+  "327bfa32-2154-4ed8-ab38-8b6d847582aa": {
+    "ts": 1771870619281,
+    "eventType": "audit",
+    "sessionId": "b2e94cbd-778a-4980-af38-85a5489296ec",
+    "runtime": "gateway",
+    "trustTier": "OBSERVED"
+  },
+  "89bb261f-09ea-49bf-ab8d-6a333b81f987": {
+    "ts": 1771870619312,
+    "eventType": "audit",
+    "sessionId": "b2e94cbd-778a-4980-af38-85a5489296ec",
+    "runtime": "gateway",
+    "trustTier": "OBSERVED"
+  },
+  "08240186-60f8-4217-9ac0-b4490be32ebb": {
+    "ts": 1771870673384,
+    "eventType": "audit",
+    "sessionId": "b2e94cbd-778a-4980-af38-85a5489296ec",
+    "runtime": "gateway",
+    "trustTier": "OBSERVED"
+  },
+  "19d5b02c-8f5c-46b0-81f4-0611c6ce300f": {
+    "ts": 1771870673438,
+    "eventType": "llm_request",
+    "sessionId": "b2e94cbd-778a-4980-af38-85a5489296ec",
+    "runtime": "gateway",
+    "trustTier": "OBSERVED"
+  },
+  "cda53773-f7b0-42ca-bbaf-01805838b72d": {
+    "ts": 1771870686622,
+    "eventType": "audit",
+    "sessionId": "studio-lifecycle-1771870686622-studio_runtime_stopped",
+    "runtime": "unknown",
+    "trustTier": "OBSERVED"
+  },
+  "16eb3f0c-43f6-4a58-98d6-9e8339b6e0ff": {
+    "ts": 1771870720445,
+    "eventType": "audit",
+    "sessionId": "studio-lifecycle-1771870720445-studio_runtime_started",
+    "runtime": "unknown",
+    "trustTier": "OBSERVED"
+  },
+  "5cff80a6-4b93-4301-b545-544918829e96": {
+    "ts": 1771870733981,
+    "eventType": "audit",
+    "sessionId": "c6d202af-b83b-4e6d-95c1-bf799ea4d5ed",
+    "runtime": "gateway",
+    "trustTier": "OBSERVED"
+  },
+  "72ede241-ae3a-47e8-8614-6ba60b3f9c03": {
+    "ts": 1771870734038,
+    "eventType": "llm_request",
+    "sessionId": "c6d202af-b83b-4e6d-95c1-bf799ea4d5ed",
+    "runtime": "gateway",
+    "trustTier": "OBSERVED"
+  },
+  "072aa29e-aa55-4d62-b361-a2f46d89609e": {
+    "ts": 1771870734044,
+    "eventType": "llm_response",
+    "sessionId": "c6d202af-b83b-4e6d-95c1-bf799ea4d5ed",
+    "runtime": "gateway",
+    "trustTier": "OBSERVED"
+  },
+  "28d21fe1-e133-4930-85a3-a3d414a07e94": {
+    "ts": 1771870734288,
+    "eventType": "llm_request",
+    "sessionId": "c6d202af-b83b-4e6d-95c1-bf799ea4d5ed",
+    "runtime": "gateway",
+    "trustTier": "OBSERVED"
+  },
+  "7867fddd-03b5-4144-8f14-0ad3f40f60a6": {
+    "ts": 1771870734292,
+    "eventType": "llm_response",
+    "sessionId": "c6d202af-b83b-4e6d-95c1-bf799ea4d5ed",
+    "runtime": "gateway",
+    "trustTier": "OBSERVED"
+  },
+  "de3b6db7-4bf3-401d-bb66-ad86feacd8db": {
+    "ts": 1771870734543,
+    "eventType": "llm_request",
+    "sessionId": "c6d202af-b83b-4e6d-95c1-bf799ea4d5ed",
+    "runtime": "gateway",
+    "trustTier": "OBSERVED"
+  },
+  "e96ad284-f470-4dca-bfda-1ac991727f39": {
+    "ts": 1771870734546,
+    "eventType": "llm_response",
+    "sessionId": "c6d202af-b83b-4e6d-95c1-bf799ea4d5ed",
+    "runtime": "gateway",
+    "trustTier": "OBSERVED"
+  },
+  "0f0c532e-b557-40c1-a472-d98c0462db96": {
+    "ts": 1771870734793,
+    "eventType": "llm_request",
+    "sessionId": "c6d202af-b83b-4e6d-95c1-bf799ea4d5ed",
+    "runtime": "gateway",
+    "trustTier": "OBSERVED"
+  },
+  "292240bb-e52d-42dd-8c92-fe56773fdc4e": {
+    "ts": 1771870734796,
+    "eventType": "llm_response",
+    "sessionId": "c6d202af-b83b-4e6d-95c1-bf799ea4d5ed",
+    "runtime": "gateway",
+    "trustTier": "OBSERVED"
+  },
+  "b571dfe2-1025-4a69-985d-ad6b6de84608": {
+    "ts": 1771870735047,
+    "eventType": "llm_request",
+    "sessionId": "c6d202af-b83b-4e6d-95c1-bf799ea4d5ed",
+    "runtime": "gateway",
+    "trustTier": "OBSERVED"
+  },
+  "0b51c038-69d3-4340-9a75-47256850029e": {
+    "ts": 1771870735049,
+    "eventType": "llm_response",
+    "sessionId": "c6d202af-b83b-4e6d-95c1-bf799ea4d5ed",
+    "runtime": "gateway",
+    "trustTier": "OBSERVED"
+  },
+  "49809f50-f6c1-471e-9f72-c404ed6111fc": {
+    "ts": 1771870735297,
+    "eventType": "llm_request",
+    "sessionId": "c6d202af-b83b-4e6d-95c1-bf799ea4d5ed",
+    "runtime": "gateway",
+    "trustTier": "OBSERVED"
+  },
+  "f547abcf-3d63-4b2d-a75b-8e34e5c4e4f8": {
+    "ts": 1771870735300,
+    "eventType": "llm_response",
+    "sessionId": "c6d202af-b83b-4e6d-95c1-bf799ea4d5ed",
+    "runtime": "gateway",
+    "trustTier": "OBSERVED"
+  },
+  "c15466d8-819f-4e0e-8a7f-16a07312962f": {
+    "ts": 1771870735546,
+    "eventType": "llm_request",
+    "sessionId": "c6d202af-b83b-4e6d-95c1-bf799ea4d5ed",
+    "runtime": "gateway",
+    "trustTier": "OBSERVED"
+  },
+  "ee6cdb54-b32c-4aa4-b53e-6efd01b78a0e": {
+    "ts": 1771870735548,
+    "eventType": "llm_response",
+    "sessionId": "c6d202af-b83b-4e6d-95c1-bf799ea4d5ed",
+    "runtime": "gateway",
+    "trustTier": "OBSERVED"
+  },
+  "d939017b-c408-4b90-96f9-b113d620c0c9": {
+    "ts": 1771870735795,
+    "eventType": "llm_request",
+    "sessionId": "c6d202af-b83b-4e6d-95c1-bf799ea4d5ed",
+    "runtime": "gateway",
+    "trustTier": "OBSERVED"
+  },
+  "ac104f1a-8791-4710-96f2-85486f77a8b6": {
+    "ts": 1771870735797,
+    "eventType": "llm_response",
+    "sessionId": "c6d202af-b83b-4e6d-95c1-bf799ea4d5ed",
+    "runtime": "gateway",
+    "trustTier": "OBSERVED"
+  },
+  "cf5697cd-7355-41d4-acd2-b753b82b23c0": {
+    "ts": 1771870736048,
+    "eventType": "llm_request",
+    "sessionId": "c6d202af-b83b-4e6d-95c1-bf799ea4d5ed",
+    "runtime": "gateway",
+    "trustTier": "OBSERVED"
+  },
+  "e80da1c8-a5e9-4dff-8200-4fa838718f67": {
+    "ts": 1771870736051,
+    "eventType": "llm_response",
+    "sessionId": "c6d202af-b83b-4e6d-95c1-bf799ea4d5ed",
+    "runtime": "gateway",
+    "trustTier": "OBSERVED"
+  },
+  "8cfe763c-4389-4a0a-af52-923f342d7756": {
+    "ts": 1771870736305,
+    "eventType": "llm_request",
+    "sessionId": "c6d202af-b83b-4e6d-95c1-bf799ea4d5ed",
+    "runtime": "gateway",
+    "trustTier": "OBSERVED"
+  },
+  "c7e08ab1-aef1-42eb-8068-c1e54aee474a": {
+    "ts": 1771870736309,
+    "eventType": "llm_response",
+    "sessionId": "c6d202af-b83b-4e6d-95c1-bf799ea4d5ed",
+    "runtime": "gateway",
+    "trustTier": "OBSERVED"
+  }
+}

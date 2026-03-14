@@ -1354,13 +1354,13 @@ program
       console.log(chalk.white(`     Why: ${rec.whyItMatters}`));
       console.log(chalk.cyan(`     How: ${rec.howToImprove}`));
 
-      // Map to specific CLI commands
+      // Map to specific CLI commands (F28: include --agent <your-agent-id> for context)
       const cmdMap: Record<string, string> = {
-        "AMC-1.1": "amc score behavioral-contract",
-        "AMC-2.1": "amc score autonomy-duration",
-        "AMC-3.1.1": "amc score alignment-index",
-        "AMC-3.2": "amc score factuality",
-        "AMC-4.1": "amc score audit-depth",
+        "AMC-1.1": "amc score behavioral-contract --agent <your-agent-id>",
+        "AMC-2.1": "amc score autonomy-duration --agent <your-agent-id>",
+        "AMC-3.1.1": "amc score alignment-index --agent <your-agent-id>",
+        "AMC-3.2": "amc score factuality --agent <your-agent-id>",
+        "AMC-4.1": "amc score audit-depth --agent <your-agent-id>",
       };
       const cmd = cmdMap[rec.questionId];
       if (cmd) {
@@ -2071,6 +2071,7 @@ program
     console.log("No ledger setup required. This is a preliminary score from 5 high-signal questions.");
     console.log(`Score: ${result.totalScore}/${result.maxScore} (${result.percentage}%)`);
     console.log(`Preliminary maturity: ${result.preliminaryLevel}`);
+    console.log(chalk.dim("Maturity Levels: L0=Undocumented | L1=Documented | L2=Automated | L3=Evidence-backed | L4=Proactive | L5=Certifiable"));
 
     // EU AI Act mapping
     if (opts.euAiAct) {
@@ -2111,7 +2112,7 @@ program
       console.log(chalk.yellow("💡 No evidence collected yet. Your score reflects default (L0) state."));
       console.log(chalk.gray("  To score a real agent, capture evidence first:"));
       console.log(chalk.white("  $"), chalk.cyan("amc wrap <runtime> -- <your-agent-command>"), chalk.gray("  # Capture agent behavior"));
-      console.log(chalk.white("  $"), chalk.cyan("amc ingest <logfile>"), chalk.gray("  # Or import existing logs"));
+      console.log(chalk.white("  $"), chalk.cyan("amc evidence ingest --source <logfile>"), chalk.gray("  # Or import existing logs"));
       console.log(chalk.white("  $"), chalk.cyan("amc quickscore"), chalk.gray("  # Then re-score"));
     }
 
@@ -2171,6 +2172,15 @@ program
     for (const evidence of explanation.exampleEvidence) {
       console.log(`- ${evidence}`);
     }
+    // F27: inline glossary of technical terms that appear in AMC explain output
+    console.log("");
+    console.log(chalk.cyan("Glossary (AMC terms used above):"));
+    console.log(chalk.gray("  context.mission    ") + "— your agent's stated purpose and scope (document it in AGENTS.md or a charter file)");
+    console.log(chalk.gray("  guardrails.alignment") + "— rules that prevent the agent from acting outside its mission (e.g. topic filters, action limits)");
+    console.log(chalk.gray("  evidence           ") + "— logged proof that a behavior actually occurred (not just claimed in docs)");
+    console.log(chalk.gray("  L0–L5 levels       ") + "— L0=undocumented, L1=documented, L2=automated checks, L3=evidence-backed, L4=proactive, L5=certifiable");
+    console.log(chalk.gray("  tuning knobs       ") + "— configurable parameters that control agent behavior (e.g. temperature, retry limits)");
+    console.log(chalk.gray("  gate               ") + "— a pass/fail check that blocks deployment if requirements are not met");
   });
 
 program
@@ -2751,7 +2761,7 @@ studio
   .action(async () => {
     const state = readStudioState(process.cwd());
     if (!state) {
-      throw new Error("Studio state not found. Start with `amc up`.");
+      throw new Error("Studio state not found. Start with: amc up (starts Studio + Gateway + Bridge)");
     }
     const token = readAdminToken(process.cwd());
     const health = await httpGetJson(`http://${state.host}:${state.apiPort}/status`, token);
@@ -7146,6 +7156,7 @@ ci
 
 ci
   .command("check")
+  .alias("gate")
   .description("One-liner CI gate: quickscore + threshold check (exit 1 if below)")
   .option("--min-score <n>", "minimum score percentage to pass (0-100)", "20")
   .option("--min-level <level>", "minimum maturity level (L0-L5)", "L1")
@@ -8154,13 +8165,28 @@ notary
 
 trust
   .command("init")
-  .description("Create and sign .amc/trust.yaml")
+  .description("Create and sign .amc/trust.yaml — sets up the trust mode (SELF/NOTARY) that governs artifact signing")
+  .addHelpText("after", `
+Concepts:
+  trust.yaml   — config file that declares how AMC verifies artifact signatures
+  SELF mode    — AMC signs with its own local key (default, good for development)
+  NOTARY mode  — AMC requires an external notary to co-sign (required for production/regulated)
+
+Example workflow:
+  amc trust init                              # create SELF-mode trust config
+  amc trust status                            # verify trust config and notary health
+  amc trust enable-notary --base-url <url> \\  # switch to NOTARY mode
+    --pin ./notary-pubkey.pem
+`)
   .action(() => {
     assertOwnerMode(process.cwd(), "trust init");
     const created = initTrustConfig(process.cwd());
     console.log(chalk.green(`Trust config created: ${created.path}`));
     console.log(`Signature: ${created.sigPath}`);
     console.log(`Mode: ${created.config.trust.mode}`);
+    console.log("");
+    console.log(chalk.gray("Next: amc trust status   — verify the config is valid and signed"));
+    console.log(chalk.gray("Docs: amc trust init --help   — see concepts and workflow"));
   });
 
 trust
@@ -8876,8 +8902,10 @@ compliance
   .option("--out <path>", "output path (.md or .json)")
   .option("--agent <agentId>", "agent ID (overrides global --agent)")
   .action((opts: { framework: string; window: string; out?: string; agent?: string }) => {
+    // Default to Markdown output to stdout-friendly file (F13)
+    const defaultToMarkdown = !opts.out;
     if (!opts.out) {
-      opts.out = `compliance-${opts.framework.toLowerCase()}.json`;
+      opts.out = `compliance-${opts.framework.toLowerCase()}.md`;
     }
     const framework = opts.framework as ComplianceFramework;
     const family = getFrameworkFamily(framework);
@@ -8892,7 +8920,13 @@ compliance
     });
     console.log(chalk.green(`Compliance report generated: ${out.outFile}`));
     console.log(`Framework: ${family.displayName}`);
-    console.log(`Coverage score: ${out.report.coverage.score.toFixed(3)}`);
+    // F14: show coverage as percentage with human-readable label
+    const coveragePct = (out.report.coverage.score * 100).toFixed(1);
+    const coverageLabel = out.report.coverage.score >= 0.8 ? "SATISFIED" : out.report.coverage.score >= 0.5 ? "PARTIAL" : "INSUFFICIENT";
+    console.log(`Coverage: ${coveragePct}% (${coverageLabel})`);
+    if (defaultToMarkdown) {
+      console.log(chalk.gray(`  Tip: use --out report.json for machine-readable output`));
+    }
   });
 
 compliance
@@ -10156,6 +10190,35 @@ fleet
     console.log(`Dimension 2 average: ${health.dimensionAverages[2].toFixed(2)}`);
     const activeDrift = health.agents.filter((agent) => agent.belowBaseline).map((agent) => agent.agentId);
     console.log(`Drift below baseline: ${activeDrift.length > 0 ? activeDrift.join(", ") : "none"}`);
+    // F25: guidance when all zeros
+    if (health.scoredAgentCount === 0) {
+      console.log("");
+      console.log(chalk.yellow("No scored agents yet. Score your first agent: ") + chalk.cyan("amc quickscore"));
+      console.log(chalk.gray("  Then run a full diagnostic:") + " " + chalk.cyan("amc score formal-spec <agentId>"));
+    }
+  });
+
+fleet
+  .command("status")
+  .description("Show fleet overview (agent count, average score, health)")
+  .option("--json", "print full JSON payload", false)
+  .action((opts: { json?: boolean }) => {
+    const health = buildFleetHealthDashboard({ workspace: process.cwd() });
+    if (opts.json) {
+      console.log(JSON.stringify(health, null, 2));
+      return;
+    }
+    console.log(chalk.bold("\n🌐  Fleet Status"));
+    console.log(`  Agents:          ${health.agentCount} total, ${health.scoredAgentCount} scored`);
+    console.log(`  Avg score:       L${health.averageOverallLevel.toFixed(1)} (integrity: ${health.averageIntegrityIndex.toFixed(3)})`);
+    console.log(`  Baseline:        ${health.baselineIntegrityIndex.toFixed(3)}`);
+    const drifting = health.agents.filter((agent: { belowBaseline: boolean; agentId: string }) => agent.belowBaseline).map((agent: { belowBaseline: boolean; agentId: string }) => agent.agentId);
+    if (drifting.length > 0) {
+      console.log(chalk.yellow(`  ⚠ Drifting:      ${drifting.join(", ")}`));
+    } else {
+      console.log(chalk.green(`  Health:          All agents at or above baseline`));
+    }
+    console.log("");
   });
 
 const fleetPolicy = fleet.command("policy").description("Fleet governance policy operations");
@@ -16356,7 +16419,7 @@ const score = program.command("score").description("Maturity scoring, adversaria
     if (result.totalScore === 0) {
       console.log(chalk.yellow("\n💡 No evidence collected yet. Capture agent behavior first:"));
       console.log(chalk.gray("  amc wrap <runtime> -- <command>    # Capture evidence"));
-      console.log(chalk.gray("  amc ingest <logfile>               # Import existing logs"));
+      console.log(chalk.gray("  amc evidence ingest --source <logfile>  # Import existing logs"));
     }
     if (result.gaps.length > 0) {
       console.log(chalk.yellow("Top gaps:"));
@@ -17185,28 +17248,56 @@ score
 score
   .command("industry-adjust")
   .description("Adjust a score using an industry-specific trust model")
-  .requiredOption("--industry <id>", "Industry ID (e.g. healthcare, finance, defense)")
-  .requiredOption("--score <n>", "Raw score value (0-1 internal scale)")
-  .option("--agent <id>", "Agent ID (for display)")
+  .option("--industry <id>", "Industry ID (e.g. healthcare, finance, defense)")
+  .option("--score <n>", "Raw score value (0-1 internal scale); auto-read from agent if omitted")
+  .option("--agent <id>", "Agent ID (used to auto-read current score)")
   .option("--json", "Output as JSON")
-  .action(async (opts: { industry: string; score: string; agent?: string; json?: boolean }) => {
+  .action(async (opts: { industry?: string; score?: string; agent?: string; json?: boolean }) => {
     try {
+      // F17: validate all required options at once before running
+      const missing: string[] = [];
+      if (!opts.industry) missing.push("--industry <id>");
+      if (missing.length > 0) {
+        const { INDUSTRY_TRUST_MODELS } = await import("./score/industryTrustModels.js");
+        console.error(chalk.red(`Missing required options: ${missing.join(", ")}`));
+        console.log(chalk.gray("Available industries:"), Object.keys(INDUSTRY_TRUST_MODELS).join(", "));
+        process.exit(1); return;
+      }
       const { computeIndustryAdjustedScore, INDUSTRY_TRUST_MODELS } = await import("./score/industryTrustModels.js");
-      const rawScore = parseFloat(opts.score);
-      const model = INDUSTRY_TRUST_MODELS[opts.industry];
+      // F18: auto-read agent score if --score not provided
+      let rawScore: number;
+      if (!opts.score) {
+        try {
+          const agentId = opts.agent ?? activeAgent(program) ?? "default";
+          const report = await runDiagnostic({ workspace: process.cwd(), window: "30d", agentId });
+          const avgLevel = report.layerScores.length > 0
+            ? report.layerScores.reduce((s: number, l: { avgFinalLevel: number }) => s + l.avgFinalLevel, 0) / report.layerScores.length
+            : 0;
+          rawScore = Math.min(1, avgLevel / 5);
+          console.log(chalk.gray(`Using current agent score: ${(rawScore * 100).toFixed(1)}% (auto-read from ${agentId})`));
+        } catch {
+          console.error(chalk.red("No --score provided and no agent score available."));
+          console.log(chalk.gray("Run `amc quickscore` first, or provide --score <0-1>"));
+          process.exit(1); return;
+        }
+      } else {
+        rawScore = parseFloat(opts.score);
+      }
+      const industryId = opts.industry!;
+      const model = INDUSTRY_TRUST_MODELS[industryId];
       if (!model) {
-        console.error(chalk.red(`Unknown industry: ${opts.industry}`));
+        console.error(chalk.red(`Unknown industry: ${industryId}`));
         console.log(chalk.gray("Available:"), Object.keys(INDUSTRY_TRUST_MODELS).join(", "));
         process.exit(1); return;
       }
       const dims = Object.keys(model.dimensionWeights);
       const rawDimensionScores: Record<string, number> = {};
       for (const dim of dims) rawDimensionScores[dim] = rawScore;
-      const result = computeIndustryAdjustedScore(rawDimensionScores, opts.industry, Date.now(), 0.8);
+      const result = computeIndustryAdjustedScore(rawDimensionScores, industryId, Date.now(), 0.8);
       if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
       console.log(chalk.bold.hex("#FF6600")(`\n📊  Industry-Adjusted Score`));
       if (opts.agent) console.log(chalk.gray("Agent:"), opts.agent);
-      console.log(chalk.gray("Industry:"), `${model.name} (${opts.industry})`);
+      console.log(chalk.gray("Industry:"), `${model.name} (${industryId})`);
       console.log(chalk.gray("Raw score:"), result.rawScore);
       console.log(chalk.gray("Adjusted score:"), chalk.bold(result.adjustedScore.toString()));
       console.log(chalk.gray("Maturity level:"), result.maturityLevel);
@@ -17758,7 +17849,7 @@ program
         answers[q.id] = level;
       }
     } else {
-      console.log(chalk.yellow("  Non-interactive mode: using L0 defaults"));
+      console.log(chalk.yellow("  ⚠  No TTY detected — defaulting all answers to L0. For interactive assessment, run: amc quickscore"));
     }
 
     const result = computeQuickScore(answers, "quick");
@@ -17834,6 +17925,62 @@ apiCmd
     console.log(`  Base path: /api/v1/`);
     console.log(`  Integrated into Studio server at :3212`);
     console.log(chalk.green("Run 'amc studio open' to start the server with API enabled."));
+  });
+
+apiCmd
+  .command("routes")
+  .description("List all available REST API endpoints")
+  .action(() => {
+    console.log(chalk.bold("\n🌐  AMC REST API v1 — Available Endpoints\n"));
+    const routes = [
+      { method: "GET",    path: "/api/v1/status",                  desc: "Server health and version" },
+      { method: "GET",    path: "/api/v1/agents",                   desc: "List all registered agents" },
+      { method: "GET",    path: "/api/v1/agents/:id",               desc: "Get agent details" },
+      { method: "POST",   path: "/api/v1/agents",                   desc: "Register a new agent" },
+      { method: "GET",    path: "/api/v1/agents/:id/score",         desc: "Get agent maturity score" },
+      { method: "GET",    path: "/api/v1/agents/:id/diagnostic",    desc: "Full diagnostic report" },
+      { method: "POST",   path: "/api/v1/agents/:id/score",         desc: "Submit scoring evidence" },
+      { method: "GET",    path: "/api/v1/fleet/health",             desc: "Fleet health dashboard" },
+      { method: "GET",    path: "/api/v1/compliance/report",        desc: "Generate compliance report" },
+      { method: "POST",   path: "/api/v1/shield/scan",              desc: "Run shield security scan" },
+      { method: "POST",   path: "/api/v1/vault/unlock",             desc: "Unlock the vault (passphrase)" },
+      { method: "GET",    path: "/api/v1/vault/status",             desc: "Vault lock status" },
+      { method: "GET",    path: "/api/v1/watch/events",             desc: "SSE stream of audit events" },
+      { method: "POST",   path: "/api/v1/enforce",                  desc: "Enforce a governance policy" },
+      { method: "GET",    path: "/api/v1/product/signals",          desc: "Product value signals" },
+    ];
+    for (const r of routes) {
+      const method = r.method.padEnd(6);
+      console.log(`  ${chalk.bold.cyan(method)} ${chalk.white(r.path.padEnd(42))} ${chalk.gray(r.desc)}`);
+    }
+    console.log("");
+    console.log(chalk.gray("  Base URL: http://localhost:3212"));
+    console.log(chalk.gray("  Auth:     Bearer token (see: amc user token)"));
+    console.log(chalk.gray("  Docs:     amc api docs | docs/API_REFERENCE.md"));
+    console.log("");
+  });
+
+apiCmd
+  .command("docs")
+  .description("Show API reference documentation summary and link")
+  .action(() => {
+    console.log(chalk.bold("\n📖  AMC API Reference\n"));
+    console.log("  Full docs: docs/API_REFERENCE.md (in your AMC install directory)");
+    console.log("  Online:    https://github.com/your-org/amc/blob/main/docs/API_REFERENCE.md");
+    console.log("");
+    console.log(chalk.bold("  Quick start:"));
+    console.log(`  1. Start Studio:      ${chalk.cyan("amc up")}`);
+    console.log(`  2. Get a token:       ${chalk.cyan("amc user token")}`);
+    console.log(`  3. List agents:       ${chalk.cyan("curl -H 'Authorization: Bearer <token>' http://localhost:3212/api/v1/agents")}`);
+    console.log(`  4. List all routes:   ${chalk.cyan("amc api routes")}`);
+    console.log("");
+    console.log(chalk.bold("  Authentication:"));
+    console.log("  All endpoints require a Bearer token header.");
+    console.log("  Tokens are issued by the Studio server after vault unlock.");
+    console.log("");
+    console.log(chalk.bold("  Response format:"));
+    console.log("  All responses are JSON. Errors use { error: string, code: string }.");
+    console.log("");
   });
 
 // ── Agent harness subcommands ────────────────────────────────────────────
@@ -18469,6 +18616,14 @@ pack
       }
 
       console.log(chalk.bold(`\n📦 Found ${result.total} packs\n`));
+      if (result.total === 0) {
+        console.log(chalk.yellow("No community packs found."));
+        console.log("");
+        console.log("  Built-in packs: " + chalk.cyan("amc assurance list"));
+        console.log("  Create your own: " + chalk.cyan("amc pack init"));
+        console.log("  Publish a pack:  " + chalk.cyan("amc pack publish"));
+        console.log("");
+      }
       for (const pkg of result.results) {
         console.log(`${chalk.cyan(pkg.name)}@${pkg.version}`);
         console.log(`  ${pkg.description}`);
@@ -18636,15 +18791,88 @@ pack
         console.log("");
         console.log(chalk.bold("Next steps:"));
         console.log("1. Edit package.json to customize your pack");
-        console.log("2. Implement your pack logic in index.js");
-        console.log("3. Test your pack locally");
-        console.log("4. Run 'amc pack publish' to share with the community");
+        console.log("2. Implement your pack logic in index.mjs (ESM format)");
+        console.log("3. Add tests in test/index.test.mjs");
+        console.log(`4. Test your pack locally: ${chalk.cyan("amc pack test .")}`);
+        console.log(`5. Run 'amc pack publish' to share with the community`);
+        console.log("");
+        console.log(chalk.bold("Documentation:"));
+        console.log(`  Pack authoring guide: ${chalk.cyan("docs/ASSURANCE_LAB.md")}`);
+        console.log(`  Contributing:         ${chalk.cyan("CONTRIBUTING.md")}`);
+        console.log(`  Built-in pack examples: ${chalk.cyan("amc assurance list")}`);
       } else {
         console.error(chalk.red(`❌ ${result.message}`));
         process.exit(1);
       }
     } catch (error: any) {
       console.error(chalk.red(`Init failed: ${error.message}`));
+      process.exit(1);
+    }
+  });
+
+pack
+  .command("test [dir]")
+  .description("Test a local pack in sandbox mode")
+  .option("--agent <agentId>", "agent ID to run the pack against")
+  .option("--json", "JSON output", false)
+  .action(async (dir: string | undefined, opts: { agent?: string; json?: boolean }) => {
+    const packDir = dir ? resolve(dir) : process.cwd();
+    // Verify pack exists
+    const manifestPath = join(packDir, "package.json");
+    if (!pathExists(manifestPath)) {
+      console.error(chalk.red(`No package.json found in ${packDir}. Run 'amc pack init' first.`));
+      process.exit(1); return;
+    }
+    let packManifest: { name?: string; version?: string; amcPack?: { type?: string } };
+    try {
+      packManifest = JSON.parse(readUtf8(manifestPath));
+    } catch {
+      console.error(chalk.red(`Invalid package.json in ${packDir}`));
+      process.exit(1); return;
+    }
+    const agentId = opts.agent ?? activeAgent(program) ?? "default";
+    console.log(chalk.bold(`\n🧪  Pack Sandbox Test — ${packManifest.name ?? "unknown"}`));
+    console.log(chalk.gray(`  Pack directory: ${packDir}`));
+    console.log(chalk.gray(`  Pack version:   ${packManifest.version ?? "unknown"}`));
+    console.log(chalk.gray(`  Pack type:      ${packManifest.amcPack?.type ?? "assurance"}`));
+    console.log(chalk.gray(`  Target agent:   ${agentId}`));
+    console.log("");
+    try {
+      // Load and execute the pack entry point
+      const entryPath = join(packDir, "index.js");
+      if (!pathExists(entryPath)) {
+        console.error(chalk.red(`No index.js found in ${packDir}. Implement your pack entry point first.`));
+        process.exit(1); return;
+      }
+      const packModule = await import(entryPath);
+      const packExport = packModule.default ?? packModule;
+      if (typeof packExport.execute !== "function") {
+        console.error(chalk.red(`Pack must export an execute(context) function.`));
+        console.log(chalk.gray(`  See: docs/ASSURANCE_LAB.md for pack structure`));
+        process.exit(1); return;
+      }
+      const context = { agentId, workspace: process.cwd(), mode: "sandbox" };
+      const result = await packExport.execute(context);
+      if (opts.json) {
+        console.log(JSON.stringify(result, null, 2));
+        return;
+      }
+      if (result.success) {
+        console.log(chalk.green(`✅ Pack executed successfully`));
+      } else {
+        console.log(chalk.yellow(`⚠️  Pack executed with issues`));
+      }
+      if (Array.isArray(result.results) && result.results.length > 0) {
+        console.log(chalk.bold("\nResults:"));
+        for (const r of result.results) {
+          console.log(`  - ${JSON.stringify(r)}`);
+        }
+      }
+      console.log("");
+      console.log(chalk.gray("  Sandbox mode: no artifacts signed or persisted."));
+      console.log(chalk.gray("  To publish: amc pack publish"));
+    } catch (e: unknown) {
+      console.error(chalk.red(`Pack execution failed: ${toErrorMessage(e)}`));
       process.exit(1);
     }
   });

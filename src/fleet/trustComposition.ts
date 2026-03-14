@@ -9,6 +9,7 @@ import { z } from "zod";
 import { randomUUID } from "node:crypto";
 import { join } from "node:path";
 import { readFileSync } from "node:fs";
+import * as YAML from "yaml";
 import { listAgents, loadAgentConfig } from "./registry.js";
 import { fleetRoot } from "./paths.js";
 import { openLedger } from "../ledger/ledger.js";
@@ -123,7 +124,6 @@ export function initTrustComposition(workspace: string): TrustCompositionConfig 
     edges: [],
   };
   ensureDir(fleetRoot(workspace));
-  const YAML = requireYaml();
   writeFileAtomic(configPath(workspace), YAML.stringify(config), 0o644);
   return config;
 }
@@ -133,19 +133,12 @@ export function loadTrustCompositionConfig(workspace: string): TrustCompositionC
   if (!pathExists(file)) {
     return initTrustComposition(workspace);
   }
-  const YAML = requireYaml();
   const raw = YAML.parse(readFileSync(file, "utf8")) as unknown;
   return trustCompositionConfigSchema.parse(raw);
 }
 
 export function saveTrustCompositionConfig(workspace: string, config: TrustCompositionConfig): void {
-  const YAML = requireYaml();
   writeFileAtomic(configPath(workspace), YAML.stringify(config), 0o644);
-}
-
-function requireYaml(): typeof import("yaml") {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  return require("yaml") as typeof import("yaml");
 }
 
 // ---------------------------------------------------------------------------

@@ -327,7 +327,7 @@ export function getVaultPrivateKeyPem(workspace: string, kind: VaultKeyKind): st
   }
   const refreshed = sessionFor(workspace);
   if (!refreshed.unlocked || !refreshed.payload) {
-    throw new Error("Vault is locked. Run `amc vault unlock` before signing operations.");
+    throw new Error("🔐 Vault locked. Run `amc vault unlock` first, or `amc setup` for first-time setup. Use --no-sign to skip signing where supported.");
   }
   if (kind === "monitor") {
     return refreshed.payload.monitorPrivateKeyPem;
@@ -467,7 +467,7 @@ export function rotateMonitorKeyInVault(workspace: string, passphrase?: string):
 function requireUnlockedPayload(workspace: string): VaultPayload {
   const session = sessionFor(workspace);
   if (!session.unlocked || !session.payload) {
-    throw new Error("Vault is locked. Run `amc vault unlock` before accessing secrets.");
+    throw new Error("🔐 Vault locked. Run `amc vault unlock` first, or `amc setup` for first-time setup.");
   }
   return session.payload;
 }

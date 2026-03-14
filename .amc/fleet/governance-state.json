@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "baselineIntegrityIndex": 0,
+  "baselineSetTs": 1773468800671,
+  "policies": {
+    "globalPolicy": null,
+    "byEnvironment": {}
+  },
+  "slos": [],
+  "lastScores": {},
+  "lastSloStatus": {},
+  "alerts": []
+}

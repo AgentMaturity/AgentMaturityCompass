@@ -286,17 +286,17 @@ export function initCiForAgent(params: {
     "      - name: Build",
     "        run: npm run build",
     "      - name: Verify evidence bundle",
-    `        run: node dist/cli.js bundle verify ${relBundle}`,
+    `        run: amc bundle verify ${relBundle}`,
     "      - name: Generate outcomes report",
-    `        run: node dist/cli.js outcomes report --agent ${agentId} --window 14d --out ${relOutcomeReport}`,
+    `        run: amc outcomes report --agent ${agentId} --window 14d --out ${relOutcomeReport}`,
     "      - name: Optional experiment gate",
-    `        run: if [ -n \"${"$"}AMC_EXPERIMENT_ID\" ] && [ -f \"${relExperimentPolicy}\" ]; then node dist/cli.js experiment gate --agent ${agentId} --experiment \"${"$"}AMC_EXPERIMENT_ID\" --policy ${relExperimentPolicy}; else echo \"Experiment gate skipped (set AMC_EXPERIMENT_ID and commit ${relExperimentPolicy})\"; fi`,
+    `        run: if [ -n \"${"$"}AMC_EXPERIMENT_ID\" ] && [ -f \"${relExperimentPolicy}\" ]; then amc experiment gate --agent ${agentId} --experiment \"${"$"}AMC_EXPERIMENT_ID\" --policy ${relExperimentPolicy}; else echo \"Experiment gate skipped (set AMC_EXPERIMENT_ID and commit ${relExperimentPolicy})\"; fi`,
     "      - name: Enforce AMC gate policy",
-    `        run: node dist/cli.js gate --bundle ${relBundle} --policy ${relPolicy}`,
+    `        run: amc gate --bundle ${relBundle} --policy ${relPolicy}`,
     "      - name: Generate maturity BOM",
-    `        run: node dist/cli.js bom generate --agent ${agentId} --run latest --out amc-bom.json`,
+    `        run: amc bom generate --agent ${agentId} --run latest --out amc-bom.json`,
     "      - name: Sign maturity BOM",
-    "        run: node dist/cli.js bom sign --in amc-bom.json --out amc-bom.json.sig",
+    "        run: amc bom sign --in amc-bom.json --out amc-bom.json.sig",
     ""
   ].join("\n");
 
@@ -320,19 +320,19 @@ export function printCiSteps(params: {
   return [
     "npm ci",
     "npm run build",
-    `node dist/cli.js bundle verify ${relativeAgentPathFromWorkspace(params.workspace, bundlePath)}`,
-    `node dist/cli.js outcomes report --agent ${agentId} --window 14d --out ${relativeAgentPathFromWorkspace(
+    `amc bundle verify ${relativeAgentPathFromWorkspace(params.workspace, bundlePath)}`,
+    `amc outcomes report --agent ${agentId} --window 14d --out ${relativeAgentPathFromWorkspace(
       params.workspace,
       join(agentPaths.rootDir, "outcomes", "reports", "ci-latest.json")
     )}`,
     `if [ -n "$AMC_EXPERIMENT_ID" ] && [ -f "${relativeAgentPathFromWorkspace(
       params.workspace,
       join(agentPaths.rootDir, "experimentGate.json")
-    )}" ]; then node dist/cli.js experiment gate --agent ${agentId} --experiment "$AMC_EXPERIMENT_ID" --policy ${relativeAgentPathFromWorkspace(
+    )}" ]; then amc experiment gate --agent ${agentId} --experiment "$AMC_EXPERIMENT_ID" --policy ${relativeAgentPathFromWorkspace(
       params.workspace,
       join(agentPaths.rootDir, "experimentGate.json")
     )}; fi`,
-    `node dist/cli.js gate --bundle ${relativeAgentPathFromWorkspace(params.workspace, bundlePath)} --policy ${relativeAgentPathFromWorkspace(params.workspace, agentPaths.gatePolicy)}`
+    `amc gate --bundle ${relativeAgentPathFromWorkspace(params.workspace, bundlePath)} --policy ${relativeAgentPathFromWorkspace(params.workspace, agentPaths.gatePolicy)}`
   ];
 }
 

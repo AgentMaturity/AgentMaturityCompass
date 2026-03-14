@@ -22,7 +22,7 @@ function ensureVaultUnlocked(workspace: string): void {
   if (!status.unlocked) {
     const passphrase = process.env.AMC_VAULT_PASSPHRASE;
     if (!passphrase) {
-      throw new Error("Vault is locked. Set AMC_VAULT_PASSPHRASE or unlock vault.");
+      throw new Error("🔐 Vault locked. Run `amc vault unlock` first, or set AMC_VAULT_PASSPHRASE env var.");
     }
     unlockVault(workspace, passphrase);
   }
