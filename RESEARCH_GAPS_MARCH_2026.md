@@ -185,7 +185,7 @@ The biggest meta-gap is **AMC is a scorer, not a runtime system.** Papers #3, #1
 2. **Hybrid validation** (rule-based + model-based, real-time)
 3. **Diagnostic transparency** (not just "unsafe" but "unsafe because X at step Y")
 
-This isn't a pack — it's a potential new AMC product: **AMC Guard** (runtime trust layer that uses AMC's knowledge to make real-time allow/deny decisions).
+This capability is now part of **AMC Shield** — the integrated runtime protection engine that handles both detection and enforcement (guard capabilities are unified within Shield, not a separate product).
 
 ---
 

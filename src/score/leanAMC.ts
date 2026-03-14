@@ -38,7 +38,7 @@ const DOMAIN_MODULES: Record<string, string[]> = {
 /* ── Core modules by level ───────────────────────────────────────── */
 
 const LEVEL_MODULES: Record<number, string[]> = {
-  1: ['diagnostic/questionBank', 'score/formalSpec', 'guardrails/guardEngine'],
+  1: ['diagnostic/questionBank', 'score/formalSpec', 'shield/guardEngine'],
   2: ['evidence/evidenceStore', 'shield/analyzer', 'shield/injectionDetector', 'enforce/policyFirewall'],
   3: ['vault/dlp', 'watch/outputAttestation', 'ledger/ledger', 'assurance/assuranceRunner'],
   4: ['audit/auditApi', 'compliance/complianceEngine', 'drift/alerts', 'transparency/merkleIndexStore'],

@@ -1,10 +1,10 @@
 /**
- * Integrated Shield-Guard Orchestration Engine
- * Combines AMC Shield (detection) with AMC Guard (enforcement) for real-time protection
+ * AMC Shield — Integrated Runtime Protection Engine
+ * Unified detection and enforcement for real-time protection
  * Matches Promptfoo's sophistication with AMC's unique maturity framework
  */
 
-import { guardCheck, type GuardCheckInput } from '../guardrails/guardEngine.js';
+import { guardCheck, type GuardCheckInput } from './guardEngine.js';
 import { detect, type DetectorResult } from './detector.js';
 import { analyzeAdvancedThreats, type AdvancedThreatInput, type AdvancedThreatAssessment } from './advancedThreats.js';
 import { dynamicAttackGenerator, type AttackContext, type GeneratedAttack } from './dynamicAttackGenerator.js';

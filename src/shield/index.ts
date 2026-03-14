@@ -51,6 +51,10 @@ export type {
   AdvancedThreatAssessment
 } from "./advancedThreats.js";
 
+// ── Guard engine (runtime enforcement — Guard IS Shield) ──────────────
+export { guardCheck } from './guardEngine.js';
+export type { GuardCheckInput } from './guardEngine.js';
+
 // ── Validator library (2026-02-21) ────────────────────────────────────
 export {
   validatePII, validateSecretLeakage, validatePromptInjection,
