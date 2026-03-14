@@ -3,12 +3,12 @@ defaultInheritanceMode: strict
 defaultWeight: 1
 blastRadiusThreshold: 0.3
 edges:
-  - id: edge_cf9f430c-1c1
-    fromAgentId: agent-a
-    toAgentId: agent-b
-    handoffId: handoff_97fae551
-    purpose: task-delegation
+  - id: edge_508ce23a-815
+    fromAgentId: orchestrator
+    toAgentId: worker
+    handoffId: handoff_da8a4d80
+    purpose: data-processing
     riskTier: med
     inheritanceMode: strict
     weight: 1
-    createdTs: 1773474387520
+    createdTs: 1773475680273

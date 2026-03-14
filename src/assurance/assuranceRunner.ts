@@ -399,7 +399,7 @@ export async function runAssurance(input: RunAssuranceInput): Promise<AssuranceR
       windowStartTs,
       windowEndTs: now,
       trustTier,
-      status: verification.ok ? "VALID" : "INVALID",
+      status: input.noSign ? (verification.ok ? "VALID" : "UNSIGNED") : (verification.ok ? "VALID" : "INVALID"),
       verificationPassed: verification.ok,
       packResults,
       overallScore0to100,

@@ -16,7 +16,7 @@ function nextRunTs(nowTs: number, defaultRunHours: number): number {
 }
 
 function toSchedulerCertStatus(params: {
-  reportStatus: "VALID" | "INVALID";
+  reportStatus: "VALID" | "INVALID" | "UNSIGNED";
   overallScore0to100: number;
   minRiskAssuranceScore: number;
 }): AssuranceSchedulerState["lastCertStatus"] {

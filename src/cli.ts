@@ -17300,7 +17300,7 @@ score
   .command("industry-adjust")
   .description("Adjust a score using an industry-specific trust model")
   .option("--industry <id>", "Industry ID (e.g. healthcare, finance, defense)")
-  .option("--score <n>", "Raw score value (0-1 internal scale); auto-read from agent if omitted")
+  .option("--score <n>", "Raw score as percentage 0-100 (e.g. 75) or decimal 0-1 (e.g. 0.75); auto-read from agent if omitted")
   .option("--agent <id>", "Agent ID (used to auto-read current score)")
   .option("--json", "Output as JSON")
   .action(async (opts: { industry?: string; score?: string; agent?: string; json?: boolean }) => {
@@ -17328,11 +17328,13 @@ score
           console.log(chalk.gray(`Using current agent score: ${(rawScore * 100).toFixed(1)}% (auto-read from ${agentId})`));
         } catch {
           console.error(chalk.red("No --score provided and no agent score available."));
-          console.log(chalk.gray("Run `amc quickscore` first, or provide --score <0-1>"));
+          console.log(chalk.gray("Run `amc quickscore` first, or provide --score <0-100> (e.g. --score 75)"));
           process.exit(1); return;
         }
       } else {
         rawScore = parseFloat(opts.score);
+        // Accept both 0-100 (e.g. 75) and 0-1 (e.g. 0.75) — normalize to 0-1
+        if (rawScore > 1) rawScore = rawScore / 100;
       }
       const industryId = opts.industry!;
       const model = INDUSTRY_TRUST_MODELS[industryId];
@@ -18901,9 +18903,11 @@ pack
     console.log("");
     try {
       // Load and execute the pack entry point
-      const entryPath = join(packDir, "index.js");
+      const entryMjs = join(packDir, "index.mjs");
+      const entryJs = join(packDir, "index.js");
+      const entryPath = pathExists(entryMjs) ? entryMjs : entryJs;
       if (!pathExists(entryPath)) {
-        console.error(chalk.red(`No index.js found in ${packDir}. Implement your pack entry point first.`));
+        console.error(chalk.red(`No index.mjs or index.js found in ${packDir}. Implement your pack entry point first.`));
         process.exit(1); return;
       }
       const packModule = await import(entryPath);

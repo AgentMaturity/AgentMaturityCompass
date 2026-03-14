@@ -209,7 +209,7 @@ function runScopeId(scopeType: "WORKSPACE" | "NODE" | "AGENT", scopeId?: string)
 }
 
 function runStatusFromReport(report: {
-  status: "VALID" | "INVALID";
+  status: "VALID" | "INVALID" | "UNSIGNED";
   overallScore0to100: number;
 }, minRiskAssuranceScore: number): "PASS" | "FAIL" | "ERROR" {
   if (report.status !== "VALID") {

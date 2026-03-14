@@ -30,7 +30,7 @@ export interface AgentScoreSummary {
   weakestQuestions: Array<{ questionId: string; level: number; gap: number }>;
   strongestQuestions: Array<{ questionId: string; level: number }>;
   evidenceCoverage: number;
-  status: "VALID" | "INVALID";
+  status: "VALID" | "INVALID" | "UNSIGNED";
 }
 
 export interface FleetAggregate {

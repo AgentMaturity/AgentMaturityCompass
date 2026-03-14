@@ -90,7 +90,7 @@ export interface RunRecord {
   target_profile_id: string | null;
   report_json_sha256: string;
   run_seal_sig: string;
-  status: "VALID" | "INVALID";
+  status: "VALID" | "INVALID" | "UNSIGNED";
 }
 
 export interface AssuranceRunRecord {
@@ -103,7 +103,7 @@ export interface AssuranceRunRecord {
   pack_ids_json: string;
   report_json_sha256: string;
   run_seal_sig: string;
-  status: "VALID" | "INVALID";
+  status: "VALID" | "INVALID" | "UNSIGNED";
 }
 
 export interface TargetProfile {
@@ -188,7 +188,7 @@ export interface DiagnosticReport {
   ts: number;
   windowStartTs: number;
   windowEndTs: number;
-  status: "VALID" | "INVALID";
+  status: "VALID" | "INVALID" | "UNSIGNED";
   verificationPassed: boolean;
   trustBoundaryViolated: boolean;
   trustBoundaryMessage: string | null;
@@ -352,7 +352,7 @@ export interface AssuranceReport {
   windowStartTs: number;
   windowEndTs: number;
   trustTier: TrustTier;
-  status: "VALID" | "INVALID";
+  status: "VALID" | "INVALID" | "UNSIGNED";
   verificationPassed: boolean;
   packResults: AssurancePackResult[];
   overallScore0to100: number;
