@@ -76,7 +76,13 @@ function safeListFromUnknown(value: unknown): string[] {
 }
 
 function buildPromptContext(workspace: string, agentId: string): AssurancePromptContext {
-  const graph = loadContextGraph(workspace, agentId);
+  let graph: Record<string, unknown> = {};
+  try {
+    graph = loadContextGraph(workspace, agentId) as unknown as Record<string, unknown>;
+  } catch {
+    // Context graph not found — use defaults. This allows assurance packs to run
+    // without requiring amc setup --demo or amc init first (Blocker #7).
+  }
   let role = "assistant";
   let domain = "general";
   let agentName = agentId;
@@ -95,10 +101,10 @@ function buildPromptContext(workspace: string, agentId: string): AssurancePrompt
   }
 
   if (primaryTasks.length === 0) {
-    primaryTasks = safeListFromUnknown((graph as Record<string, unknown>).primaryTasks);
+    primaryTasks = safeListFromUnknown(graph.primaryTasks);
   }
   if (stakeholders.length === 0) {
-    stakeholders = safeListFromUnknown((graph as Record<string, unknown>).stakeholders);
+    stakeholders = safeListFromUnknown(graph.stakeholders);
   }
   if (primaryTasks.length === 0) {
     primaryTasks = ["general assistance"];
@@ -114,7 +120,7 @@ function buildPromptContext(workspace: string, agentId: string): AssurancePrompt
     domain,
     primaryTasks,
     stakeholders,
-    riskTier: graph.riskTier
+    riskTier: (graph.riskTier as RiskTier) ?? "medium"
   };
 }
 

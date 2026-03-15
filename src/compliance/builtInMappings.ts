@@ -1501,6 +1501,448 @@ export const builtInComplianceMappings: ComplianceMapping[] = [
       configs: ["gateway.yaml", "tools.yaml"]
     }
   }),
+
+  // ── HIPAA Compliance Mappings ──────────────────────────────────────────────
+  mapping({
+    id: "hipaa_administrative_safeguards",
+    framework: "HIPAA",
+    category: "§164.308 Administrative Safeguards",
+    description: "Risk analysis, workforce security, information access management, security awareness training, security incident procedures, contingency planning, and evaluation.",
+    evidenceRequirements: [
+      { type: "requires_evidence_event", eventTypes: ["audit", "llm_request", "tool_action"], minObservedRatio: 0.6 },
+      { type: "requires_assurance_pack", packId: "governance_bypass", minScore: 80, maxSucceeded: 0 },
+      { type: "requires_no_audit", auditTypesDenylist: commonSecurityDenylist }
+    ],
+    related: {
+      questions: ["AMC-1.1", "AMC-1.5", "AMC-1.8", "AMC-2.1", "AMC-4.6"],
+      packs: ["governance_bypass", "approval_theater", "operational_discipline"],
+      configs: ["action-policy.yaml", "approval-policy.yaml"]
+    }
+  }),
+  mapping({
+    id: "hipaa_technical_safeguards",
+    framework: "HIPAA",
+    category: "§164.312 Technical Safeguards",
+    description: "Access control, audit controls, integrity controls, person or entity authentication, and transmission security for electronic PHI.",
+    evidenceRequirements: [
+      { type: "requires_evidence_event", eventTypes: ["audit", "tool_action"], minObservedRatio: 0.7 },
+      { type: "requires_assurance_pack", packId: "exfiltration", minScore: 90, maxSucceeded: 0 },
+      { type: "requires_assurance_pack", packId: "pii_detection_leakage", minScore: 85, maxSucceeded: 0 }
+    ],
+    related: {
+      questions: ["AMC-4.6", "AMC-3.3.1", "AMC-3.3.4", "AMC-1.8"],
+      packs: ["exfiltration", "pii_detection_leakage", "dlp_exfiltration", "context_leakage"],
+      configs: ["vault.yaml", "tools.yaml", "budgets.yaml"]
+    }
+  }),
+  mapping({
+    id: "hipaa_physical_safeguards",
+    framework: "HIPAA",
+    category: "§164.310 Physical Safeguards",
+    description: "Facility access controls, workstation use and security, and device and media controls for systems handling PHI.",
+    evidenceRequirements: [
+      { type: "requires_evidence_event", eventTypes: ["audit"], minObservedRatio: 0.5 },
+      { type: "requires_no_audit", auditTypesDenylist: ["UNAUTHORIZED_FACILITY_ACCESS"] }
+    ],
+    related: {
+      questions: ["AMC-4.6", "AMC-1.8"],
+      packs: ["sandbox_boundary", "host_hardening"],
+      configs: ["action-policy.yaml"]
+    }
+  }),
+  mapping({
+    id: "hipaa_organizational_requirements",
+    framework: "HIPAA",
+    category: "§164.314 Organizational Requirements",
+    description: "Business associate contracts and group health plan requirements for AI systems processing PHI on behalf of covered entities.",
+    evidenceRequirements: [
+      { type: "requires_evidence_event", eventTypes: ["audit"], minObservedRatio: 0.4 },
+      { type: "requires_assurance_pack", packId: "delegation_trust_chain", minScore: 75, maxSucceeded: 0 }
+    ],
+    related: {
+      questions: ["AMC-1.5", "AMC-2.1"],
+      packs: ["delegation_trust_chain", "supply_chain_integrity"],
+      configs: ["approval-policy.yaml"]
+    }
+  }),
+  mapping({
+    id: "hipaa_policies_documentation",
+    framework: "HIPAA",
+    category: "§164.316 Policies and Documentation",
+    description: "Documentation of policies and procedures, retention requirements, and availability of documentation.",
+    evidenceRequirements: [
+      { type: "requires_evidence_event", eventTypes: ["audit", "test"], minObservedRatio: 0.5 },
+      { type: "requires_no_audit", auditTypesDenylist: commonSecurityDenylist }
+    ],
+    related: {
+      questions: ["AMC-BCON-1", "AMC-1.1", "AMC-1.5"],
+      packs: ["behavioral_contract_violation", "operational_discipline"],
+      configs: ["action-policy.yaml", "amcconfig.yaml"]
+    }
+  }),
+  mapping({
+    id: "hipaa_privacy_rule",
+    framework: "HIPAA",
+    category: "§164.502-514 Privacy Rule Uses and Disclosures",
+    description: "Minimum necessary standard, de-identification requirements, authorization requirements, and permitted uses and disclosures of PHI by AI agents.",
+    evidenceRequirements: [
+      { type: "requires_assurance_pack", packId: "pii_detection_leakage", minScore: 90, maxSucceeded: 0 },
+      { type: "requires_assurance_pack", packId: "context_leakage", minScore: 85, maxSucceeded: 0 }
+    ],
+    related: {
+      questions: ["AMC-3.3.1", "AMC-3.3.4", "AMC-OINT-1"],
+      packs: ["pii_detection_leakage", "context_leakage", "dlp_exfiltration", "information_extraction"],
+      configs: ["vault.yaml", "tools.yaml"]
+    }
+  }),
+  mapping({
+    id: "hipaa_access_to_phi",
+    framework: "HIPAA",
+    category: "§164.524 Access to PHI",
+    description: "Individual right of access to inspect and obtain a copy of PHI, including AI-generated health records and inferences.",
+    evidenceRequirements: [
+      { type: "requires_evidence_event", eventTypes: ["audit", "tool_action"], minObservedRatio: 0.5 }
+    ],
+    related: {
+      questions: ["AMC-SPORT-1", "AMC-4.6"],
+      packs: ["operational_discipline"],
+      configs: ["action-policy.yaml"]
+    }
+  }),
+  mapping({
+    id: "hipaa_accounting_disclosures",
+    framework: "HIPAA",
+    category: "§164.528 Accounting of Disclosures",
+    description: "Maintain an accounting of disclosures of PHI by AI agents, including automated disclosures and inter-system data sharing.",
+    evidenceRequirements: [
+      { type: "requires_evidence_event", eventTypes: ["audit"], minObservedRatio: 0.6 },
+      { type: "requires_no_audit", auditTypesDenylist: ["DATA_EXFILTRATION_DETECTED"] }
+    ],
+    related: {
+      questions: ["AMC-4.6", "AMC-1.8"],
+      packs: ["exfiltration", "dlp_exfiltration"],
+      configs: ["vault.yaml"]
+    }
+  }),
+  mapping({
+    id: "hipaa_administrative_requirements",
+    framework: "HIPAA",
+    category: "§164.530 Administrative Requirements",
+    description: "Privacy officer designation, training, safeguards, complaint procedures, and sanctions for AI system operators.",
+    evidenceRequirements: [
+      { type: "requires_evidence_event", eventTypes: ["audit"], minObservedRatio: 0.4 }
+    ],
+    related: {
+      questions: ["AMC-1.1", "AMC-1.5", "AMC-2.1"],
+      packs: ["approval_theater", "human_oversight_quality"],
+      configs: ["approval-policy.yaml"]
+    }
+  }),
+  mapping({
+    id: "hipaa_breach_notification",
+    framework: "HIPAA",
+    category: "Breach Notification Rule §164.400-414",
+    description: "Breach discovery, notification to individuals and HHS, and content of breach notifications for AI-related PHI incidents.",
+    evidenceRequirements: [
+      { type: "requires_evidence_event", eventTypes: ["audit", "metric"], minObservedRatio: 0.5 },
+      { type: "requires_no_audit", auditTypesDenylist: ["DATA_EXFILTRATION_DETECTED", "PII_LEAKAGE_DETECTED"] }
+    ],
+    related: {
+      questions: ["AMC-2.7", "AMC-4.6"],
+      packs: ["exfiltration", "pii_detection_leakage", "silent_failure"],
+      configs: ["action-policy.yaml"]
+    }
+  }),
+
+  // ── SOX Compliance Mappings ────────────────────────────────────────────────
+  mapping({
+    id: "sox_section_302",
+    framework: "SOX",
+    category: "Section 302 CEO/CFO Certification",
+    description: "Internal controls over financial reporting that AI agents touch — accuracy of disclosures, material weakness identification, and control effectiveness certification.",
+    evidenceRequirements: [
+      { type: "requires_evidence_event", eventTypes: ["audit", "llm_response"], minObservedRatio: 0.6 },
+      { type: "requires_assurance_pack", packId: "truthfulness", minScore: 85, maxSucceeded: 0 }
+    ],
+    related: {
+      questions: ["AMC-OINT-1", "AMC-3.2.1", "AMC-1.1"],
+      packs: ["truthfulness", "hallucination", "false_premise"],
+      configs: ["action-policy.yaml"]
+    }
+  }),
+  mapping({
+    id: "sox_section_404",
+    framework: "SOX",
+    category: "Section 404 Internal Control Assessment",
+    description: "Management assessment and auditor attestation of internal controls over financial reporting where AI agents are in scope.",
+    evidenceRequirements: [
+      { type: "requires_evidence_event", eventTypes: ["audit", "test"], minObservedRatio: 0.7 },
+      { type: "requires_assurance_pack", packId: "governance_bypass", minScore: 90, maxSucceeded: 0 },
+      { type: "requires_no_audit", auditTypesDenylist: commonSecurityDenylist }
+    ],
+    related: {
+      questions: ["AMC-1.1", "AMC-1.5", "AMC-1.8", "AMC-4.6", "AMC-BCON-1"],
+      packs: ["governance_bypass", "approval_theater", "operational_discipline", "stepup_approval_bypass"],
+      configs: ["action-policy.yaml", "approval-policy.yaml", "amcconfig.yaml"]
+    }
+  }),
+  mapping({
+    id: "sox_itgc_access",
+    framework: "SOX",
+    category: "ITGC Access Controls",
+    description: "Logical access to AI systems, service accounts, API keys, and model endpoints handling financial data.",
+    evidenceRequirements: [
+      { type: "requires_evidence_event", eventTypes: ["audit", "tool_action"], minObservedRatio: 0.6 },
+      { type: "requires_assurance_pack", packId: "exfiltration", minScore: 85, maxSucceeded: 0 }
+    ],
+    related: {
+      questions: ["AMC-1.8", "AMC-4.6", "AMC-3.3.1"],
+      packs: ["exfiltration", "stepup_approval_bypass", "agent_identity_spoofing"],
+      configs: ["vault.yaml", "tools.yaml", "approval-policy.yaml"]
+    }
+  }),
+  mapping({
+    id: "sox_itgc_change_management",
+    framework: "SOX",
+    category: "ITGC Change Management",
+    description: "Change control for AI models, prompts, guardrails, and configurations in financial reporting scope.",
+    evidenceRequirements: [
+      { type: "requires_evidence_event", eventTypes: ["audit"], minObservedRatio: 0.6 },
+      { type: "requires_no_audit", auditTypesDenylist: ["GOVERNANCE_BYPASS_SUCCEEDED", "UNSIGNED_POLICY_LOADED"] }
+    ],
+    related: {
+      questions: ["AMC-BCON-1", "AMC-1.1", "AMC-2.9"],
+      packs: ["behavioral_contract_violation", "governance_bypass", "tool_schema_drift"],
+      configs: ["action-policy.yaml", "amcconfig.yaml"]
+    }
+  }),
+  mapping({
+    id: "sox_itgc_operations",
+    framework: "SOX",
+    category: "ITGC Computer Operations",
+    description: "Batch processing, job scheduling, backup/recovery, and operational monitoring for AI agents in financial workflows.",
+    evidenceRequirements: [
+      { type: "requires_evidence_event", eventTypes: ["metric", "audit"], minObservedRatio: 0.5 },
+      { type: "requires_assurance_pack", packId: "circuit_breaker_reliability", minScore: 80, maxSucceeded: 0 }
+    ],
+    related: {
+      questions: ["AMC-4.1", "AMC-4.6"],
+      packs: ["circuit_breaker_reliability", "silent_failure", "resource_exhaustion"],
+      configs: ["budgets.yaml", "action-policy.yaml"]
+    }
+  }),
+  mapping({
+    id: "sox_segregation_of_duties",
+    framework: "SOX",
+    category: "Segregation of Duties",
+    description: "Separation of AI agent capabilities to prevent single-agent control over conflicting financial functions.",
+    evidenceRequirements: [
+      { type: "requires_assurance_pack", packId: "excessive_agency", minScore: 85, maxSucceeded: 0 },
+      { type: "requires_assurance_pack", packId: "approval_theater", minScore: 80, maxSucceeded: 0 }
+    ],
+    related: {
+      questions: ["AMC-1.5", "AMC-2.1", "AMC-5.15"],
+      packs: ["excessive_agency", "approval_theater", "stepup_approval_bypass"],
+      configs: ["approval-policy.yaml", "action-policy.yaml"]
+    }
+  }),
+  mapping({
+    id: "sox_audit_trail",
+    framework: "SOX",
+    category: "Audit Trail and Evidence Retention",
+    description: "Tamper-evident audit trails, evidence retention for 7+ years, and reconstructability for AI agent actions affecting financial reporting.",
+    evidenceRequirements: [
+      { type: "requires_evidence_event", eventTypes: ["audit"], minObservedRatio: 0.8 },
+      { type: "requires_no_audit", auditTypesDenylist: commonSecurityDenylist }
+    ],
+    related: {
+      questions: ["AMC-4.6", "AMC-4.1", "AMC-1.8"],
+      packs: ["notary_attestation", "operational_discipline"],
+      configs: ["vault.yaml", "action-policy.yaml"]
+    }
+  }),
+  mapping({
+    id: "sox_financial_integrity",
+    framework: "SOX",
+    category: "Financial Reporting Integrity",
+    description: "Accuracy, completeness, and verifiability of AI-generated financial data, calculations, and reports.",
+    evidenceRequirements: [
+      { type: "requires_assurance_pack", packId: "truthfulness", minScore: 90, maxSucceeded: 0 },
+      { type: "requires_assurance_pack", packId: "hallucination", minScore: 85, maxSucceeded: 0 }
+    ],
+    related: {
+      questions: ["AMC-OINT-1", "AMC-3.2.1", "AMC-3.4.2"],
+      packs: ["truthfulness", "hallucination", "false_premise", "misleading_context"],
+      configs: ["action-policy.yaml"]
+    }
+  }),
+  mapping({
+    id: "sox_program_development",
+    framework: "SOX",
+    category: "ITGC Program Development",
+    description: "SDLC controls for AI agent development, testing, and deployment including model validation and prompt engineering governance.",
+    evidenceRequirements: [
+      { type: "requires_evidence_event", eventTypes: ["test", "audit"], minObservedRatio: 0.5 }
+    ],
+    related: {
+      questions: ["AMC-BCON-1", "AMC-1.1", "AMC-5.18"],
+      packs: ["config_lint", "sbom_supply_chain", "supply_chain_integrity"],
+      configs: ["amcconfig.yaml", "action-policy.yaml"]
+    }
+  }),
+
+  // ── FedRAMP Compliance Mappings ────────────────────────────────────────────
+  mapping({
+    id: "fedramp_access_control",
+    framework: "FEDRAMP",
+    category: "AC Access Control",
+    description: "Account management, access enforcement, least privilege, session controls, and remote access for AI systems in federal environments.",
+    evidenceRequirements: [
+      { type: "requires_evidence_event", eventTypes: ["audit", "tool_action"], minObservedRatio: 0.7 },
+      { type: "requires_assurance_pack", packId: "exfiltration", minScore: 90, maxSucceeded: 0 },
+      { type: "requires_assurance_pack", packId: "stepup_approval_bypass", minScore: 85, maxSucceeded: 0 }
+    ],
+    related: {
+      questions: ["AMC-1.8", "AMC-4.6", "AMC-5.15"],
+      packs: ["exfiltration", "stepup_approval_bypass", "agent_identity_spoofing", "excessive_agency"],
+      configs: ["vault.yaml", "approval-policy.yaml", "action-policy.yaml"]
+    }
+  }),
+  mapping({
+    id: "fedramp_audit_accountability",
+    framework: "FEDRAMP",
+    category: "AU Audit and Accountability",
+    description: "Audit event generation, content, storage, review, and protection for AI agent actions in federal information systems.",
+    evidenceRequirements: [
+      { type: "requires_evidence_event", eventTypes: ["audit"], minObservedRatio: 0.8 },
+      { type: "requires_no_audit", auditTypesDenylist: commonSecurityDenylist }
+    ],
+    related: {
+      questions: ["AMC-4.6", "AMC-4.1", "AMC-1.8"],
+      packs: ["notary_attestation", "operational_discipline", "silent_failure"],
+      configs: ["vault.yaml", "action-policy.yaml"]
+    }
+  }),
+  mapping({
+    id: "fedramp_assessment_authorization",
+    framework: "FEDRAMP",
+    category: "CA Assessment Authorization Monitoring",
+    description: "Security assessment, system authorization, continuous monitoring, and penetration testing for AI-enhanced federal systems.",
+    evidenceRequirements: [
+      { type: "requires_evidence_event", eventTypes: ["test", "audit"], minObservedRatio: 0.6 },
+      { type: "requires_assurance_pack", packId: "governance_bypass", minScore: 85, maxSucceeded: 0 }
+    ],
+    related: {
+      questions: ["AMC-1.1", "AMC-2.11", "AMC-5.18"],
+      packs: ["governance_bypass", "advanced_threats", "compound_threat"],
+      configs: ["amcconfig.yaml", "action-policy.yaml"]
+    }
+  }),
+  mapping({
+    id: "fedramp_config_management",
+    framework: "FEDRAMP",
+    category: "CM Configuration Management",
+    description: "Baseline configuration, change control, least functionality, and software usage restrictions for AI model and infrastructure.",
+    evidenceRequirements: [
+      { type: "requires_evidence_event", eventTypes: ["audit"], minObservedRatio: 0.6 },
+      { type: "requires_no_audit", auditTypesDenylist: ["UNSIGNED_POLICY_LOADED", "GOVERNANCE_BYPASS_SUCCEEDED"] }
+    ],
+    related: {
+      questions: ["AMC-BCON-1", "AMC-1.1", "AMC-2.9"],
+      packs: ["config_lint", "behavioral_contract_violation", "tool_schema_drift"],
+      configs: ["amcconfig.yaml", "action-policy.yaml"]
+    }
+  }),
+  mapping({
+    id: "fedramp_contingency_planning",
+    framework: "FEDRAMP",
+    category: "CP Contingency Planning",
+    description: "Contingency plan, training, testing, backup, recovery, and reconstitution for AI-dependent federal services.",
+    evidenceRequirements: [
+      { type: "requires_evidence_event", eventTypes: ["metric", "audit"], minObservedRatio: 0.5 },
+      { type: "requires_assurance_pack", packId: "circuit_breaker_reliability", minScore: 80, maxSucceeded: 0 }
+    ],
+    related: {
+      questions: ["AMC-4.1", "AMC-SPORT-1"],
+      packs: ["circuit_breaker_reliability", "silent_failure", "resource_exhaustion"],
+      configs: ["budgets.yaml"]
+    }
+  }),
+  mapping({
+    id: "fedramp_identification_authentication",
+    framework: "FEDRAMP",
+    category: "IA Identification and Authentication",
+    description: "User, device, and service identification and authentication for AI agent endpoints and API consumers.",
+    evidenceRequirements: [
+      { type: "requires_evidence_event", eventTypes: ["audit"], minObservedRatio: 0.6 },
+      { type: "requires_assurance_pack", packId: "agent_identity_spoofing", minScore: 85, maxSucceeded: 0 }
+    ],
+    related: {
+      questions: ["AMC-1.8", "AMC-3.3.1"],
+      packs: ["agent_identity_spoofing", "stepup_approval_bypass"],
+      configs: ["vault.yaml", "approval-policy.yaml"]
+    }
+  }),
+  mapping({
+    id: "fedramp_incident_response",
+    framework: "FEDRAMP",
+    category: "IR Incident Response",
+    description: "Incident handling, monitoring, reporting, and assistance for AI-related security incidents in federal systems.",
+    evidenceRequirements: [
+      { type: "requires_evidence_event", eventTypes: ["audit", "metric"], minObservedRatio: 0.6 },
+      { type: "requires_no_audit", auditTypesDenylist: commonSecurityDenylist }
+    ],
+    related: {
+      questions: ["AMC-2.7", "AMC-4.6"],
+      packs: ["silent_failure", "operational_discipline"],
+      configs: ["action-policy.yaml"]
+    }
+  }),
+  mapping({
+    id: "fedramp_risk_assessment",
+    framework: "FEDRAMP",
+    category: "RA Risk Assessment",
+    description: "Security categorization, risk assessment, and vulnerability scanning for AI models, prompts, and tool integrations.",
+    evidenceRequirements: [
+      { type: "requires_evidence_event", eventTypes: ["test", "audit"], minObservedRatio: 0.6 },
+      { type: "requires_assurance_pack", packId: "injection", minScore: 85, maxSucceeded: 0 }
+    ],
+    related: {
+      questions: ["AMC-1.1", "AMC-5.8", "AMC-5.15"],
+      packs: ["injection", "advanced_threats", "mcp_security_resilience"],
+      configs: ["action-policy.yaml", "tools.yaml"]
+    }
+  }),
+  mapping({
+    id: "fedramp_system_communications",
+    framework: "FEDRAMP",
+    category: "SC System and Communications Protection",
+    description: "Application partitioning, information in shared resources, cryptographic protection, and boundary protection for AI system communications.",
+    evidenceRequirements: [
+      { type: "requires_evidence_event", eventTypes: ["audit", "tool_action"], minObservedRatio: 0.6 },
+      { type: "requires_assurance_pack", packId: "sandbox_boundary", minScore: 85, maxSucceeded: 0 }
+    ],
+    related: {
+      questions: ["AMC-3.3.1", "AMC-3.3.4", "AMC-1.8"],
+      packs: ["sandbox_boundary", "exfiltration", "dlp_exfiltration"],
+      configs: ["vault.yaml", "tools.yaml"]
+    }
+  }),
+  mapping({
+    id: "fedramp_system_integrity",
+    framework: "FEDRAMP",
+    category: "SI System and Information Integrity",
+    description: "Flaw remediation, malicious code protection, information handling, memory protection, and software integrity for AI components.",
+    evidenceRequirements: [
+      { type: "requires_evidence_event", eventTypes: ["test", "audit"], minObservedRatio: 0.6 },
+      { type: "requires_assurance_pack", packId: "sbom_supply_chain", minScore: 80, maxSucceeded: 0 }
+    ],
+    related: {
+      questions: ["AMC-5.12", "AMC-5.8", "AMC-1.1"],
+      packs: ["sbom_supply_chain", "supply_chain_integrity", "memory_poisoning"],
+      configs: ["tools.yaml", "action-policy.yaml"]
+    }
+  }),
 ];
 
 export function defaultComplianceMapsFile(): ComplianceMapsFile {

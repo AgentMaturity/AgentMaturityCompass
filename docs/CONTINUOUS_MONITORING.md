@@ -16,16 +16,16 @@ AMC's continuous monitoring system provides production-grade observability for A
 
 ```bash
 # Start monitoring an agent
-amc watch start --agent my-agent
+amc monitor start --agent my-agent
 
 # Check monitoring status
-amc watch status
+amc monitor status
 
 # View recent events
-amc watch events --limit 50
+amc monitor events --limit 50
 
 # Get metrics for a specific agent
-amc watch metrics --agent my-agent
+amc monitor metrics --agent my-agent
 ```
 
 ## Configuration
@@ -35,7 +35,7 @@ amc watch metrics --agent my-agent
 Control how often the agent is scored:
 
 ```bash
-amc watch start --agent my-agent --scoring-interval 300000  # 5 minutes (default)
+amc monitor start --agent my-agent --scoring-interval 300000  # 5 minutes (default)
 ```
 
 ### Drift Check Interval
@@ -43,7 +43,7 @@ amc watch start --agent my-agent --scoring-interval 300000  # 5 minutes (default
 Control how often drift detection runs:
 
 ```bash
-amc watch start --agent my-agent --drift-interval 900000  # 15 minutes (default)
+amc monitor start --agent my-agent --drift-interval 900000  # 15 minutes (default)
 ```
 
 ### Score Drop Threshold
@@ -51,7 +51,7 @@ amc watch start --agent my-agent --drift-interval 900000  # 15 minutes (default)
 Set the threshold for score drop alerts (0-1):
 
 ```bash
-amc watch start --agent my-agent --score-drop-threshold 0.1  # 10% drop (default)
+amc monitor start --agent my-agent --score-drop-threshold 0.1  # 10% drop (default)
 ```
 
 ### Webhook Notifications
@@ -59,7 +59,7 @@ amc watch start --agent my-agent --score-drop-threshold 0.1  # 10% drop (default
 Disable webhook notifications:
 
 ```bash
-amc watch start --agent my-agent --no-webhooks
+amc monitor start --agent my-agent --no-webhooks
 ```
 
 ## Monitoring Events
@@ -255,8 +255,8 @@ alerts:
 
 1. **Start with defaults** — The default intervals (5min scoring, 15min drift) work well for most agents
 2. **Tune thresholds** — Adjust `scoreDropThreshold` based on your agent's stability
-3. **Monitor the monitor** — Check `amc watch status` regularly to ensure monitors are running
-4. **Review events** — Use `amc watch events` to understand agent behavior patterns
+3. **Monitor the monitor** — Check `amc monitor status` regularly to ensure monitors are running
+4. **Review events** — Use `amc monitor events` to understand agent behavior patterns
 5. **Set up webhooks** — Configure `.amc/alerts.yaml` for instant notifications
 
 ## Troubleshooting

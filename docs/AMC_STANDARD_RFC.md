@@ -4,7 +4,7 @@
 **Status:** Proposed Standard  
 **Version:** 1.0  
 **Date:** 2026-03-14  
-**Repository:** https://github.com/agentmaturitycompass/amc  
+**Repository:** https://github.com/thewisecrab/AgentMaturityCompass  
 **License:** Apache 2.0
 
 ---

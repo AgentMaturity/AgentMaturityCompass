@@ -18,7 +18,7 @@ Determine whether AMC can be integrated into your existing stack with low fricti
 ```bash
 amc doctor
 amc quickscore
-amc assurance run --scope full
+amc assurance run --all
 amc trace list
 amc business report
 ```

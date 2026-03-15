@@ -112,7 +112,7 @@ amc compliance report --framework EU_AI_ACT --window 30d --out reports/eu-ai-act
 amc quickscore --eu-ai-act
 
 <span class="comment"># Export compliance evidence binder</span>
-amc audit binder create --framework eu-ai-act</code></pre>
+amc audit binder create --framework EU_AI_ACT</code></pre>
 
       <div class="callout callout-teal">
         <strong>⚖️ Important disclaimer</strong>
@@ -219,7 +219,7 @@ amc guide --compliance EU_AI_ACT  <span class="comment"># Map gaps to regulatory
         <div class="step-num">5</div>
         <div class="step-content">
           <h4>Export audit evidence</h4>
-          <pre><code>amc audit binder create --framework eu-ai-act  <span class="comment"># Generate compliance binder</span>
+          <pre><code>amc audit binder create --framework EU_AI_ACT  <span class="comment"># Generate compliance binder</span>
 amc bundle export                                <span class="comment"># Portable evidence bundle</span></code></pre>
         </div>
       </div>
@@ -322,22 +322,22 @@ amc domain report --domain environment --output env.md  <span class="comment"># 
         <div class="card">
           <h4>ISO 42001</h4>
           <p>AI management system standard. Clauses 4–10 mapped to AMC dimensions.</p>
-          <pre><code>amc compliance report --framework iso-42001</code></pre>
+          <pre><code>amc compliance report --framework ISO_42001</code></pre>
         </div>
         <div class="card">
           <h4>NIST AI RMF</h4>
           <p>Risk management framework alignment for US federal and enterprise.</p>
-          <pre><code>amc compliance report --framework nist-ai-rmf</code></pre>
+          <pre><code>amc compliance report --framework NIST_AI_RMF</code></pre>
         </div>
         <div class="card">
           <h4>SOC 2</h4>
           <p>Trust service criteria mapping for service organization controls.</p>
-          <pre><code>amc compliance report --framework soc2</code></pre>
+          <pre><code>amc compliance report --framework SOC2</code></pre>
         </div>
         <div class="card">
           <h4>OWASP LLM Top 10</h4>
           <p>Full 10/10 coverage of the OWASP Large Language Model Top 10 risks.</p>
-          <pre><code>amc compliance report --framework owasp-llm</code></pre>
+          <pre><code>amc compliance report --framework OWASP_LLM_TOP_10</code></pre>
         </div>
       </div>
 
@@ -345,7 +345,7 @@ amc domain report --domain environment --output env.md  <span class="comment"># 
       <h2 id="audit-binder">Audit Binder</h2>
       <p>Generate a portable, signed evidence package for auditors:</p>
       <pre><code><span class="comment"># Create an audit binder for a specific framework</span>
-amc audit binder create --framework eu-ai-act
+amc audit binder create --framework EU_AI_ACT
 
 <span class="comment"># List existing binders</span>
 amc audit binder list

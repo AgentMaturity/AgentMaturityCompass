@@ -5,7 +5,7 @@
 **Version:** 1.0  
 **Date:** 2026-03-14  
 **Depends on:** AMC Standard RFC v1.0  
-**Repository:** https://github.com/agentmaturitycompass/amc  
+**Repository:** https://github.com/thewisecrab/AgentMaturityCompass  
 
 ---
 

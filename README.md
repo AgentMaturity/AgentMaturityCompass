@@ -12,7 +12,7 @@
 <p align="center">
   <a href="https://www.npmjs.com/package/agent-maturity-compass"><img src="https://img.shields.io/npm/v/agent-maturity-compass?labelColor=0a0a0a&color=4AEF79" alt="npm" /></a>
   <a href="https://www.npmjs.com/package/agent-maturity-compass"><img src="https://img.shields.io/npm/dm/agent-maturity-compass?labelColor=0a0a0a&color=4AEF79" alt="downloads" /></a>
-  <a href="#"><img src="https://img.shields.io/badge/tests-3%2C488%20passing-4AEF79?labelColor=0a0a0a" alt="tests" /></a>
+  <a href="#"><img src="https://img.shields.io/badge/tests-3%2C549%20passing-4AEF79?labelColor=0a0a0a" alt="tests" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-4AEF79?labelColor=0a0a0a" alt="MIT" /></a>
   <a href="docs/AMC_MASTER_REFERENCE.md"><img src="https://img.shields.io/badge/CLI%20commands-481-4AEF79?labelColor=0a0a0a" alt="commands" /></a>
 </p>
@@ -610,7 +610,7 @@ AMC is MIT licensed. We welcome contributions — especially new **assurance pac
 
 ```bash
 git clone https://github.com/thewisecrab/AgentMaturityCompass.git
-cd AgentMaturityCompass && npm ci && npm test   # 3,311 tests
+cd AgentMaturityCompass && npm ci && npm test   # 3,549 tests
 ```
 
 **→ [CONTRIBUTING.md](CONTRIBUTING.md)** — includes guides for writing packs, mapping research papers, and adding adapters.
@@ -631,7 +631,7 @@ cd AgentMaturityCompass && npm ci && npm test   # 3,311 tests
 ---
 
 <p align="center">
-  <strong>138 diagnostic questions · 86 assurance packs · 40 domain packs · 14 adapters · 74+ scoring modules · 3,311 tests</strong><br>
+  <strong>138 diagnostic questions · 86 assurance packs · 40 domain packs · 14 adapters · 74+ scoring modules · 3,549 tests</strong><br>
   <em>Stop trusting. Start verifying.</em>
 </p>
 

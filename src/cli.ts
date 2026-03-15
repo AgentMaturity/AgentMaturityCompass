@@ -1980,7 +1980,8 @@ program
   .option("--eu-ai-act", "show EU AI Act risk classification mapping", false)
   .option("--auto", "auto-score from ledger evidence (no questions asked)", false)
   .option("--agent <agentId>", "agent ID for auto mode")
-  .action(async (opts: { json: boolean; quiet: boolean; euAiAct: boolean; auto: boolean; agent?: string }) => {
+  .option("--share", "output shareable markdown badge + summary after scoring", false)
+  .action(async (opts: { json: boolean; quiet: boolean; euAiAct: boolean; auto: boolean; agent?: string; share: boolean }) => {
     // Auto mode: score from actual evidence in the ledger
     if (opts.auto) {
       try {
@@ -2114,6 +2115,26 @@ program
       console.log(chalk.white("  $"), chalk.hex('#4AEF79')("amc wrap <runtime> -- <your-agent-command>"), chalk.gray("  # Capture agent behavior"));
       console.log(chalk.white("  $"), chalk.hex('#4AEF79')("amc evidence collect"), chalk.gray("               # Guided wizard to connect and capture evidence"));
       console.log(chalk.white("  $"), chalk.hex('#4AEF79')("amc quickscore"), chalk.gray("  # Then re-score"));
+    }
+
+    // --share: output shareable badge + summary
+    if (opts.share) {
+      const levelNum = parseInt(result.preliminaryLevel.replace(/\D/g, ""), 10) || 0;
+      const pct = result.percentage;
+      const badgeColor = levelNum >= 4 ? "brightgreen" : levelNum >= 3 ? "green" : levelNum >= 2 ? "yellow" : "red";
+      const shieldsUrl = `https://img.shields.io/badge/AMC-L${levelNum}_(${pct}%25)-${badgeColor}?logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0iI2ZmZiIgZD0iTTEyIDJMMiA3bDEwIDUgMTAtNXptMCA5bC04LjUtNC4yNUwyIDEybDEwIDUgMTAtNXptMCA5bC04LjUtNC4yNUwyIDIxbDEwIDUgMTAtNXoiLz48L3N2Zz4=`;
+      console.log("");
+      console.log(chalk.bold("━━━ Shareable Badge ━━━"));
+      console.log("");
+      console.log(chalk.gray("Markdown (paste in README):"));
+      console.log(`[![AMC L${levelNum}](${shieldsUrl})](https://github.com/thewisecrab/AgentMaturityCompass)`);
+      console.log("");
+      console.log(chalk.gray("HTML:"));
+      console.log(`<a href="https://github.com/thewisecrab/AgentMaturityCompass"><img src="${shieldsUrl}" alt="AMC L${levelNum}" /></a>`);
+      console.log("");
+      console.log(chalk.gray("Summary:"));
+      console.log(`Agent Maturity: L${levelNum} (${pct}%) | ${result.totalScore}/${result.maxScore} | Assessed via AMC Quick Score`);
+      console.log("");
     }
 
     // Post-quickscore "What Now?" flow
@@ -16806,6 +16827,167 @@ const productGlossary = program.command("glossary").description("Domain terminol
 const domainCmd = program.command("domain").alias("sector").description("Domain-specific architecture and compliance operations");
 registerDomainApplyCommand(domainCmd);
 
+// ── Blocker #13: sector-pack CLI commands for 40 industry packs ──────────────
+const sectorPack = domainCmd.command("pack").description("Industry sector packs — 40 packs across 7 domains");
+
+sectorPack
+  .command("list")
+  .description("List all available industry sector packs")
+  .option("--domain <d>", "Filter by domain: health|education|environment|mobility|governance|technology|wealth")
+  .option("--json", "Output as JSON")
+  .action(async (opts: { domain?: string; json?: boolean }) => {
+    const { listIndustryPackIds, getIndustryPack, getIndustryPacksByStation } = await import("./domains/industryPacks.js");
+    const { parseDomainOrThrow } = await import("./domains/domainCliIntegration.js");
+
+    let packs: Array<{ packId: string; name: string; domain: string; questionCount: number; riskLevel: string }>;
+
+    if (opts.domain) {
+      const domain = parseDomainOrThrow(opts.domain);
+      const domainPacks = getIndustryPacksByStation(domain);
+      packs = domainPacks.map(p => ({
+        packId: p.id,
+        name: p.name,
+        domain: opts.domain!,
+        questionCount: p.questions.length,
+        riskLevel: p.riskTier
+      }));
+    } else {
+      const allIds = listIndustryPackIds();
+      packs = allIds.map(id => {
+        const p = getIndustryPack(id);
+        return {
+          packId: p.id,
+          name: p.name,
+          domain: p.stationId,
+          questionCount: p.questions.length,
+          riskLevel: p.riskTier
+        };
+      });
+    }
+
+    if (opts.json) { console.log(JSON.stringify(packs, null, 2)); return; }
+
+    console.log(chalk.bold.hex('#4AEF79')(`\n🏭  Industry Sector Packs (${packs.length} packs)\n`));
+    const maxName = Math.max(...packs.map(p => p.name.length), 10);
+    console.log(`  ${"Pack ID".padEnd(30)} ${"Name".padEnd(maxName + 2)} ${"Domain".padEnd(14)} ${"Questions".padEnd(12)} Risk`);
+    console.log(chalk.gray(`  ${"─".repeat(30)} ${"─".repeat(maxName + 2)} ${"─".repeat(14)} ${"─".repeat(12)} ${"─".repeat(10)}`));
+    for (const p of packs) {
+      console.log(`  ${chalk.cyan(p.packId.padEnd(30))} ${p.name.padEnd(maxName + 2)} ${p.domain.padEnd(14)} ${String(p.questionCount).padEnd(12)} ${p.riskLevel}`);
+    }
+    console.log(chalk.gray(`\n  Total: ${packs.length} packs, ${packs.reduce((s, p) => s + p.questionCount, 0)} questions`));
+    console.log(chalk.gray(`\n  Run a pack: amc domain pack run --pack <packId> --agent <agentId>`));
+    console.log(chalk.gray(`  Describe:   amc domain pack describe --pack <packId>`));
+  });
+
+sectorPack
+  .command("describe")
+  .description("Show details of a specific industry sector pack")
+  .requiredOption("--pack <packId>", "Pack ID (from 'amc domain pack list')")
+  .option("--json", "Output as JSON")
+  .action(async (opts: { pack: string; json?: boolean }) => {
+    const { getPackById } = await import("./domains/industryPacks.js");
+    const pack = getPackById(opts.pack);
+    if (!pack) {
+      console.error(chalk.red(`Pack not found: ${opts.pack}`));
+      console.log(chalk.gray("List available packs: amc domain pack list"));
+      process.exit(1); return;
+    }
+    if (opts.json) { console.log(JSON.stringify(pack, null, 2)); return; }
+
+    console.log(chalk.bold.hex('#4AEF79')(`\n🏭  ${pack.name}`));
+    console.log(chalk.gray(`  Pack ID:    ${pack.id}`));
+    console.log(chalk.gray(`  Station:    ${pack.stationId}`));
+    console.log(chalk.gray(`  Risk level: ${pack.riskTier}`));
+    console.log(chalk.gray(`  Questions:  ${pack.questions.length}`));
+    if (pack.description) console.log(`\n  ${pack.description}`);
+    if (pack.regulatoryBasis?.length) {
+      console.log(chalk.bold("\n  Regulatory basis:"));
+      for (const r of pack.regulatoryBasis) console.log(`    • ${r}`);
+    }
+    if (pack.complianceFrameworks?.length) {
+      console.log(chalk.bold("\n  Compliance frameworks:"));
+      for (const f of pack.complianceFrameworks) console.log(`    • ${f}`);
+    }
+    if (pack.certificationPath) {
+      console.log(chalk.bold("\n  Certification path:"));
+      console.log(`    ${pack.certificationPath}`);
+    }
+    console.log(chalk.bold(`\n  Questions (${pack.questions.length}):`));
+    for (const q of pack.questions) {
+      console.log(`    ${chalk.cyan(q.id)} [${q.dimension}] ${q.text.slice(0, 100)}${q.text.length > 100 ? "..." : ""}`);
+    }
+    console.log("");
+  });
+
+sectorPack
+  .command("run")
+  .description("Run an industry sector pack — interactive assessment or baseline score")
+  .requiredOption("--pack <packId>", "Pack ID")
+  .option("--baseline", "Score with L1 defaults (no interaction needed)", false)
+  .option("--json", "Output as JSON")
+  .action(async (opts: { pack: string; baseline: boolean; json?: boolean }) => {
+    const { getPackById, scoreIndustryPack } = await import("./domains/industryPacks.js");
+    type PackIdType = Parameters<typeof scoreIndustryPack>[0];
+    const pack = getPackById(opts.pack);
+    if (!pack) {
+      console.error(chalk.red(`Pack not found: ${opts.pack}`));
+      console.log(chalk.gray("List available packs: amc domain pack list"));
+      process.exit(1); return;
+    }
+    console.log(chalk.bold.hex('#4AEF79')(`\n🏭  Running: ${pack.name}`));
+    console.log(chalk.gray(`  Questions: ${pack.questions.length}\n`));
+
+    let responses: Record<string, number> = {};
+
+    if (opts.baseline) {
+      // Score all questions at L1 to show gap surface
+      for (const q of pack.questions) { responses[q.id] = 1; }
+    } else if (process.stdin.isTTY) {
+      // Interactive assessment
+      const inq = await import("inquirer");
+      for (const q of pack.questions) {
+        const { level } = await inq.default.prompt([{
+          type: "list",
+          name: "level",
+          message: `${q.id} [${q.dimension}]: ${q.text.slice(0, 120)}`,
+          choices: [
+            { name: "L1 — " + q.l1.slice(0, 80), value: 1 },
+            { name: "L3 — " + q.l3.slice(0, 80), value: 3 },
+            { name: "L5 — " + q.l5.slice(0, 80), value: 5 },
+          ]
+        }]);
+        responses[q.id] = level;
+      }
+    } else {
+      // Non-interactive: default to L1 baseline
+      for (const q of pack.questions) { responses[q.id] = 1; }
+    }
+
+    const result = scoreIndustryPack(opts.pack as PackIdType, responses);
+    if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
+
+    console.log(chalk.bold("  Results:"));
+    console.log(`    Pack:       ${result.packId}`);
+    console.log(`    Score:      ${result.percentage.toFixed(1)} / 100`);
+    console.log(`    Level:      L${result.level}`);
+    console.log(`    Questions:  ${result.questionResults.length}`);
+    const lowScoring = result.questionResults.filter(q => q.percentage < 50);
+    if (lowScoring.length > 0) {
+      console.log(chalk.yellow(`\n  Gaps (${lowScoring.length} below 50%):`));
+      for (const g of lowScoring.slice(0, 10)) {
+        console.log(`    ${chalk.cyan(g.id)} ${g.dimension} — ${g.percentage.toFixed(0)}% (score: ${g.score.toFixed(1)}/${g.weight})`);
+      }
+      if (lowScoring.length > 10) console.log(chalk.gray(`    ... and ${lowScoring.length - 10} more`));
+    }
+    if (result.complianceGaps.length > 0) {
+      console.log(chalk.yellow(`\n  Compliance gaps (${result.complianceGaps.length}):`));
+      for (const gap of result.complianceGaps.slice(0, 5)) {
+        console.log(`    • ${gap}`);
+      }
+    }
+    console.log("");
+  });
+
 product
   .command("features")
   .description("List product features")
@@ -18012,6 +18194,31 @@ score
 // ── Scan ──────────────────────────────────────────────────────────────────────
 const scan = program.command("scan").description("Zero-integration agent assessment scanner");
 
+// Blocker #9: add "inventory" as alias namespace pointing users to scan
+const inventory = program.command("inventory").description("AI asset inventory (alias for scan)");
+inventory
+  .command("scan")
+  .description("Scan and discover AI assets (same as 'amc scan')")
+  .option("--url <url>", "probe a running agent endpoint")
+  .option("--repo <url>", "scan a git repository")
+  .option("--local <path>", "scan a local codebase")
+  .option("--json", "Output as JSON")
+  .action(async (opts: { url?: string; repo?: string; local?: string; json?: boolean }) => {
+    console.log(chalk.gray("Tip: 'amc inventory scan' is an alias for 'amc scan'. Both work identically.\n"));
+    await scan.parseAsync(["scan", ...(opts.url ? ["--url", opts.url] : []), ...(opts.repo ? ["--repo", opts.repo] : []), ...(opts.local ? ["--local", opts.local] : []), ...(opts.json ? ["--json"] : [])], { from: "user" });
+  });
+inventory
+  .command("list")
+  .description("List discovered AI assets (alias for 'amc scan')")
+  .option("--url <url>", "probe a running agent endpoint")
+  .option("--repo <url>", "scan a git repository")
+  .option("--local <path>", "scan a local codebase")
+  .option("--json", "Output as JSON")
+  .action(async (opts: { url?: string; repo?: string; local?: string; json?: boolean }) => {
+    console.log(chalk.gray("Tip: 'amc inventory list' is an alias for 'amc scan'. Both work identically.\n"));
+    await scan.parseAsync(["scan", ...(opts.url ? ["--url", opts.url] : []), ...(opts.repo ? ["--repo", opts.repo] : []), ...(opts.local ? ["--local", opts.local] : []), ...(opts.json ? ["--json"] : [])], { from: "user" });
+  });
+
 scan
   .option("--url <url>", "probe a running agent endpoint")
   .option("--repo <url>", "scan a git repository")
@@ -18639,12 +18846,23 @@ apiCmd
   });
 
 apiCmd
+  .command("start")
+  .description("Start the AMC API server (alias for 'amc up')")
+  .option("--port <port>", "port number", "3212")
+  .action(async (opts: { port?: string }) => {
+    console.log(chalk.bold("\n🚀  Starting AMC API Server...\n"));
+    console.log(chalk.gray("  The API is served by AMC Studio. Starting it now.\n"));
+    const { runStudioForeground } = await import("./studio/studioSupervisor.js");
+    await runStudioForeground({ workspace: process.cwd(), apiPort: Number(opts.port) || 3212 });
+  });
+
+apiCmd
   .command("docs")
   .description("Show API reference documentation summary and link")
   .action(() => {
     console.log(chalk.bold("\n📖  AMC API Reference\n"));
     console.log("  Full docs: docs/API_REFERENCE.md (in your AMC install directory)");
-    console.log("  Online:    https://github.com/your-org/amc/blob/main/docs/API_REFERENCE.md");
+    console.log("  Online:    https://github.com/thewisecrab/AgentMaturityCompass/blob/main/docs/API_REFERENCE.md");
     console.log("");
     console.log(chalk.bold("  Quick start:"));
     console.log(`  1. Start Studio:      ${chalk.hex('#4AEF79')("amc up")}`);
@@ -19610,6 +19828,70 @@ packRegistry
     } catch (error: any) {
       console.error(chalk.red(`Registry init failed: ${error.message}`));
       process.exit(1);
+    }
+  });
+
+// ── Blocker #3: top-level `amc badge` command ──────────────────────────────────
+program
+  .command("badge")
+  .description("Generate maturity badge for README/docs (markdown, HTML, or URL)")
+  .option("--agent <agentId>", "agent ID (default: 'default')")
+  .option("--level <0-5>", "override level (instead of reading from latest score)")
+  .option("--score <0-100>", "override score (instead of reading from latest score)")
+  .option("--format <format>", "output format: markdown | html | url | svg", "markdown")
+  .action(async (opts: { agent?: string; level?: string; score?: string; format?: string }) => {
+    const { generateBadgeSvg, scoreToLevel } = await import("./cert/badgeGenerator.js");
+    const agentId = opts.agent ?? "default";
+    const format = (opts.format ?? "markdown").toLowerCase();
+
+    let level: number;
+    let score: number;
+
+    if (opts.level != null) {
+      level = Number(opts.level);
+      score = opts.score != null ? Number(opts.score) : level * 20;
+    } else if (opts.score != null) {
+      score = Number(opts.score);
+      level = scoreToLevel(score);
+    } else {
+      // Try reading from latest quickscore cache
+      try {
+        const out = passportBadgeCli({ workspace: process.cwd(), agentId: resolveAgentId(process.cwd(), agentId) });
+        console.log(out.badge);
+        return;
+      } catch {
+        // No cached passport — inform user to specify level
+        console.error(chalk.yellow("No cached score found for agent '" + agentId + "'. Specify --level or --score."));
+        console.log(chalk.gray("\nExamples:"));
+        console.log(chalk.gray("  amc badge --level 3              # Generate L3 badge"));
+        console.log(chalk.gray("  amc badge --score 72.5           # Badge from score"));
+        console.log(chalk.gray("  amc quickscore && amc badge      # Score first, then badge"));
+        console.log(chalk.gray("  amc badge --format html --level 4 # HTML img tag"));
+        console.log(chalk.gray("  amc badge --format url --level 3  # Raw shields.io URL"));
+        console.log(chalk.gray("  amc badge --format svg --level 3  # Full SVG output"));
+        return;
+      }
+    }
+
+    const badgeColor = level >= 4 ? "brightgreen" : level >= 3 ? "green" : level >= 2 ? "yellow" : "red";
+    const shieldsUrl = `https://img.shields.io/badge/AMC-L${level}_(${score.toFixed(1)})-${badgeColor}?logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0iI2ZmZiIgZD0iTTEyIDJMMiA3bDEwIDUgMTAtNXptMCA5bC04LjUtNC4yNUwyIDEybDEwIDUgMTAtNXptMCA5bC04LjUtNC4yNUwyIDIxbDEwIDUgMTAtNXoiLz48L3N2Zz4=`;
+
+    switch (format) {
+      case "url":
+        console.log(shieldsUrl);
+        break;
+      case "html":
+        console.log(`<a href="https://github.com/thewisecrab/AgentMaturityCompass"><img src="${shieldsUrl}" alt="AMC L${level}" /></a>`);
+        break;
+      case "svg": {
+        const svg = generateBadgeSvg(score, level, agentId);
+        console.log(svg);
+        break;
+      }
+      case "markdown":
+      default:
+        console.log(`[![AMC L${level}](${shieldsUrl})](https://github.com/thewisecrab/AgentMaturityCompass)`);
+        break;
     }
   });
 

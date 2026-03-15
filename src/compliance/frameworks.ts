@@ -1,4 +1,4 @@
-export type ComplianceFramework = "SOC2" | "NIST_AI_RMF" | "ISO_27001" | "ISO_42001" | "EU_AI_ACT" | "GDPR" | "MITRE_ATLAS" | "OWASP_API_TOP10";
+export type ComplianceFramework = "SOC2" | "NIST_AI_RMF" | "ISO_27001" | "ISO_42001" | "EU_AI_ACT" | "GDPR" | "MITRE_ATLAS" | "OWASP_API_TOP10" | "HIPAA" | "SOX" | "FEDRAMP";
 
 export interface ComplianceFrameworkFamily {
   framework: ComplianceFramework;
@@ -116,6 +116,59 @@ export const complianceFrameworkFamilies: ComplianceFrameworkFamily[] = [
       "API8 Security Misconfiguration",
       "API9 Improper Inventory Management",
       "API10 Unsafe Consumption of APIs"
+    ]
+  },
+  {
+    framework: "HIPAA",
+    displayName: "HIPAA (Health Insurance Portability and Accountability Act)",
+    categories: [
+      "§164.308 Administrative Safeguards",
+      "§164.310 Physical Safeguards",
+      "§164.312 Technical Safeguards",
+      "§164.314 Organizational Requirements",
+      "§164.316 Policies and Documentation",
+      "§164.502-514 Privacy Rule Uses and Disclosures",
+      "§164.524 Access to PHI",
+      "§164.528 Accounting of Disclosures",
+      "§164.530 Administrative Requirements",
+      "Breach Notification Rule §164.400-414"
+    ]
+  },
+  {
+    framework: "SOX",
+    displayName: "SOX (Sarbanes-Oxley Act) — IT General Controls for AI Systems",
+    categories: [
+      "Section 302 CEO/CFO Certification",
+      "Section 404 Internal Control Assessment",
+      "ITGC Access Controls",
+      "ITGC Change Management",
+      "ITGC Computer Operations",
+      "ITGC Program Development",
+      "Segregation of Duties",
+      "Audit Trail and Evidence Retention",
+      "Financial Reporting Integrity"
+    ]
+  },
+  {
+    framework: "FEDRAMP",
+    displayName: "FedRAMP (Federal Risk and Authorization Management Program)",
+    categories: [
+      "AC Access Control",
+      "AU Audit and Accountability",
+      "CA Assessment Authorization Monitoring",
+      "CM Configuration Management",
+      "CP Contingency Planning",
+      "IA Identification and Authentication",
+      "IR Incident Response",
+      "MA Maintenance",
+      "MP Media Protection",
+      "PE Physical and Environmental Protection",
+      "PL Planning",
+      "PS Personnel Security",
+      "RA Risk Assessment",
+      "SA System and Services Acquisition",
+      "SC System and Communications Protection",
+      "SI System and Information Integrity"
     ]
   }
 ];

@@ -26,7 +26,7 @@ git clone https://github.com/thewisecrab/AgentMaturityCompass.git
 cd AgentMaturityCompass
 npm ci
 npm run build     # must compile with 0 TypeScript errors
-npm test          # 3,311 tests, all must pass
+npm test          # 3,549 tests, all must pass
 ```
 
 **Python platform:**
@@ -379,7 +379,7 @@ export const myModule: ScoringModule = {
 1. **Fork** the repo
 2. **Branch:** `git checkout -b feat/my-contribution`
 3. **Build:** `npm run build` — must compile with 0 errors
-4. **Test:** `npm test` — all 3,311+ tests must pass
+4. **Test:** `npm test` — all 3,549+ tests must pass
 5. **Commit** with a descriptive message (`feat:`, `fix:`, `docs:`, `test:`)
 6. **Push** and open a PR
 

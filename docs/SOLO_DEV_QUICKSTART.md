@@ -34,7 +34,7 @@ amc quickscore
 amc fix
 amc observe timeline
 amc trace list
-amc assurance run --scope full
+amc assurance run --all
 ```
 
 ## When to stop overthinking it
