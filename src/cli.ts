@@ -2069,7 +2069,14 @@ program
     }
 
     console.log(chalk.bold("AMC Rapid Quickscore"));
-    console.log("No ledger setup required. This is a preliminary score from 5 high-signal questions.");
+    if (result.totalScore === 0 && !process.stdin.isTTY) {
+      console.log(chalk.yellow("⚡ Non-interactive mode detected — no questions were answered."));
+      console.log(chalk.gray("   Run in a terminal for the interactive 5-question assessment,"));
+      console.log(chalk.gray("   or use: amc quickscore --auto  (scores from captured evidence)"));
+      console.log("");
+    } else {
+      console.log("No ledger setup required. This is a preliminary score from 5 high-signal questions.");
+    }
     console.log(`Score: ${result.totalScore}/${result.maxScore} (${result.percentage}%)`);
     console.log(`Preliminary maturity: ${result.preliminaryLevel}`);
     console.log(chalk.dim("Maturity Levels: L0=Undocumented | L1=Documented | L2=Automated | L3=Evidence-backed | L4=Proactive | L5=Certifiable"));
@@ -9194,6 +9201,12 @@ compliance
     const coveragePct = (out.report.coverage.score * 100).toFixed(1);
     const coverageLabel = out.report.coverage.score >= 0.8 ? "SATISFIED" : out.report.coverage.score >= 0.5 ? "PARTIAL" : "INSUFFICIENT";
     console.log(`Coverage: ${coveragePct}% (${coverageLabel})`);
+    if (out.report.coverage.score === 0) {
+      console.log(chalk.gray(`  💡 Coverage is 0% because no evidence has been collected yet.`));
+      console.log(chalk.gray(`     This is expected for a fresh workspace. Capture evidence first:`));
+      console.log(chalk.gray(`     amc wrap <runtime> -- <your-agent-command>`));
+      console.log(chalk.gray(`     amc evidence collect`));
+    }
     if (defaultToMarkdown) {
       console.log(chalk.gray(`  Tip: use --out report.json for machine-readable output`));
     }
@@ -15516,8 +15529,9 @@ program.action(async (_opts, command: Command) => {
   if (!hasWorkspace) {
     console.log(chalk.white("  No workspace found. Get started:"));
     console.log("");
-    console.log(chalk.white("  $"), chalk.hex('#4AEF79')("amc init"), chalk.gray("           Create workspace + get your first score"));
-    console.log(chalk.white("  $"), chalk.hex('#4AEF79')("amc setup --demo"), chalk.gray("   Quick start with demo data"));
+    console.log(chalk.white("  $"), chalk.hex('#4AEF79')("amc setup"), chalk.gray("           Set up provider + workspace"));
+    console.log(chalk.white("  $"), chalk.hex('#4AEF79')("amc quickscore"), chalk.gray("     2-minute maturity assessment (no setup needed)"));
+    console.log(chalk.white("  $"), chalk.hex('#4AEF79')("amc demo gap"), chalk.gray("       See the 84-point documentation inflation demo"));
     console.log("");
     console.log(chalk.gray("  Guide:"), chalk.underline("https://github.com/thewisecrab/AgentMaturityCompass/blob/main/docs/GETTING_STARTED.md"));
   } else {

@@ -48,10 +48,10 @@ function clamp(n: number, min: number, max: number): number {
 
 function trustLabelFromIntegrity(integrity: number): TrustLabel {
   if (integrity < 0.4) {
-    return "UNRELIABLE — DO NOT USE FOR CLAIMS";
+    return "LOW — collect more evidence to increase trust";
   }
   if (integrity < 0.6) {
-    return "LOW TRUST";
+    return "DEVELOPING — some evidence, needs more coverage";
   }
   return "HIGH TRUST";
 }

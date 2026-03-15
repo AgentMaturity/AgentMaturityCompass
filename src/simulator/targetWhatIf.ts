@@ -165,7 +165,7 @@ export function simulateTargetWhatIf(params: {
         trustBoundaryViolated: false,
         trustBoundaryMessage: null,
         integrityIndex: 0,
-        trustLabel: "LOW TRUST",
+        trustLabel: "DEVELOPING — some evidence, needs more coverage",
         targetProfileId: target.id,
         layerScores: [],
         questionScores: [],

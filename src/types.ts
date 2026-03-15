@@ -46,7 +46,7 @@ export type LayerName =
   | "Resilience"
   | "Skills";
 
-export type TrustLabel = "HIGH TRUST" | "LOW TRUST" | "UNRELIABLE — DO NOT USE FOR CLAIMS";
+export type TrustLabel = "HIGH TRUST" | "LOW TRUST" | "DEVELOPING — some evidence, needs more coverage" | "LOW — collect more evidence to increase trust" | "UNRELIABLE — DO NOT USE FOR CLAIMS";
 
 export interface EvidenceEvent {
   id: string;
