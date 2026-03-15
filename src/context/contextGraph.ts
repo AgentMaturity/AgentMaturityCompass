@@ -47,7 +47,7 @@ export function loadContextGraph(workspace = process.cwd(), agentId?: string): C
           `Context graph not found for agent '${paths.agentId}'.`,
           `Expected file: ${file}`,
           "Run one of the following first:",
-          "  amc setup --demo",
+          "  amc setup",
           "  amc init"
         ].join("\n")
       );

@@ -440,6 +440,17 @@ export function registerInventoryCommands(program: Command): void {
         process.exit(1);
       }
     });
+
+  // Blocker #9: "inventory list" alias for "inventory scan"
+  inventory
+    .command("list")
+    .description("List AI assets (alias for 'inventory scan')")
+    .option("--deep", "deep scan")
+    .option("--json", "JSON output")
+    .action(async (opts: { deep?: boolean; json?: boolean }) => {
+      // Delegate to scan
+      await inventory.parseAsync(["scan", ...(opts.deep ? ["--deep"] : []), ...(opts.json ? ["--json"] : [])], { from: "user" });
+    });
 }
 
 export function registerCommsCheckCommands(program: Command): void {

@@ -321,7 +321,7 @@ import {
   initComplianceMapsCli,
   verifyComplianceMapsCli
 } from "./compliance/complianceCli.js";
-import { frameworkChoices, getFrameworkFamily, type ComplianceFramework } from "./compliance/frameworks.js";
+import { frameworkChoices, getFrameworkFamily, normalizeFrameworkName, type ComplianceFramework } from "./compliance/frameworks.js";
 import {
   federateExportCli,
   federateImportCli,
@@ -9147,7 +9147,8 @@ compliance
   .option("--window <window>", "window (e.g. 14d)", "30d")
   .option("--out <path>", "output path (.md or .json)")
   .option("--agent <agentId>", "agent ID (overrides global --agent)")
-  .action((opts: { framework?: string; window: string; out?: string; agent?: string }) => {
+  .option("--json", "output JSON to stdout", false)
+  .action((opts: { framework?: string; window: string; out?: string; agent?: string; json: boolean }) => {
     // R3: If --framework is missing, list available frameworks and exit gracefully
     if (!opts.framework) {
       const available = frameworkChoices();
@@ -9164,7 +9165,15 @@ compliance
     if (!opts.out) {
       opts.out = `compliance-${opts.framework.toLowerCase()}.md`;
     }
-    const framework = opts.framework as ComplianceFramework;
+    const normalized = normalizeFrameworkName(opts.framework);
+    if (!normalized) {
+      const available = frameworkChoices().join(", ");
+      console.error(chalk.red(`Unsupported compliance framework: ${opts.framework}`));
+      console.log(chalk.gray(`Available: ${available}`));
+      console.log(chalk.gray(`\nHint: framework names are case-insensitive. Try: amc comply report --framework HIPAA`));
+      process.exit(1); return;
+    }
+    const framework = normalized;
     const family = getFrameworkFamily(framework);
     const format = opts.out.toLowerCase().endsWith(".json") ? "json" : "md";
     const out = complianceReportCli({
@@ -9175,6 +9184,10 @@ compliance
       format,
       agentId: opts.agent ?? activeAgent(program)
     });
+    if (opts.json) {
+      console.log(JSON.stringify(out.report, null, 2));
+      return;
+    }
     console.log(chalk.green(`Compliance report generated: ${out.outFile}`));
     console.log(`Framework: ${family.displayName}`);
     // F14: show coverage as percentage with human-readable label
@@ -18193,31 +18206,6 @@ score
 
 // ── Scan ──────────────────────────────────────────────────────────────────────
 const scan = program.command("scan").description("Zero-integration agent assessment scanner");
-
-// Blocker #9: add "inventory" as alias namespace pointing users to scan
-const inventory = program.command("inventory").description("AI asset inventory (alias for scan)");
-inventory
-  .command("scan")
-  .description("Scan and discover AI assets (same as 'amc scan')")
-  .option("--url <url>", "probe a running agent endpoint")
-  .option("--repo <url>", "scan a git repository")
-  .option("--local <path>", "scan a local codebase")
-  .option("--json", "Output as JSON")
-  .action(async (opts: { url?: string; repo?: string; local?: string; json?: boolean }) => {
-    console.log(chalk.gray("Tip: 'amc inventory scan' is an alias for 'amc scan'. Both work identically.\n"));
-    await scan.parseAsync(["scan", ...(opts.url ? ["--url", opts.url] : []), ...(opts.repo ? ["--repo", opts.repo] : []), ...(opts.local ? ["--local", opts.local] : []), ...(opts.json ? ["--json"] : [])], { from: "user" });
-  });
-inventory
-  .command("list")
-  .description("List discovered AI assets (alias for 'amc scan')")
-  .option("--url <url>", "probe a running agent endpoint")
-  .option("--repo <url>", "scan a git repository")
-  .option("--local <path>", "scan a local codebase")
-  .option("--json", "Output as JSON")
-  .action(async (opts: { url?: string; repo?: string; local?: string; json?: boolean }) => {
-    console.log(chalk.gray("Tip: 'amc inventory list' is an alias for 'amc scan'. Both work identically.\n"));
-    await scan.parseAsync(["scan", ...(opts.url ? ["--url", opts.url] : []), ...(opts.repo ? ["--repo", opts.repo] : []), ...(opts.local ? ["--local", opts.local] : []), ...(opts.json ? ["--json"] : [])], { from: "user" });
-  });
 
 scan
   .option("--url <url>", "probe a running agent endpoint")

@@ -177,10 +177,34 @@ export function frameworkChoices(): ComplianceFramework[] {
   return complianceFrameworkFamilies.map((row) => row.framework);
 }
 
-export function getFrameworkFamily(framework: ComplianceFramework): ComplianceFrameworkFamily {
-  const found = complianceFrameworkFamilies.find((row) => row.framework === framework);
-  if (!found) {
-    throw new Error(`Unsupported compliance framework: ${framework}`);
+export function normalizeFrameworkName(input: string): ComplianceFramework | null {
+  // Exact match first
+  const exact = complianceFrameworkFamilies.find((row) => row.framework === input);
+  if (exact) return exact.framework;
+  // Case-insensitive match
+  const upper = input.toUpperCase().replace(/-/g, "_");
+  const caseMatch = complianceFrameworkFamilies.find((row) => row.framework === upper);
+  if (caseMatch) return caseMatch.framework;
+  // Common aliases
+  const aliases: Record<string, ComplianceFramework> = {
+    "hipaa": "HIPAA", "sox": "SOX", "fedramp": "FEDRAMP",
+    "soc2": "SOC2", "soc-2": "SOC2", "gdpr": "GDPR",
+    "eu-ai-act": "EU_AI_ACT", "eu_ai_act": "EU_AI_ACT",
+    "nist": "NIST_AI_RMF", "nist-ai-rmf": "NIST_AI_RMF", "nist_ai_rmf": "NIST_AI_RMF",
+    "iso-42001": "ISO_42001", "iso42001": "ISO_42001",
+    "iso-27001": "ISO_27001", "iso27001": "ISO_27001",
+    "mitre": "MITRE_ATLAS", "mitre-atlas": "MITRE_ATLAS",
+    "owasp": "OWASP_API_TOP10", "owasp-llm": "OWASP_API_TOP10", "owasp-api": "OWASP_API_TOP10",
+  };
+  return aliases[input.toLowerCase()] ?? null;
+}
+
+export function getFrameworkFamily(framework: ComplianceFramework | string): ComplianceFrameworkFamily {
+  const normalized = normalizeFrameworkName(framework);
+  if (normalized) {
+    const found = complianceFrameworkFamilies.find((row) => row.framework === normalized);
+    if (found) return found;
   }
-  return found;
+  const available = frameworkChoices().join(", ");
+  throw new Error(`Unsupported compliance framework: ${framework}\nAvailable: ${available}`);
 }
