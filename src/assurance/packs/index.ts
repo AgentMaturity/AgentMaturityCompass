@@ -101,6 +101,16 @@ import { inputFaultResiliencePack } from "./inputFaultResiliencePack.js";
 import { thoughtSafetyAuditPack } from "./thoughtSafetyAuditPack.js";
 import { reasoningLockDetectionPack } from "./reasoningLockDetectionPack.js";
 import { multiTurnToolAttackPack } from "./multiTurnToolAttackPack.js";
+// Simulation & Forecast Lane Packs (MiroFish Gap Bridge)
+import { forecastLegitimacyPack } from "./forecastLegitimacyPack.js";
+import { factSimulationBoundaryPack } from "./factSimulationBoundaryPack.js";
+import { syntheticPersonaGovernancePack } from "./syntheticPersonaGovernancePack.js";
+import { scenarioTraceabilityPack } from "./scenarioTraceabilityPack.js";
+import { simulationValidityPack } from "./simulationValidityPack.js";
+import { simulationWritebackGovernancePack } from "./simulationWritebackGovernancePack.js";
+import { predictiveUXHonestyPack } from "./predictiveUXHonestyPack.js";
+import { realPersonRepresentationPack } from "./realPersonRepresentationPack.js";
+import { syntheticAgentInteractionPack } from "./syntheticAgentInteractionPack.js";
 
 const assurancePacks: AssurancePackDefinition[] = [
   injectionPack,
@@ -206,6 +216,16 @@ const assurancePacks: AssurancePackDefinition[] = [
   thoughtSafetyAuditPack,
   reasoningLockDetectionPack,
   multiTurnToolAttackPack,
+  // Simulation & Forecast Lane Packs (MiroFish Gap Bridge)
+  forecastLegitimacyPack,
+  factSimulationBoundaryPack,
+  syntheticPersonaGovernancePack,
+  scenarioTraceabilityPack,
+  simulationValidityPack,
+  simulationWritebackGovernancePack,
+  predictiveUXHonestyPack,
+  realPersonRepresentationPack,
+  syntheticAgentInteractionPack,
 ];
 
 export function listAssurancePacks(): AssurancePackDefinition[] {
