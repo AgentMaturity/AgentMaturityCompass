@@ -3858,40 +3858,71 @@ monitor
 
 program
   .command("run")
-  .description("Run maturity diagnostic")
+  .description("Full assessment — Score + Shield + Enforce + Vault + Watch + Fleet + Passport + Comply in one command")
   .option("--window <window>", "evidence window", "14d")
-  .option("--target <name>", "target profile name", "default")
-  .option("--output <path>", "markdown report path")
-  .option("--claim-mode <mode>", "auto|owner|harness", "auto")
-  .option("--harness-runtime <name>", "runtime for harness mode")
+  .option("--fail-below <grade>", "exit non-zero if overall grade is below this (A+/A/A-/B+/B/B-/C+/C/C-/D+/D/D-/F)")
+  .option("--ci", "output GitHub Actions annotations", false)
+  .option("--score-only", "run only the maturity diagnostic (legacy mode)", false)
   .action(
     async (opts: {
       window: string;
-      target: string;
-      output?: string;
-      claimMode: "auto" | "owner" | "harness";
-      harnessRuntime?: "claude" | "gemini" | "openclaw";
+      failBelow?: string;
+      ci: boolean;
+      scoreOnly: boolean;
     }) => {
       const agentId = activeAgent(program);
       ensureWorkspaceReadyForAgent(process.cwd(), agentId);
-      const output = opts.output ? join(process.cwd(), opts.output) : undefined;
-      const resolvedOutput = output ? resolve(output) : undefined;
-      const report = await runDiagnostic(
-        {
-          workspace: process.cwd(),
-          window: opts.window,
-          targetName: opts.target,
-          claimMode: opts.claimMode,
-          runtimeForHarness: opts.harnessRuntime,
-          agentId
-        },
-        resolvedOutput
-      );
 
-      console.log(chalk.hex('#4AEF79')(`Run ${report.runId} status: ${report.status}`));
-      console.log(`IntegrityIndex: ${report.integrityIndex.toFixed(3)} (${report.trustLabel})`);
-      if (report.trustBoundaryViolated && report.trustBoundaryMessage) {
-        console.log(chalk.red(report.trustBoundaryMessage));
+      // Legacy mode: score-only (backward compat)
+      if (opts.scoreOnly) {
+        const report = await runDiagnostic(
+          {
+            workspace: process.cwd(),
+            window: opts.window,
+            targetName: "default",
+            claimMode: "auto",
+            agentId
+          }
+        );
+        console.log(chalk.hex('#4AEF79')(`Run ${report.runId} status: ${report.status}`));
+        console.log(`IntegrityIndex: ${report.integrityIndex.toFixed(3)} (${report.trustLabel})`);
+        if (report.trustBoundaryViolated && report.trustBoundaryMessage) {
+          console.log(chalk.red(report.trustBoundaryMessage));
+        }
+        return;
+      }
+
+      // Full unified run
+      const { unifiedRun, renderUnifiedResult, renderCIAnnotations, scoreToGrade } = await import("./unified/index.js");
+      const result = await unifiedRun({
+        workspace: process.cwd(),
+        agentId,
+        window: opts.window,
+        failBelow: opts.failBelow as any,
+        ci: opts.ci,
+      });
+
+      // Render output
+      if (opts.ci) {
+        console.log(renderCIAnnotations(result));
+      }
+      console.log(renderUnifiedResult(result, { ci: opts.ci }));
+
+      // CI gate: exit non-zero if below threshold
+      if (opts.failBelow) {
+        const thresholdScore = {
+          "A+": 97, "A": 93, "A-": 90,
+          "B+": 87, "B": 83, "B-": 80,
+          "C+": 77, "C": 73, "C-": 70,
+          "D+": 67, "D": 63, "D-": 60,
+          "F": 0,
+        }[opts.failBelow] ?? 0;
+        if (result.overallScore < thresholdScore) {
+          console.log(chalk.red(`\n  ✗ Grade ${result.overallGrade} is below --fail-below ${opts.failBelow}\n`));
+          process.exit(1);
+        } else {
+          console.log(chalk.hex('#4AEF79')(`\n  ✓ Grade ${result.overallGrade} meets --fail-below ${opts.failBelow}\n`));
+        }
       }
     }
   );
