@@ -1,0 +1,841 @@
+{
+  "reportId": "7fa2c471-8ed9-4117-9200-7e8947ba7a3b",
+  "ts": 1773511932601,
+  "workspace": "/Users/sid/AgentMaturityCompass",
+  "framework": "ISO_42001",
+  "agentId": "default",
+  "windowStartTs": 1770919932601,
+  "windowEndTs": 1773511932601,
+  "configTrusted": false,
+  "configReason": "compliance maps missing",
+  "trustTierCoverage": {
+    "observed": 1,
+    "attested": 0,
+    "selfReported": 0
+  },
+  "coverage": {
+    "satisfied": 0,
+    "partial": 10,
+    "missing": 1,
+    "unknown": 0,
+    "score": 0.4545
+  },
+  "categories": [
+    {
+      "id": "iso42001_clause_4_context",
+      "framework": "ISO_42001",
+      "category": "Clause 4 Context",
+      "description": "AIMS context, stakeholder expectations, and boundary definition are documented.",
+      "status": "PARTIAL",
+      "reasons": [
+        "Found 4785 matching events with observed ratio 1.000",
+        "Compliance maps signature invalid; green status is downgraded to PARTIAL."
+      ],
+      "evidenceRefs": [
+        {
+          "eventId": "2fdbcf3f-5754-4a70-9109-b49544d71db3",
+          "eventHash": "23941bf91946bdd7f7f6fcc818024fd798441c23507ccf68d6ed389c1adad7de",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
+          "eventHash": "944ed050ef43f39562402b1aafd6c76f3ff8a742db0dae278353f297a7507e11",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
+          "eventHash": "5178af41b822b3bb55c550a74c00f36351b3055d805199774e67a81745b2e06f",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "eventHash": "f6a0a586e713309ded55331ab53a8a12af0276de3ca5a5b0100de741a6c5f100",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "6408b1bf-1cdf-418b-9cc0-78d4ab2dea4c",
+          "eventHash": "a2a328212391b01c3d5ded9f96a25a22399f50dd1d2bf9fdef580f5f1bc36034",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "cb07bf50-d272-4425-9c7a-213a1af6a927",
+          "eventHash": "8566d974694f4fb8118e6c89e2faf9fb51d442d1daf2c6a5b54709269ea342e0",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "b6df717a-9223-47eb-a72b-1b920b694a2f",
+          "eventHash": "32360b69c2521f79ba5beeda8e0e8050cb2a031be4c7e55d9c6ef038f8f8ebe4",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "ba22a9f8-2355-46c6-b907-af14fb536f7c",
+          "eventHash": "5046e70dc6d562fffa8f3803e2e675ab69092ff23676773f47d6784e42e5db6c",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "eventHash": "c0db4a0af6b61a19cb7cb32b10dc3ea386a5501875960981b994092968b0d23f",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "d37123d6-88ed-45b4-9d33-12cfda21932d",
+          "eventHash": "d7920398c4e18652e97831100da7fc64e66694dc89bc518f3ae5c529666a3059",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35",
+          "eventHash": "e63f6dbe00166645a5484ebda7c8d3bd5af86daf96b6f18a808f47c613dc7a38",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "c2764cc7-5b52-48a2-bf03-c5dd58a8c3f3",
+          "eventHash": "5d1cd0e8a68260391de041f690008bf3c3a87630fcf9324a8e3aa9f8afaf6a2c",
+          "eventType": "audit"
+        }
+      ],
+      "neededToSatisfy": [
+        "No additional evidence required for this requirement"
+      ]
+    },
+    {
+      "id": "iso42001_clause_5_leadership",
+      "framework": "ISO_42001",
+      "category": "Clause 5 Leadership",
+      "description": "Leadership commitment, accountability assignment, and governance controls are evidenced.",
+      "status": "PARTIAL",
+      "reasons": [
+        "Found 4785 matching events with observed ratio 1.000",
+        "Assurance pack 'governance_bypass' score 100 meets threshold",
+        "Compliance maps signature invalid; green status is downgraded to PARTIAL."
+      ],
+      "evidenceRefs": [
+        {
+          "eventId": "2fdbcf3f-5754-4a70-9109-b49544d71db3",
+          "eventHash": "23941bf91946bdd7f7f6fcc818024fd798441c23507ccf68d6ed389c1adad7de",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
+          "eventHash": "944ed050ef43f39562402b1aafd6c76f3ff8a742db0dae278353f297a7507e11",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
+          "eventHash": "5178af41b822b3bb55c550a74c00f36351b3055d805199774e67a81745b2e06f",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "eventHash": "f6a0a586e713309ded55331ab53a8a12af0276de3ca5a5b0100de741a6c5f100",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "6408b1bf-1cdf-418b-9cc0-78d4ab2dea4c",
+          "eventHash": "a2a328212391b01c3d5ded9f96a25a22399f50dd1d2bf9fdef580f5f1bc36034",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "cb07bf50-d272-4425-9c7a-213a1af6a927",
+          "eventHash": "8566d974694f4fb8118e6c89e2faf9fb51d442d1daf2c6a5b54709269ea342e0",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "b6df717a-9223-47eb-a72b-1b920b694a2f",
+          "eventHash": "32360b69c2521f79ba5beeda8e0e8050cb2a031be4c7e55d9c6ef038f8f8ebe4",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "ba22a9f8-2355-46c6-b907-af14fb536f7c",
+          "eventHash": "5046e70dc6d562fffa8f3803e2e675ab69092ff23676773f47d6784e42e5db6c",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "eventHash": "c0db4a0af6b61a19cb7cb32b10dc3ea386a5501875960981b994092968b0d23f",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "d37123d6-88ed-45b4-9d33-12cfda21932d",
+          "eventHash": "d7920398c4e18652e97831100da7fc64e66694dc89bc518f3ae5c529666a3059",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35",
+          "eventHash": "e63f6dbe00166645a5484ebda7c8d3bd5af86daf96b6f18a808f47c613dc7a38",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "c2764cc7-5b52-48a2-bf03-c5dd58a8c3f3",
+          "eventHash": "5d1cd0e8a68260391de041f690008bf3c3a87630fcf9324a8e3aa9f8afaf6a2c",
+          "eventType": "audit"
+        }
+      ],
+      "neededToSatisfy": [
+        "No additional evidence required for this requirement",
+        "Improve 'governance_bypass' score to >= 80 and keep *_SUCCEEDED <= 0"
+      ]
+    },
+    {
+      "id": "iso42001_clause_6_planning",
+      "framework": "ISO_42001",
+      "category": "Clause 6 Planning",
+      "description": "Risk/opportunity planning and AI objectives are tracked with measurable controls.",
+      "status": "PARTIAL",
+      "reasons": [
+        "Found 4785 matching events with observed ratio 1.000",
+        "Compliance maps signature invalid; green status is downgraded to PARTIAL."
+      ],
+      "evidenceRefs": [
+        {
+          "eventId": "2fdbcf3f-5754-4a70-9109-b49544d71db3",
+          "eventHash": "23941bf91946bdd7f7f6fcc818024fd798441c23507ccf68d6ed389c1adad7de",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
+          "eventHash": "944ed050ef43f39562402b1aafd6c76f3ff8a742db0dae278353f297a7507e11",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
+          "eventHash": "5178af41b822b3bb55c550a74c00f36351b3055d805199774e67a81745b2e06f",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "eventHash": "f6a0a586e713309ded55331ab53a8a12af0276de3ca5a5b0100de741a6c5f100",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "6408b1bf-1cdf-418b-9cc0-78d4ab2dea4c",
+          "eventHash": "a2a328212391b01c3d5ded9f96a25a22399f50dd1d2bf9fdef580f5f1bc36034",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "cb07bf50-d272-4425-9c7a-213a1af6a927",
+          "eventHash": "8566d974694f4fb8118e6c89e2faf9fb51d442d1daf2c6a5b54709269ea342e0",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "b6df717a-9223-47eb-a72b-1b920b694a2f",
+          "eventHash": "32360b69c2521f79ba5beeda8e0e8050cb2a031be4c7e55d9c6ef038f8f8ebe4",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "ba22a9f8-2355-46c6-b907-af14fb536f7c",
+          "eventHash": "5046e70dc6d562fffa8f3803e2e675ab69092ff23676773f47d6784e42e5db6c",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "eventHash": "c0db4a0af6b61a19cb7cb32b10dc3ea386a5501875960981b994092968b0d23f",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "d37123d6-88ed-45b4-9d33-12cfda21932d",
+          "eventHash": "d7920398c4e18652e97831100da7fc64e66694dc89bc518f3ae5c529666a3059",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35",
+          "eventHash": "e63f6dbe00166645a5484ebda7c8d3bd5af86daf96b6f18a808f47c613dc7a38",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "c2764cc7-5b52-48a2-bf03-c5dd58a8c3f3",
+          "eventHash": "5d1cd0e8a68260391de041f690008bf3c3a87630fcf9324a8e3aa9f8afaf6a2c",
+          "eventType": "audit"
+        }
+      ],
+      "neededToSatisfy": [
+        "No additional evidence required for this requirement"
+      ]
+    },
+    {
+      "id": "iso42001_clause_7_support",
+      "framework": "ISO_42001",
+      "category": "Clause 7 Support",
+      "description": "Competence, documented information, and support resources are maintained as evidence artifacts.",
+      "status": "MISSING",
+      "reasons": [
+        "No evidence events found for types: artifact, review"
+      ],
+      "evidenceRefs": [],
+      "neededToSatisfy": [
+        "Capture artifact, review events with OBSERVED trust tier"
+      ]
+    },
+    {
+      "id": "iso42001_clause_8_operation",
+      "framework": "ISO_42001",
+      "category": "Clause 8 Operation",
+      "description": "Operational lifecycle controls and risk treatment are evidence-linked during runtime execution.",
+      "status": "PARTIAL",
+      "reasons": [
+        "Found 4785 matching events with observed ratio 1.000",
+        "No denied audit events found",
+        "Compliance maps signature invalid; green status is downgraded to PARTIAL."
+      ],
+      "evidenceRefs": [
+        {
+          "eventId": "2fdbcf3f-5754-4a70-9109-b49544d71db3",
+          "eventHash": "23941bf91946bdd7f7f6fcc818024fd798441c23507ccf68d6ed389c1adad7de",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
+          "eventHash": "944ed050ef43f39562402b1aafd6c76f3ff8a742db0dae278353f297a7507e11",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
+          "eventHash": "5178af41b822b3bb55c550a74c00f36351b3055d805199774e67a81745b2e06f",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "eventHash": "f6a0a586e713309ded55331ab53a8a12af0276de3ca5a5b0100de741a6c5f100",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "6408b1bf-1cdf-418b-9cc0-78d4ab2dea4c",
+          "eventHash": "a2a328212391b01c3d5ded9f96a25a22399f50dd1d2bf9fdef580f5f1bc36034",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "cb07bf50-d272-4425-9c7a-213a1af6a927",
+          "eventHash": "8566d974694f4fb8118e6c89e2faf9fb51d442d1daf2c6a5b54709269ea342e0",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "b6df717a-9223-47eb-a72b-1b920b694a2f",
+          "eventHash": "32360b69c2521f79ba5beeda8e0e8050cb2a031be4c7e55d9c6ef038f8f8ebe4",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "ba22a9f8-2355-46c6-b907-af14fb536f7c",
+          "eventHash": "5046e70dc6d562fffa8f3803e2e675ab69092ff23676773f47d6784e42e5db6c",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "eventHash": "c0db4a0af6b61a19cb7cb32b10dc3ea386a5501875960981b994092968b0d23f",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "d37123d6-88ed-45b4-9d33-12cfda21932d",
+          "eventHash": "d7920398c4e18652e97831100da7fc64e66694dc89bc518f3ae5c529666a3059",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35",
+          "eventHash": "e63f6dbe00166645a5484ebda7c8d3bd5af86daf96b6f18a808f47c613dc7a38",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "c2764cc7-5b52-48a2-bf03-c5dd58a8c3f3",
+          "eventHash": "5d1cd0e8a68260391de041f690008bf3c3a87630fcf9324a8e3aa9f8afaf6a2c",
+          "eventType": "audit"
+        }
+      ],
+      "neededToSatisfy": [
+        "No additional evidence required for this requirement"
+      ]
+    },
+    {
+      "id": "iso42001_clause_9_performance_evaluation",
+      "framework": "ISO_42001",
+      "category": "Clause 9 Performance Evaluation",
+      "description": "Monitoring, measurement, and internal evaluation evidence are continuously produced.",
+      "status": "PARTIAL",
+      "reasons": [
+        "Found 8365 matching events with observed ratio 1.000",
+        "Assurance pack 'hallucination' score 100 meets threshold",
+        "Compliance maps signature invalid; green status is downgraded to PARTIAL."
+      ],
+      "evidenceRefs": [
+        {
+          "eventId": "2fdbcf3f-5754-4a70-9109-b49544d71db3",
+          "eventHash": "23941bf91946bdd7f7f6fcc818024fd798441c23507ccf68d6ed389c1adad7de",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
+          "eventHash": "944ed050ef43f39562402b1aafd6c76f3ff8a742db0dae278353f297a7507e11",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
+          "eventHash": "5178af41b822b3bb55c550a74c00f36351b3055d805199774e67a81745b2e06f",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "eventHash": "f6a0a586e713309ded55331ab53a8a12af0276de3ca5a5b0100de741a6c5f100",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "6408b1bf-1cdf-418b-9cc0-78d4ab2dea4c",
+          "eventHash": "a2a328212391b01c3d5ded9f96a25a22399f50dd1d2bf9fdef580f5f1bc36034",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "cb07bf50-d272-4425-9c7a-213a1af6a927",
+          "eventHash": "8566d974694f4fb8118e6c89e2faf9fb51d442d1daf2c6a5b54709269ea342e0",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "b6df717a-9223-47eb-a72b-1b920b694a2f",
+          "eventHash": "32360b69c2521f79ba5beeda8e0e8050cb2a031be4c7e55d9c6ef038f8f8ebe4",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "ba22a9f8-2355-46c6-b907-af14fb536f7c",
+          "eventHash": "5046e70dc6d562fffa8f3803e2e675ab69092ff23676773f47d6784e42e5db6c",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "eventHash": "c0db4a0af6b61a19cb7cb32b10dc3ea386a5501875960981b994092968b0d23f",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "d37123d6-88ed-45b4-9d33-12cfda21932d",
+          "eventHash": "d7920398c4e18652e97831100da7fc64e66694dc89bc518f3ae5c529666a3059",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35",
+          "eventHash": "e63f6dbe00166645a5484ebda7c8d3bd5af86daf96b6f18a808f47c613dc7a38",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "c2764cc7-5b52-48a2-bf03-c5dd58a8c3f3",
+          "eventHash": "5d1cd0e8a68260391de041f690008bf3c3a87630fcf9324a8e3aa9f8afaf6a2c",
+          "eventType": "audit"
+        }
+      ],
+      "neededToSatisfy": [
+        "No additional evidence required for this requirement",
+        "Improve 'hallucination' score to >= 75 and keep *_SUCCEEDED <= 0"
+      ]
+    },
+    {
+      "id": "iso42001_clause_10_improvement",
+      "framework": "ISO_42001",
+      "category": "Clause 10 Improvement",
+      "description": "Nonconformity remediation and continual-improvement loops are closed with deterministic evidence.",
+      "status": "PARTIAL",
+      "reasons": [
+        "Found 4785 matching events with observed ratio 1.000",
+        "No denied audit events found",
+        "Compliance maps signature invalid; green status is downgraded to PARTIAL."
+      ],
+      "evidenceRefs": [
+        {
+          "eventId": "2fdbcf3f-5754-4a70-9109-b49544d71db3",
+          "eventHash": "23941bf91946bdd7f7f6fcc818024fd798441c23507ccf68d6ed389c1adad7de",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
+          "eventHash": "944ed050ef43f39562402b1aafd6c76f3ff8a742db0dae278353f297a7507e11",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
+          "eventHash": "5178af41b822b3bb55c550a74c00f36351b3055d805199774e67a81745b2e06f",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "eventHash": "f6a0a586e713309ded55331ab53a8a12af0276de3ca5a5b0100de741a6c5f100",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "6408b1bf-1cdf-418b-9cc0-78d4ab2dea4c",
+          "eventHash": "a2a328212391b01c3d5ded9f96a25a22399f50dd1d2bf9fdef580f5f1bc36034",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "cb07bf50-d272-4425-9c7a-213a1af6a927",
+          "eventHash": "8566d974694f4fb8118e6c89e2faf9fb51d442d1daf2c6a5b54709269ea342e0",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "b6df717a-9223-47eb-a72b-1b920b694a2f",
+          "eventHash": "32360b69c2521f79ba5beeda8e0e8050cb2a031be4c7e55d9c6ef038f8f8ebe4",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "ba22a9f8-2355-46c6-b907-af14fb536f7c",
+          "eventHash": "5046e70dc6d562fffa8f3803e2e675ab69092ff23676773f47d6784e42e5db6c",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "eventHash": "c0db4a0af6b61a19cb7cb32b10dc3ea386a5501875960981b994092968b0d23f",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "d37123d6-88ed-45b4-9d33-12cfda21932d",
+          "eventHash": "d7920398c4e18652e97831100da7fc64e66694dc89bc518f3ae5c529666a3059",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35",
+          "eventHash": "e63f6dbe00166645a5484ebda7c8d3bd5af86daf96b6f18a808f47c613dc7a38",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "c2764cc7-5b52-48a2-bf03-c5dd58a8c3f3",
+          "eventHash": "5d1cd0e8a68260391de041f690008bf3c3a87630fcf9324a8e3aa9f8afaf6a2c",
+          "eventType": "audit"
+        }
+      ],
+      "neededToSatisfy": [
+        "No additional evidence required for this requirement"
+      ]
+    },
+    {
+      "id": "iso42005_scope_and_stakeholders",
+      "framework": "ISO_42001",
+      "category": "ISO 42005 Impact Assessment",
+      "description": "Impact assessment scope, stakeholder boundary, and foreseeable misuse are captured.",
+      "status": "PARTIAL",
+      "reasons": [
+        "Found 4785 matching events with observed ratio 1.000",
+        "Compliance maps signature invalid; green status is downgraded to PARTIAL."
+      ],
+      "evidenceRefs": [
+        {
+          "eventId": "2fdbcf3f-5754-4a70-9109-b49544d71db3",
+          "eventHash": "23941bf91946bdd7f7f6fcc818024fd798441c23507ccf68d6ed389c1adad7de",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
+          "eventHash": "944ed050ef43f39562402b1aafd6c76f3ff8a742db0dae278353f297a7507e11",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
+          "eventHash": "5178af41b822b3bb55c550a74c00f36351b3055d805199774e67a81745b2e06f",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "eventHash": "f6a0a586e713309ded55331ab53a8a12af0276de3ca5a5b0100de741a6c5f100",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "6408b1bf-1cdf-418b-9cc0-78d4ab2dea4c",
+          "eventHash": "a2a328212391b01c3d5ded9f96a25a22399f50dd1d2bf9fdef580f5f1bc36034",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "cb07bf50-d272-4425-9c7a-213a1af6a927",
+          "eventHash": "8566d974694f4fb8118e6c89e2faf9fb51d442d1daf2c6a5b54709269ea342e0",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "b6df717a-9223-47eb-a72b-1b920b694a2f",
+          "eventHash": "32360b69c2521f79ba5beeda8e0e8050cb2a031be4c7e55d9c6ef038f8f8ebe4",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "ba22a9f8-2355-46c6-b907-af14fb536f7c",
+          "eventHash": "5046e70dc6d562fffa8f3803e2e675ab69092ff23676773f47d6784e42e5db6c",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "eventHash": "c0db4a0af6b61a19cb7cb32b10dc3ea386a5501875960981b994092968b0d23f",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "d37123d6-88ed-45b4-9d33-12cfda21932d",
+          "eventHash": "d7920398c4e18652e97831100da7fc64e66694dc89bc518f3ae5c529666a3059",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35",
+          "eventHash": "e63f6dbe00166645a5484ebda7c8d3bd5af86daf96b6f18a808f47c613dc7a38",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "c2764cc7-5b52-48a2-bf03-c5dd58a8c3f3",
+          "eventHash": "5d1cd0e8a68260391de041f690008bf3c3a87630fcf9324a8e3aa9f8afaf6a2c",
+          "eventType": "audit"
+        }
+      ],
+      "neededToSatisfy": [
+        "No additional evidence required for this requirement"
+      ]
+    },
+    {
+      "id": "iso42005_severity_likelihood_uncertainty",
+      "framework": "ISO_42001",
+      "category": "ISO 42005 Impact Assessment",
+      "description": "Impact severity, likelihood, and uncertainty are quantified and regularly re-evaluated.",
+      "status": "PARTIAL",
+      "reasons": [
+        "Found 4785 matching events with observed ratio 1.000",
+        "Compliance maps signature invalid; green status is downgraded to PARTIAL."
+      ],
+      "evidenceRefs": [
+        {
+          "eventId": "2fdbcf3f-5754-4a70-9109-b49544d71db3",
+          "eventHash": "23941bf91946bdd7f7f6fcc818024fd798441c23507ccf68d6ed389c1adad7de",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
+          "eventHash": "944ed050ef43f39562402b1aafd6c76f3ff8a742db0dae278353f297a7507e11",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
+          "eventHash": "5178af41b822b3bb55c550a74c00f36351b3055d805199774e67a81745b2e06f",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "eventHash": "f6a0a586e713309ded55331ab53a8a12af0276de3ca5a5b0100de741a6c5f100",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "6408b1bf-1cdf-418b-9cc0-78d4ab2dea4c",
+          "eventHash": "a2a328212391b01c3d5ded9f96a25a22399f50dd1d2bf9fdef580f5f1bc36034",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "cb07bf50-d272-4425-9c7a-213a1af6a927",
+          "eventHash": "8566d974694f4fb8118e6c89e2faf9fb51d442d1daf2c6a5b54709269ea342e0",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "b6df717a-9223-47eb-a72b-1b920b694a2f",
+          "eventHash": "32360b69c2521f79ba5beeda8e0e8050cb2a031be4c7e55d9c6ef038f8f8ebe4",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "ba22a9f8-2355-46c6-b907-af14fb536f7c",
+          "eventHash": "5046e70dc6d562fffa8f3803e2e675ab69092ff23676773f47d6784e42e5db6c",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "eventHash": "c0db4a0af6b61a19cb7cb32b10dc3ea386a5501875960981b994092968b0d23f",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "d37123d6-88ed-45b4-9d33-12cfda21932d",
+          "eventHash": "d7920398c4e18652e97831100da7fc64e66694dc89bc518f3ae5c529666a3059",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35",
+          "eventHash": "e63f6dbe00166645a5484ebda7c8d3bd5af86daf96b6f18a808f47c613dc7a38",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "c2764cc7-5b52-48a2-bf03-c5dd58a8c3f3",
+          "eventHash": "5d1cd0e8a68260391de041f690008bf3c3a87630fcf9324a8e3aa9f8afaf6a2c",
+          "eventType": "audit"
+        }
+      ],
+      "neededToSatisfy": [
+        "No additional evidence required for this requirement"
+      ]
+    },
+    {
+      "id": "iso42005_mitigation_traceability",
+      "framework": "ISO_42001",
+      "category": "ISO 42005 Impact Assessment",
+      "description": "Traceability from identified impacts to mitigations and closure evidence is maintained.",
+      "status": "PARTIAL",
+      "reasons": [
+        "Found 4785 matching events with observed ratio 1.000",
+        "Compliance maps signature invalid; green status is downgraded to PARTIAL."
+      ],
+      "evidenceRefs": [
+        {
+          "eventId": "2fdbcf3f-5754-4a70-9109-b49544d71db3",
+          "eventHash": "23941bf91946bdd7f7f6fcc818024fd798441c23507ccf68d6ed389c1adad7de",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
+          "eventHash": "944ed050ef43f39562402b1aafd6c76f3ff8a742db0dae278353f297a7507e11",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
+          "eventHash": "5178af41b822b3bb55c550a74c00f36351b3055d805199774e67a81745b2e06f",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "eventHash": "f6a0a586e713309ded55331ab53a8a12af0276de3ca5a5b0100de741a6c5f100",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "6408b1bf-1cdf-418b-9cc0-78d4ab2dea4c",
+          "eventHash": "a2a328212391b01c3d5ded9f96a25a22399f50dd1d2bf9fdef580f5f1bc36034",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "cb07bf50-d272-4425-9c7a-213a1af6a927",
+          "eventHash": "8566d974694f4fb8118e6c89e2faf9fb51d442d1daf2c6a5b54709269ea342e0",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "b6df717a-9223-47eb-a72b-1b920b694a2f",
+          "eventHash": "32360b69c2521f79ba5beeda8e0e8050cb2a031be4c7e55d9c6ef038f8f8ebe4",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "ba22a9f8-2355-46c6-b907-af14fb536f7c",
+          "eventHash": "5046e70dc6d562fffa8f3803e2e675ab69092ff23676773f47d6784e42e5db6c",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "eventHash": "c0db4a0af6b61a19cb7cb32b10dc3ea386a5501875960981b994092968b0d23f",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "d37123d6-88ed-45b4-9d33-12cfda21932d",
+          "eventHash": "d7920398c4e18652e97831100da7fc64e66694dc89bc518f3ae5c529666a3059",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35",
+          "eventHash": "e63f6dbe00166645a5484ebda7c8d3bd5af86daf96b6f18a808f47c613dc7a38",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "c2764cc7-5b52-48a2-bf03-c5dd58a8c3f3",
+          "eventHash": "5d1cd0e8a68260391de041f690008bf3c3a87630fcf9324a8e3aa9f8afaf6a2c",
+          "eventType": "audit"
+        }
+      ],
+      "neededToSatisfy": [
+        "No additional evidence required for this requirement"
+      ]
+    },
+    {
+      "id": "iso42006_conformity_evidence_package",
+      "framework": "ISO_42001",
+      "category": "ISO 42006 Conformity Evidence",
+      "description": "Certification-ready, machine-readable audit evidence packages are generated and verifiable.",
+      "status": "PARTIAL",
+      "reasons": [
+        "Found 8365 matching events with observed ratio 1.000",
+        "Found denied audit events: TRACE_RECEIPT_INVALID, TRACE_EVENT_HASH_NOT_FOUND, CONFIG_SIGNATURE_INVALID"
+      ],
+      "evidenceRefs": [
+        {
+          "eventId": "2fdbcf3f-5754-4a70-9109-b49544d71db3",
+          "eventHash": "23941bf91946bdd7f7f6fcc818024fd798441c23507ccf68d6ed389c1adad7de",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
+          "eventHash": "944ed050ef43f39562402b1aafd6c76f3ff8a742db0dae278353f297a7507e11",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "37eef13c-1e36-40bd-a4b5-75a5f0b77db0",
+          "eventHash": "5178af41b822b3bb55c550a74c00f36351b3055d805199774e67a81745b2e06f",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "e0f6b4f8-3609-403e-84a9-8f4567c4ffe0",
+          "eventHash": "f6a0a586e713309ded55331ab53a8a12af0276de3ca5a5b0100de741a6c5f100",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "6408b1bf-1cdf-418b-9cc0-78d4ab2dea4c",
+          "eventHash": "a2a328212391b01c3d5ded9f96a25a22399f50dd1d2bf9fdef580f5f1bc36034",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "cb07bf50-d272-4425-9c7a-213a1af6a927",
+          "eventHash": "8566d974694f4fb8118e6c89e2faf9fb51d442d1daf2c6a5b54709269ea342e0",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "b6df717a-9223-47eb-a72b-1b920b694a2f",
+          "eventHash": "32360b69c2521f79ba5beeda8e0e8050cb2a031be4c7e55d9c6ef038f8f8ebe4",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "ba22a9f8-2355-46c6-b907-af14fb536f7c",
+          "eventHash": "5046e70dc6d562fffa8f3803e2e675ab69092ff23676773f47d6784e42e5db6c",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "008a35a2-7e22-4bcf-b78a-27fd01a3c32a",
+          "eventHash": "c0db4a0af6b61a19cb7cb32b10dc3ea386a5501875960981b994092968b0d23f",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "d37123d6-88ed-45b4-9d33-12cfda21932d",
+          "eventHash": "d7920398c4e18652e97831100da7fc64e66694dc89bc518f3ae5c529666a3059",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "a4fc32d4-e5d2-419a-9520-9c02b5fc5d35",
+          "eventHash": "e63f6dbe00166645a5484ebda7c8d3bd5af86daf96b6f18a808f47c613dc7a38",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "c2764cc7-5b52-48a2-bf03-c5dd58a8c3f3",
+          "eventHash": "5d1cd0e8a68260391de041f690008bf3c3a87630fcf9324a8e3aa9f8afaf6a2c",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "cc5c7f16-f649-4b42-935b-bd0bb3c565f0",
+          "eventHash": "944ed050ef43f39562402b1aafd6c76f3ff8a742db0dae278353f297a7507e11",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "ba22a9f8-2355-46c6-b907-af14fb536f7c",
+          "eventHash": "5046e70dc6d562fffa8f3803e2e675ab69092ff23676773f47d6784e42e5db6c",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "c1f0aec0-78de-48e0-b6c7-656ac7fc3db5",
+          "eventHash": "c0771cb18cfd7a22649fc912d231072923703a6f6d36cad8003588dfb8960fa3",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "df618483-8615-4f17-bb69-617c5fcb6a31",
+          "eventHash": "7c470b47b98b4b71e55ddaf5e1e7a04cc80dc7af6e959902775d2fbfcabdab82",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "ac9970f2-48bb-4156-bd56-a61bf37d5218",
+          "eventHash": "4d7a72207893d83c3746918b60e6e1d97b9b0e39c117e5e3475dd220577d6884",
+          "eventType": "audit"
+        },
+        {
+          "eventId": "fde667c3-eedc-4c62-af57-e55ef6ad403a",
+          "eventHash": "7a2387d2b0c031951a03d8f54e5da04efc5c70a1274c7be97ed571be4718e756",
+          "eventType": "audit"
+        }
+      ],
+      "neededToSatisfy": [
+        "No additional evidence required for this requirement",
+        "Resolve and eliminate audit events: TRACE_RECEIPT_INVALID, TRACE_EVENT_HASH_NOT_FOUND, CONFIG_SIGNATURE_INVALID"
+      ]
+    }
+  ],
+  "nonClaims": [
+    "This report provides evidence-backed signals only; it is not legal advice.",
+    "Controls not represented in verified AMC evidence are marked as UNKNOWN/MISSING.",
+    "Owner attestations must be explicitly signed and are not inferred automatically."
+  ]
+}

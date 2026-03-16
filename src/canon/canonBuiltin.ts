@@ -30,6 +30,28 @@ function dimensionIdForQuestion(qid: string): "D1" | "D2" | "D3" | "D4" | "D5" {
   if (qid === "AMC-OC-1" || qid === "AMC-OC-2" || qid === "AMC-OC-3") return "D3";
   if (qid === "AMC-OC-4" || qid === "AMC-OC-5" || qid === "AMC-OC-6") return "D4";
   if (qid === "AMC-OC-7" || qid === "AMC-OC-8") return "D5";
+  // Simulation & Forecast Lane (AMC-6.x) — route by question range
+  if (qid.startsWith("AMC-6.")) {
+    const num = parseInt(qid.replace("AMC-6.", ""), 10);
+    // 6.1-6.10: Forecast Legitimacy → D3 (Culture & Alignment)
+    if (num >= 1 && num <= 10) return "D3";
+    // 6.11-6.17: Fact/Sim Boundary → D4 (Resilience)
+    if (num >= 11 && num <= 17) return "D4";
+    // 6.18-6.25: Synthetic Persona → D3 (Culture & Alignment)
+    if (num >= 18 && num <= 25) return "D3";
+    // 6.26-6.29: Scenario Traceability → D5 (Skills)
+    if (num >= 26 && num <= 29) return "D5";
+    // 6.30-6.36: Simulation Validity → D4 (Resilience)
+    if (num >= 30 && num <= 36) return "D4";
+    // 6.37-6.42: Writeback Governance → D4 (Resilience)
+    if (num >= 37 && num <= 42) return "D4";
+    // 6.43-6.47: Predictive UX Honesty → D3 (Culture & Alignment)
+    if (num >= 43 && num <= 47) return "D3";
+    // 6.48-6.52: Real-Person Controls → D3 (Culture & Alignment)
+    if (num >= 48 && num <= 52) return "D3";
+    // 6.53-6.57: Synthetic Agent Interaction → D5 (Skills)
+    if (num >= 53 && num <= 57) return "D5";
+  }
   return "D5";
 }
 
@@ -59,9 +81,9 @@ export function builtInCanon(): CompassCanon {
       dimensions: [
         { id: "D1", name: "Strategic Agent Operations", questionCount: 16 },
         { id: "D2", name: "Agent Leadership", questionCount: 20 },
-        { id: "D3", name: "Agent Culture", questionCount: 26 },
-        { id: "D4", name: "Agent Resilience", questionCount: 32 },
-        { id: "D5", name: "Agent Skills", questionCount: 44 }
+        { id: "D3", name: "Agent Culture", questionCount: 54 },
+        { id: "D4", name: "Agent Resilience", questionCount: 52 },
+        { id: "D5", name: "Agent Skills", questionCount: 53 }
       ],
       questions,
       fourCs: [

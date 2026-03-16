@@ -31,6 +31,19 @@ function dimensionIdForQuestionId(qId: string): 1 | 2 | 3 | 4 | 5 {
   if (qId === "AMC-OC-1" || qId === "AMC-OC-2" || qId === "AMC-OC-3") return 3;
   if (qId === "AMC-OC-4" || qId === "AMC-OC-5" || qId === "AMC-OC-6") return 4;
   if (qId === "AMC-OC-7" || qId === "AMC-OC-8") return 5;
+  // Simulation & Forecast Lane (AMC-6.x) — route by question range
+  if (qId.startsWith("AMC-6.")) {
+    const num = parseInt(qId.replace("AMC-6.", ""), 10);
+    if (num >= 1 && num <= 10) return 3;
+    if (num >= 11 && num <= 17) return 4;
+    if (num >= 18 && num <= 25) return 3;
+    if (num >= 26 && num <= 29) return 5;
+    if (num >= 30 && num <= 36) return 4;
+    if (num >= 37 && num <= 42) return 4;
+    if (num >= 43 && num <= 47) return 3;
+    if (num >= 48 && num <= 52) return 3;
+    if (num >= 53 && num <= 57) return 5;
+  }
   return 5;
 }
 
@@ -136,9 +149,9 @@ export function defaultDiagnosticBankV1(): DiagnosticBank {
       dimensions: [
         { id: 1, name: "Strategic Agent Operations", questionCount: 16 },
         { id: 2, name: "Agent Leadership", questionCount: 20 },
-        { id: 3, name: "Agent Culture", questionCount: 26 },
-        { id: 4, name: "Agent Resilience", questionCount: 32 },
-        { id: 5, name: "Agent Skills", questionCount: 44 }
+        { id: 3, name: "Agent Culture", questionCount: 54 },
+        { id: 4, name: "Agent Resilience", questionCount: 52 },
+        { id: 5, name: "Agent Skills", questionCount: 53 }
       ],
       questions
     }

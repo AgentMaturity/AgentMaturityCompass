@@ -26,6 +26,14 @@ export type EvidenceEventType =
   | "agent_delegation_completed";
 
 export type RiskTier = "low" | "med" | "high" | "critical";
+
+export type SystemType =
+  | "task-agent"
+  | "orchestrated-workflow"
+  | "simulation-engine"
+  | "forecast-decision-support"
+  | "synthetic-social-environment"
+  | "research-delegation";
 export type TrustTier = "OBSERVED" | "OBSERVED_HARDENED" | "ATTESTED" | "SELF_REPORTED";
 export type ExecutionMode = "SIMULATE" | "EXECUTE";
 export type ActionClass =
