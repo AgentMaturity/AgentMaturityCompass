@@ -19,7 +19,7 @@ AMC Score → Gap Analysis → Severity Tagging → Guardrails + Agent Instructi
                                               Re-score → Diff → Repeat
 ```
 
-1. **Score** — AMC scores your agent from execution evidence (138 questions, 5 dimensions)
+1. **Score** — AMC scores your agent from execution evidence (195 questions, 5 dimensions)
 2. **Analyze** — Guide identifies every gap between current and target level
 3. **Tag** — Each gap gets a severity: 🔴 Critical (gap ≥ 3), 🟡 High (gap ≥ 2), 🔵 Medium (gap = 1)
 4. **Generate** — Produces guardrails (rules), agent instructions (what to do), and human guide (what to fix)

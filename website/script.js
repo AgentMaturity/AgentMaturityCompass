@@ -60,7 +60,7 @@ var PRODUCTS=[
     {label:'fixes generated',value:'12 mapped remediations'},
     {label:'signed artifact',value:'.amc/reports/latest.md'}
   ]},
-  {name:'amc shield',title:'Shield',headline:'Attack your agent before attackers do',summary:'Runs adversarial packs against prompt injection, leakage, memory poisoning, and sycophancy.',badges:['86 assurance packs','adversarial probes','guardrail output'],info:[{label:'what it does',title:'Pressure-tests the runtime',text:'Executes attack scenarios against your actual prompt, tool, and memory surface.'},{label:'why it matters',title:'Finds brittle defenses fast',text:'One missed path can turn a polished demo into a production incident.'},{label:'output',title:'Pack report + guardrails',text:'Returns failing probes, exploit traces, and generated mitigation configs.'}],lines:[
+  {name:'amc shield',title:'Shield',headline:'Attack your agent before attackers do',summary:'Runs adversarial packs against prompt injection, leakage, memory poisoning, and sycophancy.',badges:['119 assurance packs','adversarial probes','guardrail output'],info:[{label:'what it does',title:'Pressure-tests the runtime',text:'Executes attack scenarios against your actual prompt, tool, and memory surface.'},{label:'why it matters',title:'Finds brittle defenses fast',text:'One missed path can turn a polished demo into a production incident.'},{label:'output',title:'Pack report + guardrails',text:'Returns failing probes, exploit traces, and generated mitigation configs.'}],lines:[
     {type:'code',label:'$ amc shield --pack injection,exfiltration,sycophancy'},
     {label:'injection pack',value:'PASS · 12/12 probes blocked'},
     {label:'exfiltration pack',value:'WARN · 1 DLP bypass found'},

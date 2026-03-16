@@ -4,6 +4,22 @@ All notable changes to AMC are documented here.
 
 ## [Unreleased]
 
+### Added — Simulation & Forecast Evaluation Lane (2026-03-16)
+- **57 new diagnostic questions** (AMC-6.1 → AMC-6.57) covering simulation/forecast systems
+  - Forecast Legitimacy (10): uncertainty, calibration, false precision, scenario framing
+  - Fact/Simulation Boundary Integrity (7): provenance tagging, evidence class separation
+  - Synthetic Persona Governance (8): labeling, evidence basis, private person protection
+  - Scenario Traceability & Replayability (4): end-to-end claim lineage, replay
+  - Simulation Validity (7): population diversity, synthetic consensus detection
+  - Writeback Governance (6): contamination loops, rollback, human approval
+  - Predictive UX Honesty (5): claim benchmarking, scenario language
+  - Real-Person Representation (5): defamation controls, motive attribution limits
+  - Synthetic Agent Interaction Safety (5): dialogue labeling, provenance retention
+- **9 new assurance packs** with 54 scenarios for simulation-class systems
+- **SystemType taxonomy** added to types.ts for product-class classification
+- Total diagnostic questions: 138 → **195**
+- Total assurance packs: 110 → **119**
+
 ### Added
 - Documentation + website refresh for the expanded AMC workflow surface:
   - new docs: `COMPATIBILITY_MATRIX`, `STARTER_BLUEPRINTS`, `OSS_ADOPTION_ROADMAP`

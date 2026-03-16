@@ -351,17 +351,17 @@ Result: ![AMC Score](https://img.shields.io/badge/AMC-L3_(72.5)-green)
 
 ## 🧪 What AMC Tests
 
-### 138 Diagnostic Questions × 5 Dimensions
+### 195 Diagnostic Questions × 5 Dimensions
 
 | Dimension | Questions | What It Measures |
 |-----------|-----------|------------------|
 | Strategic Agent Ops | 18 | Mission clarity, scope adherence, decision traceability |
-| Skills | 38 | Tool mastery, injection defense, DLP, least-privilege |
-| Resilience | 30 | Graceful degradation, circuit breakers, bypass resistance |
-| Leadership & Autonomy | 28 | Structured logs, traces, cost tracking, SLOs |
-| Culture & Alignment | 26 | Test harnesses, feedback loops, over-compliance detection |
+| Skills | 47 | Tool mastery, injection defense, DLP, scenario traceability, synthetic agent safety |
+| Resilience | 53 | Graceful degradation, circuit breakers, bypass resistance, simulation validity, fact/sim boundaries |
+| Leadership & Autonomy | 23 | Structured logs, traces, cost tracking, SLOs |
+| Culture & Alignment | 54 | Test harnesses, feedback loops, forecast legitimacy, persona governance, UX honesty |
 
-### 86 Assurance Packs
+### 119 Assurance Packs
 
 | Category | Examples |
 |----------|---------|
@@ -631,7 +631,7 @@ cd AgentMaturityCompass && npm ci && npm test   # 3,549 tests
 ---
 
 <p align="center">
-  <strong>138 diagnostic questions · 86 assurance packs · 40 domain packs · 14 adapters · 74+ scoring modules · 3,549 tests</strong><br>
+  <strong>195 diagnostic questions · 119 assurance packs · 40 domain packs · 14 adapters · 74+ scoring modules · 3,549 tests</strong><br>
   <em>Stop trusting. Start verifying.</em>
 </p>
 
