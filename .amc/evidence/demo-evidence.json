@@ -1,8 +1,0 @@
-{
-  "agentId": "demo-agent",
-  "type": "demo",
-  "ts": "2026-03-17T06:43:05.690Z",
-  "data": {
-    "note": "Demo evidence created by amc setup --demo"
-  }
-}

@@ -1,7 +1,7 @@
 # AMC Compliance Report (HIPAA)
 
 - Agent: default
-- Window: 2026-02-15T06:43:18.070Z -> 2026-03-17T06:43:18.070Z
+- Window: 2026-02-15T06:58:11.503Z -> 2026-03-17T06:58:11.503Z
 - Config trusted: NO (compliance maps missing)
 - Trust coverage: OBSERVED 0.0% | ATTESTED 0.0% | SELF_REPORTED 0.0%
 - Coverage score: 25.0% (S:0 P:5 M:5 U:0)

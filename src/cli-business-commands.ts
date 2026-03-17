@@ -410,11 +410,22 @@ export function registerInventoryCommands(program: Command): void {
         }
         
         if (opts.json) {
-          console.log(JSON.stringify(assets, null, 2));
+          if (assets.length === 0) {
+            console.log(JSON.stringify({ assets: [], hint: "No AI assets found. Run 'amc init' to register an agent, or 'amc inventory scan --deep' for filesystem detection." }, null, 2));
+          } else {
+            console.log(JSON.stringify(assets, null, 2));
+          }
           return;
         }
         
         console.log(chalk.bold(`\n🔍 AI Asset Inventory (${assets.length} assets found)\n`));
+        if (assets.length === 0) {
+          console.log(chalk.gray("  No AI assets detected in this workspace."));
+          console.log(chalk.gray("\n  💡 Next steps:"));
+          console.log(chalk.gray("    amc init                        # Initialize workspace and register an agent"));
+          console.log(chalk.gray("    amc inventory scan --deep       # Deep scan for model files and configs"));
+          console.log(chalk.gray("    amc connect                     # Connect an existing agent runtime"));
+        }
         
         const byType: Record<string, any[]> = {};
         for (const a of assets) {

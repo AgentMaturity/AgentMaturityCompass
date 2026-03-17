@@ -1118,7 +1118,8 @@ program
   .option("--trust-boundary <mode>", "isolated|shared")
   .option("--profile <name>", "workspace config profile: dev|ci|prod", "dev")
   .option("--force", "Force re-initialization, overwrite existing .amc directory", false)
-  .action(async (opts: { trustBoundary?: "isolated" | "shared"; profile: "dev" | "ci" | "prod"; force: boolean }) => {
+  .option("--skip-vault", "Skip vault setup (useful for CI/headless init)", false)
+  .action(async (opts: { trustBoundary?: "isolated" | "shared"; profile: "dev" | "ci" | "prod"; force: boolean; skipVault: boolean }) => {
     // Force mode: delete existing .amc directory before re-init
     if (opts.force) {
       const { rmSync, existsSync } = await import("fs");
@@ -1130,6 +1131,12 @@ program
       }
     }
     // Ensure vault passphrase is available before init (it creates crypto keys)
+    if (opts.skipVault) {
+      // Skip vault entirely — workspace will work without signing
+      if (!process.env.AMC_VAULT_PASSPHRASE) {
+        process.env.AMC_VAULT_PASSPHRASE = "skip-vault-" + Date.now();
+      }
+    }
     if (!process.env.AMC_VAULT_PASSPHRASE) {
       if (process.stdin.isTTY) {
         const crypto = await import("node:crypto");
@@ -4114,6 +4121,10 @@ program
       }
       if (runs.length === 0) {
         console.log("No runs found.");
+        console.log(chalk.gray("\n💡 To create your first run:"));
+        console.log(chalk.gray("  amc quickscore          # Quick 5-question assessment"));
+        console.log(chalk.gray("  amc run                 # Full 8-module diagnostic"));
+        console.log(chalk.gray("  amc score --tier deep   # Deep scoring with evidence"));
         return;
       }
       for (const run of runs) {
