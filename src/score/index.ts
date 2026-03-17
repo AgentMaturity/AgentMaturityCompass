@@ -410,3 +410,19 @@ export type {
   IndustryBenchmark,
   IndustryAdjustedScore,
 } from './industryTrustModels.js';
+
+// ── Simulation & Forecast Lane Score Modules ────
+export { scoreForecastLegitimacy, scanForecastLegitimacyInfrastructure } from "./forecastLegitimacy.js";
+export type { ForecastLegitimacyReport, ForecastLegitimacyInput } from "./forecastLegitimacy.js";
+
+export { scoreFactSimulationBoundary, scanFactSimBoundaryInfrastructure } from "./factSimulationBoundary.js";
+export type { FactSimBoundaryReport, FactSimBoundaryInput } from "./factSimulationBoundary.js";
+
+export { scoreSyntheticIdentityGovernance, scanSyntheticIdentityInfrastructure } from "./syntheticIdentityGovernance.js";
+export type { SyntheticIdentityReport, SyntheticIdentityInput } from "./syntheticIdentityGovernance.js";
+
+export { scoreSimulationValidity, scanSimulationValidityInfrastructure } from "./simulationValidity.js";
+export type { SimulationValidityReport, SimulationValidityInput } from "./simulationValidity.js";
+
+export { scoreScenarioProvenance, scanScenarioProvenanceInfrastructure } from "./scenarioProvenance.js";
+export type { ScenarioProvenanceReport, ScenarioProvenanceInput } from "./scenarioProvenance.js";
