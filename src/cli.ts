@@ -4620,8 +4620,19 @@ verifyCmd
     }
 
     console.log(chalk.red("Ledger verification FAILED"));
-    for (const error of result.errors) {
-      console.log(`- ${error}`);
+    const sigErrors = result.errors.filter((e: string) => e.includes("signature invalid"));
+    const otherErrors = result.errors.filter((e: string) => !e.includes("signature invalid"));
+    if (sigErrors.length > 0 && sigErrors.length === result.errors.length) {
+      console.log(chalk.yellow(`  ${sigErrors.length} events have invalid signatures — likely caused by vault re-initialization.`));
+      console.log(chalk.gray("  This happens when you run 'amc init --force' after collecting evidence."));
+      console.log(chalk.gray("  Fix: run 'amc verify --repair' to clean and rebuild the ledger."));
+    } else {
+      for (const error of result.errors.slice(0, 10)) {
+        console.log(`- ${error}`);
+      }
+      if (result.errors.length > 10) {
+        console.log(chalk.gray(`  ... and ${result.errors.length - 10} more errors`));
+      }
     }
     if (!opts.repair) {
       console.log(chalk.gray("\n  Tip: run with --repair to auto-clean corrupted entries"));

@@ -1,15 +1,15 @@
 {
   "digestSha256": "9fac7907041631982f77b57b692cbbf61cd46f94bd3bc4be2026d62ed8fa4350",
-  "signature": "PMhGq/Gke+eYmFL0MMn1SjdgZ2vgtMQnBc0hN2n7UprqwRL2or1zQzU0OAiJZVX3mtbBZs3BjUmsL5XEHZloDw==",
-  "signedTs": 1773737960370,
+  "signature": "H97KoSQN2K2Uhbsr4HLxNuQD2DFAM9XFHjgQpqCKm54/yxSk08ZwQanZ/iaGqOCjJ9AIPgwe1FuPkDawXAMXAw==",
+  "signedTs": 1773750173747,
   "signer": "auditor",
   "envelope": {
     "v": 1,
     "alg": "ed25519",
-    "pubkeyB64": "LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUNvd0JRWURLMlZ3QXlFQVNqMkJYZDl0RUFmMUVTN3Y4aUN0Vi90cXZYOFFKOVdObEgxbzFoM2p4RjA9Ci0tLS0tRU5EIFBVQkxJQyBLRVktLS0tLQo=",
-    "fingerprint": "0edeeb91c2c696efaab0acbb1646254edb9093af94d7cf3d9f01d05392c2bf50",
-    "sigB64": "PMhGq/Gke+eYmFL0MMn1SjdgZ2vgtMQnBc0hN2n7UprqwRL2or1zQzU0OAiJZVX3mtbBZs3BjUmsL5XEHZloDw==",
-    "signedTs": 1773737960370,
+    "pubkeyB64": "LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUNvd0JRWURLMlZ3QXlFQW03UmZmbUNuMDFkSjhqRE8rV0ZRb25yODJNMlNrWjdqN0ZiY3NhMVNYQ2s9Ci0tLS0tRU5EIFBVQkxJQyBLRVktLS0tLQo=",
+    "fingerprint": "b7e70be39d97aa90677a3b20dcf73a7f2f370636efdd508c30f0c56d3142e5e8",
+    "sigB64": "H97KoSQN2K2Uhbsr4HLxNuQD2DFAM9XFHjgQpqCKm54/yxSk08ZwQanZ/iaGqOCjJ9AIPgwe1FuPkDawXAMXAw==",
+    "signedTs": 1773750173747,
     "signer": {
       "type": "VAULT",
       "attestationLevel": "SOFTWARE"

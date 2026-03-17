@@ -1,7 +1,7 @@
 # AMC Compliance Report (ISO_42001)
 
 - Agent: default
-- Window: 2026-02-15T08:54:58.718Z -> 2026-03-17T08:54:58.718Z
+- Window: 2026-02-15T12:23:05.616Z -> 2026-03-17T12:23:05.616Z
 - Config trusted: NO (compliance maps missing)
 - Trust coverage: OBSERVED 0.0% | ATTESTED 0.0% | SELF_REPORTED 0.0%
 - Coverage score: 13.6% (S:0 P:3 M:8 U:0)

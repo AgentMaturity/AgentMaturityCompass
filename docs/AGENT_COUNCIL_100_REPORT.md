@@ -121,7 +121,7 @@
 | 14 | GitHub URLs (RFC, cli.ts, ci-cd.md) | ✅ Fixed | `aefbf8e` |
 | 15 | pack test index.mjs | ✅ Already fixed | — |
 | 16 | --scope full in docs | ✅ Fixed | `aefbf8e` |
-| 17 | `amc api start` | ✅ Implemented | `aefbf8e` |
+| 17 | `amc up` (was `amc api start`) | ✅ Implemented | `aefbf8e` |
 | 18 | Test count badge (→3,549) | ✅ Fixed | `aefbf8e` |
 | 19 | GETTING_STARTED.md link | ✅ Already existed | — |
 
