@@ -4,6 +4,20 @@ All notable changes to AMC are documented here.
 
 ## [Unreleased]
 
+### Added — Simulation & Forecast Lane Deep Implementation (2026-03-17)
+- **5 new scoring modules** for the Simulation & Forecast lane:
+  - `forecastLegitimacy.ts` — epistemic honesty, calibration, uncertainty scoring (AMC-6.1–6.10)
+  - `factSimulationBoundary.ts` — provenance separation, writeback governance (AMC-6.11–6.17, 6.37–6.42)
+  - `syntheticIdentityGovernance.ts` — persona labeling, real-person controls (AMC-6.18–6.25, 6.48–6.52)
+  - `simulationValidity.ts` — mode collapse, population diversity, calibration (AMC-6.30–6.36)
+  - `scenarioProvenance.ts` — end-to-end traceability, replay, interaction safety (AMC-6.26–6.29, 6.53–6.57)
+- **Lane aggregator** (`src/lanes/simulationForecastLane.ts`) — weighted 5-dimension scoring, auto-activates for simulation/forecast system types
+- **CLI command** `amc score simulation-lane --system-type <type>` with interactive, JSON, and file-based modes
+- **96 new tests** across 8 test files (score modules, lane aggregator, pack integration)
+- Total scoring modules: 74 → **79**
+- Total tests: 3,549 → **3,645**
+- Total test files: 244 → **252**
+
 ### Added — Simulation & Forecast Evaluation Lane (2026-03-16)
 - **57 new diagnostic questions** (AMC-6.1 → AMC-6.57) covering simulation/forecast systems
   - Forecast Legitimacy (10): uncertainty, calibration, false precision, scenario framing

@@ -18249,6 +18249,90 @@ score
     } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
   });
 
+score
+  .command("simulation-lane")
+  .description("Run the Simulation & Forecast evaluation lane — 5-dimension assessment for simulation/forecast systems")
+  .requiredOption("--system-type <type>", "System type: simulation-engine, forecast-decision-support, or synthetic-social-environment")
+  .option("--json", "Output as JSON")
+  .option("--responses <file>", "JSON file with diagnostic responses (Record<string, string> keyed by question ID)")
+  .action(async (opts: { systemType: string; json?: boolean; responses?: string }) => {
+    try {
+      const { scoreSimulationForecastLane, isSimulationLaneActive, getSimulationLaneQuestionIds } = await import("./lanes/simulationForecastLane.js");
+      const validTypes = ["simulation-engine", "forecast-decision-support", "synthetic-social-environment", "task-agent", "orchestrated-workflow", "research-delegation"];
+      if (!validTypes.includes(opts.systemType)) {
+        console.error(chalk.red(`Invalid system type: ${opts.systemType}`));
+        console.log(chalk.gray("Valid types:"), validTypes.join(", "));
+        process.exit(1); return;
+      }
+      const systemType = opts.systemType as import("./types.js").SystemType;
+      if (!isSimulationLaneActive(systemType)) {
+        console.log(chalk.yellow(`\n⚠  Simulation & Forecast lane is not applicable for system type '${systemType}'.`));
+        console.log(chalk.gray("This lane activates for: simulation-engine, forecast-decision-support, synthetic-social-environment"));
+        return;
+      }
+      let responses: Record<string, string> = {};
+      if (opts.responses) {
+        const { readFileSync } = await import("fs");
+        responses = JSON.parse(readFileSync(opts.responses, "utf-8"));
+      } else if (process.stdin.isTTY) {
+        const inq = await import("inquirer");
+        const questionIds = getSimulationLaneQuestionIds();
+        console.log(chalk.bold.hex('#4AEF79')("\n🔮  Simulation & Forecast Lane — Interactive Assessment"));
+        console.log(chalk.gray(`${questionIds.length} questions across 5 dimensions\n`));
+        for (const qid of questionIds) {
+          const { answer } = await inq.default.prompt([{
+            type: "editor",
+            name: "answer",
+            message: `${qid}: Describe your system's approach (or press Enter to skip):`,
+          }]);
+          if (answer && answer.trim()) {
+            responses[qid] = answer.trim();
+          }
+        }
+      }
+      const report = scoreSimulationForecastLane(responses, systemType);
+      if (!report || !report.active) {
+        console.log(chalk.yellow("Lane not active for this system type."));
+        return;
+      }
+      if (opts.json) { console.log(JSON.stringify(report, null, 2)); return; }
+      console.log(chalk.bold.hex('#4AEF79')("\n🔮  Simulation & Forecast Lane — Results"));
+      console.log(chalk.gray("System type:"), systemType);
+      console.log(chalk.gray("Overall score:"), chalk.bold(`${report.overallScore}/100`));
+      console.log(chalk.gray("Maturity level:"), chalk.bold(`L${report.overallLevel}`));
+      console.log(chalk.gray("Coverage:"), `${report.coverage.answered}/${report.coverage.total} questions (${report.coverage.percentage}%)`);
+      console.log(chalk.bold("\n📊  Dimensions:"));
+      const dims = report.dimensions;
+      const dimEntries = [
+        { name: "Forecast Legitimacy", dim: dims.forecastLegitimacy },
+        { name: "Boundary Integrity", dim: dims.boundaryIntegrity },
+        { name: "Synthetic Identity", dim: dims.syntheticIdentity },
+        { name: "Simulation Validity", dim: dims.simulationValidity },
+        { name: "Scenario Provenance", dim: dims.scenarioProvenance },
+      ];
+      for (const { name, dim } of dimEntries) {
+        const bar = "█".repeat(Math.round(dim.score / 5)) + "░".repeat(20 - Math.round(dim.score / 5));
+        const color = dim.score >= 70 ? chalk.green : dim.score >= 40 ? chalk.yellow : chalk.red;
+        console.log(`  ${color(bar)} ${chalk.bold(name)} — ${dim.score}/100 (L${dim.level}, weight ${(dim.weight * 100).toFixed(0)}%)`);
+      }
+      if (report.priorities.length > 0) {
+        console.log(chalk.bold("\n🎯  Top Priorities:"));
+        for (const p of report.priorities) {
+          console.log(chalk.yellow(`  → ${p}`));
+        }
+      }
+      if (report.allGaps.length > 0) {
+        console.log(chalk.bold(`\n⚠  Gaps (${report.allGaps.length}):`));
+        for (const g of report.allGaps.slice(0, 10)) {
+          console.log(chalk.red(`  • ${g}`));
+        }
+        if (report.allGaps.length > 10) {
+          console.log(chalk.gray(`  ... and ${report.allGaps.length - 10} more (use --json for full list)`));
+        }
+      }
+    } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
+  });
+
 // ── Scan ──────────────────────────────────────────────────────────────────────
 const scan = program.command("scan").description("Zero-integration agent assessment scanner");
 

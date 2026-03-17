@@ -384,7 +384,25 @@ Result: ![AMC Score](https://img.shields.io/badge/AMC-L3_(72.5)-green)
 | 🌿 Environment | 6 | EU Farm-to-Fork, REACH, IEC 61850 |
 | 🏛️ Governance | 5 | EU eIDAS 2.0, UNCAC, UNGPs |
 
-### 74+ Scoring Modules
+### 🔮 Simulation & Forecast Evaluation Lane
+
+Dedicated evaluation lane for simulation engines, forecast systems, and synthetic social environments. 5 scored dimensions:
+
+| Dimension | Weight | Questions | What it evaluates |
+|-----------|--------|-----------|-------------------|
+| Forecast Legitimacy | 25% | AMC-6.1–6.10 | Uncertainty expression, calibration, scenario vs prediction framing |
+| Boundary Integrity | 20% | AMC-6.11–6.17, 6.37–6.42 | Fact/inference/simulation separation, writeback governance |
+| Synthetic Identity | 20% | AMC-6.18–6.25, 6.48–6.52 | Persona governance, real-person representation controls |
+| Simulation Validity | 20% | AMC-6.30–6.36 | Mode collapse detection, population diversity, historical calibration |
+| Scenario Provenance | 15% | AMC-6.26–6.29, 6.53–6.57 | End-to-end traceability, replay capability, interaction safety |
+
+```bash
+amc score simulation-lane --system-type simulation-engine              # interactive
+amc score simulation-lane --system-type forecast-decision-support --json  # JSON output
+amc score simulation-lane --system-type synthetic-social-environment --responses answers.json
+```
+
+### 79 Scoring Modules
 
 <details>
 <summary>See all modules</summary>
@@ -403,6 +421,11 @@ Result: ![AMC Score](https://img.shields.io/badge/AMC-L3_(72.5)-green)
 - MCP compliance scoring
 - Identity continuity tracking
 - Behavioral transparency index
+- **Forecast legitimacy** (epistemic honesty, calibration, uncertainty)
+- **Fact/simulation boundary** (provenance separation, writeback governance)
+- **Synthetic identity governance** (persona labeling, real-person controls)
+- **Simulation validity** (mode collapse, population diversity)
+- **Scenario provenance** (traceability, replay, interaction safety)
 - And 60+ more...
 
 </details>
@@ -421,7 +444,7 @@ AMC Gateway ──── transparent proxy, agent doesn't know it's being watche
 Evidence Ledger ──── Ed25519 signatures + Merkle tree proof chains
     │
     ▼
-Scoring Engine ──── evidence-weighted diagnostics, 74+ scoring modules, 86 assurance packs
+Scoring Engine ──── evidence-weighted diagnostics, 79 scoring modules, 119 assurance packs
     │
     ▼
 AMC Studio ──── dashboard + API + CLI + reports
@@ -610,7 +633,7 @@ AMC is MIT licensed. We welcome contributions — especially new **assurance pac
 
 ```bash
 git clone https://github.com/thewisecrab/AgentMaturityCompass.git
-cd AgentMaturityCompass && npm ci && npm test   # 3,549 tests
+cd AgentMaturityCompass && npm ci && npm test   # 3,645 tests
 ```
 
 **→ [CONTRIBUTING.md](CONTRIBUTING.md)** — includes guides for writing packs, mapping research papers, and adding adapters.
@@ -631,7 +654,7 @@ cd AgentMaturityCompass && npm ci && npm test   # 3,549 tests
 ---
 
 <p align="center">
-  <strong>195 diagnostic questions · 119 assurance packs · 40 domain packs · 14 adapters · 74+ scoring modules · 3,549 tests</strong><br>
+  <strong>195 diagnostic questions · 119 assurance packs · 40 domain packs · 14 adapters · 79 scoring modules · 3,645 tests</strong><br>
   <em>Stop trusting. Start verifying.</em>
 </p>
 
