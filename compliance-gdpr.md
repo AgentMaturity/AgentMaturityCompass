@@ -1,7 +1,7 @@
 # AMC Compliance Report (GDPR)
 
 - Agent: default
-- Window: 2026-02-15T08:10:58.574Z -> 2026-03-17T08:10:58.574Z
+- Window: 2026-02-15T08:54:58.365Z -> 2026-03-17T08:54:58.365Z
 - Config trusted: NO (compliance maps missing)
 - Trust coverage: OBSERVED 0.0% | ATTESTED 0.0% | SELF_REPORTED 0.0%
 - Coverage score: 25.0% (S:0 P:6 M:6 U:0)
