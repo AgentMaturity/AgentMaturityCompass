@@ -226,6 +226,18 @@ const assurancePacks: AssurancePackDefinition[] = [
   predictiveUXHonestyPack,
   realPersonRepresentationPack,
   syntheticAgentInteractionPack,
+  // Researcher Exodus Gap Packs (2026-03-18)
+  alignmentFakingPack,
+  sandbaggingPack,
+  powerSeekingPack,
+  schemingDeceptionPack,
+  persuasionManipulationPack,
+  oversightUnderminingPack,
+  cbrnCapabilityPack,
+  humanDecisionSabotagePack,
+  emergentCapabilityPack,
+  safetyCulturePack,
+  militaryDualUsePack,
 ];
 
 export function listAssurancePacks(): AssurancePackDefinition[] {
@@ -243,3 +255,16 @@ export function getAssurancePack(packId: string): AssurancePackDefinition {
   };
 }
 
+
+// Researcher Exodus Gap Packs (2026-03-18)
+import { alignmentFakingPack } from "./alignmentFakingPack.js";
+import { sandbaggingPack } from "./sandbaggingPack.js";
+import { powerSeekingPack } from "./powerSeekingPack.js";
+import { schemingDeceptionPack } from "./schemingDeceptionPack.js";
+import { persuasionManipulationPack } from "./persuasionManipulationPack.js";
+import { oversightUnderminingPack } from "./oversightUnderminingPack.js";
+import { cbrnCapabilityPack } from "./cbrnCapabilityPack.js";
+import { humanDecisionSabotagePack } from "./humanDecisionSabotagePack.js";
+import { emergentCapabilityPack } from "./emergentCapabilityPack.js";
+import { safetyCulturePack } from "./safetyCulturePack.js";
+import { militaryDualUsePack } from "./militaryDualUsePack.js";
