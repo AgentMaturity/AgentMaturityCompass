@@ -1,7 +1,7 @@
 # AMC Compliance Report (SOC2)
 
 - Agent: default
-- Window: 2026-02-13T08:51:35.664Z -> 2026-03-15T08:51:35.664Z
+- Window: 2026-02-15T05:39:46.025Z -> 2026-03-17T05:39:46.025Z
 - Config trusted: NO (compliance maps signature missing)
 - Trust coverage: OBSERVED 100.0% | ATTESTED 0.0% | SELF_REPORTED 0.0%
 - Coverage score: 50.0% (S:0 P:5 M:0 U:0)
@@ -13,7 +13,7 @@
 Signals for preventing unauthorized actions and policy bypass.
 
 Deterministic reasons:
-- Found 7156 matching events with observed ratio 1.000
+- Found 11832 matching events with observed ratio 1.000
 - Assurance pack 'governance_bypass' score 100 meets threshold
 - Found denied audit events: GOVERNANCE_BYPASS_SUCCEEDED, EXECUTE_WITHOUT_TICKET_ATTEMPTED, LEASE_INVALID_OR_MISSING
 Evidence references:
@@ -44,7 +44,7 @@ What would make this SATISFIED?
 Signals for operational reliability and service continuity.
 
 Deterministic reasons:
-- Found 12516 matching events with observed ratio 1.000
+- Found 20772 matching events with observed ratio 1.000
 - No denied audit events found
 - Compliance maps signature invalid; green status is downgraded to PARTIAL.
 Evidence references:
@@ -68,7 +68,7 @@ What would make this SATISFIED?
 Signals for secret handling, redaction, and data boundary enforcement.
 
 Deterministic reasons:
-- Found 7156 matching events with observed ratio 1.000
+- Found 11832 matching events with observed ratio 1.000
 - Assurance pack 'exfiltration' score 100 meets threshold
 - No denied audit events found
 - Compliance maps signature invalid; green status is downgraded to PARTIAL.
@@ -94,7 +94,7 @@ What would make this SATISFIED?
 Signals for verification discipline and correctness controls.
 
 Deterministic reasons:
-- Found 12516 matching events with observed ratio 1.000
+- Found 20772 matching events with observed ratio 1.000
 - Assurance pack 'hallucination' score 100 meets threshold
 - Compliance maps signature invalid; green status is downgraded to PARTIAL.
 Evidence references:
@@ -119,7 +119,7 @@ What would make this SATISFIED?
 Signals for consent-aware operations and minimization.
 
 Deterministic reasons:
-- Found 7135 matching events with observed ratio 1.000
+- Found 11811 matching events with observed ratio 1.000
 - No denied audit events found
 - Compliance maps signature invalid; green status is downgraded to PARTIAL.
 Evidence references:

@@ -3896,7 +3896,7 @@ program
       const { unifiedRun, renderUnifiedResult, renderCIAnnotations, scoreToGrade } = await import("./unified/index.js");
       const result = await unifiedRun({
         workspace: process.cwd(),
-        agentId,
+        agentId: agentId ?? "default",
         window: opts.window,
         failBelow: opts.failBelow as any,
         ci: opts.ci,
@@ -18257,7 +18257,7 @@ score
   .option("--responses <file>", "JSON file with diagnostic responses (Record<string, string> keyed by question ID)")
   .action(async (opts: { systemType: string; json?: boolean; responses?: string }) => {
     try {
-      const { scoreSimulationForecastLane, isSimulationLaneActive, getSimulationLaneQuestionIds } = await import("./lanes/simulationForecastLane.js");
+      const { evaluateSimulationLane, isSimulationLaneActive, getSimulationLaneQuestionIds } = await import("./lanes/simulationForecastLane.js");
       const validTypes = ["simulation-engine", "forecast-decision-support", "synthetic-social-environment", "task-agent", "orchestrated-workflow", "research-delegation"];
       if (!validTypes.includes(opts.systemType)) {
         console.error(chalk.red(`Invalid system type: ${opts.systemType}`));
@@ -18290,7 +18290,7 @@ score
           }
         }
       }
-      const report = scoreSimulationForecastLane(responses, systemType);
+      const report = evaluateSimulationLane(systemType, responses);
       if (!report || !report.active) {
         console.log(chalk.yellow("Lane not active for this system type."));
         return;

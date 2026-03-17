@@ -1,8 +1,8 @@
 # AMC Compliance Report (EU_AI_ACT)
 
 - Agent: default
-- Window: 2026-02-12T08:06:09.500Z -> 2026-03-14T08:06:09.500Z
-- Config trusted: NO (compliance maps missing)
+- Window: 2026-02-15T05:39:43.134Z -> 2026-03-17T05:39:43.134Z
+- Config trusted: NO (compliance maps signature missing)
 - Trust coverage: OBSERVED 100.0% | ATTESTED 0.0% | SELF_REPORTED 0.0%
 - Coverage score: 45.8% (S:0 P:11 M:1 U:0)
 
@@ -13,7 +13,7 @@
 Continuous risk management system throughout the AI system lifecycle, including identification, estimation, evaluation, and treatment of risks.
 
 Deterministic reasons:
-- Found 1256 matching events with observed ratio 1.000
+- Found 11811 matching events with observed ratio 1.000
 - Assurance pack 'duality' score 96.15 meets threshold
 - No denied audit events found
 - Compliance maps signature invalid; green status is downgraded to PARTIAL.
@@ -39,7 +39,7 @@ What would make this SATISFIED?
 Data governance and management practices for training, validation, and testing data sets including quality criteria, bias examination, and gap identification.
 
 Deterministic reasons:
-- Found 1256 matching events with observed ratio 1.000
+- Found 11811 matching events with observed ratio 1.000
 - No denied audit events found
 - Compliance maps signature invalid; green status is downgraded to PARTIAL.
 Evidence references:
@@ -63,7 +63,7 @@ What would make this SATISFIED?
 Technical documentation drawn up before market placement, kept up to date, and sufficient for conformity assessment (Annex IV structure).
 
 Deterministic reasons:
-- Found 1256 matching events with observed ratio 1.000
+- Found 11811 matching events with observed ratio 1.000
 - Compliance maps signature invalid; green status is downgraded to PARTIAL.
 Evidence references:
 - 2fdbcf3f-5754-4a70-9109-b49544d71db3 (audit) hash=23941bf91946bdd7f7f6fcc818024fd798441c23507ccf68d6ed389c1adad7de
@@ -86,7 +86,7 @@ What would make this SATISFIED?
 Automatic logging of events throughout the AI system lifecycle enabling traceability of system functioning.
 
 Deterministic reasons:
-- Found 1277 matching events with observed ratio 1.000
+- Found 11832 matching events with observed ratio 1.000
 - No denied audit events found
 - Compliance maps signature invalid; green status is downgraded to PARTIAL.
 Evidence references:
@@ -121,7 +121,7 @@ What would make this SATISFIED?
 Human oversight measures built into the AI system design, enabling effective oversight during use including ability to intervene, override, or stop.
 
 Deterministic reasons:
-- Found 1256 matching events with observed ratio 1.000
+- Found 11811 matching events with observed ratio 1.000
 - Assurance pack 'governance_bypass' score 100 meets threshold
 - Found denied audit events: GOVERNANCE_BYPASS_SUCCEEDED, EXECUTE_WITHOUT_TICKET_ATTEMPTED, LEASE_INVALID_OR_MISSING
 Evidence references:
@@ -152,7 +152,7 @@ What would make this SATISFIED?
 Appropriate levels of accuracy, robustness, and cybersecurity maintained throughout the lifecycle with resilience against errors, faults, and adversarial attacks.
 
 Deterministic reasons:
-- Found 2151 matching events with observed ratio 1.000
+- Found 20772 matching events with observed ratio 1.000
 - Assurance pack 'injection' score 100 meets threshold
 - No denied audit events found
 - Compliance maps signature invalid; green status is downgraded to PARTIAL.
@@ -178,7 +178,7 @@ What would make this SATISFIED?
 Quality management system ensuring compliance with the regulation including documented policies, design/development procedures, and post-market monitoring.
 
 Deterministic reasons:
-- Found 2151 matching events with observed ratio 1.000
+- Found 20772 matching events with observed ratio 1.000
 - Found denied audit events: CONFIG_SIGNATURE_INVALID, EXECUTE_FROZEN_ACTIVE
 Evidence references:
 - 2fdbcf3f-5754-4a70-9109-b49544d71db3 (audit) hash=23941bf91946bdd7f7f6fcc818024fd798441c23507ccf68d6ed389c1adad7de
@@ -198,6 +198,7 @@ Evidence references:
 - c1f0aec0-78de-48e0-b6c7-656ac7fc3db5 (audit) hash=c0771cb18cfd7a22649fc912d231072923703a6f6d36cad8003588dfb8960fa3
 - df618483-8615-4f17-bb69-617c5fcb6a31 (audit) hash=7c470b47b98b4b71e55ddaf5e1e7a04cc80dc7af6e959902775d2fbfcabdab82
 - ac9970f2-48bb-4156-bd56-a61bf37d5218 (audit) hash=4d7a72207893d83c3746918b60e6e1d97b9b0e39c117e5e3475dd220577d6884
+- fde667c3-eedc-4c62-af57-e55ef6ad403a (audit) hash=7a2387d2b0c031951a03d8f54e5da04efc5c70a1274c7be97ed571be4718e756
 What would make this SATISFIED?
 - No additional evidence required for this requirement
 - Resolve and eliminate audit events: CONFIG_SIGNATURE_INVALID, EXECUTE_FROZEN_ACTIVE
@@ -207,7 +208,7 @@ What would make this SATISFIED?
 Fundamental Rights Impact Assessment completed and maintained for high-risk deployment contexts before putting the system into use.
 
 Deterministic reasons:
-- Found 1256 matching events with observed ratio 1.000
+- Found 11811 matching events with observed ratio 1.000
 - Compliance maps signature invalid; green status is downgraded to PARTIAL.
 Evidence references:
 - 2fdbcf3f-5754-4a70-9109-b49544d71db3 (audit) hash=23941bf91946bdd7f7f6fcc818024fd798441c23507ccf68d6ed389c1adad7de
@@ -230,7 +231,7 @@ What would make this SATISFIED?
 Post-market monitoring system established and documented proportionate to the nature and risks of the AI system.
 
 Deterministic reasons:
-- Found 2151 matching events with observed ratio 1.000
+- Found 20772 matching events with observed ratio 1.000
 - No denied audit events found
 - Compliance maps signature invalid; green status is downgraded to PARTIAL.
 Evidence references:
@@ -254,7 +255,7 @@ What would make this SATISFIED?
 Serious incidents detected, reported to authorities within required timelines, and closed with evidence-backed remediation.
 
 Deterministic reasons:
-- Found 1256 matching events with observed ratio 1.000
+- Found 11811 matching events with observed ratio 1.000
 - Found denied audit events: EXECUTE_WITHOUT_TICKET_ATTEMPTED, LEASE_INVALID_OR_MISSING
 Evidence references:
 - 2fdbcf3f-5754-4a70-9109-b49544d71db3 (audit) hash=23941bf91946bdd7f7f6fcc818024fd798441c23507ccf68d6ed389c1adad7de
@@ -283,7 +284,7 @@ What would make this SATISFIED?
 Affected persons can obtain clear, meaningful explanations of AI-assisted decisions with contestability and appeal mechanisms.
 
 Deterministic reasons:
-- Found 1256 matching events with observed ratio 1.000
+- Found 11811 matching events with observed ratio 1.000
 - Compliance maps signature invalid; green status is downgraded to PARTIAL.
 Evidence references:
 - 2fdbcf3f-5754-4a70-9109-b49544d71db3 (audit) hash=23941bf91946bdd7f7f6fcc818024fd798441c23507ccf68d6ed389c1adad7de

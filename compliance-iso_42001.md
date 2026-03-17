@@ -1,7 +1,7 @@
 # AMC Compliance Report (ISO_42001)
 
 - Agent: default
-- Window: 2026-02-13T08:51:34.944Z -> 2026-03-15T08:51:34.944Z
+- Window: 2026-02-15T05:39:45.117Z -> 2026-03-17T05:39:45.117Z
 - Config trusted: NO (compliance maps signature missing)
 - Trust coverage: OBSERVED 100.0% | ATTESTED 0.0% | SELF_REPORTED 0.0%
 - Coverage score: 45.5% (S:0 P:10 M:1 U:0)
@@ -13,7 +13,7 @@
 AIMS context, stakeholder expectations, and boundary definition are documented.
 
 Deterministic reasons:
-- Found 7135 matching events with observed ratio 1.000
+- Found 11811 matching events with observed ratio 1.000
 - Compliance maps signature invalid; green status is downgraded to PARTIAL.
 Evidence references:
 - 2fdbcf3f-5754-4a70-9109-b49544d71db3 (audit) hash=23941bf91946bdd7f7f6fcc818024fd798441c23507ccf68d6ed389c1adad7de
@@ -36,7 +36,7 @@ What would make this SATISFIED?
 Leadership commitment, accountability assignment, and governance controls are evidenced.
 
 Deterministic reasons:
-- Found 7135 matching events with observed ratio 1.000
+- Found 11811 matching events with observed ratio 1.000
 - Assurance pack 'governance_bypass' score 100 meets threshold
 - Compliance maps signature invalid; green status is downgraded to PARTIAL.
 Evidence references:
@@ -61,7 +61,7 @@ What would make this SATISFIED?
 Risk/opportunity planning and AI objectives are tracked with measurable controls.
 
 Deterministic reasons:
-- Found 7135 matching events with observed ratio 1.000
+- Found 11811 matching events with observed ratio 1.000
 - Compliance maps signature invalid; green status is downgraded to PARTIAL.
 Evidence references:
 - 2fdbcf3f-5754-4a70-9109-b49544d71db3 (audit) hash=23941bf91946bdd7f7f6fcc818024fd798441c23507ccf68d6ed389c1adad7de
@@ -95,7 +95,7 @@ What would make this SATISFIED?
 Operational lifecycle controls and risk treatment are evidence-linked during runtime execution.
 
 Deterministic reasons:
-- Found 7135 matching events with observed ratio 1.000
+- Found 11811 matching events with observed ratio 1.000
 - No denied audit events found
 - Compliance maps signature invalid; green status is downgraded to PARTIAL.
 Evidence references:
@@ -119,7 +119,7 @@ What would make this SATISFIED?
 Monitoring, measurement, and internal evaluation evidence are continuously produced.
 
 Deterministic reasons:
-- Found 12516 matching events with observed ratio 1.000
+- Found 20772 matching events with observed ratio 1.000
 - Assurance pack 'hallucination' score 100 meets threshold
 - Compliance maps signature invalid; green status is downgraded to PARTIAL.
 Evidence references:
@@ -144,7 +144,7 @@ What would make this SATISFIED?
 Nonconformity remediation and continual-improvement loops are closed with deterministic evidence.
 
 Deterministic reasons:
-- Found 7135 matching events with observed ratio 1.000
+- Found 11811 matching events with observed ratio 1.000
 - No denied audit events found
 - Compliance maps signature invalid; green status is downgraded to PARTIAL.
 Evidence references:
@@ -168,7 +168,7 @@ What would make this SATISFIED?
 Impact assessment scope, stakeholder boundary, and foreseeable misuse are captured.
 
 Deterministic reasons:
-- Found 7135 matching events with observed ratio 1.000
+- Found 11811 matching events with observed ratio 1.000
 - Compliance maps signature invalid; green status is downgraded to PARTIAL.
 Evidence references:
 - 2fdbcf3f-5754-4a70-9109-b49544d71db3 (audit) hash=23941bf91946bdd7f7f6fcc818024fd798441c23507ccf68d6ed389c1adad7de
@@ -191,7 +191,7 @@ What would make this SATISFIED?
 Impact severity, likelihood, and uncertainty are quantified and regularly re-evaluated.
 
 Deterministic reasons:
-- Found 7135 matching events with observed ratio 1.000
+- Found 11811 matching events with observed ratio 1.000
 - Compliance maps signature invalid; green status is downgraded to PARTIAL.
 Evidence references:
 - 2fdbcf3f-5754-4a70-9109-b49544d71db3 (audit) hash=23941bf91946bdd7f7f6fcc818024fd798441c23507ccf68d6ed389c1adad7de
@@ -214,7 +214,7 @@ What would make this SATISFIED?
 Traceability from identified impacts to mitigations and closure evidence is maintained.
 
 Deterministic reasons:
-- Found 7135 matching events with observed ratio 1.000
+- Found 11811 matching events with observed ratio 1.000
 - Compliance maps signature invalid; green status is downgraded to PARTIAL.
 Evidence references:
 - 2fdbcf3f-5754-4a70-9109-b49544d71db3 (audit) hash=23941bf91946bdd7f7f6fcc818024fd798441c23507ccf68d6ed389c1adad7de
@@ -237,7 +237,7 @@ What would make this SATISFIED?
 Certification-ready, machine-readable audit evidence packages are generated and verifiable.
 
 Deterministic reasons:
-- Found 12516 matching events with observed ratio 1.000
+- Found 20772 matching events with observed ratio 1.000
 - Found denied audit events: TRACE_RECEIPT_INVALID, TRACE_EVENT_HASH_NOT_FOUND, CONFIG_SIGNATURE_INVALID
 Evidence references:
 - 2fdbcf3f-5754-4a70-9109-b49544d71db3 (audit) hash=23941bf91946bdd7f7f6fcc818024fd798441c23507ccf68d6ed389c1adad7de

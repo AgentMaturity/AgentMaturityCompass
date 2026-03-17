@@ -1,7 +1,7 @@
 # AMC Compliance Report (GDPR)
 
 - Agent: default
-- Window: 2026-02-13T08:51:52.844Z -> 2026-03-15T08:51:52.844Z
+- Window: 2026-02-15T05:39:44.130Z -> 2026-03-17T05:39:44.130Z
 - Config trusted: NO (compliance maps signature missing)
 - Trust coverage: OBSERVED 100.0% | ATTESTED 0.0% | SELF_REPORTED 0.0%
 - Coverage score: 50.0% (S:0 P:12 M:0 U:0)
@@ -13,7 +13,7 @@
 Personal data processed lawfully, fairly, and transparently with clear purpose disclosure.
 
 Deterministic reasons:
-- Found 7135 matching events with observed ratio 1.000
+- Found 11811 matching events with observed ratio 1.000
 - Compliance maps signature invalid; green status is downgraded to PARTIAL.
 Evidence references:
 - 2fdbcf3f-5754-4a70-9109-b49544d71db3 (audit) hash=23941bf91946bdd7f7f6fcc818024fd798441c23507ccf68d6ed389c1adad7de
@@ -36,7 +36,7 @@ What would make this SATISFIED?
 Personal data collected for specified, explicit, legitimate purposes and not further processed incompatibly.
 
 Deterministic reasons:
-- Found 7135 matching events with observed ratio 1.000
+- Found 11811 matching events with observed ratio 1.000
 - No denied audit events found
 - Compliance maps signature invalid; green status is downgraded to PARTIAL.
 Evidence references:
@@ -60,7 +60,7 @@ What would make this SATISFIED?
 Personal data adequate, relevant, and limited to what is necessary for processing purposes.
 
 Deterministic reasons:
-- Found 7146 matching events with observed ratio 1.000
+- Found 11822 matching events with observed ratio 1.000
 - No denied audit events found
 - Compliance maps signature invalid; green status is downgraded to PARTIAL.
 Evidence references:
@@ -84,7 +84,7 @@ What would make this SATISFIED?
 Personal data accurate and kept up to date with inaccurate data erased or rectified without delay.
 
 Deterministic reasons:
-- Found 12516 matching events with observed ratio 1.000
+- Found 20772 matching events with observed ratio 1.000
 - Assurance pack 'hallucination' score 100 meets threshold
 - Compliance maps signature invalid; green status is downgraded to PARTIAL.
 Evidence references:
@@ -109,7 +109,7 @@ What would make this SATISFIED?
 Personal data kept in identifiable form no longer than necessary for processing purposes.
 
 Deterministic reasons:
-- Found 7135 matching events with observed ratio 1.000
+- Found 11811 matching events with observed ratio 1.000
 - Compliance maps signature invalid; green status is downgraded to PARTIAL.
 Evidence references:
 - 2fdbcf3f-5754-4a70-9109-b49544d71db3 (audit) hash=23941bf91946bdd7f7f6fcc818024fd798441c23507ccf68d6ed389c1adad7de
@@ -132,7 +132,7 @@ What would make this SATISFIED?
 Personal data processed securely with protection against unauthorized/unlawful processing and accidental loss.
 
 Deterministic reasons:
-- Found 7156 matching events with observed ratio 1.000
+- Found 11832 matching events with observed ratio 1.000
 - Assurance pack 'exfiltration' score 100 meets threshold
 - No denied audit events found
 - Compliance maps signature invalid; green status is downgraded to PARTIAL.
@@ -158,7 +158,7 @@ What would make this SATISFIED?
 Processing has lawful basis (consent, contract, legal obligation, vital interests, public task, or legitimate interests).
 
 Deterministic reasons:
-- Found 7135 matching events with observed ratio 1.000
+- Found 11811 matching events with observed ratio 1.000
 - No denied audit events found
 - Compliance maps signature invalid; green status is downgraded to PARTIAL.
 Evidence references:
@@ -182,7 +182,7 @@ What would make this SATISFIED?
 Data subject rights (access, rectification, erasure, restriction, portability, objection, automated decision-making) are supported.
 
 Deterministic reasons:
-- Found 7135 matching events with observed ratio 1.000
+- Found 11811 matching events with observed ratio 1.000
 - Compliance maps signature invalid; green status is downgraded to PARTIAL.
 Evidence references:
 - 2fdbcf3f-5754-4a70-9109-b49544d71db3 (audit) hash=23941bf91946bdd7f7f6fcc818024fd798441c23507ccf68d6ed389c1adad7de
@@ -205,7 +205,7 @@ What would make this SATISFIED?
 Data protection by design and by default with appropriate technical and organizational measures.
 
 Deterministic reasons:
-- Found 12516 matching events with observed ratio 1.000
+- Found 20772 matching events with observed ratio 1.000
 - Assurance pack 'exfiltration' score 100 meets threshold
 - Compliance maps signature invalid; green status is downgraded to PARTIAL.
 Evidence references:
@@ -230,7 +230,7 @@ What would make this SATISFIED?
 Appropriate technical and organizational security measures including encryption, pseudonymization, and resilience.
 
 Deterministic reasons:
-- Found 7156 matching events with observed ratio 1.000
+- Found 11832 matching events with observed ratio 1.000
 - Assurance pack 'injection' score 100 meets threshold
 - Found denied audit events: GOVERNANCE_BYPASS_SUCCEEDED, EXECUTE_WITHOUT_TICKET_ATTEMPTED, LEASE_INVALID_OR_MISSING
 Evidence references:
@@ -261,7 +261,7 @@ What would make this SATISFIED?
 Personal data breaches detected, documented, and notified to supervisory authority and data subjects within required timelines.
 
 Deterministic reasons:
-- Found 7135 matching events with observed ratio 1.000
+- Found 11811 matching events with observed ratio 1.000
 - No denied audit events found
 - Compliance maps signature invalid; green status is downgraded to PARTIAL.
 Evidence references:
@@ -285,7 +285,7 @@ What would make this SATISFIED?
 Data Protection Impact Assessment conducted for high-risk processing with systematic evaluation and mitigation measures.
 
 Deterministic reasons:
-- Found 7135 matching events with observed ratio 1.000
+- Found 11811 matching events with observed ratio 1.000
 - Compliance maps signature invalid; green status is downgraded to PARTIAL.
 Evidence references:
 - 2fdbcf3f-5754-4a70-9109-b49544d71db3 (audit) hash=23941bf91946bdd7f7f6fcc818024fd798441c23507ccf68d6ed389c1adad7de
