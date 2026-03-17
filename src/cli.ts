@@ -4120,11 +4120,12 @@ program
         }
       }
       if (runs.length === 0) {
-        console.log("No runs found.");
-        console.log(chalk.gray("\n💡 To create your first run:"));
-        console.log(chalk.gray("  amc quickscore          # Quick 5-question assessment"));
-        console.log(chalk.gray("  amc run                 # Full 8-module diagnostic"));
-        console.log(chalk.gray("  amc score --tier deep   # Deep scoring with evidence"));
+        console.log(chalk.bold("📋 No diagnostic runs yet — that's normal for a new workspace!"));
+        console.log(chalk.gray("\n  Get started with any of these:"));
+        console.log(chalk.gray("    amc quickscore          # 2-minute interactive assessment"));
+        console.log(chalk.gray("    amc run                 # Full 8-module diagnostic"));
+        console.log(chalk.gray("    amc score --tier deep   # Deep scoring with evidence"));
+        console.log(chalk.gray("\n  Your run history will appear here after your first assessment."));
         return;
       }
       for (const run of runs) {
@@ -15816,7 +15817,7 @@ shield
 
 shield
   .command("sanitize <text>")
-  .description("Sanitize text — strip XSS, injection, and dangerous patterns")
+  .description("Sanitize text — strip LLM prompt injection and dangerous AI patterns (not SQL/XSS)")
   .option("--json", "Output as JSON")
   .action(async (text: string, opts: { json?: boolean }) => {
     try {
@@ -17440,11 +17441,23 @@ score
     try {
       const { computeMaturityScore } = await import("./score/index.js");
       const result = computeMaturityScore([], {});
-      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
+      if (opts.json) {
+        const output: any = { ...result };
+        if ((result.overallScore ?? 0) === 0) {
+          output.hint = "Score is 0 because no evidence has been collected yet. Run: amc evidence collect, amc wrap <runtime> -- <command>, or amc quickscore";
+        }
+        console.log(JSON.stringify(output, null, 2));
+        return;
+      }
       console.log(chalk.bold.hex('#4AEF79')("\n📊  Maturity Score"));
       console.log(chalk.gray("Agent:"), agentId);
       console.log(chalk.gray("Score:"), result.overallScore ?? "N/A");
       console.log(chalk.gray("Level:"), result.overallLevel || "unknown");
+      if ((result.overallScore ?? 0) === 0) {
+        console.log(chalk.yellow("\n💡 Score is 0 — no evidence collected yet."));
+        console.log(chalk.gray("  amc evidence collect              # Auto-collect from workspace"));
+        console.log(chalk.gray("  amc wrap <runtime> -- <command>    # Capture live evidence"));
+      }
     } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
   });
 
@@ -17552,10 +17565,21 @@ score
     try {
       const { getLeanAMCProfile } = await import("./score/leanAMC.js");
       const result = getLeanAMCProfile();
-      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
+      if (opts.json) {
+        const output: any = { ...result, priorityOrder: result.requiredModules.slice(0, 5).map((m: string, i: number) => ({ rank: i + 1, module: m, reason: i === 0 ? "highest impact" : i < 3 ? "high impact" : "recommended" })) };
+        console.log(JSON.stringify(output, null, 2));
+        return;
+      }
       console.log(chalk.bold.hex('#4AEF79')("\n🧪  Lean AMC Profile"));
-      console.log(chalk.gray("Required modules:"), result.requiredModules.join(", "));
-      console.log(chalk.gray("Skippable modules:"), result.skippableModules.join(", "));
+      console.log(chalk.bold("\n  📋 Priority order (start here):"));
+      for (let i = 0; i < Math.min(5, result.requiredModules.length); i++) {
+        const icon = i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : "  ";
+        console.log(chalk.white(`  ${icon} ${i + 1}. ${result.requiredModules[i]}`));
+      }
+      if (result.requiredModules.length > 5) {
+        console.log(chalk.gray(`  ... and ${result.requiredModules.length - 5} more`));
+      }
+      console.log(chalk.gray("\nSkippable modules:"), result.skippableModules.join(", "));
       console.log(chalk.gray("Estimated setup hours:"), result.estimatedSetupHours);
       console.log(chalk.gray("Max achievable level:"), result.maximumAchievableLevel);
       console.log(chalk.gray("Tradeoffs:"), result.tradeoffs.join("; "));
@@ -18817,8 +18841,17 @@ playground
     const { createPlaygroundSession, runAllScenarios, formatPlaygroundReport } = await import("./playground/index.js");
     const session = createPlaygroundSession();
     const results = runAllScenarios(session);
-    if (opts.json) { console.log(JSON.stringify(results, null, 2)); return; }
+    if (opts.json) {
+      const output = { scenarios: results, hint: "These are static demo scenarios. For real agent testing, use: amc wrap <runtime> -- <command>, or amc assurance run --all" };
+      console.log(JSON.stringify(output, null, 2));
+      return;
+    }
     console.log(formatPlaygroundReport(session));
+    console.log(chalk.gray("\n💡 These are static demo scenarios for quick evaluation."));
+    console.log(chalk.gray("  For real agent testing:"));
+    console.log(chalk.gray("    amc wrap <runtime> -- <command>    # Capture live evidence"));
+    console.log(chalk.gray("    amc assurance run --all            # Run full red-team packs"));
+    console.log(chalk.gray("    amc redteam run                    # Targeted attack simulation"));
   });
 
 playground

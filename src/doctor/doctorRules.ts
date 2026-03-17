@@ -16,7 +16,7 @@ import { pathAllowedByPatterns } from "../toolhub/toolhubValidators.js";
 import { checkNotaryTrust, loadTrustConfig, verifyTrustConfigSignature } from "../trust/trustConfig.js";
 import { signDigestWithPolicy } from "../crypto/signing/signer.js";
 
-export type DoctorStatus = "PASS" | "FAIL" | "WARN";
+export type DoctorStatus = "PASS" | "FAIL" | "WARN" | "INFO";
 
 export interface DoctorCheck {
   id: string;
@@ -89,14 +89,14 @@ export async function runDoctorRules(workspace: string): Promise<DoctorReport> {
   checks.push(
     studio.running
       ? { id: "studio-running", status: "PASS", message: `Studio running on ${studio.state?.host}:${studio.state?.apiPort}` }
-      : { id: "studio-running", status: "FAIL", message: "Studio is not running", fixHint: "Run: amc up" }
+      : { id: "studio-running", status: "INFO", message: "Studio is not running (optional — needed for dashboard/API)", fixHint: "Run: amc up" }
   );
 
   const vault = vaultStatusNow(workspace);
   checks.push(
     vault.unlocked
       ? { id: "vault", status: "PASS", message: "Vault unlocked" }
-      : { id: "vault", status: "FAIL", message: "Vault locked", fixHint: "Run: amc vault unlock" }
+      : { id: "vault", status: "INFO", message: "Vault locked (normal for fresh install — needed for signing)", fixHint: "Run: amc vault unlock" }
   );
 
   pushSignatureCheck(checks, "sig-action-policy", "action-policy.yaml", verifyActionPolicySignature(workspace));
