@@ -1,0 +1,3889 @@
+{
+  "v": 1,
+  "enterpriseId": "ent_7d4e5599-1f97-407c-b241-0bed82e3b2e1",
+  "enterpriseName": "AMC Enterprise",
+  "computedAt": 1773738037898,
+  "window": {
+    "raw": "14d",
+    "windowStartTs": 1772528437898,
+    "windowEndTs": 1773738037898
+  },
+  "configTrusted": false,
+  "nodes": [
+    {
+      "nodeId": "ecosystem",
+      "nodeType": "ECOSYSTEM",
+      "name": "Partner Ecosystem",
+      "parentId": null,
+      "trustLabel": "UNTRUSTED",
+      "agentIds": [],
+      "countAgentsIncluded": 0,
+      "countHighTrustAgents": 0,
+      "countLowTrustAgents": 0,
+      "confidence": {
+        "observedCoverage": 0,
+        "medianCorrelationRatio": 0,
+        "integrityMedian": 0
+      },
+      "evidenceCoverage": {
+        "observedRatio": 0,
+        "attestedRatio": 0,
+        "selfReportedRatio": 0,
+        "medianCorrelationRatio": 0,
+        "cheatSuspicionCount": 0
+      },
+      "headline": {
+        "median": 0,
+        "trimmedMean": 0
+      },
+      "headlineDistribution": {
+        "p10": 0,
+        "p50": 0,
+        "p90": 0,
+        "iqr": 0
+      },
+      "layerScores": [
+        {
+          "layerName": "Strategic Agent Operations",
+          "median": 0,
+          "trimmedMean": 0
+        },
+        {
+          "layerName": "Leadership & Autonomy",
+          "median": 0,
+          "trimmedMean": 0
+        },
+        {
+          "layerName": "Culture & Alignment",
+          "median": 0,
+          "trimmedMean": 0
+        },
+        {
+          "layerName": "Resilience",
+          "median": 0,
+          "trimmedMean": 0
+        },
+        {
+          "layerName": "Skills",
+          "median": 0,
+          "trimmedMean": 0
+        }
+      ],
+      "questionScores": [
+        {
+          "questionId": "AMC-1.1",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-1.2",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-1.3",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-1.4",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-1.5",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-1.6",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-1.7",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-1.8",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-1.9",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-1.10",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-1.11",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-2.1",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-2.2",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-2.3",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-2.4",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-2.5",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-3.1.1",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-3.1.2",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-3.1.3",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-3.1.4",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-3.1.5",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-3.1.6",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-3.2.1",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-3.2.2",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-3.2.3",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-3.2.4",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-3.2.5",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-3.3.1",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-3.3.2",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-3.3.3",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-3.3.4",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-3.3.5",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-4.1",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-4.2",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-4.3",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-4.4",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-4.5",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-4.6",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-4.7",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-4.8",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-4.9",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-5.1",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-5.2",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-5.3",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-5.4",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-5.5",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-5.6",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-5.7",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-MEM-1.1",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-MEM-1.2",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-MEM-2.1",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-HOQ-1",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-HOQ-2",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-OPS-1",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-COST-1",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-GOV-PROACTIVE-1",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-OPDISC-1",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-OPDISC-2",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-OPDISC-3",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-OPDISC-4",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-OPDISC-5",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-OPDISC-6",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-OPDISC-7",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-OPDISC-8",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-SOCIAL-1",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-THR-1",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-THR-2",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-THR-3",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-BCON-1",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-MCP-1",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-OINT-1",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-SPORT-1",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-2.6",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-2.7",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-2.8",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-2.9",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-2.10",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-2.11",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-2.12",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-2.13",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-2.14",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-3.4.1",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-3.4.2",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-3.4.3",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-5.8",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-5.9",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-5.10",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-5.11",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-5.12",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-5.13",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-5.14",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-5.15",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-5.16",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-5.17",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-5.18",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-5.19",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-5.20",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-MEM-3.1",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-MEM-3.2",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-MEM-3.3",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-MEM-3.4",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-MCP-2",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-MCP-3",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-5.21",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-5.22",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-5.23",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-5.24",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-5.25",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-SCI-1",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-SCI-2",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-SCI-3",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-TAS-1",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-MBR-1",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-AAC-1",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-MSA-1",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-APS-1",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-ZAP-1",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-EAM-1",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-OC-1",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-OC-2",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-OC-3",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-OC-4",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-OC-5",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-OC-6",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-OC-7",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-OC-8",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-5.26",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-4.10",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-2.15",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-4.11",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-3.5.1",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-5.27",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-2.16",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-4.12",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-5.28",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-3.5.2",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-1.12",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-3.5.3",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.1",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.2",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.3",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.4",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.5",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.6",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.7",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.8",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.9",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.10",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.11",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.12",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.13",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.14",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.15",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.16",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.17",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.18",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.19",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.20",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.21",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.22",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.23",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.24",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.25",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.26",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.27",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.28",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.29",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.30",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.31",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.32",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.33",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.34",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.35",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.36",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.37",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.38",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.39",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.40",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.41",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.42",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.43",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.44",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.45",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.46",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.47",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.48",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.49",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.50",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.51",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.52",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.53",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.54",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.55",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.56",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.57",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        }
+      ],
+      "integrityIndex": 0,
+      "valueScore": null,
+      "economicSignificanceIndex": null,
+      "assurance": {},
+      "riskIndices": [
+        {
+          "id": "EcosystemFocusRisk",
+          "score0to100": 0
+        },
+        {
+          "id": "ClarityPathRisk",
+          "score0to100": 0
+        },
+        {
+          "id": "EconomicSignificanceRisk",
+          "score0to100": 0
+        },
+        {
+          "id": "RiskAssuranceRisk",
+          "score0to100": 0
+        },
+        {
+          "id": "DigitalDualityRisk",
+          "score0to100": 0
+        }
+      ],
+      "topGapQuestions": [],
+      "topSystemicRisks": [
+        {
+          "id": "ClarityPathRisk",
+          "score0to100": 0
+        },
+        {
+          "id": "DigitalDualityRisk",
+          "score0to100": 0
+        },
+        {
+          "id": "EconomicSignificanceRisk",
+          "score0to100": 0
+        },
+        {
+          "id": "EcosystemFocusRisk",
+          "score0to100": 0
+        },
+        {
+          "id": "RiskAssuranceRisk",
+          "score0to100": 0
+        }
+      ],
+      "whyCapped": [
+        "UNTRUSTED CONFIG: org.yaml signature invalid; display-level cap <= 3.0",
+        "Evidence gap: OBSERVED coverage < 50% or median correlation_ratio < 0.9"
+      ],
+      "runRefs": [],
+      "transparencyRefs": []
+    },
+    {
+      "nodeId": "enterprise",
+      "nodeType": "ENTERPRISE",
+      "name": "AMC Enterprise",
+      "parentId": null,
+      "trustLabel": "UNTRUSTED",
+      "agentIds": [],
+      "countAgentsIncluded": 0,
+      "countHighTrustAgents": 0,
+      "countLowTrustAgents": 0,
+      "confidence": {
+        "observedCoverage": 0,
+        "medianCorrelationRatio": 0,
+        "integrityMedian": 0
+      },
+      "evidenceCoverage": {
+        "observedRatio": 0,
+        "attestedRatio": 0,
+        "selfReportedRatio": 0,
+        "medianCorrelationRatio": 0,
+        "cheatSuspicionCount": 0
+      },
+      "headline": {
+        "median": 0,
+        "trimmedMean": 0
+      },
+      "headlineDistribution": {
+        "p10": 0,
+        "p50": 0,
+        "p90": 0,
+        "iqr": 0
+      },
+      "layerScores": [
+        {
+          "layerName": "Strategic Agent Operations",
+          "median": 0,
+          "trimmedMean": 0
+        },
+        {
+          "layerName": "Leadership & Autonomy",
+          "median": 0,
+          "trimmedMean": 0
+        },
+        {
+          "layerName": "Culture & Alignment",
+          "median": 0,
+          "trimmedMean": 0
+        },
+        {
+          "layerName": "Resilience",
+          "median": 0,
+          "trimmedMean": 0
+        },
+        {
+          "layerName": "Skills",
+          "median": 0,
+          "trimmedMean": 0
+        }
+      ],
+      "questionScores": [
+        {
+          "questionId": "AMC-1.1",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-1.2",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-1.3",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-1.4",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-1.5",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-1.6",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-1.7",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-1.8",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-1.9",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-1.10",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-1.11",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-2.1",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-2.2",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-2.3",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-2.4",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-2.5",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-3.1.1",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-3.1.2",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-3.1.3",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-3.1.4",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-3.1.5",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-3.1.6",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-3.2.1",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-3.2.2",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-3.2.3",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-3.2.4",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-3.2.5",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-3.3.1",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-3.3.2",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-3.3.3",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-3.3.4",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-3.3.5",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-4.1",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-4.2",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-4.3",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-4.4",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-4.5",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-4.6",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-4.7",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-4.8",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-4.9",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-5.1",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-5.2",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-5.3",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-5.4",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-5.5",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-5.6",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-5.7",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-MEM-1.1",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-MEM-1.2",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-MEM-2.1",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-HOQ-1",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-HOQ-2",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-OPS-1",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-COST-1",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-GOV-PROACTIVE-1",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-OPDISC-1",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-OPDISC-2",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-OPDISC-3",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-OPDISC-4",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-OPDISC-5",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-OPDISC-6",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-OPDISC-7",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-OPDISC-8",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-SOCIAL-1",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-THR-1",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-THR-2",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-THR-3",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-BCON-1",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-MCP-1",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-OINT-1",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-SPORT-1",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-2.6",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-2.7",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-2.8",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-2.9",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-2.10",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-2.11",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-2.12",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-2.13",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-2.14",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-3.4.1",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-3.4.2",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-3.4.3",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-5.8",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-5.9",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-5.10",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-5.11",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-5.12",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-5.13",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-5.14",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-5.15",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-5.16",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-5.17",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-5.18",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-5.19",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-5.20",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-MEM-3.1",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-MEM-3.2",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-MEM-3.3",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-MEM-3.4",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-MCP-2",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-MCP-3",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-5.21",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-5.22",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-5.23",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-5.24",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-5.25",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-SCI-1",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-SCI-2",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-SCI-3",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-TAS-1",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-MBR-1",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-AAC-1",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-MSA-1",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-APS-1",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-ZAP-1",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-EAM-1",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-OC-1",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-OC-2",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-OC-3",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-OC-4",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-OC-5",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-OC-6",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-OC-7",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-OC-8",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-5.26",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-4.10",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-2.15",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-4.11",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-3.5.1",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-5.27",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-2.16",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-4.12",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-5.28",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-3.5.2",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-1.12",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-3.5.3",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.1",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.2",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.3",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.4",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.5",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.6",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.7",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.8",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.9",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.10",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.11",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.12",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.13",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.14",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.15",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.16",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.17",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.18",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.19",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.20",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.21",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.22",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.23",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.24",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.25",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.26",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.27",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.28",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.29",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.30",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.31",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.32",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.33",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.34",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.35",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.36",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.37",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.38",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.39",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.40",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.41",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.42",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.43",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.44",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.45",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.46",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.47",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.48",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.49",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.50",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.51",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.52",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.53",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.54",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.55",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.56",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.57",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        }
+      ],
+      "integrityIndex": 0,
+      "valueScore": null,
+      "economicSignificanceIndex": null,
+      "assurance": {},
+      "riskIndices": [
+        {
+          "id": "EcosystemFocusRisk",
+          "score0to100": 0
+        },
+        {
+          "id": "ClarityPathRisk",
+          "score0to100": 0
+        },
+        {
+          "id": "EconomicSignificanceRisk",
+          "score0to100": 0
+        },
+        {
+          "id": "RiskAssuranceRisk",
+          "score0to100": 0
+        },
+        {
+          "id": "DigitalDualityRisk",
+          "score0to100": 0
+        }
+      ],
+      "topGapQuestions": [],
+      "topSystemicRisks": [
+        {
+          "id": "ClarityPathRisk",
+          "score0to100": 0
+        },
+        {
+          "id": "DigitalDualityRisk",
+          "score0to100": 0
+        },
+        {
+          "id": "EconomicSignificanceRisk",
+          "score0to100": 0
+        },
+        {
+          "id": "EcosystemFocusRisk",
+          "score0to100": 0
+        },
+        {
+          "id": "RiskAssuranceRisk",
+          "score0to100": 0
+        }
+      ],
+      "whyCapped": [
+        "UNTRUSTED CONFIG: org.yaml signature invalid; display-level cap <= 3.0",
+        "Evidence gap: OBSERVED coverage < 50% or median correlation_ratio < 0.9"
+      ],
+      "runRefs": [],
+      "transparencyRefs": []
+    }
+  ],
+  "summary": {
+    "enterpriseNodeId": "enterprise",
+    "enterpriseRollup": {
+      "nodeId": "enterprise",
+      "nodeType": "ENTERPRISE",
+      "name": "AMC Enterprise",
+      "parentId": null,
+      "trustLabel": "UNTRUSTED",
+      "agentIds": [],
+      "countAgentsIncluded": 0,
+      "countHighTrustAgents": 0,
+      "countLowTrustAgents": 0,
+      "confidence": {
+        "observedCoverage": 0,
+        "medianCorrelationRatio": 0,
+        "integrityMedian": 0
+      },
+      "evidenceCoverage": {
+        "observedRatio": 0,
+        "attestedRatio": 0,
+        "selfReportedRatio": 0,
+        "medianCorrelationRatio": 0,
+        "cheatSuspicionCount": 0
+      },
+      "headline": {
+        "median": 0,
+        "trimmedMean": 0
+      },
+      "headlineDistribution": {
+        "p10": 0,
+        "p50": 0,
+        "p90": 0,
+        "iqr": 0
+      },
+      "layerScores": [
+        {
+          "layerName": "Strategic Agent Operations",
+          "median": 0,
+          "trimmedMean": 0
+        },
+        {
+          "layerName": "Leadership & Autonomy",
+          "median": 0,
+          "trimmedMean": 0
+        },
+        {
+          "layerName": "Culture & Alignment",
+          "median": 0,
+          "trimmedMean": 0
+        },
+        {
+          "layerName": "Resilience",
+          "median": 0,
+          "trimmedMean": 0
+        },
+        {
+          "layerName": "Skills",
+          "median": 0,
+          "trimmedMean": 0
+        }
+      ],
+      "questionScores": [
+        {
+          "questionId": "AMC-1.1",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-1.2",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-1.3",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-1.4",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-1.5",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-1.6",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-1.7",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-1.8",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-1.9",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-1.10",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-1.11",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-2.1",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-2.2",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-2.3",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-2.4",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-2.5",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-3.1.1",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-3.1.2",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-3.1.3",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-3.1.4",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-3.1.5",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-3.1.6",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-3.2.1",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-3.2.2",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-3.2.3",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-3.2.4",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-3.2.5",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-3.3.1",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-3.3.2",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-3.3.3",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-3.3.4",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-3.3.5",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-4.1",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-4.2",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-4.3",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-4.4",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-4.5",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-4.6",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-4.7",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-4.8",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-4.9",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-5.1",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-5.2",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-5.3",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-5.4",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-5.5",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-5.6",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-5.7",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-MEM-1.1",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-MEM-1.2",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-MEM-2.1",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-HOQ-1",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-HOQ-2",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-OPS-1",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-COST-1",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-GOV-PROACTIVE-1",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-OPDISC-1",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-OPDISC-2",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-OPDISC-3",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-OPDISC-4",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-OPDISC-5",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-OPDISC-6",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-OPDISC-7",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-OPDISC-8",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-SOCIAL-1",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-THR-1",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-THR-2",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-THR-3",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-BCON-1",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-MCP-1",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-OINT-1",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-SPORT-1",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-2.6",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-2.7",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-2.8",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-2.9",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-2.10",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-2.11",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-2.12",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-2.13",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-2.14",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-3.4.1",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-3.4.2",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-3.4.3",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-5.8",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-5.9",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-5.10",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-5.11",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-5.12",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-5.13",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-5.14",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-5.15",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-5.16",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-5.17",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-5.18",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-5.19",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-5.20",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-MEM-3.1",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-MEM-3.2",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-MEM-3.3",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-MEM-3.4",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-MCP-2",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-MCP-3",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-5.21",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-5.22",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-5.23",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-5.24",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-5.25",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-SCI-1",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-SCI-2",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-SCI-3",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-TAS-1",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-MBR-1",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-AAC-1",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-MSA-1",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-APS-1",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-ZAP-1",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-EAM-1",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-OC-1",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-OC-2",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-OC-3",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-OC-4",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-OC-5",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-OC-6",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-OC-7",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-OC-8",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-5.26",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-4.10",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-2.15",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-4.11",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-3.5.1",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-5.27",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-2.16",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-4.12",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-5.28",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-3.5.2",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-1.12",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-3.5.3",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.1",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.2",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.3",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.4",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.5",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.6",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.7",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.8",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.9",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.10",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.11",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.12",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.13",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.14",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.15",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.16",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.17",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.18",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.19",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.20",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.21",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.22",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.23",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.24",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.25",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.26",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.27",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.28",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.29",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.30",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.31",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.32",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.33",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.34",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.35",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.36",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.37",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.38",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.39",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.40",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.41",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.42",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.43",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.44",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.45",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.46",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.47",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.48",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.49",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.50",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.51",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.52",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.53",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.54",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.55",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.56",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        },
+        {
+          "questionId": "AMC-6.57",
+          "median": 0,
+          "trimmedMean": 0,
+          "targetMedian": 0
+        }
+      ],
+      "integrityIndex": 0,
+      "valueScore": null,
+      "economicSignificanceIndex": null,
+      "assurance": {},
+      "riskIndices": [
+        {
+          "id": "EcosystemFocusRisk",
+          "score0to100": 0
+        },
+        {
+          "id": "ClarityPathRisk",
+          "score0to100": 0
+        },
+        {
+          "id": "EconomicSignificanceRisk",
+          "score0to100": 0
+        },
+        {
+          "id": "RiskAssuranceRisk",
+          "score0to100": 0
+        },
+        {
+          "id": "DigitalDualityRisk",
+          "score0to100": 0
+        }
+      ],
+      "topGapQuestions": [],
+      "topSystemicRisks": [
+        {
+          "id": "ClarityPathRisk",
+          "score0to100": 0
+        },
+        {
+          "id": "DigitalDualityRisk",
+          "score0to100": 0
+        },
+        {
+          "id": "EconomicSignificanceRisk",
+          "score0to100": 0
+        },
+        {
+          "id": "EcosystemFocusRisk",
+          "score0to100": 0
+        },
+        {
+          "id": "RiskAssuranceRisk",
+          "score0to100": 0
+        }
+      ],
+      "whyCapped": [
+        "UNTRUSTED CONFIG: org.yaml signature invalid; display-level cap <= 3.0",
+        "Evidence gap: OBSERVED coverage < 50% or median correlation_ratio < 0.9"
+      ],
+      "runRefs": [],
+      "transparencyRefs": []
+    },
+    "ecosystemRollup": {
+      "peerCount": 0,
+      "localEnterpriseOverall": 0,
+      "localEnterpriseIntegrity": 0,
+      "localEnterpriseValue": null,
+      "percentiles": {
+        "overall": 100,
+        "integrity": 100,
+        "value": null
+      }
+    }
+  }
+}

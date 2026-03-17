@@ -103,7 +103,7 @@ This matrix focuses on real adoption questions:
 Use:
 - `amc wrap <adapter> -- ...`
 - `amc quickscore`
-- `amc assurance run --scope full`
+- `amc assurance run --all`
 - `amc trace inspect`
 - `amc observe timeline`
 

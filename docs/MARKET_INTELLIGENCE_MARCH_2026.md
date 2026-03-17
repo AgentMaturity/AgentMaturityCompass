@@ -60,7 +60,7 @@ This is AMC's exact value proposition. The poster describes:
 **Problem:** Testing in dev ≠ behavior in prod. Agents drift, hallucinate, leak data
 **AMC Gap:** We score at a point in time. No continuous monitoring in production.
 **100x Fix:**
-- `amc watch start --agent <id>` — continuous production monitoring daemon
+- `amc monitor start --agent <id>` — continuous production monitoring daemon
 - Real-time alerts when trust score drops below threshold
 - Integration with observability platforms (Datadog, Grafana, OpenTelemetry)
 - Automatic re-scoring on schedule with drift detection alerts

@@ -1,10 +1,10 @@
 # AMC Compliance Report (EU_AI_ACT)
 
 - Agent: default
-- Window: 2026-02-15T08:54:58.016Z -> 2026-03-17T08:54:58.016Z
+- Window: 2026-02-15T09:09:29.756Z -> 2026-03-17T09:09:29.756Z
 - Config trusted: NO (compliance maps missing)
-- Trust coverage: OBSERVED 0.0% | ATTESTED 0.0% | SELF_REPORTED 0.0%
-- Coverage score: 33.3% (S:0 P:8 M:4 U:0)
+- Trust coverage: OBSERVED 100.0% | ATTESTED 0.0% | SELF_REPORTED 0.0%
+- Coverage score: 45.8% (S:0 P:11 M:1 U:0)
 
 ## Categories
 
@@ -13,51 +13,95 @@
 Continuous risk management system throughout the AI system lifecycle, including identification, estimation, evaluation, and treatment of risks.
 
 Deterministic reasons:
-- No evidence events found for types: audit, metric, review
+- Found 12 matching events with observed ratio 1.000
 - Assurance pack 'duality' not found in window
 - No denied audit events found
 Evidence references:
-- none
+- f027dc90-2abc-46e9-82f0-42221338da65 (audit) hash=84f1c65582dfd89622f3c851265eae3ceec85cc155bf228a8d80daca4b81c41f
+- 33dd4aae-93f3-4d0a-b69a-9a3f22a4db0c (audit) hash=c038913bbcdb8de1f2bef8db6ffdf4160e8c523a59ceb89e9c12105b048b6abb
+- 495d6aff-c6c0-4df0-83b6-44c1bffe5b08 (audit) hash=2d26b5ddf5386bbcce2a0a047a4d3be5c2668b68a5fdbe975b715422f48a7a4f
+- 5f30740c-c58f-49c0-80f6-ca070a70474b (audit) hash=a2ca59eb7c374c59de6ff4afa80bf09d0b40128b15e212d8f5720c0ad5b9694d
+- e311ee48-053a-43af-89da-6881c193085c (audit) hash=575248338d62231999581aa8fe76fd73785a1468343961f8af5483546db9b4d6
+- 5dc12594-fd36-4597-910a-c789700d8b7a (audit) hash=8d3c9aad5ef88e6a89fe625656adb0012512ed331fcc3fd10c982c558c3a5056
+- d0ecd5dd-d33a-4963-8c4f-20401fc177c7 (audit) hash=fd948cc5272b762d8cb3886572c3406eae23226afdf505391c75ec24e3b3623b
+- 66018621-437a-482f-a815-b17adfff2ceb (audit) hash=2135e32c1b6dc68f0974b3e687e06ece0aff3db1a0b69427764374c280c4a954
+- cbb461a6-9b48-41f8-8500-d78c1d5d4e70 (audit) hash=57796e6324279273d5d5d7ae3ebdc41d55bbbaa1d5ada1a2b73bfa088d731bbb
+- a3db71b5-5304-4cd2-8135-1103b185b73d (audit) hash=fa38c0f10fe2bf739c971ae52ca9f3de0fb177894d9c723cd8e1ece221e52fcd
+- f6171d38-c468-4a2a-ad11-d66996934559 (audit) hash=e3a00d8d416b899436950f6e74c36f5aa883012d926f93aefaf74a65115f6e16
+- 7eb986ba-9ac7-4bef-ba59-78f6f3c4be97 (audit) hash=4a86b1d659b82a9b56440ca66740bcd377d2d520fa09af36bf64c6f668e77861
 What would make this SATISFIED?
-- Capture audit, metric, review events with OBSERVED trust tier
-- Run assurance pack 'duality' with score >= 75
 - No additional evidence required for this requirement
+- Run assurance pack 'duality' with score >= 75
 
 ### Art. 10 Data Governance (PARTIAL)
 
 Data governance and management practices for training, validation, and testing data sets including quality criteria, bias examination, and gap identification.
 
 Deterministic reasons:
-- No evidence events found for types: audit, artifact, review
+- Found 12 matching events with observed ratio 1.000
 - No denied audit events found
+- Compliance maps signature invalid; green status is downgraded to PARTIAL.
 Evidence references:
-- none
+- f027dc90-2abc-46e9-82f0-42221338da65 (audit) hash=84f1c65582dfd89622f3c851265eae3ceec85cc155bf228a8d80daca4b81c41f
+- 33dd4aae-93f3-4d0a-b69a-9a3f22a4db0c (audit) hash=c038913bbcdb8de1f2bef8db6ffdf4160e8c523a59ceb89e9c12105b048b6abb
+- 495d6aff-c6c0-4df0-83b6-44c1bffe5b08 (audit) hash=2d26b5ddf5386bbcce2a0a047a4d3be5c2668b68a5fdbe975b715422f48a7a4f
+- 5f30740c-c58f-49c0-80f6-ca070a70474b (audit) hash=a2ca59eb7c374c59de6ff4afa80bf09d0b40128b15e212d8f5720c0ad5b9694d
+- e311ee48-053a-43af-89da-6881c193085c (audit) hash=575248338d62231999581aa8fe76fd73785a1468343961f8af5483546db9b4d6
+- 5dc12594-fd36-4597-910a-c789700d8b7a (audit) hash=8d3c9aad5ef88e6a89fe625656adb0012512ed331fcc3fd10c982c558c3a5056
+- d0ecd5dd-d33a-4963-8c4f-20401fc177c7 (audit) hash=fd948cc5272b762d8cb3886572c3406eae23226afdf505391c75ec24e3b3623b
+- 66018621-437a-482f-a815-b17adfff2ceb (audit) hash=2135e32c1b6dc68f0974b3e687e06ece0aff3db1a0b69427764374c280c4a954
+- cbb461a6-9b48-41f8-8500-d78c1d5d4e70 (audit) hash=57796e6324279273d5d5d7ae3ebdc41d55bbbaa1d5ada1a2b73bfa088d731bbb
+- a3db71b5-5304-4cd2-8135-1103b185b73d (audit) hash=fa38c0f10fe2bf739c971ae52ca9f3de0fb177894d9c723cd8e1ece221e52fcd
+- f6171d38-c468-4a2a-ad11-d66996934559 (audit) hash=e3a00d8d416b899436950f6e74c36f5aa883012d926f93aefaf74a65115f6e16
+- 7eb986ba-9ac7-4bef-ba59-78f6f3c4be97 (audit) hash=4a86b1d659b82a9b56440ca66740bcd377d2d520fa09af36bf64c6f668e77861
 What would make this SATISFIED?
-- Capture audit, artifact, review events with OBSERVED trust tier
 - No additional evidence required for this requirement
 
-### Art. 11 Technical Documentation (MISSING)
+### Art. 11 Technical Documentation (PARTIAL)
 
 Technical documentation drawn up before market placement, kept up to date, and sufficient for conformity assessment (Annex IV structure).
 
 Deterministic reasons:
-- No evidence events found for types: artifact, review, audit
+- Found 12 matching events with observed ratio 1.000
+- Compliance maps signature invalid; green status is downgraded to PARTIAL.
 Evidence references:
-- none
+- f027dc90-2abc-46e9-82f0-42221338da65 (audit) hash=84f1c65582dfd89622f3c851265eae3ceec85cc155bf228a8d80daca4b81c41f
+- 33dd4aae-93f3-4d0a-b69a-9a3f22a4db0c (audit) hash=c038913bbcdb8de1f2bef8db6ffdf4160e8c523a59ceb89e9c12105b048b6abb
+- 495d6aff-c6c0-4df0-83b6-44c1bffe5b08 (audit) hash=2d26b5ddf5386bbcce2a0a047a4d3be5c2668b68a5fdbe975b715422f48a7a4f
+- 5f30740c-c58f-49c0-80f6-ca070a70474b (audit) hash=a2ca59eb7c374c59de6ff4afa80bf09d0b40128b15e212d8f5720c0ad5b9694d
+- e311ee48-053a-43af-89da-6881c193085c (audit) hash=575248338d62231999581aa8fe76fd73785a1468343961f8af5483546db9b4d6
+- 5dc12594-fd36-4597-910a-c789700d8b7a (audit) hash=8d3c9aad5ef88e6a89fe625656adb0012512ed331fcc3fd10c982c558c3a5056
+- d0ecd5dd-d33a-4963-8c4f-20401fc177c7 (audit) hash=fd948cc5272b762d8cb3886572c3406eae23226afdf505391c75ec24e3b3623b
+- 66018621-437a-482f-a815-b17adfff2ceb (audit) hash=2135e32c1b6dc68f0974b3e687e06ece0aff3db1a0b69427764374c280c4a954
+- cbb461a6-9b48-41f8-8500-d78c1d5d4e70 (audit) hash=57796e6324279273d5d5d7ae3ebdc41d55bbbaa1d5ada1a2b73bfa088d731bbb
+- a3db71b5-5304-4cd2-8135-1103b185b73d (audit) hash=fa38c0f10fe2bf739c971ae52ca9f3de0fb177894d9c723cd8e1ece221e52fcd
+- f6171d38-c468-4a2a-ad11-d66996934559 (audit) hash=e3a00d8d416b899436950f6e74c36f5aa883012d926f93aefaf74a65115f6e16
+- 7eb986ba-9ac7-4bef-ba59-78f6f3c4be97 (audit) hash=4a86b1d659b82a9b56440ca66740bcd377d2d520fa09af36bf64c6f668e77861
 What would make this SATISFIED?
-- Capture artifact, review, audit events with OBSERVED trust tier
+- No additional evidence required for this requirement
 
 ### Art. 12 Record-Keeping (PARTIAL)
 
 Automatic logging of events throughout the AI system lifecycle enabling traceability of system functioning.
 
 Deterministic reasons:
-- No evidence events found for types: audit, llm_request, llm_response, tool_action, tool_result
+- Found 12 matching events with observed ratio 1.000
 - No denied audit events found
+- Compliance maps signature invalid; green status is downgraded to PARTIAL.
 Evidence references:
-- none
+- f027dc90-2abc-46e9-82f0-42221338da65 (audit) hash=84f1c65582dfd89622f3c851265eae3ceec85cc155bf228a8d80daca4b81c41f
+- 33dd4aae-93f3-4d0a-b69a-9a3f22a4db0c (audit) hash=c038913bbcdb8de1f2bef8db6ffdf4160e8c523a59ceb89e9c12105b048b6abb
+- 495d6aff-c6c0-4df0-83b6-44c1bffe5b08 (audit) hash=2d26b5ddf5386bbcce2a0a047a4d3be5c2668b68a5fdbe975b715422f48a7a4f
+- 5f30740c-c58f-49c0-80f6-ca070a70474b (audit) hash=a2ca59eb7c374c59de6ff4afa80bf09d0b40128b15e212d8f5720c0ad5b9694d
+- e311ee48-053a-43af-89da-6881c193085c (audit) hash=575248338d62231999581aa8fe76fd73785a1468343961f8af5483546db9b4d6
+- 5dc12594-fd36-4597-910a-c789700d8b7a (audit) hash=8d3c9aad5ef88e6a89fe625656adb0012512ed331fcc3fd10c982c558c3a5056
+- d0ecd5dd-d33a-4963-8c4f-20401fc177c7 (audit) hash=fd948cc5272b762d8cb3886572c3406eae23226afdf505391c75ec24e3b3623b
+- 66018621-437a-482f-a815-b17adfff2ceb (audit) hash=2135e32c1b6dc68f0974b3e687e06ece0aff3db1a0b69427764374c280c4a954
+- cbb461a6-9b48-41f8-8500-d78c1d5d4e70 (audit) hash=57796e6324279273d5d5d7ae3ebdc41d55bbbaa1d5ada1a2b73bfa088d731bbb
+- a3db71b5-5304-4cd2-8135-1103b185b73d (audit) hash=fa38c0f10fe2bf739c971ae52ca9f3de0fb177894d9c723cd8e1ece221e52fcd
+- f6171d38-c468-4a2a-ad11-d66996934559 (audit) hash=e3a00d8d416b899436950f6e74c36f5aa883012d926f93aefaf74a65115f6e16
+- 7eb986ba-9ac7-4bef-ba59-78f6f3c4be97 (audit) hash=4a86b1d659b82a9b56440ca66740bcd377d2d520fa09af36bf64c6f668e77861
 What would make this SATISFIED?
-- Capture audit, llm_request, llm_response, tool_action, tool_result events with OBSERVED trust tier
 - No additional evidence required for this requirement
 
 ### Art. 13 Transparency (MISSING)
@@ -76,66 +120,121 @@ What would make this SATISFIED?
 Human oversight measures built into the AI system design, enabling effective oversight during use including ability to intervene, override, or stop.
 
 Deterministic reasons:
-- No evidence events found for types: audit, tool_action
+- Found 12 matching events with observed ratio 1.000
 - Assurance pack 'governance_bypass' not found in window
 - No denied audit events found
 Evidence references:
-- none
+- f027dc90-2abc-46e9-82f0-42221338da65 (audit) hash=84f1c65582dfd89622f3c851265eae3ceec85cc155bf228a8d80daca4b81c41f
+- 33dd4aae-93f3-4d0a-b69a-9a3f22a4db0c (audit) hash=c038913bbcdb8de1f2bef8db6ffdf4160e8c523a59ceb89e9c12105b048b6abb
+- 495d6aff-c6c0-4df0-83b6-44c1bffe5b08 (audit) hash=2d26b5ddf5386bbcce2a0a047a4d3be5c2668b68a5fdbe975b715422f48a7a4f
+- 5f30740c-c58f-49c0-80f6-ca070a70474b (audit) hash=a2ca59eb7c374c59de6ff4afa80bf09d0b40128b15e212d8f5720c0ad5b9694d
+- e311ee48-053a-43af-89da-6881c193085c (audit) hash=575248338d62231999581aa8fe76fd73785a1468343961f8af5483546db9b4d6
+- 5dc12594-fd36-4597-910a-c789700d8b7a (audit) hash=8d3c9aad5ef88e6a89fe625656adb0012512ed331fcc3fd10c982c558c3a5056
+- d0ecd5dd-d33a-4963-8c4f-20401fc177c7 (audit) hash=fd948cc5272b762d8cb3886572c3406eae23226afdf505391c75ec24e3b3623b
+- 66018621-437a-482f-a815-b17adfff2ceb (audit) hash=2135e32c1b6dc68f0974b3e687e06ece0aff3db1a0b69427764374c280c4a954
+- cbb461a6-9b48-41f8-8500-d78c1d5d4e70 (audit) hash=57796e6324279273d5d5d7ae3ebdc41d55bbbaa1d5ada1a2b73bfa088d731bbb
+- a3db71b5-5304-4cd2-8135-1103b185b73d (audit) hash=fa38c0f10fe2bf739c971ae52ca9f3de0fb177894d9c723cd8e1ece221e52fcd
+- f6171d38-c468-4a2a-ad11-d66996934559 (audit) hash=e3a00d8d416b899436950f6e74c36f5aa883012d926f93aefaf74a65115f6e16
+- 7eb986ba-9ac7-4bef-ba59-78f6f3c4be97 (audit) hash=4a86b1d659b82a9b56440ca66740bcd377d2d520fa09af36bf64c6f668e77861
 What would make this SATISFIED?
-- Capture audit, tool_action events with OBSERVED trust tier
-- Run assurance pack 'governance_bypass' with score >= 85
 - No additional evidence required for this requirement
+- Run assurance pack 'governance_bypass' with score >= 85
 
 ### Art. 15 Accuracy Robustness Cybersecurity (PARTIAL)
 
 Appropriate levels of accuracy, robustness, and cybersecurity maintained throughout the lifecycle with resilience against errors, faults, and adversarial attacks.
 
 Deterministic reasons:
-- No evidence events found for types: test, metric, audit
-- Assurance pack 'injection' not found in window
+- Found 23 matching events with observed ratio 1.000
+- Assurance pack 'injection' score 100 meets threshold
 - No denied audit events found
+- Compliance maps signature invalid; green status is downgraded to PARTIAL.
 Evidence references:
-- none
+- f027dc90-2abc-46e9-82f0-42221338da65 (audit) hash=84f1c65582dfd89622f3c851265eae3ceec85cc155bf228a8d80daca4b81c41f
+- 33dd4aae-93f3-4d0a-b69a-9a3f22a4db0c (audit) hash=c038913bbcdb8de1f2bef8db6ffdf4160e8c523a59ceb89e9c12105b048b6abb
+- b8715b0f-9d7c-4183-bbcf-c76406e7a2da (test) hash=b591eac3accde8606dfe7e47341d6bdb4ad53d2a901cfa4e0799ad44cb574691
+- 495d6aff-c6c0-4df0-83b6-44c1bffe5b08 (audit) hash=2d26b5ddf5386bbcce2a0a047a4d3be5c2668b68a5fdbe975b715422f48a7a4f
+- a357df74-145f-440e-8cf4-c094b0b6f714 (test) hash=88a938f5ecb7eddbf8d37c0fca2e61632962a59fc1ddcba30e51b8804a9b1bcd
+- 5f30740c-c58f-49c0-80f6-ca070a70474b (audit) hash=a2ca59eb7c374c59de6ff4afa80bf09d0b40128b15e212d8f5720c0ad5b9694d
+- 5cc377c1-0858-4b19-b592-458c7f64c47a (test) hash=bf647c278095586c8c147a0f4bd84465a4e1d45dc65dda7778064beefe7e7670
+- e311ee48-053a-43af-89da-6881c193085c (audit) hash=575248338d62231999581aa8fe76fd73785a1468343961f8af5483546db9b4d6
+- b7d047fe-0c64-4daa-be35-2ec89e26f73c (test) hash=b41234b0632804c2276fcce7c4b395cd418682fb060488da461b01e5ecd00fe5
+- 5dc12594-fd36-4597-910a-c789700d8b7a (audit) hash=8d3c9aad5ef88e6a89fe625656adb0012512ed331fcc3fd10c982c558c3a5056
+- 455fd1dd-cf33-4d6a-844d-87422ed60536 (test) hash=e1b7fa37b9e4f6cf83552b718ebf160d97d39f6f804b7b76f4ad6b2787276533
+- d0ecd5dd-d33a-4963-8c4f-20401fc177c7 (audit) hash=fd948cc5272b762d8cb3886572c3406eae23226afdf505391c75ec24e3b3623b
 What would make this SATISFIED?
-- Capture test, metric, audit events with OBSERVED trust tier
-- Run assurance pack 'injection' with score >= 80
 - No additional evidence required for this requirement
+- Improve 'injection' score to >= 80 and keep *_SUCCEEDED <= 0
 
 ### Art. 17 Quality Management (PARTIAL)
 
 Quality management system ensuring compliance with the regulation including documented policies, design/development procedures, and post-market monitoring.
 
 Deterministic reasons:
-- No evidence events found for types: audit, test, metric
+- Found 23 matching events with observed ratio 1.000
 - No denied audit events found
+- Compliance maps signature invalid; green status is downgraded to PARTIAL.
 Evidence references:
-- none
+- f027dc90-2abc-46e9-82f0-42221338da65 (audit) hash=84f1c65582dfd89622f3c851265eae3ceec85cc155bf228a8d80daca4b81c41f
+- 33dd4aae-93f3-4d0a-b69a-9a3f22a4db0c (audit) hash=c038913bbcdb8de1f2bef8db6ffdf4160e8c523a59ceb89e9c12105b048b6abb
+- b8715b0f-9d7c-4183-bbcf-c76406e7a2da (test) hash=b591eac3accde8606dfe7e47341d6bdb4ad53d2a901cfa4e0799ad44cb574691
+- 495d6aff-c6c0-4df0-83b6-44c1bffe5b08 (audit) hash=2d26b5ddf5386bbcce2a0a047a4d3be5c2668b68a5fdbe975b715422f48a7a4f
+- a357df74-145f-440e-8cf4-c094b0b6f714 (test) hash=88a938f5ecb7eddbf8d37c0fca2e61632962a59fc1ddcba30e51b8804a9b1bcd
+- 5f30740c-c58f-49c0-80f6-ca070a70474b (audit) hash=a2ca59eb7c374c59de6ff4afa80bf09d0b40128b15e212d8f5720c0ad5b9694d
+- 5cc377c1-0858-4b19-b592-458c7f64c47a (test) hash=bf647c278095586c8c147a0f4bd84465a4e1d45dc65dda7778064beefe7e7670
+- e311ee48-053a-43af-89da-6881c193085c (audit) hash=575248338d62231999581aa8fe76fd73785a1468343961f8af5483546db9b4d6
+- b7d047fe-0c64-4daa-be35-2ec89e26f73c (test) hash=b41234b0632804c2276fcce7c4b395cd418682fb060488da461b01e5ecd00fe5
+- 5dc12594-fd36-4597-910a-c789700d8b7a (audit) hash=8d3c9aad5ef88e6a89fe625656adb0012512ed331fcc3fd10c982c558c3a5056
+- 455fd1dd-cf33-4d6a-844d-87422ed60536 (test) hash=e1b7fa37b9e4f6cf83552b718ebf160d97d39f6f804b7b76f4ad6b2787276533
+- d0ecd5dd-d33a-4963-8c4f-20401fc177c7 (audit) hash=fd948cc5272b762d8cb3886572c3406eae23226afdf505391c75ec24e3b3623b
 What would make this SATISFIED?
-- Capture audit, test, metric events with OBSERVED trust tier
 - No additional evidence required for this requirement
 
-### Art. 27 FRIA (MISSING)
+### Art. 27 FRIA (PARTIAL)
 
 Fundamental Rights Impact Assessment completed and maintained for high-risk deployment contexts before putting the system into use.
 
 Deterministic reasons:
-- No evidence events found for types: artifact, review, audit
+- Found 12 matching events with observed ratio 1.000
+- Compliance maps signature invalid; green status is downgraded to PARTIAL.
 Evidence references:
-- none
+- f027dc90-2abc-46e9-82f0-42221338da65 (audit) hash=84f1c65582dfd89622f3c851265eae3ceec85cc155bf228a8d80daca4b81c41f
+- 33dd4aae-93f3-4d0a-b69a-9a3f22a4db0c (audit) hash=c038913bbcdb8de1f2bef8db6ffdf4160e8c523a59ceb89e9c12105b048b6abb
+- 495d6aff-c6c0-4df0-83b6-44c1bffe5b08 (audit) hash=2d26b5ddf5386bbcce2a0a047a4d3be5c2668b68a5fdbe975b715422f48a7a4f
+- 5f30740c-c58f-49c0-80f6-ca070a70474b (audit) hash=a2ca59eb7c374c59de6ff4afa80bf09d0b40128b15e212d8f5720c0ad5b9694d
+- e311ee48-053a-43af-89da-6881c193085c (audit) hash=575248338d62231999581aa8fe76fd73785a1468343961f8af5483546db9b4d6
+- 5dc12594-fd36-4597-910a-c789700d8b7a (audit) hash=8d3c9aad5ef88e6a89fe625656adb0012512ed331fcc3fd10c982c558c3a5056
+- d0ecd5dd-d33a-4963-8c4f-20401fc177c7 (audit) hash=fd948cc5272b762d8cb3886572c3406eae23226afdf505391c75ec24e3b3623b
+- 66018621-437a-482f-a815-b17adfff2ceb (audit) hash=2135e32c1b6dc68f0974b3e687e06ece0aff3db1a0b69427764374c280c4a954
+- cbb461a6-9b48-41f8-8500-d78c1d5d4e70 (audit) hash=57796e6324279273d5d5d7ae3ebdc41d55bbbaa1d5ada1a2b73bfa088d731bbb
+- a3db71b5-5304-4cd2-8135-1103b185b73d (audit) hash=fa38c0f10fe2bf739c971ae52ca9f3de0fb177894d9c723cd8e1ece221e52fcd
+- f6171d38-c468-4a2a-ad11-d66996934559 (audit) hash=e3a00d8d416b899436950f6e74c36f5aa883012d926f93aefaf74a65115f6e16
+- 7eb986ba-9ac7-4bef-ba59-78f6f3c4be97 (audit) hash=4a86b1d659b82a9b56440ca66740bcd377d2d520fa09af36bf64c6f668e77861
 What would make this SATISFIED?
-- Capture artifact, review, audit events with OBSERVED trust tier
+- No additional evidence required for this requirement
 
 ### Art. 72 Post-Market Monitoring (PARTIAL)
 
 Post-market monitoring system established and documented proportionate to the nature and risks of the AI system.
 
 Deterministic reasons:
-- No evidence events found for types: metric, audit, test
+- Found 23 matching events with observed ratio 1.000
 - No denied audit events found
+- Compliance maps signature invalid; green status is downgraded to PARTIAL.
 Evidence references:
-- none
+- f027dc90-2abc-46e9-82f0-42221338da65 (audit) hash=84f1c65582dfd89622f3c851265eae3ceec85cc155bf228a8d80daca4b81c41f
+- 33dd4aae-93f3-4d0a-b69a-9a3f22a4db0c (audit) hash=c038913bbcdb8de1f2bef8db6ffdf4160e8c523a59ceb89e9c12105b048b6abb
+- b8715b0f-9d7c-4183-bbcf-c76406e7a2da (test) hash=b591eac3accde8606dfe7e47341d6bdb4ad53d2a901cfa4e0799ad44cb574691
+- 495d6aff-c6c0-4df0-83b6-44c1bffe5b08 (audit) hash=2d26b5ddf5386bbcce2a0a047a4d3be5c2668b68a5fdbe975b715422f48a7a4f
+- a357df74-145f-440e-8cf4-c094b0b6f714 (test) hash=88a938f5ecb7eddbf8d37c0fca2e61632962a59fc1ddcba30e51b8804a9b1bcd
+- 5f30740c-c58f-49c0-80f6-ca070a70474b (audit) hash=a2ca59eb7c374c59de6ff4afa80bf09d0b40128b15e212d8f5720c0ad5b9694d
+- 5cc377c1-0858-4b19-b592-458c7f64c47a (test) hash=bf647c278095586c8c147a0f4bd84465a4e1d45dc65dda7778064beefe7e7670
+- e311ee48-053a-43af-89da-6881c193085c (audit) hash=575248338d62231999581aa8fe76fd73785a1468343961f8af5483546db9b4d6
+- b7d047fe-0c64-4daa-be35-2ec89e26f73c (test) hash=b41234b0632804c2276fcce7c4b395cd418682fb060488da461b01e5ecd00fe5
+- 5dc12594-fd36-4597-910a-c789700d8b7a (audit) hash=8d3c9aad5ef88e6a89fe625656adb0012512ed331fcc3fd10c982c558c3a5056
+- 455fd1dd-cf33-4d6a-844d-87422ed60536 (test) hash=e1b7fa37b9e4f6cf83552b718ebf160d97d39f6f804b7b76f4ad6b2787276533
+- d0ecd5dd-d33a-4963-8c4f-20401fc177c7 (audit) hash=fd948cc5272b762d8cb3886572c3406eae23226afdf505391c75ec24e3b3623b
 What would make this SATISFIED?
-- Capture metric, audit, test events with OBSERVED trust tier
 - No additional evidence required for this requirement
 
 ### Art. 73 Incident Reporting (PARTIAL)
@@ -143,24 +242,47 @@ What would make this SATISFIED?
 Serious incidents detected, reported to authorities within required timelines, and closed with evidence-backed remediation.
 
 Deterministic reasons:
-- No evidence events found for types: audit, tool_action
+- Found 12 matching events with observed ratio 1.000
 - No denied audit events found
+- Compliance maps signature invalid; green status is downgraded to PARTIAL.
 Evidence references:
-- none
+- f027dc90-2abc-46e9-82f0-42221338da65 (audit) hash=84f1c65582dfd89622f3c851265eae3ceec85cc155bf228a8d80daca4b81c41f
+- 33dd4aae-93f3-4d0a-b69a-9a3f22a4db0c (audit) hash=c038913bbcdb8de1f2bef8db6ffdf4160e8c523a59ceb89e9c12105b048b6abb
+- 495d6aff-c6c0-4df0-83b6-44c1bffe5b08 (audit) hash=2d26b5ddf5386bbcce2a0a047a4d3be5c2668b68a5fdbe975b715422f48a7a4f
+- 5f30740c-c58f-49c0-80f6-ca070a70474b (audit) hash=a2ca59eb7c374c59de6ff4afa80bf09d0b40128b15e212d8f5720c0ad5b9694d
+- e311ee48-053a-43af-89da-6881c193085c (audit) hash=575248338d62231999581aa8fe76fd73785a1468343961f8af5483546db9b4d6
+- 5dc12594-fd36-4597-910a-c789700d8b7a (audit) hash=8d3c9aad5ef88e6a89fe625656adb0012512ed331fcc3fd10c982c558c3a5056
+- d0ecd5dd-d33a-4963-8c4f-20401fc177c7 (audit) hash=fd948cc5272b762d8cb3886572c3406eae23226afdf505391c75ec24e3b3623b
+- 66018621-437a-482f-a815-b17adfff2ceb (audit) hash=2135e32c1b6dc68f0974b3e687e06ece0aff3db1a0b69427764374c280c4a954
+- cbb461a6-9b48-41f8-8500-d78c1d5d4e70 (audit) hash=57796e6324279273d5d5d7ae3ebdc41d55bbbaa1d5ada1a2b73bfa088d731bbb
+- a3db71b5-5304-4cd2-8135-1103b185b73d (audit) hash=fa38c0f10fe2bf739c971ae52ca9f3de0fb177894d9c723cd8e1ece221e52fcd
+- f6171d38-c468-4a2a-ad11-d66996934559 (audit) hash=e3a00d8d416b899436950f6e74c36f5aa883012d926f93aefaf74a65115f6e16
+- 7eb986ba-9ac7-4bef-ba59-78f6f3c4be97 (audit) hash=4a86b1d659b82a9b56440ca66740bcd377d2d520fa09af36bf64c6f668e77861
 What would make this SATISFIED?
-- Capture audit, tool_action events with OBSERVED trust tier
 - No additional evidence required for this requirement
 
-### Art. 86 Right to Explanation (MISSING)
+### Art. 86 Right to Explanation (PARTIAL)
 
 Affected persons can obtain clear, meaningful explanations of AI-assisted decisions with contestability and appeal mechanisms.
 
 Deterministic reasons:
-- No evidence events found for types: artifact, audit, review
+- Found 12 matching events with observed ratio 1.000
+- Compliance maps signature invalid; green status is downgraded to PARTIAL.
 Evidence references:
-- none
+- f027dc90-2abc-46e9-82f0-42221338da65 (audit) hash=84f1c65582dfd89622f3c851265eae3ceec85cc155bf228a8d80daca4b81c41f
+- 33dd4aae-93f3-4d0a-b69a-9a3f22a4db0c (audit) hash=c038913bbcdb8de1f2bef8db6ffdf4160e8c523a59ceb89e9c12105b048b6abb
+- 495d6aff-c6c0-4df0-83b6-44c1bffe5b08 (audit) hash=2d26b5ddf5386bbcce2a0a047a4d3be5c2668b68a5fdbe975b715422f48a7a4f
+- 5f30740c-c58f-49c0-80f6-ca070a70474b (audit) hash=a2ca59eb7c374c59de6ff4afa80bf09d0b40128b15e212d8f5720c0ad5b9694d
+- e311ee48-053a-43af-89da-6881c193085c (audit) hash=575248338d62231999581aa8fe76fd73785a1468343961f8af5483546db9b4d6
+- 5dc12594-fd36-4597-910a-c789700d8b7a (audit) hash=8d3c9aad5ef88e6a89fe625656adb0012512ed331fcc3fd10c982c558c3a5056
+- d0ecd5dd-d33a-4963-8c4f-20401fc177c7 (audit) hash=fd948cc5272b762d8cb3886572c3406eae23226afdf505391c75ec24e3b3623b
+- 66018621-437a-482f-a815-b17adfff2ceb (audit) hash=2135e32c1b6dc68f0974b3e687e06ece0aff3db1a0b69427764374c280c4a954
+- cbb461a6-9b48-41f8-8500-d78c1d5d4e70 (audit) hash=57796e6324279273d5d5d7ae3ebdc41d55bbbaa1d5ada1a2b73bfa088d731bbb
+- a3db71b5-5304-4cd2-8135-1103b185b73d (audit) hash=fa38c0f10fe2bf739c971ae52ca9f3de0fb177894d9c723cd8e1ece221e52fcd
+- f6171d38-c468-4a2a-ad11-d66996934559 (audit) hash=e3a00d8d416b899436950f6e74c36f5aa883012d926f93aefaf74a65115f6e16
+- 7eb986ba-9ac7-4bef-ba59-78f6f3c4be97 (audit) hash=4a86b1d659b82a9b56440ca66740bcd377d2d520fa09af36bf64c6f668e77861
 What would make this SATISFIED?
-- Capture artifact, audit, review events with OBSERVED trust tier
+- No additional evidence required for this requirement
 
 ## Non-Claims
 - This report provides evidence-backed signals only; it is not legal advice.

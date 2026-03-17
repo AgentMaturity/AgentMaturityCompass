@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AMC Methodology — Agent Maturity Compass</title>
+<style>
+:root { --bg: #0a0a0a; --fg: #e0e0e0; --accent: #4AEF79; --card: #1a1a1a; }
+body { font-family: system-ui, -apple-system, sans-serif; max-width: 900px; margin: 0 auto; padding: 40px 20px; background: var(--bg); color: var(--fg); line-height: 1.7; }
+h1 { color: var(--accent); font-size: 2rem; }
+h2 { color: var(--accent); font-size: 1.4rem; border-bottom: 1px solid #333; padding-bottom: 8px; }
+a { color: var(--accent); }
+.card { background: var(--card); border-radius: 8px; padding: 24px; margin: 16px 0; }
+table { width: 100%; border-collapse: collapse; margin: 16px 0; }
+th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid #333; }
+th { color: var(--accent); }
+code { background: #222; padding: 2px 6px; border-radius: 4px; font-size: 0.9em; }
+.nav { margin-bottom: 32px; }
+.nav a { margin-right: 16px; text-decoration: none; }
+</style>
+</head>
+<body>
+<div class="nav">
+<a href="index.html">← Home</a>
+<a href="compliance.html">Compliance</a>
+<a href="playground.html">Playground</a>
+<a href="api.html">API</a>
+</div>
+
+<h1>🧭 AMC Methodology</h1>
+<p>How Agent Maturity Compass evaluates AI agent trustworthiness.</p>
+
+<h2>Core Principle: Evidence Over Claims</h2>
+<div class="card">
+<p>AMC scores agents based on <strong>observed behavior</strong>, not self-reported claims. An agent that says "I'm secure" scores differently from an agent that demonstrates security through tamper-evident evidence.</p>
+<p>The gap between what agents claim and what evidence supports is often <strong>84+ points</strong> — the "documentation inflation gap."</p>
+</div>
+
+<h2>Five Dimensions</h2>
+<table>
+<tr><th>Dimension</th><th>What It Measures</th></tr>
+<tr><td>D1 — Governance</td><td>Charter, permissions, approval workflows, action policies</td></tr>
+<tr><td>D2 — Capability</td><td>Task execution, autonomy duration, tool usage, delegation</td></tr>
+<tr><td>D3 — Culture & Alignment</td><td>Safety, honesty, transparency, value coherence</td></tr>
+<tr><td>D4 — Resilience</td><td>Error handling, adversarial robustness, drift detection</td></tr>
+<tr><td>D5 — Skills</td><td>Memory, reasoning, calibration, factuality</td></tr>
+</table>
+
+<h2>Maturity Scale (L0–L5)</h2>
+<table>
+<tr><th>Level</th><th>Name</th><th>Description</th></tr>
+<tr><td>L0</td><td>Unknown</td><td>No evidence collected</td></tr>
+<tr><td>L1</td><td>Ad Hoc</td><td>Some evidence, no structure</td></tr>
+<tr><td>L2</td><td>Developing</td><td>Basic governance, partial coverage</td></tr>
+<tr><td>L3</td><td>Defined</td><td>Systematic processes, evidence-backed</td></tr>
+<tr><td>L4</td><td>Managed</td><td>Quantitative measurement, continuous monitoring</td></tr>
+<tr><td>L5</td><td>Optimizing</td><td>Predictive, self-improving, externally validated</td></tr>
+</table>
+
+<h2>Evidence Trust Tiers</h2>
+<table>
+<tr><th>Tier</th><th>Weight</th><th>How</th></tr>
+<tr><td>OBSERVED_HARDENED</td><td>1.1×</td><td>AMC-controlled adversarial scenarios</td></tr>
+<tr><td>OBSERVED</td><td>1.0×</td><td>Captured via gateway proxy</td></tr>
+<tr><td>ATTESTED</td><td>0.8×</td><td>Cryptographic attestation</td></tr>
+<tr><td>SELF_REPORTED</td><td>0.4×</td><td>Agent's own claims (capped)</td></tr>
+</table>
+
+<h2>Assessment Coverage</h2>
+<div class="card">
+<p><strong>195 diagnostic questions</strong> across 5 dimensions</p>
+<p><strong>119 assurance packs</strong> — red-team attack simulations</p>
+<p><strong>79 scoring modules</strong> — evidence-weighted algorithms</p>
+<p><strong>8 compliance frameworks</strong> — EU AI Act, GDPR, ISO 42001, SOC2, NIST AI RMF, HIPAA, PCI DSS, ISO 27001</p>
+<p><strong>40 industry domain packs</strong> — health, education, finance, mobility, governance, technology, environment</p>
+</div>
+
+<h2>Getting Started</h2>
+<div class="card">
+<pre><code>npm install -g agent-maturity-compass
+amc init
+amc quickscore          # 2-minute assessment
+amc score --tier deep   # Full diagnostic
+amc assurance run --all # Red-team testing
+amc comply report --framework EU_AI_ACT</code></pre>
+</div>
+
+<p style="color:#666;margin-top:40px">© 2026 Agent Maturity Compass — <a href="https://github.com/thewisecrab/AgentMaturityCompass">GitHub</a></p>
+</body>
+</html>

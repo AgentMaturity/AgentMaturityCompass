@@ -29,7 +29,7 @@ jobs:
       - run: npm i -g agent-maturity-compass
       - run: amc doctor
       - run: amc quickscore
-      - run: amc assurance run --scope full
+      - run: amc assurance run --all
 ```
 
 ## GitLab CI
@@ -46,7 +46,7 @@ amc_check:
     - npm i -g agent-maturity-compass
     - amc doctor
     - amc quickscore
-    - amc assurance run --scope full
+    - amc assurance run --all
 ```
 
 ## CircleCI
@@ -63,7 +63,7 @@ jobs:
       - run: npm i -g agent-maturity-compass
       - run: amc doctor
       - run: amc quickscore
-      - run: amc assurance run --scope full
+      - run: amc assurance run --all
 
 workflows:
   amc-workflow:
@@ -85,7 +85,7 @@ amc quickscore
 Then add:
 
 ```bash
-amc assurance run --scope full
+amc assurance run --all
 ```
 
 Only after that should you start failing builds on stricter trust/compliance thresholds.
