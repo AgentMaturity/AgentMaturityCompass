@@ -1,26 +1,7 @@
+# AMC Demo Workspace
+version: "1.0"
+agentId: demo-agent
 profile: dev
-runtimes:
-  claude:
-    command: claude
-    argsTemplate: []
-  gemini:
-    command: gemini
-    argsTemplate: []
-  openclaw:
-    command: openclaw
-    argsTemplate: []
-  mock:
-    command: node
-    argsTemplate:
-      - -e
-      - '{"claimedLevels":{}}'
-  any:
-    command: ""
-    argsTemplate: []
+demo: true
 security:
-  trustBoundaryMode: shared
-supervise:
-  extraEnv:
-    AMC_ENV: dev
-  includeProxyEnv: true
-  customBaseUrlEnvKeys: []
+  trustBoundaryMode: isolated

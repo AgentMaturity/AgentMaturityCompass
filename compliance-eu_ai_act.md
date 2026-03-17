@@ -1,7 +1,7 @@
 # AMC Compliance Report (EU_AI_ACT)
 
 - Agent: default
-- Window: 2026-02-15T06:57:52.886Z -> 2026-03-17T06:57:52.886Z
+- Window: 2026-02-15T08:10:58.227Z -> 2026-03-17T08:10:58.227Z
 - Config trusted: NO (compliance maps missing)
 - Trust coverage: OBSERVED 0.0% | ATTESTED 0.0% | SELF_REPORTED 0.0%
 - Coverage score: 33.3% (S:0 P:8 M:4 U:0)
