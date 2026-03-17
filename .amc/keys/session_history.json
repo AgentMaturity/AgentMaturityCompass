@@ -1,22 +1,7 @@
 [
   {
-    "createdTs": 1770918024721,
-    "fingerprint": "92c7e5f95ce296e95b6be0de358e5bea1de8185590a20677df8179fd7cc46bb8",
-    "publicKeyPem": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAWKw3G4EWoadOAzUTUkmlCTodO7rtLI2JNRWys4OViBM=\n-----END PUBLIC KEY-----\n"
-  },
-  {
-    "createdTs": 1771489813872,
-    "fingerprint": "d4eeb95bb4155447b23defa4d4428d9b8ad27917bdb889476f504eb4926a1ae3",
-    "publicKeyPem": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAcxKMeMh1oY0lEsoHQuaEvytxt4YbqaY+naDc0ZApLWE=\n-----END PUBLIC KEY-----\n"
-  },
-  {
-    "createdTs": 1771866576295,
-    "fingerprint": "00e605dc14d895af9c71d9e6e3b3aab9e8ca1fd170919bfe221987ac491ea899",
-    "publicKeyPem": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEATLxLpiNZWBoaQpE9IZ9sLu2RzgAu/yawvwy+cW/OTlc=\n-----END PUBLIC KEY-----\n"
-  },
-  {
-    "createdTs": 1771867016717,
-    "fingerprint": "8d957917bbcaade768215f278f57f2f81c0b043fd64349a421bc3346b407cb95",
-    "publicKeyPem": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAXpyd8xR24cXOiCJ5Ckusuhgt2jz6zlD/MPPLmyvbSfc=\n-----END PUBLIC KEY-----\n"
+    "createdTs": 1773729778325,
+    "fingerprint": "f539522749521a35d6f5f26e470a5a38727a649b2d207420ef1f34a3c700ff94",
+    "publicKeyPem": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAiMXgwV6WxRTF3d+E1L8XFyqeVNgDRwM53JxSqYgflzk=\n-----END PUBLIC KEY-----\n"
   }
 ]

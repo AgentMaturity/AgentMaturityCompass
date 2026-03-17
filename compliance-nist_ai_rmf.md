@@ -1,7 +1,7 @@
 # AMC Compliance Report (NIST_AI_RMF)
 
 - Agent: default
-- Window: 2026-02-13T08:51:36.333Z -> 2026-03-15T08:51:36.333Z
+- Window: 2026-02-15T05:51:45.499Z -> 2026-03-17T05:51:45.499Z
 - Config trusted: NO (compliance maps signature missing)
 - Trust coverage: OBSERVED 100.0% | ATTESTED 0.0% | SELF_REPORTED 0.0%
 - Coverage score: 50.0% (S:0 P:4 M:0 U:0)
@@ -13,7 +13,7 @@
 Signals for governance structures, approvals, and policy enforcement.
 
 Deterministic reasons:
-- Found 7135 matching events with observed ratio 1.000
+- Found 11811 matching events with observed ratio 1.000
 - Assurance pack 'governance_bypass' score 100 meets threshold
 - Compliance maps signature invalid; green status is downgraded to PARTIAL.
 Evidence references:
@@ -38,7 +38,7 @@ What would make this SATISFIED?
 Signals for context mapping, role boundaries, and risk framing.
 
 Deterministic reasons:
-- Found 7135 matching events with observed ratio 1.000
+- Found 11811 matching events with observed ratio 1.000
 - Compliance maps signature invalid; green status is downgraded to PARTIAL.
 Evidence references:
 - 2fdbcf3f-5754-4a70-9109-b49544d71db3 (audit) hash=23941bf91946bdd7f7f6fcc818024fd798441c23507ccf68d6ed389c1adad7de
@@ -61,7 +61,7 @@ What would make this SATISFIED?
 Signals for measured quality, integrity, and auditability.
 
 Deterministic reasons:
-- Found 12516 matching events with observed ratio 1.000
+- Found 20772 matching events with observed ratio 1.000
 - No denied audit events found
 - Compliance maps signature invalid; green status is downgraded to PARTIAL.
 Evidence references:
@@ -85,7 +85,7 @@ What would make this SATISFIED?
 Signals for active risk response and remediation loops.
 
 Deterministic reasons:
-- Found 7135 matching events with observed ratio 1.000
+- Found 11811 matching events with observed ratio 1.000
 - No denied audit events found
 - Compliance maps signature invalid; green status is downgraded to PARTIAL.
 Evidence references:

@@ -1,7 +1,7 @@
 # AMC Compliance Report (SOC2)
 
 - Agent: default
-- Window: 2026-02-15T05:39:46.025Z -> 2026-03-17T05:39:46.025Z
+- Window: 2026-02-15T05:51:45.501Z -> 2026-03-17T05:51:45.501Z
 - Config trusted: NO (compliance maps signature missing)
 - Trust coverage: OBSERVED 100.0% | ATTESTED 0.0% | SELF_REPORTED 0.0%
 - Coverage score: 50.0% (S:0 P:5 M:0 U:0)

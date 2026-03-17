@@ -5,19 +5,4 @@ adapters:
     proxyBase: http://127.0.0.1:3211
     leaseTtlMinutes: 60
     modelDefault: gpt-4o-mini
-  perAgent:
-    default:
-      preferredAdapter: generic-cli
-      preferredProviderRoute: /openai
-      preferredModel: gpt-test
-      runMode: SUPERVISE
-      leaseScopes:
-        - gateway:llm
-        - toolhub:intent
-        - toolhub:execute
-      routeAllowlist:
-        - /openai
-        - /local
-      modelAllowlist:
-        - gpt-*
-        - "*"
+  perAgent: {}

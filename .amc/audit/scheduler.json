@@ -1,9 +1,0 @@
-{
-  "enabled": true,
-  "lastRefreshTs": null,
-  "nextRefreshTs": 1771576278754,
-  "lastOutcome": {
-    "status": "ERROR",
-    "reason": "workspace not ready"
-  }
-}

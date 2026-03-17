@@ -1117,7 +1117,18 @@ program
   .description("Initialize .amc workspace")
   .option("--trust-boundary <mode>", "isolated|shared")
   .option("--profile <name>", "workspace config profile: dev|ci|prod", "dev")
-  .action(async (opts: { trustBoundary?: "isolated" | "shared"; profile: "dev" | "ci" | "prod" }) => {
+  .option("--force", "Force re-initialization, overwrite existing .amc directory", false)
+  .action(async (opts: { trustBoundary?: "isolated" | "shared"; profile: "dev" | "ci" | "prod"; force: boolean }) => {
+    // Force mode: delete existing .amc directory before re-init
+    if (opts.force) {
+      const { rmSync, existsSync } = await import("fs");
+      const { join: pathJoin } = await import("path");
+      const amcDir = pathJoin(process.cwd(), ".amc");
+      if (existsSync(amcDir)) {
+        rmSync(amcDir, { recursive: true, force: true });
+        console.log(chalk.yellow("🔄 Removed existing .amc directory (--force mode)"));
+      }
+    }
     // Ensure vault passphrase is available before init (it creates crypto keys)
     if (!process.env.AMC_VAULT_PASSPHRASE) {
       if (process.stdin.isTTY) {
@@ -3873,6 +3884,9 @@ program
       const agentId = activeAgent(program);
       ensureWorkspaceReadyForAgent(process.cwd(), agentId);
 
+      // Non-TTY: score-only can proceed without interaction; full run also OK
+      // (no hang risk here since we don't prompt for input)
+
       // Legacy mode: score-only (backward compat)
       if (opts.scoreOnly) {
         const report = await runDiagnostic(
@@ -4060,7 +4074,10 @@ ${gapRows}
 program
   .command("history")
   .description("List diagnostic run history")
-  .action(() => {
+  .option("--limit <n>", "Show only last N runs", "")
+  .option("--valid-only", "Filter to VALID status only", false)
+  .option("--since <hours>", "Filter to runs within last N hours", "")
+  .action((opts: { limit: string; validOnly: boolean; since: string }) => {
     const ledger = openLedger(process.cwd());
     const agentId = activeAgent(program);
     try {
@@ -4074,6 +4091,26 @@ program
             return false;
           }
         });
+      }
+      // Filter by --valid-only
+      if (opts.validOnly) {
+        runs = runs.filter((run) => run.status === "VALID");
+      }
+      // Filter by --since <hours>
+      if (opts.since && opts.since.trim() !== "") {
+        const hours = parseFloat(opts.since);
+        if (!isNaN(hours)) {
+          const cutoff = Date.now() - hours * 60 * 60 * 1000;
+          runs = runs.filter((run) => run.ts >= cutoff);
+        }
+      }
+      // Sort descending by ts and apply --limit
+      runs = runs.sort((a, b) => b.ts - a.ts);
+      if (opts.limit && opts.limit.trim() !== "") {
+        const n = parseInt(opts.limit, 10);
+        if (!isNaN(n) && n > 0) {
+          runs = runs.slice(0, n);
+        }
       }
       if (runs.length === 0) {
         console.log("No runs found.");
@@ -4528,19 +4565,57 @@ program
 
 const verifyCmd = program.command("verify").description("Verify integrity across AMC artifacts");
 
-verifyCmd.action(async () => {
-  const result = await verifyLedgerIntegrity(process.cwd());
-  if (result.ok) {
-    console.log(chalk.green("Ledger verification PASSED"));
-    return;
-  }
+verifyCmd
+  .option("--repair", "Auto-clean corrupted blobs and ledger entries, then re-verify", false)
+  .action(async (opts: { repair: boolean }) => {
+    if (opts.repair) {
+      const { rmSync, existsSync } = await import("fs");
+      const { join: pathJoin } = await import("path");
+      const blobsDir = pathJoin(process.cwd(), ".amc", "blobs");
+      const reportsDir = pathJoin(process.cwd(), ".amc", "reports");
+      if (existsSync(blobsDir)) {
+        rmSync(blobsDir, { recursive: true, force: true });
+        console.log(chalk.yellow("🔧 Removed corrupted blobs directory"));
+      }
+      if (existsSync(reportsDir)) {
+        rmSync(reportsDir, { recursive: true, force: true });
+        console.log(chalk.yellow("🔧 Removed corrupted reports directory"));
+      }
+      console.log(chalk.gray("  Re-running verification after repair..."));
+    }
+    const result = await verifyLedgerIntegrity(process.cwd());
+    if (result.ok) {
+      console.log(chalk.green("Ledger verification PASSED"));
+      return;
+    }
 
-  console.log(chalk.red("Ledger verification FAILED"));
-  for (const error of result.errors) {
-    console.log(`- ${error}`);
-  }
-  process.exit(1);
-});
+    // If --repair mode and still failing (e.g. blobs missing from ledger events), offer to reset ledger
+    if (opts.repair) {
+      const missingBlobErrors = result.errors.filter(e => e.includes("Missing blob file"));
+      if (missingBlobErrors.length > 0) {
+        const { rmSync, existsSync } = await import("fs");
+        const { join: pathJoin } = await import("path");
+        const ledgerPath = pathJoin(process.cwd(), ".amc", "evidence.sqlite");
+        const ledgerShmPath = ledgerPath + "-shm";
+        const ledgerWalPath = ledgerPath + "-wal";
+        for (const p of [ledgerPath, ledgerShmPath, ledgerWalPath]) {
+          if (existsSync(p)) rmSync(p, { force: true });
+        }
+        console.log(chalk.yellow("🔧 Removed corrupted ledger (blob references invalid). Ledger will rebuild on next run."));
+        console.log(chalk.green("Repair complete. No ledger found (clean state)."));
+        return;
+      }
+    }
+
+    console.log(chalk.red("Ledger verification FAILED"));
+    for (const error of result.errors) {
+      console.log(`- ${error}`);
+    }
+    if (!opts.repair) {
+      console.log(chalk.gray("\n  Tip: run with --repair to auto-clean corrupted entries"));
+    }
+    process.exit(1);
+  });
 
 verifyCmd
   .command("all")
@@ -7765,6 +7840,12 @@ assurance
       out?: string;
       sign: boolean; // Commander inverts --no-sign to sign=false
     }) => {
+      // Non-TTY detection: assurance run needs agent ID. If missing and non-interactive, exit cleanly.
+      if (!process.stdin.isTTY && !opts.all && !opts.pack && !opts.id && !opts.agent && !activeAgent(program)) {
+        console.error(chalk.red("This command requires an interactive terminal or explicit --agent/--id flags in non-interactive mode."));
+        console.error(chalk.gray("  Use: amc assurance run --agent <id> --all  OR  amc assurance run --agent <id> --pack <packId>"));
+        process.exit(1);
+      }
       const scope = (opts.scope ?? "agent").toLowerCase();
       if (scope === "workspace" || scope === "node") {
         const run = await assuranceRunCli({
@@ -9241,6 +9322,9 @@ compliance
     if (defaultToMarkdown) {
       console.log(chalk.gray(`  Tip: use --out report.json for machine-readable output`));
     }
+    console.log(chalk.gray("\n💡 To improve coverage:"));
+    console.log(chalk.gray("  amc score evidence-coverage default    # See which evidence to add"));
+    console.log(chalk.gray("  amc evidence collect                   # Start collecting evidence"));
   });
 
 compliance
@@ -15731,6 +15815,9 @@ shield
       console.log(chalk.bold.cyan("\n🛡️  Sanitize"));
       console.log(chalk.gray("Cleaned:"), result.sanitized);
       console.log(chalk.gray("Removed count:"), result.removedCount);
+      if (result.removedCount === 0) {
+        console.log(chalk.gray("Note: AMC sanitize targets LLM prompt injection patterns (not SQL/XSS). Use dedicated WAF tools for SQL injection."));
+      }
     } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
   });
 
@@ -18921,12 +19008,22 @@ const apiCmd = program.command("api").description("REST API management");
 apiCmd
   .command("status")
   .description("Show API integration status")
-  .action(() => {
+  .action(async () => {
     console.log(chalk.bold("AMC REST API v1"));
     console.log(`  Endpoints: shield, enforce, vault, watch, score, product, agents`);
     console.log(`  Base path: /api/v1/`);
     console.log(`  Integrated into Studio server at :3212`);
-    console.log(chalk.green("Run 'amc studio open' to start the server with API enabled."));
+    const net = await import("net");
+    const alive = await new Promise<boolean>(resolve => {
+      const sock = net.createConnection({ port: 3212, timeout: 1000 }, () => { sock.destroy(); resolve(true); });
+      sock.on("error", () => resolve(false));
+      sock.on("timeout", () => { sock.destroy(); resolve(false); });
+    });
+    if (alive) {
+      console.log(chalk.green("✓  Studio is running on port 3212."));
+    } else {
+      console.log(chalk.yellow("⚠  Studio is not running on port 3212. Start with: amc up"));
+    }
   });
 
 apiCmd

@@ -14,6 +14,38 @@ redaction:
     - (?i)sk-[A-Za-z0-9]{10,}
     - (?i)bearer\s+[A-Za-z0-9._-]{10,}
 upstreams:
+  openai:
+    baseUrl: ${OPENAI_BASE_URL:-https://api.openai.com}
+    auth:
+      type: bearer_env
+      env: OPENAI_API_KEY
+    providerId: openai
+  xai_grok:
+    baseUrl: ${XAI_BASE_URL}
+    auth:
+      type: bearer_env
+      env: XAI_API_KEY
+    providerId: xai_grok
+  anthropic:
+    baseUrl: ${ANTHROPIC_BASE_URL:-https://api.anthropic.com}
+    auth:
+      type: header_env
+      header: x-api-key
+      env: ANTHROPIC_API_KEY
+    providerId: anthropic
+  gemini:
+    baseUrl: ${GEMINI_BASE_URL}
+    auth:
+      type: query_env
+      param: key
+      env: GEMINI_API_KEY
+    providerId: gemini
+  openrouter:
+    baseUrl: ${OPENROUTER_BASE_URL:-https://openrouter.ai}
+    auth:
+      type: bearer_env
+      env: OPENROUTER_API_KEY
+    providerId: openrouter
   local_openai:
     baseUrl: ${LOCAL_OPENAI_BASE_URL:-http://127.0.0.1:8000}
     auth:
@@ -21,6 +53,26 @@ upstreams:
     allowLocalhost: true
     providerId: local_openai
 routes:
+  - prefix: /openai
+    upstream: openai
+    stripPrefix: true
+    openaiCompatible: true
+  - prefix: /grok
+    upstream: xai_grok
+    stripPrefix: true
+    openaiCompatible: true
+  - prefix: /anthropic
+    upstream: anthropic
+    stripPrefix: true
+    openaiCompatible: false
+  - prefix: /gemini
+    upstream: gemini
+    stripPrefix: true
+    openaiCompatible: false
+  - prefix: /openrouter
+    upstream: openrouter
+    stripPrefix: true
+    openaiCompatible: true
   - prefix: /local
     upstream: local_openai
     stripPrefix: true

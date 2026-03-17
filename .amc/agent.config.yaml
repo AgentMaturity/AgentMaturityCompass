@@ -17,5 +17,6 @@ provider:
   auth:
     type: bearer_env
     env: OPENAI_API_KEY
-createdTs: 1771489818226
-updatedTs: 1771489818226
+environment: development
+createdTs: 1773729778484
+updatedTs: 1773729778484

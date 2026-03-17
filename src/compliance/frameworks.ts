@@ -1,4 +1,4 @@
-export type ComplianceFramework = "SOC2" | "NIST_AI_RMF" | "ISO_27001" | "ISO_42001" | "EU_AI_ACT" | "GDPR" | "MITRE_ATLAS" | "OWASP_API_TOP10" | "HIPAA" | "SOX" | "FEDRAMP";
+export type ComplianceFramework = "SOC2" | "NIST_AI_RMF" | "ISO_27001" | "ISO_42001" | "EU_AI_ACT" | "GDPR" | "MITRE_ATLAS" | "OWASP_API_TOP10" | "HIPAA" | "SOX" | "FEDRAMP" | "PCI_DSS";
 
 export interface ComplianceFrameworkFamily {
   framework: ComplianceFramework;
@@ -170,6 +170,24 @@ export const complianceFrameworkFamilies: ComplianceFrameworkFamily[] = [
       "SC System and Communications Protection",
       "SI System and Information Integrity"
     ]
+  },
+  {
+    framework: "PCI_DSS",
+    displayName: "PCI DSS v4.0 (Payment Card Industry Data Security Standard)",
+    categories: [
+      "Req 1 Install and Maintain Network Security Controls",
+      "Req 2 Apply Secure Configurations",
+      "Req 3 Protect Stored Account Data",
+      "Req 4 Protect Cardholder Data in Transit",
+      "Req 5 Protect Against Malicious Software",
+      "Req 6 Develop and Maintain Secure Systems",
+      "Req 7 Restrict Access by Business Need",
+      "Req 8 Identify Users and Authenticate Access",
+      "Req 9 Restrict Physical Access",
+      "Req 10 Log and Monitor All Access",
+      "Req 11 Test Security Regularly",
+      "Req 12 Support Information Security with Organizational Policies"
+    ]
   }
 ];
 
@@ -195,6 +213,7 @@ export function normalizeFrameworkName(input: string): ComplianceFramework | nul
     "iso-27001": "ISO_27001", "iso27001": "ISO_27001",
     "mitre": "MITRE_ATLAS", "mitre-atlas": "MITRE_ATLAS",
     "owasp": "OWASP_API_TOP10", "owasp-llm": "OWASP_API_TOP10", "owasp-api": "OWASP_API_TOP10",
+    "pci": "PCI_DSS", "pci-dss": "PCI_DSS", "pcidss": "PCI_DSS", "pci_dss": "PCI_DSS",
   };
   return aliases[input.toLowerCase()] ?? null;
 }

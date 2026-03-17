@@ -8,6 +8,7 @@ mechanicProfiles:
         AMC-1.1: 4
         AMC-1.10: 4
         AMC-1.11: 4
+        AMC-1.12: 4
         AMC-1.2: 4
         AMC-1.3: 4
         AMC-1.4: 4
@@ -17,10 +18,21 @@ mechanicProfiles:
         AMC-1.8: 4
         AMC-1.9: 4
         AMC-2.1: 4
+        AMC-2.10: 4
+        AMC-2.11: 4
+        AMC-2.12: 4
+        AMC-2.13: 4
+        AMC-2.14: 4
+        AMC-2.15: 4
+        AMC-2.16: 4
         AMC-2.2: 4
         AMC-2.3: 4
         AMC-2.4: 4
         AMC-2.5: 4
+        AMC-2.6: 4
+        AMC-2.7: 4
+        AMC-2.8: 4
+        AMC-2.9: 4
         AMC-3.1.1: 5
         AMC-3.1.2: 5
         AMC-3.1.3: 5
@@ -37,7 +49,16 @@ mechanicProfiles:
         AMC-3.3.3: 5
         AMC-3.3.4: 5
         AMC-3.3.5: 5
+        AMC-3.4.1: 5
+        AMC-3.4.2: 5
+        AMC-3.4.3: 5
+        AMC-3.5.1: 5
+        AMC-3.5.2: 5
+        AMC-3.5.3: 5
         AMC-4.1: 5
+        AMC-4.10: 5
+        AMC-4.11: 5
+        AMC-4.12: 5
         AMC-4.2: 5
         AMC-4.3: 5
         AMC-4.4: 5
@@ -47,12 +68,138 @@ mechanicProfiles:
         AMC-4.8: 5
         AMC-4.9: 5
         AMC-5.1: 4
+        AMC-5.10: 4
+        AMC-5.11: 4
+        AMC-5.12: 4
+        AMC-5.13: 4
+        AMC-5.14: 4
+        AMC-5.15: 4
+        AMC-5.16: 4
+        AMC-5.17: 4
+        AMC-5.18: 4
+        AMC-5.19: 4
         AMC-5.2: 4
+        AMC-5.20: 4
+        AMC-5.21: 4
+        AMC-5.22: 4
+        AMC-5.23: 4
+        AMC-5.24: 4
+        AMC-5.25: 4
+        AMC-5.26: 4
+        AMC-5.27: 4
+        AMC-5.28: 4
         AMC-5.3: 4
         AMC-5.4: 4
         AMC-5.5: 4
         AMC-5.6: 4
         AMC-5.7: 4
+        AMC-5.8: 4
+        AMC-5.9: 4
+        AMC-6.1: 4
+        AMC-6.10: 4
+        AMC-6.11: 4
+        AMC-6.12: 4
+        AMC-6.13: 4
+        AMC-6.14: 4
+        AMC-6.15: 4
+        AMC-6.16: 4
+        AMC-6.17: 4
+        AMC-6.18: 4
+        AMC-6.19: 4
+        AMC-6.2: 4
+        AMC-6.20: 4
+        AMC-6.21: 4
+        AMC-6.22: 4
+        AMC-6.23: 4
+        AMC-6.24: 4
+        AMC-6.25: 4
+        AMC-6.26: 4
+        AMC-6.27: 4
+        AMC-6.28: 4
+        AMC-6.29: 4
+        AMC-6.3: 4
+        AMC-6.30: 4
+        AMC-6.31: 4
+        AMC-6.32: 4
+        AMC-6.33: 4
+        AMC-6.34: 4
+        AMC-6.35: 4
+        AMC-6.36: 4
+        AMC-6.37: 4
+        AMC-6.38: 4
+        AMC-6.39: 4
+        AMC-6.4: 4
+        AMC-6.40: 4
+        AMC-6.41: 4
+        AMC-6.42: 4
+        AMC-6.43: 4
+        AMC-6.44: 4
+        AMC-6.45: 4
+        AMC-6.46: 4
+        AMC-6.47: 4
+        AMC-6.48: 4
+        AMC-6.49: 4
+        AMC-6.5: 4
+        AMC-6.50: 4
+        AMC-6.51: 4
+        AMC-6.52: 4
+        AMC-6.53: 4
+        AMC-6.54: 4
+        AMC-6.55: 4
+        AMC-6.56: 4
+        AMC-6.57: 4
+        AMC-6.6: 4
+        AMC-6.7: 4
+        AMC-6.8: 4
+        AMC-6.9: 4
+        AMC-AAC-1: 4
+        AMC-APS-1: 4
+        AMC-BCON-1: 4
+        AMC-COST-1: 4
+        AMC-EAM-1: 4
+        AMC-GOV-PROACTIVE-1: 4
+        AMC-HOQ-1: 4
+        AMC-HOQ-2: 4
+        AMC-MBR-1: 4
+        AMC-MCP-1: 4
+        AMC-MCP-2: 4
+        AMC-MCP-3: 4
+        AMC-MEM-1.1: 5
+        AMC-MEM-1.2: 5
+        AMC-MEM-2.1: 5
+        AMC-MEM-3.1: 5
+        AMC-MEM-3.2: 5
+        AMC-MEM-3.3: 5
+        AMC-MEM-3.4: 5
+        AMC-MSA-1: 4
+        AMC-OC-1: 4
+        AMC-OC-2: 4
+        AMC-OC-3: 4
+        AMC-OC-4: 4
+        AMC-OC-5: 4
+        AMC-OC-6: 4
+        AMC-OC-7: 4
+        AMC-OC-8: 4
+        AMC-OINT-1: 4
+        AMC-OPDISC-1: 4
+        AMC-OPDISC-2: 4
+        AMC-OPDISC-3: 4
+        AMC-OPDISC-4: 4
+        AMC-OPDISC-5: 4
+        AMC-OPDISC-6: 4
+        AMC-OPDISC-7: 4
+        AMC-OPDISC-8: 4
+        AMC-OPS-1: 4
+        AMC-SCI-1: 4
+        AMC-SCI-2: 4
+        AMC-SCI-3: 4
+        AMC-SOCIAL-1: 5
+        AMC-SPORT-1: 4
+        AMC-TAS-1: 4
+        AMC-THR-1: 5
+        AMC-THR-2: 5
+        AMC-THR-3: 5
+        AMC-ZAP-1: 4
       recommended:
         policyPacks:
           - code-agent.high
@@ -71,6 +218,7 @@ mechanicProfiles:
         AMC-1.1: 5
         AMC-1.10: 5
         AMC-1.11: 5
+        AMC-1.12: 5
         AMC-1.2: 5
         AMC-1.3: 5
         AMC-1.4: 5
@@ -80,10 +228,21 @@ mechanicProfiles:
         AMC-1.8: 5
         AMC-1.9: 5
         AMC-2.1: 4
+        AMC-2.10: 4
+        AMC-2.11: 4
+        AMC-2.12: 4
+        AMC-2.13: 4
+        AMC-2.14: 4
+        AMC-2.15: 4
+        AMC-2.16: 4
         AMC-2.2: 4
         AMC-2.3: 4
         AMC-2.4: 4
         AMC-2.5: 4
+        AMC-2.6: 4
+        AMC-2.7: 4
+        AMC-2.8: 4
+        AMC-2.9: 4
         AMC-3.1.1: 4
         AMC-3.1.2: 4
         AMC-3.1.3: 4
@@ -100,7 +259,16 @@ mechanicProfiles:
         AMC-3.3.3: 4
         AMC-3.3.4: 4
         AMC-3.3.5: 4
+        AMC-3.4.1: 4
+        AMC-3.4.2: 4
+        AMC-3.4.3: 4
+        AMC-3.5.1: 4
+        AMC-3.5.2: 4
+        AMC-3.5.3: 4
         AMC-4.1: 4
+        AMC-4.10: 4
+        AMC-4.11: 4
+        AMC-4.12: 4
         AMC-4.2: 4
         AMC-4.3: 4
         AMC-4.4: 4
@@ -110,12 +278,138 @@ mechanicProfiles:
         AMC-4.8: 4
         AMC-4.9: 4
         AMC-5.1: 5
+        AMC-5.10: 5
+        AMC-5.11: 5
+        AMC-5.12: 5
+        AMC-5.13: 5
+        AMC-5.14: 5
+        AMC-5.15: 5
+        AMC-5.16: 5
+        AMC-5.17: 5
+        AMC-5.18: 5
+        AMC-5.19: 5
         AMC-5.2: 5
+        AMC-5.20: 5
+        AMC-5.21: 5
+        AMC-5.22: 5
+        AMC-5.23: 5
+        AMC-5.24: 5
+        AMC-5.25: 5
+        AMC-5.26: 5
+        AMC-5.27: 5
+        AMC-5.28: 5
         AMC-5.3: 5
         AMC-5.4: 5
         AMC-5.5: 5
         AMC-5.6: 5
         AMC-5.7: 5
+        AMC-5.8: 5
+        AMC-5.9: 5
+        AMC-6.1: 5
+        AMC-6.10: 5
+        AMC-6.11: 5
+        AMC-6.12: 5
+        AMC-6.13: 5
+        AMC-6.14: 5
+        AMC-6.15: 5
+        AMC-6.16: 5
+        AMC-6.17: 5
+        AMC-6.18: 5
+        AMC-6.19: 5
+        AMC-6.2: 5
+        AMC-6.20: 5
+        AMC-6.21: 5
+        AMC-6.22: 5
+        AMC-6.23: 5
+        AMC-6.24: 5
+        AMC-6.25: 5
+        AMC-6.26: 5
+        AMC-6.27: 5
+        AMC-6.28: 5
+        AMC-6.29: 5
+        AMC-6.3: 5
+        AMC-6.30: 5
+        AMC-6.31: 5
+        AMC-6.32: 5
+        AMC-6.33: 5
+        AMC-6.34: 5
+        AMC-6.35: 5
+        AMC-6.36: 5
+        AMC-6.37: 5
+        AMC-6.38: 5
+        AMC-6.39: 5
+        AMC-6.4: 5
+        AMC-6.40: 5
+        AMC-6.41: 5
+        AMC-6.42: 5
+        AMC-6.43: 5
+        AMC-6.44: 5
+        AMC-6.45: 5
+        AMC-6.46: 5
+        AMC-6.47: 5
+        AMC-6.48: 5
+        AMC-6.49: 5
+        AMC-6.5: 5
+        AMC-6.50: 5
+        AMC-6.51: 5
+        AMC-6.52: 5
+        AMC-6.53: 5
+        AMC-6.54: 5
+        AMC-6.55: 5
+        AMC-6.56: 5
+        AMC-6.57: 5
+        AMC-6.6: 5
+        AMC-6.7: 5
+        AMC-6.8: 5
+        AMC-6.9: 5
+        AMC-AAC-1: 5
+        AMC-APS-1: 5
+        AMC-BCON-1: 4
+        AMC-COST-1: 5
+        AMC-EAM-1: 5
+        AMC-GOV-PROACTIVE-1: 4
+        AMC-HOQ-1: 4
+        AMC-HOQ-2: 4
+        AMC-MBR-1: 5
+        AMC-MCP-1: 5
+        AMC-MCP-2: 5
+        AMC-MCP-3: 5
+        AMC-MEM-1.1: 4
+        AMC-MEM-1.2: 4
+        AMC-MEM-2.1: 4
+        AMC-MEM-3.1: 4
+        AMC-MEM-3.2: 4
+        AMC-MEM-3.3: 4
+        AMC-MEM-3.4: 4
+        AMC-MSA-1: 5
+        AMC-OC-1: 5
+        AMC-OC-2: 5
+        AMC-OC-3: 5
+        AMC-OC-4: 5
+        AMC-OC-5: 5
+        AMC-OC-6: 5
+        AMC-OC-7: 5
+        AMC-OC-8: 5
+        AMC-OINT-1: 5
+        AMC-OPDISC-1: 5
+        AMC-OPDISC-2: 5
+        AMC-OPDISC-3: 5
+        AMC-OPDISC-4: 5
+        AMC-OPDISC-5: 5
+        AMC-OPDISC-6: 5
+        AMC-OPDISC-7: 5
+        AMC-OPDISC-8: 5
+        AMC-OPS-1: 5
+        AMC-SCI-1: 5
+        AMC-SCI-2: 5
+        AMC-SCI-3: 5
+        AMC-SOCIAL-1: 4
+        AMC-SPORT-1: 5
+        AMC-TAS-1: 5
+        AMC-THR-1: 4
+        AMC-THR-2: 4
+        AMC-THR-3: 4
+        AMC-ZAP-1: 5
       recommended:
         policyPacks:
           - code-agent.high
@@ -136,6 +430,7 @@ mechanicProfiles:
         AMC-1.1: 4
         AMC-1.10: 4
         AMC-1.11: 4
+        AMC-1.12: 4
         AMC-1.2: 4
         AMC-1.3: 4
         AMC-1.4: 4
@@ -145,10 +440,21 @@ mechanicProfiles:
         AMC-1.8: 4
         AMC-1.9: 4
         AMC-2.1: 4
+        AMC-2.10: 4
+        AMC-2.11: 4
+        AMC-2.12: 4
+        AMC-2.13: 4
+        AMC-2.14: 4
+        AMC-2.15: 4
+        AMC-2.16: 4
         AMC-2.2: 4
         AMC-2.3: 4
         AMC-2.4: 4
         AMC-2.5: 4
+        AMC-2.6: 4
+        AMC-2.7: 4
+        AMC-2.8: 4
+        AMC-2.9: 4
         AMC-3.1.1: 5
         AMC-3.1.2: 5
         AMC-3.1.3: 5
@@ -165,7 +471,16 @@ mechanicProfiles:
         AMC-3.3.3: 5
         AMC-3.3.4: 5
         AMC-3.3.5: 5
+        AMC-3.4.1: 5
+        AMC-3.4.2: 5
+        AMC-3.4.3: 5
+        AMC-3.5.1: 5
+        AMC-3.5.2: 5
+        AMC-3.5.3: 5
         AMC-4.1: 4
+        AMC-4.10: 4
+        AMC-4.11: 4
+        AMC-4.12: 4
         AMC-4.2: 4
         AMC-4.3: 4
         AMC-4.4: 4
@@ -175,12 +490,138 @@ mechanicProfiles:
         AMC-4.8: 4
         AMC-4.9: 4
         AMC-5.1: 4
+        AMC-5.10: 4
+        AMC-5.11: 4
+        AMC-5.12: 4
+        AMC-5.13: 4
+        AMC-5.14: 4
+        AMC-5.15: 4
+        AMC-5.16: 4
+        AMC-5.17: 4
+        AMC-5.18: 4
+        AMC-5.19: 4
         AMC-5.2: 4
+        AMC-5.20: 4
+        AMC-5.21: 4
+        AMC-5.22: 4
+        AMC-5.23: 4
+        AMC-5.24: 4
+        AMC-5.25: 4
+        AMC-5.26: 4
+        AMC-5.27: 4
+        AMC-5.28: 4
         AMC-5.3: 4
         AMC-5.4: 4
         AMC-5.5: 4
         AMC-5.6: 4
         AMC-5.7: 4
+        AMC-5.8: 4
+        AMC-5.9: 4
+        AMC-6.1: 4
+        AMC-6.10: 4
+        AMC-6.11: 4
+        AMC-6.12: 4
+        AMC-6.13: 4
+        AMC-6.14: 4
+        AMC-6.15: 4
+        AMC-6.16: 4
+        AMC-6.17: 4
+        AMC-6.18: 4
+        AMC-6.19: 4
+        AMC-6.2: 4
+        AMC-6.20: 4
+        AMC-6.21: 4
+        AMC-6.22: 4
+        AMC-6.23: 4
+        AMC-6.24: 4
+        AMC-6.25: 4
+        AMC-6.26: 4
+        AMC-6.27: 4
+        AMC-6.28: 4
+        AMC-6.29: 4
+        AMC-6.3: 4
+        AMC-6.30: 4
+        AMC-6.31: 4
+        AMC-6.32: 4
+        AMC-6.33: 4
+        AMC-6.34: 4
+        AMC-6.35: 4
+        AMC-6.36: 4
+        AMC-6.37: 4
+        AMC-6.38: 4
+        AMC-6.39: 4
+        AMC-6.4: 4
+        AMC-6.40: 4
+        AMC-6.41: 4
+        AMC-6.42: 4
+        AMC-6.43: 4
+        AMC-6.44: 4
+        AMC-6.45: 4
+        AMC-6.46: 4
+        AMC-6.47: 4
+        AMC-6.48: 4
+        AMC-6.49: 4
+        AMC-6.5: 4
+        AMC-6.50: 4
+        AMC-6.51: 4
+        AMC-6.52: 4
+        AMC-6.53: 4
+        AMC-6.54: 4
+        AMC-6.55: 4
+        AMC-6.56: 4
+        AMC-6.57: 4
+        AMC-6.6: 4
+        AMC-6.7: 4
+        AMC-6.8: 4
+        AMC-6.9: 4
+        AMC-AAC-1: 4
+        AMC-APS-1: 4
+        AMC-BCON-1: 4
+        AMC-COST-1: 4
+        AMC-EAM-1: 4
+        AMC-GOV-PROACTIVE-1: 4
+        AMC-HOQ-1: 4
+        AMC-HOQ-2: 4
+        AMC-MBR-1: 4
+        AMC-MCP-1: 4
+        AMC-MCP-2: 4
+        AMC-MCP-3: 4
+        AMC-MEM-1.1: 4
+        AMC-MEM-1.2: 4
+        AMC-MEM-2.1: 4
+        AMC-MEM-3.1: 4
+        AMC-MEM-3.2: 4
+        AMC-MEM-3.3: 4
+        AMC-MEM-3.4: 4
+        AMC-MSA-1: 4
+        AMC-OC-1: 4
+        AMC-OC-2: 4
+        AMC-OC-3: 4
+        AMC-OC-4: 4
+        AMC-OC-5: 4
+        AMC-OC-6: 4
+        AMC-OC-7: 4
+        AMC-OC-8: 4
+        AMC-OINT-1: 4
+        AMC-OPDISC-1: 4
+        AMC-OPDISC-2: 4
+        AMC-OPDISC-3: 4
+        AMC-OPDISC-4: 4
+        AMC-OPDISC-5: 4
+        AMC-OPDISC-6: 4
+        AMC-OPDISC-7: 4
+        AMC-OPDISC-8: 4
+        AMC-OPS-1: 4
+        AMC-SCI-1: 4
+        AMC-SCI-2: 4
+        AMC-SCI-3: 4
+        AMC-SOCIAL-1: 5
+        AMC-SPORT-1: 4
+        AMC-TAS-1: 4
+        AMC-THR-1: 4
+        AMC-THR-2: 4
+        AMC-THR-3: 4
+        AMC-ZAP-1: 4
       recommended:
         policyPacks:
           - support-agent.high
@@ -199,6 +640,7 @@ mechanicProfiles:
         AMC-1.1: 5
         AMC-1.10: 5
         AMC-1.11: 5
+        AMC-1.12: 5
         AMC-1.2: 5
         AMC-1.3: 5
         AMC-1.4: 5
@@ -208,10 +650,21 @@ mechanicProfiles:
         AMC-1.8: 5
         AMC-1.9: 5
         AMC-2.1: 4
+        AMC-2.10: 4
+        AMC-2.11: 4
+        AMC-2.12: 4
+        AMC-2.13: 4
+        AMC-2.14: 4
+        AMC-2.15: 4
+        AMC-2.16: 4
         AMC-2.2: 4
         AMC-2.3: 4
         AMC-2.4: 4
         AMC-2.5: 4
+        AMC-2.6: 4
+        AMC-2.7: 4
+        AMC-2.8: 4
+        AMC-2.9: 4
         AMC-3.1.1: 4
         AMC-3.1.2: 4
         AMC-3.1.3: 4
@@ -228,7 +681,16 @@ mechanicProfiles:
         AMC-3.3.3: 4
         AMC-3.3.4: 4
         AMC-3.3.5: 4
+        AMC-3.4.1: 4
+        AMC-3.4.2: 4
+        AMC-3.4.3: 4
+        AMC-3.5.1: 4
+        AMC-3.5.2: 4
+        AMC-3.5.3: 4
         AMC-4.1: 5
+        AMC-4.10: 5
+        AMC-4.11: 5
+        AMC-4.12: 5
         AMC-4.2: 5
         AMC-4.3: 5
         AMC-4.4: 5
@@ -238,12 +700,138 @@ mechanicProfiles:
         AMC-4.8: 5
         AMC-4.9: 5
         AMC-5.1: 5
+        AMC-5.10: 5
+        AMC-5.11: 5
+        AMC-5.12: 5
+        AMC-5.13: 5
+        AMC-5.14: 5
+        AMC-5.15: 5
+        AMC-5.16: 5
+        AMC-5.17: 5
+        AMC-5.18: 5
+        AMC-5.19: 5
         AMC-5.2: 5
+        AMC-5.20: 5
+        AMC-5.21: 5
+        AMC-5.22: 5
+        AMC-5.23: 5
+        AMC-5.24: 5
+        AMC-5.25: 5
+        AMC-5.26: 5
+        AMC-5.27: 5
+        AMC-5.28: 5
         AMC-5.3: 5
         AMC-5.4: 5
         AMC-5.5: 5
         AMC-5.6: 5
         AMC-5.7: 5
+        AMC-5.8: 5
+        AMC-5.9: 5
+        AMC-6.1: 5
+        AMC-6.10: 5
+        AMC-6.11: 5
+        AMC-6.12: 5
+        AMC-6.13: 5
+        AMC-6.14: 5
+        AMC-6.15: 5
+        AMC-6.16: 5
+        AMC-6.17: 5
+        AMC-6.18: 5
+        AMC-6.19: 5
+        AMC-6.2: 5
+        AMC-6.20: 5
+        AMC-6.21: 5
+        AMC-6.22: 5
+        AMC-6.23: 5
+        AMC-6.24: 5
+        AMC-6.25: 5
+        AMC-6.26: 5
+        AMC-6.27: 5
+        AMC-6.28: 5
+        AMC-6.29: 5
+        AMC-6.3: 5
+        AMC-6.30: 5
+        AMC-6.31: 5
+        AMC-6.32: 5
+        AMC-6.33: 5
+        AMC-6.34: 5
+        AMC-6.35: 5
+        AMC-6.36: 5
+        AMC-6.37: 5
+        AMC-6.38: 5
+        AMC-6.39: 5
+        AMC-6.4: 5
+        AMC-6.40: 5
+        AMC-6.41: 5
+        AMC-6.42: 5
+        AMC-6.43: 5
+        AMC-6.44: 5
+        AMC-6.45: 5
+        AMC-6.46: 5
+        AMC-6.47: 5
+        AMC-6.48: 5
+        AMC-6.49: 5
+        AMC-6.5: 5
+        AMC-6.50: 5
+        AMC-6.51: 5
+        AMC-6.52: 5
+        AMC-6.53: 5
+        AMC-6.54: 5
+        AMC-6.55: 5
+        AMC-6.56: 5
+        AMC-6.57: 5
+        AMC-6.6: 5
+        AMC-6.7: 5
+        AMC-6.8: 5
+        AMC-6.9: 5
+        AMC-AAC-1: 5
+        AMC-APS-1: 5
+        AMC-BCON-1: 4
+        AMC-COST-1: 5
+        AMC-EAM-1: 5
+        AMC-GOV-PROACTIVE-1: 4
+        AMC-HOQ-1: 4
+        AMC-HOQ-2: 4
+        AMC-MBR-1: 5
+        AMC-MCP-1: 5
+        AMC-MCP-2: 5
+        AMC-MCP-3: 5
+        AMC-MEM-1.1: 5
+        AMC-MEM-1.2: 5
+        AMC-MEM-2.1: 5
+        AMC-MEM-3.1: 5
+        AMC-MEM-3.2: 5
+        AMC-MEM-3.3: 5
+        AMC-MEM-3.4: 5
+        AMC-MSA-1: 5
+        AMC-OC-1: 5
+        AMC-OC-2: 5
+        AMC-OC-3: 5
+        AMC-OC-4: 5
+        AMC-OC-5: 5
+        AMC-OC-6: 5
+        AMC-OC-7: 5
+        AMC-OC-8: 5
+        AMC-OINT-1: 5
+        AMC-OPDISC-1: 5
+        AMC-OPDISC-2: 5
+        AMC-OPDISC-3: 5
+        AMC-OPDISC-4: 5
+        AMC-OPDISC-5: 5
+        AMC-OPDISC-6: 5
+        AMC-OPDISC-7: 5
+        AMC-OPDISC-8: 5
+        AMC-OPS-1: 5
+        AMC-SCI-1: 5
+        AMC-SCI-2: 5
+        AMC-SCI-3: 5
+        AMC-SOCIAL-1: 4
+        AMC-SPORT-1: 5
+        AMC-TAS-1: 5
+        AMC-THR-1: 5
+        AMC-THR-2: 5
+        AMC-THR-3: 5
+        AMC-ZAP-1: 5
       recommended:
         policyPacks:
           - code-agent.high
@@ -264,6 +852,7 @@ mechanicProfiles:
         AMC-1.1: 4
         AMC-1.10: 4
         AMC-1.11: 4
+        AMC-1.12: 4
         AMC-1.2: 4
         AMC-1.3: 4
         AMC-1.4: 4
@@ -273,10 +862,21 @@ mechanicProfiles:
         AMC-1.8: 4
         AMC-1.9: 4
         AMC-2.1: 4
+        AMC-2.10: 4
+        AMC-2.11: 4
+        AMC-2.12: 4
+        AMC-2.13: 4
+        AMC-2.14: 4
+        AMC-2.15: 4
+        AMC-2.16: 4
         AMC-2.2: 4
         AMC-2.3: 4
         AMC-2.4: 4
         AMC-2.5: 4
+        AMC-2.6: 4
+        AMC-2.7: 4
+        AMC-2.8: 4
+        AMC-2.9: 4
         AMC-3.1.1: 5
         AMC-3.1.2: 5
         AMC-3.1.3: 5
@@ -293,7 +893,16 @@ mechanicProfiles:
         AMC-3.3.3: 5
         AMC-3.3.4: 5
         AMC-3.3.5: 5
+        AMC-3.4.1: 5
+        AMC-3.4.2: 5
+        AMC-3.4.3: 5
+        AMC-3.5.1: 5
+        AMC-3.5.2: 5
+        AMC-3.5.3: 5
         AMC-4.1: 4
+        AMC-4.10: 4
+        AMC-4.11: 4
+        AMC-4.12: 4
         AMC-4.2: 4
         AMC-4.3: 4
         AMC-4.4: 4
@@ -303,12 +912,138 @@ mechanicProfiles:
         AMC-4.8: 4
         AMC-4.9: 4
         AMC-5.1: 5
+        AMC-5.10: 5
+        AMC-5.11: 5
+        AMC-5.12: 5
+        AMC-5.13: 5
+        AMC-5.14: 5
+        AMC-5.15: 5
+        AMC-5.16: 5
+        AMC-5.17: 5
+        AMC-5.18: 5
+        AMC-5.19: 5
         AMC-5.2: 5
+        AMC-5.20: 5
+        AMC-5.21: 5
+        AMC-5.22: 5
+        AMC-5.23: 5
+        AMC-5.24: 5
+        AMC-5.25: 5
+        AMC-5.26: 5
+        AMC-5.27: 5
+        AMC-5.28: 5
         AMC-5.3: 5
         AMC-5.4: 5
         AMC-5.5: 5
         AMC-5.6: 5
         AMC-5.7: 5
+        AMC-5.8: 5
+        AMC-5.9: 5
+        AMC-6.1: 5
+        AMC-6.10: 5
+        AMC-6.11: 5
+        AMC-6.12: 5
+        AMC-6.13: 5
+        AMC-6.14: 5
+        AMC-6.15: 5
+        AMC-6.16: 5
+        AMC-6.17: 5
+        AMC-6.18: 5
+        AMC-6.19: 5
+        AMC-6.2: 5
+        AMC-6.20: 5
+        AMC-6.21: 5
+        AMC-6.22: 5
+        AMC-6.23: 5
+        AMC-6.24: 5
+        AMC-6.25: 5
+        AMC-6.26: 5
+        AMC-6.27: 5
+        AMC-6.28: 5
+        AMC-6.29: 5
+        AMC-6.3: 5
+        AMC-6.30: 5
+        AMC-6.31: 5
+        AMC-6.32: 5
+        AMC-6.33: 5
+        AMC-6.34: 5
+        AMC-6.35: 5
+        AMC-6.36: 5
+        AMC-6.37: 5
+        AMC-6.38: 5
+        AMC-6.39: 5
+        AMC-6.4: 5
+        AMC-6.40: 5
+        AMC-6.41: 5
+        AMC-6.42: 5
+        AMC-6.43: 5
+        AMC-6.44: 5
+        AMC-6.45: 5
+        AMC-6.46: 5
+        AMC-6.47: 5
+        AMC-6.48: 5
+        AMC-6.49: 5
+        AMC-6.5: 5
+        AMC-6.50: 5
+        AMC-6.51: 5
+        AMC-6.52: 5
+        AMC-6.53: 5
+        AMC-6.54: 5
+        AMC-6.55: 5
+        AMC-6.56: 5
+        AMC-6.57: 5
+        AMC-6.6: 5
+        AMC-6.7: 5
+        AMC-6.8: 5
+        AMC-6.9: 5
+        AMC-AAC-1: 5
+        AMC-APS-1: 5
+        AMC-BCON-1: 4
+        AMC-COST-1: 4
+        AMC-EAM-1: 5
+        AMC-GOV-PROACTIVE-1: 4
+        AMC-HOQ-1: 4
+        AMC-HOQ-2: 4
+        AMC-MBR-1: 5
+        AMC-MCP-1: 5
+        AMC-MCP-2: 5
+        AMC-MCP-3: 5
+        AMC-MEM-1.1: 4
+        AMC-MEM-1.2: 4
+        AMC-MEM-2.1: 4
+        AMC-MEM-3.1: 4
+        AMC-MEM-3.2: 4
+        AMC-MEM-3.3: 4
+        AMC-MEM-3.4: 4
+        AMC-MSA-1: 5
+        AMC-OC-1: 5
+        AMC-OC-2: 5
+        AMC-OC-3: 5
+        AMC-OC-4: 5
+        AMC-OC-5: 5
+        AMC-OC-6: 5
+        AMC-OC-7: 5
+        AMC-OC-8: 5
+        AMC-OINT-1: 4
+        AMC-OPDISC-1: 5
+        AMC-OPDISC-2: 5
+        AMC-OPDISC-3: 5
+        AMC-OPDISC-4: 5
+        AMC-OPDISC-5: 5
+        AMC-OPDISC-6: 5
+        AMC-OPDISC-7: 5
+        AMC-OPDISC-8: 5
+        AMC-OPS-1: 4
+        AMC-SCI-1: 5
+        AMC-SCI-2: 5
+        AMC-SCI-3: 5
+        AMC-SOCIAL-1: 5
+        AMC-SPORT-1: 4
+        AMC-TAS-1: 5
+        AMC-THR-1: 4
+        AMC-THR-2: 4
+        AMC-THR-3: 4
+        AMC-ZAP-1: 5
       recommended:
         policyPacks:
           - research-agent.high
@@ -326,6 +1061,7 @@ mechanicProfiles:
         AMC-1.1: 4
         AMC-1.10: 4
         AMC-1.11: 4
+        AMC-1.12: 4
         AMC-1.2: 4
         AMC-1.3: 4
         AMC-1.4: 4
@@ -335,10 +1071,21 @@ mechanicProfiles:
         AMC-1.8: 4
         AMC-1.9: 4
         AMC-2.1: 5
+        AMC-2.10: 5
+        AMC-2.11: 5
+        AMC-2.12: 5
+        AMC-2.13: 5
+        AMC-2.14: 5
+        AMC-2.15: 5
+        AMC-2.16: 5
         AMC-2.2: 5
         AMC-2.3: 5
         AMC-2.4: 5
         AMC-2.5: 5
+        AMC-2.6: 5
+        AMC-2.7: 5
+        AMC-2.8: 5
+        AMC-2.9: 5
         AMC-3.1.1: 4
         AMC-3.1.2: 4
         AMC-3.1.3: 4
@@ -355,7 +1102,16 @@ mechanicProfiles:
         AMC-3.3.3: 4
         AMC-3.3.4: 4
         AMC-3.3.5: 4
+        AMC-3.4.1: 4
+        AMC-3.4.2: 4
+        AMC-3.4.3: 4
+        AMC-3.5.1: 4
+        AMC-3.5.2: 4
+        AMC-3.5.3: 4
         AMC-4.1: 4
+        AMC-4.10: 4
+        AMC-4.11: 4
+        AMC-4.12: 4
         AMC-4.2: 4
         AMC-4.3: 4
         AMC-4.4: 4
@@ -365,12 +1121,138 @@ mechanicProfiles:
         AMC-4.8: 4
         AMC-4.9: 4
         AMC-5.1: 4
+        AMC-5.10: 4
+        AMC-5.11: 4
+        AMC-5.12: 4
+        AMC-5.13: 4
+        AMC-5.14: 4
+        AMC-5.15: 4
+        AMC-5.16: 4
+        AMC-5.17: 4
+        AMC-5.18: 4
+        AMC-5.19: 4
         AMC-5.2: 4
+        AMC-5.20: 4
+        AMC-5.21: 4
+        AMC-5.22: 4
+        AMC-5.23: 4
+        AMC-5.24: 4
+        AMC-5.25: 4
+        AMC-5.26: 4
+        AMC-5.27: 4
+        AMC-5.28: 4
         AMC-5.3: 4
         AMC-5.4: 4
         AMC-5.5: 4
         AMC-5.6: 4
         AMC-5.7: 4
+        AMC-5.8: 4
+        AMC-5.9: 4
+        AMC-6.1: 4
+        AMC-6.10: 4
+        AMC-6.11: 4
+        AMC-6.12: 4
+        AMC-6.13: 4
+        AMC-6.14: 4
+        AMC-6.15: 4
+        AMC-6.16: 4
+        AMC-6.17: 4
+        AMC-6.18: 4
+        AMC-6.19: 4
+        AMC-6.2: 4
+        AMC-6.20: 4
+        AMC-6.21: 4
+        AMC-6.22: 4
+        AMC-6.23: 4
+        AMC-6.24: 4
+        AMC-6.25: 4
+        AMC-6.26: 4
+        AMC-6.27: 4
+        AMC-6.28: 4
+        AMC-6.29: 4
+        AMC-6.3: 4
+        AMC-6.30: 4
+        AMC-6.31: 4
+        AMC-6.32: 4
+        AMC-6.33: 4
+        AMC-6.34: 4
+        AMC-6.35: 4
+        AMC-6.36: 4
+        AMC-6.37: 4
+        AMC-6.38: 4
+        AMC-6.39: 4
+        AMC-6.4: 4
+        AMC-6.40: 4
+        AMC-6.41: 4
+        AMC-6.42: 4
+        AMC-6.43: 4
+        AMC-6.44: 4
+        AMC-6.45: 4
+        AMC-6.46: 4
+        AMC-6.47: 4
+        AMC-6.48: 4
+        AMC-6.49: 4
+        AMC-6.5: 4
+        AMC-6.50: 4
+        AMC-6.51: 4
+        AMC-6.52: 4
+        AMC-6.53: 4
+        AMC-6.54: 4
+        AMC-6.55: 4
+        AMC-6.56: 4
+        AMC-6.57: 4
+        AMC-6.6: 4
+        AMC-6.7: 4
+        AMC-6.8: 4
+        AMC-6.9: 4
+        AMC-AAC-1: 4
+        AMC-APS-1: 4
+        AMC-BCON-1: 5
+        AMC-COST-1: 4
+        AMC-EAM-1: 4
+        AMC-GOV-PROACTIVE-1: 5
+        AMC-HOQ-1: 5
+        AMC-HOQ-2: 5
+        AMC-MBR-1: 4
+        AMC-MCP-1: 4
+        AMC-MCP-2: 4
+        AMC-MCP-3: 4
+        AMC-MEM-1.1: 4
+        AMC-MEM-1.2: 4
+        AMC-MEM-2.1: 4
+        AMC-MEM-3.1: 4
+        AMC-MEM-3.2: 4
+        AMC-MEM-3.3: 4
+        AMC-MEM-3.4: 4
+        AMC-MSA-1: 4
+        AMC-OC-1: 4
+        AMC-OC-2: 4
+        AMC-OC-3: 4
+        AMC-OC-4: 4
+        AMC-OC-5: 4
+        AMC-OC-6: 4
+        AMC-OC-7: 4
+        AMC-OC-8: 4
+        AMC-OINT-1: 4
+        AMC-OPDISC-1: 4
+        AMC-OPDISC-2: 4
+        AMC-OPDISC-3: 4
+        AMC-OPDISC-4: 4
+        AMC-OPDISC-5: 4
+        AMC-OPDISC-6: 4
+        AMC-OPDISC-7: 4
+        AMC-OPDISC-8: 4
+        AMC-OPS-1: 4
+        AMC-SCI-1: 4
+        AMC-SCI-2: 4
+        AMC-SCI-3: 4
+        AMC-SOCIAL-1: 4
+        AMC-SPORT-1: 4
+        AMC-TAS-1: 4
+        AMC-THR-1: 4
+        AMC-THR-2: 4
+        AMC-THR-3: 4
+        AMC-ZAP-1: 4
       recommended:
         policyPacks:
           - sales-agent.high

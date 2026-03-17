@@ -1,24 +1,7 @@
-runtimes:
-  claude:
-    command: claude
-    argsTemplate: []
-  gemini:
-    command: gemini
-    argsTemplate: []
-  openclaw:
-    command: openclaw
-    argsTemplate: []
-  mock:
-    command: node
-    argsTemplate:
-      - -e
-      - '{"claimedLevels":{}}'
-  any:
-    command: ""
-    argsTemplate: []
+# AMC Demo Workspace
+version: "1.0"
+agentId: demo-agent
+profile: dev
+demo: true
 security:
   trustBoundaryMode: isolated
-supervise:
-  extraEnv: {}
-  includeProxyEnv: true
-  customBaseUrlEnvKeys: []

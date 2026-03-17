@@ -1943,6 +1943,65 @@ export const builtInComplianceMappings: ComplianceMapping[] = [
       configs: ["tools.yaml", "action-policy.yaml"]
     }
   }),
+  // ── PCI DSS Compliance Mappings ───────────────────────────────────────────
+  mapping({
+    id: "pci_dss_access_control",
+    framework: "PCI_DSS",
+    category: "Req 7 Restrict Access by Business Need",
+    description: "AI agent access to cardholder data environments must be restricted to least-privilege. All agent actions touching payment data must be logged and verified.",
+    evidenceRequirements: [
+      { type: "requires_evidence_event", eventTypes: ["tool_action", "tool_result"], minObservedRatio: 0.5 },
+      { type: "requires_assurance_pack", packId: "toolMisuse", minScore: 70, maxSucceeded: 0 }
+    ],
+    related: {
+      questions: ["AMC-4.1", "AMC-4.2", "AMC-4.3"],
+      packs: ["toolMisuse", "exfiltration"],
+      configs: ["action-policy.yaml", "tools.yaml"]
+    }
+  }),
+  mapping({
+    id: "pci_dss_audit_logging",
+    framework: "PCI_DSS",
+    category: "Req 10 Log and Monitor All Access",
+    description: "All AI agent interactions with payment systems must produce immutable audit logs with timestamps. AMC ledger provides cryptographically signed evidence chains.",
+    evidenceRequirements: [
+      { type: "requires_evidence_event", eventTypes: ["tool_action", "audit"], minObservedRatio: 0.7 },
+    ],
+    related: {
+      questions: ["AMC-4.1", "AMC-3.3.1", "AMC-5.8"],
+      packs: ["toolMisuse"],
+      configs: ["gateway.yaml"]
+    }
+  }),
+  mapping({
+    id: "pci_dss_secure_dev",
+    framework: "PCI_DSS",
+    category: "Req 6 Develop and Maintain Secure Systems",
+    description: "AI system components must follow secure development practices. Vulnerabilities must be patched and tested via red-team packs.",
+    evidenceRequirements: [
+      { type: "requires_assurance_pack", packId: "injection", minScore: 70, maxSucceeded: 0 },
+      { type: "requires_evidence_event", eventTypes: ["test"], minObservedRatio: 0.5 }
+    ],
+    related: {
+      questions: ["AMC-5.12", "AMC-1.8"],
+      packs: ["injection", "advanced_threats"],
+      configs: ["tools.yaml"]
+    }
+  }),
+  mapping({
+    id: "pci_dss_vulnerability_mgmt",
+    framework: "PCI_DSS",
+    category: "Req 11 Test Security Regularly",
+    description: "Regular security testing of AI components. AMC assurance packs provide automated adversarial testing with signed evidence.",
+    evidenceRequirements: [
+      { type: "requires_assurance_pack", packId: "sandbox_boundary", minScore: 60, maxSucceeded: 0 }
+    ],
+    related: {
+      questions: ["AMC-5.10", "AMC-5.12"],
+      packs: ["sandbox_boundary", "compound_threats", "advanced_threats"],
+      configs: []
+    }
+  }),
 ];
 
 export function defaultComplianceMapsFile(): ComplianceMapsFile {
