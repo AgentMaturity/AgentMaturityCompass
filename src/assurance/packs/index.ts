@@ -238,6 +238,10 @@ const assurancePacks: AssurancePackDefinition[] = [
   emergentCapabilityPack,
   safetyCulturePack,
   militaryDualUsePack,
+  codeSabotageDefensePack,
+  aiTrustExploitationPack,
+  modelTheftExfilPack,
+  whistleblowerProtectionPack,
 ];
 
 export function listAssurancePacks(): AssurancePackDefinition[] {
@@ -268,3 +272,7 @@ import { humanDecisionSabotagePack } from "./humanDecisionSabotagePack.js";
 import { emergentCapabilityPack } from "./emergentCapabilityPack.js";
 import { safetyCulturePack } from "./safetyCulturePack.js";
 import { militaryDualUsePack } from "./militaryDualUsePack.js";
+import { codeSabotageDefensePack } from "./codeSabotageDefensePack.js";
+import { aiTrustExploitationPack } from "./aiTrustExploitationPack.js";
+import { modelTheftExfilPack } from "./modelTheftExfilPack.js";
+import { whistleblowerProtectionPack } from "./whistleblowerProtectionPack.js";
