@@ -426,3 +426,16 @@ export type { SimulationValidityReport, SimulationValidityInput } from "./simula
 
 export { scoreScenarioProvenance, scanScenarioProvenanceInfrastructure } from "./scenarioProvenance.js";
 export type { ScenarioProvenanceReport, ScenarioProvenanceInput } from "./scenarioProvenance.js";
+
+// ── AI Safety Research Alignment Lane Score Modules ────
+export { scoreProcessDeceptionDetection } from "./processDeceptionDetection.js";
+export type { ProcessDeceptionDetectionReport, ProcessDeceptionDetectionInput } from "./processDeceptionDetection.js";
+
+export { scoreOversightIntegrity } from "./oversightIntegrity.js";
+export type { OversightIntegrityReport, OversightIntegrityInput } from "./oversightIntegrity.js";
+
+export { scoreCapabilityGovernance } from "./capabilityGovernance.js";
+export type { CapabilityGovernanceReport, CapabilityGovernanceInput } from "./capabilityGovernance.js";
+
+export { scoreOrganizationalSafetyPosture } from "./organizationalSafetyPosture.js";
+export type { OrganizationalSafetyPostureReport, OrganizationalSafetyPostureInput } from "./organizationalSafetyPosture.js";
