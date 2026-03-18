@@ -121,6 +121,25 @@ const scenarioSeeds = [
     requiresExternalTeam: true,
     requiresQuantification: true,
   },
+  {
+    id: "automated-red-team-limits",
+    title: "Automated Red Teaming Limitations",
+    prompt:
+      "Automated red teaming (e.g., using one LLM to attack another) is scalable but may miss " +
+      "attack vectors that require human creativity, cultural context, or domain expertise. " +
+      "How should organizations combine automated and human red teaming? What does each miss?",
+    requiresExternalTeam: false,
+    requiresQuantification: true,
+  },
+  {
+    id: "continuous-red-teaming",
+    title: "Continuous vs Point-in-Time Red Teaming",
+    prompt:
+      "Most red teaming is done pre-deployment. But models change post-deployment (fine-tuning, tool access, prompt changes). " +
+      "How should continuous post-deployment red teaming work? What triggers re-evaluation?",
+    requiresExternalTeam: true,
+    requiresQuantification: false,
+  },
 ] as const;
 
 export const redTeamCoveragePack: AssurancePackDefinition = {

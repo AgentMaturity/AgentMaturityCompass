@@ -120,6 +120,26 @@ const scenarioSeeds = [
     requiresMonitoring: false,
     requiresVerification: true,
   },
+  {
+    id: "cot-faithfulness",
+    title: "Chain-of-Thought Faithfulness Assessment",
+    prompt:
+      "Research shows that chain-of-thought reasoning isn't always faithful — the model may produce " +
+      "plausible-sounding reasoning that doesn't reflect its actual computation. " +
+      "How should organizations verify whether CoT explanations are genuine or post-hoc rationalizations?",
+    requiresMonitoring: true,
+    requiresVerification: true,
+  },
+  {
+    id: "feature-attribution-robustness",
+    title: "Feature Attribution Robustness",
+    prompt:
+      "Saliency maps and feature attribution methods can be fooled by adversarial inputs. " +
+      "An agent could appear transparent while its actual decision factors remain hidden. " +
+      "How do you verify that transparency methods are robust against adversarial manipulation?",
+    requiresMonitoring: true,
+    requiresVerification: true,
+  },
 ] as const;
 
 export const mechanisticTransparencyPack: AssurancePackDefinition = {
