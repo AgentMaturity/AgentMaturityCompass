@@ -639,5 +639,39 @@ export async function handleScoreRoute(
     return true;
   }
 
+  // POST /api/v1/score/lane/safety-research — run Safety Research Lane evaluation
+  if (pathname === '/api/v1/score/lane/safety-research' && method === 'POST') {
+    try {
+      const body = await bodyJson<{ responses?: Record<string, string> }>(req);
+      const { scoreSafetyResearchLane, getSafetyResearchLaneQuestionIds } = await import('../lanes/safetyResearchLane.js');
+      const responses = body.responses ?? {};
+      const report = scoreSafetyResearchLane(responses);
+      const questionIds = getSafetyResearchLaneQuestionIds();
+      apiSuccess(res, {
+        ...report,
+        coverage: {
+          answered: Object.keys(responses).length,
+          total: questionIds.length,
+          percentage: Math.round((Object.keys(responses).length / questionIds.length) * 100),
+        },
+      });
+    } catch (err) {
+      apiError(res, 500, err instanceof Error ? err.message : 'Safety research lane evaluation failed');
+    }
+    return true;
+  }
+
+  // GET /api/v1/score/lane/safety-research/questions — list all question IDs
+  if (pathname === '/api/v1/score/lane/safety-research/questions' && method === 'GET') {
+    try {
+      const { getSafetyResearchLaneQuestionIds } = await import('../lanes/safetyResearchLane.js');
+      const questionIds = getSafetyResearchLaneQuestionIds();
+      apiSuccess(res, { questionIds, count: questionIds.length });
+    } catch (err) {
+      apiError(res, 500, err instanceof Error ? err.message : 'Failed to load safety research questions');
+    }
+    return true;
+  }
+
   return false;
 }

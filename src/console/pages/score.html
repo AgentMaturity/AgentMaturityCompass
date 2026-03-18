@@ -6,7 +6,30 @@ h1{color:#4AEF79}a{color:#4AEF79}.card{background:#1a1a1a;border-radius:8px;padd
 </style></head>
 <body>
 <h1>📊 Maturity Score</h1>
-<div class="card"><p>Score your agent's maturity across 5 dimensions with 235 diagnostic questions.</p>
+<div class="card"><p>Score your agent's maturity across 7 dimensions with 235 diagnostic questions.</p>
 <p><strong>CLI equivalent:</strong> <code>amc score --tier quick</code> or <code>amc score formal-spec &lt;agentId&gt;</code></p>
 <p>See also: <a href="compass.html">Compass View</a> | <a href="diagnosticView.html">Diagnostic Detail</a></p></div>
+
+<h2>🛡️ Evaluation Lanes</h2>
+
+<div class="card">
+<h3>AI Safety Research Lane</h3>
+<p>4-dimension safety evaluation based on frontier research from Anthropic, OpenAI, Google DeepMind, MIRI, and 50+ academic sources.</p>
+<table style="width:100%;border-collapse:collapse;margin:12px 0">
+<tr style="border-bottom:1px solid #333"><th style="text-align:left;padding:6px">Dimension</th><th style="text-align:left;padding:6px">Weight</th><th style="text-align:left;padding:6px">Questions</th></tr>
+<tr><td style="padding:6px">Process Deception Detection</td><td style="padding:6px">30%</td><td style="padding:6px">AMC-7.1 → 7.12</td></tr>
+<tr><td style="padding:6px">Oversight Integrity</td><td style="padding:6px">25%</td><td style="padding:6px">AMC-7.13 → 7.18</td></tr>
+<tr><td style="padding:6px">Capability Governance</td><td style="padding:6px">25%</td><td style="padding:6px">AMC-7.19 → 7.30</td></tr>
+<tr><td style="padding:6px">Organizational Safety Posture</td><td style="padding:6px">20%</td><td style="padding:6px">AMC-7.31 → 7.40</td></tr>
+</table>
+<p>20 assurance packs · 1,315 red-team scenarios · 40 diagnostic questions</p>
+<p><strong>CLI:</strong> <code>amc score safety-research</code> | <code>amc score safety-research --json</code></p>
+</div>
+
+<div class="card">
+<h3>Simulation &amp; Forecast Lane</h3>
+<p>5-dimension evaluation for simulation engines, forecast systems, and synthetic environments.</p>
+<p><strong>CLI:</strong> <code>amc score simulation-lane --system-type &lt;type&gt;</code></p>
+</div>
+
 </body></html>

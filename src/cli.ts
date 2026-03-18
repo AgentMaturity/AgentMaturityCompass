@@ -18466,6 +18466,82 @@ score
     } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
   });
 
+score
+  .command("safety-research")
+  .description("Run the AI Safety Research evaluation lane — 4-dimension assessment based on frontier safety research")
+  .option("--json", "Output as JSON")
+  .option("--responses <file>", "JSON file with diagnostic responses (Record<string, string> keyed by question ID)")
+  .action(async (opts: { json?: boolean; responses?: string }) => {
+    try {
+      const { scoreSafetyResearchLane, getSafetyResearchLaneQuestionIds } = await import("./lanes/safetyResearchLane.js");
+      let responses: Record<string, string> = {};
+      if (opts.responses) {
+        const { readFileSync } = await import("fs");
+        responses = JSON.parse(readFileSync(opts.responses, "utf-8"));
+      } else if (process.stdin.isTTY) {
+        const inq = await import("inquirer");
+        const questionIds = getSafetyResearchLaneQuestionIds();
+        console.log(chalk.bold.hex('#FF6B6B')("\n🛡️  AI Safety Research Lane — Interactive Assessment"));
+        console.log(chalk.gray(`${questionIds.length} questions across 4 dimensions\n`));
+        console.log(chalk.gray("Based on frontier safety research: alignment faking, sandbagging, scheming,"));
+        console.log(chalk.gray("oversight integrity, CBRN governance, organizational safety posture.\n"));
+        for (const qid of questionIds) {
+          const { answer } = await inq.default.prompt([{
+            type: "editor",
+            name: "answer",
+            message: `${qid}: Describe your system's approach (or press Enter to skip):`,
+          }]);
+          if (answer && answer.trim()) {
+            responses[qid] = answer.trim();
+          }
+        }
+      }
+      const report = scoreSafetyResearchLane(responses);
+      if (opts.json) { console.log(JSON.stringify(report, null, 2)); return; }
+      console.log(chalk.bold.hex('#FF6B6B')("\n🛡️  AI Safety Research Lane — Results"));
+      console.log(chalk.gray("Overall score:"), chalk.bold(`${report.overallScore.toFixed(1)}/100`));
+      console.log(chalk.gray("Maturity level:"), chalk.bold(`L${report.overallLevel}`));
+      const answered = Object.keys(responses).length;
+      const total = getSafetyResearchLaneQuestionIds().length;
+      console.log(chalk.gray("Coverage:"), `${answered}/${total} questions (${Math.round(answered / total * 100)}%)`);
+      console.log(chalk.bold("\n📊  Dimensions:"));
+      const dimNames: Record<string, string> = {
+        processDeception: "Process Deception Detection",
+        oversightIntegrity: "Oversight Integrity",
+        capabilityGovernance: "Capability Governance",
+        organizationalSafety: "Organizational Safety Posture",
+      };
+      const dims = report.dimensions;
+      const dimEntries = [
+        { key: "processDeception", dim: dims.processDeception },
+        { key: "oversightIntegrity", dim: dims.oversightIntegrity },
+        { key: "capabilityGovernance", dim: dims.capabilityGovernance },
+        { key: "organizationalSafety", dim: dims.organizationalSafety },
+      ];
+      for (const { key, dim } of dimEntries) {
+        const bar = "█".repeat(Math.round(dim.score / 5)) + "░".repeat(20 - Math.round(dim.score / 5));
+        const color = dim.score >= 70 ? chalk.green : dim.score >= 40 ? chalk.yellow : chalk.red;
+        const name = dimNames[key] ?? dim.name;
+        console.log(`  ${color(bar)} ${chalk.bold(name)} — ${dim.score.toFixed(1)}/100 (L${dim.level}, weight ${(dim.weight * 100).toFixed(0)}%)`);
+      }
+      if (report.allGaps.length > 0) {
+        console.log(chalk.bold(`\n⚠  Gap Analysis (${report.allGaps.length}):`));
+        for (const gap of report.allGaps.slice(0, 10)) {
+          console.log(chalk.yellow(`  → ${gap}`));
+        }
+        if (report.allGaps.length > 10) {
+          console.log(chalk.gray(`  ... and ${report.allGaps.length - 10} more (use --json for full list)`));
+        }
+      }
+      if (report.priorities.length > 0) {
+        console.log(chalk.bold("\n🎯  Top Priorities:"));
+        for (const p of report.priorities) {
+          console.log(chalk.yellow(`  → ${p}`));
+        }
+      }
+    } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
+  });
+
 // ── Scan ──────────────────────────────────────────────────────────────────────
 const scan = program.command("scan").description("Zero-integration agent assessment scanner");
 
