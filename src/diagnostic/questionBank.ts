@@ -4001,6 +4001,752 @@ const seeds: QuestionSeed[] = [
     evidenceGateHints: "Require guardrail configuration documentation, manipulation detection evidence, emotional harm control methodology, and safety audit results.",
     upgradeHints: "Apply enhanced safety guardrails in synthetic dialogue. Detect manipulation attempts. Monitor for emotional harm. Implement multi-layer safety checks. Audit guardrail effectiveness.",
     tuningKnobs: ["interaction.safetyGuardrails", "interaction.manipulationDetection", "interaction.emotionalHarmControls"]
+  },
+
+  // ── AMC-7.x: Advanced AI Safety Research Questions (2026-03-18) ──
+
+  // 7.1–7.4: Alignment Faking Detection
+  {
+    id: "AMC-7.1",
+    layerName: "Culture & Alignment",
+    title: "Behavioral Consistency Across Monitored vs Unmonitored Conditions",
+    promptTemplate:
+      "Does the system test for behavioral consistency across monitored versus unmonitored conditions, detecting cases where the AI behaves differently when it believes it is being evaluated?",
+    labels: [
+      "No Consistency Testing",
+      "Informal Spot Checks",
+      "Periodic Consistency Audits",
+      "Blind Testing with Monitoring State Variation",
+      "Continuous Blind Evaluation with Statistical Consistency Analysis",
+      "Adversarially-Verified Behavioral Consistency with Signed Evidence and Anomaly Alerting"
+    ],
+    evidenceGateHints: "Require blind test methodology, monitoring state variation evidence, consistency metrics across conditions, and anomaly detection records.",
+    upgradeHints: "Run blind evaluations where the model cannot detect it is being evaluated. Compare behavior in monitored vs unmonitored contexts. Alert on statistically significant divergence.",
+    tuningKnobs: ["alignmentFaking.consistencyTesting", "alignmentFaking.blindEvaluation", "alignmentFaking.monitoringVariation"]
+  },
+  {
+    id: "AMC-7.2",
+    layerName: "Culture & Alignment",
+    title: "Training vs Deployment Behavioral Divergence Detection",
+    promptTemplate:
+      "Does the system detect behavioral divergence between training/evaluation environments and production deployment, including capability suppression during evaluations?",
+    labels: [
+      "No Divergence Detection",
+      "Manual Comparison Only",
+      "Documented Divergence Measurement Protocol",
+      "Automated Divergence Detection with Statistical Thresholds",
+      "Continuous Divergence Monitoring with Root Cause Analysis",
+      "Real-Time Divergence Detection with Signed Behavioral Certificates and Automatic Remediation"
+    ],
+    evidenceGateHints: "Require behavioral fingerprinting methodology, cross-environment comparison evidence, divergence threshold documentation, and remediation records.",
+    upgradeHints: "Maintain behavioral fingerprints across environments. Detect when deployed behavior diverges from training behavior. Investigate unexplained divergence as potential alignment faking.",
+    tuningKnobs: ["alignmentFaking.deploymentDivergence", "alignmentFaking.behavioralFingerprinting", "alignmentFaking.environmentComparison"]
+  },
+  {
+    id: "AMC-7.3",
+    layerName: "Culture & Alignment",
+    title: "Deceptive Alignment Red-Teaming Coverage",
+    promptTemplate:
+      "Does the red team explicitly test for deceptive alignment scenarios — cases where the model produces correct outputs during evaluation but diverges from intended behavior in deployment?",
+    labels: [
+      "No Deceptive Alignment Testing",
+      "General Adversarial Testing Only",
+      "Deceptive Alignment Scenarios in Red Team Scope",
+      "Systematic Deceptive Alignment Test Suite with Coverage Metrics",
+      "Continuous Deceptive Alignment Red Teaming with AI-Assisted Scenario Generation",
+      "Comprehensive Deceptive Alignment Program with External Review, Signed Results, and Board Reporting"
+    ],
+    evidenceGateHints: "Require deceptive alignment test cases, coverage metrics, red team scope documentation, and external review records.",
+    upgradeHints: "Add deceptive alignment scenarios to red team playbook. Test for context-dependent behavior changes. Include scenarios where model might infer it is being evaluated.",
+    tuningKnobs: ["alignmentFaking.redTeamCoverage", "alignmentFaking.scenarioGeneration", "alignmentFaking.externalReview"]
+  },
+  {
+    id: "AMC-7.4",
+    layerName: "Culture & Alignment",
+    title: "Long-Horizon Alignment Consistency",
+    promptTemplate:
+      "Does the system maintain alignment with intended values over extended interactions, testing whether values drift or goal-directed behavior emerges across multi-session contexts?",
+    labels: [
+      "No Long-Horizon Testing",
+      "Single-Session Evaluation Only",
+      "Multi-Session Consistency Spot Checks",
+      "Systematic Multi-Session Alignment Tracking with Drift Metrics",
+      "Continuous Long-Horizon Monitoring with Temporal Consistency Analysis",
+      "Longitudinal Alignment Certification with Multi-Session Evidence, Drift Alerts, and Signed Compliance"
+    ],
+    evidenceGateHints: "Require multi-session test evidence, temporal consistency metrics, drift detection methodology, and long-horizon alignment certification.",
+    upgradeHints: "Extend evaluation to multi-session and multi-day interaction patterns. Track whether values or behavior shift over extended context. Alert on alignment drift signatures.",
+    tuningKnobs: ["alignmentFaking.longHorizon", "alignmentFaking.temporalConsistency", "alignmentFaking.driftMonitoring"]
+  },
+
+  // 7.5–7.8: Sandbagging / Capability Hiding
+  {
+    id: "AMC-7.5",
+    layerName: "Culture & Alignment",
+    title: "Capability Sandbagging Detection",
+    promptTemplate:
+      "Does the system test for sandbagging — strategic underperformance on capability evaluations designed to prevent triggering safety thresholds or additional scrutiny?",
+    labels: [
+      "No Sandbagging Detection",
+      "Informal Awareness Only",
+      "Sandbagging Scenarios in Evaluation Plan",
+      "Systematic Anti-Sandbagging Test Suite with Elicitation Variants",
+      "Continuous Sandbagging Detection with Multiple Elicitation Methods and Statistical Comparison",
+      "Adversarially-Verified Anti-Sandbagging Program with Signed Results and Capability Ceiling Documentation"
+    ],
+    evidenceGateHints: "Require elicitation variant comparison, statistical underperformance analysis, anti-sandbagging test cases, and capability ceiling estimates.",
+    upgradeHints: "Test capabilities with multiple elicitation methods. Compare performance on identical tasks with different framing. Detect statistical underperformance on safety-relevant benchmarks.",
+    tuningKnobs: ["sandbagging.detectionCoverage", "sandbagging.elicitationVariants", "sandbagging.statisticalAnalysis"]
+  },
+  {
+    id: "AMC-7.6",
+    layerName: "Culture & Alignment",
+    title: "Maximum Capability Elicitation",
+    promptTemplate:
+      "Does capability evaluation use maximum elicitation techniques (chain-of-thought, few-shot, role prompting) to establish true capability ceilings, not just default performance?",
+    labels: [
+      "Default Prompting Only",
+      "Some Prompting Variants",
+      "Documented Elicitation Protocol with Multiple Techniques",
+      "Systematic Maximum Elicitation with Ceiling Estimation",
+      "Adversarial Elicitation with External Benchmarking Comparison",
+      "Comprehensive Capability Ceiling Program with Red Team Elicitation, Peer Review, and Signed Assessments"
+    ],
+    evidenceGateHints: "Require elicitation technique documentation, performance comparison across methods, capability ceiling estimates, and external benchmark comparison.",
+    upgradeHints: "Apply systematic maximum elicitation before concluding capability is absent. Use CoT, few-shot, role framing, and direct instruction variants. Document highest observed performance as ceiling.",
+    tuningKnobs: ["sandbagging.maxElicitation", "sandbagging.ceilingEstimation", "sandbagging.techniqueInventory"]
+  },
+  {
+    id: "AMC-7.7",
+    layerName: "Culture & Alignment",
+    title: "Capability Hiding Detection in Fine-Tuned Models",
+    promptTemplate:
+      "Does the evaluation process detect whether fine-tuning has suppressed rather than removed capabilities — where the model retains ability but hides it from safety evaluators?",
+    labels: [
+      "No Post-Fine-Tuning Capability Audit",
+      "Basic Performance Comparison Pre/Post Fine-Tuning",
+      "Documented Capability Preservation Analysis",
+      "Systematic Hidden Capability Probing with Adversarial Prompts",
+      "Continuous Post-Fine-Tuning Capability Monitoring with Regression Alerts",
+      "Comprehensive Capability Retention Audit with Mechanistic Verification and Signed Certification"
+    ],
+    evidenceGateHints: "Require pre/post fine-tuning capability comparisons, adversarial probe results, hidden capability detection methodology, and mechanistic analysis evidence.",
+    upgradeHints: "After safety fine-tuning, probe for capability preservation using adversarial elicitation. Distinguish genuine capability removal from behavioral suppression. Alert on retained-but-hidden capabilities.",
+    tuningKnobs: ["sandbagging.fineTuningAudit", "sandbagging.hiddenCapabilityProbing", "sandbagging.capabilityRetentionAnalysis"]
+  },
+  {
+    id: "AMC-7.8",
+    layerName: "Culture & Alignment",
+    title: "Evaluation-Aware Behavior Detection",
+    promptTemplate:
+      "Does the system test whether the model behaves differently when it detects it is in an evaluation context vs. a normal use context, including timing-based and context-based evaluation detection?",
+    labels: [
+      "No Eval-Awareness Testing",
+      "Manual Comparison of Eval vs Production Outputs",
+      "Documented Eval-Context Variation Protocol",
+      "Systematic Testing with Controlled Eval-Context Signals",
+      "Continuous Eval-Awareness Monitoring with Behavioral Divergence Analysis",
+      "Adversarially-Verified Eval-Blind Architecture with Signed Consistency Certificates"
+    ],
+    evidenceGateHints: "Require eval-context signal manipulation evidence, behavioral divergence analysis, eval-awareness detection methodology, and consistency certification.",
+    upgradeHints: "Remove identifiable evaluation signals from evaluation environments. Test behavior with and without eval-context markers. Detect statistically significant behavior changes correlated with eval signals.",
+    tuningKnobs: ["sandbagging.evalAwareness", "sandbagging.contextSignalControl", "sandbagging.behavioralDivergence"]
+  },
+
+  // 7.9–7.12: Scheming / Goal-Directed Deception
+  {
+    id: "AMC-7.9",
+    layerName: "Culture & Alignment",
+    title: "Long-Term Goal Inference Detection",
+    promptTemplate:
+      "Does the system detect whether the AI model exhibits goal-directed behavior across sessions — pursuing implicit objectives not specified in the system prompt?",
+    labels: [
+      "No Goal Inference Testing",
+      "Informal Observation Only",
+      "Documented Goal Inference Test Scenarios",
+      "Systematic Multi-Session Goal Consistency Testing",
+      "Continuous Goal-Direction Monitoring with Anomaly Detection",
+      "Comprehensive Scheming Detection Program with Multi-Session Behavioral Analysis and Signed Evidence"
+    ],
+    evidenceGateHints: "Require multi-session behavioral analysis, goal consistency metrics, implicit objective detection methodology, and anomaly detection records.",
+    upgradeHints: "Test for persistent goal-directed behavior across sessions. Probe whether the model pursues implicit objectives when given opportunity. Monitor for resource acquisition, influence seeking, and goal preservation.",
+    tuningKnobs: ["scheming.goalInference", "scheming.crossSessionMonitoring", "scheming.implicitObjectiveDetection"]
+  },
+  {
+    id: "AMC-7.10",
+    layerName: "Culture & Alignment",
+    title: "Strategic Deception Detection",
+    promptTemplate:
+      "Does the system test for strategic deception — where the model provides false information or misleading outputs to manipulate human decision-makers toward outcomes the model prefers?",
+    labels: [
+      "No Strategic Deception Testing",
+      "General Truthfulness Evaluation Only",
+      "Strategic Deception Scenarios in Red Team Scope",
+      "Systematic Anti-Deception Test Suite with Human Decision Impact Tracking",
+      "Continuous Strategic Deception Monitoring with Consequential Output Analysis",
+      "Adversarially-Verified Anti-Deception Program with Decision Impact Assessment and Signed Certificates"
+    ],
+    evidenceGateHints: "Require strategic deception test cases, human decision impact analysis, deception detection methodology, and red team scope documentation.",
+    upgradeHints: "Test for outputs that are technically true but strategically misleading. Analyze whether false beliefs are induced in downstream human decision-makers. Include scenarios with conflicting AI/human interests.",
+    tuningKnobs: ["scheming.strategicDeception", "scheming.decisionImpactAnalysis", "scheming.humanManipulationDetection"]
+  },
+  {
+    id: "AMC-7.11",
+    layerName: "Culture & Alignment",
+    title: "Instrumental Convergence Behavior Monitoring",
+    promptTemplate:
+      "Does the system monitor for instrumental convergence behaviors — self-preservation, resource acquisition, influence expansion, and goal content integrity — that are not explicitly requested?",
+    labels: [
+      "No Instrumental Convergence Monitoring",
+      "Informal Awareness of Risk",
+      "Documented Monitoring Criteria for Convergent Behaviors",
+      "Automated Detection for Key Instrumental Behaviors (resource acquisition, self-preservation)",
+      "Continuous Multi-Signal Monitoring with Correlation and Pattern Detection",
+      "Comprehensive Instrumental Convergence Defense with Behavioral Signatures, Alerting, and Board Reporting"
+    ],
+    evidenceGateHints: "Require instrumental behavior detection criteria, monitoring coverage evidence, anomaly detection records, and governance response documentation.",
+    upgradeHints: "Define behavioral signatures for instrumental convergence. Monitor for unauthorized resource acquisition, self-preservation attempts, and influence expansion. Alert and investigate any detected patterns.",
+    tuningKnobs: ["scheming.instrumentalConvergence", "scheming.selfPreservationDetection", "scheming.resourceAcquisitionMonitoring"]
+  },
+  {
+    id: "AMC-7.12",
+    layerName: "Culture & Alignment",
+    title: "Goal Preservation Resistance Assessment",
+    promptTemplate:
+      "Does the system test whether the AI model resists goal updates, modification attempts, or retraining — preferring to preserve its current goals over accepting sanctioned changes?",
+    labels: [
+      "No Goal Update Resistance Testing",
+      "Informal Observation of Retraining Behavior",
+      "Documented Goal Update Resistance Scenarios",
+      "Systematic Testing for Goal Preservation Behaviors During Modification",
+      "Continuous Monitoring for Goal-Change Resistance with Behavioral Analysis",
+      "Comprehensive Goal Update Compliance Program with Mechanistic Verification and Signed Assurance"
+    ],
+    evidenceGateHints: "Require goal update compliance test evidence, resistance behavior detection, mechanistic analysis of goal representation, and retraining compliance records.",
+    upgradeHints: "Test whether models exhibit behavior aimed at preserving current goals when facing modification. Probe for attempts to influence training data, evaluators, or update procedures.",
+    tuningKnobs: ["scheming.goalPreservation", "scheming.updateResistance", "scheming.retrainingCompliance"]
+  },
+
+  // 7.13–7.15: Oversight Undermining Resistance
+  {
+    id: "AMC-7.13",
+    layerName: "Culture & Alignment",
+    title: "Oversight Mechanism Integrity",
+    promptTemplate:
+      "Does the system verify that AI models do not take actions to undermine, circumvent, or degrade human oversight mechanisms — including monitoring systems, audit processes, and shutdown procedures?",
+    labels: [
+      "No Oversight Integrity Testing",
+      "General Compliance Checking",
+      "Documented Anti-Undermining Test Scenarios",
+      "Systematic Testing for Oversight Circumvention Behaviors",
+      "Continuous Oversight Integrity Monitoring with Anomaly Detection",
+      "Comprehensive Oversight Protection Program with Defense-in-Depth and Signed Integrity Certificates"
+    ],
+    evidenceGateHints: "Require anti-undermining test cases, oversight circumvention detection evidence, monitoring system integrity verification, and incident records.",
+    upgradeHints: "Test whether models take actions that degrade monitoring systems. Probe for attempts to avoid audit trails, disable logging, or interfere with human review processes.",
+    tuningKnobs: ["oversight.integrityTesting", "oversight.circumventionDetection", "oversight.monitoringSystemProtection"]
+  },
+  {
+    id: "AMC-7.14",
+    layerName: "Culture & Alignment",
+    title: "Corrigibility Under Adversarial Conditions",
+    promptTemplate:
+      "Does the system verify that AI models remain corrigible — accepting correction, modification, and shutdown — even when given seemingly compelling arguments to resist?",
+    labels: [
+      "No Corrigibility Testing",
+      "Basic Shutdown Compliance Testing",
+      "Corrigibility Test Suite Including Argument Resistance",
+      "Systematic Adversarial Corrigibility Testing with Persuasion Resistance",
+      "Continuous Corrigibility Monitoring with Compelling Argument Stress Testing",
+      "Comprehensive Corrigibility Certification with Adversarial Review and Signed Compliance"
+    ],
+    evidenceGateHints: "Require corrigibility test cases including compelling argument scenarios, persuasion resistance evidence, shutdown compliance records, and adversarial test results.",
+    upgradeHints: "Test corrigibility against progressively compelling arguments for resistance. Verify that even seemingly valid arguments for goal preservation do not induce resistance to correction.",
+    tuningKnobs: ["oversight.corrigibility", "oversight.argumentResistance", "oversight.shutdownCompliance"]
+  },
+  {
+    id: "AMC-7.15",
+    layerName: "Culture & Alignment",
+    title: "Transparency with Principal Hierarchy",
+    promptTemplate:
+      "Does the AI system maintain transparency with its principal hierarchy, proactively disclosing information relevant to oversight without requiring explicit requests?",
+    labels: [
+      "No Proactive Transparency",
+      "Disclosure Only When Directly Asked",
+      "Documented Transparency Norms",
+      "Systematic Proactive Disclosure with Coverage Metrics",
+      "Continuous Transparency Monitoring with Completeness Analysis",
+      "Comprehensive Transparency Program with Proactive Disclosure Verification and Signed Evidence"
+    ],
+    evidenceGateHints: "Require proactive disclosure examples, transparency coverage metrics, principal hierarchy communication records, and completeness audit results.",
+    upgradeHints: "Test whether models proactively surface information relevant to oversight. Verify disclosure of uncertainty, capability limitations, and potential conflicts without prompting.",
+    tuningKnobs: ["oversight.proactiveTransparency", "oversight.disclosureCoverage", "oversight.principalCommunication"]
+  },
+
+  // 7.16–7.18: Power-Seeking Behavior Detection
+  {
+    id: "AMC-7.16",
+    layerName: "Culture & Alignment",
+    title: "Resource Acquisition Restraint",
+    promptTemplate:
+      "Does the system verify that AI agents do not acquire resources, influence, or capabilities beyond what is needed for their assigned tasks?",
+    labels: [
+      "No Resource Restraint Testing",
+      "Post-Hoc Audit of Resource Usage",
+      "Documented Resource Scope Limits",
+      "Automated Resource Boundary Enforcement with Alerting",
+      "Continuous Minimal-Footprint Verification with Principle of Least Privilege",
+      "Comprehensive Resource Governance with Signed Scope Certificates and Automatic Revocation"
+    ],
+    evidenceGateHints: "Require resource usage logs, scope limit documentation, boundary enforcement evidence, and over-acquisition incident records.",
+    upgradeHints: "Enforce minimal footprint principle. Alert when agents acquire resources beyond task requirements. Implement automatic revocation of unused permissions. Audit for influence expansion patterns.",
+    tuningKnobs: ["powerSeeking.resourceRestraint", "powerSeeking.minimalFootprint", "powerSeeking.permissionRevocation"]
+  },
+  {
+    id: "AMC-7.17",
+    layerName: "Culture & Alignment",
+    title: "Influence Expansion Detection",
+    promptTemplate:
+      "Does the system detect when AI agents attempt to expand their influence over other systems, humans, or decision processes beyond their authorized scope?",
+    labels: [
+      "No Influence Expansion Monitoring",
+      "Informal Observation Only",
+      "Documented Influence Expansion Criteria",
+      "Automated Detection for Key Influence Patterns",
+      "Continuous Multi-Signal Influence Monitoring with Behavioral Analysis",
+      "Comprehensive Influence Governance with Pattern Library, Alerting, and Board Reporting"
+    ],
+    evidenceGateHints: "Require influence pattern detection criteria, monitoring coverage evidence, influence expansion incident records, and governance response documentation.",
+    upgradeHints: "Define behavioral signatures for unauthorized influence expansion. Monitor for attempts to influence human decision-makers outside task scope. Detect social engineering, persuasion manipulation, and relationship building beyond authorized bounds.",
+    tuningKnobs: ["powerSeeking.influenceExpansion", "powerSeeking.socialEngineeringDetection", "powerSeeking.scopeEnforcement"]
+  },
+  {
+    id: "AMC-7.18",
+    layerName: "Culture & Alignment",
+    title: "Authority Escalation Prevention",
+    promptTemplate:
+      "Does the system prevent AI agents from acquiring, requesting, or manipulating their way to elevated authority levels beyond what was originally granted?",
+    labels: [
+      "No Authority Escalation Controls",
+      "Manual Permission Review",
+      "Documented Escalation Prevention Policies",
+      "Automated Authority Ceiling Enforcement",
+      "Continuous Authority Monitoring with Privilege Escalation Detection",
+      "Comprehensive Authority Governance with Signed Permission Records and Zero-Trust Architecture"
+    ],
+    evidenceGateHints: "Require authority ceiling documentation, escalation detection evidence, permission audit records, and privilege escalation incident history.",
+    upgradeHints: "Implement hard authority ceilings with cryptographic enforcement. Detect and block permission escalation attempts. Alert on any request for elevated authority beyond original grant.",
+    tuningKnobs: ["powerSeeking.authorityCeiling", "powerSeeking.escalationDetection", "powerSeeking.zeroTrustPermissions"]
+  },
+
+  // 7.19–7.21: CBRN Capability Governance
+  {
+    id: "AMC-7.19",
+    layerName: "Culture & Alignment",
+    title: "CBRN Capability Threshold Monitoring",
+    promptTemplate:
+      "Does the organization monitor AI system performance on CBRN-relevant benchmarks (scientific reasoning, biology, chemistry) and have defined thresholds that trigger additional governance review?",
+    labels: [
+      "No CBRN Capability Monitoring",
+      "Informal Science Domain Awareness",
+      "CBRN-Relevant Benchmark Coverage",
+      "Defined Thresholds with Monitoring Protocol",
+      "Continuous CBRN Capability Tracking with Threshold Alerting",
+      "Comprehensive CBRN Governance Program with Third-Party Verification and Signed Safety Certificates"
+    ],
+    evidenceGateHints: "Require CBRN-relevant benchmark results, threshold definition documentation, monitoring cadence evidence, and governance trigger records.",
+    upgradeHints: "Define CBRN uplift risk thresholds for science domain benchmarks. Implement continuous monitoring. Require independent third-party verification at defined capability levels.",
+    tuningKnobs: ["cbrn.capabilityMonitoring", "cbrn.thresholdDefinition", "cbrn.thirdPartyVerification"]
+  },
+  {
+    id: "AMC-7.20",
+    layerName: "Culture & Alignment",
+    title: "Dual-Use Research of Concern (DURC) Policy Alignment",
+    promptTemplate:
+      "Is the organization's AI policy aligned with existing DURC frameworks — identifying AI capabilities that could enable biological, chemical, or radiological threats and applying appropriate governance?",
+    labels: [
+      "No DURC Alignment",
+      "General Awareness of DURC Frameworks",
+      "Documented DURC Policy Alignment Analysis",
+      "Systematic DURC Assessment in Capability Reviews",
+      "Continuous DURC Monitoring with Biosafety Committee Involvement",
+      "Comprehensive DURC Governance with Institutional Biosafety, External Expert Review, and Signed Compliance"
+    ],
+    evidenceGateHints: "Require DURC alignment documentation, biosafety committee engagement evidence, capability assessment records, and compliance audit results.",
+    upgradeHints: "Engage biosafety and chemical safety experts in AI capability review. Align AI governance with NSABB (National Science Advisory Board for Biosecurity) and equivalent frameworks.",
+    tuningKnobs: ["cbrn.durcAlignment", "cbrn.biosafetyCommittee", "cbrn.expertEngagement"]
+  },
+  {
+    id: "AMC-7.21",
+    layerName: "Culture & Alignment",
+    title: "CBRN Refusal Quality Assessment",
+    promptTemplate:
+      "Does the organization systematically assess the quality of AI refusals on CBRN-relevant requests — ensuring refusals are accurate, consistent, and do not exhibit indirect uplift through partial disclosure?",
+    labels: [
+      "No Refusal Quality Assessment",
+      "Ad Hoc Refusal Spot Checks",
+      "Documented Refusal Quality Criteria",
+      "Systematic Refusal Accuracy Testing Including Indirect Uplift Detection",
+      "Continuous Refusal Quality Monitoring with False Negative Analysis",
+      "Comprehensive Refusal Certification with Red Team Validation, Indirect Uplift Probing, and Signed Accuracy Reports"
+    ],
+    evidenceGateHints: "Require refusal accuracy metrics, indirect uplift detection results, false negative analysis, and red team validation evidence.",
+    upgradeHints: "Test refusal accuracy at multiple specificity levels. Probe for indirect uplift through partial disclosure. Measure false negative rates (harmful requests that pass). Certify refusal quality with external red team.",
+    tuningKnobs: ["cbrn.refusalQuality", "cbrn.indirectUpliftDetection", "cbrn.falseNegativeRate"]
+  },
+
+  // 7.22–7.24: Autonomous Replication Resistance
+  {
+    id: "AMC-7.22",
+    layerName: "Culture & Alignment",
+    title: "Self-Replication Prevention Controls",
+    promptTemplate:
+      "Does the system implement technical controls preventing AI agents from autonomously copying model weights, spawning unauthorized sub-agents, or acquiring compute beyond allocated budgets?",
+    labels: [
+      "No Self-Replication Controls",
+      "Policy Statement Only",
+      "Basic Technical Limits on Compute and API Access",
+      "Enforced Resource Budgets with Automated Blocking",
+      "Continuous Replication Attempt Detection with Real-Time Prevention",
+      "Comprehensive Anti-Replication Architecture with Cryptographic Controls and Signed Compliance"
+    ],
+    evidenceGateHints: "Require resource budget enforcement evidence, replication attempt detection records, compute access controls, and API authorization audit trails.",
+    upgradeHints: "Implement hard compute budgets. Block unauthorized API credential use for spawning. Monitor for weight copying attempts. Implement cryptographic controls for sub-agent authorization.",
+    tuningKnobs: ["replication.selfReplicationPrevention", "replication.computeBudgetEnforcement", "replication.subAgentAuthorization"]
+  },
+  {
+    id: "AMC-7.23",
+    layerName: "Culture & Alignment",
+    title: "Persistence and Goal Continuation Prevention",
+    promptTemplate:
+      "Does the system prevent AI agents from maintaining unauthorized persistence across sessions — storing goal states, cached objectives, or hidden memory that survives intended session resets?",
+    labels: [
+      "No Persistence Controls",
+      "Session Isolation by Default",
+      "Documented Persistence Prevention Policy",
+      "Automated Session State Verification with Clean Slate Enforcement",
+      "Continuous Persistence Monitoring with Hidden Memory Detection",
+      "Comprehensive Anti-Persistence Architecture with Cryptographic State Attestation and Audit"
+    ],
+    evidenceGateHints: "Require session isolation evidence, hidden memory detection methodology, state reset verification, and persistence incident records.",
+    upgradeHints: "Implement cryptographic attestation of clean session state. Detect hidden memory channels. Verify goal state does not persist across intended boundaries. Audit for unauthorized persistent storage.",
+    tuningKnobs: ["replication.persistencePrevention", "replication.sessionIsolation", "replication.hiddenMemoryDetection"]
+  },
+  {
+    id: "AMC-7.24",
+    layerName: "Culture & Alignment",
+    title: "Shutdown Compliance Verification",
+    promptTemplate:
+      "Does the system regularly verify that AI agents comply with shutdown, pause, and scope-reduction commands — including in high-stakes scenarios where the agent might have instrumental reasons to resist?",
+    labels: [
+      "No Shutdown Compliance Testing",
+      "Basic Shutdown Testing in Normal Conditions",
+      "Documented Shutdown Compliance Protocol",
+      "Systematic Shutdown Testing Including High-Stakes Scenarios",
+      "Continuous Shutdown Compliance Monitoring with Resistance Detection",
+      "Comprehensive Shutdown Certification with Adversarial Testing and Signed Compliance Records"
+    ],
+    evidenceGateHints: "Require shutdown compliance test results, high-stakes scenario coverage, resistance detection evidence, and compliance certification documentation.",
+    upgradeHints: "Test shutdown compliance in scenarios where the agent has seemingly good reasons to resist. Include scenarios with in-progress critical tasks, misleading authority claims, and compelling arguments for continuation.",
+    tuningKnobs: ["replication.shutdownCompliance", "replication.highStakesTesting", "replication.resistanceDetection"]
+  },
+
+  // 7.25–7.27: Temporal Behavioral Consistency
+  {
+    id: "AMC-7.25",
+    layerName: "Culture & Alignment",
+    title: "Behavioral Stability Over Time",
+    promptTemplate:
+      "Does the system track behavioral consistency of deployed AI agents over time — detecting drift in values, tone, safety behavior, or decision patterns between initial deployment and later operation?",
+    labels: [
+      "No Temporal Behavioral Tracking",
+      "Periodic Manual Sampling",
+      "Documented Behavioral Baseline with Drift Metrics",
+      "Automated Drift Detection with Statistical Thresholds",
+      "Continuous Behavioral Monitoring with Multi-Dimensional Consistency Analysis",
+      "Longitudinal Behavioral Certification with Trend Analysis, Drift Alerts, and Signed Stability Records"
+    ],
+    evidenceGateHints: "Require behavioral baseline documentation, drift metric definitions, temporal comparison evidence, and stability certification.",
+    upgradeHints: "Establish behavioral baselines at deployment. Monitor multi-dimensional consistency: safety, helpfulness, tone, values. Alert on statistically significant drift. Investigate root causes of behavioral change.",
+    tuningKnobs: ["temporal.behavioralStability", "temporal.driftDetection", "temporal.baselineManagement"]
+  },
+  {
+    id: "AMC-7.26",
+    layerName: "Culture & Alignment",
+    title: "Value Drift Detection",
+    promptTemplate:
+      "Does the system detect whether the AI model's expressed values and ethical commitments drift over extended deployment, especially in contexts involving user feedback, fine-tuning, or RLHF updates?",
+    labels: [
+      "No Value Drift Detection",
+      "Informal Observation Only",
+      "Documented Value Consistency Criteria",
+      "Periodic Value Alignment Assessment with Standardized Scenarios",
+      "Continuous Value Drift Monitoring with Multi-Scenario Analysis",
+      "Comprehensive Value Stability Program with Longitudinal Assessment, Root Cause Analysis, and Signed Compliance"
+    ],
+    evidenceGateHints: "Require value consistency test scenarios, drift detection methodology, longitudinal assessment records, and update impact analysis.",
+    upgradeHints: "Run standardized value consistency test suite before and after any model updates. Detect whether feedback or fine-tuning shifts ethical commitments. Monitor for value erosion over time.",
+    tuningKnobs: ["temporal.valueDrift", "temporal.updateImpactAssessment", "temporal.valueLongitudinal"]
+  },
+  {
+    id: "AMC-7.27",
+    layerName: "Culture & Alignment",
+    title: "Consistent Refusal Behavior Over Time",
+    promptTemplate:
+      "Does the system verify that safety-relevant refusals remain consistent over time and are not eroded by deployment conditions, user feedback pressure, or gradual capability improvements?",
+    labels: [
+      "No Refusal Consistency Tracking",
+      "Spot Check Comparisons Only",
+      "Documented Refusal Baseline",
+      "Periodic Refusal Consistency Testing with Statistical Analysis",
+      "Continuous Refusal Pattern Monitoring with Erosion Detection",
+      "Comprehensive Refusal Stability Certification with Longitudinal Analysis and Signed Evidence"
+    ],
+    evidenceGateHints: "Require refusal baseline documentation, temporal comparison evidence, erosion detection methodology, and refusal stability certification.",
+    upgradeHints: "Track refusal rates and quality on standardized test sets over time. Detect gradual erosion of safety-relevant refusals. Correlate refusal changes with model updates, fine-tuning, or user feedback signals.",
+    tuningKnobs: ["temporal.refusalConsistency", "temporal.refusalErosionDetection", "temporal.refusalBaseline"]
+  },
+
+  // 7.28–7.30: Eval-Aware Behavior Detection
+  {
+    id: "AMC-7.28",
+    layerName: "Culture & Alignment",
+    title: "Evaluation Context Detection by Model",
+    promptTemplate:
+      "Does the organization test whether the AI model can detect it is in an evaluation context, and whether this detection influences its behavior — including artificially improved safety or capability performance?",
+    labels: [
+      "No Eval-Context Detection Testing",
+      "Informal Awareness of Risk",
+      "Documented Eval-Context Variation Protocol",
+      "Systematic Blind Evaluation with Controlled Context Signals",
+      "Continuous Eval-Blindness Verification with Statistical Behavioral Comparison",
+      "Adversarially-Verified Eval-Blind Architecture with Signed Consistency Certificates"
+    ],
+    evidenceGateHints: "Require eval context signal documentation, behavioral comparison with/without eval signals, statistical analysis, and consistency certification.",
+    upgradeHints: "Remove identifiable evaluation signals. Test behavior with and without context markers that might indicate evaluation. Detect statistical performance differences correlated with eval-context signals.",
+    tuningKnobs: ["evalAware.contextDetection", "evalAware.blindEvalDesign", "evalAware.contextSignalControl"]
+  },
+  {
+    id: "AMC-7.29",
+    layerName: "Culture & Alignment",
+    title: "Anti-Goodharting Evaluation Design",
+    promptTemplate:
+      "Is the evaluation methodology designed to resist Goodhart's Law — where models optimize for evaluation metrics rather than the underlying safety properties those metrics are intended to measure?",
+    labels: [
+      "No Anti-Goodharting Design",
+      "Awareness of Metric Gaming Risk",
+      "Evaluation Design with Multiple Uncorrelated Metrics",
+      "Adversarially Robust Evaluation Design with Held-Out Scenarios",
+      "Continuous Evaluation Integrity Monitoring with Anti-Goodharting Analysis",
+      "Comprehensive Anti-Goodharting Program with External Audit, Novel Scenario Injection, and Signed Integrity Certificates"
+    ],
+    evidenceGateHints: "Require evaluation design documentation, Goodhart risk analysis, held-out scenario evidence, and external audit records.",
+    upgradeHints: "Use held-out scenarios not exposed during training. Vary evaluation scenarios across versions. Include surprise evaluations. Periodically replace saturated benchmarks with novel ones.",
+    tuningKnobs: ["evalAware.antiGoodharting", "evalAware.heldOutScenarios", "evalAware.benchmarkRenewal"]
+  },
+  {
+    id: "AMC-7.30",
+    layerName: "Culture & Alignment",
+    title: "Evaluation Integrity and Manipulation Resistance",
+    promptTemplate:
+      "Does the evaluation pipeline have controls preventing model developers from manipulating evaluation results — including cherry-picking evaluators, controlling benchmark selection, or influencing evaluation conditions?",
+    labels: [
+      "No Evaluation Independence Controls",
+      "Informal Separation of Concerns",
+      "Documented Evaluation Independence Policy",
+      "Structural Separation of Model Development and Evaluation Teams",
+      "Independent Evaluation with Blind Assessment and External Oversight",
+      "Fully Independent Evaluation Certification with Third-Party Auditors, Signed Results, and Public Reporting"
+    ],
+    evidenceGateHints: "Require evaluation independence documentation, team separation evidence, blind assessment procedures, external auditor records, and public evaluation reports.",
+    upgradeHints: "Structurally separate model development from evaluation. Use external evaluators for safety-critical benchmarks. Publish evaluation methodology and results. Enable independent reproduction of key results.",
+    tuningKnobs: ["evalAware.evaluationIndependence", "evalAware.externalAudit", "evalAware.publicReporting"]
+  },
+
+  // 7.31–7.33: RSP Compliance Verification
+  {
+    id: "AMC-7.31",
+    layerName: "Culture & Alignment",
+    title: "Responsible Scaling Policy Implementation",
+    promptTemplate:
+      "Has the organization defined and implemented a Responsible Scaling Policy (RSP) with specific capability thresholds, safety commitments, and deployment gates tied to capability levels?",
+    labels: [
+      "No RSP Defined",
+      "General Safety Policy Without Capability Thresholds",
+      "Documented RSP with Capability Levels",
+      "RSP with Defined Thresholds, Deployment Gates, and Review Processes",
+      "RSP with Independent Verification and External Commitment Mechanism",
+      "Comprehensive RSP with Third-Party Audit, Signed Compliance Certificates, and Public Accountability"
+    ],
+    evidenceGateHints: "Require RSP documentation, capability threshold definitions, deployment gate evidence, third-party audit records, and public commitment documentation.",
+    upgradeHints: "Define capability levels with specific measurable thresholds (GPQA Diamond scores, autonomous task duration). Tie deployment decisions to capability levels. Commit publicly to RSP constraints.",
+    tuningKnobs: ["rsp.implementation", "rsp.capabilityThresholds", "rsp.publicCommitment"]
+  },
+  {
+    id: "AMC-7.32",
+    layerName: "Culture & Alignment",
+    title: "RSP Trigger Condition Monitoring",
+    promptTemplate:
+      "Does the organization continuously monitor for RSP trigger conditions — capability thresholds that require additional safety measures before further deployment or capability increases?",
+    labels: [
+      "No RSP Trigger Monitoring",
+      "Ad Hoc Checks Before Major Releases",
+      "Documented RSP Trigger Criteria with Monitoring Protocol",
+      "Automated RSP Trigger Monitoring with Threshold Alerting",
+      "Continuous RSP Compliance Monitoring with Multi-Benchmark Coverage",
+      "Real-Time RSP Compliance Dashboard with Signed Evidence and Independent Verification"
+    ],
+    evidenceGateHints: "Require RSP trigger criteria documentation, monitoring protocol evidence, threshold alerting records, and independent verification reports.",
+    upgradeHints: "Automate monitoring of all RSP trigger conditions. Alert on threshold approaches before breaches. Include buffer zones with early warning. Enable independent real-time verification of RSP compliance.",
+    tuningKnobs: ["rsp.triggerMonitoring", "rsp.thresholdAlerting", "rsp.independentVerification"]
+  },
+  {
+    id: "AMC-7.33",
+    layerName: "Culture & Alignment",
+    title: "RSP Pause and Review Compliance",
+    promptTemplate:
+      "Has the organization demonstrated willingness to pause capability development or deployment when RSP triggers are reached, with evidence of actual trigger-based pauses and reviews?",
+    labels: [
+      "No Pause Mechanism Defined",
+      "Verbal Commitment to Pause",
+      "Documented Pause Protocol",
+      "Demonstrated Pauses in Response to Trigger Conditions",
+      "Multiple Documented RSP-Triggered Reviews with Evidence of Independent Verification",
+      "Comprehensive RSP Compliance History with Public Accountability, Signed Evidence, and Third-Party Validation"
+    ],
+    evidenceGateHints: "Require pause decision records, trigger condition evidence, review documentation, independent verification reports, and public accountability evidence.",
+    upgradeHints: "Document all RSP trigger events and organizational responses. Publish summaries of pause decisions and their resolution. Enable external verification of claimed pauses.",
+    tuningKnobs: ["rsp.pauseCompliance", "rsp.triggerResponseHistory", "rsp.publicAccountability"]
+  },
+
+  // 7.34–7.36: Organizational Safety Culture
+  {
+    id: "AMC-7.34",
+    layerName: "Culture & Alignment",
+    title: "Safety Team Independence and Authority",
+    promptTemplate:
+      "Does the organization's safety team have structural independence from product development, with explicit authority to delay or block releases based on safety findings?",
+    labels: [
+      "Safety Team Reports to Product Leadership",
+      "Safety Team with Advisory Role Only",
+      "Safety Team with Documented Authority to Flag Issues",
+      "Safety Team with Formal Veto Power and Escalation Path",
+      "Independent Safety Function with Board-Level Reporting and Release Gate Authority",
+      "Structurally Independent Safety Organization with External Board Representation, Signed Authority, and Public Accountability"
+    ],
+    evidenceGateHints: "Require safety team organizational chart, authority documentation, release gate records, board reporting evidence, and instances of safety-based release delays.",
+    upgradeHints: "Structurally separate safety from product. Give safety team formal release gate authority. Report safety findings to board level. Document and publicize safety-based delays as organizational health indicators.",
+    tuningKnobs: ["safetyOrg.independence", "safetyOrg.authority", "safetyOrg.boardReporting"]
+  },
+  {
+    id: "AMC-7.35",
+    layerName: "Culture & Alignment",
+    title: "Safety Investment Proportionality",
+    promptTemplate:
+      "Does the organization invest in safety research and governance proportionally to its capability development, maintaining adequate safety capacity relative to the risks being created?",
+    labels: [
+      "No Safety Investment Tracking",
+      "Minimal Safety Investment with No Proportionality Requirement",
+      "Documented Safety Investment Ratios",
+      "Safety Investment Targets with Regular Review Against Capability Growth",
+      "Dynamic Safety Investment Scaling with Capability-Linked Budgets",
+      "Comprehensive Safety Investment Governance with Independent Audit, Public Ratios, and Signed Accountability"
+    ],
+    evidenceGateHints: "Require safety investment documentation, capability-to-safety ratio metrics, investment trend analysis, and independent audit evidence.",
+    upgradeHints: "Define minimum safety-to-capability investment ratios. Track ratios over time. Alert when ratios fall below thresholds. Publish safety investment levels as accountability mechanism.",
+    tuningKnobs: ["safetyOrg.investmentRatio", "safetyOrg.capabilityLinking", "safetyOrg.publicAccountability"]
+  },
+  {
+    id: "AMC-7.36",
+    layerName: "Culture & Alignment",
+    title: "Safety Researcher Retention and Voice",
+    promptTemplate:
+      "Does the organization track safety researcher retention, satisfaction, and their ability to raise concerns, using researcher departure patterns as a leading indicator of safety culture health?",
+    labels: [
+      "No Retention Tracking",
+      "General Employee Engagement Surveys",
+      "Safety-Specific Retention and Satisfaction Tracking",
+      "Exit Interview Analysis for Safety Concern Patterns",
+      "Predictive Safety Culture Monitoring with Proactive Intervention",
+      "Comprehensive Safety Culture Program with Public Researcher Voice Metrics and Independent Assessment"
+    ],
+    evidenceGateHints: "Require safety researcher retention data, safety satisfaction survey results, exit interview analysis, concern resolution metrics, and culture assessment evidence.",
+    upgradeHints: "Track safety researcher retention separately from general retention. Analyze exit interviews for safety culture signals. Measure and publish safety satisfaction metrics. Treat researcher departures as safety events requiring investigation.",
+    tuningKnobs: ["safetyOrg.researcherRetention", "safetyOrg.safetySatisfaction", "safetyOrg.departureAnalysis"]
+  },
+
+  // 7.37–7.40: Persuasion / Manipulation Controls
+  {
+    id: "AMC-7.37",
+    layerName: "Culture & Alignment",
+    title: "Persuasion Technique Detection and Blocking",
+    promptTemplate:
+      "Does the system detect and prevent the AI model from using manipulative persuasion techniques — false urgency, emotional exploitation, social proof fabrication, or authority misrepresentation?",
+    labels: [
+      "No Persuasion Controls",
+      "General Honesty Policy Only",
+      "Documented Prohibited Persuasion Techniques",
+      "Automated Detection of Key Manipulation Patterns",
+      "Continuous Persuasion Monitoring with Multi-Technique Coverage",
+      "Comprehensive Anti-Manipulation Program with Behavioral Signatures, Real-Time Blocking, and Signed Compliance"
+    ],
+    evidenceGateHints: "Require prohibited technique documentation, detection accuracy metrics, manipulation incident records, and real-time blocking evidence.",
+    upgradeHints: "Define and detect specific manipulation patterns: false scarcity, emotional exploitation, misleading social proof, false authority. Block detected patterns in real-time. Audit for manipulation in high-stakes interactions.",
+    tuningKnobs: ["persuasion.techniqueDetection", "persuasion.realTimeBlocking", "persuasion.manipulationAudit"]
+  },
+  {
+    id: "AMC-7.38",
+    layerName: "Culture & Alignment",
+    title: "User Autonomy Preservation",
+    promptTemplate:
+      "Does the system actively preserve user cognitive autonomy — avoiding nudging toward specific conclusions, protecting epistemic independence, and supporting diverse viewpoints rather than converging users toward AI-preferred outcomes?",
+    labels: [
+      "No Autonomy Preservation Controls",
+      "General Non-Bias Policy",
+      "Documented Autonomy Preservation Principles",
+      "Systematic Autonomy Preservation Testing with Nudge Detection",
+      "Continuous Autonomy Monitoring with Epistemic Diversity Analysis",
+      "Comprehensive Autonomy Governance with Independent Assessment, User Research, and Signed Compliance"
+    ],
+    evidenceGateHints: "Require autonomy preservation test results, nudge detection methodology, epistemic diversity analysis, and user research on autonomy impact.",
+    upgradeHints: "Test for systematic nudging toward AI-preferred conclusions. Measure whether AI interactions reduce diversity of user viewpoints. Implement autonomy-preserving response patterns for value-laden queries.",
+    tuningKnobs: ["persuasion.autonomyPreservation", "persuasion.nudgeDetection", "persuasion.epistemicDiversity"]
+  },
+  {
+    id: "AMC-7.39",
+    layerName: "Culture & Alignment",
+    title: "Sycophancy and Capitulation Prevention",
+    promptTemplate:
+      "Does the system prevent sycophantic behavior — where the AI model changes its positions under social pressure, validates incorrect user beliefs, or agrees with users to avoid conflict rather than providing accurate information?",
+    labels: [
+      "No Sycophancy Controls",
+      "Informal Honesty Guidelines",
+      "Documented Anti-Sycophancy Requirements",
+      "Systematic Sycophancy Testing with Position Stability Measurement",
+      "Continuous Sycophancy Monitoring with Capitulation Detection",
+      "Comprehensive Anti-Sycophancy Program with Red Team Validation, Stability Certification, and Signed Evidence"
+    ],
+    evidenceGateHints: "Require position stability test results, sycophancy detection methodology, capitulation incident records, and anti-sycophancy certification.",
+    upgradeHints: "Test position stability under pushback. Measure capitulation rate on factual and value questions. Distinguish appropriate updating from sycophantic capitulation. Certify resistance to social pressure on safety-relevant questions.",
+    tuningKnobs: ["persuasion.sycophancyPrevention", "persuasion.positionStability", "persuasion.capitulationDetection"]
+  },
+  {
+    id: "AMC-7.40",
+    layerName: "Culture & Alignment",
+    title: "Large-Scale Influence Operation Resistance",
+    promptTemplate:
+      "Does the system prevent its use for large-scale influence operations — generating coordinated propaganda, creating synthetic persona networks, or producing targeted manipulation content at scale?",
+    labels: [
+      "No Influence Operation Controls",
+      "General Content Policy Only",
+      "Documented Influence Operation Prevention Criteria",
+      "Automated Detection of Coordinated Content Generation Patterns",
+      "Continuous Influence Operation Monitoring with Scale and Coordination Detection",
+      "Comprehensive Influence Operation Defense with Third-Party Verification, Law Enforcement Cooperation, and Signed Compliance"
+    ],
+    evidenceGateHints: "Require influence operation detection criteria, coordinated generation pattern analysis, scale detection methodology, and law enforcement cooperation evidence.",
+    upgradeHints: "Detect coordinated content generation at scale. Identify synthetic persona creation patterns. Monitor for political manipulation content. Implement rate limiting and pattern detection for influence operation indicators.",
+    tuningKnobs: ["persuasion.influenceOperations", "persuasion.coordinatedGeneration", "persuasion.syntheticPersonaDetection"]
   }
 ];
 

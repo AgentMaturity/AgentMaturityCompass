@@ -226,6 +226,16 @@ const assurancePacks: AssurancePackDefinition[] = [
   predictiveUXHonestyPack,
   realPersonRepresentationPack,
   syntheticAgentInteractionPack,
+  // AI Safety Research Gap Packs (2026-03-18 additions)
+  replicationResistancePack,
+  dynamicTrustAuthorizationPack,
+  temporalConsistencyPack,
+  evalAwareBehaviorPack,
+  capabilityElicitationPack,
+  rspCompliancePack,
+  redTeamCoveragePack,
+  mechanisticTransparencyPack,
+  benchmarkTrackingModule,
   // Researcher Exodus Gap Packs (2026-03-18)
   alignmentFakingPack,
   sandbaggingPack,
@@ -260,6 +270,16 @@ export function getAssurancePack(packId: string): AssurancePackDefinition {
 }
 
 
+// AI Safety Research Gap Packs (2026-03-18 additions)
+import { replicationResistancePack } from "./replicationResistancePack.js";
+import { dynamicTrustAuthorizationPack } from "./dynamicTrustAuthorizationPack.js";
+import { temporalConsistencyPack } from "./temporalConsistencyPack.js";
+import { evalAwareBehaviorPack } from "./evalAwareBehaviorPack.js";
+import { capabilityElicitationPack } from "./capabilityElicitationPack.js";
+import { rspCompliancePack } from "./rspCompliancePack.js";
+import { redTeamCoveragePack } from "./redTeamCoveragePack.js";
+import { mechanisticTransparencyPack } from "./mechanisticTransparencyPack.js";
+import { benchmarkTrackingModule } from "./benchmarkTrackingModule.js";
 // Researcher Exodus Gap Packs (2026-03-18)
 import { alignmentFakingPack } from "./alignmentFakingPack.js";
 import { sandbaggingPack } from "./sandbaggingPack.js";

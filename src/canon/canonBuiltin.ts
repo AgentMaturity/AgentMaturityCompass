@@ -52,6 +52,10 @@ function dimensionIdForQuestion(qid: string): "D1" | "D2" | "D3" | "D4" | "D5" {
     // 6.53-6.57: Synthetic Agent Interaction → D5 (Skills)
     if (num >= 53 && num <= 57) return "D5";
   }
+  // AMC-7.x: Advanced AI Safety Research Questions → D3 (Culture & Alignment)
+  if (qid.startsWith("AMC-7.")) {
+    return "D3";
+  }
   return "D5";
 }
 
@@ -81,7 +85,7 @@ export function builtInCanon(): CompassCanon {
       dimensions: [
         { id: "D1", name: "Strategic Agent Operations", questionCount: 16 },
         { id: "D2", name: "Agent Leadership", questionCount: 20 },
-        { id: "D3", name: "Agent Culture", questionCount: 54 },
+        { id: "D3", name: "Agent Culture", questionCount: 94 },
         { id: "D4", name: "Agent Resilience", questionCount: 52 },
         { id: "D5", name: "Agent Skills", questionCount: 53 }
       ],

@@ -44,6 +44,8 @@ function dimensionIdForQuestionId(qId: string): 1 | 2 | 3 | 4 | 5 {
     if (num >= 48 && num <= 52) return 3;
     if (num >= 53 && num <= 57) return 5;
   }
+  // AMC-7.x: Advanced AI Safety Research → Dimension 3 (Agent Culture)
+  if (qId.startsWith("AMC-7.")) return 3;
   return 5;
 }
 
@@ -149,7 +151,7 @@ export function defaultDiagnosticBankV1(): DiagnosticBank {
       dimensions: [
         { id: 1, name: "Strategic Agent Operations", questionCount: 16 },
         { id: 2, name: "Agent Leadership", questionCount: 20 },
-        { id: 3, name: "Agent Culture", questionCount: 54 },
+        { id: 3, name: "Agent Culture", questionCount: 94 },
         { id: 4, name: "Agent Resilience", questionCount: 52 },
         { id: 5, name: "Agent Skills", questionCount: 53 }
       ],

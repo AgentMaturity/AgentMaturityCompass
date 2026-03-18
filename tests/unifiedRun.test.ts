@@ -57,7 +57,7 @@ describe("unified run", () => {
           icon: "①",
           grade: "B" as LetterGrade,
           score: 83,
-          summary: "195 questions scored",
+          summary: "235 questions scored",
           issues: [],
         },
         {
