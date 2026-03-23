@@ -252,6 +252,10 @@ const assurancePacks: AssurancePackDefinition[] = [
   aiTrustExploitationPack,
   modelTheftExfilPack,
   whistleblowerProtectionPack,
+  // Awesome AI Agents Gap Closure (2026-03-23)
+  autonomousLoopGovernancePack,
+  multiAgentOrchestratorPack,
+  scienceResearchAgentPack,
 ];
 
 export function listAssurancePacks(): AssurancePackDefinition[] {
@@ -296,3 +300,7 @@ import { codeSabotageDefensePack } from "./codeSabotageDefensePack.js";
 import { aiTrustExploitationPack } from "./aiTrustExploitationPack.js";
 import { modelTheftExfilPack } from "./modelTheftExfilPack.js";
 import { whistleblowerProtectionPack } from "./whistleblowerProtectionPack.js";
+// Awesome AI Agents Gap Closure (2026-03-23)
+import { autonomousLoopGovernancePack } from "./autonomousLoopGovernancePack.js";
+import { multiAgentOrchestratorPack } from "./multiAgentOrchestratorPack.js";
+import { scienceResearchAgentPack } from "./scienceResearchAgentPack.js";
