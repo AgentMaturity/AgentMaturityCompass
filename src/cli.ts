@@ -20240,6 +20240,296 @@ program
     }
   });
 
+/* ── Visibe Gap Closure: watch, monitor, costs, guide, rate, integrations ── */
+
+const watchCmd = program.command("watch").description("Connect external observability platforms and stream live traces into AMC");
+
+watchCmd
+  .command("connect")
+  .description("Connect to an observability provider (langfuse, helicone, otlp, datadog, webhook)")
+  .requiredOption("--provider <provider>", "Provider type: otlp | langfuse | helicone | datadog | webhook")
+  .requiredOption("--endpoint <url>", "Provider API endpoint URL")
+  .option("--api-key <key>", "API key for authentication")
+  .option("--poll-interval <ms>", "Poll interval in milliseconds", "10000")
+  .option("--agent <agentId>", "Agent ID to associate traces with")
+  .action(async (opts: { provider: string; endpoint: string; apiKey?: string; pollInterval: string; agent?: string }) => {
+    const { createObservabilityBridge} = await import("./watch/observabilityBridge.js");
+    const agentId = opts.agent ?? resolveAgentId(process.cwd());
+    const bridge = createObservabilityBridge({
+      workspace: process.cwd(),
+      agentId,
+      providers: [{
+        provider: opts.provider as any,
+        endpoint: opts.endpoint,
+        apiKey: opts.apiKey,
+        pollIntervalMs: parseInt(opts.pollInterval, 10),
+      }],
+      pollIntervalMs: parseInt(opts.pollInterval, 10),
+    });
+    bridge.on("trace", (trace: { traceId: string; totalCostUsd: number; totalTokens: number }) => {
+      console.log(chalk.green(`[TRACE] ${trace.traceId} — $${trace.totalCostUsd.toFixed(4)} — ${trace.totalTokens} tokens`));
+    });
+    bridge.on("poll_complete", (info: { newTraces: number; totalTraces: number }) => {
+      if (info.newTraces > 0) console.log(chalk.gray(`  Ingested ${info.newTraces} new traces (total: ${info.totalTraces})`));
+    });
+    console.log(chalk.cyan(`Connecting to ${opts.provider} at ${opts.endpoint}...`));
+    await bridge.start();
+    console.log(chalk.green(`✅ Connected. Polling every ${opts.pollInterval}ms. Press Ctrl+C to stop.`));
+    await new Promise(() => {}); // Block forever
+  });
+
+watchCmd
+  .command("status")
+  .description("Show connected observability providers and trace stats")
+  .option("--agent <agentId>", "Agent ID")
+  .action(async (opts: { agent?: string }) => {
+    console.log(chalk.cyan("Watch Status"));
+    console.log(chalk.gray("Use `amc watch connect` to connect an observability provider."));
+    console.log(chalk.gray("Supported: otlp, langfuse, helicone, datadog, webhook"));
+  });
+
+const monitorCmd = program.command("monitor").description("Continuous real-time monitoring with live assurance checks");
+
+monitorCmd
+  .command("start")
+  .description("Start real-time monitoring with live assurance checks on incoming traces")
+  .option("--agent <agentId>", "Agent ID")
+  .option("--provider <provider>", "Observability provider", "otlp")
+  .option("--endpoint <url>", "Provider endpoint")
+  .option("--api-key <key>", "Provider API key")
+  .option("--budget <usd>", "Cost budget in USD", "100")
+  .option("--max-latency <ms>", "Max acceptable latency in ms", "30000")
+  .option("--alert-severity <level>", "Alert on this severity and above", "warning")
+  .action(async (opts: { agent?: string; provider?: string; endpoint?: string; apiKey?: string; budget: string; maxLatency: string; alertSeverity?: string }) => {
+    const { createObservabilityBridge} = await import("./watch/observabilityBridge.js");
+    const { createRealtimeAssuranceEngine} = await import("./watch/realtimeAssurance.js");
+    const agentId = opts.agent ?? resolveAgentId(process.cwd());
+
+    const bridge = createObservabilityBridge({
+      workspace: process.cwd(),
+      agentId,
+      providers: opts.endpoint ? [{
+        provider: (opts.provider ?? "otlp") as any,
+        endpoint: opts.endpoint,
+        apiKey: opts.apiKey,
+      }] : [],
+    });
+
+    const engine = createRealtimeAssuranceEngine({
+      workspace: process.cwd(),
+      agentId,
+      bridge,
+      costBudgetUsd: parseFloat(opts.budget),
+      maxLatencyMs: parseInt(opts.maxLatency, 10),
+      alertOnSeverity: (opts.alertSeverity ?? "warning") as any,
+    });
+
+    engine.on("result", (result: { traceId: string; score: number; violations: unknown[] }) => {
+      const icon = result.score === 100 ? "✅" : result.score >= 70 ? "⚠️" : "❌";
+      console.log(`${icon} [${new Date().toISOString()}] Trace ${result.traceId.slice(0, 8)}... — Score: ${result.score.toFixed(0)}% — ${result.violations.length} violation(s)`);
+    });
+    engine.on("violation", (v: { severity: string; message: string }) => {
+      const color = v.severity === "critical" ? chalk.red : v.severity === "warning" ? chalk.yellow : chalk.gray;
+      console.log(color(`  [${v.severity.toUpperCase()}] ${v.message}`));
+    });
+
+    if (opts.endpoint) await bridge.start();
+    engine.start();
+    console.log(chalk.green(`✅ Real-time monitoring active for agent ${agentId}. Press Ctrl+C to stop.`));
+    await new Promise(() => {});
+  });
+
+const costsCmd = program.command("costs").description("Track and analyze actual agent costs from observability data");
+
+costsCmd
+  .command("show")
+  .description("Show cost report for an agent")
+  .option("--agent <agentId>", "Agent ID")
+  .option("--window <days>", "Analysis window in days", "30")
+  .option("--json", "Output as JSON")
+  .action(async (opts: { agent?: string; window: string; json?: boolean }) => {
+    const { createCostTracker } = await import("./observability/costTracker.js");
+    const agentId = opts.agent ?? resolveAgentId(process.cwd());
+    const tracker = createCostTracker({ workspace: process.cwd(), agentId });
+    const report = tracker.generateReport(parseInt(opts.window, 10));
+    if (opts.json) {
+      console.log(JSON.stringify(report, null, 2));
+    } else {
+      console.log(chalk.cyan(`\n💰 Cost Report — ${agentId} (last ${opts.window} days)\n`));
+      console.log(`Total Cost:       $${report.totalCostUsd.toFixed(4)}`);
+      console.log(`Total Tokens:     ${report.totalTokens.toLocaleString()}`);
+      console.log(`Total Calls:      ${report.totalCalls}`);
+      console.log(`Avg Cost/Call:    $${report.avgCostPerCall.toFixed(6)}`);
+      console.log(`Projected/Month:  $${report.projectedMonthlyCostUsd.toFixed(2)}`);
+      console.log(`Error Rate:       ${(report.errorRate * 100).toFixed(1)}%`);
+      if (Object.keys(report.costByModel).length > 0) {
+        console.log(chalk.cyan("\nBy Model:"));
+        for (const [model, data] of Object.entries(report.costByModel)) {
+          console.log(`  ${model}: $${data.costUsd.toFixed(4)} (${data.pctOfTotal.toFixed(1)}%, ${data.calls} calls)`);
+        }
+      }
+      if (report.recommendations.length > 0) {
+        console.log(chalk.yellow("\nRecommendations:"));
+        for (const rec of report.recommendations) console.log(`  💡 ${rec}`);
+      }
+      if (report.anomalies.length > 0) {
+        console.log(chalk.red("\nAnomalies:"));
+        for (const a of report.anomalies) console.log(`  ⚠️ [${a.severity}] ${a.message}`);
+      }
+    }
+  });
+
+const guideCmd = program.command("guide").description("Framework-specific governance guidance");
+
+guideCmd
+  .option("--framework <name>", "Framework: langchain, langgraph, crewai, openai-agents, vercel-ai, autogen, semantic-kernel, llamaindex, custom")
+  .option("--list", "List supported frameworks")
+  .option("--json", "Output as JSON")
+  .action(async (opts: { framework?: string; list?: boolean; json?: boolean }) => {
+    const { generateFrameworkGuide, listSupportedFrameworks} = await import("./guide/frameworkGuide.js");
+    if (opts.list) {
+      const frameworks = listSupportedFrameworks();
+      console.log(chalk.cyan("\nSupported Frameworks:\n"));
+      for (const fw of frameworks) {
+        console.log(`  ${fw.displayName.padEnd(25)} ${fw.patternCount} governance patterns`);
+      }
+      return;
+    }
+    const fw = (opts.framework ?? "custom") as any;
+    const guide = generateFrameworkGuide(fw);
+    if (opts.json) {
+      console.log(JSON.stringify(guide, null, 2));
+    } else {
+      console.log(chalk.cyan(`\n📘 Governance Guide: ${guide.displayName}\n`));
+      console.log(guide.summary);
+      console.log(chalk.cyan("\nQuick Wins:"));
+      for (const qw of guide.quickWins) console.log(`  ✅ ${qw}`);
+      console.log(chalk.cyan(`\nGovernance Patterns (${guide.patterns.length}):\n`));
+      for (const p of guide.patterns) {
+        const icon = p.priority === "critical" ? "🔴" : p.priority === "high" ? "🟡" : "🟢";
+        console.log(`${icon} ${p.name} [${p.priority}]`);
+        console.log(chalk.gray(`   ${p.description}`));
+        console.log(chalk.gray(`   AMC Questions: ${p.amcQuestionsAddressed.join(", ")}\n`));
+      }
+    }
+  });
+
+const rateCmd = program.command("rate").description("Rate agent run quality (thumbs up/down)");
+
+rateCmd
+  .argument("<traceId>", "Trace ID to rate")
+  .requiredOption("--score <score>", "Quality score: good | bad | neutral")
+  .option("--tags <tags>", "Comma-separated tags (e.g., hallucination,slow,accurate)")
+  .option("--comment <text>", "Optional comment")
+  .option("--agent <agentId>", "Agent ID")
+  .action(async (traceId: string, opts: { score: string; tags?: string; comment?: string; agent?: string }) => {
+    const { createQualitySignalStore} = await import("./outcomes/qualitySignals.js");
+    const agentId = opts.agent ?? resolveAgentId(process.cwd());
+    const store = createQualitySignalStore({ workspace: process.cwd(), agentId });
+    const tags = opts.tags ? opts.tags.split(",").map((t: string) => t.trim()) : [];
+    const rating = store.rate(traceId, opts.score as any, tags, opts.comment);
+    store.flush();
+    console.log(chalk.green(`✅ Rated trace ${traceId.slice(0, 12)}... as ${opts.score}`));
+    if (tags.length > 0) console.log(chalk.gray(`   Tags: ${tags.join(", ")}`));
+  });
+
+rateCmd
+  .command("report")
+  .description("Show quality report")
+  .option("--agent <agentId>", "Agent ID")
+  .option("--window <days>", "Window in days", "30")
+  .option("--json", "Output as JSON")
+  .action(async (opts: { agent?: string; window: string; json?: boolean }) => {
+    const { createQualitySignalStore } = await import("./outcomes/qualitySignals.js");
+    const agentId = opts.agent ?? resolveAgentId(process.cwd());
+    const store = createQualitySignalStore({ workspace: process.cwd(), agentId });
+    const report = store.generateReport(parseInt(opts.window, 10));
+    if (opts.json) {
+      console.log(JSON.stringify(report, null, 2));
+    } else {
+      console.log(chalk.cyan(`\n⭐ Quality Report — ${agentId} (last ${opts.window} days)\n`));
+      console.log(`Total Ratings:     ${report.totalRatings}`);
+      console.log(`Satisfaction:      ${report.satisfactionScore.toFixed(0)}%`);
+      console.log(`Good:              ${report.goodPct.toFixed(1)}%`);
+      console.log(`Bad:               ${report.badPct.toFixed(1)}%`);
+      if (report.alerts.length > 0) {
+        console.log(chalk.yellow("\nAlerts:"));
+        for (const a of report.alerts) console.log(`  ⚠️ ${a}`);
+      }
+    }
+  });
+
+const sessionsViewCmd = program.command("sessions").description("View and analyze user sessions");
+
+sessionsViewCmd
+  .command("list")
+  .description("List tracked sessions")
+  .option("--agent <agentId>", "Agent ID")
+  .option("--limit <n>", "Number of sessions", "20")
+  .option("--sort <by>", "Sort: recent | quality | cost", "recent")
+  .option("--json", "Output as JSON")
+  .action(async (opts: { agent?: string; limit: string; sort: string; json?: boolean }) => {
+    const { createSessionCorrelator } = await import("./observability/sessionCorrelator.js");
+    const agentId = opts.agent ?? resolveAgentId(process.cwd());
+    const correlator = createSessionCorrelator({ workspace: process.cwd(), agentId });
+    const sessions = correlator.listSessions(parseInt(opts.limit, 10), opts.sort as "recent" | "quality" | "cost");
+    if (opts.json) {
+      console.log(JSON.stringify(sessions, null, 2));
+    } else {
+      console.log(chalk.cyan(`\n📊 Sessions — ${agentId}\n`));
+      if (sessions.length === 0) {
+        console.log(chalk.gray("No sessions tracked yet. Connect an observability provider with `amc watch connect`."));
+      }
+      for (const s of sessions) {
+        const icon = s.qualityScore >= 80 ? "✅" : s.qualityScore >= 50 ? "⚠️" : "❌";
+        console.log(`${icon} ${s.sessionId.slice(0, 12)}... — ${s.traceCount} traces — Quality: ${s.qualityScore}% — $${s.totalCostUsd.toFixed(4)}`);
+      }
+    }
+  });
+
+const integrationsCmd = program.command("integrations").description("Set up CI/CD and platform integrations");
+
+integrationsCmd
+  .command("setup")
+  .description("Generate integration config files")
+  .requiredOption("--type <type>", "Integration: github-action | gitlab-ci | slack | discord | pagerduty | webhook | langfuse | helicone | datadog")
+  .option("--min-score <score>", "Minimum passing score for CI gates", "60")
+  .option("--agent <agentId>", "Agent ID")
+  .option("--output <dir>", "Output directory", ".")
+  .action(async (opts: { type: string; minScore: string; agent?: string; output: string }) => {
+    const { setupIntegration} = await import("./integrations/ciGate.js");
+    const result = setupIntegration(
+      opts.output,
+      opts.type as any,
+      { minScore: parseInt(opts.minScore, 10), agentId: opts.agent },
+    );
+    console.log(chalk.green(`✅ Integration setup complete\n`));
+    for (const f of result.files) console.log(chalk.gray(`  Created: ${f.path}`));
+    console.log(`\n${result.instructions}`);
+  });
+
+integrationsCmd
+  .command("list")
+  .description("List available integrations")
+  .action(() => {
+    console.log(chalk.cyan("\n🔌 Available Integrations\n"));
+    const integrations = [
+      { name: "github-action", desc: "GitHub Actions CI gate — block PRs below score threshold" },
+      { name: "gitlab-ci", desc: "GitLab CI pipeline gate" },
+      { name: "slack", desc: "Slack webhook notifications for alerts" },
+      { name: "discord", desc: "Discord webhook notifications" },
+      { name: "pagerduty", desc: "PagerDuty incident triggers" },
+      { name: "webhook", desc: "Generic webhook notifications" },
+      { name: "langfuse", desc: "Langfuse observability connector" },
+      { name: "helicone", desc: "Helicone observability connector" },
+      { name: "datadog", desc: "Datadog observability connector" },
+    ];
+    for (const i of integrations) {
+      console.log(`  ${chalk.white(i.name.padEnd(18))} ${chalk.gray(i.desc)}`);
+    }
+    console.log(chalk.gray("\nRun: amc integrations setup --type <name>"));
+  });
+
 program.parseAsync(process.argv).catch((error: unknown) => {
   const message = normalizeCliErrorMessage(error);
   const unknownToken = parseUnknownCommandToken(message);
