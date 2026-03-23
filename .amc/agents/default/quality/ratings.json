@@ -1,0 +1,13 @@
+[
+  {
+    "id": "6341cc40-7806-41db-a537-c36153aad275",
+    "traceId": "test-trace-123",
+    "agentId": "default",
+    "score": "good",
+    "tags": [
+      "accurate",
+      "fast"
+    ],
+    "ts": 1774274865400
+  }
+]

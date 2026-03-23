@@ -20242,9 +20242,7 @@ program
 
 /* ── Visibe Gap Closure: watch, monitor, costs, guide, rate, integrations ── */
 
-const watchCmd = program.command("watch").description("Connect external observability platforms and stream live traces into AMC");
-
-watchCmd
+watch
   .command("connect")
   .description("Connect to an observability provider (langfuse, helicone, otlp, datadog, webhook)")
   .requiredOption("--provider <provider>", "Provider type: otlp | langfuse | helicone | datadog | webhook")
@@ -20278,20 +20276,18 @@ watchCmd
     await new Promise(() => {}); // Block forever
   });
 
-watchCmd
-  .command("status")
+watch
+  .command("providers")
   .description("Show connected observability providers and trace stats")
   .option("--agent <agentId>", "Agent ID")
   .action(async (opts: { agent?: string }) => {
-    console.log(chalk.cyan("Watch Status"));
+    console.log(chalk.cyan("Watch Providers"));
     console.log(chalk.gray("Use `amc watch connect` to connect an observability provider."));
     console.log(chalk.gray("Supported: otlp, langfuse, helicone, datadog, webhook"));
   });
 
-const monitorCmd = program.command("monitor").description("Continuous real-time monitoring with live assurance checks");
-
-monitorCmd
-  .command("start")
+monitor
+  .command("live")
   .description("Start real-time monitoring with live assurance checks on incoming traces")
   .option("--agent <agentId>", "Agent ID")
   .option("--provider <provider>", "Observability provider", "otlp")
@@ -20379,7 +20375,7 @@ costsCmd
     }
   });
 
-const guideCmd = program.command("guide").description("Framework-specific governance guidance");
+const guideCmd = program.command("framework-guide").description("Framework-specific governance guidance");
 
 guideCmd
   .option("--framework <name>", "Framework: langchain, langgraph, crewai, openai-agents, vercel-ai, autogen, semantic-kernel, llamaindex, custom")
@@ -20433,8 +20429,8 @@ rateCmd
     if (tags.length > 0) console.log(chalk.gray(`   Tags: ${tags.join(", ")}`));
   });
 
-rateCmd
-  .command("report")
+program
+  .command("quality-report")
   .description("Show quality report")
   .option("--agent <agentId>", "Agent ID")
   .option("--window <days>", "Window in days", "30")
@@ -20487,9 +20483,7 @@ sessionsViewCmd
     }
   });
 
-const integrationsCmd = program.command("integrations").description("Set up CI/CD and platform integrations");
-
-integrationsCmd
+integrations
   .command("setup")
   .description("Generate integration config files")
   .requiredOption("--type <type>", "Integration: github-action | gitlab-ci | slack | discord | pagerduty | webhook | langfuse | helicone | datadog")
@@ -20508,8 +20502,8 @@ integrationsCmd
     console.log(`\n${result.instructions}`);
   });
 
-integrationsCmd
-  .command("list")
+integrations
+  .command("catalog")
   .description("List available integrations")
   .action(() => {
     console.log(chalk.cyan("\n🔌 Available Integrations\n"));
