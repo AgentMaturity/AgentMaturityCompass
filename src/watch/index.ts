@@ -17,6 +17,42 @@ export type { AuditEvent, SiemExportResult, SiemBatchResult } from "./siemExport
 export { exportToSiem, verifyTenantBoundary, createPolicyPack } from "./stubs.js";
 export type { SiemEvent } from "./stubs.js";
 
+// ── Observability Bridge (connect external platforms to AMC scoring) ──
+export {
+  ObservabilityBridge,
+  createObservabilityBridge,
+  createProviderAdapter,
+  OTLPAdapter,
+  LangfuseAdapter,
+  HeliconeAdapter,
+  DatadogAdapter,
+  WebhookAdapter,
+  estimateCost,
+} from "./observabilityBridge.js";
+export type {
+  NormalizedTrace,
+  NormalizedSpan,
+  TraceStatus,
+  ObservabilityProvider,
+  ProviderConfig,
+  ProviderAdapter,
+  ObservabilityBridgeConfig,
+} from "./observabilityBridge.js";
+
+// ── Real-Time Assurance (live trace evaluation) ──
+export {
+  RealtimeAssuranceEngine,
+  createRealtimeAssuranceEngine,
+} from "./realtimeAssurance.js";
+export type {
+  RealtimeAssuranceCheck,
+  RealtimeAssuranceResult,
+  RealtimeAssuranceViolation,
+  RealtimeAssuranceConfig,
+  AssuranceCheckSeverity,
+  CheckContext,
+} from "./realtimeAssurance.js";
+
 // ── Behavioral Profiler (ML anomaly detection, trust degradation alerts) ──
 export { BehavioralProfiler } from './behavioralProfiler.js';
 export type {
