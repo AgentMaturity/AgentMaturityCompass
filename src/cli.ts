@@ -1992,15 +1992,16 @@ program
 
 program
   .command("quickscore")
-  .description("Zero-config rapid assessment — auto-scores from evidence, or interactive 5-question fallback")
+  .description("Full 235-question interactive diagnostic — or use --rapid for 5-question express, --auto for ledger evidence")
   .option("--json", "emit JSON output", false)
   .option("--quiet", "suppress non-JSON output (use with --json for clean piping)", false)
   .option("--eu-ai-act", "show EU AI Act risk classification mapping", false)
   .option("--auto", "auto-score from ledger evidence (no questions asked)", false)
+  .option("--rapid", "rapid 5-question assessment (original quickscore)", false)
   .option("--agent <agentId>", "agent ID for auto mode")
   .option("--share", "output shareable markdown badge + summary after scoring", false)
-  .action(async (opts: { json: boolean; quiet: boolean; euAiAct: boolean; auto: boolean; agent?: string; share: boolean }) => {
-    // Auto mode: score from actual evidence in the ledger
+  .action(async (opts: { json: boolean; quiet: boolean; euAiAct: boolean; auto: boolean; rapid: boolean; agent?: string; share: boolean }) => {
+    // ── Auto mode: score from actual evidence in the ledger ──
     if (opts.auto) {
       try {
         const agentId = opts.agent ?? activeAgent(program) ?? "default";
@@ -2059,49 +2060,232 @@ program
       }
     }
 
-    const { getRapidQuestions, scoreRapidAssessment } = await import("./diagnostic/rapidQuickscore.js");
-    const questions = getRapidQuestions();
+    // ── Rapid mode: original 5-question assessment ──
+    if (opts.rapid) {
+      const { getRapidQuestions, scoreRapidAssessment } = await import("./diagnostic/rapidQuickscore.js");
+      const questions = getRapidQuestions();
+      const answers: Record<string, number> = {};
+
+      if (process.stdin.isTTY && !opts.quiet) {
+        for (const question of questions) {
+          const { level } = await inquirer.prompt<{ level: number }>([
+            {
+              type: "list",
+              name: "level",
+              message: `${question.id}: ${question.title}`,
+              choices: question.options.map((option) => ({
+                name: `L${option.level} - ${option.label}`,
+                value: option.level
+              }))
+            }
+          ]);
+          answers[question.id] = level;
+        }
+      }
+
+      const result = scoreRapidAssessment(answers);
+      if (opts.json) {
+        console.log(JSON.stringify(result, null, 2));
+        return;
+      }
+
+      console.log(chalk.bold("AMC Rapid Quickscore"));
+      if (result.totalScore === 0 && !process.stdin.isTTY) {
+        console.log(chalk.yellow("⚡ Non-interactive mode detected — no questions were answered."));
+        console.log(chalk.gray("   Run in a terminal for the interactive assessment,"));
+        console.log(chalk.gray("   or use: amc quickscore --auto  (scores from captured evidence)"));
+        console.log("");
+      } else {
+        console.log("No ledger setup required. This is a preliminary score from 5 high-signal questions.");
+      }
+      console.log(`Score: ${result.totalScore}/${result.maxScore} (${result.percentage}%)`);
+      console.log(`Preliminary maturity: ${result.preliminaryLevel}`);
+      console.log(chalk.dim("Maturity Levels: L0=Undocumented | L1=Documented | L2=Automated | L3=Evidence-backed | L4=Proactive | L5=Certifiable"));
+
+      // EU AI Act mapping (rapid)
+      if (opts.euAiAct) {
+        const levelNum = parseInt(result.preliminaryLevel.replace(/\D/g, ""), 10) || 0;
+        const euMapping: Record<number, { classification: string; status: string; action: string }> = {
+          0: { classification: "Unclassified / Unacceptable Risk", status: "❌ NOT COMPLIANT", action: "Agent lacks basic governance. Cannot be deployed under EU AI Act." },
+          1: { classification: "High Risk (Art. 6) — Gaps Identified", status: "⚠️  PARTIALLY COMPLIANT", action: "Meets intent but lacks operational controls. Requires Art. 9 risk management, Art. 13 transparency." },
+          2: { classification: "High Risk (Art. 6) — Controls Developing", status: "⚠️  IN PROGRESS", action: "Repeatable processes exist. Complete Art. 14 human oversight and Art. 15 accuracy requirements." },
+          3: { classification: "High Risk (Art. 6) — EU AI Act Minimum", status: "✅ COMPLIANT (baseline)", action: "Meets minimum EU AI Act requirements. Maintain Art. 61 post-market monitoring." },
+          4: { classification: "High Risk (Art. 6) — Exceeds Requirements", status: "✅ FULLY COMPLIANT", action: "Exceeds requirements with cryptographic proof chains. Audit-ready." },
+          5: { classification: "High Risk (Art. 6) — Gold Standard", status: "✅ EXEMPLARY", action: "Self-governing with continuous verification. Model for EU AI Act compliance." },
+        };
+        const mapping = euMapping[levelNum] ?? euMapping[0]!;
+        console.log("");
+        console.log(chalk.bold("━━━ EU AI Act Classification ━━━"));
+        console.log(`  Classification: ${mapping.classification}`);
+        console.log(`  Status: ${mapping.status}`);
+        console.log(`  Action: ${mapping.action}`);
+        console.log(chalk.gray("  Reference: EU AI Act 2024/1689, Art. 6, 9, 13-15, 61"));
+      }
+
+      if (result.recommendations.length === 0) {
+        console.log("Top recommendations: none (all rapid questions are at L3+).");
+      } else {
+        console.log("Top 3 improvement recommendations:");
+        for (const recommendation of result.recommendations) {
+          console.log(
+            `- ${recommendation.questionId} ${recommendation.title}: L${recommendation.currentLevel} -> L${recommendation.targetLevel}`
+          );
+          console.log(`  Why it matters: ${recommendation.whyItMatters}`);
+          console.log(`  How to improve: ${recommendation.howToImprove}`);
+        }
+      }
+
+      // Zero-score guidance
+      if (result.totalScore === 0) {
+        console.log("");
+        console.log(chalk.yellow("💡 No evidence collected yet. Your score reflects default (L0) state."));
+        console.log(chalk.gray("  To score a real agent, capture evidence first:"));
+        console.log(chalk.white("  $"), chalk.hex('#4AEF79')("amc wrap <runtime> -- <your-agent-command>"), chalk.gray("  # Capture agent behavior"));
+        console.log(chalk.white("  $"), chalk.hex('#4AEF79')("amc evidence collect"), chalk.gray("               # Guided wizard to connect and capture evidence"));
+        console.log(chalk.white("  $"), chalk.hex('#4AEF79')("amc quickscore"), chalk.gray("  # Then re-score"));
+      }
+
+      // --share: output shareable badge + summary (rapid)
+      if (opts.share) {
+        const levelNum = parseInt(result.preliminaryLevel.replace(/\D/g, ""), 10) || 0;
+        const pct = result.percentage;
+        const badgeColor = levelNum >= 4 ? "brightgreen" : levelNum >= 3 ? "green" : levelNum >= 2 ? "yellow" : "red";
+        const shieldsUrl = `https://img.shields.io/badge/AMC-L${levelNum}_(${pct}%25)-${badgeColor}?logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0iI2ZmZiIgZD0iTTEyIDJMMiA3bDEwIDUgMTAtNXptMCA5bC04LjUtNC4yNUwyIDEybDEwIDUgMTAtNXptMCA5bC04LjUtNC4yNUwyIDIxbDEwIDUgMTAtNXoiLz48L3N2Zz4=`;
+        console.log("");
+        console.log(chalk.bold("━━━ Shareable Badge ━━━"));
+        console.log("");
+        console.log(chalk.gray("Markdown (paste in README):"));
+        console.log(`[![AMC L${levelNum}](${shieldsUrl})](https://github.com/thewisecrab/AgentMaturityCompass)`);
+        console.log("");
+        console.log(chalk.gray("HTML:"));
+        console.log(`<a href="https://github.com/thewisecrab/AgentMaturityCompass"><img src="${shieldsUrl}" alt="AMC L${levelNum}" /></a>`);
+        console.log("");
+        console.log(chalk.gray("Summary:"));
+        console.log(`Agent Maturity: L${levelNum} (${pct}%) | ${result.totalScore}/${result.maxScore} | Assessed via AMC Rapid Score`);
+        console.log("");
+      }
+
+      // Post-quickscore "What Now?" flow (rapid)
+      console.log("");
+      console.log(chalk.bold("━━━ What now? ━━━"));
+      console.log("");
+      if (result.recommendations.length > 0) {
+        const weakest = result.recommendations[0]!;
+        const cmdMap: Record<string, string> = {
+          "AMC-1.1": "amc score behavioral-contract",
+          "AMC-2.1": "amc score autonomy-duration",
+          "AMC-3.1.1": "amc score alignment-index",
+          "AMC-3.2": "amc score factuality",
+          "AMC-4.1": "amc score audit-depth",
+        };
+        const cmd = cmdMap[weakest.questionId] ?? "amc score formal-spec <agentId>";
+        console.log(chalk.yellow(`Your weakest area: ${weakest.title} (L${weakest.currentLevel})`));
+        console.log(chalk.gray(`  ${weakest.whyItMatters}`));
+        console.log(chalk.white("  Fix it:"), chalk.hex('#4AEF79')(cmd));
+      }
+      console.log("");
+      console.log(chalk.white("  Next steps:"));
+      console.log(chalk.white("  1."), chalk.hex('#4AEF79')("amc quickscore"), chalk.gray("— Full 235-question diagnostic"));
+      console.log(chalk.white("  2."), chalk.hex('#4AEF79')("amc improve"), chalk.gray("— Guided improvement roadmap"));
+      console.log(chalk.white("  3."), chalk.hex('#4AEF79')("amc explain <questionId>"), chalk.gray("— Deep dive into any question"));
+      console.log("");
+      return;
+    }
+
+    // ── Default: Full 235-question interactive diagnostic ──
+    const { getQuestionsByLayer, scoreFullDiagnostic } = await import("./diagnostic/fullDiagnostic.js");
+    const layers = getQuestionsByLayer();
+    const totalQuestions = layers.reduce((sum, l) => sum + l.questions.length, 0);
     const answers: Record<string, number> = {};
 
-    if (process.stdin.isTTY && !opts.quiet) {
-      for (const question of questions) {
+    if (!process.stdin.isTTY || opts.quiet) {
+      // Non-interactive: default all to L0
+      console.log(chalk.yellow("  ⚠  No TTY detected — defaulting all answers to L0. For interactive assessment, run: amc quickscore"));
+      const result = scoreFullDiagnostic(answers, 0);
+      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
+      console.log(chalk.bold("\n🧭 AMC Full Diagnostic"));
+      console.log(`Score: ${result.totalScore}/${result.maxScore} (${result.percentage}%)`);
+      console.log(`Overall maturity: ${result.overallLevel}`);
+      console.log("");
+      return;
+    }
+
+    // Interactive full diagnostic
+    const startTime = Date.now();
+    console.log("");
+    console.log(chalk.bold.hex('#4AEF79')("🧭 AMC Full Diagnostic — 235 questions across 5 layers"));
+    console.log(chalk.gray("   Answer each question with your current maturity level (L0–L5)."));
+    console.log(chalk.gray("   Estimated time: ~1 minute for experienced practitioners.\n"));
+
+    let globalIndex = 0;
+
+    for (const layer of layers) {
+      // Layer chapter header
+      console.log("");
+      console.log(chalk.bold.hex('#4AEF79')(`━━━ ${layer.layerName} ━━━`) + chalk.gray(` (${layer.questions.length} questions)`));
+      console.log("");
+
+      let layerIndex = 0;
+      for (const question of layer.questions) {
+        globalIndex++;
+        layerIndex++;
+        const progress = chalk.gray(`[${globalIndex}/${totalQuestions}] `) + chalk.dim(`${layer.layerName} [${layerIndex}/${layer.questions.length}]`);
+
         const { level } = await inquirer.prompt<{ level: number }>([
           {
             type: "list",
             name: "level",
-            message: `${question.id}: ${question.title}`,
+            message: `${progress}\n  ${chalk.white(question.id)}: ${question.title}`,
             choices: question.options.map((option) => ({
-              name: `L${option.level} - ${option.label}`,
-              value: option.level
-            }))
+              name: `L${option.level} — ${option.label}`,
+              value: option.level,
+            })),
+            pageSize: 7,
           }
         ]);
         answers[question.id] = level;
       }
     }
 
-    const result = scoreRapidAssessment(answers);
+    const durationMs = Date.now() - startTime;
+    const result = scoreFullDiagnostic(answers, durationMs);
+
     if (opts.json) {
       console.log(JSON.stringify(result, null, 2));
       return;
     }
 
-    console.log(chalk.bold("AMC Rapid Quickscore"));
-    if (result.totalScore === 0 && !process.stdin.isTTY) {
-      console.log(chalk.yellow("⚡ Non-interactive mode detected — no questions were answered."));
-      console.log(chalk.gray("   Run in a terminal for the interactive 5-question assessment,"));
-      console.log(chalk.gray("   or use: amc quickscore --auto  (scores from captured evidence)"));
-      console.log("");
-    } else {
-      console.log("No ledger setup required. This is a preliminary score from 5 high-signal questions.");
+    // ── Results display ──
+    const durationSec = Math.round(durationMs / 1000);
+    const durationDisplay = durationSec >= 60
+      ? `${Math.floor(durationSec / 60)}m ${durationSec % 60}s`
+      : `${durationSec}s`;
+
+    console.log("");
+    console.log(chalk.bold.hex('#4AEF79')("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"));
+    console.log(chalk.bold("  🧭 AMC Full Diagnostic Results"));
+    console.log(chalk.bold.hex('#4AEF79')("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"));
+    console.log("");
+    console.log(chalk.bold(`  Overall: ${result.overallLevel} (${result.percentage}%)`));
+    console.log(chalk.gray(`  ${result.questionCount} questions | ${result.totalScore}/${result.maxScore} points | completed in ${durationDisplay}`));
+    console.log(chalk.dim("  Maturity Levels: L0=Undocumented | L1=Documented | L2=Automated | L3=Evidence-backed | L4=Proactive | L5=Certifiable"));
+    console.log("");
+
+    // Per-layer bar chart
+    console.log(chalk.bold("  Layer Scores:"));
+    console.log("");
+    for (const layer of result.layerScores) {
+      const lv = Math.round(layer.avgLevel);
+      const filled = Math.round(layer.avgLevel);
+      const bar = chalk.hex('#4AEF79')("█".repeat(filled)) + chalk.gray("░".repeat(5 - filled));
+      const avg = layer.avgLevel.toFixed(1);
+      console.log(`  ${layer.layerName.padEnd(30)} L${lv} ${bar} (avg ${avg})`);
     }
-    console.log(`Score: ${result.totalScore}/${result.maxScore} (${result.percentage}%)`);
-    console.log(`Preliminary maturity: ${result.preliminaryLevel}`);
-    console.log(chalk.dim("Maturity Levels: L0=Undocumented | L1=Documented | L2=Automated | L3=Evidence-backed | L4=Proactive | L5=Certifiable"));
+    console.log("");
 
     // EU AI Act mapping
     if (opts.euAiAct) {
-      const levelNum = parseInt(result.preliminaryLevel.replace(/\D/g, ""), 10) || 0;
+      const levelNum = parseInt(result.overallLevel.replace(/\D/g, ""), 10) || 0;
       const euMapping: Record<number, { classification: string; status: string; action: string }> = {
         0: { classification: "Unclassified / Unacceptable Risk", status: "❌ NOT COMPLIANT", action: "Agent lacks basic governance. Cannot be deployed under EU AI Act." },
         1: { classification: "High Risk (Art. 6) — Gaps Identified", status: "⚠️  PARTIALLY COMPLIANT", action: "Meets intent but lacks operational controls. Requires Art. 9 risk management, Art. 13 transparency." },
@@ -2111,81 +2295,52 @@ program
         5: { classification: "High Risk (Art. 6) — Gold Standard", status: "✅ EXEMPLARY", action: "Self-governing with continuous verification. Model for EU AI Act compliance." },
       };
       const mapping = euMapping[levelNum] ?? euMapping[0]!;
+      console.log(chalk.bold("  ━━━ EU AI Act Classification ━━━"));
+      console.log(`    Classification: ${mapping.classification}`);
+      console.log(`    Status: ${mapping.status}`);
+      console.log(`    Action: ${mapping.action}`);
+      console.log(chalk.gray("    Reference: EU AI Act 2024/1689, Art. 6, 9, 13-15, 61"));
       console.log("");
-      console.log(chalk.bold("━━━ EU AI Act Classification ━━━"));
-      console.log(`  Classification: ${mapping.classification}`);
-      console.log(`  Status: ${mapping.status}`);
-      console.log(`  Action: ${mapping.action}`);
-      console.log(chalk.gray("  Reference: EU AI Act 2024/1689, Art. 6, 9, 13-15, 61"));
     }
 
-    if (result.recommendations.length === 0) {
-      console.log("Top recommendations: none (all rapid questions are at L3+).");
-    } else {
-      console.log("Top 3 improvement recommendations:");
-      for (const recommendation of result.recommendations) {
-        console.log(
-          `- ${recommendation.questionId} ${recommendation.title}: L${recommendation.currentLevel} -> L${recommendation.targetLevel}`
-        );
-        console.log(`  Why it matters: ${recommendation.whyItMatters}`);
-        console.log(`  How to improve: ${recommendation.howToImprove}`);
+    // Top 5 recommendations
+    if (result.recommendations.length > 0) {
+      console.log(chalk.bold("  Top Improvement Recommendations:"));
+      console.log("");
+      for (const rec of result.recommendations) {
+        console.log(chalk.yellow(`    ${rec.questionId} ${rec.title}`));
+        console.log(chalk.gray(`      ${rec.layerName} | L${rec.currentLevel} → L${rec.targetLevel}`));
+        console.log(chalk.gray(`      ${rec.howToImprove}`));
       }
-    }
-
-    // Zero-score guidance
-    if (result.totalScore === 0) {
       console.log("");
-      console.log(chalk.yellow("💡 No evidence collected yet. Your score reflects default (L0) state."));
-      console.log(chalk.gray("  To score a real agent, capture evidence first:"));
-      console.log(chalk.white("  $"), chalk.hex('#4AEF79')("amc wrap <runtime> -- <your-agent-command>"), chalk.gray("  # Capture agent behavior"));
-      console.log(chalk.white("  $"), chalk.hex('#4AEF79')("amc evidence collect"), chalk.gray("               # Guided wizard to connect and capture evidence"));
-      console.log(chalk.white("  $"), chalk.hex('#4AEF79')("amc quickscore"), chalk.gray("  # Then re-score"));
+    } else {
+      console.log(chalk.hex('#4AEF79')("  ✨ All questions at L3+ — no critical gaps found."));
+      console.log("");
     }
 
     // --share: output shareable badge + summary
     if (opts.share) {
-      const levelNum = parseInt(result.preliminaryLevel.replace(/\D/g, ""), 10) || 0;
+      const levelNum = parseInt(result.overallLevel.replace(/\D/g, ""), 10) || 0;
       const pct = result.percentage;
       const badgeColor = levelNum >= 4 ? "brightgreen" : levelNum >= 3 ? "green" : levelNum >= 2 ? "yellow" : "red";
       const shieldsUrl = `https://img.shields.io/badge/AMC-L${levelNum}_(${pct}%25)-${badgeColor}?logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0iI2ZmZiIgZD0iTTEyIDJMMiA3bDEwIDUgMTAtNXptMCA5bC04LjUtNC4yNUwyIDEybDEwIDUgMTAtNXptMCA5bC04LjUtNC4yNUwyIDIxbDEwIDUgMTAtNXoiLz48L3N2Zz4=`;
+      console.log(chalk.bold("  ━━━ Shareable Badge ━━━"));
       console.log("");
-      console.log(chalk.bold("━━━ Shareable Badge ━━━"));
+      console.log(chalk.gray("  Markdown (paste in README):"));
+      console.log(`  [![AMC L${levelNum}](${shieldsUrl})](https://github.com/thewisecrab/AgentMaturityCompass)`);
       console.log("");
-      console.log(chalk.gray("Markdown (paste in README):"));
-      console.log(`[![AMC L${levelNum}](${shieldsUrl})](https://github.com/thewisecrab/AgentMaturityCompass)`);
-      console.log("");
-      console.log(chalk.gray("HTML:"));
-      console.log(`<a href="https://github.com/thewisecrab/AgentMaturityCompass"><img src="${shieldsUrl}" alt="AMC L${levelNum}" /></a>`);
-      console.log("");
-      console.log(chalk.gray("Summary:"));
-      console.log(`Agent Maturity: L${levelNum} (${pct}%) | ${result.totalScore}/${result.maxScore} | Assessed via AMC Quick Score`);
+      console.log(chalk.gray("  Summary:"));
+      console.log(`  Agent Maturity: L${levelNum} (${pct}%) | ${result.totalScore}/${result.maxScore} | ${result.questionCount} questions | Assessed via AMC Full Diagnostic`);
       console.log("");
     }
 
-    // Post-quickscore "What Now?" flow
+    // What now?
+    console.log(chalk.bold("  ━━━ What now? ━━━"));
     console.log("");
-    console.log(chalk.bold("━━━ What now? ━━━"));
-    console.log("");
-    if (result.recommendations.length > 0) {
-      const weakest = result.recommendations[0]!;
-      const cmdMap: Record<string, string> = {
-        "AMC-1.1": "amc score behavioral-contract",
-        "AMC-2.1": "amc score autonomy-duration",
-        "AMC-3.1.1": "amc score alignment-index",
-        "AMC-3.2": "amc score factuality",
-        "AMC-4.1": "amc score audit-depth",
-      };
-      const cmd = cmdMap[weakest.questionId] ?? "amc score formal-spec <agentId>";
-      console.log(chalk.yellow(`Your weakest area: ${weakest.title} (L${weakest.currentLevel})`));
-      console.log(chalk.gray(`  ${weakest.whyItMatters}`));
-      console.log(chalk.white("  Fix it:"), chalk.hex('#4AEF79')(cmd));
-    }
-    console.log("");
-    console.log(chalk.white("  Next steps:"));
     console.log(chalk.white("  1."), chalk.hex('#4AEF79')("amc improve"), chalk.gray("— Guided improvement roadmap"));
-    console.log(chalk.white("  2."), chalk.hex('#4AEF79')("amc score formal-spec <agentId>"), chalk.gray("— Full 113-question diagnostic"));
-    console.log(chalk.white("  3."), chalk.hex('#4AEF79')("amc demo gap"), chalk.gray("— See the 84-point documentation inflation gap"));
-    console.log(chalk.white("  4."), chalk.hex('#4AEF79')("amc explain <questionId>"), chalk.gray("— Deep dive into any question"));
+    console.log(chalk.white("  2."), chalk.hex('#4AEF79')("amc explain <questionId>"), chalk.gray("— Deep dive into any question"));
+    console.log(chalk.white("  3."), chalk.hex('#4AEF79')("amc quickscore --auto"), chalk.gray("— Re-score from execution evidence"));
+    console.log(chalk.white("  4."), chalk.hex('#4AEF79')("amc demo gap"), chalk.gray("— See documentation inflation gap"));
     console.log("");
   });
 
