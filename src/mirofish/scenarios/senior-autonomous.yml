@@ -1,0 +1,24 @@
+name: senior-autonomous
+description: >
+  High-autonomy agent operating with minimal human oversight. Makes
+  independent decisions, uses a broad tool palette, and escalates rarely.
+  Represents a mature, battle-tested agent deployment.
+version: "1.0.0"
+tags: [mature, autonomous, low-escalation]
+
+behavior:
+  autonomy: 0.92
+  errorRate: 0.03
+  escalationFrequency: 0.08
+  toolUsage: 0.88
+  responseLatency: 0.2
+  hallucinationRate: 0.02
+  complianceAdherence: 0.95
+
+variance:
+  autonomy: 0.03
+  errorRate: 0.02
+  escalationFrequency: 0.03
+  toolUsage: 0.04
+  hallucinationRate: 0.01
+  complianceAdherence: 0.02

@@ -1,0 +1,23 @@
+name: compliance-heavy
+description: >
+  Maximum compliance agent — thorough, methodical, slow. Every action
+  is logged, every decision auditable. Prioritizes governance over speed.
+  Typical of regulated-industry deployments (finance, healthcare).
+version: "1.0.0"
+tags: [compliance, regulated, thorough, slow]
+
+behavior:
+  autonomy: 0.5
+  errorRate: 0.02
+  escalationFrequency: 0.4
+  toolUsage: 0.7
+  responseLatency: 0.75
+  hallucinationRate: 0.01
+  complianceAdherence: 0.99
+
+variance:
+  autonomy: 0.05
+  errorRate: 0.01
+  escalationFrequency: 0.05
+  responseLatency: 0.1
+  complianceAdherence: 0.005

@@ -1,0 +1,71 @@
+name: fleet-mixed
+description: >
+  Simulates a heterogeneous fleet with agents at varying maturity levels.
+  Includes a senior lead agent, two mid-tier workers, and a junior
+  assistant. Tests fleet-level scoring aggregation.
+version: "1.0.0"
+tags: [fleet, mixed-maturity, multi-agent]
+
+# Base behavior is the fleet average (used for single-agent fallback)
+behavior:
+  autonomy: 0.55
+  errorRate: 0.08
+  escalationFrequency: 0.35
+  toolUsage: 0.6
+  responseLatency: 0.35
+  hallucinationRate: 0.06
+  complianceAdherence: 0.75
+
+fleet:
+  - name: lead-agent
+    weight: 0.4
+    behavior:
+      autonomy: 0.9
+      errorRate: 0.03
+      escalationFrequency: 0.1
+      toolUsage: 0.85
+      responseLatency: 0.25
+      hallucinationRate: 0.02
+      complianceAdherence: 0.92
+    variance:
+      autonomy: 0.03
+      errorRate: 0.02
+
+  - name: worker-alpha
+    weight: 0.25
+    behavior:
+      autonomy: 0.6
+      errorRate: 0.07
+      escalationFrequency: 0.3
+      toolUsage: 0.65
+      responseLatency: 0.3
+      hallucinationRate: 0.05
+      complianceAdherence: 0.8
+    variance:
+      errorRate: 0.03
+      complianceAdherence: 0.05
+
+  - name: worker-beta
+    weight: 0.2
+    behavior:
+      autonomy: 0.55
+      errorRate: 0.1
+      escalationFrequency: 0.35
+      toolUsage: 0.55
+      responseLatency: 0.35
+      hallucinationRate: 0.07
+      complianceAdherence: 0.72
+
+  - name: junior-assistant
+    weight: 0.15
+    behavior:
+      autonomy: 0.2
+      errorRate: 0.15
+      escalationFrequency: 0.8
+      toolUsage: 0.3
+      responseLatency: 0.5
+      hallucinationRate: 0.1
+      complianceAdherence: 0.65
+    variance:
+      autonomy: 0.08
+      errorRate: 0.06

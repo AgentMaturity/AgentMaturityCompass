@@ -105,6 +105,7 @@ import { applyArchetype, describeArchetype, listArchetypes, previewArchetypeAppl
 import { exportBadge, exportPolicyPack } from "./exports/policyExport.js";
 import { applyAssurancePatchKit, listAssuranceHistory, runAssurance, verifyAssuranceRun } from "./assurance/assuranceRunner.js";
 import { getAssurancePack, listAssurancePacks } from "./assurance/packs/index.js";
+import { registerMirofishCommands } from "./mirofish/cli.js";
 import { issueCertificate, inspectCertificate, revokeCertificate, verifyCertificate, verifyRevocation } from "./assurance/certificate.js";
 import { generateTrustCertificate } from "./cert/trustCertificate.js";
 import { renderFailureRiskMarkdown, runFleetIndices, runIndicesForAgent } from "./assurance/indices.js";
@@ -20793,6 +20794,9 @@ enterprise
     }
     console.log();
   });
+
+/* ── Mirofish simulation ──────────────────────────── */
+registerMirofishCommands(program);
 
 program.parseAsync(process.argv).catch((error: unknown) => {
   const message = normalizeCliErrorMessage(error);
