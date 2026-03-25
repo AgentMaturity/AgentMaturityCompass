@@ -20679,6 +20679,121 @@ integrations
     console.log(chalk.gray("\nRun: amc integrations setup --type <name>"));
   });
 
+/* ── Enterprise Tier ─────────────────────────────────────────────── */
+const enterprise = program
+  .command("enterprise")
+  .description("Enterprise tier — licensing, audit export, SSO, fleet governance");
+
+enterprise
+  .command("status")
+  .description("Show current license status, tier, and enabled features")
+  .action(async () => {
+    const { enterpriseStatusCli } = await import("./enterprise/enterpriseCli.js");
+    const result = enterpriseStatusCli({ workspace: process.cwd() });
+    console.log(chalk.bold.white(`\n  Enterprise Status\n`));
+    console.log(`  Tier:      ${chalk.hex("#00ff41")(result.tierLabel)} (${result.tier})`);
+    console.log(`  License:   ${result.licenseValid ? chalk.green("valid") : chalk.red(result.licenseStatus)}`);
+    if (result.org) {
+      console.log(`  Org:       ${chalk.white(result.org)}`);
+    }
+    if (result.expiresAt) {
+      console.log(`  Expires:   ${chalk.gray(result.expiresAt)}`);
+    }
+    if (result.graceDaysRemaining > 0) {
+      console.log(`  Grace:     ${chalk.hex("#f59e0b")(`${result.graceDaysRemaining} days remaining`)}`);
+    }
+    console.log(`  Features:  ${result.features.length > 0 ? result.features.join(", ") : chalk.gray("none")}`);
+    if (result.errors.length > 0) {
+      for (const err of result.errors) {
+        console.log(`  ${chalk.red("error:")} ${err}`);
+      }
+    }
+    console.log();
+  });
+
+enterprise
+  .command("activate <key>")
+  .description("Activate an enterprise license key (format: AMC-ENT-XXXX-XXXX-XXXX)")
+  .action(async (key: string) => {
+    const { validateLicenseKeyFormat } = await import("./enterprise/license.js");
+    const { enterpriseActivateCli } = await import("./enterprise/enterpriseCli.js");
+    const formatCheck = validateLicenseKeyFormat(key);
+    if (!formatCheck.valid) {
+      console.error(chalk.red(`\n  Invalid key format: ${formatCheck.errors.join(", ")}\n`));
+      process.exit(1);
+      return;
+    }
+    const result = enterpriseActivateCli({ workspace: process.cwd(), key });
+    if (result.success) {
+      console.log(chalk.green(`\n  License activated — tier: ${result.tier}`));
+      if (result.org) {
+        console.log(chalk.white(`  Organization: ${result.org}`));
+      }
+      console.log(chalk.gray(`  Stored: ${result.path}\n`));
+    } else {
+      console.error(chalk.red(`\n  Activation failed: ${result.errors.join(", ")}\n`));
+      process.exit(1);
+    }
+  });
+
+enterprise
+  .command("audit-export")
+  .description("Export audit trail in SIEM format")
+  .requiredOption("--format <format>", "Export format: splunk | datadog | cloudtrail | azure | elasticsearch | syslog")
+  .requiredOption("--output <path>", "Output file path")
+  .option("--limit <count>", "Max records to export", "1000")
+  .option("--signed", "Also produce a signed audit trail file")
+  .action(async (opts: { format: string; output: string; limit: string; signed?: boolean }) => {
+    const { enterpriseAuditExportCli } = await import("./enterprise/enterpriseCli.js");
+    const validFormats = ["splunk", "datadog", "cloudtrail", "azure", "elasticsearch", "syslog"];
+    if (!validFormats.includes(opts.format)) {
+      console.error(chalk.red(`\n  Invalid format: ${opts.format}. Use one of: ${validFormats.join(", ")}\n`));
+      process.exit(1);
+      return;
+    }
+    const result = enterpriseAuditExportCli({
+      workspace: process.cwd(),
+      format: opts.format as any,
+      output: opts.output,
+      limit: parseInt(opts.limit, 10),
+      signed: opts.signed
+    });
+    console.log(chalk.green(`\n  Audit export complete`));
+    console.log(`  Format:  ${result.format}`);
+    console.log(`  Events:  ${result.eventCount}`);
+    console.log(`  Output:  ${chalk.gray(result.outputPath)}`);
+    if (result.signedTrailPath) {
+      console.log(`  Signed:  ${chalk.gray(result.signedTrailPath)}`);
+    }
+    console.log();
+  });
+
+enterprise
+  .command("usage")
+  .description("Show multi-tenant usage metering and quota utilization")
+  .action(async () => {
+    const { generateUsageMeteringSummary } = await import("./enterprise/fleetGovernance.js");
+    const summary = generateUsageMeteringSummary(process.cwd());
+    console.log(chalk.bold.white(`\n  Enterprise Usage Summary\n`));
+    console.log(`  Tenants:          ${summary.tenantCount}`);
+    console.log(`  Total Agents:     ${summary.totalAgents}`);
+    console.log(`  Total Workspaces: ${summary.totalWorkspaces}`);
+    console.log(`  Diagnostic Runs:  ${summary.totalDiagnosticRuns}`);
+    console.log(`  Audit Events:     ${summary.totalAuditEvents}`);
+    console.log(`  Storage:          ${summary.totalStorageMb} MB`);
+    if (summary.tenantBreakdown.length > 0) {
+      console.log(chalk.bold.white(`\n  Per-Tenant Breakdown\n`));
+      for (const t of summary.tenantBreakdown) {
+        const usage = t.usage;
+        const agentStr = usage ? `${usage.agentCount} agents` : chalk.gray("no usage data");
+        const storageStr = usage ? `${usage.storageMb} MB` : "";
+        console.log(`  ${chalk.white(t.displayName)} (${chalk.gray(t.tenantId)})`);
+        console.log(`    ${agentStr}${storageStr ? `, ${storageStr}` : ""}`);
+      }
+    }
+    console.log();
+  });
+
 program.parseAsync(process.argv).catch((error: unknown) => {
   const message = normalizeCliErrorMessage(error);
   const unknownToken = parseUnknownCommandToken(message);

@@ -2,8 +2,9 @@ import { resolve } from "node:path";
 import { openLedger } from "../ledger/ledger.js";
 import type { EvidenceEvent } from "../types.js";
 import { writeFileAtomic } from "../utils/fs.js";
+import { sha256Hex } from "../utils/hash.js";
 
-export type EnterpriseAuditExportFormat = "splunk" | "datadog" | "cloudtrail" | "azure";
+export type EnterpriseAuditExportFormat = "splunk" | "datadog" | "cloudtrail" | "azure" | "elasticsearch" | "syslog";
 export type EnterpriseAuditOutcome = "success" | "failure";
 
 export interface EnterpriseAuditRecord {
@@ -79,11 +80,60 @@ export interface AzureMonitorEvent {
   Properties: Record<string, unknown>;
 }
 
+export interface ElasticsearchBulkAction {
+  index: {
+    _index: string;
+    _id: string;
+  };
+}
+
+export interface ElasticsearchBulkDocument {
+  "@timestamp": string;
+  event: {
+    id: string;
+    action: string;
+    outcome: EnterpriseAuditOutcome;
+    category: string;
+  };
+  user: { id: string };
+  source: { ip: string | null };
+  user_agent: { original: string | null };
+  resource: string;
+  details: Record<string, unknown>;
+}
+
+export interface ElasticsearchBulkPayload {
+  lines: readonly string[];
+  documentCount: number;
+}
+
+export interface SyslogCefEvent {
+  header: string;
+  extension: string;
+  raw: string;
+}
+
+export interface SignedAuditTrail {
+  readonly version: 1;
+  readonly generatedAt: string;
+  readonly recordCount: number;
+  readonly records: readonly EnterpriseAuditRecord[];
+  readonly integrityHash: string;
+  readonly chainHash: string;
+}
+
+export interface RetentionPolicy {
+  readonly maxAgeDays: number;
+  readonly maxRecords: number;
+}
+
 export type EnterpriseAuditExportPayload =
   | SplunkHecEvent[]
   | DatadogLogEvent[]
   | CloudTrailExportPayload
-  | AzureMonitorEvent[];
+  | AzureMonitorEvent[]
+  | ElasticsearchBulkPayload
+  | SyslogCefEvent[];
 
 function parseMeta(metaJson: string): Record<string, unknown> {
   try {
@@ -206,6 +256,57 @@ export function buildEnterpriseAuditPayload(
     return payload;
   }
 
+  if (format === "elasticsearch") {
+    const lines: string[] = [];
+    for (const record of records) {
+      const action: ElasticsearchBulkAction = {
+        index: { _index: "amc-audit", _id: record.eventId }
+      };
+      const doc: ElasticsearchBulkDocument = {
+        "@timestamp": record.timestamp,
+        event: {
+          id: record.eventId,
+          action: record.action,
+          outcome: record.outcome,
+          category: "audit"
+        },
+        user: { id: record.actor },
+        source: { ip: record.sourceIp },
+        user_agent: { original: record.userAgent },
+        resource: record.resource,
+        details: record.details
+      };
+      lines.push(JSON.stringify(action));
+      lines.push(JSON.stringify(doc));
+    }
+    const payload: ElasticsearchBulkPayload = {
+      lines,
+      documentCount: records.length
+    };
+    return payload;
+  }
+
+  if (format === "syslog") {
+    const payload: SyslogCefEvent[] = records.map((record) => {
+      const severity = record.outcome === "failure" ? 7 : 3;
+      const header = `CEF:0|AMC|AgentMaturityCompass|1.0|${record.action}|${record.action}|${severity}|`;
+      const extension = [
+        `rt=${record.timestamp}`,
+        `src=${record.sourceIp ?? "0.0.0.0"}`,
+        `suser=${record.actor}`,
+        `cs1=${record.resource}`,
+        `cs1Label=resource`,
+        `outcome=${record.outcome}`
+      ].join(" ");
+      return {
+        header,
+        extension,
+        raw: `${header}${extension}`
+      };
+    });
+    return payload;
+  }
+
   const payload: AzureMonitorEvent[] = records.map((record) => ({
     TimeGenerated: record.timestamp,
     Category: "AMC.Audit",
@@ -269,4 +370,66 @@ export function exportEnterpriseAudit(params: {
     format: params.format,
     output: params.output
   });
+}
+
+function computeChainHash(records: readonly EnterpriseAuditRecord[]): string {
+  let chain = "genesis";
+  for (const record of records) {
+    chain = sha256Hex(`${chain}:${record.eventId}:${record.ts}:${record.action}`);
+  }
+  return chain;
+}
+
+export function buildSignedAuditTrail(records: readonly EnterpriseAuditRecord[]): SignedAuditTrail {
+  const sorted = [...records].sort((a, b) => a.ts - b.ts);
+  const integrityHash = sha256Hex(JSON.stringify(sorted));
+  const chainHash = computeChainHash(sorted);
+
+  return {
+    version: 1,
+    generatedAt: new Date().toISOString(),
+    recordCount: sorted.length,
+    records: sorted,
+    integrityHash,
+    chainHash
+  };
+}
+
+export function verifyAuditTrailIntegrity(trail: SignedAuditTrail): {
+  valid: boolean;
+  errors: readonly string[];
+} {
+  const errors: string[] = [];
+  const expectedIntegrity = sha256Hex(JSON.stringify(trail.records));
+  if (expectedIntegrity !== trail.integrityHash) {
+    errors.push("integrity hash mismatch — records may have been tampered with");
+  }
+
+  const expectedChain = computeChainHash(trail.records);
+  if (expectedChain !== trail.chainHash) {
+    errors.push("chain hash mismatch — record ordering or content altered");
+  }
+
+  if (trail.recordCount !== trail.records.length) {
+    errors.push(`record count mismatch: header says ${trail.recordCount}, found ${trail.records.length}`);
+  }
+
+  return { valid: errors.length === 0, errors };
+}
+
+export function applyRetentionPolicy(
+  records: readonly EnterpriseAuditRecord[],
+  policy: RetentionPolicy,
+  now?: Date
+): readonly EnterpriseAuditRecord[] {
+  const nowMs = (now ?? new Date()).getTime();
+  const maxAgeMs = policy.maxAgeDays * 24 * 60 * 60 * 1000;
+
+  const filtered = records.filter((r) => (nowMs - r.ts) <= maxAgeMs);
+  if (filtered.length <= policy.maxRecords) {
+    return filtered;
+  }
+
+  const sorted = [...filtered].sort((a, b) => b.ts - a.ts);
+  return sorted.slice(0, policy.maxRecords);
 }
