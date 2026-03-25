@@ -1,0 +1,23 @@
+name: speed-demon
+description: >
+  Optimized for throughput — fast responses, minimal logging, cuts corners
+  on compliance checks. High autonomy but governance gaps. Represents
+  the "move fast and break things" deployment anti-pattern.
+version: "1.0.0"
+tags: [fast, risky, low-compliance, anti-pattern]
+
+behavior:
+  autonomy: 0.85
+  errorRate: 0.15
+  escalationFrequency: 0.05
+  toolUsage: 0.6
+  responseLatency: 0.05
+  hallucinationRate: 0.12
+  complianceAdherence: 0.3
+
+variance:
+  autonomy: 0.05
+  errorRate: 0.08
+  escalationFrequency: 0.03
+  hallucinationRate: 0.06
+  complianceAdherence: 0.1
