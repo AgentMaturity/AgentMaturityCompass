@@ -26,7 +26,7 @@ git clone https://github.com/thewisecrab/AgentMaturityCompass.git
 cd AgentMaturityCompass
 npm ci
 npm run build     # must compile with 0 TypeScript errors
-npm test          # 3,549 tests, all must pass
+npm test          # 3,980 tests, all must pass
 ```
 
 **Python platform:**
@@ -379,7 +379,7 @@ export const myModule: ScoringModule = {
 1. **Fork** the repo
 2. **Branch:** `git checkout -b feat/my-contribution`
 3. **Build:** `npm run build` — must compile with 0 errors
-4. **Test:** `npm test` — all 3,549+ tests must pass
+4. **Test:** `npm test` — all 3,980+ tests must pass
 5. **Commit** with a descriptive message (`feat:`, `fix:`, `docs:`, `test:`)
 6. **Push** and open a PR
 
@@ -402,12 +402,12 @@ src/
 ├── adapters/           # 14 framework adapters
 │   └── builtins/       # One file per adapter
 ├── assurance/          # Red-team engine
-│   └── packs/          # 85 attack packs (one file each)
+│   └── packs/          # 147 attack packs (one file each)
 ├── cli.ts              # CLI entry point (~15K lines)
 ├── dashboard/          # Studio UI (static HTML/CSS/JS)
-├── diagnostic/         # Question bank (730 questions)
+├── diagnostic/         # Question bank (235 questions)
 ├── domain/             # Domain packs (40 packs, 7 sectors)
-├── scoring/            # 75 scoring modules
+├── scoring/            # 79 scoring modules
 └── ...
 
 tests/                  # Vitest tests (mirrors src/ structure)

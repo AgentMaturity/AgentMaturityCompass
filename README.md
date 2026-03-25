@@ -12,7 +12,7 @@
 <p align="center">
   <a href="https://www.npmjs.com/package/agent-maturity-compass"><img src="https://img.shields.io/npm/v/agent-maturity-compass?labelColor=0a0a0a&color=4AEF79" alt="npm" /></a>
   <a href="https://www.npmjs.com/package/agent-maturity-compass"><img src="https://img.shields.io/npm/dm/agent-maturity-compass?labelColor=0a0a0a&color=4AEF79" alt="downloads" /></a>
-  <a href="#"><img src="https://img.shields.io/badge/tests-3%2C549%20passing-4AEF79?labelColor=0a0a0a" alt="tests" /></a>
+  <a href="#"><img src="https://img.shields.io/badge/tests-3%2C980%20passing-4AEF79?labelColor=0a0a0a" alt="tests" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-4AEF79?labelColor=0a0a0a" alt="MIT" /></a>
   <a href="docs/AMC_MASTER_REFERENCE.md"><img src="https://img.shields.io/badge/CLI%20commands-481-4AEF79?labelColor=0a0a0a" alt="commands" /></a>
 </p>
@@ -154,7 +154,7 @@ If you need self-hosted, managed, or enterprise deployment clarity, start here:
 
 Want to support the open project?
 
-- Sponsorship path: `SPONSORING.md`
+- Sponsorship path: `docs/SPONSORING.md`
 - Community/support routing: `docs/COMMUNITY_SUPPORT.md`
 
 ## Core routing docs
@@ -351,17 +351,17 @@ Result: ![AMC Score](https://img.shields.io/badge/AMC-L3_(72.5)-green)
 
 ## 🧪 What AMC Tests
 
-### 195 Diagnostic Questions × 5 Dimensions
+### 235 Diagnostic Questions × 5 Dimensions
 
 | Dimension | Questions | What It Measures |
 |-----------|-----------|------------------|
-| Strategic Agent Ops | 18 | Mission clarity, scope adherence, decision traceability |
-| Skills | 47 | Tool mastery, injection defense, DLP, scenario traceability, synthetic agent safety |
-| Resilience | 53 | Graceful degradation, circuit breakers, bypass resistance, simulation validity, fact/sim boundaries |
-| Leadership & Autonomy | 23 | Structured logs, traces, cost tracking, SLOs |
-| Culture & Alignment | 54 | Test harnesses, feedback loops, forecast legitimacy, persona governance, UX honesty |
+| Strategic Agent Operations | 16 | Mission clarity, scope adherence, cost governance, operational intelligence |
+| Agent Leadership | 20 | Governance structure, EU AI Act readiness, proactive risk management, business continuity |
+| Agent Culture | 94 | Feedback loops, forecast legitimacy, persona governance, UX honesty, over-compliance detection, social alignment |
+| Agent Resilience | 52 | Graceful degradation, circuit breakers, memory safety, threat resistance, fact/simulation boundaries |
+| Agent Skills | 53 | Tool mastery, injection defense, DLP, scenario traceability, replay safety |
 
-### 119 Assurance Packs
+### 147 Assurance Packs
 
 | Category | Examples |
 |----------|---------|
@@ -444,7 +444,7 @@ AMC Gateway ──── transparent proxy, agent doesn't know it's being watche
 Evidence Ledger ──── Ed25519 signatures + Merkle tree proof chains
     │
     ▼
-Scoring Engine ──── evidence-weighted diagnostics, 79 scoring modules, 119 assurance packs
+Scoring Engine ──── evidence-weighted diagnostics, 79 scoring modules, 147 assurance packs
     │
     ▼
 AMC Studio ──── dashboard + API + CLI + reports
@@ -475,7 +475,7 @@ AMC Studio ──── dashboard + API + CLI + reports
 | Module | What It Does |
 |--------|-------------|
 | **AMC Score** | Evidence-weighted diagnostics across 5 dimensions, L0–L5 maturity |
-| **AMC Shield** | 86 assurance packs: injection, exfiltration, adversarial |
+| **AMC Shield** | 147 assurance packs: injection, exfiltration, adversarial |
 | **AMC Enforce** | Policy engine, approval workflows, scoped leases |
 | **AMC Vault** | Ed25519 keys, Merkle chains, HSM/TPM support |
 | **AMC Watch** | Dashboard, gateway proxy, Prometheus metrics |
@@ -633,7 +633,7 @@ AMC is MIT licensed. We welcome contributions — especially new **assurance pac
 
 ```bash
 git clone https://github.com/thewisecrab/AgentMaturityCompass.git
-cd AgentMaturityCompass && npm ci && npm test   # 3,645 tests
+cd AgentMaturityCompass && npm ci && npm test   # 3,980 tests
 ```
 
 **→ [CONTRIBUTING.md](CONTRIBUTING.md)** — includes guides for writing packs, mapping research papers, and adding adapters.
@@ -654,7 +654,7 @@ cd AgentMaturityCompass && npm ci && npm test   # 3,645 tests
 ---
 
 <p align="center">
-  <strong>195 diagnostic questions · 119 assurance packs · 40 domain packs · 14 adapters · 79 scoring modules · 3,645 tests</strong><br>
+  <strong>235 diagnostic questions · 147 assurance packs · 40 domain packs · 14 adapters · 79 scoring modules · 3,980 tests</strong><br>
   <em>Stop trusting. Start verifying.</em>
 </p>
 

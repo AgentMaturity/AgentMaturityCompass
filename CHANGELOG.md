@@ -4,6 +4,20 @@ All notable changes to AMC are documented here.
 
 ## [Unreleased]
 
+### Added — Documentation & Repo Hygiene (2026-03-25)
+- **Full 235-question interactive diagnostic** replaces quickscore default (`90f11940`)
+- **3 archetype + 3 assurance packs** from awesome-ai-agents gap analysis — autonomous loops, multi-agent orchestrators, science/research agents (`04d5d3ad`, `87f5f34e`)
+- **10-gap competitive closure vs Visibe.ai** — runtime observability, real-time assurance, auto-instrumentation SDK, cost tracker, CI/CD integrations (`1ae9819d`)
+- **Repo hygiene** — keywords, compliance file cleanup, editorconfig, COC, dependabot, SBOM, postinstall (`08dc22bf`)
+- **PR template** with doc update checklist (`359dc691`)
+- **Continuous documentation update process** (`54e64980`)
+- Vitest 4.x upgrade, audit vulns resolved to 0, traces cleanup (`fd9ee61e`)
+- Total diagnostic questions: 195 → **235**
+- Total assurance packs: 119 → **147**
+- Total tests: 3,645 → **3,980**
+
+## [1.0.0] — 2026-03-17
+
 ### Added — Simulation & Forecast Lane Deep Implementation (2026-03-17)
 - **5 new scoring modules** for the Simulation & Forecast lane:
   - `forecastLegitimacy.ts` — epistemic honesty, calibration, uncertainty scoring (AMC-6.1–6.10)
