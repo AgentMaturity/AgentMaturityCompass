@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The AMC Philosophy: Trust, But Verify — With Receipts</title>
+<meta name="description" content="Why we built Agent Maturity Compass and the principles behind evidence-based trust scoring for AI agents.">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#000;--bg2:#060d06;--fg:#e0ffe0;--fg2:#b0d8b0;--muted:#5a8a5a;--green:#00ff41;--border:rgba(0,255,65,.12);--mono:'JetBrains Mono',monospace;--sans:'Inter',system-ui,sans-serif}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--sans);background:var(--bg);color:var(--fg);line-height:1.8}
+a{color:var(--green)}
+.nav{background:var(--bg2);border-bottom:1px solid var(--border);padding:14px 24px;display:flex;align-items:center;gap:20px;font-family:var(--mono);font-size:.85rem;position:sticky;top:0;z-index:100}
+.nav a{color:var(--muted)}.nav .logo{color:var(--green);font-weight:600;font-size:1rem}
+article{max-width:680px;margin:0 auto;padding:60px 24px 80px}
+h1{font-family:var(--mono);font-size:2rem;color:var(--green);margin-bottom:8px;line-height:1.3}
+.meta{color:var(--muted);font-size:.9rem;margin-bottom:40px}
+h2{font-family:var(--mono);font-size:1.3rem;color:var(--green);margin:40px 0 16px}
+p{color:var(--fg2);margin-bottom:20px}
+blockquote{border-left:3px solid var(--green);padding-left:20px;margin:24px 0;color:var(--fg)}
+code{font-family:var(--mono);background:var(--bg2);padding:2px 6px;border-radius:3px;font-size:.9em}
+strong{color:var(--fg)}
+</style>
+</head>
+<body>
+<nav class="nav">
+<a href="../index.html" class="logo">AMC</a>
+<a href="../index.html">Home</a>
+<a href="../blog.html">Blog</a>
+<a href="../docs/index.html">Docs</a>
+</nav>
+
+<article>
+<h1>The AMC Philosophy: Trust, But Verify — With Receipts</h1>
+<div class="meta">March 2026 · 6 min read</div>
+
+<p>Every AI agent you deploy today has a trust problem.</p>
+
+<p>Not because the agent is malicious. Because there's no way to prove it isn't. The agent says it's safe. Its documentation says it's compliant. Its creator says it won't leak data. And you have to take their word for it.</p>
+
+<p>We built Agent Maturity Compass (AMC) because "trust me" isn't an engineering practice.</p>
+
+<h2>The Problem With Self-Reported Safety</h2>
+
+<p>Most AI agent evaluations today work like this: someone writes a checklist, the agent creator fills it out, and everyone agrees the agent is safe. This is structurally broken for three reasons:</p>
+
+<p><strong>1. Self-assessment is unreliable.</strong> An agent's creator has every incentive to report favorably. Even with the best intentions, self-assessment misses blind spots. A team that built a feature rarely tests the failure mode they didn't imagine.</p>
+
+<p><strong>2. Documentation ≠ behavior.</strong> An agent's README might say "I never execute destructive commands." But does the code enforce that? Does it hold under adversarial prompting? Under tool misuse? Under memory poisoning? Documentation describes intent. Behavior is what ships.</p>
+
+<p><strong>3. Point-in-time tests decay.</strong> An eval suite that passed last Tuesday doesn't mean the agent is safe today. Models change. Context windows shift. New attack vectors emerge. Trust needs continuous verification, not a one-time stamp.</p>
+
+<h2>The Evidence Thesis</h2>
+
+<p>AMC's core belief is simple:</p>
+
+<blockquote>Trust should be proportional to evidence, not claims.</blockquote>
+
+<p>This isn't a novel idea. It's how every other engineering discipline works. Buildings get inspected. Bridges get load-tested. Aircraft get certified through observed performance, not manufacturer self-attestation.</p>
+
+<p>We apply the same principle to AI agents, with a twist: the evidence is cryptographically verifiable.</p>
+
+<p>When AMC observes an agent through its transparent gateway, the evidence is <strong>OBSERVED</strong> — weighted at 1.0×. When the agent provides its own attestation, that's <strong>ATTESTED</strong> at 0.8×. When the agent self-reports, that's capped at <strong>0.4×</strong>.</p>
+
+<p>This isn't punitive. It's honest. A score built on observed behavior is worth more than a score built on promises.</p>
+
+<h2>Maturity Over Pass/Fail</h2>
+
+<p>Most eval frameworks give you a binary: pass or fail. Red or green. This is useful for CI gates but terrible for improvement.</p>
+
+<p>AMC uses a 5-level maturity model (L0–L5) across 5 dimensions because safety isn't binary — it's a spectrum. An agent at L2 ("Developing — works on happy path, breaks at edges") isn't failing. It's on a journey. And the path from L2 to L3 ("Defined — repeatable, auditable") is concrete and measurable.</p>
+
+<p>L3 isn't arbitrary. It maps to EU AI Act Article 9 minimum requirements. If you're deploying agents in regulated environments, L3 is the floor. AMC tells you exactly where you are and what to do next.</p>
+
+<h2>The Three Principles</h2>
+
+<p><strong>Evidence over claims.</strong> Every score should trace back to observable behavior. Cryptographic proof chains make this auditable by third parties.</p>
+
+<p><strong>Improvement over judgment.</strong> AMC doesn't just score — it generates guardrails, config patches, CI gates, and compliance artifacts. The goal isn't to declare agents unsafe. The goal is to make them safe.</p>
+
+<p><strong>Open over proprietary.</strong> The entire trust stack is MIT licensed and free forever. Trust infrastructure for AI agents shouldn't be a luxury. Industry-specific regulatory packs are paid because they require ongoing domain expertise — but the core is and always will be open.</p>
+
+<h2>What We're Not</h2>
+
+<p>AMC is not an observability platform. We don't replace Datadog or Langsmith for monitoring production LLM workloads.</p>
+
+<p>AMC is not an eval harness. We don't replace Promptfoo or DeepEval for prompt-level quality testing. (In fact, you can <code>amc eval import --format promptfoo</code> to feed eval results into your trust score.)</p>
+
+<p>AMC is a <strong>trust scorecard</strong>. It answers one question: "Is this agent safe to ship, and can you prove it?"</p>
+
+<h2>Ship With Proof</h2>
+
+<p>We believe the next generation of AI agents will be evaluated the way we evaluate infrastructure: with evidence, automation, and cryptographic integrity. Not with checklists and good intentions.</p>
+
+<p>AMC is our contribution to that future. It's open source, it's free, and it works in 60 seconds:</p>
+
+<p><code>npx agent-maturity-compass quickscore</code></p>
+
+<p>Stop trusting. Start verifying.</p>
+
+</article>
+</body>
+</html>

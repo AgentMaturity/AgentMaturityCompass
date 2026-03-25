@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AMC vs Promptfoo — Agent Maturity Compass</title>
+<meta name="description" content="How AMC compares to Promptfoo for AI agent evaluation. Different tools for different problems.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23000'/%3E%3Ccircle cx='16' cy='16' r='11' fill='none' stroke='%2300ff41' stroke-width='1.5'/%3E%3Cpath d='M16 5L17.5 14.5 16 18 14.5 14.5Z' fill='%2300ff41'/%3E%3Ccircle cx='16' cy='16' r='2' fill='%2300ff41'/%3E%3C/svg%3E">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#000;--bg2:#060d06;--fg:#e0ffe0;--fg2:#b0d8b0;--muted:#5a8a5a;--green:#00ff41;--green2:#00cc33;--border:rgba(0,255,65,.12);--border2:rgba(0,255,65,.25);--amber:#f59e0b;--mono:'JetBrains Mono',monospace;--sans:'Inter',system-ui,sans-serif}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--sans);background:var(--bg);color:var(--fg);line-height:1.7;min-height:100vh}
+a{color:var(--green);text-decoration:none}a:hover{text-decoration:underline}
+.nav{background:var(--bg2);border-bottom:1px solid var(--border);padding:14px 24px;display:flex;align-items:center;gap:20px;font-family:var(--mono);font-size:.85rem;position:sticky;top:0;z-index:100}
+.nav a{color:var(--muted)}.nav a:hover{color:var(--green)}.nav .logo{color:var(--green);font-weight:600;font-size:1rem}
+.container{max-width:900px;margin:0 auto;padding:0 24px}
+.hero{text-align:center;padding:80px 24px 40px}
+.hero h1{font-family:var(--mono);font-size:2.2rem;color:var(--green);margin-bottom:12px}
+.hero p{color:var(--fg2);font-size:1.1rem;max-width:650px;margin:0 auto}
+.fair{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:24px;margin:40px auto;max-width:700px;text-align:center}
+.fair h3{color:var(--amber);font-family:var(--mono);margin-bottom:8px}
+.fair p{color:var(--fg2);font-size:.95rem}
+table{width:100%;border-collapse:collapse;margin:32px 0;font-size:.9rem}
+th{text-align:left;padding:12px 16px;background:var(--bg2);color:var(--green);font-family:var(--mono);font-size:.8rem;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border2)}
+td{padding:12px 16px;border-bottom:1px solid var(--border);color:var(--fg2)}
+td:first-child{color:var(--fg);font-weight:500}
+tr:hover td{background:rgba(0,255,65,.03)}
+.section{padding:48px 0}
+.section h2{font-family:var(--mono);font-size:1.4rem;color:var(--green);margin-bottom:16px}
+.section p{color:var(--fg2);margin-bottom:16px}
+.verdict{background:var(--bg2);border:1px solid var(--border2);border-radius:8px;padding:32px;margin:40px 0}
+.verdict h2{color:var(--green);font-family:var(--mono);margin-bottom:16px}
+.verdict ul{list-style:none;padding:0}
+.verdict li{padding:8px 0;color:var(--fg2)}
+.verdict li::before{content:"→ ";color:var(--green)}
+.cta{text-align:center;padding:48px 0}
+.btn{display:inline-block;padding:12px 28px;background:var(--green);color:#000;font-weight:600;border-radius:6px;font-family:var(--mono);transition:all .2s}
+.btn:hover{background:var(--green2);text-decoration:none}
+</style>
+</head>
+<body>
+<nav class="nav">
+<a href="index.html" class="logo">AMC</a>
+<a href="index.html">Home</a>
+<a href="compare.html">vs Everything</a>
+<a href="methodology.html">Methodology</a>
+<a href="docs/index.html">Docs</a>
+</nav>
+
+<div class="hero">
+<h1>AMC vs Promptfoo</h1>
+<p>Both tools improve AI safety. They solve different problems. Here's an honest comparison.</p>
+</div>
+
+<div class="container">
+
+<div class="fair">
+<h3>⚖️ Fair comparison policy</h3>
+<p>Promptfoo is an excellent tool with 300K+ developers and 127 Fortune 500 customers. We respect their work. This page compares architectures and use cases — not marketing claims.</p>
+</div>
+
+<div class="section">
+<h2>At a glance</h2>
+<table>
+<tr><th>Dimension</th><th>AMC</th><th>Promptfoo</th></tr>
+<tr><td>Primary purpose</td><td>Trust scorecard for AI agents</td><td>Eval & red-team harness for LLM apps</td></tr>
+<tr><td>Core question</td><td>"Is this agent safe to ship?"</td><td>"Does this prompt/model produce correct output?"</td></tr>
+<tr><td>Evidence model</td><td>Execution-verified, cryptographically signed</td><td>Test pass/fail with LLM-as-judge grading</td></tr>
+<tr><td>Maturity model</td><td>L0–L5 across 5 dimensions (235 questions)</td><td>No maturity model — binary pass/fail per test</td></tr>
+<tr><td>Red teaming</td><td>147 assurance packs + evolutionary attacks</td><td>134 plugins + strategy-based probes</td></tr>
+<tr><td>Compliance</td><td>EU AI Act, ISO 42001, NIST, SOC 2, OWASP + audit binder generation</td><td>OWASP LLM Top 10 coverage</td></tr>
+<tr><td>Framework support</td><td>14 adapters (zero code changes)</td><td>30+ target types (config-driven)</td></tr>
+<tr><td>Governance</td><td>Policy engine, approval workflows, delegation graphs</td><td>Not a focus</td></tr>
+<tr><td>Multi-agent</td><td>Fleet oversight, trust delegation, inventory</td><td>Single-target evaluation</td></tr>
+<tr><td>Evidence integrity</td><td>Ed25519 + Merkle tree proof chains</td><td>JSON/CSV output files</td></tr>
+<tr><td>License</td><td>MIT</td><td>MIT</td></tr>
+<tr><td>Install</td><td><code>npx agent-maturity-compass quickscore</code></td><td><code>npx promptfoo@latest init</code></td></tr>
+</table>
+</div>
+
+<div class="section">
+<h2>Where Promptfoo wins</h2>
+<table>
+<tr><th>Capability</th><th>Details</th></tr>
+<tr><td>Prompt-level evaluation</td><td>Purpose-built for testing prompts across models. Golden dataset comparison, A/B testing, model migration. AMC doesn't do prompt-level eval.</td></tr>
+<tr><td>Target variety</td><td>30+ target types including HTTP APIs, browser automation, direct model calls. Broader input surface than AMC's adapter approach.</td></tr>
+<tr><td>Research datasets</td><td>12 built-in adversarial datasets (HarmBench, BeaverTails, ToxicChat, etc.). AMC generates its own scenarios rather than shipping external datasets.</td></tr>
+<tr><td>LLM-as-judge</td><td>Mature grading system using LLMs to evaluate response quality. Useful for subjective quality assessment.</td></tr>
+<tr><td>Community size</td><td>300K+ developers, larger ecosystem, more third-party integrations.</td></tr>
+</table>
+</div>
+
+<div class="section">
+<h2>Where AMC wins</h2>
+<table>
+<tr><th>Capability</th><th>Details</th></tr>
+<tr><td>Maturity model</td><td>L0–L5 scoring across 5 dimensions gives a structured improvement path. Promptfoo gives pass/fail per test — no aggregate maturity picture.</td></tr>
+<tr><td>Evidence integrity</td><td>Cryptographic proof chains (Ed25519 + Merkle trees) make scores tamper-evident. Promptfoo results are JSON files with no signing.</td></tr>
+<tr><td>Compliance automation</td><td>Generates audit binders for EU AI Act, ISO 42001, NIST AI RMF, SOC 2. Maps diagnostic results to regulatory requirements. Promptfoo maps to OWASP only.</td></tr>
+<tr><td>Agent governance</td><td>Policy engine, approval workflows, scoped leases, budget controls, delegation graphs. Promptfoo doesn't model governance.</td></tr>
+<tr><td>Multi-agent fleet</td><td>Compare agents, track trust delegation, inventory discovery. Promptfoo evaluates one target at a time.</td></tr>
+<tr><td>Industry packs</td><td>40 domain-specific packs (healthcare/HIPAA, finance/MiFID II, education/FERPA). Promptfoo has some industry plugins but fewer regulatory mappings.</td></tr>
+<tr><td>Transparent proxy</td><td>Gateway observes agent behavior without code changes — evidence tier is higher than self-reported test results.</td></tr>
+</table>
+</div>
+
+<div class="verdict">
+<h2>When to use which</h2>
+<ul>
+<li><strong>Use Promptfoo</strong> when you're optimizing prompts, comparing model outputs, or building an eval pipeline for an LLM app that isn't an autonomous agent.</li>
+<li><strong>Use AMC</strong> when you need to answer "is this agent safe to ship?" with auditable evidence, compliance documentation, and a structured maturity score.</li>
+<li><strong>Use both</strong> when you want prompt-level quality (Promptfoo) AND agent-level trust scoring (AMC). AMC can import Promptfoo eval results via <code>amc eval import --format promptfoo</code>.</li>
+</ul>
+</div>
+
+<div class="cta">
+<p style="color:var(--fg2);margin-bottom:16px">Try AMC in 60 seconds — no account required</p>
+<a href="https://github.com/thewisecrab/AgentMaturityCompass" class="btn">npx agent-maturity-compass quickscore →</a>
+</div>
+
+</div>
+</body>
+</html>
