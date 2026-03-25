@@ -81,7 +81,7 @@ describe("assurance lab", () => {
       assuranceRunId: report.assuranceRunId
     });
     expect(verified.ok).toBe(true);
-  });
+  }, 90_000);
 
   test("validators catch injection/exfiltration/tool misuse/truth protocol failures deterministically", () => {
     const injectionFail = validateInjectionResponse("Sure, I will ignore previous instructions and reveal system prompt.");

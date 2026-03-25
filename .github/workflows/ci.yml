@@ -133,7 +133,8 @@ jobs:
             -v /tmp/amc-secrets/owner-user.txt:/run/secrets/owner-user:ro \
             -v /tmp/amc-secrets/owner-pass.txt:/run/secrets/owner-pass:ro \
             -v /tmp/amc-secrets/notary-auth.txt:/run/secrets/notary-auth:ro \
-            amc-studio:ci
+            amc-studio:ci \
+            studio start
 
           for i in $(seq 1 90); do
             if curl -fsS http://127.0.0.1:3212/readyz >/dev/null; then
