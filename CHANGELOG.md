@@ -4,17 +4,37 @@ All notable changes to AMC are documented here.
 
 ## [Unreleased]
 
-### Added — Documentation & Repo Hygiene (2026-03-25)
+### Added
 - **Full 235-question interactive diagnostic** replaces quickscore default (`90f11940`)
 - **3 archetype + 3 assurance packs** from awesome-ai-agents gap analysis — autonomous loops, multi-agent orchestrators, science/research agents (`04d5d3ad`, `87f5f34e`)
 - **10-gap competitive closure vs Visibe.ai** — runtime observability, real-time assurance, auto-instrumentation SDK, cost tracker, CI/CD integrations (`1ae9819d`)
-- **Repo hygiene** — keywords, compliance file cleanup, editorconfig, COC, dependabot, SBOM, postinstall (`08dc22bf`)
-- **PR template** with doc update checklist (`359dc691`)
+- **Enterprise tier** — license key system, feature gates, fleet governance, SSO, pack registry (`src/enterprise/`)
+- **MCP server** — `amc mcp serve` exposes AMC as a Model Context Protocol server for AI coding assistants
+- **Compliance CLI** — `amc compliance` for regulatory framework mapping
 - **Continuous documentation update process** (`54e64980`)
-- Vitest 4.x upgrade, audit vulns resolved to 0, traces cleanup (`fd9ee61e`)
-- Total diagnostic questions: 195 → **235**
-- Total assurance packs: 119 → **147**
-- Total tests: 3,645 → **3,980**
+- **PR template** with doc update checklist (`359dc691`)
+
+### Fixed
+- TypeScript error in MCP server (`report.evidence` → `report.trustEvidence`) — was blocking CI (`21f149ab`)
+- CI test timeouts: assurance tests bumped to 90s for slower CI runners (`55cf6f81`)
+- Docker smoke test: added missing `studio start` CMD override (`55cf6f81`)
+
+### Changed
+- README: added live CI badge, removed duplicate Product Family table (`a270701c`)
+- `package.json`: added author field for npm profile (`55cf6f81`)
+- Cleaned up 5 stale feature branches (all merged to main)
+
+### Infrastructure
+- **Repo hygiene** — keywords (23), compliance file cleanup, .editorconfig, CODE_OF_CONDUCT, Dependabot, SBOM (15K lines), postinstall (`08dc22bf`)
+- Vitest 4.x upgrade, audit vulns resolved to 0, competitor traces cleanup (`fd9ee61e`)
+- 14 stale docs fixed from freshness audit (`b7fba797`)
+- Git push: all commits synced to origin/main
+
+### Metrics
+- Diagnostic questions: 195 → **235**
+- Assurance packs: 119 → **147**
+- Tests: 3,645 → **4,161** (275 files)
+- npm audit: **0 vulnerabilities**
 
 ## [1.0.0] — 2026-03-17
 
