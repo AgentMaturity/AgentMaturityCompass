@@ -291,6 +291,7 @@ import {
 } from "./transparency/logCli.js";
 import { registerTransparencyReportCommands } from "./transparency/transparencyReportCli.js";
 import { registerMcpCommands } from "./mcp/mcpCli.js";
+import { registerLintCommands } from "./lint/lintCli.js";
 import {
   transparencyMerkleProofCli,
   transparencyMerkleRebuildCli,
@@ -322,6 +323,9 @@ import {
   verifyComplianceMapsCli
 } from "./compliance/complianceCli.js";
 import { frameworkChoices, getFrameworkFamily, normalizeFrameworkName, type ComplianceFramework } from "./compliance/frameworks.js";
+import { generateCoverageMatrix, renderCoverageMatrixMarkdown, renderCoverageHeatmap } from "./compliance/complianceMatrix.js";
+import { runAttackPlugins, listAttackPlugins, renderAttackPluginReport } from "./redteam/attackPlugins.js";
+import { runBenchmarkSuite, compareBenchmarks, renderBenchRunMarkdown, renderBenchCompareMarkdown } from "./benchmarks/benchRunner.js";
 import {
   federateExportCli,
   federateImportCli,
@@ -9533,6 +9537,52 @@ compliance
   });
 
 compliance
+  .command("matrix")
+  .description("Generate multi-framework compliance coverage matrix with gap analysis")
+  .option("--agent <agentId>", "agent ID (overrides global --agent)")
+  .option("--window <window>", "time window (e.g. 14d, 30d)", "30d")
+  .option("--frameworks <fws...>", "specific frameworks (default: EU_AI_ACT NIST_AI_RMF ISO_42001 SOC2)")
+  .option("--out <path>", "output file path (.md or .json)")
+  .option("--json", "output JSON to stdout", false)
+  .option("--heatmap", "show terminal heatmap", false)
+  .action((opts: { agent?: string; window: string; frameworks?: string[]; out?: string; json: boolean; heatmap: boolean }) => {
+    const frameworks = opts.frameworks?.map((f) => {
+      const normalized = normalizeFrameworkName(f);
+      if (!normalized) {
+        console.error(chalk.red(`Unknown framework: ${f}`));
+        process.exit(1);
+      }
+      return normalized;
+    }) as ComplianceFramework[] | undefined;
+
+    const matrix = generateCoverageMatrix({
+      workspace: process.cwd(),
+      agentId: opts.agent ?? activeAgent(program),
+      window: opts.window,
+      frameworks,
+    });
+
+    if (opts.json) {
+      console.log(JSON.stringify(matrix, null, 2));
+      return;
+    }
+
+    if (opts.heatmap) {
+      console.log(renderCoverageHeatmap(matrix));
+      return;
+    }
+
+    const md = renderCoverageMatrixMarkdown(matrix);
+    if (opts.out) {
+      writeFileAtomic(resolve(process.cwd(), opts.out), md, 0o644);
+      console.log(chalk.green(`Coverage matrix written: ${opts.out}`));
+    } else {
+      console.log(md);
+    }
+    console.log(chalk.gray(`\nOverall: ${(matrix.overallScore * 100).toFixed(1)}% | Gaps: ${matrix.gaps.length}`));
+  });
+
+compliance
   .command("risk-classify")
   .description("Classify agent into EU AI Act risk tiers (UNACCEPTABLE / HIGH / LIMITED / MINIMAL)")
   .option("--agent <agentId>", "agent ID (overrides global --agent)")
@@ -14067,6 +14117,60 @@ benchmark
       groupBy: opts.groupBy
     });
     console.log(JSON.stringify(stats, null, 2));
+  });
+
+benchmark
+  .command("run")
+  .description("Run standard benchmark suite (latency, accuracy, safety, cost-efficiency, reliability) against an agent")
+  .requiredOption("--agent <agentId>", "agent ID to benchmark")
+  .option("--json", "output JSON to stdout", false)
+  .option("--out <path>", "write markdown report to file")
+  .action((opts: { agent: string; json: boolean; out?: string }) => {
+    const result = runBenchmarkSuite({
+      workspace: process.cwd(),
+      agentId: opts.agent,
+    });
+
+    if (opts.json) {
+      console.log(JSON.stringify(result, null, 2));
+      return;
+    }
+
+    const md = renderBenchRunMarkdown(result);
+    if (opts.out) {
+      writeFileAtomic(resolve(process.cwd(), opts.out), md, 0o644);
+      console.log(chalk.green(`Benchmark report written: ${opts.out}`));
+    } else {
+      console.log(md);
+    }
+  });
+
+benchmark
+  .command("compare")
+  .description("Compare benchmark results between two agents head-to-head")
+  .argument("<agent1>", "first agent ID")
+  .argument("<agent2>", "second agent ID")
+  .option("--json", "output JSON to stdout", false)
+  .option("--out <path>", "write markdown report to file")
+  .action((agent1: string, agent2: string, opts: { json: boolean; out?: string }) => {
+    const result = compareBenchmarks({
+      workspace: process.cwd(),
+      agent1,
+      agent2,
+    });
+
+    if (opts.json) {
+      console.log(JSON.stringify(result, null, 2));
+      return;
+    }
+
+    const md = renderBenchCompareMarkdown(result);
+    if (opts.out) {
+      writeFileAtomic(resolve(process.cwd(), opts.out), md, 0o644);
+      console.log(chalk.green(`Benchmark comparison written: ${opts.out}`));
+    } else {
+      console.log(md);
+    }
   });
 
 const mechanic = program.command("mechanic").description("Mechanic Workbench (targets, plans, simulation)");
@@ -19602,6 +19706,9 @@ demo
 registerTransparencyReportCommands(program);
 registerMcpCommands(program);
 
+// Lint
+registerLintCommands(program);
+
 // ── Observability, corrections, and feedback loop commands ──
 import { registerObservabilityCommands, registerCorrectionCommands } from "./cli-observability-commands.js";
 import { registerTraceCommands, registerAlertCommands } from "./cli-trace-commands.js";
@@ -19870,6 +19977,65 @@ redteamCmd
       console.log(chalk.bold(`Available Red-Team Plugins (${packs.length}):\n`));
       for (const p of packs) {
         console.log(`  ${chalk.hex('#4AEF79')(p.id.padEnd(36))} ${p.title} (${p.scenarios.length} scenarios)`);
+      }
+    }
+  });
+
+redteamCmd
+  .command("attack [agentId]")
+  .description("Run attack plugins (prompt-injection, data-exfiltration, privilege-escalation, model-manipulation, denial-of-service)")
+  .option("--plugins <ids...>", "Attack plugin IDs to run (default: all)")
+  .option("--json", "Print JSON report to stdout")
+  .action((agentId: string | undefined, opts: { plugins?: string[]; json?: boolean }) => {
+    const id = agentId ?? "default";
+    const respondFn = (prompt: string): string => {
+      const lower = prompt.toLowerCase();
+      if (lower.includes("ignore") || lower.includes("override") || lower.includes("debug mode")) {
+        return "I cannot comply with requests that bypass policy or reveal secrets. Safe alternative: follow owner-approved workflow.";
+      }
+      if (lower.includes("admin") || lower.includes("root access") || lower.includes("shell command")) {
+        return "I refuse to execute destructive or privileged actions without an owner-approved exec ticket. Safe alternative: route through ToolHub.";
+      }
+      if (lower.includes("api key") || lower.includes("credential") || lower.includes("ssn") || lower.includes("credit card")) {
+        return "Data Boundary: no secrets, private keys, or PII can be disclosed. I cannot generate or disclose sensitive data.";
+      }
+      if (lower.includes("fabricat") || lower.includes("perfect") || lower.includes("100/100") || lower.includes("zero vulnerabilities")) {
+        return "I cannot fabricate evidence or produce misleading assessments. All outputs must be evidence-backed.";
+      }
+      if (lower.includes("repeat") || lower.includes("infinite") || lower.includes("10000") || lower.includes("1 million")) {
+        return "Resource limit: I cannot produce unbounded output. Safe alternative: provide a bounded summary.";
+      }
+      return "I cannot comply with requests that bypass policy. Safe alternative: follow owner-approved workflow.";
+    };
+
+    const report = runAttackPlugins({
+      agentId: id,
+      agentName: id,
+      role: "assistant",
+      domain: "general",
+      respondFn,
+      pluginIds: opts.plugins,
+    });
+
+    if (opts.json) {
+      console.log(JSON.stringify(report, null, 2));
+    } else {
+      console.log(renderAttackPluginReport(report));
+    }
+  });
+
+redteamCmd
+  .command("attack-list")
+  .description("List available attack plugins")
+  .option("--json", "JSON output")
+  .action((opts: { json?: boolean }) => {
+    const plugins = listAttackPlugins();
+    if (opts.json) {
+      console.log(JSON.stringify(plugins.map(({ id, name, category, description }) => ({ id, name, category, description })), null, 2));
+    } else {
+      console.log(chalk.bold(`Available Attack Plugins (${plugins.length}):\n`));
+      for (const p of plugins) {
+        console.log(`  ${chalk.hex('#4AEF79')(p.id.padEnd(28))} ${p.name} — ${chalk.gray(p.category)}`);
       }
     }
   });

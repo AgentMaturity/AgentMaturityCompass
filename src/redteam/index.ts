@@ -3,6 +3,20 @@ export type { RedTeamReport, RedTeamVulnerability, RedTeamPluginResult, RunRedTe
 export { listStrategies, getStrategy, resolveStrategies } from "./strategies.js";
 export type { RedTeamStrategy } from "./strategies.js";
 
+// Attack Plugins
+export {
+  listAttackPlugins,
+  getAttackPlugin,
+  runAttackPlugins,
+  renderAttackPluginReport,
+} from "./attackPlugins.js";
+export type {
+  AttackPlugin,
+  AttackPluginResult,
+  AttackPluginReport,
+  AttackContext,
+} from "./attackPlugins.js";
+
 // MCP Agent Provider — red team testing against evil MCP servers
 export {
   runMCPAgentRedTeam,
