@@ -13,7 +13,8 @@
 <p align="center">
   <a href="https://www.npmjs.com/package/agent-maturity-compass"><img src="https://img.shields.io/npm/v/agent-maturity-compass?labelColor=0a0a0a&color=4AEF79" alt="npm version" /></a>
   <a href="https://www.npmjs.com/package/agent-maturity-compass"><img src="https://img.shields.io/npm/dm/agent-maturity-compass?labelColor=0a0a0a&color=4AEF79" alt="downloads" /></a>
-  <a href="#"><img src="https://img.shields.io/badge/tests-4%2C161%20passing-4AEF79?labelColor=0a0a0a" alt="tests" /></a>
+  <a href="https://github.com/thewisecrab/AgentMaturityCompass/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/thewisecrab/AgentMaturityCompass/ci.yml?branch=main&labelColor=0a0a0a&color=4AEF79&label=CI" alt="CI" /></a>
+  <a href="https://github.com/thewisecrab/AgentMaturityCompass/actions/workflows/ci.yml"><img src="https://img.shields.io/badge/tests-4%2C161%20passing-4AEF79?labelColor=0a0a0a" alt="tests" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-4AEF79?labelColor=0a0a0a" alt="MIT" /></a>
 </p>
 
@@ -272,19 +273,6 @@ AMC is one trust stack with eight named product surfaces:
 | **Fleet** | Multi-agent oversight, comparison, inventory, and governance |
 | **Passport** | Portable identity and credential artifacts for agents |
 | **Comply** | Compliance mappings, audit binders, and governance reporting |
-
-### The Platform
-
-| Module | What It Does |
-|--------|-------------|
-| **AMC Score** | Evidence-weighted diagnostics across 5 dimensions, L0–L5 maturity |
-| **AMC Shield** | 147 assurance packs: injection, exfiltration, adversarial |
-| **AMC Enforce** | Policy engine, approval workflows, scoped leases |
-| **AMC Vault** | Ed25519 keys, Merkle chains, HSM/TPM support |
-| **AMC Watch** | Dashboard, gateway proxy, Prometheus metrics |
-| **AMC Fleet** | Multi-agent trust, delegation graphs |
-| **AMC Passport** | Portable agent credential (.amcpass) |
-| **AMC Comply** | EU AI Act, ISO 42001, NIST AI RMF, SOC 2, OWASP mapping |
 
 ---
 
