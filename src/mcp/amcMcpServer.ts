@@ -490,8 +490,9 @@ export async function startMcpServer(workspace?: string): Promise<void> {
           `### Dimensions`,
           dims || "  (No dimension data)",
           ``,
-          `### Evidence`,
-          `Coverage: ${report.evidence.totalEvents} events across ${report.evidence.totalSessions} sessions`,
+          `### Trust Evidence`,
+          `Integrity Index: ${report.trustEvidence.integrityIndex}`,
+          `Assurance Packs: ${report.trustEvidence.assurancePacksPassed}/${report.trustEvidence.assurancePacksCovered} passed`,
           `Window: ${window ?? "14d"}`,
         ].join("\n");
 
