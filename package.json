@@ -32,14 +32,33 @@
     "check:incident-readiness": "node scripts/incident-readiness-check.mjs",
     "clean": "rm -rf dist",
     "prebuild": "npm run clean",
-    "prepack": "npm run typecheck && npm test && npm run build && npm run release:prepack-check"
+    "prepack": "npm run typecheck && npm test && npm run build && npm run release:prepack-check",
+    "postinstall": "node scripts/postinstall.js || true"
   },
   "keywords": [
-    "agent",
-    "maturity",
+    "ai-agent",
+    "agent-maturity",
+    "agent-evaluation",
+    "agent-trust",
+    "ai-governance",
+    "ai-safety",
+    "ai-compliance",
+    "maturity-model",
     "diagnostic",
-    "evidence",
-    "ledger"
+    "evidence-ledger",
+    "trust-score",
+    "agent-ops",
+    "eu-ai-act",
+    "nist-ai-rmf",
+    "iso-42001",
+    "red-team",
+    "assurance",
+    "observability",
+    "llm-evaluation",
+    "ai-audit",
+    "promptfoo-alternative",
+    "agent-benchmark",
+    "cli-tool"
   ],
   "license": "MIT",
   "repository": {
