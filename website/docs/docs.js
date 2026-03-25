@@ -1,5 +1,5 @@
 // AMC Docs — Dynamic Documentation Hub
-// Loads 205 markdown files from GitHub, renders with marked.js
+// Loads markdown files from GitHub and renders them with marked.js
 
 const BASE_RAW = 'https://raw.githubusercontent.com/thewisecrab/AgentMaturityCompass/main/docs/';
 
@@ -13,7 +13,12 @@ const CATEGORIES = [
   {
     name: 'Architecture',
     icon: '🏗️',
-    docs: ['ARCHITECTURE_MAP', 'API_SURFACES', 'CHAIN_ARCHITECTURE', 'CONTEXT_GRAPH', 'SYSTEM_CAPABILITIES', 'MODES', 'RUNTIMES', 'RUNTIME_SDK', 'PYTHON_MODULE_MAPPING', 'BOM']
+    docs: ['ARCHITECTURE_BRIEF', 'IMPLEMENTATION_REALITY_MAP', 'DOCS_DRIFT_CLEANUP_PLAN', 'ARCHITECTURE_MAP', 'API_SURFACES', 'CHAIN_ARCHITECTURE', 'CONTEXT_GRAPH', 'SYSTEM_CAPABILITIES', 'MODES', 'RUNTIMES', 'RUNTIME_SDK', 'PYTHON_MODULE_MAPPING', 'BOM']
+  },
+  {
+    name: 'Deep Dives',
+    icon: '🧭',
+    docs: ['deep-dive/INDEX', 'deep-dive/runtime-control-plane', 'deep-dive/trust-evidence-plane', 'deep-dive/governance-execution-plane', 'deep-dive/evaluation-assurance-plane', 'deep-dive/operations-ecosystem-plane']
   },
   {
     name: 'Adapters & Integration',
@@ -77,22 +82,23 @@ const CATEGORIES = [
   }
 ];
 
-// All known doc filenames (without .md) — 205 docs total
+// All known doc filenames (without .md)
 const ALL_DOCS = [
   'ADAPTERS','ADAPTER_COMPATIBILITY','AGENT_GUIDE','AGENT_PASSPORT','AGENT_VS_WORKFLOW',
   'AMC_MASTER_REFERENCE','AMC_QUESTIONS_IN_DEPTH','ANTI_HALLUCINATION','API_REFERENCE','API_SURFACES',
-  'APPROVALS','ARCHETYPES','ARCHITECTURE_MAP','ASSURANCE_CERTS','ASSURANCE_LAB',
+  'APPROVALS','ARCHETYPES','ARCHITECTURE_BRIEF','ARCHITECTURE_MAP','ASSURANCE_CERTS','ASSURANCE_LAB',
   'ATTESTATION_EVIDENCE_PATHS','AUDIT_BINDER','BACKUPS','BENCHMARKING','BENCHMARKS',
   'BENCH_REGISTRY','BOM','BRIDGE','BRIDGE_PROMPT_ENFORCEMENT','BUDGETS','BUNDLES',
   'CANON','CASEBOOKS','CERTIFICATION','CHAIN_ARCHITECTURE','CI','CLAIM_PROVENANCE',
   'CLI_WRAPPERS','COMPLIANCE','COMPLIANCE_FRAMEWORKS','COMPLIANCE_MAPS','CONNECT','CONSOLE','CONTEXT_GRAPH',
   'CONTINUOUS_MONITORING','CONTINUOUS_RECURRENCE','DASHBOARD','DEPLOYMENT','DEPLOYMENT_CHECKLIST','DIAGNOSTIC_BANK',
-  'DOCTOR','DOMAIN_PACKS','DRIFT_ALERTS','DUAL_CONTROL_APPROVALS','ECONOMIC_SIGNIFICANCE',
+  'DOCS_DRIFT_CLEANUP_PLAN','DOCTOR','DOMAIN_PACKS','DRIFT_ALERTS','DUAL_CONTROL_APPROVALS','ECONOMIC_SIGNIFICANCE',
   'ECOSYSTEM','ECOSYSTEM_COMPARATIVE_VIEW','ECOSYSTEM_VIEW','ENCRYPTION_AT_REST',
   'ENTERPRISE','EQUALIZER_TARGETS','EU_AI_ACT_COMPLIANCE','EVIDENCE_REQUESTS',
   'EVIDENCE_TRUST','EXECUTIVE_OVERVIEW','EXPERIMENTS','FEDERATION','FLEET','FORECASTING',
   'FULL_MODULE_ROADMAP','GDPR_ARTICLE_COMPLIANCE','GETTING_STARTED','GOVERNANCE','GOVERNOR','GO_TO_MARKET_PACK',
   'HARDWARE_TRUST','IDENTITY','IDENTITY_STABILITY','INCIDENT_RESPONSE_READINESS',
+  'IMPLEMENTATION_REALITY_MAP',
   'INNOVATION_THESIS','INSTALL','INTEGRATIONS','ISO_42001_ALIGNMENT','LAUNCH','LEASES',
   'LOOP','MCP_SERVER','MECHANIC_MODE','MECHANIC_WORKBENCH','MEMORY_MATURITY','METRICS',
   'MIGRATION_FROM_PROMPTFOO_DEEPEVAL','MIGRATION_RUNBOOK','MITRE_ATLAS_MAPPING',
@@ -116,6 +122,9 @@ const ALL_DOCS = [
   'wave4-agentic-ecosystem-audit','wave4-ai-safety-audit','wave4-documentation-audit',
   'wave4-integration-audit','wave4-product-readiness-audit','wave4-regulatory-audit',
   'wave4-supply-chain-audit','wave4-test-coverage-audit',
+  'deep-dive/INDEX','deep-dive/runtime-control-plane','deep-dive/trust-evidence-plane',
+  'deep-dive/governance-execution-plane','deep-dive/evaluation-assurance-plane',
+  'deep-dive/operations-ecosystem-plane',
   'adapters/autogen','adapters/claude-code','adapters/crewai','adapters/gemini',
   'adapters/generic-cli','adapters/langchain-node','adapters/langchain-python',
   'adapters/langgraph-python','adapters/llamaindex','adapters/openai-agents-sdk',
@@ -136,7 +145,11 @@ function prettyName(doc) {
   // For subdirectory docs, show "Category: Name" format
   const parts = doc.split('/');
   const basename = parts.length > 1 ? parts[parts.length - 1] : doc;
-  const prefix = parts.length > 1 ? parts[0].charAt(0).toUpperCase() + parts[0].slice(1) + ': ' : '';
+  const prefix = parts.length > 1
+    ? parts[0]
+        .replace(/[-_]/g, ' ')
+        .replace(/\b\w/g, c => c.toUpperCase()) + ': '
+    : '';
   return prefix + basename
     .replace(/^wave4-/, 'Wave 4: ')
     .replace(/[-_]/g, ' ')

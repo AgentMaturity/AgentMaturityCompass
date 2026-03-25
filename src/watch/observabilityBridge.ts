@@ -4,7 +4,7 @@
  * to AMC's scoring and monitoring pipeline.
  *
  * This is what makes AMC a trust layer ON TOP of observability.
- * Visibe shows you what your agent did. AMC tells you whether to trust it.
+ * Observability shows you what your agent did. AMC tells you whether to trust it.
  */
 
 import { EventEmitter } from "node:events";

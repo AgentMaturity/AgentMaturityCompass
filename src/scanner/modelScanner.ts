@@ -3,7 +3,7 @@ import { extname, basename } from "node:path";
 import { createHash } from "node:crypto";
 import { pipeline } from "node:stream/promises";
 
-// Supported model formats (based on promptfoo's modelaudit)
+// Supported model formats for security scanning
 const SUPPORTED_FORMATS = new Set([
   ".pkl", ".pickle",     // Pickle files
   ".pth", ".pt",         // PyTorch

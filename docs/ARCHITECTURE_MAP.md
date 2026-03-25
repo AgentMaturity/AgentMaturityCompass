@@ -2,6 +2,8 @@
 
 This map reflects current source structure and runtime boundaries in the repository.
 
+For the readable overview, start with [ARCHITECTURE_BRIEF.md](ARCHITECTURE_BRIEF.md). This file remains the appendix-style path map. For implementation status by surface, see [IMPLEMENTATION_REALITY_MAP.md](IMPLEMENTATION_REALITY_MAP.md).
+
 ## 1) Runtime Topology
 
 ```text

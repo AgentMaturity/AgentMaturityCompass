@@ -1,7 +1,7 @@
 /**
  * Auto-Instrumentation SDK — One-line setup for AMC governance + observability.
  *
- * Like Visibe's init() but with AMC's trust layer on top:
+ * One-line setup with AMC's trust layer built in:
  * - Auto-detects installed AI frameworks
  * - Monkey-patches them to capture traces
  * - ALSO captures governance events, policy violations, cost tracking
@@ -191,7 +191,7 @@ export class AMCInstrument extends EventEmitter {
     }
   }
 
-  /** Manually track a named operation (like Visibe's track()) */
+  /** Manually track a named operation with governance capture */
   track<T>(name: string, fn: () => T | Promise<T>): Promise<T> {
     const traceId = randomUUID();
     const startTime = Date.now();
@@ -902,13 +902,13 @@ export class AMCInstrument extends EventEmitter {
 
 /* ── Public API ───────────────────────────────────────────────────── */
 
-/** One-line initialization — the AMC answer to Visibe's init() */
+/** One-line initialization — auto-detect frameworks and start governance capture */
 export function init(config?: AMCInitConfig): AMCInstrument {
   const instrument = new AMCInstrument(config ?? {});
   return instrument.instrument();
 }
 
-/** Manually instrument a specific client (like Visibe's instrument()) */
+/** Manually instrument a specific client for governance and observability */
 export function instrument(client: unknown, framework: InstrumentableFramework): AMCInstrument {
   const inst = new AMCInstrument({ frameworks: [framework] });
   return inst.instrument();

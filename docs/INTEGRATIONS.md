@@ -2,6 +2,8 @@
 
 AMC integrates with every major AI provider. All integrations follow the same pattern: route model traffic through the AMC gateway, capture evidence, score the agent.
 
+This page describes current provider-facing integration paths. It does not imply that each integration is a separate runtime. For the underlying architecture, read `docs/ARCHITECTURE_BRIEF.md`. For the implementation-status map that distinguishes core runtime, wrappers, experimental surfaces, and legacy lineage, read `docs/IMPLEMENTATION_REALITY_MAP.md`.
+
 ## Anthropic Claude
 
 **CLI wrapper:**

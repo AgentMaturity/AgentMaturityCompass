@@ -20395,7 +20395,7 @@ program
     }
   });
 
-/* ── Visibe Gap Closure: watch, monitor, costs, guide, rate, integrations ── */
+/* ── Runtime Observability: watch, monitor, costs, guide, rate, integrations ── */
 
 watch
   .command("connect")

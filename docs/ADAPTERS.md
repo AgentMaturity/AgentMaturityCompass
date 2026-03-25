@@ -2,6 +2,8 @@
 
 Adapters are AMC's one-liner integration system. They wrap any AI agent CLI or SDK, automatically capturing evidence through the AMC gateway.
 
+Adapters are part of AMC's current TypeScript integration path. They are not a separate runtime. For the architecture overview, read `docs/ARCHITECTURE_BRIEF.md`. For core-versus-wrapper clarity across SDKs, extensions, actions, and legacy paths, read `docs/IMPLEMENTATION_REALITY_MAP.md`.
+
 ## How Adapters Work
 
 When you run `amc adapters run`:

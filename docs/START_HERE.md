@@ -6,6 +6,8 @@ AMC can look broad because it is broad. This page is the shortest route to the r
 
 AMC is a trust score for AI agents.
 
+If you want the repo-backed architectural version of that statement before choosing a path, read `docs/ARCHITECTURE_BRIEF.md`.
+
 It helps you:
 1. **Score** an agent from evidence
 2. **Find** trust and governance gaps
@@ -152,11 +154,16 @@ If you are new, start with:
 - The browser path is a real playground, not a fake full browser execution runtime.
 - The CLI is the serious path for execution evidence, traces, datasets, and CI.
 - Single-binary packaging exists as an experimental path and should be treated honestly.
+- SDKs, editor integrations, and CI shells are useful, but most of them wrap the same TypeScript runtime rather than replacing it.
+- If you want that distinction spelled out, read `docs/IMPLEMENTATION_REALITY_MAP.md`.
 
 ---
 
 ## Next docs to read
 
+- `docs/ARCHITECTURE_BRIEF.md`
+- `docs/IMPLEMENTATION_REALITY_MAP.md`
+- `docs/deep-dive/INDEX.md`
 - `docs/AFTER_QUICKSCORE.md`
 - `docs/QUICKSTART.md`
 - `docs/ADAPTERS.md`

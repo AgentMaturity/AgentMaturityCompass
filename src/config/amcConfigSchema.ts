@@ -3,7 +3,7 @@
  *
  * Single YAML file that defines agents to test, maturity thresholds,
  * assurance packs, providers, and evaluation settings.
- * Inspired by promptfoo's promptfooconfig.yaml.
+ * Declarative YAML-based configuration for AMC.
  */
 
 import { z } from "zod";
