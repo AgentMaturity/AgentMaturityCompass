@@ -33,7 +33,8 @@
     "clean": "rm -rf dist",
     "prebuild": "npm run clean",
     "prepack": "npm run typecheck && npm test && npm run build && npm run release:prepack-check",
-    "postinstall": "node scripts/postinstall.js || true"
+    "postinstall": "node scripts/postinstall.js || true",
+    "docs:api": "typedoc"
   },
   "keywords": [
     "ai-agent",
@@ -94,6 +95,7 @@
     "@vitest/coverage-v8": "^4.1.1",
     "date-fns": "^4.1.0",
     "tsx": "^4.19.2",
+    "typedoc": "^0.27.9",
     "typescript": "^5.7.2",
     "vitest": "^4.1.1"
   },

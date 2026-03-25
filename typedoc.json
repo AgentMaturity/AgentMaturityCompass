@@ -1,0 +1,18 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "entryPoints": ["src/index.ts"],
+  "out": "website/api",
+  "tsconfig": "tsconfig.json",
+  "name": "Agent Maturity Compass API",
+  "readme": "README.md",
+  "includeVersion": true,
+  "excludePrivate": true,
+  "excludeProtected": false,
+  "excludeInternal": true,
+  "skipErrorChecking": false,
+  "githubPages": true,
+  "navigationLinks": {
+    "GitHub": "https://github.com/thewisecrab/AgentMaturityCompass",
+    "Docs": "https://thewisecrab.github.io/AgentMaturityCompass"
+  }
+}

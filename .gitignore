@@ -5,6 +5,9 @@ node_modules/
 dist/
 coverage/
 
+# Generated API docs (built by CI for GitHub Pages)
+website/api/
+
 # OS files
 .DS_Store
 Thumbs.db
