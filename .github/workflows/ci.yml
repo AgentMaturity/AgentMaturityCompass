@@ -67,7 +67,7 @@ jobs:
 
       - name: Release smoke checks
         run: |
-          npm pack --json > /tmp/amc-pack.json
+          npm pack --ignore-scripts --json > /tmp/amc-pack.json
           TGZ=$(node -e 'const fs=require("fs");const j=JSON.parse(fs.readFileSync("/tmp/amc-pack.json","utf8"));process.stdout.write(j[0].filename)')
           node dist/cli.js release sbom --out /tmp/sbom.cdx.json
           node dist/cli.js release licenses --out /tmp/licenses.json
@@ -137,12 +137,24 @@ jobs:
             studio start
 
           for i in $(seq 1 90); do
-            if curl -fsS http://127.0.0.1:3212/readyz >/dev/null; then
+            if curl -fsS http://127.0.0.1:3212/readyz >/dev/null 2>&1; then
               break
+            fi
+            # Show container status every 10 iterations
+            if [ $((i % 10)) -eq 0 ]; then
+              echo "Waiting for container... (attempt $i/90)"
+              docker logs --tail 5 amc-ci 2>&1 || true
             fi
             sleep 2
           done
-          curl -fsS http://127.0.0.1:3212/healthz >/dev/null
+          # Dump full logs if health check fails
+          if ! curl -fsS http://127.0.0.1:3212/healthz >/dev/null 2>&1; then
+            echo "=== Container logs ==="
+            docker logs amc-ci 2>&1 || true
+            echo "=== Container status ==="
+            docker inspect amc-ci --format '{{.State.Status}} exit={{.State.ExitCode}}' || true
+            exit 1
+          fi
           curl -fsS http://127.0.0.1:3212/console >/dev/null
           docker exec amc-ci node dist/cli.js doctor --json > /tmp/docker-doctor.json
 
