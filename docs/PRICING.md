@@ -11,7 +11,7 @@ The only paid surface is **Industry Packs** — 40 sector-specific domain packs 
 Everything except Industry Packs:
 
 - **Score** — full evidence-weighted trust scoring, gap analysis, maturity diagnostics
-- **Shield** — all 86 adversarial assurance packs
+- **Shield** — all 147 adversarial assurance packs
 - **Enforce** — policy controls, approval workflows, scoped actions, governance
 - **Vault** — Ed25519 signatures, Merkle chains, tamper-evident proof infrastructure
 - **Watch** — traces, anomalies, timelines, monitoring, operational drift detection
@@ -19,8 +19,8 @@ Everything except Industry Packs:
 - **Passport** — portable identity, credentials, trust portability artifacts
 - **Comply** — regulatory mapping (EU AI Act, ISO 42001, NIST AI RMF, OWASP), audit binders, governance reports
 - **All 14 framework adapters** — LangChain, CrewAI, OpenAI, Claude Code, Gemini, AutoGen, LlamaIndex, Semantic Kernel, OpenClaw, OpenHands, Python SDK, generic CLI, OpenAI-compatible
-- **481 CLI commands**
-- **138 diagnostic questions**
+- **376 CLI commands**
+- **235 diagnostic questions**
 - **Browser playground**
 - **CI trust gates**
 - **GitHub Action**
