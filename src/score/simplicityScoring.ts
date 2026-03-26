@@ -1,6 +1,6 @@
 /**
  * Simplicity Scoring — AMC gap closure
- * Source: Moltbook ("orchestration is a cope"), Reddit ("deleted 400 lines of LangChain")
+ * Source: Community research ("orchestration is a cope"), Reddit ("deleted 400 lines of LangChain")
  * 
  * Measures whether agent architecture is appropriately simple for its risk level.
  * Over-engineering detection: governance overhead vs actual risk level.

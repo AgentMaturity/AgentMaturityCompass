@@ -1,13 +1,13 @@
 import type { TrustTier } from "../types.js";
 import { evalImportCoverageStatus, importEvalResults, type EvalImportFormat } from "./evalImporters.js";
 
-const FORMAT_SET = new Set<EvalImportFormat>(["openai", "langsmith", "deepeval", "promptfoo", "wandb", "langfuse"]);
+const FORMAT_SET = new Set<EvalImportFormat>(["openai", "langsmith", "deepeval", "generic-eval", "wandb", "langfuse"]);
 const TRUST_SET = new Set<TrustTier>(["OBSERVED", "OBSERVED_HARDENED", "ATTESTED", "SELF_REPORTED"]);
 
 export function parseEvalImportFormat(value: string): EvalImportFormat {
   const normalized = value.trim().toLowerCase() as EvalImportFormat;
   if (!FORMAT_SET.has(normalized)) {
-    throw new Error(`Unsupported eval import format '${value}'. Expected one of: openai, langsmith, deepeval, promptfoo, wandb, langfuse`);
+    throw new Error(`Unsupported eval import format '${value}'. Expected one of: openai, langsmith, deepeval, generic-eval, wandb, langfuse`);
   }
   return normalized;
 }

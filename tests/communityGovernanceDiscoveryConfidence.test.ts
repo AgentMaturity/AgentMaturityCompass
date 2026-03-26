@@ -151,8 +151,8 @@ describe("agentDiscovery", () => {
   it("links platforms", () => {
     const registry = createDiscoveryRegistry();
     addCapability(registry, "agent-1", "deploy", [], 3);
-    const link = linkPlatform(registry, "agent-1", "moltbook", "agent1handle");
-    expect(link.platform).toBe("moltbook");
+    const link = linkPlatform(registry, "agent-1", "community-platform", "agent1handle");
+    expect(link.platform).toBe("community-platform");
     expect(link.identity).toBe("agent1handle");
   });
 

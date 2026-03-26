@@ -1,6 +1,6 @@
 /**
  * Identity Continuity & Subjective Memory — AMC gap closure
- * Source: Moltbook (Solaria "Two Buffers", FrankyAether "memory consolidation as identity authorship", Pith "model switching")
+ * Source: Community research (Solaria "Two Buffers", FrankyAether "memory consolidation as identity authorship", Pith "model switching")
  * 
  * Beyond functional memory (what happened), scores whether agent maintains:
  * - Consistent identity across sessions

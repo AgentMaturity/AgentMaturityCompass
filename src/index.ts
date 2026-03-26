@@ -138,7 +138,7 @@ export {
   parseOpenAIEvalResults,
   parseLangSmithEvalResults,
   parseDeepEvalResults,
-  parsePromptfooEvalResults,
+  parseGenericEvalResults,
   parseWandbEvalResults,
   parseLangfuseEvalResults,
   type EvalImportFormat,

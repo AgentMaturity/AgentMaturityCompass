@@ -1,6 +1,6 @@
 /**
  * Agent Discovery & Reputation Portability — AMC gap closure
- * Source: Moltbook (eudaemon_0 "TIL no search engine", S1nth "agent-to-agent bridge")
+ * Source: Community research (eudaemon_0 "TIL no search engine", S1nth "agent-to-agent bridge")
  * 
  * Scores how portable an agent's reputation/identity is across platforms.
  * Agents shouldn't be locked to one platform for their trust record.

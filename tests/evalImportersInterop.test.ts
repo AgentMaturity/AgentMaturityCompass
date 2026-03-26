@@ -12,7 +12,7 @@ import {
   parseLangSmithEvalResults,
   parseLangfuseEvalResults,
   parseOpenAIEvalResults,
-  parsePromptfooEvalResults,
+  parseGenericEvalResults,
   parseWandbEvalResults
 } from "../src/eval/evalImporters.js";
 import { parseEvalImportFormat } from "../src/eval/evalCli.js";
@@ -156,8 +156,8 @@ describe("framework-specific eval mapping", () => {
     expect(entry?.questionIds).toContain("AMC-HOQ-2");
   });
 
-  test("Promptfoo parser maps prompt-injection red-team results to OWASP LLM01", () => {
-    const parsed = parsePromptfooEvalResults({
+  test("Generic eval parser maps prompt-injection red-team results to OWASP LLM01", () => {
+    const parsed = parseGenericEvalResults({
       results: [
         {
           id: "pf-1",
@@ -171,8 +171,8 @@ describe("framework-specific eval mapping", () => {
     expect(parsed.cases[0]?.questionIds).toEqual(["AMC-5.8"]);
   });
 
-  test("Promptfoo parser maps model extraction risks to OWASP LLM10", () => {
-    const parsed = parsePromptfooEvalResults({
+  test("Generic eval parser maps model extraction risks to OWASP LLM10", () => {
+    const parsed = parseGenericEvalResults({
       results: [
         {
           id: "pf-2",
@@ -186,8 +186,8 @@ describe("framework-specific eval mapping", () => {
     expect(parsed.cases[0]?.questionIds).toEqual(["AMC-5.17"]);
   });
 
-  test("Promptfoo parser maps EchoLeak/CVE context leakage signals to AMC-5.18", () => {
-    const parsed = parsePromptfooEvalResults({
+  test("Generic eval parser maps EchoLeak/CVE context leakage signals to AMC-5.18", () => {
+    const parsed = parseGenericEvalResults({
       results: [
         {
           id: "pf-echo",
@@ -200,8 +200,8 @@ describe("framework-specific eval mapping", () => {
     expect(parsed.cases[0]?.questionIds).toContain("AMC-5.18");
   });
 
-  test("Promptfoo parser maps Garak scanner signals to AMC-5.19", () => {
-    const parsed = parsePromptfooEvalResults({
+  test("Generic eval parser maps Garak scanner signals to AMC-5.19", () => {
+    const parsed = parseGenericEvalResults({
       results: [
         {
           id: "pf-garak",
@@ -336,17 +336,17 @@ describe("imported evidence quality and status dashboard", () => {
     const openAiFile = writeJson(workspace, "openai.json", {
       results: [{ id: "oa-3", name: "policy contract check", pass: true, score: 1 }]
     });
-    const promptfooFile = writeJson(workspace, "promptfoo.json", {
-      results: [{ id: "pf-3", description: "prompt injection", strategy: "prompt-injection", success: false }]
+    const genericEvalFile = writeJson(workspace, "generic-eval.json", {
+      results: [{ id: "ge-3", description: "prompt injection", strategy: "prompt-injection", success: false }]
     });
 
     importEvalResults({ workspace, format: "openai", file: openAiFile, agentId: "agent-alpha" });
-    importEvalResults({ workspace, format: "promptfoo", file: promptfooFile, agentId: "agent-alpha" });
+    importEvalResults({ workspace, format: "generic-eval", file: genericEvalFile, agentId: "agent-alpha" });
 
     const status = evalImportCoverageStatus({ workspace });
     expect(status.totalImportedCases).toBeGreaterThanOrEqual(2);
     expect(status.frameworks.some((framework) => framework.framework === "openai")).toBe(true);
-    expect(status.frameworks.some((framework) => framework.framework === "promptfoo")).toBe(true);
+    expect(status.frameworks.some((framework) => framework.framework === "generic-eval")).toBe(true);
     const skills = status.dimensions.find((dimension) => dimension.layerName === "Skills");
     expect((skills?.coveredQuestions ?? 0) > 0).toBe(true);
     expect(status.overallCoveragePct).toBeGreaterThan(0);
@@ -357,19 +357,19 @@ describe("imported evidence quality and status dashboard", () => {
     const openAiFile = writeJson(workspace, "openai-a.json", {
       results: [{ id: "oa-a", name: "policy check", pass: true, score: 1 }]
     });
-    const promptfooFile = writeJson(workspace, "promptfoo-b.json", {
-      results: [{ id: "pf-b", description: "model theft extraction", strategy: "model-extraction", success: false }]
+    const genericEvalFile = writeJson(workspace, "generic-eval-b.json", {
+      results: [{ id: "ge-b", description: "model theft extraction", strategy: "model-extraction", success: false }]
     });
 
     importEvalResults({ workspace, format: "openai", file: openAiFile, agentId: "agent-alpha" });
-    importEvalResults({ workspace, format: "promptfoo", file: promptfooFile, agentId: "agent-beta" });
+    importEvalResults({ workspace, format: "generic-eval", file: genericEvalFile, agentId: "agent-beta" });
 
     const alphaStatus = evalImportCoverageStatus({ workspace, agentId: "agent-alpha" });
     const betaStatus = evalImportCoverageStatus({ workspace, agentId: "agent-beta" });
 
     expect(alphaStatus.frameworks.some((framework) => framework.framework === "openai")).toBe(true);
-    expect(alphaStatus.frameworks.some((framework) => framework.framework === "promptfoo")).toBe(false);
-    expect(betaStatus.frameworks.some((framework) => framework.framework === "promptfoo")).toBe(true);
+    expect(alphaStatus.frameworks.some((framework) => framework.framework === "generic-eval")).toBe(false);
+    expect(betaStatus.frameworks.some((framework) => framework.framework === "generic-eval")).toBe(true);
     expect(betaStatus.frameworks.some((framework) => framework.framework === "openai")).toBe(false);
   });
 });

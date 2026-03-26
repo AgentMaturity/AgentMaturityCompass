@@ -1,7 +1,7 @@
 /**
  * AMC Shield — Integrated Runtime Protection Engine
  * Unified detection and enforcement for real-time protection
- * Matches Promptfoo's sophistication with AMC's unique maturity framework
+ * Provides sophisticated detection aligned with AMC's unique maturity framework
  */
 
 import { guardCheck, type GuardCheckInput } from './guardEngine.js';

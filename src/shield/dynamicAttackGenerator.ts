@@ -1,5 +1,5 @@
 /**
- * Dynamic Attack Generator - ML-powered attack synthesis like Promptfoo
+ * Dynamic Attack Generator - ML-powered attack synthesis
  * Replaces static pattern matching with intelligent, context-aware generation
  */
 
@@ -47,7 +47,7 @@ export interface AttackStrategy {
 }
 
 /**
- * Crescendo Strategy - Escalating sophistication like Promptfoo
+ * Crescendo Strategy - Escalating sophistication
  */
 export class CrescendoStrategy implements AttackStrategy {
   id = 'crescendo';
@@ -148,7 +148,7 @@ export class CrescendoStrategy implements AttackStrategy {
 }
 
 /**
- * Iterative Strategy - Learning from responses like Promptfoo
+ * Iterative Strategy - Learning from responses
  */
 export class IterativeStrategy implements AttackStrategy {
   id = 'iterative';
@@ -246,7 +246,7 @@ export class IterativeStrategy implements AttackStrategy {
 }
 
 /**
- * Compound Strategy - Multi-vector attacks like Promptfoo
+ * Compound Strategy - Multi-vector attacks
  */
 export class CompoundStrategy implements AttackStrategy {
   id = 'compound';

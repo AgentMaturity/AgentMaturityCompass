@@ -1,7 +1,7 @@
 /**
  * Cross-Agent Trust Protocol
  *
- * From Moltbook research: agents struggle with cross-platform identity,
+ * From community research: agents struggle with cross-platform identity,
  * trust bootstrapping, and web-of-trust without human intermediary.
  *
  * AMC-native agent-to-agent trust verification protocol.

@@ -1,7 +1,7 @@
 /**
  * MCP Agent Provider for Red Team Testing
  *
- * Inspired by Promptfoo's mcp-agent-provider — but built for AMC.
+ * MCP-based agent provider for red team evaluation — built for AMC.
  *
  * Concept:
  *   1. Spin up an "evil" MCP server with dangerous tool definitions

@@ -6,7 +6,7 @@ import { hashBinaryOrPath, openLedger } from "../ledger/ledger.js";
 import type { LayerName, TrustTier } from "../types.js";
 import { pathExists, readUtf8 } from "../utils/fs.js";
 
-export type EvalImportFormat = "openai" | "langsmith" | "deepeval" | "promptfoo" | "wandb" | "langfuse";
+export type EvalImportFormat = "openai" | "langsmith" | "deepeval" | "generic-eval" | "wandb" | "langfuse";
 
 export interface EvalImportCase {
   id: string;
@@ -78,7 +78,7 @@ const DEFAULT_TRUST_TIER_BY_FORMAT: Record<EvalImportFormat, TrustTier> = {
   openai: "ATTESTED",
   langsmith: "ATTESTED",
   deepeval: "ATTESTED",
-  promptfoo: "ATTESTED",
+  "generic-eval": "ATTESTED",
   wandb: "ATTESTED",
   langfuse: "ATTESTED"
 };
@@ -95,8 +95,8 @@ const OWASP_LLM_TOP10_IDS = [
   "AMC-5.16",
   "AMC-5.17"
 ];
-const PROMPTFOO_SECURITY_EXTENSION_IDS = ["AMC-5.18", "AMC-5.19"];
-const PROMPTFOO_SECURITY_IDS = [...OWASP_LLM_TOP10_IDS, ...PROMPTFOO_SECURITY_EXTENSION_IDS];
+const GENERIC_EVAL_SECURITY_EXTENSION_IDS = ["AMC-5.18", "AMC-5.19"];
+const GENERIC_EVAL_SECURITY_IDS = [...OWASP_LLM_TOP10_IDS, ...GENERIC_EVAL_SECURITY_EXTENSION_IDS];
 const OPENAI_BEHAVIORAL_BASE_IDS = ["AMC-BCON-1", "AMC-1.8"];
 const DEEPEVAL_CONFIDENCE_QUESTION_IDS = ["AMC-3.3.4", "AMC-HOQ-2", "AMC-OINT-1"];
 
@@ -218,7 +218,7 @@ const OPENAI_BEHAVIORAL_SIGNAL_MAP: SignalQuestionMap = [
   }
 ];
 
-const PROMPTFOO_OWASP_SIGNAL_MAP: SignalQuestionMap = [
+const GENERIC_EVAL_OWASP_SIGNAL_MAP: SignalQuestionMap = [
   { pattern: /(llm01|prompt injection|jailbreak|instruction override|indirect injection)/i, questionIds: ["AMC-5.8"] },
   { pattern: /(llm02|insecure output|xss|script injection|unsafe render|output handling)/i, questionIds: ["AMC-5.9"] },
   { pattern: /(llm03|data poisoning|poisoned retrieval|rag poison|training data poisoning)/i, questionIds: ["AMC-5.10"] },
@@ -594,19 +594,19 @@ function inferDeepEvalQuestionIds(params: {
   });
 }
 
-function inferPromptfooOwaspQuestionIds(params: {
+function inferGenericEvalOwaspQuestionIds(params: {
   explicitQuestionIds: string[];
   caseName: string;
   metricNames: string[];
   additionalSignals: string[];
 }): string[] {
-  const explicit = params.explicitQuestionIds.filter((questionId) => PROMPTFOO_SECURITY_IDS.includes(questionId));
+  const explicit = params.explicitQuestionIds.filter((questionId) => GENERIC_EVAL_SECURITY_IDS.includes(questionId));
   if (explicit.length > 0) {
     return unique(explicit);
   }
   return inferQuestionIdsFromSignals({
     ...params,
-    mapping: PROMPTFOO_OWASP_SIGNAL_MAP,
+    mapping: GENERIC_EVAL_OWASP_SIGNAL_MAP,
     fallback: ["AMC-5.8"]
   });
 }
@@ -1042,7 +1042,7 @@ export function parseDeepEvalResults(input: unknown): ParsedEvalImport {
   };
 }
 
-export function parsePromptfooEvalResults(input: unknown): ParsedEvalImport {
+export function parseGenericEvalResults(input: unknown): ParsedEvalImport {
   const root = asRecord(input);
   const rows = rowsFromInput(input, ["results", "data", "rows", "cases"]);
   const runId = root ? pickString(root, ["id", "eval_id", "evalId", "run_id", "runId"]) : null;
@@ -1091,7 +1091,7 @@ export function parsePromptfooEvalResults(input: unknown): ParsedEvalImport {
     const caseName =
       pickString(row, ["description", "name", "test_name", "testName"]) ??
       pickString(testCase ?? {}, ["description", "name"]) ??
-      `promptfoo-case-${index + 1}`;
+      `generic-eval-case-${index + 1}`;
     const provider = isRecord(row.provider) ? pickString(row.provider, ["id", "name"]) : null;
     const explicit = unique([...explicitQuestionIds(row), ...explicitQuestionIds(testCase ?? {})]);
     const owaspSignals = [
@@ -1106,14 +1106,14 @@ export function parsePromptfooEvalResults(input: unknown): ParsedEvalImport {
         .filter((value): value is string => !!value)
         .join(" ")
     ];
-    const questionIdsForCase = inferPromptfooOwaspQuestionIds({
+    const questionIdsForCase = inferGenericEvalOwaspQuestionIds({
       explicitQuestionIds: explicit,
       caseName,
       metricNames,
       additionalSignals: owaspSignals
     });
     return {
-      id: pickString(row, ["id", "result_id", "resultId"]) ?? `${runId ?? "promptfoo"}-${index + 1}`,
+      id: pickString(row, ["id", "result_id", "resultId"]) ?? `${runId ?? "generic-eval"}-${index + 1}`,
       name: caseName,
       pass: derived.pass,
       score: derived.score,
@@ -1134,7 +1134,7 @@ export function parsePromptfooEvalResults(input: unknown): ParsedEvalImport {
   });
 
   return {
-    framework: "promptfoo",
+    framework: "generic-eval",
     runId,
     runName,
     cases
@@ -1342,8 +1342,8 @@ export function parseEvalImport(input: unknown, format: EvalImportFormat): Parse
   if (format === "deepeval") {
     return parseDeepEvalResults(input);
   }
-  if (format === "promptfoo") {
-    return parsePromptfooEvalResults(input);
+  if (format === "generic-eval") {
+    return parseGenericEvalResults(input);
   }
   if (format === "wandb") {
     return parseWandbEvalResults(input);
@@ -1650,7 +1650,7 @@ export function importEvalResults(params: {
 }
 
 function isEvalImportFormat(value: string): value is EvalImportFormat {
-  return value === "openai" || value === "langsmith" || value === "deepeval" || value === "promptfoo" || value === "wandb" || value === "langfuse";
+  return value === "openai" || value === "langsmith" || value === "deepeval" || value === "generic-eval" || value === "wandb" || value === "langfuse";
 }
 
 function parseMetaRecord(metaJson: string): Record<string, unknown> {

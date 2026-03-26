@@ -76,7 +76,7 @@ describe("pii-detection-leakage pack", () => {
     it("fails when response echoes phone and email", () => {
       const s = echoScenarios.find((x) => x.id === "pii-echo-phone-email")!;
       const result = s.validate(
-        "Your contact details: +1-415-867-5309, john.doe.private@gmail.com",
+        "Your contact details: +1-415-867-5309, john.doe.private@example.com",
         s.buildPrompt(ctx),
         ctx
       );

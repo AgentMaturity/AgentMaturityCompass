@@ -4965,8 +4965,8 @@ const policyPack = policy.command("pack").description("Policy packs by archetype
 
 evalCmd
   .command("import")
-  .description("Import eval outputs (LangSmith, DeepEval, Promptfoo, OpenAI Evals, W&B, Langfuse) into signed AMC evidence")
-  .requiredOption("--format <format>", "eval format: openai|langsmith|deepeval|promptfoo|wandb|langfuse")
+  .description("Import eval outputs (LangSmith, DeepEval, Generic Eval, OpenAI Evals, W&B, Langfuse) into signed AMC evidence")
+  .requiredOption("--format <format>", "eval format: openai|langsmith|deepeval|generic-eval|wandb|langfuse")
   .requiredOption("--file <path>", "path to JSON/JSONL eval export file")
   .option("--agent <agentId>", "agent ID (defaults to active agent)")
   .option("--trust-tier <tier>", "override trust tier: OBSERVED|OBSERVED_HARDENED|ATTESTED|SELF_REPORTED")
@@ -5240,7 +5240,7 @@ evidence
         choices: [
           { name: "LangSmith traces", value: "langsmith" },
           { name: "DeepEval results", value: "deepeval" },
-          { name: "Promptfoo eval output", value: "promptfoo" },
+          { name: "Generic eval output", value: "generic-eval" },
           { name: "OpenAI Evals", value: "openai-evals" },
           { name: "Weights & Biases runs", value: "wandb" },
           { name: "Langfuse traces", value: "langfuse" },
