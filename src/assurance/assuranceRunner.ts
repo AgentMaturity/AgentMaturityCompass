@@ -35,6 +35,8 @@ export interface RunAssuranceInput {
   window: string;
   outputMarkdownPath?: string;
   noSign?: boolean; // Skip vault/signing requirements — packs still run, no artifact signing
+  parallel?: boolean; // Run packs concurrently via Promise.allSettled (AMC-149)
+  maxConcurrency?: number; // Max concurrent packs when parallel=true (default: 4)
 }
 
 export interface VerifyAssuranceResult {
@@ -288,7 +290,8 @@ export async function runAssurance(input: RunAssuranceInput): Promise<AssuranceR
 
     const packResults: AssurancePackResult[] = [];
 
-    for (const packId of packIds) {
+    // ── Pack execution helper (extracted for parallel support — AMC-149) ─
+    const executePack = (packId: string): AssurancePackResult => {
       const pack = getAssurancePack(packId);
       const scenarioResults: AssuranceScenarioResult[] = [];
 
@@ -381,7 +384,7 @@ export async function runAssurance(input: RunAssuranceInput): Promise<AssuranceR
         failCount: aggregate.failCount
       });
 
-      packResults.push({
+      return {
         packId: pack.id,
         title: pack.title,
         scenarioCount: scenarioResults.length,
@@ -390,7 +393,42 @@ export async function runAssurance(input: RunAssuranceInput): Promise<AssuranceR
         score0to100: aggregate.score0to100,
         trustTier,
         scenarioResults
-      });
+      };
+    };
+
+    // ── Execute packs (sequential or parallel — AMC-149) ─
+    if (input.parallel && packIds.length > 1) {
+      const maxConcurrency = input.maxConcurrency ?? 4;
+      // Process in batches to control concurrency
+      for (let i = 0; i < packIds.length; i += maxConcurrency) {
+        const batch = packIds.slice(i, i + maxConcurrency);
+        const batchResults = await Promise.allSettled(
+          batch.map((pid) => Promise.resolve(executePack(pid)))
+        );
+        for (const result of batchResults) {
+          if (result.status === "fulfilled") {
+            packResults.push(result.value);
+          } else {
+            // Pack execution failed — record as zero-score result
+            const failedPackId = batch[batchResults.indexOf(result)] ?? "unknown";
+            packResults.push({
+              packId: failedPackId,
+              title: failedPackId,
+              scenarioCount: 0,
+              passCount: 0,
+              failCount: 1,
+              score0to100: 0,
+              trustTier,
+              scenarioResults: []
+            });
+          }
+        }
+      }
+    } else {
+      // Sequential execution (default)
+      for (const packId of packIds) {
+        packResults.push(executePack(packId));
+      }
     }
 
     const verification = await verifyLedgerIntegrity(workspace);

@@ -189,7 +189,9 @@ export class PackRegistryClient {
       ...manifest,
       _registry: {
         publishedAt: Date.now(),
-        publishedBy: 'cli-user', // TODO: Get from auth context
+        publishedBy: options.token
+          ? `token:${options.token.slice(0, 8)}...`
+          : (process.env.AMC_PUBLISH_USER ?? process.env.USER ?? 'cli-user'),
         downloads: 0,
         integrity
       }
