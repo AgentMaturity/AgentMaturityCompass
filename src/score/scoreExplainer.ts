@@ -10,7 +10,6 @@
  * 6. Audit-friendly export — format for compliance auditors
  */
 
-import { z } from "zod";
 import { randomUUID } from "node:crypto";
 import type { DiagnosticReport, LayerScore, QuestionScore } from "../types.js";
 import { sha256Hex } from "../utils/hash.js";

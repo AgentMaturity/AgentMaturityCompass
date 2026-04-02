@@ -173,7 +173,7 @@ export function t(
   }
   if (params) {
     for (const [k, v] of Object.entries(params)) {
-      value = value.replace(new RegExp(`\\{${k}\\}`, "g"), String(v));
+      value = value.replace(new RegExp(`\\{${k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\}`, "g"), String(v));
     }
   }
   return value;
@@ -367,7 +367,11 @@ export function loadTranslationBundle(workspace: string, locale: SupportedLocale
   const file = join(i18nDir(workspace), `${locale}.json`);
   if (!pathExists(file)) return null;
   try {
-    return JSON.parse(readUtf8(file)) as TranslationBundle;
+    const parsed = JSON.parse(readUtf8(file));
+    if (typeof parsed !== 'object' || parsed === null || !('locale' in parsed)) {
+      throw new Error('Invalid translation bundle format');
+    }
+    return parsed as TranslationBundle;
   } catch {
     return null;
   }

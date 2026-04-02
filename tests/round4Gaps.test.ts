@@ -379,6 +379,6 @@ describe("R4-10 Evaluation Data DPIA", () => {
   });
 
   test("next review date is future", () => {
-    expect(AMC_EVALUATION_DPIA.nextReviewDate).toBeGreaterThan(Date.now());
+    expect(getDpiaAssessment().nextReviewDate).toBeGreaterThan(Date.now());
   });
 });
