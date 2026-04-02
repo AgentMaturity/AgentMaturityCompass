@@ -1,0 +1,17 @@
+{
+  "mcpServers": {
+    "linear": {
+      "command": "linear-mcp",
+      "env": {
+        "LINEAR_API_KEY": "REDACTED"
+      }
+    },
+    "context7": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@context7/mcp-server"
+      ]
+    }
+  }
+}
