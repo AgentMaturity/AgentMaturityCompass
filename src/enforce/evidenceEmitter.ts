@@ -10,6 +10,7 @@ import { mkdirSync } from 'node:fs';
 
 let _db: import('better-sqlite3').Database | null = null;
 let _insertStmt: import('better-sqlite3').Statement | null = null;
+let _dbPath: string | null = null;
 
 export interface GuardEventInput {
   agentId: string;
@@ -21,12 +22,28 @@ export interface GuardEventInput {
 }
 
 function getDb(): import('better-sqlite3').Database | null {
-  if (_db) return _db;
   try {
     const dir = join(process.cwd(), '.amc');
+    const desiredPath = join(dir, 'guard_events.sqlite');
+    if (_db && _dbPath === desiredPath) {
+      return _db;
+    }
+
+    if (_db) {
+      try {
+        _db.close();
+      } catch {
+        // best-effort close before reopening at a new workspace path
+      }
+      _db = null;
+      _insertStmt = null;
+      _dbPath = null;
+    }
+
     mkdirSync(dir, { recursive: true });
     const Database = require('better-sqlite3') as typeof import('better-sqlite3');
-    _db = new Database(join(dir, 'guard_events.sqlite'));
+    _db = new Database(desiredPath);
+    _dbPath = desiredPath;
     _db.pragma('journal_mode = WAL');
     _db.exec(`
       CREATE TABLE IF NOT EXISTS amc_guard_events (
@@ -109,6 +126,11 @@ export function readGuardEvents(agentId?: string, windowHours?: number): Array<{
 /** Close the database connection (for testing cleanup). */
 export function closeGuardDb(): void {
   try {
-    if (_db) { _db.close(); _db = null; _insertStmt = null; }
+    if (_db) {
+      _db.close();
+      _db = null;
+      _insertStmt = null;
+      _dbPath = null;
+    }
   } catch (_e) { /* silent */ }
 }

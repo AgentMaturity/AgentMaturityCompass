@@ -262,7 +262,7 @@ describe("forecast planning", () => {
   test("drift advisories are produced for critical drops", () => {
     const workspace = newWorkspace();
     forecastInitCli(workspace);
-    const baseTs = Date.UTC(2026, 0, 1);
+    const baseTs = Date.now() - 30 * 86_400_000;
     const values = [4.1, 4.0, 4.0, 3.2, 3.1, 3.0];
     for (let i = 0; i < values.length; i += 1) {
       writeRunFixture({

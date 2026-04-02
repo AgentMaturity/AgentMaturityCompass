@@ -6,6 +6,7 @@
   "main": "dist/index.js",
   "files": [
     "dist/**",
+    "!dist/sea/**",
     "README.md",
     "LICENSE"
   ],
