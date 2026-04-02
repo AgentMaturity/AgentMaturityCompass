@@ -5,9 +5,6 @@
  * baseline establishment, and fleet-level trends.
  */
 
-import { z } from "zod";
-import { join } from "node:path";
-import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 
 export interface ScoreDataPoint {
   ts: number;

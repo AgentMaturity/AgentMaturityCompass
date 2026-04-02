@@ -5,7 +5,6 @@
  * and capability degradation in evaluated agents.
  */
 
-import { sha256Hex } from "../utils/hash.js";
 
 export interface DriftSample {
   ts: number;

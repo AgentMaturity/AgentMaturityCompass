@@ -290,9 +290,12 @@ export class AuditLog {
         entryId: entry.entryId,
         ts: entry.ts,
         userId: entry.userId,
+        sessionId: entry.sessionId,
         action: entry.action,
         resource: entry.resource,
+        resourceId: entry.resourceId,
         outcome: entry.outcome,
+        details: entry.details,
         previousHash: entry.previousHash,
       }),
     );
@@ -341,9 +344,12 @@ export class AuditLog {
           entryId: entry.entryId,
           ts: entry.ts,
           userId: entry.userId,
+          sessionId: entry.sessionId,
           action: entry.action,
           resource: entry.resource,
+          resourceId: entry.resourceId,
           outcome: entry.outcome,
+          details: entry.details,
           previousHash: entry.previousHash,
         }),
       );
@@ -400,7 +406,9 @@ export function loadSsoConfig(workspace: string): SsoProvider[] {
   const file = join(iamDir(workspace), "sso-providers.json");
   if (!pathExists(file)) return [];
   try {
-    return JSON.parse(readUtf8(file)) as SsoProvider[];
+    const parsed = JSON.parse(readUtf8(file));
+    if (!Array.isArray(parsed)) return [];
+    return parsed as SsoProvider[];
   } catch {
     return [];
   }

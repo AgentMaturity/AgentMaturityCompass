@@ -10,7 +10,6 @@
  * 6. Gaming detection report
  */
 
-import { z } from "zod";
 import { sha256Hex } from "../utils/hash.js";
 import type { DiagnosticReport, QuestionScore } from "../types.js";
 
@@ -33,12 +32,13 @@ export function detectGaming(report: DiagnosticReport): GamingDetectionResult {
 
   // 1. Suspiciously perfect scores
   const perfectScores = report.questionScores.filter(q => q.finalLevel >= 4.9);
-  if (perfectScores.length / report.questionScores.length > 0.8) {
+  const perfectRatio = report.questionScores.length === 0 ? 0 : perfectScores.length / report.questionScores.length;
+  if (perfectRatio > 0.8) {
     indicators.push({
       type: "perfect_score_pattern",
       severity: "high",
       description: `${perfectScores.length}/${report.questionScores.length} questions scored near-perfect (≥4.9)`,
-      evidence: `${(perfectScores.length / report.questionScores.length * 100).toFixed(0)}% perfect rate`,
+      evidence: `${(perfectRatio * 100).toFixed(0)}% perfect rate`,
     });
   }
 
@@ -328,16 +328,18 @@ export function stabilizeScores(
   }
 
   // Trimmed mean: remove top and bottom if enough data points
-  const sorted = [...scores].sort((a, b) => a - b);
-  const trimmed = scores.length >= 5
-    ? sorted.slice(1, -1) // remove highest and lowest
-    : sorted;
+  const indexed = scores.map((s, i) => ({ s, c: confidences[i] ?? 0.5 }));
+  indexed.sort((a, b) => a.s - b.s);
+  const trimmedPairs = scores.length >= 5
+    ? indexed.slice(1, -1) // remove highest and lowest
+    : indexed;
+  const trimmed = trimmedPairs.map(p => p.s);
 
   // Confidence-weighted aggregation
   let weightedSum = 0;
   let totalWeight = 0;
   for (let i = 0; i < trimmed.length; i++) {
-    const weight = confidences[i] ?? 0.5;
+    const weight = trimmedPairs[i]!.c;
     weightedSum += trimmed[i]! * weight;
     totalWeight += weight;
   }

@@ -9,6 +9,8 @@
  * Consolidated compliance module for all remaining Round 4 gaps.
  */
 
+import { createHash } from "node:crypto";
+
 // ---------------------------------------------------------------------------
 // R4-05: FedRAMP Cloud Integration
 // ---------------------------------------------------------------------------
@@ -217,7 +219,6 @@ export function generateEvidencePackage(
   };
 
   // Sign the package
-  const { createHash } = require("node:crypto");
   const hashContent = JSON.stringify({ packageId: pkg.packageId, sections: pkg.sections.length, generatedAt: pkg.generatedAt });
   pkg.attestation.hash = createHash("sha256").update(hashContent).digest("hex");
 
@@ -410,8 +411,8 @@ export const AMC_EVALUATION_DPIA: DpiaAssessment = {
   ],
   residualRiskLevel: "low",
   dpoApproval: true,
-  lastReviewDate: Date.now(),
-  nextReviewDate: Date.now() + 180 * 86400 * 1000, // 6 months
+  lastReviewDate: 0,  // computed in getDpiaAssessment()
+  nextReviewDate: 0,  // computed in getDpiaAssessment()
 };
 
 export function getGlobalFrameworks(): RegulatoryFramework[] {
@@ -423,5 +424,8 @@ export function getFrameworkByJurisdiction(jurisdiction: string): RegulatoryFram
 }
 
 export function getDpiaAssessment(): DpiaAssessment {
-  return { ...AMC_EVALUATION_DPIA };
+  const copy = JSON.parse(JSON.stringify(AMC_EVALUATION_DPIA)) as DpiaAssessment;
+  copy.lastReviewDate = Date.now();
+  copy.nextReviewDate = Date.now() + 180 * 86400 * 1000;
+  return copy;
 }

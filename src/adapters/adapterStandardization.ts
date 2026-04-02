@@ -7,7 +7,6 @@
  * MiroFish V2 feedback: "evaluation fairness affected by adapter type, not agent quality"
  */
 
-import { z } from "zod";
 
 export const ADAPTER_CAPABILITY_TIERS = ["native", "bridge", "cli"] as const;
 export type AdapterCapabilityTier = typeof ADAPTER_CAPABILITY_TIERS[number];

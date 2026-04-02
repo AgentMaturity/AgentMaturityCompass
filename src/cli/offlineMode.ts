@@ -57,6 +57,13 @@ export function checkOfflineCapability(config: OfflineConfig): OfflineCapability
   const missing: string[] = [];
   const memEstimate = config.lite ? 80 : 200;
 
+  if (!config.offline) {
+    missing.push("offline mode not enabled");
+  }
+  if (!config.bundledQuestionBank) {
+    missing.push("bundled question bank required for offline operation");
+  }
+
   return {
     canRunOffline: missing.length === 0,
     missingDependencies: missing,

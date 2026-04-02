@@ -15,8 +15,6 @@
  */
 
 import { z } from "zod";
-import { join } from "node:path";
-import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 
 // ---------------------------------------------------------------------------
@@ -402,8 +400,8 @@ export function generateMigrationGuide(fromVersion: string, toVersion: string): 
 // ---------------------------------------------------------------------------
 
 export const pluginApiVersionSchema = z.object({
-  minApiVersion: z.string().regex(/^\d+\.\d+\.\d+/).optional(),
-  maxApiVersion: z.string().regex(/^\d+\.\d+\.\d+/).optional(),
+  minApiVersion: z.string().regex(/^\d+\.\d+\.\d+$/).optional(),
+  maxApiVersion: z.string().regex(/^\d+\.\d+\.\d+$/).optional(),
   apiStability: z.enum(["stable", "beta", "alpha"]).optional(),
 });
 
