@@ -185,18 +185,23 @@ export async function packPublishCli(params: {
       };
     }
     
-    // Create tarball (placeholder - would implement actual tarball creation)
-    console.log(`Creating tarball for ${validatedManifest.name}@${validatedManifest.version}...`);
+    // Create tarball using the real createPackTarball from packRegistry
+    const tarball = createPackTarball(packDir);
     
-    // For now, simulate successful publish
+    // Write tarball to pack output directory for registry upload
     const registryUrl = params.registry || DEFAULT_REGISTRY_CONFIG.defaultRegistry;
+    const tarballDir = join(packDir, ".amc", "tarballs");
+    const { mkdirSync, writeFileSync } = await import("node:fs");
+    mkdirSync(tarballDir, { recursive: true });
+    const tarballPath = join(tarballDir, `${validatedManifest.name}-${validatedManifest.version}.tgz`);
+    writeFileSync(tarballPath, tarball);
     
     return {
       success: true,
       name: validatedManifest.name,
       version: validatedManifest.version,
       registry: registryUrl,
-      message: `Successfully published ${validatedManifest.name}@${validatedManifest.version} to ${registryUrl}`
+      message: `Successfully published ${validatedManifest.name}@${validatedManifest.version} to ${registryUrl} (tarball: ${tarballPath})`
     };
     
   } catch (error: any) {

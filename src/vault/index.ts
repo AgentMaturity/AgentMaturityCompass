@@ -10,4 +10,8 @@ export { UndoLayer, snapshotBeforeChange, undoChange } from './undoLayer.js';
 export type { ActionRecord, UndoResult, RedoResult } from './undoLayer.js';
 
 // Legacy types
-export type { MemoryRecord, ResidencyCheck, UndoSnapshot, SecretToken } from './stubs.js';
+// Legacy types (were in vault/stubs.ts, inlined here)
+export type MemoryRecord = { key: string; purpose: string; expiresAt: Date; stored: boolean; };
+export type ResidencyCheck = { compliant: boolean; region: string; allowedRegions: string[]; };
+export type UndoSnapshot = { snapshotId: string; resourceId: string; operation: string; canUndo: boolean; };
+export type { SecretStoreResult as SecretToken } from './secretsBroker.js';

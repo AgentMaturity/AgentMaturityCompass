@@ -101,11 +101,17 @@ const RISKY_TOOL_NAMES = [
 function loadContent(pathOrUrl: string): { content: string; isUrl: boolean } {
   // Simple URL detection
   if (pathOrUrl.startsWith("http://") || pathOrUrl.startsWith("https://")) {
-    // For URL scanning, return a placeholder (real impl would fetch)
-    return {
-      content: JSON.stringify({ _note: "URL scanning requires network access", url: pathOrUrl }),
-      isUrl: true
-    };
+    // Synchronous URL fetch using execSync (child_process is already imported above)
+    try {
+      const { execSync } = require("node:child_process");
+      const result = execSync(
+        `curl -sS --max-time 10 --max-filesize 1048576 -L ${JSON.stringify(pathOrUrl)}`,
+        { encoding: "utf8", timeout: 15_000 }
+      );
+      return { content: result, isUrl: true };
+    } catch (err) {
+      throw new Error(`Cannot fetch MCP config from URL ${pathOrUrl}: ${err instanceof Error ? err.message : String(err)}`);
+    }
   }
 
   const resolved = resolve(pathOrUrl);

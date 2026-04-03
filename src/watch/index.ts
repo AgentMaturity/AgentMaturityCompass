@@ -16,7 +16,8 @@ export { exportEvent, exportBatch, exportToSiem } from "./siemExporter.js";
 export type { AuditEvent, SiemExportResult, SiemBatchResult } from "./siemExporter.js";
 export { verifyTenantBoundary } from "./multiTenantVerifier.js";
 export { createPolicyPackCompat as createPolicyPack } from "./policyPacks.js";
-export type { SiemEvent } from "./stubs.js";
+// Legacy type (was in watch/stubs.ts, inlined here)
+export type SiemEvent = { eventId: string; category: string; severity: string; timestamp: Date; };
 
 // ── Observability Bridge (connect external platforms to AMC scoring) ──
 export {
