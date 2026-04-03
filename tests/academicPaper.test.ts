@@ -4,6 +4,8 @@
 import { describe, expect, test } from "vitest";
 import {
   buildAcademicPaper,
+  computePaperStatistics,
+  renderAcademicPaperLatex,
   renderAcademicPaperMarkdown,
 } from "../src/benchmarks/academicPaper.js";
 import { createEvalConfig, buildEvalReport, type EvalTrial } from "../src/benchmarks/evalHarness.js";
@@ -40,6 +42,33 @@ describe("buildAcademicPaper", () => {
   });
 });
 
+describe("computePaperStatistics", () => {
+  test("computes effect size, confidence interval, and significance proxy", () => {
+    const config = createEvalConfig({
+      name: "Steer Impact Study",
+      description: "Test whether steering improves scores",
+      hypotheses: ["H1: Steering improves composite score"],
+      independentVars: [{ name: "steerEnabled", values: [true, false] }],
+      dependentVars: ["compositeScore"],
+      trialsPerCondition: 3,
+    });
+
+    const report = buildEvalReport(config, [
+      { trialId: "t1", conditionId: "cond-0", variables: { steerEnabled: true }, metrics: { compositeScore: 90 }, startedAt: "", completedAt: "", durationMs: 100 },
+      { trialId: "t2", conditionId: "cond-0", variables: { steerEnabled: true }, metrics: { compositeScore: 92 }, startedAt: "", completedAt: "", durationMs: 100 },
+      { trialId: "t3", conditionId: "cond-0", variables: { steerEnabled: true }, metrics: { compositeScore: 94 }, startedAt: "", completedAt: "", durationMs: 100 },
+      { trialId: "t4", conditionId: "cond-1", variables: { steerEnabled: false }, metrics: { compositeScore: 70 }, startedAt: "", completedAt: "", durationMs: 100 },
+      { trialId: "t5", conditionId: "cond-1", variables: { steerEnabled: false }, metrics: { compositeScore: 72 }, startedAt: "", completedAt: "", durationMs: 100 },
+      { trialId: "t6", conditionId: "cond-1", variables: { steerEnabled: false }, metrics: { compositeScore: 74 }, startedAt: "", completedAt: "", durationMs: 100 },
+    ]);
+
+    const stats = computePaperStatistics(report, "compositeScore");
+    expect(stats.effectSize).toBeGreaterThan(1);
+    expect(stats.confidenceInterval95.lower).toBeLessThan(stats.confidenceInterval95.upper);
+    expect(stats.isSignificant).toBe(true);
+  });
+});
+
 describe("renderAcademicPaperMarkdown", () => {
   test("renders paper-like markdown with canonical sections", () => {
     const config = createEvalConfig({
@@ -56,17 +85,20 @@ describe("renderAcademicPaperMarkdown", () => {
       { trialId: "t2", conditionId: "cond-1", variables: { steerEnabled: false }, metrics: { compositeScore: 70 }, startedAt: "", completedAt: "", durationMs: 100 },
     ]);
 
-    const markdown = renderAcademicPaperMarkdown(
-      buildAcademicPaper(report, {
-        title: "Thermostat vs Thermometer: Real-Time Steering in AMC",
-        authors: ["Sid Patel", "AMC Research"],
-      }),
-    );
+    const paper = buildAcademicPaper(report, {
+      title: "Thermostat vs Thermometer: Real-Time Steering in AMC",
+      authors: ["Sid Patel", "AMC Research"],
+    });
 
+    const markdown = renderAcademicPaperMarkdown(paper);
     expect(markdown).toContain("# Thermostat vs Thermometer");
     expect(markdown).toContain("## Abstract");
     expect(markdown).toContain("## Methods");
     expect(markdown).toContain("## Results");
     expect(markdown).toContain("## Limitations");
+
+    const latex = renderAcademicPaperLatex(paper);
+    expect(latex).toContain("\\section{Abstract}");
+    expect(latex).toContain("\\title{Thermostat vs Thermometer: Real-Time Steering in AMC}");
   });
 });
