@@ -95,6 +95,18 @@ export interface SignificanceTest {
   practicallySignificant: boolean;
 }
 
+export interface EvalExecutionResult {
+  metrics: Record<string, number>;
+}
+
+export type EvalRunner = (args: {
+  conditionId: string;
+  variables: Record<string, string | number | boolean>;
+  trialIndex: number;
+  seed: number;
+  config: EvalConfig;
+}) => Promise<EvalExecutionResult>;
+
 // ── Config builder ─────────────────────────────────────────────────────────
 
 export function createEvalConfig(params: {
@@ -303,5 +315,68 @@ export function toLatexTable(
     "\\hline",
     "\\end{tabular}",
     "\\end{table}",
+  ].join("\n");
+}
+
+export async function executeEvalHarness(
+  config: EvalConfig,
+  runner: EvalRunner,
+): Promise<EvalReport> {
+  const conditions = generateConditions(config);
+  const trials: EvalTrial[] = [];
+
+  for (const condition of conditions) {
+    for (let trialIndex = 0; trialIndex < config.trialsPerCondition; trialIndex += 1) {
+      const startedAtIso = new Date().toISOString();
+      const startedAtMs = Date.now();
+      try {
+        const result = await runner({
+          conditionId: condition.conditionId,
+          variables: condition.variables,
+          trialIndex,
+          seed: config.seed + trialIndex,
+          config,
+        });
+        trials.push({
+          trialId: `${condition.conditionId}-trial-${trialIndex}`,
+          conditionId: condition.conditionId,
+          variables: condition.variables,
+          metrics: result.metrics,
+          startedAt: startedAtIso,
+          completedAt: new Date().toISOString(),
+          durationMs: Date.now() - startedAtMs,
+        });
+      } catch (error) {
+        trials.push({
+          trialId: `${condition.conditionId}-trial-${trialIndex}`,
+          conditionId: condition.conditionId,
+          variables: condition.variables,
+          metrics: {},
+          startedAt: startedAtIso,
+          completedAt: new Date().toISOString(),
+          durationMs: Date.now() - startedAtMs,
+          error: error instanceof Error ? error.message : String(error),
+        });
+      }
+    }
+  }
+
+  return buildEvalReport(config, trials);
+}
+
+export function renderEvalSummaryMarkdown(report: EvalReport): string {
+  return [
+    "# Eval Harness Summary",
+    "",
+    `- experimentId: ${report.experimentId}`,
+    `- name: ${report.name}`,
+    `- completedTrials: ${report.summary.completedTrials}`,
+    `- failedTrials: ${report.summary.failedTrials}`,
+    `- totalTrials: ${report.summary.totalTrials}`,
+    "",
+    "## Conditions",
+    ...report.summary.conditions.map((condition) =>
+      `- ${condition.conditionId}: ${JSON.stringify({ variables: condition.variables, metrics: condition.metrics })}`,
+    ),
   ].join("\n");
 }

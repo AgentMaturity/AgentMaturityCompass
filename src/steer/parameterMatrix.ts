@@ -51,6 +51,16 @@ export interface MatrixOptions {
   model?: string;
 }
 
+export interface MatrixRunnerResult {
+  responseText: string;
+  microScore?: number;
+  latencyMs: number;
+}
+
+export interface ExecuteParameterMatrixOptions extends MatrixOptions {
+  runner: (params: Record<string, number>, body: Record<string, unknown>) => Promise<MatrixRunnerResult>;
+}
+
 // ── Cartesian product ──────────────────────────────────────────────────────
 
 export function generateCombinations(
@@ -174,4 +184,73 @@ export function buildMatrixReport(
     parameterSensitivity: analyzeParameterSensitivity(completed, ranges),
     generatedAt: Date.now(),
   };
+}
+
+export async function executeParameterMatrix(
+  options: ExecuteParameterMatrixOptions,
+): Promise<MatrixReport> {
+  const combinations = generateCombinations(options.ranges, options.maxCombinations);
+  const results: MatrixRunResult[] = [];
+
+  for (const combination of combinations) {
+    const body = buildMatrixRequestBody(combination, options.prompt, options.model);
+    try {
+      const startedAt = Date.now();
+      const run = await options.runner(combination.params, body);
+      results.push({
+        combinationId: combination.id,
+        params: combination.params,
+        responseText: run.responseText,
+        microScore: run.microScore ?? 0,
+        latencyMs: run.latencyMs ?? Date.now() - startedAt,
+      });
+    } catch (error) {
+      results.push({
+        combinationId: combination.id,
+        params: combination.params,
+        responseText: "",
+        microScore: 0,
+        latencyMs: 0,
+        error: error instanceof Error ? error.message : String(error),
+      });
+    }
+  }
+
+  return buildMatrixReport(results, options.ranges);
+}
+
+function formatParams(params: Record<string, number>): string {
+  return Object.entries(params)
+    .map(([key, value]) => `${key}=${value}`)
+    .join(", ");
+}
+
+export function renderMatrixReportMarkdown(report: MatrixReport): string {
+  const lines: string[] = [
+    "# Parameter Matrix Report",
+    "",
+    `- Total combinations: ${report.totalCombinations}`,
+    `- Completed: ${report.completed}`,
+    `- Failed: ${report.failed}`,
+    `- Average score: ${report.averageScore}`,
+    "",
+    "## Best Combination",
+  ];
+
+  if (report.bestCombination) {
+    lines.push(
+      `- Params: ${formatParams(report.bestCombination.params)}`,
+      `- Score: ${report.bestCombination.microScore}`,
+      `- Latency: ${report.bestCombination.latencyMs}ms`,
+    );
+  } else {
+    lines.push("- None");
+  }
+
+  lines.push("", "## Parameter Sensitivity");
+  for (const [key, value] of Object.entries(report.parameterSensitivity)) {
+    lines.push(`- ${key}: ${value}`);
+  }
+
+  return lines.join("\n");
 }

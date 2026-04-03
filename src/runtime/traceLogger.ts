@@ -1,5 +1,6 @@
 import { canonicalize } from "../utils/json.js";
 import type { AMCTraceV1 } from "../correlation/traceSchema.js";
+import { sanitizeTelemetryEvent, type PrivacyTier } from "../steer/privacyTiers.js";
 
 const SECRET_REDACTIONS: RegExp[] = [
   /sk-[A-Za-z0-9]{10,}/g,
@@ -37,6 +38,50 @@ export type TraceInput = Omit<AMCTraceV1, "amc_trace_v" | "ts"> & {
   ts?: number;
 };
 
+function getTracePrivacyTier(): PrivacyTier {
+  const tier = process.env.AMC_PRIVACY_TIER;
+  if (tier === "full" || tier === "redacted" || tier === "zero") {
+    return tier;
+  }
+  return "full";
+}
+
+function applyTracePrivacy(payload: AMCTraceV1): AMCTraceV1 {
+  const tier = getTracePrivacyTier();
+  if (tier === "full") {
+    return payload;
+  }
+
+  const sanitized = sanitizeTelemetryEvent(
+    {
+      eventId: payload.request_id ?? `${payload.agentId}:${payload.ts}:${payload.event}`,
+      agentId: payload.agentId,
+      timestamp: payload.ts,
+      eventType: payload.event,
+      prompt: payload.note,
+      model: payload.model,
+      providerId: payload.providerId,
+      metadata: {
+        request_id: payload.request_id,
+        receipt: payload.receipt,
+      },
+    },
+    {
+      tier,
+      hashSalt: process.env.AMC_PRIVACY_HASH_SALT,
+    },
+  );
+
+  return {
+    ...payload,
+    note: sanitized.prompt,
+    hashes: {
+      ...(payload.hashes ?? {}),
+      ...(sanitized.promptHash ? { noteHash: sanitized.promptHash } : {}),
+    },
+  };
+}
+
 export function buildTrace(input: TraceInput): AMCTraceV1 {
   if (!input.agentId || input.agentId.trim().length === 0) {
     throw new Error("Trace input must include non-empty agentId.");
@@ -53,7 +98,7 @@ export function buildTrace(input: TraceInput): AMCTraceV1 {
     note: input.note,
     hashes: input.hashes
   };
-  return redactValue(payload) as AMCTraceV1;
+  return redactValue(applyTracePrivacy(payload)) as AMCTraceV1;
 }
 
 export function stableTraceString(trace: AMCTraceV1): string {
