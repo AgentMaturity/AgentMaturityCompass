@@ -49,6 +49,66 @@ const PREAMBLE_PATTERNS: RegExp[] = [
   /^No problem[!.,]?\s*/i,
 ];
 
+// ── Casual mode substitutions ─────────────────────────────────────────────
+// Replaces formal language with informal equivalents.
+
+const CASUAL_SUBSTITUTIONS: Array<[RegExp, string]> = [
+  // Conjunctions / transition words
+  [/\bHowever,?\s*/gi, "But "],
+  [/\bTherefore,?\s*/gi, "So "],
+  [/\bFurthermore,?\s*/gi, "Also "],
+  [/\bNevertheless,?\s*/gi, "Still "],
+  [/\bMoreover,?\s*/gi, "Plus "],
+  [/\bConsequently,?\s*/gi, "So "],
+  [/\bNonetheless,?\s*/gi, "Still "],
+  [/\bAdditionally,?\s*/gi, "Also "],
+  [/\bSubsequently,?\s*/gi, "Then "],
+  [/\bConversely,?\s*/gi, "On the flip side "],
+
+  // Formal verbs → informal
+  [/\butilize\b/gi, "use"],
+  [/\bfacilitate\b/gi, "help with"],
+  [/\bendeavor\b/gi, "try"],
+  [/\bascertain\b/gi, "figure out"],
+  [/\bcommence\b/gi, "start"],
+  [/\bterminate\b/gi, "end"],
+  [/\bimplement\b/gi, "set up"],
+  [/\bdemonstrate\b/gi, "show"],
+  [/\binquire\b/gi, "ask"],
+  [/\bacquire\b/gi, "get"],
+  [/\bpurchase\b/gi, "buy"],
+  [/\bmodify\b/gi, "change"],
+  [/\brequire\b/gi, "need"],
+  [/\bpossess\b/gi, "have"],
+  [/\bprovide\b/gi, "give"],
+
+  // Formal adjectives/adverbs
+  [/\bsignificant\b/gi, "big"],
+  [/\bexceedingly\b/gi, "really"],
+  [/\bsufficient\b/gi, "enough"],
+  [/\bapproximately\b/gi, "about"],
+  [/\bnumerous\b/gi, "many"],
+  [/\bsubstantial\b/gi, "big"],
+  [/\bfrequently\b/gi, "often"],
+  [/\bpreviously\b/gi, "before"],
+  [/\bcurrently\b/gi, "now"],
+  [/\bimmediately\b/gi, "right away"],
+
+  // Formal phrases → casual
+  [/\bIn order to\b/gi, "To"],
+  [/\bWith regard to\b/gi, "About"],
+  [/\bIn the event that\b/gi, "If"],
+  [/\bAt this point in time,?\s*/gi, "Right now "],
+  [/\bDue to the fact that\b/gi, "Because"],
+  [/\bIn accordance with\b/gi, "Following"],
+  [/\bFor the purpose of\b/gi, "To"],
+  [/\bIn the absence of\b/gi, "Without"],
+  [/\bPrior to\b/gi, "Before"],
+  [/\bSubsequent to\b/gi, "After"],
+  [/\bIn lieu of\b/gi, "Instead of"],
+  [/\bWith respect to\b/gi, "About"],
+];
+
 // ── Core transforms ────────────────────────────────────────────────────────
 
 /**
@@ -88,11 +148,28 @@ export function directMode(text: string): string {
   return stripHedges(stripPreamble(text));
 }
 
+/**
+ * Casual mode: replace formal language with informal equivalents.
+ * Applies substitutions, cleans double spaces, and capitalizes sentence starts.
+ */
+export function casualMode(text: string): string {
+  let result = text;
+  for (const [pattern, replacement] of CASUAL_SUBSTITUTIONS) {
+    result = result.replace(pattern, replacement);
+  }
+  // Clean up double spaces left behind
+  result = result.replace(/ {2,}/g, " ").trim();
+  // Capitalize first letter of each sentence that may have lost its capital
+  result = result.replace(/(?:^|[.!?]\s+)([a-z])/g, (match) => match.toUpperCase());
+  return result;
+}
+
 // ── Steer stage integration ────────────────────────────────────────────────
 
 export interface HygieneOptions {
   hedges?: boolean;
   preamble?: boolean;
+  casual?: boolean;
 }
 
 function transformText(text: string, options: HygieneOptions): string {
@@ -102,6 +179,9 @@ function transformText(text: string, options: HygieneOptions): string {
   }
   if (options.hedges) {
     result = stripHedges(result);
+  }
+  if (options.casual) {
+    result = casualMode(result);
   }
   return result;
 }
@@ -155,7 +235,7 @@ export function createHygieneStage(options: HygieneOptions): SteerStage {
     onResponse: async (
       context: SteerResponseContext,
     ): Promise<SteerResponseContext> => {
-      if (!options.hedges && !options.preamble) {
+      if (!options.hedges && !options.preamble && !options.casual) {
         return context;
       }
       const transformed = await transformResponseBody(

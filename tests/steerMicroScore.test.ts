@@ -10,7 +10,7 @@ describe("microScore", () => {
       "The API returns JSON responses. Use POST for creation. Use GET for retrieval. Errors return 4xx status codes.";
     const result = microScore(text);
     expect(result.composite).toBeGreaterThan(0.7);
-    expect(result.dimensions.length).toBe(4);
+    expect(result.dimensions.length).toBe(5);
     expect(result.responseLength).toBe(text.length);
   });
 

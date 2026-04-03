@@ -37,6 +37,7 @@ export type {
 } from "./feedbackLoop.js";
 
 export {
+  casualMode,
   createHygieneStage,
   directMode,
   stripHedges,
