@@ -37,6 +37,9 @@ function round(value: number): number {
 }
 
 function mean(values: number[]): number {
+  if (values.length === 0) {
+    return 0;
+  }
   return values.reduce((sum, value) => sum + value, 0) / values.length;
 }
 
@@ -176,13 +179,14 @@ export function renderAcademicPaperMarkdown(paper: AcademicPaper): string {
 
 function escapeLatex(text: string): string {
   return text
-    .replace(/\\/g, "\\textbackslash{}")
+    .replace(/\\/g, "<<BACKSLASH>>")
     .replace(/&/g, "\\&")
     .replace(/%/g, "\\%")
     .replace(/_/g, "\\_")
     .replace(/#/g, "\\#")
     .replace(/\{/g, "\\{")
-    .replace(/\}/g, "\\}");
+    .replace(/\}/g, "\\}")
+    .replace(/<<BACKSLASH>>/g, "\\textbackslash{}");
 }
 
 export function renderAcademicPaperLatex(paper: AcademicPaper): string {
@@ -204,7 +208,9 @@ export function renderAcademicPaperLatex(paper: AcademicPaper): string {
     "\\section{Discussion}",
     escapeLatex(paper.discussion),
     "\\section{Limitations}",
+    "\\begin{itemize}",
     ...paper.limitations.map((item) => `\\item ${escapeLatex(item)}`),
+    "\\end{itemize}",
     "\\end{document}",
   ].join("\n");
 }

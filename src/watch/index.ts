@@ -12,9 +12,10 @@ export type { Finding, HardeningResult } from "./hostHardening.js";
 export { MultiTenantVerifier } from "./multiTenantVerifier.js";
 export { PolicyPackRegistry, createPolicyPackCompat, validatePolicyPack } from "./policyPacks.js";
 export type { PolicyPack, ApplyResult } from "./policyPacks.js";
-export { exportEvent, exportBatch } from "./siemExporter.js";
+export { exportEvent, exportBatch, exportToSiem } from "./siemExporter.js";
 export type { AuditEvent, SiemExportResult, SiemBatchResult } from "./siemExporter.js";
-export { exportToSiem, verifyTenantBoundary, createPolicyPack } from "./stubs.js";
+export { verifyTenantBoundary } from "./multiTenantVerifier.js";
+export { createPolicyPackCompat as createPolicyPack } from "./policyPacks.js";
 export type { SiemEvent } from "./stubs.js";
 
 // ── Observability Bridge (connect external platforms to AMC scoring) ──

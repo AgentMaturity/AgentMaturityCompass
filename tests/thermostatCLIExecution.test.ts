@@ -70,6 +70,14 @@ describe("executeSteerCommand", () => {
     expect(result.output).toContain('"composite"');
   });
 
+  test("steer micro-score can read from --file", async () => {
+    const runtime = createSteerRuntime();
+    const result = await executeSteerCommand(runtime, "steer micro-score --file package.json --json=true");
+
+    expect(result.ok).toBe(true);
+    expect(result.output).toContain('"composite"');
+  });
+
   test("steer race executes runtime racer", async () => {
     const runtime = createSteerRuntime({
       race: vi.fn(async () => ({
@@ -108,6 +116,18 @@ describe("executeSteerCommand", () => {
 
     expect(result.ok).toBe(true);
     expect(runtime.getPrivacyConfig()).toEqual({ tier: "redacted", salt: "my-org-salt" });
+  });
+
+  test("requires --agent for enable/disable/status commands", async () => {
+    const runtime = createSteerRuntime();
+    const enable = await executeSteerCommand(runtime, "steer enable");
+    const disable = await executeSteerCommand(runtime, "steer disable");
+    const status = await executeSteerCommand(runtime, "steer status");
+
+    expect(enable.ok).toBe(false);
+    expect(disable.ok).toBe(false);
+    expect(status.ok).toBe(false);
+    expect(enable.output).toContain("--agent");
   });
 
   test("returns error for unknown command", async () => {

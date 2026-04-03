@@ -67,6 +67,27 @@ describe("computePaperStatistics", () => {
     expect(stats.confidenceInterval95.lower).toBeLessThan(stats.confidenceInterval95.upper);
     expect(stats.isSignificant).toBe(true);
   });
+
+  test("fails closed to zeros when metric groups are missing instead of returning NaN", () => {
+    const config = createEvalConfig({
+      name: "Sparse Study",
+      description: "Metric absent",
+      hypotheses: [],
+      independentVars: [{ name: "steerEnabled", values: [true, false] }],
+      dependentVars: ["missingMetric"],
+      trialsPerCondition: 1,
+    });
+
+    const report = buildEvalReport(config, [
+      { trialId: "t1", conditionId: "cond-0", variables: { steerEnabled: true }, metrics: { otherMetric: 1 }, startedAt: "", completedAt: "", durationMs: 100 },
+      { trialId: "t2", conditionId: "cond-1", variables: { steerEnabled: false }, metrics: { otherMetric: 2 }, startedAt: "", completedAt: "", durationMs: 100 },
+    ] as unknown as EvalTrial[]);
+
+    const stats = computePaperStatistics(report, "missingMetric");
+    expect(Number.isNaN(stats.meanDifference)).toBe(false);
+    expect(stats.meanDifference).toBe(0);
+    expect(stats.effectSize).toBe(0);
+  });
 });
 
 describe("renderAcademicPaperMarkdown", () => {
@@ -100,5 +121,23 @@ describe("renderAcademicPaperMarkdown", () => {
     const latex = renderAcademicPaperLatex(paper);
     expect(latex).toContain("\\section{Abstract}");
     expect(latex).toContain("\\title{Thermostat vs Thermometer: Real-Time Steering in AMC}");
+    expect(latex).toContain("\\begin{itemize}");
+    expect(latex).toContain("\\end{itemize}");
+  });
+
+  test("escapes backslashes without corrupting generated latex commands", () => {
+    const latex = renderAcademicPaperLatex({
+      title: "Path \\ check",
+      authors: ["A"],
+      abstract: "Contains \\ slash",
+      introduction: "",
+      methods: "",
+      results: "",
+      discussion: "",
+      limitations: ["One \\ item"],
+    });
+
+    expect(latex).toContain("\\textbackslash{}");
+    expect(latex).not.toContain("\\textbackslash\\{\\}");
   });
 });

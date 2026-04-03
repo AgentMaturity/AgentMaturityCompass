@@ -43,6 +43,7 @@ import {
   verifyFleetConfigSignature
 } from "./fleet/registry.js";
 import { getAgentPaths, resolveAgentId } from "./fleet/paths.js";
+import { latestRunForAgent } from "./governor/actionPolicyEngine.js";
 import { getProviderTemplateById, listProviderTemplates, providerTemplateChoices } from "./providers/providerTemplates.js";
 import { runSandboxCommand } from "./sandbox/sandbox.js";
 import { attestIngestSession, ingestEvidence, type IngestType } from "./ingest/ingest.js";
@@ -15219,11 +15220,15 @@ program
       console.log(chalk.red(`Invalid role: ${opts.role}. Must be operator, executive, or auditor.`));
       return;
     }
-    // Build mock report for CLI demo when no real run is available
+    const workspace = process.cwd();
     const agentId = activeAgent(program) ?? "default";
-    const mockReport = buildMockReportForUx(agentId, opts.run ?? "latest");
-    const mockPrevious = opts.previousRun ? buildMockReportForUx(agentId, opts.previousRun) : null;
-    const dashboard = opux.generateOperatorDashboard(mockReport, opts.role as typeof validRoles[number], mockPrevious);
+    const currentReport = opts.run && opts.run !== "latest"
+      ? loadRunReport(workspace, opts.run, agentId)
+      : (latestRunForAgent(workspace, agentId) ?? buildMockReportForUx(agentId, opts.run ?? "latest"));
+    const previousReport = opts.previousRun
+      ? loadRunReport(workspace, opts.previousRun, agentId)
+      : null;
+    const dashboard = opux.generateOperatorDashboard(currentReport, opts.role as typeof validRoles[number], previousReport);
     console.log(opux.renderOperatorDashboardMarkdown(dashboard));
   });
 
@@ -15233,8 +15238,9 @@ program
   .option("--question <id>", "filter to specific question ID")
   .action((opts: { question?: string }) => {
     const opux = require("./ops/operatorUx.js") as typeof import("./ops/operatorUx.js");
+    const workspace = process.cwd();
     const agentId = activeAgent(program) ?? "default";
-    const report = buildMockReportForUx(agentId, "latest");
+    const report = latestRunForAgent(workspace, agentId) ?? buildMockReportForUx(agentId, "latest");
     const whyCaps = opux.computeWhyCaps(report);
     const filtered = opts.question ? whyCaps.filter(w => w.questionId === opts.question) : whyCaps;
     const capped = filtered.filter(w => w.capReasons.length > 0);
@@ -15257,8 +15263,9 @@ program
   .option("--limit <n>", "max actions to show", "15")
   .action((opts: { limit: string }) => {
     const opux = require("./ops/operatorUx.js") as typeof import("./ops/operatorUx.js");
+    const workspace = process.cwd();
     const agentId = activeAgent(program) ?? "default";
-    const report = buildMockReportForUx(agentId, "latest");
+    const report = latestRunForAgent(workspace, agentId) ?? buildMockReportForUx(agentId, "latest");
     const whyCaps = opux.computeWhyCaps(report);
     const queue = opux.computeActionQueue(whyCaps);
     if (queue.items.length === 0) {
@@ -15279,8 +15286,9 @@ program
   .description("Display confidence heatmap by question and layer")
   .action(() => {
     const opux = require("./ops/operatorUx.js") as typeof import("./ops/operatorUx.js");
+    const workspace = process.cwd();
     const agentId = activeAgent(program) ?? "default";
-    const report = buildMockReportForUx(agentId, "latest");
+    const report = latestRunForAgent(workspace, agentId) ?? buildMockReportForUx(agentId, "latest");
     const heatmap = opux.computeConfidenceHeatmap(report);
     console.log(chalk.bold(`\nConfidence Heatmap — Avg: ${(heatmap.avgConfidence * 100).toFixed(1)}%  Low: ${heatmap.lowConfidenceCount} questions\n`));
     for (const cell of heatmap.cells) {

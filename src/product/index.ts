@@ -213,6 +213,6 @@ export type {
   ResolutionRecord, OptimizeRequest,
 } from './clarificationOptimizer.js';
 
-// ── Remaining stubs (createBatchJob only — still a simple stub) ──
-export { createBatchJob } from './stubs.js';
-export type { BatchJob } from './stubs.js';
+// Batch job helpers
+export { createBatchJob } from './jobs.js';
+export type { BatchJob } from './jobs.js';

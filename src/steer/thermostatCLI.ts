@@ -342,8 +342,16 @@ export async function executeSteerCommand(
   const parsed = parseSteerCommandArgs(input);
   const { command, flags } = parsed;
 
+  const requireAgent = (): string | null => {
+    const agent = String(flags.agent ?? "").trim();
+    return agent.length > 0 ? agent : null;
+  };
+
   if (command === "steer enable") {
-    const agent = String(flags.agent ?? "");
+    const agent = requireAgent();
+    if (!agent) {
+      return { ok: false, output: "--agent is required for steer enable" };
+    }
     runtime.setAgentConfig(agent, {
       enabled: true,
       autotune: Boolean(flags.autotune ?? true),
@@ -355,7 +363,10 @@ export async function executeSteerCommand(
   }
 
   if (command === "steer disable") {
-    const agent = String(flags.agent ?? "");
+    const agent = requireAgent();
+    if (!agent) {
+      return { ok: false, output: "--agent is required for steer disable" };
+    }
     const prev = runtime.getAgentConfig(agent) ?? {
       enabled: false,
       autotune: true,
@@ -368,7 +379,10 @@ export async function executeSteerCommand(
   }
 
   if (command === "steer status") {
-    const agent = String(flags.agent ?? "");
+    const agent = requireAgent();
+    if (!agent) {
+      return { ok: false, output: "--agent is required for steer status" };
+    }
     const config = runtime.getAgentConfig(agent);
     const payload = {
       agent,
@@ -382,7 +396,11 @@ export async function executeSteerCommand(
 
   if (command === "steer micro-score") {
     const { microScore } = await import("./microScore.js");
-    const text = String(flags.text ?? "");
+    let text = String(flags.text ?? "");
+    if (!text && typeof flags.file === "string" && flags.file.trim().length > 0) {
+      const { readFileSync } = await import("node:fs");
+      text = readFileSync(flags.file, "utf8");
+    }
     const score = microScore(text);
     return {
       ok: true,
