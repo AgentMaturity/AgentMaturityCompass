@@ -77,6 +77,27 @@ export interface ConsortiumPool {
   contributions: ConsortiumContribution[];
 }
 
+export interface ConsortiumOutlier {
+  memberId: string;
+  orgPseudonym: string;
+  meanCompositeScore: number;
+  zScore: number;
+}
+
+export interface ConsortiumSynthesis {
+  memberCount: number;
+  contributionCount: number;
+  agentCount: number;
+  consensusTrustLabel: string | null;
+  topStrengths: Array<{
+    layer: string;
+    meanScore: number;
+  }>;
+  outliers: ConsortiumOutlier[];
+  narrative: string[];
+  generatedAt: string;
+}
+
 // ── Pool management ────────────────────────────────────────────────────────
 
 export function createConsortiumPool(): ConsortiumPool {
@@ -223,4 +244,121 @@ export function computeAggregateStats(
     trustLabelDistribution: trustDist,
     generatedAt: new Date().toISOString(),
   };
+}
+
+function mean(values: number[]): number {
+  if (values.length === 0) return 0;
+  return values.reduce((a, b) => a + b, 0) / values.length;
+}
+
+export function synthesizeConsortiumInsights(
+  pool: ConsortiumPool,
+): ConsortiumSynthesis {
+  const allEntries = pool.contributions.flatMap((c) => c.entries);
+  if (pool.members.length === 0 || allEntries.length === 0) {
+    return {
+      memberCount: pool.members.length,
+      contributionCount: pool.contributions.length,
+      agentCount: allEntries.length,
+      consensusTrustLabel: null,
+      topStrengths: [],
+      outliers: [],
+      narrative: [],
+      generatedAt: new Date().toISOString(),
+    };
+  }
+
+  const trustCounts: Record<string, number> = {};
+  for (const entry of allEntries) {
+    trustCounts[entry.trustLabel] = (trustCounts[entry.trustLabel] ?? 0) + 1;
+  }
+  const consensusTrustLabel = Object.entries(trustCounts)
+    .sort((a, b) => b[1] - a[1])[0]?.[0] ?? null;
+
+  const layerScores = new Map<string, number[]>();
+  for (const entry of allEntries) {
+    for (const [layer, score] of Object.entries(entry.layerScores)) {
+      const current = layerScores.get(layer) ?? [];
+      current.push(score);
+      layerScores.set(layer, current);
+    }
+  }
+  const topStrengths = [...layerScores.entries()]
+    .map(([layer, scores]) => ({
+      layer,
+      meanScore: Math.round(mean(scores) * 1000) / 1000,
+    }))
+    .sort((a, b) => b.meanScore - a.meanScore)
+    .slice(0, 3);
+
+  const memberMeans = pool.members.map((member) => {
+    const memberEntries = pool.contributions
+      .filter((c) => c.memberId === member.memberId)
+      .flatMap((c) => c.entries);
+    return {
+      memberId: member.memberId,
+      orgPseudonym: member.orgPseudonym,
+      meanCompositeScore: Math.round(mean(memberEntries.map((e) => e.compositeScore)) * 1000) / 1000,
+    };
+  });
+  const overallMean = mean(memberMeans.map((m) => m.meanCompositeScore));
+  const overallStdDev = stdDev(memberMeans.map((m) => m.meanCompositeScore), overallMean);
+  const outliers = overallStdDev === 0
+    ? []
+    : memberMeans
+        .map((member) => ({
+          ...member,
+          zScore: Math.round(((member.meanCompositeScore - overallMean) / overallStdDev) * 1000) / 1000,
+        }))
+        .filter((member) => Math.abs(member.zScore) >= 1)
+        .sort((a, b) => Math.abs(b.zScore) - Math.abs(a.zScore));
+
+  const narrative = [
+    `Consensus trust label across consortium members is ${consensusTrustLabel}.`,
+    topStrengths.length > 0
+      ? `Strongest shared layer is ${topStrengths[0]!.layer} (${topStrengths[0]!.meanScore}).`
+      : "No shared strengths identified.",
+    outliers.length > 0
+      ? `${outliers.length} outlier member(s) deviate materially from consortium mean.`
+      : "No major outliers detected.",
+  ];
+
+  return {
+    memberCount: pool.members.length,
+    contributionCount: pool.contributions.length,
+    agentCount: allEntries.length,
+    consensusTrustLabel,
+    topStrengths,
+    outliers,
+    narrative,
+    generatedAt: new Date().toISOString(),
+  };
+}
+
+export function renderConsortiumSynthesisMarkdown(
+  synthesis: ConsortiumSynthesis,
+): string {
+  const lines: string[] = [
+    "# Consortium Synthesis",
+    "",
+    `- Members: ${synthesis.memberCount}`,
+    `- Contributions: ${synthesis.contributionCount}`,
+    `- Agents: ${synthesis.agentCount}`,
+    `- Consensus Trust Label: ${synthesis.consensusTrustLabel ?? "None"}`,
+    "",
+    "## Top Strengths",
+    ...(synthesis.topStrengths.length > 0
+      ? synthesis.topStrengths.map((strength) => `- ${strength.layer}: ${strength.meanScore}`)
+      : ["- None"]),
+    "",
+    "## Outliers",
+    ...(synthesis.outliers.length > 0
+      ? synthesis.outliers.map((outlier) => `- ${outlier.orgPseudonym}: mean=${outlier.meanCompositeScore}, z=${outlier.zScore}`)
+      : ["- None"]),
+    "",
+    "## Narrative",
+    ...(synthesis.narrative.length > 0 ? synthesis.narrative.map((line) => `- ${line}`) : ["- None"]),
+  ];
+
+  return lines.join("\n");
 }
