@@ -41,6 +41,16 @@ export interface FeedbackAdjustedAutotuneProfile extends AutotuneProfile {
   };
 }
 
+export interface FeedbackCollectionContext {
+  response: Response;
+  metadata: Record<string, unknown>;
+}
+
+export interface FeedbackCollectionStageOptions {
+  getState: () => FeedbackLoopState;
+  setState: (state: FeedbackLoopState) => void;
+}
+
 function blankMetricBucket(): FeedbackMetricBucket {
   return {
     temperatureEma: 0,
@@ -170,6 +180,119 @@ export function getFeedbackAdjustedProfile(
       ...baseProfile.metadata,
       feedbackApplied: true,
       feedbackWeight: Number(weight.toFixed(4)),
+    },
+  };
+}
+
+function parseJsonBody(text: string): Record<string, unknown> | null {
+  try {
+    return JSON.parse(text) as Record<string, unknown>;
+  } catch {
+    return null;
+  }
+}
+
+function readAutotuneMetadata(metadata: Record<string, unknown>): {
+  contextType: SteerContextType;
+  profile: { temperature: number; topP: number };
+} | null {
+  const autotune = metadata.autotune as Record<string, unknown> | undefined;
+  if (!autotune) {
+    return null;
+  }
+
+  const contextType = autotune.contextType;
+  const profile = autotune.profile as Record<string, unknown> | undefined;
+  if (
+    typeof contextType !== "string" ||
+    !profile ||
+    typeof profile.temperature !== "number" ||
+    typeof profile.topP !== "number"
+  ) {
+    return null;
+  }
+
+  return {
+    contextType: contextType as SteerContextType,
+    profile: {
+      temperature: profile.temperature,
+      topP: profile.topP,
+    },
+  };
+}
+
+export async function extractFeedbackObservation(
+  context: FeedbackCollectionContext,
+): Promise<FeedbackObservation | null> {
+  const autotune = readAutotuneMetadata(context.metadata);
+  if (!autotune) {
+    return null;
+  }
+
+  const headerRating = context.response.headers.get("x-amc-feedback-rating");
+  if (headerRating === "1" || headerRating === "-1") {
+    return {
+      contextType: autotune.contextType,
+      rating: Number(headerRating) as 1 | -1,
+      profile: autotune.profile,
+      ts: Date.now(),
+    };
+  }
+
+  const contentType = context.response.headers.get("content-type") ?? "";
+  if (!contentType.toLowerCase().includes("application/json")) {
+    return null;
+  }
+
+  const cloned = context.response.clone();
+  const bodyText = await cloned.text();
+  const body = parseJsonBody(bodyText);
+  const feedback = body?.amc_feedback as Record<string, unknown> | undefined;
+  const rating = feedback?.rating;
+  if (rating === 1 || rating === -1) {
+    return {
+      contextType: autotune.contextType,
+      rating,
+      profile: autotune.profile,
+      ts: Date.now(),
+    };
+  }
+
+  return null;
+}
+
+export function createFeedbackCollectionStage(
+  options: FeedbackCollectionStageOptions,
+) {
+  return {
+    id: "feedback-collection",
+    enabled: true,
+    onResponse: async (context: {
+      agentId: string;
+      providerId: string;
+      url: string;
+      init: RequestInit;
+      response: Response;
+      metadata: Record<string, unknown>;
+    }) => {
+      const observation = await extractFeedbackObservation({
+        response: context.response,
+        metadata: context.metadata,
+      });
+
+      if (!observation) {
+        return context;
+      }
+
+      const nextState = applyFeedbackObservation(options.getState(), observation);
+      options.setState(nextState);
+      return {
+        ...context,
+        metadata: {
+          ...context.metadata,
+          feedbackObservation: observation,
+        },
+      };
     },
   };
 }

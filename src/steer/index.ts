@@ -12,8 +12,10 @@ export {
 
 export {
   applyFeedbackObservation,
+  createFeedbackCollectionStage,
   createFeedbackLoopState,
   defaultFeedbackLoopConfig,
+  extractFeedbackObservation,
   getFeedbackAdjustedProfile,
 } from "./feedbackLoop.js";
 
@@ -27,6 +29,8 @@ export type {
 
 export type {
   FeedbackAdjustedAutotuneProfile,
+  FeedbackCollectionContext,
+  FeedbackCollectionStageOptions,
   FeedbackLoopConfig,
   FeedbackLoopState,
   FeedbackObservation,
@@ -97,7 +101,20 @@ export {
   generateSteerHelp,
   generateCommandHelp,
 } from "./thermostatCLI.js";
-export type { SteerCLICommand, StudioPanel } from "./thermostatCLI.js";
+export type {
+  ParsedSteerCommand,
+  SteerAgentRuntimeConfig,
+  SteerCLICommand,
+  SteerCommandResult,
+  SteerRuntime,
+  SteerRuntimeHandlers,
+  StudioPanel,
+} from "./thermostatCLI.js";
+export {
+  createSteerRuntime,
+  executeSteerCommand,
+  parseSteerCommandArgs,
+} from "./thermostatCLI.js";
 
 export {
   classifyHarm,

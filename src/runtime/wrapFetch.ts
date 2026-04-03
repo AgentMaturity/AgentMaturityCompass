@@ -1,7 +1,14 @@
 import { logTrace } from "./traceLogger.js";
 import { withCircuitBreaker } from "../ops/circuitBreaker.js";
 import type { SteerPipeline, SteerRequestContext, SteerResponseContext } from "../steer/index.js";
-import { raceModels, type RaceOptions, type RaceResult } from "../steer/race.js";
+import { raceModels, type RaceOptions } from "../steer/race.js";
+import {
+  createLiquidStreamState,
+  flushRemaining,
+  ingestDelta,
+  parseSSEDelta,
+  type LiquidOptions,
+} from "../steer/liquid.js";
 
 export interface WrapFetchOptions {
   agentId: string;
@@ -192,6 +199,101 @@ async function cancelResponseBody(response: Response): Promise<void> {
   }
 }
 
+function isTextEventStream(response: Response): boolean {
+  const contentType = response.headers.get("content-type") ?? "";
+  return contentType.toLowerCase().includes("text/event-stream");
+}
+
+async function applyLiquidStreamingTransform(
+  response: Response,
+  liquidOptions: LiquidOptions,
+): Promise<Response> {
+  if (!response.body || !isTextEventStream(response)) {
+    return response;
+  }
+
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder();
+  const encoder = new TextEncoder();
+  const state = createLiquidStreamState();
+
+  let pending = "";
+  const transformedStream = new ReadableStream<Uint8Array>({
+    async start(controller) {
+      try {
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) {
+            break;
+          }
+
+          pending += decoder.decode(value, { stream: true });
+          const parts = pending.split("\n\n");
+          pending = parts.pop() ?? "";
+
+          for (const part of parts) {
+            const line = `${part}\n\n`;
+            const delta = parseSSEDelta(line);
+            if (delta === null) {
+              if (line.trim() === "data: [DONE]") {
+                const remainder = flushRemaining(state, liquidOptions);
+                if (remainder) {
+                  controller.enqueue(
+                    encoder.encode(`data: ${JSON.stringify({ text: remainder })}\n\n`),
+                  );
+                }
+                controller.enqueue(encoder.encode(line));
+              } else {
+                controller.enqueue(encoder.encode(line));
+              }
+              continue;
+            }
+
+            const flushed = ingestDelta(state, delta, liquidOptions);
+            if (flushed) {
+              controller.enqueue(
+                encoder.encode(`data: ${JSON.stringify({ text: flushed })}\n\n`),
+              );
+            }
+          }
+        }
+
+        if (pending) {
+          const delta = parseSSEDelta(pending);
+          if (delta !== null) {
+            const flushed = ingestDelta(state, delta, liquidOptions);
+            if (flushed) {
+              controller.enqueue(
+                encoder.encode(`data: ${JSON.stringify({ text: flushed })}\n\n`),
+              );
+            }
+          } else {
+            controller.enqueue(encoder.encode(pending));
+          }
+        }
+
+        const remainder = flushRemaining(state, liquidOptions);
+        if (remainder) {
+          controller.enqueue(
+            encoder.encode(`data: ${JSON.stringify({ text: remainder })}\n\n`),
+          );
+        }
+        controller.close();
+      } catch (error) {
+        controller.error(error);
+      } finally {
+        reader.releaseLock();
+      }
+    },
+  });
+
+  return new Response(transformedStream, {
+    status: response.status,
+    statusText: response.statusText,
+    headers: response.headers,
+  });
+}
+
 export function wrapFetch(originalFetch: FetchLike, opts: WrapFetchOptions): FetchLike {
   const providerId = providerFromGatewayBase(opts.gatewayBaseUrl);
   const timeoutMs = normalizePositiveInt(opts.timeoutMs, 30_000);
@@ -276,11 +378,16 @@ export function wrapFetch(originalFetch: FetchLike, opts: WrapFetchOptions): Fet
         note: `race winner=${raceResult.winnerId};score=${raceResult.winnerScore.composite.toFixed(3)};candidates=${raceResult.candidates.length}`
       });
 
+      const liquidOptions = requestContext.metadata.liquidOptions as LiquidOptions | undefined;
+      const raceResponse = liquidOptions
+        ? await applyLiquidStreamingTransform(fetchWinner, liquidOptions)
+        : fetchWinner;
+
       // Run response pipeline on the winner
       const responseContext: SteerResponseContext = opts.steerPipeline
         ? await opts.steerPipeline.runResponse({
             ...requestContext,
-            response: fetchWinner,
+            response: raceResponse,
             metadata: {
               ...requestContext.metadata,
               raceResult,
@@ -288,7 +395,7 @@ export function wrapFetch(originalFetch: FetchLike, opts: WrapFetchOptions): Fet
           })
         : {
             ...requestContext,
-            response: fetchWinner,
+            response: raceResponse,
             metadata: {
               ...requestContext.metadata,
               raceResult,
@@ -331,14 +438,19 @@ export function wrapFetch(originalFetch: FetchLike, opts: WrapFetchOptions): Fet
           continue;
         }
 
+        const liquidOptions = requestContext.metadata.liquidOptions as LiquidOptions | undefined;
+        const maybeLiquidResponse = liquidOptions
+          ? await applyLiquidStreamingTransform(response, liquidOptions)
+          : response;
+
         const responseContext: SteerResponseContext = opts.steerPipeline
           ? await opts.steerPipeline.runResponse({
               ...requestContext,
-              response,
+              response: maybeLiquidResponse,
             })
           : {
               ...requestContext,
-              response,
+              response: maybeLiquidResponse,
             };
         const requestId = responseContext.response.headers.get("x-amc-request-id") ?? undefined;
         const receipt = responseContext.response.headers.get("x-amc-receipt") ?? undefined;

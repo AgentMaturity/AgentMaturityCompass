@@ -231,3 +231,184 @@ export function generateCommandHelp(commandName: string): string | null {
 
   return lines.join("\n");
 }
+
+export interface ParsedSteerCommand {
+  command: string;
+  flags: Record<string, string | number | boolean>;
+}
+
+export interface SteerCommandResult {
+  ok: boolean;
+  output: string;
+}
+
+export interface SteerAgentRuntimeConfig {
+  enabled: boolean;
+  autotune: boolean;
+  hygiene: boolean;
+  microScore: boolean;
+  feedback: boolean;
+}
+
+export interface SteerRuntimeHandlers {
+  race: (args: Record<string, string | number | boolean>) => Promise<unknown>;
+  matrix: (args: Record<string, string | number | boolean>) => Promise<unknown>;
+}
+
+export interface SteerRuntime {
+  handlers: SteerRuntimeHandlers;
+  getAgentConfig(agent: string): SteerAgentRuntimeConfig | undefined;
+  setAgentConfig(agent: string, config: SteerAgentRuntimeConfig): void;
+  getPrivacyConfig(): { tier: string; salt?: string };
+  setPrivacyConfig(config: { tier: string; salt?: string }): void;
+}
+
+function tokenizeCommand(input: string): string[] {
+  const tokens = input.match(/'[^']*'|"[^"]*"|\S+/g) ?? [];
+  return tokens.map((token) => token.replace(/^['"]|['"]$/g, ""));
+}
+
+function normalizeFlagValue(raw: string): string | number | boolean {
+  if (raw === "true") return true;
+  if (raw === "false") return false;
+  if (/^-?\d+(?:\.\d+)?$/.test(raw)) return Number(raw);
+  return raw;
+}
+
+export function parseSteerCommandArgs(input: string): ParsedSteerCommand {
+  const tokens = tokenizeCommand(input);
+  const command = tokens.slice(0, Math.min(2, tokens.length)).join(" ");
+  const flags: Record<string, string | number | boolean> = {};
+
+  for (let i = 2; i < tokens.length; i += 1) {
+    const token = tokens[i]!;
+    if (!token.startsWith("-")) {
+      continue;
+    }
+
+    const normalized = token.replace(/^-+/, "");
+    if (normalized.includes("=")) {
+      const [key, value] = normalized.split(/=(.*)/s, 2);
+      if (key) flags[key.replace(/-([a-z])/g, (_, c: string) => c.toUpperCase())] = normalizeFlagValue(value ?? "");
+      continue;
+    }
+
+    const next = tokens[i + 1];
+    const camelKey = normalized.replace(/-([a-z])/g, (_, c: string) => c.toUpperCase());
+    if (!next || next.startsWith("-")) {
+      flags[camelKey] = true;
+      continue;
+    }
+
+    flags[camelKey] = normalizeFlagValue(next);
+    i += 1;
+  }
+
+  return { command, flags };
+}
+
+export function createSteerRuntime(
+  overrides: Partial<SteerRuntimeHandlers> = {},
+): SteerRuntime {
+  const agents = new Map<string, SteerAgentRuntimeConfig>();
+  let privacy: { tier: string; salt?: string } = { tier: "full" };
+
+  const handlers: SteerRuntimeHandlers = {
+    race: overrides.race ?? (async (args) => ({ ok: true, ...args })),
+    matrix: overrides.matrix ?? (async (args) => ({ ok: true, ...args })),
+  };
+
+  return {
+    handlers,
+    getAgentConfig(agent: string) {
+      return agents.get(agent);
+    },
+    setAgentConfig(agent: string, config: SteerAgentRuntimeConfig) {
+      agents.set(agent, config);
+    },
+    getPrivacyConfig() {
+      return privacy;
+    },
+    setPrivacyConfig(config: { tier: string; salt?: string }) {
+      privacy = config;
+    },
+  };
+}
+
+export async function executeSteerCommand(
+  runtime: SteerRuntime,
+  input: string,
+): Promise<SteerCommandResult> {
+  const parsed = parseSteerCommandArgs(input);
+  const { command, flags } = parsed;
+
+  if (command === "steer enable") {
+    const agent = String(flags.agent ?? "");
+    runtime.setAgentConfig(agent, {
+      enabled: true,
+      autotune: Boolean(flags.autotune ?? true),
+      hygiene: Boolean(flags.hygiene ?? true),
+      microScore: Boolean(flags.microScore ?? true),
+      feedback: Boolean(flags.feedback ?? true),
+    });
+    return { ok: true, output: `Enabled steer for ${agent}` };
+  }
+
+  if (command === "steer disable") {
+    const agent = String(flags.agent ?? "");
+    const prev = runtime.getAgentConfig(agent) ?? {
+      enabled: false,
+      autotune: true,
+      hygiene: true,
+      microScore: true,
+      feedback: true,
+    };
+    runtime.setAgentConfig(agent, { ...prev, enabled: false });
+    return { ok: true, output: `Disabled steer for ${agent}` };
+  }
+
+  if (command === "steer status") {
+    const agent = String(flags.agent ?? "");
+    const config = runtime.getAgentConfig(agent);
+    const payload = {
+      agent,
+      ...(config ?? null),
+    };
+    return {
+      ok: true,
+      output: flags.json ? JSON.stringify(payload) : `${agent}: ${JSON.stringify(payload)}`,
+    };
+  }
+
+  if (command === "steer micro-score") {
+    const { microScore } = await import("./microScore.js");
+    const text = String(flags.text ?? "");
+    const score = microScore(text);
+    return {
+      ok: true,
+      output: flags.json ? JSON.stringify(score) : `composite=${score.composite}`,
+    };
+  }
+
+  if (command === "steer race") {
+    const result = await runtime.handlers.race(flags);
+    return { ok: true, output: JSON.stringify(result) };
+  }
+
+  if (command === "steer matrix") {
+    const result = await runtime.handlers.matrix(flags);
+    return { ok: true, output: JSON.stringify(result) };
+  }
+
+  if (command === "steer privacy") {
+    const tier = String(flags.tier ?? "full");
+    const salt = typeof flags.salt === "string" ? flags.salt : undefined;
+    runtime.setPrivacyConfig({ tier, salt });
+    return { ok: true, output: `Privacy tier set to ${tier}` };
+  }
+
+  return {
+    ok: false,
+    output: `Unknown steer command: ${command}`,
+  };
+}
