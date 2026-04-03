@@ -1,5 +1,6 @@
 import { logTrace } from "./traceLogger.js";
 import { withCircuitBreaker } from "../ops/circuitBreaker.js";
+import type { SteerPipeline, SteerRequestContext, SteerResponseContext } from "../steer/index.js";
 
 export interface WrapFetchOptions {
   agentId: string;
@@ -12,6 +13,7 @@ export interface WrapFetchOptions {
   retryOnStatuses?: number[];
   retryNonIdempotent?: boolean;
   circuitName?: string;
+  steerPipeline?: SteerPipeline;
 }
 
 export type FetchLike = typeof fetch;
@@ -199,10 +201,10 @@ export function wrapFetch(originalFetch: FetchLike, opts: WrapFetchOptions): Fet
   const circuitName = opts.circuitName ?? `wrapFetch:${providerId}`;
   return (async (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
     const incomingUrl = inputUrl(input);
-    const finalUrl =
+    const rewrittenUrl =
       opts.forceBaseUrl && incomingUrl
         ? rewriteUrl(incomingUrl, opts.gatewayBaseUrl)
-        : input;
+        : incomingUrl;
 
     const headers = mergeHeaders(init?.headers, {
       "x-amc-agent-id": opts.agentId,
@@ -214,9 +216,34 @@ export function wrapFetch(originalFetch: FetchLike, opts: WrapFetchOptions): Fet
       ...init,
       headers
     };
-    const method = resolveMethod(input, nextInit);
+    const requestContext: SteerRequestContext = opts.steerPipeline
+      ? await opts.steerPipeline.runRequest({
+          agentId: opts.agentId,
+          providerId,
+          url: rewrittenUrl ?? incomingUrl ?? opts.gatewayBaseUrl,
+          init: nextInit,
+          metadata: {},
+        })
+      : {
+          agentId: opts.agentId,
+          providerId,
+          url: rewrittenUrl ?? incomingUrl ?? opts.gatewayBaseUrl,
+          init: nextInit,
+          metadata: {},
+        };
+    const finalUrl = requestContext.url;
+    const finalInit: RequestInit = {
+      ...requestContext.init,
+      headers: mergeHeaders(requestContext.init.headers, {
+        "x-amc-agent-id": opts.agentId,
+        ...(process.env.AMC_LEASE ? { "x-amc-lease": process.env.AMC_LEASE } : {}),
+        ...(process.env.AMC_WORKORDER_ID ? { "x-amc-workorder-id": process.env.AMC_WORKORDER_ID } : {}),
+        ...(opts.injectHeaders ?? {})
+      })
+    };
+    const method = resolveMethod(input, finalInit);
     const retryableRequest =
-      hasReplayableBody(input, nextInit) && (retryNonIdempotent || isIdempotentMethod(method));
+      hasReplayableBody(input, finalInit) && (retryNonIdempotent || isIdempotentMethod(method));
     const totalAttempts = retryableRequest ? maxRetries + 1 : 1;
 
     logTrace({
@@ -234,8 +261,8 @@ export function wrapFetch(originalFetch: FetchLike, opts: WrapFetchOptions): Fet
           circuitName,
           () =>
             originalFetch(finalUrl as RequestInfo | URL, {
-              ...nextInit,
-              signal: combineSignals(nextInit.signal ?? undefined, timeoutSignal)
+              ...finalInit,
+              signal: combineSignals(finalInit.signal ?? undefined, timeoutSignal)
             }),
           { timeoutMs: timeoutMs + 1000 }
         );
@@ -246,17 +273,26 @@ export function wrapFetch(originalFetch: FetchLike, opts: WrapFetchOptions): Fet
           continue;
         }
 
-        const requestId = response.headers.get("x-amc-request-id") ?? undefined;
-        const receipt = response.headers.get("x-amc-receipt") ?? undefined;
+        const responseContext: SteerResponseContext = opts.steerPipeline
+          ? await opts.steerPipeline.runResponse({
+              ...requestContext,
+              response,
+            })
+          : {
+              ...requestContext,
+              response,
+            };
+        const requestId = responseContext.response.headers.get("x-amc-request-id") ?? undefined;
+        const receipt = responseContext.response.headers.get("x-amc-receipt") ?? undefined;
         logTrace({
           agentId: opts.agentId,
           event: "llm_result",
           providerId,
           request_id: requestId,
           receipt,
-          note: `status=${response.status};attempt=${attempt}`
+          note: `status=${responseContext.response.status};attempt=${attempt}`
         });
-        return response;
+        return responseContext.response;
       } catch (error) {
         lastError = error;
         if (attempt < totalAttempts && isRetriableError(error)) {
