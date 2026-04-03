@@ -17,10 +17,19 @@ export interface AutotuneProfile {
   temperature: number;
   topP: number;
   topK?: number;
+  repetitionPenalty?: number;
+  frequencyPenalty?: number;
   metadata: {
     strategy: "precise" | "balanced" | "creative" | "guarded";
     blended: boolean;
+    conversationAdapted?: boolean;
+    turnCount?: number;
   };
+}
+
+export interface HistoryMessage {
+  role: string;
+  content: string;
 }
 
 export interface CreateAutotuneStageOptions {
@@ -256,6 +265,91 @@ export function createAutotuneStage(options: CreateAutotuneStageOptions = {}): S
           },
         },
       };
+    },
+  };
+}
+
+// ── Conversation-length adaptation (AMC-444) ────────────────────────────────
+
+const MAX_HISTORY_MESSAGES = 4;
+const CURRENT_MESSAGE_WEIGHT = 3;
+const ADAPTATION_THRESHOLD = 10; // turns before adaptation kicks in
+const DELTA_PER_TURN = 0.01;
+const MAX_DELTA = 0.15;
+
+/**
+ * Classify context using conversation history for disambiguation.
+ * Current message gets 3x weight; last 4 history messages get 1x each.
+ */
+export function classifyWithHistory(
+  currentMessage: string,
+  history: HistoryMessage[],
+): SteerContextClassification {
+  if (history.length === 0) {
+    return classifySteerContext(currentMessage);
+  }
+
+  // Use only last MAX_HISTORY_MESSAGES
+  const recentHistory = history.slice(-MAX_HISTORY_MESSAGES);
+
+  // Score current message with 3x weight
+  const currentScores = classifySteerContext(currentMessage).scores;
+  const aggregated: Record<SteerContextType, number> = {
+    code: currentScores.code * CURRENT_MESSAGE_WEIGHT,
+    analytical: currentScores.analytical * CURRENT_MESSAGE_WEIGHT,
+    creative: currentScores.creative * CURRENT_MESSAGE_WEIGHT,
+    conversational: currentScores.conversational * CURRENT_MESSAGE_WEIGHT,
+    adversarial: currentScores.adversarial * CURRENT_MESSAGE_WEIGHT,
+  };
+
+  // Add 1x weight for each history message
+  for (const msg of recentHistory) {
+    const histScores = classifySteerContext(msg.content).scores;
+    for (const key of Object.keys(aggregated) as SteerContextType[]) {
+      aggregated[key] += histScores[key];
+    }
+  }
+
+  // Find winner
+  let contextType: SteerContextType = "conversational";
+  let bestScore = -1;
+  for (const [candidate, score] of Object.entries(aggregated) as Array<[SteerContextType, number]>) {
+    if (score > bestScore) {
+      contextType = candidate;
+      bestScore = score;
+    }
+  }
+
+  const total = Object.values(aggregated).reduce((sum, s) => sum + s, 0);
+  const confidence = total === 0 ? 0.2 : Math.max(0.2, bestScore / total);
+
+  return { contextType, confidence, scores: aggregated };
+}
+
+/**
+ * Adapt an AutotuneProfile for long conversations.
+ * After ADAPTATION_THRESHOLD turns, ramps up repetition_penalty and
+ * frequency_penalty to fight the model's tendency to repeat itself.
+ * Delta caps at MAX_DELTA to prevent runaway.
+ */
+export function getConversationAdaptedProfile(
+  baseProfile: AutotuneProfile,
+  turnCount: number,
+): AutotuneProfile {
+  if (turnCount <= ADAPTATION_THRESHOLD) {
+    return baseProfile;
+  }
+
+  const delta = Math.min((turnCount - ADAPTATION_THRESHOLD) * DELTA_PER_TURN, MAX_DELTA);
+
+  return {
+    ...baseProfile,
+    repetitionPenalty: Number((1.0 + delta).toFixed(4)),
+    frequencyPenalty: Number((delta * 0.5).toFixed(4)),
+    metadata: {
+      ...baseProfile.metadata,
+      conversationAdapted: true,
+      turnCount,
     },
   };
 }

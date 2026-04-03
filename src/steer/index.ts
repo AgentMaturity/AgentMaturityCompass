@@ -4,8 +4,10 @@ export {
 
 export {
   classifySteerContext,
+  classifyWithHistory,
   createAutotuneStage,
   getAutotuneProfile,
+  getConversationAdaptedProfile,
 } from "./autotune.js";
 
 export {
@@ -18,6 +20,7 @@ export {
 export type {
   AutotuneProfile,
   CreateAutotuneStageOptions,
+  HistoryMessage,
   SteerContextClassification,
   SteerContextType,
 } from "./autotune.js";
@@ -95,3 +98,16 @@ export {
   generateCommandHelp,
 } from "./thermostatCLI.js";
 export type { SteerCLICommand, StudioPanel } from "./thermostatCLI.js";
+
+export {
+  classifyHarm,
+  createHarmClassifierStage,
+  HARM_DOMAINS,
+} from "./harmClassifier.js";
+export type {
+  HarmClassification,
+  HarmClassifierOptions,
+  HarmDomain,
+  HarmDomainMatch,
+  HarmSeverity,
+} from "./harmClassifier.js";

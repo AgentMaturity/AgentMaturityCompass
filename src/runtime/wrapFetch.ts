@@ -1,6 +1,7 @@
 import { logTrace } from "./traceLogger.js";
 import { withCircuitBreaker } from "../ops/circuitBreaker.js";
 import type { SteerPipeline, SteerRequestContext, SteerResponseContext } from "../steer/index.js";
+import { raceModels, type RaceOptions, type RaceResult } from "../steer/race.js";
 
 export interface WrapFetchOptions {
   agentId: string;
@@ -241,6 +242,63 @@ export function wrapFetch(originalFetch: FetchLike, opts: WrapFetchOptions): Fet
         ...(opts.injectHeaders ?? {})
       })
     };
+
+    // ── Race fan-out: if raceOptions tagged by createRaceStage, fan out ──
+    const raceOptions = requestContext.metadata.raceOptions as RaceOptions | undefined;
+    if (raceOptions && raceOptions.candidates.length > 0) {
+      logTrace({
+        agentId: opts.agentId,
+        event: "llm_call",
+        providerId,
+        note: `race fan-out to ${raceOptions.candidates.length} candidates`
+      });
+
+      const raceResult = await raceModels(finalInit, raceOptions);
+
+      // Find the winning candidate's full result to build a proper Response
+      const winnerIdx = raceResult.candidates.findIndex(c => c.id === raceResult.winnerId);
+      const winnerCandidate = raceOptions.candidates[winnerIdx >= 0 ? winnerIdx : 0]!;
+
+      // Re-fetch the winner to get the actual Response object
+      // (raceModels consumed the response bodies for scoring)
+      const fetchWinner = await originalFetch(winnerCandidate.url, {
+        ...finalInit,
+        ...(winnerCandidate.headers ? { headers: mergeHeaders(finalInit.headers, winnerCandidate.headers) } : {}),
+        ...(winnerCandidate.bodyOverrides && typeof finalInit.body === "string" ? {
+          body: JSON.stringify({ ...JSON.parse(finalInit.body), ...winnerCandidate.bodyOverrides })
+        } : {}),
+      });
+
+      logTrace({
+        agentId: opts.agentId,
+        event: "llm_result",
+        providerId,
+        note: `race winner=${raceResult.winnerId};score=${raceResult.winnerScore.composite.toFixed(3)};candidates=${raceResult.candidates.length}`
+      });
+
+      // Run response pipeline on the winner
+      const responseContext: SteerResponseContext = opts.steerPipeline
+        ? await opts.steerPipeline.runResponse({
+            ...requestContext,
+            response: fetchWinner,
+            metadata: {
+              ...requestContext.metadata,
+              raceResult,
+            },
+          })
+        : {
+            ...requestContext,
+            response: fetchWinner,
+            metadata: {
+              ...requestContext.metadata,
+              raceResult,
+            },
+          };
+
+      return responseContext.response;
+    }
+    // ── End race fan-out ────────────────────────────────────────────────
+
     const method = resolveMethod(input, finalInit);
     const retryableRequest =
       hasReplayableBody(input, finalInit) && (retryNonIdempotent || isIdempotentMethod(method));
