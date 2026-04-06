@@ -1,6 +1,6 @@
 {
   "name": "agent-maturity-compass",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Tamper-evident maturity scoring, red-team testing, and compliance toolkit for AI agents",
   "type": "module",
   "main": "dist/index.js",
