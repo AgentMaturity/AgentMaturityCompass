@@ -40,8 +40,8 @@ export async function runAmcTests(pattern?: string): Promise<{ runId: number; re
   // Record in DB
   const { rows: [run] } = await query(
     `INSERT INTO test_runs (runner, platform, status, total_tests, passed, failed, skipped, duration_ms, started_at, finished_at)
-     VALUES ('vitest', 'node', $1, $2, $3, $4, $5, $6, NOW() - interval '1 millisecond' * $6, NOW()) RETURNING id`,
-    [result.status, result.totalTests, result.passed, result.failed, result.skipped, result.durationMs]
+     VALUES ('vitest', 'node', $1, $2, $3, $4, $5, $6, $7, NOW()) RETURNING id`,
+    [result.status, result.totalTests, result.passed, result.failed, result.skipped, result.durationMs, new Date(Date.now() - result.durationMs)]
   );
 
   // Record failures
@@ -56,7 +56,13 @@ export async function runAmcTests(pattern?: string): Promise<{ runId: number; re
   return { runId: run.id, result };
 }
 
-function parseVitestOutput(stdout: string, durationMs: number, exitCode: number): VitestResult {
+function stripAnsi(s: string): string {
+  // eslint-disable-next-line no-control-regex
+  return s.replace(/\x1b\[[0-9;]*m/g, '').replace(/[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g, '');
+}
+
+function parseVitestOutput(rawStdout: string, durationMs: number, exitCode: number): VitestResult {
+  const stdout = stripAnsi(rawStdout);
   // Parse "Test Files  X passed | Y failed (Z)"
   const filesMatch = stdout.match(/Test Files\s+(?:(\d+) failed\s*\|?\s*)?(\d+) passed/);
   // Parse "Tests  X passed | Y failed (Z)"
