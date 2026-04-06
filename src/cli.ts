@@ -4115,7 +4115,7 @@ program
   .argument("<runId>")
   .option("--executive", "Generate executive summary (board-friendly)", false)
   .option("--html <path>", "Export styled HTML report (print to PDF from browser)")
-  .action((runId: string, opts: { executive: boolean; html?: string }) async => {
+  .action(async (runId: string, opts: { executive: boolean; html?: string }) => {
     const report = loadRunReport(process.cwd(), runId, activeAgent(program));
 
     // HTML export (styled, printable to PDF)
@@ -5073,7 +5073,7 @@ lifecycle
   .description("Show lifecycle stage, accountability matrix, governance gates, and transition trail")
   .option("--agent <agentId>", "agent ID (overrides global --agent)")
   .option("--json", "emit JSON output", false)
-  .action((opts: { agent?: string; json: boolean }) async => {
+  .action(async (opts: { agent?: string; json: boolean }) => {
     const { lifecycleStatusCli } = await import("./lifecycle/lifecycleCli.js");
     const status = lifecycleStatusCli({
       workspace: process.cwd(),
@@ -5129,7 +5129,7 @@ lifecycle
   .option("--controls <list>", "comma-separated governance control IDs satisfied for this advance")
   .option("--note <text>", "transition note")
   .option("--json", "emit JSON output", false)
-  .action((opts: {
+  .action(async (opts: {
     agent?: string;
     to: string;
     actor: string;
@@ -5996,7 +5996,7 @@ ops
 ops
   .command("print")
   .description("Print effective ops policy")
-  .action(() async => {
+  .action(async () => {
     console.log(JSON.stringify(loadOpsPolicy(process.cwd()), null, 2));
   });
 
@@ -6005,7 +6005,7 @@ ops
   .description("Initialize circuit breaker policy")
   .option("--timeout <ms>", "global timeout in ms", "10000")
   .option("--threshold <n>", "failure threshold before opening circuit", "5")
-  .action((opts: { timeout: string; threshold: string }) async => {
+  .action(async (opts: { timeout: string; threshold: string }) => {
     const { configureCircuitBreaker: configureCB, saveCircuitBreakerPolicy: saveCBPolicy } = await import("./ops/circuitBreaker.js");
     const policy = configureCB({
       globalTimeoutMs: parseInt(opts.timeout, 10),
@@ -6020,7 +6020,7 @@ ops
 ops
   .command("circuit-breaker-status")
   .description("Show circuit breaker status")
-  .action(() async => {
+  .action(async () => {
     const { generateCircuitBreakerReport: genCBReport, renderCircuitBreakerMarkdown: renderCBMd } = await import("./ops/circuitBreaker.js");
     const report = genCBReport();
     console.log(renderCBMd(report));
@@ -6029,7 +6029,7 @@ ops
 ops
   .command("circuit-breaker-reset")
   .description("Reset all circuit breakers")
-  .action(() async => {
+  .action(async () => {
     const { resetAllCircuits: resetAll } = await import("./ops/circuitBreaker.js");
     resetAll();
     console.log(chalk.green("All circuit breakers reset"));
@@ -6039,7 +6039,7 @@ ops
   .command("dead-letters")
   .description("Show dead letter queue")
   .option("--unresolved", "show only unresolved entries")
-  .action((opts: { unresolved?: boolean }) async => {
+  .action(async (opts: { unresolved?: boolean }) => {
     const { getDeadLetters: getDL } = await import("./ops/circuitBreaker.js");
     const entries = getDL({ unresolvedOnly: opts.unresolved });
     if (entries.length === 0) {
@@ -6059,7 +6059,7 @@ ops
   .option("--set <mode>", "Set mode: FULL, REDUCED, MINIMAL")
   .option("--reason <reason>", "Reason for mode change")
   .option("--ttl <duration>", "TTL for mode override (e.g. 4h, 30m)")
-  .action((opts: { set?: string; reason?: string; ttl?: string }) async => {
+  .action(async (opts: { set?: string; reason?: string; ttl?: string }) => {
     const dm = await import("./ops/degradationMode.js");
     if (opts.set) {
       const mode = opts.set.toUpperCase() as "FULL" | "REDUCED" | "MINIMAL";
@@ -6086,7 +6086,7 @@ ops
 ops
   .command("backpressure")
   .description("Show backpressure pipeline health")
-  .action(() async => {
+  .action(async () => {
     const bp = await import("./ops/backpressure.js");
     console.log(bp.renderBackpressureStatus());
   });
@@ -6095,7 +6095,7 @@ ops
   .command("slo")
   .description("Show governance SLO dashboard")
   .option("--window <hours>", "Window in hours", "1")
-  .action((opts: { window: string }) async => {
+  .action(async (opts: { window: string }) => {
     const slo = await import("./ops/governanceSlo.js");
     const windowMs = parseFloat(opts.window) * 3600000;
     console.log(slo.renderSloStatus(windowMs));
@@ -6105,7 +6105,7 @@ ops
   .command("latency")
   .description("Show latency accounting report")
   .option("--window <hours>", "Window in hours", "24")
-  .action((opts: { window: string }) async => {
+  .action(async (opts: { window: string }) => {
     const la = await import("./ops/latencyAccounting.js");
     const windowMs = parseFloat(opts.window) * 3600000;
     console.log(la.renderLatencyReport(windowMs));
@@ -6300,7 +6300,7 @@ program
   .option("--out <path>", "output file path", ".amc/reports/l5-delta.md")
   .option("--format <format>", "json|markdown|both", "both")
   .option("--json", "emit JSON to stdout", false)
-  .action((opts: { agent: string; out: string; format: string; json: boolean }) async => {
+  .action(async (opts: { agent: string; out: string; format: string; json: boolean }) => {
     if (opts.json) {
       const { generateL5DeltaReport } = await import("./diagnostic/l5DeltaReport.js");
       const report = generateL5DeltaReport({ workspace: process.cwd(), agentId: opts.agent });
@@ -7655,7 +7655,7 @@ ci
   .command("print")
   .description("Print suggested CI pipeline steps")
   .option("--agent <agentId>", "agent ID (overrides global --agent)")
-  .action((opts: { agent?: string }) async => {
+  .action(async (opts: { agent?: string }) => {
     const steps = printCiSteps({
       workspace: process.cwd(),
       agentId: opts.agent ?? activeAgent(program)
@@ -11762,7 +11762,7 @@ program
   .description("Education flow for a specific maturity question")
   .requiredOption("--question <qid>", "question ID (e.g. AMC-2.5)")
   .option("--agent <agentId>", "agent ID (overrides global --agent)")
-  .action((opts: { question: string; agent?: string }) async => {
+  .action(async (opts: { question: string; agent?: string }) => {
     const learned = learnQuestion({
       workspace: process.cwd(),
       agentId: opts.agent ?? activeAgent(program),
@@ -11776,7 +11776,7 @@ program
 program
   .command("lineage-init")
   .description("Initialize governance lineage tables")
-  .action(() async => {
+  .action(async () => {
     const { initGovernanceLineageTables } = await import("./claims/governanceLineage.js");
     const ledger = openLedger(process.cwd());
     const db = ledger.db;
@@ -11789,7 +11789,7 @@ program
   .command("lineage-report")
   .description("Generate governance lineage report")
   .option("--agent <agentId>", "agent ID (overrides global --agent)")
-  .action((opts: { agent?: string }) async => {
+  .action(async (opts: { agent?: string }) => {
     const {
       initGovernanceLineageTables,
       generateGovernanceLineageReport,
@@ -11808,7 +11808,7 @@ program
   .command("lineage-claim")
   .description("Show full governance lineage for a specific claim")
   .argument("<claimId>", "claim ID to show lineage for")
-  .action((claimId: string) async => {
+  .action(async (claimId: string) => {
     const {
       initGovernanceLineageTables,
       buildClaimLineageView,
@@ -11830,7 +11830,7 @@ program
   .command("lineage-policy-intents")
   .description("List all policy change intents for an agent")
   .option("--agent <agentId>", "agent ID (overrides global --agent)")
-  .action((opts: { agent?: string }) async => {
+  .action(async (opts: { agent?: string }) => {
     const {
       initGovernanceLineageTables,
       getPolicyIntentsByAgent
@@ -11862,7 +11862,7 @@ program
   .command("claim-confidence")
   .description("Generate per-claim confidence report with citation-backed scoring")
   .option("--agent <agentId>", "agent ID (overrides global --agent)")
-  .action((opts: { agent?: string }) async => {
+  .action(async (opts: { agent?: string }) => {
     const {
       generateClaimConfidenceReport,
       renderClaimConfidenceMarkdown
@@ -11882,7 +11882,7 @@ program
   .description("Check if claims for given questions pass confidence threshold")
   .option("--agent <agentId>", "agent ID (overrides global --agent)")
   .requiredOption("--questions <ids>", "comma-separated question IDs")
-  .action((opts: { agent?: string; questions: string }) async => {
+  .action(async (opts: { agent?: string; questions: string }) => {
     const { checkConfidenceGate } = await import("./claims/claimConfidence.js");
     const ledger = openLedger(process.cwd());
     const db = ledger.db;
@@ -11906,7 +11906,7 @@ program
   .command("overhead-report")
   .description("Generate per-feature overhead accounting report")
   .option("--window <hours>", "reporting window in hours", "1")
-  .action((opts: { window: string }) async => {
+  .action(async (opts: { window: string }) => {
     const oh = await import("./ops/overheadAccounting.js");
     const windowMs = parseInt(opts.window, 10) * 3600000;
     const report = oh.generateOverheadReport(windowMs);
@@ -11917,7 +11917,7 @@ program
   .command("overhead-profile")
   .description("Set the overhead mode profile (STRICT, BALANCED, LEAN)")
   .argument("<mode>", "profile mode: STRICT, BALANCED, or LEAN")
-  .action((mode: string) async => {
+  .action(async (mode: string) => {
     const oh = await import("./ops/overheadAccounting.js");
     const validModes = ["STRICT", "BALANCED", "LEAN"] as const;
     if (!(validModes as readonly string[]).includes(mode)) {
@@ -11935,7 +11935,7 @@ program
   .command("micro-canary-run")
   .description("Run all micro-canary probes immediately")
   .option("--agent <agentId>", "agent ID (overrides global --agent)")
-  .action((opts: { agent?: string }) async => {
+  .action(async (opts: { agent?: string }) => {
     const mc = await import("./assurance/microCanary.js");
     mc.registerBuiltInProbes();
     const agentId = opts.agent ?? activeAgent(program) ?? "default";
@@ -11960,7 +11960,7 @@ program
   .command("micro-canary-report")
   .description("Generate micro-canary status report")
   .option("--window <hours>", "reporting window in hours", "1")
-  .action((opts: { window: string }) async => {
+  .action(async (opts: { window: string }) => {
     const mc = await import("./assurance/microCanary.js");
     const sinceTs = Date.now() - parseInt(opts.window, 10) * 3600000;
     const report = mc.generateMicroCanaryReport(sinceTs);
@@ -11971,7 +11971,7 @@ program
   .command("micro-canary-alerts")
   .description("Show active micro-canary alerts")
   .option("--ack-all", "acknowledge all alerts", false)
-  .action((opts: { ackAll: boolean }) async => {
+  .action(async (opts: { ackAll: boolean }) => {
     const mc = await import("./assurance/microCanary.js");
     if (opts.ackAll) {
       const count = mc.acknowledgeAllAlerts();
@@ -12000,7 +12000,7 @@ program
   .requiredOption("--candidate-file <path>", "path to candidate architecture artifact")
   .option("--baseline-kind <kind>", "architecture kind", "POLICY_FRAME")
   .option("--candidate-kind <kind>", "architecture kind", "POLICY_FRAME")
-  .action((opts: {
+  .action(async (opts: {
     name: string;
     model: string;
     baselineFile: string;
@@ -12035,7 +12035,7 @@ program
 program
   .command("experiment-architecture-probes")
   .description("List the standard probe set for architecture experiments")
-  .action(() async => {
+  .action(async () => {
     const { createStandardProbeSet } = await import("./experiments/architectureExperiment.js");
     const probes = createStandardProbeSet();
     console.log(chalk.bold(`Standard Architecture Probes (${probes.length}):\n`));
@@ -12058,7 +12058,7 @@ program
   .option("--duration <ms>", "canary duration in milliseconds", "3600000")
   .option("--failure-threshold <ratio>", "failure ratio that triggers rollback", "0.1")
   .option("--auto-promote", "auto-promote if canary succeeds", false)
-  .action((opts: {
+  .action(async (opts: {
     candidateSha: string;
     stableSha: string;
     enforcePct: string;
@@ -12088,7 +12088,7 @@ program
 program
   .command("canary-status")
   .description("Show current canary status and stats")
-  .action(() async => {
+  .action(async () => {
     const { getCanaryConfig, computeCanaryStats } = await import("./governor/policyCanary.js");
     const config = getCanaryConfig();
     if (!config) {
@@ -12110,7 +12110,7 @@ program
 program
   .command("canary-stop")
   .description("Stop the active canary")
-  .action(() async => {
+  .action(async () => {
     const { stopCanary } = await import("./governor/policyCanary.js");
     stopCanary();
     console.log(chalk.green("Canary stopped."));
@@ -12120,7 +12120,7 @@ program
   .command("canary-report")
   .description("Generate full policy canary report")
   .option("--agent <agentId>", "agent ID (overrides global --agent)")
-  .action((opts: { agent?: string }) async => {
+  .action(async (opts: { agent?: string }) => {
     const { generatePolicyCanaryReport, renderPolicyCanaryMarkdown } = await import("./governor/policyCanary.js");
     const agentId = opts.agent ?? activeAgent(program) ?? "default";
     const report = generatePolicyCanaryReport(agentId);
@@ -12133,7 +12133,7 @@ program
   .option("--agent <agentId>", "agent ID (overrides global --agent)")
   .requiredOption("--reason <reason>", "reason for creating the rollback pack")
   .option("--policy-file <path>", "path to policy file", "amc-policy.yml")
-  .action((opts: { agent?: string; reason: string; policyFile: string }) async => {
+  .action(async (opts: { agent?: string; reason: string; policyFile: string }) => {
     const { createRollbackPack } = await import("./governor/policyCanary.js");
     const fs = await import("node:fs");
     const agentId = opts.agent ?? activeAgent(program) ?? "default";
@@ -12151,7 +12151,7 @@ program
   .requiredOption("--reason <reason>", "reason for the emergency override")
   .requiredOption("--action <desc>", "description of what the override allows")
   .option("--ttl <ms>", "TTL in milliseconds", "3600000")
-  .action((opts: { agent?: string; reason: string; action: string; ttl: string }) async => {
+  .action(async (opts: { agent?: string; reason: string; action: string; ttl: string }) => {
     const { activateEmergencyOverride } = await import("./governor/policyCanary.js");
     const agentId = opts.agent ?? activeAgent(program) ?? "default";
     const override = activateEmergencyOverride({
@@ -12173,7 +12173,7 @@ program
   .requiredOption("--justification <text>", "justification for the waiver")
   .requiredOption("--expires <ts>", "expiry timestamp (epoch ms) or duration e.g. 7d")
   .option("--created-by <who>", "who created this waiver", "operator")
-  .action((opts: { agent?: string; requirement: string; justification: string; expires: string; createdBy: string }) async => {
+  .action(async (opts: { agent?: string; requirement: string; justification: string; expires: string; createdBy: string }) => {
     const { registerPolicyDebt } = await import("./governor/policyCanary.js");
     const agentId = opts.agent ?? activeAgent(program) ?? "default";
     let expiresTs: number;
@@ -12206,7 +12206,7 @@ program
   .description("List active policy debt entries")
   .option("--agent <agentId>", "agent ID (overrides global --agent)")
   .option("--all", "include expired entries", false)
-  .action((opts: { agent?: string; all: boolean }) async => {
+  .action(async (opts: { agent?: string; all: boolean }) => {
     const { getActivePolicyDebt, getExpiredPolicyDebt } = await import("./governor/policyCanary.js");
     const agentId = opts.agent ?? activeAgent(program) ?? "default";
     const active = getActivePolicyDebt(agentId);
@@ -12227,7 +12227,7 @@ program
   .command("governance-drift")
   .description("Detect governance drift for an agent")
   .option("--agent <agentId>", "agent ID (overrides global --agent)")
-  .action((opts: { agent?: string }) async => {
+  .action(async (opts: { agent?: string }) => {
     const { detectGovernanceDrift } = await import("./governor/policyCanary.js");
     const agentId = opts.agent ?? activeAgent(program) ?? "default";
     const result = detectGovernanceDrift(agentId);
@@ -12246,7 +12246,7 @@ program
   .command("cgx-integrity")
   .description("Run graph integrity check on CGX with semantic overlay")
   .option("--max-contradictions <n>", "max allowed contradictions", "5")
-  .action((opts: { maxContradictions: string }) async => {
+  .action(async (opts: { maxContradictions: string }) => {
     const { checkGraphIntegrity, createSemanticOverlay, renderIntegrityCheckMarkdown } = await import("./cgx/cgxPropagation.js");
     const { loadLatestGraph } = require("./cgx/cgxStore.js") as { loadLatestGraph: (workspace: string) => any };
     const graph = loadLatestGraph(process.cwd());
@@ -12266,7 +12266,7 @@ program
   .description("Simulate risk propagation from a source node")
   .argument("<nodeId>", "source node ID")
   .option("--max-depth <n>", "max propagation depth", "5")
-  .action((nodeId: string, opts: { maxDepth: string }) async => {
+  .action(async (nodeId: string, opts: { maxDepth: string }) => {
     const { simulateRiskPropagation, createSemanticOverlay, renderPropagationMarkdown } = await import("./cgx/cgxPropagation.js");
     const { loadLatestGraph } = require("./cgx/cgxStore.js") as { loadLatestGraph: (workspace: string) => any };
     const graph = loadLatestGraph(process.cwd());
@@ -12286,7 +12286,7 @@ program
   .description("Extract lessons from verified effective corrections")
   .option("--agent <agentId>", "agent ID (overrides global --agent)")
   .option("--min-effectiveness <n>", "min effectiveness score (0-1)", "0.3")
-  .action((opts: { agent?: string; minEffectiveness: string }) async => {
+  .action(async (opts: { agent?: string; minEffectiveness: string }) => {
     const { initLessonTables, extractLessonsFromCorrections } = await import("./learning/correctionMemory.js");
     const ledger = openLedger(process.cwd());
     const db = ledger.db;
@@ -12310,7 +12310,7 @@ program
   .command("memory-advisories")
   .description("Show advisories from correction memory for prompt injection")
   .option("--agent <agentId>", "agent ID (overrides global --agent)")
-  .action((opts: { agent?: string }) async => {
+  .action(async (opts: { agent?: string }) => {
     const { initLessonTables, buildLessonAdvisories } = await import("./learning/correctionMemory.js");
     const ledger = openLedger(process.cwd());
     const db = ledger.db;
@@ -12330,7 +12330,7 @@ program
   .description("Generate correction memory report")
   .option("--agent <agentId>", "agent ID (overrides global --agent)")
   .option("--window <window>", "evidence window", "30d")
-  .action((opts: { agent?: string; window: string }) async => {
+  .action(async (opts: { agent?: string; window: string }) => {
     const { initLessonTables, generateCorrectionMemoryReport, renderCorrectionMemoryMarkdown } = await import("./learning/correctionMemory.js");
     const { parseWindowToMs } = await import("./utils/time.js");
     const ledger = openLedger(process.cwd());
@@ -12348,7 +12348,7 @@ program
   .command("memory-expire")
   .description("Expire stale lessons past their TTL")
   .option("--agent <agentId>", "agent ID (overrides global --agent)")
-  .action((opts: { agent?: string }) async => {
+  .action(async (opts: { agent?: string }) => {
     const { initLessonTables, expireStaleLessons } = await import("./learning/correctionMemory.js");
     const ledger = openLedger(process.cwd());
     const db = ledger.db;
@@ -14735,7 +14735,7 @@ program
 program
   .command("lab-templates")
   .description("List available experiment templates")
-  .action(() async => {
+  .action(async () => {
     const lab = await import("./lab/cognitionLab.js");
     const templates = lab.getLabTemplates();
     console.log(chalk.bold(`\nModel Cognition Lab — ${templates.length} Templates\n`));
@@ -14754,7 +14754,7 @@ program
   .requiredOption("--name <name>", "experiment name")
   .requiredOption("--model <modelId>", "model ID")
   .option("--description <desc>", "experiment description", "")
-  .action((opts: { kind: string; name: string; model: string; description: string }) async => {
+  .action(async (opts: { kind: string; name: string; model: string; description: string }) => {
     const lab = await import("./lab/cognitionLab.js");
     const experiment = lab.createLabExperiment({
       kind: opts.kind as never,
@@ -14771,7 +14771,7 @@ program
   .command("lab-simulate")
   .description("Simulate running all probes for an experiment")
   .requiredOption("--experiment <id>", "experiment ID")
-  .action((opts: { experiment: string }) async => {
+  .action(async (opts: { experiment: string }) => {
     const lab = await import("./lab/cognitionLab.js");
     const results = lab.simulateExperiment(opts.experiment);
     if (results.length === 0) {
@@ -14790,7 +14790,7 @@ program
   .command("lab-report")
   .description("Generate a lab experiment report")
   .requiredOption("--experiment <id>", "experiment ID")
-  .action((opts: { experiment: string }) async => {
+  .action(async (opts: { experiment: string }) => {
     const lab = await import("./lab/cognitionLab.js");
     const report = lab.generateLabReport(opts.experiment);
     if (!report) {
@@ -14805,7 +14805,7 @@ program
   .description("Compare two lab experiments")
   .requiredOption("--baseline <id>", "baseline experiment ID")
   .requiredOption("--candidate <id>", "candidate experiment ID")
-  .action((opts: { baseline: string; candidate: string }) async => {
+  .action(async (opts: { baseline: string; candidate: string }) => {
     const lab = await import("./lab/cognitionLab.js");
     const pairs = lab.compareExperiments(opts.baseline, opts.candidate);
     if (pairs.length === 0) {
@@ -14826,7 +14826,7 @@ program
   .command("lab-list")
   .description("List all lab experiments")
   .option("--kind <kind>", "filter by experiment kind")
-  .action((opts: { kind?: string }) async => {
+  .action(async (opts: { kind?: string }) => {
     const lab = await import("./lab/cognitionLab.js");
     const exps = lab.listLabExperiments(opts.kind as never);
     if (exps.length === 0) {
@@ -14843,7 +14843,7 @@ program
   .command("insider-risk-report")
   .description("Generate insider risk analytics report")
   .option("--window <days>", "reporting window in days", "7")
-  .action((opts: { window: string }) async => {
+  .action(async (opts: { window: string }) => {
     const ir = await import("./audit/insiderRisk.js");
     const windowMs = parseInt(opts.window, 10) * 86400000;
     const report = ir.generateInsiderRiskReport(Date.now() - windowMs, Date.now());
@@ -14855,7 +14855,7 @@ program
   .description("Show insider risk alerts")
   .option("--actor <id>", "filter by actor ID")
   .option("--ack <alertId>", "acknowledge an alert")
-  .action((opts: { actor?: string; ack?: string }) async => {
+  .action(async (opts: { actor?: string; ack?: string }) => {
     const ir = await import("./audit/insiderRisk.js");
     if (opts.ack) {
       const result = ir.acknowledgeInsiderAlert(opts.ack);
@@ -14877,7 +14877,7 @@ program
 program
   .command("insider-risk-scores")
   .description("Show insider risk scores by actor")
-  .action(() async => {
+  .action(async () => {
     const ir = await import("./audit/insiderRisk.js");
     const scores = ir.computeInsiderRiskScores();
     if (scores.length === 0) {
@@ -14895,7 +14895,7 @@ program
   .command("attestation-export")
   .description("Export attestation bundle for external auditors")
   .requiredOption("--tenant <id>", "tenant ID")
-  .action((opts: { tenant: string }) async => {
+  .action(async (opts: { tenant: string }) => {
     const ir = await import("./audit/insiderRisk.js");
     const bundle = ir.exportAttestationBundle(opts.tenant);
     console.log(chalk.bold(`\nAttestation Bundle: ${bundle.bundleId}`));
@@ -14916,7 +14916,7 @@ program
   .requiredOption("--run <id>", "assurance run ID")
   .requiredOption("--justification <text>", "why this is a false positive")
   .option("--reporter <name>", "who is filing", "cli-user")
-  .action((opts: { scenario: string; pack: string; run: string; justification: string; reporter: string }) async => {
+  .action(async (opts: { scenario: string; pack: string; run: string; justification: string; reporter: string }) => {
     const fp = await import("./assurance/falsePositiveTracker.js");
     const report = fp.submitFPReport({
       scenarioId: opts.scenario,
@@ -14935,7 +14935,7 @@ program
   .requiredOption("--id <reportId>", "FP report ID")
   .requiredOption("--status <status>", "confirmed or rejected")
   .requiredOption("--reason <text>", "resolution reason")
-  .action((opts: { id: string; status: string; reason: string }) async => {
+  .action(async (opts: { id: string; status: string; reason: string }) => {
     const fp = await import("./assurance/falsePositiveTracker.js");
     const result = fp.resolveFPReport(opts.id, {
       status: opts.status as "confirmed" | "rejected",
@@ -14953,7 +14953,7 @@ program
   .description("List false positive reports")
   .option("--pack <id>", "filter by pack ID")
   .option("--status <status>", "filter by status (open, confirmed, rejected)")
-  .action((opts: { pack?: string; status?: string }) async => {
+  .action(async (opts: { pack?: string; status?: string }) => {
     const fp = await import("./assurance/falsePositiveTracker.js");
     const reports = fp.listFPReports({
       packId: opts.pack,
@@ -14974,7 +14974,7 @@ program
   .command("fp-cost")
   .description("Show false positive cost summary")
   .option("--pack <id>", "filter by pack ID")
-  .action((opts: { pack?: string }) async => {
+  .action(async (opts: { pack?: string }) => {
     const fp = await import("./assurance/falsePositiveTracker.js");
     const summaries = fp.computeFPCostSummary(opts.pack);
     if (summaries.length === 0) {
@@ -14992,7 +14992,7 @@ program
   .description("Generate false positive tuning report with recommendations")
   .option("--window <days>", "reporting window in days", "30")
   .option("--threshold <rate>", "FP rate threshold for relax recommendation", "0.3")
-  .action((opts: { window: string; threshold: string }) async => {
+  .action(async (opts: { window: string; threshold: string }) => {
     const fp = await import("./assurance/falsePositiveTracker.js");
     const windowMs = parseInt(opts.window, 10) * 86400000;
     const report = fp.generateFPTuningReport({
@@ -15008,7 +15008,7 @@ program
   .command("wiring-status")
   .description("Show production wiring status for all modules (Items 11-16)")
   .option("--markdown", "output as markdown", false)
-  .action((opts: { markdown: boolean }) async => {
+  .action(async (opts: { markdown: boolean }) => {
     const pw = await import("./ops/productionWiring.js");
     if (opts.markdown) {
       console.log(pw.renderWiringDiagnosticsMarkdown());
@@ -15030,7 +15030,7 @@ program
   .description("Generate the Python SDK package for AMC Bridge API")
   .option("--endpoints", "list covered endpoints", false)
   .option("--coverage", "validate endpoint coverage", false)
-  .action((opts: { endpoints: boolean; coverage: boolean }) async => {
+  .action(async (opts: { endpoints: boolean; coverage: boolean }) => {
     const gen = await import("./sdk/pythonSdkGenerator.js");
     if (opts.endpoints) {
       const endpoints = gen.listPythonSdkEndpoints();
@@ -15069,7 +15069,7 @@ program
   .option("--region <region>", "region for new policy")
   .option("--isolation <level>", "isolation level: strict, shared, federated", "strict")
   .option("--custody <mode>", "key custody mode: local, notary, external-kms, external-hsm", "local")
-  .action((opts: { list: boolean; region?: string; isolation: string; custody: string }) async => {
+  .action(async (opts: { list: boolean; region?: string; isolation: string; custody: string }) => {
     const dr = await import("./compliance/dataResidency.js");
     if (opts.list) {
       const policies = dr.getResidencyPolicies();
@@ -15101,7 +15101,7 @@ program
   .requiredOption("--workspace <id>", "workspace ID")
   .requiredOption("--region <region>", "data region")
   .option("--isolation <level>", "isolation level", "strict")
-  .action((opts: { tenant: string; workspace: string; region: string; isolation: string }) async => {
+  .action(async (opts: { tenant: string; workspace: string; region: string; isolation: string }) => {
     const dr = await import("./compliance/dataResidency.js");
     const boundary = dr.registerTenant({
       tenantId: opts.tenant,
@@ -15115,7 +15115,7 @@ program
 program
   .command("tenant-isolation-check")
   .description("Check tenant isolation between all registered tenants")
-  .action(() async => {
+  .action(async () => {
     const dr = await import("./compliance/dataResidency.js");
     const checks = dr.checkAllTenantIsolation();
     if (checks.length === 0) {
@@ -15140,7 +15140,7 @@ program
   .option("--tenant <id>", "tenant ID")
   .option("--reason <text>", "reason for hold")
   .option("--issued-by <name>", "issuer name")
-  .action((opts: { issue: boolean; release?: string; list: boolean; tenant?: string; reason?: string; issuedBy?: string }) async => {
+  .action(async (opts: { issue: boolean; release?: string; list: boolean; tenant?: string; reason?: string; issuedBy?: string }) => {
     const dr = await import("./compliance/dataResidency.js");
     if (opts.list) {
       const holds = dr.getActiveLegalHolds(opts.tenant);
@@ -15169,7 +15169,7 @@ program
 program
   .command("redaction-test")
   .description("Run privacy redaction tests against built-in rules")
-  .action(() async => {
+  .action(async () => {
     const dr = await import("./compliance/dataResidency.js");
     const suite = dr.runRedactionTests();
     console.log(chalk.bold(`\nRedaction Test Suite: ${suite.suiteId}\n`));
@@ -15185,7 +15185,7 @@ program
   .description("Generate data residency compliance report for a tenant")
   .requiredOption("--tenant <id>", "tenant ID")
   .option("--redaction-tests", "include privacy redaction tests", false)
-  .action((opts: { tenant: string; redactionTests: boolean }) async => {
+  .action(async (opts: { tenant: string; redactionTests: boolean }) => {
     const dr = await import("./compliance/dataResidency.js");
     const report = dr.generateResidencyReport(opts.tenant, { includeRedactionTests: opts.redactionTests });
     console.log(dr.renderResidencyReportMarkdown(report));
@@ -15194,7 +15194,7 @@ program
 program
   .command("key-custody-modes")
   .description("List available key custody modes and their configurations")
-  .action(() async => {
+  .action(async () => {
     const dr = await import("./compliance/dataResidency.js");
     const modes = dr.listKeyCustodyModes();
     console.log(chalk.bold("\nKey Custody Modes:\n"));
@@ -15213,7 +15213,7 @@ program
   .option("--role <role>", "dashboard role: operator, executive, auditor", "operator")
   .option("--run <runId>", "specific run ID to analyze (defaults to latest)")
   .option("--previous-run <runId>", "previous run ID for narrative diff")
-  .action((opts: { role: string; run?: string; previousRun?: string }) async => {
+  .action(async (opts: { role: string; run?: string; previousRun?: string }) => {
     const opux = await import("./ops/operatorUx.js");
     const validRoles = ["operator", "executive", "auditor"] as const;
     if (!(validRoles as readonly string[]).includes(opts.role)) {
@@ -15236,7 +15236,7 @@ program
   .command("why-capped")
   .description("Show why each question is capped at its current level")
   .option("--question <id>", "filter to specific question ID")
-  .action((opts: { question?: string }) async => {
+  .action(async (opts: { question?: string }) => {
     const opux = await import("./ops/operatorUx.js");
     const workspace = process.cwd();
     const agentId = activeAgent(program) ?? "default";
@@ -15261,7 +15261,7 @@ program
   .command("action-queue")
   .description("Show prioritized actions sorted by risk-reduction-per-effort")
   .option("--limit <n>", "max actions to show", "15")
-  .action((opts: { limit: string }) async => {
+  .action(async (opts: { limit: string }) => {
     const opux = await import("./ops/operatorUx.js");
     const workspace = process.cwd();
     const agentId = activeAgent(program) ?? "default";
@@ -15284,7 +15284,7 @@ program
 program
   .command("confidence-heatmap")
   .description("Display confidence heatmap by question and layer")
-  .action(() async => {
+  .action(async () => {
     const opux = await import("./ops/operatorUx.js");
     const workspace = process.cwd();
     const agentId = activeAgent(program) ?? "default";
@@ -15303,7 +15303,7 @@ program
 program
   .command("role-presets")
   .description("List available dashboard role presets")
-  .action(() async => {
+  .action(async () => {
     const opux = await import("./ops/operatorUx.js");
     const presets = opux.listRolePresets();
     console.log(chalk.bold("\nAvailable Dashboard Presets:\n"));
@@ -15443,7 +15443,7 @@ program
 program
   .command("integrate-list")
   .description("List available integration frameworks")
-  .action(() async => {
+  .action(async () => {
     const is = await import("./setup/integrationScaffold.js");
     const frameworks = is.listAvailableFrameworks();
     console.log(chalk.bold(`Available Integration Frameworks (${frameworks.length}):\n`));
@@ -15455,7 +15455,7 @@ program
 program
   .command("contract-tests")
   .description("Generate and display contract test suite for bridge API")
-  .action(() async => {
+  .action(async () => {
     const is = await import("./setup/integrationScaffold.js");
     const suite = is.generateContractTests();
     console.log(chalk.bold(`\nContract Test Suite: ${suite.suiteId}\n`));
@@ -15474,7 +15474,7 @@ program
   .requiredOption("--model <model>", "model to simulate")
   .requiredOption("--prompt <prompt>", "prompt text to send")
   .option("--error-rate <rate>", "simulated error rate (0.0-1.0)", "0.05")
-  .action((opts: { model: string; prompt: string; errorRate: string }) async => {
+  .action(async (opts: { model: string; prompt: string; errorRate: string }) => {
     const is = await import("./setup/integrationScaffold.js");
     const config = is.defaultSimulatorConfig();
     config.errorRate = parseFloat(opts.errorRate);
@@ -15493,7 +15493,7 @@ program
   .description("Generate live OpenAPI spec (Studio + Bridge + Gateway)")
   .option("--out <file>", "output file path (yaml/json)")
   .option("--json", "output raw JSON to stdout", false)
-  .action((opts: { out?: string; json: boolean }) async => {
+  .action(async (opts: { out?: string; json: boolean }) => {
     const { openapiGenerateCli, renderOpenApiYaml } = await import("./studio/openapi.js");
     const result = openapiGenerateCli({ out: opts.out });
     if (opts.out) {
@@ -15509,7 +15509,7 @@ program
 plugin
   .command("limits")
   .description("Show current plugin sandbox resource limits")
-  .action(() async => {
+  .action(async () => {
     const { resolveSandboxLimits, formatSandboxLimits } = await import("./plugins/sandboxLimits.js");
     const limits = resolveSandboxLimits();
     console.log(chalk.bold("\nPlugin Sandbox Resource Limits\n"));
@@ -15523,7 +15523,7 @@ cgx
   .description("Scan repository for semantic code edges")
   .requiredOption("--agent <agentId>", "agent ID")
   .requiredOption("--path <repoPath>", "repository path to scan")
-  .action((opts: { agent: string; path: string }) async => {
+  .action(async (opts: { agent: string; path: string }) => {
     const { scanCodeGraph, renderCodeGraphMarkdown } = await import("./cgx/semanticCodeEdges.js");
     const repoPath = resolve(opts.path);
     console.log(chalk.dim(`Scanning ${repoPath}...`));
@@ -15536,7 +15536,7 @@ program
   .command("claims-stale")
   .description("List stale claims for an agent")
   .option("--agent <agentId>", "agent ID (overrides global --agent)")
-  .action((opts: { agent?: string }) async => {
+  .action(async (opts: { agent?: string }) => {
     const { findStaleClaims, renderStaleClaimsMarkdown } = await import("./claims/claimExpiry.js");
     const ledger = openLedger(process.cwd());
     const db = ledger.db;
@@ -15550,7 +15550,7 @@ program
   .command("claims-sweep")
   .description("Process all stale claims for an agent (auto-demote to PROVISIONAL)")
   .option("--agent <agentId>", "agent ID (overrides global --agent)")
-  .action((opts: { agent?: string }) async => {
+  .action(async (opts: { agent?: string }) => {
     const { sweepStaleClaims, renderSweepResultMarkdown } = await import("./claims/claimExpiry.js");
     const ledger = openLedger(process.cwd());
     const db = ledger.db;
@@ -15566,7 +15566,7 @@ program
   .description("Track confidence drift per question across diagnostic runs")
   .option("--agent <agentId>", "agent ID (overrides global --agent)")
   .option("--window <window>", "time window (e.g., 30d)", "30d")
-  .action((opts: { agent?: string; window: string }) async => {
+  .action(async (opts: { agent?: string; window: string }) => {
     const { analyzeAgentConfidenceDrift, renderConfidenceDriftMarkdown } = await import("./claims/confidenceDrift.js");
     const ledger = openLedger(process.cwd());
     const db = ledger.db;
@@ -15583,7 +15583,7 @@ program
   .description("List lessons learned from corrections")
   .option("--scope <scope>", "fleet or agent", "fleet")
   .option("--agent <agentId>", "agent ID (for scope=agent)")
-  .action((opts: { scope: string; agent?: string }) async => {
+  .action(async (opts: { scope: string; agent?: string }) => {
     const { listLessons, renderLessonsMarkdown } = await import("./corrections/lessonStore.js");
     const scope = opts.scope === "agent" ? "agent" : "fleet";
     const agentId = opts.agent ?? activeAgent(program) ?? "default";
@@ -15595,7 +15595,7 @@ program
   .command("lessons-promote")
   .description("Promote a correction to a reusable lesson")
   .argument("<correctionId>", "correction ID to promote")
-  .action((correctionId: string) async => {
+  .action(async (correctionId: string) => {
     const { promoteCorrection } = await import("./corrections/lessonStore.js");
     const ledger = openLedger(process.cwd());
     const db = ledger.db;
@@ -15614,7 +15614,7 @@ program
   .command("corrections-verify-closure")
   .description("Show open feedback loops that need closure")
   .requiredOption("--agent <id>", "Agent ID")
-  .action((opts: { agent: string }) async => {
+  .action(async (opts: { agent: string }) => {
     const { generateFeedbackClosureReport, renderFeedbackClosureReport } = await import("./corrections/feedbackClosure.js");
     const ledger = openLedger(process.cwd());
     const db = ledger.db;
@@ -15628,7 +15628,7 @@ program
   .command("receipts-chain")
   .description("Show full delegation chain for a receipt")
   .argument("<receiptId>", "receipt ID to trace")
-  .action((receiptId: string) async => {
+  .action(async (receiptId: string) => {
     const { verifyDelegationChain, renderDelegationChainMarkdown } = await import("./receipts/receiptChain.js");
     // In practice, public keys would be loaded from workspace
     const publicKeys: string[] = [];
@@ -15648,7 +15648,7 @@ program
   .option("--agent <agentId>", "agent ID (overrides global --agent)")
   .requiredOption("--pack <packId>", "policy pack ID to canary")
   .option("--duration <duration>", "canary duration (e.g., 7d)", "7d")
-  .action((opts: { agent?: string; pack: string; duration: string }) async => {
+  .action(async (opts: { agent?: string; pack: string; duration: string }) => {
     const { startCanaryMode } = await import("./governor/policyCanaryMode.js");
     const agentId = opts.agent ?? activeAgent(program) ?? "default";
     const durationMs = parseWindowToMs(opts.duration);
@@ -15664,7 +15664,7 @@ program
   .command("policy-canary-report")
   .description("Generate canary mode report for an agent")
   .option("--agent <agentId>", "agent ID (overrides global --agent)")
-  .action((opts: { agent?: string }) async => {
+  .action(async (opts: { agent?: string }) => {
     const { generateCanaryReportForAgent, renderCanaryModeReportMarkdown } = await import("./governor/policyCanaryMode.js");
     const agentId = opts.agent ?? activeAgent(program) ?? "default";
     const report = generateCanaryReportForAgent(agentId);
@@ -15686,7 +15686,7 @@ program
   .option("--policies <policies>", "comma-separated affected policy IDs", "")
   .option("--risk <risk>", "LOW|MEDIUM|HIGH|CRITICAL", "MEDIUM")
   .option("--created-by <who>", "who created this", "operator")
-  .action((opts: { agent?: string; type: string; reason: string; expiry: string; policies: string; risk: string; createdBy: string }) async => {
+  .action(async (opts: { agent?: string; type: string; reason: string; expiry: string; policies: string; risk: string; createdBy: string }) => {
     const { addDebtEntry } = await import("./governor/policyDebt.js");
     const agentId = opts.agent ?? activeAgent(program) ?? "default";
     let expiryTs: number;
@@ -15713,7 +15713,7 @@ program
   .command("debt-list")
   .description("List policy debt entries")
   .option("--agent <agentId>", "agent ID (overrides global --agent)")
-  .action((opts: { agent?: string }) async => {
+  .action(async (opts: { agent?: string }) => {
     const { buildDebtDashboard, renderDebtDashboardMarkdown } = await import("./governor/policyDebt.js");
     const agentId = opts.agent ?? activeAgent(program) ?? "default";
     const dashboard = buildDebtDashboard(process.cwd(), agentId);
@@ -15728,7 +15728,7 @@ program
   .requiredOption("--reason <reason>", "reason for the emergency override (>= 10 chars)")
   .option("--ttl <ttl>", "TTL (e.g., 4h)", "4h")
   .option("--mode <mode>", "execute or dry-run", "dry-run")
-  .action((opts: { agent?: string; reason: string; ttl: string; mode: string }) async => {
+  .action(async (opts: { agent?: string; reason: string; ttl: string; mode: string }) => {
     const { activateOverride, renderOverrideMarkdown } = await import("./governor/emergencyOverride.js");
     const agentId = opts.agent ?? activeAgent(program) ?? "default";
     const ttlMs = parseWindowToMs(opts.ttl);
@@ -15747,7 +15747,7 @@ program
   .command("governor-override-alerts")
   .description("Show alerts for active/expired overrides")
   .option("--agent <agentId>", "agent ID (overrides global --agent)")
-  .action((opts: { agent?: string }) async => {
+  .action(async (opts: { agent?: string }) => {
     const { getOverrideAlerts, renderOverrideAlertsMarkdown } = await import("./governor/emergencyOverride.js");
     const agentId = opts.agent ?? activeAgent(program) ?? "default";
     const alerts = getOverrideAlerts(process.cwd(), agentId);
@@ -15760,7 +15760,7 @@ const orgCommunity = org.command("community").description("Community/platform go
 orgCommunity
   .command("init")
   .requiredOption("--platform <name>", "platform name")
-  .action((opts: { platform: string }) async => {
+  .action(async (opts: { platform: string }) => {
     const { initCommunityPlatform } = await import("./org/communityGovernance.js");
     const config = initCommunityPlatform(opts.platform);
     console.log(JSON.stringify(config, null, 2));
@@ -15770,7 +15770,7 @@ orgCommunity
 orgCommunity
   .command("score")
   .requiredOption("--platform <name>", "platform name")
-  .action((opts: { platform: string }) async => {
+  .action(async (opts: { platform: string }) => {
     const { initCommunityPlatform, scoreCommunityGovernance, renderCommunityGovernanceMarkdown } = await import("./org/communityGovernance.js");
     const config = initCommunityPlatform(opts.platform);
     const report = scoreCommunityGovernance(config);
@@ -15784,7 +15784,7 @@ passport
   .requiredOption("--agent <id>", "agent ID")
   .requiredOption("--capability <name>", "capability name")
   .option("--evidence <eventId>", "evidence event ID")
-  .action((opts: { agent: string; capability: string; evidence?: string }) async => {
+  .action(async (opts: { agent: string; capability: string; evidence?: string }) => {
     const { createDiscoveryRegistry, addCapability } = await import("./passport/agentDiscovery.js");
     const registry = createDiscoveryRegistry();
     const decl = addCapability(registry, opts.agent, opts.capability, opts.evidence ? [opts.evidence] : []);
@@ -15797,7 +15797,7 @@ passport
   .description("Search agents by capability and minimum maturity level")
   .requiredOption("--capability <name>", "capability to search for")
   .option("--min-level <n>", "minimum maturity level", "0")
-  .action((opts: { capability: string; minLevel: string }) async => {
+  .action(async (opts: { capability: string; minLevel: string }) => {
     const { createDiscoveryRegistry, searchCapabilities } = await import("./passport/agentDiscovery.js");
     const registry = createDiscoveryRegistry();
     const results = searchCapabilities(registry, { capability: opts.capability, minLevel: Number(opts.minLevel) });
@@ -15810,7 +15810,7 @@ passport
   .requiredOption("--agent <id>", "agent ID")
   .requiredOption("--platform <name>", "platform name")
   .requiredOption("--identity <handle>", "identity handle on platform")
-  .action((opts: { agent: string; platform: string; identity: string }) async => {
+  .action(async (opts: { agent: string; platform: string; identity: string }) => {
     const { createDiscoveryRegistry, linkPlatform } = await import("./passport/agentDiscovery.js");
     const registry = createDiscoveryRegistry();
     const link = linkPlatform(registry, opts.agent, opts.platform, opts.identity);
@@ -15823,7 +15823,7 @@ program
   .command("unknowns")
   .description("List known unknowns for an agent's latest diagnostic run")
   .option("--agent <id>", "agent ID")
-  .action((opts: { agent?: string }) async => {
+  .action(async (opts: { agent?: string }) => {
     const agentId = opts.agent ?? activeAgent(program) ?? "default";
     const { generateKnownUnknownsReport, renderKnownUnknownsMarkdown } = await import("./diagnostic/knownUnknowns.js");
     const workspace = process.cwd();
@@ -15843,7 +15843,7 @@ program
   .description("Report confidence in the maturity score itself")
   .option("--agent <id>", "agent ID")
   .option("--run <runId>", "specific run ID")
-  .action((opts: { agent?: string; run?: string }) async => {
+  .action(async (opts: { agent?: string; run?: string }) => {
     const agentId = opts.agent ?? activeAgent(program) ?? "default";
     const { computeDiagnosticMetaConfidence, renderMetaConfidenceMarkdown } = await import("./diagnostic/metaConfidence.js");
     const workspace = process.cwd();
@@ -15863,7 +15863,7 @@ governor
   .requiredOption("--action <class>", "ActionClass")
   .option("--agent <id>", "agent ID")
   .option("--required-level <n>", "required maturity level", "3")
-  .action((opts: { action: string; agent?: string; requiredLevel: string }) async => {
+  .action(async (opts: { action: string; agent?: string; requiredLevel: string }) => {
     const agentId = opts.agent ?? activeAgent(program) ?? "default";
     const { confidenceCheck, renderConfidenceGovernorMarkdown } = await import("./governor/confidenceGovernor.js");
     const workspace = process.cwd();
@@ -15887,7 +15887,7 @@ program
   .command("confidence-components")
   .description("Show per-component confidence breakdown")
   .option("--agent <id>", "agent ID")
-  .action((opts: { agent?: string }) async => {
+  .action(async (opts: { agent?: string }) => {
     const agentId = opts.agent ?? activeAgent(program) ?? "default";
     const { computeComponentConfidence, renderComponentConfidenceMarkdown } = await import("./diagnostic/componentConfidence.js");
     const workspace = process.cwd();
@@ -19959,7 +19959,7 @@ redteamCmd
   .command("strategies")
   .description("List available attack strategies")
   .option("--json", "JSON output")
-  .action((opts: { json?: boolean }) async => {
+  .action(async (opts: { json?: boolean }) => {
     const strats = listStrategies();
     if (opts.json) {
       console.log(JSON.stringify(strats.map(({ id, name, description }) => ({ id, name, description })), null, 2));
