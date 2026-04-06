@@ -52,10 +52,10 @@ export const archetypeSchema = z.object({
   description: z.string().min(1),
   recommendedRiskTier: riskTierSchema,
   contextGraphSeed: contextGraphSeedSchema,
-  recommendedTarget: z.record(z.number().int().min(0).max(5)),
+  recommendedTarget: z.record(z.string(), z.number().int().min(0).max(5)),
   guardrailPatterns: z.array(guardrailPatternSchema).min(1),
   evalHarnessRecipes: z.array(evalHarnessRecipeSchema).min(1),
-  fourCUpgradeMapping: z.record(fourCSchema)
+  fourCUpgradeMapping: z.record(z.string(), fourCSchema)
 });
 
 export type Archetype = z.infer<typeof archetypeSchema>;

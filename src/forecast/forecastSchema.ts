@@ -212,8 +212,8 @@ const forecastSeriesBlockSchema = z.object({
     Capabilities: forecastSeriesSchema,
     Configuration: forecastSeriesSchema
   }),
-  indices: z.record(forecastIndexIdSchema, forecastSeriesSchema),
-  value: z.record(forecastValueDimensionSchema, forecastSeriesSchema),
+  indices: z.partialRecord(forecastIndexIdSchema, forecastSeriesSchema),
+  value: z.partialRecord(forecastValueDimensionSchema, forecastSeriesSchema),
   operating: z.record(z.string(), forecastSeriesSchema)
 });
 

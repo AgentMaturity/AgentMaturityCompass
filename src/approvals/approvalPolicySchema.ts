@@ -34,7 +34,7 @@ export const approvalPolicySchema = z.object({
     defaults: z.object({
       simulateAlwaysAllowed: z.boolean().default(true)
     }),
-    actionClasses: z.record(actionClassSchema, approvalClassPolicySchema)
+    actionClasses: z.partialRecord(actionClassSchema, approvalClassPolicySchema)
   })
 });
 

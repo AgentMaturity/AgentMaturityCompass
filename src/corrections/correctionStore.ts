@@ -367,7 +367,7 @@ const correctionDbRowSchema = z.object({
 });
 
 const correctionQuestionIdsSchema = z.array(z.string());
-const correctionLevelsSchema = z.record(z.number());
+const correctionLevelsSchema = z.record(z.string(), z.number());
 
 function parseJsonField<T>(fieldName: string, raw: string, schema: z.ZodType<T>): T {
   let parsed: unknown;

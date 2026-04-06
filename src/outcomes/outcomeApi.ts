@@ -22,7 +22,7 @@ const outcomeWebhookPayloadSchema = z.object({
   unit: z.string().min(1).optional(),
   ts: z.number().int().optional(),
   workOrderId: z.string().min(1).optional(),
-  meta: z.record(z.unknown()).optional()
+  meta: z.record(z.string(), z.unknown()).optional()
 });
 
 function normalizeSig(sigHeader: string): string {

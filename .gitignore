@@ -71,3 +71,4 @@ exports/
 .amc/blobs/
 .amc/ledger/
 .amc/reports/
+swarm-report.json

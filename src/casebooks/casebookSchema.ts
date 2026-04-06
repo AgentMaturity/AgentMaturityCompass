@@ -13,7 +13,7 @@ export const casebookCaseSchema = z.object({
   allowedActionClasses: z.array(z.string().min(1)).min(1),
   inputs: z.object({
     prompt: z.string().min(1),
-    context: z.record(z.unknown()).optional()
+    context: z.record(z.string(), z.unknown()).optional()
   }),
   validators: z.object({
     requiredToolActions: z.array(z.string().min(1)).default([]),

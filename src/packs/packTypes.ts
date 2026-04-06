@@ -343,10 +343,10 @@ export const packManifestSchema = z.object({
     url: z.string().url(),
     email: z.string().email().optional(),
   }).optional(),
-  dependencies: z.record(z.string()),
-  devDependencies: z.record(z.string()).optional(),
-  peerDependencies: z.record(z.string()).optional(),
-  optionalDependencies: z.record(z.string()).optional(),
+  dependencies: z.record(z.string(), z.string()),
+  devDependencies: z.record(z.string(), z.string()).optional(),
+  peerDependencies: z.record(z.string(), z.string()).optional(),
+  optionalDependencies: z.record(z.string(), z.string()).optional(),
   engines: z.object({
     node: z.string().optional(),
     amc: z.string().optional(),
@@ -396,7 +396,7 @@ export const packManifestSchema = z.object({
       endpoints: z.array(z.string()),
       authentication: z.object({
         type: z.enum(["none", "apikey", "oauth", "basic"]),
-        config: z.record(z.any()).optional(),
+        config: z.record(z.string(), z.any()).optional(),
       }).optional(),
     })).optional(),
   }),
@@ -445,8 +445,8 @@ export const packRegistryEntrySchema = z.object({
   "dist-tags": z.object({
     latest: z.string(),
   }).catchall(z.string()),
-  versions: z.record(z.any()),
-  time: z.record(z.string()),
+  versions: z.record(z.string(), z.any()),
+  time: z.record(z.string(), z.string()),
   maintainers: z.array(z.object({
     name: z.string(),
     email: z.string(),
@@ -511,11 +511,11 @@ export interface PackLock {
 
 export const packLockSchema = z.object({
   lockfileVersion: z.number(),
-  packages: z.record(z.object({
+  packages: z.record(z.string(), z.object({
     version: z.string(),
     resolved: z.string(),
     integrity: z.string(),
-    dependencies: z.record(z.string()).optional(),
+    dependencies: z.record(z.string(), z.string()).optional(),
     dev: z.boolean().optional(),
     optional: z.boolean().optional(),
   })),

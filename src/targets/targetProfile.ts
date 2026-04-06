@@ -16,7 +16,7 @@ const targetProfileSchema = z.object({
   name: z.string(),
   createdTs: z.number(),
   contextGraphHash: z.string(),
-  mapping: z.record(z.number().int().min(0).max(5)),
+  mapping: z.record(z.string(), z.number().int().min(0).max(5)),
   signature: z.string()
 });
 

@@ -12,7 +12,7 @@ const payloadSchema = z.object({
   createdTs: z.number().int(),
   auditorPrivateKeyPem: z.string().min(1),
   sessionPrivateKeyPem: z.string().min(1),
-  secrets: z.record(z.string()).default({})
+  secrets: z.record(z.string(), z.string()).default({})
 });
 
 type HostVaultPayload = z.infer<typeof payloadSchema>;

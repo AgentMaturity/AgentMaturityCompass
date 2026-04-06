@@ -132,7 +132,7 @@ export const cgxContextPackSchema = z.object({
   }),
   equalizerTargets: z.object({
     profileId: z.string().nullable(),
-    questionTargets: z.record(z.number().int().min(0).max(5))
+    questionTargets: z.record(z.string(), z.number().int().min(0).max(5))
   }),
   freeze: z.object({
     active: z.boolean(),

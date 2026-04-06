@@ -73,7 +73,7 @@ function parseEventForRunner(workspace: string, event: EvidenceEvent): ParsedEvi
 }
 
 const claimsSchema = z.object({
-  claimedLevels: z.record(z.number().int().min(0).max(5))
+  claimedLevels: z.record(z.string(), z.number().int().min(0).max(5))
 });
 
 function clamp(n: number, min: number, max: number): number {

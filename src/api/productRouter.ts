@@ -15,7 +15,7 @@ const submitPortalBodySchema = z.object({
   name: z.string().trim().min(1),
   type: z.string().trim().min(1),
   submittedBy: z.string().trim().min(1),
-  payload: z.record(z.unknown()).optional()
+  payload: z.record(z.string(), z.unknown()).optional()
 }).strict();
 
 export async function handleProductRoute(

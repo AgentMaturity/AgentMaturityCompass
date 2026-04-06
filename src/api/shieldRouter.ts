@@ -80,8 +80,8 @@ export async function handleShieldRoute(
   if (pathname === '/api/v1/shield/red-team/run' && method === 'POST') {
     try {
       const body = await bodyJsonSchema(req, z.object({
-        targetProfile: z.record(z.unknown()).optional(),
-        config: z.record(z.unknown()).optional(),
+        targetProfile: z.record(z.string(), z.unknown()).optional(),
+        config: z.record(z.string(), z.unknown()).optional(),
       }).strict());
       const { ContinuousRedTeam } = await import('../shield/continuousRedTeam.js');
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -112,7 +112,7 @@ export async function handleShieldRoute(
         agentId: z.string().min(1),
         action: z.string().min(1),
         toolName: z.string().min(1),
-        parameters: z.record(z.unknown()).default({}),
+        parameters: z.record(z.string(), z.unknown()).default({}),
         sessionId: z.string().min(1),
         workspaceId: z.string().min(1),
       }));
@@ -130,7 +130,7 @@ export async function handleShieldRoute(
   if (pathname === '/api/v1/shield/red-team/attack' && method === 'POST') {
     try {
       const body = await bodyJsonSchema(req, z.object({
-        targetProfile: z.record(z.unknown()).optional(),
+        targetProfile: z.record(z.string(), z.unknown()).optional(),
         attackType: z.string().optional(),
       }).strict());
       const { DynamicAttackGenerator } = await import('../shield/dynamicAttackGenerator.js');

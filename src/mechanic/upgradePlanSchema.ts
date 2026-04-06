@@ -20,7 +20,7 @@ export const mechanicPlanActionSchema = z.object({
   requiresApproval: z.boolean(),
   effect: z.string().min(1),
   evidenceToVerify: z.array(z.string().min(1)).default([]),
-  params: z.record(z.unknown()).default({}),
+  params: z.record(z.string(), z.unknown()).default({}),
   approvalRequestId: z.string().min(1).optional(),
   executedTs: z.number().int().optional(),
   executionStatus: z.enum(["PENDING", "EXECUTED", "FAILED", "SKIPPED"]).default("PENDING"),

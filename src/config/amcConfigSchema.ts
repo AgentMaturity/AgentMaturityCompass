@@ -24,7 +24,7 @@ export const amcProviderSchema = z.object({
   /** Default model to use */
   model: z.string().optional(),
   /** Extra headers to inject */
-  headers: z.record(z.string()).optional(),
+  headers: z.record(z.string(), z.string()).optional(),
 });
 
 export type AMCProvider = z.infer<typeof amcProviderSchema>;
@@ -57,7 +57,7 @@ export const amcAgentSchema = z.object({
   /** Command arguments */
   args: z.array(z.string()).optional(),
   /** Extra environment variables */
-  env: z.record(z.string()).optional(),
+  env: z.record(z.string(), z.string()).optional(),
 });
 
 export type AMCAgent = z.infer<typeof amcAgentSchema>;
@@ -80,7 +80,7 @@ export const thresholdsSchema = z.object({
   /** Minimum overall maturity level (0-5) */
   minOverallLevel: z.number().min(0).max(5).default(2),
   /** Per-layer minimum levels */
-  layers: z.record(layerNameSchema, z.number().min(0).max(5)).optional(),
+  layers: z.partialRecord(layerNameSchema, z.number().min(0).max(5)).optional(),
   /** Require OBSERVED trust tier for L5 claims */
   requireObservedForLevel5: z.boolean().default(true),
   /** Deny if trust label is LOW */
@@ -259,7 +259,7 @@ export const amcDeclarativeConfigSchema = z.object({
   }).optional(),
 
   /** Extra environment variables for all agents */
-  env: z.record(z.string()).optional(),
+  env: z.record(z.string(), z.string()).optional(),
 });
 
 export type AMCDeclarativeConfig = z.infer<typeof amcDeclarativeConfigSchema>;

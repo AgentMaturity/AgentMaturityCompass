@@ -12,7 +12,7 @@ export const mechanicTargetsSchema = z
       version: z.literal(1),
       scope: mechanicScopeSchema,
       mode: z.enum(["DESIRED", "EXCELLENCE"]),
-      targets: z.record(z.number().int().min(0).max(5)),
+      targets: z.record(z.string(), z.number().int().min(0).max(5)),
       dimensionMinimums: z
         .object({
           "DIM-1": z.number().int().min(0).max(5).optional(),

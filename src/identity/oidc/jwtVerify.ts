@@ -26,7 +26,7 @@ function fromBase64Url(value: string): Buffer {
 
 function toPemFromJwk(jwk: Record<string, unknown>): string {
   return createPublicKey({
-    key: jwk as import("node:crypto").JsonWebKey,
+    key: jwk as any,
     format: "jwk"
   })
     .export({ format: "pem", type: "spki" })

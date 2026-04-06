@@ -176,7 +176,7 @@ export const architectureSpecSchema = z.object({
   modelId: z.string().min(1),
   artifactSha256: z.string().length(64),
   description: z.string(),
-  metadata: z.record(z.string()),
+  metadata: z.record(z.string(), z.string()),
   createdTs: z.number().int(),
 });
 

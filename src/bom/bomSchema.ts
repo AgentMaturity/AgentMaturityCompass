@@ -20,8 +20,8 @@ export const maturityBomSchema = z.object({
       confidenceWeightedFinalLevel: z.number()
     })
   ),
-  assurancePackScores: z.record(z.number().min(0).max(100)),
-  indices: z.record(z.number().min(0).max(100)),
+  assurancePackScores: z.record(z.string(), z.number().min(0).max(100)),
+  indices: z.record(z.string(), z.number().min(0).max(100)),
   activeFreezeActionClasses: z.array(z.string()),
   git: z.object({
     commit: z.string().nullable(),

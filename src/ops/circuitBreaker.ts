@@ -32,18 +32,18 @@ export const circuitBreakerPolicySchema = z.object({
     maxPendingWrites: z.number().int().min(1).default(100),
     maxQueueLatencyMs: z.number().int().min(100).default(5_000),
     degradeOnExceed: z.boolean().default(true),
-  }).default({}),
+  }).prefault({}),
   deadLetter: z.object({
     enabled: z.boolean().default(true),
     maxEntries: z.number().int().min(1).default(1000),
     retryIntervalMs: z.number().int().min(1000).default(30_000),
     maxRetries: z.number().int().min(0).default(3),
-  }).default({}),
+  }).prefault({}),
   watchdog: z.object({
     enabled: z.boolean().default(true),
     checkIntervalMs: z.number().int().min(1000).default(10_000),
     stuckSessionThresholdMs: z.number().int().min(5000).default(300_000),
-  }).default({}),
+  }).prefault({}),
 });
 
 export type CircuitBreakerPolicy = z.infer<typeof circuitBreakerPolicySchema>;

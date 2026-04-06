@@ -4,7 +4,7 @@ export const mechanicProfileSchema = z.object({
   id: z.string().min(1),
   name: z.string().min(1),
   description: z.string().min(1),
-  targets: z.record(z.number().int().min(0).max(5)),
+  targets: z.record(z.string(), z.number().int().min(0).max(5)),
   recommended: z.object({
     policyPacks: z.array(z.string().min(1)).default([]),
     budgetsBaseline: z.string().min(1),

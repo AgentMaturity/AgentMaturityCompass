@@ -20,7 +20,7 @@ export const notarySignResponseSchema = z.object({
   signedTs: z.number().int(),
   backend: z.enum(["FILE_SEALED", "EXTERNAL_SIGNER"]),
   attestationLevel: notaryAttestationLevelSchema,
-  claims: z.record(z.unknown()).default({})
+  claims: z.record(z.string(), z.unknown()).default({})
 });
 export type NotarySignResponse = z.infer<typeof notarySignResponseSchema>;
 
@@ -32,7 +32,7 @@ export const notaryAttestPayloadSchema = z.object({
     pubkeyFingerprint: z.string().length(64),
     backend: z.enum(["FILE_SEALED", "EXTERNAL_SIGNER"]),
     attestationLevel: notaryAttestationLevelSchema,
-    claims: z.record(z.unknown()).default({})
+    claims: z.record(z.string(), z.unknown()).default({})
   }),
   runtime: z.object({
     amcVersion: z.string().min(1),

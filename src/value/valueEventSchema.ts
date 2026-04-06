@@ -48,7 +48,7 @@ export const valueWebhookPayloadSchema = z.object({
       kpiId: z.string().min(1),
       value: z.number(),
       unit: z.string().min(1).optional(),
-      labels: z.record(z.string()).optional()
+      labels: z.record(z.string(), z.string()).optional()
     })
   ).min(1)
 });

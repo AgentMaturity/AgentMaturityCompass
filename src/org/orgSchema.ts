@@ -31,7 +31,7 @@ export const orgPoliciesSchema = z.object({
   inheritance: z.object({
     enabled: z.boolean().default(true)
   }),
-  defaultsByNode: z.record(orgNodeDefaultsSchema).default({})
+  defaultsByNode: z.record(z.string(), orgNodeDefaultsSchema).default({})
 });
 
 export const orgSchema = z.object({

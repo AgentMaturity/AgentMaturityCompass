@@ -76,7 +76,7 @@ const passportRevocationEntrySchema = z.object({
 
 const passportRevocationFileSchema = z.object({
   v: z.literal(1),
-  revocations: z.record(passportRevocationEntrySchema)
+  revocations: z.record(z.string(), passportRevocationEntrySchema)
 });
 
 export type PassportRevocationEntry = z.infer<typeof passportRevocationEntrySchema>;

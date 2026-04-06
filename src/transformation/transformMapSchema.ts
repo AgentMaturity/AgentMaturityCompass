@@ -51,9 +51,9 @@ const interventionSchema = z.object({
   }),
   prerequisites: z
     .object({
-      minLevels: z.record(z.number().int().min(0).max(5)).optional(),
+      minLevels: z.record(z.string(), z.number().int().min(0).max(5)).optional(),
       requireAssurance: z
-        .record(
+        .record(z.string(),
           z.object({
             minScore: z.number().min(0).max(100),
             maxSucceeded: z.number().int().min(0)
@@ -78,13 +78,13 @@ export const transformMapSchema = z
   .object({
     transformMap: z.object({
       version: z.literal(1),
-      questionTo4C: z.record(
+      questionTo4C: z.record(z.string(), 
         z.object({
           primary: fourCSchema,
           secondary: z.array(fourCSchema).default([])
         })
       ),
-      questionInterventions: z.record(z.array(interventionSchema).min(1))
+      questionInterventions: z.record(z.string(), z.array(interventionSchema).min(1))
     })
   })
   .superRefine((value, ctx) => {

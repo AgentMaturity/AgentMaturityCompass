@@ -31,8 +31,8 @@ const transformTaskSchema = z.object({
   effort: z.number().int().min(1).max(5),
   phase: z.string().min(1),
   impact: z.object({
-    indices: z.record(z.number()),
-    value: z.record(z.number())
+    indices: z.record(z.string(), z.number()),
+    value: z.record(z.string(), z.number())
   }),
   owners: z.object({
     primaryRole: z.enum(["OWNER", "OPERATOR", "APPROVER", "AUDITOR", "AGENT"]),
@@ -85,10 +85,10 @@ export const transformPlanSchema = z.object({
   baseline: z.object({
     runId: z.string().min(1),
     overall: z.number().min(0).max(5),
-    layers: z.record(z.number()),
+    layers: z.record(z.string(), z.number()),
     integrityIndex: z.number().min(0).max(1),
     trustLabel: z.string().min(1),
-    indices: z.record(z.number()),
+    indices: z.record(z.string(), z.number()),
     value: z.object({
       ValueScore: z.number(),
       EconomicSignificanceIndex: z.number()
@@ -96,7 +96,7 @@ export const transformPlanSchema = z.object({
   }),
   target: z.object({
     mode: z.enum(["SIGNED_EQUALIZER", "EXCELLENCE_5", "CUSTOM"]),
-    questionTargets: z.record(z.number().int().min(0).max(5))
+    questionTargets: z.record(z.string(), z.number().int().min(0).max(5))
   }),
   phases: z
     .array(

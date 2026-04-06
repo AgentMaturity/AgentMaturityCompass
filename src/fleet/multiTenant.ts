@@ -23,7 +23,7 @@ export const tenantSchema = z.object({
     allowAnonymizedBenchmarking: z.boolean().default(false),
     dataRetentionDays: z.number().int().default(365),
     customComplianceFrameworks: z.array(z.string()).default([]),
-  }).default({}),
+  }).prefault({}),
 });
 
 export type Tenant = z.infer<typeof tenantSchema>;

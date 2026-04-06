@@ -23,13 +23,13 @@ const actionClassSchema = z.enum([
 const budgetsSchema = z.object({
   budgets: z.object({
     version: z.literal(1),
-    perAgent: z.record(
+    perAgent: z.record(z.string(), 
       z.object({
         daily: z.object({
           maxLlmRequests: z.number().int().positive(),
           maxLlmTokens: z.number().int().positive(),
           maxCostUsd: z.number().positive(),
-          maxToolExecutes: z.record(actionClassSchema, z.number().int().min(0))
+          maxToolExecutes: z.partialRecord(actionClassSchema, z.number().int().min(0))
         }),
         perMinute: z.object({
           maxLlmRequests: z.number().int().positive(),

@@ -21,7 +21,7 @@ export const adapterConfigSchema = z.object({
       leaseTtlMinutes: z.number().int().min(1).max(24 * 60).default(60),
       modelDefault: z.string().min(1).default("gpt-4o-mini")
     }),
-    perAgent: z.record(adapterAgentProfileSchema).default({})
+    perAgent: z.record(z.string(), adapterAgentProfileSchema).default({})
   })
 });
 

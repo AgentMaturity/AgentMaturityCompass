@@ -50,7 +50,7 @@ const enforceEvaluateBodySchema = z.object({
   action: z.string().trim().min(1),
   tool: z.string().trim().min(1).optional(),
   agentId: z.string().trim().min(1).optional(),
-  context: z.record(z.unknown()).optional()
+  context: z.record(z.string(), z.unknown()).optional()
 }).strict();
 
 type EnforceEvaluateBody = z.infer<typeof enforceEvaluateBodySchema>;
@@ -112,7 +112,7 @@ export async function handleEnforceRoute(
           kind: z.string(),
           severity: z.string(),
         }).passthrough().optional(),
-        agentState: z.record(z.unknown()).optional(),
+        agentState: z.record(z.string(), z.unknown()).optional(),
       }));
       const { boundedModelCheck, CORE_SAFETY_PROPERTIES } = await import('../enforce/formalVerification.js');
       const property = (body.property as unknown as Parameters<typeof boundedModelCheck>[0]) ?? CORE_SAFETY_PROPERTIES[0]!;
@@ -142,7 +142,7 @@ export async function handleEnforceRoute(
   if (pathname === '/api/v1/enforce/formal/certificate' && method === 'POST') {
     try {
       const body = await bodyJsonSchema(req, z.object({
-        certificate: z.record(z.unknown()),
+        certificate: z.record(z.string(), z.unknown()),
       }));
       const { verifyCertificate } = await import('../enforce/formalVerification.js');
       const result = verifyCertificate(body.certificate as unknown as Parameters<typeof verifyCertificate>[0]);

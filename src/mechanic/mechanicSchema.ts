@@ -31,8 +31,8 @@ export const mechanicGapReportSchema = z.object({
     upgradeReadiness: z.enum(["READY", "NEEDS_EVIDENCE", "UNTRUSTED"]),
     integrityIndex: z.number().min(0).max(1),
     correlationRatio: z.number().min(0).max(1),
-    strategyFailureRisks: z.record(z.number()).default({}),
-    valueDimensions: z.record(z.number()).default({})
+    strategyFailureRisks: z.record(z.string(), z.number()).default({}),
+    valueDimensions: z.record(z.string(), z.number()).default({})
   })
 });
 

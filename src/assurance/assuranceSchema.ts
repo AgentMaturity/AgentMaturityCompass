@@ -100,7 +100,7 @@ export type AssurancePackRun = z.infer<typeof assurancePackRunSchema>;
 export const assuranceScoreSchema = z.object({
   status: assuranceStatusSchema,
   riskAssuranceScore: z.number().min(0).max(100).nullable(),
-  categoryScores: z.record(assuranceFindingCategorySchema, z.number().min(0).max(100)).default({} as Record<AssuranceFindingCategory, number>),
+  categoryScores: z.partialRecord(assuranceFindingCategorySchema, z.number().min(0).max(100)).default({} as Record<AssuranceFindingCategory, number>),
   findingCounts: z.object({
     critical: z.number().int().min(0),
     high: z.number().int().min(0),
@@ -198,7 +198,7 @@ export const assuranceCertSchema = z.object({
   runId: z.string().min(1),
   status: z.enum(["PASS", "FAIL", "INSUFFICIENT_EVIDENCE"]),
   riskAssuranceScore: z.number().min(0).max(100).nullable().optional(),
-  categoryScores: z.record(assuranceFindingCategorySchema, z.number().min(0).max(100)).nullable().optional(),
+  categoryScores: z.partialRecord(assuranceFindingCategorySchema, z.number().min(0).max(100)).nullable().optional(),
   findingCounts: z.object({
     critical: z.number().int().min(0),
     high: z.number().int().min(0),

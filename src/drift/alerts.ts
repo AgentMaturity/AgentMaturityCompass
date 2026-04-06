@@ -29,7 +29,7 @@ const alertsSchema = z.object({
           layerDropGte: z.number().min(0),
           integrityDropGte: z.number().min(0),
           correlationDropBelow: z.number().min(0).max(1),
-          assuranceDropBelow: z.record(z.number().min(0).max(100)).default({})
+          assuranceDropBelow: z.record(z.string(), z.number().min(0).max(100)).default({})
         }),
         actions: z.array(z.enum(["ALERT_OWNER", "FREEZE_EXECUTE", "CREATE_INCIDENT"])).min(1),
         freezeActionClasses: z

@@ -48,7 +48,7 @@ export const gatewayConfigSchema = z.object({
       .array(z.string())
       .default(["(?i)sk-[A-Za-z0-9]{10,}", "(?i)bearer\\s+[A-Za-z0-9._-]{10,}"])
   }),
-  upstreams: z.record(upstreamSchema),
+  upstreams: z.record(z.string(), upstreamSchema),
   routes: z.array(routeSchema).min(1),
   lease: z
     .object({
