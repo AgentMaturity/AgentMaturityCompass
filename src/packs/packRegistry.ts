@@ -6,6 +6,7 @@
  */
 
 import { createHash } from "node:crypto";
+import { spawnSync } from "node:child_process";
 import { join, resolve } from "node:path";
 import { readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync, statSync } from "node:fs";
 import { createServer, type Server } from "node:http";
@@ -519,11 +520,21 @@ export function validatePackManifest(manifest: unknown): PackValidationResult {
 }
 
 export function createPackTarball(packDir: string): Buffer {
-  // This would create a tarball from the pack directory
-  // For now, return a placeholder
-  const tar = require("tar");
-  const { createGzip } = require("zlib");
-  
-  // Implementation would use tar.create() to create tarball
-  throw new Error("createPackTarball not yet implemented");
+  if (!existsSync(packDir) || !statSync(packDir).isDirectory()) {
+    throw new Error(`pack directory not found: ${packDir}`);
+  }
+
+  const result = spawnSync("tar", ["-czf", "-", "-C", packDir, "."], {
+    encoding: null,
+    maxBuffer: 10 * 1024 * 1024,
+  });
+
+  if (result.status !== 0 || !result.stdout) {
+    const errorText = Buffer.isBuffer(result.stderr)
+      ? result.stderr.toString("utf8")
+      : String(result.stderr ?? "unknown tar error");
+    throw new Error(`failed to create pack tarball: ${errorText.trim()}`);
+  }
+
+  return result.stdout;
 }

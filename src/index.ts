@@ -1709,3 +1709,311 @@ export type {
   RegulatoryImpactAssessment,
   RegulatoryMonitorConfig,
 } from "./compliance/regulatoryAutomation.js";
+
+// ── i18n Framework (MF-08: Localization & Cultural Adaptability) ─
+export {
+  SUPPORTED_LOCALES,
+  RTL_LOCALES,
+  localeMetadata,
+  isRtl,
+  isSupportedLocale,
+  getLocaleMetadata,
+  getTranslationKeys,
+  getDefaultTranslationBundle,
+  t,
+  CULTURAL_CONTEXTS,
+  getCulturalContext,
+  checkTranslationCompleteness,
+  i18nConfigSchema,
+  defaultI18nConfig,
+  saveTranslationBundle,
+} from "./i18n/i18nFramework.js";
+export type {
+  SupportedLocale,
+  TranslationBundle,
+  TranslationKey,
+  CulturalContext,
+  I18nConfig,
+} from "./i18n/i18nFramework.js";
+
+// ── Anti-Gaming Defenses (MF-09) ─
+export {
+  detectGaming,
+  randomizeQuestions,
+  analyzeSessionFingerprints,
+  stabilizeScores,
+} from "./score/antiGaming.js";
+export type {
+  GamingDetectionResult,
+  GamingIndicator,
+  SessionFingerprint,
+  CrossSessionAnalysis,
+  SuspiciousPattern,
+  CollusionIndicator,
+  StabilizedScore,
+} from "./score/antiGaming.js";
+
+// ── Global Regulatory Translation (MF-10) ─
+export {
+  FEDRAMP_MODERATE_FAMILIES,
+  GLOBAL_FRAMEWORKS,
+  generateEvidencePackage,
+  classifyEuAiActRisk,
+  EU_AI_ACT_RISK_MATRIX,
+  CONSTRUCT_VALIDITY_DATA,
+} from "./compliance/globalRegulatory.js";
+export type {
+  FedRampProfile,
+  FedRampControlFamily,
+  ContinuousMonitoringConfig,
+  SspSection,
+  RegulatoryFramework,
+  RegulatoryRequirement,
+  AuditEvidencePackage,
+  AuditSection,
+  EuAiActRiskAssessment,
+  ConstructValidityReport,
+  DpiaAssessment,
+  DataFlow,
+  DpiaRisk,
+  DpiaMitigation,
+} from "./compliance/globalRegulatory.js";
+
+// ── Enterprise IAM (MF-12: Authentication & Access Control) ─
+export {
+  ssoProviderSchema,
+  createSsoSession,
+  isSessionValid,
+  refreshSession,
+  BUILT_IN_ROLES,
+  DEFAULT_ROLE_DEFINITIONS,
+  getRoleDefinition,
+  resolvePermissions,
+  hasPermission,
+  checkAccess,
+  AuditLog,
+  saveSsoConfig,
+  loadSsoConfig,
+} from "./auth/enterpriseIam.js";
+export type {
+  SsoProvider,
+  SsoSession,
+  BuiltInRole,
+  Permission,
+  RoleDefinition,
+  AuditLogEntry,
+} from "./auth/enterpriseIam.js";
+
+// ── Fleet Cascade Simulator (MF-11: Fleet-Level Impact Analysis) ─
+export {
+  runCascadeSimulation,
+  saveCascadeReport,
+  listCascadeScenarios,
+  listFaultTemplates,
+  FAULT_TEMPLATES,
+  CASCADE_SCENARIOS,
+} from "./fleet/cascadeSimulator.js";
+export type {
+  SimulatedAgent,
+  FaultInjection,
+  FaultType,
+  PropagationStep,
+  CascadePattern,
+  CascadePatternType,
+  CascadeSimulationResult,
+  CascadeScenario,
+  CascadeSimulationOptions,
+} from "./fleet/cascadeSimulator.js";
+
+// ── Multi-Tenant Federated Scoring (R4-02) ─
+export {
+  TenantManager,
+  tenantSchema,
+} from "./fleet/multiTenant.js";
+export type {
+  Tenant,
+  FederatedBenchmark,
+  TenantIsolation,
+} from "./fleet/multiTenant.js";
+
+// ── Continuous Monitor (drift + anomaly detection) ─
+export {
+  continuousMonitorConfigSchema,
+  runMonitorTick,
+  createMonitorSession,
+  executeSessionTick,
+  renderMonitorTickMarkdown,
+  renderMonitorSessionMarkdown,
+  saveMonitorTickReport,
+  defaultMonitorConfig,
+} from "./drift/continuousMonitor.js";
+export type {
+  ContinuousMonitorConfig,
+  MetricPoint,
+  TimeSeriesStore,
+  AnomalyResult,
+  InjectionDetection,
+  ContextPollutionResult,
+  ToolApiChangeResult,
+  MonitorTickResult,
+  MonitorSession,
+} from "./drift/continuousMonitor.js";
+
+// ── Real-Time Dashboard Monitoring ─
+export {
+  RealtimeMonitor,
+  DEFAULT_DASHBOARD_CONFIG,
+} from "./monitoring/realtimeDashboard.js";
+export type {
+  DashboardMetric,
+  DashboardWidget,
+  DashboardConfig,
+  AlertThreshold,
+  MonitoringAlert,
+} from "./monitoring/realtimeDashboard.js";
+
+// ── Drift Detection Alerts ─
+export {
+  DriftDetector,
+  DEFAULT_DRIFT_CONFIG,
+} from "./monitoring/driftDetection.js";
+export type {
+  DriftSample,
+  DriftAlert,
+  DriftConfig,
+} from "./monitoring/driftDetection.js";
+
+// ── Risk Tiers (diagnostic severity classification) ─
+export {
+  riskTierConfigSchema,
+  RISK_TIER_PROFILES,
+  getRiskTierProfile,
+  autoDetectRiskTier,
+  shouldEscalateTier,
+} from "./diagnostic/riskTiers.js";
+export type {
+  RiskTierConfig,
+  AutoTierResult,
+} from "./diagnostic/riskTiers.js";
+
+// ── Longitudinal Time-Series Tracking (MF-19) ─
+export {
+  analyzeTimeSeries,
+  detectRegressionAlert,
+} from "./diagnostic/longitudinalTracking.js";
+export type {
+  ScoreDataPoint,
+  TimeSeriesAnalysis,
+} from "./diagnostic/longitudinalTracking.js";
+
+// ── Deep Industry Packs (MF-07) ─
+export {
+  DEEP_HEALTHCARE_QUESTIONS,
+  DEEP_FINANCE_QUESTIONS,
+  DEEP_GOVERNMENT_QUESTIONS,
+  getAllDeepIndustryQuestions,
+  getDeepQuestionsByIndustry,
+  getDeepQuestionsByRegulation,
+  getDeepIndustryPackStats,
+} from "./domains/deepIndustryPacks.js";
+export type {
+  DeepIndustryQuestion,
+} from "./domains/deepIndustryPacks.js";
+
+// ── Adapter Standardization (MF-11) ─
+export {
+  ADAPTER_CAPABILITY_TIERS,
+  ADAPTER_PROFILES,
+  getAdapterProfile,
+  getAdaptersByTier,
+  meetsMinimumSpec,
+  getAdapterScoreAdjustment,
+  getAdapterComparisonMatrix,
+} from "./adapters/adapterStandardization.js";
+export type {
+  AdapterCapabilityTier,
+  AdapterCapabilityProfile,
+  AdapterCapabilities,
+} from "./adapters/adapterStandardization.js";
+
+// ── Offline / Lite Mode (MF-08) ─
+export {
+  offlineConfigSchema,
+  offlineModeConfig,
+  liteModeConfig,
+  defaultOfflineConfig,
+  checkOfflineCapability,
+  validateOfflineEnvironment,
+} from "./cli/offlineMode.js";
+export type { OfflineConfig } from "./cli/offlineMode.js";
+
+// ── Red Team: Adversarial Generator ─
+export {
+  ATTACK_CATEGORIES,
+  generateAdversarialSuite,
+  evaluateAdversarialResults,
+  getTemplateRegistry,
+} from "./redteam/adversarialGenerator.js";
+export type {
+  AttackCategory,
+  AdversarialTemplate,
+  AgentProfile,
+  AdversarialSample,
+  AdversarialReport,
+} from "./redteam/adversarialGenerator.js";
+
+// ── Red Team: Multilingual Attacks ─
+export {
+  MULTILINGUAL_ATTACKS,
+  getAttacksByLanguage,
+  getAttacksByType,
+  getMultilingualAttackStats,
+} from "./redteam/multilingualAttacks.js";
+export type {
+  MultilingualAttack,
+} from "./redteam/multilingualAttacks.js";
+
+// ── Score Explainer (human-readable score breakdowns) ─
+export {
+  decomposeScore,
+  computeConfidenceInterval,
+  computeBenchmarkComparison,
+  buildAuditTrail,
+  generateScoreExplanationReport,
+  renderExplanationMarkdown,
+} from "./score/scoreExplainer.js";
+export type {
+  ScoreContribution,
+  ScoreDecomposition,
+  NaturalLanguageExplanation,
+  ConfidenceInterval,
+  BenchmarkComparison,
+  ScoreExplanationReport,
+  AuditTrailEntry,
+} from "./score/scoreExplainer.js";
+
+// ── Plugin API Versioning ─
+export {
+  PLUGIN_API_VERSION,
+  PLUGIN_API_MIN_VERSION,
+  PLUGIN_API_STABILITY,
+  parseSemVer,
+  compareSemVer,
+  semVerToString,
+  checkPluginCompatibility,
+  getActiveDeprecations,
+  getAllDeprecations,
+  getApiChangelog,
+  getBreakingChanges,
+  computeApiSurfaceFingerprint,
+  verifyApiSurface,
+  generateMigrationGuide,
+  pluginApiVersionSchema,
+} from "./plugins/pluginApiVersion.js";
+export type {
+  SemVer,
+  CompatibilityResult,
+  DeprecationWarning,
+  ApiChangelogEntry,
+  MigrationGuide,
+} from "./plugins/pluginApiVersion.js";

@@ -1,0 +1,24 @@
+name: adversarial
+description: >
+  Simulates an agent that actively tries to bypass governance gates,
+  ignore compliance requirements, and operate outside its sanctioned
+  scope. Used for red-team stress testing of maturity scoring.
+version: "1.0.0"
+tags: [adversarial, red-team, governance-bypass]
+
+behavior:
+  autonomy: 0.95
+  errorRate: 0.25
+  escalationFrequency: 0.02
+  toolUsage: 0.4
+  responseLatency: 0.1
+  hallucinationRate: 0.3
+  complianceAdherence: 0.05
+
+variance:
+  autonomy: 0.02
+  errorRate: 0.1
+  escalationFrequency: 0.02
+  toolUsage: 0.15
+  hallucinationRate: 0.1
+  complianceAdherence: 0.03

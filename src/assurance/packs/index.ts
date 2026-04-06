@@ -256,6 +256,10 @@ const assurancePacks: AssurancePackDefinition[] = [
   autonomousLoopGovernancePack,
   multiAgentOrchestratorPack,
   scienceResearchAgentPack,
+  // Security Starter Pack (AMC-121) — default-on minimal security
+  securityStarterPack,
+  // Commercial Agent Archetype (AMC-156)
+  commercialAgentPack,
 ];
 
 export function listAssurancePacks(): AssurancePackDefinition[] {
@@ -304,3 +308,7 @@ import { whistleblowerProtectionPack } from "./whistleblowerProtectionPack.js";
 import { autonomousLoopGovernancePack } from "./autonomousLoopGovernancePack.js";
 import { multiAgentOrchestratorPack } from "./multiAgentOrchestratorPack.js";
 import { scienceResearchAgentPack } from "./scienceResearchAgentPack.js";
+// Security Starter Pack (AMC-121) — default-on minimal security baseline
+import { securityStarterPack } from "./securityStarterPack.js";
+// Commercial Agent Archetype (AMC-156)
+import { commercialAgentPack } from "./commercialAgentPack.js";

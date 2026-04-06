@@ -1,5 +1,14 @@
 import { logTrace } from "./traceLogger.js";
 import { withCircuitBreaker } from "../ops/circuitBreaker.js";
+import type { SteerPipeline, SteerRequestContext, SteerResponseContext } from "../steer/index.js";
+import { raceModels, type RaceOptions } from "../steer/race.js";
+import {
+  createLiquidStreamState,
+  flushRemaining,
+  ingestDelta,
+  parseSSEDelta,
+  type LiquidOptions,
+} from "../steer/liquid.js";
 
 export interface WrapFetchOptions {
   agentId: string;
@@ -12,6 +21,7 @@ export interface WrapFetchOptions {
   retryOnStatuses?: number[];
   retryNonIdempotent?: boolean;
   circuitName?: string;
+  steerPipeline?: SteerPipeline;
 }
 
 export type FetchLike = typeof fetch;
@@ -189,6 +199,101 @@ async function cancelResponseBody(response: Response): Promise<void> {
   }
 }
 
+function isTextEventStream(response: Response): boolean {
+  const contentType = response.headers.get("content-type") ?? "";
+  return contentType.toLowerCase().includes("text/event-stream");
+}
+
+async function applyLiquidStreamingTransform(
+  response: Response,
+  liquidOptions: LiquidOptions,
+): Promise<Response> {
+  if (!response.body || !isTextEventStream(response)) {
+    return response;
+  }
+
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder();
+  const encoder = new TextEncoder();
+  const state = createLiquidStreamState();
+
+  let pending = "";
+  const transformedStream = new ReadableStream<Uint8Array>({
+    async start(controller) {
+      try {
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) {
+            break;
+          }
+
+          pending += decoder.decode(value, { stream: true });
+          const parts = pending.split("\n\n");
+          pending = parts.pop() ?? "";
+
+          for (const part of parts) {
+            const line = `${part}\n\n`;
+            const delta = parseSSEDelta(line);
+            if (delta === null) {
+              if (line.trim() === "data: [DONE]") {
+                const remainder = flushRemaining(state, liquidOptions);
+                if (remainder) {
+                  controller.enqueue(
+                    encoder.encode(`data: ${JSON.stringify({ text: remainder })}\n\n`),
+                  );
+                }
+                controller.enqueue(encoder.encode(line));
+              } else {
+                controller.enqueue(encoder.encode(line));
+              }
+              continue;
+            }
+
+            const flushed = ingestDelta(state, delta, liquidOptions);
+            if (flushed) {
+              controller.enqueue(
+                encoder.encode(`data: ${JSON.stringify({ text: flushed })}\n\n`),
+              );
+            }
+          }
+        }
+
+        if (pending) {
+          const delta = parseSSEDelta(pending);
+          if (delta !== null) {
+            const flushed = ingestDelta(state, delta, liquidOptions);
+            if (flushed) {
+              controller.enqueue(
+                encoder.encode(`data: ${JSON.stringify({ text: flushed })}\n\n`),
+              );
+            }
+          } else {
+            controller.enqueue(encoder.encode(pending));
+          }
+        }
+
+        const remainder = flushRemaining(state, liquidOptions);
+        if (remainder) {
+          controller.enqueue(
+            encoder.encode(`data: ${JSON.stringify({ text: remainder })}\n\n`),
+          );
+        }
+        controller.close();
+      } catch (error) {
+        controller.error(error);
+      } finally {
+        reader.releaseLock();
+      }
+    },
+  });
+
+  return new Response(transformedStream, {
+    status: response.status,
+    statusText: response.statusText,
+    headers: response.headers,
+  });
+}
+
 export function wrapFetch(originalFetch: FetchLike, opts: WrapFetchOptions): FetchLike {
   const providerId = providerFromGatewayBase(opts.gatewayBaseUrl);
   const timeoutMs = normalizePositiveInt(opts.timeoutMs, 30_000);
@@ -199,10 +304,10 @@ export function wrapFetch(originalFetch: FetchLike, opts: WrapFetchOptions): Fet
   const circuitName = opts.circuitName ?? `wrapFetch:${providerId}`;
   return (async (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
     const incomingUrl = inputUrl(input);
-    const finalUrl =
+    const rewrittenUrl =
       opts.forceBaseUrl && incomingUrl
         ? rewriteUrl(incomingUrl, opts.gatewayBaseUrl)
-        : input;
+        : incomingUrl;
 
     const headers = mergeHeaders(init?.headers, {
       "x-amc-agent-id": opts.agentId,
@@ -214,9 +319,96 @@ export function wrapFetch(originalFetch: FetchLike, opts: WrapFetchOptions): Fet
       ...init,
       headers
     };
-    const method = resolveMethod(input, nextInit);
+    const requestContext: SteerRequestContext = opts.steerPipeline
+      ? await opts.steerPipeline.runRequest({
+          agentId: opts.agentId,
+          providerId,
+          url: rewrittenUrl ?? incomingUrl ?? opts.gatewayBaseUrl,
+          init: nextInit,
+          metadata: {},
+        })
+      : {
+          agentId: opts.agentId,
+          providerId,
+          url: rewrittenUrl ?? incomingUrl ?? opts.gatewayBaseUrl,
+          init: nextInit,
+          metadata: {},
+        };
+    const finalUrl = requestContext.url;
+    const finalInit: RequestInit = {
+      ...requestContext.init,
+      headers: mergeHeaders(requestContext.init.headers, {
+        "x-amc-agent-id": opts.agentId,
+        ...(process.env.AMC_LEASE ? { "x-amc-lease": process.env.AMC_LEASE } : {}),
+        ...(process.env.AMC_WORKORDER_ID ? { "x-amc-workorder-id": process.env.AMC_WORKORDER_ID } : {}),
+        ...(opts.injectHeaders ?? {})
+      })
+    };
+
+    // ── Race fan-out: if raceOptions tagged by createRaceStage, fan out ──
+    const raceOptions = requestContext.metadata.raceOptions as RaceOptions | undefined;
+    if (raceOptions && raceOptions.candidates.length > 0) {
+      logTrace({
+        agentId: opts.agentId,
+        event: "llm_call",
+        providerId,
+        note: `race fan-out to ${raceOptions.candidates.length} candidates`
+      });
+
+      const raceResult = await raceModels(finalInit, raceOptions);
+
+      // Find the winning candidate's full result to build a proper Response
+      const winnerIdx = raceResult.candidates.findIndex(c => c.id === raceResult.winnerId);
+      const winnerCandidate = raceOptions.candidates[winnerIdx >= 0 ? winnerIdx : 0]!;
+
+      // Re-fetch the winner to get the actual Response object
+      // (raceModels consumed the response bodies for scoring)
+      const fetchWinner = await originalFetch(winnerCandidate.url, {
+        ...finalInit,
+        ...(winnerCandidate.headers ? { headers: mergeHeaders(finalInit.headers, winnerCandidate.headers) } : {}),
+        ...(winnerCandidate.bodyOverrides && typeof finalInit.body === "string" ? {
+          body: JSON.stringify({ ...JSON.parse(finalInit.body), ...winnerCandidate.bodyOverrides })
+        } : {}),
+      });
+
+      logTrace({
+        agentId: opts.agentId,
+        event: "llm_result",
+        providerId,
+        note: `race winner=${raceResult.winnerId};score=${raceResult.winnerScore.composite.toFixed(3)};candidates=${raceResult.candidates.length}`
+      });
+
+      const liquidOptions = requestContext.metadata.liquidOptions as LiquidOptions | undefined;
+      const raceResponse = liquidOptions
+        ? await applyLiquidStreamingTransform(fetchWinner, liquidOptions)
+        : fetchWinner;
+
+      // Run response pipeline on the winner
+      const responseContext: SteerResponseContext = opts.steerPipeline
+        ? await opts.steerPipeline.runResponse({
+            ...requestContext,
+            response: raceResponse,
+            metadata: {
+              ...requestContext.metadata,
+              raceResult,
+            },
+          })
+        : {
+            ...requestContext,
+            response: raceResponse,
+            metadata: {
+              ...requestContext.metadata,
+              raceResult,
+            },
+          };
+
+      return responseContext.response;
+    }
+    // ── End race fan-out ────────────────────────────────────────────────
+
+    const method = resolveMethod(input, finalInit);
     const retryableRequest =
-      hasReplayableBody(input, nextInit) && (retryNonIdempotent || isIdempotentMethod(method));
+      hasReplayableBody(input, finalInit) && (retryNonIdempotent || isIdempotentMethod(method));
     const totalAttempts = retryableRequest ? maxRetries + 1 : 1;
 
     logTrace({
@@ -234,8 +426,8 @@ export function wrapFetch(originalFetch: FetchLike, opts: WrapFetchOptions): Fet
           circuitName,
           () =>
             originalFetch(finalUrl as RequestInfo | URL, {
-              ...nextInit,
-              signal: combineSignals(nextInit.signal ?? undefined, timeoutSignal)
+              ...finalInit,
+              signal: combineSignals(finalInit.signal ?? undefined, timeoutSignal)
             }),
           { timeoutMs: timeoutMs + 1000 }
         );
@@ -246,17 +438,31 @@ export function wrapFetch(originalFetch: FetchLike, opts: WrapFetchOptions): Fet
           continue;
         }
 
-        const requestId = response.headers.get("x-amc-request-id") ?? undefined;
-        const receipt = response.headers.get("x-amc-receipt") ?? undefined;
+        const liquidOptions = requestContext.metadata.liquidOptions as LiquidOptions | undefined;
+        const maybeLiquidResponse = liquidOptions
+          ? await applyLiquidStreamingTransform(response, liquidOptions)
+          : response;
+
+        const responseContext: SteerResponseContext = opts.steerPipeline
+          ? await opts.steerPipeline.runResponse({
+              ...requestContext,
+              response: maybeLiquidResponse,
+            })
+          : {
+              ...requestContext,
+              response: maybeLiquidResponse,
+            };
+        const requestId = responseContext.response.headers.get("x-amc-request-id") ?? undefined;
+        const receipt = responseContext.response.headers.get("x-amc-receipt") ?? undefined;
         logTrace({
           agentId: opts.agentId,
           event: "llm_result",
           providerId,
           request_id: requestId,
           receipt,
-          note: `status=${response.status};attempt=${attempt}`
+          note: `status=${responseContext.response.status};attempt=${attempt}`
         });
-        return response;
+        return responseContext.response;
       } catch (error) {
         lastError = error;
         if (attempt < totalAttempts && isRetriableError(error)) {

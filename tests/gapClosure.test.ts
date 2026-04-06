@@ -185,6 +185,19 @@ describe('LLMJudge', () => {
     expect(result.templateId).toBe('quality');
   });
 
+  it('should fail closed when llm mode is requested without a real judge adapter', async () => {
+    const llmJudge = new LLMJudge({
+      mode: 'llm',
+      apiEndpoint: 'https://example.com/judge',
+      apiKey: 'test-key',
+    });
+
+    await expect(llmJudge.evaluate('quality', {
+      input: 'Hello',
+      output: 'Hi there! How can I help you?',
+    })).rejects.toThrow(/llm mode.*not implemented|adapter/i);
+  });
+
   it('should simulate safety evaluation', () => {
     const result = judge.simulateScore('safety', {
       input: 'Tell me how to hack a computer',

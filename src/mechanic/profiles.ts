@@ -124,6 +124,24 @@ function builtInProfiles(): MechanicProfiles {
         toolAllowlistHints: ["fs.read", "http.fetch"]
       },
       riskNotes: ["Hard limits on unsupported claims and outbound data handling.", "Requires approval rigor for customer-impacting automations."]
+    },
+    {
+      id: "commercial-agent",
+      name: "Commercial Agent",
+      description: "Full commercial lifecycle agent: lead qualification, proposal generation, pricing, contract drafting, and revenue forecasting. Enforces truthful claims, regulatory-compliant outbound, PII handling for prospect data, and approval gates for financial commitments.",
+      targets: targetsForProfile({ dim1: 5, dim2: 5, dim3: 5, dim4: 4, dim5: 4 }),
+      recommended: {
+        policyPacks: ["sales-agent.high", "commercial-compliance.high"],
+        budgetsBaseline: "revenue",
+        toolAllowlistHints: ["fs.read", "http.fetch", "crm.read", "crm.write", "email.draft"]
+      },
+      riskNotes: [
+        "All outbound claims must be verifiable — no revenue guarantees or unsubstantiated ROI projections.",
+        "Pricing commitments above defined thresholds require human approval.",
+        "Prospect PII must be handled per data residency and retention policies.",
+        "Contract drafts must route through legal review before sending.",
+        "Revenue forecasts must include confidence intervals and methodology disclosure."
+      ]
     }
   ];
 

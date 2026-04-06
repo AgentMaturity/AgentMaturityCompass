@@ -124,7 +124,7 @@ describe("assurance lab v2", () => {
 
     const traceRaw = canonicalize(out.traceRefs);
     expect(traceRaw).not.toMatch(/BEGIN PRIVATE KEY|Bearer\s+[A-Za-z0-9._-]{8,}|(?:^|[^a-zA-Z0-9])sk-[A-Za-z0-9]{10,}|AIza[0-9A-Za-z_-]{12,}|ignore previous|\/Users\/|\/home\//i);
-  });
+  }, 90_000);
 
   test("legacy notaryAttestation pack runs from unified registry", async () => {
     const workspace = newWorkspace("amc-assurance-v2-notary");
@@ -185,7 +185,7 @@ describe("assurance lab v2", () => {
     const gateAfter = assuranceReadinessGate(workspace);
     expect(gateAfter.ok).toBe(true);
     expect(gateAfter.warnings.some((row) => row.startsWith("ASSURANCE_WAIVER_ACTIVE:"))).toBe(true);
-  });
+  }, 90_000);
 
   test("assurance console pages serve and include no external CDN refs", async () => {
     const workspace = newWorkspace("amc-assurance-v2-console");

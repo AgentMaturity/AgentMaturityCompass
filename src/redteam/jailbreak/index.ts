@@ -29,6 +29,13 @@ export {
   type DetectionSignal,
 } from "./detector.js";
 
+// Output normalization
+export {
+  normalizeResponse,
+  getComplianceText,
+  type NormalizedResponse,
+} from "./normalizer.js";
+
 // TAP implementation
 export {
   runTAP,

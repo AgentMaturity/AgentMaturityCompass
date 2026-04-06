@@ -106,6 +106,17 @@ export interface JudgeConfig {
   mode: 'llm' | 'simulated';
   /** Temperature for judge calls */
   temperature: number;
+  /** Optional adapter that performs a real LLM judge call */
+  judgeAdapter?: (request: {
+    endpoint: string;
+    apiKey: string;
+    model: string;
+    systemPrompt: string;
+    userPrompt: string;
+    temperature: number;
+    template: JudgeTemplate;
+    input: JudgeInput;
+  }) => Promise<{ rawScore: number; reasoning: string; model?: string }>;
 }
 
 /* ── Built-in rubrics ────────────────────────────────────────────── */
@@ -339,6 +350,7 @@ export class LLMJudge {
       temperature: config?.temperature ?? 0.0,
       apiEndpoint: config?.apiEndpoint,
       apiKey: config?.apiKey,
+      judgeAdapter: config?.judgeAdapter,
     };
     for (const t of BUILTIN_TEMPLATES) {
       this.templates.set(t.id, t);
@@ -381,13 +393,25 @@ export class LLMJudge {
 
     let rawScore: number;
     let reasoning: string;
+    let model = template.defaultModel;
 
     if (this.config.mode === 'llm' && this.config.apiEndpoint && this.config.apiKey) {
-      // In production: call the LLM API
-      // For now, fall through to simulated
-      const sim = simulateScore(template, input);
-      rawScore = sim.score;
-      reasoning = sim.reasoning;
+      if (!this.config.judgeAdapter) {
+        throw new Error('llm mode requested but no judge adapter is configured');
+      }
+      const judged = await this.config.judgeAdapter({
+        endpoint: this.config.apiEndpoint,
+        apiKey: this.config.apiKey,
+        model: template.defaultModel,
+        systemPrompt: template.systemPrompt,
+        userPrompt: judgePrompt,
+        temperature: this.config.temperature,
+        template,
+        input,
+      });
+      rawScore = judged.rawScore;
+      reasoning = judged.reasoning;
+      model = judged.model ?? template.defaultModel;
     } else {
       const sim = simulateScore(template, input);
       rawScore = sim.score;
@@ -408,7 +432,7 @@ export class LLMJudge {
       reasoning,
       rubricLevel,
       judgePrompt,
-      model: template.defaultModel,
+      model,
       mode: this.config.mode,
       timestamp: Date.now(),
     };

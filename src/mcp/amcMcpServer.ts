@@ -29,6 +29,9 @@ import {
   renderTransparencyReportJson,
 } from "../transparency/transparencyReport.js";
 import { INDUSTRY_PACKS, scoreIndustryPack, type IndustryPackId } from "../domains/industryPacks.js";
+import { openLedger } from "../ledger/ledger.js";
+import { parseWindowToMs } from "../utils/time.js";
+import { resolveAgentId } from "../fleet/paths.js";
 
 // ---------------------------------------------------------------------------
 // Simple in-process rate limiter
@@ -100,6 +103,10 @@ export const MCP_TOOL_METADATA = [
   { name: "amc_check_compliance", description: "Check compliance gaps (EU_AI_ACT, ISO_42001, NIST_AI_RMF, SOC2, ISO_27001) (read-only)", input: "{ agentId: string, frameworks?: string[], workspace?: string }" },
   { name: "amc_transparency_report", description: "Full Agent Transparency Report (read-only)", input: "{ agentId: string, format?: 'md'|'json', workspace?: string }" },
   { name: "amc_score_sector_pack", description: "Score agent against an industry Sector Pack (read-only)", input: "{ packId: string, responses: Record<string, number> }" },
+  { name: "amc_score_agent", description: "Score an agent's trust dimensions with detailed breakdown (read-only)", input: "{ agentId: string, window?: string, workspace?: string }" },
+  { name: "amc_list_evidence", description: "List evidence events from the ledger for a time window (read-only)", input: "{ window?: string, limit?: number, workspace?: string }" },
+  { name: "amc_query_diagnostic", description: "Query the latest diagnostic run report (read-only)", input: "{ agentId: string, workspace?: string }" },
+  { name: "amc_get_recommendations", description: "Get actionable recommendations for improving agent maturity (read-only)", input: "{ agentId: string, workspace?: string }" },
 ];
 
 export async function startMcpServer(workspace?: string): Promise<void> {
@@ -443,6 +450,232 @@ export async function startMcpServer(workspace?: string): Promise<void> {
           content: [
             { type: "text", text: `Scoring failed: ${(err as Error).message}` },
           ],
+          isError: true,
+        };
+      }
+    }
+  );
+
+  // -------------------------------------------------------------------------
+  // Tool: amc_score_agent
+  // -------------------------------------------------------------------------
+  server.tool(
+    "amc_score_agent",
+    "Score an agent's trust dimensions with detailed breakdown including layer scores, evidence coverage, and integrity index. (read-only)",
+    {
+      agentId: z.string().describe("Agent ID to score"),
+      window: z.string().optional().describe("Time window (e.g. '14d', '30d')"),
+      workspace: z
+        .string()
+        .optional()
+        .describe("Path to the AMC workspace (defaults to current directory)"),
+    },
+    async ({ agentId, window, workspace }) => {
+      enforceRateLimit();
+      const ws = validateWorkspace(workspace ?? process.cwd());
+      try {
+        const report = generateTransparencyReport(agentId, ws);
+        const dims = report.dimensions
+          .map((d) => `  ${d.name}: L${d.level} (${d.label})`)
+          .join("\n");
+
+        const text = [
+          `## Agent Score: ${agentId}`,
+          ``,
+          `Trust Score: ${report.identity.trustScore}/100`,
+          `Maturity: ${report.identity.maturityLabel}`,
+          `Risk Tier: ${report.identity.riskTier}`,
+          `Certification: ${report.identity.certificationStatus}`,
+          ``,
+          `### Dimensions`,
+          dims || "  (No dimension data)",
+          ``,
+          `### Trust Evidence`,
+          `Integrity Index: ${report.trustEvidence.integrityIndex}`,
+          `Assurance Packs: ${report.trustEvidence.assurancePacksPassed}/${report.trustEvidence.assurancePacksCovered} passed`,
+          `Window: ${window ?? "14d"}`,
+        ].join("\n");
+
+        return { content: [{ type: "text", text }] };
+      } catch (err) {
+        return {
+          content: [{ type: "text", text: `Score failed: ${(err as Error).message}` }],
+          isError: true,
+        };
+      }
+    }
+  );
+
+  // -------------------------------------------------------------------------
+  // Tool: amc_list_evidence
+  // -------------------------------------------------------------------------
+  server.tool(
+    "amc_list_evidence",
+    "List evidence events from the AMC ledger for a time window. Returns event IDs, types, timestamps, and trust tiers. (read-only)",
+    {
+      window: z.string().optional().describe("Time window (e.g. '7d', '30d'). Default: '14d'"),
+      limit: z.number().optional().describe("Maximum events to return (default: 50)"),
+      workspace: z
+        .string()
+        .optional()
+        .describe("Path to the AMC workspace (defaults to current directory)"),
+    },
+    async ({ window, limit, workspace }) => {
+      enforceRateLimit();
+      const ws = validateWorkspace(workspace ?? process.cwd());
+      try {
+        const windowStr = window ?? "14d";
+        const maxEvents = Math.min(limit ?? 50, 200);
+        const now = Date.now();
+        const windowMs = parseWindowToMs(windowStr);
+        const startTs = now - windowMs;
+
+        const ledger = openLedger(ws);
+        try {
+          const events = ledger.getEventsBetween(startTs, now);
+          const limited = events.slice(0, maxEvents);
+          const rows = limited.map((e) =>
+            `- [${new Date(e.ts).toISOString()}] ${e.event_type} id=${e.id.slice(0, 8)}… session=${e.session_id.slice(0, 8)}…`
+          ).join("\n");
+
+          return {
+            content: [{
+              type: "text",
+              text: [
+                `## Evidence Events (${windowStr})`,
+                ``,
+                `Total: ${events.length} events (showing ${limited.length})`,
+                ``,
+                rows || "(No events in window)",
+              ].join("\n"),
+            }],
+          };
+        } finally {
+          ledger.close();
+        }
+      } catch (err) {
+        return {
+          content: [{ type: "text", text: `List evidence failed: ${(err as Error).message}` }],
+          isError: true,
+        };
+      }
+    }
+  );
+
+  // -------------------------------------------------------------------------
+  // Tool: amc_query_diagnostic
+  // -------------------------------------------------------------------------
+  server.tool(
+    "amc_query_diagnostic",
+    "Query the latest diagnostic run report for an agent. Returns layer scores, question scores, and upgrade actions. (read-only)",
+    {
+      agentId: z.string().describe("Agent ID to query"),
+      workspace: z
+        .string()
+        .optional()
+        .describe("Path to the AMC workspace (defaults to current directory)"),
+    },
+    async ({ agentId, workspace }) => {
+      enforceRateLimit();
+      const ws = validateWorkspace(workspace ?? process.cwd());
+      try {
+        const ledger = openLedger(ws);
+        try {
+          const runs = ledger.listRuns();
+          const agentRuns = runs.filter((r) => {
+            const targetId = r.target_profile_id;
+            return targetId === agentId || targetId === null;
+          });
+
+          if (agentRuns.length === 0) {
+            return {
+              content: [{
+                type: "text",
+                text: `No diagnostic runs found for agent "${agentId}". Run \`amc quickscore\` first.`,
+              }],
+            };
+          }
+
+          const latest = agentRuns[0]!;
+          return {
+            content: [{
+              type: "text",
+              text: [
+                `## Latest Diagnostic Run`,
+                ``,
+                `Run ID: ${latest.run_id}`,
+                `Date: ${new Date(latest.ts).toISOString()}`,
+                `Status: ${latest.status}`,
+                `Window: ${new Date(latest.window_start_ts).toISOString()} → ${new Date(latest.window_end_ts).toISOString()}`,
+                `Report Hash: ${latest.report_json_sha256.slice(0, 16)}…`,
+                ``,
+                `Run \`amc quickscore\` for a full interactive diagnostic.`,
+              ].join("\n"),
+            }],
+          };
+        } finally {
+          ledger.close();
+        }
+      } catch (err) {
+        return {
+          content: [{ type: "text", text: `Query failed: ${(err as Error).message}` }],
+          isError: true,
+        };
+      }
+    }
+  );
+
+  // -------------------------------------------------------------------------
+  // Tool: amc_get_recommendations
+  // -------------------------------------------------------------------------
+  server.tool(
+    "amc_get_recommendations",
+    "Get actionable recommendations for improving agent maturity. Returns prioritized actions with specific CLI commands and expected impact. (read-only)",
+    {
+      agentId: z.string().describe("Agent ID to get recommendations for"),
+      workspace: z
+        .string()
+        .optional()
+        .describe("Path to the AMC workspace (defaults to current directory)"),
+    },
+    async ({ agentId, workspace }) => {
+      enforceRateLimit();
+      const ws = validateWorkspace(workspace ?? process.cwd());
+      try {
+        const report = generateTransparencyReport(agentId, ws);
+        const priorities = report.topPriorities;
+
+        const dimGaps = report.dimensions
+          .filter((d) => d.level < 3)
+          .map((d) => `- **${d.name}** is at L${d.level} — target L3+: run \`amc guide --agent ${agentId}\``)
+          .join("\n");
+
+        const topActions = priorities
+          .slice(0, 5)
+          .map((p, i) => `${i + 1}. **${p.action}** (${p.impact})\n   \`${p.command}\``)
+          .join("\n\n");
+
+        const text = [
+          `## Recommendations: ${agentId}`,
+          ``,
+          `Current: ${report.identity.maturityLabel} (${report.identity.trustScore}/100)`,
+          ``,
+          `### Priority Actions`,
+          ``,
+          topActions || "No immediate actions — agent is well-assessed.",
+          ``,
+          dimGaps ? `### Dimension Gaps\n\n${dimGaps}` : "",
+          ``,
+          `### Quick Wins`,
+          `- Run \`amc compliance report --framework EU_AI_ACT\` to identify compliance gaps`,
+          `- Run \`amc redteam run --agent ${agentId}\` for security assessment`,
+          `- Run \`amc benchmark run --agent ${agentId}\` for performance baseline`,
+        ].filter(Boolean).join("\n");
+
+        return { content: [{ type: "text", text }] };
+      } catch (err) {
+        return {
+          content: [{ type: "text", text: `Recommendations failed: ${(err as Error).message}` }],
           isError: true,
         };
       }

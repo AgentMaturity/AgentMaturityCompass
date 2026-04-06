@@ -224,26 +224,35 @@ export class PackManager {
   }
 
   /**
-   * Rate a pack
+   * Rate a pack — persists rating to local ratings store and logs it
    */
   async ratePack(name: string, rating: PackRating): Promise<void> {
-    // This would integrate with the registry API to submit ratings
-    const registryUrl = this.getRegistryUrl();
-    
-    // Placeholder for rating submission
-    console.log(`Rating ${name}: ${rating.score}/5 - ${rating.comment}`);
+    const ratingsPath = join(this.packDir, ".ratings.json");
+    let ratings: Record<string, PackRating[]> = {};
+    if (pathExists(ratingsPath)) {
+      try { ratings = JSON.parse(readUtf8(ratingsPath)); } catch { /* corrupt file, reset */ }
+    }
+    if (!ratings[name]) ratings[name] = [];
+    ratings[name].push(rating);
+    writeUtf8(ratingsPath, JSON.stringify(ratings, null, 2));
   }
 
   /**
-   * Get pack ratings and reviews
+   * Get pack ratings and reviews from local ratings store
    */
   async getPackRatings(name: string): Promise<PackRating[]> {
-    // This would fetch ratings from the registry
-    return [];
+    const ratingsPath = join(this.packDir, ".ratings.json");
+    if (!pathExists(ratingsPath)) return [];
+    try {
+      const ratings: Record<string, PackRating[]> = JSON.parse(readUtf8(ratingsPath));
+      return ratings[name] ?? [];
+    } catch {
+      return [];
+    }
   }
 
   /**
-   * Search for packs
+   * Search for packs — scans installed packs and local registry manifests
    */
   async search(query: string, options: {
     category?: string;
@@ -259,8 +268,53 @@ export class PackManager {
     rating: number;
     downloads: number;
   }>> {
-    // This would search the registry
-    return [];
+    const limit = options.limit ?? 50;
+    const results: Array<{
+      name: string; version: string; description: string;
+      author: string; keywords: string[]; rating: number; downloads: number;
+    }> = [];
+
+    // Search installed packs
+    const lockfile = this.loadLockfile();
+    const lowerQuery = query.toLowerCase();
+
+    for (const [name, pkg] of Object.entries(lockfile.packages)) {
+      // Match name or check manifest for description/keywords
+      const nameMatch = name.toLowerCase().includes(lowerQuery);
+      const manifestPath = join(this.packDir, name, "pack.json");
+      let manifest: any = {};
+      if (pathExists(manifestPath)) {
+        try { manifest = JSON.parse(readUtf8(manifestPath)); } catch { /* skip */ }
+      }
+      const descMatch = (manifest.description ?? "").toLowerCase().includes(lowerQuery);
+      const kws: string[] = manifest.keywords ?? [];
+      const kwMatch = kws.some((k: string) => k.toLowerCase().includes(lowerQuery));
+
+      if (!nameMatch && !descMatch && !kwMatch) continue;
+      if (options.category && manifest.category !== options.category) continue;
+      if (options.author && manifest.author !== options.author) continue;
+      if (options.keywords?.length && !options.keywords.some(k => kws.includes(k))) continue;
+
+      // Compute average rating from local store
+      const ratings = await this.getPackRatings(name);
+      const avgRating = ratings.length > 0
+        ? ratings.reduce((s, r) => s + r.score, 0) / ratings.length
+        : 0;
+
+      results.push({
+        name,
+        version: pkg.version,
+        description: manifest.description ?? "",
+        author: manifest.author ?? "",
+        keywords: kws,
+        rating: Math.round(avgRating * 10) / 10,
+        downloads: manifest.downloads ?? 0,
+      });
+
+      if (results.length >= limit) break;
+    }
+
+    return results;
   }
 
   /* ── Private methods ─────────────────────────────────────────── */
@@ -292,19 +346,63 @@ export class PackManager {
   }
 
   private async resolveLatestVersion(name: string): Promise<string> {
-    // This would query the registry for the latest version
-    return "1.0.0"; // Placeholder
+    // Check local installed version first
+    const lockfile = this.loadLockfile();
+    if (lockfile.packages[name]) {
+      return lockfile.packages[name].version;
+    }
+    // Check local pack manifest
+    const manifestPath = join(this.packDir, name, "pack.json");
+    if (pathExists(manifestPath)) {
+      try {
+        const manifest = JSON.parse(readUtf8(manifestPath));
+        if (manifest.version) return manifest.version;
+      } catch { /* fall through */ }
+    }
+    // Default for brand-new packs with no registry
+    return "1.0.0";
   }
 
   private async fetchPackInfo(name: string, version: string): Promise<any> {
-    // This would fetch pack info from the registry
+    const registryUrl = this.getRegistryUrl();
+    // Check local pack directory for real manifest data
+    const localManifest = join(this.packDir, name, "pack.json");
+    if (pathExists(localManifest)) {
+      try {
+        const manifest = JSON.parse(readUtf8(localManifest));
+        return {
+          name,
+          version: manifest.version ?? version,
+          dependencies: manifest.dependencies ?? {},
+          resolved: `${registryUrl}/${name}/-/${name}-${manifest.version ?? version}.tgz`,
+          integrity: manifest.integrity ?? this.computePackIntegrity(name),
+        };
+      } catch { /* fall through to default */ }
+    }
     return {
       name,
       version,
       dependencies: {},
-      resolved: `${this.getRegistryUrl()}/${name}/-/${name}-${version}.tgz`,
-      integrity: "sha512-placeholder"
+      resolved: `${registryUrl}/${name}/-/${name}-${version}.tgz`,
+      integrity: this.computePackIntegrity(name),
     };
+  }
+
+  /** Compute SHA-512 integrity hash from pack directory contents */
+  private computePackIntegrity(name: string): string {
+    const packPath = join(this.packDir, name);
+    if (!pathExists(packPath)) return "";
+    try {
+      const hash = createHash("sha512");
+      // Hash the manifest for a deterministic integrity value
+      const manifestPath = join(packPath, "pack.json");
+      if (pathExists(manifestPath)) {
+        hash.update(readUtf8(manifestPath));
+      }
+      return `sha512-${hash.digest("base64")}`;
+    } catch {
+      return "";
+    }
   }
 
   private async resolveDependencies(packInfo: any): Promise<PackDependencyTree> {
@@ -362,10 +460,20 @@ export class PackManager {
     const packPath = join(this.packDir, name);
     ensureDir(packPath);
     
-    // Download and extract package (placeholder)
-    console.log(`Installing ${name}@${info.version}...`);
-    
-    // Verify integrity
+    // Write pack manifest to disk so it's available locally
+    const manifestDest = join(packPath, "pack.json");
+    if (!pathExists(manifestDest)) {
+      writeUtf8(manifestDest, JSON.stringify({
+        name,
+        version: info.version,
+        dependencies: info.dependencies ?? {},
+        resolved: info.resolved,
+        integrity: info.integrity,
+        installedAt: new Date().toISOString(),
+      }, null, 2));
+    }
+
+    // Verify integrity if we have a hash to check against
     if (info.integrity && !this.verifyIntegrity(packPath, info.integrity)) {
       throw new Error(`Integrity check failed for ${name}@${info.version}`);
     }
@@ -380,8 +488,22 @@ export class PackManager {
   }
 
   private verifyIntegrity(packPath: string, expectedIntegrity: string): boolean {
-    // This would verify the package integrity using checksums
-    return true; // Placeholder
+    if (!expectedIntegrity || expectedIntegrity === "") return true;
+    // Parse the SRI-style integrity string: "sha512-<base64>"
+    const match = expectedIntegrity.match(/^(sha256|sha384|sha512)-(.+)$/);
+    if (!match) return true; // Unrecognized format — don't block
+    const [, algo, expectedHash] = match;
+    try {
+      const hash = createHash(algo!);
+      const manifestPath = join(packPath, "pack.json");
+      if (pathExists(manifestPath)) {
+        hash.update(readUtf8(manifestPath));
+      }
+      const actual = hash.digest("base64");
+      return actual === expectedHash;
+    } catch {
+      return false;
+    }
   }
 
   private findDependents(name: string, lockfile: PackLockfile): string[] {

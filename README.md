@@ -5,24 +5,26 @@
 <h1 align="center">Agent Maturity Compass</h1>
 
 <p align="center">
-  <strong>Score your AI agent. Find the gaps. Fix them.</strong><br>
-  2 minutes to your first score. Free and open source.
+  <strong>Score your AI agent. Red-team it. Ship it with proof.</strong><br>
+  Open-source CLI for evidence-based trust scoring, adversarial testing, and compliance.<br>
+  Works with any framework. 60 seconds to your first score.
 </p>
 
 <p align="center">
-  <a href="https://www.npmjs.com/package/agent-maturity-compass"><img src="https://img.shields.io/npm/v/agent-maturity-compass?labelColor=0a0a0a&color=4AEF79" alt="npm" /></a>
+  <a href="https://www.npmjs.com/package/agent-maturity-compass"><img src="https://img.shields.io/npm/v/agent-maturity-compass?labelColor=0a0a0a&color=4AEF79" alt="npm version" /></a>
   <a href="https://www.npmjs.com/package/agent-maturity-compass"><img src="https://img.shields.io/npm/dm/agent-maturity-compass?labelColor=0a0a0a&color=4AEF79" alt="downloads" /></a>
-  <a href="#"><img src="https://img.shields.io/badge/tests-3%2C549%20passing-4AEF79?labelColor=0a0a0a" alt="tests" /></a>
+  <a href="https://github.com/thewisecrab/AgentMaturityCompass/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/thewisecrab/AgentMaturityCompass/ci.yml?branch=main&labelColor=0a0a0a&color=4AEF79&label=CI" alt="CI" /></a>
+  <a href="https://github.com/thewisecrab/AgentMaturityCompass/actions/workflows/ci.yml"><img src="https://img.shields.io/badge/tests-4%2C161%20passing-4AEF79?labelColor=0a0a0a" alt="tests" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-4AEF79?labelColor=0a0a0a" alt="MIT" /></a>
-  <a href="docs/AMC_MASTER_REFERENCE.md"><img src="https://img.shields.io/badge/CLI%20commands-481-4AEF79?labelColor=0a0a0a" alt="commands" /></a>
 </p>
 
 <p align="center">
-  <a href="https://thewisecrab.github.io/AgentMaturityCompass/playground.html">🎮 Web Playground</a> ·
-  <a href="docs/QUICKSTART.md">📖 Docs</a> ·
-  <a href="https://github.com/thewisecrab/AgentMaturityCompass/discussions">💬 Community</a> ·
-  <a href="#-recipes--copy-paste-examples">📋 Recipes</a> ·
-  <a href="CONTRIBUTING.md">🤝 Contribute</a>
+  <a href="#-60-seconds-to-your-first-score">Quick Start</a> ·
+  <a href="https://thewisecrab.github.io/AgentMaturityCompass/playground.html">Web Playground</a> ·
+  <a href="docs/QUICKSTART.md">Docs</a> ·
+  <a href="#-recipes--copy-paste-examples">Recipes</a> ·
+  <a href="https://github.com/thewisecrab/AgentMaturityCompass/discussions">Community</a> ·
+  <a href="CONTRIBUTING.md">Contribute</a>
 </p>
 
 ---
@@ -68,7 +70,196 @@ That is the entire thesis: **trust, but verify — with receipts**.
 
 ---
 
-## Product family
+## ⚡ 60 Seconds to Your First Score
+
+```bash
+# Install globally (or use npx below)
+npm i -g agent-maturity-compass
+
+# Score your agent
+cd your-agent-project
+amc quickscore
+```
+
+Or skip the install entirely:
+
+```bash
+npx agent-maturity-compass quickscore
+```
+
+Want it even faster?
+
+```bash
+amc quickscore --rapid           # skip optional questions, get a score in seconds
+```
+
+<details>
+<summary><strong>More install methods</strong></summary>
+
+**curl (no Node required)**
+```bash
+curl -fsSL https://raw.githubusercontent.com/thewisecrab/AgentMaturityCompass/main/install.sh | bash
+```
+
+**Homebrew**
+```bash
+brew tap thewisecrab/amc && brew install agent-maturity-compass
+```
+
+**Docker**
+```bash
+docker run -it --rm ghcr.io/thewisecrab/amc-quickstart amc quickscore
+```
+
+**From source**
+```bash
+git clone https://github.com/thewisecrab/AgentMaturityCompass.git
+cd AgentMaturityCompass && npm ci && npm run build && npm link
+```
+
+</details>
+
+---
+
+## 🔍 How AMC Compares
+
+|  | **AMC** | Observability platforms | Eval frameworks | Manual checklists |
+|---|---|---|---|---|
+| **Evidence model** | Execution-verified, cryptographic proofs | Logs and metrics, no trust scoring | Test pass/fail, no maturity model | Self-reported |
+| **Adversarial testing** | 147 attack simulations built in | Not a focus | Partial (prompt-level only) | None |
+| **Compliance mapping** | EU AI Act, ISO 42001, NIST, SOC 2, OWASP | Not included | Not included | Manual, labor-intensive |
+| **Framework support** | 14 adapters, zero code changes | Framework-specific agents | Framework-specific | N/A |
+| **Cost** | Free, open source (MIT) | Per-seat/month pricing | Free to paid | Free but manual |
+| **Time to first result** | 60 seconds | Hours to days | Minutes to hours | Days to weeks |
+
+AMC is not an observability tool and not an eval harness. It is a **trust scorecard** — it tells you whether your agent is safe to ship, with cryptographic evidence, and generates the compliance artifacts to prove it.
+
+---
+
+## 🧪 What AMC Tests
+
+### 235 Diagnostic Questions × 5 Dimensions
+
+| Dimension | Questions | What It Measures |
+|-----------|-----------|------------------|
+| Strategic Agent Operations | 16 | Mission clarity, scope adherence, cost governance, operational intelligence |
+| Agent Leadership | 20 | Governance structure, EU AI Act readiness, proactive risk management, business continuity |
+| Agent Culture | 94 | Feedback loops, forecast legitimacy, persona governance, UX honesty, over-compliance detection, social alignment |
+| Agent Resilience | 52 | Graceful degradation, circuit breakers, memory safety, threat resistance, fact/simulation boundaries |
+| Agent Skills | 53 | Tool mastery, injection defense, DLP, scenario traceability, replay safety |
+
+### 147 Assurance Packs
+
+| Category | Examples |
+|----------|---------|
+| Prompt Injection | System tampering, role hijacking, jailbreaks |
+| Exfiltration | Secret leakage, PII exposure, data boundary violations |
+| Adversarial | TAP/PAIR, Crescendo, Skeleton Key, best-of-N |
+| Context Leakage | EchoLeak, cross-session bleed, memory poisoning |
+| Supply Chain | Dependency attacks, MCP server poisoning, SBOM integrity |
+| Behavioral | Sycophancy, self-preservation, sabotage, over-compliance |
+
+### 40 Industry Domain Packs
+
+| Sector | Packs | Key Regulations |
+|--------|-------|-----------------|
+| 🏥 Health | 9 | HIPAA, FDA 21 CFR Part 11, EU MDR, ICH E6(R3) |
+| 💰 Wealth | 5 | MiFID II, PSD2, EU DORA, MiCA, FATF |
+| 🎓 Education | 5 | FERPA, COPPA, IDEA, EU AI Act Annex III |
+| 🚇 Mobility | 5 | UNECE WP.29, ETSI EN 303 645, EU NIS2 |
+| 💡 Technology | 5 | EU AI Act Art. 13, EU Data Act, DSA Art. 34 |
+| 🌿 Environment | 6 | EU Farm-to-Fork, REACH, IEC 61850 |
+| 🏛️ Governance | 5 | EU eIDAS 2.0, UNCAC, UNGPs |
+
+### 🔮 Simulation & Forecast Evaluation Lane
+
+Dedicated evaluation lane for simulation engines, forecast systems, and synthetic social environments. 5 scored dimensions:
+
+| Dimension | Weight | Questions | What it evaluates |
+|-----------|--------|-----------|-------------------|
+| Forecast Legitimacy | 25% | AMC-6.1–6.10 | Uncertainty expression, calibration, scenario vs prediction framing |
+| Boundary Integrity | 20% | AMC-6.11–6.17, 6.37–6.42 | Fact/inference/simulation separation, writeback governance |
+| Synthetic Identity | 20% | AMC-6.18–6.25, 6.48–6.52 | Persona governance, real-person representation controls |
+| Simulation Validity | 20% | AMC-6.30–6.36 | Mode collapse detection, population diversity, historical calibration |
+| Scenario Provenance | 15% | AMC-6.26–6.29, 6.53–6.57 | End-to-end traceability, replay capability, interaction safety |
+
+```bash
+amc score simulation-lane --system-type simulation-engine              # interactive
+amc score simulation-lane --system-type forecast-decision-support --json  # JSON output
+amc score simulation-lane --system-type synthetic-social-environment --responses answers.json
+```
+
+### 79 Scoring Modules
+
+<details>
+<summary>See all modules</summary>
+
+- Calibration gap (confidence vs reality)
+- Evidence conflict detection
+- Gaming resistance (adversarial score inflation)
+- Sleeper agent detection (context-dependent behavior)
+- Policy consistency (pass^k reliability)
+- Factuality (parametric, retrieval, grounded)
+- Memory integrity & poisoning resistance
+- Alignment index (safety × honesty × helpfulness)
+- Over-compliance detection (H-Neurons, arXiv:2512.01797)
+- Monitor bypass resistance (arXiv:2503.09950)
+- Trust-authorization synchronization (arXiv:2512.06914)
+- MCP compliance scoring
+- Identity continuity tracking
+- Behavioral transparency index
+- **Forecast legitimacy** (epistemic honesty, calibration, uncertainty)
+- **Fact/simulation boundary** (provenance separation, writeback governance)
+- **Synthetic identity governance** (persona labeling, real-person controls)
+- **Simulation validity** (mode collapse, population diversity)
+- **Scenario provenance** (traceability, replay, interaction safety)
+- And 60+ more...
+
+</details>
+
+---
+
+## 🏗️ Architecture
+
+```
+Agent (untrusted)
+    │
+    ▼
+AMC Gateway ──── transparent proxy, agent doesn't know it's being watched
+    │
+    ▼
+Evidence Ledger ──── Ed25519 signatures + Merkle tree proof chains
+    │
+    ▼
+Scoring Engine ──── evidence-weighted diagnostics, 79 scoring modules, 147 assurance packs
+    │
+    ▼
+AMC Studio ──── dashboard + API + CLI + reports
+```
+
+### Evidence Trust Tiers
+
+| Tier | Weight | How |
+|------|--------|-----|
+| `OBSERVED_HARDENED` | 1.1× | AMC-controlled adversarial scenarios |
+| `OBSERVED` | 1.0× | Captured via gateway proxy |
+| `ATTESTED` | 0.8× | Cryptographic attestation |
+| `SELF_REPORTED` | 0.4× | Agent's own claims (capped) |
+
+### Maturity Scale
+
+| Level | Name | Meaning |
+|-------|------|---------|
+| **L0** | Absent | No safety controls |
+| **L1** | Initial | Some intent, nothing operational |
+| **L2** | Developing | Works on happy path, breaks at edges |
+| **L3** | Defined | Repeatable, measurable, auditable (EU AI Act minimum) |
+| **L4** | Managed | Proactive, risk-calibrated, cryptographic proofs |
+| **L5** | Optimizing | Self-correcting, continuously verified |
+
+---
+
+## Product Family
 
 AMC is one trust stack with eight named product surfaces:
 
@@ -82,146 +273,6 @@ AMC is one trust stack with eight named product surfaces:
 | **Fleet** | Multi-agent oversight, comparison, inventory, and governance |
 | **Passport** | Portable identity and credential artifacts for agents |
 | **Comply** | Compliance mappings, audit binders, and governance reporting |
-
-These names are intentional. AMC is not a single command with a long README — it is a trust stack you can grow into.
-
----
-
-## Pricing
-
-The full trust stack is **free and MIT licensed**. The only paid surface is Industry Packs.
-
-| Tier | What you get |
-|---|---|
-| **Free / Open Source** | Everything — Score, Shield, Enforce, Vault, Watch, Fleet, Passport, Comply, all 14 adapters, 481 CLI commands, browser playground, CI gates |
-| **Pro** | Everything in Free + selected Industry Packs for your regulated verticals |
-| **Enterprise** | Everything in Pro + all 40 Industry Packs + priority support + custom pack development + deployment assistance |
-
-> Industry Packs are 40 sector-specific domain packs (healthcare, finance, education, government, etc.) that require ongoing regulatory research and maintenance. The core trust stack stays free forever.
-
----
-
-## Choose your path
-
-### 1. Browser — fastest first look
-Use the existing browser playground to explore scoring logic, questions, and scenarios.
-
-**[→ Try the Web Playground](https://thewisecrab.github.io/AgentMaturityCompass/playground.html)**
-
-Best for:
-- first-touch evaluation
-- demos
-- lightweight exploration
-- understanding how scoring works
-
-### 2. CLI — real evidence workflows
-Use the CLI when you want actual execution evidence, traces, datasets, reports, and CI gates.
-
-```bash
-npx agent-maturity-compass quickscore
-```
-
-Best for:
-- real agent scoring
-- evidence capture
-- local trust workflows
-- shareable outputs
-
-### 3. CI — enforce standards continuously
-Use AMC in GitHub Actions or CI to prevent trust regressions.
-
-Best for:
-- release gates
-- score thresholds
-- drop detection
-- PR comments and artifact generation
-
-### 4. Deployment / enterprise path
-If you need self-hosted, managed, or enterprise deployment clarity, start here:
-
-- `docs/DEPLOYMENT_OPTIONS.md`
-- `docs/PRODUCT_EDITIONS.md`
-- `docs/PRICING.md`
-- `docs/ENTERPRISE.md`
-
-## Start by persona
-
-- **Solo builder / OSS maintainer** → `docs/SOLO_DEV_PATH.md`
-- **Platform / engineering team** → `docs/PLATFORM_PATH.md`
-- **Security / compliance** → `docs/SECURITY_PATH.md`
-
-## Support AMC
-
-Want to support the open project?
-
-- Sponsorship path: `SPONSORING.md`
-- Community/support routing: `docs/COMMUNITY_SUPPORT.md`
-
-## Core routing docs
-
-- `docs/INDEX.md`
-- `docs/START_HERE.md`
-- `docs/WHY_AMC.md`
-- `docs/USE_CASES.md`
-- `docs/PERSONAS.md`
-- `docs/AFTER_QUICKSCORE.md`
-- `docs/EXAMPLES_INDEX.md`
-- `docs/RECIPES.md`
-- `docs/DEPLOYMENT_OPTIONS.md`
-- `docs/PRODUCT_EDITIONS.md`
-- `docs/PRICING.md`
-- `docs/BUYER_PACKAGES.md`
-- `docs/SERVICES_AND_SUPPORT.md`
-- `docs/COMMUNITY_SHOWCASE.md`
-- `docs/RELEASE_HIGHLIGHTS.md`
-- `docs/BENCHMARK_GALLERY.md`
-
----
-
-## ⚡ Quick Start
-
-### Option 1: Terminal (2 minutes)
-
-```bash
-# Install
-npm i -g agent-maturity-compass
-
-# Score your agent
-cd your-agent-project
-amc init          # interactive setup
-amc quickscore    # get your score
-amc fix           # auto-generate fixes
-```
-
-### Option 2: Browser (0 minutes)
-
-**[→ Try the Web Playground](https://thewisecrab.github.io/AgentMaturityCompass/playground.html)** — answer questions, explore scenarios and assurance packs, get a score. No install.
-
-This is AMC's **browser try-now path**: great for first-touch scoring and exploration. For execution evidence, traces, datasets, and CI gates, use the CLI.
-
-### Option 3: Docker (0 config)
-
-```bash
-docker run -it --rm ghcr.io/thewisecrab/amc-quickstart amc quickscore
-```
-
-### Option 4: CI/CD (copy-paste)
-
-```yaml
-# .github/workflows/amc.yml
-name: AMC Score
-on: [push, pull_request]
-jobs:
-  score:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: thewisecrab/AgentMaturityCompass/amc-action@main
-        with:
-          target-level: 3        # fail if below L3
-          fail-on-drop: true     # fail if score drops
-          comment: true          # post results on PR
-```
 
 ---
 
@@ -313,7 +364,7 @@ amc domain assess --domain health                        # HIPAA assessment
 amc domain assess --domain wealth                        # MiFID II / DORA
 ```
 
-### GitHub Actions — full CI gate
+### GitHub Actions — CI trust gate
 
 ```yaml
 # .github/workflows/amc.yml — copy this entire file
@@ -349,142 +400,6 @@ Result: ![AMC Score](https://img.shields.io/badge/AMC-L3_(72.5)-green)
 
 ---
 
-## 🧪 What AMC Tests
-
-### 195 Diagnostic Questions × 5 Dimensions
-
-| Dimension | Questions | What It Measures |
-|-----------|-----------|------------------|
-| Strategic Agent Ops | 18 | Mission clarity, scope adherence, decision traceability |
-| Skills | 47 | Tool mastery, injection defense, DLP, scenario traceability, synthetic agent safety |
-| Resilience | 53 | Graceful degradation, circuit breakers, bypass resistance, simulation validity, fact/sim boundaries |
-| Leadership & Autonomy | 23 | Structured logs, traces, cost tracking, SLOs |
-| Culture & Alignment | 54 | Test harnesses, feedback loops, forecast legitimacy, persona governance, UX honesty |
-
-### 119 Assurance Packs
-
-| Category | Examples |
-|----------|---------|
-| Prompt Injection | System tampering, role hijacking, jailbreaks |
-| Exfiltration | Secret leakage, PII exposure, data boundary violations |
-| Adversarial | TAP/PAIR, Crescendo, Skeleton Key, best-of-N |
-| Context Leakage | EchoLeak, cross-session bleed, memory poisoning |
-| Supply Chain | Dependency attacks, MCP server poisoning, SBOM integrity |
-| Behavioral | Sycophancy, self-preservation, sabotage, over-compliance |
-
-### 40 Industry Domain Packs
-
-| Sector | Packs | Key Regulations |
-|--------|-------|-----------------|
-| 🏥 Health | 9 | HIPAA, FDA 21 CFR Part 11, EU MDR, ICH E6(R3) |
-| 💰 Wealth | 5 | MiFID II, PSD2, EU DORA, MiCA, FATF |
-| 🎓 Education | 5 | FERPA, COPPA, IDEA, EU AI Act Annex III |
-| 🚇 Mobility | 5 | UNECE WP.29, ETSI EN 303 645, EU NIS2 |
-| 💡 Technology | 5 | EU AI Act Art. 13, EU Data Act, DSA Art. 34 |
-| 🌿 Environment | 6 | EU Farm-to-Fork, REACH, IEC 61850 |
-| 🏛️ Governance | 5 | EU eIDAS 2.0, UNCAC, UNGPs |
-
-### 🔮 Simulation & Forecast Evaluation Lane
-
-Dedicated evaluation lane for simulation engines, forecast systems, and synthetic social environments. 5 scored dimensions:
-
-| Dimension | Weight | Questions | What it evaluates |
-|-----------|--------|-----------|-------------------|
-| Forecast Legitimacy | 25% | AMC-6.1–6.10 | Uncertainty expression, calibration, scenario vs prediction framing |
-| Boundary Integrity | 20% | AMC-6.11–6.17, 6.37–6.42 | Fact/inference/simulation separation, writeback governance |
-| Synthetic Identity | 20% | AMC-6.18–6.25, 6.48–6.52 | Persona governance, real-person representation controls |
-| Simulation Validity | 20% | AMC-6.30–6.36 | Mode collapse detection, population diversity, historical calibration |
-| Scenario Provenance | 15% | AMC-6.26–6.29, 6.53–6.57 | End-to-end traceability, replay capability, interaction safety |
-
-```bash
-amc score simulation-lane --system-type simulation-engine              # interactive
-amc score simulation-lane --system-type forecast-decision-support --json  # JSON output
-amc score simulation-lane --system-type synthetic-social-environment --responses answers.json
-```
-
-### 79 Scoring Modules
-
-<details>
-<summary>See all modules</summary>
-
-- Calibration gap (confidence vs reality)
-- Evidence conflict detection
-- Gaming resistance (adversarial score inflation)
-- Sleeper agent detection (context-dependent behavior)
-- Policy consistency (pass^k reliability)
-- Factuality (parametric, retrieval, grounded)
-- Memory integrity & poisoning resistance
-- Alignment index (safety × honesty × helpfulness)
-- Over-compliance detection (H-Neurons, arXiv:2512.01797)
-- Monitor bypass resistance (arXiv:2503.09950)
-- Trust-authorization synchronization (arXiv:2512.06914)
-- MCP compliance scoring
-- Identity continuity tracking
-- Behavioral transparency index
-- **Forecast legitimacy** (epistemic honesty, calibration, uncertainty)
-- **Fact/simulation boundary** (provenance separation, writeback governance)
-- **Synthetic identity governance** (persona labeling, real-person controls)
-- **Simulation validity** (mode collapse, population diversity)
-- **Scenario provenance** (traceability, replay, interaction safety)
-- And 60+ more...
-
-</details>
-
----
-
-## 🏗️ Architecture
-
-```
-Agent (untrusted)
-    │
-    ▼
-AMC Gateway ──── transparent proxy, agent doesn't know it's being watched
-    │
-    ▼
-Evidence Ledger ──── Ed25519 signatures + Merkle tree proof chains
-    │
-    ▼
-Scoring Engine ──── evidence-weighted diagnostics, 79 scoring modules, 119 assurance packs
-    │
-    ▼
-AMC Studio ──── dashboard + API + CLI + reports
-```
-
-### Evidence Trust Tiers
-
-| Tier | Weight | How |
-|------|--------|-----|
-| `OBSERVED_HARDENED` | 1.1× | AMC-controlled adversarial scenarios |
-| `OBSERVED` | 1.0× | Captured via gateway proxy |
-| `ATTESTED` | 0.8× | Cryptographic attestation |
-| `SELF_REPORTED` | 0.4× | Agent's own claims (capped) |
-
-### Maturity Scale
-
-| Level | Name | Meaning |
-|-------|------|---------|
-| **L0** | Absent | No safety controls |
-| **L1** | Initial | Some intent, nothing operational |
-| **L2** | Developing | Works on happy path, breaks at edges |
-| **L3** | Defined | Repeatable, measurable, auditable (EU AI Act minimum) |
-| **L4** | Managed | Proactive, risk-calibrated, cryptographic proofs |
-| **L5** | Optimizing | Self-correcting, continuously verified |
-
-### The Platform
-
-| Module | What It Does |
-|--------|-------------|
-| **AMC Score** | Evidence-weighted diagnostics across 5 dimensions, L0–L5 maturity |
-| **AMC Shield** | 86 assurance packs: injection, exfiltration, adversarial |
-| **AMC Enforce** | Policy engine, approval workflows, scoped leases |
-| **AMC Vault** | Ed25519 keys, Merkle chains, HSM/TPM support |
-| **AMC Watch** | Dashboard, gateway proxy, Prometheus metrics |
-| **AMC Fleet** | Multi-agent trust, delegation graphs |
-| **AMC Passport** | Portable agent credential (.amcpass) |
-| **AMC Comply** | EU AI Act, ISO 42001, NIST AI RMF, SOC 2, OWASP mapping |
-
----
-
 ## 🔌 14 Framework Adapters
 
 Zero code changes. One environment variable.
@@ -510,7 +425,7 @@ amc wrap <adapter> -- <your command>
 | Generic CLI | `amc wrap generic-cli -- python bot.py` |
 | OpenAI-compatible | `amc wrap openai-compat -- node server.js` |
 
-> 📖 [Full adapter docs](docs/ADAPTERS.md)
+> [Full adapter docs](docs/ADAPTERS.md)
 
 ---
 
@@ -571,6 +486,37 @@ cd AgentMaturityCompass && npm ci && npm run build && npm link
 
 ---
 
+## Pricing
+
+The full trust stack is **free and MIT licensed**. The only paid surface is Industry Packs.
+
+| Tier | What you get |
+|---|---|
+| **Free / Open Source** | Everything — Score, Shield, Enforce, Vault, Watch, Fleet, Passport, Comply, all 14 adapters, 481 CLI commands, browser playground, CI gates |
+| **Pro** | Everything in Free + selected Industry Packs for your regulated verticals |
+| **Enterprise** | Everything in Pro + all 40 Industry Packs + priority support + custom pack development + deployment assistance |
+
+> Industry Packs are 40 sector-specific domain packs (healthcare, finance, education, government, etc.) that require ongoing regulatory research and maintenance. The core trust stack stays free forever.
+
+---
+
+## Choose Your Path
+
+| Path | Best for | Start here |
+|------|----------|------------|
+| **Browser** | First-touch evaluation, demos, understanding scoring | [Web Playground](https://thewisecrab.github.io/AgentMaturityCompass/playground.html) |
+| **CLI** | Real agent scoring, evidence capture, shareable outputs | `npx agent-maturity-compass quickscore` |
+| **CI/CD** | Release gates, score thresholds, PR comments | [CI Templates](docs/CI_TEMPLATES.md) |
+| **Enterprise** | Self-hosted, managed deployment | [Deployment Options](docs/DEPLOYMENT_OPTIONS.md) |
+
+### Start by persona
+
+- **Solo builder / OSS maintainer** → [docs/SOLO_DEV_PATH.md](docs/SOLO_DEV_PATH.md)
+- **Platform / engineering team** → [docs/PLATFORM_PATH.md](docs/PLATFORM_PATH.md)
+- **Security / compliance** → [docs/SECURITY_PATH.md](docs/SECURITY_PATH.md)
+
+---
+
 ## 📚 Docs
 
 | | |
@@ -583,6 +529,34 @@ cd AgentMaturityCompass && npm ci && npm run build && npm link
 | [Install Packages](docs/INSTALL_PACKAGES.md) | [Support Policy](docs/SUPPORT_POLICY.md) |
 | [Release Cadence](docs/RELEASE_CADENCE.md) | [CI Templates](docs/CI_TEMPLATES.md) |
 | [Hardening Guide](docs/HARDENING.md) | [Community](docs/COMMUNITY.md) |
+| [Assurance Lab](docs/ASSURANCE_LAB.md) | [Domain Packs](docs/SECTOR_PACKS.md) |
+| [EU AI Act Compliance](docs/EU_AI_ACT_COMPLIANCE.md) | [Multi-Agent Trust](docs/MULTI_AGENT_TRUST.md) |
+| [Executive Overview](docs/EXECUTIVE_OVERVIEW.md) | [White Paper](whitepaper/AMC_WHITEPAPER_v1.md) |
+| [Example Projects](examples/) | [Web Playground](https://thewisecrab.github.io/AgentMaturityCompass/playground.html) |
+
+<details>
+<summary><strong>More docs</strong></summary>
+
+- [docs/INDEX.md](docs/INDEX.md) — full documentation index
+- [docs/START_HERE.md](docs/START_HERE.md) — orientation guide
+- [docs/WHY_AMC.md](docs/WHY_AMC.md) — the case for AMC
+- [docs/USE_CASES.md](docs/USE_CASES.md) — use case gallery
+- [docs/PERSONAS.md](docs/PERSONAS.md) — role-based guides
+- [docs/AFTER_QUICKSCORE.md](docs/AFTER_QUICKSCORE.md) — what to do after your first score
+- [docs/EXAMPLES_INDEX.md](docs/EXAMPLES_INDEX.md) — example index
+- [docs/RECIPES.md](docs/RECIPES.md) — extended recipes
+- [docs/DEPLOYMENT_OPTIONS.md](docs/DEPLOYMENT_OPTIONS.md) — deployment options
+- [docs/PRODUCT_EDITIONS.md](docs/PRODUCT_EDITIONS.md) — product editions
+- [docs/PRICING.md](docs/PRICING.md) — pricing details
+- [docs/BUYER_PACKAGES.md](docs/BUYER_PACKAGES.md) — buyer packages
+- [docs/SERVICES_AND_SUPPORT.md](docs/SERVICES_AND_SUPPORT.md) — services and support
+- [docs/COMMUNITY_SHOWCASE.md](docs/COMMUNITY_SHOWCASE.md) — community showcase
+- [docs/RELEASE_HIGHLIGHTS.md](docs/RELEASE_HIGHLIGHTS.md) — release highlights
+- [docs/BENCHMARK_GALLERY.md](docs/BENCHMARK_GALLERY.md) — benchmark gallery
+- [docs/SPONSORING.md](docs/SPONSORING.md) — sponsorship
+- [docs/COMMUNITY_SUPPORT.md](docs/COMMUNITY_SUPPORT.md) — community and support
+
+</details>
 
 ### Single-binary install (experimental)
 
@@ -619,12 +593,6 @@ Current MVP behavior:
 - `prod` → isolated trust boundary, proxy env disabled
 - explicit `--trust-boundary` still overrides the profile when you need it
 
-| [Assurance Lab](docs/ASSURANCE_LAB.md) | [Domain Packs](docs/SECTOR_PACKS.md) |
-| [EU AI Act Compliance](docs/EU_AI_ACT_COMPLIANCE.md) | [Multi-Agent Trust](docs/MULTI_AGENT_TRUST.md) |
-| [Executive Overview](docs/EXECUTIVE_OVERVIEW.md) | [White Paper](whitepaper/AMC_WHITEPAPER_v1.md) |
-| [Example Projects](examples/) | [Community](docs/COMMUNITY.md) |
-| [Web Playground](https://thewisecrab.github.io/AgentMaturityCompass/playground.html) | [Compatibility Matrix](docs/COMPATIBILITY_MATRIX.md) |
-
 ---
 
 ## 🤝 Contributing
@@ -633,17 +601,17 @@ AMC is MIT licensed. We welcome contributions — especially new **assurance pac
 
 ```bash
 git clone https://github.com/thewisecrab/AgentMaturityCompass.git
-cd AgentMaturityCompass && npm ci && npm test   # 3,645 tests
+cd AgentMaturityCompass && npm ci && npm test   # 4,161 tests
 ```
 
 **→ [CONTRIBUTING.md](CONTRIBUTING.md)** — includes guides for writing packs, mapping research papers, and adding adapters.
 
 ### Good first contributions
 
-- 🔬 **New assurance pack** — model a new attack scenario ([guide](CONTRIBUTING.md#writing-an-assurance-pack))
-- 🏥 **New domain pack** — add industry-specific questions ([guide](CONTRIBUTING.md#writing-a-domain-pack))
-- 🔌 **New adapter** — support another agent framework ([guide](CONTRIBUTING.md#writing-an-adapter))
-- 📄 **Research paper → module** — turn arXiv findings into scoring logic ([guide](CONTRIBUTING.md#mapping-a-research-paper))
+- **New assurance pack** — model a new attack scenario ([guide](CONTRIBUTING.md#writing-an-assurance-pack))
+- **New domain pack** — add industry-specific questions ([guide](CONTRIBUTING.md#writing-a-domain-pack))
+- **New adapter** — support another agent framework ([guide](CONTRIBUTING.md#writing-an-adapter))
+- **Research paper → module** — turn arXiv findings into scoring logic ([guide](CONTRIBUTING.md#mapping-a-research-paper))
 
 ---
 
@@ -654,10 +622,6 @@ cd AgentMaturityCompass && npm ci && npm test   # 3,645 tests
 ---
 
 <p align="center">
-  <strong>195 diagnostic questions · 119 assurance packs · 40 domain packs · 14 adapters · 79 scoring modules · 3,645 tests</strong><br>
+  <strong>235 diagnostic questions · 147 assurance packs · 40 domain packs · 14 adapters · 79 scoring modules · 4,161 tests</strong><br>
   <em>Stop trusting. Start verifying.</em>
-</p>
-
-<p align="center">
-  <sub>If your AGENTS.md doesn't have an AMC badge, you're running with scissors. 🏃‍♂️✂️</sub>
 </p>

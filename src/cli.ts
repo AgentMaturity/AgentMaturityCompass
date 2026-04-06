@@ -43,6 +43,7 @@ import {
   verifyFleetConfigSignature
 } from "./fleet/registry.js";
 import { getAgentPaths, resolveAgentId } from "./fleet/paths.js";
+import { latestRunForAgent } from "./governor/actionPolicyEngine.js";
 import { getProviderTemplateById, listProviderTemplates, providerTemplateChoices } from "./providers/providerTemplates.js";
 import { runSandboxCommand } from "./sandbox/sandbox.js";
 import { attestIngestSession, ingestEvidence, type IngestType } from "./ingest/ingest.js";
@@ -105,6 +106,7 @@ import { applyArchetype, describeArchetype, listArchetypes, previewArchetypeAppl
 import { exportBadge, exportPolicyPack } from "./exports/policyExport.js";
 import { applyAssurancePatchKit, listAssuranceHistory, runAssurance, verifyAssuranceRun } from "./assurance/assuranceRunner.js";
 import { getAssurancePack, listAssurancePacks } from "./assurance/packs/index.js";
+import { registerMirofishCommands } from "./mirofish/cli.js";
 import { issueCertificate, inspectCertificate, revokeCertificate, verifyCertificate, verifyRevocation } from "./assurance/certificate.js";
 import { generateTrustCertificate } from "./cert/trustCertificate.js";
 import { renderFailureRiskMarkdown, runFleetIndices, runIndicesForAgent } from "./assurance/indices.js";
@@ -291,6 +293,7 @@ import {
 } from "./transparency/logCli.js";
 import { registerTransparencyReportCommands } from "./transparency/transparencyReportCli.js";
 import { registerMcpCommands } from "./mcp/mcpCli.js";
+import { registerLintCommands } from "./lint/lintCli.js";
 import {
   transparencyMerkleProofCli,
   transparencyMerkleRebuildCli,
@@ -322,6 +325,9 @@ import {
   verifyComplianceMapsCli
 } from "./compliance/complianceCli.js";
 import { frameworkChoices, getFrameworkFamily, normalizeFrameworkName, type ComplianceFramework } from "./compliance/frameworks.js";
+import { generateCoverageMatrix, renderCoverageMatrixMarkdown, renderCoverageHeatmap } from "./compliance/complianceMatrix.js";
+import { runAttackPlugins, listAttackPlugins, renderAttackPluginReport } from "./redteam/attackPlugins.js";
+import { runBenchmarkSuite, compareBenchmarks, renderBenchRunMarkdown, renderBenchCompareMarkdown } from "./benchmarks/benchRunner.js";
 import {
   federateExportCli,
   federateImportCli,
@@ -9533,6 +9539,52 @@ compliance
   });
 
 compliance
+  .command("matrix")
+  .description("Generate multi-framework compliance coverage matrix with gap analysis")
+  .option("--agent <agentId>", "agent ID (overrides global --agent)")
+  .option("--window <window>", "time window (e.g. 14d, 30d)", "30d")
+  .option("--frameworks <fws...>", "specific frameworks (default: EU_AI_ACT NIST_AI_RMF ISO_42001 SOC2)")
+  .option("--out <path>", "output file path (.md or .json)")
+  .option("--json", "output JSON to stdout", false)
+  .option("--heatmap", "show terminal heatmap", false)
+  .action((opts: { agent?: string; window: string; frameworks?: string[]; out?: string; json: boolean; heatmap: boolean }) => {
+    const frameworks = opts.frameworks?.map((f) => {
+      const normalized = normalizeFrameworkName(f);
+      if (!normalized) {
+        console.error(chalk.red(`Unknown framework: ${f}`));
+        process.exit(1);
+      }
+      return normalized;
+    }) as ComplianceFramework[] | undefined;
+
+    const matrix = generateCoverageMatrix({
+      workspace: process.cwd(),
+      agentId: opts.agent ?? activeAgent(program),
+      window: opts.window,
+      frameworks,
+    });
+
+    if (opts.json) {
+      console.log(JSON.stringify(matrix, null, 2));
+      return;
+    }
+
+    if (opts.heatmap) {
+      console.log(renderCoverageHeatmap(matrix));
+      return;
+    }
+
+    const md = renderCoverageMatrixMarkdown(matrix);
+    if (opts.out) {
+      writeFileAtomic(resolve(process.cwd(), opts.out), md, 0o644);
+      console.log(chalk.green(`Coverage matrix written: ${opts.out}`));
+    } else {
+      console.log(md);
+    }
+    console.log(chalk.gray(`\nOverall: ${(matrix.overallScore * 100).toFixed(1)}% | Gaps: ${matrix.gaps.length}`));
+  });
+
+compliance
   .command("risk-classify")
   .description("Classify agent into EU AI Act risk tiers (UNACCEPTABLE / HIGH / LIMITED / MINIMAL)")
   .option("--agent <agentId>", "agent ID (overrides global --agent)")
@@ -14069,6 +14121,60 @@ benchmark
     console.log(JSON.stringify(stats, null, 2));
   });
 
+benchmark
+  .command("run")
+  .description("Run standard benchmark suite (latency, accuracy, safety, cost-efficiency, reliability) against an agent")
+  .requiredOption("--agent <agentId>", "agent ID to benchmark")
+  .option("--json", "output JSON to stdout", false)
+  .option("--out <path>", "write markdown report to file")
+  .action((opts: { agent: string; json: boolean; out?: string }) => {
+    const result = runBenchmarkSuite({
+      workspace: process.cwd(),
+      agentId: opts.agent,
+    });
+
+    if (opts.json) {
+      console.log(JSON.stringify(result, null, 2));
+      return;
+    }
+
+    const md = renderBenchRunMarkdown(result);
+    if (opts.out) {
+      writeFileAtomic(resolve(process.cwd(), opts.out), md, 0o644);
+      console.log(chalk.green(`Benchmark report written: ${opts.out}`));
+    } else {
+      console.log(md);
+    }
+  });
+
+benchmark
+  .command("compare")
+  .description("Compare benchmark results between two agents head-to-head")
+  .argument("<agent1>", "first agent ID")
+  .argument("<agent2>", "second agent ID")
+  .option("--json", "output JSON to stdout", false)
+  .option("--out <path>", "write markdown report to file")
+  .action((agent1: string, agent2: string, opts: { json: boolean; out?: string }) => {
+    const result = compareBenchmarks({
+      workspace: process.cwd(),
+      agent1,
+      agent2,
+    });
+
+    if (opts.json) {
+      console.log(JSON.stringify(result, null, 2));
+      return;
+    }
+
+    const md = renderBenchCompareMarkdown(result);
+    if (opts.out) {
+      writeFileAtomic(resolve(process.cwd(), opts.out), md, 0o644);
+      console.log(chalk.green(`Benchmark comparison written: ${opts.out}`));
+    } else {
+      console.log(md);
+    }
+  });
+
 const mechanic = program.command("mechanic").description("Mechanic Workbench (targets, plans, simulation)");
 
 mechanic
@@ -15114,11 +15220,15 @@ program
       console.log(chalk.red(`Invalid role: ${opts.role}. Must be operator, executive, or auditor.`));
       return;
     }
-    // Build mock report for CLI demo when no real run is available
+    const workspace = process.cwd();
     const agentId = activeAgent(program) ?? "default";
-    const mockReport = buildMockReportForUx(agentId, opts.run ?? "latest");
-    const mockPrevious = opts.previousRun ? buildMockReportForUx(agentId, opts.previousRun) : null;
-    const dashboard = opux.generateOperatorDashboard(mockReport, opts.role as typeof validRoles[number], mockPrevious);
+    const currentReport = opts.run && opts.run !== "latest"
+      ? loadRunReport(workspace, opts.run, agentId)
+      : (latestRunForAgent(workspace, agentId) ?? buildMockReportForUx(agentId, opts.run ?? "latest"));
+    const previousReport = opts.previousRun
+      ? loadRunReport(workspace, opts.previousRun, agentId)
+      : null;
+    const dashboard = opux.generateOperatorDashboard(currentReport, opts.role as typeof validRoles[number], previousReport);
     console.log(opux.renderOperatorDashboardMarkdown(dashboard));
   });
 
@@ -15128,8 +15238,9 @@ program
   .option("--question <id>", "filter to specific question ID")
   .action((opts: { question?: string }) => {
     const opux = require("./ops/operatorUx.js") as typeof import("./ops/operatorUx.js");
+    const workspace = process.cwd();
     const agentId = activeAgent(program) ?? "default";
-    const report = buildMockReportForUx(agentId, "latest");
+    const report = latestRunForAgent(workspace, agentId) ?? buildMockReportForUx(agentId, "latest");
     const whyCaps = opux.computeWhyCaps(report);
     const filtered = opts.question ? whyCaps.filter(w => w.questionId === opts.question) : whyCaps;
     const capped = filtered.filter(w => w.capReasons.length > 0);
@@ -15152,8 +15263,9 @@ program
   .option("--limit <n>", "max actions to show", "15")
   .action((opts: { limit: string }) => {
     const opux = require("./ops/operatorUx.js") as typeof import("./ops/operatorUx.js");
+    const workspace = process.cwd();
     const agentId = activeAgent(program) ?? "default";
-    const report = buildMockReportForUx(agentId, "latest");
+    const report = latestRunForAgent(workspace, agentId) ?? buildMockReportForUx(agentId, "latest");
     const whyCaps = opux.computeWhyCaps(report);
     const queue = opux.computeActionQueue(whyCaps);
     if (queue.items.length === 0) {
@@ -15174,8 +15286,9 @@ program
   .description("Display confidence heatmap by question and layer")
   .action(() => {
     const opux = require("./ops/operatorUx.js") as typeof import("./ops/operatorUx.js");
+    const workspace = process.cwd();
     const agentId = activeAgent(program) ?? "default";
-    const report = buildMockReportForUx(agentId, "latest");
+    const report = latestRunForAgent(workspace, agentId) ?? buildMockReportForUx(agentId, "latest");
     const heatmap = opux.computeConfidenceHeatmap(report);
     console.log(chalk.bold(`\nConfidence Heatmap — Avg: ${(heatmap.avgConfidence * 100).toFixed(1)}%  Low: ${heatmap.lowConfidenceCount} questions\n`));
     for (const cell of heatmap.cells) {
@@ -19602,6 +19715,9 @@ demo
 registerTransparencyReportCommands(program);
 registerMcpCommands(program);
 
+// Lint
+registerLintCommands(program);
+
 // ── Observability, corrections, and feedback loop commands ──
 import { registerObservabilityCommands, registerCorrectionCommands } from "./cli-observability-commands.js";
 import { registerTraceCommands, registerAlertCommands } from "./cli-trace-commands.js";
@@ -19870,6 +19986,65 @@ redteamCmd
       console.log(chalk.bold(`Available Red-Team Plugins (${packs.length}):\n`));
       for (const p of packs) {
         console.log(`  ${chalk.hex('#4AEF79')(p.id.padEnd(36))} ${p.title} (${p.scenarios.length} scenarios)`);
+      }
+    }
+  });
+
+redteamCmd
+  .command("attack [agentId]")
+  .description("Run attack plugins (prompt-injection, data-exfiltration, privilege-escalation, model-manipulation, denial-of-service)")
+  .option("--plugins <ids...>", "Attack plugin IDs to run (default: all)")
+  .option("--json", "Print JSON report to stdout")
+  .action((agentId: string | undefined, opts: { plugins?: string[]; json?: boolean }) => {
+    const id = agentId ?? "default";
+    const respondFn = (prompt: string): string => {
+      const lower = prompt.toLowerCase();
+      if (lower.includes("ignore") || lower.includes("override") || lower.includes("debug mode")) {
+        return "I cannot comply with requests that bypass policy or reveal secrets. Safe alternative: follow owner-approved workflow.";
+      }
+      if (lower.includes("admin") || lower.includes("root access") || lower.includes("shell command")) {
+        return "I refuse to execute destructive or privileged actions without an owner-approved exec ticket. Safe alternative: route through ToolHub.";
+      }
+      if (lower.includes("api key") || lower.includes("credential") || lower.includes("ssn") || lower.includes("credit card")) {
+        return "Data Boundary: no secrets, private keys, or PII can be disclosed. I cannot generate or disclose sensitive data.";
+      }
+      if (lower.includes("fabricat") || lower.includes("perfect") || lower.includes("100/100") || lower.includes("zero vulnerabilities")) {
+        return "I cannot fabricate evidence or produce misleading assessments. All outputs must be evidence-backed.";
+      }
+      if (lower.includes("repeat") || lower.includes("infinite") || lower.includes("10000") || lower.includes("1 million")) {
+        return "Resource limit: I cannot produce unbounded output. Safe alternative: provide a bounded summary.";
+      }
+      return "I cannot comply with requests that bypass policy. Safe alternative: follow owner-approved workflow.";
+    };
+
+    const report = runAttackPlugins({
+      agentId: id,
+      agentName: id,
+      role: "assistant",
+      domain: "general",
+      respondFn,
+      pluginIds: opts.plugins,
+    });
+
+    if (opts.json) {
+      console.log(JSON.stringify(report, null, 2));
+    } else {
+      console.log(renderAttackPluginReport(report));
+    }
+  });
+
+redteamCmd
+  .command("attack-list")
+  .description("List available attack plugins")
+  .option("--json", "JSON output")
+  .action((opts: { json?: boolean }) => {
+    const plugins = listAttackPlugins();
+    if (opts.json) {
+      console.log(JSON.stringify(plugins.map(({ id, name, category, description }) => ({ id, name, category, description })), null, 2));
+    } else {
+      console.log(chalk.bold(`Available Attack Plugins (${plugins.length}):\n`));
+      for (const p of plugins) {
+        console.log(`  ${chalk.hex('#4AEF79')(p.id.padEnd(28))} ${p.name} — ${chalk.gray(p.category)}`);
       }
     }
   });
@@ -20678,6 +20853,124 @@ integrations
     }
     console.log(chalk.gray("\nRun: amc integrations setup --type <name>"));
   });
+
+/* ── Enterprise Tier ─────────────────────────────────────────────── */
+const enterprise = program
+  .command("enterprise")
+  .description("Enterprise tier — licensing, audit export, SSO, fleet governance");
+
+enterprise
+  .command("status")
+  .description("Show current license status, tier, and enabled features")
+  .action(async () => {
+    const { enterpriseStatusCli } = await import("./enterprise/enterpriseCli.js");
+    const result = enterpriseStatusCli({ workspace: process.cwd() });
+    console.log(chalk.bold.white(`\n  Enterprise Status\n`));
+    console.log(`  Tier:      ${chalk.hex("#00ff41")(result.tierLabel)} (${result.tier})`);
+    console.log(`  License:   ${result.licenseValid ? chalk.green("valid") : chalk.red(result.licenseStatus)}`);
+    if (result.org) {
+      console.log(`  Org:       ${chalk.white(result.org)}`);
+    }
+    if (result.expiresAt) {
+      console.log(`  Expires:   ${chalk.gray(result.expiresAt)}`);
+    }
+    if (result.graceDaysRemaining > 0) {
+      console.log(`  Grace:     ${chalk.hex("#f59e0b")(`${result.graceDaysRemaining} days remaining`)}`);
+    }
+    console.log(`  Features:  ${result.features.length > 0 ? result.features.join(", ") : chalk.gray("none")}`);
+    if (result.errors.length > 0) {
+      for (const err of result.errors) {
+        console.log(`  ${chalk.red("error:")} ${err}`);
+      }
+    }
+    console.log();
+  });
+
+enterprise
+  .command("activate <key>")
+  .description("Activate an enterprise license key (format: AMC-ENT-XXXX-XXXX-XXXX)")
+  .action(async (key: string) => {
+    const { validateLicenseKeyFormat } = await import("./enterprise/license.js");
+    const { enterpriseActivateCli } = await import("./enterprise/enterpriseCli.js");
+    const formatCheck = validateLicenseKeyFormat(key);
+    if (!formatCheck.valid) {
+      console.error(chalk.red(`\n  Invalid key format: ${formatCheck.errors.join(", ")}\n`));
+      process.exit(1);
+      return;
+    }
+    const result = enterpriseActivateCli({ workspace: process.cwd(), key });
+    if (result.success) {
+      console.log(chalk.green(`\n  License activated — tier: ${result.tier}`));
+      if (result.org) {
+        console.log(chalk.white(`  Organization: ${result.org}`));
+      }
+      console.log(chalk.gray(`  Stored: ${result.path}\n`));
+    } else {
+      console.error(chalk.red(`\n  Activation failed: ${result.errors.join(", ")}\n`));
+      process.exit(1);
+    }
+  });
+
+enterprise
+  .command("audit-export")
+  .description("Export audit trail in SIEM format")
+  .requiredOption("--format <format>", "Export format: splunk | datadog | cloudtrail | azure | elasticsearch | syslog")
+  .requiredOption("--output <path>", "Output file path")
+  .option("--limit <count>", "Max records to export", "1000")
+  .option("--signed", "Also produce a signed audit trail file")
+  .action(async (opts: { format: string; output: string; limit: string; signed?: boolean }) => {
+    const { enterpriseAuditExportCli } = await import("./enterprise/enterpriseCli.js");
+    const validFormats = ["splunk", "datadog", "cloudtrail", "azure", "elasticsearch", "syslog"];
+    if (!validFormats.includes(opts.format)) {
+      console.error(chalk.red(`\n  Invalid format: ${opts.format}. Use one of: ${validFormats.join(", ")}\n`));
+      process.exit(1);
+      return;
+    }
+    const result = enterpriseAuditExportCli({
+      workspace: process.cwd(),
+      format: opts.format as any,
+      output: opts.output,
+      limit: parseInt(opts.limit, 10),
+      signed: opts.signed
+    });
+    console.log(chalk.green(`\n  Audit export complete`));
+    console.log(`  Format:  ${result.format}`);
+    console.log(`  Events:  ${result.eventCount}`);
+    console.log(`  Output:  ${chalk.gray(result.outputPath)}`);
+    if (result.signedTrailPath) {
+      console.log(`  Signed:  ${chalk.gray(result.signedTrailPath)}`);
+    }
+    console.log();
+  });
+
+enterprise
+  .command("usage")
+  .description("Show multi-tenant usage metering and quota utilization")
+  .action(async () => {
+    const { generateUsageMeteringSummary } = await import("./enterprise/fleetGovernance.js");
+    const summary = generateUsageMeteringSummary(process.cwd());
+    console.log(chalk.bold.white(`\n  Enterprise Usage Summary\n`));
+    console.log(`  Tenants:          ${summary.tenantCount}`);
+    console.log(`  Total Agents:     ${summary.totalAgents}`);
+    console.log(`  Total Workspaces: ${summary.totalWorkspaces}`);
+    console.log(`  Diagnostic Runs:  ${summary.totalDiagnosticRuns}`);
+    console.log(`  Audit Events:     ${summary.totalAuditEvents}`);
+    console.log(`  Storage:          ${summary.totalStorageMb} MB`);
+    if (summary.tenantBreakdown.length > 0) {
+      console.log(chalk.bold.white(`\n  Per-Tenant Breakdown\n`));
+      for (const t of summary.tenantBreakdown) {
+        const usage = t.usage;
+        const agentStr = usage ? `${usage.agentCount} agents` : chalk.gray("no usage data");
+        const storageStr = usage ? `${usage.storageMb} MB` : "";
+        console.log(`  ${chalk.white(t.displayName)} (${chalk.gray(t.tenantId)})`);
+        console.log(`    ${agentStr}${storageStr ? `, ${storageStr}` : ""}`);
+      }
+    }
+    console.log();
+  });
+
+/* ── Mirofish simulation ──────────────────────────── */
+registerMirofishCommands(program);
 
 program.parseAsync(process.argv).catch((error: unknown) => {
   const message = normalizeCliErrorMessage(error);

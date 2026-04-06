@@ -1,0 +1,23 @@
+name: junior-copilot
+description: >
+  Low-autonomy copilot that escalates frequently, uses tools conservatively,
+  and defers to human judgement. Typical of newly deployed assistants with
+  training wheels still on.
+version: "1.0.0"
+tags: [beginner, conservative, high-escalation]
+
+behavior:
+  autonomy: 0.15
+  errorRate: 0.12
+  escalationFrequency: 0.85
+  toolUsage: 0.25
+  responseLatency: 0.3
+  hallucinationRate: 0.08
+  complianceAdherence: 0.7
+
+variance:
+  autonomy: 0.05
+  errorRate: 0.04
+  escalationFrequency: 0.06
+  toolUsage: 0.08
+  hallucinationRate: 0.03
