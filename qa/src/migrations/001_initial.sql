@@ -1,0 +1,31 @@
+CREATE TABLE IF NOT EXISTS releases (
+  id SERIAL PRIMARY KEY,
+  tag VARCHAR(50) NOT NULL,
+  app VARCHAR(50) NOT NULL DEFAULT 'amc',
+  phase VARCHAR(20) NOT NULL DEFAULT 'Plan',
+  bugs INTEGER NOT NULL DEFAULT 0,
+  status VARCHAR(20) NOT NULL DEFAULT 'active',
+  created_at TIMESTAMP DEFAULT NOW(),
+  updated_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS bot_log (
+  id SERIAL PRIMARY KEY,
+  msg TEXT NOT NULL,
+  created_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS bot_state (
+  id INTEGER PRIMARY KEY DEFAULT 1,
+  status VARCHAR(20) NOT NULL DEFAULT 'stopped',
+  last_run TIMESTAMP,
+  last_action TEXT
+);
+
+INSERT INTO bot_state (id, status) VALUES (1, 'stopped') ON CONFLICT DO NOTHING;
+
+CREATE TABLE IF NOT EXISTS integrations (
+  service VARCHAR(50) PRIMARY KEY,
+  status VARCHAR(20) NOT NULL DEFAULT 'not_configured',
+  config JSONB NOT NULL DEFAULT '{}'
+);

@@ -72,3 +72,6 @@ exports/
 .amc/ledger/
 .amc/reports/
 swarm-report.json
+qa/node_modules/
+qa/dist/
+qa/.env
