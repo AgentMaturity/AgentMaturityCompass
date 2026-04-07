@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AMC Playground — Score Your AI Agent</title>
 <link rel="manifest" href="manifest.json">
-<script defer data-domain="thewisecrab.github.io" src="https://plausible.io/js/script.js"></script>
+<script defer data-domain="agentmaturity.co" src="https://plausible.io/js/script.js"></script>
 <style>
   :root { --bg: #020802; --g: #00ff41; --g2: #00cc33; --t1: #e0ffe0; --t2: #8cc88c; --mono: 'JetBrains Mono', monospace; --bdr: rgba(0,255,65,.12); --t0: #1a1a1a; --panel: rgba(0,20,0,.85); --danger: #ff4444; --warn: #ffaa00; --info: #44aaff; }
   *:focus-visible { outline: 2px solid var(--g); outline-offset: 2px; }
@@ -519,7 +519,7 @@ function shareResults() {
     const dl = avg >= 90 ? 'L5' : avg >= 70 ? 'L4' : avg >= 50 ? 'L3' : avg >= 30 ? 'L2' : avg >= 10 ? 'L1' : 'L0';
     dimLines += `  • ${dimName}: ${dl} (${Math.round(avg)}/100)\n`;
   }
-  const text = `🧭 AMC Agent Trust Score: ${level} (${score}/100)\n\nDimensions:\n${dimLines}\nAssessed ${Object.keys(responses).length}/15 questions.\nDate: ${new Date().toLocaleDateString()}\n\nScore your own agent → https://thewisecrab.github.io/AgentMaturityCompass/playground.html`;
+  const text = `🧭 AMC Agent Trust Score: ${level} (${score}/100)\n\nDimensions:\n${dimLines}\nAssessed ${Object.keys(responses).length}/15 questions.\nDate: ${new Date().toLocaleDateString()}\n\nScore your own agent → https://AgentMaturity.github.io/AgentMaturityCompass/playground.html`;
   document.getElementById('shareText').value = text;
   document.getElementById('shareResult').style.display = 'block';
 }

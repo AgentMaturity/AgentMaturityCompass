@@ -36,7 +36,7 @@ class GitHubIntegration extends BaseIntegration {
 
   async getPRs(repo: string, state: string = 'open'): Promise<any[]> {
     const config = await this.getConfig();
-    const owner = config.owner || 'thewisecrab';
+    const owner = config.owner || 'AgentMaturity';
     const prs = await this.request(`/repos/${owner}/${repo}/pulls?state=${state}&per_page=30`);
     return (prs as any[]).map((pr: any) => ({
       number: pr.number,
@@ -51,7 +51,7 @@ class GitHubIntegration extends BaseIntegration {
 
   async getRelease(repo: string, tag?: string): Promise<any> {
     const config = await this.getConfig();
-    const owner = config.owner || 'thewisecrab';
+    const owner = config.owner || 'AgentMaturity';
     const path = tag
       ? `/repos/${owner}/${repo}/releases/tags/${tag}`
       : `/repos/${owner}/${repo}/releases/latest`;
@@ -60,7 +60,7 @@ class GitHubIntegration extends BaseIntegration {
 
   async triggerWorkflow(repo: string, workflowId: string, ref: string = 'main', inputs?: Record<string, string>): Promise<void> {
     const config = await this.getConfig();
-    const owner = config.owner || 'thewisecrab';
+    const owner = config.owner || 'AgentMaturity';
     await this.request(`/repos/${owner}/${repo}/actions/workflows/${workflowId}/dispatches`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -70,7 +70,7 @@ class GitHubIntegration extends BaseIntegration {
 
   async getWorkflowRuns(repo: string, limit: number = 10): Promise<any[]> {
     const config = await this.getConfig();
-    const owner = config.owner || 'thewisecrab';
+    const owner = config.owner || 'AgentMaturity';
     const data = await this.request(`/repos/${owner}/${repo}/actions/runs?per_page=${limit}`);
     return (data as any).workflow_runs.map((r: any) => ({
       id: r.id,

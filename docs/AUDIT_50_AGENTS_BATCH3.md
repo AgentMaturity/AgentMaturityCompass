@@ -276,7 +276,7 @@ AMC is an impressive and deeply engineered product with serious production scaff
 - `whitepaper/AMC_WHITEPAPER_v1.md` → Exists. 1,192+ lines. arXiv-ready abstract, formal M(a,d,t) function, citations, keyword list. **This is the primary citable artifact.**
 - `docs/RESEARCH_PAPERS_2026.md` → References 20 papers with gap analysis. Shows scholarly engagement.
 - Both RFCs dated 2026-03-14 — current.
-- Repository URL in RFC: `https://github.com/agentmaturitycompass/amc` — but actual repo is `https://github.com/thewisecrab/AgentMaturityCompass`. **URL MISMATCH — breaks citation.**
+- Repository URL in RFC: `https://github.com/agentmaturitycompass/amc` — but actual repo is `https://github.com/AgentMaturity/AgentMaturityCompass`. **URL MISMATCH — breaks citation.**
 - No DOI (Digital Object Identifier) assigned.
 - No arXiv submission visible (paper references "arXiv Categories: cs.AI, cs.SE, cs.MA" but no arXiv ID).
 - `docs/AMC_QUESTION_BANK_FULL.json` exists — researchers can audit the rubric.
@@ -430,7 +430,7 @@ Commands expected but missing or broken:
 2. **SOX compliance engine** — Same. James is missing his primary framework.
 3. **FedRAMP compliance engine** — Patrick can't complete a government procurement.
 4. **COPPA/FERPA in compliance engine** — Ling's EdTech product likely violates COPPA without this.
-5. **GitHub URL mismatch in RFC** — Breaks academic citations. Fix `agentmaturitycompass/amc` → `thewisecrab/AgentMaturityCompass`.
+5. **GitHub URL mismatch in RFC** — Breaks academic citations. Fix `agentmaturitycompass/amc` → `AgentMaturity/AgentMaturityCompass`.
 6. **Sector packs unreachable via CLI** — Docs describe 40 packs, CLI exposes 0 of them. Major docs-reality gap.
 
 ### 🟡 Important (significant user friction)

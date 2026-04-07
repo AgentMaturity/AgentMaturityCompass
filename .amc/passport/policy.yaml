@@ -1,0 +1,37 @@
+passportPolicy:
+  version: 1
+  governance:
+    requireOwnerForCreate: true
+    requireDualControlForExternalSharing: true
+    approvalActionClass: GOVERNANCE
+    allowAgentReadOnlyBadge: true
+  privacy:
+    exportAllowlistOnly: true
+    redactAllFreeText: true
+    allowFreeTextFields: []
+    exportAgentIdsHashed: true
+    hashTruncBytes: 8
+    anonymizeWorkspaceIdDefault: true
+    forbidPromptsAndRawIO: true
+    forbidPII: true
+    forbidSecrets: true
+    forbidUrlsAndPaths: true
+  integrityGates:
+    minIntegrityIndexForVerified: 0.9
+    minCorrelationRatioForVerified: 0.9
+    requireTrustLabelForVerified: HIGH
+    requireAssuranceCertPassForVerified: true
+    requireNotaryWhenEnabled: true
+  contents:
+    includeMaturity: true
+    includeFiveStrategyRisks: true
+    includeFiveValueDims: true
+    includeAssuranceSummary: true
+    includeBenchSummary: true
+    includePromptEnforcementSummary: true
+    includeToolModelGovernanceSummary: true
+    includeAuditBinderSummary: true
+    includeMechanicTargetsHashOnly: true
+    includeCgxPackHash: true
+    includeEvidenceCoverage: true
+    includeQuestionLevelScores: false

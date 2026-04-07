@@ -22,7 +22,7 @@ Every contribution makes AI agent trust scoring better for everyone. Whether you
 ## Quick Setup
 
 ```bash
-git clone https://github.com/thewisecrab/AgentMaturityCompass.git
+git clone https://github.com/AgentMaturity/AgentMaturityCompass.git
 cd AgentMaturityCompass
 npm ci
 npm run build     # must compile with 0 TypeScript errors
@@ -432,8 +432,8 @@ docker/                 # Docker Compose setup
 
 ## Community
 
-- **[GitHub Discussions](https://github.com/thewisecrab/AgentMaturityCompass/discussions)** — questions, ideas, show & tell
-- **[Issues](https://github.com/thewisecrab/AgentMaturityCompass/issues)** — bugs and feature requests
+- **[GitHub Discussions](https://github.com/AgentMaturity/AgentMaturityCompass/discussions)** — questions, ideas, show & tell
+- **[Issues](https://github.com/AgentMaturity/AgentMaturityCompass/issues)** — bugs and feature requests
 - **Security issues** → see [SECURITY.md](SECURITY.md) (responsible disclosure)
 
 ### Labels to look for

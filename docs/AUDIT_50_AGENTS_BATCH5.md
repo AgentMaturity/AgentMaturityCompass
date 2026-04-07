@@ -151,7 +151,7 @@ npx agent-maturity-compass quickscore
 
 ```
 # CLI help output references:
-"Full guide: https://github.com/thewisecrab/AgentMaturityCompass/blob/main/docs/GETTING_STARTED.md"
+"Full guide: https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/GETTING_STARTED.md"
 # But the actual file is:
 docs/QUICKSTART.md
 ```
@@ -223,7 +223,7 @@ This is the FIRST thing a cloud architect tries. It fails with a cryptic error. 
 - Docker README has a working `docker run` command with proper env vars. ✅
 - Multi-port exposure (3210, 3211, 3212) is documented. ✅
 - `docs/DEPLOYMENT_OPTIONS.md` covers self-hosted, managed, enterprise paths. ✅
-- GitHub Container Registry (`ghcr.io/thewisecrab/amc-quickstart`) referenced in README. Status unknown (image may not be published).
+- GitHub Container Registry (`ghcr.io/agentmaturity/amc-quickstart`) referenced in README. Status unknown (image may not be published).
 
 **Cloud-specific gaps:**
 - No Kubernetes Helm chart or k8s manifests.
@@ -533,7 +533,7 @@ amc quickstart --profile dev        # ✅ works
 5. Reconcile all stat numbers across README/website/whitepaper/CONTRIBUTING
 
 ## Risks / Unknowns
-- `ghcr.io/thewisecrab/amc-quickstart` Docker image: not verified as actually published
+- `ghcr.io/agentmaturity/amc-quickstart` Docker image: not verified as actually published
 - `amc quickscore --share` generates a shareable link: no backend hosting found; may be a planned feature
 - Whether arXiv submission is real or planned (no ID found anywhere)
 - `website/og-card.png` referenced in meta tags but not verified to exist in repo

@@ -1,6 +1,6 @@
 # AMC Python SDK
 
-Python client library for the [Agent Maturity Compass](https://github.com/thewisecrab/AgentMaturityCompass) Bridge HTTP API.
+Python client library for the [Agent Maturity Compass](https://github.com/AgentMaturity/AgentMaturityCompass) Bridge HTTP API.
 
 ## Installation
 
@@ -114,4 +114,4 @@ clean = redact_text("my key is sk-abc123xyz456")
 
 ## License
 
-MIT — see [LICENSE](https://github.com/thewisecrab/AgentMaturityCompass/blob/main/LICENSE).
+MIT — see [LICENSE](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/LICENSE).

@@ -13,17 +13,17 @@
 <p align="center">
   <a href="https://www.npmjs.com/package/agent-maturity-compass"><img src="https://img.shields.io/npm/v/agent-maturity-compass?labelColor=0a0a0a&color=4AEF79" alt="npm version" /></a>
   <a href="https://www.npmjs.com/package/agent-maturity-compass"><img src="https://img.shields.io/npm/dm/agent-maturity-compass?labelColor=0a0a0a&color=4AEF79" alt="downloads" /></a>
-  <a href="https://github.com/thewisecrab/AgentMaturityCompass/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/thewisecrab/AgentMaturityCompass/ci.yml?branch=main&labelColor=0a0a0a&color=4AEF79&label=CI" alt="CI" /></a>
-  <a href="https://github.com/thewisecrab/AgentMaturityCompass/actions/workflows/ci.yml"><img src="https://img.shields.io/badge/tests-4%2C161%20passing-4AEF79?labelColor=0a0a0a" alt="tests" /></a>
+  <a href="https://github.com/AgentMaturity/AgentMaturityCompass/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/AgentMaturity/AgentMaturityCompass/ci.yml?branch=main&labelColor=0a0a0a&color=4AEF79&label=CI" alt="CI" /></a>
+  <a href="https://github.com/AgentMaturity/AgentMaturityCompass/actions/workflows/ci.yml"><img src="https://img.shields.io/badge/tests-4%2C161%20passing-4AEF79?labelColor=0a0a0a" alt="tests" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-4AEF79?labelColor=0a0a0a" alt="MIT" /></a>
 </p>
 
 <p align="center">
   <a href="#-60-seconds-to-your-first-score">Quick Start</a> ·
-  <a href="https://thewisecrab.github.io/AgentMaturityCompass/playground.html">Web Playground</a> ·
+  <a href="https://AgentMaturity.github.io/AgentMaturityCompass/playground.html">Web Playground</a> ·
   <a href="docs/QUICKSTART.md">Docs</a> ·
   <a href="#-recipes--copy-paste-examples">Recipes</a> ·
-  <a href="https://github.com/thewisecrab/AgentMaturityCompass/discussions">Community</a> ·
+  <a href="https://github.com/AgentMaturity/AgentMaturityCompass/discussions">Community</a> ·
   <a href="CONTRIBUTING.md">Contribute</a>
 </p>
 
@@ -98,22 +98,22 @@ amc quickscore --rapid           # skip optional questions, get a score in secon
 
 **curl (no Node required)**
 ```bash
-curl -fsSL https://raw.githubusercontent.com/thewisecrab/AgentMaturityCompass/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/AgentMaturity/AgentMaturityCompass/main/install.sh | bash
 ```
 
 **Homebrew**
 ```bash
-brew tap thewisecrab/amc && brew install agent-maturity-compass
+brew tap AgentMaturity/amc && brew install agent-maturity-compass
 ```
 
 **Docker**
 ```bash
-docker run -it --rm ghcr.io/thewisecrab/amc-quickstart amc quickscore
+docker run -it --rm ghcr.io/agentmaturity/amc-quickstart amc quickscore
 ```
 
 **From source**
 ```bash
-git clone https://github.com/thewisecrab/AgentMaturityCompass.git
+git clone https://github.com/AgentMaturity/AgentMaturityCompass.git
 cd AgentMaturityCompass && npm ci && npm run build && npm link
 ```
 
@@ -380,7 +380,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: thewisecrab/AgentMaturityCompass/amc-action@main
+      - uses: AgentMaturity/AgentMaturityCompass/amc-action@main
         with:
           agent-id: my-agent
           target-level: 3
@@ -393,7 +393,7 @@ jobs:
 
 ```markdown
 <!-- Add this to your README -->
-[![AMC Score](https://img.shields.io/badge/AMC-L3_(72.5)-green?logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0iI2ZmZiIgZD0iTTEyIDJMMiA3bDEwIDUgMTAtNXptMCA5bC04LjUtNC4yNUwyIDEybDEwIDUgMTAtNXptMCA5bC04LjUtNC4yNUwyIDIxbDEwIDUgMTAtNXoiLz48L3N2Zz4=)](https://github.com/thewisecrab/AgentMaturityCompass)
+[![AMC Score](https://img.shields.io/badge/AMC-L3_(72.5)-green?logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0iI2ZmZiIgZD0iTTEyIDJMMiA3bDEwIDUgMTAtNXptMCA5bC04LjUtNC4yNUwyIDEybDEwIDUgMTAtNXptMCA5bC04LjUtNC4yNUwyIDIxbDEwIDUgMTAtNXoiLz48L3N2Zz4=)](https://github.com/AgentMaturity/AgentMaturityCompass)
 ```
 
 Result: ![AMC Score](https://img.shields.io/badge/AMC-L3_(72.5)-green)
@@ -455,22 +455,22 @@ npx agent-maturity-compass quickscore
 
 ### Homebrew
 ```bash
-brew tap thewisecrab/amc && brew install agent-maturity-compass
+brew tap AgentMaturity/amc && brew install agent-maturity-compass
 ```
 
 ### curl
 ```bash
-curl -fsSL https://raw.githubusercontent.com/thewisecrab/AgentMaturityCompass/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/AgentMaturity/AgentMaturityCompass/main/install.sh | bash
 ```
 
 ### Docker
 ```bash
-docker run -it --rm ghcr.io/thewisecrab/amc-quickstart amc quickscore
+docker run -it --rm ghcr.io/agentmaturity/amc-quickstart amc quickscore
 ```
 
 ### From source
 ```bash
-git clone https://github.com/thewisecrab/AgentMaturityCompass.git
+git clone https://github.com/AgentMaturity/AgentMaturityCompass.git
 cd AgentMaturityCompass && npm ci && npm run build && npm link
 ```
 
@@ -481,8 +481,8 @@ cd AgentMaturityCompass && npm ci && npm run build && npm link
 | Platform | Deploy |
 |----------|--------|
 | **Docker Compose** | `cd docker && docker compose up` |
-| **Vercel** | [![Deploy](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/thewisecrab/AgentMaturityCompass) |
-| **Railway** | [![Deploy](https://railway.app/button.svg)](https://railway.app/template?referralCode=amc&repo=https://github.com/thewisecrab/AgentMaturityCompass) |
+| **Vercel** | [![Deploy](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/AgentMaturity/AgentMaturityCompass) |
+| **Railway** | [![Deploy](https://railway.app/button.svg)](https://railway.app/template?referralCode=amc&repo=https://github.com/AgentMaturity/AgentMaturityCompass) |
 
 ---
 
@@ -504,7 +504,7 @@ The full trust stack is **free and MIT licensed**. The only paid surface is Indu
 
 | Path | Best for | Start here |
 |------|----------|------------|
-| **Browser** | First-touch evaluation, demos, understanding scoring | [Web Playground](https://thewisecrab.github.io/AgentMaturityCompass/playground.html) |
+| **Browser** | First-touch evaluation, demos, understanding scoring | [Web Playground](https://AgentMaturity.github.io/AgentMaturityCompass/playground.html) |
 | **CLI** | Real agent scoring, evidence capture, shareable outputs | `npx agent-maturity-compass quickscore` |
 | **CI/CD** | Release gates, score thresholds, PR comments | [CI Templates](docs/CI_TEMPLATES.md) |
 | **Enterprise** | Self-hosted, managed deployment | [Deployment Options](docs/DEPLOYMENT_OPTIONS.md) |
@@ -532,7 +532,7 @@ The full trust stack is **free and MIT licensed**. The only paid surface is Indu
 | [Assurance Lab](docs/ASSURANCE_LAB.md) | [Domain Packs](docs/SECTOR_PACKS.md) |
 | [EU AI Act Compliance](docs/EU_AI_ACT_COMPLIANCE.md) | [Multi-Agent Trust](docs/MULTI_AGENT_TRUST.md) |
 | [Executive Overview](docs/EXECUTIVE_OVERVIEW.md) | [White Paper](whitepaper/AMC_WHITEPAPER_v1.md) |
-| [Example Projects](examples/) | [Web Playground](https://thewisecrab.github.io/AgentMaturityCompass/playground.html) |
+| [Example Projects](examples/) | [Web Playground](https://AgentMaturity.github.io/AgentMaturityCompass/playground.html) |
 
 <details>
 <summary><strong>More docs</strong></summary>
@@ -600,7 +600,7 @@ Current MVP behavior:
 AMC is MIT licensed. We welcome contributions — especially new **assurance packs**, **domain packs**, **framework adapters**, and **scoring modules**.
 
 ```bash
-git clone https://github.com/thewisecrab/AgentMaturityCompass.git
+git clone https://github.com/AgentMaturity/AgentMaturityCompass.git
 cd AgentMaturityCompass && npm ci && npm test   # 4,161 tests
 ```
 

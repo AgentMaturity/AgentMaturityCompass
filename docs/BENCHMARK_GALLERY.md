@@ -9,7 +9,7 @@ No invented benchmarks. No synthetic customer theater. Every artifact here exist
 Add a trust badge to your README after running AMC:
 
 ```markdown
-[![AMC Score](https://img.shields.io/badge/AMC-L3_(72.5)-green)](https://github.com/thewisecrab/AgentMaturityCompass)
+[![AMC Score](https://img.shields.io/badge/AMC-L3_(72.5)-green)](https://github.com/AgentMaturity/AgentMaturityCompass)
 ```
 
 Result: ![AMC Score](https://img.shields.io/badge/AMC-L3_(72.5)-green)
@@ -38,7 +38,7 @@ Real workflow already in the repo:
 
 ```yaml
 # .github/workflows/amc-score.yml
-- uses: thewisecrab/AgentMaturityCompass/amc-action@main
+- uses: AgentMaturity/AgentMaturityCompass/amc-action@main
   with:
     target-level: 3
     fail-on-drop: true

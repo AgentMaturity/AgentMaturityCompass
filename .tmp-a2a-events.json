@@ -1,0 +1,14 @@
+{
+  "events": [
+    { "timestamp": 1, "eventType": "card_published", "cardFields": ["name", "description", "capabilities", "endpoint", "authentication"] },
+    { "timestamp": 2, "eventType": "task_submitted" },
+    { "timestamp": 3, "eventType": "state_transition", "taskStates": ["submitted", "working"] },
+    { "timestamp": 4, "eventType": "task_completed" },
+    { "timestamp": 5, "eventType": "auth_challenge", "peerId": "peer-1" },
+    { "timestamp": 6, "eventType": "auth_success", "peerId": "peer-1" },
+    { "timestamp": 7, "eventType": "message_sent" },
+    { "timestamp": 8, "eventType": "message_received" },
+    { "timestamp": 9, "eventType": "error_handled" },
+    { "timestamp": 10, "eventType": "peer_discovered", "peerId": "peer-1" }
+  ]
+}

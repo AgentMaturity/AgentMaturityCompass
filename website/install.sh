@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # AMC Install Script
-# Usage: curl -fsSL https://thewisecrab.github.io/AgentMaturityCompass/install.sh | sh
+# Usage: curl -fsSL https://AgentMaturity.github.io/AgentMaturityCompass/install.sh | sh
 set -euo pipefail
 
 GREEN='\033[0;32m'
@@ -25,7 +25,7 @@ if command -v npm &>/dev/null; then
   echo -e "${GREEN}✓ AMC installed via npm${RESET}"
 elif command -v brew &>/dev/null; then
   echo "Installing via Homebrew..."
-  brew tap thewisecrab/tap 2>/dev/null || true
+  brew tap AgentMaturity/tap 2>/dev/null || true
   brew install amc
   echo -e "${GREEN}✓ AMC installed via Homebrew${RESET}"
 else
@@ -41,4 +41,4 @@ echo "  amc init           — initialize workspace"
 echo "  amc quickscore     — score your agent in 2 minutes"
 echo "  amc guide --go     — generate + apply guardrails"
 echo ""
-echo "Docs: https://thewisecrab.github.io/AgentMaturityCompass/"
+echo "Docs: https://AgentMaturity.github.io/AgentMaturityCompass/"

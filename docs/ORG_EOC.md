@@ -3,8 +3,8 @@
 AMC extends E/O/C from single-agent planning to node-level (team/function/process/enterprise).
 
 Generated artifacts:
-- `/Users/thewisecrab/AMC/.amc/org/commitments/<nodeId>/<commitId>.md`
-- `/Users/thewisecrab/AMC/.amc/org/commitments/<nodeId>/<commitId>.md.sig`
+- `/Users/sid/AgentMaturityCompass/.amc/org/commitments/<nodeId>/<commitId>.md`
+- `/Users/sid/AgentMaturityCompass/.amc/org/commitments/<nodeId>/<commitId>.md.sig`
 
 Each artifact is signed and appended to transparency.
 

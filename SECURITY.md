@@ -158,7 +158,7 @@ If not isolated, keep `shared` and treat results as untrusted (`INVALID`).
 
 If you discover a security vulnerability in AMC, please report it responsibly:
 
-1. **GitHub Security Advisories** (preferred): [Report a vulnerability](https://github.com/thewisecrab/AgentMaturityCompass/security/advisories/new)
+1. **GitHub Security Advisories** (preferred): [Report a vulnerability](https://github.com/AgentMaturity/AgentMaturityCompass/security/advisories/new)
 2. **Email**: Open a GitHub Security Advisory (we don't publish a public email to avoid spam)
 
 Please include:

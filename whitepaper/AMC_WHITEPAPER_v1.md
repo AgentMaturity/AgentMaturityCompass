@@ -1129,7 +1129,7 @@ The threshold system is designed to be *asymmetric*: a high score on Observabili
 
 ---
 
-*© 2026 POLARIS Research Team, AMC Labs. This paper is submitted for peer review. A preprint is available at arXiv. The AMC platform, including 140 core diagnostic questions, 593 sector-specific questions across 40 industry packs, 75 scoring modules, 85 assurance attack packs, and the Agent Passport (.amcpass) system, is MIT licensed and open source at https://github.com/thewisecrab/AgentMaturityCompass. Contact research@amc-labs.ai.*
+*© 2026 POLARIS Research Team, AMC Labs. This paper is submitted for peer review. A preprint is available at arXiv. The AMC platform, including 140 core diagnostic questions, 593 sector-specific questions across 40 industry packs, 75 scoring modules, 85 assurance attack packs, and the Agent Passport (.amcpass) system, is MIT licensed and open source at https://github.com/AgentMaturity/AgentMaturityCompass. Contact research@amc-labs.ai.*
 
 *Acknowledgments: The authors thank the engineering teams who deployed ContentModerationBot and DataPipelineBot in production environments for case study participation. We acknowledge the research contributions of Anthropic (Bloom behavioral evaluation, graduated autonomy), METR (task horizon methodology), and Google DeepMind (FACTS factuality framework) whose work informed AMC's scoring modules. No conflicts of interest to declare.*
 

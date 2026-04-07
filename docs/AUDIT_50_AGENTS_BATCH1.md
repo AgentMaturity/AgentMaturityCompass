@@ -99,7 +99,7 @@ $ amc api docs
 Online:    https://github.com/your-org/amc/blob/main/docs/API_REFERENCE.md
 ```
 
-`your-org` was never replaced with `thewisecrab`. Chen copies this URL and gets a 404. The correct URL would be `https://github.com/thewisecrab/AgentMaturityCompass/blob/main/docs/API_REFERENCE.md`.
+`your-org` was never replaced with the org name. Chen copies this URL and gets a 404. The correct URL would be `https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/API_REFERENCE.md`.
 
 ---
 
@@ -243,7 +243,7 @@ Raw Node.js EADDRINUSE error. Should say "Port 3210 is already in use. If AMC St
 | README.md badge | `tests-3,488 passing` | Body text and CONTRIBUTING.md say 3,311 |
 | README.md badge | `CLI commands-481` | MASTER_REFERENCE has 269 `amc xxx` entries; root help has 232 top-level entries |
 | README.md body | `138 diagnostic questions` | `amc score formal-spec` returns "Score: 0/0" which doesn't match 138 questions |
-| `amc api docs` output | `https://github.com/your-org/amc/...` | Should be `thewisecrab/AgentMaturityCompass` |
+| `amc api docs` output | `https://github.com/your-org/amc/...` | Should be `AgentMaturity/AgentMaturityCompass` |
 | `getting-started.html` | `curl .../raw.githubusercontent.com/.../main/install.sh` | 404 — wrong URL |
 | `getting-started.html` | `brew install agent-maturity-compass` | Not in homebrew |
 | `website/docs/compliance.html` | `--framework iso-42001` | CLI needs `ISO_42001` |
@@ -260,7 +260,7 @@ Either publish `agent-maturity-compass` to npm, OR replace all "install" docs wi
 *Files: README.md, website/docs/getting-started.html, website/install.sh, Formula/amc.rb*
 
 **FIX-02: Fix the install.sh URL in getting-started.html**  
-`getting-started.html` documents `curl .../raw.githubusercontent.com/.../main/install.sh` but the script is at `website/install.sh` (i.e., `https://thewisecrab.github.io/AgentMaturityCompass/install.sh`).  
+`getting-started.html` documents `curl .../raw.githubusercontent.com/.../main/install.sh` but the script is at `website/install.sh` (i.e., `https://AgentMaturity.github.io/AgentMaturityCompass/install.sh`).  
 *File: website/docs/getting-started.html — one line*
 
 ---
@@ -287,7 +287,7 @@ Also fix website docs to use uppercase-underscore, or add case-insensitive norma
 // Change:
 'Online:    https://github.com/your-org/amc/blob/main/docs/API_REFERENCE.md'
 // To:
-'Online:    https://github.com/thewisecrab/AgentMaturityCompass/blob/main/docs/API_REFERENCE.md'
+'Online:    https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/API_REFERENCE.md'
 ```
 *File: src/commands/api/docs.ts — 1 line*
 

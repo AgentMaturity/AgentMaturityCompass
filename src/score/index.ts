@@ -439,3 +439,11 @@ export type { CapabilityGovernanceReport, CapabilityGovernanceInput } from "./ca
 
 export { scoreOrganizationalSafetyPosture } from "./organizationalSafetyPosture.js";
 export type { OrganizationalSafetyPostureReport, OrganizationalSafetyPostureInput } from "./organizationalSafetyPosture.js";
+
+export { scoreA2AProtocol } from './a2aProtocol.js';
+export type { A2AProtocolScore, A2AProtocolInput } from './a2aProtocol.js';
+export { scoreDistributedAgents } from './distributedAgents.js';
+export type { DistributedAgentsScore, DistributedAgentsInput } from './distributedAgents.js';
+
+export { scoreMemoryDepth } from "./memoryDepth.js";
+export type { MemoryDepthScore, MemoryDepthInput, MemoryDepthEvent, MemoryDepthEventType } from "./memoryDepth.js";

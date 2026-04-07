@@ -1,6 +1,7 @@
-import { resolve } from "node:path";
+import { readdirSync } from "node:fs";
+import { join, resolve } from "node:path";
 import YAML from "yaml";
-import { readUtf8, writeFileAtomic } from "../utils/fs.js";
+import { pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { loadMechanicTargets, initMechanicTargets, saveMechanicTargets } from "./targetsStore.js";
 import { loadMechanicTuning, initMechanicTuning, saveMechanicTuning } from "./tuningStore.js";
 import { verifyMechanicProfilesSignature } from "./profiles.js";
@@ -8,6 +9,8 @@ import { loadMechanicPlanById } from "./planStore.js";
 import type { MechanicTargets } from "./targetSchema.js";
 import type { MechanicScope } from "./targetSchema.js";
 import type { MechanicTuning } from "./tuningSchema.js";
+import { mechanicGapReportSchema, type MechanicGapReport } from "./mechanicSchema.js";
+import { exportAsDSPyTargets, exportAsFineTuneRecipe, exportAsRewardFunction } from "./tuneExport.js";
 import {
   initMechanicWorkspace,
   mechanicTargetsForApi,
@@ -73,6 +76,26 @@ function setByPath(target: Record<string, unknown>, path: string, value: unknown
     cursor = cursor[part] as Record<string, unknown>;
   }
   cursor[parts[parts.length - 1]!] = value;
+}
+
+function latestMechanicGapReportPath(workspace: string): string {
+  const reportsDir = join(resolve(workspace), ".amc", "mechanic", "reports");
+  if (!pathExists(reportsDir)) {
+    throw new Error("No mechanic reports directory found — run `amc mechanic gap` first");
+  }
+  const files = readdirSync(reportsDir)
+    .filter((name) => /^gap_\d+\.json$/.test(name))
+    .sort((a, b) => b.localeCompare(a));
+  if (files.length === 0) {
+    throw new Error("No mechanic gap reports found — run `amc mechanic gap` first");
+  }
+  return join(reportsDir, files[0]!);
+}
+
+function loadMechanicGapReportCli(workspace: string, gapFile?: string): { report: MechanicGapReport; sourcePath: string } {
+  const sourcePath = gapFile ? resolve(workspace, gapFile) : latestMechanicGapReportPath(workspace);
+  const report = mechanicGapReportSchema.parse(JSON.parse(readUtf8(sourcePath)) as unknown);
+  return { report, sourcePath };
 }
 
 export function mechanicInitCli(params: {
@@ -308,6 +331,37 @@ export async function mechanicSimulateCli(params: {
 
 export function mechanicSimulationLatestCli(workspace: string) {
   return mechanicLatestSimulationForApi(workspace);
+}
+
+export function mechanicTuneExportCli(params: {
+  workspace: string;
+  gapFile?: string;
+  format?: "reward" | "dspy" | "recipe" | "all";
+  outFile?: string;
+}) {
+  const { report, sourcePath } = loadMechanicGapReportCli(params.workspace, params.gapFile);
+  const format = params.format ?? "all";
+  const reward = exportAsRewardFunction(report);
+  const dspy = exportAsDSPyTargets(report);
+  const recipe = exportAsFineTuneRecipe(report);
+  const output = format === "reward"
+    ? reward
+    : format === "dspy"
+      ? dspy
+      : format === "recipe"
+        ? recipe
+        : { reward, dspy, recipe };
+
+  if (params.outFile) {
+    writeFileAtomic(resolve(params.workspace, params.outFile), `${JSON.stringify(output, null, 2)}\n`, 0o644);
+  }
+
+  return {
+    format,
+    sourcePath,
+    gap: report,
+    output,
+  };
 }
 
 export function mechanicVerifyCli(workspace: string) {

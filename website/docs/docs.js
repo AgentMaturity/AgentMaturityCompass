@@ -1,7 +1,7 @@
 // AMC Docs — Dynamic Documentation Hub
 // Loads markdown files from GitHub and renders them with marked.js
 
-const BASE_RAW = 'https://raw.githubusercontent.com/thewisecrab/AgentMaturityCompass/main/docs/';
+const BASE_RAW = 'https://raw.githubusercontent.com/AgentMaturity/AgentMaturityCompass/main/docs/';
 
 // ─── Category Mapping ───
 const CATEGORIES = [

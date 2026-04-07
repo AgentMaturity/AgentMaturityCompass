@@ -270,6 +270,17 @@ export { serveDashboard } from "./dashboard/serve.js";
 export { learnQuestion, assignOwnership, createCommitmentPlan } from "./eoc/flows.js";
 
 export { questionBank, questionIds } from "./diagnostic/questionBank.js";
+export {
+  exportAsRewardFunction,
+  exportAsDSPyTargets,
+  exportAsFineTuneRecipe,
+  type RewardSignal,
+  type RewardFunctionExport,
+  type DSPyMetric,
+  type DSPyTargetExport,
+  type FocusArea,
+  type FineTuneRecipe
+} from "./mechanic/tuneExport.js";
 
 export {
   wrapFetch,

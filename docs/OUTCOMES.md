@@ -5,8 +5,8 @@ AMC Outcomes adds a value layer on top of maturity scoring. It answers: "Is this
 ## Outcome Contracts
 
 Per-agent contract:
-- `/Users/thewisecrab/AMC/.amc/agents/<agentId>/outcomes/contract.yaml`
-- `/Users/thewisecrab/AMC/.amc/agents/<agentId>/outcomes/contract.yaml.sig`
+- `/Users/sid/AgentMaturityCompass/.amc/agents/<agentId>/outcomes/contract.yaml`
+- `/Users/sid/AgentMaturityCompass/.amc/agents/<agentId>/outcomes/contract.yaml.sig`
 
 The contract defines:
 - value metrics

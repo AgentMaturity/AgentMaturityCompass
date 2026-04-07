@@ -64,11 +64,11 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/thewisecrab/AgentMaturityCompass.git"
+    "url": "https://github.com/AgentMaturity/AgentMaturityCompass.git"
   },
-  "homepage": "https://thewisecrab.github.io/AgentMaturityCompass",
+  "homepage": "https://AgentMaturity.github.io/AgentMaturityCompass",
   "bugs": {
-    "url": "https://github.com/thewisecrab/AgentMaturityCompass/issues"
+    "url": "https://github.com/AgentMaturity/AgentMaturityCompass/issues"
   },
   "types": "dist/index.d.ts",
   "exports": {
@@ -100,6 +100,6 @@
   },
   "author": {
     "name": "Sid",
-    "url": "https://github.com/thewisecrab"
+    "url": "https://github.com/AgentMaturity"
   }
 }

@@ -24,7 +24,7 @@ Different tools for different jobs. Promptfoo evaluates prompt quality. AMC answ
 
 4,161 tests passing. Would love feedback from this community.
 
-GitHub: https://github.com/thewisecrab/AgentMaturityCompass
+GitHub: https://github.com/AgentMaturity/AgentMaturityCompass
 
 ---
 
@@ -48,5 +48,5 @@ The framework generates compliance mappings for EU AI Act, ISO 42001, NIST AI RM
 
 MIT licensed, 4,161 tests, TypeScript.
 
-Paper references and methodology: https://thewisecrab.github.io/AgentMaturityCompass/methodology.html
-GitHub: https://github.com/thewisecrab/AgentMaturityCompass
+Paper references and methodology: https://AgentMaturity.github.io/AgentMaturityCompass/methodology.html
+GitHub: https://github.com/AgentMaturity/AgentMaturityCompass

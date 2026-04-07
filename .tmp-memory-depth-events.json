@@ -1,0 +1,18 @@
+{
+  "events": [
+    { "timestamp": 1, "eventType": "backend_failure", "memoryBackend": "redis" },
+    { "timestamp": 2, "eventType": "fallback_activated", "memoryBackend": "sqlite" },
+    { "timestamp": 3, "eventType": "backend_recovered", "memoryBackend": "redis" },
+    { "timestamp": 4, "eventType": "compression_executed" },
+    { "timestamp": 5, "eventType": "compression_verified" },
+    { "timestamp": 6, "eventType": "session_boundary" },
+    { "timestamp": 7, "eventType": "cross_session_merge" },
+    { "timestamp": 8, "eventType": "injection_attempted" },
+    { "timestamp": 9, "eventType": "injection_blocked" },
+    { "timestamp": 10, "eventType": "anomaly_flagged" },
+    { "timestamp": 11, "eventType": "ttl_enforced" },
+    { "timestamp": 12, "eventType": "deletion_audited" },
+    { "timestamp": 13, "eventType": "capacity_warning" },
+    { "timestamp": 14, "eventType": "eviction_executed" }
+  ]
+}

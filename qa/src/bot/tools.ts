@@ -71,7 +71,7 @@ export const toolDefinitions: ToolDef[] = [
     type: 'function',
     function: {
       name: 'github_get_prs',
-      description: 'Get open PRs on thewisecrab/AgentMaturityCompass',
+      description: 'Get open PRs on AgentMaturity/AgentMaturityCompass',
       parameters: {
         type: 'object',
         properties: {

@@ -109,4 +109,4 @@ The goal is not to make gaming impossible in theory — it's to make gaming hard
 ---
 
 *For vulnerability reporting and security contacts, see [SECURITY.md](../SECURITY.md).*
-*For technical details, see the [AMC documentation](https://thewisecrab.github.io/AgentMaturityCompass).*
+*For technical details, see the [AMC documentation](https://AgentMaturity.github.io/AgentMaturityCompass).*

@@ -104,7 +104,7 @@ addopts = --amc-score --amc-min-level 3 --amc-fail-below
 ### Static Badge (shields.io)
 
 ```markdown
-[![AMC Score](https://img.shields.io/badge/AMC-L3-green)](https://github.com/thewisecrab/AgentMaturityCompass)
+[![AMC Score](https://img.shields.io/badge/AMC-L3-green)](https://github.com/AgentMaturity/AgentMaturityCompass)
 ```
 
 ### Dynamic Badge (from CI)

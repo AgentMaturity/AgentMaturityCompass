@@ -8,9 +8,9 @@ AMC is distributed through 5 channels:
 |---------|--------|---------|
 | **npm** | ✅ Ready | `npm i -g agent-maturity-compass` |
 | **GitHub Releases** | ✅ Ready | `.amcrelease` bundles + SBOM |
-| **Docker / GHCR** | ✅ Ready | `docker run ghcr.io/thewisecrab/amc-studio` |
+| **Docker / GHCR** | ✅ Ready | `docker run ghcr.io/agentmaturity/amc-studio` |
 | **Single-binary (SEA)** | 🧪 Experimental | host-built `amc` binary artifact |
-| **Homebrew** | 🔜 Pending | `brew install thewisecrab/tap/amc` |
+| **Homebrew** | 🔜 Pending | `brew install AgentMaturity/tap/amc` |
 
 ---
 
@@ -84,8 +84,8 @@ git push origin main --follow-tags   # triggers release.yml CI
 The Docker image builds automatically in `release.yml`. It is pushed to:
 
 ```
-ghcr.io/thewisecrab/amc-studio:latest
-ghcr.io/thewisecrab/amc-studio:v{VERSION}
+ghcr.io/agentmaturity/amc-studio:latest
+ghcr.io/agentmaturity/amc-studio:v{VERSION}
 ```
 
 ### Local build & test
@@ -111,10 +111,10 @@ GitHub → Packages → amc-studio → Package Settings
 
 ### Also publish to Docker Hub (optional, broader reach)
 1. Create Docker Hub account at [hub.docker.com](https://hub.docker.com)
-2. Create repo: `thewisecrab/amc-studio`
+2. Create repo: `AgentMaturity/amc-studio`
 3. Add secrets to GitHub:
    ```
-   DOCKERHUB_USERNAME = thewisecrab
+   DOCKERHUB_USERNAME = agentmaturity
    DOCKERHUB_TOKEN = <access token from Docker Hub>
    ```
 4. Add to `release.yml`:
@@ -125,7 +125,7 @@ GitHub → Packages → amc-studio → Package Settings
        username: ${{ secrets.DOCKERHUB_USERNAME }}
        password: ${{ secrets.DOCKERHUB_TOKEN }}
    ```
-5. Add `docker.io/thewisecrab/amc-studio:latest` to the image tags list
+5. Add `docker.io/AgentMaturity/amc-studio:latest` to the image tags list
 
 ---
 
@@ -156,13 +156,13 @@ A Homebrew tap is just a GitHub repo named `homebrew-{tap-name}`.
 ### Step-by-step setup
 
 ```bash
-# 1. Create a new GitHub repo: thewisecrab/homebrew-tap
+# 1. Create a new GitHub repo: AgentMaturity/homebrew-tap
 #    (must be named "homebrew-tap" for brew to find it)
 
 # 2. Copy Formula/amc.rb into it
 mkdir -p ~/homebrew-tap/Formula
 cp Formula/amc.rb ~/homebrew-tap/Formula/amc.rb
-cd ~/homebrew-tap && git init && git add . && git push thewisecrab/homebrew-tap main
+cd ~/homebrew-tap && git init && git add . && git push AgentMaturity/homebrew-tap main
 
 # 3. Get the SHA256 of the npm tarball AFTER publishing
 curl -s https://registry.npmjs.org/agent-maturity-compass/latest | \
@@ -174,7 +174,7 @@ curl -sL <tarball-url> | sha256sum
 # 5. Push to homebrew-tap repo
 
 # Users then install with:
-brew tap thewisecrab/tap
+brew tap AgentMaturity/tap
 brew install amc
 ```
 
@@ -190,7 +190,7 @@ Add to `release.yml` after npm publish:
     TARBALL="https://registry.npmjs.org/agent-maturity-compass/-/agent-maturity-compass-${VERSION}.tgz"
     SHA256=$(curl -sL "$TARBALL" | sha256sum | cut -d' ' -f1)
     
-    git clone https://x-access-token:${HOMEBREW_TAP_TOKEN}@github.com/thewisecrab/homebrew-tap.git /tmp/homebrew-tap
+    git clone https://x-access-token:${HOMEBREW_TAP_TOKEN}@github.com/AgentMaturity/homebrew-tap.git /tmp/homebrew-tap
     sed -i "s|url \".*\"|url \"${TARBALL}\"|" /tmp/homebrew-tap/Formula/amc.rb
     sed -i "s|sha256 \".*\"|sha256 \"${SHA256}\"|" /tmp/homebrew-tap/Formula/amc.rb
     sed -i "s|version \".*\"|version \"${VERSION}\"|" /tmp/homebrew-tap/Formula/amc.rb
@@ -206,7 +206,7 @@ Add to `release.yml` after npm publish:
 Required secrets:
 ```
 HOMEBREW_TAP_TOKEN = GitHub Personal Access Token with repo:write scope
-                     (for thewisecrab/homebrew-tap repo)
+                     (for AgentMaturity/homebrew-tap repo)
 ```
 
 ---
@@ -223,7 +223,7 @@ set -euo pipefail
 if command -v npm &>/dev/null; then
   npm install -g agent-maturity-compass
 elif command -v brew &>/dev/null; then
-  brew tap thewisecrab/tap && brew install amc
+  brew tap AgentMaturity/tap && brew install amc
 else
   echo "Install Node.js from https://nodejs.org then run: npm i -g agent-maturity-compass"
   exit 1
@@ -232,9 +232,9 @@ fi
 echo "✓ AMC installed. Run: amc init && amc quickscore"
 ```
 
-Host at: `thewisecrab.github.io/AgentMaturityCompass/install.sh`
+Host at: `AgentMaturity.github.io/AgentMaturityCompass/install.sh`
 
-Users run: `curl -fsSL https://thewisecrab.github.io/AgentMaturityCompass/install.sh | sh`
+Users run: `curl -fsSL https://AgentMaturity.github.io/AgentMaturityCompass/install.sh | sh`
 
 ---
 

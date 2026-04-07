@@ -20,7 +20,7 @@ permissions:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: thewisecrab/amc-runner
+  IMAGE_NAME: agentmaturity/amc-runner
 
 jobs:
   build-and-push:

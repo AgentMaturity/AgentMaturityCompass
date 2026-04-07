@@ -442,4 +442,4 @@ amc mcp serve --workspace .
 amc mcp install-config --ide claude-code
 ```
 
-Questions? Issues? [GitHub](https://github.com/thewisecrab/AgentMaturityCompass)
+Questions? Issues? [GitHub](https://github.com/AgentMaturity/AgentMaturityCompass)

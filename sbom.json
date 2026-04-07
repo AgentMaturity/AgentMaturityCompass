@@ -92,20 +92,20 @@
           }
         }
       ],
-      "purl": "pkg:npm/agent-maturity-compass@1.0.0?vcs_url=git%2Bhttps%3A%2F%2Fgithub.com%2Fthewisecrab%2FAgentMaturityCompass.git",
+      "purl": "pkg:npm/agent-maturity-compass@1.0.0?vcs_url=git%2Bhttps%3A%2F%2Fgithub.com%2FAgentMaturity%2FAgentMaturityCompass.git",
       "externalReferences": [
         {
-          "url": "git+https://github.com/thewisecrab/AgentMaturityCompass.git",
+          "url": "git+https://github.com/AgentMaturity/AgentMaturityCompass.git",
           "type": "vcs",
           "comment": "as detected from PackageJson property \"repository.url\""
         },
         {
-          "url": "https://thewisecrab.github.io/AgentMaturityCompass",
+          "url": "https://AgentMaturity.github.io/AgentMaturityCompass",
           "type": "website",
           "comment": "as detected from PackageJson property \"homepage\""
         },
         {
-          "url": "https://github.com/thewisecrab/AgentMaturityCompass/issues",
+          "url": "https://github.com/AgentMaturity/AgentMaturityCompass/issues",
           "type": "issue-tracker",
           "comment": "as detected from PackageJson property \"bugs.url\""
         }

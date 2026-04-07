@@ -3,9 +3,9 @@
 
 **Compiled:** April 2026
 **Repo:** /Users/sid/AgentMaturityCompass
-**GitHub:** thewisecrab/AgentMaturityCompass
+**GitHub:** AgentMaturity/AgentMaturityCompass
 **License:** MIT
-**Author:** Sid (thewisecrab)
+**Author:** Sid (AgentMaturity)
 
 ---
 
@@ -511,14 +511,14 @@ Request Token → Present Token → Verify (signature, expiry, claims)
 - **npm-publish.yml** — Changesets-based release to npm with provenance
 - **release.yml** — Full release: Docker push (ghcr.io), SEA binary, npm publish, Homebrew tap
 - **docker-build.yml** — Docker image build + smoke tests
-- **docker-runner.yml** — Runner image (ghcr.io/thewisecrab/amc-runner)
+- **docker-runner.yml** — Runner image (ghcr.io/agentmaturity/amc-runner)
 - **nightly-compatibility-matrix.yml** — Cross-platform (ubuntu/macos × Node 20/22)
 - **pages.yml** — GitHub Pages deployment
 - **amc-score.yml** — Reusable scoring workflow
 - **amc-pr-gate.yml** — PR quality gate (target L3, fail on drop)
 
 ### 10.2 Docker
-- Image: ghcr.io/thewisecrab/amc-studio
+- Image: ghcr.io/agentmaturity/amc-studio
 - Ports: 3210 (gateway), 3211 (proxy), 3212 (studio API), 3213 (toolhub), 4173 (dashboard)
 - Security: read_only, no-new-privileges, cap_drop ALL, tmpfs /tmp (noexec, 64m)
 

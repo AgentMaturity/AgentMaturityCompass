@@ -25,7 +25,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - uses: thewisecrab/AgentMaturityCompass/amc-action@main
+      - uses: AgentMaturity/AgentMaturityCompass/amc-action@main
         with:
           target-level: '3'
 ```
@@ -63,7 +63,7 @@ jobs:
 ## Advanced: Use Outputs in Downstream Steps
 
 ```yaml
-- uses: thewisecrab/AgentMaturityCompass/amc-action@main
+- uses: AgentMaturity/AgentMaturityCompass/amc-action@main
   id: amc
   with:
     target-level: '2'
@@ -74,7 +74,7 @@ jobs:
 ## Advanced: Score-Drop Protection
 
 ```yaml
-- uses: thewisecrab/AgentMaturityCompass/amc-action@main
+- uses: AgentMaturity/AgentMaturityCompass/amc-action@main
   with:
     fail-on-drop: 'true'
     target-level: '3'

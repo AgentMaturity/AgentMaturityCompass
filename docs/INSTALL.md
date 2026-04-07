@@ -23,7 +23,7 @@ Note: CI validates Node 20.x. Newer major releases can require native rebuilds f
 ## Option B: From GitHub (Development)
 
 ```bash
-git clone https://github.com/thewisecrab/AgentMaturityCompass.git
+git clone https://github.com/AgentMaturity/AgentMaturityCompass.git
 cd AgentMaturityCompass
 npm ci
 npm run build
@@ -40,7 +40,7 @@ amc doctor
 ## Option C: Docker Compose
 
 ```bash
-git clone https://github.com/thewisecrab/AgentMaturityCompass.git
+git clone https://github.com/AgentMaturity/AgentMaturityCompass.git
 cd AgentMaturityCompass/deploy/compose
 cp .env.example .env    # edit secrets, ports, volumes
 docker compose up -d --build

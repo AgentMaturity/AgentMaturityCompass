@@ -1,6 +1,6 @@
 # AMC Marketing Website
 
-Static marketing site for [Agent Maturity Compass](https://github.com/thewisecrab/AgentMaturityCompass).
+Static marketing site for [Agent Maturity Compass](https://github.com/AgentMaturity/AgentMaturityCompass).
 
 ## Local Preview
 

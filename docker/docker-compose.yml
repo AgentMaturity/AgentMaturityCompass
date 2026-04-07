@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   amc-studio:
-    image: ghcr.io/thewisecrab/amc-studio:latest
+    image: ghcr.io/agentmaturity/amc-studio:latest
     container_name: amc-studio
     restart: unless-stopped
     ports:

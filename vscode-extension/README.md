@@ -12,7 +12,7 @@ Inline Agent Maturity Compass integration for Visual Studio Code.
 
 ## Requirements
 
-- [Agent Maturity Compass](https://github.com/thewisecrab/AgentMaturityCompass) installed (`npm i -g agent-maturity-compass`)
+- [Agent Maturity Compass](https://github.com/AgentMaturity/AgentMaturityCompass) installed (`npm i -g agent-maturity-compass`)
 - A workspace with `.amc/` directory (run `amc init` first)
 
 ## Status

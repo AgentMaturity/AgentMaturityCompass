@@ -64,7 +64,7 @@ Notary can delegate signing to an external executable using deterministic CLI pr
 ```
 
 AMC includes testable reference script:
-- `/Users/thewisecrab/AMC/scripts/fake-external-signer.mjs`
+- `/Users/sid/AgentMaturityCompass/scripts/fake-external-signer.mjs`
 
 ## Auth and isolation
 
@@ -75,8 +75,8 @@ AMC includes testable reference script:
 ## Deployment notes
 
 Compose and Helm include Notary wiring:
-- Compose: `/Users/thewisecrab/AMC/deploy/compose`
-- Helm: `/Users/thewisecrab/AMC/deploy/helm/amc`
+- Compose: `/Users/sid/AgentMaturityCompass/deploy/compose`
+- Helm: `/Users/sid/AgentMaturityCompass/deploy/helm/amc`
 
 Recommended:
 - keep Notary on internal-only network

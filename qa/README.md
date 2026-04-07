@@ -16,7 +16,7 @@ Layer 6: PostgreSQL (releases, test runs, job queue, audit trail)
 ## Features
 
 - **AI Bot Engine** — Chat-based QA assistant with tool-calling (Anthropic Claude)
-- **GitHub Integration** — PRs, releases, CI workflow monitoring for thewisecrab/AgentMaturityCompass
+- **GitHub Integration** — PRs, releases, CI workflow monitoring for AgentMaturity/AgentMaturityCompass
 - **Vitest Runner** — Run full 5031-test suite or filtered subsets
 - **AI Triage** — Auto-classify failures as real_bug / flaky / env_issue
 - **Release Gates** — Automated go/no-go checks (bugs zero, tests green, all triaged)

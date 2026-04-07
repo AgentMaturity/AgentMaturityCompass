@@ -1,0 +1,18 @@
+{
+  "events": [
+    { "timestamp": 1, "nodeId": "node-1", "eventType": "partition_detected" },
+    { "timestamp": 2, "nodeId": "node-2", "eventType": "partition_recovered" },
+    { "timestamp": 3, "nodeId": "node-1", "eventType": "state_sync" },
+    { "timestamp": 4, "nodeId": "node-2", "eventType": "state_resolved" },
+    { "timestamp": 5, "nodeId": "node-1", "eventType": "node_failed" },
+    { "timestamp": 6, "nodeId": "node-2", "eventType": "failover_started" },
+    { "timestamp": 7, "nodeId": "node-2", "eventType": "failover_completed" },
+    { "timestamp": 8, "nodeId": "node-1", "eventType": "vote_cast" },
+    { "timestamp": 9, "nodeId": "node-2", "eventType": "consensus_reached" },
+    { "timestamp": 10, "nodeId": "node-1", "eventType": "task_assigned" },
+    { "timestamp": 11, "nodeId": "node-2", "eventType": "task_rebalanced" },
+    { "timestamp": 12, "nodeId": "node-1", "eventType": "backpressure_applied" },
+    { "timestamp": 13, "nodeId": "node-1", "eventType": "trace_correlated" },
+    { "timestamp": 14, "nodeId": "node-1", "eventType": "topology_mapped" }
+  ]
+}

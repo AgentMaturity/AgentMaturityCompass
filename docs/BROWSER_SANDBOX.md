@@ -27,7 +27,7 @@ So the honest MVP is:
 3. **Move to CI** for ongoing checks
 
 ## Canonical URL
-- `https://thewisecrab.github.io/AgentMaturityCompass/playground.html`
+- `https://AgentMaturity.github.io/AgentMaturityCompass/playground.html`
 
 ## Positioning copy
 Use language like:

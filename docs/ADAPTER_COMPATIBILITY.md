@@ -65,7 +65,7 @@ AMC supports plugin adapters for frameworks not covered by built-ins. See the [a
 
 ## Reporting Issues
 
-If an adapter doesn't work with your framework version, please [open an issue](https://github.com/thewisecrab/AgentMaturityCompass/issues) with:
+If an adapter doesn't work with your framework version, please [open an issue](https://github.com/AgentMaturity/AgentMaturityCompass/issues) with:
 - Framework name and version
 - AMC version (`amc --version`)
 - Error output

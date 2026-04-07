@@ -38,13 +38,13 @@ export function generateShareableSummary(result: RapidQuickscoreResult, agentNam
     "|-----------|----------|-------|",
     ...dimensionLines,
     "",
-    `*Scored with [Agent Maturity Compass](https://github.com/thewisecrab/AgentMaturityCompass) — ${new Date().toISOString().split("T")[0]}*`,
+    `*Scored with [Agent Maturity Compass](https://github.com/AgentMaturity/AgentMaturityCompass) — ${new Date().toISOString().split("T")[0]}*`,
   ].join("\n");
 
   const plainText = [
     `${name} — AMC Maturity: ${result.preliminaryLevel} (${result.percentage}%)`,
     ...result.questionScores.map((q) => `  ${q.layerName}: L${q.level}`),
-    `Scored with AMC (github.com/thewisecrab/AgentMaturityCompass)`,
+    `Scored with AMC (github.com/AgentMaturity/AgentMaturityCompass)`,
   ].join("\n");
 
   return { markdown, plainText, badge };

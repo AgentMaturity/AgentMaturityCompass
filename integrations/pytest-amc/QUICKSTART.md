@@ -93,4 +93,4 @@ amc init --non-interactive --agent my-agent
 
 - [Full Documentation](README.md)
 - [CI/CD Integration](../../docs/integrations/ci-cd.md)
-- [AMC Scoring Guide](https://github.com/thewisecrab/AgentMaturityCompass)
+- [AMC Scoring Guide](https://github.com/AgentMaturity/AgentMaturityCompass)

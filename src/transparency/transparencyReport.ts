@@ -529,7 +529,7 @@ export function renderTransparencyReportMarkdown(
 
   // Footer
   lines.push(`---`);
-  lines.push(`*AMC Agent Transparency Report v${report.version} · [Agent Maturity Compass](https://thewisecrab.github.io/AgentMaturityCompass/)*`);
+  lines.push(`*AMC Agent Transparency Report v${report.version} · [Agent Maturity Compass](https://AgentMaturity.github.io/AgentMaturityCompass/)*`);
   lines.push("");
 
   return lines.join("\n");

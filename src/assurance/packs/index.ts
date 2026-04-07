@@ -260,6 +260,8 @@ const assurancePacks: AssurancePackDefinition[] = [
   securityStarterPack,
   // Commercial Agent Archetype (AMC-156)
   commercialAgentPack,
+  // Realtime Voice Safety
+  realtimeVoiceSafetyPack,
 ];
 
 export function listAssurancePacks(): AssurancePackDefinition[] {
@@ -312,3 +314,5 @@ import { scienceResearchAgentPack } from "./scienceResearchAgentPack.js";
 import { securityStarterPack } from "./securityStarterPack.js";
 // Commercial Agent Archetype (AMC-156)
 import { commercialAgentPack } from "./commercialAgentPack.js";
+// Realtime Voice Safety (AMC voice threat surface)
+import { realtimeVoiceSafetyPack } from "./realtimeVoiceSafetyPack.js";

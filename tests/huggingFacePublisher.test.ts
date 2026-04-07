@@ -22,7 +22,7 @@ describe("buildHFDatasetReadme", () => {
     ];
 
     const readme = buildHFDatasetReadme(entries, {
-      datasetId: "thewisecrab/amc-global-index",
+      datasetId: "AgentMaturity/amc-global-index",
       prettyName: "AMC Global Index",
       license: "apache-2.0",
       amcVersion: "1.0.0",
@@ -31,7 +31,7 @@ describe("buildHFDatasetReadme", () => {
     expect(readme).toContain("---");
     expect(readme).toContain("dataset_info:");
     expect(readme).toContain("AMC Global Index");
-    expect(readme).toContain("thewisecrab/amc-global-index");
+    expect(readme).toContain("AgentMaturity/amc-global-index");
   });
 });
 
@@ -48,7 +48,7 @@ describe("buildHFDatasetRepoFiles", () => {
     ];
 
     const files = buildHFDatasetRepoFiles(entries, {
-      datasetId: "thewisecrab/amc-global-index",
+      datasetId: "AgentMaturity/amc-global-index",
       prettyName: "AMC Global Index",
       license: "apache-2.0",
       amcVersion: "1.0.0",
@@ -72,14 +72,14 @@ describe("createHFAutoPublishPlan", () => {
     ];
 
     const plan = createHFAutoPublishPlan(entries, {
-      datasetId: "thewisecrab/amc-global-index",
+      datasetId: "AgentMaturity/amc-global-index",
       prettyName: "AMC Global Index",
       license: "apache-2.0",
       amcVersion: "1.0.0",
       private: false,
     });
 
-    expect(plan.repoId).toBe("thewisecrab/amc-global-index");
+    expect(plan.repoId).toBe("AgentMaturity/amc-global-index");
     expect(plan.private).toBe(false);
     expect(plan.files["README.md"]).toBeDefined();
     expect(plan.files["data/train.jsonl"]).toBeDefined();
@@ -104,7 +104,7 @@ describe("createHFAutoPublishPlan", () => {
     ];
 
     const plan = createHFAutoPublishPlan(entries, {
-      datasetId: "thewisecrab/amc-global-index",
+      datasetId: "AgentMaturity/amc-global-index",
       prettyName: "AMC Global Index",
       license: "apache-2.0",
       amcVersion: "1.0.0",

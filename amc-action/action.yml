@@ -1,6 +1,6 @@
 name: 'AMC Score — Agent Maturity Compass'
 description: 'Run AMC eval on your agent, post results as a PR comment, fail on score drops, upload artifacts.'
-author: 'thewisecrab'
+author: 'AgentMaturity'
 
 branding:
   icon: 'compass'
@@ -219,7 +219,7 @@ runs:
           **Status:** ${statusLine}
 
           ---
-          *[Agent Maturity Compass](https://github.com/thewisecrab/AgentMaturityCompass) · amc-action v1*`;
+          *[Agent Maturity Compass](https://github.com/AgentMaturity/AgentMaturityCompass) · amc-action v1*`;
 
           // Upsert: find existing AMC comment and update, or create new
           const { data: comments } = await github.rest.issues.listComments({

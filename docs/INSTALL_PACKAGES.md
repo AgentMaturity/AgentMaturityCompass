@@ -30,7 +30,7 @@ Best for:
 - repeat installs on developer machines
 
 ```bash
-brew tap thewisecrab/amc
+brew tap AgentMaturity/amc
 brew install agent-maturity-compass
 ```
 
@@ -50,7 +50,7 @@ Best for:
 - local development on the repo itself
 
 ```bash
-git clone https://github.com/thewisecrab/AgentMaturityCompass.git
+git clone https://github.com/AgentMaturity/AgentMaturityCompass.git
 cd AgentMaturityCompass
 npm ci
 npm run build

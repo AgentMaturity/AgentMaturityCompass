@@ -1,6 +1,6 @@
 # Show HN: AMC – Open-source trust scoring for AI agents (evidence > claims)
 
-**URL:** https://github.com/thewisecrab/AgentMaturityCompass
+**URL:** https://github.com/AgentMaturity/AgentMaturityCompass
 
 **Text:**
 

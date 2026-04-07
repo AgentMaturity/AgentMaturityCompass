@@ -5,7 +5,7 @@ AMC compares local org performance against imported federation benchmarks withou
 ## Data Sources
 
 Local:
-- signed org scorecards (`/Users/thewisecrab/AMC/.amc/org/scorecards`)
+- signed org scorecards (`/Users/sid/AgentMaturityCompass/.amc/org/scorecards`)
 - local runs/assurance/outcomes
 
 Federated peers:
