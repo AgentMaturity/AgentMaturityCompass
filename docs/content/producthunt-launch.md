@@ -10,9 +10,9 @@ Score your AI agent from L0 (dangerous) to L5 (production-ready) with execution-
 **Topics:** Developer Tools, Artificial Intelligence, Open Source, Security, Compliance
 
 **Links:**
-- Website: https://AgentMaturity.github.io/AgentMaturityCompass
+- Website: https://agentmaturity.co
 - GitHub: https://github.com/AgentMaturity/AgentMaturityCompass
-- Web Playground: https://AgentMaturity.github.io/AgentMaturityCompass/playground.html
+- Web Playground: https://agentmaturity.co/playground.html
 
 **Maker Comment (first comment):**
 Hi PH! 👋

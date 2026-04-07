@@ -519,7 +519,7 @@ function shareResults() {
     const dl = avg >= 90 ? 'L5' : avg >= 70 ? 'L4' : avg >= 50 ? 'L3' : avg >= 30 ? 'L2' : avg >= 10 ? 'L1' : 'L0';
     dimLines += `  • ${dimName}: ${dl} (${Math.round(avg)}/100)\n`;
   }
-  const text = `🧭 AMC Agent Trust Score: ${level} (${score}/100)\n\nDimensions:\n${dimLines}\nAssessed ${Object.keys(responses).length}/15 questions.\nDate: ${new Date().toLocaleDateString()}\n\nScore your own agent → https://AgentMaturity.github.io/AgentMaturityCompass/playground.html`;
+  const text = `🧭 AMC Agent Trust Score: ${level} (${score}/100)\n\nDimensions:\n${dimLines}\nAssessed ${Object.keys(responses).length}/15 questions.\nDate: ${new Date().toLocaleDateString()}\n\nScore your own agent → https://agentmaturity.co/playground.html`;
   document.getElementById('shareText').value = text;
   document.getElementById('shareResult').style.display = 'block';
 }

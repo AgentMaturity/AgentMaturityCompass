@@ -48,5 +48,5 @@ The framework generates compliance mappings for EU AI Act, ISO 42001, NIST AI RM
 
 MIT licensed, 4,161 tests, TypeScript.
 
-Paper references and methodology: https://AgentMaturity.github.io/AgentMaturityCompass/methodology.html
+Paper references and methodology: https://agentmaturity.co/methodology.html
 GitHub: https://github.com/AgentMaturity/AgentMaturityCompass

@@ -232,9 +232,9 @@ fi
 echo "✓ AMC installed. Run: amc init && amc quickscore"
 ```
 
-Host at: `AgentMaturity.github.io/AgentMaturityCompass/install.sh`
+Host at: `agentmaturity.co/install.sh`
 
-Users run: `curl -fsSL https://AgentMaturity.github.io/AgentMaturityCompass/install.sh | sh`
+Users run: `curl -fsSL https://agentmaturity.co/install.sh | sh`
 
 ---
 

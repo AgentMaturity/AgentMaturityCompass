@@ -95,7 +95,7 @@ Full report: amc guide --status
 ```
 
 ### Option 2: Try the Web Playground (No Install)
-Visit: [AMC Playground](https://AgentMaturity.github.io/AgentMaturityCompass/playground.html)
+Visit: [AMC Playground](https://agentmaturity.co/playground.html)
 
 Answer 15 questions about your agent. Get an instant score.
 
@@ -111,7 +111,7 @@ docker run -it amc/compass amc quickscore
 ## Contact
 
 - GitHub: [github.com/AgentMaturity/AgentMaturityCompass](https://github.com/AgentMaturity/AgentMaturityCompass)
-- Website: [AgentMaturity.github.io/AgentMaturityCompass](https://AgentMaturity.github.io/AgentMaturityCompass/)
+- Website: [agentmaturity.co](https://agentmaturity.co/)
 
 ---
 

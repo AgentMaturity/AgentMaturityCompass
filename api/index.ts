@@ -203,7 +203,7 @@ function handleRequest(req: http.IncomingMessage, res: http.ServerResponse) {
         'POST /api/quickscore': 'Quick self-assessment score',
         'GET /api/badge/:agentId': 'SVG badge for agent score',
       },
-      docs: 'https://AgentMaturity.github.io/AgentMaturityCompass/',
+      docs: 'https://agentmaturity.co/',
       github: 'https://github.com/AgentMaturity/AgentMaturityCompass',
     }, null, 2));
     return;

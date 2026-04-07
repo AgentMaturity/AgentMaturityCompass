@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # AMC Install Script
-# Usage: curl -fsSL https://AgentMaturity.github.io/AgentMaturityCompass/install.sh | sh
+# Usage: curl -fsSL https://agentmaturity.co/install.sh | sh
 set -euo pipefail
 
 GREEN='\033[0;32m'
@@ -41,4 +41,4 @@ echo "  amc init           — initialize workspace"
 echo "  amc quickscore     — score your agent in 2 minutes"
 echo "  amc guide --go     — generate + apply guardrails"
 echo ""
-echo "Docs: https://AgentMaturity.github.io/AgentMaturityCompass/"
+echo "Docs: https://agentmaturity.co/"

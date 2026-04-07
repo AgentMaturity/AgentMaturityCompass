@@ -260,7 +260,7 @@ Either publish `agent-maturity-compass` to npm, OR replace all "install" docs wi
 *Files: README.md, website/docs/getting-started.html, website/install.sh, Formula/amc.rb*
 
 **FIX-02: Fix the install.sh URL in getting-started.html**  
-`getting-started.html` documents `curl .../raw.githubusercontent.com/.../main/install.sh` but the script is at `website/install.sh` (i.e., `https://AgentMaturity.github.io/AgentMaturityCompass/install.sh`).  
+`getting-started.html` documents `curl .../raw.githubusercontent.com/.../main/install.sh` but the script is at `website/install.sh` (i.e., `https://agentmaturity.co/install.sh`).  
 *File: website/docs/getting-started.html — one line*
 
 ---

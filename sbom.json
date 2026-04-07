@@ -100,7 +100,7 @@
           "comment": "as detected from PackageJson property \"repository.url\""
         },
         {
-          "url": "https://AgentMaturity.github.io/AgentMaturityCompass",
+          "url": "https://agentmaturity.co",
           "type": "website",
           "comment": "as detected from PackageJson property \"homepage\""
         },

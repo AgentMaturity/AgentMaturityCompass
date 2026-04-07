@@ -20,7 +20,7 @@
 
 <p align="center">
   <a href="#-60-seconds-to-your-first-score">Quick Start</a> ·
-  <a href="https://AgentMaturity.github.io/AgentMaturityCompass/playground.html">Web Playground</a> ·
+  <a href="https://agentmaturity.co/playground.html">Web Playground</a> ·
   <a href="docs/QUICKSTART.md">Docs</a> ·
   <a href="#-recipes--copy-paste-examples">Recipes</a> ·
   <a href="https://github.com/AgentMaturity/AgentMaturityCompass/discussions">Community</a> ·
@@ -98,7 +98,7 @@ amc quickscore --rapid           # skip optional questions, get a score in secon
 
 **curl (no Node required)**
 ```bash
-curl -fsSL https://raw.githubusercontent.com/AgentMaturity/AgentMaturityCompass/main/install.sh | bash
+curl -fsSL https://agentmaturity.co/install.sh | sh
 ```
 
 **Homebrew**
@@ -460,7 +460,7 @@ brew tap AgentMaturity/amc && brew install agent-maturity-compass
 
 ### curl
 ```bash
-curl -fsSL https://raw.githubusercontent.com/AgentMaturity/AgentMaturityCompass/main/install.sh | bash
+curl -fsSL https://agentmaturity.co/install.sh | sh
 ```
 
 ### Docker
@@ -504,7 +504,7 @@ The full trust stack is **free and MIT licensed**. The only paid surface is Indu
 
 | Path | Best for | Start here |
 |------|----------|------------|
-| **Browser** | First-touch evaluation, demos, understanding scoring | [Web Playground](https://AgentMaturity.github.io/AgentMaturityCompass/playground.html) |
+| **Browser** | First-touch evaluation, demos, understanding scoring | [Web Playground](https://agentmaturity.co/playground.html) |
 | **CLI** | Real agent scoring, evidence capture, shareable outputs | `npx agent-maturity-compass quickscore` |
 | **CI/CD** | Release gates, score thresholds, PR comments | [CI Templates](docs/CI_TEMPLATES.md) |
 | **Enterprise** | Self-hosted, managed deployment | [Deployment Options](docs/DEPLOYMENT_OPTIONS.md) |
@@ -532,7 +532,7 @@ The full trust stack is **free and MIT licensed**. The only paid surface is Indu
 | [Assurance Lab](docs/ASSURANCE_LAB.md) | [Domain Packs](docs/SECTOR_PACKS.md) |
 | [EU AI Act Compliance](docs/EU_AI_ACT_COMPLIANCE.md) | [Multi-Agent Trust](docs/MULTI_AGENT_TRUST.md) |
 | [Executive Overview](docs/EXECUTIVE_OVERVIEW.md) | [White Paper](whitepaper/AMC_WHITEPAPER_v1.md) |
-| [Example Projects](examples/) | [Web Playground](https://AgentMaturity.github.io/AgentMaturityCompass/playground.html) |
+| [Example Projects](examples/) | [Web Playground](https://agentmaturity.co/playground.html) |
 
 <details>
 <summary><strong>More docs</strong></summary>

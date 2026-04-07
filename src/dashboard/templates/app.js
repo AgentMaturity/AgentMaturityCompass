@@ -1745,7 +1745,7 @@ function buildSettings() {
         </div>
         <div style="display:flex;gap:16px;margin-top:12px">
           <a href="https://github.com/AgentMaturity/AgentMaturityCompass" target="_blank" style="font:500 12px/1 'Inter',sans-serif;color:var(--accent)">GitHub →</a>
-          <a href="https://AgentMaturity.github.io/AgentMaturityCompass" target="_blank" style="font:500 12px/1 'Inter',sans-serif;color:var(--text-secondary)">Docs →</a>
+          <a href="https://agentmaturity.co" target="_blank" style="font:500 12px/1 'Inter',sans-serif;color:var(--text-secondary)">Docs →</a>
         </div>
       </div>
     </div>
