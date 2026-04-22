@@ -96,7 +96,7 @@ jobs:
 
       - name: Upload smoke artifact
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: e2e-smoke-local
           path: /tmp/e2e-smoke-local.json
@@ -172,7 +172,7 @@ jobs:
 
       - name: Upload docker smoke artifact
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: docker-smoke
           path: |
@@ -206,7 +206,7 @@ jobs:
 
       - name: Upload helm render artifact
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: helm-template
           path: /tmp/amc-helm-rendered.yaml
@@ -243,7 +243,7 @@ jobs:
 
       - name: Upload security artifacts
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: security-scan-lite
           path: |
