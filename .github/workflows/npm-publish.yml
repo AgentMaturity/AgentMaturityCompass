@@ -78,7 +78,26 @@ jobs:
       - name: Build
         run: npm run build
 
+      - name: Release automation preflight
+        id: release_preflight
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          CHANGESETS_GITHUB_TOKEN: ${{ secrets.CHANGESETS_GITHUB_TOKEN }}
+        run: |
+          if [ -z "$NODE_AUTH_TOKEN" ]; then
+            echo "::notice::Skipping npm release automation because NPM_TOKEN is not configured."
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          if [ -z "$CHANGESETS_GITHUB_TOKEN" ]; then
+            echo "::notice::Skipping npm release automation because CHANGESETS_GITHUB_TOKEN is not configured. This token must be allowed to create release PRs."
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          echo "enabled=true" >> "$GITHUB_OUTPUT"
+
       - name: Create Release PR or Publish
+        if: steps.release_preflight.outputs.enabled == 'true'
         id: changesets
         uses: changesets/action@v1
         with:
@@ -89,9 +108,16 @@ jobs:
           title: "chore: version packages for release"
           commit: "chore: version packages"
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.CHANGESETS_GITHUB_TOKEN }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           NPM_CONFIG_PROVENANCE: true
+
+      - name: Release automation skipped
+        if: steps.release_preflight.outputs.enabled != 'true'
+        run: |
+          echo "## npm release automation skipped" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "Configure both NPM_TOKEN and CHANGESETS_GITHUB_TOKEN to enable automated release PR creation and npm publishing." >> "$GITHUB_STEP_SUMMARY"
 
       # After publish: tag + GitHub Release with auto-generated notes
       - name: Create git tag and GitHub Release
