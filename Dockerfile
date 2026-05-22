@@ -28,8 +28,9 @@ RUN npm ci --omit=dev 2>/dev/null || npm install --omit=dev
 # Make CLI available globally
 RUN npm link 2>/dev/null || true
 
-# Default workspace — writable for non-root user
-RUN mkdir -p /workspace && chown 10001:10001 /workspace
+# Default workspaces — writable for non-root user.
+# Studio bootstrap uses /data/amc while ad hoc CLI use defaults to /workspace.
+RUN mkdir -p /workspace /data/amc && chown -R 10001:10001 /workspace /data/amc
 
 # Non-root user for security
 USER 10001:10001
