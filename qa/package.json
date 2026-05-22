@@ -14,9 +14,9 @@
   "dependencies": {
     "express": "^5.2.0",
     "pg": "^8.20.0",
-    "ws": "^8.20.0",
+    "ws": "^8.20.1",
     "dotenv": "^17.0.0",
-    "express-rate-limit": "^8.3.0",
+    "express-rate-limit": "^8.5.2",
     "bcrypt": "^6.0.0",
     "@anthropic-ai/sdk": "^0.40.0"
   },
