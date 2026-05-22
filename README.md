@@ -328,6 +328,17 @@ amc trace list                                           # recent agent sessions
 amc trace inspect <trace-id>                             # inspect tool calls and trust tiers
 ```
 
+### Run realtime monitoring
+
+```bash
+amc monitor start                                        # fresh full score now, then continuous scoring
+amc monitor start --scoring-interval 60000               # rescore every minute
+amc monitor status                                       # active monitor metrics
+amc monitor events --limit 20                            # recent score, drift, anomaly, and alert events
+```
+
+`amc monitor start` bootstraps the AMC workspace if needed, generates a fresh full diagnostic immediately, then keeps creating new full diagnostic runs on the configured interval. Drift checks and alerts run against those fresh runs instead of rereading stale score files.
+
 ### Build golden datasets and run evals
 
 ```bash

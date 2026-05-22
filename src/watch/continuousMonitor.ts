@@ -6,16 +6,18 @@
  */
 
 import { EventEmitter } from "node:events";
-import { randomUUID } from "node:crypto";
+import { randomBytes, randomUUID } from "node:crypto";
 import { join } from "node:path";
 import type { DiagnosticReport, TrustTier } from "../types.js";
+import { runDiagnostic } from "../diagnostic/runner.js";
 import { runDriftCheck, type DriftCheckResult } from "../drift/driftDetector.js";
 import { dispatchAlert, loadAlertsConfig, type AlertPayload } from "../drift/alerts.js";
 import { detectEvidenceStreamAnomalies, type ObservabilityAnomaly } from "../observability/anomalyDetector.js";
 import { openLedger } from "../ledger/ledger.js";
 import { sha256Hex } from "../utils/hash.js";
-import { pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
+import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { getAgentPaths } from "../fleet/paths.js";
+import { initWorkspace } from "../workspace.js";
 
 export interface ContinuousMonitorConfig {
   workspace: string;
@@ -30,6 +32,8 @@ export interface ContinuousMonitorConfig {
   enableWebhooks?: boolean;
   /** Score drop threshold for alerts (0-1, default: 0.1 = 10% drop) */
   scoreDropThreshold?: number;
+  /** Evidence window used for fresh realtime diagnostic runs */
+  diagnosticWindow?: string;
 }
 
 export interface MonitoringMetrics {
@@ -52,6 +56,32 @@ export interface MonitoringEvent {
   data: unknown;
 }
 
+function ensureLocalMonitorVaultPassphrase(workspace: string): void {
+  if (process.env.AMC_VAULT_PASSPHRASE && process.env.AMC_VAULT_PASSPHRASE.length > 0) {
+    return;
+  }
+
+  const amcDir = join(workspace, ".amc");
+  const localPassphrasePath = join(amcDir, "local-vault-passphrase");
+  if (pathExists(localPassphrasePath)) {
+    const localPassphrase = readUtf8(localPassphrasePath).trim();
+    if (localPassphrase.length >= 8) {
+      process.env.AMC_VAULT_PASSPHRASE = localPassphrase;
+    }
+    return;
+  }
+
+  const vaultFile = join(amcDir, "vault.amcvault");
+  if (pathExists(vaultFile)) {
+    return;
+  }
+
+  ensureDir(amcDir);
+  const generated = `amc-monitor-${randomBytes(32).toString("base64url")}`;
+  writeFileAtomic(localPassphrasePath, `${generated}\n`, 0o600);
+  process.env.AMC_VAULT_PASSPHRASE = generated;
+}
+
 export class ContinuousMonitor extends EventEmitter {
   private config: Required<ContinuousMonitorConfig>;
   private scoringTimer: NodeJS.Timeout | null = null;
@@ -60,6 +90,8 @@ export class ContinuousMonitor extends EventEmitter {
   private metrics: MonitoringMetrics;
   private scoreHistory: Array<{ ts: number; score: number; runId: string }> = [];
   private running = false;
+  private scoringInFlight = false;
+  private driftInFlight = false;
 
   constructor(config: ContinuousMonitorConfig) {
     super();
@@ -70,7 +102,8 @@ export class ContinuousMonitor extends EventEmitter {
       driftCheckIntervalMs: config.driftCheckIntervalMs ?? 15 * 60 * 1000, // 15 min
       anomalyWindowMs: config.anomalyWindowMs ?? 60 * 60 * 1000, // 1 hour
       enableWebhooks: config.enableWebhooks ?? true,
-      scoreDropThreshold: config.scoreDropThreshold ?? 0.1
+      scoreDropThreshold: config.scoreDropThreshold ?? 0.1,
+      diagnosticWindow: config.diagnosticWindow ?? "30d"
     };
 
     this.metrics = {
@@ -94,28 +127,43 @@ export class ContinuousMonitor extends EventEmitter {
 
     this.running = true;
     this.startedAt = Date.now();
-    this.emit("started", { agentId: this.config.agentId, ts: this.startedAt });
-
-    // Load existing score history
-    await this.loadScoreHistory();
-
-    // Start continuous scoring
-    this.scoringTimer = setInterval(() => {
-      this.runScoringCycle().catch((error) => {
-        this.emitError("scoring_cycle_failed", error);
+    try {
+      ensureLocalMonitorVaultPassphrase(this.config.workspace);
+      initWorkspace({
+        workspacePath: this.config.workspace,
+        agentId: this.config.agentId
       });
-    }, this.config.scoringIntervalMs);
+      this.emit("started", { agentId: this.config.agentId, ts: this.startedAt });
 
-    // Start drift checks
-    this.driftTimer = setInterval(() => {
-      this.runDriftCheckCycle().catch((error) => {
-        this.emitError("drift_check_failed", error);
-      });
-    }, this.config.driftCheckIntervalMs);
+      // Load existing score history before generating the first fresh score.
+      await this.loadScoreHistory();
 
-    // Run initial cycles
-    await this.runScoringCycle();
-    await this.runDriftCheckCycle();
+      // Generate an immediate fresh score so monitoring begins with live state,
+      // not a stale snapshot from a prior run.
+      const initialReport = await this.runScoringCycle();
+      await this.runDriftCheckCycle(initialReport?.runId);
+
+      // Start continuous scoring only after the first run completes to avoid
+      // overlapping diagnostics on short intervals.
+      this.scoringTimer = setInterval(() => {
+        this.runScoringCycle()
+          .then((report) => this.runDriftIfDue(report?.runId))
+          .catch((error) => {
+            this.emitError("scoring_cycle_failed", error);
+          });
+      }, this.config.scoringIntervalMs);
+
+      // Keep a separate drift cadence for deployments that want slower drift
+      // evaluation than scoring.
+      this.driftTimer = setInterval(() => {
+        this.runDriftCheckCycle().catch((error) => {
+          this.emitError("drift_check_failed", error);
+        });
+      }, this.config.driftCheckIntervalMs);
+    } catch (error) {
+      await this.stop();
+      throw error;
+    }
   }
 
   async stop(): Promise<void> {
@@ -179,91 +227,134 @@ export class ContinuousMonitor extends EventEmitter {
     }
   }
 
-  private async runScoringCycle(): Promise<void> {
-    const ts = Date.now();
-    
-    // In production, this would trigger actual scoring via gateway
-    // For now, we simulate by reading the latest run
-    const runsDir = getAgentPaths(this.config.workspace, this.config.agentId).runsDir;
-    if (!pathExists(runsDir)) {
-      return;
-    }
-
-    const { readdirSync } = await import("node:fs");
-    const files = readdirSync(runsDir)
-      .filter((name) => name.endsWith(".json"))
-      .sort();
-
-    if (files.length === 0) {
-      return;
-    }
-
-    const latestFile = files[files.length - 1]!;
-    const report = JSON.parse(readUtf8(join(runsDir, latestFile))) as DiagnosticReport;
-
-    // Update metrics
-    this.metrics.previousScore = this.metrics.currentScore;
-    this.metrics.currentScore = report.integrityIndex;
-    this.metrics.lastScoredAt = ts;
-    this.metrics.totalScores += 1;
-
-    if (this.metrics.previousScore !== null) {
-      this.metrics.scoreDelta = this.metrics.currentScore - this.metrics.previousScore!;
-
-      // Check for score drops
-      if (this.metrics.scoreDelta < -this.config.scoreDropThreshold) {
-        await this.handleScoreDrop(report);
+  private async runFreshDiagnostic(): Promise<DiagnosticReport> {
+    const forceNoSign = process.env.AMC_NO_SIGN === "1";
+    try {
+      return await runDiagnostic({
+        workspace: this.config.workspace,
+        agentId: this.config.agentId,
+        window: this.config.diagnosticWindow,
+        targetName: "default",
+        claimMode: "auto",
+        noSign: forceNoSign
+      });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      if (forceNoSign || !/Vault unlock failed|Vault locked|passphrase/i.test(message)) {
+        throw error;
       }
+      return runDiagnostic({
+        workspace: this.config.workspace,
+        agentId: this.config.agentId,
+        window: this.config.diagnosticWindow,
+        targetName: "default",
+        claimMode: "auto",
+        noSign: true
+      });
     }
-
-    // Add to history
-    this.scoreHistory.push({
-      ts,
-      score: report.integrityIndex,
-      runId: report.runId
-    });
-
-    // Keep only last 100 scores
-    if (this.scoreHistory.length > 100) {
-      this.scoreHistory = this.scoreHistory.slice(-100);
-    }
-
-    // Run anomaly detection
-    await this.runAnomalyDetection();
-
-    this.emit("score", {
-      type: "score",
-      ts,
-      agentId: this.config.agentId,
-      data: {
-        score: report.integrityIndex,
-        runId: report.runId,
-        delta: this.metrics.scoreDelta
-      }
-    } as MonitoringEvent);
   }
 
-  private async runDriftCheckCycle(): Promise<void> {
-    const ts = Date.now();
-
-    const result = await runDriftCheck({
-      workspace: this.config.workspace,
-      agentId: this.config.agentId
-    });
-
-    this.metrics.lastDriftCheckAt = ts;
-
-    if (result.triggered) {
-      this.metrics.activeIncidents += 1;
-      await this.handleDriftDetected(result);
+  private async runScoringCycle(): Promise<DiagnosticReport | null> {
+    if (this.scoringInFlight) {
+      return null;
     }
+    this.scoringInFlight = true;
+    try {
+      const report = await this.runFreshDiagnostic();
 
-    this.emit("drift", {
-      type: "drift",
-      ts,
-      agentId: this.config.agentId,
-      data: result
-    } as MonitoringEvent);
+      // Update metrics
+      this.metrics.previousScore = this.metrics.currentScore;
+      this.metrics.currentScore = report.integrityIndex;
+      this.metrics.lastScoredAt = report.ts;
+      this.metrics.totalScores += 1;
+
+      if (this.metrics.previousScore !== null) {
+        this.metrics.scoreDelta = this.metrics.currentScore - this.metrics.previousScore!;
+
+        // Check for score drops
+        if (this.metrics.scoreDelta < -this.config.scoreDropThreshold) {
+          await this.handleScoreDrop(report);
+        }
+      } else {
+        this.metrics.scoreDelta = null;
+      }
+
+      // Add to history
+      this.scoreHistory.push({
+        ts: report.ts,
+        score: report.integrityIndex,
+        runId: report.runId
+      });
+
+      // Keep only last 100 scores
+      if (this.scoreHistory.length > 100) {
+        this.scoreHistory = this.scoreHistory.slice(-100);
+      }
+
+      // Run anomaly detection
+      await this.runAnomalyDetection();
+
+      this.emit("score", {
+        type: "score",
+        ts: report.ts,
+        agentId: this.config.agentId,
+        data: {
+          score: report.integrityIndex,
+          runId: report.runId,
+          delta: this.metrics.scoreDelta,
+          status: report.status,
+          questionCount: report.questionScores.length
+        }
+      } as MonitoringEvent);
+
+      return report;
+    } finally {
+      this.scoringInFlight = false;
+    }
+  }
+
+  private async runDriftIfDue(currentRunId?: string): Promise<void> {
+    if (!currentRunId) {
+      return;
+    }
+    if (
+      this.metrics.lastDriftCheckAt !== null &&
+      Date.now() - this.metrics.lastDriftCheckAt < this.config.driftCheckIntervalMs
+    ) {
+      return;
+    }
+    await this.runDriftCheckCycle(currentRunId);
+  }
+
+  private async runDriftCheckCycle(currentRunId?: string): Promise<void> {
+    if (this.driftInFlight) {
+      return;
+    }
+    this.driftInFlight = true;
+    const ts = Date.now();
+    try {
+      const result = await runDriftCheck({
+        workspace: this.config.workspace,
+        agentId: this.config.agentId,
+        currentRunId
+      });
+
+      this.metrics.lastDriftCheckAt = ts;
+
+      if (result.triggered) {
+        this.metrics.activeIncidents += 1;
+        await this.handleDriftDetected(result);
+      }
+
+      this.emit("drift", {
+        type: "drift",
+        ts,
+        agentId: this.config.agentId,
+        data: result
+      } as MonitoringEvent);
+    } finally {
+      this.driftInFlight = false;
+    }
   }
 
   private async runAnomalyDetection(): Promise<void> {
