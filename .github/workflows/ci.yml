@@ -112,10 +112,10 @@ jobs:
       - name: Prepare bootstrap secrets
         run: |
           mkdir -p /tmp/amc-secrets
-          echo "ci-vault-passphrase-123456" > /tmp/amc-secrets/vault.txt
-          echo "owner" > /tmp/amc-secrets/owner-user.txt
-          echo "owner-password-123" > /tmp/amc-secrets/owner-pass.txt
-          echo "ci-notary-auth-secret-123456789012345678901234" > /tmp/amc-secrets/notary-auth.txt
+          printf '%s' "ci-vault-passphrase-123456" > /tmp/amc-secrets/vault.txt
+          printf '%s' "owner" > /tmp/amc-secrets/owner-user.txt
+          printf '%s' "owner-password-123" > /tmp/amc-secrets/owner-pass.txt
+          printf '%s' "ci-notary-auth-secret-123456789012345678901234" > /tmp/amc-secrets/notary-auth.txt
 
       - name: Run container smoke
         run: |
