@@ -3208,7 +3208,7 @@ studio
     const lanSig = verifyLanModeSignature(runtimeConfig.workspaceDir);
     const queryCarrierAllowed = runtimeConfig.queryLeaseCarrierEnabled && lan.enabled && lanSig.valid;
 
-    if (runtimeConfig.vaultPassphrase && !process.env.AMC_VAULT_PASSPHRASE) {
+    if (runtimeConfig.vaultPassphrase) {
       process.env.AMC_VAULT_PASSPHRASE = runtimeConfig.vaultPassphrase;
     }
     if (queryCarrierAllowed) {

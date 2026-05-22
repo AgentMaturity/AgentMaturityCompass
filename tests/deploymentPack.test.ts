@@ -1,4 +1,5 @@
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { spawnSync } from "node:child_process";
 import { describe, expect, it } from "vitest";
@@ -90,6 +91,22 @@ describe("deployment pack assets", () => {
     expect(config.allowedCidrs).toEqual(["127.0.0.1/32", "10.0.0.0/8"]);
     expect(config.corsAllowedOrigins).toEqual(["https://example.test"]);
     expect(config.lanMode).toBe(true);
+  });
+
+  it("prefers vault passphrase file over inherited direct env passphrase", () => {
+    const tmp = mkdtempSync(join(tmpdir(), "amc-deploy-test-"));
+    try {
+      const passphraseFile = join(tmp, "vault.txt");
+      writeFileSync(passphraseFile, "file-passphrase-123", "utf8");
+      const config = loadStudioRuntimeConfig({
+        AMC_WORKSPACE_DIR: "/tmp/amc",
+        AMC_VAULT_PASSPHRASE: "inherited-image-default",
+        AMC_VAULT_PASSPHRASE_FILE: passphraseFile
+      });
+      expect(config.vaultPassphrase).toBe("file-passphrase-123");
+    } finally {
+      rmSync(tmp, { recursive: true, force: true });
+    }
   });
 
   it("rejects duplicate runtime port assignments", () => {
