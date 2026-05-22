@@ -1461,6 +1461,12 @@ program
   .description("Check runtime availability and wrap readiness")
   .option("--json", "emit structured JSON output", false)
   .action(async (opts: { json: boolean }) => {
+    const runtimeConfig = loadStudioRuntimeConfig(process.env, {
+      workspaceDir: process.cwd()
+    });
+    if (runtimeConfig.vaultPassphrase) {
+      process.env.AMC_VAULT_PASSPHRASE = runtimeConfig.vaultPassphrase;
+    }
     const legacy = runDoctor(process.cwd());
     const result = await runDoctorCli(process.cwd());
     if (opts.json) {
