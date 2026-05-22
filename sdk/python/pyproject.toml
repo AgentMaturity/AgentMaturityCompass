@@ -10,7 +10,7 @@ readme = "README.md"
 license = "MIT"
 requires-python = ">=3.9"
 authors = [
-    { name = "thewisecrab" },
+    { name = "AgentMaturity" },
 ]
 keywords = ["ai", "agents", "trust", "security", "scoring", "maturity", "guardrails"]
 classifiers = [
@@ -28,10 +28,10 @@ classifiers = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/thewisecrab/AgentMaturityCompass"
-Documentation = "https://github.com/thewisecrab/AgentMaturityCompass/tree/main/sdk/python"
-Repository = "https://github.com/thewisecrab/AgentMaturityCompass"
-Issues = "https://github.com/thewisecrab/AgentMaturityCompass/issues"
+Homepage = "https://github.com/AgentMaturity/AgentMaturityCompass"
+Documentation = "https://github.com/AgentMaturity/AgentMaturityCompass/tree/main/sdk/python"
+Repository = "https://github.com/AgentMaturity/AgentMaturityCompass"
+Issues = "https://github.com/AgentMaturity/AgentMaturityCompass/issues"
 
 [tool.hatch.build.targets.wheel]
 packages = ["amc_sdk"]

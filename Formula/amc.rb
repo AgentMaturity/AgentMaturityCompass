@@ -1,10 +1,10 @@
 class Amc < Formula
   desc "AI Agent Trust Scoring — execution-verified maturity scores with cryptographic evidence"
-  homepage "https://thewisecrab.github.io/AgentMaturityCompass/"
+  homepage "https://agentmaturity.co/"
   url "https://registry.npmjs.org/agent-maturity-compass/-/agent-maturity-compass-1.0.0.tgz"
   sha256 "PLACEHOLDER_SHA256"
   license "MIT"
-  head "https://github.com/thewisecrab/AgentMaturityCompass.git", branch: "main"
+  head "https://github.com/AgentMaturity/AgentMaturityCompass.git", branch: "main"
 
   depends_on "node"
 
@@ -15,7 +15,7 @@ class Amc < Formula
 
   def post_install
     ohai "AMC installed! Run: amc init && amc quickscore"
-    ohai "Docs: https://thewisecrab.github.io/AgentMaturityCompass/"
+    ohai "Docs: https://agentmaturity.co/"
   end
 
   test do

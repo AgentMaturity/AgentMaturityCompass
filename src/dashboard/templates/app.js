@@ -1759,7 +1759,7 @@ function buildSettings() {
         <div style="font:400 13px/1.7 'Inter',sans-serif;color:var(--text-secondary);margin-top:8px">
           <strong style="color:var(--text-primary)">Agent Maturity Compass</strong> — the open-source trust scoring framework for AI agents.<br>
           Evidence-based. Cryptographically verifiable. Zero fluff.<br>
-          <span style="color:var(--text-tertiary)">Built by the wise crab. MIT licensed.</span>
+          <span style="color:var(--text-tertiary)">Built by AgentMaturity. MIT licensed.</span>
         </div>
         <div style="display:flex;gap:16px;margin-top:12px">
           <a href="https://github.com/AgentMaturity/AgentMaturityCompass" target="_blank" style="font:500 12px/1 'Inter',sans-serif;color:var(--accent)">GitHub →</a>

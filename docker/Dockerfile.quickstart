@@ -2,7 +2,7 @@ FROM node:20-slim
 
 LABEL org.opencontainers.image.title="Agent Maturity Compass — Quickstart"
 LABEL org.opencontainers.image.description="Zero-dependency AMC quickstart container"
-LABEL org.opencontainers.image.source="https://github.com/thewisecrab/AgentMaturityCompass"
+LABEL org.opencontainers.image.source="https://github.com/AgentMaturity/AgentMaturityCompass"
 LABEL org.opencontainers.image.licenses="MIT"
 
 # Install AMC globally

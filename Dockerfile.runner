@@ -1,12 +1,12 @@
 # amc-runner — CI/CD runner image with AMC pre-installed
-# Usage: docker run --rm -v $(pwd):/workspace ghcr.io/thewisecrab/amc-runner:latest quickscore --json
+# Usage: docker run --rm -v $(pwd):/workspace ghcr.io/agentmaturity/amc-runner:latest quickscore --json
 # Or in GitHub Actions:
 #   container:
-#     image: ghcr.io/thewisecrab/amc-runner:latest
+#     image: ghcr.io/agentmaturity/amc-runner:latest
 
 FROM node:20-bookworm-slim
 
-LABEL org.opencontainers.image.source="https://github.com/thewisecrab/AgentMaturityCompass"
+LABEL org.opencontainers.image.source="https://github.com/AgentMaturity/AgentMaturityCompass"
 LABEL org.opencontainers.image.description="AMC CI/CD Runner — Agent Maturity Compass pre-installed for pipelines"
 LABEL org.opencontainers.image.licenses="MIT"
 LABEL org.opencontainers.image.title="amc-runner"

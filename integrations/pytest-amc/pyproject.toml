@@ -28,9 +28,9 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/thewisecrab/AgentMaturityCompass"
-Repository = "https://github.com/thewisecrab/AgentMaturityCompass"
-Documentation = "https://thewisecrab.github.io/AgentMaturityCompass"
+Homepage = "https://github.com/AgentMaturity/AgentMaturityCompass"
+Repository = "https://github.com/AgentMaturity/AgentMaturityCompass"
+Documentation = "https://agentmaturity.co/"
 
 [project.entry-points.pytest11]
 amc = "pytest_amc.plugin"

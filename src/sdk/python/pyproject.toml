@@ -10,7 +10,7 @@ readme = "README.md"
 license = {text = "MIT"}
 requires-python = ">=3.9"
 authors = [
-    {name = "The Wise Crab", email = "thewisecrab@users.noreply.github.com"},
+    {name = "AgentMaturity"},
 ]
 keywords = ["ai", "agent", "trust", "scoring", "maturity", "governance", "amc", "llm", "safety"]
 classifiers = [
@@ -30,10 +30,10 @@ classifiers = [
 dependencies = []
 
 [project.urls]
-Homepage = "https://github.com/thewisecrab/AgentMaturityCompass"
-Documentation = "https://github.com/thewisecrab/AgentMaturityCompass/blob/main/docs/GETTING_STARTED.md"
-Repository = "https://github.com/thewisecrab/AgentMaturityCompass"
-Issues = "https://github.com/thewisecrab/AgentMaturityCompass/issues"
+Homepage = "https://github.com/AgentMaturity/AgentMaturityCompass"
+Documentation = "https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/GETTING_STARTED.md"
+Repository = "https://github.com/AgentMaturity/AgentMaturityCompass"
+Issues = "https://github.com/AgentMaturity/AgentMaturityCompass/issues"
 
 [project.optional-dependencies]
 httpx = ["httpx>=0.24.0"]
