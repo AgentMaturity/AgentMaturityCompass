@@ -158,7 +158,7 @@ jobs:
             exit 1
           fi
           curl -fsS http://127.0.0.1:3212/console >/dev/null
-          docker exec amc-ci amc doctor --json > /tmp/docker-doctor.json
+          docker exec -w /data/amc amc-ci amc doctor --json > /tmp/docker-doctor.json
 
       - name: Secret leak check
         run: |

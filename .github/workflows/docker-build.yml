@@ -68,7 +68,7 @@ jobs:
               exit 1
             fi
           done
-          docker exec amc-ci amc doctor --json > /tmp/doctor.json
+          docker exec -w /data/amc amc-ci amc doctor --json > /tmp/doctor.json
 
       - name: Ensure logs are redacted
         run: |
