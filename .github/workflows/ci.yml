@@ -136,7 +136,7 @@ jobs:
             -v /tmp/amc-secrets/notary-auth.txt:/run/secrets/notary-auth:ro \
             --entrypoint sh \
             amc-studio:ci \
-            -c "amc gateway init && exec amc studio start"
+            -c "amc bootstrap && exec amc studio start"
 
           for i in $(seq 1 90); do
             if curl -fsS http://127.0.0.1:3212/readyz >/dev/null 2>&1; then
