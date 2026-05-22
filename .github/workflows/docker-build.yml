@@ -42,6 +42,7 @@ jobs:
             -e AMC_BOOTSTRAP=1 \
             -e AMC_BIND=0.0.0.0 \
             -e AMC_LAN_MODE=true \
+            -e AMC_ALLOWED_CIDRS=127.0.0.1/32,::1/128,172.16.0.0/12,10.0.0.0/8 \
             -e AMC_VAULT_PASSPHRASE_FILE=/run/secrets/vault \
             -e AMC_BOOTSTRAP_OWNER_USERNAME_FILE=/run/secrets/owner-user \
             -e AMC_BOOTSTRAP_OWNER_PASSWORD_FILE=/run/secrets/owner-pass \
