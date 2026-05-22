@@ -64,7 +64,8 @@ Complete reference for every `amc` command organized by category.
 
 | Command | Description |
 |---------|-------------|
-| `amc quickscore` | 2-minute rapid self-assessment (no gateway required) |
+| `amc` | Full evidence-based score with automatic local workspace initialization |
+| `amc quickscore` | Legacy quickscore flow (use `--rapid` for the 5-question pulse check) |
 | `amc quickscore --share` | Generate shareable markdown summary + badge after scoring |
 | `amc quickscore --json` | Machine-readable quickscore output |
 

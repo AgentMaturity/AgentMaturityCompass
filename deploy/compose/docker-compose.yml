@@ -15,15 +15,27 @@ services:
     ports:
       - "3212:3212"
       - "3210:3210"
+      - "3211:3211"
     volumes:
       - amc_data:/data/amc
     environment:
+      - AMC_BOOTSTRAP=${AMC_BOOTSTRAP:-1}
+      - AMC_WORKSPACE_DIR=/data/amc
+      - AMC_BIND=0.0.0.0
       - AMC_STUDIO_PORT=3212
       - AMC_GATEWAY_PORT=3210
-      - AMC_VAULT_PASSPHRASE_FILE=/run/secrets/vault_passphrase
-      - AMC_BOOTSTRAP_OWNER_PASSWORD_FILE=/run/secrets/owner_password
+      - AMC_PROXY_PORT=3211
+      - AMC_ALLOWED_CIDRS=${AMC_ALLOWED_CIDRS:-127.0.0.1/32,192.168.0.0/16,10.0.0.0/8,172.16.0.0/12,::1/128}
+      - AMC_QUERY_LEASE_CARRIER_ENABLED=${AMC_QUERY_LEASE_CARRIER_ENABLED:-false}
+      - AMC_VAULT_PASSPHRASE_FILE=/run/secrets/amc_vault_passphrase
+      - AMC_BOOTSTRAP_OWNER_USERNAME_FILE=/run/secrets/amc_owner_username
+      - AMC_BOOTSTRAP_OWNER_PASSWORD_FILE=/run/secrets/amc_owner_password
       - NODE_ENV=production
-    command: ["node", "dist/cli.js", "up", "--non-interactive"]
+    command: >
+      sh -lc 'if [ "$${AMC_BOOTSTRAP:-1}" = "1" ]; then
+        node dist/cli.js bootstrap --workspace /data/amc;
+      fi;
+      exec node dist/cli.js studio start --workspace /data/amc --bind 0.0.0.0 --port "$${AMC_STUDIO_PORT:-3212}"'
     read_only: true
     tmpfs:
       - /tmp
@@ -40,14 +52,17 @@ services:
       retries: 3
       start_period: 10s
     secrets:
-      - vault_passphrase
-      - owner_password
+      - amc_vault_passphrase
+      - amc_owner_username
+      - amc_owner_password
 
 secrets:
-  vault_passphrase:
-    file: ./secrets/vault_passphrase.txt
-  owner_password:
-    file: ./secrets/owner_password.txt
+  amc_vault_passphrase:
+    file: ./secrets/amc_vault_passphrase.txt
+  amc_owner_username:
+    file: ./secrets/amc_owner_username.txt
+  amc_owner_password:
+    file: ./secrets/amc_owner_password.txt
 
 volumes:
   amc_data:

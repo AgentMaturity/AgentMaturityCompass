@@ -90,7 +90,7 @@ Each question references specific regulatory articles — not vague guidelines.
 ### Option 1: Ask Your Engineering Team
 ```
 Install: npm i -g agent-maturity-compass
-First score: amc init && amc quickscore
+First score: amc
 Full report: amc guide --status
 ```
 
@@ -101,7 +101,7 @@ Answer 15 questions about your agent. Get an instant score.
 
 ### Option 3: Docker (Zero Setup)
 ```
-docker run -it amc/compass amc quickscore
+docker run -it amc/compass amc
 ```
 
 ## Cost

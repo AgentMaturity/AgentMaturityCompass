@@ -39,7 +39,7 @@ Next step:
 Use the CLI.
 
 ```bash
-npx agent-maturity-compass quickscore
+npx agent-maturity-compass
 ```
 
 Best for:
@@ -49,7 +49,7 @@ Best for:
 - generating fixes
 
 Recommended next steps after your first score:
-1. `amc quickscore`
+1. `amc`
 2. `amc fix`
 3. `amc doctor --json`
 4. review `docs/AFTER_QUICKSCORE.md`
@@ -107,7 +107,7 @@ amc wrap <adapter> -- <your command>
 ```
 
 Then move into:
-- `quickscore`
+- full scoring with `amc`
 - traces
 - assurance packs
 - CI
@@ -137,7 +137,7 @@ If you are new, start with:
 
 ## Recommended first 15 minutes
 
-1. Run `npx agent-maturity-compass quickscore`
+1. Run `npx agent-maturity-compass`
 2. Read the gaps
 3. Run `amc fix`
 4. Read `docs/AFTER_QUICKSCORE.md`

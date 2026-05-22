@@ -108,7 +108,7 @@ async function getGuide(agent = 'default') {
 
 async function execCommand(command) {
   return amcApiWithFallback(
-    ['/exec', '/studio/exec'],
+    ['/cli/exec', '/exec', '/studio/exec'],
     { method: 'POST', body: JSON.stringify({ command }) }
   );
 }

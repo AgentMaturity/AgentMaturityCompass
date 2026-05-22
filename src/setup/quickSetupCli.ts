@@ -40,7 +40,7 @@ export function registerQuickSetupCommand(program: Command): void {
         console.log("  Agent ID: demo-agent");
         console.log("  .amc/amc.config.yaml — workspace config");
         console.log("  .amc/evidence/demo-evidence.json — sample evidence");
-        console.log("\n  Next: amc quickscore --auto --agent demo-agent");
+        console.log("\n  Next: amc --agent demo-agent");
         return;
       }
       await runQuickSetup({

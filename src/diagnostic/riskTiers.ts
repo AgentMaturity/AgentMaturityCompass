@@ -2,7 +2,7 @@
  * Risk-Tiered Assessment Profiles — MF-13
  *
  * Configures evaluation depth based on agent risk tier:
- * - Critical: Full 235 questions + all assurance packs
+ * - Critical: Full 240 questions + all assurance packs
  * - High: 150 questions + security assurance packs
  * - Medium: 100 core questions
  * - Low: 50 essential questions
@@ -30,7 +30,7 @@ export type RiskTierConfig = z.infer<typeof riskTierConfigSchema>;
 export const RISK_TIER_PROFILES: Record<string, RiskTierConfig> = {
   critical: {
     tier: "critical",
-    maxQuestions: 235,
+    maxQuestions: 240,
     assurancePacks: "all",
     evidenceDepth: "full",
     reportDetail: "comprehensive",

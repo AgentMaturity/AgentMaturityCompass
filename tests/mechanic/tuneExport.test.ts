@@ -47,8 +47,8 @@ function buildMockReport(overrides: Partial<{
   ];
 
   const questions = overrides.questions ?? defaultQuestions;
-  // Pad to 235 with no-gap questions
-  while (questions.length < 235) {
+  // Pad to 240 with no-gap questions
+  while (questions.length < 240) {
     const idx = questions.length;
     const dim = (idx % 5) + 1;
     questions.push(makeQuestion(`AMC-${dim}.${String(idx).padStart(2, "0")}`, 3, 3));
@@ -127,7 +127,7 @@ describe("exportAsRewardFunction", () => {
   });
 
   it("returns zero gaps when all questions meet targets", () => {
-    const questions = Array.from({ length: 235 }, (_, i) => {
+    const questions = Array.from({ length: 240 }, (_, i) => {
       const dim = (i % 5) + 1;
       return makeQuestion(`AMC-${dim}.${String(i).padStart(2, "0")}`, 3, 3);
     });
@@ -179,7 +179,7 @@ describe("exportAsDSPyTargets", () => {
   });
 
   it("returns empty metrics when no gaps exist", () => {
-    const questions = Array.from({ length: 235 }, (_, i) => {
+    const questions = Array.from({ length: 240 }, (_, i) => {
       const dim = (i % 5) + 1;
       return makeQuestion(`AMC-${dim}.${String(i).padStart(2, "0")}`, 4, 4);
     });
@@ -244,7 +244,7 @@ describe("exportAsFineTuneRecipe", () => {
   });
 
   it("returns empty focus areas when no gaps exist", () => {
-    const questions = Array.from({ length: 235 }, (_, i) => {
+    const questions = Array.from({ length: 240 }, (_, i) => {
       const dim = (i % 5) + 1;
       return makeQuestion(`AMC-${dim}.${String(i).padStart(2, "0")}`, 3, 3);
     });

@@ -344,7 +344,7 @@ describe("R4-09 Formal Construct Validity", () => {
   });
 
   test("sample size matches question count", () => {
-    expect(CONSTRUCT_VALIDITY_DATA.sampleSize).toBe(235);
+    expect(CONSTRUCT_VALIDITY_DATA.sampleSize).toBe(240);
   });
 });
 

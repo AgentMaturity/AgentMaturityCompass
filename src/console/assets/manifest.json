@@ -1,11 +1,11 @@
 {
-  "name": "AMC Compass Console",
-  "short_name": "AMC Console",
+  "name": "AMC Studio",
+  "short_name": "AMC Studio",
   "start_url": "../home",
   "scope": "../",
   "display": "standalone",
-  "background_color": "#0f172a",
-  "theme_color": "#0f172a",
+  "background_color": "#0a0a0a",
+  "theme_color": "#0a0a0a",
   "icons": [
     {
       "src": "./icons/compass.svg",

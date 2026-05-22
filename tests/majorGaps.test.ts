@@ -103,7 +103,7 @@ describe("MF-09 Deep Industry Packs", () => {
 
 describe("MF-13 Risk Tiers", () => {
   test("4 tier profiles defined", () => { expect(Object.keys(RISK_TIER_PROFILES).length).toBe(4); });
-  test("critical tier has most questions", () => { expect(RISK_TIER_PROFILES["critical"]!.maxQuestions).toBe(235); });
+  test("critical tier has most questions", () => { expect(RISK_TIER_PROFILES["critical"]!.maxQuestions).toBe(240); });
   test("low tier has fewest questions", () => { expect(RISK_TIER_PROFILES["low"]!.maxQuestions).toBe(50); });
   test("getRiskTierProfile returns correct tier", () => {
     expect(getRiskTierProfile("critical").tier).toBe("critical");

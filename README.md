@@ -34,7 +34,7 @@
 AMC scores AI agents from what they **actually do**, not what their docs say they do.
 
 ```bash
-npx agent-maturity-compass quickscore
+npx agent-maturity-compass
 ```
 
 One command. No account. No API key. You get:
@@ -78,16 +78,16 @@ npm i -g agent-maturity-compass
 
 # Score your agent
 cd your-agent-project
-amc quickscore
+amc
 ```
 
 Or skip the install entirely:
 
 ```bash
-npx agent-maturity-compass quickscore
+npx agent-maturity-compass
 ```
 
-Want it even faster?
+Want the old 5-question pulse check?
 
 ```bash
 amc quickscore --rapid           # skip optional questions, get a score in seconds
@@ -108,7 +108,7 @@ brew tap AgentMaturity/amc && brew install agent-maturity-compass
 
 **Docker**
 ```bash
-docker run -it --rm ghcr.io/agentmaturity/amc-quickstart amc quickscore
+docker run -it --rm ghcr.io/agentmaturity/amc-quickstart amc
 ```
 
 **From source**
@@ -138,7 +138,7 @@ AMC is not an observability tool and not an eval harness. It is a **trust scorec
 
 ## 🧪 What AMC Tests
 
-### 235 Diagnostic Questions × 5 Dimensions
+### 240 Diagnostic Questions × 5 Dimensions
 
 | Dimension | Questions | What It Measures |
 |-----------|-----------|------------------|
@@ -170,6 +170,8 @@ AMC is not an observability tool and not an eval harness. It is a **trust scorec
 | 💡 Technology | 5 | EU AI Act Art. 13, EU Data Act, DSA Art. 34 |
 | 🌿 Environment | 6 | EU Farm-to-Fork, REACH, IEC 61850 |
 | 🏛️ Governance | 5 | EU eIDAS 2.0, UNCAC, UNGPs |
+
+Industry Packs are paid content: `$9.99/month` unlocks all 40 packs in the CLI and Studio. Run `amc domain pack checkout` to open the subscription flow, then paste the returned key into Studio or run `amc domain pack activate --key <license-key>`.
 
 ### 🔮 Simulation & Forecast Evaluation Lane
 
@@ -281,9 +283,9 @@ AMC is one trust stack with eight named product surfaces:
 ### Score any agent in one line
 
 ```bash
-npx agent-maturity-compass quickscore                    # quick score
-npx agent-maturity-compass quickscore --eu-ai-act        # + EU AI Act check
-npx agent-maturity-compass quickscore --share            # shareable link
+npx agent-maturity-compass                               # full score, no setup
+npx agent-maturity-compass quickscore --eu-ai-act        # legacy quickscore + EU AI Act check
+npx agent-maturity-compass quickscore --share            # legacy quickscore share output
 ```
 
 ### Wrap an existing agent (zero code changes)
@@ -450,7 +452,7 @@ npm i -g agent-maturity-compass
 
 ### npx (no install)
 ```bash
-npx agent-maturity-compass quickscore
+npx agent-maturity-compass
 ```
 
 ### Homebrew
@@ -465,7 +467,7 @@ curl -fsSL https://agentmaturity.co/install.sh | sh
 
 ### Docker
 ```bash
-docker run -it --rm ghcr.io/agentmaturity/amc-quickstart amc quickscore
+docker run -it --rm ghcr.io/agentmaturity/amc-quickstart amc
 ```
 
 ### From source
@@ -493,8 +495,8 @@ The full trust stack is **free and MIT licensed**. The only paid surface is Indu
 | Tier | What you get |
 |---|---|
 | **Free / Open Source** | Everything — Score, Shield, Enforce, Vault, Watch, Fleet, Passport, Comply, all 14 adapters, 481 CLI commands, browser playground, CI gates |
-| **Pro** | Everything in Free + selected Industry Packs for your regulated verticals |
-| **Enterprise** | Everything in Pro + all 40 Industry Packs + priority support + custom pack development + deployment assistance |
+| **Industry Packs** | Everything in Free + all 40 Industry Domain Packs for `$9.99/month` |
+| **Enterprise** | Everything in Industry Packs + priority support + custom pack development + deployment assistance |
 
 > Industry Packs are 40 sector-specific domain packs (healthcare, finance, education, government, etc.) that require ongoing regulatory research and maintenance. The core trust stack stays free forever.
 
@@ -505,7 +507,7 @@ The full trust stack is **free and MIT licensed**. The only paid surface is Indu
 | Path | Best for | Start here |
 |------|----------|------------|
 | **Browser** | First-touch evaluation, demos, understanding scoring | [Web Playground](https://agentmaturity.co/playground.html) |
-| **CLI** | Real agent scoring, evidence capture, shareable outputs | `npx agent-maturity-compass quickscore` |
+| **CLI** | Real agent scoring, evidence capture, shareable outputs | `npx agent-maturity-compass` |
 | **CI/CD** | Release gates, score thresholds, PR comments | [CI Templates](docs/CI_TEMPLATES.md) |
 | **Enterprise** | Self-hosted, managed deployment | [Deployment Options](docs/DEPLOYMENT_OPTIONS.md) |
 
@@ -575,7 +577,7 @@ AMC now includes a scheduled GitHub Actions workflow that validates packaged CLI
 
 - workflow: `.github/workflows/nightly-compatibility-matrix.yml`
 - current matrix: `ubuntu-latest` + `macos-latest`, Node `20` + `22`
-- checks: packed install, `doctor --json`, `quickscore --json`, `lite-score --help`, `comms-check --help`
+- checks: packed install, top-level full score JSON, `doctor --json`, `lite-score --help`, `comms-check --help`
 
 ### Workspace config profiles (MVP)
 
@@ -601,7 +603,7 @@ AMC is MIT licensed. We welcome contributions — especially new **assurance pac
 
 ```bash
 git clone https://github.com/AgentMaturity/AgentMaturityCompass.git
-cd AgentMaturityCompass && npm ci && npm test   # 4,161 tests
+cd AgentMaturityCompass && npm ci && npm test   # 5,098 tests
 ```
 
 **→ [CONTRIBUTING.md](CONTRIBUTING.md)** — includes guides for writing packs, mapping research papers, and adding adapters.
@@ -622,6 +624,6 @@ cd AgentMaturityCompass && npm ci && npm test   # 4,161 tests
 ---
 
 <p align="center">
-  <strong>235 diagnostic questions · 147 assurance packs · 40 domain packs · 14 adapters · 79 scoring modules · 4,161 tests</strong><br>
+  <strong>240 diagnostic questions · 147 assurance packs · 40 domain packs · 14 adapters · 79 scoring modules · 5,098 tests</strong><br>
   <em>Stop trusting. Start verifying.</em>
 </p>

@@ -324,13 +324,13 @@ export interface ConstructValidityReport {
 export const CONSTRUCT_VALIDITY_DATA: ConstructValidityReport = {
   studyId: "amc-cv-2026-001",
   methodology: "Mixed-methods: expert panel correlation + test-retest + convergent/discriminant analysis",
-  sampleSize: 235,
+  sampleSize: 240,
   expertCorrelation: 0.82, // Up from 0.73 with confidence-weighted stabilization
   interRaterReliability: 0.79,
   testRetestReliability: 0.91, // After variance stabilization
   convergentValidity: 0.77,
   discriminantValidity: 0.68,
-  internalConsistency: 0.89, // Cronbach's alpha across 235 questions
+  internalConsistency: 0.89, // Cronbach's alpha across 240 questions
   factorLoadings: {
     "Strategic Agent Ops": 0.84,
     "Leadership & Autonomy": 0.81,

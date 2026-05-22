@@ -70,6 +70,13 @@ const INTERACTIVE_COMMANDS = [
   "target set",
 ];
 
+function normalizeCliCommand(cmd: string): string {
+  const trimmed = cmd.trim();
+  if (trimmed === "amc") return "";
+  if (trimmed.startsWith("amc ")) return trimmed.slice(4).trim();
+  return trimmed;
+}
+
 /* ── Validation ───────────────────────────────────── */
 export function validateCliExec(req: CliExecRequest): string | null {
   if (!req.command || typeof req.command !== "string") {
@@ -78,6 +85,7 @@ export function validateCliExec(req: CliExecRequest): string | null {
   const cmd = req.command.trim();
   if (cmd.length === 0) return "command cannot be empty";
   if (cmd.length > 2000) return "command too long (max 2000 chars)";
+  const normalized = normalizeCliCommand(cmd);
 
   // Block shell metacharacters
   if (/[;&|`$(){}\\]/.test(cmd)) {
@@ -85,15 +93,15 @@ export function validateCliExec(req: CliExecRequest): string | null {
   }
 
   // Check dangerous commands
-  const isDangerous = DANGEROUS_PREFIXES.some(p => cmd.startsWith(p));
+  const isDangerous = DANGEROUS_PREFIXES.some(p => normalized.startsWith(p));
   if (isDangerous && !req.confirm) {
-    return `dangerous command "${cmd.split(" ").slice(0, 2).join(" ")}" requires confirm:true`;
+    return `dangerous command "${normalized.split(" ").slice(0, 2).join(" ")}" requires confirm:true`;
   }
 
   // Check interactive commands
-  const isInteractive = INTERACTIVE_COMMANDS.some(p => cmd === p || cmd.startsWith(p + " "));
+  const isInteractive = INTERACTIVE_COMMANDS.some(p => normalized === p || normalized.startsWith(p + " "));
   if (isInteractive) {
-    return `interactive command "${cmd.split(" ")[0]}" cannot run headless via API — use --non-interactive flag or equivalent API endpoint`;
+    return `interactive command "${normalized.split(" ")[0]}" cannot run headless via API — use --non-interactive flag or equivalent API endpoint`;
   }
 
   return null;
@@ -153,7 +161,7 @@ export function execCliCommand(
     });
   }
 
-  const argv = parseArgv(cmd);
+  const argv = parseArgv(normalizeCliCommand(cmd));
 
   // Add --json if requested and not already present
   if (req.format === "json" && !argv.includes("--json")) {

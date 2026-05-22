@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://thewisecrab.github.io/AgentMaturityCompass/sitemap.xml
+Sitemap: https://agentmaturity.co/sitemap.xml

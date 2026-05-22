@@ -29,6 +29,7 @@ import {
   renderTransparencyReportJson,
 } from "../transparency/transparencyReport.js";
 import { INDUSTRY_PACKS, scoreIndustryPack, type IndustryPackId } from "../domains/industryPacks.js";
+import { formatIndustryPackPaywallMessage, getIndustryPackEntitlement } from "../domains/industryPackEntitlement.js";
 import { openLedger } from "../ledger/ledger.js";
 import { parseWindowToMs } from "../utils/time.js";
 import { resolveAgentId } from "../fleet/paths.js";
@@ -400,6 +401,18 @@ export async function startMcpServer(workspace?: string): Promise<void> {
     },
     async ({ packId, responses }) => {
       enforceRateLimit();
+      const entitlement = getIndustryPackEntitlement(process.cwd());
+      if (!entitlement.active) {
+        return {
+          content: [
+            {
+              type: "text",
+              text: formatIndustryPackPaywallMessage(entitlement),
+            },
+          ],
+          isError: true,
+        };
+      }
       if (!INDUSTRY_PACKS[packId as IndustryPackId]) {
         const available = Object.keys(INDUSTRY_PACKS).join(", ");
         return {

@@ -22,6 +22,7 @@ import { benchmarkStats } from "../benchmarks/benchStats.js";
 import { latestOutcomeReport, outcomeTrend, topValueGaps } from "../outcomes/outcomeDashboard.js";
 import { listDomainMetadata } from "../domains/domainRegistry.js";
 import { listIndustryPacks } from "../domains/industryPacks.js";
+import { getIndustryPackEntitlement, toIndustryPackCatalogItem } from "../domains/industryPackEntitlement.js";
 import { createGuardrailState, listGuardrailsWithStatus } from "../enforce/guardrailProfiles.js";
 
 export interface DashboardBuildInput {
@@ -214,7 +215,7 @@ function getDomainSummaries(): Array<{
   }));
 }
 
-function getPackSummaries(): Array<{
+function getPackSummaries(workspace: string): Array<{
   id: string;
   name: string;
   domain: string;
@@ -222,15 +223,18 @@ function getPackSummaries(): Array<{
   questionCount: number;
   description: string;
   regulatoryBasis: string[];
+  locked: boolean;
 }> {
+  const entitlement = getIndustryPackEntitlement(workspace);
   return listIndustryPacks().map((pack) => ({
     id: pack.id,
     name: pack.name,
     domain: pack.stationId,
     riskTier: pack.riskTier,
     questionCount: pack.questions.length,
-    description: pack.description,
-    regulatoryBasis: pack.regulatoryBasis
+    description: toIndustryPackCatalogItem(pack, entitlement).description,
+    regulatoryBasis: entitlement.active ? pack.regulatoryBasis : [],
+    locked: !entitlement.active
   }));
 }
 
@@ -300,7 +304,7 @@ export function buildDashboard(input: DashboardBuildInput): DashboardBuildResult
     trends,
     assurance,
     domains: getDomainSummaries(),
-    industryPacks: getPackSummaries(),
+    industryPacks: getPackSummaries(input.workspace),
     guardrails: getGuardrailsList(),
     approvalsSummary: {
       requested: 0,

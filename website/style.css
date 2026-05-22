@@ -219,7 +219,7 @@ section{padding:clamp(5rem,10vw,8rem) 0;position:relative;z-index:1}
 .faq-a{max-height:0;overflow:hidden;transition:max-height .4s cubic-bezier(.16,1,.3,1)}
 .faq-a p{font-size:.88rem;color:var(--text-muted);line-height:1.65;padding-bottom:1.25rem}
 .faq-a code{font-family:var(--mono);font-size:.82rem;color:var(--accent);background:rgba(74,239,121,.08);padding:.15rem .4rem}
-.faq-item.open .faq-a{max-height:300px}.faq-item.open .faq-icon{transform:rotate(45deg)}
+.faq-item.open .faq-a{max-height:520px}.faq-item.open .faq-icon{transform:rotate(45deg)}
 
 /* ═══ GRADIENT CTA (OSE pre-footer) ═══ */
 .gradient-cta{position:relative;padding:clamp(16rem,30vw,28rem) 0 0;text-align:center;background:linear-gradient(180deg,#0a0a0a 0%,#0f0f0f 8%,#1a1a1a 18%,#2a2a2a 30%,#4a4a4a 45%,#777 60%,#aaa 75%,#d0d0d0 88%,#fff 100%);overflow:hidden;margin-bottom:0}

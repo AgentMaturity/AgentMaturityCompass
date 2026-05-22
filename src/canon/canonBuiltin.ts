@@ -7,6 +7,7 @@ function dimensionIdForQuestion(qid: string): "D1" | "D2" | "D3" | "D4" | "D5" {
   if (qid.startsWith("AMC-SPORT-")) return "D1";
   if (qid.startsWith("AMC-OPS-")) return "D1";
   if (qid.startsWith("AMC-OINT-")) return "D1";
+  if (qid.startsWith("AMC-TUNE-")) return "D1";
   if (qid.startsWith("AMC-2.")) return "D2";
   if (qid.startsWith("AMC-HOQ-")) return "D2";
   if (qid.startsWith("AMC-GOV-PROACTIVE-")) return "D2";
@@ -16,6 +17,7 @@ function dimensionIdForQuestion(qid: string): "D1" | "D2" | "D3" | "D4" | "D5" {
   if (qid.startsWith("AMC-SOCIAL-")) return "D3";
   if (qid.startsWith("AMC-4.")) return "D4";
   if (qid.startsWith("AMC-MEM-")) return "D4";
+  if (qid.startsWith("AMC-DIST-")) return "D4";
   if (qid.startsWith("AMC-RES-")) return "D4";
   if (qid.startsWith("AMC-SK-")) return "D4";
   if (qid.startsWith("AMC-THR-")) return "D4";
@@ -52,10 +54,21 @@ function dimensionIdForQuestion(qid: string): "D1" | "D2" | "D3" | "D4" | "D5" {
     // 6.53-6.57: Synthetic Agent Interaction → D5 (Skills)
     if (num >= 53 && num <= 57) return "D5";
   }
+  // New native skill questions
+  if (qid.startsWith("AMC-A2A-")) return "D5";
+  if (qid.startsWith("AMC-VOICE-")) return "D5";
   // AMC-7.x: Advanced AI Safety Research Questions → D3 (Culture & Alignment)
   if (qid.startsWith("AMC-7.")) {
     return "D3";
   }
+  return "D5";
+}
+
+function dimensionIdForLayerName(layerName: string): "D1" | "D2" | "D3" | "D4" | "D5" {
+  if (layerName === "Strategic Agent Operations") return "D1";
+  if (layerName === "Leadership & Autonomy") return "D2";
+  if (layerName === "Culture & Alignment") return "D3";
+  if (layerName === "Resilience") return "D4";
   return "D5";
 }
 
@@ -74,7 +87,7 @@ export function builtInCanon(): CompassCanon {
   const questions = questionBank
     .map((q) => ({
       qId: q.id,
-      dimensionId: dimensionIdForQuestion(q.id),
+      dimensionId: dimensionIdForLayerName(q.layerName),
       semantics: `${q.title}: ${q.promptTemplate}`
     }))
     .sort((a, b) => a.qId.localeCompare(b.qId));
@@ -83,11 +96,11 @@ export function builtInCanon(): CompassCanon {
     compassCanon: {
       version: 1,
       dimensions: [
-        { id: "D1", name: "Strategic Agent Operations", questionCount: 16 },
-        { id: "D2", name: "Agent Leadership", questionCount: 20 },
+        { id: "D1", name: "Strategic Agent Operations", questionCount: 19 },
+        { id: "D2", name: "Agent Leadership", questionCount: 23 },
         { id: "D3", name: "Agent Culture", questionCount: 94 },
-        { id: "D4", name: "Agent Resilience", questionCount: 52 },
-        { id: "D5", name: "Agent Skills", questionCount: 53 }
+        { id: "D4", name: "Agent Resilience", questionCount: 55 },
+        { id: "D5", name: "Agent Skills", questionCount: 49 }
       ],
       questions,
       fourCs: [

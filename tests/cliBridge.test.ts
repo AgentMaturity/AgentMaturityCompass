@@ -32,11 +32,14 @@ describe("CLI Bridge", () => {
 
     it("rejects interactive commands", () => {
       expect(validateCliExec({ command: "quickscore" })).toContain("cannot run headless");
+      expect(validateCliExec({ command: "amc quickscore" })).toContain("cannot run headless");
       expect(validateCliExec({ command: "setup" })).toContain("cannot run headless");
       expect(validateCliExec({ command: "bootstrap" })).toContain("cannot run headless");
     });
 
     it("allows normal commands", () => {
+      expect(validateCliExec({ command: "amc" })).toBeNull();
+      expect(validateCliExec({ command: "amc doctor --json" })).toBeNull();
       expect(validateCliExec({ command: "status" })).toBeNull();
       expect(validateCliExec({ command: "doctor --json" })).toBeNull();
       expect(validateCliExec({ command: "score formal-spec default" })).toBeNull();

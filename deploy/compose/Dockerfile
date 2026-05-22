@@ -10,9 +10,8 @@ RUN npm ci --production=false
 COPY . .
 RUN npm run build
 
-# Initialize workspace
-RUN node dist/cli.js init 2>/dev/null || true
+RUN mkdir -p /data/amc
 
 EXPOSE 3212 3210
 
-CMD ["node", "dist/cli.js", "up", "--non-interactive"]
+CMD ["sh", "-lc", "if [ \"${AMC_BOOTSTRAP:-1}\" = \"1\" ]; then node dist/cli.js bootstrap --workspace /data/amc; fi; exec node dist/cli.js studio start --workspace /data/amc --bind 0.0.0.0 --port ${AMC_STUDIO_PORT:-3212}"]

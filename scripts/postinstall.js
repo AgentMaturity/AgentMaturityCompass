@@ -10,8 +10,8 @@ const msg = `
   │   🧭  Agent Maturity Compass installed!      │
   │                                              │
   │   Quick start:                               │
-  │     npx amc quickscore                       │
-  │     npx amc quickscore --rapid               │
+  │     npx amc                                  │
+  │     npx amc up                               │
   │                                              │
   │   Docs:  npx amc help                        │
   │                                              │

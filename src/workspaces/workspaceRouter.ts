@@ -659,7 +659,16 @@ async function proxyToWorkspace(
       res.statusCode = upstreamRes.statusCode ?? 500;
       for (const [key, value] of Object.entries(upstreamRes.headers)) {
         if (typeof value !== "undefined") {
-          res.setHeader(key, value);
+          if (key.toLowerCase() === "service-worker-allowed" && targetPath === "/console/assets/sw.js") {
+            const originalPath = new URL(req.url ?? "/", "http://localhost").pathname;
+            const suffix = "/assets/sw.js";
+            const allowedScope = originalPath.endsWith(suffix)
+              ? `${originalPath.slice(0, -suffix.length)}/`
+              : value;
+            res.setHeader(key, allowedScope);
+          } else {
+            res.setHeader(key, value);
+          }
         }
       }
       upstreamRes.pipe(res);

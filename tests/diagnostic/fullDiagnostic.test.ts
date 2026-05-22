@@ -7,9 +7,9 @@ import {
 } from "../../src/diagnostic/fullDiagnostic.js";
 
 describe("fullDiagnostic", () => {
-  test("getAllQuestions returns 235 questions", () => {
+  test("getAllQuestions returns 240 questions", () => {
     const questions = getAllQuestions();
-    expect(questions).toHaveLength(235);
+    expect(questions).toHaveLength(240);
   });
 
   test("getQuestionsByLayer returns 5 layers in canonical order", () => {
@@ -28,24 +28,24 @@ describe("fullDiagnostic", () => {
     const layers = getQuestionsByLayer();
     const counts: Record<string, number> = {};
     for (const l of layers) counts[l.layerName] = l.questions.length;
-    expect(counts["Strategic Agent Operations"]).toBe(18);
+    expect(counts["Strategic Agent Operations"]).toBe(19);
     expect(counts["Leadership & Autonomy"]).toBe(23);
     expect(counts["Culture & Alignment"]).toBe(94);
-    expect(counts["Resilience"]).toBe(53);
-    expect(counts["Skills"]).toBe(47);
+    expect(counts["Resilience"]).toBe(55);
+    expect(counts["Skills"]).toBe(49);
   });
 
-  test("all layer questions sum to 235", () => {
+  test("all layer questions sum to 240", () => {
     const layers = getQuestionsByLayer();
     const total = layers.reduce((s, l) => s + l.questions.length, 0);
-    expect(total).toBe(235);
+    expect(total).toBe(240);
   });
 
   test("scoreFullDiagnostic returns L0 with empty answers", () => {
     const result = scoreFullDiagnostic({}, 1000);
-    expect(result.questionCount).toBe(235);
+    expect(result.questionCount).toBe(240);
     expect(result.totalScore).toBe(0);
-    expect(result.maxScore).toBe(235 * 5);
+    expect(result.maxScore).toBe(240 * 5);
     expect(result.percentage).toBe(0);
     expect(result.overallLevel).toBe("L0");
     expect(result.layerScores).toHaveLength(5);
@@ -61,7 +61,7 @@ describe("fullDiagnostic", () => {
     const answers: Record<string, number> = {};
     for (const q of questions) answers[q.id] = 5;
     const result = scoreFullDiagnostic(answers, 5000);
-    expect(result.totalScore).toBe(235 * 5);
+    expect(result.totalScore).toBe(240 * 5);
     expect(result.percentage).toBe(100);
     expect(result.overallLevel).toBe("L5");
     expect(result.recommendations).toHaveLength(0);
@@ -77,8 +77,8 @@ describe("fullDiagnostic", () => {
       (l) => l.layerName === "Strategic Agent Operations"
     )!;
     expect(saoLayer.avgLevel).toBe(3);
-    expect(saoLayer.totalScore).toBe(18 * 3);
-    expect(saoLayer.maxScore).toBe(18 * 5);
+    expect(saoLayer.totalScore).toBe(19 * 3);
+    expect(saoLayer.maxScore).toBe(19 * 5);
   });
 
   test("recommendations are sorted by level ascending and capped at 5", () => {
@@ -118,7 +118,7 @@ describe("fullDiagnostic", () => {
     const halfAnswers: Record<string, number> = {};
     let count = 0;
     for (const q of questions) {
-      halfAnswers[q.id] = count < 118 ? 5 : 0; // 118*5 = 590; 590/1175 ≈ 50.2%
+      halfAnswers[q.id] = count < 120 ? 5 : 0; // 120*5 = 600; 600/1200 = 50%
       count++;
     }
     const halfResult = scoreFullDiagnostic(halfAnswers, 100);
@@ -127,7 +127,7 @@ describe("fullDiagnostic", () => {
     // ~85% → L5
     const highAnswers: Record<string, number> = {};
     for (const q of questions) highAnswers[q.id] = 4;
-    // 235*4 = 940; 940/1175 = 80% → L4
+    // 240*4 = 960; 960/1200 = 80% → L4
     const highResult = scoreFullDiagnostic(highAnswers, 100);
     expect(highResult.overallLevel).toBe("L4");
   });

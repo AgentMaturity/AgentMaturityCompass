@@ -319,8 +319,8 @@ export function generateFirstWeekPlan(params: {
     {
       day: 1,
       focus: "Baseline",
-      action: "Run the rapid assessment and lock your initial maturity baseline.",
-      command: "amc quickscore"
+      action: "Run the full assessment and lock your initial maturity baseline.",
+      command: "amc"
     },
     {
       day: 2,
@@ -343,8 +343,8 @@ export function generateFirstWeekPlan(params: {
     {
       day: 5,
       focus: "Gap closure",
-      action: "Address your top three maturity blockers and rerun quickscore to verify lift.",
-      command: "amc quickscore"
+      action: "Address your top three maturity blockers and rerun the full score to verify lift.",
+      command: "amc"
     },
     {
       day: 6,
@@ -462,4 +462,3 @@ export async function runSetupWizard(params: {
     priority
   };
 }
-

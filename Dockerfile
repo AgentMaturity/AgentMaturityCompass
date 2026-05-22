@@ -1,6 +1,6 @@
 FROM node:20-alpine AS build
 
-LABEL org.opencontainers.image.source="https://github.com/thewisecrab/AgentMaturityCompass"
+LABEL org.opencontainers.image.source="https://github.com/AgentMaturity/AgentMaturityCompass"
 LABEL org.opencontainers.image.description="Agent Maturity Compass — The Credit Score for AI Agents"
 LABEL org.opencontainers.image.licenses="MIT"
 
@@ -14,7 +14,7 @@ RUN npm run build
 
 FROM node:20-alpine
 
-LABEL org.opencontainers.image.source="https://github.com/thewisecrab/AgentMaturityCompass"
+LABEL org.opencontainers.image.source="https://github.com/AgentMaturity/AgentMaturityCompass"
 LABEL org.opencontainers.image.description="Agent Maturity Compass — The Credit Score for AI Agents"
 LABEL org.opencontainers.image.licenses="MIT"
 

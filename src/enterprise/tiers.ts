@@ -48,14 +48,14 @@ export const TIER_DEFINITIONS: Readonly<Record<LicenseTier, TierDefinition>> = {
   PRO: {
     tier: "PRO",
     label: "Professional",
-    quickscoreQuestionLimit: 235,
+    quickscoreQuestionLimit: 240,
     rapidOnly: false,
     features: PRO_FEATURES
   },
   ENTERPRISE: {
     tier: "ENTERPRISE",
     label: "Enterprise",
-    quickscoreQuestionLimit: 235,
+    quickscoreQuestionLimit: 240,
     rapidOnly: false,
     features: ENTERPRISE_FEATURES
   }

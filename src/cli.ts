@@ -1,8 +1,9 @@
 #!/usr/bin/env node
-import { randomUUID } from "node:crypto";
+import { randomBytes, randomUUID } from "node:crypto";
 import { spawn } from "node:child_process";
 import { dirname, join, resolve } from "node:path";
 import { stdin } from "node:process";
+import { tmpdir } from "node:os";
 import chalk from "chalk";
 import { Command } from "commander";
 import YAML from "yaml";
@@ -248,7 +249,7 @@ import {
 } from "./storage/blobs/blobCli.js";
 import { ensureBlobKey, verifyBlobCurrentKeySignature } from "./storage/blobs/blobKeys.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "./utils/fs.js";
-import { existsSync, readdirSync, readFileSync } from "node:fs";
+import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync } from "node:fs";
 import {
   packInstallCli,
   packPublishCli,
@@ -1037,6 +1038,243 @@ function ensureWorkspaceReadyForAgent(workspace: string, agentId?: string): void
   }
 }
 
+interface InstantVaultMode {
+  noSign: boolean;
+  createdLocalPassphrase: boolean;
+  localPassphrasePath: string | null;
+  reason: string | null;
+}
+
+interface InstantWorkspaceState {
+  createdWorkspace: boolean;
+  createdAgentContext: boolean;
+  vault: InstantVaultMode;
+}
+
+function localVaultPassphrasePath(workspace: string): string {
+  return join(workspace, ".amc", "local-vault-passphrase");
+}
+
+function ensureInstantVaultMode(workspace: string): InstantVaultMode {
+  if (process.env.AMC_VAULT_PASSPHRASE && process.env.AMC_VAULT_PASSPHRASE.length > 0) {
+    return { noSign: false, createdLocalPassphrase: false, localPassphrasePath: null, reason: null };
+  }
+
+  const localPassphrase = localVaultPassphrasePath(workspace);
+  if (pathExists(localPassphrase)) {
+    const value = readUtf8(localPassphrase).trim();
+    if (value.length >= 8) {
+      process.env.AMC_VAULT_PASSPHRASE = value;
+      return { noSign: false, createdLocalPassphrase: false, localPassphrasePath: localPassphrase, reason: null };
+    }
+  }
+
+  const existingVault = join(workspace, ".amc", "vault.amcvault");
+  if (pathExists(existingVault)) {
+    return {
+      noSign: true,
+      createdLocalPassphrase: false,
+      localPassphrasePath: null,
+      reason: "Existing vault is locked and no passphrase is available; generated an unsigned full score."
+    };
+  }
+
+  const generated = `amc-local-${randomBytes(32).toString("base64url")}`;
+  writeFileAtomic(localPassphrase, `${generated}\n`, 0o600);
+  process.env.AMC_VAULT_PASSPHRASE = generated;
+  return {
+    noSign: false,
+    createdLocalPassphrase: true,
+    localPassphrasePath: localPassphrase,
+    reason: null
+  };
+}
+
+function ensureInstantWorkspace(workspace: string, agentId: string): InstantWorkspaceState {
+  const createdWorkspace = !isWorkspaceInitialized(workspace);
+  const vault = ensureInstantVaultMode(workspace);
+  const agentPaths = getAgentPaths(workspace, agentId);
+  const createdAgentContext = !pathExists(agentPaths.contextGraph);
+  if (createdWorkspace || createdAgentContext) {
+    initWorkspace({
+      workspacePath: workspace,
+      agentId: agentId === "default" ? undefined : agentId,
+      agentName: agentId === "default" ? "Agent" : agentId,
+      trustBoundaryMode: "isolated"
+    });
+  }
+  return { createdWorkspace, createdAgentContext, vault };
+}
+
+function diagnosticAverageLevel(report: Awaited<ReturnType<typeof runDiagnostic>>): number {
+  if (report.layerScores.length === 0) {
+    return 0;
+  }
+  return report.layerScores.reduce((sum, layer) => sum + layer.avgFinalLevel, 0) / report.layerScores.length;
+}
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolveSleep) => setTimeout(resolveSleep, ms));
+}
+
+async function acquireInstantScoreLock(workspace: string): Promise<() => void> {
+  const lockDir = join(tmpdir(), `amc-instant-score-${sha256Hex(resolve(workspace)).slice(0, 16)}.lock`);
+  const started = Date.now();
+  while (Date.now() - started < 120_000) {
+    try {
+      mkdirSync(lockDir);
+      writeFileAtomic(join(lockDir, "owner"), `${process.pid}\n${new Date().toISOString()}\n`, 0o600);
+      return () => {
+        rmSync(lockDir, { recursive: true, force: true });
+      };
+    } catch {
+      try {
+        const ageMs = Date.now() - statSync(lockDir).mtimeMs;
+        if (ageMs > 120_000) {
+          rmSync(lockDir, { recursive: true, force: true });
+          continue;
+        }
+      } catch {
+        // Lock disappeared between attempts.
+      }
+      await sleep(100);
+    }
+  }
+  throw new Error("Timed out waiting for another AMC score run to finish.");
+}
+
+function renderInstantFullScore(
+  report: Awaited<ReturnType<typeof runDiagnostic>>,
+  elapsedMs: number,
+  state: InstantWorkspaceState,
+  opts: { json?: boolean } = {}
+): void {
+  const avgLevel = diagnosticAverageLevel(report);
+  const score100 = Math.round((avgLevel / 5) * 100);
+  const fullQuestionCount = report.questionScores.length;
+  if (opts.json) {
+    const dimensions = Object.fromEntries(
+      report.layerScores.map((layer) => [
+        layer.layerName,
+        {
+          score: Number(layer.avgFinalLevel.toFixed(2)),
+          level: `L${layer.avgFinalLevel.toFixed(2)}`
+        }
+      ])
+    );
+    console.log(JSON.stringify({
+      ok: true,
+      mode: "full-score",
+      agentId: report.agentId,
+      runId: report.runId,
+      status: report.status,
+      score: score100,
+      level: `L${avgLevel.toFixed(2)}`,
+      overallLevel: Number(avgLevel.toFixed(2)),
+      trustLabel: report.trustLabel,
+      questionCount: fullQuestionCount,
+      integrityIndex: Number(report.integrityIndex.toFixed(3)),
+      evidenceCoverage: Number(report.evidenceCoverage.toFixed(3)),
+      elapsedMs,
+      dimensions,
+      createdWorkspace: state.createdWorkspace,
+      createdAgentContext: state.createdAgentContext,
+      signed: !state.vault.noSign,
+      vaultReason: state.vault.reason
+    }, null, 2));
+    return;
+  }
+  console.log("");
+  console.log(chalk.bold.hex('#4AEF79')("  AMC Full Score"));
+  console.log(chalk.gray(`  Agent: ${report.agentId} | Run: ${report.runId}`));
+  console.log(chalk.gray(`  Generated in ${(elapsedMs / 1000).toFixed(1)}s | Questions: ${fullQuestionCount} | Status: ${report.status}`));
+  console.log("");
+  console.log(chalk.bold(`  Overall: L${avgLevel.toFixed(2)} (${score100}/100) ${report.trustLabel}`));
+  console.log(chalk.gray(`  Integrity: ${report.integrityIndex.toFixed(3)} | Evidence coverage: ${(report.evidenceCoverage * 100).toFixed(1)}%`));
+  console.log("");
+  for (const layer of report.layerScores) {
+    const lv = Math.max(0, Math.min(5, Math.round(layer.avgFinalLevel)));
+    const bar = "█".repeat(lv) + "░".repeat(5 - lv);
+    console.log(`  ${layer.layerName.padEnd(28)} L${layer.avgFinalLevel.toFixed(2)} ${bar}`);
+  }
+  const gaps = report.questionScores.filter((question) => question.finalLevel < 3).slice(0, 5);
+  if (gaps.length > 0) {
+    console.log("");
+    console.log(chalk.yellow("  Top gaps:"));
+    for (const gap of gaps) {
+      console.log(chalk.gray(`    ${gap.questionId}: L${gap.finalLevel} (${gap.flags.slice(0, 2).join(", ") || "needs evidence"})`));
+    }
+  }
+  console.log("");
+  if (state.createdWorkspace) {
+    console.log(chalk.green("  Created .amc workspace automatically."));
+  } else if (state.createdAgentContext) {
+    console.log(chalk.green("  Created missing agent context automatically."));
+  }
+  if (state.vault.createdLocalPassphrase && state.vault.localPassphrasePath) {
+    console.log(chalk.gray(`  Local signing vault initialized: ${state.vault.localPassphrasePath}`));
+  }
+  if (state.vault.reason) {
+    console.log(chalk.yellow(`  ${state.vault.reason}`));
+  }
+  console.log(chalk.gray("  Next: amc up        # open Studio"));
+  console.log(chalk.gray("        amc shell     # interactive command shell"));
+  console.log("");
+}
+
+async function runInstantFullScoreForAgent(params: { workspace: string; agentId: string; json?: boolean }): Promise<void> {
+  const started = Date.now();
+  const releaseLock = await acquireInstantScoreLock(params.workspace);
+  const previousNoSign = process.env.AMC_NO_SIGN;
+  let state: InstantWorkspaceState | null = null;
+  try {
+    state = ensureInstantWorkspace(params.workspace, params.agentId);
+    if (state.vault.noSign) {
+      process.env.AMC_NO_SIGN = "1";
+    }
+    const report = await runDiagnostic({
+      workspace: params.workspace,
+      window: "30d",
+      targetName: "default",
+      agentId: params.agentId,
+      claimMode: "auto",
+      noSign: state.vault.noSign
+    });
+    renderInstantFullScore(report, Date.now() - started, state, { json: params.json });
+  } catch (error: unknown) {
+    const message = toErrorMessage(error);
+    if (state && !state.vault.noSign && /Vault unlock failed|Vault locked|passphrase/i.test(message)) {
+      process.env.AMC_NO_SIGN = "1";
+      const unsignedState: InstantWorkspaceState = {
+        ...state,
+        vault: {
+          ...state.vault,
+          noSign: true,
+          reason: "Vault could not be unlocked; generated an unsigned full score."
+        }
+      };
+      const report = await runDiagnostic({
+        workspace: params.workspace,
+        window: "30d",
+        targetName: "default",
+        agentId: params.agentId,
+        claimMode: "auto",
+        noSign: true
+      });
+      renderInstantFullScore(report, Date.now() - started, unsignedState, { json: params.json });
+      return;
+    }
+    throw error;
+  } finally {
+    releaseLock();
+    if (previousNoSign === undefined) {
+      delete process.env.AMC_NO_SIGN;
+    } else {
+      process.env.AMC_NO_SIGN = previousNoSign;
+    }
+  }
+}
+
 function normalizeCliErrorMessage(error: unknown): string {
   const message = error instanceof Error ? error.message : String(error);
   if (/User force closed the prompt/i.test(message)) {
@@ -1071,6 +1309,7 @@ program
   .showHelpAfterError("\nTip: add '--help' after any command to see available options.")
   .addHelpText("afterAll", cliDiscoverabilityFooter());
 program.option("--agent <agentId>", "agent ID (defaults to .amc/current-agent)");
+program.option("--json", "emit structured JSON for the top-level full score", false);
 program
   .command("help [commandPath...]")
   .description("Show help for a command (for example: amc help run)")
@@ -1193,7 +1432,7 @@ program
     console.log(fmt.pass("Workspace initialized"));
     console.log(fmt.info(`Location: ${init.workspacePath}`));
     console.log(fmt.nextSteps([
-      { cmd: "amc quickscore", desc: "Get your first maturity score (2 min, interactive)" },
+      { cmd: "amc", desc: "Generate the full evidence score immediately" },
       { cmd: `amc config profile ${opts.profile}`, desc: "Re-apply the selected workspace config profile" },
       { cmd: "amc setup --demo", desc: "Load demo data and explore all features" },
       { cmd: "amc doctor", desc: "Check what's available in your environment" },
@@ -1202,52 +1441,17 @@ program
     console.log(fmt.colors.dim("  Full guide: https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/GETTING_STARTED.md"));
     console.log("");
 
-    // Offer to run quickscore immediately if interactive
+    // Offer to run the same full score users get from the top-level `amc` command.
     if (process.stdin.isTTY) {
       const { runNow } = await inquirer.prompt([{
         type: "confirm",
         name: "runNow",
-        message: "Run quickscore now? (2-minute interactive assessment)",
+        message: "Generate the full AMC score now?",
         default: true
       }]);
       if (runNow) {
-        const { getRapidQuestions, scoreRapidAssessment } = await import("./diagnostic/rapidQuickscore.js");
-        const questions = getRapidQuestions();
-        const answers: Record<string, number> = {};
-        console.log("");
-        console.log(chalk.bold("  🧭 AMC Quickscore — 5 questions about your agent"));
-        console.log(chalk.gray("  Pick the level that best describes your current state."));
-        console.log("");
-        for (const question of questions) {
-          const { level } = await inquirer.prompt([{
-            type: "select",
-            name: "level",
-            message: `${question.id}: ${question.title}`,
-            choices: question.options.map((option) => ({
-              name: `L${option.level} - ${option.label}`,
-              value: option.level
-            }))
-          }]);
-          answers[question.id] = level;
-        }
-        const result = scoreRapidAssessment(answers);
-        const fmt = await import("./cliFormat.js");
-        console.log("");
-        console.log(fmt.scoreBox(result.totalScore, result.maxScore, "AMC Quickscore", result.preliminaryLevel));
-        console.log("");
-        if (result.recommendations.length > 0) {
-          console.log(fmt.colors.dim("  Top improvements:"));
-          for (const rec of result.recommendations.slice(0, 3)) {
-            console.log(fmt.gap(rec.questionId, rec.title));
-            console.log(fmt.colors.dim(`    ${rec.howToImprove}`));
-          }
-          console.log("");
-        }
-        console.log(fmt.nextSteps([
-          { cmd: "amc score formal-spec <agentId>", desc: "Full diagnostic with evidence" },
-          { cmd: "amc mechanic gap", desc: "See exactly what to fix" },
-          { cmd: "amc up", desc: "Open the dashboard" },
-        ]));
+        const agentId = activeAgent(program) ?? "default";
+        await runInstantFullScoreForAgent({ workspace: process.cwd(), agentId });
       }
     }
   });
@@ -1286,13 +1490,13 @@ program
       console.log(fmt.nextSteps([
         { cmd: "amc doctor-fix", desc: "Auto-repair common issues" },
         { cmd: "amc up", desc: "Start Studio (the local control plane)" },
-        { cmd: "amc quickscore", desc: "2-minute health check" },
+        { cmd: "amc", desc: "Generate your full maturity score" },
         { cmd: "amc help", desc: "All available commands" },
       ]));
     } else {
       console.log(fmt.pass("All checks passed. Your workspace is ready."));
       console.log(fmt.nextSteps([
-        { cmd: "amc quickscore", desc: "Get your first maturity score" },
+        { cmd: "amc", desc: "Get your first full maturity score" },
       ]));
     }
     process.exit(result.ok && legacy.ok ? 0 : 1);
@@ -1999,7 +2203,7 @@ program
 
 program
   .command("quickscore")
-  .description("Full 235-question interactive diagnostic — or use --rapid for 5-question express, --auto for ledger evidence")
+  .description("Full 240-question interactive diagnostic — or use --rapid for 5-question express, --auto for ledger evidence")
   .option("--json", "emit JSON output", false)
   .option("--quiet", "suppress non-JSON output (use with --json for clean piping)", false)
   .option("--eu-ai-act", "show EU AI Act risk classification mapping", false)
@@ -2192,14 +2396,14 @@ program
       }
       console.log("");
       console.log(chalk.white("  Next steps:"));
-      console.log(chalk.white("  1."), chalk.hex('#4AEF79')("amc quickscore"), chalk.gray("— Full 235-question diagnostic"));
+      console.log(chalk.white("  1."), chalk.hex('#4AEF79')("amc quickscore"), chalk.gray("— Full 240-question diagnostic"));
       console.log(chalk.white("  2."), chalk.hex('#4AEF79')("amc improve"), chalk.gray("— Guided improvement roadmap"));
       console.log(chalk.white("  3."), chalk.hex('#4AEF79')("amc explain <questionId>"), chalk.gray("— Deep dive into any question"));
       console.log("");
       return;
     }
 
-    // ── Default: Full 235-question interactive diagnostic ──
+    // ── Default: Full 240-question interactive diagnostic ──
     const { getQuestionsByLayer, scoreFullDiagnostic } = await import("./diagnostic/fullDiagnostic.js");
     const layers = getQuestionsByLayer();
     const totalQuestions = layers.reduce((sum, l) => sum + l.questions.length, 0);
@@ -2220,7 +2424,7 @@ program
     // Interactive full diagnostic
     const startTime = Date.now();
     console.log("");
-    console.log(chalk.bold.hex('#4AEF79')("🧭 AMC Full Diagnostic — 235 questions across 5 layers"));
+    console.log(chalk.bold.hex('#4AEF79')("🧭 AMC Full Diagnostic — 240 questions across 5 layers"));
     console.log(chalk.gray("   Answer each question with your current maturity level (L0–L5)."));
     console.log(chalk.gray("   Estimated time: ~1 minute for experienced practitioners.\n"));
 
@@ -15970,49 +16174,14 @@ program.action(async (_opts, command: Command) => {
     return;
   }
 
-  // Interactive REPL when TTY
-  if (process.stdin.isTTY) {
-    const { startRepl } = await import("./repl/amcRepl.js");
-    await startRepl();
-    return;
+  const opts = program.opts<{ agent?: string; json?: boolean }>();
+  const agentId = resolveAgentId(process.cwd(), opts.agent ?? activeAgent(program) ?? undefined);
+  try {
+    await runInstantFullScoreForAgent({ workspace: process.cwd(), agentId, json: Boolean(opts.json) });
+  } catch (error: unknown) {
+    console.error(chalk.red(normalizeCliErrorMessage(error)));
+    process.exit(1);
   }
-
-  // Welcome screen — shown when piped/non-interactive
-  const hasWorkspace = existsSync(".amc");
-
-  console.log("");
-  console.log(chalk.bold.hex('#4AEF79')("  🧭 Agent Maturity Compass"));
-  console.log(chalk.gray("  The credit score for AI agents."));
-  console.log("");
-
-  if (!hasWorkspace) {
-    console.log(chalk.white("  No workspace found. Get started:"));
-    console.log("");
-    console.log(chalk.white("  $"), chalk.hex('#4AEF79')("amc setup"), chalk.gray("           Set up provider + workspace"));
-    console.log(chalk.white("  $"), chalk.hex('#4AEF79')("amc quickscore"), chalk.gray("     2-minute maturity assessment (no setup needed)"));
-    console.log(chalk.white("  $"), chalk.hex('#4AEF79')("amc demo gap"), chalk.gray("       See the 84-point documentation inflation demo"));
-    console.log("");
-    console.log(chalk.gray("  Guide:"), chalk.underline("https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/GETTING_STARTED.md"));
-  } else {
-    console.log(chalk.green("  ✓ Workspace found"));
-    console.log("");
-    console.log(chalk.bold("  Common commands:"));
-    console.log("");
-    console.log(chalk.white("  $"), chalk.hex('#4AEF79')("amc quickscore"), chalk.gray("       2-minute maturity assessment"));
-    console.log(chalk.white("  $"), chalk.hex('#4AEF79')("amc doctor"), chalk.gray("           Check environment health"));
-    console.log(chalk.white("  $"), chalk.hex('#4AEF79')("amc up"), chalk.gray("               Start Studio (web dashboard)"));
-    console.log(chalk.white("  $"), chalk.hex('#4AEF79')("amc score --help"), chalk.gray("     All scoring commands"));
-    console.log(chalk.white("  $"), chalk.hex('#4AEF79')("amc status"), chalk.gray("           Show current status"));
-    console.log("");
-    console.log(chalk.bold("  Improve your agent:"));
-    console.log("");
-    console.log(chalk.white("  $"), chalk.hex('#4AEF79')("amc score formal-spec <agent>"), chalk.gray("   Full diagnostic"));
-    console.log(chalk.white("  $"), chalk.hex('#4AEF79')("amc score collect-evidence <agent>"), chalk.gray("Gather proof"));
-    console.log(chalk.white("  $"), chalk.hex('#4AEF79')("amc explain <questionId>"), chalk.gray("        Learn about any question"));
-    console.log("");
-    console.log(chalk.gray("  All commands:"), chalk.hex('#4AEF79')("amc --help"));
-  }
-  console.log("");
 });
 
 
@@ -17320,6 +17489,104 @@ registerDomainApplyCommand(domainCmd);
 const sectorPack = domainCmd.command("pack").description("Industry sector packs — 40 packs across 7 domains");
 
 sectorPack
+  .command("access")
+  .alias("subscribe")
+  .description("Show Industry Packs subscription status and unlock instructions")
+  .option("--json", "Output as JSON")
+  .action(async (opts: { json?: boolean }) => {
+    const { getIndustryPackEntitlement, formatIndustryPackPaywallMessage } = await import("./domains/industryPackEntitlement.js");
+    const entitlement = getIndustryPackEntitlement(process.cwd());
+    if (opts.json) {
+      console.log(JSON.stringify(entitlement, null, 2));
+      return;
+    }
+    console.log(chalk.bold.hex('#4AEF79')("\n🏭  Industry Packs Access"));
+    console.log(chalk.gray("Plan:"), entitlement.planId);
+    console.log(chalk.gray("Price:"), `$${entitlement.priceUsdMonthly}/month`);
+    console.log(chalk.gray("Status:"), entitlement.active ? chalk.green("active") : chalk.yellow("locked"));
+    console.log(chalk.gray("Source:"), entitlement.source);
+    if (!entitlement.active) {
+      console.log("");
+      console.log(formatIndustryPackPaywallMessage(entitlement));
+    }
+    console.log("");
+  });
+
+sectorPack
+  .command("checkout")
+  .description("Create an Industry Packs checkout link")
+  .option("--success-url <url>", "Return URL after successful payment")
+  .option("--cancel-url <url>", "Return URL if checkout is cancelled")
+  .option("--email <email>", "Customer email to prefill at checkout")
+  .option("--reference <id>", "Client reference ID for the checkout provider")
+  .option("--json", "Output as JSON")
+  .action(async (opts: { successUrl?: string; cancelUrl?: string; email?: string; reference?: string; json?: boolean }) => {
+    const { buildIndustryPackCheckoutUrl, getIndustryPackEntitlement } = await import("./domains/industryPackEntitlement.js");
+    const entitlement = getIndustryPackEntitlement(process.cwd());
+    const checkoutUrl = buildIndustryPackCheckoutUrl({
+      successUrl: opts.successUrl,
+      cancelUrl: opts.cancelUrl,
+      customerEmail: opts.email,
+      clientReferenceId: opts.reference
+    });
+    const payload = { checkoutUrl, entitlement };
+    if (opts.json) {
+      console.log(JSON.stringify(payload, null, 2));
+      return;
+    }
+    console.log(chalk.bold.hex('#4AEF79')("\n🏭  Industry Packs Checkout"));
+    console.log(chalk.gray("Price:"), `$${entitlement.priceUsdMonthly}/month for all 40 packs`);
+    console.log(checkoutUrl);
+    console.log(chalk.gray("\nAfter payment, activate the license: amc domain pack activate --key <license-key>"));
+  });
+
+sectorPack
+  .command("activate")
+  .description("Activate Industry Packs after purchase")
+  .requiredOption("--key <licenseKey>", "License key from checkout")
+  .option("--expires-at <isoDate>", "Optional entitlement expiry timestamp")
+  .option("--json", "Output as JSON")
+  .action(async (opts: { key: string; expiresAt?: string; json?: boolean }) => {
+    try {
+      const { activateIndustryPackAccessOnline } = await import("./domains/industryPackEntitlement.js");
+      const entitlement = await activateIndustryPackAccessOnline({
+        workspace: process.cwd(),
+        licenseKey: opts.key,
+        expiresAt: opts.expiresAt ?? null
+      });
+      if (opts.json) {
+        console.log(JSON.stringify(entitlement, null, 2));
+        return;
+      }
+      console.log(chalk.green("Industry Packs activated."));
+      console.log(chalk.gray(`Access: all 40 Industry Domain Packs at $${entitlement.priceUsdMonthly}/month`));
+    } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
+  });
+
+sectorPack
+  .command("verify")
+  .description("Verify an Industry Packs license key")
+  .requiredOption("--key <licenseKey>", "License key from checkout")
+  .option("--json", "Output as JSON")
+  .action(async (opts: { key: string; json?: boolean }) => {
+    const { verifyIndustryPackLicenseKey } = await import("./domains/industryPackEntitlement.js");
+    const result = verifyIndustryPackLicenseKey(opts.key);
+    if (opts.json) {
+      console.log(JSON.stringify(result, null, 2));
+      return;
+    }
+    if (result.valid) {
+      console.log(chalk.green("Industry Packs license is valid."));
+      if (result.payload?.expiresAt) {
+        console.log(chalk.gray(`Expires: ${result.payload.expiresAt}`));
+      }
+      return;
+    }
+    console.error(chalk.red(`Industry Packs license is invalid: ${result.reason ?? "verification failed"}`));
+    process.exit(1);
+  });
+
+sectorPack
   .command("list")
   .description("List all available industry sector packs")
   .option("--domain <d>", "Filter by domain: health|education|environment|mobility|governance|technology|wealth")
@@ -17327,45 +17594,44 @@ sectorPack
   .action(async (opts: { domain?: string; json?: boolean }) => {
     const { listIndustryPackIds, getIndustryPack, getIndustryPacksByStation } = await import("./domains/industryPacks.js");
     const { parseDomainOrThrow } = await import("./domains/domainCliIntegration.js");
+    const { getIndustryPackEntitlement, toIndustryPackCatalogItem } = await import("./domains/industryPackEntitlement.js");
+    const entitlement = getIndustryPackEntitlement(process.cwd());
 
-    let packs: Array<{ packId: string; name: string; domain: string; questionCount: number; riskLevel: string }>;
+    let packs: Array<{ packId: string; name: string; domain: string; questionCount: number; riskLevel: string; locked: boolean }>;
 
     if (opts.domain) {
       const domain = parseDomainOrThrow(opts.domain);
       const domainPacks = getIndustryPacksByStation(domain);
-      packs = domainPacks.map(p => ({
-        packId: p.id,
-        name: p.name,
-        domain: opts.domain!,
-        questionCount: p.questions.length,
-        riskLevel: p.riskTier
-      }));
+      packs = domainPacks.map(p => toIndustryPackCatalogItem(p, entitlement));
     } else {
       const allIds = listIndustryPackIds();
       packs = allIds.map(id => {
         const p = getIndustryPack(id);
-        return {
-          packId: p.id,
-          name: p.name,
-          domain: p.stationId,
-          questionCount: p.questions.length,
-          riskLevel: p.riskTier
-        };
+        return toIndustryPackCatalogItem(p, entitlement);
       });
     }
 
-    if (opts.json) { console.log(JSON.stringify(packs, null, 2)); return; }
+    if (opts.json) {
+      console.log(JSON.stringify({ entitlement, packs }, null, 2));
+      return;
+    }
 
     console.log(chalk.bold.hex('#4AEF79')(`\n🏭  Industry Sector Packs (${packs.length} packs)\n`));
     const maxName = Math.max(...packs.map(p => p.name.length), 10);
-    console.log(`  ${"Pack ID".padEnd(30)} ${"Name".padEnd(maxName + 2)} ${"Domain".padEnd(14)} ${"Questions".padEnd(12)} Risk`);
-    console.log(chalk.gray(`  ${"─".repeat(30)} ${"─".repeat(maxName + 2)} ${"─".repeat(14)} ${"─".repeat(12)} ${"─".repeat(10)}`));
+    console.log(`  ${"Pack ID".padEnd(30)} ${"Name".padEnd(maxName + 2)} ${"Domain".padEnd(14)} ${"Questions".padEnd(12)} ${"Access".padEnd(10)} Risk`);
+    console.log(chalk.gray(`  ${"─".repeat(30)} ${"─".repeat(maxName + 2)} ${"─".repeat(14)} ${"─".repeat(12)} ${"─".repeat(10)} ${"─".repeat(10)}`));
     for (const p of packs) {
-      console.log(`  ${chalk.cyan(p.packId.padEnd(30))} ${p.name.padEnd(maxName + 2)} ${p.domain.padEnd(14)} ${String(p.questionCount).padEnd(12)} ${p.riskLevel}`);
+      console.log(`  ${chalk.cyan(p.packId.padEnd(30))} ${p.name.padEnd(maxName + 2)} ${p.domain.padEnd(14)} ${String(p.questionCount).padEnd(12)} ${(p.locked ? "locked" : "active").padEnd(10)} ${p.riskLevel}`);
     }
     console.log(chalk.gray(`\n  Total: ${packs.length} packs, ${packs.reduce((s, p) => s + p.questionCount, 0)} questions`));
-    console.log(chalk.gray(`\n  Run a pack: amc domain pack run --pack <packId> --agent <agentId>`));
-    console.log(chalk.gray(`  Describe:   amc domain pack describe --pack <packId>`));
+    if (!entitlement.active) {
+      console.log(chalk.yellow(`\n  Locked: $${entitlement.priceUsdMonthly}/month unlocks all 40 Industry Domain Packs.`));
+      console.log(chalk.gray(`  Subscribe: ${entitlement.checkoutUrl}`));
+      console.log(chalk.gray(`  Activate:  amc domain pack activate --key <license-key>`));
+    } else {
+      console.log(chalk.gray(`\n  Run a pack: amc domain pack run --pack <packId> --agent <agentId>`));
+      console.log(chalk.gray(`  Describe:   amc domain pack describe --pack <packId>`));
+    }
   });
 
 sectorPack
@@ -17375,10 +17641,21 @@ sectorPack
   .option("--json", "Output as JSON")
   .action(async (opts: { pack: string; json?: boolean }) => {
     const { getPackById } = await import("./domains/industryPacks.js");
+    const { assertIndustryPackAccess } = await import("./domains/industryPackEntitlement.js");
     const pack = getPackById(opts.pack);
     if (!pack) {
       console.error(chalk.red(`Pack not found: ${opts.pack}`));
       console.log(chalk.gray("List available packs: amc domain pack list"));
+      process.exit(1); return;
+    }
+    try {
+      assertIndustryPackAccess(process.cwd());
+    } catch (e: unknown) {
+      if (opts.json && e instanceof Error && "entitlement" in e) {
+        console.log(JSON.stringify({ error: "industry_packs_locked", message: e.message }, null, 2));
+      } else {
+        console.error(chalk.yellow(toErrorMessage(e)));
+      }
       process.exit(1); return;
     }
     if (opts.json) { console.log(JSON.stringify(pack, null, 2)); return; }
@@ -17416,11 +17693,22 @@ sectorPack
   .option("--json", "Output as JSON")
   .action(async (opts: { pack: string; baseline: boolean; json?: boolean }) => {
     const { getPackById, scoreIndustryPack } = await import("./domains/industryPacks.js");
+    const { assertIndustryPackAccess } = await import("./domains/industryPackEntitlement.js");
     type PackIdType = Parameters<typeof scoreIndustryPack>[0];
     const pack = getPackById(opts.pack);
     if (!pack) {
       console.error(chalk.red(`Pack not found: ${opts.pack}`));
       console.log(chalk.gray("List available packs: amc domain pack list"));
+      process.exit(1); return;
+    }
+    try {
+      assertIndustryPackAccess(process.cwd());
+    } catch (e: unknown) {
+      if (opts.json && e instanceof Error && "entitlement" in e) {
+        console.log(JSON.stringify({ error: "industry_packs_locked", message: e.message }, null, 2));
+      } else {
+        console.error(chalk.yellow(toErrorMessage(e)));
+      }
       process.exit(1); return;
     }
     console.log(chalk.bold.hex('#4AEF79')(`\n🏭  Running: ${pack.name}`));
@@ -17588,6 +17876,8 @@ domainCmd
   .option("--json", "Output as JSON")
   .action(async (opts: { agent: string; domain: string; json?: boolean }) => {
     try {
+      const { assertIndustryPackAccess } = await import("./domains/industryPackEntitlement.js");
+      assertIndustryPackAccess(process.cwd());
       const { assessDomainForAgent, parseDomainOrThrow } = await import("./domains/domainCliIntegration.js");
       const domain = parseDomainOrThrow(opts.domain);
       const assessment = assessDomainForAgent({ agentId: opts.agent, domain });
@@ -17633,6 +17923,8 @@ domainCmd
   .option("--json", "Output as JSON")
   .action(async (opts: { agent: string; domain: string; json?: boolean }) => {
     try {
+      const { assertIndustryPackAccess } = await import("./domains/industryPackEntitlement.js");
+      assertIndustryPackAccess(process.cwd());
       const { getDomainGaps, parseDomainOrThrow } = await import("./domains/domainCliIntegration.js");
       const domain = parseDomainOrThrow(opts.domain);
       const gaps = getDomainGaps(opts.agent, domain);
@@ -17658,6 +17950,8 @@ domainCmd
   .option("--json", "Output as JSON")
   .action(async (opts: { agent: string; domain: string; output: string; json?: boolean }) => {
     try {
+      const { assertIndustryPackAccess } = await import("./domains/industryPackEntitlement.js");
+      assertIndustryPackAccess(process.cwd());
       const { buildDomainReportForAgent, parseDomainOrThrow } = await import("./domains/domainCliIntegration.js");
       const domain = parseDomainOrThrow(opts.domain);
       const report = buildDomainReportForAgent({ agentId: opts.agent, domain, outputPath: opts.output });
@@ -17686,6 +17980,8 @@ domainCmd
   .option("--json", "Output as JSON")
   .action(async (opts: { agent: string; domain: string; json?: boolean }) => {
     try {
+      const { assertIndustryPackAccess } = await import("./domains/industryPackEntitlement.js");
+      assertIndustryPackAccess(process.cwd());
       const { parseDomainOrThrow, runDomainAssurance } = await import("./domains/domainCliIntegration.js");
       const domain = parseDomainOrThrow(opts.domain);
       const run = runDomainAssurance(opts.agent, domain);
@@ -17709,6 +18005,8 @@ domainCmd
   .option("--json", "Output as JSON")
   .action(async (opts: { agent: string; domain: string; json?: boolean }) => {
     try {
+      const { assertIndustryPackAccess } = await import("./domains/industryPackEntitlement.js");
+      assertIndustryPackAccess(process.cwd());
       const { getDomainRoadmap, parseDomainOrThrow } = await import("./domains/domainCliIntegration.js");
       const domain = parseDomainOrThrow(opts.domain);
       const roadmap = getDomainRoadmap(opts.agent, domain);

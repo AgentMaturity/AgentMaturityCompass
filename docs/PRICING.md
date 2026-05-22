@@ -4,7 +4,7 @@
 
 AMC is open source and MIT licensed. The full trust stack is free.
 
-The only paid surface is **Industry Packs** — 40 sector-specific domain packs that map trust scoring to regulated and specialized verticals.
+The only paid surface is **Industry Packs** — 40 sector-specific domain packs that map trust scoring to regulated and specialized verticals. Access is **$9.99/month** for all 40 packs.
 
 ## What is free
 
@@ -20,7 +20,7 @@ Everything except Industry Packs:
 - **Comply** — regulatory mapping (EU AI Act, ISO 42001, NIST AI RMF, OWASP), audit binders, governance reports
 - **All 14 framework adapters** — LangChain, CrewAI, OpenAI, Claude Code, Gemini, AutoGen, LlamaIndex, Semantic Kernel, OpenClaw, OpenHands, Python SDK, generic CLI, OpenAI-compatible
 - **376 CLI commands**
-- **235 diagnostic questions**
+- **240 diagnostic questions**
 - **Browser playground**
 - **CI trust gates**
 - **GitHub Action**
@@ -45,16 +45,27 @@ Examples:
 Industry packs require deep domain expertise, regulatory research, and ongoing maintenance as regulations evolve. Keeping them as the paid tier funds the open-source core sustainably.
 
 ### How to access
-- **Pro** — individual access to Industry Packs for specific verticals
-- **Enterprise** — full access to all 40 Industry Packs, priority support, custom pack development, deployment assistance
+- **Industry Packs** — $9.99/month for all 40 packs in CLI and Studio
+- **Enterprise** — Industry Packs plus priority support, custom pack development, deployment assistance
+
+CLI:
+
+```bash
+amc domain pack access
+amc domain pack checkout
+amc domain pack activate --key <license-key>
+amc domain pack verify --key <license-key>
+```
+
+For production checkout, set `AMC_INDUSTRY_PACKS_CHECKOUT_URL` to the live payment link and configure the API with `AMC_INDUSTRY_PACKS_LICENSE_SECRET` plus `AMC_INDUSTRY_PACKS_ADMIN_TOKEN`. Payment webhooks or a checkout adapter can then call `POST /api/industry-packs/license/issue` to generate a signed activation key after a paid subscription event.
 
 ## Pricing tiers
 
 | Tier | What you get | Who it's for |
 |---|---|---|
 | **Free / Open Source** | Full AMC trust stack (Score, Shield, Enforce, Vault, Watch, Fleet, Passport, Comply), all adapters, all CLI commands, browser playground, CI gates | Everyone — solo devs, teams, enterprises evaluating |
-| **Pro** | Everything in Free + selected Industry Packs for your verticals | Teams in regulated industries who need sector-specific diagnostics |
-| **Enterprise** | Everything in Pro + all 40 Industry Packs + priority support + custom pack development + deployment assistance | Regulated organizations, platform teams at scale |
+| **Industry Packs** | Everything in Free + all 40 Industry Packs for $9.99/month | Teams in regulated industries who need sector-specific diagnostics |
+| **Enterprise** | Everything in Industry Packs + priority support + custom pack development + deployment assistance | Regulated organizations, platform teams at scale |
 
 ## FAQ
 

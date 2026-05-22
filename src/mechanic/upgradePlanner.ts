@@ -17,6 +17,7 @@ function qidDimension(qid: string): 1 | 2 | 3 | 4 | 5 {
   if (qid.startsWith("AMC-SPORT-")) return 1;
   if (qid.startsWith("AMC-OPS-")) return 1;
   if (qid.startsWith("AMC-OINT-")) return 1;
+  if (qid.startsWith("AMC-TUNE-")) return 1;
   if (qid.startsWith("AMC-2.")) return 2;
   if (qid.startsWith("AMC-HOQ-")) return 2;
   if (qid.startsWith("AMC-GOV-PROACTIVE-")) return 2;
@@ -26,9 +27,12 @@ function qidDimension(qid: string): 1 | 2 | 3 | 4 | 5 {
   if (qid.startsWith("AMC-SOCIAL-")) return 3;
   if (qid.startsWith("AMC-4.")) return 4;
   if (qid.startsWith("AMC-MEM-")) return 4;
+  if (qid.startsWith("AMC-DIST-")) return 4;
   if (qid.startsWith("AMC-RES-")) return 4;
   if (qid.startsWith("AMC-SK-")) return 4;
   if (qid.startsWith("AMC-THR-")) return 4;
+  if (qid.startsWith("AMC-A2A-")) return 5;
+  if (qid.startsWith("AMC-VOICE-")) return 5;
   return 5;
 }
 

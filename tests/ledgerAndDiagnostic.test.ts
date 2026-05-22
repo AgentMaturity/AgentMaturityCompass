@@ -182,6 +182,17 @@ describe("ledger and diagnostics", () => {
 
     const runJson = JSON.parse(readFileSync(join(workspace, ".amc", "runs", `${report.runId}.json`), "utf8")) as { runId: string };
     expect(runJson.runId).toBe(report.runId);
+
+    const verifyAfterFirstRun = await verifyLedgerIntegrity(workspace);
+    expect(verifyAfterFirstRun.ok).toBe(true);
+
+    const secondReport = await runDiagnostic({
+      workspace,
+      window: "14d",
+      targetName: "default",
+      claimMode: "auto"
+    });
+    expect(secondReport.status).toBe("VALID");
   });
 
   test("wrap mode captures stdin/stdout and seals session", async () => {

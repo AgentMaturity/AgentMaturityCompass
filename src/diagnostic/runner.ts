@@ -660,8 +660,10 @@ export async function runDiagnostic(input: RunDiagnosticInput, outputMarkdownPat
       agentId,
       riskTier: configuredRiskTier
     });
-    persistAuditFindings(ledger, derivedAudits, runId);
-    _cachedAllEvents = null;
+    if (!input.noSign) {
+      persistAuditFindings(ledger, derivedAudits, runId);
+      _cachedAllEvents = null;
+    }
 
     let events = filterEventsForAgent(
       getCachedEvents(),
@@ -673,12 +675,14 @@ export async function runDiagnostic(input: RunDiagnosticInput, outputMarkdownPat
       monitorPublicKeys: monitorKeys,
       expectedAgentId: agentId
     });
-    const correlationAuditIds = persistCorrelationAudits({
-      ledger,
-      runId,
-      agentId,
-      metrics: correlation
-    });
+    const correlationAuditIds = input.noSign
+      ? []
+      : persistCorrelationAudits({
+          ledger,
+          runId,
+          agentId,
+          metrics: correlation
+        });
     if (correlationAuditIds.length > 0) {
       _cachedAllEvents = null;
       events = filterEventsForAgent(
@@ -759,12 +763,16 @@ export async function runDiagnostic(input: RunDiagnosticInput, outputMarkdownPat
 
       supportedMaxLevel = applyGlobalCherryPickDefense(supportedMaxLevel, relevant);
       const relevantAuditMap = buildAuditCountMap(relevant);
-      if (question.id === "AMC-1.5" && !hasLlmEvidenceInWindow) {
+      if (
+        !hasLlmEvidenceInWindow &&
+        (
+          question.id === "AMC-1.5" ||
+          ((configuredRiskTier === "high" || configuredRiskTier === "critical") && question.id === "AMC-VOICE-1")
+        )
+      ) {
         const capped = Math.min(supportedMaxLevel, 2);
-        if (capped !== supportedMaxLevel) {
-          missingLlmCapApplied = true;
-          supportedMaxLevel = capped;
-        }
+        missingLlmCapApplied = true;
+        supportedMaxLevel = capped;
       }
       let routeMismatchCapApplied = false;
       if (
@@ -1303,7 +1311,11 @@ export async function runDiagnostic(input: RunDiagnosticInput, outputMarkdownPat
       autonomyAllowanceIndex = 0;
     }
 
-    const status = verification.ok && !trustBoundary.violated && targetSignatureValid ? "VALID" : "INVALID";
+    const status = input.noSign
+      ? "UNSIGNED"
+      : verification.ok && !trustBoundary.violated && targetSignatureValid
+        ? "VALID"
+        : "INVALID";
 
     const prioritized = prioritizeUpgradeActions(questionScores, targetProfile);
     const evidenceToCollectNext = collectEvidenceChecklist(questionScores);

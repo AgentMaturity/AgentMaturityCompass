@@ -3,6 +3,20 @@ const G = { data:null, section:'overview', view:'engineer', hm:false, af:false, 
 const esc = v => String(v??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 const fmt = (n,d=2) => typeof n==='number' ? n.toFixed(d) : '—';
 const escJs = v => String(v ?? '').replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+function timestampMs(value) {
+  if (typeof value === 'number' && Number.isFinite(value)) {
+    return value < 1e12 ? value * 1000 : value;
+  }
+  if (typeof value === 'string' && value.trim()) {
+    const numeric = Number(value);
+    if (Number.isFinite(numeric)) {
+      return numeric < 1e12 ? numeric * 1000 : numeric;
+    }
+    const parsed = Date.parse(value);
+    return Number.isFinite(parsed) ? parsed : null;
+  }
+  return null;
+}
 
 /* ── SEMANTIC COLOR SYSTEM ────────────────────────── */
 function scoreColor(score, max = 5) {
@@ -36,9 +50,9 @@ const ONBOARD_STEPS = [
   { icon: '🧭', title: 'What is AMC?', body: 'AMC scores your AI agents on trustworthiness from actual behavior — not self-reported claims. Think of it as a credit score for AI agents.' },
   { icon: '📊', title: 'Your Trust Score', body: 'The overall score (0–5) reflects how mature and trustworthy your agent is across 5 dimensions: Strategy, Leadership, Culture, Resilience, and Skills. The L0→L5 maturity journey tracks your progress.' },
   { icon: '🔍', title: 'Evidence-Based', body: 'Unlike other frameworks, AMC verifies claims with cryptographic evidence chains. A claimed score of 5/5 might actually be 1/5 without evidence.' },
-  { icon: '🏭', title: 'Industry Domains', body: '<strong>40 industry packs</strong> across 7 domains (Health, Education, Environment, Mobility, Governance, Technology, Wealth). Each pack includes regulatory frameworks like HIPAA, GDPR, and EU AI Act. Click <strong>Domains</strong> in the sidebar to browse and apply them.' },
+  { icon: '🏭', title: 'Industry Domains', body: '<strong>40 industry packs</strong> across 7 domains (Health, Education, Environment, Mobility, Governance, Technology, Wealth). Industry Packs are $9.99/month for all 40 packs. Click <strong>Domains</strong> in the sidebar to browse and unlock them.' },
   { icon: '🛡️', title: 'Guardrails & Views', body: 'Toggle <strong>14 runtime guardrails</strong> (prompt injection, toxicity, PII, etc.) from the Guardrails section. Use the <strong>Engineer / CISO / Exec</strong> buttons (top-right) to switch views — each role sees only what matters to them.' },
-  { icon: '🚀', title: 'Get Started', body: 'Run <code style="color:var(--accent);font-family:\'JetBrains Mono\',monospace">amc quickscore</code> to get your first score in under 2 minutes. Use <strong>Priority Actions</strong> to improve, or open the <strong>Terminal</strong> to run any AMC command. Press <kbd style="background:var(--bg-overlay);border:1px solid var(--border);border-radius:3px;padding:1px 5px;font-size:11px">⌘K</kbd> to search actions.' },
+  { icon: '🚀', title: 'Get Started', body: 'Run <code style="color:var(--accent);font-family:\'JetBrains Mono\',monospace">amc</code> to get a full score with no setup. Use <strong>Priority Actions</strong> to improve, or open the <strong>Terminal</strong> to run any AMC command. Press <kbd style="background:var(--bg-overlay);border:1px solid var(--border);border-radius:3px;padding:1px 5px;font-size:11px">⌘K</kbd> to search actions.' },
 ];
 
 let G_onboardStep = 0;
@@ -102,7 +116,7 @@ function resetOnboarding() {
 
 /* ── COMMAND PALETTE ──────────────────────────────── */
 const CMD_ACTIONS = [
-  { label: 'Run quickscore', desc: 'Get a score in under 2 minutes', cmd: 'amc quickscore', nav: 'overview' },
+  { label: 'Run full score', desc: 'Generate a full score with no setup', cmd: 'amc', nav: 'overview' },
   { label: 'View evidence gaps', desc: 'See what evidence is missing', cmd: 'amc mechanic gap', nav: 'evidence' },
   { label: 'Check assurance packs', desc: 'Review all assurance pack results', cmd: 'amc assurance list', nav: 'assurance' },
   { label: 'Browse domain packs', desc: 'Open industry domain packs', cmd: null, nav: 'domains' },
@@ -567,10 +581,10 @@ function renderScore(d) {
           <div style="font-size:48px;margin-bottom:16px;opacity:.6">🧭</div>
           <div style="font-size:20px;font-weight:600;color:var(--text-primary);margin-bottom:8px">No score yet</div>
           <div style="font-size:14px;color:var(--text-secondary);max-width:360px;margin:0 auto 20px;line-height:1.6">
-            Run your first assessment to see how trustworthy your AI agent really is. Takes under 2 minutes.
+            Run your first full assessment to see how trustworthy your AI agent really is. Usually completes in under 2 minutes.
           </div>
-          <button class="action-btn action-btn-lg" onclick="executeAction('quickscore', this, 'amc quickscore')">
-            Run Quickscore ▸
+          <button class="action-btn action-btn-lg" onclick="executeAction('quickscore', this, 'amc')">
+            Run Full Score ▸
           </button>
         </div>`;
     }
@@ -645,9 +659,9 @@ function renderScore(d) {
   /* Topbar agent id + freshness */
   document.getElementById('tb-id').textContent = d.agentId || 'default';
 
-  const lastTs = d.trends?.slice(-1)[0]?.ts;
-  if (lastTs) {
-    const mins = Math.round((Date.now() - lastTs) / 60000);
+  const lastMs = timestampMs(d.trends?.slice(-1)[0]?.ts || d.latestRun?.timestamp || d.latestRun?.scoredAt);
+  if (lastMs) {
+    const mins = Math.max(0, Math.round((Date.now() - lastMs) / 60000));
     const agoStr = mins < 1 ? 'just now' : mins < 60 ? `${mins}m ago` : mins < 1440 ? `${Math.round(mins/60)}h ago` : `${Math.round(mins/1440)}d ago`;
     const fr = document.getElementById('tb-freshness');
     if (fr) fr.textContent = agoStr;
@@ -850,13 +864,15 @@ async function executeAction(action, buttonEl, fallbackCmd = '') {
 
   try {
     if (action === 'quickscore') {
-      if (typeof window.runQuickscore !== 'function') {
+      if (typeof window.execCommand !== 'function') {
         throw new Error('Studio API unavailable. Start with: amc up');
       }
-      const result = await window.runQuickscore((G.data && G.data.agentId) || 'default');
+      const result = await window.execCommand('amc');
+      if (result && result.ok === false) {
+        throw new Error(result.stderr || result.stdout || 'Full score failed');
+      }
       await reloadDashboardData();
-      const summary = quickscoreSummary(result);
-      showViewToast(`Score updated: ${summary.label} (${summary.overall.toFixed(1)}/5)`);
+      showViewToast('Full score generated.');
       return;
     }
 
@@ -901,14 +917,16 @@ async function handleQuickScore() {
   btn.disabled = true;
   if (label) label.textContent = '⏳ Scoring...';
   try {
-    const result = await window.runQuickscore((G.data && G.data.agentId) || 'default');
+    const result = await window.execCommand('amc');
+    if (result && result.ok === false) {
+      throw new Error(result.stderr || result.stdout || 'Full score failed');
+    }
     await reloadDashboardData();
-    const summary = quickscoreSummary(result);
-    showViewToast(`Score: ${summary.overall.toFixed(1)}/5.0 — ${summary.label}`);
+    showViewToast('Full score generated.');
   } catch (err) {
     showViewToast('Studio not running. Run: amc up', 'error');
   } finally {
-    if (label) label.textContent = '⚡ Quick Score';
+    if (label) label.textContent = 'Full Score';
     btn.disabled = false;
   }
 }
@@ -950,11 +968,11 @@ function renderNextActions(d) {
 
   if (!score || !d.latestRun?.questionScores?.length) {
     actions.push({
-      title: 'Run your first quickscore',
-      body: 'Kick off a live trust score from Studio in under 2 minutes.',
-      cmd: 'amc quickscore',
+      title: 'Run your first full score',
+      body: 'Kick off a live trust score from Studio with no setup.',
+      cmd: 'amc',
       action: 'quickscore',
-      button: 'Run Quickscore ▸',
+      button: 'Run Full Score ▸',
       nav: 'overview',
     });
   }
@@ -1017,7 +1035,7 @@ function renderNextActions(d) {
       <div class="task-num">✓</div>
       <div class="task-title">All clear</div>
       <div class="task-body">Score ${score.toFixed(1)}/5.0 — looking good.</div>
-      <div class="task-cmd"><button class="action-btn" onclick="event.stopPropagation();executeAction('quickscore', this, 'amc quickscore')">Run Quickscore ▸</button></div>
+      <div class="task-cmd"><button class="action-btn" onclick="event.stopPropagation();executeAction('quickscore', this, 'amc')">Run Full Score ▸</button></div>
     </div>`;
     return;
   }
@@ -1319,7 +1337,7 @@ function buildHm() {
   const el = document.getElementById('hm-mount');
   if (!el) return;
   if (!qs.length) {
-    el.innerHTML = '<div class="empty"><span class="empty-i">🗺️</span><span class="empty-t">No question scores yet — run <code style="color:var(--accent)">amc quickscore</code></span></div>';
+    el.innerHTML = '<div class="empty"><span class="empty-i">🗺️</span><span class="empty-t">No question scores yet — run <code style="color:var(--accent)">amc</code></span></div>';
     return;
   }
   const grps = {};
@@ -1538,7 +1556,7 @@ function initTerminal() {
     histIdx = -1;
     input.value = '';
 
-    const fullCmd = cmd.startsWith('amc ') ? cmd : `amc ${cmd}`;
+    const fullCmd = cmd === 'amc' || cmd.startsWith('amc ') ? cmd : `amc ${cmd}`;
     const ts = new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
     output.innerHTML += `<div class="cli-entry"><span class="cli-ts">${ts}</span> <span class="cli-cmd-echo">$ ${esc(fullCmd)}</span></div>`;
 
@@ -1577,7 +1595,7 @@ function initTerminal() {
   });
 
   /* Quick action buttons above output */
-  const quickCmds = ['quickscore','doctor --json','improve','assurance list','mechanic gap','domain assess --domain health','guardrails list','history'];
+  const quickCmds = ['amc','doctor --json','improve','assurance list','mechanic gap','domain pack access','guardrails list','history'];
   const qwrap = document.createElement('div');
   qwrap.className = 'term-quick';
   qwrap.innerHTML = quickCmds.map(c => `<button class="term-qbtn" data-cmd="${esc(c)}">${esc(c)}</button>`).join('');

@@ -5,11 +5,11 @@
 AMC has one simple split:
 
 - **Free / Open Source**: the entire trust stack
-- **Pro / Enterprise**: Industry Packs (sector-specific domain diagnostics)
+- **Industry Packs / Enterprise**: paid sector-specific domain diagnostics
 
 ## Full edition matrix
 
-| Product | Free / Open Source | Pro | Enterprise |
+| Product | Free / Open Source | Industry Packs ($9.99/mo) | Enterprise |
 |---|---|---|---|
 | **Score** | ✅ Full | ✅ Full | ✅ Full |
 | **Shield** (86 assurance packs) | ✅ Full | ✅ Full | ✅ Full |
@@ -23,7 +23,7 @@ AMC has one simple split:
 | **481 CLI commands** | ✅ Full | ✅ Full | ✅ Full |
 | **Browser playground** | ✅ Full | ✅ Full | ✅ Full |
 | **CI trust gates** | ✅ Full | ✅ Full | ✅ Full |
-| **Industry Packs** (40 verticals) | ❌ | ✅ Selected verticals | ✅ All 40 packs |
+| **Industry Packs** (40 verticals) | ❌ | ✅ All 40 packs | ✅ All 40 packs |
 | **Priority support** | ❌ | ❌ | ✅ |
 | **Custom pack development** | ❌ | ❌ | ✅ |
 | **Deployment assistance** | ❌ | ❌ | ✅ |

@@ -25,6 +25,10 @@ Thumbs.db
 .amc/guard_events.sqlite-wal
 .amc/studio/tmp/
 .amc/release/working/
+.amc/local-vault-passphrase
+.amc/industry-packs-access.json
+.amc/vault.amcvault
+.amc/vault.amcvault.meta.json
 .amc/**/*.json.sig
 .amc/**/scheduler.json
 

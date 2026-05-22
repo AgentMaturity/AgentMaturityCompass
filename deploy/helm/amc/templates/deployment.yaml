@@ -24,6 +24,13 @@ spec:
         - name: amc-studio
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ["/bin/sh", "-lc"]
+          args:
+            - >
+              if [ "${AMC_BOOTSTRAP:-1}" = "1" ]; then
+                amc bootstrap --workspace {{ .Values.workspace.mountPath }};
+              fi;
+              exec amc studio start --workspace {{ .Values.workspace.mountPath }} --bind ${AMC_BIND:-0.0.0.0} --port ${AMC_STUDIO_PORT:-3212}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           envFrom:
@@ -73,7 +80,8 @@ spec:
         - name: amc-notary
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          command: ["node", "dist/cli.js", "notary", "start", "--notary-dir", "/data/notary", "--workspace", "{{ .Values.workspace.mountPath }}"]
+          command: ["amc"]
+          args: ["notary", "start", "--notary-dir", "/data/notary", "--workspace", "{{ .Values.workspace.mountPath }}"]
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           env:

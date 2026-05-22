@@ -8,7 +8,20 @@ export function persistCorrelationAudits(params: {
   agentId: string;
   metrics: CorrelationMetrics;
 }): string[] {
+  if (params.metrics.issues.length === 0) {
+    return [];
+  }
+
   const ids: string[] = [];
+  const auditSessionId = `audit-${params.runId}-correlation`;
+  params.ledger.startSession({
+    sessionId: auditSessionId,
+    runtime: "unknown",
+    binaryPath: "amc-correlation-audits",
+    binarySha256: sha256Hex("amc-correlation-audits")
+  });
+
+  try {
   for (const issue of params.metrics.issues) {
     const payloadObj = {
       auditType: issue.auditType,
@@ -24,7 +37,7 @@ export function persistCorrelationAudits(params: {
     };
     const payload = JSON.stringify(payloadObj);
     const event = params.ledger.appendEvidenceWithReceipt({
-      sessionId: params.runId,
+      sessionId: auditSessionId,
       runtime: "unknown",
       eventType: "audit",
       payload,
@@ -44,6 +57,9 @@ export function persistCorrelationAudits(params: {
       }
     });
     ids.push(event.id);
+  }
+  } finally {
+    params.ledger.sealSession(auditSessionId);
   }
   return ids;
 }

@@ -2690,12 +2690,24 @@ html { scroll-behavior: smooth; }
   .sidebar { transform: translateX(-224px); width: 224px; }
   .sidebar.open { transform: translateX(0); }
   .sidebar.open .sb-link { min-height: 44px; padding: 10px 12px; }
-  .main { margin-left: 0; }
+  .main {
+    margin-left: 0;
+    min-width: 0;
+    width: 100%;
+    max-width: 100vw;
+    overflow-x: hidden;
+  }
   .tb-ham { display: flex; }
   .bnav { display: block; }
   .bnav-i { justify-content: flex-start; overflow-x: auto; gap: 6px; padding-left: 8px; padding-right: 8px; }
   .bn { min-height: 44px; min-width: 44px; }
-  .content { padding: 16px; padding-bottom: 80px; }
+  .content {
+    min-width: 0;
+    max-width: 100vw;
+    padding: 16px;
+    padding-bottom: 80px;
+    overflow-x: hidden;
+  }
   .row.c3 { grid-template-columns: 1fr; }
   .row.c2 { grid-template-columns: 1fr; }
   .score-card-v2 { grid-template-columns: 1fr; gap: 20px; }
@@ -2829,3 +2841,236 @@ html { scroll-behavior: smooth; }
 .studio-badge{font-size:11px;padding:3px 8px;border-radius:9999px;font-weight:500;letter-spacing:.02em;white-space:nowrap;transition:all .3s ease}
 .studio-on{color:#22c55e;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.2)}
 .studio-off{color:var(--text-tertiary);background:var(--bg-overlay);border:1px solid var(--border)}
+
+/* ═══════════════════════════════════════════════════════════════
+   Website alignment pass — AMC black terminal product language
+   ═══════════════════════════════════════════════════════════════ */
+:root {
+  --bg: #0a0a0a;
+  --bg-raised: #111111;
+  --bg-overlay: #1a1a1a;
+  --border: rgba(255,255,255,.08);
+  --border-strong: rgba(255,255,255,.15);
+  --text-primary: #ffffff;
+  --text-secondary: #a0a0a0;
+  --text-tertiary: rgba(255,255,255,.32);
+  --accent: #4AEF79;
+  --accent-dim: rgba(74,239,121,.08);
+  --accent-border: rgba(74,239,121,.24);
+  --accent-glow: rgba(74,239,121,.16);
+  --glass: rgba(10,10,10,.86);
+  --glass-border: rgba(255,255,255,.08);
+  --shadow-sm: 0 1px 0 rgba(255,255,255,.03), 0 16px 42px rgba(0,0,0,.20);
+  --shadow-md: 0 1px 0 rgba(255,255,255,.04), 0 22px 70px rgba(0,0,0,.28);
+  --shadow-lg: 0 1px 0 rgba(255,255,255,.05), 0 30px 90px rgba(0,0,0,.36);
+}
+
+[data-theme="light"] {
+  --bg: #f8f9fa;
+  --bg-raised: #ffffff;
+  --bg-overlay: #f1f3f5;
+  --border: rgba(0,0,0,.10);
+  --border-strong: rgba(0,0,0,.18);
+  --text-primary: #111827;
+  --text-secondary: rgba(17,24,39,.60);
+  --text-tertiary: rgba(17,24,39,.40);
+  --accent: #2BA84A;
+  --accent-dim: rgba(43,168,74,.10);
+  --accent-border: rgba(43,168,74,.20);
+  --accent-glow: rgba(43,168,74,.08);
+  --glass: rgba(248,249,250,.82);
+  --glass-border: rgba(0,0,0,.06);
+  --shadow-sm: 0 1px 2px rgba(0,0,0,.05);
+  --shadow-md: 0 4px 16px rgba(0,0,0,.08);
+  --shadow-lg: 0 12px 40px rgba(0,0,0,.12);
+}
+
+body {
+  background:
+    radial-gradient(ellipse 70% 45% at 74% 0%, rgba(74,239,121,.055), transparent 60%),
+    radial-gradient(ellipse 42% 52% at 0% 96%, rgba(74,239,121,.024), transparent 58%),
+    var(--bg);
+}
+
+body::before {
+  content: "amc";
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-family: var(--sans);
+  font-size: clamp(24rem, 48vw, 54rem);
+  font-weight: 900;
+  line-height: .85;
+  letter-spacing: -.06em;
+  color: rgba(255,255,255,.012);
+  pointer-events: none;
+  z-index: 0;
+  text-transform: lowercase;
+  white-space: nowrap;
+}
+
+.main,
+.content {
+  position: relative;
+}
+
+.sidebar {
+  position: fixed;
+}
+
+.topbar {
+  position: sticky;
+}
+
+.main {
+  background:
+    linear-gradient(rgba(255,255,255,.012) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.010) 1px, transparent 1px),
+    transparent;
+  background-size: 72px 72px;
+}
+
+.sidebar {
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.025), transparent 28%),
+    rgba(10,10,10,.98);
+}
+
+.sb-logo {
+  padding-top: 18px;
+}
+
+.sb-logo-text {
+  font-family: var(--mono);
+  color: var(--text-primary);
+  letter-spacing: -.04em;
+  font-size: 20px;
+}
+
+.sb-logo-text::after {
+  content: "_";
+  color: var(--accent);
+}
+
+.sb-link {
+  border-radius: 6px;
+  font-family: var(--mono);
+  font-size: 12px;
+  text-transform: lowercase;
+  letter-spacing: .02em;
+}
+
+.sb-link.on {
+  background: linear-gradient(90deg, rgba(74,239,121,.11), transparent 82%);
+}
+
+.topbar {
+  background: var(--glass);
+  border-bottom-color: var(--glass-border);
+  box-shadow: 0 1px 0 rgba(255,255,255,.025);
+}
+
+.tb-search,
+.tb-views,
+.tb-freshness,
+.tb-agent-id,
+.tb-v.on,
+.tb-act:hover {
+  background: rgba(255,255,255,.035);
+}
+
+.card,
+.task-card,
+.domain-card,
+.pack-card,
+.guardrail-card,
+.dim-card,
+.cli-term,
+.onboard-modal {
+  border-radius: 8px;
+}
+
+.card {
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.026), rgba(255,255,255,0) 44%),
+    rgba(20,20,20,.94);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+
+.card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(74,239,121,.022), transparent 34%);
+  opacity: 0;
+  transition: opacity .2s ease;
+}
+
+.card:hover::before {
+  opacity: 1;
+}
+
+.card:hover {
+  border-color: rgba(74,239,121,.22);
+  box-shadow: var(--shadow-md);
+}
+
+.card--hero,
+.hero-panel {
+  border-color: rgba(74,239,121,.24);
+  background:
+    radial-gradient(ellipse 58% 100% at 0% 45%, rgba(74,239,121,.13), transparent 58%),
+    radial-gradient(ellipse 42% 70% at 100% 0%, rgba(74,239,121,.08), transparent 62%),
+    rgba(17,17,17,.96);
+}
+
+.hero-panel::before {
+  opacity: .35;
+}
+
+.score-big,
+.hero-level-name {
+  background: linear-gradient(135deg, #fff 42%, var(--accent) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+.hero-kpi {
+  border-radius: 8px;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.03), transparent 42%),
+    rgba(26,26,26,.88);
+}
+
+.action-btn,
+.sb-quickscore,
+.onboard-btn,
+.cli-run-btn {
+  border-radius: 6px;
+  font-family: var(--mono);
+  text-transform: lowercase;
+}
+
+.cli-term {
+  background:
+    radial-gradient(circle at top right, rgba(74,239,121,.055), transparent 36%),
+    #2a2a2a;
+  border-color: var(--border);
+}
+
+.domain-card,
+.pack-card,
+.guardrail-card {
+  background:
+    linear-gradient(100deg, color-mix(in srgb, var(--accent) 8%, transparent), transparent 42%),
+    rgba(26,26,26,.90);
+}
+
+.studio-badge {
+  border-radius: 999px;
+  font-family: var(--mono);
+  text-transform: lowercase;
+}

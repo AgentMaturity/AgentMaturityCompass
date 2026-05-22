@@ -49,13 +49,13 @@ jobs:
           amc doctor --json > /tmp/amc-doctor.json
           echo "AMC_MATRIX_DOCTOR_JSON=ok" >> "$GITHUB_ENV"
 
-      - name: Verify quickscore JSON
+      - name: Verify full score JSON
         shell: bash
         run: |
           set -euo pipefail
-          amc quickscore --json > /tmp/amc-quickscore.json || true
-          test -s /tmp/amc-quickscore.json
-          echo "AMC_MATRIX_QUICKSCORE_JSON=ok" >> "$GITHUB_ENV"
+          amc --json > /tmp/amc-fullscore.json
+          test -s /tmp/amc-fullscore.json
+          echo "AMC_MATRIX_FULLSCORE_JSON=ok" >> "$GITHUB_ENV"
 
       - name: Verify lite-score help path
         shell: bash
@@ -83,7 +83,7 @@ jobs:
           name: compatibility-${{ matrix.os }}-node${{ matrix.node-version }}
           path: |
             /tmp/amc-doctor.json
-            /tmp/amc-quickscore.json
+            /tmp/amc-fullscore.json
             /tmp/amc-lite-score.txt
             /tmp/amc-comms-check.txt
             /tmp/compat-matrix-${{ matrix.os }}-node${{ matrix.node-version }}.json

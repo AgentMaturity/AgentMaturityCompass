@@ -8407,6 +8407,134 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         return;
       }
 
+      if (pathname === "/industry-packs/access" && req.method === "GET") {
+        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
+          return;
+        }
+        const { getIndustryPackEntitlement } = await import("../domains/industryPackEntitlement.js");
+        json(res, 200, {
+          entitlement: getIndustryPackEntitlement(options.workspace)
+        });
+        return;
+      }
+
+      if (pathname === "/industry-packs/checkout" && (req.method === "GET" || req.method === "POST")) {
+        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
+          return;
+        }
+        const { buildIndustryPackCheckoutUrl, getIndustryPackEntitlement } = await import("../domains/industryPackEntitlement.js");
+        const parsed = req.method === "POST"
+          ? (JSON.parse(await readBody(req, options.maxRequestBytes ?? 1_048_576) || "{}") as {
+              successUrl?: string;
+              cancelUrl?: string;
+              customerEmail?: string;
+              clientReferenceId?: string;
+            })
+          : {};
+        const checkoutUrl = buildIndustryPackCheckoutUrl({
+          successUrl: parsed.successUrl ?? url.searchParams.get("successUrl") ?? undefined,
+          cancelUrl: parsed.cancelUrl ?? url.searchParams.get("cancelUrl") ?? undefined,
+          customerEmail: parsed.customerEmail ?? url.searchParams.get("email") ?? undefined,
+          clientReferenceId: parsed.clientReferenceId ?? url.searchParams.get("reference") ?? undefined
+        });
+        json(res, 200, {
+          checkoutUrl,
+          entitlement: getIndustryPackEntitlement(options.workspace)
+        });
+        return;
+      }
+
+      if (pathname === "/industry-packs/activate" && req.method === "POST") {
+        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER"] })) {
+          return;
+        }
+        if (requiresReadOnlyMode(options.workspace)) {
+          json(res, 403, { error: "users config signature invalid: read-only mode active" });
+          return;
+        }
+        const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
+        const parsed = body ? (JSON.parse(body) as { licenseKey?: string; expiresAt?: string | null }) : {};
+        if (!parsed.licenseKey) {
+          json(res, 400, { error: "licenseKey is required" });
+          return;
+        }
+        const { activateIndustryPackAccessOnline } = await import("../domains/industryPackEntitlement.js");
+        const entitlement = await activateIndustryPackAccessOnline({
+          workspace: options.workspace,
+          licenseKey: parsed.licenseKey,
+          expiresAt: parsed.expiresAt ?? null
+        });
+        writeStudioAuditEvent({
+          workspace: options.workspace,
+          auditType: "INDUSTRY_PACKS_ACTIVATED",
+          severity: "LOW",
+          payload: {
+            source: entitlement.source,
+            planId: entitlement.planId,
+            expiresAt: entitlement.expiresAt,
+            subscriptionId: entitlement.subscriptionId
+          }
+        });
+        json(res, 200, { entitlement });
+        return;
+      }
+
+      if (pathname === "/industry-packs/license/verify" && req.method === "POST") {
+        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
+          return;
+        }
+        const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
+        const parsed = body ? (JSON.parse(body) as { licenseKey?: string }) : {};
+        if (!parsed.licenseKey) {
+          json(res, 400, { error: "licenseKey is required" });
+          return;
+        }
+        const { verifyIndustryPackLicenseKey } = await import("../domains/industryPackEntitlement.js");
+        const verification = verifyIndustryPackLicenseKey(parsed.licenseKey);
+        json(res, verification.valid ? 200 : 422, verification);
+        return;
+      }
+
+      if (pathname === "/industry-packs/list" && req.method === "GET") {
+        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
+          return;
+        }
+        const { listIndustryPacks } = await import("../domains/industryPacks.js");
+        const { getIndustryPackEntitlement, toIndustryPackCatalogItem } = await import("../domains/industryPackEntitlement.js");
+        const entitlement = getIndustryPackEntitlement(options.workspace);
+        json(res, 200, {
+          entitlement,
+          packs: listIndustryPacks().map((pack) => toIndustryPackCatalogItem(pack, entitlement))
+        });
+        return;
+      }
+
+      const industryPackMatch = pathname.match(/^\/industry-packs\/([^/]+)$/);
+      if (industryPackMatch && req.method === "GET") {
+        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
+          return;
+        }
+        const { getPackById } = await import("../domains/industryPacks.js");
+        const { getIndustryPackEntitlement, formatIndustryPackPaywallMessage } = await import("../domains/industryPackEntitlement.js");
+        const entitlement = getIndustryPackEntitlement(options.workspace);
+        if (!entitlement.active) {
+          json(res, 402, {
+            error: "industry_packs_locked",
+            message: formatIndustryPackPaywallMessage(entitlement),
+            entitlement
+          });
+          return;
+        }
+        const packId = decodeURIComponent(industryPackMatch[1] ?? "");
+        const pack = getPackById(packId);
+        if (!pack) {
+          json(res, 404, { error: "industry pack not found" });
+          return;
+        }
+        json(res, 200, { pack, entitlement });
+        return;
+      }
+
       const policyPackMatch = pathname.match(/^\/policy-packs\/([^/]+)$/);
       if (policyPackMatch && req.method === "GET") {
         if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {

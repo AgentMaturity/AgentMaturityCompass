@@ -237,7 +237,7 @@ export async function runQuickSetup(options: QuickSetupOptions): Promise<QuickSe
   }
   logger.log("");
   logger.log("Next command:");
-  logger.log("  amc quickscore");
+  logger.log("  amc");
 
   const detectedApiKeys = PROVIDERS
     .filter((provider) => detectedProviderIds.has(provider.id))

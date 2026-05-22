@@ -47,7 +47,7 @@ Evidence degrades over time to reflect that agent behavior may change:
 
 ## 3. Question Bank
 
-AMC assesses agents across **235 diagnostic questions** organized into 5 layers:
+AMC assesses agents across **240 diagnostic questions** organized into 5 layers:
 
 | Layer | Questions | Focus Area |
 |-------|-----------|------------|

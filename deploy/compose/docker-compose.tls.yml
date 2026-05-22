@@ -8,7 +8,7 @@ services:
     image: amc-studio:local
     container_name: amc-notary
     restart: unless-stopped
-    command: ["node", "dist/cli.js", "notary", "start", "--notary-dir", "/data/notary", "--workspace", "/data/amc"]
+    command: ["notary", "start", "--notary-dir", "/data/notary", "--workspace", "/data/amc"]
     environment:
       AMC_NOTARY_DIR: /data/notary
       AMC_NOTARY_PASSPHRASE_FILE: /run/secrets/amc_notary_passphrase
@@ -54,6 +54,13 @@ services:
       AMC_BOOTSTRAP_OWNER_PASSWORD_FILE: /run/secrets/amc_owner_password
     depends_on:
       - amc-notary
+    entrypoint: ["/bin/sh", "-lc"]
+    command:
+      - >
+        if [ "$${AMC_BOOTSTRAP:-1}" = "1" ]; then
+          amc bootstrap --workspace /data/amc;
+        fi;
+        exec amc studio start --workspace /data/amc --bind 0.0.0.0 --port "$${AMC_STUDIO_PORT:-3212}"
     expose:
       - "3210"
       - "3211"

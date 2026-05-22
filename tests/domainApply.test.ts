@@ -1,7 +1,7 @@
 import { existsSync, mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { afterEach, describe, expect, test } from "vitest";
+import { afterEach, beforeEach, describe, expect, test } from "vitest";
 import { applyDomainToAgent } from "../src/domains/domainApply.js";
 
 const workspaces: string[] = [];
@@ -13,6 +13,7 @@ function createWorkspace(): string {
 }
 
 afterEach(() => {
+  delete process.env.AMC_INDUSTRY_PACKS_ACTIVE;
   while (workspaces.length > 0) {
     const workspace = workspaces.pop();
     if (!workspace) continue;
@@ -21,6 +22,10 @@ afterEach(() => {
 });
 
 describe("domain apply", () => {
+  beforeEach(() => {
+    process.env.AMC_INDUSTRY_PACKS_ACTIVE = "1";
+  });
+
   test("apply health domain to default agent", async () => {
     const workspace = createWorkspace();
     const result = await applyDomainToAgent({

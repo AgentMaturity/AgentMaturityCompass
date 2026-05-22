@@ -49,7 +49,7 @@ jobs:
       - name: Run AMC Score
         id: amc
         run: |
-          RESULT=$(amc quickscore --json --agent ${{ inputs.agent-id }} 2>/dev/null || echo '{"score":0,"level":"L0"}')
+          RESULT=$(amc --json --agent ${{ inputs.agent-id }} 2>/dev/null || echo '{"score":0,"level":"L0"}')
           SCORE=$(echo "$RESULT" | jq -r '.score // 0')
           LEVEL=$(echo "$RESULT" | jq -r '.level // "L0"')
           echo "score=$SCORE" >> "$GITHUB_OUTPUT"

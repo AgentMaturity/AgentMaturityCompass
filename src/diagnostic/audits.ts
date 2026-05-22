@@ -1,5 +1,6 @@
 import type { Ledger } from "../ledger/ledger.js";
 import type { RiskTier, RuntimeName } from "../types.js";
+import { sha256Hex } from "../utils/hash.js";
 import type { ParsedEvidenceEvent } from "./gates.js";
 
 export interface AuditFinding {
@@ -394,10 +395,24 @@ function dedupeFindings(findings: AuditFinding[]): AuditFinding[] {
 }
 
 export function persistAuditFindings(ledger: Ledger, findings: AuditFinding[], runId: string): string[] {
+  const deduped = dedupeFindings(findings);
+  if (deduped.length === 0) {
+    return [];
+  }
+
   const ids: string[] = [];
-  for (const finding of findings) {
+  const auditSessionId = `audit-${runId}-${sha256Hex(JSON.stringify(deduped)).slice(0, 12)}`;
+  ledger.startSession({
+    sessionId: auditSessionId,
+    runtime: "unknown",
+    binaryPath: "amc-diagnostic-audits",
+    binarySha256: sha256Hex("amc-diagnostic-audits")
+  });
+
+  try {
+  for (const finding of deduped) {
     const id = ledger.appendEvidence({
-      sessionId: finding.sessionId,
+      sessionId: auditSessionId,
       runtime: finding.runtime,
       eventType: "audit",
       payload: JSON.stringify({
@@ -406,7 +421,8 @@ export function persistAuditFindings(ledger: Ledger, findings: AuditFinding[], r
         message: finding.message,
         relatedEventIds: finding.relatedEventIds,
         questionId: finding.questionId,
-        runId
+        runId,
+        sourceSessionId: finding.sessionId
       }),
       payloadExt: "json",
       inline: true,
@@ -416,10 +432,14 @@ export function persistAuditFindings(ledger: Ledger, findings: AuditFinding[], r
         relatedEventIds: finding.relatedEventIds,
         questionId: finding.questionId,
         runId,
+        sourceSessionId: finding.sessionId,
         source: "derived"
       }
     });
     ids.push(id);
+  }
+  } finally {
+    ledger.sealSession(auditSessionId);
   }
 
   return ids;

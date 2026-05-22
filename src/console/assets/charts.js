@@ -1,4 +1,4 @@
-export function renderLine(canvas, values, color = "#134e4a") {
+export function renderLine(canvas, values, color = "#4AEF79") {
   if (!canvas) {
     return;
   }
@@ -9,8 +9,16 @@ export function renderLine(canvas, values, color = "#134e4a") {
   const w = canvas.width;
   const h = canvas.height;
   ctx.clearRect(0, 0, w, h);
-  ctx.fillStyle = "#f8fafc";
+  ctx.fillStyle = "#101010";
   ctx.fillRect(0, 0, w, h);
+  ctx.strokeStyle = "rgba(255,255,255,0.08)";
+  ctx.lineWidth = 1;
+  for (let y = 24; y < h; y += 28) {
+    ctx.beginPath();
+    ctx.moveTo(8, y);
+    ctx.lineTo(w - 8, y);
+    ctx.stroke();
+  }
   if (!values || values.length === 0) {
     return;
   }
@@ -29,10 +37,13 @@ export function renderLine(canvas, values, color = "#134e4a") {
       ctx.lineTo(x, y);
     }
   });
+  ctx.shadowColor = color;
+  ctx.shadowBlur = 8;
   ctx.stroke();
+  ctx.shadowBlur = 0;
 }
 
-export function renderBars(canvas, values, color = "#1d4ed8") {
+export function renderBars(canvas, values, color = "#4AEF79") {
   if (!canvas) {
     return;
   }
@@ -43,7 +54,7 @@ export function renderBars(canvas, values, color = "#1d4ed8") {
   const w = canvas.width;
   const h = canvas.height;
   ctx.clearRect(0, 0, w, h);
-  ctx.fillStyle = "#f8fafc";
+  ctx.fillStyle = "#101010";
   ctx.fillRect(0, 0, w, h);
   if (!values || values.length === 0) {
     return;
@@ -59,4 +70,3 @@ export function renderBars(canvas, values, color = "#1d4ed8") {
     ctx.fillRect(x, y, barW, barH);
   });
 }
-

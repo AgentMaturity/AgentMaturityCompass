@@ -10,6 +10,7 @@ function dimensionIdForQuestion(questionId: string): "DIM-1" | "DIM-2" | "DIM-3"
   if (questionId.startsWith("AMC-SPORT-")) return "DIM-1";
   if (questionId.startsWith("AMC-OPS-")) return "DIM-1";
   if (questionId.startsWith("AMC-OINT-")) return "DIM-1";
+  if (questionId.startsWith("AMC-TUNE-")) return "DIM-1";
   if (questionId.startsWith("AMC-2.")) return "DIM-2";
   if (questionId.startsWith("AMC-HOQ-")) return "DIM-2";
   if (questionId.startsWith("AMC-GOV-PROACTIVE-")) return "DIM-2";
@@ -19,9 +20,12 @@ function dimensionIdForQuestion(questionId: string): "DIM-1" | "DIM-2" | "DIM-3"
   if (questionId.startsWith("AMC-SOCIAL-")) return "DIM-3";
   if (questionId.startsWith("AMC-4.")) return "DIM-4";
   if (questionId.startsWith("AMC-MEM-")) return "DIM-4";
+  if (questionId.startsWith("AMC-DIST-")) return "DIM-4";
   if (questionId.startsWith("AMC-RES-")) return "DIM-4";
   if (questionId.startsWith("AMC-SK-")) return "DIM-4";
   if (questionId.startsWith("AMC-THR-")) return "DIM-4";
+  if (questionId.startsWith("AMC-A2A-")) return "DIM-5";
+  if (questionId.startsWith("AMC-VOICE-")) return "DIM-5";
   return "DIM-5";
 }
 

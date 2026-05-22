@@ -1,5 +1,5 @@
 /**
- * Full Interactive Diagnostic — walks all 235 questions grouped by layer.
+ * Full Interactive Diagnostic — walks all 240 questions grouped by layer.
  * Designed to complete in ~1 minute with clean progress UX.
  */
 import type { DiagnosticQuestion } from "../types.js";

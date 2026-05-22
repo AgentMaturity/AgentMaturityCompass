@@ -63,7 +63,9 @@ export function serveConsolePath(pathname: string, res: ServerResponse): boolean
   }
   res.statusCode = 200;
   res.setHeader("content-type", contentType(file));
+  if (file.endsWith(join("assets", "sw.js"))) {
+    res.setHeader("Service-Worker-Allowed", "/console/");
+  }
   res.end(readUtf8(file));
   return true;
 }
-

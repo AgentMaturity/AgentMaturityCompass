@@ -284,7 +284,7 @@ function renderAuthScreen() {
   }
   root.innerHTML = `
     <div class="card">
-      <h2>Compass Console Login</h2>
+      <h2>AMC Studio Login</h2>
       <p class="muted">Login with username/password. Admin token fallback is available for emergency CLI access.</p>
       <div class="row wrap">
         <input id="loginUser" placeholder="username" />
@@ -361,33 +361,75 @@ async function renderHome() {
   const benchmarkStats = await apiGet("/benchmarks/stats").catch(() => ({ count: 0, groups: [], scatter: [] }));
   const agents = agentsResp.agents || [];
   const activeFreezes = Array.isArray(status.studio?.activeFreezes) ? status.studio.activeFreezes.length : 0;
+  const agentId = status.studio?.currentAgent || "default";
+  const vaultState = status.vaultLocked ? "LOCKED" : "UNLOCKED";
+  const studioRunning = status.studio?.running === false ? "STOPPED" : "RUNNING";
   root.innerHTML = `
-    ${card("Studio Status", `
-      <div class="grid">
-        <div><div class="muted">Gateway</div><div class="tile-value">${status.studio?.gatewayPort || "-"}</div></div>
-        <div><div class="muted">Proxy</div><div class="tile-value">${status.studio?.proxyPort || "-"}</div></div>
-        <div><div class="muted">ToolHub/API</div><div class="tile-value">${status.studio?.apiPort || "-"}</div></div>
-        <div><div class="muted">Vault</div><div class="tile-value">${status.vaultLocked ? "LOCKED" : "UNLOCKED"}</div></div>
+    <section class="card studio-hero">
+      <div>
+        <div class="studio-kicker">amc studio</div>
+        <h2 class="studio-title">Run<span>Watch</span><strong>Prove_</strong></h2>
+        <p class="studio-sub">
+          A local control plane for the full AMC trust stack. Run the 240-question score,
+          inspect evidence, watch drift, browse Industry Packs, and export audit-ready proof
+          without leaving your workspace.
+        </p>
+        <div class="studio-actions">
+          <button id="studioRunFullScore">run full score →</button>
+          <a class="secondary" href="./industrypacks" style="display:inline-flex;align-items:center;border:1px solid var(--border-strong);border-radius:6px;padding:9px 13px;font-family:var(--mono);font-size:12px;color:var(--ink)">industry packs →</a>
+          <a class="secondary" href="./agent?agent=${encodeURIComponent(agentId)}" style="display:inline-flex;align-items:center;border:1px solid var(--border-strong);border-radius:6px;padding:9px 13px;font-family:var(--mono);font-size:12px;color:var(--ink)">agent evidence →</a>
+        </div>
       </div>
-    `)}
-    ${card("Fleet Summary", `
-      <div class="grid">
-        <div><div class="muted">Agents</div><div class="tile-value">${agents.length}</div></div>
-        <div><div class="muted">Active Freezes</div><div class="tile-value">${activeFreezes}</div></div>
-        <div><div class="muted">Benchmarks</div><div class="tile-value">${benchmarkStats.count || 0}</div></div>
-        <div><div class="muted">Current Agent</div><div class="tile-value">${status.studio?.currentAgent || "-"}</div></div>
+      <div class="studio-terminal">
+        <div class="studio-terminal-bar">
+          <span class="studio-dot r"></span><span class="studio-dot y"></span><span class="studio-dot g"></span>
+          <span class="studio-terminal-title">amc up</span>
+        </div>
+        <div class="studio-terminal-body">
+          <div class="studio-command">$ amc up</div>
+          <div class="studio-terminal-line"><strong>Studio</strong><span>${htmlEscape(studioRunning)}</span></div>
+          <div class="studio-terminal-line"><strong>Agent</strong><span>${htmlEscape(agentId)}</span></div>
+          <div class="studio-terminal-line"><strong>Gateway</strong><span>${htmlEscape(status.studio?.gatewayPort || "-")}</span></div>
+          <div class="studio-terminal-line"><strong>ToolHub/API</strong><span>${htmlEscape(status.studio?.apiPort || "-")}</span></div>
+          <div class="studio-terminal-line"><strong>Vault</strong><span>${htmlEscape(vaultState)}</span></div>
+          <div class="studio-terminal-line"><strong>Industry Packs</strong><span>$9.99/month</span></div>
+        </div>
       </div>
-    `)}
-    <div class="grid">
+    </section>
+
+    <div class="studio-kpi-grid">
+      <section class="card studio-kpi"><div class="muted">Agents</div><div class="tile-value">${agents.length}</div></section>
+      <section class="card studio-kpi"><div class="muted">Active Freezes</div><div class="tile-value">${activeFreezes}</div></section>
+      <section class="card studio-kpi"><div class="muted">Benchmarks</div><div class="tile-value">${benchmarkStats.count || 0}</div></section>
+      <section class="card studio-kpi"><div class="muted">Current Agent</div><div class="tile-value">${htmlEscape(agentId)}</div></section>
+    </div>
+
+    <div class="studio-section-label">runtime telemetry</div>
+    <div class="studio-chart-grid">
       ${card("Overall Trend", `<canvas id="overallTrend" width="360" height="140"></canvas>`)}
       ${card("Integrity Trend", `<canvas id="integrityTrend" width="360" height="140"></canvas>`)}
     </div>
   `;
-  const agentId = status.studio?.currentAgent || "default";
   const agentStatus = await apiGet(`/agents/${encodeURIComponent(agentId)}/status`).catch(() => ({ latestRun: null }));
   const latestRun = agentStatus.latestRun;
   renderLine(document.getElementById("overallTrend"), latestRun ? [latestRun.integrityIndex, latestRun.integrityIndex] : [0]);
   renderLine(document.getElementById("integrityTrend"), latestRun ? [latestRun.integrityIndex, latestRun.integrityIndex] : [0], "#7c3aed");
+  document.getElementById("studioRunFullScore")?.addEventListener("click", async (event) => {
+    const button = event.currentTarget;
+    const original = button.textContent;
+    button.textContent = "running...";
+    button.disabled = true;
+    try {
+      await apiPost("/cli/exec", { command: "amc", format: "json", timeout: 120000 });
+      setStatus("Full score generated.");
+      await renderHome();
+    } catch (error) {
+      setStatus(`Full score failed: ${errText(error)}`, true);
+    } finally {
+      button.disabled = false;
+      button.textContent = original;
+    }
+  });
 }
 
 async function renderAgent() {
@@ -677,6 +719,88 @@ async function renderPolicyPacks() {
       });
       out.textContent = JSON.stringify(applied, null, 2);
       await refreshUnifiedBanner();
+    });
+  });
+}
+
+async function renderIndustryPacks() {
+  const response = await apiGet("/industry-packs/list");
+  const entitlement = response.entitlement || {};
+  const packs = response.packs || [];
+  const locked = !entitlement.active;
+  root.innerHTML = `
+    ${card("Industry Packs", `
+      <div class="grid">
+        <div>
+          <div class="muted">Access</div>
+          <div class="tile-value">${locked ? "Locked" : "Active"}</div>
+        </div>
+        <div>
+          <div class="muted">Plan</div>
+          <div class="tile-value">$${htmlEscape(entitlement.priceUsdMonthly || "9.99")}/mo</div>
+        </div>
+      </div>
+      ${locked ? `
+        <p class="muted">$${htmlEscape(entitlement.priceUsdMonthly || "9.99")}/month unlocks all 40 Industry Domain Packs.</p>
+        <div class="row">
+          <button id="industryCheckout">Open checkout</button>
+          <a class="button secondary" href="${htmlEscape(entitlement.checkoutUrl || "https://agentmaturity.co/pricing#industry-packs")}" target="_blank" rel="noopener">Pricing</a>
+        </div>
+        <div class="form-row">
+          <label for="industryLicenseKey">License key</label>
+          <input id="industryLicenseKey" placeholder="AMC-INDUSTRY-PACKS..." autocomplete="off" />
+        </div>
+        <button id="industryActivate" class="secondary">Activate access</button>
+        <p class="muted">After purchase, paste the license key here or run <code>amc domain pack activate --key &lt;license-key&gt;</code>.</p>
+      ` : `<p class="status-ok">All 40 Industry Domain Packs are unlocked.</p>`}
+    `)}
+    ${card("Pack Catalog", `<div id="industryPackRows" class="scroll"></div><pre id="industryPackOut" class="muted"></pre>`)}
+  `;
+  const rows = document.getElementById("industryPackRows");
+  rows.innerHTML = packs
+    .map((pack) => `
+      <div class="card">
+        <div class="row spaced">
+          <strong>${htmlEscape(pack.name || pack.packId)}</strong>
+          <span>${pack.locked ? "locked" : htmlEscape(pack.riskLevel || "active")}</span>
+        </div>
+        <p class="muted">${htmlEscape(pack.description || "")}</p>
+        <div class="row spaced">
+          <span class="muted">${htmlEscape(pack.domain || "")} · ${Number(pack.questionCount || 0)} questions</span>
+          <button class="secondary" data-industry-pack="${htmlEscape(pack.packId)}">${pack.locked ? "Locked" : "Open"}</button>
+        </div>
+      </div>
+    `)
+    .join("");
+  const out = document.getElementById("industryPackOut");
+  document.getElementById("industryCheckout")?.addEventListener("click", async () => {
+    const payload = await apiPost("/industry-packs/checkout", {
+      successUrl: window.location.href,
+      cancelUrl: window.location.href,
+      clientReferenceId: currentAgent()
+    });
+    window.open(payload.checkoutUrl || entitlement.checkoutUrl, "_blank", "noopener");
+  });
+  document.getElementById("industryActivate")?.addEventListener("click", async () => {
+    const input = document.getElementById("industryLicenseKey");
+    const licenseKey = input?.value?.trim();
+    if (!licenseKey) {
+      out.textContent = "Paste the Industry Packs license key first.";
+      return;
+    }
+    const activated = await apiPost("/industry-packs/activate", { licenseKey });
+    out.textContent = JSON.stringify(activated, null, 2);
+    await renderIndustryPacks();
+  });
+  rows.querySelectorAll("button[data-industry-pack]").forEach((button) => {
+    button.addEventListener("click", async () => {
+      const id = button.getAttribute("data-industry-pack");
+      if (locked) {
+        out.textContent = `Industry Packs are locked. $${entitlement.priceUsdMonthly || "9.99"}/month unlocks all 40 packs.\n${entitlement.checkoutUrl || ""}`;
+        return;
+      }
+      const detail = await apiGet(`/industry-packs/${encodeURIComponent(id)}`);
+      out.textContent = JSON.stringify(detail, null, 2);
     });
   });
 }
@@ -1387,6 +1511,7 @@ async function renderPage() {
     if (page === "users") return await renderUsers();
     if (page === "transparency") return await renderTransparency();
     if (page === "policypacks") return await renderPolicyPacks();
+    if (page === "industrypacks") return await renderIndustryPacks();
     if (page === "governor") {
       const actionClasses = ["READ_ONLY", "WRITE_LOW", "WRITE_HIGH", "DEPLOY", "SECURITY"];
       const rows = [];

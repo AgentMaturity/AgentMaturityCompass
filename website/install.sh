@@ -37,8 +37,8 @@ fi
 
 echo ""
 echo "Get started:"
-echo "  amc init           — initialize workspace"
-echo "  amc quickscore     — score your agent in 2 minutes"
+echo "  amc                — initialize workspace and generate full score"
+echo "  amc up             — open Studio"
 echo "  amc guide --go     — generate + apply guardrails"
 echo ""
 echo "Docs: https://agentmaturity.co/"
