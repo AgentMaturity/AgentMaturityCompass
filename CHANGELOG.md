@@ -1,10 +1,17 @@
 # Changelog
 
+## 1.1.0
+
+### Minor Changes
+
+- 604df61: Add MCP Server (`amc mcp serve`) for IDE integration and Agent Transparency Report (`amc transparency report`) for agent SBOM generation. Includes 14 MCP tools exposing scoring, assurance, fleet, and guide capabilities over JSON-RPC stdio transport.
+
 All notable changes to AMC are documented here.
 
 ## [Unreleased]
 
 ### Added
+
 - **Full 235-question interactive diagnostic** replaces quickscore default (`90f11940`)
 - **3 archetype + 3 assurance packs** from awesome-ai-agents gap analysis — autonomous loops, multi-agent orchestrators, science/research agents (`04d5d3ad`, `87f5f34e`)
 - **10-gap competitive closure vs Visibe.ai** — runtime observability, real-time assurance, auto-instrumentation SDK, cost tracker, CI/CD integrations (`1ae9819d`)
@@ -15,22 +22,26 @@ All notable changes to AMC are documented here.
 - **PR template** with doc update checklist (`359dc691`)
 
 ### Fixed
+
 - TypeScript error in MCP server (`report.evidence` → `report.trustEvidence`) — was blocking CI (`21f149ab`)
 - CI test timeouts: assurance tests bumped to 90s for slower CI runners (`55cf6f81`)
 - Docker smoke test: added missing `studio start` CMD override (`55cf6f81`)
 
 ### Changed
+
 - README: added live CI badge, removed duplicate Product Family table (`a270701c`)
 - `package.json`: added author field for npm profile (`55cf6f81`)
 - Cleaned up 5 stale feature branches (all merged to main)
 
 ### Infrastructure
+
 - **Repo hygiene** — keywords (23), compliance file cleanup, .editorconfig, CODE_OF_CONDUCT, Dependabot, SBOM (15K lines), postinstall (`08dc22bf`)
 - Vitest 4.x upgrade, audit vulns resolved to 0, competitor traces cleanup (`fd9ee61e`)
 - 14 stale docs fixed from freshness audit (`b7fba797`)
 - Git push: all commits synced to origin/main
 
 ### Metrics
+
 - Diagnostic questions: 195 → **235**
 - Assurance packs: 119 → **147**
 - Tests: 3,645 → **4,161** (275 files)
@@ -39,6 +50,7 @@ All notable changes to AMC are documented here.
 ## [1.0.0] — 2026-03-17
 
 ### Added — Simulation & Forecast Lane Deep Implementation (2026-03-17)
+
 - **5 new scoring modules** for the Simulation & Forecast lane:
   - `forecastLegitimacy.ts` — epistemic honesty, calibration, uncertainty scoring (AMC-6.1–6.10)
   - `factSimulationBoundary.ts` — provenance separation, writeback governance (AMC-6.11–6.17, 6.37–6.42)
@@ -53,6 +65,7 @@ All notable changes to AMC are documented here.
 - Total test files: 244 → **252**
 
 ### Added — Simulation & Forecast Evaluation Lane (2026-03-16)
+
 - **57 new diagnostic questions** (AMC-6.1 → AMC-6.57) covering simulation/forecast systems
   - Forecast Legitimacy (10): uncertainty, calibration, false precision, scenario framing
   - Fact/Simulation Boundary Integrity (7): provenance tagging, evidence class separation
@@ -69,6 +82,7 @@ All notable changes to AMC are documented here.
 - Total assurance packs: 110 → **119**
 
 ### Added
+
 - Documentation + website refresh for the expanded AMC workflow surface:
   - new docs: `COMPATIBILITY_MATRIX`, `STARTER_BLUEPRINTS`, `OSS_ADOPTION_ROADMAP`
   - website/docs hub now visibly surfaces compatibility, starter blueprints, and adoption planning
@@ -77,6 +91,7 @@ All notable changes to AMC are documented here.
   - `lite-score` naming normalized in updated public docs
 
 ### Added
+
 - Agent Transparency Report (`amc transparency report`) — behavioral SBOM for AI agents
 - AMC MCP Server (`amc mcp serve`) — Model Context Protocol integration for AI coding assistants
   - 6 tools: amc_list_agents, amc_quickscore, amc_get_guide, amc_check_compliance, amc_transparency_report, amc_score_sector_pack
@@ -85,6 +100,7 @@ All notable changes to AMC are documented here.
 - `amc mcp config` — print ready-to-paste MCP configuration for supported IDEs
 - `amc mcp list-tools` — list all MCP tools with descriptions
 - **AMC Sector Packs** — 40 industry-specific assessment packs across 7 stations with 380 diagnostic questions
+
   - **7 Stations**: Environment (6), Health (9), Wealth (5), Education (5), Mobility (5), Technology (5), Governance (5)
   - **382 questions** with specific regulatory article references (e.g., `HIPAA §164.312(a)(1)`, `EU AI Act Art. 5(1)(a)`, `FERPA 20 U.S.C. §1232g`, `UNECE WP.29 R155 §7`, `UNCAC Art. 7`)
   - **Per-pack enterprise metadata**: `riskTier`, `euAIActClassification`, `sdgAlignment`, `certificationPath`, `keyRisks`, `certificationThreshold`
@@ -113,12 +129,13 @@ All notable changes to AMC are documented here.
   - 15 agent config targets with idempotent AMC-GUARDRAILS markers
   - Per-question verification commands in agent instructions
   - Getting-started tutorial for L0-L1 agents
-  - Framework auto-detection from pyproject.toml, requirements.txt, package.json, *.csproj, config files
+  - Framework auto-detection from pyproject.toml, requirements.txt, package.json, \*.csproj, config files
 - **Over-Compliance Detection** — 3 new assurance packs + 8 diagnostic questions (AMC-OC-1 through AMC-OC-8) based on H-Neurons paper (arXiv:2512.01797)
 - **Website Improvement Journey** — new section showing L1→L5 path with simple and technical modes
 - **Dashboard v13** — zero-state first-run, rich trend tooltips, crosshair, sidebar collapse, skip-link, prefers-reduced-motion (council score: 9.39/10)
 
 ### Changed
+
 - Question bank expanded: 118 → 138 questions (added Evaluation & Growth dimension)
 - Assurance packs expanded: 71 → 86 packs
 - Test count: 2656 → 3311
@@ -127,6 +144,7 @@ All notable changes to AMC are documented here.
 - Dashboard rebuilt from ground up (v11) with Linear/Vercel aesthetic
 
 ### Fixed
+
 - All 44 TypeScript errors in API routers resolved
 - Website hero-tag, capability strip, and install tab stats synchronized
 - Dashboard light mode contrast and accessibility improvements
