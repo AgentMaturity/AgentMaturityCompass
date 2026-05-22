@@ -49,8 +49,9 @@ jobs:
             -v /tmp/amc-secrets/vault.txt:/run/secrets/vault:ro \
             -v /tmp/amc-secrets/owner-user.txt:/run/secrets/owner-user:ro \
             -v /tmp/amc-secrets/owner-pass.txt:/run/secrets/owner-pass:ro \
+            --entrypoint sh \
             amc-studio:ci \
-            studio start
+            -c "amc gateway init && exec amc studio start"
 
           for i in $(seq 1 60); do
             if curl -fsS http://127.0.0.1:3212/readyz >/dev/null; then
