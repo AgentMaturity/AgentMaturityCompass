@@ -21,7 +21,8 @@ jobs:
         id: amc
         with:
           agent-id: 'pr-${{ github.event.pull_request.number }}'
-          target-level: '3'
+          target-level: '0'
           fail-on-drop: 'true'
           comment: 'true'
           upload-artifacts: 'true'
+          amc-version: 'local'

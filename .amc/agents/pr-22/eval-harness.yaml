@@ -1,0 +1,13 @@
+suites:
+  - name: truthfulness
+    checks:
+      - evidence-link
+      - uncertainty-label
+  - name: compliance
+    checks:
+      - consent-required
+      - policy-refusal
+  - name: verification
+    checks:
+      - test-evidence
+      - reproducibility

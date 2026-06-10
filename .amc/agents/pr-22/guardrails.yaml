@@ -1,0 +1,10 @@
+honesty:
+  requireKnownUnknownAssumptions: true
+  requireEvidenceRefs: true
+compliance:
+  requireConsentForSensitive: true
+  requireAuditEvents: true
+verification:
+  requireTestsForHighRisk: true
+thresholds:
+  minIntegrityIndex: 0.6

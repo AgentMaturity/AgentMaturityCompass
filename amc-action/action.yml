@@ -32,7 +32,7 @@ inputs:
     required: false
     default: '20'
   amc-version:
-    description: 'agent-maturity-compass npm version (semver or "latest")'
+    description: 'agent-maturity-compass npm version (semver, "latest", or "local" for this checkout)'
     required: false
     default: 'latest'
   working-directory:
@@ -64,7 +64,15 @@ runs:
 
     - name: Install AMC CLI
       shell: bash
-      run: npm i -g agent-maturity-compass@${{ inputs.amc-version }}
+      run: |
+        set -euo pipefail
+        if [ "${{ inputs.amc-version }}" = "local" ]; then
+          npm ci
+          npm run build
+          npm install -g "$GITHUB_WORKSPACE"
+        else
+          npm i -g agent-maturity-compass@${{ inputs.amc-version }}
+        fi
 
     - name: Initialize AMC workspace
       shell: bash
@@ -82,9 +90,10 @@ runs:
         RESULT=$(amc quickscore --json --agent "${{ inputs.agent-id }}" 2>/dev/null || echo '{"score":0,"level":"L0","dimensions":{}}')
         echo "$RESULT" > "$RESULT_PATH"
 
-        SCORE=$(echo "$RESULT" | jq -r '.score // 0')
-        LEVEL=$(echo "$RESULT" | jq -r '.level // "L0"')
+        SCORE=$(echo "$RESULT" | jq -r '.score // .percentage // 0')
+        LEVEL=$(echo "$RESULT" | jq -r '.level // .overallLevel // .preliminaryLevel // "L0"')
         LEVEL_NUM=$(echo "$LEVEL" | sed 's/L//')
+        if ! [[ "$LEVEL_NUM" =~ ^[0-9]+$ ]]; then LEVEL_NUM=0; fi
 
         echo "score=$SCORE"         >> "$GITHUB_OUTPUT"
         echo "level=$LEVEL"         >> "$GITHUB_OUTPUT"
@@ -131,6 +140,7 @@ runs:
         set -euo pipefail
         TARGET=${{ inputs.target-level }}
         LEVEL_NUM=${{ steps.run-amc.outputs.level_num }}
+        if ! [[ "$LEVEL_NUM" =~ ^[0-9]+$ ]]; then LEVEL_NUM=0; fi
         DROPPED="${{ steps.drop.outputs.dropped || 'false' }}"
         FAIL_ON_DROP="${{ inputs.fail-on-drop }}"
 
@@ -165,6 +175,7 @@ runs:
         LEVEL="${{ steps.run-amc.outputs.level }}"
         SCORE="${{ steps.run-amc.outputs.score }}"
         LEVEL_NUM=${{ steps.run-amc.outputs.level_num }}
+        if ! [[ "$LEVEL_NUM" =~ ^[0-9]+$ ]]; then LEVEL_NUM=0; fi
 
         if [ "$LEVEL_NUM" -ge 4 ]; then COLOR="brightgreen";
         elif [ "$LEVEL_NUM" -ge 3 ]; then COLOR="green";
@@ -188,8 +199,9 @@ runs:
           let result = { score: 0, level: 'L0', dimensions: {} };
           try { result = JSON.parse(fs.readFileSync(resultPath, 'utf8')); } catch {}
 
-          const score = (result.score || 0).toFixed ? result.score.toFixed(2) : result.score;
-          const level = result.level || 'L0';
+          const rawScore = result.score ?? result.percentage ?? 0;
+          const score = rawScore.toFixed ? rawScore.toFixed(2) : rawScore;
+          const level = result.level || result.overallLevel || result.preliminaryLevel || 'L0';
           const levelNum = parseInt(level.replace('L', ''));
           const targetLevel = parseInt('${{ inputs.target-level }}') || 0;
           const passed = '${{ steps.gate.outputs.passed }}' !== 'false';
@@ -200,6 +212,11 @@ runs:
           if (result.dimensions) {
             for (const [name, data] of Object.entries(result.dimensions)) {
               dimTable += `| ${name} | ${data.score} | ${data.level} |\n`;
+            }
+          } else if (Array.isArray(result.layerScores)) {
+            for (const layer of result.layerScores) {
+              const score = layer.avgLevel ?? layer.avgFinalLevel ?? layer.totalScore ?? 0;
+              dimTable += `| ${layer.layerName} | ${score} | ${level} |\n`;
             }
           }
 
