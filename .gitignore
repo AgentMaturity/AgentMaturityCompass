@@ -28,6 +28,9 @@ Thumbs.db
 .amc/release/working/
 .amc/local-vault-passphrase
 .amc/industry-packs-access.json
+.amc/agents/
+!.amc/agents/default/
+!.amc/agents/default/**
 .amc/vault.amcvault
 .amc/vault.amcvault.meta.json
 .amc/decision-receipts/
