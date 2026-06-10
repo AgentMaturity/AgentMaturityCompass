@@ -87,7 +87,12 @@ runs:
         set -euo pipefail
         RESULT_PATH="${RUNNER_TEMP}/amc-result.json"
 
-        RESULT=$(amc quickscore --json --agent "${{ inputs.agent-id }}" 2>/dev/null || echo '{"score":0,"level":"L0","dimensions":{}}')
+        extract_json() {
+          node -e 'let s="";process.stdin.setEncoding("utf8");process.stdin.on("data",c=>{s+=c;});process.stdin.on("end",()=>{const fallback={score:0,level:"L0",dimensions:{}};const start=s.indexOf("{");if(start<0){console.log(JSON.stringify(fallback));return;}let depth=0,inString=false,escape=false,end=-1;for(let i=start;i<s.length;i++){const ch=s[i];if(escape){escape=false;continue;}if(ch==="\\"){escape=true;continue;}if(ch==="\""){inString=!inString;continue;}if(inString)continue;if(ch==="{")depth++;if(ch==="}"){depth--;if(depth===0){end=i+1;break;}}}if(end<0){console.log(JSON.stringify(fallback));return;}const candidate=s.slice(start,end);try{JSON.parse(candidate);console.log(candidate);}catch{console.log(JSON.stringify(fallback));}});'
+        }
+
+        RAW_RESULT=$(amc quickscore --rapid --json --agent "${{ inputs.agent-id }}" 2>/dev/null || true)
+        RESULT=$(printf '%s\n' "$RAW_RESULT" | extract_json)
         echo "$RESULT" > "$RESULT_PATH"
 
         SCORE=$(echo "$RESULT" | jq -r '.score // .percentage // 0')
@@ -114,14 +119,23 @@ runs:
       working-directory: ${{ inputs.working-directory }}
       run: |
         set -euo pipefail
+        extract_json() {
+          node -e 'let s="";process.stdin.setEncoding("utf8");process.stdin.on("data",c=>{s+=c;});process.stdin.on("end",()=>{const fallback={score:0,level:"L0",dimensions:{}};const start=s.indexOf("{");if(start<0){console.log(JSON.stringify(fallback));return;}let depth=0,inString=false,escape=false,end=-1;for(let i=start;i<s.length;i++){const ch=s[i];if(escape){escape=false;continue;}if(ch==="\\"){escape=true;continue;}if(ch==="\""){inString=!inString;continue;}if(inString)continue;if(ch==="{")depth++;if(ch==="}"){depth--;if(depth===0){end=i+1;break;}}}if(end<0){console.log(JSON.stringify(fallback));return;}const candidate=s.slice(start,end);try{JSON.parse(candidate);console.log(candidate);}catch{console.log(JSON.stringify(fallback));}});'
+        }
+
         # Checkout base branch, score it, compare
         git fetch origin "${{ github.base_ref }}" --depth=1 2>/dev/null || true
-        BASE_RESULT=$(git stash && git checkout "origin/${{ github.base_ref }}" -- . 2>/dev/null && \
-          amc quickscore --json --agent "${{ inputs.agent-id }}" 2>/dev/null || echo '{"score":0}')
-        git checkout - -- . 2>/dev/null || true
+        git stash push -u -m "amc-action-base-comparison" >/dev/null 2>&1 || true
+        if git checkout "origin/${{ github.base_ref }}" -- . 2>/dev/null; then
+          RAW_BASE_RESULT=$(amc quickscore --rapid --json --agent "${{ inputs.agent-id }}" 2>/dev/null || true)
+        else
+          RAW_BASE_RESULT='{"score":0,"level":"L0","dimensions":{}}'
+        fi
+        git restore --source=HEAD --staged --worktree . 2>/dev/null || true
         git stash pop 2>/dev/null || true
+        BASE_RESULT=$(printf '%s\n' "$RAW_BASE_RESULT" | extract_json)
 
-        BASE_SCORE=$(echo "$BASE_RESULT" | jq -r '.score // 0')
+        BASE_SCORE=$(echo "$BASE_RESULT" | jq -r '.score // .percentage // 0')
         HEAD_SCORE="${{ steps.run-amc.outputs.score }}"
 
         echo "base_score=$BASE_SCORE" >> "$GITHUB_OUTPUT"
