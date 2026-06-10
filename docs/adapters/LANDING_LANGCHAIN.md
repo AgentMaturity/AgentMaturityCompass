@@ -12,7 +12,7 @@ LangChain gives you agent orchestration. AMC gives you trust evidence for what t
 amc wrap langchain -- python my_agent.py
 
 # Score it
-amc quickscore
+amc
 
 # See what gaps exist
 amc fix
@@ -31,5 +31,5 @@ amc fix
 
 ## Next steps
 - `docs/START_HERE.md`
-- `docs/AFTER_QUICKSCORE.md`
+- `docs/AFTER_FIRST_SCORE.md`
 - `docs/CI_TEMPLATES.md`

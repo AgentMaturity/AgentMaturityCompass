@@ -111,6 +111,116 @@ export async function handleFleetRoute(
     return true;
   }
 
+  // GET /api/v1/fleet/graph — inspect latest typed multi-agent graph
+  if (pathname === '/api/v1/fleet/graph' && method === 'GET') {
+    try {
+      const {
+        loadLatestTypedMultiAgentGraph,
+        typedMultiAgentGraphRef,
+      } = await import('../fleet/typedGraph.js');
+      const graph = loadLatestTypedMultiAgentGraph(workspace);
+      if (!graph) {
+        apiSuccess(res, { graph: null, ref: null });
+        return true;
+      }
+      apiSuccess(res, { graph, ref: typedMultiAgentGraphRef({ workspace, graph }) });
+    } catch (err) {
+      apiError(res, 500, err instanceof Error ? err.message : 'Could not inspect typed graph');
+    }
+    return true;
+  }
+
+  // POST /api/v1/fleet/graph — write latest typed multi-agent graph
+  if (pathname === '/api/v1/fleet/graph' && method === 'POST') {
+    try {
+      const body = await bodyJson<{ graph?: unknown }>(req);
+      if (!body.graph) {
+        apiError(res, 400, 'Required: graph');
+        return true;
+      }
+      const { writeTypedMultiAgentGraph } = await import('../fleet/typedGraph.js');
+      const written = writeTypedMultiAgentGraph({ workspace, graph: body.graph });
+      apiSuccess(res, written, 201);
+    } catch (err) {
+      apiError(res, 400, err instanceof Error ? err.message : 'Could not write typed graph');
+    }
+    return true;
+  }
+
+  // GET /api/v1/fleet/graph/validate — validate latest typed multi-agent graph
+  if (pathname === '/api/v1/fleet/graph/validate' && method === 'GET') {
+    try {
+      const {
+        loadLatestTypedMultiAgentGraph,
+        typedMultiAgentGraphRef,
+        validateTypedMultiAgentGraph,
+      } = await import('../fleet/typedGraph.js');
+      const graph = loadLatestTypedMultiAgentGraph(workspace);
+      if (!graph) {
+        apiSuccess(res, {
+          graph: null,
+          ref: null,
+          validation: {
+            valid: false,
+            summary: 'No typed multi-agent graph has been written.',
+            issueCount: 1,
+            issues: [{
+              code: 'invalid_schema',
+              severity: 'error',
+              message: 'No typed multi-agent graph has been written.',
+              evidenceRefs: []
+            }]
+          }
+        });
+        return true;
+      }
+      apiSuccess(res, {
+        graph,
+        ref: typedMultiAgentGraphRef({ workspace, graph }),
+        validation: validateTypedMultiAgentGraph(graph)
+      });
+    } catch (err) {
+      apiError(res, 500, err instanceof Error ? err.message : 'Could not validate typed graph');
+    }
+    return true;
+  }
+
+  // GET /api/v1/fleet/lifecycle — list parent fleet lifecycle artifacts
+  if (pathname === '/api/v1/fleet/lifecycle' && method === 'GET') {
+    try {
+      const limit = Number.parseInt(queryParam(req.url ?? '', 'limit') ?? '20', 10);
+      const redacted = queryParam(req.url ?? '', 'redacted') !== 'false';
+      const { listFleetLifecycleRunArtifacts } = await import('../fleet/fleetLifecycle.js');
+      const runs = listFleetLifecycleRunArtifacts({
+        workspace,
+        limit: Number.isFinite(limit) && limit > 0 ? limit : 20,
+        redacted
+      });
+      apiSuccess(res, { runs, total: runs.length });
+    } catch (err) {
+      apiError(res, 500, err instanceof Error ? err.message : 'Could not list fleet lifecycle runs');
+    }
+    return true;
+  }
+
+  // GET /api/v1/fleet/lifecycle/:selector — inspect parent fleet lifecycle artifact
+  const fleetLifecycleParams = pathParam(pathname, '/api/v1/fleet/lifecycle/:selector');
+  if (fleetLifecycleParams && method === 'GET') {
+    try {
+      const redacted = queryParam(req.url ?? '', 'redacted') !== 'false';
+      const { loadFleetLifecycleRunArtifact } = await import('../fleet/fleetLifecycle.js');
+      const run = loadFleetLifecycleRunArtifact({
+        workspace,
+        selector: decodeURIComponent(fleetLifecycleParams.selector!),
+        redacted
+      });
+      apiSuccess(res, run);
+    } catch (err) {
+      apiError(res, 404, err instanceof Error ? err.message : 'Fleet lifecycle run not found');
+    }
+    return true;
+  }
+
   // POST /api/v1/fleet/init — initialize fleet
   if (pathname === '/api/v1/fleet/init' && method === 'POST') {
     try {

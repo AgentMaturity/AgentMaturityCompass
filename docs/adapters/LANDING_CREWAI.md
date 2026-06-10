@@ -6,7 +6,7 @@ You already use CrewAI. AMC wraps it — zero code changes.
 
 ```bash
 amc wrap crewai -- python crew.py
-amc quickscore
+amc
 amc fix
 ```
 
@@ -21,4 +21,4 @@ amc fix
 
 ## Next steps
 - `docs/START_HERE.md`
-- `docs/AFTER_QUICKSCORE.md`
+- `docs/AFTER_FIRST_SCORE.md`

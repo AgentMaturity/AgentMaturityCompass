@@ -12,7 +12,7 @@ The full AMC trust stack is free and MIT licensed. Enterprise adds:
 ## What is already free
 
 Everything else:
-- Score, Shield, Enforce, Vault, Watch, Fleet, Passport, Comply
+- Score, Shield, Enforce, Vault, Watch, Comply, Fleet, Passport
 - All 14 framework adapters
 - 481 CLI commands
 - 138 diagnostic questions

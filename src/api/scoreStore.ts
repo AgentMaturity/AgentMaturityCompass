@@ -3,7 +3,7 @@ import { join, resolve } from "node:path";
 import type Database from "better-sqlite3";
 import { ensureDir } from "../utils/fs.js";
 import { closeSqlitePool, getOrCreateSqlitePool } from "../storage/sqlitePool.js";
-import { questionBank } from "../diagnostic/questionBank.js";
+import { allKnownQuestions } from "../diagnostic/questionSets.js";
 
 export interface DiagAnswerRecord {
   value: number;
@@ -19,7 +19,7 @@ export interface DiagSession {
 }
 
 const poolKeys = new Map<string, string>();
-const VALID_QUESTION_IDS = new Set(questionBank.map((question) => question.id));
+const VALID_QUESTION_IDS = new Set(allKnownQuestions().map((question) => question.id));
 const MIN_SCORE_VALUE = 0;
 const MAX_SCORE_VALUE = 5;
 const MAX_NOTES_LENGTH = 2000;

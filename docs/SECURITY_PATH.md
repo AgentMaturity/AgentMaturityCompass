@@ -15,7 +15,7 @@
 
 ## Best path
 1. `docs/START_HERE.md`
-2. `docs/AFTER_QUICKSCORE.md`
+2. `docs/AFTER_FIRST_SCORE.md`
 3. `docs/PRODUCT_EDITIONS.md`
 4. `docs/PRICING.md`
 5. `docs/DEPLOYMENT_OPTIONS.md`

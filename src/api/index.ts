@@ -18,6 +18,7 @@ import { handleFleetRoute } from './fleetRouter.js';
 import { handlePassportRoute } from './passportRouter.js';
 import { handleIncidentRoute } from './incidentRouter.js';
 import { handleEvidenceRoute } from './evidenceRouter.js';
+import { handleFixerRoute } from './fixerRouter.js';
 import { handleGatewayRoute } from './gatewayRouter.js';
 import { handleConfigRoute } from './configRouter.js';
 import { handleDriftRoute } from './driftRouter.js';
@@ -25,6 +26,11 @@ import { handleSandboxRoute } from './sandboxRouter.js';
 import { handleCiRoute } from './ciRouter.js';
 import { handleBenchmarkRoute } from './benchmarkRouter.js';
 import { handleWorkflowRoute } from './workflowRouter.js';
+import { handleOrgRunRoute } from './orgRunRouter.js';
+import { handleFirewallRoute } from './firewallRouter.js';
+import { handleRuntimeRoute } from './runtimeRouter.js';
+import { handleImporterRoute } from './importerRouter.js';
+import { handleStrategyRoute } from './strategyRouter.js';
 import { handleGovernorRoute } from './governorRouter.js';
 import { handleAdaptersRoute } from './adaptersRouter.js';
 import { handleToolsRoute } from './toolsRouter.js';
@@ -61,9 +67,17 @@ export async function handleApiRoute(
     if (pathname.startsWith('/api/v1/fleet/') || pathname === '/api/v1/fleet')
       return await handleFleetRoute(pathname, method, req, res, workspace);
 
+    // ── Org runner: advanced Fleet/Watch/Vault lifecycle workspaces ──
+    if (pathname.startsWith('/api/v1/org/') || pathname === '/api/v1/org')
+      return await handleOrgRunRoute(pathname, method, req, res, workspace);
+
     // ── Evidence lifecycle ────────────────────────────────────────
     if (pathname.startsWith('/api/v1/evidence/') || pathname === '/api/v1/evidence')
       return await handleEvidenceRoute(pathname, method, req, res, workspace);
+
+    // ── Fixer RCA: Watch failure mining -> Enforce repair proposals ─
+    if (pathname.startsWith('/api/v1/fixer/') || pathname === '/api/v1/fixer')
+      return await handleFixerRoute(pathname, method, req, res, workspace);
 
     // ── Vault, DLP, key management ───────────────────────────────
     if (pathname.startsWith('/api/v1/vault/') || pathname === '/api/v1/vault')
@@ -76,6 +90,22 @@ export async function handleApiRoute(
     // ── Gateway / LLM proxy ───────────────────────────────────────
     if (pathname.startsWith('/api/v1/gateway/') || pathname === '/api/v1/gateway')
       return await handleGatewayRoute(pathname, method, req, res, workspace);
+
+    // ── Runtime Firewall: live Enforce/Shield/Watch protection ─────
+    if (pathname.startsWith('/api/v1/firewall/') || pathname === '/api/v1/firewall')
+      return await handleFirewallRoute(pathname, method, req, res, workspace);
+
+    // ── Runtime Run Manager: connected-agent state and event stream ──
+    if (pathname.startsWith('/api/v1/runtime/') || pathname === '/api/v1/runtime')
+      return await handleRuntimeRoute(pathname, method, req, res, workspace);
+
+    // ── Neutral importers: traces, runs, graphs, configs, memory, evals ──
+    if (pathname.startsWith('/api/v1/imports'))
+      return await handleImporterRoute(pathname, method, req, res, workspace);
+
+    // ── Inference strategy comparisons and governed route receipts ──
+    if (pathname.startsWith('/api/v1/strategy'))
+      return await handleStrategyRoute(pathname, method, req, res, workspace);
 
     // ── Runtime config + logs ─────────────────────────────────────
     if (pathname.startsWith('/api/v1/config/') || pathname === '/api/v1/config')
@@ -99,11 +129,11 @@ export async function handleApiRoute(
 
     // ── Shield ────────────────────────────────────────────────────
     if (pathname.startsWith('/api/v1/shield/'))
-      return await handleShieldRoute(pathname, method, req, res);
+      return await handleShieldRoute(pathname, method, req, res, workspace);
 
     // ── Enforce ───────────────────────────────────────────────────
     if (pathname.startsWith('/api/v1/enforce/'))
-      return await handleEnforceRoute(pathname, method, req, res);
+      return await handleEnforceRoute(pathname, method, req, res, workspace);
 
     // ── Agent timeline ────────────────────────────────────────────
     if (pathname.startsWith('/api/v1/agents/'))

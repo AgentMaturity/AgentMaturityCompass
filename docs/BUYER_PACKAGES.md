@@ -18,7 +18,7 @@ Best fit:
 ## Enterprise security / governance team
 Best fit:
 - Enterprise
-- focus on Enforce, Vault, Watch, Fleet, Passport, Comply
+- focus on Enforce, Vault, Watch, Comply, Fleet, Passport
 
 ## OSS maintainer / ecosystem partner
 Best fit:

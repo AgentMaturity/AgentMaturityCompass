@@ -5,6 +5,11 @@ import { presetGatewayConfigForProvider, saveGatewayConfig, signGatewayConfig, t
 import { pathExists } from "../utils/fs.js";
 import { initWorkspace } from "../workspace.js";
 import { detectFrameworksForOnboarding as detectFrameworks, type FrameworkDetection } from "./setupWizard.js";
+import {
+  createOnboardingState,
+  saveOnboardingState,
+  setOnboardingStep
+} from "./onboardingState.js";
 
 type ProviderId = "openai" | "anthropic" | "gemini" | "groq" | "mistral" | "together" | "openrouter";
 type ProviderPresetName = "OpenAI" | "Anthropic" | "Gemini" | "Groq" | "Mistral" | "Together AI" | "OpenRouter";
@@ -226,6 +231,21 @@ export async function runQuickSetup(options: QuickSetupOptions): Promise<QuickSe
   const configPath = saveGatewayConfig(workspace, config);
   signGatewayConfig(workspace);
   const baseUrl = renderBaseUrl(config);
+
+  let onboarding = createOnboardingState({
+    workspace,
+    agentId: "default",
+    mode: "cli",
+    status: "in_progress",
+    provider: selectedProvider.displayName,
+    detectedFrameworks: frameworks.map((framework) => framework.framework)
+  });
+  onboarding = setOnboardingStep(onboarding, "detect", "complete", `${frameworks.length} framework signal(s), ${detectedProviderIds.size} provider key(s).`);
+  onboarding = setOnboardingStep(onboarding, "workspace", "complete", bootstrapped ? "Created .amc workspace." : "Existing workspace reused.");
+  onboarding = setOnboardingStep(onboarding, "provider", "complete", `${selectedProvider.displayName} gateway preset saved.`);
+  onboarding = setOnboardingStep(onboarding, "score", "pending", "Run `amc` to generate the full score.");
+  onboarding = setOnboardingStep(onboarding, "studio", "pending", "Run `amc up` to open Studio.");
+  saveOnboardingState(workspace, onboarding);
 
   logger.log(`Configured gateway for ${selectedProvider.displayName}`);
   logger.log(`Gateway config: ${configPath}`);

@@ -31,7 +31,7 @@ AMC is strongest when compared honestly.
 | | Prompt security tools | AMC |
 |---|---|---|
 | Scope | Prompt injection testing | Full trust stack: scoring, assurance, governance, monitoring, compliance |
-| Product surface | Single-focus | Score, Shield, Enforce, Vault, Watch, Fleet, Passport, Comply |
+| Product surface | Single-focus | Score, Shield, Enforce, Vault, Watch, Comply, Fleet, Passport |
 | Evidence model | Pass/fail per test | Weighted evidence with integrity verification |
 | Maturity model | None | L0–L5 with clear progression and evidence gates |
 | Domain coverage | Generic | 40 industry-specific domain packs (health, wealth, education, mobility, etc.) |

@@ -39,6 +39,6 @@ That is the whole AMC thesis:
 
 ## Read next
 - `docs/START_HERE.md`
-- `docs/AFTER_QUICKSCORE.md`
+- `docs/AFTER_FIRST_SCORE.md`
 - `docs/COMPARE_AMC.md`
 - `docs/PRODUCT_EDITIONS.md`

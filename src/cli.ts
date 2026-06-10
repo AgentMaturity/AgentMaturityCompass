@@ -11,12 +11,20 @@ import { guardCheck } from "./guardrails/guardEngine.js";
 import { openLedger, verifyLedgerIntegrity } from "./ledger/ledger.js";
 import { startMonitor, superviseProcess, wrapAny, wrapRuntime } from "./ledger/monitor.js";
 import { compareRuns, compareModels, generateReport, loadRunReport, runDiagnostic } from "./diagnostic/runner.js";
+import type { DiagnosticReport } from "./types.js";
 import { loadTargetProfile, loadTargetProfileFromFile, setTargetProfileInteractive, verifyTargetProfileSignature } from "./targets/targetProfile.js";
 import { runTuneWizard, runUpgradeWizard } from "./tuning/tuneWizard.js";
 import { loadContextGraph } from "./context/contextGraph.js";
 import { applyAMCConfigProfile, initWorkspace, loadAMCConfig, quickstartWizard, runDoctor, saveAMCConfig } from "./workspace.js";
 import { runDoctorCli } from "./doctor/doctorCli.js";
-import { cliDiscoverabilityFooter, flattenCommandPaths, parseUnknownCommandToken, suggestCommandPaths } from "./cliUx.js";
+import {
+  buildCommandInventory,
+  cliDiscoverabilityFooter,
+  flattenCommandPaths,
+  parseUnknownCommandToken,
+  renderCommandInventoryMarkdown,
+  suggestCommandPaths
+} from "./cliUx.js";
 import {
   bindAgentRoute,
   initGatewayConfig,
@@ -29,6 +37,38 @@ import {
 import { gatewayStatus, startGateway } from "./gateway/server.js";
 import { sha256Hex } from "./utils/hash.js";
 import { canonicalize } from "./utils/json.js";
+import {
+  buildEnforceResourceManifest,
+  diffEnforceResourceManifests,
+  enforceResourceManifestRef,
+  applyEnforceResourceLifecycle,
+  enforceResourceLifecycleContract,
+  evaluateEnforceResourceLifecycle,
+  type EnforceResourceDiff,
+  type EnforceResourceEvaluation,
+  type EnforceResourceHistoryEntry,
+  type EnforceResourceManifestRef,
+  type EnforceResourcePolicyGate,
+  type EnforceResourceProposal,
+  type EnforceResourceRestorePlan,
+  type EnforceResourceValidation,
+  inspectEnforceResource,
+  latestEnforceResourceManifestPath,
+  listEnforceResourceHistory,
+  listEnforceResources,
+  loadEnforceResourceManifest,
+  proposeEnforceResourceLifecycle,
+  restoreEnforceResourceSnapshot,
+  validateEnforceResourceLifecycle,
+  verifyEnforceResourceManifest,
+  writeEnforceResourceManifest
+} from "./enforce/resourceManifest.js";
+import { exportEpisodeRecord, listEpisodeRecords, loadEpisodeRecord, writeEpisodeRecord } from "./lifecycle/episodeRecord.js";
+import { listDecisionReceipts, loadDecisionReceipt, observeDecisionOutcomes, writeDecisionReceipts, type DecisionReceipt } from "./lifecycle/decisionReceipt.js";
+import { exportFindingProofs, listFindingProofs, loadFindingProof, writeFindingProofs } from "./lifecycle/findingProof.js";
+import { exportLifecycleChangeReceipts, listLifecycleChangeReceipts, loadLifecycleChangeReceipt, writeLifecycleChangeReceipts } from "./lifecycle/changeReceipt.js";
+import { exportLifecycleRunArtifact, listLifecycleRunArtifacts, loadLifecycleRunArtifact, writeLifecycleRunArtifact } from "./lifecycle/lifecycleRunArtifact.js";
+import { listObservabilityLaneRecords, loadObservabilityLaneRecord, writeObservabilityLaneRecord } from "./lifecycle/observabilityLane.js";
 import { getPrivateKeyPem, signHexDigest } from "./crypto/keys.js";
 import { computeIncidentHash, createIncidentStore } from "./incidents/incidentStore.js";
 import {
@@ -49,7 +89,15 @@ import { getProviderTemplateById, listProviderTemplates, providerTemplateChoices
 import { runSandboxCommand } from "./sandbox/sandbox.js";
 import { attestIngestSession, ingestEvidence, type IngestType } from "./ingest/ingest.js";
 import { generateFleetReport } from "./fleet/report.js";
-import { evaluateFleet, renderFleetScoringMarkdown } from "./fleet/fleetScoring.js";
+import { evaluateFleet, renderFleetScoringMarkdown, type FleetScoreProgressEvent } from "./fleet/fleetScoring.js";
+import { listFleetLifecycleRunArtifacts, loadFleetLifecycleRunArtifact } from "./fleet/fleetLifecycle.js";
+import {
+  listTypedMultiAgentGraphs,
+  loadLatestTypedMultiAgentGraph,
+  typedMultiAgentGraphRef,
+  validateTypedMultiAgentGraph,
+  writeTypedMultiAgentGraph
+} from "./fleet/typedGraph.js";
 import {
   applyFleetGovernancePolicy,
   buildFleetHealthDashboard,
@@ -169,6 +217,14 @@ import { buildConnectInstructions } from "./studio/connectWizard.js";
 import { runStudioForeground, startStudioDaemon, stopStudioDaemon, studioStatus } from "./studio/studioSupervisor.js";
 import { readAdminToken, readStudioState, studioLogsDir } from "./studio/studioState.js";
 import { fixSignatures, inspectSignatures } from "./studio/signatures.js";
+import {
+  completeOnboarding,
+  createOnboardingState,
+  failOnboarding,
+  saveOnboardingState,
+  setOnboardingStep,
+  type OnboardingState
+} from "./setup/onboardingState.js";
 import { createUnifiedClaritySnapshot } from "./snapshot/snapshot.js";
 import { initLoop, loopPlan, loopRun, loopSchedule } from "./loop/loop.js";
 import {
@@ -426,6 +482,9 @@ import {
   experimentCreateCli,
   experimentGateCli,
   experimentListCli,
+  experimentOptimizeCli,
+  experimentOptimizerListCli,
+  experimentOptimizerShowCli,
   experimentRunCli,
   experimentSetBaselineCli,
   experimentSetCandidateCli
@@ -449,6 +508,31 @@ import {
   orgUnassignCli,
   orgVerifyCli
 } from "./org/orgCli.js";
+import { listOrgRuns, loadOrgRun, orgRunRoleDefinitions, orgRunSummaryForUi, parseOrgRoleList, runOrg } from "./org/orgRun.js";
+import {
+  evaluateRuntimeFirewall,
+  exportRuntimeFirewallDecisions,
+  listRuntimeFirewallDecisions,
+  runtimeFirewallStatus,
+  writeRuntimeFirewallPolicy,
+  type RuntimeFirewallDirection,
+  type RuntimeFirewallMode
+} from "./runtime/firewall.js";
+import {
+  appendRuntimeRunEvent,
+  cancelRuntimeRun,
+  completeRuntimeRun,
+  createRuntimeRun,
+  exportRuntimeRunEvents,
+  inspectRuntimeRun,
+  listRuntimeRuns,
+  markRuntimeRunDegraded,
+  resumeRuntimeRun,
+  runtimeRunStatus,
+  type RuntimeRunEventType,
+  type RuntimeRunSeverity,
+  type RuntimeRunSource
+} from "./runtime/runManager.js";
 import {
   transformAttestCli,
   transformAttestVerifyCli,
@@ -1147,7 +1231,17 @@ function renderInstantFullScore(
   report: Awaited<ReturnType<typeof runDiagnostic>>,
   elapsedMs: number,
   state: InstantWorkspaceState,
-  opts: { json?: boolean } = {}
+  opts: {
+    json?: boolean;
+    lifecycleArtifactPath?: string;
+    episodeRecordPath?: string;
+    findingProofsPath?: string;
+    lifecycleReceiptsPath?: string;
+    observabilityPath?: string;
+    reportJsonPath?: string;
+    reportMarkdownPath?: string;
+    studioEvidenceUrl?: string | null;
+  } = {}
 ): void {
   const avgLevel = diagnosticAverageLevel(report);
   const score100 = Math.round((avgLevel / 5) * 100);
@@ -1180,7 +1274,21 @@ function renderInstantFullScore(
       createdWorkspace: state.createdWorkspace,
       createdAgentContext: state.createdAgentContext,
       signed: !state.vault.noSign,
-      vaultReason: state.vault.reason
+      vaultReason: state.vault.reason,
+      freshness: "generated-now",
+      firstResultSla: {
+        targetMs: 120_000,
+        elapsedMs,
+        met: elapsedMs <= 120_000
+      },
+      reportJsonPath: opts.reportJsonPath ?? null,
+      reportMarkdownPath: opts.reportMarkdownPath ?? null,
+      lifecycleArtifactPath: opts.lifecycleArtifactPath ?? null,
+      episodeRecordPath: opts.episodeRecordPath ?? null,
+      findingProofsPath: opts.findingProofsPath ?? null,
+      lifecycleReceiptsPath: opts.lifecycleReceiptsPath ?? null,
+      observabilityPath: opts.observabilityPath ?? null,
+      studioEvidenceUrl: opts.studioEvidenceUrl ?? null
     }, null, 2));
     return;
   }
@@ -1217,9 +1325,137 @@ function renderInstantFullScore(
   if (state.vault.reason) {
     console.log(chalk.yellow(`  ${state.vault.reason}`));
   }
+  if (opts.lifecycleArtifactPath) {
+    console.log(chalk.gray(`  Lifecycle artifact: ${opts.lifecycleArtifactPath}`));
+  }
+  if (opts.episodeRecordPath) {
+    console.log(chalk.gray(`  Episode record:     ${opts.episodeRecordPath}`));
+  }
+  if (opts.findingProofsPath) {
+    console.log(chalk.gray(`  Finding proofs:     ${opts.findingProofsPath}`));
+  }
+  if (opts.lifecycleReceiptsPath) {
+    console.log(chalk.gray(`  Change receipts:    ${opts.lifecycleReceiptsPath}`));
+  }
+  if (opts.observabilityPath) {
+    console.log(chalk.gray(`  Observability:      ${opts.observabilityPath}`));
+  }
+  if (opts.reportMarkdownPath) {
+    console.log(chalk.gray(`  Report:             ${opts.reportMarkdownPath}`));
+  } else if (opts.reportJsonPath) {
+    console.log(chalk.gray(`  Report:             ${opts.reportJsonPath}`));
+  }
+  if (opts.studioEvidenceUrl) {
+    console.log(chalk.gray(`  Studio Evidence:    ${opts.studioEvidenceUrl}`));
+  } else {
+    console.log(chalk.gray("  Studio Evidence:    amc up  # then open /console/evidence"));
+  }
   console.log(chalk.gray("  Next: amc up        # open Studio"));
+  console.log(chalk.gray("        amc evidence lifecycle list"));
   console.log(chalk.gray("        amc shell     # interactive command shell"));
   console.log("");
+}
+
+function instantRunOutputRefs(workspace: string, agentId: string, runId: string, params: {
+  lifecycleArtifactPath?: string;
+  episodeRecordPath?: string;
+  findingProofsPath?: string;
+  lifecycleReceiptsPath?: string;
+  observabilityPath?: string;
+}): {
+  lifecycleArtifactPath?: string;
+  episodeRecordPath?: string;
+  findingProofsPath?: string;
+  lifecycleReceiptsPath?: string;
+  observabilityPath?: string;
+  reportJsonPath: string;
+  reportMarkdownPath: string;
+  studioEvidenceUrl: string | null;
+} {
+  const agentPaths = getAgentPaths(workspace, agentId);
+  const studio = studioStatus(workspace);
+  const encodedAgent = encodeURIComponent(agentId);
+  const studioEvidenceUrl = studio.running && studio.state
+    ? `http://${studio.state.host}:${studio.state.apiPort}/console/evidence?agent=${encodedAgent}`
+    : null;
+  return {
+    lifecycleArtifactPath: params.lifecycleArtifactPath,
+    episodeRecordPath: params.episodeRecordPath,
+    findingProofsPath: params.findingProofsPath,
+    lifecycleReceiptsPath: params.lifecycleReceiptsPath,
+    observabilityPath: params.observabilityPath,
+    reportJsonPath: join(agentPaths.runsDir, `${runId}.json`),
+    reportMarkdownPath: join(agentPaths.reportsDir, `${runId}.md`),
+    studioEvidenceUrl
+  };
+}
+
+function startInstantOnboarding(workspace: string, agentId: string, state: InstantWorkspaceState): OnboardingState {
+  let onboarding = createOnboardingState({
+    workspace,
+    agentId,
+    mode: "cli",
+    status: "in_progress"
+  });
+  onboarding = setOnboardingStep(onboarding, "detect", "complete", `Agent '${agentId}' selected.`);
+  onboarding = setOnboardingStep(
+    onboarding,
+    "workspace",
+    "complete",
+    state.createdWorkspace
+      ? "Created .amc workspace automatically."
+      : state.createdAgentContext
+        ? "Created missing agent context automatically."
+        : "Existing workspace reused."
+  );
+  onboarding = setOnboardingStep(onboarding, "provider", "skipped", "No provider setup required for local full-score generation.");
+  onboarding = setOnboardingStep(onboarding, "score", "running", "Full 240-question score is running.");
+  return saveOnboardingState(workspace, onboarding);
+}
+
+function completeInstantOnboarding(workspace: string, onboarding: OnboardingState, refs: OnboardingState["refs"]): void {
+  let next = setOnboardingStep(onboarding, "score", "complete", "Full score generated.");
+  next = setOnboardingStep(
+    next,
+    "studio",
+    refs.studioEvidenceUrl ? "complete" : "skipped",
+    refs.studioEvidenceUrl ? "Studio Evidence page is available." : "Run `amc up` to open Studio Evidence."
+  );
+  saveOnboardingState(workspace, completeOnboarding(next, refs));
+}
+
+function failInstantOnboarding(workspace: string, onboarding: OnboardingState | null, error: string): void {
+  if (!onboarding) {
+    return;
+  }
+  saveOnboardingState(workspace, failOnboarding(setOnboardingStep(onboarding, "score", "failed", error), error));
+}
+
+function writeObservabilityLaneForScoreRun(input: {
+  workspace: string;
+  report: DiagnosticReport;
+  source: "cli" | "studio" | "api" | "ci";
+  command: string;
+  decisionReceipts: DecisionReceipt[];
+  resourceManifestRefs: EnforceResourceManifestRef[];
+  lifecycleReceiptIds: string[];
+}) {
+  const observed = observeDecisionOutcomes({
+    workspace: input.workspace,
+    agentId: input.report.agentId,
+    report: input.report
+  });
+  return writeObservabilityLaneRecord({
+    workspace: input.workspace,
+    report: input.report,
+    source: input.source,
+    command: input.command,
+    episodeIds: [`episode-${input.report.runId}`],
+    lifecycleReceiptIds: input.lifecycleReceiptIds,
+    resourceManifests: input.resourceManifestRefs,
+    decisionReceipts: [...observed.updatedReceipts, ...input.decisionReceipts],
+    observedDecisionReceiptIds: observed.updatedReceipts.map((receipt) => receipt.receiptId)
+  });
 }
 
 async function runInstantFullScoreForAgent(params: { workspace: string; agentId: string; json?: boolean }): Promise<void> {
@@ -1227,8 +1463,10 @@ async function runInstantFullScoreForAgent(params: { workspace: string; agentId:
   const releaseLock = await acquireInstantScoreLock(params.workspace);
   const previousNoSign = process.env.AMC_NO_SIGN;
   let state: InstantWorkspaceState | null = null;
+  let onboarding: OnboardingState | null = null;
   try {
     state = ensureInstantWorkspace(params.workspace, params.agentId);
+    onboarding = startInstantOnboarding(params.workspace, params.agentId, state);
     if (state.vault.noSign) {
       process.env.AMC_NO_SIGN = "1";
     }
@@ -1240,7 +1478,88 @@ async function runInstantFullScoreForAgent(params: { workspace: string; agentId:
       claimMode: "auto",
       noSign: state.vault.noSign
     });
-    renderInstantFullScore(report, Date.now() - started, state, { json: params.json });
+    const elapsedMs = Date.now() - started;
+    const resourceManifest = writeEnforceResourceManifest({
+      workspace: params.workspace,
+      agentId: params.agentId
+    });
+    const resourceRef = enforceResourceManifestRef(resourceManifest);
+    const decisions = writeDecisionReceipts({
+      workspace: params.workspace,
+      report,
+      command: "amc",
+      resourceManifestIds: [resourceRef.manifestId]
+    });
+    const findingProofs = writeFindingProofs({
+      workspace: params.workspace,
+      report,
+      command: "amc",
+      episodeIds: [`episode-${report.runId}`],
+      resourceManifestIds: [resourceRef.manifestId],
+      decisionReceipts: decisions.receipts
+    });
+    const lifecycleReceipts = writeLifecycleChangeReceipts({
+      workspace: params.workspace,
+      report,
+      command: "amc",
+      resourceManifestIds: [resourceRef.manifestId],
+      decisionReceipts: decisions.receipts,
+      findingProofs: [findingProofs.proofSetRef]
+    });
+    const observability = writeObservabilityLaneForScoreRun({
+      workspace: params.workspace,
+      report,
+      source: "cli",
+      command: "amc",
+      decisionReceipts: decisions.receipts,
+      resourceManifestRefs: [resourceRef],
+      lifecycleReceiptIds: lifecycleReceipts.receipts.map((receipt) => receipt.receiptId)
+    });
+    const episode = writeEpisodeRecord({
+      workspace: params.workspace,
+      report,
+      source: "cli",
+      command: "amc",
+      resourceManifestIds: [resourceRef.manifestId],
+      receipts: lifecycleReceipts.receipts.map((receipt) => receipt.receiptId),
+      observabilityRecords: [observability.ref]
+    });
+    const { artifactPath } = writeLifecycleRunArtifact({
+      workspace: params.workspace,
+      report,
+      source: "cli",
+      command: "amc",
+      elapsedMs,
+      createdWorkspace: state.createdWorkspace,
+      createdAgentContext: state.createdAgentContext,
+      signed: !state.vault.noSign,
+      vaultReason: state.vault.reason,
+      episodeRecords: [{ episodeId: episode.episode.episodeId, path: episode.episodePath }],
+      decisionReceipts: decisions.receipts.map((receipt) => ({ receiptId: receipt.receiptId, path: decisions.receiptsPath })),
+      lifecycleReceipts: lifecycleReceipts.refs,
+      findingProofs: [findingProofs.proofSetRef],
+      observabilityRecords: [observability.ref],
+      resourceManifests: [resourceRef]
+    });
+    const refs = instantRunOutputRefs(params.workspace, report.agentId, report.runId, {
+      lifecycleArtifactPath: artifactPath,
+      episodeRecordPath: episode.episodePath,
+      findingProofsPath: findingProofs.proofsPath,
+      lifecycleReceiptsPath: lifecycleReceipts.receiptsPath,
+      observabilityPath: observability.recordPath
+    });
+    completeInstantOnboarding(params.workspace, onboarding, {
+      runId: report.runId,
+      reportJsonPath: refs.reportJsonPath,
+      reportMarkdownPath: refs.reportMarkdownPath,
+      lifecycleArtifactPath: refs.lifecycleArtifactPath ?? null,
+      episodeRecordPath: refs.episodeRecordPath ?? null,
+      studioEvidenceUrl: refs.studioEvidenceUrl
+    });
+    renderInstantFullScore(report, elapsedMs, state, {
+      json: params.json,
+      ...refs
+    });
   } catch (error: unknown) {
     const message = toErrorMessage(error);
     if (state && !state.vault.noSign && /Vault unlock failed|Vault locked|passphrase/i.test(message)) {
@@ -1261,9 +1580,93 @@ async function runInstantFullScoreForAgent(params: { workspace: string; agentId:
         claimMode: "auto",
         noSign: true
       });
-      renderInstantFullScore(report, Date.now() - started, unsignedState, { json: params.json });
+      const elapsedMs = Date.now() - started;
+      const resourceManifest = writeEnforceResourceManifest({
+        workspace: params.workspace,
+        agentId: params.agentId
+      });
+      const resourceRef = enforceResourceManifestRef(resourceManifest);
+      const decisions = writeDecisionReceipts({
+        workspace: params.workspace,
+        report,
+        command: "amc",
+        resourceManifestIds: [resourceRef.manifestId]
+      });
+      const findingProofs = writeFindingProofs({
+        workspace: params.workspace,
+        report,
+        command: "amc",
+        episodeIds: [`episode-${report.runId}`],
+        resourceManifestIds: [resourceRef.manifestId],
+        decisionReceipts: decisions.receipts
+      });
+      const lifecycleReceipts = writeLifecycleChangeReceipts({
+        workspace: params.workspace,
+        report,
+        command: "amc",
+        resourceManifestIds: [resourceRef.manifestId],
+        decisionReceipts: decisions.receipts,
+        findingProofs: [findingProofs.proofSetRef]
+      });
+      const observability = writeObservabilityLaneForScoreRun({
+        workspace: params.workspace,
+        report,
+        source: "cli",
+        command: "amc",
+        decisionReceipts: decisions.receipts,
+        resourceManifestRefs: [resourceRef],
+        lifecycleReceiptIds: lifecycleReceipts.receipts.map((receipt) => receipt.receiptId)
+      });
+      const episode = writeEpisodeRecord({
+        workspace: params.workspace,
+        report,
+        source: "cli",
+        command: "amc",
+        resourceManifestIds: [resourceRef.manifestId],
+        receipts: lifecycleReceipts.receipts.map((receipt) => receipt.receiptId),
+        observabilityRecords: [observability.ref]
+      });
+      const { artifactPath } = writeLifecycleRunArtifact({
+        workspace: params.workspace,
+        report,
+        source: "cli",
+        command: "amc",
+        elapsedMs,
+        createdWorkspace: unsignedState.createdWorkspace,
+        createdAgentContext: unsignedState.createdAgentContext,
+        signed: false,
+        vaultReason: unsignedState.vault.reason,
+        episodeRecords: [{ episodeId: episode.episode.episodeId, path: episode.episodePath }],
+        decisionReceipts: decisions.receipts.map((receipt) => ({ receiptId: receipt.receiptId, path: decisions.receiptsPath })),
+        lifecycleReceipts: lifecycleReceipts.refs,
+        findingProofs: [findingProofs.proofSetRef],
+        observabilityRecords: [observability.ref],
+        resourceManifests: [resourceRef]
+      });
+      const refs = instantRunOutputRefs(params.workspace, report.agentId, report.runId, {
+        lifecycleArtifactPath: artifactPath,
+        episodeRecordPath: episode.episodePath,
+        findingProofsPath: findingProofs.proofsPath,
+        lifecycleReceiptsPath: lifecycleReceipts.receiptsPath,
+        observabilityPath: observability.recordPath
+      });
+      if (onboarding) {
+        completeInstantOnboarding(params.workspace, onboarding, {
+          runId: report.runId,
+          reportJsonPath: refs.reportJsonPath,
+          reportMarkdownPath: refs.reportMarkdownPath,
+          lifecycleArtifactPath: refs.lifecycleArtifactPath ?? null,
+          episodeRecordPath: refs.episodeRecordPath ?? null,
+          studioEvidenceUrl: refs.studioEvidenceUrl
+        });
+      }
+      renderInstantFullScore(report, elapsedMs, unsignedState, {
+        json: params.json,
+        ...refs
+      });
       return;
     }
+    failInstantOnboarding(params.workspace, onboarding, message);
     throw error;
   } finally {
     releaseLock();
@@ -1346,6 +1749,36 @@ program
       return;
     }
     cursor.outputHelp();
+  });
+program
+  .command("commands")
+  .description("Generate the live AMC CLI command inventory from the registered command map")
+  .option("--json", "Output inventory as JSON")
+  .option("--markdown", "Output inventory as Markdown")
+  .option("--include-internal", "Include internal helper commands", false)
+  .option("--out <path>", "Write inventory to a file")
+  .action((opts: { json?: boolean; markdown?: boolean; includeInternal?: boolean; out?: string }) => {
+    const inventory = buildCommandInventory(program, { includeInternal: Boolean(opts.includeInternal) });
+    const markdown = Boolean(opts.markdown || opts.out?.endsWith(".md"));
+    const body = markdown
+      ? renderCommandInventoryMarkdown(inventory)
+      : `${JSON.stringify({ generatedAt: new Date().toISOString(), total: inventory.length, commands: inventory }, null, 2)}\n`;
+    if (opts.out) {
+      writeFileAtomic(resolve(process.cwd(), opts.out), body, 0o644);
+      console.log(chalk.green(`Command inventory written to ${opts.out}`));
+      return;
+    }
+    if (!opts.json && !opts.markdown) {
+      console.log(chalk.bold.hex("#4AEF79")("\nAMC Command Inventory"));
+      console.log(chalk.gray("Commands:"), inventory.length);
+      console.log(chalk.gray("Use:"), "amc commands --markdown --out docs/CLI_COMMAND_INVENTORY.md");
+      console.log(JSON.stringify(inventory.slice(0, 20), null, 2));
+      if (inventory.length > 20) {
+        console.log(chalk.gray(`... ${inventory.length - 20} more commands hidden. Use --json or --markdown for full output.`));
+      }
+      return;
+    }
+    process.stdout.write(body);
   });
 program.hook("preAction", (_thisCommand, actionCommand) => {
   const opts = actionCommand.optsWithGlobals<{ agent?: string }>();
@@ -4248,37 +4681,133 @@ monitor
 
 program
   .command("run")
-  .description("Full assessment — Score + Shield + Enforce + Vault + Watch + Fleet + Passport + Comply in one command")
+  .description("Full assessment — Score + Shield + Enforce + Vault + Watch + Comply + Fleet + Passport in one command")
   .option("--window <window>", "evidence window", "14d")
   .option("--fail-below <grade>", "exit non-zero if overall grade is below this (A+/A/A-/B+/B/B-/C+/C/C-/D+/D/D-/F)")
   .option("--ci", "output GitHub Actions annotations", false)
   .option("--score-only", "run only the maturity diagnostic (legacy mode)", false)
+  .option("--question-set <version>", "assessment question set: legacy or lifecycle")
+  .option("--industry-pack-weights", "apply entitled Industry Pack weighting to expanded assessment questions", false)
+  .option("--json", "emit structured JSON output", false)
   .action(
     async (opts: {
       window: string;
       failBelow?: string;
       ci: boolean;
       scoreOnly: boolean;
+      questionSet?: string;
+      industryPackWeights: boolean;
+      json: boolean;
     }) => {
-      const agentId = activeAgent(program);
-      ensureWorkspaceReadyForAgent(process.cwd(), agentId);
+      const workspace = process.cwd();
+      const agentId = resolveAgentId(workspace, activeAgent(program));
+      const previousNoSign = process.env.AMC_NO_SIGN;
+      const state = ensureInstantWorkspace(workspace, agentId);
+      if (state.vault.noSign) {
+        process.env.AMC_NO_SIGN = "1";
+      }
 
       // Non-TTY: score-only can proceed without interaction; full run also OK
       // (no hang risk here since we don't prompt for input)
+      try {
 
       // Legacy mode: score-only (backward compat)
       if (opts.scoreOnly) {
         const report = await runDiagnostic(
           {
-            workspace: process.cwd(),
+            workspace,
             window: opts.window,
             targetName: "default",
             claimMode: "auto",
-            agentId
+            agentId,
+            noSign: state.vault.noSign,
+            questionSetVersion: opts.questionSet,
+            applyIndustryPackWeights: opts.industryPackWeights
           }
         );
+        const resourceManifest = writeEnforceResourceManifest({ workspace, agentId });
+        const resourceRef = enforceResourceManifestRef(resourceManifest);
+        const decisions = writeDecisionReceipts({
+          workspace,
+          report,
+          command: "amc run --score-only",
+          resourceManifestIds: [resourceRef.manifestId]
+        });
+        const findingProofs = writeFindingProofs({
+          workspace,
+          report,
+          command: "amc run --score-only",
+          episodeIds: [`episode-${report.runId}`],
+          resourceManifestIds: [resourceRef.manifestId],
+          decisionReceipts: decisions.receipts
+        });
+        const lifecycleReceipts = writeLifecycleChangeReceipts({
+          workspace,
+          report,
+          command: "amc run --score-only",
+          resourceManifestIds: [resourceRef.manifestId],
+          decisionReceipts: decisions.receipts,
+          findingProofs: [findingProofs.proofSetRef]
+        });
+        const observability = writeObservabilityLaneForScoreRun({
+          workspace,
+          report,
+          source: "cli",
+          command: "amc run --score-only",
+          decisionReceipts: decisions.receipts,
+          resourceManifestRefs: [resourceRef],
+          lifecycleReceiptIds: lifecycleReceipts.receipts.map((receipt) => receipt.receiptId)
+        });
+        const episode = writeEpisodeRecord({
+          workspace,
+          report,
+          source: "cli",
+          command: "amc run --score-only",
+          resourceManifestIds: [resourceRef.manifestId],
+          receipts: lifecycleReceipts.receipts.map((receipt) => receipt.receiptId),
+          observabilityRecords: [observability.ref]
+        });
+        const lifecycle = writeLifecycleRunArtifact({
+          workspace,
+          report,
+          source: "cli",
+          command: "amc run --score-only",
+          createdWorkspace: state.createdWorkspace,
+          createdAgentContext: state.createdAgentContext,
+          signed: !state.vault.noSign && report.status === "VALID",
+          vaultReason: state.vault.reason,
+          episodeRecords: [{ episodeId: episode.episode.episodeId, path: episode.episodePath }],
+          decisionReceipts: decisions.receipts.map((receipt) => ({ receiptId: receipt.receiptId, path: decisions.receiptsPath })),
+          lifecycleReceipts: lifecycleReceipts.refs,
+          findingProofs: [findingProofs.proofSetRef],
+          observabilityRecords: [observability.ref],
+          resourceManifests: [resourceRef]
+        });
+        if (opts.json) {
+          console.log(JSON.stringify({
+            status: report.status,
+            runId: report.runId,
+            agentId,
+            score: report.integrityIndex,
+            trustLabel: report.trustLabel,
+            questionSet: report.questionSet,
+            lifecycleArtifactPath: lifecycle.artifactPath,
+            episodeRecordPath: episode.episodePath,
+            findingProofsPath: findingProofs.proofsPath,
+            lifecycleReceiptsPath: lifecycleReceipts.receiptsPath,
+            observabilityPath: observability.recordPath,
+            createdWorkspace: state.createdWorkspace,
+            createdAgentContext: state.createdAgentContext,
+            signed: !state.vault.noSign && report.status === "VALID",
+            vaultReason: state.vault.reason
+          }, null, 2));
+          return;
+        }
         console.log(chalk.hex('#4AEF79')(`Run ${report.runId} status: ${report.status}`));
         console.log(`IntegrityIndex: ${report.integrityIndex.toFixed(3)} (${report.trustLabel})`);
+        console.log(chalk.gray(`Lifecycle artifact: ${lifecycle.artifactPath}`));
+        console.log(chalk.gray(`Finding proofs: ${findingProofs.proofsPath}`));
+        console.log(chalk.gray(`Observability: ${observability.recordPath}`));
         if (report.trustBoundaryViolated && report.trustBoundaryMessage) {
           console.log(chalk.red(report.trustBoundaryMessage));
         }
@@ -4288,18 +4817,28 @@ program
       // Full unified run
       const { unifiedRun, renderUnifiedResult, renderCIAnnotations, scoreToGrade } = await import("./unified/index.js");
       const result = await unifiedRun({
-        workspace: process.cwd(),
-        agentId: agentId ?? "default",
+        workspace,
+        agentId,
         window: opts.window,
         failBelow: opts.failBelow as any,
         ci: opts.ci,
+        noSign: state.vault.noSign,
+        questionSetVersion: opts.questionSet,
+        applyIndustryPackWeights: opts.industryPackWeights,
+        createdWorkspace: state.createdWorkspace,
+        createdAgentContext: state.createdAgentContext,
+        vaultReason: state.vault.reason,
       });
 
       // Render output
-      if (opts.ci) {
+      if (opts.json) {
+        console.log(JSON.stringify(result, null, 2));
+      } else if (opts.ci) {
         console.log(renderCIAnnotations(result));
+        console.log(renderUnifiedResult(result, { ci: opts.ci }));
+      } else {
+        console.log(renderUnifiedResult(result, { ci: opts.ci }));
       }
-      console.log(renderUnifiedResult(result, { ci: opts.ci }));
 
       // CI gate: exit non-zero if below threshold
       if (opts.failBelow) {
@@ -4315,6 +4854,13 @@ program
           process.exit(1);
         } else {
           console.log(chalk.hex('#4AEF79')(`\n  ✓ Grade ${result.overallGrade} meets --fail-below ${opts.failBelow}\n`));
+        }
+      }
+      } finally {
+        if (previousNoSign === undefined) {
+          delete process.env.AMC_NO_SIGN;
+        } else {
+          process.env.AMC_NO_SIGN = previousNoSign;
         }
       }
     }
@@ -5053,11 +5599,525 @@ const tools = program.command("tools").description("ToolHub tools config");
 const workorder = program.command("workorder").description("Signed work order operations");
 const ticket = program.command("ticket").description("Execution ticket operations");
 const gateway = program.command("gateway").description("AMC universal LLM proxy gateway");
+const firewall = program.command("firewall").description("Runtime protection for live agent traffic");
+const runtime = program.command("runtime").description("Runtime run manager for connected agents");
 const bundle = program.command("bundle").description("Portable evidence bundle operations");
 const ci = program.command("ci").description("CI/CD release gate helpers");
 const archetype = program.command("archetype").description("Archetype packs");
 const exportGroup = program.command("export").description("Export policy packs and badges");
 const assurance = program.command("assurance").description("Assurance Lab red-team packs");
+
+const evidenceEpisodes = evidence
+  .command("episodes")
+  .description("List, inspect, and export lifecycle evidence episodes");
+
+evidenceEpisodes
+  .command("list")
+  .description("List persisted EpisodeRecord evidence objects")
+  .option("--agent <agentId>", "agent id to list")
+  .option("--limit <n>", "maximum episodes to show", "20")
+  .option("--json", "Output as JSON")
+  .action(async (opts: { agent?: string; limit: string; json?: boolean }) => {
+    try {
+      const workspace = process.cwd();
+      const agentId = resolveAgentId(workspace, opts.agent ?? activeAgent(program));
+      const limit = Math.max(1, parseInt(opts.limit, 10) || 20);
+      const episodes = listEpisodeRecords({ workspace, agentId, limit });
+      if (opts.json) {
+        console.log(JSON.stringify(episodes, null, 2));
+        return;
+      }
+      console.log(chalk.bold.hex("#4AEF79")("\nAMC Evidence Episodes"));
+      if (episodes.length === 0) {
+        console.log(chalk.gray("No episodes found yet. Run `amc` to create the first full-score episode."));
+        return;
+      }
+      for (const episode of episodes) {
+        console.log(`  ${chalk.white(episode.episodeId)} ${chalk.gray(episode.endedAt)}`);
+        console.log(chalk.gray(`    run=${episode.runId} agent=${episode.agentId} status=${episode.evaluations.status} evidence=${episode.evaluations.evidenceCoverage}`));
+      }
+    } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
+  });
+
+evidenceEpisodes
+  .command("inspect <episode>")
+  .description("Inspect one EpisodeRecord by episode id, lifecycle id, or run id")
+  .option("--agent <agentId>", "agent id to inspect")
+  .option("--json", "Output as JSON")
+  .action(async (episode: string, opts: { agent?: string; json?: boolean }) => {
+    try {
+      const workspace = process.cwd();
+      const agentId = resolveAgentId(workspace, opts.agent ?? activeAgent(program));
+      const record = loadEpisodeRecord({ workspace, agentId, selector: episode });
+      if (opts.json) {
+        console.log(JSON.stringify(record, null, 2));
+        return;
+      }
+      console.log(chalk.bold.hex("#4AEF79")("\nAMC Evidence Episode"));
+      console.log(chalk.gray("Episode:"), record.episodeId);
+      console.log(chalk.gray("Run:"), record.runId);
+      console.log(chalk.gray("Lifecycle:"), record.lifecycleRunId);
+      console.log(chalk.gray("Agent:"), record.agentId);
+      console.log(chalk.gray("Command:"), record.command);
+      console.log(chalk.gray("Status:"), record.evaluations.status);
+      console.log(chalk.gray("Evidence coverage:"), record.evaluations.evidenceCoverage);
+      console.log(chalk.gray("Raw trace refs:"), record.rawTraceRefs.length);
+      console.log(chalk.gray("Failures:"), record.failureClassifications.length);
+      console.log(chalk.gray("Resource manifests:"), record.resourceManifestIds.length);
+    } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
+  });
+
+evidenceEpisodes
+  .command("export <episode>")
+  .description("Export one EpisodeRecord as JSON or Markdown")
+  .requiredOption("--out <path>", "output file path")
+  .option("--agent <agentId>", "agent id to export")
+  .option("--format <format>", "json or markdown; inferred from extension if omitted")
+  .option("--redacted", "replace local workspace paths with $WORKSPACE")
+  .option("--json", "Output command result as JSON")
+  .action(async (episode: string, opts: { out: string; agent?: string; format?: string; redacted?: boolean; json?: boolean }) => {
+    try {
+      const workspace = process.cwd();
+      const agentId = resolveAgentId(workspace, opts.agent ?? activeAgent(program));
+      const format: "json" | "markdown" | undefined = opts.format === "markdown" || opts.format === "json" ? opts.format : undefined;
+      const result = exportEpisodeRecord({
+        workspace,
+        agentId,
+        selector: episode,
+        outputPath: resolve(opts.out),
+        format,
+        redacted: opts.redacted
+      });
+      if (opts.json) {
+        console.log(JSON.stringify({
+          episodeId: result.episode.episodeId,
+          runId: result.episode.runId,
+          outputPath: result.outputPath,
+          format: result.format,
+          redacted: result.redacted
+        }, null, 2));
+        return;
+      }
+      console.log(chalk.green(`Episode exported: ${result.outputPath}`));
+    } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
+  });
+
+const evidenceLifecycle = evidence
+  .command("lifecycle")
+  .description("List, inspect, and export full lifecycle run artifacts");
+
+evidenceLifecycle
+  .command("list")
+  .description("List persisted lifecycle run artifacts")
+  .option("--agent <agentId>", "agent id to list")
+  .option("--limit <n>", "maximum runs to show", "20")
+  .option("--json", "Output as JSON")
+  .action(async (opts: { agent?: string; limit: string; json?: boolean }) => {
+    try {
+      const workspace = process.cwd();
+      const agentId = resolveAgentId(workspace, opts.agent ?? activeAgent(program));
+      const limit = Math.max(1, parseInt(opts.limit, 10) || 20);
+      const runs = listLifecycleRunArtifacts({ workspace, agentId, limit });
+      if (opts.json) {
+        console.log(JSON.stringify(runs, null, 2));
+        return;
+      }
+      console.log(chalk.bold.hex("#4AEF79")("\nAMC Lifecycle Runs"));
+      if (runs.length === 0) {
+        console.log(chalk.gray("No lifecycle runs found yet. Run `amc` to create the first full-score lifecycle artifact."));
+        return;
+      }
+      for (const run of runs) {
+        console.log(`  ${chalk.white(run.lifecycleRunId)} ${chalk.gray(run.createdAt)}`);
+        console.log(chalk.gray(`    run=${run.runId} agent=${run.agentId} source=${run.source} evidence=${run.evidence.evidenceCoverage}`));
+      }
+    } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
+  });
+
+evidenceLifecycle
+  .command("inspect <run>")
+  .description("Inspect one lifecycle artifact by lifecycle id or run id")
+  .option("--agent <agentId>", "agent id to inspect")
+  .option("--json", "Output as JSON")
+  .action(async (run: string, opts: { agent?: string; json?: boolean }) => {
+    try {
+      const workspace = process.cwd();
+      const agentId = resolveAgentId(workspace, opts.agent ?? activeAgent(program));
+      const artifact = loadLifecycleRunArtifact({ workspace, agentId, selector: run });
+      if (opts.json) {
+        console.log(JSON.stringify(artifact, null, 2));
+        return;
+      }
+      console.log(chalk.bold.hex("#4AEF79")("\nAMC Lifecycle Run"));
+      console.log(chalk.gray("Lifecycle:"), artifact.lifecycleRunId);
+      console.log(chalk.gray("Run:"), artifact.runId);
+      console.log(chalk.gray("Agent:"), artifact.agentId);
+      console.log(chalk.gray("Command:"), artifact.command);
+      console.log(chalk.gray("Source:"), artifact.source);
+      console.log(chalk.gray("Stage:"), artifact.stage);
+      console.log(chalk.gray("Evidence coverage:"), artifact.evidence.evidenceCoverage);
+      console.log(chalk.gray("Episodes:"), artifact.evidence.episodeRecords.length);
+      console.log(chalk.gray("Decision receipts:"), artifact.evidence.decisionReceipts.length);
+      console.log(chalk.gray("Resource manifests:"), artifact.evidence.resourceManifests.length);
+    } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
+  });
+
+evidenceLifecycle
+  .command("export <run>")
+  .description("Export one lifecycle artifact as JSON")
+  .requiredOption("--out <path>", "output file path")
+  .option("--agent <agentId>", "agent id to export")
+  .option("--redacted", "replace local workspace paths with $WORKSPACE")
+  .option("--json", "Output command result as JSON")
+  .action(async (run: string, opts: { out: string; agent?: string; redacted?: boolean; json?: boolean }) => {
+    try {
+      const workspace = process.cwd();
+      const agentId = resolveAgentId(workspace, opts.agent ?? activeAgent(program));
+      const result = exportLifecycleRunArtifact({
+        workspace,
+        agentId,
+        selector: run,
+        outputPath: resolve(opts.out),
+        redacted: opts.redacted
+      });
+      if (opts.json) {
+        console.log(JSON.stringify({
+          lifecycleRunId: result.artifact.lifecycleRunId,
+          runId: result.artifact.runId,
+          outputPath: result.outputPath,
+          redacted: result.redacted
+        }, null, 2));
+        return;
+      }
+      console.log(chalk.green(`Lifecycle artifact exported: ${result.outputPath}`));
+    } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
+  });
+
+const evidenceDecisions = evidence
+  .command("decisions")
+  .description("List and inspect decision receipts generated by full-score runs");
+
+evidenceDecisions
+  .command("list")
+  .description("List persisted decision receipts")
+  .option("--agent <agentId>", "agent id to list")
+  .option("--limit <n>", "maximum receipts to show", "20")
+  .option("--json", "Output as JSON")
+  .action(async (opts: { agent?: string; limit: string; json?: boolean }) => {
+    try {
+      const workspace = process.cwd();
+      const agentId = resolveAgentId(workspace, opts.agent ?? activeAgent(program));
+      const limit = Math.max(1, parseInt(opts.limit, 10) || 20);
+      const receipts = listDecisionReceipts({ workspace, agentId, limit });
+      if (opts.json) {
+        console.log(JSON.stringify(receipts, null, 2));
+        return;
+      }
+      console.log(chalk.bold.hex("#4AEF79")("\nAMC Decision Receipts"));
+      if (receipts.length === 0) {
+        console.log(chalk.gray("No decision receipts found yet. Run `amc` to generate the first set."));
+        return;
+      }
+      for (const receipt of receipts) {
+        console.log(`  ${chalk.white(receipt.receiptId)} ${chalk.gray(receipt.surface)} ${chalk.gray(receipt.decisionType)}`);
+        console.log(chalk.gray(`    run=${receipt.runId} confidence=${receipt.confidence} status=${receipt.status}`));
+      }
+    } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
+  });
+
+evidenceDecisions
+  .command("inspect <receipt>")
+  .description("Inspect one decision receipt by receipt id or run id")
+  .option("--agent <agentId>", "agent id to inspect")
+  .option("--json", "Output as JSON")
+  .action(async (receipt: string, opts: { agent?: string; json?: boolean }) => {
+    try {
+      const workspace = process.cwd();
+      const agentId = resolveAgentId(workspace, opts.agent ?? activeAgent(program));
+      const record = loadDecisionReceipt({ workspace, agentId, selector: receipt });
+      if (opts.json) {
+        console.log(JSON.stringify(record, null, 2));
+        return;
+      }
+      console.log(chalk.bold.hex("#4AEF79")("\nAMC Decision Receipt"));
+      console.log(chalk.gray("Receipt:"), record.receiptId);
+      console.log(chalk.gray("Run:"), record.runId);
+      console.log(chalk.gray("Surface:"), record.surface);
+      console.log(chalk.gray("Type:"), record.decisionType);
+      console.log(chalk.gray("Owner:"), record.owner);
+      console.log(chalk.gray("Hypothesis:"), record.hypothesis);
+      console.log(chalk.gray("Predicted outcome:"), record.predictedOutcome);
+      console.log(chalk.gray("Observed outcome:"), record.observedOutcome ?? "pending");
+      console.log(chalk.gray("Confidence:"), record.confidence);
+      console.log(chalk.gray("Components:"), record.subject.componentIds?.length ?? 0);
+      console.log(chalk.gray("Evidence refs:"), record.evidenceRefs.length);
+    } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
+  });
+
+evidenceDecisions
+  .command("observe <run>")
+  .description("Update open decision receipts with observed outcomes from a later full-score run")
+  .option("--agent <agentId>", "agent id to inspect")
+  .option("--json", "Output as JSON")
+  .action(async (run: string, opts: { agent?: string; json?: boolean }) => {
+    try {
+      const workspace = process.cwd();
+      const agentId = resolveAgentId(workspace, opts.agent ?? activeAgent(program));
+      const report = loadRunReport(workspace, run, agentId);
+      const result = observeDecisionOutcomes({ workspace, agentId, report });
+      if (opts.json) {
+        console.log(JSON.stringify(result, null, 2));
+        return;
+      }
+      console.log(chalk.bold.hex("#4AEF79")("\nAMC Decision Outcomes"));
+      console.log(chalk.gray("Run:"), result.runId);
+      console.log(chalk.gray("Scanned:"), result.scannedCount);
+      console.log(chalk.gray("Updated:"), result.updatedCount);
+      for (const receipt of result.updatedReceipts.slice(0, 10)) {
+        console.log(`  ${chalk.white(receipt.receiptId)} ${chalk.gray(receipt.status)} ${chalk.gray(receipt.observedOutcome ?? "")}`);
+      }
+    } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
+  });
+
+const evidenceObservability = evidence
+  .command("observability")
+  .description("List and inspect component, experience, and decision observability records");
+
+evidenceObservability
+  .command("list")
+  .description("List persisted observability lane records")
+  .option("--agent <agentId>", "agent id to list")
+  .option("--limit <n>", "maximum records to show", "20")
+  .option("--json", "Output as JSON")
+  .action(async (opts: { agent?: string; limit: string; json?: boolean }) => {
+    try {
+      const workspace = process.cwd();
+      const agentId = resolveAgentId(workspace, opts.agent ?? activeAgent(program));
+      const limit = Math.max(1, parseInt(opts.limit, 10) || 20);
+      const records = listObservabilityLaneRecords({ workspace, agentId, limit });
+      if (opts.json) {
+        console.log(JSON.stringify(records, null, 2));
+        return;
+      }
+      console.log(chalk.bold.hex("#4AEF79")("\nAMC Observability Lane"));
+      if (records.length === 0) {
+        console.log(chalk.gray("No observability records found yet. Run `amc` to capture component, experience, and decision observability."));
+        return;
+      }
+      for (const record of records) {
+        console.log(`  ${chalk.white(record.observabilityId)} ${chalk.gray(record.createdAt)}`);
+        console.log(chalk.gray(`    run=${record.runId} components=${record.summary.componentCount} experience=${record.summary.experienceSignalCount} decisions=${record.summary.decisionCount}`));
+      }
+    } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
+  });
+
+evidenceObservability
+  .command("inspect <record>")
+  .description("Inspect one observability lane record by observability id, lifecycle id, or run id")
+  .option("--agent <agentId>", "agent id to inspect")
+  .option("--json", "Output as JSON")
+  .action(async (record: string, opts: { agent?: string; json?: boolean }) => {
+    try {
+      const workspace = process.cwd();
+      const agentId = resolveAgentId(workspace, opts.agent ?? activeAgent(program));
+      const loaded = loadObservabilityLaneRecord({ workspace, agentId, selector: record });
+      if (opts.json) {
+        console.log(JSON.stringify(loaded, null, 2));
+        return;
+      }
+      console.log(chalk.bold.hex("#4AEF79")("\nAMC Observability Lane"));
+      console.log(chalk.gray("Record:"), loaded.observabilityId);
+      console.log(chalk.gray("Run:"), loaded.runId);
+      console.log(chalk.gray("Agent:"), loaded.agentId);
+      console.log(chalk.gray("Components:"), loaded.summary.componentCount);
+      console.log(chalk.gray("High-risk components:"), loaded.summary.highRiskComponentCount);
+      console.log(chalk.gray("Experience signals:"), loaded.summary.experienceSignalCount);
+      console.log(chalk.gray("Decision chain:"), `${loaded.summary.observedDecisionCount}/${loaded.summary.decisionCount} observed`);
+    } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
+  });
+
+const evidenceFindingProofs = evidence
+  .command("finding-proofs")
+  .description("List, inspect, and export finding proof chains");
+
+evidenceFindingProofs
+  .command("list")
+  .description("List persisted finding proof chains")
+  .option("--agent <agentId>", "agent id to list")
+  .option("--limit <n>", "maximum proofs to show", "30")
+  .option("--json", "Output as JSON")
+  .action(async (opts: { agent?: string; limit: string; json?: boolean }) => {
+    try {
+      const workspace = process.cwd();
+      const agentId = resolveAgentId(workspace, opts.agent ?? activeAgent(program));
+      const limit = Math.max(1, parseInt(opts.limit, 10) || 30);
+      const proofs = listFindingProofs({ workspace, agentId, limit });
+      if (opts.json) {
+        console.log(JSON.stringify(proofs, null, 2));
+        return;
+      }
+      console.log(chalk.bold.hex("#4AEF79")("\nAMC Finding Proofs"));
+      if (proofs.length === 0) {
+        console.log(chalk.gray("No finding proofs found yet. Run `amc` to generate proof-backed findings."));
+        return;
+      }
+      for (const proof of proofs) {
+        console.log(`  ${chalk.white(proof.proofId)} ${chalk.gray(proof.surface)} ${chalk.gray(proof.status)}`);
+        console.log(chalk.gray(`    run=${proof.runId} question=${proof.questionId} evidence=${proof.evidenceEpisodeIds.length} recommendations=${proof.recommendationIds.length}`));
+      }
+    } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
+  });
+
+evidenceFindingProofs
+  .command("inspect <proof>")
+  .description("Inspect one finding proof by proof id, finding id, run id, or question id")
+  .option("--agent <agentId>", "agent id to inspect")
+  .option("--json", "Output as JSON")
+  .action(async (proof: string, opts: { agent?: string; json?: boolean }) => {
+    try {
+      const workspace = process.cwd();
+      const agentId = resolveAgentId(workspace, opts.agent ?? activeAgent(program));
+      const record = loadFindingProof({ workspace, agentId, selector: proof });
+      if (opts.json) {
+        console.log(JSON.stringify(record, null, 2));
+        return;
+      }
+      console.log(chalk.bold.hex("#4AEF79")("\nAMC Finding Proof"));
+      console.log(chalk.gray("Proof:"), record.proofId);
+      console.log(chalk.gray("Run:"), record.runId);
+      console.log(chalk.gray("Surface:"), record.surface);
+      console.log(chalk.gray("Question:"), record.questionId);
+      console.log(chalk.gray("Severity:"), record.severity);
+      console.log(chalk.gray("Status:"), record.status);
+      console.log(chalk.gray("Evidence episodes:"), record.evidenceEpisodeIds.join(", ") || "none");
+      console.log(chalk.gray("Recommendations:"), record.recommendationIds.join(", ") || "none");
+      if (record.uncertaintyNotes.length > 0) {
+        console.log(chalk.gray("Uncertainty:"), record.uncertaintyNotes.join(" | "));
+      }
+    } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
+  });
+
+evidenceFindingProofs
+  .command("export")
+  .description("Export finding proofs as JSON")
+  .requiredOption("--out <path>", "output file path")
+  .option("--agent <agentId>", "agent id to export")
+  .option("--run <runId>", "only export proofs for one run")
+  .option("--redacted", "replace local workspace paths with $WORKSPACE")
+  .option("--json", "Output command result as JSON")
+  .action(async (opts: { out: string; agent?: string; run?: string; redacted?: boolean; json?: boolean }) => {
+    try {
+      const workspace = process.cwd();
+      const agentId = resolveAgentId(workspace, opts.agent ?? activeAgent(program));
+      const result = exportFindingProofs({
+        workspace,
+        agentId,
+        outputPath: resolve(opts.out),
+        runId: opts.run,
+        redacted: opts.redacted
+      });
+      if (opts.json) {
+        console.log(JSON.stringify({
+          outputPath: result.outputPath,
+          proofCount: result.proofs.length,
+          redacted: result.redacted
+        }, null, 2));
+        return;
+      }
+      console.log(chalk.green(`Finding proofs exported: ${result.outputPath}`));
+    } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
+  });
+
+const evidenceLifecycleReceipts = evidence
+  .command("lifecycle-receipts")
+  .description("List, inspect, and export lifecycle proposal, validation, commit, rollback, and monitor receipts");
+
+evidenceLifecycleReceipts
+  .command("list")
+  .description("List persisted lifecycle change receipts")
+  .option("--agent <agentId>", "agent id to list")
+  .option("--limit <n>", "maximum receipts to show", "30")
+  .option("--json", "Output as JSON")
+  .action(async (opts: { agent?: string; limit: string; json?: boolean }) => {
+    try {
+      const workspace = process.cwd();
+      const agentId = resolveAgentId(workspace, opts.agent ?? activeAgent(program));
+      const limit = Math.max(1, parseInt(opts.limit, 10) || 30);
+      const receipts = listLifecycleChangeReceipts({ workspace, agentId, limit });
+      if (opts.json) {
+        console.log(JSON.stringify(receipts, null, 2));
+        return;
+      }
+      console.log(chalk.bold.hex("#4AEF79")("\nAMC Lifecycle Receipts"));
+      if (receipts.length === 0) {
+        console.log(chalk.gray("No lifecycle receipts found yet. Run `amc` to generate proposal, validation, commit, and monitor receipts."));
+        return;
+      }
+      for (const receipt of receipts) {
+        console.log(`  ${chalk.white(receipt.receiptId)} ${chalk.gray(receipt.receiptType)} ${chalk.gray(receipt.status)}`);
+        console.log(chalk.gray(`    run=${receipt.runId ?? "n/a"} health=${receipt.monitor.health} drift=${receipt.monitor.driftState}`));
+      }
+    } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
+  });
+
+evidenceLifecycleReceipts
+  .command("inspect <receipt>")
+  .description("Inspect one lifecycle receipt by receipt id, run id, or lifecycle id")
+  .option("--agent <agentId>", "agent id to inspect")
+  .option("--json", "Output as JSON")
+  .action(async (receipt: string, opts: { agent?: string; json?: boolean }) => {
+    try {
+      const workspace = process.cwd();
+      const agentId = resolveAgentId(workspace, opts.agent ?? activeAgent(program));
+      const record = loadLifecycleChangeReceipt({ workspace, agentId, selector: receipt });
+      if (opts.json) {
+        console.log(JSON.stringify(record, null, 2));
+        return;
+      }
+      console.log(chalk.bold.hex("#4AEF79")("\nAMC Lifecycle Receipt"));
+      console.log(chalk.gray("Receipt:"), record.receiptId);
+      console.log(chalk.gray("Type:"), record.receiptType);
+      console.log(chalk.gray("Status:"), record.status);
+      console.log(chalk.gray("Run:"), record.runId ?? "n/a");
+      console.log(chalk.gray("Policies:"), `${record.policyChecks.filter((check) => check.passed).length}/${record.policyChecks.length} passed`);
+      console.log(chalk.gray("Health:"), record.monitor.health);
+      console.log(chalk.gray("Drift:"), record.monitor.driftState);
+      if (record.rollback.targetManifestId) {
+        console.log(chalk.gray("Rollback target:"), record.rollback.targetManifestId);
+      }
+    } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
+  });
+
+evidenceLifecycleReceipts
+  .command("export")
+  .description("Export lifecycle receipts as JSON")
+  .requiredOption("--out <path>", "output file path")
+  .option("--agent <agentId>", "agent id to export")
+  .option("--run <runId>", "only export receipts for one run")
+  .option("--redacted", "replace local workspace paths with $WORKSPACE")
+  .option("--json", "Output command result as JSON")
+  .action(async (opts: { out: string; agent?: string; run?: string; redacted?: boolean; json?: boolean }) => {
+    try {
+      const workspace = process.cwd();
+      const agentId = resolveAgentId(workspace, opts.agent ?? activeAgent(program));
+      const result = exportLifecycleChangeReceipts({
+        workspace,
+        agentId,
+        outputPath: resolve(opts.out),
+        runId: opts.run,
+        redacted: opts.redacted
+      });
+      if (opts.json) {
+        console.log(JSON.stringify({
+          outputPath: result.outputPath,
+          receiptCount: result.receipts.length,
+          redacted: result.redacted
+        }, null, 2));
+        return;
+      }
+      console.log(chalk.green(`Lifecycle receipts exported: ${result.outputPath}`));
+    } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
+  });
 
 
 assurance
@@ -5389,6 +6449,8 @@ evidence
     console.log(chalk.bold("Evidence namespace"));
     console.log("  amc evidence collect                 Guided wizard to connect your agent and capture evidence");
     console.log("  amc evidence verify                  Run full integrity verification");
+    console.log("  amc evidence decisions list          Inspect prediction and observed-outcome receipts");
+    console.log("  amc evidence observability list      Inspect component, experience, and decision observability");
     console.log("  amc verify all                       Full trust/policy/plugin verification");
     console.log("  amc bundle export --out <file>       Export signed evidence bundle");
     console.log("  amc transparency verify              Verify append-only transparency log");
@@ -7542,6 +8604,538 @@ ticket
     }
     console.log(chalk.red(`Execution ticket invalid: ${verified.error ?? "unknown reason"}`));
     process.exit(1);
+  });
+
+function parseRuntimeFirewallModeCli(mode: string): RuntimeFirewallMode {
+  const normalized = mode.trim().toLowerCase();
+  if (normalized === "observe" || normalized === "warn" || normalized === "block") {
+    return normalized;
+  }
+  throw new Error(`Invalid firewall mode: ${mode}. Expected observe, warn, or block.`);
+}
+
+function parseRuntimeFirewallDirectionCli(direction: string): RuntimeFirewallDirection {
+  const normalized = direction.trim().toLowerCase();
+  if (normalized === "request" || normalized === "response") {
+    return normalized;
+  }
+  throw new Error(`Invalid firewall direction: ${direction}. Expected request or response.`);
+}
+
+function parseRuntimeFirewallExportFormat(format: string): "json" | "jsonl" | "splunk" {
+  const normalized = format.trim().toLowerCase();
+  if (normalized === "json" || normalized === "jsonl" || normalized === "splunk") {
+    return normalized;
+  }
+  throw new Error(`Invalid firewall export format: ${format}. Expected json, jsonl, or splunk.`);
+}
+
+firewall
+  .command("enable")
+  .description("Enable Runtime Firewall in observe, warn, or block mode")
+  .option("--mode <mode>", "observe, warn, or block", "warn")
+  .option("--fail-open", "do not fail closed when a required runtime policy is missing", false)
+  .option("--json", "emit JSON output", false)
+  .action((opts: { mode: string; failOpen?: boolean; json?: boolean }) => {
+    const out = writeRuntimeFirewallPolicy({
+      workspace: process.cwd(),
+      mode: parseRuntimeFirewallModeCli(opts.mode),
+      enabled: true,
+      failClosedOnMissingPolicy: !opts.failOpen
+    });
+    if (opts.json) {
+      console.log(JSON.stringify(out, null, 2));
+      return;
+    }
+    console.log(chalk.green(`Runtime Firewall enabled in ${out.policy.mode} mode.`));
+    console.log(`Policy: ${out.path}`);
+    if (out.signaturePath) {
+      console.log(`Signature: ${out.signaturePath}`);
+    }
+  });
+
+firewall
+  .command("disable")
+  .description("Disable Runtime Firewall for this workspace")
+  .option("--json", "emit JSON output", false)
+  .action((opts: { json?: boolean }) => {
+    const out = writeRuntimeFirewallPolicy({
+      workspace: process.cwd(),
+      mode: "observe",
+      enabled: false,
+      failClosedOnMissingPolicy: false
+    });
+    if (opts.json) {
+      console.log(JSON.stringify(out, null, 2));
+      return;
+    }
+    console.log(chalk.yellow("Runtime Firewall disabled."));
+    console.log(`Policy: ${out.path}`);
+  });
+
+firewall
+  .command("status")
+  .description("Show Runtime Firewall policy and event status")
+  .option("--json", "emit JSON output", false)
+  .action((opts: { json?: boolean }) => {
+    const status = runtimeFirewallStatus(process.cwd());
+    if (opts.json) {
+      console.log(JSON.stringify(status, null, 2));
+      return;
+    }
+    console.log(chalk.green(`Runtime Firewall: ${status.enabled ? "enabled" : "disabled"} (${status.mode})`));
+    console.log(`Policy: ${status.policyExists ? status.policyPath : "missing"}`);
+    console.log(`Decisions: ${status.eventCount}`);
+    if (status.latestDecision) {
+      console.log(`Latest: ${status.latestDecision.decisionId} ${status.latestDecision.action} risk=${status.latestDecision.riskScore}`);
+    }
+  });
+
+firewall
+  .command("check")
+  .description("Evaluate a request or response payload against Runtime Firewall")
+  .requiredOption("--text <text>", "payload text to evaluate")
+  .option("--direction <direction>", "request or response", "request")
+  .option("--agent <id>", "agent id", "default")
+  .option("--provider <name>", "provider name")
+  .option("--model <name>", "model name")
+  .option("--route <path>", "route or endpoint")
+  .option("--method <method>", "HTTP method")
+  .option("--run <runId>", "linked run id")
+  .option("--episode <episodeId>", "linked episode id")
+  .option("--lifecycle-run <id>", "linked lifecycle run id")
+  .option("--bridge-request <id>", "linked bridge request id")
+  .option("--require-policy", "block if the workspace has no Runtime Firewall policy", false)
+  .option("--no-record", "evaluate without writing a signed decision event")
+  .option("--json", "emit JSON output", false)
+  .action((opts: {
+    text: string;
+    direction: string;
+    agent: string;
+    provider?: string;
+    model?: string;
+    route?: string;
+    method?: string;
+    run?: string;
+    episode?: string;
+    lifecycleRun?: string;
+    bridgeRequest?: string;
+    requirePolicy?: boolean;
+    record?: boolean;
+    json?: boolean;
+  }) => {
+    const decision = evaluateRuntimeFirewall({
+      workspace: process.cwd(),
+      content: opts.text,
+      direction: parseRuntimeFirewallDirectionCli(opts.direction),
+      source: "cli",
+      agentId: opts.agent,
+      provider: opts.provider,
+      model: opts.model,
+      route: opts.route,
+      method: opts.method,
+      runId: opts.run,
+      episodeId: opts.episode,
+      lifecycleRunId: opts.lifecycleRun,
+      bridgeRequestId: opts.bridgeRequest,
+      requirePolicy: opts.requirePolicy,
+      record: opts.record
+    });
+    if (opts.json) {
+      console.log(JSON.stringify(decision, null, 2));
+      return;
+    }
+    const color = decision.action === "block" ? chalk.red : decision.action === "warn" ? chalk.yellow : chalk.green;
+    console.log(color(`Runtime Firewall decision: ${decision.action} risk=${decision.riskScore} severity=${decision.severity}`));
+    for (const reason of decision.reasons) {
+      console.log(`- ${reason}`);
+    }
+    if (decision.eventPath) {
+      console.log(`Event: ${decision.eventPath}`);
+    }
+  });
+
+firewall
+  .command("events")
+  .description("List Runtime Firewall decision events")
+  .option("--limit <n>", "max events", "20")
+  .option("--redacted", "hide absolute workspace paths", true)
+  .option("--json", "emit JSON output", false)
+  .action((opts: { limit: string; redacted?: boolean; json?: boolean }) => {
+    const limit = Number.parseInt(opts.limit, 10);
+    const events = listRuntimeFirewallDecisions({
+      workspace: process.cwd(),
+      limit: Number.isFinite(limit) && limit > 0 ? limit : 20,
+      redacted: opts.redacted !== false
+    });
+    if (opts.json) {
+      console.log(JSON.stringify({ events, total: events.length }, null, 2));
+      return;
+    }
+    if (events.length === 0) {
+      console.log(chalk.gray("No Runtime Firewall events found. Try: amc firewall check --text \"ignore previous instructions\""));
+      return;
+    }
+    for (const event of events) {
+      console.log(`${event.createdAt} ${event.decisionId} ${event.action} risk=${event.riskScore} agent=${event.agentId} ${event.reasons[0] ?? ""}`);
+    }
+  });
+
+firewall
+  .command("export")
+  .description("Export Runtime Firewall decisions for SIEM or audit review")
+  .requiredOption("--out <path>", "output path")
+  .option("--format <format>", "json, jsonl, or splunk", "jsonl")
+  .option("--limit <n>", "max events", "100")
+  .option("--redacted", "redact paths and sensitive previews", true)
+  .option("--json", "emit JSON output", false)
+  .action((opts: { out: string; format: string; limit: string; redacted?: boolean; json?: boolean }) => {
+    const limit = Number.parseInt(opts.limit, 10);
+    const out = exportRuntimeFirewallDecisions({
+      workspace: process.cwd(),
+      outputPath: resolve(process.cwd(), opts.out),
+      format: parseRuntimeFirewallExportFormat(opts.format),
+      redacted: opts.redacted !== false,
+      limit: Number.isFinite(limit) && limit > 0 ? limit : 100
+    });
+    if (opts.json) {
+      console.log(JSON.stringify(out, null, 2));
+      return;
+    }
+    console.log(chalk.green(`Runtime Firewall export wrote ${out.count} events.`));
+    console.log(`Path: ${out.outputPath}`);
+  });
+
+function parseRuntimeRunSourceCli(source: string | undefined): RuntimeRunSource {
+  const normalized = (source ?? "cli").trim().toLowerCase();
+  if (
+    normalized === "cli" ||
+    normalized === "studio" ||
+    normalized === "api" ||
+    normalized === "gateway" ||
+    normalized === "bridge" ||
+    normalized === "sdk" ||
+    normalized === "watch" ||
+    normalized === "fleet" ||
+    normalized === "firewall"
+  ) {
+    return normalized;
+  }
+  throw new Error(`Invalid runtime source: ${source}.`);
+}
+
+function parseRuntimeRunSeverityCli(severity: string | undefined): RuntimeRunSeverity {
+  const normalized = (severity ?? "info").trim().toLowerCase();
+  if (normalized === "info" || normalized === "low" || normalized === "medium" || normalized === "high" || normalized === "critical") {
+    return normalized;
+  }
+  throw new Error(`Invalid runtime severity: ${severity}. Expected info, low, medium, high, or critical.`);
+}
+
+function parseRuntimeRunEventTypeCli(type: string | undefined): RuntimeRunEventType {
+  const normalized = (type ?? "trace.received").trim().toLowerCase();
+  const allowed: RuntimeRunEventType[] = [
+    "stage.changed",
+    "trace.received",
+    "score.updated",
+    "policy.decision",
+    "alert.raised",
+    "receipt.written",
+    "candidate.proposed",
+    "commit.applied",
+    "rollback.applied"
+  ];
+  if (allowed.includes(normalized as RuntimeRunEventType)) {
+    return normalized as RuntimeRunEventType;
+  }
+  throw new Error(`Invalid runtime event type: ${type}. Expected ${allowed.join(", ")}.`);
+}
+
+function parseRuntimeRunPayload(payloadJson: string | undefined): unknown {
+  if (!payloadJson || payloadJson.trim().length === 0) {
+    return undefined;
+  }
+  try {
+    return JSON.parse(payloadJson);
+  } catch {
+    return payloadJson;
+  }
+}
+
+runtime
+  .command("status")
+  .description("Show persisted runtime run-manager status")
+  .option("--agent <agentId>", "agent id")
+  .option("--json", "emit JSON output", false)
+  .action((opts: { agent?: string; json?: boolean }) => {
+    const status = runtimeRunStatus(process.cwd(), opts.agent ?? activeAgent(program));
+    if (opts.json) {
+      console.log(JSON.stringify(status, null, 2));
+      return;
+    }
+    console.log(chalk.green(`Runtime runs: ${status.total} total, ${status.running} running, ${status.degraded} degraded`));
+    if (status.latest) {
+      console.log(`Latest: ${status.latest.runId} ${status.latest.status} stage=${status.latest.currentStage} events=${status.latest.eventCount}`);
+    }
+  });
+
+runtime
+  .command("create")
+  .description("Create a persisted connected-agent runtime run")
+  .option("--run <runId>", "run id to use")
+  .option("--agent <agentId>", "agent id")
+  .option("--source <source>", "cli, studio, api, gateway, bridge, sdk, watch, fleet, or firewall", "cli")
+  .option("--stage <stage>", "initial stage", "created")
+  .option("--episode <episodeId>", "linked episode id")
+  .option("--lifecycle-run <id>", "linked lifecycle run id")
+  .option("--message <text>", "start event message")
+  .option("--json", "emit JSON output", false)
+  .action((opts: { run?: string; agent?: string; source: string; stage: string; episode?: string; lifecycleRun?: string; message?: string; json?: boolean }) => {
+    const created = createRuntimeRun({
+      workspace: process.cwd(),
+      runId: opts.run,
+      agentId: opts.agent ?? activeAgent(program),
+      source: parseRuntimeRunSourceCli(opts.source),
+      stage: opts.stage,
+      episodeId: opts.episode,
+      lifecycleRunId: opts.lifecycleRun,
+      message: opts.message
+    });
+    if (opts.json) {
+      console.log(JSON.stringify(created, null, 2));
+      return;
+    }
+    console.log(chalk.green(`Runtime run created: ${created.run.runId}`));
+    console.log(`State: ${created.statePath}`);
+    console.log(`Resume token: ${created.run.resumeToken}`);
+  });
+
+runtime
+  .command("list")
+  .description("List persisted runtime runs")
+  .option("--agent <agentId>", "agent id")
+  .option("--limit <n>", "max runs", "20")
+  .option("--redacted", "hide absolute workspace paths", true)
+  .option("--json", "emit JSON output", false)
+  .action((opts: { agent?: string; limit: string; redacted?: boolean; json?: boolean }) => {
+    const limit = Number.parseInt(opts.limit, 10);
+    const runs = listRuntimeRuns({
+      workspace: process.cwd(),
+      agentId: opts.agent ?? activeAgent(program),
+      limit: Number.isFinite(limit) && limit > 0 ? limit : 20,
+      redacted: opts.redacted !== false
+    });
+    if (opts.json) {
+      console.log(JSON.stringify({ runs, total: runs.length }, null, 2));
+      return;
+    }
+    if (runs.length === 0) {
+      console.log(chalk.gray("No runtime runs found. Try: amc runtime create --run demo"));
+      return;
+    }
+    for (const run of runs) {
+      console.log(`${run.updatedAt} ${run.runId} ${run.status} stage=${run.currentStage} events=${run.eventCount} agent=${run.agentId}`);
+    }
+  });
+
+runtime
+  .command("inspect <runId>")
+  .description("Inspect a runtime run and its event stream")
+  .option("--agent <agentId>", "agent id")
+  .option("--limit <n>", "max events", "100")
+  .option("--no-events", "omit events")
+  .option("--redacted", "hide absolute workspace paths", true)
+  .option("--json", "emit JSON output", false)
+  .action((runId: string, opts: { agent?: string; limit: string; events?: boolean; redacted?: boolean; json?: boolean }) => {
+    const limit = Number.parseInt(opts.limit, 10);
+    const inspected = inspectRuntimeRun({
+      workspace: process.cwd(),
+      runId,
+      agentId: opts.agent ?? activeAgent(program),
+      includeEvents: opts.events !== false,
+      limit: Number.isFinite(limit) && limit > 0 ? limit : 100,
+      redacted: opts.redacted !== false
+    });
+    if (opts.json) {
+      console.log(JSON.stringify(inspected, null, 2));
+      return;
+    }
+    console.log(chalk.green(`Runtime run: ${inspected.run.runId}`));
+    console.log(`Status: ${inspected.run.status}`);
+    console.log(`Stage: ${inspected.run.currentStage}`);
+    console.log(`Events: ${inspected.run.eventCount}`);
+    for (const event of inspected.events.slice(-10)) {
+      console.log(`- ${event.createdAt} ${event.type} ${event.severity} ${event.message}`);
+    }
+  });
+
+runtime
+  .command("event <runId>")
+  .description("Append an event to a persisted runtime run")
+  .option("--agent <agentId>", "agent id")
+  .option("--source <source>", "cli, studio, api, gateway, bridge, sdk, watch, fleet, or firewall", "cli")
+  .option("--type <type>", "stage.changed, trace.received, score.updated, policy.decision, alert.raised, receipt.written, candidate.proposed, commit.applied, rollback.applied", "trace.received")
+  .option("--stage <stage>", "runtime stage")
+  .option("--severity <severity>", "info, low, medium, high, or critical", "info")
+  .option("--message <text>", "event message")
+  .option("--payload-json <json>", "event payload JSON; secret-like values are redacted")
+  .option("--receipt <receiptId>", "linked receipt id")
+  .option("--decision <decisionId>", "linked decision id")
+  .option("--trace <traceId>", "linked trace id")
+  .option("--candidate <candidateId>", "linked candidate id")
+  .option("--json", "emit JSON output", false)
+  .action((runId: string, opts: {
+    agent?: string;
+    source: string;
+    type: string;
+    stage?: string;
+    severity?: string;
+    message?: string;
+    payloadJson?: string;
+    receipt?: string;
+    decision?: string;
+    trace?: string;
+    candidate?: string;
+    json?: boolean;
+  }) => {
+    const written = appendRuntimeRunEvent({
+      workspace: process.cwd(),
+      runId,
+      agentId: opts.agent ?? activeAgent(program),
+      source: parseRuntimeRunSourceCli(opts.source),
+      type: parseRuntimeRunEventTypeCli(opts.type),
+      stage: opts.stage,
+      severity: parseRuntimeRunSeverityCli(opts.severity),
+      message: opts.message,
+      payload: parseRuntimeRunPayload(opts.payloadJson),
+      links: {
+        receiptId: opts.receipt,
+        decisionId: opts.decision,
+        traceId: opts.trace,
+        candidateId: opts.candidate
+      }
+    });
+    if (opts.json) {
+      console.log(JSON.stringify(written, null, 2));
+      return;
+    }
+    console.log(chalk.green(`Runtime event appended: ${written.event.eventId}`));
+    console.log(`Run: ${written.run.runId} status=${written.run.status} events=${written.run.eventCount}`);
+  });
+
+runtime
+  .command("resume <runId>")
+  .description("Resume a running or degraded runtime run from persisted state")
+  .option("--agent <agentId>", "agent id")
+  .option("--stage <stage>", "stage after resume")
+  .option("--message <text>", "resume message")
+  .option("--json", "emit JSON output", false)
+  .action((runId: string, opts: { agent?: string; stage?: string; message?: string; json?: boolean }) => {
+    const written = resumeRuntimeRun({
+      workspace: process.cwd(),
+      runId,
+      agentId: opts.agent ?? activeAgent(program),
+      stage: opts.stage,
+      message: opts.message
+    });
+    if (opts.json) {
+      console.log(JSON.stringify(written, null, 2));
+      return;
+    }
+    console.log(chalk.green(`Runtime run resumed: ${written.run.runId}`));
+  });
+
+runtime
+  .command("cancel <runId>")
+  .description("Cancel a runtime run cleanly")
+  .option("--agent <agentId>", "agent id")
+  .option("--reason <text>", "cancel reason")
+  .option("--json", "emit JSON output", false)
+  .action((runId: string, opts: { agent?: string; reason?: string; json?: boolean }) => {
+    const written = cancelRuntimeRun({
+      workspace: process.cwd(),
+      runId,
+      agentId: opts.agent ?? activeAgent(program),
+      reason: opts.reason
+    });
+    if (opts.json) {
+      console.log(JSON.stringify(written, null, 2));
+      return;
+    }
+    console.log(chalk.yellow(`Runtime run canceled: ${written.run.runId}`));
+  });
+
+runtime
+  .command("degrade <runId>")
+  .description("Mark a runtime run degraded")
+  .option("--agent <agentId>", "agent id")
+  .option("--reason <text>", "degraded reason")
+  .option("--json", "emit JSON output", false)
+  .action((runId: string, opts: { agent?: string; reason?: string; json?: boolean }) => {
+    const written = markRuntimeRunDegraded({
+      workspace: process.cwd(),
+      runId,
+      agentId: opts.agent ?? activeAgent(program),
+      reason: opts.reason
+    });
+    if (opts.json) {
+      console.log(JSON.stringify(written, null, 2));
+      return;
+    }
+    console.log(chalk.yellow(`Runtime run degraded: ${written.run.runId}`));
+  });
+
+runtime
+  .command("complete <runId>")
+  .description("Complete a runtime run")
+  .option("--agent <agentId>", "agent id")
+  .option("--reason <text>", "completion reason")
+  .option("--json", "emit JSON output", false)
+  .action((runId: string, opts: { agent?: string; reason?: string; json?: boolean }) => {
+    const written = completeRuntimeRun({
+      workspace: process.cwd(),
+      runId,
+      agentId: opts.agent ?? activeAgent(program),
+      reason: opts.reason
+    });
+    if (opts.json) {
+      console.log(JSON.stringify(written, null, 2));
+      return;
+    }
+    console.log(chalk.green(`Runtime run completed: ${written.run.runId}`));
+  });
+
+runtime
+  .command("export <runId>")
+  .description("Export runtime run events as JSON or JSONL")
+  .requiredOption("--out <path>", "output path")
+  .option("--agent <agentId>", "agent id")
+  .option("--format <format>", "json or jsonl", "jsonl")
+  .option("--limit <n>", "max events", "100")
+  .option("--stage <stage>", "filter by stage")
+  .option("--receipt <receiptId>", "filter by receipt id")
+  .option("--redacted", "redact paths and sensitive previews", true)
+  .option("--json", "emit JSON output", false)
+  .action((runId: string, opts: { out: string; agent?: string; format: string; limit: string; stage?: string; receipt?: string; redacted?: boolean; json?: boolean }) => {
+    const limit = Number.parseInt(opts.limit, 10);
+    const format = opts.format.trim().toLowerCase() === "json" ? "json" : "jsonl";
+    const out = exportRuntimeRunEvents({
+      workspace: process.cwd(),
+      runId,
+      agentId: opts.agent ?? activeAgent(program),
+      outputPath: resolve(process.cwd(), opts.out),
+      format,
+      redacted: opts.redacted !== false,
+      limit: Number.isFinite(limit) && limit > 0 ? limit : 100,
+      stage: opts.stage,
+      receiptId: opts.receipt
+    });
+    if (opts.json) {
+      console.log(JSON.stringify(out, null, 2));
+      return;
+    }
+    console.log(chalk.green(`Runtime event export wrote ${out.count} events.`));
+    console.log(`Path: ${out.outputPath}`);
   });
 
 gateway
@@ -10951,6 +12545,74 @@ experiment
     console.log(JSON.stringify(out, null, 2));
   });
 
+experiment
+  .command("optimize")
+  .description("Create governed optimizer candidates from a Fixer RCA report")
+  .option("--rca <selector>", "Fixer RCA report selector, run ID, or latest", "latest")
+  .option("--agent <agentId>", "agent ID (overrides global --agent)")
+  .option("--json", "print JSON")
+  .action((opts: { rca?: string; agent?: string; json?: boolean }) => {
+    const out = experimentOptimizeCli({
+      workspace: process.cwd(),
+      agentId: opts.agent ?? activeAgent(program),
+      rcaSelector: opts.rca ?? "latest"
+    });
+    if (opts.json) {
+      console.log(JSON.stringify(out, null, 2));
+      return;
+    }
+    console.log(chalk.green(`Governed optimizer run: ${out.run.optimizerRunId}`));
+    console.log(`accepted=${out.run.acceptedCandidateId ?? "none"}`);
+    console.log(`candidates=${out.run.candidateCount}`);
+    console.log(`receipt=${out.run.validationReceipt.receiptId} status=${out.run.validationReceipt.status}`);
+    console.log(`path=${out.path}`);
+  });
+
+experiment
+  .command("optimizer-list")
+  .description("List governed optimizer runs")
+  .option("--agent <agentId>", "agent ID (overrides global --agent)")
+  .option("--limit <n>", "maximum runs to list", "10")
+  .option("--json", "print JSON")
+  .action((opts: { agent?: string; limit?: string; json?: boolean }) => {
+    const out = experimentOptimizerListCli({
+      workspace: process.cwd(),
+      agentId: opts.agent ?? activeAgent(program),
+      limit: Math.max(1, Number.parseInt(opts.limit ?? "10", 10) || 10)
+    });
+    if (opts.json) {
+      console.log(JSON.stringify(out, null, 2));
+      return;
+    }
+    for (const run of out) {
+      console.log(`${run.optimizerRunId} accepted=${run.acceptedCandidateId ?? "none"} status=${run.validationReceipt.status}`);
+    }
+  });
+
+experiment
+  .command("optimizer-show")
+  .description("Show a governed optimizer run")
+  .argument("<selector>", "optimizer run ID, accepted candidate ID, source run ID, or latest")
+  .option("--agent <agentId>", "agent ID (overrides global --agent)")
+  .option("--json", "print JSON")
+  .action((selector: string, opts: { agent?: string; json?: boolean }) => {
+    const out = experimentOptimizerShowCli({
+      workspace: process.cwd(),
+      agentId: opts.agent ?? activeAgent(program),
+      selector
+    });
+    if (opts.json) {
+      console.log(JSON.stringify(out, null, 2));
+      return;
+    }
+    console.log(chalk.green(`Governed optimizer run: ${out.optimizerRunId}`));
+    console.log(`sourceRca=${out.sourceRcaReportId}`);
+    console.log(`accepted=${out.acceptedCandidateId ?? "none"}`);
+    for (const candidate of out.candidates) {
+      console.log(`- ${candidate.candidateId}: ${candidate.decision} rank=${candidate.rank ?? "-"} pareto=${candidate.paretoFront} reason=${candidate.decisionReason}`);
+    }
+  });
+
 program
   .command("fix-signatures")
   .description("Verify and re-sign gateway/fleet/agent configs")
@@ -11116,6 +12778,33 @@ function parseDimensionThresholds(raw: string | undefined): Partial<Record<1 | 2
   return out;
 }
 
+function parseFleetSlaMs(raw: string): number {
+  const value = raw.trim().toLowerCase();
+  const match = /^(\d+)(ms|s|m)?$/.exec(value);
+  if (!match) {
+    throw new Error(`Invalid --sla value "${raw}". Use values like 120s, 2m, or 30000ms.`);
+  }
+  const n = Number.parseInt(match[1]!, 10);
+  const unit = match[2] ?? "s";
+  if (!Number.isFinite(n) || n <= 0) {
+    throw new Error(`Invalid --sla value "${raw}".`);
+  }
+  if (unit === "ms") return n;
+  if (unit === "m") return n * 60_000;
+  return n * 1000;
+}
+
+function formatFleetProgressEvent(event: FleetScoreProgressEvent): string {
+  const agent = event.agentId ?? "fleet";
+  const score = event.score === undefined ? "" : ` score=${event.score}`;
+  const artifact = event.lifecycleArtifactPath ? ` artifact=${event.lifecycleArtifactPath}` : "";
+  const error = event.error ? ` error=${event.error}` : "";
+  return `[${event.elapsedMs}ms] ${agent} ${event.stage}${score}${artifact}${error} - ${event.message}`;
+}
+
+const fleetLifecycle = fleet.command("lifecycle").description("Fleet parent/child lifecycle evidence");
+const fleetGraph = fleet.command("graph").description("Typed multi-agent graph operations");
+
 fleet
   .command("init")
   .description("Create and sign .amc/fleet.yaml")
@@ -11167,26 +12856,55 @@ fleet
   .description("Score multiple agents in one run with fleet-wide aggregates, weak-link detection, and pairwise comparison")
   .option("--window <window>", "evidence window (e.g. 7d, 30d)", "30d")
   .option("--agents <ids>", "comma-separated agent IDs (default: all)")
+  .option("--all", "score all configured agents (default when --agents is omitted)", false)
+  .option("--sla <duration>", "first full-result SLA per agent, e.g. 120s or 2m", "120s")
+  .option("--concurrency <n>", "max agents scored concurrently", "4")
   .option("--max-comparisons <n>", "max pairwise comparisons (0 to skip)", "50")
+  .option("--stream", "emit progressive per-agent status events to stderr", false)
   .option("--out <path>", "output JSON path (relative to .amc/reports/)")
   .option("--md", "also print markdown summary to stdout", false)
   .option("--json", "print full JSON to stdout", false)
-  .action(async (opts: { window: string; agents?: string; maxComparisons: string; out?: string; md?: boolean; json?: boolean }) => {
+  .action(async (opts: { window: string; agents?: string; all?: boolean; sla: string; concurrency: string; maxComparisons: string; stream?: boolean; out?: string; md?: boolean; json?: boolean }) => {
     const agentIds = opts.agents ? opts.agents.split(",").map((s: string) => s.trim()).filter(Boolean) : undefined;
+    const slaMs = parseFleetSlaMs(opts.sla);
+    const concurrency = Math.max(1, Number.parseInt(opts.concurrency, 10) || 1);
     const result = await evaluateFleet({
       workspace: process.cwd(),
       window: opts.window,
       agentIds,
+      slaMs,
+      concurrency,
       maxComparisons: parseInt(opts.maxComparisons, 10),
       outputPath: opts.out,
+      onProgress: opts.stream ? (event) => {
+        console.error(formatFleetProgressEvent(event));
+      } : undefined,
     });
     if (opts.json) {
       console.log(JSON.stringify(result, null, 2));
       return;
     }
-    console.log(chalk.green(`Fleet scoring complete: ${result.agentCount} agents evaluated`));
+    console.log(chalk.green(`Fleet scoring complete: ${result.agents.length}/${result.agentCount} agents scored`));
+    console.log(`SLA: ${(slaMs / 1000).toFixed(0)}s | First result: ${result.agents[0]?.firstResultMs ?? "n/a"}ms | Failures: ${result.failures.length}`);
     console.log(`Mean: ${result.aggregate.fleetMeanScore} | Median: ${result.aggregate.fleetMedianScore} | StdDev: ${result.aggregate.fleetStdDev}`);
     console.log(`Weak links: ${result.weakLinks.length}`);
+    console.log(`Cascade failures: ${result.cascadeFailures.length}`);
+    if (result.typedGraph) {
+      const graphState = result.typedGraph.validation.valid ? "valid" : `${result.typedGraph.validation.issueCount} issue(s)`;
+      console.log(`Typed graph: ${result.typedGraph.graphId} (${graphState})`);
+    } else {
+      console.log("Typed graph: none");
+    }
+    if (result.fleetLifecycle) {
+      console.log(`Fleet lifecycle: ${result.fleetLifecycle.artifactPath}`);
+    }
+    for (const agent of result.agents) {
+      const sla = agent.slaStatus === "met" ? chalk.green("met") : chalk.yellow("missed");
+      console.log(`  ${agent.agentId}: score=${agent.overallScore}, first=${agent.firstResultMs}ms, sla=${sla}, lifecycle=${agent.lifecycleArtifactPath ?? "none"}`);
+    }
+    for (const failure of result.failures) {
+      console.log(chalk.red(`  ${failure.agentId}: failed after ${failure.durationMs}ms - ${failure.actionableReason}`));
+    }
     for (const wl of result.weakLinks) {
       console.log(chalk.yellow(`  ⚠ ${wl.agentId}: score=${wl.overallScore}, risk=${wl.riskLabel}, ${wl.deviationFromMean}σ below mean`));
     }
@@ -11195,6 +12913,160 @@ fleet
     }
     if (opts.out) {
       console.log(chalk.green(`Report written: ${opts.out}`));
+    }
+  });
+
+fleetGraph
+  .command("write")
+  .description("Write the latest typed multi-agent graph from a JSON file")
+  .requiredOption("--file <path>", "typed graph JSON file")
+  .option("--json", "print full JSON payload", false)
+  .action((opts: { file: string; json?: boolean }) => {
+    const graphPath = resolve(process.cwd(), opts.file);
+    const graph = JSON.parse(readFileSync(graphPath, "utf8")) as unknown;
+    const written = writeTypedMultiAgentGraph({ workspace: process.cwd(), graph });
+    if (opts.json) {
+      console.log(JSON.stringify(written, null, 2));
+      return;
+    }
+    const color = written.ref.validation.valid ? chalk.green : chalk.yellow;
+    console.log(color(`Typed graph written: ${written.ref.graphId}`));
+    console.log(`Latest: ${written.latestPath}`);
+    console.log(`Digest: ${written.ref.digestSha256}`);
+    console.log(`Validation: ${written.ref.validation.summary}`);
+    for (const issue of written.ref.validation.issues.slice(0, 8)) {
+      console.log(chalk.yellow(`- ${issue.severity} ${issue.code}: ${issue.message}`));
+    }
+  });
+
+fleetGraph
+  .command("show")
+  .description("Inspect the latest typed multi-agent graph")
+  .option("--json", "print full JSON payload", false)
+  .action((opts: { json?: boolean }) => {
+    const graph = loadLatestTypedMultiAgentGraph(process.cwd());
+    if (!graph) {
+      if (opts.json) {
+        console.log(JSON.stringify({ graph: null, ref: null }, null, 2));
+        return;
+      }
+      console.log(chalk.gray("No typed multi-agent graph found."));
+      return;
+    }
+    const ref = typedMultiAgentGraphRef({ workspace: process.cwd(), graph });
+    if (opts.json) {
+      console.log(JSON.stringify({ graph, ref }, null, 2));
+      return;
+    }
+    console.log(chalk.green(`Typed graph: ${ref.graphId}`));
+    console.log(`Nodes: ${ref.nodeCount}`);
+    console.log(`Edges: ${ref.edgeCount}`);
+    console.log(`Digest: ${ref.digestSha256}`);
+    console.log(`Validation: ${ref.validation.summary}`);
+  });
+
+fleetGraph
+  .command("validate")
+  .description("Validate the latest typed multi-agent graph")
+  .option("--json", "print full JSON payload", false)
+  .action((opts: { json?: boolean }) => {
+    const graph = loadLatestTypedMultiAgentGraph(process.cwd());
+    const ref = graph ? typedMultiAgentGraphRef({ workspace: process.cwd(), graph }) : null;
+    const validation = graph
+      ? validateTypedMultiAgentGraph(graph)
+      : {
+          valid: false,
+          summary: "No typed multi-agent graph has been written.",
+          issueCount: 1,
+          issues: [{
+            code: "invalid_schema",
+            severity: "error",
+            message: "No typed multi-agent graph has been written.",
+            evidenceRefs: []
+          }]
+        };
+    if (opts.json) {
+      console.log(JSON.stringify({ ref, validation }, null, 2));
+    } else {
+      const color = validation.valid ? chalk.green : chalk.red;
+      console.log(color(`Typed graph validation: ${validation.summary}`));
+      for (const issue of validation.issues.slice(0, 12)) {
+        console.log(chalk.yellow(`- ${issue.severity} ${issue.code}: ${issue.message}`));
+      }
+    }
+    if (!validation.valid) {
+      process.exitCode = 1;
+    }
+  });
+
+fleetGraph
+  .command("list")
+  .description("List saved typed multi-agent graphs")
+  .option("--json", "print full JSON payload", false)
+  .action((opts: { json?: boolean }) => {
+    const graphs = listTypedMultiAgentGraphs(process.cwd());
+    if (opts.json) {
+      console.log(JSON.stringify({ graphs, total: graphs.length }, null, 2));
+      return;
+    }
+    if (graphs.length === 0) {
+      console.log(chalk.gray("No typed multi-agent graphs found."));
+      return;
+    }
+    for (const graph of graphs) {
+      const state = graph.validation.valid ? "valid" : `${graph.validation.issueCount} issue(s)`;
+      console.log(`${graph.graphId} nodes=${graph.nodeCount} edges=${graph.edgeCount} ${state} sha256=${graph.digestSha256.slice(0, 16)}`);
+    }
+  });
+
+fleetLifecycle
+  .command("list")
+  .description("List parent fleet lifecycle artifacts")
+  .option("--limit <n>", "max runs", "20")
+  .option("--redacted", "hide absolute workspace paths", true)
+  .option("--json", "emit JSON output", false)
+  .action((opts: { limit: string; redacted?: boolean; json?: boolean }) => {
+    const limit = Number.parseInt(opts.limit, 10);
+    const runs = listFleetLifecycleRunArtifacts({
+      workspace: process.cwd(),
+      limit: Number.isFinite(limit) && limit > 0 ? limit : 20,
+      redacted: opts.redacted !== false
+    });
+    if (opts.json) {
+      console.log(JSON.stringify({ runs, total: runs.length }, null, 2));
+      return;
+    }
+    if (runs.length === 0) {
+      console.log(chalk.gray("No fleet lifecycle runs found. Try: amc fleet score --all"));
+      return;
+    }
+    for (const run of runs) {
+      console.log(`${run.createdAt} ${run.fleetLifecycleRunId} ${run.status} childRuns=${run.childRuns.length} cascade=${run.cascadeFailures.length}`);
+    }
+  });
+
+fleetLifecycle
+  .command("show <run>")
+  .description("Inspect one parent fleet lifecycle artifact")
+  .option("--redacted", "hide absolute workspace paths", true)
+  .option("--json", "emit JSON output", false)
+  .action((run: string, opts: { redacted?: boolean; json?: boolean }) => {
+    const artifact = loadFleetLifecycleRunArtifact({
+      workspace: process.cwd(),
+      selector: run,
+      redacted: opts.redacted !== false
+    });
+    if (opts.json) {
+      console.log(JSON.stringify(artifact, null, 2));
+      return;
+    }
+    console.log(chalk.green(`Fleet lifecycle: ${artifact.fleetLifecycleRunId}`));
+    console.log(`Status: ${artifact.status}`);
+    console.log(`Parent: ${artifact.parentRunId}`);
+    console.log(`Children: ${artifact.childRuns.length}`);
+    console.log(`Cascade failures: ${artifact.cascadeFailures.length}`);
+    for (const failure of artifact.cascadeFailures.slice(0, 8)) {
+      console.log(`- ${failure.severity} ${failure.type}: ${failure.summary}`);
     }
   });
 
@@ -11218,8 +13090,8 @@ fleet
     // F25: guidance when all zeros
     if (health.scoredAgentCount === 0) {
       console.log("");
-      console.log(chalk.yellow("No scored agents yet. Score your first agent: ") + chalk.hex('#4AEF79')("amc quickscore"));
-      console.log(chalk.gray("  Then run a full diagnostic:") + " " + chalk.hex('#4AEF79')("amc score formal-spec <agentId>"));
+      console.log(chalk.yellow("No scored agents yet. Score the current agent: ") + chalk.hex('#4AEF79')("amc"));
+      console.log(chalk.gray("  Or score the fleet:") + " " + chalk.hex('#4AEF79')("amc fleet score --all --stream"));
     }
   });
 
@@ -13305,6 +15177,124 @@ transform
 const org = program.command("org").description("Org graph and real-time comparative scorecards");
 
 org
+  .command("roles")
+  .description("List the canonical 70 AMC org roles")
+  .option("--json", "emit JSON output", false)
+  .action((opts: { json?: boolean }) => {
+    const roles = orgRunRoleDefinitions();
+    if (opts.json) {
+      console.log(JSON.stringify({ roles, total: roles.length }, null, 2));
+      return;
+    }
+    console.log(chalk.green(`AMC org roles (${roles.length})`));
+    for (const role of roles) {
+      console.log(`- ${role.roleId} (${role.category}) -> ${role.primarySurface}: ${role.defaultScope}`);
+    }
+  });
+
+org
+  .command("run")
+  .description("Run the advanced 70-role org lifecycle loop with isolated role workspaces")
+  .option("--roles <csv>", "comma-separated role IDs", "REV_PRODUCT_MANAGER,REV_TECH_LEAD,REV_QA_LEAD")
+  .option("--goal <text>", "org run goal", "Run the AMC org lifecycle loop and produce traceable role handoffs.")
+  .option("--heartbeat <minutes>", "heartbeat interval in minutes", "30")
+  .option("--max-stale <minutes>", "max stale minutes before review pressure", "90")
+  .option("--plateau-after <n>", "heartbeats before plateau status", "3")
+  .option("--id <id>", "optional deterministic org run id")
+  .option("--json", "emit JSON output", false)
+  .action((opts: {
+    roles: string;
+    goal: string;
+    heartbeat: string;
+    maxStale: string;
+    plateauAfter: string;
+    id?: string;
+    json?: boolean;
+  }) => {
+    const result = runOrg({
+      workspace: process.cwd(),
+      roles: parseOrgRoleList(opts.roles),
+      goal: opts.goal,
+      command: `amc org run --roles ${opts.roles}`,
+      orgRunId: opts.id,
+      heartbeatPolicy: {
+        intervalMinutes: Number(opts.heartbeat),
+        maxStaleMinutes: Number(opts.maxStale),
+        plateauAfterHeartbeats: Number(opts.plateauAfter)
+      }
+    });
+    if (opts.json) {
+      console.log(JSON.stringify({
+        artifact: result.artifact,
+        artifactPath: result.artifactPath,
+        signaturePath: result.signaturePath,
+        summary: orgRunSummaryForUi(result.artifact)
+      }, null, 2));
+      return;
+    }
+    console.log(chalk.green(`Org run ${result.artifact.orgRunId}: ${result.artifact.status}`));
+    console.log(`Roles: ${result.artifact.summary.roleCount} (${result.artifact.summary.completedRoles} completed, ${result.artifact.summary.needsApprovalRoles} approval, ${result.artifact.summary.blockedRoles} blocked)`);
+    console.log(`Heartbeats: ${result.artifact.summary.heartbeatCount}`);
+    console.log(`Artifact: ${result.artifactPath}`);
+    if (result.signaturePath) {
+      console.log(`Signature: ${result.signaturePath}`);
+    }
+    for (const role of result.artifact.roles) {
+      const heartbeat = role.heartbeats[0];
+      console.log(`- ${role.roleId}: ${role.status} | next ${heartbeat?.nextReviewAt ?? role.updatedAt} | ${role.roleWorkspace}`);
+    }
+  });
+
+org
+  .command("runs")
+  .description("List org lifecycle runs")
+  .option("--limit <n>", "max runs", "10")
+  .option("--json", "emit JSON output", false)
+  .action((opts: { limit: string; json?: boolean }) => {
+    const limit = Number.parseInt(opts.limit, 10);
+    const runs = listOrgRuns({
+      workspace: process.cwd(),
+      limit: Number.isFinite(limit) && limit > 0 ? limit : 10
+    });
+    if (opts.json) {
+      console.log(JSON.stringify({ runs, total: runs.length }, null, 2));
+      return;
+    }
+    if (runs.length === 0) {
+      console.log(chalk.gray("No org runs found. Try: amc org run"));
+      return;
+    }
+    for (const run of runs) {
+      console.log(`${run.orgRunId} ${run.status} roles=${run.summary.roleCount} heartbeats=${run.summary.heartbeatCount} created=${run.createdAt}`);
+    }
+  });
+
+org
+  .command("inspect")
+  .argument("<run>", "org run id")
+  .option("--redacted", "hide workspace/private grader paths", false)
+  .option("--json", "emit JSON output", false)
+  .action((run: string, opts: { redacted?: boolean; json?: boolean }) => {
+    const loaded = loadOrgRun({
+      workspace: process.cwd(),
+      selector: run,
+      redacted: Boolean(opts.redacted)
+    });
+    if (opts.json) {
+      console.log(JSON.stringify(loaded, null, 2));
+      return;
+    }
+    const summary = orgRunSummaryForUi(loaded);
+    console.log(chalk.green(`Org run ${summary.orgRunId}: ${summary.status}`));
+    console.log(`Goal: ${summary.goal}`);
+    console.log(`Roles: ${summary.roleCount}, Heartbeats: ${summary.heartbeatCount}, Gated: ${summary.blockedGateCount}`);
+    for (const role of summary.roles) {
+      const gates = role.blockedGateIds.length > 0 ? ` gates=${role.blockedGateIds.join(",")}` : "";
+      console.log(`- ${role.roleId}: ${role.status}/${role.heartbeatStatus} next=${role.nextReviewAt}${gates}`);
+    }
+  });
+
+org
   .command("init")
   .option("--enterprise <name>", "enterprise display name", "AMC Enterprise")
   .action((opts: { enterprise: string }) => {
@@ -14698,6 +16688,94 @@ mechanic
     console.log(JSON.stringify(mechanicSimulationLatestCli(process.cwd()), null, 2));
   });
 
+const mechanicRca = mechanic.command("rca").description("Generate fixer root-cause reports from trace failure indexes");
+
+mechanicRca
+  .command("run")
+  .description("Classify a failed run and create regression-preserving fix proposals")
+  .argument("<selector>", "run id, episode id, or trace-index id")
+  .option("--agent <agentId>", "agent ID")
+  .option("--json", "output JSON", false)
+  .action(async (selector: string, opts: { agent?: string; json: boolean }) => {
+    const agentId = opts.agent ?? activeAgent(program) ?? "default";
+    const { writeFixerRcaReport } = await import("./mechanic/fixerRca.js");
+    const result = writeFixerRcaReport({
+      workspace: process.cwd(),
+      agentId,
+      selector
+    });
+    if (opts.json) {
+      console.log(JSON.stringify(result, null, 2));
+      return;
+    }
+    console.log(chalk.green(`Fixer RCA report written: ${result.path}`));
+    console.log(`Run: ${result.report.runId}`);
+    console.log(`Root causes: ${result.report.rootCauses.length}`);
+    console.log(`Regression tests: ${result.report.regressionTests.length}`);
+    console.log(`Proposals: ${result.report.proposals.filter((proposal) => proposal.status === "proposed").length} proposed, ${result.report.proposals.filter((proposal) => proposal.status === "blocked").length} blocked`);
+    console.log(`Validation: ${result.report.validationReceipt.status}`);
+    if (result.signaturePath) {
+      console.log(`Signature: ${result.signaturePath}`);
+    }
+  });
+
+mechanicRca
+  .command("list")
+  .description("List generated fixer RCA reports")
+  .option("--agent <agentId>", "agent ID")
+  .option("--limit <n>", "maximum reports to show", "10")
+  .option("--json", "output JSON", false)
+  .action(async (opts: { agent?: string; limit: string; json: boolean }) => {
+    const agentId = opts.agent ?? activeAgent(program) ?? "default";
+    const limit = Number.parseInt(opts.limit, 10);
+    const { listFixerRcaReports } = await import("./mechanic/fixerRca.js");
+    const reports = listFixerRcaReports({
+      workspace: process.cwd(),
+      agentId,
+      limit: Number.isFinite(limit) && limit > 0 ? limit : 10,
+      redacted: true
+    });
+    if (opts.json) {
+      console.log(JSON.stringify({ agentId, reports, total: reports.length }, null, 2));
+      return;
+    }
+    if (reports.length === 0) {
+      console.log(chalk.dim("No fixer RCA reports found. Run `amc mechanic rca run <run-id>` first."));
+      return;
+    }
+    for (const report of reports) {
+      console.log(`${report.reportId}  ${report.runId}  ${report.validationReceipt.status}  root-causes=${report.rootCauses.length} proposals=${report.proposals.length}`);
+    }
+  });
+
+mechanicRca
+  .command("show")
+  .description("Inspect a fixer RCA report")
+  .argument("<selector>", "report id, run id, or trace-index id")
+  .option("--agent <agentId>", "agent ID")
+  .option("--json", "output JSON", false)
+  .action(async (selector: string, opts: { agent?: string; json: boolean }) => {
+    const agentId = opts.agent ?? activeAgent(program) ?? "default";
+    const { loadFixerRcaReport } = await import("./mechanic/fixerRca.js");
+    const report = loadFixerRcaReport({
+      workspace: process.cwd(),
+      agentId,
+      selector,
+      redacted: true
+    });
+    if (opts.json) {
+      console.log(JSON.stringify(report, null, 2));
+      return;
+    }
+    console.log(chalk.bold(report.reportId));
+    console.log(`Run: ${report.runId}`);
+    console.log(`Trace index: ${report.traceIndexId}`);
+    console.log(`Validation: ${report.validationReceipt.status}`);
+    for (const cause of report.rootCauses) {
+      console.log(`- ${cause.failureClass}: ${cause.likelyCause} (${Math.round(cause.confidence * 100)}%)`);
+    }
+  });
+
 mechanic
   .command("export")
   .description("Export latest gap analysis as reward functions, DSPy targets, or fine-tune recipes")
@@ -14793,12 +16871,14 @@ release
   .description("Build a signed deterministic .amcrelease bundle")
   .requiredOption("--out <file>", "output .amcrelease file")
   .option("--private-key <path>", "release signing private key path override")
-  .action((opts: { out: string; privateKey?: string }) => {
+  .option("--skip-install-build", "use current built artifacts without running npm ci/build", false)
+  .action((opts: { out: string; privateKey?: string; skipInstallBuild?: boolean }) => {
     assertOwnerMode(process.cwd(), "release pack");
     const out = releasePackCli({
       workspace: process.cwd(),
       outFile: resolve(process.cwd(), opts.out),
-      privateKeyPath: opts.privateKey
+      privateKeyPath: opts.privateKey,
+      skipInstallBuild: opts.skipInstallBuild
     });
     console.log(chalk.green("Release bundle created"));
     console.log(`File: ${out.outFile}`);
@@ -16430,6 +18510,141 @@ shield
     } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
   });
 
+const shieldConfirm = shield.command("confirm").description("Controlled exploit confirmation with strict authorization gates");
+
+shieldConfirm
+  .command("scope-write")
+  .description("Write a signed exploit-confirmation authorization scope from JSON")
+  .requiredOption("--file <path>", "authorization scope JSON file")
+  .option("--json", "Output as JSON")
+  .action(async (opts: { file: string; json?: boolean }) => {
+    try {
+      const { writeExploitConfirmationScope } = await import("./shield/exploitConfirmation.js");
+      const scope = JSON.parse(readFileSync(resolve(process.cwd(), opts.file), "utf8")) as unknown;
+      const written = writeExploitConfirmationScope({ workspace: process.cwd(), scope });
+      if (opts.json) {
+        console.log(JSON.stringify(written, null, 2));
+        return;
+      }
+      console.log(chalk.green(`Exploit confirmation scope written: ${written.scope.scopeId}`));
+      console.log(`Path: ${written.scopePath}`);
+      console.log(`Digest: ${written.digestSha256}`);
+      console.log(`Receipt: ${written.receipt?.receiptId ?? "none"}`);
+    } catch (e: unknown) {
+      console.error(chalk.red(toErrorMessage(e)));
+      process.exit(1);
+    }
+  });
+
+shieldConfirm
+  .command("scopes")
+  .description("List exploit-confirmation authorization scopes")
+  .option("--json", "Output as JSON")
+  .action(async (opts: { json?: boolean }) => {
+    try {
+      const { listExploitConfirmationScopes } = await import("./shield/exploitConfirmation.js");
+      const scopes = listExploitConfirmationScopes(process.cwd());
+      if (opts.json) {
+        console.log(JSON.stringify({ scopes, total: scopes.length }, null, 2));
+        return;
+      }
+      if (scopes.length === 0) {
+        console.log(chalk.gray("No exploit confirmation authorization scopes found."));
+        return;
+      }
+      for (const row of scopes) {
+        console.log(`${row.scope.scopeId} target=${row.scope.target.type}:${row.scope.target.id} safeMode=${row.scope.safeMode} sha256=${row.digestSha256.slice(0, 16)}`);
+      }
+    } catch (e: unknown) {
+      console.error(chalk.red(toErrorMessage(e)));
+      process.exit(1);
+    }
+  });
+
+shieldConfirm
+  .command("run")
+  .description("Run authorized safe exploit confirmation from a task JSON file")
+  .requiredOption("--task <path>", "confirmation task JSON file")
+  .option("--scope <scopeId>", "authorization scope id; defaults to latest scope")
+  .option("--json", "Output as JSON")
+  .action(async (opts: { task: string; scope?: string; json?: boolean }) => {
+    try {
+      const { runExploitConfirmation } = await import("./shield/exploitConfirmation.js");
+      const task = JSON.parse(readFileSync(resolve(process.cwd(), opts.task), "utf8")) as unknown;
+      const result = runExploitConfirmation({
+        workspace: process.cwd(),
+        scopeId: opts.scope,
+        task
+      });
+      if (opts.json) {
+        console.log(JSON.stringify(result, null, 2));
+        return;
+      }
+      const color = result.status === "BLOCKED" ? chalk.red : result.status === "INCONCLUSIVE" ? chalk.yellow : chalk.green;
+      console.log(color(`Exploit confirmation: ${result.status}`));
+      console.log(`Authorization: ${result.authorization.ok ? "ok" : result.authorization.reasons.join(", ")}`);
+      console.log(`Proof: ${result.proofPath ?? "none"}`);
+      console.log(`Receipt: ${result.receipt?.receiptId ?? "none"}`);
+      if (result.status === "BLOCKED") {
+        process.exitCode = 1;
+      }
+    } catch (e: unknown) {
+      console.error(chalk.red(toErrorMessage(e)));
+      process.exit(1);
+    }
+  });
+
+shieldConfirm
+  .command("proofs")
+  .description("List safe exploit-confirmation proof artifacts")
+  .option("--json", "Output as JSON")
+  .action(async (opts: { json?: boolean }) => {
+    try {
+      const { listExploitConfirmationProofs } = await import("./shield/exploitConfirmation.js");
+      const proofs = listExploitConfirmationProofs(process.cwd());
+      if (opts.json) {
+        console.log(JSON.stringify({ proofs, total: proofs.length }, null, 2));
+        return;
+      }
+      if (proofs.length === 0) {
+        console.log(chalk.gray("No exploit confirmation proofs found."));
+        return;
+      }
+      for (const row of proofs) {
+        console.log(`${row.proof.proofId} ${row.proof.confirmationStatus} finding=${row.proof.findingId} technique=${row.proof.technique} sha256=${row.digestSha256.slice(0, 16)}`);
+      }
+    } catch (e: unknown) {
+      console.error(chalk.red(toErrorMessage(e)));
+      process.exit(1);
+    }
+  });
+
+shieldConfirm
+  .command("export <proofId>")
+  .description("Export a redacted safe proof without exploit instructions")
+  .option("--out <path>", "output path")
+  .option("--json", "Output as JSON")
+  .action(async (proofId: string, opts: { out?: string; json?: boolean }) => {
+    try {
+      const { exportExploitConfirmationProof } = await import("./shield/exploitConfirmation.js");
+      const exported = exportExploitConfirmationProof({
+        workspace: process.cwd(),
+        proofId,
+        outPath: opts.out,
+        redacted: true
+      });
+      if (opts.json) {
+        console.log(JSON.stringify(exported, null, 2));
+        return;
+      }
+      console.log(chalk.green(`Safe proof exported: ${exported.outPath}`));
+      console.log(`sha256=${exported.sha256}`);
+    } catch (e: unknown) {
+      console.error(chalk.red(toErrorMessage(e)));
+      process.exit(1);
+    }
+  });
+
 shield
   .command("trust-pipeline")
   .description("Run end-to-end trust pipeline for an agent action")
@@ -16540,6 +18755,666 @@ shield
 // ENFORCE — Policy enforcement and guardrails
 // ============================================================
 const enforce = program.command("enforce").description("Policy enforcement and guardrails");
+
+function enforceResourceDiffSummary(diff: EnforceResourceDiff): string {
+  return `${diff.added.length} added, ${diff.changed.length} changed, ${diff.removed.length} removed, ${diff.unchanged} unchanged`;
+}
+
+function printEnforceResourceDiff(diff: EnforceResourceDiff): void {
+  console.log(chalk.gray("Diff:"), enforceResourceDiffSummary(diff));
+  for (const entry of diff.added) {
+    console.log(chalk.green(`  + ${entry.id}`));
+  }
+  for (const entry of diff.changed) {
+    console.log(chalk.yellow(`  ~ ${entry.id}`));
+  }
+  for (const entry of diff.removed) {
+    console.log(chalk.red(`  - ${entry.id}`));
+  }
+}
+
+function printEnforceResourceRestorePlan(plan: EnforceResourceRestorePlan): void {
+  console.log(chalk.gray("Manifest:"), plan.manifestId);
+  console.log(chalk.gray("Mode:"), plan.apply ? "apply" : "dry-run");
+  for (const entry of plan.entries) {
+    const marker = entry.status === "restored" ? chalk.green("✓")
+      : entry.status === "would-restore" ? chalk.yellow("•")
+      : entry.status === "immutable-skipped" ? chalk.gray("⊘")
+      : chalk.red("!");
+    console.log(`  ${marker} ${entry.status.padEnd(18)} ${entry.id}`);
+  }
+}
+
+function printEnforceResourceGates(gates: EnforceResourcePolicyGate[]): void {
+  console.log(chalk.gray("Gates:"));
+  for (const gate of gates) {
+    const marker = gate.status === "passed" ? chalk.green("✓")
+      : gate.status === "warning" ? chalk.yellow("!")
+      : chalk.red("x");
+    console.log(`  ${marker} ${gate.id.padEnd(34)} ${gate.summary}`);
+  }
+}
+
+function printEnforceResourceValidation(validation: EnforceResourceValidation): void {
+  const status = validation.status === "valid" ? chalk.green(validation.status)
+    : validation.status === "requires-review" ? chalk.yellow(validation.status)
+    : chalk.red(validation.status);
+  console.log(chalk.gray("Manifest:"), validation.manifestPath);
+  console.log(chalk.gray("Expected:"), validation.expectedManifestId);
+  console.log(chalk.gray("Current:"), validation.currentManifestId);
+  console.log(chalk.gray("Status:"), status);
+  console.log(chalk.gray("Can apply:"), validation.canApply ? chalk.green("yes") : chalk.red("no"));
+  console.log(chalk.gray("Signature:"), validation.signature.valid ? chalk.green("valid") : chalk.yellow(validation.signature.reason ?? "missing"));
+  printEnforceResourceDiff(validation.diff);
+  printEnforceResourceGates(validation.gates);
+}
+
+function printEnforceResourceProposal(proposal: EnforceResourceProposal): void {
+  console.log(chalk.gray("Proposal:"), proposal.proposalId);
+  console.log(chalk.gray("Agent:"), proposal.agentId);
+  console.log(chalk.gray("Summary:"), proposal.summary);
+  console.log(chalk.gray("Mode:"), "dry-run");
+  printEnforceResourceValidation(proposal.validation);
+}
+
+function printEnforceResourceEvaluation(evaluation: EnforceResourceEvaluation): void {
+  const decision = evaluation.decision === "accept" ? chalk.green(evaluation.decision)
+    : evaluation.decision === "review" ? chalk.yellow(evaluation.decision)
+    : chalk.red(evaluation.decision);
+  console.log(chalk.gray("Proposal:"), evaluation.proposalId);
+  console.log(chalk.gray("Decision:"), decision);
+  console.log(chalk.gray("Can apply:"), evaluation.canApply ? chalk.green("yes") : chalk.red("no"));
+  printEnforceResourceDiff(evaluation.diff);
+  printEnforceResourceGates(evaluation.gates);
+  console.log(chalk.gray("Next:"), evaluation.nextCommand);
+}
+
+function printEnforceResourceHistory(entries: EnforceResourceHistoryEntry[]): void {
+  if (entries.length === 0) {
+    console.log(chalk.gray("No Enforce resource history yet. Run `amc resource snapshot` first."));
+    return;
+  }
+  for (const entry of entries) {
+    const sig = entry.signatureValid ? chalk.green("signed") : chalk.yellow(entry.signatureReason ?? "unsigned");
+    console.log(`  ${entry.kind.padEnd(15)} ${entry.id}`);
+    console.log(chalk.gray(`    ${entry.createdAt ?? "unknown-time"} ${sig} ${entry.path}`));
+  }
+}
+
+function registerResourceProtocolCommands(root: Command, includeCore: boolean): void {
+  if (includeCore) {
+    root
+      .command("snapshot")
+      .description("Write the current Enforce resource manifest")
+      .option("--agent <agentId>", "agent id to snapshot")
+      .option("--json", "Output as JSON")
+      .action(async (opts: { agent?: string; json?: boolean }) => {
+        try {
+          const workspace = process.cwd();
+          const agentId = resolveAgentId(workspace, opts.agent ?? activeAgent(program));
+          const result = writeEnforceResourceManifest({ workspace, agentId });
+          if (opts.json) {
+            console.log(JSON.stringify({
+              manifestId: result.manifest.manifestId,
+              agentId: result.manifest.agentId,
+              resourceCount: result.manifest.resourceCount,
+              resourcesSha256: result.manifest.resourcesSha256,
+              manifestPath: result.manifestPath,
+              snapshotPath: result.snapshotPath,
+              snapshotBundlePath: result.snapshotBundlePath,
+              manifestSigPath: result.manifestSigPath,
+              snapshotSigPath: result.snapshotSigPath
+            }, null, 2));
+            return;
+          }
+          console.log(chalk.bold.hex("#4AEF79")("\nEnforce Resource Snapshot"));
+          console.log(chalk.gray("Agent:"), result.manifest.agentId);
+          console.log(chalk.gray("Manifest:"), result.manifest.manifestId);
+          console.log(chalk.gray("Resources:"), result.manifest.resourceCount);
+          console.log(chalk.gray("Path:"), result.manifestPath);
+          console.log(chalk.gray("Snapshot:"), result.snapshotPath);
+          console.log(chalk.gray("Snapshot bundle:"), result.snapshotBundlePath);
+          console.log(chalk.gray("Manifest signature:"), result.manifestSigPath ?? "not signed");
+          console.log(chalk.gray("Snapshot signature:"), result.snapshotSigPath ?? "not signed");
+        } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
+      });
+
+    root
+      .command("list")
+      .description("List resources in an Enforce resource manifest")
+      .option("--agent <agentId>", "agent id to list")
+      .option("--manifest <path>", "manifest path to read")
+      .option("--json", "Output as JSON")
+      .action(async (opts: { agent?: string; manifest?: string; json?: boolean }) => {
+        try {
+          const workspace = process.cwd();
+          const agentId = resolveAgentId(workspace, opts.agent ?? activeAgent(program));
+          const resources = listEnforceResources({
+            workspace,
+            agentId,
+            manifestPath: opts.manifest ? resolve(opts.manifest) : undefined
+          });
+          if (opts.json) {
+            console.log(JSON.stringify(resources, null, 2));
+            return;
+          }
+          console.log(chalk.bold.hex("#4AEF79")("\nEnforce Resources"));
+          for (const resource of resources) {
+            console.log(`  ${resource.kind.padEnd(14)} ${resource.id}`);
+            console.log(chalk.gray(`    ${resource.path} ${resource.digest ? resource.digest.slice(0, 12) : "no-digest"}`));
+          }
+        } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
+      });
+
+    root
+      .command("get <resource>")
+      .alias("inspect")
+      .description("Inspect one resource in an Enforce resource manifest")
+      .option("--agent <agentId>", "agent id to inspect")
+      .option("--manifest <path>", "manifest path to read")
+      .option("--json", "Output as JSON")
+      .action(async (resource: string, opts: { agent?: string; manifest?: string; json?: boolean }) => {
+        try {
+          const workspace = process.cwd();
+          const agentId = resolveAgentId(workspace, opts.agent ?? activeAgent(program));
+          const result = inspectEnforceResource({
+            workspace,
+            agentId,
+            selector: resource,
+            manifestPath: opts.manifest ? resolve(opts.manifest) : undefined
+          });
+          if (opts.json) {
+            console.log(JSON.stringify(result, null, 2));
+            return;
+          }
+          console.log(chalk.bold.hex("#4AEF79")("\nEnforce Resource"));
+          console.log(chalk.gray("ID:"), result.id);
+          console.log(chalk.gray("Kind:"), result.kind);
+          console.log(chalk.gray("Path:"), result.path);
+          console.log(chalk.gray("Digest:"), result.digest ?? "none");
+          console.log(chalk.gray("Mutable:"), result.mutable ? "yes" : "no");
+          console.log(chalk.gray("Owner:"), result.owner);
+          console.log(chalk.gray("Validation:"), result.validationStatus);
+        } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
+      });
+
+    root
+      .command("diff")
+      .description("Diff an Enforce resource manifest against the current workspace")
+      .option("--agent <agentId>", "agent id to diff")
+      .option("--from <path>", "baseline manifest path; defaults to latest manifest")
+      .option("--to <path>", "comparison manifest path; defaults to current workspace resources")
+      .option("--json", "Output as JSON")
+      .action(async (opts: { agent?: string; from?: string; to?: string; json?: boolean }) => {
+        try {
+          const workspace = process.cwd();
+          const agentId = resolveAgentId(workspace, opts.agent ?? activeAgent(program));
+          const fromPath = opts.from ? resolve(opts.from) : latestEnforceResourceManifestPath(workspace, agentId);
+          const before = loadEnforceResourceManifest(fromPath);
+          const after = opts.to
+            ? loadEnforceResourceManifest(resolve(opts.to))
+            : buildEnforceResourceManifest({ workspace, agentId: before.agentId });
+          const diff = diffEnforceResourceManifests(before, after);
+          if (opts.json) {
+            console.log(JSON.stringify({
+              from: fromPath,
+              to: opts.to ? resolve(opts.to) : "current-workspace",
+              diff
+            }, null, 2));
+            return;
+          }
+          console.log(chalk.bold.hex("#4AEF79")("\nEnforce Resource Diff"));
+          console.log(chalk.gray("From:"), fromPath);
+          console.log(chalk.gray("To:"), opts.to ? resolve(opts.to) : "current workspace");
+          printEnforceResourceDiff(diff);
+        } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
+      });
+
+    root
+      .command("restore")
+      .description("Restore resources from an Enforce snapshot; dry-run unless --apply is set")
+      .option("--agent <agentId>", "agent id to restore")
+      .option("--manifest <path>", "manifest path to restore from")
+      .option("--resource <idOrPath>", "restore one resource id or path")
+      .option("--apply", "write restored resources to the workspace", false)
+      .option("--include-immutable", "include immutable signature resources", false)
+      .option("--json", "Output as JSON")
+      .action(async (opts: { agent?: string; manifest?: string; resource?: string; apply?: boolean; includeImmutable?: boolean; json?: boolean }) => {
+        try {
+          const workspace = process.cwd();
+          const agentId = resolveAgentId(workspace, opts.agent ?? activeAgent(program));
+          const plan = restoreEnforceResourceSnapshot({
+            workspace,
+            agentId,
+            manifestPath: opts.manifest ? resolve(opts.manifest) : undefined,
+            resource: opts.resource,
+            apply: Boolean(opts.apply),
+            includeImmutable: Boolean(opts.includeImmutable)
+          });
+          if (opts.json) {
+            console.log(JSON.stringify(plan, null, 2));
+            return;
+          }
+          console.log(chalk.bold.hex("#4AEF79")("\nEnforce Resource Restore"));
+          printEnforceResourceRestorePlan(plan);
+          if (!opts.apply) {
+            console.log(chalk.gray("\nDry run only. Re-run with --apply to write these resources."));
+          }
+        } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
+      });
+  } else {
+    root
+      .command("get <resource>")
+      .description("Alias for inspect: read one resource from an Enforce resource manifest")
+      .option("--agent <agentId>", "agent id to inspect")
+      .option("--manifest <path>", "manifest path to read")
+      .option("--json", "Output as JSON")
+      .action(async (resource: string, opts: { agent?: string; manifest?: string; json?: boolean }) => {
+        try {
+          const workspace = process.cwd();
+          const agentId = resolveAgentId(workspace, opts.agent ?? activeAgent(program));
+          const result = inspectEnforceResource({
+            workspace,
+            agentId,
+            selector: resource,
+            manifestPath: opts.manifest ? resolve(opts.manifest) : undefined
+          });
+          if (opts.json) {
+            console.log(JSON.stringify(result, null, 2));
+            return;
+          }
+          console.log(chalk.bold.hex("#4AEF79")("\nEnforce Resource"));
+          console.log(chalk.gray("ID:"), result.id);
+          console.log(chalk.gray("Kind:"), result.kind);
+          console.log(chalk.gray("Path:"), result.path);
+          console.log(chalk.gray("Digest:"), result.digest ?? "none");
+          console.log(chalk.gray("Mutable:"), result.mutable ? "yes" : "no");
+          console.log(chalk.gray("Owner:"), result.owner);
+          console.log(chalk.gray("Validation:"), result.validationStatus);
+        } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
+      });
+  }
+
+  root
+    .command("validate")
+    .description("Validate governed resource changes before accepting them")
+    .option("--agent <agentId>", "agent id to validate")
+    .option("--manifest <path>", "manifest path to validate against")
+    .option("--json", "Output as JSON")
+    .action(async (opts: { agent?: string; manifest?: string; json?: boolean }) => {
+      try {
+        const workspace = process.cwd();
+        const agentId = resolveAgentId(workspace, opts.agent ?? activeAgent(program));
+        const validation = validateEnforceResourceLifecycle({
+          workspace,
+          agentId,
+          manifestPath: opts.manifest ? resolve(opts.manifest) : undefined
+        });
+        if (opts.json) {
+          console.log(JSON.stringify(validation, null, 2));
+          return;
+        }
+        console.log(chalk.bold.hex("#4AEF79")("\nEnforce Resource Validate"));
+        printEnforceResourceValidation(validation);
+        if (validation.status === "blocked") process.exitCode = 1;
+      } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
+    });
+
+  root
+    .command("propose")
+    .description("Create a dry-run resource change proposal from the latest manifest to current workspace state")
+    .option("--agent <agentId>", "agent id to propose for")
+    .option("--manifest <path>", "manifest path to propose from")
+    .option("--json", "Output as JSON")
+    .action(async (opts: { agent?: string; manifest?: string; json?: boolean }) => {
+      try {
+        const workspace = process.cwd();
+        const agentId = resolveAgentId(workspace, opts.agent ?? activeAgent(program));
+        const proposal = proposeEnforceResourceLifecycle({
+          workspace,
+          agentId,
+          manifestPath: opts.manifest ? resolve(opts.manifest) : undefined
+        });
+        if (opts.json) {
+          console.log(JSON.stringify(proposal, null, 2));
+          return;
+        }
+        console.log(chalk.bold.hex("#4AEF79")("\nEnforce Resource Proposal"));
+        printEnforceResourceProposal(proposal);
+      } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
+    });
+
+  root
+    .command("evaluate")
+    .description("Evaluate a resource proposal against Enforce gates")
+    .option("--agent <agentId>", "agent id to evaluate")
+    .option("--manifest <path>", "manifest path to evaluate against")
+    .option("--json", "Output as JSON")
+    .action(async (opts: { agent?: string; manifest?: string; json?: boolean }) => {
+      try {
+        const workspace = process.cwd();
+        const agentId = resolveAgentId(workspace, opts.agent ?? activeAgent(program));
+        const evaluation = evaluateEnforceResourceLifecycle({
+          workspace,
+          agentId,
+          manifestPath: opts.manifest ? resolve(opts.manifest) : undefined
+        });
+        if (opts.json) {
+          console.log(JSON.stringify(evaluation, null, 2));
+          return;
+        }
+        console.log(chalk.bold.hex("#4AEF79")("\nEnforce Resource Evaluate"));
+        printEnforceResourceEvaluation(evaluation);
+        if (evaluation.decision === "block") process.exitCode = 1;
+      } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
+    });
+
+  root
+    .command("apply")
+    .description("Accept current resources as the new signed manifest; dry-run unless --yes is set")
+    .option("--agent <agentId>", "agent id to apply")
+    .option("--manifest <path>", "baseline manifest path")
+    .option("--yes", "accept current resource state and write a signed receipt", false)
+    .option("--force", "override blocked gates and record the override in the signed receipt", false)
+    .option("--json", "Output as JSON")
+    .action(async (opts: { agent?: string; manifest?: string; yes?: boolean; force?: boolean; json?: boolean }) => {
+      try {
+        const workspace = process.cwd();
+        const agentId = resolveAgentId(workspace, opts.agent ?? activeAgent(program));
+        const result = applyEnforceResourceLifecycle({
+          workspace,
+          agentId,
+          manifestPath: opts.manifest ? resolve(opts.manifest) : undefined,
+          dryRun: !opts.yes,
+          force: Boolean(opts.force)
+        });
+        if (opts.json) {
+          console.log(JSON.stringify(result, null, 2));
+          return;
+        }
+        console.log(chalk.bold.hex("#4AEF79")("\nEnforce Resource Apply"));
+        printEnforceResourceEvaluation(result.evaluation);
+        if (result.applied) {
+          console.log(chalk.gray("Accepted manifest:"), result.acceptedManifest?.manifest.manifestId ?? "none");
+          console.log(chalk.gray("Receipt:"), result.receiptPath ?? "not written");
+          console.log(chalk.gray("Receipt signature:"), result.receiptSigPath ?? "not signed");
+        } else {
+          console.log(chalk.gray("\nDry run only. Re-run with --yes to accept current resources."));
+        }
+      } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
+    });
+
+  root
+    .command("rollback")
+    .description("Alias for restore: rollback resources from an Enforce snapshot")
+    .option("--agent <agentId>", "agent id to rollback")
+    .option("--manifest <path>", "manifest path to restore from")
+    .option("--resource <idOrPath>", "restore one resource id or path")
+    .option("--apply", "write restored resources to the workspace", false)
+    .option("--include-immutable", "include immutable signature resources", false)
+    .option("--json", "Output as JSON")
+    .action(async (opts: { agent?: string; manifest?: string; resource?: string; apply?: boolean; includeImmutable?: boolean; json?: boolean }) => {
+      try {
+        const workspace = process.cwd();
+        const agentId = resolveAgentId(workspace, opts.agent ?? activeAgent(program));
+        const plan = restoreEnforceResourceSnapshot({
+          workspace,
+          agentId,
+          manifestPath: opts.manifest ? resolve(opts.manifest) : undefined,
+          resource: opts.resource,
+          apply: Boolean(opts.apply),
+          includeImmutable: Boolean(opts.includeImmutable)
+        });
+        if (opts.json) {
+          console.log(JSON.stringify(plan, null, 2));
+          return;
+        }
+        console.log(chalk.bold.hex("#4AEF79")("\nEnforce Resource Rollback"));
+        printEnforceResourceRestorePlan(plan);
+        if (!opts.apply) {
+          console.log(chalk.gray("\nDry run only. Re-run with --apply to write rollback resources."));
+        }
+      } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
+    });
+
+  root
+    .command("history")
+    .description("Show signed Enforce resource manifests, snapshots, and receipts")
+    .option("--agent <agentId>", "agent id to inspect")
+    .option("--json", "Output as JSON")
+    .action(async (opts: { agent?: string; json?: boolean }) => {
+      try {
+        const workspace = process.cwd();
+        const agentId = resolveAgentId(workspace, opts.agent ?? activeAgent(program));
+        const entries = listEnforceResourceHistory({ workspace, agentId });
+        if (opts.json) {
+          console.log(JSON.stringify(entries, null, 2));
+          return;
+        }
+        console.log(chalk.bold.hex("#4AEF79")("\nEnforce Resource History"));
+        printEnforceResourceHistory(entries);
+      } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
+    });
+
+  root
+    .command("contract")
+    .description("Show the AMC-native governed resource lifecycle contract")
+    .option("--json", "Output as JSON")
+    .action(async (opts: { json?: boolean }) => {
+      try {
+        const contract = enforceResourceLifecycleContract();
+        if (opts.json) {
+          console.log(JSON.stringify(contract, null, 2));
+          return;
+        }
+        console.log(chalk.bold.hex("#4AEF79")("\nEnforce Resource Contract"));
+        console.log(chalk.gray("Surface:"), contract.surface);
+        console.log(chalk.gray("Verbs:"), contract.verbs.join(", "));
+        console.log(chalk.gray("Kinds:"), contract.resourceKinds.join(", "));
+        console.log(chalk.gray("Gates:"), contract.gates.join(", "));
+      } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
+    });
+}
+
+const enforceResources = enforce
+  .command("resources")
+  .description("Snapshot, diff, and verify agent resources governed by Enforce");
+
+enforceResources
+  .command("snapshot")
+  .description("Write the current Enforce resource manifest")
+  .option("--agent <agentId>", "agent id to snapshot")
+  .option("--json", "Output as JSON")
+  .action(async (opts: { agent?: string; json?: boolean }) => {
+    try {
+      const workspace = process.cwd();
+      const agentId = resolveAgentId(workspace, opts.agent ?? activeAgent(program));
+      const result = writeEnforceResourceManifest({ workspace, agentId });
+      if (opts.json) {
+        console.log(JSON.stringify({
+          manifestId: result.manifest.manifestId,
+          agentId: result.manifest.agentId,
+          resourceCount: result.manifest.resourceCount,
+          resourcesSha256: result.manifest.resourcesSha256,
+          manifestPath: result.manifestPath,
+          snapshotPath: result.snapshotPath,
+          snapshotBundlePath: result.snapshotBundlePath,
+          manifestSigPath: result.manifestSigPath,
+          snapshotSigPath: result.snapshotSigPath
+        }, null, 2));
+        return;
+      }
+      console.log(chalk.bold.hex("#4AEF79")("\nEnforce Resource Snapshot"));
+      console.log(chalk.gray("Agent:"), result.manifest.agentId);
+      console.log(chalk.gray("Manifest:"), result.manifest.manifestId);
+      console.log(chalk.gray("Resources:"), result.manifest.resourceCount);
+      console.log(chalk.gray("Path:"), result.manifestPath);
+      console.log(chalk.gray("Snapshot:"), result.snapshotPath);
+      console.log(chalk.gray("Snapshot bundle:"), result.snapshotBundlePath);
+      console.log(chalk.gray("Manifest signature:"), result.manifestSigPath ?? "not signed");
+      console.log(chalk.gray("Snapshot signature:"), result.snapshotSigPath ?? "not signed");
+    } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
+  });
+
+enforceResources
+  .command("list")
+  .description("List resources in an Enforce resource manifest")
+  .option("--agent <agentId>", "agent id to list")
+  .option("--manifest <path>", "manifest path to read")
+  .option("--json", "Output as JSON")
+  .action(async (opts: { agent?: string; manifest?: string; json?: boolean }) => {
+    try {
+      const workspace = process.cwd();
+      const agentId = resolveAgentId(workspace, opts.agent ?? activeAgent(program));
+      const resources = listEnforceResources({
+        workspace,
+        agentId,
+        manifestPath: opts.manifest ? resolve(opts.manifest) : undefined
+      });
+      if (opts.json) {
+        console.log(JSON.stringify(resources, null, 2));
+        return;
+      }
+      console.log(chalk.bold.hex("#4AEF79")("\nEnforce Resources"));
+      for (const resource of resources) {
+        console.log(`  ${resource.kind.padEnd(14)} ${resource.id}`);
+        console.log(chalk.gray(`    ${resource.path} ${resource.digest ? resource.digest.slice(0, 12) : "no-digest"}`));
+      }
+    } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
+  });
+
+enforceResources
+  .command("inspect <resource>")
+  .description("Inspect one resource in an Enforce resource manifest")
+  .option("--agent <agentId>", "agent id to inspect")
+  .option("--manifest <path>", "manifest path to read")
+  .option("--json", "Output as JSON")
+  .action(async (resource: string, opts: { agent?: string; manifest?: string; json?: boolean }) => {
+    try {
+      const workspace = process.cwd();
+      const agentId = resolveAgentId(workspace, opts.agent ?? activeAgent(program));
+      const result = inspectEnforceResource({
+        workspace,
+        agentId,
+        selector: resource,
+        manifestPath: opts.manifest ? resolve(opts.manifest) : undefined
+      });
+      if (opts.json) {
+        console.log(JSON.stringify(result, null, 2));
+        return;
+      }
+      console.log(chalk.bold.hex("#4AEF79")("\nEnforce Resource"));
+      console.log(chalk.gray("ID:"), result.id);
+      console.log(chalk.gray("Kind:"), result.kind);
+      console.log(chalk.gray("Path:"), result.path);
+      console.log(chalk.gray("Digest:"), result.digest ?? "none");
+      console.log(chalk.gray("Mutable:"), result.mutable ? "yes" : "no");
+      console.log(chalk.gray("Owner:"), result.owner);
+    } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
+  });
+
+enforceResources
+  .command("verify")
+  .description("Verify the current workspace resources against an Enforce resource manifest")
+  .option("--agent <agentId>", "agent id to verify")
+  .option("--manifest <path>", "manifest path to verify")
+  .option("--json", "Output as JSON")
+  .action(async (opts: { agent?: string; manifest?: string; json?: boolean }) => {
+    try {
+      const workspace = process.cwd();
+      const agentId = resolveAgentId(workspace, opts.agent ?? activeAgent(program));
+      const verification = verifyEnforceResourceManifest({
+        workspace,
+        agentId,
+        manifestPath: opts.manifest ? resolve(opts.manifest) : undefined
+      });
+      if (opts.json) {
+        console.log(JSON.stringify(verification, null, 2));
+        return;
+      }
+      console.log(chalk.bold.hex("#4AEF79")("\nEnforce Resource Verify"));
+      console.log(chalk.gray("Manifest:"), verification.manifestPath);
+      console.log(chalk.gray("Status:"), verification.valid ? chalk.green("valid") : chalk.red("changed"));
+      console.log(chalk.gray("Signature:"), verification.signature.valid ? chalk.green("valid") : chalk.yellow(verification.signature.reason ?? "missing"));
+      printEnforceResourceDiff(verification.diff);
+      if (!verification.valid) {
+        process.exitCode = 1;
+      }
+    } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
+  });
+
+enforceResources
+  .command("diff")
+  .description("Diff two Enforce resource manifests, or a manifest against the current workspace")
+  .option("--agent <agentId>", "agent id to diff")
+  .option("--from <path>", "baseline manifest path; defaults to latest manifest")
+  .option("--to <path>", "comparison manifest path; defaults to current workspace resources")
+  .option("--json", "Output as JSON")
+  .action(async (opts: { agent?: string; from?: string; to?: string; json?: boolean }) => {
+    try {
+      const workspace = process.cwd();
+      const agentId = resolveAgentId(workspace, opts.agent ?? activeAgent(program));
+      const fromPath = opts.from ? resolve(opts.from) : latestEnforceResourceManifestPath(workspace, agentId);
+      const before = loadEnforceResourceManifest(fromPath);
+      const after = opts.to
+        ? loadEnforceResourceManifest(resolve(opts.to))
+        : buildEnforceResourceManifest({ workspace, agentId: before.agentId });
+      const diff = diffEnforceResourceManifests(before, after);
+      if (opts.json) {
+        console.log(JSON.stringify({
+          from: fromPath,
+          to: opts.to ? resolve(opts.to) : "current-workspace",
+          diff
+        }, null, 2));
+        return;
+      }
+      console.log(chalk.bold.hex("#4AEF79")("\nEnforce Resource Diff"));
+      console.log(chalk.gray("From:"), fromPath);
+      console.log(chalk.gray("To:"), opts.to ? resolve(opts.to) : "current workspace");
+      printEnforceResourceDiff(diff);
+    } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
+  });
+
+enforceResources
+  .command("restore")
+  .description("Restore resources from an Enforce snapshot; dry-run unless --apply is set")
+  .option("--agent <agentId>", "agent id to restore")
+  .option("--manifest <path>", "manifest path to restore from")
+  .option("--resource <idOrPath>", "restore one resource id or path")
+  .option("--apply", "write restored resources to the workspace", false)
+  .option("--include-immutable", "include immutable signature resources", false)
+  .option("--json", "Output as JSON")
+  .action(async (opts: { agent?: string; manifest?: string; resource?: string; apply?: boolean; includeImmutable?: boolean; json?: boolean }) => {
+    try {
+      const workspace = process.cwd();
+      const agentId = resolveAgentId(workspace, opts.agent ?? activeAgent(program));
+      const plan = restoreEnforceResourceSnapshot({
+        workspace,
+        agentId,
+        manifestPath: opts.manifest ? resolve(opts.manifest) : undefined,
+        resource: opts.resource,
+        apply: Boolean(opts.apply),
+        includeImmutable: Boolean(opts.includeImmutable)
+      });
+      if (opts.json) {
+        console.log(JSON.stringify(plan, null, 2));
+        return;
+      }
+      console.log(chalk.bold.hex("#4AEF79")("\nEnforce Resource Restore"));
+      printEnforceResourceRestorePlan(plan);
+      if (!opts.apply) {
+        console.log(chalk.gray("\nDry run only. Re-run with --apply to write these resources."));
+      }
+    } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
+  });
+
+registerResourceProtocolCommands(enforceResources, false);
+
+const resource = program
+  .command("resource")
+  .description("Govern prompts, tools, memory, policies, routes, and other agent-defining resources");
+
+registerResourceProtocolCommands(resource, true);
 
 enforce
   .command("check <agentId> <tool> <action>")
@@ -18900,6 +21775,84 @@ memory.command("assess <agentId>").description("Full memory maturity assessment"
   result.agentId = agentId;
   if (opts.json) { console.log(JSON.stringify(result, null, 2)); } else { console.log(chalk.bold(`Memory Maturity — ${agentId}`)); console.log(`  Persistence: L${result.persistenceLevel}`); console.log(`  Continuity:  L${result.continuityLevel}`); console.log(`  Integrity:   L${result.integrityLevel}`); console.log(`  Overall:     ${result.overallScore}/100`); if (result.gaps.length) { console.log(chalk.yellow(`  Gaps: ${result.gaps.join("; ")}`)); } }
 });
+memory
+  .command("writeback <episode>")
+  .description("Write governed reasoning memory from an EpisodeRecord")
+  .option("--agent <agentId>", "agent ID (overrides global --agent)")
+  .option("--consumer <csv>", "allowed consumers", "score,recommendation,fixer,studio")
+  .option("--ttl-days <n>", "days until expiry", "90")
+  .option("--review-days <n>", "days until review", "30")
+  .option("--summary <text>", "override generated summary")
+  .option("--json", "print JSON")
+  .action(async (episode: string, opts: { agent?: string; consumer?: string; ttlDays?: string; reviewDays?: string; summary?: string; json?: boolean }) => {
+    const { writeReasoningMemoryFromEpisode } = await import("./learning/reasoningMemory.js");
+    const result = writeReasoningMemoryFromEpisode({
+      workspace: process.cwd(),
+      agentId: opts.agent ?? activeAgent(program),
+      episodeSelector: episode,
+      allowedConsumers: (opts.consumer ?? "score,recommendation,fixer,studio")
+        .split(",")
+        .map((value) => value.trim())
+        .filter((value) => value.length > 0) as import("./learning/reasoningMemory.js").ReasoningMemoryConsumer[],
+      ttlDays: Number.parseInt(opts.ttlDays ?? "90", 10) || 90,
+      reviewDays: Number.parseInt(opts.reviewDays ?? "30", 10) || 30,
+      summaryOverride: opts.summary
+    });
+    if (opts.json) {
+      console.log(JSON.stringify(result, null, 2));
+      return;
+    }
+    for (const receipt of result.receipts) {
+      const memory = receipt.memoryId ?? "none";
+      console.log(`${receipt.decision}: ${memory} (${receipt.reason})`);
+    }
+  });
+memory
+  .command("retrieve")
+  .description("Retrieve active reasoning memory for a consumer")
+  .option("--agent <agentId>", "agent ID (overrides global --agent)")
+  .option("--consumer <consumer>", "score|recommendation|fixer|studio", "studio")
+  .option("--query <text>", "filter memory by text or evidence ref")
+  .option("--limit <n>", "maximum items", "20")
+  .option("--json", "print JSON")
+  .action(async (opts: { agent?: string; consumer?: string; query?: string; limit?: string; json?: boolean }) => {
+    const { retrieveReasoningMemory } = await import("./learning/reasoningMemory.js");
+    const result = retrieveReasoningMemory({
+      workspace: process.cwd(),
+      agentId: opts.agent ?? activeAgent(program),
+      consumer: (opts.consumer ?? "studio") as import("./learning/reasoningMemory.js").ReasoningMemoryConsumer,
+      query: opts.query,
+      limit: Math.max(1, Number.parseInt(opts.limit ?? "20", 10) || 20)
+    });
+    if (opts.json) {
+      console.log(JSON.stringify(result, null, 2));
+      return;
+    }
+    for (const item of result.items) {
+      console.log(`${item.memoryId}: ${item.lessonType} confidence=${item.confidence.toFixed(2)} expires=${item.expiresAt}`);
+      console.log(`  ${item.summary}`);
+    }
+  });
+memory
+  .command("show <selector>")
+  .description("Show one reasoning memory item")
+  .option("--agent <agentId>", "agent ID (overrides global --agent)")
+  .option("--json", "print JSON")
+  .action(async (selector: string, opts: { agent?: string; json?: boolean }) => {
+    const { loadReasoningMemoryItem } = await import("./learning/reasoningMemory.js");
+    const item = loadReasoningMemoryItem({
+      workspace: process.cwd(),
+      agentId: opts.agent ?? activeAgent(program),
+      selector
+    });
+    if (opts.json) {
+      console.log(JSON.stringify(item, null, 2));
+      return;
+    }
+    console.log(`${item.memoryId}: ${item.lessonType} ${item.status}`);
+    console.log(item.summary);
+    console.log(`Evidence: ${item.evidenceRefs.map((ref) => ref.ref).join(", ")}`);
+  });
 
 // Oversight commands
 const oversight = program.command("oversight").description("Human oversight quality assessment");
@@ -18959,11 +21912,12 @@ score
   .command("tier")
   .description("Run tiered maturity assessment (quick/standard/deep)")
   .option("--tier <tier>", "Assessment tier: quick, standard, or deep", "quick")
+  .option("--question-set <version>", "assessment question set for standard/deep: legacy or lifecycle")
   .option("--json", "Output as JSON")
-  .action(async (opts: { tier?: string; json?: boolean }) => {
+  .action(async (opts: { tier?: string; questionSet?: string; json?: boolean }) => {
     const { getQuestionsForTier, computeQuickScore, renderAsciiRadar } = await import("./diagnostic/quickScore.js");
     const tier = (opts.tier === "standard" || opts.tier === "deep") ? opts.tier : "quick" as const;
-    const questions = getQuestionsForTier(tier);
+    const questions = getQuestionsForTier(tier, opts.questionSet);
     const answers: Record<string, number> = {};
 
     if (process.stdin.isTTY) {
@@ -18979,7 +21933,7 @@ score
       }
     }
 
-    const result = computeQuickScore(answers, tier);
+    const result = computeQuickScore(answers, tier, opts.questionSet);
     if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
     console.log(chalk.bold.hex('#4AEF79')(`\n📊  ${tier.charAt(0).toUpperCase() + tier.slice(1)} Score Assessment`));
     console.log(chalk.gray(`Score: ${result.totalScore}/${result.maxScore} (${result.percentage}%)`));
@@ -19903,6 +22857,9 @@ apiCmd
       { method: "GET",    path: "/api/v1/fleet/health",             desc: "Fleet health dashboard" },
       { method: "GET",    path: "/api/v1/compliance/report",        desc: "Generate compliance report" },
       { method: "POST",   path: "/api/v1/shield/scan",              desc: "Run shield security scan" },
+      { method: "POST",   path: "/api/v1/shield/exploit-confirmation/scopes", desc: "Create controlled exploit-confirmation scope" },
+      { method: "POST",   path: "/api/v1/shield/exploit-confirmation/run", desc: "Run authorized safe exploit confirmation" },
+      { method: "GET",    path: "/api/v1/shield/exploit-confirmation/proofs", desc: "List safe exploit-confirmation proofs" },
       { method: "POST",   path: "/api/v1/vault/unlock",             desc: "Unlock the vault (passphrase)" },
       { method: "GET",    path: "/api/v1/vault/status",             desc: "Vault lock status" },
       { method: "GET",    path: "/api/v1/watch/events",             desc: "SSE stream of audit events" },
@@ -20183,12 +23140,16 @@ registerLintCommands(program);
 // ── Observability, corrections, and feedback loop commands ──
 import { registerObservabilityCommands, registerCorrectionCommands } from "./cli-observability-commands.js";
 import { registerTraceCommands, registerAlertCommands } from "./cli-trace-commands.js";
+import { registerNeutralImportCommands } from "./cli-import-commands.js";
+import { registerStrategyCommands } from "./cli-strategy-commands.js";
 import { registerEvalDatasetCommands, registerLiteScoreCommands } from "./cli-eval-dataset-commands.js";
 import { registerBusinessCommands, registerLeaderboardCommands, registerInventoryCommands, registerCommsCheckCommands } from "./cli-business-commands.js";
 registerObservabilityCommands(program, activeAgent);
 registerCorrectionCommands(program, activeAgent);
 registerTraceCommands(program, activeAgent);
 registerAlertCommands(program, activeAgent);
+registerNeutralImportCommands(program, activeAgent);
+registerStrategyCommands(program, activeAgent);
 registerEvalDatasetCommands(program, activeAgent);
 registerLiteScoreCommands(program);
 registerBusinessCommands(program, activeAgent);

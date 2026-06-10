@@ -13,12 +13,12 @@ After months of building AI agents and having no reliable way to know if they we
 - 147 adversarial test packs (prompt injection, exfiltration, alignment faking, sandbagging)
 - Evidence is cryptographically signed — tamper-evident proof chains
 - Works with any framework: LangChain, CrewAI, AutoGen, local models, etc.
-- `npx agent-maturity-compass quickscore` — 60 seconds, no account
+- `npx agent-maturity-compass` — 60 seconds, no account
 
 **Why not just use Promptfoo?**
 Different tools for different jobs. Promptfoo evaluates prompt quality. AMC answers "is this agent safe to ship?" with a structured maturity model and compliance documentation. You can even import Promptfoo results into AMC.
 
-**What's free:** Everything — the entire trust stack (Score, Shield, Enforce, Vault, Watch, Fleet, Passport, Comply), all 14 adapters, 235 diagnostic questions, CI gates. MIT licensed.
+**What's free:** Everything — the entire trust stack (Score, Shield, Enforce, Vault, Watch, Comply, Fleet, Passport), all 14 adapters, 235 diagnostic questions, CI gates. MIT licensed.
 
 **What's paid:** 40 industry-specific domain packs for regulated verticals (healthcare, finance, education).
 

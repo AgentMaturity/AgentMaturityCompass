@@ -7,6 +7,7 @@
   "files": [
     "dist/**",
     "!dist/sea/**",
+    "scripts/postinstall.js",
     "README.md",
     "LICENSE"
   ],
@@ -30,11 +31,15 @@
     "changeset": "changeset",
     "version-packages": "changeset version",
     "release": "changeset publish",
+    "release:gate": "node scripts/release-gate.mjs",
     "release:prepack-check": "node scripts/prepack-release-check.mjs",
+    "qa:install-personas": "node scripts/install-persona-qa.mjs",
+    "audit:runtime": "npm audit --omit=dev --audit-level=moderate",
     "check:incident-readiness": "node scripts/incident-readiness-check.mjs",
+    "check:docs-drift": "node scripts/docs-drift-check.mjs",
     "clean": "rm -rf dist",
     "prebuild": "npm run clean",
-    "prepack": "npm run typecheck && npm test && npm run build && npm run release:prepack-check",
+    "prepack": "npm run release:gate -- --json --out tmp/release-gate/prepack.json && npm run release:prepack-check",
     "postinstall": "node scripts/postinstall.js || true"
   },
   "keywords": [
@@ -84,8 +89,12 @@
     "chalk": "^5.4.1",
     "commander": "^14.0.3",
     "inquirer": "^13.3.2",
+    "semver": "^7.7.4",
     "yaml": "^2.8.3",
     "zod": "^4.3.6"
+  },
+  "overrides": {
+    "qs": "6.15.2"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.11.1",

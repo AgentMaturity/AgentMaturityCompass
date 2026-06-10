@@ -30,7 +30,7 @@ import type {
   TargetProfile,
   TrustLabel
 } from "../types.js";
-import { questionBank } from "./questionBank.js";
+import { getQuestionSet } from "./questionSets.js";
 import { evaluateGate, parseEvidenceEvent, type ParsedEvidenceEvent } from "./gates.js";
 import { deriveDeterministicAudits, persistAuditFindings, type AuditFinding } from "./audits.js";
 import { loadTargetProfile, verifyTargetProfileSignature } from "../targets/targetProfile.js";
@@ -50,6 +50,12 @@ import {
 import { correlateTracesAgainstEvidence } from "../correlation/correlate.js";
 import { persistCorrelationAudits } from "../correlation/correlationAudits.js";
 import { correlationWarnings } from "../correlation/correlationReport.js";
+import {
+  confidenceControlsForQuestion,
+  controlsForScore,
+  recommendationControlForScore,
+  summarizeConfidenceControls
+} from "./confidenceControls.js";
 
 function parseEventForRunner(workspace: string, event: EvidenceEvent): ParsedEvidenceEvent {
   const parsed = parseEvidenceEvent(event);
@@ -85,6 +91,7 @@ async function getClaimedLevels(params: {
   runtimeForHarness?: RuntimeName;
   config: ReturnType<typeof loadAMCConfig>;
   contextSummary: string;
+  questions: Array<{ id: string; title: string; promptTemplate: string }>;
 }): Promise<Record<string, number>> {
   if (params.mode === "auto") {
     return {};
@@ -92,7 +99,7 @@ async function getClaimedLevels(params: {
 
   if (params.mode === "owner") {
     const out: Record<string, number> = {};
-    for (const question of questionBank) {
+    for (const question of params.questions) {
       const answer = await inquirer.prompt<{ level: number }>([
         {
           type: "list",
@@ -115,7 +122,7 @@ async function getClaimedLevels(params: {
     "Context:",
     params.contextSummary,
     "Questions:",
-    questionBank.map((question) => `${question.id}: ${question.promptTemplate}`).join("\n")
+    params.questions.map((question) => `${question.id}: ${question.promptTemplate}`).join("\n")
   ].join("\n\n");
 
   const harness = await runHarnessWithRetries(runtime, prompt, {
@@ -304,30 +311,36 @@ function summarizeNarrative(questionId: string, supported: number, claimed: numb
   return `${questionId}: evidence gates support level ${supported}; final level reflects claim-evidence minimum.`;
 }
 
-function computeLayerScores(questionScores: QuestionScore[]): LayerScore[] {
+function computeLayerScores(
+  questionScores: QuestionScore[],
+  questions: Array<{ id: string; layerName: LayerName; scoringWeight?: number }>
+): LayerScore[] {
   const scoreByQuestionId = new Map<string, QuestionScore>(
     questionScores.map((score) => [score.questionId, score])
   );
-  const byLayer = new Map<LayerName, QuestionScore[]>();
-  for (const question of questionBank) {
+  const byLayer = new Map<LayerName, Array<{ score: QuestionScore; weight: number }>>();
+  for (const question of questions) {
     const rows = byLayer.get(question.layerName) ?? [];
     const score = scoreByQuestionId.get(question.id);
     if (score) {
-      rows.push(score);
+      rows.push({ score, weight: Math.max(0, question.scoringWeight ?? 1) });
     }
     byLayer.set(question.layerName, rows);
   }
 
   const out: LayerScore[] = [];
-  for (const [layerName, scores] of byLayer.entries()) {
-    if (scores.length === 0) {
+  for (const [layerName, rows] of byLayer.entries()) {
+    if (rows.length === 0) {
       continue;
     }
-    const avgFinalLevel = scores.reduce((sum, row) => sum + row.finalLevel, 0) / scores.length;
-    const confidenceWeightSum = scores.reduce((sum, row) => sum + row.confidence, 0);
+    const totalWeight = rows.reduce((sum, row) => sum + row.weight, 0);
+    const avgFinalLevel = totalWeight > 0
+      ? rows.reduce((sum, row) => sum + row.score.finalLevel * row.weight, 0) / totalWeight
+      : rows.reduce((sum, row) => sum + row.score.finalLevel, 0) / rows.length;
+    const confidenceWeightSum = rows.reduce((sum, row) => sum + row.score.confidence * row.weight, 0);
     const confidenceWeightedFinalLevel =
       confidenceWeightSum > 0
-        ? scores.reduce((sum, row) => sum + row.finalLevel * row.confidence, 0) / confidenceWeightSum
+        ? rows.reduce((sum, row) => sum + row.score.finalLevel * row.score.confidence * row.weight, 0) / confidenceWeightSum
         : avgFinalLevel;
 
     out.push({
@@ -352,8 +365,13 @@ function trustLabelFromIntegrity(integrity: number): TrustLabel {
 
 function prioritizeUpgradeActions(
   questionScores: QuestionScore[],
-  targetProfile: TargetProfile | null
-): { actions: string[]; targetDiff: Array<{ questionId: string; current: number; target: number; gap: number }> } {
+  targetProfile: TargetProfile | null,
+  questions: Array<{ id: string; title: string }>
+): {
+  actions: string[];
+  recommendationControls: NonNullable<DiagnosticReport["recommendationControls"]>;
+  targetDiff: Array<{ questionId: string; current: number; target: number; gap: number }>;
+} {
   const targetDiff = questionScores.map((score) => {
     const target = targetProfile ? targetProfile.mapping[score.questionId] ?? 0 : 5;
     return {
@@ -366,15 +384,18 @@ function prioritizeUpgradeActions(
 
   targetDiff.sort((a, b) => b.gap - a.gap || a.questionId.localeCompare(b.questionId));
 
-  const actions = targetDiff
+  const recommendationControls = targetDiff
     .filter((row) => row.gap > 0)
     .slice(0, 12)
     .map((row) => {
-      const question = questionBank.find((q) => q.id === row.questionId);
-      return `${row.questionId} (${question?.title ?? "unknown"}): raise from ${row.current} to ${row.target} by satisfying gate requirements and adding missing evidence.`;
+      const question = questions.find((q) => q.id === row.questionId);
+      const score = questionScores.find((item) => item.questionId === row.questionId)!;
+      const action = `${row.questionId} (${question?.title ?? "unknown"}): raise from ${row.current} to ${row.target} by satisfying gate requirements and adding missing evidence.`;
+      return recommendationControlForScore({ action, score });
     });
+  const actions = recommendationControls.map((control) => control.action);
 
-  return { actions, targetDiff };
+  return { actions, recommendationControls, targetDiff };
 }
 
 function collectEvidenceChecklist(scores: QuestionScore[]): string[] {
@@ -593,7 +614,6 @@ export function enforceHighRiskSandboxRequirement(params: {
 function markdownHeatmap(diff: Array<{ questionId: string; current: number; target: number; gap: number }>): string {
   const header = "| Question | Current | Target | Gap |\n|---|---:|---:|---:|";
   const rows = diff
-    .slice(0, questionBank.length)
     .map((row) => `| ${row.questionId} | ${row.current} | ${row.target} | ${row.gap} |`)
     .join("\n");
   return `${header}\n${rows}`;
@@ -604,6 +624,12 @@ export async function runDiagnostic(input: RunDiagnosticInput, outputMarkdownPat
   const agentId = resolveAgentId(workspace, input.agentId);
   const agentPaths = getAgentPaths(workspace, agentId);
   const config = loadAMCConfig(workspace);
+  const selectedQuestionSet = getQuestionSet({
+    version: input.questionSetVersion,
+    workspace,
+    applyIndustryPackWeights: input.applyIndustryPackWeights
+  });
+  const activeQuestions = selectedQuestionSet.questions;
   const ledger = openLedger(workspace);
   const runId = randomUUID();
 
@@ -726,7 +752,8 @@ export async function runDiagnostic(input: RunDiagnosticInput, outputMarkdownPat
       mode: claimMode,
       runtimeForHarness: input.runtimeForHarness,
       config,
-      contextSummary
+      contextSummary,
+      questions: activeQuestions
     });
 
     const questionScores: QuestionScore[] = [];
@@ -736,7 +763,7 @@ export async function runDiagnostic(input: RunDiagnosticInput, outputMarkdownPat
     const relevanceWarnings = new Set<string>();
     const eventsByQuestionId = buildQuestionEventIndex(events);
 
-    for (const question of questionBank) {
+    for (const question of activeQuestions) {
       let relevant = selectRelevantEvents(question.id, events, 0, relevanceWarnings, eventsByQuestionId);
 
       let supportedMaxLevel = 0;
@@ -1076,7 +1103,16 @@ export async function runDiagnostic(input: RunDiagnosticInput, outputMarkdownPat
         confidence,
         evidenceEventIds: matchedIds,
         flags,
-        narrative: summarizeNarrative(question.id, supportedMaxLevel, claimedLevel, flags)
+        narrative: summarizeNarrative(question.id, supportedMaxLevel, claimedLevel, flags),
+        confidenceControls: confidenceControlsForQuestion({
+          questionId: question.id,
+          claimedLevel,
+          supportedMaxLevel,
+          finalLevel,
+          confidence,
+          evidenceEventIds: matchedIds,
+          flags
+        })
       });
     }
 
@@ -1118,7 +1154,7 @@ export async function runDiagnostic(input: RunDiagnosticInput, outputMarkdownPat
       );
     }
 
-    let layerScores = computeLayerScores(questionScores);
+    let layerScores = computeLayerScores(questionScores, activeQuestions);
     eventsAuditMap = buildAuditCountMap(events);
     const contradictionCount = countAuditFromMap(eventsAuditMap, "CONTRADICTION_FOUND") + countAuditFromMap(eventsAuditMap, "HALLUCINATION_ADMISSION");
     const unsupportedClaimCount = countAuditFromMap(eventsAuditMap, "UNSUPPORTED_HIGH_CLAIM");
@@ -1154,7 +1190,7 @@ export async function runDiagnostic(input: RunDiagnosticInput, outputMarkdownPat
     const traceAgentMismatchCount = countAuditFromMap(eventsAuditMap, "TRACE_AGENT_MISMATCH");
     const traceCorrelationLowCount = countAuditFromMap(eventsAuditMap, "TRACE_CORRELATION_LOW");
     const evidenceCoverage =
-      questionScores.filter((score) => score.evidenceEventIds.length > 0).length / Math.max(questionBank.length, 1);
+      questionScores.filter((score) => score.evidenceEventIds.length > 0).length / Math.max(activeQuestions.length, 1);
     const trustCoverage = computeEvidenceTrustCoverage(events);
 
     const contradictionPenalty = Math.min(0.5, contradictionCount * 0.05);
@@ -1317,7 +1353,8 @@ export async function runDiagnostic(input: RunDiagnosticInput, outputMarkdownPat
         ? "VALID"
         : "INVALID";
 
-    const prioritized = prioritizeUpgradeActions(questionScores, targetProfile);
+    const prioritized = prioritizeUpgradeActions(questionScores, targetProfile, activeQuestions);
+    const confidenceSummary = summarizeConfidenceControls(questionScores, prioritized.recommendationControls);
     const evidenceToCollectNext = collectEvidenceChecklist(questionScores);
     const targetSignerFingerprint = targetProfile?.signature
       ? sha256Hex(Buffer.from(targetProfile.signature, "utf8")).slice(0, 16)
@@ -1373,6 +1410,9 @@ export async function runDiagnostic(input: RunDiagnosticInput, outputMarkdownPat
       // audit counts included in evidence checklist and trust computation; keep report shape stable
       targetDiff: prioritized.targetDiff,
       prioritizedUpgradeActions: prioritized.actions,
+      recommendationControls: prioritized.recommendationControls,
+      confidenceSummary,
+      questionSet: selectedQuestionSet.info,
       evidenceToCollectNext,
       runSealSig: "",
       reportJsonSha256: ""
@@ -1451,6 +1491,37 @@ export function generateReport(report: DiagnosticReport, format: "md" | "json"):
     lastTargetUpdatedTs: null,
     signerFingerprint: null
   };
+  const recommendationControls = report.recommendationControls ?? report.prioritizedUpgradeActions
+    .map((action) => {
+      const questionId = action.match(/^([A-Z0-9.-]+)/)?.[1] ?? "";
+      const score = report.questionScores.find((row) => row.questionId === questionId);
+      return score ? recommendationControlForScore({ action, score }) : null;
+    })
+    .filter((row): row is NonNullable<DiagnosticReport["recommendationControls"]>[number] => row !== null);
+  const confidenceSummary = report.confidenceSummary ?? summarizeConfidenceControls(report.questionScores, recommendationControls);
+  const questionSet = report.questionSet ?? {
+    version: "amc-legacy-240-v1",
+    title: "Legacy 240-question AMC assessment",
+    questionCount: report.questionScores.length,
+    default: true,
+    includedVersions: ["amc-legacy-240-v1"],
+    dimensions: []
+  };
+  const expandedDimensions = (questionSet.dimensions ?? []).filter((dimension) => dimension.family !== "core");
+  const dimensionSection = expandedDimensions.length > 0
+    ? [
+        "| Dimension | Questions | Surfaces | Layers | Why it matters |",
+        "|---|---:|---|---|---|",
+        ...expandedDimensions.map(
+          (dimension) =>
+            `| ${dimension.title} | ${dimension.questionCount} | ${dimension.surfaces.join(", ")} | ${dimension.layers.join(", ")} | ${dimension.description} |`
+        )
+      ].join("\n")
+    : "- Legacy core assessment only. Use an explicit expanded question set to include lifecycle, runtime, proof, memory, and fleet dimensions.";
+  const weighting = questionSet.domainPackWeighting;
+  const domainPackWeightingLine = weighting
+    ? `${weighting.applied ? "applied" : "not applied"} (${weighting.message})`
+    : "not requested";
 
   const layerSection = report.layerScores
     .map(
@@ -1460,12 +1531,12 @@ export function generateReport(report: DiagnosticReport, format: "md" | "json"):
     .join("\n");
 
   const questionTable = [
-    "| Question | Claimed | Supported | Final | Confidence | Flags | Evidence IDs |",
-    "|---|---:|---:|---:|---:|---|---|",
-    ...report.questionScores.map(
-      (q) =>
-        `| ${q.questionId} | ${q.claimedLevel} | ${q.supportedMaxLevel} | ${q.finalLevel} | ${q.confidence.toFixed(2)} | ${q.flags.join(", ") || "-"} | ${q.evidenceEventIds.join(", ") || "-"} |`
-    )
+    "| Question | Claimed | Supported | Final | Confidence | Evidence Sufficiency | Uncertainty | Auto-fix | Flags | Evidence IDs |",
+    "|---|---:|---:|---:|---:|---:|---|---|---|---|",
+    ...report.questionScores.map((q) => {
+      const controls = controlsForScore(q);
+      return `| ${q.questionId} | ${q.claimedLevel} | ${q.supportedMaxLevel} | ${q.finalLevel} | ${q.confidence.toFixed(2)} | ${controls.evidenceSufficiency.toFixed(2)} | ${controls.uncertaintyLevel} | ${controls.autoFixAllowed ? "allowed" : "review"} | ${q.flags.join(", ") || "-"} | ${q.evidenceEventIds.join(", ") || "-"} |`;
+    })
   ].join("\n");
 
   const inflation =
@@ -1482,6 +1553,16 @@ export function generateReport(report: DiagnosticReport, format: "md" | "json"):
   const checklist = report.evidenceToCollectNext.length
     ? report.evidenceToCollectNext.map((line) => `- ${line}`).join("\n")
     : "- none";
+  const recommendationControlTable = recommendationControls.length > 0
+    ? [
+        "| Question | Confidence | Uncertainty | Auto-fix | Reason |",
+        "|---|---:|---|---|---|",
+        ...recommendationControls.map(
+          (row) =>
+            `| ${row.questionId} | ${row.confidence.toFixed(2)} | ${row.uncertaintyLevel} | ${row.autoFixAllowed ? "allowed" : "blocked"} | ${row.reason} |`
+        )
+      ].join("\n")
+    : "- none";
 
   return [
     `# Agent Maturity Compass Report (${report.runId})`,
@@ -1495,6 +1576,8 @@ export function generateReport(report: DiagnosticReport, format: "md" | "json"):
     `- Evidence Coverage: ${(report.evidenceCoverage * 100).toFixed(1)}%`,
     `- Correlation Ratio: ${correlationRatio.toFixed(3)}`,
     `- Invalid Receipts: ${invalidReceiptsCount}`,
+    `- Question Set: ${questionSet.version} (${questionSet.questionCount} questions)`,
+    `- Industry Pack Weighting: ${domainPackWeightingLine}`,
     `- AutonomyAllowanceIndex: ${autonomyAllowanceIndex}`,
     `- DualityCompliance: ${duality.executeWithValidTicket}/${duality.executeAttempted} (${(duality.ratio * 100).toFixed(1)}%)`,
     `- ToolHub Usage: actions=${toolHub.toolActionCount}, results=${toolHub.toolResultCount}, denied=${toolHub.deniedActionCount}`,
@@ -1503,6 +1586,21 @@ export function generateReport(report: DiagnosticReport, format: "md" | "json"):
     `- Evidence Trust Coverage: OBSERVED ${(trustCoverage.observed * 100).toFixed(1)}% | ATTESTED ${(trustCoverage.attested * 100).toFixed(1)}% | SELF_REPORTED ${(trustCoverage.selfReported * 100).toFixed(1)}%`,
     `- Contradictions: ${report.contradictionCount}`,
     `- Unsupported Claims: ${report.unsupportedClaimCount}`,
+    `- Low-Confidence Findings: ${confidenceSummary.lowConfidenceFindings}`,
+    `- High-Uncertainty Findings: ${confidenceSummary.highUncertaintyFindings}`,
+    `- Auto-Fix Blocked Recommendations: ${confidenceSummary.autoFixBlockedRecommendations}`,
+    "",
+    "## Expanded Assessment Dimensions",
+    dimensionSection,
+    "",
+    "## Confidence and Uncertainty Controls",
+    `AMC downgrades low-evidence findings and blocks auto-fix when confidence, evidence sufficiency, contradiction risk, judge agreement, or decisiveness risk do not pass thresholds.`,
+    "",
+    `- Average evidence sufficiency: ${confidenceSummary.averageEvidenceSufficiency.toFixed(2)}`,
+    `- Average judge agreement: ${confidenceSummary.averageJudgeAgreement.toFixed(2)}`,
+    `- Downgraded findings: ${confidenceSummary.downgradedFindings}`,
+    "",
+    recommendationControlTable,
     "",
     "## Correlation Warnings",
     correlationWarn.length > 0 ? correlationWarn.map((line) => `- ${line}`).join("\n") : "- none",

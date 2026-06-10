@@ -799,7 +799,7 @@ AMC needs a sharper buyer journey and commercial packaging system.
   - **Enterprise** — regulated and large-scale governance buyers
 - Each tier should answer:
   - who it is for
-  - which AMC products are included (Score, Shield, Enforce, Vault, Watch, Fleet, Passport, Comply)
+  - which AMC products are included (Score, Shield, Enforce, Vault, Watch, Comply, Fleet, Passport)
   - usage limits / deployment rights / support level
   - what unlocks at the next tier
 - Deliverables:

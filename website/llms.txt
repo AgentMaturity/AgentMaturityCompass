@@ -16,7 +16,7 @@
 ## Install
 npm i -g agent-maturity-compass
 
-## Quick Score
+## Full Score
 amc
 
 ## Key Concepts

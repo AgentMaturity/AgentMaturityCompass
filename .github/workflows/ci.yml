@@ -236,7 +236,7 @@ jobs:
       - name: Create signed release bundle for scan
         run: |
           node -e "const fs=require('fs');const {generateKeyPairSync}=require('crypto');const kp=generateKeyPairSync('ed25519');fs.writeFileSync('/tmp/amc-release.key',kp.privateKey.export({format:'pem',type:'pkcs8'}),{mode:0o600});"
-          node dist/cli.js release pack --out /tmp/amc-ci.amcrelease --private-key /tmp/amc-release.key
+          node dist/cli.js release pack --out /tmp/amc-ci.amcrelease --private-key /tmp/amc-release.key --skip-install-build
 
       - name: Scan release bundle and produce license inventory
         run: |

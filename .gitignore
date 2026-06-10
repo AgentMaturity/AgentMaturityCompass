@@ -4,6 +4,7 @@ node_modules/
 # Build output
 dist/
 coverage/
+*.tgz
 
 # OS files
 .DS_Store
@@ -29,6 +30,16 @@ Thumbs.db
 .amc/industry-packs-access.json
 .amc/vault.amcvault
 .amc/vault.amcvault.meta.json
+.amc/decision-receipts/
+.amc/enforce/
+.amc/episodes/
+.amc/finding-proofs/
+.amc/lifecycle-receipts/
+.amc/lifecycle-runs/
+.amc/observability-lane/
+.amc/onboarding/
+.amc/runs/
+.amc/trace-indexes/
 .amc/**/*.json.sig
 .amc/**/scheduler.json
 
@@ -70,6 +81,7 @@ AMC_IMPROVEMENT_ROADMAP.md
 COMPETITIVE_ANALYSIS.md
 ..bfg-report/
 exports/
+tmp/
 
 # AMC workspace artifacts (assurance blobs, ledger)
 .amc/blobs/

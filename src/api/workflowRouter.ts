@@ -181,6 +181,68 @@ export async function handleWorkflowRoute(
 
   // ── Lifecycle ───────────────────────────────────────────────────
 
+  // GET /api/v1/lifecycle/surfaces — canonical 8-surface product map
+  if (pathname === '/api/v1/lifecycle/surfaces' && method === 'GET') {
+    try {
+      const { AMC_SURFACE_ORDER, AMC_SURFACE_DEFINITIONS } = await import('../lifecycle/lifecycleRunArtifact.js');
+      apiSuccess(res, { order: AMC_SURFACE_ORDER, surfaces: AMC_SURFACE_DEFINITIONS });
+    } catch (err) {
+      apiError(res, 500, err instanceof Error ? err.message : 'Could not load lifecycle surfaces');
+    }
+    return true;
+  }
+
+  // GET /api/v1/lifecycle/runs — list lifecycle run artifacts
+  if (pathname === '/api/v1/lifecycle/runs' && method === 'GET') {
+    try {
+      const agentId = queryParam(req.url ?? '', 'agentId') ?? 'default';
+      const limit = Number.parseInt(queryParam(req.url ?? '', 'limit') ?? '25', 10);
+      const { listLifecycleRunArtifacts } = await import('../lifecycle/lifecycleRunArtifact.js');
+      const runs = listLifecycleRunArtifacts({
+        workspace,
+        agentId,
+        limit: Number.isFinite(limit) && limit > 0 ? limit : 25,
+      });
+      apiSuccess(res, { agentId, runs, total: runs.length });
+    } catch (err) {
+      apiError(res, 500, err instanceof Error ? err.message : 'Could not list lifecycle runs');
+    }
+    return true;
+  }
+
+  // GET /api/v1/lifecycle/latest — latest lifecycle run artifact for Studio
+  if (pathname === '/api/v1/lifecycle/latest' && method === 'GET') {
+    try {
+      const agentId = queryParam(req.url ?? '', 'agentId') ?? 'default';
+      const redacted = queryParam(req.url ?? '', 'redacted') === 'true';
+      const { listLifecycleRunArtifacts, redactLifecycleRunArtifact } = await import('../lifecycle/lifecycleRunArtifact.js');
+      const [latest] = listLifecycleRunArtifacts({ workspace, agentId, limit: 1 });
+      if (!latest) {
+        apiSuccess(res, { agentId, run: null, message: 'No lifecycle runs found' });
+        return true;
+      }
+      apiSuccess(res, { agentId, run: redacted ? redactLifecycleRunArtifact(latest) : latest });
+    } catch (err) {
+      apiError(res, 500, err instanceof Error ? err.message : 'Could not load latest lifecycle run');
+    }
+    return true;
+  }
+
+  // GET /api/v1/lifecycle/runs/:selector — inspect lifecycle artifact by lifecycle id or run id
+  const lifecycleRunParams = pathParam(pathname, '/api/v1/lifecycle/runs/:selector');
+  if (lifecycleRunParams && method === 'GET') {
+    try {
+      const agentId = queryParam(req.url ?? '', 'agentId') ?? 'default';
+      const redacted = queryParam(req.url ?? '', 'redacted') === 'true';
+      const { loadLifecycleRunArtifact, redactLifecycleRunArtifact } = await import('../lifecycle/lifecycleRunArtifact.js');
+      const run = loadLifecycleRunArtifact({ workspace, agentId, selector: decodeURIComponent(lifecycleRunParams.selector!) });
+      apiSuccess(res, redacted ? redactLifecycleRunArtifact(run) : run);
+    } catch (err) {
+      apiError(res, 404, err instanceof Error ? err.message : 'Lifecycle run not found');
+    }
+    return true;
+  }
+
   // GET /api/v1/lifecycle/status — lifecycle status
   if (pathname === '/api/v1/lifecycle/status' && method === 'GET') {
     try {

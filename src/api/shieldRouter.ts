@@ -20,6 +20,7 @@ export async function handleShieldRoute(
   method: string,
   req: IncomingMessage,
   res: ServerResponse,
+  workspace = process.cwd()
 ): Promise<boolean> {
   if (pathname === '/api/v1/shield/status' && method === 'GET') {
     apiSuccess(res, { status: 'operational', module: 'shield', capabilities: ['scan', 'injection-detect', 'sanitize'] });
@@ -102,6 +103,103 @@ export async function handleShieldRoute(
       module: 'continuous-red-team',
       capabilities: ['attack-generation', 'evolutionary-mutation', 'crossover', 'regression-detection'],
     });
+    return true;
+  }
+
+  if (pathname === '/api/v1/shield/exploit-confirmation/scopes' && method === 'GET') {
+    try {
+      const { listExploitConfirmationScopes } = await import('../shield/exploitConfirmation.js');
+      const scopes = listExploitConfirmationScopes(workspace);
+      apiSuccess(res, { scopes, total: scopes.length });
+    } catch (err) {
+      apiError(res, 500, err instanceof Error ? err.message : 'Could not list exploit confirmation scopes');
+    }
+    return true;
+  }
+
+  if (pathname === '/api/v1/shield/exploit-confirmation/scopes' && method === 'POST') {
+    try {
+      const body = await bodyJsonSchema(req, z.object({
+        scope: z.unknown()
+      }).strict());
+      const { writeExploitConfirmationScope } = await import('../shield/exploitConfirmation.js');
+      const written = writeExploitConfirmationScope({ workspace, scope: body.scope });
+      apiSuccess(res, written, 201);
+    } catch (err) {
+      if (isRequestBodyError(err)) { apiError(res, err.statusCode, err.message); return true; }
+      apiError(res, 400, err instanceof Error ? err.message : 'Could not write exploit confirmation scope');
+    }
+    return true;
+  }
+
+  const exploitScopeParams = /^\/api\/v1\/shield\/exploit-confirmation\/scopes\/([^/]+)$/.exec(pathname);
+  if (exploitScopeParams && method === 'GET') {
+    try {
+      const { loadExploitConfirmationScope } = await import('../shield/exploitConfirmation.js');
+      const scope = loadExploitConfirmationScope(workspace, decodeURIComponent(exploitScopeParams[1]!));
+      if (!scope) {
+        apiError(res, 404, 'Exploit confirmation scope not found');
+        return true;
+      }
+      apiSuccess(res, { scope });
+    } catch (err) {
+      apiError(res, 404, err instanceof Error ? err.message : 'Exploit confirmation scope not found');
+    }
+    return true;
+  }
+
+  if (pathname === '/api/v1/shield/exploit-confirmation/run' && method === 'POST') {
+    try {
+      const body = await bodyJsonSchema(req, z.object({
+        scopeId: z.string().min(1).optional(),
+        task: z.unknown(),
+        nowTs: z.number().int().optional()
+      }).strict());
+      const { runExploitConfirmation } = await import('../shield/exploitConfirmation.js');
+      const result = runExploitConfirmation({
+        workspace,
+        scopeId: body.scopeId,
+        task: body.task,
+        nowTs: body.nowTs
+      });
+      apiSuccess(res, { result }, result.status === 'BLOCKED' ? 200 : 201);
+    } catch (err) {
+      if (isRequestBodyError(err)) { apiError(res, err.statusCode, err.message); return true; }
+      apiError(res, 400, err instanceof Error ? err.message : 'Exploit confirmation failed');
+    }
+    return true;
+  }
+
+  if (pathname === '/api/v1/shield/exploit-confirmation/proofs' && method === 'GET') {
+    try {
+      const { listExploitConfirmationProofs } = await import('../shield/exploitConfirmation.js');
+      const proofs = listExploitConfirmationProofs(workspace);
+      apiSuccess(res, { proofs, total: proofs.length });
+    } catch (err) {
+      apiError(res, 500, err instanceof Error ? err.message : 'Could not list exploit confirmation proofs');
+    }
+    return true;
+  }
+
+  const exploitProofExportParams = /^\/api\/v1\/shield\/exploit-confirmation\/proofs\/([^/]+)\/export$/.exec(pathname);
+  if (exploitProofExportParams && method === 'POST') {
+    try {
+      const body = await bodyJsonSchema(req, z.object({
+        outPath: z.string().min(1).optional(),
+        redacted: z.boolean().optional()
+      }).strict());
+      const { exportExploitConfirmationProof } = await import('../shield/exploitConfirmation.js');
+      const exported = exportExploitConfirmationProof({
+        workspace,
+        proofId: decodeURIComponent(exploitProofExportParams[1]!),
+        outPath: body.outPath,
+        redacted: body.redacted !== false
+      });
+      apiSuccess(res, exported);
+    } catch (err) {
+      if (isRequestBodyError(err)) { apiError(res, err.statusCode, err.message); return true; }
+      apiError(res, 400, err instanceof Error ? err.message : 'Could not export exploit confirmation proof');
+    }
     return true;
   }
 

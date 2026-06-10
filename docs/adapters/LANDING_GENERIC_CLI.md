@@ -6,7 +6,7 @@ AMC wraps any command-line agent — zero code changes.
 
 ```bash
 amc wrap generic-cli -- python my_bot.py
-amc quickscore
+amc
 amc fix
 ```
 
@@ -21,4 +21,4 @@ amc fix
 
 ## Next steps
 - `docs/START_HERE.md`
-- `docs/AFTER_QUICKSCORE.md`
+- `docs/AFTER_FIRST_SCORE.md`

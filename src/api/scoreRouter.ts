@@ -28,6 +28,17 @@ export async function handleScoreRoute(
     return true;
   }
 
+  // GET /api/v1/score/question-sets — list supported assessment question sets
+  if (pathname === '/api/v1/score/question-sets' && method === 'GET') {
+    try {
+      const { listQuestionSets } = await import('../diagnostic/questionSets.js');
+      apiSuccess(res, { questionSets: listQuestionSets() });
+    } catch (err) {
+      apiError(res, 500, err instanceof Error ? err.message : 'Could not load question sets');
+    }
+    return true;
+  }
+
   // POST /api/v1/score/run — trigger a full diagnostic run (CLI: amc run)
   if (pathname === '/api/v1/score/run' && method === 'POST') {
     try {
@@ -37,6 +48,8 @@ export async function handleScoreRoute(
         targetName?: string;
         claimMode?: 'auto' | 'owner' | 'harness';
         runtimeForHarness?: string;
+        questionSetVersion?: string;
+        applyIndustryPackWeights?: boolean;
       }>(req);
       const agentId = body.agentId ?? 'default';
       const { runDiagnostic } = await import('../diagnostic/runner.js');
@@ -47,6 +60,8 @@ export async function handleScoreRoute(
         targetName: body.targetName,
         claimMode: body.claimMode ?? 'auto',
         runtimeForHarness: body.runtimeForHarness as import('../types.js').RuntimeName | undefined,
+        questionSetVersion: body.questionSetVersion,
+        applyIndustryPackWeights: body.applyIndustryPackWeights === true,
       });
       queueScoreComputationMetric({
         agentId,

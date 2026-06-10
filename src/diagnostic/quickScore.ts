@@ -1,5 +1,5 @@
-import type { DiagnosticQuestion, LayerName } from "../types.js";
-import { questionBank } from "./questionBank.js";
+import type { DiagnosticQuestion } from "../types.js";
+import { getQuestionSet } from "./questionSets.js";
 
 export type ScoringTier = "quick" | "standard" | "deep";
 
@@ -12,16 +12,14 @@ const QUICK_QUESTION_IDS: string[] = [
   "AMC-5.1", "AMC-5.5",   // Skills
 ];
 
-// Canonical standard/deep assessments use the full signed bank.
-const CANONICAL_BANK_COUNT = questionBank.length;
-
-export function getQuestionsForTier(tier: ScoringTier): DiagnosticQuestion[] {
+export function getQuestionsForTier(tier: ScoringTier, questionSetVersion?: string): DiagnosticQuestion[] {
+  const questionBank = getQuestionSet({ version: questionSetVersion }).questions;
   switch (tier) {
     case "quick":
       return questionBank.filter(q => QUICK_QUESTION_IDS.includes(q.id));
     case "standard":
     case "deep":
-      return questionBank.slice(0, CANONICAL_BANK_COUNT);
+      return questionBank;
   }
 }
 
@@ -37,9 +35,10 @@ export interface QuickScoreResult {
 
 export function computeQuickScore(
   answers: Record<string, number>,
-  tier: ScoringTier = "quick"
+  tier: ScoringTier = "quick",
+  questionSetVersion?: string
 ): QuickScoreResult {
-  const questions = getQuestionsForTier(tier);
+  const questions = getQuestionsForTier(tier, questionSetVersion);
   const layerScores: Record<string, { score: number; max: number; count: number }> = {};
   const gaps: QuickScoreResult["gaps"] = [];
   let totalScore = 0;

@@ -1,5 +1,6 @@
 import type { DiagnosticReport, QuestionScore } from "../../types.js";
 import { autoAnswerRuleByQuestionId } from "./autoAnswerMappings.js";
+import { controlsForScore } from "../confidenceControls.js";
 
 export interface AutoAnswerQuestionResult {
   questionId: string;
@@ -10,6 +11,7 @@ export interface AutoAnswerQuestionResult {
   unknown: boolean;
   reasons: string[];
   flags: string[];
+  confidenceControls: ReturnType<typeof controlsForScore>;
 }
 
 function isObservedHeavy(report: DiagnosticReport): boolean {
@@ -65,7 +67,8 @@ export function deriveAutoAnswerResults(report: DiagnosticReport): {
       requiredMinEvents: rule.minEvents,
       unknown,
       reasons,
-      flags: [...score.flags]
+      flags: [...score.flags],
+      confidenceControls: controlsForScore(score)
     });
     measuredScores[score.questionId] = measured;
     evidenceCoverage[score.questionId] = coverage;

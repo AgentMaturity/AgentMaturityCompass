@@ -5,7 +5,7 @@ AMC supports multiple installation paths depending on how much friction you are 
 ## Recommended install order
 
 If you just want to try AMC:
-1. `npx agent-maturity-compass quickscore`
+1. `npx agent-maturity-compass`
 2. `npm i -g agent-maturity-compass`
 3. Homebrew on macOS
 4. Docker for isolated or team environments
@@ -20,7 +20,7 @@ Best for:
 - quick evaluation
 
 ```bash
-npx agent-maturity-compass quickscore
+npx agent-maturity-compass
 npm i -g agent-maturity-compass
 ```
 

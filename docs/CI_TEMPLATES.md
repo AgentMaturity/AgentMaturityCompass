@@ -28,7 +28,7 @@ jobs:
       - run: npm ci
       - run: npm i -g agent-maturity-compass
       - run: amc doctor
-      - run: amc quickscore
+      - run: amc
       - run: amc assurance run --all
 ```
 
@@ -45,7 +45,7 @@ amc_check:
     - npm ci
     - npm i -g agent-maturity-compass
     - amc doctor
-    - amc quickscore
+    - amc
     - amc assurance run --all
 ```
 
@@ -62,7 +62,7 @@ jobs:
       - run: npm ci
       - run: npm i -g agent-maturity-compass
       - run: amc doctor
-      - run: amc quickscore
+      - run: amc
       - run: amc assurance run --all
 
 workflows:
@@ -79,7 +79,7 @@ Start with:
 
 ```bash
 amc doctor
-amc quickscore
+amc
 ```
 
 Then add:

@@ -13,6 +13,7 @@ import { spawnSync } from "node:child_process";
 import { parse as parseYaml } from "yaml";
 import { listAgents } from "../fleet/registry.js";
 import { getAgentPaths, resolveAgentId } from "../fleet/paths.js";
+import { createOnboardingState, loadOnboardingState } from "../setup/onboardingState.js";
 import { runDiagnostic, generateReport, loadRunReport } from "../diagnostic/runner.js";
 import { runAutoAnswer } from "../diagnostic/autoAnswer/autoAnswerEngine.js";
 import { runAssurance } from "../assurance/assuranceRunner.js";
@@ -198,6 +199,9 @@ import {
   experimentCreateCli,
   experimentGateCli,
   experimentListCli,
+  experimentOptimizeCli,
+  experimentOptimizerListCli,
+  experimentOptimizerShowCli,
   experimentRunCli,
   experimentSetBaselineCli,
   experimentSetCandidateCli
@@ -214,6 +218,7 @@ import { compareNodeScorecards, loadLatestOrgScorecard } from "../org/orgScoreca
 import { computeOrgScorecard, nodeHierarchy, recomputeAndPersistOrgScorecard } from "../org/orgEngine.js";
 import { renderOrgCompareMarkdown, renderOrgNodeReportMarkdown, renderOrgSystemicMarkdown } from "../org/orgReports.js";
 import { generateOrgCommitmentPlan, generateOrgEducationBrief, generateOrgOwnershipPlan } from "../org/orgCommitments.js";
+import { listOrgRuns, loadOrgRun, orgRunRoleDefinitions, orgRunSummaryForUi, parseOrgRoleList, runOrg } from "../org/orgRun.js";
 import { OrgSseHub } from "../org/orgSse.js";
 import {
   applyTransformMapForApi,
@@ -2710,6 +2715,89 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           signature: verifyOrgConfigSignature(options.workspace),
           tree: nodeHierarchy(config)
         });
+        return;
+      }
+
+      if (pathname === "/org/roles" && req.method === "GET") {
+        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
+          return;
+        }
+        const roles = orgRunRoleDefinitions();
+        json(res, 200, { roles, total: roles.length });
+        return;
+      }
+
+      if (pathname === "/org/runs" && req.method === "GET") {
+        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
+          return;
+        }
+        const runs = listOrgRuns({ workspace: options.workspace, limit: 25, redacted: true });
+        json(res, 200, {
+          runs,
+          summaries: runs.map((run) => orgRunSummaryForUi(run)),
+          total: runs.length
+        });
+        return;
+      }
+
+      if (pathname === "/org/runs" && req.method === "POST") {
+        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER", "OPERATOR"] })) {
+          return;
+        }
+        if (requiresReadOnlyMode(options.workspace)) {
+          json(res, 403, { error: "users signature invalid; write operations blocked" });
+          return;
+        }
+        const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
+        const parsed = body ? (JSON.parse(body) as {
+          roles?: string[] | string;
+          goal?: string;
+          orgRunId?: string;
+          heartbeatPolicy?: {
+            intervalMinutes?: number;
+            maxStaleMinutes?: number;
+            plateauAfterHeartbeats?: number;
+          };
+        }) : {};
+        const result = runOrg({
+          workspace: options.workspace,
+          roles: parseOrgRoleList(parsed.roles),
+          goal: parsed.goal,
+          orgRunId: parsed.orgRunId,
+          heartbeatPolicy: parsed.heartbeatPolicy,
+          source: "studio",
+          command: "Studio org run"
+        });
+        const audit = writeStudioAuditEvent({
+          workspace: options.workspace,
+          auditType: "ORG_RUN_CREATED",
+          severity: result.artifact.status === "completed" ? "LOW" : "MEDIUM",
+          payload: {
+            orgRunId: result.artifact.orgRunId,
+            roleCount: result.artifact.summary.roleCount,
+            status: result.artifact.status
+          }
+        });
+        emitOrgEvent("ORG_RUN_CREATED");
+        json(res, 201, {
+          ...result,
+          summary: orgRunSummaryForUi(result.artifact),
+          auditEventId: audit.eventId
+        });
+        return;
+      }
+
+      const orgRunGetMatch = pathname.match(/^\/org\/runs\/([^/]+)$/);
+      if (orgRunGetMatch && req.method === "GET") {
+        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
+          return;
+        }
+        const run = loadOrgRun({
+          workspace: options.workspace,
+          selector: decodeURIComponent(orgRunGetMatch[1]!),
+          redacted: true
+        });
+        json(res, 200, { run, summary: orgRunSummaryForUi(run) });
         return;
       }
 
@@ -7772,6 +7860,64 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         return;
       }
 
+      if (pathname === "/experiments/optimizers" && req.method === "GET") {
+        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
+          return;
+        }
+        const agentId = resolveAgentId(options.workspace, url.searchParams.get("agentId") ?? "default");
+        const limit = Math.max(1, Number(url.searchParams.get("limit") ?? "10") || 10);
+        json(res, 200, {
+          agentId,
+          rows: experimentOptimizerListCli({
+            workspace: options.workspace,
+            agentId,
+            limit,
+            redacted: true
+          })
+        });
+        return;
+      }
+
+      if (pathname === "/experiments/optimize" && req.method === "POST") {
+        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER", "OPERATOR"] })) {
+          return;
+        }
+        const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
+        const parsed = body ? (JSON.parse(body) as { agentId?: string; rcaSelector?: string; rca?: string }) : {};
+        const agentId = resolveAgentId(options.workspace, parsed.agentId ?? "default");
+        const out = experimentOptimizeCli({
+          workspace: options.workspace,
+          agentId,
+          rcaSelector: parsed.rcaSelector ?? parsed.rca ?? "latest"
+        });
+        json(res, 200, {
+          ...out,
+          run: experimentOptimizerShowCli({
+            workspace: options.workspace,
+            agentId,
+            selector: out.run.optimizerRunId,
+            redacted: true
+          })
+        });
+        return;
+      }
+
+      const optimizerMatch = pathname.match(/^\/experiments\/optimizers\/([^/]+)$/);
+      if (optimizerMatch && req.method === "GET") {
+        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
+          return;
+        }
+        const selector = decodeURIComponent(optimizerMatch[1] ?? "");
+        const agentId = resolveAgentId(options.workspace, url.searchParams.get("agentId") ?? "default");
+        json(res, 200, experimentOptimizerShowCli({
+          workspace: options.workspace,
+          agentId,
+          selector,
+          redacted: true
+        }));
+        return;
+      }
+
       if (pathname === "/experiments/create" && req.method === "POST") {
         if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER", "OPERATOR"] })) {
           return;
@@ -8613,6 +8759,32 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         res.statusCode = 200;
         res.setHeader("content-type", "text/markdown; charset=utf-8");
         res.end(generateReport(report, "md") as string);
+        return;
+      }
+
+      if (pathname === "/onboarding/status" && req.method === "GET") {
+        const current = loadOnboardingState(options.workspace) ?? createOnboardingState({
+          workspace: options.workspace,
+          agentId: auth.agentId ?? "default",
+          mode: "studio"
+        });
+        json(res, 200, { state: current });
+        return;
+      }
+
+      if (pathname === "/onboarding/run" && method === "POST") {
+        const result = await cliBridgeExec(options.workspace, {
+          command: "amc",
+          format: "json",
+          timeout: 120_000
+        });
+        const state = loadOnboardingState(options.workspace) ?? createOnboardingState({
+          workspace: options.workspace,
+          agentId: auth.agentId ?? "default",
+          mode: "studio",
+          status: result.ok ? "complete" : "failed"
+        });
+        json(res, result.ok ? 200 : 422, { result, state });
         return;
       }
 

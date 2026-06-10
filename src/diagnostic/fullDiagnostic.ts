@@ -3,7 +3,7 @@
  * Designed to complete in ~1 minute with clean progress UX.
  */
 import type { DiagnosticQuestion } from "../types.js";
-import { questionBank } from "./questionBank.js";
+import { getQuestionSet } from "./questionSets.js";
 
 /* ── Layer ordering (canonical) ─────────────────────────────────────── */
 const LAYER_ORDER: string[] = [
@@ -97,7 +97,8 @@ export interface LayerGroup {
   questions: DiagnosticQuestion[];
 }
 
-export function getQuestionsByLayer(): LayerGroup[] {
+export function getQuestionsByLayer(questionSetVersion?: string): LayerGroup[] {
+  const questionBank = getQuestionSet({ version: questionSetVersion }).questions;
   const byLayer = new Map<string, DiagnosticQuestion[]>();
   for (const q of questionBank) {
     const arr = byLayer.get(q.layerName) ?? [];
@@ -133,20 +134,22 @@ export function getQuestionsByLayer(): LayerGroup[] {
   return groups;
 }
 
-export function getTotalQuestionCount(): number {
-  return questionBank.length;
+export function getTotalQuestionCount(questionSetVersion?: string): number {
+  return getQuestionSet({ version: questionSetVersion }).questions.length;
 }
 
-export function getAllQuestions() {
-  return [...questionBank];
+export function getAllQuestions(questionSetVersion?: string) {
+  return [...getQuestionSet({ version: questionSetVersion }).questions];
 }
 
 /* ── Score a completed diagnostic ────────────────────────────────────── */
 export function scoreFullDiagnostic(
   answers: Record<string, number>,
   durationMs: number,
+  questionSetVersion?: string,
 ): FullDiagnosticResult {
-  const groups = getQuestionsByLayer();
+  const questionBank = getQuestionSet({ version: questionSetVersion }).questions;
+  const groups = getQuestionsByLayer(questionSetVersion);
   const questionScores: FullDiagnosticQuestionScore[] = [];
   const layerScores: FullDiagnosticLayerScore[] = [];
 

@@ -7,6 +7,11 @@ import {
   setExperimentBaseline,
   setExperimentCandidate
 } from "./experimentRunner.js";
+import {
+  listGovernedOptimizerRuns,
+  loadGovernedOptimizerRun,
+  writeGovernedOptimizerRun
+} from "./governedOptimizer.js";
 
 export function experimentCreateCli(params: {
   workspace: string;
@@ -64,4 +69,30 @@ export function experimentGateCli(params: {
 
 export function experimentListCli(params: { workspace: string; agentId?: string }) {
   return listExperiments(params);
+}
+
+export function experimentOptimizeCli(params: {
+  workspace: string;
+  agentId?: string;
+  rcaSelector?: string;
+}) {
+  return writeGovernedOptimizerRun(params);
+}
+
+export function experimentOptimizerListCli(params: {
+  workspace: string;
+  agentId?: string;
+  limit?: number;
+  redacted?: boolean;
+}) {
+  return listGovernedOptimizerRuns(params);
+}
+
+export function experimentOptimizerShowCli(params: {
+  workspace: string;
+  agentId?: string;
+  selector: string;
+  redacted?: boolean;
+}) {
+  return loadGovernedOptimizerRun(params);
 }

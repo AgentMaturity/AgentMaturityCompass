@@ -110,6 +110,15 @@ export interface CliAliasEntry {
   description: string;
 }
 
+export interface CliCommandInventoryEntry {
+  path: string;
+  name: string;
+  description: string;
+  aliases: string[];
+  options: string[];
+  subcommands: string[];
+}
+
 export const CLI_GROUPS: CliCommandGroup[] = [
   {
     id: "evidence",
@@ -168,7 +177,9 @@ export const CLI_GROUPS: CliCommandGroup[] = [
       { path: "lifecycle init", description: "Initialize .amc workspace" },
       { path: "lifecycle up", description: "Start control plane services" },
       { path: "lifecycle doctor", description: "Run health checks before deploy" },
-      { path: "lifecycle verify", description: "Run full verification pass" }
+      { path: "lifecycle verify", description: "Run full verification pass" },
+      { path: "resource validate", description: "Validate governed resource drift" },
+      { path: "resource apply", description: "Dry-run or accept governed resource changes" }
     ]
   },
   {
@@ -214,6 +225,49 @@ function formatHelpRow(path: string, description: string): string {
 
 function commandPathSet(program: Command): Set<string> {
   return new Set(flattenCommandPaths(program));
+}
+
+export function buildCommandInventory(program: Command, options: { includeInternal?: boolean } = {}): CliCommandInventoryEntry[] {
+  const entries: CliCommandInventoryEntry[] = [];
+  const walk = (cmd: Command, prefix: string[]): void => {
+    for (const child of cmd.commands) {
+      if (!options.includeInternal && child.name().startsWith("_")) {
+        continue;
+      }
+      const next = [...prefix, child.name()];
+      entries.push({
+        path: next.join(" "),
+        name: child.name(),
+        description: child.description(),
+        aliases: child.aliases(),
+        options: child.options.map((option) => option.flags),
+        subcommands: child.commands.map((grandchild) => grandchild.name())
+      });
+      walk(child, next);
+    }
+  };
+  walk(program, []);
+  return entries.sort((a, b) => a.path.localeCompare(b.path));
+}
+
+export function renderCommandInventoryMarkdown(entries: CliCommandInventoryEntry[]): string {
+  const lines = [
+    "# AMC CLI Command Inventory",
+    "",
+    "Generated from the live Commander command registry. Use this as the source of truth for docs and website command examples.",
+    "",
+    "| Command | Description | Options | Aliases |",
+    "|---|---|---|---|"
+  ];
+  for (const entry of entries) {
+    const command = `amc ${entry.path}`;
+    const description = entry.description || "-";
+    const options = entry.options.length > 0 ? entry.options.map((option) => `\`${option}\``).join("<br>") : "-";
+    const aliases = entry.aliases.length > 0 ? entry.aliases.map((alias) => `\`${alias}\``).join(", ") : "-";
+    lines.push(`| \`${command}\` | ${description.replaceAll("|", "\\|")} | ${options} | ${aliases} |`);
+  }
+  lines.push("");
+  return lines.join("\n");
 }
 
 export function renderGroupedHelp(program: Command): string {
@@ -384,17 +438,19 @@ export function cliDiscoverabilityFooter(): string {
   return [
     "",
     "Start with a task:",
-    "  • First-time setup       → amc setup    / amc quickstart --profile dev",
+    "  • Run AMC end to end     → amc",
+    "  • First-time setup       → amc          / amc setup",
     "  • Health check          → amc doctor",
     "  • Start services        → amc up",
-    "  • Score an agent        → amc score     / amc diagnostic run",
+    "  • Full assessment       → amc          / amc run / amc score",
+    "  • Govern resources      → amc resource validate / amc resource apply",
     "  • Run assurance         → amc assurance run --all",
     "  • Inspect traces        → amc trace list / amc trace inspect",
     "  • Build audit artifacts → amc audit binder create",
     "  • Explore interactively → amc shell",
     "",
     "Quick start by role:",
-    "  Developer   → amc quickscore",
+    "  Developer   → amc",
     "  DevOps      → amc ci check",
     "  Compliance  → amc comply report --framework EU_AI_ACT",
     "  Security    → amc redteam run",
@@ -403,6 +459,7 @@ export function cliDiscoverabilityFooter(): string {
     "Discoverability:",
     "  • Use 'amc help <command>' for detailed subcommand docs",
     "  • Use '--help' after any command path (for example: 'amc run --help')",
+    "  • Use 'amc commands --markdown' to generate the live CLI inventory for docs",
     "  • Namespace shortcuts:",
     "      - evidence  → verify, bundle, transparency, receipts",
     "      - score     → score, diagnostic, compare",
@@ -411,6 +468,6 @@ export function cliDiscoverabilityFooter(): string {
     "      - admin     → user, identity, vault, trust, ops",
     "      - lifecycle → init, up, doctor, verify",
     "      - eval      → run, compare, whatif",
-    "  • Start with common entry points: setup, quickstart, doctor, up, score, verify",
+    "  • Start with common entry points: amc, run, doctor, up, score, verify",
   ].join("\n");
 }

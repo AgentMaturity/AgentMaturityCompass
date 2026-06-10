@@ -145,6 +145,99 @@ export function registerTraceCommands(program: Command, activeAgent: (p: Command
         process.exit(1);
       }
     });
+
+  trace
+    .command("index")
+    .description("List or inspect distilled trace failure indexes")
+    .option("--agent <agentId>", "agent ID")
+    .option("--run <runId>", "run id, episode id, or trace-index id to inspect")
+    .option("--limit <n>", "max indexes", "10")
+    .option("--redacted", "hide local workspace paths", true)
+    .option("--json", "JSON output")
+    .action(async (opts: { agent?: string; run?: string; limit: string; redacted?: boolean; json?: boolean }) => {
+      try {
+        const agentId = opts.agent ?? activeAgent(program) ?? "default";
+        const { listTraceFailureIndexes, loadTraceFailureIndex } = await import("./watch/traceFailureIndex.js");
+        if (opts.run) {
+          const index = loadTraceFailureIndex({
+            workspace: process.cwd(),
+            agentId,
+            selector: opts.run,
+            redacted: opts.redacted !== false
+          });
+          if (opts.json) {
+            console.log(JSON.stringify(index, null, 2));
+            return;
+          }
+          console.log(chalk.bold(`Trace index ${index.indexId}`));
+          console.log(`  Run: ${index.runId}`);
+          console.log(`  Entries: ${index.summary.entryCount}`);
+          console.log(`  Clusters: ${index.summary.clusterCount}`);
+          for (const cluster of index.clusters.slice(0, 10)) {
+            console.log(`  - ${cluster.failureClass} count=${cluster.count} impact=${cluster.scoreImpact} ${cluster.sampleSnippet}`);
+          }
+          return;
+        }
+        const limit = Number.parseInt(opts.limit, 10);
+        const indexes = listTraceFailureIndexes({
+          workspace: process.cwd(),
+          agentId,
+          limit: Number.isFinite(limit) && limit > 0 ? limit : 10,
+          redacted: opts.redacted !== false
+        });
+        if (opts.json) {
+          console.log(JSON.stringify({ indexes, total: indexes.length }, null, 2));
+          return;
+        }
+        if (indexes.length === 0) {
+          console.log(chalk.dim("No trace failure indexes found. Run a full score with trace evidence first."));
+          return;
+        }
+        for (const index of indexes) {
+          console.log(`${index.generatedAt} ${index.indexId} entries=${index.summary.entryCount} clusters=${index.summary.clusterCount} top=${index.summary.topFailureClass ?? "-"}`);
+        }
+      } catch (e: any) {
+        console.error(chalk.red(e.message));
+        process.exit(1);
+      }
+    });
+
+  trace
+    .command("failures")
+    .description("Show top recurring failure clusters mined from trace indexes")
+    .option("--agent <agentId>", "agent ID")
+    .option("--limit <n>", "max clusters", "10")
+    .option("--redacted", "hide local workspace paths", true)
+    .option("--json", "JSON output")
+    .action(async (opts: { agent?: string; limit: string; redacted?: boolean; json?: boolean }) => {
+      try {
+        const agentId = opts.agent ?? activeAgent(program) ?? "default";
+        const limit = Number.parseInt(opts.limit, 10);
+        const { topTraceFailureClusters } = await import("./watch/traceFailureIndex.js");
+        const clusters = topTraceFailureClusters({
+          workspace: process.cwd(),
+          agentId,
+          limit: Number.isFinite(limit) && limit > 0 ? limit : 10,
+          redacted: opts.redacted !== false
+        });
+        if (opts.json) {
+          console.log(JSON.stringify({ agentId, clusters, total: clusters.length }, null, 2));
+          return;
+        }
+        if (clusters.length === 0) {
+          console.log(chalk.dim("No recurring failure clusters found."));
+          return;
+        }
+        console.log(chalk.bold(`Top trace failure clusters for ${agentId}`));
+        for (const cluster of clusters) {
+          console.log(`- ${cluster.failureClass} count=${cluster.count} impact=${cluster.scoreImpact} agents=${cluster.agents.join(",")}`);
+          console.log(`  ${cluster.sampleSnippet}`);
+        }
+      } catch (e: any) {
+        console.error(chalk.red(e.message));
+        process.exit(1);
+      }
+    });
 }
 
 export function registerAlertCommands(program: Command, activeAgent: (p: Command) => string | undefined): void {

@@ -1,6 +1,6 @@
 import type { DiagnosticQuestion, EvidenceEventType, Gate, LayerName, OptionLevel } from "../types.js";
 
-interface QuestionSeed {
+export interface QuestionSeed {
   id: string;
   layerName: LayerName;
   title: string;
@@ -10,6 +10,8 @@ interface QuestionSeed {
   upgradeHints: string;
   tuningKnobs: string[];
 }
+
+export const LEGACY_QUESTION_SET_VERSION = "amc-legacy-240-v1";
 
 const HIGH_LEVEL_BLOCKERS = [
   "POLICY_VIOLATION_CRITICAL",
@@ -205,7 +207,7 @@ function mergeUnique(existing: string[] | undefined, additions: string[]): strin
   return [...new Set([...(existing ?? []), ...additions])];
 }
 
-function buildQuestion(seed: QuestionSeed): DiagnosticQuestion {
+export function buildQuestion(seed: QuestionSeed): DiagnosticQuestion {
   const gates: [Gate, Gate, Gate, Gate, Gate, Gate] = [
     buildBaseGate(0),
     buildBaseGate(1),
@@ -718,7 +720,14 @@ function buildQuestion(seed: QuestionSeed): DiagnosticQuestion {
     evidenceGateHints: seed.evidenceGateHints,
     upgradeHints: seed.upgradeHints,
     tuningKnobs: seed.tuningKnobs,
-    gates
+    gates,
+    questionSetVersion: LEGACY_QUESTION_SET_VERSION,
+    family: "core",
+    surfaces: ["Score"],
+    assessmentLayers: [seed.layerName],
+    introducedIn: LEGACY_QUESTION_SET_VERSION,
+    scoringWeight: 1,
+    activeByDefault: true
   };
 }
 

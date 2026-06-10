@@ -15,14 +15,45 @@ function iso(ts) {
   return Number.isFinite(Number(ts)) ? new Date(Number(ts)).toISOString() : "-";
 }
 
+function renderConfirmationProofRows(proofs) {
+  return proofs.map((row) => {
+    const proof = row.proof || row;
+    return `<tr>
+      <td><code>${escapeHtml(proof.proofId || "-")}</code></td>
+      <td>${escapeHtml(proof.confirmationStatus || "-")}</td>
+      <td>${escapeHtml(proof.findingId || "-")}</td>
+      <td>${escapeHtml(proof.technique || "-")}</td>
+      <td>${escapeHtml(proof.safeMode || "-")}</td>
+      <td>${escapeHtml(String(proof.safeProof?.signalCount ?? 0))}</td>
+    </tr>`;
+  }).join("");
+}
+
+function renderConfirmationScopeRows(scopes) {
+  return scopes.map((row) => {
+    const scope = row.scope || row;
+    return `<tr>
+      <td><code>${escapeHtml(scope.scopeId || "-")}</code></td>
+      <td>${escapeHtml(`${scope.target?.type || "-"}:${scope.target?.id || "-"}`)}</td>
+      <td>${escapeHtml((scope.allowedTechniques || []).join(", ") || "-")}</td>
+      <td>${escapeHtml(scope.safeMode || "-")}</td>
+      <td>${escapeHtml(iso(scope.windowEndTs))}</td>
+    </tr>`;
+  }).join("");
+}
+
 export async function renderAssurancePage(params) {
   const policy = await params.apiGet("/assurance/policy");
   const runsResponse = await params.apiGet("/assurance/runs");
   const certLatest = await params.apiGet("/assurance/cert/latest");
   const waiverStatus = await params.apiGet("/assurance/waiver/status").catch(() => ({ active: null }));
   const status = await params.apiGet("/status").catch(() => null);
+  const confirmationScopesResponse = await params.apiGet("/shield/exploit-confirmation/scopes").catch(() => ({ scopes: [] }));
+  const confirmationProofsResponse = await params.apiGet("/shield/exploit-confirmation/proofs").catch(() => ({ proofs: [] }));
 
   const runs = Array.isArray(runsResponse?.runs) ? runsResponse.runs : [];
+  const confirmationScopes = Array.isArray(confirmationScopesResponse?.scopes) ? confirmationScopesResponse.scopes : [];
+  const confirmationProofs = Array.isArray(confirmationProofsResponse?.proofs) ? confirmationProofsResponse.proofs : [];
   const latestRun = runs[0] || null;
   const latestRunDetail = latestRun
     ? await params.apiGet(`/assurance/runs/${encodeURIComponent(latestRun.runId)}`).catch(() => null)
@@ -80,6 +111,30 @@ export async function renderAssurancePage(params) {
         lastCertStatus: certSummary?.status || null,
         thresholds: policy?.policy?.assurancePolicy?.thresholds || null
       }, null, 2))}</pre>
+      `
+    ),
+    params.card(
+      "Authorized Security Confirmation",
+      `
+      <div class="grid">
+        <div><div class="muted">Active scopes</div><div class="tile-value">${confirmationScopes.length}</div></div>
+        <div><div class="muted">Safe proofs</div><div class="tile-value">${confirmationProofs.length}</div></div>
+        <div><div class="muted">Raw payload storage</div><div class="tile-value">disabled</div></div>
+        <div><div class="muted">Export mode</div><div class="tile-value">safe proof</div></div>
+      </div>
+      <p class="muted">Exploit confirmation is fail-closed. It requires an explicit signed scope and exports hashes, signal refs, and receipts instead of exploit instructions.</p>
+      <div class="scroll">
+        <table>
+          <thead><tr><th>Proof</th><th>Status</th><th>Finding</th><th>Technique</th><th>Mode</th><th>Signals</th></tr></thead>
+          <tbody>${renderConfirmationProofRows(confirmationProofs) || "<tr><td colspan='6' class='muted'>No confirmation proofs yet.</td></tr>"}</tbody>
+        </table>
+      </div>
+      <div class="scroll">
+        <table>
+          <thead><tr><th>Scope</th><th>Target</th><th>Techniques</th><th>Safe Mode</th><th>Ends</th></tr></thead>
+          <tbody>${renderConfirmationScopeRows(confirmationScopes) || "<tr><td colspan='5' class='muted'>No authorization scopes yet.</td></tr>"}</tbody>
+        </table>
+      </div>
       `
     ),
     params.card("Top Findings", findingsHtml)

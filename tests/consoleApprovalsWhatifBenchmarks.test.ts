@@ -740,10 +740,17 @@ describe("console + approvals + what-if + benchmarks", () => {
         url: `http://127.0.0.1:${port}/console/assets/app.js`,
         method: "GET"
       });
+      const evidence = await httpRequestJson({
+        url: `http://127.0.0.1:${port}/console/evidence`,
+        method: "GET"
+      });
       expect(page.status).toBe(200);
       expect(app.status).toBe(200);
+      expect(evidence.status).toBe(200);
       expect(page.body).toContain("Compass Console");
       expect(app.body).toContain("renderAuthScreen");
+      expect(app.body).toContain("renderEvidence");
+      expect(evidence.body).toContain('data-page="evidence"');
     } finally {
       await server.close();
     }

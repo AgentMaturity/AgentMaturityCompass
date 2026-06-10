@@ -52,7 +52,7 @@ Recommended next steps after your first score:
 1. `amc`
 2. `amc fix`
 3. `amc doctor --json`
-4. review `docs/AFTER_QUICKSCORE.md`
+4. review `docs/AFTER_FIRST_SCORE.md`
 
 ---
 
@@ -140,7 +140,7 @@ If you are new, start with:
 1. Run `npx agent-maturity-compass`
 2. Read the gaps
 3. Run `amc fix`
-4. Read `docs/AFTER_QUICKSCORE.md`
+4. Read `docs/AFTER_FIRST_SCORE.md`
 5. Decide whether you need:
    - browser exploration
    - local CLI workflows
@@ -164,7 +164,7 @@ If you are new, start with:
 - `docs/ARCHITECTURE_BRIEF.md`
 - `docs/IMPLEMENTATION_REALITY_MAP.md`
 - `docs/deep-dive/INDEX.md`
-- `docs/AFTER_QUICKSCORE.md`
+- `docs/AFTER_FIRST_SCORE.md`
 - `docs/QUICKSTART.md`
 - `docs/ADAPTERS.md`
 - `docs/CI_TEMPLATES.md`

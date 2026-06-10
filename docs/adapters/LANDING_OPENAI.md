@@ -6,7 +6,7 @@ You already use the OpenAI Agents SDK. AMC wraps it — zero code changes.
 
 ```bash
 amc wrap openai-agents-sdk -- python my_agent.py
-amc quickscore
+amc
 amc fix
 ```
 
@@ -21,4 +21,4 @@ amc fix
 
 ## Next steps
 - `docs/START_HERE.md`
-- `docs/AFTER_QUICKSCORE.md`
+- `docs/AFTER_FIRST_SCORE.md`

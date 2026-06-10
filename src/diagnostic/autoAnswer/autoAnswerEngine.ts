@@ -12,6 +12,8 @@ export interface AutoAnswerOutput {
   unknownReasons: Array<{ questionId: string; reasons: string[] }>;
   questions: ReturnType<typeof deriveAutoAnswerResults>["questions"];
   recommendedUpgradeActions: string[];
+  recommendationControls: NonNullable<DiagnosticReport["recommendationControls"]>;
+  confidenceSummary: DiagnosticReport["confidenceSummary"];
   integrityIndex: number;
   trustLabel: string;
   evidenceTrustCoverage: DiagnosticReport["evidenceTrustCoverage"];
@@ -60,6 +62,8 @@ export async function runAutoAnswer(params: {
     unknownReasons: derived.unknownReasons,
     questions: derived.questions,
     recommendedUpgradeActions: report.prioritizedUpgradeActions.slice(0, 10),
+    recommendationControls: (report.recommendationControls ?? []).slice(0, 10),
+    confidenceSummary: report.confidenceSummary,
     integrityIndex: report.integrityIndex,
     trustLabel: report.trustLabel,
     evidenceTrustCoverage: report.evidenceTrustCoverage,
