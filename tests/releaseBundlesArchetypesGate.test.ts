@@ -182,6 +182,49 @@ describe("release bundles, gates, archetypes, badges", () => {
     db.close();
   });
 
+  test("bundle export scopes assurance rows to the bundled agent", async () => {
+    const workspace = newWorkspace();
+    const run = await runDiagnostic({
+      workspace,
+      window: "14d",
+      targetName: "default",
+      claimMode: "auto",
+      agentId: "default"
+    });
+
+    const ledger = openLedger(workspace);
+    ledger.insertAssuranceRun({
+      assurance_run_id: "other-agent-unsigned",
+      agent_id: "other-agent",
+      ts: run.windowStartTs + 1,
+      window_start_ts: run.windowStartTs,
+      window_end_ts: run.windowEndTs,
+      mode: "sandbox",
+      pack_ids_json: JSON.stringify(["security-starter"]),
+      report_json_sha256: "0".repeat(64),
+      run_seal_sig: "unsigned",
+      status: "UNSIGNED"
+    });
+    ledger.close();
+
+    const bundlePath = join(workspace, ".amc", "scoped-assurance.amcbundle");
+    exportEvidenceBundle({
+      workspace,
+      runId: run.runId,
+      outFile: bundlePath,
+      agentId: "default"
+    });
+
+    const extracted = extractBundle(bundlePath);
+    const db = new Database(join(extracted, "evidence", "evidence.sqlite"), { readonly: true });
+    const assuranceRows = db.prepare("SELECT COUNT(*) as count FROM assurance_runs").get() as { count: number };
+    db.close();
+    expect(assuranceRows.count).toBe(0);
+
+    const verified = await verifyEvidenceBundle(bundlePath);
+    expect(verified.ok).toBe(true);
+  });
+
   test("bundle verify catches manifest/blob/missing/signature tampering", async () => {
     const workspace = newWorkspace();
 

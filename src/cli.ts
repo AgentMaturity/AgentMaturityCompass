@@ -9814,7 +9814,7 @@ assurance
   .option("--out <path>", "output markdown path")
   .option("--format <format>", "output format: text|sarif", "text")
   .option("--verbose", "show full scenario-level detail with payloads and reasons", false)
-  .option("--no-sign", "skip vault/artifact signing (packs still run)", false)
+  .option("--no-sign", "skip vault/artifact signing (packs still run)")
   .action(
     async (opts: {
       agent?: string;

@@ -666,6 +666,7 @@ function buildImportedDiagnosticReport(input: {
   parsedCandidates: ParsedCandidate[];
 }): DiagnosticReport {
   const ts = Date.now();
+  const evidenceCoverage = Math.min(1, input.plan.candidateCount / 6);
   const questionScores: QuestionScore[] = input.parsedCandidates.map((candidate, index) => {
     const flags = candidate.flags;
     const finalLevel = flags.some((flag) => /failure|malformed|unsupported/i.test(flag)) ? 2 : flags.length > 0 ? 3 : 4;
@@ -707,9 +708,9 @@ function buildImportedDiagnosticReport(input: {
     correlationRatio: questionScores.length > 0 ? 1 : 0,
     invalidReceiptsCount: 0,
     correlationWarnings: input.plan.warnings,
-    evidenceCoverage: Math.min(1, input.plan.candidateCount / 6),
+    evidenceCoverage,
     evidenceTrustCoverage: {
-      observed: input.plan.candidateCount,
+      observed: Number(evidenceCoverage.toFixed(6)),
       attested: 0,
       selfReported: 0
     },

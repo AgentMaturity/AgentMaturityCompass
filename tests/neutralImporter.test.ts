@@ -177,6 +177,33 @@ describe("neutral importer", () => {
     }
   });
 
+  test("normalizes imported evidence trust coverage shares", () => {
+    const workspace = mkdtempSync(join(tmpdir(), "amc-neutral-import-trust-"));
+    const inputPath = representativeImportDir();
+    try {
+      const result = runNeutralImport({
+        workspace,
+        inputPath,
+        agentId: "default",
+        mode: "import"
+      });
+
+      expect(result.diagnosticReportPath).toBeTruthy();
+      const report = JSON.parse(readFileSync(result.diagnosticReportPath!, "utf8")) as {
+        evidenceCoverage: number;
+        evidenceTrustCoverage: { observed: number; attested: number; selfReported: number };
+      };
+      expect(report.evidenceCoverage).toBe(1);
+      expect(report.evidenceTrustCoverage.observed).toBeGreaterThanOrEqual(0);
+      expect(report.evidenceTrustCoverage.observed).toBeLessThanOrEqual(1);
+      expect(report.evidenceTrustCoverage.attested).toBe(0);
+      expect(report.evidenceTrustCoverage.selfReported).toBe(0);
+    } finally {
+      rmSync(workspace, { recursive: true, force: true });
+      rmSync(inputPath, { recursive: true, force: true });
+    }
+  });
+
   test("collaboration records import as telemetry-only runtime events linked to lifecycle evidence", () => {
     const workspace = mkdtempSync(join(tmpdir(), "amc-neutral-import-collab-"));
     const inputPath = mkdtempSync(join(tmpdir(), "amc-neutral-import-collab-input-"));

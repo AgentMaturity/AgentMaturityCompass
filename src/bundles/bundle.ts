@@ -405,8 +405,8 @@ function copyEvidenceSlice(params: {
     txSessions(sessions);
 
     const assuranceRows = source
-      .prepare("SELECT * FROM assurance_runs WHERE ts >= ? AND ts <= ? ORDER BY ts ASC")
-      .all(params.report.windowStartTs, params.report.windowEndTs) as Array<Record<string, unknown>>;
+      .prepare("SELECT * FROM assurance_runs WHERE agent_id = ? AND ts >= ? AND ts <= ? ORDER BY ts ASC")
+      .all(params.report.agentId, params.report.windowStartTs, params.report.windowEndTs) as Array<Record<string, unknown>>;
     if (assuranceRows.length > 0) {
       const insertAssurance = out.prepare(
         `INSERT INTO assurance_runs
