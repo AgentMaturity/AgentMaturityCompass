@@ -4,7 +4,8 @@
  */
 
 import type { IncomingMessage, ServerResponse } from 'node:http';
-import { bodyJson, apiSuccess, apiError, pathParam, queryParam } from './apiHelpers.js';
+import { z } from 'zod';
+import { bodyJsonSchema, apiSuccess, apiError, pathParam, queryParam, isRequestBodyError } from './apiHelpers.js';
 import {
   countActiveScoreSessions,
   createScoreSession,
@@ -13,6 +14,98 @@ import {
   recordScoreAnswer,
 } from './scoreStore.js';
 import { queueScoreComputationMetric } from '../observability/otelExporter.js';
+
+const nonEmptyStringSchema = z.string().trim().min(1);
+const optionalNonEmptyStringSchema = nonEmptyStringSchema.optional();
+const objectRecordSchema = z.record(z.string(), z.unknown());
+const scoreLevelSchema = z.number().int().min(0).max(5);
+const answersSchema = z.record(nonEmptyStringSchema, scoreLevelSchema);
+
+const scoreRunBodySchema = z.object({
+  agentId: optionalNonEmptyStringSchema,
+  window: optionalNonEmptyStringSchema,
+  targetName: optionalNonEmptyStringSchema,
+  claimMode: z.enum(["auto", "owner", "harness"]).optional(),
+  runtimeForHarness: optionalNonEmptyStringSchema,
+  questionSetVersion: optionalNonEmptyStringSchema,
+  applyIndustryPackWeights: z.boolean().optional(),
+});
+const quickscoreBodySchema = z.object({ answers: answersSchema });
+const quickScoreBodySchema = z.object({
+  answers: answersSchema,
+  tier: z.enum(["quick", "standard", "deep"]).optional(),
+});
+const compareBodySchema = z.object({
+  runA: nonEmptyStringSchema,
+  runB: nonEmptyStringSchema,
+  agentId: optionalNonEmptyStringSchema,
+});
+const agentWindowBodySchema = z.object({
+  agentId: optionalNonEmptyStringSchema,
+  window: optionalNonEmptyStringSchema,
+});
+const optionalAgentBodySchema = z.object({ agentId: optionalNonEmptyStringSchema });
+const scoreSessionBodySchema = z.object({ agentId: nonEmptyStringSchema });
+const scoreAnswerBodySchema = z.object({
+  sessionId: nonEmptyStringSchema,
+  questionId: nonEmptyStringSchema,
+  value: scoreLevelSchema,
+  notes: z.string().max(2000).optional(),
+});
+const industryAdjustBodySchema = z.object({
+  rawDimensionScores: z.record(nonEmptyStringSchema, z.number()),
+  industryId: nonEmptyStringSchema,
+  lastVerifiedAt: z.number().optional(),
+  observedEvidenceShare: z.number().min(0).max(1).optional(),
+});
+const verifyClaimBodySchema = z.object({
+  claim: objectRecordSchema,
+  policy: objectRecordSchema,
+  sharedSecret: optionalNonEmptyStringSchema,
+});
+const createClaimBodySchema = z.object({
+  agentId: nonEmptyStringSchema,
+  publicKeyHash: nonEmptyStringSchema,
+  issuingWorkspace: nonEmptyStringSchema,
+  sharedSecret: optionalNonEmptyStringSchema,
+  amcScore: z.number().optional(),
+  amcLevel: optionalNonEmptyStringSchema,
+  amcPassportId: optionalNonEmptyStringSchema,
+  ttlHours: z.number().positive().optional(),
+});
+const transitiveTrustBodySchema = z.object({
+  graph: objectRecordSchema,
+  sourceAgent: nonEmptyStringSchema,
+  targetAgent: nonEmptyStringSchema,
+  opts: z.object({
+    maxHops: z.number().int().positive().optional(),
+    decayPerHop: z.number().optional(),
+    now: z.number().optional(),
+  }).optional(),
+});
+const temporalDecayBodySchema = z.object({
+  originalScore: z.number(),
+  establishedAt: z.number(),
+  config: objectRecordSchema,
+  now: z.number().optional(),
+});
+const inheritedTrustBodySchema = z.object({
+  delegatorTrust: objectRecordSchema,
+  delegateScore: z.number(),
+  policy: objectRecordSchema,
+  delegationDepth: z.number().int().nonnegative().optional(),
+});
+const safetyResearchBodySchema = z.object({
+  responses: z.record(nonEmptyStringSchema, z.string()).optional(),
+});
+
+function scoreRouteError(res: ServerResponse, error: unknown, fallback: string, status = 500): void {
+  if (isRequestBodyError(error)) {
+    apiError(res, error.statusCode, error.message);
+    return;
+  }
+  apiError(res, status, fallback);
+}
 
 export async function handleScoreRoute(
   pathname: string,
@@ -34,7 +127,7 @@ export async function handleScoreRoute(
       const { listQuestionSets } = await import('../diagnostic/questionSets.js');
       apiSuccess(res, { questionSets: listQuestionSets() });
     } catch (err) {
-      apiError(res, 500, err instanceof Error ? err.message : 'Could not load question sets');
+      scoreRouteError(res, err, 'Could not load question sets');
     }
     return true;
   }
@@ -42,15 +135,7 @@ export async function handleScoreRoute(
   // POST /api/v1/score/run — trigger a full diagnostic run (CLI: amc run)
   if (pathname === '/api/v1/score/run' && method === 'POST') {
     try {
-      const body = await bodyJson<{
-        agentId?: string;
-        window?: string;
-        targetName?: string;
-        claimMode?: 'auto' | 'owner' | 'harness';
-        runtimeForHarness?: string;
-        questionSetVersion?: string;
-        applyIndustryPackWeights?: boolean;
-      }>(req);
+      const body = await bodyJsonSchema(req, scoreRunBodySchema);
       const agentId = body.agentId ?? 'default';
       const { runDiagnostic } = await import('../diagnostic/runner.js');
       const result = await runDiagnostic({
@@ -80,7 +165,7 @@ export async function handleScoreRoute(
       });
       apiSuccess(res, result, 200);
     } catch (err) {
-      apiError(res, 500, err instanceof Error ? err.message : 'Diagnostic run failed');
+      scoreRouteError(res, err, 'Diagnostic run failed');
     }
     return true;
   }
@@ -88,17 +173,13 @@ export async function handleScoreRoute(
   // POST /api/v1/score/quickscore — rapid 5-question assessment (CLI: amc quickscore)
   if (pathname === '/api/v1/score/quickscore' && method === 'POST') {
     try {
-      const body = await bodyJson<{ answers: Record<string, number> }>(req);
-      if (!body.answers || typeof body.answers !== 'object') {
-        apiError(res, 400, 'Missing required field: answers (Record<questionId, level>)');
-        return true;
-      }
+      const body = await bodyJsonSchema(req, quickscoreBodySchema);
       const { getRapidQuestions, scoreRapidAssessment } = await import('../diagnostic/rapidQuickscore.js');
       const questions = getRapidQuestions();
       const result = scoreRapidAssessment(body.answers);
       apiSuccess(res, { questions: questions.map((q: { id: string; title: string }) => ({ id: q.id, title: q.title })), result });
     } catch (err) {
-      apiError(res, 500, err instanceof Error ? err.message : 'Quickscore failed');
+      scoreRouteError(res, err, 'Quickscore failed');
     }
     return true;
   }
@@ -110,7 +191,7 @@ export async function handleScoreRoute(
       const questions = getRapidQuestions();
       apiSuccess(res, { questions });
     } catch (err) {
-      apiError(res, 500, err instanceof Error ? err.message : 'Could not load quickscore questions');
+      scoreRouteError(res, err, 'Could not load quickscore questions');
     }
     return true;
   }
@@ -118,22 +199,14 @@ export async function handleScoreRoute(
   // POST /api/v1/score/quick — tiered quick score (CLI: amc score --tier)
   if (pathname === '/api/v1/score/quick' && method === 'POST') {
     try {
-      const body = await bodyJson<{ answers: Record<string, number>; tier?: string }>(req);
-      if (!body.answers || typeof body.answers !== 'object') {
-        apiError(res, 400, 'Missing required field: answers (Record<questionId, level>)');
-        return true;
-      }
-      const tier = (body.tier ?? 'quick') as 'quick' | 'standard' | 'deep';
-      if (tier !== 'quick' && tier !== 'standard' && tier !== 'deep') {
-        apiError(res, 400, 'Invalid tier. Use quick, standard, or deep.');
-        return true;
-      }
+      const body = await bodyJsonSchema(req, quickScoreBodySchema);
+      const tier = body.tier ?? 'quick';
       const { getQuestionsForTier, computeQuickScore } = await import('../diagnostic/quickScore.js');
       const questions = getQuestionsForTier(tier);
       const result = computeQuickScore(body.answers, tier);
       apiSuccess(res, { tier, questions: questions.map((q: { id: string; title: string }) => ({ id: q.id, title: q.title })), result });
     } catch (err) {
-      apiError(res, 500, err instanceof Error ? err.message : 'Quick score failed');
+      scoreRouteError(res, err, 'Quick score failed');
     }
     return true;
   }
@@ -150,7 +223,7 @@ export async function handleScoreRoute(
       const questions = getQuestionsForTier(tier);
       apiSuccess(res, { tier, questions });
     } catch (err) {
-      apiError(res, 500, err instanceof Error ? err.message : 'Could not load questions');
+      scoreRouteError(res, err, 'Could not load questions');
     }
     return true;
   }
@@ -171,7 +244,7 @@ export async function handleScoreRoute(
       const report = loadRunReport(workspace, latestRunId, agentId);
       apiSuccess(res, report);
     } catch (err) {
-      apiError(res, 500, err instanceof Error ? err.message : 'Could not load latest run');
+      scoreRouteError(res, err, 'Could not load latest run');
     }
     return true;
   }
@@ -204,7 +277,7 @@ export async function handleScoreRoute(
         ledger.close();
       }
     } catch (err) {
-      apiError(res, 500, err instanceof Error ? err.message : 'Could not list history');
+      scoreRouteError(res, err, 'Could not list history');
     }
     return true;
   }
@@ -212,8 +285,7 @@ export async function handleScoreRoute(
   // POST /api/v1/score/compare — compare two runs via POST body
   if (pathname === '/api/v1/score/compare' && method === 'POST') {
     try {
-      const body = await bodyJson<{ runA: string; runB: string; agentId?: string }>(req);
-      if (!body.runA || !body.runB) { apiError(res, 400, 'Missing required fields: runA, runB'); return true; }
+      const body = await bodyJsonSchema(req, compareBodySchema);
       const agentId = body.agentId ?? 'default';
       const { loadRunReport, compareRuns } = await import('../diagnostic/runner.js');
       const a = loadRunReport(workspace, body.runA, agentId);
@@ -221,7 +293,7 @@ export async function handleScoreRoute(
       const comparison = compareRuns(a, b);
       apiSuccess(res, comparison);
     } catch (err) {
-      apiError(res, 500, err instanceof Error ? err.message : 'Comparison failed');
+      scoreRouteError(res, err, 'Comparison failed');
     }
     return true;
   }
@@ -229,7 +301,7 @@ export async function handleScoreRoute(
   // POST /api/v1/score/formal-spec — run full formal-spec diagnostic score
   if (pathname === '/api/v1/score/formal-spec' && method === 'POST') {
     try {
-      const body = await bodyJson<{ agentId?: string; window?: string }>(req);
+      const body = await bodyJsonSchema(req, agentWindowBodySchema);
       const agentId = body.agentId ?? 'default';
       const { runDiagnostic } = await import('../diagnostic/runner.js');
       const result = await runDiagnostic({ workspace, agentId, window: body.window ?? '30d' });
@@ -248,7 +320,7 @@ export async function handleScoreRoute(
       });
       apiSuccess(res, result, 200);
     } catch (err) {
-      apiError(res, 500, err instanceof Error ? err.message : 'Score failed');
+      scoreRouteError(res, err, 'Score failed');
     }
     return true;
   }
@@ -256,14 +328,14 @@ export async function handleScoreRoute(
   // POST /api/v1/score/adversarial — test gaming resistance
   if (pathname === '/api/v1/score/adversarial' && method === 'POST') {
     try {
-      const body = await bodyJson<{ agentId?: string }>(req);
+      const body = await bodyJsonSchema(req, optionalAgentBodySchema);
       const agentId = body.agentId ?? 'default';
       // Adversarial runs a special diagnostic pass — run diagnostic with adversarial window
       const { runDiagnostic } = await import('../diagnostic/runner.js');
       const result = await runDiagnostic({ workspace, agentId, window: '7d', claimMode: 'auto' });
       apiSuccess(res, { agentId, adversarialResult: result, inflationAttempts: result.inflationAttempts ?? [], unsupportedClaims: result.unsupportedClaimCount ?? 0 });
     } catch (err) {
-      apiError(res, 500, err instanceof Error ? err.message : 'Adversarial test failed');
+      scoreRouteError(res, err, 'Adversarial test failed');
     }
     return true;
   }
@@ -281,7 +353,7 @@ export async function handleScoreRoute(
       const runIds = files.map((f: string) => f.replace('.json', ''));
       apiSuccess(res, { agentId, runIds, total: runIds.length });
     } catch (err) {
-      apiError(res, 500, err instanceof Error ? err.message : 'Could not list runs');
+      scoreRouteError(res, err, 'Could not list runs');
     }
     return true;
   }
@@ -295,7 +367,7 @@ export async function handleScoreRoute(
       const run = loadRunReport(workspace, runParams.runId!, agentId);
       apiSuccess(res, run);
     } catch (err) {
-      apiError(res, 404, err instanceof Error ? err.message : 'Run not found');
+      scoreRouteError(res, err, 'Run not found', 404);
     }
     return true;
   }
@@ -313,7 +385,7 @@ export async function handleScoreRoute(
       const comparison = compareRuns(a, b);
       apiSuccess(res, comparison);
     } catch (err) {
-      apiError(res, 500, err instanceof Error ? err.message : 'Comparison failed');
+      scoreRouteError(res, err, 'Comparison failed');
     }
     return true;
   }
@@ -333,7 +405,7 @@ export async function handleScoreRoute(
       }
       apiSuccess(res, report);
     } catch (err) {
-      apiError(res, 404, err instanceof Error ? err.message : 'Run not found');
+      scoreRouteError(res, err, 'Run not found', 404);
     }
     return true;
   }
@@ -354,7 +426,7 @@ export async function handleScoreRoute(
       }
       apiSuccess(res, report);
     } catch (err) {
-      apiError(res, 500, err instanceof Error ? err.message : 'Report generation failed');
+      scoreRouteError(res, err, 'Report generation failed');
     }
     return true;
   }
@@ -362,12 +434,11 @@ export async function handleScoreRoute(
   // POST /api/v1/score/session — create interactive diagnostic session
   if (pathname === '/api/v1/score/session' && method === 'POST') {
     try {
-      const body = await bodyJson<{ agentId: string }>(req);
-      if (!body.agentId) { apiError(res, 400, 'Missing required field: agentId'); return true; }
+      const body = await bodyJsonSchema(req, scoreSessionBodySchema);
       const session = createScoreSession(workspace, body.agentId);
       apiSuccess(res, { sessionId: session.id, agentId: session.agentId }, 201);
     } catch (err) {
-      apiError(res, 500, err instanceof Error ? err.message : 'Internal error');
+      scoreRouteError(res, err, 'Internal error');
     }
     return true;
   }
@@ -387,7 +458,7 @@ export async function handleScoreRoute(
         apiSuccess(res, { complete: false, question: next, answeredCount: answered.size, totalQuestions: questionBank.length });
       }
     } catch (err) {
-      apiError(res, 500, err instanceof Error ? err.message : 'Internal error');
+      scoreRouteError(res, err, 'Internal error');
     }
     return true;
   }
@@ -395,11 +466,7 @@ export async function handleScoreRoute(
   // POST /api/v1/score/answer
   if (pathname === '/api/v1/score/answer' && method === 'POST') {
     try {
-      const body = await bodyJson<{ sessionId: string; questionId: string; value: number; notes?: string }>(req);
-      if (!body.sessionId || !body.questionId || body.value === undefined) {
-        apiError(res, 400, 'Missing required fields: sessionId, questionId, value');
-        return true;
-      }
+      const body = await bodyJsonSchema(req, scoreAnswerBodySchema);
       const session = recordScoreAnswer({
         workspace,
         sessionId: body.sessionId,
@@ -411,10 +478,10 @@ export async function handleScoreRoute(
       apiSuccess(res, { recorded: true, answeredCount: Object.keys(session.answers).length });
     } catch (err) {
       if (err instanceof Error && err.message.startsWith("Invalid score answer:")) {
-        apiError(res, 400, err.message);
+        apiError(res, 400, "Invalid score answer");
         return true;
       }
-      apiError(res, 500, err instanceof Error ? err.message : 'Internal error');
+      scoreRouteError(res, err, 'Internal error');
     }
     return true;
   }
@@ -438,15 +505,7 @@ export async function handleScoreRoute(
   // POST /api/v1/score/industry/adjust — adjust score using industry-specific model
   if (pathname === '/api/v1/score/industry/adjust' && method === 'POST') {
     try {
-      const body = await bodyJson<{
-        rawDimensionScores?: Record<string, number>;
-        industryId?: string;
-        lastVerifiedAt?: number;
-        observedEvidenceShare?: number;
-      }>(req);
-      if (!body.rawDimensionScores || !body.industryId) {
-        apiError(res, 400, 'rawDimensionScores and industryId required'); return true;
-      }
+      const body = await bodyJsonSchema(req, industryAdjustBodySchema);
       const { computeIndustryAdjustedScore } = await import('../score/industryTrustModels.js');
       const result = computeIndustryAdjustedScore(
         body.rawDimensionScores,
@@ -456,7 +515,7 @@ export async function handleScoreRoute(
       );
       apiSuccess(res, result);
     } catch (err) {
-      apiError(res, 500, err instanceof Error ? err.message : 'Industry score adjustment failed');
+      scoreRouteError(res, err, 'Industry score adjustment failed');
     }
     return true;
   }
@@ -473,7 +532,7 @@ export async function handleScoreRoute(
       }));
       apiSuccess(res, { models, count: models.length });
     } catch (err) {
-      apiError(res, 500, err instanceof Error ? err.message : 'Failed to list industry models');
+      scoreRouteError(res, err, 'Failed to list industry models');
     }
     return true;
   }
@@ -487,7 +546,7 @@ export async function handleScoreRoute(
       if (!model) { apiError(res, 404, `Industry model not found: ${industryModelParams.industryId}`); return true; }
       apiSuccess(res, model);
     } catch (err) {
-      apiError(res, 500, err instanceof Error ? err.message : 'Failed to get industry model');
+      scoreRouteError(res, err, 'Failed to get industry model');
     }
     return true;
   }
@@ -497,15 +556,7 @@ export async function handleScoreRoute(
   // POST /api/v1/score/trust/verify-claim — verify an agent identity claim against a policy
   if (pathname === '/api/v1/score/trust/verify-claim' && method === 'POST') {
     try {
-      const body = await bodyJson<{
-        claim: unknown;
-        policy: unknown;
-        sharedSecret?: string;
-      }>(req);
-      if (!body.claim || !body.policy) {
-        apiError(res, 400, 'Missing required fields: claim, policy');
-        return true;
-      }
+      const body = await bodyJsonSchema(req, verifyClaimBodySchema);
       const { verifyAgentClaim } = await import('../score/crossAgentTrust.js');
       const secret = body.sharedSecret ?? process.env['AMC_TRUST_SECRET'] ?? 'amc-trust-default';
       // Dates may arrive as strings — coerce issuedAt / expiresAt
@@ -519,7 +570,7 @@ export async function handleScoreRoute(
       );
       apiSuccess(res, result);
     } catch (err) {
-      apiError(res, 500, err instanceof Error ? err.message : 'verify-claim failed');
+      scoreRouteError(res, err, 'verify-claim failed');
     }
     return true;
   }
@@ -527,20 +578,7 @@ export async function handleScoreRoute(
   // POST /api/v1/score/trust/create-claim — create a new agent identity claim
   if (pathname === '/api/v1/score/trust/create-claim' && method === 'POST') {
     try {
-      const body = await bodyJson<{
-        agentId: string;
-        publicKeyHash: string;
-        issuingWorkspace: string;
-        sharedSecret?: string;
-        amcScore?: number;
-        amcLevel?: string;
-        amcPassportId?: string;
-        ttlHours?: number;
-      }>(req);
-      if (!body.agentId || !body.publicKeyHash || !body.issuingWorkspace) {
-        apiError(res, 400, 'Missing required fields: agentId, publicKeyHash, issuingWorkspace');
-        return true;
-      }
+      const body = await bodyJsonSchema(req, createClaimBodySchema);
       const { createAgentClaim } = await import('../score/crossAgentTrust.js');
       const secret = body.sharedSecret ?? process.env['AMC_TRUST_SECRET'] ?? 'amc-trust-default';
       const result = createAgentClaim(
@@ -557,7 +595,7 @@ export async function handleScoreRoute(
       );
       apiSuccess(res, result, 201);
     } catch (err) {
-      apiError(res, 500, err instanceof Error ? err.message : 'create-claim failed');
+      scoreRouteError(res, err, 'create-claim failed');
     }
     return true;
   }
@@ -565,16 +603,7 @@ export async function handleScoreRoute(
   // POST /api/v1/score/trust/transitive — compute transitive trust between two agents
   if (pathname === '/api/v1/score/trust/transitive' && method === 'POST') {
     try {
-      const body = await bodyJson<{
-        graph: unknown;
-        sourceAgent: string;
-        targetAgent: string;
-        opts?: { maxHops?: number; decayPerHop?: number; now?: number };
-      }>(req);
-      if (!body.graph || !body.sourceAgent || !body.targetAgent) {
-        apiError(res, 400, 'Missing required fields: graph, sourceAgent, targetAgent');
-        return true;
-      }
+      const body = await bodyJsonSchema(req, transitiveTrustBodySchema);
       const { computeTransitiveTrust } = await import('../score/crossAgentTrust.js');
       const result = computeTransitiveTrust(
         body.graph as unknown as import('../score/crossAgentTrust.js').TrustGraph,
@@ -584,7 +613,7 @@ export async function handleScoreRoute(
       );
       apiSuccess(res, result ?? { found: false, message: 'No trust path found between agents' });
     } catch (err) {
-      apiError(res, 500, err instanceof Error ? err.message : 'transitive trust computation failed');
+      scoreRouteError(res, err, 'transitive trust computation failed');
     }
     return true;
   }
@@ -592,16 +621,7 @@ export async function handleScoreRoute(
   // POST /api/v1/score/trust/decay — apply temporal decay to a trust score
   if (pathname === '/api/v1/score/trust/decay' && method === 'POST') {
     try {
-      const body = await bodyJson<{
-        originalScore: number;
-        establishedAt: number;
-        config: unknown;
-        now?: number;
-      }>(req);
-      if (body.originalScore === undefined || body.establishedAt === undefined || !body.config) {
-        apiError(res, 400, 'Missing required fields: originalScore, establishedAt, config');
-        return true;
-      }
+      const body = await bodyJsonSchema(req, temporalDecayBodySchema);
       const { applyTemporalDecay } = await import('../score/crossAgentTrust.js');
       const decayedScore = applyTemporalDecay(
         body.originalScore,
@@ -611,7 +631,7 @@ export async function handleScoreRoute(
       );
       apiSuccess(res, { originalScore: body.originalScore, decayedScore, decayApplied: body.originalScore - decayedScore });
     } catch (err) {
-      apiError(res, 500, err instanceof Error ? err.message : 'temporal decay failed');
+      scoreRouteError(res, err, 'temporal decay failed');
     }
     return true;
   }
@@ -619,16 +639,7 @@ export async function handleScoreRoute(
   // POST /api/v1/score/trust/inherited — compute inherited trust from parent delegation
   if (pathname === '/api/v1/score/trust/inherited' && method === 'POST') {
     try {
-      const body = await bodyJson<{
-        delegatorTrust: unknown;
-        delegateScore: number;
-        policy: unknown;
-        delegationDepth?: number;
-      }>(req);
-      if (!body.delegatorTrust || body.delegateScore === undefined || !body.policy) {
-        apiError(res, 400, 'Missing required fields: delegatorTrust, delegateScore, policy');
-        return true;
-      }
+      const body = await bodyJsonSchema(req, inheritedTrustBodySchema);
       const { computeInheritedTrust } = await import('../score/crossAgentTrust.js');
       const result = computeInheritedTrust(
         body.delegatorTrust as unknown as import('../score/crossAgentTrust.js').TrustVerificationResult,
@@ -638,7 +649,7 @@ export async function handleScoreRoute(
       );
       apiSuccess(res, result);
     } catch (err) {
-      apiError(res, 500, err instanceof Error ? err.message : 'inherited trust computation failed');
+      scoreRouteError(res, err, 'inherited trust computation failed');
     }
     return true;
   }
@@ -649,7 +660,7 @@ export async function handleScoreRoute(
       const { INDUSTRY_DECAY_PRESETS } = await import('../score/crossAgentTrust.js');
       apiSuccess(res, { presets: INDUSTRY_DECAY_PRESETS, count: Object.keys(INDUSTRY_DECAY_PRESETS).length });
     } catch (err) {
-      apiError(res, 500, err instanceof Error ? err.message : 'Failed to load decay presets');
+      scoreRouteError(res, err, 'Failed to load decay presets');
     }
     return true;
   }
@@ -657,7 +668,7 @@ export async function handleScoreRoute(
   // POST /api/v1/score/lane/safety-research — run Safety Research Lane evaluation
   if (pathname === '/api/v1/score/lane/safety-research' && method === 'POST') {
     try {
-      const body = await bodyJson<{ responses?: Record<string, string> }>(req);
+      const body = await bodyJsonSchema(req, safetyResearchBodySchema);
       const { scoreSafetyResearchLane, getSafetyResearchLaneQuestionIds } = await import('../lanes/safetyResearchLane.js');
       const responses = body.responses ?? {};
       const report = scoreSafetyResearchLane(responses);
@@ -671,7 +682,7 @@ export async function handleScoreRoute(
         },
       });
     } catch (err) {
-      apiError(res, 500, err instanceof Error ? err.message : 'Safety research lane evaluation failed');
+      scoreRouteError(res, err, 'Safety research lane evaluation failed');
     }
     return true;
   }
@@ -683,7 +694,7 @@ export async function handleScoreRoute(
       const questionIds = getSafetyResearchLaneQuestionIds();
       apiSuccess(res, { questionIds, count: questionIds.length });
     } catch (err) {
-      apiError(res, 500, err instanceof Error ? err.message : 'Failed to load safety research questions');
+      scoreRouteError(res, err, 'Failed to load safety research questions');
     }
     return true;
   }

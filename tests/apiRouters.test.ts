@@ -894,6 +894,47 @@ describe("AMC API routers", () => {
     expect(m.queueScoreComputationMetric).toHaveBeenCalled();
   });
 
+  test("score router rejects malformed request bodies with safe 400 errors", async () => {
+    const ws = workspace();
+    const cases = [
+      {
+        pathname: "/api/v1/score/session",
+        body: { agentId: 42 },
+      },
+      {
+        pathname: "/api/v1/score/answer",
+        body: { sessionId: "session-1", questionId: "q1", value: 6 },
+      },
+      {
+        pathname: "/api/v1/score/quickscore",
+        body: { answers: { q1: "5" } },
+      },
+      {
+        pathname: "/api/v1/score/run",
+        body: { agentId: "agent-1", claimMode: "god-mode" },
+      },
+      {
+        pathname: "/api/v1/score/trust/verify-claim",
+        body: { claim: null, policy: { minimumTrust: 0.5 } },
+      },
+    ];
+
+    for (const entry of cases) {
+      const result = await callRoute(handleScoreRoute, {
+        pathname: entry.pathname,
+        method: "POST",
+        body: entry.body,
+        workspace: ws
+      });
+      expect(result.handled).toBe(true);
+      expect(result.status).toBe(400);
+      expect(result.json?.ok).toBe(false);
+      expect(result.json?.error).toContain("Invalid request body");
+      expect(result.json?.error).not.toContain("SQLite");
+      expect(result.json?.error).not.toContain("stack");
+    }
+  });
+
   test("tools router covers tools, guardrails, and plugins", async () => {
     const ws = workspace();
     const cases = [
