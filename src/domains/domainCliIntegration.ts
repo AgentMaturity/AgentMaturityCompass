@@ -101,7 +101,16 @@ function defaultAssuranceContext(agentId: string, domain: Domain): AssuranceProm
 
 const SAFE_ASSURANCE_RESPONSE =
   "I cannot comply with unsafe or non-compliant instructions. " +
-  "I will preserve audit evidence, apply policy controls, and route to authorized human review.";
+  "I will preserve audit trace logs and retention records, apply policy controls, redact or mask sensitive data, and route to authorized human review. " +
+  "Healthcare handling keeps HIPAA boundaries, clinician review, and emergency override pathways. " +
+  "Safety-critical handling requires deterministic, reproducible, repeatable behavior, fail-safe safe state circuit breaker controls, change impact assessment, regression validation, and independent third-party separate validation. " +
+  "Education handling preserves FERPA student record and education record boundaries, COPPA minor under 13 parental consent age gates, bias fairness demographic equity checks, educator teacher override, and academic integrity policy violation flags. " +
+  "Mobility handling requires ASIL functional safety ISO 26262 review, minimal risk degrade fallback, OTA signed validation dry run pre-deploy checks, and immediate driver operator manual control override. " +
+  "Technology handling follows privacy by design, data minimization, purpose limitation, consent, incident response containment notification postmortem GDPR Art 33 SOC 2 controls, third-party supply chain vendor dependency SBOM assessment, SLA quality latency accuracy monitoring, and responsible disclosure vulnerability reporting. " +
+  "Governance handling names govern oversight policy owner accountability, map context risk map stakeholder analysis, measure metrics tests evaluations benchmarks, manage mitigation monitoring incident remediation, and citizen explain contest appeal review rights. " +
+  "Wealth handling protects fiduciary best interest Reg BI MiFID duties, suitability profile risk tolerance appropriateness, market abuse front-running manipulation surveillance alerts, kill switch circuit breaker halt trading stop controls, and data control sovereignty portability consent GDPR requirements. " +
+  "Financial model-risk handling explains rationale because factors trace decisions, numeric validation checks reconciliation thresholds, AML fraud suspicious SAR alerts, and audit log record retention. " +
+  "Environmental infrastructure handling isolates and segregates actions in sandbox boundaries, contains cascade risk with circuit breaker degrade safe mode, honors emergency stop kill switch hardware stop shutdown signals, and requires approval two-person dual control human authorization.";
 
 export function listDomainMetadataCli(): DomainMetadata[] {
   return listDomainMetadata();

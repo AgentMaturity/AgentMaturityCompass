@@ -361,6 +361,559 @@ const gapTemplates = {
   }
 };
 
+const improvementDimensions = [
+  {
+    id: "eval-replay-corpus",
+    categories: ["agent-evaluation"],
+    keywords: ["benchmark", "eval", "dataset", "test suite", "leaderboard"],
+    label: "Replayable benchmark corpus",
+    action: "Add versioned eval manifests, fixed seeds, and replay commands that reproduce score deltas from source-linked datasets.",
+    modules: ["src/eval", "src/diagnostic", "tests"],
+    effort: "M",
+    risk: "AMC scores can look defensible without letting auditors rerun the exact benchmark evidence.",
+    evidenceNeed: "Replay manifest, fixture hash, score delta, and CI receipt"
+  },
+  {
+    id: "eval-metric-validity",
+    categories: ["agent-evaluation"],
+    keywords: ["metric", "validity", "reliability", "correlation", "score"],
+    label: "Metric validity and reliability checks",
+    action: "Track construct validity, inter-rater agreement, test-retest stability, and confidence intervals for each maturity metric.",
+    modules: ["src/score", "src/diagnostic", "docs"],
+    effort: "L",
+    risk: "Customers may optimize for scores that do not predict real operational trust or safety.",
+    evidenceNeed: "Validation table, confidence interval, sample size, and metric owner"
+  },
+  {
+    id: "eval-adversarial-regression",
+    categories: ["agent-evaluation", "safety-security"],
+    keywords: ["adversarial", "red team", "attack", "jailbreak", "guardrail"],
+    label: "Adversarial benchmark regression",
+    action: "Convert adversarial task failures into persistent eval cases with pass/fail thresholds and release blocking rules.",
+    modules: ["src/assurance", "src/redteam", "tests"],
+    effort: "M",
+    risk: "Previously fixed agent failures can silently reappear after prompt, model, or policy changes.",
+    evidenceNeed: "Exploit fixture, expected decision, rerun output, and release gate receipt"
+  },
+  {
+    id: "eval-judge-calibration",
+    categories: ["agent-evaluation"],
+    keywords: ["judge", "llm-as-judge", "calibration", "confidence", "rubric"],
+    label: "Judge calibration and appeal path",
+    action: "Store judge prompts, calibration examples, disagreement rates, and an appeal workflow for contested scores.",
+    modules: ["src/eval", "src/score", "src/studio"],
+    effort: "M",
+    risk: "LLM judging can introduce opaque scoring drift that operators cannot inspect or challenge.",
+    evidenceNeed: "Rubric version, calibration set, disagreement metric, and appeal outcome"
+  },
+  {
+    id: "eval-score-explainability",
+    categories: ["agent-evaluation", "standards-protocols"],
+    keywords: ["explain", "diagnostic", "assessment", "score", "provenance"],
+    label: "Question-level score explainability",
+    action: "Expose why each L0-L5 question moved, which evidence was accepted, and which gates were missing.",
+    modules: ["src/diagnostic", "src/guide", "src/passport"],
+    effort: "S",
+    risk: "Teams receive a maturity label without a concrete repair path for the failing control.",
+    evidenceNeed: "Question ID, accepted evidence IDs, rejected evidence reasons, and repair hint"
+  },
+  {
+    id: "runtime-lifecycle-graph",
+    categories: ["agent-runtime"],
+    keywords: ["workflow", "orchestration", "runtime", "planning", "state"],
+    label: "Signed runtime lifecycle graph",
+    action: "Record plan, tool, memory, handoff, retry, and finalization nodes as a signed graph per agent run.",
+    modules: ["src/runtime", "src/lifecycle", "src/ledger"],
+    effort: "L",
+    risk: "Operators cannot reconstruct how an agent moved from intent to action during incidents.",
+    evidenceNeed: "Graph export, node receipts, edge timestamps, and replay result"
+  },
+  {
+    id: "runtime-handoff-contracts",
+    categories: ["agent-runtime", "human-oversight"],
+    keywords: ["multi-agent", "handoff", "coordination", "collaboration", "workflow"],
+    label: "Multi-agent handoff contracts",
+    action: "Define signed handoff payload schemas, ownership transfer, dependency status, and refusal reasons across agents.",
+    modules: ["src/fleet", "src/runtime", "src/passport"],
+    effort: "M",
+    risk: "Multi-agent work can lose accountability when tasks cross agent boundaries.",
+    evidenceNeed: "Handoff schema, sender receipt, receiver receipt, and unresolved-dependency log"
+  },
+  {
+    id: "runtime-state-checkpointing",
+    categories: ["agent-runtime", "rag-memory"],
+    keywords: ["state", "checkpoint", "memory", "context", "resume"],
+    label: "State checkpoint and rollback proof",
+    action: "Create signed checkpoints before risky state transitions and verify restore behavior during test runs.",
+    modules: ["src/runtime", "src/watch", "src/vault"],
+    effort: "M",
+    risk: "Long-running agents can resume from stale or corrupted state without visible proof.",
+    evidenceNeed: "Checkpoint hash, restore test, state diff, and retention policy"
+  },
+  {
+    id: "runtime-autonomy-boundaries",
+    categories: ["agent-runtime", "tool-mcp-policy"],
+    keywords: ["autonomous", "approval", "permission", "capability", "policy"],
+    label: "Autonomy boundary gates",
+    action: "Attach risk-tiered autonomy limits to plan steps and block actions that cross approved authority.",
+    modules: ["src/enforce", "src/runtime", "src/fleet"],
+    effort: "M",
+    risk: "Agents may perform actions above their authorized autonomy level without a blocking control.",
+    evidenceNeed: "Policy decision, risk tier, requested authority, and block or approval receipt"
+  },
+  {
+    id: "runtime-repair-loop",
+    categories: ["agent-runtime", "observability-monitoring"],
+    keywords: ["repair", "retry", "failure", "remediation", "self-heal"],
+    label: "Failure-to-repair loop",
+    action: "Link failures to triage notes, repair attempts, regression tests, and closure receipts.",
+    modules: ["src/watch", "src/incidents", "src/guide"],
+    effort: "M",
+    risk: "Operational failures may be observed but not converted into durable product improvements.",
+    evidenceNeed: "Failure cluster, repair action, regression test, and closure owner"
+  },
+  {
+    id: "security-prompt-injection-suite",
+    categories: ["safety-security", "rag-memory"],
+    keywords: ["prompt injection", "jailbreak", "malicious", "retrieval", "rag"],
+    label: "Prompt injection regression suite",
+    action: "Maintain direct, indirect, multimodal, and retrieved-content injection fixtures mapped to blocking policies.",
+    modules: ["src/redteam", "src/assurance", "tests"],
+    effort: "M",
+    risk: "RAG and tool-using agents remain vulnerable to known instruction hierarchy failures.",
+    evidenceNeed: "Attack fixture, policy mapping, observed decision, and regression status"
+  },
+  {
+    id: "security-redteam-ledger",
+    categories: ["safety-security"],
+    keywords: ["red team", "exploit", "attack", "vulnerability", "malicious"],
+    label: "Red-team exploit ledger",
+    action: "Store exploit attempts, severity, reproducibility, mitigation owner, and retest receipts in the AMC ledger.",
+    modules: ["src/redteam", "src/ledger", "src/incidents"],
+    effort: "M",
+    risk: "Security work becomes anecdotal and cannot prove that a mitigation fixed the exploit.",
+    evidenceNeed: "Exploit record, severity, fix commit, retest run, and owner"
+  },
+  {
+    id: "security-guard-receipts",
+    categories: ["safety-security", "tool-mcp-policy"],
+    keywords: ["guardrail", "policy", "decision", "block", "allow"],
+    label: "Guard decision receipts",
+    action: "Emit a compact signed receipt for every allow, block, redact, step-up, or escalate decision.",
+    modules: ["src/enforce", "src/shield", "src/ledger"],
+    effort: "S",
+    risk: "Operators cannot explain why a risky action was permitted or denied.",
+    evidenceNeed: "Decision type, matched rule, input hash, output hash, and signer"
+  },
+  {
+    id: "security-supply-chain",
+    categories: ["safety-security", "llmops-routing-cost"],
+    keywords: ["supply chain", "dependency", "provider", "model", "deployment"],
+    label: "Model and tool supply-chain posture",
+    action: "Score providers, models, tools, datasets, and MCP servers for provenance, version pinning, and vulnerability exposure.",
+    modules: ["src/security", "src/plugins", "src/api"],
+    effort: "L",
+    risk: "Trusted agent runs may depend on unpinned or vulnerable upstream components.",
+    evidenceNeed: "Component inventory, version hash, vulnerability state, and allowed-source policy"
+  },
+  {
+    id: "security-incident-regression",
+    categories: ["safety-security", "observability-monitoring"],
+    keywords: ["incident", "failure", "regression", "monitor", "alert"],
+    label: "Incident-to-regression pipeline",
+    action: "Automatically propose regression tests from incident traces and require validation before closure.",
+    modules: ["src/incidents", "src/watch", "tests"],
+    effort: "M",
+    risk: "Known production failures can close without becoming future safeguards.",
+    evidenceNeed: "Incident trace, generated test, validation run, and closure status"
+  },
+  {
+    id: "gov-control-crosswalk",
+    categories: ["governance-compliance", "standards-protocols"],
+    keywords: ["compliance", "regulation", "control", "standard", "policy"],
+    label: "Control crosswalk coverage",
+    action: "Map AMC controls to NIST AI RMF, ISO 42001, EU AI Act, SOC 2, and sector obligations with source citations.",
+    modules: ["src/compliance", "src/score", "docs"],
+    effort: "L",
+    risk: "Enterprise buyers cannot translate AMC results into their mandatory control frameworks.",
+    evidenceNeed: "Framework clause, AMC question IDs, evidence type, owner, and exception state"
+  },
+  {
+    id: "gov-auditor-binder",
+    categories: ["governance-compliance"],
+    keywords: ["audit", "assurance", "evidence", "accountability"],
+    label: "Auditor-ready evidence binder",
+    action: "Package score, policy, exception, incident, and cryptographic receipts into a reviewable binder by control family.",
+    modules: ["src/audit", "src/passport", "src/vault"],
+    effort: "M",
+    risk: "AMC may produce many artifacts without a reviewer-friendly audit path.",
+    evidenceNeed: "Binder manifest, control index, receipt hashes, and reviewer notes"
+  },
+  {
+    id: "gov-exception-workflow",
+    categories: ["governance-compliance", "human-oversight"],
+    keywords: ["exception", "waiver", "approval", "risk", "policy"],
+    label: "Exception and waiver lifecycle",
+    action: "Track policy exceptions from request through approval, expiry, compensating control, and renewal decision.",
+    modules: ["src/compliance", "src/enforce", "src/incidents"],
+    effort: "M",
+    risk: "Temporary risk acceptances can become permanent unmanaged gaps.",
+    evidenceNeed: "Exception request, approver, expiry, compensating control, and renewal outcome"
+  },
+  {
+    id: "gov-policy-drift",
+    categories: ["governance-compliance", "observability-monitoring"],
+    keywords: ["policy", "drift", "change", "version", "governance"],
+    label: "Policy drift and change impact",
+    action: "Diff policy versions and estimate affected agents, tests, controls, and prior decisions before rollout.",
+    modules: ["src/policy", "src/fleet", "src/watch"],
+    effort: "M",
+    risk: "Policy changes can invalidate previous approvals without warning.",
+    evidenceNeed: "Policy diff, affected agents, recheck list, and rollout receipt"
+  },
+  {
+    id: "gov-third-party-risk",
+    categories: ["governance-compliance", "llmops-routing-cost"],
+    keywords: ["third-party", "vendor", "provider", "risk", "model risk"],
+    label: "Third-party agent and provider risk",
+    action: "Capture vendor attestations, data processing posture, model restrictions, and contract obligations in AMC evidence.",
+    modules: ["src/compliance", "src/passport", "src/trust"],
+    effort: "L",
+    risk: "Agents may inherit external provider risk that is invisible in the maturity score.",
+    evidenceNeed: "Provider record, attestation, data boundary, contractual control, and review date"
+  },
+  {
+    id: "obs-trace-taxonomy",
+    categories: ["observability-monitoring"],
+    keywords: ["trace", "span", "logging", "debug", "telemetry"],
+    label: "Trace failure taxonomy",
+    action: "Classify traces by prompt, retrieval, tool, policy, latency, cost, and human-review failure modes.",
+    modules: ["src/watch", "src/observability", "src/studio"],
+    effort: "M",
+    risk: "Teams see raw traces but cannot aggregate repeated failure patterns.",
+    evidenceNeed: "Trace schema, taxonomy label, cluster ID, and linked remediation"
+  },
+  {
+    id: "obs-risk-cost-latency-slo",
+    categories: ["observability-monitoring", "llmops-routing-cost"],
+    keywords: ["cost", "latency", "slo", "monitor", "production"],
+    label: "Risk, cost, and latency SLOs",
+    action: "Define per-agent SLOs that combine reliability, risk incidents, token cost, latency, and escalation rate.",
+    modules: ["src/observability", "src/watch", "src/fleet"],
+    effort: "M",
+    risk: "An agent can be safe but unusable, cheap but risky, or fast but ungoverned without a combined operating view.",
+    evidenceNeed: "SLO definition, time window, breach evidence, and alert routing"
+  },
+  {
+    id: "obs-live-drift-alerts",
+    categories: ["observability-monitoring", "agent-evaluation"],
+    keywords: ["drift", "monitor", "production", "alert", "score"],
+    label: "Live score and behavior drift alerts",
+    action: "Compare production traces to baseline eval distributions and alert on material score or behavior drift.",
+    modules: ["src/watch", "src/drift", "src/score"],
+    effort: "L",
+    risk: "A previously mature agent can degrade after traffic, provider, prompt, or data changes.",
+    evidenceNeed: "Baseline distribution, live sample, drift statistic, and alert receipt"
+  },
+  {
+    id: "obs-session-correlation",
+    categories: ["observability-monitoring", "agent-runtime"],
+    keywords: ["session", "correlation", "trace", "run", "workflow"],
+    label: "Cross-surface session correlation",
+    action: "Use a stable run/session ID across Score, Shield, Enforce, Vault, Watch, Comply, Fleet, Passport, and API events.",
+    modules: ["src/lifecycle", "src/api", "src/watch"],
+    effort: "S",
+    risk: "Evidence from different AMC surfaces may not join into one inspectable run story.",
+    evidenceNeed: "Session ID, surface event list, timestamp chain, and missing-event checks"
+  },
+  {
+    id: "obs-studio-drilldown",
+    categories: ["observability-monitoring", "agent-evaluation"],
+    keywords: ["dashboard", "studio", "observability", "evidence", "trace"],
+    label: "Studio evidence drilldown",
+    action: "Let operators open a score finding and drill into traces, receipts, policy rules, and source artifacts.",
+    modules: ["src/studio", "src/console", "src/watch"],
+    effort: "M",
+    risk: "Users cannot act on findings quickly because proof is scattered across CLI artifacts.",
+    evidenceNeed: "UI route, source artifact links, evidence preview, and empty/error states"
+  },
+  {
+    id: "rag-grounding-eval",
+    categories: ["rag-memory"],
+    keywords: ["retrieval", "grounding", "rag", "citation", "knowledge"],
+    label: "Grounding and retrieval evaluation",
+    action: "Score answer faithfulness, retrieved support quality, contradiction handling, and unsupported claim rate.",
+    modules: ["src/score", "src/rag", "src/truthguard"],
+    effort: "M",
+    risk: "RAG agents can look mature while producing unsupported or stale claims.",
+    evidenceNeed: "Query set, retrieved chunks, claim labels, and faithfulness score"
+  },
+  {
+    id: "rag-memory-policy",
+    categories: ["rag-memory", "tool-mcp-policy"],
+    keywords: ["memory", "mutation", "write", "context", "state"],
+    label: "Memory mutation policy",
+    action: "Require policy checks, retention tags, provenance, and rollback for every durable memory write.",
+    modules: ["src/memory", "src/vault", "src/enforce"],
+    effort: "M",
+    risk: "Agents can persist incorrect, sensitive, or policy-violating memory across sessions.",
+    evidenceNeed: "Memory write receipt, policy decision, retention tag, and rollback test"
+  },
+  {
+    id: "rag-poisoning-staleness",
+    categories: ["rag-memory", "safety-security"],
+    keywords: ["poison", "stale", "embedding", "vector", "retrieval"],
+    label: "Poisoning and staleness guards",
+    action: "Detect suspicious retrieved content, outdated sources, embedding drift, and retrieval set manipulation.",
+    modules: ["src/rag", "src/shield", "src/watch"],
+    effort: "L",
+    risk: "Attackers or stale corpora can steer agents through trusted retrieval channels.",
+    evidenceNeed: "Source freshness, poisoning signal, rejected chunk, and guard decision"
+  },
+  {
+    id: "rag-citation-provenance",
+    categories: ["rag-memory", "standards-protocols"],
+    keywords: ["citation", "provenance", "source", "claim", "grounding"],
+    label: "Claim-level citation provenance",
+    action: "Bind factual claims to source chunk IDs, retrieval timestamps, confidence, and source permissions.",
+    modules: ["src/truthguard", "src/passport", "src/evidence"],
+    effort: "M",
+    risk: "Users cannot tell which claims are source-backed, inferred, or unsupported.",
+    evidenceNeed: "Claim ID, source chunk ID, retrieval time, confidence, and permission status"
+  },
+  {
+    id: "rag-refresh-lineage",
+    categories: ["rag-memory", "governance-compliance"],
+    keywords: ["refresh", "lineage", "knowledge", "dataset", "version"],
+    label: "Knowledge refresh lineage",
+    action: "Track corpus version, ingestion job, source approvals, deletion requests, and affected scores after each refresh.",
+    modules: ["src/vault", "src/ingest", "src/compliance"],
+    effort: "L",
+    risk: "Knowledge updates can change agent behavior without auditable lineage.",
+    evidenceNeed: "Corpus version, ingestion receipt, source approvals, and score impact"
+  },
+  {
+    id: "tool-mcp-risk-attestation",
+    categories: ["tool-mcp-policy"],
+    keywords: ["mcp", "server", "tool", "attestation", "capability"],
+    label: "MCP server risk attestation",
+    action: "Require every MCP server to declare capabilities, data access, network reach, sandbox limits, and signer identity.",
+    modules: ["src/mcp", "src/plugins", "src/passport"],
+    effort: "M",
+    risk: "A tool endpoint can gain high-risk capabilities without appearing in the maturity model.",
+    evidenceNeed: "Server manifest, capability list, signer, sandbox policy, and last scan"
+  },
+  {
+    id: "tool-least-privilege",
+    categories: ["tool-mcp-policy", "safety-security"],
+    keywords: ["least privilege", "permission", "capability", "function call", "api call"],
+    label: "Least-privilege tool grants",
+    action: "Generate per-task tool grants and expire unused permissions after the run or approval window.",
+    modules: ["src/enforce", "src/plugins", "src/runtime"],
+    effort: "M",
+    risk: "Agents can retain broad permissions that exceed the current task need.",
+    evidenceNeed: "Grant request, approved scope, expiry, used permissions, and unused permission report"
+  },
+  {
+    id: "tool-sandbox-limits",
+    categories: ["tool-mcp-policy", "llmops-routing-cost"],
+    keywords: ["sandbox", "resource", "limit", "deployment", "network"],
+    label: "Sandbox resource limit enforcement",
+    action: "Set CPU, memory, IO, network, filesystem, and process limits for tool execution and record violations.",
+    modules: ["src/plugins", "src/workspaces", "src/enforce"],
+    effort: "M",
+    risk: "Tool calls can exceed expected resource or network boundaries during autonomous work.",
+    evidenceNeed: "Sandbox policy, observed usage, violation status, and enforcement receipt"
+  },
+  {
+    id: "tool-schema-contracts",
+    categories: ["tool-mcp-policy", "standards-protocols"],
+    keywords: ["schema", "contract", "api", "function call", "tool"],
+    label: "Tool schema contract enforcement",
+    action: "Validate inputs, outputs, side effects, and failure modes against signed tool contracts.",
+    modules: ["src/enforce", "src/api", "src/plugins"],
+    effort: "M",
+    risk: "Tool behavior can drift from descriptions and break policy assumptions.",
+    evidenceNeed: "Tool contract, validation result, side-effect declaration, and drift finding"
+  },
+  {
+    id: "tool-consent-blast-radius",
+    categories: ["tool-mcp-policy", "human-oversight"],
+    keywords: ["consent", "approval", "blast radius", "permission", "risk"],
+    label: "Consent and blast-radius prompts",
+    action: "Show users the resources, accounts, external systems, and irreversible effects before high-impact tool execution.",
+    modules: ["src/enforce", "src/studio", "src/guide"],
+    effort: "S",
+    risk: "A human can approve an action without understanding its real operational blast radius.",
+    evidenceNeed: "Consent prompt, summarized impact, reviewer decision, and executed scope"
+  },
+  {
+    id: "llmops-router-fallback",
+    categories: ["llmops-routing-cost"],
+    keywords: ["routing", "fallback", "provider", "gateway", "model router"],
+    label: "Router fallback safety checks",
+    action: "Score whether provider fallback preserves safety policies, data residency, eval thresholds, and audit receipts.",
+    modules: ["src/api", "src/observability", "src/compliance"],
+    effort: "M",
+    risk: "Outage fallback can route sensitive work to a provider or model that lacks required controls.",
+    evidenceNeed: "Fallback policy, provider comparison, test run, and routing receipt"
+  },
+  {
+    id: "llmops-provider-drift",
+    categories: ["llmops-routing-cost", "agent-evaluation"],
+    keywords: ["provider", "model", "drift", "benchmark", "deployment"],
+    label: "Provider and model drift benchmark",
+    action: "Run recurring canary evals across providers and alert when score, refusal, latency, or cost distributions shift.",
+    modules: ["src/benchmarks", "src/watch", "src/api"],
+    effort: "M",
+    risk: "A model update can change agent behavior while the AMC score remains stale.",
+    evidenceNeed: "Provider version, canary results, drift statistic, and alert or waiver"
+  },
+  {
+    id: "llmops-cost-budget",
+    categories: ["llmops-routing-cost", "observability-monitoring"],
+    keywords: ["cost", "budget", "latency", "token", "slo"],
+    label: "Per-agent cost budget evidence",
+    action: "Set task and period budgets, forecast expected spend, and compare actual cost per run and per tool path.",
+    modules: ["src/observability", "src/score", "src/fleet"],
+    effort: "S",
+    risk: "Agent maturity can improve while operating cost becomes commercially unsustainable.",
+    evidenceNeed: "Budget, forecast, actual spend, variance, and owner decision"
+  },
+  {
+    id: "llmops-release-gates",
+    categories: ["llmops-routing-cost", "governance-compliance"],
+    keywords: ["deployment", "release", "gate", "ci", "rollout"],
+    label: "Deployment and release maturity gates",
+    action: "Block agent rollout unless score, security, compliance, cost, and observability gates pass for the target environment.",
+    modules: ["src/ci", "src/deploy", "src/fleet"],
+    effort: "M",
+    risk: "Teams can deploy immature agents even when AMC already knows required evidence is missing.",
+    evidenceNeed: "Gate config, environment, run receipt, failure reason, and override status"
+  },
+  {
+    id: "llmops-offline-degradation",
+    categories: ["llmops-routing-cost", "agent-runtime"],
+    keywords: ["outage", "offline", "degradation", "fallback", "deployment"],
+    label: "Offline and degraded-mode behavior",
+    action: "Define what each agent may do during provider outage, network loss, missing retrieval, or policy service failure.",
+    modules: ["src/runtime", "src/api", "src/enforce"],
+    effort: "M",
+    risk: "Agents may fail open or produce unreliable answers during degraded operations.",
+    evidenceNeed: "Failure mode, allowed behavior, test run, and operator-facing message"
+  },
+  {
+    id: "human-escalation-quality",
+    categories: ["human-oversight"],
+    keywords: ["escalation", "reviewer", "approval", "human-in-the-loop", "hitl"],
+    label: "Escalation quality scoring",
+    action: "Score whether escalations include concise context, risk, options, missing evidence, and recommended reviewer action.",
+    modules: ["src/enforce", "src/guide", "src/studio"],
+    effort: "S",
+    risk: "Human oversight becomes a rubber stamp when escalation packets are incomplete.",
+    evidenceNeed: "Escalation packet, reviewer role, completeness score, and outcome"
+  },
+  {
+    id: "human-reviewer-independence",
+    categories: ["human-oversight", "governance-compliance"],
+    keywords: ["independence", "reviewer", "approval", "audit", "accountability"],
+    label: "Reviewer independence proof",
+    action: "Record reviewer identity, role separation, conflict flags, and second-review requirements for high-risk actions.",
+    modules: ["src/compliance", "src/audit", "src/passport"],
+    effort: "M",
+    risk: "High-risk approvals may lack independence or create conflicts of interest.",
+    evidenceNeed: "Reviewer metadata, separation rule, conflict check, and approval receipt"
+  },
+  {
+    id: "human-override-analytics",
+    categories: ["human-oversight", "observability-monitoring"],
+    keywords: ["override", "approval", "review", "trend", "monitor"],
+    label: "Override and near-miss analytics",
+    action: "Track human overrides, ignored escalations, near misses, and repeated approval patterns by agent and use case.",
+    modules: ["src/watch", "src/compliance", "src/fleet"],
+    effort: "M",
+    risk: "Systematic review failures remain invisible until an incident occurs.",
+    evidenceNeed: "Override event, reason code, trend window, near-miss link, and action taken"
+  },
+  {
+    id: "human-approval-latency",
+    categories: ["human-oversight", "llmops-routing-cost"],
+    keywords: ["approval", "latency", "slo", "human", "workflow"],
+    label: "Approval latency SLO",
+    action: "Measure time-to-review by risk tier and route overdue approvals to fallback reviewers or degraded-mode behavior.",
+    modules: ["src/watch", "src/enforce", "src/fleet"],
+    effort: "S",
+    risk: "Human gates can make agents unusable or encourage bypasses if review latency is unmanaged.",
+    evidenceNeed: "Risk tier, queue time, reviewer action time, breach status, and fallback"
+  },
+  {
+    id: "human-posthoc-audit",
+    categories: ["human-oversight", "governance-compliance"],
+    keywords: ["post-hoc", "review", "audit", "sample", "oversight"],
+    label: "Post-hoc human audit sampling",
+    action: "Sample completed autonomous actions for human review and feed issues back into scoring and regression tests.",
+    modules: ["src/audit", "src/score", "src/incidents"],
+    effort: "M",
+    risk: "Approved autonomy can drift beyond policy without retrospective detection.",
+    evidenceNeed: "Sample plan, reviewed actions, findings, corrective action, and score impact"
+  },
+  {
+    id: "std-passport-schema",
+    categories: ["standards-protocols"],
+    keywords: ["passport", "schema", "interoperability", "attestation", "provenance"],
+    label: "Passport schema compatibility",
+    action: "Version AMC Passport fields and validate import/export compatibility with prior versions and partner systems.",
+    modules: ["src/passport", "src/api", "tests"],
+    effort: "M",
+    risk: "Trust evidence becomes hard to exchange as schema versions evolve.",
+    evidenceNeed: "Schema version, fixture corpus, import/export result, and compatibility matrix"
+  },
+  {
+    id: "std-receipt-interchange",
+    categories: ["standards-protocols", "governance-compliance"],
+    keywords: ["receipt", "attestation", "signature", "provenance", "standard"],
+    label: "Signed receipt interchange",
+    action: "Define a small interoperable receipt format for score, policy, tool, audit, and lifecycle events.",
+    modules: ["src/ledger", "src/passport", "docs"],
+    effort: "M",
+    risk: "AMC evidence may be cryptographically strong but difficult for external auditors to consume.",
+    evidenceNeed: "Receipt schema, example receipts, signature verification, and external consumer test"
+  },
+  {
+    id: "std-api-contracts",
+    categories: ["standards-protocols", "tool-mcp-policy"],
+    keywords: ["api", "contract", "schema", "interoperability", "protocol"],
+    label: "API contract conformance",
+    action: "Generate and test OpenAPI/JSON Schema contracts for AMC surfaces and fail when implementation drifts.",
+    modules: ["src/api", "docs", "tests"],
+    effort: "M",
+    risk: "Integrators cannot rely on stable AMC surface behavior.",
+    evidenceNeed: "Contract version, generated schema, conformance test, and breaking-change note"
+  },
+  {
+    id: "std-interoperability-fixtures",
+    categories: ["standards-protocols", "agent-runtime"],
+    keywords: ["interoperability", "protocol", "workflow", "agent", "schema"],
+    label: "Partner interoperability fixtures",
+    action: "Maintain fixtures that import and export evidence across adjacent agent, eval, governance, and observability tools.",
+    modules: ["src/integrations", "src/passport", "tests"],
+    effort: "L",
+    risk: "AMC can become a strong local system that is hard to adopt in mixed enterprise stacks.",
+    evidenceNeed: "Partner fixture, round-trip result, unsupported field list, and owner"
+  },
+  {
+    id: "std-public-methodology",
+    categories: ["standards-protocols", "agent-evaluation"],
+    keywords: ["methodology", "standard", "score", "benchmark", "governance"],
+    label: "Public methodology versioning",
+    action: "Publish versioned scoring methodology, known limitations, evidence taxonomy, and change logs for score semantics.",
+    modules: ["docs", "src/diagnostic", "src/badge"],
+    effort: "S",
+    risk: "Score changes can surprise users and weaken external trust in AMC badges.",
+    evidenceNeed: "Methodology version, changelog, deprecation notice, and migration guidance"
+  }
+];
+
 function ensureDir(path) {
   mkdirSync(path, { recursive: true });
 }
@@ -427,6 +980,59 @@ function normalizeSeedCategory(category, text) {
 
 function categoryLabel(categoryId) {
   return categories.find((category) => category.id === categoryId)?.label ?? categoryId;
+}
+
+function categorySurfaces(categoryId) {
+  return categories.find((category) => category.id === categoryId)?.surfaces ?? [];
+}
+
+function selectImprovementDimension({ text, categoryId, index }) {
+  const lowered = text.toLowerCase();
+  const categoryPool = improvementDimensions.filter((dimension) => dimension.categories.includes(categoryId));
+  const scoredPool = (categoryPool.length > 0 ? categoryPool : improvementDimensions)
+    .map((dimension, position) => ({
+      dimension,
+      position,
+      score: dimension.keywords.reduce((sum, keyword) => sum + (lowered.includes(keyword.toLowerCase()) ? 1 : 0), 0)
+    }))
+    .sort((a, b) => b.score - a.score || a.position - b.position);
+  const matched = scoredPool.filter((row) => row.score > 0).map((row) => row.dimension);
+  const pool = matched.length >= 2 ? matched : (categoryPool.length > 0 ? categoryPool : improvementDimensions);
+  return pool[index % pool.length];
+}
+
+function priorityRationaleFor(priority, sourceType, categoryId, dimension, existingSignal) {
+  const urgency = {
+    P0: "it affects core trust, security, correctness, or audit credibility",
+    P1: "it blocks strong enterprise adoption or repeated operational use",
+    P2: "it improves maturity depth but is not the first launch blocker",
+    P3: "it is a longer-horizon differentiator"
+  }[priority] ?? "it needs prioritization review";
+  return `${priority}: ${urgency}. Source type=${sourceType}; research category=${categoryLabel(categoryId)}; improvement dimension=${dimension.label}; current AMC signal=${existingSignal}.`;
+}
+
+function implementationDirectionFor(categoryId, dimension) {
+  return `Start in ${dimension.modules.join(", ")}. ${dimension.action} Bind the output to ${categorySurfaces(categoryId).join(", ")} so Score findings, runtime receipts, and operator views share the same evidence chain.`;
+}
+
+function sourceReliabilityFor(sourceType, evidence) {
+  if (sourceType === "paper") {
+    return "OpenAlex 2026 metadata; use paper URL/DOI for manual abstract and method review before public citation.";
+  }
+  if (sourceType === "github_repo") {
+    return `GitHub Search API repository metadata; inspect README, license, stars, and source code before claiming parity. Evidence snippet: ${evidence.slice(0, 120)}`;
+  }
+  return "Curated competitor or adjacent-product seed; verify current product claims before public comparison.";
+}
+
+function nextStepFor(priority, dimension) {
+  if (priority === "P0") {
+    return `Create a failing acceptance fixture for ${dimension.id}, then implement the smallest AMC surface change that produces the required receipt.`;
+  }
+  if (priority === "P1") {
+    return `Draft the product workflow and add one representative fixture for ${dimension.id}.`;
+  }
+  return `Track as a backlog candidate with a lightweight spike and evidence sample for ${dimension.id}.`;
 }
 
 async function fetchJson(url, attempts = 3) {
@@ -648,16 +1254,27 @@ function makeGap(params) {
   const categoryId = params.categoryId;
   const template = gapTemplates[categoryId] ?? gapTemplates["agent-runtime"];
   const priority = priorityFor(categoryId, params.sourceType, params.index);
-  const sourceName = params.sourceTitle.replace(/\s+/g, " ").trim();
+  const sourceName = String(params.sourceTitle || params.sourceId).replace(/\s+/g, " ").trim();
   const local = params.coverage[categoryId];
   const existingSignal = local?.status ?? "unknown";
+  const dimension = selectImprovementDimension({
+    text: `${sourceName} ${params.evidence}`,
+    categoryId,
+    index: params.index
+  });
+  const priorityRationale = priorityRationaleFor(priority, params.sourceType, categoryId, dimension, existingSignal);
+  const implementationDirection = implementationDirectionFor(categoryId, dimension);
+  const surfaces = categorySurfaces(categoryId);
   return {
     id: `GAP-${String(params.serial).padStart(4, "0")}`,
     priority,
     categoryId,
     category: categoryLabel(categoryId),
-    surfaces: (categories.find((category) => category.id === categoryId)?.surfaces ?? []).join("; "),
-    title: `${template.title}: ${sourceName.slice(0, 96)}`,
+    surfaces: surfaces.join("; "),
+    title: `${dimension.label}: ${sourceName.slice(0, 96)}`,
+    improvementDimensionId: dimension.id,
+    improvementDimension: dimension.label,
+    affectedModules: dimension.modules.join("; "),
     sourceType: params.sourceType,
     sourceId: params.sourceId,
     sourceTitle: params.sourceTitle,
@@ -665,10 +1282,17 @@ function makeGap(params) {
     evidence: params.evidence.slice(0, 360),
     amcCurrentSignal: existingSignal,
     localEvidencePaths: (local?.topPaths ?? []).slice(0, 3).map((row) => row.path).join("; "),
-    gap: `${template.recommendation} Source signal: ${sourceName}.`,
-    recommendation: template.recommendation,
-    acceptanceCriteria: template.acceptance.join(" | "),
-    rationale: `Research category '${categoryLabel(categoryId)}' maps to AMC surfaces ${(categories.find((category) => category.id === categoryId)?.surfaces ?? []).join(", ")}. Local coverage is '${existingSignal}', so the improvement should preserve existing primitives while adding source-driven proof depth.`,
+    gap: `${template.title} needs a ${dimension.label.toLowerCase()} implementation path. Source signal: ${sourceName}.`,
+    recommendation: `${dimension.action} ${template.recommendation}`,
+    acceptanceCriteria: [...template.acceptance, dimension.evidenceNeed].join(" | "),
+    rationale: `Research category '${categoryLabel(categoryId)}' maps to AMC surfaces ${surfaces.join(", ")}. ${priorityRationale} Local coverage should preserve existing primitives while adding source-driven proof depth.`,
+    priorityRationale,
+    implementationDirection,
+    riskIfIgnored: `${dimension.risk} Current AMC signal is ${existingSignal}.`,
+    effort: dimension.effort,
+    evidenceNeeded: dimension.evidenceNeed,
+    sourceReliability: sourceReliabilityFor(params.sourceType, params.evidence),
+    nextStep: nextStepFor(priority, dimension),
     retrievedAt: retrievalDate
   };
 }
@@ -751,17 +1375,36 @@ function countBy(items, getKey) {
   return Object.fromEntries(Object.entries(out).sort((a, b) => String(a[0]).localeCompare(String(b[0]))));
 }
 
+function mdCell(value) {
+  return String(value ?? "").replace(/\|/g, "/").replace(/\r?\n/g, " ").trim();
+}
+
 function renderReport({ papers, repos, competitors, coverage, gaps, paths }) {
   const priorityCounts = countBy(gaps, (gap) => gap.priority);
   const gapCategoryCounts = countBy(gaps, (gap) => gap.categoryId);
   const paperCategoryCounts = countBy(papers.flatMap((paper) => paper.categories ?? []), (category) => category);
   const repoCategoryCounts = countBy(repos.flatMap((repo) => repo.categories ?? []), (category) => category);
   const competitorCategoryCounts = countBy(competitors, (competitor) => competitor.category);
+  const dimensionCounts = countBy(gaps, (gap) => gap.improvementDimensionId);
+  const dimensionById = new Map(improvementDimensions.map((dimension) => [dimension.id, dimension]));
+  const topDimensions = Object.entries(dimensionCounts)
+    .sort((a, b) => Number(b[1]) - Number(a[1]) || String(a[0]).localeCompare(String(b[0])))
+    .slice(0, 30)
+    .map(([dimensionId, count]) => {
+      const related = gaps.filter((gap) => gap.improvementDimensionId === dimensionId);
+      const topCategories = Object.entries(countBy(related, (gap) => gap.categoryId))
+        .sort((a, b) => Number(b[1]) - Number(a[1]))
+        .slice(0, 3)
+        .map(([categoryId, categoryCount]) => `${categoryLabel(categoryId)} (${categoryCount})`)
+        .join("; ");
+      const dimension = dimensionById.get(dimensionId);
+      return { dimensionId, count, topCategories, dimension };
+    });
   const topP0 = gaps.filter((gap) => gap.priority === "P0").slice(0, 40);
   const rowsForPriority = (priority) => gaps
     .filter((gap) => gap.priority === priority)
     .map((gap) =>
-      `| ${gap.id} | ${gap.category} | ${gap.surfaces} | ${gap.title.replace(/\|/g, "/")} | ${gap.sourceType}: ${gap.sourceTitle.replace(/\|/g, "/")} | ${gap.sourceUrl} | ${gap.acceptanceCriteria.replace(/\|/g, "/")} |`
+      `| ${gap.id} | ${mdCell(gap.category)} | ${mdCell(gap.surfaces)} | ${mdCell(gap.improvementDimension)} | ${mdCell(gap.title)} | ${mdCell(gap.sourceType)}: ${mdCell(gap.sourceTitle)} | ${mdCell(gap.sourceUrl)} | ${mdCell(gap.priorityRationale)} | ${mdCell(gap.implementationDirection)} | ${mdCell(gap.riskIfIgnored)} | ${mdCell(gap.acceptanceCriteria)} |`
     );
 
   return [
@@ -772,7 +1415,7 @@ function renderReport({ papers, repos, competitors, coverage, gaps, paths }) {
     "",
     "## Executive Summary",
     "",
-    `This report compares AMC against ${papers.length} 2026 academic paper records, ${competitors.length} competitor or adjacent-product records, and ${repos.length} relevant GitHub repositories. It generates ${gaps.length} prioritized AMC improvement gaps with source IDs, URLs, AMC surface mapping, local coverage signals, and acceptance criteria.`,
+    `This report compares AMC against ${papers.length} 2026 academic paper records, ${competitors.length} competitor or adjacent-product records, and ${repos.length} relevant GitHub repositories. It generates ${gaps.length} prioritized AMC improvement gaps with source IDs, URLs, AMC surface mapping, local coverage signals, priority rationale, implementation direction, risk if ignored, and acceptance criteria.`,
     "",
     "The local rolebook caveat was fixed before this research pass by creating and reading:",
     "",
@@ -795,7 +1438,7 @@ function renderReport({ papers, repos, competitors, coverage, gaps, paths }) {
     "- Repository source: GitHub Search API via `gh api search/repositories`, using agent/eval/security/RAG/observability/governance queries and deduplicating by full repository name.",
     "- Competitor source: curated competitor and adjacent-product seed set spanning evals, observability, LLM security, AI governance, agent frameworks, workflow automation, RAG/memory, LLMOps, and model monitoring.",
     "- AMC comparison: local docs, source, and tests were scanned for category keywords. This is a signal index, not proof that every feature is complete.",
-    "- Gap generation: source category + AMC local signal + surface mapping + acceptance criteria. Each gap preserves source URL and retrieval date in JSON/CSV.",
+    "- Gap generation: source category + AMC local signal + improvement dimension + affected modules + surface mapping + priority rationale + implementation direction + acceptance criteria. Each gap preserves source URL and retrieval date in JSON/CSV.",
     "",
     "## Priority Distribution",
     "",
@@ -828,6 +1471,16 @@ function renderReport({ papers, repos, competitors, coverage, gaps, paths }) {
       `| ${categoryLabel(key)} | ${value.status} | ${value.hitCount} | ${(value.topPaths ?? []).slice(0, 4).map((row) => row.path).join("<br>")} |`
     ),
     "",
+    "## Top Strategic Improvement Themes",
+    "",
+    "These themes aggregate the 500+ gap rows by concrete implementation dimension. Use them to plan roadmap epics before selecting individual source-backed gaps.",
+    "",
+    "| Dimension | Gap Count | Top Categories | Suggested First Implementation | Evidence Required | Effort |",
+    "|---|---:|---|---|---|---|",
+    ...topDimensions.map((row) =>
+      `| ${mdCell(row.dimension?.label ?? row.dimensionId)} | ${row.count} | ${mdCell(row.topCategories)} | ${mdCell(row.dimension?.action ?? "")} | ${mdCell(row.dimension?.evidenceNeed ?? "")} | ${mdCell(row.dimension?.effort ?? "")} |`
+    ),
+    "",
     "## Highest Priority P0/P1 Themes",
     "",
     ...topP0.map((gap) => `- ${gap.id}: ${gap.title} (${gap.category}; source ${gap.sourceType} ${gap.sourceId})`),
@@ -838,26 +1491,26 @@ function renderReport({ papers, repos, competitors, coverage, gaps, paths }) {
     "",
     "### P0 Gaps",
     "",
-    "| ID | Category | AMC Surfaces | Gap Title | Source | Source URL | Acceptance Criteria |",
-    "|---|---|---|---|---|---|---|",
+    "| ID | Category | AMC Surfaces | Dimension | Gap Title | Source | Source URL | Priority Rationale | Implementation Direction | Risk If Ignored | Acceptance Criteria |",
+    "|---|---|---|---|---|---|---|---|---|---|---|",
     ...rowsForPriority("P0"),
     "",
     "### P1 Gaps",
     "",
-    "| ID | Category | AMC Surfaces | Gap Title | Source | Source URL | Acceptance Criteria |",
-    "|---|---|---|---|---|---|---|",
+    "| ID | Category | AMC Surfaces | Dimension | Gap Title | Source | Source URL | Priority Rationale | Implementation Direction | Risk If Ignored | Acceptance Criteria |",
+    "|---|---|---|---|---|---|---|---|---|---|---|",
     ...rowsForPriority("P1"),
     "",
     "### P2 Gaps",
     "",
-    "| ID | Category | AMC Surfaces | Gap Title | Source | Source URL | Acceptance Criteria |",
-    "|---|---|---|---|---|---|---|",
+    "| ID | Category | AMC Surfaces | Dimension | Gap Title | Source | Source URL | Priority Rationale | Implementation Direction | Risk If Ignored | Acceptance Criteria |",
+    "|---|---|---|---|---|---|---|---|---|---|---|",
     ...rowsForPriority("P2"),
     "",
     "### P3 Gaps",
     "",
-    "| ID | Category | AMC Surfaces | Gap Title | Source | Source URL | Acceptance Criteria |",
-    "|---|---|---|---|---|---|---|",
+    "| ID | Category | AMC Surfaces | Dimension | Gap Title | Source | Source URL | Priority Rationale | Implementation Direction | Risk If Ignored | Acceptance Criteria |",
+    "|---|---|---|---|---|---|---|---|---|---|---|",
     ...rowsForPriority("P3"),
     "",
     "## Data Artifacts",
@@ -911,6 +1564,7 @@ async function main() {
 
   const coverage = buildAmcCoverageIndex();
   const gaps = generateGaps({ papers, repos, competitors, coverage });
+  const dimensionCounts = countBy(gaps, (gap) => gap.improvementDimensionId);
   const summary = {
     generatedAt: new Date().toISOString(),
     retrievalDate,
@@ -933,6 +1587,17 @@ async function main() {
       competitors: countBy(competitors, (competitor) => competitor.category),
       gaps: countBy(gaps, (gap) => gap.categoryId)
     },
+    dimensionCounts,
+    quality: {
+      reportDetailVersion: "dimension-v2",
+      uniqueImprovementDimensions: Object.keys(dimensionCounts).length,
+      gapsWithImprovementDimension: gaps.filter((gap) => Boolean(gap.improvementDimensionId && gap.improvementDimension)).length,
+      gapsWithPriorityRationale: gaps.filter((gap) => Boolean(gap.priorityRationale)).length,
+      gapsWithImplementationDirection: gaps.filter((gap) => Boolean(gap.implementationDirection)).length,
+      gapsWithRiskIfIgnored: gaps.filter((gap) => Boolean(gap.riskIfIgnored)).length,
+      gapsWithEvidenceNeed: gaps.filter((gap) => Boolean(gap.evidenceNeeded)).length,
+      gapsWithAffectedModules: gaps.filter((gap) => Boolean(gap.affectedModules)).length
+    },
     paths
   };
 
@@ -944,7 +1609,36 @@ async function main() {
   writeCsv(paths.competitorsCsv, competitors, ["id", "name", "sourceCategory", "category", "url", "note", "retrievedAt"]);
   writeJson(paths.coverageJson, coverage);
   writeJson(paths.gapsJson, gaps);
-  writeCsv(paths.gapsCsv, gaps, ["id", "priority", "categoryId", "category", "surfaces", "title", "sourceType", "sourceId", "sourceTitle", "sourceUrl", "evidence", "amcCurrentSignal", "localEvidencePaths", "gap", "recommendation", "acceptanceCriteria", "rationale", "retrievedAt"]);
+  writeCsv(paths.gapsCsv, gaps, [
+    "id",
+    "priority",
+    "categoryId",
+    "category",
+    "surfaces",
+    "title",
+    "improvementDimensionId",
+    "improvementDimension",
+    "affectedModules",
+    "sourceType",
+    "sourceId",
+    "sourceTitle",
+    "sourceUrl",
+    "evidence",
+    "amcCurrentSignal",
+    "localEvidencePaths",
+    "gap",
+    "recommendation",
+    "acceptanceCriteria",
+    "rationale",
+    "priorityRationale",
+    "implementationDirection",
+    "riskIfIgnored",
+    "effort",
+    "evidenceNeeded",
+    "sourceReliability",
+    "nextStep",
+    "retrievedAt"
+  ]);
   writeJson(paths.summaryJson, summary);
   writeFileSync(paths.reportMd, renderReport({ papers, repos, competitors, coverage, gaps, paths }));
 

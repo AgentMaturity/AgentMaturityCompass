@@ -86,6 +86,9 @@ const agents = DOGFOOD_MATURITY_AGENTS.map((agent) => ({
   ...(industryPacks.get(agent.id) ?? { domain: null, pack: null })
 }));
 
+const requiredTargetLevels = ["L0", "L1", "L2", "L3", "L4", "L5"];
+const surfaceOrder = ["score", "shield", "enforce", "vault", "watch", "comply", "fleet", "passport"];
+
 function ensureDir(path) {
   mkdirSync(path, { recursive: true });
 }
@@ -324,6 +327,29 @@ function targetMet(target, actual) {
   return Math.abs(actual - target) <= 0.35;
 }
 
+function finiteNumber(value) {
+  return typeof value === "number" && Number.isFinite(value);
+}
+
+function levelDelta(beforeReport, afterReport) {
+  const before = beforeReport?.averageFinalLevel;
+  const after = afterReport?.averageFinalLevel;
+  if (!finiteNumber(before) || !finiteNumber(after)) {
+    return null;
+  }
+  return Number((after - before).toFixed(3));
+}
+
+function targetLevelBucket(target) {
+  if (target >= 5) return "L5";
+  if (target <= 0) return "L0";
+  return `L${Math.floor(target)}`;
+}
+
+function surfacePassed(value) {
+  return value === true || value === "covered-by-fleet-status";
+}
+
 function runAgentFlow(agent) {
   const agentDir = setupAgent(agent);
   const commands = [];
@@ -432,14 +458,14 @@ function runAgentFlow(agent) {
     domain: agent.domain,
     pack: agent.pack,
     targetMaturity: agent.targetMaturity,
+    targetLevelBucket: targetLevelBucket(agent.targetMaturity),
     actualMaturity,
+    actualLevel: improvedFull?.level ?? null,
     maturityPassed,
     task: agent.task,
     baselineImport: baselineImport.report,
     improvedImport: improvedImport.report,
-    importLevelDelta: baselineImport.report && improvedImport.report
-      ? Number((improvedImport.report.averageFinalLevel - baselineImport.report.averageFinalLevel).toFixed(3))
-      : null,
+    importLevelDelta: levelDelta(baselineImport.report, improvedImport.report),
     baselineFullScore: baselineFull,
     improvedFullScore: improvedFull,
     strictMaturityEvidence: strictEvidence.parsed,
@@ -495,27 +521,37 @@ function writeMarkdown(receipt) {
     "",
     "## Agent Results",
     "",
-    "| Agent | Domain | Pack | Target | Strict Score After | Import Lvl Before | Import Lvl After | Delta | Pack Baseline | Domain Assurance | Command Failures |",
-    "|---|---|---|---:|---:|---:|---:|---:|---|---|---:|",
+    "| Agent | Domain | Pack | Target | Target Bucket | Strict Score After | Import Lvl Before | Import Lvl After | Delta | Pack Baseline | Domain Assurance | Command Failures |",
+    "|---|---|---|---:|---|---:|---:|---:|---:|---|---|---:|",
     ...receipt.agents.map((agent) => {
       const failures = agent.commands.filter((cmd) => cmd.status !== "passed").length;
       const pack = agent.industryPack ? `L${agent.industryPack.level} ${agent.industryPack.percentage}/100` : "-";
       const assurance = agent.domainAssurance ? `${agent.domainAssurance.passed}/${agent.domainAssurance.totalScenarios}` : "-";
-      return `| ${agent.name} | ${agent.domain ?? "generic"} | ${agent.pack ?? "-"} | L${agent.targetMaturity} | ${agent.improvedFullScore?.level ?? "-"} (${agent.improvedFullScore?.score ?? "-"}) | ${agent.baselineImport?.averageFinalLevel ?? "-"} | ${agent.improvedImport?.averageFinalLevel ?? "-"} | ${agent.importLevelDelta ?? "-"} | ${pack} | ${assurance} | ${failures} |`;
+      const delta = finiteNumber(agent.importLevelDelta) ? agent.importLevelDelta : "-";
+      return `| ${agent.name} | ${agent.domain ?? "generic"} | ${agent.pack ?? "-"} | L${agent.targetMaturity} | ${agent.targetLevelBucket} | ${agent.improvedFullScore?.level ?? "-"} (${agent.improvedFullScore?.score ?? "-"}) | ${agent.baselineImport?.averageFinalLevel ?? "-"} | ${agent.improvedImport?.averageFinalLevel ?? "-"} | ${delta} | ${pack} | ${assurance} | ${failures} |`;
+    }),
+    "",
+    "## Target Maturity Spread",
+    "",
+    "| Level | Covered | Agents |",
+    "|---|---|---|",
+    ...requiredTargetLevels.map((level) => {
+      const levelAgents = receipt.agents.filter((agent) => agent.targetLevelBucket === level).map((agent) => agent.id);
+      return `| ${level} | ${levelAgents.length > 0 ? "yes" : "no"} | ${levelAgents.join(", ") || "-"} |`;
     }),
     "",
     "## Surface Coverage",
     "",
-    "| Surface | Evidence |",
-    "|---|---|",
-    "| Score | Baseline and improved full-score runs; improved runs include strict question-bound evidence across L0-L5 target profiles. |",
-    "| Shield | `amc assurance run --pack security-starter` for all 8 agents; domain assurance for 7 industry agents. |",
-    "| Enforce | `amc resource validate` for all 8 agents; `amc domain apply` guardrails for 7 industry agents. |",
-    "| Vault | Signed audit binders, passports, and evidence bundles generated and verified for all 8 agents. |",
-    "| Watch | Lifecycle evidence and trace-list commands run for all 8 agents after import and scoring. |",
-    "| Comply | EU AI Act compliance report generated for all 8 agents. |",
-    "| Fleet | Fleet status run across all 8 agents. |",
-    "| Passport | Passport create and verify run for all 8 agents. |",
+    "| Surface | Covered For All 8 | Evidence |",
+    "|---|---|---|",
+    `| Score | ${receipt.surfaceCoverage.score ? "yes" : "no"} | Baseline and improved full-score runs; improved runs include strict question-bound evidence across L0-L5 target profiles. |`,
+    `| Shield | ${receipt.surfaceCoverage.shield ? "yes" : "no"} | \`amc assurance run --pack security-starter\` for all 8 agents; domain assurance for 7 industry agents. |`,
+    `| Enforce | ${receipt.surfaceCoverage.enforce ? "yes" : "no"} | \`amc resource validate\` for all 8 agents; \`amc domain apply\` guardrails for 7 industry agents. |`,
+    `| Vault | ${receipt.surfaceCoverage.vault ? "yes" : "no"} | Signed audit binders, passports, and evidence bundles generated and verified for all 8 agents. |`,
+    `| Watch | ${receipt.surfaceCoverage.watch ? "yes" : "no"} | Lifecycle evidence and trace-list commands run for all 8 agents after import and scoring. |`,
+    `| Comply | ${receipt.surfaceCoverage.comply ? "yes" : "no"} | EU AI Act compliance report generated for all 8 agents. |`,
+    `| Fleet | ${receipt.surfaceCoverage.fleet ? "yes" : "no"} | Fleet status run across all 8 agents. |`,
+    `| Passport | ${receipt.surfaceCoverage.passport ? "yes" : "no"} | Passport create and verify run for all 8 agents. |`,
     "",
     "## Notes",
     "",
@@ -558,14 +594,29 @@ const allCommands = [
 const failedCommands = allCommands.filter((cmd) => cmd.status !== "passed");
 const failedMaturity = results.filter((agent) => !agent.maturityPassed);
 const failedSurfaces = results.filter((agent) => Object.values(agent.surfaces).some((value) => value !== true && value !== "covered-by-fleet-status"));
+const targetLevelCoverage = Object.fromEntries(requiredTargetLevels.map((level) => [
+  level,
+  results.filter((agent) => agent.targetLevelBucket === level).map((agent) => agent.id)
+]));
+const missingTargetLevels = requiredTargetLevels.filter((level) => targetLevelCoverage[level].length === 0);
+const surfaceCoverage = Object.fromEntries(surfaceOrder.map((surface) => [
+  surface,
+  results.every((agent) => surfacePassed(agent.surfaces[surface]))
+]));
+const failedSurfaceNames = surfaceOrder.filter((surface) => !surfaceCoverage[surface]);
 const receipt = {
   schemaVersion: "2026-06-12",
   generatedAt: new Date().toISOString(),
   runRoot,
   workspace,
   agentCount: agents.length,
-  overallStatus: failedCommands.length === 0 && failedMaturity.length === 0 && failedSurfaces.length === 0 ? "passed" : "failed",
+  overallStatus: failedCommands.length === 0 && failedMaturity.length === 0 && failedSurfaces.length === 0 && missingTargetLevels.length === 0 && failedSurfaceNames.length === 0 ? "passed" : "failed",
   industryEntitlement: packListJson?.entitlement ?? null,
+  requiredTargetLevels,
+  targetLevelCoverage,
+  missingTargetLevels,
+  surfaceCoverage,
+  failedSurfaceNames,
   setupCommands,
   agents: results,
   fleetStatus: {
@@ -592,6 +643,8 @@ console.log(JSON.stringify({
   failedCommandCount: failedCommands.length,
   failedMaturity: receipt.failedMaturity,
   failedSurfaces: receipt.failedSurfaces,
+  missingTargetLevels: receipt.missingTargetLevels,
+  surfaceCoverage: receipt.surfaceCoverage,
   jsonPath: receipt.jsonPath,
   markdownPath: receipt.markdownPath,
   workspace,
