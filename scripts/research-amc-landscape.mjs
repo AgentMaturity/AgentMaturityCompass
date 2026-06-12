@@ -8,9 +8,13 @@ const retrievalDate = process.env.AMC_RESEARCH_DATE || "2026-06-13";
 const outRoot = resolve(root, process.env.AMC_RESEARCH_OUT || "AMC_OS/RESEARCH/2026-06-13-amc-landscape");
 const userAgent = "AgentMaturityCompass research (https://github.com/AgentMaturity/AgentMaturityCompass)";
 
+const requiredPapers = Number(process.env.AMC_RESEARCH_REQUIRED_PAPERS || 500);
+const requiredRepos = Number(process.env.AMC_RESEARCH_REQUIRED_REPOS || 1500);
+const requiredCompetitors = Number(process.env.AMC_RESEARCH_REQUIRED_COMPETITORS || 100);
+const requiredGaps = Number(process.env.AMC_RESEARCH_REQUIRED_GAPS || 5000);
 const targetPapers = Number(process.env.AMC_RESEARCH_PAPERS || 520);
-const targetRepos = Number(process.env.AMC_RESEARCH_REPOS || 520);
-const targetGaps = Number(process.env.AMC_RESEARCH_GAPS || 540);
+const targetRepos = Number(process.env.AMC_RESEARCH_REPOS || 1500);
+const targetGaps = Number(process.env.AMC_RESEARCH_GAPS || 5000);
 
 const categories = [
   {
@@ -1128,7 +1132,7 @@ function ghApi(path, fields) {
 async function collectGithubRepos() {
   const byName = new Map();
   for (const query of repoQueries) {
-    for (let page = 1; page <= 4 && byName.size < targetRepos + 80; page += 1) {
+    for (let page = 1; page <= 6 && byName.size < targetRepos + 120; page += 1) {
       const json = ghApi("search/repositories", {
         q: query,
         sort: "stars",
@@ -1165,7 +1169,7 @@ async function collectGithubRepos() {
       }
       await sleep(250);
     }
-    if (byName.size >= targetRepos + 40) {
+    if (byName.size >= targetRepos + 80) {
       break;
     }
   }
@@ -1244,7 +1248,7 @@ function priorityFor(categoryId, source, index) {
   if (source === "competitor" && index < 25 && base !== "P0") {
     return "P1";
   }
-  if (source === "repo" && categoryId === "llmops-routing-cost") {
+  if (source === "github_repo" && categoryId === "llmops-routing-cost") {
     return "P2";
   }
   return base;
@@ -1255,6 +1259,7 @@ function makeGap(params) {
   const template = gapTemplates[categoryId] ?? gapTemplates["agent-runtime"];
   const priority = priorityFor(categoryId, params.sourceType, params.index);
   const sourceName = String(params.sourceTitle || params.sourceId).replace(/\s+/g, " ").trim();
+  const sourceKey = String(params.sourceId || params.sourceTitle).replace(/\s+/g, " ").slice(0, 42);
   const local = params.coverage[categoryId];
   const existingSignal = local?.status ?? "unknown";
   const dimension = selectImprovementDimension({
@@ -1271,7 +1276,7 @@ function makeGap(params) {
     categoryId,
     category: categoryLabel(categoryId),
     surfaces: surfaces.join("; "),
-    title: `${dimension.label}: ${sourceName.slice(0, 96)}`,
+    title: `${dimension.label} / ${categoryLabel(categoryId)}: ${sourceName.slice(0, 72)} [${params.sourceType}:${sourceKey}]`,
     improvementDimensionId: dimension.id,
     improvementDimension: dimension.label,
     affectedModules: dimension.modules.join("; "),
@@ -1297,66 +1302,91 @@ function makeGap(params) {
   };
 }
 
+function sourceDescriptors({ papers, repos, competitors }) {
+  const out = [];
+  const max = Math.max(papers.length, repos.length, competitors.length);
+  for (let index = 0; index < max; index += 1) {
+    if (papers[index]) {
+      const paper = papers[index];
+      out.push({
+        sourceType: "paper",
+        sourceId: paper.id,
+        sourceTitle: paper.title,
+        sourceUrl: paper.url || paper.openAlexUrl,
+        categories: paper.categories?.length ? paper.categories : ["agent-runtime"],
+        evidence: `${paper.title}. Concepts: ${paper.concepts || "n/a"}. Abstract: ${paper.abstract || "No abstract in OpenAlex metadata."}`,
+        sourceIndex: index
+      });
+    }
+    if (repos[index]) {
+      const repo = repos[index];
+      out.push({
+        sourceType: "github_repo",
+        sourceId: repo.fullName,
+        sourceTitle: repo.fullName,
+        sourceUrl: repo.url,
+        categories: repo.categories?.length ? repo.categories : ["agent-runtime"],
+        evidence: `${repo.description || repo.fullName}. Stars=${repo.stars}; language=${repo.language}; topics=${repo.topics || "n/a"}.`,
+        sourceIndex: index
+      });
+    }
+    if (competitors[index]) {
+      const competitor = competitors[index];
+      out.push({
+        sourceType: "competitor",
+        sourceId: competitor.id,
+        sourceTitle: competitor.name,
+        sourceUrl: competitor.url,
+        categories: [competitor.category in gapTemplates ? competitor.category : classify(`${competitor.name} ${competitor.note}`)[0]],
+        evidence: competitor.note,
+        sourceIndex: index
+      });
+    }
+  }
+  return out;
+}
+
 function generateGaps({ papers, repos, competitors, coverage }) {
   const gaps = [];
   let serial = 1;
+  const seen = new Set();
   const addGap = (gap) => {
+    const key = `${gap.sourceType}:${gap.sourceId}:${gap.categoryId}:${gap.improvementDimensionId}`;
+    if (seen.has(key)) {
+      return false;
+    }
+    seen.add(key);
     gaps.push(gap);
     serial += 1;
+    return true;
   };
 
-  for (const [index, paper] of papers.entries()) {
-    if (gaps.length >= Math.floor(targetGaps * 0.52)) {
-      break;
+  const sources = sourceDescriptors({ papers, repos, competitors });
+  const maxRounds = Math.ceil(targetGaps / Math.max(1, sources.length)) + 8;
+  for (let round = 0; round < maxRounds && gaps.length < targetGaps; round += 1) {
+    for (const [position, source] of sources.entries()) {
+      if (gaps.length >= targetGaps) {
+        break;
+      }
+      const categoriesForSource = source.categories.length ? source.categories : ["agent-runtime"];
+      const categoryId = categoriesForSource[round % categoriesForSource.length] ?? "agent-runtime";
+      const dimensionIndex = source.sourceIndex + position + (round * 1009);
+      addGap(makeGap({
+        serial,
+        index: dimensionIndex,
+        sourceType: source.sourceType,
+        sourceId: source.sourceId,
+        sourceTitle: source.sourceTitle,
+        sourceUrl: source.sourceUrl,
+        categoryId,
+        evidence: `${source.evidence} Focus pass ${round + 1}: ${categoryLabel(categoryId)} / ${categorySurfaces(categoryId).join(", ")}.`,
+        coverage
+      }));
     }
-    const categoryId = paper.categories?.[0] ?? "agent-runtime";
-    addGap(makeGap({
-      serial,
-      index,
-      sourceType: "paper",
-      sourceId: paper.id,
-      sourceTitle: paper.title,
-      sourceUrl: paper.url || paper.openAlexUrl,
-      categoryId,
-      evidence: `${paper.title}. Concepts: ${paper.concepts || "n/a"}. Abstract: ${paper.abstract || "No abstract in OpenAlex metadata."}`,
-      coverage
-    }));
   }
 
-  for (const [index, repo] of repos.entries()) {
-    if (gaps.length >= Math.floor(targetGaps * 0.82)) {
-      break;
-    }
-    const categoryId = repo.categories?.[0] ?? "agent-runtime";
-    addGap(makeGap({
-      serial,
-      index,
-      sourceType: "github_repo",
-      sourceId: repo.fullName,
-      sourceTitle: repo.fullName,
-      sourceUrl: repo.url,
-      categoryId,
-      evidence: `${repo.description || repo.fullName}. Stars=${repo.stars}; language=${repo.language}; topics=${repo.topics || "n/a"}.`,
-      coverage
-    }));
-  }
-
-  for (const [index, competitor] of competitors.entries()) {
-    if (gaps.length >= targetGaps) {
-      break;
-    }
-    const categoryId = competitor.category in gapTemplates ? competitor.category : classify(`${competitor.name} ${competitor.note}`)[0];
-    addGap(makeGap({
-      serial,
-      index,
-      sourceType: "competitor",
-      sourceId: competitor.id,
-      sourceTitle: competitor.name,
-      sourceUrl: competitor.url,
-      categoryId,
-      evidence: competitor.note,
-      coverage
-    }));
+  if (gaps.length < targetGaps) {
+    throw new Error(`could only generate ${gaps.length} unique gaps from ${sources.length} sources; target is ${targetGaps}`);
   }
 
   gaps.sort((a, b) => priorityRank(a.priority) - priorityRank(b.priority) || a.category.localeCompare(b.category) || a.id.localeCompare(b.id));
@@ -1427,10 +1457,10 @@ function renderReport({ papers, repos, competitors, coverage, gaps, paths }) {
     "",
     "| Corpus | Required | Collected | Evidence File |",
     "|---|---:|---:|---|",
-    `| 2026 academic papers | 500 | ${papers.length} | ${paths.papersJson} |`,
-    `| Competitors / adjacent products | 100 | ${competitors.length} | ${paths.competitorsJson} |`,
-    `| Similar GitHub repositories | 500 | ${repos.length} | ${paths.reposJson} |`,
-    `| Prioritized gaps | 500 | ${gaps.length} | ${paths.gapsJson} |`,
+    `| 2026 academic papers | ${requiredPapers} | ${papers.length} | ${paths.papersJson} |`,
+    `| Competitors / adjacent products | ${requiredCompetitors} | ${competitors.length} | ${paths.competitorsJson} |`,
+    `| Similar GitHub repositories | ${requiredRepos} | ${repos.length} | ${paths.reposJson} |`,
+    `| Prioritized gaps | ${requiredGaps} | ${gaps.length} | ${paths.gapsJson} |`,
     "",
     "## Methodology",
     "",
@@ -1473,7 +1503,7 @@ function renderReport({ papers, repos, competitors, coverage, gaps, paths }) {
     "",
     "## Top Strategic Improvement Themes",
     "",
-    "These themes aggregate the 500+ gap rows by concrete implementation dimension. Use them to plan roadmap epics before selecting individual source-backed gaps.",
+    `These themes aggregate the ${requiredGaps}+ gap rows by concrete implementation dimension. Use them to plan roadmap epics before selecting individual source-backed gaps.`,
     "",
     "| Dimension | Gap Count | Top Categories | Suggested First Implementation | Evidence Required | Effort |",
     "|---|---:|---|---|---|---|",
@@ -1530,6 +1560,7 @@ function renderReport({ papers, repos, competitors, coverage, gaps, paths }) {
     "- OpenAlex metadata can include preprints, Zenodo records, and publisher records with uneven abstract quality; the JSON preserves raw source IDs and URLs for rechecking.",
     "- GitHub repository search is a relevance scan, not a code audit of every repository.",
     "- Competitor records are a broad market/adjacency map. Product claims should be verified in depth before using them in public comparisons.",
+    "- Gap rows are source-linked improvement candidates. Multiple gap rows can derive from the same source when that source maps to multiple AMC improvement dimensions.",
     "- Local AMC coverage signals are keyword-based. A category marked implemented-signals-present can still have deep feature gaps.",
     ""
   ].join("\n");
@@ -1575,12 +1606,20 @@ async function main() {
       gaps: gaps.length
     },
     requirements: {
-      papersAtLeast500: papers.length >= 500,
-      githubReposAtLeast500: repos.length >= 500,
-      competitorsAtLeast100: competitors.length >= 100,
-      gapsAtLeast500: gaps.length >= 500
+      papersAtLeast500: papers.length >= requiredPapers,
+      githubReposAtLeast1500: repos.length >= requiredRepos,
+      competitorsAtLeast100: competitors.length >= requiredCompetitors,
+      gapsAtLeast5000: gaps.length >= requiredGaps,
+      legacyGithubReposAtLeast500: repos.length >= 500,
+      legacyGapsAtLeast500: gaps.length >= 500
     },
     priorityCounts: countBy(gaps, (gap) => gap.priority),
+    sourceTypeCounts: countBy(gaps, (gap) => gap.sourceType),
+    sourceCoverage: {
+      paperSourcesWithGaps: new Set(gaps.filter((gap) => gap.sourceType === "paper").map((gap) => gap.sourceId)).size,
+      githubRepoSourcesWithGaps: new Set(gaps.filter((gap) => gap.sourceType === "github_repo").map((gap) => gap.sourceId)).size,
+      competitorSourcesWithGaps: new Set(gaps.filter((gap) => gap.sourceType === "competitor").map((gap) => gap.sourceId)).size
+    },
     categoryCounts: {
       papers: countBy(papers.flatMap((paper) => paper.categories ?? []), (category) => category),
       githubRepos: countBy(repos.flatMap((repo) => repo.categories ?? []), (category) => category),
