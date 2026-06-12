@@ -103,6 +103,7 @@ import { loadLeaseRevocations, revokeLease, verifyLeaseRevocationsSignature } fr
 import { verifyLeaseToken } from "../leases/leaseVerifier.js";
 import { extractLeaseCarrier } from "../leases/leaseCarriers.js";
 import { serveConsolePath } from "../console/consoleServer.js";
+import { handleStudioApiDelegation } from "./apiDelegation.js";
 import { openLedger } from "../ledger/ledger.js";
 import { sha256Hex } from "../utils/hash.js";
 import {
@@ -874,17 +875,6 @@ function normalizeMetricRoute(pathname: string): string {
     return part;
   });
   return `/${normalized.join("/")}`;
-}
-
-const PUBLIC_API_V1_PATHS = new Set<string>([
-  "/api/v1/health",
-  "/api/v1/chat/completions",
-  "/api/v1/completions",
-  "/api/v1/embeddings"
-]);
-
-function isPublicApiV1Path(pathname: string): boolean {
-  return PUBLIC_API_V1_PATHS.has(pathname);
 }
 
 function backupStatusSummary(workspace: string): {
@@ -1782,38 +1772,26 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
 
       // ── AMC REST API v1 ─────────────────────────────────────────────
       if (pathname.startsWith("/api/v1/")) {
-        const quotaAuth = authenticate(req, options.workspace, options.token);
-        const quotaKey = quotaAuth?.username ?? quotaAuth?.agentId ?? `ip:${clientIp}`;
-        const privileged = quotaAuth?.isAdmin === true || (quotaAuth?.roles.has("OWNER") ?? false);
-        const quota = (privileged ? privilegedApiLimiter : apiLimiter)(`api:${quotaKey}`);
-        setRateLimitHeaders(res, quota);
-        if (!quota.allowed) {
-          json(res, 429, { error: "API rate limit exceeded" });
-          return;
-        }
-        if (!isPublicApiV1Path(pathname)) {
-          const apiAuth = authenticate(req, options.workspace, options.token);
-          if (!apiAuth) {
-            json(res, 401, { error: "missing or invalid token" });
-            return;
-          }
-          if (!apiAuth.isAdmin && apiAuth.agentId) {
-            json(res, 403, { error: "agent or lease auth cannot access internal /api/v1 routes" });
-            return;
-          }
-          if (
-            !requireRoles({
-              auth: apiAuth,
-              res,
-              workspace: options.workspace,
-              roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"]
-            })
-          ) {
-            return;
-          }
-        }
-        const { handleApiRoute } = await import("../api/index.js");
-        const handled = await handleApiRoute(pathname, req.method ?? "GET", req, res, options.workspace, options.token);
+        const handled = await handleStudioApiDelegation({
+          pathname,
+          method,
+          clientIp,
+          workspace: options.workspace,
+          token: options.token,
+          req,
+          res,
+          authenticate,
+          requireRoles: (params) => requireRoles({
+            auth: params.auth as AuthContext,
+            res: params.res,
+            workspace: params.workspace,
+            roles: params.roles as UserRole[]
+          }),
+          json,
+          apiLimiter,
+          privilegedApiLimiter,
+          setRateLimitHeaders: (response, decision) => setRateLimitHeaders(response, decision)
+        });
         if (handled) return;
       }
 

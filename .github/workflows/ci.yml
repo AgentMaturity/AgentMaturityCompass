@@ -65,6 +65,9 @@ jobs:
       - name: Build
         run: npm run build
 
+      - name: Architecture boundary compatibility
+        run: npm run check:architecture-boundaries
+
       - name: Release smoke checks
         run: |
           npm pack --ignore-scripts --json > /tmp/amc-pack.json

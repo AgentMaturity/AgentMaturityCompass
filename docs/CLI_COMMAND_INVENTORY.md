@@ -40,7 +40,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc alerts verify` | - | - | - |
 | `amc api` | REST API management | - | - |
 | `amc api docs` | Show API reference documentation summary and link | - | - |
-| `amc api routes` | List all available REST API endpoints | - | - |
+| `amc api routes` | List all available REST API route families | - | - |
 | `amc api start` | Start the AMC API server (alias for 'amc up') | `--port <port>` | - |
 | `amc api status` | Show API integration status | - | - |
 | `amc approvals` | Signed approval inbox operations | - | - |

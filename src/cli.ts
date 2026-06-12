@@ -587,6 +587,7 @@ import { runBootstrap } from "./bootstrap/bootstrap.js";
 import { registerQuickSetupCommand } from "./setup/quickSetupCli.js";
 import { registerDomainApplyCommand } from "./domains/domainApplyCli.js";
 import { registerReplCommand } from "./repl/replCli.js";
+import { registerApiCommands } from "./api/apiCli.js";
 import {
   defaultReleaseKeyPaths,
   releaseInitCli,
@@ -22818,98 +22819,7 @@ program
     });
   });
 
-// ── API subcommand ──────────────────────────────────────────────────────
-const apiCmd = program.command("api").description("REST API management");
-apiCmd
-  .command("status")
-  .description("Show API integration status")
-  .action(async () => {
-    console.log(chalk.bold("AMC REST API v1"));
-    console.log(`  Endpoints: shield, enforce, vault, watch, score, product, agents`);
-    console.log(`  Base path: /api/v1/`);
-    console.log(`  Integrated into Studio server at :3212`);
-    const net = await import("net");
-    const alive = await new Promise<boolean>(resolve => {
-      const sock = net.createConnection({ port: 3212, timeout: 1000 }, () => { sock.destroy(); resolve(true); });
-      sock.on("error", () => resolve(false));
-      sock.on("timeout", () => { sock.destroy(); resolve(false); });
-    });
-    if (alive) {
-      console.log(chalk.green("✓  Studio is running on port 3212."));
-    } else {
-      console.log(chalk.yellow("⚠  Studio is not running on port 3212. Start with: amc up"));
-    }
-  });
-
-apiCmd
-  .command("routes")
-  .description("List all available REST API endpoints")
-  .action(() => {
-    console.log(chalk.bold("\n🌐  AMC REST API v1 — Available Endpoints\n"));
-    const routes = [
-      { method: "GET",    path: "/api/v1/status",                  desc: "Server health and version" },
-      { method: "GET",    path: "/api/v1/agents",                   desc: "List all registered agents" },
-      { method: "GET",    path: "/api/v1/agents/:id",               desc: "Get agent details" },
-      { method: "POST",   path: "/api/v1/agents",                   desc: "Register a new agent" },
-      { method: "GET",    path: "/api/v1/agents/:id/score",         desc: "Get agent maturity score" },
-      { method: "GET",    path: "/api/v1/agents/:id/diagnostic",    desc: "Full diagnostic report" },
-      { method: "POST",   path: "/api/v1/agents/:id/score",         desc: "Submit scoring evidence" },
-      { method: "GET",    path: "/api/v1/fleet/health",             desc: "Fleet health dashboard" },
-      { method: "GET",    path: "/api/v1/compliance/report",        desc: "Generate compliance report" },
-      { method: "POST",   path: "/api/v1/shield/scan",              desc: "Run shield security scan" },
-      { method: "POST",   path: "/api/v1/shield/exploit-confirmation/scopes", desc: "Create controlled exploit-confirmation scope" },
-      { method: "POST",   path: "/api/v1/shield/exploit-confirmation/run", desc: "Run authorized safe exploit confirmation" },
-      { method: "GET",    path: "/api/v1/shield/exploit-confirmation/proofs", desc: "List safe exploit-confirmation proofs" },
-      { method: "POST",   path: "/api/v1/vault/unlock",             desc: "Unlock the vault (passphrase)" },
-      { method: "GET",    path: "/api/v1/vault/status",             desc: "Vault lock status" },
-      { method: "GET",    path: "/api/v1/watch/events",             desc: "SSE stream of audit events" },
-      { method: "POST",   path: "/api/v1/enforce",                  desc: "Enforce a governance policy" },
-      { method: "GET",    path: "/api/v1/product/signals",          desc: "Product value signals" },
-    ];
-    for (const r of routes) {
-      const method = r.method.padEnd(6);
-      console.log(`  ${chalk.bold.cyan(method)} ${chalk.white(r.path.padEnd(42))} ${chalk.gray(r.desc)}`);
-    }
-    console.log("");
-    console.log(chalk.gray("  Base URL: http://localhost:3212"));
-    console.log(chalk.gray("  Auth:     Bearer token (see: amc user token)"));
-    console.log(chalk.gray("  Docs:     amc api docs | docs/API_REFERENCE.md"));
-    console.log("");
-  });
-
-apiCmd
-  .command("start")
-  .description("Start the AMC API server (alias for 'amc up')")
-  .option("--port <port>", "port number", "3212")
-  .action(async (opts: { port?: string }) => {
-    console.log(chalk.bold("\n🚀  Starting AMC API Server...\n"));
-    console.log(chalk.gray("  The API is served by AMC Studio. Starting it now.\n"));
-    const { runStudioForeground } = await import("./studio/studioSupervisor.js");
-    await runStudioForeground({ workspace: process.cwd(), apiPort: Number(opts.port) || 3212 });
-  });
-
-apiCmd
-  .command("docs")
-  .description("Show API reference documentation summary and link")
-  .action(() => {
-    console.log(chalk.bold("\n📖  AMC API Reference\n"));
-    console.log("  Full docs: docs/API_REFERENCE.md (in your AMC install directory)");
-    console.log("  Online:    https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/API_REFERENCE.md");
-    console.log("");
-    console.log(chalk.bold("  Quick start:"));
-    console.log(`  1. Start Studio:      ${chalk.hex('#4AEF79')("amc up")}`);
-    console.log(`  2. Get a token:       ${chalk.hex('#4AEF79')("amc user token")}`);
-    console.log(`  3. List agents:       ${chalk.hex('#4AEF79')("curl -H 'Authorization: Bearer <token>' http://localhost:3212/api/v1/agents")}`);
-    console.log(`  4. List all routes:   ${chalk.hex('#4AEF79')("amc api routes")}`);
-    console.log("");
-    console.log(chalk.bold("  Authentication:"));
-    console.log("  All endpoints require a Bearer token header.");
-    console.log("  Tokens are issued by the Studio server after vault unlock.");
-    console.log("");
-    console.log(chalk.bold("  Response format:"));
-    console.log("  All responses are JSON. Errors use { error: string, code: string }.");
-    console.log("");
-  });
+registerApiCommands(program);
 
 // ── Agent harness subcommands ────────────────────────────────────────────
 agent

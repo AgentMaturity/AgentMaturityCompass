@@ -124,6 +124,10 @@ steps.push(runStep("build", "npm", ["run", "build"], {
 steps.push(runStep("command-inventory", "node", ["dist/cli.js", "commands", "--markdown", "--out", "docs/CLI_COMMAND_INVENTORY.md"], {
   remediation: "Regenerate or fix the live CLI command inventory."
 }));
+steps.push(runStep("architecture-boundaries", "node", ["scripts/architecture-boundaries-check.mjs"], {
+  timeoutMs: 120_000,
+  remediation: "Fix CLI/API/Studio boundary drift and rerun npm run check:architecture-boundaries."
+}));
 steps.push(runStep("docs-drift-public-naming", "npm", ["run", "check:docs-drift"], {
   remediation: "Fix public docs drift, stale quickscore primary path, or forbidden source-name leakage."
 }));
