@@ -5,7 +5,7 @@
 **Narration:** "Your AI agent says it's safe. But can it prove it?"
 
 ## Scene 2: One Command (10-20s)
-**Visual:** Type `npx agent-maturity-compass quickscore --rapid`
+**Visual:** Type `npx agent-maturity-compass`
 **Narration:** "One command. No account. No API key. Agent Maturity Compass scores your agent in seconds."
 
 ## Scene 3: The Score (20-30s)

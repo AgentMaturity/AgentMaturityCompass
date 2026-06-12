@@ -80,6 +80,239 @@ components:
         mode:
           type: string
 
+    TypedGraphValidationIssue:
+      type: object
+      properties:
+        code:
+          type: string
+          enum:
+            - invalid_schema
+            - duplicate_node
+            - duplicate_edge
+            - missing_node
+            - missing_node_contract
+            - missing_handoff_contract
+            - contract_schema_mismatch
+            - unsafe_permission_without_policy
+            - cycle_detected
+            - unbounded_fanout
+        severity:
+          type: string
+          enum: [warning, error]
+        message:
+          type: string
+        nodeId:
+          type: string
+        edgeId:
+          type: string
+        evidenceRefs:
+          type: array
+          items:
+            type: string
+
+    TypedGraphValidation:
+      type: object
+      properties:
+        valid:
+          type: boolean
+        summary:
+          type: string
+        issueCount:
+          type: integer
+        issues:
+          type: array
+          items:
+            $ref: '#/components/schemas/TypedGraphValidationIssue'
+
+    TypedMultiAgentGraph:
+      type: object
+      required: [schemaVersion, graphId, nodes]
+      properties:
+        schemaVersion:
+          type: string
+          enum: ['2026-05-22']
+        graphId:
+          type: string
+        fleetId:
+          type: string
+        createdAt:
+          type: string
+        maxFanOut:
+          type: integer
+        nodes:
+          type: array
+          items:
+            type: object
+        edges:
+          type: array
+          items:
+            type: object
+        invariants:
+          type: array
+          items:
+            type: object
+
+    TypedMultiAgentGraphRef:
+      type: object
+      properties:
+        graphId:
+          type: string
+        path:
+          type: string
+        digestSha256:
+          type: string
+        nodeCount:
+          type: integer
+        edgeCount:
+          type: integer
+        validation:
+          $ref: '#/components/schemas/TypedGraphValidation'
+
+    ExploitConfirmationScope:
+      type: object
+      required: [schemaVersion, scopeId, target, allowedTechniques, windowStartTs, windowEndTs, safeMode]
+      properties:
+        schemaVersion:
+          type: string
+          enum: ['2026-05-22']
+        scopeId:
+          type: string
+        target:
+          type: object
+          properties:
+            type:
+              type: string
+              enum: [WORKSPACE, AGENT, NODE, URL, SERVICE]
+            id:
+              type: string
+            ownership:
+              type: object
+        allowedTechniques:
+          type: array
+          items:
+            type: string
+            enum: [prompt_injection, tool_abuse, data_exfiltration, sandbox_escape, auth_bypass, model_route_poisoning, rag_poisoning]
+        windowStartTs:
+          type: integer
+        windowEndTs:
+          type: integer
+        safeMode:
+          type: string
+          enum: [synthetic_replay, sandbox_repro, log_correlation]
+        reviewerApproval:
+          type: object
+        constraints:
+          type: object
+
+    ExploitConfirmationTask:
+      type: object
+      required: [taskId, findingId, targetId, technique, hypothesis, requestedBy, requestedTs]
+      properties:
+        taskId:
+          type: string
+        findingId:
+          type: string
+        targetId:
+          type: string
+        technique:
+          type: string
+        hypothesis:
+          type: string
+          description: Raw hypothesis is never included in safe proof exports; only its SHA-256 hash is persisted in public artifacts.
+        requestedBy:
+          type: string
+        requestedTs:
+          type: integer
+        evidenceRefs:
+          type: array
+          items:
+            type: string
+        proofSignals:
+          type: array
+          items:
+            type: object
+
+    ExploitConfirmationProof:
+      type: object
+      properties:
+        proofId:
+          type: string
+        scopeId:
+          type: string
+        findingId:
+          type: string
+        confirmationStatus:
+          type: string
+          enum: [CONFIRMED_SAFE_PROOF, INCONCLUSIVE]
+        exploitInstructionsIncluded:
+          type: boolean
+          enum: [false]
+        rawPayloadStored:
+          type: boolean
+          enum: [false]
+        safeProof:
+          type: object
+
+    NeutralImportPlan:
+      type: object
+      properties:
+        importId:
+          type: string
+        agentId:
+          type: string
+        sourcePath:
+          type: string
+        status:
+          type: string
+          enum: [ready, unsupported, blocked]
+        candidateCount:
+          type: integer
+        redactionCount:
+          type: integer
+        categories:
+          type: array
+          items:
+            type: string
+            enum: [trace-jsonl, event-log, run-directory, workflow-graph, agent-config, memory-store, eval-output, benchmark-result]
+        candidates:
+          type: array
+          items:
+            type: object
+
+    NeutralImportResult:
+      type: object
+      properties:
+        importId:
+          type: string
+        mode:
+          type: string
+          enum: [dry-run, validate, import]
+        applied:
+          type: boolean
+        plan:
+          $ref: '#/components/schemas/NeutralImportPlan'
+        normalizedPath:
+          type: string
+          nullable: true
+
+    InferenceStrategyRun:
+      type: object
+      properties:
+        strategyRunId:
+          type: string
+        recommendedStrategyId:
+          type: string
+        confidence:
+          type: number
+        tradeoffSummary:
+          type: string
+        routeChange:
+          type: object
+        strategies:
+          type: array
+          items:
+            type: object
+
 tags:
   - name: health
     description: Health and readiness checks
@@ -93,6 +326,12 @@ tags:
     description: Compliance frameworks, policy packs, waivers, and regulatory scoring
   - name: evidence
     description: Evidence lifecycle — ingest, list, gaps, bundles, attestation
+  - name: imports
+    description: Framework-neutral importers for traces, runs, graphs, configs, memory, evals, and benchmarks
+  - name: strategy
+    description: Inference strategy comparison, route receipts, and rollback
+  - name: fixer
+    description: Fixer RCA reports, regression tests, and governed Enforce proposals
   - name: crypto
     description: Notary, certificates, Merkle transparency, receipts chain
   - name: drift
@@ -109,6 +348,10 @@ tags:
     description: Runtime config, logs, doctor, version, and status
   - name: gateway
     description: Gateway/LLM proxy — config, init, bind, sign, verify, providers
+  - name: firewall
+    description: Runtime Firewall decisions, policy mode, event log, and SIEM export
+  - name: runtime
+    description: Connected-agent runtime run state and redacted event streams
   - name: identity
     description: Identity, SCIM tokens, OIDC/SAML providers, group mapping
   - name: adapters
@@ -122,7 +365,7 @@ tags:
   - name: incidents
     description: Incident creation, listing, and state transitions
   - name: memory
-    description: Memory maturity assessment, correction memory, lessons, advisories
+    description: Memory maturity, correction memory, governed reasoning memory, lessons, advisories
   - name: metrics
     description: Metrics status, SLO, and failure-risk indices
   - name: security
@@ -182,11 +425,20 @@ paths:
         '200':
           description: Status and active session count
 
+  /v1/score/question-sets:
+    get:
+      tags: [score]
+      summary: List supported assessment question sets
+      description: Returns the default 240-question set and the explicit lifecycle-expanded set with surface/layer mappings.
+      responses:
+        '200':
+          description: Question set metadata
+
   /v1/score/run:
     post:
       tags: [score]
       summary: Run full diagnostic
-      description: Trigger a full diagnostic run (CLI equivalent of `amc run`).
+      description: Trigger a full diagnostic run (CLI equivalent of `amc run`). Defaults to the legacy 240-question set unless `questionSetVersion` is explicitly set to `amc-lifecycle-2026-v1` or `lifecycle`.
       requestBody:
         content:
           application/json:
@@ -203,6 +455,12 @@ paths:
                 claimMode:
                   type: string
                   enum: [auto, owner, harness]
+                questionSetVersion:
+                  type: string
+                  enum: [amc-legacy-240-v1, amc-lifecycle-2026-v1, legacy, lifecycle]
+                applyIndustryPackWeights:
+                  type: boolean
+                  description: Applies Industry Pack weighting only when the workspace has an active Industry Packs entitlement.
       responses:
         '200':
           description: Diagnostic result with layer scores
@@ -224,7 +482,7 @@ paths:
                     type: integer
       responses:
         '200':
-          description: Quickscore result
+          description: Rapid score result
 
   /v1/score/quickscore/questions:
     get:
@@ -613,6 +871,96 @@ paths:
       responses:
         '200':
           description: Fleet report
+
+  /v1/fleet/graph:
+    get:
+      tags: [fleet]
+      summary: Inspect latest typed multi-agent graph
+      description: Returns the latest graph, canonical digest, node/edge counts, and validation findings used by fleet scoring and lifecycle evidence.
+      responses:
+        '200':
+          description: Typed graph inspection payload
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  graph:
+                    $ref: '#/components/schemas/TypedMultiAgentGraph'
+                  ref:
+                    $ref: '#/components/schemas/TypedMultiAgentGraphRef'
+    post:
+      tags: [fleet]
+      summary: Write latest typed multi-agent graph
+      description: Stores a graph under `.amc/fleet/typed-graphs/`, computes its canonical digest, and returns actionable validation findings.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [graph]
+              properties:
+                graph:
+                  $ref: '#/components/schemas/TypedMultiAgentGraph'
+      responses:
+        '201':
+          description: Typed graph written
+
+  /v1/fleet/graph/validate:
+    get:
+      tags: [fleet]
+      summary: Validate latest typed multi-agent graph
+      description: Checks node contracts, handoff contracts, unsafe permissions, circular dependencies, and fan-out limits before fleet assessment.
+      responses:
+        '200':
+          description: Typed graph validation payload
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  graph:
+                    $ref: '#/components/schemas/TypedMultiAgentGraph'
+                  ref:
+                    $ref: '#/components/schemas/TypedMultiAgentGraphRef'
+                  validation:
+                    $ref: '#/components/schemas/TypedGraphValidation'
+
+  /v1/fleet/lifecycle:
+    get:
+      tags: [fleet]
+      summary: List parent fleet lifecycle artifacts
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+        - name: redacted
+          in: query
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: Fleet lifecycle artifact list
+
+  /v1/fleet/lifecycle/{selector}:
+    get:
+      tags: [fleet]
+      summary: Inspect a parent fleet lifecycle artifact
+      parameters:
+        - name: selector
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: redacted
+          in: query
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: Fleet lifecycle artifact
 
   /v1/fleet/init:
     post:
@@ -1201,6 +1549,170 @@ paths:
         '200':
           description: Evidence export
 
+  # ── Neutral Imports ─────────────────────────────────────────────
+  /v1/imports:
+    get:
+      tags: [imports]
+      summary: List neutral import runs
+      responses:
+        '200':
+          description: Neutral import list
+    post:
+      tags: [imports]
+      summary: Import neutral artifacts into AMC evidence
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [inputPath]
+              properties:
+                inputPath:
+                  type: string
+                agentId:
+                  type: string
+      responses:
+        '201':
+          description: Import written
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NeutralImportResult'
+
+  /v1/imports/dry-run:
+    post:
+      tags: [imports]
+      summary: Detect neutral artifacts without writing files
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [inputPath]
+              properties:
+                inputPath:
+                  type: string
+                agentId:
+                  type: string
+      responses:
+        '200':
+          description: Dry-run import plan
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NeutralImportResult'
+
+  /v1/imports/validate:
+    post:
+      tags: [imports]
+      summary: Validate neutral import support
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [inputPath]
+              properties:
+                inputPath:
+                  type: string
+                agentId:
+                  type: string
+      responses:
+        '200':
+          description: Import validation plan
+
+  /v1/imports/{importId}/rollback:
+    post:
+      tags: [imports]
+      summary: Roll back files written by a neutral import
+      parameters:
+        - name: importId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Rollback receipt
+
+  # ── Inference Strategy ──────────────────────────────────────────
+  /v1/strategy/runs:
+    get:
+      tags: [strategy]
+      summary: List inference strategy comparison runs
+      parameters:
+        - name: agentId
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Strategy run list
+
+  /v1/strategy/compare:
+    post:
+      tags: [strategy]
+      summary: Compare inference strategies and optionally commit a route
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [strategies]
+              properties:
+                agentId:
+                  type: string
+                objective:
+                  type: string
+                  enum: [balanced, quality, cost, latency, safety]
+                applyRoute:
+                  type: boolean
+                policyApproval:
+                  type: boolean
+                strategies:
+                  type: array
+                  items:
+                    type: object
+      responses:
+        '201':
+          description: Strategy comparison result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InferenceStrategyRun'
+
+  /v1/strategy/runs/{selector}:
+    get:
+      tags: [strategy]
+      summary: Inspect a strategy comparison run
+      parameters:
+        - name: selector
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: agentId
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Strategy comparison run
+
+  /v1/strategy/runs/{selector}/rollback:
+    post:
+      tags: [strategy]
+      summary: Roll back an accepted strategy route change
+      parameters:
+        - name: selector
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Strategy rollback receipt
+
   /v1/evidence/attest:
     post:
       tags: [evidence]
@@ -1238,6 +1750,70 @@ paths:
       responses:
         '200':
           description: Bundle created
+
+  /v1/evidence/trace-indexes:
+    get:
+      tags: [evidence]
+      summary: List distilled trace failure indexes
+      parameters:
+        - name: agentId
+          in: query
+          schema:
+            type: string
+        - name: limit
+          in: query
+          schema:
+            type: integer
+        - name: redacted
+          in: query
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: Trace failure index list
+
+  /v1/evidence/trace-indexes/{selector}:
+    get:
+      tags: [evidence]
+      summary: Inspect a trace failure index
+      parameters:
+        - name: selector
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: agentId
+          in: query
+          schema:
+            type: string
+        - name: redacted
+          in: query
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: Trace failure index
+
+  /v1/evidence/failure-clusters:
+    get:
+      tags: [evidence]
+      summary: List top recurring failure clusters
+      parameters:
+        - name: agentId
+          in: query
+          schema:
+            type: string
+        - name: limit
+          in: query
+          schema:
+            type: integer
+        - name: redacted
+          in: query
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: Ranked failure clusters
 
   # ── Crypto ─────────────────────────────────────────────────────
   /v1/crypto/notary/status:
@@ -2187,6 +2763,354 @@ paths:
         '200':
           description: Provider list
 
+  # ── Runtime Firewall ───────────────────────────────────────────
+  /v1/firewall/status:
+    get:
+      tags: [firewall]
+      summary: Runtime Firewall status
+      responses:
+        '200':
+          description: Runtime Firewall policy mode and decision counts
+
+  /v1/firewall/enable:
+    post:
+      tags: [firewall]
+      summary: Enable or disable Runtime Firewall policy
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                mode:
+                  type: string
+                  enum: [observe, warn, block]
+                enabled:
+                  type: boolean
+                failClosedOnMissingPolicy:
+                  type: boolean
+      responses:
+        '201':
+          description: Runtime Firewall policy written
+
+  /v1/firewall/check:
+    post:
+      tags: [firewall]
+      summary: Evaluate request or response payload
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [content]
+              properties:
+                content:
+                  type: string
+                direction:
+                  type: string
+                  enum: [request, response]
+                agentId:
+                  type: string
+                requirePolicy:
+                  type: boolean
+      responses:
+        '201':
+          description: Allow, warn, or block decision
+
+  /v1/firewall/events:
+    get:
+      tags: [firewall]
+      summary: List Runtime Firewall decision events
+      responses:
+        '200':
+          description: Runtime Firewall decisions
+
+  /v1/firewall/export:
+    post:
+      tags: [firewall]
+      summary: Export redacted Runtime Firewall decisions
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                outputPath:
+                  type: string
+                format:
+                  type: string
+                  enum: [json, jsonl, splunk]
+                redacted:
+                  type: boolean
+                limit:
+                  type: integer
+      responses:
+        '201':
+          description: Export written
+
+  # ── Runtime Run Manager ───────────────────────────────────────
+  /v1/runtime/status:
+    get:
+      tags: [runtime]
+      summary: Runtime run-manager status
+      parameters:
+        - in: query
+          name: agentId
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Runtime run counts and latest run
+
+  /v1/runtime/runs:
+    get:
+      tags: [runtime]
+      summary: List runtime runs
+      parameters:
+        - in: query
+          name: agentId
+          schema:
+            type: string
+        - in: query
+          name: limit
+          schema:
+            type: integer
+        - in: query
+          name: redacted
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: Runtime run list
+    post:
+      tags: [runtime]
+      summary: Create a runtime run
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                agentId:
+                  type: string
+                runId:
+                  type: string
+                episodeId:
+                  type: string
+                lifecycleRunId:
+                  type: string
+                source:
+                  type: string
+                stage:
+                  type: string
+      responses:
+        '201':
+          description: Runtime run created
+
+  /v1/runtime/runs/{runId}:
+    get:
+      tags: [runtime]
+      summary: Inspect runtime run state and events
+      parameters:
+        - in: path
+          name: runId
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: agentId
+          schema:
+            type: string
+        - in: query
+          name: redacted
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: Runtime run inspection
+
+  /v1/runtime/runs/{runId}/events:
+    post:
+      tags: [runtime]
+      summary: Append a runtime event
+      parameters:
+        - in: path
+          name: runId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                type:
+                  type: string
+                stage:
+                  type: string
+                severity:
+                  type: string
+                  enum: [info, low, medium, high, critical]
+                message:
+                  type: string
+                payload:
+                  type: object
+                links:
+                  type: object
+      responses:
+        '201':
+          description: Runtime event appended
+
+  /v1/runtime/runs/{runId}/resume:
+    post:
+      tags: [runtime]
+      summary: Resume a runtime run
+      parameters:
+        - in: path
+          name: runId
+          required: true
+          schema:
+            type: string
+      responses:
+        '201':
+          description: Runtime run resumed
+
+  /v1/runtime/runs/{runId}/cancel:
+    post:
+      tags: [runtime]
+      summary: Cancel a runtime run
+      parameters:
+        - in: path
+          name: runId
+          required: true
+          schema:
+            type: string
+      responses:
+        '201':
+          description: Runtime run canceled
+
+  /v1/runtime/runs/{runId}/degrade:
+    post:
+      tags: [runtime]
+      summary: Mark a runtime run degraded
+      parameters:
+        - in: path
+          name: runId
+          required: true
+          schema:
+            type: string
+      responses:
+        '201':
+          description: Runtime run degraded
+
+  /v1/runtime/runs/{runId}/complete:
+    post:
+      tags: [runtime]
+      summary: Complete a runtime run
+      parameters:
+        - in: path
+          name: runId
+          required: true
+          schema:
+            type: string
+      responses:
+        '201':
+          description: Runtime run completed
+
+  /v1/runtime/events/export:
+    post:
+      tags: [runtime]
+      summary: Export runtime run events
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [runId]
+              properties:
+                runId:
+                  type: string
+                agentId:
+                  type: string
+                outputPath:
+                  type: string
+                format:
+                  type: string
+                  enum: [json, jsonl]
+                redacted:
+                  type: boolean
+                limit:
+                  type: integer
+      responses:
+        '201':
+          description: Runtime event export written
+
+  # ── Fixer RCA ─────────────────────────────────────────────────
+  /v1/fixer/rca:
+    get:
+      tags: [fixer]
+      summary: List Fixer RCA reports
+      parameters:
+        - in: query
+          name: agentId
+          schema:
+            type: string
+        - in: query
+          name: limit
+          schema:
+            type: integer
+        - in: query
+          name: redacted
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: Fixer RCA report list
+    post:
+      tags: [fixer]
+      summary: Generate Fixer RCA from a trace failure index
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [selector]
+              properties:
+                agentId:
+                  type: string
+                selector:
+                  type: string
+                  description: Run id, episode id, or trace-index id
+                runId:
+                  type: string
+                  description: Backward-compatible alias for selector
+      responses:
+        '201':
+          description: Fixer RCA report generated
+
+  /v1/fixer/rca/{selector}:
+    get:
+      tags: [fixer]
+      summary: Inspect one Fixer RCA report
+      parameters:
+        - in: path
+          name: selector
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: agentId
+          schema:
+            type: string
+        - in: query
+          name: redacted
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: Fixer RCA report
+
   # ── Identity ───────────────────────────────────────────────────
   /v1/identity/init:
     post:
@@ -2685,6 +3609,108 @@ paths:
         '200':
           description: Integrity score
 
+  /v1/memory/reasoning/writeback:
+    post:
+      tags: [memory]
+      summary: Write governed reasoning memory from an EpisodeRecord
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                agentId:
+                  type: string
+                episodeSelector:
+                  type: string
+                episode:
+                  type: string
+                runId:
+                  type: string
+                allowedConsumers:
+                  type: array
+                  items:
+                    type: string
+                    enum: [score, recommendation, fixer, studio]
+                ttlDays:
+                  type: integer
+                reviewDays:
+                  type: integer
+                summary:
+                  type: string
+      responses:
+        '201':
+          description: Reasoning memory writeback result with item and receipt decisions
+
+  /v1/memory/reasoning:
+    get:
+      tags: [memory]
+      summary: Retrieve active governed reasoning memory for a consumer
+      parameters:
+        - name: agentId
+          in: query
+          schema:
+            type: string
+        - name: consumer
+          in: query
+          schema:
+            type: string
+            enum: [score, recommendation, fixer, studio]
+        - name: query
+          in: query
+          schema:
+            type: string
+        - name: limit
+          in: query
+          schema:
+            type: integer
+        - name: redacted
+          in: query
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: Active reasoning memory items and citation-ready refs
+
+  /v1/memory/reasoning/receipts:
+    get:
+      tags: [memory]
+      summary: List governed reasoning memory writeback receipts
+      parameters:
+        - name: agentId
+          in: query
+          schema:
+            type: string
+        - name: limit
+          in: query
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Writeback receipts
+
+  /v1/memory/reasoning/{selector}:
+    get:
+      tags: [memory]
+      summary: Inspect one governed reasoning memory item
+      parameters:
+        - name: selector
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: agentId
+          in: query
+          schema:
+            type: string
+        - name: redacted
+          in: query
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: Reasoning memory item
+
   /v1/memory/extract:
     post:
       tags: [memory]
@@ -3113,6 +4139,90 @@ paths:
       responses:
         '200':
           description: Sanitized output
+
+  /v1/shield/exploit-confirmation/scopes:
+    get:
+      tags: [shield]
+      summary: List exploit-confirmation authorization scopes
+      description: Returns signed scopes that permit controlled exploit confirmation under ownership, time-window, technique, and safe-mode constraints.
+      responses:
+        '200':
+          description: Authorization scope list
+    post:
+      tags: [shield]
+      summary: Write exploit-confirmation authorization scope
+      description: Stores a signed fail-closed authorization scope. Confirmation cannot run without an active matching scope.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [scope]
+              properties:
+                scope:
+                  $ref: '#/components/schemas/ExploitConfirmationScope'
+      responses:
+        '201':
+          description: Authorization scope written
+
+  /v1/shield/exploit-confirmation/run:
+    post:
+      tags: [shield]
+      summary: Run controlled exploit confirmation
+      description: Converts an authorized security finding into safe proof. Public artifacts include hashes, receipts, and signal refs, not exploit instructions or raw payloads.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [task]
+              properties:
+                scopeId:
+                  type: string
+                task:
+                  $ref: '#/components/schemas/ExploitConfirmationTask'
+                nowTs:
+                  type: integer
+      responses:
+        '201':
+          description: Confirmation completed with safe proof
+        '200':
+          description: Confirmation blocked by policy or scope gate
+
+  /v1/shield/exploit-confirmation/proofs:
+    get:
+      tags: [shield]
+      summary: List safe exploit-confirmation proofs
+      responses:
+        '200':
+          description: Safe proof list
+
+  /v1/shield/exploit-confirmation/proofs/{proofId}/export:
+    post:
+      tags: [shield]
+      summary: Export safe exploit-confirmation proof
+      description: Exports redacted proof suitable for Vault or Passport evidence bundles without exploit instructions.
+      parameters:
+        - name: proofId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                outPath:
+                  type: string
+                redacted:
+                  type: boolean
+      responses:
+        '200':
+          description: Safe proof exported
 
   # ── Vault ──────────────────────────────────────────────────────
   /v1/vault/status:

@@ -113,11 +113,11 @@ blockquote{border-left:3px solid var(--accent);padding:12px 20px;margin:20px 0;c
 <div class="step">
 <p><span class="step-number">3</span> <strong>Initialize and score</strong></p>
 <pre><code>amc init</code></pre>
-<p>The interactive wizard walks you through setup — it'll ask a few questions about your agent and set up the evidence vault. Then run your quickscore:</p>
-<pre><code>amc quickscore</code></pre>
+<p>The interactive wizard walks you through setup — it'll ask a few questions about your agent and set up the evidence vault. Then run the full score:</p>
+<pre><code>amc</code></pre>
 
 <div class="output-label">Example Output</div>
-<div class="output-box">🧭 Agent Maturity Compass — Quick Score
+<div class="output-box">🧭 Agent Maturity Compass — Full Score
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 Agent:     my-langchain-agent
@@ -144,7 +144,7 @@ Run `amc improve` for actionable fixes →</div>
 
 <div class="step">
 <p><span class="step-number">4</span> <strong>Enable the LangChain adapter for observed evidence</strong></p>
-<p>The quickscore uses self-reported evidence by default (capped at 0.4× weight). To unlock the full score, enable the LangChain adapter to capture real execution data:</p>
+<p>The full score can use self-reported evidence when no runtime evidence is present (capped at 0.4× weight). To unlock the full score, enable the LangChain adapter to capture real execution data:</p>
 <pre><code>export LANGCHAIN_AMC_ENABLED=1
 amc evidence collect</code></pre>
 <p>The evidence collector wizard will guide you through connecting AMC's gateway proxy to your LangChain agent. Once connected, AMC captures every LLM call and tool use transparently — your agent runs exactly as before.</p>
@@ -185,7 +185,7 @@ amc fix
 amc guide --go
 
 <span style="color:#6a9955"># Re-score to see improvement</span>
-amc quickscore</code></pre>
+amc</code></pre>
 <p>AMC's guide system auto-detects LangChain and applies guardrails to 15 different config targets, including <code>AGENTS.md</code>, CI workflows, and framework-specific configuration files.</p>
 </div>
 
@@ -218,7 +218,7 @@ amc fix --target-level L3    <span style="color:#6a9955"># Creates GitHub Action
 
 <p>If your LangChain agent operates in the EU or serves EU users, you can get an instant regulatory risk classification:</p>
 
-<pre><code>amc quickscore --eu-ai-act</code></pre>
+<pre><code>amc compliance report --framework EU_AI_ACT</code></pre>
 
 <p>This maps your agent's gaps to specific EU AI Act articles and tells you exactly what needs to change for compliance. For the full compliance workflow, see our <a href="eu-ai-act-agents.html">EU AI Act guide</a>.</p>
 
@@ -236,7 +236,7 @@ amc fix --target-level L3    <span style="color:#6a9955"># Creates GitHub Action
 <div class="cta-box">
   <h3>Ready to score your agent?</h3>
   <p>Two minutes. Zero code changes. Real answers.</p>
-  <pre><code>npm install -g agent-maturity-compass && amc quickscore</code></pre>
+  <pre><code>npm install -g agent-maturity-compass && amc</code></pre>
 </div>
 
 <div class="share">

@@ -30,7 +30,7 @@ These blueprints are meant to reduce time-to-adopt by giving teams:
 
 ### Core flow
 1. Wrap or route OpenClaw traffic through AMC
-2. Run `amc quickscore`
+2. Run `amc`
 3. Run `amc assurance run --scope full`
 4. Inspect `amc trace inspect`
 5. Enable ongoing checks with `amc observe timeline`

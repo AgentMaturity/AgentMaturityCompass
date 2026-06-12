@@ -4,7 +4,7 @@ These are the smallest useful AMC workflows.
 
 ## 1. Get a first score
 ```bash
-npx agent-maturity-compass quickscore
+npx agent-maturity-compass
 ```
 
 ## 2. Add a CI trust gate
@@ -30,5 +30,5 @@ Use compliance/reporting workflows when you need audit-oriented evidence outputs
 
 ## Next
 - `docs/START_HERE.md`
-- `docs/AFTER_QUICKSCORE.md`
+- `docs/AFTER_FIRST_SCORE.md`
 - `docs/EXAMPLES_INDEX.md`

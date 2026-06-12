@@ -93,9 +93,24 @@ export function renderUnifiedResult(result: UnifiedRunResult, opts?: { ci?: bool
   }
 
   // Footer actions
+  if (result.lifecycleArtifactPath) {
+    lines.push(`  ${DIM}Lifecycle:${RESET} ${WHITE}${result.lifecycleArtifactPath}${RESET}`);
+  }
+  if (result.episodeRecordPath) {
+    lines.push(`  ${DIM}Episode:${RESET}   ${WHITE}${result.episodeRecordPath}${RESET}`);
+  }
+  if (result.findingProofsPath) {
+    lines.push(`  ${DIM}Proofs:${RESET}    ${WHITE}${result.findingProofsPath}${RESET}`);
+  }
+  if (result.lifecycleReceiptsPath) {
+    lines.push(`  ${DIM}Receipts:${RESET}  ${WHITE}${result.lifecycleReceiptsPath}${RESET}`);
+  }
+  if (result.observabilityPath) {
+    lines.push(`  ${DIM}Observe:${RESET}   ${WHITE}${result.observabilityPath}${RESET}`);
+  }
   lines.push(`  ${DIM}CI gate:${RESET}    ${WHITE}amc run --fail-below B${RESET}`);
   lines.push(`  ${DIM}Badge:${RESET}      ${WHITE}amc badge --style full${RESET}`);
-  lines.push(`  ${DIM}Fix mode:${RESET}   ${WHITE}amc run --fix${RESET}`);
+  lines.push(`  ${DIM}Improve:${RESET}    ${WHITE}amc mechanic plan${RESET}`);
   lines.push("");
 
   return lines.join("\n");

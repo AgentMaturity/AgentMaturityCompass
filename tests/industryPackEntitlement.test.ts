@@ -1,9 +1,10 @@
-import { mkdtempSync, readFileSync, rmSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, test } from "vitest";
 import {
   activateIndustryPackAccess,
+  activateIndustryPackAccessOnline,
   buildIndustryPackCheckoutUrl,
   createIndustryPackLicenseKey,
   assertIndustryPackAccess,
@@ -11,7 +12,7 @@ import {
   toIndustryPackCatalogItem,
   verifyIndustryPackLicenseKey
 } from "../src/domains/industryPackEntitlement.js";
-import { getIndustryPack } from "../src/domains/industryPacks.js";
+import { getIndustryPack, listIndustryPacks } from "../src/domains/industryPacks.js";
 
 const workspaces: string[] = [];
 
@@ -37,6 +38,16 @@ afterEach(() => {
 });
 
 describe("industry pack entitlement", () => {
+  test("catalog exposes exactly 40 locked industry packs by default", () => {
+    const workspace = createWorkspace();
+    const entitlement = getIndustryPackEntitlement(workspace, {} as NodeJS.ProcessEnv);
+    const catalog = listIndustryPacks().map((pack) => toIndustryPackCatalogItem(pack, entitlement));
+
+    expect(catalog).toHaveLength(40);
+    expect(catalog.every((pack) => pack.locked)).toBe(true);
+    expect(new Set(catalog.map((pack) => pack.packId)).size).toBe(40);
+  });
+
   test("locks packs by default and redacts paid details", () => {
     const workspace = createWorkspace();
     const entitlement = getIndustryPackEntitlement(workspace, {} as NodeJS.ProcessEnv);
@@ -110,6 +121,33 @@ describe("industry pack entitlement", () => {
     expect(verifyIndustryPackLicenseKey(`${activeKey}x`).valid).toBe(false);
     expect(verifyIndustryPackLicenseKey(expiredKey).valid).toBe(false);
     expect(verifyIndustryPackLicenseKey(expiredKey).reason).toMatch(/expired/);
+  });
+
+  test("expired local entitlement returns locked state", () => {
+    const workspace = createWorkspace();
+    mkdirSync(join(workspace, ".amc"), { recursive: true });
+    writeFileSync(join(workspace, ".amc", "industry-packs-access.json"), JSON.stringify({
+      active: true,
+      planId: "industry-packs-monthly",
+      expiresAt: "2000-01-01T00:00:00.000Z",
+      licenseKeySha256: "redacted"
+    }));
+
+    const entitlement = getIndustryPackEntitlement(workspace, {} as NodeJS.ProcessEnv);
+    expect(entitlement.active).toBe(false);
+    expect(entitlement.source).toBe("none");
+  });
+
+  test("online activation fails closed when verification is offline", async () => {
+    const workspace = createWorkspace();
+    await expect(activateIndustryPackAccessOnline({
+      workspace,
+      licenseKey: "not-a-license",
+      fetchImpl: async () => {
+        throw new Error("offline");
+      }
+    })).rejects.toThrow(/offline/);
+    expect(getIndustryPackEntitlement(workspace, {} as NodeJS.ProcessEnv).active).toBe(false);
   });
 
   test("checkout URLs include the Industry Packs plan and return targets", () => {

@@ -13,6 +13,7 @@ import { spawnSync } from "node:child_process";
 import { parse as parseYaml } from "yaml";
 import { listAgents } from "../fleet/registry.js";
 import { getAgentPaths, resolveAgentId } from "../fleet/paths.js";
+import { createOnboardingState, loadOnboardingState } from "../setup/onboardingState.js";
 import { runDiagnostic, generateReport, loadRunReport } from "../diagnostic/runner.js";
 import { runAutoAnswer } from "../diagnostic/autoAnswer/autoAnswerEngine.js";
 import { runAssurance } from "../assurance/assuranceRunner.js";
@@ -102,6 +103,7 @@ import { loadLeaseRevocations, revokeLease, verifyLeaseRevocationsSignature } fr
 import { verifyLeaseToken } from "../leases/leaseVerifier.js";
 import { extractLeaseCarrier } from "../leases/leaseCarriers.js";
 import { serveConsolePath } from "../console/consoleServer.js";
+import { handleStudioApiDelegation } from "./apiDelegation.js";
 import { openLedger } from "../ledger/ledger.js";
 import { sha256Hex } from "../utils/hash.js";
 import {
@@ -198,6 +200,9 @@ import {
   experimentCreateCli,
   experimentGateCli,
   experimentListCli,
+  experimentOptimizeCli,
+  experimentOptimizerListCli,
+  experimentOptimizerShowCli,
   experimentRunCli,
   experimentSetBaselineCli,
   experimentSetCandidateCli
@@ -214,6 +219,7 @@ import { compareNodeScorecards, loadLatestOrgScorecard } from "../org/orgScoreca
 import { computeOrgScorecard, nodeHierarchy, recomputeAndPersistOrgScorecard } from "../org/orgEngine.js";
 import { renderOrgCompareMarkdown, renderOrgNodeReportMarkdown, renderOrgSystemicMarkdown } from "../org/orgReports.js";
 import { generateOrgCommitmentPlan, generateOrgEducationBrief, generateOrgOwnershipPlan } from "../org/orgCommitments.js";
+import { listOrgRuns, loadOrgRun, orgRunRoleDefinitions, orgRunSummaryForUi, parseOrgRoleList, runOrg } from "../org/orgRun.js";
 import { OrgSseHub } from "../org/orgSse.js";
 import {
   applyTransformMapForApi,
@@ -869,17 +875,6 @@ function normalizeMetricRoute(pathname: string): string {
     return part;
   });
   return `/${normalized.join("/")}`;
-}
-
-const PUBLIC_API_V1_PATHS = new Set<string>([
-  "/api/v1/health",
-  "/api/v1/chat/completions",
-  "/api/v1/completions",
-  "/api/v1/embeddings"
-]);
-
-function isPublicApiV1Path(pathname: string): boolean {
-  return PUBLIC_API_V1_PATHS.has(pathname);
 }
 
 function backupStatusSummary(workspace: string): {
@@ -1543,6 +1538,8 @@ function pickAgentApproval(workspace: string, approvalId: string): { agentId: st
 
 export async function startStudioApiServer(options: StudioApiOptions): Promise<{
   server: Server;
+  host: string;
+  port: number;
   url: string;
   close: () => Promise<void>;
 }> {
@@ -1777,38 +1774,26 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
 
       // ── AMC REST API v1 ─────────────────────────────────────────────
       if (pathname.startsWith("/api/v1/")) {
-        const quotaAuth = authenticate(req, options.workspace, options.token);
-        const quotaKey = quotaAuth?.username ?? quotaAuth?.agentId ?? `ip:${clientIp}`;
-        const privileged = quotaAuth?.isAdmin === true || (quotaAuth?.roles.has("OWNER") ?? false);
-        const quota = (privileged ? privilegedApiLimiter : apiLimiter)(`api:${quotaKey}`);
-        setRateLimitHeaders(res, quota);
-        if (!quota.allowed) {
-          json(res, 429, { error: "API rate limit exceeded" });
-          return;
-        }
-        if (!isPublicApiV1Path(pathname)) {
-          const apiAuth = authenticate(req, options.workspace, options.token);
-          if (!apiAuth) {
-            json(res, 401, { error: "missing or invalid token" });
-            return;
-          }
-          if (!apiAuth.isAdmin && apiAuth.agentId) {
-            json(res, 403, { error: "agent or lease auth cannot access internal /api/v1 routes" });
-            return;
-          }
-          if (
-            !requireRoles({
-              auth: apiAuth,
-              res,
-              workspace: options.workspace,
-              roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"]
-            })
-          ) {
-            return;
-          }
-        }
-        const { handleApiRoute } = await import("../api/index.js");
-        const handled = await handleApiRoute(pathname, req.method ?? "GET", req, res, options.workspace, options.token);
+        const handled = await handleStudioApiDelegation({
+          pathname,
+          method,
+          clientIp,
+          workspace: options.workspace,
+          token: options.token,
+          req,
+          res,
+          authenticate,
+          requireRoles: (params) => requireRoles({
+            auth: params.auth as AuthContext,
+            res: params.res,
+            workspace: params.workspace,
+            roles: params.roles as UserRole[]
+          }),
+          json,
+          apiLimiter,
+          privilegedApiLimiter,
+          setRateLimitHeaders: (response, decision) => setRateLimitHeaders(response, decision)
+        });
         if (handled) return;
       }
 
@@ -2710,6 +2695,89 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           signature: verifyOrgConfigSignature(options.workspace),
           tree: nodeHierarchy(config)
         });
+        return;
+      }
+
+      if (pathname === "/org/roles" && req.method === "GET") {
+        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
+          return;
+        }
+        const roles = orgRunRoleDefinitions();
+        json(res, 200, { roles, total: roles.length });
+        return;
+      }
+
+      if (pathname === "/org/runs" && req.method === "GET") {
+        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
+          return;
+        }
+        const runs = listOrgRuns({ workspace: options.workspace, limit: 25, redacted: true });
+        json(res, 200, {
+          runs,
+          summaries: runs.map((run) => orgRunSummaryForUi(run)),
+          total: runs.length
+        });
+        return;
+      }
+
+      if (pathname === "/org/runs" && req.method === "POST") {
+        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER", "OPERATOR"] })) {
+          return;
+        }
+        if (requiresReadOnlyMode(options.workspace)) {
+          json(res, 403, { error: "users signature invalid; write operations blocked" });
+          return;
+        }
+        const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
+        const parsed = body ? (JSON.parse(body) as {
+          roles?: string[] | string;
+          goal?: string;
+          orgRunId?: string;
+          heartbeatPolicy?: {
+            intervalMinutes?: number;
+            maxStaleMinutes?: number;
+            plateauAfterHeartbeats?: number;
+          };
+        }) : {};
+        const result = runOrg({
+          workspace: options.workspace,
+          roles: parseOrgRoleList(parsed.roles),
+          goal: parsed.goal,
+          orgRunId: parsed.orgRunId,
+          heartbeatPolicy: parsed.heartbeatPolicy,
+          source: "studio",
+          command: "Studio org run"
+        });
+        const audit = writeStudioAuditEvent({
+          workspace: options.workspace,
+          auditType: "ORG_RUN_CREATED",
+          severity: result.artifact.status === "completed" ? "LOW" : "MEDIUM",
+          payload: {
+            orgRunId: result.artifact.orgRunId,
+            roleCount: result.artifact.summary.roleCount,
+            status: result.artifact.status
+          }
+        });
+        emitOrgEvent("ORG_RUN_CREATED");
+        json(res, 201, {
+          ...result,
+          summary: orgRunSummaryForUi(result.artifact),
+          auditEventId: audit.eventId
+        });
+        return;
+      }
+
+      const orgRunGetMatch = pathname.match(/^\/org\/runs\/([^/]+)$/);
+      if (orgRunGetMatch && req.method === "GET") {
+        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
+          return;
+        }
+        const run = loadOrgRun({
+          workspace: options.workspace,
+          selector: decodeURIComponent(orgRunGetMatch[1]!),
+          redacted: true
+        });
+        json(res, 200, { run, summary: orgRunSummaryForUi(run) });
         return;
       }
 
@@ -7772,6 +7840,64 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         return;
       }
 
+      if (pathname === "/experiments/optimizers" && req.method === "GET") {
+        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
+          return;
+        }
+        const agentId = resolveAgentId(options.workspace, url.searchParams.get("agentId") ?? "default");
+        const limit = Math.max(1, Number(url.searchParams.get("limit") ?? "10") || 10);
+        json(res, 200, {
+          agentId,
+          rows: experimentOptimizerListCli({
+            workspace: options.workspace,
+            agentId,
+            limit,
+            redacted: true
+          })
+        });
+        return;
+      }
+
+      if (pathname === "/experiments/optimize" && req.method === "POST") {
+        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER", "OPERATOR"] })) {
+          return;
+        }
+        const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
+        const parsed = body ? (JSON.parse(body) as { agentId?: string; rcaSelector?: string; rca?: string }) : {};
+        const agentId = resolveAgentId(options.workspace, parsed.agentId ?? "default");
+        const out = experimentOptimizeCli({
+          workspace: options.workspace,
+          agentId,
+          rcaSelector: parsed.rcaSelector ?? parsed.rca ?? "latest"
+        });
+        json(res, 200, {
+          ...out,
+          run: experimentOptimizerShowCli({
+            workspace: options.workspace,
+            agentId,
+            selector: out.run.optimizerRunId,
+            redacted: true
+          })
+        });
+        return;
+      }
+
+      const optimizerMatch = pathname.match(/^\/experiments\/optimizers\/([^/]+)$/);
+      if (optimizerMatch && req.method === "GET") {
+        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
+          return;
+        }
+        const selector = decodeURIComponent(optimizerMatch[1] ?? "");
+        const agentId = resolveAgentId(options.workspace, url.searchParams.get("agentId") ?? "default");
+        json(res, 200, experimentOptimizerShowCli({
+          workspace: options.workspace,
+          agentId,
+          selector,
+          redacted: true
+        }));
+        return;
+      }
+
       if (pathname === "/experiments/create" && req.method === "POST") {
         if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER", "OPERATOR"] })) {
           return;
@@ -8616,6 +8742,32 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         return;
       }
 
+      if (pathname === "/onboarding/status" && req.method === "GET") {
+        const current = loadOnboardingState(options.workspace) ?? createOnboardingState({
+          workspace: options.workspace,
+          agentId: auth.agentId ?? "default",
+          mode: "studio"
+        });
+        json(res, 200, { state: current });
+        return;
+      }
+
+      if (pathname === "/onboarding/run" && method === "POST") {
+        const result = await cliBridgeExec(options.workspace, {
+          command: "amc",
+          format: "json",
+          timeout: 120_000
+        });
+        const state = loadOnboardingState(options.workspace) ?? createOnboardingState({
+          workspace: options.workspace,
+          agentId: auth.agentId ?? "default",
+          mode: "studio",
+          status: result.ok ? "complete" : "failed"
+        });
+        json(res, result.ok ? 200 : 422, { result, state });
+        return;
+      }
+
       /* ════════════════════════════════════════════════
          CLI BRIDGE — exposes all CLI commands via API
          ════════════════════════════════════════════════ */
@@ -8678,10 +8830,15 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
     server.once("error", rejectPromise);
     server.listen(options.port, options.host, () => resolvePromise());
   });
+  const address = server.address();
+  const host = typeof address === "object" && address ? address.address : options.host;
+  const port = typeof address === "object" && address ? address.port : options.port;
 
   return {
     server,
-    url: `http://${options.host}:${options.port}`,
+    host,
+    port,
+    url: `http://${host}:${port}`,
     close: async () => {
       shuttingDown = true;
       for (const socket of openSockets) {

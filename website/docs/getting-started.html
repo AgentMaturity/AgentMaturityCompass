@@ -39,6 +39,7 @@
       <a href="#install">Installation</a>
       <a href="#first-score">Your First Score</a>
       <a href="#understand-results">Understanding Results</a>
+      <a href="#surfaces">8 Surfaces</a>
       <a href="#next-steps">Next Steps</a>
     </div>
     <div class="sidebar-section">
@@ -98,11 +99,11 @@ brew install agent-maturity-compass</code></pre>
       <pre><code><span class="comment"># Build the quickstart image</span>
 docker build -t amc-quickstart -f docker/Dockerfile.quickstart .
 
-<span class="comment"># Run interactive quick score</span>
-docker run -it --rm amc-quickstart amc init
+<span class="comment"># Run the full score</span>
+docker run -it --rm amc-quickstart amc
 
 <span class="comment"># Non-interactive</span>
-docker run -it --rm -e AMC_VAULT_PASSPHRASE=demo amc-quickstart amc quickscore</code></pre>
+docker run -it --rm -e AMC_VAULT_PASSPHRASE=demo amc-quickstart amc</code></pre>
 
       <h3>From source</h3>
       <pre><code>git clone https://github.com/AgentMaturity/AgentMaturityCompass.git
@@ -112,8 +113,8 @@ npm run build
 npm link</code></pre>
 
       <!-- First Score -->
-      <h2 id="first-score">Your First Score in 2 Minutes</h2>
-      <p>Three commands. That's it.</p>
+      <h2 id="first-score">Your First Full Score in 2 Minutes</h2>
+      <p>One command from your agent project. That's it.</p>
 
       <div class="step">
         <div class="step-num">1</div>
@@ -126,29 +127,34 @@ npm link</code></pre>
       <div class="step">
         <div class="step-num">2</div>
         <div class="step-content">
-          <h4>Initialize AMC</h4>
-          <pre><code>amc init</code></pre>
-          <p>This walks you through a short interactive setup. It'll ask for a passphrase to protect your evidence vault — pick something memorable, or press Enter to auto-generate one.</p>
+          <h4>Run AMC</h4>
+          <pre><code>amc</code></pre>
+          <p>AMC creates the workspace if needed, detects what is available, runs the full maturity score, and prints the next action.</p>
         </div>
       </div>
 
       <div class="step">
         <div class="step-num">3</div>
         <div class="step-content">
-          <h4>Get your score</h4>
-          <pre><code>amc quickscore</code></pre>
-          <p>Answer a few questions about your agent. AMC produces a maturity score from <strong>L0</strong> (no controls) to <strong>L5</strong> (fully verified), with a breakdown across 5 dimensions and specific actions to improve.</p>
+          <h4>Open Studio when ready</h4>
+          <pre><code>amc up</code></pre>
+          <p>Studio shows the same score, lifecycle evidence, reports, assurance packs, domain packs, run history, and advanced org runs in a local dashboard.</p>
         </div>
       </div>
 
       <div class="callout callout-orange">
-        <strong>💡 Pro tip — Share your score</strong>
-        Run <code>amc quickscore --share</code> to generate a markdown badge and summary you can paste into your GitHub README.
+        <strong>💡 Need a fast demo check?</strong>
+        Run <code>amc quickscore --rapid</code> only when you want a lightweight pulse check. Use <code>amc</code> for the full score.
+      </div>
+
+      <div class="callout">
+        <strong>Expanded lifecycle assessment:</strong>
+        Run <code>amc run --question-set lifecycle</code> when you want the explicit 260-question set covering lifecycle governance, evidence binding, runtime watch, proof exports, reasoning memory, and fleet operation. Default scoring stays on the stable 240-question set.
       </div>
 
       <!-- Understanding Results -->
       <h2 id="understand-results">Understanding Your Results</h2>
-      <p>Your quickscore output includes:</p>
+      <p>Your full score output includes:</p>
 
       <div class="card-grid">
         <div class="card">
@@ -161,7 +167,7 @@ npm link</code></pre>
         </div>
         <div class="card">
           <h4>📋 Gap Analysis</h4>
-          <p>Specific gaps with severity tags — 🔴 Critical, 🟡 High, 🔵 Medium — and concrete actions to fix each one.</p>
+          <p>Specific gaps with severity, proof chains, evidence episodes, resource refs, and concrete actions to fix each one.</p>
         </div>
         <div class="card">
           <h4>🏷️ README Badge</h4>
@@ -197,6 +203,24 @@ npm link</code></pre>
         </div>
       </div>
 
+      <h2 id="surfaces">The 8 AMC Surfaces</h2>
+      <p>AMC stays simple by keeping every feature under one trust stack.</p>
+      <table>
+        <thead>
+          <tr><th>Surface</th><th>Promise</th><th>What it does</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>Score</strong></td><td>Score trust before you ship</td><td>Evidence-weighted scoring across live execution behavior instead of brochure claims.</td></tr>
+          <tr><td><strong>Shield</strong></td><td>Attack your agent before attackers do</td><td>Runs adversarial packs against prompt injection, leakage, memory poisoning, and sycophancy.</td></tr>
+          <tr><td><strong>Enforce</strong></td><td>Wrap agent actions in policy</td><td>Approval gates, scoped permissions, and runtime controls for sensitive operations.</td></tr>
+          <tr><td><strong>Vault</strong></td><td>Cryptographically prove what happened</td><td>Signs evidence, verifies ledgers, and gives auditors a tamper-evident chain of custody.</td></tr>
+          <tr><td><strong>Watch</strong></td><td>See trust drift before it hurts you</td><td>Monitors posture over time and surfaces anomalies, regressions, and risky changes.</td></tr>
+          <tr><td><strong>Comply</strong></td><td>Map trust evidence to real frameworks</td><td>Turns technical evidence into regulator-readable artifacts for audits and risk reviews.</td></tr>
+          <tr><td><strong>Fleet</strong></td><td>Govern many agents like an actual platform</td><td>Benchmarks multiple agents, compares risk posture, and enforces org-wide trust baselines.</td></tr>
+          <tr><td><strong>Passport</strong></td><td>Make trust portable between environments</td><td>Issues a portable, signed trust identity that can move between tools, teams, and environments.</td></tr>
+        </tbody>
+      </table>
+
       <!-- Next Steps -->
       <h2 id="next-steps">Next Steps</h2>
       <p>Once you have your first score, here's what to explore:</p>
@@ -216,7 +240,7 @@ npm link</code></pre>
         </div>
         <div class="card">
           <h4>⚖️ Check compliance</h4>
-          <p>Use <code>amc quickscore --eu-ai-act</code> for EU AI Act risk classification, or explore the full <a href="compliance.html">compliance guide</a>.</p>
+          <p>Use <code>amc compliance report --framework EU_AI_ACT</code> for EU AI Act mapping, or explore the full <a href="compliance.html">compliance guide</a>.</p>
         </div>
       </div>
 
@@ -232,6 +256,35 @@ npm link</code></pre>
           <tr><td><code>amc doctor</code></td><td>Check runtime and workspace health</td></tr>
           <tr><td><code>amc up</code></td><td>Start AMC Studio (gateway, proxy, dashboard, API)</td></tr>
           <tr><td><code>amc evidence collect</code></td><td>Interactive wizard to connect your agent</td></tr>
+          <tr><td><code>amc evidence lifecycle list|inspect|export --redacted</code></td><td>Open or export the lifecycle artifacts behind full-score runs</td></tr>
+          <tr><td><code>amc evidence episodes list|inspect|export --redacted</code></td><td>Open or export the evidence episodes behind full-score runs</td></tr>
+          <tr><td><code>amc evidence decisions list|inspect</code></td><td>Open recommendation and evidence-request receipts</td></tr>
+          <tr><td><code>amc evidence decisions observe &lt;run&gt;</code></td><td>Update older receipts with observed outcomes from a later full-score run</td></tr>
+          <tr><td><code>amc evidence observability list|inspect</code></td><td>Open component attribution, experience signals, and decision-chain records</td></tr>
+          <tr><td><code>amc memory writeback &lt;episode&gt;</code></td><td>Store a redacted, evidence-backed reasoning lesson with expiry and a receipt</td></tr>
+          <tr><td><code>amc memory retrieve --consumer studio</code></td><td>Retrieve active memory lessons with citations for score, recommendations, fixer, or Studio</td></tr>
+          <tr><td><code>amc report &lt;run&gt;</code></td><td>Review confidence, uncertainty, low-evidence downgrades, and auto-fix review gates</td></tr>
+          <tr><td><code>amc trace index|failures</code></td><td>Inspect distilled trace indexes and recurring failure clusters</td></tr>
+          <tr><td><code>amc mechanic rca run &lt;run&gt;</code></td><td>Create RCA, regression tests, rollback pointers, and governed Enforce fix proposals</td></tr>
+          <tr><td><code>amc mechanic rca list|show</code></td><td>Review signed Fixer RCA reports</td></tr>
+          <tr><td><code>amc experiment optimize --rca latest</code></td><td>Create isolated candidates with held-out validation, leakage checks, Pareto ranking, and receipts</td></tr>
+          <tr><td><code>amc experiment optimizer-list|optimizer-show</code></td><td>Review accepted and rejected optimizer candidates</td></tr>
+          <tr><td><code>amc resource snapshot|validate|apply|rollback</code></td><td>Record, gate, accept, and rollback the resources governed by Enforce</td></tr>
+          <tr><td><code>amc firewall enable --mode block</code></td><td>Protect live Bridge/Gateway traffic with allow, warn, or block decisions</td></tr>
+          <tr><td><code>amc firewall events|export --redacted</code></td><td>Inspect and export signed runtime decisions for audit or SIEM review</td></tr>
+          <tr><td><code>amc shield confirm scope-write --file security-scope.json</code></td><td>Authorize controlled exploit confirmation with ownership, time window, safe mode, and allowed techniques</td></tr>
+          <tr><td><code>amc shield confirm run --scope &lt;scope&gt; --task finding-task.json</code></td><td>Convert an authorized finding into safe proof with hashes, signal refs, and receipts</td></tr>
+          <tr><td><code>amc shield confirm export &lt;proof&gt; --out safe-proof.json</code></td><td>Export redacted confirmation proof without exploit instructions</td></tr>
+          <tr><td><code>amc import &lt;path&gt; --dry-run</code></td><td>Detect neutral traces, runs, graphs, configs, memory, evaluator outputs, and benchmarks before writing</td></tr>
+          <tr><td><code>amc import &lt;path&gt;</code></td><td>Write redacted imported evidence into episodes, lifecycle runs, resource manifests, and trace indexes</td></tr>
+          <tr><td><code>amc strategy compare --file strategies.json</code></td><td>Compare inference strategies by score, cost, latency, risk, confidence, and evidence</td></tr>
+          <tr><td><code>amc strategy compare --file strategies.json --apply --approve</code></td><td>Commit the recommended model route only with policy approval, manifest evidence, and rollback data</td></tr>
+          <tr><td><code>amc runtime create|event|inspect</code></td><td>Persist connected-agent run state and redacted event streams shared by CLI and Studio</td></tr>
+          <tr><td><code>amc fleet graph write --file graph.json</code></td><td>Register typed nodes, handoffs, tools, contracts, policies, permissions, and invariants</td></tr>
+          <tr><td><code>amc fleet graph validate</code></td><td>Check graph contracts, unsafe permissions, cycles, and fan-out before fleet scoring</td></tr>
+          <tr><td><code>amc fleet score --all --stream</code></td><td>Full-score every configured agent with progressive results</td></tr>
+          <tr><td><code>amc fleet lifecycle list|show</code></td><td>Inspect parent/child fleet lifecycle evidence, topology, typed graph digest, and cascade failures</td></tr>
+          <tr><td><code>npm run release:gate</code></td><td>Run the release gate for CLI, Studio assets, OpenAPI, docs drift, domain packs, and receipt output</td></tr>
           <tr><td><code>amc badge</code></td><td>Generate a maturity badge for your README</td></tr>
           <tr><td><code>amc assurance run --scope full</code></td><td>Run the built-in red team across the full assurance library</td></tr>
           <tr><td><code>amc observe timeline</code></td><td>See score progression, evidence volume, and recent anomalies</td></tr>

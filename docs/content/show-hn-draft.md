@@ -11,7 +11,7 @@ I built AMC (Agent Maturity Compass) because I got tired of agents that say "I'm
 AMC is an open-source CLI that scores AI agents from L0 (dangerous) to L5 (production-ready) based on what they actually do — not what their docs claim. One command, no account:
 
 ```
-npx agent-maturity-compass quickscore
+npx agent-maturity-compass
 ```
 
 What makes it different from eval tools like Promptfoo:

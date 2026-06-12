@@ -14,6 +14,7 @@ import { enforceBridgePolicy } from "./bridgePolicyEnforcer.js";
 import { preparePromptForBridgeRequest, validateBridgeResponseWithPromptPolicy } from "../prompt/promptPackApi.js";
 import type { PromptPackProvider } from "../prompt/promptPackSchema.js";
 import type { PromptPolicy } from "../prompt/promptPolicySchema.js";
+import { evaluateRuntimeFirewall, runtimeFirewallEnabled, type RuntimeFirewallDecision } from "../runtime/firewall.js";
 
 interface HandleBridgeRequestOptions {
   workspace: string;
@@ -171,6 +172,57 @@ function auditDeniedBridgeCall(params: {
   } finally {
     ledger.close();
   }
+}
+
+function bridgeFirewallAuditSeverity(decision: RuntimeFirewallDecision): "LOW" | "MEDIUM" | "HIGH" {
+  if (decision.severity === "critical" || decision.severity === "high") return "HIGH";
+  if (decision.severity === "medium") return "MEDIUM";
+  return "LOW";
+}
+
+function bridgeFirewallAuditType(decision: RuntimeFirewallDecision): string {
+  if (decision.action === "block") return "RUNTIME_FIREWALL_BLOCKED";
+  if (decision.action === "warn") return "RUNTIME_FIREWALL_WARNED";
+  return "RUNTIME_FIREWALL_ALLOWED";
+}
+
+function setBridgeFirewallHeaders(res: ServerResponse, decision: RuntimeFirewallDecision): void {
+  res.setHeader("x-amc-firewall-decision", decision.decisionId);
+  res.setHeader("x-amc-firewall-action", decision.action);
+  res.setHeader("x-amc-firewall-risk", String(decision.riskScore));
+  res.setHeader("x-amc-firewall-receipt", decision.links.receiptId);
+}
+
+function appendBridgeFirewallAudit(params: {
+  ledger: ReturnType<typeof openLedger>;
+  sessionId: string;
+  decision: RuntimeFirewallDecision;
+  requestId: string;
+  agentId: string;
+  provider: string;
+  model: string | null;
+}): void {
+  appendBridgeAudit({
+    ledger: params.ledger,
+    sessionId: params.sessionId,
+    auditType: bridgeFirewallAuditType(params.decision),
+    severity: bridgeFirewallAuditSeverity(params.decision),
+    details: {
+      requestId: params.requestId,
+      agentId: params.agentId,
+      provider: params.provider,
+      model: params.model,
+      direction: params.decision.direction,
+      decisionId: params.decision.decisionId,
+      action: params.decision.action,
+      riskScore: params.decision.riskScore,
+      reasons: params.decision.reasons,
+      receiptId: params.decision.links.receiptId,
+      receiptSha256: params.decision.links.receiptSha256,
+      eventPath: params.decision.eventPath,
+      signaturePath: params.decision.signaturePath
+    }
+  });
 }
 
 async function forwardToGateway(params: {
@@ -641,6 +693,69 @@ export async function handleBridgeRequest(options: HandleBridgeRequestOptions): 
       });
     }
 
+    let firewallActive = false;
+    try {
+      firewallActive = runtimeFirewallEnabled(options.workspace);
+    } catch (error) {
+      appendBridgeAudit({
+        ledger,
+        sessionId,
+        auditType: "RUNTIME_FIREWALL_POLICY_UNREADABLE",
+        severity: "HIGH",
+        details: {
+          requestId,
+          agentId: lease.payload.agentId,
+          provider: route.provider,
+          model: intent.model,
+          reason: String(error)
+        }
+      });
+      ledger.sealSession(sessionId);
+      writeJson(options.res, 503, {
+        error: "RUNTIME_FIREWALL_POLICY_UNREADABLE",
+        reason: String(error)
+      });
+      return true;
+    }
+
+    let requestFirewallDecision: RuntimeFirewallDecision | null = null;
+    if (firewallActive) {
+      requestFirewallDecision = evaluateRuntimeFirewall({
+        workspace: options.workspace,
+        content: preparedRequestBody.toString("utf8"),
+        direction: "request",
+        source: "bridge",
+        agentId: lease.payload.agentId,
+        provider: route.provider,
+        model: intent.model,
+        route: route.gatewayPath,
+        method: "POST",
+        runId,
+        bridgeRequestId: requestId,
+        requirePolicy: true
+      });
+      appendBridgeFirewallAudit({
+        ledger,
+        sessionId,
+        decision: requestFirewallDecision,
+        requestId,
+        agentId: lease.payload.agentId,
+        provider: route.provider,
+        model: intent.model
+      });
+      if (requestFirewallDecision.action === "block") {
+        ledger.sealSession(sessionId);
+        setBridgeFirewallHeaders(options.res, requestFirewallDecision);
+        writeJson(options.res, 403, {
+          error: "RUNTIME_FIREWALL_BLOCKED",
+          decisionId: requestFirewallDecision.decisionId,
+          receiptId: requestFirewallDecision.links.receiptId,
+          reasons: requestFirewallDecision.reasons
+        });
+        return true;
+      }
+    }
+
     const streamPassthrough = isStreamingBridgeRequest(options.req, preparedBodyJson);
     if (
       shouldBlockStreamingForTruthguard({
@@ -704,11 +819,16 @@ export async function handleBridgeRequest(options: HandleBridgeRequestOptions): 
         options.res.setHeader("x-amc-prompt-pack-id", promptBinding.packId);
       }
 
-      const streamedBody = await readUpstreamBody(response.body, async (chunk) => {
-        if (!options.res.write(chunk)) {
-          await once(options.res, "drain");
-        }
-      });
+      const streamedBody = await readUpstreamBody(
+        response.body,
+        firewallActive
+          ? undefined
+          : async (chunk) => {
+              if (!options.res.write(chunk)) {
+                await once(options.res, "drain");
+              }
+            }
+      );
       let responseJson: unknown = {};
       try {
         responseJson = streamedBody.byteLength > 0 ? JSON.parse(streamedBody.toString("utf8")) : {};
@@ -717,6 +837,9 @@ export async function handleBridgeRequest(options: HandleBridgeRequestOptions): 
       }
       const usage = extractUsage(responseJson);
       const responseModel = extractModel(responseJson) ?? intent.model;
+      let finalStreamStatus = response.status;
+      let finalStreamBody = streamedBody;
+      let streamFirewallDecision: RuntimeFirewallDecision | null = null;
 
       if (promptPolicy) {
         appendBridgeAudit({
@@ -733,6 +856,48 @@ export async function handleBridgeRequest(options: HandleBridgeRequestOptions): 
           }
         });
       }
+      if (firewallActive) {
+        streamFirewallDecision = evaluateRuntimeFirewall({
+          workspace: options.workspace,
+          content: streamedBody.toString("utf8"),
+          direction: "response",
+          source: "bridge",
+          agentId: lease.payload.agentId,
+          provider: route.provider,
+          model: responseModel,
+          route: route.gatewayPath,
+          method: "POST",
+          runId,
+          bridgeRequestId: requestId,
+          requirePolicy: true
+        });
+        appendBridgeFirewallAudit({
+          ledger,
+          sessionId,
+          decision: streamFirewallDecision,
+          requestId,
+          agentId: lease.payload.agentId,
+          provider: route.provider,
+          model: responseModel
+        });
+        setBridgeFirewallHeaders(options.res, streamFirewallDecision);
+        if (streamFirewallDecision.action === "block") {
+          finalStreamStatus = 422;
+          finalStreamBody = Buffer.from(
+            JSON.stringify({
+              error: {
+                code: "RUNTIME_FIREWALL_BLOCKED",
+                decisionId: streamFirewallDecision.decisionId,
+                receiptId: streamFirewallDecision.links.receiptId,
+                reasons: streamFirewallDecision.reasons
+              }
+            }),
+            "utf8"
+          );
+          options.res.statusCode = finalStreamStatus;
+          options.res.setHeader("content-type", "application/json; charset=utf-8");
+        }
+      }
 
       const responseReceipt = appendBridgeResponseReceipt({
         ledger,
@@ -744,9 +909,9 @@ export async function handleBridgeRequest(options: HandleBridgeRequestOptions): 
           runId,
           provider: route.provider,
           model: responseModel,
-          statusCode: response.status,
+          statusCode: finalStreamStatus,
           usage,
-          bodySha256: bridgeSha256(streamedBody),
+          bodySha256: bridgeSha256(finalStreamBody),
           promptPackSha256: promptBinding?.packSha256,
           promptPackId: promptBinding?.packId,
           promptTemplateId: promptBinding?.templateId,
@@ -766,6 +931,11 @@ export async function handleBridgeRequest(options: HandleBridgeRequestOptions): 
       });
 
       ledger.sealSession(sessionId);
+      if (firewallActive) {
+        if (!options.res.write(finalStreamBody)) {
+          await once(options.res, "drain");
+        }
+      }
       options.res.addTrailers({
         "x-amc-receipt-trailer": responseReceipt.receipt
       });
@@ -842,6 +1012,46 @@ export async function handleBridgeRequest(options: HandleBridgeRequestOptions): 
         );
       }
     }
+    let responseFirewallDecision: RuntimeFirewallDecision | null = null;
+    if (firewallActive) {
+      responseFirewallDecision = evaluateRuntimeFirewall({
+        workspace: options.workspace,
+        content: finalBody.toString("utf8"),
+        direction: "response",
+        source: "bridge",
+        agentId: lease.payload.agentId,
+        provider: route.provider,
+        model: responseModel,
+        route: route.gatewayPath,
+        method: "POST",
+        runId,
+        bridgeRequestId: requestId,
+        requirePolicy: true
+      });
+      appendBridgeFirewallAudit({
+        ledger,
+        sessionId,
+        decision: responseFirewallDecision,
+        requestId,
+        agentId: lease.payload.agentId,
+        provider: route.provider,
+        model: responseModel
+      });
+      if (responseFirewallDecision.action === "block") {
+        finalStatus = 422;
+        finalBody = Buffer.from(
+          JSON.stringify({
+            error: {
+              code: "RUNTIME_FIREWALL_BLOCKED",
+              decisionId: responseFirewallDecision.decisionId,
+              receiptId: responseFirewallDecision.links.receiptId,
+              reasons: responseFirewallDecision.reasons
+            }
+          }),
+          "utf8"
+        );
+      }
+    }
 
     const responseReceipt = appendBridgeResponseReceipt({
       ledger,
@@ -888,6 +1098,9 @@ export async function handleBridgeRequest(options: HandleBridgeRequestOptions): 
     options.res.setHeader("x-amc-bridge-request-id", requestId);
     options.res.setHeader("x-amc-correlation-id", correlationId);
     options.res.setHeader("x-amc-receipt", responseReceipt.receipt);
+    if (responseFirewallDecision ?? requestFirewallDecision) {
+      setBridgeFirewallHeaders(options.res, responseFirewallDecision ?? requestFirewallDecision!);
+    }
     if (promptBinding) {
       options.res.setHeader("x-amc-prompt-pack-sha256", promptBinding.packSha256);
       options.res.setHeader("x-amc-prompt-pack-id", promptBinding.packId);

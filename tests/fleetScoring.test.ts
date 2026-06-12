@@ -1,4 +1,4 @@
-import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { afterEach, describe, expect, test, vi } from "vitest";
@@ -109,6 +109,43 @@ describe("Fleet Scoring", () => {
     expect(result.pairComparisons).toHaveLength(3); // 3 choose 2
   });
 
+  test("evaluateFleet emits progress, SLA metadata, and lifecycle refs per agent", async () => {
+    const ws = newWorkspace();
+    initFleet(ws);
+    addAgent(ws, "alpha", "Alpha Agent");
+    addAgent(ws, "bravo", "Bravo Agent");
+    seedEvidence(ws, "alpha", 4);
+    seedEvidence(ws, "bravo", 4);
+    const events: string[] = [];
+
+    const result = await evaluateFleet({
+      workspace: ws,
+      window: "7d",
+      agentIds: ["alpha", "bravo"],
+      slaMs: 120_000,
+      concurrency: 2,
+      onProgress: (event) => events.push(`${event.agentId}:${event.stage}`)
+    });
+
+    expect(result.failures).toEqual([]);
+    expect(result.progressEvents.length).toBeGreaterThanOrEqual(8);
+    expect(events).toContain("alpha:queued");
+    expect(events).toContain("bravo:queued");
+    expect(events).toContain("alpha:scored");
+    expect(events).toContain("bravo:scored");
+    for (const agent of result.agents) {
+      expect(agent.firstResultMs).toBeGreaterThanOrEqual(0);
+      expect(agent.slaStatus).toBe("met");
+      expect(agent.lifecycleArtifactPath ? existsSync(agent.lifecycleArtifactPath) : false).toBe(true);
+      expect(agent.episodePath ? existsSync(agent.episodePath) : false).toBe(true);
+      expect(agent.resourceManifestId).toMatch(/^enforce-resources-/);
+    }
+    expect(result.fleetLifecycle?.artifactPath ? existsSync(result.fleetLifecycle.artifactPath) : false).toBe(true);
+    expect(result.fleetLifecycle?.childRunCount).toBe(2);
+    expect(result.fleetLifecycle?.sharedResourceManifestId).toMatch(/^enforce-resources-/);
+    expect(result.progressEvents.some((event) => event.agentId === null && event.lifecycleArtifactPath === result.fleetLifecycle?.artifactPath)).toBe(true);
+  });
+
   test("pairwise comparisons are capped by maxComparisons", async () => {
     const ws = newWorkspace();
     initFleet(ws);
@@ -153,6 +190,7 @@ describe("Fleet Scoring", () => {
 
     expect(md).toContain("# Fleet Scoring Report");
     expect(md).toContain("Fleet Aggregate");
+    expect(md).toContain("Fleet Lifecycle Evidence");
     expect(md).toContain("Per-Agent Scores");
     expect(md).toContain("default");
   });

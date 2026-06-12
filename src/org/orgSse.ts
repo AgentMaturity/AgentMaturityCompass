@@ -5,6 +5,7 @@ import { canonicalize } from "../utils/json.js";
 export interface OrgSseEvent {
   type:
     | "ORG_SCORECARD_UPDATED"
+    | "ORG_RUN_CREATED"
     | "AGENT_RUN_COMPLETED"
     | "ASSURANCE_RUN_COMPLETED"
     | "OUTCOMES_UPDATED"

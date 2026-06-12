@@ -6,7 +6,7 @@ You already use Claude Code. AMC wraps it — zero code changes.
 
 ```bash
 amc wrap claude-code -- claude "analyze this code"
-amc quickscore
+amc
 amc fix
 ```
 
@@ -21,4 +21,4 @@ amc fix
 
 ## Next steps
 - `docs/START_HERE.md`
-- `docs/AFTER_QUICKSCORE.md`
+- `docs/AFTER_FIRST_SCORE.md`

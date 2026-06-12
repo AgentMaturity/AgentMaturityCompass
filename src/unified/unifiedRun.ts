@@ -4,7 +4,7 @@
  * Runs all 8 AMC product modules in one command and produces
  * a combined report with letter grades.
  *
- * Modules: Score, Shield, Enforce, Vault, Watch, Fleet, Passport, Comply
+ * Modules: Score, Shield, Enforce, Vault, Watch, Comply, Fleet, Passport
  */
 
 import { runDiagnostic } from "../diagnostic/runner.js";
@@ -18,6 +18,13 @@ import { collectPassportData } from "../passport/passportCollector.js";
 import { loadRunReport } from "../diagnostic/runner.js";
 import { pathExists, readUtf8 } from "../utils/fs.js";
 import { join } from "node:path";
+import { enforceResourceManifestRef, writeEnforceResourceManifest } from "../enforce/resourceManifest.js";
+import { observeDecisionOutcomes, writeDecisionReceipts } from "../lifecycle/decisionReceipt.js";
+import { writeEpisodeRecord } from "../lifecycle/episodeRecord.js";
+import { writeFindingProofs } from "../lifecycle/findingProof.js";
+import { writeLifecycleChangeReceipts } from "../lifecycle/changeReceipt.js";
+import { AMC_SURFACE_ORDER, writeLifecycleRunArtifact, type AMCSurface, type LifecycleSurfaceStatus, type LifecycleSurfaceSummary } from "../lifecycle/lifecycleRunArtifact.js";
+import { writeObservabilityLaneRecord } from "../lifecycle/observabilityLane.js";
 
 /* ── Types ──────────────────────────────────────────────────── */
 
@@ -42,6 +49,17 @@ export interface UnifiedRunResult {
   overallScore: number;
   topFixes: Array<{ action: string; impact: string; command?: string }>;
   reportPath?: string;
+  diagnosticRunId?: string;
+  episodeRecordPath?: string;
+  findingProofsPath?: string;
+  lifecycleReceiptsPath?: string;
+  lifecycleArtifactPath?: string;
+  observabilityPath?: string;
+}
+
+interface ScoreModuleOutput {
+  module: ModuleResult;
+  report: DiagnosticReport | null;
 }
 
 /* ── Grade helpers ──────────────────────────────────────────── */
@@ -81,21 +99,59 @@ const MODULE_WEIGHTS: Record<string, number> = {
   Enforce:  0.12,
   Vault:    0.08,
   Watch:    0.10,
+  Comply:   0.10,
   Fleet:    0.05,
   Passport: 0.05,
-  Comply:   0.10,
 };
+
+function lifecycleStatusForModule(module: ModuleResult): LifecycleSurfaceStatus {
+  if (module.skipped) {
+    return "pending";
+  }
+  if (module.grade === "F" || module.grade.startsWith("D")) {
+    return "degraded";
+  }
+  if (module.grade.startsWith("C")) {
+    return "partial";
+  }
+  return "complete";
+}
+
+function lifecycleSurfaceOverridesFromModules(modules: ModuleResult[]): Partial<Record<AMCSurface, LifecycleSurfaceSummary>> {
+  const overrides: Partial<Record<AMCSurface, LifecycleSurfaceSummary>> = {};
+  for (const module of modules) {
+    if (!AMC_SURFACE_ORDER.includes(module.name as AMCSurface)) {
+      continue;
+    }
+    overrides[module.name as AMCSurface] = {
+      status: lifecycleStatusForModule(module),
+      summary: module.skipped && module.skipReason ? module.skipReason : module.summary,
+      refs: module.issues
+    };
+  }
+  return overrides;
+}
 
 /* ── Individual module runners ──────────────────────────────── */
 
-async function runScoreModule(workspace: string, agentId: string, window: string): Promise<ModuleResult> {
+async function runScoreModule(params: {
+  workspace: string;
+  agentId: string;
+  window: string;
+  noSign?: boolean;
+  questionSetVersion?: string;
+  applyIndustryPackWeights?: boolean;
+}): Promise<ScoreModuleOutput> {
   try {
     const report: DiagnosticReport = await runDiagnostic({
-      workspace,
-      window,
+      workspace: params.workspace,
+      window: params.window,
       targetName: "default",
       claimMode: "auto",
-      agentId,
+      agentId: params.agentId,
+      noSign: params.noSign,
+      questionSetVersion: params.questionSetVersion,
+      applyIndustryPackWeights: params.applyIndustryPackWeights,
     });
 
     const avgLevel = report.layerScores.length > 0
@@ -117,21 +173,27 @@ async function runScoreModule(workspace: string, agentId: string, window: string
     }
 
     return {
-      name: "Score",
-      icon: "①",
-      grade: scoreToGrade(normalized),
-      score: Math.round(normalized),
-      summary: `${totalQuestions} questions scored, ${belowTarget} below target`,
-      issues,
+      module: {
+        name: "Score",
+        icon: "①",
+        grade: scoreToGrade(normalized),
+        score: Math.round(normalized),
+        summary: `${totalQuestions} questions scored, ${belowTarget} below target`,
+        issues,
+      },
+      report
     };
   } catch (err) {
     return {
-      name: "Score",
-      icon: "①",
-      grade: "F",
-      score: 0,
-      summary: "Diagnostic failed to run",
-      issues: [String(err instanceof Error ? err.message : err)],
+      module: {
+        name: "Score",
+        icon: "①",
+        grade: "F",
+        score: 0,
+        summary: "Diagnostic failed to run",
+        issues: [String(err instanceof Error ? err.message : err)],
+      },
+      report: null
     };
   }
 }
@@ -499,23 +561,38 @@ export interface UnifiedRunInput {
   window?: string;
   failBelow?: LetterGrade;
   ci?: boolean;
+  noSign?: boolean;
+  questionSetVersion?: string;
+  applyIndustryPackWeights?: boolean;
+  createdWorkspace?: boolean;
+  createdAgentContext?: boolean;
+  vaultReason?: string | null;
 }
 
 export async function unifiedRun(input: UnifiedRunInput): Promise<UnifiedRunResult> {
   const { workspace, agentId, window = "14d" } = input;
+  const started = Date.now();
 
   // Run all modules (Score and Shield are async, rest are sync checks)
-  const [scoreResult, shieldResult] = await Promise.all([
-    runScoreModule(workspace, agentId, window),
+  const [scoreOutput, shieldResult] = await Promise.all([
+    runScoreModule({
+      workspace,
+      agentId,
+      window,
+      noSign: Boolean(input.noSign),
+      questionSetVersion: input.questionSetVersion,
+      applyIndustryPackWeights: input.applyIndustryPackWeights,
+    }),
     runShieldModule(workspace, agentId),
   ]);
+  const scoreResult = scoreOutput.module;
 
   const enforceResult = runEnforceModule(workspace);
   const vaultResult = runVaultModule(workspace);
   const watchResult = runWatchModule(workspace);
+  const complyResult = runComplyModule(workspace);
   const fleetResult = runFleetModule(workspace);
   const passportResult = runPassportModule(workspace, agentId);
-  const complyResult = runComplyModule(workspace);
 
   const modules = [
     scoreResult,
@@ -523,9 +600,9 @@ export async function unifiedRun(input: UnifiedRunInput): Promise<UnifiedRunResu
     enforceResult,
     vaultResult,
     watchResult,
+    complyResult,
     fleetResult,
     passportResult,
-    complyResult,
   ];
 
   // Calculate weighted overall score (skip skipped modules, redistribute weight)
@@ -541,8 +618,90 @@ export async function unifiedRun(input: UnifiedRunInput): Promise<UnifiedRunResu
   const overallGrade = scoreToGrade(overallScore);
 
   const topFixes = generateTopFixes(modules);
+  let diagnosticRunId: string | undefined;
+  let episodeRecordPath: string | undefined;
+  let findingProofsPath: string | undefined;
+  let lifecycleReceiptsPath: string | undefined;
+  let lifecycleArtifactPath: string | undefined;
+  let observabilityPath: string | undefined;
 
-  return {
+  if (scoreOutput.report) {
+    diagnosticRunId = scoreOutput.report.runId;
+    const resourceManifest = writeEnforceResourceManifest({ workspace, agentId });
+    const resourceRef = enforceResourceManifestRef(resourceManifest);
+    const decisions = writeDecisionReceipts({
+      workspace,
+      report: scoreOutput.report,
+      command: "amc run",
+      resourceManifestIds: [resourceRef.manifestId]
+    });
+    const findingProofs = writeFindingProofs({
+      workspace,
+      report: scoreOutput.report,
+      command: "amc run",
+      episodeIds: [`episode-${scoreOutput.report.runId}`],
+      resourceManifestIds: [resourceRef.manifestId],
+      decisionReceipts: decisions.receipts
+    });
+    const lifecycleReceipts = writeLifecycleChangeReceipts({
+      workspace,
+      report: scoreOutput.report,
+      command: "amc run",
+      resourceManifestIds: [resourceRef.manifestId],
+      decisionReceipts: decisions.receipts,
+      findingProofs: [findingProofs.proofSetRef]
+    });
+    const observed = observeDecisionOutcomes({
+      workspace,
+      agentId,
+      report: scoreOutput.report
+    });
+    const observability = writeObservabilityLaneRecord({
+      workspace,
+      report: scoreOutput.report,
+      source: "cli",
+      command: "amc run",
+      episodeIds: [`episode-${scoreOutput.report.runId}`],
+      lifecycleReceiptIds: lifecycleReceipts.receipts.map((receipt) => receipt.receiptId),
+      resourceManifests: [resourceRef],
+      decisionReceipts: [...observed.updatedReceipts, ...decisions.receipts],
+      observedDecisionReceiptIds: observed.updatedReceipts.map((receipt) => receipt.receiptId)
+    });
+    const episode = writeEpisodeRecord({
+      workspace,
+      report: scoreOutput.report,
+      source: "cli",
+      command: "amc run",
+      resourceManifestIds: [resourceRef.manifestId],
+      receipts: lifecycleReceipts.receipts.map((receipt) => receipt.receiptId),
+      observabilityRecords: [observability.ref]
+    });
+    episodeRecordPath = episode.episodePath;
+    findingProofsPath = findingProofs.proofsPath;
+    lifecycleReceiptsPath = lifecycleReceipts.receiptsPath;
+    observabilityPath = observability.recordPath;
+    const lifecycle = writeLifecycleRunArtifact({
+      workspace,
+      report: scoreOutput.report,
+      source: "cli",
+      command: "amc run",
+      elapsedMs: Date.now() - started,
+      createdWorkspace: Boolean(input.createdWorkspace),
+      createdAgentContext: Boolean(input.createdAgentContext),
+      signed: !input.noSign && scoreOutput.report.status === "VALID",
+      vaultReason: input.vaultReason ?? null,
+      episodeRecords: [{ episodeId: episode.episode.episodeId, path: episode.episodePath }],
+      decisionReceipts: decisions.receipts.map((receipt) => ({ receiptId: receipt.receiptId, path: decisions.receiptsPath })),
+      lifecycleReceipts: lifecycleReceipts.refs,
+      findingProofs: [findingProofs.proofSetRef],
+      observabilityRecords: [observability.ref],
+      resourceManifests: [resourceRef],
+      surfaceOverrides: lifecycleSurfaceOverridesFromModules(modules)
+    });
+    lifecycleArtifactPath = lifecycle.artifactPath;
+  }
+
+  const result: UnifiedRunResult = {
     agentId,
     ts: Date.now(),
     modules,
@@ -550,4 +709,23 @@ export async function unifiedRun(input: UnifiedRunInput): Promise<UnifiedRunResu
     overallScore,
     topFixes,
   };
+  if (diagnosticRunId) {
+    result.diagnosticRunId = diagnosticRunId;
+  }
+  if (episodeRecordPath) {
+    result.episodeRecordPath = episodeRecordPath;
+  }
+  if (findingProofsPath) {
+    result.findingProofsPath = findingProofsPath;
+  }
+  if (lifecycleReceiptsPath) {
+    result.lifecycleReceiptsPath = lifecycleReceiptsPath;
+  }
+  if (lifecycleArtifactPath) {
+    result.lifecycleArtifactPath = lifecycleArtifactPath;
+  }
+  if (observabilityPath) {
+    result.observabilityPath = observabilityPath;
+  }
+  return result;
 }

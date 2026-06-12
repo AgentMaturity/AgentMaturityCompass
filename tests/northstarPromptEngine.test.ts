@@ -25,23 +25,6 @@ function newWorkspace(): string {
   return dir;
 }
 
-function pickPort(): Promise<number> {
-  return new Promise((resolvePromise, rejectPromise) => {
-    const probe = createServer();
-    probe.once("error", rejectPromise);
-    probe.listen(0, "127.0.0.1", () => {
-      const addr = probe.address();
-      probe.close(() => {
-        if (!addr || typeof addr === "string") {
-          rejectPromise(new Error("failed to allocate free port"));
-          return;
-        }
-        resolvePromise(addr.port);
-      });
-    });
-  });
-}
-
 function httpJson(params: {
   method?: "GET" | "POST";
   url: string;
@@ -209,11 +192,11 @@ describe("northstar prompt engine", () => {
 
     const runtime = await runStudioForeground({
       workspace,
-      apiPort: await pickPort(),
-      dashboardPort: await pickPort(),
-      gatewayPort: await pickPort(),
-      proxyPort: await pickPort(),
-      metricsPort: await pickPort()
+      apiPort: 0,
+      dashboardPort: 0,
+      gatewayPort: 0,
+      proxyPort: 0,
+      metricsPort: 0
     });
     const lease = issueLeaseForCli({
       workspace,
@@ -292,11 +275,11 @@ describe("northstar prompt engine", () => {
     });
     const runtime = await runStudioForeground({
       workspace,
-      apiPort: await pickPort(),
-      dashboardPort: await pickPort(),
-      gatewayPort: await pickPort(),
-      proxyPort: await pickPort(),
-      metricsPort: await pickPort()
+      apiPort: 0,
+      dashboardPort: 0,
+      gatewayPort: 0,
+      proxyPort: 0,
+      metricsPort: 0
     });
     const lease = issueLeaseForCli({
       workspace,
@@ -360,11 +343,11 @@ describe("northstar prompt engine", () => {
 
     const runtime = await runStudioForeground({
       workspace,
-      apiPort: await pickPort(),
-      dashboardPort: await pickPort(),
-      gatewayPort: await pickPort(),
-      proxyPort: await pickPort(),
-      metricsPort: await pickPort()
+      apiPort: 0,
+      dashboardPort: 0,
+      gatewayPort: 0,
+      proxyPort: 0,
+      metricsPort: 0
     });
     const lease = issueLeaseForCli({
       workspace,
@@ -422,11 +405,11 @@ describe("northstar prompt engine", () => {
     });
     const runtime = await runStudioForeground({
       workspace,
-      apiPort: await pickPort(),
-      dashboardPort: await pickPort(),
-      gatewayPort: await pickPort(),
-      proxyPort: await pickPort(),
-      metricsPort: await pickPort()
+      apiPort: 0,
+      dashboardPort: 0,
+      gatewayPort: 0,
+      proxyPort: 0,
+      metricsPort: 0
     });
     const lease = issueLeaseForCli({
       workspace,

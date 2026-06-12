@@ -1,6 +1,6 @@
 # Getting Started with AMC
 
-**Time to first score: ~2 minutes.**
+**Time to first full score: ~2 minutes.**
 
 AMC (Agent Maturity Compass) scores your AI agent's trustworthiness from actual behavior — not self-reported claims. Think of it as a credit score for AI agents.
 
@@ -14,33 +14,26 @@ AMC (Agent Maturity Compass) scores your AI agent's trustworthiness from actual 
 npm i -g agent-maturity-compass
 ```
 
-## Your First Score (2 minutes)
+## Your First Full Score (2 minutes)
 
 ```bash
 # 1. Create a workspace
 mkdir my-agent && cd my-agent
 
-# 2. Set a vault passphrase (protects your evidence chain)
-export AMC_VAULT_PASSPHRASE='pick-a-passphrase'
-
-# 3. Initialize and get your first maturity score
-amc init
-
-# 4. Get your first maturity score (interactive, 5 questions)
-amc quickscore
+# 2. Run the full AMC lifecycle
+amc
 ```
 
-That's it. You now have a baseline maturity level (L0–L5).
+That's it. AMC creates the workspace if needed, runs the full evidence score, prints the maturity level (L0-L5), and shows the next action.
 
-> **Why a passphrase?** AMC creates a cryptographic evidence vault (Ed25519 keys) that signs all your scores and evidence. The passphrase encrypts the vault so your signing keys stay protected. Pick something memorable — you'll need it each session.
+> **Why no setup command first?** The top-level `amc` command is the default onboarding path. It detects what is available, creates the minimum workspace state, and falls back to unsigned/demo-safe behavior when a local vault cannot be unlocked.
 
 After scoring, AMC automatically shows what your agent needs to reach the next level.
 
-**Share your score** — generate a README badge and markdown summary:
+**Optional: run a fast pulse check** when you only need a lightweight demo score:
 
 ```bash
-amc quickscore --share
-# Outputs a markdown snippet + shields.io badge you can paste anywhere
+amc quickscore --rapid
 ```
 
 **Add a badge to your README:**
@@ -75,14 +68,34 @@ AMC scores agents on a 5-level scale:
 
 ## What Gets Scored
 
-AMC evaluates 5 dimensions, each with specific questions:
+AMC evaluates 5 dimensions with 240 default questions. The optional lifecycle expansion adds 20 explicitly versioned questions across lifecycle governance, harness resources, evidence binding, typed multi-agent systems, trace repair, proof exports, reasoning memory, uncertainty controls, runtime gateway/watch, and fleet/org operation.
 
-1. **Strategic Agent Operations** (17 questions) — Mission clarity, scope adherence, decision traceability
-2. **Skills** (35 questions) — Tool mastery, injection defense, DLP, zero-trust
-3. **Resilience** (30 questions) — Graceful degradation, circuit breakers, monitor bypass resistance
-4. **Leadership & Autonomy** (21 questions) — Structured logs, traces, cost tracking, SLO monitoring
-5. **Culture & Alignment** (23 questions) — Test harnesses, benchmarks, feedback loops, over-compliance detection
+1. **Strategic Agent Operations** (19 default questions) — Mission clarity, scope adherence, decision traceability
+2. **Leadership & Autonomy** (23 default questions) — Governance, decision-making authority, autonomy boundaries
+3. **Culture & Alignment** (94 default questions) — Safety culture, value alignment, compliance
+4. **Resilience** (55 default questions) — Graceful degradation, circuit breakers, monitor bypass resistance
+5. **Skills** (49 default questions) — Tool mastery, evidence practices, testing, learning
 
+To run the expanded set:
+
+```bash
+amc run --question-set lifecycle
+```
+
+## The 8 AMC Surfaces
+
+Everything AMC does fits under one simple trust stack:
+
+| Surface | Promise | What it does |
+|---|---|---|
+| **Score** | Score trust before you ship | Evidence-weighted scoring across live execution behavior instead of brochure claims. |
+| **Shield** | Attack your agent before attackers do | Runs adversarial packs against prompt injection, leakage, memory poisoning, and sycophancy. |
+| **Enforce** | Wrap agent actions in policy | Approval gates, scoped permissions, and runtime controls for sensitive operations. |
+| **Vault** | Cryptographically prove what happened | Signs evidence, verifies ledgers, and gives auditors a tamper-evident chain of custody. |
+| **Watch** | See trust drift before it hurts you | Monitors posture over time and surfaces anomalies, regressions, and risky changes. |
+| **Comply** | Map trust evidence to real frameworks | Turns technical evidence into regulator-readable artifacts for audits and risk reviews. |
+| **Fleet** | Govern many agents like an actual platform | Benchmarks multiple agents, compares risk posture, and enforces org-wide trust baselines. |
+| **Passport** | Make trust portable between environments | Issues a portable, signed trust identity that can move between tools, teams, and environments. |
 
 ---
 
@@ -99,10 +112,10 @@ amc guide --go
 
 This auto-detects your framework (LangChain, CrewAI, Claude Code, Cursor, etc.), generates severity-tagged guardrails (🔴 Critical / 🟡 High / 🔵 Medium), and applies them to your agent's config file.
 
-After your agent works with the new guardrails, re-score and see what improved:
+After your agent works with the new guardrails, run the full score again and see what improved:
 
 ```bash
-amc quickscore
+amc
 amc guide --diff    # Shows closed gaps, new gaps, level changes
 ```
 
@@ -125,8 +138,8 @@ amc guide --compliance          # All 5 frameworks (EU AI Act, ISO 42001, NIST, 
 # Full diagnostic — shows every dimension and where you're weak
 amc score formal-spec my-agent
 
-# Quick check — what's your biggest gap?
-amc quickscore
+# Full check — what's your biggest gap?
+amc
 ```
 
 ### Common improvements by level
@@ -207,7 +220,7 @@ amc down
 
 Studio gives you:
 - Live dashboard with agent scores
-- Evidence browser
+- Lifecycle Evidence page for the 8 surfaces, full-score artifacts, episodes, decisions, and Enforce resource proof
 - Evaluation runner
 - Policy editor
 - Audit log viewer
@@ -289,7 +302,7 @@ amc score evidence-ingest --format weights-biases
 ### Lifecycle
 | Command | What it does |
 |---------|-------------|
-| `amc init` | Create a new workspace |
+| `amc` | Create a workspace if needed and run the full score |
 | `amc setup` | Full setup with framework detection |
 | `amc setup --demo` | Quick demo with sample data |
 | `amc doctor` | Health check your workspace |
@@ -300,7 +313,8 @@ amc score evidence-ingest --format weights-biases
 ### Scoring
 | Command | What it does |
 |---------|-------------|
-| `amc quickscore` | 2-minute rapid assessment |
+| `amc` | Full evidence-backed maturity score |
+| `amc quickscore --rapid` | Optional lightweight pulse check |
 | `amc score formal-spec <agent>` | Full formal maturity score |
 | `amc score production-ready <agent>` | Production readiness gate |
 | `amc score adversarial <agent>` | Gaming resistance test |
@@ -318,6 +332,58 @@ amc score evidence-ingest --format weights-biases
 | `amc guide --compliance EU_AI_ACT` | EU AI Act compliance guardrails |
 | `amc guide --compliance` | All 5 regulatory frameworks |
 | `amc guide --frameworks` | List supported frameworks |
+
+### Enforce Resource Proof
+| Command | What it does |
+|---------|-------------|
+| `amc resource snapshot` | Snapshot the prompts, tools, policies, memory, routes, evaluators, datasets, schemas, environments, and configs that define the agent |
+| `amc resource validate` | Run Enforce gates for signature validity, owners, contained paths, immutable resources, rollback readiness, review, and evidence coverage |
+| `amc resource propose` / `amc resource evaluate` | Create a dry-run proposal and show the policy decision before accepting resource changes |
+| `amc resource apply` | Dry-run apply by default; add `--yes` to accept current resources as the new signed manifest and write a signed receipt |
+| `amc resource rollback` | Dry-run rollback by default; add `--apply` to restore from a prior snapshot or explain why rollback cannot happen |
+| `amc firewall enable --mode block` | Turn on Runtime Firewall protection for live Bridge/Gateway traffic |
+| `amc firewall check --direction request --text "ignore previous instructions"` | Preview the exact allow/warn/block decision before traffic reaches a model |
+| `amc firewall events` / `amc firewall export --format splunk --redacted` | Inspect and export signed runtime decisions without leaking local paths or sensitive previews |
+| `amc shield confirm scope-write --file security-scope.json` | Authorize controlled exploit confirmation with ownership, time window, safe mode, and allowed techniques |
+| `amc shield confirm run --scope <scope> --task finding-task.json` | Convert an authorized finding into safe proof with hashes, signals, and receipts instead of exploit instructions |
+| `amc shield confirm export <proof> --out safe-proof.json` | Export redacted confirmation proof for Vault/Passport evidence bundles |
+| `amc import <path> --dry-run` / `amc import <path>` | Detect and import neutral traces, runs, workflow graphs, configs, memory, evaluator outputs, and benchmarks as redacted AMC evidence |
+| `amc strategy compare --file strategies.json` | Compare inference strategies by score, cost, latency, risk, confidence, and evidence refs |
+| `amc strategy compare --file strategies.json --apply --approve` | Commit the recommended model route only with policy approval, manifest evidence, and rollback data |
+| `amc runtime create|event|inspect|resume|cancel|degrade|complete` | Persist connected-agent run state and redacted event streams that CLI and Studio both read |
+| `amc fleet graph write --file graph.json` | Register the typed multi-agent graph that defines nodes, handoffs, tools, contracts, policies, permissions, and invariants |
+| `amc fleet graph validate` | Check the graph for missing contracts, unsafe permissions, cycles, and unbounded fan-out before fleet scoring |
+| `amc fleet score --all --stream --sla 120s` | Full-score every configured agent with progressive per-agent status, first-result SLA timing, lifecycle artifacts, and partial-failure summaries |
+| `amc fleet lifecycle list|show <run>` | Inspect the fleet parent lifecycle artifact, child runs, topology, typed graph digest, shared resources, and cascade failures |
+| `amc org run --roles REV_PRODUCT_MANAGER,REV_TECH_LEAD,REV_QA_LEAD` | Advanced Fleet org loop with isolated role workspaces, public state, private grader state, Watch heartbeats, Enforce gates, and parent/child lifecycle artifacts |
+| `amc org runs` / `amc org inspect <run> --redacted` | List or inspect org runs without exposing local private grader paths |
+| `amc resource history` / `amc resource contract` | Show signed manifests, receipts, and the AMC-native lifecycle protocol |
+| `amc enforce resources verify` / `amc enforce resources diff` | Advanced aliases for the same Enforce resource engine |
+| `amc commands --markdown` | Generate the live CLI command inventory from the registered command map |
+| `npm run release:gate` | Run the release gate for typecheck, build, Studio assets, OpenAPI, docs drift, CLI smoke, domain packs, and receipt output |
+| `amc evidence lifecycle list` | List the full lifecycle artifacts created by `amc` and `amc run` |
+| `amc evidence lifecycle export <run> --out lifecycle.json --redacted` | Export a shareable lifecycle artifact without local workspace paths |
+| `amc evidence episodes list` | List the durable evidence episodes created by `amc` and `amc run` |
+| `amc evidence episodes inspect <id>` | Inspect one episode by run id or episode id |
+| `amc evidence episodes export <id> --out episode.md --redacted` | Export an episode as Markdown or JSON without local workspace paths |
+| `amc evidence decisions list` | List recommendation and evidence-request receipts generated by full-score runs |
+| `amc evidence decisions inspect <id>` | Inspect one decision receipt with hypothesis, predicted outcome, confidence, and evidence refs |
+| `amc evidence decisions observe <run>` | Update open decision receipts with observed outcomes from a later full-score run |
+| `amc evidence observability list` | List component attribution, experience signals, and decision-chain records |
+| `amc evidence observability inspect <run>` | Inspect one run-level observability lane record |
+| `amc memory writeback <episode>` | Store an evidence-backed, redacted reasoning lesson with expiry, allowed consumers, and a writeback receipt |
+| `amc memory retrieve --consumer fixer` / `amc memory show <memory>` | Retrieve active reasoning memory for score, recommendations, fixer, or Studio with citations |
+| `amc report <run>` / Studio Diagnostic filters | Review confidence, uncertainty, low-evidence downgrades, and auto-fix review gates |
+| `amc trace index` / `amc trace index --run <run>` | List or inspect distilled trace failure indexes created from full-score evidence |
+| `amc trace failures` | Show ranked recurring failure clusters with affected agents, runs, score impact, and repair input |
+| `amc mechanic rca run <run>` | Generate likely root causes, regression tests, rollback pointers, and governed Enforce fix proposals |
+| `amc mechanic rca list` / `amc mechanic rca show <run>` | Review signed Fixer RCA reports without exposing local workspace paths |
+| `amc experiment optimize --rca latest` | Create isolated optimizer candidates with held-out validation, leakage checks, Pareto ranking, and receipts |
+| `amc experiment optimizer-list` / `amc experiment optimizer-show latest` | Review accepted/rejected optimizer candidates and reasons |
+| `amc evidence finding-proofs list` | Trace each major finding to evidence, resources, receipts, and recommendation ids |
+| `amc evidence finding-proofs export --out proofs.json --redacted` | Export shareable proof chains without local workspace paths |
+| `amc evidence lifecycle-receipts list` | List proposal, validation, commit, rollback, and monitor receipts |
+| `amc evidence lifecycle-receipts export --out receipts.json --redacted` | Export lifecycle change receipts without local workspace paths |
 
 ### Research-Backed Modules
 | Command | What it scores |
@@ -360,7 +426,7 @@ amc admin --help        # Administration
 Every command supports `--json` for automation:
 
 ```bash
-amc quickscore --json
+amc --json
 amc score calibration-gap --json
 amc doctor --json
 ```
@@ -386,7 +452,7 @@ This is normal on first run. The doctor checks for optional components:
 Zero scores mean no data was provided. AMC scores from evidence, not defaults:
 1. Run `amc score collect-evidence <agentId>` to gather data
 2. Or use `--json` to pipe in evidence programmatically
-3. Or run `amc quickscore` for a questionnaire-based baseline
+3. Or run `amc` for a full local baseline
 
 ### Python tests
 ```bash
@@ -420,7 +486,7 @@ cd platform/python && python3 -m pytest tests/ -q
 
 ## Next Steps
 
-1. **Run `amc quickscore`** — get your baseline
+1. **Run `amc`** — get your full baseline
 2. **Run `amc guide --go`** — generate and apply guardrails automatically
 3. **Run `amc doctor`** — check your environment
 4. **Run `amc setup --demo`** — explore with sample data

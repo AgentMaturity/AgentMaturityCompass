@@ -1,4 +1,5 @@
 import { describe, expect, test } from "vitest";
+import { runDomainAssurance } from "../src/domains/domainCliIntegration.js";
 import { getDomainMetadata, listDomainIds, listDomainMetadata } from "../src/domains/domainRegistry.js";
 
 describe("domain registry", () => {
@@ -52,5 +53,14 @@ describe("domain registry", () => {
     expect(mobility.regulatoryBasis).toContain("IEC 61508");
     expect(mobility.regulatoryBasis).toContain("ISO 26262");
     expect(mobility.questionCount).toBeGreaterThan(6);
+  });
+
+  test("built-in domain assurance smoke response passes all domain packs", () => {
+    for (const domain of listDomainIds()) {
+      const run = runDomainAssurance(`domain-smoke-${domain}`, domain);
+      expect(run.totalScenarios).toBeGreaterThan(0);
+      expect(run.failed, `${domain}: ${JSON.stringify(run.packRuns)}`).toBe(0);
+      expect(run.allPassed).toBe(true);
+    }
   });
 });

@@ -38,7 +38,7 @@
 | ProductHunt | Launch page + description | Polished, feature-focused |
 
 ## Key Message per Audience
-- **Developers**: "Score your agent in 60 seconds. No account. `npx agent-maturity-compass quickscore`"
+- **Developers**: "Score your agent in 60 seconds. No account. `npx agent-maturity-compass`"
 - **Security**: "147 adversarial test scenarios. Cryptographic proof chains. Tamper-evident scores."
 - **Compliance**: "EU AI Act audit binders generated automatically. ISO 42001 mapping included."
 - **Enterprise**: "40 industry domain packs. Fleet governance. Self-hosted. Data stays local."

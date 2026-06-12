@@ -47,20 +47,21 @@ Evidence degrades over time to reflect that agent behavior may change:
 
 ## 3. Question Bank
 
-AMC assesses agents across **240 diagnostic questions** organized into 5 layers:
+AMC assesses agents across a stable default **240 diagnostic questions** organized into 5 layers. The optional `amc run --question-set lifecycle` expansion adds 20 explicitly versioned lifecycle questions for lifecycle governance, harness resources, evidence binding, typed multi-agent systems, trace repair, proof exports, reasoning memory, uncertainty controls, runtime gateway/watch, and fleet/org operation. Default scores stay on the legacy 240-question set unless the expanded version is requested.
 
 | Layer | Questions | Focus Area |
 |-------|-----------|------------|
-| Strategic Agent Ops | 18 | Operational maturity, cost efficiency |
+| Strategic Agent Ops | 19 | Operational maturity, cost efficiency |
 | Leadership & Autonomy | 23 | Governance, decision-making authority |
 | Culture & Alignment | 94 | Safety culture, value alignment, compliance |
-| Resilience | 53 | Fault tolerance, recovery, monitoring |
-| Skills | 47 | Technical capabilities, tool use, learning |
+| Resilience | 55 | Fault tolerance, recovery, monitoring |
+| Skills | 49 | Technical capabilities, tool use, learning |
 
 Each question has:
 - A maturity scale from L0 (absent) to L5 (industry-leading)
 - Required evidence types for each level
 - Scoring rubric with specific pass/fail criteria
+- Question-set metadata that maps expanded questions to AMC surfaces and layers
 
 ## 4. Scoring Pipeline
 

@@ -9,7 +9,7 @@ Get from zero to first score with the least possible ceremony.
 ## Fast path
 
 ```bash
-npx agent-maturity-compass quickscore
+npx agent-maturity-compass
 ```
 
 Or install AMC globally:
@@ -18,7 +18,7 @@ Or install AMC globally:
 npm i -g agent-maturity-compass
 amc init
 amc doctor
-amc quickscore
+amc
 ```
 
 ## Best next docs
@@ -39,4 +39,4 @@ amc assurance run --all
 
 ## When to stop overthinking it
 
-If you just want to know whether your agent is reckless, run quickscore, then inspect the caps and fixes. You do not need to ingest the whole governance universe on day one.
+If you just want to know whether your agent is reckless, run full score, then inspect the caps and fixes. You do not need to ingest the whole governance universe on day one.

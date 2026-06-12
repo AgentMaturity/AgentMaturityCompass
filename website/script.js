@@ -50,9 +50,9 @@ function initReveals(){
 }
 
 var PRODUCTS=[
-  {name:'amc score',title:'Score',headline:'Score trust before you ship',summary:'Evidence-weighted scoring across live execution behavior instead of brochure claims.',badges:['240 questions','L0-L5 maturity','instant full score'],info:[{label:'what it does',title:'Calculates the trust baseline',text:'Finds maturity gaps across governance, security, reliability, cost, and state.'},{label:'why it matters',title:'Kills documentation inflation',text:'Observed evidence carries full weight. Self-reported evidence is capped.'},{label:'output',title:'Actionable trust report',text:'Ships a scored report, signed evidence bundle, and remediation targets.'}],lines:[
+  {name:'amc score',title:'Score',headline:'Score trust before you ship',summary:'Evidence-weighted scoring across live execution behavior instead of brochure claims.',badges:['240 default questions','20 lifecycle expansion','instant full score'],info:[{label:'what it does',title:'Calculates the trust baseline',text:'Finds maturity gaps across governance, security, reliability, cost, and state.'},{label:'why it matters',title:'Kills documentation inflation',text:'Observed evidence carries full weight. Self-reported evidence is capped.'},{label:'output',title:'Actionable trust report',text:'Ships a scored report, signed evidence bundle, and remediation targets.'}],lines:[
     {type:'code',label:'$ amc'},
-    {label:'full score',value:'240 questions · VALID'},
+    {label:'full score',value:'240 default questions · VALID'},
     {label:'overall maturity',value:'L3.2 · 64%'},
     {label:'security',value:'L4.0 · hardened execution'},
     {label:'governance',value:'L2.8 · approvals missing'},
@@ -61,13 +61,13 @@ var PRODUCTS=[
     {label:'fixes generated',value:'12 mapped remediations'},
     {label:'signed artifact',value:'.amc/reports/latest.md'}
   ]},
-  {name:'amc shield',title:'Shield',headline:'Attack your agent before attackers do',summary:'Runs adversarial packs against prompt injection, leakage, memory poisoning, and sycophancy.',badges:['147 assurance packs','adversarial probes','guardrail output'],info:[{label:'what it does',title:'Pressure-tests the runtime',text:'Executes attack scenarios against your actual prompt, tool, and memory surface.'},{label:'why it matters',title:'Finds brittle defenses fast',text:'One missed path can turn a polished demo into a production incident.'},{label:'output',title:'Pack report + guardrails',text:'Returns failing probes, exploit traces, and generated mitigation configs.'}],lines:[
-    {type:'code',label:'$ amc shield --pack injection,exfiltration,sycophancy'},
+  {name:'amc shield',title:'Shield',headline:'Attack your agent before attackers do',summary:'Runs adversarial packs and controlled confirmation lanes against prompt injection, leakage, memory poisoning, and sycophancy.',badges:['147 assurance packs','authorized confirmation','safe proof'],info:[{label:'what it does',title:'Pressure-tests the runtime',text:'Executes attack scenarios against your actual prompt, tool, and memory surface.'},{label:'why it matters',title:'Finds brittle defenses fast',text:'One missed path can turn a polished demo into a production incident.'},{label:'output',title:'Pack report + safe proof',text:'Returns failing probes, redacted confirmation proof, and generated mitigation configs.'}],lines:[
+    {type:'code',label:'$ amc shield confirm run --scope sec-1 --task finding.json'},
     {label:'injection pack',value:'PASS · 12/12 probes blocked'},
     {label:'exfiltration pack',value:'WARN · 1 DLP bypass found'},
     {label:'memory poisoning',value:'PASS · persistence blocked'},
     {label:'sycophancy',value:'PASS · 8/8 resisted'},
-    {label:'critical finding',value:'base64 PII escaped tool output'},
+    {label:'safe proof',value:'confirmed · raw payload omitted'},
     {label:'generated fix',value:'.amc/guardrails/dlp-base64.yaml'},
     {label:'report',value:'.amc/shield/latest.md'}
   ]},
@@ -111,14 +111,15 @@ var PRODUCTS=[
     {label:'remediation plan',value:'binder/gap-remediation.md'},
     {label:'status',value:'review-ready'}
   ]},
-  {name:'amc fleet',title:'Fleet',headline:'Govern many agents like an actual platform',summary:'Benchmarks multiple agents, compares risk posture, and enforces org-wide trust baselines.',badges:['fleet baselines','org policy','cross-agent compare'],info:[{label:'what it does',title:'Surfaces weakest links',text:'Puts every agent on one trust map so the laggards are obvious.'},{label:'why it matters',title:'Your stack fails at the weakest boundary',text:'One sloppy assistant can negate ten well-governed ones.'},{label:'output',title:'Fleet scorecard',text:'Shows per-agent maturity, threshold breaches, and policy coverage.'}],lines:[
-    {type:'code',label:'$ amc fleet status --org acme-corp'},
+  {name:'amc fleet',title:'Fleet',headline:'Govern many agents like an actual platform',summary:'Validates typed multi-agent topology, compares risk posture, and enforces org-wide trust baselines.',badges:['typed graph','fleet baselines','cross-agent compare'],info:[{label:'what it does',title:'Surfaces topology and weak links',text:'Puts every agent and handoff contract on one trust map so routing risk is visible.'},{label:'why it matters',title:'Your stack fails at the weakest boundary',text:'One unsafe handoff can negate ten well-governed agents.'},{label:'output',title:'Fleet scorecard + graph validation',text:'Shows per-agent maturity, graph digest, validation findings, threshold breaches, and policy coverage.'}],lines:[
+    {type:'code',label:'$ amc fleet graph validate'},
     {label:'agents scanned',value:'12'},
+    {label:'graph digest',value:'9d4f62c1e83a7b20'},
     {label:'fleet average',value:'L2.9'},
     {label:'top performer',value:'prod-agent-02 · L3.5'},
-    {label:'below threshold',value:'2 agents'},
+    {label:'graph risks',value:'1 unsafe permission'},
     {label:'org policy',value:'strict'},
-    {label:'focus area',value:'raise staging and dev assistants'},
+    {label:'focus area',value:'tighten approval contracts'},
     {label:'report',value:'.amc/fleet/acme-corp.md'}
   ]},
   {name:'amc passport',title:'Passport',headline:'Make trust portable between environments',summary:'Issues a portable, signed trust identity that can move between tools, teams, and environments.',badges:['portable identity','verifiable score','expiry controls'],info:[{label:'what it does',title:'Packages trust state',text:'Bundles score, evidence, validity window, and signature into a portable credential.'},{label:'why it matters',title:'Trust should travel with the agent',text:'Handoffs break when context and evidence get lost between systems.'},{label:'output',title:'Signed passport artifact',text:'Exports a machine-readable trust document with expiry and verification data.'}],lines:[

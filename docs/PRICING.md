@@ -15,12 +15,12 @@ Everything except Industry Packs:
 - **Enforce** — policy controls, approval workflows, scoped actions, governance
 - **Vault** — Ed25519 signatures, Merkle chains, tamper-evident proof infrastructure
 - **Watch** — traces, anomalies, timelines, monitoring, operational drift detection
+- **Comply** — regulatory mapping (EU AI Act, ISO 42001, NIST AI RMF, OWASP), audit binders, governance reports
 - **Fleet** — multi-agent oversight, comparison, delegation graphs
 - **Passport** — portable identity, credentials, trust portability artifacts
-- **Comply** — regulatory mapping (EU AI Act, ISO 42001, NIST AI RMF, OWASP), audit binders, governance reports
 - **All 14 framework adapters** — LangChain, CrewAI, OpenAI, Claude Code, Gemini, AutoGen, LlamaIndex, Semantic Kernel, OpenClaw, OpenHands, Python SDK, generic CLI, OpenAI-compatible
 - **376 CLI commands**
-- **240 diagnostic questions**
+- **240 default diagnostic questions** plus the free, opt-in 20-question lifecycle expansion
 - **Browser playground**
 - **CI trust gates**
 - **GitHub Action**
@@ -63,14 +63,14 @@ For production checkout, set `AMC_INDUSTRY_PACKS_CHECKOUT_URL` to the live payme
 
 | Tier | What you get | Who it's for |
 |---|---|---|
-| **Free / Open Source** | Full AMC trust stack (Score, Shield, Enforce, Vault, Watch, Fleet, Passport, Comply), all adapters, all CLI commands, browser playground, CI gates | Everyone — solo devs, teams, enterprises evaluating |
+| **Free / Open Source** | Full AMC trust stack (Score, Shield, Enforce, Vault, Watch, Comply, Fleet, Passport), all adapters, all CLI commands, browser playground, CI gates | Everyone — solo devs, teams, enterprises evaluating |
 | **Industry Packs** | Everything in Free + all 40 Industry Packs for $9.99/month | Teams in regulated industries who need sector-specific diagnostics |
 | **Enterprise** | Everything in Industry Packs + priority support + custom pack development + deployment assistance | Regulated organizations, platform teams at scale |
 
 ## FAQ
 
 ### Is the core product really free?
-Yes. Score, Shield, Enforce, Vault, Watch, Fleet, Passport, Comply — all free, all MIT licensed. No feature gating on the trust stack itself.
+Yes. Score, Shield, Enforce, Vault, Watch, Comply, Fleet, Passport — all free, all MIT licensed. No feature gating on the trust stack itself.
 
 ### What if I don't need Industry Packs?
 Then AMC is completely free for you. The full trust stack works without any Industry Pack.

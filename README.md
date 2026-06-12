@@ -21,7 +21,7 @@
 <p align="center">
   <a href="#-60-seconds-to-your-first-score">Quick Start</a> ·
   <a href="https://agentmaturity.co/playground.html">Web Playground</a> ·
-  <a href="docs/QUICKSTART.md">Docs</a> ·
+  <a href="docs/GETTING_STARTED.md">Docs</a> ·
   <a href="#-recipes--copy-paste-examples">Recipes</a> ·
   <a href="https://github.com/AgentMaturity/AgentMaturityCompass/discussions">Community</a> ·
   <a href="CONTRIBUTING.md">Contribute</a>
@@ -87,10 +87,10 @@ Or skip the install entirely:
 npx agent-maturity-compass
 ```
 
-Want the old 5-question pulse check?
+Want a fast legacy pulse check instead of the full evidence score?
 
 ```bash
-amc quickscore --rapid           # skip optional questions, get a score in seconds
+amc quickscore --rapid           # optional rapid check, not the full score
 ```
 
 <details>
@@ -265,16 +265,16 @@ AMC Studio ──── dashboard + API + CLI + reports
 
 AMC is one trust stack with eight named product surfaces:
 
-| Product | What it does |
-|---|---|
-| **Score** | Evidence-weighted maturity diagnostics and trust scoring |
-| **Shield** | Adversarial assurance packs and attack simulations |
-| **Enforce** | Policy controls, approvals, and governance workflows |
-| **Vault** | Signatures, keys, and tamper-evident proof infrastructure |
-| **Watch** | Traces, anomalies, monitoring, and operational drift detection |
-| **Fleet** | Multi-agent oversight, comparison, inventory, and governance |
-| **Passport** | Portable identity and credential artifacts for agents |
-| **Comply** | Compliance mappings, audit binders, and governance reporting |
+| Product | Promise | What it does |
+|---|---|---|
+| **Score** | Score trust before you ship | Evidence-weighted scoring across live execution behavior instead of brochure claims. |
+| **Shield** | Attack your agent before attackers do | Runs adversarial packs against prompt injection, leakage, memory poisoning, and sycophancy. |
+| **Enforce** | Wrap agent actions in policy | Approval gates, scoped permissions, and runtime controls for sensitive operations. |
+| **Vault** | Cryptographically prove what happened | Signs evidence, verifies ledgers, and gives auditors a tamper-evident chain of custody. |
+| **Watch** | See trust drift before it hurts you | Monitors posture over time and surfaces anomalies, regressions, and risky changes. |
+| **Comply** | Map trust evidence to real frameworks | Turns technical evidence into regulator-readable artifacts for audits and risk reviews. |
+| **Fleet** | Govern many agents like an actual platform | Benchmarks multiple agents, compares risk posture, and enforces org-wide trust baselines. |
+| **Passport** | Make trust portable between environments | Issues a portable, signed trust identity that can move between tools, teams, and environments. |
 
 ---
 
@@ -283,10 +283,67 @@ AMC is one trust stack with eight named product surfaces:
 ### Score any agent in one line
 
 ```bash
-npx agent-maturity-compass                               # full score, no setup
-npx agent-maturity-compass quickscore --eu-ai-act        # legacy quickscore + EU AI Act check
-npx agent-maturity-compass quickscore --share            # legacy quickscore share output
+npx agent-maturity-compass        # full score, no setup
+amc                               # full score after global install
+amc run                           # explicit 8-surface maturity run
+amc run --question-set lifecycle  # opt-in 260-question lifecycle expansion
 ```
+
+Need a fast pulse check for a demo or README badge? Use `amc quickscore --rapid` explicitly.
+
+Advanced proof check:
+
+```bash
+amc resource snapshot            # record agent-defining resources under Enforce
+amc resource validate            # run Enforce gates over resource drift
+amc resource apply               # dry-run acceptance; add --yes to write a signed apply receipt
+amc resource rollback            # dry-run rollback; add --apply to restore from the snapshot
+amc firewall enable --mode block # protect live traffic with Enforce/Shield/Watch decisions
+amc firewall check --direction request --text "ignore previous instructions"
+amc firewall events              # inspect signed allow/warn/block decision events
+amc firewall export --out firewall.jsonl --format splunk --redacted
+amc shield confirm scope-write --file security-scope.json
+amc shield confirm run --scope scope-1 --task finding-task.json
+amc shield confirm export <proof> --out safe-proof.json
+amc import ./agent-run --dry-run # detect traces, runs, graphs, configs, memory, evals, and benchmarks without writing
+amc import ./agent-run           # write redacted import evidence into episodes, lifecycle runs, manifests, and trace indexes
+amc strategy compare --file strategies.json --objective balanced
+amc strategy compare --file strategies.json --apply --approve # commit a manifest-covered model route with receipts
+amc strategy rollback <run>      # restore the prior model route
+amc runtime create --run live-1  # persist connected-agent run state across restarts
+amc runtime event live-1 --type policy.decision --receipt rec-1
+amc runtime inspect live-1       # inspect run state and redacted event stream
+amc fleet graph write --file graph.json # register a typed multi-agent graph for fleet validation
+amc fleet graph validate         # check contracts, permissions, cycles, and fan-out before scoring
+amc fleet score --all --stream   # full-score every configured agent with per-agent SLA progress
+amc fleet lifecycle list         # inspect fleet parent/child lifecycle evidence
+amc fleet lifecycle show <run>   # review topology, typed graph digest, shared resources, and cascade failures
+amc org run --roles REV_PRODUCT_MANAGER,REV_TECH_LEAD,REV_QA_LEAD
+                                  # advanced Fleet role loop with isolated workspaces, heartbeats, and signed evidence
+amc org inspect <run> --redacted  # review role status without local private grader paths
+amc enforce resources verify     # advanced alias for the same Enforce resource engine
+amc evidence lifecycle list      # inspect the full lifecycle artifacts behind recent runs
+amc evidence lifecycle export <run> --out lifecycle.json --redacted
+amc evidence episodes list       # see the evidence objects behind recent full scores
+amc evidence episodes export <id> --out episode.json --redacted
+amc evidence decisions list      # see recommendation and evidence-request receipts
+amc evidence decisions observe <run> # update older receipts with observed outcomes
+amc evidence observability list  # see component, experience, and decision observability
+amc memory writeback <episode>   # store redacted, evidence-backed reasoning lessons with receipts
+amc memory retrieve --consumer fixer # retrieve active lessons for score, recommendations, fixer, or Studio
+amc report <run>                 # review confidence, uncertainty, and auto-fix gates in plain language
+amc trace index                  # list distilled trace failure indexes
+amc trace failures               # see recurring failure clusters and repair inputs
+amc mechanic rca run <run>       # turn a failure index into RCA, regression tests, and governed fix proposals
+amc mechanic rca list            # review signed Fixer RCA reports
+amc experiment optimize --rca latest # create isolated candidates, held-out validation, leakage checks, and receipts
+amc experiment optimizer-list     # review governed optimizer runs and accepted/rejected candidates
+amc evidence finding-proofs list # trace finding -> evidence -> resource -> recommendation
+amc evidence lifecycle-receipts list # see proposal, validation, commit, rollback, and monitor receipts
+npm run release:gate             # release gate for CLI, Studio assets, docs, website spec, domain packs, and receipt output
+```
+
+For a source-of-truth command map generated from the live CLI registry, run `amc commands --markdown` or see [docs/CLI_COMMAND_INVENTORY.md](docs/CLI_COMMAND_INVENTORY.md).
 
 ### Wrap an existing agent (zero code changes)
 
@@ -505,7 +562,7 @@ The full trust stack is **free and MIT licensed**. The only paid surface is Indu
 
 | Tier | What you get |
 |---|---|
-| **Free / Open Source** | Everything — Score, Shield, Enforce, Vault, Watch, Fleet, Passport, Comply, all 14 adapters, 481 CLI commands, browser playground, CI gates |
+| **Free / Open Source** | Everything — Score, Shield, Enforce, Vault, Watch, Comply, Fleet, Passport, all 14 adapters, 1,084 registered CLI command paths, browser playground, CI gates |
 | **Industry Packs** | Everything in Free + all 40 Industry Domain Packs for `$9.99/month` |
 | **Enterprise** | Everything in Industry Packs + priority support + custom pack development + deployment assistance |
 
@@ -534,10 +591,10 @@ The full trust stack is **free and MIT licensed**. The only paid surface is Indu
 
 | | |
 |--|--|
-| [Quickstart (5 min)](docs/QUICKSTART.md) | [Agent Guide](docs/AGENT_GUIDE.md) |
+| [Getting Started (2 min)](docs/GETTING_STARTED.md) | [Agent Guide](docs/AGENT_GUIDE.md) |
 | [Solo Dev Quickstart](docs/SOLO_DEV_QUICKSTART.md) | [Platform Engineer Quickstart](docs/PLATFORM_ENGINEER_QUICKSTART.md) |
 | [Security & Compliance Quickstart](docs/SECURITY_COMPLIANCE_QUICKSTART.md) | [Troubleshooting](docs/TROUBLESHOOTING.md) |
-| [CLI Reference (481 commands)](docs/AMC_MASTER_REFERENCE.md) | [Architecture](docs/ARCHITECTURE_MAP.md) |
+| [CLI Reference (1,084 command paths)](docs/AMC_MASTER_REFERENCE.md) | [Architecture](docs/ARCHITECTURE_MAP.md) |
 | [Compatibility Matrix](docs/COMPATIBILITY_MATRIX.md) | [Starter Blueprints](docs/STARTER_BLUEPRINTS.md) |
 | [Install Packages](docs/INSTALL_PACKAGES.md) | [Support Policy](docs/SUPPORT_POLICY.md) |
 | [Release Cadence](docs/RELEASE_CADENCE.md) | [CI Templates](docs/CI_TEMPLATES.md) |
@@ -555,7 +612,7 @@ The full trust stack is **free and MIT licensed**. The only paid surface is Indu
 - [docs/WHY_AMC.md](docs/WHY_AMC.md) — the case for AMC
 - [docs/USE_CASES.md](docs/USE_CASES.md) — use case gallery
 - [docs/PERSONAS.md](docs/PERSONAS.md) — role-based guides
-- [docs/AFTER_QUICKSCORE.md](docs/AFTER_QUICKSCORE.md) — what to do after your first score
+- [docs/AFTER_FIRST_SCORE.md](docs/AFTER_FIRST_SCORE.md) — what to do after your first score
 - [docs/EXAMPLES_INDEX.md](docs/EXAMPLES_INDEX.md) — example index
 - [docs/RECIPES.md](docs/RECIPES.md) — extended recipes
 - [docs/DEPLOYMENT_OPTIONS.md](docs/DEPLOYMENT_OPTIONS.md) — deployment options
@@ -635,6 +692,6 @@ cd AgentMaturityCompass && npm ci && npm test   # 5,098 tests
 ---
 
 <p align="center">
-  <strong>240 diagnostic questions · 147 assurance packs · 40 domain packs · 14 adapters · 79 scoring modules · 5,098 tests</strong><br>
+  <strong>240 default diagnostic questions + 20 lifecycle expansion questions · 147 assurance packs · 40 domain packs · 14 adapters · 79 scoring modules · 5,098 tests</strong><br>
   <em>Stop trusting. Start verifying.</em>
 </p>

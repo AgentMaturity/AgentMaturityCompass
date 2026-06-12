@@ -16,7 +16,7 @@
 ## Best path
 1. `docs/START_HERE.md`
 2. `docs/QUICKSTART.md`
-3. `docs/AFTER_QUICKSCORE.md`
+3. `docs/AFTER_FIRST_SCORE.md`
 4. `docs/CI_TEMPLATES.md`
 5. `docs/EXAMPLES_INDEX.md`
 
@@ -26,7 +26,7 @@
 - light **Watch** usage
 
 ## Suggested sequence
-1. run `npx agent-maturity-compass quickscore`
+1. run `npx agent-maturity-compass`
 2. inspect the gaps
 3. run `amc fix`
 4. add one CI gate

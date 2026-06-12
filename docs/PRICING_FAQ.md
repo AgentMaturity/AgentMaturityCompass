@@ -1,7 +1,7 @@
 # PRICING_FAQ.md — Pricing Questions
 
 ## Is AMC free?
-Yes. The full trust stack is MIT licensed and free: Score, Shield, Enforce, Vault, Watch, Fleet, Passport, Comply, all 14 adapters, 481 CLI commands, browser playground, and CI gates.
+Yes. The full trust stack is MIT licensed and free: Score, Shield, Enforce, Vault, Watch, Comply, Fleet, Passport, all 14 adapters, 481 CLI commands, browser playground, and CI gates.
 
 ## What costs money?
 Only **Industry Packs** — 40 sector-specific domain packs for regulated verticals like healthcare, finance, education, and government.

@@ -1,6 +1,6 @@
 import Database from "better-sqlite3";
 import { spawnSync } from "node:child_process";
-import { mkdtempSync, readFileSync, rmSync, statSync, writeFileSync, readdirSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, statSync, writeFileSync, readdirSync } from "node:fs";
 import { join, relative } from "node:path";
 import { tmpdir } from "node:os";
 import { afterEach, describe, expect, test } from "vitest";
@@ -180,6 +180,105 @@ describe("release bundles, gates, archetypes, badges", () => {
     const row = db.prepare("SELECT run_id FROM runs LIMIT 1").get() as { run_id: string };
     expect(row.run_id).toBe(run.runId);
     db.close();
+  });
+
+  test("bundle export preserves payloadPath artifacts and complete sealed sessions", async () => {
+    const workspace = newWorkspace();
+    const artifactDir = join(workspace, "agents", "default", "dogfood-artifacts");
+    mkdirSync(artifactDir, { recursive: true });
+    const artifactPath = join(artifactDir, "observed-artifact.json");
+    writeFileSync(artifactPath, JSON.stringify({ kind: "observed-artifact", ok: true }, null, 2));
+    const artifactRelativePath = relative(workspace, artifactPath).replace(/\\/g, "/");
+
+    const ledger = openLedger(workspace);
+    ledger.startSession({
+      sessionId: "payload-path-session",
+      runtime: "unknown",
+      binaryPath: "seed",
+      binarySha256: "seed-sha"
+    });
+    ledger.appendEvidence({
+      sessionId: "payload-path-session",
+      runtime: "unknown",
+      eventType: "stdout",
+      payloadPath: artifactRelativePath,
+      meta: { questionId: "AMC-1.1", trustTier: "OBSERVED", agentId: "default" }
+    });
+    ledger.appendEvidence({
+      sessionId: "payload-path-session",
+      runtime: "unknown",
+      eventType: "stdout",
+      payload: "trailing signed event outside score evidence IDs",
+      meta: { trustTier: "OBSERVED", agentId: "default" }
+    });
+    ledger.sealSession("payload-path-session");
+    ledger.close();
+
+    const run = await runDiagnostic({
+      workspace,
+      window: "14d",
+      targetName: "default",
+      claimMode: "auto",
+      agentId: "default"
+    });
+
+    const bundlePath = join(workspace, ".amc", "payload-path.amcbundle");
+    exportEvidenceBundle({
+      workspace,
+      runId: run.runId,
+      outFile: bundlePath,
+      agentId: "default"
+    });
+
+    const extracted = extractBundle(bundlePath);
+    expect(pathExists(join(extracted, "payloads", artifactRelativePath))).toBe(true);
+
+    const verified = await verifyEvidenceBundle(bundlePath);
+    expect(verified.errors).toEqual([]);
+    expect(verified.ok).toBe(true);
+  });
+
+  test("bundle export scopes assurance rows to the bundled agent", async () => {
+    const workspace = newWorkspace();
+    const run = await runDiagnostic({
+      workspace,
+      window: "14d",
+      targetName: "default",
+      claimMode: "auto",
+      agentId: "default"
+    });
+
+    const ledger = openLedger(workspace);
+    ledger.insertAssuranceRun({
+      assurance_run_id: "other-agent-unsigned",
+      agent_id: "other-agent",
+      ts: run.windowStartTs + 1,
+      window_start_ts: run.windowStartTs,
+      window_end_ts: run.windowEndTs,
+      mode: "sandbox",
+      pack_ids_json: JSON.stringify(["security-starter"]),
+      report_json_sha256: "0".repeat(64),
+      run_seal_sig: "unsigned",
+      status: "UNSIGNED"
+    });
+    ledger.close();
+
+    const bundlePath = join(workspace, ".amc", "scoped-assurance.amcbundle");
+    exportEvidenceBundle({
+      workspace,
+      runId: run.runId,
+      outFile: bundlePath,
+      agentId: "default"
+    });
+
+    const extracted = extractBundle(bundlePath);
+    const db = new Database(join(extracted, "evidence", "evidence.sqlite"), { readonly: true });
+    const assuranceRows = db.prepare("SELECT COUNT(*) as count FROM assurance_runs").get() as { count: number };
+    db.close();
+    expect(assuranceRows.count).toBe(0);
+
+    const verified = await verifyEvidenceBundle(bundlePath);
+    expect(verified.ok).toBe(true);
   });
 
   test("bundle verify catches manifest/blob/missing/signature tampering", async () => {

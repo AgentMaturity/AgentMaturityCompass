@@ -2,7 +2,7 @@ import Database from "better-sqlite3";
 import { spawnSync } from "node:child_process";
 import { mkdtempSync, readdirSync, readFileSync, rmSync, statSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { dirname, join, relative, resolve } from "node:path";
+import { dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
 import type { BundleManifest, DiagnosticReport } from "../types.js";
 import { getAgentPaths, resolveAgentId } from "../fleet/paths.js";
 import { pathExists, ensureDir, writeFileAtomic, readUtf8 } from "../utils/fs.js";
@@ -304,6 +304,60 @@ function findLatestExperimentReport(agentRootDir: string): { json: string; md: s
   };
 }
 
+function resolveWorkspacePayload(workspace: string, payloadPath: string): { source: string; relativePath: string } | null {
+  const workspaceRoot = resolve(workspace);
+  const source = resolve(workspaceRoot, payloadPath);
+  const relativeNative = relative(workspaceRoot, source);
+  if (
+    relativeNative.length === 0 ||
+    relativeNative === ".." ||
+    relativeNative.startsWith(`..${sep}`) ||
+    isAbsolute(relativeNative)
+  ) {
+    return null;
+  }
+  return {
+    source,
+    relativePath: relativeNative.replace(/\\/g, "/")
+  };
+}
+
+function copyPayloadIntoBundle(params: {
+  workspace: string;
+  bundleRoot: string;
+  payloadPath: string;
+}): void {
+  const resolved = resolveWorkspacePayload(params.workspace, params.payloadPath);
+  if (!resolved || !pathExists(resolved.source)) {
+    return;
+  }
+
+  if (resolved.relativePath.startsWith(".amc/blobs/")) {
+    const filename = resolved.relativePath.split("/").pop();
+    if (!filename) {
+      return;
+    }
+    writeFileAtomic(join(params.bundleRoot, "evidence", "blobs", filename), readFileSync(resolved.source));
+    return;
+  }
+
+  writeFileAtomic(join(params.bundleRoot, "payloads", resolved.relativePath), readFileSync(resolved.source));
+}
+
+function restorePayloadsFromBundle(root: string, workspace: string): void {
+  const payloadsRoot = join(root, "payloads");
+  if (!pathExists(payloadsRoot)) {
+    return;
+  }
+  for (const payloadFile of collectFiles(payloadsRoot)) {
+    const resolved = resolveWorkspacePayload(workspace, payloadFile);
+    if (!resolved) {
+      continue;
+    }
+    writeFileAtomic(resolved.source, readFileSync(join(payloadsRoot, payloadFile)));
+  }
+}
+
 function copyEvidenceSlice(params: {
   sourceDbPath: string;
   outputDbPath: string;
@@ -340,12 +394,27 @@ function copyEvidenceSlice(params: {
       maxRowId = Number(allRunWindowEvents[allRunWindowEvents.length - 1]?.rowid ?? 0);
     }
 
-    const selectedEvents =
+    let selectedEvents =
       maxRowId > 0
         ? (source
             .prepare("SELECT rowid, * FROM evidence_events WHERE rowid <= ? ORDER BY rowid ASC")
             .all(maxRowId) as Array<Record<string, unknown>>)
         : [];
+
+    const selectedSessionIds = [...new Set(selectedEvents.map((row) => String(row.session_id)))];
+    if (selectedSessionIds.length > 0) {
+      const placeholders = selectedSessionIds.map(() => "?").join(",");
+      const sessionMaxRows = source
+        .prepare(`SELECT MAX(rowid) as maxRowId FROM evidence_events WHERE session_id IN (${placeholders})`)
+        .get(...selectedSessionIds) as { maxRowId: number | null };
+      const sealedSessionMaxRowId = Number(sessionMaxRows.maxRowId ?? 0);
+      if (sealedSessionMaxRowId > maxRowId) {
+        maxRowId = sealedSessionMaxRowId;
+        selectedEvents = source
+          .prepare("SELECT rowid, * FROM evidence_events WHERE rowid <= ? ORDER BY rowid ASC")
+          .all(maxRowId) as Array<Record<string, unknown>>;
+      }
+    }
 
     const insertEvent = out.prepare(
       `INSERT INTO evidence_events
@@ -405,8 +474,8 @@ function copyEvidenceSlice(params: {
     txSessions(sessions);
 
     const assuranceRows = source
-      .prepare("SELECT * FROM assurance_runs WHERE ts >= ? AND ts <= ? ORDER BY ts ASC")
-      .all(params.report.windowStartTs, params.report.windowEndTs) as Array<Record<string, unknown>>;
+      .prepare("SELECT * FROM assurance_runs WHERE agent_id = ? AND ts >= ? AND ts <= ? ORDER BY ts ASC")
+      .all(params.report.agentId, params.report.windowStartTs, params.report.windowEndTs) as Array<Record<string, unknown>>;
     if (assuranceRows.length > 0) {
       const insertAssurance = out.prepare(
         `INSERT INTO assurance_runs
@@ -559,6 +628,7 @@ function materializeBundleWorkspace(root: string): string {
       writeFileAtomic(target, readFileSync(source));
     }
   }
+  restorePayloadsFromBundle(root, workspace);
 
   writeFileAtomic(join(keysDir, "monitor_ed25519.pub"), readUtf8(join(root, "public-keys", "monitor.pub")), 0o644);
   writeFileAtomic(join(keysDir, "auditor_ed25519.pub"), readUtf8(join(root, "public-keys", "auditor.pub")), 0o644);
@@ -707,15 +777,11 @@ export function exportEvidenceBundle(params: {
     const copied = copyEvidenceSlice({ sourceDbPath, outputDbPath, report });
 
     for (const payloadPath of copied.blobPaths) {
-      const filename = payloadPath.split("/").pop();
-      if (!filename) {
-        continue;
-      }
-      const source = join(params.workspace, payloadPath);
-      if (!pathExists(source)) {
-        continue;
-      }
-      writeFileAtomic(join(root, "evidence", "blobs", filename), readFileSync(source));
+      copyPayloadIntoBundle({
+        workspace: params.workspace,
+        bundleRoot: root,
+        payloadPath
+      });
     }
 
     const packageJsonPath = join(params.workspace, "package.json");

@@ -54,6 +54,21 @@ export type LayerName =
   | "Resilience"
   | "Skills";
 
+export type AMCSurfaceName = "Score" | "Shield" | "Enforce" | "Vault" | "Watch" | "Comply" | "Fleet" | "Passport";
+
+export type AssessmentQuestionFamily =
+  | "core"
+  | "lifecycle-governance"
+  | "harness-resources"
+  | "evidence-binding"
+  | "typed-multi-agent"
+  | "trace-repair"
+  | "proof-exports"
+  | "reasoning-memory"
+  | "uncertainty-controls"
+  | "runtime-gateway-watch"
+  | "fleet-org-operation";
+
 export type TrustLabel = "HIGH TRUST" | "LOW TRUST" | "DEVELOPING — some evidence, needs more coverage" | "LOW — collect more evidence to increase trust" | "UNRELIABLE — DO NOT USE FOR CLAIMS";
 
 export interface EvidenceEvent {
@@ -161,6 +176,38 @@ export interface DiagnosticQuestion {
   upgradeHints: string;
   tuningKnobs: string[];
   gates: Gate[];
+  questionSetVersion?: string;
+  family?: AssessmentQuestionFamily;
+  surfaces?: AMCSurfaceName[];
+  assessmentLayers?: LayerName[];
+  introducedIn?: string;
+  scoringWeight?: number;
+  activeByDefault?: boolean;
+}
+
+export interface DiagnosticQuestionSetDimension {
+  family: AssessmentQuestionFamily;
+  title: string;
+  description: string;
+  questionCount: number;
+  surfaces: AMCSurfaceName[];
+  layers: LayerName[];
+}
+
+export interface DiagnosticQuestionSetInfo {
+  version: string;
+  title: string;
+  questionCount: number;
+  default: boolean;
+  includedVersions: string[];
+  dimensions: DiagnosticQuestionSetDimension[];
+  domainPackWeighting?: {
+    requested: boolean;
+    applied: boolean;
+    entitlementActive: boolean;
+    modifiedQuestionCount: number;
+    message: string;
+  };
 }
 
 export interface QuestionScore {
@@ -172,6 +219,36 @@ export interface QuestionScore {
   evidenceEventIds: string[];
   flags: string[];
   narrative: string;
+  confidenceControls?: QuestionConfidenceControls;
+}
+
+export interface QuestionConfidenceControls {
+  evidenceSufficiency: number;
+  contradictionRisk: number;
+  judgeAgreement: number;
+  decisivenessRisk: number;
+  uncertaintyLevel: "low" | "medium" | "high";
+  presentationStatus: "verified" | "downgraded" | "needs_review";
+  downgradeReason: string | null;
+  autoFixAllowed: boolean;
+}
+
+export interface RecommendationConfidenceControl {
+  questionId: string;
+  action: string;
+  confidence: number;
+  uncertaintyLevel: QuestionConfidenceControls["uncertaintyLevel"];
+  autoFixAllowed: boolean;
+  reason: string;
+}
+
+export interface DiagnosticConfidenceSummary {
+  lowConfidenceFindings: number;
+  highUncertaintyFindings: number;
+  downgradedFindings: number;
+  autoFixBlockedRecommendations: number;
+  averageEvidenceSufficiency: number;
+  averageJudgeAgreement: number;
 }
 
 export interface LayerScore {
@@ -188,6 +265,8 @@ export interface RunDiagnosticInput {
   runtimeForHarness?: RuntimeName;
   agentId?: string;
   noSign?: boolean; // Skip vault/artifact signing — report still generates, just unsigned
+  questionSetVersion?: string;
+  applyIndustryPackWeights?: boolean;
 }
 
 export interface DiagnosticReport {
@@ -243,6 +322,9 @@ export interface DiagnosticReport {
   };
   targetDiff: { questionId: string; current: number; target: number; gap: number }[];
   prioritizedUpgradeActions: string[];
+  recommendationControls?: RecommendationConfidenceControl[];
+  confidenceSummary?: DiagnosticConfidenceSummary;
+  questionSet?: DiagnosticQuestionSetInfo;
   evidenceToCollectNext: string[];
   runSealSig: string;
   reportJsonSha256: string;

@@ -52,7 +52,7 @@
       <a href="#ns-config" class="sub">Configuration</a>
       <a href="#ns-adapters" class="sub">Adapters</a>
       <a href="#ns-evidence" class="sub">Evidence Capture</a>
-      <a href="#ns-quickscore" class="sub">Quickscore &amp; Sharing</a>
+      <a href="#ns-quickscore" class="sub">Rapid Checks &amp; Sharing</a>
       <a href="#ns-scoring" class="sub">Scoring &amp; Diagnostics</a>
       <a href="#ns-observability" class="sub">Observability &amp; Trace</a>
       <a href="#ns-evals" class="sub">Datasets &amp; Lite Scoring</a>
@@ -89,7 +89,7 @@
 
       <div class="callout callout-green">
         <strong>📊 By the numbers</strong>
-        The AMC CLI ships with 481 commands across 48 namespaces. Every command supports <code>--help</code> for inline documentation.
+        The AMC CLI currently registers 1,084 command paths. Every command supports <code>--help</code> for inline documentation.
       </div>
 
       <!-- Top 20 -->
@@ -99,8 +99,8 @@
       <table>
         <thead><tr><th>Command</th><th>What it does</th><th>Example</th></tr></thead>
         <tbody>
-          <tr><td><code>amc init</code></td><td>Initialize a new <code>.amc</code> workspace</td><td><code>amc init</code></td></tr>
-          <tr><td><code>amc quickscore</code></td><td>2-minute rapid self-assessment</td><td><code>amc quickscore --share</code></td></tr>
+          <tr><td><code>amc</code></td><td>Detect setup and run the full maturity score</td><td><code>amc</code></td></tr>
+          <tr><td><code>amc setup --demo</code></td><td>Create demo data and run the same full-score path</td><td><code>amc setup --demo &amp;&amp; amc</code></td></tr>
           <tr><td><code>amc doctor</code></td><td>Check runtime and workspace health</td><td><code>amc doctor</code></td></tr>
           <tr><td><code>amc fix</code></td><td>Generate remediation files</td><td><code>amc fix --target-level L4</code></td></tr>
           <tr><td><code>amc guide --go</code></td><td>Auto-detect framework and apply guardrails</td><td><code>amc guide --go</code></td></tr>
@@ -110,6 +110,7 @@
           <tr><td><code>amc wrap</code></td><td>Wrap any agent CLI for evidence capture</td><td><code>amc wrap claude -- claude "hello"</code></td></tr>
           <tr><td><code>amc adapters run</code></td><td>Run adapter with lease + gateway routing</td><td><code>amc adapters run --adapter claude-cli -- claude</code></td></tr>
           <tr><td><code>amc run</code></td><td>Run full maturity diagnostic</td><td><code>amc run --agent my-agent --window 30</code></td></tr>
+          <tr><td><code>amc run --question-set lifecycle</code></td><td>Run the explicit 260-question lifecycle-expanded diagnostic</td><td><code>amc run --question-set lifecycle</code></td></tr>
           <tr><td><code>amc report</code></td><td>Render diagnostic report</td><td><code>amc report &lt;id&gt; --html r.html</code></td></tr>
           <tr><td><code>amc badge</code></td><td>Generate maturity badge</td><td><code>amc badge --format html</code></td></tr>
           <tr><td><code>amc assurance run</code></td><td>Run red team assurance packs</td><td><code>amc assurance run --scope full</code></td></tr>
@@ -160,7 +161,7 @@
         <table>
           <thead><tr><th>Command</th><th>Description</th></tr></thead>
           <tbody>
-            <tr><td><code>amc up</code></td><td>Start Studio local control plane (gateway, proxy, dashboard, API)</td></tr>
+            <tr><td><code>amc up</code></td><td>Start Studio local control plane with lifecycle evidence, gateway, proxy, dashboard, and API</td></tr>
             <tr><td><code>amc down</code></td><td>Stop Studio</td></tr>
             <tr><td><code>amc status</code></td><td>Show Studio and vault status</td></tr>
             <tr><td><code>amc logs</code></td><td>Print latest Studio logs</td></tr>
@@ -227,18 +228,18 @@
         </table>
       </div>
 
-      <!-- QUICKSCORE -->
+      <!-- RAPID CHECKS -->
       <div class="ns-toggle" id="ns-quickscore" onclick="this.classList.toggle('open')">
-        <h3>Quickscore, Badge &amp; Telemetry <span class="cmd-count">8 commands</span></h3>
+        <h3>Rapid Checks, Badge &amp; Telemetry <span class="cmd-count">8 commands</span></h3>
       </div>
       <div class="ns-body">
         <table>
           <thead><tr><th>Command</th><th>Description</th></tr></thead>
           <tbody>
-            <tr><td><code>amc quickscore</code></td><td>2-minute rapid self-assessment (no gateway required)</td></tr>
-            <tr><td><code>amc quickscore --share</code></td><td>Generate shareable markdown summary + badge</td></tr>
+            <tr><td><code>amc quickscore</code></td><td>Optional rapid pulse check; use <code>amc</code> for the full score</td></tr>
+            <tr><td><code>amc quickscore --rapid</code></td><td>Run the lightweight pulse-check mode explicitly</td></tr>
             <tr><td><code>amc quickscore --json</code></td><td>Machine-readable JSON output</td></tr>
-            <tr><td><code>amc quickscore --eu-ai-act</code></td><td>Include EU AI Act risk classification</td></tr>
+            <tr><td><code>amc compliance report --framework EU_AI_ACT</code></td><td>Generate EU AI Act mapping from evidence</td></tr>
             <tr><td><code>amc badge</code></td><td>Generate maturity badge (markdown, HTML, or URL)</td></tr>
             <tr><td><code>amc badge --format html</code></td><td>HTML <code>&lt;img&gt;</code> tag output</td></tr>
             <tr><td><code>amc telemetry on|off</code></td><td>Enable/disable anonymous opt-in telemetry</td></tr>
@@ -256,6 +257,7 @@
           <thead><tr><th>Command</th><th>Description</th></tr></thead>
           <tbody>
             <tr><td><code>amc run --agent &lt;id&gt; --window &lt;d&gt;</code></td><td>Run maturity diagnostic</td></tr>
+            <tr><td><code>amc run --question-set lifecycle</code></td><td>Opt into lifecycle, evidence, runtime, proof, memory, and fleet question coverage</td></tr>
             <tr><td><code>amc report &lt;runId&gt;</code></td><td>Render report for a run</td></tr>
             <tr><td><code>amc report &lt;id&gt; --html r.html</code></td><td>Styled HTML report (print to PDF)</td></tr>
             <tr><td><code>amc report &lt;id&gt; --executive</code></td><td>Board-friendly terminal summary</td></tr>
@@ -280,7 +282,7 @@
 
       <!-- GATEWAY -->
       <div class="ns-toggle" id="ns-gateway" onclick="this.classList.toggle('open')">
-        <h3>Gateway &amp; Proxy <span class="cmd-count">5 commands</span></h3>
+        <h3>Gateway, Proxy &amp; Runtime <span class="cmd-count">21 commands</span></h3>
       </div>
       <div class="ns-body">
         <table>
@@ -291,13 +293,25 @@
             <tr><td><code>amc gateway status</code></td><td>Show gateway status</td></tr>
             <tr><td><code>amc gateway verify-config</code></td><td>Verify gateway config</td></tr>
             <tr><td><code>amc gateway bind-agent</code></td><td>Bind agent to gateway route</td></tr>
+            <tr><td><code>amc firewall enable --mode observe|warn|block</code></td><td>Enable Runtime Firewall protection for live agent traffic</td></tr>
+            <tr><td><code>amc firewall status</code></td><td>Show policy mode and decision counts</td></tr>
+            <tr><td><code>amc firewall check --direction request --text "..."</code></td><td>Preview an allow, warn, or block decision with reasons and receipt refs</td></tr>
+            <tr><td><code>amc firewall events</code></td><td>List signed runtime decision events</td></tr>
+            <tr><td><code>amc firewall export --format splunk --redacted</code></td><td>Export redacted SIEM-friendly decision logs</td></tr>
+            <tr><td><code>amc firewall disable</code></td><td>Disable Runtime Firewall policy for the workspace</td></tr>
+            <tr><td><code>amc runtime status</code></td><td>Show persisted connected-agent run state counts</td></tr>
+            <tr><td><code>amc runtime create --run &lt;id&gt;</code></td><td>Create a resumable runtime run</td></tr>
+            <tr><td><code>amc runtime event &lt;id&gt; --type trace.received</code></td><td>Append a redacted runtime event</td></tr>
+            <tr><td><code>amc runtime inspect &lt;id&gt;</code></td><td>Inspect run state and event stream</td></tr>
+            <tr><td><code>amc runtime resume|cancel|degrade|complete &lt;id&gt;</code></td><td>Manage run lifecycle state cleanly</td></tr>
+            <tr><td><code>amc runtime export &lt;id&gt; --redacted</code></td><td>Export runtime run events as JSON or JSONL</td></tr>
           </tbody>
         </table>
       </div>
 
       <!-- FLEET -->
       <div class="ns-toggle" id="ns-fleet" onclick="this.classList.toggle('open')">
-        <h3>Fleet &amp; Agents <span class="cmd-count">18 commands</span></h3>
+        <h3>Fleet &amp; Agents <span class="cmd-count">28 commands</span></h3>
       </div>
       <div class="ns-body">
         <table>
@@ -305,6 +319,16 @@
           <tbody>
             <tr><td><code>amc fleet init</code></td><td>Create and sign <code>fleet.yaml</code></td></tr>
             <tr><td><code>amc fleet report --window &lt;d&gt;</code></td><td>Cross-agent fleet report</td></tr>
+            <tr><td><code>amc fleet graph write --file graph.json</code></td><td>Write typed nodes, handoffs, tools, contracts, policies, permissions, and invariants</td></tr>
+            <tr><td><code>amc fleet graph show</code></td><td>Inspect the latest typed graph, digest, node/edge counts, and validation status</td></tr>
+            <tr><td><code>amc fleet graph validate</code></td><td>Fail invalid graph contracts, unsafe permissions, cycles, and unbounded fan-out with actionable errors</td></tr>
+            <tr><td><code>amc fleet graph list</code></td><td>List saved typed multi-agent graph versions</td></tr>
+            <tr><td><code>amc fleet score --all --stream --sla 120s</code></td><td>Full-score every configured agent with progressive SLA status and parent/child lifecycle evidence</td></tr>
+            <tr><td><code>amc fleet lifecycle list</code></td><td>List fleet parent lifecycle artifacts</td></tr>
+            <tr><td><code>amc fleet lifecycle show &lt;run&gt;</code></td><td>Inspect child runs, topology, typed graph digest, shared resources, and cascade failures</td></tr>
+            <tr><td><code>amc org roles</code></td><td>List the canonical 70-role operating model</td></tr>
+            <tr><td><code>amc org run --roles REV_PRODUCT_MANAGER,REV_TECH_LEAD,REV_QA_LEAD</code></td><td>Advanced Fleet role loop with isolated workspaces, Watch heartbeats, Enforce gates, and Vault-signed evidence</td></tr>
+            <tr><td><code>amc org runs|inspect &lt;run&gt; --redacted</code></td><td>Review org-run status, handoffs, blocked gates, receipts, and rollback refs without private grader paths</td></tr>
             <tr><td><code>amc fleet trust-init</code></td><td>Initialize trust composition</td></tr>
             <tr><td><code>amc fleet trust-add-edge</code></td><td>Add delegation edge</td></tr>
             <tr><td><code>amc fleet trust-report</code></td><td>Trust composition report</td></tr>
@@ -340,6 +364,20 @@
             <tr><td><code>amc correction report</code></td><td>Summarize correction closure and effectiveness</td></tr>
             <tr><td><code>amc trace list</code></td><td>List recent agent sessions with evidence summary</td></tr>
             <tr><td><code>amc trace inspect</code></td><td>Inspect tool calls, decisions, payloads, and trust tiers</td></tr>
+            <tr><td><code>amc evidence lifecycle list|inspect|export --redacted</code></td><td>List, inspect, and export shareable lifecycle artifacts</td></tr>
+            <tr><td><code>amc evidence episodes list|inspect|export --redacted</code></td><td>List, inspect, and export durable full-score evidence episodes</td></tr>
+            <tr><td><code>amc evidence decisions list|inspect</code></td><td>Inspect recommendation and evidence-request receipts</td></tr>
+            <tr><td><code>amc evidence decisions observe &lt;run&gt;</code></td><td>Update proposed decision receipts with later observed outcomes</td></tr>
+            <tr><td><code>amc evidence observability list|inspect</code></td><td>Inspect component attribution, experience signals, and decision-chain records</td></tr>
+            <tr><td><code>amc memory writeback &lt;episode&gt;</code></td><td>Write redacted, evidence-backed reasoning memory with expiry and receipts</td></tr>
+            <tr><td><code>amc memory retrieve --consumer fixer</code></td><td>Retrieve active reasoning memory with citations for score, recommendations, fixer, or Studio</td></tr>
+            <tr><td><code>amc report &lt;run&gt;</code></td><td>Review confidence controls, uncertainty language, and auto-fix review gates</td></tr>
+            <tr><td><code>amc trace index --run &lt;run&gt;</code></td><td>Inspect distilled trace failure index entries and clusters</td></tr>
+            <tr><td><code>amc trace failures</code></td><td>Show ranked recurring failure clusters and repair inputs</td></tr>
+            <tr><td><code>amc mechanic rca run &lt;run&gt;</code></td><td>Generate RCA, regression tests, rollback pointers, and governed Enforce fix proposals</td></tr>
+            <tr><td><code>amc experiment optimize --rca latest</code></td><td>Create governed optimizer candidates with held-out validation and leakage checks</td></tr>
+            <tr><td><code>amc evidence finding-proofs list|inspect|export --redacted</code></td><td>Trace findings to evidence, resources, receipts, and recommendations</td></tr>
+            <tr><td><code>amc evidence lifecycle-receipts list|inspect|export --redacted</code></td><td>Inspect proposal, validation, commit, rollback, and monitor receipts</td></tr>
             <tr><td><code>amc trace stats</code></td><td>Break down events by type, trust tier, and tool usage</td></tr>
             <tr><td><code>amc alert config</code></td><td>Configure webhook, Slack, or PagerDuty destinations</td></tr>
             <tr><td><code>amc alert send|test|watch</code></td><td>Send manual alerts or auto-watch for anomalies</td></tr>
@@ -360,6 +398,12 @@
             <tr><td><code>amc dataset list</code></td><td>List evaluation datasets</td></tr>
             <tr><td><code>amc dataset run &lt;name&gt;</code></td><td>Run a dataset against your configured endpoint or model</td></tr>
             <tr><td><code>amc dataset import &lt;name&gt; --file &lt;path&gt;</code></td><td>Import CSV/JSON/JSONL test cases</td></tr>
+            <tr><td><code>amc import &lt;path&gt; --dry-run</code></td><td>Detect neutral traces, event logs, run directories, graphs, configs, memory, evals, and benchmarks</td></tr>
+            <tr><td><code>amc import &lt;path&gt;</code></td><td>Persist redacted imported evidence into episodes, lifecycle runs, resource manifests, and trace indexes</td></tr>
+            <tr><td><code>amc imports list|show|rollback</code></td><td>Inspect and roll back neutral import runs</td></tr>
+            <tr><td><code>amc strategy compare --file strategies.json</code></td><td>Rank inference strategies with score, cost, latency, risk, confidence, and evidence refs</td></tr>
+            <tr><td><code>amc strategy compare --file strategies.json --apply --approve</code></td><td>Commit a recommended route through policy approval, resource manifest evidence, and rollback data</td></tr>
+            <tr><td><code>amc strategy list|show|rollback</code></td><td>Inspect strategy receipts and roll back accepted route changes</td></tr>
             <tr><td><code>amc lite-score</code></td><td>Lite scoring for non-agent chatbots and vanilla LLM apps</td></tr>
             <tr><td><code>amc eval import</code></td><td>Import results from LangSmith, DeepEval, Promptfoo, and more</td></tr>
             <tr><td><code>amc eval status</code></td><td>Check imported eval coverage</td></tr>
@@ -401,6 +445,15 @@
             <tr><td><code>amc policy action init|verify</code></td><td>Signed autonomy action policy</td></tr>
             <tr><td><code>amc policy approval init|verify</code></td><td>Signed dual-control approval policy</td></tr>
             <tr><td><code>amc policy pack list|describe|apply</code></td><td>Policy packs by archetype/risk</td></tr>
+            <tr><td><code>amc resource snapshot|validate|apply|rollback</code></td><td>One governed Enforce protocol for prompts, tools, policies, memory, routes, evaluators, datasets, schemas, environments, and configs</td></tr>
+            <tr><td><code>amc resource propose|evaluate|history|contract</code></td><td>Dry-run resource changes, inspect gates, trace signed receipts, and view the AMC-native resource contract</td></tr>
+            <tr><td><code>amc import &lt;path&gt;</code></td><td>Map existing neutral run artifacts into AMC evidence without platform-specific connectors or public source names</td></tr>
+            <tr><td><code>amc strategy compare</code></td><td>Explain model route tradeoffs and gate route changes through receipts</td></tr>
+            <tr><td><code>amc fleet graph write|validate</code></td><td>Register and validate typed multi-agent graph topology before fleet scoring</td></tr>
+            <tr><td><code>amc fleet score --all --stream --sla 120s</code></td><td>Full-score every configured agent with progressive status, per-agent SLA timing, lifecycle artifacts, and partial-failure summaries</td></tr>
+            <tr><td><code>npm run release:gate</code></td><td>Run the release gate and write a JSON receipt for CLI, Studio assets, OpenAPI, docs drift, domain packs, and optional live health</td></tr>
+            <tr><td><code>amc commands --markdown</code></td><td>Generate the live CLI inventory from the registered command map so docs can stay in sync</td></tr>
+            <tr><td><code>amc enforce resources snapshot|diff|verify</code></td><td>Advanced aliases for the same signed Enforce resource engine</td></tr>
             <tr><td><code>amc approvals list</code></td><td>List pending approvals</td></tr>
             <tr><td><code>amc approvals approve &lt;id&gt;</code></td><td>Approve execution intent</td></tr>
             <tr><td><code>amc approvals deny &lt;id&gt;</code></td><td>Deny execution intent</td></tr>
@@ -447,6 +500,9 @@
             <tr><td><code>amc assurance run --format sarif</code></td><td>SARIF 2.1.0 export for security tools</td></tr>
             <tr><td><code>amc assurance runs</code></td><td>List past runs</td></tr>
             <tr><td><code>amc assurance show &lt;runId&gt;</code></td><td>Show run details</td></tr>
+            <tr><td><code>amc shield confirm scope-write --file security-scope.json</code></td><td>Write a signed authorization scope for controlled exploit confirmation</td></tr>
+            <tr><td><code>amc shield confirm run --scope &lt;scope&gt; --task finding-task.json</code></td><td>Run fail-closed confirmation and emit safe proof without exploit instructions</td></tr>
+            <tr><td><code>amc shield confirm proofs|export &lt;proof&gt;</code></td><td>List and export redacted confirmation proof for Vault or Passport evidence</td></tr>
             <tr><td><code>amc assurance cert issue|verify</code></td><td>Assurance certificates</td></tr>
             <tr><td><code>amc assurance scheduler status</code></td><td>Scheduler controls</td></tr>
             <tr><td><code>amc assurance waiver request</code></td><td>Temporary waiver</td></tr>
@@ -526,6 +582,7 @@
             <tr><td><code>amc mechanic init</code></td><td>Initialize mechanic workspace</td></tr>
             <tr><td><code>amc mechanic gap</code></td><td>Show maturity gaps</td></tr>
             <tr><td><code>amc mechanic plan create|execute</code></td><td>Upgrade plan lifecycle</td></tr>
+            <tr><td><code>amc mechanic rca list|show</code></td><td>Review signed Fixer RCA reports</td></tr>
             <tr><td><code>amc learn --agent &lt;id&gt;</code></td><td>Education flow for a question</td></tr>
             <tr><td><code>amc own --agent &lt;id&gt;</code></td><td>Ownership flow for top gaps</td></tr>
             <tr><td><code>amc commit --agent &lt;id&gt;</code></td><td>Commitment plan</td></tr>
@@ -534,6 +591,8 @@
             <tr><td><code>amc bom generate|sign|verify</code></td><td>Maturity Bill of Materials</td></tr>
             <tr><td><code>amc forecast init|refresh</code></td><td>Evidence-gated forecasting</td></tr>
             <tr><td><code>amc experiment create|run|analyze</code></td><td>Experiment lifecycle</td></tr>
+            <tr><td><code>amc experiment optimize|optimizer-list|optimizer-show</code></td><td>Governed optimizer candidates with held-out validation and receipts</td></tr>
+            <tr><td><code>amc memory writeback|retrieve|show</code></td><td>Governed reasoning memory from full-score episodes</td></tr>
             <tr><td><code>amc casebook init|add|list</code></td><td>Signed casebook operations</td></tr>
             <tr><td><code>amc plugin keygen|pack|install</code></td><td>Plugin development &amp; lifecycle</td></tr>
             <tr><td><code>amc release pack|verify|sbom</code></td><td>Release engineering</td></tr>

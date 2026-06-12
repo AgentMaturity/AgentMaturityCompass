@@ -8,7 +8,7 @@ This is the fastest routing page for AMC documentation.
 - **I want to understand what AMC actually is** → `docs/ARCHITECTURE_BRIEF.md`
 - **I want core vs wrapper vs legacy clarity** → `docs/IMPLEMENTATION_REALITY_MAP.md`
 - **I want subsystem deep dives** → `docs/deep-dive/INDEX.md`
-- **I already ran quickscore** → `docs/AFTER_QUICKSCORE.md`
+- **I already ran quickscore** → `docs/AFTER_FIRST_SCORE.md`
 - **I want install options** → `docs/INSTALL.md`
 - **I want product/edition clarity** → `docs/PRODUCT_EDITIONS.md`
 - **I want pricing/commercial packaging** → `docs/PRICING.md`
@@ -44,7 +44,7 @@ This is the fastest routing page for AMC documentation.
 - `docs/DOCS_DRIFT_CLEANUP_PLAN.md`
 - `docs/deep-dive/INDEX.md`
 - `docs/START_HERE.md`
-- `docs/AFTER_QUICKSCORE.md`
+- `docs/AFTER_FIRST_SCORE.md`
 - `docs/INSTALL.md`
 - `docs/QUICKSTART.md`
 - `docs/ADAPTERS.md`

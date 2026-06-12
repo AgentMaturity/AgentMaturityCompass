@@ -6,10 +6,10 @@ AMC is easiest to understand when mapped to concrete jobs.
 Use this when you want the fastest useful answer.
 
 Typical path:
-1. `npx agent-maturity-compass quickscore`
+1. `npx agent-maturity-compass`
 2. read the gaps
 3. run `amc fix`
-4. review `docs/AFTER_QUICKSCORE.md`
+4. review `docs/AFTER_FIRST_SCORE.md`
 
 ## 2. Add a trust gate to CI
 Use this when you want releases to stop regressing silently.

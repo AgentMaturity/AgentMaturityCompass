@@ -60,7 +60,7 @@ amc init
 ✔ Created .amc/ workspace
 ✔ Generated Ed25519 signing keys
 ✔ Wrote amc.config.yaml
-Ready. Run `amc quickscore` to get your first maturity score.
+Ready. Run `amc full score` to get your first maturity score.
 ```
 
 **Narration:**
@@ -68,17 +68,17 @@ Ready. Run `amc quickscore` to get your first maturity score.
 
 ---
 
-## Scene 4 — Quickscore (0:45 – 1:25)
+## Scene 4 — Full score (0:45 – 1:25)
 
 **Screen:** Type:
 
 ```bash
-amc quickscore
+amc full score
 ```
 
 **Expected output — interactive Q&A (show 3 of 5 questions):**
 ```
-AMC Quickscore — 5 questions to your maturity level
+AMC Full Score — 5 questions to your maturity level
 
 1/5  Does your agent have a defined capability boundary?
      (what it can and cannot do)
@@ -98,7 +98,7 @@ Calculating maturity score...
 **Expected output — result:**
 ```
 ╭─────────────────────────────────────────╮
-│  AMC Quickscore Result                  │
+│  AMC Full Score Result                  │
 │                                         │
 │  Overall Level:  L3 — Governed          │
 │  Trust Score:    72/100                  │

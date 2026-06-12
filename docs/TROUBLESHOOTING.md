@@ -23,7 +23,7 @@ npm i -g agent-maturity-compass
 Or run without installing:
 
 ```bash
-npx agent-maturity-compass quickscore
+npx agent-maturity-compass
 ```
 
 ### Install fails on Node version / native module issues
@@ -51,7 +51,7 @@ Unlock it before running flows that need signing or protected operations.
 amc vault unlock
 ```
 
-### Quickscore works, but deeper workflows feel confusing
+### Full score works, but deeper workflows feel confusing
 
 Read these in order:
 - `docs/QUICKSTART.md`

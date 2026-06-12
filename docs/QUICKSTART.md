@@ -1,4 +1,4 @@
-# ⚡ Quickstart — 5 Minutes to First Eval
+# Quickstart — 2 Minutes to First Full Score
 
 Get your AI agent's trust score in under 5 minutes. No code changes needed.
 
@@ -24,33 +24,38 @@ amc --version
 
 ---
 
-## 2. Create a workspace (15 seconds)
+## 2. Run AMC in your agent project
 
 ```bash
 mkdir my-agent && cd my-agent
-export AMC_VAULT_PASSPHRASE='pick-a-passphrase'
-amc init
+amc
 ```
 
-`amc init` creates an `.amc/` directory with your cryptographic evidence vault (Ed25519 keys) and workspace config at `.amc/amc.config.yaml`.
+`amc` is the default path. It creates the `.amc/` workspace if needed, detects what it can score, runs the full maturity score, and prints the next action.
 
-> **Tip:** The vault passphrase protects your signing keys. Pick something memorable — you'll need it each session.
+> **Tip:** For a demo workspace with sample data, run `amc setup --demo` and then `amc`.
 
 ---
 
-## 3. Get your first score (2 minutes)
+## 3. Read your result
 
 ```bash
-amc quickscore
+amc
 ```
 
-Answer 5 quick questions about your agent. AMC returns a maturity level from **L0** (no governance) to **L5** (self-governing), plus a gap analysis showing what to fix first.
+AMC returns a maturity level from **L0** (no governance) to **L5** (self-governing), plus a gap analysis showing what to fix first.
 
-**Share it:**
+**Optional expanded assessment:**
 
 ```bash
-amc quickscore --share    # Markdown snippet + shields.io badge
-amc badge                 # README badge: ![AMC L3](https://img.shields.io/badge/AMC-L3-blue)
+amc run --question-set lifecycle    # 240 default questions + 20 lifecycle questions
+```
+
+**Optional fast pulse check:**
+
+```bash
+amc quickscore --rapid    # lightweight pulse check, not the full score
+amc badge                 # README badge after a scored run
 ```
 
 ---
@@ -111,10 +116,10 @@ amc guide --go
 
 This auto-detects your framework (LangChain, CrewAI, Claude Code, Cursor, OpenClaw, etc.), generates severity-tagged guardrails (🔴 Critical / 🟡 High / 🔵 Medium), and applies them to your agent's config.
 
-Re-score to see improvement:
+Run the full score again to see improvement:
 
 ```bash
-amc quickscore
+amc
 amc guide --diff    # Shows closed gaps, new gaps, level changes
 ```
 
@@ -184,9 +189,33 @@ amc wrap generic -- your-agent-command
 
 | Goal | Command |
 |------|---------|
-| Deep diagnostic (140 questions) | `amc diagnostic run` |
-| EU AI Act compliance check | `amc quickscore --eu-ai-act` |
+| Deep diagnostic (240 default questions) | `amc diagnostic run` |
+| Lifecycle-expanded diagnostic (260 questions) | `amc run --question-set lifecycle` |
+| EU AI Act compliance check | `amc compliance report --framework EU_AI_ACT` |
 | Red-team your agent | `amc assurance run --all` |
+| Prove governed resources did not drift | `amc resource snapshot` / `amc resource validate` |
+| Protect live traffic | `amc firewall enable --mode block` / `amc firewall events` |
+| Confirm security findings safely | `amc shield confirm scope-write --file security-scope.json` / `amc shield confirm run --task finding-task.json` |
+| Import existing run evidence | `amc import ./agent-run --dry-run` / `amc import ./agent-run` |
+| Compare model routes | `amc strategy compare --file strategies.json` / `amc strategy compare --file strategies.json --apply --approve` |
+| Track connected runs | `amc runtime create --run live-1` / `amc runtime inspect live-1` |
+| Coordinate role workspaces | `amc org run --roles REV_PRODUCT_MANAGER,REV_TECH_LEAD,REV_QA_LEAD` |
+| Validate fleet topology | `amc fleet graph write --file graph.json` / `amc fleet graph validate` |
+| Inspect fleet lifecycle | `amc fleet lifecycle list` / `amc fleet lifecycle show <run>` |
+| Inspect org run evidence | `amc org runs` / `amc org inspect <run> --redacted` |
+| Inspect lifecycle artifacts | `amc evidence lifecycle list` / `amc evidence lifecycle inspect <run>` |
+| Export shareable lifecycle proof | `amc evidence lifecycle export <run> --out lifecycle.json --redacted` |
+| Inspect full-score evidence episodes | `amc evidence episodes list` / `amc evidence episodes inspect <id>` |
+| Run release gate | `npm run release:gate` |
+| Export a shareable episode | `amc evidence episodes export <id> --out episode.json --redacted` |
+| Inspect recommendation receipts | `amc evidence decisions list` / `amc evidence decisions inspect <id>` |
+| Observe receipt outcomes | `amc evidence decisions observe <run>` |
+| Inspect decision observability | `amc evidence observability list` / `amc evidence observability inspect <run>` |
+| Write governed reasoning memory | `amc memory writeback <episode>` / `amc memory retrieve --consumer studio` |
+| Review uncertainty gates | `amc report <run>` / Studio low-confidence filters |
+| Mine recurring trace failures | `amc trace index` / `amc trace failures` |
+| Generate governed fix RCA | `amc mechanic rca run <run>` / `amc mechanic rca list` |
+| Compare governed fix candidates | `amc experiment optimize --rca latest` / `amc experiment optimizer-list` |
 | CI/CD release gate | `amc guide --ci --target 3` |
 | Auto-fix gaps | `amc fix` |
 | HTML report for stakeholders | `amc report <id> --html report.html` |

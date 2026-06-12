@@ -35,6 +35,7 @@ export function releasePackCli(params: {
   workspace: string;
   outFile: string;
   privateKeyPath?: string;
+  skipInstallBuild?: boolean;
 }): {
   outFile: string;
   manifestPathHint: string;
@@ -46,7 +47,8 @@ export function releasePackCli(params: {
   const packed = createReleaseBundle({
     workspace,
     outFile: resolve(params.outFile),
-    privateKeyPath: params.privateKeyPath
+    privateKeyPath: params.privateKeyPath,
+    skipInstallBuild: params.skipInstallBuild
   });
   return {
     outFile: packed.outFile,

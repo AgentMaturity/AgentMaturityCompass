@@ -10,8 +10,9 @@ const msg = `
   │   🧭  Agent Maturity Compass installed!      │
   │                                              │
   │   Quick start:                               │
-  │     npx amc                                  │
-  │     npx amc up                               │
+  │     amc                                      │
+  │     amc up                                   │
+  │     npx agent-maturity-compass               │
   │                                              │
   │   Docs:  npx amc help                        │
   │                                              │

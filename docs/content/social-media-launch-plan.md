@@ -29,7 +29,7 @@
 
 ### Day 2: The Evidence Thesis  
 - Thread: "Your agent says it's safe. Can it prove it?"
-- Screenshot of `amc quickscore` output
+- Screenshot of `amc full score` output
 
 ### Day 3: Compliance
 - Thread: "EU AI Act enforcement starts Aug 2026. Here's how to be ready in 60 seconds."
@@ -61,7 +61,7 @@ The credit score for AI agents. Open source, free, 60 seconds.
 
 One command. No account. No API key.
 
-npx agent-maturity-compass quickscore
+npx agent-maturity-compass
 
 Thread 🧵
 ```

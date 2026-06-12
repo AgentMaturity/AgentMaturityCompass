@@ -9,6 +9,8 @@ export async function renderDiagnosticViewPage(params) {
 
   const scoreById = new Map((auto.questions ?? []).map((row) => [row.questionId, row]));
   const unknownReasons = new Map((auto.unknownReasons ?? []).map((row) => [row.questionId, row.reasons]));
+  const lowConfidenceCount = (auto.questions ?? []).filter((row) => row.confidenceControls?.uncertaintyLevel === "high" || row.confidenceControls?.presentationStatus === "needs_review").length;
+  const highRiskCount = (auto.questions ?? []).filter((row) => Number(row.confidenceControls?.decisivenessRisk || 0) >= 0.65 || Number(row.confidenceControls?.contradictionRisk || 0) >= 0.5).length;
 
   const groups = new Map();
   for (const dimension of rendered.dimensions ?? []) {
@@ -51,9 +53,30 @@ export async function renderDiagnosticViewPage(params) {
         <div><div class="muted">Run ID</div><div class="tile-value">${auto.runId ?? "n/a"}</div></div>
         <div><div class="muted">Integrity</div><div class="tile-value">${typeof auto.integrityIndex === "number" ? auto.integrityIndex.toFixed(3) : "n/a"}</div></div>
         <div><div class="muted">Unknown Questions</div><div class="tile-value">${(auto.unknownReasons ?? []).length}</div></div>
+        <div><div class="muted">Low Confidence</div><div class="tile-value">${lowConfidenceCount}</div></div>
+        <div><div class="muted">High Risk</div><div class="tile-value">${highRiskCount}</div></div>
+      </div>
+      <div class="row wrap">
+        <button class="secondary" data-confidence-filter="all">All</button>
+        <button class="secondary" data-confidence-filter="low">Low confidence</button>
+        <button class="secondary" data-confidence-filter="risk">High risk</button>
       </div>
       ${(auto.unknownReasons ?? []).length > 0 ? `<p class="status-bad"><strong>Honesty banner:</strong> insufficient evidence for one or more questions.</p>` : ""}
+      ${auto.confidenceSummary ? `<pre class="scroll">${JSON.stringify(auto.confidenceSummary, null, 2)}</pre>` : ""}
     `)}
     ${sections}
   `;
+  params.root.querySelectorAll("button[data-confidence-filter]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const filter = button.getAttribute("data-confidence-filter");
+      params.root.querySelectorAll(".question-card").forEach((card) => {
+        const show = filter === "low"
+          ? card.getAttribute("data-low-confidence") === "true"
+          : filter === "risk"
+            ? card.getAttribute("data-high-risk") === "true"
+            : true;
+        card.style.display = show ? "" : "none";
+      });
+    });
+  });
 }

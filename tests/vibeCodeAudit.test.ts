@@ -7,8 +7,7 @@ import { auditVibeCode, auditVibeCodeFiles } from "../src/score/vibeCodeAudit.js
 
 function runCli(cwd: string, args: string[]): Promise<{ code: number; stdout: string; stderr: string }> {
   return new Promise((resolvePromise) => {
-    const tsxCliPath = join(process.cwd(), "node_modules", "tsx", "dist", "cli.mjs");
-    const childArgs = [tsxCliPath, join(process.cwd(), "src", "cli.ts"), ...args];
+    const childArgs = ["--import", "tsx", join(process.cwd(), "src", "cli.ts"), ...args];
     const child = spawn(process.execPath, childArgs, {
       cwd,
       env: process.env,

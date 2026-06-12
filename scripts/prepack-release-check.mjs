@@ -69,7 +69,7 @@ try {
   const releaseOut = join(tmp, "prepack.amcrelease");
   run(
     "node",
-    ["dist/cli.js", "release", "pack", "--out", releaseOut],
+    ["dist/cli.js", "release", "pack", "--out", releaseOut, "--skip-install-build"],
     workspace,
     {
       ...npmEnv,
