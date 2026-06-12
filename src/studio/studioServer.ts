@@ -1538,6 +1538,8 @@ function pickAgentApproval(workspace: string, approvalId: string): { agentId: st
 
 export async function startStudioApiServer(options: StudioApiOptions): Promise<{
   server: Server;
+  host: string;
+  port: number;
   url: string;
   close: () => Promise<void>;
 }> {
@@ -8828,10 +8830,15 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
     server.once("error", rejectPromise);
     server.listen(options.port, options.host, () => resolvePromise());
   });
+  const address = server.address();
+  const host = typeof address === "object" && address ? address.address : options.host;
+  const port = typeof address === "object" && address ? address.port : options.port;
 
   return {
     server,
-    url: `http://${options.host}:${options.port}`,
+    host,
+    port,
+    url: `http://${host}:${port}`,
     close: async () => {
       shuttingDown = true;
       for (const socket of openSockets) {

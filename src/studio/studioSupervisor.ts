@@ -436,16 +436,34 @@ export async function runStudioForeground(params: {
     throw new Error("Refusing to bind Studio API publicly. Enable LAN mode or set explicit public bind allowance.");
   }
 
-  const api = await startStudioApiServer({
-    workspace,
-    host: apiHost,
-    port: apiPort,
-    token,
-    allowedCidrs: params.allowedCidrs,
-    trustedProxyHops: params.trustedProxyHops,
-    maxRequestBytes: params.maxRequestBytes,
-    corsAllowedOrigins: params.corsAllowedOrigins
-  });
+  let api: Awaited<ReturnType<typeof startStudioApiServer>>;
+  try {
+    api = await startStudioApiServer({
+      workspace,
+      host: apiHost,
+      port: apiPort,
+      token,
+      allowedCidrs: params.allowedCidrs,
+      trustedProxyHops: params.trustedProxyHops,
+      maxRequestBytes: params.maxRequestBytes,
+      corsAllowedOrigins: params.corsAllowedOrigins
+    });
+  } catch (error) {
+    const message = String(error);
+    if (!message.includes("EADDRINUSE")) {
+      throw error;
+    }
+    api = await startStudioApiServer({
+      workspace,
+      host: apiHost,
+      port: 0,
+      token,
+      allowedCidrs: params.allowedCidrs,
+      trustedProxyHops: params.trustedProxyHops,
+      maxRequestBytes: params.maxRequestBytes,
+      corsAllowedOrigins: params.corsAllowedOrigins
+    });
+  }
 
   const gatewaySig = verifyGatewayConfigSignature(workspace);
   const actionPolicySig = verifyActionPolicySignature(workspace);
@@ -481,13 +499,13 @@ export async function runStudioForeground(params: {
   const state: StudioState = {
     pid: process.pid,
     startedTs: Date.now(),
-    apiPort,
+    apiPort: api.port,
     gatewayPort: gateway.port,
     proxyPort: gateway.proxyPort ?? 0,
     dashboardPort: dashboard.port,
     metricsPort: metrics.port,
     metricsHost: metrics.host,
-    host: apiHost,
+    host: api.host,
     lanEnabled: lan.enabled && lanSig.valid,
     pairingRequired: lan.enabled && lanSig.valid && lan.requirePairing,
     currentAgent: agentId,
