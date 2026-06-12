@@ -1,7 +1,7 @@
 import Database from "better-sqlite3";
 import { randomUUID } from "node:crypto";
 import { readdirSync, readFileSync } from "node:fs";
-import { join, resolve } from "node:path";
+import { join, relative, resolve } from "node:path";
 import type {
   AMCConfig,
   AssuranceRunRecord,
@@ -35,6 +35,7 @@ export interface AppendEvidenceInput {
   runtime: RuntimeName;
   eventType: EvidenceEventType;
   payload?: string | Buffer;
+  payloadPath?: string;
   payloadExt?: "txt" | "json";
   inline?: boolean;
   meta?: Record<string, unknown>;
@@ -997,6 +998,36 @@ export class Ledger {
     }
   }
 
+  private materializePayloadPath(
+    payloadPath: string,
+    payload?: string | Buffer,
+    maxPayloadBytes?: number
+  ): { relativePath: string; bytes: Buffer } {
+    const workspaceRoot = resolve(this.workspace);
+    const fullPath = resolve(this.workspace, payloadPath);
+    if (fullPath !== workspaceRoot && !fullPath.startsWith(`${workspaceRoot}/`)) {
+      throw new Error(`payloadPath must stay inside workspace: ${payloadPath}`);
+    }
+    if (payload !== undefined) {
+      const bytes = typeof payload === "string" ? Buffer.from(payload, "utf8") : payload;
+      if (maxPayloadBytes !== undefined && bytes.byteLength > maxPayloadBytes) {
+        throw new Error(`payload exceeds max bytes for payloadPath (${bytes.byteLength} > ${maxPayloadBytes})`);
+      }
+      writeFileAtomic(fullPath, bytes);
+      return {
+        relativePath: relative(this.workspace, fullPath).replace(/\\/g, "/"),
+        bytes
+      };
+    }
+    if (!pathExists(fullPath)) {
+      throw new Error(`payloadPath not found: ${payloadPath}`);
+    }
+    return {
+      relativePath: relative(this.workspace, fullPath).replace(/\\/g, "/"),
+      bytes: readFileSync(fullPath)
+    };
+  }
+
   private buildEvidenceInsert(params: {
     input: AppendEvidenceInput;
     id: string;
@@ -1015,7 +1046,11 @@ export class Ledger {
     let blobRef: string | null = null;
     let payloadSha256 = sha256Hex(Buffer.alloc(0));
 
-    if (payload !== undefined) {
+    if (input.payloadPath) {
+      const materialized = this.materializePayloadPath(input.payloadPath, payload, policy.opsPolicy.retention.maxBlobBytes);
+      payloadPath = materialized.relativePath;
+      payloadSha256 = sha256Hex(materialized.bytes);
+    } else if (payload !== undefined) {
       const bytes = typeof payload === "string" ? Buffer.from(payload, "utf8") : payload;
       if (bytes.byteLength > policy.opsPolicy.retention.maxPayloadBytesPerEvent) {
         throw new Error(
@@ -1184,7 +1219,11 @@ export class Ledger {
     let blobRef: string | null = null;
     let payloadSha256 = sha256Hex(Buffer.alloc(0));
 
-    if (payload !== undefined) {
+    if (input.payloadPath) {
+      const materialized = this.materializePayloadPath(input.payloadPath, payload, policy.opsPolicy.retention.maxBlobBytes);
+      payloadPath = materialized.relativePath;
+      payloadSha256 = sha256Hex(materialized.bytes);
+    } else if (payload !== undefined) {
       const bytes = typeof payload === "string" ? Buffer.from(payload, "utf8") : payload;
       if (bytes.byteLength > policy.opsPolicy.retention.maxPayloadBytesPerEvent) {
         throw new Error(

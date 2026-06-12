@@ -34,6 +34,7 @@
     "release:gate": "node scripts/release-gate.mjs",
     "release:prepack-check": "node scripts/prepack-release-check.mjs",
     "qa:install-personas": "node scripts/install-persona-qa.mjs",
+    "qa:dogfood-8-agents": "node scripts/amc-dogfood-8-agents.mjs",
     "audit:runtime": "npm audit --omit=dev --audit-level=moderate",
     "check:incident-readiness": "node scripts/incident-readiness-check.mjs",
     "check:architecture-boundaries": "node scripts/architecture-boundaries-check.mjs",
