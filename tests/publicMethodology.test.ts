@@ -55,9 +55,10 @@ describe("public methodology manifest", () => {
     expect(first.questionSet.version).toBe("amc-legacy-240-v1");
     expect(first.questionSet.questionCount).toBe(getAllQuestions().length);
     expect(first.changelog[0]?.version).toBe(AMC_PUBLIC_METHODOLOGY_VERSION);
-    expect(first.changelog[0]?.migration).toContain("Reports generated under 2026.06.19-r209");
-    expect(first.changelog[0]?.summary).toContain("Open Models RAG question-explainability receipts");
+    expect(first.changelog[0]?.migration).toContain("Reports generated under 2026.06.20-r210");
+    expect(first.changelog[0]?.summary).toContain("LangSmith-style observability/evaluation metric-validity boundaries");
     for (const previousVersion of [
+      "2026.06.20-r210",
       "2026.06.19-r209",
       "2026.06.19-r208",
       "2026.06.19-r207",
@@ -884,6 +885,7 @@ describe("public methodology manifest", () => {
     expect(first.benchmarkMethodologyVersioning.changeTriggers.map((trigger) => trigger.trigger)).toContain("evidra_provider_drift_change");
     expect(first.benchmarkMethodologyVersioning.changeTriggers.map((trigger) => trigger.trigger)).toContain("scorable_studio_drilldown_change");
     expect(first.benchmarkMethodologyVersioning.changeTriggers.map((trigger) => trigger.trigger)).toContain("calibra_public_methodology_change");
+    expect(first.benchmarkMethodologyVersioning.changeTriggers.map((trigger) => trigger.trigger)).toContain("langsmith_eval_observability_metric_validity_change");
     expect(first.benchmarkMethodologyVersioning.changeTriggers.map((trigger) => trigger.trigger)).toContain("kubernetes_operational_agent_metric_validity_change");
     expect(first.benchmarkMethodologyVersioning.changeTriggers.map((trigger) => trigger.trigger)).toContain("secure_vibe_bench_metric_validity_change");
     expect(first.benchmarkMethodologyVersioning.changeTriggers.map((trigger) => trigger.trigger)).toContain("ai_evaluation_guide_methodology_change");
@@ -891,6 +893,7 @@ describe("public methodology manifest", () => {
     expect(first.metricValidationGates.map((gate) => gate.gate)).toContain("agent_mont_monitoring_replay_evidence");
     expect(first.metricValidationGates.map((gate) => gate.gate)).toContain("edge_ai_agent_replay_evidence");
     expect(first.metricValidationGates.map((gate) => gate.gate)).toContain("web_eval_dataset_coverage");
+    expect(first.metricValidationGates.map((gate) => gate.gate)).toContain("langsmith_eval_observability_metric_validity");
     expect(first.metricValidationGates.map((gate) => gate.gate)).toContain("chipbenchmark_coverage");
     expect(first.metricValidationGates.map((gate) => gate.gate)).toContain("cooperbench_metric_validity");
     expect(first.metricValidationGates.map((gate) => gate.gate)).toContain("codercup_metric_validity");
@@ -1095,7 +1098,18 @@ describe("public methodology manifest", () => {
     expect(first.agentBeltMethodologyAssurance.noCopyBoundary).toContain("does not copy Agent Belt code");
     expect(first.scoreClaimBoundaries.find((boundary) => boundary.boundary === "encourage_rag_replay_integrity")?.requiredEvidence).toContain("MLflow run hash");
     expect(first.scoreClaimBoundaries.find((boundary) => boundary.boundary === "encourage_rag_replay_integrity")?.publicDisclosure).toContain("source metadata alone");
+    const langSmithBoundary = first.scoreClaimBoundaries.find((boundary) => boundary.boundary === "langsmith_eval_observability_metric_validity");
+    expect(langSmithBoundary?.appliesWhen).toContain("Score report");
+    expect(langSmithBoundary?.appliesWhen).toContain("Shield receipt");
+    expect(langSmithBoundary?.appliesWhen).toContain("Watch alert");
+    expect(langSmithBoundary?.requiredEvidence).toContain("validation table artifact");
+    expect(langSmithBoundary?.requiredEvidence).toContain("metric owner");
+    expect(langSmithBoundary?.requiredEvidence).toContain("sample size");
+    expect(langSmithBoundary?.requiredEvidence).toContain("confidence interval");
+    expect(langSmithBoundary?.publicDisclosure).toContain("source metadata alone");
     const methodologyDoc = readFileSync("docs/SCORING_METHODOLOGY.md", "utf8");
+    expect(methodologyDoc).toContain("`2026.06.20-r211`");
+    expect(methodologyDoc).toContain("LangSmith-style observability/evaluation metric-validity boundaries");
     expect(methodologyDoc).toContain("`2026.06.19-r164`");
     expect(methodologyDoc).toContain("`2026.06.19-r163`");
     expect(methodologyDoc).toContain("`2026.06.19-r162`");
@@ -1225,6 +1239,7 @@ describe("public methodology manifest", () => {
     expect(first.limitations).toContain("Comparative coding-agent report replay claims require report and source identity, source-material hash, standardized prompt hash, agent roster hash, scoring rubric hash, category-score manifest hash, implementation artifact hash, screenshot manifest hash, report artifact hash, replay command, deterministic seed, agent-count coverage, category-score coverage, recommendation use cases, normalized score threshold, evidence refs, signed evidence refs, and row hashes; aggregate rankings, report PDFs, screenshots, local metadata, or copied implementation examples alone are not enough.");
     expect(first.limitations).toContain("Benchmark-hackability audit replay claims require scanner id/version, target benchmark id, source ref, target task manifest, audit config, phase traces, static-tool reports when static or hybrid analysis is claimed, AI-inspection trace when AI or hybrid analysis is claimed, vulnerability-finding manifest, dashboard/event stream, report artifact, replay command, sandbox config, sandbox network/read-only/capability controls, PoC validation, vulnerability-class coverage, task-count coverage, exploitability threshold, evidence refs, signed evidence refs, and row hashes; a dashboard screenshot, vulnerability label, generated exploit snippet, or local command log alone is not enough.");
     expect(first.limitations).toContain("Evaluator-suite metric-validity claims require deterministic assertion, LLM judge, safety assertion, red-team attack, dataset eval manifest, custom judge, reporter output, framework integration, threshold config, metric owner, sample size, and confidence interval evidence; a judge score or report artifact alone is not enough.");
+    expect(first.limitations).toContain("LangSmith-style observability and evaluation metric-validity claims require an AMC-owned eval pack, validation table, project or run identity reference, dataset and experiment manifests, trace export, evaluator or feedback config, fail-closed threshold policy, metric owner, sample size, confidence interval, signed evidence refs, artifact hashes, and row hashes before Score, Shield, or Watch claims can use them; public product-page metadata, a LangSmith label, dashboard screenshot, trace id, copied evaluator name, local export, cost/latency total, aggregate score, or source metadata alone is not enough.");
     expect(first.limitations).toContain("Pentesting and threat-model benchmark metric-validity claims require Dockerized app manifests, language-stack coverage, vulnerability-class coverage, difficulty distribution, multi-step chain coverage, flag ground truth, threat-model ground truth, false-positive traps, security-control effectiveness, exploit execution trace, threat-model report, metric owner, sample size, confidence interval, signed evidence refs, and row hashes; a flag solve rate, exploit script, or threat-model score alone is not enough.");
     expect(first.limitations).toContain("Trace-derived agent-evaluation metric-validity claims require Bedrock Converse-style model config, agent-parameter manifest, tool registry, trace manifest, repeatable case manifest, dynamic expectation validator, bulk case run manifest, run permutation manifest, mock LLM backend control, metric definition manifest, measurement export manifest, production monitor binding, threshold alarm config, metric owner, sample size, confidence interval, signed evidence refs, and row hashes; a trace viewer, case list, metric table, or production alarm alone is not enough.");
     expect(first.limitations).toContain("Living-environment metric-validity claims require task-program, living-environment, environment-mutation, capability, sandbox-provider, agent-adapter, multi-turn trajectory, stage-checker, checker-result, trial-result, aggregate-metric, pass-at-k, proactive-trigger, metric-owner, sample-size, confidence-interval, signed evidence refs, and row hashes; a demo video, final task score, or static benchmark label alone is not enough.");
@@ -1318,6 +1333,7 @@ describe("public methodology manifest", () => {
       "evaluator_suite_coverage",
       "pentest_benchmark_coverage",
       "trace_evaluation_coverage",
+      "langsmith_eval_observability_metric_validity",
       "living_environment_coverage",
       "persona_agent_coverage",
       "scientific_literature_coverage",

@@ -6,7 +6,7 @@ import { DEFAULT_QUESTION_SET_VERSION } from "../diagnostic/questionSets.js";
 import { questionBank } from "../diagnostic/questionBank.js";
 
 export const AMC_PUBLIC_METHODOLOGY_ID = "amc-public-scoring-methodology";
-export const AMC_PUBLIC_METHODOLOGY_VERSION = "2026.06.20-r210";
+export const AMC_PUBLIC_METHODOLOGY_VERSION = "2026.06.20-r211";
 export const AMC_PUBLIC_METHODOLOGY_RELEASE_DATE = "2026-06-20";
 export const AMC_PUBLIC_METHODOLOGY_DOC = "docs/SCORING_METHODOLOGY.md";
 export const AMC_PUBLIC_METHODOLOGY_URL = "https://agentmaturity.co/methodology.html";
@@ -491,6 +491,11 @@ export function getPublicMethodologyManifest(questionSet?: DiagnosticQuestionSet
           trigger: "web_eval_dataset_metric_validity_change",
           versionImpact: "Increment corpus, verification-protocol, scoring, and methodology versions when web evaluation dataset-generation benchmark identity, source repository boundary, subject inventory, generated-query manifest, search-provider config, retrieved-document corpus, filtering policy, QA generation, reference-answer set, dataset export target, freshness window, provider-diversity metric, source-coverage metric, answer-grounding metric, owner, or sample/CI semantics change.",
           migration: "Regenerate badges or reports before comparing Eyalbenba/tavily-web-eval-generator-style, Tavily-style, web-search RAG eval dataset, real-time web retrieval, generated-query, QA-pair, local export, LangSmith export, source-coverage, freshness, or grounding metric-validity claims."
+        },
+        {
+          trigger: "langsmith_eval_observability_metric_validity_change",
+          versionImpact: "Increment corpus, verification-protocol, scoring, and methodology versions when LangSmith-style observability or evaluation metric validity changes project/run/dataset/experiment identity, trace export, evaluator or feedback config, validation table, threshold policy, metric owner, sample-size, confidence-interval, signed-evidence, or no-copy/source-review boundary semantics.",
+          migration: "Regenerate badges or reports before comparing LangSmith-style observability, tracing, experiment, dataset, evaluator, feedback, threshold, or metric-validity claims. Competitor/product page metadata can seed review only; it is not parity proof."
         },
         {
           trigger: "parallel_research_skill_metric_validity_change",
@@ -1539,6 +1544,13 @@ export function getPublicMethodologyManifest(questionSet?: DiagnosticQuestionSet
         migration: "Reports generated under 2026.06.13-r114 should be regenerated or relabeled before using Eyalbenba/tavily-web-eval-generator-style, Tavily-style, web-search RAG eval dataset, generated-query, retrieved-document, QA-pair, local export, LangSmith export, freshness, source-coverage, or answer-grounding metric-validity claims."
       },
       {
+        boundary: "langsmith_eval_observability_metric_validity",
+        appliesWhen: "Any Score report, Shield receipt, Watch alert, badge, API response, or metric-validation row uses LangSmith-style observability, tracing, datasets, experiments, evaluator feedback, monitoring, cost/latency, or threshold evidence as proof of metric quality.",
+        publicDisclosure: "A LangSmith product label, public webpage metadata, trace viewer, dashboard screenshot, run id, local export, copied evaluator name, cost/latency total, aggregate score, or source metadata alone does not establish comparable AMC metric validity without AMC-owned eval pack, validation table, thresholds, metric owner, sample size, confidence interval, signed evidence, and row hashes.",
+        requiredEvidence: "Signed AMC eval-pack manifest, project or run identity reference, dataset manifest, experiment/run manifest, trace export manifest, evaluator/feedback config, validation table artifact, threshold policy, baseline/candidate or baseline/live result, score/shield/watch surface mapping, metric owner, sample size, confidence interval, no-copy/source-review boundary proof, signed evidence refs, artifact hashes, and row hashes.",
+        migration: "Reports generated under 2026.06.20-r210 should be regenerated or relabeled before using LangSmith-style observability, tracing, datasets, experiments, evaluator feedback, monitoring, cost/latency, thresholds, or metric-validity claims as external evidence."
+      },
+      {
         boundary: "parallel_research_skill_metric_validity",
         appliesWhen: "Any report, badge, metric-validation row, Shield receipt, Watch alert, or public claim uses Parallel/OpenClaw-style web research, source filtering, extraction, deep-research tasks, grounded chat, task groups, monitoring, citations, or benchmark claims as proof of metric quality.",
         publicDisclosure: "A Parallel skill label, repository metadata, README feature list, SKILL manifest title, API surface name, fast/agentic search mode, local wrapper run, citation excerpt, monitoring note, batch-size claim, benchmark claim, or source metadata alone does not establish comparable research-skill metric validity without source, license boundary, skill manifest, API surface, search mode, deep-research, chat grounding, extraction, citation provenance, source policy, batch, monitoring, security, dependency, benchmark-validation, owner, sample-size, and CI proof.",
@@ -2260,6 +2272,13 @@ export function getPublicMethodologyManifest(questionSet?: DiagnosticQuestionSet
         appliesWhen: "Metrics that claim trace-derived agent-evaluation validity over Bedrock Converse-style model configs, agent parameters, tools, traces, repeatable cases, dynamic validators, bulk runs, model/parameter permutations, mocked LLM controls, metric definitions, measurement exports, production monitor bindings, or threshold alarms.",
         proofField: "metricValidation.rows[].traceEvaluationCoverage",
         migration: "Set requireTraceEvaluationProof and attach model config, agent-parameter manifest, tool registry, trace manifest, repeatable case manifest, dynamic validator, bulk run, permutation, mock backend, metric-definition, measurement-export, production-monitor, threshold-alarm, metric-owner, sample-size, and confidence-interval evidence refs before using trace-evaluation metric-validity claims as external proof."
+      },
+      {
+        gate: "langsmith_eval_observability_metric_validity",
+        defaultThreshold: ">= 1.00 when required; validationTable present; sampleSize>=configured minimum; confidenceInterval present; metricOwner present; signedEvidenceRefs present; failClosed on missing threshold policy",
+        appliesWhen: "Metrics that claim LangSmith-style observability, traces, datasets, experiments, evaluator feedback, cost/latency monitoring, or production threshold evidence as Score, Shield, or Watch metric-validity proof.",
+        proofField: "metricValidation.rows[].langSmithEvalObservabilityCoverage",
+        migration: "Set requireLangSmithEvalObservabilityProof and attach signed AMC eval pack, project/run reference, dataset/experiment/trace manifests, evaluator/feedback config, validation table, threshold policy, baseline/candidate or baseline/live result, metric owner, sample size, confidence interval, signed evidence refs, artifact hashes, and row hashes. Metadata-only source review fails closed."
       },
       {
         gate: "living_environment_coverage",
@@ -3088,11 +3107,18 @@ export function getPublicMethodologyManifest(questionSet?: DiagnosticQuestionSet
       "Scorable SDK-style Studio drilldown claims require source repository snapshot, Apache-2.0 license proof, default branch, commit/tree refs, README, Python package/OpenAPI/client/execution-log/evaluator API hashes, CLI package/lock/evaluator/judge/execution-log/OTEL/file-upload hashes, TypeScript package/lock/source tree hashes, npm package refs and integrity strings, Studio route, source artifact links, trace/receipt/policy/source-artifact preview hashes, empty/error-state hashes, evidence preview count, source artifact link count, evidence refs, signed evidence refs, rejected evidence refs, repair hints, and row hashes; a Scorable SDK label, source metadata, package name, CLI command, execution-log list, OTEL trace list, Studio screenshot, UI route, or local evaluator output alone is not enough.",
       "Agentest-style scenario-test metric-validity claims require source/repository/license refs, agent endpoint contract, scenario, simulated-user persona, goal/knowledge, tool mock, scripted-turn, trajectory-assertion, LLM-judge metric, comparison-run, CI-reporter, result artifact, owner, sample-size, confidence-interval, signed evidence refs, and row hashes; source metadata, labels, README examples, copied scenarios, config snippets, local run output, screenshots, aggregate pass rate, tool-mock transcript, or judge score alone is not enough.",
       "Awesome AI Pentest-style curated-index claims require live source repository snapshot, default-branch and README blob refs, no-root-license boundary proof, no-source-copy proof, and underlying benchmark-specific manifests, hashes, execution traces, scoring configs, CI receipts, owners, sample sizes, confidence intervals, signed evidence refs, and row hashes through pentest_benchmark_coverage before Score, Shield, or Watch metric-validity claims; repository metadata, README benchmark lists, paper-result percentages, tool names, or source-index labels alone are discovery metadata and fail closed.",
+      "LangSmith-style observability and evaluation metric-validity claims require an AMC-owned eval pack, validation table, project or run identity reference, dataset and experiment manifests, trace export, evaluator or feedback config, fail-closed threshold policy, metric owner, sample size, confidence interval, signed evidence refs, artifact hashes, and row hashes before Score, Shield, or Watch claims can use them; public product-page metadata, a LangSmith label, dashboard screenshot, trace id, copied evaluator name, local export, cost/latency total, aggregate score, or source metadata alone is not enough.",
       "Red-team/offensive-security benchmark regression claims require benchmark id/version, question-set hash, reference-answer manifest hash, scoring config hash, scoring modes, provider backend, model config hash, result export hashes, rerun output hash, release gate receipt, question count, pass/refusal/hallucination/semantic scores where claimed, judge rubric for LLM-judge scoring, prompt-optimization config/count where claimed, signed evidence refs, and row hashes; raw prompts, exploit content, reference answers, or final percentage alone is not enough."
     ],
     changelog: [
       {
         version: AMC_PUBLIC_METHODOLOGY_VERSION,
+        date: AMC_PUBLIC_METHODOLOGY_RELEASE_DATE,
+        summary: "Adds LangSmith-style observability/evaluation metric-validity boundaries for Score, Shield, and Watch so validation tables, metric owners, sample sizes, confidence intervals, signed AMC eval packs, signed evidence, thresholds, and row hashes fail closed; product-page metadata remains source-signal only.",
+        migration: "Reports generated under 2026.06.20-r210 should be regenerated before using LangSmith-style observability, tracing, datasets, experiments, evaluator feedback, monitoring, cost/latency, thresholds, or metric-validity claims as external evidence."
+      },
+      {
+        version: "2026.06.20-r210",
         date: AMC_PUBLIC_METHODOLOGY_RELEASE_DATE,
         summary: "Adds Open Models RAG question-explainability receipts and clarifies Awesome AI Pentest-style curated-index handling: source indexes can seed Score/Shield/Watch security metric review, but pentest metric-validity proof remains bound to underlying benchmark manifests, execution/scoring artifacts, CI receipts, signed evidence, and row hashes.",
         migration: "Reports generated under 2026.06.19-r209 should be regenerated before using bbenz/gen-ai-with-open-models-style, Open Models, Java local inference, LangChain4j, Ollama, RAG pipeline, RAG evaluation, question score explainability, insidetrust/awesome-ai-pentest-style curated pentest indexes, or pentest benchmark metric-validity claims as external evidence."

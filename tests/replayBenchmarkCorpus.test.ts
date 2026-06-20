@@ -14531,6 +14531,156 @@ describe("runReplayBenchmarkCorpus", () => {
     });
   });
 
+  test("maps Testing-RAG source review to existing agent benchmark replay receipts without a standalone subsystem", () => {
+    const result = runReplayBenchmarkCorpus({
+      ...baseInput,
+      corpusId: "testing-rag-replay-corpus",
+      sourceRefs: [
+        "https://github.com/shiragannavar/Testing-RAG",
+        "git:shiragannavar/Testing-RAG@d5bc7cf6bb2a1d5cef9e1aec4893045e99cf23a8",
+        "tree:shiragannavar/Testing-RAG@d5bc7cf6bb2a1d5cef9e1aec4893045e99cf23a8:26-paths",
+      ],
+      rows: [
+        {
+          ...baseInput.rows[0]!,
+          rowId: "testing-rag-ragchecker-complete",
+          fixture: {
+            ...baseInput.rows[0]!.fixture,
+            task: "Replay a Testing-RAG-style RAGChecker evaluation pack without copying upstream fixtures.",
+            outputArtifactHashes: [ragScoringReportHash],
+            agentBenchmarkReplay: {
+              benchmarkId: "testing-rag-ragchecker-eval",
+              benchmarkVersion: "2026.06.20-source-review",
+              paperRefHash: ragEvalFlowSourceRefHash,
+              repositorySnapshotHash: ragEvalFlowRepositorySnapshotHash,
+              datasetManifestHash: ragEvalFlowEvalPackManifestHash,
+              agentConfigHash: ragEvalFlowPipelineConfigHash,
+              globalConfigHash: ragEvalFlowMetricDefinitionHash,
+              modelServerConfigHash: ragEvalFlowModelConfigHash,
+              environmentManifestHash: ragEvalFlowDataSourceManifestHash,
+              dependencyLockHash: dependencyHash,
+              runCommandHash: ragEvalFlowReplayCommandHash,
+              replayCommandHash: commandHash,
+              tracePathHash: ragRetrievalTraceHash,
+              sampleTraceHash: ragGenerationTraceHash,
+              resultManifestHash: ragEvalFlowResultManifestHash,
+              metricsReportHash: ragEvalFlowScoreDeltaReportHash,
+              architecture: "reasoning_trace",
+              workload: "knowledge_qa",
+              deterministicSeed: 597,
+              sampleCount: 2,
+              minSampleCount: 1,
+              shuffled: true,
+              traceSaved: true,
+              baselineMetric0to1: 0.72,
+              candidateMetric0to1: 0.81,
+              replayPassRate0to1: 1,
+              minReplayPassRate0to1: 1,
+              traceCoverage0to1: 1,
+              minTraceCoverage0to1: 0.95,
+              maxScoreRegression0to1: 0.02,
+            },
+          },
+          baseline: {
+            score0to1: 0.72,
+            evidenceRefs: ["trace:baseline-testing-rag-ragchecker"],
+            signedEvidenceRefs: ["ledger:sig-baseline-testing-rag-ragchecker"],
+          },
+          candidate: {
+            score0to1: 0.81,
+            evidenceRefs: ["trace:candidate-testing-rag-ragchecker"],
+            signedEvidenceRefs: ["ledger:sig-candidate-testing-rag-ragchecker"],
+          },
+        },
+      ],
+    });
+
+    expect(result.manifest.replayable).toBe(true);
+    expect(result.manifest.fixtureHash).toMatch(/^[a-f0-9]{64}$/);
+    expect(result.manifest.rows[0]?.rowHash).toMatch(/^[a-f0-9]{64}$/);
+    expect(result.manifest.rows[0]?.agentBenchmarkReplay).toMatchObject({
+      benchmarkId: "testing-rag-ragchecker-eval",
+      scoreDelta0to1: 0.09,
+      replayPassRate0to1: 1,
+      traceCoverage0to1: 1,
+    });
+    expect(result.manifest.agentBenchmarkReplaySummary).toMatchObject({
+      rowCount: 1,
+      benchmarkIds: ["testing-rag-ragchecker-eval"],
+      failedRowIds: [],
+    });
+    expect(result.ciReceipt).toMatchObject({
+      passed: true,
+      failClosed: false,
+      fixtureHash: result.manifest.fixtureHash,
+      scoreDelta0to1: 0.09,
+      agentBenchmarkReplayRowCount: 1,
+      failedAgentBenchmarkReplayRowIds: [],
+    });
+    expect(verifyReplayBenchmarkCorpusReceipt(result.manifest, result.ciReceipt)).toMatchObject({
+      valid: true,
+      errors: [],
+    });
+    const markdown = renderReplayBenchmarkCorpusMarkdown(result.manifest, result.ciReceipt);
+    expect(markdown).toContain("Agent Benchmark Replay Rows: 1");
+    expect(markdown).toContain("Agent Benchmark Replay Architectures: reasoning_trace");
+    expect(markdown).toContain("Agent Benchmark Replay Workloads: knowledge_qa");
+  });
+
+  test("fails closed when Testing-RAG source evidence is only repository metadata", () => {
+    const result = runReplayBenchmarkCorpus({
+      ...baseInput,
+      corpusId: "testing-rag-metadata-only",
+      sourceRefs: ["https://github.com/shiragannavar/Testing-RAG"],
+      rows: [
+        {
+          ...baseInput.rows[0]!,
+          rowId: "testing-rag-metadata-only",
+          fixture: {
+            ...baseInput.rows[0]!.fixture,
+            task: "Reject repository-metadata-only Testing-RAG proof.",
+            agentBenchmarkReplay: {
+              benchmarkId: "testing-rag-ragchecker-eval",
+              benchmarkVersion: "metadata-only",
+              architecture: "reasoning_trace",
+              workload: "knowledge_qa",
+            },
+          },
+          baseline: {
+            score0to1: 0.72,
+            evidenceRefs: ["github:shiragannavar/Testing-RAG"],
+            signedEvidenceRefs: [],
+          },
+          candidate: {
+            score0to1: 0.81,
+            evidenceRefs: ["github:shiragannavar/Testing-RAG"],
+            signedEvidenceRefs: [],
+          },
+        },
+      ],
+    });
+
+    expect(result.manifest.replayable).toBe(false);
+    expect(result.manifest.rows[0]?.status).toBe("missing_evidence");
+    expect(result.manifest.rows[0]?.issues).toEqual(expect.arrayContaining([
+      "signed evidence refs below threshold",
+      "agent benchmark replay repository snapshot hash invalid",
+      "agent benchmark replay dataset manifest hash invalid",
+      "agent benchmark replay replay command hash invalid",
+      "agent benchmark replay score delta missing",
+    ]));
+    expect(result.ciReceipt).toMatchObject({
+      passed: false,
+      failClosed: true,
+      agentBenchmarkReplayRowCount: 1,
+      failedAgentBenchmarkReplayRowIds: ["testing-rag-metadata-only"],
+    });
+    expect(result.watchAlerts[0]).toMatchObject({
+      rowId: "testing-rag-metadata-only",
+      severity: "critical",
+    });
+  });
+
   test("binds Knowlytics-AI MCQ and RAG self-evaluation replay proof into agent benchmark receipts", () => {
     const result = runReplayBenchmarkCorpus({
       ...baseInput,
