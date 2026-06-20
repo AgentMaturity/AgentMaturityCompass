@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { badgeUrl, generateBadge, formatBadgeOutput } from "../../src/badge/badgeCli.js";
+import { badgeMethodologyMetadata, badgeUrl, generateBadge, formatBadgeOutput } from "../../src/badge/badgeCli.js";
+import { AMC_PUBLIC_METHODOLOGY_VERSION } from "../../src/methodology/publicMethodology.js";
 
 describe("badge generator", () => {
   it("generates correct shields.io URL for L0", () => {
@@ -7,6 +8,9 @@ describe("badge generator", () => {
     expect(url).toContain("img.shields.io/badge");
     expect(url).toContain("L0");
     expect(url).toContain("lightgrey");
+    expect(url).toContain(`amc_methodology=${AMC_PUBLIC_METHODOLOGY_VERSION}`);
+    expect(url).toContain("amc_methodology_hash=");
+    expect(url).toContain("amc_methodology_assurance=");
   });
 
   it("generates correct URL for L3", () => {
@@ -30,6 +34,7 @@ describe("badge generator", () => {
     const badge = generateBadge({ level: 4, format: "html" });
     expect(badge).toMatch(/^<img src="https:\/\/img\.shields\.io/);
     expect(badge).toContain("L4 Measured");
+    expect(badge).toContain("title=\"amc-public-scoring-methodology");
   });
 
   it("generates URL-only format", () => {
@@ -49,5 +54,19 @@ describe("badge generator", () => {
     expect(output).toContain("HTML");
     expect(output).toContain("URL");
     expect(output).toContain("L3 Defined");
+    expect(output).toContain("Methodology: amc-public-scoring-methodology");
+    expect(output).toContain("Methodology Hash:");
+    expect(output).toContain("Methodology Assurance Hash:");
+  });
+
+  it("exposes deterministic methodology metadata", () => {
+    const first = badgeMethodologyMetadata({ level: 3 });
+    const second = badgeMethodologyMetadata({ level: 5 });
+    expect(first.id).toBe("amc-public-scoring-methodology");
+    expect(first.version).toBe(AMC_PUBLIC_METHODOLOGY_VERSION);
+    expect(first.hash).toMatch(/^[a-f0-9]{64}$/);
+    expect(first.versioningAssuranceHash).toMatch(/^[a-f0-9]{64}$/);
+    expect(second.hash).toBe(first.hash);
+    expect(second.versioningAssuranceHash).toBe(first.versioningAssuranceHash);
   });
 });

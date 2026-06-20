@@ -43,6 +43,8 @@ describe("cliUx", () => {
     expect(footer).toContain("amc score");
     expect(footer).toContain("amc resource validate");
     expect(footer).toContain("amc shell");
+    expect(footer).toContain("NO_COLOR=1");
+    expect(footer).toContain("--no-color");
   });
 
   it("builds a source-of-truth command inventory from Commander", () => {
@@ -60,6 +62,22 @@ describe("cliUx", () => {
     const markdown = renderCommandInventoryMarkdown(inventory);
     expect(markdown).toContain("`amc resource validate`");
     expect(markdown).toContain("Generated from the live Commander command registry");
+  });
+
+  it("includes inherited namespace aliases in nested inventory entries", () => {
+    const program = new Command();
+    const compliance = program.command("compliance").alias("comply");
+    compliance.command("risk-classify").description("Classify EU AI Act risk");
+    const policy = compliance.command("policy").alias("pol");
+    policy.command("print");
+
+    const inventory = buildCommandInventory(program);
+
+    expect(inventory.find((entry) => entry.path === "compliance")?.aliases).toEqual(["comply"]);
+    expect(inventory.find((entry) => entry.path === "compliance risk-classify")?.aliases)
+      .toEqual(["comply risk-classify"]);
+    expect(inventory.find((entry) => entry.path === "compliance policy print")?.aliases)
+      .toEqual(["comply policy print", "compliance pol print", "comply pol print"]);
   });
 
   it("omits internal helper commands unless requested", () => {

@@ -2241,7 +2241,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         const providedToken = Array.isArray(webhookToken) ? webhookToken[0] : webhookToken;
         const tokenValid = verifyValueWebhookToken(options.workspace, typeof providedToken === "string" ? providedToken : null);
         if (!canIngestAsOperator && !tokenValid) {
-          json(res, 401, { error: "value ingest requires OWNER/OPERATOR session or signed webhook token" });
+          json(res, 401, { error: "value ingest requires OWNER/OPERATOR session or vault-backed webhook token" });
           return;
         }
         const out = ingestValueWebhookForApi({

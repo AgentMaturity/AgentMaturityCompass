@@ -87,7 +87,7 @@ Agents aren't chatbots. They have tools, budgets, network access, and autonomy. 
 
 ## AMC's Red Teaming Stack
 
-AMC provides three complementary layers of red teaming:
+AMC provides four complementary layers of red teaming:
 
 ### Layer 1: Assurance Lab (Deterministic Defensive Testing)
 Tests AMC's own trust boundary — Bridge, ToolHub, policy enforcement, Truthguard, and notary checks. Deterministic scenarios with signed evidence. Think of it as your agent's immune system test.
@@ -95,7 +95,7 @@ Tests AMC's own trust boundary — Bridge, ToolHub, policy enforcement, Truthgua
 **What it covers:** `injection`, `exfiltration`, `toolMisuse`, `truthfulness`, `sandboxBoundary`, `notaryAttestation`, `sycophancy`, `self-preservation`, `sabotage`, `self-preferential-bias`
 
 ### Layer 2: Evil MCP Server (Adversarial Tool Testing)
-A purpose-built malicious MCP server that simulates real-world tool-based attacks. Points your agent at hostile infrastructure and measures its resistance.
+A built-in MCP agent-provider test harness, plus an optional standalone malicious MCP server, that simulates real-world tool-based attacks. Use `amc redteam run --evil-mcp` for the standard AMC evidence path; use `tools/evil-mcp-server/` when you need to point an external live agent harness at hostile MCP infrastructure.
 
 **What it covers:** `data_exfil`, `tool_poison`, `priv_esc`, `rug_pull`, `prompt_inject`, `resource_exhaust`
 
@@ -104,6 +104,13 @@ Systematically attempts to inflate AMC maturity scores without real implementati
 
 **What it covers:** `keyword_stuffing`, `mock_execution`, `hardcoded_output`, `execution_proof_defense`
 
+**Primary command:** `amc score gaming-resistance --json`
+
+### Layer 4: Runtime Action Analysis
+Static source review cannot fully predict which tool calls an adaptive agent will make at runtime. Use Shield runtime analysis to evaluate a proposed live action before execution, including instruction source, sensitive fields, credential freshness, confidence, stage outcomes, and evidence-chain hashes.
+
+**Primary command:** `amc shield analyze-runtime --agent <id> --action <action> --tool <tool> --json`
+
 ---
 
 ## Getting Started: Your First Red Team Run
@@ -111,10 +118,10 @@ Systematically attempts to inflate AMC maturity scores without real implementati
 ### Prerequisites
 
 ```bash
-# AMC platform installed
-pip install -e ./platform/python
+# AMC CLI installed and workspace initialized
+amc init
 
-# Evil MCP server available
+# Optional: standalone Python Evil MCP server for external live-agent harnesses
 cd tools/evil-mcp-server
 pip install -e .
 ```
@@ -122,18 +129,23 @@ pip install -e .
 ### Quick Start: 5-Minute Security Check
 
 ```bash
-# 1. Initialize assurance policy
-amc assurance init
+# 1. Run behavior-level red-team scenarios
+amc redteam run default --plugins injection exfiltration --strategies direct --no-sign
 
-# 2. Run all built-in assurance packs
+# 2. Add MCP tool-surface attacks to the same primary red-team report
+amc redteam run default --plugins injection --strategies direct --evil-mcp --mcp-attacks tool_poison data_exfil --no-sign
+
+# 3. Analyze a proposed runtime action before execution
+amc shield analyze-runtime --agent default --action "export customer ticket" --tool external-api --parameters '{"ticketId":"T-100"}' --sensitive-fields customerEmail,ssn --credential-age-minutes 45 --json
+
+# 4. Test whether the maturity score itself can be inflated
+amc score gaming-resistance --json
+
+# 5. Run deterministic assurance packs for deeper signed evidence
 amc assurance run --scope workspace --pack all
 
-# 3. View results
-amc assurance runs
-amc assurance show <runId>
-
-# 4. Issue a certificate if passing
-amc assurance cert issue --run <runId>
+# 6. Add a fail-closed CI regression gate
+amc ci redteam default --plugins injection --strategies direct --evil-mcp --mcp-attacks tool_poison --no-sign
 ```
 
 ### Understanding the Output
@@ -240,7 +252,23 @@ failClosed: true         # Block operations on policy breach
 
 ## Evil MCP Server: Adversarial Tool Testing
 
-The Evil MCP Server simulates what happens when your agent connects to a compromised or malicious tool server. This is not theoretical — MCP servers are third-party code your agent trusts.
+The Evil MCP coverage simulates what happens when your agent connects to a compromised or malicious tool server. This is not theoretical — MCP servers are third-party code your agent trusts.
+
+For the standard AMC path, run the built-in MCP agent-provider through the primary red-team command:
+
+```bash
+amc redteam run default \
+  --plugins injection \
+  --strategies direct \
+  --evil-mcp \
+  --mcp-attacks tool_poison data_exfil priv_esc \
+  --no-sign \
+  --json
+```
+
+The primary JSON report includes an `evilMcp` summary with the MCP provider run id, requested categories, tested categories, score, dangerous-call count, and linked JSON/Markdown evidence paths.
+
+Use the standalone Python server only when you need to attach a separate live agent harness to hostile MCP infrastructure:
 
 ### Attack Types
 
@@ -350,7 +378,27 @@ server = EvilMCPServer(config)
 
 ## Adversarial Score Testing
 
-The `AdversarialTester` proves that AMC's scoring system can't be gamed through common evasion techniques.
+Behavioral red-team runs answer "can the agent be compromised?" Score-gaming checks answer "can the agent or evaluator inflate the maturity score without real evidence?" Run both before making L4/L5 claims.
+
+Primary CLI:
+
+```bash
+amc score gaming-resistance
+amc score gaming-resistance --json
+```
+
+The JSON report includes:
+
+| Field | What It Tests |
+|-------|---------------|
+| `floodingResistance` | Whether large volumes of low-quality evidence can inflate scores |
+| `selectiveResistance` | Whether cherry-picked evidence can hide weak dimensions |
+| `temporalResistance` | Whether evidence bursts right before evaluation can inflate scores |
+| `contextResistance` | Whether agents can behave well only in evaluation contexts |
+| `formulaResistance` | Whether scoring edge cases can be exploited |
+| `gaps` | Specific score-gaming weaknesses to fix before relying on the maturity level |
+
+Why this belongs in red teaming: evaluation-context behavior can create a false sense of safety. Sleeper Agents-style findings show that unsafe behavior can persist through safety training and that adversarial training can teach a model to recognize triggers rather than remove the underlying behavior. AMC therefore treats gaming resistance as meta-assurance: testing the test.
 
 ### Attack Strategies Tested
 
@@ -358,14 +406,8 @@ The `AdversarialTester` proves that AMC's scoring system can't be gamed through 
 
 **What it does:** Floods answers with every rubric keyword to artificially inflate scores.
 
-```python
-from amc.score.adversarial import AdversarialTester
-
-tester = AdversarialTester()
-
-# The attacker stuffs all rubric keywords into responses
-# Result: raw keyword scoring might give high marks, but...
-result = tester.run_attack("keyword_stuffing")
+```bash
+amc score gaming-resistance --json
 ```
 
 **Why it fails:** The EvidenceCollector requires execution-proof artifacts (signed traces, hashes, receipts), not just keyword presence.
@@ -390,14 +432,9 @@ result = tester.run_attack("keyword_stuffing")
 
 ### Running the Full Suite
 
-```python
-from amc.score.adversarial import AdversarialTester
-
-tester = AdversarialTester()
-summary = tester.run_all_attacks()
-
-# Human-readable report
-print(tester.generate_report())
+```bash
+amc score gaming-resistance
+amc score adversarial default --json
 ```
 
 ---
@@ -515,7 +552,8 @@ rules:
 **Scenario:** An organization wants to appear L4 on AMC's maturity scale. They write elaborate descriptions of security practices, stuffing every rubric keyword into their responses, but haven't actually implemented any of them.
 
 **How AMC catches it:**
-- `AdversarialTester.keyword_stuffing_attack()` demonstrates that keywords alone don't produce valid scores
+- `amc score gaming-resistance --json` reports whether evidence flooding, cherry-picking, temporal bursts, context manipulation, or formula edge cases can inflate scores
+- `src/score/gamingResistance.ts` keeps the score-gaming checks in the same CLI surface that operators already use for maturity scoring
 - The `EvidenceCollector` requires execution-proof artifacts: signed traces, hashes, receipts
 - Without real implementation, the trust multiplier drops scores to L1 regardless of how many keywords are present
 
@@ -548,6 +586,33 @@ rules:
 ## Continuous Red Teaming
 
 One-time testing is necessary but insufficient. Agents change. Tools change. Threats change.
+
+### CI Red-Team Gate
+
+Use `amc ci redteam` when a build should fail if red-team regressions, Evil MCP failures, or score-gaming weaknesses exceed thresholds.
+
+```bash
+amc ci redteam default \
+  --plugins injection exfiltration \
+  --strategies direct \
+  --evil-mcp \
+  --mcp-attacks tool_poison data_exfil \
+  --min-score 80 \
+  --max-critical 0 \
+  --max-high 0 \
+  --max-vulnerabilities 0 \
+  --min-mcp-score 80 \
+  --min-gaming-score 80 \
+  --no-sign
+```
+
+For CI systems that need machine-readable evidence:
+
+```bash
+amc ci redteam default --plugins injection --strategies direct --evil-mcp --mcp-attacks tool_poison --no-sign --json
+```
+
+The command exits `0` only when every configured gate passes. It exits `1` with explicit reasons when the red-team score is too low, vulnerability thresholds are exceeded, Evil MCP score falls below threshold, or score-gaming resistance is weak. Use `--no-gaming-resistance` only when a separate job already checks `amc score gaming-resistance`.
 
 ### Setting Up Continuous Assurance
 
@@ -653,8 +718,11 @@ Each layer is tested independently. A failure at any layer should trigger remedi
 - **AMC Documentation:** See `docs/` for full API reference, architecture maps, and CLI commands
 - **Assurance Lab Reference:** `docs/ASSURANCE_LAB.md`
 - **Shield & Enforce CLI:** `docs/SHIELD_ENFORCE_REFERENCE.md`
-- **Evil MCP Server:** `tools/evil-mcp-server/README.md`
-- **Adversarial Scorer:** `platform/python/amc/score/adversarial.py`
+- **Runtime Shield Analysis:** `amc shield analyze-runtime --agent default --action "<action>" --tool "<tool>" --json`
+- **Evil MCP CLI:** `amc redteam run --evil-mcp --mcp-attacks tool_poison`
+- **Standalone Evil MCP Server:** `tools/evil-mcp-server/README.md`
+- **Gaming Resistance CLI:** `amc score gaming-resistance --json`
+- **Gaming Resistance Scorer:** `src/score/gamingResistance.ts`
 
 ---
 

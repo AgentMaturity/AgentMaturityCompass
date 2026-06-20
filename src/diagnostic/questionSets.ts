@@ -391,7 +391,7 @@ function coreDimension(questionCount: number): DiagnosticQuestionSetDimension {
   return {
     family: "core",
     title: "Core AMC Assessment",
-    description: "The stable default 240-question evidence-weighted AMC assessment.",
+    description: "The stable default evidence-weighted AMC assessment.",
     questionCount,
     surfaces: ["Score"],
     layers: unique(questionBank.map((question) => question.layerName))
@@ -424,7 +424,7 @@ function baseInfo(version: DiagnosticQuestionSetVersion, questions: DiagnosticQu
     version,
     title: includeLifecycle
       ? "Lifecycle expanded AMC assessment"
-      : "Legacy 240-question AMC assessment",
+      : "Default AMC assessment",
     questionCount: questions.length,
     default: version === DEFAULT_QUESTION_SET_VERSION,
     includedVersions: includeLifecycle

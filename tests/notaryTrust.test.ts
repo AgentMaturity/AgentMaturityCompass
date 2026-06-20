@@ -84,7 +84,7 @@ async function httpGetJson(url: string): Promise<{ status: number; body: string 
       });
     });
     req.on("error", reject);
-    req.setTimeout(3000, () => {
+    req.setTimeout(10_000, () => {
       req.destroy(new Error("http get timeout"));
     });
     req.end();
@@ -115,7 +115,7 @@ async function httpPostJson(params: {
       });
     });
     req.on("error", reject);
-    req.setTimeout(3000, () => {
+    req.setTimeout(10_000, () => {
       req.destroy(new Error("http post timeout"));
     });
     req.write(params.body);

@@ -56,7 +56,11 @@ export function identityProviderAddOidcCli(params: {
   tokenEndpoint?: string;
   jwksUri?: string;
 }): { path: string; sigPath: string } {
-  unlockHostVault(params.hostDir);
+  if (!hostVaultExists(params.hostDir)) {
+    initHostVault(params.hostDir);
+  } else {
+    unlockHostVault(params.hostDir);
+  }
   const clientSecret = readFileSync(resolve(params.clientSecretFile), "utf8").trim();
   if (!clientSecret) {
     throw new Error("OIDC client secret file is empty.");
@@ -106,7 +110,11 @@ export function identityProviderAddSamlCli(params: {
   spEntityId: string;
   acsUrl: string;
 }): { path: string; sigPath: string } {
-  unlockHostVault(params.hostDir);
+  if (!hostVaultExists(params.hostDir)) {
+    initHostVault(params.hostDir);
+  } else {
+    unlockHostVault(params.hostDir);
+  }
   const certPem = readFileSync(resolve(params.idpCertFile), "utf8").trim();
   if (!certPem) {
     throw new Error("SAML IdP cert file is empty.");
@@ -188,4 +196,44 @@ export function scimTokenCreateCli(params: {
     writeFileSync(outPath, `${created.token}\n`, { mode: 0o600 });
   }
   return created;
+}
+
+export function scimInitCli(params: {
+  hostDir: string;
+  requireHttps?: boolean;
+  tokenName?: string;
+  outFile?: string;
+}): {
+  path: string;
+  sigPath: string;
+  enabled: true;
+  requireHttps: boolean;
+  token?: {
+    tokenId: string;
+    token: string;
+    tokenHash: string;
+  };
+} {
+  if (!hostVaultExists(params.hostDir)) {
+    initHostVault(params.hostDir);
+  } else {
+    unlockHostVault(params.hostDir);
+  }
+  const saved = nextConfig(params.hostDir, (config) => {
+    config.identity.scim.enabled = true;
+    config.identity.scim.auth.requireHttps = params.requireHttps ?? true;
+  });
+  const token = params.tokenName
+    ? scimTokenCreateCli({
+        hostDir: params.hostDir,
+        name: params.tokenName,
+        outFile: params.outFile
+      })
+    : undefined;
+  return {
+    ...saved,
+    enabled: true,
+    requireHttps: params.requireHttps ?? true,
+    token
+  };
 }

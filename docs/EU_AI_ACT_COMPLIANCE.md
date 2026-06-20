@@ -14,6 +14,7 @@ The EU AI Act applies a risk-based approach. AMC's compliance engine now support
 
 ```bash
 amc compliance report --framework EU_AI_ACT --window 30d --out .amc/reports/eu-ai-act.md
+amc comply risk-classify --employment --json
 ```
 
 ---
@@ -34,6 +35,8 @@ AMC uses **Domain Risk Classification** to determine which governance tier appli
 Domain classification is stored in `.amc/eu_ai_act_classification.json` and scored by `src/score/euAIActCompliance.ts`.
 
 High-risk domains include: healthcare, finance, employment, education, law enforcement, critical infrastructure, and immigration/asylum (per Annex III).
+
+Use `amc comply risk-classify` for the CLI risk-tier pre-check. It is an alias for `amc compliance risk-classify` and maps capability flags to the EU AI Act risk tiers in Regulation (EU) 2024/1689, including Article 5 prohibited practices, Article 6 high-risk systems, Annex III use areas, and Article 50 transparency obligations. Official source: https://data.europa.eu/eli/reg/2024/1689/oj.
 
 ### Autonomy Duration Factor
 

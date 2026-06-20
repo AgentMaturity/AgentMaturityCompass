@@ -66,8 +66,8 @@ Complete these checks before going live. Every item is a real `amc` command.
 
 ## Optional: Enterprise
 
-- [ ] SSO/OIDC configured — `amc identity init`
-- [ ] SCIM provisioning — `amc scim token create`
+- [ ] SSO/OIDC configured — `amc sso configure oidc --host-dir <host-dir> ...`
+- [ ] SCIM provisioning — `amc scim init --host-dir <host-dir> --token-name <name>`
 - [ ] Audit binder — `amc audit init`
 - [ ] Federation — `amc federate init`
 - [ ] Agent Passport — `amc passport init`

@@ -117,8 +117,8 @@ describe("REPL parser — evidence", () => {
     expect(parseInput("collect evidence").command).toBe("evidence collect");
   });
 
-  it("parses 'ingest' as evidence ingest", () => {
-    expect(parseInput("ingest").command).toBe("evidence ingest");
+  it("parses 'ingest' as the guided evidence collection wizard", () => {
+    expect(parseInput("ingest").command).toBe("evidence collect");
   });
 
   it("parses 'evidence' as evidence gaps", () => {

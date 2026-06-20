@@ -20,10 +20,10 @@ AMC has one simple split:
 | **Passport** | ✅ Full | ✅ Full | ✅ Full |
 | **Comply** | ✅ Full | ✅ Full | ✅ Full |
 | **All 14 adapters** | ✅ Full | ✅ Full | ✅ Full |
-| **481 CLI commands** | ✅ Full | ✅ Full | ✅ Full |
+| **1,140 CLI command paths** | ✅ Full | ✅ Full | ✅ Full |
 | **Browser playground** | ✅ Full | ✅ Full | ✅ Full |
 | **CI trust gates** | ✅ Full | ✅ Full | ✅ Full |
-| **Industry Packs** (40 verticals) | ❌ | ✅ All 40 packs | ✅ All 40 packs |
+| **Industry Packs** (41 verticals) | ❌ | ✅ All 41 packs | ✅ All 41 packs |
 | **Priority support** | ❌ | ❌ | ✅ |
 | **Custom pack development** | ❌ | ❌ | ✅ |
 | **Deployment assistance** | ❌ | ❌ | ✅ |

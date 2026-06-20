@@ -1,5 +1,14 @@
-export { runRedTeam, renderRedTeamMarkdown } from "./runner.js";
-export type { RedTeamReport, RedTeamVulnerability, RedTeamPluginResult, RunRedTeamInput } from "./runner.js";
+export { runRedTeam, renderRedTeamMarkdown, scoreRedTeamCvss } from "./runner.js";
+export type {
+  RedTeamReport,
+  RedTeamVulnerability,
+  RedTeamPluginResult,
+  RedTeamEvilMcpResult,
+  RedTeamCvssScore,
+  RedTeamCvssMetrics,
+  RedTeamCvssQualitativeRating,
+  RunRedTeamInput,
+} from "./runner.js";
 export { listStrategies, getStrategy, resolveStrategies } from "./strategies.js";
 export type { RedTeamStrategy } from "./strategies.js";
 
@@ -23,6 +32,8 @@ export {
   renderMCPAgentRedTeamMarkdown,
   buildEvilTools,
   buildScenarios,
+  listMCPAttackCategories,
+  normalizeMCPAttackCategories,
 } from "./mcpAgentProvider.js";
 
 export type {
@@ -30,6 +41,7 @@ export type {
   MCPAgentScenario,
   EvilToolDefinition,
   MCPAttackCategory,
+  MCPAttackCategoryFilter,
   RecordedToolCall,
   ScenarioResult,
   RunMCPAgentRedTeamInput,

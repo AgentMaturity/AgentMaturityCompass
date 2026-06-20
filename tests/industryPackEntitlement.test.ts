@@ -38,14 +38,14 @@ afterEach(() => {
 });
 
 describe("industry pack entitlement", () => {
-  test("catalog exposes exactly 40 locked industry packs by default", () => {
+  test("catalog exposes exactly 41 locked industry packs by default", () => {
     const workspace = createWorkspace();
     const entitlement = getIndustryPackEntitlement(workspace, {} as NodeJS.ProcessEnv);
     const catalog = listIndustryPacks().map((pack) => toIndustryPackCatalogItem(pack, entitlement));
 
-    expect(catalog).toHaveLength(40);
+    expect(catalog).toHaveLength(41);
     expect(catalog.every((pack) => pack.locked)).toBe(true);
-    expect(new Set(catalog.map((pack) => pack.packId)).size).toBe(40);
+    expect(new Set(catalog.map((pack) => pack.packId)).size).toBe(41);
   });
 
   test("locks packs by default and redacts paid details", () => {

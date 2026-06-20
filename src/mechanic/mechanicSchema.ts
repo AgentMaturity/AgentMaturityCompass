@@ -20,12 +20,14 @@ export const mechanicGapDimensionSchema = z.object({
   topGaps: z.array(z.object({ qId: z.string().min(1), gap: z.number() })).default([])
 });
 
+export const MECHANIC_GAP_QUESTION_COUNT = 244;
+
 export const mechanicGapReportSchema = z.object({
   v: z.literal(1),
   generatedTs: z.number().int().nonnegative(),
   scope: mechanicScopeSchema,
   readiness: z.enum(["READY", "NEEDS_EVIDENCE", "UNTRUSTED"]),
-  perQuestion: z.array(mechanicGapQuestionSchema).length(240),
+  perQuestion: z.array(mechanicGapQuestionSchema).length(MECHANIC_GAP_QUESTION_COUNT),
   perDimension: z.array(mechanicGapDimensionSchema).length(5),
   global: z.object({
     upgradeReadiness: z.enum(["READY", "NEEDS_EVIDENCE", "UNTRUSTED"]),

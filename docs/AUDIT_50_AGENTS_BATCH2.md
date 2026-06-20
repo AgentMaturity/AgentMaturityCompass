@@ -17,7 +17,7 @@
 | 14 | Grace | ML Engineer / Eval | **5/10** | `amc run` vault-blocked. `amc compare` requires args but help is clear. No ML-native eval flow. Has to understand AMC's internal model first. |
 | 15 | David | CISO / Red Team | **5/10** | `amc redteam run` works. `amc shield analyze-mcp` doesn't exist — phantom command in docs. Good security depth, rough edges. |
 | 16 | Aisha | Enterprise Architect | **4/10** | `amc fleet status` returns `unknown command`. `amc inventory list` returns `unknown command`. Both documented, neither exists. |
-| 17 | Carlos | Frontend Dev / Embed | **3/10** | `amc api start` doesn't exist. `amc api routes` and `amc api docs` only work via `npx tsx src/cli.ts` (source), not installed `amc` CLI. `amc dashboard open` blocks terminal, no browser open. |
+| 17 | Carlos | Frontend Dev / Embed | **4/10** | API namespace gaps were resolved in the 2026-06-16 follow-up (`amc api start/routes/docs/key`); `amc dashboard open`, embedding docs, and CORS docs remain rough. |
 | 18 | Kim | Regulatory Lawyer | **6/10** | `amc comply report --framework ISO_42001/SOC2/NIST_AI_RMF` all work. Framework names in `website/docs/compliance.html` are wrong — every copy-paste fails. Generates JSON, not human-readable. |
 | 19 | Wei | Infrastructure Engineer | **5/10** | `amc watch start` doesn't exist (correct: `amc monitor start`). `amc monitor` works well. `amc alert` exists. `amc metrics status` returns JSON stub. The entire `docs/CONTINUOUS_MONITORING.md` uses wrong command namespace. |
 | 20 | Sophie | Technical Writer | **4/10** | 228 markdown docs. Dead command references throughout. Framework name inconsistency across website. `amc quickscore --share`, `amc badge`, `amc fleet status`, `amc inventory list`, `amc watch start` all documented but broken or nonexistent. |
@@ -357,7 +357,7 @@ Closest command paths:
 
 `amc api --help` shows only: `status`, `help`. `amc api routes` → errors with `unknown command 'routes'`. `amc api docs` → errors with `unknown command 'docs'`.
 
-IMPORTANT: `amc api routes` and `amc api docs` DO work via `npx tsx src/cli.ts api routes` (source run) but NOT via the installed `amc` binary. This means these commands were added to source but never published in the npm package. Carlos using the published package can't access them.
+2026-06-16 follow-up: `amc api start`, `amc api routes`, `amc api docs`, and `amc api key create/list/revoke` are now registered in the compiled CLI. The older source-only/published-binary mismatch is resolved for this namespace.
 
 `amc api status` works and tells him to run `amc studio open` to start the server. He tries that — requires vault passphrase.
 
@@ -365,8 +365,8 @@ He reads `docs/API_REFERENCE.md` — comprehensive (1777+ lines). He reads `docs
 
 ### Gaps Found
 
-1. **`amc api start` doesn't exist** — documented in AUDIT_50_AGENTS_BATCH4.md as a known issue (Persona 35 Victor, also noted in R5). Still broken. `amc api status` only.
-2. **`amc api routes` and `amc api docs` only work from source** — they're in `src/cli.ts` but not in the published binary. Carlos can see them in the internal audit docs but running `amc api routes` fails.
+1. **`amc api start` resolved in the 2026-06-16 follow-up.** The compiled CLI exposes Studio-backed API start.
+2. **`amc api routes` and `amc api docs` resolved in the 2026-06-16 follow-up.** The compiled CLI exposes route inventory and docs summary.
 3. **`amc dashboard open` blocks terminal, doesn't open browser** — the second most-cited UX issue (after vault blocks). Still not fixed.
 4. **No embedding guide** — `docs/DASHBOARD.md` mentions `components/*.js` but no docs explain how to embed the dashboard as an iframe, web component, or React module in an external app.
 5. **No CORS configuration docs** — Carlos needs to know the Studio server's CORS policy to make cross-origin API calls from his app.
@@ -567,8 +567,8 @@ Sophie reads all 228 markdown docs plus `website/docs/` (12 files). She's lookin
 
 | Gap ID | Description | Affects |
 |--------|-------------|---------|
-| G-B2-08 | `amc api start` doesn't exist | Carlos, Sophie |
-| G-B2-09 | `amc api routes` and `amc api docs` only work from source, not installed binary | Carlos |
+| G-B2-08 | `amc api start` doesn't exist | ✅ Resolved 2026-06-16 |
+| G-B2-09 | `amc api routes` and `amc api docs` only work from source, not installed binary | ✅ Resolved 2026-06-16 |
 | G-B2-10 | `amc shield analyze-mcp` doesn't exist (in market docs as real feature) | David, Sophie |
 | G-B2-11 | `amc verify` shows 19 failures on dev workspace — alarming without context | Omar |
 | G-B2-12 | `amc audit binder create` requires undocumented `--scope` arg | Omar |

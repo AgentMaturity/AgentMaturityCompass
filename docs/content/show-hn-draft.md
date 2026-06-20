@@ -26,10 +26,10 @@ What makes it different from eval tools like Promptfoo:
 
 - **14 framework adapters** — LangChain, CrewAI, AutoGen, OpenAI Agents SDK, Claude Code, etc. Zero code changes.
 
-- **40 industry domain packs** — healthcare/HIPAA, finance/MiFID II, education/FERPA, and more.
+- **41 industry domain packs** — healthcare/HIPAA, finance/MiFID II, education/FERPA, logistics reliability, and more.
 
 The entire trust stack is MIT licensed and free. Only the industry-specific domain packs are paid.
 
-Tech: TypeScript, Commander CLI, Ed25519 crypto, SQLite evidence ledger, 4,161 tests (vitest), MCP server for AI coding assistants.
+Tech: TypeScript, Commander CLI, Ed25519 crypto, SQLite evidence ledger, 5,394 statically collected Vitest tests, MCP server for AI coding assistants.
 
 I'd love feedback on the scoring model and whether the evidence-weighted approach resonates. Happy to answer any questions about the architecture.

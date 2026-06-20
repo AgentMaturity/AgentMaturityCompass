@@ -5,7 +5,7 @@
  */
 
 import { randomUUID } from 'node:crypto';
-import { join } from 'node:path';
+import { dirname, join, resolve } from 'node:path';
 import { mkdirSync } from 'node:fs';
 
 let _db: import('better-sqlite3').Database | null = null;
@@ -23,8 +23,11 @@ export interface GuardEventInput {
 
 function getDb(): import('better-sqlite3').Database | null {
   try {
-    const dir = join(process.cwd(), '.amc');
-    const desiredPath = join(dir, 'guard_events.sqlite');
+    const configuredPath = process.env.AMC_GUARD_EVENTS_DB_PATH;
+    const desiredPath = configuredPath
+      ? resolve(configuredPath)
+      : join(process.cwd(), '.amc', 'guard_events.sqlite');
+    const dir = dirname(desiredPath);
     if (_db && _dbPath === desiredPath) {
       return _db;
     }

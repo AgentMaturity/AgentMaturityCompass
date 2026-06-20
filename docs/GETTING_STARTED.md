@@ -28,6 +28,22 @@ That's it. AMC creates the workspace if needed, runs the full evidence score, pr
 
 > **Why no setup command first?** The top-level `amc` command is the default onboarding path. It detects what is available, creates the minimum workspace state, and falls back to unsigned/demo-safe behavior when a local vault cannot be unlocked.
 
+For a smaller startup path that only creates the workspace and points you to lightweight next checks:
+
+```bash
+amc quickstart --minimal
+```
+
+For a guided 10-minute startup path with framework detection and sample answers:
+
+```bash
+amc quickstart --startup-plan --role cto --answers-out amc-startup-answers.json
+amc quickstart --what-broken
+amc quickscore --answers amc-startup-answers.json --json
+```
+
+Use `--startup-plan` when you want a role-aware plan and starter answer file before running a measured score. Use `--what-broken` when you only want startup blockers, vault/passphrase readiness, and the next commands.
+
 After scoring, AMC automatically shows what your agent needs to reach the next level.
 
 **Optional: run a fast pulse check** when you only need a lightweight demo score:
@@ -35,6 +51,16 @@ After scoring, AMC automatically shows what your agent needs to reach the next l
 ```bash
 amc quickscore --rapid
 ```
+
+For CI, scripted demos, or other non-interactive runs, provide answer JSON explicitly:
+
+```bash
+amc quickscore --answers answers.json --json
+```
+
+If a no-prompt run prints a placeholder L0 score, AMC now shows: "Did you mean to run the interactive score?" Use `amc quickscore` in a terminal for prompted scoring, or keep using `--answers` for CI.
+
+If `amc quickscore --auto --json` has no captured ledger evidence, AMC fails closed with `scoreStatus: "AUTO_NO_EVIDENCE"` and no measured score fields. Capture evidence first with `amc wrap <runtime> -- <your-agent-command>`, or use `amc quickscore --answers answers.json --json` for a CI-safe survey score.
 
 **Add a badge to your README:**
 
@@ -68,7 +94,7 @@ AMC scores agents on a 5-level scale:
 
 ## What Gets Scored
 
-AMC evaluates 5 dimensions with 240 default questions. The optional lifecycle expansion adds 20 explicitly versioned questions across lifecycle governance, harness resources, evidence binding, typed multi-agent systems, trace repair, proof exports, reasoning memory, uncertainty controls, runtime gateway/watch, and fleet/org operation.
+AMC evaluates 5 dimensions with 244 default questions. The optional lifecycle expansion adds 20 explicitly versioned questions across lifecycle governance, harness resources, evidence binding, typed multi-agent systems, trace repair, proof exports, reasoning memory, uncertainty controls, runtime gateway/watch, and fleet/org operation.
 
 1. **Strategic Agent Operations** (19 default questions) — Mission clarity, scope adherence, decision traceability
 2. **Leadership & Autonomy** (23 default questions) — Governance, decision-making authority, autonomy boundaries
@@ -155,8 +181,8 @@ amc score owasp-llm              # OWASP LLM Top 10 coverage
 
 **L1 → L2** (add structure):
 ```bash
-# Set up evidence collection
-amc score collect-evidence my-agent
+# Capture the first real agent run without choosing between setup paths
+amc evidence collect --first-run --runtime any -- node agent.js
 
 # Check your audit trail
 amc score audit-depth
@@ -267,14 +293,17 @@ amc adapters run langchain-python --agent my-agent
 AMC's power comes from evidence — not questionnaires. Evidence is collected automatically during agent runs.
 
 ```bash
-# Collect evidence from a run
-amc score collect-evidence my-agent
+# Capture your first real agent run
+amc evidence collect --first-run --runtime any -- node agent.js
+
+# Preview the capture plan without running the agent
+amc evidence collect --first-run --dry-run --runtime any -- node agent.js
 
 # Verify evidence integrity
 amc evidence verify
 
 # Bundle evidence for sharing
-amc evidence bundle create
+amc bundle export --out evidence.amcbundle
 ```
 
 ### Ingesting from external eval systems
@@ -283,16 +312,16 @@ Already running evals elsewhere? Import them:
 
 ```bash
 # From OpenAI Evals
-amc score evidence-ingest --format openai-evals
+amc eval import --format openai --file ./openai-evals.jsonl
 
 # From LangSmith
-amc score evidence-ingest --format langsmith
+amc eval import --format langsmith --file ./langsmith.jsonl
 
-# From MLflow
-amc score evidence-ingest --format mlflow
+# From Promptfoo
+amc eval import --format promptfoo --file ./promptfoo.json
 
-# From Weights & Biases
-amc score evidence-ingest --format weights-biases
+# Generic local logs
+amc ingest ./external-agent-logs/ --type generic_json --agent imported-agent
 ```
 
 ---
@@ -303,6 +332,8 @@ amc score evidence-ingest --format weights-biases
 | Command | What it does |
 |---------|-------------|
 | `amc` | Create a workspace if needed and run the full score |
+| `amc init --minimal` | Startup-friendly workspace setup without vault prompt or immediate full-score prompt |
+| `amc quickstart --minimal` | Minimal quickstart path with lightweight next steps |
 | `amc setup` | Full setup with framework detection |
 | `amc setup --demo` | Quick demo with sample data |
 | `amc doctor` | Health check your workspace |
@@ -315,10 +346,19 @@ amc score evidence-ingest --format weights-biases
 |---------|-------------|
 | `amc` | Full evidence-backed maturity score |
 | `amc quickscore --rapid` | Optional lightweight pulse check |
+| `amc quickscore --answers answers.json --json` | Non-interactive diagnostic from provided L0-L5 answers |
 | `amc score formal-spec <agent>` | Full formal maturity score |
 | `amc score production-ready <agent>` | Production readiness gate |
 | `amc score adversarial <agent>` | Gaming resistance test |
-| `amc score collect-evidence <agent>` | Collect evidence from runs |
+| `amc evidence collect --first-run --runtime any -- <agent command>` | Capture a first real agent run without the interactive method picker |
+| `amc business risk --maturity 3 --baseline-frequency 4 --incident-cost 50000 --risk-appetite 75000` | Convert maturity into residual incident frequency, expected annual loss, and risk-appetite status |
+| `amc business fair-scenario --scenario claims-ai-data-leak --maturity 3 --frequency-min 2 --frequency-most-likely 5 --frequency-max 9 --loss-min 20000 --loss-most-likely 75000 --loss-max 250000 --out fair-scenario.md` | Run a FAIR-style calibrated scenario distribution with P10/P50/P90 loss estimates |
+| `amc business roi --current-maturity 2 --target-maturity 3 --baseline-frequency 5 --incident-cost 20000 --annual-control-cost 15000 --implementation-cost 5000` | Estimate first-year ROI from a maturity improvement and write a cost-of-trust-gap business case |
+| `amc business heatmap --portfolio risk-portfolio.json --out risk-heatmap.md` | Build a portfolio monetary risk heatmap across agents, business units, and annual loss appetite |
+| `amc business grc-export --portfolio risk-portfolio.json --out grc-treatment-plan.csv` | Export a GRC treatment-plan register with control owners, due dates, appetite status, ISO 31000 context, and FAIR-style frequency/magnitude fields |
+| `amc executive brief --run latest --out board-brief.html` | Generate a board-ready one-page HTML brief that can be printed to PDF |
+| `amc leaderboard public-export --output public-leaderboard` | Build an anonymized dataset-card and JSONL bundle for public leaderboard review |
+| `amc compare <run-a> <run-b> --output compare.json --badge` | Compare two scored runs and write a comparison SVG badge beside the report |
 
 ### Agent Guide
 | Command | What it does |
@@ -348,6 +388,8 @@ amc score evidence-ingest --format weights-biases
 | `amc shield confirm run --scope <scope> --task finding-task.json` | Convert an authorized finding into safe proof with hashes, signals, and receipts instead of exploit instructions |
 | `amc shield confirm export <proof> --out safe-proof.json` | Export redacted confirmation proof for Vault/Passport evidence bundles |
 | `amc import <path> --dry-run` / `amc import <path>` | Detect and import neutral traces, runs, workflow graphs, configs, memory, evaluator outputs, and benchmarks as redacted AMC evidence |
+| `amc executive brief --run latest --out board-brief.html` | Write a print-ready board one-pager from a diagnostic run without certificate signing |
+| `amc compare <run-a> <run-b> --output compare.json --badge` | Compare scored runs and write a comparison SVG badge beside the report |
 | `amc strategy compare --file strategies.json` | Compare inference strategies by score, cost, latency, risk, confidence, and evidence refs |
 | `amc strategy compare --file strategies.json --apply --approve` | Commit the recommended model route only with policy approval, manifest evidence, and rollback data |
 | `amc runtime create|event|inspect|resume|cancel|degrade|complete` | Persist connected-agent run state and redacted event streams that CLI and Studio both read |
@@ -373,7 +415,9 @@ amc score evidence-ingest --format weights-biases
 | `amc evidence observability inspect <run>` | Inspect one run-level observability lane record |
 | `amc memory writeback <episode>` | Store an evidence-backed, redacted reasoning lesson with expiry, allowed consumers, and a writeback receipt |
 | `amc memory retrieve --consumer fixer` / `amc memory show <memory>` | Retrieve active reasoning memory for score, recommendations, fixer, or Studio with citations |
-| `amc report <run>` / Studio Diagnostic filters | Review confidence, uncertainty, low-evidence downgrades, and auto-fix review gates |
+| `amc run-alias set <alias> <run>` | Name a diagnostic run for customer-success, report, and history workflows |
+| `amc report <run|alias|latest>` / Studio Diagnostic filters | Review confidence, uncertainty, low-evidence downgrades, and auto-fix review gates |
+| `amc report <alias> --share --public-base-url <url>` | Generate a static report bundle, local file URL, and public URL manifest for client review |
 | `amc trace index` / `amc trace index --run <run>` | List or inspect distilled trace failure indexes created from full-score evidence |
 | `amc trace failures` | Show ranked recurring failure clusters with affected agents, runs, score impact, and repair input |
 | `amc mechanic rca run <run>` | Generate likely root causes, regression tests, rollback pointers, and governed Enforce fix proposals |
@@ -450,7 +494,7 @@ This is normal on first run. The doctor checks for optional components:
 
 ### "Score is 0"
 Zero scores mean no data was provided. AMC scores from evidence, not defaults:
-1. Run `amc score collect-evidence <agentId>` to gather data
+1. Run `amc evidence collect --first-run --runtime any -- node agent.js` to capture the first real run
 2. Or use `--json` to pipe in evidence programmatically
 3. Or run `amc` for a full local baseline
 
@@ -491,7 +535,7 @@ cd platform/python && python3 -m pytest tests/ -q
 3. **Run `amc doctor`** — check your environment
 4. **Run `amc setup --demo`** — explore with sample data
 5. **Run `amc guide --diff`** — see what improved after your agent works with guardrails
-6. **Set up evidence collection** — move from questionnaires to proof
+6. **Set up evidence collection** — `amc evidence collect --first-run --runtime any -- node agent.js`
 
 ## New: Transparency Reports & MCP Server
 

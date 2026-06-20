@@ -14,7 +14,7 @@ Smaller community, narrower scope, less technical depth than AMC.
 | Assurance depth | 147 packs, evolutionary red-team | Basic test suites |
 | Compliance | EU AI Act, ISO 42001, NIST, SOC 2, OWASP | None |
 | Crypto evidence | Ed25519 + Merkle trees | None |
-| Domain packs | 40 industry packs | None |
+| Domain packs | 41 industry packs | None |
 | Framework adapters | 14 | Limited |
 | Open source | Yes (MIT) | Partially |
 

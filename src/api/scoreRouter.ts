@@ -5,7 +5,7 @@
 
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import { z } from 'zod';
-import { bodyJsonSchema, apiSuccess, apiError, pathParam, queryParam, isRequestBodyError } from './apiHelpers.js';
+import { bodyJson, bodyJsonSchema, apiSuccess, apiError, pathParam, queryParam, isRequestBodyError } from './apiHelpers.js';
 import {
   countActiveScoreSessions,
   createScoreSession,
@@ -14,6 +14,8 @@ import {
   recordScoreAnswer,
 } from './scoreStore.js';
 import { queueScoreComputationMetric } from '../observability/otelExporter.js';
+import type { RunLiveScoreBehaviorDriftInput } from '../watch/liveDriftAlerts.js';
+import type { BuildJudgeCalibrationReceiptInput } from '../eval/judgeCalibration.js';
 
 const nonEmptyStringSchema = z.string().trim().min(1);
 const optionalNonEmptyStringSchema = nonEmptyStringSchema.optional();
@@ -118,6 +120,57 @@ export async function handleScoreRoute(
   // GET /api/v1/score/status
   if (pathname === '/api/v1/score/status' && method === 'GET') {
     apiSuccess(res, { status: 'operational', module: 'score', activeSessions: countActiveScoreSessions(workspace) });
+    return true;
+  }
+
+  // POST /api/v1/score/live-drift — score-facing live drift receipt for production samples
+  if (pathname === '/api/v1/score/live-drift' && method === 'POST') {
+    try {
+      const body = await bodyJson<RunLiveScoreBehaviorDriftInput>(req);
+      if (!body.baselineWindow || !Array.isArray(body.baselineWindow.rows) || !body.liveWindow || !Array.isArray(body.liveWindow.rows)) {
+        apiError(res, 400, 'Required: baselineWindow.rows and liveWindow.rows');
+        return true;
+      }
+      const { runLiveScoreBehaviorDrift } = await import('../watch/liveDriftAlerts.js');
+      const receipt = runLiveScoreBehaviorDrift({
+        ...body,
+        agentId: body.agentId ?? 'default',
+      });
+      apiSuccess(res, {
+        receipt,
+        scoreDrift: receipt.scoreDrift,
+        behaviorDrift: receipt.behaviorDrift,
+        failClosed: receipt.failClosed,
+      });
+    } catch (err) {
+      scoreRouteError(res, err, 'Live drift scoring failed');
+    }
+    return true;
+  }
+
+  // POST /api/v1/score/judge-calibration — score-facing LLM judge calibration receipt
+  if (pathname === '/api/v1/score/judge-calibration' && method === 'POST') {
+    try {
+      const body = await bodyJson<BuildJudgeCalibrationReceiptInput>(req);
+      if (!body.rubric || !body.calibrationSet || !Array.isArray(body.calibrationSet.rows) || !Array.isArray(body.judgments)) {
+        apiError(res, 400, 'Required: rubric, calibrationSet.rows, and judgments');
+        return true;
+      }
+      const { buildJudgeCalibrationReceipt } = await import('../eval/judgeCalibration.js');
+      const receipt = buildJudgeCalibrationReceipt({
+        ...body,
+        agentId: body.agentId ?? 'default',
+        runId: body.runId ?? `judge-calibration-${Date.now()}`,
+      });
+      apiSuccess(res, {
+        receipt,
+        disagreement: receipt.disagreement,
+        ciGate: receipt.ciGate,
+        failClosed: receipt.failClosed,
+      });
+    } catch (err) {
+      scoreRouteError(res, err, 'Judge calibration scoring failed');
+    }
     return true;
   }
 
@@ -368,6 +421,23 @@ export async function handleScoreRoute(
       apiSuccess(res, run);
     } catch (err) {
       scoreRouteError(res, err, 'Run not found', 404);
+    }
+    return true;
+  }
+
+  // GET /api/v1/score/evidence-drilldown/:runId/:questionId — UI-ready score finding receipt drilldown
+  const drilldownParams = pathParam(pathname, '/api/v1/score/evidence-drilldown/:runId/:questionId');
+  if (drilldownParams && method === 'GET') {
+    try {
+      const runId = decodeURIComponent(drilldownParams.runId ?? '');
+      const questionId = decodeURIComponent(drilldownParams.questionId ?? '');
+      const agentId = queryParam(req.url ?? '', 'agentId') ?? 'default';
+      const { loadRunReport } = await import('../diagnostic/runner.js');
+      const { buildScoreEvidenceDrilldown } = await import('../diagnostic/evidenceDrilldown.js');
+      const report = loadRunReport(workspace, runId, agentId);
+      apiSuccess(res, buildScoreEvidenceDrilldown(report, questionId));
+    } catch (err) {
+      scoreRouteError(res, err, 'Evidence drilldown failed', 404);
     }
     return true;
   }

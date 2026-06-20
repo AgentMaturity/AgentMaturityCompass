@@ -1,0 +1,56 @@
+name: amc-helm-release
+description: Deploy the AMC Helm chart to an existing Kubernetes cluster with Pulumi.
+runtime: nodejs
+config:
+  kubeconfig:
+    type: string
+    secret: true
+    description: Optional kubeconfig content. Omit to use the active kubeconfig environment.
+  kubeContext:
+    type: string
+    description: Optional kubeconfig context name.
+  releaseName:
+    type: string
+    default: amc
+  namespace:
+    type: string
+    default: amc-system
+  chartPath:
+    type: string
+    default: ../../helm/amc
+  imageRepository:
+    type: string
+    default: ghcr.io/your-org/amc-studio
+  imageTag:
+    type: string
+    default: latest
+  imagePullPolicy:
+    type: string
+    default: IfNotPresent
+  replicaCount:
+    type: integer
+    default: 1
+  bootstrapSecretName:
+    type: string
+    default: amc-bootstrap
+  ingressEnabled:
+    type: boolean
+    default: false
+  ingressClassName:
+    type: string
+    default: ""
+  ingressHost:
+    type: string
+    default: amc.example.com
+  ingressTlsSecretName:
+    type: string
+    default: ""
+  storageClassName:
+    type: string
+    default: ""
+  workspaceStorageSize:
+    type: string
+    default: 10Gi
+  timeoutSeconds:
+    type: integer
+    default: 600

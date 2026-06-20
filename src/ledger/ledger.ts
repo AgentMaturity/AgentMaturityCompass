@@ -733,15 +733,19 @@ export class Ledger {
   readonly workspace: string;
   readonly db: Database.Database;
   private readonly dbLease: SqliteConnectionLease;
+  private readonly unsignedSignatures: boolean;
   private incidentStoreInitialized = false;
 
   constructor(workspace: string) {
     this.workspace = workspace;
+    this.unsignedSignatures = process.env.AMC_NO_SIGN === "1";
     ensureDir(join(workspace, ".amc"));
     ensureDir(blobDir(workspace));
     ensureDir(targetsDir(workspace));
     ensureDir(runsDir(workspace));
-    ensureSigningKeys(workspace);
+    if (!this.unsignedSignatures) {
+      ensureSigningKeys(workspace);
+    }
 
     const pool = getOrCreateSqlitePool({
       key: ledgerPoolKey(workspace),
@@ -773,6 +777,14 @@ export class Ledger {
 
   private auditorPrivateKey(): string {
     return getPrivateKeyPem(this.workspace, "auditor");
+  }
+
+  private signMonitorDigest(digestHex: string): string {
+    return this.unsignedSignatures ? "unsigned" : signHexDigest(digestHex, this.monitorPrivateKey());
+  }
+
+  private signAuditorDigest(digestHex: string): string {
+    return this.unsignedSignatures ? "unsigned" : signHexDigest(digestHex, this.auditorPrivateKey());
   }
 
   private assertTrustedWriter(): void {
@@ -1033,13 +1045,14 @@ export class Ledger {
     id: string;
     ts: number;
     prevHash: string;
+    policy?: ReturnType<typeof loadOpsPolicy>;
   }): {
     row: Record<string, unknown>;
     meta: Record<string, unknown>;
     result: AppendEvidenceResult;
   } {
     const { input, id, ts, prevHash } = params;
-    const policy = loadOpsPolicy(this.workspace);
+    const policy = params.policy ?? loadOpsPolicy(this.workspace);
     const payload = input.payload;
     let payloadPath: string | null = null;
     let payloadInline: string | null = null;
@@ -1080,7 +1093,7 @@ export class Ledger {
       metaJson
     });
     const eventHash = sha256Hex(`${prevHash}${canonicalMetadata}${payloadSha256}`);
-    const writerSig = signHexDigest(eventHash, this.monitorPrivateKey());
+    const writerSig = this.signMonitorDigest(eventHash);
 
     return {
       row: {
@@ -1162,6 +1175,7 @@ export class Ledger {
     }> = [];
     const insert = this.db.prepare(EVIDENCE_EVENT_INSERT_SQL);
     const spanRows: EvidenceEvent[] = [];
+    const policy = loadOpsPolicy(this.workspace);
     this.runImmediateTransaction(() => {
       let previousHash = this.latestEventHash();
       for (const input of inputs) {
@@ -1171,7 +1185,8 @@ export class Ledger {
           input,
           id,
           ts,
-          prevHash: previousHash
+          prevHash: previousHash,
+          policy
         });
         insert.run(prepared.row);
         spanRows.push(prepared.row as unknown as EvidenceEvent);
@@ -1490,7 +1505,7 @@ export class Ledger {
       .get(sessionId) as { event_hash: string } | undefined;
 
     const finalHash = row?.event_hash ?? sha256Hex("EMPTY_SESSION");
-    const sealSig = signHexDigest(finalHash, this.monitorPrivateKey());
+    const sealSig = this.signMonitorDigest(finalHash);
 
     this.db
       .prepare(
@@ -1553,7 +1568,7 @@ export class Ledger {
   }
 
   signRunHash(hashHex: string): string {
-    return signHexDigest(hashHex, this.auditorPrivateKey());
+    return this.signAuditorDigest(hashHex);
   }
 
   getEventsBetween(startTs: number, endTs: number): EvidenceEvent[] {

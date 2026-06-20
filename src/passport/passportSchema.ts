@@ -48,6 +48,7 @@ export const passportJsonSchema = z.object({
       skills: z.number().min(0).max(5).nullable()
     }),
     unknownQuestionsCount: z.number().int().min(0),
+    questionExplainabilityHash: z.string().length(64).optional(),
     questionScores42: z
       .array(
         z.object({

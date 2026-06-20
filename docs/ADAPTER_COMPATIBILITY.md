@@ -61,7 +61,7 @@ amc doctor
 
 ## Adding Custom Adapters
 
-AMC supports plugin adapters for frameworks not covered by built-ins. See the [adapter development guide](ARCHITECTURE_MAP.md) for details.
+AMC supports plugin adapters for frameworks not covered by built-ins. See the [custom adapter authoring guide](CUSTOM_ADAPTER.md) for the adapter schema, SDK wrapper path, evidence contract, and validation checklist.
 
 ## Reporting Issues
 

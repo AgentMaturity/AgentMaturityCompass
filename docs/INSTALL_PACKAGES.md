@@ -41,7 +41,7 @@ Best for:
 - team/local infra
 - reproducible environments
 
-Common images referenced in repo/docs include quickstart and compose-based deployment flows.
+Use local build commands for quickstart images unless a GHCR package has been verified public. GitHub Container Registry publication and visibility are release operations, not assumptions from source docs.
 
 ### From source
 Best for:

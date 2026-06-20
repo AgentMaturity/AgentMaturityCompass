@@ -22,6 +22,13 @@ export { sendBridgeTelemetry, type AMCTelemetryEvent } from "./amcTelemetry.js";
 export { hashSdkValue, redactSdkText } from "./amcEvidence.js";
 export { assertNoSelfScoring, requireBridgeUrl } from "./amcGuards.js";
 export { AMCSDKError, type AMCSDKErrorCode } from "./errors.js";
+export {
+  createAMCMobileFetchBridge,
+  createReactNativeAMCFetch,
+  type AMCMobileFetchLike,
+  type AMCMobileFetchOptions,
+  type AMCMobileProvider
+} from "./mobileFetch.js";
 export { instrumentOpenAIClient, createOpenAIFetchTransport } from "./integrations/openai.js";
 export { instrumentAnthropicClient } from "./integrations/anthropic.js";
 export { instrumentGeminiClient } from "./integrations/gemini.js";

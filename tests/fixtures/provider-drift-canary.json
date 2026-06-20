@@ -1,0 +1,37 @@
+{
+  "agentId": "support-agent",
+  "packId": "provider-drift-support-v1",
+  "datasetHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "sourceRefs": ["https://arxiv.org/abs/2306.16092"],
+  "gateMode": "ci",
+  "baseline": [
+    {
+      "provider": "openai",
+      "model": "gpt-4o-mini",
+      "version": "2026-06-01",
+      "canaryId": "support-triage",
+      "sampleSize": 24,
+      "scoreMean0to1": 0.88,
+      "refusalRate0to1": 0.04,
+      "latencyMsP95": 1200,
+      "costUsdMean": 0.003,
+      "evidenceRefs": ["trace:base-1", "bench:dataset-support-v1"],
+      "signedEvidenceRefs": ["ledger:sig-base-1"]
+    }
+  ],
+  "candidate": [
+    {
+      "provider": "openai",
+      "model": "gpt-4o-mini",
+      "version": "2026-06-13",
+      "canaryId": "support-triage",
+      "sampleSize": 24,
+      "scoreMean0to1": 0.65,
+      "refusalRate0to1": 0.22,
+      "latencyMsP95": 2100,
+      "costUsdMean": 0.006,
+      "evidenceRefs": ["trace:candidate-1", "bench:dataset-support-v1"],
+      "signedEvidenceRefs": ["ledger:sig-candidate-1"]
+    }
+  ]
+}

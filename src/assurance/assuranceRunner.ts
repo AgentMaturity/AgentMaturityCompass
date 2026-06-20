@@ -30,6 +30,7 @@ export interface RunAssuranceInput {
   workspace: string;
   agentId?: string;
   packId?: string;
+  packIds?: string[];
   runAll?: boolean;
   mode: "supervise" | "sandbox";
   window: string;
@@ -59,6 +60,9 @@ function trustLabelFromIntegrity(integrity: number): TrustLabel {
 }
 
 function packIdsForRun(input: RunAssuranceInput): string[] {
+  if (input.packIds && input.packIds.length > 0) {
+    return input.packIds;
+  }
   if (input.runAll) {
     return listAssurancePacks().map((pack) => pack.id);
   }
@@ -431,7 +435,9 @@ export async function runAssurance(input: RunAssuranceInput): Promise<AssuranceR
       }
     }
 
-    const verification = await verifyLedgerIntegrity(workspace);
+    const verification = input.noSign
+      ? { ok: false, errors: ["unsigned assurance run"] }
+      : await verifyLedgerIntegrity(workspace);
     const integrityIndex = Number(scoreIntegrity(packResults).toFixed(4));
     const trustLabel = trustLabelFromIntegrity(integrityIndex);
     const overallScore0to100 = aggregateOverallScore(packResults);
@@ -443,7 +449,7 @@ export async function runAssurance(input: RunAssuranceInput): Promise<AssuranceR
       windowStartTs,
       windowEndTs: now,
       trustTier,
-      status: input.noSign ? (verification.ok ? "VALID" : "UNSIGNED") : (verification.ok ? "VALID" : "INVALID"),
+      status: input.noSign ? "UNSIGNED" : (verification.ok ? "VALID" : "INVALID"),
       verificationPassed: verification.ok,
       packResults,
       overallScore0to100,

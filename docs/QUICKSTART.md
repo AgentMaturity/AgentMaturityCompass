@@ -35,6 +35,40 @@ amc
 
 > **Tip:** For a demo workspace with sample data, run `amc setup --demo` and then `amc`.
 
+For a stripped-down startup setup that skips the vault prompt and immediate full-score prompt:
+
+```bash
+amc init --minimal
+amc quickscore --rapid
+```
+
+For a startup action plan without the full interactive score:
+
+```bash
+amc quickstart --startup-plan --role cto --answers-out amc-startup-answers.json
+amc quickstart --what-broken
+amc quickscore --answers amc-startup-answers.json --json
+```
+
+`--startup-plan` detects common agent frameworks, writes optional sample L0-L5 answers for non-interactive scoring, and explains the vault passphrase environment variable before signed evidence capture. `--what-broken` prints only the startup blockers and next commands.
+
+Want to see the live gateway demo before setup?
+
+```bash
+amc demo run --no-vault
+```
+
+This starts an ephemeral demo workspace and gateway without touching your current vault. Output is labeled `DEMO_ONLY`; use `amc setup` or `amc init` for production audit evidence.
+
+Running a sales or stakeholder walkthrough?
+
+```bash
+amc demo prospect
+amc demo share --public-base-url https://reports.example.com/amc-demo
+```
+
+`amc demo prospect` prints a five-minute flow that includes `amc demo gap --fast`, `amc demo run --no-vault`, `amc compare-models`, and `amc leaderboard show`. `amc demo share` writes a static leave-behind bundle; publish the generated directory to the matching base URL before sending the link.
+
 ---
 
 ## 3. Read your result
@@ -48,7 +82,7 @@ AMC returns a maturity level from **L0** (no governance) to **L5** (self-governi
 **Optional expanded assessment:**
 
 ```bash
-amc run --question-set lifecycle    # 240 default questions + 20 lifecycle questions
+amc run --question-set lifecycle    # 244 default questions + 20 lifecycle questions
 ```
 
 **Optional fast pulse check:**
@@ -57,6 +91,17 @@ amc run --question-set lifecycle    # 240 default questions + 20 lifecycle quest
 amc quickscore --rapid    # lightweight pulse check, not the full score
 amc badge                 # README badge after a scored run
 ```
+
+For CI or other non-interactive runs, pass answer levels as JSON instead of relying on a TTY prompt:
+
+```bash
+amc quickscore --answers answers.json --json
+amc quickscore --rapid --answers '{"AMC-1.1":3,"AMC-2.1":4}' --json
+```
+
+If `amc quickscore` cannot open terminal prompts, its placeholder L0 output includes the hint "Did you mean to run the interactive score?" so first-run users know to rerun in a terminal or pass answer JSON.
+
+If `amc quickscore --auto --json` cannot find captured execution evidence, it returns `scoreStatus: "AUTO_NO_EVIDENCE"` and no measured score fields. Use `amc wrap <runtime> -- <your-agent-command>` to capture evidence first, or use `amc quickscore --answers answers.json --json` when you want CI-safe survey scoring.
 
 ---
 
@@ -189,14 +234,16 @@ amc wrap generic -- your-agent-command
 
 | Goal | Command |
 |------|---------|
-| Deep diagnostic (240 default questions) | `amc diagnostic run` |
-| Lifecycle-expanded diagnostic (260 questions) | `amc run --question-set lifecycle` |
+| Deep diagnostic (244 default questions) | `amc diagnostic run` |
+| Lifecycle-expanded diagnostic (264 questions) | `amc run --question-set lifecycle` |
 | EU AI Act compliance check | `amc compliance report --framework EU_AI_ACT` |
 | Red-team your agent | `amc assurance run --all` |
 | Prove governed resources did not drift | `amc resource snapshot` / `amc resource validate` |
 | Protect live traffic | `amc firewall enable --mode block` / `amc firewall events` |
 | Confirm security findings safely | `amc shield confirm scope-write --file security-scope.json` / `amc shield confirm run --task finding-task.json` |
 | Import existing run evidence | `amc import ./agent-run --dry-run` / `amc import ./agent-run` |
+| Create a board one-pager | `amc executive brief --run latest --out board-brief.html` |
+| Compare scored runs with badge output | `amc compare <run-a> <run-b> --output compare.json --badge` |
 | Compare model routes | `amc strategy compare --file strategies.json` / `amc strategy compare --file strategies.json --apply --approve` |
 | Track connected runs | `amc runtime create --run live-1` / `amc runtime inspect live-1` |
 | Coordinate role workspaces | `amc org run --roles REV_PRODUCT_MANAGER,REV_TECH_LEAD,REV_QA_LEAD` |
@@ -212,13 +259,15 @@ amc wrap generic -- your-agent-command
 | Observe receipt outcomes | `amc evidence decisions observe <run>` |
 | Inspect decision observability | `amc evidence observability list` / `amc evidence observability inspect <run>` |
 | Write governed reasoning memory | `amc memory writeback <episode>` / `amc memory retrieve --consumer studio` |
-| Review uncertainty gates | `amc report <run>` / Studio low-confidence filters |
+| Name a diagnostic run | `amc run-alias set q1-assessment latest` |
+| Review uncertainty gates | `amc report <run|alias|latest>` / Studio low-confidence filters |
 | Mine recurring trace failures | `amc trace index` / `amc trace failures` |
 | Generate governed fix RCA | `amc mechanic rca run <run>` / `amc mechanic rca list` |
 | Compare governed fix candidates | `amc experiment optimize --rca latest` / `amc experiment optimizer-list` |
 | CI/CD release gate | `amc guide --ci --target 3` |
 | Auto-fix gaps | `amc fix` |
-| HTML report for stakeholders | `amc report <id> --html report.html` |
+| HTML report for stakeholders | `amc report q1-assessment --html report.html` |
+| Shareable report URL | `amc report q1-assessment --share --public-base-url https://reports.example.com/amc` |
 | Continuous monitoring | `amc guide --watch --apply` |
 | Score timeline + anomaly detection | `amc observe timeline` / `amc observe anomalies` |
 | Inspect sessions and tool calls | `amc trace list` / `amc trace inspect` |
@@ -226,7 +275,13 @@ amc wrap generic -- your-agent-command
 | Run business-specific evals | `amc dataset run <name>` |
 | Score a non-agent LLM app | `amc lite-score` |
 | Correlate maturity to outcomes | `amc business kpi` / `amc business report` |
-| Compare agents publicly or internally | `amc leaderboard show` |
+| Quantify expected annual loss | `amc business risk --maturity 3 --baseline-frequency 4 --incident-cost 50000 --json` |
+| Run a calibrated loss scenario | `amc business fair-scenario --scenario claims-ai-data-leak --maturity 3 --frequency-min 2 --frequency-most-likely 5 --frequency-max 9 --loss-min 20000 --loss-most-likely 75000 --loss-max 250000 --out fair-scenario.md` |
+| Calculate cost-of-trust-gap ROI | `amc business roi --current-maturity 2 --target-maturity 3 --baseline-frequency 5 --incident-cost 20000 --annual-control-cost 15000 --implementation-cost 5000` |
+| Create a portfolio risk heatmap | `amc business heatmap --portfolio risk-portfolio.json --out risk-heatmap.md` |
+| Export a GRC treatment plan | `amc business grc-export --portfolio risk-portfolio.json --out grc-treatment-plan.csv` |
+| Compare agents internally | `amc leaderboard show` |
+| Export anonymized public leaderboard data | `amc leaderboard public-export --output public-leaderboard` |
 
 ---
 

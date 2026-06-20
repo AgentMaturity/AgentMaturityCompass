@@ -237,7 +237,7 @@
           <div class="ch-sub">Assess readiness and apply guardrailed domain settings</div>
           ${lockedPacks ? `
             <div class="empty">
-              <span class="empty-t">$9.99/month unlocks all 40 Industry Domain Packs. Use <code>amc domain pack access</code> to subscribe or activate a license.</span>
+              <span class="empty-t">$9.99/month unlocks all 41 Industry Domain Packs. Use <code>amc domain pack access</code> to subscribe or activate a license.</span>
             </div>
           ` : ''}
           <div class="pack-grid" id="domain-pack-grid">

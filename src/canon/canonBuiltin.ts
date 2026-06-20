@@ -91,16 +91,18 @@ export function builtInCanon(): CompassCanon {
       semantics: `${q.title}: ${q.promptTemplate}`
     }))
     .sort((a, b) => a.qId.localeCompare(b.qId));
+  const questionCount = (dimensionId: "D1" | "D2" | "D3" | "D4" | "D5"): number =>
+    questions.filter((question) => question.dimensionId === dimensionId).length;
 
   return {
     compassCanon: {
       version: 1,
       dimensions: [
-        { id: "D1", name: "Strategic Agent Operations", questionCount: 19 },
-        { id: "D2", name: "Agent Leadership", questionCount: 23 },
-        { id: "D3", name: "Agent Culture", questionCount: 94 },
-        { id: "D4", name: "Agent Resilience", questionCount: 55 },
-        { id: "D5", name: "Agent Skills", questionCount: 49 }
+        { id: "D1", name: "Strategic Agent Operations", questionCount: questionCount("D1") },
+        { id: "D2", name: "Agent Leadership", questionCount: questionCount("D2") },
+        { id: "D3", name: "Agent Culture", questionCount: questionCount("D3") },
+        { id: "D4", name: "Agent Resilience", questionCount: questionCount("D4") },
+        { id: "D5", name: "Agent Skills", questionCount: questionCount("D5") }
       ],
       questions,
       fourCs: [

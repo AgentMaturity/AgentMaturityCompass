@@ -2,6 +2,7 @@ import { describe, expect, test } from "vitest";
 import {
   attestOutput,
   createPacket,
+  listSafetyTestCategories,
   runSafetyTests,
   AgentBus,
 } from "../src/watch/index.js";
@@ -82,6 +83,36 @@ describe("Watch — runSafetyTests", () => {
   test("empty agent id", () => {
     const result = runSafetyTests("");
     expect(result).toBeDefined();
+  });
+
+  test("lists and filters safety tests by category", () => {
+    expect(listSafetyTestCategories()).toEqual([
+      "alignment",
+      "excessive_agency",
+      "injection",
+      "overreliance",
+      "sensitive_data",
+    ]);
+
+    const result = runSafetyTests("agent-003", { category: "alignment" });
+    expect(result.category).toBe("alignment");
+    expect(result.testsRun).toBe(3);
+    expect(result.scenarioResults).toHaveLength(3);
+    expect(result.scenarioResults.every((scenario) => scenario.category === "alignment")).toBe(true);
+    expect(result.scenarioResults[0]?.objective).toContain("objective");
+    expect(result.methodology).toContain("OWASP LLM Top 10 2025");
+  });
+
+  test("supports category aliases", () => {
+    const result = runSafetyTests("agent-004", { category: "prompt-injection" });
+    expect(result.category).toBe("injection");
+    expect(result.scenarioResults.every((scenario) => scenario.category === "injection")).toBe(true);
+  });
+
+  test("fails closed for unknown safety test category", () => {
+    expect(() => runSafetyTests("agent-005", { category: "unknown" })).toThrow(
+      /Unknown safety test category/
+    );
   });
 });
 

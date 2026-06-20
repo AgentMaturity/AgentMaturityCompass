@@ -43,3 +43,7 @@ amc adapters run --agent <agent-name> --adapter <adapter-id> -- <your-command>
 5. Lease tokens are **redacted** from logs
 
 See [ADAPTERS.md](../ADAPTERS.md) for the full architecture overview.
+
+## Write a Custom Adapter
+
+For unsupported frameworks, see [CUSTOM_ADAPTER.md](../CUSTOM_ADAPTER.md). It covers declarative plugin adapters, SDK wrapper adapters, required schema fields, evidence emitted by adapter runs, and the verification checklist before publishing.

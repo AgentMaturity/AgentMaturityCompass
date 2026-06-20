@@ -37,6 +37,8 @@ helm template amc deploy/helm/amc
 helm install amc deploy/helm/amc
 ```
 
+Full operator guide: `docs/KUBERNETES_HELM_DEPLOYMENT.md`.
+
 Example values profiles:
 
 ```bash
@@ -65,6 +67,18 @@ Bootstrap creates and signs required configs, initializes transparency + Merkle 
 - Liveness: `/healthz`
 - Readiness: `/readyz`
 - CLI probe: `amc studio healthcheck`
+
+## Terraform Helm Release
+
+```bash
+cd deploy/terraform/helm-release
+cp terraform.tfvars.example terraform.tfvars
+terraform init
+terraform plan
+terraform apply
+```
+
+Create the `amc-bootstrap` Kubernetes secret outside Terraform so bootstrap passphrases and owner credentials do not land in Terraform state.
 
 ## LAN Access
 

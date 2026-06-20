@@ -90,6 +90,9 @@ tmp/
 .amc/blobs/
 .amc/ledger/
 .amc/reports/
+.amc/dashboard/
+.amc/gatePolicy.json
+test-results/
 swarm-report.json
 qa/node_modules/
 qa/dist/

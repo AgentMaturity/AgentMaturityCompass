@@ -321,6 +321,25 @@ function cliCommandsForGap(q: DiagnosticQuestion, currentLevel: number, targetLe
   return [...new Set(cmds)];
 }
 
+function evidenceNeededForGap(q: DiagnosticQuestion, targetLevel: number, baseEvidence: string[]): string[] {
+  const evidence = [...baseEvidence];
+  const benchmarkRelevant =
+    targetLevel >= 4 &&
+    q.tuningKnobs.some((knob) => knob.includes("evalHarness")) &&
+    /verify|validation|benchmark|outcome|task|correctness/i.test(`${q.title} ${q.promptTemplate} ${q.evidenceGateHints}`);
+  if (benchmarkRelevant) {
+    evidence.push("Benchmark-submission receipt with signed task breakdown, criterion-level scores, status indicators, leaderboard metric views, accepted evidence IDs, rejected-evidence reasons, repair hint, and replay hashes.");
+  }
+  const multiUserRelevant =
+    targetLevel >= 4 &&
+    q.tuningKnobs.some((knob) => knob.includes("evalHarness")) &&
+    /multi[- ]?user|multi[- ]?agent|coordination|permission|preference|fairness|resource queue|stakeholder/i.test(`${q.title} ${q.promptTemplate} ${q.evidenceGateHints}`);
+  if (multiUserRelevant) {
+    evidence.push("Multi-user benchmark receipt with signed scenario, user-role, permission or preference or queue policy, instruction, interaction trace, evaluator config, result, metric report, accepted evidence IDs, rejected-evidence reasons, repair hint, and row hash.");
+  }
+  return [...new Set(evidence)];
+}
+
 /* ── Agent instruction generator ───────────────────── */
 
 function generateAgentInstruction(q: DiagnosticQuestion, currentLevel: number, targetLevel: number): string {
@@ -414,7 +433,7 @@ export function generateGuide(input: GuideInput): Guide {
         ? `Currently at "${currentOption.label}". Need "${targetOption?.label ?? `L${targetLevel}`}".`
         : `Currently at L${qs.finalLevel}. Need L${targetLevel}.`,
       howToFix: [q.upgradeHints, q.evidenceGateHints].filter(Boolean),
-      evidenceNeeded: targetOption?.typicalEvidence ?? [],
+      evidenceNeeded: evidenceNeededForGap(q, targetLevel, targetOption?.typicalEvidence ?? []),
       cliCommands: cliCommandsForGap(q, qs.finalLevel, targetLevel),
       agentInstruction: generateAgentInstruction(q, qs.finalLevel, targetLevel),
       complianceGaps: complianceMappingsForQuestion(qs.questionId, input.complianceFrameworks),
@@ -1202,4 +1221,3 @@ export function detectFramework(
 
   return null;
 }
-

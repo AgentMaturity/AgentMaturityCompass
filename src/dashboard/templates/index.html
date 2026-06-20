@@ -187,7 +187,7 @@
           <circle cx="11" cy="11" r="1.5" fill="var(--accent)"/>
           <line x1="11" y1="2" x2="11" y2="5.5" stroke="var(--accent)" stroke-width="1.5" stroke-linecap="round"/>
         </svg>
-        <span><strong>AMC</strong> scores your AI agent's trustworthiness from actual behavior — not claims. Browse <strong>40 industry packs</strong> under Domains, toggle <strong>14 guardrails</strong>, or press <kbd style="background:var(--bg-overlay);border:1px solid var(--border);border-radius:3px;padding:1px 5px;font-size:10px">⌘K</kbd> to search.</span>
+        <span><strong>AMC</strong> scores your AI agent's trustworthiness from actual behavior — not claims. Browse <strong>41 industry packs</strong> under Domains, toggle <strong>14 guardrails</strong>, or press <kbd style="background:var(--bg-overlay);border:1px solid var(--border);border-radius:3px;padding:1px 5px;font-size:10px">⌘K</kbd> to search.</span>
         <button class="orient-dismiss" id="orient-dismiss" aria-label="Dismiss">×</button>
       </div>
 
@@ -261,6 +261,24 @@
         <div class="hero-stats-col" id="hero-kpis">
           <!-- Populated by JS -->
         </div>
+      </div>
+
+      <!-- BOARD BRIEF: executive trend and drill-down context -->
+      <div class="board-readiness-panel card card-enter" style="animation-delay:40ms" id="board-readiness-panel" aria-labelledby="board-readiness-title">
+        <div class="board-readiness-head">
+          <div>
+            <div class="sec-label">Board Brief</div>
+            <h2 id="board-readiness-title">Board-Ready Trends</h2>
+            <p class="board-readiness-copy">Current trend, weakest control, evidence posture, and the next board action from the latest AMC run.</p>
+          </div>
+          <span class="tb-badge md" id="board-readiness-status">Needs data</span>
+        </div>
+        <div class="board-metrics" id="board-readiness-metrics" aria-label="Board-ready trend metrics"></div>
+        <div class="board-drilldown-head">
+          <span>Drill-down Panels</span>
+          <button class="board-drilldown-link" onclick="nav('dimensions')">Open dimensions</button>
+        </div>
+        <div class="board-drilldowns" id="board-readiness-drilldowns" aria-label="Board-ready drill-down panels"></div>
       </div>
 
       <!-- PRIORITY ACTIONS — horizontal list not boxes -->
@@ -482,6 +500,13 @@
         <div class="card">
           <div class="ch"><span class="ch-dot"></span>Fleet Agents</div>
           <div id="fleet-mount" style="margin-top:8px"></div>
+        </div>
+      </div>
+
+      <div class="row c1" style="margin-bottom:16px">
+        <div class="card">
+          <div class="ch"><span class="ch-dot"></span>Trust Topology</div>
+          <div id="trust-graph-mount" style="margin-top:8px"></div>
         </div>
       </div>
 

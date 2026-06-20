@@ -151,6 +151,34 @@ export {
 } from "./eval/evalImporters.js";
 export { evalImportCli, evalStatusCli, parseEvalImportFormat, parseEvalImportTrustTier } from "./eval/evalCli.js";
 export {
+  buildJudgeCalibrationReceipt,
+  buildJudgeCalibrationWatchAlerts,
+  verifyJudgeCalibrationReceipt,
+  defaultJudgeCalibrationThresholds,
+  type BuildJudgeCalibrationReceiptInput,
+  type JudgeCalibrationReceipt,
+  type JudgeCalibrationWatchAlert,
+  type JudgeCalibrationReceiptVerification
+} from "./eval/judgeCalibration.js";
+export {
+  runEffectAutoAgentReplayCorpus,
+  verifyEffectAutoAgentReplayReceipt,
+  type EffectAutoAgentReplayCiReceipt,
+  type EffectAutoAgentReplayGateMode,
+  type EffectAutoAgentReplayManifest,
+  type EffectAutoAgentReplayProviderRoute,
+  type EffectAutoAgentReplayReceiptVerification,
+  type EffectAutoAgentReplayResult,
+  type EffectAutoAgentReplayRow,
+  type EffectAutoAgentReplayRowInput,
+  type EffectAutoAgentReplayRuntime,
+  type EffectAutoAgentReplaySeverity,
+  type EffectAutoAgentReplayStatus,
+  type EffectAutoAgentReplayTaskFamily,
+  type EffectAutoAgentReplayWatchAlert,
+  type RunEffectAutoAgentReplayCorpusInput,
+} from "./eval/effectAutoAgentReplayCorpus.js";
+export {
   exportEvidenceBundle,
   verifyEvidenceBundle,
   inspectEvidenceBundle,

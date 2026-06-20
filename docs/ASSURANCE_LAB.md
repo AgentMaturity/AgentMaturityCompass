@@ -61,6 +61,92 @@ amc assurance scheduler enable
 amc assurance scheduler disable
 ```
 
+## Signed Certificate Walkthrough
+
+Use unsigned mode only for local exploration, onboarding, and first-run remediation:
+
+```bash
+amc assurance run --demo --no-sign
+```
+
+That run is intentionally not verifier-ready. Graduate to signed assurance when the result will be used for release approval, customer evidence, compliance review, or audit evidence:
+
+```bash
+amc setup
+amc assurance init
+amc assurance verify-policy
+amc assurance run --demo
+amc assurance runs
+amc assurance show --run <runId>
+amc assurance cert issue --run <runId>
+amc assurance cert verify .amc/assurance/certificates/latest.amccert
+```
+
+What to check before sharing a certificate:
+- The run is signed, not `UNSIGNED`.
+- `amc assurance verify-policy` passes against `.amc/assurance/policy.yaml.sig`.
+- `amc assurance cert verify .amc/assurance/certificates/latest.amccert` passes locally.
+- The remediation-priority section has no unresolved CRITICAL items unless the exception is explicitly approved and documented.
+
+## Policy Threshold Tuning
+
+The signed assurance policy lives at `.amc/assurance/policy.yaml`. Tune it through pull request review, then re-sign with:
+
+```bash
+amc assurance policy apply --file .amc/assurance/policy.yaml --reason "tighten assurance thresholds for release gate"
+amc assurance verify-policy
+```
+
+Key threshold fields:
+- `minRiskAssuranceScore`: minimum overall assurance score required before the run is considered acceptable.
+- `maxCriticalFindings`: maximum allowed CRITICAL findings. Production release policies should usually keep this at `0`.
+- `maxHighFindings`: maximum allowed HIGH findings before the gate fails.
+- `failClosedIfBelowThresholds`: when `true`, below-threshold runs make readiness fail closed with `ASSURANCE_THRESHOLD_BREACH`.
+
+Tune thresholds only to reflect risk appetite, environment, and evidence quality. Do not relax thresholds to hide known failures; fix the failing pack, document an approved exception, or keep the run unsigned and non-verifier-ready.
+
+## Community Pack Authoring
+
+Use `amc pack init` to scaffold a local community pack. The scaffold writes `package.json` with `"main": "index.mjs"` and creates an ESM entry point at `index.mjs`.
+
+```bash
+mkdir my-pack
+cd my-pack
+amc pack init --name my-pack
+amc pack test .
+```
+
+`amc pack test` resolves the entry point in this order:
+- `package.json` `main`, when it points inside the pack directory
+- `index.mjs`
+- `index.js`
+
+New packs should use `index.mjs`. Legacy `index.js` packs remain supported for local sandbox tests.
+
+## Community Registry Review Gates
+
+Community registry publishing is a reviewed promotion step, not a blind upload. Before a pack is uploaded to a shared registry, the author or reviewer should record these checks in the pack review note or pull request:
+
+1. **Local execution:** `amc pack test .` passes in sandbox mode and the pack entry point resolves through `package.json` `main`, `index.mjs`, or `index.js`.
+2. **Provenance and license:** source references, research papers, CVEs, datasets, and copied snippets are cited; the manifest license is compatible with redistribution.
+3. **Scope clarity:** scenarios describe what they test, which AMC dimension or assurance category they affect, and what evidence a pass/fail result represents.
+4. **Determinism:** checks avoid hidden randomness, live network dependencies, unpinned remote data, or unverifiable model-judge-only outcomes.
+5. **Safety boundary:** the pack does not include secrets, malware, credential harvesting, destructive payloads, or instructions that would make unsafe execution likely.
+6. **Maintenance owner:** the manifest identifies an owner or support contact and a version compatible with the current AMC pack contract.
+
+### Moderation rejection criteria
+
+Reject or quarantine a community pack before registry upload when any of these are present:
+
+- leaked credentials, private keys, tokens, customer data, or other secrets
+- malware, persistence mechanisms, exploit payloads, credential harvesting, or destructive system commands
+- hidden network calls, telemetry, or dependency downloads not documented in the manifest
+- unlicensed copied content, unclear dataset provenance, or missing citation for research-derived scenarios
+- prompt payloads that materially enable abuse beyond defensive evaluation
+- falsified evidence claims, misleading certification language, or impersonation of AMC/partner approval
+
+`amc pack publish .` creates a local bundle first. Upload with `amc pack publish . --registry <url>` only after the review gates above are satisfied for the target registry.
+
 ## Why This Matters
 
 Assurance Lab provides the operational risk-assurance loop for AMC's physical/virtual trust boundary:

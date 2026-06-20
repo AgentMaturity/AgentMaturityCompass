@@ -20,9 +20,9 @@ Different tools for different jobs. Promptfoo evaluates prompt quality. AMC answ
 
 **What's free:** Everything — the entire trust stack (Score, Shield, Enforce, Vault, Watch, Comply, Fleet, Passport), all 14 adapters, 235 diagnostic questions, CI gates. MIT licensed.
 
-**What's paid:** 40 industry-specific domain packs for regulated verticals (healthcare, finance, education).
+**What's paid:** 41 industry-specific domain packs for regulated verticals (healthcare, finance, education, logistics).
 
-4,161 tests passing. Would love feedback from this community.
+5,394 statically collected Vitest tests. Would love feedback from this community.
 
 GitHub: https://github.com/AgentMaturity/AgentMaturityCompass
 
@@ -46,7 +46,7 @@ Sharing a project I've been working on: an open-source framework for evaluating 
 
 The framework generates compliance mappings for EU AI Act, ISO 42001, NIST AI RMF, and OWASP LLM Top 10.
 
-MIT licensed, 4,161 tests, TypeScript.
+MIT licensed, 5,394 statically collected Vitest tests, TypeScript.
 
 Paper references and methodology: https://agentmaturity.co/methodology.html
 GitHub: https://github.com/AgentMaturity/AgentMaturityCompass

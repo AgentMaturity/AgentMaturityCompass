@@ -16,12 +16,21 @@ These are trust-tiered as `OBSERVED`.
 
 Endpoint:
 
+- `POST /value/ingest/webhook` in single-workspace Studio mode
 - `POST /w/:workspaceId/value/ingest/webhook`
 
 Auth:
 
-- OWNER/OPERATOR session, or
-- signed webhook token from vault (`x-amc-webhook-token`)
+- OWNER/OPERATOR Studio session, or
+- `x-amc-admin-token`, or
+- vault-backed webhook token in `x-amc-webhook-token`
+
+Token contract:
+
+- The dedicated webhook token is stored in the vault at `value/webhook/token`.
+- Send it only as the `x-amc-webhook-token` header.
+- It is compared with timing-safe equality and is not an HMAC request signature.
+- Do not send this token in the query string or JSON body.
 
 Payload rules:
 
@@ -31,8 +40,8 @@ Payload rules:
 
 Trust labeling:
 
-- Signed/attested webhook flow => `ATTESTED`
-- Unsigned flow => `SELF_REPORTED`
+- Session/admin-token/token-authenticated webhook flow => `ATTESTED`
+- Unauthenticated value webhook requests are rejected with `401`
 
 ## 3) CSV Import (Offline)
 

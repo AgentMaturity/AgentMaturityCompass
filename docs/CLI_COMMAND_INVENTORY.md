@@ -40,6 +40,10 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc alerts verify` | - | - | - |
 | `amc api` | REST API management | - | - |
 | `amc api docs` | Show API reference documentation summary and link | - | - |
+| `amc api key` | Manage programmatic API keys | - | - |
+| `amc api key create` | Create a programmatic API key and show the secret once | `--scope <scope>`<br>`--label <label>`<br>`--expires-in <duration>`<br>`--json` | - |
+| `amc api key list` | List programmatic API keys without printing secrets | `--json` | - |
+| `amc api key revoke` | Revoke a programmatic API key | `--json` | - |
 | `amc api routes` | List all available REST API route families | - | - |
 | `amc api start` | Start the AMC API server (alias for 'amc up') | `--port <port>` | - |
 | `amc api status` | Show API integration status | - | - |
@@ -147,6 +151,8 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc benchmark export` | - | `--agent <agentId>`<br>`--run <runId>`<br>`--out <file.amcbench>`<br>`--publisher <org>`<br>`--public-agent-id <id>` | - |
 | `amc benchmark ingest` | - | - | - |
 | `amc benchmark list` | - | `--sort <field>`<br>`--limit <n>` | - |
+| `amc benchmark provider-drift` | Run provider/model canary drift benchmark with score, refusal, latency, and cost thresholds | `--file <path>`<br>`--agent <agentId>`<br>`--json`<br>`--out <path>` | - |
+| `amc benchmark replay-corpus` | Run a replayable benchmark corpus with optional multi-turn tool-risk ASR checks | `--file <path>`<br>`--agent <agentId>`<br>`--json`<br>`--out <path>` | - |
 | `amc benchmark report` | - | `--out <file>`<br>`--group-by <groupBy>` | - |
 | `amc benchmark run` | Run standard benchmark suite (latency, accuracy, safety, cost-efficiency, reliability) against an agent | `--agent <agentId>`<br>`--json`<br>`--out <path>` | - |
 | `amc benchmark stats` | - | `--group-by <groupBy>` | - |
@@ -173,8 +179,13 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc bundle inspect` | Inspect bundle metadata | - | - |
 | `amc bundle verify` | Verify evidence bundle offline | - | - |
 | `amc business` | Business impact — KPI correlation, ROI tracking, and maturity-to-outcome mapping | - | - |
+| `amc business fair-scenario` | Run a FAIR-style calibrated loss-distribution scenario | `--scenario <id>`<br>`--agent <agentId>`<br>`--maturity <level>`<br>`--frequency-min <n>`<br>`--frequency-most-likely <n>`<br>`--frequency-max <n>`<br>`--loss-min <amount>`<br>`--loss-most-likely <amount>`<br>`--loss-max <amount>`<br>`--risk-appetite <amount>`<br>`--iterations <n>`<br>`--seed <n>`<br>`--currency <code>`<br>`--out <path>`<br>`--format <format>`<br>`--json` | - |
+| `amc business grc-export` | Export a GRC treatment-plan register from portfolio maturity risk inputs | `--portfolio <path>`<br>`--out <path>`<br>`--format <format>`<br>`--currency <code>`<br>`--title <title>`<br>`--treatment-due-days <days>`<br>`--json` | - |
+| `amc business heatmap` | Build a portfolio financial risk heatmap from maturity, likelihood, impact, and appetite | `--portfolio <path>`<br>`--out <path>`<br>`--format <format>`<br>`--currency <code>`<br>`--title <title>`<br>`--json` | - |
 | `amc business kpi` | Show business KPIs correlated with maturity levels | `--agent <agentId>`<br>`--json` | - |
 | `amc business report` | Generate business impact report with maturity correlation | `--agent <agentId>`<br>`--json` | - |
+| `amc business risk` | Quantify maturity-linked incident frequency and expected annual loss | `--agent <agentId>`<br>`--maturity <level>`<br>`--baseline-frequency <n>`<br>`--incident-cost <amount>`<br>`--risk-appetite <amount>`<br>`--currency <code>`<br>`--json` | - |
+| `amc business roi` | Estimate first-year ROI and cost of a trust gap from maturity improvement | `--agent <agentId>`<br>`--current-maturity <level>`<br>`--target-maturity <level>`<br>`--baseline-frequency <n>`<br>`--incident-cost <amount>`<br>`--annual-control-cost <amount>`<br>`--implementation-cost <amount>`<br>`--risk-appetite <amount>`<br>`--currency <code>`<br>`--out <path>`<br>`--format <format>`<br>`--json` | - |
 | `amc business track` | Record a business outcome event (incident, audit finding, cost) | `--type <type>`<br>`--agent <agentId>`<br>`--description <text>`<br>`--value <n>`<br>`--severity <level>`<br>`--json` | - |
 | `amc canary-report` | Generate full policy canary report | `--agent <agentId>` | - |
 | `amc canary-start` | Start a policy canary with candidate vs stable policy | `--candidate-sha <sha256>`<br>`--stable-sha <sha256>`<br>`--enforce-pct <n>`<br>`--duration <ms>`<br>`--failure-threshold <ratio>`<br>`--auto-promote` | - |
@@ -190,7 +201,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc casebook list` | List casebooks | `--agent <agentId>` | - |
 | `amc casebook verify` | Verify signed casebook and case files | `--casebook <id>`<br>`--agent <agentId>` | - |
 | `amc cert` | Certificate operations | - | - |
-| `amc cert generate` | Generate execution-proof trust certificate (signed PDF or JSON) | `--agent <id>`<br>`--output <path>`<br>`--valid-days <n>`<br>`--badge`<br>`--url`<br>`--base-url <url>` | - |
+| `amc cert generate` | Generate execution-proof trust certificate (signed PDF or JSON) | `--agent <id>`<br>`--output <path>`<br>`--valid-days <n>`<br>`--no-sign`<br>`--preview`<br>`--badge`<br>`--url`<br>`--base-url <url>` | - |
 | `amc cert inspect` | Inspect certificate bundle contents | - | - |
 | `amc cert revoke` | Create signed revocation file for a certificate | `--reason <text>`<br>`--cert <file>`<br>`--out <file>` | - |
 | `amc cert verify` | Verify certificate bundle offline | `--revocation <path>` | - |
@@ -210,6 +221,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc ci check` | One-liner CI gate: quickscore + threshold check (exit 1 if below) | `--min-score <n>`<br>`--min-level <level>`<br>`--agent <agentId>`<br>`--json` | `gate` |
 | `amc ci init` | Generate GitHub workflow and signed gate policy | `--agent <agentId>` | - |
 | `amc ci print` | Print suggested CI pipeline steps | `--agent <agentId>` | - |
+| `amc ci redteam` | CI gate: run red-team plugins, optional Evil MCP, and score-gaming resistance checks | `--plugins <ids...>`<br>`--strategies <ids...>`<br>`--min-score <n>`<br>`--max-vulnerabilities <n>`<br>`--max-critical <n>`<br>`--max-high <n>`<br>`--evil-mcp`<br>`--mcp-attacks <categories...>`<br>`--min-mcp-score <n>`<br>`--no-gaming-resistance`<br>`--min-gaming-score <n>`<br>`--no-sign`<br>`--json` | - |
 | `amc claim-confidence` | Generate per-claim confidence report with citation-backed scoring | `--agent <agentId>` | - |
 | `amc claim-confidence-gate` | Check if claims for given questions pass confidence threshold | `--agent <agentId>`<br>`--questions <ids>` | - |
 | `amc claims` | Evidence claim expiry tracking | - | - |
@@ -224,17 +236,17 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc compare` | Compare two runs OR multiple models (side-by-side evaluation) | `--agent <agentId>`<br>`--window <window>`<br>`--target <name>`<br>`--iterations <n>`<br>`--output <path>`<br>`--json`<br>`--badge`<br>`--format <fmt>` | - |
 | `amc compare-models` | Run the same agent evaluation across multiple models and show comparison matrix | `--agent <agentId>`<br>`--window <window>`<br>`--target <name>`<br>`--iterations <n>`<br>`--output <path>`<br>`--json` | - |
 | `amc compliance` | Evidence-linked compliance map operations | - | `comply` |
-| `amc compliance diff` | Diff two compliance report JSON files | - | - |
-| `amc compliance fleet` | Generate fleet compliance summary | `--framework <framework>`<br>`--window <window>`<br>`--out <path>` | - |
-| `amc compliance init` | Create and sign compliance-maps.yaml | - | - |
-| `amc compliance matrix` | Generate multi-framework compliance coverage matrix with gap analysis | `--agent <agentId>`<br>`--window <window>`<br>`--frameworks <fws...>`<br>`--out <path>`<br>`--json`<br>`--heatmap` | - |
-| `amc compliance regulatory-check` | Check for regulatory changes from configured feeds | `--framework <name>`<br>`--json` | - |
-| `amc compliance regulatory-feeds` | List all configured regulatory feed sources | `--json` | - |
-| `amc compliance regulatory-gap` | Run gap analysis against current AMC configuration | `--framework <name>`<br>`--json` | - |
-| `amc compliance report` | Generate evidence-linked compliance report | `--framework <framework>`<br>`--window <window>`<br>`--out <path>`<br>`--agent <agentId>`<br>`--json` | - |
-| `amc compliance risk-classify` | Classify agent into EU AI Act risk tiers (UNACCEPTABLE / HIGH / LIMITED / MINIMAL) | `--agent <agentId>`<br>`--capabilities <json>`<br>`--biometric`<br>`--critical-infra`<br>`--education`<br>`--employment`<br>`--essential-services`<br>`--law-enforcement`<br>`--migration`<br>`--justice`<br>`--realtime-biometric`<br>`--social-scoring`<br>`--subliminal`<br>`--exploits-vulnerabilities`<br>`--emotion-recognition`<br>`--chatbot`<br>`--synthetic-content`<br>`--human-interaction`<br>`--safety-component`<br>`--json` | - |
-| `amc compliance roadmap` | Generate step-by-step compliance plan for a framework | `--framework <framework>`<br>`--agent <agentId>`<br>`--capabilities <json>`<br>`--risk-tier <tier>`<br>`--out <path>`<br>`--json` | - |
-| `amc compliance verify` | Verify compliance maps signature | - | - |
+| `amc compliance diff` | Diff two compliance report JSON files | - | `comply diff` |
+| `amc compliance fleet` | Generate fleet compliance summary | `--framework <framework>`<br>`--window <window>`<br>`--out <path>` | `comply fleet` |
+| `amc compliance init` | Create and sign compliance-maps.yaml | - | `comply init` |
+| `amc compliance matrix` | Generate multi-framework compliance coverage matrix with gap analysis | `--agent <agentId>`<br>`--window <window>`<br>`--frameworks <fws...>`<br>`--out <path>`<br>`--json`<br>`--heatmap` | `comply matrix` |
+| `amc compliance regulatory-check` | Check for regulatory changes from configured feeds | `--framework <name>`<br>`--json` | `comply regulatory-check` |
+| `amc compliance regulatory-feeds` | List all configured regulatory feed sources | `--json` | `comply regulatory-feeds` |
+| `amc compliance regulatory-gap` | Run gap analysis against current AMC configuration | `--framework <name>`<br>`--json` | `comply regulatory-gap` |
+| `amc compliance report` | Generate evidence-linked compliance report | `--framework <framework>`<br>`--window <window>`<br>`--out <path>`<br>`--agent <agentId>`<br>`--json` | `comply report` |
+| `amc compliance risk-classify` | Classify agent into EU AI Act risk tiers (UNACCEPTABLE / HIGH / LIMITED / MINIMAL) | `--agent <agentId>`<br>`--capabilities <json>`<br>`--biometric`<br>`--critical-infra`<br>`--education`<br>`--employment`<br>`--essential-services`<br>`--law-enforcement`<br>`--migration`<br>`--justice`<br>`--realtime-biometric`<br>`--social-scoring`<br>`--subliminal`<br>`--exploits-vulnerabilities`<br>`--emotion-recognition`<br>`--chatbot`<br>`--synthetic-content`<br>`--human-interaction`<br>`--safety-component`<br>`--json` | `comply risk-classify` |
+| `amc compliance roadmap` | Generate step-by-step compliance plan for a framework | `--framework <framework>`<br>`--agent <agentId>`<br>`--capabilities <json>`<br>`--risk-tier <tier>`<br>`--out <path>`<br>`--json` | `comply roadmap` |
+| `amc compliance verify` | Verify compliance maps signature | - | `comply verify` |
 | `amc confidence` | Confidence drift tracking | - | - |
 | `amc confidence calibration` | Show calibration report | `--json` | - |
 | `amc confidence drift` | Show drift trend | `--json` | - |
@@ -276,31 +288,35 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc delta-to-l5` | Generate L4→L5 delta report showing what separates current state from L5 | `--agent <id>`<br>`--out <path>`<br>`--format <format>`<br>`--json` | - |
 | `amc demo` | Run interactive demos of AMC capabilities | - | - |
 | `amc demo gap` | The 84-point documentation inflation gap — keyword vs execution scoring | `--json`<br>`--fast` | - |
-| `amc demo run` | Run a simulated agent through the AMC gateway and produce a real score (~30s) | `--gateway <url>`<br>`--json` | - |
+| `amc demo prospect` | Run a guided 5-minute prospect demo flow | `--share`<br>`--out <dir>`<br>`--slug <slug>`<br>`--public-base-url <url>`<br>`--live`<br>`--json` | - |
+| `amc demo run` | Run a simulated agent through the AMC gateway and produce a real score (~30s) | `--gateway <url>`<br>`--no-vault`<br>`--demo`<br>`--json` | - |
+| `amc demo share` | Generate a static client-facing prospect demo bundle | `--out <dir>`<br>`--slug <slug>`<br>`--public-base-url <url>`<br>`--live`<br>`--json` | - |
 | `amc diagnostic` | Diagnostic bank/render operations | - | - |
 | `amc diagnostic bank` | Signed diagnostic 126-question bank operations | - | - |
 | `amc diagnostic bank init` | Create and sign .amc/diagnostic/bank/bank.yaml | - | - |
 | `amc diagnostic bank verify` | Verify diagnostic bank signature | - | - |
 | `amc diagnostic render` | Render contextualized 126-question diagnostic for an agent | `--agent <agentId>`<br>`--format <format>`<br>`--out <file>` | - |
+| `amc dlp` | DLP scanner for PII and secrets | - | - |
+| `amc dlp scan` | Scan text for PII and secrets | `--json`<br>`--redact` | - |
 | `amc doctor` | Check runtime availability and wrap readiness | `--json` | - |
 | `amc doctor-fix` | Auto-repair common setup issues | `--dry-run`<br>`--json` | - |
 | `amc domain` | Domain-specific architecture and compliance operations | - | `sector` |
-| `amc domain apply` | Apply domain-specific guardrails and industry pack rules to an agent | `--agent <id>`<br>`--domain <domain>`<br>`--pack <packId>`<br>`--dry-run`<br>`--compliance <frameworks>`<br>`--file <path>`<br>`--json` | - |
-| `amc domain assess` | Run full domain assessment | `--agent <id>`<br>`--domain <d>`<br>`--json` | - |
-| `amc domain assurance` | Run domain-specific assurance packs | `--agent <id>`<br>`--domain <d>`<br>`--json` | - |
-| `amc domain gaps` | Show compliance gaps for an agent and domain | `--agent <id>`<br>`--domain <d>`<br>`--json` | - |
-| `amc domain list` | List all 7 domains with metadata | `--json` | - |
-| `amc domain modules` | Show module activation map for domain | `--domain <d>`<br>`--json` | - |
-| `amc domain pack` | Industry sector packs — 40 packs across 7 domains | - | - |
-| `amc domain pack access` | Show Industry Packs subscription status and unlock instructions | `--json` | `subscribe` |
-| `amc domain pack activate` | Activate Industry Packs after purchase | `--key <licenseKey>`<br>`--expires-at <isoDate>`<br>`--json` | - |
-| `amc domain pack checkout` | Create an Industry Packs checkout link | `--success-url <url>`<br>`--cancel-url <url>`<br>`--email <email>`<br>`--reference <id>`<br>`--json` | - |
-| `amc domain pack describe` | Show details of a specific industry sector pack | `--pack <packId>`<br>`--json` | - |
-| `amc domain pack list` | List all available industry sector packs | `--domain <d>`<br>`--json` | - |
-| `amc domain pack run` | Run an industry sector pack — interactive assessment or baseline score | `--pack <packId>`<br>`--baseline`<br>`--json` | - |
-| `amc domain pack verify` | Verify an Industry Packs license key | `--key <licenseKey>`<br>`--json` | - |
-| `amc domain report` | Build full domain report and write it to a file | `--agent <id>`<br>`--domain <d>`<br>`--output <file>`<br>`--json` | - |
-| `amc domain roadmap` | Generate 30/60/90-day roadmap for this domain | `--agent <id>`<br>`--domain <d>`<br>`--json` | - |
+| `amc domain apply` | Apply domain-specific guardrails and industry pack rules to an agent | `--agent <id>`<br>`--domain <domain>`<br>`--pack <packId>`<br>`--dry-run`<br>`--compliance <frameworks>`<br>`--file <path>`<br>`--json` | `sector apply` |
+| `amc domain assess` | Run full domain assessment | `--agent <id>`<br>`--domain <d>`<br>`--json` | `sector assess` |
+| `amc domain assurance` | Run domain-specific assurance packs | `--agent <id>`<br>`--domain <d>`<br>`--json` | `sector assurance` |
+| `amc domain gaps` | Show compliance gaps for an agent and domain | `--agent <id>`<br>`--domain <d>`<br>`--json` | `sector gaps` |
+| `amc domain list` | List all 7 domains with metadata | `--json` | `sector list` |
+| `amc domain modules` | Show module activation map for domain | `--domain <d>`<br>`--json` | `sector modules` |
+| `amc domain pack` | Industry sector packs — 41 packs across 7 domains | - | `sector pack` |
+| `amc domain pack access` | Show Industry Packs subscription status and unlock instructions | `--json` | `subscribe`, `sector pack access` |
+| `amc domain pack activate` | Activate Industry Packs after purchase | `--key <licenseKey>`<br>`--expires-at <isoDate>`<br>`--json` | `sector pack activate` |
+| `amc domain pack checkout` | Create an Industry Packs checkout link | `--success-url <url>`<br>`--cancel-url <url>`<br>`--email <email>`<br>`--reference <id>`<br>`--json` | `sector pack checkout` |
+| `amc domain pack describe` | Show details of a specific industry sector pack | `--pack <packId>`<br>`--json` | `sector pack describe` |
+| `amc domain pack list` | List all available industry sector packs | `--domain <d>`<br>`--json` | `sector pack list` |
+| `amc domain pack run` | Run an industry sector pack — interactive assessment or baseline score | `--pack <packId>`<br>`--baseline`<br>`--json` | `sector pack run` |
+| `amc domain pack verify` | Verify an Industry Packs license key | `--key <licenseKey>`<br>`--json` | `sector pack verify` |
+| `amc domain report` | Build full domain report and write it to a file | `--agent <id>`<br>`--domain <d>`<br>`--output <file>`<br>`--json` | `sector report` |
+| `amc domain roadmap` | Generate 30/60/90-day roadmap for this domain | `--agent <id>`<br>`--domain <d>`<br>`--json` | `sector roadmap` |
 | `amc down` | Stop AMC Studio local control plane | - | - |
 | `amc drift` | Drift/regression detection and reporting | - | - |
 | `amc drift check` | - | `--agent <agentId>`<br>`--against <kind>` | - |
@@ -370,6 +386,8 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc evidence observability inspect` | Inspect one observability lane record by observability id, lifecycle id, or run id | `--agent <agentId>`<br>`--json` | - |
 | `amc evidence observability list` | List persisted observability lane records | `--agent <agentId>`<br>`--limit <n>`<br>`--json` | - |
 | `amc evidence verify` | Run full workspace verification suite | `--json` | - |
+| `amc executive` | Executive and board-ready AMC artifacts | - | - |
+| `amc executive brief` | Generate a board-ready one-page executive brief from a diagnostic run | `--agent <agentId>`<br>`--run <runId>`<br>`--out <path>`<br>`--format <format>`<br>`--title <title>` | - |
 | `amc experiment` | Deterministic baseline vs candidate experiments | - | - |
 | `amc experiment analyze` | Analyze latest experiment run | `--experiment <id>`<br>`--out <path>`<br>`--agent <agentId>` | - |
 | `amc experiment create` | Create an experiment | `--name <name>`<br>`--casebook <id>`<br>`--agent <agentId>` | - |
@@ -528,7 +546,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc indices` | Compute deterministic failure-risk indices | `--run <runId>`<br>`--agent <agentId>`<br>`--out <path>` | - |
 | `amc indices fleet` | Compute failure-risk indices across fleet | `--window <window>`<br>`--out <path>` | - |
 | `amc ingest` | Ingest external logs/transcripts as SELF_REPORTED evidence | `--type <kind>`<br>`--agent <agentId>` | - |
-| `amc init` | Initialize .amc workspace | `--trust-boundary <mode>`<br>`--profile <name>`<br>`--force`<br>`--skip-vault` | - |
+| `amc init` | Initialize .amc workspace | `--trust-boundary <mode>`<br>`--profile <name>`<br>`--force`<br>`--skip-vault`<br>`--minimal` | - |
 | `amc insider-alerts` | Show insider risk alerts | `--actor <id>`<br>`--ack <alertId>` | - |
 | `amc insider-risk-report` | Generate insider risk analytics report | `--window <days>` | - |
 | `amc insider-risk-scores` | Show insider risk scores by actor | - | - |
@@ -555,6 +573,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc lab-templates` | List available experiment templates | - | - |
 | `amc leaderboard` | Benchmark leaderboard — compare agent maturity scores | - | - |
 | `amc leaderboard export` | Export leaderboard as JSON/HTML for public sharing | `--format <fmt>`<br>`--output <path>` | - |
+| `amc leaderboard public-export` | Build an anonymized public leaderboard dataset bundle | `--output <dir>`<br>`--dataset-id <id>`<br>`--name <name>`<br>`--license <id>`<br>`--amc-version <version>`<br>`--salt <value>`<br>`--min-agents <n>`<br>`--allow-small-cohort`<br>`--include-model-family`<br>`--include-provider-id`<br>`--json` | - |
 | `amc leaderboard show` | Show fleet-wide maturity leaderboard | `--json` | - |
 | `amc learn` | Education flow for a specific maturity question | `--question <qid>`<br>`--agent <agentId>` | - |
 | `amc lease` | Issue/verify/revoke short-lived agent leases | - | - |
@@ -643,6 +662,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc memory-extract` | Extract lessons from verified effective corrections | `--agent <agentId>`<br>`--min-effectiveness <n>` | - |
 | `amc memory-report` | Generate correction memory report | `--agent <agentId>`<br>`--window <window>` | - |
 | `amc meta-confidence` | Report confidence in the maturity score itself | `--agent <id>`<br>`--run <runId>` | - |
+| `amc methodology` | Print the public AMC scoring methodology manifest and hash | `--json`<br>`--reproducibility`<br>`--sample-dataset`<br>`--format <format>`<br>`--out <path>` | - |
 | `amc metrics` | Prometheus metrics endpoint helpers | - | - |
 | `amc metrics status` | Show configured metrics endpoint bind/port | - | - |
 | `amc micro-canary-alerts` | Show active micro-canary alerts | `--ack-all` | - |
@@ -829,8 +849,8 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc provider list` | List provider templates | - | - |
 | `amc python-sdk` | Generate the Python SDK package for AMC Bridge API | `--endpoints`<br>`--coverage` | - |
 | `amc quality-report` | Show quality report | `--agent <agentId>`<br>`--window <days>`<br>`--json` | - |
-| `amc quickscore` | Full 240-question interactive diagnostic — or use --rapid for 5-question express, --auto for ledger evidence | `--json`<br>`--quiet`<br>`--eu-ai-act`<br>`--auto`<br>`--rapid`<br>`--agent <agentId>`<br>`--share` | - |
-| `amc quickstart` | 2-minute quickstart with Quick Score assessment | `--profile <name>` | - |
+| `amc quickscore` | Full default interactive diagnostic — or use --rapid for 5-question express, --auto for ledger evidence | `--json`<br>`--quiet`<br>`--answers <jsonOrFile>`<br>`--eu-ai-act`<br>`--auto`<br>`--rapid`<br>`--agent <agentId>`<br>`--share` | - |
+| `amc quickstart` | 2-minute quickstart with Quick Score assessment | `--profile <name>`<br>`--minimal`<br>`--startup-plan`<br>`--what-broken`<br>`--role <role>`<br>`--framework <name>`<br>`--answers-out <path>`<br>`--json` | - |
 | `amc rate` | Rate agent run quality (thumbs up/down) | `--score <score>`<br>`--tags <tags>`<br>`--comment <text>`<br>`--agent <agentId>` | - |
 | `amc receipts-chain` | Show full delegation chain for a receipt | - | - |
 | `amc redaction-test` | Run privacy redaction tests against built-in rules | - | - |
@@ -838,7 +858,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc redteam attack` | Run attack plugins (prompt-injection, data-exfiltration, privilege-escalation, model-manipulation, denial-of-service) | `--plugins <ids...>`<br>`--json` | - |
 | `amc redteam attack-list` | List available attack plugins | `--json` | - |
 | `amc redteam plugins` | List available attack plugins (assurance packs) | `--json` | - |
-| `amc redteam run` | Execute red-team plugins with chosen attack strategies and generate a vulnerability report | `--plugins <ids...>`<br>`--strategies <ids...>`<br>`--output <path>`<br>`--json` | - |
+| `amc redteam run` | Execute red-team plugins with chosen attack strategies and generate a vulnerability report | `--plugins <ids...>`<br>`--strategies <ids...>`<br>`--output <path>`<br>`--no-sign`<br>`--evil-mcp`<br>`--mcp-attacks <categories...>`<br>`--json` | - |
 | `amc redteam strategies` | List available attack strategies | `--json` | - |
 | `amc release` | Deterministic release engineering and offline verification | - | - |
 | `amc release init` | Initialize AMC release signing keypair | `--write-private-to <path>` | - |
@@ -849,7 +869,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc release sbom` | Generate deterministic CycloneDX SBOM | `--out <file>` | - |
 | `amc release scan` | Run strict secret scan on a .amcrelease bundle | `--in <file>`<br>`--out <file>` | - |
 | `amc release verify` | Verify a .amcrelease bundle offline | `--pubkey <path>` | - |
-| `amc report` | Render report for run ID | `--executive`<br>`--html <path>` | - |
+| `amc report` | Render report for run ID, saved alias, prefix, or 'latest' | `--executive`<br>`--html <path>`<br>`--share`<br>`--share-dir <path>`<br>`--public-base-url <url>` | - |
 | `amc residency-policy` | Create or list data residency policies | `--list`<br>`--region <region>`<br>`--isolation <level>`<br>`--custody <mode>` | - |
 | `amc residency-report` | Generate data residency compliance report for a tenant | `--tenant <id>`<br>`--redaction-tests` | - |
 | `amc resource` | Govern prompts, tools, memory, policies, routes, and other agent-defining resources | - | - |
@@ -872,6 +892,10 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc role-presets` | List available dashboard role presets | - | - |
 | `amc rollback-create` | Create a rollback pack from the current policy file | `--agent <agentId>`<br>`--reason <reason>`<br>`--policy-file <path>` | - |
 | `amc run` | Full assessment — Score + Shield + Enforce + Vault + Watch + Comply + Fleet + Passport in one command | `--window <window>`<br>`--fail-below <grade>`<br>`--ci`<br>`--score-only`<br>`--question-set <version>`<br>`--industry-pack-weights`<br>`--json` | - |
+| `amc run-alias` | Name diagnostic runs for report and history workflows | - | `run-name` |
+| `amc run-alias list` | List diagnostic run aliases for the active agent | - | `run-name list` |
+| `amc run-alias remove` | Remove a diagnostic run alias | - | `rm`, `run-name remove` |
+| `amc run-alias set` | Assign a reusable alias to a diagnostic run | - | `run-name set` |
 | `amc runtime` | Runtime run manager for connected agents | - | - |
 | `amc runtime cancel` | Cancel a runtime run cleanly | `--agent <agentId>`<br>`--reason <text>`<br>`--json` | - |
 | `amc runtime complete` | Complete a runtime run | `--agent <agentId>`<br>`--reason <text>`<br>`--json` | - |
@@ -888,6 +912,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc scan` | Zero-integration agent assessment scanner | `--url <url>`<br>`--repo <url>`<br>`--local <path>`<br>`--json` | - |
 | `amc scan model-scan` | Scan ML model files for security threats (malicious code, backdoors, supply chain attacks) | `--format <formats>`<br>`--max-size <mb>`<br>`--no-deep-scan`<br>`--no-hashes`<br>`--timeout <ms>`<br>`--output <format>`<br>`--output-file <path>`<br>`--recursive`<br>`--include-safe` | - |
 | `amc scim` | SCIM token management | - | - |
+| `amc scim init` | Enable SCIM provisioning and optionally create an initial bearer token | `--host-dir <path>`<br>`--token-name <name>`<br>`--out <file>`<br>`--require-https <bool>` | - |
 | `amc scim token` | SCIM bearer token operations | - | - |
 | `amc scim token create` | Create a SCIM bearer token and store hash in host vault | `--host-dir <path>`<br>`--name <name>`<br>`--out <file>` | - |
 | `amc score` | Maturity scoring, adversarial testing, and evidence collection | `--tier <tier>` | - |
@@ -920,7 +945,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc score memory-depth` | Score deep memory infrastructure: backend resilience, compression fidelity, cross-session consistency, TTL, capacity | `--file <path>`<br>`--json` | - |
 | `amc score memory-integrity` | Score memory correction persistence and poisoning resistance | `--json` | - |
 | `amc score mutual-verification` | Score agent-to-agent trust verification (challenge-response) | `--json` | - |
-| `amc score operational-independence` | Calculate operational independence score | `--window <days>`<br>`--json` | - |
+| `amc score operational-independence` | Calculate operational independence score | `--window <days>`<br>`--domain <domain>`<br>`--json` | - |
 | `amc score output-attestation` | Score output signing and trust metadata for receiving agents | `--json` | - |
 | `amc score output-integrity` | Score output integrity maturity (OWASP LLM02, confidence calibration, citation) | `--json` | - |
 | `amc score owasp-llm` | Score OWASP LLM Top 10 coverage (all 10 risks) | `--json` | - |
@@ -944,6 +969,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc shield` | Threat detection and security scanning | - | - |
 | `amc shield analyze` | Run static code analyzer on a skill file | `--json` | - |
 | `amc shield analyze-mcp` | Scan an MCP server definition for security risks (score L0–L5) | `--json`<br>`--out <path>` | - |
+| `amc shield analyze-runtime` | Analyze a proposed runtime agent action through the Shield trust pipeline | `--agent <id>`<br>`--action <action>`<br>`--tool <tool>`<br>`--parameters <json>`<br>`--sensitive-fields <csv>`<br>`--instruction-source <source>`<br>`--session <id>`<br>`--workspace-id <id>`<br>`--credential-age-minutes <n>`<br>`--confidence <n>`<br>`--step <n>`<br>`--previous-actions <csv>`<br>`--fail-on-block`<br>`--json` | - |
 | `amc shield confirm` | Controlled exploit confirmation with strict authorization gates | - | - |
 | `amc shield confirm export` | Export a redacted safe proof without exploit instructions | `--out <path>`<br>`--json` | - |
 | `amc shield confirm proofs` | List safe exploit-confirmation proof artifacts | `--json` | - |
@@ -962,6 +988,8 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc shield trust-pipeline` | Run end-to-end trust pipeline for an agent action | `--agent <id>`<br>`--action <action>`<br>`--tool <tool>`<br>`--session <id>`<br>`--workspace <id>`<br>`--json` | - |
 | `amc simulate-bridge` | Run a simulated bridge request for local testing | `--model <model>`<br>`--prompt <prompt>`<br>`--error-rate <rate>` | - |
 | `amc snapshot` | Generate Unified Clarity Snapshot markdown | `--out <file>`<br>`--agent <agentId>` | - |
+| `amc sso` | SSO setup shortcuts for OIDC and SAML providers | - | - |
+| `amc sso configure` | Configure an OIDC or SAML SSO provider | `--host-dir <path>`<br>`--id <providerId>`<br>`--display-name <name>`<br>`--issuer <issuer>`<br>`--client-id <id>`<br>`--client-secret-file <path>`<br>`--redirect-uri <uri>`<br>`--scopes <scopes>`<br>`--use-well-known <bool>`<br>`--authorization-endpoint <url>`<br>`--token-endpoint <url>`<br>`--jwks-uri <url>`<br>`--entry-point <url>`<br>`--idp-cert-file <path>`<br>`--sp-entity-id <id>`<br>`--acs-url <url>` | - |
 | `amc standard` | Open Compass Standard schema bundle and validation | - | - |
 | `amc standard generate` | Generate signed Open Compass schema bundle under .amc/standard/ | - | - |
 | `amc standard print` | Print one generated schema | `--id <id>` | - |
@@ -1068,6 +1096,13 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc value verify-policy` | Verify signed value policy | - | - |
 | `amc vault` | Encrypted key vault operations | - | - |
 | `amc vault classify` | Classify data sensitivity level | `--json` | - |
+| `amc vault dlp` | DLP scanner for PII and secrets | - | - |
+| `amc vault dlp scan` | Scan text for PII and secrets | `--json`<br>`--redact` | - |
+| `amc vault dsar` | Persistent DSAR (Data Subject Access Request) workflow | - | - |
+| `amc vault dsar complete` | Mark a DSAR request complete and append an audit event | `--json` | - |
+| `amc vault dsar list` | List persistent DSAR requests | `--json` | - |
+| `amc vault dsar status` | Show a persistent DSAR request | `--json` | - |
+| `amc vault dsar submit` | Submit a persistent DSAR request | `--subject <id>`<br>`--type <type>`<br>`--json` | - |
 | `amc vault dsar-status` | Show DSAR (Data Subject Access Request) status | `--json` | - |
 | `amc vault init` | Initialize encrypted vault for signing keys | - | - |
 | `amc vault lock` | Lock vault and clear in-memory private keys | - | - |
@@ -1094,7 +1129,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc watch profiler-start` | Start behavioral profiling for an agent | `--agent <id>`<br>`--sensitivity <level>` | - |
 | `amc watch profiler-status` | Show behavioral profiler status and any recent anomalies | `--agent <id>` | - |
 | `amc watch providers` | Show connected observability providers and trace stats | `--agent <agentId>` | - |
-| `amc watch safety-test` | Run safety tests for an agent | `--json` | - |
+| `amc watch safety-test` | Run safety tests for an agent | `--category <category>`<br>`--verbose`<br>`--json` | - |
 | `amc watch start` | Start continuous production monitoring for an agent | `--agent <id>`<br>`--interval <seconds>`<br>`--alert-threshold <score>`<br>`--score-drop-threshold <n>`<br>`--no-webhooks` | - |
 | `amc watch status` | Show all monitored agents and their current state | `--json` | - |
 | `amc whatif` | Equalizer what-if simulator | - | - |

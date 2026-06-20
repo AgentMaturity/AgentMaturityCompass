@@ -24,6 +24,20 @@ describe("deployment pack assets", () => {
     expect(dockerfile).toContain("\"studio\", \"healthcheck\"");
   });
 
+  it("does not advertise unverified GHCR quickstart images as published", () => {
+    const readme = read("README.md");
+    const publishing = read("docs/PUBLISHING.md");
+    const audit = read("docs/AUDIT_50_AGENTS_BATCH5.md");
+
+    expect(readme).not.toContain("ghcr.io/agentmaturity/amc-quickstart");
+    expect(readme).toContain("docker build -t amc-quickstart");
+    expect(readme).toContain("Use the local build command unless a GHCR package has been verified public.");
+    expect(publishing).toContain("GHCR visibility must be verified before publishing copy-paste `docker run ghcr.io/...` commands.");
+    expect(audit).toContain("GHCR quickstart image claim — ✅ Resolved 2026-06-16");
+    expect(audit).not.toContain("Status unknown (image may not be published)");
+    expect(audit).not.toContain("not verified as actually published");
+  });
+
   it("includes compose deployment assets", () => {
     const compose = read("deploy/compose/docker-compose.yml");
     expect(compose).toContain("amc_data:/data/amc");
@@ -63,6 +77,40 @@ describe("deployment pack assets", () => {
     expect(values).toContain("ingressNamespaceSelector:");
     expect(values).toContain("dnsNamespaceSelector:");
     expect(values).toContain("allowedEgressCidrs: []");
+  });
+
+  it("documents Kubernetes, Helm, and Terraform deployment paths", () => {
+    const guide = read("docs/KUBERNETES_HELM_DEPLOYMENT.md");
+    expect(guide).toContain("helm upgrade --install amc deploy/helm/amc");
+    expect(guide).toContain("kubectl -n amc-system create secret generic amc-bootstrap");
+    expect(guide).toContain("GET /healthz");
+    expect(guide).toContain("GET /readyz");
+    expect(guide).toContain("deploy/terraform/helm-release/");
+    expect(guide).toContain("Terraform state is not the right place for those values");
+    expect(guide).toContain("Helm `install` docs");
+    expect(guide).toContain("Kubernetes probe docs");
+
+    const terraformMain = read("deploy/terraform/helm-release/main.tf");
+    const terraformVersions = read("deploy/terraform/helm-release/versions.tf");
+    const terraformVars = read("deploy/terraform/helm-release/variables.tf");
+    const terraformReadme = read("deploy/terraform/helm-release/README.md");
+    expect(terraformVersions).toContain('source  = "hashicorp/helm"');
+    expect(terraformMain).toContain('resource "helm_release" "amc"');
+    expect(terraformMain).toContain("create_namespace = true");
+    expect(terraformMain).toContain("atomic           = true");
+    expect(terraformMain).toContain("cleanup_on_fail  = true");
+    expect(terraformMain).toContain("lint             = true");
+    expect(terraformMain).toContain("wait             = true");
+    expect(terraformVars).not.toContain("passphrase");
+    expect(terraformVars).not.toContain("password");
+    expect(terraformReadme).toContain("Do not put vault passphrases or owner passwords in `terraform.tfvars`");
+
+    const audit = read("docs/AUDIT_50_AGENTS_BATCH5.md");
+    expect(audit).toContain("Kubernetes/Helm deployment guide** — ✅ Resolved 2026-06-16");
+    expect(audit).toContain("Terraform Helm-release example exists at `deploy/terraform/helm-release/`");
+    expect(audit).not.toContain("No Kubernetes Helm chart or k8s manifests.");
+    expect(audit).not.toContain("No Terraform or Pulumi modules.");
+    expect(audit).not.toContain("cloud native story is still pre-Kubernetes");
   });
 
   it("parses deployment env config including *_FILE secret loaders", () => {

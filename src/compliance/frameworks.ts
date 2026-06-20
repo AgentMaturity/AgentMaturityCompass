@@ -77,6 +77,7 @@ export const complianceFrameworkFamilies: ComplianceFrameworkFamily[] = [
       "Art. 5 Accuracy",
       "Art. 5 Storage Limitation",
       "Art. 5 Integrity and Confidentiality",
+      "Art. 5 Accountability",
       "Art. 6 Lawful Basis",
       "Art. 15-22 Data Subject Rights",
       "Art. 25 Data Protection by Design",

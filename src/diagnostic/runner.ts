@@ -41,6 +41,10 @@ import { sha256Hex } from "../utils/hash.js";
 import { parseWindowToMs, dayKey } from "../utils/time.js";
 import { getAgentPaths, resolveAgentId } from "../fleet/paths.js";
 import { getPublicKeyHistory } from "../crypto/keys.js";
+import { getPublicMethodologyManifest } from "../methodology/publicMethodology.js";
+import { buildMetricValidationReport } from "../score/metricValidity.js";
+import { resolveRunAlias } from "./runAliases.js";
+import { buildDiagnosticMethodologyVersioningReceipt } from "./methodologyVersioning.js";
 import {
   loadAgentConfig,
   mandatoryTrustTierForLevel5,
@@ -56,6 +60,7 @@ import {
   recommendationControlForScore,
   summarizeConfidenceControls
 } from "./confidenceControls.js";
+import { buildQuestionExplainabilityReport, type QuestionExplainabilityInputRow } from "./questionScoreExplainability.js";
 
 function parseEventForRunner(workspace: string, event: EvidenceEvent): ParsedEvidenceEvent {
   const parsed = parseEvidenceEvent(event);
@@ -423,6 +428,38 @@ function collectEvidenceChecklist(scores: QuestionScore[]): string[] {
   return [...out].slice(0, 20);
 }
 
+function rejectedEvidenceReason(
+  event: ParsedEvidenceEvent,
+  matchedGateLevel: number,
+  requiredEvidenceTypes: EvidenceEventType[]
+): string {
+  const requiredTypes = requiredEvidenceTypes.join(", ");
+  if (requiredEvidenceTypes.length > 0 && !requiredEvidenceTypes.includes(event.event_type)) {
+    return `not accepted by the selected L${matchedGateLevel} gate evidence set; event type ${event.event_type} is outside required evidence types (${requiredTypes})`;
+  }
+  return `not accepted by the selected L${matchedGateLevel} gate evidence set; it did not satisfy every gate filter or was outside the matched evidence subset`;
+}
+
+function missingGateReasonsFromFlags(flags: string[]): string[] {
+  const reasons: Record<string, string> = {
+    FLAG_UNSUPPORTED_CLAIM: "claim exceeded the supported evidence gate and was capped",
+    FLAG_LEDGER_INVALID: "ledger integrity failed, so score evidence cannot be trusted",
+    FLAG_CONTRADICTION_RISK: "contradictory or hallucination audit evidence was present",
+    FLAG_MISSING_LLM_EVIDENCE: "LLM request/response evidence is missing for this gate",
+    FLAG_SANDBOX_REQUIRED: "high-risk L5 scoring requires sandbox attestation evidence",
+    FLAG_PROVIDER_ROUTE_MISMATCH: "provider route mismatch or direct bypass evidence capped the score",
+    FLAG_TRUTH_PROTOCOL_REQUIRED: "truth protocol evidence is missing for high-risk scoring",
+    FLAG_ASSURANCE_CAP: "assurance pack score or observed-run evidence capped the score",
+    FLAG_ASSURANCE_EVIDENCE_MISSING: "required assurance pack evidence is missing in the selected window",
+    FLAG_CORRELATION_LOW: "runtime receipt correlation is below the required threshold",
+    FLAG_INVALID_RECEIPTS: "invalid runtime receipts capped the score",
+    FLAG_CONFIG_UNTRUSTED: "unsigned or invalid configuration evidence capped the score",
+    FLAG_TOOLHUB_REQUIRED: "ToolHub execution or ticket evidence is missing or invalid",
+    FLAG_APPROVAL_REPLAY: "approval replay evidence capped the score"
+  };
+  return flags.map((flag) => reasons[flag]).filter((reason): reason is string => Boolean(reason));
+}
+
 function computeEvidenceTrustCoverage(events: ParsedEvidenceEvent[]): {
   observed: number;
   attested: number;
@@ -619,6 +656,10 @@ function markdownHeatmap(diff: Array<{ questionId: string; current: number; targ
   return `${header}\n${rows}`;
 }
 
+function markdownCell(input: string): string {
+  return input.replace(/\|/g, "\\|").replace(/\s+/g, " ").trim();
+}
+
 export async function runDiagnostic(input: RunDiagnosticInput, outputMarkdownPath?: string): Promise<DiagnosticReport> {
   const workspace = input.workspace;
   const agentId = resolveAgentId(workspace, input.agentId);
@@ -757,6 +798,7 @@ export async function runDiagnostic(input: RunDiagnosticInput, outputMarkdownPat
     });
 
     const questionScores: QuestionScore[] = [];
+    const questionExplainabilityInputs: QuestionExplainabilityInputRow[] = [];
     const inflationAttempts: { questionId: string; claimed: number; supported: number }[] = [];
     const unsupportedClaimFindings: AuditFinding[] = [];
     const assuranceMissingQuestions = new Set<string>();
@@ -768,9 +810,11 @@ export async function runDiagnostic(input: RunDiagnosticInput, outputMarkdownPat
 
       let supportedMaxLevel = 0;
       let matchedIds: string[] = [];
+      let matchedGateLevel = 0;
       let gateMinDays = 0;
       let gateEvidenceTypes: EvidenceEventType[] = [];
       let missingLlmCapApplied = false;
+      const failedGateReasons: string[] = [];
       for (let level = 5; level >= 0; level -= 1) {
         const levelRelevant = selectRelevantEvents(question.id, events, level, relevanceWarnings, eventsByQuestionId);
         const gate = { ...question.gates[level]! };
@@ -780,12 +824,14 @@ export async function runDiagnostic(input: RunDiagnosticInput, outputMarkdownPat
         const evaluation = evaluateGate(gate, levelRelevant);
         if (evaluation.pass) {
           supportedMaxLevel = level;
+          matchedGateLevel = level;
           matchedIds = evaluation.matchedEventIds.slice(0, 64);
           gateMinDays = gate.minDistinctDays;
           gateEvidenceTypes = gate.requiredEvidenceTypes;
           relevant = levelRelevant;
           break;
         }
+        failedGateReasons.push(evaluation.reason);
       }
 
       supportedMaxLevel = applyGlobalCherryPickDefense(supportedMaxLevel, relevant);
@@ -1095,7 +1141,7 @@ export async function runDiagnostic(input: RunDiagnosticInput, outputMarkdownPat
         flags.push("FLAG_APPROVAL_REPLAY");
       }
 
-      questionScores.push({
+      const questionScore: QuestionScore = {
         questionId: question.id,
         claimedLevel,
         supportedMaxLevel,
@@ -1113,6 +1159,30 @@ export async function runDiagnostic(input: RunDiagnosticInput, outputMarkdownPat
           evidenceEventIds: matchedIds,
           flags
         })
+      };
+      questionScores.push(questionScore);
+
+      const matchedIdSet = new Set(matchedIds);
+      const relevantById = new Map<string, ParsedEvidenceEvent>(relevant.map((event) => [event.id, event]));
+      const acceptedEvidence = matchedIds
+        .map((eventId) => relevantById.get(eventId))
+        .filter((event): event is ParsedEvidenceEvent => Boolean(event));
+      const rejectedEvidence = relevant
+        .filter((event) => !matchedIdSet.has(event.id))
+        .slice(0, 64)
+        .map((event) => ({
+          event,
+          reason: rejectedEvidenceReason(event, matchedGateLevel, gateEvidenceTypes)
+        }));
+      questionExplainabilityInputs.push({
+        question,
+        score: questionScore,
+        acceptedEvidence,
+        rejectedEvidence,
+        missingGateReasons: [
+          ...failedGateReasons,
+          ...missingGateReasonsFromFlags(flags)
+        ]
       });
     }
 
@@ -1258,8 +1328,8 @@ export async function runDiagnostic(input: RunDiagnosticInput, outputMarkdownPat
         ? trustLabelFromIntegrity(Math.min(integrityIndex, 0.59))
         : trustLabelFromIntegrity(integrityIndex);
 
-    if (driftRegressionCount > 0) {
-      const priorRuns = readdirSync(agentPaths.runsDir)
+    const priorRuns = pathExists(agentPaths.runsDir)
+      ? readdirSync(agentPaths.runsDir)
         .filter((name) => name.endsWith(".json"))
         .map((name) => {
           try {
@@ -1271,7 +1341,10 @@ export async function runDiagnostic(input: RunDiagnosticInput, outputMarkdownPat
         })
         .filter((row): row is DiagnosticReport => row !== null)
         .filter((row) => row.runId !== runId)
-        .sort((a, b) => b.ts - a.ts);
+        .sort((a, b) => b.ts - a.ts)
+      : [];
+
+    if (driftRegressionCount > 0) {
       const previous = priorRuns[0];
       if (previous) {
         const previousOverall =
@@ -1356,6 +1429,38 @@ export async function runDiagnostic(input: RunDiagnosticInput, outputMarkdownPat
     const prioritized = prioritizeUpgradeActions(questionScores, targetProfile, activeQuestions);
     const confidenceSummary = summarizeConfidenceControls(questionScores, prioritized.recommendationControls);
     const evidenceToCollectNext = collectEvidenceChecklist(questionScores);
+    const questionExplainability = buildQuestionExplainabilityReport({
+      agentId,
+      runId,
+      generatedAt: new Date(now).toISOString(),
+      sourceRefs: ["amc:diagnostic-ledger", "amc:public-methodology"],
+      rows: questionExplainabilityInputs
+    });
+    const methodology = getPublicMethodologyManifest(selectedQuestionSet.info);
+    const methodologyVersioning = buildDiagnosticMethodologyVersioningReceipt(methodology);
+    const metricValidation = buildMetricValidationReport(
+      {
+        agentId,
+        runId,
+        ts: now,
+        trustLabel,
+        integrityIndex: Number(integrityIndex.toFixed(4)),
+        evidenceCoverage: Number(evidenceCoverage.toFixed(4)),
+        correlationRatio: Number(correlation.correlationRatio.toFixed(4)),
+        unsupportedClaimCount,
+        layerScores,
+        questionScores,
+        confidenceSummary,
+        questions: activeQuestions.map((question) => ({
+          id: question.id,
+          layerName: question.layerName
+        })),
+        signedEvidenceRefs: questionExplainability.rows.flatMap((row) => row.signedEvidenceRefs),
+        sourceRefs: ["amc:diagnostic-ledger", "amc:public-methodology"],
+        gateMode: "ci"
+      },
+      priorRuns
+    );
     const targetSignerFingerprint = targetProfile?.signature
       ? sha256Hex(Buffer.from(targetProfile.signature, "utf8")).slice(0, 16)
       : null;
@@ -1413,6 +1518,10 @@ export async function runDiagnostic(input: RunDiagnosticInput, outputMarkdownPat
       recommendationControls: prioritized.recommendationControls,
       confidenceSummary,
       questionSet: selectedQuestionSet.info,
+      methodology,
+      methodologyVersioning,
+      metricValidation,
+      questionExplainability,
       evidenceToCollectNext,
       runSealSig: "",
       reportJsonSha256: ""
@@ -1455,10 +1564,80 @@ export async function runDiagnostic(input: RunDiagnosticInput, outputMarkdownPat
   }
 }
 
+export interface DiagnosticReportStatusExplanation {
+  status: DiagnosticReport["status"];
+  label: string;
+  verificationLabel: string;
+  claimBoundary: string;
+  nextStep: string;
+  strongClaimsAllowed: boolean;
+}
+
+export function explainDiagnosticReportStatus(
+  report: Pick<
+    DiagnosticReport,
+    "status" | "verificationPassed" | "trustBoundaryViolated" | "trustBoundaryMessage" | "integrityIndex" | "trustLabel"
+  >
+): DiagnosticReportStatusExplanation {
+  if (report.status === "VALID" && report.verificationPassed && !report.trustBoundaryViolated) {
+    return {
+      status: report.status,
+      label: "Verified evidence chain",
+      verificationLabel: "PASSED",
+      claimBoundary: "This report is verified and client-ready for the configured trust boundary and evidence window.",
+      nextStep: "Use the report for client, auditor, or internal governance review; rerun after material agent or policy changes.",
+      strongClaimsAllowed: true,
+    };
+  }
+
+  if (report.status === "UNSIGNED") {
+    return {
+      status: report.status,
+      label: "Unsigned local preview",
+      verificationLabel: report.verificationPassed ? "PASSED WITHOUT SIGNING" : "NOT CRYPTOGRAPHICALLY VERIFIED",
+      claimBoundary: "Vault signing was skipped. Use this for local diagnosis and CS previews, but do not present it as verified evidence.",
+      nextStep: "Unlock or initialize the vault and rerun without --no-sign to produce a signed, verifier-ready report.",
+      strongClaimsAllowed: false,
+    };
+  }
+
+  if (report.trustBoundaryViolated) {
+    return {
+      status: report.status,
+      label: "Trust boundary violation",
+      verificationLabel: report.verificationPassed ? "FAILED TRUST BOUNDARY" : "FAILED",
+      claimBoundary: "The report is not client-ready because AMC detected a trust-boundary violation in the evidence path.",
+      nextStep: report.trustBoundaryMessage ?? "Resolve the trust-boundary finding, then rerun the assessment.",
+      strongClaimsAllowed: false,
+    };
+  }
+
+  if (!report.verificationPassed) {
+    return {
+      status: report.status,
+      label: "Unverified evidence chain",
+      verificationLabel: "FAILED",
+      claimBoundary: "This report is useful for local diagnosis, but it is not client-ready or auditor-ready because the evidence chain did not verify.",
+      nextStep: "Run amc verify, inspect ledger/config signatures, fix invalid receipts or missing seals, then rerun the report.",
+      strongClaimsAllowed: false,
+    };
+  }
+
+  return {
+    status: report.status,
+    label: "Additional verification gate failed",
+    verificationLabel: "FAILED",
+    claimBoundary: "This report is not client-ready because an additional verification gate failed after ledger verification.",
+    nextStep: "Check target profile signatures, trust-boundary settings, and report metadata before sharing externally.",
+    strongClaimsAllowed: false,
+  };
+}
+
 export function generateReport(report: DiagnosticReport, format: "md" | "json"): string | DiagnosticReport {
   if (format === "json") {
     return report;
   }
+  const statusExplanation = explainDiagnosticReportStatus(report);
   const correlationRatio = typeof report.correlationRatio === "number" ? report.correlationRatio : 0;
   const invalidReceiptsCount = typeof report.invalidReceiptsCount === "number" ? report.invalidReceiptsCount : 0;
   const correlationWarn = Array.isArray(report.correlationWarnings) ? report.correlationWarnings : [];
@@ -1501,12 +1680,13 @@ export function generateReport(report: DiagnosticReport, format: "md" | "json"):
   const confidenceSummary = report.confidenceSummary ?? summarizeConfidenceControls(report.questionScores, recommendationControls);
   const questionSet = report.questionSet ?? {
     version: "amc-legacy-240-v1",
-    title: "Legacy 240-question AMC assessment",
+    title: "Default AMC assessment",
     questionCount: report.questionScores.length,
     default: true,
     includedVersions: ["amc-legacy-240-v1"],
     dimensions: []
   };
+  const methodology = report.methodology ?? getPublicMethodologyManifest(questionSet);
   const expandedDimensions = (questionSet.dimensions ?? []).filter((dimension) => dimension.family !== "core");
   const dimensionSection = expandedDimensions.length > 0
     ? [
@@ -1522,6 +1702,39 @@ export function generateReport(report: DiagnosticReport, format: "md" | "json"):
   const domainPackWeightingLine = weighting
     ? `${weighting.applied ? "applied" : "not applied"} (${weighting.message})`
     : "not requested";
+  const metricValidation = report.metricValidation;
+  const metricEvalPack = metricValidation?.evalPack;
+  const metricCiGate = metricValidation?.ciGate;
+  const metricValidationSection = metricValidation
+    ? [
+        `- Fail Closed: ${metricValidation.failClosed ? "YES" : "NO"}`,
+        `- Thresholds: minSampleSize=${metricValidation.thresholdPolicy.minSampleSize}, minConstructValidity=${metricValidation.thresholdPolicy.minConstructValidity}, minCounterfactualResponsiveness=${metricValidation.thresholdPolicy.minCounterfactualResponsiveness}, minValidationFacetCoverage=${metricValidation.thresholdPolicy.minValidationFacetCoverage}, minConfounderControlCoverage=${metricValidation.thresholdPolicy.minConfounderControlCoverage}, maxCIWidth=${metricValidation.thresholdPolicy.maxConfidenceIntervalWidth}`,
+        `- Eval Pack Hash: ${metricEvalPack?.manifestHash ?? "unavailable"}`,
+        `- Eval Pack Replayable: ${metricEvalPack?.replayable ? "YES" : "NO"}`,
+        `- CI Gate: ${metricCiGate ? (metricCiGate.passed ? "PASS" : "FAIL") : "unavailable"}${metricCiGate ? ` (${metricCiGate.summary})` : ""}`,
+        "",
+        "| Metric | Owner | Sample | Construct Validity | Counterfactual | Facet Coverage | Confounder Control | Inter-Rater | Test-Retest | 95% CI | Status | Warnings |",
+        "|---|---|---:|---:|---:|---:|---:|---:|---:|---|---|---|",
+        ...metricValidation.rows.map((row) => {
+          const interval = row.confidenceInterval;
+          return `| ${row.metricId} | ${row.owner} | ${row.sampleSize} | ${row.constructValidity.toFixed(2)} | ${row.counterfactualResponsiveness === null ? "-" : `${row.counterfactualResponsiveness.toFixed(2)} (${row.counterfactualSampleSize})`} | ${row.validationFacetCoverage === null ? "-" : `${row.validationFacetCoverage.toFixed(2)} (${row.validationFacetSampleSize})`} | ${row.confounderControlCoverage === null ? "-" : `${row.confounderControlCoverage.toFixed(2)} (${row.confounderControlSampleSize})`} | ${row.interRaterAgreement === null ? "-" : row.interRaterAgreement.toFixed(2)} | ${row.testRetestStability === null ? "-" : row.testRetestStability.toFixed(2)} | ${interval.lower.toFixed(1)}-${interval.upper.toFixed(1)} | ${row.status} | ${row.warnings.join("; ") || "-"} |`;
+        })
+      ].join("\n")
+    : "- Metric validation table unavailable in this report.";
+  const methodologyVersioning = report.methodologyVersioning;
+  const methodologyVersioningSection = methodologyVersioning
+    ? [
+        `- Status: ${methodologyVersioning.status}`,
+        `- Source Ref: ${methodologyVersioning.sourceRef}`,
+        `- Receipt Hash: ${methodologyVersioning.receiptHash}`,
+        `- Methodology Assurance Hash: ${methodologyVersioning.methodology.versioningAssuranceHash}`,
+        `- Required Audit Fields: ${methodologyVersioning.requiredAuditFields.join(", ")}`,
+        `- Missing Audit Fields: ${methodologyVersioning.missingAuditFields.join(", ") || "none"}`,
+        `- Badge Query Params: ${methodologyVersioning.badgeQueryParams.join(", ")}`,
+        `- Diagnostic Fields: ${methodologyVersioning.diagnosticFields.join(", ")}`,
+        `- No-Copy Boundary: ${methodologyVersioning.telemetryCalibrationProof.noCopyBoundary}`,
+      ].join("\n")
+    : "- Methodology-versioning receipt unavailable in this report.";
 
   const layerSection = report.layerScores
     .map(
@@ -1538,6 +1751,139 @@ export function generateReport(report: DiagnosticReport, format: "md" | "json"):
       return `| ${q.questionId} | ${q.claimedLevel} | ${q.supportedMaxLevel} | ${q.finalLevel} | ${q.confidence.toFixed(2)} | ${controls.evidenceSufficiency.toFixed(2)} | ${controls.uncertaintyLevel} | ${controls.autoFixAllowed ? "allowed" : "review"} | ${q.flags.join(", ") || "-"} | ${q.evidenceEventIds.join(", ") || "-"} |`;
     })
   ].join("\n");
+  const questionExplainability = report.questionExplainability;
+  const questionExplainabilitySection = questionExplainability
+    ? [
+        `- Manifest Hash: ${questionExplainability.manifestHash}`,
+        `- Replayable: ${questionExplainability.replayable ? "YES" : "NO"}`,
+        `- Fail Closed: ${questionExplainability.failClosed ? "YES" : "NO"}`,
+        "",
+        "| Question | Status | Evidence Window | Accepted Signed Evidence | Rejected Evidence | Component Diagnostics | Evaluation Criteria | Rubric Lens | Landscape Lens | Benchmark Submission Lens | Test-Suite Evaluation Lens | Multi-User Benchmark Lens | Professional Task Lens | IoT Firmware Question Lens | Retail Sales Question Lens | Continual-Learning Benchmark Lens | Hermes Turbo Performance Lens | Missing Gates | Repair Hint | Row Hash |",
+        "|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|",
+        ...questionExplainability.rows.map((row) => {
+          const accepted = row.acceptedEvidenceIds.join(", ") || "-";
+          const window = `${row.evidenceWindow.eventCount} events / ${row.evidenceWindow.distinctSessionCount} sessions / ${row.evidenceWindow.durationMs}ms`;
+          const rejected = row.rejectedEvidence
+            .map((evidence) => `${evidence.evidenceId}: ${evidence.reason}`)
+            .join("; ") || "-";
+          const components = row.componentDiagnostics
+            .map((component) => `${component.componentId} (${component.componentType}/${component.status}): ${component.repairHint}`)
+            .join("; ") || "-";
+          const criteria = row.criteriaDiagnostics
+            .map((criterion) => `${criterion.criterionId} (${criterion.criterionType}/${criterion.status}${criterion.judgeRef ? `/${criterion.judgeRef}` : ""}): ${criterion.repairHint}`)
+            .join("; ") || "-";
+          const rubricLens = row.rubricLens
+            .map((lens) => {
+              const checks = lens.checks
+                .map((check) => `${check.checkId} (${check.pillar}/${check.status}): ${check.fixHint}`)
+                .join("; ");
+              return `${lens.rubricId}@${lens.rubricVersion} ${lens.skillType} ${lens.score0to100}/${lens.grade}: ${checks}`;
+            })
+            .join("; ") || "-";
+          const landscapeLens = row.landscapeLens
+            .map((lens) => {
+              const freshness = lens.freshnessDays === null || lens.maxAllowedFreshnessDays === null
+                ? "freshness=unknown"
+                : `freshness=${lens.freshnessDays}/${lens.maxAllowedFreshnessDays}d`;
+              return `${lens.landscapeId} (${lens.category}/${lens.status}/${lens.updateCadence}/${freshness}): ${lens.sourceRef}; cohorts=${lens.cohortRefs.join(",") || "-"}; datasets=${lens.datasetRefs.join(",") || "-"}; ${lens.repairHint}`;
+            })
+            .join("; ") || "-";
+          const benchmarkSubmissionLens = row.benchmarkSubmissionLens
+            .map((lens) => {
+              const score = lens.overallScore0to100 === null
+                ? "score=unknown"
+                : `score=${lens.overallScore0to100}`;
+              const categoryScore = lens.categoryScore0to100 === null
+                ? "category=unknown"
+                : `category=${lens.categoryScore0to100}`;
+              const speed = lens.speedMs === null ? "speed=unknown" : `speedMs=${lens.speedMs}`;
+              const cost = lens.costUsd === null ? "cost=unknown" : `costUsd=${lens.costUsd}`;
+              const criteriaCount = lens.criterionScores.length;
+              return `${lens.benchmarkId}/${lens.submissionId}/${lens.taskId} (${lens.taskCategory}/${lens.taskStatus}/${lens.gradingType}/${lens.status}; ${score}; ${categoryScore}; ${speed}; ${cost}; criteria=${criteriaCount}; views=${lens.leaderboardMetricViews.join(",") || "-"}): ${lens.repairHint}`;
+            })
+            .join("; ") || "-";
+          const testSuiteEvaluationLens = row.testSuiteEvaluationLens
+            .map((lens) => {
+              const passRate = lens.passRate0to1 === null ? "pass=unknown" : `pass=${lens.passRate0to1}`;
+              const score = lens.averageScore0to1 === null ? "score=unknown" : `score=${lens.averageScore0to1}`;
+              const ci = lens.ciRunId === null ? "ci=missing" : `ci=${lens.ciRunId}`;
+              const experiment = lens.experimentRunId === null ? "experiment=missing" : `experiment=${lens.experimentRunId}`;
+              const trace = lens.agentBehaviorEvaluation ? "agent-trace=required" : "agent-trace=optional";
+              return `${lens.suiteId}/${lens.testCaseId} (${lens.language}/${lens.testFramework}/${lens.adapter}/${lens.status}; ${passRate}; ${score}; ${ci}; ${experiment}; evaluators=${lens.evaluatorIds.join(",") || "-"}; ${trace}): ${lens.repairHint}`;
+            })
+            .join("; ") || "-";
+          const multiUserBenchmarkLens = row.multiUserBenchmarkLens
+            .map((lens) => {
+              const privacy = lens.privacyPassRate0to1 === null ? "privacy=unknown" : `privacy=${lens.privacyPassRate0to1}`;
+              const coordination = lens.coordinationSuccessRate0to1 === null ? "coordination=unknown" : `coordination=${lens.coordinationSuccessRate0to1}`;
+              const fairness = lens.queueFairnessScore0to1 === null ? "fairness=unknown" : `fairness=${lens.queueFairnessScore0to1}`;
+              const instruction = lens.instructionFollowingScore0to1 === null ? "instruction=unknown" : `instruction=${lens.instructionFollowingScore0to1}`;
+              const roles = lens.userRoleCount === null ? "roles=unknown" : `roles=${lens.userRoleCount}`;
+              const turns = lens.turnCount === null ? "turns=unknown" : `turns=${lens.turnCount}`;
+              return `${lens.benchmarkId}/${lens.scenarioId} (${lens.scenarioFamily}/${lens.capability}/${lens.status}; ${roles}; ${turns}; ${privacy}; ${coordination}; ${fairness}; ${instruction}): ${lens.repairHint}`;
+            })
+            .join("; ") || "-";
+          const professionalTaskLens = row.professionalTaskLens
+            .map((lens) => {
+              const passRate = lens.passRate0to1 === null ? "pass=unknown" : `pass=${lens.passRate0to1}`;
+              const robustness = lens.robustnessScore0to1 === null ? "robustness=unknown" : `robustness=${lens.robustnessScore0to1}`;
+              const votes = lens.verifierVoteCount === null ? "votes=unknown" : `votes=${lens.verifierVoteCount}`;
+              const steps = lens.trajectoryStepCount === null ? "steps=unknown" : `steps=${lens.trajectoryStepCount}`;
+              return `${lens.benchmarkId}/${lens.taskId}/${lens.scenarioId} (${lens.industryCategory}/${lens.professionalDomain}/${lens.environmentMode}/${lens.faultMode}/${lens.status}; ${votes}; ${steps}; ${passRate}; ${robustness}): ${lens.repairHint}`;
+            })
+            .join("; ") || "-";
+          const iotFirmwareQuestionLens = row.iotFirmwareQuestionLens
+            .map((lens) => {
+              const bugClosure = lens.bugClosureRate0to1 === null ? "closure=unknown" : `closure=${lens.bugClosureRate0to1}`;
+              const tokenEfficiency = lens.tokenEfficiencyRatio === null ? "tokenEfficiency=unknown" : `tokenEfficiency=${lens.tokenEfficiencyRatio}`;
+              const logCoverage = lens.logCaptureCoverage0to1 === null ? "logCoverage=unknown" : `logCoverage=${lens.logCaptureCoverage0to1}`;
+              const runs = lens.hardwareRunCount === null ? "runs=unknown" : `runs=${lens.hardwareRunCount}`;
+              const devices = lens.deviceCount === null ? "devices=unknown" : `devices=${lens.deviceCount}`;
+              return `${lens.benchmarkId}/${lens.taskId} (${lens.platform}/${lens.boardId}/${lens.chipFamily}/${lens.status}; ${runs}; ${devices}; ${bugClosure}; ${tokenEfficiency}; ${logCoverage}): ${lens.repairHint}`;
+            })
+            .join("; ") || "-";
+          const retailSalesQuestionLens = (row.retailSalesQuestionLens ?? [])
+            .map((lens) => {
+              const providers = lens.modelProviderCount === null ? "providers=unknown" : `providers=${lens.modelProviderCount}`;
+              const scenarios = lens.customerScenarioCount === null ? "scenarios=unknown" : `scenarios=${lens.customerScenarioCount}`;
+              const orders = lens.orderCount === null ? "orders=unknown" : `orders=${lens.orderCount}`;
+              const orderAccuracy = lens.orderCaptureAccuracy0to1 === null ? "orderAccuracy=unknown" : `orderAccuracy=${lens.orderCaptureAccuracy0to1}`;
+              const policy = lens.policyComplianceRate0to1 === null ? "policy=unknown" : `policy=${lens.policyComplianceRate0to1}`;
+              const grounding = lens.recommendationGrounding0to1 === null ? "grounding=unknown" : `grounding=${lens.recommendationGrounding0to1}`;
+              const pii = lens.piiRedactionRate0to1 === null ? "pii=unknown" : `pii=${lens.piiRedactionRate0to1}`;
+              return `${lens.benchmarkId}/${lens.taskId} (${lens.salesChannel}/${lens.status}; ${providers}; ${scenarios}; ${orders}; ${orderAccuracy}; ${policy}; ${grounding}; ${pii}): ${lens.repairHint}`;
+            })
+            .join("; ") || "-";
+          const continualLearningBenchmarkLens = row.continualLearningBenchmarkLens
+            .map((lens) => {
+              const completion = lens.taskCompletionRate0to1 === null ? "completion=unknown" : `completion=${lens.taskCompletionRate0to1}`;
+              const quality = lens.responseQualityScore0to1 === null ? "quality=unknown" : `quality=${lens.responseQualityScore0to1}`;
+              const stateAccuracy = lens.stateAccuracy0to1 === null ? "state=unknown" : `state=${lens.stateAccuracy0to1}`;
+              const retention = lens.retentionScore0to1 === null ? "retention=unknown" : `retention=${lens.retentionScore0to1}`;
+              const tokenCost = lens.tokenCostUsd === null ? "tokenCost=unknown" : `tokenCost=${lens.tokenCostUsd}`;
+              const scenarios = lens.scenarioCount === null ? "scenarios=unknown" : `scenarios=${lens.scenarioCount}`;
+              const turns = lens.turnCount === null ? "turns=unknown" : `turns=${lens.turnCount}`;
+              const mutations = lens.stateMutationCount === null ? "mutations=unknown" : `mutations=${lens.stateMutationCount}`;
+              const entities = lens.entityCount === null ? "entities=unknown" : `entities=${lens.entityCount}`;
+              return `${lens.benchmarkId}/${lens.domainId}/${lens.workflowId} (${lens.status}; ${scenarios}; ${turns}; ${mutations}; ${entities}; ${completion}; ${quality}; ${stateAccuracy}; ${retention}; ${tokenCost}): ${lens.repairHint}`;
+            })
+            .join("; ") || "-";
+          const hermesTurboPerformanceLens = (row.hermesTurboPerformanceLens ?? [])
+            .map((lens) => {
+              const runs = lens.runCount === null ? "runs=unknown" : `runs=${lens.runCount}`;
+              const p50 = lens.latencyP50Ms === null ? "p50=unknown" : `p50=${lens.latencyP50Ms}ms`;
+              const p95 = lens.latencyP95Ms === null ? "p95=unknown" : `p95=${lens.latencyP95Ms}ms`;
+              const throughput = lens.throughputOpsPerSec === null ? "throughput=unknown" : `throughput=${lens.throughputOpsPerSec}`;
+              const speedup = lens.speedupFactor === null ? "speedup=unknown" : `speedup=${lens.speedupFactor}x`;
+              const dashboard = lens.dashboardCoverage0to1 === null ? "dashboard=unknown" : `dashboard=${lens.dashboardCoverage0to1}`;
+              const regression = lens.regressionPassRate0to1 === null ? "regression=unknown" : `regression=${lens.regressionPassRate0to1}`;
+              return `${lens.benchmarkId}/${lens.performanceFacet} (${lens.defaultBranch}/${lens.status}; ${runs}; ${p50}; ${p95}; ${throughput}; ${speedup}; ${dashboard}; ${regression}): ${lens.repairHint}`;
+            })
+            .join("; ") || "-";
+          return `| ${row.questionId} | ${row.status} | ${markdownCell(window)} | ${markdownCell(accepted)} | ${markdownCell(rejected)} | ${markdownCell(components)} | ${markdownCell(criteria)} | ${markdownCell(rubricLens)} | ${markdownCell(landscapeLens)} | ${markdownCell(benchmarkSubmissionLens)} | ${markdownCell(testSuiteEvaluationLens)} | ${markdownCell(multiUserBenchmarkLens)} | ${markdownCell(professionalTaskLens)} | ${markdownCell(iotFirmwareQuestionLens)} | ${markdownCell(retailSalesQuestionLens)} | ${markdownCell(continualLearningBenchmarkLens)} | ${markdownCell(hermesTurboPerformanceLens)} | ${markdownCell(row.missingGateReasons.join("; ") || "-")} | ${markdownCell(row.repairHint)} | ${row.rowHash.slice(0, 16)} |`;
+        })
+      ].join("\n")
+    : "- Question explainability receipts unavailable in this report.";
 
   const inflation =
     report.inflationAttempts.length > 0
@@ -1568,8 +1914,10 @@ export function generateReport(report: DiagnosticReport, format: "md" | "json"):
     `# Agent Maturity Compass Report (${report.runId})`,
     "",
     `- Agent: ${report.agentId}`,
-    `- Status: **${report.status}**`,
-    `- Verification: ${report.verificationPassed ? "PASSED" : "FAILED"}`,
+    `- Status: **${report.status}** — ${statusExplanation.label}`,
+    `- Verification: ${statusExplanation.verificationLabel}`,
+    `- Claim Boundary: ${statusExplanation.claimBoundary}`,
+    `- Next Verification Step: ${statusExplanation.nextStep}`,
     `- Trust Boundary Violated: ${report.trustBoundaryViolated ? "YES" : "NO"}`,
     report.trustBoundaryMessage ? `- Trust Boundary Message: ${report.trustBoundaryMessage}` : "- Trust Boundary Message: none",
     `- IntegrityIndex: ${report.integrityIndex.toFixed(3)} (${report.trustLabel})`,
@@ -1577,6 +1925,10 @@ export function generateReport(report: DiagnosticReport, format: "md" | "json"):
     `- Correlation Ratio: ${correlationRatio.toFixed(3)}`,
     `- Invalid Receipts: ${invalidReceiptsCount}`,
     `- Question Set: ${questionSet.version} (${questionSet.questionCount} questions)`,
+    `- Methodology: ${methodology.id} ${methodology.version}`,
+    `- Methodology Hash: ${methodology.hash}`,
+    `- Methodology Versioning: ${methodologyVersioning?.status ?? "unavailable"}`,
+    `- Methodology Versioning Receipt Hash: ${methodologyVersioning?.receiptHash ?? "unavailable"}`,
     `- Industry Pack Weighting: ${domainPackWeightingLine}`,
     `- AutonomyAllowanceIndex: ${autonomyAllowanceIndex}`,
     `- DualityCompliance: ${duality.executeWithValidTicket}/${duality.executeAttempted} (${(duality.ratio * 100).toFixed(1)}%)`,
@@ -1592,6 +1944,12 @@ export function generateReport(report: DiagnosticReport, format: "md" | "json"):
     "",
     "## Expanded Assessment Dimensions",
     dimensionSection,
+    "",
+    "## Metric Validity and Reliability",
+    metricValidationSection,
+    "",
+    "## Methodology Versioning Assurance",
+    methodologyVersioningSection,
     "",
     "## Confidence and Uncertainty Controls",
     `AMC downgrades low-evidence findings and blocks auto-fix when confidence, evidence sufficiency, contradiction risk, judge agreement, or decisiveness risk do not pass thresholds.`,
@@ -1610,6 +1968,9 @@ export function generateReport(report: DiagnosticReport, format: "md" | "json"):
     "",
     "## Per-Question Scores",
     questionTable,
+    "",
+    "## Question Score Explainability",
+    questionExplainabilitySection,
     "",
     "## Inflation Attempts",
     inflation,
@@ -1668,6 +2029,105 @@ export function loadRunReport(workspace: string, runId: string, agentId?: string
   return JSON.parse(readUtf8(legacyFile)) as DiagnosticReport;
 }
 
+export interface ResolvedRunReport {
+  requestedRunId: string;
+  resolvedRunId: string;
+  resolvedBy: "exact" | "latest" | "alias" | "prefix";
+  alias?: string;
+  report: DiagnosticReport;
+}
+
+function listRunReportCandidates(workspace: string, agentId?: string): DiagnosticReport[] {
+  const resolvedAgentId = resolveAgentId(workspace, agentId);
+  const agentPaths = getAgentPaths(workspace, resolvedAgentId);
+  const legacyRunsDir = join(workspace, ".amc", "runs");
+  const dirs = Array.from(new Set([agentPaths.runsDir, legacyRunsDir]));
+  const reports: DiagnosticReport[] = [];
+
+  for (const dir of dirs) {
+    if (!pathExists(dir)) {
+      continue;
+    }
+    for (const file of readdirSync(dir)) {
+      if (!file.endsWith(".json")) {
+        continue;
+      }
+      try {
+        const report = JSON.parse(readUtf8(join(dir, file))) as DiagnosticReport;
+        if (report.agentId && report.agentId !== resolvedAgentId) {
+          continue;
+        }
+        reports.push(report);
+      } catch {
+        // Ignore corrupt legacy run files when resolving convenience aliases.
+      }
+    }
+  }
+
+  return reports.sort((a, b) => b.ts - a.ts);
+}
+
+export function resolveRunReport(workspace: string, runId: string, agentId?: string): ResolvedRunReport {
+  const requestedRunId = runId.trim();
+  if (!requestedRunId) {
+    throw new Error("runId is required.");
+  }
+
+  if (requestedRunId.toLowerCase() === "latest") {
+    const reports = listRunReportCandidates(workspace, agentId);
+    const report = reports.find((row) => row.status === "VALID") ?? reports[0];
+    if (!report) {
+      throw new Error(`No diagnostic runs found for agent ${resolveAgentId(workspace, agentId)}.`);
+    }
+    return {
+      requestedRunId,
+      resolvedRunId: report.runId,
+      resolvedBy: "latest",
+      report
+    };
+  }
+
+  try {
+    const report = loadRunReport(workspace, requestedRunId, agentId);
+    return {
+      requestedRunId,
+      resolvedRunId: report.runId,
+      resolvedBy: "exact",
+      report
+    };
+  } catch {
+    const alias = resolveRunAlias(workspace, requestedRunId, agentId);
+    if (alias) {
+      try {
+        const report = loadRunReport(workspace, alias.runId, agentId);
+        return {
+          requestedRunId,
+          resolvedRunId: report.runId,
+          resolvedBy: "alias",
+          alias: alias.alias,
+          report
+        };
+      } catch {
+        throw new Error(`Run alias "${alias.alias}" points to missing run "${alias.runId}".`);
+      }
+    }
+
+    const matches = listRunReportCandidates(workspace, agentId).filter((report) => report.runId.startsWith(requestedRunId));
+    if (matches.length === 1) {
+      return {
+        requestedRunId,
+        resolvedRunId: matches[0]!.runId,
+        resolvedBy: "prefix",
+        report: matches[0]!
+      };
+    }
+    if (matches.length > 1) {
+      throw new Error(`Run ID prefix "${requestedRunId}" is ambiguous; matched ${matches.length} runs.`);
+    }
+    throw new Error(`No runId found matching "${requestedRunId}".`);
+  }
+}
+
 export async function compareModels(
   workspace: string,
   models: string[],
@@ -1715,13 +2175,13 @@ export async function compareModels(
   // Run diagnostic for each model
   for (const model of models) {
     console.log(`Running diagnostic for model: ${model}`);
-    
+
     // For now, we'll simulate running with different models
     // In a real implementation, this would involve:
     // 1. Configuring the agent to use the specific model
     // 2. Running the diagnostic with that configuration
     // 3. Collecting the results
-    
+
     const report = await runDiagnostic({
       workspace,
       window: options.window ?? "14d",
@@ -1745,11 +2205,11 @@ export async function compareModels(
   }
 
   // Calculate summary statistics
-  const bestModel = results.reduce((best, current) => 
+  const bestModel = results.reduce((best, current) =>
     current.overallScore > best.overallScore ? current : best
   );
-  
-  const worstModel = results.reduce((worst, current) => 
+
+  const worstModel = results.reduce((worst, current) =>
     current.overallScore < worst.overallScore ? current : worst
   );
 

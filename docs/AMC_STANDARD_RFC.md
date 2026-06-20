@@ -27,6 +27,7 @@ The Agent Maturity Compass (AMC) Standard defines an open, evidence-based framew
 8. [Compliance Mapping](#8-compliance-mapping)
 9. [Implementation Requirements](#9-implementation-requirements)
 10. [Security Considerations](#10-security-considerations)
+11. [Citation](#11-citation)
 - [Appendix A: Question Bank Schema](#appendix-a-question-bank-schema)
 - [Appendix B: Assurance Pack Schema](#appendix-b-assurance-pack-schema)
 - [Appendix C: Certificate Format](#appendix-c-certificate-format)
@@ -809,6 +810,25 @@ The hash chain prevents retroactive tampering: modifying any historical event ch
 - Evidence ledger entries strip sensitive parameters via DLP redaction before storage.
 - `agentIdHash` in `AssuranceScenarioTraceRef` uses the first 8–64 hex characters of a SHA-256 digest, not the raw agent ID.
 - Workspace keys are stored in an isolated vault and MUST NOT be included in exported artifacts.
+
+---
+
+## 11. Citation
+
+Use this citation when referring to the AMC Standard. No DOI or arXiv identifier is assigned to this RFC-style specification as of 2026-06-16; cite the repository document until an external identifier is issued.
+
+```bibtex
+@misc{amcstandard2026,
+  title = {AMC Standard: Agent Maturity Compass, RFC-style Specification v1.0},
+  author = {{AMC Labs}},
+  year = {2026},
+  month = mar,
+  url = {https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/AMC_STANDARD_RFC.md},
+  note = {Repository specification; DOI and arXiv identifier not assigned as of 2026-06-16}
+}
+```
+
+Related whitepaper citation: `whitepaper/AMC_WHITEPAPER_v1.md` includes the companion BibTeX entry for the AMC maturity framework paper.
 
 ---
 

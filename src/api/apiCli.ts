@@ -6,6 +6,10 @@ function routePath(prefix: string): string {
   return prefix === "/api/v1/health" ? prefix : `${prefix}/*`;
 }
 
+function formatTimestamp(ts: number | null): string {
+  return ts === null ? "never" : new Date(ts).toISOString();
+}
+
 export function registerApiCommands(program: Command): void {
   const apiCmd = program.command("api").description("REST API management");
 
@@ -95,5 +99,83 @@ export function registerApiCommands(program: Command): void {
       console.log(chalk.bold("  Response format:"));
       console.log("  All responses are JSON. Errors use { error: string, code?: string }.");
       console.log("");
+    });
+
+  const keyCmd = apiCmd.command("key").description("Manage programmatic API keys");
+
+  keyCmd
+    .command("create")
+    .description("Create a programmatic API key and show the secret once")
+    .option("--scope <scope>", "read-only|write|admin", "read-only")
+    .option("--label <label>", "human-readable label")
+    .option("--expires-in <duration>", "30m, 12h, 90d, 4w, or never", "never")
+    .option("--json", "Output as JSON", false)
+    .action(async (opts: { scope: string; label?: string; expiresIn?: string; json?: boolean }) => {
+      const { createApiKeyForCli } = await import("../auth/apiKeyCli.js");
+      const result = createApiKeyForCli({
+        workspace: process.cwd(),
+        scope: opts.scope,
+        label: opts.label,
+        expiresIn: opts.expiresIn
+      });
+      if (opts.json) {
+        console.log(JSON.stringify(result, null, 2));
+        return;
+      }
+      console.log(chalk.bold("\nAMC API key created\n"));
+      console.log(`  Key ID:     ${result.keyId}`);
+      console.log(`  Label:      ${result.record.label}`);
+      console.log(`  Scope:      ${result.record.scope}`);
+      console.log(`  Expires:    ${formatTimestamp(result.record.expiresTs)}`);
+      console.log(`  Store:      ${result.storePath}`);
+      console.log("");
+      console.log(chalk.yellow("  API key (shown once):"));
+      console.log(`  ${result.apiKey}`);
+      console.log("");
+    });
+
+  keyCmd
+    .command("list")
+    .description("List programmatic API keys without printing secrets")
+    .option("--json", "Output as JSON", false)
+    .action(async (opts: { json?: boolean }) => {
+      const { listApiKeysForCli } = await import("../auth/apiKeyCli.js");
+      const result = listApiKeysForCli({ workspace: process.cwd() });
+      if (opts.json) {
+        console.log(JSON.stringify(result, null, 2));
+        return;
+      }
+      console.log(chalk.bold("\nAMC API keys\n"));
+      if (result.keys.length === 0) {
+        console.log(chalk.gray("  No API keys found."));
+        console.log(chalk.gray(`  Store: ${result.storePath}`));
+        console.log("");
+        return;
+      }
+      for (const key of result.keys) {
+        console.log(
+          `  ${chalk.bold(key.keyId)} ${key.scope.padEnd(9)} ${key.status.padEnd(7)} ${key.prefix.padEnd(16)} ${key.label}`
+        );
+        console.log(chalk.gray(`    created=${formatTimestamp(key.createdTs)} expires=${formatTimestamp(key.expiresTs)} lastUsed=${formatTimestamp(key.lastUsedTs)}`));
+      }
+      console.log("");
+      console.log(chalk.gray(`  Store: ${result.storePath}`));
+      console.log("");
+    });
+
+  keyCmd
+    .command("revoke")
+    .description("Revoke a programmatic API key")
+    .argument("<keyId>", "API key ID")
+    .option("--json", "Output as JSON", false)
+    .action(async (keyId: string, opts: { json?: boolean }) => {
+      const { revokeApiKeyForCli } = await import("../auth/apiKeyCli.js");
+      const result = revokeApiKeyForCli({ workspace: process.cwd(), keyId });
+      if (opts.json) {
+        console.log(JSON.stringify(result, null, 2));
+        return;
+      }
+      console.log(chalk.green(`API key revoked: ${result.record.keyId}`));
+      console.log(chalk.gray(`  Store: ${result.storePath}`));
     });
 }

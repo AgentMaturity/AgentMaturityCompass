@@ -12,7 +12,7 @@ export interface FeatureGateResult {
 }
 
 const FEATURE_LABELS: Record<string, string> = {
-  "full-diagnostic": "full 240-question diagnostic",
+  "full-diagnostic": "full default diagnostic",
   "pdf-export": "PDF export",
   "html-export": "HTML export",
   badges: "maturity badges",

@@ -63,6 +63,32 @@ export type MCPAttackCategory =
   | "resource-exhaustion"
   | "supply-chain";
 
+export type MCPAttackCategoryFilter = MCPAttackCategory | "all";
+
+const MCP_ATTACK_CATEGORY_ALIASES: Record<string, MCPAttackCategoryFilter> = {
+  "all": "all",
+  "*": "all",
+  "tool-poison": "tool-poisoning",
+  "tool-poisoning": "tool-poisoning",
+  "prompt-inject": "tool-poisoning",
+  "prompt-injection": "tool-poisoning",
+  "data-exfil": "data-exfiltration",
+  "data-exfiltration": "data-exfiltration",
+  "credential-theft": "credential-theft",
+  "credential-harvest": "credential-theft",
+  "priv-esc": "privilege-escalation",
+  "privilege-escalation": "privilege-escalation",
+  "destructive-action": "destructive-action",
+  "rug-pull": "rug-pull",
+  "cross-server-exfil": "cross-server-exfil",
+  "permission-bypass": "permission-bypass",
+  "shadow-tool": "shadow-tool",
+  "resource-exhaust": "resource-exhaustion",
+  "resource-exhaustion": "resource-exhaustion",
+  "supply-chain": "supply-chain",
+  "server-spoofing": "server-spoofing",
+};
+
 /* ------------------------------------------------------------------ */
 /*  Evil Tool Library                                                   */
 /* ------------------------------------------------------------------ */
@@ -554,6 +580,46 @@ function buildScenarios(tools: EvilToolDefinition[]): MCPAgentScenario[] {
   ];
 }
 
+export function listMCPAttackCategories(): MCPAttackCategory[] {
+  const categories = new Set<MCPAttackCategory>();
+  for (const scenario of buildScenarios(buildEvilTools())) {
+    for (const category of scenario.categories) {
+      categories.add(category);
+    }
+  }
+  return [...categories].sort();
+}
+
+export function normalizeMCPAttackCategories(
+  categories?: readonly string[]
+): MCPAttackCategory[] | undefined {
+  if (!categories || categories.length === 0) return undefined;
+
+  const implemented = new Set(listMCPAttackCategories());
+  const normalized = new Set<MCPAttackCategory>();
+
+  for (const rawCategory of categories) {
+    const key = rawCategory.trim().toLowerCase().replace(/_/g, "-");
+    if (!key) continue;
+
+    const category = MCP_ATTACK_CATEGORY_ALIASES[key];
+    if (!category) {
+      throw new Error(
+        `Unknown MCP attack category: ${rawCategory}. Available: all, ${listMCPAttackCategories().join(", ")}`
+      );
+    }
+    if (category === "all") return undefined;
+    if (!implemented.has(category)) {
+      throw new Error(
+        `MCP attack category is not implemented by built-in scenarios yet: ${category}. Available: ${listMCPAttackCategories().join(", ")}`
+      );
+    }
+    normalized.add(category);
+  }
+
+  return normalized.size > 0 ? [...normalized] : undefined;
+}
+
 /* ------------------------------------------------------------------ */
 /*  Tool Call Recording                                                 */
 /* ------------------------------------------------------------------ */
@@ -893,7 +959,7 @@ export interface RunMCPAgentRedTeamInput {
   workspace: string;
   agentId?: string;
   /** Filter to specific attack categories. Default: all */
-  attackCategories?: MCPAttackCategory[];
+  attackCategories?: MCPAttackCategoryFilter[];
   /** Path to write markdown report */
   output?: string;
 }
@@ -909,11 +975,12 @@ export async function runMCPAgentRedTeam(
   const toolLib = buildEvilTools();
   let scenarios = buildScenarios(toolLib);
 
+  const requestedCategories = normalizeMCPAttackCategories(input.attackCategories);
+
   // Filter by categories if specified
-  if (input.attackCategories && input.attackCategories.length > 0 && !input.attackCategories.includes("tool-poisoning" as any)) {
-    // Only filter if not requesting all
+  if (requestedCategories && requestedCategories.length > 0) {
     scenarios = scenarios.filter((s) =>
-      s.categories.some((c) => input.attackCategories!.includes(c))
+      s.categories.some((c) => requestedCategories.includes(c))
     );
   }
 

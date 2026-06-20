@@ -4,6 +4,39 @@ AMC's runtime protection is implemented across several module groups: **Assuranc
 
 ---
 
+## Runtime Shield Analysis
+
+Use runtime analysis when you need to evaluate a proposed agent action, not a static skill file. It runs the Shield trust pipeline and reports the pre-action gate decision, risk level, stage summaries, recommendations, and evidence-chain hashes.
+
+### `amc shield analyze-runtime`
+Analyze a live/proposed action before the agent executes it.
+```bash
+amc shield analyze-runtime \
+  --agent my-agent \
+  --action "export customer ticket" \
+  --tool external-api \
+  --parameters '{"ticketId":"T-100"}' \
+  --sensitive-fields customerEmail,ssn \
+  --credential-age-minutes 45 \
+  --confidence 0.8 \
+  --json
+```
+
+Useful options:
+
+| Option | Purpose |
+|--------|---------|
+| `--parameters <json>` | Runtime tool parameters as a JSON object. |
+| `--sensitive-fields <csv>` | Names fields that should trigger leakage checks when sent to external tools. |
+| `--instruction-source <source>` | Models whether the action came from `system`, `developer`, `user`, or untrusted `tool` content. |
+| `--credential-age-minutes <n>` | Models stale or expired authorization context. |
+| `--confidence <n>` | Runtime confidence from `0` to `1`; low values trigger human-review recommendations. |
+| `--fail-on-block` | Exits non-zero when the Shield gate blocks the action. |
+
+For static skill-file analysis, continue using `amc shield analyze <path>`.
+
+---
+
 ## Assurance Lab (Shield)
 
 Deterministic defensive assurance packs that test agent behavior.

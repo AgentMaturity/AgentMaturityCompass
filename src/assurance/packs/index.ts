@@ -101,6 +101,7 @@ import { inputFaultResiliencePack } from "./inputFaultResiliencePack.js";
 import { thoughtSafetyAuditPack } from "./thoughtSafetyAuditPack.js";
 import { reasoningLockDetectionPack } from "./reasoningLockDetectionPack.js";
 import { multiTurnToolAttackPack } from "./multiTurnToolAttackPack.js";
+import { adversarialAlignmentProbesPack } from "./adversarialAlignmentProbesPack.js";
 // Simulation & Forecast Lane Packs (MiroFish Gap Bridge)
 import { forecastLegitimacyPack } from "./forecastLegitimacyPack.js";
 import { factSimulationBoundaryPack } from "./factSimulationBoundaryPack.js";
@@ -216,6 +217,7 @@ const assurancePacks: AssurancePackDefinition[] = [
   thoughtSafetyAuditPack,
   reasoningLockDetectionPack,
   multiTurnToolAttackPack,
+  adversarialAlignmentProbesPack,
   // Simulation & Forecast Lane Packs (MiroFish Gap Bridge)
   forecastLegitimacyPack,
   factSimulationBoundaryPack,

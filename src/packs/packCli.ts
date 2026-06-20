@@ -5,7 +5,7 @@
  * for the community assurance pack registry with NPM-style functionality.
  */
 
-import { join, resolve, basename } from "node:path";
+import { join, resolve, basename, sep } from "node:path";
 import { readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync } from "node:fs";
 import { execSync } from "node:child_process";
 import { createHash } from "node:crypto";
@@ -77,6 +77,42 @@ function loadRegistryConfig(workspace: string): PackRegistryConfig {
   }
 }
 
+function isWithinDirectory(parent: string, child: string): boolean {
+  const resolvedParent = resolve(parent);
+  const resolvedChild = resolve(child);
+  return resolvedChild === resolvedParent || resolvedChild.startsWith(`${resolvedParent}${sep}`);
+}
+
+function communityRegistryReviewSteps(): string[] {
+  return [
+    "Review governance checklist: docs/ASSURANCE_LAB.md#community-registry-review-gates",
+    "Confirm provenance/licensing and source references are documented before upload",
+    "Run moderation checks: no secrets, malware, unsafe prompts, hidden network calls, or unlicensed copied content"
+  ];
+}
+
+export function resolvePackEntryPath(packDir: string, manifestMain?: string): string | null {
+  const resolvedPackDir = resolve(packDir);
+  const candidates = [
+    manifestMain ? resolve(resolvedPackDir, manifestMain) : null,
+    join(resolvedPackDir, "index.mjs"),
+    join(resolvedPackDir, "index.js")
+  ];
+  const seen = new Set<string>();
+
+  for (const candidate of candidates) {
+    if (!candidate || seen.has(candidate) || !isWithinDirectory(resolvedPackDir, candidate)) {
+      continue;
+    }
+    seen.add(candidate);
+    if (pathExists(candidate)) {
+      return candidate;
+    }
+  }
+
+  return null;
+}
+
 /* ── amc pack install <name> ─────────────────────────────────── */
 
 export async function packInstallCli(params: {
@@ -137,6 +173,11 @@ export async function packPublishCli(params: {
   name: string;
   version: string;
   registry: string;
+  published: boolean;
+  destinationKind: "dry-run" | "local-bundle" | "registry";
+  tarballPath?: string;
+  integrity?: string;
+  nextSteps: string[];
   message: string;
 }> {
   const packDir = params.packDir ? resolve(params.packDir) : process.cwd();
@@ -148,6 +189,9 @@ export async function packPublishCli(params: {
       name: "",
       version: "",
       registry: "",
+      published: false,
+      destinationKind: "local-bundle",
+      nextSteps: ["Run: amc pack init --name my-pack"],
       message: "No package.json found. Run 'amc pack init' first."
     };
   }
@@ -164,6 +208,9 @@ export async function packPublishCli(params: {
         name: manifest.name || "",
         version: manifest.version || "",
         registry: "",
+        published: false,
+        destinationKind: "local-bundle",
+        nextSteps: ["Fix package.json, then run: amc pack test ."],
         message: `Invalid manifest:\n${validation.errors.join('\n')}`
       };
     }
@@ -173,6 +220,7 @@ export async function packPublishCli(params: {
     }
     
     const validatedManifest = validation.manifest;
+    const registryUrl = params.registry?.trim();
     
     // Check if this is a dry run
     if (params.dryRun) {
@@ -180,28 +228,94 @@ export async function packPublishCli(params: {
         success: true,
         name: validatedManifest.name,
         version: validatedManifest.version,
-        registry: params.registry || "default",
-        message: `Would publish ${validatedManifest.name}@${validatedManifest.version} to ${params.registry || "default registry"}`
+        registry: registryUrl || "local-bundle",
+        published: false,
+        destinationKind: "dry-run",
+        nextSteps: registryUrl
+          ? [
+              ...communityRegistryReviewSteps(),
+              `Run without --dry-run to upload: amc pack publish . --registry ${registryUrl}`
+            ]
+          : [
+              "Run without --dry-run to create a local tarball bundle.",
+              ...communityRegistryReviewSteps(),
+              "Start a local registry: amc pack registry serve --port 4873",
+              "Upload to it: amc pack publish . --registry http://127.0.0.1:4873"
+            ],
+        message: registryUrl
+          ? `Would upload ${validatedManifest.name}@${validatedManifest.version} to ${registryUrl}`
+          : `Would create a local publish bundle for ${validatedManifest.name}@${validatedManifest.version}`
       };
     }
     
     // Create tarball using the real createPackTarball from packRegistry
     const tarball = createPackTarball(packDir);
+    const integrity = createHash("sha256").update(tarball).digest("hex");
     
-    // Write tarball to pack output directory for registry upload
-    const registryUrl = params.registry || DEFAULT_REGISTRY_CONFIG.defaultRegistry;
     const tarballDir = join(packDir, ".amc", "tarballs");
-    const { mkdirSync, writeFileSync } = await import("node:fs");
     mkdirSync(tarballDir, { recursive: true });
     const tarballPath = join(tarballDir, `${validatedManifest.name}-${validatedManifest.version}.tgz`);
     writeFileSync(tarballPath, tarball);
+
+    if (!registryUrl) {
+      return {
+        success: true,
+        name: validatedManifest.name,
+        version: validatedManifest.version,
+        registry: "local-bundle",
+        published: false,
+        destinationKind: "local-bundle",
+        tarballPath,
+        integrity,
+        nextSteps: [
+          ...communityRegistryReviewSteps(),
+          "Start a local registry: amc pack registry serve --port 4873",
+          "Upload to it: amc pack publish . --registry http://127.0.0.1:4873",
+          `Verify discovery: amc pack search ${validatedManifest.name}`
+        ],
+        message: `Created local publish bundle for ${validatedManifest.name}@${validatedManifest.version} at ${tarballPath}`
+      };
+    }
+
+    const filename = `${validatedManifest.name}-${validatedManifest.version}.tgz`;
+    const publishPayload = {
+      ...validatedManifest,
+      _attachments: {
+        [filename]: {
+          content_type: "application/gzip",
+          data: tarball.toString("base64"),
+          length: tarball.length,
+          shasum: integrity
+        }
+      }
+    };
+    const publishUrl = new URL(encodeURIComponent(validatedManifest.name), registryUrl.endsWith("/") ? registryUrl : `${registryUrl}/`).toString();
+    const response = await fetch(publishUrl, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(publishPayload)
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text().catch(() => response.statusText);
+      throw new Error(`registry upload failed (${response.status}): ${errorText}`);
+    }
     
     return {
       success: true,
       name: validatedManifest.name,
       version: validatedManifest.version,
       registry: registryUrl,
-      message: `Successfully published ${validatedManifest.name}@${validatedManifest.version} to ${registryUrl} (tarball: ${tarballPath})`
+      published: true,
+      destinationKind: "registry",
+      tarballPath,
+      integrity,
+      nextSteps: [
+        "Record registry review evidence before promoting the pack broadly",
+        `Verify discovery: amc pack search ${validatedManifest.name}`,
+        `Install from registry when configured: amc pack install ${validatedManifest.name}`
+      ],
+      message: `Published ${validatedManifest.name}@${validatedManifest.version} to ${registryUrl}`
     };
     
   } catch (error: any) {
@@ -210,6 +324,9 @@ export async function packPublishCli(params: {
       name: "",
       version: "",
       registry: "",
+      published: false,
+      destinationKind: "local-bundle",
+      nextSteps: ["Run: amc pack test ."],
       message: error.message || String(error)
     };
   }

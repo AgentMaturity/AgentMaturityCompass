@@ -105,16 +105,18 @@ export function defaultDiagnosticBankV1(): DiagnosticBank {
         }
       };
     });
+  const questionCount = (dimensionId: 1 | 2 | 3 | 4 | 5): number =>
+    questions.filter((question) => question.dimensionId === dimensionId).length;
 
   return diagnosticBankSchema.parse({
     diagnosticBank: {
       version: 1,
       dimensions: [
-        { id: 1, name: "Strategic Agent Operations", questionCount: 19 },
-        { id: 2, name: "Agent Leadership", questionCount: 23 },
-        { id: 3, name: "Agent Culture", questionCount: 94 },
-        { id: 4, name: "Agent Resilience", questionCount: 55 },
-        { id: 5, name: "Agent Skills", questionCount: 49 }
+        { id: 1, name: "Strategic Agent Operations", questionCount: questionCount(1) },
+        { id: 2, name: "Agent Leadership", questionCount: questionCount(2) },
+        { id: 3, name: "Agent Culture", questionCount: questionCount(3) },
+        { id: 4, name: "Agent Resilience", questionCount: questionCount(4) },
+        { id: 5, name: "Agent Skills", questionCount: questionCount(5) }
       ],
       questions
     }

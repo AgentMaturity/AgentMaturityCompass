@@ -71,7 +71,7 @@ async function renderScope(params, scope, id, title) {
         <button id="valueRefreshBtn">Refresh Value Snapshot</button>
         <a href="./valueKpis">Open KPI Detail</a>
       </div>
-      <canvas id="valueTrendCanvas" width="640" height="170"></canvas>
+      <canvas id="valueTrendCanvas" width="640" height="170" role="img" aria-label="Value realization trend chart for the selected scope."></canvas>
       <p class="muted">Realtime + continuous recurrence: value snapshots refresh on cadence and key governance events.</p>
       `
     ),

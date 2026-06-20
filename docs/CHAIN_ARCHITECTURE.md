@@ -222,7 +222,7 @@ AMC can ingest evidence from systems that operate at Level 1 only:
 
 ```bash
 # Ingest external JSONL logs (e.g., from Codex or any agent)
-amc ingest --source ./external-agent-logs/ --format jsonl --agent imported-agent
+amc ingest ./external-agent-logs/ --type generic_json --agent imported-agent
 
 # Evidence arrives as SELF_REPORTED (0.4× trust)
 # Upgrade to ATTESTED via human/notary attestation

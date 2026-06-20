@@ -235,21 +235,33 @@ function relativeAgentPathFromWorkspace(workspace: string, path: string): string
 export function initCiForAgent(params: {
   workspace: string;
   agentId?: string;
+  signPolicy?: boolean;
 }): {
   workflowPath: string;
   policyPath: string;
-  policySigPath: string;
+  policySigPath: string | null;
   suggestedBundlePath: string;
+  signed: boolean;
 } {
   const agentId = resolveAgentId(params.workspace, params.agentId);
   const agentPaths = getAgentPaths(params.workspace, agentId);
+  const signPolicy = params.signPolicy !== false;
 
   const policy = defaultGatePolicy();
-  const savedPolicy = writeSignedGatePolicy({
-    workspace: params.workspace,
-    policyPath: agentPaths.gatePolicy,
-    policy
-  });
+  const savedPolicy = signPolicy
+    ? writeSignedGatePolicy({
+        workspace: params.workspace,
+        policyPath: agentPaths.gatePolicy,
+        policy
+      })
+    : (() => {
+        ensureDir(dirname(agentPaths.gatePolicy));
+        writeFileAtomic(agentPaths.gatePolicy, JSON.stringify(policy, null, 2), 0o644);
+        return {
+          policyPath: agentPaths.gatePolicy,
+          sigPath: null
+        };
+      })();
 
   const workflowPath = join(params.workspace, ".github", "workflows", "amc.yml");
   ensureDir(dirname(workflowPath));
@@ -265,6 +277,20 @@ export function initCiForAgent(params: {
     params.workspace,
     join(agentPaths.rootDir, "experimentGate.json")
   );
+  const gateCommand = `amc gate --bundle ${relBundle} --policy ${relPolicy}${signPolicy ? "" : " --no-sign"}`;
+  const bomSteps = signPolicy
+    ? [
+        "      - name: Generate maturity BOM",
+        `        run: amc bom generate --agent ${agentId} --run latest --out amc-bom.json`,
+        "      - name: Sign maturity BOM",
+        "        run: amc bom sign --in amc-bom.json --out amc-bom.json.sig"
+      ]
+    : [
+        "      - name: Generate maturity BOM",
+        `        run: amc bom generate --agent ${agentId} --run latest --out amc-bom.json`,
+        "      - name: Unsigned CI boundary",
+        "        run: echo \"UNSIGNED CI mode: maturity BOM signing skipped; run amc ci init after vault setup for verifier-ready signatures.\""
+      ];
 
   const workflow = [
     "name: AMC Release Gate",
@@ -292,11 +318,8 @@ export function initCiForAgent(params: {
     "      - name: Optional experiment gate",
     `        run: if [ -n \"${"$"}AMC_EXPERIMENT_ID\" ] && [ -f \"${relExperimentPolicy}\" ]; then amc experiment gate --agent ${agentId} --experiment \"${"$"}AMC_EXPERIMENT_ID\" --policy ${relExperimentPolicy}; else echo \"Experiment gate skipped (set AMC_EXPERIMENT_ID and commit ${relExperimentPolicy})\"; fi`,
     "      - name: Enforce AMC gate policy",
-    `        run: amc gate --bundle ${relBundle} --policy ${relPolicy}`,
-    "      - name: Generate maturity BOM",
-    `        run: amc bom generate --agent ${agentId} --run latest --out amc-bom.json`,
-    "      - name: Sign maturity BOM",
-    "        run: amc bom sign --in amc-bom.json --out amc-bom.json.sig",
+    `        run: ${gateCommand}`,
+    ...bomSteps,
     ""
   ].join("\n");
 
@@ -306,7 +329,8 @@ export function initCiForAgent(params: {
     workflowPath,
     policyPath: savedPolicy.policyPath,
     policySigPath: savedPolicy.sigPath,
-    suggestedBundlePath
+    suggestedBundlePath,
+    signed: signPolicy
   };
 }
 
@@ -340,6 +364,7 @@ export async function runBundleGate(params: {
   workspace: string;
   bundlePath: string;
   policyPath: string;
+  requireSignedPolicy?: boolean;
 }): Promise<{ pass: boolean; reasons: string[]; report: DiagnosticReport; policy: GatePolicy }> {
   const verification = await verifyEvidenceBundle(resolve(params.workspace, params.bundlePath));
   const reasons: string[] = [];
@@ -349,12 +374,14 @@ export async function runBundleGate(params: {
 
   const policyRaw = JSON.parse(readFileSync(resolve(params.workspace, params.policyPath), "utf8")) as unknown;
   const policy = parseGatePolicy(policyRaw);
-  const signature = verifyGatePolicySignature({
-    workspace: params.workspace,
-    policyPath: params.policyPath
-  });
-  if (!signature.valid) {
-    reasons.push(`gate policy signature invalid: ${signature.reason ?? "unknown"}`);
+  if (params.requireSignedPolicy !== false) {
+    const signature = verifyGatePolicySignature({
+      workspace: params.workspace,
+      policyPath: params.policyPath
+    });
+    if (!signature.valid) {
+      reasons.push(`gate policy signature invalid: ${signature.reason ?? "unknown"}`);
+    }
   }
 
   const loaded = loadBundleRunAndTrustMap(resolve(params.workspace, params.bundlePath));

@@ -1,0 +1,12 @@
+config:
+  amc-helm-release:releaseName: amc
+  amc-helm-release:namespace: amc-system
+  amc-helm-release:chartPath: ../../helm/amc
+  amc-helm-release:imageRepository: ghcr.io/your-org/amc-studio
+  amc-helm-release:imageTag: latest
+  amc-helm-release:bootstrapSecretName: amc-bootstrap
+  amc-helm-release:ingressEnabled: false
+  amc-helm-release:ingressHost: amc.example.com
+  amc-helm-release:storageClassName: ""
+  amc-helm-release:workspaceStorageSize: 10Gi
+  amc-helm-release:timeoutSeconds: 600
