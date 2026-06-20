@@ -172,12 +172,12 @@ function renderDrilldown(params, data) {
   const criteria = `<table><thead><tr><th>Criterion</th><th>Type</th><th>Status</th><th>Evidence refs</th><th>Repair</th></tr></thead><tbody>${criteriaRows(data.criteriaPreview)}</tbody></table>`;
 
   const studio = `
-    <p class="muted">Scorable Studio Drilldown and Langfuse observability rows use the same AMC-owned evidenceDrilldown route. Source links point to live repository artifacts; no upstream UI/prose/assets/code are embedded.</p>
+    <p class="muted">Scorable Studio Drilldown rows use the same AMC-owned evidenceDrilldown route. Source links point to live repository artifacts; no upstream UI/prose/assets/code are embedded.</p>
     <table><thead><tr><th>Drilldown</th><th>Source</th><th>Surface</th><th>UI route</th><th>Evidence preview</th><th>Source artifact links</th><th>Preview hashes and states</th><th>Status</th><th>Repair</th></tr></thead><tbody>${scorableStudioRows(data.scorableStudioDrilldownPreview)}</tbody></table>
   `;
 
   const obsStudio = `
-    <p class="muted">Observability Studio drilldown rows bind AMC-owned UI routes to source artifact links, evidence previews, and empty/error-state receipts. Paper metadata is shown only as verified source identity; no paper prose, figures, or data are embedded.</p>
+    <p class="muted">Observability Studio drilldown rows bind AMC-owned UI routes to source artifact links, evidence previews, and empty/error-state receipts for product, repository, and paper sources such as Literal AI or Langfuse. Source metadata is shown only as verified identity; no upstream UI/prose/assets/code, SDK, importer, or subsystem is embedded.</p>
     <table><thead><tr><th>Drilldown</th><th>Source</th><th>OpenAlex</th><th>DOI</th><th>UI route</th><th>Evidence preview</th><th>Source artifact links</th><th>Preview hashes and states</th><th>Status</th></tr></thead><tbody>${obsStudioRows(data.obsStudioDrilldownPreview)}</tbody></table>
   `;
 
@@ -203,7 +203,7 @@ function renderDrilldown(params, data) {
     localCard(params, "Evidence Drilldown", body),
     localCard(params, "Evidence Preview", evidence),
     localCard(params, "Criterion Preview", criteria),
-    localCard(params, "Scorable Studio Drilldown / Langfuse Observability Drilldown", studio),
+    localCard(params, "Scorable Studio Drilldown", studio),
     localCard(params, "Observability Studio Drilldown", obsStudio),
     extras,
     localCard(params, "Raw drilldown JSON", jsonBlock(data)),

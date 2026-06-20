@@ -91,6 +91,54 @@ export function lunaryObservabilityMetricValidityRequirements(): string[] {
   return [...LUNARY_OBSERVABILITY_METRIC_VALIDITY_REQUIREMENTS];
 }
 
+export const GOOGLE_ADK_EVAL_METRIC_VALIDITY_SOURCE_REF = "github:google/adk-python";
+
+export const GOOGLE_ADK_EVAL_METRIC_VALIDITY_REQUIREMENTS = [
+  "live GitHub metadata relevance review",
+  "AMC-owned eval-pack manifest",
+  "validation table artifact",
+  "evaluator-suite proof using existing primitives",
+  "trace-evaluation proof when traces or Watch are claimed",
+  "fail-closed threshold policy",
+  "Score/Shield/Watch surface mapping",
+  "metric owner",
+  "sample size",
+  "confidence interval",
+  "signed evidence refs",
+  "artifact hashes",
+  "row hashes",
+  "no-copy/source-review boundary proof"
+] as const;
+
+export function googleAdkEvalMetricValidityRequirements(): string[] {
+  return [...GOOGLE_ADK_EVAL_METRIC_VALIDITY_REQUIREMENTS];
+}
+
+export const DIGITAL_MATERIALS_ECOSYSTEM_METRIC_VALIDITY_SOURCE_REF = "doi:10.1039/d5sc09229a; openalex:W7131071926";
+
+export const DIGITAL_MATERIALS_ECOSYSTEM_METRIC_VALIDITY_REQUIREMENTS = [
+  "verified DOI metadata receipt",
+  "verified OpenAlex metadata receipt",
+  "metadata-only source-review proof",
+  "AMC-owned eval-pack manifest",
+  "validation table artifact",
+  "existing metric-validation primitive mapping",
+  "trace or evaluator proof when claimed",
+  "Score/Shield/Watch surface mapping",
+  "fail-closed threshold policy",
+  "metric owner",
+  "sample size",
+  "confidence interval",
+  "signed evidence refs",
+  "artifact hashes",
+  "row hashes",
+  "no-copy/source-review boundary proof"
+] as const;
+
+export function digitalMaterialsEcosystemMetricValidityRequirements(): string[] {
+  return [...DIGITAL_MATERIALS_ECOSYSTEM_METRIC_VALIDITY_REQUIREMENTS];
+}
+
 export interface BuildMetricValidationInput {
   agentId: string;
   runId: string;

@@ -512,6 +512,45 @@ function report(overrides: Partial<DiagnosticReport> = {}): DiagnosticReport {
               rowHash: "f".repeat(64),
             },
           ],
+          obsStudioDrilldownLens: [
+            {
+              drilldownId: "literal-ai-product-studio-drilldown",
+              sourceRef: "https://docs.literalai.com/llms.txt",
+              sourceKind: "product",
+              publisherRef: "Literal AI docs",
+              titleRef: "Literal AI observability, evaluation, dashboard, logs, and online evals",
+              venueRef: "docs.literalai.com",
+              publicationDate: "2026-06-20",
+              uiRoutePath: "/api/v1/score/evidence-drilldown/run-1/AMC-1.1",
+              sourceArtifactLinks: buildWatchObsStudioSourceArtifactLinks({
+                sourceUrl: "https://literalai.com",
+                docsIndexUrl: "https://docs.literalai.com/llms.txt",
+                docsPageUrls: [
+                  "https://docs.literalai.com/get-started/overview.md",
+                  "https://docs.literalai.com/guides/dashboard.md",
+                  "https://docs.literalai.com/guides/logs.md",
+                  "https://docs.literalai.com/guides/online-evals.md",
+                ],
+              }),
+              tracePreviewHash: "1".repeat(64),
+              reasoningTracePreviewHash: "2".repeat(64),
+              receiptPreviewHash: "3".repeat(64),
+              evidencePreviewHash: "4".repeat(64),
+              sourceArtifactPreviewHash: "5".repeat(64),
+              emptyStateHash: "6".repeat(64),
+              errorStateHash: "7".repeat(64),
+              evidencePreviewState: "ready",
+              evidencePreviewCount: 4,
+              minEvidencePreviewCount: 2,
+              sourceArtifactLinkCount: 6,
+              minSourceArtifactLinkCount: 4,
+              status: "satisfied",
+              evidenceRefs: ["ev-pass"],
+              rejectedEvidenceRefs: ["ev-reject"],
+              repairHint: "Keep Literal AI source artifact links, AMC-owned route proof, preview hashes, and empty/error state receipts attached without copying upstream UI or docs prose.",
+              rowHash: "8".repeat(64),
+            },
+          ],
           missingGateReasons: ["failed gate 4"],
           repairHint: "Collect signed mission evidence.",
           scoreReceiptRef: "diagnostic://run-1/question/AMC-1.1",
@@ -777,6 +816,32 @@ describe("buildScoreEvidenceDrilldown", () => {
     expect(out.scorableStudioDrilldownPreview[0]?.sourceArtifactLinks).toContain(
       "https://github.com/root-signals/scorable-sdk/tree/3498486b9d567099d6ec9849a7391537233752d2"
     );
+    expect(out.obsStudioDrilldownPreview[0]).toMatchObject({
+      drilldownId: "literal-ai-product-studio-drilldown",
+      sourceRef: "https://docs.literalai.com/llms.txt",
+      sourceKind: "product",
+      publisherRef: "Literal AI docs",
+      titleRef: "Literal AI observability, evaluation, dashboard, logs, and online evals",
+      venueRef: "docs.literalai.com",
+      uiRoutePath: "/api/v1/score/evidence-drilldown/run-1/AMC-1.1",
+      evidencePreviewState: "ready",
+      evidencePreviewCount: 4,
+      minEvidencePreviewCount: 2,
+      sourceArtifactLinkCount: 6,
+      minSourceArtifactLinkCount: 4,
+      status: "satisfied",
+      evidenceRefs: ["ev-pass"],
+      rejectedEvidenceRefs: ["ev-reject"],
+      rowHash: "8".repeat(64),
+    });
+    expect(out.obsStudioDrilldownPreview[0]?.sourceArtifactLinks).toEqual([
+      "https://literalai.com",
+      "https://docs.literalai.com/llms.txt",
+      "https://docs.literalai.com/get-started/overview.md",
+      "https://docs.literalai.com/guides/dashboard.md",
+      "https://docs.literalai.com/guides/logs.md",
+      "https://docs.literalai.com/guides/online-evals.md",
+    ]);
     expect(out.repairHint).toBe("Collect signed mission evidence.");
     expect(out.failClosed).toBe(true);
   });
@@ -810,12 +875,35 @@ describe("buildScoreEvidenceDrilldown", () => {
     expect(out.message).toContain("No question-level receipt found");
     expect(out.manifestHash).toBe("a".repeat(64));
     expect(out.scorableStudioDrilldownPreview).toEqual([]);
+    expect(out.obsStudioDrilldownPreview).toEqual([]);
+  });
+
+  test("builds product source artifact links for Literal AI without duplicating docs links", () => {
+    const links = buildWatchObsStudioSourceArtifactLinks({
+      sourceUrl: " https://literalai.com ",
+      docsIndexUrl: "https://docs.literalai.com/llms.txt",
+      docsPageUrls: [
+        "https://docs.literalai.com/guides/dashboard.md",
+        "https://docs.literalai.com/guides/dashboard.md",
+        "https://docs.literalai.com/guides/logs.md",
+      ],
+    });
+
+    expect(links).toEqual([
+      "https://literalai.com",
+      "https://docs.literalai.com/llms.txt",
+      "https://docs.literalai.com/guides/dashboard.md",
+      "https://docs.literalai.com/guides/logs.md",
+    ]);
   });
 
   test("renders the Scorable Studio drilldown table in the console bundle", () => {
     const bundle = readFileSync("src/console/assets/evidenceDrilldown.js", "utf8");
 
     expect(bundle).toContain("scorableStudioDrilldownPreview");
+    expect(bundle).toContain("obsStudioDrilldownPreview");
     expect(bundle).toContain("Scorable Studio Drilldown");
+    expect(bundle).toContain("Literal AI");
+    expect(bundle).toContain("no upstream UI/prose/assets/code, SDK, importer, or subsystem");
   });
 });

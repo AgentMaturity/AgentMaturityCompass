@@ -217,6 +217,18 @@ export {
   type TrismAgenticSurface,
 } from './trismAgenticLiveDrift.js';
 export {
+  NARROW_TASK_BROAD_MISALIGNMENT_METADATA,
+  runNarrowTaskBroadMisalignmentLiveDrift,
+  type NarrowTaskBroadMisalignmentDriftStatistic,
+  type NarrowTaskBroadMisalignmentLiveDriftResult,
+  type NarrowTaskBroadMisalignmentLiveDriftRow,
+  type NarrowTaskBroadMisalignmentMetadataProof,
+  type NarrowTaskBroadMisalignmentRiskSignal,
+  type NarrowTaskBroadMisalignmentRowProof,
+  type NarrowTaskBroadMisalignmentSurface,
+  type RunNarrowTaskBroadMisalignmentLiveDriftInput,
+} from './narrowTaskBroadMisalignmentLiveDrift.js';
+export {
   runBraintrustLiveDrift,
   type BraintrustLiveDriftResult,
   type BraintrustLiveDriftRow,

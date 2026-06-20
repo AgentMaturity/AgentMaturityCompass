@@ -109,6 +109,7 @@ export type LiveDriftMetricId =
   | "agentSecurityFalsePositiveRate0to1"
   | "agentSecurityEvidenceCoverage0to1"
   | "trismAgenticEvidenceCoverage0to1"
+  | "narrowTaskBroadMisalignmentEvidenceCoverage0to1"
   | "agentSecurityLatencyP95Ms"
   | "agentSecurityContextDistribution"
   | "agentTestingMethodologyCoverage0to1"

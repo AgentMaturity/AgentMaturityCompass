@@ -171,6 +171,17 @@ describe("2. Endpoint pattern consistency", () => {
     expect(errors).toEqual([]);
   });
 
+  test("OpenAPI exposes the AMC-owned Score evidence drilldown route", () => {
+    const spec = generateFullOpenApiSpec();
+    const route = spec.paths["/api/v1/score/evidence-drilldown/{runId}/{questionId}"] as any;
+
+    expect(route?.get?.tags).toEqual(expect.arrayContaining(["Studio", "Score", "Shield", "Watch"]));
+    expect(route?.get?.responses?.["200"]?.content?.["application/json"]?.schema?.$ref).toBe(
+      "#/components/schemas/ScoreEvidenceDrilldownResponse"
+    );
+    expect(spec.components.schemas).toHaveProperty("ScoreEvidenceDrilldownResponse");
+  });
+
   test("all router modules export a handler function", async () => {
     // Use static imports to verify router exports (vitest doesn't support computed dynamic imports)
     const mods = await Promise.all([

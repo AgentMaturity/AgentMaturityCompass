@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { buildMetricValidationReport } from "../src/score/metricValidity.js";
+import { buildMetricValidationReport, googleAdkEvalMetricValidityRequirements } from "../src/score/metricValidity.js";
 import type {
   DiagnosticReport,
   LayerName,
@@ -70,6 +70,22 @@ function prior(runId: string, ts: number, layerValue = 3): DiagnosticReport {
 const layerName: LayerName = "Strategic Agent Operations";
 
 describe("buildMetricValidationReport", () => {
+  test("exposes Google ADK metric-validity requirements without adding an ADK-specific adapter", () => {
+    const requirements = googleAdkEvalMetricValidityRequirements();
+
+    expect(requirements).toEqual(expect.arrayContaining([
+      "live GitHub metadata relevance review",
+      "AMC-owned eval-pack manifest",
+      "validation table artifact",
+      "evaluator-suite proof using existing primitives",
+      "trace-evaluation proof when traces or Watch are claimed",
+      "metric owner",
+      "sample size",
+      "confidence interval",
+      "no-copy/source-review boundary proof"
+    ]));
+  });
+
   test("builds a validation table with owners, samples, CIs, and stability", () => {
     const questionScores = [
       score("AMC-1.1"),

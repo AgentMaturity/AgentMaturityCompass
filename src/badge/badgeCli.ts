@@ -44,6 +44,10 @@ export function badgeMethodologyMetadata(opts: BadgeOptions = { level: 0 }): Pub
   return opts.methodology ?? getPublicMethodologyReference();
 }
 
+export function badgeSourceReviewNotice(methodology: PublicMethodologyReference = getPublicMethodologyReference()): string {
+  return `Source-review claims are methodology-bound by ${methodology.version}; metadata-only fact-checking/factuality-review signals require amc_methodology_assurance proof.`;
+}
+
 /**
  * Generate a shields.io badge URL for the given maturity level.
  */
@@ -94,6 +98,7 @@ export function formatBadgeOutput(opts: BadgeOptions): string {
   lines.push(`Methodology: ${methodology.id} ${methodology.version}`);
   lines.push(`Methodology Hash: ${methodology.hash}`);
   lines.push(`Methodology Assurance Hash: ${methodology.versioningAssuranceHash}`);
+  lines.push(`Source Review Notice: ${badgeSourceReviewNotice(methodology)}`);
   lines.push("");
   lines.push("Markdown (paste in README):");
   lines.push(`  ${generateBadge({ ...opts, format: "markdown" })}`);

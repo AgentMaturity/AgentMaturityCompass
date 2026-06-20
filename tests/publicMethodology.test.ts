@@ -55,9 +55,11 @@ describe("public methodology manifest", () => {
     expect(first.questionSet.version).toBe("amc-legacy-240-v1");
     expect(first.questionSet.questionCount).toBe(getAllQuestions().length);
     expect(first.changelog[0]?.version).toBe(AMC_PUBLIC_METHODOLOGY_VERSION);
-    expect(first.changelog[0]?.migration).toContain("Reports generated under 2026.06.20-r212");
-    expect(first.changelog[0]?.summary).toContain("Mastra-style agent-framework and Lunary-style observability/evaluation metric-validity boundaries");
+    expect(first.changelog[0]?.migration).toContain("Reports generated under 2026.06.20-r213");
+    expect(first.changelog[0]?.summary).toContain("fact-checking and factuality-evaluation review methodology boundaries");
+    expect(first.changelog[0]?.summary).toContain("Google ADK-style agent-toolkit evaluation metric-validity boundaries");
     for (const previousVersion of [
+      "2026.06.20-r213",
       "2026.06.20-r212",
       "2026.06.20-r211",
       "2026.06.20-r210",
@@ -1126,11 +1128,28 @@ describe("public methodology manifest", () => {
     const arizePhoenixGate = first.metricValidationGates.find((gate) => gate.gate === "arize_phoenix_observability_eval_coverage");
     expect(arizePhoenixGate?.defaultThreshold).toContain(">= 1.00 when required");
     expect(arizePhoenixGate?.migration).toContain("signed-evidence refs");
-    expect(first.deprecationNotice).toContain("2026.06.20-r213");
-    expect(first.migrationGuidance.join("\n")).toContain("Lunary-style observability");
+    const googleAdkBoundary = first.scoreClaimBoundaries.find((boundary) => boundary.boundary === "google_adk_eval_metric_validity");
+    expect(googleAdkBoundary?.appliesWhen).toContain("Score report");
+    expect(googleAdkBoundary?.appliesWhen).toContain("Shield receipt");
+    expect(googleAdkBoundary?.appliesWhen).toContain("Watch alert");
+    expect(googleAdkBoundary?.requiredEvidence).toContain("validation table artifact");
+    expect(googleAdkBoundary?.requiredEvidence).toContain("evaluator-suite proof using existing primitives");
+    expect(googleAdkBoundary?.requiredEvidence).toContain("trace-evaluation proof when traces or Watch are claimed");
+    expect(googleAdkBoundary?.requiredEvidence).toContain("metric owner");
+    expect(googleAdkBoundary?.requiredEvidence).toContain("sample size");
+    expect(googleAdkBoundary?.requiredEvidence).toContain("confidence interval");
+    expect(googleAdkBoundary?.publicDisclosure).toContain("not a Google ADK subsystem, adapter, importer, or parity claim");
+    expect(googleAdkBoundary?.publicDisclosure).toContain("does not authorize copied Google ADK code");
+    const googleAdkGate = first.metricValidationGates.find((gate) => gate.gate === "google_adk_eval_metric_validity");
+    expect(googleAdkGate?.defaultThreshold).toContain("validationTable present");
+    expect(googleAdkGate?.proofField).toContain("evaluatorSuiteCoverage");
+    expect(googleAdkGate?.proofField).toContain("traceEvaluationCoverage");
+    expect(first.deprecationNotice).toContain("2026.06.20-r214");
+    expect(first.migrationGuidance.join("\n")).toContain("Google ADK-style agent evaluation");
     const methodologyDoc = readFileSync("docs/SCORING_METHODOLOGY.md", "utf8");
-    expect(methodologyDoc).toContain("`2026.06.20-r213`");
-    expect(methodologyDoc).toContain("Mastra-style agent-framework and Lunary-style observability/evaluation metric-validity boundaries");
+    expect(methodologyDoc).toContain("`2026.06.20-r214`");
+    expect(methodologyDoc).toContain("Google ADK-style agent-toolkit evaluation metric-validity boundaries");
+    expect(methodologyDoc).toContain("AMC must not add a Google ADK subsystem");
     expect(methodologyDoc).toContain("AMC must not copy Phoenix website prose");
     expect(methodologyDoc).toContain("`2026.06.19-r164`");
     expect(methodologyDoc).toContain("`2026.06.19-r163`");
@@ -1341,6 +1360,8 @@ describe("public methodology manifest", () => {
       "lifecycle_observability_coverage",
       "arize_phoenix_observability_eval_coverage",
       "lunary_observability_metric_validity",
+      "google_adk_eval_metric_validity",
+      "digital_materials_ecosystem_metric_validity",
       "ranking_stability_coverage",
       "tool_sandbox_coverage",
       "continual_learning_coverage",
@@ -1428,6 +1449,7 @@ describe("public methodology manifest", () => {
       "agent_mont_monitoring_replay_evidence",
       "spent_session_cost_replay_evidence",
       "fire_fact_checking_replay_evidence",
+      "fact_checking_factuality_review_methodology_evidence",
       "nuclia_rag_triad_replay_evidence",
       "navi_bench_web_agent_live_drift_evidence",
       "agent_trial_statistical_question_explainability_evidence",
@@ -1937,12 +1959,17 @@ describe("public methodology manifest", () => {
     expect(report.methodologyVersioning?.sourceRef).toContain("github:sutro-sh/sutro");
     expect(report.methodologyVersioning?.sourceRef).toContain("github:jfrog/agent-belt");
     expect(report.methodologyVersioning?.sourceRef).toContain("https://phoenix.arize.com");
+    expect(report.methodologyVersioning?.sourceRef).toContain("github:google/adk-python");
     expect(report.methodologyVersioning?.receiptHash).toMatch(/^[a-f0-9]{64}$/);
     expect(report.methodologyVersioning?.badgeQueryParams).toContain("amc_methodology_assurance");
     expect(report.methodologyVersioning?.requiredAuditFields).toContain("arizePhoenixThresholdPolicy");
+    expect(report.methodologyVersioning?.requiredAuditFields).toContain("googleAdkValidationTable");
     expect(report.methodologyVersioning?.presentAuditFields).toContain("sourceReview.arizePhoenix.metricGate");
+    expect(report.methodologyVersioning?.presentAuditFields).toContain("sourceReview.googleAdk.metricGate");
     expect(report.methodologyVersioning?.evidenceRefs).toContain("amc:arize-phoenix-source-review-boundary");
+    expect(report.methodologyVersioning?.evidenceRefs).toContain("amc:google-adk-source-review-boundary");
     expect(report.methodologyVersioning?.rejectedEvidenceRefs).toContain("metadata-only:phoenix.arize.com");
+    expect(report.methodologyVersioning?.rejectedEvidenceRefs).toContain("metadata-only:google/adk-python");
     expect(report.methodologyVersioning?.batchMethodologyProof?.dryRunCostEstimateRequired).toBe(true);
     expect(report.methodologyVersioning?.batchMethodologyProof?.resultExportRequired).toBe(true);
     expect(report.methodologyVersioning?.agentBeltMethodologyProof?.passPowerKReliabilityRequired).toBe(true);

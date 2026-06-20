@@ -12,8 +12,11 @@ export interface BuildWatchEvidenceDrilldownArtifactLinkParams {
 }
 
 export interface WatchObsStudioSourceArtifactLinksParams {
-  doi: string;
-  openAlexWorkId: string;
+  sourceUrl?: string | null;
+  docsIndexUrl?: string | null;
+  docsPageUrls?: string[];
+  doi?: string | null;
+  openAlexWorkId?: string | null;
   publisherUrl?: string | null;
 }
 
@@ -39,13 +42,22 @@ export function buildWatchEvidenceDrilldownArtifactLink(
 /**
  * Build metadata-only source artifact links for observability Studio drilldown rows.
  *
- * These links point to live source identity records (DOI/OpenAlex/publisher) while
- * the actual preview, empty, and error-state evidence remains AMC-owned and signed
- * in the Score evidence drilldown response.
+ * These links point to live source identity records (product/docs/DOI/OpenAlex/
+ * publisher) while the actual preview, empty, and error-state evidence remains
+ * AMC-owned and signed in the Score evidence drilldown response.
  */
 export function buildWatchObsStudioSourceArtifactLinks(
   params: WatchObsStudioSourceArtifactLinksParams,
 ): string[] {
-  return [params.doi, params.openAlexWorkId, params.publisherUrl ?? null]
-    .filter((value): value is string => typeof value === "string" && value.trim().length > 0);
+  return [
+    params.sourceUrl,
+    params.docsIndexUrl,
+    ...(params.docsPageUrls ?? []),
+    params.doi,
+    params.openAlexWorkId,
+    params.publisherUrl,
+  ]
+    .filter((value): value is string => typeof value === "string" && value.trim().length > 0)
+    .map((value) => value.trim())
+    .filter((value, index, values) => values.indexOf(value) === index);
 }
