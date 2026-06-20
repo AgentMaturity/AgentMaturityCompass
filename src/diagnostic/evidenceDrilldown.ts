@@ -9,6 +9,7 @@ import type {
   QuestionScoreIotFirmwareQuestionLensRef,
   QuestionScoreLandscapeLensRef,
   QuestionScoreMultiUserBenchmarkLensRef,
+  QuestionScoreObsStudioDrilldownLensRef,
   QuestionScoreProfessionalTaskLensRef,
   QuestionScoreRagFlowDiagnosticRef,
   QuestionScoreRetailSalesQuestionLensRef,
@@ -464,6 +465,37 @@ export interface ScoreScorableStudioDrilldownPreviewRow {
   rowHash: string;
 }
 
+export interface ScoreObsStudioDrilldownPreviewRow {
+  drilldownId: string;
+  sourceRef: string;
+  sourceKind: string;
+  openAlexWorkId: string | null;
+  doi: string | null;
+  publisherRef: string | null;
+  titleRef: string | null;
+  venueRef: string | null;
+  publicationDate: string | null;
+  uiRoutePath: string;
+  sourceArtifactLinks: string[];
+  tracePreviewHash: string | null;
+  reasoningTracePreviewHash: string | null;
+  receiptPreviewHash: string | null;
+  evidencePreviewHash: string | null;
+  sourceArtifactPreviewHash: string | null;
+  emptyStateHash: string | null;
+  errorStateHash: string | null;
+  evidencePreviewState: string;
+  evidencePreviewCount: number | null;
+  minEvidencePreviewCount: number | null;
+  sourceArtifactLinkCount: number | null;
+  minSourceArtifactLinkCount: number | null;
+  status: string;
+  evidenceRefs: string[];
+  rejectedEvidenceRefs: string[];
+  repairHint: string;
+  rowHash: string;
+}
+
 export interface ScoreEvidenceDrilldown {
   state: ScoreEvidenceDrilldownState;
   message: string;
@@ -499,6 +531,7 @@ export interface ScoreEvidenceDrilldown {
   iotFirmwareQuestionPreview: ScoreIotFirmwareQuestionLensPreviewRow[];
   retailSalesQuestionPreview: ScoreRetailSalesQuestionLensPreviewRow[];
   scorableStudioDrilldownPreview: ScoreScorableStudioDrilldownPreviewRow[];
+  obsStudioDrilldownPreview: ScoreObsStudioDrilldownPreviewRow[];
   rowHash: string | null;
   manifestHash: string | null;
   failClosed: boolean;
@@ -976,6 +1009,41 @@ function scorableStudioDrilldownLensPreview(
     tracePreviewHash: ref.tracePreviewHash,
     receiptPreviewHash: ref.receiptPreviewHash,
     policyRulePreviewHash: ref.policyRulePreviewHash,
+    sourceArtifactPreviewHash: ref.sourceArtifactPreviewHash,
+    emptyStateHash: ref.emptyStateHash,
+    errorStateHash: ref.errorStateHash,
+    evidencePreviewState: ref.evidencePreviewState,
+    evidencePreviewCount: ref.evidencePreviewCount,
+    minEvidencePreviewCount: ref.minEvidencePreviewCount,
+    sourceArtifactLinkCount: ref.sourceArtifactLinkCount,
+    minSourceArtifactLinkCount: ref.minSourceArtifactLinkCount,
+    status: ref.status,
+    evidenceRefs: ref.evidenceRefs,
+    rejectedEvidenceRefs: ref.rejectedEvidenceRefs,
+    repairHint: ref.repairHint,
+    rowHash: ref.rowHash,
+  };
+}
+
+function obsStudioDrilldownLensPreview(
+  ref: QuestionScoreObsStudioDrilldownLensRef,
+): ScoreObsStudioDrilldownPreviewRow {
+  return {
+    drilldownId: ref.drilldownId,
+    sourceRef: ref.sourceRef,
+    sourceKind: ref.sourceKind,
+    openAlexWorkId: ref.openAlexWorkId,
+    doi: ref.doi,
+    publisherRef: ref.publisherRef,
+    titleRef: ref.titleRef,
+    venueRef: ref.venueRef,
+    publicationDate: ref.publicationDate,
+    uiRoutePath: ref.uiRoutePath,
+    sourceArtifactLinks: ref.sourceArtifactLinks,
+    tracePreviewHash: ref.tracePreviewHash,
+    reasoningTracePreviewHash: ref.reasoningTracePreviewHash,
+    receiptPreviewHash: ref.receiptPreviewHash,
+    evidencePreviewHash: ref.evidencePreviewHash,
     sourceArtifactPreviewHash: ref.sourceArtifactPreviewHash,
     emptyStateHash: ref.emptyStateHash,
     errorStateHash: ref.errorStateHash,
@@ -1499,6 +1567,57 @@ function scorableStudioDrilldownLensFailClosed(ref: QuestionScoreScorableStudioD
   return false;
 }
 
+function obsStudioDrilldownLensFailClosed(ref: QuestionScoreObsStudioDrilldownLensRef): boolean {
+  if (ref.status !== "satisfied") {
+    return true;
+  }
+  const routePresent = ref.uiRoutePath.startsWith("/api/v1/score/evidence-drilldown/") ||
+    ref.uiRoutePath.includes("evidenceDrilldown");
+  const paperMetadataPresent = ref.sourceKind !== "paper" || (
+    ref.openAlexWorkId !== null &&
+    ref.openAlexWorkId.startsWith("https://openalex.org/W") &&
+    ref.doi !== null &&
+    ref.doi.startsWith("https://doi.org/") &&
+    ref.publisherRef !== null &&
+    ref.titleRef !== null &&
+    ref.venueRef !== null &&
+    ref.publicationDate !== null
+  );
+  if (
+    !ref.drilldownId ||
+    ref.drilldownId.startsWith("unknown-") ||
+    !ref.sourceRef ||
+    ref.sourceRef === "unknown-source" ||
+    ref.sourceKind === "custom" ||
+    !routePresent ||
+    !paperMetadataPresent ||
+    !isSha256(ref.rowHash)
+  ) {
+    return true;
+  }
+  const proofHashes = [
+    ref.tracePreviewHash,
+    ref.reasoningTracePreviewHash,
+    ref.receiptPreviewHash,
+    ref.evidencePreviewHash,
+    ref.sourceArtifactPreviewHash,
+    ref.emptyStateHash,
+    ref.errorStateHash,
+  ];
+  if (!proofHashes.every(isPresentSha256)) {
+    return true;
+  }
+  return ref.evidenceRefs.length === 0 ||
+    ref.evidencePreviewState !== "ready" ||
+    ref.evidencePreviewCount === null ||
+    ref.minEvidencePreviewCount === null ||
+    ref.evidencePreviewCount < ref.minEvidencePreviewCount ||
+    ref.sourceArtifactLinkCount === null ||
+    ref.minSourceArtifactLinkCount === null ||
+    ref.sourceArtifactLinkCount < ref.minSourceArtifactLinkCount ||
+    ref.sourceArtifactLinks.length < ref.minSourceArtifactLinkCount;
+}
+
 function artifactLinks(report: DiagnosticReport, agentId: string, runId: string): ScoreEvidenceDrilldownArtifactLink[] {
   const query = `agentId=${encodeURIComponent(agentId)}`;
   return [
@@ -1578,6 +1697,7 @@ export function buildScoreEvidenceDrilldown(
       iotFirmwareQuestionPreview: [],
       retailSalesQuestionPreview: [],
       scorableStudioDrilldownPreview: [],
+      obsStudioDrilldownPreview: [],
       rowHash: null,
       manifestHash: null,
       failClosed: true,
@@ -1615,6 +1735,7 @@ export function buildScoreEvidenceDrilldown(
       iotFirmwareQuestionPreview: [],
       retailSalesQuestionPreview: [],
       scorableStudioDrilldownPreview: [],
+      obsStudioDrilldownPreview: [],
       rowHash: null,
       manifestHash: pack.manifestHash,
       failClosed: true,
@@ -1631,6 +1752,7 @@ export function buildScoreEvidenceDrilldown(
   const iotFirmwareQuestionLens = row.iotFirmwareQuestionLens ?? [];
   const retailSalesQuestionLens = row.retailSalesQuestionLens ?? [];
   const scorableStudioDrilldownLens = row.scorableStudioDrilldownLens ?? [];
+  const obsStudioDrilldownLens = row.obsStudioDrilldownLens ?? [];
 
   return {
     state: "ready",
@@ -1667,6 +1789,7 @@ export function buildScoreEvidenceDrilldown(
     iotFirmwareQuestionPreview: iotFirmwareQuestionLens.map(iotFirmwareQuestionLensPreview),
     retailSalesQuestionPreview: retailSalesQuestionLens.map(retailSalesQuestionLensPreview),
     scorableStudioDrilldownPreview: scorableStudioDrilldownLens.map(scorableStudioDrilldownLensPreview),
+    obsStudioDrilldownPreview: obsStudioDrilldownLens.map(obsStudioDrilldownLensPreview),
     rowHash: row.rowHash,
     manifestHash: pack.manifestHash,
     failClosed: row.status !== "passed"
@@ -1683,6 +1806,7 @@ export function buildScoreEvidenceDrilldown(
       || iotFirmwareQuestionLens.some(iotFirmwareQuestionLensFailClosed)
       || retailSalesQuestionLens.some(retailSalesQuestionLensFailClosed)
       || scorableStudioDrilldownLens.some(scorableStudioDrilldownLensFailClosed)
+      || obsStudioDrilldownLens.some(obsStudioDrilldownLensFailClosed)
       || row.rubricLens.some((lens) => lens.checks.some((check) => check.status === "partial" || check.status === "fail")),
     replayable: pack.replayable,
   };

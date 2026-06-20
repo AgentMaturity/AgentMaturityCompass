@@ -55,9 +55,10 @@ describe("public methodology manifest", () => {
     expect(first.questionSet.version).toBe("amc-legacy-240-v1");
     expect(first.questionSet.questionCount).toBe(getAllQuestions().length);
     expect(first.changelog[0]?.version).toBe(AMC_PUBLIC_METHODOLOGY_VERSION);
-    expect(first.changelog[0]?.migration).toContain("Reports generated under 2026.06.20-r211");
-    expect(first.changelog[0]?.summary).toContain("Arize Phoenix/AX-style observability/evaluation metric-validity boundaries");
+    expect(first.changelog[0]?.migration).toContain("Reports generated under 2026.06.20-r212");
+    expect(first.changelog[0]?.summary).toContain("Mastra-style agent-framework and Lunary-style observability/evaluation metric-validity boundaries");
     for (const previousVersion of [
+      "2026.06.20-r212",
       "2026.06.20-r211",
       "2026.06.20-r210",
       "2026.06.19-r209",
@@ -1125,11 +1126,11 @@ describe("public methodology manifest", () => {
     const arizePhoenixGate = first.metricValidationGates.find((gate) => gate.gate === "arize_phoenix_observability_eval_coverage");
     expect(arizePhoenixGate?.defaultThreshold).toContain(">= 1.00 when required");
     expect(arizePhoenixGate?.migration).toContain("signed-evidence refs");
-    expect(first.deprecationNotice).toContain("2026.06.20-r212");
-    expect(first.migrationGuidance.join("\n")).toContain("Arize Phoenix/AX-style observability/evaluation claims");
+    expect(first.deprecationNotice).toContain("2026.06.20-r213");
+    expect(first.migrationGuidance.join("\n")).toContain("Lunary-style observability");
     const methodologyDoc = readFileSync("docs/SCORING_METHODOLOGY.md", "utf8");
-    expect(methodologyDoc).toContain("`2026.06.20-r212`");
-    expect(methodologyDoc).toContain("Arize Phoenix/AX-style observability/evaluation metric-validity boundaries");
+    expect(methodologyDoc).toContain("`2026.06.20-r213`");
+    expect(methodologyDoc).toContain("Mastra-style agent-framework and Lunary-style observability/evaluation metric-validity boundaries");
     expect(methodologyDoc).toContain("AMC must not copy Phoenix website prose");
     expect(methodologyDoc).toContain("`2026.06.19-r164`");
     expect(methodologyDoc).toContain("`2026.06.19-r163`");
@@ -1339,6 +1340,7 @@ describe("public methodology manifest", () => {
       "modality_transformation_coverage",
       "lifecycle_observability_coverage",
       "arize_phoenix_observability_eval_coverage",
+      "lunary_observability_metric_validity",
       "ranking_stability_coverage",
       "tool_sandbox_coverage",
       "continual_learning_coverage",

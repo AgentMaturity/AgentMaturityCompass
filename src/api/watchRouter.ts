@@ -8,6 +8,7 @@ import { bodyJson, apiSuccess, apiError, queryParam } from './apiHelpers.js';
 import type { ReplayBenchmarkCorpusInput } from '../benchmarks/replayBenchmarkCorpus.js';
 import type { RunLiveScoreBehaviorDriftInput } from '../watch/liveDriftAlerts.js';
 import type { BuildJudgeCalibrationReceiptInput } from '../eval/judgeCalibration.js';
+import type { RunPromptLayerProviderDriftInput } from '../benchmarks/promptLayerProviderDrift.js';
 
 export async function handleWatchRoute(
   pathname: string,
@@ -172,6 +173,31 @@ export async function handleWatchRoute(
       });
     } catch (err) {
       apiError(res, 500, err instanceof Error ? err.message : 'Live drift watch projection failed');
+    }
+    return true;
+  }
+
+  // POST /api/v1/watch/provider-drift — project provider/version canary drift into Watch alerts
+  if (pathname === '/api/v1/watch/provider-drift' && method === 'POST') {
+    try {
+      const body = await bodyJson<RunPromptLayerProviderDriftInput>(req);
+      if (!Array.isArray(body.baseline) || !Array.isArray(body.candidate) || !body.promptLayer) {
+        apiError(res, 400, 'Required: baseline[], candidate[], and promptLayer metadata');
+        return true;
+      }
+      const { runPromptLayerProviderDrift } = await import('../watch/promptLayerProviderDrift.js');
+      const result = runPromptLayerProviderDrift({
+        ...body,
+        agentId: body.agentId ?? 'default',
+      });
+      apiSuccess(res, {
+        report: result.report,
+        promptLayerEvidenceHash: result.promptLayerEvidenceHash,
+        watchAlerts: result.watchAlerts,
+        failClosed: result.report.failClosed,
+      });
+    } catch (err) {
+      apiError(res, 500, err instanceof Error ? err.message : 'Provider drift watch projection failed');
     }
     return true;
   }

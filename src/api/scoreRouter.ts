@@ -16,6 +16,7 @@ import {
 import { queueScoreComputationMetric } from '../observability/otelExporter.js';
 import type { RunLiveScoreBehaviorDriftInput } from '../watch/liveDriftAlerts.js';
 import type { BuildJudgeCalibrationReceiptInput } from '../eval/judgeCalibration.js';
+import type { RunPromptLayerProviderDriftInput } from '../benchmarks/promptLayerProviderDrift.js';
 
 const nonEmptyStringSchema = z.string().trim().min(1);
 const optionalNonEmptyStringSchema = nonEmptyStringSchema.optional();
@@ -144,6 +145,39 @@ export async function handleScoreRoute(
       });
     } catch (err) {
       scoreRouteError(res, err, 'Live drift scoring failed');
+    }
+    return true;
+  }
+
+  // POST /api/v1/score/provider-drift — score-facing provider/version canary drift report
+  if (pathname === '/api/v1/score/provider-drift' && method === 'POST') {
+    try {
+      const body = await bodyJson<RunPromptLayerProviderDriftInput>(req);
+      if (!Array.isArray(body.baseline) || !Array.isArray(body.candidate) || !body.promptLayer) {
+        apiError(res, 400, 'Required: baseline[], candidate[], and promptLayer metadata');
+        return true;
+      }
+      const { runPromptLayerProviderDrift } = await import('../benchmarks/promptLayerProviderDrift.js');
+      const result = runPromptLayerProviderDrift({
+        ...body,
+        agentId: body.agentId ?? 'default',
+      });
+      apiSuccess(res, {
+        report: result.report,
+        providerVersions: result.report.providerVersions,
+        canaryResults: result.report.comparisons,
+        driftStatistics: result.report.comparisons.map((item) => ({
+          canaryId: item.canaryId,
+          provider: item.provider,
+          model: item.model,
+          driftStatistic: item.driftStatistic,
+          status: item.status,
+        })),
+        promptLayerEvidenceHash: result.promptLayerEvidenceHash,
+        failClosed: result.report.failClosed,
+      });
+    } catch (err) {
+      scoreRouteError(res, err, 'Provider drift scoring failed');
     }
     return true;
   }

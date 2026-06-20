@@ -1,6 +1,7 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, test } from "vitest";
 import { buildScoreEvidenceDrilldown } from "../src/diagnostic/evidenceDrilldown.js";
+import { buildWatchObsStudioSourceArtifactLinks } from "../src/watch/evidenceDrilldown.js";
 import type { DiagnosticReport } from "../src/types.js";
 
 function report(overrides: Partial<DiagnosticReport> = {}): DiagnosticReport {

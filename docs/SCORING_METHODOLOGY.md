@@ -7,11 +7,13 @@ AMC publishes a machine-readable scoring methodology manifest so reports, badges
 | Field | Current Value |
 |-------|---------------|
 | Methodology ID | `amc-public-scoring-methodology` |
-| Methodology Version | `2026.06.20-r212` |
+| Methodology Version | `2026.06.20-r213` |
 | Release Date | `2026-06-20` |
 | Manifest Command | `amc methodology --json` |
 | Human-Readable Command | `amc methodology` |
 | Sample Dataset Command | `amc methodology --sample-dataset --json` |
+
+Current methodology delta: Mastra-style agent-framework and Lunary-style observability/evaluation metric-validity boundaries keep live repository/product metadata as source signals only; validation tables, evaluator or trace proof, threshold policies, metric owners, sample sizes, confidence intervals, signed evidence, no-copy/source-review proof, and row hashes fail closed.
 
 Every generated diagnostic report now includes a `methodology` object with the methodology id, version, release date, question-set summary, public documentation link, and SHA-256 hash of the canonical manifest. Reports also include a `methodologyVersioning` receipt that binds public comparability to changelog, deprecation, migration, telemetry, benchmark, calibration, archive, export-sanitization, and badge-assurance proof. Badge URLs include `amc_methodology`, `amc_methodology_hash`, and `amc_methodology_assurance` query parameters, and badge HTML/Markdown includes a title containing the same method reference.
 

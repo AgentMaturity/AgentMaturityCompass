@@ -104,6 +104,36 @@ function scorableStudioRows(rows) {
   }).join("");
 }
 
+function obsStudioRows(rows) {
+  if (!Array.isArray(rows) || rows.length === 0) {
+    return `<tr><td colspan="9" class="muted">No observability Studio drilldown rows are attached. This empty state is fail-closed until an AMC route, source artifact links, evidence preview, and empty/error-state receipts are present.</td></tr>`;
+  }
+  return rows.map((row) => {
+    const previewBad = row.evidencePreviewState !== "ready";
+    const linkCount = row.sourceArtifactLinkCount ?? (row.sourceArtifactLinks || []).length;
+    return `
+      <tr>
+        <td><code>${esc(row.drilldownId)}</code><br><span class="muted">${esc(row.sourceKind)}</span></td>
+        <td><a href="${esc(row.sourceRef)}" target="_blank" rel="noreferrer noopener">source</a><br><span class="muted">${esc(row.titleRef || row.venueRef || "metadata")}</span></td>
+        <td>${esc(row.openAlexWorkId || "")}</td>
+        <td>${row.doi ? `<a href="${esc(row.doi)}" target="_blank" rel="noreferrer noopener">${esc(row.doi)}</a>` : ""}</td>
+        <td><code>${esc(row.uiRoutePath)}</code></td>
+        <td>${badge(row.evidencePreviewState || "empty", previewBad)}<br>${esc(row.evidencePreviewCount ?? 0)} / ${esc(row.minEvidencePreviewCount ?? "?")}</td>
+        <td>${esc(linkCount)} / ${esc(row.minSourceArtifactLinkCount ?? "?")}<br>${linkList(row.sourceArtifactLinks)}</td>
+        <td>
+          <div>trace <code>${esc(row.tracePreviewHash || "missing")}</code></div>
+          <div>reasoning <code>${esc(row.reasoningTracePreviewHash || "missing")}</code></div>
+          <div>receipt <code>${esc(row.receiptPreviewHash || "missing")}</code></div>
+          <div>evidence <code>${esc(row.evidencePreviewHash || "missing")}</code></div>
+          <div>source artifact <code>${esc(row.sourceArtifactPreviewHash || "missing")}</code></div>
+          <div>empty state <code>${esc(row.emptyStateHash || "missing")}</code></div>
+          <div>error state <code>${esc(row.errorStateHash || "missing")}</code></div>
+        </td>
+        <td>${badge(row.status, row.status !== "satisfied")}<br><span class="muted">signed evidence: ${esc((row.evidenceRefs || []).join(", ") || "none")}</span><br>${esc(row.repairHint || "")}</td>
+      </tr>`;
+  }).join("");
+}
+
 function genericPreview(title, rows, idKey, fields) {
   if (!Array.isArray(rows) || rows.length === 0) return "";
   return `<details class="card"><summary>${esc(title)} (${rows.length})</summary><table><thead><tr>${fields.map((field) => `<th>${esc(field.label)}</th>`).join("")}</tr></thead><tbody>${rows.map((row) => `<tr>${fields.map((field) => `<td>${esc(field.render ? field.render(row) : row[field.key])}</td>`).join("")}</tr>`).join("")}</tbody></table></details>`;
@@ -146,6 +176,11 @@ function renderDrilldown(params, data) {
     <table><thead><tr><th>Drilldown</th><th>Source</th><th>Surface</th><th>UI route</th><th>Evidence preview</th><th>Source artifact links</th><th>Preview hashes and states</th><th>Status</th><th>Repair</th></tr></thead><tbody>${scorableStudioRows(data.scorableStudioDrilldownPreview)}</tbody></table>
   `;
 
+  const obsStudio = `
+    <p class="muted">Observability Studio drilldown rows bind AMC-owned UI routes to source artifact links, evidence previews, and empty/error-state receipts. Paper metadata is shown only as verified source identity; no paper prose, figures, or data are embedded.</p>
+    <table><thead><tr><th>Drilldown</th><th>Source</th><th>OpenAlex</th><th>DOI</th><th>UI route</th><th>Evidence preview</th><th>Source artifact links</th><th>Preview hashes and states</th><th>Status</th></tr></thead><tbody>${obsStudioRows(data.obsStudioDrilldownPreview)}</tbody></table>
+  `;
+
   const extras = [
     genericPreview("Rubric lens", data.rubricLensPreview, "rubricId", [
       { label: "Rubric", key: "rubricId" },
@@ -169,6 +204,7 @@ function renderDrilldown(params, data) {
     localCard(params, "Evidence Preview", evidence),
     localCard(params, "Criterion Preview", criteria),
     localCard(params, "Scorable Studio Drilldown / Langfuse Observability Drilldown", studio),
+    localCard(params, "Observability Studio Drilldown", obsStudio),
     extras,
     localCard(params, "Raw drilldown JSON", jsonBlock(data)),
   ].join("");

@@ -75,6 +75,14 @@ export {
   type ProviderDriftWatchAlert,
 } from './providerDriftAlerts.js';
 export {
+  runPromptLayerProviderDrift,
+  type PromptLayerProviderDriftMetadata,
+  type PromptLayerProviderDriftProof,
+  type PromptLayerProviderDriftResult,
+  type PromptLayerProviderDriftSide,
+  type RunPromptLayerProviderDriftInput,
+} from './promptLayerProviderDrift.js';
+export {
   buildLiveDriftWatchAlerts,
   defaultLiveDriftThresholds,
   runLiveScoreBehaviorDrift,
@@ -164,6 +172,18 @@ export {
   type ReflexionAgentTaskType,
   type RunReflexionAgentLiveDriftInput,
 } from './reflexionAgentLiveDrift.js';
+export {
+  TRISM_AGENTIC_AI_METADATA,
+  runTrismAgenticLiveDrift,
+  type RunTrismAgenticLiveDriftInput,
+  type TrismAgenticDriftStatistic,
+  type TrismAgenticLiveDriftResult,
+  type TrismAgenticLiveDriftRow,
+  type TrismAgenticMetadataProof,
+  type TrismAgenticRiskSignal,
+  type TrismAgenticRowProof,
+  type TrismAgenticSurface,
+} from './trismAgenticLiveDrift.js';
 export {
   runBraintrustLiveDrift,
   type BraintrustLiveDriftResult,

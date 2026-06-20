@@ -65,6 +65,32 @@ export interface MetricValidationQuestionRef {
   layerName: LayerName;
 }
 
+export const LUNARY_OBSERVABILITY_METRIC_VALIDITY_SOURCE_REF = "web:https://lunary.ai";
+
+export const LUNARY_OBSERVABILITY_METRIC_VALIDITY_REQUIREMENTS = [
+  "live source relevance receipt",
+  "AMC-owned eval-pack manifest",
+  "validation table artifact",
+  "trace/session export manifest",
+  "prompt template or model-registry snapshot when claimed",
+  "evaluator or score-LLM-response config",
+  "feedback or annotation export when claimed",
+  "production monitoring or alert-policy manifest when Watch is claimed",
+  "Score/Shield/Watch surface mapping",
+  "fail-closed threshold policy",
+  "metric owner",
+  "sample size",
+  "confidence interval",
+  "signed evidence refs",
+  "artifact hashes",
+  "row hashes",
+  "no-copy/source-review boundary proof"
+] as const;
+
+export function lunaryObservabilityMetricValidityRequirements(): string[] {
+  return [...LUNARY_OBSERVABILITY_METRIC_VALIDITY_REQUIREMENTS];
+}
+
 export interface BuildMetricValidationInput {
   agentId: string;
   runId: string;

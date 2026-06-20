@@ -1126,6 +1126,41 @@ export type QuestionScoreScorableStudioSurface =
 
 export type QuestionScoreScorableEvidencePreviewState = "ready" | "empty" | "error" | "custom";
 
+export type QuestionScoreObsStudioSourceKind = "paper" | "repository" | "product" | "custom";
+
+export type QuestionScoreObsStudioEvidencePreviewState = "ready" | "empty" | "error" | "custom";
+
+export interface QuestionScoreObsStudioDrilldownLensRef {
+  drilldownId: string;
+  sourceRef: string;
+  sourceKind: QuestionScoreObsStudioSourceKind;
+  openAlexWorkId: string | null;
+  doi: string | null;
+  publisherRef: string | null;
+  titleRef: string | null;
+  venueRef: string | null;
+  publicationDate: string | null;
+  uiRoutePath: string;
+  sourceArtifactLinks: string[];
+  tracePreviewHash: string | null;
+  reasoningTracePreviewHash: string | null;
+  receiptPreviewHash: string | null;
+  evidencePreviewHash: string | null;
+  sourceArtifactPreviewHash: string | null;
+  emptyStateHash: string | null;
+  errorStateHash: string | null;
+  evidencePreviewState: QuestionScoreObsStudioEvidencePreviewState;
+  evidencePreviewCount: number | null;
+  minEvidencePreviewCount: number | null;
+  sourceArtifactLinkCount: number | null;
+  minSourceArtifactLinkCount: number | null;
+  status: QuestionScoreCriterionStatus;
+  evidenceRefs: string[];
+  rejectedEvidenceRefs: string[];
+  repairHint: string;
+  rowHash: string;
+}
+
 export interface QuestionScoreScorableStudioDrilldownLensRef {
   drilldownId: string;
   sourceRef: string;
@@ -1217,6 +1252,7 @@ export interface QuestionScoreExplainabilityRow {
   continualLearningBenchmarkLens: QuestionScoreContinualLearningBenchmarkLensRef[];
   hermesTurboPerformanceLens: QuestionScoreHermesTurboPerformanceLensRef[];
   scorableStudioDrilldownLens: QuestionScoreScorableStudioDrilldownLensRef[];
+  obsStudioDrilldownLens?: QuestionScoreObsStudioDrilldownLensRef[];
   missingGateReasons: string[];
   repairHint: string;
   scoreReceiptRef: string;

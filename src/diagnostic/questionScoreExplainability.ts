@@ -34,6 +34,9 @@ import type {
   QuestionScoreLandscapeUpdateCadence,
   QuestionScoreOpenModelRagQuestionLensRef,
   QuestionScoreOpenModelRagRuntime,
+  QuestionScoreObsStudioDrilldownLensRef,
+  QuestionScoreObsStudioEvidencePreviewState,
+  QuestionScoreObsStudioSourceKind,
   QuestionScoreOpikEvaluationMetricFamily,
   QuestionScoreOpikEvaluationQuestionLensRef,
   QuestionScoreMultiUserBenchmarkLensRef,
@@ -813,6 +816,36 @@ export interface QuestionExplainabilityScorableStudioDrilldownInput {
   repairHint?: string;
 }
 
+export interface QuestionExplainabilityObsStudioDrilldownInput {
+  drilldownId: string;
+  sourceRef: string;
+  sourceKind?: QuestionScoreObsStudioSourceKind;
+  openAlexWorkId?: string | null;
+  doi?: string | null;
+  publisherRef?: string | null;
+  titleRef?: string | null;
+  venueRef?: string | null;
+  publicationDate?: string | null;
+  uiRoutePath?: string;
+  sourceArtifactLinks?: string[];
+  tracePreviewHash?: string | null;
+  reasoningTracePreviewHash?: string | null;
+  receiptPreviewHash?: string | null;
+  evidencePreviewHash?: string | null;
+  sourceArtifactPreviewHash?: string | null;
+  emptyStateHash?: string | null;
+  errorStateHash?: string | null;
+  evidencePreviewState?: QuestionScoreObsStudioEvidencePreviewState;
+  evidencePreviewCount?: number | null;
+  minEvidencePreviewCount?: number | null;
+  sourceArtifactLinkCount?: number | null;
+  minSourceArtifactLinkCount?: number | null;
+  status: QuestionScoreCriterionStatus;
+  evidenceRefs?: string[];
+  rejectedEvidenceRefs?: string[];
+  repairHint?: string;
+}
+
 export interface QuestionExplainabilityInputRow {
   question: DiagnosticQuestion;
   score: QuestionScore;
@@ -838,6 +871,7 @@ export interface QuestionExplainabilityInputRow {
   continualLearningBenchmarkLens?: QuestionExplainabilityContinualLearningBenchmarkInput[];
   hermesTurboPerformanceLens?: QuestionExplainabilityHermesTurboPerformanceInput[];
   scorableStudioDrilldownLens?: QuestionExplainabilityScorableStudioDrilldownInput[];
+  obsStudioDrilldownLens?: QuestionExplainabilityObsStudioDrilldownInput[];
   missingGateReasons: string[];
 }
 
@@ -2253,6 +2287,73 @@ function normalizeScorableStudioDrilldownLens(
   };
 }
 
+const obsStudioSourceKinds = new Set<QuestionScoreObsStudioSourceKind>([
+  "paper",
+  "repository",
+  "product",
+  "custom"
+]);
+
+const obsStudioEvidencePreviewStates = new Set<QuestionScoreObsStudioEvidencePreviewState>([
+  "ready",
+  "empty",
+  "error",
+  "custom"
+]);
+
+function normalizeObsStudioSourceKind(
+  input: QuestionScoreObsStudioSourceKind | undefined,
+): QuestionScoreObsStudioSourceKind {
+  return input && obsStudioSourceKinds.has(input) ? input : "custom";
+}
+
+function normalizeObsStudioEvidencePreviewState(
+  input: QuestionScoreObsStudioEvidencePreviewState | undefined,
+): QuestionScoreObsStudioEvidencePreviewState {
+  return input && obsStudioEvidencePreviewStates.has(input) ? input : "custom";
+}
+
+function normalizeObsStudioDrilldownLens(
+  input: QuestionExplainabilityObsStudioDrilldownInput,
+): QuestionScoreObsStudioDrilldownLensRef {
+  const sourceArtifactLinks = unique(input.sourceArtifactLinks ?? []);
+  const sourceArtifactLinkCount = positiveInteger(input.sourceArtifactLinkCount) ??
+    (sourceArtifactLinks.length > 0 ? sourceArtifactLinks.length : null);
+  const withoutHash: Omit<QuestionScoreObsStudioDrilldownLensRef, "rowHash"> = {
+    drilldownId: input.drilldownId.trim() || "unknown-obs-studio-drilldown",
+    sourceRef: input.sourceRef.trim() || "unknown-source",
+    sourceKind: normalizeObsStudioSourceKind(input.sourceKind),
+    openAlexWorkId: nullableString(input.openAlexWorkId),
+    doi: nullableString(input.doi),
+    publisherRef: nullableString(input.publisherRef),
+    titleRef: nullableString(input.titleRef),
+    venueRef: nullableString(input.venueRef),
+    publicationDate: nullableString(input.publicationDate),
+    uiRoutePath: input.uiRoutePath?.trim() || "unknown-studio-route",
+    sourceArtifactLinks,
+    tracePreviewHash: nullableSha256Hash(input.tracePreviewHash),
+    reasoningTracePreviewHash: nullableSha256Hash(input.reasoningTracePreviewHash),
+    receiptPreviewHash: nullableSha256Hash(input.receiptPreviewHash),
+    evidencePreviewHash: nullableSha256Hash(input.evidencePreviewHash),
+    sourceArtifactPreviewHash: nullableSha256Hash(input.sourceArtifactPreviewHash),
+    emptyStateHash: nullableSha256Hash(input.emptyStateHash),
+    errorStateHash: nullableSha256Hash(input.errorStateHash),
+    evidencePreviewState: normalizeObsStudioEvidencePreviewState(input.evidencePreviewState),
+    evidencePreviewCount: positiveInteger(input.evidencePreviewCount),
+    minEvidencePreviewCount: positiveInteger(input.minEvidencePreviewCount),
+    sourceArtifactLinkCount,
+    minSourceArtifactLinkCount: positiveInteger(input.minSourceArtifactLinkCount),
+    status: input.status,
+    evidenceRefs: unique(input.evidenceRefs ?? []),
+    rejectedEvidenceRefs: unique(input.rejectedEvidenceRefs ?? []),
+    repairHint: input.repairHint?.trim() || "Attach AMC-owned observability drilldown route proof, source artifact links, trace/reasoning/receipt previews, empty and error states, signed evidence refs, and repair proof before relying on this question score."
+  };
+  return {
+    ...withoutHash,
+    rowHash: sha256Hex(canonicalize(withoutHash))
+  };
+}
+
 function defaultComponentDiagnostics(params: {
   acceptedEvidenceIds: string[];
   rejectedEvidenceIds: string[];
@@ -3361,6 +3462,72 @@ function scorableStudioRoutePresent(ref: QuestionScoreScorableStudioDrilldownLen
     ref.uiRoutePath.includes("evidenceDrilldown");
 }
 
+function obsStudioRoutePresent(ref: QuestionScoreObsStudioDrilldownLensRef): boolean {
+  return ref.uiRoutePath.startsWith("/api/v1/score/evidence-drilldown/") ||
+    ref.uiRoutePath.includes("evidenceDrilldown");
+}
+
+function obsStudioCountsMeetThreshold(ref: QuestionScoreObsStudioDrilldownLensRef): boolean {
+  return ref.evidencePreviewCount !== null &&
+    ref.minEvidencePreviewCount !== null &&
+    ref.evidencePreviewCount >= ref.minEvidencePreviewCount &&
+    ref.sourceArtifactLinkCount !== null &&
+    ref.minSourceArtifactLinkCount !== null &&
+    ref.sourceArtifactLinkCount >= ref.minSourceArtifactLinkCount &&
+    ref.sourceArtifactLinks.length >= ref.minSourceArtifactLinkCount;
+}
+
+function obsStudioPaperMetadataPresent(ref: QuestionScoreObsStudioDrilldownLensRef): boolean {
+  if (ref.sourceKind !== "paper") {
+    return true;
+  }
+  return ref.openAlexWorkId !== null &&
+    ref.openAlexWorkId.startsWith("https://openalex.org/W") &&
+    ref.doi !== null &&
+    ref.doi.startsWith("https://doi.org/") &&
+    ref.publisherRef !== null &&
+    ref.titleRef !== null &&
+    ref.venueRef !== null &&
+    ref.publicationDate !== null;
+}
+
+function hasReplayableObsStudioDrilldownLens(
+  ref: QuestionScoreObsStudioDrilldownLensRef,
+): boolean {
+  if (
+    ref.drilldownId.length === 0 ||
+    ref.drilldownId.startsWith("unknown-") ||
+    ref.sourceRef.length === 0 ||
+    ref.sourceRef === "unknown-source" ||
+    ref.sourceKind === "custom" ||
+    !obsStudioRoutePresent(ref) ||
+    !obsStudioPaperMetadataPresent(ref) ||
+    !isSha256(ref.rowHash)
+  ) {
+    return false;
+  }
+  if (![
+    ref.tracePreviewHash,
+    ref.reasoningTracePreviewHash,
+    ref.receiptPreviewHash,
+    ref.evidencePreviewHash,
+    ref.sourceArtifactPreviewHash,
+    ref.emptyStateHash,
+    ref.errorStateHash,
+  ].every(hashPresent)) {
+    return false;
+  }
+  if (ref.status === "satisfied") {
+    return ref.evidenceRefs.length > 0 &&
+      ref.evidencePreviewState === "ready" &&
+      obsStudioCountsMeetThreshold(ref);
+  }
+  if (ref.status === "failed") {
+    return ref.evidenceRefs.length > 0 || ref.rejectedEvidenceRefs.length > 0 || ref.repairHint.length > 0;
+  }
+  return ref.repairHint.length > 0;
+}
+
 function scorableStudioCountsMeetThreshold(ref: QuestionScoreScorableStudioDrilldownLensRef): boolean {
   return ref.evidencePreviewCount !== null &&
     ref.minEvidencePreviewCount !== null &&
@@ -3486,6 +3653,9 @@ export function buildQuestionExplainabilityReport(
     const scorableStudioDrilldownLens = (
       item.scorableStudioDrilldownLens ?? []
     ).map(normalizeScorableStudioDrilldownLens);
+    const obsStudioDrilldownLens = (
+      item.obsStudioDrilldownLens ?? []
+    ).map(normalizeObsStudioDrilldownLens);
     const status = statusFor(item.score, acceptedEvidenceIds, missingGateReasons);
     const rowWithoutHash: Omit<QuestionScoreExplainabilityRow, "rowHash"> = {
       questionId: item.question.id,
@@ -3519,6 +3689,7 @@ export function buildQuestionExplainabilityReport(
       continualLearningBenchmarkLens,
       hermesTurboPerformanceLens,
       scorableStudioDrilldownLens,
+      obsStudioDrilldownLens,
       missingGateReasons,
       repairHint: repairHintFor(item.question, item.score),
       scoreReceiptRef: `diagnostic://${input.runId}/question/${item.question.id}`
@@ -3556,7 +3727,8 @@ export function buildQuestionExplainabilityReport(
     row.retailSalesQuestionLens.every(hasReplayableRetailSalesQuestionLens) &&
     row.continualLearningBenchmarkLens.every(hasReplayableContinualLearningBenchmarkLens) &&
     row.hermesTurboPerformanceLens.every(hasReplayableHermesTurboPerformanceLens) &&
-    row.scorableStudioDrilldownLens.every(hasReplayableScorableStudioDrilldownLens)
+    row.scorableStudioDrilldownLens.every(hasReplayableScorableStudioDrilldownLens) &&
+    (row.obsStudioDrilldownLens ?? []).every(hasReplayableObsStudioDrilldownLens)
   );
   const failClosed = rows.some((row) =>
     row.status !== "passed" ||
@@ -3592,6 +3764,9 @@ export function buildQuestionExplainabilityReport(
     ) ||
     row.scorableStudioDrilldownLens.some(
       (lens) => lens.status !== "satisfied" || !hasReplayableScorableStudioDrilldownLens(lens)
+    ) ||
+    (row.obsStudioDrilldownLens ?? []).some(
+      (lens) => lens.status !== "satisfied" || !hasReplayableObsStudioDrilldownLens(lens)
     ) ||
     row.rubricLens.some((lens) => (
       lens.checks.some((check) => check.status === "partial" || check.status === "fail")
