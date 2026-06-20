@@ -125,6 +125,30 @@ const evidraProof = (
   ...overrides,
 });
 
+const galileoProof = (
+  overrides: Partial<ProviderDriftCanaryRow> = {},
+): Partial<ProviderDriftCanaryRow> => ({
+  galileoSourceRefHash: hash("a"),
+  galileoWebsiteSnapshotHash: hash("b"),
+  galileoDocsIndexHash: hash("c"),
+  galileoProductSurfaceId: "galileo-eval-observability",
+  galileoProjectId: "provider-drift-canaries",
+  galileoDatasetHash: hash("d"),
+  galileoPromptSetHash: hash("e"),
+  galileoTraceExportHash: hash("f"),
+  galileoMetricReportHash: hash("1"),
+  galileoEvaluatorConfigHash: hash("2"),
+  galileoProviderRouteId: "openai:gpt-4o-mini:galileo-provider-drift",
+  galileoCanaryResultHash: hash("3"),
+  galileoDriftStatisticHash: hash("4"),
+  galileoAlertOrWaiverHash: hash("5"),
+  galileoSignedEvidenceBundleHash: hash("6"),
+  galileoNoSourceCopyProofHash: hash("7"),
+  galileoMetricIds: ["correctness", "instruction_adherence", "latency", "cost", "guardrail_pass"],
+  galileoMetricCount: 5,
+  ...overrides,
+});
+
 describe("runProviderDriftBenchmark", () => {
   test("approves a provider canary when score, refusal, latency, and cost remain inside thresholds", () => {
     const report = runProviderDriftBenchmark({
@@ -1572,6 +1596,193 @@ describe("runProviderDriftBenchmark", () => {
     expect(markdown).toContain("Evidra Evidence Chain Proof");
     expect(markdown).toContain("v0.5.30");
     expect(markdown).toContain("evidra-prescribe-report-canary");
+  });
+
+  test("binds Galileo eval-observability proof into provider drift eval packs and watch surfaces", () => {
+    const galileoBaseline: ProviderDriftCanaryRow = {
+      ...baseline,
+      canaryId: "galileo-provider-drift-canary",
+      benchmarkFamily: "llmops-provider-drift",
+      capabilityId: "eval-observability-canary",
+      sampleSize: 32,
+      trajectoryCount: 32,
+      scoreMean0to1: 0.9,
+      refusalRate0to1: 0.03,
+      evaluatorCoverage0to1: 0.94,
+      guardrailPassRate0to1: 0.96,
+      scoreThresholdPassRate0to1: 0.92,
+      latencyMsP95: 1100,
+      costUsdMean: 0.003,
+      ...galileoProof({
+        galileoProviderRouteId: "openai:gpt-4o-mini:galileo-baseline",
+        galileoCanaryResultHash: hash("8"),
+      }),
+      evidenceRefs: [
+        "source-signal:galileo.ai:eval-observability",
+        "galileo:canary-baseline",
+      ],
+      signedEvidenceRefs: ["ledger:galileo-baseline"],
+    };
+    const galileoCandidate: ProviderDriftCanaryRow = {
+      ...candidate,
+      canaryId: "galileo-provider-drift-canary",
+      benchmarkFamily: "llmops-provider-drift",
+      capabilityId: "eval-observability-canary",
+      sampleSize: 32,
+      trajectoryCount: 32,
+      scoreMean0to1: 0.89,
+      refusalRate0to1: 0.04,
+      evaluatorCoverage0to1: 0.93,
+      guardrailPassRate0to1: 0.95,
+      scoreThresholdPassRate0to1: 0.91,
+      latencyMsP95: 1130,
+      costUsdMean: 0.0031,
+      ...galileoProof({
+        galileoProviderRouteId: "openai:gpt-4o-mini:galileo-candidate",
+        galileoCanaryResultHash: hash("9"),
+        galileoDriftStatisticHash: hash("0"),
+      }),
+      evidenceRefs: [
+        "source-signal:galileo.ai:eval-observability",
+        "galileo:canary-candidate",
+      ],
+      signedEvidenceRefs: ["ledger:galileo-candidate"],
+    };
+
+    const report = runProviderDriftBenchmark({
+      agentId: "llmops-agent",
+      baseline: [galileoBaseline],
+      candidate: [galileoCandidate],
+      thresholds: {
+        minTrajectoryCount: 16,
+        minEvaluationMetricCount: 5,
+      },
+    });
+
+    expect(report.providerVersions).toContain("openai/gpt-4o-mini@2026-06-01");
+    expect(report.providerVersions).toContain("openai/gpt-4o-mini@2026-06-13");
+    expect(report.recommendation).toBe("approve");
+    expect(report.failClosed).toBe(false);
+    expect(report.alerts).toEqual([]);
+    expect(report.comparisons[0]).toMatchObject({
+      baselineGalileoProductSurfaceId: "galileo-eval-observability",
+      candidateGalileoProductSurfaceId: "galileo-eval-observability",
+      baselineGalileoProviderRouteId: "openai:gpt-4o-mini:galileo-baseline",
+      candidateGalileoProviderRouteId: "openai:gpt-4o-mini:galileo-candidate",
+      baselineGalileoMetricCount: 5,
+      candidateGalileoMetricCount: 5,
+      galileoMissingReasons: [],
+      scoreDelta0to1: -0.01,
+      guardrailPassRateDelta0to1: -0.01,
+    });
+    expect(report.comparisons[0]?.driftStatistic).toBeGreaterThan(0);
+
+    const pack = buildProviderDriftEvalPack(report, {
+      packId: "provider-drift-galileo-v1",
+      datasetHash: "8".repeat(64),
+      sourceRefs: ["https://www.galileo.ai"],
+    });
+    expect(pack.replayable).toBe(true);
+    expect(pack.rows[0]).toMatchObject({
+      baselineGalileoSourceRefHash: hash("a"),
+      candidateGalileoCanaryResultHash: hash("9"),
+      candidateGalileoDriftStatisticHash: hash("0"),
+      galileoMissingReasons: [],
+      signedEvidenceRefs: ["ledger:galileo-baseline", "ledger:galileo-candidate"],
+    });
+    expect(buildProviderDriftWatchAlerts(report)).toEqual([]);
+
+    const markdown = renderProviderDriftBenchmarkMarkdown(report);
+    expect(markdown).toContain("Galileo Observability Proof");
+    expect(markdown).toContain("galileo-provider-drift-canary");
+  });
+
+  test("fails closed when Galileo observability proof is incomplete despite stable drift metrics", () => {
+    const completeBaseline: ProviderDriftCanaryRow = {
+      ...baseline,
+      canaryId: "galileo-incomplete-proof",
+      benchmarkFamily: "llmops-provider-drift",
+      capabilityId: "eval-observability-canary",
+      sampleSize: 24,
+      trajectoryCount: 24,
+      scoreMean0to1: 0.88,
+      refusalRate0to1: 0.03,
+      evaluatorCoverage0to1: 0.93,
+      guardrailPassRate0to1: 0.95,
+      scoreThresholdPassRate0to1: 0.91,
+      latencyMsP95: 1160,
+      costUsdMean: 0.0032,
+      ...galileoProof(),
+      evidenceRefs: ["source-signal:galileo.ai:eval-observability", "galileo:complete-baseline"],
+      signedEvidenceRefs: ["ledger:galileo-complete-baseline"],
+    };
+    const incompleteCandidate: ProviderDriftCanaryRow = {
+      ...candidate,
+      canaryId: "galileo-incomplete-proof",
+      benchmarkFamily: "llmops-provider-drift",
+      capabilityId: "eval-observability-canary",
+      sampleSize: completeBaseline.sampleSize,
+      trajectoryCount: completeBaseline.trajectoryCount,
+      scoreMean0to1: completeBaseline.scoreMean0to1,
+      refusalRate0to1: completeBaseline.refusalRate0to1,
+      evaluatorCoverage0to1: completeBaseline.evaluatorCoverage0to1,
+      guardrailPassRate0to1: completeBaseline.guardrailPassRate0to1,
+      scoreThresholdPassRate0to1: completeBaseline.scoreThresholdPassRate0to1,
+      latencyMsP95: completeBaseline.latencyMsP95,
+      costUsdMean: completeBaseline.costUsdMean,
+      ...galileoProof({
+        galileoTraceExportHash: "not-a-hash",
+        galileoMetricReportHash: undefined,
+        galileoCanaryResultHash: undefined,
+        galileoDriftStatisticHash: undefined,
+        galileoAlertOrWaiverHash: undefined,
+        galileoSignedEvidenceBundleHash: undefined,
+        galileoNoSourceCopyProofHash: undefined,
+        galileoMetricIds: [],
+        galileoMetricCount: 0,
+      }),
+      evidenceRefs: ["source-signal:galileo.ai:eval-observability", "galileo:incomplete-candidate"],
+      signedEvidenceRefs: ["ledger:galileo-incomplete-candidate"],
+    };
+
+    const report = runProviderDriftBenchmark({
+      agentId: "llmops-agent",
+      baseline: [completeBaseline],
+      candidate: [incompleteCandidate],
+      thresholds: {
+        minTrajectoryCount: 16,
+        minEvaluationMetricCount: 5,
+      },
+    });
+
+    expect(report.recommendation).toBe("alert");
+    expect(report.failClosed).toBe(true);
+    expect(report.alerts.map((alert) => alert.metricId)).toEqual(["galileoObservabilityEvidence"]);
+    expect(report.alerts[0]?.severity).toBe("critical");
+    expect(report.alerts[0]?.message).toContain("candidate:galileoTraceExportHash");
+    expect(report.alerts[0]?.message).toContain("candidate:galileoSignedEvidenceBundleHash");
+    expect(report.alerts[0]?.message).toContain("candidate:galileoMetricCount");
+    expect(report.comparisons[0]?.scoreDelta0to1).toBe(0);
+
+    const watchAlerts = buildProviderDriftWatchAlerts(report);
+    expect(watchAlerts.map((alert) => alert.metricId)).toEqual(["galileoObservabilityEvidence"]);
+    expect(watchAlerts[0]?.evidenceRefs).toContain("galileo:incomplete-candidate");
+
+    const gate = buildProviderDriftCiGate(report, { mode: "ci" });
+    expect(gate.failClosed).toBe(true);
+    expect(gate.failedAlertIds).toEqual([
+      "pdrift:openai:gpt-4o-mini:galileo-incomplete-proof:galileoObservabilityEvidence",
+    ]);
+
+    const pack = buildProviderDriftEvalPack(report, {
+      packId: "provider-drift-galileo-incomplete-v1",
+      datasetHash: "9".repeat(64),
+      sourceRefs: ["https://www.galileo.ai"],
+    });
+    expect(pack.replayable).toBe(true);
+    expect(pack.rows[0]?.galileoMissingReasons).toContain("candidate:galileoTraceExportHash");
+    expect(pack.rows[0]?.galileoMissingReasons).toContain("candidate:galileoMetricCount");
+    expect(pack.rows[0]?.rowHash).toMatch(/^[a-f0-9]{64}$/);
   });
 
   test("fails closed when Evidra evidence-chain proof is incomplete despite stable drift metrics", () => {

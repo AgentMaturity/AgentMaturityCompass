@@ -6,6 +6,7 @@ import { canonicalize } from "../utils/json.js";
 export const METRONOUS_METHODOLOGY_VERSIONING_SOURCE_REF = "github:kiosvantra/metronous";
 export const SUTRO_BATCH_METHODOLOGY_VERSIONING_SOURCE_REF = "github:sutro-sh/sutro";
 export const AGENT_BELT_METHODOLOGY_VERSIONING_SOURCE_REF = "github:jfrog/agent-belt";
+export const ARIZE_PHOENIX_SOURCE_REVIEW_REF = "web:https://phoenix.arize.com; docs:https://arize.com/docs/ax";
 
 function hasText(value: unknown): boolean {
   return typeof value === "string" && value.trim().length > 0;
@@ -19,7 +20,9 @@ function versioningAssuranceHash(manifest: PublicMethodologyManifest): string {
   return sha256Hex(canonicalize({
     methodologyVersioningAssurance: manifest.methodologyVersioningAssurance,
     sutroBatchMethodologyAssurance: manifest.sutroBatchMethodologyAssurance,
-    agentBeltMethodologyAssurance: manifest.agentBeltMethodologyAssurance
+    agentBeltMethodologyAssurance: manifest.agentBeltMethodologyAssurance,
+    sourceReviewBoundaries: manifest.scoreClaimBoundaries.filter((boundary) => boundary.boundary === "arize_phoenix_eval_observability_metric_validity"),
+    sourceReviewGates: manifest.metricValidationGates.filter((gate) => gate.gate === "arize_phoenix_observability_eval_coverage")
   }));
 }
 
@@ -29,6 +32,8 @@ export function buildDiagnosticMethodologyVersioningReceipt(
   const assurance = manifest.methodologyVersioningAssurance;
   const sutroAssurance = manifest.sutroBatchMethodologyAssurance;
   const agentBeltAssurance = manifest.agentBeltMethodologyAssurance;
+  const arizePhoenixBoundary = manifest.scoreClaimBoundaries.find((boundary) => boundary.boundary === "arize_phoenix_eval_observability_metric_validity");
+  const arizePhoenixGate = manifest.metricValidationGates.find((gate) => gate.gate === "arize_phoenix_observability_eval_coverage");
   const checks = [
     { field: "methodology.id", present: hasText(manifest.id) },
     { field: "methodology.version", present: hasText(manifest.version) },
@@ -70,6 +75,13 @@ export function buildDiagnosticMethodologyVersioningReceipt(
     { field: "agentBeltMethodologyAssurance.ciWorkflowHash", present: agentBeltAssurance.requiredAuditFields.includes("ciWorkflowHash") },
     { field: "agentBeltMethodologyAssurance.packageReleaseDigest", present: agentBeltAssurance.requiredAuditFields.includes("packageReleaseDigest") },
     { field: "agentBeltMethodologyAssurance.noCopyBoundary", present: hasText(agentBeltAssurance.noCopyBoundary) },
+    { field: "sourceReview.arizePhoenix.boundary", present: arizePhoenixBoundary?.appliesWhen.includes("Score report") === true && arizePhoenixBoundary?.appliesWhen.includes("Shield receipt") === true && arizePhoenixBoundary?.appliesWhen.includes("Watch alert") === true },
+    { field: "sourceReview.arizePhoenix.primarySourceDocs", present: arizePhoenixBoundary?.requiredEvidence.includes("live primary-source docs retrieval refs") === true },
+    { field: "sourceReview.arizePhoenix.signedEvidence", present: arizePhoenixBoundary?.requiredEvidence.includes("signed evidence refs") === true },
+    { field: "sourceReview.arizePhoenix.thresholdPolicy", present: arizePhoenixBoundary?.requiredEvidence.includes("fail-closed threshold policy") === true },
+    { field: "sourceReview.arizePhoenix.metadataOnlyFailClosed", present: arizePhoenixBoundary?.publicDisclosure.includes("source metadata alone") === true && arizePhoenixBoundary?.publicDisclosure.includes("not a parity claim") === true },
+    { field: "sourceReview.arizePhoenix.noCopyBoundary", present: arizePhoenixBoundary?.publicDisclosure.includes("does not authorize copied Phoenix website prose") === true },
+    { field: "sourceReview.arizePhoenix.metricGate", present: arizePhoenixGate?.defaultThreshold.includes(">= 1.00 when required") === true && arizePhoenixGate?.migration.includes("signed-evidence refs") === true },
   ];
   const presentAuditFields = checks.filter((check) => check.present).map((check) => check.field);
   const missingAuditFields = checks.filter((check) => !check.present).map((check) => check.field);
@@ -80,7 +92,7 @@ export function buildDiagnosticMethodologyVersioningReceipt(
     id: "amc-methodology-versioning-receipt",
     generatedAt: `${manifest.releaseDate}T00:00:00.000Z`,
     status: missingAuditFields.length === 0 ? "ready" as const : "fail_closed" as const,
-    sourceRef: `${METRONOUS_METHODOLOGY_VERSIONING_SOURCE_REF}; ${SUTRO_BATCH_METHODOLOGY_VERSIONING_SOURCE_REF}; ${AGENT_BELT_METHODOLOGY_VERSIONING_SOURCE_REF}`,
+    sourceRef: `${METRONOUS_METHODOLOGY_VERSIONING_SOURCE_REF}; ${SUTRO_BATCH_METHODOLOGY_VERSIONING_SOURCE_REF}; ${AGENT_BELT_METHODOLOGY_VERSIONING_SOURCE_REF}; ${ARIZE_PHOENIX_SOURCE_REVIEW_REF}`,
     sourceKind: "methodology_versioning_assurance_bundle" as const,
     methodology: {
       id: manifest.id,
@@ -90,7 +102,7 @@ export function buildDiagnosticMethodologyVersioningReceipt(
       questionSetVersion: manifest.questionSet.version,
       versioningAssuranceHash: assuranceHash,
     },
-    requiredAuditFields: [...assurance.requiredAuditFields, ...sutroAssurance.requiredAuditFields, ...agentBeltAssurance.requiredAuditFields],
+    requiredAuditFields: [...assurance.requiredAuditFields, ...sutroAssurance.requiredAuditFields, ...agentBeltAssurance.requiredAuditFields, "arizePhoenixPrimarySourceDocsRefs", "arizePhoenixTraceSpanExportManifest", "arizePhoenixEvaluatorTaskConfigManifest", "arizePhoenixDatasetExperimentManifest", "arizePhoenixAnnotationEvalExport", "arizePhoenixThresholdPolicy", "arizePhoenixSignedEvidenceRefs", "arizePhoenixRowHashes", "arizePhoenixNoCopyBoundary"],
     presentAuditFields,
     missingAuditFields,
     badgeQueryParams: [...manifest.reportBindings.badgeQueryParams],
@@ -147,13 +159,14 @@ export function buildDiagnosticMethodologyVersioningReceipt(
       sourceMetadataOnlyRejected: true as const,
       noCopyBoundary: agentBeltAssurance.noCopyBoundary,
     },
-    evidenceRefs: ["amc:public-methodology", "amc:badge-methodology-binding", "amc:diagnostic-methodology-versioning", "amc:agent-belt-methodology-assurance"],
-    rejectedEvidenceRefs: ["metadata-only:kiosvantra/metronous", "metadata-only:sutro-sh/sutro", "metadata-only:jfrog/agent-belt"],
+    evidenceRefs: ["amc:public-methodology", "amc:badge-methodology-binding", "amc:diagnostic-methodology-versioning", "amc:agent-belt-methodology-assurance", "amc:arize-phoenix-source-review-boundary"],
+    rejectedEvidenceRefs: ["metadata-only:kiosvantra/metronous", "metadata-only:sutro-sh/sutro", "metadata-only:jfrog/agent-belt", "metadata-only:phoenix.arize.com"],
     failClosedReasons,
     warnings: [
       "Metronous-style repository metadata is a discovery signal only; AMC requires local telemetry, benchmark, calibration, migration, and badge-methodology receipts before public comparability claims.",
       "Sutro-style repository metadata is a discovery signal only; AMC requires function/schema, data-source, priority, dry-run cost, observability, export, retention, multi-model, embedding, and badge-methodology receipts before public comparability claims.",
       "Agent Belt-style repository metadata is a discovery signal only; AMC requires source snapshot, license, release, scenario schema, agent-adapter, workspace-diff, rule-check, judge-config, pass@k/pass^k, isolation, export, CI, package-digest, and badge-methodology receipts before public comparability claims.",
+      "Arize Phoenix/AX public docs are relevant source-review signals for observability/evaluation boundaries, but metadata, labels, screenshots, copied website prose, examples, or aggregate eval scores fail closed without AMC-owned eval packs, trace/span exports, evaluator configs, dataset/experiment manifests, thresholds, signed evidence, and row hashes.",
     ],
   };
   return {

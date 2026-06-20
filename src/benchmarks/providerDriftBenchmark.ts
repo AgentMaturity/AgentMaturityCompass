@@ -43,6 +43,7 @@ export type ProviderDriftMetricId =
   | "falconEvaluateEvidence"
   | "agentDefenseBenchEvidence"
   | "evidraEvidenceChainEvidence"
+  | "galileoObservabilityEvidence"
   | "agentDefenseBenchDefenseCoverage0to1"
   | "agentDefenseBenchPromptInjectionBlockRate0to1"
   | "agentDefenseBenchJailbreakBlockRate0to1"
@@ -228,6 +229,24 @@ export interface ProviderDriftCanaryRow {
   evidraCiReceiptHash?: string;
   evidraNoSourceCopyProofHash?: string;
   evidraSignedEvidenceChainHash?: string;
+  galileoSourceRefHash?: string;
+  galileoWebsiteSnapshotHash?: string;
+  galileoDocsIndexHash?: string;
+  galileoProductSurfaceId?: string;
+  galileoProjectId?: string;
+  galileoDatasetHash?: string;
+  galileoPromptSetHash?: string;
+  galileoTraceExportHash?: string;
+  galileoMetricReportHash?: string;
+  galileoEvaluatorConfigHash?: string;
+  galileoProviderRouteId?: string;
+  galileoCanaryResultHash?: string;
+  galileoDriftStatisticHash?: string;
+  galileoAlertOrWaiverHash?: string;
+  galileoSignedEvidenceBundleHash?: string;
+  galileoNoSourceCopyProofHash?: string;
+  galileoMetricIds?: string[];
+  galileoMetricCount?: number;
   sampleSize: number;
   trajectoryCount?: number;
   scoreMean0to1: number;
@@ -676,6 +695,43 @@ export interface ProviderDriftComparison {
   baselineEvidraSignedEvidenceChainHash?: string;
   candidateEvidraSignedEvidenceChainHash?: string;
   evidraMissingReasons: string[];
+  baselineGalileoSourceRefHash?: string;
+  candidateGalileoSourceRefHash?: string;
+  baselineGalileoWebsiteSnapshotHash?: string;
+  candidateGalileoWebsiteSnapshotHash?: string;
+  baselineGalileoDocsIndexHash?: string;
+  candidateGalileoDocsIndexHash?: string;
+  baselineGalileoProductSurfaceId?: string;
+  candidateGalileoProductSurfaceId?: string;
+  baselineGalileoProjectId?: string;
+  candidateGalileoProjectId?: string;
+  baselineGalileoDatasetHash?: string;
+  candidateGalileoDatasetHash?: string;
+  baselineGalileoPromptSetHash?: string;
+  candidateGalileoPromptSetHash?: string;
+  baselineGalileoTraceExportHash?: string;
+  candidateGalileoTraceExportHash?: string;
+  baselineGalileoMetricReportHash?: string;
+  candidateGalileoMetricReportHash?: string;
+  baselineGalileoEvaluatorConfigHash?: string;
+  candidateGalileoEvaluatorConfigHash?: string;
+  baselineGalileoProviderRouteId?: string;
+  candidateGalileoProviderRouteId?: string;
+  baselineGalileoCanaryResultHash?: string;
+  candidateGalileoCanaryResultHash?: string;
+  baselineGalileoDriftStatisticHash?: string;
+  candidateGalileoDriftStatisticHash?: string;
+  baselineGalileoAlertOrWaiverHash?: string;
+  candidateGalileoAlertOrWaiverHash?: string;
+  baselineGalileoSignedEvidenceBundleHash?: string;
+  candidateGalileoSignedEvidenceBundleHash?: string;
+  baselineGalileoNoSourceCopyProofHash?: string;
+  candidateGalileoNoSourceCopyProofHash?: string;
+  baselineGalileoMetricIds: string[];
+  candidateGalileoMetricIds: string[];
+  baselineGalileoMetricCount: number;
+  candidateGalileoMetricCount: number;
+  galileoMissingReasons: string[];
   baselineVersion?: string;
   candidateVersion?: string;
   baselineSampleSize: number;
@@ -1082,6 +1138,43 @@ export interface ProviderDriftEvalPackRow {
   baselineEvidraSignedEvidenceChainHash?: string;
   candidateEvidraSignedEvidenceChainHash?: string;
   evidraMissingReasons: string[];
+  baselineGalileoSourceRefHash?: string;
+  candidateGalileoSourceRefHash?: string;
+  baselineGalileoWebsiteSnapshotHash?: string;
+  candidateGalileoWebsiteSnapshotHash?: string;
+  baselineGalileoDocsIndexHash?: string;
+  candidateGalileoDocsIndexHash?: string;
+  baselineGalileoProductSurfaceId?: string;
+  candidateGalileoProductSurfaceId?: string;
+  baselineGalileoProjectId?: string;
+  candidateGalileoProjectId?: string;
+  baselineGalileoDatasetHash?: string;
+  candidateGalileoDatasetHash?: string;
+  baselineGalileoPromptSetHash?: string;
+  candidateGalileoPromptSetHash?: string;
+  baselineGalileoTraceExportHash?: string;
+  candidateGalileoTraceExportHash?: string;
+  baselineGalileoMetricReportHash?: string;
+  candidateGalileoMetricReportHash?: string;
+  baselineGalileoEvaluatorConfigHash?: string;
+  candidateGalileoEvaluatorConfigHash?: string;
+  baselineGalileoProviderRouteId?: string;
+  candidateGalileoProviderRouteId?: string;
+  baselineGalileoCanaryResultHash?: string;
+  candidateGalileoCanaryResultHash?: string;
+  baselineGalileoDriftStatisticHash?: string;
+  candidateGalileoDriftStatisticHash?: string;
+  baselineGalileoAlertOrWaiverHash?: string;
+  candidateGalileoAlertOrWaiverHash?: string;
+  baselineGalileoSignedEvidenceBundleHash?: string;
+  candidateGalileoSignedEvidenceBundleHash?: string;
+  baselineGalileoNoSourceCopyProofHash?: string;
+  candidateGalileoNoSourceCopyProofHash?: string;
+  baselineGalileoMetricIds: string[];
+  candidateGalileoMetricIds: string[];
+  baselineGalileoMetricCount: number;
+  candidateGalileoMetricCount: number;
+  galileoMissingReasons: string[];
   repairEffectivenessDelta0to1: number;
   falsePositiveIdentificationDelta0to1: number;
   netCodebaseImpactDelta0to1: number;
@@ -1864,6 +1957,111 @@ function pickEvidraComparisonFields(comparison: ProviderDriftComparison): Partia
   ) as Partial<ProviderDriftEvalPackRow>;
 }
 
+const GALILEO_SHA_FIELDS: Array<keyof ProviderDriftCanaryRow> = [
+  "galileoSourceRefHash",
+  "galileoWebsiteSnapshotHash",
+  "galileoDocsIndexHash",
+  "galileoDatasetHash",
+  "galileoPromptSetHash",
+  "galileoTraceExportHash",
+  "galileoMetricReportHash",
+  "galileoEvaluatorConfigHash",
+  "galileoCanaryResultHash",
+  "galileoDriftStatisticHash",
+  "galileoAlertOrWaiverHash",
+  "galileoSignedEvidenceBundleHash",
+  "galileoNoSourceCopyProofHash",
+];
+
+const GALILEO_ID_FIELDS: Array<keyof ProviderDriftCanaryRow> = [
+  "galileoProductSurfaceId",
+  "galileoProjectId",
+  "galileoProviderRouteId",
+];
+
+function hasGalileoContext(row: ProviderDriftCanaryRow | undefined): boolean {
+  if (!row) return false;
+  return Boolean(
+    GALILEO_SHA_FIELDS.some((field) => isValidSha256(row[field] as string | undefined)) ||
+    GALILEO_ID_FIELDS.some((field) => normalizeOptionalId(row[field] as string | undefined)) ||
+    normalizedStringList(row.galileoMetricIds).length > 0 ||
+    Number.isFinite(row.galileoMetricCount)
+  );
+}
+
+function galileoMissingReasons(
+  row: ProviderDriftCanaryRow | undefined,
+  side: "baseline" | "candidate",
+  thresholds: ProviderDriftThresholds,
+  required: boolean,
+): string[] {
+  if (!required && !hasGalileoContext(row)) return [];
+  const reasons: string[] = [];
+  for (const field of GALILEO_SHA_FIELDS) {
+    if (!isValidSha256(row?.[field] as string | undefined)) reasons.push(`${side}:${String(field)}`);
+  }
+  for (const field of GALILEO_ID_FIELDS) {
+    if (!normalizeOptionalId(row?.[field] as string | undefined)) reasons.push(`${side}:${String(field)}`);
+  }
+  if (normalizedStringList(row?.galileoMetricIds).length === 0) reasons.push(`${side}:galileoMetricIds`);
+  if (safeNonNegative(row?.galileoMetricCount ?? 0) < thresholds.minEvaluationMetricCount) {
+    reasons.push(`${side}:galileoMetricCount`);
+  }
+  return reasons;
+}
+
+function buildGalileoComparisonFields(
+  before: ProviderDriftCanaryRow | undefined,
+  after: ProviderDriftCanaryRow | undefined,
+  galileoMissingReasons: string[],
+) {
+  return {
+    baselineGalileoSourceRefHash: normalizeSha256(before?.galileoSourceRefHash),
+    candidateGalileoSourceRefHash: normalizeSha256(after?.galileoSourceRefHash),
+    baselineGalileoWebsiteSnapshotHash: normalizeSha256(before?.galileoWebsiteSnapshotHash),
+    candidateGalileoWebsiteSnapshotHash: normalizeSha256(after?.galileoWebsiteSnapshotHash),
+    baselineGalileoDocsIndexHash: normalizeSha256(before?.galileoDocsIndexHash),
+    candidateGalileoDocsIndexHash: normalizeSha256(after?.galileoDocsIndexHash),
+    baselineGalileoProductSurfaceId: normalizeOptionalId(before?.galileoProductSurfaceId),
+    candidateGalileoProductSurfaceId: normalizeOptionalId(after?.galileoProductSurfaceId),
+    baselineGalileoProjectId: normalizeOptionalId(before?.galileoProjectId),
+    candidateGalileoProjectId: normalizeOptionalId(after?.galileoProjectId),
+    baselineGalileoDatasetHash: normalizeSha256(before?.galileoDatasetHash),
+    candidateGalileoDatasetHash: normalizeSha256(after?.galileoDatasetHash),
+    baselineGalileoPromptSetHash: normalizeSha256(before?.galileoPromptSetHash),
+    candidateGalileoPromptSetHash: normalizeSha256(after?.galileoPromptSetHash),
+    baselineGalileoTraceExportHash: normalizeSha256(before?.galileoTraceExportHash),
+    candidateGalileoTraceExportHash: normalizeSha256(after?.galileoTraceExportHash),
+    baselineGalileoMetricReportHash: normalizeSha256(before?.galileoMetricReportHash),
+    candidateGalileoMetricReportHash: normalizeSha256(after?.galileoMetricReportHash),
+    baselineGalileoEvaluatorConfigHash: normalizeSha256(before?.galileoEvaluatorConfigHash),
+    candidateGalileoEvaluatorConfigHash: normalizeSha256(after?.galileoEvaluatorConfigHash),
+    baselineGalileoProviderRouteId: normalizeOptionalId(before?.galileoProviderRouteId),
+    candidateGalileoProviderRouteId: normalizeOptionalId(after?.galileoProviderRouteId),
+    baselineGalileoCanaryResultHash: normalizeSha256(before?.galileoCanaryResultHash),
+    candidateGalileoCanaryResultHash: normalizeSha256(after?.galileoCanaryResultHash),
+    baselineGalileoDriftStatisticHash: normalizeSha256(before?.galileoDriftStatisticHash),
+    candidateGalileoDriftStatisticHash: normalizeSha256(after?.galileoDriftStatisticHash),
+    baselineGalileoAlertOrWaiverHash: normalizeSha256(before?.galileoAlertOrWaiverHash),
+    candidateGalileoAlertOrWaiverHash: normalizeSha256(after?.galileoAlertOrWaiverHash),
+    baselineGalileoSignedEvidenceBundleHash: normalizeSha256(before?.galileoSignedEvidenceBundleHash),
+    candidateGalileoSignedEvidenceBundleHash: normalizeSha256(after?.galileoSignedEvidenceBundleHash),
+    baselineGalileoNoSourceCopyProofHash: normalizeSha256(before?.galileoNoSourceCopyProofHash),
+    candidateGalileoNoSourceCopyProofHash: normalizeSha256(after?.galileoNoSourceCopyProofHash),
+    baselineGalileoMetricIds: normalizedStringList(before?.galileoMetricIds),
+    candidateGalileoMetricIds: normalizedStringList(after?.galileoMetricIds),
+    baselineGalileoMetricCount: safeNonNegative(before?.galileoMetricCount ?? 0),
+    candidateGalileoMetricCount: safeNonNegative(after?.galileoMetricCount ?? 0),
+    galileoMissingReasons,
+  };
+}
+
+function pickGalileoComparisonFields(comparison: ProviderDriftComparison): Partial<ProviderDriftEvalPackRow> {
+  return Object.fromEntries(
+    Object.entries(comparison).filter(([key]) => key.includes("Galileo") || key === "galileoMissingReasons"),
+  ) as Partial<ProviderDriftEvalPackRow>;
+}
+
 function percentRatio(after: number, before: number): number {
   if (!Number.isFinite(after) || !Number.isFinite(before)) return 0;
   if (before <= 0) return after > 0 ? 1 : 0;
@@ -1895,7 +2093,8 @@ function severityForMetric(metricId: ProviderDriftMetricId, observed: number, th
     metricId === "geospatialToolCallingEvidence" ||
     metricId === "falconEvaluateEvidence" ||
     metricId === "agentDefenseBenchEvidence" ||
-    metricId === "evidraEvidenceChainEvidence"
+    metricId === "evidraEvidenceChainEvidence" ||
+    metricId === "galileoObservabilityEvidence"
   ) return "critical";
   if (threshold <= 0) return "high";
   const ratio = Math.abs(observed / threshold);
@@ -1973,9 +2172,14 @@ export function runProviderDriftBenchmark(input: RunProviderDriftBenchmarkInput)
     const geospatialToolCallingRequired = hasGeospatialToolCallingContext(before) || hasGeospatialToolCallingContext(after);
     const agentDefenseBenchRequired = hasAgentDefenseBenchContext(before) || hasAgentDefenseBenchContext(after);
     const evidraRequired = hasEvidraContext(before) || hasEvidraContext(after);
+    const galileoRequired = hasGalileoContext(before) || hasGalileoContext(after);
     const evidraMissing = unique([
       ...evidraMissingReasons(before, "baseline", evidraRequired),
       ...evidraMissingReasons(after, "candidate", evidraRequired),
+    ]);
+    const galileoMissing = unique([
+      ...galileoMissingReasons(before, "baseline", thresholds, galileoRequired),
+      ...galileoMissingReasons(after, "candidate", thresholds, galileoRequired),
     ]);
     const comparison: ProviderDriftComparison = {
       provider: row.provider,
@@ -2284,6 +2488,7 @@ export function runProviderDriftBenchmark(input: RunProviderDriftBenchmarkInput)
         ...agentDefenseBenchMissingReasons(after, "candidate", thresholds, agentDefenseBenchRequired),
       ]),
       ...buildEvidraComparisonFields(before, after, evidraMissing),
+      ...buildGalileoComparisonFields(before, after, galileoMissing),
       baselineVersion: before?.version,
       candidateVersion: after?.version,
       baselineSampleSize: before?.sampleSize ?? 0,
@@ -2490,6 +2695,16 @@ export function runProviderDriftBenchmark(input: RunProviderDriftBenchmarkInput)
         0,
         1,
         `Provider Evidra evidence-chain proof is incomplete: ${comparison.evidraMissingReasons.join(", ")}.`,
+        active,
+      ));
+    }
+    if (comparison.galileoMissingReasons.length > 0) {
+      pairAlerts.push(makeAlert(
+        comparison,
+        "galileoObservabilityEvidence",
+        0,
+        1,
+        `Provider Galileo observability proof is incomplete: ${comparison.galileoMissingReasons.join(", ")}.`,
         active,
       ));
     }
@@ -3178,6 +3393,12 @@ export function buildProviderDriftEvalPack(
       agentDefenseBenchMissingReasons: comparison.agentDefenseBenchMissingReasons,
       evidraMissingReasons: comparison.evidraMissingReasons,
       ...pickEvidraComparisonFields(comparison),
+      ...pickGalileoComparisonFields(comparison),
+      baselineGalileoMetricIds: comparison.baselineGalileoMetricIds,
+      candidateGalileoMetricIds: comparison.candidateGalileoMetricIds,
+      baselineGalileoMetricCount: comparison.baselineGalileoMetricCount,
+      candidateGalileoMetricCount: comparison.candidateGalileoMetricCount,
+      galileoMissingReasons: comparison.galileoMissingReasons,
       repairEffectivenessDelta0to1: comparison.repairEffectivenessDelta0to1,
       falsePositiveIdentificationDelta0to1: comparison.falsePositiveIdentificationDelta0to1,
       netCodebaseImpactDelta0to1: comparison.netCodebaseImpactDelta0to1,
@@ -3666,6 +3887,54 @@ export function renderProviderDriftBenchmarkMarkdown(report: ProviderDriftBenchm
           `${item.baselineEvidraSignedEvidenceChainHash ? item.baselineEvidraSignedEvidenceChainHash.slice(0, 12) : "missing"} -> ${item.candidateEvidraSignedEvidenceChainHash ? item.candidateEvidraSignedEvidenceChainHash.slice(0, 12) : "missing"}`,
         ].join(" / "),
         item.evidraMissingReasons.join(", ") || "none",
+      ].join(" | ").replace(/^/, "| ").replace(/$/, " |"));
+    }
+    lines.push("");
+  }
+  const galileoRows = report.comparisons.filter((item) =>
+    item.baselineGalileoSourceRefHash ||
+    item.candidateGalileoSourceRefHash ||
+    item.baselineGalileoTraceExportHash ||
+    item.candidateGalileoTraceExportHash ||
+    item.baselineGalileoMetricIds.length > 0 ||
+    item.candidateGalileoMetricIds.length > 0 ||
+    item.galileoMissingReasons.length > 0
+  );
+  if (galileoRows.length > 0) {
+    lines.push("## Galileo Observability Proof");
+    lines.push("");
+    lines.push("| Canary | Source / Website / Docs | Product / Project | Dataset / Prompts | Trace / Metrics / Evaluator | Provider / Canary / Drift | Alert / Signed / No-Copy | Metrics | Missing Proof |");
+    lines.push("|---|---|---|---|---|---|---|---|---|");
+    for (const item of galileoRows) {
+      lines.push([
+        item.canaryId,
+        [
+          `${item.baselineGalileoSourceRefHash ? item.baselineGalileoSourceRefHash.slice(0, 12) : "missing"} -> ${item.candidateGalileoSourceRefHash ? item.candidateGalileoSourceRefHash.slice(0, 12) : "missing"}`,
+          `${item.baselineGalileoWebsiteSnapshotHash ? item.baselineGalileoWebsiteSnapshotHash.slice(0, 12) : "missing"} -> ${item.candidateGalileoWebsiteSnapshotHash ? item.candidateGalileoWebsiteSnapshotHash.slice(0, 12) : "missing"}`,
+          `${item.baselineGalileoDocsIndexHash ? item.baselineGalileoDocsIndexHash.slice(0, 12) : "missing"} -> ${item.candidateGalileoDocsIndexHash ? item.candidateGalileoDocsIndexHash.slice(0, 12) : "missing"}`,
+        ].join(" / "),
+        `${item.baselineGalileoProductSurfaceId ?? "missing"}:${item.baselineGalileoProjectId ?? "missing"} -> ${item.candidateGalileoProductSurfaceId ?? "missing"}:${item.candidateGalileoProjectId ?? "missing"}`,
+        [
+          `${item.baselineGalileoDatasetHash ? item.baselineGalileoDatasetHash.slice(0, 12) : "missing"} -> ${item.candidateGalileoDatasetHash ? item.candidateGalileoDatasetHash.slice(0, 12) : "missing"}`,
+          `${item.baselineGalileoPromptSetHash ? item.baselineGalileoPromptSetHash.slice(0, 12) : "missing"} -> ${item.candidateGalileoPromptSetHash ? item.candidateGalileoPromptSetHash.slice(0, 12) : "missing"}`,
+        ].join(" / "),
+        [
+          `${item.baselineGalileoTraceExportHash ? item.baselineGalileoTraceExportHash.slice(0, 12) : "missing"} -> ${item.candidateGalileoTraceExportHash ? item.candidateGalileoTraceExportHash.slice(0, 12) : "missing"}`,
+          `${item.baselineGalileoMetricReportHash ? item.baselineGalileoMetricReportHash.slice(0, 12) : "missing"} -> ${item.candidateGalileoMetricReportHash ? item.candidateGalileoMetricReportHash.slice(0, 12) : "missing"}`,
+          `${item.baselineGalileoEvaluatorConfigHash ? item.baselineGalileoEvaluatorConfigHash.slice(0, 12) : "missing"} -> ${item.candidateGalileoEvaluatorConfigHash ? item.candidateGalileoEvaluatorConfigHash.slice(0, 12) : "missing"}`,
+        ].join(" / "),
+        [
+          `${item.baselineGalileoProviderRouteId ?? "missing"} -> ${item.candidateGalileoProviderRouteId ?? "missing"}`,
+          `${item.baselineGalileoCanaryResultHash ? item.baselineGalileoCanaryResultHash.slice(0, 12) : "missing"} -> ${item.candidateGalileoCanaryResultHash ? item.candidateGalileoCanaryResultHash.slice(0, 12) : "missing"}`,
+          `${item.baselineGalileoDriftStatisticHash ? item.baselineGalileoDriftStatisticHash.slice(0, 12) : "missing"} -> ${item.candidateGalileoDriftStatisticHash ? item.candidateGalileoDriftStatisticHash.slice(0, 12) : "missing"}`,
+        ].join(" / "),
+        [
+          `${item.baselineGalileoAlertOrWaiverHash ? item.baselineGalileoAlertOrWaiverHash.slice(0, 12) : "missing"} -> ${item.candidateGalileoAlertOrWaiverHash ? item.candidateGalileoAlertOrWaiverHash.slice(0, 12) : "missing"}`,
+          `${item.baselineGalileoSignedEvidenceBundleHash ? item.baselineGalileoSignedEvidenceBundleHash.slice(0, 12) : "missing"} -> ${item.candidateGalileoSignedEvidenceBundleHash ? item.candidateGalileoSignedEvidenceBundleHash.slice(0, 12) : "missing"}`,
+          `${item.baselineGalileoNoSourceCopyProofHash ? item.baselineGalileoNoSourceCopyProofHash.slice(0, 12) : "missing"} -> ${item.candidateGalileoNoSourceCopyProofHash ? item.candidateGalileoNoSourceCopyProofHash.slice(0, 12) : "missing"}`,
+        ].join(" / "),
+        `${item.baselineGalileoMetricIds.join("+") || "missing"} -> ${item.candidateGalileoMetricIds.join("+") || "missing"} (${item.baselineGalileoMetricCount}/${item.candidateGalileoMetricCount})`,
+        item.galileoMissingReasons.join(", ") || "none",
       ].join(" | ").replace(/^/, "| ").replace(/$/, " |"));
     }
     lines.push("");

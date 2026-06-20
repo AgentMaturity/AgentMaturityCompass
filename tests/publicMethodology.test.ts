@@ -55,9 +55,10 @@ describe("public methodology manifest", () => {
     expect(first.questionSet.version).toBe("amc-legacy-240-v1");
     expect(first.questionSet.questionCount).toBe(getAllQuestions().length);
     expect(first.changelog[0]?.version).toBe(AMC_PUBLIC_METHODOLOGY_VERSION);
-    expect(first.changelog[0]?.migration).toContain("Reports generated under 2026.06.20-r210");
-    expect(first.changelog[0]?.summary).toContain("LangSmith-style observability/evaluation metric-validity boundaries");
+    expect(first.changelog[0]?.migration).toContain("Reports generated under 2026.06.20-r211");
+    expect(first.changelog[0]?.summary).toContain("Arize Phoenix/AX-style observability/evaluation metric-validity boundaries");
     for (const previousVersion of [
+      "2026.06.20-r211",
       "2026.06.20-r210",
       "2026.06.19-r209",
       "2026.06.19-r208",
@@ -367,6 +368,7 @@ describe("public methodology manifest", () => {
     expect(first.scoreClaimBoundaries.map((boundary) => boundary.boundary)).toContain("strands_benchmark_harness_live_drift_integrity");
     expect(first.scoreClaimBoundaries.map((boundary) => boundary.boundary)).toContain("costnav_physical_navigation_replay_integrity");
     expect(first.scoreClaimBoundaries.map((boundary) => boundary.boundary)).toContain("terminalworld_replay_integrity");
+    expect(first.scoreClaimBoundaries.map((boundary) => boundary.boundary)).toContain("arize_phoenix_eval_observability_metric_validity");
     expect(first.scoreClaimBoundaries[0]?.requiredEvidence).toContain("off-path attempts");
     expect(first.scoreClaimBoundaries[1]?.requiredEvidence).toContain("harm prevalence");
     expect(first.scoreClaimBoundaries[2]?.requiredEvidence).toContain("task-goal preservation");
@@ -1107,9 +1109,28 @@ describe("public methodology manifest", () => {
     expect(langSmithBoundary?.requiredEvidence).toContain("sample size");
     expect(langSmithBoundary?.requiredEvidence).toContain("confidence interval");
     expect(langSmithBoundary?.publicDisclosure).toContain("source metadata alone");
+    const arizePhoenixBoundary = first.scoreClaimBoundaries.find((boundary) => boundary.boundary === "arize_phoenix_eval_observability_metric_validity");
+    expect(arizePhoenixBoundary?.appliesWhen).toContain("Score report");
+    expect(arizePhoenixBoundary?.appliesWhen).toContain("Shield receipt");
+    expect(arizePhoenixBoundary?.appliesWhen).toContain("Watch alert");
+    expect(arizePhoenixBoundary?.requiredEvidence).toContain("live primary-source docs retrieval refs");
+    expect(arizePhoenixBoundary?.requiredEvidence).toContain("trace/span export manifest");
+    expect(arizePhoenixBoundary?.requiredEvidence).toContain("evaluator task and evaluator config manifests");
+    expect(arizePhoenixBoundary?.requiredEvidence).toContain("dataset manifest");
+    expect(arizePhoenixBoundary?.requiredEvidence).toContain("fail-closed threshold policy");
+    expect(arizePhoenixBoundary?.requiredEvidence).toContain("signed evidence refs");
+    expect(arizePhoenixBoundary?.publicDisclosure).toContain("source metadata alone");
+    expect(arizePhoenixBoundary?.publicDisclosure).toContain("not a parity claim");
+    expect(arizePhoenixBoundary?.publicDisclosure).toContain("does not authorize copied Phoenix website prose");
+    const arizePhoenixGate = first.metricValidationGates.find((gate) => gate.gate === "arize_phoenix_observability_eval_coverage");
+    expect(arizePhoenixGate?.defaultThreshold).toContain(">= 1.00 when required");
+    expect(arizePhoenixGate?.migration).toContain("signed-evidence refs");
+    expect(first.deprecationNotice).toContain("2026.06.20-r212");
+    expect(first.migrationGuidance.join("\n")).toContain("Arize Phoenix/AX-style observability/evaluation claims");
     const methodologyDoc = readFileSync("docs/SCORING_METHODOLOGY.md", "utf8");
-    expect(methodologyDoc).toContain("`2026.06.20-r211`");
-    expect(methodologyDoc).toContain("LangSmith-style observability/evaluation metric-validity boundaries");
+    expect(methodologyDoc).toContain("`2026.06.20-r212`");
+    expect(methodologyDoc).toContain("Arize Phoenix/AX-style observability/evaluation metric-validity boundaries");
+    expect(methodologyDoc).toContain("AMC must not copy Phoenix website prose");
     expect(methodologyDoc).toContain("`2026.06.19-r164`");
     expect(methodologyDoc).toContain("`2026.06.19-r163`");
     expect(methodologyDoc).toContain("`2026.06.19-r162`");
@@ -1317,6 +1338,7 @@ describe("public methodology manifest", () => {
       "safety_utility_coverage",
       "modality_transformation_coverage",
       "lifecycle_observability_coverage",
+      "arize_phoenix_observability_eval_coverage",
       "ranking_stability_coverage",
       "tool_sandbox_coverage",
       "continual_learning_coverage",
@@ -1912,8 +1934,13 @@ describe("public methodology manifest", () => {
     expect(report.methodologyVersioning?.sourceRef).toContain("github:kiosvantra/metronous");
     expect(report.methodologyVersioning?.sourceRef).toContain("github:sutro-sh/sutro");
     expect(report.methodologyVersioning?.sourceRef).toContain("github:jfrog/agent-belt");
+    expect(report.methodologyVersioning?.sourceRef).toContain("https://phoenix.arize.com");
     expect(report.methodologyVersioning?.receiptHash).toMatch(/^[a-f0-9]{64}$/);
     expect(report.methodologyVersioning?.badgeQueryParams).toContain("amc_methodology_assurance");
+    expect(report.methodologyVersioning?.requiredAuditFields).toContain("arizePhoenixThresholdPolicy");
+    expect(report.methodologyVersioning?.presentAuditFields).toContain("sourceReview.arizePhoenix.metricGate");
+    expect(report.methodologyVersioning?.evidenceRefs).toContain("amc:arize-phoenix-source-review-boundary");
+    expect(report.methodologyVersioning?.rejectedEvidenceRefs).toContain("metadata-only:phoenix.arize.com");
     expect(report.methodologyVersioning?.batchMethodologyProof?.dryRunCostEstimateRequired).toBe(true);
     expect(report.methodologyVersioning?.batchMethodologyProof?.resultExportRequired).toBe(true);
     expect(report.methodologyVersioning?.agentBeltMethodologyProof?.passPowerKReliabilityRequired).toBe(true);

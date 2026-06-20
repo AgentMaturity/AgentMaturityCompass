@@ -165,6 +165,15 @@ export {
   type RunReflexionAgentLiveDriftInput,
 } from './reflexionAgentLiveDrift.js';
 export {
+  runBraintrustLiveDrift,
+  type BraintrustLiveDriftResult,
+  type BraintrustLiveDriftRow,
+  type BraintrustRowProof,
+  type BraintrustSignalSurface,
+  type BraintrustSourceProof,
+  type RunBraintrustLiveDriftInput,
+} from './braintrustLiveDrift.js';
+export {
   defaultCtfAgentBenchmarkLiveDriftThresholds,
   runCtfAgentBenchmarkLiveDrift,
   type CtfAgentBenchmarkBehaviorDrift,
