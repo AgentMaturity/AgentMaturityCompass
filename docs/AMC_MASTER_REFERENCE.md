@@ -116,8 +116,12 @@ Telemetry is **off by default**. When enabled, only sends: OS, Node version, AMC
 | Command | Description |
 |---------|-------------|
 | `amc run --agent <id> --window <days>` | Run maturity diagnostic |
-| `amc report <runId>` | Render report for a run |
-| `amc history` | List diagnostic run history |
+| `amc report <runId|alias|latest>` | Render report for a run, saved alias, or latest run |
+| `amc report <alias> --share --public-base-url <url>` | Generate a static report share bundle and URL manifest |
+| `amc demo prospect` | Run a guided 5-minute prospect demo flow |
+| `amc demo share --public-base-url <url>` | Generate a static DEMO_ONLY prospect leave-behind bundle |
+| `amc run-alias set <alias> <run>` | Name a diagnostic run for report and history workflows |
+| `amc history` | List diagnostic run history with aliases |
 | `amc compare <runIdA> <runIdB>` | Compare two runs |
 | `amc verify` | Verify integrity across AMC artifacts |
 | `amc verify all --json` | Full verification in one pass |
@@ -425,7 +429,9 @@ Telemetry is **off by default**. When enabled, only sends: OS, Node version, AMC
 |---------|-------------|
 | `amc identity init` | Initialize identity config |
 | `amc identity provider add oidc\|saml` | Add SSO provider |
+| `amc sso configure oidc\|saml` | Discoverable SSO setup shortcut |
 | `amc identity mapping add` | Group-to-role mapping |
+| `amc scim init` | Enable SCIM provisioning and optionally create first token |
 | `amc scim token create` | Create SCIM provisioning token |
 
 ## Host Mode (Multi-Workspace)

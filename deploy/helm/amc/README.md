@@ -20,6 +20,8 @@ helm install amc ./deploy/helm/amc \
   --set image.tag=latest
 ```
 
+Production guide: `docs/KUBERNETES_HELM_DEPLOYMENT.md`.
+
 ## Example values
 
 Render internal-only deployment:
@@ -50,3 +52,11 @@ helm template amc ./deploy/helm/amc -f ./deploy/helm/amc/examples/values-persist
 - TLS ingress support
 - NetworkPolicy with ingress-controller-only ingress and DNS/upstream egress controls
 - PDB + ServiceAccount templates
+
+## Terraform
+
+The example under `deploy/terraform/helm-release/` deploys this chart with Terraform's Helm provider while keeping bootstrap secrets outside Terraform state.
+
+## Pulumi
+
+The example under `deploy/pulumi/helm-release/` deploys this chart with Pulumi's Kubernetes Helm v3 Release resource while keeping bootstrap secrets outside Pulumi stack config/state.

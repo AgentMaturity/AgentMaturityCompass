@@ -4,7 +4,10 @@
 
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import { z } from "zod";
-import { bodyJsonSchema, apiSuccess, apiError, isRequestBodyError, requireMethod } from './apiHelpers.js';
+import { bodyJson, bodyJsonSchema, apiSuccess, apiError, isRequestBodyError, requireMethod } from './apiHelpers.js';
+import type { ReplayBenchmarkCiReceipt, ReplayBenchmarkCorpusManifest } from '../benchmarks/replayBenchmarkCorpus.js';
+import type { LiveDriftReceipt } from '../watch/liveDriftAlerts.js';
+import type { JudgeCalibrationReceipt } from '../eval/judgeCalibration.js';
 
 const shieldScanBodySchema = z.object({
   code: z.string().min(1),
@@ -23,7 +26,97 @@ export async function handleShieldRoute(
   workspace = process.cwd()
 ): Promise<boolean> {
   if (pathname === '/api/v1/shield/status' && method === 'GET') {
-    apiSuccess(res, { status: 'operational', module: 'shield', capabilities: ['scan', 'injection-detect', 'sanitize'] });
+    apiSuccess(res, {
+      status: 'operational',
+      module: 'shield',
+      capabilities: ['scan', 'injection-detect', 'sanitize', 'score-explainability-receipts', 'replay-corpus-ci-receipts', 'live-drift-receipts', 'judge-calibration-receipts']
+    });
+    return true;
+  }
+
+  if (pathname === '/api/v1/shield/replay-corpus/verify' && method === 'POST') {
+    try {
+      const body = await bodyJson<{
+        manifest?: ReplayBenchmarkCorpusManifest;
+        ciReceipt?: ReplayBenchmarkCiReceipt;
+      }>(req);
+      if (!body.manifest || !body.ciReceipt) {
+        apiError(res, 400, 'Required: manifest and ciReceipt');
+        return true;
+      }
+      const { verifyReplayBenchmarkCorpusReceipt } = await import('../benchmarks/replayBenchmarkCorpus.js');
+      const verification = verifyReplayBenchmarkCorpusReceipt(body.manifest, body.ciReceipt);
+      apiSuccess(res, {
+        verification,
+        failClosed: body.ciReceipt.failClosed,
+        manifestHash: body.manifest.manifestHash,
+        receiptHash: body.ciReceipt.receiptHash,
+      });
+    } catch (err) {
+      apiError(res, 400, err instanceof Error ? err.message : 'Replay corpus receipt verification failed');
+    }
+    return true;
+  }
+
+  if (pathname === '/api/v1/shield/live-drift/verify' && method === 'POST') {
+    try {
+      const body = await bodyJson<{ receipt?: LiveDriftReceipt }>(req);
+      if (!body.receipt) {
+        apiError(res, 400, 'Required: receipt');
+        return true;
+      }
+      const { verifyLiveDriftReceipt } = await import('../watch/liveDriftAlerts.js');
+      const verification = verifyLiveDriftReceipt(body.receipt);
+      apiSuccess(res, {
+        verification,
+        failClosed: body.receipt.failClosed,
+        receiptHash: body.receipt.receiptHash,
+      });
+    } catch (err) {
+      apiError(res, 400, err instanceof Error ? err.message : 'Live drift receipt verification failed');
+    }
+    return true;
+  }
+
+  if (pathname === '/api/v1/shield/judge-calibration/verify' && method === 'POST') {
+    try {
+      const body = await bodyJson<{ receipt?: JudgeCalibrationReceipt }>(req);
+      if (!body.receipt) {
+        apiError(res, 400, 'Required: receipt');
+        return true;
+      }
+      const { verifyJudgeCalibrationReceipt } = await import('../eval/judgeCalibration.js');
+      const verification = verifyJudgeCalibrationReceipt(body.receipt);
+      apiSuccess(res, {
+        verification,
+        failClosed: body.receipt.failClosed,
+        receiptHash: body.receipt.receiptHash,
+      });
+    } catch (err) {
+      apiError(res, 400, err instanceof Error ? err.message : 'Judge calibration receipt verification failed');
+    }
+    return true;
+  }
+
+  const scoreExplainabilityParams = /^\/api\/v1\/shield\/score-explainability\/([^/]+)$/.exec(pathname);
+  if (scoreExplainabilityParams && method === 'GET') {
+    try {
+      const runId = decodeURIComponent(scoreExplainabilityParams[1]!);
+      const url = new URL(req.url ?? pathname, 'http://localhost');
+      const agentId = url.searchParams.get('agentId') ?? 'default';
+      const { loadRunReport } = await import('../diagnostic/runner.js');
+      const report = loadRunReport(workspace, runId, agentId);
+      apiSuccess(res, {
+        agentId,
+        runId,
+        trustLabel: report.trustLabel,
+        integrityIndex: report.integrityIndex,
+        questionExplainability: report.questionExplainability ?? null,
+        failClosed: report.questionExplainability?.failClosed ?? true
+      });
+    } catch (err) {
+      apiError(res, 404, err instanceof Error ? err.message : 'Question explainability receipt not found');
+    }
     return true;
   }
 

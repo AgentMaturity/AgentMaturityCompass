@@ -4,7 +4,7 @@ import { generateFrameworkReport, listSupportedFrameworks } from "../src/score/c
 describe("score crossFrameworkMapping", () => {
   test("listSupportedFrameworks returns all expected framework entries", () => {
     const supported = listSupportedFrameworks();
-    expect(supported).toHaveLength(9);
+    expect(supported).toHaveLength(10);
     expect(supported.map((s) => s.framework)).toEqual([
       "NIST_AI_RMF",
       "ISO_42001",
@@ -14,7 +14,8 @@ describe("score crossFrameworkMapping", () => {
       "FORESIGHT_SAFETY",
       "AGENTIC_4C",
       "MITRE_ATLAS",
-      "OWASP_API_TOP10"
+      "OWASP_API_TOP10",
+      "PBSAI"
     ]);
   });
 
@@ -38,8 +39,18 @@ describe("score crossFrameworkMapping", () => {
     const report = generateFrameworkReport("GDPR", { passedQIDs: [], activeModules: [] });
     expect(report.coveragePercent).toBe(0);
     expect(report.coveredControls).toHaveLength(0);
-    expect(report.gapControls.length).toBe(16);
+    expect(report.gapControls.length).toBe(17);
     expect(report.certificationReadiness).toBe(false);
+  });
+
+  test("GDPR Article 5 accountability is represented and coverable", () => {
+    const report = generateFrameworkReport("GDPR", {
+      passedQIDs: ["AMC-1.7"],
+      activeModules: []
+    });
+
+    expect(report.coveredControls).toContain("GDPR-5.2");
+    expect(report.automatedControls).toContain("GDPR-5.2");
   });
 
   test("MITRE ATLAS has technique-level controls and zero coverage with no evidence", () => {

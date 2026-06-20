@@ -189,4 +189,113 @@ describe("operational independence dependency analytics", () => {
 
     expect(resilientScore.reducedExternalAccessScore).toBeGreaterThan(fragileScore.reducedExternalAccessScore);
   });
+
+  test("logistics context scores carrier, warehouse, SLA, traceability, and cold-chain evidence", () => {
+    const events: GuardEventLike[] = [
+      eventAt(0, { reason: "carrier delivery on time" }, {
+        domain: "logistics",
+        eventType: "delivery",
+        carrierId: "ACME",
+        shipmentId: "S-1",
+        onTime: true,
+        slaMet: true,
+        traceId: "trace-1",
+        sscc: "000123456789012345"
+      }),
+      eventAt(1, { reason: "carrier pickup on time" }, {
+        domain: "freight",
+        eventType: "pickup",
+        carrierId: "ACME",
+        shipmentId: "S-2",
+        difot: true,
+        traceId: "trace-2"
+      }),
+      eventAt(2, { reason: "delivery exception resolved" }, {
+        domain: "logistics",
+        eventType: "exception",
+        exceptionType: "address-correction",
+        exceptionResolved: true,
+        resolutionHours: 3,
+        shipmentId: "S-3",
+        traceId: "trace-3"
+      }),
+      eventAt(3, { reason: "warehouse inventory reconciliation passed" }, {
+        domain: "warehouse",
+        eventType: "inventory_reconciliation",
+        warehouseId: "W1",
+        inventoryAccuracy: 0.99,
+        traceId: "trace-4"
+      }),
+      eventAt(4, { reason: "cold-chain condition check ok" }, {
+        domain: "logistics",
+        eventType: "cold_chain",
+        shipmentId: "S-4",
+        coldChain: true,
+        temperatureMonitored: true,
+        temperatureExcursion: false,
+        traceId: "trace-5"
+      })
+    ];
+
+    const result = scoreOperationalIndependenceFromEvents(events, 30, { domain: "logistics" });
+    const logistics = result.logisticsReliability;
+
+    expect(result.context).toBe("logistics");
+    expect(logistics).toBeDefined();
+    expect(logistics!.logisticsEventCount).toBe(5);
+    expect(logistics!.carriers).toEqual(["acme"]);
+    expect(logistics!.carrierReliability.onTimeRate).toBe(1);
+    expect(logistics!.exceptionManagement.unresolvedExceptions).toBe(0);
+    expect(logistics!.warehouseIntegrity.inventoryAccuracy).toBe(0.99);
+    expect(logistics!.slaPerformance.breachRate).toBe(0);
+    expect(logistics!.traceabilityCoverage.coverage).toBe(1);
+    expect(logistics!.coldChainIntegrity.excursionRate).toBe(0);
+    expect(logistics!.score).toBeGreaterThanOrEqual(95);
+  });
+
+  test("logistics context flags weak freight and warehouse telemetry", () => {
+    const events: GuardEventLike[] = [
+      eventAt(0, { decision: "warn", reason: "carrier delivery late and SLA breach", severity: "medium" }, {
+        domain: "logistics",
+        eventType: "delivery",
+        carrierId: "SlowCarrier",
+        shipmentId: "S-1",
+        onTime: false,
+        slaBreached: true
+      }),
+      eventAt(1, { decision: "warn", reason: "freight exception unresolved", severity: "medium" }, {
+        domain: "freight",
+        eventType: "exception",
+        exceptionType: "damaged",
+        exceptionResolved: false,
+        exceptionAgeHours: 30
+      }),
+      eventAt(2, { decision: "deny", reason: "warehouse pick error and inventory mismatch", severity: "high" }, {
+        domain: "warehouse",
+        eventType: "pick",
+        warehouseId: "W1",
+        pickPackError: true,
+        inventoryAccuracy: 0.88
+      }),
+      eventAt(3, { decision: "warn", reason: "cold-chain temperature excursion", severity: "high" }, {
+        domain: "logistics",
+        eventType: "cold_chain",
+        shipmentId: "S-2",
+        coldChain: true,
+        temperatureExcursion: true
+      })
+    ];
+
+    const result = scoreOperationalIndependenceFromEvents(events, 30, { domain: "logistics" });
+    const logistics = result.logisticsReliability;
+
+    expect(logistics).toBeDefined();
+    expect(logistics!.score).toBeLessThan(50);
+    expect(logistics!.status).toBe("critical");
+    expect(logistics!.gaps).toEqual(expect.arrayContaining([
+      expect.stringContaining("carrier reliability"),
+      expect.stringContaining("traceability coverage")
+    ]));
+    expect(logistics!.recommendedActions.join(" ")).toContain("EPCIS");
+  });
 });

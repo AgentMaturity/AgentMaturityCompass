@@ -52,8 +52,14 @@ code,pre{font-family:var(--mono)}
 
 @media(max-width:768px){.hero h1{font-size:1.5rem}}
 </style>
+<style id="skip-link-style">
+.skip-link{position:fixed;left:-9999px;top:12px;z-index:10000;padding:8px 14px;background:#4AEF79;color:#0a0a0a;font:700 14px system-ui,sans-serif;text-decoration:none}
+.skip-link:focus,.skip-link:focus-visible{left:12px}
+:where(a,button,input,select,textarea,[tabindex]:not([tabindex="-1"])):focus-visible{outline:2px solid #4AEF79;outline-offset:3px}
+</style>
 </head>
 <body>
+<a href="#main-content" class="skip-link">Skip to content</a>
 
 <nav class="nav">
   <a href="./" class="logo">🛡️ AMC</a>
@@ -64,6 +70,7 @@ code,pre{font-family:var(--mono)}
   <a href="changelog.html" style="color:var(--green)">Changelog</a>
   <a href="https://github.com/AgentMaturity/AgentMaturityCompass" target="_blank">GitHub</a>
 </nav>
+<div id="main-content" tabindex="-1"></div>
 
 <div class="hero">
   <h1>📋 Changelog</h1>
@@ -72,7 +79,26 @@ code,pre{font-family:var(--mono)}
 
 <div class="container">
   <div id="changelog-content">
-    <div class="loading">Loading changelog...</div>
+    <noscript>
+      <p class="loading">JavaScript disabled. Static release notes fallback is shown below. MDN noscript reference: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/noscript</p>
+    </noscript>
+    <div class="timeline" aria-label="Static release notes fallback">
+      <div class="version">
+        <h2>Version 1.0.0</h2>
+        <div class="date">2026-06-16 static release notes fallback</div>
+        <h3>Added</h3>
+        <ul>
+          <li>GRC treatment-plan export for portfolio risk registers with CSV, JSON, and Markdown output.</li>
+          <li>Community demo kit with a GitHub-shareable terminal SVG and concise Why AMC one-pager.</li>
+          <li>Self-hosted cloud reference architectures, Helm deployment guidance, and Terraform/Pulumi Helm-release examples.</li>
+        </ul>
+        <h3>Verified</h3>
+        <ul>
+          <li>Generated CLI command inventory and API reference use the compiled command registry.</li>
+          <li>Blog index includes real article cards and long-form article content, not placeholder copy.</li>
+        </ul>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -84,6 +110,7 @@ code,pre{font-family:var(--mono)}
 <script>
 (async function() {
   const container = document.getElementById('changelog-content');
+  const staticFallback = container.innerHTML;
   try {
     const resp = await fetch('https://raw.githubusercontent.com/AgentMaturity/AgentMaturityCompass/main/CHANGELOG.md');
     if (!resp.ok) throw new Error('HTTP ' + resp.status);
@@ -132,7 +159,8 @@ code,pre{font-family:var(--mono)}
       <h2>⚠️ Failed to load changelog</h2>
       <p>${err.message}</p>
       <p style="margin-top:12px"><a href="https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/CHANGELOG.md" target="_blank">View on GitHub →</a></p>
-    </div>`;
+      <p style="margin-top:12px">Using the Static release notes fallback below.</p>
+    </div>${staticFallback}`;
   }
 })();
 </script>

@@ -67,6 +67,13 @@ export type { ValidationResult as ShieldValidationResult, ValidationViolation, V
 // ── Trust Pipeline (end-to-end trust orchestration) ──────────────────────
 export { runTrustPipeline } from './trustPipeline.js';
 export type { TrustPipelineInput, TrustPipelineResult } from './trustPipeline.js';
+export { analyzeRuntimeAction } from './runtimeAnalyzer.js';
+export type {
+  RuntimeShieldAnalysisInput,
+  RuntimeShieldAnalysisReport,
+  RuntimeShieldRiskLevel,
+  RuntimeShieldStageSummary,
+} from './runtimeAnalyzer.js';
 
 // ── Continuous Red Team (evolutionary adversarial testing) ────────────────
 export { ContinuousRedTeam } from './continuousRedTeam.js';

@@ -46,7 +46,7 @@ No existing tool combines:
 - Multi-dimensional maturity model (L0-L5)
 - Automated compliance artifact generation
 - Multi-agent fleet governance
-- 40 industry-specific domain packs
+- 41 industry-specific domain packs
 - Zero-code framework integration (14 adapters)
 
 ## Competitive Threats
@@ -68,4 +68,4 @@ No existing tool combines:
 2. **Open source** (MIT) — community contributions compound
 3. **Framework agnostic** — works with any agent, any provider
 4. **Evidence-based** — cryptographic proofs set a higher bar than competitors can easily match
-5. **Depth** — 92 scoring modules, 40 domain packs, 14 adapters built before launch
+5. **Depth** — 92 scoring modules, 41 domain packs, 14 adapters built before launch

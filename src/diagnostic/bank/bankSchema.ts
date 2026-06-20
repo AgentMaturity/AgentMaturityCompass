@@ -1,4 +1,27 @@
 import { z } from "zod";
+import { questionBank } from "../questionBank.js";
+
+function dimensionIdForLayerName(layerName: string): 1 | 2 | 3 | 4 | 5 {
+  if (layerName === "Strategic Agent Operations") return 1;
+  if (layerName === "Leadership & Autonomy") return 2;
+  if (layerName === "Culture & Alignment") return 3;
+  if (layerName === "Resilience") return 4;
+  return 5;
+}
+
+const expectedQuestionCount = questionBank.length;
+const expectedDimensionCounts: Record<number, number> = {
+  1: 0,
+  2: 0,
+  3: 0,
+  4: 0,
+  5: 0
+};
+
+for (const question of questionBank) {
+  const dimensionId = dimensionIdForLayerName(question.layerName);
+  expectedDimensionCounts[dimensionId] = (expectedDimensionCounts[dimensionId] ?? 0) + 1;
+}
 
 export const diagnosticBankAgentTypes = [
   "code-agent",
@@ -58,7 +81,7 @@ export const diagnosticBankSchema = z
     diagnosticBank: z.object({
       version: z.literal(1),
       dimensions: z.array(diagnosticBankDimensionSchema).length(5),
-      questions: z.array(diagnosticBankQuestionSchema).length(240)
+      questions: z.array(diagnosticBankQuestionSchema).length(expectedQuestionCount)
     })
   })
   .superRefine((value, ctx) => {
@@ -95,14 +118,6 @@ export const diagnosticBankSchema = z
       }
     }
 
-    const expectedCounts: Record<number, number> = {
-      1: 19,
-      2: 23,
-      3: 94,
-      4: 55,
-      5: 49
-    };
-
     const actualCounts: Record<number, number> = {
       1: 0,
       2: 0,
@@ -115,17 +130,17 @@ export const diagnosticBankSchema = z
     }
 
     for (const key of [1, 2, 3, 4, 5]) {
-      if ((actualCounts[key] ?? 0) !== expectedCounts[key]) {
+      if ((actualCounts[key] ?? 0) !== expectedDimensionCounts[key]) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: `dimension ${key} must contain ${expectedCounts[key]} questions (found ${actualCounts[key] ?? 0})`
+          message: `dimension ${key} must contain ${expectedDimensionCounts[key]} questions (found ${actualCounts[key] ?? 0})`
         });
       }
       const declared = dimensions.find((row) => row.id === key)?.questionCount;
-      if (declared !== expectedCounts[key]) {
+      if (declared !== expectedDimensionCounts[key]) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: `dimension metadata for ${key} must declare questionCount=${expectedCounts[key]}`
+          message: `dimension metadata for ${key} must declare questionCount=${expectedDimensionCounts[key]}`
         });
       }
     }

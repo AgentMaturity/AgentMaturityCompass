@@ -25,8 +25,16 @@ export interface ApiKeyRecord {
   usageCount: number;
 }
 
-interface StoredApiKeyRecord extends ApiKeyRecord {
+export interface ApiKeyStoreRecord extends ApiKeyRecord {
   secretHash: string;
+}
+
+interface StoredApiKeyRecord extends ApiKeyStoreRecord {}
+
+export interface ApiKeyStoreSnapshot {
+  v: 1;
+  keys: ApiKeyStoreRecord[];
+  usageEvents: ApiKeyUsageEvent[];
 }
 
 export interface ApiKeyIssueResult {
@@ -82,6 +90,36 @@ export class ApiKeyManager {
   private readonly keys = new Map<string, StoredApiKeyRecord>();
   private readonly keyIdBySecretHash = new Map<string, string>();
   private readonly usageEvents = new Map<string, ApiKeyUsageEvent[]>();
+
+  static fromSnapshot(snapshot: ApiKeyStoreSnapshot): ApiKeyManager {
+    const manager = new ApiKeyManager();
+    if (snapshot.v !== 1) {
+      throw new Error(`unsupported api key store version: ${String((snapshot as { v?: unknown }).v)}`);
+    }
+    for (const record of snapshot.keys) {
+      manager.keys.set(record.keyId, { ...record });
+      manager.keyIdBySecretHash.set(record.secretHash, record.keyId);
+    }
+    for (const event of snapshot.usageEvents) {
+      const current = manager.usageEvents.get(event.keyId) ?? [];
+      current.push({ ...event });
+      manager.usageEvents.set(event.keyId, current);
+    }
+    return manager;
+  }
+
+  toSnapshot(): ApiKeyStoreSnapshot {
+    return {
+      v: 1,
+      keys: Array.from(this.keys.values())
+        .map((record) => ({ ...record }))
+        .sort((a, b) => a.createdTs - b.createdTs),
+      usageEvents: Array.from(this.usageEvents.values())
+        .flat()
+        .map((event) => ({ ...event }))
+        .sort((a, b) => a.ts - b.ts)
+    };
+  }
 
   createKey(params: {
     scope: ApiKeyScope;

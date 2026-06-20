@@ -2,7 +2,7 @@
  * Risk-Tiered Assessment Profiles — MF-13
  *
  * Configures evaluation depth based on agent risk tier:
- * - Critical: Full 240 questions + all assurance packs
+ * - Critical: Full current default question bank + all assurance packs
  * - High: 150 questions + security assurance packs
  * - Medium: 100 core questions
  * - Low: 50 essential questions

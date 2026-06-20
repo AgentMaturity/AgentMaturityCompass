@@ -51,7 +51,7 @@ ISO 42001 provides a comprehensive AI management system framework with:
 
 GDPR establishes data protection principles and requirements:
 
-- **Art. 5**: Lawfulness, fairness, transparency, purpose limitation, data minimization, accuracy, storage limitation, integrity & confidentiality
+- **Art. 5**: Lawfulness, fairness, transparency, purpose limitation, data minimization, accuracy, storage limitation, integrity & confidentiality, and accountability
 - **Art. 6**: Lawful basis for processing
 - **Art. 15-22**: Data subject rights (access, rectification, erasure, restriction, portability, objection)
 - **Art. 25**: Data protection by design and by default

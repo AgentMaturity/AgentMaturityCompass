@@ -67,8 +67,14 @@ code,pre{font-family:var(--mono)}
 
 @media(max-width:768px){.hero h1{font-size:1.5rem}.article h1{font-size:1.4rem}.nav{flex-wrap:wrap;gap:10px}}
 </style>
+<style id="skip-link-style">
+.skip-link{position:fixed;left:-9999px;top:12px;z-index:10000;padding:8px 14px;background:#4AEF79;color:#0a0a0a;font:700 14px system-ui,sans-serif;text-decoration:none}
+.skip-link:focus,.skip-link:focus-visible{left:12px}
+:where(a,button,input,select,textarea,[tabindex]:not([tabindex="-1"])):focus-visible{outline:2px solid #4AEF79;outline-offset:3px}
+</style>
 </head>
 <body>
+<a href="#main-content" class="skip-link">Skip to content</a>
 
 <nav class="nav">
   <a href="./" class="logo">🛡️ AMC</a>
@@ -79,6 +85,7 @@ code,pre{font-family:var(--mono)}
   <a href="changelog.html">Changelog</a>
   <a href="https://github.com/AgentMaturity/AgentMaturityCompass" target="_blank">GitHub</a>
 </nav>
+<div id="main-content" tabindex="-1"></div>
 
 <div class="hero" id="blog-hero">
   <h1>📝 AMC Blog</h1>

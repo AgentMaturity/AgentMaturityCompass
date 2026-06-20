@@ -75,6 +75,8 @@ describe("generateTrustCertificate", () => {
     });
 
     expect(out.format).toBe("json");
+    expect(out.signatureStatus).toBe("SIGNED");
+    expect(out.envelope.signatureStatus).toBe("SIGNED");
     expect(existsSync(out.outputPath)).toBe(true);
     expect(out.envelope.payload.agentId).toBe("agent-x");
     expect(out.envelope.payload.score).toBe(82);
@@ -105,6 +107,32 @@ describe("generateTrustCertificate", () => {
     const verified = verifyTrustCertificateEnvelope(tampered);
     expect(verified.ok).toBe(false);
     expect(verified.errors.some((error) => error.includes("payloadSha256"))).toBe(true);
+  });
+
+  test("generates an unsigned preview without vault signing and verifier rejects it", () => {
+    const workspace = newWorkspace();
+    delete process.env.AMC_VAULT_PASSPHRASE;
+    writeRun(workspace, "agent-x", "run-1", 1000, 0.73);
+
+    const out = generateTrustCertificate({
+      workspace,
+      agentId: "agent-x",
+      outputPath: "preview.json",
+      nowTs: 1700000000000,
+      preview: true
+    });
+
+    expect(out.format).toBe("json");
+    expect(out.signatureStatus).toBe("UNSIGNED_PREVIEW");
+    expect(out.envelope.signatureAlgorithm).toBe("unsigned-preview");
+    expect(out.envelope.signature).toBe("UNSIGNED_PREVIEW");
+    expect(out.envelope.claimBoundary).toContain("not verifier-ready evidence");
+    expect(out.envelope.payload.signingKey.kind).toBe("preview");
+    expect(out.envelope.payload.score).toBe(73);
+
+    const verified = verifyTrustCertificateEnvelope(out.envelope);
+    expect(verified.ok).toBe(false);
+    expect(verified.errors.some((error) => error.includes("unsigned preview certificate"))).toBe(true);
   });
 
   test("writes PDF certificate and machine-verifiable JSON sidecar", () => {
@@ -162,4 +190,3 @@ describe("generateTrustCertificate", () => {
     expect(out.envelope.payload.signingKey.fingerprint).toBe(expected);
   });
 });
-

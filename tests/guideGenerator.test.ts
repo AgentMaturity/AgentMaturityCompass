@@ -100,6 +100,22 @@ describe("guideGenerator", () => {
     }
   });
 
+  it("adds benchmark-submission evidence guidance for high-target verified outcome gaps", () => {
+    const guide = generateGuide({
+      overall: 2,
+      questionScores: [makeScore("AMC-2.3", 2)],
+      targetLevel: 4,
+    });
+
+    expect(guide.sections).toHaveLength(1);
+    expect(guide.sections[0]?.evidenceNeeded).toEqual(
+      expect.arrayContaining([
+        expect.stringContaining("Benchmark-submission receipt with signed task breakdown"),
+      ]),
+    );
+    expect(guideToHumanMarkdown(guide)).toContain("criterion-level scores");
+  });
+
   it("sorts sections by impact (biggest gap first)", () => {
     const scores = [
       makeScore(questionBank[0]!.id, 4),  // small gap

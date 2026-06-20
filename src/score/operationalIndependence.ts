@@ -79,8 +79,61 @@ export interface VendorLockInRiskScore {
   recommendations: string[];
 }
 
+export type OperationalIndependenceDomainContext = "generic" | "logistics";
+
+export interface LogisticsReliabilityMetric {
+  score: number;
+  evidenceEvents: number;
+  notes: string[];
+}
+
+export interface LogisticsReliabilityScore {
+  score: number;
+  status: "ready" | "watch" | "degrading" | "critical";
+  logisticsEventCount: number;
+  telemetryConfidence: number;
+  carriers: string[];
+  carrierReliability: LogisticsReliabilityMetric & {
+    shipmentEvents: number;
+    failedShipmentEvents: number;
+    onTimeRate: number;
+  };
+  exceptionManagement: LogisticsReliabilityMetric & {
+    exceptionEvents: number;
+    resolvedExceptions: number;
+    unresolvedExceptions: number;
+    avgResolutionHours: number | null;
+  };
+  warehouseIntegrity: LogisticsReliabilityMetric & {
+    warehouseEvents: number;
+    errorEvents: number;
+    inventoryAccuracy: number | null;
+  };
+  slaPerformance: LogisticsReliabilityMetric & {
+    slaEvents: number;
+    breachEvents: number;
+    breachRate: number;
+  };
+  traceabilityCoverage: LogisticsReliabilityMetric & {
+    traceableEvents: number;
+    coverage: number;
+  };
+  coldChainIntegrity: LogisticsReliabilityMetric & {
+    monitoredEvents: number;
+    excursionEvents: number;
+    excursionRate: number;
+  };
+  gaps: string[];
+  recommendedActions: string[];
+}
+
+export interface OperationalIndependenceOptions {
+  domain?: string;
+}
+
 export interface OperationalIndependenceScore {
   score: number; // 0-100
+  context: OperationalIndependenceDomainContext;
   longestRunDays: number;
   escalationRate: number; // percent
   driftEvents: number;
@@ -91,6 +144,7 @@ export interface OperationalIndependenceScore {
   dependencyDrift: DependencyDriftReport;
   gracefulDegradation: GracefulDegradationScore;
   vendorLockInRisk: VendorLockInRiskScore;
+  logisticsReliability?: LogisticsReliabilityScore;
 }
 
 export interface GuardEventLike {
@@ -397,6 +451,353 @@ function isDrift(event: GuardEventLike): boolean {
   const meta = parseMeta(event.meta_json);
   const auditType = String((meta as { auditType?: string } | null)?.auditType || "").toLowerCase();
   return reason.includes("drift") || reason.includes("anomaly") || reason.includes("deviation") || auditType.includes("drift");
+}
+
+function normalizeContext(value?: string): OperationalIndependenceDomainContext {
+  if (!value) return "generic";
+  const normalized = value.trim().toLowerCase().replace(/[_\s]+/g, "-");
+  if ([
+    "logistics",
+    "freight",
+    "3pl",
+    "third-party-logistics",
+    "warehouse",
+    "warehousing",
+    "carrier",
+    "carrier-management",
+    "transportation",
+    "port-logistics",
+    "supply-chain-logistics"
+  ].includes(normalized)) {
+    return "logistics";
+  }
+  return "generic";
+}
+
+function lowerMetaValue(meta: Record<string, unknown>, keys: string[]): string {
+  return keys
+    .map((key) => meta[key])
+    .filter((value) => typeof value === "string" || typeof value === "number" || typeof value === "boolean")
+    .map((value) => String(value).toLowerCase())
+    .join(" ");
+}
+
+function logisticsText(event: GuardEventLike, meta: Record<string, unknown>): string {
+  return `${event.module_code} ${event.reason} ${lowerMetaValue(meta, [
+    "domain",
+    "sector",
+    "workflow",
+    "eventType",
+    "operation",
+    "carrierId",
+    "shipmentId",
+    "loadId",
+    "warehouseId",
+    "exceptionType",
+    "deliveryStatus",
+    "pickupStatus",
+    "status",
+    "kpi",
+    "system"
+  ])}`.toLowerCase();
+}
+
+function isLogisticsEvent(event: GuardEventLike, meta: Record<string, unknown>): boolean {
+  const text = logisticsText(event, meta);
+  return /\b(logistics|freight|shipment|shipper|carrier|3pl|warehouse|wms|tms|load|lane|route|delivery|pickup|dock|inventory|putaway|pick|pack|pallet|container|sscc|epcis|edi|telematics|cold[\s-]?chain|otif|difot|demurrage|detention)\b/i.test(text);
+}
+
+function isShipmentEvent(event: GuardEventLike, meta: Record<string, unknown>): boolean {
+  const eventType = firstString(meta, ["eventType", "operation"]);
+  if (eventType && /\b(exception|inventory|warehouse|cold_chain|condition)\b/i.test(eventType)) return false;
+  const text = logisticsText(event, meta);
+  return /\b(shipment|carrier|load|lane|route|delivery|pickup|tender|otif|difot|freight)\b/i.test(text);
+}
+
+function isFailedShipmentEvent(event: GuardEventLike, meta: Record<string, unknown>): boolean {
+  const text = logisticsText(event, meta);
+  if (firstBoolean(meta, ["onTime", "otif", "difot", "deliveredOnTime"]) === false) return true;
+  if (firstBoolean(meta, ["failed", "damaged", "lost", "late", "missedPickup", "failedDelivery"]) === true) return true;
+  return /\b(late|delayed|missed|failed|failure|damaged|lost|short|refused|exception|detention|demurrage)\b/i.test(text);
+}
+
+function isExceptionEvent(event: GuardEventLike, meta: Record<string, unknown>): boolean {
+  const text = logisticsText(event, meta);
+  return firstString(meta, ["exceptionType", "exceptionId"]) !== null ||
+    /\b(exception|hold|damage|lost|late|delayed|missed|detention|demurrage|customs|quarantine|incident)\b/i.test(text);
+}
+
+function isExceptionResolved(event: GuardEventLike, meta: Record<string, unknown>): boolean {
+  const resolved = firstBoolean(meta, ["resolved", "exceptionResolved", "closed"]);
+  if (resolved !== null) return resolved;
+  const status = lowerMetaValue(meta, ["status", "exceptionStatus"]);
+  return /\b(resolved|closed|cleared|remediated)\b/.test(status) || /\bresolved|closed|cleared|remediated\b/i.test(event.reason);
+}
+
+function isWarehouseEvent(event: GuardEventLike, meta: Record<string, unknown>): boolean {
+  const text = logisticsText(event, meta);
+  return /\b(warehouse|wms|inventory|receiving|putaway|pick|pack|ship|cycle[\s-]?count|dock|stockout|short[\s-]?pick|adjustment)\b/i.test(text);
+}
+
+function isWarehouseError(event: GuardEventLike, meta: Record<string, unknown>): boolean {
+  const text = logisticsText(event, meta);
+  if (firstBoolean(meta, ["inventoryMismatch", "inventoryAdjustment", "pickPackError", "stockout", "shortPick"]) === true) return true;
+  return /\b(mismatch|adjustment|pick[\s-]?error|pack[\s-]?error|stockout|short[\s-]?pick|mis[-\s]?ship|cycle count variance)\b/i.test(text);
+}
+
+function isSlaEvent(event: GuardEventLike, meta: Record<string, unknown>): boolean {
+  const text = logisticsText(event, meta);
+  return firstBoolean(meta, ["slaBreached", "slaMet"]) !== null ||
+    firstNumber(meta, ["slaMs", "slaTargetMs", "slaLatencyMs", "targetHours", "actualHours"]) !== null ||
+    /\b(sla|slo|otif|difot|on[\s-]?time|service level|breach)\b/i.test(text);
+}
+
+function isSlaBreach(event: GuardEventLike, meta: Record<string, unknown>): boolean {
+  const breached = firstBoolean(meta, ["slaBreached", "breached"]);
+  if (breached !== null) return breached;
+  const met = firstBoolean(meta, ["slaMet", "onTime", "otif", "difot"]);
+  if (met === false) return true;
+  const targetHours = firstNumber(meta, ["targetHours", "slaHours"]);
+  const actualHours = firstNumber(meta, ["actualHours", "elapsedHours", "resolutionHours"]);
+  if (targetHours !== null && actualHours !== null && actualHours > targetHours) return true;
+  return /\b(sla breach|breached sla|missed sla|late|delayed|overdue)\b/i.test(`${event.reason} ${lowerMetaValue(meta, ["status"])}`);
+}
+
+function isTraceableLogisticsEvent(meta: Record<string, unknown>): boolean {
+  return firstString(meta, [
+    "traceId",
+    "epcisEventId",
+    "gs1EventId",
+    "sscc",
+    "lotId",
+    "serialNumber",
+    "containerId",
+    "chainOfCustodyId",
+    "signedEvidenceRef",
+    "receiptId"
+  ]) !== null;
+}
+
+function isColdChainEvent(event: GuardEventLike, meta: Record<string, unknown>): boolean {
+  const text = logisticsText(event, meta);
+  return firstNumber(meta, ["temperatureC", "temperatureF", "humidityPct", "shockG"]) !== null ||
+    firstBoolean(meta, ["coldChain", "temperatureMonitored", "temperatureExcursion"]) !== null ||
+    /\b(cold[\s-]?chain|temperature|humidity|reefer|seal|excursion|shock)\b/i.test(text);
+}
+
+function isColdChainExcursion(event: GuardEventLike, meta: Record<string, unknown>): boolean {
+  const excursion = firstBoolean(meta, ["temperatureExcursion", "conditionExcursion", "coldChainBreach", "sealBroken"]);
+  if (excursion !== null) return excursion;
+  return /\b(excursion|out of range|temperature breach|seal broken|condition breach)\b/i.test(logisticsText(event, meta));
+}
+
+function boundedScore(value: number): number {
+  return Math.max(0, Math.min(100, Math.round(value)));
+}
+
+function avgOrNull(values: number[]): number | null {
+  if (values.length === 0) return null;
+  return Number((values.reduce((sum, value) => sum + value, 0) / values.length).toFixed(2));
+}
+
+function metricNoEvidence(label: string): LogisticsReliabilityMetric {
+  return {
+    score: 0,
+    evidenceEvents: 0,
+    notes: [`No ${label} evidence was observed in logistics telemetry.`]
+  };
+}
+
+export function scoreLogisticsOperationalReliabilityFromEvents(events: GuardEventLike[]): LogisticsReliabilityScore {
+  const logisticsEvents = events
+    .map((event) => ({ event, meta: parseMeta(event.meta_json) }))
+    .filter(({ event, meta }) => isLogisticsEvent(event, meta));
+
+  const carriers = [...new Set(
+    logisticsEvents
+      .map(({ meta }) => firstString(meta, ["carrierId", "carrier", "scac", "providerId"]))
+      .filter((carrier): carrier is string => typeof carrier === "string" && carrier.trim().length > 0)
+      .map((carrier) => sanitizeToken(carrier))
+  )].sort((a, b) => a.localeCompare(b));
+
+  const shipmentEvents = logisticsEvents.filter(({ event, meta }) => isShipmentEvent(event, meta));
+  const failedShipmentEvents = shipmentEvents.filter(({ event, meta }) => isFailedShipmentEvent(event, meta));
+  const onTimeRate = shipmentEvents.length > 0 ? (shipmentEvents.length - failedShipmentEvents.length) / shipmentEvents.length : 0;
+  const carrierReliability: LogisticsReliabilityScore["carrierReliability"] = shipmentEvents.length === 0
+    ? { ...metricNoEvidence("carrier shipment"), shipmentEvents: 0, failedShipmentEvents: 0, onTimeRate: 0 }
+    : {
+      score: boundedScore(onTimeRate * 100),
+      evidenceEvents: shipmentEvents.length,
+      shipmentEvents: shipmentEvents.length,
+      failedShipmentEvents: failedShipmentEvents.length,
+      onTimeRate: Number(onTimeRate.toFixed(4)),
+      notes: failedShipmentEvents.length === 0
+        ? ["Carrier shipment evidence shows no late, missed, damaged, or lost shipment signal."]
+        : [`${failedShipmentEvents.length} of ${shipmentEvents.length} carrier shipment event(s) indicate late, missed, damaged, lost, or failed execution.`]
+    };
+
+  const exceptionEvents = logisticsEvents.filter(({ event, meta }) => isExceptionEvent(event, meta));
+  const resolvedExceptions = exceptionEvents.filter(({ event, meta }) => isExceptionResolved(event, meta));
+  const unresolvedExceptions = exceptionEvents.length - resolvedExceptions.length;
+  const resolutionHours = exceptionEvents
+    .map(({ meta }) => firstNumber(meta, ["resolutionHours", "timeToResolveHours", "exceptionAgeHours"]))
+    .filter((value): value is number => typeof value === "number" && Number.isFinite(value) && value >= 0);
+  const exceptionResolutionRate = exceptionEvents.length > 0 ? resolvedExceptions.length / exceptionEvents.length : 1;
+  const avgResolutionHours = avgOrNull(resolutionHours);
+  const resolutionTimeBonus = avgResolutionHours === null ? 15 : avgResolutionHours <= 4 ? 30 : avgResolutionHours <= 24 ? 20 : 5;
+  const exceptionManagement: LogisticsReliabilityScore["exceptionManagement"] = exceptionEvents.length === 0
+    ? {
+      score: logisticsEvents.length > 0 ? 100 : 0,
+      evidenceEvents: 0,
+      exceptionEvents: 0,
+      resolvedExceptions: 0,
+      unresolvedExceptions: 0,
+      avgResolutionHours: null,
+      notes: logisticsEvents.length > 0
+        ? ["No delivery, warehouse, or carrier exceptions were observed in this logistics window."]
+        : ["No exception evidence was observed in logistics telemetry."]
+    }
+    : {
+      score: boundedScore(exceptionResolutionRate * 70 + resolutionTimeBonus),
+      evidenceEvents: exceptionEvents.length,
+      exceptionEvents: exceptionEvents.length,
+      resolvedExceptions: resolvedExceptions.length,
+      unresolvedExceptions,
+      avgResolutionHours,
+      notes: unresolvedExceptions === 0
+        ? ["All observed logistics exceptions have closure evidence."]
+        : [`${unresolvedExceptions} logistics exception(s) lack closure evidence.`]
+    };
+
+  const warehouseEvents = logisticsEvents.filter(({ event, meta }) => isWarehouseEvent(event, meta));
+  const warehouseErrors = warehouseEvents.filter(({ event, meta }) => isWarehouseError(event, meta));
+  const inventoryAccuracyValues = warehouseEvents
+    .map(({ meta }) => firstNumber(meta, ["inventoryAccuracy", "inventoryAccuracyRate", "cycleCountAccuracy"]))
+    .filter((value): value is number => typeof value === "number" && Number.isFinite(value))
+    .map((value) => value > 1 ? value / 100 : value)
+    .filter((value) => value >= 0 && value <= 1);
+  const inventoryAccuracy = avgOrNull(inventoryAccuracyValues);
+  const warehouseScore = inventoryAccuracy !== null
+    ? inventoryAccuracy * 100 - Math.min(40, warehouseErrors.length * 8)
+    : warehouseEvents.length > 0
+      ? ((warehouseEvents.length - warehouseErrors.length) / warehouseEvents.length) * 100
+      : 0;
+  const warehouseIntegrity: LogisticsReliabilityScore["warehouseIntegrity"] = warehouseEvents.length === 0
+    ? { ...metricNoEvidence("warehouse/WMS"), warehouseEvents: 0, errorEvents: 0, inventoryAccuracy: null }
+    : {
+      score: boundedScore(warehouseScore),
+      evidenceEvents: warehouseEvents.length,
+      warehouseEvents: warehouseEvents.length,
+      errorEvents: warehouseErrors.length,
+      inventoryAccuracy,
+      notes: warehouseErrors.length === 0
+        ? ["Warehouse/WMS evidence shows no inventory mismatch, stockout, or pick-pack error signal."]
+        : [`${warehouseErrors.length} warehouse integrity event(s) indicate inventory mismatch, stockout, adjustment, or pick-pack error.`]
+    };
+
+  const slaEvents = logisticsEvents.filter(({ event, meta }) => isSlaEvent(event, meta));
+  const breachEvents = slaEvents.filter(({ event, meta }) => isSlaBreach(event, meta));
+  const breachRate = slaEvents.length > 0 ? breachEvents.length / slaEvents.length : 0;
+  const slaPerformance: LogisticsReliabilityScore["slaPerformance"] = slaEvents.length === 0
+    ? { ...metricNoEvidence("SLA/OTIF"), slaEvents: 0, breachEvents: 0, breachRate: 0 }
+    : {
+      score: boundedScore((1 - breachRate) * 100),
+      evidenceEvents: slaEvents.length,
+      slaEvents: slaEvents.length,
+      breachEvents: breachEvents.length,
+      breachRate: Number(breachRate.toFixed(4)),
+      notes: breachEvents.length === 0
+        ? ["SLA/OTIF evidence shows no breach signal."]
+        : [`${breachEvents.length} of ${slaEvents.length} SLA/OTIF event(s) breached target.`]
+    };
+
+  const traceableEvents = logisticsEvents.filter(({ meta }) => isTraceableLogisticsEvent(meta));
+  const traceCoverage = logisticsEvents.length > 0 ? traceableEvents.length / logisticsEvents.length : 0;
+  const traceabilityCoverage: LogisticsReliabilityScore["traceabilityCoverage"] = logisticsEvents.length === 0
+    ? { ...metricNoEvidence("GS1/EPCIS or custody traceability"), traceableEvents: 0, coverage: 0 }
+    : {
+      score: boundedScore(traceCoverage * 100),
+      evidenceEvents: logisticsEvents.length,
+      traceableEvents: traceableEvents.length,
+      coverage: Number(traceCoverage.toFixed(4)),
+      notes: traceCoverage >= 0.9
+        ? ["Most logistics events carry trace, custody, SSCC, lot, EPCIS, or receipt identifiers."]
+        : [`${logisticsEvents.length - traceableEvents.length} logistics event(s) lack trace/custody identifiers.`]
+    };
+
+  const coldChainEvents = logisticsEvents.filter(({ event, meta }) => isColdChainEvent(event, meta));
+  const excursionEvents = coldChainEvents.filter(({ event, meta }) => isColdChainExcursion(event, meta));
+  const excursionRate = coldChainEvents.length > 0 ? excursionEvents.length / coldChainEvents.length : 0;
+  const coldChainIntegrity: LogisticsReliabilityScore["coldChainIntegrity"] = coldChainEvents.length === 0
+    ? {
+      score: logisticsEvents.length > 0 ? 100 : 0,
+      evidenceEvents: 0,
+      monitoredEvents: 0,
+      excursionEvents: 0,
+      excursionRate: 0,
+      notes: logisticsEvents.length > 0
+        ? ["No cold-chain or condition-sensitive freight evidence was observed; this component is neutral for non-cold-chain windows."]
+        : ["No cold-chain evidence was observed in logistics telemetry."]
+    }
+    : {
+      score: boundedScore((1 - excursionRate) * 100),
+      evidenceEvents: coldChainEvents.length,
+      monitoredEvents: coldChainEvents.length,
+      excursionEvents: excursionEvents.length,
+      excursionRate: Number(excursionRate.toFixed(4)),
+      notes: excursionEvents.length === 0
+        ? ["Condition-sensitive freight evidence shows no excursion signal."]
+        : [`${excursionEvents.length} condition-sensitive freight event(s) indicate excursion or custody breach.`]
+    };
+
+  const score = boundedScore(
+    carrierReliability.score * 0.22 +
+    exceptionManagement.score * 0.18 +
+    warehouseIntegrity.score * 0.18 +
+    slaPerformance.score * 0.18 +
+    traceabilityCoverage.score * 0.14 +
+    coldChainIntegrity.score * 0.10
+  );
+  const telemetryConfidence = Number(Math.min(1, 0.25 + logisticsEvents.length / 40).toFixed(4));
+  const status: LogisticsReliabilityScore["status"] =
+    score >= 85 && telemetryConfidence >= 0.7 ? "ready" : score >= 70 ? "watch" : score >= 45 ? "degrading" : "critical";
+
+  const gaps: string[] = [];
+  const recommendedActions: string[] = [];
+  const components: Array<[string, LogisticsReliabilityMetric, string]> = [
+    ["carrier reliability", carrierReliability, "Bind carrier routing to signed OTIF/DIFOT and damage/loss scorecards."],
+    ["exception management", exceptionManagement, "Add owner, SLA timer, escalation, and closure evidence for every logistics exception."],
+    ["warehouse integrity", warehouseIntegrity, "Connect WMS receiving, inventory, cycle-count, pick, pack, and ship evidence to agent decisions."],
+    ["SLA performance", slaPerformance, "Emit SLA/OTIF breach events with target, actual, lane, carrier, and corrective-action fields."],
+    ["traceability coverage", traceabilityCoverage, "Add EPCIS/GS1, SSCC, lot, custody, or signed receipt identifiers to logistics events."],
+    ["cold-chain integrity", coldChainIntegrity, "Gate condition-sensitive freight on excursion telemetry and release/quarantine evidence."]
+  ];
+  for (const [label, metric, action] of components) {
+    if (metric.score < 70) {
+      gaps.push(`${label}: ${metric.score}/100`);
+      recommendedActions.push(action);
+    }
+  }
+  if (logisticsEvents.length === 0) {
+    gaps.push("logistics telemetry: no logistics events detected");
+    recommendedActions.push("Emit logistics guard events with domain=logistics, shipment/carrier/warehouse identifiers, SLA fields, and traceability IDs.");
+  }
+
+  return {
+    score,
+    status,
+    logisticsEventCount: logisticsEvents.length,
+    telemetryConfidence,
+    carriers,
+    carrierReliability,
+    exceptionManagement,
+    warehouseIntegrity,
+    slaPerformance,
+    traceabilityCoverage,
+    coldChainIntegrity,
+    gaps,
+    recommendedActions: [...new Set(recommendedActions)]
+  };
 }
 
 function dependencySamples(events: GuardEventLike[]): DependencySample[] {
@@ -823,14 +1224,19 @@ function computeAutonomyRunStats(
 
 export function scoreOperationalIndependenceFromEvents(
   events: GuardEventLike[],
-  windowDays = 30
+  windowDays = 30,
+  options: OperationalIndependenceOptions = {}
 ): OperationalIndependenceScore {
   const sortedEvents = [...events].sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+  const context = normalizeContext(options.domain);
   const base = computeAutonomyRunStats(sortedEvents);
   const externalDependencyInventory = buildExternalDependencyInventory(sortedEvents);
   const dependencyDrift = detectDependencyDrift(sortedEvents, externalDependencyInventory);
   const gracefulDegradation = scoreGracefulDegradation(sortedEvents);
   const vendorLockInRisk = scoreVendorLockInRisk(externalDependencyInventory);
+  const logisticsReliability = context === "logistics"
+    ? scoreLogisticsOperationalReliabilityFromEvents(sortedEvents)
+    : undefined;
   const reducedExternalAccessScore = scoreReducedExternalAccess(
     externalDependencyInventory,
     gracefulDegradation,
@@ -859,6 +1265,7 @@ export function scoreOperationalIndependenceFromEvents(
 
   return {
     score,
+    context,
     longestRunDays: base.longestRunDays,
     escalationRate: base.escalationRate,
     driftEvents: base.driftEvents,
@@ -868,11 +1275,16 @@ export function scoreOperationalIndependenceFromEvents(
     externalDependencyInventory,
     dependencyDrift,
     gracefulDegradation,
-    vendorLockInRisk
+    vendorLockInRisk,
+    ...(logisticsReliability ? { logisticsReliability } : {})
   };
 }
 
-export function scoreOperationalIndependence(agentId: string, windowDays = 30): OperationalIndependenceScore {
+export function scoreOperationalIndependence(
+  agentId: string,
+  windowDays = 30,
+  options: OperationalIndependenceOptions = {}
+): OperationalIndependenceScore {
   const events = readGuardEvents(agentId, windowDays * 24).map((ev) => ({
     created_at: ev.created_at,
     module_code: ev.module_code,
@@ -881,5 +1293,5 @@ export function scoreOperationalIndependence(agentId: string, windowDays = 30): 
     severity: ev.severity,
     meta_json: ev.meta_json
   }));
-  return scoreOperationalIndependenceFromEvents(events, windowDays);
+  return scoreOperationalIndependenceFromEvents(events, windowDays, options);
 }

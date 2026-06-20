@@ -33,7 +33,7 @@ describe("new domain native integration", () => {
     expect(getLayer("AMC-VOICE-1")).toBe("Skills");
   });
 
-  test("mechanic gap schema accepts 240-question reports including new domains", () => {
+  test("mechanic gap schema accepts current question reports including new domains", () => {
     const perQuestion = questionBank.map((q) => ({
       qId: q.id,
       measured: 2,
@@ -66,7 +66,7 @@ describe("new domain native integration", () => {
       },
     });
 
-    expect(parsed.perQuestion).toHaveLength(240);
+    expect(parsed.perQuestion).toHaveLength(questionBank.length);
     for (const id of NEW_IDS) {
       expect(parsed.perQuestion.some((row) => row.qId === id), `schema missing ${id}`).toBe(true);
     }

@@ -45,8 +45,8 @@ export async function renderForecastScopePage(params) {
                <div><div class="muted">Correlation</div><div class="tile-value">${latestCorrelation === null ? "n/a" : Number(latestCorrelation).toFixed(3)}</div></div>
              </div>`
       }
-      <canvas id="forecastMaturityBand" width="680" height="180"></canvas>
-      <canvas id="forecastIntegrityMini" width="680" height="120"></canvas>
+      <canvas id="forecastMaturityBand" width="680" height="180" role="img" aria-label="Forecast maturity band chart with observed and forecast points."></canvas>
+      <canvas id="forecastIntegrityMini" width="680" height="120" role="img" aria-label="Forecast integrity index trend chart."></canvas>
     `)}
     ${card("Leading Indicators (Why)", `<div id="forecastIndicators"></div>`)}
     ${card("ETA to Target", `<div id="forecastEta"></div>`)}
@@ -71,4 +71,3 @@ export async function renderForecastScopePage(params) {
   renderEtaCard(document.getElementById("forecastEta"), latest.etaToTarget);
   renderAdvisoryCards(document.getElementById("forecastAdvisories"), forecastAdvisories);
 }
-

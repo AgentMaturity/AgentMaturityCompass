@@ -5,6 +5,9 @@
 
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import { bodyJson, apiSuccess, apiError, queryParam } from './apiHelpers.js';
+import type { ReplayBenchmarkCorpusInput } from '../benchmarks/replayBenchmarkCorpus.js';
+import type { RunLiveScoreBehaviorDriftInput } from '../watch/liveDriftAlerts.js';
+import type { BuildJudgeCalibrationReceiptInput } from '../eval/judgeCalibration.js';
 
 export async function handleWatchRoute(
   pathname: string,
@@ -113,10 +116,86 @@ export async function handleWatchRoute(
         trustLabel: report.trustLabel,
         integrityIndex: report.integrityIndex,
         inflationAttempts: report.inflationAttempts ?? [],
+        questionExplainability: report.questionExplainability ?? null,
         markdown: md,
       });
     } catch (err) {
       apiError(res, 500, err instanceof Error ? err.message : 'Explain failed');
+    }
+    return true;
+  }
+
+  // POST /api/v1/watch/replay-corpus — turn a replay corpus into watchable CI alerts
+  if (pathname === '/api/v1/watch/replay-corpus' && method === 'POST') {
+    try {
+      const body = await bodyJson<ReplayBenchmarkCorpusInput>(req);
+      if (!Array.isArray(body.rows)) {
+        apiError(res, 400, 'rows required');
+        return true;
+      }
+      const { runReplayBenchmarkCorpus } = await import('../benchmarks/replayBenchmarkCorpus.js');
+      const result = runReplayBenchmarkCorpus({
+        ...body,
+        agentId: body.agentId ?? 'default',
+      });
+      apiSuccess(res, {
+        agentId: result.manifest.agentId,
+        corpusId: result.manifest.corpusId,
+        manifestHash: result.manifest.manifestHash,
+        fixtureHash: result.manifest.fixtureHash,
+        scoreDelta0to1: result.manifest.scoreDelta0to1,
+        ciReceipt: result.ciReceipt,
+        watchAlerts: result.watchAlerts,
+      });
+    } catch (err) {
+      apiError(res, 500, err instanceof Error ? err.message : 'Replay corpus watch projection failed');
+    }
+    return true;
+  }
+
+  // POST /api/v1/watch/live-drift — compare baseline eval distribution to live production samples
+  if (pathname === '/api/v1/watch/live-drift' && method === 'POST') {
+    try {
+      const body = await bodyJson<RunLiveScoreBehaviorDriftInput>(req);
+      if (!body.baselineWindow || !Array.isArray(body.baselineWindow.rows) || !body.liveWindow || !Array.isArray(body.liveWindow.rows)) {
+        apiError(res, 400, 'Required: baselineWindow.rows and liveWindow.rows');
+        return true;
+      }
+      const { runLiveScoreBehaviorDrift, buildLiveDriftWatchAlerts } = await import('../watch/liveDriftAlerts.js');
+      const receipt = runLiveScoreBehaviorDrift({
+        ...body,
+        agentId: body.agentId ?? 'default',
+      });
+      apiSuccess(res, {
+        receipt,
+        watchAlerts: buildLiveDriftWatchAlerts(receipt),
+      });
+    } catch (err) {
+      apiError(res, 500, err instanceof Error ? err.message : 'Live drift watch projection failed');
+    }
+    return true;
+  }
+
+  // POST /api/v1/watch/judge-calibration — project judge calibration failures into Watch alerts
+  if (pathname === '/api/v1/watch/judge-calibration' && method === 'POST') {
+    try {
+      const body = await bodyJson<BuildJudgeCalibrationReceiptInput>(req);
+      if (!body.rubric || !body.calibrationSet || !Array.isArray(body.calibrationSet.rows) || !Array.isArray(body.judgments)) {
+        apiError(res, 400, 'Required: rubric, calibrationSet.rows, and judgments');
+        return true;
+      }
+      const { buildJudgeCalibrationReceipt, buildJudgeCalibrationWatchAlerts } = await import('../eval/judgeCalibration.js');
+      const receipt = buildJudgeCalibrationReceipt({
+        ...body,
+        agentId: body.agentId ?? 'default',
+        runId: body.runId ?? `judge-calibration-${Date.now()}`,
+      });
+      apiSuccess(res, {
+        receipt,
+        watchAlerts: buildJudgeCalibrationWatchAlerts(receipt),
+      });
+    } catch (err) {
+      apiError(res, 500, err instanceof Error ? err.message : 'Judge calibration watch projection failed');
     }
     return true;
   }

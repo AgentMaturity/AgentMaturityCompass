@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Accessibility - Agent Maturity Compass</title>
+  <meta name="description" content="Accessibility statement for Agent Maturity Compass CLI, website, generated dashboard, and local Studio.">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Accessibility - Agent Maturity Compass">
+  <meta property="og:description" content="AMC accessibility support, standards target, known limitations, and feedback path.">
+  <meta property="og:url" content="https://agentmaturity.co/accessibility.html">
+  <meta property="og:image" content="https://agentmaturity.co/og-card.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="stylesheet" href="style.css?v=14">
+  <style>
+    .plain-page{min-height:100vh;padding:8rem 0 4rem}
+    .plain-page .label{margin-bottom:.75rem}
+    .plain-page h1{white-space:normal;margin-bottom:1.5rem}
+    .plain-page p,.plain-page li{max-width:760px;color:var(--text-muted);line-height:1.75}
+    .plain-page ul{margin:1rem 0 2rem 1.25rem}
+    .plain-page h2{font-size:1.15rem;text-transform:none;letter-spacing:0;color:var(--text);margin:2rem 0 .75rem}
+    .plain-page a{color:var(--accent);text-decoration:underline;text-underline-offset:3px}
+  </style>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <nav class="nav scrolled">
+    <div class="nav-inner">
+      <a href="./" class="nav-brand">amc<span class="accent">_</span></a>
+      <ul class="nav-links">
+        <li><a href="./#install">install</a></li>
+        <li><a href="./playground.html">playground</a></li>
+        <li><a href="./docs/index.html">docs</a></li>
+        <li><a href="https://github.com/AgentMaturity/AgentMaturityCompass">github</a></li>
+      </ul>
+    </div>
+  </nav>
+  <span id="main-content" tabindex="-1"></span>
+  <main class="plain-page">
+    <div class="container">
+      <p class="label">accessibility</p>
+      <h1>AMC should be usable without relying on color or pointer-only interaction<span class="accent">.</span></h1>
+      <p>Last reviewed: 2026-06-16. This statement covers the public website, browser playground, generated dashboard, local Studio, and CLI output conventions.</p>
+
+      <h2>Standards Target</h2>
+      <ul>
+        <li>Website and generated dashboard: WCAG 2.2 AA-aligned checks for contrast, focus visibility, skip navigation, and chart names.</li>
+        <li>Generated dashboard: Settings includes a high-contrast theme, and the onboarding dialog traps keyboard focus while open.</li>
+        <li>Generated dashboard heatmaps expose score, target, gap, and confidence as text plus ARIA grid, gridcell, selected-state, and meter values.</li>
+        <li>CLI: color is supplemental. Use <code>NO_COLOR=1</code> or <code>--no-color</code> for plain output where supported.</li>
+        <li>Evidence: accessibility claims should be backed by tests, not only screenshots.</li>
+      </ul>
+
+      <h2>Current Support</h2>
+      <ul>
+        <li>Static pages include skip links and keyboard focus-visible styling.</li>
+        <li>Decorative canvases are hidden from assistive technology.</li>
+        <li>Playground and generated console chart canvases expose descriptive accessible names.</li>
+        <li>The generated dashboard secondary-text token was raised from the low-contrast value flagged in the audit.</li>
+        <li>The generated dashboard can switch to a high-contrast theme for low-vision review.</li>
+        <li>The generated dashboard question heatmap includes visible maturity, gap, and confidence labels so color is supplemental.</li>
+      </ul>
+
+      <h2>Known Limitations</h2>
+      <ul>
+        <li>Interactive terminal prompts depend on terminal and screen-reader support.</li>
+        <li>Dense generated reports still need manual screen-reader review with representative data.</li>
+        <li>Automated axe checks do not replace manual keyboard and assistive-technology testing.</li>
+      </ul>
+
+      <h2>Feedback</h2>
+      <p>Open an issue with the affected page, command, or artifact path; assistive technology and browser or terminal used; expected result; actual result; and any screenshot, terminal output, or axe report.</p>
+      <p><a href="https://github.com/AgentMaturity/AgentMaturityCompass/issues">Report an accessibility issue</a></p>
+    </div>
+  </main>
+</body>
+</html>

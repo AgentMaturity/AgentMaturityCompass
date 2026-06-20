@@ -2,7 +2,7 @@
 
 **Industry-specific, regulatory-grounded assessment packs for enterprise AI deployments.**
 
-AMC Sector Packs extend the base 126-question AMC rubric with deep vertical expertise — covering regulated industries, critical infrastructure, and public institutions. Each pack is authored against specific regulatory articles (not vague references), calibrated to real-world risk, and mapped to international standards.
+AMC Sector Packs extend the base 138-question AMC rubric with deep vertical expertise — covering regulated industries, critical infrastructure, and public institutions. Each pack is authored against specific regulatory articles (not vague references), calibrated to real-world risk, and mapped to international standards.
 
 ---
 
@@ -11,14 +11,25 @@ AMC Sector Packs extend the base 126-question AMC rubric with deep vertical expe
 | Layer | Coverage |
 |---|---|
 | **Base AMC** | 138 questions, 5 dimensions — mandatory for all agents |
-| **Domain Packs** | 9 existing vertical packs (healthcare, financial, etc.) |
-| **Sector Packs** | 40 new packs across 7 stations — granular industry sub-verticals |
+| **Domain Packs** | 7 canonical domain stations with CLI aliases (health, education, environment, mobility, governance, technology, wealth) |
+| **Sector Packs** | 41 packs across 7 stations — granular industry sub-verticals |
 
 **Sector Packs do not replace Domain Packs.** They add a third layer of specificity for organizations that need sub-vertical precision.
 
+## Supply Chain and Logistics Discovery
+
+Supply-chain and logistics users can start with familiar operational language instead of memorizing AMC's canonical domain IDs:
+
+| Need | CLI Domain Input | Canonical Station | Relevant Sector Packs |
+|---|---|---|---|
+| Supplier risk, traceability, procurement, materials, food systems, energy grids | `supply-chain`, `supply chain`, `scm`, `procurement`, `vendor-risk` | Environment | `farm-to-fork`, `weave-to-wear`, `material-to-machines`, `source-to-sustenance`, `ubiquity-to-utility` |
+| Freight, 3PL, warehouse, carrier management, transport, port logistics | `logistics`, `freight`, `3pl`, `warehouse`, `carrier`, `transportation` | Mobility | `freight-3pl-warehouse`, `sustainable-ports`, `virtual-infrastructure`, `privacy-security-mobility`, `sustainable-communities` |
+
+Use `amc domain list` for the full alias table, then run `amc domain modules --domain supply-chain` or `amc domain modules --domain logistics` to inspect activated modules. For freight, 3PL, warehouse, and carrier reliability depth, start with `amc domain pack describe --pack freight-3pl-warehouse` and `amc score operational-independence <agent-id> --domain logistics --json`.
+
 ---
 
-## The 7 Stations — 40 Packs, 382 Questions
+## The 7 Stations — 41 Packs, 390 Questions
 
 ### 🌿 Environment (6 packs)
 
@@ -85,7 +96,7 @@ Regulatory basis: FERPA, COPPA, IDEA, EU AI Act Annex III §3, GDPR Art. 8, UN C
 
 ---
 
-### 🚇 Mobility (5 packs)
+### 🚇 Mobility (6 packs)
 
 | Pack ID | Name | Risk Tier | EU AI Act Class |
 |---|---|---|---|
@@ -94,9 +105,10 @@ Regulatory basis: FERPA, COPPA, IDEA, EU AI Act Annex III §3, GDPR Art. 8, UN C
 | `sustainable-real-estate` | Sustainable Real Estate | high | Annex III §2 |
 | `virtual-infrastructure` | Sustainable Virtual Infrastructure | critical | General Purpose AI |
 | `privacy-security-mobility` | Privacy & Security | critical | Annex III §6 |
+| `freight-3pl-warehouse` | Freight, 3PL & Warehouse Operations | very-high | Annex III §2 |
 
-Focus: Smart cities/urban AI, port logistics, sustainable buildings, cloud/virtual infrastructure, network privacy and cybersecurity.  
-Regulatory basis: EU EPBD 2024, LEED v4, ISO 50001, EU NIS2, UNECE WP.29, ETSI EN 303 645, GDPR Art. 25.
+Focus: Smart cities/urban AI, port logistics, freight/3PL/warehouse operations, sustainable buildings, cloud/virtual infrastructure, network privacy and cybersecurity.
+Regulatory basis: EU EPBD 2024, LEED v4, ISO 50001, EU NIS2, UNECE WP.29, ETSI EN 303 645, GDPR Art. 25, ISO 28000:2022, NIST SP 800-161r1-upd1, GS1 EPCIS 2.0.
 
 ---
 

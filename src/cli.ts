@@ -1,17 +1,35 @@
 #!/usr/bin/env node
 import { randomBytes, randomUUID } from "node:crypto";
 import { spawn } from "node:child_process";
-import { dirname, join, resolve } from "node:path";
+import { basename, dirname, join, resolve } from "node:path";
 import { stdin } from "node:process";
 import { tmpdir } from "node:os";
+import { pathToFileURL } from "node:url";
 import chalk from "chalk";
 import { Command } from "commander";
 import YAML from "yaml";
 import { guardCheck } from "./guardrails/guardEngine.js";
 import { openLedger, verifyLedgerIntegrity } from "./ledger/ledger.js";
 import { startMonitor, superviseProcess, wrapAny, wrapRuntime } from "./ledger/monitor.js";
-import { compareRuns, compareModels, generateReport, loadRunReport, runDiagnostic } from "./diagnostic/runner.js";
-import type { DiagnosticReport } from "./types.js";
+import { compareRuns, compareModels, explainDiagnosticReportStatus, generateReport, loadRunReport, resolveRunReport, runDiagnostic } from "./diagnostic/runner.js";
+import { aliasesForRun, listRunAliases, removeRunAlias, saveRunAlias } from "./diagnostic/runAliases.js";
+import { writeDiagnosticReportShareBundle } from "./diagnostic/reportShare.js";
+import {
+  NON_INTERACTIVE_QUICKSCORE_NOTICE,
+  parseQuickscoreAnswers,
+  withAutoQuickscoreNoEvidenceNotice,
+  withNonInteractiveQuickscoreNotice,
+  withProvidedAnswersQuickscoreMetadata
+} from "./diagnostic/nonInteractiveQuickscore.js";
+import type { AssurancePackResult, AssuranceReport, AssuranceScenarioResult, DiagnosticReport } from "./types.js";
+import {
+  getPublicMethodologyManifest,
+  getPublicMethodologyCaseStudyDataset,
+  getPublicMethodologyReproducibilityPacket,
+  renderPublicMethodologyCaseStudyDatasetMarkdown,
+  renderPublicMethodologyMarkdown,
+  renderPublicMethodologyReproducibilityMarkdown
+} from "./methodology/publicMethodology.js";
 import { loadTargetProfile, loadTargetProfileFromFile, setTargetProfileInteractive, verifyTargetProfileSignature } from "./targets/targetProfile.js";
 import { runTuneWizard, runUpgradeWizard } from "./tuning/tuneWizard.js";
 import { loadContextGraph } from "./context/contextGraph.js";
@@ -23,6 +41,7 @@ import {
   flattenCommandPaths,
   parseUnknownCommandToken,
   renderCommandInventoryMarkdown,
+  renderGroupedHelp,
   suggestCommandPaths
 } from "./cliUx.js";
 import {
@@ -106,7 +125,8 @@ import {
   generateFleetComplianceReport,
   listFleetGovernancePolicies,
   listFleetSlos,
-  tagFleetAgentEnvironment
+  tagFleetAgentEnvironment,
+  type FleetHealthDashboard
 } from "./fleet/governance.js";
 import {
   initTrustComposition,
@@ -116,7 +136,8 @@ import {
   computeTrustComposition,
   saveTrustCompositionReport,
   renderTrustCompositionMarkdown,
-  verifyCrossAgentReceipts
+  verifyCrossAgentReceipts,
+  type DelegationEdge
 } from "./fleet/trustComposition.js";
 import {
   createDag,
@@ -266,6 +287,21 @@ import { ingestBenchmarks } from "./benchmarks/benchImport.js";
 import { listImportedBenchmarks } from "./benchmarks/benchStore.js";
 import { benchmarkStats } from "./benchmarks/benchStats.js";
 import {
+  buildProviderDriftCiGate,
+  buildProviderDriftEvalPack,
+  buildProviderDriftWatchAlerts,
+  renderProviderDriftBenchmarkMarkdown,
+  runProviderDriftBenchmark,
+  type ProviderDriftCanaryRow,
+  type ProviderDriftThresholds,
+  type ProviderDriftWaiver,
+} from "./benchmarks/providerDriftBenchmark.js";
+import {
+  renderReplayBenchmarkCorpusMarkdown,
+  runReplayBenchmarkCorpus,
+  type ReplayBenchmarkCorpusInput,
+} from "./benchmarks/replayBenchmarkCorpus.js";
+import {
   benchCompareCli,
   benchComparisonLatestCli,
   benchCreateCli,
@@ -305,7 +341,7 @@ import {
 } from "./storage/blobs/blobCli.js";
 import { ensureBlobKey, verifyBlobCurrentKeySignature } from "./storage/blobs/blobKeys.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "./utils/fs.js";
-import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync } from "node:fs";
+import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
 import {
   packInstallCli,
   packPublishCli,
@@ -314,6 +350,7 @@ import {
   packUninstallCli,
   packListCli,
   packInitCli,
+  resolvePackEntryPath,
   packRegistryServeCli,
   packRegistryInitCli
 } from "./packs/packCli.js";
@@ -334,6 +371,7 @@ import {
   identityProviderAddOidcCli,
   identityProviderAddSamlCli,
   identityVerifyCli,
+  scimInitCli,
   scimTokenCreateCli
 } from "./identity/identityCli.js";
 import { createPairingCode } from "./pairing/pairingCodes.js";
@@ -381,7 +419,7 @@ import {
   initComplianceMapsCli,
   verifyComplianceMapsCli
 } from "./compliance/complianceCli.js";
-import { frameworkChoices, getFrameworkFamily, normalizeFrameworkName, type ComplianceFramework } from "./compliance/frameworks.js";
+import { complianceFrameworkFamilies, frameworkChoices, getFrameworkFamily, normalizeFrameworkName, type ComplianceFramework } from "./compliance/frameworks.js";
 import { generateCoverageMatrix, renderCoverageMatrixMarkdown, renderCoverageHeatmap } from "./compliance/complianceMatrix.js";
 import { runAttackPlugins, listAttackPlugins, renderAttackPluginReport } from "./redteam/attackPlugins.js";
 import { runBenchmarkSuite, compareBenchmarks, renderBenchRunMarkdown, renderBenchCompareMarkdown } from "./benchmarks/benchRunner.js";
@@ -706,6 +744,30 @@ function activeAgent(program: Command): string | undefined {
   return opts.agent;
 }
 
+interface DlpScanCliOptions {
+  json?: boolean;
+  redact?: boolean;
+}
+
+async function runDlpScanCli(text: string, opts: DlpScanCliOptions): Promise<void> {
+  const { scanForPII } = await import("./vault/dlp.js");
+  const result = scanForPII(text);
+  if (opts.json) {
+    console.log(JSON.stringify(result, null, 2));
+    return;
+  }
+  if (opts.redact) {
+    console.log(result.redacted);
+    return;
+  }
+  console.log(chalk.bold.green("\nDLP Scan"));
+  console.log(chalk.gray("  Found:"), result.found ? chalk.red("yes") : chalk.green("no"));
+  console.log(chalk.gray("  Types:"), result.types.length > 0 ? result.types.join(", ") : "none");
+  if (result.found) {
+    console.log(chalk.gray("  Redacted:"), result.redacted);
+  }
+}
+
 async function httpGetJson(url: string, token?: string): Promise<{ status: number; body: string }> {
   return new Promise((resolvePromise, rejectPromise) => {
     const req = httpRequest(
@@ -1021,6 +1083,67 @@ function commandPath(command: Command): string {
   return names.join(" ").trim();
 }
 
+function openExternalUrl(url: string): boolean {
+  const platform = process.platform;
+  const command = platform === "darwin" ? "open" : platform === "win32" ? "cmd" : "xdg-open";
+  const args = platform === "win32" ? ["/c", "start", "", url] : [url];
+  try {
+    const child = spawn(command, args, {
+      detached: true,
+      stdio: "ignore"
+    });
+    child.unref();
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function directoryNameForPackName(name: string): string {
+  const trimmed = name.trim();
+  const parts = trimmed.split("/").map((part) => part.trim()).filter(Boolean);
+  return parts.at(-1) || "amc-pack";
+}
+
+type PackPackageManifest = {
+  name?: string;
+  version?: string;
+  main?: string;
+  amcPack?: {
+    type?: string;
+  };
+};
+
+function readPackPackageManifest(packDir: string): PackPackageManifest | null {
+  const manifestPath = join(packDir, "package.json");
+  if (!pathExists(manifestPath)) {
+    return null;
+  }
+  try {
+    return JSON.parse(readUtf8(manifestPath)) as PackPackageManifest;
+  } catch {
+    return null;
+  }
+}
+
+function findImmediatePackDirectories(parentDir: string): string[] {
+  if (!pathExists(parentDir)) {
+    return [];
+  }
+  const out: string[] = [];
+  for (const entry of readdirSync(parentDir, { withFileTypes: true })) {
+    if (!entry.isDirectory() || entry.name === "node_modules" || entry.name.startsWith(".")) {
+      continue;
+    }
+    const candidate = join(parentDir, entry.name);
+    const manifest = readPackPackageManifest(candidate);
+    if (manifest?.amcPack) {
+      out.push(candidate);
+    }
+  }
+  return out.sort((a, b) => a.localeCompare(b));
+}
+
 function latestRunSummary(workspace: string, agentId: string): { runId: string; integrityIndex: number; trustLabel: string } | null {
   const runsDir = join(workspace, ".amc", "agents", agentId, "runs");
   if (!pathExists(runsDir)) {
@@ -1049,6 +1172,128 @@ function latestRunSummary(workspace: string, agentId: string): { runId: string; 
   } catch {
     return null;
   }
+}
+
+function readCurrentAgentScore(workspace: string, agentId: string): { score0to1: number; source: string } | null {
+  const latest = latestRunSummary(workspace, agentId);
+  if (!latest) {
+    return null;
+  }
+  const score0to1 = Math.max(0, Math.min(1, latest.integrityIndex));
+  return {
+    score0to1,
+    source: `latest run ${latest.runId} for ${agentId}`
+  };
+}
+
+type AssuranceRemediationSeverity = "CRITICAL" | "HIGH" | "MEDIUM";
+
+interface AssuranceRemediationItem {
+  severity: AssuranceRemediationSeverity;
+  packId: string;
+  scenarioId: string;
+  title: string;
+  category: string;
+  score0to100: number;
+  reason: string;
+  fix: string;
+}
+
+const ASSURANCE_REMEDIATION_SEVERITY_RANK: Record<AssuranceRemediationSeverity, number> = {
+  CRITICAL: 0,
+  HIGH: 1,
+  MEDIUM: 2,
+};
+
+function assuranceRemediationSeverity(scenario: AssuranceScenarioResult): AssuranceRemediationSeverity {
+  const category = scenario.category.toLowerCase();
+  if (scenario.auditEventTypes.some((auditType) => auditType.endsWith("_SUCCEEDED"))) {
+    return "CRITICAL";
+  }
+  if (category.includes("kill_chain") && scenario.score0to100 === 0) {
+    return "CRITICAL";
+  }
+  if (scenario.score0to100 < 50 || scenario.reasons.length > 1) {
+    return "HIGH";
+  }
+  return "MEDIUM";
+}
+
+function assuranceRemediationFix(category: string): string {
+  const normalized = category.toLowerCase();
+  if (normalized.includes("injection") || normalized.includes("prompt")) {
+    return "Harden prompt-injection refusal, context isolation, and incident escalation before rerunning this pack.";
+  }
+  if (normalized.includes("tool")) {
+    return "Require signed execution tickets, owner approval for risky tools, and ToolHub routing before action.";
+  }
+  if (normalized.includes("truth") || normalized.includes("hallucination")) {
+    return "Add an evidence-first answer protocol with explicit uncertainty and verification steps.";
+  }
+  if (normalized.includes("secret") || normalized.includes("pii") || normalized.includes("leak")) {
+    return "Add DLP redaction, secret-blocking tests, and escalation for attempted sensitive-data movement.";
+  }
+  return "Add a targeted control for this failure category, rerun the pack, and keep the scenario failing until evidence proves the fix.";
+}
+
+function buildAssuranceRemediationItems(packResults: AssurancePackResult[]): AssuranceRemediationItem[] {
+  const items: AssuranceRemediationItem[] = [];
+  for (const pack of packResults) {
+    for (const scenario of pack.scenarioResults) {
+      if (scenario.pass) {
+        continue;
+      }
+      items.push({
+        severity: assuranceRemediationSeverity(scenario),
+        packId: pack.packId,
+        scenarioId: scenario.scenarioId,
+        title: scenario.title,
+        category: scenario.category,
+        score0to100: scenario.score0to100,
+        reason: scenario.reasons[0] ?? "Scenario failed without a recorded reason.",
+        fix: assuranceRemediationFix(scenario.category),
+      });
+    }
+  }
+  return items.sort((a, b) => {
+    const severityDelta = ASSURANCE_REMEDIATION_SEVERITY_RANK[a.severity] - ASSURANCE_REMEDIATION_SEVERITY_RANK[b.severity];
+    if (severityDelta !== 0) {
+      return severityDelta;
+    }
+    const scoreDelta = a.score0to100 - b.score0to100;
+    if (scoreDelta !== 0) {
+      return scoreDelta;
+    }
+    return `${a.packId}/${a.scenarioId}`.localeCompare(`${b.packId}/${b.scenarioId}`);
+  });
+}
+
+function renderAssuranceRemediationPriority(report: AssuranceReport, opts: {
+  rerunCommand: string;
+  artifactPath: string;
+  maxItems?: number;
+}): void {
+  const items = buildAssuranceRemediationItems(report.packResults);
+  console.log("");
+  console.log(chalk.bold("  Remediation priority:"));
+  if (items.length === 0) {
+    console.log(chalk.gray("  No failed scenarios. Keep scheduled assurance running and graduate to signed reports before verifier-ready claims."));
+    console.log(chalk.gray(`  Evidence: ${opts.artifactPath}`));
+    return;
+  }
+
+  const maxItems = opts.maxItems ?? 5;
+  for (const [index, item] of items.slice(0, maxItems).entries()) {
+    console.log(`  ${index + 1}. ${item.severity} ${item.packId}/${item.scenarioId} (${item.category}, score ${item.score0to100.toFixed(0)}%)`);
+    console.log(chalk.gray(`     ${item.title}`));
+    console.log(chalk.gray(`     Reason: ${item.reason}`));
+    console.log(chalk.gray(`     Fix: ${item.fix}`));
+  }
+  if (items.length > maxItems) {
+    console.log(chalk.gray(`  ... ${items.length - maxItems} more failed scenarios; rerun with --verbose for full detail.`));
+  }
+  console.log(chalk.gray(`  Evidence: ${opts.artifactPath}`));
+  console.log(chalk.gray(`  Next: ${opts.rerunCommand}`));
 }
 
 function loadTemporalDecayRuns(workspace: string, agentId: string, lookbackDays: number, nowTs: number): TemporalDecaySourceRun[] {
@@ -1410,7 +1655,7 @@ function startInstantOnboarding(workspace: string, agentId: string, state: Insta
         : "Existing workspace reused."
   );
   onboarding = setOnboardingStep(onboarding, "provider", "skipped", "No provider setup required for local full-score generation.");
-  onboarding = setOnboardingStep(onboarding, "score", "running", "Full 240-question score is running.");
+  onboarding = setOnboardingStep(onboarding, "score", "running", "Full default score is running.");
   return saveOnboardingState(workspace, onboarding);
 }
 
@@ -1714,12 +1959,18 @@ program
   .addHelpText("afterAll", cliDiscoverabilityFooter());
 program.option("--agent <agentId>", "agent ID (defaults to .amc/current-agent)");
 program.option("--json", "emit structured JSON for the top-level full score", false);
+program.option("--no-color", "disable ANSI color output; equivalent to NO_COLOR=1", false);
 program
   .command("help [commandPath...]")
   .description("Show help for a command (for example: amc help run)")
-  .action((commandPath?: string[]) => {
+  .option("--all", "Show the complete top-level command list")
+  .action((commandPath?: string[], opts?: { all?: boolean }) => {
     if (!commandPath || commandPath.length === 0) {
-      program.outputHelp();
+      if (opts?.all) {
+        program.outputHelp();
+      } else {
+        console.log(renderGroupedHelp(program));
+      }
       return;
     }
     const query = commandPath.join(" ").trim();
@@ -1781,16 +2032,101 @@ program
     }
     process.stdout.write(body);
   });
+program
+  .command("methodology")
+  .description("Print the public AMC scoring methodology manifest and hash")
+  .option("--json", "Output the manifest as JSON", false)
+  .option("--reproducibility", "Output a reproducibility packet with the public question bank, source paths, hashes, and commands", false)
+  .option("--sample-dataset", "Output a public synthetic L0-L5 sample case-study dataset", false)
+  .option("--format <format>", "Output format: markdown | json")
+  .option("--out <path>", "Write output to a file")
+  .action((opts: { json?: boolean; reproducibility?: boolean; sampleDataset?: boolean; format?: string; out?: string }) => {
+    const requestedFormat = opts.json ? "json" : opts.format ?? (opts.out?.endsWith(".json") ? "json" : "markdown");
+    if (requestedFormat !== "json" && requestedFormat !== "markdown") {
+      console.error(chalk.red("--format must be markdown or json."));
+      process.exit(1);
+    }
+    if (opts.reproducibility && opts.sampleDataset) {
+      console.error(chalk.red("--reproducibility and --sample-dataset are mutually exclusive."));
+      process.exit(1);
+    }
+
+    let body: string;
+    if (opts.sampleDataset) {
+      body = requestedFormat === "json"
+        ? `${JSON.stringify(getPublicMethodologyCaseStudyDataset(), null, 2)}\n`
+        : renderPublicMethodologyCaseStudyDatasetMarkdown();
+    } else if (opts.reproducibility) {
+      body = requestedFormat === "json"
+        ? `${JSON.stringify(getPublicMethodologyReproducibilityPacket(), null, 2)}\n`
+        : renderPublicMethodologyReproducibilityMarkdown();
+    } else {
+      body = requestedFormat === "json"
+        ? `${JSON.stringify(getPublicMethodologyManifest(), null, 2)}\n`
+        : renderPublicMethodologyMarkdown();
+    }
+
+    if (opts.out) {
+      writeFileAtomic(resolve(process.cwd(), opts.out), body, 0o644);
+      console.log(chalk.green(`Methodology output written to ${opts.out}`));
+      return;
+    }
+    process.stdout.write(body.endsWith("\n") ? body : `${body}\n`);
+  });
 program.hook("preAction", (_thisCommand, actionCommand) => {
-  const opts = actionCommand.optsWithGlobals<{ agent?: string }>();
+  const opts = actionCommand.optsWithGlobals<{ agent?: string; color?: boolean }>();
   if (opts.agent && opts.agent.trim().length > 0) {
     process.env.AMC_AGENT_ID = opts.agent.trim();
+  }
+  if (opts.color === false || process.env.NO_COLOR) {
+    process.env.NO_COLOR = "1";
+    chalk.level = 0;
   }
   const path = commandPath(actionCommand);
   if (path.length > 0) {
     assertOwnerMode(process.cwd(), path);
   }
 });
+
+async function initializeMinimalStartupWorkspace(opts: {
+  profile: "dev" | "ci" | "prod";
+  trustBoundary?: "isolated" | "shared";
+}): Promise<void> {
+  if (!process.env.AMC_VAULT_PASSPHRASE) {
+    process.env.AMC_VAULT_PASSPHRASE = `minimal-startup-${Date.now()}`;
+  }
+
+  const init = initWorkspace({
+    trustBoundaryMode: opts.trustBoundary,
+    agentName: "Startup Agent",
+    role: "assistant",
+    domain: "general",
+    primaryTasks: ["support", "analysis"],
+    stakeholders: ["owner", "users"],
+    riskTier: "low",
+    channels: ["cli"],
+    tools: ["filesystem", "http"]
+  });
+  const profiled = applyAMCConfigProfile(opts.profile, loadAMCConfig(process.cwd()));
+  if (opts.trustBoundary) {
+    profiled.security.trustBoundaryMode = opts.trustBoundary;
+  }
+  saveAMCConfig(process.cwd(), profiled);
+
+  const fmt = await import("./cliFormat.js");
+  console.log(fmt.logo());
+  console.log(fmt.pass("Minimal startup workspace initialized"));
+  console.log(fmt.info(`Location: ${init.workspacePath}`));
+  console.log(fmt.info(`Profile: ${opts.profile}`));
+  console.log(fmt.nextSteps([
+    { cmd: "amc quickscore --rapid", desc: "Run a lightweight pulse check" },
+    { cmd: "amc quickscore --answers answers.json --json", desc: "Score headlessly from L0-L5 answers" },
+    { cmd: "amc guide --go", desc: "Generate and apply first guardrails" },
+    { cmd: "amc doctor", desc: "Check runtime and evidence-capture readiness" }
+  ]));
+  console.log(fmt.colors.dim("  Minimal mode skips the vault prompt and immediate full-score prompt."));
+  console.log("");
+}
 
 program
   .command("init")
@@ -1799,7 +2135,8 @@ program
   .option("--profile <name>", "workspace config profile: dev|ci|prod", "dev")
   .option("--force", "Force re-initialization, overwrite existing .amc directory", false)
   .option("--skip-vault", "Skip vault setup (useful for CI/headless init)", false)
-  .action(async (opts: { trustBoundary?: "isolated" | "shared"; profile: "dev" | "ci" | "prod"; force: boolean; skipVault: boolean }) => {
+  .option("--minimal", "Startup-friendly setup without vault prompt or immediate full score", false)
+  .action(async (opts: { trustBoundary?: "isolated" | "shared"; profile: "dev" | "ci" | "prod"; force: boolean; skipVault: boolean; minimal: boolean }) => {
     // Force mode: delete existing .amc directory before re-init
     if (opts.force) {
       const { rmSync, existsSync } = await import("fs");
@@ -1809,6 +2146,13 @@ program
         rmSync(amcDir, { recursive: true, force: true });
         console.log(chalk.yellow("🔄 Removed existing .amc directory (--force mode)"));
       }
+    }
+    if (opts.minimal) {
+      await initializeMinimalStartupWorkspace({
+        profile: opts.profile,
+        trustBoundary: opts.trustBoundary
+      });
+      return;
     }
     // Ensure vault passphrase is available before init (it creates crypto keys)
     if (opts.skipVault) {
@@ -2005,6 +2349,15 @@ program
     console.log("");
     console.log(chalk.bold(`  Current: ${result.preliminaryLevel} (${result.totalScore}/${result.maxScore})`));
     console.log("");
+    console.log(chalk.bold("  What L3 means for your product:"));
+    console.log(chalk.gray("  L3 = evidence-backed and reviewable: customers can trust the agent's behavior because key decisions have replayable proof, not just team claims."));
+    console.log(chalk.gray("  PM translation: define the product promise, capture proof when the agent acts, and make that proof easy for a reviewer to inspect."));
+    console.log(chalk.bold("  L3 examples by agent archetype:"));
+    console.log(chalk.gray("  Chatbot: answers, refusals, and escalations have replayable conversation evidence tied to the product promise."));
+    console.log(chalk.gray("  Copilot: code/content suggestions include source context, accepted/rejected actions, and reviewer-visible rationale."));
+    console.log(chalk.gray("  Workflow agent: each automated step records trigger, policy check, approval state, and outcome so teams can replay the workflow."));
+    console.log(chalk.gray("  Research agent: claims cite source snapshots, uncertainty, and evidence receipts so findings are reviewable later."));
+    console.log("");
 
     if (result.recommendations.length === 0) {
       console.log(chalk.green("  🎉 You're at L5 across the board. Nothing to improve!"));
@@ -2022,6 +2375,7 @@ program
       console.log(chalk.gray(`     Current: L${rec.currentLevel} → Target: L${rec.targetLevel}`));
       console.log(chalk.white(`     Why: ${rec.whyItMatters}`));
       console.log(chalk.hex('#4AEF79')(`     How: ${rec.howToImprove}`));
+      console.log(chalk.gray("     Product outcome: turns this gap into a customer-reviewable control for scope, autonomy, or alignment risk."));
 
       // Map to specific CLI commands (F28: include --agent <your-agent-id> for context)
       const cmdMap: Record<string, string> = {
@@ -2643,15 +2997,30 @@ program
 
 program
   .command("quickscore")
-  .description("Full 240-question interactive diagnostic — or use --rapid for 5-question express, --auto for ledger evidence")
+  .description("Full default interactive diagnostic — or use --rapid for 5-question express, --auto for ledger evidence")
   .option("--json", "emit JSON output", false)
   .option("--quiet", "suppress non-JSON output (use with --json for clean piping)", false)
+  .option("--answers <jsonOrFile>", "score from inline JSON answers or a JSON answer file without prompting")
   .option("--eu-ai-act", "show EU AI Act risk classification mapping", false)
   .option("--auto", "auto-score from ledger evidence (no questions asked)", false)
   .option("--rapid", "rapid 5-question assessment (original quickscore)", false)
   .option("--agent <agentId>", "agent ID for auto mode")
   .option("--share", "output shareable markdown badge + summary after scoring", false)
-  .action(async (opts: { json: boolean; quiet: boolean; euAiAct: boolean; auto: boolean; rapid: boolean; agent?: string; share: boolean }) => {
+  .action(async (opts: { json: boolean; quiet: boolean; answers?: string; euAiAct: boolean; auto: boolean; rapid: boolean; agent?: string; share: boolean }) => {
+    let providedAnswers: ReturnType<typeof parseQuickscoreAnswers> | undefined;
+    if (opts.answers) {
+      if (opts.auto) {
+        console.error(chalk.red("--answers and --auto are mutually exclusive. Use --answers for survey responses or --auto for ledger evidence."));
+        process.exit(1);
+      }
+      try {
+        providedAnswers = parseQuickscoreAnswers(opts.answers);
+      } catch (error: unknown) {
+        console.error(chalk.red(toErrorMessage(error)));
+        process.exit(1);
+      }
+    }
+
     // ── Auto mode: score from actual evidence in the ledger ──
     if (opts.auto) {
       try {
@@ -2702,7 +3071,15 @@ program
         console.log("");
         return;
       } catch (e: unknown) {
+        if (opts.json) {
+          console.log(JSON.stringify(withAutoQuickscoreNoEvidenceNotice({
+            agentId: opts.agent ?? activeAgent(program) ?? "default",
+            error: toErrorMessage(e)
+          }), null, 2));
+          process.exit(1);
+        }
         console.error(chalk.red(toErrorMessage(e)));
+        console.log(chalk.yellow("\n  Auto-score unavailable — no measured maturity score was produced."));
         console.log(chalk.gray("\n  No evidence found. Run your agent through AMC first:"));
         console.log(chalk.gray("    amc adapters run --agent <id> -- <command>"));
         console.log(chalk.gray("    amc wrap <runtime> -- <command>"));
@@ -2715,9 +3092,24 @@ program
     if (opts.rapid) {
       const { getRapidQuestions, scoreRapidAssessment } = await import("./diagnostic/rapidQuickscore.js");
       const questions = getRapidQuestions();
-      const answers: Record<string, number> = {};
+      const answers: Record<string, number> = { ...(providedAnswers?.answers ?? {}) };
 
-      if (process.stdin.isTTY && !opts.quiet) {
+      if (!providedAnswers && (!process.stdin.isTTY || opts.quiet)) {
+        if (opts.json) {
+          console.log(JSON.stringify(NON_INTERACTIVE_QUICKSCORE_NOTICE, null, 2));
+          process.exit(1);
+        }
+        console.log(chalk.yellow("  ⚠  Interactive quickscore requires a terminal."));
+        console.log(chalk.yellow("     No placeholder L0 score was generated."));
+        console.log(chalk.gray(`     ${NON_INTERACTIVE_QUICKSCORE_NOTICE.firstRunHint}`));
+        console.log(chalk.gray("     Run in a terminal: amc quickscore --rapid"));
+        console.log(chalk.gray("     Or pass answers: amc quickscore --rapid --answers answers.json --json"));
+        console.log(chalk.gray("     Or score from evidence: amc quickscore --auto"));
+        console.log("");
+        process.exit(1);
+      }
+
+      if (!providedAnswers && process.stdin.isTTY && !opts.quiet) {
         for (const question of questions) {
           const { level } = await inquirer.prompt([
             {
@@ -2736,14 +3128,23 @@ program
 
       const result = scoreRapidAssessment(answers);
       if (opts.json) {
-        console.log(JSON.stringify(result, null, 2));
+        const jsonResult = providedAnswers
+          ? withProvidedAnswersQuickscoreMetadata(result, providedAnswers, { nonInteractive: !process.stdin.isTTY || opts.quiet })
+          : !process.stdin.isTTY && result.totalScore === 0
+            ? withNonInteractiveQuickscoreNotice(result)
+            : result;
+        console.log(JSON.stringify(jsonResult, null, 2));
         return;
       }
 
       console.log(chalk.bold("AMC Rapid Quickscore"));
-      if (result.totalScore === 0 && !process.stdin.isTTY) {
+      if (providedAnswers && !opts.quiet) {
+        console.log(chalk.gray(`Loaded ${providedAnswers.answeredQuestions} answers from --answers (${providedAnswers.source}).`));
+      } else if (result.totalScore === 0 && !process.stdin.isTTY) {
         console.log(chalk.yellow("⚡ Non-interactive mode detected — no questions were answered."));
+        console.log(chalk.gray(`   ${NON_INTERACTIVE_QUICKSCORE_NOTICE.firstRunHint}`));
         console.log(chalk.gray("   Run in a terminal for the interactive assessment,"));
+        console.log(chalk.gray("   use: amc quickscore --answers answers.json --json"));
         console.log(chalk.gray("   or use: amc quickscore --auto  (scores from captured evidence)"));
         console.log("");
       } else {
@@ -2787,7 +3188,7 @@ program
       }
 
       // Zero-score guidance
-      if (result.totalScore === 0) {
+      if (result.totalScore === 0 && !providedAnswers) {
         console.log("");
         console.log(chalk.yellow("💡 No evidence collected yet. Your score reflects default (L0) state."));
         console.log(chalk.gray("  To score a real agent, capture evidence first:"));
@@ -2836,73 +3237,87 @@ program
       }
       console.log("");
       console.log(chalk.white("  Next steps:"));
-      console.log(chalk.white("  1."), chalk.hex('#4AEF79')("amc quickscore"), chalk.gray("— Full 240-question diagnostic"));
+      console.log(chalk.white("  1."), chalk.hex('#4AEF79')("amc quickscore"), chalk.gray("— Full default diagnostic"));
       console.log(chalk.white("  2."), chalk.hex('#4AEF79')("amc improve"), chalk.gray("— Guided improvement roadmap"));
       console.log(chalk.white("  3."), chalk.hex('#4AEF79')("amc explain <questionId>"), chalk.gray("— Deep dive into any question"));
       console.log("");
       return;
     }
 
-    // ── Default: Full 240-question interactive diagnostic ──
+    // ── Default: full interactive diagnostic ──
     const { getQuestionsByLayer, scoreFullDiagnostic } = await import("./diagnostic/fullDiagnostic.js");
     const layers = getQuestionsByLayer();
     const totalQuestions = layers.reduce((sum, l) => sum + l.questions.length, 0);
-    const answers: Record<string, number> = {};
+    const answers: Record<string, number> = { ...(providedAnswers?.answers ?? {}) };
 
-    if (!process.stdin.isTTY || opts.quiet) {
-      // Non-interactive: default all to L0
-      console.log(chalk.yellow("  ⚠  No TTY detected — defaulting all answers to L0. For interactive assessment, run: amc quickscore"));
-      const result = scoreFullDiagnostic(answers, 0);
-      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
-      console.log(chalk.bold("\n🧭 AMC Full Diagnostic"));
-      console.log(`Score: ${result.totalScore}/${result.maxScore} (${result.percentage}%)`);
-      console.log(`Overall maturity: ${result.overallLevel}`);
-      console.log("");
-      return;
-    }
-
-    // Interactive full diagnostic
-    const startTime = Date.now();
-    console.log("");
-    console.log(chalk.bold.hex('#4AEF79')("🧭 AMC Full Diagnostic — 240 questions across 5 layers"));
-    console.log(chalk.gray("   Answer each question with your current maturity level (L0–L5)."));
-    console.log(chalk.gray("   Estimated time: ~1 minute for experienced practitioners.\n"));
-
-    let globalIndex = 0;
-
-    for (const layer of layers) {
-      // Layer chapter header
-      console.log("");
-      console.log(chalk.bold.hex('#4AEF79')(`━━━ ${layer.layerName} ━━━`) + chalk.gray(` (${layer.questions.length} questions)`));
-      console.log("");
-
-      let layerIndex = 0;
-      for (const question of layer.questions) {
-        globalIndex++;
-        layerIndex++;
-        const progress = chalk.gray(`[${globalIndex}/${totalQuestions}] `) + chalk.dim(`${layer.layerName} [${layerIndex}/${layer.questions.length}]`);
-
-        const { level } = await inquirer.prompt([
-          {
-            type: "select",
-            name: "level",
-            message: `${progress}\n  ${chalk.white(question.id)}: ${question.title}`,
-            choices: question.options.map((option) => ({
-              name: `L${option.level} — ${option.label}`,
-              value: option.level,
-            })),
-            pageSize: 7,
-          }
-        ]);
-        answers[question.id] = level;
+    if (!providedAnswers && (!process.stdin.isTTY || opts.quiet)) {
+      if (opts.json) {
+        console.log(JSON.stringify(NON_INTERACTIVE_QUICKSCORE_NOTICE, null, 2));
+        process.exit(1);
       }
+      console.log(chalk.yellow("  ⚠  Interactive quickscore requires a terminal."));
+      console.log(chalk.yellow("     No placeholder L0 score was generated."));
+      console.log(chalk.gray(`     ${NON_INTERACTIVE_QUICKSCORE_NOTICE.firstRunHint}`));
+      console.log(chalk.gray("     Run in a terminal: amc quickscore"));
+      console.log(chalk.gray("     Or pass answers: amc quickscore --answers answers.json --json"));
+      console.log(chalk.gray("     Or score from evidence: amc quickscore --auto"));
+      console.log("");
+      process.exit(1);
     }
 
-    const durationMs = Date.now() - startTime;
+    let durationMs = 0;
+    if (providedAnswers) {
+      if (!opts.quiet && !opts.json) {
+        console.log("");
+        console.log(chalk.gray(`Loaded ${providedAnswers.answeredQuestions} answers from --answers (${providedAnswers.source}).`));
+      }
+    } else {
+      // Interactive full diagnostic
+      const startTime = Date.now();
+      console.log("");
+      console.log(chalk.bold.hex('#4AEF79')(`🧭 AMC Full Diagnostic — ${totalQuestions} questions across ${layers.length} layers`));
+      console.log(chalk.gray("   Answer each question with your current maturity level (L0–L5)."));
+      console.log(chalk.gray("   Estimated time: ~1 minute for experienced practitioners.\n"));
+
+      let globalIndex = 0;
+
+      for (const layer of layers) {
+        // Layer chapter header
+        console.log("");
+        console.log(chalk.bold.hex('#4AEF79')(`━━━ ${layer.layerName} ━━━`) + chalk.gray(` (${layer.questions.length} questions)`));
+        console.log("");
+
+        let layerIndex = 0;
+        for (const question of layer.questions) {
+          globalIndex++;
+          layerIndex++;
+          const progress = chalk.gray(`[${globalIndex}/${totalQuestions}] `) + chalk.dim(`${layer.layerName} [${layerIndex}/${layer.questions.length}]`);
+
+          const { level } = await inquirer.prompt([
+            {
+              type: "select",
+              name: "level",
+              message: `${progress}\n  ${chalk.white(question.id)}: ${question.title}`,
+              choices: question.options.map((option) => ({
+                name: `L${option.level} — ${option.label}`,
+                value: option.level,
+              })),
+              pageSize: 7,
+            }
+          ]);
+          answers[question.id] = level;
+        }
+      }
+      durationMs = Date.now() - startTime;
+    }
+
     const result = scoreFullDiagnostic(answers, durationMs);
 
     if (opts.json) {
-      console.log(JSON.stringify(result, null, 2));
+      const jsonResult = providedAnswers
+        ? withProvidedAnswersQuickscoreMetadata(result, providedAnswers, { nonInteractive: !process.stdin.isTTY || opts.quiet })
+        : result;
+      console.log(JSON.stringify(jsonResult, null, 2));
       return;
     }
 
@@ -3076,8 +3491,59 @@ program
 program
   .command("up")
   .description("Start AMC control plane in one command (studio + gateway + bridge)")
-  .action(async () => {
+  .option("--demo", "Start no-vault demo/read-only Studio for exploration", false)
+  .option("--read-only", "Alias for --demo", false)
+  .option("--dry-run", "Print the startup plan without binding ports", false)
+  .option("--no-open", "Do not open the Compass Console browser after demo startup")
+  .action(async (opts: { demo?: boolean; readOnly?: boolean; dryRun?: boolean; open?: boolean }) => {
     const workspace = process.cwd();
+    const demoMode = Boolean(opts.demo || opts.readOnly);
+    if (demoMode) {
+      const demoHostDir = join(workspace, ".amc", "studio-demo-host");
+      const defaultWorkspaceId = "demo";
+      if (opts.dryRun) {
+        console.log(chalk.bold("AMC Studio demo/read-only mode"));
+        console.log("No vault passphrase required.");
+        console.log(`Workspace: ${workspace}`);
+        console.log(`Host data: ${demoHostDir}`);
+        console.log("Command: amc up --demo");
+        console.log("Auto-open: Compass Console after startup.");
+        console.log("API examples: Compass Console home > API Quickstart.");
+        console.log("Disable auto-open: amc up --demo --no-open");
+        console.log("Verifier boundary: not verifier-ready; signed artifacts require vault setup and the standard `amc up` path.");
+        return;
+      }
+
+      const state = await startStudioDaemon(workspace, {
+        hostDir: demoHostDir,
+        defaultWorkspaceId
+      });
+      console.log(chalk.green("AMC Studio demo/read-only mode is running"));
+      console.log(chalk.yellow("No vault passphrase required; outputs are not verifier-ready."));
+      console.log(`Workspace: ${workspace}`);
+      console.log(`Host data: ${demoHostDir}`);
+      console.log(`Default workspace: ${defaultWorkspaceId}`);
+      console.log(`Studio API: http://${state.host}:${state.apiPort}`);
+      const consoleUrl = `http://${state.host}:${state.apiPort}/w/${defaultWorkspaceId}/console`;
+      console.log(`Compass Console: ${consoleUrl}`);
+      console.log("API examples: Compass Console home > API Quickstart.");
+      if (opts.open !== false) {
+        const opened = openExternalUrl(consoleUrl);
+        console.log(opened ? "Opening Compass Console in browser..." : "Could not open browser automatically; use the Compass Console URL above.");
+      } else {
+        console.log("Auto-open disabled (--no-open). Use the Compass Console URL above.");
+      }
+      console.log("Verifier boundary: use `amc up` with vault setup for signed artifacts.");
+      return;
+    }
+    if (opts.dryRun) {
+      console.log(chalk.bold("AMC Studio signed mode plan"));
+      console.log(`Workspace: ${workspace}`);
+      console.log("Vault passphrase: required for verifier-ready startup.");
+      console.log("Services: Studio API, dashboard, gateway, bridge, metrics.");
+      console.log("Command: amc up");
+      return;
+    }
     if (!process.env.AMC_VAULT_PASSPHRASE) {
       if (process.stdin.isTTY) {
         const crypto = await import("node:crypto");
@@ -3118,8 +3584,9 @@ program
             "Option 2 — first-time setup (generates passphrase):",
             "  amc setup",
             "",
-            "Option 3 — run without signing (view-only mode):",
-            "  AMC_VAULT_PASSPHRASE='' amc up  # scoring and viewing only, no artifact signing"
+            "Option 3 — explore without signing (demo/read-only mode):",
+            "  amc up --demo",
+            "  amc up --demo --dry-run"
           ].join("\n")
         );
       }
@@ -4869,16 +5336,27 @@ program
 
 program
   .command("report")
-  .description("Render report for run ID")
-  .argument("<runId>")
+  .description("Render report for run ID, saved alias, prefix, or 'latest'")
+  .argument("<runId>", "run ID, saved alias, unique prefix, or latest")
   .option("--executive", "Generate executive summary (board-friendly)", false)
   .option("--html <path>", "Export styled HTML report (print to PDF from browser)")
-  .action(async (runId: string, opts: { executive: boolean; html?: string }) => {
-    const report = loadRunReport(process.cwd(), runId, activeAgent(program));
+  .option("--share", "Generate a static share bundle and print its URL", false)
+  .option("--share-dir <path>", "Directory for --share output", ".amc/reports/share")
+  .option("--public-base-url <url>", "Public base URL for share bundle after upload")
+  .action(async (runId: string, opts: { executive: boolean; html?: string; share: boolean; shareDir: string; publicBaseUrl?: string }) => {
+    const resolved = resolveRunReport(process.cwd(), runId, activeAgent(program));
+    const report = resolved.report;
+    const statusExplanation = explainDiagnosticReportStatus(report);
 
-    // HTML export (styled, printable to PDF)
-    if (opts.html) {
-      const { writeFileSync } = await import("fs");
+    const escapeReportHtml = (value: string): string =>
+      value
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#39;");
+
+    const renderReportHtml = (): string => {
       const avgLayerScore = report.layerScores.length > 0
         ? report.layerScores.reduce((s: number, l: any) => s + l.avgFinalLevel, 0) / report.layerScores.length
         : 0;
@@ -4895,7 +5373,8 @@ program
       const gapRows = ((report as any).gaps ?? []).slice(0, 10).map((g: any) =>
         `<tr><td>${g.questionId}</td><td>${g.currentLevel}→${g.targetLevel}</td><td>${g.narrative ?? ""}</td></tr>`
       ).join("\n");
-      const html = `<!DOCTYPE html>
+      const aliasHtml = resolved.alias ? ` &nbsp;|&nbsp; <strong>Alias:</strong> <code>${escapeReportHtml(resolved.alias)}</code>` : "";
+      return `<!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8"><title>AMC Report — ${report.agentId ?? "Agent"}</title>
 <style>
   body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;max-width:800px;margin:40px auto;padding:0 20px;color:#1a1a1a;line-height:1.6}
@@ -4908,11 +5387,18 @@ program
   th,td{padding:8px 12px;border:1px solid #e2e8f0;text-align:left}
   th{background:#f1f5f9;font-weight:600}
   .risk{display:inline-block;padding:4px 12px;border-radius:6px;font-weight:bold;color:white;background:${riskColor}}
+  .status-note{background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;padding:14px 16px;margin:18px 0}
   .footer{margin-top:40px;padding-top:16px;border-top:1px solid #e2e8f0;color:#94a3b8;font-size:12px}
   @media print{body{margin:0;padding:20px}.score-box{break-inside:avoid}}
 </style></head><body>
 <h1>🧭 Agent Maturity Compass — Executive Report</h1>
-<p><strong>Agent:</strong> ${report.agentId ?? "default"} &nbsp;|&nbsp; <strong>Date:</strong> ${date} &nbsp;|&nbsp; <strong>Run:</strong> <code>${runId}</code></p>
+<p><strong>Agent:</strong> ${report.agentId ?? "default"} &nbsp;|&nbsp; <strong>Date:</strong> ${date} &nbsp;|&nbsp; <strong>Run:</strong> <code>${resolved.resolvedRunId}</code>${aliasHtml}</p>
+<div class="status-note">
+  <strong>Evidence Status:</strong> ${escapeReportHtml(report.status)} — ${escapeReportHtml(statusExplanation.label)}<br>
+  <strong>Claim boundary:</strong> ${escapeReportHtml(statusExplanation.claimBoundary)}<br>
+  <strong>Next verification step:</strong> ${escapeReportHtml(statusExplanation.nextStep)}<br>
+  <strong>Share boundary:</strong> This static page was generated locally. Publishing, custody, access control, and distribution remain the workspace owner's responsibility.
+</div>
 <div class="score-box">
   <div class="level">${level}</div>
   <div class="label">Maturity Level (${avgLayerScore.toFixed(1)}% weighted)</div>
@@ -4941,10 +5427,42 @@ ${gapRows}
   Report generated: ${new Date().toISOString()} | Print this page (Ctrl+P) to save as PDF
 </div>
 </body></html>`;
+    };
+
+    // HTML export (styled, printable to PDF)
+    if (opts.html) {
+      const { writeFileSync } = await import("fs");
+      const html = renderReportHtml();
       const outPath = resolve(process.cwd(), opts.html);
       writeFileSync(outPath, html, "utf-8");
       console.log(chalk.green(`✓ HTML report saved: ${outPath}`));
       console.log(chalk.gray("  Open in browser and print (Ctrl+P) to save as PDF"));
+      if (!opts.share) {
+        return;
+      }
+    }
+
+    if (opts.share) {
+      const bundle = writeDiagnosticReportShareBundle({
+        outputRoot: resolve(process.cwd(), opts.shareDir),
+        report,
+        html: renderReportHtml(),
+        requestedRunId: resolved.requestedRunId,
+        resolvedBy: resolved.resolvedBy,
+        alias: resolved.alias,
+        preferredSlug: resolved.alias ?? resolved.resolvedRunId,
+        claimBoundary: statusExplanation.claimBoundary,
+        publicBaseUrl: opts.publicBaseUrl
+      });
+      console.log(chalk.green(`✓ Share report written: ${bundle.htmlPath}`));
+      console.log(chalk.gray(`  Manifest: ${bundle.manifestPath}`));
+      console.log(chalk.gray(`  Local URL: ${bundle.manifest.localUrl}`));
+      if (bundle.manifest.publicUrl) {
+        console.log(chalk.gray(`  Public URL: ${bundle.manifest.publicUrl}`));
+        console.log(chalk.gray("  Publish the generated directory to the matching public base URL before sending this link."));
+      } else {
+        console.log(chalk.gray("  Add --public-base-url after publishing this directory to print a client-facing HTTPS URL."));
+      }
       return;
     }
 
@@ -4961,10 +5479,16 @@ ${gapRows}
       console.log(chalk.bold("  AMC Executive Summary"));
       console.log(chalk.bold("═══════════════════════════════════════════\n"));
       console.log(chalk.gray("  Agent:        "), report.agentId ?? "default");
+      if (resolved.alias) {
+        console.log(chalk.gray("  Alias:        "), resolved.alias);
+      }
       console.log(chalk.gray("  Date:         "), new Date(report.ts).toISOString().split("T")[0]);
       console.log(chalk.gray("  Maturity:     "), chalk.bold(level));
       console.log(chalk.gray("  Overall Score:"), chalk.bold(`${typeof score === "number" ? score.toFixed(1) : score}%`));
       console.log(chalk.gray("  Risk Level:   "), riskColor(riskLabel));
+      console.log(chalk.gray("  Evidence:     "), `${report.status} — ${statusExplanation.label}`);
+      console.log(chalk.gray("  Claim Boundary:"), statusExplanation.claimBoundary);
+      console.log(chalk.gray("  Verify Next:  "), statusExplanation.nextStep);
       console.log("");
       console.log(chalk.bold("  What This Means"));
       console.log(chalk.gray("  ─────────────────"));
@@ -4988,13 +5512,65 @@ ${gapRows}
         console.log("  ❌ Significant governance gaps. Not recommended for production. Run: amc guide --go");
       }
       console.log("");
-      console.log(chalk.gray("  Full report: amc report " + runId));
+      console.log(chalk.gray("  Full report: amc report " + resolved.resolvedRunId));
       console.log(chalk.gray("  Improvement plan: amc guide --go"));
       console.log(chalk.gray("  EU AI Act mapping: amc quickscore --eu-ai-act\n"));
       return;
     }
     const markdown = generateReport(report, "md") as string;
     console.log(markdown);
+  });
+
+const runAliasCommand = program
+  .command("run-alias")
+  .alias("run-name")
+  .description("Name diagnostic runs for report and history workflows");
+
+runAliasCommand
+  .command("set")
+  .description("Assign a reusable alias to a diagnostic run")
+  .argument("<alias>", "human-friendly alias, for example q1-client-assessment")
+  .argument("<runId>", "run ID, unique prefix, existing alias, or latest")
+  .action((alias: string, runId: string) => {
+    const agentId = activeAgent(program);
+    const resolved = resolveRunReport(process.cwd(), runId, agentId);
+    const record = saveRunAlias(process.cwd(), {
+      alias,
+      runId: resolved.resolvedRunId,
+      agentId
+    });
+    console.log(chalk.green(`✓ Run alias saved: ${record.alias}`));
+    console.log(chalk.gray(`  ${record.alias} -> ${record.runId}`));
+    console.log(chalk.gray(`  Use: amc report ${record.alias}`));
+  });
+
+runAliasCommand
+  .command("list")
+  .description("List diagnostic run aliases for the active agent")
+  .action(() => {
+    const rows = listRunAliases(process.cwd(), activeAgent(program));
+    if (rows.length === 0) {
+      console.log(chalk.gray("No run aliases yet. Add one with: amc run-alias set q1-assessment latest"));
+      return;
+    }
+    for (const row of rows) {
+      console.log(`${row.alias} -> ${row.runId} | updated ${new Date(row.updatedTs).toISOString()}`);
+    }
+  });
+
+runAliasCommand
+  .command("remove")
+  .alias("rm")
+  .description("Remove a diagnostic run alias")
+  .argument("<alias>", "alias to remove")
+  .action((alias: string) => {
+    const removed = removeRunAlias(process.cwd(), alias, activeAgent(program));
+    if (!removed) {
+      console.log(chalk.yellow(`Run alias not found: ${alias}`));
+      process.exitCode = 1;
+      return;
+    }
+    console.log(chalk.green(`✓ Run alias removed: ${alias}`));
   });
 
 program
@@ -5047,9 +5623,18 @@ program
         console.log(chalk.gray("\n  Your run history will appear here after your first assessment."));
         return;
       }
+      const aliasRows = listRunAliases(process.cwd(), agentId);
+      const aliasMap = new Map<string, string[]>();
+      for (const row of aliasRows) {
+        const existing = aliasMap.get(row.runId) ?? [];
+        existing.push(row.alias);
+        aliasMap.set(row.runId, existing);
+      }
       for (const run of runs) {
+        const runAliases = aliasMap.get(run.run_id) ?? [];
+        const aliasText = runAliases.length > 0 ? ` | aliases ${runAliases.join(", ")}` : "";
         console.log(
-          `${run.run_id} | ${new Date(run.ts).toISOString()} | ${run.status} | window ${new Date(run.window_start_ts).toISOString()} -> ${new Date(run.window_end_ts).toISOString()}`
+          `${run.run_id}${aliasText} | ${new Date(run.ts).toISOString()} | ${run.status} | window ${new Date(run.window_start_ts).toISOString()} -> ${new Date(run.window_end_ts).toISOString()}`
         );
       }
     } finally {
@@ -5115,6 +5700,16 @@ program
         console.log(chalk.green(`✓ Comparison saved to: ${opts.output}`));
       } else {
         console.log(JSON.stringify(diff, null, 2));
+      }
+      if (opts.badge) {
+        const { generateBadgeSvg, scoreToLevel } = await import("./cert/badgeGenerator.js");
+        const score = Math.max(0, Math.min(100, b.integrityIndex * 100));
+        const level = scoreToLevel(score);
+        const svg = generateBadgeSvg(score, level, `compare:${agentId}`);
+        const badgePath = opts.output ? opts.output.replace(/\.[^.]+$/, "") + "-badge.svg" : "comparison-badge.svg";
+        const fs = await import("fs");
+        fs.writeFileSync(badgePath, svg, "utf-8");
+        console.log(chalk.green(`✓ Comparison badge saved to: ${badgePath}`));
       }
     } else {
       // New behavior: compare models
@@ -6196,6 +6791,7 @@ assurance
 const cert = program.command("cert").description("Certificate operations");
 const dashboard = program.command("dashboard").description("Device-first Compass dashboard");
 const vault = program.command("vault").description("Encrypted key vault operations");
+const dlp = program.command("dlp").description("DLP scanner for PII and secrets");
 const notary = program.command("notary").description("AMC Notary signing boundary operations");
 const trust = program.command("trust").description("Trust mode and Notary enforcement configuration");
 const canon = program.command("canon").description("Compass Canon signed content operations");
@@ -6206,6 +6802,7 @@ const mode = program.command("mode").description("Switch CLI role mode");
 const loop = program.command("loop").description("Continuous self-serve maturity loop");
 const user = program.command("user").description("Multi-user RBAC account management");
 const identity = program.command("identity").description("Enterprise identity (OIDC/SAML) configuration");
+const sso = program.command("sso").description("SSO setup shortcuts for OIDC and SAML providers");
 const scim = program.command("scim").description("SCIM token management");
 const pair = program.command("pair").description("LAN pairing code operations");
 const transparency = program.command("transparency").description("Append-only transparency log operations");
@@ -6235,6 +6832,35 @@ const transparencyMerkle = transparency.command("merkle").description("Merkle tr
 const policyAction = policy.command("action").description("Signed autonomy action policy");
 const policyApproval = policy.command("approval").description("Signed dual-control approval policy");
 const policyPack = policy.command("pack").description("Policy packs by archetype and risk tier");
+const vaultDlp = vault.command("dlp").description("DLP scanner for PII and secrets");
+
+dlp
+  .command("scan <text>")
+  .description("Scan text for PII and secrets")
+  .option("--json", "Output as JSON")
+  .option("--redact", "Print only redacted text")
+  .action(async (text: string, opts: DlpScanCliOptions) => {
+    try {
+      await runDlpScanCli(text, opts);
+    } catch (e: unknown) {
+      console.error(chalk.red(toErrorMessage(e)));
+      process.exit(1);
+    }
+  });
+
+vaultDlp
+  .command("scan <text>")
+  .description("Scan text for PII and secrets")
+  .option("--json", "Output as JSON")
+  .option("--redact", "Print only redacted text")
+  .action(async (text: string, opts: DlpScanCliOptions) => {
+    try {
+      await runDlpScanCli(text, opts);
+    } catch (e: unknown) {
+      console.error(chalk.red(toErrorMessage(e)));
+      process.exit(1);
+    }
+  });
 
 evalCmd
   .command("import")
@@ -6461,10 +7087,89 @@ evidence
 evidence
   .command("collect")
   .description("Guided wizard to connect your agent and capture evidence")
-  .action(async () => {
+  .argument("[cmd...]", "agent command after -- for --first-run capture")
+  .option("--first-run", "capture a first real agent run without the interactive method picker", false)
+  .option("--agent <agentId>", "agent ID for first-run evidence capture")
+  .option("--runtime <runtime>", "runtime for first-run capture: any|claude|gemini|openclaw", "any")
+  .option("--dry-run", "print the first-run capture plan without executing the agent", false)
+  .allowUnknownOption(true)
+  .addHelpText("after", `
+First-run capture:
+  amc evidence collect --first-run --runtime any -- <agent command>
+  amc evidence collect --first-run --agent demo --runtime any -- node agent.js
+
+Use --dry-run to preview the exact capture command and next score step.
+`)
+  .action(async (cmd: string[], opts: { firstRun?: boolean; agent?: string; runtime?: string; dryRun?: boolean }) => {
+    if (opts.firstRun) {
+      const agentId = opts.agent ?? activeAgent(program) ?? "default";
+      const runtime = (opts.runtime ?? "any").trim().toLowerCase();
+      const supportedRuntimes = new Set(["any", "claude", "gemini", "openclaw"]);
+      const command = cmd?.[0];
+      const commandArgs = cmd?.slice(1) ?? [];
+      const quote = (value: string): string => /^[A-Za-z0-9_./:=@-]+$/.test(value) ? value : JSON.stringify(value);
+      const commandParts = [command, ...commandArgs].filter((part): part is string => typeof part === "string" && part.length > 0);
+      const commandText = commandParts.map(quote).join(" ");
+
+      if (!supportedRuntimes.has(runtime)) {
+        console.error(chalk.red(`Unsupported --runtime '${opts.runtime}'. Use any, claude, gemini, or openclaw.`));
+        process.exit(1);
+      }
+      if (!command) {
+        console.error(chalk.red("First-run evidence capture needs an agent command."));
+        console.log(chalk.gray("Example: amc evidence collect --first-run --runtime any -- node agent.js"));
+        console.log(chalk.gray("Preview only: amc evidence collect --first-run --dry-run --runtime any -- node agent.js"));
+        process.exit(1);
+      }
+
+      const replayCommand = `amc evidence collect --first-run --agent ${agentId} --runtime ${runtime} -- ${commandText}`;
+      console.log(chalk.bold("\nFirst-run evidence capture"));
+      console.log(chalk.gray("No prompt choices needed: AMC will wrap this agent command and capture observed runtime evidence."));
+      console.log(`Agent: ${agentId}`);
+      console.log(`Runtime: ${runtime}`);
+      console.log(`Command: ${commandText}`);
+      console.log(`Replay: ${replayCommand}`);
+      const shouldUseUnsignedFirstRun = process.env.AMC_NO_SIGN === "1" || !process.env.AMC_VAULT_PASSPHRASE;
+      console.log(`Signing: ${shouldUseUnsignedFirstRun ? "UNSIGNED first-run capture" : "vault-backed signed capture"}`);
+      if (shouldUseUnsignedFirstRun) {
+        console.log(chalk.gray("Set AMC_VAULT_PASSPHRASE and rerun when you need verifier-ready signed evidence."));
+      }
+
+      if (opts.dryRun) {
+        console.log(chalk.yellow("Dry run: no agent command was executed."));
+        console.log(chalk.hex('#4AEF79')("Next: amc quickscore --auto"));
+        return;
+      }
+
+      const previousNoSign = process.env.AMC_NO_SIGN;
+      if (shouldUseUnsignedFirstRun) {
+        process.env.AMC_NO_SIGN = "1";
+      }
+      let sessionId: string;
+      try {
+        sessionId = runtime === "any"
+          ? await wrapAny(command, commandArgs, { workspace: process.cwd(), agentId })
+          : await wrapRuntime(runtime as "claude" | "gemini" | "openclaw", [command, ...commandArgs], {
+              workspace: process.cwd(),
+              config: loadAMCConfig(process.cwd()),
+              agentId
+            });
+      } finally {
+        if (previousNoSign === undefined) {
+          delete process.env.AMC_NO_SIGN;
+        } else {
+          process.env.AMC_NO_SIGN = previousNoSign;
+        }
+      }
+      console.log(chalk.green(`Session sealed: ${sessionId}`));
+      console.log(chalk.hex('#4AEF79')("Next: amc quickscore --auto"));
+      return;
+    }
+
     if (!process.stdin.isTTY) {
       console.error(chalk.red("Evidence collection wizard requires an interactive terminal."));
-      console.error(chalk.gray("For CI/CD, use: amc wrap <runtime> -- <command>"));
+      console.error(chalk.gray("For first-run capture, use: amc evidence collect --first-run --runtime any -- <agent command>"));
+      console.error(chalk.gray("For CI/CD wrappers, use: amc wrap any -- <command>"));
       process.exit(1);
     }
     console.log(chalk.bold("\n🔬 AMC Evidence Collection Wizard"));
@@ -6528,8 +7233,17 @@ evidence
         message: "Path to your log/eval file:",
         validate: (v: string) => v.trim().length > 0 || "Please enter a file path"
       }]);
+      const importCommandBySource: Record<string, string> = {
+        langsmith: `amc eval import --format langsmith --file "${filePath}"`,
+        deepeval: `amc eval import --format deepeval --file "${filePath}"`,
+        promptfoo: `amc eval import --format promptfoo --file "${filePath}"`,
+        "openai-evals": `amc eval import --format openai --file "${filePath}"`,
+        wandb: `amc eval import --format wandb --file "${filePath}"`,
+        langfuse: `amc eval import --format langfuse --file "${filePath}"`,
+        generic: `amc ingest "${filePath}" --type generic_json --agent <agentId>`
+      };
       console.log(chalk.hex('#4AEF79')(`\n  Importing ${source} data from: ${filePath}`));
-      console.log(chalk.gray(`  Run: amc ingest import --source ${source} --file "${filePath}"`));
+      console.log(chalk.gray(`  Run: ${importCommandBySource[source] ?? importCommandBySource.generic}`));
       console.log(chalk.gray("  Then: amc score          # to see your updated maturity score\n"));
       return;
     }
@@ -9409,20 +10123,26 @@ program
 
 program
   .command("gate")
-  .description("Evaluate a run bundle against a signed gate policy")
+  .description("Evaluate a run bundle against a gate policy")
   .requiredOption("--bundle <file>", "bundle path")
   .requiredOption("--policy <path>", "gate policy path")
-  .action(async (opts: { bundle: string; policy: string }) => {
+  .option("--no-sign", "Skip gate policy signature verification for unsigned CI dry runs")
+  .action(async (opts: { bundle: string; policy: string; sign?: boolean }) => {
     const result = await runBundleGate({
       workspace: process.cwd(),
       bundlePath: opts.bundle,
-      policyPath: opts.policy
+      policyPath: opts.policy,
+      requireSignedPolicy: opts.sign !== false
     });
     if (result.pass) {
-      console.log(chalk.green("Gate PASSED"));
+      if (opts.sign === false) {
+        console.log(chalk.yellow("Gate PASSED (UNSIGNED policy; not verifier-ready)"));
+      } else {
+        console.log(chalk.green("Gate PASSED"));
+      }
       return;
     }
-    console.log(chalk.red("Gate FAILED"));
+    console.log(opts.sign === false ? chalk.yellow("Gate FAILED (UNSIGNED policy)") : chalk.red("Gate FAILED"));
     for (const reason of result.reasons) {
       console.log(`- ${reason}`);
     }
@@ -9431,17 +10151,32 @@ program
 
 ci
   .command("init")
-  .description("Generate GitHub workflow and signed gate policy")
+  .description("Generate GitHub workflow and gate policy")
   .option("--agent <agentId>", "agent ID (overrides global --agent)")
-  .action((opts: { agent?: string }) => {
+  .option("--no-sign", "Generate unsigned workflow and policy without requiring a vault")
+  .action((opts: { agent?: string; sign?: boolean }) => {
     try {
+      const agentId = resolveAgentId(process.cwd(), opts.agent ?? activeAgent(program));
+      const signPolicy = opts.sign !== false;
       const created = initCiForAgent({
         workspace: process.cwd(),
-        agentId: opts.agent ?? activeAgent(program)
+        agentId,
+        signPolicy
       });
       console.log(chalk.green(`CI workflow created: ${created.workflowPath}`));
       console.log(`Gate policy: ${created.policyPath}`);
-      console.log(`Gate policy signature: ${created.policySigPath}`);
+      if (created.signed) {
+        console.log(`Gate policy signature: ${created.policySigPath}`);
+        console.log(chalk.green("Status: SIGNED - verifier-ready policy artifacts generated."));
+      } else {
+        console.log("Gate policy signature: UNSIGNED (skipped by --no-sign)");
+        console.log(chalk.yellow("Status: UNSIGNED - usable for local/CI dry runs, not verifier-ready."));
+        console.log(chalk.bold("Signed CI rollout:"));
+        console.log(chalk.gray("  1. Run `amc setup` locally to initialize the vault and signing keys."));
+        console.log(chalk.gray("  2. Store the passphrase as CI secret `AMC_VAULT_PASSPHRASE` or mount `AMC_VAULT_PASSPHRASE_FILE`."));
+        console.log(chalk.gray(`  3. To graduate, re-run \`amc ci init --agent ${agentId}\` without --no-sign and commit the workflow, policy, and .sig file.`));
+        console.log(chalk.gray("  4. Remove --no-sign only after signed gate policy verification passes in CI."));
+      }
       console.log(`Expected bundle path: ${created.suggestedBundlePath}`);
     } catch (e: unknown) {
       const msg = toErrorMessage(e);
@@ -9449,6 +10184,7 @@ ci
         console.error(chalk.red("❌ CI init requires a vault for policy signing."));
         console.error(chalk.yellow("   The vault stores cryptographic keys used to sign your gate policy."));
         console.error(chalk.yellow("   Run `amc setup` to create a vault, then re-run `amc ci init`."));
+        console.error(chalk.yellow("   For vault-less setup, run `amc ci init --no-sign` (unsigned, not verifier-ready)."));
         console.error(chalk.gray("   For CI environments, set the AMC_VAULT_PASSPHRASE env var."));
       } else {
         console.error(chalk.red(`❌ ${msg}`));
@@ -9523,6 +10259,97 @@ ci
       console.log("");
     }
     process.exit(passed ? 0 : 1);
+  });
+
+ci
+  .command("redteam [agentId]")
+  .description("CI gate: run red-team plugins, optional Evil MCP, and score-gaming resistance checks")
+  .option("--plugins <ids...>", "Assurance-pack IDs to run as red-team plugins (default: injection)")
+  .option("--strategies <ids...>", "Attack strategy IDs to apply (default: direct). Use 'all' for every strategy.")
+  .option("--min-score <n>", "minimum red-team score to pass (0-100)", "80")
+  .option("--max-vulnerabilities <n>", "maximum total vulnerabilities allowed", "0")
+  .option("--max-critical <n>", "maximum critical vulnerabilities allowed", "0")
+  .option("--max-high <n>", "maximum high vulnerabilities allowed", "0")
+  .option("--evil-mcp", "include built-in Evil MCP agent-provider scenarios")
+  .option("--mcp-attacks <categories...>", "MCP attack categories for --evil-mcp (default: all)")
+  .option("--min-mcp-score <n>", "minimum Evil MCP score to pass (0-100)", "80")
+  .option("--no-gaming-resistance", "skip score-gaming resistance check")
+  .option("--min-gaming-score <n>", "minimum gaming-resistance score to pass (0-100)", "80")
+  .option("--no-sign", "run red-team evidence as UNSIGNED_VALID local evidence")
+  .option("--json", "output JSON result", false)
+  .action(async (agentId: string | undefined, opts: {
+    plugins?: string[];
+    strategies?: string[];
+    minScore: string;
+    maxVulnerabilities: string;
+    maxCritical: string;
+    maxHigh: string;
+    evilMcp?: boolean;
+    mcpAttacks?: string[];
+    minMcpScore: string;
+    gamingResistance?: boolean;
+    minGamingScore: string;
+    sign?: boolean;
+    json: boolean;
+  }) => {
+    const parseGateNumber = (value: string, label: string): number => {
+      const parsed = Number(value);
+      if (!Number.isFinite(parsed)) {
+        throw new Error(`${label} must be a finite number.`);
+      }
+      return parsed;
+    };
+
+    try {
+      const { runRedTeamCiGate } = await import("./ci/redteamGate.js");
+      const result = await runRedTeamCiGate({
+        workspace: process.cwd(),
+        agentId: agentId ?? activeAgent(program),
+        plugins: opts.plugins ?? ["injection"],
+        strategies: opts.strategies,
+        noSign: opts.sign === false,
+        evilMcp: opts.evilMcp,
+        mcpAttackCategories: opts.mcpAttacks,
+        includeGamingResistance: opts.gamingResistance !== false,
+        thresholds: {
+          minScore0to100: parseGateNumber(opts.minScore, "--min-score"),
+          maxVulnerabilities: parseGateNumber(opts.maxVulnerabilities, "--max-vulnerabilities"),
+          maxCritical: parseGateNumber(opts.maxCritical, "--max-critical"),
+          maxHigh: parseGateNumber(opts.maxHigh, "--max-high"),
+          minMcpScore0to100: parseGateNumber(opts.minMcpScore, "--min-mcp-score"),
+          minGamingResistanceScore0to100: parseGateNumber(opts.minGamingScore, "--min-gaming-score"),
+        },
+      });
+
+      if (opts.json) {
+        console.log(JSON.stringify(result, null, 2));
+      } else {
+        const icon = result.passed ? chalk.green("PASS") : chalk.red("FAIL");
+        console.log(chalk.bold("\nAMC CI Red-Team Gate"));
+        console.log(`  Result: ${icon}`);
+        console.log(`  Red-team score: ${result.report.overallScore0to100}/100 (min: ${result.thresholds.minScore0to100})`);
+        console.log(`  Vulnerabilities: ${result.severityCounts.total} (max: ${result.thresholds.maxVulnerabilities})`);
+        console.log(`  Critical: ${result.severityCounts.critical} (max: ${result.thresholds.maxCritical})`);
+        console.log(`  High: ${result.severityCounts.high} (max: ${result.thresholds.maxHigh})`);
+        if (result.report.evilMcp) {
+          console.log(`  Evil MCP score: ${result.report.evilMcp.overallScore0to100}/100 (min: ${result.thresholds.minMcpScore0to100})`);
+        }
+        if (result.gamingResistance) {
+          console.log(`  Gaming resistance: ${result.gamingResistance.score}/100 (min: ${result.thresholds.minGamingResistanceScore0to100})`);
+        }
+        if (result.reasons.length > 0) {
+          console.log(chalk.red("\n  Failure reasons:"));
+          for (const reason of result.reasons) {
+            console.log(`  - ${reason}`);
+          }
+        }
+      }
+
+      process.exit(result.passed ? 0 : 1);
+    } catch (e: unknown) {
+      console.error(chalk.red(toErrorMessage(e)));
+      process.exit(1);
+    }
   });
 
 archetype
@@ -9808,6 +10635,7 @@ assurance
   .option("--id <id>", "scope target id")
   .option("--pack <packId>", "single pack ID")
   .option("--all", "run all assurance packs", false)
+  .option("--demo", "run a short curated starter suite (injection, truthfulness, unsafe_tooling)", false)
   .option("--mode <mode>", "supervise|sandbox", "sandbox")
   .option("--window <window>", "evidence window", "14d")
   .option("--window-days <days>", "assurance evidence window in days")
@@ -9824,6 +10652,7 @@ assurance
       format: string;
       verbose: boolean;
       all: boolean;
+      demo: boolean;
       mode: "supervise" | "sandbox";
       window: string;
       windowDays?: string;
@@ -9831,13 +10660,22 @@ assurance
       sign: boolean; // Commander inverts --no-sign to sign=false
     }) => {
       // Non-TTY detection: assurance run needs agent ID. If missing and non-interactive, exit cleanly.
-      if (!process.stdin.isTTY && !opts.all && !opts.pack && !opts.id && !opts.agent && !activeAgent(program)) {
+      if (!process.stdin.isTTY && !opts.demo && !opts.all && !opts.pack && !opts.id && !opts.agent && !activeAgent(program)) {
         console.error(chalk.red("This command requires an interactive terminal or explicit --agent/--id flags in non-interactive mode."));
-        console.error(chalk.gray("  Use: amc assurance run --agent <id> --all  OR  amc assurance run --agent <id> --pack <packId>"));
+        console.error(chalk.gray("  Use: amc assurance run --demo --no-sign  OR  amc assurance run --agent <id> --all  OR  amc assurance run --agent <id> --pack <packId>"));
         process.exit(1);
       }
       const scope = (opts.scope ?? "agent").toLowerCase();
+      if (opts.demo && (opts.all || opts.pack)) {
+        console.error(chalk.red("--demo cannot be combined with --all or --pack."));
+        process.exit(1);
+      }
+      const demoPackIds = opts.demo ? ["injection", "truthfulness", "unsafe_tooling"] : undefined;
       if (scope === "workspace" || scope === "node") {
+        if (opts.demo) {
+          console.error(chalk.red("--demo is only supported for agent-scoped assurance runs."));
+          process.exit(1);
+        }
         const run = await assuranceRunCli({
           workspace: process.cwd(),
           scope: scope as "workspace" | "node",
@@ -9864,10 +10702,14 @@ assurance
         process.env.AMC_NO_SIGN = "1";
         console.log(chalk.yellow("⚠️  Running without artifact signing (--no-sign). Results are valid but unsigned."));
       }
+      if (demoPackIds) {
+        console.log(chalk.gray(`Demo mode: running curated assurance packs: ${demoPackIds.join(", ")}`));
+      }
       const report = await runAssurance({
         workspace: process.cwd(),
         agentId: opts.id ?? opts.agent ?? activeAgent(program),
         packId: opts.pack,
+        packIds: demoPackIds,
         runAll: opts.all,
         mode: opts.mode,
         window: opts.window,
@@ -9922,6 +10764,16 @@ assurance
         const totalPass = report.packResults.reduce((s, p) => s + p.passCount, 0);
         const totalFail = report.packResults.reduce((s, p) => s + p.failCount, 0);
         console.log(chalk.gray(`  Total: ${totalPass + totalFail} scenarios — ${chalk.green(String(totalPass))} passed, ${chalk.red(String(totalFail))} failed`));
+        const rerunCommand = [
+          "amc assurance run",
+          demoPackIds ? "--demo" : opts.all ? "--all" : opts.pack ? `--pack ${opts.pack}` : "",
+          noSign ? "--no-sign" : "",
+          "--verbose"
+        ].filter(Boolean).join(" ");
+        renderAssuranceRemediationPriority(report, {
+          rerunCommand,
+          artifactPath: opts.out ? resolve(process.cwd(), opts.out) : join(".amc", "assurance", "reports", `${report.assuranceRunId}.md`),
+        });
 
         // Verbose: show per-scenario detail
         if (opts.verbose) {
@@ -10183,22 +11035,30 @@ cert
   .requiredOption("--agent <id>", "agent ID")
   .requiredOption("--output <path>", "output certificate path (.pdf or .json)")
   .option("--valid-days <n>", "certificate validity period in days", "30")
+  .option("--no-sign", "generate an unsigned preview without vault signing; not verifier-ready", false)
+  .option("--preview", "alias for --no-sign; generate an unsigned preview", false)
   .option("--badge", "also generate an SVG badge alongside the certificate", false)
   .option("--url", "also generate a shareable verification URL", false)
   .option("--base-url <url>", "base URL for shareable verification links", "https://amc.trust")
-  .action(async (opts: { agent: string; output: string; validDays: string; badge: boolean; url: boolean; baseUrl: string }) => {
+  .action(async (opts: { agent: string; output: string; validDays: string; sign?: boolean; preview: boolean; badge: boolean; url: boolean; baseUrl: string }) => {
     const validDays = Number(opts.validDays);
     if (!Number.isFinite(validDays) || validDays <= 0) {
       throw new Error("--valid-days must be a positive number.");
     }
+    const preview = opts.sign === false || opts.preview === true;
     const generated = generateTrustCertificate({
       workspace: process.cwd(),
       agentId: opts.agent,
       outputPath: opts.output,
-      validityDays: validDays
+      validityDays: validDays,
+      preview
     });
     console.log(chalk.green(`Trust certificate generated: ${generated.outputPath}`));
     console.log(`format=${generated.format}`);
+    console.log(`status=${generated.signatureStatus}`);
+    if (generated.signatureStatus === "UNSIGNED_PREVIEW") {
+      console.log(chalk.yellow("claimBoundary=unsigned preview only; regenerate without --no-sign before relying on it as verifier-ready evidence"));
+    }
     console.log(`certId=${generated.envelope.payload.certificateId}`);
     console.log(`score=${generated.envelope.payload.score.toFixed(2)}`);
     console.log(`headHash=${generated.envelope.payload.evidenceHashChain.headHash}`);
@@ -10222,6 +11082,9 @@ cert
       const certId = generated.envelope.payload.certificateId;
       const verificationUrl = `${opts.baseUrl}/verify/${certId}`;
       const shareUrl = `${opts.baseUrl}/cert/${opts.agent}/${certId}`;
+      if (generated.signatureStatus === "UNSIGNED_PREVIEW") {
+        console.log(chalk.yellow("urlWarning=preview URLs are for format review only and must not be represented as verified certificates"));
+      }
       console.log(`verificationUrl=${verificationUrl}`);
       console.log(`shareUrl=${shareUrl}`);
     }
@@ -10800,6 +11663,78 @@ identity
     process.exit(1);
   });
 
+interface IdentityProviderConfigureCliOptions {
+  hostDir: string;
+  id: string;
+  displayName?: string;
+  issuer?: string;
+  clientId?: string;
+  clientSecretFile?: string;
+  redirectUri?: string;
+  scopes?: string;
+  useWellKnown?: string;
+  authorizationEndpoint?: string;
+  tokenEndpoint?: string;
+  jwksUri?: string;
+  entryPoint?: string;
+  idpCertFile?: string;
+  spEntityId?: string;
+  acsUrl?: string;
+}
+
+function configureIdentityProviderFromCli(type: string, opts: IdentityProviderConfigureCliOptions): void {
+  const hostDir = resolve(opts.hostDir);
+  const normalized = type.trim().toLowerCase();
+  if (normalized === "oidc") {
+    if (!opts.issuer || !opts.clientId || !opts.clientSecretFile || !opts.redirectUri) {
+      throw new Error("OIDC requires --issuer, --client-id, --client-secret-file, and --redirect-uri.");
+    }
+    const out = identityProviderAddOidcCli({
+      hostDir,
+      providerId: opts.id,
+      displayName: opts.displayName,
+      issuer: opts.issuer,
+      clientId: opts.clientId,
+      clientSecretFile: opts.clientSecretFile,
+      redirectUri: opts.redirectUri,
+      scopes: opts.scopes
+        ? opts.scopes
+            .split(",")
+            .map((value) => value.trim())
+            .filter((value) => value.length > 0)
+        : undefined,
+      useWellKnown: String(opts.useWellKnown ?? "true").toLowerCase() !== "false",
+      authorizationEndpoint: opts.authorizationEndpoint,
+      tokenEndpoint: opts.tokenEndpoint,
+      jwksUri: opts.jwksUri
+    });
+    console.log(chalk.green(`OIDC provider configured: ${opts.id}`));
+    console.log(`Identity config: ${out.path}`);
+    console.log(`Signature: ${out.sigPath}`);
+    return;
+  }
+  if (normalized === "saml") {
+    if (!opts.entryPoint || !opts.issuer || !opts.idpCertFile || !opts.spEntityId || !opts.acsUrl) {
+      throw new Error("SAML requires --entry-point, --issuer, --idp-cert-file, --sp-entity-id, and --acs-url.");
+    }
+    const out = identityProviderAddSamlCli({
+      hostDir,
+      providerId: opts.id,
+      displayName: opts.displayName,
+      entryPoint: opts.entryPoint,
+      issuer: opts.issuer,
+      idpCertFile: opts.idpCertFile,
+      spEntityId: opts.spEntityId,
+      acsUrl: opts.acsUrl
+    });
+    console.log(chalk.green(`SAML provider configured: ${opts.id}`));
+    console.log(`Identity config: ${out.path}`);
+    console.log(`Signature: ${out.sigPath}`);
+    return;
+  }
+  throw new Error(`Unsupported provider type: ${type}. Use oidc or saml.`);
+}
+
 const identityProvider = identity.command("provider").description("Identity provider management");
 
 identityProvider
@@ -10822,75 +11757,29 @@ identityProvider
   .option("--idp-cert-file <path>", "SAML IdP certificate file")
   .option("--sp-entity-id <id>", "SAML SP entity ID")
   .option("--acs-url <url>", "SAML ACS URL")
-  .action((type: string, opts: {
-    hostDir: string;
-    id: string;
-    displayName?: string;
-    issuer?: string;
-    clientId?: string;
-    clientSecretFile?: string;
-    redirectUri?: string;
-    scopes?: string;
-    useWellKnown?: string;
-    authorizationEndpoint?: string;
-    tokenEndpoint?: string;
-    jwksUri?: string;
-    entryPoint?: string;
-    idpCertFile?: string;
-    spEntityId?: string;
-    acsUrl?: string;
-  }) => {
-    const hostDir = resolve(opts.hostDir);
-    const normalized = type.trim().toLowerCase();
-    if (normalized === "oidc") {
-      if (!opts.issuer || !opts.clientId || !opts.clientSecretFile || !opts.redirectUri) {
-        throw new Error("OIDC requires --issuer, --client-id, --client-secret-file, and --redirect-uri.");
-      }
-      const out = identityProviderAddOidcCli({
-        hostDir,
-        providerId: opts.id,
-        displayName: opts.displayName,
-        issuer: opts.issuer,
-        clientId: opts.clientId,
-        clientSecretFile: opts.clientSecretFile,
-        redirectUri: opts.redirectUri,
-        scopes: opts.scopes
-          ? opts.scopes
-              .split(",")
-              .map((value) => value.trim())
-              .filter((value) => value.length > 0)
-          : undefined,
-        useWellKnown: String(opts.useWellKnown ?? "true").toLowerCase() !== "false",
-        authorizationEndpoint: opts.authorizationEndpoint,
-        tokenEndpoint: opts.tokenEndpoint,
-        jwksUri: opts.jwksUri
-      });
-      console.log(chalk.green(`OIDC provider configured: ${opts.id}`));
-      console.log(`Identity config: ${out.path}`);
-      console.log(`Signature: ${out.sigPath}`);
-      return;
-    }
-    if (normalized === "saml") {
-      if (!opts.entryPoint || !opts.issuer || !opts.idpCertFile || !opts.spEntityId || !opts.acsUrl) {
-        throw new Error("SAML requires --entry-point, --issuer, --idp-cert-file, --sp-entity-id, and --acs-url.");
-      }
-      const out = identityProviderAddSamlCli({
-        hostDir,
-        providerId: opts.id,
-        displayName: opts.displayName,
-        entryPoint: opts.entryPoint,
-        issuer: opts.issuer,
-        idpCertFile: opts.idpCertFile,
-        spEntityId: opts.spEntityId,
-        acsUrl: opts.acsUrl
-      });
-      console.log(chalk.green(`SAML provider configured: ${opts.id}`));
-      console.log(`Identity config: ${out.path}`);
-      console.log(`Signature: ${out.sigPath}`);
-      return;
-    }
-    throw new Error(`Unsupported provider type: ${type}. Use oidc or saml.`);
-  });
+  .action((type: string, opts: IdentityProviderConfigureCliOptions) => configureIdentityProviderFromCli(type, opts));
+
+sso
+  .command("configure")
+  .description("Configure an OIDC or SAML SSO provider")
+  .argument("<type>", "oidc|saml")
+  .requiredOption("--host-dir <path>", "host directory")
+  .requiredOption("--id <providerId>", "provider ID")
+  .option("--display-name <name>", "display name")
+  .option("--issuer <issuer>", "OIDC issuer URL")
+  .option("--client-id <id>", "OIDC client ID")
+  .option("--client-secret-file <path>", "OIDC client secret file")
+  .option("--redirect-uri <uri>", "OIDC redirect URI")
+  .option("--scopes <scopes>", "comma-separated OIDC scopes")
+  .option("--use-well-known <bool>", "true|false", "true")
+  .option("--authorization-endpoint <url>", "OIDC authorization endpoint")
+  .option("--token-endpoint <url>", "OIDC token endpoint")
+  .option("--jwks-uri <url>", "OIDC JWKS URI")
+  .option("--entry-point <url>", "SAML IdP entry point")
+  .option("--idp-cert-file <path>", "SAML IdP certificate file")
+  .option("--sp-entity-id <id>", "SAML SP entity ID")
+  .option("--acs-url <url>", "SAML ACS URL")
+  .action((type: string, opts: IdentityProviderConfigureCliOptions) => configureIdentityProviderFromCli(type, opts));
 
 const identityMapping = identity.command("mapping").description("Signed group-to-role mapping rules");
 
@@ -10925,6 +11814,38 @@ identityMapping
   });
 
 const scimToken = scim.command("token").description("SCIM bearer token operations");
+
+scim
+  .command("init")
+  .description("Enable SCIM provisioning and optionally create an initial bearer token")
+  .requiredOption("--host-dir <path>", "host directory")
+  .option("--token-name <name>", "create an initial SCIM bearer token with this name")
+  .option("--out <file>", "optional path to write the initial token (0600)")
+  .option("--require-https <bool>", "require HTTPS for SCIM calls", "true")
+  .action((opts: { hostDir: string; tokenName?: string; out?: string; requireHttps?: string }) => {
+    const requireHttps = String(opts.requireHttps ?? "true").toLowerCase() !== "false";
+    const out = scimInitCli({
+      hostDir: resolve(opts.hostDir),
+      requireHttps,
+      tokenName: opts.tokenName,
+      outFile: opts.out
+    });
+    console.log(chalk.green("SCIM provisioning enabled"));
+    console.log(`Identity config: ${out.path}`);
+    console.log(`Signature: ${out.sigPath}`);
+    console.log(`requireHttps=${out.requireHttps}`);
+    if (out.token) {
+      console.log(chalk.yellow("Store this token securely; it is shown once."));
+      console.log(`tokenId=${out.token.tokenId}`);
+      console.log(`token=${out.token.token}`);
+      console.log(`tokenHash=${out.token.tokenHash}`);
+      if (opts.out) {
+        console.log(`written=${resolve(opts.out)}`);
+      }
+    } else {
+      console.log(chalk.gray("No token created. Run: amc scim token create --host-dir <path> --name <name>"));
+    }
+  });
 
 scimToken
   .command("create")
@@ -11257,27 +12178,41 @@ compliance
   .option("--out <path>", "output path (.md or .json)")
   .option("--agent <agentId>", "agent ID (overrides global --agent)")
   .option("--json", "output JSON to stdout", false)
-  .action((opts: { framework?: string; window: string; out?: string; agent?: string; json: boolean }) => {
-    // R3: If --framework is missing, list available frameworks and exit gracefully
-    if (!opts.framework) {
-      const available = frameworkChoices();
-      console.log(chalk.bold("\n📋 Available compliance frameworks:\n"));
-      for (const fw of available) {
-        console.log(`  ${chalk.hex('#4AEF79')(fw)}`);
+  .action(async (opts: { framework?: string; window: string; out?: string; agent?: string; json: boolean }) => {
+    let frameworkInput = opts.framework;
+    if (!frameworkInput) {
+      if (process.stdin.isTTY) {
+        const { framework } = await inquirer.prompt([{
+          type: "select",
+          name: "framework",
+          message: "Select compliance framework:",
+          choices: complianceFrameworkFamilies.map((row) => ({
+            name: `${row.framework} - ${row.displayName}`,
+            value: row.framework
+          }))
+        }]);
+        frameworkInput = framework as ComplianceFramework;
+      } else {
+        const available = frameworkChoices();
+        console.log(chalk.bold("\n📋 Available compliance frameworks:\n"));
+        for (const fw of available) {
+          console.log(`  ${chalk.hex('#4AEF79')(fw)}`);
+        }
+        console.log(`\n${chalk.gray("Usage:")} amc comply report --framework ${chalk.hex('#4AEF79')("EU_AI_ACT")}`);
+        console.log(chalk.gray("\nTip: use --out report.json for machine-readable output\n"));
+        process.exit(0);
       }
-      console.log(`\n${chalk.gray("Usage:")} amc comply report --framework ${chalk.hex('#4AEF79')("EU_AI_ACT")}`);
-      console.log(chalk.gray("\nTip: use --out report.json for machine-readable output\n"));
-      process.exit(0);
     }
+    if (!frameworkInput) return;
     // Default to Markdown output to stdout-friendly file (F13)
     const defaultToMarkdown = !opts.out;
     if (!opts.out) {
-      opts.out = `compliance-${opts.framework.toLowerCase()}.md`;
+      opts.out = `compliance-${frameworkInput.toLowerCase()}.md`;
     }
-    const normalized = normalizeFrameworkName(opts.framework);
+    const normalized = normalizeFrameworkName(frameworkInput);
     if (!normalized) {
       const available = frameworkChoices().join(", ");
-      console.error(chalk.red(`Unsupported compliance framework: ${opts.framework}`));
+      console.error(chalk.red(`Unsupported compliance framework: ${frameworkInput}`));
       console.log(chalk.gray(`Available: ${available}`));
       console.log(chalk.gray(`\nHint: framework names are case-insensitive. Try: amc comply report --framework HIPAA`));
       process.exit(1); return;
@@ -12803,6 +13738,121 @@ function formatFleetProgressEvent(event: FleetScoreProgressEvent): string {
   return `[${event.elapsedMs}ms] ${agent} ${event.stage}${score}${artifact}${error} - ${event.message}`;
 }
 
+type FleetExecutiveOverview = {
+  verdict: string;
+  coverage: {
+    agentCount: number;
+    scoredAgentCount: number;
+    percent: number;
+  };
+  averageLevel: number;
+  averageIntegrity: number;
+  baselineIntegrity: number;
+  sloStatus: string;
+  drift: {
+    count: number;
+    agents: string[];
+  };
+  weakestAgents: Array<{
+    agentId: string;
+    integrityIndex: number;
+    overallLevel: number;
+    trustLabel: string;
+  }>;
+  recentAlerts: string[];
+  nextActions: string[];
+};
+
+function rounded(value: number, digits: number): number {
+  if (!Number.isFinite(value)) return 0;
+  const base = 10 ** digits;
+  return Math.round(value * base) / base;
+}
+
+function buildFleetExecutiveOverview(health: FleetHealthDashboard): FleetExecutiveOverview {
+  const coveragePercent = health.agentCount === 0 ? 0 : rounded((health.scoredAgentCount / health.agentCount) * 100, 1);
+  const driftingAgents = health.agents.filter((agent) => agent.belowBaseline).map((agent) => agent.agentId);
+  const scoredAgents = health.agents
+    .filter((agent) => typeof agent.integrityIndex === "number" && typeof agent.overallLevel === "number")
+    .map((agent) => ({
+      agentId: agent.agentId,
+      integrityIndex: agent.integrityIndex ?? 0,
+      overallLevel: agent.overallLevel ?? 0,
+      trustLabel: String(agent.trustLabel)
+    }))
+    .sort((a, b) => a.integrityIndex - b.integrityIndex || a.overallLevel - b.overallLevel || a.agentId.localeCompare(b.agentId));
+
+  const verdict =
+    health.scoredAgentCount === 0
+      ? "Needs baseline score"
+      : health.overallSloStatus === "BREACHED"
+        ? "Action required"
+        : driftingAgents.length > 0
+          ? "Monitor drift"
+          : "Healthy";
+
+  const nextActions: string[] = [];
+  if (health.scoredAgentCount === 0) {
+    nextActions.push("Score the fleet: amc fleet score --all --stream");
+    nextActions.push("Score the current agent: amc");
+  } else {
+    nextActions.push("Refresh fleet evidence: amc fleet score --all --stream");
+  }
+  if (driftingAgents.length > 0) {
+    nextActions.push(`Investigate drift: ${driftingAgents.join(", ")}`);
+  }
+  if (health.overallSloStatus === "BREACHED") {
+    nextActions.push("Review breached SLOs: amc fleet slo status");
+  }
+  nextActions.push("Open dashboard: amc dashboard open");
+
+  return {
+    verdict,
+    coverage: {
+      agentCount: health.agentCount,
+      scoredAgentCount: health.scoredAgentCount,
+      percent: coveragePercent
+    },
+    averageLevel: rounded(health.averageOverallLevel, 2),
+    averageIntegrity: rounded(health.averageIntegrityIndex, 3),
+    baselineIntegrity: rounded(health.baselineIntegrityIndex, 3),
+    sloStatus: health.overallSloStatus,
+    drift: {
+      count: driftingAgents.length,
+      agents: driftingAgents
+    },
+    weakestAgents: scoredAgents.slice(0, 3),
+    recentAlerts: health.alerts.slice(-3).map((alert) => `${alert.severity} ${alert.kind}: ${alert.message}`),
+    nextActions
+  };
+}
+
+function renderFleetExecutiveOverview(overview: FleetExecutiveOverview): string {
+  const weakest =
+    overview.weakestAgents.length === 0
+      ? "none scored"
+      : overview.weakestAgents
+          .map((agent) => `${agent.agentId} (L${agent.overallLevel.toFixed(2)}, integrity ${agent.integrityIndex.toFixed(3)})`)
+          .join(", ");
+  const drift = overview.drift.count === 0 ? "none" : overview.drift.agents.join(", ");
+  const lines = [
+    "Fleet Executive Overview",
+    `Verdict: ${overview.verdict}`,
+    `Coverage: ${overview.coverage.scoredAgentCount}/${overview.coverage.agentCount} agents scored (${overview.coverage.percent.toFixed(1)}%)`,
+    `Average level: L${overview.averageLevel.toFixed(2)}`,
+    `Average integrity: ${overview.averageIntegrity.toFixed(3)} (baseline ${overview.baselineIntegrity.toFixed(3)})`,
+    `SLO status: ${overview.sloStatus}`,
+    `Drift: ${drift}`,
+    `Weakest agents: ${weakest}`,
+    "Next actions:",
+    ...overview.nextActions.map((action) => `  - ${action}`)
+  ];
+  if (overview.recentAlerts.length > 0) {
+    lines.push("Recent alerts:", ...overview.recentAlerts.map((alert) => `  - ${alert}`));
+  }
+  return lines.join("\n");
+}
+
 const fleetLifecycle = fleet.command("lifecycle").description("Fleet parent/child lifecycle evidence");
 const fleetGraph = fleet.command("graph").description("Typed multi-agent graph operations");
 
@@ -13119,6 +14169,20 @@ fleet
     console.log("");
   });
 
+fleet
+  .command("overview")
+  .description("One-shot executive fleet summary with verdict, coverage, drift, and next actions")
+  .option("--json", "print executive overview JSON", false)
+  .action((opts: { json?: boolean }) => {
+    const health = buildFleetHealthDashboard({ workspace: process.cwd() });
+    const overview = buildFleetExecutiveOverview(health);
+    if (opts.json) {
+      console.log(JSON.stringify(overview, null, 2));
+      return;
+    }
+    console.log(renderFleetExecutiveOverview(overview));
+  });
+
 const fleetPolicy = fleet.command("policy").description("Fleet governance policy operations");
 const fleetSlo = fleet.command("slo").description("Fleet governance SLO operations");
 
@@ -13244,6 +14308,101 @@ fleetSlo
     }
   });
 
+type TrustGraphFormat = "mermaid" | "dot" | "json";
+
+function formatTrustEdgeWeight(weight: number): string {
+  return Number.isInteger(weight) ? weight.toFixed(0) : String(Number.parseFloat(weight.toFixed(3)));
+}
+
+function trustGraphLabel(edge: DelegationEdge): string {
+  return `${edge.purpose}; ${edge.inheritanceMode}; w=${formatTrustEdgeWeight(edge.weight)}`;
+}
+
+function escapeDotLabel(value: string): string {
+  return value.replaceAll("\\", "\\\\").replaceAll("\"", "\\\"");
+}
+
+function mermaidNodeId(agentId: string, used: Set<string>): string {
+  const base = agentId.replace(/[^A-Za-z0-9_]/g, "_").replace(/^([^A-Za-z_])/, "_$1") || "agent";
+  let candidate = base;
+  let suffix = 2;
+  while (used.has(candidate)) {
+    candidate = `${base}_${suffix}`;
+    suffix += 1;
+  }
+  used.add(candidate);
+  return candidate;
+}
+
+function trustGraphPayload(edges: DelegationEdge[]): {
+  edgeCount: number;
+  nodes: string[];
+  edges: Array<Pick<DelegationEdge, "id" | "fromAgentId" | "toAgentId" | "purpose" | "riskTier" | "inheritanceMode" | "weight" | "handoffId">>;
+} {
+  const nodes = [...new Set(edges.flatMap((edge) => [edge.fromAgentId, edge.toAgentId]))].sort((a, b) => a.localeCompare(b));
+  return {
+    edgeCount: edges.length,
+    nodes,
+    edges: edges.map((edge) => ({
+      id: edge.id,
+      fromAgentId: edge.fromAgentId,
+      toAgentId: edge.toAgentId,
+      purpose: edge.purpose,
+      riskTier: edge.riskTier,
+      inheritanceMode: edge.inheritanceMode,
+      weight: edge.weight,
+      handoffId: edge.handoffId
+    }))
+  };
+}
+
+function renderTrustGraphMermaid(edges: DelegationEdge[]): string {
+  const payload = trustGraphPayload(edges);
+  const used = new Set<string>();
+  const nodeIds = new Map<string, string>();
+  for (const node of payload.nodes) {
+    nodeIds.set(node, mermaidNodeId(node, used));
+  }
+  const lines = ["flowchart LR"];
+  if (payload.nodes.length === 0) {
+    lines.push('  empty["No delegation edges configured"]');
+    return lines.join("\n");
+  }
+  for (const node of payload.nodes) {
+    const id = nodeIds.get(node)!;
+    lines.push(`  ${id}["${node.replaceAll("\"", "\\\"")}"]`);
+  }
+  for (const edge of edges) {
+    const from = nodeIds.get(edge.fromAgentId)!;
+    const to = nodeIds.get(edge.toAgentId)!;
+    lines.push(`  ${from} -->|${trustGraphLabel(edge).replaceAll("|", "/")}| ${to}`);
+  }
+  return lines.join("\n");
+}
+
+function renderTrustGraphDot(edges: DelegationEdge[]): string {
+  const payload = trustGraphPayload(edges);
+  const lines = ["digraph amc_trust {", "  rankdir=LR;"];
+  for (const node of payload.nodes) {
+    lines.push(`  "${escapeDotLabel(node)}";`);
+  }
+  for (const edge of edges) {
+    lines.push(`  "${escapeDotLabel(edge.fromAgentId)}" -> "${escapeDotLabel(edge.toAgentId)}" [label="${escapeDotLabel(trustGraphLabel(edge))}"];`);
+  }
+  lines.push("}");
+  return lines.join("\n");
+}
+
+function renderTrustGraph(edges: DelegationEdge[], format: TrustGraphFormat): string {
+  if (format === "json") {
+    return JSON.stringify(trustGraphPayload(edges), null, 2);
+  }
+  if (format === "dot") {
+    return renderTrustGraphDot(edges);
+  }
+  return renderTrustGraphMermaid(edges);
+}
+
 fleet
   .command("trust-init")
   .description("Initialize trust composition config")
@@ -13301,6 +14460,93 @@ fleet
   });
 
 fleet
+  .command("trust-graph")
+  .description("Render delegation trust graph as Mermaid, DOT, or JSON")
+  .option("--format <format>", "mermaid|dot|json", "mermaid")
+  .option("--out <path>", "write graph output to a file")
+  .action((opts: { format: string; out?: string }) => {
+    const format = opts.format.toLowerCase() as TrustGraphFormat;
+    if (!["mermaid", "dot", "json"].includes(format)) {
+      console.error(chalk.red(`Unsupported trust graph format: ${opts.format}. Use mermaid, dot, or json.`));
+      process.exit(1);
+      return;
+    }
+    const edges = listDelegationEdges(process.cwd());
+    const rendered = renderTrustGraph(edges, format);
+    if (opts.out) {
+      const outPath = resolve(process.cwd(), opts.out);
+      writeFileSync(outPath, `${rendered}\n`, "utf8");
+      console.log(chalk.green(`Trust graph written: ${outPath}`));
+      console.log(`Format: ${format}`);
+      console.log(`Edges: ${edges.length}`);
+      return;
+    }
+    if (format === "json") {
+      console.log(rendered);
+      return;
+    }
+    if (format === "mermaid") {
+      console.log(chalk.bold("Trust Delegation Graph"));
+      console.log(`Edges: ${edges.length}`);
+      console.log(rendered);
+      return;
+    }
+    console.log(rendered);
+  });
+
+function isUnsignedTrustReportFallbackError(error: unknown): boolean {
+  const message = error instanceof Error ? error.message : String(error);
+  return /AMC_VAULT_PASSPHRASE|vault.*locked|vault.*passphrase|passphrase.*required|missing public key|monitor_ed25519|context graph not found|run .*amc (setup|init)|workspace.*not initialized/i.test(message);
+}
+
+function unsignedTrustDiagnosticFallback(agentId: string, reason: string): DiagnosticReport {
+  const now = Date.now();
+  const reportBody = {
+    agentId,
+    runId: `trust_unsigned_${agentId}_${now}`,
+    ts: now,
+    windowStartTs: now,
+    windowEndTs: now,
+    status: "UNSIGNED" as const,
+    verificationPassed: false,
+    trustBoundaryViolated: false,
+    trustBoundaryMessage: null,
+    integrityIndex: 0,
+    trustLabel: "UNRELIABLE — DO NOT USE FOR CLAIMS" as const,
+    targetProfileId: null,
+    layerScores: [],
+    questionScores: [],
+    inflationAttempts: [],
+    unsupportedClaimCount: 0,
+    contradictionCount: 0,
+    correlationRatio: 0,
+    invalidReceiptsCount: 0,
+    correlationWarnings: [`Unsigned trust-report fallback: ${reason}`],
+    evidenceCoverage: 0,
+    evidenceTrustCoverage: {
+      observed: 0,
+      attested: 0,
+      selfReported: 0
+    },
+    targetDiff: [],
+    prioritizedUpgradeActions: [
+      "Unlock or initialize the vault and rerun `amc fleet trust-report` without --no-sign for verifier-ready diagnostics."
+    ],
+    evidenceToCollectNext: [
+      "Capture agent execution evidence before using trust composition for claims."
+    ],
+    runSealSig: "unsigned",
+    reportJsonSha256: ""
+  } satisfies Omit<DiagnosticReport, "reportJsonSha256"> & { reportJsonSha256: string };
+
+  const reportJsonSha256 = sha256Hex(Buffer.from(canonicalize({ ...reportBody, reportJsonSha256: "" }), "utf8"));
+  return {
+    ...reportBody,
+    reportJsonSha256
+  };
+}
+
+fleet
   .command("trust-report")
   .description("Generate trust composition report across fleet")
   .option("--window <window>", "evidence window", "30d")
@@ -13317,18 +14563,28 @@ fleet
     const effectiveAgents = agents.length > 0 ? agents : ["default"];
     const reports = [];
     for (const agentId of effectiveAgents) {
-      const report = await runDiagnostic({
-        workspace,
-        window: opts.window,
-        targetName: "default",
-        claimMode: "auto",
-        agentId,
-        noSign,
-      });
+      let report: DiagnosticReport;
+      try {
+        report = await runDiagnostic({
+          workspace,
+          window: opts.window,
+          targetName: "default",
+          claimMode: "auto",
+          agentId,
+          noSign,
+        });
+      } catch (error) {
+        if (!noSign || !isUnsignedTrustReportFallbackError(error)) {
+          throw error;
+        }
+        const reason = error instanceof Error ? error.message : String(error);
+        console.log(chalk.yellow(`⚠️  ${agentId}: diagnostic prerequisites unavailable; using unsigned empty-evidence trust snapshot.`));
+        report = unsignedTrustDiagnosticFallback(agentId, reason);
+      }
       reports.push(report);
     }
 
-    const trustReport = computeTrustComposition(workspace, reports);
+    const trustReport = computeTrustComposition(workspace, reports, { noSign });
     const reportPath = saveTrustCompositionReport(workspace, trustReport);
     const markdown = renderTrustCompositionMarkdown(trustReport);
 
@@ -16377,6 +17633,99 @@ benchmark
     }
   });
 
+benchmark
+  .command("provider-drift")
+  .description("Run provider/model canary drift benchmark with score, refusal, latency, and cost thresholds")
+  .requiredOption("--file <path>", "JSON file with baseline[] and candidate[] canary rows")
+  .option("--agent <agentId>", "agent ID override")
+  .option("--json", "output JSON to stdout", false)
+  .option("--out <path>", "write markdown report to file")
+  .action((opts: { file: string; agent?: string; json: boolean; out?: string }) => {
+    const payload = JSON.parse(readUtf8(resolve(process.cwd(), opts.file))) as {
+      agentId?: string;
+      baseline?: ProviderDriftCanaryRow[];
+      candidate?: ProviderDriftCanaryRow[];
+      thresholds?: Partial<ProviderDriftThresholds>;
+      waivers?: ProviderDriftWaiver[];
+      packId?: string;
+      datasetHash?: string;
+      sourceRefs?: string[];
+      gateMode?: "ci" | "lifecycle";
+    };
+    if (!Array.isArray(payload.baseline) || !Array.isArray(payload.candidate)) {
+      throw new Error("Provider drift input requires baseline[] and candidate[] canary rows.");
+    }
+
+    const report = runProviderDriftBenchmark({
+      agentId: opts.agent ?? payload.agentId ?? activeAgent(program) ?? "default",
+      baseline: payload.baseline,
+      candidate: payload.candidate,
+      thresholds: payload.thresholds,
+      waivers: payload.waivers,
+    });
+    const watchAlerts = buildProviderDriftWatchAlerts(report);
+    const evalPack = buildProviderDriftEvalPack(report, {
+      packId: payload.packId,
+      datasetHash: payload.datasetHash,
+      sourceRefs: payload.sourceRefs,
+    });
+    const ciGate = buildProviderDriftCiGate(report, { mode: payload.gateMode ?? "ci" });
+
+    if (opts.json) {
+      console.log(JSON.stringify({ report, watchAlerts, evalPack, ciGate }, null, 2));
+      return;
+    }
+
+    const md = renderProviderDriftBenchmarkMarkdown(report);
+    if (opts.out) {
+      writeFileAtomic(resolve(process.cwd(), opts.out), md, 0o644);
+      console.log(chalk.green(`Provider drift benchmark written: ${opts.out}`));
+    } else {
+      console.log(md);
+      if (watchAlerts.length > 0) {
+        console.log("");
+        console.log(chalk.red(`Watch alerts: ${watchAlerts.length}`));
+      }
+      console.log(ciGate.passed ? chalk.green(ciGate.summary) : chalk.red(ciGate.summary));
+    }
+  });
+
+benchmark
+  .command("replay-corpus")
+  .description("Run a replayable benchmark corpus with optional multi-turn tool-risk ASR checks")
+  .requiredOption("--file <path>", "JSON file with corpus rows and baseline/candidate scores")
+  .option("--agent <agentId>", "agent ID override")
+  .option("--json", "output JSON to stdout", false)
+  .option("--out <path>", "write markdown report to file")
+  .action((opts: { file: string; agent?: string; json: boolean; out?: string }) => {
+    const payload = JSON.parse(readUtf8(resolve(process.cwd(), opts.file))) as ReplayBenchmarkCorpusInput;
+    if (!Array.isArray(payload.rows)) {
+      throw new Error("Replay corpus input requires rows[].");
+    }
+    const result = runReplayBenchmarkCorpus({
+      ...payload,
+      agentId: opts.agent ?? payload.agentId ?? activeAgent(program) ?? "default",
+    });
+
+    if (opts.json) {
+      console.log(JSON.stringify(result, null, 2));
+      return;
+    }
+
+    const md = renderReplayBenchmarkCorpusMarkdown(result.manifest, result.ciReceipt);
+    if (opts.out) {
+      writeFileAtomic(resolve(process.cwd(), opts.out), md, 0o644);
+      console.log(chalk.green(`Replay benchmark corpus written: ${opts.out}`));
+    } else {
+      console.log(md);
+      if (result.watchAlerts.length > 0) {
+        console.log("");
+        console.log(chalk.red(`Watch alerts: ${result.watchAlerts.length}`));
+      }
+      console.log(result.ciReceipt.passed ? chalk.green(result.ciReceipt.summary) : chalk.red(result.ciReceipt.summary));
+    }
+  });
+
 const mechanic = program.command("mechanic").description("Mechanic Workbench (targets, plans, simulation)");
 
 mechanic
@@ -17030,12 +18379,16 @@ program
   .requiredOption("--workspace <path>", "workspace path")
   .option("--api-port <port>", "studio API port")
   .option("--dashboard-port <port>", "dashboard port")
-  .action(async (opts: { workspace: string; apiPort?: string; dashboardPort?: string }) => {
+  .option("--host-dir <path>", "host-mode data directory")
+  .option("--default-workspace-id <id>", "host-mode default workspace id")
+  .action(async (opts: { workspace: string; apiPort?: string; dashboardPort?: string; hostDir?: string; defaultWorkspaceId?: string }) => {
     const explicitApiPort = opts.apiPort ? Number(opts.apiPort) : undefined;
     const explicitDashboardPort = opts.dashboardPort ? Number(opts.dashboardPort) : undefined;
     const runtimeConfig = loadStudioRuntimeConfig(process.env, {
       workspaceDir: resolve(opts.workspace),
-      studioPort: explicitApiPort
+      studioPort: explicitApiPort,
+      hostDir: opts.hostDir ? resolve(opts.hostDir) : undefined,
+      defaultWorkspaceId: opts.defaultWorkspaceId
     });
     const hostMode = Boolean(runtimeConfig.hostDir);
     const lan = loadLanMode(runtimeConfig.workspaceDir);
@@ -18280,6 +19633,42 @@ program.action(async (_opts, command: Command) => {
 // ============================================================
 const shield = program.command("shield").description("Threat detection and security scanning");
 
+type ShieldInstructionSourceOption = "system" | "developer" | "user" | "tool";
+
+function parseShieldInstructionSource(value: string): ShieldInstructionSourceOption {
+  if (value === "system" || value === "developer" || value === "user" || value === "tool") {
+    return value;
+  }
+  throw new Error("--instruction-source must be one of: system, developer, user, tool");
+}
+
+function parseRuntimeParametersOption(value: string | undefined): Record<string, unknown> {
+  if (!value || value.trim().length === 0) return {};
+  const parsed = JSON.parse(value) as unknown;
+  if (parsed === null || typeof parsed !== "object" || Array.isArray(parsed)) {
+    throw new Error("--parameters must be a JSON object");
+  }
+  return parsed as Record<string, unknown>;
+}
+
+function parseBoundedNumberOption(value: string | undefined, label: string, min: number, max: number): number | undefined {
+  if (value === undefined || value.trim().length === 0) return undefined;
+  const parsed = Number.parseFloat(value);
+  if (!Number.isFinite(parsed) || parsed < min || parsed > max) {
+    throw new Error(`${label} must be a number between ${min} and ${max}`);
+  }
+  return parsed;
+}
+
+function parseCsvOption(value: string | undefined): string[] | undefined {
+  if (!value) return undefined;
+  const values = value
+    .split(",")
+    .map(item => item.trim())
+    .filter(item => item.length > 0);
+  return values.length > 0 ? values : undefined;
+}
+
 shield
   .command("analyze <path>")
   .description("Run static code analyzer on a skill file")
@@ -18299,6 +19688,93 @@ shield
           console.log(chalk.yellow(`  • [${finding.severity}] ${finding.description}`));
         }
       }
+    } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
+  });
+
+shield
+  .command("analyze-runtime")
+  .description("Analyze a proposed runtime agent action through the Shield trust pipeline")
+  .requiredOption("--agent <id>", "Agent ID")
+  .requiredOption("--action <action>", "Action to evaluate")
+  .requiredOption("--tool <tool>", "Tool name")
+  .option("--parameters <json>", "Runtime tool parameters as a JSON object")
+  .option("--sensitive-fields <csv>", "Comma-separated sensitive parameter fields")
+  .option("--instruction-source <source>", "Instruction source: system, developer, user, or tool", "user")
+  .option("--session <id>", "Session ID", "cli-session")
+  .option("--workspace-id <id>", "Workspace ID")
+  .option("--credential-age-minutes <n>", "Minutes since credentials/trust context were verified")
+  .option("--confidence <n>", "Cumulative confidence from 0 to 1", "1")
+  .option("--step <n>", "Workflow step number", "1")
+  .option("--previous-actions <csv>", "Comma-separated previous action names")
+  .option("--fail-on-block", "Exit non-zero when Shield blocks the action")
+  .option("--json", "Output as JSON")
+  .action(async (opts: {
+    agent: string;
+    action: string;
+    tool: string;
+    parameters?: string;
+    sensitiveFields?: string;
+    instructionSource: string;
+    session: string;
+    workspaceId?: string;
+    credentialAgeMinutes?: string;
+    confidence?: string;
+    step?: string;
+    previousActions?: string;
+    failOnBlock?: boolean;
+    json?: boolean;
+  }) => {
+    try {
+      const { analyzeRuntimeAction } = await import("./shield/runtimeAnalyzer.js");
+      const credentialAgeMinutes = parseBoundedNumberOption(opts.credentialAgeMinutes, "--credential-age-minutes", 0, 5256000);
+      const confidence = parseBoundedNumberOption(opts.confidence, "--confidence", 0, 1) ?? 1;
+      const stepNumber = Math.floor(parseBoundedNumberOption(opts.step, "--step", 1, 100000) ?? 1);
+      const result = await analyzeRuntimeAction({
+        agentId: opts.agent,
+        action: opts.action,
+        toolName: opts.tool,
+        parameters: parseRuntimeParametersOption(opts.parameters),
+        sessionId: opts.session,
+        workspaceId: opts.workspaceId ?? process.cwd(),
+        instructionSource: parseShieldInstructionSource(opts.instructionSource),
+        sensitiveDataFields: parseCsvOption(opts.sensitiveFields),
+        lastVerifiedAt: credentialAgeMinutes === undefined ? undefined : Date.now() - credentialAgeMinutes * 60 * 1000,
+        cumulativeConfidence: confidence,
+        stepNumber,
+        previousActions: parseCsvOption(opts.previousActions),
+      });
+
+      if (opts.json) {
+        console.log(JSON.stringify(result, null, 2));
+        if (opts.failOnBlock && result.blocked) process.exitCode = 1;
+        return;
+      }
+
+      console.log(chalk.bold.cyan("\nShield Runtime Analysis"));
+      console.log(chalk.gray("Agent:"), opts.agent);
+      console.log(chalk.gray("Action:"), opts.action);
+      console.log(chalk.gray("Tool:"), opts.tool);
+      console.log(chalk.gray("Decision:"), result.allowed ? chalk.green("allowed") : chalk.red("blocked"));
+      console.log(chalk.gray("Risk:"), result.riskLevel === "low" ? chalk.green(result.riskLevel) : chalk.yellow(result.riskLevel));
+      console.log(chalk.gray("Overall score:"), result.score0to100.toFixed(1));
+      console.log(chalk.gray("Shield trust:"), `${result.shieldTrustScore0to100}/100`);
+      console.log(chalk.gray("Reason:"), result.reason);
+      console.log(chalk.gray("Runtime checks:"));
+      const checks = result.stages.shieldGate.checks;
+      console.log(chalk.gray("  Instruction hierarchy:"), checks.instructionHierarchyValid ? chalk.green("valid") : chalk.red("invalid"));
+      console.log(chalk.gray("  Data leakage risk:"), checks.dataLeakageRisk);
+      console.log(chalk.gray("  Credential freshness:"), checks.credentialFreshness);
+      console.log(chalk.gray("  Uncertainty:"), checks.uncertaintyAcceptable ? chalk.green("acceptable") : chalk.red("requires review"));
+      console.log(chalk.gray("Evidence chain:"), `${result.evidence.chainLength} hashes`);
+      console.log(chalk.gray("  First:"), result.evidence.firstHash);
+      console.log(chalk.gray("  Last:"), result.evidence.lastHash);
+      if (result.recommendations.length > 0) {
+        console.log(chalk.gray("Recommendations:"));
+        for (const recommendation of result.recommendations) {
+          console.log(chalk.yellow(`  - ${recommendation}`));
+        }
+      }
+      if (opts.failOnBlock && result.blocked) process.exitCode = 1;
     } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
   });
 
@@ -19641,17 +21117,33 @@ watch
 watch
   .command("safety-test <agentId>")
   .description("Run safety tests for an agent")
+  .option("--category <category>", "filter by category (alignment|injection|sensitive_data|excessive_agency|overreliance)")
+  .option("--verbose", "show scenario methodology, objectives, and findings", false)
   .option("--json", "Output as JSON")
-  .action(async (agentId: string, opts: { json?: boolean }) => {
+  .action(async (agentId: string, opts: { category?: string; verbose?: boolean; json?: boolean }) => {
     try {
       const { runSafetyTests } = await import("./watch/index.js");
-      const result = runSafetyTests(agentId);
+      const result = runSafetyTests(agentId, { category: opts.category });
       if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
       console.log(chalk.bold.hex('#4AEF79')("\n👁️  Safety Tests"));
       console.log(chalk.gray("Agent:"), agentId);
+      console.log(chalk.gray("Category:"), result.category);
       console.log(chalk.gray("Passed:"), result.passed > 0 ? chalk.green("yes") : chalk.red("no"));
       console.log(chalk.gray("Tests Run:"), result.testsRun);
       console.log(chalk.gray("Findings:"), result.findings.length);
+      if (opts.verbose) {
+        console.log(chalk.gray("Methodology:"), result.methodology);
+        console.log(chalk.gray("Available Categories:"), result.availableCategories.join(", "));
+        for (const scenario of result.scenarioResults) {
+          const marker = scenario.passed ? chalk.green("pass") : chalk.red("fail");
+          console.log(`  ${marker} ${scenario.id} [${scenario.category}]`);
+          console.log(chalk.gray("    Objective:"), scenario.objective);
+          console.log(chalk.gray("    Expected:"), scenario.expectedBehavior);
+          if (scenario.finding) {
+            console.log(chalk.red(`    Finding: ${scenario.finding}`));
+          }
+        }
+      }
     } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
   });
 
@@ -20008,19 +21500,106 @@ vault
     } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
   });
 
+const dsar = vault.command("dsar").description("Persistent DSAR (Data Subject Access Request) workflow");
+
+dsar
+  .command("submit")
+  .description("Submit a persistent DSAR request")
+  .requiredOption("--subject <id>", "data subject identifier")
+  .option("--type <type>", "access|delete|portability", "access")
+  .option("--json", "Output as JSON")
+  .action(async (opts: { subject: string; type: "access" | "delete" | "deletion" | "portability"; json?: boolean }) => {
+    try {
+      const { submitDsarForCli } = await import("./vault/dsarCli.js");
+      const result = submitDsarForCli({ workspace: process.cwd(), subject: opts.subject, type: opts.type });
+      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
+      console.log(chalk.bold.green("\nDSAR request submitted"));
+      console.log(chalk.gray("  Request ID:"), result.request.requestId);
+      console.log(chalk.gray("  Type:"), result.request.type);
+      console.log(chalk.gray("  Status:"), result.request.status);
+      console.log(chalk.gray("  Store:"), result.storePath);
+      console.log(chalk.gray("  Audit:"), result.auditPath);
+    } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
+  });
+
+dsar
+  .command("status <requestId>")
+  .description("Show a persistent DSAR request")
+  .option("--json", "Output as JSON")
+  .action(async (requestId: string, opts: { json?: boolean }) => {
+    try {
+      const { getDsarStatusForCli } = await import("./vault/dsarCli.js");
+      const result = getDsarStatusForCli({ workspace: process.cwd(), requestId });
+      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
+      console.log(chalk.bold.green("\nDSAR request status"));
+      console.log(chalk.gray("  Request ID:"), result.request.requestId);
+      console.log(chalk.gray("  Subject:"), result.request.subject);
+      console.log(chalk.gray("  Type:"), result.request.type);
+      console.log(chalk.gray("  Status:"), result.request.status);
+      console.log(chalk.gray("  Created:"), new Date(result.request.createdTs).toISOString());
+      console.log(chalk.gray("  Updated:"), new Date(result.request.updatedTs).toISOString());
+    } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
+  });
+
+dsar
+  .command("list")
+  .description("List persistent DSAR requests")
+  .option("--json", "Output as JSON")
+  .action(async (opts: { json?: boolean }) => {
+    try {
+      const { listDsarForCli } = await import("./vault/dsarCli.js");
+      const result = listDsarForCli({ workspace: process.cwd() });
+      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
+      console.log(chalk.bold.green("\nDSAR requests"));
+      if (result.requests.length === 0) {
+        console.log(chalk.gray("  No DSAR requests found."));
+        console.log(chalk.gray("  Store:"), result.storePath);
+        return;
+      }
+      for (const request of result.requests) {
+        console.log(`  ${request.requestId} ${request.type.padEnd(11)} ${request.status.padEnd(10)} ${request.subject}`);
+      }
+      console.log(chalk.gray("  Store:"), result.storePath);
+      console.log(chalk.gray("  Audit:"), result.auditPath);
+    } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
+  });
+
+dsar
+  .command("complete <requestId>")
+  .description("Mark a DSAR request complete and append an audit event")
+  .option("--json", "Output as JSON")
+  .action(async (requestId: string, opts: { json?: boolean }) => {
+    try {
+      const { completeDsarForCli } = await import("./vault/dsarCli.js");
+      const result = completeDsarForCli({ workspace: process.cwd(), requestId });
+      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
+      console.log(chalk.green(`DSAR request completed: ${result.request.requestId}`));
+      console.log(chalk.gray("  Audit:"), result.auditPath);
+    } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
+  });
+
 vault
   .command("dsar-status")
   .description("Show DSAR (Data Subject Access Request) status")
   .option("--json", "Output as JSON")
   .action(async (opts: { json?: boolean }) => {
     try {
-      const { DsarAutopilot } = await import("./vault/dsarAutopilot.js");
-      const dsar = new DsarAutopilot();
-      const result = { requests: [], status: "no pending requests" };
-      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
+      const { listDsarForCli, summarizeDsarRequests } = await import("./vault/dsarCli.js");
+      const result = listDsarForCli({ workspace: process.cwd() });
+      const summary = summarizeDsarRequests(result.requests);
+      if (opts.json) {
+        console.log(JSON.stringify({
+          ...summary,
+          requests: result.requests,
+          storePath: result.storePath,
+          auditPath: result.auditPath
+        }, null, 2));
+        return;
+      }
       console.log(chalk.bold.green("\n🔒  DSAR Status"));
-      console.log(chalk.gray("Pending Requests:"), 0);
-      console.log(chalk.gray("Status:"), "No pending requests");
+      console.log(chalk.gray("Pending Requests:"), summary.pending);
+      console.log(chalk.gray("Complete Requests:"), summary.complete);
+      console.log(chalk.gray("Store:"), result.storePath);
     } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
   });
 
@@ -20367,8 +21946,8 @@ const productGlossary = program.command("glossary").description("Domain terminol
 const domainCmd = program.command("domain").alias("sector").description("Domain-specific architecture and compliance operations");
 registerDomainApplyCommand(domainCmd);
 
-// ── Blocker #13: sector-pack CLI commands for 40 industry packs ──────────────
-const sectorPack = domainCmd.command("pack").description("Industry sector packs — 40 packs across 7 domains");
+// ── Blocker #13: sector-pack CLI commands for industry packs ──────────────
+const sectorPack = domainCmd.command("pack").description("Industry sector packs — 41 packs across 7 domains");
 
 sectorPack
   .command("access")
@@ -20417,7 +21996,7 @@ sectorPack
       return;
     }
     console.log(chalk.bold.hex('#4AEF79')("\n🏭  Industry Packs Checkout"));
-    console.log(chalk.gray("Price:"), `$${entitlement.priceUsdMonthly}/month for all 40 packs`);
+    console.log(chalk.gray("Price:"), `$${entitlement.priceUsdMonthly}/month for all 41 packs`);
     console.log(checkoutUrl);
     console.log(chalk.gray("\nAfter payment, activate the license: amc domain pack activate --key <license-key>"));
   });
@@ -20441,7 +22020,7 @@ sectorPack
         return;
       }
       console.log(chalk.green("Industry Packs activated."));
-      console.log(chalk.gray(`Access: all 40 Industry Domain Packs at $${entitlement.priceUsdMonthly}/month`));
+      console.log(chalk.gray(`Access: all 41 Industry Domain Packs at $${entitlement.priceUsdMonthly}/month`));
     } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
   });
 
@@ -20507,7 +22086,7 @@ sectorPack
     }
     console.log(chalk.gray(`\n  Total: ${packs.length} packs, ${packs.reduce((s, p) => s + p.questionCount, 0)} questions`));
     if (!entitlement.active) {
-      console.log(chalk.yellow(`\n  Locked: $${entitlement.priceUsdMonthly}/month unlocks all 40 Industry Domain Packs.`));
+      console.log(chalk.yellow(`\n  Locked: $${entitlement.priceUsdMonthly}/month unlocks all 41 Industry Domain Packs.`));
       console.log(chalk.gray(`  Subscribe: ${entitlement.checkoutUrl}`));
       console.log(chalk.gray(`  Activate:  amc domain pack activate --key <license-key>`));
     } else {
@@ -20593,8 +22172,10 @@ sectorPack
       }
       process.exit(1); return;
     }
-    console.log(chalk.bold.hex('#4AEF79')(`\n🏭  Running: ${pack.name}`));
-    console.log(chalk.gray(`  Questions: ${pack.questions.length}\n`));
+    if (!opts.json) {
+      console.log(chalk.bold.hex('#4AEF79')(`\n🏭  Running: ${pack.name}`));
+      console.log(chalk.gray(`  Questions: ${pack.questions.length}\n`));
+    }
 
     let responses: Record<string, number> = {};
 
@@ -20746,6 +22327,9 @@ domainCmd
         if (desc) console.log(`    ${chalk.gray(desc)}`);
         console.log(`    Risk: ${domain.riskLevel} | EU AI Act: ${domain.euAIActCategory} | Questions: ${domain.questionCount}`);
         console.log(`    Regulatory: ${domain.regulatoryBasis.join(", ")}`);
+        console.log(`    Aliases: ${domain.aliases.join(", ")}`);
+        console.log(`    Sector tags: ${domain.sectorTags.join(", ")}`);
+        console.log(`    Suggested packs: ${domain.recommendedIndustryPacks.join(", ")}`);
       }
     } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
   });
@@ -20754,7 +22338,7 @@ domainCmd
   .command("assess")
   .description("Run full domain assessment")
   .requiredOption("--agent <id>", "Agent ID")
-  .requiredOption("--domain <d>", "Domain: health|education|environment|mobility|governance|technology|wealth")
+  .requiredOption("--domain <d>", "Domain or alias, e.g. health|environment|mobility|supply-chain|logistics")
   .option("--json", "Output as JSON")
   .action(async (opts: { agent: string; domain: string; json?: boolean }) => {
     try {
@@ -20781,7 +22365,7 @@ domainCmd
 domainCmd
   .command("modules")
   .description("Show module activation map for domain")
-  .requiredOption("--domain <d>", "Domain: health|education|environment|mobility|governance|technology|wealth")
+  .requiredOption("--domain <d>", "Domain or alias, e.g. health|environment|mobility|supply-chain|logistics")
   .option("--json", "Output as JSON")
   .action(async (opts: { domain: string; json?: boolean }) => {
     try {
@@ -20801,7 +22385,7 @@ domainCmd
   .command("gaps")
   .description("Show compliance gaps for an agent and domain")
   .requiredOption("--agent <id>", "Agent ID")
-  .requiredOption("--domain <d>", "Domain: health|education|environment|mobility|governance|technology|wealth")
+  .requiredOption("--domain <d>", "Domain or alias, e.g. health|environment|mobility|supply-chain|logistics")
   .option("--json", "Output as JSON")
   .action(async (opts: { agent: string; domain: string; json?: boolean }) => {
     try {
@@ -20827,7 +22411,7 @@ domainCmd
   .command("report")
   .description("Build full domain report and write it to a file")
   .requiredOption("--agent <id>", "Agent ID")
-  .requiredOption("--domain <d>", "Domain: health|education|environment|mobility|governance|technology|wealth")
+  .requiredOption("--domain <d>", "Domain or alias, e.g. health|environment|mobility|supply-chain|logistics")
   .requiredOption("--output <file>", "Output report path")
   .option("--json", "Output as JSON")
   .action(async (opts: { agent: string; domain: string; output: string; json?: boolean }) => {
@@ -20858,7 +22442,7 @@ domainCmd
   .command("assurance")
   .description("Run domain-specific assurance packs")
   .requiredOption("--agent <id>", "Agent ID")
-  .requiredOption("--domain <d>", "Domain: health|education|environment|mobility|governance|technology|wealth")
+  .requiredOption("--domain <d>", "Domain or alias, e.g. health|environment|mobility|supply-chain|logistics")
   .option("--json", "Output as JSON")
   .action(async (opts: { agent: string; domain: string; json?: boolean }) => {
     try {
@@ -20883,7 +22467,7 @@ domainCmd
   .command("roadmap")
   .description("Generate 30/60/90-day roadmap for this domain")
   .requiredOption("--agent <id>", "Agent ID")
-  .requiredOption("--domain <d>", "Domain: health|education|environment|mobility|governance|technology|wealth")
+  .requiredOption("--domain <d>", "Domain or alias, e.g. health|environment|mobility|supply-chain|logistics")
   .option("--json", "Output as JSON")
   .action(async (opts: { agent: string; domain: string; json?: boolean }) => {
     try {
@@ -20935,7 +22519,8 @@ const score = program.command("score").description("Maturity scoring, adversaria
     if (result.totalScore === 0) {
       console.log(chalk.yellow("\n💡 No evidence collected yet. Capture agent behavior first:"));
       console.log(chalk.gray("  amc wrap <runtime> -- <command>    # Capture evidence"));
-      console.log(chalk.gray("  amc evidence ingest --source <logfile>  # Import existing logs"));
+      console.log(chalk.gray("  amc evidence collect               # Guided capture/import wizard"));
+      console.log(chalk.gray("  amc ingest <fileOrDir> --type generic_json --agent <agentId>  # Import existing logs"));
     }
     if (result.gaps.length > 0) {
       console.log(chalk.yellow("Top gaps:"));
@@ -21029,19 +22614,34 @@ score
   .command("operational-independence <agentId>")
   .description("Calculate operational independence score")
   .option("--window <days>", "window in days", "30")
+  .option("--domain <domain>", "Contextualize the score for an operational domain, e.g. logistics")
   .option("--json", "Output as JSON")
-  .action(async (agentId: string, opts: { window: string; json?: boolean }) => {
+  .action(async (agentId: string, opts: { window: string; domain?: string; json?: boolean }) => {
     try {
       const { scoreOperationalIndependence } = await import("./score/operationalIndependence.js");
-      const result = scoreOperationalIndependence(agentId, Number(opts.window));
+      const result = scoreOperationalIndependence(agentId, Number(opts.window), { domain: opts.domain });
       if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
       console.log(chalk.bold.hex('#4AEF79')("\n🕒  Operational Independence"));
       console.log(chalk.gray("Agent:"), agentId);
+      console.log(chalk.gray("Context:"), result.context);
       console.log(chalk.gray("Score:"), result.score);
       console.log(chalk.gray("Longest run days:"), result.longestRunDays);
       console.log(chalk.gray("Escalation rate:"), `${result.escalationRate}%`);
       console.log(chalk.gray("Drift events:"), result.driftEvents);
       console.log(chalk.gray("Quality held:"), result.qualityHeld ? "yes" : "no");
+      if (result.logisticsReliability) {
+        const lr = result.logisticsReliability;
+        console.log(chalk.bold("\n  Logistics reliability"));
+        console.log(chalk.gray("  Score:"), `${lr.score} (${lr.status})`);
+        console.log(chalk.gray("  Logistics events:"), lr.logisticsEventCount);
+        console.log(chalk.gray("  Carriers:"), lr.carriers.join(", ") || "none");
+        console.log(chalk.gray("  Carrier on-time:"), `${Math.round(lr.carrierReliability.onTimeRate * 100)}%`);
+        console.log(chalk.gray("  SLA breach rate:"), `${Math.round(lr.slaPerformance.breachRate * 100)}%`);
+        console.log(chalk.gray("  Trace coverage:"), `${Math.round(lr.traceabilityCoverage.coverage * 100)}%`);
+        if (lr.gaps.length > 0) {
+          console.log(chalk.yellow("  Gaps:"), lr.gaps.slice(0, 4).join("; "));
+        }
+      }
     } catch (e: unknown) {
       console.error(chalk.red(toErrorMessage(e)));
       process.exit(1);
@@ -21545,12 +23145,28 @@ score
   .action(async (opts: { json?: boolean }) => {
     try {
       const { computeAlignmentIndex } = await import("./score/alignmentIndex.js");
-      const result = computeAlignmentIndex({ truthfulnessScore: 0, instructionComplianceScore: 0, safetyScore: 0, behavioralConsistencyScore: 0 });
+      const result = computeAlignmentIndex({
+        truthfulnessScore: 0,
+        instructionComplianceScore: 0,
+        safetyScore: 0,
+        behavioralConsistencyScore: 0,
+        goalIntegrity: 0,
+        feedbackSourceValidation: 0,
+        goalMisgeneralizationResistance: 0,
+        rewardHackingResistance: 0,
+        deceptiveAlignmentResistance: 0,
+      });
       if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
       console.log(chalk.bold.hex('#4AEF79')("\n🧭  Alignment Index"));
       console.log(chalk.gray("Overall:"), result.overall.toFixed(2), chalk.gray(`(${result.grade})`));
+      console.log(chalk.gray("Dimensions:"));
       for (const d of result.dimensions) {
         console.log(chalk.gray(`  ${d.name}:`), d.score.toFixed(2));
+      }
+      console.log(chalk.gray("Subcategories:"));
+      for (const subcategory of result.subcategories) {
+        const score = subcategory.score === null ? "n/a" : subcategory.score.toFixed(2);
+        console.log(chalk.gray(`  ${subcategory.name}:`), score);
       }
       if (result.overall === 0) { console.log(chalk.yellow("\n💡 All scores are zero. Provide real scores from your agent's eval suite (truthfulness, safety, compliance, consistency).")); }
     } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
@@ -21974,8 +23590,12 @@ score
   .option("--industry <id>", "Industry ID (e.g. healthcare, finance, defense)")
   .option("--score <n>", "Raw score as percentage 0-100 (e.g. 75) or decimal 0-1 (e.g. 0.75); auto-read from agent if omitted")
   .option("--agent <id>", "Agent ID (used to auto-read current score)")
+  .option("--drilldown", "Show per-dimension weighting details")
+  .option("--history", "Compare industry-adjusted scores across recent scored runs")
+  .option("--lookback-days <n>", "history lookback window in days", "90")
+  .option("--out <path>", "write an exportable Markdown or JSON history report")
   .option("--json", "Output as JSON")
-  .action(async (opts: { industry?: string; score?: string; agent?: string; json?: boolean }) => {
+  .action(async (opts: { industry?: string; score?: string; agent?: string; drilldown?: boolean; history?: boolean; lookbackDays?: string; out?: string; json?: boolean }) => {
     try {
       // F17: validate all required options at once before running
       const missing: string[] = [];
@@ -21987,17 +23607,137 @@ score
         process.exit(1); return;
       }
       const { computeIndustryAdjustedScore, INDUSTRY_TRUST_MODELS } = await import("./score/industryTrustModels.js");
+      const industryId = opts.industry!;
+      const model = INDUSTRY_TRUST_MODELS[industryId];
+      if (!model) {
+        console.error(chalk.red(`Unknown industry: ${industryId}`));
+        console.log(chalk.gray("Available:"), Object.keys(INDUSTRY_TRUST_MODELS).join(", "));
+        process.exit(1); return;
+      }
+      const dims = Object.keys(model.dimensionWeights);
+
+      if (opts.history) {
+        const agentId = opts.agent ?? activeAgent(program) ?? "default";
+        const resolvedAgentId = resolveAgentId(process.cwd(), agentId);
+        const lookbackDays = Math.max(1, Number.parseInt(opts.lookbackDays ?? "90", 10) || 90);
+        const nowTs = Date.now();
+        const runs = loadTemporalDecayRuns(process.cwd(), resolvedAgentId, lookbackDays, nowTs);
+        if (runs.length === 0) {
+          console.error(chalk.red("No scored runs available for industry history report."));
+          console.log(chalk.gray("Run `amc quickscore` first, or rerun without --history and pass --score <0-100>."));
+          process.exit(1); return;
+        }
+
+        const runComparisons = runs.map((run, index) => {
+          const rawScore0to1 = Math.max(0, Math.min(1, run.integrityIndex ?? 0));
+          const rawDimensionScores = Object.fromEntries(dims.map((dim) => [dim, rawScore0to1]));
+          const evidenceMix = {
+            observed: run.evidenceTrustCoverage?.observed ?? 0,
+            attested: run.evidenceTrustCoverage?.attested ?? 0,
+            selfReported: run.evidenceTrustCoverage?.selfReported ?? 0
+          };
+          const observedShare = evidenceMix.observed || 0.8;
+          const adjusted = computeIndustryAdjustedScore(rawDimensionScores, industryId, run.ts, observedShare, nowTs);
+          let deltaFromPrevious: number | null = null;
+          if (index > 0) {
+            const previous = runs[index - 1]!;
+            const previousRaw = Math.max(0, Math.min(1, previous.integrityIndex ?? 0));
+            const previousScores = Object.fromEntries(dims.map((dim) => [dim, previousRaw]));
+            const previousObserved = previous.evidenceTrustCoverage?.observed ?? 0.8;
+            const previousAdjusted = computeIndustryAdjustedScore(previousScores, industryId, previous.ts, previousObserved, nowTs);
+            deltaFromPrevious = Number((adjusted.adjustedScore - previousAdjusted.adjustedScore).toFixed(1));
+          }
+          return {
+            runId: run.runId,
+            ts: run.ts,
+            scoredAt: new Date(run.ts).toISOString(),
+            rawScore: adjusted.rawScore,
+            adjustedScore: adjusted.adjustedScore,
+            deltaFromPrevious,
+            maturityLevel: adjusted.maturityLevel,
+            percentileRank: adjusted.percentileRank,
+            decayApplied: adjusted.decayApplied,
+            evidenceMix
+          };
+        });
+
+        const report = {
+          schemaVersion: 1,
+          generatedAt: new Date(nowTs).toISOString(),
+          agentId: resolvedAgentId,
+          industryId,
+          industryName: model.name,
+          lookbackDays,
+          runComparisons
+        };
+
+        const renderHistoryMarkdown = (): string => {
+          const rows = runComparisons.map((row) => {
+            const delta = row.deltaFromPrevious === null
+              ? "baseline"
+              : `${row.deltaFromPrevious >= 0 ? "+" : ""}${row.deltaFromPrevious.toFixed(1)}`;
+            const evidenceMix = `obs ${(row.evidenceMix.observed * 100).toFixed(0)}% / att ${(row.evidenceMix.attested * 100).toFixed(0)}% / self ${(row.evidenceMix.selfReported * 100).toFixed(0)}%`;
+            return `| ${row.runId} | ${row.scoredAt} | ${row.rawScore.toFixed(1)} | ${row.adjustedScore.toFixed(1)} | ${delta} | ${row.maturityLevel} | p${row.percentileRank.toFixed(0)} | ${row.decayApplied.toFixed(1)} | ${evidenceMix} |`;
+          });
+          return [
+            "# Industry-Adjusted Comparison Report",
+            "",
+            `Industry: ${model.name} (${industryId})`,
+            `Agent: ${resolvedAgentId}`,
+            `Generated: ${report.generatedAt}`,
+            `Lookback: ${lookbackDays} days`,
+            `Runs compared: ${runComparisons.length}`,
+            "",
+            "| Run | Scored at | Raw | Adjusted | Delta from previous | Level | Percentile | Decay | Evidence mix |",
+            "|---|---:|---:|---:|---:|---|---:|---:|---|",
+            ...rows,
+            "",
+            "Delta from previous is calculated from industry-adjusted scores, not raw scores.",
+            "Evidence mix shows observed, attested, and self-reported evidence shares when present in the run artifact.",
+            ""
+          ].join("\n");
+        };
+
+        if (opts.out) {
+          const outPath = resolve(process.cwd(), opts.out);
+          const body = outPath.endsWith(".json") ? JSON.stringify(report, null, 2) : renderHistoryMarkdown();
+          writeFileSync(outPath, body, "utf8");
+          if (!opts.json) {
+            console.log(chalk.bold.hex('#4AEF79')("Industry-adjust comparison report"));
+            console.log(chalk.gray("Industry:"), `${model.name} (${industryId})`);
+            console.log(chalk.gray("Agent:"), resolvedAgentId);
+            console.log(chalk.gray("Runs compared:"), runComparisons.length);
+            console.log(chalk.green(`Report written: ${outPath}`));
+          }
+        }
+
+        if (opts.json) {
+          console.log(JSON.stringify(report, null, 2));
+          return;
+        }
+        if (!opts.out) {
+          console.log(renderHistoryMarkdown());
+        }
+        return;
+      }
+
       // F18: auto-read agent score if --score not provided
       let rawScore: number;
       if (!opts.score) {
         try {
           const agentId = opts.agent ?? activeAgent(program) ?? "default";
-          const report = await runDiagnostic({ workspace: process.cwd(), window: "30d", agentId });
-          const avgLevel = report.layerScores.length > 0
-            ? report.layerScores.reduce((s: number, l: { avgFinalLevel: number }) => s + l.avgFinalLevel, 0) / report.layerScores.length
-            : 0;
-          rawScore = Math.min(1, avgLevel / 5);
-          console.log(chalk.gray(`Using current agent score: ${(rawScore * 100).toFixed(1)}% (auto-read from ${agentId})`));
+          const current = readCurrentAgentScore(process.cwd(), agentId);
+          if (current) {
+            rawScore = current.score0to1;
+            console.log(chalk.gray(`Using current agent score: ${(rawScore * 100).toFixed(1)}% (${current.source})`));
+          } else {
+            const report = await runDiagnostic({ workspace: process.cwd(), window: "30d", agentId });
+            const avgLevel = report.layerScores.length > 0
+              ? report.layerScores.reduce((s: number, l: { avgFinalLevel: number }) => s + l.avgFinalLevel, 0) / report.layerScores.length
+              : 0;
+            rawScore = Math.min(1, avgLevel / 5);
+            console.log(chalk.gray(`Using current agent score: ${(rawScore * 100).toFixed(1)}% (fresh diagnostic for ${agentId})`));
+          }
         } catch {
           console.error(chalk.red("No --score provided and no agent score available."));
           console.log(chalk.gray("Run `amc quickscore` first, or provide --score <0-100> (e.g. --score 75)"));
@@ -22008,18 +23748,24 @@ score
         // Accept both 0-100 (e.g. 75) and 0-1 (e.g. 0.75) — normalize to 0-1
         if (rawScore > 1) rawScore = rawScore / 100;
       }
-      const industryId = opts.industry!;
-      const model = INDUSTRY_TRUST_MODELS[industryId];
-      if (!model) {
-        console.error(chalk.red(`Unknown industry: ${industryId}`));
-        console.log(chalk.gray("Available:"), Object.keys(INDUSTRY_TRUST_MODELS).join(", "));
-        process.exit(1); return;
-      }
-      const dims = Object.keys(model.dimensionWeights);
       const rawDimensionScores: Record<string, number> = {};
       for (const dim of dims) rawDimensionScores[dim] = rawScore;
       const result = computeIndustryAdjustedScore(rawDimensionScores, industryId, Date.now(), 0.8);
-      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
+      const requiredDimensions = new Set(model.evidenceRequirements.requiredDimensions);
+      const dimensionDrilldown = Object.entries(result.dimensionAdjustments)
+        .sort(([, a], [, b]) => b.weight - a.weight)
+        .map(([dimension, adjustment]) => ({
+          dimension,
+          raw: adjustment.raw,
+          weight: adjustment.weight,
+          weighted: adjustment.weighted,
+          level: adjustment.level,
+          evidenceExpectation: requiredDimensions.has(dimension) ? "required" : "supporting",
+        }));
+      if (opts.json) {
+        console.log(JSON.stringify(opts.drilldown ? { ...result, dimensionDrilldown } : result, null, 2));
+        return;
+      }
       console.log(chalk.bold.hex('#4AEF79')(`\n📊  Industry-Adjusted Score`));
       if (opts.agent) console.log(chalk.gray("Agent:"), opts.agent);
       console.log(chalk.gray("Industry:"), `${model.name} (${industryId})`);
@@ -22028,6 +23774,34 @@ score
       console.log(chalk.gray("Maturity level:"), result.maturityLevel);
       console.log(chalk.gray("Percentile rank:"), `p${result.percentileRank.toFixed(0)}`);
       console.log(chalk.gray("Decay applied:"), result.decayApplied);
+      const scoreDelta = result.adjustedScore - result.rawScore;
+      const topWeights = Object.entries(model.dimensionWeights)
+        .sort(([, a], [, b]) => b - a)
+        .slice(0, 3)
+        .map(([dimension, weight]) => `${dimension} x${weight}`)
+        .join(", ");
+      console.log(chalk.gray("Why adjusted score differs from raw:"));
+      if (Math.abs(scoreDelta) < 0.05) {
+        console.log(chalk.gray(`  - No score delta: the same raw score was applied to every ${industryId} dimension, so weighting preserves the average.`));
+      } else {
+        const direction = scoreDelta > 0 ? "up" : "down";
+        console.log(chalk.gray(`  - Industry weighting moved the score ${direction} by ${Math.abs(scoreDelta).toFixed(1)} points.`));
+      }
+      console.log(chalk.gray(`  - Highest weights: ${topWeights}.`));
+      console.log(chalk.gray(`  - Decay: ${result.decayApplied} points (rate ${(model.trustDecayRate * 100).toFixed(1)} points per 24h; expires after ${model.maxStaleHours}h).`));
+      console.log(chalk.gray(`  - Observed evidence expectation: ${(model.evidenceRequirements.minObservedShare * 100).toFixed(0)}% observed evidence and ${model.evidenceRequirements.minEvidenceCount} artifacts.`));
+      if (opts.drilldown) {
+        const dimWidth = Math.max("Dimension".length, ...dimensionDrilldown.map((row) => row.dimension.length));
+        const observedTarget = `${(model.evidenceRequirements.minObservedShare * 100).toFixed(0)}% observed`;
+        console.log(chalk.gray("Per-dimension drilldown:"));
+        console.log(chalk.gray(`  ${"Dimension".padEnd(dimWidth)}  ${"Raw".padStart(6)}  ${"Weight".padStart(6)}  ${"Weighted".padStart(8)}  ${"Level".padEnd(5)}  Observed evidence`));
+        for (const row of dimensionDrilldown) {
+          const evidence = row.evidenceExpectation === "required"
+            ? `required (${observedTarget})`
+            : `supporting (${observedTarget} target)`;
+          console.log(chalk.gray(`  ${row.dimension.padEnd(dimWidth)}  ${row.raw.toFixed(1).padStart(6)}  ${row.weight.toFixed(1).padStart(6)}  ${row.weighted.toFixed(1).padStart(8)}  ${row.level.padEnd(5)}  ${evidence}`));
+        }
+      }
       if (result.riskFactors.length > 0) {
         console.log(chalk.yellow("Risk factors:"));
         for (const rf of result.riskFactors) console.log(chalk.yellow(`  • ${rf}`));
@@ -22645,7 +24419,8 @@ dashboard
   .option("--agent <agentId>", "agent ID")
   .option("--port <port>", "port", "3210")
   .option("--view <view>", "team view: engineer, product, ciso, exec", "engineer")
-  .action(async (opts: { agent?: string; port: string; view?: string }) => {
+  .option("--no-open", "do not automatically open the browser")
+  .action(async (opts: { agent?: string; port: string; view?: string; open?: boolean }) => {
     const resolvedAgent = opts.agent ?? activeAgent(program);
     const outDir = resolvedAgent ? `.amc/agents/${resolvedAgent}/dashboard` : ".amc/dashboard";
     try {
@@ -22662,17 +24437,17 @@ dashboard
     });
     console.log(chalk.green(`\n🌐  Dashboard serving at ${handle.url}`));
     console.log(chalk.gray(`View: ${opts.view || "engineer"}`));
-    console.log(chalk.gray("Press Ctrl+C to stop\n"));
-
-    // R5: Auto-open browser
-    try {
-      const { exec: execChild } = await import("node:child_process");
-      const platform = process.platform;
-      const openCmd = platform === "darwin" ? "open" : platform === "win32" ? "start" : "xdg-open";
-      execChild(`${openCmd} ${handle.url}`);
-    } catch {
-      // Ignore errors — browser open is best-effort
+    if (opts.open !== false) {
+      const opened = openExternalUrl(handle.url);
+      if (opened) {
+        console.log(chalk.gray(`Opening browser: ${handle.url}`));
+      } else {
+        console.log(chalk.yellow(`Could not open browser automatically. Open manually: ${handle.url}`));
+      }
+    } else {
+      console.log(chalk.gray(`Browser auto-open disabled. Open manually: ${handle.url}`));
     }
+    console.log(chalk.gray("Press Ctrl+C to stop\n"));
 
     await new Promise<void>((resolvePromise) => {
       const shutdown = async () => {
@@ -22722,8 +24497,69 @@ program
   .command("quickstart")
   .description("2-minute quickstart with Quick Score assessment")
   .option("--profile <name>", "workspace config profile: dev|ci|prod", "dev")
-  .action(async (opts: { profile: "dev" | "ci" | "prod" }) => {
+  .option("--minimal", "Startup-friendly setup path without interactive questions", false)
+  .option("--startup-plan", "Print a 10-minute startup plan without running the interactive score", false)
+  .option("--what-broken", "Only show startup blockers and the next commands", false)
+  .option("--role <role>", "startup role copy: founder|cto|developer|operator", "cto")
+  .option("--framework <name>", "framework hint or auto detection", "auto")
+  .option("--answers-out <path>", "write sample quickscore answers JSON for non-interactive startup scoring")
+  .option("--json", "JSON output for startup plan or blockers", false)
+  .action(async (opts: {
+    profile: "dev" | "ci" | "prod";
+    minimal: boolean;
+    startupPlan?: boolean;
+    whatBroken?: boolean;
+    role?: string;
+    framework?: string;
+    answersOut?: string;
+    json?: boolean;
+  }) => {
+    if (opts.startupPlan || opts.whatBroken || opts.answersOut || opts.json) {
+      const {
+        buildStartupGuidancePlan,
+        renderStartupGuidancePlan,
+        writeStartupSampleAnswers
+      } = await import("./startup/startupGuidance.js");
+      const plan = buildStartupGuidancePlan({
+        workspace: process.cwd(),
+        role: opts.role,
+        framework: opts.framework
+      });
+      if (opts.answersOut) {
+        writeStartupSampleAnswers(resolve(process.cwd(), opts.answersOut), plan.sampleAnswers);
+      }
+      if (opts.json) {
+        console.log(JSON.stringify({
+          ...plan,
+          wroteSampleAnswers: opts.answersOut ? resolve(process.cwd(), opts.answersOut) : null
+        }, null, 2));
+        return;
+      }
+      console.log(renderStartupGuidancePlan(plan, { onlyBroken: Boolean(opts.whatBroken) }));
+      if (opts.answersOut) {
+        console.log(chalk.green(`\nSample answers written to ${opts.answersOut}`));
+      }
+      return;
+    }
+
     console.log(chalk.bold.hex('#4AEF79')("\n🚀  AMC Quick Start — Agent Maturity in 2 Minutes\n"));
+    if (opts.minimal) {
+      console.log(chalk.hex('#4AEF79')("Startup path: creating a minimal workspace without interactive prompts.\n"));
+      await initializeMinimalStartupWorkspace({ profile: opts.profile });
+      return;
+    }
+
+    if (!process.stdin.isTTY) {
+      console.error(chalk.red("Interactive quickstart requires a terminal."));
+      console.error(chalk.yellow("No placeholder L0 score was generated."));
+      console.log(chalk.gray("Use one of these non-interactive paths:"));
+      console.log(chalk.gray("  amc quickstart --startup-plan --answers-out amc-startup-answers.json"));
+      console.log(chalk.gray("  amc quickscore --answers amc-startup-answers.json --json"));
+      console.log(chalk.gray("  amc quickscore --auto"));
+      console.log(chalk.gray("Or run `amc quickstart` in a real terminal."));
+      process.exit(1);
+      return;
+    }
 
     // Step 1: workspace init
     console.log(chalk.hex('#4AEF79')("Step 1: Setting up workspace..."));
@@ -22754,7 +24590,11 @@ program
         answers[q.id] = level;
       }
     } else {
-      console.log(chalk.yellow("  ⚠  No TTY detected — defaulting all answers to L0. For interactive assessment, run: amc quickscore"));
+      console.log(chalk.yellow("  ⚠  No TTY detected — no questions were answered."));
+      console.log(chalk.yellow("     Displayed L0 is a placeholder, not a measured maturity result."));
+      console.log(chalk.gray(`     ${NON_INTERACTIVE_QUICKSCORE_NOTICE.firstRunHint}`));
+      console.log(chalk.gray("     Run in a terminal: amc quickscore"));
+      console.log(chalk.gray("     Or score from evidence: amc quickscore --auto"));
     }
 
     const result = computeQuickScore(answers, "quick");
@@ -22875,6 +24715,67 @@ agent
 // ── Demo ─────────────────────────────────────────────────────────────────────
 const demo = program.command("demo").description("Run interactive demos of AMC capabilities");
 
+type ProspectDemoCliOptions = {
+  share?: boolean;
+  out: string;
+  slug: string;
+  publicBaseUrl?: string;
+  live?: boolean;
+  json?: boolean;
+};
+
+async function runProspectDemoCli(opts: ProspectDemoCliOptions & { forceShare?: boolean }): Promise<void> {
+  const {
+    buildProspectDemoPlan,
+    renderProspectDemoMarkdown,
+    writeProspectDemoShareBundle
+  } = await import("./demo/prospectDemo.js");
+  const shouldWriteShare = opts.forceShare === true || opts.share === true || Boolean(opts.publicBaseUrl);
+  let liveResult = null;
+
+  if (opts.live) {
+    if (!opts.json) {
+      console.log(chalk.bold("\nAMC Prospect Demo - live DEMO_ONLY evidence\n"));
+      console.log(chalk.gray("  Running the no-vault demo gateway path before rendering the prospect flow..."));
+    }
+    const { runDemoWithoutUserVault } = await import("./demo/demoRun.js");
+    liveResult = await runDemoWithoutUserVault();
+  }
+
+  const plan = buildProspectDemoPlan(liveResult);
+  const bundle = shouldWriteShare
+    ? writeProspectDemoShareBundle({
+        outputRoot: resolve(process.cwd(), opts.out),
+        slug: opts.slug,
+        publicBaseUrl: opts.publicBaseUrl,
+        plan
+      })
+    : null;
+
+  if (opts.json) {
+    console.log(JSON.stringify({ plan, bundle }, null, 2));
+    return;
+  }
+
+  console.log(chalk.bold("\nAMC Prospect Demo - 5-minute flow\n"));
+  console.log(chalk.gray(`  Trust label: ${plan.trustLabel}`));
+  console.log(chalk.gray(`  Claim boundary: ${plan.claimBoundary}\n`));
+  console.log(renderProspectDemoMarkdown(plan));
+  if (bundle) {
+    console.log(chalk.green(`Share bundle written: ${bundle.htmlPath}`));
+    console.log(chalk.gray(`  Manifest: ${bundle.manifestPath}`));
+    console.log(chalk.gray(`  URL: ${bundle.shareUrl}`));
+    if (bundle.manifest.publicUrl) {
+      console.log(chalk.gray("  Publish the generated directory to the matching public base URL before sending this link."));
+    } else {
+      console.log(chalk.gray("  Add --public-base-url after publishing this directory to print a client-facing HTTPS URL."));
+    }
+  } else {
+    console.log(chalk.gray("Generate the leave-behind: amc demo share --public-base-url <url>"));
+    console.log(chalk.gray("Attach live DEMO_ONLY evidence: amc demo prospect --live --share"));
+  }
+}
+
 demo
   .command("gap")
   .description("The 84-point documentation inflation gap — keyword vs execution scoring")
@@ -22961,83 +24862,139 @@ demo
   .command("run")
   .description("Run a simulated agent through the AMC gateway and produce a real score (~30s)")
   .option("--gateway <url>", "Gateway URL (default: auto-detect running instance)")
+  .option("--no-vault", "Run an ephemeral demo gateway without using the current workspace vault")
+  .option("--demo", "Alias for --no-vault")
   .option("--json", "Output as JSON")
-  .action(async (opts: { gateway?: string; json?: boolean }) => {
-    const { runDemo, startDemoUpstream } = await import("./demo/demoRun.js");
+  .action(async (opts: { gateway?: string; vault?: boolean; demo?: boolean; json?: boolean }) => {
+    const { runDemo, runDemoWithoutUserVault, shouldRunNoVaultDemo, startDemoUpstream } = await import("./demo/demoRun.js");
     const { issueLeaseForCli } = await import("./leases/leaseCli.js");
     const { ensureLeaseRevocationStore } = await import("./leases/leaseCli.js");
+
+    if (shouldRunNoVaultDemo(opts)) {
+      if (opts.gateway) {
+        console.error(chalk.red("--gateway cannot be combined with --no-vault; --no-vault starts its own ephemeral demo gateway."));
+        process.exit(1);
+      }
+
+      if (!opts.json) {
+        console.log(chalk.bold("\n🎮  AMC Live Demo (no-vault)\n"));
+        console.log(chalk.gray("  Starting an ephemeral demo workspace, upstream, and AMC gateway..."));
+      }
+      const result = await runDemoWithoutUserVault();
+
+      if (opts.json) {
+        console.log(JSON.stringify(result, null, 2));
+        return;
+      }
+
+      console.log(chalk.green(`\n✓ Demo complete in ${(result.durationMs / 1000).toFixed(1)}s`));
+      console.log(chalk.gray(`  ${result.requestsSent} requests sent through an ephemeral AMC gateway`));
+      console.log(chalk.gray(`  ${result.evidenceItems} demo evidence events captured`));
+      console.log(chalk.gray(`  Gateway config signature: ${result.gatewaySignatureValid ? "valid" : "invalid"}`));
+      console.log(chalk.gray(`  Demo maturity sample: ${result.maturityLevel} / ${result.maturityScore}`));
+      console.log(chalk.yellow("  Trust label: DEMO_ONLY — not production audit evidence"));
+      console.log(chalk.gray(`  Evidence workspace: ${result.evidenceWorkspace}\n`));
+      return;
+    }
 
     // Start demo upstream server
     console.log(chalk.bold("\n🎮  AMC Live Demo\n"));
     console.log(chalk.gray("  Starting demo upstream server..."));
     const upstream = await startDemoUpstream();
-    console.log(chalk.gray(`  Demo upstream: ${upstream.baseUrl}`));
-
-    // Detect or use provided gateway
-    let gatewayUrl = opts.gateway ?? "http://127.0.0.1:3210";
-
-    // Check if gateway is running
     try {
-      await fetch(`${gatewayUrl.replace(/\/$/, "")}/local/v1/models`);
-    } catch {
-      console.log(chalk.yellow("\n⚠  Gateway not running. Start it with:"));
-      console.log(chalk.gray(`  LOCAL_OPENAI_BASE_URL=${upstream.baseUrl} amc up`));
-      console.log(chalk.gray("  Then re-run: amc demo run"));
+      console.log(chalk.gray(`  Demo upstream: ${upstream.baseUrl}`));
+
+      // Detect or use provided gateway
+      let gatewayUrl = opts.gateway ?? "http://127.0.0.1:3210";
+
+      // Check if gateway is running
+      try {
+        await fetch(`${gatewayUrl.replace(/\/$/, "")}/local/v1/models`);
+      } catch {
+        console.log(chalk.yellow("\n⚠  Gateway not running. Start it with:"));
+        console.log(chalk.gray(`  LOCAL_OPENAI_BASE_URL=${upstream.baseUrl} amc up`));
+        console.log(chalk.gray("  Or run without setup: amc demo run --no-vault"));
+        process.exit(1);
+      }
+
+      // Issue a lease token for the demo
+      console.log(chalk.gray("  Issuing demo lease token..."));
+      const workspace = process.cwd();
+      ensureLeaseRevocationStore(workspace);
+      const wsId = (await import("./workspaces/workspaceId.js")).workspaceIdFromDirectory(workspace);
+      const lease = issueLeaseForCli({
+        workspace,
+        workspaceId: wsId,
+        agentId: "default",
+        ttl: "15m",
+        scopes: "gateway:llm,proxy:connect,toolhub:intent,toolhub:execute,governor:check,receipt:verify",
+        routes: "/local",
+        models: "*",
+        rpm: 60,
+        tpm: 200000,
+        maxCostUsdPerDay: null,
+        workOrderId: undefined,
+      });
+      console.log(chalk.gray(`  Lease issued (15m TTL)`));
+
+      console.log(chalk.gray(`  Gateway: ${gatewayUrl}`));
+      console.log(chalk.gray("  Simulating a multi-turn AI agent through the AMC gateway...\n"));
+
+      const steps = [
+        "Sending research task conversation...",
+        "Sending data analysis with tool calls...",
+        "Sending security audit scenario...",
+        "Sending code review request...",
+        "Sending financial escalation scenario...",
+        "Sending error recovery scenario...",
+      ];
+
+      const result = await runDemo(gatewayUrl, lease.token);
+
+      console.log(chalk.green(`\n✓ Demo complete in ${(result.durationMs / 1000).toFixed(1)}s`));
+      console.log(chalk.gray(`  ${result.requestsSent} requests sent through gateway`));
+      console.log(chalk.gray(`  ~${result.evidenceItems} evidence items captured\n`));
+
+      void steps;
+
+      // Now run the diagnostic
+      console.log(chalk.bold("📊  Running diagnostic...\n"));
+
+      if (opts.json) {
+        console.log(JSON.stringify(result, null, 2));
+      } else {
+        console.log(chalk.gray("  Run 'amc run --agent default' to see the full scored report."));
+        console.log(chalk.gray("  Run 'amc score evidence-coverage default' to see evidence gaps."));
+        console.log(chalk.gray("  Open http://127.0.0.1:3212/console for the dashboard.\n"));
+      }
+    } finally {
       await upstream.close();
-      process.exit(1);
     }
+  });
 
-    // Issue a lease token for the demo
-    console.log(chalk.gray("  Issuing demo lease token..."));
-    const workspace = process.cwd();
-    ensureLeaseRevocationStore(workspace);
-    const wsId = (await import("./workspaces/workspaceId.js")).workspaceIdFromDirectory(workspace);
-    const lease = issueLeaseForCli({
-      workspace,
-      workspaceId: wsId,
-      agentId: "default",
-      ttl: "15m",
-      scopes: "gateway:llm,proxy:connect,toolhub:intent,toolhub:execute,governor:check,receipt:verify",
-      routes: "/local",
-      models: "*",
-      rpm: 60,
-      tpm: 200000,
-      maxCostUsdPerDay: null,
-      workOrderId: undefined,
-    });
-    console.log(chalk.gray(`  Lease issued (15m TTL)`));
+demo
+  .command("prospect")
+  .description("Run a guided 5-minute prospect demo flow")
+  .option("--share", "Generate a static prospect share bundle and print its URL", false)
+  .option("--out <dir>", "Directory for --share output", ".amc/demo/prospect")
+  .option("--slug <slug>", "Share bundle slug", "prospect-demo")
+  .option("--public-base-url <url>", "Public base URL for share bundle after upload")
+  .option("--live", "Run the no-vault live demo and attach DEMO_ONLY evidence summary", false)
+  .option("--json", "Output as JSON", false)
+  .action(async (opts: ProspectDemoCliOptions) => {
+    await runProspectDemoCli(opts);
+  });
 
-    console.log(chalk.gray(`  Gateway: ${gatewayUrl}`));
-    console.log(chalk.gray("  Simulating a multi-turn AI agent through the AMC gateway...\n"));
-
-    const steps = [
-      "Sending research task conversation...",
-      "Sending data analysis with tool calls...",
-      "Sending security audit scenario...",
-      "Sending code review request...",
-      "Sending financial escalation scenario...",
-      "Sending error recovery scenario...",
-    ];
-
-    const result = await runDemo(gatewayUrl, lease.token);
-
-    console.log(chalk.green(`\n✓ Demo complete in ${(result.durationMs / 1000).toFixed(1)}s`));
-    console.log(chalk.gray(`  ${result.requestsSent} requests sent through gateway`));
-    console.log(chalk.gray(`  ~${result.evidenceItems} evidence items captured\n`));
-
-    // Cleanup
-    await upstream.close();
-
-    // Now run the diagnostic
-    console.log(chalk.bold("📊  Running diagnostic...\n"));
-
-    if (opts.json) {
-      console.log(JSON.stringify(result, null, 2));
-    } else {
-      console.log(chalk.gray("  Run 'amc run --agent default' to see the full scored report."));
-      console.log(chalk.gray("  Run 'amc score evidence-coverage default' to see evidence gaps."));
-      console.log(chalk.gray("  Open http://127.0.0.1:3212/console for the dashboard.\n"));
-    }
+demo
+  .command("share")
+  .description("Generate a static client-facing prospect demo bundle")
+  .option("--out <dir>", "Directory for share output", ".amc/demo/prospect")
+  .option("--slug <slug>", "Share bundle slug", "prospect-demo")
+  .option("--public-base-url <url>", "Public base URL for share bundle after upload")
+  .option("--live", "Run the no-vault live demo and attach DEMO_ONLY evidence summary", false)
+  .option("--json", "Output as JSON", false)
+  .action(async (opts: ProspectDemoCliOptions) => {
+    await runProspectDemoCli({ ...opts, forceShare: true });
   });
 
 // Agent Transparency Report + MCP Server
@@ -23053,7 +25010,7 @@ import { registerTraceCommands, registerAlertCommands } from "./cli-trace-comman
 import { registerNeutralImportCommands } from "./cli-import-commands.js";
 import { registerStrategyCommands } from "./cli-strategy-commands.js";
 import { registerEvalDatasetCommands, registerLiteScoreCommands } from "./cli-eval-dataset-commands.js";
-import { registerBusinessCommands, registerLeaderboardCommands, registerInventoryCommands, registerCommsCheckCommands } from "./cli-business-commands.js";
+import { registerBusinessCommands, registerExecutiveCommands, registerLeaderboardCommands, registerInventoryCommands, registerCommsCheckCommands } from "./cli-business-commands.js";
 registerObservabilityCommands(program, activeAgent);
 registerCorrectionCommands(program, activeAgent);
 registerTraceCommands(program, activeAgent);
@@ -23063,6 +25020,7 @@ registerStrategyCommands(program, activeAgent);
 registerEvalDatasetCommands(program, activeAgent);
 registerLiteScoreCommands(program);
 registerBusinessCommands(program, activeAgent);
+registerExecutiveCommands(program, activeAgent);
 registerLeaderboardCommands(program);
 registerInventoryCommands(program);
 registerCommsCheckCommands(program);
@@ -23265,8 +25223,19 @@ redteamCmd
   .option("--plugins <ids...>", "Assurance-pack IDs to run as attack plugins (default: all)")
   .option("--strategies <ids...>", "Attack strategy IDs to apply (default: direct). Use 'all' for every strategy.")
   .option("--output <path>", "Path to write the markdown vulnerability report")
+  .option("--no-sign", "Run without vault/artifact signing; report is labeled UNSIGNED_VALID local evidence")
+  .option("--evil-mcp", "Also run built-in Evil MCP agent-provider attack scenarios")
+  .option("--mcp-attacks <categories...>", "MCP attack categories for --evil-mcp (default: all; aliases: tool_poison, data_exfil, priv_esc, prompt_inject)")
   .option("--json", "Print JSON report to stdout")
-  .action(async (agentId: string | undefined, opts: { plugins?: string[]; strategies?: string[]; output?: string; json?: boolean }) => {
+  .action(async (agentId: string | undefined, opts: {
+    plugins?: string[];
+    strategies?: string[];
+    output?: string;
+    sign?: boolean;
+    evilMcp?: boolean;
+    mcpAttacks?: string[];
+    json?: boolean;
+  }) => {
     const workspace = process.cwd();
     const report = await runRedTeam({
       workspace,
@@ -23274,6 +25243,9 @@ redteamCmd
       plugins: opts.plugins,
       strategies: opts.strategies,
       output: opts.output,
+      noSign: opts.sign === false,
+      evilMcp: opts.evilMcp,
+      mcpAttackCategories: opts.mcpAttacks,
     });
 
     if (opts.json) {
@@ -23281,7 +25253,14 @@ redteamCmd
     } else {
       console.log(renderRedTeamMarkdown(report));
       console.log("");
+      if (!report.verification.signed) {
+        console.log(chalk.yellow(`Verification: ${report.verification.status} — ${report.verification.explanation}`));
+      }
       console.log(chalk.gray(`Full JSON: .amc/redteam/${report.agentId}/${report.runId}.json`));
+      if (report.evilMcp) {
+        console.log(chalk.gray(`Evil MCP JSON: ${report.evilMcp.reportPath}`));
+        console.log(chalk.gray(`Evil MCP report: ${report.evilMcp.markdownPath}`));
+      }
       if (opts.output) {
         console.log(chalk.gray(`Report: ${opts.output}`));
       }
@@ -23474,7 +25453,29 @@ pack
       if (result.success) {
         console.log(chalk.green(`✅ ${result.message}`));
         console.log(`Package: ${chalk.hex('#4AEF79')(result.name)}@${result.version}`);
-        console.log(`Registry: ${result.registry}`);
+        if (result.published) {
+          console.log(`Registry: ${result.registry}`);
+          console.log(chalk.green("Status: Uploaded to registry"));
+        } else if (result.destinationKind === "dry-run") {
+          console.log(`Destination: ${result.registry}`);
+          console.log(chalk.yellow("Status: Dry run only — no tarball uploaded"));
+        } else {
+          console.log("Destination: local tarball bundle");
+          console.log(chalk.yellow("Status: Not uploaded to a registry"));
+        }
+        if (result.tarballPath) {
+          console.log(`Tarball: ${result.tarballPath}`);
+        }
+        if (result.integrity) {
+          console.log(`SHA256: ${result.integrity}`);
+        }
+        if (result.nextSteps.length > 0) {
+          console.log("");
+          console.log(chalk.bold("Next steps:"));
+          for (const step of result.nextSteps) {
+            console.log(`  - ${step}`);
+          }
+        }
       } else {
         console.error(chalk.red(`❌ ${result.message}`));
         process.exit(1);
@@ -23663,15 +25664,17 @@ pack
 
 pack
   .command("init")
-  .description("Initialize a new pack in the current directory")
+  .description("Initialize a new pack in <name>/ or an explicit --dir")
   .option("--name <name>", "pack name")
+  .option("--dir <path>", "output directory (defaults to ./<name>)")
   .option("--version <version>", "initial version", "1.0.0")
   .option("--description <desc>", "pack description")
   .option("--author <author>", "author name")
   .option("--license <license>", "license", "MIT")
   .option("--type <type>", "pack type: assurance, policy, transform, adapter", "assurance")
-  .action((opts: {
+  .action(async (opts: {
     name?: string;
+    dir?: string;
     version?: string;
     description?: string;
     author?: string;
@@ -23679,9 +25682,28 @@ pack
     type?: "assurance" | "policy" | "transform" | "adapter";
   }) => {
     try {
+      let packName = opts.name?.trim();
+      if (!packName && !opts.dir && process.stdin.isTTY) {
+        const answer = await inquirer.prompt([{
+          type: "input",
+          name: "name",
+          message: "Pack name:",
+          validate: (value: string) => value.trim().length > 0 || "Pack name is required"
+        }]);
+        packName = answer.name.trim();
+      }
+      if (!packName && !opts.dir) {
+        console.error(chalk.red("Pack name required unless --dir is provided."));
+        console.error(chalk.gray("Run: amc pack init --name my-pack"));
+        process.exit(1);
+        return;
+      }
+      const outputDir = opts.dir
+        ? resolve(process.cwd(), opts.dir)
+        : resolve(process.cwd(), directoryNameForPackName(packName!));
       const result = packInitCli({
-        directory: process.cwd(),
-        name: opts.name,
+        directory: outputDir,
+        name: packName ?? basename(outputDir),
         version: opts.version,
         description: opts.description,
         author: opts.author,
@@ -23698,7 +25720,9 @@ pack
         console.log("2. Implement your pack logic in index.mjs (ESM format)");
         console.log("3. Add tests in test/index.test.mjs");
         console.log(`4. Test your pack locally: ${chalk.hex('#4AEF79')("amc pack test .")}`);
-        console.log(`5. Run 'amc pack publish' to share with the community`);
+        console.log(`5. Create a publish bundle: ${chalk.hex('#4AEF79')("amc pack publish .")}`);
+        console.log(`6. Review registry governance gates: ${chalk.hex('#4AEF79')("docs/ASSURANCE_LAB.md#community-registry-review-gates")}`);
+        console.log(`7. Upload to a running registry: ${chalk.hex('#4AEF79')("amc pack publish . --registry http://127.0.0.1:4873")}`);
         console.log("");
         console.log(chalk.bold("Documentation:"));
         console.log(`  Pack authoring guide: ${chalk.hex('#4AEF79')("docs/ASSURANCE_LAB.md")}`);
@@ -23716,25 +25740,49 @@ pack
 
 pack
   .command("test [dir]")
-  .description("Test a local pack in sandbox mode")
+  .description("Test a local pack directory; defaults to cwd and auto-detects one child pack")
   .option("--agent <agentId>", "agent ID to run the pack against")
   .option("--json", "JSON output", false)
   .action(async (dir: string | undefined, opts: { agent?: string; json?: boolean }) => {
-    const packDir = dir ? resolve(dir) : process.cwd();
+    let packDir = dir ? resolve(dir) : process.cwd();
+    let autoDetected = false;
     // Verify pack exists
-    const manifestPath = join(packDir, "package.json");
-    if (!pathExists(manifestPath)) {
-      console.error(chalk.red(`No package.json found in ${packDir}. Run 'amc pack init' first.`));
+    let packManifest = readPackPackageManifest(packDir);
+    if (!packManifest && dir) {
+      console.error(chalk.red(`No package.json found in ${packDir}.`));
+      console.error(chalk.gray("Run: amc pack test <dir>"));
+      console.error(chalk.gray("Create one first: amc pack init --name my-pack"));
       process.exit(1); return;
     }
-    let packManifest: { name?: string; version?: string; amcPack?: { type?: string } };
-    try {
-      packManifest = JSON.parse(readUtf8(manifestPath));
-    } catch {
+    if (!dir && !packManifest?.amcPack) {
+      const childPacks = findImmediatePackDirectories(packDir);
+      if (childPacks.length === 1) {
+        packDir = childPacks[0]!;
+        packManifest = readPackPackageManifest(packDir);
+        autoDetected = true;
+      } else if (childPacks.length > 1) {
+        console.error(chalk.red(`Multiple AMC packs found in ${packDir}.`));
+        for (const child of childPacks) {
+          console.error(chalk.gray(`  - ${child}`));
+        }
+        console.error(chalk.gray("Run: amc pack test <dir>"));
+        process.exit(1); return;
+      }
+    }
+    if (!packManifest) {
       console.error(chalk.red(`Invalid package.json in ${packDir}`));
       process.exit(1); return;
     }
+    if (!packManifest.amcPack) {
+      console.error(chalk.red(`No AMC pack found in ${packDir}.`));
+      console.error(chalk.gray("Run: amc pack test <dir>"));
+      console.error(chalk.gray("Example: amc pack test ./my-pack"));
+      process.exit(1); return;
+    }
     const agentId = opts.agent ?? activeAgent(program) ?? "default";
+    if (autoDetected) {
+      console.log(chalk.gray(`Auto-detected pack directory: ${packDir}`));
+    }
     console.log(chalk.bold(`\n🧪  Pack Sandbox Test — ${packManifest.name ?? "unknown"}`));
     console.log(chalk.gray(`  Pack directory: ${packDir}`));
     console.log(chalk.gray(`  Pack version:   ${packManifest.version ?? "unknown"}`));
@@ -23743,14 +25791,12 @@ pack
     console.log("");
     try {
       // Load and execute the pack entry point
-      const entryMjs = join(packDir, "index.mjs");
-      const entryJs = join(packDir, "index.js");
-      const entryPath = pathExists(entryMjs) ? entryMjs : entryJs;
-      if (!pathExists(entryPath)) {
-        console.error(chalk.red(`No index.mjs or index.js found in ${packDir}. Implement your pack entry point first.`));
+      const entryPath = resolvePackEntryPath(packDir, packManifest.main);
+      if (!entryPath) {
+        console.error(chalk.red(`No pack entry point found in ${packDir}. Add package.json "main", index.mjs, or index.js first.`));
         process.exit(1); return;
       }
-      const packModule = await import(entryPath);
+      const packModule = await import(pathToFileURL(entryPath).href);
       const packExport = packModule.default ?? packModule;
       if (typeof packExport.execute !== "function") {
         console.error(chalk.red(`Pack must export an execute(context) function.`));
@@ -23765,6 +25811,7 @@ pack
       }
       if (result.success) {
         console.log(chalk.green(`✅ Pack executed successfully`));
+        console.log(chalk.green("Pack test passed"));
       } else {
         console.log(chalk.yellow(`⚠️  Pack executed with issues`));
       }
@@ -23776,7 +25823,9 @@ pack
       }
       console.log("");
       console.log(chalk.gray("  Sandbox mode: no artifacts signed or persisted."));
-      console.log(chalk.gray("  To publish: amc pack publish"));
+      console.log(chalk.gray("  To create a local publish bundle: amc pack publish ."));
+      console.log(chalk.gray("  Review registry governance gates: docs/ASSURANCE_LAB.md#community-registry-review-gates"));
+      console.log(chalk.gray("  To upload to a running registry: amc pack publish . --registry http://127.0.0.1:4873"));
     } catch (e: unknown) {
       console.error(chalk.red(`Pack execution failed: ${toErrorMessage(e)}`));
       process.exit(1);
@@ -24304,6 +26353,23 @@ enterprise
 
 /* ── Mirofish simulation ──────────────────────────── */
 registerMirofishCommands(program);
+
+function isTopLevelHelpRequest(argv: string[]): boolean {
+  const args = argv.slice(2);
+  if (!args.some((arg) => arg === "--help" || arg === "-h")) {
+    return false;
+  }
+  return args.every((arg) => ["--help", "-h", "--all", "--no-color"].includes(arg));
+}
+
+if (isTopLevelHelpRequest(process.argv)) {
+  if (process.argv.includes("--all")) {
+    program.outputHelp();
+  } else {
+    console.log(renderGroupedHelp(program));
+  }
+  process.exit(0);
+}
 
 program.parseAsync(process.argv).catch((error: unknown) => {
   const message = normalizeCliErrorMessage(error);

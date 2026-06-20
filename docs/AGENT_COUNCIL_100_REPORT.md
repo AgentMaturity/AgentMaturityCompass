@@ -146,7 +146,7 @@ All produce valid reports with `--json` support:
 | MITRE_ATLAS | MITRE_ATLAS, mitre | ✅ |
 | OWASP_API_TOP10 | OWASP_API_TOP10, owasp | ✅ |
 
-### Industry Sector Packs (40 packs across 7 domains)
+### Industry Sector Packs (41 packs across 7 domains)
 All accessible via `amc domain pack list/describe/run`:
 
 | Domain | Packs | Status |

@@ -11,8 +11,12 @@ This is the fastest routing page for AMC documentation.
 - **I already ran quickscore** → `docs/AFTER_FIRST_SCORE.md`
 - **I want install options** → `docs/INSTALL.md`
 - **I want product/edition clarity** → `docs/PRODUCT_EDITIONS.md`
+- **I need to explain L3 business risk to a board** → `docs/BOARD_RISK_L3_MEMO.md`
+- **I want the whitepaper or citation metadata** → `whitepaper/AMC_WHITEPAPER_v1.md`
+- **I want methodology exports or sample case-study rows** → `docs/SCORING_METHODOLOGY.md`
 - **I want pricing/commercial packaging** → `docs/PRICING.md`
 - **I want deployment options** → `docs/DEPLOYMENT_OPTIONS.md`
+- **I want AWS/GCP/Azure self-hosting architecture** → `docs/CLOUD_REFERENCE_ARCHITECTURES.md`
 - **I want examples to copy** → `docs/EXAMPLES_INDEX.md`
 
 ## Start by persona
@@ -27,6 +31,8 @@ This is the fastest routing page for AMC documentation.
 - **CLI** → `docs/QUICKSTART.md`
 - **CI** → `docs/CI_TEMPLATES.md`
 - **Enterprise deployment** → `docs/ENTERPRISE.md`
+- **Cloud self-hosting** → `docs/CLOUD_REFERENCE_ARCHITECTURES.md`
+- **Accessibility release evidence** → `docs/runbooks/ACCESSIBILITY_RELEASE_EVIDENCE.md`
 
 ## Architecture and implementation reality
 
@@ -50,6 +56,13 @@ This is the fastest routing page for AMC documentation.
 - `docs/ADAPTERS.md`
 - `docs/CI_TEMPLATES.md`
 - `docs/PRODUCT_EDITIONS.md`
+- `docs/BOARD_RISK_L3_MEMO.md`
+- `whitepaper/AMC_WHITEPAPER_v1.md`
+- `docs/SCORING_METHODOLOGY.md`
 - `docs/PRICING.md`
 - `docs/DEPLOYMENT_OPTIONS.md`
+- `docs/CLOUD_REFERENCE_ARCHITECTURES.md`
+- `docs/runbooks/ACCESSIBILITY_RELEASE_EVIDENCE.md`
+- `docs/COMMUNITY_DEMO_KIT.md`
+- `docs/WHY_AMC_ONE_PAGER.md`
 - `docs/COMMUNITY_SUPPORT.md`

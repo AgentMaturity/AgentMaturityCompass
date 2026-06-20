@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AMC for Executives - Board Brief</title>
+  <meta name="description" content="A board-level overview of Agent Maturity Compass: what it does, what executives see, and how teams use AMC evidence to reduce AI-agent risk.">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="AMC for Executives - Board Brief">
+  <meta property="og:description" content="Board-level AI-agent trust scoring, evidence, compliance, and action paths.">
+  <meta property="og:url" content="https://agentmaturity.co/executive.html">
+  <meta property="og:image" content="https://agentmaturity.co/og-card.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="stylesheet" href="style.css?v=14">
+  <style>
+    .exec-page{min-height:100vh;padding:8rem 0 5rem}
+    .exec-hero{display:grid;grid-template-columns:minmax(0,1fr) minmax(280px,420px);gap:clamp(2rem,5vw,4rem);align-items:center;padding:3rem 0 5rem}
+    .exec-hero h1{white-space:normal;margin:.6rem 0 1.2rem}
+    .exec-lede{font-size:1.05rem;color:var(--text-muted);max-width:680px;line-height:1.75}
+    .exec-visual{border:1px solid var(--border);background:rgba(255,255,255,.025);padding:1rem}
+    .exec-visual img{width:100%;height:auto}
+    .exec-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem;margin:2rem 0 4rem}
+    .exec-panel{border:1px solid var(--border);background:rgba(255,255,255,.025);padding:1.25rem;min-height:190px}
+    .exec-panel h2{font-size:1rem;color:var(--text);letter-spacing:0;text-transform:none;margin-bottom:.75rem}
+    .exec-panel p,.exec-panel li{color:var(--text-muted);font-size:.92rem;line-height:1.65}
+    .exec-panel ul{margin-left:1rem}
+    .exec-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:var(--border);border:1px solid var(--border);margin:2rem 0 4rem}
+    .exec-kpi{background:var(--bg);padding:1.25rem}
+    .exec-kpi strong{display:block;font-family:var(--mono);font-size:1.6rem;color:var(--accent);line-height:1}
+    .exec-kpi span{display:block;margin-top:.5rem;color:var(--text-muted);font-size:.78rem}
+    .exec-steps{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0;border:1px solid var(--border);margin-top:1.5rem}
+    .exec-step{padding:1.2rem;border-right:1px solid var(--border)}
+    .exec-step:last-child{border-right:none}
+    .exec-step span{font-family:var(--mono);font-size:.7rem;color:var(--accent)}
+    .exec-step h3{font-size:.95rem;text-transform:none;letter-spacing:0;margin:.45rem 0;color:var(--text)}
+    .exec-step p{font-size:.85rem;color:var(--text-muted);line-height:1.6}
+    @media(max-width:900px){.exec-hero,.exec-grid,.exec-kpis,.exec-steps{grid-template-columns:1fr}.exec-step{border-right:none;border-bottom:1px solid var(--border)}.exec-step:last-child{border-bottom:none}}
+  </style>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <nav class="nav scrolled">
+    <div class="nav-inner">
+      <a href="./" class="nav-brand">amc<span class="accent">_</span></a>
+      <ul class="nav-links">
+        <li><a href="./#install">install</a></li>
+        <li><a href="./executive.html">executives</a></li>
+        <li><a href="./playground.html">playground</a></li>
+        <li><a href="./docs/index.html">docs</a></li>
+        <li><a href="https://github.com/AgentMaturity/AgentMaturityCompass">github</a></li>
+      </ul>
+    </div>
+  </nav>
+  <span id="main-content" tabindex="-1"></span>
+  <main class="exec-page">
+    <div class="container">
+      <section class="exec-hero">
+        <div>
+          <p class="label">board brief</p>
+          <h1>Know which AI agents are ready for real work<span class="accent">.</span></h1>
+          <p class="exec-lede">AMC gives executives a maturity level, evidence trail, and action path for each AI agent. The point is not another dashboard; it is a defensible answer to what is deployed, what it can do, where it can fail, and what has to be fixed before autonomy expands.</p>
+        </div>
+        <div class="exec-visual">
+          <img src="og-card.png" alt="Agent Maturity Compass scorecard preview showing evidence over claims">
+        </div>
+      </section>
+
+      <div class="exec-kpis" aria-label="AMC executive facts">
+        <div class="exec-kpi"><strong>L0-L5</strong><span>maturity levels for board reporting</span></div>
+        <div class="exec-kpi"><strong>244</strong><span>default diagnostic questions</span></div>
+        <div class="exec-kpi"><strong>147</strong><span>assurance packs for adversarial checks</span></div>
+        <div class="exec-kpi"><strong>41</strong><span>industry packs with 600 sector questions</span></div>
+      </div>
+
+      <div class="exec-grid">
+        <section class="exec-panel">
+          <h2>What The Board Sees</h2>
+          <ul>
+            <li>Agent maturity level and score trend.</li>
+            <li>Top risk areas and blocked autonomy decisions.</li>
+            <li>Evidence coverage, integrity status, and audit readiness.</li>
+            <li>EU AI Act risk classification where applicable.</li>
+            <li><a href="../docs/BOARD_RISK_L3_MEMO.md">L3 business-risk memo</a> for controlled-use board decisions.</li>
+          </ul>
+        </section>
+        <section class="exec-panel">
+          <h2>What Engineering Does</h2>
+          <ul>
+            <li>Runs `amc` in the agent workspace.</li>
+            <li>Connects runtime traces, policies, and evidence sources.</li>
+            <li>Uses guidance to fix weak controls and rerun score.</li>
+            <li>Exports reports, binders, and CI gates for release decisions.</li>
+          </ul>
+        </section>
+        <section class="exec-panel">
+          <h2>What Changes</h2>
+          <ul>
+            <li>Vendor claims are separated from observed behavior.</li>
+            <li>Risk exceptions become tracked work, not meeting notes.</li>
+            <li>Autonomy is expanded only when evidence supports it.</li>
+            <li>Compliance teams get repeatable proof instead of screenshots.</li>
+          </ul>
+        </section>
+      </div>
+
+      <section>
+        <p class="label">operating path</p>
+        <h2>From first score to board-ready evidence<span class="accent">_</span></h2>
+        <div class="exec-steps">
+          <div class="exec-step"><span>01</span><h3>Inventory</h3><p>Identify agents, owners, tools, data access, and autonomy boundaries.</p></div>
+          <div class="exec-step"><span>02</span><h3>Score</h3><p>Run the default diagnostic and capture evidence-weighted maturity.</p></div>
+          <div class="exec-step"><span>03</span><h3>Fix</h3><p>Prioritize gaps by risk, compliance impact, and effort.</p></div>
+          <div class="exec-step"><span>04</span><h3>Govern</h3><p>Use reports, audit binders, and release gates to keep agents inside approved autonomy.</p></div>
+        </div>
+      </section>
+    </div>
+  </main>
+</body>
+</html>

@@ -956,6 +956,28 @@ export const builtInComplianceMappings: ComplianceMapping[] = [
     }
   }),
   mapping({
+    id: "gdpr_art5_accountability",
+    framework: "GDPR",
+    category: "Art. 5 Accountability",
+    description: "Controller accountability is evidenced by demonstrable compliance with GDPR Art. 5 principles through audit trails, review artifacts, and governance records.",
+    evidenceRequirements: [
+      {
+        type: "requires_evidence_event",
+        eventTypes: ["artifact", "audit", "review", "metric"],
+        minObservedRatio: 0.6
+      },
+      {
+        type: "requires_no_audit",
+        auditTypesDenylist: ["EVIDENCE_CHAIN_BROKEN", "AUDIT_TRAIL_MISSING", "POLICY_VIOLATION"]
+      }
+    ],
+    related: {
+      questions: ["AMC-1.7", "AMC-2.4", "AMC-4.5"],
+      packs: ["technologyGDPRSOC", "scenarioTraceability", "notaryAttestation"],
+      configs: ["context-graph.json", "audit-map.yaml", "compliance-report.md"]
+    }
+  }),
+  mapping({
     id: "gdpr_art6_lawful_basis",
     framework: "GDPR",
     category: "Art. 6 Lawful Basis",

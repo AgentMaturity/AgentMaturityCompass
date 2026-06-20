@@ -86,7 +86,7 @@ export function renderHelp(ctx: ReplContext): string {
   lines.push(`    ${ACCENT("check GDPR")}                ${DIM("Education domain (GDPR, FERPA)")}`);
   lines.push(`    ${ACCENT("fintech")}                   ${DIM("Wealth domain (SOX, PCI-DSS)")}`);
   lines.push(`    ${ACCENT("EU AI Act")}                 ${DIM("Technology domain")}`);
-  lines.push(`    ${ACCENT("domains")}                   ${DIM("List all 7 domains + 40 packs")}`);
+  lines.push(`    ${ACCENT("domains")}                   ${DIM("List all 7 domains + 41 packs")}`);
   lines.push(`    ${ACCENT("guardrails")}                ${DIM("Toggle runtime protections")}`);
   lines.push("");
 

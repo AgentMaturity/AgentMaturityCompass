@@ -18,8 +18,15 @@ code { background: #222; padding: 2px 6px; border-radius: 4px; font-size: 0.9em;
 .nav { margin-bottom: 32px; }
 .nav a { margin-right: 16px; text-decoration: none; }
 </style>
+<style id="skip-link-style">
+.skip-link{position:fixed;left:-9999px;top:12px;z-index:10000;padding:8px 14px;background:#4AEF79;color:#0a0a0a;font:700 14px system-ui,sans-serif;text-decoration:none}
+.skip-link:focus,.skip-link:focus-visible{left:12px}
+:where(a,button,input,select,textarea,[tabindex]:not([tabindex="-1"])):focus-visible{outline:2px solid #4AEF79;outline-offset:3px}
+</style>
 </head>
 <body>
+<a href="#main-content" class="skip-link">Skip to content</a>
+<div id="main-content" tabindex="-1"></div>
 <div class="nav">
 <a href="index.html">← Home</a>
 <a href="compliance.html">Compliance</a>
@@ -68,11 +75,11 @@ code { background: #222; padding: 2px 6px; border-radius: 4px; font-size: 0.9em;
 
 <h2>Assessment Coverage</h2>
 <div class="card">
-<p><strong>240 default diagnostic questions</strong> across 5 layers, plus a free opt-in 20-question lifecycle expansion</p>
+<p><strong>244 default diagnostic questions</strong> across 5 layers, plus a free opt-in 20-question lifecycle expansion</p>
 <p><strong>147 assurance packs</strong> — red-team attack simulations including alignment faking, sandbagging, and scheming detection</p>
 <p><strong>79 scoring modules</strong> — evidence-weighted algorithms</p>
 <p><strong>8 compliance frameworks</strong> — EU AI Act, GDPR, ISO 42001, SOC2, NIST AI RMF, HIPAA, PCI DSS, ISO 27001</p>
-<p><strong>40 industry domain packs</strong> — health, education, finance, mobility, governance, technology, environment</p>
+<p><strong>41 industry domain packs</strong> — health, education, finance, mobility, governance, technology, environment</p>
 </div>
 
 <h2>Getting Started</h2>

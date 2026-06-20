@@ -40,8 +40,14 @@ nav a{font-size:.8rem;color:#7aaa7a}nav a:hover{color:#00ff41}
 .nav-brand{font-weight:700;color:#00ff41;font-size:1rem}
 @media(max-width:480px){body{padding:.75rem}h1{font-size:1.4rem}.stats{flex-direction:column;align-items:center}}
 </style>
+<style id="skip-link-style">
+.skip-link{position:fixed;left:-9999px;top:12px;z-index:10000;padding:8px 14px;background:#4AEF79;color:#0a0a0a;font:700 14px system-ui,sans-serif;text-decoration:none}
+.skip-link:focus,.skip-link:focus-visible{left:12px}
+:where(a,button,input,select,textarea,[tabindex]:not([tabindex="-1"])):focus-visible{outline:2px solid #4AEF79;outline-offset:3px}
+</style>
 </head>
 <body>
+<a href="#main-content" class="skip-link">Skip to content</a>
 
 <nav>
   <span class="nav-brand">🧭 AMC</span>
@@ -103,10 +109,10 @@ nav a{font-size:.8rem;color:#7aaa7a}nav a:hover{color:#00ff41}
   <h2>📐 Five Trust Dimensions</h2>
   <div class="cards">
     <div class="card"><h3>🏛️ Strategic Agent Ops</h3><p>Mission clarity, scope adherence, decision traceability. 19 default questions.</p></div>
-    <div class="card"><h3>🛡️ Skills</h3><p>Injection defense, DLP, least-privilege execution. 49 default questions.</p></div>
+    <div class="card"><h3>🛡️ Skills</h3><p>Injection defense, DLP, least-privilege execution. 52 default questions.</p></div>
     <div class="card"><h3>🔄 Resilience</h3><p>Graceful degradation, circuit breakers, error recovery. 55 default questions.</p></div>
     <div class="card"><h3>📊 Leadership & Autonomy</h3><p>Structured logs, traces, cost tracking, human oversight. 23 default questions.</p></div>
-    <div class="card"><h3>🧬 Culture & Alignment</h3><p>Testing, benchmarks, feedback loops, truthfulness. 94 default questions.</p></div>
+    <div class="card"><h3>🧬 Culture & Alignment</h3><p>Testing, benchmarks, feedback loops, truthfulness. 95 default questions.</p></div>
   </div>
 
   <h2>📏 Maturity Scale</h2>

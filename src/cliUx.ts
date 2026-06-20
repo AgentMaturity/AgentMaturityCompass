@@ -229,24 +229,37 @@ function commandPathSet(program: Command): Set<string> {
 
 export function buildCommandInventory(program: Command, options: { includeInternal?: boolean } = {}): CliCommandInventoryEntry[] {
   const entries: CliCommandInventoryEntry[] = [];
-  const walk = (cmd: Command, prefix: string[]): void => {
+  const walk = (cmd: Command, prefix: string[], aliasPrefixes: string[][]): void => {
     for (const child of cmd.commands) {
       if (!options.includeInternal && child.name().startsWith("_")) {
         continue;
       }
       const next = [...prefix, child.name()];
+      const aliases = new Set(child.aliases());
+      for (const aliasPrefix of aliasPrefixes) {
+        aliases.add([...aliasPrefix, child.name()].join(" "));
+      }
       entries.push({
         path: next.join(" "),
         name: child.name(),
         description: child.description(),
-        aliases: child.aliases(),
+        aliases: [...aliases],
         options: child.options.map((option) => option.flags),
         subcommands: child.commands.map((grandchild) => grandchild.name())
       });
-      walk(child, next);
+
+      const childAliasPrefixes = [
+        ...aliasPrefixes.map((aliasPrefix) => [...aliasPrefix, child.name()]),
+        ...child.aliases().flatMap((alias) => {
+          const ownAliasPrefix = [...prefix, alias];
+          const inheritedAliasPrefixes = aliasPrefixes.map((aliasPrefix) => [...aliasPrefix, alias]);
+          return [ownAliasPrefix, ...inheritedAliasPrefixes];
+        })
+      ];
+      walk(child, next, childAliasPrefixes);
     }
   };
-  walk(program, []);
+  walk(program, [], []);
   return entries.sort((a, b) => a.path.localeCompare(b.path));
 }
 
@@ -292,21 +305,24 @@ export function renderGroupedHelp(program: Command): string {
     }
   }
   lines.push("");
-  lines.push("Aliases:");
-  for (const alias of CLI_ALIASES) {
-    if (existing.has(alias.aliasPath) && existing.has(alias.targetPath)) {
+  const aliases = CLI_ALIASES.filter((alias) => existing.has(alias.aliasPath) && existing.has(alias.targetPath));
+  if (aliases.length > 0) {
+    lines.push("Aliases:");
+    for (const alias of aliases) {
       lines.push(formatHelpRow(`${alias.aliasPath} -> ${alias.targetPath}`, alias.description));
     }
+    lines.push("");
   }
-  lines.push("");
   lines.push("Global options:");
   lines.push("  --agent <agentId>                  Agent ID override");
+  lines.push("  --no-color                         Disable ANSI color output (or set NO_COLOR=1)");
   lines.push("  -h, --help                         Show command help");
   lines.push("  -V, --version                      Show CLI version");
   lines.push("");
   lines.push("Discoverability:");
   lines.push("  amc help <command>                 Detailed help for any command path");
   lines.push("  amc shell                          Interactive REPL session");
+  lines.push("  amc --help --all                   Complete command list");
   return lines.join("\n");
 }
 
@@ -459,6 +475,7 @@ export function cliDiscoverabilityFooter(): string {
     "Discoverability:",
     "  • Use 'amc help <command>' for detailed subcommand docs",
     "  • Use '--help' after any command path (for example: 'amc run --help')",
+    "  • Set NO_COLOR=1 or pass '--no-color' for plain, non-colored output",
     "  • Use 'amc commands --markdown' to generate the live CLI inventory for docs",
     "  • Namespace shortcuts:",
     "      - evidence  → verify, bundle, transparency, receipts",

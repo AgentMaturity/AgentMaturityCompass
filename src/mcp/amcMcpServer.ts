@@ -386,7 +386,7 @@ export async function startMcpServer(workspace?: string): Promise<void> {
   // -------------------------------------------------------------------------
   server.tool(
     "amc_score_sector_pack",
-    "Score an AI agent against an AMC Sector Pack for a specific industry vertical. Sector Packs provide regulatory-grounded assessment for 40 industry sub-verticals across 7 stations (Environment, Health, Wealth, Education, Mobility, Technology, Governance). Example pack IDs: digital-health-record, clinical-trials, farm-to-fork, dance-of-democracy. (read-only)",
+    "Score an AI agent against an AMC Sector Pack for a specific industry vertical. Sector Packs provide regulatory-grounded assessment for 41 industry sub-verticals across 7 stations (Environment, Health, Wealth, Education, Mobility, Technology, Governance). Example pack IDs: digital-health-record, clinical-trials, farm-to-fork, freight-3pl-warehouse, dance-of-democracy. (read-only)",
     {
       packId: z
         .string()

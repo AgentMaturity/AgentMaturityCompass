@@ -44,7 +44,8 @@ function firstSentence(text: string): string {
     return "Implement the control with repeatable evidence collection.";
   }
   const parts = normalized.split(/[.!?]\s+/).map((row) => row.trim()).filter(Boolean);
-  return `${parts[0] ?? normalized}.`;
+  const first = (parts[0] ?? normalized).replace(/[.!?]+$/, "");
+  return `${first}.`;
 }
 
 function preliminaryLevelFromPercent(percentage: number): "L0" | "L1" | "L2" | "L3" | "L4" | "L5" {
@@ -136,4 +137,3 @@ export function scoreRapidAssessment(answers: Record<string, number>): RapidQuic
     recommendations
   };
 }
-

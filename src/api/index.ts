@@ -10,6 +10,7 @@ import { handleShieldRoute } from './shieldRouter.js';
 import { handleEnforceRoute } from './enforceRouter.js';
 import { handleVaultRoute } from './vaultRouter.js';
 import { handleWatchRoute } from './watchRouter.js';
+import { handleObserveRoute } from './observeRouter.js';
 import { handleScoreRoute } from './scoreRouter.js';
 import { handleProductRoute } from './productRouter.js';
 import { handleAgentTimelineRoute } from './agentTimelineRouter.js';
@@ -156,6 +157,15 @@ export const API_ROUTE_REGISTRY: readonly ApiRouteDefinition[] = [
     auth: 'protected',
     validationPolicy: 'router-local',
     handler: workspaceRoute(handleWatchRoute)
+  },
+  {
+    id: 'observe',
+    description: 'Observe timeline and anomaly read APIs',
+    prefixes: ['/api/v1/observe'],
+    methods: ['GET'],
+    auth: 'protected',
+    validationPolicy: 'router-local',
+    handler: workspaceRoute(handleObserveRoute)
   },
   {
     id: 'gateway',

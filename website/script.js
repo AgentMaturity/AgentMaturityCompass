@@ -50,9 +50,9 @@ function initReveals(){
 }
 
 var PRODUCTS=[
-  {name:'amc score',title:'Score',headline:'Score trust before you ship',summary:'Evidence-weighted scoring across live execution behavior instead of brochure claims.',badges:['240 default questions','20 lifecycle expansion','instant full score'],info:[{label:'what it does',title:'Calculates the trust baseline',text:'Finds maturity gaps across governance, security, reliability, cost, and state.'},{label:'why it matters',title:'Kills documentation inflation',text:'Observed evidence carries full weight. Self-reported evidence is capped.'},{label:'output',title:'Actionable trust report',text:'Ships a scored report, signed evidence bundle, and remediation targets.'}],lines:[
+  {name:'amc score',title:'Score',headline:'Score trust before you ship',summary:'Evidence-weighted scoring across live execution behavior instead of brochure claims.',badges:['244 default questions','20 lifecycle expansion','instant full score'],info:[{label:'what it does',title:'Calculates the trust baseline',text:'Finds maturity gaps across governance, security, reliability, cost, and state.'},{label:'why it matters',title:'Kills documentation inflation',text:'Observed evidence carries full weight. Self-reported evidence is capped.'},{label:'output',title:'Actionable trust report',text:'Ships a scored report, signed evidence bundle, and remediation targets.'}],lines:[
     {type:'code',label:'$ amc'},
-    {label:'full score',value:'240 default questions · VALID'},
+    {label:'full score',value:'244 default questions · VALID'},
     {label:'overall maturity',value:'L3.2 · 64%'},
     {label:'security',value:'L4.0 · hardened execution'},
     {label:'governance',value:'L2.8 · approvals missing'},

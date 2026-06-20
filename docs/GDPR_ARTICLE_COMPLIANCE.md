@@ -16,6 +16,41 @@ GDPR applies to any processing of personal data by or through AI agents. AMC's c
 amc compliance report --framework GDPR --window 30d --out .amc/reports/gdpr.md
 ```
 
+### Operational DSAR Intake
+
+AMC also exposes a persistent DSAR workflow for access, erasure, and portability requests:
+
+```bash
+amc vault dsar submit --subject user@example.com --type access --json
+amc vault dsar status <requestId> --json
+amc vault dsar complete <requestId> --json
+amc vault dsar list --json
+```
+
+Requests are stored under `.amc/vault/dsar/requests.json`, and each submit/complete action appends a JSONL audit event under `.amc/vault/dsar/audit.jsonl`. The audit trail hashes the subject identifier so operators can prove request handling without duplicating raw subject identifiers in the audit log.
+
+External regulator guidance checked on 2026-06-16: ICO guidance for subject access requests says organizations should respond without delay and within one month, and provide copies in accessible, concise, intelligible formats; ICO erasure guidance says Article 17 requests can be verbal or written and require one-month handling; ICO data portability guidance emphasizes structured, commonly used, machine-readable formats and one-month response handling. See:
+
+- https://ico.org.uk/for-organisations/uk-gdpr-guidance-and-resources/subject-access-requests/a-guide-to-subject-access/
+- https://ico.org.uk/for-organisations/uk-gdpr-guidance-and-resources/individual-rights/individual-rights/right-to-erasure/
+- https://ico.org.uk/for-organisations/uk-gdpr-guidance-and-resources/individual-rights/individual-rights/right-to-data-portability/
+
+### Operational DLP Scan
+
+AMC exposes the DLP scanner from both the top-level namespace and Vault namespace:
+
+```bash
+amc dlp scan "IBAN GB82 WEST 1234 5698 7654 32 from 198.51.100.42" --json
+amc vault dlp scan "passport number C01X00T99" --redact
+```
+
+The scanner detects existing US/credential patterns plus EU-relevant identifiers: validated IBANs, IP addresses, VAT IDs, keyword-bound EU national ID references, passport numbers, and health-record IDs. IBAN detection validates the checksum rather than redacting every IBAN-shaped string.
+
+External source check on 2026-06-16:
+
+- GDPR Recital 30 lists internet protocol addresses and similar online identifiers as identifiers that can be associated with natural persons: https://gdpr-info.eu/recitals/no-30/
+- Swift states IBAN is the international standard for account numbers, follows ISO 13616 national formats, and that Swift publishes the ISO 13616 IBAN registry: https://www.swift.com/standards/data-standards/iban-international-bank-account-number
+
 ---
 
 ## 2. Scope: Why GDPR Applies to AI Agents
@@ -147,7 +182,7 @@ Art. 5 establishes seven foundational principles. Each maps to distinct AMC evid
 
 **Evidence requirement**: Audit/artifact/review events ≥60% OBSERVED + signed audit binder with valid chain.
 
-**AMC mapping ID**: `gdpr_art5_accountability` *(new — not yet in builtInMappings.ts)*
+**AMC mapping ID**: `gdpr_art5_accountability` *(added to builtInMappings.ts in the 2026-06-16 follow-up)*
 
 ---
 
@@ -318,7 +353,7 @@ The DPIA must contain: (a) systematic description of processing operations and p
 | Art. 5(1)(d) | `gdpr_art5_accuracy` | ✅ Exists | — |
 | Art. 5(1)(e) | `gdpr_art5_storage_limitation` | ✅ Exists | — |
 | Art. 5(1)(f) | `gdpr_art5_integrity_confidentiality` | ✅ Exists | — |
-| Art. 5(2) | — | ⚠️ Missing | Add `gdpr_art5_accountability` |
+| Art. 5(2) | `gdpr_art5_accountability` | ✅ Exists | — |
 | Art. 13 | — | ⚠️ Missing | Add `gdpr_art13_information_provision` |
 | Art. 14 | — | ⚠️ Missing | Add `gdpr_art14_indirect_collection` |
 | Art. 17 | `gdpr_art15_22_data_subject_rights` (bundled) | ⚠️ Bundled | Add dedicated `gdpr_art17_right_to_erasure` |
@@ -326,7 +361,7 @@ The DPIA must contain: (a) systematic description of processing operations and p
 | Art. 25 | `gdpr_art25_data_protection_by_design` | ✅ Exists | — |
 | Art. 35 | `gdpr_art35_dpia` | ✅ Exists | — |
 
-**Summary**: 7 of 13 article-level controls exist. 4 new mappings recommended (Art. 5(2), Art. 13, Art. 14, Art. 17 standalone). 2 controls should be broken out from the bundled Art. 15-22 mapping (Art. 17, Art. 22).
+**Summary**: 9 of 13 article-level rows now have direct mappings. Art. 13 and Art. 14 remain missing. Art. 17 and Art. 22 are bundled in Art. 15-22 data-subject rights and should be split into dedicated mappings.
 
 ---
 

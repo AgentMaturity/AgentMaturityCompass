@@ -350,6 +350,7 @@ export function collectPassportData(params: {
       }))
       .sort((a, b) => a.qIdHash.localeCompare(b.qIdHash))
     : undefined;
+  const questionExplainabilityHash = report?.questionExplainability?.manifestHash;
 
   const policySha256 = fileSha(join(params.workspace, ".amc", "passport", "policy.yaml"));
   const canonSha256 = fileSha(canonPath(params.workspace));
@@ -394,8 +395,9 @@ export function collectPassportData(params: {
             culture: null,
             resilience: null,
             skills: null
-          },
+      },
       unknownQuestionsCount,
+      ...(questionExplainabilityHash ? { questionExplainabilityHash } : {}),
       ...(questionScores42 ? { questionScores42 } : {})
     },
     strategyFailureRisks: params.policy.passportPolicy.contents.includeFiveStrategyRisks

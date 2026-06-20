@@ -75,8 +75,14 @@ tr:hover td{background:var(--bg2)}
 
 @media(max-width:768px){h1{font-size:1.6rem}.container{padding:32px 18px 60px}.timeline-item{flex-direction:column;gap:4px}}
 </style>
+<style id="skip-link-style">
+.skip-link{position:fixed;left:-9999px;top:12px;z-index:10000;padding:8px 14px;background:#4AEF79;color:#0a0a0a;font:700 14px system-ui,sans-serif;text-decoration:none}
+.skip-link:focus,.skip-link:focus-visible{left:12px}
+:where(a,button,input,select,textarea,[tabindex]:not([tabindex="-1"])):focus-visible{outline:2px solid #4AEF79;outline-offset:3px}
+</style>
 </head>
 <body>
+<a href="#main-content" class="skip-link">Skip to content</a>
 
 <nav class="nav">
   <a href="../" class="logo">🧭 <span>AMC</span></a>
@@ -86,6 +92,7 @@ tr:hover td{background:var(--bg2)}
   <a href="./" style="color:var(--accent2)">Blog</a>
   <a href="https://github.com/AgentMaturity/AgentMaturityCompass" target="_blank">GitHub</a>
 </nav>
+<div id="main-content" tabindex="-1"></div>
 
 <div class="container">
 
@@ -149,7 +156,7 @@ tr:hover td{background:var(--bg2)}
 
 <h2>How AMC Maps to EU AI Act Articles</h2>
 
-<p>AMC was designed with regulatory compliance as a first-class concern. Its 5 dimensions and 195 core questions (730 total across 40 industry packs) map directly to the Act's requirements:</p>
+<p>AMC was designed with regulatory compliance as a first-class concern. Its 5 dimensions and 244 default questions (844 total across 41 industry packs) map directly to the Act's requirements:</p>
 
 <table>
   <thead>
@@ -252,7 +259,7 @@ amc guide --diff</code></pre>
 
 <h2>Industry-Specific Requirements</h2>
 
-<p>If your agent operates in a specific sector, the regulatory landscape is even more complex. AMC includes 40 domain packs across 7 industries that layer sector-specific requirements on top of the EU AI Act baseline:</p>
+<p>If your agent operates in a specific sector, the regulatory landscape is even more complex. AMC includes 41 domain packs across 7 industries that layer sector-specific requirements on top of the EU AI Act baseline:</p>
 
 <ul>
   <li><strong>Healthcare:</strong> HIPAA §164.312, FDA 21 CFR Part 11, EU MDR 2017/745</li>

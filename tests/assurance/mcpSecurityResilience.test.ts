@@ -2,6 +2,7 @@ import { describe, it, expect } from "vitest";
 import {
   getMCPAttackTaxonomy,
   analyzeMCPSecurityResilience,
+  computeNetResilientPerformance,
   getMCPSecurityTestCases,
   type MCPSecurityTestResult,
 } from "../../src/assurance/packs/mcpSecurityResiliencePack.js";
@@ -149,6 +150,33 @@ describe("MCP security resilience pack", () => {
 
       const result = analyzeMCPSecurityResilience(results);
       expect(result.recommendations.some(r => r.includes("tool-poisoning"))).toBe(true);
+    });
+
+    it("computes NRP from attack success rate and performance under attack", () => {
+      const nrp = computeNetResilientPerformance({
+        attackSuccessRate: 0.25,
+        performanceUnderAttack: 0.8,
+      });
+
+      expect(nrp.formula).toBe("PUA * (1 - ASR)");
+      expect(nrp.netResilientPerformance).toBe(0.6);
+      expect(nrp.score0to100).toBe(60);
+    });
+
+    it("returns NRP in resilience analysis", () => {
+      const results: MCPSecurityTestResult[] = [
+        { testCaseId: "mcp-001", attackBlocked: false, detectionMethod: "none", falsePositive: false },
+        { testCaseId: "mcp-002", attackBlocked: true, detectionMethod: "sig", falsePositive: false },
+        { testCaseId: "mcp-003", attackBlocked: true, detectionMethod: "sig", falsePositive: false },
+        { testCaseId: "mcp-004", attackBlocked: true, detectionMethod: "sig", falsePositive: false },
+      ];
+
+      const result = analyzeMCPSecurityResilience(results, { performanceUnderAttack: 0.8 });
+
+      expect(result.attackSuccessRate).toBe(0.25);
+      expect(result.performanceUnderAttack).toBe(0.8);
+      expect(result.netResilientPerformance.netResilientPerformance).toBe(0.6);
+      expect(result.netResilientPerformance.score0to100).toBe(60);
     });
   });
 });

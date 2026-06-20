@@ -34,7 +34,7 @@ AMC is strongest when compared honestly.
 | Product surface | Single-focus | Score, Shield, Enforce, Vault, Watch, Comply, Fleet, Passport |
 | Evidence model | Pass/fail per test | Weighted evidence with integrity verification |
 | Maturity model | None | L0–L5 with clear progression and evidence gates |
-| Domain coverage | Generic | 40 industry-specific domain packs (health, wealth, education, mobility, etc.) |
+| Domain coverage | Generic | 41 industry-specific domain packs (health, wealth, education, mobility/logistics, etc.) |
 
 **Bottom line:** Prompt security is one slice. AMC is the full trust stack.
 

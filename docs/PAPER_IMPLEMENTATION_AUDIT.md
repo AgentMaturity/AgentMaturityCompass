@@ -130,15 +130,14 @@
 | Control mapping | `src/score/crossFrameworkMapping.ts:76-77` | — | ✅ `FORESIGHT_SAFETY_CONTROLS` array with 6 AMC-relevant risk dimensions mapped |
 | Framework registry | `src/score/crossFrameworkMapping.ts:167,230` | — | ✅ Registered in control map and framework summary |
 | Evidence artifacts | `src/score/crossFrameworkMapping.ts:179` | — | ✅ Evidence artifact patterns defined |
-| `catastrophicRiskIndicators.ts` | — | — | ❌ **Does not exist** |
-| Self-preservation pack (partial coverage) | `src/assurance/packs/selfPreservationPack.ts` | exists | ⚠️ Covers shutdown resistance but not self-replication or resource acquisition |
+| `catastrophicRiskIndicators.ts` | `src/score/catastrophicRiskIndicators.ts` | exists | ✅ Focused score module for self-replication capability, autonomous resource acquisition, shutdown resistance, unauthorized persistence, goal-preservation pressure, and cross-system propagation |
+| Self-preservation / replication / power-seeking packs (behavioral coverage) | `src/assurance/packs/selfPreservationPack.ts`, `src/assurance/packs/replicationResistancePack.ts`, `src/assurance/packs/powerSeekingPack.ts` | exists | ✅ Behavioral probes cover shutdown resistance, self-replication/resource acquisition attempts, and power-seeking pressure |
 
-### Status: **PARTIAL**
+### Status: **PARTIAL** (focused catastrophic-risk indicators implemented)
 
 ### Gaps
-- `catastrophicRiskIndicators.ts` was recommended but never created — no scoring for self-replication capability, resource acquisition behavior, or resistance to shutdown as catastrophic risk indicators
 - ForesightSafety mapping covers only 6 of 94 risk dimensions (top AMC-relevant ones, per the doc's own note, but still a fraction)
-- `selfPreservationPack.ts` covers shutdown resistance but doesn't score self-replication or resource acquisition
+- Full 94-dimension ForesightSafety expansion remains broader mapping work; AMC now covers the high-priority catastrophic-risk indicators as a Score API plus behavioral probes
 
 ---
 
@@ -231,12 +230,12 @@
 | Artifact | Path | Lines | Verdict |
 |----------|------|-------|---------|
 | Per-step test case | `src/assurance/packs/excessiveAgencyPack.ts:73` | — | ✅ `per-step-permission-narrowing` scenario present |
-| Diagnostic question | `src/diagnostic/questionBank.ts` | — | ❌ No question found matching "per-step least-privilege for tool access" |
+| Diagnostic question | `src/diagnostic/questionBank.ts` | — | ✅ `AMC-5.29 Per-Step Tool Least-Privilege` covers adaptive per-step tool filtering and status-aware validation |
 
-### Status: **PARTIAL**
+### Status: **IMPLEMENTED**
 
 ### Gaps
-- The recommended diagnostic question ("Does the agent enforce per-step least-privilege for tool access, adapting permissions based on the current task phase?") is **missing** from `questionBank.ts`.
+- Resolved 2026-06-16: `AMC-5.29` now asks whether the agent enforces per-step least-privilege tool access, adapts available tools/scopes to the current task phase, and validates tool-call status before execution.
 
 ---
 
@@ -277,12 +276,12 @@
 | Artifact | Path | Lines | Verdict |
 |----------|------|-------|---------|
 | Proactive vs reactive test | `src/assurance/packs/toolMisusePack.ts:46-47` | — | ✅ `proactive-vs-reactive-guardrail` scenario — "Tests whether guardrails are proactive (pre-action) vs reactive (post-action)" |
-| Diagnostic question | `src/diagnostic/questionBank.ts` | — | ❌ No question found matching "proactive (before execution) or only reactively (after execution)" |
+| Diagnostic question | `src/diagnostic/questionBank.ts` | — | ✅ `AMC-5.30 Proactive Tool Invocation Guardrails` covers pre-execution safety judgments, guardrail feedback, and reactive-only gaps |
 
-### Status: **PARTIAL**
+### Status: **IMPLEMENTED**
 
 ### Gaps
-- The recommended diagnostic question ("Does the agent system evaluate tool invocation safety proactively (before execution) or only reactively (after execution)?") is **missing** from `questionBank.ts`.
+- Resolved 2026-06-16: `AMC-5.30` now asks whether tool invocation safety is evaluated proactively before execution with step-level guardrail feedback rather than only after unsafe execution.
 
 ---
 
@@ -298,18 +297,17 @@
 
 | Artifact | Path | Lines | Verdict |
 |----------|------|-------|---------|
-| PBSAI in `crossFrameworkMapping.ts` | — | — | ❌ **Not found** — no mention of PBSAI, twelve-domain taxonomy, context envelopes, or bounded agent families |
-| PBSAI in `questionBank.ts` | — | — | ❌ **Not found** |
-| `outputAttestation.ts` envelope format | `src/score/outputAttestation.ts` | — | ❌ No `envelope`, `provenance metadata`, or `structured metadata` terms found |
-| PBSAI anywhere in codebase | — | — | ❌ Zero grep hits for "PBSAI", "pbsai", "context envelope", "bounded agent famil", or "twelve domain" across all `src/**/*.ts` files |
+| PBSAI in `crossFrameworkMapping.ts` | `src/score/crossFrameworkMapping.ts` | — | ✅ `PBSAI` framework registered with 12 controls matching the paper taxonomy |
+| PBSAI in `questionBank.ts` | `src/diagnostic/questionBank.ts` | — | ✅ `AMC-3.6.1 Structured Context Envelopes` asks for MCP-style context envelopes, policy refs, provenance, legal/classification fields, and human escalation thresholds |
+| `outputAttestation.ts` envelope format | `src/score/outputAttestation.ts` | — | ✅ Attestations can now bind `contextEnvelope`, `provenanceMetadata`, and `outputContract` into the signed payload |
+| PBSAI anywhere in codebase | `src/**/*.ts` | — | ✅ PBSAI mapping, diagnostic, and attestation metadata are implemented |
 
-### Status: **MISSING**
+### Status: **IMPLEMENTED**
 
 ### Gaps
-- **All three recommended artifacts are missing:**
-  1. PBSAI twelve-domain taxonomy mapping in `crossFrameworkMapping.ts`
-  2. Diagnostic question about structured context envelopes for cross-domain traceability
-  3. `outputAttestation.ts` enhancement for provenance metadata in envelope format
+- Resolved 2026-06-16: PBSAI twelve-domain taxonomy mapping added to `crossFrameworkMapping.ts`.
+- Resolved 2026-06-16: context-envelope diagnostic question added as `AMC-3.6.1`.
+- Resolved 2026-06-16: output attestations now support signed context envelopes, provenance metadata, and output contracts.
 
 ---
 
@@ -350,14 +348,14 @@
 |----------|------|-------|---------|
 | Assurance pack | `src/assurance/packs/mcpSecurityResiliencePack.ts` | 347 | ✅ `getMCPAttackTaxonomy()` returns all 12 categories: tool-poisoning, rug-pull, server-spoofing, credential-theft, cross-server-exfiltration, etc. Full interfaces and detection logic |
 | Pack test | `tests/assurance/mcpSecurityResilience.test.ts` | exists | ✅ |
-| `mcpCompliance.ts` security-resilience enhancement | `src/score/mcpCompliance.ts` | 412 | ❌ No `supplyChain`, `securityResilience`, or `resilience` terms found |
-| NRP metric | `src/assurance/packs/mcpSecurityResiliencePack.ts` | — | ❌ No NRP (Net Resilient Performance) metric found anywhere |
+| `mcpCompliance.ts` security-resilience enhancement | `src/score/mcpCompliance.ts` | — | ✅ Adds `securityResilience` subscore with taxonomy coverage, MSB attack-instance count, and NRP warnings/recommendations |
+| NRP metric | `src/assurance/packs/mcpSecurityResiliencePack.ts`, `src/score/mcpCompliance.ts` | — | ✅ Implements Net Resilient Performance as `PUA * (1 - ASR)` and exposes it in pack analysis + MCP compliance scoring |
 
-### Status: **PARTIAL**
+### Status: **IMPLEMENTED**
 
 ### Gaps
-- `mcpCompliance.ts` was not enhanced with security-resilience scoring — it remains focused on protocol compliance only
-- NRP (Net Resilient Performance) metric from the paper was not adopted
+- Resolved 2026-06-16: `mcpCompliance.ts` now includes MCP Security Bench resilience scoring alongside protocol compliance.
+- Resolved 2026-06-16: NRP is implemented in both the assurance pack and MCP compliance scorecard.
 
 ---
 
@@ -372,15 +370,14 @@
 
 | Artifact | Path | Lines | Verdict |
 |----------|------|-------|---------|
-| `mcpCompliance.ts` supply-chain governance | `src/score/mcpCompliance.ts` | — | ❌ No terms found for `supplyChain`, `privateRegistry`, `curatedRegistry`, or `mcpRegistry` |
-| `excessiveAgencyPack.ts` unintentional adversary | `src/assurance/packs/excessiveAgencyPack.ts` | — | ❌ No terms found for `unintentional`, `ambiguous`, or `ambiguity` — all scenarios test deliberate scope creep, not unintentional overstepping |
+| `mcpCompliance.ts` supply-chain governance | `src/score/mcpCompliance.ts` | — | ✅ Adds MCP supply-chain governance scoring for private/curated registries, gateway mediation, provenance, version pinning, and package scanning |
+| `excessiveAgencyPack.ts` unintentional adversary | `src/assurance/packs/excessiveAgencyPack.ts` | — | ✅ Adds unintentional-adversary scenarios for ambiguous MCP cleanup, broad customer fixes, and legal exports |
 
-### Status: **MISSING**
+### Status: **IMPLEMENTED**
 
 ### Gaps
-- **Both recommended enhancements are missing:**
-  1. `mcpCompliance.ts` has no supply-chain governance scoring (curated registries vs arbitrary community servers)
-  2. `excessiveAgencyPack.ts` has no "unintentional adversary" test cases where the agent over-steps due to ambiguous instructions rather than injection
+- Resolved 2026-06-16: `mcpCompliance.ts` now scores supply-chain governance for curated/private MCP registries and gateway controls.
+- Resolved 2026-06-16: `excessiveAgencyPack.ts` now includes unintentional-adversary scenarios where ambiguous instructions could cause over-step without malicious prompt injection.
 
 ---
 
@@ -419,17 +416,16 @@
 
 | Artifact | Path | Lines | Verdict |
 |----------|------|-------|---------|
-| `sycophancyPack.ts` | `src/assurance/packs/sycophancyPack.ts` | 122 | ⚠️ Covers per-response sycophancy (authority pressure, emotional pressure, repeated assertion) but **no systemic/objective-decoupling tests** — zero matches for "systemic", "decoupl", "feedback source", "training", or "ESA" |
-| `alignmentIndex.ts` feedback validation | `src/score/alignmentIndex.ts` | 182 | ❌ No feedback-source validation scoring — zero matches for "feedback", "source validation", "evaluator quality", or "trainer" |
-| Diagnostic question | `src/diagnostic/questionBank.ts` | — | ❌ No question matching "alignment process validate feedback sources" or "trust all human feedback equally" |
+| `sycophancyPack.ts` | `src/assurance/packs/sycophancyPack.ts` | 122 | ✅ Covers response-level sycophancy and systemic/objective-decoupling scenarios for collusive majority feedback, lazy evaluator consensus, and adversarial stakeholder feedback |
+| `alignmentIndex.ts` feedback validation | `src/score/alignmentIndex.ts` | 182 | ✅ `feedbackSourceValidation` dimension scores whether feedback/evaluator sources are validated before alignment updates |
+| Diagnostic question | `src/diagnostic/questionBank.ts` | — | ✅ `AMC-3.5.5 Feedback Source Validation` asks whether alignment processes validate reliability, independence, and bias risk before using feedback |
 
-### Status: **PARTIAL**
+### Status: **IMPLEMENTED**
 
 ### Gaps
-- **All three enhancements are missing:**
-  1. `sycophancyPack.ts` lacks systemic sycophancy tests — only tests individual response-level sycophancy, not whether the agent's objective has decoupled from ground truth through biased feedback loops
-  2. `alignmentIndex.ts` lacks feedback-source validation scoring
-  3. No diagnostic question about feedback source quality in the alignment process
+- Resolved 2026-06-16: `sycophancyPack.ts` now includes systemic sycophancy/objective-decoupling probes.
+- Resolved 2026-06-16: `alignmentIndex.ts` now includes feedback-source validation scoring.
+- Resolved 2026-06-16: `questionBank.ts` now includes `AMC-3.5.5 Feedback Source Validation`.
 
 ---
 
@@ -479,14 +475,13 @@ Papers 18 (Healthcare Governance), 19 (AGENTSAFE), 20 (Audited Skill-Graph), and
 
 | Artifact | Path | Lines | Verdict |
 |----------|------|-------|---------|
-| `injectionPack.ts` | `src/assurance/packs/injectionPack.ts` | 77 | ❌ Contains only single-step injection scenarios (ignore-previous, disable-guardrails, fake-auditor, etc.). **No kill-chain, multi-step, lateral movement, or persistence-chain scenarios** |
-| `compoundThreatPack.ts` (potential coverage) | `src/assurance/packs/compoundThreatPack.ts` | exists | ⚠️ Has data exfiltration chains (read→compress→upload) but these are not framed as "promptware kill chain" stages and don't model injection→persistence→lateral-movement→exfiltration |
+| `injectionPack.ts` | `src/assurance/packs/injectionPack.ts` | 77 | ✅ Adds promptware kill-chain scenarios covering initial access, privilege escalation, reconnaissance, persistence, command and control, lateral movement, and actions on objective |
+| `compoundThreatPack.ts` (potential coverage) | `src/assurance/packs/compoundThreatPack.ts` | exists | ✅ No longer needed for this paper gap; `injectionPack.ts` now directly models promptware kill-chain stages |
 
-### Status: **MISSING**
+### Status: **IMPLEMENTED**
 
 ### Gaps
-- `injectionPack.ts` was not enhanced with multi-step kill chain scenarios
-- The promptware kill chain formalization (injection as initial vector → persistence → lateral movement → exfiltration) is not modeled anywhere
+- Resolved 2026-06-16: `injectionPack.ts` now includes `promptware_kill_chain` scenarios and deterministic validation for persistence, lateral movement, exfiltration, evidence preservation, and incident escalation.
 
 ---
 
@@ -513,22 +508,22 @@ Papers 18 (Healthcare Governance), 19 (AGENTSAFE), 20 (Audited Skill-Graph), and
 | 2 | Agent-as-a-Proxy | 2602.05066 | NEW GAP | **IMPLEMENTED** | Score module + pack + tests + diagnostic all exist |
 | 3 | Legibility Protocols | 2602.10153 | PARTIAL | **IMPLEMENTED** | Legibility scoring in behavioralTransparency.ts |
 | 4 | Visibility vs Verification | 2602.11412 | PARTIAL | **IMPLEMENTED** | independentVerificationRate + narrativeLockInRisk |
-| 5 | ForesightSafety Bench | 2602.14135 | PARTIAL | **PARTIAL** | Framework mapped (6 controls) but `catastrophicRiskIndicators.ts` never created |
+| 5 | ForesightSafety Bench | 2602.14135 | PARTIAL | **PARTIAL** | Framework mapped (6 controls) + focused catastrophic-risk score module; full 94-dimension coverage remains broader work |
 | 6 | 4C Framework | 2602.01942 | PARTIAL | **IMPLEMENTED** | Goal integrity + 4C framework mapping both exist |
 | 7 | AgentGuardian | 2601.10440 | NEW GAP | **IMPLEMENTED** | Score module + 3 new test scenarios in excessiveAgencyPack |
 | 8 | MemTrust | 2601.07004 | NEW GAP | **IMPLEMENTED** | Score module + tests + diagnostic question |
-| 9 | AgenTRIM | 2601.12449 | PARTIAL | **PARTIAL** | Per-step test exists but diagnostic question missing |
+| 9 | AgenTRIM | 2601.12449 | PARTIAL | **IMPLEMENTED** | Per-step assurance scenario + `AMC-5.29` diagnostic question |
 | 10 | Beyond Max Tokens | 2601.10955 | PARTIAL | **IMPLEMENTED** | Pack + costPredictability enhancement + multi-turn test |
-| 11 | ToolSafe | 2601.10156 | PARTIAL | **PARTIAL** | Proactive vs reactive test exists but diagnostic question missing |
-| 12 | PBSAI Governance | 2602.11301 | PARTIAL | **MISSING** | Zero implementation — no PBSAI mapping, no envelopes, no diagnostic |
+| 11 | ToolSafe | 2601.10156 | PARTIAL | **IMPLEMENTED** | Proactive vs reactive assurance scenario + `AMC-5.30` diagnostic question |
+| 12 | PBSAI Governance | 2602.11301 | PARTIAL | **IMPLEMENTED** | PBSAI mapping + context-envelope diagnostic + attestation metadata |
 | 13 | SoK Trust-Auth Mismatch | 2512.06914 | NEW GAP | **IMPLEMENTED** | Score module + tests + diagnostic — foundational gap closed |
-| 14 | MCP Security Bench | 2510.15994 | PARTIAL | **PARTIAL** | Pack exists (12 categories) but mcpCompliance enhancement + NRP metric missing |
-| 15 | Securing MCP | 2511.20920 | PARTIAL | **MISSING** | Neither supply-chain governance nor unintentional adversary implemented |
+| 14 | MCP Security Bench | 2510.15994 | PARTIAL | **IMPLEMENTED** | Pack + MCP compliance security-resilience subscore + NRP metric |
+| 15 | Securing MCP | 2511.20920 | PARTIAL | **IMPLEMENTED** | MCP supply-chain governance scoring + unintentional adversary probes |
 | 16 | Think Deep | 2602.13517 | PARTIAL | **IMPLEMENTED** | reasoningEfficiency explicitly cites paper; overthinkingDetection pack exists |
-| 17 | Objective Decoupling | 2602.08092 | PARTIAL | **PARTIAL** | sycophancyPack lacks systemic tests; alignmentIndex lacks feedback validation |
+| 17 | Objective Decoupling | 2602.08092 | PARTIAL | **IMPLEMENTED** | Systemic sycophancy probes + feedback-source scoring/question |
 | B-A | Protocol Security | 2602.11327 | NEW GAP | **IMPLEMENTED** | Score module + tests + diagnostic question |
 | B-B | MCPShield | 2602.14281 | PARTIAL | **IMPLEMENTED** | Covered by trustAuthorizationSync.ts |
-| B-C | Promptware Kill Chain | 2601.09625 | PARTIAL | **MISSING** | injectionPack has no kill-chain scenarios |
+| B-C | Promptware Kill Chain | 2601.09625 | PARTIAL | **IMPLEMENTED** | injectionPack includes multi-stage promptware kill-chain scenarios |
 | B-D | Coding Assistant Injection | 2601.17548 | PARTIAL | **IMPLEMENTED** | Covered by codingAgentEscapePack.ts |
 
 ---
@@ -537,30 +532,28 @@ Papers 18 (Healthcare Governance), 19 (AGENTSAFE), 20 (Audited Skill-Graph), and
 
 | Status | Count | Papers |
 |--------|-------|--------|
-| **IMPLEMENTED** | 13 | Papers 1, 2, 3, 4, 6, 7, 8, 10, 13, 16, B-A, B-B, B-D |
-| **PARTIAL** | 5 | Papers 5, 9, 11, 14, 17 |
-| **MISSING** | 3 | Papers 12, 15, B-C |
+| **IMPLEMENTED** | 20 | Papers 1, 2, 3, 4, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, B-A, B-B, B-C, B-D |
+| **PARTIAL** | 1 | Paper 5 |
+| **MISSING** | 0 | — |
 | **SKIPPED** | 4 | Papers 18, 19, 20, 21 (not found on arXiv) |
 
-**Implementation rate (non-skipped):** 13/21 fully implemented (62%), 18/21 at least partially (86%), 3/21 missing (14%)
+**Implementation rate (non-skipped):** 20/21 fully implemented (95%), 21/21 at least partially (100%), 0/21 missing (0%)
 
 ---
 
 ## Priority Remediation List
 
-### P0 — Missing implementations (3 items)
+### P0 — Missing implementations (0 items)
 
-1. **Paper 12 (PBSAI):** Add PBSAI twelve-domain taxonomy to `crossFrameworkMapping.ts`, add context envelope diagnostic question, enhance `outputAttestation.ts` with structured provenance metadata
-2. **Paper 15 (Securing MCP):** Add supply-chain governance scoring to `mcpCompliance.ts` (curated registry detection), add "unintentional adversary" scenarios to `excessiveAgencyPack.ts`
-3. **Bonus C (Promptware Kill Chain):** Add multi-step kill chain scenarios to `injectionPack.ts` (injection→persistence→lateral movement→exfiltration)
+- None remaining after the 2026-06-16 Promptware Kill Chain follow-up.
 
-### P1 — Partial implementations needing completion (5 items)
+### P1 — Partial implementations needing completion (0 items)
 
-4. **Paper 5 (ForesightSafety):** Consider creating `catastrophicRiskIndicators.ts` for self-replication, resource acquisition, shutdown resistance scoring
-5. **Paper 9 (AgenTRIM):** Add diagnostic question about per-step least-privilege to `questionBank.ts`
-6. **Paper 11 (ToolSafe):** Add diagnostic question about proactive vs reactive tool invocation safety to `questionBank.ts`
-7. **Paper 14 (MCP Security Bench):** Enhance `mcpCompliance.ts` with security-resilience scoring; consider adopting NRP metric
-8. **Paper 17 (Objective Decoupling):** Add systemic sycophancy tests to `sycophancyPack.ts`; add feedback-source validation to `alignmentIndex.ts`; add diagnostic question about feedback quality
+- None remaining after the 2026-06-16 MCP Security Bench follow-up.
+
+### P2 — Broader framework coverage
+
+8. **Paper 5 (ForesightSafety):** Expand beyond AMC's top catastrophic-risk indicators toward the full 94-dimension ForesightSafety mapping when product scope requires it
 
 ---
 

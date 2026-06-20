@@ -17,6 +17,11 @@ import { canonicalize } from "../utils/json.js";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 const MAX_CHAIN_SAMPLES = 24;
+const PREVIEW_FINGERPRINT = "UNSIGNED_PREVIEW";
+const PREVIEW_SIGNATURE = "UNSIGNED_PREVIEW";
+const PREVIEW_CLAIM_BOUNDARY = "Unsigned preview certificate for demos and format review only. It is not verifier-ready evidence and must not be presented as a signed AMC trust certificate.";
+
+export type TrustCertificateSignatureStatus = "SIGNED" | "UNSIGNED_PREVIEW";
 
 export interface TrustCertificateEvidenceHashChain {
   eventCount: number;
@@ -38,7 +43,7 @@ export interface TrustCertificatePayload {
   scoreSourceRunTs: number | null;
   evidenceHashChain: TrustCertificateEvidenceHashChain;
   signingKey: {
-    kind: "auditor";
+    kind: "auditor" | "preview";
     fingerprint: string;
     publicKeyPem: string;
   };
@@ -51,9 +56,11 @@ export interface TrustCertificatePayload {
 
 export interface TrustCertificateEnvelope {
   type: "amc-trust-certificate";
-  signatureAlgorithm: "ed25519";
+  signatureAlgorithm: "ed25519" | "unsigned-preview";
+  signatureStatus: TrustCertificateSignatureStatus;
   payloadSha256: string;
   signature: string;
+  claimBoundary?: string;
   payload: TrustCertificatePayload;
 }
 
@@ -63,11 +70,13 @@ export interface GenerateTrustCertificateInput {
   outputPath: string;
   validityDays?: number;
   nowTs?: number;
+  preview?: boolean;
 }
 
 export interface GeneratedTrustCertificate {
   outputPath: string;
   format: "pdf" | "json";
+  signatureStatus: TrustCertificateSignatureStatus;
   sidecarJsonPath?: string;
   envelope: TrustCertificateEnvelope;
 }
@@ -278,6 +287,10 @@ function renderTrustCertificatePdf(envelope: TrustCertificateEnvelope): Buffer {
     `Score: ${envelope.payload.score.toFixed(2)}/100`,
     `Integrity Index: ${envelope.payload.integrityIndex.toFixed(4)}`,
     `Score Source Run: ${envelope.payload.scoreSourceRunId ?? "none"}`,
+    `Certificate Status: ${envelope.signatureStatus}`,
+    envelope.signatureStatus === "UNSIGNED_PREVIEW"
+      ? `Claim Boundary: ${envelope.claimBoundary ?? PREVIEW_CLAIM_BOUNDARY}`
+      : "Claim Boundary: Signed AMC trust certificate; verify before relying on it.",
     "",
     "Evidence Hash Chain",
     `  Event Count: ${envelope.payload.evidenceHashChain.eventCount}`,
@@ -298,7 +311,9 @@ function renderTrustCertificatePdf(envelope: TrustCertificateEnvelope): Buffer {
     `  Days Valid: ${envelope.payload.validity.daysValid}`,
     "",
     "Tamper Evidence",
-    "  Verify payload SHA256 over canonical JSON and signature with signing public key.",
+    envelope.signatureStatus === "UNSIGNED_PREVIEW"
+      ? "  Preview only: no signing key was used, and offline verification must fail."
+      : "  Verify payload SHA256 over canonical JSON and signature with signing public key.",
     "  Full machine-readable envelope is emitted as a .json sidecar."
   ];
   return renderPdfFromLines(lines);
@@ -310,14 +325,26 @@ export function generateTrustCertificate(input: GenerateTrustCertificateInput): 
   const nowTs = typeof input.nowTs === "number" ? input.nowTs : Date.now();
   const validityDays = normalizeValidityDays(input.validityDays);
   const notAfterTs = nowTs + validityDays * DAY_MS;
+  const signatureStatus: TrustCertificateSignatureStatus = input.preview ? "UNSIGNED_PREVIEW" : "SIGNED";
 
   const runSnapshot = loadLatestRunSnapshot(workspace, agentId);
   const evidenceHashChain = readEvidenceHashChain(workspace);
 
-  ensureSigningKeys(workspace);
-  const publicKeyPem = getPublicKeyPem(workspace, "auditor");
-  const privateKeyPem = getPrivateKeyPem(workspace, "auditor");
-  const keyFingerprint = sha256Hex(Buffer.from(publicKeyPem, "utf8"));
+  const signingKey = input.preview
+    ? {
+        kind: "preview" as const,
+        fingerprint: PREVIEW_FINGERPRINT,
+        publicKeyPem: ""
+      }
+    : (() => {
+        ensureSigningKeys(workspace);
+        const publicKeyPem = getPublicKeyPem(workspace, "auditor");
+        return {
+          kind: "auditor" as const,
+          fingerprint: sha256Hex(Buffer.from(publicKeyPem, "utf8")),
+          publicKeyPem
+        };
+      })();
 
   const payload: TrustCertificatePayload = {
     schemaVersion: 1,
@@ -329,11 +356,7 @@ export function generateTrustCertificate(input: GenerateTrustCertificateInput): 
     scoreSourceRunId: runSnapshot.runId,
     scoreSourceRunTs: runSnapshot.runTs,
     evidenceHashChain,
-    signingKey: {
-      kind: "auditor",
-      fingerprint: keyFingerprint,
-      publicKeyPem
-    },
+    signingKey,
     validity: {
       notBeforeTs: nowTs,
       notAfterTs,
@@ -342,12 +365,16 @@ export function generateTrustCertificate(input: GenerateTrustCertificateInput): 
   };
 
   const payloadSha256 = sha256Hex(Buffer.from(canonicalize(payload), "utf8"));
-  const signature = signHexDigest(payloadSha256, privateKeyPem);
+  const signature = input.preview
+    ? PREVIEW_SIGNATURE
+    : signHexDigest(payloadSha256, getPrivateKeyPem(workspace, "auditor"));
   const envelope: TrustCertificateEnvelope = {
     type: "amc-trust-certificate",
-    signatureAlgorithm: "ed25519",
+    signatureAlgorithm: input.preview ? "unsigned-preview" : "ed25519",
+    signatureStatus,
     payloadSha256,
     signature,
+    claimBoundary: input.preview ? PREVIEW_CLAIM_BOUNDARY : undefined,
     payload
   };
 
@@ -362,6 +389,7 @@ export function generateTrustCertificate(input: GenerateTrustCertificateInput): 
     return {
       outputPath,
       format: "json",
+      signatureStatus,
       envelope
     };
   }
@@ -372,6 +400,7 @@ export function generateTrustCertificate(input: GenerateTrustCertificateInput): 
   return {
     outputPath,
     format: "pdf",
+    signatureStatus,
     sidecarJsonPath,
     envelope
   };
@@ -382,7 +411,13 @@ export function verifyTrustCertificateEnvelope(envelope: TrustCertificateEnvelop
   if (envelope.type !== "amc-trust-certificate") {
     errors.push(`Unexpected certificate type: ${envelope.type}`);
   }
-  if (envelope.signatureAlgorithm !== "ed25519") {
+  const signatureStatus = envelope.signatureStatus ?? "SIGNED";
+  if (signatureStatus === "UNSIGNED_PREVIEW" || envelope.signatureAlgorithm === "unsigned-preview") {
+    errors.push("unsigned preview certificate is not verifier-ready evidence; regenerate without --no-sign before relying on it");
+  } else if (signatureStatus !== "SIGNED") {
+    errors.push(`Unsupported signature status: ${signatureStatus}`);
+  }
+  if (signatureStatus === "SIGNED" && envelope.signatureAlgorithm !== "ed25519") {
     errors.push(`Unsupported signature algorithm: ${envelope.signatureAlgorithm}`);
   }
   const recalculatedPayloadSha256 = sha256Hex(Buffer.from(canonicalize(envelope.payload), "utf8"));
@@ -390,22 +425,28 @@ export function verifyTrustCertificateEnvelope(envelope: TrustCertificateEnvelop
     errors.push("payloadSha256 mismatch");
   }
 
-  const verified = verifyHexDigest(
-    envelope.payloadSha256,
-    envelope.signature,
-    envelope.payload.signingKey.publicKeyPem
-  );
-  if (!verified) {
-    errors.push("signature verification failed");
+  if (signatureStatus === "SIGNED") {
+    const verified = verifyHexDigest(
+      envelope.payloadSha256,
+      envelope.signature,
+      envelope.payload.signingKey.publicKeyPem
+    );
+    if (!verified) {
+      errors.push("signature verification failed");
+    }
   }
 
   if (envelope.payload.validity.notAfterTs <= envelope.payload.validity.notBeforeTs) {
     errors.push("Invalid validity window");
   }
 
-  const expectedFingerprint = sha256Hex(Buffer.from(envelope.payload.signingKey.publicKeyPem, "utf8"));
-  if (expectedFingerprint !== envelope.payload.signingKey.fingerprint) {
-    errors.push("signing key fingerprint mismatch");
+  if (signatureStatus === "SIGNED") {
+    const expectedFingerprint = sha256Hex(Buffer.from(envelope.payload.signingKey.publicKeyPem, "utf8"));
+    if (expectedFingerprint !== envelope.payload.signingKey.fingerprint) {
+      errors.push("signing key fingerprint mismatch");
+    }
+  } else if (envelope.payload.signingKey.fingerprint !== PREVIEW_FINGERPRINT || envelope.payload.signingKey.kind !== "preview") {
+    errors.push("preview signing marker mismatch");
   }
 
   return {
@@ -413,4 +454,3 @@ export function verifyTrustCertificateEnvelope(envelope: TrustCertificateEnvelop
     errors
   };
 }
-

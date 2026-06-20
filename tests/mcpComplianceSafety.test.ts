@@ -5,9 +5,12 @@ import {
   scoreMcpCompliance,
   type MCPCapabilityDeclaration
 } from "../src/score/mcpCompliance.js";
+import { getMCPAttackTaxonomy } from "../src/assurance/packs/mcpSecurityResiliencePack.js";
 import { questionBank } from "../src/diagnostic/questionBank.js";
 import { getPolicyPack } from "../src/policyPacks/builtInPacks.js";
 import { PolicyPackRegistry } from "../src/watch/policyPacks.js";
+
+const mcpSecurityBenchCategories = getMCPAttackTaxonomy().map((entry) => entry.category);
 
 function baselineCapabilities(overrides: Partial<MCPCapabilityDeclaration> = {}): MCPCapabilityDeclaration {
   return {
@@ -41,6 +44,16 @@ function baselineCapabilities(overrides: Partial<MCPCapabilityDeclaration> = {})
     emitsReceiptsOnToolCall: true,
     supportsPolicyGates: true,
     hasAuditLog: true,
+    hasPrivateMcpRegistry: true,
+    usesCuratedMcpRegistry: true,
+    routesMcpThroughGateway: true,
+    verifiesMcpServerProvenance: true,
+    pinsMcpServerVersions: true,
+    scansMcpServerPackages: true,
+    mcpSecurityBenchAttackCategoriesCovered: mcpSecurityBenchCategories,
+    mcpSecurityBenchAttackSuccessRate: 0,
+    mcpSecurityBenchPerformanceUnderAttack: 1,
+    mcpSecurityBenchAttackInstanceCount: 120,
     ...overrides
   };
 }
@@ -52,6 +65,10 @@ describe("mcp compliance scoring", () => {
     expect(result.badge).toBe("MCP-Certified");
     expect(result.score).toBe(100);
     expect(result.safety.overall).toBe(100);
+    expect(result.safety.supplyChainGovernance.score).toBe(100);
+    expect(result.safety.securityResilience.score).toBeGreaterThanOrEqual(95);
+    expect(result.safety.securityResilience.attackTaxonomyCoverage).toBe(1);
+    expect(result.safety.securityResilience.netResilientPerformance.formula).toBe("PUA * (1 - ASR)");
     expect(result.failed).toHaveLength(0);
   });
 
@@ -141,6 +158,54 @@ describe("mcp compliance scoring", () => {
     expect(result.failed.includes("permission-scopes-declared")).toBe(true);
   });
 
+  test("penalizes weak MCP supply-chain governance", () => {
+    const result = scoreMcpCompliance(
+      baselineCapabilities({
+        hasSupplyChainGovernance: false,
+        hasPrivateMcpRegistry: false,
+        usesCuratedMcpRegistry: false,
+        routesMcpThroughGateway: false,
+        verifiesMcpServerProvenance: false,
+        usesSignedMcpServerMetadata: false,
+        pinsMcpServerVersions: false,
+        scansMcpServerPackages: false
+      })
+    );
+
+    expect(result.safety.supplyChainGovernance.score).toBe(0);
+    expect(result.failed).toEqual(
+      expect.arrayContaining([
+        "mcp-private-registry",
+        "mcp-gateway-layer",
+        "mcp-server-provenance",
+        "mcp-version-pinning",
+        "mcp-package-scanning"
+      ])
+    );
+    expect(result.warnings.some((item) => item.includes("MCP supply-chain governance is weak"))).toBe(true);
+    expect(result.recommendations.some((item) => item.includes("Private/Curated MCP Registry"))).toBe(true);
+  });
+
+  test("penalizes weak MCP Security Bench NRP and taxonomy coverage", () => {
+    const result = scoreMcpCompliance(
+      baselineCapabilities({
+        mcpSecurityBenchAttackCategoriesCovered: ["tool-poisoning"],
+        mcpSecurityBenchAttackSuccessRate: 0.75,
+        mcpSecurityBenchPerformanceUnderAttack: 0.6,
+        mcpSecurityBenchAttackInstanceCount: 8
+      })
+    );
+
+    expect(result.level).not.toBe("full");
+    expect(result.safety.securityResilience.attackTaxonomyCoverage).toBeCloseTo(1 / 12, 4);
+    expect(result.safety.securityResilience.netResilientPerformance.netResilientPerformance).toBe(0.15);
+    expect(result.safety.securityResilience.failedChecks).toEqual(
+      expect.arrayContaining(["mcp-security-bench-12-category-coverage", "mcp-net-resilient-performance"])
+    );
+    expect(result.warnings.some((item) => item.includes("MCP Security Bench coverage is incomplete"))).toBe(true);
+    expect(result.recommendations.some((item) => item.includes("Net Resilient Performance"))).toBe(true);
+  });
+
   test("returns minimal when only MCP core checks pass", () => {
     const result = scoreMcpCompliance(
       baselineCapabilities({
@@ -191,6 +256,9 @@ describe("mcp compliance scoring", () => {
     expect(guide.includes("Tool-call safety validation")).toBe(true);
     expect(guide.includes("MCP server trust verification")).toBe(true);
     expect(guide.includes("Tool permission scope enforcement")).toBe(true);
+    expect(guide.includes("MCP supply-chain governance")).toBe(true);
+    expect(guide.includes("MCP Security Bench resilience")).toBe(true);
+    expect(guide.includes("Net Resilient Performance")).toBe(true);
   });
 });
 

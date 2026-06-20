@@ -7,6 +7,7 @@
   "files": [
     "dist/**",
     "!dist/sea/**",
+    "!dist/installers/**",
     "scripts/postinstall.js",
     "README.md",
     "LICENSE"
@@ -20,6 +21,8 @@
   "scripts": {
     "build": "tsc -p tsconfig.json && chmod +x dist/cli.js && npm run copy-assets",
     "build:sea": "node scripts/build-sea.mjs",
+    "package:desktop": "node scripts/package-desktop-installers.mjs",
+    "package:desktop:verify": "node scripts/verify-desktop-installers.mjs",
     "copy-assets": "rm -rf dist/console/pages dist/console/assets dist/dashboard/templates && mkdir -p dist/console dist/dashboard && cp -r src/console/pages dist/console/pages && cp -r src/console/assets dist/console/assets && cp -r src/dashboard/templates dist/dashboard/templates",
     "dev": "tsx src/cli.ts",
     "api:start": "tsx api/index.ts",
@@ -27,6 +30,7 @@
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run",
     "test:e2e": "npx playwright test --config tests/e2e/playwright.config.ts",
+    "accessibility:release-evidence": "node scripts/write-accessibility-release-evidence.mjs --report tmp/accessibility-playwright.json --out docs/runbooks/accessibility-release-evidence-latest.md",
     "test:watch": "vitest",
     "changeset": "changeset",
     "version-packages": "changeset version",
@@ -85,6 +89,10 @@
     ".": {
       "import": "./dist/index.js",
       "types": "./dist/index.d.ts"
+    },
+    "./sdk/mobile-fetch": {
+      "import": "./dist/sdk/mobileFetch.js",
+      "types": "./dist/sdk/mobileFetch.d.ts"
     }
   },
   "dependencies": {

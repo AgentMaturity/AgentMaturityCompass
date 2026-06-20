@@ -3,8 +3,9 @@ import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { readdirSync } from "node:fs";
 import type { DiagnosticReport } from "../types.js";
-import { getAgentPaths, resolveAgentId } from "../fleet/paths.js";
+import { fleetRoot, getAgentPaths, resolveAgentId } from "../fleet/paths.js";
 import { listAgents } from "../fleet/registry.js";
+import { listDelegationEdges, type DelegationEdge } from "../fleet/trustComposition.js";
 import { loadTargetProfile } from "../targets/targetProfile.js";
 import { latestAssuranceByPack } from "../assurance/assuranceRunner.js";
 import { computeFailureRiskIndices } from "../assurance/indices.js";
@@ -257,6 +258,47 @@ function getGuardrailsList(): Array<{
   }));
 }
 
+function trustGraphReviewActions(edges: DelegationEdge[]): string[] {
+  if (edges.length === 0) {
+    return ["Add delegation edges with: amc fleet trust-add-edge --from <orchestrator> --to <worker> --purpose <purpose>."];
+  }
+  const actions: string[] = [];
+  if (edges.some((edge) => edge.inheritanceMode === "weighted" && edge.weight < 0.7)) {
+    actions.push("Review weighted delegation edges below 0.70 before production use.");
+  }
+  if (edges.some((edge) => edge.riskTier === "high" || edge.riskTier === "critical")) {
+    actions.push("Require signed handoff evidence for high-risk delegation edges.");
+  }
+  actions.push("Export architecture evidence with: amc fleet trust-graph --format mermaid --out trust-graph.mmd.");
+  return actions;
+}
+
+function dashboardTrustGraph(workspace: string): {
+  edgeCount: number;
+  nodes: string[];
+  edges: Array<Pick<DelegationEdge, "id" | "fromAgentId" | "toAgentId" | "purpose" | "riskTier" | "inheritanceMode" | "weight" | "handoffId">>;
+  reviewActions: string[];
+} {
+  const configPath = join(fleetRoot(workspace), "trust-composition.yaml");
+  const edges = pathExists(configPath) ? listDelegationEdges(workspace) : [];
+  const nodes = [...new Set(edges.flatMap((edge) => [edge.fromAgentId, edge.toAgentId]))].sort((a, b) => a.localeCompare(b));
+  return {
+    edgeCount: edges.length,
+    nodes,
+    edges: edges.map((edge) => ({
+      id: edge.id,
+      fromAgentId: edge.fromAgentId,
+      toAgentId: edge.toAgentId,
+      purpose: edge.purpose,
+      riskTier: edge.riskTier,
+      inheritanceMode: edge.inheritanceMode,
+      weight: edge.weight,
+      handoffId: edge.handoffId
+    })),
+    reviewActions: trustGraphReviewActions(edges)
+  };
+}
+
 export function buildDashboard(input: DashboardBuildInput): DashboardBuildResult {
   const agentId = resolveAgentId(input.workspace, input.agentId);
   const paths = getAgentPaths(input.workspace, agentId);
@@ -306,6 +348,7 @@ export function buildDashboard(input: DashboardBuildInput): DashboardBuildResult
     domains: getDomainSummaries(),
     industryPacks: getPackSummaries(input.workspace),
     guardrails: getGuardrailsList(),
+    trustGraph: dashboardTrustGraph(input.workspace),
     approvalsSummary: {
       requested: 0,
       approved: 0,

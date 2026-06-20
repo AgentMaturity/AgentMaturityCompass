@@ -18,8 +18,9 @@
 2. `docs/QUICKSTART.md`
 3. `docs/CI_TEMPLATES.md`
 4. `docs/DEPLOYMENT_OPTIONS.md`
-5. `docs/PRODUCT_EDITIONS.md`
-6. `docs/EXAMPLES_INDEX.md`
+5. `docs/CLOUD_REFERENCE_ARCHITECTURES.md`
+6. `docs/PRODUCT_EDITIONS.md`
+7. `docs/EXAMPLES_INDEX.md`
 
 ## Recommended product focus
 - **Score**
