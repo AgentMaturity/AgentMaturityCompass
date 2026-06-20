@@ -135,6 +135,160 @@ describe("buildMetricValidationReport", () => {
     expect(report.ciGate.passed).toBe(true);
   });
 
+  test("maps GBQA agent-QA source relevance to existing metric-validity receipts without source-specific product bloat", () => {
+    const questionScores = [
+      score("AMC-1.1"),
+      score("AMC-1.2"),
+      score("AMC-1.3"),
+      score("AMC-1.4"),
+      score("AMC-1.5"),
+      score("AMC-1.6")
+    ];
+    const gbqaEvidenceIds = [
+      "gbqa-source-repository-license",
+      "gbqa-default-branch-snapshot",
+      "gbqa-agent-harness-manifest",
+      "gbqa-task-corpus-manifest",
+      "gbqa-quality-reward-criteria",
+      "gbqa-test-oracle-suite",
+      "gbqa-report-schema",
+      "gbqa-ci-regression-receipt",
+      "gbqa-metric-owner-ci"
+    ];
+    const signedEvidenceRefs = [
+      ...questionScores.map((row, index) => ({
+        evidenceId: row.evidenceEventIds[0]!,
+        eventHash: `${index}`.repeat(64).slice(0, 64),
+        writerSig: `writer-sig-${index}`,
+        eventType: "audit" as const,
+        sessionId: `session-${index}`,
+        ts: Date.UTC(2026, 5, 20),
+        trustTier: "OBSERVED" as const
+      })),
+      ...gbqaEvidenceIds.map((evidenceId, index) => ({
+        evidenceId,
+        eventHash: `g${index}`.repeat(64).slice(0, 64),
+        writerSig: `gbqa-writer-sig-${index}`,
+        eventType: "metric" as const,
+        sessionId: `gbqa-session-${index}`,
+        ts: Date.UTC(2026, 5, 20),
+        trustTier: "OBSERVED_HARDENED" as const
+      }))
+    ];
+
+    const report = buildMetricValidationReport(
+      {
+        agentId: "gbqa-agent-qa-benchmark",
+        runId: "run-gbqa-relevance-review",
+        ts: Date.UTC(2026, 5, 20),
+        trustLabel: "HIGH TRUST",
+        integrityIndex: 1,
+        evidenceCoverage: 1,
+        correlationRatio: 1,
+        unsupportedClaimCount: 0,
+        layerScores: [{ layerName, avgFinalLevel: 3, confidenceWeightedFinalLevel: 3 }],
+        questionScores,
+        confidenceSummary: {
+          lowConfidenceFindings: 0,
+          highUncertaintyFindings: 0,
+          downgradedFindings: 0,
+          autoFixBlockedRecommendations: 0,
+          averageEvidenceSufficiency: 1,
+          averageJudgeAgreement: 0.91
+        },
+        questions: questionScores.map((row) => ({ id: row.questionId, layerName })),
+        signedEvidenceRefs,
+        validationFacetChecks: [
+          "source-repository-license",
+          "default-branch-snapshot",
+          "agent-harness-manifest",
+          "quality-reward-criteria",
+          "report-schema"
+        ].map((facetId, index) => ({
+          facetId: `gbqa-${facetId}`,
+          covered: true,
+          evidenceRefs: [gbqaEvidenceIds[index]!]
+        })),
+        processEvidenceChecks: [
+          ["task-corpus-manifest", "gbqa-task-corpus-manifest"],
+          ["quality-reward-criteria", "gbqa-quality-reward-criteria"],
+          ["test-oracle-suite", "gbqa-test-oracle-suite"],
+          ["report-schema", "gbqa-report-schema"],
+          ["ci-regression-receipt", "gbqa-ci-regression-receipt"],
+          ["metric-owner", "gbqa-metric-owner-ci"]
+        ].map(([processEvidenceId, evidenceId]) => ({
+          processEvidenceId: `gbqa-${processEvidenceId}`,
+          covered: true,
+          evidenceRefs: [evidenceId]
+        })),
+        outcomeAlignmentChecks: [
+          {
+            outcomeId: "gbqa-industrial-agent-quality-assurance",
+            aligned: true,
+            evidenceRefs: ["gbqa-quality-reward-criteria", "gbqa-report-schema"]
+          }
+        ],
+        toolSandboxChecks: [
+          "gbqa-isolated-agent-environment",
+          "gbqa-computer-use-backend",
+          "gbqa-test-oracle-runner",
+          "gbqa-report-export"
+        ].map((sandboxSignalId, index) => ({
+          sandboxSignalId,
+          covered: true,
+          evidenceRefs: [gbqaEvidenceIds[index + 2]!]
+        })),
+        sourceRefs: ["https://github.com/camel-ai/GBQA"],
+        gateMode: "ci"
+      },
+      [
+        prior("run-gbqa-baseline", Date.UTC(2026, 5, 13), 3),
+        prior("run-gbqa-repeat", Date.UTC(2026, 5, 19), 3.01)
+      ]
+    );
+
+    expect(report.failClosed).toBe(false);
+    expect(report.evalPack.replayable).toBe(true);
+    expect(report.evalPack.sourceRefs).toContain("https://github.com/camel-ai/GBQA");
+    expect(report.rows[0]).toMatchObject({
+      metricId: "overall_maturity_score",
+      validationFacetCoverage: 1,
+      processEvidenceCoverage: 1,
+      outcomeAlignment: 1,
+      toolSandboxCoverage: 1,
+      status: "pass"
+    });
+    expect(report.rows[0]?.evidenceRefs).toEqual(expect.arrayContaining(gbqaEvidenceIds));
+    expect(report.evalPack.rows[0]?.signedEvidenceRefs.map((ref) => ref.evidenceId)).toEqual(expect.arrayContaining(gbqaEvidenceIds));
+    expect(report.evalPack.rows[0]?.rowHash).toMatch(/^[a-f0-9]{64}$/);
+    expect(report.ciGate.passed).toBe(true);
+  });
+
+  test("fails closed when a GBQA-style source row is only repository metadata without signed validation evidence", () => {
+    const report = buildMetricValidationReport({
+      agentId: "gbqa-agent-qa-benchmark",
+      runId: "run-gbqa-metadata-only",
+      ts: Date.UTC(2026, 5, 20),
+      trustLabel: "LOW TRUST",
+      integrityIndex: 0.35,
+      evidenceCoverage: 0.2,
+      correlationRatio: 0.2,
+      unsupportedClaimCount: 1,
+      layerScores: [{ layerName, avgFinalLevel: 1, confidenceWeightedFinalLevel: 1 }],
+      questionScores: [{ ...score("AMC-1.1", 1, 0.15), evidenceEventIds: [], flags: ["FLAG_UNSUPPORTED_CLAIM"] }],
+      questions: [{ id: "AMC-1.1", layerName }],
+      sourceRefs: ["https://github.com/camel-ai/GBQA"],
+      gateMode: "ci"
+    });
+
+    expect(report.failClosed).toBe(true);
+    expect(report.evalPack.replayable).toBe(false);
+    expect(report.ciGate.failClosed).toBe(true);
+    expect(report.ciGate.failedMetricIds).toContain("overall_maturity_score");
+    expect(report.rows[0]?.warnings.join(" ")).toContain("sample size");
+    expect(report.rows[0]?.warnings.join(" ")).toContain("construct validity");
+  });
+
   test("fails closed when metric evidence is under-sampled or low-validity", () => {
     const report = buildMetricValidationReport({
       agentId: "agent-a",
