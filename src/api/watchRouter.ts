@@ -11,6 +11,7 @@ import type { BuildJudgeCalibrationReceiptInput } from '../eval/judgeCalibration
 import type { RunHumanloopProviderDriftInput } from '../benchmarks/humanloopProviderDrift.js';
 import type { RunPromptLayerProviderDriftInput } from '../benchmarks/promptLayerProviderDrift.js';
 import type { RunPromptfooProviderDriftInput } from '../benchmarks/promptfooProviderDrift.js';
+import type { RunPatronusProviderDriftInput } from '../benchmarks/patronusProviderDrift.js';
 
 export async function handleWatchRoute(
   pathname: string,
@@ -254,6 +255,35 @@ export async function handleWatchRoute(
       });
     } catch (err) {
       apiError(res, 500, err instanceof Error ? err.message : 'promptfoo provider drift watch projection failed');
+    }
+    return true;
+  }
+
+  // POST /api/v1/watch/patronus-provider-drift — project Patronus-style provider/version canary drift into Watch alerts
+  if (pathname === '/api/v1/watch/patronus-provider-drift' && method === 'POST') {
+    try {
+      const body = await bodyJson<RunPatronusProviderDriftInput>(req);
+      if (!Array.isArray(body.baseline) || !Array.isArray(body.candidate) || !body.patronus) {
+        apiError(res, 400, 'Required: baseline[], candidate[], and patronus metadata');
+        return true;
+      }
+      const { runPatronusProviderDrift } = await import('../watch/patronusProviderDrift.js');
+      const result = runPatronusProviderDrift({
+        ...body,
+        agentId: body.agentId ?? 'default',
+      });
+      apiSuccess(res, {
+        report: result.report,
+        patronusEvidenceHash: result.patronusEvidenceHash,
+        score: result.score,
+        shield: result.shield,
+        watch: result.watch,
+        watchAlerts: result.watchAlerts,
+        failClosed: result.report.failClosed,
+        sourceRefs: result.sourceRefs,
+      });
+    } catch (err) {
+      apiError(res, 500, err instanceof Error ? err.message : 'Patronus provider drift watch projection failed');
     }
     return true;
   }

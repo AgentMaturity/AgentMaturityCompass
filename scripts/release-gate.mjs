@@ -109,6 +109,10 @@ steps.push(runStep("typecheck", "npm", ["run", "typecheck"], {
   timeoutMs: 180_000,
   remediation: "Fix TypeScript errors."
 }));
+steps.push(runStep("gap-0626-adversarial-regression", "npx", ["vitest", "run", "tests/gap0626AdversarialRegression.test.ts"], {
+  timeoutMs: 180_000,
+  remediation: "Fix GAP-0626 synthetic adversarial regression fixture, expected DENIED decision, or Score/Shield/Watch rerun output."
+}));
 if (quick) {
   steps.push(skippedStep("full-test-suite", "Quick mode skips npm test; CI must run the full suite before release."));
 } else {

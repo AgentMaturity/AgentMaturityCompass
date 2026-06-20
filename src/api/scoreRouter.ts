@@ -18,6 +18,7 @@ import type { RunLiveScoreBehaviorDriftInput } from '../watch/liveDriftAlerts.js
 import type { BuildJudgeCalibrationReceiptInput } from '../eval/judgeCalibration.js';
 import type { RunPromptLayerProviderDriftInput } from '../benchmarks/promptLayerProviderDrift.js';
 import type { RunPromptfooProviderDriftInput } from '../benchmarks/promptfooProviderDrift.js';
+import type { RunPatronusProviderDriftInput } from '../benchmarks/patronusProviderDrift.js';
 
 const nonEmptyStringSchema = z.string().trim().min(1);
 const optionalNonEmptyStringSchema = nonEmptyStringSchema.optional();
@@ -212,6 +213,34 @@ export async function handleScoreRoute(
       });
     } catch (err) {
       scoreRouteError(res, err, 'promptfoo provider drift scoring failed');
+    }
+    return true;
+  }
+
+  // POST /api/v1/score/patronus-provider-drift — score-facing Patronus-style provider/version canary drift report
+  if (pathname === '/api/v1/score/patronus-provider-drift' && method === 'POST') {
+    try {
+      const body = await bodyJson<RunPatronusProviderDriftInput>(req);
+      if (!Array.isArray(body.baseline) || !Array.isArray(body.candidate) || !body.patronus) {
+        apiError(res, 400, 'Required: baseline[], candidate[], and patronus metadata');
+        return true;
+      }
+      const { runPatronusProviderDrift } = await import('../benchmarks/patronusProviderDrift.js');
+      const result = runPatronusProviderDrift({
+        ...body,
+        agentId: body.agentId ?? 'default',
+      });
+      apiSuccess(res, {
+        report: result.report,
+        providerVersions: result.score.providerVersions,
+        canaryResults: result.score.canaryResults,
+        driftStatistics: result.score.driftStatistics,
+        patronusEvidenceHash: result.patronusEvidenceHash,
+        failClosed: result.report.failClosed,
+        sourceRefs: result.sourceRefs,
+      });
+    } catch (err) {
+      scoreRouteError(res, err, 'Patronus provider drift scoring failed');
     }
     return true;
   }

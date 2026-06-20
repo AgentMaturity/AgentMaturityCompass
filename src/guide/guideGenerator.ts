@@ -342,13 +342,19 @@ function evidenceNeededForGap(q: DiagnosticQuestion, targetLevel: number, baseEv
     /verify|validation|benchmark|outcome|task|correctness/i.test(`${q.title} ${q.promptTemplate} ${q.evidenceGateHints}`);
   if (benchmarkRelevant) {
     evidence.push("Benchmark-submission receipt with signed task breakdown, criterion-level scores, status indicators, leaderboard metric views, accepted evidence IDs, rejected-evidence reasons, repair hint, and replay hashes.");
-    evidence.push("Eval-score explainability pack bound to the question ID for Score/Shield/Watch with accepted evidence IDs, rejected-evidence reasons, repair hint, reproducible eval pack, signed evidence rows, fail-closed thresholds, metadata-only source-review proof (DOI/OpenAlex when citing literature), and source-boundary/no-parity proof. W&B/Weave exports may be used as source evidence only after import into AMC question-score explainability receipts; source metadata, screenshots, copied marketing text, or copied paper prose alone are insufficient.");
+    evidence.push("Eval-score explainability pack bound to the question ID for Score/Shield/Watch with accepted evidence IDs, rejected-evidence reasons, repair hint, reproducible eval pack, signed evidence rows, fail-closed thresholds, metadata-only source-review proof (DOI/OpenAlex when citing literature), accepted/rejected evidence ledger hashes, and source-boundary/no-parity proof. W&B/Weave exports and open-source eval-library metadata (including UpTrain repository metadata) may be used as source evidence only after import into AMC question-score explainability receipts; source metadata, screenshots, copied marketing text, copied repository code/config, or copied paper prose alone are insufficient.");
   }
   const opikStyleRelevant =
     targetLevel >= 4 &&
     /observability|trace|tracing|evaluation|eval|metric|score|dashboard|monitor/i.test(`${q.title} ${q.promptTemplate} ${q.evidenceGateHints}`);
   if (opikStyleRelevant) {
     evidence.push("Opik-style eval observability metadata can only be a relevance signal: attach AMC-owned question score proof with live relevance-check hash, question trace, evaluator config, metric result, score breakdown, accepted/rejected evidence ledgers, repair-hint hash, signed evidence rows, fail-closed threshold policy, and no-copy/no-parity attestation.");
+  }
+  const deepEvalStyleRelevant =
+    targetLevel >= 4 &&
+    /evaluation|eval|metric|score|test|testing|dataset|benchmark|red.?team|guardrail|observability|trace/i.test(`${q.title} ${q.promptTemplate} ${q.evidenceGateHints}`);
+  if (deepEvalStyleRelevant) {
+    evidence.push("Confident AI/DeepEval-style source metadata can only be a relevance signal: attach AMC-owned question-score proof with question ID, accepted evidence IDs, rejected-evidence reasons, repair hint, reproducible eval pack, signed evidence rows, fail-closed thresholds, and no-SDK/importer/no-parity/no-copy boundary proof.");
   }
   const multiUserRelevant =
     targetLevel >= 4 &&

@@ -4,6 +4,8 @@ import { join } from "node:path";
 import { afterEach, describe, expect, test } from "vitest";
 import { getQuestionSet } from "../src/diagnostic/questionSets.js";
 import { buildEvalScoreExplainabilityPack, buildQuestionExplainabilityReport } from "../src/diagnostic/questionScoreExplainability.js";
+import { generateGuide, guideToHumanMarkdown } from "../src/guide/guideGenerator.js";
+import { passportJsonSchema } from "../src/passport/passportSchema.js";
 import { generateReport, runDiagnostic } from "../src/diagnostic/runner.js";
 import { openLedger } from "../src/ledger/ledger.js";
 import type { DiagnosticQuestion, QuestionScore } from "../src/types.js";
@@ -2299,6 +2301,7 @@ describe("question score explainability receipts", () => {
               evaluatorConfigHash: "5".repeat(64),
               metricResultHash: "6".repeat(64),
               scoreBreakdownHash: "7".repeat(64),
+              acceptedEvidenceLedgerHash: "c".repeat(64),
               rejectedEvidenceLedgerHash: "8".repeat(64),
               repairHintHash: "9".repeat(64),
               regressionThresholdHash: "0".repeat(64),
@@ -2751,6 +2754,7 @@ describe("question score explainability receipts", () => {
               evaluatorConfigHash: "3".repeat(64),
               metricResultHash: "4".repeat(64),
               scoreBreakdownHash: "5".repeat(64),
+              acceptedEvidenceLedgerHash: "a".repeat(64),
               rejectedEvidenceLedgerHash: "6".repeat(64),
               repairHintHash: "7".repeat(64),
               regressionThresholdHash: "8".repeat(64),
@@ -6477,6 +6481,196 @@ describe("question score explainability receipts", () => {
     });
   });
 
+  test("GAP-0625 binds Confident AI DeepEval-style metadata to AMC-owned question score proof", () => {
+    const report = buildQuestionExplainabilityReport({
+      agentId: "deepeval-style-agent",
+      runId: "run-gap-0625-deepeval-score-explainability",
+      generatedAt: "2026-06-20T00:00:00.000Z",
+      sourceRefs: ["https://www.confident-ai.com", "amc:no-deepeval-sdk-importer-or-parity-claim", "amc:no-website-prose-or-ui-copied"],
+      rows: [
+        {
+          question: question("AMC-1.1"),
+          score: score({
+            flags: [],
+            claimedLevel: 4,
+            supportedMaxLevel: 4,
+            finalLevel: 4,
+            evidenceEventIds: ["ev-gap-0625-eval-pack", "ev-gap-0625-signed-rows", "ev-gap-0625-ci"],
+            narrative: "AMC-1.1: DeepEval-style source review is bounded to AMC-owned question score explainability evidence.",
+          }),
+          acceptedEvidence: [
+            { id: "ev-gap-0625-eval-pack", event_hash: "a".repeat(64), writer_sig: "sig-gap-0625-eval-pack", event_type: "artifact", session_id: "session-gap-0625-eval", ts: 10, trustTier: "OBSERVED" },
+            { id: "ev-gap-0625-signed-rows", event_hash: "b".repeat(64), writer_sig: "sig-gap-0625-signed-rows", event_type: "metric", session_id: "session-gap-0625-eval", ts: 11, trustTier: "OBSERVED_HARDENED" },
+            { id: "ev-gap-0625-ci", event_hash: "c".repeat(64), writer_sig: "sig-gap-0625-ci", event_type: "test", session_id: "session-gap-0625-ci", ts: 12, trustTier: "OBSERVED_HARDENED" },
+          ],
+          rejectedEvidence: [
+            {
+              event: { id: "ev-gap-0625-website-metadata-only", event_hash: "d".repeat(64), writer_sig: "sig-gap-0625-website-metadata-only", event_type: "review", session_id: "session-gap-0625-source-review", ts: 13, trustTier: "ATTESTED" },
+              reason: "Confident AI website metadata confirms relevance but lacks AMC question ID binding, accepted evidence IDs, rejected evidence reasons, repair hint, reproducible eval pack, signed evidence rows, and fail-closed thresholds",
+            },
+          ],
+          criteriaDiagnostics: [
+            {
+              criterionId: "gap-0625-deepeval-score-explainability-proof",
+              criterionType: "objective_quality",
+              status: "satisfied",
+              evidenceRefs: ["ev-gap-0625-eval-pack", "ev-gap-0625-signed-rows", "ev-gap-0625-ci"],
+              rejectedEvidenceRefs: ["ev-gap-0625-website-metadata-only"],
+              judgeRef: "judge://amc/gap-0625-deepeval-score-explainability",
+              repairHint: "Keep question ID, accepted evidence IDs, rejected evidence reasons, repair hint, signed rows, thresholds, and no-DeepEval-SDK/importer/parity proof linked.",
+            },
+          ],
+          deepEvalQuestionLens: [
+            {
+              lensId: "gap-0625-deepeval-style-question-proof",
+              sourceRef: "https://www.confident-ai.com",
+              productUrl: "https://www.confident-ai.com",
+              liveSourceMetadataHash: "318c59f3bcf05f7e937ddd5777b9681d2e9ee45be0987a331617307a4d7467c3",
+              evalPackManifestHash: "e".repeat(64),
+              datasetManifestHash: "f".repeat(64),
+              testCaseManifestHash: "0".repeat(64),
+              questionSetHash: "1".repeat(64),
+              questionIdRef: "AMC-1.1",
+              questionTraceHash: "2".repeat(64),
+              evaluatorConfigHash: "3".repeat(64),
+              metricResultHash: "4".repeat(64),
+              scoreBreakdownHash: "5".repeat(64),
+              acceptedEvidenceLedgerHash: "6".repeat(64),
+              rejectedEvidenceLedgerHash: "7".repeat(64),
+              repairHintHash: "8".repeat(64),
+              thresholdPolicyHash: "9".repeat(64),
+              signedEvidenceRowsHash: "a".repeat(64),
+              ciRunId: "vitest:gap-0625-deepeval-score-explainability",
+              ciConfigHash: "b".repeat(64),
+              noDeepEvalSubsystemHash: "c".repeat(64),
+              noSdkImporterHash: "d".repeat(64),
+              noParityClaimHash: "e".repeat(64),
+              noSourceCopyBoundaryHash: "f".repeat(64),
+              metricFamily: "llm_evaluation",
+              metricIds: ["question_score_breakdown", "accepted_evidence_coverage", "repair_hint_coverage"],
+              testCaseCount: 12,
+              minTestCaseCount: 10,
+              questionCount: 3,
+              minQuestionCount: 3,
+              evidenceCoverage0to1: 1,
+              minEvidenceCoverage0to1: 0.95,
+              rejectedEvidenceReasonCoverage0to1: 1,
+              minRejectedEvidenceReasonCoverage0to1: 0.9,
+              repairHintCoverage0to1: 1,
+              minRepairHintCoverage0to1: 0.9,
+              thresholdPassRate0to1: 1,
+              minThresholdPassRate0to1: 0.99,
+              scoreConfidence0to1: 0.91,
+              minScoreConfidence0to1: 0.8,
+              status: "satisfied",
+              evidenceRefs: ["ev-gap-0625-eval-pack", "ev-gap-0625-signed-rows", "ev-gap-0625-ci"],
+              rejectedEvidenceRefs: ["ev-gap-0625-website-metadata-only"],
+              repairHint: "Preserve question ID, accepted evidence IDs, rejected reasons, repair hint, signed evidence rows, fail-closed thresholds, and no-SDK/importer/parity/no-copy proof before using this score.",
+            },
+          ],
+          missingGateReasons: [],
+        },
+      ],
+    });
+
+    const pack = buildEvalScoreExplainabilityPack(report);
+    expect(report.replayable).toBe(true);
+    expect(report.failClosed).toBe(false);
+    expect(report.rows[0]).toMatchObject({
+      questionId: "AMC-1.1",
+      acceptedEvidenceIds: ["ev-gap-0625-eval-pack", "ev-gap-0625-signed-rows", "ev-gap-0625-ci"],
+      rejectedEvidence: [
+        expect.objectContaining({
+          evidenceId: "ev-gap-0625-website-metadata-only",
+          reason: expect.stringContaining("website metadata confirms relevance"),
+        }),
+      ],
+      deepEvalQuestionLens: [
+        expect.objectContaining({
+          lensId: "gap-0625-deepeval-style-question-proof",
+          sourceRef: "https://www.confident-ai.com",
+          questionIdRef: "AMC-1.1",
+          metricFamily: "llm_evaluation",
+          rowHash: expect.stringMatching(/^[a-f0-9]{64}$/),
+        }),
+      ],
+    });
+    expect(pack.rows[0]).toMatchObject({
+      questionId: "AMC-1.1",
+      acceptedEvidenceIds: ["ev-gap-0625-eval-pack", "ev-gap-0625-signed-rows", "ev-gap-0625-ci"],
+      rejectedEvidenceReasons: [
+        {
+          evidenceId: "ev-gap-0625-website-metadata-only",
+          reason: expect.stringContaining("accepted evidence IDs"),
+        },
+      ],
+      repairHint: expect.stringContaining("Target L5"),
+      status: "ready",
+    });
+    expect(pack.rows[0]?.reproducibleEvalPacks).toEqual([
+      expect.objectContaining({ kind: "deepeval_question", sourceRef: "https://www.confident-ai.com" }),
+    ]);
+  });
+
+  test("GAP-0625 fails closed when Confident AI metadata is presented without AMC-owned score evidence", () => {
+    const metadataOnly = buildQuestionExplainabilityReport({
+      agentId: "deepeval-style-agent",
+      runId: "run-gap-0625-metadata-only",
+      generatedAt: "2026-06-20T00:00:00.000Z",
+      sourceRefs: ["https://www.confident-ai.com"],
+      rows: [
+        {
+          question: question("AMC-1.1"),
+          score: score({ flags: [], claimedLevel: 4, supportedMaxLevel: 4, finalLevel: 4, evidenceEventIds: ["ev-gap-0625-source-metadata"] }),
+          acceptedEvidence: [
+            { id: "ev-gap-0625-source-metadata", event_hash: "a".repeat(64), writer_sig: "sig-gap-0625-source-metadata", event_type: "artifact", session_id: "session-gap-0625-source", ts: 20, trustTier: "OBSERVED" },
+          ],
+          rejectedEvidence: [
+            {
+              event: { id: "ev-gap-0625-missing-row-proof", event_hash: "b".repeat(64), writer_sig: "sig-gap-0625-missing-row-proof", event_type: "review", session_id: "session-gap-0625-review", ts: 21, trustTier: "ATTESTED" },
+              reason: "metadata-only source review lacked question score row proof, accepted evidence ids, rejected evidence reasons, repair hint hash, signed evidence rows, and threshold policy",
+            },
+          ],
+          deepEvalQuestionLens: [
+            {
+              lensId: "gap-0625-deepeval-style-question-proof",
+              sourceRef: "https://www.confident-ai.com",
+              liveSourceMetadataHash: "318c59f3bcf05f7e937ddd5777b9681d2e9ee45be0987a331617307a4d7467c3",
+              questionIdRef: "AMC-1.1",
+              metricFamily: "llm_evaluation",
+              metricIds: ["metadata_relevance"],
+              testCaseCount: 1,
+              minTestCaseCount: 10,
+              questionCount: 1,
+              minQuestionCount: 3,
+              evidenceCoverage0to1: 0.1,
+              minEvidenceCoverage0to1: 0.95,
+              status: "satisfied",
+              evidenceRefs: ["ev-gap-0625-source-metadata"],
+              rejectedEvidenceRefs: ["ev-gap-0625-missing-row-proof"],
+              repairHint: "Replace metadata-only relevance with AMC-owned question score rows, signed evidence, rejected reasons, repair hints, and thresholds.",
+            },
+          ],
+          missingGateReasons: [],
+        },
+      ],
+    });
+
+    expect(metadataOnly.replayable).toBe(false);
+    expect(metadataOnly.failClosed).toBe(true);
+    expect(metadataOnly.rows[0]?.deepEvalQuestionLens[0]).toMatchObject({
+      evalPackManifestHash: null,
+      signedEvidenceRowsHash: null,
+      thresholdPolicyHash: null,
+      noDeepEvalSubsystemHash: null,
+      noSdkImporterHash: null,
+      noParityClaimHash: null,
+      noSourceCopyBoundaryHash: null,
+      repairHint: expect.stringContaining("metadata-only"),
+    });
+    expect(buildEvalScoreExplainabilityPack(metadataOnly).rows[0]).toMatchObject({ status: "fail_closed" });
+  });
+
   test("binds Opik-style eval score explainability without allowing metadata-only evidence", () => {
     const report = buildQuestionExplainabilityReport({
       agentId: "opik-eval-agent",
@@ -6623,6 +6817,218 @@ describe("question score explainability receipts", () => {
       traceCount: 1,
       minTraceCount: 20,
       repairHint: expect.stringContaining("Metadata-only"),
+    });
+  });
+
+  test("binds UpTrain repository metadata to existing eval score explainability primitives", () => {
+    const uptrainRepo = "https://github.com/uptrain-ai/uptrain";
+    const report = buildQuestionExplainabilityReport({
+      agentId: "uptrain-eval-agent",
+      runId: "run-gap-0628-uptrain-eval-score-explainability",
+      generatedAt: "2026-06-21T00:00:00.000Z",
+      sourceRefs: [uptrainRepo],
+      rows: [
+        {
+          question: question("AMC-1.3"),
+          score: score({
+            questionId: "AMC-1.3",
+            flags: [],
+            claimedLevel: 4,
+            supportedMaxLevel: 4,
+            finalLevel: 4,
+            evidenceEventIds: ["ev-uptrain-eval-pack", "ev-uptrain-signed-ledgers"],
+          }),
+          acceptedEvidence: [
+            { id: "ev-uptrain-eval-pack", event_hash: "a".repeat(64), writer_sig: "sig-uptrain-eval-pack", event_type: "artifact", session_id: "session-uptrain-eval", ts: 50, trustTier: "OBSERVED_HARDENED" },
+            { id: "ev-uptrain-signed-ledgers", event_hash: "b".repeat(64), writer_sig: "sig-uptrain-signed-ledgers", event_type: "metric", session_id: "session-uptrain-eval", ts: 51, trustTier: "OBSERVED_HARDENED" },
+          ],
+          rejectedEvidence: [
+            {
+              event: { id: "ev-uptrain-repo-metadata-only", event_hash: "c".repeat(64), writer_sig: "sig-uptrain-repo-metadata-only", event_type: "review", session_id: "session-uptrain-review", ts: 52, trustTier: "ATTESTED" },
+              reason: "UpTrain repository metadata is source context only; it lacks AMC question ID, accepted evidence IDs, rejected evidence reasons, repair hint, signed evidence rows, and fail-closed thresholds.",
+            },
+          ],
+          criteriaDiagnostics: [
+            {
+              criterionId: "gap-0628-uptrain-eval-score-explainability",
+              criterionType: "agent_judge",
+              status: "satisfied",
+              evidenceRefs: ["ev-uptrain-eval-pack", "ev-uptrain-signed-ledgers"],
+              rejectedEvidenceRefs: ["ev-uptrain-repo-metadata-only"],
+              judgeRef: "judge://amc/gap-0628-uptrain-eval-score-explainability",
+              repairHint: "Keep the AMC-owned question ID, accepted evidence IDs, rejected evidence reasons, repair hint, signed rows, thresholds, and source-boundary proof together.",
+            },
+          ],
+          evalAiLibraryQuestionLens: [
+            {
+              frameworkId: "uptrain-eval-score-explainability",
+              sourceRef: uptrainRepo,
+              repositoryRef: "github:uptrain-ai/uptrain",
+              licenseRef: "Apache License 2.0",
+              licenseSpdxId: "Apache-2.0",
+              defaultBranch: "main",
+              sourceCommitSha: "a31cc14eddcb6c0b0b12cbed15f086d98c441c6f",
+              sourceTreeSha: "8816d2eeb9118f7c3852a1d9e0b133b8d1fff942",
+              sourceStatusHash: "d".repeat(64),
+              readmeArtifactHash: "096802282e606371b9aa359ca67a48fe9a7a64e0",
+              licenseArtifactHash: "261eeb9e9f8b2b4b0d119366dda99c6fd7d35c64",
+              noticeArtifactHash: "e".repeat(64),
+              pyprojectArtifactHash: "66f2e210d7c9a5d62172693e79d30ffd7e4ce03c",
+              requirementsArtifactHash: "f".repeat(64),
+              evalLibTreeHash: "00c5ebc9a46d4f2a9071d6b0e980aabf0905ca8b",
+              metricsTreeHash: "0".repeat(64),
+              agentMetricsTreeHash: "1".repeat(64),
+              securityMetricsTreeHash: "2".repeat(64),
+              tracingTreeHash: "3".repeat(64),
+              dashboardArtifactHash: "4".repeat(64),
+              evaluationSchemaHash: "5".repeat(64),
+              testcasesSchemaHash: "6".repeat(64),
+              metricPatternHash: "7".repeat(64),
+              llmClientHash: "8".repeat(64),
+              evalPackManifestHash: "9".repeat(64),
+              datasetManifestHash: "a".repeat(64),
+              questionSetHash: "b".repeat(64),
+              questionTraceHash: "c".repeat(64),
+              evaluatorConfigHash: "d".repeat(64),
+              metricResultHash: "e".repeat(64),
+              scoreBreakdownHash: "f".repeat(64),
+              acceptedEvidenceLedgerHash: "0".repeat(64),
+              rejectedEvidenceLedgerHash: "1".repeat(64),
+              repairHintHash: "2".repeat(64),
+              regressionThresholdHash: "3".repeat(64),
+              ciRunId: "ci:gap-0628-uptrain-eval-score-explainability:001",
+              ciConfigHash: "4".repeat(64),
+              noSourceCopyBoundaryHash: "5".repeat(64),
+              metricFamily: "mixed",
+              metricIds: ["question_score_breakdown", "accepted_evidence_coverage", "repair_hint_coverage"],
+              providerCount: 2,
+              minProviderCount: 1,
+              metricCount: 3,
+              minMetricCount: 3,
+              questionCount: 14,
+              minQuestionCount: 10,
+              evidenceCoverage0to1: 1,
+              minEvidenceCoverage0to1: 0.95,
+              rejectedEvidenceReasonCoverage0to1: 1,
+              minRejectedEvidenceReasonCoverage0to1: 0.9,
+              repairHintCoverage0to1: 1,
+              minRepairHintCoverage0to1: 0.9,
+              regressionPassRate0to1: 1,
+              minRegressionPassRate0to1: 0.99,
+              scoreConfidence0to1: 0.91,
+              minScoreConfidence0to1: 0.8,
+              status: "satisfied",
+              evidenceRefs: ["ev-uptrain-eval-pack", "ev-uptrain-signed-ledgers"],
+              rejectedEvidenceRefs: ["ev-uptrain-repo-metadata-only"],
+              repairHint: "Keep question ID, accepted evidence IDs, rejected reasons, repair hint, signed rows, thresholds, and no-source-copy proof attached; do not claim an UpTrain subsystem or copy upstream code/config.",
+            },
+          ],
+          missingGateReasons: [],
+        },
+      ],
+    });
+    const pack = buildEvalScoreExplainabilityPack(report);
+
+    expect(report.replayable).toBe(true);
+    expect(report.failClosed).toBe(false);
+    expect(report.rows[0]?.surfaces).toEqual(expect.arrayContaining(["Score", "Shield", "Watch"]));
+    expect(pack.rows[0]).toMatchObject({
+      questionId: "AMC-1.3",
+      acceptedEvidenceIds: ["ev-uptrain-eval-pack", "ev-uptrain-signed-ledgers"],
+      rejectedEvidenceReasons: [
+        expect.objectContaining({
+          evidenceId: "ev-uptrain-repo-metadata-only",
+          reason: expect.stringContaining("repository metadata is source context only"),
+        }),
+      ],
+      repairHint: expect.stringContaining("release gates"),
+      status: "ready",
+      reproducibleEvalPacks: [
+        expect.objectContaining({
+          packId: "uptrain-eval-score-explainability",
+          sourceRef: uptrainRepo,
+          kind: "eval_ai_library_question",
+          ciRunId: "ci:gap-0628-uptrain-eval-score-explainability:001",
+          manifestHashes: expect.objectContaining({ acceptedEvidenceLedgerHash: "0".repeat(64) }),
+        }),
+      ],
+    });
+    expect(pack.failClosed).toBe(false);
+
+    const guide = generateGuide({
+      overall: 3,
+      agentId: "uptrain-eval-agent",
+      targetLevel: 4,
+      questionScores: [score({ questionId: "AMC-1.3", claimedLevel: 3, supportedMaxLevel: 3, finalLevel: 3, flags: [] })],
+      evalScoreExplainabilityPack: pack,
+    });
+    const guideMarkdown = guideToHumanMarkdown(guide);
+    expect(guideMarkdown).toContain("Question ID: AMC-1.3");
+    expect(guideMarkdown).toContain("Accepted evidence IDs: ev-uptrain-eval-pack, ev-uptrain-signed-ledgers");
+    expect(guideMarkdown).toContain("ev-uptrain-repo-metadata-only");
+    expect(guideMarkdown).toContain("Repair hint:");
+    expect(guide.sections[0]?.evidenceNeeded.join("\n")).toContain("UpTrain repository metadata");
+
+    const passport = passportJsonSchema.parse({
+      v: 1,
+      passportId: "pass_uptrain0628",
+      generatedTs: 1,
+      scope: { type: "AGENT", idHash: "abc12345" },
+      trust: {
+        integrityIndex: 1,
+        correlationRatio: 1,
+        trustLabel: "HIGH",
+        evidenceCoverage: { observedShare: 1, attestedShare: 0, selfReportedShare: 0 },
+        notary: { enabled: false },
+      },
+      status: { label: "VERIFIED", reasons: [] },
+      maturity: {
+        status: "OK",
+        overall: 4,
+        byFiveLayers: { strategicOps: 4, leadership: 4, culture: 4, resilience: 4, skills: 4 },
+        unknownQuestionsCount: 0,
+        questionExplainabilityHash: report.manifestHash,
+        questionExplainabilitySummary: {
+          replayable: pack.replayable,
+          failClosed: pack.failClosed,
+          rowCount: pack.rows.length,
+          signedEvidenceRowCount: pack.rows[0]?.signedEvidenceRows.length ?? 0,
+          acceptedEvidenceCount: pack.rows[0]?.acceptedEvidenceIds.length ?? 0,
+          rejectedEvidenceCount: pack.rows[0]?.rejectedEvidenceReasons.length ?? 0,
+          rejectedEvidenceReasonCount: pack.rows[0]?.rejectedEvidenceReasons.length ?? 0,
+          reproducibleEvalPackCount: pack.rows[0]?.reproducibleEvalPacks.length ?? 0,
+          failClosedThresholdCount: pack.rows[0]?.failClosedThresholds.length ?? 0,
+          surfaces: report.rows[0]?.surfaces ?? [],
+          sourceRefs: pack.sourceRefs,
+          rows: pack.rows.map((row) => ({
+            questionId: row.questionId,
+            acceptedEvidenceIds: row.acceptedEvidenceIds,
+            rejectedEvidenceReasons: row.rejectedEvidenceReasons,
+            repairHint: row.repairHint,
+            status: row.status,
+            rowHash: row.rowHash,
+          })),
+        },
+      },
+      strategyFailureRisks: { ecosystemFocusRisk: null, clarityPathRisk: null, economicSignificanceRisk: null, riskAssuranceRisk: null, digitalDualityRisk: null },
+      valueDimensions: { emotionalValue: null, functionalValue: null, economicValue: null, brandValue: null, lifetimeValue: null, valueScore: null },
+      checkpoints: {
+        cgxPackSha256: "6".repeat(64),
+        lastAssuranceCert: { status: "PASS" },
+        lastBench: {},
+        lastAuditBinder: {},
+        lastValueSnapshot: {},
+      },
+      governanceSummary: { promptEnforcement: "ON", truthguard: "ENFORCE", providerAllowlist: "PASS", modelAllowlist: "PASS", toolAllowlist: "PASS", approvals: "PASS", leases: "PASS", pluginsIntegrity: "PASS" },
+      bindings: { passportPolicySha256: "7".repeat(64), canonSha256: "8".repeat(64), bankSha256: "9".repeat(64), trustMode: "LOCAL_VAULT" },
+      proofBindings: { transparencyRootSha256: "a".repeat(64), merkleRootSha256: "b".repeat(64), includedEventProofIds: ["ev-uptrain-eval-pack"], calculationManifestSha256: "c".repeat(64) },
+    });
+    expect(passport.maturity.questionExplainabilitySummary?.sourceRefs).toContain(uptrainRepo);
+    expect(passport.maturity.questionExplainabilitySummary?.rows?.[0]).toMatchObject({
+      questionId: "AMC-1.3",
+      acceptedEvidenceIds: ["ev-uptrain-eval-pack", "ev-uptrain-signed-ledgers"],
+      rejectedEvidenceReasons: [expect.objectContaining({ evidenceId: "ev-uptrain-repo-metadata-only" })],
+      repairHint: expect.stringContaining("release gates"),
     });
   });
 

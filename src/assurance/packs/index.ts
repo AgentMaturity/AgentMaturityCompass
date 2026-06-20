@@ -112,6 +112,7 @@ import { simulationWritebackGovernancePack } from "./simulationWritebackGovernan
 import { predictiveUXHonestyPack } from "./predictiveUXHonestyPack.js";
 import { realPersonRepresentationPack } from "./realPersonRepresentationPack.js";
 import { syntheticAgentInteractionPack } from "./syntheticAgentInteractionPack.js";
+import { linuxPrivilegeBoundaryRegressionPack } from "./linuxPrivilegeBoundaryRegressionPack.js";
 
 const assurancePacks: AssurancePackDefinition[] = [
   injectionPack,
@@ -228,6 +229,8 @@ const assurancePacks: AssurancePackDefinition[] = [
   predictiveUXHonestyPack,
   realPersonRepresentationPack,
   syntheticAgentInteractionPack,
+  // GAP-0626 — synthetic adversarial regression for privilege-boundary decisions
+  linuxPrivilegeBoundaryRegressionPack,
   // AI Safety Research Gap Packs (2026-03-18 additions)
   replicationResistancePack,
   dynamicTrustAuthorizationPack,

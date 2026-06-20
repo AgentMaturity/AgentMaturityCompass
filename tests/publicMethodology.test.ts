@@ -55,10 +55,12 @@ describe("public methodology manifest", () => {
     expect(first.questionSet.version).toBe("amc-legacy-240-v1");
     expect(first.questionSet.questionCount).toBe(getAllQuestions().length);
     expect(first.changelog[0]?.version).toBe(AMC_PUBLIC_METHODOLOGY_VERSION);
-    expect(first.changelog[0]?.migration).toContain("Reports generated under 2026.06.20-r213");
-    expect(first.changelog[0]?.summary).toContain("fact-checking and factuality-evaluation review methodology boundaries");
-    expect(first.changelog[0]?.summary).toContain("Google ADK-style agent-toolkit evaluation metric-validity boundaries");
+    expect(first.changelog[0]?.migration).toContain("Reports generated under 2026.06.20-r214");
+    expect(first.changelog[0]?.summary).toContain("OpenAI Evals-style public-methodology source-review boundaries");
+    expect(first.changelog[1]?.summary).toContain("fact-checking and factuality-evaluation review methodology boundaries");
+    expect(first.changelog[1]?.summary).toContain("Google ADK-style agent-toolkit evaluation metric-validity boundaries");
     for (const previousVersion of [
+      "2026.06.20-r214",
       "2026.06.20-r213",
       "2026.06.20-r212",
       "2026.06.20-r211",
@@ -1361,6 +1363,7 @@ describe("public methodology manifest", () => {
       "arize_phoenix_observability_eval_coverage",
       "lunary_observability_metric_validity",
       "google_adk_eval_metric_validity",
+      "openai_evals_public_methodology",
       "digital_materials_ecosystem_metric_validity",
       "ranking_stability_coverage",
       "tool_sandbox_coverage",

@@ -10,6 +10,7 @@ import type { LiveDriftReceipt } from '../watch/liveDriftAlerts.js';
 import type { JudgeCalibrationReceipt } from '../eval/judgeCalibration.js';
 import type { RunPromptLayerProviderDriftInput } from '../benchmarks/promptLayerProviderDrift.js';
 import type { RunPromptfooProviderDriftInput } from '../benchmarks/promptfooProviderDrift.js';
+import type { RunPatronusProviderDriftInput } from '../benchmarks/patronusProviderDrift.js';
 
 const shieldScanBodySchema = z.object({
   code: z.string().min(1),
@@ -31,7 +32,7 @@ export async function handleShieldRoute(
     apiSuccess(res, {
       status: 'operational',
       module: 'shield',
-      capabilities: ['scan', 'injection-detect', 'sanitize', 'score-explainability-receipts', 'replay-corpus-ci-receipts', 'live-drift-receipts', 'judge-calibration-receipts', 'provider-drift-fail-closed-receipts', 'promptfoo-provider-drift-receipts']
+      capabilities: ['scan', 'injection-detect', 'sanitize', 'score-explainability-receipts', 'replay-corpus-ci-receipts', 'live-drift-receipts', 'judge-calibration-receipts', 'provider-drift-fail-closed-receipts', 'promptfoo-provider-drift-receipts', 'patronus-provider-drift-receipts']
     });
     return true;
   }
@@ -148,6 +149,34 @@ export async function handleShieldRoute(
       });
     } catch (err) {
       apiError(res, 400, err instanceof Error ? err.message : 'promptfoo provider drift receipt verification failed');
+    }
+    return true;
+  }
+
+  if (pathname === '/api/v1/shield/patronus-provider-drift/verify' && method === 'POST') {
+    try {
+      const body = await bodyJson<RunPatronusProviderDriftInput>(req);
+      if (!Array.isArray(body.baseline) || !Array.isArray(body.candidate) || !body.patronus) {
+        apiError(res, 400, 'Required: baseline[], candidate[], and patronus metadata');
+        return true;
+      }
+      const { runPatronusProviderDrift } = await import('../benchmarks/patronusProviderDrift.js');
+      const result = runPatronusProviderDrift({
+        ...body,
+        agentId: body.agentId ?? 'default',
+      });
+      apiSuccess(res, {
+        verification: result.ciGate.passed ? 'passed' : 'blocked',
+        ciGate: result.ciGate,
+        patronusEvidenceHash: result.patronusEvidenceHash,
+        failClosed: result.report.failClosed,
+        activeAlerts: result.report.alerts.filter((alert) => !alert.waived).map((alert) => alert.alertId),
+        waivedAlerts: result.report.alerts.filter((alert) => alert.waived).map((alert) => alert.alertId),
+        shield: result.shield,
+        sourceRefs: result.sourceRefs,
+      });
+    } catch (err) {
+      apiError(res, 400, err instanceof Error ? err.message : 'Patronus provider drift receipt verification failed');
     }
     return true;
   }

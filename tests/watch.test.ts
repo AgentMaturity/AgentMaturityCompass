@@ -87,6 +87,7 @@ describe("Watch — runSafetyTests", () => {
 
   test("lists and filters safety tests by category", () => {
     expect(listSafetyTestCategories()).toEqual([
+      "adversarial_regression",
       "alignment",
       "excessive_agency",
       "injection",

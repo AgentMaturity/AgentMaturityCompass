@@ -568,6 +568,7 @@ export interface QuestionScoreEvalAiLibraryQuestionLensRef {
   evaluatorConfigHash: string | null;
   metricResultHash: string | null;
   scoreBreakdownHash: string | null;
+  acceptedEvidenceLedgerHash: string | null;
   rejectedEvidenceLedgerHash: string | null;
   repairHintHash: string | null;
   regressionThresholdHash: string | null;
@@ -701,6 +702,62 @@ export interface QuestionScoreOpikEvaluationQuestionLensRef {
   metricIds: string[];
   traceCount: number | null;
   minTraceCount: number | null;
+  questionCount: number | null;
+  minQuestionCount: number | null;
+  evidenceCoverage0to1: number | null;
+  minEvidenceCoverage0to1: number | null;
+  rejectedEvidenceReasonCoverage0to1: number | null;
+  minRejectedEvidenceReasonCoverage0to1: number | null;
+  repairHintCoverage0to1: number | null;
+  minRepairHintCoverage0to1: number | null;
+  thresholdPassRate0to1: number | null;
+  minThresholdPassRate0to1: number | null;
+  scoreConfidence0to1: number | null;
+  minScoreConfidence0to1: number | null;
+  status: QuestionScoreCriterionStatus;
+  evidenceRefs: string[];
+  rejectedEvidenceRefs: string[];
+  repairHint: string;
+  rowHash: string;
+}
+
+export type QuestionScoreDeepEvalMetricFamily =
+  | "llm_evaluation"
+  | "dataset_evaluation"
+  | "test_case_evaluation"
+  | "red_teaming"
+  | "observability"
+  | "custom";
+
+export interface QuestionScoreDeepEvalQuestionLensRef {
+  lensId: string;
+  sourceRef: string;
+  productUrl: string;
+  liveSourceMetadataHash: string | null;
+  evalPackManifestHash: string | null;
+  datasetManifestHash: string | null;
+  testCaseManifestHash: string | null;
+  questionSetHash: string | null;
+  questionIdRef: string;
+  questionTraceHash: string | null;
+  evaluatorConfigHash: string | null;
+  metricResultHash: string | null;
+  scoreBreakdownHash: string | null;
+  acceptedEvidenceLedgerHash: string | null;
+  rejectedEvidenceLedgerHash: string | null;
+  repairHintHash: string | null;
+  thresholdPolicyHash: string | null;
+  signedEvidenceRowsHash: string | null;
+  ciRunId: string | null;
+  ciConfigHash: string | null;
+  noDeepEvalSubsystemHash: string | null;
+  noSdkImporterHash: string | null;
+  noParityClaimHash: string | null;
+  noSourceCopyBoundaryHash: string | null;
+  metricFamily: QuestionScoreDeepEvalMetricFamily;
+  metricIds: string[];
+  testCaseCount: number | null;
+  minTestCaseCount: number | null;
   questionCount: number | null;
   minQuestionCount: number | null;
   evidenceCoverage0to1: number | null;
@@ -1243,6 +1300,7 @@ export interface QuestionScoreExplainabilityRow {
   evalAiLibraryQuestionLens: QuestionScoreEvalAiLibraryQuestionLensRef[];
   openModelRagQuestionLens: QuestionScoreOpenModelRagQuestionLensRef[];
   opikEvaluationQuestionLens: QuestionScoreOpikEvaluationQuestionLensRef[];
+  deepEvalQuestionLens: QuestionScoreDeepEvalQuestionLensRef[];
   statisticalAgentTrialLens: QuestionScoreAgentTrialStatisticalLensRef[];
   codeQuestQualityLens: QuestionScoreCodeQuestQualityLensRef[];
   multiUserBenchmarkLens: QuestionScoreMultiUserBenchmarkLensRef[];
