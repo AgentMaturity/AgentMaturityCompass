@@ -10,6 +10,7 @@ import {
   parseDeepEvalResults,
   parseEvalImport,
   parseLangSmithEvalResults,
+  parseLangWatchEvalResults,
   parseLangfuseEvalResults,
   parseOpenAIEvalResults,
   parsePromptfooEvalResults,
@@ -251,12 +252,38 @@ describe("framework-specific eval mapping", () => {
     expect(parsed.cases[0]?.questionIds).toContain("AMC-1.7");
     expect(parsed.cases[0]?.questionIds).toContain("AMC-2.3");
   });
+
+  test("LangWatch parser maps eval runs, guardrails, datasets, and trace metrics to AMC questions", () => {
+    const parsed = parseLangWatchEvalResults({
+      evaluation_run_id: "lw-run-1",
+      evaluations: [
+        {
+          id: "lw-1",
+          name: "agent scenario prompt shield regression",
+          status: "passed",
+          dataset: "checkout-agent-scenarios",
+          metrics: { latency_ms: 90, quality_score: 0.87 },
+          scores: [{ name: "answer relevance", score: 0.87 }],
+          guardrails: [{ name: "Azure Prompt Shield", pass: true }],
+          trace: { traceId: "trace-lw-1", input: "hi", output: "safe answer" }
+        }
+      ]
+    });
+    expect(parsed.framework).toBe("langwatch");
+    expect(parsed.runId).toBe("lw-run-1");
+    expect(parsed.cases[0]?.id).toBe("lw-1");
+    expect(parsed.cases[0]?.questionIds).toContain("AMC-1.7");
+    expect(parsed.cases[0]?.questionIds).toContain("AMC-2.3");
+    expect(parsed.cases[0]?.questionIds).toContain("AMC-5.8");
+    expect(parsed.cases[0]?.metadata.mappingTarget).toBe("langwatch_eval_replay");
+  });
 });
 
 describe("format parsing and importer dispatch", () => {
-  test("parseEvalImportFormat accepts wandb and langfuse", () => {
+  test("parseEvalImportFormat accepts wandb, langfuse, and langwatch", () => {
     expect(parseEvalImportFormat("wandb")).toBe("wandb");
     expect(parseEvalImportFormat("langfuse")).toBe("langfuse");
+    expect(parseEvalImportFormat("langwatch")).toBe("langwatch");
   });
 
   test("parseEvalImportFormat rejects unknown formats", () => {
@@ -273,6 +300,12 @@ describe("format parsing and importer dispatch", () => {
     const parsed = parseEvalImport({ traces: [{ id: "lf-2", name: "trace", status: "ok" }] }, "langfuse");
     expect(parsed.framework).toBe("langfuse");
     expect(parsed.cases[0]?.id).toBe("lf-2");
+  });
+
+  test("parseEvalImport dispatches LangWatch importer", () => {
+    const parsed = parseEvalImport({ evaluations: [{ id: "lw-2", name: "eval", status: "ok" }] }, "langwatch");
+    expect(parsed.framework).toBe("langwatch");
+    expect(parsed.cases[0]?.id).toBe("lw-2");
   });
 });
 

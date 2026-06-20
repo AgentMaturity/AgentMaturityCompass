@@ -329,6 +329,13 @@ function evidenceNeededForGap(q: DiagnosticQuestion, targetLevel: number, baseEv
     /verify|validation|benchmark|outcome|task|correctness/i.test(`${q.title} ${q.promptTemplate} ${q.evidenceGateHints}`);
   if (benchmarkRelevant) {
     evidence.push("Benchmark-submission receipt with signed task breakdown, criterion-level scores, status indicators, leaderboard metric views, accepted evidence IDs, rejected-evidence reasons, repair hint, and replay hashes.");
+    evidence.push("Eval-score explainability pack bound to the question ID for Score/Shield/Watch with accepted evidence IDs, rejected-evidence reasons, repair hint, reproducible eval pack, signed evidence rows, fail-closed thresholds, and source-boundary/no-parity proof. W&B/Weave exports may be used as source evidence only after import into AMC question-score explainability receipts; source metadata, screenshots, or copied marketing text alone are insufficient.");
+  }
+  const opikStyleRelevant =
+    targetLevel >= 4 &&
+    /observability|trace|tracing|evaluation|eval|metric|score|dashboard|monitor/i.test(`${q.title} ${q.promptTemplate} ${q.evidenceGateHints}`);
+  if (opikStyleRelevant) {
+    evidence.push("Opik-style eval observability metadata can only be a relevance signal: attach AMC-owned question score proof with live relevance-check hash, question trace, evaluator config, metric result, score breakdown, accepted/rejected evidence ledgers, repair-hint hash, signed evidence rows, fail-closed threshold policy, and no-copy/no-parity attestation.");
   }
   const multiUserRelevant =
     targetLevel >= 4 &&

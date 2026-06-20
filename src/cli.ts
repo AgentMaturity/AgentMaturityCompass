@@ -6864,8 +6864,8 @@ vaultDlp
 
 evalCmd
   .command("import")
-  .description("Import eval outputs (LangSmith, DeepEval, Promptfoo, OpenAI Evals, W&B, Langfuse) into signed AMC evidence")
-  .requiredOption("--format <format>", "eval format: openai|langsmith|deepeval|promptfoo|wandb|langfuse")
+  .description("Import eval outputs (LangSmith, DeepEval, Promptfoo, OpenAI Evals, W&B, Langfuse, LangWatch) into signed AMC evidence")
+  .requiredOption("--format <format>", "eval format: openai|langsmith|deepeval|promptfoo|wandb|langfuse|langwatch")
   .requiredOption("--file <path>", "path to JSON/JSONL eval export file")
   .option("--agent <agentId>", "agent ID (defaults to active agent)")
   .option("--trust-tier <tier>", "override trust tier: OBSERVED|OBSERVED_HARDENED|ATTESTED|SELF_REPORTED")
@@ -7224,6 +7224,7 @@ Use --dry-run to preview the exact capture command and next score step.
           { name: "OpenAI Evals", value: "openai-evals" },
           { name: "Weights & Biases runs", value: "wandb" },
           { name: "Langfuse traces", value: "langfuse" },
+          { name: "LangWatch evals", value: "langwatch" },
           { name: "Generic JSON/JSONL logs", value: "generic" },
         ]
       }]);
@@ -7240,6 +7241,7 @@ Use --dry-run to preview the exact capture command and next score step.
         "openai-evals": `amc eval import --format openai --file "${filePath}"`,
         wandb: `amc eval import --format wandb --file "${filePath}"`,
         langfuse: `amc eval import --format langfuse --file "${filePath}"`,
+        langwatch: `amc eval import --format langwatch --file "${filePath}"`,
         generic: `amc ingest "${filePath}" --type generic_json --agent <agentId>`
       };
       console.log(chalk.hex('#4AEF79')(`\n  Importing ${source} data from: ${filePath}`));

@@ -34,6 +34,8 @@ import type {
   QuestionScoreLandscapeUpdateCadence,
   QuestionScoreOpenModelRagQuestionLensRef,
   QuestionScoreOpenModelRagRuntime,
+  QuestionScoreOpikEvaluationMetricFamily,
+  QuestionScoreOpikEvaluationQuestionLensRef,
   QuestionScoreMultiUserBenchmarkLensRef,
   QuestionScoreMultiUserCapability,
   QuestionScoreMultiUserScenarioFamily,
@@ -378,6 +380,53 @@ export interface QuestionExplainabilityOpenModelRagQuestionInput {
   minRepairHintCoverage0to1?: number | null;
   regressionPassRate0to1?: number | null;
   minRegressionPassRate0to1?: number | null;
+  status: QuestionScoreCriterionStatus;
+  evidenceRefs?: string[];
+  rejectedEvidenceRefs?: string[];
+  repairHint?: string;
+}
+
+export interface QuestionExplainabilityOpikEvaluationQuestionInput {
+  lensId: string;
+  sourceRef: string;
+  productUrl?: string;
+  liveRelevanceCheckHash?: string | null;
+  projectRef?: string | null;
+  experimentRef?: string | null;
+  datasetManifestHash?: string | null;
+  traceExportHash?: string | null;
+  evalPackManifestHash?: string | null;
+  questionSetHash?: string | null;
+  questionIdRef?: string;
+  questionTraceHash?: string | null;
+  evaluatorConfigHash?: string | null;
+  metricResultHash?: string | null;
+  scoreBreakdownHash?: string | null;
+  acceptedEvidenceLedgerHash?: string | null;
+  rejectedEvidenceLedgerHash?: string | null;
+  repairHintHash?: string | null;
+  thresholdPolicyHash?: string | null;
+  signedEvidenceRowsHash?: string | null;
+  ciRunId?: string | null;
+  ciConfigHash?: string | null;
+  noParityClaimHash?: string | null;
+  noSourceCopyBoundaryHash?: string | null;
+  metricFamily?: QuestionScoreOpikEvaluationMetricFamily;
+  metricIds?: string[];
+  traceCount?: number | null;
+  minTraceCount?: number | null;
+  questionCount?: number | null;
+  minQuestionCount?: number | null;
+  evidenceCoverage0to1?: number | null;
+  minEvidenceCoverage0to1?: number | null;
+  rejectedEvidenceReasonCoverage0to1?: number | null;
+  minRejectedEvidenceReasonCoverage0to1?: number | null;
+  repairHintCoverage0to1?: number | null;
+  minRepairHintCoverage0to1?: number | null;
+  thresholdPassRate0to1?: number | null;
+  minThresholdPassRate0to1?: number | null;
+  scoreConfidence0to1?: number | null;
+  minScoreConfidence0to1?: number | null;
   status: QuestionScoreCriterionStatus;
   evidenceRefs?: string[];
   rejectedEvidenceRefs?: string[];
@@ -779,6 +828,7 @@ export interface QuestionExplainabilityInputRow {
   testSuiteEvaluationLens?: QuestionExplainabilityTestSuiteEvaluationInput[];
   evalAiLibraryQuestionLens?: QuestionExplainabilityEvalAiLibraryQuestionInput[];
   openModelRagQuestionLens?: QuestionExplainabilityOpenModelRagQuestionInput[];
+  opikEvaluationQuestionLens?: QuestionExplainabilityOpikEvaluationQuestionInput[];
   statisticalAgentTrialLens?: QuestionExplainabilityAgentTrialStatisticalInput[];
   codeQuestQualityLens?: QuestionExplainabilityCodeQuestQualityInput[];
   multiUserBenchmarkLens?: QuestionExplainabilityMultiUserBenchmarkInput[];
@@ -797,6 +847,48 @@ export interface BuildQuestionExplainabilityReportInput {
   generatedAt: string;
   sourceRefs?: string[];
   rows: QuestionExplainabilityInputRow[];
+}
+
+export interface EvalScoreExplainabilityThresholdRef {
+  id: string;
+  actual: number | null;
+  threshold: number | null;
+  operator: "gte" | "lte";
+  passed: boolean;
+}
+
+export interface EvalScoreExplainabilityEvalPackRef {
+  packId: string;
+  sourceRef: string;
+  kind: "test_suite_evaluation" | "eval_ai_library_question";
+  manifestHashes: Record<string, string | null>;
+  ciRunId: string | null;
+  ciConfigHash: string | null;
+  rowHash: string;
+}
+
+export interface EvalScoreExplainabilityPackRow {
+  questionId: string;
+  acceptedEvidenceIds: string[];
+  rejectedEvidenceReasons: Array<{ evidenceId: string; reason: string }>;
+  repairHint: string;
+  signedEvidenceRows: QuestionScoreSignedEvidenceRef[];
+  reproducibleEvalPacks: EvalScoreExplainabilityEvalPackRef[];
+  failClosedThresholds: EvalScoreExplainabilityThresholdRef[];
+  status: "ready" | "fail_closed";
+  rowHash: string;
+}
+
+export interface EvalScoreExplainabilityPack {
+  v: 1;
+  generatedAt: string;
+  agentId: string;
+  runId: string;
+  sourceRefs: string[];
+  replayable: boolean;
+  failClosed: boolean;
+  rows: EvalScoreExplainabilityPackRow[];
+  packHash: string;
 }
 
 function unique(input: string[]): string[] {
@@ -1432,6 +1524,76 @@ function normalizeOpenModelRagQuestionLens(
     evidenceRefs: unique(input.evidenceRefs ?? []),
     rejectedEvidenceRefs: unique(input.rejectedEvidenceRefs ?? []),
     repairHint: input.repairHint?.trim() || "Attach open-model RAG source snapshot, license/no-license boundary, Java/LangChain4j/Ollama/RAG proof, local model ids, evaluation manifest, question trace, score breakdown, rejected evidence, repair hints, CI threshold, no-source-copy proof, signed evidence, and row hash before relying on this question score."
+  };
+  return {
+    ...withoutHash,
+    rowHash: sha256Hex(canonicalize(withoutHash))
+  };
+}
+
+const opikEvaluationMetricFamilies = new Set<QuestionScoreOpikEvaluationMetricFamily>([
+  "trace_observability",
+  "offline_experiment",
+  "online_evaluation",
+  "dataset_evaluation",
+  "llm_judge",
+  "custom"
+]);
+
+function normalizeOpikEvaluationMetricFamily(
+  input: QuestionScoreOpikEvaluationMetricFamily | undefined,
+): QuestionScoreOpikEvaluationMetricFamily {
+  return input && opikEvaluationMetricFamilies.has(input) ? input : "custom";
+}
+
+function normalizeOpikEvaluationQuestionLens(
+  input: QuestionExplainabilityOpikEvaluationQuestionInput,
+): QuestionScoreOpikEvaluationQuestionLensRef {
+  const withoutHash: Omit<QuestionScoreOpikEvaluationQuestionLensRef, "rowHash"> = {
+    lensId: input.lensId.trim() || "unknown-opik-evaluation-lens",
+    sourceRef: input.sourceRef.trim() || "unknown-source",
+    productUrl: input.productUrl?.trim() || "https://www.comet.com/site/products/opik/",
+    liveRelevanceCheckHash: nullableSha256Hash(input.liveRelevanceCheckHash),
+    projectRef: nullableString(input.projectRef),
+    experimentRef: nullableString(input.experimentRef),
+    datasetManifestHash: nullableSha256Hash(input.datasetManifestHash),
+    traceExportHash: nullableSha256Hash(input.traceExportHash),
+    evalPackManifestHash: nullableSha256Hash(input.evalPackManifestHash),
+    questionSetHash: nullableSha256Hash(input.questionSetHash),
+    questionIdRef: input.questionIdRef?.trim() || "unknown-question-id",
+    questionTraceHash: nullableSha256Hash(input.questionTraceHash),
+    evaluatorConfigHash: nullableSha256Hash(input.evaluatorConfigHash),
+    metricResultHash: nullableSha256Hash(input.metricResultHash),
+    scoreBreakdownHash: nullableSha256Hash(input.scoreBreakdownHash),
+    acceptedEvidenceLedgerHash: nullableSha256Hash(input.acceptedEvidenceLedgerHash),
+    rejectedEvidenceLedgerHash: nullableSha256Hash(input.rejectedEvidenceLedgerHash),
+    repairHintHash: nullableSha256Hash(input.repairHintHash),
+    thresholdPolicyHash: nullableSha256Hash(input.thresholdPolicyHash),
+    signedEvidenceRowsHash: nullableSha256Hash(input.signedEvidenceRowsHash),
+    ciRunId: nullableString(input.ciRunId),
+    ciConfigHash: nullableSha256Hash(input.ciConfigHash),
+    noParityClaimHash: nullableSha256Hash(input.noParityClaimHash),
+    noSourceCopyBoundaryHash: nullableSha256Hash(input.noSourceCopyBoundaryHash),
+    metricFamily: normalizeOpikEvaluationMetricFamily(input.metricFamily),
+    metricIds: unique(input.metricIds ?? []),
+    traceCount: positiveInteger(input.traceCount),
+    minTraceCount: positiveInteger(input.minTraceCount),
+    questionCount: positiveInteger(input.questionCount),
+    minQuestionCount: positiveInteger(input.minQuestionCount),
+    evidenceCoverage0to1: nullableRate(input.evidenceCoverage0to1),
+    minEvidenceCoverage0to1: nullableRate(input.minEvidenceCoverage0to1),
+    rejectedEvidenceReasonCoverage0to1: nullableRate(input.rejectedEvidenceReasonCoverage0to1),
+    minRejectedEvidenceReasonCoverage0to1: nullableRate(input.minRejectedEvidenceReasonCoverage0to1),
+    repairHintCoverage0to1: nullableRate(input.repairHintCoverage0to1),
+    minRepairHintCoverage0to1: nullableRate(input.minRepairHintCoverage0to1),
+    thresholdPassRate0to1: nullableRate(input.thresholdPassRate0to1),
+    minThresholdPassRate0to1: nullableRate(input.minThresholdPassRate0to1),
+    scoreConfidence0to1: nullableRate(input.scoreConfidence0to1),
+    minScoreConfidence0to1: nullableRate(input.minScoreConfidence0to1),
+    status: input.status,
+    evidenceRefs: unique(input.evidenceRefs ?? []),
+    rejectedEvidenceRefs: unique(input.rejectedEvidenceRefs ?? []),
+    repairHint: input.repairHint?.trim() || "Attach AMC-owned Opik-style evaluation proof with question id, accepted evidence ids, rejected evidence reasons, repair hint, reproducible eval pack, signed evidence rows, fail-closed thresholds, no-parity/no-copy proof, and row hash before relying on this question score."
   };
   return {
     ...withoutHash,
@@ -2618,6 +2780,69 @@ function hasReplayableOpenModelRagQuestionLens(ref: QuestionScoreOpenModelRagQue
   return ref.repairHint.length > 0;
 }
 
+function opikEvaluationMetricsMeetThreshold(ref: QuestionScoreOpikEvaluationQuestionLensRef): boolean {
+  return ref.traceCount !== null &&
+    ref.minTraceCount !== null &&
+    ref.traceCount >= ref.minTraceCount &&
+    ref.questionCount !== null &&
+    ref.minQuestionCount !== null &&
+    ref.questionCount >= ref.minQuestionCount &&
+    meetsMinimum(ref.evidenceCoverage0to1, ref.minEvidenceCoverage0to1) &&
+    meetsMinimum(ref.rejectedEvidenceReasonCoverage0to1, ref.minRejectedEvidenceReasonCoverage0to1) &&
+    meetsMinimum(ref.repairHintCoverage0to1, ref.minRepairHintCoverage0to1) &&
+    meetsMinimum(ref.thresholdPassRate0to1, ref.minThresholdPassRate0to1) &&
+    meetsMinimum(ref.scoreConfidence0to1, ref.minScoreConfidence0to1);
+}
+
+function hasReplayableOpikEvaluationQuestionLens(ref: QuestionScoreOpikEvaluationQuestionLensRef): boolean {
+  if (
+    ref.lensId.length === 0 ||
+    ref.lensId.startsWith("unknown-") ||
+    ref.sourceRef.length === 0 ||
+    ref.sourceRef === "unknown-source" ||
+    ref.productUrl.length === 0 ||
+    ref.questionIdRef.length === 0 ||
+    ref.questionIdRef === "unknown-question-id" ||
+    !isSha256(ref.rowHash)
+  ) {
+    return false;
+  }
+  if (![
+    ref.liveRelevanceCheckHash,
+    ref.datasetManifestHash,
+    ref.traceExportHash,
+    ref.evalPackManifestHash,
+    ref.questionSetHash,
+    ref.questionTraceHash,
+    ref.evaluatorConfigHash,
+    ref.metricResultHash,
+    ref.scoreBreakdownHash,
+    ref.acceptedEvidenceLedgerHash,
+    ref.rejectedEvidenceLedgerHash,
+    ref.repairHintHash,
+    ref.thresholdPolicyHash,
+    ref.signedEvidenceRowsHash,
+    ref.ciConfigHash,
+    ref.noParityClaimHash,
+    ref.noSourceCopyBoundaryHash,
+  ].every(hashPresent)) {
+    return false;
+  }
+  if (ref.status === "satisfied") {
+    return ref.evidenceRefs.length > 0 &&
+      ref.metricFamily !== "custom" &&
+      ref.metricIds.length > 0 &&
+      ref.projectRef !== null &&
+      ref.experimentRef !== null &&
+      ref.ciRunId !== null &&
+      opikEvaluationMetricsMeetThreshold(ref);
+  }
+  if (ref.status === "failed") {
+    return ref.evidenceRefs.length > 0 || ref.rejectedEvidenceRefs.length > 0 || ref.repairHint.length > 0;
+  }
+  return ref.repairHint.length > 0;
+}
+
 function meetsMaximum(value: number | null, maximum: number | null): boolean {
   return value !== null && maximum !== null && value <= maximum;
 }
@@ -3241,6 +3466,9 @@ export function buildQuestionExplainabilityReport(
     const openModelRagQuestionLens = (
       item.openModelRagQuestionLens ?? []
     ).map(normalizeOpenModelRagQuestionLens);
+    const opikEvaluationQuestionLens = (
+      item.opikEvaluationQuestionLens ?? []
+    ).map(normalizeOpikEvaluationQuestionLens);
     const statisticalAgentTrialLens = (
       item.statisticalAgentTrialLens ?? []
     ).map(normalizeAgentTrialStatisticalLens);
@@ -3281,6 +3509,7 @@ export function buildQuestionExplainabilityReport(
       testSuiteEvaluationLens,
       evalAiLibraryQuestionLens,
       openModelRagQuestionLens,
+      opikEvaluationQuestionLens,
       statisticalAgentTrialLens,
       codeQuestQualityLens,
       multiUserBenchmarkLens,
@@ -3318,6 +3547,7 @@ export function buildQuestionExplainabilityReport(
     row.testSuiteEvaluationLens.every(hasReplayableTestSuiteEvaluationLens) &&
     row.evalAiLibraryQuestionLens.every(hasReplayableEvalAiLibraryQuestionLens) &&
     row.openModelRagQuestionLens.every(hasReplayableOpenModelRagQuestionLens) &&
+    row.opikEvaluationQuestionLens.every(hasReplayableOpikEvaluationQuestionLens) &&
     row.statisticalAgentTrialLens.every(hasReplayableAgentTrialStatisticalLens) &&
     row.codeQuestQualityLens.every(hasReplayableCodeQuestQualityLens) &&
     row.multiUserBenchmarkLens.every(hasReplayableMultiUserBenchmarkLens) &&
@@ -3342,6 +3572,9 @@ export function buildQuestionExplainabilityReport(
     ) ||
     row.openModelRagQuestionLens.some(
       (lens) => lens.status !== "satisfied" || !hasReplayableOpenModelRagQuestionLens(lens)
+    ) ||
+    row.opikEvaluationQuestionLens.some(
+      (lens) => lens.status !== "satisfied" || !hasReplayableOpikEvaluationQuestionLens(lens)
     ) ||
     row.statisticalAgentTrialLens.some(
       (lens) => lens.status !== "satisfied" || !hasReplayableAgentTrialStatisticalLens(lens)
@@ -3376,5 +3609,133 @@ export function buildQuestionExplainabilityReport(
   return {
     ...reportWithoutHash,
     manifestHash: sha256Hex(canonicalize(reportWithoutHash))
+  };
+}
+
+function thresholdRef(
+  id: string,
+  actual: number | null,
+  threshold: number | null,
+  operator: "gte" | "lte" = "gte",
+): EvalScoreExplainabilityThresholdRef {
+  const passed = operator === "gte" ? meetsMinimum(actual, threshold) : meetsMaximum(actual, threshold);
+  return { id, actual, threshold, operator, passed };
+}
+
+function compactThresholds(input: EvalScoreExplainabilityThresholdRef[]): EvalScoreExplainabilityThresholdRef[] {
+  return input.filter((row) => row.actual !== null || row.threshold !== null);
+}
+
+function evalScorePackRefs(row: QuestionScoreExplainabilityRow): EvalScoreExplainabilityEvalPackRef[] {
+  const testSuitePacks = row.testSuiteEvaluationLens.map<EvalScoreExplainabilityEvalPackRef>((lens) => ({
+    packId: lens.suiteId,
+    sourceRef: lens.sourceRef,
+    kind: "test_suite_evaluation",
+    manifestHashes: {
+      datasetHash: lens.datasetHash,
+      testCaseHash: lens.testCaseHash,
+      evaluatorConfigHash: lens.evaluatorConfigHash,
+      experimentResultHash: lens.experimentResultHash,
+      exportArtifactHash: lens.exportArtifactHash,
+      traceArtifactHash: lens.traceArtifactHash,
+      toolCallValidationHash: lens.toolCallValidationHash,
+    },
+    ciRunId: lens.ciRunId,
+    ciConfigHash: lens.ciConfigHash,
+    rowHash: lens.rowHash,
+  }));
+  const evalLibraryPacks = row.evalAiLibraryQuestionLens.map<EvalScoreExplainabilityEvalPackRef>((lens) => ({
+    packId: lens.frameworkId,
+    sourceRef: lens.sourceRef,
+    kind: "eval_ai_library_question",
+    manifestHashes: {
+      evalPackManifestHash: lens.evalPackManifestHash,
+      datasetManifestHash: lens.datasetManifestHash,
+      questionSetHash: lens.questionSetHash,
+      questionTraceHash: lens.questionTraceHash,
+      evaluatorConfigHash: lens.evaluatorConfigHash,
+      metricResultHash: lens.metricResultHash,
+      scoreBreakdownHash: lens.scoreBreakdownHash,
+      rejectedEvidenceLedgerHash: lens.rejectedEvidenceLedgerHash,
+      repairHintHash: lens.repairHintHash,
+      regressionThresholdHash: lens.regressionThresholdHash,
+    },
+    ciRunId: lens.ciRunId,
+    ciConfigHash: lens.ciConfigHash,
+    rowHash: lens.rowHash,
+  }));
+  return [...testSuitePacks, ...evalLibraryPacks];
+}
+
+function evalScoreThresholds(row: QuestionScoreExplainabilityRow): EvalScoreExplainabilityThresholdRef[] {
+  const testSuiteThresholds = row.testSuiteEvaluationLens.flatMap((lens) => compactThresholds([
+    thresholdRef(`${lens.suiteId}:pass_rate`, lens.passRate0to1, lens.minPassRate0to1),
+    thresholdRef(`${lens.suiteId}:average_score`, lens.averageScore0to1, lens.threshold0to1),
+  ]));
+  const evalLibraryThresholds = row.evalAiLibraryQuestionLens.flatMap((lens) => compactThresholds([
+    thresholdRef(`${lens.frameworkId}:provider_count`, lens.providerCount, lens.minProviderCount),
+    thresholdRef(`${lens.frameworkId}:metric_count`, lens.metricCount, lens.minMetricCount),
+    thresholdRef(`${lens.frameworkId}:question_count`, lens.questionCount, lens.minQuestionCount),
+    thresholdRef(`${lens.frameworkId}:evidence_coverage`, lens.evidenceCoverage0to1, lens.minEvidenceCoverage0to1),
+    thresholdRef(`${lens.frameworkId}:rejected_reason_coverage`, lens.rejectedEvidenceReasonCoverage0to1, lens.minRejectedEvidenceReasonCoverage0to1),
+    thresholdRef(`${lens.frameworkId}:repair_hint_coverage`, lens.repairHintCoverage0to1, lens.minRepairHintCoverage0to1),
+    thresholdRef(`${lens.frameworkId}:regression_pass_rate`, lens.regressionPassRate0to1, lens.minRegressionPassRate0to1),
+    thresholdRef(`${lens.frameworkId}:score_confidence`, lens.scoreConfidence0to1, lens.minScoreConfidence0to1),
+  ]));
+  return [...testSuiteThresholds, ...evalLibraryThresholds];
+}
+
+function evalPackComplete(pack: EvalScoreExplainabilityEvalPackRef): boolean {
+  return pack.rowHash.length === 64 &&
+    pack.ciRunId !== null &&
+    pack.ciConfigHash !== null &&
+    Object.values(pack.manifestHashes).every((value) => value !== null && value.length > 0);
+}
+
+export function buildEvalScoreExplainabilityPack(
+  report: QuestionScoreExplainabilityReport,
+): EvalScoreExplainabilityPack {
+  const rows = report.rows.map<EvalScoreExplainabilityPackRow>((row) => {
+    const reproducibleEvalPacks = evalScorePackRefs(row);
+    const failClosedThresholds = evalScoreThresholds(row);
+    const rejectedEvidenceReasons = row.rejectedEvidence.map((evidence) => ({
+      evidenceId: evidence.evidenceId,
+      reason: evidence.reason,
+    }));
+    const rowReady = row.status === "passed" &&
+      row.acceptedEvidenceIds.length > 0 &&
+      row.signedEvidenceRefs.length === row.acceptedEvidenceIds.length &&
+      row.signedEvidenceRefs.every(hasSignedEvidence) &&
+      row.rejectedEvidence.every((evidence) => hasSignedEvidence(evidence) && evidence.reason.trim().length > 0) &&
+      row.repairHint.trim().length > 0 &&
+      reproducibleEvalPacks.length > 0 &&
+      reproducibleEvalPacks.every(evalPackComplete) &&
+      failClosedThresholds.length > 0 &&
+      failClosedThresholds.every((threshold) => threshold.passed);
+    return {
+      questionId: row.questionId,
+      acceptedEvidenceIds: row.acceptedEvidenceIds,
+      rejectedEvidenceReasons,
+      repairHint: row.repairHint,
+      signedEvidenceRows: row.signedEvidenceRefs,
+      reproducibleEvalPacks,
+      failClosedThresholds,
+      status: rowReady ? "ready" : "fail_closed",
+      rowHash: row.rowHash,
+    };
+  });
+  const withoutHash = {
+    v: 1 as const,
+    generatedAt: report.generatedAt,
+    agentId: report.agentId,
+    runId: report.runId,
+    sourceRefs: report.sourceRefs,
+    replayable: report.replayable,
+    failClosed: report.failClosed || !report.replayable || rows.some((row) => row.status === "fail_closed"),
+    rows,
+  };
+  return {
+    ...withoutHash,
+    packHash: sha256Hex(canonicalize(withoutHash)),
   };
 }

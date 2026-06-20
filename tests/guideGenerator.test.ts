@@ -111,9 +111,10 @@ describe("guideGenerator", () => {
     expect(guide.sections[0]?.evidenceNeeded).toEqual(
       expect.arrayContaining([
         expect.stringContaining("Benchmark-submission receipt with signed task breakdown"),
+        expect.stringContaining("Eval-score explainability pack bound to the question ID"),
       ]),
     );
-    expect(guideToHumanMarkdown(guide)).toContain("criterion-level scores");
+    expect(guideToHumanMarkdown(guide)).toContain("fail-closed thresholds");
   });
 
   it("sorts sections by impact (biggest gap first)", () => {

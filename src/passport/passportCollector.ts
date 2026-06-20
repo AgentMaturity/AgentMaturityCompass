@@ -21,6 +21,7 @@ import { verifyApprovalPolicySignature } from "../approvals/approvalPolicyEngine
 import { verifyLeaseRevocationsSignature } from "../leases/leaseStore.js";
 import { verifyPluginWorkspace } from "../plugins/pluginApi.js";
 import { questionBank } from "../diagnostic/questionBank.js";
+import { buildEvalScoreExplainabilityPack } from "../diagnostic/questionScoreExplainability.js";
 import { hashPassportId } from "./passportRedaction.js";
 import type { PassportPolicy } from "./passportPolicySchema.js";
 import { passportJsonSchema, type PassportJson } from "./passportSchema.js";
@@ -350,7 +351,29 @@ export function collectPassportData(params: {
       }))
       .sort((a, b) => a.qIdHash.localeCompare(b.qIdHash))
     : undefined;
+  const evalScoreExplainabilityPack = report?.questionExplainability
+    ? buildEvalScoreExplainabilityPack(report.questionExplainability)
+    : null;
   const questionExplainabilityHash = report?.questionExplainability?.manifestHash;
+  const questionExplainabilitySummary = evalScoreExplainabilityPack
+    ? {
+        replayable: evalScoreExplainabilityPack.replayable,
+        failClosed: evalScoreExplainabilityPack.failClosed,
+        rowCount: evalScoreExplainabilityPack.rows.length,
+        signedEvidenceRowCount: evalScoreExplainabilityPack.rows.reduce((sum, row) => sum + row.signedEvidenceRows.length, 0),
+        acceptedEvidenceCount: evalScoreExplainabilityPack.rows.reduce((sum, row) => sum + row.acceptedEvidenceIds.length, 0),
+        rejectedEvidenceCount: evalScoreExplainabilityPack.rows.reduce((sum, row) => sum + row.rejectedEvidenceReasons.length, 0),
+        rejectedEvidenceReasonCount: evalScoreExplainabilityPack.rows.reduce(
+          (sum, row) => sum + row.rejectedEvidenceReasons.filter((reason) => reason.reason.trim().length > 0).length,
+          0
+        ),
+        reproducibleEvalPackCount: evalScoreExplainabilityPack.rows.reduce((sum, row) => sum + row.reproducibleEvalPacks.length, 0),
+        failClosedThresholdCount: evalScoreExplainabilityPack.rows.reduce((sum, row) => sum + row.failClosedThresholds.length, 0),
+        surfaces: [...new Set(report?.questionExplainability?.rows.flatMap((row) => row.surfaces) ?? [])].sort((a, b) => a.localeCompare(b))
+      }
+    : null;
+  const questionExplainabilityReplayable = report?.questionExplainability?.replayable;
+  const questionExplainabilityFailClosed = report?.questionExplainability?.failClosed;
 
   const policySha256 = fileSha(join(params.workspace, ".amc", "passport", "policy.yaml"));
   const canonSha256 = fileSha(canonPath(params.workspace));
@@ -398,6 +421,9 @@ export function collectPassportData(params: {
       },
       unknownQuestionsCount,
       ...(questionExplainabilityHash ? { questionExplainabilityHash } : {}),
+      ...(questionExplainabilitySummary ? { questionExplainabilitySummary } : {}),
+      ...(questionExplainabilityReplayable !== undefined ? { questionExplainabilityReplayable } : {}),
+      ...(questionExplainabilityFailClosed !== undefined ? { questionExplainabilityFailClosed } : {}),
       ...(questionScores42 ? { questionScores42 } : {})
     },
     strategyFailureRisks: params.policy.passportPolicy.contents.includeFiveStrategyRisks
@@ -500,6 +526,11 @@ export function collectPassportData(params: {
       mechanicTargetsSha256: mechanicSha
     },
     reportRunId: report?.runId ?? null,
+    questionExplainabilityHash: questionExplainabilityHash ?? null,
+    evalScoreExplainabilityPackHash: evalScoreExplainabilityPack?.packHash ?? null,
+    evalScoreExplainabilityFailClosed: evalScoreExplainabilityPack?.failClosed ?? null,
+    questionExplainabilityReplayable: questionExplainabilityReplayable ?? null,
+    questionExplainabilityFailClosed: questionExplainabilityFailClosed ?? null,
     forecastGeneratedTs: loadLatestForecastArtifact(params.workspace, { type: scope.type, id: scope.id })?.generatedTs ?? null,
     generatedTs
   };

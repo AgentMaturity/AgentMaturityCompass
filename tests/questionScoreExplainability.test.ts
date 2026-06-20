@@ -3,7 +3,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, test } from "vitest";
 import { getQuestionSet } from "../src/diagnostic/questionSets.js";
-import { buildQuestionExplainabilityReport } from "../src/diagnostic/questionScoreExplainability.js";
+import { buildEvalScoreExplainabilityPack, buildQuestionExplainabilityReport } from "../src/diagnostic/questionScoreExplainability.js";
 import { generateReport, runDiagnostic } from "../src/diagnostic/runner.js";
 import { openLedger } from "../src/ledger/ledger.js";
 import type { DiagnosticQuestion, QuestionScore } from "../src/types.js";
@@ -6172,6 +6172,323 @@ describe("question score explainability receipts", () => {
     });
     expect(incomplete.replayable).toBe(false);
     expect(incomplete.failClosed).toBe(true);
+  });
+
+  test("binds W&B Weave-style eval exports into eval-score explainability packs without standalone subsystem", () => {
+    const report = buildQuestionExplainabilityReport({
+      agentId: "weave-eval-agent",
+      runId: "run-weave-eval-score-explainability",
+      generatedAt: "2026-06-20T00:00:00.000Z",
+      sourceRefs: ["https://wandb.ai/site/weave/"],
+      rows: [
+        {
+          question: question("AMC-1.1"),
+          score: score({
+            flags: [],
+            claimedLevel: 4,
+            supportedMaxLevel: 4,
+            finalLevel: 4,
+            evidenceEventIds: ["ev-weave-export", "ev-weave-thresholds"],
+          }),
+          acceptedEvidence: [
+            {
+              id: "ev-weave-export",
+              event_hash: "a".repeat(64),
+              writer_sig: "sig-weave-export",
+              event_type: "artifact",
+              session_id: "session-weave-export",
+              ts: 10,
+              trustTier: "OBSERVED",
+            },
+            {
+              id: "ev-weave-thresholds",
+              event_hash: "b".repeat(64),
+              writer_sig: "sig-weave-thresholds",
+              event_type: "metric",
+              session_id: "session-weave-eval",
+              ts: 20,
+              trustTier: "OBSERVED_HARDENED",
+            },
+          ],
+          rejectedEvidence: [
+            {
+              event: {
+                id: "ev-weave-metadata-only",
+                event_hash: "c".repeat(64),
+                writer_sig: "sig-weave-metadata-only",
+                event_type: "review",
+                session_id: "session-weave-review",
+                ts: 30,
+                trustTier: "ATTESTED",
+              },
+              reason: "metadata-only Weave export lacked question id, accepted evidence ids, rejected reasons, repair hint, eval pack hashes, signed rows, and thresholds",
+            },
+          ],
+          criteriaDiagnostics: [
+            {
+              criterionId: "weave-eval-score-explainability",
+              criterionType: "agent_judge",
+              status: "satisfied",
+              evidenceRefs: ["ev-weave-export", "ev-weave-thresholds"],
+              rejectedEvidenceRefs: ["ev-weave-metadata-only"],
+              judgeRef: "judge://amc/eval-score-explainability",
+              repairHint: "Keep the Weave export as evidence only after it is bound to AMC question IDs, signed evidence rows, rejected reasons, repair hints, and thresholds.",
+            },
+          ],
+          testSuiteEvaluationLens: [
+            {
+              suiteId: "weave-eval-score-pack",
+              sourceRef: "https://wandb.ai/site/weave/",
+              language: "python",
+              testFramework: "pytest",
+              adapter: "generic_llm_client",
+              datasetRef: "weave://evals/customer-support",
+              datasetHash: "d".repeat(64),
+              testCaseId: "AMC-1.1:traceable-score-row",
+              testCaseHash: "e".repeat(64),
+              evaluatorIds: ["answer-quality", "tool-call-policy"],
+              evaluatorConfigHash: "f".repeat(64),
+              judgeModelRef: "judge://amc/local-eval",
+              experimentRunId: "weave-run-2026-06-20",
+              experimentResultHash: "0".repeat(64),
+              exportArtifactHash: "1".repeat(64),
+              ciRunId: "ci-weave-eval-score-001",
+              ciConfigHash: "2".repeat(64),
+              traceArtifactHash: "3".repeat(64),
+              toolCallValidationHash: "4".repeat(64),
+              agentBehaviorEvaluation: true,
+              passRate0to1: 0.96,
+              minPassRate0to1: 0.95,
+              averageScore0to1: 0.91,
+              threshold0to1: 0.9,
+              status: "satisfied",
+              evidenceRefs: ["ev-weave-export", "ev-weave-thresholds"],
+              rejectedEvidenceRefs: ["ev-weave-metadata-only"],
+              repairHint: "Preserve question ID, signed evidence rows, accepted/rejected evidence references, replayable export hashes, and threshold config before relying on this score.",
+            },
+          ],
+          missingGateReasons: [],
+        },
+      ],
+    });
+    const pack = buildEvalScoreExplainabilityPack(report);
+
+    expect(report.replayable).toBe(true);
+    expect(pack.failClosed).toBe(false);
+    expect(pack.rows[0]).toMatchObject({
+      questionId: "AMC-1.1",
+      acceptedEvidenceIds: ["ev-weave-export", "ev-weave-thresholds"],
+      rejectedEvidenceReasons: [
+        expect.objectContaining({
+          evidenceId: "ev-weave-metadata-only",
+          reason: expect.stringContaining("metadata-only Weave export"),
+        }),
+      ],
+      status: "ready",
+      reproducibleEvalPacks: [
+        expect.objectContaining({
+          packId: "weave-eval-score-pack",
+          sourceRef: "https://wandb.ai/site/weave/",
+          kind: "test_suite_evaluation",
+          ciRunId: "ci-weave-eval-score-001",
+        }),
+      ],
+      failClosedThresholds: [
+        expect.objectContaining({ id: "weave-eval-score-pack:pass_rate", passed: true }),
+        expect.objectContaining({ id: "weave-eval-score-pack:average_score", passed: true }),
+      ],
+    });
+    expect(pack.rows[0]?.signedEvidenceRows).toHaveLength(2);
+    expect(pack.packHash).toMatch(/^[a-f0-9]{64}$/);
+
+    const metadataOnly = buildQuestionExplainabilityReport({
+      agentId: "weave-eval-agent",
+      runId: "run-weave-eval-score-metadata-only",
+      generatedAt: "2026-06-20T00:00:00.000Z",
+      sourceRefs: ["https://wandb.ai/site/weave/"],
+      rows: [
+        {
+          question: question("AMC-1.1"),
+          score: score({ flags: [], claimedLevel: 4, supportedMaxLevel: 4, finalLevel: 4 }),
+          acceptedEvidence: [
+            {
+              id: "ev-weave-metadata",
+              event_hash: "a".repeat(64),
+              writer_sig: "sig-weave-metadata",
+              event_type: "artifact",
+              session_id: "session-weave-metadata",
+              ts: 10,
+              trustTier: "ATTESTED",
+            },
+          ],
+          rejectedEvidence: [],
+          criteriaDiagnostics: [
+            {
+              criterionId: "weave-metadata-only",
+              criterionType: "agent_judge",
+              status: "satisfied",
+              evidenceRefs: ["ev-weave-metadata"],
+              repairHint: "Attach per-question eval pack hashes, signed evidence rows, rejected reasons, and thresholds.",
+            },
+          ],
+          missingGateReasons: [],
+        },
+      ],
+    });
+
+    expect(buildEvalScoreExplainabilityPack(metadataOnly)).toMatchObject({
+      failClosed: true,
+      rows: [expect.objectContaining({ status: "fail_closed", reproducibleEvalPacks: [] })],
+    });
+  });
+
+  test("binds Opik-style eval score explainability without allowing metadata-only evidence", () => {
+    const report = buildQuestionExplainabilityReport({
+      agentId: "opik-eval-agent",
+      runId: "run-opik-eval-score-explainability",
+      generatedAt: "2026-06-20T00:00:00.000Z",
+      sourceRefs: ["https://www.comet.com/site/products/opik/"],
+      rows: [
+        {
+          question: question("AMC-1.1"),
+          score: score({
+            flags: [],
+            claimedLevel: 4,
+            supportedMaxLevel: 4,
+            finalLevel: 4,
+            evidenceEventIds: ["ev-opik-eval-pack", "ev-opik-signed-rows"],
+          }),
+          acceptedEvidence: [
+            { id: "ev-opik-eval-pack", event_hash: "a".repeat(64), writer_sig: "sig-opik-eval-pack", event_type: "metric", session_id: "session-opik-eval", ts: 30, trustTier: "OBSERVED_HARDENED" },
+            { id: "ev-opik-signed-rows", event_hash: "b".repeat(64), writer_sig: "sig-opik-signed-rows", event_type: "artifact", session_id: "session-opik-eval", ts: 31, trustTier: "OBSERVED_HARDENED" },
+          ],
+          rejectedEvidence: [
+            {
+              event: { id: "ev-opik-product-page-only", event_hash: "c".repeat(64), writer_sig: "sig-opik-product-page-only", event_type: "review", session_id: "session-opik-review", ts: 32, trustTier: "ATTESTED" },
+              reason: "Comet Opik product-page metadata is relevant to eval observability but lacks AMC question id, accepted evidence ids, rejected reasons, repair hint, reproducible eval pack, signed evidence rows, and fail-closed thresholds",
+            },
+          ],
+          criteriaDiagnostics: [
+            {
+              criterionId: "opik-eval-score-explainability-proof",
+              criterionType: "evaluation_metric",
+              status: "satisfied",
+              evidenceRefs: ["ev-opik-eval-pack", "ev-opik-signed-rows"],
+              rejectedEvidenceRefs: ["ev-opik-product-page-only"],
+              judgeRef: "judge://amc/opik-eval-score-explainability",
+              repairHint: "Attach AMC-owned eval pack, signed evidence rows, question trace, threshold policy, accepted/rejected ledgers, and no-parity/no-copy proof.",
+            },
+          ],
+          opikEvaluationQuestionLens: [
+            {
+              lensId: "opik-eval-score-explainability",
+              sourceRef: "https://www.comet.com/site/products/opik/",
+              productUrl: "https://www.comet.com/site/products/opik/",
+              liveRelevanceCheckHash: "d".repeat(64),
+              projectRef: "amc-opik-style-project",
+              experimentRef: "amc-opik-style-experiment-001",
+              datasetManifestHash: "e".repeat(64),
+              traceExportHash: "f".repeat(64),
+              evalPackManifestHash: "0".repeat(64),
+              questionSetHash: "1".repeat(64),
+              questionIdRef: "AMC-1.1",
+              questionTraceHash: "2".repeat(64),
+              evaluatorConfigHash: "3".repeat(64),
+              metricResultHash: "4".repeat(64),
+              scoreBreakdownHash: "5".repeat(64),
+              acceptedEvidenceLedgerHash: "6".repeat(64),
+              rejectedEvidenceLedgerHash: "7".repeat(64),
+              repairHintHash: "8".repeat(64),
+              thresholdPolicyHash: "9".repeat(64),
+              signedEvidenceRowsHash: "a".repeat(64),
+              ciRunId: "ci:opik-eval-score-explainability:001",
+              ciConfigHash: "b".repeat(64),
+              noParityClaimHash: "c".repeat(64),
+              noSourceCopyBoundaryHash: "d".repeat(64),
+              metricFamily: "offline_experiment",
+              metricIds: ["question_score_breakdown", "accepted_evidence_coverage", "repair_hint_coverage"],
+              traceCount: 25,
+              minTraceCount: 20,
+              questionCount: 12,
+              minQuestionCount: 10,
+              evidenceCoverage0to1: 1,
+              minEvidenceCoverage0to1: 0.95,
+              rejectedEvidenceReasonCoverage0to1: 1,
+              minRejectedEvidenceReasonCoverage0to1: 0.9,
+              repairHintCoverage0to1: 1,
+              minRepairHintCoverage0to1: 0.9,
+              thresholdPassRate0to1: 1,
+              minThresholdPassRate0to1: 0.99,
+              scoreConfidence0to1: 0.92,
+              minScoreConfidence0to1: 0.8,
+              status: "satisfied",
+              evidenceRefs: ["ev-opik-eval-pack", "ev-opik-signed-rows"],
+              rejectedEvidenceRefs: ["ev-opik-product-page-only"],
+              repairHint: "Keep question ID, accepted evidence IDs, rejected reasons, repair hint, eval pack, signed rows, thresholds, and no-parity/no-copy proof attached.",
+            },
+          ],
+          missingGateReasons: [],
+        },
+      ],
+    });
+
+    expect(report.replayable).toBe(true);
+    expect(report.failClosed).toBe(false);
+    expect(report.rows[0]?.opikEvaluationQuestionLens[0]).toMatchObject({
+      lensId: "opik-eval-score-explainability",
+      questionIdRef: "AMC-1.1",
+      metricFamily: "offline_experiment",
+      thresholdPassRate0to1: 1,
+      rowHash: expect.stringMatching(/^[a-f0-9]{64}$/),
+    });
+
+    const metadataOnly = buildQuestionExplainabilityReport({
+      agentId: "opik-eval-agent",
+      runId: "run-opik-metadata-only",
+      generatedAt: "2026-06-20T00:00:00.000Z",
+      rows: [
+        {
+          question: question("AMC-1.1"),
+          score: score({ flags: [], claimedLevel: 4, supportedMaxLevel: 4, finalLevel: 4 }),
+          acceptedEvidence: [
+            { id: "ev-opik-product-metadata", event_hash: "a".repeat(64), writer_sig: "sig-opik-product-metadata", event_type: "artifact", session_id: "session-opik-metadata", ts: 40, trustTier: "OBSERVED" },
+          ],
+          rejectedEvidence: [],
+          opikEvaluationQuestionLens: [
+            {
+              lensId: "opik-eval-score-explainability",
+              sourceRef: "https://www.comet.com/site/products/opik/",
+              questionIdRef: "AMC-1.1",
+              metricFamily: "trace_observability",
+              metricIds: ["metadata_relevance"],
+              traceCount: 1,
+              minTraceCount: 20,
+              questionCount: 1,
+              minQuestionCount: 10,
+              evidenceCoverage0to1: 0.1,
+              minEvidenceCoverage0to1: 0.95,
+              status: "satisfied",
+              evidenceRefs: ["ev-opik-product-metadata"],
+              repairHint: "Metadata-only Opik relevance must be replaced with AMC-owned signed eval rows and thresholds.",
+            },
+          ],
+          missingGateReasons: [],
+        },
+      ],
+    });
+
+    expect(metadataOnly.replayable).toBe(false);
+    expect(metadataOnly.failClosed).toBe(true);
+    expect(metadataOnly.rows[0]?.opikEvaluationQuestionLens[0]).toMatchObject({
+      evalPackManifestHash: null,
+      signedEvidenceRowsHash: null,
+      thresholdPolicyHash: null,
+      noParityClaimHash: null,
+      noSourceCopyBoundaryHash: null,
+      traceCount: 1,
+      minTraceCount: 20,
+      repairHint: expect.stringContaining("Metadata-only"),
+    });
   });
 
 });

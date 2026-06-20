@@ -664,6 +664,62 @@ export interface QuestionScoreOpenModelRagQuestionLensRef {
   rowHash: string;
 }
 
+export type QuestionScoreOpikEvaluationMetricFamily =
+  | "trace_observability"
+  | "offline_experiment"
+  | "online_evaluation"
+  | "dataset_evaluation"
+  | "llm_judge"
+  | "custom";
+
+export interface QuestionScoreOpikEvaluationQuestionLensRef {
+  lensId: string;
+  sourceRef: string;
+  productUrl: string;
+  liveRelevanceCheckHash: string | null;
+  projectRef: string | null;
+  experimentRef: string | null;
+  datasetManifestHash: string | null;
+  traceExportHash: string | null;
+  evalPackManifestHash: string | null;
+  questionSetHash: string | null;
+  questionIdRef: string;
+  questionTraceHash: string | null;
+  evaluatorConfigHash: string | null;
+  metricResultHash: string | null;
+  scoreBreakdownHash: string | null;
+  acceptedEvidenceLedgerHash: string | null;
+  rejectedEvidenceLedgerHash: string | null;
+  repairHintHash: string | null;
+  thresholdPolicyHash: string | null;
+  signedEvidenceRowsHash: string | null;
+  ciRunId: string | null;
+  ciConfigHash: string | null;
+  noParityClaimHash: string | null;
+  noSourceCopyBoundaryHash: string | null;
+  metricFamily: QuestionScoreOpikEvaluationMetricFamily;
+  metricIds: string[];
+  traceCount: number | null;
+  minTraceCount: number | null;
+  questionCount: number | null;
+  minQuestionCount: number | null;
+  evidenceCoverage0to1: number | null;
+  minEvidenceCoverage0to1: number | null;
+  rejectedEvidenceReasonCoverage0to1: number | null;
+  minRejectedEvidenceReasonCoverage0to1: number | null;
+  repairHintCoverage0to1: number | null;
+  minRepairHintCoverage0to1: number | null;
+  thresholdPassRate0to1: number | null;
+  minThresholdPassRate0to1: number | null;
+  scoreConfidence0to1: number | null;
+  minScoreConfidence0to1: number | null;
+  status: QuestionScoreCriterionStatus;
+  evidenceRefs: string[];
+  rejectedEvidenceRefs: string[];
+  repairHint: string;
+  rowHash: string;
+}
+
 export type QuestionScoreAgentTrialAdapter =
   | "langgraph"
   | "crewai"
@@ -1151,6 +1207,7 @@ export interface QuestionScoreExplainabilityRow {
   testSuiteEvaluationLens: QuestionScoreTestSuiteEvaluationLensRef[];
   evalAiLibraryQuestionLens: QuestionScoreEvalAiLibraryQuestionLensRef[];
   openModelRagQuestionLens: QuestionScoreOpenModelRagQuestionLensRef[];
+  opikEvaluationQuestionLens: QuestionScoreOpikEvaluationQuestionLensRef[];
   statisticalAgentTrialLens: QuestionScoreAgentTrialStatisticalLensRef[];
   codeQuestQualityLens: QuestionScoreCodeQuestQualityLensRef[];
   multiUserBenchmarkLens: QuestionScoreMultiUserBenchmarkLensRef[];

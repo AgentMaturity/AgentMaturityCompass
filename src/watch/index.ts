@@ -264,3 +264,11 @@ export {
   type AiReputationTask,
   type RunAiReputationClaudeLiveDriftInput,
 } from './aiReputationClaudeLiveDrift.js';
+export {
+  runRagTextGenerationLiveDrift,
+  type RagTextGenerationLiveDriftResult,
+  type RagTextGenerationLiveDriftRow,
+  type RagTextGenerationSourceProof,
+  type RagTextGenerationWindow,
+  type RunRagTextGenerationLiveDriftInput,
+} from './ragTextGenerationLiveDrift.js';

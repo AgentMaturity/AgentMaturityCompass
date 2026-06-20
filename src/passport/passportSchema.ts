@@ -49,6 +49,22 @@ export const passportJsonSchema = z.object({
     }),
     unknownQuestionsCount: z.number().int().min(0),
     questionExplainabilityHash: z.string().length(64).optional(),
+    questionExplainabilitySummary: z
+      .object({
+        replayable: z.boolean(),
+        failClosed: z.boolean(),
+        rowCount: z.number().int().min(0),
+        signedEvidenceRowCount: z.number().int().min(0),
+        acceptedEvidenceCount: z.number().int().min(0),
+        rejectedEvidenceCount: z.number().int().min(0),
+        rejectedEvidenceReasonCount: z.number().int().min(0),
+        reproducibleEvalPackCount: z.number().int().min(0),
+        failClosedThresholdCount: z.number().int().min(0),
+        surfaces: z.array(z.string().min(1))
+      })
+      .optional(),
+    questionExplainabilityReplayable: z.boolean().optional(),
+    questionExplainabilityFailClosed: z.boolean().optional(),
     questionScores42: z
       .array(
         z.object({

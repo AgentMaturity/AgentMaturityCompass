@@ -1758,8 +1758,8 @@ export function generateReport(report: DiagnosticReport, format: "md" | "json"):
         `- Replayable: ${questionExplainability.replayable ? "YES" : "NO"}`,
         `- Fail Closed: ${questionExplainability.failClosed ? "YES" : "NO"}`,
         "",
-        "| Question | Status | Evidence Window | Accepted Signed Evidence | Rejected Evidence | Component Diagnostics | Evaluation Criteria | Rubric Lens | Landscape Lens | Benchmark Submission Lens | Test-Suite Evaluation Lens | Multi-User Benchmark Lens | Professional Task Lens | IoT Firmware Question Lens | Retail Sales Question Lens | Continual-Learning Benchmark Lens | Hermes Turbo Performance Lens | Missing Gates | Repair Hint | Row Hash |",
-        "|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|",
+        "| Question | Status | Evidence Window | Accepted Signed Evidence | Rejected Evidence | Component Diagnostics | Evaluation Criteria | Rubric Lens | Landscape Lens | Benchmark Submission Lens | Test-Suite Evaluation Lens | Opik Evaluation Lens | Multi-User Benchmark Lens | Professional Task Lens | IoT Firmware Question Lens | Retail Sales Question Lens | Continual-Learning Benchmark Lens | Hermes Turbo Performance Lens | Missing Gates | Repair Hint | Row Hash |",
+        "|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|",
         ...questionExplainability.rows.map((row) => {
           const accepted = row.acceptedEvidenceIds.join(", ") || "-";
           const window = `${row.evidenceWindow.eventCount} events / ${row.evidenceWindow.distinctSessionCount} sessions / ${row.evidenceWindow.durationMs}ms`;
@@ -1810,6 +1810,16 @@ export function generateReport(report: DiagnosticReport, format: "md" | "json"):
               const experiment = lens.experimentRunId === null ? "experiment=missing" : `experiment=${lens.experimentRunId}`;
               const trace = lens.agentBehaviorEvaluation ? "agent-trace=required" : "agent-trace=optional";
               return `${lens.suiteId}/${lens.testCaseId} (${lens.language}/${lens.testFramework}/${lens.adapter}/${lens.status}; ${passRate}; ${score}; ${ci}; ${experiment}; evaluators=${lens.evaluatorIds.join(",") || "-"}; ${trace}): ${lens.repairHint}`;
+            })
+            .join("; ") || "-";
+          const opikEvaluationQuestionLens = (row.opikEvaluationQuestionLens ?? [])
+            .map((lens) => {
+              const traces = lens.traceCount === null ? "traces=unknown" : `traces=${lens.traceCount}`;
+              const questions = lens.questionCount === null ? "questions=unknown" : `questions=${lens.questionCount}`;
+              const coverage = lens.evidenceCoverage0to1 === null ? "coverage=unknown" : `coverage=${lens.evidenceCoverage0to1}`;
+              const thresholds = lens.thresholdPassRate0to1 === null ? "thresholds=unknown" : `thresholds=${lens.thresholdPassRate0to1}`;
+              const ci = lens.ciRunId === null ? "ci=missing" : `ci=${lens.ciRunId}`;
+              return `${lens.lensId}/${lens.questionIdRef} (${lens.metricFamily}/${lens.status}; ${traces}; ${questions}; ${coverage}; ${thresholds}; ${ci}; metrics=${lens.metricIds.join(",") || "-"}): ${lens.repairHint}`;
             })
             .join("; ") || "-";
           const multiUserBenchmarkLens = row.multiUserBenchmarkLens
@@ -1880,7 +1890,7 @@ export function generateReport(report: DiagnosticReport, format: "md" | "json"):
               return `${lens.benchmarkId}/${lens.performanceFacet} (${lens.defaultBranch}/${lens.status}; ${runs}; ${p50}; ${p95}; ${throughput}; ${speedup}; ${dashboard}; ${regression}): ${lens.repairHint}`;
             })
             .join("; ") || "-";
-          return `| ${row.questionId} | ${row.status} | ${markdownCell(window)} | ${markdownCell(accepted)} | ${markdownCell(rejected)} | ${markdownCell(components)} | ${markdownCell(criteria)} | ${markdownCell(rubricLens)} | ${markdownCell(landscapeLens)} | ${markdownCell(benchmarkSubmissionLens)} | ${markdownCell(testSuiteEvaluationLens)} | ${markdownCell(multiUserBenchmarkLens)} | ${markdownCell(professionalTaskLens)} | ${markdownCell(iotFirmwareQuestionLens)} | ${markdownCell(retailSalesQuestionLens)} | ${markdownCell(continualLearningBenchmarkLens)} | ${markdownCell(hermesTurboPerformanceLens)} | ${markdownCell(row.missingGateReasons.join("; ") || "-")} | ${markdownCell(row.repairHint)} | ${row.rowHash.slice(0, 16)} |`;
+          return `| ${row.questionId} | ${row.status} | ${markdownCell(window)} | ${markdownCell(accepted)} | ${markdownCell(rejected)} | ${markdownCell(components)} | ${markdownCell(criteria)} | ${markdownCell(rubricLens)} | ${markdownCell(landscapeLens)} | ${markdownCell(benchmarkSubmissionLens)} | ${markdownCell(testSuiteEvaluationLens)} | ${markdownCell(opikEvaluationQuestionLens)} | ${markdownCell(multiUserBenchmarkLens)} | ${markdownCell(professionalTaskLens)} | ${markdownCell(iotFirmwareQuestionLens)} | ${markdownCell(retailSalesQuestionLens)} | ${markdownCell(continualLearningBenchmarkLens)} | ${markdownCell(hermesTurboPerformanceLens)} | ${markdownCell(row.missingGateReasons.join("; ") || "-")} | ${markdownCell(row.repairHint)} | ${row.rowHash.slice(0, 16)} |`;
         })
       ].join("\n")
     : "- Question explainability receipts unavailable in this report.";
