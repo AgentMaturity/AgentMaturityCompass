@@ -599,6 +599,71 @@ export interface QuestionScoreEvalAiLibraryQuestionLensRef {
   rowHash: string;
 }
 
+export type QuestionScoreOpenModelRagRuntime =
+  | "ollama_langchain4j"
+  | "ollama"
+  | "langchain4j"
+  | "local_jvm"
+  | "mixed"
+  | "custom";
+
+export interface QuestionScoreOpenModelRagQuestionLensRef {
+  frameworkId: string;
+  sourceRef: string;
+  repositoryRef: string;
+  licenseRef: string | null;
+  licenseSpdxId: string | null;
+  licenseBoundaryHash: string | null;
+  defaultBranch: string;
+  sourceCommitSha: string | null;
+  sourceTreeSha: string | null;
+  sourceStatusHash: string | null;
+  readmeArtifactHash: string | null;
+  javaSourceTreeHash: string | null;
+  buildConfigHash: string | null;
+  dependencyManifestHash: string | null;
+  langChain4jIntegrationHash: string | null;
+  ollamaRuntimeConfigHash: string | null;
+  ragPipelineHash: string | null;
+  ragCorpusManifestHash: string | null;
+  embeddingConfigHash: string | null;
+  retrievalTraceHash: string | null;
+  evaluationManifestHash: string | null;
+  questionSetHash: string | null;
+  questionTraceHash: string | null;
+  evaluatorConfigHash: string | null;
+  metricResultHash: string | null;
+  scoreBreakdownHash: string | null;
+  rejectedEvidenceLedgerHash: string | null;
+  repairHintHash: string | null;
+  regressionThresholdHash: string | null;
+  ciRunId: string | null;
+  ciConfigHash: string | null;
+  noSourceCopyBoundaryHash: string | null;
+  runtime: QuestionScoreOpenModelRagRuntime;
+  openModelIds: string[];
+  evaluationMetricIds: string[];
+  ragQueryCount: number | null;
+  minRagQueryCount: number | null;
+  retrievalGroundingScore0to1: number | null;
+  minRetrievalGroundingScore0to1: number | null;
+  answerRelevanceScore0to1: number | null;
+  minAnswerRelevanceScore0to1: number | null;
+  evidenceCoverage0to1: number | null;
+  minEvidenceCoverage0to1: number | null;
+  rejectedEvidenceReasonCoverage0to1: number | null;
+  minRejectedEvidenceReasonCoverage0to1: number | null;
+  repairHintCoverage0to1: number | null;
+  minRepairHintCoverage0to1: number | null;
+  regressionPassRate0to1: number | null;
+  minRegressionPassRate0to1: number | null;
+  status: QuestionScoreCriterionStatus;
+  evidenceRefs: string[];
+  rejectedEvidenceRefs: string[];
+  repairHint: string;
+  rowHash: string;
+}
+
 export type QuestionScoreAgentTrialAdapter =
   | "langgraph"
   | "crewai"
@@ -1085,6 +1150,7 @@ export interface QuestionScoreExplainabilityRow {
   benchmarkSubmissionLens: QuestionScoreBenchmarkSubmissionLensRef[];
   testSuiteEvaluationLens: QuestionScoreTestSuiteEvaluationLensRef[];
   evalAiLibraryQuestionLens: QuestionScoreEvalAiLibraryQuestionLensRef[];
+  openModelRagQuestionLens: QuestionScoreOpenModelRagQuestionLensRef[];
   statisticalAgentTrialLens: QuestionScoreAgentTrialStatisticalLensRef[];
   codeQuestQualityLens: QuestionScoreCodeQuestQualityLensRef[];
   multiUserBenchmarkLens: QuestionScoreMultiUserBenchmarkLensRef[];

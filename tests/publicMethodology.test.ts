@@ -55,9 +55,10 @@ describe("public methodology manifest", () => {
     expect(first.questionSet.version).toBe("amc-legacy-240-v1");
     expect(first.questionSet.questionCount).toBe(getAllQuestions().length);
     expect(first.changelog[0]?.version).toBe(AMC_PUBLIC_METHODOLOGY_VERSION);
-    expect(first.changelog[0]?.migration).toContain("Reports generated under 2026.06.19-r208");
-    expect(first.changelog[0]?.summary).toContain("RAViG-Bench metric-validity receipts");
+    expect(first.changelog[0]?.migration).toContain("Reports generated under 2026.06.19-r209");
+    expect(first.changelog[0]?.summary).toContain("Open Models RAG question-explainability receipts");
     for (const previousVersion of [
+      "2026.06.19-r209",
       "2026.06.19-r208",
       "2026.06.19-r207",
       "2026.06.19-r206",
@@ -519,6 +520,10 @@ describe("public methodology manifest", () => {
     expect(first.scoreClaimBoundaries.find((boundary) => boundary.boundary === "eval_ai_library_question_explainability_integrity")?.requiredEvidence).toContain("rejected evidence ledger hash");
     expect(first.scoreClaimBoundaries.find((boundary) => boundary.boundary === "eval_ai_library_question_explainability_integrity")?.requiredEvidence).toContain("repair hint hash");
     expect(first.scoreClaimBoundaries.find((boundary) => boundary.boundary === "eval_ai_library_question_explainability_integrity")?.migration).toContain("eval-ai-library");
+    expect(first.scoreClaimBoundaries.find((boundary) => boundary.boundary === "open_model_rag_question_explainability_integrity")?.publicDisclosure).toContain("source metadata alone");
+    expect(first.scoreClaimBoundaries.find((boundary) => boundary.boundary === "open_model_rag_question_explainability_integrity")?.requiredEvidence).toContain("LangChain4j integration hash");
+    expect(first.scoreClaimBoundaries.find((boundary) => boundary.boundary === "open_model_rag_question_explainability_integrity")?.requiredEvidence).toContain("retrieval grounding");
+    expect(first.scoreClaimBoundaries.find((boundary) => boundary.boundary === "open_model_rag_question_explainability_integrity")?.migration).toContain("Open Models");
     expect(first.scoreClaimBoundaries.find((boundary) => boundary.boundary === "fore_public_methodology_versioning_integrity")?.publicDisclosure).toContain("source metadata alone");
     expect(first.scoreClaimBoundaries.find((boundary) => boundary.boundary === "fore_public_methodology_versioning_integrity")?.requiredEvidence).toContain("methodology changelog hash");
     expect(first.scoreClaimBoundaries.find((boundary) => boundary.boundary === "fore_public_methodology_versioning_integrity")?.requiredEvidence).toContain("deprecation notice hash");
@@ -582,6 +587,7 @@ describe("public methodology manifest", () => {
     expect(first.benchmarkMethodologyVersioning.changeTriggers.map((trigger) => trigger.trigger)).toContain("agent_defense_bench_provider_drift_change");
     expect(first.benchmarkMethodologyVersioning.changeTriggers.map((trigger) => trigger.trigger)).toContain("paper_read_skill_live_drift_change");
     expect(first.benchmarkMethodologyVersioning.changeTriggers.map((trigger) => trigger.trigger)).toContain("eval_ai_library_question_explainability_change");
+    expect(first.benchmarkMethodologyVersioning.changeTriggers.map((trigger) => trigger.trigger)).toContain("open_model_rag_question_explainability_change");
     expect(first.benchmarkMethodologyVersioning.changeTriggers.map((trigger) => trigger.trigger)).toContain("fore_public_methodology_versioning_change");
     expect(first.benchmarkMethodologyVersioning.changeTriggers.map((trigger) => trigger.trigger)).toContain("heurekabench_scientific_replay_change");
     expect(first.benchmarkMethodologyVersioning.changeTriggers.map((trigger) => trigger.trigger)).toContain("rag_contradiction_detector_replay_change");
@@ -871,6 +877,7 @@ describe("public methodology manifest", () => {
     expect(first.benchmarkMethodologyVersioning.changeTriggers.map((trigger) => trigger.trigger)).toContain("agent_defense_bench_provider_drift_change");
     expect(first.benchmarkMethodologyVersioning.changeTriggers.map((trigger) => trigger.trigger)).toContain("paper_read_skill_live_drift_change");
     expect(first.benchmarkMethodologyVersioning.changeTriggers.map((trigger) => trigger.trigger)).toContain("eval_ai_library_question_explainability_change");
+    expect(first.benchmarkMethodologyVersioning.changeTriggers.map((trigger) => trigger.trigger)).toContain("open_model_rag_question_explainability_change");
     expect(first.benchmarkMethodologyVersioning.changeTriggers.map((trigger) => trigger.trigger)).toContain("fore_public_methodology_versioning_change");
     expect(first.benchmarkMethodologyVersioning.changeTriggers.map((trigger) => trigger.trigger)).toContain("skillmatch_resume_live_drift_change");
     expect(first.benchmarkMethodologyVersioning.changeTriggers.map((trigger) => trigger.trigger)).toContain("decibench_voice_live_drift_change");
@@ -1350,6 +1357,7 @@ describe("public methodology manifest", () => {
       "agent_defense_bench_provider_drift_evidence",
       "paper_read_skill_live_drift_evidence",
       "eval_ai_library_question_explainability_evidence",
+      "open_model_rag_question_explainability_evidence",
       "fore_public_methodology_versioning_evidence",
       "heurekabench_scientific_replay_evidence",
       "rag_contradiction_detector_replay_evidence",
@@ -1517,6 +1525,10 @@ describe("public methodology manifest", () => {
     expect(markdown).toContain("eval_ai_library_question_explainability_integrity");
     expect(markdown).toContain("eval_ai_library_question_explainability_evidence");
     expect(markdown).toContain("eval_ai_library_question_explainability_change");
+    expect(markdown).toContain("Open Models RAG question-explainability receipts");
+    expect(markdown).toContain("open_model_rag_question_explainability_integrity");
+    expect(markdown).toContain("open_model_rag_question_explainability_evidence");
+    expect(markdown).toContain("open_model_rag_question_explainability_change");
     expect(markdown).toContain("fore public methodology versioning receipts");
     expect(markdown).toContain("fore_public_methodology_versioning_integrity");
     expect(markdown).toContain("fore_public_methodology_versioning_evidence");

@@ -5551,4 +5551,173 @@ describe("question score explainability receipts", () => {
     expect(markdown).toContain("ev-review-rejected");
     expect(markdown).toContain("Repair Hint");
   }, 120_000);
+
+  test("binds Open Models LangChain4j/Ollama RAG source proof into question-explainability rows", () => {
+    const report = buildQuestionExplainabilityReport({
+      agentId: "open-model-rag-agent",
+      runId: "open-model-rag-run",
+      generatedAt: "2026-06-20T00:00:00.000Z",
+      sourceRefs: ["https://github.com/bbenz/gen-ai-with-open-models"],
+      rows: [
+        {
+          question: question("AMC-1.1"),
+          score: score({ flags: [], claimedLevel: 4, supportedMaxLevel: 4, finalLevel: 4 }),
+          acceptedEvidence: [
+            {
+              id: "ev-open-model-rag-pass",
+              event_hash: "a".repeat(64),
+              writer_sig: "sig-open-model-rag-pass",
+              event_type: "metric",
+              session_id: "session-open-model-rag",
+              ts: 20,
+              trustTier: "OBSERVED_HARDENED",
+            },
+          ],
+          rejectedEvidence: [
+            {
+              event: {
+                id: "ev-open-model-rag-reject",
+                event_hash: "b".repeat(64),
+                writer_sig: "sig-open-model-rag-reject",
+                event_type: "review",
+                session_id: "session-open-model-rag-review",
+                ts: 22,
+                trustTier: "ATTESTED",
+              },
+              reason: "upstream demo output was not accepted as product evidence without a source-boundary receipt",
+            },
+          ],
+          criteriaDiagnostics: [
+            {
+              criterionId: "open-model-rag-question-proof",
+              criterionType: "deterministic_check",
+              status: "satisfied",
+              evidenceRefs: ["ev-open-model-rag-pass"],
+              rejectedEvidenceRefs: ["ev-open-model-rag-reject"],
+              repairHint: "Attach source snapshot, LangChain4j/Ollama/RAG eval proof, score breakdown, rejected evidence, and per-question repair hint.",
+            },
+          ],
+          openModelRagQuestionLens: [
+            {
+              frameworkId: "gen-ai-with-open-models",
+              sourceRef: "https://github.com/bbenz/gen-ai-with-open-models",
+              repositoryRef: "github:bbenz/gen-ai-with-open-models",
+              licenseBoundaryHash: "c".repeat(64),
+              defaultBranch: "main",
+              sourceCommitSha: "d".repeat(40),
+              sourceTreeSha: "e".repeat(40),
+              sourceStatusHash: "f".repeat(64),
+              readmeArtifactHash: "1".repeat(64),
+              javaSourceTreeHash: "2".repeat(64),
+              buildConfigHash: "3".repeat(64),
+              dependencyManifestHash: "4".repeat(64),
+              langChain4jIntegrationHash: "5".repeat(64),
+              ollamaRuntimeConfigHash: "6".repeat(64),
+              ragPipelineHash: "7".repeat(64),
+              ragCorpusManifestHash: "8".repeat(64),
+              embeddingConfigHash: "9".repeat(64),
+              retrievalTraceHash: "a".repeat(64),
+              evaluationManifestHash: "b".repeat(64),
+              questionSetHash: "c".repeat(64),
+              questionTraceHash: "d".repeat(64),
+              evaluatorConfigHash: "e".repeat(64),
+              metricResultHash: "f".repeat(64),
+              scoreBreakdownHash: "0".repeat(64),
+              rejectedEvidenceLedgerHash: "1".repeat(64),
+              repairHintHash: "2".repeat(64),
+              regressionThresholdHash: "3".repeat(64),
+              ciRunId: "ci-open-model-rag-001",
+              ciConfigHash: "4".repeat(64),
+              noSourceCopyBoundaryHash: "5".repeat(64),
+              runtime: "ollama_langchain4j",
+              openModelIds: ["ollama:llama3.1", "ollama:nomic-embed-text"],
+              evaluationMetricIds: ["retrieval_grounding", "answer_relevance", "question_repair_hint_coverage"],
+              ragQueryCount: 12,
+              minRagQueryCount: 10,
+              retrievalGroundingScore0to1: 0.93,
+              minRetrievalGroundingScore0to1: 0.9,
+              answerRelevanceScore0to1: 0.91,
+              minAnswerRelevanceScore0to1: 0.9,
+              evidenceCoverage0to1: 0.98,
+              minEvidenceCoverage0to1: 0.95,
+              rejectedEvidenceReasonCoverage0to1: 0.95,
+              minRejectedEvidenceReasonCoverage0to1: 0.9,
+              repairHintCoverage0to1: 0.96,
+              minRepairHintCoverage0to1: 0.9,
+              regressionPassRate0to1: 1,
+              minRegressionPassRate0to1: 0.99,
+              status: "satisfied",
+              evidenceRefs: ["ev-open-model-rag-pass"],
+              rejectedEvidenceRefs: ["ev-open-model-rag-reject"],
+              repairHint: "Keep the Open Models RAG source snapshot, local model runtime, retrieval trace, evaluation manifest, score breakdown, and repair hint linked to this question.",
+            },
+          ],
+          missingGateReasons: [],
+        },
+      ],
+    });
+
+    expect(report.replayable).toBe(true);
+    expect(report.failClosed).toBe(false);
+    expect(report.rows[0]).toMatchObject({
+      questionId: "AMC-1.1",
+      openModelRagQuestionLens: [
+        expect.objectContaining({
+          frameworkId: "gen-ai-with-open-models",
+          runtime: "ollama_langchain4j",
+          openModelIds: ["ollama:llama3.1", "ollama:nomic-embed-text"],
+          evaluationMetricIds: ["retrieval_grounding", "answer_relevance", "question_repair_hint_coverage"],
+          ragQueryCount: 12,
+          rowHash: expect.stringMatching(/^[a-f0-9]{64}$/),
+        }),
+      ],
+    });
+
+    const incomplete = buildQuestionExplainabilityReport({
+      agentId: "open-model-rag-agent",
+      runId: "open-model-rag-run-incomplete",
+      generatedAt: "2026-06-20T00:00:00.000Z",
+      rows: [
+        {
+          question: question("AMC-1.1"),
+          score: score({ flags: [], claimedLevel: 4, supportedMaxLevel: 4, finalLevel: 4 }),
+          acceptedEvidence: [
+            {
+              id: "ev-open-model-rag-pass",
+              event_hash: "a".repeat(64),
+              writer_sig: "sig-open-model-rag-pass",
+              event_type: "metric",
+              session_id: "session-open-model-rag",
+              ts: 20,
+              trustTier: "OBSERVED_HARDENED",
+            },
+          ],
+          rejectedEvidence: [],
+          openModelRagQuestionLens: [
+            {
+              frameworkId: "gen-ai-with-open-models",
+              sourceRef: "https://github.com/bbenz/gen-ai-with-open-models",
+              repositoryRef: "github:bbenz/gen-ai-with-open-models",
+              defaultBranch: "main",
+              sourceCommitSha: "d".repeat(40),
+              sourceTreeSha: "e".repeat(40),
+              readmeArtifactHash: "1".repeat(64),
+              runtime: "ollama_langchain4j",
+              openModelIds: ["ollama:llama3.1"],
+              evaluationMetricIds: ["retrieval_grounding"],
+              ragQueryCount: 1,
+              minRagQueryCount: 10,
+              status: "satisfied",
+              evidenceRefs: ["ev-open-model-rag-pass"],
+              repairHint: "Complete missing LangChain4j/Ollama/RAG proof before relying on this score.",
+            },
+          ],
+          missingGateReasons: [],
+        },
+      ],
+    });
+    expect(incomplete.replayable).toBe(false);
+    expect(incomplete.failClosed).toBe(true);
+  });
+
 });

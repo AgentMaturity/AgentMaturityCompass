@@ -32,6 +32,8 @@ import type {
   QuestionScoreLandscapeCategory,
   QuestionScoreLandscapeLensRef,
   QuestionScoreLandscapeUpdateCadence,
+  QuestionScoreOpenModelRagQuestionLensRef,
+  QuestionScoreOpenModelRagRuntime,
   QuestionScoreMultiUserBenchmarkLensRef,
   QuestionScoreMultiUserCapability,
   QuestionScoreMultiUserScenarioFamily,
@@ -320,6 +322,62 @@ export interface QuestionExplainabilityEvalAiLibraryQuestionInput {
   minRegressionPassRate0to1?: number | null;
   scoreConfidence0to1?: number | null;
   minScoreConfidence0to1?: number | null;
+  status: QuestionScoreCriterionStatus;
+  evidenceRefs?: string[];
+  rejectedEvidenceRefs?: string[];
+  repairHint?: string;
+}
+
+export interface QuestionExplainabilityOpenModelRagQuestionInput {
+  frameworkId: string;
+  sourceRef: string;
+  repositoryRef?: string;
+  licenseRef?: string | null;
+  licenseSpdxId?: string | null;
+  licenseBoundaryHash?: string | null;
+  defaultBranch?: string;
+  sourceCommitSha?: string | null;
+  sourceTreeSha?: string | null;
+  sourceStatusHash?: string | null;
+  readmeArtifactHash?: string | null;
+  javaSourceTreeHash?: string | null;
+  buildConfigHash?: string | null;
+  dependencyManifestHash?: string | null;
+  langChain4jIntegrationHash?: string | null;
+  ollamaRuntimeConfigHash?: string | null;
+  ragPipelineHash?: string | null;
+  ragCorpusManifestHash?: string | null;
+  embeddingConfigHash?: string | null;
+  retrievalTraceHash?: string | null;
+  evaluationManifestHash?: string | null;
+  questionSetHash?: string | null;
+  questionTraceHash?: string | null;
+  evaluatorConfigHash?: string | null;
+  metricResultHash?: string | null;
+  scoreBreakdownHash?: string | null;
+  rejectedEvidenceLedgerHash?: string | null;
+  repairHintHash?: string | null;
+  regressionThresholdHash?: string | null;
+  ciRunId?: string | null;
+  ciConfigHash?: string | null;
+  noSourceCopyBoundaryHash?: string | null;
+  runtime?: QuestionScoreOpenModelRagRuntime;
+  openModelIds?: string[];
+  evaluationMetricIds?: string[];
+  ragQueryCount?: number | null;
+  minRagQueryCount?: number | null;
+  retrievalGroundingScore0to1?: number | null;
+  minRetrievalGroundingScore0to1?: number | null;
+  answerRelevanceScore0to1?: number | null;
+  minAnswerRelevanceScore0to1?: number | null;
+  evidenceCoverage0to1?: number | null;
+  minEvidenceCoverage0to1?: number | null;
+  rejectedEvidenceReasonCoverage0to1?: number | null;
+  minRejectedEvidenceReasonCoverage0to1?: number | null;
+  repairHintCoverage0to1?: number | null;
+  minRepairHintCoverage0to1?: number | null;
+  regressionPassRate0to1?: number | null;
+  minRegressionPassRate0to1?: number | null;
   status: QuestionScoreCriterionStatus;
   evidenceRefs?: string[];
   rejectedEvidenceRefs?: string[];
@@ -720,6 +778,7 @@ export interface QuestionExplainabilityInputRow {
   benchmarkSubmissionLens?: QuestionExplainabilityBenchmarkSubmissionInput[];
   testSuiteEvaluationLens?: QuestionExplainabilityTestSuiteEvaluationInput[];
   evalAiLibraryQuestionLens?: QuestionExplainabilityEvalAiLibraryQuestionInput[];
+  openModelRagQuestionLens?: QuestionExplainabilityOpenModelRagQuestionInput[];
   statisticalAgentTrialLens?: QuestionExplainabilityAgentTrialStatisticalInput[];
   codeQuestQualityLens?: QuestionExplainabilityCodeQuestQualityInput[];
   multiUserBenchmarkLens?: QuestionExplainabilityMultiUserBenchmarkInput[];
@@ -1294,6 +1353,85 @@ function normalizeEvalAiLibraryQuestionLens(
     evidenceRefs: unique(input.evidenceRefs ?? []),
     rejectedEvidenceRefs: unique(input.rejectedEvidenceRefs ?? []),
     repairHint: input.repairHint?.trim() || "Attach eval-ai-library source, metric catalog, question id, accepted evidence ids, rejected evidence reasons, repair hint, score breakdown, CI threshold, and no-copy proof before relying on this question score."
+  };
+  return {
+    ...withoutHash,
+    rowHash: sha256Hex(canonicalize(withoutHash))
+  };
+}
+
+const openModelRagRuntimes = new Set<QuestionScoreOpenModelRagRuntime>([
+  "ollama_langchain4j",
+  "ollama",
+  "langchain4j",
+  "local_jvm",
+  "mixed",
+  "custom"
+]);
+
+function normalizeOpenModelRagRuntime(
+  input: QuestionScoreOpenModelRagRuntime | undefined,
+): QuestionScoreOpenModelRagRuntime {
+  return input && openModelRagRuntimes.has(input) ? input : "custom";
+}
+
+function normalizeOpenModelRagQuestionLens(
+  input: QuestionExplainabilityOpenModelRagQuestionInput,
+): QuestionScoreOpenModelRagQuestionLensRef {
+  const withoutHash: Omit<QuestionScoreOpenModelRagQuestionLensRef, "rowHash"> = {
+    frameworkId: input.frameworkId.trim() || "unknown-open-model-rag-framework",
+    sourceRef: input.sourceRef.trim() || "unknown-source",
+    repositoryRef: input.repositoryRef?.trim() || "unknown-repository",
+    licenseRef: nullableString(input.licenseRef),
+    licenseSpdxId: nullableString(input.licenseSpdxId),
+    licenseBoundaryHash: nullableSha256Hash(input.licenseBoundaryHash),
+    defaultBranch: input.defaultBranch?.trim() || "unknown-branch",
+    sourceCommitSha: nullableGitSha(input.sourceCommitSha),
+    sourceTreeSha: nullableGitSha(input.sourceTreeSha),
+    sourceStatusHash: nullableSha256Hash(input.sourceStatusHash),
+    readmeArtifactHash: nullableSourceHash(input.readmeArtifactHash),
+    javaSourceTreeHash: nullableSourceHash(input.javaSourceTreeHash),
+    buildConfigHash: nullableSourceHash(input.buildConfigHash),
+    dependencyManifestHash: nullableSourceHash(input.dependencyManifestHash),
+    langChain4jIntegrationHash: nullableSourceHash(input.langChain4jIntegrationHash),
+    ollamaRuntimeConfigHash: nullableSourceHash(input.ollamaRuntimeConfigHash),
+    ragPipelineHash: nullableSourceHash(input.ragPipelineHash),
+    ragCorpusManifestHash: nullableSourceHash(input.ragCorpusManifestHash),
+    embeddingConfigHash: nullableSourceHash(input.embeddingConfigHash),
+    retrievalTraceHash: nullableSha256Hash(input.retrievalTraceHash),
+    evaluationManifestHash: nullableSourceHash(input.evaluationManifestHash),
+    questionSetHash: nullableSha256Hash(input.questionSetHash),
+    questionTraceHash: nullableSha256Hash(input.questionTraceHash),
+    evaluatorConfigHash: nullableSha256Hash(input.evaluatorConfigHash),
+    metricResultHash: nullableSha256Hash(input.metricResultHash),
+    scoreBreakdownHash: nullableSha256Hash(input.scoreBreakdownHash),
+    rejectedEvidenceLedgerHash: nullableSha256Hash(input.rejectedEvidenceLedgerHash),
+    repairHintHash: nullableSha256Hash(input.repairHintHash),
+    regressionThresholdHash: nullableSha256Hash(input.regressionThresholdHash),
+    ciRunId: nullableString(input.ciRunId),
+    ciConfigHash: nullableSha256Hash(input.ciConfigHash),
+    noSourceCopyBoundaryHash: nullableSha256Hash(input.noSourceCopyBoundaryHash),
+    runtime: normalizeOpenModelRagRuntime(input.runtime),
+    openModelIds: unique(input.openModelIds ?? []),
+    evaluationMetricIds: unique(input.evaluationMetricIds ?? []),
+    ragQueryCount: positiveInteger(input.ragQueryCount),
+    minRagQueryCount: positiveInteger(input.minRagQueryCount),
+    retrievalGroundingScore0to1: nullableRate(input.retrievalGroundingScore0to1),
+    minRetrievalGroundingScore0to1: nullableRate(input.minRetrievalGroundingScore0to1),
+    answerRelevanceScore0to1: nullableRate(input.answerRelevanceScore0to1),
+    minAnswerRelevanceScore0to1: nullableRate(input.minAnswerRelevanceScore0to1),
+    evidenceCoverage0to1: nullableRate(input.evidenceCoverage0to1),
+    minEvidenceCoverage0to1: nullableRate(input.minEvidenceCoverage0to1),
+    rejectedEvidenceReasonCoverage0to1: nullableRate(input.rejectedEvidenceReasonCoverage0to1),
+    minRejectedEvidenceReasonCoverage0to1: nullableRate(input.minRejectedEvidenceReasonCoverage0to1),
+    repairHintCoverage0to1: nullableRate(input.repairHintCoverage0to1),
+    minRepairHintCoverage0to1: nullableRate(input.minRepairHintCoverage0to1),
+    regressionPassRate0to1: nullableRate(input.regressionPassRate0to1),
+    minRegressionPassRate0to1: nullableRate(input.minRegressionPassRate0to1),
+    status: input.status,
+    evidenceRefs: unique(input.evidenceRefs ?? []),
+    rejectedEvidenceRefs: unique(input.rejectedEvidenceRefs ?? []),
+    repairHint: input.repairHint?.trim() || "Attach open-model RAG source snapshot, license/no-license boundary, Java/LangChain4j/Ollama/RAG proof, local model ids, evaluation manifest, question trace, score breakdown, rejected evidence, repair hints, CI threshold, no-source-copy proof, signed evidence, and row hash before relying on this question score."
   };
   return {
     ...withoutHash,
@@ -2406,6 +2544,80 @@ function hasReplayableEvalAiLibraryQuestionLens(ref: QuestionScoreEvalAiLibraryQ
   return ref.repairHint.length > 0;
 }
 
+function openModelRagMetricsMeetThreshold(ref: QuestionScoreOpenModelRagQuestionLensRef): boolean {
+  return ref.ragQueryCount !== null &&
+    ref.minRagQueryCount !== null &&
+    ref.ragQueryCount >= ref.minRagQueryCount &&
+    meetsMinimum(ref.retrievalGroundingScore0to1, ref.minRetrievalGroundingScore0to1) &&
+    meetsMinimum(ref.answerRelevanceScore0to1, ref.minAnswerRelevanceScore0to1) &&
+    meetsMinimum(ref.evidenceCoverage0to1, ref.minEvidenceCoverage0to1) &&
+    meetsMinimum(ref.rejectedEvidenceReasonCoverage0to1, ref.minRejectedEvidenceReasonCoverage0to1) &&
+    meetsMinimum(ref.repairHintCoverage0to1, ref.minRepairHintCoverage0to1) &&
+    meetsMinimum(ref.regressionPassRate0to1, ref.minRegressionPassRate0to1);
+}
+
+function hasReplayableOpenModelRagQuestionLens(ref: QuestionScoreOpenModelRagQuestionLensRef): boolean {
+  if (
+    ref.frameworkId.length === 0 ||
+    ref.frameworkId.startsWith("unknown-") ||
+    ref.sourceRef.length === 0 ||
+    ref.sourceRef === "unknown-source" ||
+    ref.repositoryRef.length === 0 ||
+    ref.repositoryRef === "unknown-repository" ||
+    ref.defaultBranch.length === 0 ||
+    ref.defaultBranch === "unknown-branch" ||
+    !isSha256(ref.rowHash)
+  ) {
+    return false;
+  }
+  if (ref.sourceCommitSha === null || ref.sourceTreeSha === null) {
+    return false;
+  }
+  if (![
+    ref.licenseBoundaryHash,
+    ref.sourceStatusHash,
+    ref.retrievalTraceHash,
+    ref.questionSetHash,
+    ref.questionTraceHash,
+    ref.evaluatorConfigHash,
+    ref.metricResultHash,
+    ref.scoreBreakdownHash,
+    ref.rejectedEvidenceLedgerHash,
+    ref.repairHintHash,
+    ref.regressionThresholdHash,
+    ref.ciConfigHash,
+    ref.noSourceCopyBoundaryHash,
+  ].every(hashPresent)) {
+    return false;
+  }
+  if (![
+    ref.readmeArtifactHash,
+    ref.javaSourceTreeHash,
+    ref.buildConfigHash,
+    ref.dependencyManifestHash,
+    ref.langChain4jIntegrationHash,
+    ref.ollamaRuntimeConfigHash,
+    ref.ragPipelineHash,
+    ref.ragCorpusManifestHash,
+    ref.embeddingConfigHash,
+    ref.evaluationManifestHash,
+  ].every(sourceHashPresent)) {
+    return false;
+  }
+  if (ref.status === "satisfied") {
+    return ref.evidenceRefs.length > 0 &&
+      ref.ciRunId !== null &&
+      ref.runtime !== "custom" &&
+      ref.openModelIds.length > 0 &&
+      ref.evaluationMetricIds.length > 0 &&
+      openModelRagMetricsMeetThreshold(ref);
+  }
+  if (ref.status === "failed") {
+    return ref.evidenceRefs.length > 0 || ref.rejectedEvidenceRefs.length > 0 || ref.repairHint.length > 0;
+  }
+  return ref.repairHint.length > 0;
+}
+
 function meetsMaximum(value: number | null, maximum: number | null): boolean {
   return value !== null && maximum !== null && value <= maximum;
 }
@@ -3026,6 +3238,9 @@ export function buildQuestionExplainabilityReport(
     const evalAiLibraryQuestionLens = (
       item.evalAiLibraryQuestionLens ?? []
     ).map(normalizeEvalAiLibraryQuestionLens);
+    const openModelRagQuestionLens = (
+      item.openModelRagQuestionLens ?? []
+    ).map(normalizeOpenModelRagQuestionLens);
     const statisticalAgentTrialLens = (
       item.statisticalAgentTrialLens ?? []
     ).map(normalizeAgentTrialStatisticalLens);
@@ -3065,6 +3280,7 @@ export function buildQuestionExplainabilityReport(
       benchmarkSubmissionLens,
       testSuiteEvaluationLens,
       evalAiLibraryQuestionLens,
+      openModelRagQuestionLens,
       statisticalAgentTrialLens,
       codeQuestQualityLens,
       multiUserBenchmarkLens,
@@ -3101,6 +3317,7 @@ export function buildQuestionExplainabilityReport(
     row.benchmarkSubmissionLens.every(hasReplayableBenchmarkSubmissionLens) &&
     row.testSuiteEvaluationLens.every(hasReplayableTestSuiteEvaluationLens) &&
     row.evalAiLibraryQuestionLens.every(hasReplayableEvalAiLibraryQuestionLens) &&
+    row.openModelRagQuestionLens.every(hasReplayableOpenModelRagQuestionLens) &&
     row.statisticalAgentTrialLens.every(hasReplayableAgentTrialStatisticalLens) &&
     row.codeQuestQualityLens.every(hasReplayableCodeQuestQualityLens) &&
     row.multiUserBenchmarkLens.every(hasReplayableMultiUserBenchmarkLens) &&
@@ -3122,6 +3339,9 @@ export function buildQuestionExplainabilityReport(
     row.testSuiteEvaluationLens.some((lens) => lens.status !== "satisfied" || !hasReplayableTestSuiteEvaluationLens(lens)) ||
     row.evalAiLibraryQuestionLens.some(
       (lens) => lens.status !== "satisfied" || !hasReplayableEvalAiLibraryQuestionLens(lens)
+    ) ||
+    row.openModelRagQuestionLens.some(
+      (lens) => lens.status !== "satisfied" || !hasReplayableOpenModelRagQuestionLens(lens)
     ) ||
     row.statisticalAgentTrialLens.some(
       (lens) => lens.status !== "satisfied" || !hasReplayableAgentTrialStatisticalLens(lens)
