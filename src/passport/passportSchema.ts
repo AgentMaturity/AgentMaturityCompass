@@ -60,7 +60,19 @@ export const passportJsonSchema = z.object({
         rejectedEvidenceReasonCount: z.number().int().min(0),
         reproducibleEvalPackCount: z.number().int().min(0),
         failClosedThresholdCount: z.number().int().min(0),
-        surfaces: z.array(z.string().min(1))
+        surfaces: z.array(z.string().min(1)),
+        rows: z
+          .array(
+            z.object({
+              questionId: z.string().min(1),
+              acceptedEvidenceIds: z.array(z.string().min(1)),
+              rejectedEvidenceReasons: z.array(z.object({ evidenceId: z.string().min(1), reason: z.string().min(1) })),
+              repairHint: z.string().min(1),
+              status: z.enum(["ready", "fail_closed"]),
+              rowHash: z.string().length(64)
+            })
+          )
+          .optional()
       })
       .optional(),
     questionExplainabilityReplayable: z.boolean().optional(),

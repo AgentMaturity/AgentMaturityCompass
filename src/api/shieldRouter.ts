@@ -9,6 +9,7 @@ import type { ReplayBenchmarkCiReceipt, ReplayBenchmarkCorpusManifest } from '..
 import type { LiveDriftReceipt } from '../watch/liveDriftAlerts.js';
 import type { JudgeCalibrationReceipt } from '../eval/judgeCalibration.js';
 import type { RunPromptLayerProviderDriftInput } from '../benchmarks/promptLayerProviderDrift.js';
+import type { RunPromptfooProviderDriftInput } from '../benchmarks/promptfooProviderDrift.js';
 
 const shieldScanBodySchema = z.object({
   code: z.string().min(1),
@@ -30,7 +31,7 @@ export async function handleShieldRoute(
     apiSuccess(res, {
       status: 'operational',
       module: 'shield',
-      capabilities: ['scan', 'injection-detect', 'sanitize', 'score-explainability-receipts', 'replay-corpus-ci-receipts', 'live-drift-receipts', 'judge-calibration-receipts', 'provider-drift-fail-closed-receipts']
+      capabilities: ['scan', 'injection-detect', 'sanitize', 'score-explainability-receipts', 'replay-corpus-ci-receipts', 'live-drift-receipts', 'judge-calibration-receipts', 'provider-drift-fail-closed-receipts', 'promptfoo-provider-drift-receipts']
     });
     return true;
   }
@@ -121,6 +122,32 @@ export async function handleShieldRoute(
       });
     } catch (err) {
       apiError(res, 400, err instanceof Error ? err.message : 'Provider drift receipt verification failed');
+    }
+    return true;
+  }
+
+  if (pathname === '/api/v1/shield/promptfoo-provider-drift/verify' && method === 'POST') {
+    try {
+      const body = await bodyJson<RunPromptfooProviderDriftInput>(req);
+      if (!Array.isArray(body.baseline) || !Array.isArray(body.candidate) || !body.promptfoo) {
+        apiError(res, 400, 'Required: baseline[], candidate[], and promptfoo metadata');
+        return true;
+      }
+      const { runPromptfooProviderDrift } = await import('../benchmarks/promptfooProviderDrift.js');
+      const result = runPromptfooProviderDrift({
+        ...body,
+        agentId: body.agentId ?? 'default',
+      });
+      apiSuccess(res, {
+        verification: result.ciGate.passed ? 'passed' : 'blocked',
+        ciGate: result.ciGate,
+        promptfooEvidenceHash: result.promptfooEvidenceHash,
+        failClosed: result.report.failClosed,
+        activeAlerts: result.report.alerts.filter((alert) => !alert.waived).map((alert) => alert.alertId),
+        waivedAlerts: result.report.alerts.filter((alert) => alert.waived).map((alert) => alert.alertId),
+      });
+    } catch (err) {
+      apiError(res, 400, err instanceof Error ? err.message : 'promptfoo provider drift receipt verification failed');
     }
     return true;
   }

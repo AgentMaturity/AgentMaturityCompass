@@ -12,6 +12,7 @@ import type { LayerName, DiagnosticQuestion, QuestionScore } from "../types.js";
 import { questionBank } from "../diagnostic/questionBank.js";
 import { builtInComplianceMappings } from "../compliance/builtInMappings.js";
 import type { ComplianceMapping } from "../compliance/mappingSchema.js";
+import type { EvalScoreExplainabilityPack } from "../diagnostic/questionScoreExplainability.js";
 import { includes } from "../utils/typeGuards.js";
 
 /* ── Framework-specific hints ──────────────────────── */
@@ -192,6 +193,8 @@ export interface GuideInput {
   framework?: string;
   /** Compliance frameworks to include (e.g. ["EU_AI_ACT", "ISO_42001"]) */
   complianceFrameworks?: string[];
+  /** Optional eval-score explainability pack from the latest diagnostic run. */
+  evalScoreExplainabilityPack?: EvalScoreExplainabilityPack;
 }
 
 export interface ComplianceGap {
@@ -201,6 +204,15 @@ export interface ComplianceGap {
   mappingId: string;
   requiredPacks: string[];
   requiredEvidenceTypes: string[];
+}
+
+export interface GuideScoreExplainabilityProof {
+  questionId: string;
+  acceptedEvidenceIds: string[];
+  rejectedEvidenceReasons: Array<{ evidenceId: string; reason: string }>;
+  repairHint: string;
+  status: "ready" | "fail_closed";
+  rowHash: string;
 }
 
 export interface GuideSection {
@@ -216,6 +228,7 @@ export interface GuideSection {
   cliCommands: string[];
   agentInstruction: string;
   complianceGaps: ComplianceGap[];
+  scoreExplainabilityProof?: GuideScoreExplainabilityProof;
 }
 
 export interface Guide {
@@ -329,7 +342,7 @@ function evidenceNeededForGap(q: DiagnosticQuestion, targetLevel: number, baseEv
     /verify|validation|benchmark|outcome|task|correctness/i.test(`${q.title} ${q.promptTemplate} ${q.evidenceGateHints}`);
   if (benchmarkRelevant) {
     evidence.push("Benchmark-submission receipt with signed task breakdown, criterion-level scores, status indicators, leaderboard metric views, accepted evidence IDs, rejected-evidence reasons, repair hint, and replay hashes.");
-    evidence.push("Eval-score explainability pack bound to the question ID for Score/Shield/Watch with accepted evidence IDs, rejected-evidence reasons, repair hint, reproducible eval pack, signed evidence rows, fail-closed thresholds, and source-boundary/no-parity proof. W&B/Weave exports may be used as source evidence only after import into AMC question-score explainability receipts; source metadata, screenshots, or copied marketing text alone are insufficient.");
+    evidence.push("Eval-score explainability pack bound to the question ID for Score/Shield/Watch with accepted evidence IDs, rejected-evidence reasons, repair hint, reproducible eval pack, signed evidence rows, fail-closed thresholds, metadata-only source-review proof (DOI/OpenAlex when citing literature), and source-boundary/no-parity proof. W&B/Weave exports may be used as source evidence only after import into AMC question-score explainability receipts; source metadata, screenshots, copied marketing text, or copied paper prose alone are insufficient.");
   }
   const opikStyleRelevant =
     targetLevel >= 4 &&
@@ -416,6 +429,19 @@ export function generateGuide(input: GuideInput): Guide {
 
   // Find questions where the agent is below target
   const gaps: GuideSection[] = [];
+  const scoreExplainabilityProofByQuestion = new Map(
+    input.evalScoreExplainabilityPack?.rows.map((row) => [
+      row.questionId,
+      {
+        questionId: row.questionId,
+        acceptedEvidenceIds: row.acceptedEvidenceIds,
+        rejectedEvidenceReasons: row.rejectedEvidenceReasons,
+        repairHint: row.repairHint,
+        status: row.status,
+        rowHash: row.rowHash,
+      } satisfies GuideScoreExplainabilityProof,
+    ]) ?? [],
+  );
 
   for (const qs of input.questionScores) {
     if (qs.finalLevel >= targetLevel) continue;
@@ -444,6 +470,9 @@ export function generateGuide(input: GuideInput): Guide {
       cliCommands: cliCommandsForGap(q, qs.finalLevel, targetLevel),
       agentInstruction: generateAgentInstruction(q, qs.finalLevel, targetLevel),
       complianceGaps: complianceMappingsForQuestion(qs.questionId, input.complianceFrameworks),
+      ...(scoreExplainabilityProofByQuestion.has(qs.questionId)
+        ? { scoreExplainabilityProof: scoreExplainabilityProofByQuestion.get(qs.questionId)! }
+        : {}),
     });
   }
 
@@ -537,6 +566,22 @@ export function guideToHumanMarkdown(guide: Guide): string {
       for (const e of s.evidenceNeeded) {
         lines.push(`- ${e}`);
       }
+      lines.push("");
+    }
+
+    if (s.scoreExplainabilityProof) {
+      lines.push("**Score explainability proof:**");
+      lines.push(`- Question ID: ${s.scoreExplainabilityProof.questionId}`);
+      lines.push(`- Status: ${s.scoreExplainabilityProof.status}`);
+      lines.push(`- Accepted evidence IDs: ${s.scoreExplainabilityProof.acceptedEvidenceIds.join(", ") || "none"}`);
+      if (s.scoreExplainabilityProof.rejectedEvidenceReasons.length > 0) {
+        lines.push("- Rejected evidence reasons:");
+        for (const reason of s.scoreExplainabilityProof.rejectedEvidenceReasons) {
+          lines.push(`  - ${reason.evidenceId}: ${reason.reason}`);
+        }
+      }
+      lines.push(`- Repair hint: ${s.scoreExplainabilityProof.repairHint}`);
+      lines.push(`- Row hash: ${s.scoreExplainabilityProof.rowHash}`);
       lines.push("");
     }
 

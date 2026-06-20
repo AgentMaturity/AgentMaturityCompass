@@ -8,7 +8,9 @@ import { bodyJson, apiSuccess, apiError, queryParam } from './apiHelpers.js';
 import type { ReplayBenchmarkCorpusInput } from '../benchmarks/replayBenchmarkCorpus.js';
 import type { RunLiveScoreBehaviorDriftInput } from '../watch/liveDriftAlerts.js';
 import type { BuildJudgeCalibrationReceiptInput } from '../eval/judgeCalibration.js';
+import type { RunHumanloopProviderDriftInput } from '../benchmarks/humanloopProviderDrift.js';
 import type { RunPromptLayerProviderDriftInput } from '../benchmarks/promptLayerProviderDrift.js';
+import type { RunPromptfooProviderDriftInput } from '../benchmarks/promptfooProviderDrift.js';
 
 export async function handleWatchRoute(
   pathname: string,
@@ -198,6 +200,60 @@ export async function handleWatchRoute(
       });
     } catch (err) {
       apiError(res, 500, err instanceof Error ? err.message : 'Provider drift watch projection failed');
+    }
+    return true;
+  }
+
+  // POST /api/v1/watch/humanloop-provider-drift — project Humanloop eval/log canary drift into Score, Shield, and Watch surfaces
+  if (pathname === '/api/v1/watch/humanloop-provider-drift' && method === 'POST') {
+    try {
+      const body = await bodyJson<RunHumanloopProviderDriftInput>(req);
+      if (!Array.isArray(body.baseline) || !Array.isArray(body.candidate) || !body.humanloop) {
+        apiError(res, 400, 'Required: baseline[], candidate[], and humanloop metadata');
+        return true;
+      }
+      const { runHumanloopProviderDrift } = await import('../watch/humanloopProviderDrift.js');
+      const result = runHumanloopProviderDrift({
+        ...body,
+        agentId: body.agentId ?? 'default',
+      });
+      apiSuccess(res, {
+        report: result.report,
+        humanloopEvidenceHash: result.humanloopEvidenceHash,
+        score: result.score,
+        shield: result.shield,
+        watch: result.watch,
+        watchAlerts: result.watchAlerts,
+        failClosed: result.report.failClosed,
+        sourceRefs: result.sourceRefs,
+      });
+    } catch (err) {
+      apiError(res, 500, err instanceof Error ? err.message : 'Humanloop provider drift watch projection failed');
+    }
+    return true;
+  }
+
+  // POST /api/v1/watch/promptfoo-provider-drift — project promptfoo provider/version canary drift into Watch alerts
+  if (pathname === '/api/v1/watch/promptfoo-provider-drift' && method === 'POST') {
+    try {
+      const body = await bodyJson<RunPromptfooProviderDriftInput>(req);
+      if (!Array.isArray(body.baseline) || !Array.isArray(body.candidate) || !body.promptfoo) {
+        apiError(res, 400, 'Required: baseline[], candidate[], and promptfoo metadata');
+        return true;
+      }
+      const { runPromptfooProviderDrift } = await import('../watch/promptfooProviderDrift.js');
+      const result = runPromptfooProviderDrift({
+        ...body,
+        agentId: body.agentId ?? 'default',
+      });
+      apiSuccess(res, {
+        report: result.report,
+        promptfooEvidenceHash: result.promptfooEvidenceHash,
+        watchAlerts: result.watchAlerts,
+        failClosed: result.report.failClosed,
+      });
+    } catch (err) {
+      apiError(res, 500, err instanceof Error ? err.message : 'promptfoo provider drift watch projection failed');
     }
     return true;
   }

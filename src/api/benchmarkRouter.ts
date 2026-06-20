@@ -10,6 +10,7 @@ import type {
   ProviderDriftThresholds,
   ProviderDriftWaiver,
 } from '../benchmarks/providerDriftBenchmark.js';
+import type { RunPromptfooProviderDriftInput } from '../benchmarks/promptfooProviderDrift.js';
 import type { ReplayBenchmarkCorpusInput } from '../benchmarks/replayBenchmarkCorpus.js';
 
 export async function handleBenchmarkRoute(
@@ -157,6 +158,26 @@ export async function handleBenchmarkRoute(
       });
     } catch (err) {
       apiError(res, 500, err instanceof Error ? err.message : 'Provider drift benchmark failed');
+    }
+    return true;
+  }
+
+  // POST /api/v1/benchmarks/promptfoo-provider-drift — run promptfoo-scoped provider/version drift proof
+  if (pathname === '/api/v1/benchmarks/promptfoo-provider-drift' && method === 'POST') {
+    try {
+      const body = await bodyJson<RunPromptfooProviderDriftInput>(req);
+      if (!Array.isArray(body.baseline) || !Array.isArray(body.candidate) || !body.promptfoo) {
+        apiError(res, 400, 'Required: baseline[], candidate[], and promptfoo metadata');
+        return true;
+      }
+      const { runPromptfooProviderDrift } = await import('../benchmarks/promptfooProviderDrift.js');
+      const result = runPromptfooProviderDrift({
+        ...body,
+        agentId: body.agentId ?? 'default',
+      });
+      apiSuccess(res, result);
+    } catch (err) {
+      apiError(res, 500, err instanceof Error ? err.message : 'promptfoo provider drift benchmark failed');
     }
     return true;
   }

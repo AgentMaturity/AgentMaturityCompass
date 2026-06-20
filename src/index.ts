@@ -151,6 +151,11 @@ export {
 } from "./eval/evalImporters.js";
 export { evalImportCli, evalStatusCli, parseEvalImportFormat, parseEvalImportTrustTier } from "./eval/evalCli.js";
 export {
+  buildEvalReplayCorpusEvidenceReceipt,
+  type EvalReplayCorpusEvidenceReceipt,
+  type EvalReplayCorpusEvidenceStatus
+} from "./eval/replayCorpusEvidenceReceipt.js";
+export {
   buildJudgeCalibrationReceipt,
   buildJudgeCalibrationWatchAlerts,
   verifyJudgeCalibrationReceipt,
@@ -288,6 +293,11 @@ export {
 
 export { runDiagnostic, generateReport, compareRuns } from "./diagnostic/runner.js";
 export { runAutoAnswer } from "./diagnostic/autoAnswer/autoAnswerEngine.js";
+export {
+  diagnoseEvalReplayCorpusBoundary,
+  type DiagnosticEvalReplayCorpusBoundary,
+  type DiagnosticEvalReplaySurfaceStatus
+} from "./diagnostic/evalReplayCorpusBoundary.js";
 
 export { generateTuningPack, generateUpgradePlan } from "./tuning/upgradeEngine.js";
 export { runTuneWizard, runUpgradeWizard } from "./tuning/tuneWizard.js";

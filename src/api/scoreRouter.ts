@@ -17,6 +17,7 @@ import { queueScoreComputationMetric } from '../observability/otelExporter.js';
 import type { RunLiveScoreBehaviorDriftInput } from '../watch/liveDriftAlerts.js';
 import type { BuildJudgeCalibrationReceiptInput } from '../eval/judgeCalibration.js';
 import type { RunPromptLayerProviderDriftInput } from '../benchmarks/promptLayerProviderDrift.js';
+import type { RunPromptfooProviderDriftInput } from '../benchmarks/promptfooProviderDrift.js';
 
 const nonEmptyStringSchema = z.string().trim().min(1);
 const optionalNonEmptyStringSchema = nonEmptyStringSchema.optional();
@@ -178,6 +179,39 @@ export async function handleScoreRoute(
       });
     } catch (err) {
       scoreRouteError(res, err, 'Provider drift scoring failed');
+    }
+    return true;
+  }
+
+  // POST /api/v1/score/promptfoo-provider-drift — score-facing promptfoo provider/version canary drift report
+  if (pathname === '/api/v1/score/promptfoo-provider-drift' && method === 'POST') {
+    try {
+      const body = await bodyJson<RunPromptfooProviderDriftInput>(req);
+      if (!Array.isArray(body.baseline) || !Array.isArray(body.candidate) || !body.promptfoo) {
+        apiError(res, 400, 'Required: baseline[], candidate[], and promptfoo metadata');
+        return true;
+      }
+      const { runPromptfooProviderDrift } = await import('../benchmarks/promptfooProviderDrift.js');
+      const result = runPromptfooProviderDrift({
+        ...body,
+        agentId: body.agentId ?? 'default',
+      });
+      apiSuccess(res, {
+        report: result.report,
+        providerVersions: result.report.providerVersions,
+        canaryResults: result.report.comparisons,
+        driftStatistics: result.report.comparisons.map((item) => ({
+          canaryId: item.canaryId,
+          provider: item.provider,
+          model: item.model,
+          driftStatistic: item.driftStatistic,
+          status: item.status,
+        })),
+        promptfooEvidenceHash: result.promptfooEvidenceHash,
+        failClosed: result.report.failClosed,
+      });
+    } catch (err) {
+      scoreRouteError(res, err, 'promptfoo provider drift scoring failed');
     }
     return true;
   }

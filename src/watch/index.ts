@@ -83,6 +83,38 @@ export {
   type RunPromptLayerProviderDriftInput,
 } from './promptLayerProviderDrift.js';
 export {
+  HUMANLOOP_PROVIDER_DRIFT_SOURCE_REFS,
+  runHumanloopProviderDrift,
+  type HumanloopProviderDriftMetadata,
+  type HumanloopProviderDriftProof,
+  type HumanloopProviderDriftResult,
+  type HumanloopProviderDriftScoreSurface,
+  type HumanloopProviderDriftShieldSurface,
+  type HumanloopProviderDriftSide,
+  type HumanloopProviderDriftWatchSurface,
+  type RunHumanloopProviderDriftInput,
+} from './humanloopProviderDrift.js';
+export {
+  runPromptfooProviderDrift,
+  type PromptfooProviderDriftMetadata,
+  type PromptfooProviderDriftProof,
+  type PromptfooProviderDriftResult,
+  type PromptfooProviderDriftSide,
+  type RunPromptfooProviderDriftInput,
+} from './promptfooProviderDrift.js';
+export {
+  LMNR_OBSERVABILITY_METADATA,
+  runLmnrObservabilityLiveDrift,
+  type LmnrObservabilityDriftStatistic,
+  type LmnrObservabilityLiveDriftResult,
+  type LmnrObservabilityLiveDriftRow,
+  type LmnrObservabilityMetadataProof,
+  type LmnrObservabilitySignal,
+  type LmnrObservabilityRowProof,
+  type LmnrObservabilitySurface,
+  type RunLmnrObservabilityLiveDriftInput,
+} from './lmnrObservabilityLiveDrift.js';
+export {
   buildLiveDriftWatchAlerts,
   defaultLiveDriftThresholds,
   runLiveScoreBehaviorDrift,

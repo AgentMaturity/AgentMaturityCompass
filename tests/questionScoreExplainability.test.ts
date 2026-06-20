@@ -2512,6 +2512,141 @@ describe("question score explainability receipts", () => {
     });
   });
 
+  test("GAP-0616 binds DOI/OpenAlex metadata-only review to eval-score explainability pack rows", () => {
+    const report = buildQuestionExplainabilityReport({
+      agentId: "gap-0616-agent",
+      runId: "run-gap-0616-eval-score-explainability",
+      generatedAt: "2026-06-20T00:00:00.000Z",
+      sourceRefs: [
+        "https://doi.org/10.1007/s10462-025-11471-9",
+        "https://openalex.org/W7118468219",
+        "crossref:journal-article:Artificial Intelligence Review:2026",
+        "amc:no-paper-prose-or-data-copied",
+      ],
+      rows: [
+        {
+          question: question("AMC-2.3"),
+          score: score({
+            questionId: "AMC-2.3",
+            flags: [],
+            claimedLevel: 4,
+            supportedMaxLevel: 4,
+            finalLevel: 4,
+            evidenceEventIds: ["ev-gap-0616-eval-pack", "ev-gap-0616-result", "ev-gap-0616-ci"],
+            narrative: "AMC-2.3: eval-score explainability links question id, evidence decisions, result hashes, and repair guidance.",
+          }),
+          acceptedEvidence: [
+            {
+              id: "ev-gap-0616-eval-pack",
+              event_hash: "a".repeat(64),
+              writer_sig: "sig-gap-0616-eval-pack",
+              event_type: "artifact",
+              session_id: "session-gap-0616-eval",
+              ts: 10,
+              trustTier: "OBSERVED",
+            },
+            {
+              id: "ev-gap-0616-result",
+              event_hash: "b".repeat(64),
+              writer_sig: "sig-gap-0616-result",
+              event_type: "metric",
+              session_id: "session-gap-0616-eval",
+              ts: 11,
+              trustTier: "OBSERVED_HARDENED",
+            },
+            {
+              id: "ev-gap-0616-ci",
+              event_hash: "c".repeat(64),
+              writer_sig: "sig-gap-0616-ci",
+              event_type: "test",
+              session_id: "session-gap-0616-ci",
+              ts: 12,
+              trustTier: "OBSERVED_HARDENED",
+            },
+          ],
+          rejectedEvidence: [
+            {
+              event: {
+                id: "ev-gap-0616-paper-metadata-only",
+                event_hash: "d".repeat(64),
+                writer_sig: "sig-gap-0616-paper-metadata-only",
+                event_type: "review",
+                session_id: "session-gap-0616-source-review",
+                ts: 13,
+                trustTier: "ATTESTED",
+              },
+              reason: "paper metadata confirms relevance but is not accepted as question score evidence without per-question accepted evidence ids, rejected evidence reasons, result hashes, CI thresholds, and repair hints",
+            },
+          ],
+          criteriaDiagnostics: [
+            {
+              criterionId: "gap-0616-eval-score-explainability-proof",
+              criterionType: "objective_quality",
+              status: "satisfied",
+              evidenceRefs: ["ev-gap-0616-eval-pack", "ev-gap-0616-result", "ev-gap-0616-ci"],
+              rejectedEvidenceRefs: ["ev-gap-0616-paper-metadata-only"],
+              judgeRef: "judge://amc/gap-0616-eval-score-explainability",
+              repairHint: "Keep the question id, accepted evidence ids, rejected evidence reasons, result hashes, CI thresholds, and repair hint together.",
+            },
+          ],
+          testSuiteEvaluationLens: [
+            {
+              suiteId: "gap-0616-eval-score-explainability",
+              sourceRef: "https://doi.org/10.1007/s10462-025-11471-9",
+              language: "typescript",
+              testFramework: "vitest",
+              adapter: "custom",
+              datasetRef: "amc-owned-gap-0616-eval-score-fixture",
+              datasetHash: "1".repeat(64),
+              testCaseId: "gap-0616-question-row-proof",
+              testCaseHash: "2".repeat(64),
+              evaluatorIds: ["amc-question-score-explainability"],
+              evaluatorConfigHash: "3".repeat(64),
+              judgeModelRef: "deterministic-amc-rubric",
+              experimentRunId: "gap-0616-run-001",
+              experimentResultHash: "4".repeat(64),
+              exportArtifactHash: "5".repeat(64),
+              ciRunId: "vitest:questionScoreExplainability:gap-0616",
+              ciConfigHash: "6".repeat(64),
+              traceArtifactHash: "7".repeat(64),
+              toolCallValidationHash: "8".repeat(64),
+              agentBehaviorEvaluation: true,
+              passRate0to1: 1,
+              minPassRate0to1: 0.99,
+              averageScore0to1: 0.94,
+              threshold0to1: 0.9,
+              status: "satisfied",
+              evidenceRefs: ["ev-gap-0616-eval-pack", "ev-gap-0616-result", "ev-gap-0616-ci"],
+              rejectedEvidenceRefs: ["ev-gap-0616-paper-metadata-only"],
+              repairHint: "Preserve question id, accepted evidence ids, rejected reason ledger, repair hint, CI, and result hashes before using this eval-score explanation.",
+            },
+          ],
+          missingGateReasons: [],
+        },
+      ],
+    });
+    const pack = buildEvalScoreExplainabilityPack(report);
+
+    expect(pack.sourceRefs).toEqual(expect.arrayContaining([
+      "https://doi.org/10.1007/s10462-025-11471-9",
+      "https://openalex.org/W7118468219",
+      "amc:no-paper-prose-or-data-copied",
+    ]));
+    expect(pack.failClosed).toBe(false);
+    expect(pack.rows[0]).toMatchObject({
+      questionId: "AMC-2.3",
+      acceptedEvidenceIds: ["ev-gap-0616-eval-pack", "ev-gap-0616-result", "ev-gap-0616-ci"],
+      rejectedEvidenceReasons: [
+        {
+          evidenceId: "ev-gap-0616-paper-metadata-only",
+          reason: expect.stringContaining("paper metadata confirms relevance"),
+        },
+      ],
+      repairHint: expect.stringContaining("Target L5"),
+      status: "ready",
+    });
+  });
+
   test("binds auto-bench-audit reproducible eval pack rows to signed evidence and fail-closed thresholds", () => {
     const report = buildQuestionExplainabilityReport({
       agentId: "auto-bench-audit-agent",

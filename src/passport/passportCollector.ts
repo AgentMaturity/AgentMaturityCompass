@@ -369,7 +369,15 @@ export function collectPassportData(params: {
         ),
         reproducibleEvalPackCount: evalScoreExplainabilityPack.rows.reduce((sum, row) => sum + row.reproducibleEvalPacks.length, 0),
         failClosedThresholdCount: evalScoreExplainabilityPack.rows.reduce((sum, row) => sum + row.failClosedThresholds.length, 0),
-        surfaces: [...new Set(report?.questionExplainability?.rows.flatMap((row) => row.surfaces) ?? [])].sort((a, b) => a.localeCompare(b))
+        surfaces: [...new Set(report?.questionExplainability?.rows.flatMap((row) => row.surfaces) ?? [])].sort((a, b) => a.localeCompare(b)),
+        rows: evalScoreExplainabilityPack.rows.map((row) => ({
+          questionId: row.questionId,
+          acceptedEvidenceIds: row.acceptedEvidenceIds,
+          rejectedEvidenceReasons: row.rejectedEvidenceReasons,
+          repairHint: row.repairHint,
+          status: row.status,
+          rowHash: row.rowHash
+        }))
       }
     : null;
   const questionExplainabilityReplayable = report?.questionExplainability?.replayable;
