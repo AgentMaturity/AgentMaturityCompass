@@ -481,6 +481,7 @@ export type LiveDriftMetricId =
   | "paperReadSkillEvidenceCoverage0to1"
   | "skillMatchEvidenceCoverage0to1"
   | "decibenchEvidenceCoverage0to1"
+  | "reflexionAgentEvidenceCoverage0to1"
   | "aiReputationScoreMean0to1"
   | "aiReputationSentimentMean0to1"
   | "aiReputationResponseQualityMean0to1"

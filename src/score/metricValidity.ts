@@ -15876,9 +15876,13 @@ function buildMetricValidationEvalPack(params: {
 
 function buildMetricValidationCiGate(
   rows: MetricValidationRow[],
-  mode: "ci" | "lifecycle"
+  mode: "ci" | "lifecycle",
+  evalPackReplayable: boolean
 ): MetricValidationCiGate {
-  const failedMetricIds = rows.filter((row) => row.status === "fail").map((row) => row.metricId);
+  const rowFailedMetricIds = rows.filter((row) => row.status === "fail").map((row) => row.metricId);
+  const failedMetricIds = evalPackReplayable
+    ? rowFailedMetricIds
+    : [...new Set([...rowFailedMetricIds, ...rows.map((row) => row.metricId)])];
   const attentionMetricIds = rows.filter((row) => row.status === "attention").map((row) => row.metricId);
   const failClosed = failedMetricIds.length > 0;
   return {
@@ -15888,7 +15892,9 @@ function buildMetricValidationCiGate(
     failedMetricIds,
     attentionMetricIds,
     summary: failClosed
-      ? `${failedMetricIds.length} metric validation gate(s) failed closed`
+      ? evalPackReplayable
+        ? `${failedMetricIds.length} metric validation gate(s) failed closed`
+        : `${failedMetricIds.length} metric validation gate(s) failed closed because the eval pack is not replayable`
       : attentionMetricIds.length > 0
         ? `${attentionMetricIds.length} metric validation gate(s) need attention`
         : "all metric validation gates passed"
@@ -18274,7 +18280,6 @@ export function buildMetricValidationReport(
     }));
   }
 
-  const failClosed = rows.some((row) => row.status === "fail");
   const warnings = [
     ...new Set(rows.flatMap((row) => row.warnings.map((warning) => `${row.metricId}: ${warning}`)))
   ];
@@ -18288,7 +18293,11 @@ export function buildMetricValidationReport(
     sourceRefs: input.sourceRefs ?? ["amc:diagnostic-metric-validation"],
     datasetHash: input.datasetHash
   });
-  const ciGate = buildMetricValidationCiGate(rows, input.gateMode ?? "ci");
+  if (!evalPack.replayable) {
+    warnings.push("metric validation eval pack is not replayable; signed evidence refs are required for all row evidence refs");
+  }
+  const failClosed = rows.some((row) => row.status === "fail") || !evalPack.replayable;
+  const ciGate = buildMetricValidationCiGate(rows, input.gateMode ?? "ci", evalPack.replayable);
 
   return {
     generatedAt,

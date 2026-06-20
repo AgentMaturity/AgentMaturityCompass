@@ -156,6 +156,15 @@ export {
   type RunDecibenchVoiceLiveDriftInput,
 } from './decibenchVoiceLiveDrift.js';
 export {
+  runReflexionAgentLiveDrift,
+  type ReflexionAgentLiveDriftResult,
+  type ReflexionAgentLiveDriftRow,
+  type ReflexionAgentRowProof,
+  type ReflexionAgentSourceProof,
+  type ReflexionAgentTaskType,
+  type RunReflexionAgentLiveDriftInput,
+} from './reflexionAgentLiveDrift.js';
+export {
   defaultCtfAgentBenchmarkLiveDriftThresholds,
   runCtfAgentBenchmarkLiveDrift,
   type CtfAgentBenchmarkBehaviorDrift,

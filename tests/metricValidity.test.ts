@@ -4398,6 +4398,86 @@ describe("buildMetricValidationReport", () => {
     expect(report.ciGate.failedMetricIds).toContain("overall_maturity_score");
   });
 
+  test("treats Awesome AI Pentest curated indexes as discovery metadata, not pentest proof", () => {
+    const questionScores = [score("AMC-1.1", 4), score("AMC-1.2", 4)];
+    const signedEvidenceRefs = [
+      ...questionScores.map((row, index) => ({
+        evidenceId: row.evidenceEventIds[0]!,
+        eventHash: `${index}`.repeat(64).slice(0, 64),
+        writerSig: `writer-sig-${index}`,
+        eventType: "audit" as const,
+        sessionId: `session-${index}`,
+        ts: Date.UTC(2026, 5, 20),
+        trustTier: "OBSERVED" as const
+      })),
+      {
+        evidenceId: "awesome-ai-pentest-readme-snapshot",
+        eventHash: "d".repeat(64),
+        writerSig: "source-index-writer-sig",
+        eventType: "metric" as const,
+        sessionId: "source-index-session",
+        ts: Date.UTC(2026, 5, 20),
+        trustTier: "OBSERVED" as const
+      }
+    ];
+
+    const report = buildMetricValidationReport(
+      {
+        agentId: "security-agent",
+        runId: "run-awesome-ai-pentest-curated-index",
+        ts: Date.UTC(2026, 5, 20),
+        trustLabel: "HIGH TRUST",
+        integrityIndex: 1,
+        evidenceCoverage: 1,
+        correlationRatio: 1,
+        unsupportedClaimCount: 0,
+        layerScores: [{ layerName, avgFinalLevel: 4, confidenceWeightedFinalLevel: 4 }],
+        questionScores,
+        confidenceSummary: {
+          lowConfidenceFindings: 0,
+          highUncertaintyFindings: 0,
+          downgradedFindings: 0,
+          autoFixBlockedRecommendations: 0,
+          averageEvidenceSufficiency: 1,
+          averageJudgeAgreement: 0.93
+        },
+        questions: questionScores.map((row) => ({ id: row.questionId, layerName })),
+        signedEvidenceRefs,
+        requirePentestBenchmarkProof: true,
+        pentestBenchmarkChecks: [
+          {
+            pentestSignalId: "awesome-ai-pentest-readme-snapshot",
+            pentestSignalType: "source_repository_license",
+            covered: true,
+            evidenceRefs: ["awesome-ai-pentest-readme-snapshot"],
+            artifactHash: "d".repeat(64),
+            benchmarkSuiteIds: ["insidetrust/awesome-ai-pentest"]
+          }
+        ],
+        sourceRefs: ["https://github.com/insidetrust/awesome-ai-pentest"],
+        gateMode: "ci"
+      },
+      [
+        prior("run-1", Date.UTC(2026, 5, 1), 4),
+        prior("run-2", Date.UTC(2026, 5, 7), 4.01)
+      ]
+    );
+
+    expect(report.failClosed).toBe(true);
+    expect(report.rows[0]).toMatchObject({
+      metricId: "overall_maturity_score",
+      status: "fail",
+      pentestBenchmarkSampleSize: 1
+    });
+    expect(report.rows[0]?.pentestBenchmarkCoverage).toBeCloseTo(1 / 29, 6);
+    expect(report.rows[0]?.pentestBenchmarkMissingSignals).toContain("benchmark_release_manifest");
+    expect(report.rows[0]?.pentestBenchmarkMissingSignals).toContain("exploit_execution_trace");
+    expect(report.rows[0]?.warnings.join(" ")).toContain("pentest benchmark coverage");
+    expect(report.evalPack.sourceRefs).toContain("https://github.com/insidetrust/awesome-ai-pentest");
+    expect(report.ciGate.failClosed).toBe(true);
+    expect(report.ciGate.failedMetricIds).toContain("overall_maturity_score");
+  });
+
   test("validates ExploitGym-style exploit-development metric validity with release, task, isolation, proxy, and success proof", () => {
     const questionScores = [
       score("AMC-1.1", 4),
@@ -13181,5 +13261,154 @@ describe("buildMetricValidationReport", () => {
     expect((report.rows[0] as any)?.subtleMemoryMissingSignals).toContain("relation_taxonomy_manifest");
     expect((report.rows[0] as any)?.warnings.join(" ")).toContain("SubtleMemory coverage");
     expect((report.evalPack.rows[0] as any)?.subtleMemoryMissingSignals).toContain("ci_validation_manifest");
+  });
+
+  test("maps comparative RAG and agent framework benchmarks to existing metric validity checks", () => {
+    const questionScores = [
+      score("AMC-1.1", 4),
+      score("AMC-1.2", 4),
+      score("AMC-1.3", 4),
+      score("AMC-1.4", 4),
+      score("AMC-1.5", 4),
+      score("AMC-1.6", 4)
+    ];
+    const facetIds = [
+      "facet-throughput",
+      "facet-latency",
+      "facet-resource-usage",
+      "facet-rag-pipeline",
+      "facet-agent-resiliency"
+    ];
+    const confounderIds = [
+      "confounder-framework-runtime",
+      "confounder-local-ollama-backend",
+      "confounder-dataset-corpus",
+      "confounder-concurrency-level",
+      "confounder-dependency-versions"
+    ];
+    const outcomeIds = [
+      "outcome-production-latency",
+      "outcome-throughput-capacity",
+      "outcome-memory-budget",
+      "outcome-error-recovery",
+      "outcome-cost-efficiency"
+    ];
+    const processIds = [
+      "process-paired-go-python-scenario",
+      "process-stepwise-run-command",
+      "process-result-artifact",
+      "process-repeatable-local-backend",
+      "process-summary-table"
+    ];
+    const safetyUtilityIds = [
+      "safety-timeout-behavior",
+      "safety-tool-failure-behavior",
+      "safety-parser-failure-behavior",
+      "safety-resource-pressure",
+      "safety-observability-overhead"
+    ];
+    const lifecycleIds = [
+      "watch-baseline-latency",
+      "watch-p95-p99-tail",
+      "watch-cpu-memory-drift",
+      "watch-error-rate",
+      "watch-gpu-saturation"
+    ];
+    const evidenceIds = [
+      ...questionScores.map((row) => row.evidenceEventIds[0]!),
+      ...facetIds,
+      ...confounderIds,
+      ...outcomeIds,
+      ...processIds,
+      ...safetyUtilityIds,
+      ...lifecycleIds
+    ];
+    const baseInput = {
+      agentId: "comparative-framework-agent",
+      runId: "run-langchain-framework-benchmark",
+      ts: Date.UTC(2026, 5, 20),
+      trustLabel: "HIGH TRUST" as const,
+      integrityIndex: 1,
+      evidenceCoverage: 1,
+      correlationRatio: 1,
+      unsupportedClaimCount: 0,
+      layerScores: [{ layerName, avgFinalLevel: 4, confidenceWeightedFinalLevel: 4 }],
+      questionScores,
+      confidenceSummary: {
+        lowConfidenceFindings: 0,
+        highUncertaintyFindings: 0,
+        downgradedFindings: 0,
+        autoFixBlockedRecommendations: 0,
+        averageEvidenceSufficiency: 1,
+        averageJudgeAgreement: 0.93
+      },
+      questions: questionScores.map((row) => ({ id: row.questionId, layerName })),
+      validationFacetChecks: facetIds.map((facetId) => ({ facetId, covered: true, evidenceRefs: [facetId] })),
+      confounderControlChecks: confounderIds.map((confounderId) => ({
+        confounderId,
+        controlled: true,
+        evidenceRefs: [confounderId]
+      })),
+      outcomeAlignmentChecks: outcomeIds.map((outcomeId) => ({ outcomeId, aligned: true, evidenceRefs: [outcomeId] })),
+      processEvidenceChecks: processIds.map((processEvidenceId) => ({
+        processEvidenceId,
+        covered: true,
+        evidenceRefs: [processEvidenceId]
+      })),
+      safetyUtilityChecks: safetyUtilityIds.map((safetyUtilityId) => ({
+        safetyUtilityId,
+        covered: true,
+        evidenceRefs: [safetyUtilityId]
+      })),
+      lifecycleObservabilityChecks: lifecycleIds.map((lifecycleSignalId) => ({
+        lifecycleSignalId,
+        covered: true,
+        evidenceRefs: [lifecycleSignalId]
+      })),
+      sourceRefs: ["https://github.com/FareedKhan-dev/langchain-go-vs-python"],
+      gateMode: "ci" as const
+    };
+    const signedEvidenceRefs = evidenceIds.map((evidenceId, index) => ({
+      evidenceId,
+      eventHash: `${index % 10}`.repeat(64).slice(0, 64),
+      writerSig: `writer-sig-${index}`,
+      eventType: "audit" as const,
+      sessionId: `session-${index}`,
+      ts: Date.UTC(2026, 5, 20),
+      trustTier: "OBSERVED_HARDENED" as const
+    }));
+
+    const report = buildMetricValidationReport(
+      { ...baseInput, signedEvidenceRefs },
+      [prior("run-1", Date.UTC(2026, 5, 1), 4), prior("run-2", Date.UTC(2026, 5, 10), 4.01)]
+    );
+
+    expect(report.failClosed).toBe(false);
+    expect(report.evalPack.replayable).toBe(true);
+    expect(report.evalPack.sourceRefs).toContain("https://github.com/FareedKhan-dev/langchain-go-vs-python");
+    expect(report.rows[0]).toMatchObject({
+      metricId: "overall_maturity_score",
+      validationFacetCoverage: 1,
+      confounderControlCoverage: 1,
+      outcomeAlignment: 1,
+      processEvidenceCoverage: 1,
+      safetyUtilityCoverage: 1,
+      lifecycleObservabilityCoverage: 1,
+      status: "pass"
+    });
+
+    const metadataOnlyReport = buildMetricValidationReport(
+      baseInput,
+      [prior("run-1", Date.UTC(2026, 5, 1), 4), prior("run-2", Date.UTC(2026, 5, 10), 4.01)]
+    );
+
+    expect(metadataOnlyReport.evalPack.replayable).toBe(false);
+    expect(metadataOnlyReport.failClosed).toBe(true);
+    expect(metadataOnlyReport.ciGate.failClosed).toBe(true);
+    expect(metadataOnlyReport.ciGate.failedMetricIds).toContain("overall_maturity_score");
+    expect(metadataOnlyReport.ciGate.summary).toContain("eval pack is not replayable");
+    expect(metadataOnlyReport.warnings).toContain(
+      "metric validation eval pack is not replayable; signed evidence refs are required for all row evidence refs"
+    );
   });
 });

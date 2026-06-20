@@ -1429,6 +1429,128 @@ describe("question score explainability receipts", () => {
     expect(report.rows[0]?.rejectedEvidence[0]?.reason).toContain("trace/tool-call");
   });
 
+  test("fails closed when rage4j-style source metadata is presented without replayable JVM eval corpus proof", () => {
+    const report = buildQuestionExplainabilityReport({
+      agentId: "jvm-eval-agent",
+      runId: "run-rage4j-metadata-only",
+      generatedAt: "2026-06-20T00:00:00.000Z",
+      sourceRefs: ["https://github.com/explore-de/rage4j"],
+      rows: [
+        {
+          question: question("AMC-2.3"),
+          score: score({
+            questionId: "AMC-2.3",
+            flags: [],
+            claimedLevel: 4,
+            supportedMaxLevel: 4,
+            finalLevel: 4,
+            evidenceEventIds: ["ev-rage4j-repo-metadata"],
+          }),
+          acceptedEvidence: [
+            {
+              id: "ev-rage4j-repo-metadata",
+              event_hash: "9".repeat(64),
+              writer_sig: "sig-rage4j-repo-metadata",
+              event_type: "audit",
+              session_id: "session-rage4j-source-review",
+              ts: 20,
+              trustTier: "ATTESTED",
+            },
+          ],
+          rejectedEvidence: [
+            {
+              event: {
+                id: "ev-rage4j-missing-corpus-proof",
+                event_hash: "0".repeat(64),
+                writer_sig: "sig-rage4j-missing-corpus-proof",
+                event_type: "review",
+                session_id: "session-rage4j-source-review",
+                ts: 21,
+                trustTier: "ATTESTED",
+              },
+              reason: "repository metadata did not include signed dataset/test-case hashes, evaluator config, CI run/config, experiment result/export, or trace proof for a replayable JVM eval corpus",
+            },
+          ],
+          criteriaDiagnostics: [
+            {
+              criterionId: "jvm-eval-corpus-proof",
+              criterionType: "unit_test",
+              status: "satisfied",
+              evidenceRefs: ["ev-rage4j-repo-metadata"],
+              rejectedEvidenceRefs: ["ev-rage4j-missing-corpus-proof"],
+              judgeRef: "judge://amc/test-suite-evaluation",
+              repairHint: "Attach dataset/test-case hashes, evaluator config, CI run/config, experiment result/export, and trace proof before relying on rage4j-style Java evaluation claims.",
+            },
+          ],
+          testSuiteEvaluationLens: [
+            {
+              suiteId: "rage4j-style-jvm-eval-corpus",
+              sourceRef: "https://github.com/explore-de/rage4j",
+              language: "java",
+              testFramework: "junit",
+              adapter: "langchain4j",
+              datasetRef: "source-metadata-only",
+              datasetHash: null,
+              testCaseId: "source-metadata-only",
+              testCaseHash: null,
+              evaluatorIds: [],
+              evaluatorConfigHash: null,
+              judgeModelRef: null,
+              experimentRunId: null,
+              experimentResultHash: null,
+              exportArtifactHash: null,
+              ciRunId: null,
+              ciConfigHash: null,
+              traceArtifactHash: null,
+              toolCallValidationHash: null,
+              agentBehaviorEvaluation: true,
+              passRate0to1: null,
+              minPassRate0to1: 1,
+              averageScore0to1: null,
+              threshold0to1: 0.8,
+              costUsd: null,
+              latencyMs: null,
+              tokenCount: null,
+              status: "satisfied",
+              evidenceRefs: ["ev-rage4j-repo-metadata"],
+              rejectedEvidenceRefs: ["ev-rage4j-missing-corpus-proof"],
+              repairHint: "Bind source metadata to concrete JVM eval dataset, test-case, evaluator, CI, result/export, trace/tool-call, and row-hash proof before using it as Score, Shield, or Watch evidence.",
+            },
+          ],
+          missingGateReasons: [],
+        },
+      ],
+    });
+
+    expect(report.replayable).toBe(false);
+    expect(report.failClosed).toBe(true);
+    expect(report.sourceRefs).toContain("https://github.com/explore-de/rage4j");
+    expect(report.rows[0]).toMatchObject({
+      status: "passed",
+      testSuiteEvaluationLens: [
+        {
+          suiteId: "rage4j-style-jvm-eval-corpus",
+          sourceRef: "https://github.com/explore-de/rage4j",
+          datasetHash: null,
+          testCaseHash: null,
+          evaluatorIds: [],
+          evaluatorConfigHash: null,
+          experimentRunId: null,
+          experimentResultHash: null,
+          exportArtifactHash: null,
+          ciRunId: null,
+          ciConfigHash: null,
+          traceArtifactHash: null,
+          toolCallValidationHash: null,
+          passRate0to1: null,
+          averageScore0to1: null,
+          repairHint: expect.stringContaining("concrete JVM eval dataset"),
+        },
+      ],
+    });
+    expect(report.rows[0]?.rejectedEvidence[0]?.reason).toContain("repository metadata");
+  });
+
   test("binds AgentTrial-style statistical trials, confidence intervals, regression, and failure attribution into question rows", () => {
     const report = buildQuestionExplainabilityReport({
       agentId: "statistical-eval-agent",
