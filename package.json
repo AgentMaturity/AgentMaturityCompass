@@ -28,6 +28,7 @@
     "api:start": "tsx api/index.ts",
     "lint": "npm run typecheck",
     "typecheck": "tsc -p tsconfig.json --noEmit",
+    "pretest": "npm run build",
     "test": "vitest run",
     "test:e2e": "npx playwright test --config tests/e2e/playwright.config.ts",
     "accessibility:release-evidence": "node scripts/write-accessibility-release-evidence.mjs --report tmp/accessibility-playwright.json --out docs/runbooks/accessibility-release-evidence-latest.md",
