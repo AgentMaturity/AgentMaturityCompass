@@ -13,13 +13,15 @@ describe("GAP-0629 OpenAI Evals public-methodology source-review boundary", () =
   it("publishes methodology-versioned Score/Shield/Watch boundaries without an OpenAI Evals subsystem", () => {
     const manifest = getPublicMethodologyManifest();
 
-    expect(AMC_PUBLIC_METHODOLOGY_VERSION).toBe("2026.06.20-r215");
-    expect(manifest.changelog[0]).toMatchObject({
+    expect(AMC_PUBLIC_METHODOLOGY_VERSION).toBe("2026.06.20-r216");
+    const openaiEvalsChangelog = manifest.changelog.find((row) => row.version === "2026.06.20-r215");
+    expect(openaiEvalsChangelog).toMatchObject({
       version: "2026.06.20-r215",
-      date: "2026-06-20"
+      date: "2026-06-20",
     });
-    expect(manifest.changelog[0]?.summary).toContain("OpenAI Evals-style public-methodology source-review boundaries");
-    expect(manifest.changelog[0]?.migration).toContain("Reports generated under 2026.06.20-r214");
+    expect(openaiEvalsChangelog?.summary).toContain("OpenAI Evals-style public-methodology source-review boundaries");
+    expect(openaiEvalsChangelog?.migration).toContain("Reports generated under 2026.06.20-r214");
+
     expect(manifest.deprecationNotice).toContain("2026.06.20-r215");
     expect(manifest.deprecationNotice).toContain("OpenAI Evals-style public-methodology");
     expect(manifest.migrationGuidance.join("\n")).toContain("OpenAI Evals-style public-methodology claims");
@@ -98,7 +100,7 @@ describe("GAP-0629 OpenAI Evals public-methodology source-review boundary", () =
 
     expect(methodologyDoc).toContain("`2026.06.20-r215`");
     expect(methodologyDoc).toContain("OpenAI Evals-style public-methodology source-review boundaries");
-    expect(methodologyDoc).toContain("No OpenAI Evals subsystem, importer, adapter, registry mirror, parity layer");
+    expect(methodologyDoc).toContain("AMC must not add an OpenAI Evals subsystem, importer, adapter, registry mirror, parity layer");
     expect(sourceReviewDoc).toContain("full_name: openai/evals");
     expect(sourceReviewDoc).toContain("default_branch: main");
     expect(sourceReviewDoc).toContain("license: NOASSERTION");

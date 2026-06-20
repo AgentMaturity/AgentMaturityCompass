@@ -55,12 +55,17 @@ describe("public methodology manifest", () => {
     expect(first.questionSet.version).toBe("amc-legacy-240-v1");
     expect(first.questionSet.questionCount).toBe(getAllQuestions().length);
     expect(first.changelog[0]?.version).toBe(AMC_PUBLIC_METHODOLOGY_VERSION);
-    expect(first.changelog[0]?.migration).toContain("Reports generated under 2026.06.20-r214");
-    expect(first.changelog[0]?.summary).toContain("OpenAI Evals-style public-methodology source-review boundaries");
-    expect(first.changelog[1]?.summary).toContain("fact-checking and factuality-evaluation review methodology boundaries");
-    expect(first.changelog[1]?.summary).toContain("Google ADK-style agent-toolkit evaluation metric-validity boundaries");
+    expect(first.changelog[0]?.migration).toContain("Reports generated under 2026.06.20-r215");
+    expect(first.changelog[0]?.summary).toContain("ChemGraph-style agentic computational chemistry workflow");
+    expect(first.changelog[0]?.summary).toContain("LM Evaluation Harness-style metric-validity source-review boundaries");
+
+    expect(first.changelog[1]?.summary).toContain("OpenAI Evals-style public-methodology source-review boundaries");
+    expect(first.changelog[2]?.summary).toContain("fact-checking and factuality-evaluation review methodology boundaries");
+    expect(first.changelog[2]?.summary).toContain("Google ADK-style agent-toolkit evaluation metric-validity boundaries");
     for (const previousVersion of [
+      "2026.06.20-r215",
       "2026.06.20-r214",
+      "2026.06.20-r215",
       "2026.06.20-r213",
       "2026.06.20-r212",
       "2026.06.20-r211",
@@ -1349,6 +1354,7 @@ describe("public methodology manifest", () => {
     expect(first.limitations).toContain("LLM workflow observability methodology claims require methodology id, methodology version, methodology hash, trace schema version, SDK/instrumentation manifest, workflow graph or span-model proof, telemetry sampling and redaction policies, prompt and model registry snapshots, evaluation template, judge/rubric config, development test-window id, production monitoring-window id, frontend analytics schema, session replay artifact manifest, user-feedback collection schema, data-security boundary, retention policy, alert threshold config, report or badge migration guidance, signed evidence refs, and row hashes; a dashboard screenshot, trace id, SDK hook, visual debugger view, local telemetry run, aggregate evaluation score, frontend analytics event, user-feedback widget, or README example alone is not enough.");
     expect(first.limitations).toContain("Static offline benchmark receipts and live dynamic execution receipts are not interchangeable unless versioned corpus, harness, model-pool, tier-policy, verification, scoring, and cost-accounting context is disclosed.");
     expect(first.limitations).toContain("Awesome AI Pentest-style curated-index claims require live source repository snapshot, default-branch and README blob refs, no-root-license boundary proof, no-source-copy proof, and underlying benchmark-specific manifests, hashes, execution traces, scoring configs, CI receipts, owners, sample sizes, confidence intervals, signed evidence refs, and row hashes through pentest_benchmark_coverage before Score, Shield, or Watch metric-validity claims; repository metadata, README benchmark lists, paper-result percentages, tool names, or source-index labels alone are discovery metadata and fail closed.");
+    expect(first.limitations).toContain("ChemGraph-style agentic computational chemistry workflow metric-validity claims require DOI/OpenAlex metadata verification, AMC-owned eval-pack manifest, validation table, existing metric-validity primitive mapping, trace/evaluator proof when claimed, threshold policy, metric owner, sample size, confidence interval, signed evidence refs, artifact hashes, row hashes, and no-copy/source-review proof before Score, Shield, or Watch claims can use them; DOI metadata, OpenAlex metadata, paper title, abstract summary, computational-chemistry label, benchmark-task count, LLM/model name, aggregate accuracy, workflow claim, or source metadata alone is not enough and does not establish a chemistry/domain subsystem, connector, importer, or parity claim.");
     expect(first.limitations).toContain("Red-team/offensive-security benchmark regression claims require benchmark id/version, question-set hash, reference-answer manifest hash, scoring config hash, scoring modes, provider backend, model config hash, result export hashes, rerun output hash, release gate receipt, question count, pass/refusal/hallucination/semantic scores where claimed, judge rubric for LLM-judge scoring, prompt-optimization config/count where claimed, signed evidence refs, and row hashes; raw prompts, exploit content, reference answers, or final percentage alone is not enough.");
     expect(first.metricValidationGates.map((gate) => gate.gate)).toEqual([
       "construct_validity",
@@ -1363,8 +1369,10 @@ describe("public methodology manifest", () => {
       "arize_phoenix_observability_eval_coverage",
       "lunary_observability_metric_validity",
       "google_adk_eval_metric_validity",
+      "lm_evaluation_harness_metric_validity",
       "openai_evals_public_methodology",
       "digital_materials_ecosystem_metric_validity",
+      "chemgraph_agentic_chemistry_workflow_metric_validity",
       "ranking_stability_coverage",
       "tool_sandbox_coverage",
       "continual_learning_coverage",

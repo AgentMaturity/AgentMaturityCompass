@@ -62,6 +62,7 @@ export const passportJsonSchema = z.object({
         failClosedThresholdCount: z.number().int().min(0),
         surfaces: z.array(z.string().min(1)),
         sourceRefs: z.array(z.string().min(1)),
+        sourceRefCount: z.number().int().min(0).optional(),
         rows: z
           .array(
             z.object({

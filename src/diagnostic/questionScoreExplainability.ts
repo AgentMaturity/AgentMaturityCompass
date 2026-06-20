@@ -970,6 +970,7 @@ export interface EvalScoreExplainabilityPack {
   agentId: string;
   runId: string;
   sourceRefs: string[];
+  sourceRefCount: number;
   replayable: boolean;
   failClosed: boolean;
   rows: EvalScoreExplainabilityPackRow[];
@@ -4102,6 +4103,7 @@ function evalPackComplete(pack: EvalScoreExplainabilityEvalPackRef): boolean {
 export function buildEvalScoreExplainabilityPack(
   report: QuestionScoreExplainabilityReport,
 ): EvalScoreExplainabilityPack {
+  const sourceRefs = unique(report.sourceRefs);
   const rows = report.rows.map<EvalScoreExplainabilityPackRow>((row) => {
     const reproducibleEvalPacks = evalScorePackRefs(row);
     const failClosedThresholds = evalScoreThresholds(row);
@@ -4136,7 +4138,8 @@ export function buildEvalScoreExplainabilityPack(
     generatedAt: report.generatedAt,
     agentId: report.agentId,
     runId: report.runId,
-    sourceRefs: report.sourceRefs,
+    sourceRefs,
+    sourceRefCount: sourceRefs.length,
     replayable: report.replayable,
     failClosed: report.failClosed || !report.replayable || rows.some((row) => row.status === "fail_closed"),
     rows,

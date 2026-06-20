@@ -11,6 +11,8 @@ import type {
   ProviderDriftWaiver,
 } from '../benchmarks/providerDriftBenchmark.js';
 import type { RunPromptfooProviderDriftInput } from '../benchmarks/promptfooProviderDrift.js';
+import type { RunInspectProviderDriftInput } from '../benchmarks/inspectProviderDrift.js';
+import type { RunTensorZeroProviderDriftInput } from '../benchmarks/tensorZeroProviderDrift.js';
 import type { ReplayBenchmarkCorpusInput } from '../benchmarks/replayBenchmarkCorpus.js';
 
 export async function handleBenchmarkRoute(
@@ -178,6 +180,46 @@ export async function handleBenchmarkRoute(
       apiSuccess(res, result);
     } catch (err) {
       apiError(res, 500, err instanceof Error ? err.message : 'promptfoo provider drift benchmark failed');
+    }
+    return true;
+  }
+
+  // POST /api/v1/benchmarks/inspect-provider-drift — run Inspect-scoped provider/version drift proof
+  if (pathname === '/api/v1/benchmarks/inspect-provider-drift' && method === 'POST') {
+    try {
+      const body = await bodyJson<RunInspectProviderDriftInput>(req);
+      if (!Array.isArray(body.baseline) || !Array.isArray(body.candidate) || !body.inspect) {
+        apiError(res, 400, 'Required: baseline[], candidate[], and inspect metadata');
+        return true;
+      }
+      const { runInspectProviderDrift } = await import('../benchmarks/inspectProviderDrift.js');
+      const result = runInspectProviderDrift({
+        ...body,
+        agentId: body.agentId ?? 'default',
+      });
+      apiSuccess(res, result);
+    } catch (err) {
+      apiError(res, 500, err instanceof Error ? err.message : 'Inspect provider drift benchmark failed');
+    }
+    return true;
+  }
+
+  // POST /api/v1/benchmarks/tensorzero-provider-drift — run TensorZero-scoped provider/version drift proof
+  if (pathname === '/api/v1/benchmarks/tensorzero-provider-drift' && method === 'POST') {
+    try {
+      const body = await bodyJson<RunTensorZeroProviderDriftInput>(req);
+      if (!Array.isArray(body.baseline) || !Array.isArray(body.candidate) || !body.tensorZero) {
+        apiError(res, 400, 'Required: baseline[], candidate[], and tensorZero metadata');
+        return true;
+      }
+      const { runTensorZeroProviderDrift } = await import('../benchmarks/tensorZeroProviderDrift.js');
+      const result = runTensorZeroProviderDrift({
+        ...body,
+        agentId: body.agentId ?? 'default',
+      });
+      apiSuccess(res, result);
+    } catch (err) {
+      apiError(res, 500, err instanceof Error ? err.message : 'TensorZero provider drift benchmark failed');
     }
     return true;
   }

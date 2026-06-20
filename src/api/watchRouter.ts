@@ -12,6 +12,8 @@ import type { RunHumanloopProviderDriftInput } from '../benchmarks/humanloopProv
 import type { RunPromptLayerProviderDriftInput } from '../benchmarks/promptLayerProviderDrift.js';
 import type { RunPromptfooProviderDriftInput } from '../benchmarks/promptfooProviderDrift.js';
 import type { RunPatronusProviderDriftInput } from '../benchmarks/patronusProviderDrift.js';
+import type { RunInspectProviderDriftInput } from '../benchmarks/inspectProviderDrift.js';
+import type { RunTensorZeroProviderDriftInput } from '../benchmarks/tensorZeroProviderDrift.js';
 
 export async function handleWatchRoute(
   pathname: string,
@@ -284,6 +286,64 @@ export async function handleWatchRoute(
       });
     } catch (err) {
       apiError(res, 500, err instanceof Error ? err.message : 'Patronus provider drift watch projection failed');
+    }
+    return true;
+  }
+
+  // POST /api/v1/watch/inspect-provider-drift — project Inspect-backed provider/version canary drift into Score, Shield, and Watch surfaces
+  if (pathname === '/api/v1/watch/inspect-provider-drift' && method === 'POST') {
+    try {
+      const body = await bodyJson<RunInspectProviderDriftInput>(req);
+      if (!Array.isArray(body.baseline) || !Array.isArray(body.candidate) || !body.inspect) {
+        apiError(res, 400, 'Required: baseline[], candidate[], and inspect metadata');
+        return true;
+      }
+      const { runInspectProviderDrift } = await import('../watch/inspectProviderDrift.js');
+      const result = runInspectProviderDrift({
+        ...body,
+        agentId: body.agentId ?? 'default',
+      });
+      apiSuccess(res, {
+        report: result.report,
+        inspectEvidenceHash: result.inspectEvidenceHash,
+        score: result.score,
+        shield: result.shield,
+        watch: result.watch,
+        watchAlerts: result.watchAlerts,
+        failClosed: result.report.failClosed,
+        sourceRefs: result.sourceRefs,
+      });
+    } catch (err) {
+      apiError(res, 500, err instanceof Error ? err.message : 'Inspect provider drift watch projection failed');
+    }
+    return true;
+  }
+
+  // POST /api/v1/watch/tensorzero-provider-drift — project TensorZero-scoped provider/version canary drift into Watch alerts
+  if (pathname === '/api/v1/watch/tensorzero-provider-drift' && method === 'POST') {
+    try {
+      const body = await bodyJson<RunTensorZeroProviderDriftInput>(req);
+      if (!Array.isArray(body.baseline) || !Array.isArray(body.candidate) || !body.tensorZero) {
+        apiError(res, 400, 'Required: baseline[], candidate[], and tensorZero metadata');
+        return true;
+      }
+      const { runTensorZeroProviderDrift } = await import('../watch/tensorZeroProviderDrift.js');
+      const result = runTensorZeroProviderDrift({
+        ...body,
+        agentId: body.agentId ?? 'default',
+      });
+      apiSuccess(res, {
+        report: result.report,
+        tensorZeroEvidenceHash: result.tensorZeroEvidenceHash,
+        score: result.score,
+        shield: result.shield,
+        watch: result.watch,
+        watchAlerts: result.watchAlerts,
+        failClosed: result.report.failClosed,
+        sourceRefs: result.sourceRefs,
+      });
+    } catch (err) {
+      apiError(res, 500, err instanceof Error ? err.message : 'TensorZero provider drift watch projection failed');
     }
     return true;
   }

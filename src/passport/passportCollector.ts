@@ -371,6 +371,7 @@ export function collectPassportData(params: {
         failClosedThresholdCount: evalScoreExplainabilityPack.rows.reduce((sum, row) => sum + row.failClosedThresholds.length, 0),
         surfaces: [...new Set(report?.questionExplainability?.rows.flatMap((row) => row.surfaces) ?? [])].sort((a, b) => a.localeCompare(b)),
         sourceRefs: evalScoreExplainabilityPack.sourceRefs,
+        sourceRefCount: evalScoreExplainabilityPack.sourceRefCount,
         rows: evalScoreExplainabilityPack.rows.map((row) => ({
           questionId: row.questionId,
           acceptedEvidenceIds: row.acceptedEvidenceIds,

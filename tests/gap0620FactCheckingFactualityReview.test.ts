@@ -11,12 +11,13 @@ import { buildDiagnosticMethodologyVersioningReceipt } from "../src/diagnostic/m
 describe("GAP-0620 fact-checking/factuality review methodology boundary", () => {
   it("publishes methodology-versioned Score/Shield/Watch boundaries without a standalone fact-checking subsystem", () => {
     const manifest = getPublicMethodologyManifest();
-    expect(AMC_PUBLIC_METHODOLOGY_VERSION).toBe("2026.06.20-r215");
+    expect(AMC_PUBLIC_METHODOLOGY_VERSION).toBe("2026.06.20-r216");
     expect(manifest.changelog[0]).toMatchObject({
-      version: "2026.06.20-r215",
+      version: "2026.06.20-r216",
       date: "2026-06-20"
     });
-    expect(manifest.changelog[1]?.summary).toContain("no standalone fact-checking subsystem");
+    expect(manifest.changelog.map((row) => row.summary).join("\n")).toContain("no standalone fact-checking subsystem");
+
     expect(manifest.deprecationNotice).toContain("2026.06.20-r214");
     expect(manifest.migrationGuidance.join("\n")).toContain("DOI/OpenAlex metadata receipts");
 

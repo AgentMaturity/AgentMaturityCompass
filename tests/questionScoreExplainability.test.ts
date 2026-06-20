@@ -6820,6 +6820,200 @@ describe("question score explainability receipts", () => {
     });
   });
 
+  test("GAP-0634 binds cognitive-retrieval preprint metadata to existing eval score explainability primitives", () => {
+    const doiRef = "https://doi.org/10.5281/zenodo.19425474";
+    const zenodoRecordRef = "https://zenodo.org/records/19476901";
+    const openAlexRef = "https://openalex.org/W7150166984";
+    const report = buildQuestionExplainabilityReport({
+      agentId: "cognitive-retrieval-source-review-agent",
+      runId: "run-gap-0634-cognitive-retrieval-score-explainability",
+      generatedAt: "2026-06-21T00:00:00.000Z",
+      sourceRefs: [doiRef, zenodoRecordRef, openAlexRef],
+      rows: [
+        {
+          question: question("AMC-1.3"),
+          score: score({
+            questionId: "AMC-1.3",
+            flags: [],
+            claimedLevel: 4,
+            supportedMaxLevel: 4,
+            finalLevel: 4,
+            evidenceEventIds: ["ev-gap-0634-eval-pack", "ev-gap-0634-signed-ledgers", "ev-gap-0634-ci"],
+            narrative: "AMC-1.3: literature metadata is bounded to AMC-owned eval-score explainability receipts.",
+          }),
+          acceptedEvidence: [
+            { id: "ev-gap-0634-eval-pack", event_hash: "a".repeat(64), writer_sig: "sig-gap-0634-eval-pack", event_type: "artifact", session_id: "session-gap-0634-eval", ts: 60, trustTier: "OBSERVED_HARDENED" },
+            { id: "ev-gap-0634-signed-ledgers", event_hash: "b".repeat(64), writer_sig: "sig-gap-0634-signed-ledgers", event_type: "metric", session_id: "session-gap-0634-eval", ts: 61, trustTier: "OBSERVED_HARDENED" },
+            { id: "ev-gap-0634-ci", event_hash: "c".repeat(64), writer_sig: "sig-gap-0634-ci", event_type: "test", session_id: "session-gap-0634-ci", ts: 62, trustTier: "OBSERVED_HARDENED" },
+          ],
+          rejectedEvidence: [
+            {
+              event: { id: "ev-gap-0634-paper-metadata-only", event_hash: "d".repeat(64), writer_sig: "sig-gap-0634-paper-metadata-only", event_type: "review", session_id: "session-gap-0634-source-review", ts: 63, trustTier: "ATTESTED" },
+              reason: "DOI/OpenAlex/Zenodo metadata confirms source relevance only; it lacks AMC question ID binding, accepted evidence IDs, rejected evidence reasons, repair hint, signed evidence rows, reproducible eval pack, and fail-closed thresholds.",
+            },
+          ],
+          criteriaDiagnostics: [
+            {
+              criterionId: "gap-0634-cognitive-retrieval-score-explainability",
+              criterionType: "objective_quality",
+              status: "satisfied",
+              evidenceRefs: ["ev-gap-0634-eval-pack", "ev-gap-0634-signed-ledgers", "ev-gap-0634-ci"],
+              rejectedEvidenceRefs: ["ev-gap-0634-paper-metadata-only"],
+              judgeRef: "judge://amc/gap-0634-cognitive-retrieval-score-explainability",
+              repairHint: "Keep question ID, accepted evidence IDs, rejected evidence reasons, repair hint, signed rows, thresholds, and metadata-only source-boundary proof linked.",
+            },
+          ],
+          testSuiteEvaluationLens: [
+            {
+              suiteId: "gap-0634-cognitive-retrieval-eval-score-pack",
+              sourceRef: doiRef,
+              language: "typescript",
+              testFramework: "vitest",
+              adapter: "generic_llm_client",
+              datasetRef: "amc://gap-0634/question-score-explainability",
+              datasetHash: "e".repeat(64),
+              testCaseId: "AMC-1.3:cognitive-retrieval-source-boundary",
+              testCaseHash: "f".repeat(64),
+              evaluatorIds: ["question-id-binding", "accepted-evidence-ledger", "rejected-reason-ledger", "repair-hint-coverage"],
+              evaluatorConfigHash: "0".repeat(64),
+              judgeModelRef: "judge://amc/local-eval",
+              experimentRunId: "gap-0634-cognitive-retrieval-score-explainability",
+              experimentResultHash: "1".repeat(64),
+              exportArtifactHash: "2".repeat(64),
+              ciRunId: "vitest:gap-0634-cognitive-retrieval-score-explainability",
+              ciConfigHash: "3".repeat(64),
+              traceArtifactHash: "4".repeat(64),
+              toolCallValidationHash: "5".repeat(64),
+              agentBehaviorEvaluation: true,
+              passRate0to1: 1,
+              minPassRate0to1: 0.99,
+              averageScore0to1: 0.94,
+              threshold0to1: 0.9,
+              status: "satisfied",
+              evidenceRefs: ["ev-gap-0634-eval-pack", "ev-gap-0634-signed-ledgers", "ev-gap-0634-ci"],
+              rejectedEvidenceRefs: ["ev-gap-0634-paper-metadata-only"],
+              repairHint: "Preserve question ID, accepted evidence IDs, rejected reasons, repair hint, signed rows, fail-closed thresholds, and no-paper-prose/data-copy proof before using cognitive-retrieval source metadata.",
+            },
+          ],
+          missingGateReasons: [],
+        },
+      ],
+    });
+    const pack = buildEvalScoreExplainabilityPack(report);
+
+    expect(report.replayable).toBe(true);
+    expect(report.failClosed).toBe(false);
+    expect(report.rows[0]?.surfaces).toEqual(expect.arrayContaining(["Score", "Shield", "Watch"]));
+    expect(pack).toMatchObject({
+      sourceRefs: [doiRef, zenodoRecordRef, openAlexRef],
+      sourceRefCount: 3,
+      failClosed: false,
+    });
+    expect(pack.rows[0]).toMatchObject({
+      questionId: "AMC-1.3",
+      acceptedEvidenceIds: ["ev-gap-0634-eval-pack", "ev-gap-0634-signed-ledgers", "ev-gap-0634-ci"],
+      rejectedEvidenceReasons: [
+        expect.objectContaining({
+          evidenceId: "ev-gap-0634-paper-metadata-only",
+          reason: expect.stringContaining("DOI/OpenAlex/Zenodo metadata confirms source relevance only"),
+        }),
+      ],
+      repairHint: expect.stringContaining("release gates"),
+      status: "ready",
+      reproducibleEvalPacks: [
+        expect.objectContaining({
+          packId: "gap-0634-cognitive-retrieval-eval-score-pack",
+          sourceRef: doiRef,
+          kind: "test_suite_evaluation",
+          ciRunId: "vitest:gap-0634-cognitive-retrieval-score-explainability",
+        }),
+      ],
+      failClosedThresholds: [
+        expect.objectContaining({ id: "gap-0634-cognitive-retrieval-eval-score-pack:pass_rate", passed: true }),
+        expect.objectContaining({ id: "gap-0634-cognitive-retrieval-eval-score-pack:average_score", passed: true }),
+      ],
+    });
+
+    const guide = generateGuide({
+      overall: 3,
+      agentId: "cognitive-retrieval-source-review-agent",
+      targetLevel: 4,
+      questionScores: [score({ questionId: "AMC-1.3", claimedLevel: 3, supportedMaxLevel: 3, finalLevel: 3, flags: [] })],
+      evalScoreExplainabilityPack: pack,
+    });
+    const guideMarkdown = guideToHumanMarkdown(guide);
+    expect(guideMarkdown).toContain("Question ID: AMC-1.3");
+    expect(guideMarkdown).toContain("Accepted evidence IDs: ev-gap-0634-eval-pack, ev-gap-0634-signed-ledgers, ev-gap-0634-ci");
+    expect(guideMarkdown).toContain("ev-gap-0634-paper-metadata-only");
+    expect(guideMarkdown).toContain("Repair hint:");
+    expect(guide.sections[0]?.evidenceNeeded.join("\n")).toContain("DOI/OpenAlex/Zenodo metadata");
+    expect(guide.sections[0]?.evidenceNeeded.join("\n")).toContain("cognitive-retrieval preprint");
+
+    const passport = passportJsonSchema.parse({
+      v: 1,
+      passportId: "pass_gap0634x",
+      generatedTs: 1,
+      scope: { type: "AGENT", idHash: "06340634" },
+      trust: {
+        integrityIndex: 1,
+        correlationRatio: 1,
+        trustLabel: "HIGH",
+        evidenceCoverage: { observedShare: 1, attestedShare: 0, selfReportedShare: 0 },
+        notary: { enabled: false },
+      },
+      status: { label: "VERIFIED", reasons: [] },
+      maturity: {
+        status: "OK",
+        overall: 4,
+        byFiveLayers: { strategicOps: 4, leadership: 4, culture: 4, resilience: 4, skills: 4 },
+        unknownQuestionsCount: 0,
+        questionExplainabilityHash: report.manifestHash,
+        questionExplainabilitySummary: {
+          replayable: pack.replayable,
+          failClosed: pack.failClosed,
+          rowCount: pack.rows.length,
+          signedEvidenceRowCount: pack.rows[0]?.signedEvidenceRows.length ?? 0,
+          acceptedEvidenceCount: pack.rows[0]?.acceptedEvidenceIds.length ?? 0,
+          rejectedEvidenceCount: pack.rows[0]?.rejectedEvidenceReasons.length ?? 0,
+          rejectedEvidenceReasonCount: pack.rows[0]?.rejectedEvidenceReasons.length ?? 0,
+          reproducibleEvalPackCount: pack.rows[0]?.reproducibleEvalPacks.length ?? 0,
+          failClosedThresholdCount: pack.rows[0]?.failClosedThresholds.length ?? 0,
+          surfaces: report.rows[0]?.surfaces ?? [],
+          sourceRefs: pack.sourceRefs,
+          sourceRefCount: pack.sourceRefCount,
+          rows: pack.rows.map((row) => ({
+            questionId: row.questionId,
+            acceptedEvidenceIds: row.acceptedEvidenceIds,
+            rejectedEvidenceReasons: row.rejectedEvidenceReasons,
+            repairHint: row.repairHint,
+            status: row.status,
+            rowHash: row.rowHash,
+          })),
+        },
+      },
+      strategyFailureRisks: { ecosystemFocusRisk: null, clarityPathRisk: null, economicSignificanceRisk: null, riskAssuranceRisk: null, digitalDualityRisk: null },
+      valueDimensions: { emotionalValue: null, functionalValue: null, economicValue: null, brandValue: null, lifetimeValue: null, valueScore: null },
+      checkpoints: {
+        cgxPackSha256: "6".repeat(64),
+        lastAssuranceCert: { status: "PASS" },
+        lastBench: {},
+        lastAuditBinder: {},
+        lastValueSnapshot: {},
+      },
+      governanceSummary: { promptEnforcement: "ON", truthguard: "ENFORCE", providerAllowlist: "PASS", modelAllowlist: "PASS", toolAllowlist: "PASS", approvals: "PASS", leases: "PASS", pluginsIntegrity: "PASS" },
+      bindings: { passportPolicySha256: "7".repeat(64), canonSha256: "8".repeat(64), bankSha256: "9".repeat(64), trustMode: "LOCAL_VAULT" },
+      proofBindings: { transparencyRootSha256: "a".repeat(64), merkleRootSha256: "b".repeat(64), includedEventProofIds: ["ev-gap-0634-eval-pack"], calculationManifestSha256: "c".repeat(64) },
+    });
+    expect(passport.maturity.questionExplainabilitySummary?.sourceRefCount).toBe(3);
+    expect(passport.maturity.questionExplainabilitySummary?.sourceRefs).toContain(doiRef);
+    expect(passport.maturity.questionExplainabilitySummary?.rows?.[0]).toMatchObject({
+      questionId: "AMC-1.3",
+      acceptedEvidenceIds: ["ev-gap-0634-eval-pack", "ev-gap-0634-signed-ledgers", "ev-gap-0634-ci"],
+      rejectedEvidenceReasons: [expect.objectContaining({ evidenceId: "ev-gap-0634-paper-metadata-only" })],
+      repairHint: expect.stringContaining("release gates"),
+    });
+  });
+
   test("binds UpTrain repository metadata to existing eval score explainability primitives", () => {
     const uptrainRepo = "https://github.com/uptrain-ai/uptrain";
     const report = buildQuestionExplainabilityReport({

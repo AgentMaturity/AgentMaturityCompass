@@ -19,6 +19,8 @@ import type { BuildJudgeCalibrationReceiptInput } from '../eval/judgeCalibration
 import type { RunPromptLayerProviderDriftInput } from '../benchmarks/promptLayerProviderDrift.js';
 import type { RunPromptfooProviderDriftInput } from '../benchmarks/promptfooProviderDrift.js';
 import type { RunPatronusProviderDriftInput } from '../benchmarks/patronusProviderDrift.js';
+import type { RunInspectProviderDriftInput } from '../benchmarks/inspectProviderDrift.js';
+import type { RunTensorZeroProviderDriftInput } from '../benchmarks/tensorZeroProviderDrift.js';
 
 const nonEmptyStringSchema = z.string().trim().min(1);
 const optionalNonEmptyStringSchema = nonEmptyStringSchema.optional();
@@ -241,6 +243,62 @@ export async function handleScoreRoute(
       });
     } catch (err) {
       scoreRouteError(res, err, 'Patronus provider drift scoring failed');
+    }
+    return true;
+  }
+
+  // POST /api/v1/score/inspect-provider-drift — score-facing Inspect-backed provider/version canary drift report
+  if (pathname === '/api/v1/score/inspect-provider-drift' && method === 'POST') {
+    try {
+      const body = await bodyJson<RunInspectProviderDriftInput>(req);
+      if (!Array.isArray(body.baseline) || !Array.isArray(body.candidate) || !body.inspect) {
+        apiError(res, 400, 'Required: baseline[], candidate[], and inspect metadata');
+        return true;
+      }
+      const { runInspectProviderDrift } = await import('../benchmarks/inspectProviderDrift.js');
+      const result = runInspectProviderDrift({
+        ...body,
+        agentId: body.agentId ?? 'default',
+      });
+      apiSuccess(res, {
+        report: result.report,
+        providerVersions: result.score.providerVersions,
+        canaryResults: result.score.canaryResults,
+        driftStatistics: result.score.driftStatistics,
+        inspectEvidenceHash: result.inspectEvidenceHash,
+        failClosed: result.report.failClosed,
+        sourceRefs: result.sourceRefs,
+      });
+    } catch (err) {
+      scoreRouteError(res, err, 'Inspect provider drift scoring failed');
+    }
+    return true;
+  }
+
+  // POST /api/v1/score/tensorzero-provider-drift — score-facing TensorZero-scoped provider/version canary drift report
+  if (pathname === '/api/v1/score/tensorzero-provider-drift' && method === 'POST') {
+    try {
+      const body = await bodyJson<RunTensorZeroProviderDriftInput>(req);
+      if (!Array.isArray(body.baseline) || !Array.isArray(body.candidate) || !body.tensorZero) {
+        apiError(res, 400, 'Required: baseline[], candidate[], and tensorZero metadata');
+        return true;
+      }
+      const { runTensorZeroProviderDrift } = await import('../benchmarks/tensorZeroProviderDrift.js');
+      const result = runTensorZeroProviderDrift({
+        ...body,
+        agentId: body.agentId ?? 'default',
+      });
+      apiSuccess(res, {
+        report: result.report,
+        providerVersions: result.score.providerVersions,
+        canaryResults: result.score.canaryResults,
+        driftStatistics: result.score.driftStatistics,
+        tensorZeroEvidenceHash: result.tensorZeroEvidenceHash,
+        failClosed: result.report.failClosed,
+        sourceRefs: result.sourceRefs,
+      });
+    } catch (err) {
+      scoreRouteError(res, err, 'TensorZero provider drift scoring failed');
     }
     return true;
   }

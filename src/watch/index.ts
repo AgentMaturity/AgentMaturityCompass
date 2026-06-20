@@ -115,6 +115,30 @@ export {
   type RunPatronusProviderDriftInput,
 } from './patronusProviderDrift.js';
 export {
+  INSPECT_PROVIDER_DRIFT_SOURCE_REFS,
+  runInspectProviderDrift,
+  type InspectProviderDriftMetadata,
+  type InspectProviderDriftProof,
+  type InspectProviderDriftResult,
+  type InspectProviderDriftScoreSurface,
+  type InspectProviderDriftShieldSurface,
+  type InspectProviderDriftSide,
+  type InspectProviderDriftWatchSurface,
+  type RunInspectProviderDriftInput,
+} from './inspectProviderDrift.js';
+export {
+  TENSORZERO_PROVIDER_DRIFT_SOURCE_REFS,
+  runTensorZeroProviderDrift,
+  type RunTensorZeroProviderDriftInput,
+  type TensorZeroProviderDriftMetadata,
+  type TensorZeroProviderDriftProof,
+  type TensorZeroProviderDriftResult,
+  type TensorZeroProviderDriftScoreSurface,
+  type TensorZeroProviderDriftShieldSurface,
+  type TensorZeroProviderDriftSide,
+  type TensorZeroProviderDriftWatchSurface,
+} from './tensorZeroProviderDrift.js';
+export {
   LMNR_OBSERVABILITY_METADATA,
   runLmnrObservabilityLiveDrift,
   type LmnrObservabilityDriftStatistic,

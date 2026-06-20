@@ -11,6 +11,8 @@ import type { JudgeCalibrationReceipt } from '../eval/judgeCalibration.js';
 import type { RunPromptLayerProviderDriftInput } from '../benchmarks/promptLayerProviderDrift.js';
 import type { RunPromptfooProviderDriftInput } from '../benchmarks/promptfooProviderDrift.js';
 import type { RunPatronusProviderDriftInput } from '../benchmarks/patronusProviderDrift.js';
+import type { RunInspectProviderDriftInput } from '../benchmarks/inspectProviderDrift.js';
+import type { RunTensorZeroProviderDriftInput } from '../benchmarks/tensorZeroProviderDrift.js';
 
 const shieldScanBodySchema = z.object({
   code: z.string().min(1),
@@ -32,7 +34,7 @@ export async function handleShieldRoute(
     apiSuccess(res, {
       status: 'operational',
       module: 'shield',
-      capabilities: ['scan', 'injection-detect', 'sanitize', 'score-explainability-receipts', 'replay-corpus-ci-receipts', 'live-drift-receipts', 'judge-calibration-receipts', 'provider-drift-fail-closed-receipts', 'promptfoo-provider-drift-receipts', 'patronus-provider-drift-receipts']
+      capabilities: ['scan', 'injection-detect', 'sanitize', 'score-explainability-receipts', 'replay-corpus-ci-receipts', 'live-drift-receipts', 'judge-calibration-receipts', 'provider-drift-fail-closed-receipts', 'promptfoo-provider-drift-receipts', 'patronus-provider-drift-receipts', 'inspect-provider-drift-receipts', 'tensorzero-provider-drift-receipts']
     });
     return true;
   }
@@ -177,6 +179,62 @@ export async function handleShieldRoute(
       });
     } catch (err) {
       apiError(res, 400, err instanceof Error ? err.message : 'Patronus provider drift receipt verification failed');
+    }
+    return true;
+  }
+
+  if (pathname === '/api/v1/shield/inspect-provider-drift/verify' && method === 'POST') {
+    try {
+      const body = await bodyJson<RunInspectProviderDriftInput>(req);
+      if (!Array.isArray(body.baseline) || !Array.isArray(body.candidate) || !body.inspect) {
+        apiError(res, 400, 'Required: baseline[], candidate[], and inspect metadata');
+        return true;
+      }
+      const { runInspectProviderDrift } = await import('../benchmarks/inspectProviderDrift.js');
+      const result = runInspectProviderDrift({
+        ...body,
+        agentId: body.agentId ?? 'default',
+      });
+      apiSuccess(res, {
+        verification: result.ciGate.passed ? 'passed' : 'blocked',
+        ciGate: result.ciGate,
+        inspectEvidenceHash: result.inspectEvidenceHash,
+        failClosed: result.report.failClosed,
+        activeAlerts: result.report.alerts.filter((alert) => !alert.waived).map((alert) => alert.alertId),
+        waivedAlerts: result.report.alerts.filter((alert) => alert.waived).map((alert) => alert.alertId),
+        shield: result.shield,
+        sourceRefs: result.sourceRefs,
+      });
+    } catch (err) {
+      apiError(res, 400, err instanceof Error ? err.message : 'Inspect provider drift receipt verification failed');
+    }
+    return true;
+  }
+
+  if (pathname === '/api/v1/shield/tensorzero-provider-drift/verify' && method === 'POST') {
+    try {
+      const body = await bodyJson<RunTensorZeroProviderDriftInput>(req);
+      if (!Array.isArray(body.baseline) || !Array.isArray(body.candidate) || !body.tensorZero) {
+        apiError(res, 400, 'Required: baseline[], candidate[], and tensorZero metadata');
+        return true;
+      }
+      const { runTensorZeroProviderDrift } = await import('../benchmarks/tensorZeroProviderDrift.js');
+      const result = runTensorZeroProviderDrift({
+        ...body,
+        agentId: body.agentId ?? 'default',
+      });
+      apiSuccess(res, {
+        verification: result.ciGate.passed ? 'passed' : 'blocked',
+        ciGate: result.ciGate,
+        tensorZeroEvidenceHash: result.tensorZeroEvidenceHash,
+        failClosed: result.report.failClosed,
+        activeAlerts: result.report.alerts.filter((alert) => !alert.waived).map((alert) => alert.alertId),
+        waivedAlerts: result.report.alerts.filter((alert) => alert.waived).map((alert) => alert.alertId),
+        shield: result.shield,
+        sourceRefs: result.sourceRefs,
+      });
+    } catch (err) {
+      apiError(res, 400, err instanceof Error ? err.message : 'TensorZero provider drift receipt verification failed');
     }
     return true;
   }
