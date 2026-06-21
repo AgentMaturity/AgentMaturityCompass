@@ -107,8 +107,8 @@ function driftRows(prefix: string, score0to1: number, behavior: string): LiveDri
   }));
 }
 
-describe("GAP-0640..0648 AMC relevance-gated source reviews", () => {
-  it("keeps every GAP-0640..0648 source-review note in the required restartable shape", () => {
+describe("GAP-0640..0649 AMC relevance-gated source reviews", () => {
+  it("keeps every GAP-0640..0649 source-review note in the required restartable shape", () => {
     const docs = [
       "docs/source-reviews/GAP-0640-pyod-replay-corpus.md",
       "docs/source-reviews/GAP-0641-multi-agent-alignment-score-explainability.md",
@@ -119,6 +119,7 @@ describe("GAP-0640..0648 AMC relevance-gated source reviews", () => {
       "docs/source-reviews/GAP-0646-swarm-routing-provider-drift.md",
       "docs/source-reviews/GAP-0647-adaptive-task-decomposition-live-drift.md",
       "docs/source-reviews/GAP-0648-clinical-agent-public-methodology.md",
+      "docs/source-reviews/GAP-0649-adaptive-multi-agent-public-methodology.md",
     ];
 
     for (const path of docs) {
@@ -139,6 +140,7 @@ describe("GAP-0640..0648 AMC relevance-gated source reviews", () => {
       ["docs/source-reviews/GAP-0643-title-pending-47-live-drift.md", "skipped for product implementation"],
       ["docs/source-reviews/GAP-0646-swarm-routing-provider-drift.md", "would misclassify the gap"],
       ["docs/source-reviews/GAP-0648-clinical-agent-public-methodology.md", "not a public AMC methodology version change by itself"],
+      ["docs/source-reviews/GAP-0649-adaptive-multi-agent-public-methodology.md", "not a public AMC methodology version change by itself"],
     ];
 
     for (const [path, phrase] of expectations) {
