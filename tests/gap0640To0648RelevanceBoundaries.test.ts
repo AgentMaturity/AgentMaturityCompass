@@ -107,7 +107,7 @@ function driftRows(prefix: string, score0to1: number, behavior: string): LiveDri
   }));
 }
 
-describe("GAP-0640..0648 AMC relevance-gated source reviews", () => {
+describe("GAP-0640..0651 AMC relevance-gated source reviews", () => {
   it("keeps irrelevant or metadata-only sources out of product code while documenting the 8-surface decision", () => {
     const expectations = [
       ["docs/source-reviews/GAP-0640-pyod-replay-corpus.md", "No PyOD runtime dependency or source-specific module was added"],
@@ -115,6 +115,7 @@ describe("GAP-0640..0648 AMC relevance-gated source reviews", () => {
       ["docs/source-reviews/GAP-0643-title-pending-47-live-drift.md", "skipped for product implementation"],
       ["docs/source-reviews/GAP-0646-swarm-routing-provider-drift.md", "would misclassify the gap"],
       ["docs/source-reviews/GAP-0648-clinical-agent-public-methodology.md", "not a public AMC methodology version change by itself"],
+      ["docs/source-reviews/GAP-0651-autorag-replay-corpus.md", "No AutoRAG runtime dependency or source-specific module was added"],
     ];
 
     for (const [path, phrase] of expectations) {
@@ -127,7 +128,7 @@ describe("GAP-0640..0648 AMC relevance-gated source reviews", () => {
     }
   });
 
-  it("rejects GAP-0640 PyOD metadata-only replay claims and accepts GAP-0644 OpenLLMetry only through existing signed replay receipts", () => {
+  it("rejects metadata-only replay claims and accepts relevant repos only through existing signed replay receipts", () => {
     const pyod = buildEvalReplayCorpusEvidenceReceipt(
       runReplayBenchmarkCorpus(replayInput("https://github.com/yzhao062/pyod", "0640-pyod", false)),
     );
@@ -142,6 +143,22 @@ describe("GAP-0640..0648 AMC relevance-gated source reviews", () => {
     expect(openllmetry.surfaces).toEqual(expect.arrayContaining(["Score", "Shield", "Watch"]));
     expect(openllmetry.sourceRefs).toEqual(["https://github.com/traceloop/openllmetry"]);
     expect(openllmetry.signedEvidenceRefCount).toBe(2);
+
+    const autoragMetadataOnly = buildEvalReplayCorpusEvidenceReceipt(
+      runReplayBenchmarkCorpus(replayInput("https://github.com/Marker-Inc-Korea/AutoRAG", "0651-autorag", false)),
+    );
+    expect(autoragMetadataOnly.status).toBe("fail_closed");
+    expect(autoragMetadataOnly.sourceRefs).toEqual(["https://github.com/Marker-Inc-Korea/AutoRAG"]);
+    expect(autoragMetadataOnly.issues.join("\n")).toContain("signed evidence");
+    expect(autoragMetadataOnly.recommendation).toContain("Fail closed");
+
+    const autoragSignedReplay = buildEvalReplayCorpusEvidenceReceipt(
+      runReplayBenchmarkCorpus(replayInput("https://github.com/Marker-Inc-Korea/AutoRAG", "0651-autorag", true)),
+    );
+    expect(autoragSignedReplay.status).toBe("ready");
+    expect(autoragSignedReplay.surfaces).toEqual(expect.arrayContaining(["Score", "Shield", "Watch"]));
+    expect(autoragSignedReplay.sourceRefs).toEqual(["https://github.com/Marker-Inc-Korea/AutoRAG"]);
+    expect(autoragSignedReplay.signedEvidenceRefCount).toBe(2);
   });
 
   it("binds GAP-0641 coordinated multi-agent outcome metadata to existing question-score explainability primitives", () => {
