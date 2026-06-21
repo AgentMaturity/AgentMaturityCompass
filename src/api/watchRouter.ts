@@ -14,6 +14,7 @@ import type { RunPromptfooProviderDriftInput } from '../benchmarks/promptfooProv
 import type { RunPatronusProviderDriftInput } from '../benchmarks/patronusProviderDrift.js';
 import type { RunInspectProviderDriftInput } from '../benchmarks/inspectProviderDrift.js';
 import type { RunTensorZeroProviderDriftInput } from '../benchmarks/tensorZeroProviderDrift.js';
+import type { RunHelmProviderDriftInput } from '../benchmarks/helmProviderDrift.js';
 
 export async function handleWatchRoute(
   pathname: string,
@@ -344,6 +345,35 @@ export async function handleWatchRoute(
       });
     } catch (err) {
       apiError(res, 500, err instanceof Error ? err.message : 'TensorZero provider drift watch projection failed');
+    }
+    return true;
+  }
+
+  // POST /api/v1/watch/helm-provider-drift — project HELM-backed provider/version canary drift into Score, Shield, and Watch surfaces
+  if (pathname === '/api/v1/watch/helm-provider-drift' && method === 'POST') {
+    try {
+      const body = await bodyJson<RunHelmProviderDriftInput>(req);
+      if (!Array.isArray(body.baseline) || !Array.isArray(body.candidate) || !body.helm) {
+        apiError(res, 400, 'Required: baseline[], candidate[], and helm metadata');
+        return true;
+      }
+      const { runHelmProviderDrift } = await import('../watch/helmProviderDrift.js');
+      const result = runHelmProviderDrift({
+        ...body,
+        agentId: body.agentId ?? 'default',
+      });
+      apiSuccess(res, {
+        report: result.report,
+        helmEvidenceHash: result.helmEvidenceHash,
+        score: result.score,
+        shield: result.shield,
+        watch: result.watch,
+        watchAlerts: result.watchAlerts,
+        failClosed: result.report.failClosed,
+        sourceRefs: result.sourceRefs,
+      });
+    } catch (err) {
+      apiError(res, 500, err instanceof Error ? err.message : 'HELM provider drift watch projection failed');
     }
     return true;
   }

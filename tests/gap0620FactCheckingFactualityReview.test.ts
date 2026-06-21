@@ -11,10 +11,10 @@ import { buildDiagnosticMethodologyVersioningReceipt } from "../src/diagnostic/m
 describe("GAP-0620 fact-checking/factuality review methodology boundary", () => {
   it("publishes methodology-versioned Score/Shield/Watch boundaries without a standalone fact-checking subsystem", () => {
     const manifest = getPublicMethodologyManifest();
-    expect(AMC_PUBLIC_METHODOLOGY_VERSION).toBe("2026.06.20-r216");
+    expect(AMC_PUBLIC_METHODOLOGY_VERSION).toBe("2026.06.21-r217");
     expect(manifest.changelog[0]).toMatchObject({
-      version: "2026.06.20-r216",
-      date: "2026-06-20"
+      version: "2026.06.21-r217",
+      date: "2026-06-21"
     });
     expect(manifest.changelog.map((row) => row.summary).join("\n")).toContain("no standalone fact-checking subsystem");
 

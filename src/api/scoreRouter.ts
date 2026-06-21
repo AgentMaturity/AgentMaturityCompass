@@ -21,6 +21,7 @@ import type { RunPromptfooProviderDriftInput } from '../benchmarks/promptfooProv
 import type { RunPatronusProviderDriftInput } from '../benchmarks/patronusProviderDrift.js';
 import type { RunInspectProviderDriftInput } from '../benchmarks/inspectProviderDrift.js';
 import type { RunTensorZeroProviderDriftInput } from '../benchmarks/tensorZeroProviderDrift.js';
+import type { RunHelmProviderDriftInput } from '../benchmarks/helmProviderDrift.js';
 
 const nonEmptyStringSchema = z.string().trim().min(1);
 const optionalNonEmptyStringSchema = nonEmptyStringSchema.optional();
@@ -299,6 +300,34 @@ export async function handleScoreRoute(
       });
     } catch (err) {
       scoreRouteError(res, err, 'TensorZero provider drift scoring failed');
+    }
+    return true;
+  }
+
+  // POST /api/v1/score/helm-provider-drift — score-facing HELM-backed provider/version canary drift report
+  if (pathname === '/api/v1/score/helm-provider-drift' && method === 'POST') {
+    try {
+      const body = await bodyJson<RunHelmProviderDriftInput>(req);
+      if (!Array.isArray(body.baseline) || !Array.isArray(body.candidate) || !body.helm) {
+        apiError(res, 400, 'Required: baseline[], candidate[], and helm metadata');
+        return true;
+      }
+      const { runHelmProviderDrift } = await import('../benchmarks/helmProviderDrift.js');
+      const result = runHelmProviderDrift({
+        ...body,
+        agentId: body.agentId ?? 'default',
+      });
+      apiSuccess(res, {
+        report: result.report,
+        providerVersions: result.score.providerVersions,
+        canaryResults: result.score.canaryResults,
+        driftStatistics: result.score.driftStatistics,
+        helmEvidenceHash: result.helmEvidenceHash,
+        failClosed: result.report.failClosed,
+        sourceRefs: result.sourceRefs,
+      });
+    } catch (err) {
+      scoreRouteError(res, err, 'HELM provider drift scoring failed');
     }
     return true;
   }

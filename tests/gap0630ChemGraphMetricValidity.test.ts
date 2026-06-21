@@ -36,8 +36,8 @@ describe("GAP-0630 ChemGraph agentic chemistry workflow metric-validity boundary
     const gate = manifest.metricValidationGates.find((row) => row.gate === "chemgraph_agentic_chemistry_workflow_metric_validity");
     const changeTrigger = manifest.benchmarkMethodologyVersioning.changeTriggers.find((row) => row.trigger === "chemgraph_agentic_chemistry_workflow_metric_validity_change");
 
-    expect(manifest.version).toBe("2026.06.20-r216");
-    expect(manifest.changelog[0]?.summary).toContain("ChemGraph-style agentic computational chemistry workflow metric-validity boundaries");
+    expect(manifest.version).toBe("2026.06.21-r217");
+    expect(manifest.changelog.find((row) => row.version === "2026.06.20-r216")?.summary).toContain("ChemGraph-style agentic computational chemistry workflow metric-validity boundaries");
     expect(boundary).toBeDefined();
     expect(boundary?.appliesWhen).toContain("Score report");
     expect(boundary?.appliesWhen).toContain("Shield receipt");

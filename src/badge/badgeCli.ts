@@ -45,7 +45,8 @@ export function badgeMethodologyMetadata(opts: BadgeOptions = { level: 0 }): Pub
 }
 
 export function badgeSourceReviewNotice(methodology: PublicMethodologyReference = getPublicMethodologyReference()): string {
-  return `Source-review claims are methodology-bound by ${methodology.version}; metadata-only fact-checking/factuality-review, Google ADK, LM Evaluation Harness, Digital materials, ChemGraph, and OpenAI Evals signals require amc_methodology_assurance proof and no subsystem/importer/parity claim, connector claim, or registry-mirror claim.`;
+  return `Source-review claims are methodology-bound by ${methodology.version}; metadata-only fact-checking/factuality-review, Google ADK, LM Evaluation Harness, OpenAI Simple Evals, Digital materials, ChemGraph, OpenAI Evals, and PocketFlow signals require amc_methodology_assurance proof, no subsystem/importer/parity claim, no SDK/importer/parity claim, no PocketFlow subsystem/SDK/importer/parity claim, no connector claim, no framework-compatibility claim, and no registry-mirror claim.`;
+
 
 }
 

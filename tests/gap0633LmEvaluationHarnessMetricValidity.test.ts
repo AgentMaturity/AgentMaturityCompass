@@ -18,13 +18,14 @@ describe("GAP-0633 LM Evaluation Harness metric-validity source-review boundary"
     const manifest = getPublicMethodologyManifest();
     const requirements = lmEvaluationHarnessMetricValidityRequirements();
 
-    expect(AMC_PUBLIC_METHODOLOGY_VERSION).toBe("2026.06.20-r216");
-    expect(manifest.changelog[0]).toMatchObject({
+    expect(AMC_PUBLIC_METHODOLOGY_VERSION).toBe("2026.06.21-r217");
+    const lmEvaluationHarnessChangelog = manifest.changelog.find((row) => row.version === "2026.06.20-r216");
+    expect(lmEvaluationHarnessChangelog).toMatchObject({
       version: "2026.06.20-r216",
       date: "2026-06-20"
     });
-    expect(manifest.changelog[0]?.summary).toContain("LM Evaluation Harness-style metric-validity source-review boundaries");
-    expect(manifest.changelog[0]?.migration).toContain("Reports generated under 2026.06.20-r215");
+    expect(lmEvaluationHarnessChangelog?.summary).toContain("LM Evaluation Harness-style metric-validity source-review boundaries");
+    expect(lmEvaluationHarnessChangelog?.migration).toContain("Reports generated under 2026.06.20-r215");
     expect(manifest.deprecationNotice).toContain("2026.06.20-r216");
     expect(manifest.migrationGuidance.join("\n")).toContain("LM Evaluation Harness-style metric-validity claims");
 

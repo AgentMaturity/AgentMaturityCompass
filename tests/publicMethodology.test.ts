@@ -55,14 +55,16 @@ describe("public methodology manifest", () => {
     expect(first.questionSet.version).toBe("amc-legacy-240-v1");
     expect(first.questionSet.questionCount).toBe(getAllQuestions().length);
     expect(first.changelog[0]?.version).toBe(AMC_PUBLIC_METHODOLOGY_VERSION);
-    expect(first.changelog[0]?.migration).toContain("Reports generated under 2026.06.20-r215");
-    expect(first.changelog[0]?.summary).toContain("ChemGraph-style agentic computational chemistry workflow");
-    expect(first.changelog[0]?.summary).toContain("LM Evaluation Harness-style metric-validity source-review boundaries");
+    expect(first.changelog[0]?.migration).toContain("Reports generated under 2026.06.20-r216");
+    expect(first.changelog[0]?.summary).toContain("PocketFlow-style public-methodology source-review boundaries");
 
-    expect(first.changelog[1]?.summary).toContain("OpenAI Evals-style public-methodology source-review boundaries");
-    expect(first.changelog[2]?.summary).toContain("fact-checking and factuality-evaluation review methodology boundaries");
-    expect(first.changelog[2]?.summary).toContain("Google ADK-style agent-toolkit evaluation metric-validity boundaries");
+    expect(first.changelog[1]?.summary).toContain("ChemGraph-style agentic computational chemistry workflow");
+    expect(first.changelog[1]?.summary).toContain("LM Evaluation Harness-style metric-validity source-review boundaries");
+    expect(first.changelog[2]?.summary).toContain("OpenAI Evals-style public-methodology source-review boundaries");
+    expect(first.changelog[3]?.summary).toContain("fact-checking and factuality-evaluation review methodology boundaries");
+    expect(first.changelog[3]?.summary).toContain("Google ADK-style agent-toolkit evaluation metric-validity boundaries");
     for (const previousVersion of [
+      "2026.06.20-r216",
       "2026.06.20-r215",
       "2026.06.20-r214",
       "2026.06.20-r215",
@@ -1371,6 +1373,8 @@ describe("public methodology manifest", () => {
       "google_adk_eval_metric_validity",
       "lm_evaluation_harness_metric_validity",
       "openai_evals_public_methodology",
+      "pocketflow_public_methodology",
+      "openai_simple_evals_metric_validity",
       "digital_materials_ecosystem_metric_validity",
       "chemgraph_agentic_chemistry_workflow_metric_validity",
       "ranking_stability_coverage",

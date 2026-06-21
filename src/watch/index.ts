@@ -139,6 +139,18 @@ export {
   type TensorZeroProviderDriftWatchSurface,
 } from './tensorZeroProviderDrift.js';
 export {
+  HELM_PROVIDER_DRIFT_SOURCE_REFS,
+  runHelmProviderDrift,
+  type HelmProviderDriftMetadata,
+  type HelmProviderDriftProof,
+  type HelmProviderDriftResult,
+  type HelmProviderDriftScoreSurface,
+  type HelmProviderDriftShieldSurface,
+  type HelmProviderDriftSide,
+  type HelmProviderDriftWatchSurface,
+  type RunHelmProviderDriftInput,
+} from './helmProviderDrift.js';
+export {
   LMNR_OBSERVABILITY_METADATA,
   runLmnrObservabilityLiveDrift,
   type LmnrObservabilityDriftStatistic,
@@ -150,6 +162,24 @@ export {
   type LmnrObservabilitySurface,
   type RunLmnrObservabilityLiveDriftInput,
 } from './lmnrObservabilityLiveDrift.js';
+export {
+  BISHENG_OBSERVABILITY_METADATA,
+  buildBishengObservabilityScoreSurface,
+  buildBishengObservabilityShieldSurface,
+  buildBishengObservabilityWatchSurface,
+  runBishengObservabilityLiveDrift,
+  type BishengObservabilityDriftStatistic,
+  type BishengObservabilityLiveDriftResult,
+  type BishengObservabilityLiveDriftRow,
+  type BishengObservabilityMetadataProof,
+  type BishengObservabilityRowProof,
+  type BishengObservabilityScoreSurface,
+  type BishengObservabilityShieldSurface,
+  type BishengObservabilitySignal,
+  type BishengObservabilitySurface,
+  type BishengObservabilityWatchSurface,
+  type RunBishengObservabilityLiveDriftInput,
+} from './bishengObservabilityLiveDrift.js';
 export {
   buildLiveDriftWatchAlerts,
   defaultLiveDriftThresholds,
