@@ -21,6 +21,18 @@ The correct AMC-native handling is to keep existing public-methodology rules unc
 | Score/Shield | No accepted proof without AMC-owned methodology evidence. |
 | Enforce/Vault/Fleet/Passport/Comply | No direct scope for this gap. |
 
+## Product closure
+
+Closed as a documented skip for public methodology changes. HertzBeat is an observability system, so this gap does not alter AMC methodology semantics, badge comparability, question-set versions, or scoring gates.
+
+## Fail-closed rule
+
+HertzBeat repository metadata, monitor/alert labels, star counts, language, license, README summaries, or source URL alone must fail closed as AMC public methodology evidence. Public methodology claims still require AMC-owned version, changelog, deprecation notice, migration guidance, validation proof, signed evidence, and row hashes.
+
 ## No-bloat boundary
 
 No HertzBeat subsystem, monitor integration, importer, API compatibility layer, metric mirror, public-methodology version bump, or copied upstream code/prose/config/examples was added.
+
+## Verification
+
+- `npx vitest run tests/gap0640To0648RelevanceBoundaries.test.ts --reporter=dot`

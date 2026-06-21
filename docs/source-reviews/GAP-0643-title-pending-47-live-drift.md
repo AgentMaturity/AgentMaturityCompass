@@ -21,6 +21,18 @@ Existing Watch live-drift primitives already require baseline/live windows, samp
 | Score/Shield | No accepted score/safety proof from the source metadata alone. |
 | Enforce/Vault/Fleet/Passport/Comply | No direct scope for this gap. |
 
+## Product closure
+
+Closed as a documented skip. The source metadata was too generic to justify a Watch, Score, Shield, methodology, or benchmark implementation, and existing Watch live-drift receipts already cover valid caller-owned baseline/live evidence.
+
+## Fail-closed rule
+
+The paper title, DOI, OpenAlex row, broad concept tags, or short metadata abstract alone must fail closed. A future drift claim can pass only with AMC-owned baseline distribution, live samples, drift statistic, alert or waiver receipt, signed evidence, and source-review/no-copy proof.
+
 ## No-bloat boundary
 
 No source-specific module, paper importer, dataset mirror, drift algorithm, copied preprint content, or public methodology change was added.
+
+## Verification
+
+- `npx vitest run tests/gap0640To0648RelevanceBoundaries.test.ts --reporter=dot`

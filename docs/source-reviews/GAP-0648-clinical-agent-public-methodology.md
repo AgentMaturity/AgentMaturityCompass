@@ -23,6 +23,18 @@ Clinical benchmark metadata alone must fail closed as public methodology evidenc
 | Comply | Indirect healthcare compliance context; no new compliance claim. |
 | Enforce/Vault/Fleet/Passport | No direct scope for this gap. |
 
+## Product closure
+
+Closed as a documented no-op for public methodology versioning. The source is clinical benchmark context, but it does not change AMC scoring methodology, public versioning, badge comparability, or migration guidance.
+
+## Fail-closed rule
+
+Clinical benchmark metadata, DOI, journal/source identity, article concepts, or source URL alone must fail closed as public methodology evidence. Public methodology claims require AMC-owned methodology version, changelog, deprecation notice, migration guidance, validation proof, badge assurance, signed evidence, row hashes, and no-copy proof.
+
 ## No-bloat boundary
 
 No clinical benchmark mirror, medical decision subsystem, importer, public methodology version bump, healthcare compliance claim, or copied paper content was added.
+
+## Verification
+
+- `npx vitest run tests/gap0640To0648RelevanceBoundaries.test.ts --reporter=dot`

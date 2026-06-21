@@ -22,6 +22,18 @@ AMC accepts healthcare agent replay claims only when the user provides AMC-owned
 | Comply | Indirect healthcare compliance context; no new compliance framework in this gap. |
 | Enforce/Vault/Fleet/Passport | No direct scope for this gap. |
 
+## Product closure
+
+Closed as healthcare-context replay-corpus guidance over existing Score, Shield, and Watch receipts. No clinical feature was added because the source is a scoping review, not an AMC-owned benchmark or validated medical task corpus.
+
+## Fail-closed rule
+
+Article metadata, journal/source name, DOI, healthcare keywords, scoping-review status, or abstract concepts alone must fail closed. Healthcare agent replay claims require AMC-owned task manifests, privacy boundaries, signed evidence rows, score deltas, safety checks, and CI/lifecycle receipts.
+
 ## No-bloat boundary
 
 No clinical-decision subsystem, healthcare dataset, medical workflow, clinical benchmark mirror, importer, compliance claim, or copied paper content was added.
+
+## Verification
+
+- `npx vitest run tests/gap0640To0648RelevanceBoundaries.test.ts --reporter=dot`

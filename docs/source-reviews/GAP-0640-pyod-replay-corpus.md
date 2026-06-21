@@ -22,6 +22,18 @@ AMC already has the needed replay-corpus primitive: an AMC-owned replay pack mus
 | Watch | Relevant only as generic anomaly/drift context through existing Watch receipts. |
 | Enforce/Vault/Fleet/Passport/Comply | No direct scope for this gap. |
 
+## Product closure
+
+Closed as a relevance-gated no-bloat boundary over existing replay-corpus receipts. No product module changed because AMC already requires caller-owned fixture hashes, replay manifests, baseline/candidate rows, signed evidence refs, score-delta gates, and CI/lifecycle receipts.
+
+## Fail-closed rule
+
+PyOD repository metadata, detector names, topic labels, README claims, stars, language, or source URL alone must fail closed. A PyOD-related replay claim can pass only when bound to AMC-owned fixtures, deterministic hashes, signed evidence rows, and regression thresholds.
+
 ## No-bloat boundary
 
 No upstream code, docs prose, examples, configs, datasets, benchmark rows, detector lists, screenshots, or implementation details were copied. No PyOD runtime dependency or source-specific module was added.
+
+## Verification
+
+- `npx vitest run tests/gap0640To0648RelevanceBoundaries.test.ts --reporter=dot`

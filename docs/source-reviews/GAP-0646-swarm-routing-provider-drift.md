@@ -22,6 +22,18 @@ AMC-native handling is to use existing Watch live-drift or Fleet evidence when a
 | Score/Shield | Accepted only when bound to AMC-owned evidence and thresholds. |
 | Enforce/Vault/Passport/Comply | No direct scope for this gap. |
 
+## Product closure
+
+Closed as a misclassification decision. The source can inform Watch/Fleet routing-stability review, but it is not a provider/model drift benchmark and does not justify provider-drift product code.
+
+## Fail-closed rule
+
+DOI/OpenAlex metadata, routing terminology, swarm labels, abstract concepts, or paper identity alone must fail closed as provider-drift evidence. Routing-stability claims require AMC-owned baseline/live windows, route manifests, drift statistics, alert/waiver proof, signed evidence, and thresholds.
+
 ## No-bloat boundary
 
 No swarm simulator, routing algorithm, provider-drift wrapper, paper importer, dataset mirror, or copied paper content was added.
+
+## Verification
+
+- `npx vitest run tests/gap0640To0648RelevanceBoundaries.test.ts --reporter=dot`

@@ -21,6 +21,18 @@ This does not justify an OpenLLMetry SDK integration, OpenTelemetry exporter/imp
 | Watch | Relevant through existing observability/replay watch alerts, not a new telemetry subsystem. |
 | Enforce/Vault/Fleet/Passport/Comply | No direct scope for this gap. |
 
-## No-copy boundary
+## Product closure
+
+Closed through existing replay-corpus and Watch observability receipts. The regression test proves OpenLLMetry source refs pass only when bound to AMC-owned replay rows with deterministic fixture hashes, signed baseline/candidate evidence, score deltas, and CI proof.
+
+## Fail-closed rule
+
+OpenLLMetry repository metadata, OpenTelemetry terminology, README descriptions, SDK names, trace labels, source URL, or stars alone must fail closed. Replay claims require AMC-owned trace/export hashes, result/report hashes, signed evidence refs, and regression thresholds.
+
+## No-bloat boundary
 
 No upstream code, docs prose, examples, SDK setup, telemetry schema, config, trace data, screenshots, or implementation details were copied.
+
+## Verification
+
+- `npx vitest run tests/gap0640To0648RelevanceBoundaries.test.ts --reporter=dot`

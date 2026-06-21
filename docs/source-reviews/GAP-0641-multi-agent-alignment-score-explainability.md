@@ -22,6 +22,18 @@ This does not justify a standalone alignment-study subsystem, paper importer, mu
 | Fleet | Indirect context; no Fleet runtime change in this gap. |
 | Enforce/Vault/Passport/Comply | No direct scope for this gap. |
 
-## No-copy boundary
+## Product closure
+
+Closed through existing question-score explainability, multi-user benchmark lens, and test-suite evaluation lens primitives. No product code was needed beyond regression coverage proving DOI/OpenAlex metadata is accepted only as a source ref and rejected as score evidence unless AMC-owned traces, evaluator configs, accepted/rejected evidence, repair hints, signed rows, and thresholds are present.
+
+## Fail-closed rule
+
+Paper title, DOI, OpenAlex metadata, abstract concepts, citation status, or a local summary alone must fail closed. Coordinated multi-agent outcome claims pass only with AMC-owned role manifests, interaction traces, evaluator configs, question ids, repair hints, signed evidence refs, and row hashes.
+
+## No-bloat boundary
 
 No paper prose, tables, figures, datasets, prompts, model outputs, examples, or implementation details were copied. The source is used only as live bibliographic metadata for relevance review.
+
+## Verification
+
+- `npx vitest run tests/gap0640To0648RelevanceBoundaries.test.ts --reporter=dot`

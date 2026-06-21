@@ -22,6 +22,18 @@ This does not justify an adaptive task-decomposition subsystem, strategy-update 
 | Fleet | Indirect context for multi-agent task decomposition; no Fleet runtime change. |
 | Enforce/Vault/Passport/Comply | No direct scope for this gap. |
 
-## No-copy boundary
+## Product closure
+
+Closed through existing Watch live score/behavior drift receipts. The regression test builds an AMC-owned baseline/live receipt for adaptive task decomposition and verifies signed evidence, drift alerting, receipt verification, and Watch alert projection without a new subsystem.
+
+## Fail-closed rule
+
+Preprint metadata, DOI, OpenAlex row, strategy/decomposition labels, or source URL alone must fail closed. A live-drift claim passes only with AMC-owned baseline/live samples, behavior signatures, score/pass-rate drift, interaction metrics, alert or waiver proof, signed evidence refs, and source refs.
+
+## No-bloat boundary
 
 No preprint prose, figures, tables, prompts, datasets, strategy algorithms, agent code, or implementation details were copied.
+
+## Verification
+
+- `npx vitest run tests/gap0640To0648RelevanceBoundaries.test.ts --reporter=dot`

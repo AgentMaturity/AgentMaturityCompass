@@ -108,6 +108,30 @@ function driftRows(prefix: string, score0to1: number, behavior: string): LiveDri
 }
 
 describe("GAP-0640..0648 AMC relevance-gated source reviews", () => {
+  it("keeps every GAP-0640..0648 source-review note in the required restartable shape", () => {
+    const docs = [
+      "docs/source-reviews/GAP-0640-pyod-replay-corpus.md",
+      "docs/source-reviews/GAP-0641-multi-agent-alignment-score-explainability.md",
+      "docs/source-reviews/GAP-0642-hertzbeat-public-methodology.md",
+      "docs/source-reviews/GAP-0643-title-pending-47-live-drift.md",
+      "docs/source-reviews/GAP-0644-openllmetry-replay-corpus.md",
+      "docs/source-reviews/GAP-0645-healthcare-agentic-ai-replay-corpus.md",
+      "docs/source-reviews/GAP-0646-swarm-routing-provider-drift.md",
+      "docs/source-reviews/GAP-0647-adaptive-task-decomposition-live-drift.md",
+      "docs/source-reviews/GAP-0648-clinical-agent-public-methodology.md",
+    ];
+
+    for (const path of docs) {
+      const doc = readFileSync(path, "utf8");
+      expect(doc).toContain("## Relevance decision");
+      expect(doc).toContain("## AMC/8 surface check");
+      expect(doc).toContain("## Product closure");
+      expect(doc).toContain("## Fail-closed rule");
+      expect(doc).toContain("## No-bloat boundary");
+      expect(doc).toContain("## Verification");
+    }
+  });
+
   it("keeps irrelevant or metadata-only sources out of product code while documenting the 8-surface decision", () => {
     const expectations = [
       ["docs/source-reviews/GAP-0640-pyod-replay-corpus.md", "No PyOD runtime dependency or source-specific module was added"],
