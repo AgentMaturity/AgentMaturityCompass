@@ -151,6 +151,22 @@ Each compliance mapping defines:
   - Assurance packs
   - Configuration files
 
+## Control Crosswalk Receipts
+
+Auditor-ready crosswalks use `buildControlCrosswalkReceipt` from `src/compliance/controlCrosswalk.ts`. A crosswalk receipt maps existing AMC compliance mappings to framework clauses without creating a new compliance framework or legal-certification claim.
+
+Each control row includes:
+
+- **Framework clause**: The existing compliance mapping category, such as NIST AI RMF `Govern`, ISO 42001 `Clause 5 Leadership`, EU AI Act `Art. 12 Record-Keeping`, SOC 2 `Security`, or a sector framework clause such as HIPAA `§164.312 Technical Safeguards`.
+- **AMC question IDs**: Diagnostic questions already linked by the compliance mapping.
+- **Evidence types**: Required event, assurance-pack, or audit-absence evidence from the mapping.
+- **Owner**: Accountable control owner supplied by the operator.
+- **Exception state**: `none`, `pending`, `approved`, `rejected`, or `expired`.
+- **Source citations**: Source-backed framework or review references supplied to the receipt.
+- **Evidence chain**: Event hashes and signed evidence refs for the row, summarized with a row-level evidence-chain hash.
+
+Crosswalk verification fails closed when source citations are missing, a row lacks an owner, a row lacks evidence lineage, or a non-`none` exception has no signed evidence reference and signature hash. Paper metadata, framework names, local notes, or self-reported owner names are not enough to satisfy a crosswalk without signed evidence and row hashes.
+
 ## Evidence Requirements
 
 ### Evidence Event Types

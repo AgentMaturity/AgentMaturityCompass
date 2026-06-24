@@ -528,6 +528,11 @@ export {
   generateComplianceReport
 } from "./compliance/complianceEngine.js";
 export {
+  buildControlCrosswalkReceipt,
+  verifyControlCrosswalkReceipt,
+  renderControlCrosswalkAuditExport
+} from "./compliance/controlCrosswalk.js";
+export {
   initComplianceMapsCli,
   verifyComplianceMapsCli,
   complianceReportCli,
