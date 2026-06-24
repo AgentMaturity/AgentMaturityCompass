@@ -686,6 +686,7 @@ import { classifyControls, renderControlClassificationMarkdown } from "./diagnos
 import { diagnosticBankInitCli, diagnosticBankVerifyCli } from "./diagnostic/bank/bankCli.js";
 import { contextualizedDiagnosticRenderCli } from "./diagnostic/contextualizer/contextualizerCli.js";
 import { truthguardValidateCli } from "./truthguard/truthguardCli.js";
+import { domainProofCheckCli } from "./domainProof/domainProofCli.js";
 import { toErrorMessage } from "./utils/errors.js";
 import { registerWatchCommands } from "./cli-watch-commands.js";
 import {
@@ -6798,6 +6799,7 @@ const canon = program.command("canon").description("Compass Canon signed content
 const cgx = program.command("cgx").description("Context Graph (CGX) build and verify operations");
 const diagnostic = program.command("diagnostic").description("Diagnostic bank/render operations");
 const truthguard = program.command("truthguard").description("Deterministic output truth-constraint validator");
+const proof = program.command("proof").description("Domain Proof Lane source-to-rule proof checks");
 const mode = program.command("mode").description("Switch CLI role mode");
 const loop = program.command("loop").description("Continuous self-serve maturity loop");
 const user = program.command("user").description("Multi-user RBAC account management");
@@ -8889,6 +8891,45 @@ truthguard
         console.log(`- ${violation.kind} ${violation.path}: ${violation.message}`);
       }
       process.exit(1);
+    }
+  });
+
+proof
+  .command("check")
+  .description("Check a claim against a declared source-to-rule manifest and emit an amcproof artifact")
+  .requiredOption("--domain <domain>", "domain id, currently governance for the local toy fixture")
+  .requiredOption("--manifest <path>", "source-to-rule manifest JSON")
+  .requiredOption("--input <path>", "proof-check input JSON")
+  .option("--out <path>", "write the amcproof artifact JSON")
+  .option("--json", "print machine-readable JSON", false)
+  .action((opts: { domain: string; manifest: string; input: string; out?: string; json?: boolean }) => {
+    const out = domainProofCheckCli({
+      workspace: process.cwd(),
+      domain: opts.domain,
+      manifest: opts.manifest,
+      input: opts.input,
+      outFile: opts.out
+    });
+    if (opts.json) {
+      console.log(JSON.stringify(out, null, 2));
+      return;
+    }
+    console.log(`result: ${out.result}`);
+    console.log(`proofId: ${out.proofId}`);
+    console.log(`artifactHash: ${out.artifactHash}`);
+    console.log(`sourceManifestHash: ${out.sourceManifestHash}`);
+    console.log(`formalSpecHash: ${out.formalSpecHash}`);
+    console.log(`ruleRefs: ${out.ruleRefs.map((ref) => ref.clauseId).join(",")}`);
+    if (out.counterexample) {
+      console.log(`counterexample: ${out.counterexample.brokenClauseId} ${out.counterexample.inputFact}`);
+    }
+    console.log(`surfaces: ${out.surfaces.join(",")}`);
+    console.log(`nonClaim: ${out.nonClaim}`);
+    if (opts.out) {
+      console.log(`artifactFile: ${opts.out}`);
+    }
+    if (out.result !== "proven") {
+      process.exitCode = 2;
     }
   });
 

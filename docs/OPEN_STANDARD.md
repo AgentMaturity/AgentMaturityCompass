@@ -15,6 +15,7 @@ Generated bundle location:
 - `amccert.schema.json`
 - `amcaudit.schema.json`
 - `amcpass.schema.json`
+- `amcproof.schema.json`
 - `registry.bench.schema.json`
 - `registry.passport.schema.json`
 
@@ -42,6 +43,8 @@ amc standard validate --schema amcpass --file ./agent.amcpass
 4. Keep artifact verification separate (`amc passport verify`, `amc bench verify`, etc.).
 
 Schema validation checks shape; artifact verification checks cryptographic trust/proofs.
+
+`amcproof.schema.json` validates the portable Domain Proof Lane artifact shape. It distinguishes evidence integrity, runtime policy, and domain correctness proof classes, but schema validation alone is not a correctness claim. Domain correctness is only proven when an artifact carries `result: "proven"`, source rule refs, checked constraints, and valid proof bindings.
 
 ## Compatibility + Versioning
 

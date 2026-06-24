@@ -33,6 +33,20 @@ Therefore GAP-0650 is closed as a source-review non-adoption boundary: relevant 
 
 A focused regression test now exercises the existing provider-drift primitive with only GAP-0650 DOI/OpenAlex-style metadata references and partial evaluator labels. The result must fail closed with `signedEvidenceRefs` and `evaluationFrameworkEvidence` alerts, proving that citation metadata is not accepted as Score/Shield/Watch provider-drift proof.
 
-## No-copy / no-bloat boundary
+## Product closure
+
+GAP-0650 is closed as a non-adoption provider-drift boundary over existing AMC provider-drift primitives. No product-design provider wrapper, route, importer, methodology bump, dataset mirror, or source-specific provider-drift subsystem was added because the source supplies only bibliographic metadata and high-level adjacent context.
+
+## Fail-closed rule
+
+DOI, OpenAlex, Crossref, citation count, paper-title, venue, author, publisher, and partial evaluator-label metadata must fail closed for provider-drift claims. A claim can pass only when AMC-owned canary rows include baseline/candidate provider versions, evaluator proof, result hashes, drift statistics, signed evidence refs, row hashes, and Watch alert or waiver proof.
+
+## No-bloat boundary
 
 No paper prose, abstract, tables, figures, prompts, examples, datasets, model outputs, evaluation data, implementation details, product-design workflow, importer, parity layer, benchmark mirror, or source-specific provider-drift wrapper was added. The source was used only through live bibliographic metadata for relevance review.
+
+## Verification
+
+- Focused regression: `npx vitest run tests/gap0650ProviderDriftBoundary.test.ts tests/gap0650To0658SourceReviewShape.test.ts --reporter=dot`
+- Static checks: `git diff --check -- . ':(exclude)AMC_OS'`
+- Typecheck: `npm run typecheck`

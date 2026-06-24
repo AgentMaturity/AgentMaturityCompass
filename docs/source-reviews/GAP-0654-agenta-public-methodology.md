@@ -49,6 +49,20 @@ Therefore Agenta metadata alone must fail closed for public Score, Shield, and W
 | Passport | No direct scope for this gap. |
 | Comply | No direct scope for this gap. |
 
+## Product closure
+
+GAP-0654 is closed as a public-methodology non-adoption boundary. No public methodology version, scoring-rule migration, badge comparability rule, API/CLI behavior, or Watch drift methodology changed because Agenta repository metadata is background context rather than AMC methodology proof.
+
+## Fail-closed rule
+
+Agenta repository metadata, topics, stars, README positioning, prompt/eval platform labels, branch head, license metadata, and observability/evaluation vocabulary must fail closed for AMC public-methodology claims. Passing evidence requires AMC-owned versioned scoring rules, changelog, deprecation notice, migration guidance, validation proof, signed evidence, badge assurance proof, row hashes, and no-copy proof.
+
 ## No-bloat boundary
 
 No Agenta subsystem, SDK, importer, adapter, experiment-platform clone, registry mirror, benchmark runner, parity layer, public methodology version bump, or copied upstream code/prose/config/examples was added.
+
+## Verification
+
+- Focused regression: `npx vitest run tests/gap0654PublicMethodologyBoundary.test.ts tests/gap0650To0658SourceReviewShape.test.ts --reporter=dot`
+- Static checks: `git diff --check -- . ':(exclude)AMC_OS'`
+- Typecheck: `npm run typecheck`

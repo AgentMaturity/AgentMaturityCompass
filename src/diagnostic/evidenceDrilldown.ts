@@ -1573,15 +1573,19 @@ function obsStudioDrilldownLensFailClosed(ref: QuestionScoreObsStudioDrilldownLe
   }
   const routePresent = ref.uiRoutePath.startsWith("/api/v1/score/evidence-drilldown/") ||
     ref.uiRoutePath.includes("evidenceDrilldown");
+  const openAlexWorkId = typeof ref.openAlexWorkId === "string" ? ref.openAlexWorkId : "";
+  const doi = typeof ref.doi === "string" ? ref.doi : "";
+  const publisherRef = typeof ref.publisherRef === "string" ? ref.publisherRef : "";
+  const titleRef = typeof ref.titleRef === "string" ? ref.titleRef : "";
+  const venueRef = typeof ref.venueRef === "string" ? ref.venueRef : "";
+  const publicationDate = typeof ref.publicationDate === "string" ? ref.publicationDate : "";
   const paperMetadataPresent = ref.sourceKind !== "paper" || (
-    ref.openAlexWorkId !== null &&
-    ref.openAlexWorkId.startsWith("https://openalex.org/W") &&
-    ref.doi !== null &&
-    ref.doi.startsWith("https://doi.org/") &&
-    ref.publisherRef !== null &&
-    ref.titleRef !== null &&
-    ref.venueRef !== null &&
-    ref.publicationDate !== null
+    openAlexWorkId.startsWith("https://openalex.org/W") &&
+    doi.startsWith("https://doi.org/") &&
+    publisherRef.trim().length > 0 &&
+    titleRef.trim().length > 0 &&
+    venueRef.trim().length > 0 &&
+    publicationDate.trim().length > 0
   );
   if (
     !ref.drilldownId ||

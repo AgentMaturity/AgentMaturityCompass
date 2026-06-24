@@ -159,6 +159,21 @@ amc domain assess --agent agent-1 --domain supply-chain
 amc domain assess --agent agent-1 --domain logistics
 ```
 
+## Domain Proof Lane Boundary
+
+Domain packs score regulated vertical controls; they do not automatically prove that a specific legal, clinical, tax, benefits, or policy answer is correct. The Domain Proof Lane adds a bounded source-to-rule path for that narrower claim:
+
+```bash
+amc proof check --domain governance \
+  --manifest fixtures/domain-proof/toy-governance/source-rule-manifest.json \
+  --input examples/domain-proof/toy-governance/proven.json \
+  --json
+```
+
+Current P0 support is intentionally limited to a local toy governance fixture. It maps through AMC's existing **Enforce**, **Comply**, **Score**, **Vault**, and **Watch** surfaces, emits an `amcproof` artifact, and returns `proven`, `disproven`, or `unsupported`. Unsupported domain-correctness proof never increases a domain score and must remain visible as `correctnessProofStatus: "unsupported"`.
+
+See [`DOMAIN_PROOF_LANE.md`](./DOMAIN_PROOF_LANE.md) for the proof taxonomy and non-claim boundary.
+
 ## Regulatory Mapping Matrix
 
 | Domain | Regulatory Basis |

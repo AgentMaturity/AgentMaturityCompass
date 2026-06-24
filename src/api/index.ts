@@ -48,6 +48,7 @@ import { apiError } from './apiHelpers.js';
 import { buildHealthPayload } from './health.js';
 import { deprecatedBridgeRoute, sdkVersionPolicy } from '../sdk/versioning.js';
 import { handleMarketplaceRoute } from '../marketplace/marketplaceRouter.js';
+import { handleDomainProofRoute } from './domainProofRouter.js';
 
 export type ApiAuthPolicy = 'public' | 'protected';
 export type ApiValidationPolicy = 'schema-validated' | 'router-local' | 'passthrough';
@@ -409,6 +410,15 @@ export const API_ROUTE_REGISTRY: readonly ApiRouteDefinition[] = [
     auth: 'protected',
     validationPolicy: 'router-local',
     handler: workspaceRoute(handleComplianceRoute)
+  },
+  {
+    id: 'proof',
+    description: 'Domain Proof Lane checks for declared source-to-rule manifests across Enforce, Comply, Score, Vault, and Watch',
+    prefixes: ['/api/v1/proof'],
+    methods: ['GET', 'POST'],
+    auth: 'protected',
+    validationPolicy: 'schema-validated',
+    handler: workspaceRoute(handleDomainProofRoute)
   },
   {
     id: 'memory',

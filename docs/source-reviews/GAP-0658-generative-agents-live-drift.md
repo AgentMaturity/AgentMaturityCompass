@@ -24,10 +24,20 @@ It is not a standalone AMC product feature. The paper metadata does not by itsel
 
 ## AMC/8 surface check
 
-- Score: only through existing score-window and evidence-gated maturity primitives.
-- Shield: only when signed drift evidence supports a safety/behavior regression claim.
-- Watch: only through existing `liveDriftAlerts` receipts and Watch alert builders.
-- Enforce, Vault, Fleet, Passport, Comply: no direct implementation for this gap.
+| Surface | Decision |
+| --- | --- |
+| Score | Only through existing score-window and evidence-gated maturity primitives. |
+| Shield | Only when signed drift evidence supports a safety/behavior regression claim. |
+| Watch | Only through existing `liveDriftAlerts` receipts and Watch alert builders. |
+| Enforce | No direct implementation for this gap. |
+| Vault | No direct implementation for this gap. |
+| Fleet | No direct implementation for this gap. |
+| Passport | No direct implementation for this gap. |
+| Comply | No direct implementation for this gap. |
+
+## Fail-closed rule
+
+DOI/OpenAlex/Crossref metadata, publication venue, urban-perception framing, generative-agent title language, citation metadata, and source identity must fail closed for live score/behavior drift claims. Passing evidence requires AMC-owned baseline/live windows, trace rows, evaluator configs, threshold policies, signed evidence refs, row hashes, receipt hashes, and Watch alert or waiver proof.
 
 ## No-bloat boundary
 
@@ -36,3 +46,9 @@ No generative-agent subsystem, urban simulation runner, survey importer, percept
 ## Product closure
 
 GAP-0658 is closed by documenting the source-review boundary and adding regression coverage that exercises the existing Watch live score/behavior drift receipt path with AMC-owned synthetic traces. The test confirms source metadata is only a source ref; readiness still depends on AMC-owned baseline/live rows, signed evidence refs, thresholds, and receipt verification.
+
+## Verification
+
+- Focused regression: `npx vitest run tests/gap0658GenerativeAgentsLiveDriftBoundary.test.ts tests/gap0650To0658SourceReviewShape.test.ts --reporter=dot`
+- Static checks: `git diff --check -- . ':(exclude)AMC_OS'`
+- Typecheck: `npm run typecheck`

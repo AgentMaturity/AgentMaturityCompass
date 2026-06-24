@@ -57,10 +57,33 @@ If a future AMC claim cites this survey, the citation can be used only as a high
 - signed evidence refs, artifact hashes, and row hashes;
 - no-copy/source-review boundary proof.
 
-## Non-implementation boundary
+## AMC/8 surface check
+
+| Surface | Decision |
+| --- | --- |
+| Score | Only background literature context. No metric-validity claim can pass without AMC-owned scientific-literature, evaluator-suite, trace-evaluation, validation-table, signed-evidence, and row-hash proof. |
+| Shield | Only relevant if unsupported communications-domain AI claims are rejected with signed evidence, thresholds, and repair guidance. |
+| Watch | Only relevant when caller-owned trace/eval telemetry is hash-bound through existing Watch evidence; metadata alone cannot create drift or observability proof. |
+| Enforce | No policy-enforcement change. |
+| Vault | No secrets, storage, or data-residency scope. |
+| Fleet | No orchestration or multi-agent topology scope. |
+| Passport | No portable proof-bundle field or credential change. |
+| Comply | No compliance mapping or regulated-domain claim. |
+
+## Product closure
 
 No `src/score/metricValidity.ts`, `src/methodology/publicMethodology.ts`, or `src/diagnostic/methodologyVersioning.ts` source change was made for GAP-0652. No new communications-domain gate, subsystem, importer, adapter, benchmark mirror, task corpus, or parity claim was added. Existing scientific-literature, evaluator-suite, and trace-evaluation primitives remain the only allowed path for future Score/Shield/Watch claims.
 
-## Copy/provenance boundary
+## Fail-closed rule
+
+Bibliographic metadata, DOI/Crossref/OpenAlex records, survey title, venue, publisher, authors, publication date, abstract availability, citation counts, and broad communications-domain framing must fail closed for AMC metric-validity claims. Passing evidence requires AMC-owned validation artifacts, evaluator/trace coverage, thresholds, signed evidence refs, artifact hashes, row hashes, and no-copy proof.
+
+## No-bloat boundary
 
 No paper prose beyond the bibliographic title, no abstract text, no figures, no tables, no benchmark rows, no communications-domain data, no prompts, no workflows, no screenshots, and no implementation details were copied. This review records only metadata facts, retrieval status, response hashes, and the fail-closed non-implementation decision.
+
+## Verification
+
+- Focused regression: `npx vitest run tests/gap0652LargeAiCommsSurveySourceReview.test.ts tests/gap0650To0658SourceReviewShape.test.ts --reporter=dot`
+- Static checks: `git diff --check -- . ':(exclude)AMC_OS'`
+- Typecheck: `npm run typecheck`

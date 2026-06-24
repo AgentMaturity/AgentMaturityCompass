@@ -44,6 +44,14 @@ The source is not an agent-evaluation benchmark for AMC, not a question-score ex
 | Comply | Healthcare context is indirect; this review adds no compliance or medical claim. |
 | Enforce/Vault/Fleet/Passport | No direct scope for this gap. |
 
+## Product closure
+
+GAP-0656 is closed as a question-score explainability source-review boundary. Existing AMC question rows, accepted/rejected evidence reasons, repair hints, eval-pack hashes, signed evidence refs, thresholds, and row hashes remain the only accepted path; no healthcare ontology, federated-learning, or clinical claim was added.
+
+## Fail-closed rule
+
+DOI/OpenAlex/Crossref metadata, healthcare title/context, ontology/federated-learning keywords, access/license metadata, citation counts, registry indexing, and author/venue facts must fail closed for Score, Shield, and Watch question-score explainability claims. Passing evidence requires AMC-owned accepted evidence IDs, rejected evidence reasons, signed evidence rows, reproducible eval-pack hashes, thresholds, repair hints, and row hashes.
+
 ## No-bloat boundary
 
 No healthcare ontology/federated-learning subsystem, importer, data pipeline, benchmark mirror, clinical mapper, paper-content copy, or source-specific product code was added. This review closes fail-closed unless future AMC-owned evidence supplies question-score explainability receipts through existing primitives.
@@ -51,3 +59,9 @@ No healthcare ontology/federated-learning subsystem, importer, data pipeline, be
 ## Regression coverage
 
 `tests/gap0656SourceReview.test.ts` verifies that DOI/OpenAlex metadata for this source remains fail-closed as question-score explainability evidence when it lacks AMC-owned accepted evidence IDs, signed evidence rows, reproducible eval-pack hashes, thresholds, and repair hints tied to release gates.
+
+## Verification
+
+- Focused regression: `npx vitest run tests/gap0656SourceReview.test.ts tests/gap0650To0658SourceReviewShape.test.ts --reporter=dot`
+- Static checks: `git diff --check -- . ':(exclude)AMC_OS'`
+- Typecheck: `npm run typecheck`

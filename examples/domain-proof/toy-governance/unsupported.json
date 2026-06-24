@@ -1,0 +1,7 @@
+{
+  "claimText": "The toy applicant is eligible under the declared local governance fixture rules.",
+  "facts": {
+    "age": 22
+  },
+  "evidenceRefs": ["ev-toy-governance-unsupported"]
+}

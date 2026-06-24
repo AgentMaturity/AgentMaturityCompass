@@ -55,6 +55,16 @@ For Score, Shield, or Watch claims, AdalFlow-related evidence must be represente
 - Kept AdalFlow metadata as source-review context only; accepted evidence remains AMC-owned live score windows, behavior signatures, thresholds, signed evidence refs, row hashes, receipt hashes, and Watch alerts.
 - No methodology version bump or source-specific metric family was added because the existing Watch live-drift model already covers the relevant Score/Shield/Watch behavior.
 
-## No-bloat / no-copy boundary
+## Fail-closed rule
+
+AdalFlow repository metadata, GitHub counts, topics, README positioning, optimizer labels, branch head, license metadata, and repository identity must fail closed for live score/behavior drift claims. Passing evidence requires AMC-owned baseline and live trace windows, behavior signatures, thresholds, signed evidence refs, row hashes, receipt hashes, and Watch alert or waiver proof.
+
+## No-bloat boundary
 
 No upstream code, README prose, docs prose, examples, prompts, configs, tests, data, benchmark definitions, optimizer logic, implementation details, or assets were copied. No AdalFlow subsystem, SDK/importer, adapter, parity layer, benchmark runner, optimizer wrapper, or source-specific live-drift implementation was added.
+
+## Verification
+
+- Focused regression: `npx vitest run tests/gap0655AdalFlowLiveDriftBoundary.test.ts tests/gap0650To0658SourceReviewShape.test.ts --reporter=dot`
+- Static checks: `git diff --check -- . ':(exclude)AMC_OS'`
+- Typecheck: `npm run typecheck`

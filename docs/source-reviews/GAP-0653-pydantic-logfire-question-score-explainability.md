@@ -45,9 +45,17 @@ Metadata-only claims remain rejected evidence. A Logfire repository label, GitHu
 | Passport | Indirect: portable proof remains AMC-owned row hashes and signed evidence, not Logfire parity. |
 | Fleet / Enforce / Vault / Comply | No direct product scope in this source review. |
 
+## Product closure
+
+GAP-0653 is closed through existing question-score explainability and observability Studio drilldown primitives. The product boundary is AMC-owned question rows, rejected-evidence reasons, repair hints, route/preview links, row hashes, and signed evidence, not a Logfire integration or parity claim.
+
 ## No-bloat boundary
 
 No Logfire subsystem, SDK integration, importer, adapter, dashboard clone, parity layer, trace schema mirror, copied upstream code, copied docs, copied config, or copied UI asset was added. This review binds only to existing AMC question-score explainability and observability Studio drilldown lenses.
+
+## Fail-closed rule
+
+Logfire repository metadata, stars, README labels, dashboard screenshots, SDK snippets, trace-route names, aggregate score labels, and observability positioning must fail closed as question-score explainability proof. A claim can pass only with AMC-owned question IDs, accepted evidence IDs, rejected-evidence reasons, repair hints, source artifact links, signed evidence refs, row hashes, threshold results, and drilldown evidence previews.
 
 ## Acceptance boundary
 

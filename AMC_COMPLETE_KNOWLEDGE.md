@@ -141,6 +141,8 @@ CLI (amc) → Studio API + Console → Workspace (.amc) + Ledger + Merkle
 | **Passport** | Agent identity, trust tokens, cross-platform portability |
 | **Comply** | EU AI Act, ISO 42001, NIST AI RMF, SOC 2, OWASP |
 
+**Domain Proof Lane (cross-surface, not a ninth surface):** `src/domainProof/` separates evidence integrity, runtime policy, and domain correctness proof. It adds fail-closed `correctnessProofStatus`, `amcproof` artifacts, source-to-rule manifests, a local toy governance checker, `amc proof check`, and `/api/v1/proof/check`. It maps to Score, Shield, Enforce, Vault, Watch, Comply, Fleet, and Passport without inflating score when correctness is `unsupported`.
+
 ---
 
 ## 4. SOURCE CODE MAP

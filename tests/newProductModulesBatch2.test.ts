@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 
 /* ── Python-ported modules ──────────────────────────────────────────── */
 
@@ -555,15 +555,17 @@ describe('LongTermMemory (enhanced)', () => {
   });
 
   it('supports TTL expiry', () => {
-    const mem = new LongTermMemory();
-    mem.set('temp', 'data', { ttlMs: 1 }); // expires in 1ms
-    // Wait a tick
-    const before = mem.has('temp');
-    // After expiry, should not be found
-    setTimeout(() => {
+    vi.useFakeTimers();
+    try {
+      vi.setSystemTime(new Date('2026-06-21T00:00:00.000Z'));
+      const mem = new LongTermMemory();
+      mem.set('temp', 'data', { ttlMs: 1 });
+      expect(mem.has('temp')).toBe(true);
+      vi.advanceTimersByTime(2);
       expect(mem.get('temp')).toBeUndefined();
-    }, 10);
-    expect(before).toBe(true); // initially present
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it('searches by tag', () => {

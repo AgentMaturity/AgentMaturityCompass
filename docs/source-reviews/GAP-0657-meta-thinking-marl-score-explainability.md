@@ -57,6 +57,16 @@ Metadata-only DOI/OpenAlex citation remains rejected as Score, Shield, or Watch 
 
 GAP-0657 is closed with documentation plus regression coverage over existing question-score explainability primitives. No source module was added because the existing diagnostic explainability builder already supports source refs, rejected evidence, multi-user benchmark lenses, reproducible eval packs, signed rows, thresholds, and fail-closed pack status.
 
+## Fail-closed rule
+
+DOI/OpenAlex metadata, survey/preprint identity, meta-thinking/MARL title language, source host, authorship count, citation metadata, and literature framing must fail closed for Score, Shield, Watch, or Fleet explainability claims. Passing evidence requires AMC-owned question-score receipts, accepted evidence IDs, rejected metadata-only reasons, repair hints, reproducible eval-pack hashes, multi-user benchmark lens artifacts when claimed, thresholds, signed evidence refs, and row hashes.
+
 ## No-bloat boundary
 
 This change does **not** add a meta-thinking subsystem, MARL subsystem, DOI/OpenAlex importer, benchmark mirror, paper parser, survey-content corpus, copied paper prose/data, training loop, multi-agent simulator, benchmark parity layer, or source-specific scoring path. The source is used only as live bibliographic metadata for a relevance-gated source review.
+
+## Verification
+
+- Focused regression: `npx vitest run tests/gap0657MetaThinkingQuestionExplainability.test.ts tests/gap0650To0658SourceReviewShape.test.ts --reporter=dot`
+- Static checks: `git diff --check -- . ':(exclude)AMC_OS'`
+- Typecheck: `npm run typecheck`
