@@ -183,6 +183,23 @@ Each reviewer row includes:
 
 Reviewer-independence verification fails closed when source citations are missing, the reviewer cannot be identified, the separation rule is missing, the reviewer is also the requester, a conflict check is missing or unsigned, a conflict flag is present, a high-risk second review is missing or unsigned, an approval receipt is missing, or evidence lineage is missing or malformed. Source metadata, paper titles, policy names, or unsigned reviewer notes do not satisfy the receipt.
 
+## Third-Party Provider Risk Receipts
+
+Third-party provider reviews can use `buildThirdPartyProviderRiskReceipt` from `src/compliance/providerRisk.ts` to capture provider and vendor risk without creating a provider-specific integration. The receipt is a generic Comply, Passport, and Vault artifact for external agents, model providers, tool providers, data providers, and infrastructure providers.
+
+Each provider row includes:
+
+- **Provider record**: provider ID, name, type, owner, review date, next review date, and allowed use cases.
+- **Attestations**: signed SOC 2, ISO 42001, security questionnaire, AI safety, or custom attestations.
+- **Data boundary**: data classes, allowed regions, subprocessors, retention, transfer mechanism, and signed boundary evidence.
+- **Model restrictions**: operator-defined restrictions such as no regulated decisioning or no autonomous funds transfer.
+- **Contractual controls**: obligations, status, owner, review date, and signed control evidence.
+- **Exceptions**: signed exception workflow state and owner.
+- **Evidence lineage**: event hashes and signed evidence references summarized into an evidence-chain hash.
+- **Source citations**: source-backed review or control obligations supplied by the operator.
+
+Provider-risk verification fails closed when source citations are missing, provider record metadata is missing, owner or review date is missing, attestations are missing or unsigned, data boundary evidence is missing or unsigned, contractual controls are missing or unsigned, exceptions are unsigned, or evidence lineage is missing or malformed. Source metadata, paper titles, vendor names, website copy, or unsigned questionnaires do not satisfy the receipt.
+
 ## Evidence Requirements
 
 ### Evidence Event Types

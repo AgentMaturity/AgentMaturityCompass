@@ -548,6 +548,25 @@ export {
   renderControlCrosswalkAuditExport
 } from "./compliance/controlCrosswalk.js";
 export {
+  buildThirdPartyProviderRiskReceipt,
+  verifyThirdPartyProviderRiskReceipt,
+  renderThirdPartyProviderRiskAuditExport,
+  type ThirdPartyContractControlStatus,
+  type ThirdPartyProviderAttestation,
+  type ThirdPartyProviderContractualControl,
+  type ThirdPartyProviderDataBoundary,
+  type ThirdPartyProviderDataPosture,
+  type ThirdPartyProviderExceptionState,
+  type ThirdPartyProviderRiskEvidenceLink,
+  type ThirdPartyProviderRiskException,
+  type ThirdPartyProviderRiskReceipt,
+  type ThirdPartyProviderRiskRecord,
+  type ThirdPartyProviderRiskRow,
+  type ThirdPartyProviderRiskSourceCitation,
+  type ThirdPartyProviderRiskVerification,
+  type ThirdPartyProviderType
+} from "./compliance/providerRisk.js";
+export {
   initComplianceMapsCli,
   verifyComplianceMapsCli,
   complianceReportCli,
