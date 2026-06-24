@@ -204,6 +204,21 @@ export {
   createZipArchive
 } from "./evidence/index.js";
 export {
+  buildReviewerIndependenceReceipt,
+  verifyReviewerIndependenceReceipt,
+  renderReviewerIndependenceAuditExport,
+  type ReviewerConflictCheck,
+  type ReviewerIndependenceApproval,
+  type ReviewerIndependenceDecision,
+  type ReviewerIndependenceEvidenceLink,
+  type ReviewerIndependenceReceipt,
+  type ReviewerIndependenceRiskTier,
+  type ReviewerIndependenceRow,
+  type ReviewerIndependenceSourceCitation,
+  type ReviewerIndependenceVerification,
+  type ReviewerSecondReview
+} from "./audit/reviewerIndependence.js";
+export {
   artifactProvenanceManifestSchema,
   artifactProvenanceSignatureSchema,
   signArtifactProvenance,

@@ -167,6 +167,22 @@ Each control row includes:
 
 Crosswalk verification fails closed when source citations are missing, a row lacks an owner, a row lacks evidence lineage, or a non-`none` exception has no signed evidence reference and signature hash. Paper metadata, framework names, local notes, or self-reported owner names are not enough to satisfy a crosswalk without signed evidence and row hashes.
 
+## Reviewer Independence Receipts
+
+High-risk approval reviews can use `buildReviewerIndependenceReceipt` from `src/audit/reviewerIndependence.ts` to prove reviewer separation without adding a separate workflow engine. The receipt is a generic audit artifact for existing Comply, Passport, and Vault evidence paths.
+
+Each reviewer row includes:
+
+- **Reviewer metadata**: requester, reviewer, role, org unit, action, control, risk tier, decision, and decision time.
+- **Role separation**: a separation rule ID plus checks that the reviewer is not the requester and is not acting in the same role.
+- **Conflict flags**: the conflict-check timestamp, conflict flags, and signed conflict-check evidence.
+- **Second review**: required signed second-review metadata for `high` and `critical` actions.
+- **Approval receipt**: the signed approval receipt reference and signature hash.
+- **Evidence lineage**: event hashes and signed evidence references summarized into an evidence-chain hash.
+- **Source citations**: source-backed review or control obligations supplied by the operator.
+
+Reviewer-independence verification fails closed when source citations are missing, the reviewer cannot be identified, the separation rule is missing, the reviewer is also the requester, a conflict check is missing or unsigned, a conflict flag is present, a high-risk second review is missing or unsigned, an approval receipt is missing, or evidence lineage is missing or malformed. Source metadata, paper titles, policy names, or unsigned reviewer notes do not satisfy the receipt.
+
 ## Evidence Requirements
 
 ### Evidence Event Types
