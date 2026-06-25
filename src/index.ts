@@ -1931,6 +1931,27 @@ export type {
   TrustNetworkEdge,
 } from "./passport/trustInterchange.js";
 
+// ── Receipt Interchange (versioned external receipt schema) ─
+export {
+  INTEROPERABLE_RECEIPT_SCHEMA_VERSION,
+  buildInteroperableReceipt,
+  interoperableReceiptJsonSchema,
+  parseInteroperableReceipt,
+  serializeInteroperableReceipt,
+  verifyInteroperableReceipt,
+} from "./passport/receiptInterchange.js";
+export type {
+  BuildInteroperableReceiptInput,
+  InteroperableReceipt,
+  InteroperableReceiptEventRef,
+  InteroperableReceiptIssuer,
+  InteroperableReceiptKind,
+  InteroperableReceiptSignature,
+  InteroperableReceiptSourceCitation,
+  InteroperableReceiptSubject,
+  InteroperableReceiptVerification,
+} from "./passport/receiptInterchange.js";
+
 // ── Regulatory Automation (RegulatoryMonitor, feed configs, gap analysis) ─
 export {
   DEFAULT_REGULATORY_FEEDS,
