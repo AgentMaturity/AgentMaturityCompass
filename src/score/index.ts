@@ -183,7 +183,18 @@ export type {
 } from "./memoryMaturity.js";
 
 export { assessOversightQuality } from "./humanOversightQuality.js";
-export type { OversightQualityProfile } from "./humanOversightQuality.js";
+export type {
+  ApprovalLatencyBreachStatus,
+  ApprovalLatencySloRecord,
+  ApprovalLatencySloSummary,
+  ApprovalLatencySloTierSummary,
+  OversightApprovalEvent,
+  OversightEscalationEvent,
+  OversightQualityInput,
+  OversightQualityProfile,
+  OversightRecommendation,
+  OversightRiskTier
+} from "./humanOversightQuality.js";
 
 export { checkClaimExpiry, CLAIM_TTL } from "./claimExpiry.js";
 export type { ClaimExpiryProfile } from "./claimExpiry.js";

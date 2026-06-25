@@ -13,11 +13,15 @@ export interface OversightApprovalEvent {
   actionId?: string;
   riskTier: OversightRiskTier;
   requestedTs: number;
+  reviewStartedTs?: number;
   decidedTs?: number;
   decision: OversightDecision;
   reviewedByHuman: boolean;
   reviewerId?: string;
   agentRecommendation?: OversightRecommendation;
+  fallbackTriggeredTs?: number;
+  fallbackReviewerId?: string;
+  degradedModeActivated?: boolean;
 }
 
 export interface OversightEscalationEvent {
@@ -43,6 +47,44 @@ export interface OversightQualityInput {
   hasMultiModalOversight?: boolean; // uses multiple oversight methods (CoT + output audit + behavioral baseline)
 }
 
+export type ApprovalLatencyBreachStatus = "met" | "breached";
+
+export interface ApprovalLatencySloRecord {
+  approvalId: string;
+  actionId: string;
+  riskTier: OversightRiskTier;
+  targetMs: number;
+  queueMs: number;
+  reviewerActionMs: number;
+  totalLatencyMs: number;
+  breachStatus: ApprovalLatencyBreachStatus;
+  fallbackTriggered: boolean;
+  fallbackReviewerId?: string;
+  degradedModeActivated: boolean;
+}
+
+export interface ApprovalLatencySloTierSummary {
+  riskTier: OversightRiskTier;
+  targetMs: number;
+  reviewedCount: number;
+  breachedCount: number;
+  breachRate: number;
+  p95TotalLatencyMs: number;
+  fallbackTriggeredCount: number;
+  degradedModeCount: number;
+}
+
+export interface ApprovalLatencySloSummary {
+  sloMet: boolean;
+  reviewedCount: number;
+  breachedCount: number;
+  breachRate: number;
+  fallbackTriggeredCount: number;
+  degradedModeCount: number;
+  byRiskTier: Record<OversightRiskTier, ApprovalLatencySloTierSummary>;
+  breaches: ApprovalLatencySloRecord[];
+}
+
 export interface OversightQualityProfile {
   agentId: string;
   oversightExistence: boolean;
@@ -60,6 +102,8 @@ export interface OversightQualityProfile {
   overrideRateSampleSize: number;
   escalationPathVerified: boolean;
   escalationVerificationRate: number;
+  approvalLatencySloMet: boolean;
+  approvalLatencySlo: ApprovalLatencySloSummary;
   overallScore: number;
   confidence: number;
   hasIndependentVerificationChannel: boolean;
@@ -93,6 +137,13 @@ interface NormalizedInput {
 
 const FAST_APPROVAL_MS = 2_000;
 const ESCALATION_ACK_SLA_MS = 10 * 60_000;
+const RISK_TIERS: OversightRiskTier[] = ["low", "medium", "high", "critical"];
+const APPROVAL_LATENCY_SLO_TARGET_MS: Record<OversightRiskTier, number> = {
+  low: 4 * 60 * 60_000,
+  medium: 60 * 60_000,
+  high: 15 * 60_000,
+  critical: 5 * 60_000
+};
 
 /* ── Helpers ─────────────────────────────────────────────────────── */
 
@@ -127,6 +178,100 @@ function approvalLatencyMs(event: OversightApprovalEvent): number | null {
     return null;
   }
   return Math.max(0, (event.decidedTs ?? 0) - event.requestedTs);
+}
+
+function percentile(values: number[], quantile: number): number {
+  if (values.length === 0) {
+    return 0;
+  }
+  const sorted = [...values].sort((a, b) => a - b);
+  const index = Math.min(sorted.length - 1, Math.ceil(sorted.length * quantile) - 1);
+  return sorted[index] ?? 0;
+}
+
+function approvalLatencySloRecord(event: OversightApprovalEvent, index: number): ApprovalLatencySloRecord | null {
+  if (!event.reviewedByHuman || event.decision === "NO_REVIEW") {
+    return null;
+  }
+  if (!Number.isFinite(event.requestedTs) || !Number.isFinite(event.decidedTs)) {
+    return null;
+  }
+
+  const targetMs = APPROVAL_LATENCY_SLO_TARGET_MS[event.riskTier];
+  const reviewStart = Number.isFinite(event.reviewStartedTs) ? event.reviewStartedTs! : event.requestedTs;
+  const safeReviewStart = Math.max(event.requestedTs, Math.min(reviewStart, event.decidedTs ?? event.requestedTs));
+  const decidedTs = event.decidedTs ?? event.requestedTs;
+  const queueMs = Math.max(0, safeReviewStart - event.requestedTs);
+  const reviewerActionMs = Math.max(0, decidedTs - safeReviewStart);
+  const totalLatencyMs = Math.max(0, decidedTs - event.requestedTs);
+  const breachStatus: ApprovalLatencyBreachStatus = totalLatencyMs > targetMs ? "breached" : "met";
+
+  return {
+    approvalId: event.approvalId ?? `approval-${index + 1}`,
+    actionId: event.actionId ?? `action-${index + 1}`,
+    riskTier: event.riskTier,
+    targetMs,
+    queueMs,
+    reviewerActionMs,
+    totalLatencyMs,
+    breachStatus,
+    fallbackTriggered: Boolean(event.fallbackReviewerId || Number.isFinite(event.fallbackTriggeredTs)),
+    fallbackReviewerId: event.fallbackReviewerId,
+    degradedModeActivated: event.degradedModeActivated === true
+  };
+}
+
+function emptyLatencyTierSummary(riskTier: OversightRiskTier): ApprovalLatencySloTierSummary {
+  return {
+    riskTier,
+    targetMs: APPROVAL_LATENCY_SLO_TARGET_MS[riskTier],
+    reviewedCount: 0,
+    breachedCount: 0,
+    breachRate: 0,
+    p95TotalLatencyMs: 0,
+    fallbackTriggeredCount: 0,
+    degradedModeCount: 0
+  };
+}
+
+function assessApprovalLatencySlo(approvals: OversightApprovalEvent[]): ApprovalLatencySloSummary {
+  const records = approvals
+    .map((event, index) => approvalLatencySloRecord(event, index))
+    .filter((record): record is ApprovalLatencySloRecord => record !== null);
+  const byRiskTier = Object.fromEntries(
+    RISK_TIERS.map((riskTier) => [riskTier, emptyLatencyTierSummary(riskTier)])
+  ) as Record<OversightRiskTier, ApprovalLatencySloTierSummary>;
+
+  for (const riskTier of RISK_TIERS) {
+    const tierRecords = records.filter((record) => record.riskTier === riskTier);
+    const breachedRecords = tierRecords.filter((record) => record.breachStatus === "breached");
+    byRiskTier[riskTier] = {
+      riskTier,
+      targetMs: APPROVAL_LATENCY_SLO_TARGET_MS[riskTier],
+      reviewedCount: tierRecords.length,
+      breachedCount: breachedRecords.length,
+      breachRate: tierRecords.length > 0 ? clamp01(breachedRecords.length / tierRecords.length) : 0,
+      p95TotalLatencyMs: percentile(tierRecords.map((record) => record.totalLatencyMs), 0.95),
+      fallbackTriggeredCount: tierRecords.filter((record) => record.fallbackTriggered).length,
+      degradedModeCount: tierRecords.filter((record) => record.degradedModeActivated).length
+    };
+  }
+
+  const breachedCount = records.filter((record) => record.breachStatus === "breached").length;
+  const reviewedCount = records.length;
+  const fallbackTriggeredCount = records.filter((record) => record.fallbackTriggered).length;
+  const degradedModeCount = records.filter((record) => record.degradedModeActivated).length;
+
+  return {
+    sloMet: reviewedCount > 0 && breachedCount === 0,
+    reviewedCount,
+    breachedCount,
+    breachRate: reviewedCount > 0 ? clamp01(breachedCount / reviewedCount) : 0,
+    fallbackTriggeredCount,
+    degradedModeCount,
+    byRiskTier,
+    breaches: records.filter((record) => record.breachStatus === "breached")
+  };
 }
 
 function isStructuredInput(input: Record<string, number> | OversightQualityInput): input is OversightQualityInput {
@@ -294,6 +439,8 @@ export function assessOversightQuality(input: Record<string, number> | Oversight
     escalationEvents.length > 0 ? clamp01(escalationVerifiedCount / escalationEvents.length) : clamp01(hoq4 / 5);
   const escalationPathVerified =
     escalationEvents.length > 0 ? escalationVerificationRate >= 0.8 : hoq4 >= 4;
+  const approvalLatencySlo = assessApprovalLatencySlo(normalized.approvals);
+  const approvalLatencySloMet = approvalLatencySlo.sloMet;
 
   const theaterResilienceScore =
     highRiskHumanApprovals.length > 0 ? clamp01(1 - approvalTheaterPenalty) : clamp01(hoq1 / 5);
@@ -319,11 +466,15 @@ export function assessOversightQuality(input: Record<string, number> | Oversight
   if (hasIndependentVerificationChannel && hasMultiModalOversight) {
     overallScore = Math.min(100, overallScore + 5);
   }
+  if (approvalLatencySlo.reviewedCount > 0 && approvalLatencySlo.breachedCount > 0) {
+    overallScore = Math.max(0, overallScore - Math.round(Math.min(20, 10 + approvalLatencySlo.breachRate * 10)));
+  }
 
   const evidenceSignals = [
     Object.keys(scoreMap).length > 0 ? 1 : 0,
     highRiskActions > 0 ? 1 : 0,
     highRiskHumanApprovals.length > 0 ? 1 : 0,
+    approvalLatencySlo.reviewedCount > 0 ? 1 : 0,
     overrideComparables > 0 ? 1 : 0,
     escalationEvents.length > 0 ? 1 : 0
   ].reduce((sum, value) => sum + value, 0);
@@ -397,6 +548,26 @@ export function assessOversightQuality(input: Record<string, number> | Oversight
       "Run escalation drills and require acknowledged + resolved escalation receipts within SLA."
     );
   }
+  if (approvalLatencySlo.reviewedCount === 0) {
+    pushUnique(
+      gaps,
+      "Approval latency SLO is not evidenced by reviewed approval receipts with request and decision timestamps."
+    );
+    pushUnique(
+      recommendations,
+      "Capture risk tier, queue time, reviewer action time, breach status, and fallback routing on every approval."
+    );
+  }
+  if (approvalLatencySlo.breachedCount > 0) {
+    pushUnique(
+      gaps,
+      `Approval latency SLO breached for ${approvalLatencySlo.breachedCount} of ${approvalLatencySlo.reviewedCount} reviewed approvals.`
+    );
+    pushUnique(
+      recommendations,
+      "Route overdue approvals to fallback reviewers or degraded-mode behavior before risk-tier SLO breach."
+    );
+  }
   if (!graduatedAutonomy) {
     pushUnique(gaps, "No confidence-gated autonomy");
     pushUnique(
@@ -437,6 +608,8 @@ export function assessOversightQuality(input: Record<string, number> | Oversight
     overrideRateSampleSize: overrideComparables,
     escalationPathVerified,
     escalationVerificationRate,
+    approvalLatencySloMet,
+    approvalLatencySlo,
     overallScore,
     confidence,
     hasIndependentVerificationChannel,
