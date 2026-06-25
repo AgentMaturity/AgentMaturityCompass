@@ -35,9 +35,10 @@ describe("GAP-0001 LangSmith public methodology boundary", () => {
     const manifest = getPublicMethodologyManifest();
     const receipt = buildDiagnosticMethodologyVersioningReceipt(manifest);
 
-    expect(AMC_PUBLIC_METHODOLOGY_VERSION).toBe("2026.06.25-r218");
-    expect(manifest.changelog[0]?.summary).toContain("LangSmith-style public-methodology");
-    expect(manifest.changelog[0]?.migration).toContain("Reports generated under 2026.06.21-r217");
+    expect(AMC_PUBLIC_METHODOLOGY_VERSION).toBe("2026.06.25-r219");
+    expect(manifest.changelog[0]?.summary).toContain("Lunary-style public-methodology");
+    expect(manifest.changelog[1]?.summary).toContain("LangSmith-style public-methodology");
+    expect(manifest.changelog[1]?.migration).toContain("Reports generated under 2026.06.21-r217");
     expect(receipt.status).toBe("ready");
     expect(receipt.sourceRef).toContain(LANGSMITH_SOURCE_REVIEW_REF);
     expect(receipt.requiredAuditFields).toContain("langSmithLiveSourceReceipt");
