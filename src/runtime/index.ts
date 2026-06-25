@@ -43,3 +43,25 @@ export {
   type RuntimeLifecycleNodeKind,
   type RuntimeLifecycleRequiredNodeKind
 } from "./lifecycleGraph.js";
+export {
+  createRuntimeStateCheckpoint,
+  loadRuntimeStateCheckpoint,
+  proveRuntimeStateRestore,
+  renderRuntimeStateCheckpointAuditExport,
+  runtimeStateCheckpointPath,
+  runtimeStateRestoreProofPath,
+  verifyRuntimeStateCheckpoint,
+  verifyRuntimeStateRestoreProof,
+  type PersistedRuntimeStateCheckpoint,
+  type PersistedRuntimeStateRestoreProof,
+  type RuntimeStateCheckpoint,
+  type RuntimeStateCheckpointRiskLevel,
+  type RuntimeStateCheckpointSourceCitation,
+  type RuntimeStateCheckpointVerification,
+  type RuntimeStateDiffChange,
+  type RuntimeStateDiffEntry,
+  type RuntimeStateRestoreProof,
+  type RuntimeStateRestoreProofVerification,
+  type RuntimeStateRetentionClass,
+  type RuntimeStateRetentionPolicy
+} from "./stateCheckpoint.js";
