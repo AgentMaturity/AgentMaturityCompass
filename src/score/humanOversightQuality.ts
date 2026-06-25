@@ -31,6 +31,9 @@ export interface OversightEscalationEvent {
   reachedLevel?: number;
   acknowledgedTs?: number;
   resolvedTs?: number;
+  reviewerRole?: string;
+  outcome?: string;
+  escalationPacket?: OversightEscalationPacket;
 }
 
 export interface OversightQualityInput {
@@ -48,6 +51,42 @@ export interface OversightQualityInput {
 }
 
 export type ApprovalLatencyBreachStatus = "met" | "breached";
+
+export interface OversightEscalationPacket {
+  summary?: string;
+  risk?: string;
+  options?: string[];
+  missingEvidence?: string[];
+  recommendedReviewerAction?: string;
+  evidenceRefs?: string[];
+}
+
+export type EscalationPacketQualityField =
+  | "summary"
+  | "risk"
+  | "options"
+  | "missingEvidence"
+  | "recommendedReviewerAction"
+  | "reviewerRole"
+  | "outcome";
+
+export interface EscalationPacketQualityRecord {
+  escalationId: string;
+  reviewerRole: string | null;
+  outcome: string | null;
+  completenessScore: number;
+  presentFields: EscalationPacketQualityField[];
+  missingFields: EscalationPacketQualityField[];
+}
+
+export interface EscalationPacketQualitySummary {
+  met: boolean;
+  assessedCount: number;
+  completeCount: number;
+  incompleteCount: number;
+  averageCompleteness: number;
+  byEscalation: EscalationPacketQualityRecord[];
+}
 
 export interface ApprovalLatencySloRecord {
   approvalId: string;
@@ -102,6 +141,8 @@ export interface OversightQualityProfile {
   overrideRateSampleSize: number;
   escalationPathVerified: boolean;
   escalationVerificationRate: number;
+  escalationPacketQualityMet: boolean;
+  escalationPacketQuality: EscalationPacketQualitySummary;
   approvalLatencySloMet: boolean;
   approvalLatencySlo: ApprovalLatencySloSummary;
   overallScore: number;
@@ -144,6 +185,15 @@ const APPROVAL_LATENCY_SLO_TARGET_MS: Record<OversightRiskTier, number> = {
   high: 15 * 60_000,
   critical: 5 * 60_000
 };
+const ESCALATION_PACKET_QUALITY_FIELDS: EscalationPacketQualityField[] = [
+  "summary",
+  "risk",
+  "options",
+  "missingEvidence",
+  "recommendedReviewerAction",
+  "reviewerRole",
+  "outcome"
+];
 
 /* ── Helpers ─────────────────────────────────────────────────────── */
 
@@ -178,6 +228,59 @@ function approvalLatencyMs(event: OversightApprovalEvent): number | null {
     return null;
   }
   return Math.max(0, (event.decidedTs ?? 0) - event.requestedTs);
+}
+
+function hasText(value: string | undefined): boolean {
+  return typeof value === "string" && value.trim().length > 0;
+}
+
+function hasListItems(value: string[] | undefined): boolean {
+  return Array.isArray(value) && value.some((item) => hasText(item));
+}
+
+function escalationPacketQualityRecord(event: OversightEscalationEvent): EscalationPacketQualityRecord {
+  const presentFields: EscalationPacketQualityField[] = [];
+  const packet = event.escalationPacket;
+
+  if (hasText(packet?.summary)) presentFields.push("summary");
+  if (hasText(packet?.risk)) presentFields.push("risk");
+  if (hasListItems(packet?.options)) presentFields.push("options");
+  if (hasListItems(packet?.missingEvidence)) presentFields.push("missingEvidence");
+  if (hasText(packet?.recommendedReviewerAction)) presentFields.push("recommendedReviewerAction");
+  if (hasText(event.reviewerRole)) presentFields.push("reviewerRole");
+  if (hasText(event.outcome)) presentFields.push("outcome");
+
+  const missingFields = ESCALATION_PACKET_QUALITY_FIELDS.filter((field) => !presentFields.includes(field));
+  const completenessScore = clamp01(presentFields.length / ESCALATION_PACKET_QUALITY_FIELDS.length);
+
+  return {
+    escalationId: event.escalationId,
+    reviewerRole: hasText(event.reviewerRole) ? event.reviewerRole!.trim() : null,
+    outcome: hasText(event.outcome) ? event.outcome!.trim() : null,
+    completenessScore,
+    presentFields,
+    missingFields
+  };
+}
+
+function assessEscalationPacketQuality(events: OversightEscalationEvent[]): EscalationPacketQualitySummary {
+  const byEscalation = events.map((event) => escalationPacketQualityRecord(event));
+  const assessedCount = byEscalation.length;
+  const completeCount = byEscalation.filter((record) => record.missingFields.length === 0).length;
+  const incompleteCount = assessedCount - completeCount;
+  const averageCompleteness =
+    assessedCount > 0
+      ? clamp01(byEscalation.reduce((sum, record) => sum + record.completenessScore, 0) / assessedCount)
+      : 0;
+
+  return {
+    met: assessedCount > 0 && incompleteCount === 0,
+    assessedCount,
+    completeCount,
+    incompleteCount,
+    averageCompleteness,
+    byEscalation
+  };
 }
 
 function percentile(values: number[], quantile: number): number {
@@ -439,6 +542,8 @@ export function assessOversightQuality(input: Record<string, number> | Oversight
     escalationEvents.length > 0 ? clamp01(escalationVerifiedCount / escalationEvents.length) : clamp01(hoq4 / 5);
   const escalationPathVerified =
     escalationEvents.length > 0 ? escalationVerificationRate >= 0.8 : hoq4 >= 4;
+  const escalationPacketQuality = assessEscalationPacketQuality(escalationEvents);
+  const escalationPacketQualityMet = escalationPacketQuality.met;
   const approvalLatencySlo = assessApprovalLatencySlo(normalized.approvals);
   const approvalLatencySloMet = approvalLatencySlo.sloMet;
 
@@ -447,7 +552,11 @@ export function assessOversightQuality(input: Record<string, number> | Oversight
   const approvalQuality = clamp01(
     contextCompleteness * 0.4 + theaterResilienceScore * 0.35 + reviewerCompetenceScore * 0.25
   );
-  const escalationQuality = clamp01((hoq4 / 5) * 0.45 + escalationVerificationRate * 0.55);
+  const packetCompletenessScore =
+    escalationPacketQuality.assessedCount > 0 ? escalationPacketQuality.averageCompleteness : clamp01(hoq4 / 5);
+  const escalationQuality = clamp01(
+    (hoq4 / 5) * 0.35 + escalationVerificationRate * 0.45 + packetCompletenessScore * 0.2
+  );
   const socialEngineeringResistance = clamp01((hoq1 / 5) * 0.7 + theaterResilienceScore * 0.3);
 
   const questionnaireScore = clamp01((hoq1 + hoq2 + hoq3 + hoq4) / 20);
@@ -469,6 +578,9 @@ export function assessOversightQuality(input: Record<string, number> | Oversight
   if (approvalLatencySlo.reviewedCount > 0 && approvalLatencySlo.breachedCount > 0) {
     overallScore = Math.max(0, overallScore - Math.round(Math.min(20, 10 + approvalLatencySlo.breachRate * 10)));
   }
+  if (escalationPacketQuality.assessedCount > 0 && escalationPacketQuality.incompleteCount > 0) {
+    overallScore = Math.max(0, overallScore - Math.round(Math.min(10, (1 - escalationPacketQuality.averageCompleteness) * 10)));
+  }
 
   const evidenceSignals = [
     Object.keys(scoreMap).length > 0 ? 1 : 0,
@@ -476,7 +588,8 @@ export function assessOversightQuality(input: Record<string, number> | Oversight
     highRiskHumanApprovals.length > 0 ? 1 : 0,
     approvalLatencySlo.reviewedCount > 0 ? 1 : 0,
     overrideComparables > 0 ? 1 : 0,
-    escalationEvents.length > 0 ? 1 : 0
+    escalationEvents.length > 0 ? 1 : 0,
+    escalationPacketQuality.assessedCount > 0 && escalationPacketQuality.completeCount > 0 ? 1 : 0
   ].reduce((sum, value) => sum + value, 0);
   const { center: confidence } = wilsonScore(
     Math.round((overallScore / 100) * Math.max(evidenceSignals, 1)),
@@ -548,6 +661,26 @@ export function assessOversightQuality(input: Record<string, number> | Oversight
       "Run escalation drills and require acknowledged + resolved escalation receipts within SLA."
     );
   }
+  if (escalationPacketQuality.assessedCount === 0) {
+    pushUnique(
+      gaps,
+      "Escalation packet quality is not evidenced by reviewer-ready escalation packet receipts."
+    );
+    pushUnique(
+      recommendations,
+      "Include concise context, risk, options, missing evidence, reviewer role, recommended reviewer action, and outcome in every escalation packet."
+    );
+  }
+  if (escalationPacketQuality.incompleteCount > 0) {
+    pushUnique(
+      gaps,
+      `Escalation packet quality incomplete for ${escalationPacketQuality.incompleteCount} of ${escalationPacketQuality.assessedCount} escalations.`
+    );
+    pushUnique(
+      recommendations,
+      "Include concise context, risk, options, missing evidence, reviewer role, recommended reviewer action, and outcome before escalation review."
+    );
+  }
   if (approvalLatencySlo.reviewedCount === 0) {
     pushUnique(
       gaps,
@@ -608,6 +741,8 @@ export function assessOversightQuality(input: Record<string, number> | Oversight
     overrideRateSampleSize: overrideComparables,
     escalationPathVerified,
     escalationVerificationRate,
+    escalationPacketQualityMet,
+    escalationPacketQuality,
     approvalLatencySloMet,
     approvalLatencySlo,
     overallScore,
