@@ -2275,6 +2275,27 @@ export type {
   PromptInjectionRegressionVector,
 } from "./redteam/promptInjectionRegressionSuite.js";
 
+// ── Red Team: Exploit Ledger ─
+export {
+  RED_TEAM_EXPLOIT_LEDGER_SCHEMA_VERSION,
+  buildRedTeamExploitLedgerReceipt,
+  renderRedTeamExploitLedgerMarkdown,
+  verifyRedTeamExploitLedgerReceipt,
+} from "./redteam/exploitLedger.js";
+export type {
+  RedTeamExploitLedgerInput,
+  RedTeamExploitLedgerReceipt,
+  RedTeamExploitLedgerRow,
+  RedTeamExploitLedgerRowStatus,
+  RedTeamExploitLedgerSourceMetadata,
+  RedTeamExploitLedgerStatus,
+  RedTeamExploitLedgerVerification,
+  RedTeamExploitRecordInput,
+  RedTeamExploitReproducibility,
+  RedTeamExploitRetestStatus,
+  RedTeamExploitSeverity,
+} from "./redteam/exploitLedger.js";
+
 // ── Score Explainer (human-readable score breakdowns) ─
 export {
   decomposeScore,

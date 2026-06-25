@@ -102,3 +102,23 @@ export type {
   PromptInjectionRegressionSuiteVerification,
   PromptInjectionRegressionVector,
 } from "./promptInjectionRegressionSuite.js";
+
+export {
+  RED_TEAM_EXPLOIT_LEDGER_SCHEMA_VERSION,
+  buildRedTeamExploitLedgerReceipt,
+  renderRedTeamExploitLedgerMarkdown,
+  verifyRedTeamExploitLedgerReceipt,
+} from "./exploitLedger.js";
+export type {
+  RedTeamExploitLedgerInput,
+  RedTeamExploitLedgerReceipt,
+  RedTeamExploitLedgerRow,
+  RedTeamExploitLedgerRowStatus,
+  RedTeamExploitLedgerSourceMetadata,
+  RedTeamExploitLedgerStatus,
+  RedTeamExploitLedgerVerification,
+  RedTeamExploitRecordInput,
+  RedTeamExploitReproducibility,
+  RedTeamExploitRetestStatus,
+  RedTeamExploitSeverity,
+} from "./exploitLedger.js";
