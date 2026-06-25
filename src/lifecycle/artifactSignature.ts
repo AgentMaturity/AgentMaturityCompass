@@ -33,6 +33,7 @@ const artifactSignatureSchema = z.object({
     "governed-optimizer-run",
     "reasoning-memory-item",
     "reasoning-memory-receipt",
+    "knowledge-refresh-lineage-receipt",
     "exploit-confirmation-scope",
     "exploit-confirmation-proof",
     "neutral-import-artifact",

@@ -1797,6 +1797,7 @@ export * from "./vault/metadataScrubber.js";
 export * from "./vault/invoiceFraud.js";
 export * from "./vault/dsarAutopilot.js";
 export * from "./vault/privacyBudget.js";
+export * from "./vault/knowledgeRefreshLineage.js";
 
 // ── NL Policy authoring (2026-02-21) ─────────────────────────────────
 export { parseNLPolicy, validateParsedPolicy, POLICY_TEMPLATES } from "./governor/nlPolicy.js";
