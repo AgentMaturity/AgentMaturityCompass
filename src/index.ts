@@ -548,6 +548,21 @@ export {
   renderControlCrosswalkAuditExport
 } from "./compliance/controlCrosswalk.js";
 export {
+  buildGovernanceExceptionLifecycleReceipt,
+  verifyGovernanceExceptionLifecycleReceipt,
+  renderGovernanceExceptionLifecycleAuditExport,
+  type GovernanceExceptionApprovalDecision,
+  type GovernanceExceptionCompensatingControl,
+  type GovernanceExceptionLifecycleEvidenceLink,
+  type GovernanceExceptionLifecycleReceipt,
+  type GovernanceExceptionLifecycleRecord,
+  type GovernanceExceptionLifecycleRow,
+  type GovernanceExceptionLifecycleSourceCitation,
+  type GovernanceExceptionLifecycleVerification,
+  type GovernanceExceptionRenewalDecision,
+  type GovernanceExceptionRenewalOutcome
+} from "./compliance/exceptionLifecycle.js";
+export {
   buildThirdPartyProviderRiskReceipt,
   verifyThirdPartyProviderRiskReceipt,
   renderThirdPartyProviderRiskAuditExport,

@@ -183,6 +183,22 @@ Each reviewer row includes:
 
 Reviewer-independence verification fails closed when source citations are missing, the reviewer cannot be identified, the separation rule is missing, the reviewer is also the requester, a conflict check is missing or unsigned, a conflict flag is present, a high-risk second review is missing or unsigned, an approval receipt is missing, or evidence lineage is missing or malformed. Source metadata, paper titles, policy names, or unsigned reviewer notes do not satisfy the receipt.
 
+## Governance Exception Lifecycle Receipts
+
+Governance exception and waiver reviews can use `buildGovernanceExceptionLifecycleReceipt` from `src/compliance/exceptionLifecycle.ts` to prove temporary risk acceptances without adding a separate workflow engine. The receipt is a generic Comply, Passport, and Vault artifact for policy exceptions, compliance waivers, and compensating-control windows.
+
+Each exception row includes:
+
+- **Exception request**: exception ID, policy ID, control ID, requester, request reason, request time, signed request evidence, and accountable owner.
+- **Approval**: approver, decision, decision time, signed approval evidence, and approval signature hash.
+- **Expiry**: expiry timestamp, expiry-check timestamp, signed expiry-check evidence, and expiry signature hash.
+- **Compensating controls**: one or more signed compensating controls with owners and descriptions.
+- **Renewal outcome**: signed renewal, denial, or not-requested decision with approver, reason, and decision time.
+- **Evidence lineage**: event hashes and signed evidence references summarized into an evidence-chain hash.
+- **Source citations**: source-backed review or control obligations supplied by the operator.
+
+Exception-lifecycle verification fails closed when source citations are missing, the policy/control mapping is missing, the owner is missing, the request is unsigned, the approval is unsigned, expiry proof is missing, compensating controls are missing or unsigned, renewal outcome is missing or unsigned, or evidence lineage is missing or malformed. Source metadata, website labels, policy names, or unsigned waiver notes do not satisfy the receipt.
+
 ## Third-Party Provider Risk Receipts
 
 Third-party provider reviews can use `buildThirdPartyProviderRiskReceipt` from `src/compliance/providerRisk.ts` to capture provider and vendor risk without creating a provider-specific integration. The receipt is a generic Comply, Passport, and Vault artifact for external agents, model providers, tool providers, data providers, and infrastructure providers.
