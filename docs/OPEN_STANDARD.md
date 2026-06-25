@@ -52,3 +52,10 @@ Schema validation checks shape; artifact verification checks cryptographic trust
 - Backward-compatible additions should preserve existing required fields.
 - Breaking changes must increment artifact version and ship updated schema files.
 - Bundle signatures are required for trusted distribution.
+
+Passport compatibility evidence can also use the `amc.passport.compatibility.v1` report contract. That report records the fixture corpus, import/export results, and compatibility matrix for `.amcpass` exchange across AMC and partner systems.
+
+Schema validation and compatibility reporting are separate gates:
+- schema validation checks that one artifact matches a generated schema
+- compatibility reporting checks that a fixture corpus covers import, export, and round-trip behavior
+- artifact verification still checks cryptographic trust, proof bindings, privacy checks, and revocation state

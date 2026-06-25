@@ -1952,6 +1952,27 @@ export type {
   InteroperableReceiptVerification,
 } from "./passport/receiptInterchange.js";
 
+// ── Passport Schema Compatibility (versioned import/export matrix) ─
+export {
+  CURRENT_PASSPORT_SCHEMA_VERSION,
+  PASSPORT_SCHEMA_COMPATIBILITY_VERSION,
+  PASSPORT_SCHEMA_ID,
+  buildPassportSchemaCompatibilityReport,
+  passportSchemaCompatibilityDirections,
+  verifyPassportSchemaCompatibilityReport,
+} from "./passport/passportSchemaCompatibility.js";
+export type {
+  BuildPassportSchemaCompatibilityReportInput,
+  PassportSchemaCompatibilityDirection,
+  PassportSchemaCompatibilityFixture,
+  PassportSchemaCompatibilityMatrixRow,
+  PassportSchemaCompatibilityReport,
+  PassportSchemaCompatibilitySourceCitation,
+  PassportSchemaCompatibilityStatus,
+  PassportSchemaCompatibilityVerification,
+  PassportSchemaImportExportResult,
+} from "./passport/passportSchemaCompatibility.js";
+
 // ── Regulatory Automation (RegulatoryMonitor, feed configs, gap analysis) ─
 export {
   DEFAULT_REGULATORY_FEEDS,
