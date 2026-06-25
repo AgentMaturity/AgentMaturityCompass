@@ -30,6 +30,25 @@ export { checkPhishing } from './antiPhishing.js';
 export type { PhishingResult } from './antiPhishing.js';
 export { blindSecrets } from './secretBlind.js';
 export type { SecretBlindResult } from './secretBlind.js';
+export {
+  buildGuardDecisionReceipt,
+  closeGuardDb,
+  emitGuardDecisionReceipt,
+  emitGuardEvent,
+  readGuardDecisionReceipts,
+  readGuardEvents,
+  verifyGuardDecisionReceipt,
+} from './evidenceEmitter.js';
+export type {
+  EmitGuardDecisionReceiptInput,
+  GuardDecisionReceipt,
+  GuardDecisionReceiptDecision,
+  GuardDecisionReceiptPayloadV1,
+  GuardDecisionReceiptSigner,
+  GuardEventInput,
+  VerifyGuardDecisionReceiptOptions,
+  VerifyGuardDecisionReceiptResult,
+} from './evidenceEmitter.js';
 export { createEvidenceContract } from './evidenceContract.js';
 export type { EvidenceContract } from './evidenceContract.js';
 export { checkTemporalAccess } from './temporalControls.js';
