@@ -388,7 +388,19 @@ export {
   truthProtocolTemplate,
   extractApprovalToken,
   hasValidApprovalToken,
-  withApprovalTrace
+  withApprovalTrace,
+  buildDegradedModeBehaviorReceipt,
+  verifyDegradedModeBehaviorReceipt,
+  renderDegradedModeBehaviorMarkdown,
+  type BuildDegradedModeBehaviorReceiptInput,
+  type DegradedModeAllowedBehavior,
+  type DegradedModeBehaviorReceipt,
+  type DegradedModeBehaviorSourceCitation,
+  type DegradedModeBehaviorStatus,
+  type DegradedModeBehaviorTestRun,
+  type DegradedModeBehaviorVerification,
+  type DegradedModeFailureMode,
+  type DegradedModeOperatorMessage
 } from "./runtime/index.js";
 
 export { parseTraceLine, parseTraceLines } from "./correlation/traceSchema.js";

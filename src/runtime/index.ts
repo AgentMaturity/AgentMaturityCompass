@@ -86,3 +86,17 @@ export {
   type RuntimeAutonomyPlanStep,
   type RuntimeAutonomyRiskTier
 } from "./autonomyBoundary.js";
+export {
+  buildDegradedModeBehaviorReceipt,
+  verifyDegradedModeBehaviorReceipt,
+  renderDegradedModeBehaviorMarkdown,
+  type BuildDegradedModeBehaviorReceiptInput,
+  type DegradedModeAllowedBehavior,
+  type DegradedModeBehaviorReceipt,
+  type DegradedModeBehaviorSourceCitation,
+  type DegradedModeBehaviorStatus,
+  type DegradedModeBehaviorTestRun,
+  type DegradedModeBehaviorVerification,
+  type DegradedModeFailureMode,
+  type DegradedModeOperatorMessage
+} from "./degradedModeContract.js";
