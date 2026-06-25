@@ -60,6 +60,8 @@ export {
   type RuntimeStateCheckpointVerification,
   type RuntimeStateDiffChange,
   type RuntimeStateDiffEntry,
+  type RuntimeStateRestoreAssurance,
+  type RuntimeStateRestoreEnforcementAction,
   type RuntimeStateRestoreProof,
   type RuntimeStateRestoreProofVerification,
   type RuntimeStateRetentionClass,

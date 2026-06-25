@@ -10,6 +10,7 @@ import { loadRuntimeRun, runtimeRunStatePath, type RuntimeManagedRun } from "./r
 export type RuntimeStateCheckpointRiskLevel = "medium" | "high" | "critical";
 export type RuntimeStateRetentionClass = "ephemeral" | "standard" | "regulated";
 export type RuntimeStateDiffChange = "added" | "removed" | "changed";
+export type RuntimeStateRestoreEnforcementAction = "allow" | "block";
 
 export interface RuntimeStateCheckpointSourceCitation {
   sourceId: string;
@@ -63,6 +64,16 @@ export interface RuntimeStateDiffEntry {
   restoredValueHash: string | null;
 }
 
+export interface RuntimeStateRestoreAssurance {
+  surfaceBinding: ["Score", "Watch", "Enforce"];
+  enforcementAction: RuntimeStateRestoreEnforcementAction;
+  scoreImpact: {
+    penalty0to100: number;
+    reason: string;
+    evidenceRefs: string[];
+  };
+}
+
 export interface RuntimeStateRestoreProof {
   schemaVersion: "2026-06-25";
   proofId: string;
@@ -82,6 +93,7 @@ export interface RuntimeStateRestoreProof {
     checkedAt: string;
     evidenceRefs: string[];
   };
+  assurance: RuntimeStateRestoreAssurance;
   failClosed: boolean;
   failClosedReasons: string[];
   proofHash: string;
@@ -292,6 +304,28 @@ function diffState(checkpointValue: unknown, restoredValue: unknown, path = ""):
   }];
 }
 
+function restoreAssurance(input: {
+  failClosedReasons: string[];
+  stateDiff: RuntimeStateDiffEntry[];
+  restoreTestEvidenceRefs: string[];
+}): RuntimeStateRestoreAssurance {
+  const hasFailure = input.failClosedReasons.length > 0 || input.stateDiff.length > 0;
+  const penalty = hasFailure
+    ? Math.min(100, 55 + Math.min(35, input.stateDiff.length * 10) + (input.restoreTestEvidenceRefs.length === 0 ? 10 : 0))
+    : 0;
+  return {
+    surfaceBinding: ["Score", "Watch", "Enforce"],
+    enforcementAction: hasFailure ? "block" : "allow",
+    scoreImpact: {
+      penalty0to100: penalty,
+      reason: hasFailure
+        ? "Runtime restore proof failed or state diverged; Score confidence is penalized and Enforce blocks unsafe continuation."
+        : "Runtime restore proof passed with no state diff.",
+      evidenceRefs: input.restoreTestEvidenceRefs
+    }
+  };
+}
+
 export function proveRuntimeStateRestore(input: {
   workspace: string;
   runId: string;
@@ -342,6 +376,11 @@ export function proveRuntimeStateRestore(input: {
       checkedAt,
       evidenceRefs: restoreTestEvidenceRefs
     },
+    assurance: restoreAssurance({
+      failClosedReasons: uniqueReasons,
+      stateDiff,
+      restoreTestEvidenceRefs
+    }),
     failClosed: uniqueReasons.length > 0,
     failClosedReasons: uniqueReasons,
     proofHash: "",
@@ -365,6 +404,33 @@ export function verifyRuntimeStateRestoreProof(proof: RuntimeStateRestoreProof):
   }
   if (proof.restoreTest.evidenceRefs.length === 0) {
     reasons.push("runtime-state-restore:test-evidence:missing");
+  }
+  if (
+    proof.assurance.surfaceBinding.length !== 3 ||
+    proof.assurance.surfaceBinding[0] !== "Score" ||
+    proof.assurance.surfaceBinding[1] !== "Watch" ||
+    proof.assurance.surfaceBinding[2] !== "Enforce"
+  ) {
+    reasons.push("runtime-state-restore:assurance-surface:invalid");
+  }
+  const expectedAction: RuntimeStateRestoreEnforcementAction = proof.failClosed || !proof.restoreTest.passed || proof.stateDiff.length > 0
+    ? "block"
+    : "allow";
+  if (proof.assurance.enforcementAction !== expectedAction) {
+    reasons.push("runtime-state-restore:assurance-action:mismatch");
+  }
+  if (
+    !Number.isFinite(proof.assurance.scoreImpact.penalty0to100) ||
+    proof.assurance.scoreImpact.penalty0to100 < 0 ||
+    proof.assurance.scoreImpact.penalty0to100 > 100
+  ) {
+    reasons.push("runtime-state-restore:score-impact:invalid");
+  }
+  if (expectedAction === "allow" && proof.assurance.scoreImpact.penalty0to100 !== 0) {
+    reasons.push("runtime-state-restore:score-impact:unexpected");
+  }
+  if (expectedAction === "block" && proof.assurance.scoreImpact.penalty0to100 <= 0) {
+    reasons.push("runtime-state-restore:score-impact:missing");
   }
   if (proof.proofHash !== restoreProofDigest(proof)) {
     reasons.push("runtime-state-restore:proof-hash:mismatch");
@@ -421,6 +487,8 @@ export function renderRuntimeStateCheckpointAuditExport(
       `- Passed: ${restoreProof.restoreTest.passed ? "yes" : "no"}`,
       `- Evidence: ${restoreProof.restoreTest.evidenceRefs.join(", ") || "none"}`,
       `- State diff count: ${restoreProof.stateDiff.length}`,
+      `- Enforcement action: ${restoreProof.assurance.enforcementAction}`,
+      `- Score impact: ${restoreProof.assurance.scoreImpact.penalty0to100}/100`,
       restoreVerification?.valid ? "- VALID" : `- FAIL_CLOSED: ${restoreVerification?.failClosedReasons.join("; ")}`
     );
   }
