@@ -55,16 +55,18 @@ describe("public methodology manifest", () => {
     expect(first.questionSet.version).toBe("amc-legacy-240-v1");
     expect(first.questionSet.questionCount).toBe(getAllQuestions().length);
     expect(first.changelog[0]?.version).toBe(AMC_PUBLIC_METHODOLOGY_VERSION);
-    expect(first.changelog[0]?.summary).toContain("Lunary-style public-methodology");
-    expect(first.changelog[0]?.migration).toContain("Reports generated under 2026.06.25-r218");
+    expect(first.changelog[0]?.summary).toContain("Cua-style computer-use benchmark public-methodology");
+    expect(first.changelog[0]?.migration).toContain("Reports generated under 2026.06.25-r219");
+    expect(first.changelog[1]?.summary).toContain("Lunary-style public-methodology");
+    expect(first.changelog[1]?.migration).toContain("Reports generated under 2026.06.25-r218");
 
-    expect(first.changelog[1]?.summary).toContain("LangSmith-style public-methodology");
-    expect(first.changelog[2]?.summary).toContain("PocketFlow-style public-methodology source-review boundaries");
-    expect(first.changelog[3]?.summary).toContain("ChemGraph-style agentic computational chemistry workflow");
-    expect(first.changelog[3]?.summary).toContain("LM Evaluation Harness-style metric-validity source-review boundaries");
-    expect(first.changelog[4]?.summary).toContain("OpenAI Evals-style public-methodology source-review boundaries");
-    expect(first.changelog[5]?.summary).toContain("fact-checking and factuality-evaluation review methodology boundaries");
-    expect(first.changelog[5]?.summary).toContain("Google ADK-style agent-toolkit evaluation metric-validity boundaries");
+    expect(first.changelog[2]?.summary).toContain("LangSmith-style public-methodology");
+    expect(first.changelog[3]?.summary).toContain("PocketFlow-style public-methodology source-review boundaries");
+    expect(first.changelog[4]?.summary).toContain("ChemGraph-style agentic computational chemistry workflow");
+    expect(first.changelog[4]?.summary).toContain("LM Evaluation Harness-style metric-validity source-review boundaries");
+    expect(first.changelog[5]?.summary).toContain("OpenAI Evals-style public-methodology source-review boundaries");
+    expect(first.changelog[6]?.summary).toContain("fact-checking and factuality-evaluation review methodology boundaries");
+    expect(first.changelog[6]?.summary).toContain("Google ADK-style agent-toolkit evaluation metric-validity boundaries");
     for (const previousVersion of [
       "2026.06.21-r217",
       "2026.06.20-r216",
@@ -1373,6 +1375,7 @@ describe("public methodology manifest", () => {
       "lifecycle_observability_coverage",
       "arize_phoenix_observability_eval_coverage",
       "lunary_observability_metric_validity",
+      "cua_computer_use_public_methodology",
       "google_adk_eval_metric_validity",
       "lm_evaluation_harness_metric_validity",
       "openai_evals_public_methodology",

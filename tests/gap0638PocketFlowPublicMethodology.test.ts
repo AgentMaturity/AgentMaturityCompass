@@ -13,7 +13,7 @@ describe("GAP-0638 PocketFlow public-methodology source-review boundary", () => 
   it("publishes methodology-versioned Score/Shield/Watch boundaries without a PocketFlow subsystem", () => {
     const manifest = getPublicMethodologyManifest();
 
-    expect(AMC_PUBLIC_METHODOLOGY_VERSION).toBe("2026.06.25-r219");
+    expect(AMC_PUBLIC_METHODOLOGY_VERSION).toBe("2026.06.25-r220");
     const pocketFlowChangelog = manifest.changelog.find((row) => row.version === "2026.06.21-r217");
     expect(pocketFlowChangelog).toMatchObject({
       version: "2026.06.21-r217",
