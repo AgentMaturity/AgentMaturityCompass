@@ -647,6 +647,20 @@ export {
   type ThirdPartyProviderType
 } from "./compliance/providerRisk.js";
 export {
+  buildRouterFallbackSafetyReceipt,
+  verifyRouterFallbackSafetyReceipt,
+  renderRouterFallbackSafetyMarkdown,
+  type BuildRouterFallbackSafetyReceiptInput,
+  type RouterFallbackCostBudget,
+  type RouterFallbackEvalThreshold,
+  type RouterFallbackLatencySlo,
+  type RouterFallbackProviderSnapshot,
+  type RouterFallbackSafetyDecision,
+  type RouterFallbackSafetyReceipt,
+  type RouterFallbackSafetySourceCitation,
+  type RouterFallbackSafetyVerification
+} from "./observability/routerFallbackSafety.js";
+export {
   initComplianceMapsCli,
   verifyComplianceMapsCli,
   complianceReportCli,
