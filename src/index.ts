@@ -661,6 +661,25 @@ export {
   type RouterFallbackSafetyVerification
 } from "./observability/routerFallbackSafety.js";
 export {
+  buildPerAgentCostBudgetEvidenceReceipt,
+  verifyPerAgentCostBudgetEvidenceReceipt,
+  renderPerAgentCostBudgetEvidenceMarkdown,
+  type BuildPerAgentCostBudgetEvidenceReceiptInput,
+  type CostBudgetDefinition,
+  type CostBudgetOwnerDecision,
+  type CostBudgetOwnerDecisionRecord,
+  type CostBudgetPeriod,
+  type CostBudgetRowStatus,
+  type CostBudgetSpendSnapshot,
+  type CostBudgetToolPathSpendSnapshot,
+  type PerAgentCostBudgetEvidenceReceipt,
+  type PerAgentCostBudgetEvidenceVerification,
+  type PerAgentCostBudgetReceiptStatus,
+  type PerAgentCostBudgetSourceCitation,
+  type PerAgentCostBudgetToolPathRow,
+  type PerAgentCostBudgetRow
+} from "./observability/costBudgetEvidence.js";
+export {
   initComplianceMapsCli,
   verifyComplianceMapsCli,
   complianceReportCli,
