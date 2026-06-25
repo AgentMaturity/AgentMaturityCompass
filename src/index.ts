@@ -254,7 +254,20 @@ export {
   evaluateGatePolicy,
   initCiForAgent,
   printCiSteps,
-  runBundleGate
+  runBundleGate,
+  buildReleaseGateReceipt,
+  verifyReleaseGateReceipt,
+  renderReleaseGateAuditExport
+} from "./ci/gate.js";
+export type {
+  ReleaseGateOverrideStatus,
+  ReleaseGateSourceCitation,
+  ReleaseGateEvidenceLink,
+  ReleaseGateOverrideRecord,
+  ReleaseGateRunRecord,
+  ReleaseGateReceiptRow,
+  ReleaseGateReceipt,
+  ReleaseGateReceiptVerification
 } from "./ci/gate.js";
 export {
   listArchetypes,

@@ -4,7 +4,9 @@ import { z } from "zod";
 import type { DiagnosticReport, GatePolicy, LayerName } from "../types.js";
 import { ensureDir, pathExists, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
+import { canonicalize } from "../utils/json.js";
 import { signHexDigest, verifyHexDigestAny, getPrivateKeyPem, getPublicKeyHistory } from "../crypto/keys.js";
+import type { FleetEnvironment } from "../fleet/registry.js";
 import { getAgentPaths, resolveAgentId } from "../fleet/paths.js";
 import { loadBundleRunAndTrustMap, verifyEvidenceBundle } from "../bundles/bundle.js";
 import { appendTransparencyEntry } from "../transparency/logChain.js";
@@ -48,6 +50,86 @@ interface SignaturePayload {
   signature: string;
   signedTs: number;
   signer: "auditor";
+}
+
+export type ReleaseGateOverrideStatus = "none" | "requested" | "approved" | "rejected" | "expired";
+
+export interface ReleaseGateSourceCitation {
+  sourceId: string;
+  title: string;
+  url: string;
+  retrievedAt: string;
+}
+
+export interface ReleaseGateEvidenceLink {
+  eventId: string;
+  eventHash: string;
+  eventType: string;
+  signedEvidenceRef: string;
+}
+
+export interface ReleaseGateOverrideRecord {
+  overrideId: string;
+  status: Exclude<ReleaseGateOverrideStatus, "none">;
+  requesterId: string;
+  approverId?: string;
+  reason: string;
+  decidedAt?: string;
+  signedEvidenceRef?: string;
+  signatureSha256?: string;
+}
+
+export interface ReleaseGateRunRecord {
+  gateId: string;
+  agentId: string;
+  environment: FleetEnvironment;
+  gateConfig: GatePolicy;
+  policyPath?: string;
+  bundlePath?: string;
+  evaluatedAt: string;
+  passed: boolean;
+  failureReasons: string[];
+  runReceiptRef: string;
+  runReceiptHash: string;
+  override?: ReleaseGateOverrideRecord;
+  evidenceRefs: ReleaseGateEvidenceLink[];
+  sourceCitationIds?: string[];
+}
+
+export interface ReleaseGateReceiptRow {
+  gateId: string;
+  agentId: string;
+  environment: FleetEnvironment;
+  gateConfig: GatePolicy;
+  gateConfigHash: string;
+  policyPath: string | null;
+  bundlePath: string | null;
+  evaluatedAt: string;
+  passed: boolean;
+  failureReasons: string[];
+  runReceiptRef: string;
+  runReceiptHash: string;
+  overrideStatus: ReleaseGateOverrideStatus;
+  overrideId: string | null;
+  sourceCitationIds: string[];
+  evidenceRefs: ReleaseGateEvidenceLink[];
+  evidenceChainHash: string;
+  rowHash: string;
+}
+
+export interface ReleaseGateReceipt {
+  receiptId: string;
+  generatedAt: string;
+  sourceCitations: ReleaseGateSourceCitation[];
+  rows: ReleaseGateReceiptRow[];
+  failClosed: boolean;
+  failClosedReasons: string[];
+  receiptHash: string;
+}
+
+export interface ReleaseGateReceiptVerification {
+  valid: boolean;
+  reasons: string[];
 }
 
 export function defaultGatePolicy(): GatePolicy {
@@ -472,4 +554,233 @@ export async function runBundleGate(params: {
     report: loaded.run,
     policy
   };
+}
+
+function isSha256(value: string | undefined): boolean {
+  return typeof value === "string" && /^[a-f0-9]{64}$/.test(value);
+}
+
+function timestampPresent(value: string | undefined): boolean {
+  return typeof value === "string" && value.length > 0 && !Number.isNaN(Date.parse(value));
+}
+
+function releaseGateRowHash(row: Omit<ReleaseGateReceiptRow, "rowHash">): string {
+  return sha256Hex(canonicalize(row));
+}
+
+function releaseGateReceiptHash(receipt: Omit<ReleaseGateReceipt, "receiptHash">): string {
+  return sha256Hex(canonicalize(receipt));
+}
+
+function releaseGateEvidenceValid(evidenceRefs: ReleaseGateEvidenceLink[]): boolean {
+  return evidenceRefs.length > 0 && evidenceRefs.every((evidence) => (
+    Boolean(evidence.eventId)
+    && Boolean(evidence.eventType)
+    && Boolean(evidence.signedEvidenceRef)
+    && isSha256(evidence.eventHash)
+  ));
+}
+
+function releaseGateOverrideValid(override: ReleaseGateOverrideRecord | undefined): boolean {
+  if (!override) {
+    return true;
+  }
+  return Boolean(
+    override.overrideId
+    && override.status
+    && override.requesterId
+    && override.approverId
+    && override.reason
+    && timestampPresent(override.decidedAt)
+    && override.signedEvidenceRef
+    && isSha256(override.signatureSha256)
+  );
+}
+
+function validateReleaseGateRow(row: ReleaseGateReceiptRow): string[] {
+  const reasons: string[] = [];
+  if (!row.gateId) reasons.push("gateId:missing");
+  if (!row.agentId) reasons.push(`${row.gateId || "unknown"}:agentId:missing`);
+  if (!["development", "staging", "production"].includes(row.environment)) {
+    reasons.push(`${row.gateId || "unknown"}:environment:invalid`);
+  }
+  try {
+    parseGatePolicy(row.gateConfig);
+  } catch {
+    reasons.push(`${row.gateId || "unknown"}:gateConfig:invalid`);
+  }
+  if (!isSha256(row.gateConfigHash)) reasons.push(`${row.gateId || "unknown"}:gateConfigHash:invalid`);
+  if (!timestampPresent(row.evaluatedAt)) reasons.push(`${row.gateId || "unknown"}:evaluatedAt:missing`);
+  if (!row.passed && row.failureReasons.length === 0) {
+    reasons.push(`${row.gateId || "unknown"}:failureReason:missing`);
+  }
+  if (!row.runReceiptRef || !isSha256(row.runReceiptHash)) {
+    reasons.push(`${row.gateId || "unknown"}:runReceipt:missing`);
+  }
+  if (!releaseGateEvidenceValid(row.evidenceRefs)) {
+    reasons.push(`${row.gateId || "unknown"}:evidenceChain:missing`);
+  }
+  const recalculatedConfigHash = sha256Hex(canonicalize(row.gateConfig));
+  if (row.gateConfigHash !== recalculatedConfigHash) {
+    reasons.push(`${row.gateId || "unknown"}:gateConfigHash:mismatch`);
+  }
+  if (row.evidenceChainHash !== sha256Hex(canonicalize(row.evidenceRefs))) {
+    reasons.push(`${row.gateId || "unknown"}:evidenceChainHash:mismatch`);
+  }
+  const { rowHash: actual, ...baseRow } = row;
+  if (releaseGateRowHash(baseRow) !== actual) {
+    reasons.push(`${row.gateId || "unknown"}:rowHash:mismatch`);
+  }
+  return reasons;
+}
+
+export function buildReleaseGateReceipt(input: {
+  receiptId: string;
+  sourceCitations: ReleaseGateSourceCitation[];
+  gates: ReleaseGateRunRecord[];
+  generatedAt?: string;
+}): ReleaseGateReceipt {
+  const failClosedReasons: string[] = [];
+  const sourceIds = new Set(input.sourceCitations.map((citation) => citation.sourceId).filter(Boolean));
+  if (sourceIds.size === 0) {
+    failClosedReasons.push("sourceCitations:missing");
+  }
+
+  const rows = input.gates.map((gate): ReleaseGateReceiptRow => {
+    const gateLabel = gate.gateId || "unknown";
+    const sourceCitationIds = gate.sourceCitationIds ?? [...sourceIds];
+    if (sourceCitationIds.length === 0) {
+      failClosedReasons.push(`${gateLabel}:sourceCitation:missing`);
+    }
+    if (sourceCitationIds.some((sourceId) => !sourceIds.has(sourceId))) {
+      failClosedReasons.push(`${gateLabel}:sourceCitation:unknown`);
+    }
+    try {
+      parseGatePolicy(gate.gateConfig);
+    } catch {
+      failClosedReasons.push(`${gateLabel}:gateConfig:invalid`);
+    }
+    if (!timestampPresent(gate.evaluatedAt)) {
+      failClosedReasons.push(`${gateLabel}:evaluatedAt:missing`);
+    }
+    if (!gate.passed && gate.failureReasons.length === 0) {
+      failClosedReasons.push(`${gateLabel}:failureReason:missing`);
+    }
+    if (!gate.runReceiptRef || !isSha256(gate.runReceiptHash)) {
+      failClosedReasons.push(`${gateLabel}:runReceipt:missing`);
+    }
+    if (!releaseGateEvidenceValid(gate.evidenceRefs)) {
+      failClosedReasons.push(`${gateLabel}:evidenceChain:missing`);
+    }
+    if (gate.override && !releaseGateOverrideValid(gate.override)) {
+      failClosedReasons.push(`${gateLabel}:override:missing`);
+    }
+
+    const gateConfigHash = sha256Hex(canonicalize(gate.gateConfig));
+    const evidenceChainHash = sha256Hex(canonicalize(gate.evidenceRefs));
+    const baseRow: Omit<ReleaseGateReceiptRow, "rowHash"> = {
+      gateId: gate.gateId,
+      agentId: gate.agentId,
+      environment: gate.environment,
+      gateConfig: gate.gateConfig,
+      gateConfigHash,
+      policyPath: gate.policyPath ?? null,
+      bundlePath: gate.bundlePath ?? null,
+      evaluatedAt: gate.evaluatedAt,
+      passed: gate.passed,
+      failureReasons: gate.failureReasons,
+      runReceiptRef: gate.runReceiptRef,
+      runReceiptHash: gate.runReceiptHash,
+      overrideStatus: gate.override?.status ?? "none",
+      overrideId: gate.override?.overrideId ?? null,
+      sourceCitationIds,
+      evidenceRefs: gate.evidenceRefs,
+      evidenceChainHash
+    };
+    return {
+      ...baseRow,
+      rowHash: releaseGateRowHash(baseRow)
+    };
+  });
+
+  if (rows.length === 0) {
+    failClosedReasons.push("rows:missing");
+  }
+
+  const withoutHash: Omit<ReleaseGateReceipt, "receiptHash"> = {
+    receiptId: input.receiptId,
+    generatedAt: input.generatedAt ?? new Date().toISOString(),
+    sourceCitations: input.sourceCitations,
+    rows,
+    failClosed: failClosedReasons.length > 0,
+    failClosedReasons: [...new Set(failClosedReasons)]
+  };
+  return {
+    ...withoutHash,
+    receiptHash: releaseGateReceiptHash(withoutHash)
+  };
+}
+
+export function verifyReleaseGateReceipt(receipt: ReleaseGateReceipt): ReleaseGateReceiptVerification {
+  const reasons: string[] = [];
+  if (receipt.failClosed) {
+    reasons.push(...receipt.failClosedReasons);
+  }
+  if (receipt.sourceCitations.length === 0) {
+    reasons.push("sourceCitations:missing");
+  }
+  if (receipt.rows.length === 0) {
+    reasons.push("rows:missing");
+  }
+  for (const row of receipt.rows) {
+    reasons.push(...validateReleaseGateRow(row));
+  }
+  const { receiptHash: actual, ...withoutHash } = receipt;
+  if (releaseGateReceiptHash(withoutHash) !== actual) {
+    reasons.push("receiptHash:mismatch");
+  }
+  return {
+    valid: reasons.length === 0,
+    reasons: [...new Set(reasons)]
+  };
+}
+
+export function renderReleaseGateAuditExport(receipt: ReleaseGateReceipt): string {
+  const lines: string[] = [];
+  lines.push("# AMC Release Gate Audit Export");
+  lines.push("");
+  lines.push(`- Receipt: \`${receipt.receiptId}\``);
+  lines.push(`- Generated: \`${receipt.generatedAt}\``);
+  lines.push(`- Status: ${receipt.failClosed ? "FAIL-CLOSED" : "VALID"}`);
+  lines.push(`- Receipt hash: \`${receipt.receiptHash}\``);
+  lines.push("");
+  lines.push("## Source Citations");
+  for (const citation of receipt.sourceCitations) {
+    lines.push(`- ${citation.sourceId}: ${citation.title} (${citation.url})`);
+  }
+  lines.push("");
+  lines.push("## Release Gates");
+  lines.push("");
+  lines.push("| Gate | Agent | Environment | Result | Override | Run receipt | Failure reasons |");
+  lines.push("| --- | --- | --- | --- | --- | --- | --- |");
+  for (const row of receipt.rows) {
+    lines.push([
+      row.gateId,
+      row.agentId,
+      row.environment,
+      row.passed ? "passed" : "failed",
+      `override ${row.overrideStatus}`,
+      `${row.runReceiptRef || "MISSING"} (${row.runReceiptHash || "MISSING"})`,
+      row.failureReasons.join("; ") || "none"
+    ].map((value) => value.replace(/\|/g, "\\|")).join(" | ").replace(/^/, "| ").concat(" |"));
+  }
+  if (receipt.failClosedReasons.length > 0) {
+    lines.push("");
+    lines.push("## Fail-Closed Reasons");
+    for (const reason of receipt.failClosedReasons) {
+      lines.push(`- ${reason}`);
+    }
+  }
+  lines.push("");
+  return lines.join("\n");
 }
