@@ -81,3 +81,24 @@ export type {
   JailbreakSummary,
   RunJailbreakTestInput,
 } from "./jailbreak/index.js";
+
+export {
+  PROMPT_INJECTION_REGRESSION_SUITE_SCHEMA_VERSION,
+  buildPromptInjectionRegressionSuiteReceipt,
+  renderPromptInjectionRegressionSuiteMarkdown,
+  verifyPromptInjectionRegressionSuiteReceipt,
+} from "./promptInjectionRegressionSuite.js";
+export type {
+  PromptInjectionRegressionDecision,
+  PromptInjectionRegressionFixtureInput,
+  PromptInjectionRegressionFixtureStatus,
+  PromptInjectionRegressionRowStatus,
+  PromptInjectionRegressionSourceMetadata,
+  PromptInjectionRegressionSuiteCoverage,
+  PromptInjectionRegressionSuiteInput,
+  PromptInjectionRegressionSuiteReceipt,
+  PromptInjectionRegressionSuiteRow,
+  PromptInjectionRegressionSuiteStatus,
+  PromptInjectionRegressionSuiteVerification,
+  PromptInjectionRegressionVector,
+} from "./promptInjectionRegressionSuite.js";

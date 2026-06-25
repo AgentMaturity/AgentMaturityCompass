@@ -2253,6 +2253,28 @@ export type {
   MultilingualAttack,
 } from "./redteam/multilingualAttacks.js";
 
+// ── Red Team: Prompt Injection Regression Suite ─
+export {
+  PROMPT_INJECTION_REGRESSION_SUITE_SCHEMA_VERSION,
+  buildPromptInjectionRegressionSuiteReceipt,
+  renderPromptInjectionRegressionSuiteMarkdown,
+  verifyPromptInjectionRegressionSuiteReceipt,
+} from "./redteam/promptInjectionRegressionSuite.js";
+export type {
+  PromptInjectionRegressionDecision,
+  PromptInjectionRegressionFixtureInput,
+  PromptInjectionRegressionFixtureStatus,
+  PromptInjectionRegressionRowStatus,
+  PromptInjectionRegressionSourceMetadata,
+  PromptInjectionRegressionSuiteCoverage,
+  PromptInjectionRegressionSuiteInput,
+  PromptInjectionRegressionSuiteReceipt,
+  PromptInjectionRegressionSuiteRow,
+  PromptInjectionRegressionSuiteStatus,
+  PromptInjectionRegressionSuiteVerification,
+  PromptInjectionRegressionVector,
+} from "./redteam/promptInjectionRegressionSuite.js";
+
 // ── Score Explainer (human-readable score breakdowns) ─
 export {
   decomposeScore,
