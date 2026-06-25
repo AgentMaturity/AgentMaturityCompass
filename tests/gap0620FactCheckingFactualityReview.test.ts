@@ -11,8 +11,9 @@ import { buildDiagnosticMethodologyVersioningReceipt } from "../src/diagnostic/m
 describe("GAP-0620 fact-checking/factuality review methodology boundary", () => {
   it("publishes methodology-versioned Score/Shield/Watch boundaries without a standalone fact-checking subsystem", () => {
     const manifest = getPublicMethodologyManifest();
-    expect(AMC_PUBLIC_METHODOLOGY_VERSION).toBe("2026.06.21-r217");
-    expect(manifest.changelog[0]).toMatchObject({
+    expect(AMC_PUBLIC_METHODOLOGY_VERSION).toBe("2026.06.25-r218");
+    const pocketFlowRelease = manifest.changelog.find((row) => row.version === "2026.06.21-r217");
+    expect(pocketFlowRelease).toMatchObject({
       version: "2026.06.21-r217",
       date: "2026-06-21"
     });

@@ -55,15 +55,17 @@ describe("public methodology manifest", () => {
     expect(first.questionSet.version).toBe("amc-legacy-240-v1");
     expect(first.questionSet.questionCount).toBe(getAllQuestions().length);
     expect(first.changelog[0]?.version).toBe(AMC_PUBLIC_METHODOLOGY_VERSION);
-    expect(first.changelog[0]?.migration).toContain("Reports generated under 2026.06.20-r216");
-    expect(first.changelog[0]?.summary).toContain("PocketFlow-style public-methodology source-review boundaries");
+    expect(first.changelog[0]?.migration).toContain("Reports generated under 2026.06.21-r217");
+    expect(first.changelog[0]?.summary).toContain("LangSmith-style public-methodology");
 
-    expect(first.changelog[1]?.summary).toContain("ChemGraph-style agentic computational chemistry workflow");
-    expect(first.changelog[1]?.summary).toContain("LM Evaluation Harness-style metric-validity source-review boundaries");
-    expect(first.changelog[2]?.summary).toContain("OpenAI Evals-style public-methodology source-review boundaries");
-    expect(first.changelog[3]?.summary).toContain("fact-checking and factuality-evaluation review methodology boundaries");
-    expect(first.changelog[3]?.summary).toContain("Google ADK-style agent-toolkit evaluation metric-validity boundaries");
+    expect(first.changelog[1]?.summary).toContain("PocketFlow-style public-methodology source-review boundaries");
+    expect(first.changelog[2]?.summary).toContain("ChemGraph-style agentic computational chemistry workflow");
+    expect(first.changelog[2]?.summary).toContain("LM Evaluation Harness-style metric-validity source-review boundaries");
+    expect(first.changelog[3]?.summary).toContain("OpenAI Evals-style public-methodology source-review boundaries");
+    expect(first.changelog[4]?.summary).toContain("fact-checking and factuality-evaluation review methodology boundaries");
+    expect(first.changelog[4]?.summary).toContain("Google ADK-style agent-toolkit evaluation metric-validity boundaries");
     for (const previousVersion of [
+      "2026.06.21-r217",
       "2026.06.20-r216",
       "2026.06.20-r215",
       "2026.06.20-r214",
@@ -1973,16 +1975,21 @@ describe("public methodology manifest", () => {
     expect(report.methodologyVersioning?.sourceRef).toContain("github:kiosvantra/metronous");
     expect(report.methodologyVersioning?.sourceRef).toContain("github:sutro-sh/sutro");
     expect(report.methodologyVersioning?.sourceRef).toContain("github:jfrog/agent-belt");
+    expect(report.methodologyVersioning?.sourceRef).toContain("https://www.langchain.com/langsmith");
     expect(report.methodologyVersioning?.sourceRef).toContain("https://phoenix.arize.com");
     expect(report.methodologyVersioning?.sourceRef).toContain("github:google/adk-python");
     expect(report.methodologyVersioning?.receiptHash).toMatch(/^[a-f0-9]{64}$/);
     expect(report.methodologyVersioning?.badgeQueryParams).toContain("amc_methodology_assurance");
+    expect(report.methodologyVersioning?.requiredAuditFields).toContain("langSmithMethodologyVersionProof");
     expect(report.methodologyVersioning?.requiredAuditFields).toContain("arizePhoenixThresholdPolicy");
     expect(report.methodologyVersioning?.requiredAuditFields).toContain("googleAdkValidationTable");
+    expect(report.methodologyVersioning?.presentAuditFields).toContain("sourceReview.langSmith.metricGate");
     expect(report.methodologyVersioning?.presentAuditFields).toContain("sourceReview.arizePhoenix.metricGate");
     expect(report.methodologyVersioning?.presentAuditFields).toContain("sourceReview.googleAdk.metricGate");
+    expect(report.methodologyVersioning?.evidenceRefs).toContain("amc:langsmith-source-review-boundary");
     expect(report.methodologyVersioning?.evidenceRefs).toContain("amc:arize-phoenix-source-review-boundary");
     expect(report.methodologyVersioning?.evidenceRefs).toContain("amc:google-adk-source-review-boundary");
+    expect(report.methodologyVersioning?.rejectedEvidenceRefs).toContain("metadata-only:langchain.com/langsmith");
     expect(report.methodologyVersioning?.rejectedEvidenceRefs).toContain("metadata-only:phoenix.arize.com");
     expect(report.methodologyVersioning?.rejectedEvidenceRefs).toContain("metadata-only:google/adk-python");
     expect(report.methodologyVersioning?.batchMethodologyProof?.dryRunCostEstimateRequired).toBe(true);

@@ -13,13 +13,14 @@ describe("GAP-0638 PocketFlow public-methodology source-review boundary", () => 
   it("publishes methodology-versioned Score/Shield/Watch boundaries without a PocketFlow subsystem", () => {
     const manifest = getPublicMethodologyManifest();
 
-    expect(AMC_PUBLIC_METHODOLOGY_VERSION).toBe("2026.06.21-r217");
-    expect(manifest.changelog[0]).toMatchObject({
+    expect(AMC_PUBLIC_METHODOLOGY_VERSION).toBe("2026.06.25-r218");
+    const pocketFlowChangelog = manifest.changelog.find((row) => row.version === "2026.06.21-r217");
+    expect(pocketFlowChangelog).toMatchObject({
       version: "2026.06.21-r217",
       date: "2026-06-21"
     });
-    expect(manifest.changelog[0]?.summary).toContain("PocketFlow-style public-methodology source-review boundaries");
-    expect(manifest.changelog[0]?.migration).toContain("Reports generated under 2026.06.20-r216");
+    expect(pocketFlowChangelog?.summary).toContain("PocketFlow-style public-methodology source-review boundaries");
+    expect(pocketFlowChangelog?.migration).toContain("Reports generated under 2026.06.20-r216");
     expect(manifest.deprecationNotice).toContain("2026.06.21-r217");
     expect(manifest.deprecationNotice).toContain("PocketFlow-style public-methodology");
     expect(manifest.migrationGuidance.join("\n")).toContain("PocketFlow-style public-methodology claims");
