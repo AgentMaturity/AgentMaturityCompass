@@ -219,6 +219,26 @@ export {
   type ReviewerSecondReview
 } from "./audit/reviewerIndependence.js";
 export {
+  buildPosthocAuditSamplingReceipt,
+  verifyPosthocAuditSamplingReceipt,
+  renderPosthocAuditSamplingAuditExport,
+  type PosthocAuditCorrectiveAction,
+  type PosthocAuditCorrectiveActionStatus,
+  type PosthocAuditFinding,
+  type PosthocAuditFindingSeverity,
+  type PosthocAuditReviewedAction,
+  type PosthocAuditReviewDecision,
+  type PosthocAuditSamplePlan,
+  type PosthocAuditSamplingEvidenceLink,
+  type PosthocAuditSamplingMethod,
+  type PosthocAuditSamplingReceipt,
+  type PosthocAuditSamplingRiskTier,
+  type PosthocAuditSamplingRow,
+  type PosthocAuditSamplingSourceCitation,
+  type PosthocAuditSamplingVerification,
+  type PosthocAuditScoreImpact
+} from "./audit/posthocAuditSampling.js";
+export {
   artifactProvenanceManifestSchema,
   artifactProvenanceSignatureSchema,
   signArtifactProvenance,

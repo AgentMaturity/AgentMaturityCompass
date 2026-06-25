@@ -183,6 +183,22 @@ Each reviewer row includes:
 
 Reviewer-independence verification fails closed when source citations are missing, the reviewer cannot be identified, the separation rule is missing, the reviewer is also the requester, a conflict check is missing or unsigned, a conflict flag is present, a high-risk second review is missing or unsigned, an approval receipt is missing, or evidence lineage is missing or malformed. Source metadata, paper titles, policy names, or unsigned reviewer notes do not satisfy the receipt.
 
+## Post-Hoc Audit Sampling Receipts
+
+Completed autonomous actions can use `buildPosthocAuditSamplingReceipt` from `src/audit/posthocAuditSampling.ts` to prove retrospective human audit coverage without adding a separate audit-workflow engine. The receipt is a generic Comply, Passport, and Vault artifact for sampled action reviews, audit findings, corrective actions, and scoring deltas.
+
+Each sampled action row includes:
+
+- **Sample plan**: plan ID, population ID, population size, sample size, method, risk tier, owner, plan time, signed plan evidence, and signature hash.
+- **Reviewed action**: action ID, agent ID, policy ID, completion time, sample time, reviewer ID, review decision, signed review evidence, and signature hash.
+- **Findings**: signed finding records with severity, owner, opened time, and action linkage.
+- **Corrective actions**: signed corrective-action records linked to findings, with owner, status, due date, and optional regression test reference.
+- **Score impact**: signed diagnostic score-impact rows with dimension ID, question ID, before/after scores, impact, and reason.
+- **Evidence lineage**: event hashes and signed evidence references summarized into an evidence-chain hash.
+- **Source citations**: source-backed review or control obligations supplied by the operator.
+
+Post-hoc audit sampling verification fails closed when source citations are missing, the sample plan is missing or unsigned, reviewed action metadata is missing, review evidence is unsigned, evidence lineage is missing, non-passing reviews lack findings, findings lack corrective actions, score impact rows are missing, or row and receipt hashes do not verify. Source metadata, website labels, policy names, or unsigned review notes do not satisfy the receipt.
+
 ## Governance Exception Lifecycle Receipts
 
 Governance exception and waiver reviews can use `buildGovernanceExceptionLifecycleReceipt` from `src/compliance/exceptionLifecycle.ts` to prove temporary risk acceptances without adding a separate workflow engine. The receipt is a generic Comply, Passport, and Vault artifact for policy exceptions, compliance waivers, and compensating-control windows.
