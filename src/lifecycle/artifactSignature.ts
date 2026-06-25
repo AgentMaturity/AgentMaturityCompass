@@ -26,6 +26,7 @@ const artifactSignatureSchema = z.object({
     "runtime-state-checkpoint",
     "runtime-state-restore-proof",
     "partner-interoperability-fixture",
+    "rag-grounding-eval-receipt",
     "fleet-lifecycle-run",
     "trace-failure-index",
     "fixer-rca-report",

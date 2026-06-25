@@ -80,6 +80,30 @@ export type {
   RAGOutputEvaluation,
   RAGCitationEvaluation,
 } from "./ragMaturity.js";
+export {
+  buildRagGroundingEvalReceipt,
+  ragGroundingEvalReceiptPath,
+  renderRagGroundingEvalAuditExport,
+  verifyRagGroundingEvalReceipt,
+  writeRagGroundingEvalReceipt
+} from "./ragGroundingEval.js";
+export type {
+  RagGroundingClaimEvaluation,
+  RagGroundingClaimLabel,
+  RagGroundingEnforcementAction,
+  RagGroundingEvalCase,
+  RagGroundingEvalCaseInput,
+  RagGroundingEvalMetrics,
+  RagGroundingEvalReceipt,
+  RagGroundingEvalSourceCitation,
+  RagGroundingEvalVerification,
+  RagGroundingEvalWriteResult,
+  RagGroundingFinding,
+  RagGroundingFindingKind,
+  RagGroundingFindingSeverity,
+  RagGroundingRetrievedChunk,
+  RagGroundingRetrievedChunkInput
+} from "./ragGroundingEval.js";
 
 export { scoreMultiAgentDimension } from "./multiAgentDimension.js";
 export type { MultiAgentDimensionScore, MultiAgentProfile } from "./multiAgentDimension.js";
