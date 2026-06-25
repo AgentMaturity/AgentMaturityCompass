@@ -271,6 +271,9 @@ export {
   renderReleaseGateAuditExport
 } from "./ci/gate.js";
 export type {
+  ReleaseGateControlEvidence,
+  ReleaseGateControlKind,
+  ReleaseGateControlStatus,
   ReleaseGateOverrideStatus,
   ReleaseGateSourceCitation,
   ReleaseGateEvidenceLink,

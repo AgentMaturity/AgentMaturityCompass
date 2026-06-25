@@ -53,6 +53,8 @@ interface SignaturePayload {
 }
 
 export type ReleaseGateOverrideStatus = "none" | "requested" | "approved" | "rejected" | "expired";
+export type ReleaseGateControlKind = "score" | "security" | "compliance" | "cost" | "observability";
+export type ReleaseGateControlStatus = "not_recorded" | "passed" | "failed" | "missing";
 
 export interface ReleaseGateSourceCitation {
   sourceId: string;
@@ -79,6 +81,13 @@ export interface ReleaseGateOverrideRecord {
   signatureSha256?: string;
 }
 
+export interface ReleaseGateControlEvidence {
+  control: ReleaseGateControlKind;
+  passed: boolean;
+  evidenceRef: string;
+  reason: string;
+}
+
 export interface ReleaseGateRunRecord {
   gateId: string;
   agentId: string;
@@ -92,6 +101,7 @@ export interface ReleaseGateRunRecord {
   runReceiptRef: string;
   runReceiptHash: string;
   override?: ReleaseGateOverrideRecord;
+  controlEvidence?: ReleaseGateControlEvidence[];
   evidenceRefs: ReleaseGateEvidenceLink[];
   sourceCitationIds?: string[];
 }
@@ -111,6 +121,8 @@ export interface ReleaseGateReceiptRow {
   runReceiptHash: string;
   overrideStatus: ReleaseGateOverrideStatus;
   overrideId: string | null;
+  controlStatus: ReleaseGateControlStatus;
+  controlEvidence: ReleaseGateControlEvidence[];
   sourceCitationIds: string[];
   evidenceRefs: ReleaseGateEvidenceLink[];
   evidenceChainHash: string;
@@ -597,6 +609,55 @@ function releaseGateOverrideValid(override: ReleaseGateOverrideRecord | undefine
   );
 }
 
+const requiredReleaseGateControls: ReleaseGateControlKind[] = ["score", "security", "compliance", "cost", "observability"];
+
+function releaseGateControlStatus(controlEvidence: ReleaseGateControlEvidence[] | undefined): ReleaseGateControlStatus {
+  if (!controlEvidence) {
+    return "not_recorded";
+  }
+  const byControl = new Map(controlEvidence.map((evidence) => [evidence.control, evidence]));
+  if (requiredReleaseGateControls.some((control) => !byControl.has(control))) {
+    return "missing";
+  }
+  if (controlEvidence.some((evidence) => !evidence.evidenceRef || !evidence.reason)) {
+    return "missing";
+  }
+  return controlEvidence.every((evidence) => evidence.passed) ? "passed" : "failed";
+}
+
+function releaseGateControlEvidenceReasons(params: {
+  gateLabel: string;
+  passed: boolean;
+  failureReasons: string[];
+  controlEvidence: ReleaseGateControlEvidence[] | undefined;
+}): string[] {
+  if (!params.controlEvidence) {
+    return [];
+  }
+  const reasons: string[] = [];
+  const byControl = new Map(params.controlEvidence.map((evidence) => [evidence.control, evidence]));
+  for (const control of requiredReleaseGateControls) {
+    const evidence = byControl.get(control);
+    if (!evidence) {
+      reasons.push(`${params.gateLabel}:controlEvidence:${control}:missing`);
+      continue;
+    }
+    if (!evidence.evidenceRef) {
+      reasons.push(`${params.gateLabel}:controlEvidence:${control}:evidenceRef:missing`);
+    }
+    if (!evidence.reason) {
+      reasons.push(`${params.gateLabel}:controlEvidence:${control}:reason:missing`);
+    }
+    if (params.passed && !evidence.passed) {
+      reasons.push(`${params.gateLabel}:controlEvidence:${control}:failed`);
+    }
+  }
+  if (!params.passed && params.controlEvidence.some((evidence) => !evidence.passed) && params.failureReasons.length === 0) {
+    reasons.push(`${params.gateLabel}:controlEvidence:failureReason:missing`);
+  }
+  return reasons;
+}
+
 function validateReleaseGateRow(row: ReleaseGateReceiptRow): string[] {
   const reasons: string[] = [];
   if (!row.gateId) reasons.push("gateId:missing");
@@ -627,6 +688,16 @@ function validateReleaseGateRow(row: ReleaseGateReceiptRow): string[] {
   if (row.evidenceChainHash !== sha256Hex(canonicalize(row.evidenceRefs))) {
     reasons.push(`${row.gateId || "unknown"}:evidenceChainHash:mismatch`);
   }
+  const expectedControlStatus = releaseGateControlStatus(row.controlEvidence.length > 0 ? row.controlEvidence : undefined);
+  if (row.controlStatus !== expectedControlStatus) {
+    reasons.push(`${row.gateId || "unknown"}:controlStatus:mismatch`);
+  }
+  reasons.push(...releaseGateControlEvidenceReasons({
+    gateLabel: row.gateId || "unknown",
+    passed: row.passed,
+    failureReasons: row.failureReasons,
+    controlEvidence: row.controlEvidence.length > 0 ? row.controlEvidence : undefined
+  }));
   const { rowHash: actual, ...baseRow } = row;
   if (releaseGateRowHash(baseRow) !== actual) {
     reasons.push(`${row.gateId || "unknown"}:rowHash:mismatch`);
@@ -675,9 +746,16 @@ export function buildReleaseGateReceipt(input: {
     if (gate.override && !releaseGateOverrideValid(gate.override)) {
       failClosedReasons.push(`${gateLabel}:override:missing`);
     }
+    failClosedReasons.push(...releaseGateControlEvidenceReasons({
+      gateLabel,
+      passed: gate.passed,
+      failureReasons: gate.failureReasons,
+      controlEvidence: gate.controlEvidence
+    }));
 
     const gateConfigHash = sha256Hex(canonicalize(gate.gateConfig));
     const evidenceChainHash = sha256Hex(canonicalize(gate.evidenceRefs));
+    const controlEvidence = gate.controlEvidence ?? [];
     const baseRow: Omit<ReleaseGateReceiptRow, "rowHash"> = {
       gateId: gate.gateId,
       agentId: gate.agentId,
@@ -693,6 +771,8 @@ export function buildReleaseGateReceipt(input: {
       runReceiptHash: gate.runReceiptHash,
       overrideStatus: gate.override?.status ?? "none",
       overrideId: gate.override?.overrideId ?? null,
+      controlStatus: releaseGateControlStatus(gate.controlEvidence),
+      controlEvidence,
       sourceCitationIds,
       evidenceRefs: gate.evidenceRefs,
       evidenceChainHash
@@ -761,18 +841,37 @@ export function renderReleaseGateAuditExport(receipt: ReleaseGateReceipt): strin
   lines.push("");
   lines.push("## Release Gates");
   lines.push("");
-  lines.push("| Gate | Agent | Environment | Result | Override | Run receipt | Failure reasons |");
-  lines.push("| --- | --- | --- | --- | --- | --- | --- |");
+  lines.push("| Gate | Agent | Environment | Result | Control status | Override | Run receipt | Failure reasons |");
+  lines.push("| --- | --- | --- | --- | --- | --- | --- | --- |");
   for (const row of receipt.rows) {
     lines.push([
       row.gateId,
       row.agentId,
       row.environment,
       row.passed ? "passed" : "failed",
+      `control ${row.controlStatus}`,
       `override ${row.overrideStatus}`,
       `${row.runReceiptRef || "MISSING"} (${row.runReceiptHash || "MISSING"})`,
       row.failureReasons.join("; ") || "none"
     ].map((value) => value.replace(/\|/g, "\\|")).join(" | ").replace(/^/, "| ").concat(" |"));
+  }
+  if (receipt.rows.some((row) => row.controlEvidence.length > 0)) {
+    lines.push("");
+    lines.push("## Release Controls");
+    lines.push("");
+    lines.push("| Gate | Control | Result | Evidence | Reason |");
+    lines.push("| --- | --- | --- | --- | --- |");
+    for (const row of receipt.rows) {
+      for (const control of row.controlEvidence) {
+        lines.push([
+          row.gateId,
+          control.control,
+          control.passed ? "passed" : "failed",
+          control.evidenceRef || "MISSING",
+          control.reason || "missing"
+        ].map((value) => value.replace(/\|/g, "\\|")).join(" | ").replace(/^/, "| ").concat(" |"));
+      }
+    }
   }
   if (receipt.failClosedReasons.length > 0) {
     lines.push("");
