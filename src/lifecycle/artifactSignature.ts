@@ -21,6 +21,7 @@ const artifactSignatureSchema = z.object({
     "runtime-firewall-decision",
     "runtime-run-state",
     "runtime-run-event",
+    "runtime-lifecycle-graph",
     "fleet-lifecycle-run",
     "trace-failure-index",
     "fixer-rca-report",

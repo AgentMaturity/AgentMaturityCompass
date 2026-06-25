@@ -25,3 +25,21 @@ export {
   type RuntimeRunSource,
   type RuntimeRunStatus
 } from "./runManager.js";
+export {
+  buildRuntimeLifecycleGraph,
+  renderRuntimeLifecycleGraphAuditExport,
+  runtimeLifecycleGraphPath,
+  runtimeLifecycleRequiredNodeKinds,
+  verifyRuntimeLifecycleGraph,
+  writeRuntimeLifecycleGraph,
+  type RuntimeLifecycleEdgeKind,
+  type RuntimeLifecycleGraph,
+  type RuntimeLifecycleGraphEdge,
+  type RuntimeLifecycleGraphNode,
+  type RuntimeLifecycleGraphReplay,
+  type RuntimeLifecycleGraphSourceCitation,
+  type RuntimeLifecycleGraphVerification,
+  type RuntimeLifecycleGraphWriteResult,
+  type RuntimeLifecycleNodeKind,
+  type RuntimeLifecycleRequiredNodeKind
+} from "./lifecycleGraph.js";
