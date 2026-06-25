@@ -773,6 +773,27 @@ export type {
   ProcessIntegrationQueueResult,
   QueuedIntegrationDelivery
 } from "./integrations/integrationDeliveryQueue.js";
+export {
+  buildPartnerInteroperabilityFixture,
+  exportRuntimeLifecycleGraphForPartner,
+  partnerInteroperabilityFixturePath,
+  renderPartnerInteroperabilityFixtureAuditExport,
+  verifyPartnerInteroperabilityFixture,
+  writePartnerInteroperabilityFixture
+} from "./integrations/partnerInteroperability.js";
+export type {
+  PartnerFieldReviewDecision,
+  PartnerInteroperabilityFixture,
+  PartnerInteroperabilityOwner,
+  PartnerInteroperabilityRoundTrip,
+  PartnerInteroperabilitySourceCitation,
+  PartnerInteroperabilityVerification,
+  PartnerInteroperabilityWriteResult,
+  PartnerLifecycleGraphEdgeExport,
+  PartnerLifecycleGraphExport,
+  PartnerLifecycleGraphNodeExport,
+  PartnerUnsupportedField
+} from "./integrations/partnerInteroperability.js";
 export { defaultSsoConfig, mapSsoGroupsToRole, normalizeEnterpriseRole, resolveSsoRole } from "./auth/ssoConfig.js";
 export type {
   EnterpriseRole,

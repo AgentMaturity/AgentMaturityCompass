@@ -83,3 +83,24 @@ export type {
   ProcessIntegrationQueueResult,
   QueuedIntegrationDelivery
 } from "./integrationDeliveryQueue.js";
+export {
+  buildPartnerInteroperabilityFixture,
+  exportRuntimeLifecycleGraphForPartner,
+  partnerInteroperabilityFixturePath,
+  renderPartnerInteroperabilityFixtureAuditExport,
+  verifyPartnerInteroperabilityFixture,
+  writePartnerInteroperabilityFixture
+} from "./partnerInteroperability.js";
+export type {
+  PartnerFieldReviewDecision,
+  PartnerInteroperabilityFixture,
+  PartnerInteroperabilityOwner,
+  PartnerInteroperabilityRoundTrip,
+  PartnerInteroperabilitySourceCitation,
+  PartnerInteroperabilityVerification,
+  PartnerInteroperabilityWriteResult,
+  PartnerLifecycleGraphEdgeExport,
+  PartnerLifecycleGraphExport,
+  PartnerLifecycleGraphNodeExport,
+  PartnerUnsupportedField
+} from "./partnerInteroperability.js";
