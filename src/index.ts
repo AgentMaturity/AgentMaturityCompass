@@ -1,5 +1,20 @@
 export { quickstartWizard, initWorkspace, runDoctor } from "./workspace.js";
 export { runDoctorCli } from "./doctor/doctorCli.js";
+export {
+  buildSupplyChainGuardDecisionReceiptInput,
+  buildSupplyChainPostureReport,
+  computeSupplyChainVersionHash,
+  verifySupplyChainPostureReportIntegrity,
+  type BuildSupplyChainPostureReportInput,
+  type SupplyChainAllowedSourcePolicy,
+  type SupplyChainComponentInput,
+  type SupplyChainComponentKind,
+  type SupplyChainComponentPosture,
+  type SupplyChainPostureIntegrityResult,
+  type SupplyChainPostureReport,
+  type SupplyChainPostureSummary,
+  type SupplyChainVulnerabilityState,
+} from "./security/index.js";
 
 export { openLedger, verifyLedgerIntegrity } from "./ledger/ledger.js";
 export { wrapRuntime, wrapAny, superviseProcess, startMonitor } from "./ledger/monitor.js";
