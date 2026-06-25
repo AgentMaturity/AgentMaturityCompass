@@ -19,6 +19,7 @@ const artifactSignatureSchema = z.object({
     "org-run-artifact",
     "runtime-firewall-policy",
     "runtime-firewall-decision",
+    "runtime-autonomy-boundary-decision",
     "runtime-run-state",
     "runtime-run-event",
     "runtime-lifecycle-graph",

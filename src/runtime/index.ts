@@ -65,3 +65,22 @@ export {
   type RuntimeStateRetentionClass,
   type RuntimeStateRetentionPolicy
 } from "./stateCheckpoint.js";
+export {
+  defaultRuntimeAutonomyBoundaryPolicy,
+  evaluateRuntimeAutonomyBoundary,
+  renderRuntimeAutonomyBoundaryAuditExport,
+  runtimeAutonomyAuthorityLevels,
+  runtimeAutonomyBoundaryDecisionPath,
+  runtimeAutonomyRiskTiers,
+  verifyRuntimeAutonomyBoundaryDecision,
+  type RuntimeAutonomyApprovalReceipt,
+  type RuntimeAutonomyAuthority,
+  type RuntimeAutonomyBoundaryAction,
+  type RuntimeAutonomyBoundaryDecision,
+  type RuntimeAutonomyBoundaryLimit,
+  type RuntimeAutonomyBoundaryPolicy,
+  type RuntimeAutonomyBoundarySourceCitation,
+  type RuntimeAutonomyBoundaryVerification,
+  type RuntimeAutonomyPlanStep,
+  type RuntimeAutonomyRiskTier
+} from "./autonomyBoundary.js";
