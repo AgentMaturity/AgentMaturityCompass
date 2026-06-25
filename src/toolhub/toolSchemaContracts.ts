@@ -51,6 +51,12 @@ export interface ToolSchemaSideEffectValidation {
   warnings: string[];
 }
 
+export interface ToolSchemaFailureModeValidation {
+  valid: boolean;
+  errors: string[];
+  warnings: string[];
+}
+
 export interface ToolSchemaContractReceipt {
   schemaVersion: "2026-06-25";
   receiptId: string;
@@ -68,6 +74,8 @@ export interface ToolSchemaContractReceipt {
   sideEffectDeclaration: ToolSchemaSideEffectDeclaration;
   observedSideEffects: ToolSchemaObservedSideEffects;
   sideEffectValidation: ToolSchemaSideEffectValidation;
+  observedFailureMode: string | null;
+  failureModeValidation: ToolSchemaFailureModeValidation;
   approvalReceiptId: string | null;
   driftFindings: string[];
   allowed: boolean;
@@ -173,6 +181,28 @@ function validateSideEffects(input: {
   return { valid: errors.length === 0, errors, warnings };
 }
 
+function validateFailureMode(input: {
+  declared: string[];
+  observed?: string | null;
+}): ToolSchemaFailureModeValidation {
+  const errors: string[] = [];
+  const warnings: string[] = [];
+  const declared = unique(input.declared);
+  const observed = input.observed?.trim() || null;
+
+  if (declared.length === 0) {
+    errors.push("failure modes not declared");
+  }
+  if (observed && !declared.includes(observed)) {
+    errors.push(`failure mode not declared: ${observed}`);
+  }
+  if (!observed) {
+    warnings.push("failure mode not observed");
+  }
+
+  return { valid: errors.length === 0, errors, warnings };
+}
+
 function outputNotObservedValidation(phase: ToolSchemaContractPhase): SchemaValidation {
   if (phase === "afterExecution") {
     return {
@@ -229,6 +259,7 @@ export function validateToolSchemaContractInvocation(input: {
   input: unknown;
   output?: unknown;
   observedSideEffects: ToolSchemaObservedSideEffects;
+  observedFailureMode?: string | null;
   approvalReceiptId?: string | null;
 }): ToolSchemaContractReceipt {
   const contractSignatureValid = verifyContractSignature(input.workspace, input.contract);
@@ -239,6 +270,10 @@ export function validateToolSchemaContractInvocation(input: {
     declaration: input.contract.sideEffectDeclaration,
     observed: input.observedSideEffects,
     approvalReceiptId: input.approvalReceiptId ?? null
+  });
+  const failureModeValidation = validateFailureMode({
+    declared: input.contract.failureModes,
+    observed: input.observedFailureMode ?? null
   });
   const driftFindings: string[] = [];
   if (!contractSignatureValid) {
@@ -256,8 +291,19 @@ export function validateToolSchemaContractInvocation(input: {
   if (sideEffectValidation.errors.some((error) => error.includes("approval required"))) {
     driftFindings.push("approval_required");
   }
+  if (failureModeValidation.errors.some((error) => error === "failure modes not declared")) {
+    driftFindings.push("failure_modes_missing");
+  }
+  if (failureModeValidation.errors.some((error) => error.startsWith("failure mode not declared:"))) {
+    driftFindings.push("failure_mode_drift");
+  }
 
-  const allowed = contractSignatureValid && inputValidation.valid && outputValidation.valid && sideEffectValidation.valid;
+  const allowed =
+    contractSignatureValid &&
+    inputValidation.valid &&
+    outputValidation.valid &&
+    sideEffectValidation.valid &&
+    failureModeValidation.valid;
   const baseReceipt: ToolSchemaContractReceipt = {
     schemaVersion: "2026-06-25",
     receiptId: `toolcontract_${randomUUID().replace(/-/g, "")}`,
@@ -275,6 +321,8 @@ export function validateToolSchemaContractInvocation(input: {
     sideEffectDeclaration: input.contract.sideEffectDeclaration,
     observedSideEffects: input.observedSideEffects,
     sideEffectValidation,
+    observedFailureMode: input.observedFailureMode ?? null,
+    failureModeValidation,
     approvalReceiptId: input.approvalReceiptId ?? null,
     driftFindings: unique(driftFindings),
     allowed,
@@ -312,6 +360,9 @@ export function verifyToolSchemaContractReceipt(input: {
   }
   if (!receipt.sideEffectValidation || !Array.isArray(receipt.sideEffectValidation.errors)) {
     reasons.push("tool-schema-contract:side-effect-validation:missing");
+  }
+  if (!receipt.failureModeValidation || !Array.isArray(receipt.failureModeValidation.errors)) {
+    reasons.push("tool-schema-contract:failure-mode-validation:missing");
   }
   if (!receipt.surfaceBinding.includes("Enforce") || !receipt.surfaceBinding.includes("Shield") || !receipt.surfaceBinding.includes("Vault")) {
     reasons.push("tool-schema-contract:surface-binding:missing");
