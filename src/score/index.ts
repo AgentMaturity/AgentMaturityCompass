@@ -89,6 +89,7 @@ export {
 } from "./ragGroundingEval.js";
 export type {
   RagGroundingClaimEvaluation,
+  RagGroundingClaimCitationProvenance,
   RagGroundingClaimLabel,
   RagGroundingEnforcementAction,
   RagGroundingEvalCase,
@@ -102,7 +103,8 @@ export type {
   RagGroundingFindingKind,
   RagGroundingFindingSeverity,
   RagGroundingRetrievedChunk,
-  RagGroundingRetrievedChunkInput
+  RagGroundingRetrievedChunkInput,
+  RagGroundingSourcePermissionStatus
 } from "./ragGroundingEval.js";
 
 export { scoreMultiAgentDimension } from "./multiAgentDimension.js";

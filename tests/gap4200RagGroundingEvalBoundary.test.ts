@@ -100,6 +100,8 @@ describe("GAP-4200 RAG grounding evaluation boundary", () => {
               sourceTitle: "AMC RAG grounding guide",
               documentVersion: "2026.06.25",
               ingestedAt: "2026-06-25T09:50:00.000Z",
+              retrievedAt: "2026-06-25T09:51:00.000Z",
+              permissionStatus: "allowed",
               retrievedRank: 1,
               retrievalScore: 0.97
             },
@@ -111,6 +113,8 @@ describe("GAP-4200 RAG grounding evaluation boundary", () => {
               sourceTitle: "AMC claim safety guide",
               documentVersion: "2026.06.25",
               ingestedAt: "2026-06-25T09:50:00.000Z",
+              retrievedAt: "2026-06-25T09:51:02.000Z",
+              permissionStatus: "allowed",
               retrievedRank: 2,
               retrievalScore: 0.88
             }

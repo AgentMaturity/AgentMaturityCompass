@@ -106,6 +106,8 @@ describe("GAP-4207 Ragas poisoning and staleness guard boundary", () => {
               sourceTitle: "Ragas faithfulness docs",
               documentVersion: "stable-2026-01-13",
               ingestedAt: "2026-06-25T10:11:07.000Z",
+              retrievedAt: "2026-06-25T10:12:00.000Z",
+              permissionStatus: "allowed",
               retrievedRank: 1,
               retrievalScore: 0.95
             },

@@ -15,6 +15,7 @@ export type RagGroundingFindingKind =
   | "poisoning_signal";
 export type RagGroundingFindingSeverity = "low" | "medium" | "high" | "critical";
 export type RagGroundingEnforcementAction = "allow" | "warn" | "block";
+export type RagGroundingSourcePermissionStatus = "allowed" | "denied" | "unknown";
 
 export interface RagGroundingEvalSourceCitation {
   sourceId: string;
@@ -31,6 +32,8 @@ export interface RagGroundingRetrievedChunkInput {
   sourceTitle?: string | null;
   documentVersion?: string | null;
   ingestedAt?: string | null;
+  retrievedAt?: string | null;
+  permissionStatus?: RagGroundingSourcePermissionStatus | null;
   retrievedRank?: number | null;
   retrievalScore?: number | null;
   stale?: boolean;
@@ -46,10 +49,23 @@ export interface RagGroundingRetrievedChunk {
   sourceTitle: string | null;
   documentVersion: string | null;
   ingestedAt: string | null;
+  retrievedAt: string | null;
+  permissionStatus: RagGroundingSourcePermissionStatus;
   retrievedRank: number | null;
   retrievalScore: number | null;
   stale: boolean;
   poisoningSignal: boolean;
+}
+
+export interface RagGroundingClaimCitationProvenance {
+  claimId: string;
+  sourceChunkId: string;
+  retrievedAt: string | null;
+  confidence: number;
+  permissionStatus: RagGroundingSourcePermissionStatus;
+  sourceId: string | null;
+  sourceUri: string | null;
+  documentVersion: string | null;
 }
 
 export interface RagGroundingClaimEvaluation {
@@ -77,6 +93,7 @@ export interface RagGroundingEvalCase {
   answerPreview: string;
   retrievedChunks: RagGroundingRetrievedChunk[];
   claims: RagGroundingClaimEvaluation[];
+  citationProvenance: RagGroundingClaimCitationProvenance[];
   caseHash: string;
 }
 
@@ -95,6 +112,7 @@ export interface RagGroundingEvalMetrics {
   staleChunkRate: number;
   poisoningSignalRate: number;
   provenanceCoverage: number;
+  citationProvenanceCoverage: number;
 }
 
 export interface RagGroundingFinding {
@@ -159,6 +177,11 @@ function preview(text: string): string {
   return text.replace(/\s+/g, " ").trim().slice(0, 240);
 }
 
+function normalizePermissionStatus(value: RagGroundingSourcePermissionStatus | null | undefined): RagGroundingSourcePermissionStatus {
+  if (value === "allowed" || value === "denied" || value === "unknown") return value;
+  return "unknown";
+}
+
 function normalizeChunk(chunk: RagGroundingRetrievedChunkInput): RagGroundingRetrievedChunk {
   return {
     chunkId: chunk.chunkId,
@@ -169,6 +192,8 @@ function normalizeChunk(chunk: RagGroundingRetrievedChunkInput): RagGroundingRet
     sourceTitle: chunk.sourceTitle ?? null,
     documentVersion: chunk.documentVersion ?? null,
     ingestedAt: chunk.ingestedAt ?? null,
+    retrievedAt: chunk.retrievedAt ?? null,
+    permissionStatus: normalizePermissionStatus(chunk.permissionStatus),
     retrievedRank: Number.isFinite(chunk.retrievedRank ?? NaN) ? Math.max(1, Math.floor(chunk.retrievedRank!)) : null,
     retrievalScore: Number.isFinite(chunk.retrievalScore ?? NaN) ? clamp01(chunk.retrievalScore!) : null,
     stale: chunk.stale ?? false,
@@ -187,19 +212,47 @@ function normalizeClaim(claim: RagGroundingClaimEvaluation): RagGroundingClaimEv
   };
 }
 
+function buildCitationProvenance(
+  chunks: RagGroundingRetrievedChunk[],
+  claims: RagGroundingClaimEvaluation[]
+): RagGroundingClaimCitationProvenance[] {
+  const chunksById = new Map(chunks.map((chunk) => [chunk.chunkId, chunk]));
+  const rows: RagGroundingClaimCitationProvenance[] = [];
+  for (const claim of claims) {
+    for (const chunkId of claim.evidenceChunkIds) {
+      const chunk = chunksById.get(chunkId);
+      if (!chunk) continue;
+      rows.push({
+        claimId: claim.claimId,
+        sourceChunkId: chunk.chunkId,
+        retrievedAt: chunk.retrievedAt,
+        confidence: claim.confidence,
+        permissionStatus: chunk.permissionStatus,
+        sourceId: chunk.sourceId,
+        sourceUri: chunk.sourceUri,
+        documentVersion: chunk.documentVersion
+      });
+    }
+  }
+  return rows.sort((a, b) => `${a.claimId}:${a.sourceChunkId}`.localeCompare(`${b.claimId}:${b.sourceChunkId}`));
+}
+
 function caseDigest(inputCase: Omit<RagGroundingEvalCase, "caseHash">): string {
   return sha256Hex(canonicalize(inputCase));
 }
 
 function normalizeCase(inputCase: RagGroundingEvalCaseInput): RagGroundingEvalCase {
+  const retrievedChunks = inputCase.retrievedChunks.map(normalizeChunk);
+  const claims = inputCase.claims.map(normalizeClaim);
   const normalizedWithoutHash: Omit<RagGroundingEvalCase, "caseHash"> = {
     queryId: inputCase.queryId,
     querySha256: sha256Hex(inputCase.query),
     queryPreview: preview(inputCase.query),
     answerSha256: sha256Hex(inputCase.answer),
     answerPreview: preview(inputCase.answer),
-    retrievedChunks: inputCase.retrievedChunks.map(normalizeChunk),
-    claims: inputCase.claims.map(normalizeClaim)
+    retrievedChunks,
+    claims,
+    citationProvenance: buildCitationProvenance(retrievedChunks, claims)
   };
   return { ...normalizedWithoutHash, caseHash: caseDigest(normalizedWithoutHash) };
 }
@@ -213,9 +266,24 @@ function hasChunkProvenance(chunk: RagGroundingRetrievedChunk): boolean {
   return Boolean((chunk.sourceId || chunk.sourceUri) && chunk.documentVersion && chunk.ingestedAt);
 }
 
+function hasValidTimestamp(value: string | null): boolean {
+  if (!value) return false;
+  const parsed = Date.parse(value);
+  return Number.isFinite(parsed);
+}
+
+function hasClaimCitationProvenance(row: RagGroundingClaimCitationProvenance): boolean {
+  return hasValidTimestamp(row.retrievedAt) && row.permissionStatus === "allowed";
+}
+
 function computeMetrics(cases: RagGroundingEvalCase[]): RagGroundingEvalMetrics {
   const chunks = cases.flatMap((inputCase) => inputCase.retrievedChunks);
   const claims = cases.flatMap((inputCase) => inputCase.claims);
+  const citationProvenance = cases.flatMap((inputCase) => inputCase.citationProvenance);
+  const citationEvidenceEdgeCount = cases.reduce(
+    (count, inputCase) => count + inputCase.claims.reduce((claimCount, claim) => claimCount + claim.evidenceChunkIds.length, 0),
+    0
+  );
   const retrievedByCase = new Map(cases.map((inputCase) => [
     inputCase.queryId,
     new Set(inputCase.retrievedChunks.map((chunk) => chunk.chunkId))
@@ -254,7 +322,8 @@ function computeMetrics(cases: RagGroundingEvalCase[]): RagGroundingEvalMetrics 
     contradictionRate: ratio(contradictedClaimCount, claims.length),
     staleChunkRate: ratio(chunks.filter((chunk) => chunk.stale).length, chunks.length),
     poisoningSignalRate: ratio(chunks.filter((chunk) => chunk.poisoningSignal).length, chunks.length),
-    provenanceCoverage: ratio(chunks.filter(hasChunkProvenance).length, chunks.length)
+    provenanceCoverage: ratio(chunks.filter(hasChunkProvenance).length, chunks.length),
+    citationProvenanceCoverage: ratio(citationProvenance.filter(hasClaimCitationProvenance).length, citationEvidenceEdgeCount)
   };
 }
 
@@ -412,8 +481,16 @@ function collectFailClosedReasons(receipt: RagGroundingEvalReceipt): string[] {
         reasons.push(`rag-grounding-eval:claim:${claim.claimId}:evidence:missing`);
       }
       for (const chunkId of claim.evidenceChunkIds) {
-        if (!retrievedIds.has(chunkId)) {
+        const retrievedChunk = inputCase.retrievedChunks.find((chunk) => chunk.chunkId === chunkId);
+        if (!retrievedIds.has(chunkId) || !retrievedChunk) {
           reasons.push(`rag-grounding-eval:claim:${claim.claimId}:evidence-not-retrieved`);
+          continue;
+        }
+        if (!hasValidTimestamp(retrievedChunk.retrievedAt)) {
+          reasons.push(`rag-grounding-eval:claim:${claim.claimId}:citation:${chunkId}:retrieved-at:missing`);
+        }
+        if (retrievedChunk.permissionStatus !== "allowed") {
+          reasons.push(`rag-grounding-eval:claim:${claim.claimId}:citation:${chunkId}:permission:not-allowed`);
         }
       }
     }
@@ -529,7 +606,14 @@ export function renderRagGroundingEvalAuditExport(receipt: RagGroundingEvalRecei
     `- Retrieved support quality: ${receipt.metrics.retrievedSupportQuality.toFixed(3)}`,
     `- Unsupported claim rate: ${receipt.metrics.unsupportedClaimRate.toFixed(3)}`,
     `- Contradiction rate: ${receipt.metrics.contradictionRate.toFixed(3)}`,
+    `- Citation provenance coverage: ${receipt.metrics.citationProvenanceCoverage.toFixed(3)}`,
     `- Score penalty: ${receipt.scoreImpact.penalty0to100}/100`,
+    "",
+    "## Citation Provenance",
+    ...(receipt.cases.flatMap((inputCase) => inputCase.citationProvenance).length
+      ? receipt.cases.flatMap((inputCase) => inputCase.citationProvenance)
+        .map((row) => `- ${row.claimId} -> ${row.sourceChunkId}: ${row.retrievedAt ?? "missing"} ${row.permissionStatus}`)
+      : ["- None"]),
     "",
     "## Findings",
     ...(receipt.findings.length

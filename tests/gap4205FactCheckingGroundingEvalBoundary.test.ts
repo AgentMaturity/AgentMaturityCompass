@@ -100,6 +100,8 @@ describe("GAP-4205 fact-checking grounding eval boundary", () => {
               sourceTitle: "AMC RAG grounding receipt",
               documentVersion: "2026.06.25",
               ingestedAt: "2026-06-25T09:56:00.000Z",
+              retrievedAt: "2026-06-25T09:57:00.000Z",
+              permissionStatus: "allowed",
               retrievedRank: 1,
               retrievalScore: 0.93
             }

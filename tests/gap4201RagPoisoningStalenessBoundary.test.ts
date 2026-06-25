@@ -103,6 +103,8 @@ describe("GAP-4201 RAG poisoning and staleness guard boundary", () => {
               sourceTitle: "RAG source ledger",
               documentVersion: "2026.06.25",
               ingestedAt: "2026-06-25T10:04:16.000Z",
+              retrievedAt: "2026-06-25T10:05:00.000Z",
+              permissionStatus: "allowed",
               retrievedRank: 1,
               retrievalScore: 0.96
             },
