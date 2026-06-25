@@ -333,13 +333,14 @@ export function renderReviewerIndependenceAuditExport(receipt: ReviewerIndepende
   lines.push("");
   lines.push("## Reviewer Rows");
   lines.push("");
-  lines.push("| Approval | Control | Risk | Reviewer | Separation Rule | Conflicts | Second Review | Evidence chain |");
-  lines.push("| --- | --- | --- | --- | --- | --- | --- | --- |");
+  lines.push("| Approval | Control | Risk | Requester/Owner | Reviewer | Separation Rule | Conflicts | Second Review | Evidence chain |");
+  lines.push("| --- | --- | --- | --- | --- | --- | --- | --- | --- |");
   for (const row of receipt.rows) {
     const values = [
       row.approvalId,
       row.controlId,
       row.riskTier,
+      row.requesterId || "MISSING",
       row.reviewerId || "MISSING",
       row.separationRuleId || "MISSING",
       row.conflictFree ? "none" : row.conflictFlags.join(", ") || "failed",

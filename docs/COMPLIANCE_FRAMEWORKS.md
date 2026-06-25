@@ -173,7 +173,7 @@ High-risk approval reviews can use `buildReviewerIndependenceReceipt` from `src/
 
 Each reviewer row includes:
 
-- **Reviewer metadata**: requester, reviewer, role, org unit, action, control, risk tier, decision, and decision time.
+- **Reviewer metadata**: requester/control owner, reviewer, role, org unit, action, control, risk tier, decision, and decision time.
 - **Role separation**: a separation rule ID plus checks that the reviewer is not the requester and is not acting in the same role.
 - **Conflict flags**: the conflict-check timestamp, conflict flags, and signed conflict-check evidence.
 - **Second review**: required signed second-review metadata for `high` and `critical` actions.
