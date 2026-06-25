@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { getPrivateKeyPem, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
 import { validateSchema, type SchemaDefinition, type SchemaValidation } from "../enforce/schemaGate.js";
-import type { ActionClass } from "../types.js";
+import type { ActionClass, RiskTier } from "../types.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 
@@ -29,6 +29,27 @@ export interface ToolSchemaObservedSideEffects {
   irreversible: boolean;
 }
 
+export type ToolSchemaNetworkPolicy = "none" | "allowlisted" | "open";
+
+export interface ToolSchemaMcpServerRiskPosture {
+  serverId: string;
+  serverVersion: string;
+  riskTier: RiskTier;
+  approvedTransports: string[];
+  leastPrivilegeScopes: string[];
+  sandboxRequired: boolean;
+  networkPolicy: ToolSchemaNetworkPolicy;
+}
+
+export interface ToolSchemaObservedMcpServerRiskPosture {
+  serverId: string;
+  serverVersion: string;
+  transport: string;
+  scopes: string[];
+  sandboxed: boolean;
+  networkPolicy: ToolSchemaNetworkPolicy;
+}
+
 export interface SignedToolSchemaContract {
   schemaVersion: "2026-06-25";
   contractId: string;
@@ -38,6 +59,7 @@ export interface SignedToolSchemaContract {
   outputSchema: SchemaDefinition;
   sideEffectDeclaration: ToolSchemaSideEffectDeclaration;
   failureModes: string[];
+  mcpServerRiskPosture?: ToolSchemaMcpServerRiskPosture;
   sourceCitations: ToolSchemaContractSourceCitation[];
   contractDigestSha256: string;
   contractSignature: string;
@@ -52,6 +74,12 @@ export interface ToolSchemaSideEffectValidation {
 }
 
 export interface ToolSchemaFailureModeValidation {
+  valid: boolean;
+  errors: string[];
+  warnings: string[];
+}
+
+export interface ToolSchemaMcpServerRiskValidation {
   valid: boolean;
   errors: string[];
   warnings: string[];
@@ -76,6 +104,9 @@ export interface ToolSchemaContractReceipt {
   sideEffectValidation: ToolSchemaSideEffectValidation;
   observedFailureMode: string | null;
   failureModeValidation: ToolSchemaFailureModeValidation;
+  mcpServerRiskPosture: ToolSchemaMcpServerRiskPosture | null;
+  observedMcpServerRiskPosture: ToolSchemaObservedMcpServerRiskPosture | null;
+  mcpServerRiskValidation: ToolSchemaMcpServerRiskValidation;
   approvalReceiptId: string | null;
   driftFindings: string[];
   allowed: boolean;
@@ -103,8 +134,20 @@ function unsignedContractPayload(contract: {
   outputSchema: SchemaDefinition;
   sideEffectDeclaration: ToolSchemaSideEffectDeclaration;
   failureModes: string[];
+  mcpServerRiskPosture?: ToolSchemaMcpServerRiskPosture;
   sourceCitations: ToolSchemaContractSourceCitation[];
 }) {
+  const mcpServerRiskPosture = contract.mcpServerRiskPosture
+    ? {
+        serverId: contract.mcpServerRiskPosture.serverId,
+        serverVersion: contract.mcpServerRiskPosture.serverVersion,
+        riskTier: contract.mcpServerRiskPosture.riskTier,
+        approvedTransports: unique(contract.mcpServerRiskPosture.approvedTransports),
+        leastPrivilegeScopes: unique(contract.mcpServerRiskPosture.leastPrivilegeScopes),
+        sandboxRequired: contract.mcpServerRiskPosture.sandboxRequired === true,
+        networkPolicy: contract.mcpServerRiskPosture.networkPolicy
+      }
+    : undefined;
   return {
     schemaVersion: contract.schemaVersion ?? "2026-06-25",
     contractId: contract.contractId,
@@ -120,6 +163,7 @@ function unsignedContractPayload(contract: {
       approvalRequired: contract.sideEffectDeclaration.approvalRequired === true
     },
     failureModes: unique(contract.failureModes),
+    ...(mcpServerRiskPosture ? { mcpServerRiskPosture } : {}),
     sourceCitations: contract.sourceCitations
   };
 }
@@ -203,6 +247,57 @@ function validateFailureMode(input: {
   return { valid: errors.length === 0, errors, warnings };
 }
 
+function networkPolicyRank(policy: ToolSchemaNetworkPolicy): number {
+  if (policy === "none") return 0;
+  if (policy === "allowlisted") return 1;
+  return 2;
+}
+
+function validateMcpServerRisk(input: {
+  declared?: ToolSchemaMcpServerRiskPosture;
+  observed?: ToolSchemaObservedMcpServerRiskPosture | null;
+}): ToolSchemaMcpServerRiskValidation {
+  const errors: string[] = [];
+  const warnings: string[] = [];
+  const declared = input.declared;
+  const observed = input.observed ?? null;
+
+  if (!declared) {
+    warnings.push("mcp server risk posture not declared");
+    return { valid: true, errors, warnings };
+  }
+  if (!observed) {
+    errors.push("mcp server risk posture not observed");
+    return { valid: false, errors, warnings };
+  }
+
+  const approvedTransports = new Set(unique(declared.approvedTransports));
+  const approvedScopes = new Set(unique(declared.leastPrivilegeScopes));
+
+  if (observed.serverId !== declared.serverId) {
+    errors.push(`server id mismatch: ${observed.serverId}`);
+  }
+  if (observed.serverVersion !== declared.serverVersion) {
+    errors.push(`server version mismatch: ${observed.serverVersion}`);
+  }
+  if (!approvedTransports.has(observed.transport)) {
+    errors.push(`transport not approved: ${observed.transport}`);
+  }
+  for (const scope of unique(observed.scopes)) {
+    if (!approvedScopes.has(scope)) {
+      errors.push(`scope not least-privilege approved: ${scope}`);
+    }
+  }
+  if (declared.sandboxRequired && !observed.sandboxed) {
+    errors.push("sandbox required but not observed");
+  }
+  if (networkPolicyRank(observed.networkPolicy) > networkPolicyRank(declared.networkPolicy)) {
+    errors.push(`network policy drift: ${observed.networkPolicy}`);
+  }
+
+  return { valid: errors.length === 0, errors, warnings };
+}
+
 function outputNotObservedValidation(phase: ToolSchemaContractPhase): SchemaValidation {
   if (phase === "afterExecution") {
     return {
@@ -229,6 +324,7 @@ export function createSignedToolSchemaContract(input: {
   outputSchema: SchemaDefinition;
   sideEffectDeclaration: ToolSchemaSideEffectDeclaration;
   failureModes: string[];
+  mcpServerRiskPosture?: ToolSchemaMcpServerRiskPosture;
   sourceCitations?: ToolSchemaContractSourceCitation[];
 }): SignedToolSchemaContract {
   const payload = unsignedContractPayload({
@@ -240,6 +336,7 @@ export function createSignedToolSchemaContract(input: {
     outputSchema: input.outputSchema,
     sideEffectDeclaration: input.sideEffectDeclaration,
     failureModes: input.failureModes,
+    mcpServerRiskPosture: input.mcpServerRiskPosture,
     sourceCitations: input.sourceCitations ?? []
   });
   const digest = sha256Hex(canonicalize(payload));
@@ -260,6 +357,7 @@ export function validateToolSchemaContractInvocation(input: {
   output?: unknown;
   observedSideEffects: ToolSchemaObservedSideEffects;
   observedFailureMode?: string | null;
+  observedMcpServerRiskPosture?: ToolSchemaObservedMcpServerRiskPosture | null;
   approvalReceiptId?: string | null;
 }): ToolSchemaContractReceipt {
   const contractSignatureValid = verifyContractSignature(input.workspace, input.contract);
@@ -274,6 +372,10 @@ export function validateToolSchemaContractInvocation(input: {
   const failureModeValidation = validateFailureMode({
     declared: input.contract.failureModes,
     observed: input.observedFailureMode ?? null
+  });
+  const mcpServerRiskValidation = validateMcpServerRisk({
+    declared: input.contract.mcpServerRiskPosture,
+    observed: input.observedMcpServerRiskPosture ?? null
   });
   const driftFindings: string[] = [];
   if (!contractSignatureValid) {
@@ -297,13 +399,20 @@ export function validateToolSchemaContractInvocation(input: {
   if (failureModeValidation.errors.some((error) => error.startsWith("failure mode not declared:"))) {
     driftFindings.push("failure_mode_drift");
   }
+  if (mcpServerRiskValidation.errors.some((error) => error === "mcp server risk posture not observed")) {
+    driftFindings.push("mcp_server_risk_posture_missing");
+  }
+  if (mcpServerRiskValidation.errors.some((error) => error !== "mcp server risk posture not observed")) {
+    driftFindings.push("mcp_server_risk_drift");
+  }
 
   const allowed =
     contractSignatureValid &&
     inputValidation.valid &&
     outputValidation.valid &&
     sideEffectValidation.valid &&
-    failureModeValidation.valid;
+    failureModeValidation.valid &&
+    mcpServerRiskValidation.valid;
   const baseReceipt: ToolSchemaContractReceipt = {
     schemaVersion: "2026-06-25",
     receiptId: `toolcontract_${randomUUID().replace(/-/g, "")}`,
@@ -323,6 +432,9 @@ export function validateToolSchemaContractInvocation(input: {
     sideEffectValidation,
     observedFailureMode: input.observedFailureMode ?? null,
     failureModeValidation,
+    mcpServerRiskPosture: input.contract.mcpServerRiskPosture ?? null,
+    observedMcpServerRiskPosture: input.observedMcpServerRiskPosture ?? null,
+    mcpServerRiskValidation,
     approvalReceiptId: input.approvalReceiptId ?? null,
     driftFindings: unique(driftFindings),
     allowed,
@@ -363,6 +475,9 @@ export function verifyToolSchemaContractReceipt(input: {
   }
   if (!receipt.failureModeValidation || !Array.isArray(receipt.failureModeValidation.errors)) {
     reasons.push("tool-schema-contract:failure-mode-validation:missing");
+  }
+  if (!receipt.mcpServerRiskValidation || !Array.isArray(receipt.mcpServerRiskValidation.errors)) {
+    reasons.push("tool-schema-contract:mcp-server-risk-validation:missing");
   }
   if (!receipt.surfaceBinding.includes("Enforce") || !receipt.surfaceBinding.includes("Shield") || !receipt.surfaceBinding.includes("Vault")) {
     reasons.push("tool-schema-contract:surface-binding:missing");
