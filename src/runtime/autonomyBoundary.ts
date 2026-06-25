@@ -78,7 +78,7 @@ export interface RuntimeAutonomyBoundaryDecision {
     receiptId: string;
     receiptSha256: string;
   };
-  surfaceBinding: ["Enforce", "Fleet", "Watch", "Studio"];
+  surfaceBinding: ["Enforce", "Shield", "Vault", "Fleet", "Watch", "Studio"];
   eventPath: string | null;
   signaturePath: string | null;
 }
@@ -265,7 +265,7 @@ export function evaluateRuntimeAutonomyBoundary(input: {
       receiptId,
       receiptSha256: ""
     },
-    surfaceBinding: ["Enforce", "Fleet", "Watch", "Studio"],
+    surfaceBinding: ["Enforce", "Shield", "Vault", "Fleet", "Watch", "Studio"],
     eventPath,
     signaturePath
   };
