@@ -95,14 +95,25 @@ export type {
 
 // Handoff Packets
 export {
+  acceptHandoffPacket,
   createHandoffPacket,
+  loadHandoffReceiverReceipt,
+  loadHandoffUnresolvedDependencyLog,
   loadHandoffPacket,
   listHandoffPackets,
+  verifyHandoffContract,
   verifyHandoffPacket,
   renderHandoffPacketMarkdown,
 } from "./fleet/handoffPacket.js";
 export type {
+  HandoffContractVerificationResult,
+  HandoffDependencyStatus,
+  HandoffOwnershipTransfer,
   HandoffPacket,
+  HandoffReceiverReceipt,
+  HandoffRefusalReason,
+  HandoffSenderReceipt,
+  HandoffUnresolvedDependencyLog,
   HandoffVerificationResult,
 } from "./fleet/handoffPacket.js";
 

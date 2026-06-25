@@ -155,7 +155,9 @@ import {
 } from "./fleet/trustInheritance.js";
 import type { TrustInheritancePolicyMode } from "./fleet/trustInheritance.js";
 import {
+  acceptHandoffPacket,
   createHandoffPacket,
+  verifyHandoffContract,
   verifyHandoffPacket,
   renderHandoffPacketMarkdown
 } from "./fleet/handoffPacket.js";
@@ -14728,13 +14730,15 @@ fleet
 fleet
   .command("handoff")
   .description("Manage handoff packets")
-  .argument("<action>", "create|verify")
+  .argument("<action>", "create|verify|accept")
   .option("--from <id>", "source agent ID")
   .option("--to <id>", "target agent ID")
   .option("--goal <goal>", "delegation goal")
   .option("--mode <mode>", "execute|simulate", "execute")
   .option("--packet <packetId>", "packet ID for verify")
-  .action((action: string, opts: { from?: string; to?: string; goal?: string; mode?: string; packet?: string }) => {
+  .option("--receiver <id>", "receiver agent ID for accept")
+  .option("--refuse <reason>", "record receiver refusal reason")
+  .action((action: string, opts: { from?: string; to?: string; goal?: string; mode?: string; packet?: string; receiver?: string; refuse?: string }) => {
     const workspace = process.cwd();
     if (action === "create") {
       if (!opts.from || !opts.to || !opts.goal) {
@@ -14749,6 +14753,9 @@ fleet
       console.log(chalk.green(`Handoff packet created: ${packet.packetId}`));
       console.log(`From: ${packet.fromAgentId} → To: ${packet.toAgentId}`);
       console.log(`Expires: ${new Date(packet.expiryTs).toISOString()}`);
+      if (packet.senderReceipt) {
+        console.log(`Sender receipt: ${packet.senderReceipt.receiptId}`);
+      }
     } else if (action === "verify") {
       const packetId = opts.packet;
       if (!packetId) {
@@ -14766,9 +14773,32 @@ fleet
       if (result.packet) {
         console.log(`  Expired: ${result.expired}`);
         console.log(`  Signature: ${result.signatureValid ? "valid" : "invalid"}`);
+        console.log(`  Sender receipt: ${result.senderReceiptValid ? "valid" : "invalid"}`);
+        const contract = verifyHandoffContract(workspace, packetId);
+        console.log(`  Contract: ${contract.valid ? "valid" : "invalid"}`);
+        if (!contract.valid) {
+          for (const err of contract.errors) {
+            console.log(`  - ${err}`);
+          }
+        }
       }
+    } else if (action === "accept") {
+      const packetId = opts.packet;
+      if (!packetId) {
+        throw new Error("--packet <packetId> required for accept");
+      }
+      const receipt = acceptHandoffPacket(workspace, packetId, {
+        receiverAgentId: opts.receiver,
+        accepted: !opts.refuse,
+        refusalReason: opts.refuse
+      });
+      console.log(chalk.green(`Handoff receiver receipt created: ${receipt.receiptId}`));
+      console.log(`Packet: ${receipt.packetId}`);
+      console.log(`Accepted: ${receipt.accepted}`);
+      console.log(`Ownership accepted: ${receipt.ownershipAccepted}`);
+      console.log(`Unresolved dependencies: ${receipt.unresolvedDependencies.length}`);
     } else {
-      throw new Error(`Unknown handoff action: ${action}. Use create or verify.`);
+      throw new Error(`Unknown handoff action: ${action}. Use create, verify, or accept.`);
     }
   });
 
