@@ -215,6 +215,24 @@ Each exception row includes:
 
 Exception-lifecycle verification fails closed when source citations are missing, the policy/control mapping is missing, the owner is missing, the request is unsigned, the approval is unsigned, expiry proof is missing, compensating controls are missing or unsigned, renewal outcome is missing or unsigned, or evidence lineage is missing or malformed. Source metadata, website labels, policy names, or unsigned waiver notes do not satisfy the receipt.
 
+## Policy Drift Impact Receipts
+
+Policy changes can use `buildPolicyDriftImpactReceipt` from `src/compliance/policyDrift.ts` to prove change impact before rollout without adding a separate policy-management platform. The receipt is a generic Comply, Passport, and Vault artifact for policy diffs, affected agents, affected controls, affected tests, prior decisions, recheck lists, and rollout receipts.
+
+Each policy drift row includes:
+
+- **Policy diff**: policy ID, before/after versions, before/after policy hashes, change owner, change timestamp, rationale, diff summary, signed diff evidence, and signature hash.
+- **Affected agents**: agent IDs, environments, current and required policy versions, impact level, reason, signed evidence, and signature hash.
+- **Affected controls**: framework/control IDs, owners, change type, signed evidence, and signature hash.
+- **Affected tests**: test IDs, commands, owners, reasons, signed evidence, and signature hash.
+- **Prior decisions**: release, waiver, approval, or compliance decisions that must be rechecked when policy drift invalidates previous proof.
+- **Recheck list**: owner, due date, action, status, signed recheck evidence, and signature hash.
+- **Rollout receipt**: rollout ID, approver, approval time, rollout window, rollback plan reference, signed rollout evidence, and signature hash.
+- **Evidence lineage**: event hashes and signed evidence references summarized into an evidence-chain hash.
+- **Source citations**: source-backed review or control obligations supplied by the operator.
+
+Policy-drift verification fails closed when source citations are missing, the policy diff is missing or unsigned, affected agents are missing, affected controls are missing, affected tests are missing, prior decisions are missing, recheck items are missing, rollout proof is missing or unsigned, evidence lineage is missing, or row and receipt hashes do not verify. Source metadata, website labels, policy names, or unsigned impact notes do not satisfy the receipt.
+
 ## Third-Party Provider Risk Receipts
 
 Third-party provider reviews can use `buildThirdPartyProviderRiskReceipt` from `src/compliance/providerRisk.ts` to capture provider and vendor risk without creating a provider-specific integration. The receipt is a generic Comply, Passport, and Vault artifact for external agents, model providers, tool providers, data providers, and infrastructure providers.

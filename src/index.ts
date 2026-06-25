@@ -583,6 +583,27 @@ export {
   type GovernanceExceptionRenewalOutcome
 } from "./compliance/exceptionLifecycle.js";
 export {
+  buildPolicyDriftImpactReceipt,
+  verifyPolicyDriftImpactReceipt,
+  renderPolicyDriftImpactAuditExport,
+  type PolicyDriftAffectedAgent,
+  type PolicyDriftAffectedControl,
+  type PolicyDriftAffectedTest,
+  type PolicyDriftControlChangeType,
+  type PolicyDriftEnvironment,
+  type PolicyDriftImpactChange,
+  type PolicyDriftImpactEvidenceLink,
+  type PolicyDriftImpactLevel,
+  type PolicyDriftImpactReceipt,
+  type PolicyDriftImpactRow,
+  type PolicyDriftImpactSourceCitation,
+  type PolicyDriftImpactVerification,
+  type PolicyDriftPriorDecision,
+  type PolicyDriftRecheckItem,
+  type PolicyDriftRecheckStatus,
+  type PolicyDriftRolloutReceipt
+} from "./compliance/policyDrift.js";
+export {
   buildThirdPartyProviderRiskReceipt,
   verifyThirdPartyProviderRiskReceipt,
   renderThirdPartyProviderRiskAuditExport,
