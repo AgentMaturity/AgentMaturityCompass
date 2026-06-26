@@ -52,10 +52,174 @@ export interface SessionAnomaly {
   ts: number;
 }
 
+export type AMCSurfaceId =
+  | "Score"
+  | "Shield"
+  | "Enforce"
+  | "Vault"
+  | "Watch"
+  | "Comply"
+  | "Fleet"
+  | "Passport"
+  | "API"
+  | "Studio"
+  | "Unknown";
+
+export interface CrossSurfaceSessionEvent {
+  sessionId: string;
+  surface: AMCSurfaceId;
+  traceId: string;
+  timestampMs: number;
+  eventName: string;
+  status: NormalizedTrace["status"];
+  latencyMs: number;
+  costUsd: number;
+  failureMode: string | null;
+  riskEvent: string | null;
+  remediationState: string | null;
+}
+
+export interface SurfaceMissingEventCheck {
+  surface: AMCSurfaceId;
+  status: "present" | "missing";
+}
+
+export interface CrossSurfaceSessionCorrelation {
+  sessionId: string;
+  eventCount: number;
+  surfaceEvents: CrossSurfaceSessionEvent[];
+  timestampChain: number[];
+  timestampChainValid: boolean;
+  missingSurfaces: AMCSurfaceId[];
+  missingEventChecks: SurfaceMissingEventCheck[];
+  liveTrends: {
+    totalCostUsd: number;
+    p95LatencyMs: number;
+    riskEventCount: number;
+    failureModeCounts: Record<string, number>;
+  };
+  failClosed: boolean;
+  failClosedReasons: string[];
+}
+
+export interface BuildCrossSurfaceSessionCorrelationInput {
+  sessionId: string;
+  traces: NormalizedTrace[];
+  requiredSurfaces?: AMCSurfaceId[];
+}
+
 export interface SessionCorrelatorConfig {
   workspace: string;
   agentId: string;
   maxSessions?: number;
+}
+
+const DEFAULT_REQUIRED_SURFACES: AMCSurfaceId[] = ["Score", "Shield", "Watch", "API", "Studio"];
+const SURFACE_LOOKUP: Record<string, AMCSurfaceId> = {
+  score: "Score",
+  shield: "Shield",
+  enforce: "Enforce",
+  vault: "Vault",
+  watch: "Watch",
+  comply: "Comply",
+  fleet: "Fleet",
+  passport: "Passport",
+  api: "API",
+  studio: "Studio",
+};
+
+function stringMeta(value: unknown): string | null {
+  return typeof value === "string" && value.trim().length > 0 ? value.trim() : null;
+}
+
+function normalizeSurface(value: unknown): AMCSurfaceId {
+  const raw = stringMeta(value);
+  if (!raw) return "Unknown";
+  return SURFACE_LOOKUP[raw.toLowerCase()] ?? "Unknown";
+}
+
+function surfaceForTrace(trace: NormalizedTrace): AMCSurfaceId {
+  const traceSurface = normalizeSurface(trace.metadata?.surface ?? trace.metadata?.amcSurface);
+  if (traceSurface !== "Unknown") return traceSurface;
+  for (const span of trace.spans) {
+    const spanSurface = normalizeSurface(span.metadata?.surface ?? span.metadata?.amcSurface);
+    if (spanSurface !== "Unknown") return spanSurface;
+  }
+  return "Unknown";
+}
+
+function eventNameForTrace(trace: NormalizedTrace): string {
+  return (
+    stringMeta(trace.metadata?.eventName) ??
+    stringMeta(trace.metadata?.event) ??
+    stringMeta(trace.name) ??
+    stringMeta(trace.spans[0]?.name) ??
+    trace.status
+  );
+}
+
+export function buildCrossSurfaceSessionCorrelation(
+  input: BuildCrossSurfaceSessionCorrelationInput
+): CrossSurfaceSessionCorrelation {
+  const requiredSurfaces = input.requiredSurfaces ?? DEFAULT_REQUIRED_SURFACES;
+  const surfaceEvents = input.traces
+    .map((trace): CrossSurfaceSessionEvent => ({
+      sessionId: trace.sessionId ?? "",
+      surface: surfaceForTrace(trace),
+      traceId: trace.traceId,
+      timestampMs: trace.startTimeMs,
+      eventName: eventNameForTrace(trace),
+      status: trace.status,
+      latencyMs: trace.durationMs,
+      costUsd: trace.totalCostUsd,
+      failureMode: stringMeta(trace.metadata?.failureMode),
+      riskEvent: stringMeta(trace.metadata?.riskEvent),
+      remediationState: stringMeta(trace.metadata?.remediationState),
+    }))
+    .sort((a, b) => a.timestampMs - b.timestampMs || a.traceId.localeCompare(b.traceId));
+
+  const presentSurfaces = new Set(surfaceEvents.map((event) => event.surface));
+  const missingSurfaces = requiredSurfaces.filter((surface) => !presentSurfaces.has(surface));
+  const missingEventChecks = requiredSurfaces.map((surface) => ({
+    surface,
+    status: presentSurfaces.has(surface) ? "present" as const : "missing" as const,
+  }));
+  const timestampChain = surfaceEvents.map((event) => event.timestampMs);
+  const timestampChainValid = timestampChain.every((ts, index) =>
+    Number.isFinite(ts) && (index === 0 || ts >= timestampChain[index - 1]!)
+  );
+  const missingStableSession = input.traces.some((trace) => trace.sessionId !== input.sessionId);
+  const latencies = surfaceEvents.map((event) => event.latencyMs).sort((a, b) => a - b);
+  const failureModeCounts: Record<string, number> = {};
+  for (const event of surfaceEvents) {
+    if (event.failureMode) {
+      failureModeCounts[event.failureMode] = (failureModeCounts[event.failureMode] ?? 0) + 1;
+    }
+  }
+
+  const failClosedReasons: string[] = [];
+  if (surfaceEvents.length === 0) failClosedReasons.push("no correlated session events");
+  if (missingStableSession) failClosedReasons.push("missing stable session id");
+  if (missingSurfaces.length > 0) failClosedReasons.push(`missing surface events: ${missingSurfaces.join(", ")}`);
+  if (!timestampChainValid) failClosedReasons.push("invalid timestamp chain");
+
+  return {
+    sessionId: input.sessionId,
+    eventCount: surfaceEvents.length,
+    surfaceEvents,
+    timestampChain,
+    timestampChainValid,
+    missingSurfaces,
+    missingEventChecks,
+    liveTrends: {
+      totalCostUsd: Number(surfaceEvents.reduce((sum, event) => sum + event.costUsd, 0).toFixed(6)),
+      p95LatencyMs: percentile(latencies, 0.95),
+      riskEventCount: surfaceEvents.filter((event) => event.riskEvent !== null).length,
+      failureModeCounts,
+    },
+    failClosed: failClosedReasons.length > 0,
+    failClosedReasons,
+  };
 }
 
 /* ── Session Correlator ──────────────────────────────────────────── */
