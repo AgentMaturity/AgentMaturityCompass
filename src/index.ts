@@ -710,6 +710,26 @@ export {
   type PerAgentCostBudgetRow
 } from "./observability/costBudgetEvidence.js";
 export {
+  buildRiskCostLatencySloReceipt,
+  buildRiskCostLatencySloWatchAlerts,
+  type BuildRiskCostLatencySloReceiptInput,
+  type RiskCostLatencyAlertRoute,
+  type RiskCostLatencyAlertSeverity,
+  type RiskCostLatencyFailureCluster,
+  type RiskCostLatencyLiveTrends,
+  type RiskCostLatencySloAlert,
+  type RiskCostLatencySloBreachEvidence,
+  type RiskCostLatencySloDefinition,
+  type RiskCostLatencySloObjectives,
+  type RiskCostLatencySloReceipt,
+  type RiskCostLatencySloStatus,
+  type RiskCostLatencySloTimeWindow,
+  type RiskCostLatencyTraceIndex,
+  type RiskCostLatencyTraceIndexEntry,
+  type RiskCostLatencyTraceRow,
+  type RiskCostLatencyTraceStatus
+} from "./observability/riskCostLatencySlo.js";
+export {
   initComplianceMapsCli,
   verifyComplianceMapsCli,
   complianceReportCli,
