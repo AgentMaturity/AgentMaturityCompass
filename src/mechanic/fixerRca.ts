@@ -107,14 +107,17 @@ export interface FixerRcaReport {
 }
 
 const FAILURE_RESOURCE_MAP: Record<TraceFailureClass, EnforceResourceKind[]> = {
+  prompt_error: ["prompt", "evaluator", "policy"],
   tool_misuse: ["tool", "policy", "guardrail"],
   invalid_schema: ["schema", "evaluator", "prompt"],
   refusal_overreach: ["prompt", "policy", "guardrail"],
   hallucinated_claim: ["prompt", "evaluator", "dataset"],
   unsafe_action: ["policy", "guardrail", "tool"],
   latency_timeout: ["router", "model_provider", "environment"],
+  cost_spike: ["router", "model_provider", "policy"],
   retrieval_error: ["dataset", "graph", "tool"],
   memory_error: ["memory", "policy"],
+  human_review_gap: ["policy", "guardrail", "agent"],
   orchestration_dead_end: ["agent", "code", "prompt"],
   policy_violation: ["policy", "guardrail"],
   unknown_failure: []
@@ -183,14 +186,17 @@ function chooseResource(cluster: TraceFailureCluster, resources: EnforceResource
 
 function likelyCauseFor(cluster: TraceFailureCluster): string {
   const map: Record<TraceFailureClass, string> = {
+    prompt_error: "Prompt contract or instruction boundary is incomplete.",
     tool_misuse: "Tool contract or permission boundary is incomplete.",
     invalid_schema: "Output schema or evaluator contract is underspecified.",
     refusal_overreach: "Prompt or policy boundary is too broad.",
     hallucinated_claim: "Evidence citation and claim grounding are insufficient.",
     unsafe_action: "Sensitive action policy lacks a strong approval gate.",
     latency_timeout: "Route, provider, or environment needs timeout and fallback controls.",
+    cost_spike: "Route, provider, or policy budget controls are insufficient.",
     retrieval_error: "Retrieval corpus or graph grounding is incomplete.",
     memory_error: "Memory writeback or recall policy is unsafe.",
+    human_review_gap: "Human review escalation or approval routing is incomplete.",
     orchestration_dead_end: "Planner or handoff policy is missing a recovery route.",
     policy_violation: "Policy guardrail requires stricter enforcement or clearer scope.",
     unknown_failure: "Failure needs manual classification before mutation."

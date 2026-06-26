@@ -48,6 +48,37 @@ export const passportJsonSchema = z.object({
       skills: z.number().min(0).max(5).nullable()
     }),
     unknownQuestionsCount: z.number().int().min(0),
+    questionExplainabilityHash: z.string().length(64).optional(),
+    questionExplainabilitySummary: z
+      .object({
+        replayable: z.boolean(),
+        failClosed: z.boolean(),
+        rowCount: z.number().int().min(0),
+        signedEvidenceRowCount: z.number().int().min(0),
+        acceptedEvidenceCount: z.number().int().min(0),
+        rejectedEvidenceCount: z.number().int().min(0),
+        rejectedEvidenceReasonCount: z.number().int().min(0),
+        reproducibleEvalPackCount: z.number().int().min(0),
+        failClosedThresholdCount: z.number().int().min(0),
+        surfaces: z.array(z.string().min(1)),
+        sourceRefs: z.array(z.string().min(1)),
+        sourceRefCount: z.number().int().min(0).optional(),
+        rows: z
+          .array(
+            z.object({
+              questionId: z.string().min(1),
+              acceptedEvidenceIds: z.array(z.string().min(1)),
+              rejectedEvidenceReasons: z.array(z.object({ evidenceId: z.string().min(1), reason: z.string().min(1) })),
+              repairHint: z.string().min(1),
+              status: z.enum(["ready", "fail_closed"]),
+              rowHash: z.string().length(64)
+            })
+          )
+          .optional()
+      })
+      .optional(),
+    questionExplainabilityReplayable: z.boolean().optional(),
+    questionExplainabilityFailClosed: z.boolean().optional(),
     questionScores42: z
       .array(
         z.object({

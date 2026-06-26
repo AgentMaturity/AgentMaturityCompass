@@ -43,6 +43,7 @@ export interface ReasoningMemoryItem {
   affectedResource: ReasoningMemoryAffectedResource;
   confidence: number;
   privacyClass: ReasoningMemoryPrivacyClass;
+  retentionTag: string;
   allowedConsumers: ReasoningMemoryConsumer[];
   createdAt: string;
   updatedAt: string;
@@ -62,6 +63,22 @@ export interface ReasoningMemoryGate {
   reason: string;
 }
 
+export interface ReasoningMemoryRollbackPlan {
+  action: "delete-new-item" | "restore-previous-item" | "none";
+  targetMemoryId: string | null;
+  previousItemSha256: string | null;
+  reason: string;
+}
+
+export interface ReasoningMemoryPolicyDecision {
+  policyId: "reasoning-memory-writeback-v1";
+  status: "allowed" | "denied";
+  retentionTag: string | null;
+  evidenceRefCount: number;
+  deniedGateIds: string[];
+  rollbackPlan: ReasoningMemoryRollbackPlan;
+}
+
 export interface ReasoningMemoryWritebackReceipt {
   schemaVersion: "2026-05-22";
   receiptId: string;
@@ -75,6 +92,7 @@ export interface ReasoningMemoryWritebackReceipt {
   reason: string;
   createdAt: string;
   gates: ReasoningMemoryGate[];
+  policyDecision: ReasoningMemoryPolicyDecision;
   signaturePath: string | null;
 }
 
@@ -234,10 +252,13 @@ function buildCandidate(input: {
 }): Omit<ReasoningMemoryItem, "itemSha256" | "signaturePath"> {
   const createdAtDate = new Date();
   const createdAt = createdAtDate.toISOString();
+  const ttlDays = input.ttlDays ?? 90;
+  const reviewDays = input.reviewDays ?? 30;
   const lessonType = lessonTypeForEpisode(input.episode);
   const summary = sanitizeSummary(input.summaryOverride ?? summaryForEpisode(input.episode, lessonType));
   const allowedConsumers = normalizeConsumers(input.allowedConsumers);
   const affectedResource = affectedResourceForEpisode(input.episode);
+  const privacyClass: ReasoningMemoryPrivacyClass = input.episode.rawTraceRefs.length > 0 ? "internal" : "public";
   const fingerprint = fingerprintFor({
     agentId: input.episode.agentId,
     lessonType,
@@ -258,12 +279,13 @@ function buildCandidate(input: {
     evidenceRefs: evidenceRefsForEpisode(input.episode),
     affectedResource,
     confidence: round(Math.max(0.1, Math.min(0.95, input.episode.evaluations.evidenceCoverage * 0.6 + input.episode.evaluations.integrityIndex * 0.4))),
-    privacyClass: input.episode.rawTraceRefs.length > 0 ? "internal" : "public",
+    privacyClass,
+    retentionTag: `reasoning-memory:${privacyClass}:ttl-${ttlDays}d:review-${reviewDays}d`,
     allowedConsumers,
     createdAt,
     updatedAt: createdAt,
-    expiresAt: addDays(createdAtDate, input.ttlDays ?? 90),
-    reviewAfter: addDays(createdAtDate, input.reviewDays ?? 30),
+    expiresAt: addDays(createdAtDate, ttlDays),
+    reviewAfter: addDays(createdAtDate, reviewDays),
     status: "active",
     occurrenceCount: 1,
     duplicateOf: null,
@@ -279,6 +301,7 @@ function gatesForCandidate(input: {
   const hasEvidence = input.candidate.evidenceRefs.length > 1 || Boolean(input.episode.traceFailureIndexRef);
   const expires = Date.parse(input.candidate.expiresAt) > Date.parse(input.candidate.createdAt);
   const review = Date.parse(input.candidate.reviewAfter) > Date.parse(input.candidate.createdAt);
+  const retentionTagPresent = /^reasoning-memory:(public|internal|restricted):ttl-[1-9]\d*d:review-[1-9]\d*d$/.test(input.candidate.retentionTag);
   const consumersValid = input.candidate.allowedConsumers.length > 0
     && input.candidate.allowedConsumers.every((consumer) => VALID_CONSUMERS.includes(consumer));
   const summaryStillSecret = containsSecret(input.candidate.summary);
@@ -297,6 +320,11 @@ function gatesForCandidate(input: {
       id: "expiry-present",
       status: expires && review ? "passed" : "blocked",
       reason: expires && review ? "Memory item has expiry and review timestamps." : "Memory item requires future expiry and review timestamps."
+    },
+    {
+      id: "retention-tag-present",
+      status: retentionTagPresent ? "passed" : "blocked",
+      reason: retentionTagPresent ? "Memory item has a durable retention tag." : "Memory item requires a durable retention tag."
     },
     {
       id: "allowed-consumers-valid",
@@ -363,6 +391,9 @@ function receiptFor(input: {
   decision: ReasoningMemoryWritebackReceipt["decision"];
   reason: string;
   gates: ReasoningMemoryGate[];
+  retentionTag: string | null;
+  evidenceRefCount: number;
+  rollbackPlan: ReasoningMemoryRollbackPlan;
 }): ReasoningMemoryWritebackReceipt {
   return {
     schemaVersion: "2026-05-22",
@@ -377,7 +408,26 @@ function receiptFor(input: {
     reason: input.reason,
     createdAt: new Date().toISOString(),
     gates: input.gates,
+    policyDecision: {
+      policyId: "reasoning-memory-writeback-v1",
+      status: input.decision === "rejected" ? "denied" : "allowed",
+      retentionTag: input.retentionTag,
+      evidenceRefCount: input.evidenceRefCount,
+      deniedGateIds: input.gates
+        .filter((gate) => gate.status === "blocked")
+        .map((gate) => gate.id),
+      rollbackPlan: input.rollbackPlan
+    },
     signaturePath: null
+  };
+}
+
+function noRollbackPlan(reason: string): ReasoningMemoryRollbackPlan {
+  return {
+    action: "none",
+    targetMemoryId: null,
+    previousItemSha256: null,
+    reason
   };
 }
 
@@ -409,7 +459,10 @@ export function writeReasoningMemoryFromEpisode(input: {
       memoryId: null,
       decision: "rejected",
       reason: blocked.reason,
-      gates
+      gates,
+      retentionTag: candidateBase.retentionTag,
+      evidenceRefCount: candidateBase.evidenceRefs.length,
+      rollbackPlan: noRollbackPlan("No durable memory item was written.")
     }));
     appendReceiptToEpisode(workspace, episode, receipt.receiptId);
     return { agentId, sourceEpisodeId: episode.episodeId, items: [], receipts: [receipt] };
@@ -438,7 +491,15 @@ export function writeReasoningMemoryFromEpisode(input: {
       memoryId: item.memoryId,
       decision: "merged",
       reason: "Duplicate lesson merged into an existing active memory item.",
-      gates
+      gates,
+      retentionTag: item.retentionTag,
+      evidenceRefCount: item.evidenceRefs.length,
+      rollbackPlan: {
+        action: "restore-previous-item",
+        targetMemoryId: duplicate.memoryId,
+        previousItemSha256: duplicate.itemSha256,
+        reason: "Restore the previous signed memory item if this duplicate merge must be rolled back."
+      }
     }));
     appendReceiptToEpisode(workspace, episode, receipt.receiptId);
     return { agentId, sourceEpisodeId: episode.episodeId, items: [item], receipts: [receipt] };
@@ -454,7 +515,15 @@ export function writeReasoningMemoryFromEpisode(input: {
     memoryId: item.memoryId,
     decision: "accepted",
     reason: "Evidence-backed reasoning memory item accepted after redaction, expiry, and consumer gates.",
-    gates
+    gates,
+    retentionTag: item.retentionTag,
+    evidenceRefCount: item.evidenceRefs.length,
+    rollbackPlan: {
+      action: "delete-new-item",
+      targetMemoryId: item.memoryId,
+      previousItemSha256: null,
+      reason: "Remove the newly written memory item from active retrieval if this writeback must be rolled back."
+    }
   }));
   appendReceiptToEpisode(workspace, episode, receipt.receiptId);
   return { agentId, sourceEpisodeId: episode.episodeId, items: [item], receipts: [receipt] };

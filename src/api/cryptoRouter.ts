@@ -112,7 +112,7 @@ export async function handleCryptoRoute(
   // POST /api/v1/crypto/cert/generate — generate trust certificate
   if (pathname === '/api/v1/crypto/cert/generate' && method === 'POST') {
     try {
-      const body = await bodyJson<{ agentId: string; outputPath: string; validityDays?: number }>(req);
+      const body = await bodyJson<{ agentId: string; outputPath: string; validityDays?: number; preview?: boolean; noSign?: boolean }>(req);
       if (!body.agentId || !body.outputPath) {
         apiError(res, 400, 'Required: agentId, outputPath');
         return true;
@@ -122,11 +122,14 @@ export async function handleCryptoRoute(
         workspace,
         agentId: body.agentId,
         outputPath: body.outputPath,
-        validityDays: body.validityDays
+        validityDays: body.validityDays,
+        preview: body.preview === true || body.noSign === true
       });
       apiSuccess(res, {
         outputPath: out.outputPath,
         format: out.format,
+        signatureStatus: out.signatureStatus,
+        claimBoundary: out.envelope.claimBoundary ?? null,
         certId: out.envelope.payload.certificateId,
         score: out.envelope.payload.score,
         sidecarJsonPath: out.sidecarJsonPath

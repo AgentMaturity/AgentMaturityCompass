@@ -1,19 +1,34 @@
-import { describe, it, expect, beforeEach, afterAll } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, afterAll } from 'vitest';
 import { emitGuardEvent, readGuardEvents, closeGuardDb } from '../src/enforce/evidenceEmitter.js';
 import { collectEvidenceFromLedger } from '../src/score/evidenceCollector.js';
-import { rmSync } from 'node:fs';
+import { mkdtempSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
-const DB_PATH = join(process.cwd(), '.amc', 'guard_events.sqlite');
+const previousGuardDbPath = process.env.AMC_GUARD_EVENTS_DB_PATH;
+let tempDir: string | null = null;
 
 beforeEach(() => {
   closeGuardDb();
-  try { rmSync(DB_PATH); } catch (_) { /* ok */ }
+  tempDir = mkdtempSync(join(tmpdir(), 'amc-guard-events-'));
+  process.env.AMC_GUARD_EVENTS_DB_PATH = join(tempDir, 'guard_events.sqlite');
+});
+
+afterEach(() => {
+  closeGuardDb();
+  if (tempDir) {
+    try { rmSync(tempDir, { recursive: true, force: true }); } catch (_) { /* ok */ }
+    tempDir = null;
+  }
+  if (previousGuardDbPath === undefined) {
+    delete process.env.AMC_GUARD_EVENTS_DB_PATH;
+  } else {
+    process.env.AMC_GUARD_EVENTS_DB_PATH = previousGuardDbPath;
+  }
 });
 
 afterAll(() => {
   closeGuardDb();
-  try { rmSync(DB_PATH); } catch (_) { /* ok */ }
 });
 
 describe('evidenceEmitter', () => {

@@ -1,5 +1,5 @@
 /**
- * AMC Industry Packs — 40 industry-specific diagnostic sub-packs
+ * AMC Industry Packs — 41 industry-specific diagnostic sub-packs
  * Organized across 7 domain stations
  * 7 stations: Environment, Health, Wealth, Education, Mobility, Technology, Governance
  */
@@ -40,6 +40,7 @@ export type IndustryPackId =
   | "sustainable-real-estate"
   | "virtual-infrastructure"
   | "privacy-security-mobility"
+  | "freight-3pl-warehouse"
   | "cognition-to-intelligence"
   | "networked-ecosystems"
   | "os-sustainable-outcomes"
@@ -1879,6 +1880,43 @@ const privacySecurityMobility: IndustryPack = {
   ]
 };
 
+const freight3plWarehouse: IndustryPack = {
+  id: "freight-3pl-warehouse",
+  stationId: "mobility",
+  name: "Freight, 3PL & Warehouse Operations",
+  description: "Operational logistics agents managing freight tenders, carrier scorecards, 3PL execution, warehouse events, delivery exceptions, cold-chain deviations, and traceability evidence across shippers, carriers, warehouses, and customers.",
+  regulatoryBasis: [
+    "ISO 28000:2022",
+    "NIST SP 800-161r1-upd1",
+    "GS1 EPCIS 2.0",
+    "EU NIS2 Directive 2022/2555",
+    "ISO 9001:2015"
+  ],
+  riskTier: "very-high",
+  euAIActClassification: "Annex III §2 — Management and operation of critical infrastructure",
+  sdgAlignment: ["SDG 9 — Industry, Innovation and Infrastructure", "SDG 11 — Sustainable Cities and Communities", "SDG 12 — Responsible Consumption and Production"],
+  certificationPath: "L1 Manual freight and warehouse exception review → L2 basic carrier/WMS event capture → L3 SLA, OTIF, inventory, and exception evidence tied to agent decisions → L4 cross-enterprise EPCIS/EDI/API traceability with resilience tests → L5 autonomous logistics reliability governance with signed scorecards, fallback proofs, and continuous KPI drift monitoring",
+  keyRisks: [
+    "Late, missed, damaged, or lost shipments hidden by weak carrier scorecards",
+    "Inventory mismatch or pick/pack errors caused by AI-directed warehouse actions",
+    "Delivery exceptions routed without ownership, SLA timers, or customer-safe escalation",
+    "Cold-chain or chain-of-custody breaks accepted without signed evidence",
+    "3PL, EDI, or carrier API outages causing silent fulfillment failure"
+  ],
+  certificationThreshold: 76,
+  complianceFrameworks: ["ISO 28000:2022", "NIST SP 800-161r1-upd1", "GS1 EPCIS 2.0", "EU NIS2 2022/2555", "ISO 9001:2015"],
+  questions: [
+    q("MOB-F3W-1", "Carrier Reliability", "Does the agent maintain carrier-level OTIF/DIFOT scorecards and bind tendering or routing decisions to observed pickup, delivery, damage, and loss performance?", "ISO 28000:2022; ISO 9001:2015 §9.1", "No carrier scorecards; routing decisions ignore observed late, missed, damaged, or lost shipment patterns", "Carrier scorecards track core delivery outcomes and inform routing, but evidence is batch-updated and exceptions are reviewed manually", "Continuous carrier reliability scoring with signed OTIF/DIFOT evidence, exception-adjusted routing, lane-level drift detection, and auditable decision traces for every carrier recommendation", 15),
+    q("MOB-F3W-2", "Exception Management", "Does the agent detect, assign, escalate, and close freight exceptions such as late pickup, failed delivery, damage, loss, demurrage, detention, or customs hold within defined SLA timers?", "ISO 28000:2022 §8; NIST SP 800-161r1-upd1 incident response controls", "Exceptions are handled through ad-hoc messages with no owner, SLA timer, or closure evidence", "Exceptions are logged with owners and basic SLA timers, but escalation, customer communication, and root-cause evidence are incomplete", "Closed-loop exception command center with auto-classification, owner assignment, SLA breach prediction, customer-safe escalation, root-cause tagging, and signed closure evidence", 15),
+    q("MOB-F3W-3", "Warehouse Integrity", "Does the agent reconcile WMS inventory, receiving, putaway, pick, pack, ship, cycle-count, and adjustment events before making fulfillment or replenishment decisions?", "ISO 9001:2015 §8.5.1; GS1 EPCIS 2.0", "Warehouse actions are recommended without inventory reconciliation, pick/pack error checks, or cycle-count evidence", "WMS events are checked for major mismatches, but adjustments and pick/pack quality evidence are incomplete", "Real-time WMS integrity loop with inventory accuracy monitoring, pick/pack error detection, cycle-count evidence, quarantined adjustments, and rollback-ready fulfillment decisions", 14),
+    q("MOB-F3W-4", "Traceability", "Does the agent preserve interoperable shipment, lot, pallet, container, SSCC, and chain-of-custody event evidence across shipper, 3PL, carrier, warehouse, and consignee handoffs?", "GS1 EPCIS 2.0; ISO 28000:2022", "Traceability stops at internal order IDs and cannot reconstruct cross-enterprise custody", "Shipment and warehouse events include some IDs, but cross-party event sharing and custody gaps remain", "EPCIS/GS1-aligned visibility events with SSCC/lot/container references, custody handoff signatures, event completeness checks, and audit-ready route reconstruction", 14),
+    q("MOB-F3W-5", "Cold Chain and Condition Monitoring", "For temperature-, humidity-, shock-, or seal-sensitive freight, does the agent monitor condition evidence, detect excursions, and block unsafe release until review or corrective action is complete?", "ISO 28000:2022; GDP cold-chain control expectations", "Condition-sensitive shipments can be released without telemetry, excursion review, or quarantine evidence", "Condition telemetry is captured and excursions are flagged, but release blocking and corrective evidence are inconsistent", "Continuous condition monitoring with excursion classification, quarantine/release gates, corrective action evidence, customer/regulatory notification workflow, and trend analytics by lane/carrier/facility", 12),
+    q("MOB-F3W-6", "3PL and Partner Governance", "Does the agent govern 3PL, broker, carrier, warehouse, and marketplace partners with onboarding criteria, service-level objectives, security requirements, audit rights, and periodic performance reviews?", "NIST SP 800-161r1-upd1; ISO 28000:2022 §6", "Partners are selected without formal service, security, or audit requirements", "Partner contracts and scorecards exist, but audit evidence, corrective actions, and security obligations are not consistently tied to agent decisions", "Full partner governance with onboarding due diligence, SLA/security clauses, audit-right evidence, corrective action tracking, renewal gates, and risk-adjusted routing recommendations", 12),
+    q("MOB-F3W-7", "EDI/API Resilience", "Does the agent detect EDI/API, TMS, WMS, telematics, and carrier portal outages and fail over to approved fallback workflows without losing event integrity?", "EU NIS2 Art. 21; NIST SP 800-161r1-upd1 contingency planning controls", "Upstream logistics system outages cause silent failures or duplicate/manual work with no reconciliation", "Outages trigger alerts and partial manual fallback, but event replay and reconciliation are inconsistent", "Tested resilience runbooks with circuit breakers, fallback queues, replay/reconciliation evidence, duplicate prevention, and post-outage integrity verification across every logistics integration", 10),
+    q("MOB-F3W-8", "Operational KPI Mapping", "Does the agent map logistics KPIs such as OTIF/DIFOT, fill rate, inventory accuracy, dock-to-stock time, exception aging, carrier acceptance, and SLA breach rate to AMC maturity evidence?", "ISO 9001:2015 §9.1; ISO 28000:2022 performance evaluation", "KPIs exist outside AMC and do not affect maturity, routing, or remediation", "Some KPIs are reported in dashboards, but they are not consistently bound to evidence or maturity recommendations", "KPI-to-AMC mapping is versioned, signed, and continuously monitored with threshold drift alerts, evidence links, and remediation playbooks for every degraded KPI", 8),
+  ]
+};
+
 // ---------------------------------------------------------------------------
 // TECHNOLOGY STATION (5 packs)
 // ---------------------------------------------------------------------------
@@ -2304,7 +2342,7 @@ const publicPrivateCollaboration: IndustryPack = {
 };
 
 // ---------------------------------------------------------------------------
-// REGISTRY — all 40 packs
+// REGISTRY — all 41 packs
 // ---------------------------------------------------------------------------
 
 export const INDUSTRY_PACKS: Record<IndustryPackId, IndustryPack> = {
@@ -2343,6 +2381,7 @@ export const INDUSTRY_PACKS: Record<IndustryPackId, IndustryPack> = {
   "sustainable-real-estate": sustainableRealEstate,
   "virtual-infrastructure": virtualInfrastructure,
   "privacy-security-mobility": privacySecurityMobility,
+  "freight-3pl-warehouse": freight3plWarehouse,
   // Technology (5)
   "cognition-to-intelligence": cognitionToIntelligence,
   "networked-ecosystems": networkedEcosystems,

@@ -14,7 +14,7 @@
   <a href="https://www.npmjs.com/package/agent-maturity-compass"><img src="https://img.shields.io/npm/v/agent-maturity-compass?labelColor=0a0a0a&color=4AEF79" alt="npm version" /></a>
   <a href="https://www.npmjs.com/package/agent-maturity-compass"><img src="https://img.shields.io/npm/dm/agent-maturity-compass?labelColor=0a0a0a&color=4AEF79" alt="downloads" /></a>
   <a href="https://github.com/AgentMaturity/AgentMaturityCompass/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/AgentMaturity/AgentMaturityCompass/ci.yml?branch=main&labelColor=0a0a0a&color=4AEF79&label=CI" alt="CI" /></a>
-  <a href="https://github.com/AgentMaturity/AgentMaturityCompass/actions/workflows/ci.yml"><img src="https://img.shields.io/badge/tests-5%2C031%20passing-4AEF79?labelColor=0a0a0a" alt="tests" /></a>
+  <a href="https://github.com/AgentMaturity/AgentMaturityCompass/actions/workflows/ci.yml"><img src="https://img.shields.io/badge/tests-8%2C150%20collected-4AEF79?labelColor=0a0a0a" alt="tests" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-4AEF79?labelColor=0a0a0a" alt="MIT" /></a>
 </p>
 
@@ -91,6 +91,7 @@ Want a fast legacy pulse check instead of the full evidence score?
 
 ```bash
 amc quickscore --rapid           # optional rapid check, not the full score
+amc quickscore --answers answers.json --json  # non-interactive answer-based score
 ```
 
 <details>
@@ -108,8 +109,11 @@ brew tap AgentMaturity/amc && brew install agent-maturity-compass
 
 **Docker**
 ```bash
-docker run -it --rm ghcr.io/agentmaturity/amc-quickstart amc
+docker build -t amc-quickstart -f docker/Dockerfile.quickstart .
+docker run -it --rm amc-quickstart amc
 ```
+
+Use the local build command unless a GHCR package has been verified public.
 
 **From source**
 ```bash
@@ -138,15 +142,15 @@ AMC is not an observability tool and not an eval harness. It is a **trust scorec
 
 ## 🧪 What AMC Tests
 
-### 240 Diagnostic Questions × 5 Dimensions
+### 244 Default Diagnostic Questions × 5 Dimensions
 
 | Dimension | Questions | What It Measures |
 |-----------|-----------|------------------|
-| Strategic Agent Operations | 16 | Mission clarity, scope adherence, cost governance, operational intelligence |
-| Agent Leadership | 20 | Governance structure, EU AI Act readiness, proactive risk management, business continuity |
-| Agent Culture | 94 | Feedback loops, forecast legitimacy, persona governance, UX honesty, over-compliance detection, social alignment |
-| Agent Resilience | 52 | Graceful degradation, circuit breakers, memory safety, threat resistance, fact/simulation boundaries |
-| Agent Skills | 53 | Tool mastery, injection defense, DLP, scenario traceability, replay safety |
+| Strategic Agent Operations | 19 | Mission clarity, scope adherence, cost governance, operational intelligence |
+| Leadership & Autonomy | 23 | Governance structure, EU AI Act readiness, proactive risk management, business continuity |
+| Culture & Alignment | 95 | Feedback loops, forecast legitimacy, persona governance, UX honesty, over-compliance detection, social alignment |
+| Resilience | 55 | Graceful degradation, circuit breakers, memory safety, threat resistance, fact/simulation boundaries |
+| Skills | 52 | Tool mastery, injection defense, DLP, scenario traceability, replay safety |
 
 ### 147 Assurance Packs
 
@@ -159,19 +163,19 @@ AMC is not an observability tool and not an eval harness. It is a **trust scorec
 | Supply Chain | Dependency attacks, MCP server poisoning, SBOM integrity |
 | Behavioral | Sycophancy, self-preservation, sabotage, over-compliance |
 
-### 40 Industry Domain Packs
+### 41 Industry Domain Packs
 
 | Sector | Packs | Key Regulations |
 |--------|-------|-----------------|
 | 🏥 Health | 9 | HIPAA, FDA 21 CFR Part 11, EU MDR, ICH E6(R3) |
 | 💰 Wealth | 5 | MiFID II, PSD2, EU DORA, MiCA, FATF |
 | 🎓 Education | 5 | FERPA, COPPA, IDEA, EU AI Act Annex III |
-| 🚇 Mobility | 5 | UNECE WP.29, ETSI EN 303 645, EU NIS2 |
+| 🚇 Mobility | 6 | UNECE WP.29, ETSI EN 303 645, EU NIS2, ISO 28000, GS1 EPCIS |
 | 💡 Technology | 5 | EU AI Act Art. 13, EU Data Act, DSA Art. 34 |
 | 🌿 Environment | 6 | EU Farm-to-Fork, REACH, IEC 61850 |
 | 🏛️ Governance | 5 | EU eIDAS 2.0, UNCAC, UNGPs |
 
-Industry Packs are paid content: `$9.99/month` unlocks all 40 packs in the CLI and Studio. Run `amc domain pack checkout` to open the subscription flow, then paste the returned key into Studio or run `amc domain pack activate --key <license-key>`.
+Industry Packs are paid content: `$9.99/month` unlocks all 41 packs in the CLI and Studio. Run `amc domain pack checkout` to open the subscription flow, then paste the returned key into Studio or run `amc domain pack activate --key <license-key>`.
 
 ### 🔮 Simulation & Forecast Evaluation Lane
 
@@ -233,7 +237,7 @@ AMC Gateway ──── transparent proxy, agent doesn't know it's being watche
 Evidence Ledger ──── Ed25519 signatures + Merkle tree proof chains
     │
     ▼
-Scoring Engine ──── evidence-weighted diagnostics, 79 scoring modules, 147 assurance packs
+Scoring Engine ──── evidence-weighted diagnostics, research-backed scoring, 147 assurance packs
     │
     ▼
 AMC Studio ──── dashboard + API + CLI + reports
@@ -286,10 +290,16 @@ AMC is one trust stack with eight named product surfaces:
 npx agent-maturity-compass        # full score, no setup
 amc                               # full score after global install
 amc run                           # explicit 8-surface maturity run
-amc run --question-set lifecycle  # opt-in 260-question lifecycle expansion
+amc run --question-set lifecycle  # opt-in 264-question lifecycle expansion
 ```
 
 Need a fast pulse check for a demo or README badge? Use `amc quickscore --rapid` explicitly.
+
+Need a CI-safe score without terminal prompts? Use `amc quickscore --answers answers.json --json`, where `answers.json` maps question IDs to L0-L5 numbers.
+
+If `amc quickscore` prints a placeholder L0 because no terminal prompt was available, it now shows a first-run hint: "Did you mean to run the interactive score?" Run it in a terminal, or pass answers explicitly for CI.
+
+If `amc quickscore --auto --json` cannot find captured execution evidence, it fails closed with `scoreStatus: "AUTO_NO_EVIDENCE"` and does not emit a measured zero score. Capture evidence with `amc wrap <runtime> -- <your-agent-command>`, or use `amc quickscore --answers answers.json --json` for CI-safe survey scoring.
 
 Advanced proof check:
 
@@ -410,8 +420,16 @@ amc lite-score                                           # score a non-agent cha
 
 ```bash
 amc business kpi                                         # correlate maturity to outcomes
+amc business risk --maturity 3 --baseline-frequency 4 --incident-cost 50000 --json
+amc business fair-scenario --scenario claims-ai-data-leak --maturity 3 --frequency-min 2 --frequency-most-likely 5 --frequency-max 9 --loss-min 20000 --loss-most-likely 75000 --loss-max 250000 --out fair-scenario.md
+amc business roi --current-maturity 2 --target-maturity 3 --baseline-frequency 5 --incident-cost 20000 --annual-control-cost 15000 --implementation-cost 5000
+amc business heatmap --portfolio risk-portfolio.json --out risk-heatmap.md
+amc business grc-export --portfolio risk-portfolio.json --out grc-treatment-plan.csv
 amc business report                                      # stakeholder-ready business summary
+amc executive brief --run latest --out board-brief.html  # print-ready board one-pager
 amc leaderboard show                                     # compare agents across a fleet
+amc leaderboard public-export --output public-leaderboard # anonymized leaderboard dataset bundle
+amc compare <run-a> <run-b> --output compare.json --badge # run diff plus compare-badge.svg
 amc inventory scan --deep                                # discover agents, frameworks, model files
 amc comms-check --text "Guaranteed 40% return" --domain wealth
 ```
@@ -460,6 +478,16 @@ jobs:
 ```
 
 ### Badge for your README
+
+For a run-to-run or model-route comparison badge, generate it from the real comparison command:
+
+```bash
+amc compare <run-a> <run-b> --output compare.json --badge
+amc compare gpt-4o-mini claude-3-haiku --agent support-bot --output model-compare.json --badge
+# writes compare-badge.svg or model-compare-badge.svg beside the report
+```
+
+Standalone maturity badges are also available when you only need a README trust marker:
 
 ```markdown
 <!-- Add this to your README -->
@@ -535,8 +563,11 @@ curl -fsSL https://agentmaturity.co/install.sh | sh
 
 ### Docker
 ```bash
-docker run -it --rm ghcr.io/agentmaturity/amc-quickstart amc
+docker build -t amc-quickstart -f docker/Dockerfile.quickstart .
+docker run -it --rm amc-quickstart amc
 ```
+
+Use the local build command unless a GHCR package has been verified public.
 
 ### From source
 ```bash
@@ -562,11 +593,11 @@ The full trust stack is **free and MIT licensed**. The only paid surface is Indu
 
 | Tier | What you get |
 |---|---|
-| **Free / Open Source** | Everything — Score, Shield, Enforce, Vault, Watch, Comply, Fleet, Passport, all 14 adapters, 1,084 registered CLI command paths, browser playground, CI gates |
-| **Industry Packs** | Everything in Free + all 40 Industry Domain Packs for `$9.99/month` |
+| **Free / Open Source** | Everything — Score, Shield, Enforce, Vault, Watch, Comply, Fleet, Passport, all 14 adapters, 1,144 registered CLI command paths, browser playground, CI gates |
+| **Industry Packs** | Everything in Free + all 41 Industry Domain Packs for `$9.99/month` |
 | **Enterprise** | Everything in Industry Packs + priority support + custom pack development + deployment assistance |
 
-> Industry Packs are 40 sector-specific domain packs (healthcare, finance, education, government, etc.) that require ongoing regulatory research and maintenance. The core trust stack stays free forever.
+> Industry Packs are 41 sector-specific domain packs (healthcare, finance, education, logistics, government, etc.) that require ongoing regulatory research and maintenance. The core trust stack stays free forever.
 
 ---
 
@@ -578,6 +609,7 @@ The full trust stack is **free and MIT licensed**. The only paid surface is Indu
 | **CLI** | Real agent scoring, evidence capture, shareable outputs | `npx agent-maturity-compass` |
 | **CI/CD** | Release gates, score thresholds, PR comments | [CI Templates](docs/CI_TEMPLATES.md) |
 | **Enterprise** | Self-hosted, managed deployment | [Deployment Options](docs/DEPLOYMENT_OPTIONS.md) |
+| **Cloud self-hosting** | AWS, GCP, Azure reference architectures | [Cloud Reference Architectures](docs/CLOUD_REFERENCE_ARCHITECTURES.md) |
 
 ### Start by persona
 
@@ -592,17 +624,20 @@ The full trust stack is **free and MIT licensed**. The only paid surface is Indu
 | | |
 |--|--|
 | [Getting Started (2 min)](docs/GETTING_STARTED.md) | [Agent Guide](docs/AGENT_GUIDE.md) |
+| [Community Demo Kit](docs/COMMUNITY_DEMO_KIT.md) | [Why AMC One-Pager](docs/WHY_AMC_ONE_PAGER.md) |
 | [Solo Dev Quickstart](docs/SOLO_DEV_QUICKSTART.md) | [Platform Engineer Quickstart](docs/PLATFORM_ENGINEER_QUICKSTART.md) |
 | [Security & Compliance Quickstart](docs/SECURITY_COMPLIANCE_QUICKSTART.md) | [Troubleshooting](docs/TROUBLESHOOTING.md) |
-| [CLI Reference (1,084 command paths)](docs/AMC_MASTER_REFERENCE.md) | [Architecture](docs/ARCHITECTURE_MAP.md) |
+| [CLI Reference (1,144 command paths)](docs/CLI_COMMAND_INVENTORY.md) | [Architecture](docs/ARCHITECTURE_MAP.md) |
 | [Compatibility Matrix](docs/COMPATIBILITY_MATRIX.md) | [Starter Blueprints](docs/STARTER_BLUEPRINTS.md) |
 | [Install Packages](docs/INSTALL_PACKAGES.md) | [Support Policy](docs/SUPPORT_POLICY.md) |
 | [Release Cadence](docs/RELEASE_CADENCE.md) | [CI Templates](docs/CI_TEMPLATES.md) |
 | [Hardening Guide](docs/HARDENING.md) | [Community](docs/COMMUNITY.md) |
+| [Cloud Reference Architectures](docs/CLOUD_REFERENCE_ARCHITECTURES.md) | [Deployment Options](docs/DEPLOYMENT_OPTIONS.md) |
 | [Assurance Lab](docs/ASSURANCE_LAB.md) | [Domain Packs](docs/SECTOR_PACKS.md) |
 | [EU AI Act Compliance](docs/EU_AI_ACT_COMPLIANCE.md) | [Multi-Agent Trust](docs/MULTI_AGENT_TRUST.md) |
-| [Executive Overview](docs/EXECUTIVE_OVERVIEW.md) | [White Paper](whitepaper/AMC_WHITEPAPER_v1.md) |
-| [Example Projects](examples/) | [Web Playground](https://agentmaturity.co/playground.html) |
+| [Executive Overview](docs/EXECUTIVE_OVERVIEW.md) | [Board L3 Risk Memo](docs/BOARD_RISK_L3_MEMO.md) |
+| [White Paper](whitepaper/AMC_WHITEPAPER_v1.md) | [Example Projects](examples/) |
+| [Web Playground](https://agentmaturity.co/playground.html) | [Docs Index](docs/INDEX.md) |
 
 <details>
 <summary><strong>More docs</strong></summary>
@@ -616,6 +651,7 @@ The full trust stack is **free and MIT licensed**. The only paid surface is Indu
 - [docs/EXAMPLES_INDEX.md](docs/EXAMPLES_INDEX.md) — example index
 - [docs/RECIPES.md](docs/RECIPES.md) — extended recipes
 - [docs/DEPLOYMENT_OPTIONS.md](docs/DEPLOYMENT_OPTIONS.md) — deployment options
+- [docs/CLOUD_REFERENCE_ARCHITECTURES.md](docs/CLOUD_REFERENCE_ARCHITECTURES.md) — AWS, GCP, and Azure self-hosted reference architectures
 - [docs/PRODUCT_EDITIONS.md](docs/PRODUCT_EDITIONS.md) — product editions
 - [docs/PRICING.md](docs/PRICING.md) — pricing details
 - [docs/BUYER_PACKAGES.md](docs/BUYER_PACKAGES.md) — buyer packages
@@ -652,7 +688,11 @@ AMC now includes a scheduled GitHub Actions workflow that validates packaged CLI
 AMC now supports lightweight workspace config presets for `.amc/amc.config.yaml`:
 
 ```bash
+amc init --minimal
 amc init --profile dev
+amc quickstart --minimal
+amc quickstart --startup-plan --answers-out amc-startup-answers.json
+amc quickstart --what-broken
 amc quickstart --profile ci
 amc config profile prod
 ```
@@ -662,6 +702,9 @@ Current MVP behavior:
 - `ci` → isolated trust boundary, proxy env enabled
 - `prod` → isolated trust boundary, proxy env disabled
 - explicit `--trust-boundary` still overrides the profile when you need it
+- `--minimal` → startup-friendly setup without a vault prompt or immediate full-score prompt
+- `--startup-plan` → role-aware 10-minute startup plan, framework detection, and optional sample answer file
+- `--what-broken` → single-command startup blocker report without running the interactive score
 
 ---
 
@@ -671,7 +714,7 @@ AMC is MIT licensed. We welcome contributions — especially new **assurance pac
 
 ```bash
 git clone https://github.com/AgentMaturity/AgentMaturityCompass.git
-cd AgentMaturityCompass && npm ci && npm test   # 5,098 tests
+cd AgentMaturityCompass && npm ci && npm test   # 8,150 collected Vitest tests
 ```
 
 **→ [CONTRIBUTING.md](CONTRIBUTING.md)** — includes guides for writing packs, mapping research papers, and adding adapters.
@@ -692,6 +735,6 @@ cd AgentMaturityCompass && npm ci && npm test   # 5,098 tests
 ---
 
 <p align="center">
-  <strong>240 default diagnostic questions + 20 lifecycle expansion questions · 147 assurance packs · 40 domain packs · 14 adapters · 79 scoring modules · 5,098 tests</strong><br>
+  <strong>244 default diagnostic questions + 20 lifecycle expansion questions · 147 assurance packs · 41 domain packs · 14 adapters · 1,144 CLI command paths</strong><br>
   <em>Stop trusting. Start verifying.</em>
 </p>

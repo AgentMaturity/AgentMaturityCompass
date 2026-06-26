@@ -8,11 +8,11 @@ This page exists to show momentum without making users read the entire changelog
 - help visitors see that AMC is active
 
 ## Current highlights
-- strong build/test health with large automated test coverage
-- expanded product-family packaging and public routing docs
-- browser / CLI / CI / deployment pathing clarified
-- stronger pricing / editions / sponsorship / deployment architecture docs
-- expanded docs hub routing and persona paths
+- 244-question default diagnostic bank with a 264-question lifecycle-expanded option
+- 1,144 generated CLI command paths in the public command inventory
+- Domain Proof Lane with `amc proof check`, `amcproof` artifacts, and fail-closed correctness status
+- Watch/Fleet evidence upgrades: session correlation, risk/cost/latency SLOs, incident-to-regression closure, fleet overview, and trust graph export
+- 147 assurance packs, 14 adapters, 41 Industry Packs, API/OpenAPI docs, and Studio/browser/docs paths refreshed around the same eight AMC surfaces
 
 ## Good future format
 For each release/month:

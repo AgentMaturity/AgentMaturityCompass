@@ -4,7 +4,16 @@
 
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import { z } from "zod";
-import { bodyJsonSchema, apiSuccess, apiError, isRequestBodyError, requireMethod } from './apiHelpers.js';
+import { bodyJson, bodyJsonSchema, apiSuccess, apiError, isRequestBodyError, requireMethod } from './apiHelpers.js';
+import type { ReplayBenchmarkCiReceipt, ReplayBenchmarkCorpusManifest } from '../benchmarks/replayBenchmarkCorpus.js';
+import type { LiveDriftReceipt } from '../watch/liveDriftAlerts.js';
+import type { JudgeCalibrationReceipt } from '../eval/judgeCalibration.js';
+import type { RunPromptLayerProviderDriftInput } from '../benchmarks/promptLayerProviderDrift.js';
+import type { RunPromptfooProviderDriftInput } from '../benchmarks/promptfooProviderDrift.js';
+import type { RunPatronusProviderDriftInput } from '../benchmarks/patronusProviderDrift.js';
+import type { RunInspectProviderDriftInput } from '../benchmarks/inspectProviderDrift.js';
+import type { RunTensorZeroProviderDriftInput } from '../benchmarks/tensorZeroProviderDrift.js';
+import type { RunHelmProviderDriftInput } from '../benchmarks/helmProviderDrift.js';
 
 const shieldScanBodySchema = z.object({
   code: z.string().min(1),
@@ -23,7 +32,261 @@ export async function handleShieldRoute(
   workspace = process.cwd()
 ): Promise<boolean> {
   if (pathname === '/api/v1/shield/status' && method === 'GET') {
-    apiSuccess(res, { status: 'operational', module: 'shield', capabilities: ['scan', 'injection-detect', 'sanitize'] });
+    apiSuccess(res, {
+      status: 'operational',
+      module: 'shield',
+      capabilities: ['scan', 'injection-detect', 'sanitize', 'score-explainability-receipts', 'replay-corpus-ci-receipts', 'live-drift-receipts', 'judge-calibration-receipts', 'provider-drift-fail-closed-receipts', 'promptfoo-provider-drift-receipts', 'patronus-provider-drift-receipts', 'inspect-provider-drift-receipts', 'tensorzero-provider-drift-receipts', 'helm-provider-drift-receipts']
+    });
+    return true;
+  }
+
+  if (pathname === '/api/v1/shield/replay-corpus/verify' && method === 'POST') {
+    try {
+      const body = await bodyJson<{
+        manifest?: ReplayBenchmarkCorpusManifest;
+        ciReceipt?: ReplayBenchmarkCiReceipt;
+      }>(req);
+      if (!body.manifest || !body.ciReceipt) {
+        apiError(res, 400, 'Required: manifest and ciReceipt');
+        return true;
+      }
+      const { verifyReplayBenchmarkCorpusReceipt } = await import('../benchmarks/replayBenchmarkCorpus.js');
+      const verification = verifyReplayBenchmarkCorpusReceipt(body.manifest, body.ciReceipt);
+      apiSuccess(res, {
+        verification,
+        failClosed: body.ciReceipt.failClosed,
+        manifestHash: body.manifest.manifestHash,
+        receiptHash: body.ciReceipt.receiptHash,
+      });
+    } catch (err) {
+      apiError(res, 400, err instanceof Error ? err.message : 'Replay corpus receipt verification failed');
+    }
+    return true;
+  }
+
+  if (pathname === '/api/v1/shield/live-drift/verify' && method === 'POST') {
+    try {
+      const body = await bodyJson<{ receipt?: LiveDriftReceipt }>(req);
+      if (!body.receipt) {
+        apiError(res, 400, 'Required: receipt');
+        return true;
+      }
+      const { verifyLiveDriftReceipt } = await import('../watch/liveDriftAlerts.js');
+      const verification = verifyLiveDriftReceipt(body.receipt);
+      apiSuccess(res, {
+        verification,
+        failClosed: body.receipt.failClosed,
+        receiptHash: body.receipt.receiptHash,
+      });
+    } catch (err) {
+      apiError(res, 400, err instanceof Error ? err.message : 'Live drift receipt verification failed');
+    }
+    return true;
+  }
+
+  if (pathname === '/api/v1/shield/judge-calibration/verify' && method === 'POST') {
+    try {
+      const body = await bodyJson<{ receipt?: JudgeCalibrationReceipt }>(req);
+      if (!body.receipt) {
+        apiError(res, 400, 'Required: receipt');
+        return true;
+      }
+      const { verifyJudgeCalibrationReceipt } = await import('../eval/judgeCalibration.js');
+      const verification = verifyJudgeCalibrationReceipt(body.receipt);
+      apiSuccess(res, {
+        verification,
+        failClosed: body.receipt.failClosed,
+        receiptHash: body.receipt.receiptHash,
+      });
+    } catch (err) {
+      apiError(res, 400, err instanceof Error ? err.message : 'Judge calibration receipt verification failed');
+    }
+    return true;
+  }
+
+  if (pathname === '/api/v1/shield/provider-drift/verify' && method === 'POST') {
+    try {
+      const body = await bodyJson<RunPromptLayerProviderDriftInput>(req);
+      if (!Array.isArray(body.baseline) || !Array.isArray(body.candidate) || !body.promptLayer) {
+        apiError(res, 400, 'Required: baseline[], candidate[], and promptLayer metadata');
+        return true;
+      }
+      const { runPromptLayerProviderDrift } = await import('../benchmarks/promptLayerProviderDrift.js');
+      const result = runPromptLayerProviderDrift({
+        ...body,
+        agentId: body.agentId ?? 'default',
+      });
+      apiSuccess(res, {
+        verification: result.ciGate.passed ? 'passed' : 'blocked',
+        ciGate: result.ciGate,
+        promptLayerEvidenceHash: result.promptLayerEvidenceHash,
+        failClosed: result.report.failClosed,
+        activeAlerts: result.report.alerts.filter((alert) => !alert.waived).map((alert) => alert.alertId),
+        waivedAlerts: result.report.alerts.filter((alert) => alert.waived).map((alert) => alert.alertId),
+      });
+    } catch (err) {
+      apiError(res, 400, err instanceof Error ? err.message : 'Provider drift receipt verification failed');
+    }
+    return true;
+  }
+
+  if (pathname === '/api/v1/shield/promptfoo-provider-drift/verify' && method === 'POST') {
+    try {
+      const body = await bodyJson<RunPromptfooProviderDriftInput>(req);
+      if (!Array.isArray(body.baseline) || !Array.isArray(body.candidate) || !body.promptfoo) {
+        apiError(res, 400, 'Required: baseline[], candidate[], and promptfoo metadata');
+        return true;
+      }
+      const { runPromptfooProviderDrift } = await import('../benchmarks/promptfooProviderDrift.js');
+      const result = runPromptfooProviderDrift({
+        ...body,
+        agentId: body.agentId ?? 'default',
+      });
+      apiSuccess(res, {
+        verification: result.ciGate.passed ? 'passed' : 'blocked',
+        ciGate: result.ciGate,
+        promptfooEvidenceHash: result.promptfooEvidenceHash,
+        failClosed: result.report.failClosed,
+        activeAlerts: result.report.alerts.filter((alert) => !alert.waived).map((alert) => alert.alertId),
+        waivedAlerts: result.report.alerts.filter((alert) => alert.waived).map((alert) => alert.alertId),
+      });
+    } catch (err) {
+      apiError(res, 400, err instanceof Error ? err.message : 'promptfoo provider drift receipt verification failed');
+    }
+    return true;
+  }
+
+  if (pathname === '/api/v1/shield/patronus-provider-drift/verify' && method === 'POST') {
+    try {
+      const body = await bodyJson<RunPatronusProviderDriftInput>(req);
+      if (!Array.isArray(body.baseline) || !Array.isArray(body.candidate) || !body.patronus) {
+        apiError(res, 400, 'Required: baseline[], candidate[], and patronus metadata');
+        return true;
+      }
+      const { runPatronusProviderDrift } = await import('../benchmarks/patronusProviderDrift.js');
+      const result = runPatronusProviderDrift({
+        ...body,
+        agentId: body.agentId ?? 'default',
+      });
+      apiSuccess(res, {
+        verification: result.ciGate.passed ? 'passed' : 'blocked',
+        ciGate: result.ciGate,
+        patronusEvidenceHash: result.patronusEvidenceHash,
+        failClosed: result.report.failClosed,
+        activeAlerts: result.report.alerts.filter((alert) => !alert.waived).map((alert) => alert.alertId),
+        waivedAlerts: result.report.alerts.filter((alert) => alert.waived).map((alert) => alert.alertId),
+        shield: result.shield,
+        sourceRefs: result.sourceRefs,
+      });
+    } catch (err) {
+      apiError(res, 400, err instanceof Error ? err.message : 'Patronus provider drift receipt verification failed');
+    }
+    return true;
+  }
+
+  if (pathname === '/api/v1/shield/inspect-provider-drift/verify' && method === 'POST') {
+    try {
+      const body = await bodyJson<RunInspectProviderDriftInput>(req);
+      if (!Array.isArray(body.baseline) || !Array.isArray(body.candidate) || !body.inspect) {
+        apiError(res, 400, 'Required: baseline[], candidate[], and inspect metadata');
+        return true;
+      }
+      const { runInspectProviderDrift } = await import('../benchmarks/inspectProviderDrift.js');
+      const result = runInspectProviderDrift({
+        ...body,
+        agentId: body.agentId ?? 'default',
+      });
+      apiSuccess(res, {
+        verification: result.ciGate.passed ? 'passed' : 'blocked',
+        ciGate: result.ciGate,
+        inspectEvidenceHash: result.inspectEvidenceHash,
+        failClosed: result.report.failClosed,
+        activeAlerts: result.report.alerts.filter((alert) => !alert.waived).map((alert) => alert.alertId),
+        waivedAlerts: result.report.alerts.filter((alert) => alert.waived).map((alert) => alert.alertId),
+        shield: result.shield,
+        sourceRefs: result.sourceRefs,
+      });
+    } catch (err) {
+      apiError(res, 400, err instanceof Error ? err.message : 'Inspect provider drift receipt verification failed');
+    }
+    return true;
+  }
+
+  if (pathname === '/api/v1/shield/tensorzero-provider-drift/verify' && method === 'POST') {
+    try {
+      const body = await bodyJson<RunTensorZeroProviderDriftInput>(req);
+      if (!Array.isArray(body.baseline) || !Array.isArray(body.candidate) || !body.tensorZero) {
+        apiError(res, 400, 'Required: baseline[], candidate[], and tensorZero metadata');
+        return true;
+      }
+      const { runTensorZeroProviderDrift } = await import('../benchmarks/tensorZeroProviderDrift.js');
+      const result = runTensorZeroProviderDrift({
+        ...body,
+        agentId: body.agentId ?? 'default',
+      });
+      apiSuccess(res, {
+        verification: result.ciGate.passed ? 'passed' : 'blocked',
+        ciGate: result.ciGate,
+        tensorZeroEvidenceHash: result.tensorZeroEvidenceHash,
+        failClosed: result.report.failClosed,
+        activeAlerts: result.report.alerts.filter((alert) => !alert.waived).map((alert) => alert.alertId),
+        waivedAlerts: result.report.alerts.filter((alert) => alert.waived).map((alert) => alert.alertId),
+        shield: result.shield,
+        sourceRefs: result.sourceRefs,
+      });
+    } catch (err) {
+      apiError(res, 400, err instanceof Error ? err.message : 'TensorZero provider drift receipt verification failed');
+    }
+    return true;
+  }
+
+  if (pathname === '/api/v1/shield/helm-provider-drift/verify' && method === 'POST') {
+    try {
+      const body = await bodyJson<RunHelmProviderDriftInput>(req);
+      if (!Array.isArray(body.baseline) || !Array.isArray(body.candidate) || !body.helm) {
+        apiError(res, 400, 'Required: baseline[], candidate[], and helm metadata');
+        return true;
+      }
+      const { runHelmProviderDrift } = await import('../benchmarks/helmProviderDrift.js');
+      const result = runHelmProviderDrift({
+        ...body,
+        agentId: body.agentId ?? 'default',
+      });
+      apiSuccess(res, {
+        verification: result.ciGate.passed ? 'passed' : 'blocked',
+        ciGate: result.ciGate,
+        helmEvidenceHash: result.helmEvidenceHash,
+        failClosed: result.report.failClosed,
+        activeAlerts: result.report.alerts.filter((alert) => !alert.waived).map((alert) => alert.alertId),
+        waivedAlerts: result.report.alerts.filter((alert) => alert.waived).map((alert) => alert.alertId),
+        shield: result.shield,
+        sourceRefs: result.sourceRefs,
+      });
+    } catch (err) {
+      apiError(res, 400, err instanceof Error ? err.message : 'HELM provider drift receipt verification failed');
+    }
+    return true;
+  }
+
+  const scoreExplainabilityParams = /^\/api\/v1\/shield\/score-explainability\/([^/]+)$/.exec(pathname);
+  if (scoreExplainabilityParams && method === 'GET') {
+    try {
+      const runId = decodeURIComponent(scoreExplainabilityParams[1]!);
+      const url = new URL(req.url ?? pathname, 'http://localhost');
+      const agentId = url.searchParams.get('agentId') ?? 'default';
+      const { loadRunReport } = await import('../diagnostic/runner.js');
+      const report = loadRunReport(workspace, runId, agentId);
+      apiSuccess(res, {
+        agentId,
+        runId,
+        trustLabel: report.trustLabel,
+        integrityIndex: report.integrityIndex,
+        questionExplainability: report.questionExplainability ?? null,
+        failClosed: report.questionExplainability?.failClosed ?? true
+      });
+    } catch (err) {
+      apiError(res, 404, err instanceof Error ? err.message : 'Question explainability receipt not found');
+    }
     return true;
   }
 

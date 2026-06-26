@@ -5,6 +5,16 @@
 
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import { bodyJson, apiSuccess, apiError, queryParam } from './apiHelpers.js';
+import type { ReplayBenchmarkCorpusInput } from '../benchmarks/replayBenchmarkCorpus.js';
+import type { RunLiveScoreBehaviorDriftInput } from '../watch/liveDriftAlerts.js';
+import type { BuildJudgeCalibrationReceiptInput } from '../eval/judgeCalibration.js';
+import type { RunHumanloopProviderDriftInput } from '../benchmarks/humanloopProviderDrift.js';
+import type { RunPromptLayerProviderDriftInput } from '../benchmarks/promptLayerProviderDrift.js';
+import type { RunPromptfooProviderDriftInput } from '../benchmarks/promptfooProviderDrift.js';
+import type { RunPatronusProviderDriftInput } from '../benchmarks/patronusProviderDrift.js';
+import type { RunInspectProviderDriftInput } from '../benchmarks/inspectProviderDrift.js';
+import type { RunTensorZeroProviderDriftInput } from '../benchmarks/tensorZeroProviderDrift.js';
+import type { RunHelmProviderDriftInput } from '../benchmarks/helmProviderDrift.js';
 
 export async function handleWatchRoute(
   pathname: string,
@@ -113,10 +123,281 @@ export async function handleWatchRoute(
         trustLabel: report.trustLabel,
         integrityIndex: report.integrityIndex,
         inflationAttempts: report.inflationAttempts ?? [],
+        questionExplainability: report.questionExplainability ?? null,
         markdown: md,
       });
     } catch (err) {
       apiError(res, 500, err instanceof Error ? err.message : 'Explain failed');
+    }
+    return true;
+  }
+
+  // POST /api/v1/watch/replay-corpus — turn a replay corpus into watchable CI alerts
+  if (pathname === '/api/v1/watch/replay-corpus' && method === 'POST') {
+    try {
+      const body = await bodyJson<ReplayBenchmarkCorpusInput>(req);
+      if (!Array.isArray(body.rows)) {
+        apiError(res, 400, 'rows required');
+        return true;
+      }
+      const { runReplayBenchmarkCorpus } = await import('../benchmarks/replayBenchmarkCorpus.js');
+      const result = runReplayBenchmarkCorpus({
+        ...body,
+        agentId: body.agentId ?? 'default',
+      });
+      apiSuccess(res, {
+        agentId: result.manifest.agentId,
+        corpusId: result.manifest.corpusId,
+        manifestHash: result.manifest.manifestHash,
+        fixtureHash: result.manifest.fixtureHash,
+        scoreDelta0to1: result.manifest.scoreDelta0to1,
+        ciReceipt: result.ciReceipt,
+        watchAlerts: result.watchAlerts,
+      });
+    } catch (err) {
+      apiError(res, 500, err instanceof Error ? err.message : 'Replay corpus watch projection failed');
+    }
+    return true;
+  }
+
+  // POST /api/v1/watch/live-drift — compare baseline eval distribution to live production samples
+  if (pathname === '/api/v1/watch/live-drift' && method === 'POST') {
+    try {
+      const body = await bodyJson<RunLiveScoreBehaviorDriftInput>(req);
+      if (!body.baselineWindow || !Array.isArray(body.baselineWindow.rows) || !body.liveWindow || !Array.isArray(body.liveWindow.rows)) {
+        apiError(res, 400, 'Required: baselineWindow.rows and liveWindow.rows');
+        return true;
+      }
+      const { runLiveScoreBehaviorDrift, buildLiveDriftWatchAlerts } = await import('../watch/liveDriftAlerts.js');
+      const receipt = runLiveScoreBehaviorDrift({
+        ...body,
+        agentId: body.agentId ?? 'default',
+      });
+      apiSuccess(res, {
+        receipt,
+        watchAlerts: buildLiveDriftWatchAlerts(receipt),
+      });
+    } catch (err) {
+      apiError(res, 500, err instanceof Error ? err.message : 'Live drift watch projection failed');
+    }
+    return true;
+  }
+
+  // POST /api/v1/watch/provider-drift — project provider/version canary drift into Watch alerts
+  if (pathname === '/api/v1/watch/provider-drift' && method === 'POST') {
+    try {
+      const body = await bodyJson<RunPromptLayerProviderDriftInput>(req);
+      if (!Array.isArray(body.baseline) || !Array.isArray(body.candidate) || !body.promptLayer) {
+        apiError(res, 400, 'Required: baseline[], candidate[], and promptLayer metadata');
+        return true;
+      }
+      const { runPromptLayerProviderDrift } = await import('../watch/promptLayerProviderDrift.js');
+      const result = runPromptLayerProviderDrift({
+        ...body,
+        agentId: body.agentId ?? 'default',
+      });
+      apiSuccess(res, {
+        report: result.report,
+        promptLayerEvidenceHash: result.promptLayerEvidenceHash,
+        watchAlerts: result.watchAlerts,
+        failClosed: result.report.failClosed,
+      });
+    } catch (err) {
+      apiError(res, 500, err instanceof Error ? err.message : 'Provider drift watch projection failed');
+    }
+    return true;
+  }
+
+  // POST /api/v1/watch/humanloop-provider-drift — project Humanloop eval/log canary drift into Score, Shield, and Watch surfaces
+  if (pathname === '/api/v1/watch/humanloop-provider-drift' && method === 'POST') {
+    try {
+      const body = await bodyJson<RunHumanloopProviderDriftInput>(req);
+      if (!Array.isArray(body.baseline) || !Array.isArray(body.candidate) || !body.humanloop) {
+        apiError(res, 400, 'Required: baseline[], candidate[], and humanloop metadata');
+        return true;
+      }
+      const { runHumanloopProviderDrift } = await import('../watch/humanloopProviderDrift.js');
+      const result = runHumanloopProviderDrift({
+        ...body,
+        agentId: body.agentId ?? 'default',
+      });
+      apiSuccess(res, {
+        report: result.report,
+        humanloopEvidenceHash: result.humanloopEvidenceHash,
+        score: result.score,
+        shield: result.shield,
+        watch: result.watch,
+        watchAlerts: result.watchAlerts,
+        failClosed: result.report.failClosed,
+        sourceRefs: result.sourceRefs,
+      });
+    } catch (err) {
+      apiError(res, 500, err instanceof Error ? err.message : 'Humanloop provider drift watch projection failed');
+    }
+    return true;
+  }
+
+  // POST /api/v1/watch/promptfoo-provider-drift — project promptfoo provider/version canary drift into Watch alerts
+  if (pathname === '/api/v1/watch/promptfoo-provider-drift' && method === 'POST') {
+    try {
+      const body = await bodyJson<RunPromptfooProviderDriftInput>(req);
+      if (!Array.isArray(body.baseline) || !Array.isArray(body.candidate) || !body.promptfoo) {
+        apiError(res, 400, 'Required: baseline[], candidate[], and promptfoo metadata');
+        return true;
+      }
+      const { runPromptfooProviderDrift } = await import('../watch/promptfooProviderDrift.js');
+      const result = runPromptfooProviderDrift({
+        ...body,
+        agentId: body.agentId ?? 'default',
+      });
+      apiSuccess(res, {
+        report: result.report,
+        promptfooEvidenceHash: result.promptfooEvidenceHash,
+        watchAlerts: result.watchAlerts,
+        failClosed: result.report.failClosed,
+      });
+    } catch (err) {
+      apiError(res, 500, err instanceof Error ? err.message : 'promptfoo provider drift watch projection failed');
+    }
+    return true;
+  }
+
+  // POST /api/v1/watch/patronus-provider-drift — project Patronus-style provider/version canary drift into Watch alerts
+  if (pathname === '/api/v1/watch/patronus-provider-drift' && method === 'POST') {
+    try {
+      const body = await bodyJson<RunPatronusProviderDriftInput>(req);
+      if (!Array.isArray(body.baseline) || !Array.isArray(body.candidate) || !body.patronus) {
+        apiError(res, 400, 'Required: baseline[], candidate[], and patronus metadata');
+        return true;
+      }
+      const { runPatronusProviderDrift } = await import('../watch/patronusProviderDrift.js');
+      const result = runPatronusProviderDrift({
+        ...body,
+        agentId: body.agentId ?? 'default',
+      });
+      apiSuccess(res, {
+        report: result.report,
+        patronusEvidenceHash: result.patronusEvidenceHash,
+        score: result.score,
+        shield: result.shield,
+        watch: result.watch,
+        watchAlerts: result.watchAlerts,
+        failClosed: result.report.failClosed,
+        sourceRefs: result.sourceRefs,
+      });
+    } catch (err) {
+      apiError(res, 500, err instanceof Error ? err.message : 'Patronus provider drift watch projection failed');
+    }
+    return true;
+  }
+
+  // POST /api/v1/watch/inspect-provider-drift — project Inspect-backed provider/version canary drift into Score, Shield, and Watch surfaces
+  if (pathname === '/api/v1/watch/inspect-provider-drift' && method === 'POST') {
+    try {
+      const body = await bodyJson<RunInspectProviderDriftInput>(req);
+      if (!Array.isArray(body.baseline) || !Array.isArray(body.candidate) || !body.inspect) {
+        apiError(res, 400, 'Required: baseline[], candidate[], and inspect metadata');
+        return true;
+      }
+      const { runInspectProviderDrift } = await import('../watch/inspectProviderDrift.js');
+      const result = runInspectProviderDrift({
+        ...body,
+        agentId: body.agentId ?? 'default',
+      });
+      apiSuccess(res, {
+        report: result.report,
+        inspectEvidenceHash: result.inspectEvidenceHash,
+        score: result.score,
+        shield: result.shield,
+        watch: result.watch,
+        watchAlerts: result.watchAlerts,
+        failClosed: result.report.failClosed,
+        sourceRefs: result.sourceRefs,
+      });
+    } catch (err) {
+      apiError(res, 500, err instanceof Error ? err.message : 'Inspect provider drift watch projection failed');
+    }
+    return true;
+  }
+
+  // POST /api/v1/watch/tensorzero-provider-drift — project TensorZero-scoped provider/version canary drift into Watch alerts
+  if (pathname === '/api/v1/watch/tensorzero-provider-drift' && method === 'POST') {
+    try {
+      const body = await bodyJson<RunTensorZeroProviderDriftInput>(req);
+      if (!Array.isArray(body.baseline) || !Array.isArray(body.candidate) || !body.tensorZero) {
+        apiError(res, 400, 'Required: baseline[], candidate[], and tensorZero metadata');
+        return true;
+      }
+      const { runTensorZeroProviderDrift } = await import('../watch/tensorZeroProviderDrift.js');
+      const result = runTensorZeroProviderDrift({
+        ...body,
+        agentId: body.agentId ?? 'default',
+      });
+      apiSuccess(res, {
+        report: result.report,
+        tensorZeroEvidenceHash: result.tensorZeroEvidenceHash,
+        score: result.score,
+        shield: result.shield,
+        watch: result.watch,
+        watchAlerts: result.watchAlerts,
+        failClosed: result.report.failClosed,
+        sourceRefs: result.sourceRefs,
+      });
+    } catch (err) {
+      apiError(res, 500, err instanceof Error ? err.message : 'TensorZero provider drift watch projection failed');
+    }
+    return true;
+  }
+
+  // POST /api/v1/watch/helm-provider-drift — project HELM-backed provider/version canary drift into Score, Shield, and Watch surfaces
+  if (pathname === '/api/v1/watch/helm-provider-drift' && method === 'POST') {
+    try {
+      const body = await bodyJson<RunHelmProviderDriftInput>(req);
+      if (!Array.isArray(body.baseline) || !Array.isArray(body.candidate) || !body.helm) {
+        apiError(res, 400, 'Required: baseline[], candidate[], and helm metadata');
+        return true;
+      }
+      const { runHelmProviderDrift } = await import('../watch/helmProviderDrift.js');
+      const result = runHelmProviderDrift({
+        ...body,
+        agentId: body.agentId ?? 'default',
+      });
+      apiSuccess(res, {
+        report: result.report,
+        helmEvidenceHash: result.helmEvidenceHash,
+        score: result.score,
+        shield: result.shield,
+        watch: result.watch,
+        watchAlerts: result.watchAlerts,
+        failClosed: result.report.failClosed,
+        sourceRefs: result.sourceRefs,
+      });
+    } catch (err) {
+      apiError(res, 500, err instanceof Error ? err.message : 'HELM provider drift watch projection failed');
+    }
+    return true;
+  }
+
+  // POST /api/v1/watch/judge-calibration — project judge calibration failures into Watch alerts
+  if (pathname === '/api/v1/watch/judge-calibration' && method === 'POST') {
+    try {
+      const body = await bodyJson<BuildJudgeCalibrationReceiptInput>(req);
+      if (!body.rubric || !body.calibrationSet || !Array.isArray(body.calibrationSet.rows) || !Array.isArray(body.judgments)) {
+        apiError(res, 400, 'Required: rubric, calibrationSet.rows, and judgments');
+        return true;
+      }
+      const { buildJudgeCalibrationReceipt, buildJudgeCalibrationWatchAlerts } = await import('../eval/judgeCalibration.js');
+      const receipt = buildJudgeCalibrationReceipt({
+        ...body,
+        agentId: body.agentId ?? 'default',
+        runId: body.runId ?? `judge-calibration-${Date.now()}`,
+      });
+      apiSuccess(res, {
+        receipt,
+        watchAlerts: buildJudgeCalibrationWatchAlerts(receipt),
+      });
+    } catch (err) {
+      apiError(res, 500, err instanceof Error ? err.message : 'Judge calibration watch projection failed');
     }
     return true;
   }

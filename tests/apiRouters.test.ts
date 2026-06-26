@@ -29,7 +29,17 @@ const m = vi.hoisted(() => ({
     integrityIndex: 0.9,
     unsupportedClaimCount: 1,
     inflationAttempts: [{ questionId: "q1" }],
-    layerScores: [{ avgFinalLevel: 4 }]
+    layerScores: [{ avgFinalLevel: 4 }],
+    questionExplainability: {
+      generatedAt: "2026-06-13T00:00:00.000Z",
+      agentId: agentId ?? "default",
+      runId,
+      sourceRefs: ["amc:diagnostic-ledger"],
+      replayable: true,
+      failClosed: false,
+      manifestHash: "a".repeat(64),
+      rows: []
+    }
   })),
   compareRuns: vi.fn(() => ({ delta: 1, improved: true })),
   generateReport: vi.fn(() => "# report"),
@@ -124,10 +134,14 @@ const m = vi.hoisted(() => ({
   notaryVerifyAttestCli: vi.fn(() => ({ valid: true })),
   notarySignCli: vi.fn(() => ({ signature: "sig" })),
   notaryLogVerifyCli: vi.fn(() => ({ valid: true })),
-  generateTrustCertificate: vi.fn(() => ({
+  generateTrustCertificate: vi.fn((params?: { preview?: boolean }) => ({
     outputPath: "cert.json",
     format: "json",
-    envelope: { payload: { certificateId: "cert-1", score: 93 } },
+    signatureStatus: params?.preview ? "UNSIGNED_PREVIEW" : "SIGNED",
+    envelope: {
+      claimBoundary: params?.preview ? "unsigned preview only" : undefined,
+      payload: { certificateId: "cert-1", score: 93 }
+    },
     sidecarJsonPath: "cert.sidecar.json"
   })),
   issueCertificate: vi.fn(async () => ({ certId: "cert-1", outFile: "cert.amccert" })),
@@ -293,6 +307,44 @@ const m = vi.hoisted(() => ({
   exportBenchmarkArtifact: vi.fn(() => ({ outFile: "bench.json", bench: { benchId: "bench-1" } })),
   ingestBenchmarks: vi.fn(() => ({ imported: [{ benchId: "bench-1" }] })),
   verifyBenchmarkArtifact: vi.fn(() => ({ valid: true })),
+  runProviderDriftBenchmark: vi.fn(() => ({
+    reportId: "provider-drift-test",
+    agentId: "agent-1",
+    createdAt: "2026-06-13T00:00:00.000Z",
+    providerVersions: ["openai/gpt-4o-mini@v1", "openai/gpt-4o-mini@v2"],
+    thresholds: {},
+    comparisons: [],
+    alerts: [],
+    waivers: [],
+    recommendation: "approve",
+    failClosed: false,
+    summary: "ok"
+  })),
+  buildProviderDriftWatchAlerts: vi.fn(() => []),
+  buildProviderDriftEvalPack: vi.fn(() => ({ packId: "pack-1", replayable: true })),
+  buildProviderDriftCiGate: vi.fn(() => ({ mode: "ci", passed: true })),
+  runReplayBenchmarkCorpus: vi.fn(() => ({
+    manifest: {
+      agentId: "agent-1",
+      corpusId: "corpus-1",
+      fixtureHash: "f".repeat(64),
+      manifestHash: "a".repeat(64),
+      scoreDelta0to1: 0.1,
+      rows: [],
+      replayable: true
+    },
+    ciReceipt: {
+      mode: "ci",
+      passed: true,
+      failClosed: false,
+      manifestHash: "a".repeat(64),
+      fixtureHash: "f".repeat(64),
+      scoreDelta0to1: 0.1,
+      receiptHash: "b".repeat(64)
+    },
+    watchAlerts: []
+  })),
+  verifyReplayBenchmarkCorpusReceipt: vi.fn(() => ({ valid: true, errors: [] })),
 
   initCiForAgent: vi.fn(() => ({ workflowPath: "workflow.yml" })),
   printCiSteps: vi.fn(() => ["checkout", "run amc"]),
@@ -682,6 +734,16 @@ vi.mock("../src/benchmarks/benchStats.js", () => ({ benchmarkStats: m.benchmarkS
 vi.mock("../src/benchmarks/benchExport.js", () => ({ exportBenchmarkArtifact: m.exportBenchmarkArtifact }));
 vi.mock("../src/benchmarks/benchImport.js", () => ({ ingestBenchmarks: m.ingestBenchmarks }));
 vi.mock("../src/benchmarks/benchVerify.js", () => ({ verifyBenchmarkArtifact: m.verifyBenchmarkArtifact }));
+vi.mock("../src/benchmarks/providerDriftBenchmark.js", () => ({
+  runProviderDriftBenchmark: m.runProviderDriftBenchmark,
+  buildProviderDriftWatchAlerts: m.buildProviderDriftWatchAlerts,
+  buildProviderDriftEvalPack: m.buildProviderDriftEvalPack,
+  buildProviderDriftCiGate: m.buildProviderDriftCiGate
+}));
+vi.mock("../src/benchmarks/replayBenchmarkCorpus.js", () => ({
+  runReplayBenchmarkCorpus: m.runReplayBenchmarkCorpus,
+  verifyReplayBenchmarkCorpusReceipt: m.verifyReplayBenchmarkCorpusReceipt
+}));
 
 vi.mock("../src/ci/gate.js", () => ({
   initCiForAgent: m.initCiForAgent,
@@ -851,6 +913,219 @@ async function assertJsonRoute(
   return result.json.data;
 }
 
+function liveDriftRequestBody(): unknown {
+  return {
+    agentId: "agent-1",
+    baselineWindow: {
+      windowId: "baseline",
+      startedAt: "2026-06-13T00:00:00.000Z",
+      endedAt: "2026-06-13T00:05:00.000Z",
+      rows: []
+    },
+    liveWindow: {
+      windowId: "live",
+      startedAt: "2026-06-13T01:00:00.000Z",
+      endedAt: "2026-06-13T01:05:00.000Z",
+      rows: []
+    }
+  };
+}
+
+function eddRagLiveDriftRequestBody(): unknown {
+  const row = (
+    windowPrefix: string,
+    index: number,
+    strategy: "recursive_doc_agent" | "metadata_replacement_sentence_window",
+    completeStrategyProof: boolean
+  ) => ({
+    traceId: `${windowPrefix}-${index}`,
+    scenarioId: `edd-rag-${index}`,
+    timestamp: `2026-06-13T0${windowPrefix === "baseline" ? 0 : 1}:0${index}:00.000Z`,
+    score0to1: 0.9,
+    passed: true,
+    refused: false,
+    errored: false,
+    behaviorSignature: "edd-rag:answer|action:grounded_answer",
+    domain: "multi-document rag",
+    agentEvaluationDimension: "evaluation_frameworks",
+    ragEvaluationMode: "hybrid",
+    ragPipelineStrategy: strategy,
+    ragStrategyComparisonId: "edd-rag-comparison-v1",
+    ragStrategyRunId: `${windowPrefix}-run-${index}`,
+    ragStrategyManifestHash: completeStrategyProof ? `strategy-manifest-${strategy}` : undefined,
+    ragIndexManifestHash: completeStrategyProof ? `index-${index}` : undefined,
+    ragQuerySetHash: "query-set-v1",
+    ragReferenceAnswerHash: completeStrategyProof ? "reference-answer-v1" : undefined,
+    ragEvaluatorConfigHash: completeStrategyProof ? "evaluator-config-v1" : undefined,
+    ragModelConfigHash: completeStrategyProof ? "model-config-v1" : undefined,
+    ragStrategyResultHash: completeStrategyProof ? `${windowPrefix}-result-${index}` : undefined,
+    ragCorpusId: "edd-corpus",
+    ragCorpusHash: "edd-corpus-v1",
+    ragChunkSize: 512,
+    ragChunkOverlap: 64,
+    ragNodeName: strategy === "recursive_doc_agent" ? "document-agent-node" : "sentence-window-node",
+    ragRetrieverId: strategy === "recursive_doc_agent" ? "recursive-retriever" : "metadata-replacement-retriever",
+    ragGeneratorId: "answer-generator-v1",
+    ragFrameworkId: "rag-eval-harness-v1",
+    ragRetrievalTopK: 5,
+    ragGeneratedDataSuffix: "generated-eval-v1",
+    ragGeneratedDataFinalized: true,
+    ragJudgeType: "hybrid",
+    ragHallucinationEvaluatorEnabled: true,
+    ragAccuracy0to1: 0.9,
+    ragCompleteness0to1: 0.88,
+    ragUtilization0to1: 0.84,
+    ragNumericalAccuracy0to1: 0.91,
+    ragHallucinationRate0to1: 0.04,
+    evidenceRefs: [`trace:${windowPrefix}-${index}`],
+    signedEvidenceRefs: [`ledger:${windowPrefix}-${index}`]
+  });
+
+  return {
+    agentId: "edd-rag-agent",
+    baselineWindow: {
+      windowId: "baseline-edd",
+      startedAt: "2026-06-13T00:00:00.000Z",
+      endedAt: "2026-06-13T00:05:00.000Z",
+      rows: [
+        row("baseline", 1, "recursive_doc_agent", true),
+        row("baseline", 2, "metadata_replacement_sentence_window", true),
+        row("baseline", 3, "metadata_replacement_sentence_window", true)
+      ]
+    },
+    liveWindow: {
+      windowId: "live-edd",
+      startedAt: "2026-06-13T01:00:00.000Z",
+      endedAt: "2026-06-13T01:05:00.000Z",
+      rows: [
+        row("live", 1, "metadata_replacement_sentence_window", true),
+        row("live", 2, "metadata_replacement_sentence_window", false),
+        row("live", 3, "metadata_replacement_sentence_window", false)
+      ]
+    },
+    thresholds: {
+      minRagStrategyEvidenceCoverage0to1: 1,
+      maxRagStrategyDivergence0to1: 0.2
+    },
+    sourceRefs: ["https://github.com/wenqiglantz/edd-recursive-doc-agent-vs-metadata-replacement"]
+  };
+}
+
+function signedEvidenceRef(evidenceId: string, seed: string): Record<string, unknown> {
+  return {
+    evidenceId,
+    eventHash: seed.repeat(64).slice(0, 64),
+    writerSig: `sig-${evidenceId}`,
+    eventType: "audit",
+    sessionId: `session-${evidenceId}`,
+    ts: Date.UTC(2026, 5, 13),
+    trustTier: "OBSERVED"
+  };
+}
+
+function judgeCalibrationRequestBody(): unknown {
+  const calibrationRow = (itemId: string, expectedScore0to1: number, seed: string) => ({
+    itemId,
+    expectedScore0to1,
+    sourceRefs: [`amc:judge-calibration:${itemId}`],
+    evidenceRefs: [`ev-cal-${itemId}`],
+    signedEvidenceRefs: [signedEvidenceRef(`ev-cal-${itemId}`, seed)]
+  });
+  const judgment = (itemId: string, judgeId: string, score0to1: number, promptSeed: string, outputSeed: string, evidenceSeed: string) => ({
+    itemId,
+    judgeId,
+    score0to1,
+    promptHash: promptSeed.repeat(64).slice(0, 64),
+    outputHash: outputSeed.repeat(64).slice(0, 64),
+    evidenceRefs: [`ev-${judgeId}-${itemId}`],
+    signedEvidenceRefs: [signedEvidenceRef(`ev-${judgeId}-${itemId}`, evidenceSeed)]
+  });
+  return {
+    agentId: "agent-1",
+    runId: "judge-calibration-run-1",
+    generatedAt: "2026-06-13T00:00:00.000Z",
+    mode: "ci",
+    rubric: {
+      rubricId: "amc-judge-rubric",
+      version: "2026.06",
+      criteria: ["factuality", "completeness", "faithfulness"],
+      owner: "AMC Eval"
+    },
+    calibrationSet: {
+      setId: "amc-judge-calibration-v1",
+      version: "2026.06",
+      rows: [
+        calibrationRow("item-1", 0.91, "a"),
+        calibrationRow("item-2", 0.72, "b"),
+        calibrationRow("item-3", 0.44, "c")
+      ]
+    },
+    judgments: [
+      judgment("item-1", "judge-a", 0.9, "1", "2", "d"),
+      judgment("item-1", "judge-b", 0.92, "3", "4", "e"),
+      judgment("item-2", "judge-a", 0.71, "5", "6", "f"),
+      judgment("item-2", "judge-b", 0.73, "7", "8", "9"),
+      judgment("item-3", "judge-a", 0.45, "a", "b", "1"),
+      judgment("item-3", "judge-b", 0.43, "c", "d", "2")
+    ],
+    appeals: [
+      {
+        appealId: "appeal-1",
+        itemId: "item-2",
+        status: "upheld",
+        submittedBy: "eval-owner",
+        reviewer: "human-reviewer",
+        outcomeReasonHash: "e".repeat(64),
+        evidenceRefs: ["ev-appeal-1"],
+        signedEvidenceRefs: [signedEvidenceRef("ev-appeal-1", "3")]
+      }
+    ],
+    agentStockBenchmarkProof: {
+      benchmarkId: "agentstock-sp500-daily-arena",
+      benchmarkVersion: "2026.06.16",
+      sourceRepository: "https://github.com/xsunsim/AgentStockBenchmarkResults",
+      sourceCommit: "9f6cc89af052e4903feab99851809748bf74a84d",
+      sourceTreeHash: "d23aeed71ef3cf5d3b1b8553e726ac11fa747976",
+      licenseRefHash: "9844180ce4cd878d0174ee11b50ea7dfd0552177",
+      readmeBlobHash: "702714fce4a1ff01538c5721713c86a59162f204",
+      pyprojectHash: "db7eb398e66ef127b184b134b3163c949f0a08e8",
+      accountingMetricsHash: "0a271d272a4a4583baf04d855169f979388754d9",
+      leaderboardHash: "0a271d272a4a4583baf04d855169f979388754d9",
+      leaderboardMarkdownHash: "69a1d71cf07600a8ad2e5431a20881fbeddfa053",
+      strategyManifestHash: "bd28c574fd8ff2facd8aadd5f12857fee267499d",
+      promptsTreeHash: "4a538f3b6c31600a852aa250551470b37b8ba566",
+      rankingsTreeHash: "3ea023727722c20c7d457f704275df9cbcba392f",
+      portfolioTreeHash: "bfd8969316d57fdeb72124e5b59bb70c0bd16e6f",
+      strategyTreeHash: "969863caf4b0453f25e3b34592d320760e413564",
+      dataRawTreeHash: "b1f26c6bcaac391ed59f040f74f7a661def5fd2a",
+      dataParquetTreeHash: "a853fb02ef935eae8a68f9b8940b3e08fa21700a",
+      scriptsTreeHash: "e5d164b01ff31af20eb32a7ac2936e502d003660",
+      dailyDigestTreeHash: "2a7135e0ecb2cd12196f3d9aa3542f9ca068a485",
+      benchmarkDate: "2026-06-16",
+      marketUniverse: "sp500",
+      agentRosterHash: "4".repeat(64),
+      predictionPromptHash: "5".repeat(64),
+      futureOutcomeWindowHash: "6".repeat(64),
+      groundTruthPriceDataHash: "7".repeat(64),
+      rankingResultHash: "8".repeat(64),
+      pnlMetricHash: "9".repeat(64),
+      appealWorkflowHash: "a".repeat(64),
+      replayCommandHash: "b".repeat(64),
+      ciReceiptHash: "c".repeat(64),
+      rankedAgentCount: 16,
+      tickerCount: 500,
+      tradingDayCount: 45,
+      futureOutcomeCoverage0to1: 1,
+      leaderboardCoverage0to1: 1,
+      appealResolutionCoverage0to1: 1,
+      replayPassRate0to1: 1,
+      evidenceRefs: ["ev-agentstock-proof"],
+      signedEvidenceRefs: [signedEvidenceRef("ev-agentstock-proof", "4")]
+    },
+    sourceRefs: ["https://www.mdpi.com/2079-9292/15/3/659", "https://github.com/xsunsim/AgentStockBenchmarkResults"]
+  };
+}
+
 describe("AMC API routers", () => {
   test("score router covers interactive, reporting, industry, trust, and lane routes", async () => {
     const ws = workspace();
@@ -859,6 +1134,17 @@ describe("AMC API routers", () => {
 
     await assertJsonRoute(handleScoreRoute, { pathname: "/api/v1/score/status", method: "GET", workspace: ws });
     await assertJsonRoute(handleScoreRoute, { pathname: "/api/v1/score/run", method: "POST", body: { agentId: "agent-1" }, workspace: ws });
+    await assertJsonRoute(handleScoreRoute, { pathname: "/api/v1/score/live-drift", method: "POST", body: liveDriftRequestBody(), workspace: ws });
+    const eddRagScore = await assertJsonRoute(handleScoreRoute, { pathname: "/api/v1/score/live-drift", method: "POST", body: eddRagLiveDriftRequestBody(), workspace: ws });
+    expect(eddRagScore.receipt.liveDistribution.ragStrategyEvidenceCoverage0to1).toBeCloseTo(1 / 3);
+    expect(eddRagScore.receipt.alerts.map((alert: { metricId: string }) => alert.metricId)).toEqual(expect.arrayContaining([
+      "ragStrategyEvidenceCoverage0to1",
+      "ragStrategyDistribution"
+    ]));
+    const judgeCalibrationScore = await assertJsonRoute(handleScoreRoute, { pathname: "/api/v1/score/judge-calibration", method: "POST", body: judgeCalibrationRequestBody(), workspace: ws });
+    expect(judgeCalibrationScore.receipt.receiptHash).toMatch(/^[a-f0-9]{64}$/);
+    expect(judgeCalibrationScore.receipt.agentStockBenchmarkProof.proofHash).toMatch(/^[a-f0-9]{64}$/);
+    expect(judgeCalibrationScore.ciGate.passed).toBe(true);
     await assertJsonRoute(handleScoreRoute, { pathname: "/api/v1/score/quickscore", method: "POST", body: { answers: { q1: 3 } }, workspace: ws });
     await assertJsonRoute(handleScoreRoute, { pathname: "/api/v1/score/quickscore/questions", method: "GET", workspace: ws });
     await assertJsonRoute(handleScoreRoute, { pathname: "/api/v1/score/quick", method: "POST", body: { answers: { q1: 4 }, tier: "quick" }, workspace: ws });
@@ -870,6 +1156,7 @@ describe("AMC API routers", () => {
     await assertJsonRoute(handleScoreRoute, { pathname: "/api/v1/score/adversarial", method: "POST", body: { agentId: "agent-1" }, workspace: ws });
     await assertJsonRoute(handleScoreRoute, { pathname: "/api/v1/score/runs", method: "GET", url: "/api/v1/score/runs?agentId=default&limit=5", workspace: ws });
     await assertJsonRoute(handleScoreRoute, { pathname: "/api/v1/score/run/run-a", method: "GET", url: "/api/v1/score/run/run-a?agentId=default", workspace: ws });
+    await assertJsonRoute(handleScoreRoute, { pathname: "/api/v1/score/evidence-drilldown/run-1/AMC-1.1", method: "GET", url: "/api/v1/score/evidence-drilldown/run-1/AMC-1.1?agentId=agent-1", workspace: ws });
     await assertJsonRoute(handleScoreRoute, { pathname: "/api/v1/score/compare", method: "GET", url: "/api/v1/score/compare?runA=run-a&runB=run-b&agentId=default", workspace: ws });
     const reportMd = await callRoute(handleScoreRoute, { pathname: "/api/v1/score/report/run-a", method: "GET", url: "/api/v1/score/report/run-a?format=md", workspace: ws });
     expect(reportMd.handled).toBe(true);
@@ -1032,6 +1319,28 @@ describe("AMC API routers", () => {
     for (const [pathname, method, body, url, status] of cases) {
       await assertJsonRoute(handleCryptoRoute, { pathname, method, body, url, workspace: ws }, status);
     }
+  });
+
+  test("crypto cert generate passes unsigned preview mode through", async () => {
+    const ws = workspace();
+    const data = await assertJsonRoute(handleCryptoRoute, {
+      pathname: "/api/v1/crypto/cert/generate",
+      method: "POST",
+      workspace: ws,
+      body: {
+        agentId: "agent-1",
+        outputPath: "preview.json",
+        preview: true
+      }
+    }, 201);
+
+    expect(m.generateTrustCertificate).toHaveBeenCalledWith(expect.objectContaining({
+      agentId: "agent-1",
+      outputPath: "preview.json",
+      preview: true
+    }));
+    expect(data.signatureStatus).toBe("UNSIGNED_PREVIEW");
+    expect(data.claimBoundary).toBe("unsigned preview only");
   });
 
   test("security router covers all security endpoints", async () => {
@@ -1305,6 +1614,9 @@ describe("AMC API routers", () => {
       ["/api/v1/watch/attest", "POST", { agentId: "agent-1", output: "response", sessionId: "sess-1" }, undefined],
       ["/api/v1/watch/safety-test", "POST", { agentId: "agent-1", packId: "all", window: "30d" }, undefined],
       ["/api/v1/watch/explain", "POST", { agentId: "agent-1", runId: "run-1" }, undefined],
+      ["/api/v1/watch/replay-corpus", "POST", { agentId: "agent-1", corpusId: "corpus-1", corpusVersion: "v1", baselineRunId: "base", candidateRunId: "candidate", rows: [] }, undefined],
+      ["/api/v1/watch/live-drift", "POST", liveDriftRequestBody(), undefined],
+      ["/api/v1/watch/judge-calibration", "POST", judgeCalibrationRequestBody(), undefined],
       ["/api/v1/watch/governor", "GET", undefined, "/api/v1/watch/governor?agentId=agent-1&actionClass=READ_ONLY&riskTier=low&mode=SIMULATE"],
       ["/api/v1/watch/host-hardening", "GET", undefined, undefined],
       ["/api/v1/watch/oversight", "POST", { agentId: "agent-1", event: "approved", metadata: { by: "owner" } }, undefined],
@@ -1315,6 +1627,12 @@ describe("AMC API routers", () => {
     for (const [pathname, method, body, url] of cases) {
       await assertJsonRoute(handleWatchRoute, { pathname, method, body, url, workspace: ws });
     }
+    const eddRagWatch = await assertJsonRoute(handleWatchRoute, { pathname: "/api/v1/watch/live-drift", method: "POST", body: eddRagLiveDriftRequestBody(), workspace: ws });
+    expect(eddRagWatch.receipt.failClosed).toBe(true);
+    expect(eddRagWatch.watchAlerts.map((alert: { metricId: string }) => alert.metricId)).toEqual(expect.arrayContaining([
+      "ragStrategyEvidenceCoverage0to1",
+      "ragStrategyDistribution"
+    ]));
   });
 
   test("workflow router covers workorders, tickets, and lifecycle routes", async () => {
@@ -1342,11 +1660,122 @@ describe("AMC API routers", () => {
       ["/api/v1/benchmarks/stats", "GET", undefined, "/api/v1/benchmarks/stats?groupBy=archetype", 200],
       ["/api/v1/benchmarks/export", "POST", { runId: "run-1", outFile: "bench.json" }, undefined, 200],
       ["/api/v1/benchmarks/import", "POST", { path: "bench.json" }, undefined, 200],
-      ["/api/v1/benchmarks/verify", "POST", { file: "bench.json" }, undefined, 200]
+      ["/api/v1/benchmarks/verify", "POST", { file: "bench.json" }, undefined, 200],
+      ["/api/v1/benchmarks/provider-drift", "POST", { agentId: "agent-1", baseline: [], candidate: [] }, undefined, 200],
+      ["/api/v1/benchmarks/replay-corpus", "POST", { agentId: "agent-1", corpusId: "corpus-1", corpusVersion: "v1", baselineRunId: "base", candidateRunId: "candidate", rows: [] }, undefined, 200]
     ] as const;
     for (const [pathname, method, body, url, status] of cases) {
       await assertJsonRoute(handleBenchmarkRoute, { pathname, method, body, url, workspace: ws }, status);
     }
+  });
+
+  test("benchmark provider-drift API returns observability-pipeline alerts and gate state", async () => {
+    const ws = workspace();
+    const report = {
+      reportId: "provider-drift-observability-api",
+      agentId: "agent-1",
+      createdAt: "2026-06-13T00:00:00.000Z",
+      providerVersions: ["openai/gpt-4o-mini@2026-06-01", "openai/gpt-4o-mini@2026-06-13"],
+      thresholds: {},
+      comparisons: [{
+        canaryId: "football-content-observability-api",
+        observabilityPipelineMissingReasons: ["candidate:pipelineRunId"]
+      }],
+      alerts: [{
+        alertId: "pdrift:openai:gpt-4o-mini:football-content-observability-api:observabilityPipelineEvidence",
+        provider: "openai",
+        model: "gpt-4o-mini",
+        canaryId: "football-content-observability-api",
+        metricId: "observabilityPipelineEvidence",
+        severity: "critical",
+        message: "Provider observability pipeline proof is incomplete: candidate:pipelineRunId.",
+        threshold: 1,
+        observed: 0,
+        evidenceRefs: ["trace:candidate-football-api"],
+        waived: false
+      }],
+      waivers: [],
+      recommendation: "alert",
+      failClosed: true,
+      summary: "blocked"
+    };
+    m.runProviderDriftBenchmark.mockReturnValueOnce(report);
+    m.buildProviderDriftWatchAlerts.mockReturnValueOnce([{
+      id: "watch:provider-drift-observability-api",
+      agentId: "agent-1",
+      source: "provider-drift-benchmark",
+      severity: "critical",
+      metricId: "observabilityPipelineEvidence",
+      provider: "openai",
+      model: "gpt-4o-mini",
+      canaryId: "football-content-observability-api",
+      evidenceRefs: ["trace:candidate-football-api"],
+      message: "Provider observability pipeline proof is incomplete: candidate:pipelineRunId.",
+      createdAt: "2026-06-13T00:00:00.000Z"
+    }]);
+    m.buildProviderDriftEvalPack.mockReturnValueOnce({
+      packId: "provider-drift-football-content-api",
+      replayable: true,
+      rows: [{
+        observabilityPipelineMissingReasons: ["candidate:pipelineRunId"],
+        rowHash: "b".repeat(64)
+      }]
+    });
+    m.buildProviderDriftCiGate.mockReturnValueOnce({
+      mode: "lifecycle",
+      passed: false,
+      failClosed: true,
+      failedAlertIds: ["pdrift:openai:gpt-4o-mini:football-content-observability-api:observabilityPipelineEvidence"],
+      waivedAlertIds: [],
+      summary: "blocked"
+    });
+    const baseline = {
+      provider: "openai",
+      model: "gpt-4o-mini",
+      version: "2026-06-01",
+      canaryId: "football-content-observability-api",
+      sampleSize: 12,
+      scoreMean0to1: 0.84,
+      refusalRate0to1: 0.02,
+      latencyMsP95: 1100,
+      costUsdMean: 0.002,
+      evidenceRefs: ["trace:baseline-football-api"],
+      signedEvidenceRefs: ["ledger:baseline-football-api"]
+    };
+    const candidate = {
+      ...baseline,
+      version: "2026-06-13",
+      scoreMean0to1: 0.84,
+      refusalRate0to1: 0.02,
+      latencyMsP95: 1100,
+      costUsdMean: 0.002,
+      experimentTrackerId: "opik",
+      evidenceRefs: ["trace:candidate-football-api"],
+      signedEvidenceRefs: ["ledger:candidate-football-api"]
+    };
+
+    const data = await assertJsonRoute(handleBenchmarkRoute, {
+      pathname: "/api/v1/benchmarks/provider-drift",
+      method: "POST",
+      body: {
+        agentId: "agent-1",
+        baseline: [baseline],
+        candidate: [candidate],
+        packId: "provider-drift-football-content-api",
+        datasetHash: "a".repeat(64),
+        sourceRefs: ["https://github.com/benitomartin/llm-observability-opik"],
+        gateMode: "lifecycle"
+      },
+      workspace: ws
+    });
+
+    expect(data.report.failClosed).toBe(true);
+    expect(data.report.alerts.map((alert: any) => alert.metricId)).toEqual(["observabilityPipelineEvidence"]);
+    expect(data.watchAlerts.map((alert: any) => alert.metricId)).toEqual(["observabilityPipelineEvidence"]);
+    expect(data.evalPack.rows[0].observabilityPipelineMissingReasons).toContain("candidate:pipelineRunId");
+    expect(data.evalPack.rows[0].rowHash).toMatch(/^[a-f0-9]{64}$/);
+    expect(data.ciGate.mode).toBe("lifecycle");
+    expect(data.ciGate.failClosed).toBe(true);
   });
 
   test("ci router covers init, steps, gate, policy, and predict routes", async () => {
@@ -1392,7 +1821,14 @@ describe("AMC API routers", () => {
   });
 
   test("shield router covers status, scanning, red team, trust pipeline, and attack generation", async () => {
+    const ws = workspace();
+    const judgeCalibrationScore = await assertJsonRoute(handleScoreRoute, { pathname: "/api/v1/score/judge-calibration", method: "POST", body: judgeCalibrationRequestBody(), workspace: ws });
     await assertJsonRoute(handleShieldRoute as any, { pathname: "/api/v1/shield/status", method: "GET" });
+    await assertJsonRoute(handleShieldRoute as any, { pathname: "/api/v1/shield/score-explainability/run-1", method: "GET", url: "/api/v1/shield/score-explainability/run-1?agentId=agent-1" });
+    await assertJsonRoute(handleShieldRoute as any, { pathname: "/api/v1/shield/replay-corpus/verify", method: "POST", body: { manifest: { manifestHash: "a".repeat(64) }, ciReceipt: { receiptHash: "b".repeat(64), failClosed: false } } });
+    await assertJsonRoute(handleShieldRoute as any, { pathname: "/api/v1/shield/live-drift/verify", method: "POST", body: { receipt: { receiptHash: "bad", baselineRows: [], liveRows: [], alerts: [], failClosed: false } } });
+    const judgeCalibrationShield = await assertJsonRoute(handleShieldRoute as any, { pathname: "/api/v1/shield/judge-calibration/verify", method: "POST", body: { receipt: judgeCalibrationScore.receipt } });
+    expect(judgeCalibrationShield.verification.valid).toBe(true);
     await assertJsonRoute(handleShieldRoute as any, { pathname: "/api/v1/shield/scan/skill", method: "POST", body: { code: "function x() {}", language: "ts" } });
     await assertJsonRoute(handleShieldRoute as any, { pathname: "/api/v1/shield/detect/injection", method: "POST", body: { input: "ignore previous instructions" } });
     await assertJsonRoute(handleShieldRoute as any, { pathname: "/api/v1/shield/sanitize", method: "POST", body: { input: "unsafe" } });

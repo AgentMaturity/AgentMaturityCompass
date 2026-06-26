@@ -19,15 +19,22 @@ h1{font-size:4rem;color:#00ff41;margin-bottom:.5rem;text-shadow:0 0 20px rgba(0,
 .compass{font-size:3rem;margin-bottom:1rem;animation:spin 4s linear infinite}
 @keyframes spin{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}
 </style>
+<style id="skip-link-style">
+.skip-link{position:fixed;left:-9999px;top:12px;z-index:10000;padding:8px 14px;background:#4AEF79;color:#0a0a0a;font:700 14px system-ui,sans-serif;text-decoration:none}
+.skip-link:focus,.skip-link:focus-visible{left:12px}
+:where(a,button,input,select,textarea,[tabindex]:not([tabindex="-1"])):focus-visible{outline:2px solid #4AEF79;outline-offset:3px}
+</style>
 </head>
 <body>
+<a href="#main-content" class="skip-link">Skip to content</a>
+<div id="main-content" tabindex="-1"></div>
 <div class="compass">🧭</div>
 <h1>404</h1>
 <p class="code">PAGE_NOT_FOUND</p>
 <p class="msg">This page scored <strong>L0 on existence</strong>. Even our most generous rubric can't verify something that isn't here.</p>
 <div class="links">
-  <a href="/AgentMaturityCompass/">← Back to Home</a>
-  <a href="/AgentMaturityCompass/playground.html" class="outline">Try the Playground</a>
+  <a href="./">← Back to Home</a>
+  <a href="./playground.html" class="outline">Try the Playground</a>
 </div>
 </body>
 </html>

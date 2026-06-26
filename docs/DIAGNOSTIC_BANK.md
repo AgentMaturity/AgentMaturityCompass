@@ -1,4 +1,4 @@
-# Diagnostic Bank (5 Dimensions, 89 Questions)
+# Diagnostic Bank (5 Dimensions, 244 Default Questions)
 
 AMC diagnostic bank is a signed, explicit rubric built from the live question bank in `src/diagnostic/questionBank.ts`.
 
@@ -16,7 +16,8 @@ amc diagnostic render --agent default --format md
 
 Hard guarantees:
 - exactly 5 dimensions
-- exactly 138 questions
+- exactly 244 default questions
+- optional lifecycle-expanded question set has 264 questions
 - each question has 6 rubric levels (`0..5`)
 - each question has explicit evidence mapping and minimum coverage logic
 

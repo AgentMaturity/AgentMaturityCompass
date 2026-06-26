@@ -12,7 +12,7 @@ AMC has one simple split:
 | Product | Free / Open Source | Industry Packs ($9.99/mo) | Enterprise |
 |---|---|---|---|
 | **Score** | ✅ Full | ✅ Full | ✅ Full |
-| **Shield** (86 assurance packs) | ✅ Full | ✅ Full | ✅ Full |
+| **Shield** (147 assurance packs) | ✅ Full | ✅ Full | ✅ Full |
 | **Enforce** | ✅ Full | ✅ Full | ✅ Full |
 | **Vault** | ✅ Full | ✅ Full | ✅ Full |
 | **Watch** | ✅ Full | ✅ Full | ✅ Full |
@@ -20,10 +20,10 @@ AMC has one simple split:
 | **Passport** | ✅ Full | ✅ Full | ✅ Full |
 | **Comply** | ✅ Full | ✅ Full | ✅ Full |
 | **All 14 adapters** | ✅ Full | ✅ Full | ✅ Full |
-| **481 CLI commands** | ✅ Full | ✅ Full | ✅ Full |
+| **1,144 CLI command paths** | ✅ Full | ✅ Full | ✅ Full |
 | **Browser playground** | ✅ Full | ✅ Full | ✅ Full |
 | **CI trust gates** | ✅ Full | ✅ Full | ✅ Full |
-| **Industry Packs** (40 verticals) | ❌ | ✅ All 40 packs | ✅ All 40 packs |
+| **Industry Packs** (41 verticals) | ❌ | ✅ All 41 packs | ✅ All 41 packs |
 | **Priority support** | ❌ | ❌ | ✅ |
 | **Custom pack development** | ❌ | ❌ | ✅ |
 | **Deployment assistance** | ❌ | ❌ | ✅ |

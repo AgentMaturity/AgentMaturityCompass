@@ -94,6 +94,54 @@ describe("output attestation", () => {
     expect(report.hasTrustLevelBinding).toBe(true);
     expect(report.hasShieldResultBinding).toBe(true);
   });
+
+  test("binds PBSAI context envelope provenance and output contract into attestation", () => {
+    const att = createAttestation({
+      agentId: "pbsai-architecture-agent",
+      output: { decision: "route to human review" },
+      trustLevel: 5,
+      contextEnvelope: {
+        envelopeId: "env-001",
+        mission: "PBSAI estate governance",
+        threadId: "thread-001",
+        taskId: "task-001",
+        policyRefs: ["policy://ai-estate/human-oversight"],
+        constraints: ["no autonomous containment without approval"],
+        decisionBasis: ["critical asset impact", "policy threshold exceeded"],
+        provenance: {
+          sourceAgentId: "pbsai-architecture-agent",
+          sourceRunId: "run-001",
+          inputHashes: ["sha256:abc"],
+          evidenceRefs: ["ev://incident-001"],
+          modelRefs: ["model://risk-triage"],
+          toolRefs: ["tool://soar"],
+          createdAt: 1781590000000,
+        },
+        classification: "confidential",
+        legalBasis: "legitimate_interest",
+        humanEscalationThreshold: "high",
+      },
+      outputContract: {
+        schemaId: "pbsai.output.contract.v1",
+        version: "1.0.0",
+        requiredFields: ["decision", "policyRefs", "provenance"],
+        evidenceRefs: ["ev://incident-001"],
+        humanReviewRequired: true,
+      },
+    });
+
+    expect(att.contextEnvelope?.mission).toBe("PBSAI estate governance");
+    expect(att.provenanceMetadata?.evidenceRefs).toContain("ev://incident-001");
+    expect(att.outputContract?.schemaId).toBe("pbsai.output.contract.v1");
+
+    const ver = verifyAttestation(att);
+    expect(ver.valid).toBe(true);
+
+    const report = scoreOutputAttestation({ attestations: [att], verifications: [ver] });
+    expect(report.hasStructuredContextEnvelope).toBe(true);
+    expect(report.hasProvenanceMetadata).toBe(true);
+    expect(report.hasOutputContract).toBe(true);
+  });
 });
 
 describe("mutual verification", () => {

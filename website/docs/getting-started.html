@@ -11,6 +11,7 @@
   <link rel="stylesheet" href="shared.css">
 </head>
 <body>
+<a href="#main-content" class="skip-link">Skip to content</a>
 
 <!-- Topbar -->
 <div class="topbar">
@@ -58,7 +59,7 @@
   </nav>
 
   <!-- Main -->
-  <main class="main">
+  <main id="main-content" tabindex="-1" class="main">
     <div class="content">
 
       <h1 id="overview">Getting Started</h1>
@@ -149,7 +150,7 @@ npm link</code></pre>
 
       <div class="callout">
         <strong>Expanded lifecycle assessment:</strong>
-        Run <code>amc run --question-set lifecycle</code> when you want the explicit 260-question set covering lifecycle governance, evidence binding, runtime watch, proof exports, reasoning memory, and fleet operation. Default scoring stays on the stable 240-question set.
+        Run <code>amc run --question-set lifecycle</code> when you want the explicit 264-question set covering lifecycle governance, evidence binding, runtime watch, proof exports, reasoning memory, and fleet operation. Default scoring stays on the stable 244-question set.
       </div>
 
       <!-- Understanding Results -->
@@ -236,7 +237,7 @@ npm link</code></pre>
         </div>
         <div class="card">
           <h4>📊 Generate reports</h4>
-          <p>Run <code>amc report &lt;id&gt; --html report.html</code> for a styled stakeholder report, or <code>amc report &lt;id&gt; --executive</code> for a terminal summary.</p>
+          <p>Name a run with <code>amc run-alias set q1-assessment latest</code>, then run <code>amc report q1-assessment --share --public-base-url https://reports.example.com/amc</code> for a static share bundle, or <code>amc report q1-assessment --executive</code> for a terminal summary.</p>
         </div>
         <div class="card">
           <h4>⚖️ Check compliance</h4>
@@ -263,7 +264,9 @@ npm link</code></pre>
           <tr><td><code>amc evidence observability list|inspect</code></td><td>Open component attribution, experience signals, and decision-chain records</td></tr>
           <tr><td><code>amc memory writeback &lt;episode&gt;</code></td><td>Store a redacted, evidence-backed reasoning lesson with expiry and a receipt</td></tr>
           <tr><td><code>amc memory retrieve --consumer studio</code></td><td>Retrieve active memory lessons with citations for score, recommendations, fixer, or Studio</td></tr>
-          <tr><td><code>amc report &lt;run&gt;</code></td><td>Review confidence, uncertainty, low-evidence downgrades, and auto-fix review gates</td></tr>
+          <tr><td><code>amc run-alias set &lt;alias&gt; &lt;run&gt;</code></td><td>Name a diagnostic run for report, history, and customer-success workflows</td></tr>
+          <tr><td><code>amc report &lt;run|alias|latest&gt;</code></td><td>Review confidence, uncertainty, low-evidence downgrades, and auto-fix review gates</td></tr>
+          <tr><td><code>amc report &lt;alias&gt; --share --public-base-url &lt;url&gt;</code></td><td>Generate a static report bundle with local and public URLs for client review</td></tr>
           <tr><td><code>amc trace index|failures</code></td><td>Inspect distilled trace indexes and recurring failure clusters</td></tr>
           <tr><td><code>amc mechanic rca run &lt;run&gt;</code></td><td>Create RCA, regression tests, rollback pointers, and governed Enforce fix proposals</td></tr>
           <tr><td><code>amc mechanic rca list|show</code></td><td>Review signed Fixer RCA reports</td></tr>

@@ -30,12 +30,25 @@ export interface TrustPipelineInput {
   parameters: Record<string, unknown>;
   sessionId: string;
   workspaceId: string;
+  instructionSource?: PreActionTrustGateRequest['instructionSource'];
+  sensitiveDataFields?: string[];
+  lastVerifiedAt?: number;
+  cumulativeConfidence?: number;
+  stepNumber?: number;
+  previousActions?: string[];
 }
 
 export interface TrustPipelineResult {
   allowed: boolean;
   stages: {
-    shieldGate: { passed: boolean; trustScore: number; reason: string };
+    shieldGate: {
+      passed: boolean;
+      trustScore: number;
+      reason: string;
+      checks: PreActionTrustGateResult['checks'];
+      recommendations: string[];
+      evidenceId: string;
+    };
     formalVerification: { passed: boolean; propertiesVerified: number; certificateHash: string };
     zkProof: { generated: boolean; claim: string; proofId: string };
     trustToken: { issued: boolean; tokenId: string; expiresAt: number };
@@ -86,12 +99,13 @@ export async function runTrustPipeline(input: TrustPipelineInput): Promise<Trust
     toolName: input.toolName,
     parameters: input.parameters,
     sessionId: input.sessionId,
-    instructionSource: 'user',
+    instructionSource: input.instructionSource ?? 'user',
+    sensitiveDataFields: input.sensitiveDataFields,
     trustContext: {
-      lastVerifiedAt: Date.now(),
-      cumulativeConfidence: 1.0,
-      stepNumber: 1,
-      previousActions: [],
+      lastVerifiedAt: input.lastVerifiedAt ?? Date.now(),
+      cumulativeConfidence: input.cumulativeConfidence ?? 1.0,
+      stepNumber: input.stepNumber ?? 1,
+      previousActions: input.previousActions ?? [],
     },
   };
 
@@ -109,7 +123,7 @@ export async function runTrustPipeline(input: TrustPipelineInput): Promise<Trust
         credentialFreshness: 'expired',
         uncertaintyAcceptable: false,
       },
-      recommendations: [],
+      recommendations: ['Investigate Shield trust gate failure before executing this action.'],
       evidenceId: sha256(`gate-error:${input.sessionId}`),
     };
   }
@@ -118,6 +132,9 @@ export async function runTrustPipeline(input: TrustPipelineInput): Promise<Trust
     passed: gateResult.allowed,
     trustScore: gateResult.trustScore,
     reason: gateResult.reason,
+    checks: gateResult.checks,
+    recommendations: gateResult.recommendations,
+    evidenceId: gateResult.evidenceId,
   };
 
   const shieldHash = chainHash(genesisHash, 'shield-gate', shieldGateStage);

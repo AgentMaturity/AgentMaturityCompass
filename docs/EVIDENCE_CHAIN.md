@@ -426,7 +426,7 @@ amc transparency merkle prove --entry-hash <hash> --out proof.amcproof
 amc transparency merkle verify-proof proof.amcproof
 
 # Ingest external logs (arrives as SELF_REPORTED, 0.4× trust)
-amc ingest --source ./external-logs/ --format jsonl --agent imported-agent
+amc ingest ./external-logs/ --type generic_json --agent imported-agent
 
 # Upgrade trust tier via attestation
 amc attest --agent imported-agent --run <runId> --reason "verified against source"

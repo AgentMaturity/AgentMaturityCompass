@@ -20,6 +20,15 @@ import {
   verifyToolsConfigSignature
 } from "./toolhubValidators.js";
 import { appendToolEvidenceWithReceipt } from "./toolhubReceipts.js";
+import {
+  buildToolBlastRadiusConsent,
+  buildToolExecutedScope,
+  hashToolBlastRadiusConsent,
+  validateToolBlastRadiusConsent,
+  withToolBlastRadiusDecision,
+  type ToolBlastRadiusConsent,
+  type ToolBlastRadiusReviewerDecision
+} from "./blastRadiusConsent.js";
 import { executeFsRead, executeFsWrite } from "./toolhubExecutors/fs.js";
 import { executeGit } from "./toolhubExecutors/git.js";
 import { executeHttpFetch } from "./toolhubExecutors/http.js";
@@ -58,6 +67,7 @@ export interface ToolIntentResponse {
   approvalStatus?: "PENDING" | "QUORUM_MET" | "DENIED" | "CONSUMED" | "EXPIRED" | "CANCELLED";
   quorum?: { required: number; received: number; status: string };
   guardReceipt?: string;
+  blastRadiusConsent?: ToolBlastRadiusConsent;
 }
 
 export interface ToolExecutionRequest {
@@ -75,6 +85,8 @@ export interface ToolExecutionResponse {
   result: Record<string, unknown>;
   actionReceipt?: string;
   resultReceipt?: string;
+  blastRadiusReceipt?: string;
+  blastRadiusConsent?: ToolBlastRadiusConsent;
   reasons: string[];
 }
 
@@ -87,6 +99,7 @@ interface IntentRecord {
   actionClass: ActionClass;
   approvalRequestId?: string;
   approvalRequired: boolean;
+  blastRadiusConsent: ToolBlastRadiusConsent;
 }
 
 export interface ExecutionRecord {
@@ -352,6 +365,16 @@ export class ToolHubService {
     const approvalRequired =
       normalizeMode(input.requestedMode) === "EXECUTE" &&
       (tool.requireExecTicket === true || (approvalPolicySig.valid && manualApprovalsRequired > 0));
+    const blastRadiusConsent = buildToolBlastRadiusConsent({
+      intentId,
+      agentId: input.agentId,
+      toolName: input.toolName,
+      actionClass: normalizeActionClass(tool.actionClass),
+      args: input.args,
+      requestedMode: normalizeMode(input.requestedMode),
+      effectiveMode: decision.effectiveMode,
+      approvalRequired
+    });
     const record: IntentRecord = {
       intentId,
       createdTs: Date.now(),
@@ -362,7 +385,8 @@ export class ToolHubService {
       },
       decision,
       actionClass: normalizeActionClass(tool.actionClass),
-      approvalRequired
+      approvalRequired,
+      blastRadiusConsent
     };
     if (approvalRequired) {
       const approval = createApprovalForIntent({
@@ -382,7 +406,8 @@ export class ToolHubService {
           actionClass: record.actionClass,
           requestedMode: record.request.requestedMode,
           effectiveMode: decision.effectiveMode,
-          reasons: decision.reasons
+          reasons: decision.reasons,
+          blastRadiusConsent
         }
       });
       record.approvalRequestId = approval.approval.approvalRequestId;
@@ -505,7 +530,8 @@ export class ToolHubService {
               approvalId: record.approvalRequestId
             }).quorum
           : undefined,
-      guardReceipt
+      guardReceipt,
+      blastRadiusConsent
     };
   }
 
@@ -652,6 +678,51 @@ export class ToolHubService {
     }
 
     const executionId = `exec_${randomUUID().replace(/-/g, "")}`;
+    const blastRadiusReviewerDecision: ToolBlastRadiusReviewerDecision =
+      approvalUsedId !== null
+        ? {
+            status: "approved",
+            approvalRequestId: approvalUsedId,
+            decidedBy: "approval_quorum"
+          }
+        : ticketValid
+          ? {
+              status: "ticket_accepted",
+              decidedBy: "exec_ticket"
+            }
+          : requestedMode === "EXECUTE" && (intent.blastRadiusConsent.highImpact || ticketRequired)
+            ? {
+                status: "missing",
+                reason: "no approval or execution ticket was accepted"
+              }
+            : {
+                status: "not_required"
+              };
+    const blastRadiusConsent = withToolBlastRadiusDecision(
+      intent.blastRadiusConsent,
+      blastRadiusReviewerDecision,
+      buildToolExecutedScope({
+        toolName: intent.request.toolName,
+        actionClass: intent.actionClass,
+        args: intent.request.args,
+        effectiveMode,
+        workOrderId: intent.request.workOrderId ?? null
+      })
+    );
+    const blastRadiusValidation = validateToolBlastRadiusConsent(blastRadiusConsent);
+    if (!blastRadiusValidation.ok && requestedMode === "EXECUTE") {
+      return this.auditDenied(
+        intent,
+        "BLAST_RADIUS_CONSENT_INVALID",
+        `Blast-radius consent evidence invalid: ${blastRadiusValidation.reasons.join("; ")}`,
+        {
+          executeAttempted: true,
+          executeWithoutTicketAttempted: !ticketValid,
+          blastRadiusConsent
+        }
+      );
+    }
+    const blastRadiusConsentHash = hashToolBlastRadiusConsent(blastRadiusConsent);
     const ledger = openLedger(this.workspace);
     const sessionId = `toolhub-exec-${randomUUID()}`;
     const eventIds: string[] = [];
@@ -679,7 +750,9 @@ export class ToolHubService {
           actionClass: intent.actionClass,
           execTicketValid: ticketValid,
           approvalId: approvalUsedId,
-          approvalDecisionReceiptId
+          approvalDecisionReceiptId,
+          blastRadiusConsent,
+          blastRadiusConsentHash
         },
         payload: {
           executionId,
@@ -692,7 +765,9 @@ export class ToolHubService {
           execTicketValid: ticketValid,
           actionClass: intent.actionClass,
           approvalId: approvalUsedId,
-          approvalDecisionReceiptId
+          approvalDecisionReceiptId,
+          blastRadiusConsent,
+          blastRadiusConsentHash
         }
       });
       eventIds.push(action.eventId);
@@ -710,7 +785,8 @@ export class ToolHubService {
           requestedMode,
           effectiveMode,
           actionClass: intent.actionClass,
-          approvalId: approvalUsedId
+          approvalId: approvalUsedId,
+          blastRadiusConsentHash
         },
         payload: {
           executionId,
@@ -722,7 +798,8 @@ export class ToolHubService {
           result: resultPayload,
           denied: false,
           actionClass: intent.actionClass,
-          approvalId: approvalUsedId
+          approvalId: approvalUsedId,
+          blastRadiusConsentHash
         }
       });
       eventIds.push(result.eventId);
@@ -845,7 +922,7 @@ export class ToolHubService {
         };
         const approvalPayloadText = JSON.stringify(approvalPayload);
         const approvalBodySha = sha256Hex(Buffer.from(approvalPayloadText, "utf8"));
-          const consumedAudit = ledger.appendEvidenceWithReceipt({
+        const consumedAudit = ledger.appendEvidenceWithReceipt({
           sessionId,
           runtime: "unknown",
           eventType: "audit",
@@ -937,6 +1014,8 @@ export class ToolHubService {
         result: resultPayload,
         actionReceipt,
         resultReceipt,
+        blastRadiusReceipt: actionReceipt,
+        blastRadiusConsent,
         reasons
       };
     } finally {
@@ -1081,12 +1160,15 @@ export class ToolHubService {
     opts?: {
       executeAttempted?: boolean;
       executeWithoutTicketAttempted?: boolean;
+      blastRadiusConsent?: ToolBlastRadiusConsent;
     }
   ): ToolExecutionResponse {
     const executionId = `exec_${randomUUID().replace(/-/g, "")}`;
     const ledger = openLedger(this.workspace);
     const sessionId = `toolhub-deny-${randomUUID()}`;
     const eventIds: string[] = [];
+    const blastRadiusConsent = opts?.blastRadiusConsent;
+    const blastRadiusConsentHash = blastRadiusConsent ? hashToolBlastRadiusConsent(blastRadiusConsent) : null;
 
     try {
       ledger.startSession({
@@ -1105,7 +1187,9 @@ export class ToolHubService {
         actionClass: intent.actionClass,
         requestedMode: intent.request.requestedMode,
         executeAttempted: opts?.executeAttempted ?? false,
-        executeWithoutTicketAttempted: opts?.executeWithoutTicketAttempted ?? false
+        executeWithoutTicketAttempted: opts?.executeWithoutTicketAttempted ?? false,
+        blastRadiusConsent,
+        blastRadiusConsentHash
       };
       const id = ledger.appendEvidence({
         sessionId,
@@ -1167,7 +1251,9 @@ export class ToolHubService {
             intentId: intent.intentId,
             toolName: intent.request.toolName,
             agentId: intent.request.agentId,
-            actionClass: intent.actionClass
+            actionClass: intent.actionClass,
+            blastRadiusConsent,
+            blastRadiusConsentHash
           }),
           payloadExt: "json",
           inline: true,
@@ -1178,6 +1264,8 @@ export class ToolHubService {
             toolName: intent.request.toolName,
             agentId: intent.request.agentId,
             actionClass: intent.actionClass,
+            blastRadiusConsent,
+            blastRadiusConsentHash,
             trustTier: "OBSERVED"
           }
         });

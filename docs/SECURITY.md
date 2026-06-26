@@ -180,6 +180,8 @@ AMC certificates (`.amccert`) are offline-verifiable bundles containing:
 
 Verification checks: all signatures (auditor + monitor), evidence chain integrity, blob hashes, gate threshold satisfaction, and required assurance evidence.
 
+`amc cert generate --no-sign` and `amc cert generate --preview` are preview-only paths for showing the trust-certificate shape without unlocking the vault. They emit `UNSIGNED_PREVIEW` material, skip vault signing, and are intentionally rejected by certificate verification. Regenerate without preview mode before using a certificate as evidence.
+
 ## Truth Protocol
 
 For high-risk tasks, AMC enforces a structured response format:

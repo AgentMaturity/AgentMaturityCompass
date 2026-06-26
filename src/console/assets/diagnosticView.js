@@ -24,6 +24,8 @@ export async function renderDiagnosticViewPage(params) {
     const score = scoreById.get(question.qId);
     row.items.push({
       question,
+      runId: auto.runId,
+      agentId,
       score: score
         ? {
             ...score,

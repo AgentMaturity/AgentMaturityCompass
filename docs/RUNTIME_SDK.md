@@ -2,9 +2,14 @@
 
 AMC ships a Node runtime embed SDK for correlation-ready traces and gateway routing.
 
+This runtime SDK is Node-first. For React Native and Flutter, use the mobile Bridge path in `docs/SDK.md`; do not import `wrapFetch` into mobile bundles because it includes Node/runtime steering dependencies.
+
+For the full Node/TypeScript, Python, Go, and OpenAPI inventory, see `docs/SDK.md`.
+
 ## Exports
 
 - `wrapFetch(fetch, opts)`
+- `createAMCMobileFetchBridge(opts)` via `agent-maturity-compass/sdk/mobile-fetch` for mobile-safe Bridge routing
 - `logTrace(trace)`
 - `validateTruthProtocol(text, riskTier)`
 - `extractApprovalToken(text)`

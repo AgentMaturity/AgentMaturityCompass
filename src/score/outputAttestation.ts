@@ -18,6 +18,41 @@ export interface AttestationInput {
   timestamp?: number;
   delegationChain?: string[];
   shieldResults?: { pack: string; passed: boolean }[];
+  contextEnvelope?: ContextEnvelope;
+  provenanceMetadata?: ProvenanceMetadata;
+  outputContract?: OutputContract;
+}
+
+export interface ProvenanceMetadata {
+  sourceAgentId?: string;
+  sourceRunId?: string;
+  inputHashes?: string[];
+  evidenceRefs?: string[];
+  modelRefs?: string[];
+  toolRefs?: string[];
+  createdAt?: number;
+}
+
+export interface ContextEnvelope {
+  envelopeId: string;
+  mission: string;
+  threadId: string;
+  taskId: string;
+  policyRefs: string[];
+  constraints: string[];
+  decisionBasis: string[];
+  provenance: ProvenanceMetadata;
+  classification: string;
+  legalBasis?: string;
+  humanEscalationThreshold?: string;
+}
+
+export interface OutputContract {
+  schemaId: string;
+  version: string;
+  requiredFields: string[];
+  evidenceRefs: string[];
+  humanReviewRequired: boolean;
 }
 
 export interface Attestation {
@@ -30,6 +65,9 @@ export interface Attestation {
   evidenceChainHash: string | null;
   shieldSummary: { totalPacks: number; passed: number; failed: number };
   delegationDepth: number;
+  contextEnvelope: ContextEnvelope | null;
+  provenanceMetadata: ProvenanceMetadata | null;
+  outputContract: OutputContract | null;
   signature: string; // HMAC-SHA256 of attestation payload
 }
 
@@ -48,6 +86,9 @@ export interface OutputAttestationReport {
   hasTrustLevelBinding: boolean;
   hasDelegationChainTracking: boolean;
   hasShieldResultBinding: boolean;
+  hasStructuredContextEnvelope: boolean;
+  hasProvenanceMetadata: boolean;
+  hasOutputContract: boolean;
   hasEvidenceDecay: boolean;
   hasReceivingAgentVerification: boolean;
   attestationsIssued: number;
@@ -89,6 +130,9 @@ export function createAttestation(
     evidenceChainHash: input.evidenceChainHash ?? null,
     shieldSummary: { totalPacks: shieldTotal, passed: shieldPassed, failed: shieldTotal - shieldPassed },
     delegationDepth,
+    contextEnvelope: input.contextEnvelope ?? null,
+    provenanceMetadata: input.provenanceMetadata ?? input.contextEnvelope?.provenance ?? null,
+    outputContract: input.outputContract ?? null,
   };
 
   const payloadStr = JSON.stringify(payload);
@@ -115,6 +159,9 @@ export function verifyAttestation(
     evidenceChainHash: attestation.evidenceChainHash,
     shieldSummary: attestation.shieldSummary,
     delegationDepth: attestation.delegationDepth,
+    contextEnvelope: attestation.contextEnvelope,
+    provenanceMetadata: attestation.provenanceMetadata,
+    outputContract: attestation.outputContract,
   };
   const expectedSig = createHmac("sha256", signingKey).update(JSON.stringify(payload)).digest("hex");
 
@@ -157,6 +204,9 @@ export function scoreOutputAttestation(input: {
   const hasTrustLevelBinding = atts.some(a => a.trustLevel > 0);
   const hasDelegationChainTracking = atts.some(a => a.delegationDepth > 0);
   const hasShieldResultBinding = atts.some(a => a.shieldSummary.totalPacks > 0);
+  const hasStructuredContextEnvelope = atts.some(a => a.contextEnvelope !== null);
+  const hasProvenanceMetadata = atts.some(a => a.provenanceMetadata !== null);
+  const hasOutputContract = atts.some(a => a.outputContract !== null);
   const hasEvidenceDecay = vers.some(v => v.trustDecay > 0);
   const hasReceivingAgentVerification = vers.length > 0;
 
@@ -169,8 +219,12 @@ export function scoreOutputAttestation(input: {
   if (hasTrustLevelBinding) score += 15;
   if (hasDelegationChainTracking) score += 15;
   if (hasShieldResultBinding) score += 20;
+  if (hasStructuredContextEnvelope) score += 10;
+  if (hasProvenanceMetadata) score += 10;
+  if (hasOutputContract) score += 10;
   if (hasEvidenceDecay) score += 15;
   if (hasReceivingAgentVerification) score += 15;
+  score = Math.min(100, score);
 
   const level = score >= 85 ? 5 : score >= 65 ? 4 : score >= 45 ? 3 : score >= 25 ? 2 : score > 0 ? 1 : 0;
 
@@ -181,6 +235,9 @@ export function scoreOutputAttestation(input: {
     hasTrustLevelBinding,
     hasDelegationChainTracking,
     hasShieldResultBinding,
+    hasStructuredContextEnvelope,
+    hasProvenanceMetadata,
+    hasOutputContract,
     hasEvidenceDecay,
     hasReceivingAgentVerification,
     attestationsIssued: atts.length,

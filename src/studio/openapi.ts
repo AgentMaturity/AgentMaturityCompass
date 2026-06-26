@@ -118,6 +118,21 @@ function studioEndpoints(): Record<string, Record<string, OpenApiOperation>> {
         },
       },
     },
+    "/api/v1/score/evidence-drilldown/{runId}/{questionId}": {
+      get: {
+        summary: "Load a UI-ready Score evidence drilldown",
+        tags: ["Studio", "Score", "Shield", "Watch"],
+        parameters: [
+          { name: "runId", in: "path", required: true, schema: { type: "string" } },
+          { name: "questionId", in: "path", required: true, schema: { type: "string" } },
+          { name: "agentId", in: "query", required: false, schema: { type: "string", default: "default" } },
+        ],
+        responses: {
+          "200": okJson("Evidence drilldown with source artifact links, evidence previews, and fail-closed empty/error state metadata", "#/components/schemas/ScoreEvidenceDrilldownResponse"),
+          "404": errJson("Evidence drilldown not found"),
+        },
+      },
+    },
     "/api/assurance/run": {
       post: {
         summary: "Run assurance pack(s)",
@@ -331,6 +346,23 @@ function studioSchemas(): Record<string, unknown> {
         runId: { type: "string" },
       },
       required: ["accepted"],
+    },
+    ScoreEvidenceDrilldownResponse: {
+      type: "object",
+      properties: {
+        state: { type: "string", enum: ["ready", "empty", "error"] },
+        agentId: { type: "string" },
+        runId: { type: "string" },
+        questionId: { type: "string" },
+        surfaces: { type: "array", items: { type: "string", enum: ["Score", "Shield", "Watch"] } },
+        sourceArtifacts: { type: "array", items: { type: "object" } },
+        evidencePreview: { type: "object" },
+        scorableStudioDrilldownPreview: { type: "array", items: { type: "object" } },
+        obsStudioDrilldownPreview: { type: "array", items: { type: "object" } },
+        failClosed: { type: "boolean" },
+        replayable: { type: "boolean" },
+      },
+      required: ["state", "agentId", "runId", "questionId", "surfaces", "sourceArtifacts", "evidencePreview", "scorableStudioDrilldownPreview", "obsStudioDrilldownPreview", "failClosed", "replayable"],
     },
     RunHistoryResponse: {
       type: "object",

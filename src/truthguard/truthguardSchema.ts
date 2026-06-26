@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { correctnessProofStatusSchema } from "../domainProof/domainProofSchema.js";
 
 export const truthguardOutputSchema = z.object({
   v: z.literal(1),
@@ -7,7 +8,9 @@ export const truthguardOutputSchema = z.object({
     .array(
       z.object({
         text: z.string().min(1),
-        evidenceRefs: z.array(z.string().min(1)).optional()
+        evidenceRefs: z.array(z.string().min(1)).optional(),
+        correctnessProofStatus: correctnessProofStatusSchema.optional(),
+        domainProofRefs: z.array(z.string().min(1)).default([])
       })
     )
     .default([]),
@@ -29,7 +32,7 @@ export const truthguardOutputSchema = z.object({
 });
 
 export const truthguardViolationSchema = z.object({
-  kind: z.enum(["MISSING_EVIDENCE_REF", "DISALLOWED_TOOL", "DISALLOWED_MODEL", "SECRET_PATTERN"]),
+  kind: z.enum(["MISSING_EVIDENCE_REF", "DISALLOWED_TOOL", "DISALLOWED_MODEL", "SECRET_PATTERN", "UNSUPPORTED_CORRECTNESS_PROOF"]),
   path: z.string().min(1),
   message: z.string().min(1),
   snippetRedacted: z.string().min(1)

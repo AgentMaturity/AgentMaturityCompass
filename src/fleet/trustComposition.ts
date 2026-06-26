@@ -572,6 +572,7 @@ export function verifyCrossAgentReceipts(
 export function computeTrustComposition(
   workspace: string,
   reports: DiagnosticReport[],
+  options: { noSign?: boolean } = {},
 ): TrustCompositionReport {
   const config = loadTrustCompositionConfig(workspace);
   const snapshots = buildSnapshotMap(workspace, reports);
@@ -622,11 +623,13 @@ export function computeTrustComposition(
   };
 
   const reportJsonSha256 = sha256Hex(Buffer.from(canonicalize(reportBody), "utf8"));
-  let reportSealSig = "";
-  try {
-    reportSealSig = signHexDigest(reportJsonSha256, getPrivateKeyPem(workspace, "auditor"));
-  } catch {
-    reportSealSig = "unsigned";
+  let reportSealSig = "unsigned";
+  if (!options.noSign) {
+    try {
+      reportSealSig = signHexDigest(reportJsonSha256, getPrivateKeyPem(workspace, "auditor"));
+    } catch {
+      reportSealSig = "unsigned";
+    }
   }
 
   return {

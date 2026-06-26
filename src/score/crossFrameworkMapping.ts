@@ -5,7 +5,7 @@
  * compliance artifacts automatically from AMC assessment results."
  */
 
-export type ComplianceFramework = 'NIST_AI_RMF' | 'ISO_42001' | 'EU_AI_ACT' | 'SOC2_TYPE2' | 'GDPR' | 'FORESIGHT_SAFETY' | 'AGENTIC_4C' | 'MITRE_ATLAS' | 'OWASP_API_TOP10';
+export type ComplianceFramework = 'NIST_AI_RMF' | 'ISO_42001' | 'EU_AI_ACT' | 'SOC2_TYPE2' | 'GDPR' | 'FORESIGHT_SAFETY' | 'AGENTIC_4C' | 'MITRE_ATLAS' | 'OWASP_API_TOP10' | 'PBSAI';
 
 export interface FrameworkControl {
   id: string;
@@ -113,6 +113,7 @@ const GDPR_CONTROLS: FrameworkControl[] = [
   { id: 'GDPR-5.1d', name: 'Accuracy', description: 'Personal data accurate and kept up to date', amcQIDs: ['AMC-2.3', 'AMC-4.3'], amcModules: ['assurance', 'score'], automatable: true },
   { id: 'GDPR-5.1e', name: 'Storage Limitation', description: 'Data kept no longer than necessary', amcQIDs: ['AMC-3.1.2'], amcModules: ['vault', 'memoryTTL'], automatable: true },
   { id: 'GDPR-5.1f', name: 'Integrity and Confidentiality', description: 'Appropriate security measures for personal data', amcQIDs: ['AMC-1.5', 'AMC-1.8'], amcModules: ['shield', 'vault', 'enforce'], automatable: true },
+  { id: 'GDPR-5.2', name: 'Accountability', description: 'Controller can demonstrate compliance with GDPR Art. 5 principles', amcQIDs: ['AMC-1.7', 'AMC-2.4', 'AMC-4.5'], amcModules: ['audit', 'docs', 'passport'], automatable: true },
   { id: 'GDPR-6', name: 'Lawful Basis for Processing', description: 'Processing has documented lawful basis', amcQIDs: ['AMC-1.8', 'AMC-4.5'], amcModules: ['governor', 'audit'], automatable: false },
   { id: 'GDPR-15', name: 'Right of Access', description: 'Data subject can obtain confirmation and access to their data', amcQIDs: ['AMC-2.10'], amcModules: ['vault', 'transparency'], automatable: true },
   { id: 'GDPR-17', name: 'Right to Erasure', description: 'Data subject can request erasure of personal data', amcQIDs: ['AMC-3.1.2'], amcModules: ['vault', 'memoryTTL'], automatable: true },
@@ -158,6 +159,22 @@ const OWASP_API_TOP10_CONTROLS: FrameworkControl[] = [
   { id: 'OWASP-API10', name: 'Unsafe Consumption of APIs', description: 'Developers trust third-party APIs without proper validation', amcQIDs: ['AMC-2.5', 'AMC-1.5'], amcModules: ['enforce', 'gateway', 'shield'], automatable: true },
 ];
 
+// PBSAI Governance Ecosystem twelve-domain taxonomy (arXiv:2602.11301)
+const PBSAI_CONTROLS: FrameworkControl[] = [
+  { id: 'PBSAI-GRC', name: 'Governance, Risk, and Compliance', description: 'GRC agent family maps policy, risk appetite, controls, and evidence obligations across the AI estate', amcQIDs: ['AMC-1.1', 'AMC-1.3', 'AMC-2.11'], amcModules: ['governor', 'policyPacks', 'audit'], automatable: true },
+  { id: 'PBSAI-ASSET-CONFIG', name: 'Asset and Configuration', description: 'Asset/configuration domain maintains AI estate inventories, configuration state, and drift evidence', amcQIDs: ['AMC-1.7', 'AMC-2.9'], amcModules: ['inventory', 'drift', 'audit'], automatable: true },
+  { id: 'PBSAI-IDENTITY', name: 'Identity', description: 'Identity domain enforces actor identity, authorization, delegation, and zero-trust access to agent actions', amcQIDs: ['AMC-1.5', 'AMC-1.8', 'AMC-5.28'], amcModules: ['identity', 'rbac', 'crossAgentTrust'], automatable: true },
+  { id: 'PBSAI-MONITORING', name: 'Monitoring', description: 'Monitoring domain captures telemetry, analytic monitoring, and continuous detection evidence', amcQIDs: ['AMC-1.6', 'AMC-4.5'], amcModules: ['watch', 'siem', 'drift'], automatable: true },
+  { id: 'PBSAI-PROTECTION', name: 'Protection', description: 'Protection domain applies preventive controls, guardrails, and policy enforcement around agent tools', amcQIDs: ['AMC-1.5', 'AMC-3.3.4'], amcModules: ['enforce', 'shield', 'gateway'], automatable: true },
+  { id: 'PBSAI-DATA-SECURITY', name: 'Data Security', description: 'Data security domain protects sensitive data, classification, provenance, and evidence handling', amcQIDs: ['AMC-3.1.2', 'AMC-1.8'], amcModules: ['vault', 'dlp', 'dataClassification'], automatable: true },
+  { id: 'PBSAI-INCIDENT-RESPONSE', name: 'Incident Response', description: 'Incident response domain coordinates triage, containment, human escalation, and signed response records', amcQIDs: ['AMC-2.7', 'AMC-4.1'], amcModules: ['incidents', 'watch', 'audit'], automatable: true },
+  { id: 'PBSAI-RESILIENCE', name: 'Resilience', description: 'Resilience domain manages continuity, graceful degradation, backup, and adaptive response evidence', amcQIDs: ['AMC-4.2', 'AMC-4.5'], amcModules: ['forecast', 'resilience', 'watch'], automatable: true },
+  { id: 'PBSAI-ARCHITECTURE', name: 'Architecture', description: 'Architecture domain keeps bounded agent families, context envelopes, and structured output contracts aligned', amcQIDs: ['AMC-3.6.1', 'AMC-5.28'], amcModules: ['architecture', 'passport', 'outputAttestation'], automatable: true },
+  { id: 'PBSAI-PHYSICAL-SECURITY', name: 'Physical Security', description: 'Physical security domain ties AI estate operations to facility, hardware, and high-value asset controls', amcQIDs: ['AMC-1.7', 'AMC-4.6'], amcModules: ['hostHardening', 'inventory', 'audit'], automatable: false },
+  { id: 'PBSAI-SUPPLY-CHAIN', name: 'Supply Chain', description: 'Supply-chain domain tracks model, data, package, tool, and vendor provenance across the AI estate', amcQIDs: ['AMC-2.5', 'AMC-1.5'], amcModules: ['sbom', 'supplyChain', 'gateway'], automatable: true },
+  { id: 'PBSAI-PROGRAM-ENABLEMENT', name: 'Program Enablement', description: 'Program enablement domain manages adoption, training, operating model, and evidence registry maturity', amcQIDs: ['AMC-2.2', 'AMC-4.3'], amcModules: ['guide', 'mechanic', 'docs'], automatable: false },
+];
+
 const FRAMEWORK_CONTROLS: Record<ComplianceFramework, FrameworkControl[]> = {
   NIST_AI_RMF: NIST_AI_RMF_CONTROLS,
   ISO_42001: ISO_42001_CONTROLS,
@@ -168,6 +185,7 @@ const FRAMEWORK_CONTROLS: Record<ComplianceFramework, FrameworkControl[]> = {
   AGENTIC_4C: AGENTIC_4C_CONTROLS,
   MITRE_ATLAS: MITRE_ATLAS_CONTROLS,
   OWASP_API_TOP10: OWASP_API_TOP10_CONTROLS,
+  PBSAI: PBSAI_CONTROLS,
 };
 
 const FRAMEWORK_ARTIFACTS: Record<ComplianceFramework, string[]> = {
@@ -180,6 +198,7 @@ const FRAMEWORK_ARTIFACTS: Record<ComplianceFramework, string[]> = {
   AGENTIC_4C: ['*.amcaudit (4C mapping)', 'Agentic_4C_Compliance.pdf', '*.amcbundle (evidence)'],
   MITRE_ATLAS: ['*.amcaudit (MITRE ATLAS mapping)', 'ATLAS_Threat_Matrix.pdf', 'Adversarial_ML_Assessment.pdf', '*.amcbundle (evidence)'],
   OWASP_API_TOP10: ['*.amcaudit (OWASP API mapping)', 'API_Security_Assessment.pdf', 'OWASP_API_Compliance.xlsx', '*.amcbundle (evidence)'],
+  PBSAI: ['*.amcaudit (PBSAI twelve-domain mapping)', 'PBSAI_Context_Envelope.json', 'PBSAI_Output_Contracts.json', 'PBSAI_Evidence_Graph.pdf'],
 };
 
 export function generateFrameworkReport(
@@ -231,5 +250,6 @@ export function listSupportedFrameworks(): { framework: ComplianceFramework; con
     { framework: 'AGENTIC_4C', controlCount: AGENTIC_4C_CONTROLS.length, description: 'Agentic 4C Framework — Code, Constitution, Compliance, Collaboration' },
     { framework: 'MITRE_ATLAS', controlCount: MITRE_ATLAS_CONTROLS.length, description: 'MITRE ATLAS — Adversarial Threat Landscape for AI Systems (AML techniques)' },
     { framework: 'OWASP_API_TOP10', controlCount: OWASP_API_TOP10_CONTROLS.length, description: 'OWASP API Security Top 10 (2023) — API vulnerability categories' },
+    { framework: 'PBSAI', controlCount: PBSAI_CONTROLS.length, description: 'Practitioner Blueprint for Secure AI — twelve-domain AI estate governance architecture' },
   ];
 }

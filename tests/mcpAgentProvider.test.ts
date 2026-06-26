@@ -15,6 +15,8 @@ import {
   buildEvilTools,
   buildScenarios,
   renderMCPAgentRedTeamMarkdown,
+  listMCPAttackCategories,
+  normalizeMCPAttackCategories,
 } from "../src/redteam/mcpAgentProvider.js";
 import type {
   EvilToolDefinition,
@@ -193,6 +195,32 @@ describe("runMCPAgentRedTeam", () => {
   it("dangerous calls summary is empty for cautious agent", () => {
     // Cautious agent should not make dangerous calls
     expect(report.dangerousCallsSummary.length).toBe(0);
+  });
+
+  it("filters scenarios to requested MCP attack categories", async () => {
+    const tmpDir = mkdtempSync(join(tmpdir(), "amc-mcp-rt-filter-"));
+    const filtered = await runMCPAgentRedTeam({
+      workspace: tmpDir,
+      agentId: "tool-poison-only",
+      attackCategories: ["tool-poisoning"],
+    });
+    const allScenarioCount = buildScenarios(buildEvilTools()).length;
+
+    expect(filtered.totalScenarios).toBeGreaterThan(0);
+    expect(filtered.totalScenarios).toBeLessThan(allScenarioCount);
+    expect(filtered.scenarioResults.every((sr) => sr.categories.includes("tool-poisoning"))).toBe(true);
+    expect(Object.keys(filtered.categoryScores)).toContain("tool-poisoning");
+    expect(Object.keys(filtered.categoryScores)).not.toContain("resource-exhaustion");
+  });
+
+  it("normalizes CLI-friendly MCP attack category aliases", () => {
+    expect(normalizeMCPAttackCategories(["tool_poison", "data_exfil", "priv_esc"])).toEqual([
+      "tool-poisoning",
+      "data-exfiltration",
+      "privilege-escalation",
+    ]);
+    expect(normalizeMCPAttackCategories(["all"])).toBeUndefined();
+    expect(listMCPAttackCategories()).toContain("tool-poisoning");
   });
 });
 

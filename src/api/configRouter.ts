@@ -81,7 +81,8 @@ export async function handleConfigRoute(
   if (pathname === '/api/v1/config/version' && method === 'GET') {
     try {
       const { amcVersion } = await import('../version.js');
-      apiSuccess(res, { version: amcVersion });
+      const { getPublicMethodologyReference } = await import('../methodology/publicMethodology.js');
+      apiSuccess(res, { version: amcVersion, methodology: getPublicMethodologyReference() });
     } catch {
       apiSuccess(res, { version: 'unknown' });
     }

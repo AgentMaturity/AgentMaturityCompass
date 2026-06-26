@@ -1,0 +1,10 @@
+image_repository = "ghcr.io/your-org/amc-studio"
+image_tag        = "latest"
+replica_count    = 2
+
+# Optional production overrides:
+# values_files            = ["../../helm/amc/examples/values-ingress-tls.yaml"]
+# ingress_enabled         = true
+# ingress_class_name      = "nginx"
+# ingress_host            = "amc.example.com"
+# ingress_tls_secret_name = "amc-tls"

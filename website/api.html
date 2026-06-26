@@ -204,8 +204,15 @@
   .swagger-ui .auth-container input { background: #0f0f0f !important; color: var(--green) !important; border: 1px solid var(--border) !important; }
   .swagger-ui .loading-container .loading::after { color: var(--green) !important; }
 </style>
+<style id="skip-link-style">
+.skip-link{position:fixed;left:-9999px;top:12px;z-index:10000;padding:8px 14px;background:#4AEF79;color:#0a0a0a;font:700 14px system-ui,sans-serif;text-decoration:none}
+.skip-link:focus,.skip-link:focus-visible{left:12px}
+:where(a,button,input,select,textarea,[tabindex]:not([tabindex="-1"])):focus-visible{outline:2px solid #4AEF79;outline-offset:3px}
+</style>
 </head>
 <body>
+<a href="#main-content" class="skip-link">Skip to content</a>
+<div id="main-content" tabindex="-1"></div>
   <div class="top-bar">
     <div style="display:flex;align-items:center;gap:1.5rem">
       <a href="index.html">← Back to AMC</a>

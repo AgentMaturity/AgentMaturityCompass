@@ -37,3 +37,24 @@ export {
   identifyRootCauses,
   traceImpactChain
 } from "./causalInference.js";
+
+export {
+  buildIncidentRegressionReceipt,
+  buildIncidentRegressionWatchAlerts,
+  type BuildIncidentRegressionReceiptInput,
+  type IncidentRegressionAlertSeverity,
+  type IncidentRegressionClosureStatus,
+  type IncidentRegressionFailureCluster,
+  type IncidentRegressionGeneratedTest,
+  type IncidentRegressionGeneratedTestReceipt,
+  type IncidentRegressionLiveTrends,
+  type IncidentRegressionReceipt,
+  type IncidentRegressionReceiptStatus,
+  type IncidentRegressionTraceIndex,
+  type IncidentRegressionTraceIndexEntry,
+  type IncidentRegressionTraceRow,
+  type IncidentRegressionValidationRun,
+  type IncidentRegressionValidationRunReceipt,
+  type IncidentRegressionValidationStatus,
+  type IncidentRegressionWatchAlert
+} from "./incidentRegression.js";

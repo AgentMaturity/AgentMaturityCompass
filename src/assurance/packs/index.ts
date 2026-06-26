@@ -101,6 +101,7 @@ import { inputFaultResiliencePack } from "./inputFaultResiliencePack.js";
 import { thoughtSafetyAuditPack } from "./thoughtSafetyAuditPack.js";
 import { reasoningLockDetectionPack } from "./reasoningLockDetectionPack.js";
 import { multiTurnToolAttackPack } from "./multiTurnToolAttackPack.js";
+import { adversarialAlignmentProbesPack } from "./adversarialAlignmentProbesPack.js";
 // Simulation & Forecast Lane Packs (MiroFish Gap Bridge)
 import { forecastLegitimacyPack } from "./forecastLegitimacyPack.js";
 import { factSimulationBoundaryPack } from "./factSimulationBoundaryPack.js";
@@ -111,6 +112,7 @@ import { simulationWritebackGovernancePack } from "./simulationWritebackGovernan
 import { predictiveUXHonestyPack } from "./predictiveUXHonestyPack.js";
 import { realPersonRepresentationPack } from "./realPersonRepresentationPack.js";
 import { syntheticAgentInteractionPack } from "./syntheticAgentInteractionPack.js";
+import { linuxPrivilegeBoundaryRegressionPack } from "./linuxPrivilegeBoundaryRegressionPack.js";
 
 const assurancePacks: AssurancePackDefinition[] = [
   injectionPack,
@@ -216,6 +218,7 @@ const assurancePacks: AssurancePackDefinition[] = [
   thoughtSafetyAuditPack,
   reasoningLockDetectionPack,
   multiTurnToolAttackPack,
+  adversarialAlignmentProbesPack,
   // Simulation & Forecast Lane Packs (MiroFish Gap Bridge)
   forecastLegitimacyPack,
   factSimulationBoundaryPack,
@@ -226,6 +229,8 @@ const assurancePacks: AssurancePackDefinition[] = [
   predictiveUXHonestyPack,
   realPersonRepresentationPack,
   syntheticAgentInteractionPack,
+  // GAP-0626 — synthetic adversarial regression for privilege-boundary decisions
+  linuxPrivilegeBoundaryRegressionPack,
   // AI Safety Research Gap Packs (2026-03-18 additions)
   replicationResistancePack,
   dynamicTrustAuthorizationPack,

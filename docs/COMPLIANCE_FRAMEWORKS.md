@@ -51,7 +51,7 @@ ISO 42001 provides a comprehensive AI management system framework with:
 
 GDPR establishes data protection principles and requirements:
 
-- **Art. 5**: Lawfulness, fairness, transparency, purpose limitation, data minimization, accuracy, storage limitation, integrity & confidentiality
+- **Art. 5**: Lawfulness, fairness, transparency, purpose limitation, data minimization, accuracy, storage limitation, integrity & confidentiality, and accountability
 - **Art. 6**: Lawful basis for processing
 - **Art. 15-22**: Data subject rights (access, rectification, erasure, restriction, portability, objection)
 - **Art. 25**: Data protection by design and by default
@@ -150,6 +150,105 @@ Each compliance mapping defines:
   - AMC diagnostic questions
   - Assurance packs
   - Configuration files
+
+## Control Crosswalk Receipts
+
+Auditor-ready crosswalks use `buildControlCrosswalkReceipt` from `src/compliance/controlCrosswalk.ts`. A crosswalk receipt maps existing AMC compliance mappings to framework clauses without creating a new compliance framework or legal-certification claim.
+
+Each control row includes:
+
+- **Framework clause**: The existing compliance mapping category, such as NIST AI RMF `Govern`, ISO 42001 `Clause 5 Leadership`, EU AI Act `Art. 12 Record-Keeping`, SOC 2 `Security`, or a sector framework clause such as HIPAA `§164.312 Technical Safeguards`.
+- **AMC question IDs**: Diagnostic questions already linked by the compliance mapping.
+- **Evidence types**: Required event, assurance-pack, or audit-absence evidence from the mapping.
+- **Owner**: Accountable control owner supplied by the operator.
+- **Exception state**: `none`, `pending`, `approved`, `rejected`, or `expired`.
+- **Source citations**: Source-backed framework or review references supplied to the receipt.
+- **Evidence chain**: Event hashes and signed evidence refs for the row, summarized with a row-level evidence-chain hash.
+
+Crosswalk verification fails closed when source citations are missing, a row lacks an owner, a row lacks evidence lineage, or a non-`none` exception has no signed evidence reference and signature hash. Paper metadata, framework names, local notes, or self-reported owner names are not enough to satisfy a crosswalk without signed evidence and row hashes.
+
+## Reviewer Independence Receipts
+
+High-risk approval reviews can use `buildReviewerIndependenceReceipt` from `src/audit/reviewerIndependence.ts` to prove reviewer separation without adding a separate workflow engine. The receipt is a generic audit artifact for existing Comply, Passport, and Vault evidence paths.
+
+Each reviewer row includes:
+
+- **Reviewer metadata**: requester/control owner, reviewer, role, org unit, action, control, risk tier, decision, and decision time.
+- **Role separation**: a separation rule ID plus checks that the reviewer is not the requester and is not acting in the same role.
+- **Conflict flags**: the conflict-check timestamp, conflict flags, and signed conflict-check evidence.
+- **Second review**: required signed second-review metadata for `high` and `critical` actions.
+- **Approval receipt**: the signed approval receipt reference and signature hash.
+- **Evidence lineage**: event hashes and signed evidence references summarized into an evidence-chain hash.
+- **Source citations**: source-backed review or control obligations supplied by the operator.
+
+Reviewer-independence verification fails closed when source citations are missing, the reviewer cannot be identified, the separation rule is missing, the reviewer is also the requester, a conflict check is missing or unsigned, a conflict flag is present, a high-risk second review is missing or unsigned, an approval receipt is missing, or evidence lineage is missing or malformed. Source metadata, paper titles, policy names, or unsigned reviewer notes do not satisfy the receipt.
+
+## Post-Hoc Audit Sampling Receipts
+
+Completed autonomous actions can use `buildPosthocAuditSamplingReceipt` from `src/audit/posthocAuditSampling.ts` to prove retrospective human audit coverage without adding a separate audit-workflow engine. The receipt is a generic Comply, Passport, and Vault artifact for sampled action reviews, audit findings, corrective actions, and scoring deltas.
+
+Each sampled action row includes:
+
+- **Sample plan**: plan ID, population ID, population size, sample size, method, risk tier, owner, plan time, signed plan evidence, and signature hash.
+- **Reviewed action**: action ID, agent ID, policy ID, completion time, sample time, reviewer ID, review decision, signed review evidence, and signature hash.
+- **Findings**: signed finding records with severity, owner, opened time, and action linkage.
+- **Corrective actions**: signed corrective-action records linked to findings, with owner, status, due date, and optional regression test reference.
+- **Score impact**: signed diagnostic score-impact rows with dimension ID, question ID, before/after scores, impact, and reason.
+- **Evidence lineage**: event hashes and signed evidence references summarized into an evidence-chain hash.
+- **Source citations**: source-backed review or control obligations supplied by the operator.
+
+Post-hoc audit sampling verification fails closed when source citations are missing, the sample plan is missing or unsigned, reviewed action metadata is missing, review evidence is unsigned, evidence lineage is missing, non-passing reviews lack findings, findings lack corrective actions, score impact rows are missing, or row and receipt hashes do not verify. Source metadata, website labels, policy names, or unsigned review notes do not satisfy the receipt.
+
+## Governance Exception Lifecycle Receipts
+
+Governance exception and waiver reviews can use `buildGovernanceExceptionLifecycleReceipt` from `src/compliance/exceptionLifecycle.ts` to prove temporary risk acceptances without adding a separate workflow engine. The receipt is a generic Comply, Passport, and Vault artifact for policy exceptions, compliance waivers, and compensating-control windows.
+
+Each exception row includes:
+
+- **Exception request**: exception ID, policy ID, control ID, requester, request reason, request time, signed request evidence, and accountable owner.
+- **Approval**: approver, decision, decision time, signed approval evidence, and approval signature hash.
+- **Expiry**: expiry timestamp, expiry-check timestamp, signed expiry-check evidence, and expiry signature hash.
+- **Compensating controls**: one or more signed compensating controls with owners and descriptions.
+- **Renewal outcome**: signed renewal, denial, or not-requested decision with approver, reason, and decision time.
+- **Evidence lineage**: event hashes and signed evidence references summarized into an evidence-chain hash.
+- **Source citations**: source-backed review or control obligations supplied by the operator.
+
+Exception-lifecycle verification fails closed when source citations are missing, the policy/control mapping is missing, the owner is missing, the request is unsigned, the approval is unsigned, expiry proof is missing, compensating controls are missing or unsigned, renewal outcome is missing or unsigned, or evidence lineage is missing or malformed. Source metadata, website labels, policy names, or unsigned waiver notes do not satisfy the receipt.
+
+## Policy Drift Impact Receipts
+
+Policy changes can use `buildPolicyDriftImpactReceipt` from `src/compliance/policyDrift.ts` to prove change impact before rollout without adding a separate policy-management platform. The receipt is a generic Comply, Passport, and Vault artifact for policy diffs, affected agents, affected controls, affected tests, prior decisions, recheck lists, and rollout receipts.
+
+Each policy drift row includes:
+
+- **Policy diff**: policy ID, before/after versions, before/after policy hashes, change owner, change timestamp, rationale, diff summary, signed diff evidence, and signature hash.
+- **Affected agents**: agent IDs, environments, current and required policy versions, impact level, reason, signed evidence, and signature hash.
+- **Affected controls**: framework/control IDs, owners, change type, signed evidence, and signature hash.
+- **Affected tests**: test IDs, commands, owners, reasons, signed evidence, and signature hash.
+- **Prior decisions**: release, waiver, approval, or compliance decisions that must be rechecked when policy drift invalidates previous proof.
+- **Recheck list**: owner, due date, action, status, signed recheck evidence, and signature hash.
+- **Rollout receipt**: rollout ID, approver, approval time, rollout window, rollback plan reference, signed rollout evidence, and signature hash.
+- **Evidence lineage**: event hashes and signed evidence references summarized into an evidence-chain hash.
+- **Source citations**: source-backed review or control obligations supplied by the operator.
+
+Policy-drift verification fails closed when source citations are missing, the policy diff is missing or unsigned, affected agents are missing, affected controls are missing, affected tests are missing, prior decisions are missing, recheck items are missing, rollout proof is missing or unsigned, evidence lineage is missing, or row and receipt hashes do not verify. Source metadata, website labels, policy names, or unsigned impact notes do not satisfy the receipt.
+
+## Third-Party Provider Risk Receipts
+
+Third-party provider reviews can use `buildThirdPartyProviderRiskReceipt` from `src/compliance/providerRisk.ts` to capture provider and vendor risk without creating a provider-specific integration. The receipt is a generic Comply, Passport, and Vault artifact for external agents, model providers, tool providers, data providers, and infrastructure providers.
+
+Each provider row includes:
+
+- **Provider record**: provider ID, name, type, owner, review date, next review date, and allowed use cases.
+- **Attestations**: signed SOC 2, ISO 42001, security questionnaire, AI safety, or custom attestations.
+- **Data boundary**: data classes, allowed regions, subprocessors, retention, transfer mechanism, and signed boundary evidence.
+- **Model restrictions**: operator-defined restrictions such as no regulated decisioning or no autonomous funds transfer.
+- **Contractual controls**: obligations, status, owner, review date, and signed control evidence.
+- **Exceptions**: signed exception workflow state and owner.
+- **Evidence lineage**: event hashes and signed evidence references summarized into an evidence-chain hash.
+- **Source citations**: source-backed review or control obligations supplied by the operator.
+
+Provider-risk verification fails closed when source citations are missing, provider record metadata is missing, owner or review date is missing, attestations are missing or unsigned, data boundary evidence is missing or unsigned, contractual controls are missing or unsigned, exceptions are unsigned, or evidence lineage is missing or malformed. Source metadata, paper titles, vendor names, website copy, or unsigned questionnaires do not satisfy the receipt.
 
 ## Evidence Requirements
 

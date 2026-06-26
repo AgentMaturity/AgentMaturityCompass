@@ -10,6 +10,7 @@ import { handleShieldRoute } from './shieldRouter.js';
 import { handleEnforceRoute } from './enforceRouter.js';
 import { handleVaultRoute } from './vaultRouter.js';
 import { handleWatchRoute } from './watchRouter.js';
+import { handleObserveRoute } from './observeRouter.js';
 import { handleScoreRoute } from './scoreRouter.js';
 import { handleProductRoute } from './productRouter.js';
 import { handleAgentTimelineRoute } from './agentTimelineRouter.js';
@@ -47,6 +48,7 @@ import { apiError } from './apiHelpers.js';
 import { buildHealthPayload } from './health.js';
 import { deprecatedBridgeRoute, sdkVersionPolicy } from '../sdk/versioning.js';
 import { handleMarketplaceRoute } from '../marketplace/marketplaceRouter.js';
+import { handleDomainProofRoute } from './domainProofRouter.js';
 
 export type ApiAuthPolicy = 'public' | 'protected';
 export type ApiValidationPolicy = 'schema-validated' | 'router-local' | 'passthrough';
@@ -156,6 +158,15 @@ export const API_ROUTE_REGISTRY: readonly ApiRouteDefinition[] = [
     auth: 'protected',
     validationPolicy: 'router-local',
     handler: workspaceRoute(handleWatchRoute)
+  },
+  {
+    id: 'observe',
+    description: 'Observe timeline and anomaly read APIs',
+    prefixes: ['/api/v1/observe'],
+    methods: ['GET'],
+    auth: 'protected',
+    validationPolicy: 'router-local',
+    handler: workspaceRoute(handleObserveRoute)
   },
   {
     id: 'gateway',
@@ -399,6 +410,15 @@ export const API_ROUTE_REGISTRY: readonly ApiRouteDefinition[] = [
     auth: 'protected',
     validationPolicy: 'router-local',
     handler: workspaceRoute(handleComplianceRoute)
+  },
+  {
+    id: 'proof',
+    description: 'Domain Proof Lane checks for declared source-to-rule manifests across Enforce, Comply, Score, Vault, and Watch',
+    prefixes: ['/api/v1/proof'],
+    methods: ['GET', 'POST'],
+    auth: 'protected',
+    validationPolicy: 'schema-validated',
+    handler: workspaceRoute(handleDomainProofRoute)
   },
   {
     id: 'memory',

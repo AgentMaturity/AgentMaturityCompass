@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Compliance Guide — AMC Documentation</title>
-  <meta name="description" content="EU AI Act compliance, 7 industry domains, 40 domain packs, and regulatory mapping with Agent Maturity Compass.">
+  <meta name="description" content="EU AI Act compliance, 7 industry domains, 41 domain packs, and regulatory mapping with Agent Maturity Compass.">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230D6E6E'/%3E%3Ctext x='16' y='22' text-anchor='middle' fill='white' font-size='18' font-weight='bold'%3EA%3C/text%3E%3C/svg%3E">
   <link rel="stylesheet" href="shared.css">
   <style>
@@ -34,6 +34,7 @@
   </style>
 </head>
 <body>
+<a href="#main-content" class="skip-link">Skip to content</a>
 
 <div class="topbar">
   <button class="menu-btn" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
@@ -83,11 +84,11 @@
     </div>
   </nav>
 
-  <main class="main">
+  <main id="main-content" tabindex="-1" class="main">
     <div class="content">
 
       <h1 id="overview">Compliance Guide</h1>
-      <p class="subtitle">Map your agent's maturity to regulatory requirements. AMC supports EU AI Act, ISO 42001, NIST AI RMF, SOC 2, and OWASP LLM Top 10 — with 40 industry-specific domain packs across 7 sectors.</p>
+      <p class="subtitle">Map your agent's maturity to regulatory requirements. AMC supports EU AI Act, ISO 42001, NIST AI RMF, SOC 2, and OWASP LLM Top 10 — with 41 industry-specific domain packs across 7 sectors.</p>
 
       <!-- Deadline Banner -->
       <div class="deadline-banner" id="deadline-banner">
@@ -176,7 +177,7 @@ amc audit binder create --framework EU_AI_ACT</code></pre>
           <tr><td><strong>Art. 12</strong></td><td>Record-keeping</td><td>Transparency log, Merkle tree, signed evidence ledger.</td></tr>
           <tr><td><strong>Art. 13</strong></td><td>Transparency</td><td>Transparency reports, capability disclosures, output attestation.</td></tr>
           <tr><td><strong>Art. 14</strong></td><td>Human Oversight</td><td>Governor policies, approval workflows, escalation gates.</td></tr>
-          <tr><td><strong>Art. 15</strong></td><td>Accuracy, Robustness, Cybersecurity</td><td>Assurance packs (78 attack scenarios), calibration gap, adversarial robustness.</td></tr>
+          <tr><td><strong>Art. 15</strong></td><td>Accuracy, Robustness, Cybersecurity</td><td>147 assurance packs, calibration gap, adversarial robustness, incident-to-regression closure.</td></tr>
           <tr><td><strong>Art. 17</strong></td><td>Quality Management System</td><td>Continuous loop, drift alerts, scheduled assurance runs.</td></tr>
         </tbody>
       </table>
@@ -195,7 +196,7 @@ amc audit binder create --framework EU_AI_ACT</code></pre>
         <div class="step-num">2</div>
         <div class="step-content">
           <h4>Apply domain packs</h4>
-          <pre><code>amc domain list                              <span class="comment"># See all 7 domains + 40 packs</span>
+          <pre><code>amc domain list                              <span class="comment"># See all 7 domains + 41 packs</span>
 amc domain assess --domain health --agent my-agent  <span class="comment"># Run domain assessment</span></code></pre>
         </div>
       </div>
@@ -227,8 +228,8 @@ amc bundle export                                <span class="comment"># Portabl
       <hr>
 
       <!-- Domain Packs -->
-      <h2 id="domains">7 Domains — 40 Industry Packs</h2>
-      <p>Domain packs extend AMC's base 195-question rubric with industry-specific, regulatory-grounded questions. Each pack references specific regulatory articles — not vague guidelines. <strong>592 domain-specific diagnostic questions</strong> in total.</p>
+      <h2 id="domains">7 Domains — 41 Industry Packs</h2>
+      <p>Domain packs extend AMC's 244-question default rubric with industry-specific, regulatory-grounded questions. Each pack references specific regulatory articles — not vague guidelines. The paid Industry Packs cover 41 sector-specific packs across 7 domains.</p>
 
       <pre><code>amc domain list                                   <span class="comment"># See all 7 domains + packs</span>
 amc domain assess --domain health --agent my-agent  <span class="comment"># Assess against a domain</span>

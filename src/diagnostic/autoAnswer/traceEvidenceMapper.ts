@@ -5,7 +5,7 @@
  * AMC diagnostic question answers. This enables `amc run --auto`
  * to derive scores from REAL runtime data, not self-reported answers.
  *
- * For each of AMC's 195+ diagnostic questions, this mapper inspects
+ * For each of AMC's default diagnostic questions, this mapper inspects
  * the trace data and produces an evidence-backed answer with confidence.
  */
 

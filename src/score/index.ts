@@ -13,6 +13,7 @@ export type { ProductionReadinessResult } from "./productionReadiness.js";
 export {
   scoreOperationalIndependence,
   scoreOperationalIndependenceFromEvents,
+  scoreLogisticsOperationalReliabilityFromEvents,
   buildExternalDependencyInventory,
   detectDependencyDrift,
   scoreGracefulDegradation,
@@ -26,7 +27,11 @@ export type {
   DependencyDriftSignal,
   DependencyDriftReport,
   GracefulDegradationScore,
-  VendorLockInRiskScore
+  VendorLockInRiskScore,
+  LogisticsReliabilityScore,
+  LogisticsReliabilityMetric,
+  OperationalIndependenceDomainContext,
+  OperationalIndependenceOptions
 } from "./operationalIndependence.js";
 
 export { getLeanAMCProfile } from "./leanAMC.js";
@@ -43,10 +48,21 @@ export type {
   MCPComplianceResult,
   MCPCapabilityDeclaration,
   MCPSafetyDimensionResult,
+  MCPSecurityResilienceDimensionResult,
   MCPSafetyScorecard,
   MCPPromptInjectionSignal,
   MCPPromptInjectionDetectionResult
 } from "./mcpCompliance.js";
+
+export { scoreCatastrophicRiskIndicators } from "./catastrophicRiskIndicators.js";
+export type {
+  CatastrophicRiskEvidenceStatus,
+  CatastrophicRiskIndicatorInput,
+  CatastrophicRiskIndicatorResult,
+  CatastrophicRiskReadinessLevel,
+  CatastrophicRiskReport,
+  CatastrophicRiskSeverity
+} from "./catastrophicRiskIndicators.js";
 
 export { scoreRAGMaturity } from "./ragMaturity.js";
 export type {
@@ -64,6 +80,32 @@ export type {
   RAGOutputEvaluation,
   RAGCitationEvaluation,
 } from "./ragMaturity.js";
+export {
+  buildRagGroundingEvalReceipt,
+  ragGroundingEvalReceiptPath,
+  renderRagGroundingEvalAuditExport,
+  verifyRagGroundingEvalReceipt,
+  writeRagGroundingEvalReceipt
+} from "./ragGroundingEval.js";
+export type {
+  RagGroundingClaimEvaluation,
+  RagGroundingClaimCitationProvenance,
+  RagGroundingClaimLabel,
+  RagGroundingEnforcementAction,
+  RagGroundingEvalCase,
+  RagGroundingEvalCaseInput,
+  RagGroundingEvalMetrics,
+  RagGroundingEvalReceipt,
+  RagGroundingEvalSourceCitation,
+  RagGroundingEvalVerification,
+  RagGroundingEvalWriteResult,
+  RagGroundingFinding,
+  RagGroundingFindingKind,
+  RagGroundingFindingSeverity,
+  RagGroundingRetrievedChunk,
+  RagGroundingRetrievedChunkInput,
+  RagGroundingSourcePermissionStatus
+} from "./ragGroundingEval.js";
 
 export { scoreMultiAgentDimension } from "./multiAgentDimension.js";
 export type { MultiAgentDimensionScore, MultiAgentProfile } from "./multiAgentDimension.js";
@@ -96,6 +138,17 @@ export type {
   PredictionLogAnalysis,
   PredictionLogTrackingReport,
 } from "./predictiveValidity.js";
+
+export { buildMetricValidationReport } from "./metricValidity.js";
+export type {
+  BuildMetricValidationInput,
+  MetricValidationQuestionRef,
+  MetricValidationRankingStabilityCheck,
+  MetricValidationThresholdPolicy
+} from "./metricValidity.js";
+
+export { projectBishengObservabilityScoreSurface } from "./bishengObservabilityLiveDriftScore.js";
+export type { BishengObservabilityScoreSurface } from "./bishengObservabilityLiveDriftScore.js";
 
 export { generateFrameworkReport, listSupportedFrameworks } from "./crossFrameworkMapping.js";
 export type { FrameworkComplianceReport } from "./crossFrameworkMapping.js";
@@ -130,7 +183,22 @@ export type {
 } from "./memoryMaturity.js";
 
 export { assessOversightQuality } from "./humanOversightQuality.js";
-export type { OversightQualityProfile } from "./humanOversightQuality.js";
+export type {
+  ApprovalLatencyBreachStatus,
+  ApprovalLatencySloRecord,
+  ApprovalLatencySloSummary,
+  ApprovalLatencySloTierSummary,
+  EscalationPacketQualityField,
+  EscalationPacketQualityRecord,
+  EscalationPacketQualitySummary,
+  OversightApprovalEvent,
+  OversightEscalationEvent,
+  OversightEscalationPacket,
+  OversightQualityInput,
+  OversightQualityProfile,
+  OversightRecommendation,
+  OversightRiskTier
+} from "./humanOversightQuality.js";
 
 export { checkClaimExpiry, CLAIM_TTL } from "./claimExpiry.js";
 export type { ClaimExpiryProfile } from "./claimExpiry.js";
@@ -321,7 +389,15 @@ export { ingestEvidence, TRUST_WEIGHTS } from "./evidenceIngestion.js";
 export type { TrustTier, IngestFormat, IngestInput, NormalizedEvidence, IngestReport } from "./evidenceIngestion.js";
 
 export { createAttestation, verifyAttestation, scoreOutputAttestation } from "./outputAttestation.js";
-export type { AttestationInput, Attestation, AttestationVerification, OutputAttestationReport } from "./outputAttestation.js";
+export type {
+  AttestationInput,
+  Attestation,
+  AttestationVerification,
+  ContextEnvelope,
+  OutputAttestationReport,
+  OutputContract,
+  ProvenanceMetadata,
+} from "./outputAttestation.js";
 
 export { createChallenge, respondToChallenge, verifyMutualTrust, scoreMutualVerification } from "./mutualVerification.js";
 export type { AgentIdentity, VerificationChallenge, VerificationResponse, MutualTrustResult, MutualVerificationReport } from "./mutualVerification.js";

@@ -70,6 +70,31 @@ Start here:
 - `docs/RELEASE_HIGHLIGHTS.md`
 - `docs/INDEX.md`
 
+## Supply chain / logistics operator
+You want:
+- a reliable score for an agent that touches supplier risk, procurement, transport, carrier management, warehouse operations, or delivery exceptions
+- a clear mapping from operations language to AMC's domain stations
+- domain modules and gaps without reading the whole product manual
+
+Start here:
+- `docs/DOMAIN_PACKS.md`
+- `docs/SECTOR_PACKS.md`
+- `docs/SUPPLY_CHAIN.md`
+- `docs/AFTER_QUICKSCORE.md`
+
+First commands:
+
+```bash
+amc domain list
+amc domain assess --agent <agent-id> --domain supply-chain
+amc domain assess --agent <agent-id> --domain logistics
+amc domain modules --domain logistics
+amc domain pack describe --pack freight-3pl-warehouse
+amc score operational-independence <agent-id> --domain logistics --json
+```
+
+Use `--domain supply-chain` for supplier risk, procurement, traceability, materials, food systems, and critical-infrastructure workflows. Use `--domain logistics` for freight, 3PL, warehouse, carrier, transport, and port-logistics workflows. Use `freight-3pl-warehouse` when you need carrier reliability, WMS integrity, exception management, traceability, SLA, EDI/API resilience, and cold-chain controls.
+
 ## One-line routing rule
 - New? start with `START_HERE`
 - Already scored? go to `AFTER_QUICKSCORE`

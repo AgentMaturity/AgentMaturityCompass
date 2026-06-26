@@ -4,7 +4,7 @@
 
 The full AMC trust stack is free and MIT licensed. Enterprise adds:
 
-1. **All 40 Industry Packs** — sector-specific domain diagnostics for regulated verticals
+1. **All 41 Industry Packs** — sector-specific domain diagnostics for regulated verticals
 2. **Priority support** — faster response times and dedicated channels
 3. **Custom pack development** — bespoke domain packs for your specific regulatory or industry needs
 4. **Deployment assistance** — help with self-hosted, on-prem, or hybrid deployments
@@ -14,16 +14,16 @@ The full AMC trust stack is free and MIT licensed. Enterprise adds:
 Everything else:
 - Score, Shield, Enforce, Vault, Watch, Comply, Fleet, Passport
 - All 14 framework adapters
-- 481 CLI commands
-- 138 diagnostic questions
-- 86 adversarial assurance packs
+- 1,144 CLI command paths
+- 244 default diagnostic questions plus the free, opt-in 20-question lifecycle expansion
+- 147 adversarial assurance packs
 - Browser playground
 - CI trust gates
 - GitHub Action
 
 ## Industry Packs included in Enterprise
 
-All 40 domain-specific packs, including:
+All 41 domain-specific packs, including:
 - Healthcare / HIPAA
 - Financial services / SOX / PCI-DSS
 - Education / FERPA

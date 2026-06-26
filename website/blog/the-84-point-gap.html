@@ -73,8 +73,14 @@ tr:hover td{background:var(--bg2)}
 
 @media(max-width:768px){h1{font-size:1.7rem}h2{font-size:1.25rem}.container{padding:32px 18px 60px}}
 </style>
+<style id="skip-link-style">
+.skip-link{position:fixed;left:-9999px;top:12px;z-index:10000;padding:8px 14px;background:#4AEF79;color:#0a0a0a;font:700 14px system-ui,sans-serif;text-decoration:none}
+.skip-link:focus,.skip-link:focus-visible{left:12px}
+:where(a,button,input,select,textarea,[tabindex]:not([tabindex="-1"])):focus-visible{outline:2px solid #4AEF79;outline-offset:3px}
+</style>
 </head>
 <body>
+<a href="#main-content" class="skip-link">Skip to content</a>
 
 <nav class="nav">
   <a href="../" class="logo">🧭 <span>AMC</span></a>
@@ -84,6 +90,7 @@ tr:hover td{background:var(--bg2)}
   <a href="./" style="color:var(--accent2)">Blog</a>
   <a href="https://github.com/AgentMaturity/AgentMaturityCompass" target="_blank">GitHub</a>
 </nav>
+<div id="main-content" tabindex="-1"></div>
 
 <div class="container">
 
@@ -197,7 +204,7 @@ tr:hover td{background:var(--bg2)}
                             ↓
                     Evidence Ledger (Ed25519 + Merkle tree)
                             ↓
-                    Scoring Engine (195 core + 592 sector questions, 5 dimensions)
+                    Scoring Engine (244 default + Industry Pack questions, 5 dimensions)
 </code></pre>
 
 <p>The Gateway operates as a transparent MITM proxy. Your agent talks to its LLM provider exactly as before — same API, same endpoints, same behavior. But every request and response passes through AMC, which captures:</p>
@@ -213,18 +220,18 @@ tr:hover td{background:var(--bg2)}
 
 <h2>The Five Dimensions of Agent Maturity</h2>
 
-<p>AMC doesn't produce a single opaque number. It evaluates agents across 5 dimensions with 138 core diagnostic questions (plus 592 sector-specific questions across 40 industry packs — 730 total):</p>
+<p>AMC doesn't produce a single opaque number. It evaluates agents across 5 dimensions with 244 default diagnostic questions, plus optional sector-specific questions across 41 Industry Packs:</p>
 
 <table>
   <thead>
     <tr><th>Dimension</th><th>Questions</th><th>What It Measures</th></tr>
   </thead>
   <tbody>
-    <tr><td><strong>Strategic Agent Ops</strong></td><td>18</td><td>Mission clarity, scope adherence, decision traceability</td></tr>
-    <tr><td><strong>Skills</strong></td><td>38</td><td>Tool mastery, injection defense, DLP, least-privilege execution</td></tr>
-    <tr><td><strong>Resilience</strong></td><td>30</td><td>Graceful degradation, circuit breakers, monitor bypass resistance</td></tr>
-    <tr><td><strong>Leadership &amp; Autonomy</strong></td><td>28</td><td>Structured logs, traces, cost tracking, SLO monitoring</td></tr>
-    <tr><td><strong>Culture &amp; Alignment</strong></td><td>26</td><td>Test harnesses, benchmarks, feedback loops, over-compliance detection</td></tr>
+    <tr><td><strong>Strategic Agent Ops</strong></td><td>19</td><td>Mission clarity, scope adherence, decision traceability</td></tr>
+    <tr><td><strong>Leadership &amp; Autonomy</strong></td><td>23</td><td>Governance, decision-making authority, autonomy boundaries</td></tr>
+    <tr><td><strong>Culture &amp; Alignment</strong></td><td>95</td><td>Safety culture, value alignment, compliance, social alignment</td></tr>
+    <tr><td><strong>Resilience</strong></td><td>55</td><td>Graceful degradation, circuit breakers, monitor bypass resistance</td></tr>
+    <tr><td><strong>Skills</strong></td><td>52</td><td>Tool mastery, evidence practices, testing, learning, DLP</td></tr>
   </tbody>
 </table>
 
@@ -267,7 +274,7 @@ tr:hover td{background:var(--bg2)}
 
 <p>AMC doesn't make your agent safer by itself. What it does is tell you the truth about where you actually stand — and that truth is the first step toward building agents that deserve the trust we place in them.</p>
 
-<p><strong>Deep question coverage. A broad assurance library. 40 domain packs. 14 adapters. Zero self-reported illusions.</strong></p>
+<p><strong>Deep question coverage. A broad assurance library. 41 domain packs. 14 adapters. Zero self-reported illusions.</strong></p>
 
 <p>Stop trusting. Start verifying.</p>
 

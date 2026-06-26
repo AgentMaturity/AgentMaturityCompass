@@ -1,5 +1,20 @@
 export { quickstartWizard, initWorkspace, runDoctor } from "./workspace.js";
 export { runDoctorCli } from "./doctor/doctorCli.js";
+export {
+  buildSupplyChainGuardDecisionReceiptInput,
+  buildSupplyChainPostureReport,
+  computeSupplyChainVersionHash,
+  verifySupplyChainPostureReportIntegrity,
+  type BuildSupplyChainPostureReportInput,
+  type SupplyChainAllowedSourcePolicy,
+  type SupplyChainComponentInput,
+  type SupplyChainComponentKind,
+  type SupplyChainComponentPosture,
+  type SupplyChainPostureIntegrityResult,
+  type SupplyChainPostureReport,
+  type SupplyChainPostureSummary,
+  type SupplyChainVulnerabilityState,
+} from "./security/index.js";
 
 export { openLedger, verifyLedgerIntegrity } from "./ledger/ledger.js";
 export { wrapRuntime, wrapAny, superviseProcess, startMonitor } from "./ledger/monitor.js";
@@ -95,14 +110,25 @@ export type {
 
 // Handoff Packets
 export {
+  acceptHandoffPacket,
   createHandoffPacket,
+  loadHandoffReceiverReceipt,
+  loadHandoffUnresolvedDependencyLog,
   loadHandoffPacket,
   listHandoffPackets,
+  verifyHandoffContract,
   verifyHandoffPacket,
   renderHandoffPacketMarkdown,
 } from "./fleet/handoffPacket.js";
 export type {
+  HandoffContractVerificationResult,
+  HandoffDependencyStatus,
+  HandoffOwnershipTransfer,
   HandoffPacket,
+  HandoffReceiverReceipt,
+  HandoffRefusalReason,
+  HandoffSenderReceipt,
+  HandoffUnresolvedDependencyLog,
   HandoffVerificationResult,
 } from "./fleet/handoffPacket.js";
 
@@ -151,6 +177,39 @@ export {
 } from "./eval/evalImporters.js";
 export { evalImportCli, evalStatusCli, parseEvalImportFormat, parseEvalImportTrustTier } from "./eval/evalCli.js";
 export {
+  buildEvalReplayCorpusEvidenceReceipt,
+  type EvalReplayCorpusEvidenceReceipt,
+  type EvalReplayCorpusEvidenceStatus
+} from "./eval/replayCorpusEvidenceReceipt.js";
+export {
+  buildJudgeCalibrationReceipt,
+  buildJudgeCalibrationWatchAlerts,
+  verifyJudgeCalibrationReceipt,
+  defaultJudgeCalibrationThresholds,
+  type BuildJudgeCalibrationReceiptInput,
+  type JudgeCalibrationReceipt,
+  type JudgeCalibrationWatchAlert,
+  type JudgeCalibrationReceiptVerification
+} from "./eval/judgeCalibration.js";
+export {
+  runEffectAutoAgentReplayCorpus,
+  verifyEffectAutoAgentReplayReceipt,
+  type EffectAutoAgentReplayCiReceipt,
+  type EffectAutoAgentReplayGateMode,
+  type EffectAutoAgentReplayManifest,
+  type EffectAutoAgentReplayProviderRoute,
+  type EffectAutoAgentReplayReceiptVerification,
+  type EffectAutoAgentReplayResult,
+  type EffectAutoAgentReplayRow,
+  type EffectAutoAgentReplayRowInput,
+  type EffectAutoAgentReplayRuntime,
+  type EffectAutoAgentReplaySeverity,
+  type EffectAutoAgentReplayStatus,
+  type EffectAutoAgentReplayTaskFamily,
+  type EffectAutoAgentReplayWatchAlert,
+  type RunEffectAutoAgentReplayCorpusInput,
+} from "./eval/effectAutoAgentReplayCorpus.js";
+export {
   exportEvidenceBundle,
   verifyEvidenceBundle,
   inspectEvidenceBundle,
@@ -171,6 +230,41 @@ export {
   createZipArchive
 } from "./evidence/index.js";
 export {
+  buildReviewerIndependenceReceipt,
+  verifyReviewerIndependenceReceipt,
+  renderReviewerIndependenceAuditExport,
+  type ReviewerConflictCheck,
+  type ReviewerIndependenceApproval,
+  type ReviewerIndependenceDecision,
+  type ReviewerIndependenceEvidenceLink,
+  type ReviewerIndependenceReceipt,
+  type ReviewerIndependenceRiskTier,
+  type ReviewerIndependenceRow,
+  type ReviewerIndependenceSourceCitation,
+  type ReviewerIndependenceVerification,
+  type ReviewerSecondReview
+} from "./audit/reviewerIndependence.js";
+export {
+  buildPosthocAuditSamplingReceipt,
+  verifyPosthocAuditSamplingReceipt,
+  renderPosthocAuditSamplingAuditExport,
+  type PosthocAuditCorrectiveAction,
+  type PosthocAuditCorrectiveActionStatus,
+  type PosthocAuditFinding,
+  type PosthocAuditFindingSeverity,
+  type PosthocAuditReviewedAction,
+  type PosthocAuditReviewDecision,
+  type PosthocAuditSamplePlan,
+  type PosthocAuditSamplingEvidenceLink,
+  type PosthocAuditSamplingMethod,
+  type PosthocAuditSamplingReceipt,
+  type PosthocAuditSamplingRiskTier,
+  type PosthocAuditSamplingRow,
+  type PosthocAuditSamplingSourceCitation,
+  type PosthocAuditSamplingVerification,
+  type PosthocAuditScoreImpact
+} from "./audit/posthocAuditSampling.js";
+export {
   artifactProvenanceManifestSchema,
   artifactProvenanceSignatureSchema,
   signArtifactProvenance,
@@ -186,7 +280,23 @@ export {
   evaluateGatePolicy,
   initCiForAgent,
   printCiSteps,
-  runBundleGate
+  runBundleGate,
+  buildReleaseGateReceipt,
+  verifyReleaseGateReceipt,
+  renderReleaseGateAuditExport
+} from "./ci/gate.js";
+export type {
+  ReleaseGateControlEvidence,
+  ReleaseGateControlKind,
+  ReleaseGateControlStatus,
+  ReleaseGateOverrideStatus,
+  ReleaseGateSourceCitation,
+  ReleaseGateEvidenceLink,
+  ReleaseGateOverrideRecord,
+  ReleaseGateRunRecord,
+  ReleaseGateReceiptRow,
+  ReleaseGateReceipt,
+  ReleaseGateReceiptVerification
 } from "./ci/gate.js";
 export {
   listArchetypes,
@@ -260,6 +370,11 @@ export {
 
 export { runDiagnostic, generateReport, compareRuns } from "./diagnostic/runner.js";
 export { runAutoAnswer } from "./diagnostic/autoAnswer/autoAnswerEngine.js";
+export {
+  diagnoseEvalReplayCorpusBoundary,
+  type DiagnosticEvalReplayCorpusBoundary,
+  type DiagnosticEvalReplaySurfaceStatus
+} from "./diagnostic/evalReplayCorpusBoundary.js";
 
 export { generateTuningPack, generateUpgradePlan } from "./tuning/upgradeEngine.js";
 export { runTuneWizard, runUpgradeWizard } from "./tuning/tuneWizard.js";
@@ -291,7 +406,19 @@ export {
   truthProtocolTemplate,
   extractApprovalToken,
   hasValidApprovalToken,
-  withApprovalTrace
+  withApprovalTrace,
+  buildDegradedModeBehaviorReceipt,
+  verifyDegradedModeBehaviorReceipt,
+  renderDegradedModeBehaviorMarkdown,
+  type BuildDegradedModeBehaviorReceiptInput,
+  type DegradedModeAllowedBehavior,
+  type DegradedModeBehaviorReceipt,
+  type DegradedModeBehaviorSourceCitation,
+  type DegradedModeBehaviorStatus,
+  type DegradedModeBehaviorTestRun,
+  type DegradedModeBehaviorVerification,
+  type DegradedModeFailureMode,
+  type DegradedModeOperatorMessage
 } from "./runtime/index.js";
 
 export { parseTraceLine, parseTraceLines } from "./correlation/traceSchema.js";
@@ -490,6 +617,119 @@ export {
   generateComplianceReport
 } from "./compliance/complianceEngine.js";
 export {
+  buildControlCrosswalkReceipt,
+  verifyControlCrosswalkReceipt,
+  renderControlCrosswalkAuditExport
+} from "./compliance/controlCrosswalk.js";
+export {
+  buildGovernanceExceptionLifecycleReceipt,
+  verifyGovernanceExceptionLifecycleReceipt,
+  renderGovernanceExceptionLifecycleAuditExport,
+  type GovernanceExceptionApprovalDecision,
+  type GovernanceExceptionCompensatingControl,
+  type GovernanceExceptionLifecycleEvidenceLink,
+  type GovernanceExceptionLifecycleReceipt,
+  type GovernanceExceptionLifecycleRecord,
+  type GovernanceExceptionLifecycleRow,
+  type GovernanceExceptionLifecycleSourceCitation,
+  type GovernanceExceptionLifecycleVerification,
+  type GovernanceExceptionRenewalDecision,
+  type GovernanceExceptionRenewalOutcome
+} from "./compliance/exceptionLifecycle.js";
+export {
+  buildPolicyDriftImpactReceipt,
+  verifyPolicyDriftImpactReceipt,
+  renderPolicyDriftImpactAuditExport,
+  type PolicyDriftAffectedAgent,
+  type PolicyDriftAffectedControl,
+  type PolicyDriftAffectedTest,
+  type PolicyDriftControlChangeType,
+  type PolicyDriftEnvironment,
+  type PolicyDriftImpactChange,
+  type PolicyDriftImpactEvidenceLink,
+  type PolicyDriftImpactLevel,
+  type PolicyDriftImpactReceipt,
+  type PolicyDriftImpactRow,
+  type PolicyDriftImpactSourceCitation,
+  type PolicyDriftImpactVerification,
+  type PolicyDriftPriorDecision,
+  type PolicyDriftRecheckItem,
+  type PolicyDriftRecheckStatus,
+  type PolicyDriftRolloutReceipt
+} from "./compliance/policyDrift.js";
+export {
+  buildThirdPartyProviderRiskReceipt,
+  verifyThirdPartyProviderRiskReceipt,
+  renderThirdPartyProviderRiskAuditExport,
+  type ThirdPartyContractControlStatus,
+  type ThirdPartyProviderAttestation,
+  type ThirdPartyProviderContractualControl,
+  type ThirdPartyProviderDataBoundary,
+  type ThirdPartyProviderDataPosture,
+  type ThirdPartyProviderExceptionState,
+  type ThirdPartyProviderRiskEvidenceLink,
+  type ThirdPartyProviderRiskException,
+  type ThirdPartyProviderRiskReceipt,
+  type ThirdPartyProviderRiskRecord,
+  type ThirdPartyProviderRiskRow,
+  type ThirdPartyProviderRiskSourceCitation,
+  type ThirdPartyProviderRiskVerification,
+  type ThirdPartyProviderType
+} from "./compliance/providerRisk.js";
+export {
+  buildRouterFallbackSafetyReceipt,
+  verifyRouterFallbackSafetyReceipt,
+  renderRouterFallbackSafetyMarkdown,
+  type BuildRouterFallbackSafetyReceiptInput,
+  type RouterFallbackCostBudget,
+  type RouterFallbackEvalThreshold,
+  type RouterFallbackLatencySlo,
+  type RouterFallbackProviderSnapshot,
+  type RouterFallbackSafetyDecision,
+  type RouterFallbackSafetyReceipt,
+  type RouterFallbackSafetySourceCitation,
+  type RouterFallbackSafetyVerification
+} from "./observability/routerFallbackSafety.js";
+export {
+  buildPerAgentCostBudgetEvidenceReceipt,
+  verifyPerAgentCostBudgetEvidenceReceipt,
+  renderPerAgentCostBudgetEvidenceMarkdown,
+  type BuildPerAgentCostBudgetEvidenceReceiptInput,
+  type CostBudgetDefinition,
+  type CostBudgetOwnerDecision,
+  type CostBudgetOwnerDecisionRecord,
+  type CostBudgetPeriod,
+  type CostBudgetRowStatus,
+  type CostBudgetSpendSnapshot,
+  type CostBudgetToolPathSpendSnapshot,
+  type PerAgentCostBudgetEvidenceReceipt,
+  type PerAgentCostBudgetEvidenceVerification,
+  type PerAgentCostBudgetReceiptStatus,
+  type PerAgentCostBudgetSourceCitation,
+  type PerAgentCostBudgetToolPathRow,
+  type PerAgentCostBudgetRow
+} from "./observability/costBudgetEvidence.js";
+export {
+  buildRiskCostLatencySloReceipt,
+  buildRiskCostLatencySloWatchAlerts,
+  type BuildRiskCostLatencySloReceiptInput,
+  type RiskCostLatencyAlertRoute,
+  type RiskCostLatencyAlertSeverity,
+  type RiskCostLatencyFailureCluster,
+  type RiskCostLatencyLiveTrends,
+  type RiskCostLatencySloAlert,
+  type RiskCostLatencySloBreachEvidence,
+  type RiskCostLatencySloDefinition,
+  type RiskCostLatencySloObjectives,
+  type RiskCostLatencySloReceipt,
+  type RiskCostLatencySloStatus,
+  type RiskCostLatencySloTimeWindow,
+  type RiskCostLatencyTraceIndex,
+  type RiskCostLatencyTraceIndexEntry,
+  type RiskCostLatencyTraceRow,
+  type RiskCostLatencyTraceStatus
+} from "./observability/riskCostLatencySlo.js";
+export {
   initComplianceMapsCli,
   verifyComplianceMapsCli,
   complianceReportCli,
@@ -616,6 +856,27 @@ export type {
   ProcessIntegrationQueueResult,
   QueuedIntegrationDelivery
 } from "./integrations/integrationDeliveryQueue.js";
+export {
+  buildPartnerInteroperabilityFixture,
+  exportRuntimeLifecycleGraphForPartner,
+  partnerInteroperabilityFixturePath,
+  renderPartnerInteroperabilityFixtureAuditExport,
+  verifyPartnerInteroperabilityFixture,
+  writePartnerInteroperabilityFixture
+} from "./integrations/partnerInteroperability.js";
+export type {
+  PartnerFieldReviewDecision,
+  PartnerInteroperabilityFixture,
+  PartnerInteroperabilityOwner,
+  PartnerInteroperabilityRoundTrip,
+  PartnerInteroperabilitySourceCitation,
+  PartnerInteroperabilityVerification,
+  PartnerInteroperabilityWriteResult,
+  PartnerLifecycleGraphEdgeExport,
+  PartnerLifecycleGraphExport,
+  PartnerLifecycleGraphNodeExport,
+  PartnerUnsupportedField
+} from "./integrations/partnerInteroperability.js";
 export { defaultSsoConfig, mapSsoGroupsToRole, normalizeEnterpriseRole, resolveSsoRole } from "./auth/ssoConfig.js";
 export type {
   EnterpriseRole,
@@ -961,6 +1222,26 @@ export {
   assembleFromBudgetExceed,
   autoDetectAndAssemble
 } from "./incidents/autoAssembly.js";
+export {
+  buildIncidentRegressionReceipt,
+  buildIncidentRegressionWatchAlerts,
+  type BuildIncidentRegressionReceiptInput,
+  type IncidentRegressionAlertSeverity,
+  type IncidentRegressionClosureStatus,
+  type IncidentRegressionFailureCluster,
+  type IncidentRegressionGeneratedTest,
+  type IncidentRegressionGeneratedTestReceipt,
+  type IncidentRegressionLiveTrends,
+  type IncidentRegressionReceipt,
+  type IncidentRegressionReceiptStatus,
+  type IncidentRegressionTraceIndex,
+  type IncidentRegressionTraceIndexEntry,
+  type IncidentRegressionTraceRow,
+  type IncidentRegressionValidationRun,
+  type IncidentRegressionValidationRunReceipt,
+  type IncidentRegressionValidationStatus,
+  type IncidentRegressionWatchAlert
+} from "./incidents/incidentRegression.js";
 
 // Enhanced CGX Edge Semantics & Risk Propagation
 export {
@@ -1619,6 +1900,7 @@ export * from "./vault/metadataScrubber.js";
 export * from "./vault/invoiceFraud.js";
 export * from "./vault/dsarAutopilot.js";
 export * from "./vault/privacyBudget.js";
+export * from "./vault/knowledgeRefreshLineage.js";
 
 // ── NL Policy authoring (2026-02-21) ─────────────────────────────────
 export { parseNLPolicy, validateParsedPolicy, POLICY_TEMPLATES } from "./governor/nlPolicy.js";
@@ -1703,6 +1985,48 @@ export type {
   TrustNetworkNode,
   TrustNetworkEdge,
 } from "./passport/trustInterchange.js";
+
+// ── Receipt Interchange (versioned external receipt schema) ─
+export {
+  INTEROPERABLE_RECEIPT_SCHEMA_VERSION,
+  buildInteroperableReceipt,
+  interoperableReceiptJsonSchema,
+  parseInteroperableReceipt,
+  serializeInteroperableReceipt,
+  verifyInteroperableReceipt,
+} from "./passport/receiptInterchange.js";
+export type {
+  BuildInteroperableReceiptInput,
+  InteroperableReceipt,
+  InteroperableReceiptEventRef,
+  InteroperableReceiptIssuer,
+  InteroperableReceiptKind,
+  InteroperableReceiptSignature,
+  InteroperableReceiptSourceCitation,
+  InteroperableReceiptSubject,
+  InteroperableReceiptVerification,
+} from "./passport/receiptInterchange.js";
+
+// ── Passport Schema Compatibility (versioned import/export matrix) ─
+export {
+  CURRENT_PASSPORT_SCHEMA_VERSION,
+  PASSPORT_SCHEMA_COMPATIBILITY_VERSION,
+  PASSPORT_SCHEMA_ID,
+  buildPassportSchemaCompatibilityReport,
+  passportSchemaCompatibilityDirections,
+  verifyPassportSchemaCompatibilityReport,
+} from "./passport/passportSchemaCompatibility.js";
+export type {
+  BuildPassportSchemaCompatibilityReportInput,
+  PassportSchemaCompatibilityDirection,
+  PassportSchemaCompatibilityFixture,
+  PassportSchemaCompatibilityMatrixRow,
+  PassportSchemaCompatibilityReport,
+  PassportSchemaCompatibilitySourceCitation,
+  PassportSchemaCompatibilityStatus,
+  PassportSchemaCompatibilityVerification,
+  PassportSchemaImportExportResult,
+} from "./passport/passportSchemaCompatibility.js";
 
 // ── Regulatory Automation (RegulatoryMonitor, feed configs, gap analysis) ─
 export {
@@ -1983,6 +2307,49 @@ export {
 export type {
   MultilingualAttack,
 } from "./redteam/multilingualAttacks.js";
+
+// ── Red Team: Prompt Injection Regression Suite ─
+export {
+  PROMPT_INJECTION_REGRESSION_SUITE_SCHEMA_VERSION,
+  buildPromptInjectionRegressionSuiteReceipt,
+  renderPromptInjectionRegressionSuiteMarkdown,
+  verifyPromptInjectionRegressionSuiteReceipt,
+} from "./redteam/promptInjectionRegressionSuite.js";
+export type {
+  PromptInjectionRegressionDecision,
+  PromptInjectionRegressionFixtureInput,
+  PromptInjectionRegressionFixtureStatus,
+  PromptInjectionRegressionRowStatus,
+  PromptInjectionRegressionSourceMetadata,
+  PromptInjectionRegressionSuiteCoverage,
+  PromptInjectionRegressionSuiteInput,
+  PromptInjectionRegressionSuiteReceipt,
+  PromptInjectionRegressionSuiteRow,
+  PromptInjectionRegressionSuiteStatus,
+  PromptInjectionRegressionSuiteVerification,
+  PromptInjectionRegressionVector,
+} from "./redteam/promptInjectionRegressionSuite.js";
+
+// ── Red Team: Exploit Ledger ─
+export {
+  RED_TEAM_EXPLOIT_LEDGER_SCHEMA_VERSION,
+  buildRedTeamExploitLedgerReceipt,
+  renderRedTeamExploitLedgerMarkdown,
+  verifyRedTeamExploitLedgerReceipt,
+} from "./redteam/exploitLedger.js";
+export type {
+  RedTeamExploitLedgerInput,
+  RedTeamExploitLedgerReceipt,
+  RedTeamExploitLedgerRow,
+  RedTeamExploitLedgerRowStatus,
+  RedTeamExploitLedgerSourceMetadata,
+  RedTeamExploitLedgerStatus,
+  RedTeamExploitLedgerVerification,
+  RedTeamExploitRecordInput,
+  RedTeamExploitReproducibility,
+  RedTeamExploitRetestStatus,
+  RedTeamExploitSeverity,
+} from "./redteam/exploitLedger.js";
 
 // ── Score Explainer (human-readable score breakdowns) ─
 export {

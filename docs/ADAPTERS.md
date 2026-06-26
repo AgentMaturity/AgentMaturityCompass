@@ -4,6 +4,8 @@ Adapters are AMC's one-liner integration system. They wrap any AI agent CLI or S
 
 Adapters are part of AMC's current TypeScript integration path. They are not a separate runtime. For the architecture overview, read `docs/ARCHITECTURE_BRIEF.md`. For core-versus-wrapper clarity across SDKs, extensions, actions, and legacy paths, read `docs/IMPLEMENTATION_REALITY_MAP.md`.
 
+Need an adapter for a framework AMC does not ship yet? Read `docs/CUSTOM_ADAPTER.md` for the declarative plugin adapter schema, SDK wrapper path, evidence contract, and acceptance checklist.
+
 ## How Adapters Work
 
 When you run `amc adapters run`:
@@ -83,6 +85,16 @@ const response = await fetchWithAmc("https://api.openai.com/v1/chat/completions"
   }),
 });
 ```
+
+## Mobile Apps (React Native / Flutter)
+
+Mobile apps should use AMC Bridge over HTTPS, not the Node `wrapFetch` runtime:
+
+- React Native: use `createReactNativeAMCFetch` from `agent-maturity-compass/sdk/mobile-fetch` when your package manager can consume the mobile-safe subpath, or vendor `src/sdk/mobileFetch.ts`.
+- Flutter: call `https://<bridge-host>/bridge/<provider>/...` directly with `authorization: Bearer <AMC bridge token>`, `x-amc-agent-id`, and `x-amc-correlation-id`.
+- Keep provider API keys on your backend or in AMC Bridge; do not embed provider keys in mobile apps.
+
+See `docs/SDK.md#mobile-react-native--flutter` for full examples.
 
 ## Custom SDK Integration
 
@@ -174,6 +186,8 @@ Create a runnable local sample for library-based frameworks:
 ```bash
 amc adapters init-project --agent my-agent --adapter openai-agents-sdk
 ```
+
+For a framework not covered by a built-in sample, use `docs/CUSTOM_ADAPTER.md` to choose between a declarative plugin adapter and an SDK wrapper adapter.
 
 ## Lease Compatibility
 

@@ -5,6 +5,16 @@
 
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import { bodyJson, apiSuccess, apiError, queryParam } from './apiHelpers.js';
+import type {
+  ProviderDriftCanaryRow,
+  ProviderDriftThresholds,
+  ProviderDriftWaiver,
+} from '../benchmarks/providerDriftBenchmark.js';
+import type { RunPromptfooProviderDriftInput } from '../benchmarks/promptfooProviderDrift.js';
+import type { RunInspectProviderDriftInput } from '../benchmarks/inspectProviderDrift.js';
+import type { RunTensorZeroProviderDriftInput } from '../benchmarks/tensorZeroProviderDrift.js';
+import type { RunHelmProviderDriftInput } from '../benchmarks/helmProviderDrift.js';
+import type { ReplayBenchmarkCorpusInput } from '../benchmarks/replayBenchmarkCorpus.js';
 
 export async function handleBenchmarkRoute(
   pathname: string,
@@ -104,6 +114,153 @@ export async function handleBenchmarkRoute(
       apiSuccess(res, result);
     } catch (err) {
       apiError(res, 500, err instanceof Error ? err.message : 'Benchmark verification failed');
+    }
+    return true;
+  }
+
+  // POST /api/v1/benchmarks/provider-drift — run provider/model canary drift benchmark
+  if (pathname === '/api/v1/benchmarks/provider-drift' && method === 'POST') {
+    try {
+      const body = await bodyJson<{
+        agentId?: string;
+        baseline?: unknown[];
+        candidate?: unknown[];
+        thresholds?: Record<string, unknown>;
+        waivers?: unknown[];
+        packId?: string;
+        datasetHash?: string;
+        sourceRefs?: string[];
+        gateMode?: 'ci' | 'lifecycle';
+      }>(req);
+      if (!Array.isArray(body.baseline) || !Array.isArray(body.candidate)) {
+        apiError(res, 400, 'Required: baseline[] and candidate[] canary rows');
+        return true;
+      }
+      const {
+        runProviderDriftBenchmark,
+        buildProviderDriftWatchAlerts,
+        buildProviderDriftEvalPack,
+        buildProviderDriftCiGate,
+      } = await import('../benchmarks/providerDriftBenchmark.js');
+      const report = runProviderDriftBenchmark({
+        agentId: body.agentId ?? 'default',
+        baseline: body.baseline as ProviderDriftCanaryRow[],
+        candidate: body.candidate as ProviderDriftCanaryRow[],
+        thresholds: body.thresholds as Partial<ProviderDriftThresholds> | undefined,
+        waivers: body.waivers as ProviderDriftWaiver[] | undefined,
+      });
+      apiSuccess(res, {
+        report,
+        watchAlerts: buildProviderDriftWatchAlerts(report),
+        evalPack: buildProviderDriftEvalPack(report, {
+          packId: body.packId,
+          datasetHash: body.datasetHash,
+          sourceRefs: body.sourceRefs,
+        }),
+        ciGate: buildProviderDriftCiGate(report, { mode: body.gateMode ?? 'ci' }),
+      });
+    } catch (err) {
+      apiError(res, 500, err instanceof Error ? err.message : 'Provider drift benchmark failed');
+    }
+    return true;
+  }
+
+  // POST /api/v1/benchmarks/promptfoo-provider-drift — run promptfoo-scoped provider/version drift proof
+  if (pathname === '/api/v1/benchmarks/promptfoo-provider-drift' && method === 'POST') {
+    try {
+      const body = await bodyJson<RunPromptfooProviderDriftInput>(req);
+      if (!Array.isArray(body.baseline) || !Array.isArray(body.candidate) || !body.promptfoo) {
+        apiError(res, 400, 'Required: baseline[], candidate[], and promptfoo metadata');
+        return true;
+      }
+      const { runPromptfooProviderDrift } = await import('../benchmarks/promptfooProviderDrift.js');
+      const result = runPromptfooProviderDrift({
+        ...body,
+        agentId: body.agentId ?? 'default',
+      });
+      apiSuccess(res, result);
+    } catch (err) {
+      apiError(res, 500, err instanceof Error ? err.message : 'promptfoo provider drift benchmark failed');
+    }
+    return true;
+  }
+
+  // POST /api/v1/benchmarks/inspect-provider-drift — run Inspect-scoped provider/version drift proof
+  if (pathname === '/api/v1/benchmarks/inspect-provider-drift' && method === 'POST') {
+    try {
+      const body = await bodyJson<RunInspectProviderDriftInput>(req);
+      if (!Array.isArray(body.baseline) || !Array.isArray(body.candidate) || !body.inspect) {
+        apiError(res, 400, 'Required: baseline[], candidate[], and inspect metadata');
+        return true;
+      }
+      const { runInspectProviderDrift } = await import('../benchmarks/inspectProviderDrift.js');
+      const result = runInspectProviderDrift({
+        ...body,
+        agentId: body.agentId ?? 'default',
+      });
+      apiSuccess(res, result);
+    } catch (err) {
+      apiError(res, 500, err instanceof Error ? err.message : 'Inspect provider drift benchmark failed');
+    }
+    return true;
+  }
+
+  // POST /api/v1/benchmarks/tensorzero-provider-drift — run TensorZero-scoped provider/version drift proof
+  if (pathname === '/api/v1/benchmarks/tensorzero-provider-drift' && method === 'POST') {
+    try {
+      const body = await bodyJson<RunTensorZeroProviderDriftInput>(req);
+      if (!Array.isArray(body.baseline) || !Array.isArray(body.candidate) || !body.tensorZero) {
+        apiError(res, 400, 'Required: baseline[], candidate[], and tensorZero metadata');
+        return true;
+      }
+      const { runTensorZeroProviderDrift } = await import('../benchmarks/tensorZeroProviderDrift.js');
+      const result = runTensorZeroProviderDrift({
+        ...body,
+        agentId: body.agentId ?? 'default',
+      });
+      apiSuccess(res, result);
+    } catch (err) {
+      apiError(res, 500, err instanceof Error ? err.message : 'TensorZero provider drift benchmark failed');
+    }
+    return true;
+  }
+
+  // POST /api/v1/benchmarks/helm-provider-drift — run HELM-scoped provider/version drift proof
+  if (pathname === '/api/v1/benchmarks/helm-provider-drift' && method === 'POST') {
+    try {
+      const body = await bodyJson<RunHelmProviderDriftInput>(req);
+      if (!Array.isArray(body.baseline) || !Array.isArray(body.candidate) || !body.helm) {
+        apiError(res, 400, 'Required: baseline[], candidate[], and helm metadata');
+        return true;
+      }
+      const { runHelmProviderDrift } = await import('../benchmarks/helmProviderDrift.js');
+      const result = runHelmProviderDrift({
+        ...body,
+        agentId: body.agentId ?? 'default',
+      });
+      apiSuccess(res, result);
+    } catch (err) {
+      apiError(res, 500, err instanceof Error ? err.message : 'HELM provider drift benchmark failed');
+    }
+    return true;
+  }
+
+  // POST /api/v1/benchmarks/replay-corpus — run a replayable benchmark corpus
+  if (pathname === '/api/v1/benchmarks/replay-corpus' && method === 'POST') {
+    try {
+      const body = await bodyJson<ReplayBenchmarkCorpusInput>(req);
+      if (!Array.isArray(body.rows)) {
+        apiError(res, 400, 'Required: rows[] replay corpus rows');
+        return true;
+      }
+      const { runReplayBenchmarkCorpus } = await import('../benchmarks/replayBenchmarkCorpus.js');
+      const result = runReplayBenchmarkCorpus({
+        ...body,
+        agentId: body.agentId ?? 'default',
+      });
+      apiSuccess(res, result);
+    } catch (err) {
+      apiError(res, 500, err instanceof Error ? err.message : 'Replay benchmark corpus failed');
     }
     return true;
   }

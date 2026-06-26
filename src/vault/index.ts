@@ -8,6 +8,22 @@ export { redactScreenshotMetadata, hasExifData, redactScreenshot } from './scree
 export type { RedactResult } from './screenshotRedact.js';
 export { UndoLayer, snapshotBeforeChange, undoChange } from './undoLayer.js';
 export type { ActionRecord, UndoResult, RedoResult } from './undoLayer.js';
+export {
+  buildKnowledgeRefreshLineageReceipt,
+  knowledgeRefreshLineageReceiptPath,
+  renderKnowledgeRefreshLineageAuditExport,
+  verifyKnowledgeRefreshLineageReceipt,
+  writeKnowledgeRefreshLineageReceipt,
+} from './knowledgeRefreshLineage.js';
+export type {
+  BuildKnowledgeRefreshLineageReceiptInput,
+  KnowledgeRefreshAffectedScore,
+  KnowledgeRefreshDeletionRequest,
+  KnowledgeRefreshLineageReceipt,
+  KnowledgeRefreshLineageVerification,
+  KnowledgeRefreshSourceApproval,
+  WrittenKnowledgeRefreshLineageReceipt,
+} from './knowledgeRefreshLineage.js';
 
 // Legacy types
 // Legacy types (were in vault/stubs.ts, inlined here)

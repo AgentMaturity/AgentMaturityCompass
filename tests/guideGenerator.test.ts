@@ -100,6 +100,71 @@ describe("guideGenerator", () => {
     }
   });
 
+  it("adds benchmark-submission evidence guidance for high-target verified outcome gaps", () => {
+    const guide = generateGuide({
+      overall: 2,
+      questionScores: [makeScore("AMC-2.3", 2)],
+      targetLevel: 4,
+    });
+
+    expect(guide.sections).toHaveLength(1);
+    expect(guide.sections[0]?.evidenceNeeded).toEqual(
+      expect.arrayContaining([
+        expect.stringContaining("Benchmark-submission receipt with signed task breakdown"),
+        expect.stringContaining("Eval-score explainability pack bound to the question ID"),
+      ]),
+    );
+    expect(guideToHumanMarkdown(guide)).toContain("fail-closed thresholds");
+  });
+
+  it("surfaces GAP-0616 eval-score proof fields in guide sections and markdown", () => {
+    const guide = generateGuide({
+      overall: 2,
+      questionScores: [makeScore("AMC-2.3", 2)],
+      targetLevel: 4,
+      evalScoreExplainabilityPack: {
+        v: 1,
+        generatedAt: "2026-06-20T00:00:00.000Z",
+        agentId: "gap-0616-agent",
+        runId: "run-gap-0616",
+        sourceRefs: ["https://doi.org/10.1007/s10462-025-11471-9", "https://openalex.org/W7118468219"],
+        replayable: true,
+        failClosed: false,
+        rows: [
+          {
+            questionId: "AMC-2.3",
+            acceptedEvidenceIds: ["ev-gap-0616-eval-pack", "ev-gap-0616-result"],
+            rejectedEvidenceReasons: [
+              { evidenceId: "ev-gap-0616-paper-metadata-only", reason: "paper metadata was only a relevance signal" },
+            ],
+            repairHint: "Attach per-question accepted evidence IDs, rejected evidence reasons, and repair hints.",
+            signedEvidenceRows: [],
+            reproducibleEvalPacks: [],
+            failClosedThresholds: [],
+            status: "ready",
+            rowHash: "a".repeat(64),
+          },
+        ],
+        packHash: "b".repeat(64),
+      },
+    });
+
+    expect(guide.sections[0]?.scoreExplainabilityProof).toMatchObject({
+      questionId: "AMC-2.3",
+      acceptedEvidenceIds: ["ev-gap-0616-eval-pack", "ev-gap-0616-result"],
+      rejectedEvidenceReasons: [
+        { evidenceId: "ev-gap-0616-paper-metadata-only", reason: expect.stringContaining("relevance signal") },
+      ],
+      repairHint: expect.stringContaining("accepted evidence IDs"),
+    });
+    const markdown = guideToHumanMarkdown(guide);
+    expect(markdown).toContain("Score explainability proof");
+    expect(markdown).toContain("Question ID: AMC-2.3");
+    expect(markdown).toContain("Accepted evidence IDs: ev-gap-0616-eval-pack, ev-gap-0616-result");
+    expect(markdown).toContain("ev-gap-0616-paper-metadata-only: paper metadata was only a relevance signal");
+    expect(markdown).toContain("Repair hint: Attach per-question accepted evidence IDs");
+  });
+
   it("sorts sections by impact (biggest gap first)", () => {
     const scores = [
       makeScore(questionBank[0]!.id, 4),  // small gap

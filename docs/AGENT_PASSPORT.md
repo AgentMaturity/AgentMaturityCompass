@@ -62,3 +62,17 @@ amc passport export-latest --scope agent --id <agentId> --out ./agent-latest.amc
 - PII/secret scanner results
 
 If any critical check fails, verification returns fail and the artifact is treated as untrusted.
+
+## Schema Compatibility
+
+Passport schema compatibility can be recorded with a passport schema compatibility report using `amc.passport.compatibility.v1`. The report is a signed-evidence companion for `.amcpass` exchange, not a replacement for `amc passport verify`.
+
+The report binds:
+- current Passport schema version (`1`)
+- fixture corpus id
+- import, export, and round-trip fixture results
+- compatibility matrix rows by partner system and schema version
+- evidence refs and source citations
+- deterministic row and report hashes
+
+Metadata-only claims about a paper, benchmark, partner system, or protocol are not enough. A compatibility claim must include concrete fixture payloads, import/export results, and a compatibility matrix that covers import, export, and round-trip behavior.

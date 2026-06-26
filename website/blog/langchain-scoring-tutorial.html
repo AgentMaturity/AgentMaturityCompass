@@ -63,8 +63,14 @@ blockquote{border-left:3px solid var(--accent);padding:12px 20px;margin:20px 0;c
 
 @media(max-width:768px){h1{font-size:1.6rem}.container{padding:32px 18px 60px}}
 </style>
+<style id="skip-link-style">
+.skip-link{position:fixed;left:-9999px;top:12px;z-index:10000;padding:8px 14px;background:#4AEF79;color:#0a0a0a;font:700 14px system-ui,sans-serif;text-decoration:none}
+.skip-link:focus,.skip-link:focus-visible{left:12px}
+:where(a,button,input,select,textarea,[tabindex]:not([tabindex="-1"])):focus-visible{outline:2px solid #4AEF79;outline-offset:3px}
+</style>
 </head>
 <body>
+<a href="#main-content" class="skip-link">Skip to content</a>
 
 <nav class="nav">
   <a href="../" class="logo">🧭 <span>AMC</span></a>
@@ -74,6 +80,7 @@ blockquote{border-left:3px solid var(--accent);padding:12px 20px;margin:20px 0;c
   <a href="./" style="color:var(--accent2)">Blog</a>
   <a href="https://github.com/AgentMaturity/AgentMaturityCompass" target="_blank">GitHub</a>
 </nav>
+<div id="main-content" tabindex="-1"></div>
 
 <div class="container">
 
@@ -191,7 +198,7 @@ amc</code></pre>
 
 <h2>Interpreting Your Results</h2>
 
-<p>AMC scores your agent across 5 dimensions with 138 core diagnostic questions (730 total including industry packs), on a scale from L0 (no controls) to L5 (self-governing with cryptographic proof). Here's what the levels mean for a LangChain agent:</p>
+<p>AMC scores your agent across 5 dimensions with 244 default diagnostic questions, plus 600 sector-specific questions through 41 Industry Packs for 844 total when domain coverage is enabled, on a scale from L0 (no controls) to L5 (self-governing with cryptographic proof). Here's what the levels mean for a LangChain agent:</p>
 
 <ul>
   <li><strong>L0–L1:</strong> Your agent has no safety controls or only documentation-level intent. Fix the critical gaps immediately.</li>
@@ -227,7 +234,7 @@ amc fix --target-level L3    <span style="color:#6a9955"># Creates GitHub Action
 <p>Once you have your baseline score, there are several paths forward:</p>
 
 <ul>
-  <li><strong>Run the full Assurance Lab</strong> — <code>amc assurance run --scope full</code> tests your agent against 78 attack packs</li>
+  <li><strong>Run the full Assurance Lab</strong> — <code>amc assurance run --scope full</code> tests your agent against 147 assurance packs</li>
   <li><strong>Apply domain-specific packs</strong> — <code>amc domain assess --domain health</code> for healthcare, <code>--domain wealth</code> for finance</li>
   <li><strong>Generate a stakeholder report</strong> — <code>amc report &lt;id&gt; --html report.html</code> creates a styled report you can print to PDF</li>
   <li><strong>Add a README badge</strong> — <code>amc badge</code> generates a shield showing your maturity level</li>

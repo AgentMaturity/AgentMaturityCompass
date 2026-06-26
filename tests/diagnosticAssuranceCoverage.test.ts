@@ -3,7 +3,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, test } from "vitest";
 import { initWorkspace } from "../src/workspace.js";
-import { compareModels, generateReport, loadRunReport, runDiagnostic } from "../src/diagnostic/runner.js";
+import { compareModels, generateReport, loadRunReport, resolveRunReport, runDiagnostic } from "../src/diagnostic/runner.js";
 import { renderFailureRiskMarkdown, runFleetIndices, runIndicesForAgent } from "../src/assurance/indices.js";
 import { applyAssurancePatchKit, listAssuranceHistory, runAssurance, verifyAssuranceRun } from "../src/assurance/assuranceRunner.js";
 
@@ -46,6 +46,22 @@ describe("diagnostic and assurance coverage expansion", () => {
     expect(reloaded.runId).toBe(report.runId);
     expect(markdown).toContain("#");
     expect(markdown.toLowerCase()).toContain("trust");
+  });
+
+  test("resolveRunReport supports latest and unique run ID prefixes", async () => {
+    const ws = workspace();
+    await runDiagnostic({ workspace: ws, agentId: "default", window: "14d", targetName: "default", claimMode: "auto" });
+    await new Promise((resolve) => setTimeout(resolve, 2));
+    const latest = await runDiagnostic({ workspace: ws, agentId: "default", window: "14d", targetName: "default", claimMode: "auto" });
+
+    const latestResolved = resolveRunReport(ws, "latest", "default");
+    expect(latestResolved.resolvedRunId).toBe(latest.runId);
+    expect(latestResolved.resolvedBy).toBe("latest");
+    expect(latestResolved.report.runId).toBe(latest.runId);
+
+    const prefixResolved = resolveRunReport(ws, latest.runId.slice(0, 12), "default");
+    expect(prefixResolved.resolvedRunId).toBe(latest.runId);
+    expect(prefixResolved.resolvedBy).toBe("prefix");
   });
 
   test("assurance run verifies, patch history is tracked, and indices render markdown", async () => {

@@ -12,6 +12,7 @@ import { renderPortfolioForecastPage } from "./portfolioForecast.js";
 import { renderCompassPage } from "./compass.js";
 import { renderContextGraphPage } from "./contextGraph.js";
 import { renderDiagnosticViewPage } from "./diagnosticView.js";
+import { renderEvidenceDrilldownPage } from "./evidenceDrilldown.js";
 import { renderNorthstarPage } from "./northstar.js";
 import { renderAssurancePage } from "./assurance.js";
 import { renderAssuranceRunPage } from "./assuranceRun.js";
@@ -246,6 +247,69 @@ function renderOnboardingSteps(state) {
         `)
         .join("")}
     </div>
+  `;
+}
+
+function renderApiQuickstart(status, agentId) {
+  const base = `${window.location.origin}${workspacePrefixFromPath()}`;
+  const tokenHeader = 'x-amc-admin-token: <admin-token>';
+  const examples = [
+    {
+      label: "GET /status",
+      method: "GET",
+      path: "/status",
+      title: "Studio status",
+      command: `curl -s ${base}/status -H "${tokenHeader}"`,
+      response: '{ "studio": { "running": true }, "vaultLocked": true }'
+    },
+    {
+      label: "GET /api/v1/score/latest",
+      method: "GET",
+      path: `/api/v1/score/latest?agent=${encodeURIComponent(agentId)}`,
+      title: "Latest score",
+      command: `curl -s "${base}/api/v1/score/latest?agent=${encodeURIComponent(agentId)}" -H "${tokenHeader}"`,
+      response: '{ "runId": "...", "integrityIndex": 0.82, "trustLabel": "HIGH TRUST" }'
+    },
+    {
+      label: "POST /api/v1/score/quickscore",
+      method: "POST",
+      path: "/api/v1/score/quickscore",
+      title: "Run quickscore",
+      command: `curl -s ${base}/api/v1/score/quickscore -H "content-type: application/json" -H "${tokenHeader}" -d '{"agentId":"${agentId}"}'`,
+      response: '{ "score": 0, "level": "L0", "nextActions": [...] }'
+    }
+  ];
+  return `
+    ${card("API Quickstart", `
+      <div class="api-quickstart-head">
+        <div>
+          <div class="muted">Base URL</div>
+          <code>${htmlEscape(base || window.location.origin)}</code>
+        </div>
+        <div>
+          <div class="muted">Auth header</div>
+          <code>${htmlEscape(tokenHeader)}</code>
+        </div>
+        <div>
+          <div class="muted">Current agent</div>
+          <code>${htmlEscape(agentId)}</code>
+        </div>
+      </div>
+      <div class="api-quickstart-grid">
+        ${examples.map((example) => `
+          <div class="api-example-card">
+            <div class="row spaced wrap">
+              <strong>${htmlEscape(example.label)}</strong>
+              <span class="pill muted">${htmlEscape(example.title)}</span>
+            </div>
+            <pre>${htmlEscape(example.command)}</pre>
+            <div class="muted">Response shape</div>
+            <code class="api-response-shape">${htmlEscape(example.response)}</code>
+          </div>
+        `).join("")}
+      </div>
+      <p class="muted">OpenAPI spec: <code>${htmlEscape(base)}/openapi.json</code>. Demo mode is for exploration; signed verifier-ready artifacts still require standard vault-backed startup.</p>
+    `)}
   `;
 }
 
@@ -953,7 +1017,7 @@ async function renderHome() {
         <div class="studio-kicker">amc studio</div>
         <h2 class="studio-title">Run<span>Watch</span><strong>Prove_</strong></h2>
         <p class="studio-sub">
-          A local control plane for the full AMC trust stack. Run the 240-question score,
+          A local control plane for the full AMC trust stack. Run the 244-question score,
           inspect evidence, watch drift, browse Industry Packs, and export audit-ready proof
           without leaving your workspace.
         </p>
@@ -995,6 +1059,8 @@ async function renderHome() {
       <pre id="onboardingOut" class="scroll muted"></pre>
     `)}
 
+    ${renderApiQuickstart(status, agentId)}
+
     <div class="studio-kpi-grid">
       <section class="card studio-kpi"><div class="muted">Agents</div><div class="tile-value">${agents.length}</div></section>
       <section class="card studio-kpi"><div class="muted">Active Freezes</div><div class="tile-value">${activeFreezes}</div></section>
@@ -1004,8 +1070,8 @@ async function renderHome() {
 
     <div class="studio-section-label">runtime telemetry</div>
     <div class="studio-chart-grid">
-      ${card("Overall Trend", `<canvas id="overallTrend" width="360" height="140"></canvas>`)}
-      ${card("Integrity Trend", `<canvas id="integrityTrend" width="360" height="140"></canvas>`)}
+      ${card("Overall Trend", `<canvas id="overallTrend" width="360" height="140" role="img" aria-label="Overall maturity trend chart for the selected agent."></canvas>`)}
+      ${card("Integrity Trend", `<canvas id="integrityTrend" width="360" height="140" role="img" aria-label="Integrity index trend chart for the selected agent."></canvas>`)}
     </div>
   `;
   const agentStatus = await apiGet(`/agents/${encodeURIComponent(agentId)}/status`).catch(() => ({ latestRun: null }));
@@ -1066,7 +1132,7 @@ async function renderAgent() {
       <p>Overall: <strong>${((report.layerScores || []).reduce((s, x) => s + x.avgFinalLevel, 0) / Math.max(1, (report.layerScores || []).length)).toFixed(3)}</strong></p>
       <p>IntegrityIndex: <strong>${Number(report.integrityIndex || 0).toFixed(3)}</strong> (${report.trustLabel})</p>
       <p>Evidence Coverage: ${(Number(report.evidenceCoverage || 0) * 100).toFixed(1)}%</p>
-      <canvas id="layerBars" width="520" height="170"></canvas>
+      <canvas id="layerBars" width="520" height="170" role="img" aria-label="Layer maturity bar chart for the selected agent."></canvas>
       `
       : "<p class='muted'>No run found.</p>"
     )}
@@ -1362,7 +1428,7 @@ async function renderIndustryPacks() {
         </div>
       </div>
       ${locked ? `
-        <p class="muted">$${htmlEscape(entitlement.priceUsdMonthly || "9.99")}/month unlocks all 40 Industry Domain Packs.</p>
+        <p class="muted">$${htmlEscape(entitlement.priceUsdMonthly || "9.99")}/month unlocks all 41 Industry Domain Packs.</p>
         <div class="row">
           <button id="industryCheckout">Open checkout</button>
           <a class="button secondary" href="${htmlEscape(entitlement.checkoutUrl || "https://agentmaturity.co/pricing#industry-packs")}" target="_blank" rel="noopener">Pricing</a>
@@ -1373,7 +1439,7 @@ async function renderIndustryPacks() {
         </div>
         <button id="industryActivate" class="secondary">Activate access</button>
         <p class="muted">After purchase, paste the license key here or run <code>amc domain pack activate --key &lt;license-key&gt;</code>.</p>
-      ` : `<p class="status-ok">All 40 Industry Domain Packs are unlocked.</p>`}
+      ` : `<p class="status-ok">All 41 Industry Domain Packs are unlocked.</p>`}
     `)}
     ${card("Pack Catalog", `<div id="industryPackRows" class="scroll"></div><pre id="industryPackOut" class="muted"></pre>`)}
   `;
@@ -1417,7 +1483,7 @@ async function renderIndustryPacks() {
     button.addEventListener("click", async () => {
       const id = button.getAttribute("data-industry-pack");
       if (locked) {
-        out.textContent = `Industry Packs are locked. $${entitlement.priceUsdMonthly || "9.99"}/month unlocks all 40 packs.\n${entitlement.checkoutUrl || ""}`;
+        out.textContent = `Industry Packs are locked. $${entitlement.priceUsdMonthly || "9.99"}/month unlocks all 41 packs.\n${entitlement.checkoutUrl || ""}`;
         return;
       }
       const detail = await apiGet(`/industry-packs/${encodeURIComponent(id)}`);
@@ -1493,7 +1559,7 @@ async function renderOutcomes() {
         <div><div class="muted">ValueRegressionRisk</div><div class="tile-value">${Number(report.valueRegressionRisk || 0).toFixed(2)}</div></div>
         <div><div class="muted">Observed Coverage</div><div class="tile-value">${(Number(report.observedCoverageRatio || 0) * 100).toFixed(1)}%</div></div>
       </div>
-      <canvas id="outcomeTrend" width="640" height="160"></canvas>
+      <canvas id="outcomeTrend" width="640" height="160" role="img" aria-label="Outcome value trend chart for the selected agent."></canvas>
     `)}
     ${card("Category Scores", `
       <pre class="scroll">${JSON.stringify(report.categoryScores || {}, null, 2)}</pre>
@@ -2199,11 +2265,11 @@ async function renderOrg() {
       <div class="grid">
         <div>
           <h4>Layers</h4>
-          <canvas id="orgLayerBars" width="520" height="160"></canvas>
+          <canvas id="orgLayerBars" width="520" height="160" role="img" aria-label="Organization node layer maturity bar chart."></canvas>
         </div>
         <div>
           <h4>Distribution (P10/P50/P90)</h4>
-          <canvas id="orgDistLine" width="520" height="160"></canvas>
+          <canvas id="orgDistLine" width="520" height="160" role="img" aria-label="Organization node distribution line chart showing P10, P50, and P90 scores."></canvas>
         </div>
       </div>
       <div class="grid">
@@ -2728,6 +2794,14 @@ async function renderPage() {
     }
     if (page === "diagnosticView") {
       return await renderDiagnosticViewPage({
+        root,
+        card,
+        apiGet,
+        currentAgent
+      });
+    }
+    if (page === "evidenceDrilldown") {
+      return await renderEvidenceDrilldownPage({
         root,
         card,
         apiGet,

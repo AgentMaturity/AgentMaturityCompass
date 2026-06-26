@@ -24,7 +24,7 @@ Promptfoo and AMC are **complementary, not competitive**. Promptfoo evaluates pr
 | Compliance automation | OWASP only | EU AI Act + ISO 42001 + NIST + SOC 2 |
 | Evidence integrity | JSON files | Ed25519 + Merkle proofs |
 | Multi-agent governance | Single target | Fleet oversight + delegation |
-| Industry packs | Limited | 40 packs across 7 verticals |
+| Industry packs | Limited | 41 packs across 7 verticals |
 
 ### 4. When developers compare
 - ✅ `website/vs-promptfoo.html` comparison page published

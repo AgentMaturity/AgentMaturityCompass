@@ -139,8 +139,8 @@ const NATURAL_MAPPINGS: NaturalMapping[] = [
   },
   {
     patterns: [/^ingest/i, /^evidence.*ingest/i, /^import.*evidence/i, /^upload.*evidence/i],
-    command: "evidence ingest",
-    description: "Ingesting evidence file",
+    command: "evidence collect",
+    description: "Opening evidence collection/import wizard",
   },
   {
     patterns: [/^evidence$/i, /^proof$/i, /^show.*evidence/i, /^evidence.*(?:gap|list|status)/i],

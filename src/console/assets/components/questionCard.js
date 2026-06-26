@@ -18,6 +18,9 @@ export function renderQuestionCard(params) {
   const highRisk = controls.decisivenessRisk >= 0.65 || controls.contradictionRisk >= 0.5;
   const chips = refs.map((row) => renderEvidenceChip(row)).join(" ");
   const examples = (params.question.tailoredEvidenceExamples ?? []).map((row) => `<li>${esc(row)}</li>`).join("");
+  const drilldownHref = params.runId
+    ? `./evidenceDrilldown?agent=${encodeURIComponent(params.agentId || "default")}&run=${encodeURIComponent(params.runId)}&question=${encodeURIComponent(params.question.qId)}`
+    : null;
   return `
     <section class="card question-card" data-low-confidence="${lowConfidence ? "true" : "false"}" data-high-risk="${highRisk ? "true" : "false"}">
       <h3>${esc(params.question.qId)} — ${esc(params.question.title)}</h3>
@@ -33,6 +36,9 @@ export function renderQuestionCard(params) {
       ${chips.length > 0 ? `<div class="row wrap">${chips}</div>` : ""}
       ${reasons.length > 0 ? `<p class="status-bad"><strong>UNKNOWN reasons:</strong> ${esc(reasons.join(" | "))}</p>` : ""}
       ${controls.downgradeReason ? `<p class="status-bad"><strong>Confidence gate:</strong> ${esc(controls.downgradeReason)}</p>` : ""}
+      <div class="row wrap">
+        ${drilldownHref ? `<a class="secondary" href="${drilldownHref}">Open evidence drilldown</a>` : `<span class="muted">Evidence drilldown appears after a run ID is available.</span>`}
+      </div>
       <details>
         <summary>Evidence examples for this agent</summary>
         <ul>${examples}</ul>

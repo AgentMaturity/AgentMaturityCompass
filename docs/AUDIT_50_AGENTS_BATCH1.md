@@ -14,11 +14,11 @@
 | 1 | Sarah (Junior Dev) | **6/10** | Install is completely broken — npm package doesn't exist |
 | 2 | Jake (DevOps) | **7/10** | `ci check` works; vault blocks `ci init`; no `--no-sign` bypass |
 | 3 | Priya (Compliance Officer) | **5/10** | Framework names in docs vs CLI differ; iso-42001 silently rejected |
-| 4 | Marcus (Security Researcher) | **7/10** | `analyze-mcp` needs clearer arg; `--no-sign` missing from cert/compare |
+| 4 | Marcus (Security Researcher) | **7/10** | `analyze-mcp` needs clearer arg; cert preview `--no-sign` is resolved, compare no-sign remains open |
 | 5 | Elena (CTO) | **6/10** | `fleet status` works but shows 1 agent; no path to add 20 agents |
 | 6 | Tom (Data Scientist) | **5/10** | `compare` vault-blocks on model names; run-ID comparison broken |
 | 7 | Raj (OSS Contributor) | **5/10** | `pack test` in AMC root fails; test count badge disagrees with CONTRIBUTING.md |
-| 8 | Lisa (Enterprise Architect) | **4/10** | `cert generate --badge` vault-blocked, no `--no-sign`; API docs link is placeholder |
+| 8 | Lisa (Enterprise Architect) | **5/10** | `cert generate --badge` and `--no-sign` preview are now available; API docs link and compare no-sign remain separate gaps |
 | 9 | Chen (API Developer) | **4/10** | `amc api start` dead command; npm package doesn't exist so can't install |
 | 10 | Maya (Product Manager) | **6/10** | `inventory list` dead; website playground works but CLI confusing |
 
@@ -118,18 +118,20 @@ Raj (contributor) reads the badge, reads CONTRIBUTING.md, they disagree. Which i
 ### [GAP-007] `amc cert generate` and `amc compare` are vault-blocked with no escape hatch
 **Severity: P2**
 
+2026-06-16 update: the certificate half is resolved. `amc cert generate --no-sign` and `--preview` now emit `UNSIGNED_PREVIEW` format material without vault signing, and verification rejects it until regenerated as a signed certificate. The model-compare bypass remains a separate gap.
+
 ```bash
 $ amc cert generate --agent default --output /tmp/cert.json
 🔐 Vault locked.
 
 $ amc cert generate --agent default --output /tmp/cert.json --no-sign
-error: unknown option '--no-sign'
+status=UNSIGNED_PREVIEW
 
 $ amc compare gpt-4 claude-3-opus --no-sign  
 error: unknown option '--no-sign'
 ```
 
-`amc assurance run --pack injection --no-sign` works. But `cert generate` and `compare` (model comparison) have no `--no-sign` bypass. Lisa (Architect) evaluating AMC can't generate a sample cert to demo the format. Tom (Data Scientist) can't compare models without unlocking the vault first. Both users likely give up.
+`amc assurance run --pack injection --no-sign` works, and the certificate preview path now works. `compare` (model comparison) still has no `--no-sign` bypass, so Tom (Data Scientist) remains blocked separately.
 
 ---
 
@@ -213,7 +215,7 @@ Raw Node.js EADDRINUSE error. Should say "Port 3210 is already in use. If AMC St
 | `amc compliance report --framework iso-42001` | Compliance report | Unsupported framework | Needs `ISO_42001` not `iso-42001` |
 | `amc compliance report --framework nist-ai-rmf` | Compliance report | Unsupported framework | Needs `NIST_AI_RMF` |
 | `amc compliance report --framework soc2` | Compliance report | Unsupported framework | Needs `SOC2` |
-| `amc cert generate --agent x --output cert.json` | Generate cert | Vault locked, no escape | `--no-sign` not supported |
+| `amc cert generate --agent x --output cert.json --no-sign` | Generate preview cert | Works as unsigned preview | Verification intentionally rejects preview until signed |
 | `amc compare <run-id-A> <run-id-B>` | Compare two runs | Treats as model names, vault-blocks | Run comparison not implemented |
 | `amc compare gpt-4 claude-3 --no-sign` | Compare models | error: unknown option | No `--no-sign` on compare |
 | `amc pack test .` (from repo root) | Test packs | No index.mjs found | Only works from a pack directory |
@@ -292,7 +294,7 @@ Also fix website docs to use uppercase-underscore, or add case-insensitive norma
 *File: src/commands/api/docs.ts — 1 line*
 
 **FIX-06: Add `--no-sign` flag to `cert generate` and `compare-models`**  
-These are the two main "evaluate AMC" commands for Lisa and Tom. Without `--no-sign`, vault setup is mandatory before you can even see what output looks like.  
+2026-06-16 update: `cert generate --no-sign` is resolved as an unsigned preview path. `compare-models` remains open; without a no-sign mode, model comparison still forces vault setup before users can inspect output shape.
 *Files: src/commands/cert/generate.ts, src/commands/compare-models/index.ts*
 
 **FIX-07: Add "how to add agents" hint to `fleet status` and `fleet health`**  
@@ -367,7 +369,7 @@ The 481 number is misleading — it likely counts every leaf subcommand includin
 - `amc api start` — dead command ❌
 - `amc comply report --framework iso-42001` (lowercase) — silent reject ❌
 - `amc api docs` — shows placeholder URL `your-org` ❌
-- `amc cert generate` — no `--no-sign` bypass ❌
+- `amc cert generate --no-sign` — unsigned preview path resolved 2026-06-16 ✅
 - `amc compare` with run IDs — broken (treats as models) ❌
 - `amc dashboard open` (when port taken) — raw EADDRINUSE ❌
 - `amc pack test .` from repo root — no index.mjs ❌

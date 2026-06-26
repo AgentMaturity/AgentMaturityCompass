@@ -38,8 +38,14 @@ tr:hover td{background:rgba(0,255,65,.03)}
 .btn{display:inline-block;padding:12px 28px;background:var(--green);color:#000;font-weight:600;border-radius:6px;font-family:var(--mono);transition:all .2s}
 .btn:hover{background:var(--green2);text-decoration:none}
 </style>
+<style id="skip-link-style">
+.skip-link{position:fixed;left:-9999px;top:12px;z-index:10000;padding:8px 14px;background:#4AEF79;color:#0a0a0a;font:700 14px system-ui,sans-serif;text-decoration:none}
+.skip-link:focus,.skip-link:focus-visible{left:12px}
+:where(a,button,input,select,textarea,[tabindex]:not([tabindex="-1"])):focus-visible{outline:2px solid #4AEF79;outline-offset:3px}
+</style>
 </head>
 <body>
+<a href="#main-content" class="skip-link">Skip to content</a>
 <nav class="nav">
 <a href="index.html" class="logo">AMC</a>
 <a href="index.html">Home</a>
@@ -47,6 +53,7 @@ tr:hover td{background:rgba(0,255,65,.03)}
 <a href="methodology.html">Methodology</a>
 <a href="docs/index.html">Docs</a>
 </nav>
+<div id="main-content" tabindex="-1"></div>
 
 <div class="hero">
 <h1>AMC vs Promptfoo</h1>
@@ -67,7 +74,7 @@ tr:hover td{background:rgba(0,255,65,.03)}
 <tr><td>Primary purpose</td><td>Trust scorecard for AI agents</td><td>Eval & red-team harness for LLM apps</td></tr>
 <tr><td>Core question</td><td>"Is this agent safe to ship?"</td><td>"Does this prompt/model produce correct output?"</td></tr>
 <tr><td>Evidence model</td><td>Execution-verified, cryptographically signed</td><td>Test pass/fail with LLM-as-judge grading</td></tr>
-<tr><td>Maturity model</td><td>L0-L5 across 5 dimensions (240 default questions, 260 with lifecycle expansion)</td><td>No maturity model — binary pass/fail per test</td></tr>
+<tr><td>Maturity model</td><td>L0-L5 across 5 dimensions (244 default questions, 264 with lifecycle expansion)</td><td>No maturity model — binary pass/fail per test</td></tr>
 <tr><td>Red teaming</td><td>147 assurance packs + evolutionary attacks</td><td>134 plugins + strategy-based probes</td></tr>
 <tr><td>Compliance</td><td>EU AI Act, ISO 42001, NIST, SOC 2, OWASP + audit binder generation</td><td>OWASP LLM Top 10 coverage</td></tr>
 <tr><td>Framework support</td><td>14 adapters (zero code changes)</td><td>30+ target types (config-driven)</td></tr>
@@ -100,7 +107,7 @@ tr:hover td{background:rgba(0,255,65,.03)}
 <tr><td>Compliance automation</td><td>Generates audit binders for EU AI Act, ISO 42001, NIST AI RMF, SOC 2. Maps diagnostic results to regulatory requirements. Promptfoo maps to OWASP only.</td></tr>
 <tr><td>Agent governance</td><td>Policy engine, approval workflows, scoped leases, budget controls, delegation graphs. Promptfoo doesn't model governance.</td></tr>
 <tr><td>Multi-agent fleet</td><td>Compare agents, track trust delegation, inventory discovery. Promptfoo evaluates one target at a time.</td></tr>
-<tr><td>Industry packs</td><td>40 domain-specific packs (healthcare/HIPAA, finance/MiFID II, education/FERPA). Promptfoo has some industry plugins but fewer regulatory mappings.</td></tr>
+<tr><td>Industry packs</td><td>41 domain-specific packs (healthcare/HIPAA, finance/MiFID II, education/FERPA, logistics/warehouse reliability). Promptfoo has some industry plugins but fewer regulatory mappings.</td></tr>
 <tr><td>Transparent proxy</td><td>Gateway observes agent behavior without code changes — evidence tier is higher than self-reported test results.</td></tr>
 </table>
 </div>

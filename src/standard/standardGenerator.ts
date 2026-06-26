@@ -12,6 +12,7 @@ import { promptPackSchema } from "../prompt/promptPackSchema.js";
 import { assuranceCertSchema } from "../assurance/assuranceSchema.js";
 import { binderJsonSchema } from "../audit/binderSchema.js";
 import { passportJsonSchema } from "../passport/passportSchema.js";
+import { domainProofArtifactSchema } from "../domainProof/domainProofArtifact.js";
 import { inspectBenchArtifact } from "../bench/benchArtifact.js";
 import { inspectPromptPackArtifact } from "../prompt/promptPackArtifact.js";
 import { verifyAssuranceCertificateFile } from "../assurance/assuranceVerifier.js";
@@ -93,6 +94,27 @@ function schemaByName(name: SchemaName): Record<string, unknown> {
       ]
     };
   }
+  if (name === "amcproof.schema.json") {
+    return {
+      ...common,
+      title: "AMC Domain Proof Artifact",
+      type: "object",
+      required: [
+        "v",
+        "proofId",
+        "generatedTs",
+        "proofClass",
+        "claimText",
+        "sourceManifestHash",
+        "formalSpecHash",
+        "ruleRefs",
+        "constraintsChecked",
+        "result",
+        "humanReview",
+        "proofBindings"
+      ]
+    };
+  }
   if (name === "registry.bench.schema.json") {
     return {
       ...common,
@@ -161,6 +183,10 @@ function validateSchemaPayload(name: SchemaName, payload: unknown): void {
   }
   if (name === "amcpass.schema.json") {
     passportJsonSchema.parse(payload);
+    return;
+  }
+  if (name === "amcproof.schema.json") {
+    domainProofArtifactSchema.parse(payload);
     return;
   }
   if (name === "registry.bench.schema.json") {

@@ -60,8 +60,14 @@ footer{padding:2rem 0;text-align:center;color:var(--muted);font-size:.85rem}
   .tl-item{flex-direction:column;gap:.25rem}
 }
 </style>
+<style id="skip-link-style">
+.skip-link{position:fixed;left:-9999px;top:12px;z-index:10000;padding:8px 14px;background:#4AEF79;color:#0a0a0a;font:700 14px system-ui,sans-serif;text-decoration:none}
+.skip-link:focus,.skip-link:focus-visible{left:12px}
+:where(a,button,input,select,textarea,[tabindex]:not([tabindex="-1"])):focus-visible{outline:2px solid #4AEF79;outline-offset:3px}
+</style>
 </head>
 <body>
+<a href="#main-content" class="skip-link">Skip to content</a>
 
 <nav>
 <div class="w">
@@ -73,6 +79,7 @@ footer{padding:2rem 0;text-align:center;color:var(--muted);font-size:.85rem}
   </div>
 </div>
 </nav>
+<div id="main-content" tabindex="-1"></div>
 
 <div class="hero">
 <div class="w">
@@ -122,7 +129,7 @@ footer{padding:2rem 0;text-align:center;color:var(--muted);font-size:.85rem}
 <div class="w">
   <h2>Article-by-Article Mapping</h2>
   <ul class="checklist">
-    <li><span class="check">✓</span><div><span class="article-ref">Article 9 — Risk Management</span><br>AMC's 85 assurance packs map to systematic risk identification. Each pack targets specific failure modes with documented mitigation paths.</div></li>
+    <li><span class="check">✓</span><div><span class="article-ref">Article 9 — Risk Management</span><br>AMC's 147 assurance packs map to systematic risk identification. Each pack targets specific failure modes with documented mitigation paths.</div></li>
     <li><span class="check">✓</span><div><span class="article-ref">Article 12 — Record Keeping</span><br>Merkle-tree evidence ledger with Ed25519 signatures. Every API call, tool use, and decision is hash-chained into a tamper-proof audit trail.</div></li>
     <li><span class="check">✓</span><div><span class="article-ref">Article 13 — Transparency</span><br>L0–L5 scores with cryptographic provenance. Auditors can verify scores offline without trusting the operator — using <code>amc verify all --json</code>.</div></li>
     <li><span class="check">✓</span><div><span class="article-ref">Article 14 — Human Oversight</span><br>Oversight quality scoring measures when the agent can act alone vs when humans must review. Policy-gated autonomy levels with signed action policies.</div></li>

@@ -68,6 +68,7 @@ function toEventPayload(input: Omit<OrgSseEvent, "summaryHash">): OrgSseEvent {
 }
 
 function writeEvent(res: ServerResponse, event: OrgSseEvent): void {
+  res.write(`id: ${event.summaryHash}\n`);
   res.write(`event: ${event.type}\n`);
   res.write(`data: ${JSON.stringify(event)}\n\n`);
 }
@@ -81,6 +82,7 @@ export class OrgSseHub {
     res.setHeader("cache-control", "no-cache");
     res.setHeader("connection", "keep-alive");
     res.flushHeaders?.();
+    res.write("retry: 15000\n");
     res.write(": connected\n\n");
     this.clients.add(res);
 

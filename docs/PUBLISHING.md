@@ -8,7 +8,7 @@ AMC is distributed through 5 channels:
 |---------|--------|---------|
 | **npm** | ✅ Ready | `npm i -g agent-maturity-compass` |
 | **GitHub Releases** | ✅ Ready | `.amcrelease` bundles + SBOM |
-| **Docker / GHCR** | ✅ Ready | `docker run ghcr.io/agentmaturity/amc-studio` |
+| **Docker / GHCR** | Release workflow ready; public visibility must be verified | local build first; GHCR after package visibility check |
 | **Single-binary (SEA)** | 🧪 Experimental | host-built `amc` binary artifact |
 | **Homebrew** | 🔜 Pending | `brew install AgentMaturity/tap/amc` |
 
@@ -87,6 +87,8 @@ The Docker image builds automatically in `release.yml`. It is pushed to:
 ghcr.io/agentmaturity/amc-studio:latest
 ghcr.io/agentmaturity/amc-studio:v{VERSION}
 ```
+
+GHCR visibility must be verified before publishing copy-paste `docker run ghcr.io/...` commands. GitHub Container Registry packages can be private by default or have independent package permissions, so public install docs should use local build commands until the package page and anonymous pull have both been verified.
 
 ### Local build & test
 ```bash

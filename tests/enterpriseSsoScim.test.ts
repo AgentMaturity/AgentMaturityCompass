@@ -14,6 +14,7 @@ import {
   identityMappingAddCli,
   identityProviderAddOidcCli,
   identityProviderAddSamlCli,
+  scimInitCli,
   scimTokenCreateCli
 } from "../src/identity/identityCli.js";
 import { issueLeaseForCli } from "../src/leases/leaseCli.js";
@@ -298,6 +299,26 @@ function buildCompactSamlResponse(params: {
 }
 
 describe("enterprise identity (OIDC/SAML/SCIM)", () => {
+  test("OIDC provider add bootstraps host identity config on a fresh host", () => {
+    const hostDir = newDir("amc-identity-oidc-fresh-");
+    process.env.AMC_HOST_VAULT_PASSPHRASE = "identity-host-passphrase";
+    const clientSecretFile = join(hostDir, "oidc-secret.txt");
+    writeFileSync(clientSecretFile, "oidc-secret-value");
+
+    const out = identityProviderAddOidcCli({
+      hostDir,
+      providerId: "okta",
+      issuer: "https://okta.example.com/oauth2/default",
+      clientId: "amc-client",
+      clientSecretFile,
+      redirectUri: "https://amc.example.com/host/api/auth/oidc/okta/callback"
+    });
+    const config = loadIdentityConfig(hostDir);
+
+    expect(out.path).toContain("identity.yaml");
+    expect(config.identity.providers.map((provider) => provider.id)).toContain("okta");
+  });
+
   test("OIDC auth code + PKCE flow creates session and mapped workspace roles", async () => {
     const { hostDir } = initHostWorkspace("amc-identity-oidc-");
     const routerPort = await pickPort();
@@ -646,6 +667,39 @@ describe("enterprise identity (OIDC/SAML/SCIM)", () => {
       await host.close();
     }
   }, 40_000);
+
+  test("SCIM init enables provisioning without resetting existing SSO providers", () => {
+    const { hostDir } = initHostWorkspace("amc-identity-scim-init-");
+    const clientSecretFile = join(hostDir, "oidc-secret.txt");
+    const tokenFile = join(hostDir, "scim-token.txt");
+    writeFileSync(clientSecretFile, "oidc-secret-value");
+
+    identityInitCli(hostDir);
+    identityProviderAddOidcCli({
+      hostDir,
+      providerId: "okta",
+      issuer: "https://okta.example.com/oauth2/default",
+      clientId: "amc-client",
+      clientSecretFile,
+      redirectUri: "https://amc.example.com/host/api/auth/oidc/okta/callback"
+    });
+
+    const out = scimInitCli({
+      hostDir,
+      requireHttps: false,
+      tokenName: "okta-scim",
+      outFile: tokenFile
+    });
+    const config = loadIdentityConfig(hostDir);
+
+    expect(out.enabled).toBe(true);
+    expect(out.requireHttps).toBe(false);
+    expect(out.token?.tokenId).toBeTruthy();
+    expect(readFileSync(tokenFile, "utf8").trim()).toBe(out.token?.token);
+    expect(config.identity.scim.enabled).toBe(true);
+    expect(config.identity.scim.auth.requireHttps).toBe(false);
+    expect(config.identity.providers.map((provider) => provider.id)).toContain("okta");
+  });
 
   test("lease-auth cannot call host identity/scim endpoints and users without membership cannot access workspace routes", async () => {
     const { hostDir, workspaceDir } = initHostWorkspace("amc-identity-isolation-");

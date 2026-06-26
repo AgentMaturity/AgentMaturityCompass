@@ -52,6 +52,13 @@ export interface StudioRuntime {
   state: StudioState;
 }
 
+export interface StartStudioDaemonOptions {
+  hostDir?: string;
+  defaultWorkspaceId?: string;
+  apiPort?: number;
+  dashboardPort?: number;
+}
+
 function enforceStudioLogRetention(workspace: string, retentionDays: number): void {
   const days = Math.max(1, Math.trunc(retentionDays));
   const dir = studioLogsDir(workspace);
@@ -298,10 +305,12 @@ export async function runStudioForeground(params: {
       untrustedConfig: false,
       logFile: join(hostDir, "logs", "host.log")
     };
+    writeStudioState(params.workspace, state);
     return {
       state,
       stop: async () => {
         await router.close();
+        clearStudioState(params.workspace);
       }
     };
   }
@@ -537,8 +546,10 @@ export async function runStudioForeground(params: {
   };
 }
 
-export async function startStudioDaemon(workspace: string): Promise<StudioState> {
-  ensureWorkspace(workspace);
+export async function startStudioDaemon(workspace: string, options: StartStudioDaemonOptions = {}): Promise<StudioState> {
+  if (!options.hostDir) {
+    ensureWorkspace(workspace);
+  }
   enforceStudioLogRetention(workspace, 30);
   ensureDir(studioDir(workspace));
   ensureDir(studioLogsDir(workspace));
@@ -551,7 +562,21 @@ export async function startStudioDaemon(workspace: string): Promise<StudioState>
   const outFd = openSync(logFile, "a");
   const errFd = openSync(logFile, "a");
 
-  const child = spawn(process.execPath, [process.argv[1] ?? "", "_studio-daemon", "--workspace", workspace], {
+  const args = [process.argv[1] ?? "", "_studio-daemon", "--workspace", workspace];
+  if (options.hostDir) {
+    args.push("--host-dir", options.hostDir);
+  }
+  if (options.defaultWorkspaceId) {
+    args.push("--default-workspace-id", options.defaultWorkspaceId);
+  }
+  if (typeof options.apiPort === "number") {
+    args.push("--api-port", String(options.apiPort));
+  }
+  if (typeof options.dashboardPort === "number") {
+    args.push("--dashboard-port", String(options.dashboardPort));
+  }
+
+  const child = spawn(process.execPath, args, {
     detached: true,
     stdio: ["ignore", outFd, errFd],
     env: process.env

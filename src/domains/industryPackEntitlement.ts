@@ -7,7 +7,7 @@ import type { IndustryPack } from "./industryPacks.js";
 export const INDUSTRY_PACKS_PLAN_ID = "industry-packs-monthly";
 export const INDUSTRY_PACKS_MONTHLY_PRICE_USD = "9.99";
 export const INDUSTRY_PACKS_ACCESS_FILE = "industry-packs-access.json";
-export const INDUSTRY_PACKS_PUBLIC_COUNT = 40;
+export const INDUSTRY_PACKS_PUBLIC_COUNT = 41;
 export const INDUSTRY_PACKS_LICENSE_PREFIX = "AMC-INDUSTRY-PACKS";
 export const INDUSTRY_PACKS_DEFAULT_CHECKOUT_URL = "https://agentmaturity.co/pricing#industry-packs";
 export const INDUSTRY_PACKS_DEFAULT_VERIFY_URL = "https://agentmaturity.co/api/industry-packs/license/verify";

@@ -13,13 +13,14 @@ This document describes the active diagnostic question bank used by AMC scoring.
 ## Current Bank Shape
 
 - 5 maturity layers:
-  - Strategic Operations
+  - Strategic Agent Operations
   - Leadership & Autonomy
   - Culture & Alignment
   - Resilience
   - Skills
 - 6 rubric levels per question (`0..5`)
-- 138 questions in current repository state
+- 244 default questions in current repository state
+- 264 questions in the optional lifecycle-expanded question set
 - Each question includes:
   - prompt template
   - evidence gate hints
@@ -49,6 +50,7 @@ Extended families currently present in the live bank:
 - `AMC-MCP-*`
 - `AMC-OINT-*`
 - `AMC-SPORT-*`
+- lifecycle, runtime, proof, memory, and fleet expansion questions are available through `amc run --question-set lifecycle`
 
 ## Commands
 

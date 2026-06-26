@@ -1,6 +1,7 @@
 /* AMC Dashboard v14 — State-of-the-Art */
 const G = { data:null, section:'overview', view:'engineer', hm:false, af:false, ef:false, ff:false, df:false, gf:false, studioOnline:null };
 const esc = v => String(v??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const escAttr = v => esc(v).replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 const fmt = (n,d=2) => typeof n==='number' ? n.toFixed(d) : '—';
 const escJs = v => String(v ?? '').replace(/\\/g, '\\\\').replace(/'/g, "\\'");
 function timestampMs(value) {
@@ -50,19 +51,60 @@ const ONBOARD_STEPS = [
   { icon: '🧭', title: 'What is AMC?', body: 'AMC scores your AI agents on trustworthiness from actual behavior — not self-reported claims. Think of it as a credit score for AI agents.' },
   { icon: '📊', title: 'Your Trust Score', body: 'The overall score (0–5) reflects how mature and trustworthy your agent is across 5 dimensions: Strategy, Leadership, Culture, Resilience, and Skills. The L0→L5 maturity journey tracks your progress.' },
   { icon: '🔍', title: 'Evidence-Based', body: 'Unlike other frameworks, AMC verifies claims with cryptographic evidence chains. A claimed score of 5/5 might actually be 1/5 without evidence.' },
-  { icon: '🏭', title: 'Industry Domains', body: '<strong>40 industry packs</strong> across 7 domains (Health, Education, Environment, Mobility, Governance, Technology, Wealth). Industry Packs are $9.99/month for all 40 packs. Click <strong>Domains</strong> in the sidebar to browse and unlock them.' },
+  { icon: '🏭', title: 'Industry Domains', body: '<strong>41 industry packs</strong> across 7 domains (Health, Education, Environment, Mobility, Governance, Technology, Wealth). Industry Packs are $9.99/month for all 41 packs. Click <strong>Domains</strong> in the sidebar to browse and unlock them.' },
   { icon: '🛡️', title: 'Guardrails & Views', body: 'Toggle <strong>14 runtime guardrails</strong> (prompt injection, toxicity, PII, etc.) from the Guardrails section. Use the <strong>Engineer / CISO / Exec</strong> buttons (top-right) to switch views — each role sees only what matters to them.' },
   { icon: '🚀', title: 'Get Started', body: 'Run <code style="color:var(--accent);font-family:\'JetBrains Mono\',monospace">amc</code> to get a full score with no setup. Use <strong>Priority Actions</strong> to improve, or open the <strong>Terminal</strong> to run any AMC command. Press <kbd style="background:var(--bg-overlay);border:1px solid var(--border);border-radius:3px;padding:1px 5px;font-size:11px">⌘K</kbd> to search actions.' },
 ];
 
 let G_onboardStep = 0;
+let G_onboardReturnFocus = null;
 
-function buildOnboarding() {
-  if (localStorage.getItem('amc_onboarded') === '1') return;
+function onboardFocusables(root) {
+  return [...root.querySelectorAll('a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])')]
+    .filter(el => el.offsetParent !== null || el === document.activeElement);
+}
+
+function openOnboarding(step = 0) {
   const overlay = document.getElementById('onboard');
   if (!overlay) return;
+  G_onboardReturnFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+  G_onboardStep = step;
   overlay.style.display = 'flex';
-  renderOnboardStep(0);
+  overlay.style.opacity = '1';
+  renderOnboardStep(step);
+  setTimeout(() => {
+    const focusables = onboardFocusables(overlay);
+    (focusables[0] || overlay).focus?.();
+  }, 0);
+}
+
+function trapOnboardingFocus(e) {
+  if (e.key !== 'Tab') return;
+  const overlay = document.getElementById('onboard');
+  if (!overlay || overlay.style.display === 'none') return;
+  const focusables = onboardFocusables(overlay);
+  if (focusables.length === 0) {
+    e.preventDefault();
+    overlay.focus?.();
+    return;
+  }
+  const first = focusables[0];
+  const last = focusables[focusables.length - 1];
+  if (e.shiftKey && document.activeElement === first) {
+    e.preventDefault();
+    last.focus();
+  } else if (!e.shiftKey && document.activeElement === last) {
+    e.preventDefault();
+    first.focus();
+  }
+}
+
+function buildOnboarding() {
+  const overlay = document.getElementById('onboard');
+  if (!overlay) return;
+  overlay.addEventListener('keydown', trapOnboardingFocus);
+  if (localStorage.getItem('amc_onboarded') === '1') return;
+  openOnboarding(0);
   document.getElementById('onboard-skip').addEventListener('click', closeOnboarding);
   document.getElementById('onboard-next').addEventListener('click', () => {
     G_onboardStep++;
@@ -103,15 +145,20 @@ function closeOnboarding() {
   const ov = document.getElementById('onboard');
   if (ov) {
     ov.style.opacity = '0'; ov.style.transition = 'opacity .25s ease';
-    setTimeout(() => { ov.style.display = 'none'; ov.style.opacity = ''; }, 250);
+    setTimeout(() => {
+      ov.style.display = 'none';
+      ov.style.opacity = '';
+      if (G_onboardReturnFocus && document.contains(G_onboardReturnFocus)) {
+        G_onboardReturnFocus.focus();
+      }
+      G_onboardReturnFocus = null;
+    }, 250);
   }
 }
 
 function resetOnboarding() {
   localStorage.removeItem('amc_onboarded');
-  G_onboardStep = 0;
-  const overlay = document.getElementById('onboard');
-  if (overlay) { overlay.style.display = 'flex'; overlay.style.opacity = '1'; renderOnboardStep(0); }
+  openOnboarding(0);
 }
 
 /* ── COMMAND PALETTE ──────────────────────────────── */
@@ -432,7 +479,7 @@ function initNav() {
 
 /* ── THEME ────────────────────────────────────────── */
 function initTheme() {
-  const saved = localStorage.getItem('amc_theme') || 'dark';
+  const saved = normalizeTheme(localStorage.getItem('amc_theme') || 'dark');
   applyTheme(saved);
   const btn = document.getElementById('tb-theme');
   if (btn) btn.addEventListener('click', () => toggleTheme());
@@ -443,16 +490,25 @@ function initTheme() {
     });
   });
 }
+function normalizeTheme(theme) {
+  return ['dark', 'light', 'high-contrast'].includes(theme) ? theme : 'dark';
+}
+function themeButtonLabel(theme) {
+  if (theme === 'high-contrast') return 'HC';
+  return theme === 'dark' ? '☀️' : '🌙';
+}
 function applyTheme(theme) {
-  document.documentElement.setAttribute('data-theme', theme);
-  localStorage.setItem('amc_theme', theme);
+  const normalized = normalizeTheme(theme);
+  document.documentElement.setAttribute('data-theme', normalized);
+  localStorage.setItem('amc_theme', normalized);
   const btn = document.getElementById('tb-theme');
-  if (btn) btn.textContent = theme === 'dark' ? '☀️' : '🌙';
-  document.querySelectorAll('.theme-opt').forEach(x => x.classList.toggle('on', x.dataset.t === theme));
+  if (btn) btn.textContent = themeButtonLabel(normalized);
+  document.querySelectorAll('.theme-opt').forEach(x => x.classList.toggle('on', x.dataset.t === normalized));
 }
 function toggleTheme() {
-  const current = document.documentElement.getAttribute('data-theme') || 'dark';
-  applyTheme(current === 'dark' ? 'light' : 'dark');
+  const themes = ['dark', 'light', 'high-contrast'];
+  const current = normalizeTheme(document.documentElement.getAttribute('data-theme') || 'dark');
+  applyTheme(themes[(themes.indexOf(current) + 1) % themes.length]);
 }
 
 /* ── ANIMATE COUNT ────────────────────────────────── */
@@ -822,6 +878,7 @@ async function reloadDashboardData() {
   renderScore(G.data);
   renderDims(G.data);
   renderStats(G.data);
+  renderBoardReadiness(G.data);
   renderNextActions(G.data);
   renderRadar(G.data);
   renderTimeline(G.data);
@@ -1074,6 +1131,112 @@ function renderStats(d) {
     </div>` + (i < s.length-1 ? '<span class="task-meta-sep">·</span>' : '')
   ).join('');
   el.querySelectorAll('.stats-bar-item[data-nav]').forEach(item => {
+    item.addEventListener('click', () => nav(item.dataset.nav));
+  });
+}
+
+/* ── BOARD READINESS ──────────────────────────────── */
+function renderBoardReadiness(d) {
+  const metricsEl = document.getElementById('board-readiness-metrics');
+  const drillEl = document.getElementById('board-readiness-drilldowns');
+  const statusEl = document.getElementById('board-readiness-status');
+  if (!metricsEl || !drillEl) return;
+
+  const trends = Array.isArray(d.trends)
+    ? d.trends.filter(t => typeof t.overall === 'number' && Number.isFinite(t.overall))
+    : [];
+  const layers = Array.isArray(d.latestRun?.layerScores) ? d.latestRun.layerScores : [];
+  const gaps = d.evidenceGaps?.length || 0;
+  const packs = Array.isArray(d.assurance) ? d.assurance : [];
+  const lowPacks = packs.filter(p => typeof p.score0to100 === 'number' && p.score0to100 < 75);
+  const questions = d.latestRun?.questionScores?.length || 0;
+  const latestTrend = trends[trends.length - 1];
+  const firstTrend = trends[0];
+  const latestScore = typeof d.overall === 'number' ? d.overall : (latestTrend?.overall || 0);
+  const trendDelta = trends.length >= 2 && latestTrend && firstTrend ? latestTrend.overall - firstTrend.overall : null;
+  const trendTone = trendDelta === null ? 'md' : trendDelta < -0.05 ? 'lo' : trendDelta > 0.05 ? 'hi' : 'md';
+  const weakest = layers.reduce((min, layer) => {
+    if (typeof layer.avgFinalLevel !== 'number') return min;
+    return layer.avgFinalLevel < (min?.avgFinalLevel ?? Number.POSITIVE_INFINITY) ? layer : min;
+  }, null);
+  const weakestName = weakest ? (DIM_SHORT[weakest.layerName] || weakest.layerName) : 'No dimension data';
+  const weakestTone = !weakest ? 'md' : weakest.avgFinalLevel < 3 ? 'lo' : 'hi';
+  const evidenceTone = gaps > 0 ? 'lo' : questions > 0 ? 'hi' : 'md';
+  const packTone = lowPacks.length > 0 ? 'lo' : packs.length > 0 ? 'hi' : 'md';
+  const boardReady = latestScore >= 3 && gaps === 0 && (!weakest || weakest.avgFinalLevel >= 3) && lowPacks.length === 0;
+
+  if (statusEl) {
+    statusEl.textContent = boardReady ? 'Board ready' : 'Needs review';
+    statusEl.className = `tb-badge ${boardReady ? 'hi' : 'md'}`;
+  }
+
+  const trendValue = trendDelta === null
+    ? 'Need 2 runs'
+    : `${trendDelta >= 0 ? '+' : ''}${trendDelta.toFixed(2)}`;
+  const trendDetail = trendDelta === null
+    ? 'Run a second score to establish movement.'
+    : `${trends.length} recent runs; latest ${latestScore.toFixed(1)}/5.0.`;
+  const evidenceValue = gaps > 0 ? `${gaps} gap${gaps === 1 ? '' : 's'}` : (questions > 0 ? 'No gaps' : 'No data');
+  const evidenceDetail = gaps > 0
+    ? 'Close evidence gaps before customer, investor, or auditor review.'
+    : questions > 0
+      ? `${questions} scored questions have no open evidence gap.`
+      : 'Run a full score to populate evidence posture.';
+  const weakestValue = weakest ? `${weakestName} ${weakest.avgFinalLevel.toFixed(1)}` : 'Need score';
+  const weakestDetail = weakest
+    ? weakest.avgFinalLevel < 3
+      ? 'Below the L3 evidence-backed target.'
+      : 'At or above the L3 evidence-backed target.'
+    : 'Run a full score to populate maturity dimensions.';
+  const packValue = packs.length ? `${packs.length} run${packs.length === 1 ? '' : 's'}` : 'No packs';
+  const packDetail = lowPacks.length
+    ? `${lowPacks.length} assurance pack${lowPacks.length === 1 ? '' : 's'} below target.`
+    : packs.length
+      ? 'Assurance packs are at or above target.'
+      : 'Run assurance to add behavioral risk evidence.';
+  const nextAction = gaps > 0
+    ? { value: 'Close evidence gaps', detail: 'Start with the evidence page.', nav: 'evidence' }
+    : weakest && weakest.avgFinalLevel < 3
+      ? { value: `Raise ${weakestName} to L3`, detail: 'Use the dimension drill-down.', nav: 'dimensions' }
+      : lowPacks.length > 0
+        ? { value: 'Fix assurance failures', detail: 'Review failing packs.', nav: 'assurance' }
+        : trends.length < 2
+          ? { value: 'Add trend baseline', detail: 'Run another score after the next change.', nav: 'overview' }
+          : { value: 'Prepare signed evidence', detail: 'Move from review-ready to verifier-ready.', nav: 'evidence' };
+
+  const metrics = [
+    { label: 'Run Trend', value: trendValue, detail: trendDetail, tone: trendTone, nav: 'overview' },
+    { label: 'Weakest Dimension', value: weakestValue, detail: weakestDetail, tone: weakestTone, nav: 'dimensions' },
+    { label: 'Evidence Coverage', value: evidenceValue, detail: evidenceDetail, tone: evidenceTone, nav: 'evidence' },
+    { label: 'Next Board Action', value: nextAction.value, detail: nextAction.detail, tone: boardReady ? 'hi' : 'md', nav: nextAction.nav },
+  ];
+
+  metricsEl.innerHTML = metrics.map(metric => `
+    <button class="board-metric ${metric.tone}" type="button" data-nav="${escAttr(metric.nav)}">
+      <span class="board-metric-label">${esc(metric.label)}</span>
+      <span class="board-metric-value">${esc(metric.value)}</span>
+      <span class="board-metric-detail">${esc(metric.detail)}</span>
+    </button>
+  `).join('');
+
+  const drilldowns = [
+    { title: 'Run Trend', body: trendDetail, meta: trendDelta === null ? 'Needs baseline' : `${trendValue} across the window`, tone: trendTone, nav: 'overview' },
+    { title: 'Weakest Dimension', body: weakestDetail, meta: weakest ? weakest.layerName : 'No scored dimensions', tone: weakestTone, nav: 'dimensions' },
+    { title: 'Evidence Coverage', body: evidenceDetail, meta: evidenceValue, tone: evidenceTone, nav: 'evidence' },
+    { title: 'Assurance Packs', body: packDetail, meta: packValue, tone: packTone, nav: 'assurance' },
+  ];
+
+  drillEl.innerHTML = drilldowns.map(item => `
+    <button class="board-drill ${item.tone}" type="button" data-nav="${escAttr(item.nav)}">
+      <span class="board-drill-top">
+        <span class="board-drill-title">${esc(item.title)}</span>
+        <span class="board-drill-meta">${esc(item.meta)}</span>
+      </span>
+      <span class="board-drill-body">${esc(item.body)}</span>
+    </button>
+  `).join('');
+
+  document.querySelectorAll('.board-metric[data-nav], .board-drill[data-nav]').forEach(item => {
     item.addEventListener('click', () => nav(item.dataset.nav));
   });
 }
@@ -1345,38 +1508,75 @@ function buildHm() {
   const layerNames = (G.data.latestRun?.layerScores || []).reduce((m, l, i) => {
     const k = Object.keys(grps)[i]; if (k) m[k] = l.layerName; return m;
   }, {});
-  const hdr = `<div class="hm-hdr"><span>QID</span><span style="text-align:center">Score</span><span style="text-align:center">Target</span><span style="text-align:center">Gap</span><span>Conf</span></div>`;
-  el.innerHTML = hdr + Object.entries(grps).map(([p, rows]) => {
+  const hdr = `<div class="hm-hdr" role="row">
+    <span role="columnheader">QID</span>
+    <span role="columnheader" style="text-align:center">Score</span>
+    <span role="columnheader" style="text-align:center">Target</span>
+    <span role="columnheader" style="text-align:center">Gap</span>
+    <span role="columnheader">Conf</span>
+    <span role="columnheader">Action</span>
+  </div>`;
+  const legend = `<div class="hm-legend" aria-label="Question heatmap legend">
+    <span><strong>Score</strong> shows L0-L5 plus status text.</span>
+    <span><strong>Gap</strong> uses OK or the target delta.</span>
+    <span><strong>Conf</strong> shows a percent and meter value.</span>
+  </div>`;
+  const grid = Object.entries(grps).map(([p, rows]) => {
     const nm = layerNames[p] || p;
     const body = rows.map(q => {
       const tgt = tm[q.questionId] ?? 0, gap = tgt - q.finalLevel;
       const gc = gap <= 0 ? 'g0' : gap === 1 ? 'g1' : gap === 2 ? 'g2c' : 'g3';
       const conf = Math.round((q.confidence || 0) * 100);
       const sc = scoreColor(q.finalLevel);
-      return `<div class="hm-row" data-qid="${esc(q.questionId)}" tabindex="0">
-        <span class="hm-qid">${esc(q.questionId)}</span>
-        <span class="hm-n" style="color:${sc}">${q.finalLevel}</span>
-        <span class="hm-n" style="color:var(--text-tertiary)">${tgt}</span>
-        <span class="hm-n ${gc}">${gap > 0 ? '+' : ''}${gap}</span>
-        <div class="hm-conf"><div class="hm-cf" style="width:${conf}%;background:${sc}"></div></div>
-        <button class="hm-explain" onclick="event.stopPropagation();explainQ('${escJs(q.questionId)}',this)" title="Explain this question">? Explain</button>
+      const scoreTone = q.finalLevel >= 3 ? 'baseline' : q.finalLevel >= 2 ? 'watch' : 'risk';
+      const scoreLabel = `L${q.finalLevel} ${scoreTone}`;
+      const targetLabel = `L${tgt}`;
+      const gapLabel = gap <= 0 ? 'OK' : `+${gap} level${gap === 1 ? '' : 's'}`;
+      const confidenceLabel = `${conf}% confidence`;
+      const rowLabel = escAttr(`${q.questionId}, ${nm}, score ${scoreLabel}, target ${targetLabel}, gap ${gapLabel}, ${confidenceLabel}`);
+      return `<div class="hm-row" data-qid="${escAttr(q.questionId)}" tabindex="0" role="row" aria-selected="false" aria-label="${rowLabel}">
+        <span class="hm-qid" role="gridcell">${esc(q.questionId)}</span>
+        <span class="hm-n" role="gridcell" style="color:${sc}">
+          <span class="hm-level-label">${esc(scoreLabel)}</span>
+        </span>
+        <span class="hm-n" role="gridcell" style="color:var(--text-tertiary)">
+          <span class="hm-level-label">${esc(targetLabel)}</span>
+        </span>
+        <span class="hm-n ${gc}" role="gridcell">
+          <span class="hm-gap-label">${esc(gapLabel)}</span>
+        </span>
+        <span class="hm-conf-cell" role="gridcell">
+          <span class="hm-conf-label">${esc(confidenceLabel)}</span>
+          <span class="hm-conf" role="meter" aria-label="Confidence for ${escAttr(q.questionId)}" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${conf}">
+            <span class="hm-cf" style="width:${conf}%;background:${sc}"></span>
+          </span>
+        </span>
+        <span role="gridcell"><button class="hm-explain" onclick="event.stopPropagation();explainQ('${escJs(q.questionId)}',this)" title="Explain this question">? Explain</button></span>
       </div>`;
     }).join('');
     return `<div class="hm-grp">
-      <div class="hm-ghdr">${esc(nm)}<span style="color:var(--text-tertiary);font-size:9px">${rows.length}q</span></div>
+      <button type="button" class="hm-ghdr" aria-expanded="true">${esc(nm)}<span style="color:var(--text-tertiary);font-size:9px">${rows.length}q</span></button>
       <div class="hm-gbody">${body}</div>
     </div>`;
   }).join('');
+  el.innerHTML = `${legend}<div class="hm-grid" role="grid" aria-label="Question heatmap showing score, target, gap, and confidence as text">${hdr}${grid}</div><span class="hm-sr">Heatmap cells include text labels so color is supplemental.</span>`;
   el.querySelectorAll('.hm-row').forEach(r => {
     const fn = () => selQ(r.dataset.qid);
     r.addEventListener('click', fn);
     r.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') fn(); });
   });
-  el.querySelectorAll('.hm-ghdr').forEach(h => h.addEventListener('click', () => h.parentElement.classList.toggle('c')));
+  el.querySelectorAll('.hm-ghdr').forEach(h => h.addEventListener('click', () => {
+    const collapsed = h.parentElement.classList.toggle('c');
+    h.setAttribute('aria-expanded', String(!collapsed));
+  }));
 }
 
 function selQ(qid) {
-  document.querySelectorAll('.hm-row').forEach(r => r.classList.toggle('sel', r.dataset.qid === qid));
+  document.querySelectorAll('.hm-row').forEach(r => {
+    const selected = r.dataset.qid === qid;
+    r.classList.toggle('sel', selected);
+    r.setAttribute('aria-selected', String(selected));
+  });
   const q = G.data.latestRun?.questionScores?.find(x => x.questionId === qid);
   const el = document.getElementById('qd-mount');
   if (!q || !el) return;
@@ -1487,7 +1687,7 @@ function buildEv() {
       <span style="font-size:12px;color:var(--text-secondary)">${gaps.length} evidence gap${gaps.length > 1 ? 's' : ''}${critGaps.length ? ` · <strong style="color:var(--red)">${critGaps.length} critical</strong>` : ''}${highGaps.length ? ` · <strong style="color:var(--amber)">${highGaps.length} high</strong>` : ''}</span>
       <div style="display:flex;gap:6px">
         <button class="action-btn" style="font-size:10px;padding:5px 10px" onclick="executeAction('manual', this, 'amc evidence collect')">Collect Evidence ▸</button>
-        <button class="action-btn" style="font-size:10px;padding:5px 10px;background:var(--bg-overlay);border-color:var(--border);color:var(--text-secondary)" onclick="executeAction('manual', this, 'amc evidence ingest')">Ingest File ▸</button>
+        <button class="action-btn" style="font-size:10px;padding:5px 10px;background:var(--bg-overlay);border-color:var(--border);color:var(--text-secondary)" title="Known file import: amc ingest <fileOrDir> --type generic_json --agent <agentId>" onclick="executeAction('manual', this, 'amc evidence collect')">Ingest File ▸</button>
       </div>
     </div>${gaps.map(g => {
       const sev = (g.severity || '').toLowerCase() === 'critical' || (g.gap ?? 99) >= 3 ? 'crit' : (g.severity || '').toLowerCase() === 'high' || (g.gap ?? 0) === 2 ? 'high' : 'med';
@@ -1607,6 +1807,46 @@ function initTerminal() {
 }
 
 /* ── FLEET ────────────────────────────────────────── */
+function renderTrustTopology(graph) {
+  const mount = document.getElementById('trust-graph-mount');
+  if (!mount) return;
+  const g = graph || {};
+  const edges = g.edges || [];
+  const nodes = g.nodes || [];
+  const actions = g.reviewActions || [];
+  if (!edges.length) {
+    mount.innerHTML = '<div class="empty"><span class="empty-i">⌁</span><span class="empty-t">No delegation topology yet — run <code style="color:var(--accent)">amc fleet trust-add-edge --from orchestrator --to worker --purpose handoff</code></span></div>';
+    return;
+  }
+  mount.innerHTML = `
+    <div class="trust-topology">
+      <div class="trust-topology-summary">
+        <div class="trust-stat"><span>Nodes</span><strong>${nodes.length}</strong></div>
+        <div class="trust-stat"><span>Edges</span><strong>${g.edgeCount ?? edges.length}</strong></div>
+        <div class="trust-stat"><span>Export</span><code>amc fleet trust-graph --format mermaid</code></div>
+      </div>
+      <div class="trust-node-strip">${nodes.map(node => `<span class="trust-node">${esc(node)}</span>`).join('')}</div>
+      <div class="trust-edge-grid">
+        ${edges.map(edge => `
+          <div class="trust-edge-card risk-${escAttr(edge.riskTier || 'med')}">
+            <div class="trust-edge-route"><strong>${esc(edge.fromAgentId)}</strong><span>→</span><strong>${esc(edge.toAgentId)}</strong></div>
+            <div class="trust-edge-meta">
+              <span>${esc(edge.purpose || 'handoff')}</span>
+              <span>${esc(edge.inheritanceMode || 'strict')}</span>
+              <span>w=${typeof edge.weight === 'number' ? edge.weight.toFixed(2) : '—'}</span>
+              <span>${esc(edge.riskTier || 'med')}</span>
+            </div>
+            <div class="trust-edge-handoff">${esc(edge.handoffId || edge.id || 'handoff')}</div>
+          </div>
+        `).join('')}
+      </div>
+      <div class="trust-review-actions">
+        ${actions.map(action => `<div class="trust-action">${esc(action)}</div>`).join('')}
+      </div>
+    </div>
+  `;
+}
+
 function buildFleet() {
   G.ff = true;
   initTerminal();
@@ -1637,8 +1877,10 @@ function buildFleet() {
         <td>${esc(a.lastModel || '—')}</td>
         <td>${a.freezeActive ? `<span style="color:var(--amber)">Yes</span>` : '—'}</td>
       </tr>`;
-    }).join('')}</tbody></table>` :
+  }).join('')}</tbody></table>` :
     '<div class="empty"><span class="empty-i">🤖</span><span class="empty-t">No agents registered — run <code style="color:var(--accent)">amc init</code> to create one</span></div>';
+
+  renderTrustTopology(G.data.trustGraph);
 
   const bm = G.data.benchmarksSummary || {};
   const bmEl = document.getElementById('bm-mount');
@@ -1677,6 +1919,7 @@ function buildSettings() {
           <div class="theme-toggle" role="group">
             <button class="theme-opt on" data-t="dark">🌙 Dark</button>
             <button class="theme-opt" data-t="light">☀️ Light</button>
+            <button class="theme-opt" data-t="high-contrast">HC High contrast</button>
           </div>
         </div>
       </div>
@@ -1828,6 +2071,7 @@ function removeLoadingSkeleton() {
     renderScore(G.data);
     renderDims(G.data);
     renderStats(G.data);
+    renderBoardReadiness(G.data);
     renderNextActions(G.data);
     renderRadar(G.data);
     renderTimeline(G.data);

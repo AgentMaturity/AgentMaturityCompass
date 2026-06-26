@@ -26,7 +26,7 @@ git clone https://github.com/AgentMaturity/AgentMaturityCompass.git
 cd AgentMaturityCompass
 npm ci
 npm run build     # must compile with 0 TypeScript errors
-npm test          # 3,980 tests, all must pass
+npm test          # 8,150 collected Vitest tests, all must pass in CI
 ```
 
 **Python platform:**
@@ -172,6 +172,17 @@ npm run build
 npx vitest run tests/assurance/myAttackPack.test.ts
 amc assurance run --pack my-attack-pack --verbose    # manual test
 ```
+
+### Step 6: Review registry readiness
+
+Before a community pack is uploaded to any shared registry, complete the review gates in `docs/ASSURANCE_LAB.md#community-registry-review-gates`.
+
+At minimum, reviewers should confirm:
+
+- `amc pack test .` passes locally
+- provenance, citations, and license terms are documented
+- no secrets, malware, hidden network calls, unsafe prompts, or unlicensed copied content are present
+- the manifest names a maintenance owner and compatible pack version
 
 ### Guidelines for good packs
 
@@ -379,7 +390,7 @@ export const myModule: ScoringModule = {
 1. **Fork** the repo
 2. **Branch:** `git checkout -b feat/my-contribution`
 3. **Build:** `npm run build` — must compile with 0 errors
-4. **Test:** `npm test` — all 3,980+ tests must pass
+4. **Test:** `npm test` — the collected Vitest suite must pass
 5. **Commit** with a descriptive message (`feat:`, `fix:`, `docs:`, `test:`)
 6. **Push** and open a PR
 
@@ -405,9 +416,9 @@ src/
 │   └── packs/          # 147 attack packs (one file each)
 ├── cli.ts              # CLI entry point (~15K lines)
 ├── dashboard/          # Studio UI (static HTML/CSS/JS)
-├── diagnostic/         # Question bank (235 questions)
-├── domain/             # Domain packs (40 packs, 7 sectors)
-├── scoring/            # 79 scoring modules
+├── diagnostic/         # Question bank (244 default, 264 lifecycle)
+├── domain/             # Domain packs (41 packs, 7 sectors)
+├── scoring/            # Research-backed scoring modules
 └── ...
 
 tests/                  # Vitest tests (mirrors src/ structure)

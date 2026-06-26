@@ -12,6 +12,12 @@ info:
 servers:
   - url: http://localhost:3000/api
     description: Local AMC Studio instance
+  - url: https://{host}/api
+    description: Self-hosted AMC API behind your ingress, load balancer, or API gateway
+    variables:
+      host:
+        default: amc.example.com
+        description: DNS name for your self-hosted AMC deployment
 
 security:
   - bearerAuth: []
@@ -22,6 +28,21 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
+    amcSessionCookie:
+      type: apiKey
+      in: cookie
+      name: amc_session
+      description: Studio session cookie. Value webhook ingestion requires an OWNER or OPERATOR role.
+    amcAdminToken:
+      type: apiKey
+      in: header
+      name: x-amc-admin-token
+      description: Studio bootstrap admin token; treated as OWNER/OPERATOR for value ingestion.
+    valueWebhookToken:
+      type: apiKey
+      in: header
+      name: x-amc-webhook-token
+      description: Vault-backed value webhook token stored under value/webhook/token.
 
   schemas:
     ApiResponse:
@@ -79,6 +100,217 @@ components:
           type: string
         mode:
           type: string
+
+    WebhookSignatureHeaders:
+      type: object
+      description: Headers AMC sends with signed outbound webhook deliveries.
+      required:
+        - x-amc-webhook-delivery-id
+        - x-amc-webhook-attempt
+        - x-amc-webhook-timestamp
+        - x-amc-webhook-signature
+      properties:
+        x-amc-webhook-delivery-id:
+          type: string
+          example: wh_3f6e9a4c7b8245158c9df1a4b5d2f901
+        x-amc-webhook-attempt:
+          type: string
+          example: "1"
+        x-amc-webhook-timestamp:
+          type: string
+          description: Unix timestamp in seconds used in the HMAC signing base string.
+          example: "1781607200"
+        x-amc-webhook-signature:
+          type: string
+          description: HMAC-SHA256 signature in `sha256=<hex>` form over `<timestamp>.<body>`.
+          example: sha256=0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+
+    WebhookEventEnvelope:
+      type: object
+      description: Generic AMC event envelope for webhook-style integrations and portal submissions.
+      required: [eventType, source, data]
+      properties:
+        eventType:
+          type: string
+          example: value.signal.recorded
+        source:
+          type: string
+          example: amc.value
+        data:
+          type: object
+          additionalProperties: true
+        timestamp:
+          type: integer
+          format: int64
+        correlationId:
+          type: string
+        idempotencyKey:
+          type: string
+
+    WebhookDeliveryRequest:
+      type: object
+      description: Outbound signed webhook delivery request used by AMC integration dispatch.
+      required: [url, eventType, payload, secret]
+      properties:
+        url:
+          type: string
+          format: uri
+        eventType:
+          type: string
+        payload:
+          oneOf:
+            - $ref: '#/components/schemas/WebhookEventEnvelope'
+            - type: object
+              additionalProperties: true
+            - type: string
+        secret:
+          type: string
+          writeOnly: true
+        headers:
+          type: object
+          additionalProperties:
+            type: string
+
+    WebhookAttemptReceipt:
+      type: object
+      required: [attempt, startedTs, completedTs, delivered, httpStatus, error, signature, backoffMs]
+      properties:
+        attempt:
+          type: integer
+          minimum: 1
+        startedTs:
+          type: integer
+          format: int64
+        completedTs:
+          type: integer
+          format: int64
+        delivered:
+          type: boolean
+        httpStatus:
+          type: integer
+          nullable: true
+        error:
+          type: string
+          nullable: true
+        signature:
+          type: string
+        backoffMs:
+          type: integer
+          nullable: true
+
+    WebhookDeliveryReceipt:
+      type: object
+      description: Delivery receipt emitted after AMC attempts a signed outbound webhook.
+      required: [deliveryId, eventType, url, payloadSha256, createdTs, completedTs, delivered, attempts]
+      properties:
+        deliveryId:
+          type: string
+        eventType:
+          type: string
+        url:
+          type: string
+          format: uri
+        payloadSha256:
+          type: string
+          pattern: '^[a-f0-9]{64}$'
+        createdTs:
+          type: integer
+          format: int64
+        completedTs:
+          type: integer
+          format: int64
+        delivered:
+          type: boolean
+        attempts:
+          type: array
+          items:
+            $ref: '#/components/schemas/WebhookAttemptReceipt'
+
+    PortalWebhookPayload:
+      type: object
+      description: Generic portal webhook payload accepted as a product job payload.
+      required: [eventType, source, data]
+      properties:
+        eventType:
+          type: string
+        source:
+          type: string
+        data:
+          type: object
+          additionalProperties: true
+        timestamp:
+          type: integer
+          format: int64
+        correlationId:
+          type: string
+
+    OutcomeWebhookPayload:
+      type: object
+      description: Outcome signal webhook payload shape used by AMC outcome ingestion helpers.
+      required: [agentId, signalId, category, value]
+      properties:
+        agentId:
+          type: string
+        signalId:
+          type: string
+        category:
+          type: string
+          enum: [Emotional, Functional, Economic, Brand, Lifetime]
+        value:
+          oneOf:
+            - type: number
+            - type: string
+            - type: boolean
+        unit:
+          type: string
+        ts:
+          type: integer
+          format: int64
+        workOrderId:
+          type: string
+        meta:
+          type: object
+          additionalProperties: true
+
+    ValueWebhookPayload:
+      type: object
+      description: Value KPI webhook payload accepted by AMC value ingestion helpers.
+      required: [v, sourceId, scope, events]
+      properties:
+        v:
+          type: integer
+          enum: [1]
+        sourceId:
+          type: string
+        scope:
+          type: object
+          required: [type, id]
+          properties:
+            type:
+              type: string
+              enum: [WORKSPACE, NODE, AGENT]
+            id:
+              type: string
+        events:
+          type: array
+          minItems: 1
+          items:
+            type: object
+            required: [kpiId, value]
+            properties:
+              ts:
+                type: integer
+                format: int64
+              kpiId:
+                type: string
+              value:
+                type: number
+              unit:
+                type: string
+              labels:
+                type: object
+                additionalProperties:
+                  type: string
 
     TypedGraphValidationIssue:
       type: object
@@ -313,6 +545,53 @@ components:
           items:
             type: object
 
+    DomainProofCheckRequest:
+      type: object
+      required: [domain, manifest, input]
+      properties:
+        domain:
+          type: string
+          description: Domain proof fixture or rule lane. Current public P0 support is governance.
+          example: governance
+        manifest:
+          type: string
+          description: Workspace-relative source-to-rule manifest path.
+          example: fixtures/domain-proof/toy-governance/source-rule-manifest.json
+        input:
+          type: string
+          description: Workspace-relative claim input JSON path.
+          example: examples/domain-proof/toy-governance/proven.json
+        outFile:
+          type: string
+          description: Optional workspace-relative path for the emitted amcproof artifact.
+          example: out/proven.amcproof.json
+
+    DomainProofStatus:
+      type: object
+      properties:
+        status:
+          type: string
+          example: available
+        lane:
+          type: string
+          example: Domain Proof Lane
+        supportedDomains:
+          type: array
+          items:
+            type: string
+        proofClasses:
+          type: array
+          items:
+            type: string
+            enum: [evidence_integrity, runtime_policy, domain_correctness]
+        correctnessProofStatuses:
+          type: array
+          items:
+            type: string
+            enum: [proven, disproven, unsupported, not_applicable]
+        nonClaim:
+          type: string
+
 tags:
   - name: health
     description: Health and readiness checks
@@ -326,6 +605,8 @@ tags:
     description: Compliance frameworks, policy packs, waivers, and regulatory scoring
   - name: evidence
     description: Evidence lifecycle — ingest, list, gaps, bundles, attestation
+  - name: proof
+    description: Domain Proof Lane — source-to-rule correctness checks with amcproof artifacts
   - name: imports
     description: Framework-neutral importers for traces, runs, graphs, configs, memory, evals, and benchmarks
   - name: strategy
@@ -378,12 +659,16 @@ tags:
     description: ToolHub, guardrails, and plugin management
   - name: watch
     description: Watch/observability — guard, attest, safety test, explainability, oversight
+  - name: observe
+    description: Observe CLI parity — timelines and anomaly read APIs
   - name: workflow
     description: Work orders, execution tickets, and lifecycle management
   - name: sandbox
     description: Hardened Docker sandbox execution
   - name: product
     description: Batch processor and portal
+  - name: value
+    description: Value realization and KPI ingestion
   - name: passport
     description: Agent passport — public profile, verification, revocation
   - name: timeline
@@ -416,6 +701,46 @@ paths:
                   dbStatus:
                     type: string
 
+  # ── Domain Proof Lane ──────────────────────────────────────────
+  /v1/proof/status:
+    get:
+      tags: [proof]
+      summary: Domain Proof Lane status
+      description: Returns supported proof classes, correctness statuses, supported domains, and the non-claim boundary for source-to-rule proof checks.
+      responses:
+        '200':
+          description: Domain Proof Lane status
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/DomainProofStatus'
+
+  /v1/proof/check:
+    post:
+      tags: [proof]
+      summary: Run source-to-rule proof check
+      description: Checks a claim against a declared source-to-rule manifest and emits a fail-closed amcproof artifact. Unsupported correctness never raises the AMC maturity score.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DomainProofCheckRequest'
+      responses:
+        '200':
+          description: Domain proof check result and optional artifact metadata
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '400':
+          description: Missing required paths or failed proof check
+
   # ── Score ──────────────────────────────────────────────────────
   /v1/score/status:
     get:
@@ -429,7 +754,7 @@ paths:
     get:
       tags: [score]
       summary: List supported assessment question sets
-      description: Returns the default 240-question set and the explicit lifecycle-expanded set with surface/layer mappings.
+      description: Returns the default question set and the explicit lifecycle-expanded set with surface/layer mappings.
       responses:
         '200':
           description: Question set metadata
@@ -438,7 +763,7 @@ paths:
     post:
       tags: [score]
       summary: Run full diagnostic
-      description: Trigger a full diagnostic run (CLI equivalent of `amc run`). Defaults to the legacy 240-question set unless `questionSetVersion` is explicitly set to `amc-lifecycle-2026-v1` or `lifecycle`.
+      description: Trigger a full diagnostic run (CLI equivalent of `amc run`). Defaults to the current default question set unless `questionSetVersion` is explicitly set to `amc-lifecycle-2026-v1` or `lifecycle`.
       requestBody:
         content:
           application/json:
@@ -4920,6 +5245,80 @@ paths:
         '200':
           description: Batch progress
 
+  /value/ingest/webhook:
+    post:
+      tags: [value]
+      summary: Ingest value KPI webhook payload
+      description: |
+        Studio-root value ingestion endpoint for owner systems. In single-workspace Studio mode call `/value/ingest/webhook`.
+        In multi-workspace host mode call `/w/{workspaceId}/value/ingest/webhook`.
+
+        Authentication accepts either an OWNER/OPERATOR Studio session, `x-amc-admin-token`, or the vault-backed
+        `x-amc-webhook-token` stored under `value/webhook/token`. The webhook token is a bearer-style shared token
+        compared with timing-safe equality; it is not an HMAC request signature and should not be sent in the query string
+        or JSON body.
+      servers:
+        - url: http://localhost:3000
+          description: Single-workspace local Studio root
+        - url: https://{host}
+          description: Single-workspace self-hosted Studio root
+          variables:
+            host:
+              default: amc.example.com
+              description: DNS name for your self-hosted AMC Studio deployment
+        - url: https://{host}/w/{workspaceId}
+          description: Multi-workspace host-mode Studio route prefix
+          variables:
+            host:
+              default: amc.example.com
+              description: DNS name for your self-hosted AMC host deployment
+            workspaceId:
+              default: default
+              description: AMC host-mode workspace id
+      security:
+        - amcSessionCookie: []
+        - amcAdminToken: []
+        - valueWebhookToken: []
+      parameters:
+        - name: x-amc-webhook-token
+          in: header
+          required: false
+          description: Vault-backed value webhook token. Required when the caller does not use an OWNER/OPERATOR Studio session or `x-amc-admin-token`.
+          schema:
+            type: string
+            minLength: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ValueWebhookPayload'
+      responses:
+        '200':
+          description: Value events ingested and transparency entry appended
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [ingested, file, sha256, trustKind, transparencyHash]
+                properties:
+                  ingested:
+                    type: integer
+                    minimum: 1
+                  file:
+                    type: string
+                  sha256:
+                    type: string
+                  trustKind:
+                    type: string
+                    enum: [ATTESTED]
+                  transparencyHash:
+                    type: string
+        '400':
+          description: Invalid JSON, schema violation, or suspicious string content in the value payload
+        '401':
+          description: Missing or invalid OWNER/OPERATOR session, `x-amc-admin-token`, or `x-amc-webhook-token`
+
   /v1/product/portal/submit:
     post:
       tags: [product]
@@ -4938,7 +5337,54 @@ paths:
                 submittedBy:
                   type: string
                 payload:
-                  type: object
+                  oneOf:
+                    - $ref: '#/components/schemas/PortalWebhookPayload'
+                    - $ref: '#/components/schemas/OutcomeWebhookPayload'
+                    - $ref: '#/components/schemas/ValueWebhookPayload'
+                    - $ref: '#/components/schemas/WebhookEventEnvelope'
+            examples:
+              valueSignal:
+                summary: Value KPI webhook payload
+                value:
+                  name: Support SLA value signal
+                  type: value.signal
+                  submittedBy: ops-webhook
+                  payload:
+                    v: 1
+                    sourceId: support.sla.webhook
+                    scope:
+                      type: AGENT
+                      id: support-agent
+                    events:
+                      - kpiId: ticket.resolve.minutes
+                        value: 12
+                        unit: minutes
+                        labels:
+                          domain: customer-support
+              outcomeSignal:
+                summary: Outcome signal webhook payload
+                value:
+                  name: Brand lift outcome
+                  type: outcome.signal
+                  submittedBy: growth-webhook
+                  payload:
+                    agentId: sales-agent
+                    signalId: demo.followup.rate
+                    category: Economic
+                    value: 0.18
+                    unit: ratio
+              genericEnvelope:
+                summary: Generic AMC webhook envelope
+                value:
+                  name: Generic routed event
+                  type: integration.event
+                  submittedBy: integration-router
+                  payload:
+                    eventType: integration.delivery.failed
+                    source: amc.integrations
+                    data:
+                      channelId: pagerduty-primary
+                      reason: timeout
       responses:
         '201':
           description: Job submitted
@@ -5049,3 +5495,79 @@ paths:
       responses:
         '200':
           description: Timeline data
+
+  # ── Observe ────────────────────────────────────────────────────
+  /v1/observe/status:
+    get:
+      tags: [observe]
+      summary: Observe API status
+      responses:
+        '200':
+          description: Observe module status
+
+  /v1/observe/timeline:
+    get:
+      tags: [observe]
+      summary: CLI-parity observe timeline
+      description: Returns the same score series, evidence series, timeline events, and anomaly summary used by `amc observe timeline --json`.
+      parameters:
+        - name: agentId
+          in: query
+          schema:
+            type: string
+            default: default
+        - name: limit
+          in: query
+          description: Alias for maxRuns, matching the CLI --limit flag.
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 5000
+        - name: maxRuns
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 5000
+        - name: maxEvidenceEvents
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 20000
+      responses:
+        '200':
+          description: Observe timeline payload
+
+  /v1/observe/anomalies:
+    get:
+      tags: [observe]
+      summary: CLI-parity observe anomalies
+      description: Returns anomaly records derived from the same timeline builder used by `amc observe anomalies --json`.
+      parameters:
+        - name: agentId
+          in: query
+          schema:
+            type: string
+            default: default
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 500
+        - name: maxRuns
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 5000
+        - name: maxEvidenceEvents
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 20000
+      responses:
+        '200':
+          description: Observe anomalies payload

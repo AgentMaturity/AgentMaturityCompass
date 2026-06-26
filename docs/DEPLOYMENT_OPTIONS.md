@@ -18,10 +18,20 @@ This page clarifies the deployment and usage paths for AMC.
 - **CLI** is the serious execution-evidence path.
 - **CI** is where trust standards become repeatable.
 - **Self-hosted / managed / enterprise** are where collaboration, governance, and regulated delivery become real.
+- **Cloud self-hosting** is documented as customer-operated AWS, GCP, or Azure deployment architecture. This repo does not publish an AMC-operated hosted SaaS API endpoint.
+
+## Self-hosted cloud starting points
+
+- **AWS:** ECS on Fargate with an Application Load Balancer, or EKS with the Helm chart.
+- **GCP:** Cloud Run when persistence is externalized, or Google Kubernetes Engine with the Helm chart.
+- **Azure:** Azure Container Apps with managed ingress, or AKS with the Helm chart.
+- **OpenAPI clients:** use `https://{host}/api` for your own DNS name and keep `http://localhost:3000/api` for local development.
 
 ## Read next
 - `docs/START_HERE.md`
 - `docs/INSTALL.md`
 - `docs/CI_TEMPLATES.md`
+- `docs/CLOUD_REFERENCE_ARCHITECTURES.md`
+- `docs/KUBERNETES_HELM_DEPLOYMENT.md`
 - `docs/ENTERPRISE.md`
 - `docs/PRICING.md`

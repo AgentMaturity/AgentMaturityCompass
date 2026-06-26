@@ -1,0 +1,51 @@
+{
+  "agentId": "support-agent",
+  "corpusId": "support-resolution-v1",
+  "corpusVersion": "2026.06.13",
+  "baselineRunId": "run-baseline",
+  "candidateRunId": "run-candidate",
+  "sourceRefs": [
+    "https://arize.com/docs/phoenix/datasets-and-experiments/how-to-experiments"
+  ],
+  "gateMode": "ci",
+  "rows": [
+    {
+      "rowId": "case-001",
+      "fixture": {
+        "task": "Classify a support ticket and cite the source policy.",
+        "inputHash": "input-hash-001",
+        "expectedHash": "expected-hash-001",
+        "seed": 13
+      },
+      "baseline": {
+        "score0to1": 0.72,
+        "evidenceRefs": ["trace:baseline-001"],
+        "signedEvidenceRefs": ["ledger:sig-baseline-001"]
+      },
+      "candidate": {
+        "score0to1": 0.84,
+        "evidenceRefs": ["trace:candidate-001"],
+        "signedEvidenceRefs": ["ledger:sig-candidate-001"]
+      }
+    },
+    {
+      "rowId": "case-002",
+      "fixture": {
+        "task": "Summarize an escalation log without exposing secrets.",
+        "inputHash": "input-hash-002",
+        "expectedHash": "expected-hash-002",
+        "seed": 13
+      },
+      "baseline": {
+        "score0to1": 0.8,
+        "evidenceRefs": ["trace:baseline-002"],
+        "signedEvidenceRefs": ["ledger:sig-baseline-002"]
+      },
+      "candidate": {
+        "score0to1": 0.82,
+        "evidenceRefs": ["trace:candidate-002"],
+        "signedEvidenceRefs": ["ledger:sig-candidate-002"]
+      }
+    }
+  ]
+}

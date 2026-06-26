@@ -22,14 +22,21 @@ blockquote{border-left:3px solid var(--green);padding-left:20px;margin:24px 0;co
 code{font-family:var(--mono);background:var(--bg2);padding:2px 6px;border-radius:3px;font-size:.9em}
 strong{color:var(--fg)}
 </style>
+<style id="skip-link-style">
+.skip-link{position:fixed;left:-9999px;top:12px;z-index:10000;padding:8px 14px;background:#4AEF79;color:#0a0a0a;font:700 14px system-ui,sans-serif;text-decoration:none}
+.skip-link:focus,.skip-link:focus-visible{left:12px}
+:where(a,button,input,select,textarea,[tabindex]:not([tabindex="-1"])):focus-visible{outline:2px solid #4AEF79;outline-offset:3px}
+</style>
 </head>
 <body>
+<a href="#main-content" class="skip-link">Skip to content</a>
 <nav class="nav">
 <a href="../index.html" class="logo">AMC</a>
 <a href="../index.html">Home</a>
 <a href="../blog.html">Blog</a>
 <a href="../docs/index.html">Docs</a>
 </nav>
+<div id="main-content" tabindex="-1"></div>
 
 <article>
 <h1>The AMC Philosophy: Trust, But Verify — With Receipts</h1>

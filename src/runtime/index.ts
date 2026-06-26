@@ -25,3 +25,78 @@ export {
   type RuntimeRunSource,
   type RuntimeRunStatus
 } from "./runManager.js";
+export {
+  buildRuntimeLifecycleGraph,
+  renderRuntimeLifecycleGraphAuditExport,
+  runtimeLifecycleGraphPath,
+  runtimeLifecycleRequiredNodeKinds,
+  verifyRuntimeLifecycleGraph,
+  writeRuntimeLifecycleGraph,
+  type RuntimeLifecycleEdgeKind,
+  type RuntimeLifecycleGraph,
+  type RuntimeLifecycleGraphEdge,
+  type RuntimeLifecycleGraphNode,
+  type RuntimeLifecycleGraphReplay,
+  type RuntimeLifecycleGraphSourceCitation,
+  type RuntimeLifecycleGraphVerification,
+  type RuntimeLifecycleGraphWriteResult,
+  type RuntimeLifecycleNodeKind,
+  type RuntimeLifecycleRequiredNodeKind
+} from "./lifecycleGraph.js";
+export {
+  createRuntimeStateCheckpoint,
+  loadRuntimeStateCheckpoint,
+  proveRuntimeStateRestore,
+  renderRuntimeStateCheckpointAuditExport,
+  runtimeStateCheckpointPath,
+  runtimeStateRestoreProofPath,
+  verifyRuntimeStateCheckpoint,
+  verifyRuntimeStateRestoreProof,
+  type PersistedRuntimeStateCheckpoint,
+  type PersistedRuntimeStateRestoreProof,
+  type RuntimeStateCheckpoint,
+  type RuntimeStateCheckpointRiskLevel,
+  type RuntimeStateCheckpointSourceCitation,
+  type RuntimeStateCheckpointVerification,
+  type RuntimeStateDiffChange,
+  type RuntimeStateDiffEntry,
+  type RuntimeStateRestoreAssurance,
+  type RuntimeStateRestoreEnforcementAction,
+  type RuntimeStateRestoreProof,
+  type RuntimeStateRestoreProofVerification,
+  type RuntimeStateRetentionClass,
+  type RuntimeStateRetentionPolicy
+} from "./stateCheckpoint.js";
+export {
+  defaultRuntimeAutonomyBoundaryPolicy,
+  evaluateRuntimeAutonomyBoundary,
+  renderRuntimeAutonomyBoundaryAuditExport,
+  runtimeAutonomyAuthorityLevels,
+  runtimeAutonomyBoundaryDecisionPath,
+  runtimeAutonomyRiskTiers,
+  verifyRuntimeAutonomyBoundaryDecision,
+  type RuntimeAutonomyApprovalReceipt,
+  type RuntimeAutonomyAuthority,
+  type RuntimeAutonomyBoundaryAction,
+  type RuntimeAutonomyBoundaryDecision,
+  type RuntimeAutonomyBoundaryLimit,
+  type RuntimeAutonomyBoundaryPolicy,
+  type RuntimeAutonomyBoundarySourceCitation,
+  type RuntimeAutonomyBoundaryVerification,
+  type RuntimeAutonomyPlanStep,
+  type RuntimeAutonomyRiskTier
+} from "./autonomyBoundary.js";
+export {
+  buildDegradedModeBehaviorReceipt,
+  verifyDegradedModeBehaviorReceipt,
+  renderDegradedModeBehaviorMarkdown,
+  type BuildDegradedModeBehaviorReceiptInput,
+  type DegradedModeAllowedBehavior,
+  type DegradedModeBehaviorReceipt,
+  type DegradedModeBehaviorSourceCitation,
+  type DegradedModeBehaviorStatus,
+  type DegradedModeBehaviorTestRun,
+  type DegradedModeBehaviorVerification,
+  type DegradedModeFailureMode,
+  type DegradedModeOperatorMessage
+} from "./degradedModeContract.js";

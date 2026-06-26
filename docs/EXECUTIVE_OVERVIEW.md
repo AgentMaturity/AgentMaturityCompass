@@ -45,8 +45,8 @@ We tested a content moderation agent with two methods:
 
 ### For Your Engineering Team
 - **Evidence-weighted diagnostic scoring** that reveals exactly where agents are weak
-- **593 sector-specific questions** for regulated industries (healthcare, finance, education, etc.)
-- **86 assurance packs** that test real adversarial scenarios (prompt injection, data exfiltration, etc.)
+- **600 sector-specific questions** for regulated industries (healthcare, finance, education, etc.)
+- **147 assurance packs** that test real adversarial scenarios (prompt injection, data exfiltration, etc.)
 - **Auto-generated guardrails** that plug directly into agent config files
 - **CI/CD integration** — fail builds if agents don't meet maturity targets
 
@@ -69,7 +69,9 @@ We tested a content moderation agent with two methods:
 
 **For EU AI Act compliance (mandatory August 2026), you need at least L3 for high-risk AI systems.**
 
-## 40 Industry-Specific Assessment Packs
+Board L3 business-risk memo: [docs/BOARD_RISK_L3_MEMO.md](BOARD_RISK_L3_MEMO.md)
+
+## 41 Industry-Specific Assessment Packs
 
 Not all agents face the same risks. AMC includes specialized assessment packs for:
 
@@ -79,7 +81,7 @@ Not all agents face the same risks. AMC includes specialized assessment packs fo
 | 💰 **Finance** | 5 | MiFID II, PSD2, EU DORA, MiCA, FATF |
 | 🎓 **Education** | 5 | FERPA, COPPA, IDEA, EU AI Act Annex III |
 | 🌿 **Environment** | 6 | EU Farm-to-Fork, REACH, IEC 61850 |
-| 🚇 **Mobility** | 5 | EU EPBD, UNECE WP.29, ETSI, NIS2 |
+| 🚇 **Mobility** | 6 | EU EPBD, UNECE WP.29, ETSI, NIS2, freight/logistics controls |
 | 💡 **Technology** | 5 | EU AI Act Art. 13, EU Data Act, DSA |
 | 🏛️ **Governance** | 5 | eIDAS 2.0, UNCAC, Council of Europe AI Convention |
 
@@ -91,7 +93,8 @@ Each question references specific regulatory articles — not vague guidelines.
 ```
 Install: npm i -g agent-maturity-compass
 First score: amc
-Full report: amc guide --status
+Board one-pager: amc executive brief --run latest --out board-brief.html
+Full report: amc report latest --executive --html executive-report.html
 ```
 
 ### Option 2: Try the Web Playground (No Install)
@@ -99,14 +102,25 @@ Visit: [AMC Playground](https://agentmaturity.co/playground.html)
 
 Answer 15 questions about your agent. Get an instant score.
 
-### Option 3: Docker (Zero Setup)
+### Option 3: Local Studio
 ```
-docker run -it amc/compass amc
+amc up
 ```
+
+Open the local Studio dashboard for non-terminal review of scores, evidence, and reports.
+
+### Option 4: Board Packet Artifact
+```
+amc executive brief --run latest --out board-brief.html
+```
+
+This writes a one-page HTML brief with maturity, integrity, board risk, evidence status, top maturity gaps, and a recommended board decision. Open the file in a browser and use Print to PDF for a board packet.
+
+For the board interpretation of an L3 result, attach [What L3 Means For Business Risk](BOARD_RISK_L3_MEMO.md). It explains why L3 supports limited production use, why it is not blanket approval, and which residual-risk questions should still be answered.
 
 ## Cost
 
-**Free.** AMC is MIT licensed, open source. No vendor lock-in. No subscription fees.
+The core trust stack is MIT licensed: scoring, evidence, reports, Studio, adapters, and CI gates. The paid add-on is access to all 41 Industry Domain Packs at $9.99/month.
 
 ## Contact
 

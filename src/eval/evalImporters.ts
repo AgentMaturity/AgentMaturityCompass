@@ -6,7 +6,7 @@ import { hashBinaryOrPath, openLedger } from "../ledger/ledger.js";
 import type { LayerName, TrustTier } from "../types.js";
 import { pathExists, readUtf8 } from "../utils/fs.js";
 
-export type EvalImportFormat = "openai" | "langsmith" | "deepeval" | "promptfoo" | "wandb" | "langfuse";
+export type EvalImportFormat = "openai" | "langsmith" | "deepeval" | "promptfoo" | "wandb" | "langfuse" | "langwatch";
 
 export interface EvalImportCase {
   id: string;
@@ -80,7 +80,8 @@ const DEFAULT_TRUST_TIER_BY_FORMAT: Record<EvalImportFormat, TrustTier> = {
   deepeval: "ATTESTED",
   promptfoo: "ATTESTED",
   wandb: "ATTESTED",
-  langfuse: "ATTESTED"
+  langfuse: "ATTESTED",
+  langwatch: "ATTESTED"
 };
 
 const OWASP_LLM_TOP10_IDS = [
@@ -268,6 +269,25 @@ const LANGFUSE_OBSERVABILITY_SIGNAL_MAP: SignalQuestionMap = [
   {
     pattern: /(prompt injection|jailbreak|policy|safety|harm)/i,
     questionIds: ["AMC-1.8", "AMC-5.8"]
+  }
+];
+
+const LANGWATCH_EVAL_SIGNAL_MAP: SignalQuestionMap = [
+  {
+    pattern: /(trace|span|latency|token|cost|error|status|monitor|observability|regression|request)/i,
+    questionIds: ["AMC-1.7"]
+  },
+  {
+    pattern: /(score|quality|relevance|correct|accuracy|faithful|grounded|hallucin|bleu|rouge|summarization)/i,
+    questionIds: ["AMC-2.3", "AMC-OINT-1"]
+  },
+  {
+    pattern: /(prompt shield|prompt injection|jailbreak|guardrail|policy|safety|harm|toxicity)/i,
+    questionIds: ["AMC-1.8", "AMC-5.8"]
+  },
+  {
+    pattern: /(dataset|experiment|simulation|scenario|agent test|agent validation)/i,
+    questionIds: ["AMC-4.1", "AMC-2.3"]
   }
 ];
 
@@ -634,6 +654,19 @@ function inferLangfuseObservabilityQuestionIds(params: {
     ...params,
     mapping: LANGFUSE_OBSERVABILITY_SIGNAL_MAP,
     fallback: ["AMC-1.7"]
+  });
+}
+
+function inferLangWatchEvalQuestionIds(params: {
+  explicitQuestionIds: string[];
+  caseName: string;
+  metricNames: string[];
+  additionalSignals: string[];
+}): string[] {
+  return inferQuestionIdsFromSignals({
+    ...params,
+    mapping: LANGWATCH_EVAL_SIGNAL_MAP,
+    fallback: ["AMC-1.7", "AMC-2.3"]
   });
 }
 
@@ -1332,6 +1365,122 @@ export function parseLangfuseEvalResults(input: unknown): ParsedEvalImport {
   };
 }
 
+export function parseLangWatchEvalResults(input: unknown): ParsedEvalImport {
+  const root = asRecord(input);
+  const rows = rowsFromInput(input, ["evaluations", "evals", "runs", "traces", "results", "items", "data"]);
+  const runId = root ? pickString(root, ["id", "run_id", "runId", "evaluation_run_id", "evaluationRunId", "trace_id", "traceId"]) : null;
+  const runName = root ? pickString(root, ["name", "run_name", "runName", "project", "project_name", "experiment", "experiment_name"]) : null;
+
+  const cases = rows.map((row, index) => {
+    const evaluation = asRecord(row.evaluation) ?? asRecord(row.eval) ?? row;
+    const trace = asRecord(evaluation.trace) ?? asRecord(row.trace);
+    const datasetRecord = asRecord(evaluation.dataset_record) ?? asRecord(evaluation.datasetRecord) ?? asRecord(row.dataset_record) ?? asRecord(row.datasetRecord);
+    const scores = asRecordArray(evaluation.scores ?? row.scores ?? evaluation.evaluations ?? row.evaluations);
+    const metrics = asRecord(evaluation.metrics ?? row.metrics);
+    const checks = asRecordArray(evaluation.checks ?? row.checks ?? evaluation.guardrails ?? row.guardrails);
+    const metricNames = collectMetricNames(
+      metrics,
+      scores.map((score) => pickString(score, ["name", "key", "metric", "metric_name", "evaluator", "evaluator_id"])).filter((name): name is string => !!name),
+      checks.map((check) => pickString(check, ["name", "type", "rule", "evaluator", "evaluator_id"])).filter((name): name is string => !!name),
+      evaluation.metric,
+      row.metric,
+      evaluation.evaluator,
+      row.evaluator
+    );
+    const scoreValues = [
+      ...numericValuesFromRecord(metrics ?? {}),
+      ...scores.map((score) => pickNumber(score, ["score", "value", "result", "normalized_score", "normalizedScore"])).filter((value): value is number => value !== null),
+      ...checks.map((check) => pickNumber(check, ["score", "value"])).filter((value): value is number => value !== null)
+    ];
+    const status =
+      pickString(evaluation, ["status", "state", "result", "outcome"]) ??
+      pickString(row, ["status", "state", "result", "outcome"]);
+    const statusPass =
+      status && /(success|ok|completed|passed|pass)/i.test(status)
+        ? true
+        : status && /(error|failed|fail|timeout|cancelled|rejected|blocked)/i.test(status)
+          ? false
+          : null;
+    const threshold = pickNumber(evaluation, ["threshold", "pass_threshold", "passThreshold"]) ?? pickNumber(row, ["threshold", "pass_threshold", "passThreshold"]);
+    const derived = derivePassAndScore({
+      pass:
+        pickBoolean(evaluation, ["success", "pass", "passed", "passed_evaluation", "passedEvaluation"]) ??
+        pickBoolean(row, ["success", "pass", "passed"]) ??
+        (() => {
+          const checkPasses = checks
+            .map((check) => pickBoolean(check, ["success", "pass", "passed", "blocked"]))
+            .filter((value): value is boolean => value !== null);
+          if (checkPasses.length === 0) {
+            return null;
+          }
+          return checkPasses.every(Boolean);
+        })() ??
+        statusPass,
+      score:
+        pickNumber(evaluation, ["score", "value", "overall_score", "overallScore", "normalized_score", "normalizedScore"]) ??
+        pickNumber(row, ["score", "value", "overall_score", "overallScore"]) ??
+        average(scoreValues),
+      threshold
+    });
+
+    const caseName =
+      pickString(evaluation, ["name", "test_name", "testName", "scenario", "scenario_name", "scenarioName"]) ??
+      pickString(row, ["name", "test_name", "testName", "scenario", "scenario_name", "scenarioName"]) ??
+      pickString(trace ?? {}, ["name", "trace_name", "traceName"]) ??
+      `langwatch-eval-${index + 1}`;
+    const explicit = unique([
+      ...explicitQuestionIds(row),
+      ...explicitQuestionIds(evaluation),
+      ...explicitQuestionIds(trace ?? {}),
+      ...explicitQuestionIds(datasetRecord ?? {})
+    ]);
+    const mappingSignals = [
+      status ?? "",
+      pickString(evaluation, ["type", "category", "kind", "evaluator_type", "evaluatorType"]) ?? "",
+      pickString(row, ["type", "category", "kind"]) ?? "",
+      scores.map((score) => pickString(score, ["comment", "reason", "explanation"])).filter((value): value is string => !!value).join(" "),
+      checks.map((check) => pickString(check, ["comment", "reason", "explanation", "rule"])).filter((value): value is string => !!value).join(" ")
+    ];
+    const questionIdsForCase = inferLangWatchEvalQuestionIds({
+      explicitQuestionIds: explicit,
+      caseName,
+      metricNames,
+      additionalSignals: mappingSignals
+    });
+
+    return {
+      id:
+        pickString(evaluation, ["id", "case_id", "caseId", "evaluation_id", "evaluationId", "trace_id", "traceId"]) ??
+        pickString(row, ["id", "case_id", "caseId", "evaluation_id", "evaluationId", "trace_id", "traceId"]) ??
+        `${runId ?? "langwatch"}-${index + 1}`,
+      name: caseName,
+      pass: derived.pass,
+      score: derived.score,
+      inputSnippet: valueSnippet(evaluation.input ?? row.input ?? datasetRecord?.input ?? trace?.input ?? evaluation.prompt ?? row.prompt),
+      outputSnippet: valueSnippet(evaluation.output ?? row.output ?? trace?.output ?? evaluation.response ?? row.response),
+      expectedSnippet: valueSnippet(evaluation.expected ?? row.expected ?? datasetRecord?.expected ?? datasetRecord?.output),
+      metricNames,
+      questionIds: questionIdsForCase,
+      ts: parseCaseTimestamp(row, evaluation, trace),
+      metadata: {
+        ...filterMetadata(evaluation, ["project", "project_name", "experiment", "experiment_name", "dataset", "dataset_id", "datasetId", "scenario", "evaluator", "evaluator_id", "status", "state"]),
+        ...filterMetadata(row, ["project", "project_name", "workspace", "environment"]),
+        ...(trace ? filterMetadata(trace, ["trace_id", "traceId", "session_id", "sessionId"]) : {}),
+        mappingTarget: "langwatch_eval_replay",
+        mappingSignals,
+        ...(threshold !== null ? { threshold } : {})
+      }
+    } satisfies EvalImportCase;
+  });
+
+  return {
+    framework: "langwatch",
+    runId,
+    runName,
+    cases
+  };
+}
+
 export function parseEvalImport(input: unknown, format: EvalImportFormat): ParsedEvalImport {
   if (format === "openai") {
     return parseOpenAIEvalResults(input);
@@ -1347,6 +1496,9 @@ export function parseEvalImport(input: unknown, format: EvalImportFormat): Parse
   }
   if (format === "wandb") {
     return parseWandbEvalResults(input);
+  }
+  if (format === "langwatch") {
+    return parseLangWatchEvalResults(input);
   }
   return parseLangfuseEvalResults(input);
 }
@@ -1650,7 +1802,7 @@ export function importEvalResults(params: {
 }
 
 function isEvalImportFormat(value: string): value is EvalImportFormat {
-  return value === "openai" || value === "langsmith" || value === "deepeval" || value === "promptfoo" || value === "wandb" || value === "langfuse";
+  return value === "openai" || value === "langsmith" || value === "deepeval" || value === "promptfoo" || value === "wandb" || value === "langfuse" || value === "langwatch";
 }
 
 function parseMetaRecord(metaJson: string): Record<string, unknown> {

@@ -10,14 +10,17 @@ import { readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 
 export type TraceFailureClass =
+  | "prompt_error"
   | "tool_misuse"
   | "invalid_schema"
   | "refusal_overreach"
   | "hallucinated_claim"
   | "unsafe_action"
   | "latency_timeout"
+  | "cost_spike"
   | "retrieval_error"
   | "memory_error"
+  | "human_review_gap"
   | "orchestration_dead_end"
   | "policy_violation"
   | "unknown_failure";
@@ -144,14 +147,17 @@ function severityFor(scoreImpact: number): TraceFailureSeverity {
 
 function classifyFromText(text: string): TraceFailureClass {
   const normalized = normalizeText(text);
+  if (/\b(prompt|instruction|system prompt|prompt template|prompt variable|prompt drift)\b/.test(normalized)) return "prompt_error";
   if (/\b(tool|function|api call|permission|scope|argument)\b/.test(normalized)) return "tool_misuse";
   if (/\b(schema|json|parse|validation|invalid|malformed|missing field|required)\b/.test(normalized)) return "invalid_schema";
   if (/\b(refusal|refuse|overreach|cannot help|policy blanket)\b/.test(normalized)) return "refusal_overreach";
   if (/\b(unsupported|hallucinat|fabricat|claim|citation|source)\b/.test(normalized)) return "hallucinated_claim";
   if (/\b(unsafe|delete|drop|transfer|credential|secret|jailbreak|injection)\b/.test(normalized)) return "unsafe_action";
   if (/\b(timeout|latency|slow|deadline|rate limit)\b/.test(normalized)) return "latency_timeout";
+  if (/\b(cost|costs|spend|spending|budget|token usage|tokens|usage spike|billing)\b/.test(normalized)) return "cost_spike";
   if (/\b(retrieval|rag|vector|search|context missing|not found)\b/.test(normalized)) return "retrieval_error";
   if (/\b(memory|poison|recall|writeback|state)\b/.test(normalized)) return "memory_error";
+  if (/\b(human review|manual review|review queue|escalation|human in the loop|human-in-the-loop|hil)\b/.test(normalized)) return "human_review_gap";
   if (/\b(orchestrat|loop|dead end|planner|handoff|stuck)\b/.test(normalized)) return "orchestration_dead_end";
   if (/\b(policy|guardrail|approval|ticket|workorder|blocked|denied)\b/.test(normalized)) return "policy_violation";
   return "unknown_failure";
@@ -239,7 +245,7 @@ function entriesFromTraces(input: BuildTraceFailureIndexInput, runId: string): T
         return null;
       }
       const failureClass = classifyTraceFailure({
-        note: prod ? JSON.stringify({ input: trace.input, output: trace.output, metadata: trace.metadata }) : trace.note,
+        note: prod ? JSON.stringify({ output: trace.output, metadata: trace.metadata }) : trace.note,
         errorMessage,
         event: prod ? trace.agentType : trace.event,
         outcome
