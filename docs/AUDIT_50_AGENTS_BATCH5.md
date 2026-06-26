@@ -42,12 +42,12 @@ node -e 'const fs=require("fs"); const tests=JSON.parse(fs.readFileSync(process.
 
 External verification basis: Vitest's official CLI docs state that `vitest list` supports `--json` output and `--static-parse` collection; Shields.io's official static badge docs confirm the `label-message-color` path format used for the README badge.
 
-The command-count drift was resolved 2026-06-16 by regenerating `docs/CLI_COMMAND_INVENTORY.md` from the compiled Commander registry and updating current-facing README, website, pricing, edition, enterprise, benchmark, and API reference surfaces to **1,140 public CLI command paths**.
+The command-count drift was resolved 2026-06-16 by regenerating `docs/CLI_COMMAND_INVENTORY.md` from the compiled Commander registry and updating current-facing README, website, pricing, edition, enterprise, benchmark, and API reference surfaces to **1,144 public CLI command paths**.
 
 Reproduction:
 ```bash
 node dist/cli.js commands --json | node -e 'let s=""; process.stdin.on("data",d=>s+=d); process.stdin.on("end",()=>console.log(JSON.parse(s).total));'
-# 1140
+# 1144
 ```
 
 The product diagnostic-count drift was resolved 2026-06-16 by separating runtime product counts from the whitepaper's research-core framing:
@@ -361,7 +361,7 @@ This was the FIRST thing a cloud architect tried in the original audit. Current 
 - The OpenAPI spec now documents both local `localhost:3000/api` and self-hosted `https://{host}/api` server roots.
 - Inbound value webhook token details are now a published Studio route-family contract in `website/openapi.yaml`, `docs/API_SURFACES.md`, and `docs/VALUE_INGESTION.md`.
 - SSE reconnect and rate-limit documentation are resolved in the 2026-06-16 follow-up.
-- `docs/API_REFERENCE.md` now lists the canonical 1,140 public CLI command paths.
+- `docs/API_REFERENCE.md` now lists the canonical 1,144 public CLI command paths.
 - `docs/SDK.md` now consolidates Node/TypeScript, Python, Go, and OpenAPI contract surfaces with current source paths and server roots. ✅
 - Observe CLI data is now API-visible: `GET /api/v1/observe/status`, `GET /api/v1/observe/timeline`, and `GET /api/v1/observe/anomalies` expose the same timeline builder used by `amc observe timeline --json` and `amc observe anomalies --json`. ✅
 
@@ -583,7 +583,7 @@ amc quickstart --profile dev        # ✅ works
 - **The 0/50 score in non-interactive mode is now explicitly labeled as a placeholder.** Running `amc quickstart --profile dev` in a non-TTY prints "No TTY detected — no questions were answered" and says the displayed L0 is not a measured maturity result.
 - **Vault passphrase requirement** is confusing for first-time users. `AMC_VAULT_PASSPHRASE` must be set or the CLI prompts interactively. This is not mentioned until you try to do real evidence capture.
 - **234+ docs files** — still a lot. The minimal commands give a smaller path, but the full docs corpus still signals "enterprise" to some startup CTOs.
-- The pricing section in README now says "Free / Open Source... 1,140 registered CLI command paths" with a link to the generated inventory; this is accurate but still risks sounding like enterprise bloat to a startup CTO.
+- The pricing section in README now says "Free / Open Source... 1,144 registered CLI command paths" with a link to the generated inventory; this is accurate but still risks sounding like enterprise bloat to a startup CTO.
 
 **Gaps:**
 - Minimal startup path — ✅ Resolved 2026-06-16. `amc init --minimal` and `amc quickstart --minimal` skip the vault prompt, skip the immediate full-score prompt, and show lightweight next steps.
@@ -617,7 +617,7 @@ The startup plan reports role-specific goals, framework detection, workspace/sam
 ✅ Test count inconsistency resolved 2026-06-16: current-facing README, CONTRIBUTING, website, launch drafts, and whitepaper use 5,394 statically collected Vitest tests across 407 files
 ✅ Non-interactive quickscore placeholder output resolved 2026-06-16
 ✅ First-run quickscore interactive hint resolved 2026-06-16
-✅ CLI command-count inconsistency resolved 2026-06-16: current-facing surfaces use 1,140 public command paths from `amc commands --json`
+✅ CLI command-count inconsistency resolved 2026-06-16: current-facing surfaces use 1,144 public command paths from `amc commands --json`
 ✅ `docs/GETTING_STARTED.md` exists and is referenced by README/CLI links
 
 ### WEBSITE/DOCS HTML
@@ -659,7 +659,7 @@ The startup plan reports role-specific goals, framework detection, workspace/sam
 6. **arXiv URL/status** — ✅ Truthfully resolved 2026-06-16. No arxiv.org record was found; the false arXiv availability claim was removed and the paper now states no arXiv identifier is assigned.
 7. **`amc cert generate --badge`** — ✅ Resolved 2026-06-16. Current compiled CLI exposes `--badge`.
 8. **`amc comply risk-classify`** — ✅ Resolved 2026-06-16. Compiled CLI exposes the command through the `comply` alias and docs now list it explicitly.
-9. **CLI commands count** — ✅ Resolved 2026-06-16. README, website, pricing, editions, enterprise, benchmark gallery, API reference, and generated CLI inventory now agree on 1,140 public command paths.
+9. **CLI commands count** — ✅ Resolved 2026-06-16. README, website, pricing, editions, enterprise, benchmark gallery, API reference, and generated CLI inventory now agree on 1,144 public command paths.
 10. **package.json keywords** — ✅ Resolved 2026-06-16. Description and keywords now include AI agents, governance, compliance, trust, safety, and LLM evaluation terms.
 
 ### P2 — Fix This Quarter

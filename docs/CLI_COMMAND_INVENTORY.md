@@ -68,7 +68,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc assurance patch` | Apply deterministic patch kit for failed assurance findings | `--assuranceRun <id>`<br>`--agent <agentId>`<br>`--apply` | - |
 | `amc assurance policy` | Print current assurance policy | - | - |
 | `amc assurance policy-apply` | Apply assurance policy from YAML/JSON file | `--file <path>` | - |
-| `amc assurance run` | Run assurance pack(s) with deterministic validation | `--agent <agentId>`<br>`--scope <scope>`<br>`--id <id>`<br>`--pack <packId>`<br>`--all`<br>`--mode <mode>`<br>`--window <window>`<br>`--window-days <days>`<br>`--out <path>`<br>`--format <format>`<br>`--verbose`<br>`--no-sign` | - |
+| `amc assurance run` | Run assurance pack(s) with deterministic validation | `--agent <agentId>`<br>`--scope <scope>`<br>`--id <id>`<br>`--pack <packId>`<br>`--all`<br>`--demo`<br>`--mode <mode>`<br>`--window <window>`<br>`--window-days <days>`<br>`--out <path>`<br>`--format <format>`<br>`--verbose`<br>`--no-sign` | - |
 | `amc assurance runs` | List assurance lab runs | - | - |
 | `amc assurance scheduler` | Assurance scheduler controls | - | - |
 | `amc assurance scheduler disable` | Disable assurance scheduler | - | - |
@@ -219,7 +219,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc cgx-propagation` | Simulate risk propagation from a source node | `--max-depth <n>` | - |
 | `amc ci` | CI/CD release gate helpers | - | - |
 | `amc ci check` | One-liner CI gate: quickscore + threshold check (exit 1 if below) | `--min-score <n>`<br>`--min-level <level>`<br>`--agent <agentId>`<br>`--json` | `gate` |
-| `amc ci init` | Generate GitHub workflow and signed gate policy | `--agent <agentId>` | - |
+| `amc ci init` | Generate GitHub workflow and gate policy | `--agent <agentId>`<br>`--no-sign` | - |
 | `amc ci print` | Print suggested CI pipeline steps | `--agent <agentId>` | - |
 | `amc ci redteam` | CI gate: run red-team plugins, optional Evil MCP, and score-gaming resistance checks | `--plugins <ids...>`<br>`--strategies <ids...>`<br>`--min-score <n>`<br>`--max-vulnerabilities <n>`<br>`--max-critical <n>`<br>`--max-high <n>`<br>`--evil-mcp`<br>`--mcp-attacks <categories...>`<br>`--min-mcp-score <n>`<br>`--no-gaming-resistance`<br>`--min-gaming-score <n>`<br>`--no-sign`<br>`--json` | - |
 | `amc claim-confidence` | Generate per-claim confidence report with citation-backed scoring | `--agent <agentId>` | - |
@@ -273,7 +273,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc dag score` | Score DAG governance | `--json` | - |
 | `amc dashboard` | Device-first Compass dashboard | - | - |
 | `amc dashboard build` | Build responsive offline dashboard for an agent | `--agent <agentId>`<br>`--out <dir>` | - |
-| `amc dashboard open` | Build and serve dashboard at localhost:3210 | `--agent <agentId>`<br>`--port <port>`<br>`--view <view>` | - |
+| `amc dashboard open` | Build and serve dashboard at localhost:3210 | `--agent <agentId>`<br>`--port <port>`<br>`--view <view>`<br>`--no-open` | - |
 | `amc dashboard serve` | Serve dashboard locally | `--agent <agentId>`<br>`--port <port>`<br>`--out <dir>` | - |
 | `amc dashboard view` | Build and open web UI showing maturity scores, test results, and comparison matrix with shareable URLs | `--agent <agentId>`<br>`--port <port>`<br>`--out <dir>`<br>`--no-open` | - |
 | `amc dataset` | Manage evaluation datasets (golden sets) — curate business-specific test cases | - | - |
@@ -355,11 +355,11 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc enterprise status` | Show current license status, tier, and enabled features | - | - |
 | `amc enterprise usage` | Show multi-tenant usage metering and quota utilization | - | - |
 | `amc eval` | Eval interop import and coverage status | - | - |
-| `amc eval import` | Import eval outputs (LangSmith, DeepEval, Promptfoo, OpenAI Evals, W&B, Langfuse) into signed AMC evidence | `--format <format>`<br>`--file <path>`<br>`--agent <agentId>`<br>`--trust-tier <tier>`<br>`--json` | - |
+| `amc eval import` | Import eval outputs (LangSmith, DeepEval, Promptfoo, OpenAI Evals, W&B, Langfuse, LangWatch) into signed AMC evidence | `--format <format>`<br>`--file <path>`<br>`--agent <agentId>`<br>`--trust-tier <tier>`<br>`--json` | - |
 | `amc eval run` | One-shot evaluation: read amcconfig.yaml, run all diagnostic tests, output results | `--format <format>`<br>`--output <path>`<br>`--window <window>`<br>`--agent <agentId>`<br>`--fail-on-error`<br>`--threshold <n>` | - |
 | `amc eval status` | Show imported eval coverage per AMC dimension | `--agent <agentId>`<br>`--window <window>`<br>`--json` | - |
 | `amc evidence` | Evidence lifecycle workflows | - | - |
-| `amc evidence collect` | Guided wizard to connect your agent and capture evidence | - | - |
+| `amc evidence collect` | Guided wizard to connect your agent and capture evidence | `--first-run`<br>`--agent <agentId>`<br>`--runtime <runtime>`<br>`--dry-run` | - |
 | `amc evidence decisions` | List and inspect decision receipts generated by full-score runs | - | - |
 | `amc evidence decisions inspect` | Inspect one decision receipt by receipt id or run id | `--agent <agentId>`<br>`--json` | - |
 | `amc evidence decisions list` | List persisted decision receipts | `--agent <agentId>`<br>`--limit <n>`<br>`--json` | - |
@@ -432,12 +432,13 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc fleet graph show` | Inspect the latest typed multi-agent graph | `--json` | - |
 | `amc fleet graph validate` | Validate the latest typed multi-agent graph | `--json` | - |
 | `amc fleet graph write` | Write the latest typed multi-agent graph from a JSON file | `--file <path>`<br>`--json` | - |
-| `amc fleet handoff` | Manage handoff packets | `--from <id>`<br>`--to <id>`<br>`--goal <goal>`<br>`--mode <mode>`<br>`--packet <packetId>` | - |
+| `amc fleet handoff` | Manage handoff packets | `--from <id>`<br>`--to <id>`<br>`--goal <goal>`<br>`--mode <mode>`<br>`--packet <packetId>`<br>`--receiver <id>`<br>`--refuse <reason>` | - |
 | `amc fleet health` | Show fleet health dashboard aggregates | `--json` | - |
 | `amc fleet init` | Create and sign .amc/fleet.yaml | `--org <name>` | - |
 | `amc fleet lifecycle` | Fleet parent/child lifecycle evidence | - | - |
 | `amc fleet lifecycle list` | List parent fleet lifecycle artifacts | `--limit <n>`<br>`--redacted`<br>`--json` | - |
 | `amc fleet lifecycle show` | Inspect one parent fleet lifecycle artifact | `--redacted`<br>`--json` | - |
+| `amc fleet overview` | One-shot executive fleet summary with verdict, coverage, drift, and next actions | `--json` | - |
 | `amc fleet policy` | Fleet governance policy operations | - | - |
 | `amc fleet policy apply` | Apply a governance policy to all fleet agents or one environment | `--policy-id <id>`<br>`--description <text>`<br>`--min-integrity <n>`<br>`--dimension-min <rules>`<br>`--env <environment>` | - |
 | `amc fleet policy list` | List effective fleet governance policies | - | - |
@@ -451,6 +452,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc fleet tag` | Tag an agent with an environment | `--env <environment>` | - |
 | `amc fleet trust-add-edge` | Add a delegation edge (orchestrator → worker) | `--from <agentId>`<br>`--to <agentId>`<br>`--purpose <purpose>`<br>`--risk <tier>`<br>`--mode <mode>`<br>`--weight <n>` | - |
 | `amc fleet trust-edges` | List all delegation edges | - | - |
+| `amc fleet trust-graph` | Render delegation trust graph as Mermaid, DOT, or JSON | `--format <format>`<br>`--out <path>` | - |
 | `amc fleet trust-init` | Initialize trust composition config | - | - |
 | `amc fleet trust-mode` | Set trust inheritance policy mode | `--mode <mode>` | - |
 | `amc fleet trust-receipts` | Verify cross-agent receipt chains | `--window <window>` | - |
@@ -479,7 +481,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc freeze` | Execution freeze status and controls | - | - |
 | `amc freeze lift` | - | `--agent <agentId>`<br>`--incident <id>`<br>`--reason <text>` | - |
 | `amc freeze status` | - | `--agent <agentId>` | - |
-| `amc gate` | Evaluate a run bundle against a signed gate policy | `--bundle <file>`<br>`--policy <path>` | - |
+| `amc gate` | Evaluate a run bundle against a gate policy | `--bundle <file>`<br>`--policy <path>`<br>`--no-sign` | - |
 | `amc gateway` | AMC universal LLM proxy gateway | - | - |
 | `amc gateway bind-agent` | Bind a gateway route prefix to an agent ID for deterministic attribution | `--route <prefix>`<br>`--agent <agentId>`<br>`--config <path>` | - |
 | `amc gateway init` | Create and sign .amc/gateway.yaml | `--provider <name>`<br>`--base-url <url>`<br>`--auth-type <type>`<br>`--env <name>`<br>`--header <name>`<br>`--param <name>` | - |
@@ -504,7 +506,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc guardrails list` | List all available guardrails with status | `--json` | - |
 | `amc guardrails profile` | Apply a guardrail profile (minimal, standard, strict, healthcare, financial) | - | - |
 | `amc guide` | Generate personalized improvement guide with exportable agent instructions | `--target <level>`<br>`--export`<br>`--agent-instructions`<br>`--guardrails`<br>`--apply [file]`<br>`--interactive`<br>`--watch`<br>`--watch-interval <seconds>`<br>`--diff`<br>`--frameworks`<br>`--ci`<br>`--dry-run`<br>`--quick`<br>`--auto-detect`<br>`--status`<br>`--go`<br>`--compliance [frameworks]`<br>`--agent <id>`<br>`--framework <name>`<br>`--json` | - |
-| `amc help` | Show help for a command (for example: amc help run) | - | - |
+| `amc help` | Show help for a command (for example: amc help run) | `--all` | - |
 | `amc history` | List diagnostic run history | `--limit <n>`<br>`--valid-only`<br>`--since <hours>` | - |
 | `amc host` | Multi-workspace host mode operations | - | - |
 | `amc host bootstrap` | Bootstrap host admin + default workspace from secret files | `--dir <path>` | - |
@@ -743,7 +745,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc own` | Ownership flow for top maturity gaps | `--target <name>`<br>`--agent <agentId>` | - |
 | `amc pack` | Community assurance pack registry — NPM-style package management | - | - |
 | `amc pack info` | Show detailed information about a pack | `--json` | - |
-| `amc pack init` | Initialize a new pack in the current directory | `--name <name>`<br>`--version <version>`<br>`--description <desc>`<br>`--author <author>`<br>`--license <license>`<br>`--type <type>` | - |
+| `amc pack init` | Initialize a new pack in <name>/ or an explicit --dir | `--name <name>`<br>`--dir <path>`<br>`--version <version>`<br>`--description <desc>`<br>`--author <author>`<br>`--license <license>`<br>`--type <type>` | - |
 | `amc pack install` | Install a community assurance pack | `--version <version>`<br>`--save`<br>`--save-dev`<br>`--force`<br>`--dry-run`<br>`--json` | - |
 | `amc pack list` | List installed packs | `--global`<br>`--json` | - |
 | `amc pack publish` | Publish a pack to the registry | `--registry <url>`<br>`--dry-run`<br>`--access <level>`<br>`--json` | - |
@@ -751,7 +753,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc pack registry init` | Initialize local pack registry | - | - |
 | `amc pack registry serve` | Start a local pack registry server | `--port <port>`<br>`--host <host>` | - |
 | `amc pack search` | Search for packs in the registry | `--category <category>`<br>`--author <author>`<br>`--keywords <keywords>`<br>`--limit <n>`<br>`--offset <n>`<br>`--json` | - |
-| `amc pack test` | Test a local pack in sandbox mode | `--agent <agentId>`<br>`--json` | - |
+| `amc pack test` | Test a local pack directory; defaults to cwd and auto-detects one child pack | `--agent <agentId>`<br>`--json` | - |
 | `amc pack uninstall` | Uninstall a pack | `--save`<br>`--json` | - |
 | `amc pair` | LAN pairing code operations | - | - |
 | `amc pair create` | Create one-time pairing code (LAN login pairing or agent bridge pairing) | `--ttl <ttl>`<br>`--ttl-min <minutes>`<br>`--agent-name <name>`<br>`--workspace <workspaceId>` | - |
@@ -844,6 +846,8 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc prompt scheduler status` | Show prompt scheduler status | - | - |
 | `amc prompt status` | List per-agent prompt pack status | - | - |
 | `amc prompt verify` | Verify prompt policy, pack, lint and scheduler signatures | - | - |
+| `amc proof` | Domain Proof Lane source-to-rule proof checks | - | - |
+| `amc proof check` | Check a claim against a declared source-to-rule manifest and emit an amcproof artifact | `--domain <domain>`<br>`--manifest <path>`<br>`--input <path>`<br>`--out <path>`<br>`--json` | - |
 | `amc provider` | Provider template operations | - | - |
 | `amc provider add` | Assign or update provider template for an agent | `--agent <agentId>` | - |
 | `amc provider list` | List provider templates | - | - |
@@ -935,7 +939,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc score faithfulness` | Score how well LLM output is grounded in provided context | `--json`<br>`--context <text>`<br>`--output <text>`<br>`--threshold <n>` | - |
 | `amc score formal-spec` | Compute formal maturity score for an agent | `--json` | - |
 | `amc score gaming-resistance` | Test whether adversarial evidence injection can inflate scores | `--json` | - |
-| `amc score industry-adjust` | Adjust a score using an industry-specific trust model | `--industry <id>`<br>`--score <n>`<br>`--agent <id>`<br>`--json` | - |
+| `amc score industry-adjust` | Adjust a score using an industry-specific trust model | `--industry <id>`<br>`--score <n>`<br>`--agent <id>`<br>`--drilldown`<br>`--history`<br>`--lookback-days <n>`<br>`--out <path>`<br>`--json` | - |
 | `amc score industry-benchmark` | Show industry benchmark percentiles | `--industry <id>`<br>`--json` | - |
 | `amc score industry-list` | List all available industry trust models | `--json` | - |
 | `amc score interpretability` | Score structural transparency and explainability | `--json` | - |
@@ -1062,7 +1066,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc truthguard validate` | Validate structured agent output claims against deterministic truth constraints | `--file <json>` | - |
 | `amc tune` | Mechanic mode tuning wizard | `--target <name>` | - |
 | `amc unknowns` | List known unknowns for an agent's latest diagnostic run | `--agent <id>` | - |
-| `amc up` | Start AMC control plane in one command (studio + gateway + bridge) | - | - |
+| `amc up` | Start AMC control plane in one command (studio + gateway + bridge) | `--demo`<br>`--read-only`<br>`--dry-run`<br>`--no-open` | - |
 | `amc upgrade` | Generate upgrade plan | `--to <destination>` | - |
 | `amc user` | Multi-user RBAC account management | - | - |
 | `amc user add` | Add a user with RBAC roles | `--username <name>`<br>`--role <roles>` | - |

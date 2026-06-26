@@ -225,7 +225,33 @@ function initMobileNav(){
   btn.addEventListener('click',function(){ mob.classList.toggle('open'); });
 }
 
+function initTheme(){
+  var btn=document.getElementById('themeToggle');
+  if(!btn) return;
+
+  function applyTheme(theme){
+    var clean=theme==='clean';
+    document.body.classList.toggle('clean-theme',clean);
+    btn.setAttribute('aria-pressed',clean?'true':'false');
+    btn.textContent=clean?'☀':'◐';
+  }
+
+  try{
+    var saved=localStorage.getItem('amc-theme')||localStorage.getItem('theme');
+    applyTheme(saved==='clean'?'clean':'terminal');
+  }catch(e){
+    applyTheme('terminal');
+  }
+
+  btn.addEventListener('click',function(){
+    var next=document.body.classList.contains('clean-theme')?'terminal':'clean';
+    applyTheme(next);
+    try{ localStorage.setItem('amc-theme',next); }catch(e){}
+  });
+}
+
 function init(){
+  initTheme();
   initProducts();
   initReveals();
   initFAQ();

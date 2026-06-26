@@ -60,7 +60,7 @@ See: `.github/workflows/amc-score.yml`
 | Domain packs | 40 |
 | Framework adapters | 14 |
 | Scoring modules | 74+ |
-| CLI command paths | 1,140 |
+| CLI command paths | 1,144 |
 
 These numbers come from the actual repo, not marketing material.
 
