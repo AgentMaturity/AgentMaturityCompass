@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
+  <title id="title">AMC five-minute terminal demo</title>
+  <desc id="desc">A terminal-style community demo showing AMC quickscore, startup guidance, business risk, and GRC export commands.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#07130f"/>
+      <stop offset="0.55" stop-color="#10141f"/>
+      <stop offset="1" stop-color="#141007"/>
+    </linearGradient>
+    <style>
+      .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; }
+      .title { font: 700 34px ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #f6f8fa; }
+      .sub { font: 500 18px ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #b7c4c0; }
+      .cmd { font-size: 22px; fill: #d8ffe8; }
+      .out { font-size: 20px; fill: #d5d9df; }
+      .muted { font-size: 18px; fill: #9aa7a1; }
+      .accent { fill: #4aef79; }
+      .warn { fill: #ffd166; }
+      .line { stroke: #28352f; stroke-width: 1; }
+    </style>
+  </defs>
+  <rect width="1200" height="720" fill="url(#bg)"/>
+  <rect x="54" y="52" width="1092" height="616" rx="18" fill="#0b0f14" stroke="#26332e"/>
+  <rect x="54" y="52" width="1092" height="52" rx="18" fill="#121820"/>
+  <circle cx="86" cy="78" r="8" fill="#ff5f57"/>
+  <circle cx="113" cy="78" r="8" fill="#ffbd2e"/>
+  <circle cx="140" cy="78" r="8" fill="#28c840"/>
+  <text x="176" y="84" class="mono muted">amc-demo --community-kit</text>
+
+  <text x="84" y="154" class="title">Agent Maturity Compass in five minutes</text>
+  <text x="84" y="188" class="sub">Score an agent, avoid placeholder confusion, then export business-risk proof.</text>
+  <line x1="84" y1="214" x2="1114" y2="214" class="line"/>
+
+  <text x="84" y="260" class="mono cmd">$ npx agent-maturity-compass quickscore</text>
+  <text x="112" y="296" class="mono out"><tspan class="accent">Score:</tspan> L0 / 50</text>
+  <text x="112" y="326" class="mono out"><tspan class="warn">Warning:</tspan> L0 placeholder is not a measured maturity result</text>
+
+  <text x="84" y="382" class="mono cmd">$ amc quickstart --startup-plan --role cto</text>
+  <text x="112" y="418" class="mono out"><tspan class="accent">Plan:</tspan> create answers, run measured score, capture evidence, generate guardrails</text>
+
+  <text x="84" y="474" class="mono cmd">$ amc business risk --maturity 3 --baseline-frequency 4 --incident-cost 50000 --json</text>
+  <text x="112" y="510" class="mono out"><tspan class="accent">Residual EAL:</tspan> USD 76,000/year  <tspan class="warn">Appetite:</tspan> ABOVE by USD 1,000</text>
+
+  <text x="84" y="566" class="mono cmd">$ amc business grc-export --portfolio risk-portfolio.json --out grc-treatment-plan.csv</text>
+  <text x="112" y="602" class="mono out"><tspan class="accent">Export:</tspan> risk IDs, owners, due dates, ISO 31000 context, FAIR-style fields</text>
+
+  <text x="84" y="640" class="mono muted">Local-first. No account required. Evidence and caveats travel with the artifact.</text>
+</svg>
