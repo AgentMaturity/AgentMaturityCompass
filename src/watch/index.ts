@@ -75,6 +75,23 @@ export {
   type ProviderDriftWatchAlert,
 } from './providerDriftAlerts.js';
 export {
+  buildOverrideNearMissAnalyticsReceipt,
+  buildOverrideNearMissWatchAlerts,
+  type BuildOverrideNearMissAnalyticsReceiptInput,
+  type OverrideNearMissAlertSeverity,
+  type OverrideNearMissAnalyticsReceipt,
+  type OverrideNearMissEvent,
+  type OverrideNearMissEventType,
+  type OverrideNearMissFailureCluster,
+  type OverrideNearMissLiveTrends,
+  type OverrideNearMissReceiptStatus,
+  type OverrideNearMissTraceIndex,
+  type OverrideNearMissTraceIndexEntry,
+  type OverrideNearMissTrendWindow,
+  type OverrideNearMissWatchAlert,
+  type RepeatedApprovalPattern,
+} from './overrideNearMissAnalytics.js';
+export {
   runPromptLayerProviderDrift,
   type PromptLayerProviderDriftMetadata,
   type PromptLayerProviderDriftProof,
