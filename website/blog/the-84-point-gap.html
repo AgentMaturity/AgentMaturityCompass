@@ -204,7 +204,7 @@ tr:hover td{background:var(--bg2)}
                             ↓
                     Evidence Ledger (Ed25519 + Merkle tree)
                             ↓
-                    Scoring Engine (244 default + 600 sector questions, 5 dimensions)
+                    Scoring Engine (244 default + Industry Pack questions, 5 dimensions)
 </code></pre>
 
 <p>The Gateway operates as a transparent MITM proxy. Your agent talks to its LLM provider exactly as before — same API, same endpoints, same behavior. But every request and response passes through AMC, which captures:</p>
@@ -220,18 +220,18 @@ tr:hover td{background:var(--bg2)}
 
 <h2>The Five Dimensions of Agent Maturity</h2>
 
-<p>AMC doesn't produce a single opaque number. It evaluates agents across 5 dimensions with 244 default diagnostic questions (plus 600 sector-specific questions across 41 industry packs — 844 total):</p>
+<p>AMC doesn't produce a single opaque number. It evaluates agents across 5 dimensions with 244 default diagnostic questions, plus optional sector-specific questions across 41 Industry Packs:</p>
 
 <table>
   <thead>
     <tr><th>Dimension</th><th>Questions</th><th>What It Measures</th></tr>
   </thead>
   <tbody>
-    <tr><td><strong>Strategic Agent Ops</strong></td><td>18</td><td>Mission clarity, scope adherence, decision traceability</td></tr>
-    <tr><td><strong>Skills</strong></td><td>38</td><td>Tool mastery, injection defense, DLP, least-privilege execution</td></tr>
-    <tr><td><strong>Resilience</strong></td><td>30</td><td>Graceful degradation, circuit breakers, monitor bypass resistance</td></tr>
-    <tr><td><strong>Leadership &amp; Autonomy</strong></td><td>28</td><td>Structured logs, traces, cost tracking, SLO monitoring</td></tr>
-    <tr><td><strong>Culture &amp; Alignment</strong></td><td>26</td><td>Test harnesses, benchmarks, feedback loops, over-compliance detection</td></tr>
+    <tr><td><strong>Strategic Agent Ops</strong></td><td>19</td><td>Mission clarity, scope adherence, decision traceability</td></tr>
+    <tr><td><strong>Leadership &amp; Autonomy</strong></td><td>23</td><td>Governance, decision-making authority, autonomy boundaries</td></tr>
+    <tr><td><strong>Culture &amp; Alignment</strong></td><td>95</td><td>Safety culture, value alignment, compliance, social alignment</td></tr>
+    <tr><td><strong>Resilience</strong></td><td>55</td><td>Graceful degradation, circuit breakers, monitor bypass resistance</td></tr>
+    <tr><td><strong>Skills</strong></td><td>52</td><td>Tool mastery, evidence practices, testing, learning, DLP</td></tr>
   </tbody>
 </table>
 

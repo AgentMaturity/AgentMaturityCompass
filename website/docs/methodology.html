@@ -64,7 +64,7 @@
       <h4>Scoring Methodology</h4>
       <a href="#overview" class="active">Overview</a>
       <a href="#dimensions">5 Dimensions</a>
-      <a href="#question-bank">195 Questions</a>
+      <a href="#question-bank">244 Questions</a>
       <a href="#maturity-scale">L0–L5 Scale</a>
     </div>
     <div class="sidebar-section">
@@ -110,52 +110,52 @@
 
       <div class="dim-bar">
         <span class="dim-bar-label">Strategic Agent Ops</span>
-        <div class="dim-bar-track"><div class="dim-bar-fill" style="width: 13%"></div></div>
-        <span class="dim-bar-count">18 Qs</span>
-      </div>
-      <div class="dim-bar">
-        <span class="dim-bar-label">Skills</span>
-        <div class="dim-bar-track"><div class="dim-bar-fill" style="width: 28%"></div></div>
-        <span class="dim-bar-count">38 Qs</span>
-      </div>
-      <div class="dim-bar">
-        <span class="dim-bar-label">Resilience</span>
-        <div class="dim-bar-track"><div class="dim-bar-fill" style="width: 22%"></div></div>
-        <span class="dim-bar-count">30 Qs</span>
+        <div class="dim-bar-track"><div class="dim-bar-fill" style="width: 8%"></div></div>
+        <span class="dim-bar-count">19 Qs</span>
       </div>
       <div class="dim-bar">
         <span class="dim-bar-label">Leadership &amp; Autonomy</span>
-        <div class="dim-bar-track"><div class="dim-bar-fill" style="width: 20%"></div></div>
-        <span class="dim-bar-count">28 Qs</span>
+        <div class="dim-bar-track"><div class="dim-bar-fill" style="width: 9%"></div></div>
+        <span class="dim-bar-count">23 Qs</span>
       </div>
       <div class="dim-bar">
         <span class="dim-bar-label">Culture &amp; Alignment</span>
-        <div class="dim-bar-track"><div class="dim-bar-fill" style="width: 19%"></div></div>
-        <span class="dim-bar-count">26 Qs</span>
+        <div class="dim-bar-track"><div class="dim-bar-fill" style="width: 39%"></div></div>
+        <span class="dim-bar-count">95 Qs</span>
+      </div>
+      <div class="dim-bar">
+        <span class="dim-bar-label">Resilience</span>
+        <div class="dim-bar-track"><div class="dim-bar-fill" style="width: 23%"></div></div>
+        <span class="dim-bar-count">55 Qs</span>
+      </div>
+      <div class="dim-bar">
+        <span class="dim-bar-label">Skills</span>
+        <div class="dim-bar-track"><div class="dim-bar-fill" style="width: 21%"></div></div>
+        <span class="dim-bar-count">52 Qs</span>
       </div>
 
       <table>
         <thead><tr><th>Dimension</th><th>Questions</th><th>What It Measures</th></tr></thead>
         <tbody>
           <tr>
-            <td><strong>Strategic Agent Ops</strong></td><td>18</td>
+            <td><strong>Strategic Agent Ops</strong></td><td>19</td>
             <td>Mission clarity, scope adherence, decision traceability</td>
           </tr>
           <tr>
-            <td><strong>Skills</strong></td><td>38</td>
-            <td>Tool mastery, injection defense, DLP, least-privilege execution</td>
+            <td><strong>Leadership &amp; Autonomy</strong></td><td>23</td>
+            <td>Governance, decision-making authority, autonomy boundaries</td>
           </tr>
           <tr>
-            <td><strong>Resilience</strong></td><td>30</td>
+            <td><strong>Culture &amp; Alignment</strong></td><td>95</td>
+            <td>Safety culture, value alignment, compliance, social alignment</td>
+          </tr>
+          <tr>
+            <td><strong>Resilience</strong></td><td>55</td>
             <td>Graceful degradation, circuit breakers, monitor bypass resistance</td>
           </tr>
           <tr>
-            <td><strong>Leadership &amp; Autonomy</strong></td><td>28</td>
-            <td>Structured logs, traces, cost tracking, SLO monitoring</td>
-          </tr>
-          <tr>
-            <td><strong>Culture &amp; Alignment</strong></td><td>26</td>
-            <td>Test harnesses, benchmarks, feedback loops, over-compliance detection</td>
+            <td><strong>Skills</strong></td><td>52</td>
+            <td>Tool mastery, evidence practices, testing, learning, DLP</td>
           </tr>
         </tbody>
       </table>
@@ -165,7 +165,7 @@
       <p>The diagnostic bank is a signed, explicit rubric with hard guarantees:</p>
       <ul>
         <li>Exactly <strong>5 dimensions</strong></li>
-        <li>Exactly <strong>244 default questions</strong></li>
+        <li>Exactly <strong>244 default questions</strong>, with an optional 264-question lifecycle-expanded set</li>
         <li>Each question has <strong>6 rubric levels</strong> (0–5) with specific, measurable criteria</li>
         <li>Each question has explicit <strong>evidence mapping</strong> and minimum coverage logic</li>
         <li>The bank is <strong>cryptographically signed</strong> — tampering is detectable</li>
@@ -290,6 +290,12 @@ amc diagnostic render --agent my-agent --format md</code></pre>
         <li>The 84-point gap: agents self-report 100/100 → AMC observes 16/100. Evidence weighting closes this gap.</li>
       </ul>
 
+      <h3>Domain Proof Boundary</h3>
+      <p>Evidence integrity and answer correctness are separate claims. AMC receipts can prove what happened, but domain correctness requires a declared source-to-rule manifest and a passing <code>amc proof check</code> result. When correctness proof is missing, AMC reports <code>correctnessProofStatus: unsupported</code> instead of inflating the maturity score.</p>
+
+      <pre><code><span class="comment"># Emit a source-to-rule proof artifact</span>
+amc proof check --domain clinical --manifest rules.json --input claim.json --out claim.amcproof.json</code></pre>
+
       <!-- Anti-Cheat -->
       <h2 id="anti-cheat">Anti-Cheat Guarantees</h2>
       <div class="anti-cheat">
@@ -362,9 +368,9 @@ amc trust status               <span class="comment"># Trust posture overview</s
 
       <hr>
 
-      <!-- 75 Scoring Modules -->
-      <h2 id="scoring-modules">75 Scoring Modules</h2>
-      <p>Beyond the 195-question diagnostic, AMC includes research-backed scoring modules for deeper analysis:</p>
+      <!-- Scoring Modules -->
+      <h2 id="scoring-modules">Research-Backed Scoring Modules</h2>
+      <p>Beyond the 244-question default diagnostic, AMC includes research-backed scoring modules for deeper analysis:</p>
 
       <div class="card-grid">
         <div class="card">

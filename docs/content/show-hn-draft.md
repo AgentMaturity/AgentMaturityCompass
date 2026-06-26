@@ -18,7 +18,7 @@ What makes it different from eval tools like Promptfoo:
 
 - **Evidence-weighted scoring** — observed behavior (via transparent proxy) is weighted higher than self-reported claims. Cryptographic proof chains (Ed25519 + Merkle trees) make scores tamper-evident.
 
-- **235 diagnostic questions across 5 dimensions** — not pass/fail, but a maturity model (L0-L5) that gives you a concrete improvement path.
+- **244 default diagnostic questions across 5 dimensions** — not pass/fail, but a maturity model (L0-L5) that gives you a concrete improvement path. Teams can opt into the 264-question lifecycle set when they need deeper runtime and proof coverage.
 
 - **147 assurance packs** — adversarial testing for prompt injection, exfiltration, alignment faking, sandbagging, tool misuse, and more.
 
@@ -30,6 +30,6 @@ What makes it different from eval tools like Promptfoo:
 
 The entire trust stack is MIT licensed and free. Only the industry-specific domain packs are paid.
 
-Tech: TypeScript, Commander CLI, Ed25519 crypto, SQLite evidence ledger, 5,394 statically collected Vitest tests, MCP server for AI coding assistants.
+Tech: TypeScript, Commander CLI, Ed25519 crypto, SQLite evidence ledger, 8,150 statically collected Vitest tests, MCP server for AI coding assistants.
 
 I'd love feedback on the scoring model and whether the evidence-weighted approach resonates. Happy to answer any questions about the architecture.

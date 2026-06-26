@@ -14,7 +14,7 @@
   <a href="https://www.npmjs.com/package/agent-maturity-compass"><img src="https://img.shields.io/npm/v/agent-maturity-compass?labelColor=0a0a0a&color=4AEF79" alt="npm version" /></a>
   <a href="https://www.npmjs.com/package/agent-maturity-compass"><img src="https://img.shields.io/npm/dm/agent-maturity-compass?labelColor=0a0a0a&color=4AEF79" alt="downloads" /></a>
   <a href="https://github.com/AgentMaturity/AgentMaturityCompass/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/AgentMaturity/AgentMaturityCompass/ci.yml?branch=main&labelColor=0a0a0a&color=4AEF79&label=CI" alt="CI" /></a>
-  <a href="https://github.com/AgentMaturity/AgentMaturityCompass/actions/workflows/ci.yml"><img src="https://img.shields.io/badge/tests-5%2C394%20collected-4AEF79?labelColor=0a0a0a" alt="tests" /></a>
+  <a href="https://github.com/AgentMaturity/AgentMaturityCompass/actions/workflows/ci.yml"><img src="https://img.shields.io/badge/tests-8%2C150%20collected-4AEF79?labelColor=0a0a0a" alt="tests" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-4AEF79?labelColor=0a0a0a" alt="MIT" /></a>
 </p>
 
@@ -142,15 +142,15 @@ AMC is not an observability tool and not an eval harness. It is a **trust scorec
 
 ## 🧪 What AMC Tests
 
-### 240 Diagnostic Questions × 5 Dimensions
+### 244 Default Diagnostic Questions × 5 Dimensions
 
 | Dimension | Questions | What It Measures |
 |-----------|-----------|------------------|
-| Strategic Agent Operations | 16 | Mission clarity, scope adherence, cost governance, operational intelligence |
-| Agent Leadership | 20 | Governance structure, EU AI Act readiness, proactive risk management, business continuity |
-| Agent Culture | 94 | Feedback loops, forecast legitimacy, persona governance, UX honesty, over-compliance detection, social alignment |
-| Agent Resilience | 52 | Graceful degradation, circuit breakers, memory safety, threat resistance, fact/simulation boundaries |
-| Agent Skills | 53 | Tool mastery, injection defense, DLP, scenario traceability, replay safety |
+| Strategic Agent Operations | 19 | Mission clarity, scope adherence, cost governance, operational intelligence |
+| Leadership & Autonomy | 23 | Governance structure, EU AI Act readiness, proactive risk management, business continuity |
+| Culture & Alignment | 95 | Feedback loops, forecast legitimacy, persona governance, UX honesty, over-compliance detection, social alignment |
+| Resilience | 55 | Graceful degradation, circuit breakers, memory safety, threat resistance, fact/simulation boundaries |
+| Skills | 52 | Tool mastery, injection defense, DLP, scenario traceability, replay safety |
 
 ### 147 Assurance Packs
 
@@ -237,7 +237,7 @@ AMC Gateway ──── transparent proxy, agent doesn't know it's being watche
 Evidence Ledger ──── Ed25519 signatures + Merkle tree proof chains
     │
     ▼
-Scoring Engine ──── evidence-weighted diagnostics, 79 scoring modules, 147 assurance packs
+Scoring Engine ──── evidence-weighted diagnostics, research-backed scoring, 147 assurance packs
     │
     ▼
 AMC Studio ──── dashboard + API + CLI + reports
@@ -290,7 +290,7 @@ AMC is one trust stack with eight named product surfaces:
 npx agent-maturity-compass        # full score, no setup
 amc                               # full score after global install
 amc run                           # explicit 8-surface maturity run
-amc run --question-set lifecycle  # opt-in 260-question lifecycle expansion
+amc run --question-set lifecycle  # opt-in 264-question lifecycle expansion
 ```
 
 Need a fast pulse check for a demo or README badge? Use `amc quickscore --rapid` explicitly.
@@ -714,7 +714,7 @@ AMC is MIT licensed. We welcome contributions — especially new **assurance pac
 
 ```bash
 git clone https://github.com/AgentMaturity/AgentMaturityCompass.git
-cd AgentMaturityCompass && npm ci && npm test   # 5,394 collected Vitest tests
+cd AgentMaturityCompass && npm ci && npm test   # 8,150 collected Vitest tests
 ```
 
 **→ [CONTRIBUTING.md](CONTRIBUTING.md)** — includes guides for writing packs, mapping research papers, and adding adapters.
@@ -735,6 +735,6 @@ cd AgentMaturityCompass && npm ci && npm test   # 5,394 collected Vitest tests
 ---
 
 <p align="center">
-  <strong>244 default diagnostic questions + 20 lifecycle expansion questions · 147 assurance packs · 41 domain packs · 14 adapters · 79 scoring modules · 5,394 collected tests</strong><br>
+  <strong>244 default diagnostic questions + 20 lifecycle expansion questions · 147 assurance packs · 41 domain packs · 14 adapters · 1,144 CLI command paths</strong><br>
   <em>Stop trusting. Start verifying.</em>
 </p>

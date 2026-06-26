@@ -332,7 +332,9 @@ function showWelcome() {
       <div class="stat-grid">
         <div class="stat-card"><div class="num">${ALL_DOCS.length}</div><div class="label">Documentation Files</div></div>
         <div class="stat-card"><div class="num">${CATEGORIES.length}</div><div class="label">Categories</div></div>
-        <div class="stat-card"><div class="num">195</div><div class="label">Diagnostic Questions</div></div>
+        <div class="stat-card"><div class="num">244</div><div class="label">Default Questions</div></div>
+        <div class="stat-card"><div class="num">1,144</div><div class="label">CLI Paths</div></div>
+        <div class="stat-card"><div class="num">41</div><div class="label">Industry Packs</div></div>
         <div class="stat-card"><div class="num">14</div><div class="label">Framework Adapters</div></div>
       </div>
 

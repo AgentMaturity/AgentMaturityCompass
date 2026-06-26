@@ -22,8 +22,10 @@ amc
 ## Key Concepts
 - L0-L5 maturity scale based on execution evidence
 - Ed25519 + Merkle tree cryptographic proof chains
-- 240 core diagnostic questions, 5 trust dimensions
+- 244 default diagnostic questions across 5 trust dimensions, plus a 264-question lifecycle-expanded set
 - 14 framework adapters (LangChain, CrewAI, AutoGen, etc.)
+- 1,144 public CLI command paths
+- Domain Proof Lane with amcproof artifacts for source-to-rule correctness checks
 - Evidence trust tiers: SELF_REPORTED (0.4x), OBSERVED (1.0x), CRYPTOGRAPHIC (1.0x)
 
 ## Links

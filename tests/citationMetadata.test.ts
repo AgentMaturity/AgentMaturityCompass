@@ -42,8 +42,9 @@ describe("citation metadata", () => {
 
     expect(whitepaper).toContain("41 industry-specific sector packs");
     expect(whitepaper).toContain("600 sector-specific diagnostic questions");
-    expect(whitepaper).toContain("740 questions (140 core + 600 sector-specific)");
+    expect(whitepaper).toContain("844 questions (244 default + 600 sector-specific)");
     expect(whitepaper).not.toContain("40 industry-specific sector packs");
     expect(whitepaper).not.toContain("593 sector-specific diagnostic questions");
+    expect(whitepaper).not.toContain("740 questions (140 core + 600 sector-specific)");
   });
 });

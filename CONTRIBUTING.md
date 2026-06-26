@@ -26,7 +26,7 @@ git clone https://github.com/AgentMaturity/AgentMaturityCompass.git
 cd AgentMaturityCompass
 npm ci
 npm run build     # must compile with 0 TypeScript errors
-npm test          # 5,394 collected Vitest tests, all must pass in CI
+npm test          # 8,150 collected Vitest tests, all must pass in CI
 ```
 
 **Python platform:**
@@ -416,9 +416,9 @@ src/
 │   └── packs/          # 147 attack packs (one file each)
 ├── cli.ts              # CLI entry point (~15K lines)
 ├── dashboard/          # Studio UI (static HTML/CSS/JS)
-├── diagnostic/         # Question bank (235 questions)
-├── domain/             # Domain packs (40 packs, 7 sectors)
-├── scoring/            # 79 scoring modules
+├── diagnostic/         # Question bank (244 default, 264 lifecycle)
+├── domain/             # Domain packs (41 packs, 7 sectors)
+├── scoring/            # Research-backed scoring modules
 └── ...
 
 tests/                  # Vitest tests (mirrors src/ structure)

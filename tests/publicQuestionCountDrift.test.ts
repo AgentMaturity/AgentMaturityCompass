@@ -74,9 +74,11 @@ describe("public diagnostic question-count claims", () => {
     expect(readProjectFile("website/station-governance.html")).toContain("5 diagnostic packs · 71 questions");
   });
 
-  test("whitepaper keeps research-core framing explicit and separate from product runtime counts", () => {
+  test("whitepaper uses current product runtime counts for default and sector coverage", () => {
     const whitepaper = readProjectFile("whitepaper/AMC_WHITEPAPER_v1.md");
-    expect(whitepaper).toContain("140 core diagnostic questions plus 600 sector-specific questions");
-    expect(whitepaper).toContain("740 questions (140 core + 600 sector-specific)");
+    expect(whitepaper).toContain("244 default diagnostic questions plus 600 sector-specific questions");
+    expect(whitepaper).toContain("844 questions (244 default + 600 sector-specific)");
+    expect(whitepaper).not.toContain("140 core diagnostic questions plus 600 sector-specific questions");
+    expect(whitepaper).not.toContain("740 questions (140 core + 600 sector-specific)");
   });
 });

@@ -50,9 +50,10 @@ function initReveals(){
 }
 
 var PRODUCTS=[
-  {name:'amc score',title:'Score',headline:'Score trust before you ship',summary:'Evidence-weighted scoring across live execution behavior instead of brochure claims.',badges:['244 default questions','20 lifecycle expansion','instant full score'],info:[{label:'what it does',title:'Calculates the trust baseline',text:'Finds maturity gaps across governance, security, reliability, cost, and state.'},{label:'why it matters',title:'Kills documentation inflation',text:'Observed evidence carries full weight. Self-reported evidence is capped.'},{label:'output',title:'Actionable trust report',text:'Ships a scored report, signed evidence bundle, and remediation targets.'}],lines:[
+  {name:'amc score',title:'Score',headline:'Score trust before you ship',summary:'Evidence-weighted scoring across live execution behavior instead of brochure claims.',badges:['244 default questions','264 lifecycle set','instant full score'],info:[{label:'what it does',title:'Calculates the trust baseline',text:'Finds maturity gaps across governance, security, reliability, cost, proof, and state.'},{label:'why it matters',title:'Kills documentation inflation',text:'Observed evidence carries full weight. Self-reported evidence is capped.'},{label:'output',title:'Actionable trust report',text:'Ships a scored report, signed evidence bundle, proof status, and remediation targets.'}],lines:[
     {type:'code',label:'$ amc'},
     {label:'full score',value:'244 default questions · VALID'},
+    {label:'lifecycle option',value:'264 questions · runtime/proof/fleet'},
     {label:'overall maturity',value:'L3.2 · 64%'},
     {label:'security',value:'L4.0 · hardened execution'},
     {label:'governance',value:'L2.8 · approvals missing'},
@@ -91,9 +92,11 @@ var PRODUCTS=[
     {label:'notary timestamp',value:'2026-03-12T18:30:00Z'},
     {label:'status',value:'auditor-ready'}
   ]},
-  {name:'amc watch',title:'Watch',headline:'See trust drift before it hurts you',summary:'Monitors posture over time and surfaces anomalies, regressions, and risky changes.',badges:['drift alerts','timelines','anomaly review'],info:[{label:'what it does',title:'Tracks trust over time',text:'Continuously compares current behavior against prior baselines and thresholds.'},{label:'why it matters',title:'Most failures are regressions',text:'A safe launch can quietly rot after a few prompt or policy changes.'},{label:'output',title:'Timeline + anomaly report',text:'Shows which dimension slipped, when it changed, and why it matters.'}],lines:[
+  {name:'amc watch',title:'Watch',headline:'See trust drift before it hurts you',summary:'Monitors posture over time and surfaces anomalies, regressions, SLO breaches, and risky changes.',badges:['drift alerts','session receipts','SLO review'],info:[{label:'what it does',title:'Tracks trust over time',text:'Continuously compares current behavior against prior baselines, session receipts, and risk/cost/latency thresholds.'},{label:'why it matters',title:'Most failures are regressions',text:'A safe launch can quietly rot after a few prompt, route, policy, or resource changes.'},{label:'output',title:'Timeline + anomaly report',text:'Shows which dimension slipped, when it changed, which session proves it, and why it matters.'}],lines:[
     {type:'code',label:'$ amc watch --agent prod-agent-01 --since 7d'},
     {label:'score trend',value:'L3.2 → L2.9'},
+    {label:'session correlation',value:'complete · 18 signed refs'},
+    {label:'risk/cost/latency SLO',value:'WARN · p95 latency breached'},
     {label:'drift alert',value:'governance dimension declining'},
     {label:'anomalies',value:'2 detected'},
     {label:'scope expansion',value:'tool permissions widened at T+3d'},
@@ -111,8 +114,9 @@ var PRODUCTS=[
     {label:'remediation plan',value:'binder/gap-remediation.md'},
     {label:'status',value:'review-ready'}
   ]},
-  {name:'amc fleet',title:'Fleet',headline:'Govern many agents like an actual platform',summary:'Validates typed multi-agent topology, compares risk posture, and enforces org-wide trust baselines.',badges:['typed graph','fleet baselines','cross-agent compare'],info:[{label:'what it does',title:'Surfaces topology and weak links',text:'Puts every agent and handoff contract on one trust map so routing risk is visible.'},{label:'why it matters',title:'Your stack fails at the weakest boundary',text:'One unsafe handoff can negate ten well-governed agents.'},{label:'output',title:'Fleet scorecard + graph validation',text:'Shows per-agent maturity, graph digest, validation findings, threshold breaches, and policy coverage.'}],lines:[
+  {name:'amc fleet',title:'Fleet',headline:'Govern many agents like an actual platform',summary:'Validates typed multi-agent topology, compares risk posture, and enforces org-wide trust baselines.',badges:['fleet overview','trust graph','SLO status'],info:[{label:'what it does',title:'Surfaces topology and weak links',text:'Puts every agent and handoff contract on one trust map so routing risk is visible.'},{label:'why it matters',title:'Your stack fails at the weakest boundary',text:'One unsafe handoff can negate ten well-governed agents.'},{label:'output',title:'Fleet scorecard + graph validation',text:'Shows per-agent maturity, graph digest, validation findings, trust graph, threshold breaches, and policy coverage.'}],lines:[
     {type:'code',label:'$ amc fleet graph validate'},
+    {label:'fleet overview',value:'ready · 12 agents scored'},
     {label:'agents scanned',value:'12'},
     {label:'graph digest',value:'9d4f62c1e83a7b20'},
     {label:'fleet average',value:'L2.9'},
@@ -120,6 +124,7 @@ var PRODUCTS=[
     {label:'graph risks',value:'1 unsafe permission'},
     {label:'org policy',value:'strict'},
     {label:'focus area',value:'tighten approval contracts'},
+    {label:'trust graph',value:'mermaid export ready'},
     {label:'report',value:'.amc/fleet/acme-corp.md'}
   ]},
   {name:'amc passport',title:'Passport',headline:'Make trust portable between environments',summary:'Issues a portable, signed trust identity that can move between tools, teams, and environments.',badges:['portable identity','verifiable score','expiry controls'],info:[{label:'what it does',title:'Packages trust state',text:'Bundles score, evidence, validity window, and signature into a portable credential.'},{label:'why it matters',title:'Trust should travel with the agent',text:'Handoffs break when context and evidence get lost between systems.'},{label:'output',title:'Signed passport artifact',text:'Exports a machine-readable trust document with expiry and verification data.'}],lines:[

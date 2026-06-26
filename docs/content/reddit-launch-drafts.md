@@ -18,11 +18,11 @@ After months of building AI agents and having no reliable way to know if they we
 **Why not just use Promptfoo?**
 Different tools for different jobs. Promptfoo evaluates prompt quality. AMC answers "is this agent safe to ship?" with a structured maturity model and compliance documentation. You can even import Promptfoo results into AMC.
 
-**What's free:** Everything — the entire trust stack (Score, Shield, Enforce, Vault, Watch, Comply, Fleet, Passport), all 14 adapters, 235 diagnostic questions, CI gates. MIT licensed.
+**What's free:** Everything — the entire trust stack (Score, Shield, Enforce, Vault, Watch, Comply, Fleet, Passport), all 14 adapters, the 244-question default diagnostic bank, CI gates. MIT licensed.
 
 **What's paid:** 41 industry-specific domain packs for regulated verticals (healthcare, finance, education, logistics).
 
-5,394 statically collected Vitest tests. Would love feedback from this community.
+8,150 statically collected Vitest tests. Would love feedback from this community.
 
 GitHub: https://github.com/AgentMaturity/AgentMaturityCompass
 
@@ -40,13 +40,13 @@ Sharing a project I've been working on: an open-source framework for evaluating 
 - **Evidence trust tiers**: OBSERVED_HARDENED (1.1×), OBSERVED (1.0×), ATTESTED (0.8×), SELF_REPORTED (0.4×) — weights are applied to scoring based on evidence source quality
 - **Transparent gateway proxy**: intercepts agent-provider API calls without modifying agent code, collecting OBSERVED-tier evidence
 - **Cryptographic integrity**: Ed25519 signatures + Merkle tree proof chains on all assessment artifacts
-- **5-dimension maturity model**: 235 diagnostic questions across Strategic Ops, Leadership, Culture, Resilience, and Skills
-- **79 scoring modules** including calibration gap, gaming resistance, sleeper agent detection, alignment faking, over-compliance detection
+- **5-dimension maturity model**: 244 default diagnostic questions across Strategic Ops, Leadership, Culture, Resilience, and Skills, with an optional 264-question lifecycle set
+- **Research-backed scoring modules** including calibration gap, gaming resistance, sleeper agent detection, alignment faking, over-compliance detection
 - **Informed by recent research**: arXiv:2512.01797 (over-compliance / H-Neurons), arXiv:2503.09950 (monitor bypass resistance), arXiv:2512.06914 (trust-authorization synchronization)
 
 The framework generates compliance mappings for EU AI Act, ISO 42001, NIST AI RMF, and OWASP LLM Top 10.
 
-MIT licensed, 5,394 statically collected Vitest tests, TypeScript.
+MIT licensed, 8,150 statically collected Vitest tests, TypeScript.
 
 Paper references and methodology: https://agentmaturity.co/methodology.html
 GitHub: https://github.com/AgentMaturity/AgentMaturityCompass

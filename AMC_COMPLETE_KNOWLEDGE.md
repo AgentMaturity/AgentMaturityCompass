@@ -1,7 +1,7 @@
 # AMC Complete Knowledge Base
 ## Agent Maturity Compass — Full Codebase Reference
 
-**Compiled:** April 2026
+**Compiled:** April 2026; refreshed 2026-06-26 from repository verification
 **Repo:** /Users/sid/AgentMaturityCompass
 **GitHub:** AgentMaturity/AgentMaturityCompass
 **License:** MIT
@@ -16,14 +16,14 @@ AMC is an open-source, evidence-based framework for measuring, comparing, and co
 **Tagline:** "Score your agent. Red-team it. Ship it with proof."
 
 **Key Stats:**
-- 235 core diagnostic questions across 5 dimensions
+- 244 default diagnostic questions across 5 dimensions
 - 147 assurance packs (red-team scenarios)
-- 40 industry domain packs across 7 sectors
+- 41 industry domain packs across 7 sectors
 - 94 scoring modules
 - 14 framework adapters
-- 4,400+ tests (291 TS + 93 Python + 7 E2E)
-- 842 CLI commands
-- ~700+ TypeScript source files
+- Test counts drift quickly; repository verification on 2026-06-26 recorded 1033 Vitest files / 8150 tests
+- 1,144 public `amc ...` command paths in `docs/CLI_COMMAND_INVENTORY.md` as of 2026-06-26
+- ~700+ TypeScript source files plus late-stage/domain CLI registration splits
 
 ---
 
@@ -44,12 +44,12 @@ AMC is an open-source, evidence-based framework for measuring, comparing, and co
 
 | Dim | Name | Questions |
 |-----|------|-----------|
-| 1 | Strategic Agent Operations | 16 |
-| 2 | Agent Leadership | 20 |
-| 3 | Agent Culture | 94 |
-| 4 | Agent Resilience | 52 |
-| 5 | Agent Skills | 53 |
-| **Total** | | **235** |
+| 1 | Strategic Agent Operations | 19 |
+| 2 | Leadership & Autonomy | 23 |
+| 3 | Culture & Alignment | 95 |
+| 4 | Resilience | 55 |
+| 5 | Skills | 52 |
+| **Total** | | **244** |
 
 ### 2.3 Scoring Formula
 
@@ -89,8 +89,8 @@ Internal scores: 0-1 (canonical). Display scores: 0-100 (configurable).
 |------|-----------|----------|
 | Rapid | 5 sentinel | Ultra-fast pulse check |
 | Quick | 10 (2/layer) | Quick maturity snapshot |
-| Standard | 235 (full) | Complete assessment |
-| Deep | 235 (full) | Full with extended analysis |
+| Standard | 244 (default full) | Complete assessment |
+| Deep | 264 (lifecycle-expanded) | Full with extended lifecycle, runtime, proof, memory, and fleet analysis |
 
 ### 2.7 Risk Tiers (with auto-escalation)
 
@@ -99,7 +99,7 @@ Internal scores: 0-1 (canonical). Display scores: 0-100 (configurable).
 | Low | 50 | Default for low-risk agents |
 | Med | 100 | Score regression detected |
 | High | 150 | + security incidents |
-| Critical | 235 | Full assessment required |
+| Critical | 244 | Full default assessment required |
 
 ---
 
@@ -117,7 +117,7 @@ CLI (amc) → Studio API + Console → Workspace (.amc) + Ledger + Merkle
 
 ### 3.2 Ten Architectural Planes
 
-1. **Entry/Control** — CLI (src/cli.ts ~21K lines), Studio
+1. **Entry/Control** — CLI (`src/cli.ts` plus split registration files `src/cli-domain-product-commands.ts` and `src/cli-late-stage-commands.ts`), Studio
 2. **Trust/Identity/Auth** — Vault, Notary, Leases, RBAC, OIDC/SAML/SCIM
 3. **Evidence/Verifiability** — Ledger (SQLite), Receipts, Transparency/Merkle
 4. **Agent Traffic/Integration** — Gateway, Bridge, 14 Adapters
@@ -132,7 +132,7 @@ CLI (amc) → Studio API + Console → Workspace (.amc) + Ledger + Merkle
 
 | Surface | Purpose |
 |---------|---------|
-| **Score** | 235-question diagnostic, quickscore, maturity levels |
+| **Score** | 244-question default diagnostic, 264-question lifecycle expansion, quickscore, maturity levels |
 | **Shield** | 147 assurance packs, red-team testing |
 | **Enforce** | Runtime guardrails, circuit breakers, sandboxing |
 | **Vault** | Secrets, DLP, privacy, data residency |
@@ -149,7 +149,7 @@ CLI (amc) → Studio API + Console → Workspace (.amc) + Ledger + Merkle
 
 ### 4.1 Core Engine — src/diagnostic/ (37 files, ~8,500 lines)
 
-**questionBank.ts** (4,755 lines) — THE question database. 235 questions with 6-level gates. QuestionSeed → buildQuestion() with escalating evidence requirements per level. Question IDs: AMC-1.x through AMC-7.x plus AMC-COST, AMC-SPORT, AMC-OPS, AMC-EUAI, AMC-HOQ prefixes.
+**questionBank.ts** (4,755 lines) — THE default question database. 244 questions with 6-level gates. QuestionSeed → buildQuestion() with escalating evidence requirements per level. Question IDs: AMC-1.x through AMC-7.x plus AMC-COST, AMC-SPORT, AMC-OPS, AMC-EUAI, AMC-HOQ prefixes.
 
 **runner.ts** (1,688 lines) — Main diagnostic orchestrator. Interactive inquirer-based flow. Multi-model comparison. Imports from nearly every subsystem.
 
@@ -266,6 +266,13 @@ CLI (amc) → Studio API + Console → Workspace (.amc) + Ledger + Merkle
 **realtimeAssurance.ts** (708 lines) — 9 built-in live checks: cost-spike, budget-exceeded, high-latency, error-rate, tool-failure, model-misuse, hallucination-pattern, data-leakage, governance-bypass.
 **behavioralProfiler.ts** — Online learning (Welford's algorithm), anomaly detection (2.5σ threshold)
 **siemExporter.ts** — CEF, LEEF, JSON-LD, Splunk HEC, Elastic ECS. MITRE ATT&CK mapping.
+**overrideNearMissAnalytics.ts** — Generic Watch/Studio/API receipt path for human overrides, ignored escalations, near misses, repeated approvals, reason codes, trend-window proof, action taken, evidence refs, row hashes, clusters, and Watch alert projection.
+**traceFailureIndex.ts** — Trace failure classes include prompt errors, retrieval/tool/policy failures, latency/cost spikes, and human-review gaps; maps clusters into remediation/fixer RCA paths.
+
+### 4.7a Observability — src/observability/
+
+**sessionCorrelator.ts** — Builds cross-surface session-correlation receipts from AMC-owned normalized traces: stable session ID, surface event list, timestamp chain, missing-event checks, failure/risk counts, cost totals, p95 latency, evidence refs, hashes, and no-copy proof.
+**riskCostLatencySlo.ts** — Builds operating SLO receipts across Watch/Studio/API/Fleet: reliability objectives, risk incidents, token cost, latency, escalation rate, time windows, breach evidence, and alert routing.
 
 ### 4.8 Fleet — src/fleet/ (12 files)
 
@@ -342,6 +349,7 @@ SCIM: Full REST API for user/group provisioning (create/get/list/patch/replace/d
 IncidentState: OPEN → INVESTIGATING → MITIGATED → RESOLVED → POSTMORTEM.
 CausalRelationship: CAUSED, ENABLED, BLOCKED, MITIGATED, FIXED, CORRELATED.
 Signed causal edges with confidence + evidence refs. Auto-assembly from drift/freeze events.
+**incidentRegression.ts** — Generic incident-to-regression closure receipts requiring incident trace rows, generated regression-test receipts, validation-run receipts, passing validation status, closure evidence refs, computed closure status, receipt hash, and Watch alert projection when closure is blocked.
 
 ### 4.20 Passport — src/passport/ (14 files)
 
@@ -404,9 +412,9 @@ Share policies: benchmarks, certs, BOM, transparency roots, plugins. Merkle proo
 
 ---
 
-## 6. CLI ENTRY POINT — src/cli.ts (~21,000 lines)
+## 6. CLI ENTRY POINT — `src/cli.ts` + split command registration files
 
-Commander-based CLI importing from 100+ internal modules. Binary: `amc`.
+Commander-based CLI. Large late-stage/domain product registrations are split into `src/cli-domain-product-commands.ts` and `src/cli-late-stage-commands.ts`; binary remains `amc`.
 
 **Key Commands:**
 - `amc quickscore` — Quick 10-question assessment (--rapid for 5q, --auto for evidence-based)
@@ -483,10 +491,9 @@ Request Token → Present Token → Verify (signature, expiry, claims)
 ## 9. TEST SUITE
 
 ### 9.1 Scale
-- 291 TypeScript test files (~68,449 lines)
-- 93 Python test files (~21,187 lines)
-- 7 Playwright E2E specs
-- 4,400+ total tests
+- Counts drift quickly because the source-review wave adds many boundary suites.
+- Repository verification on 2026-06-26 recorded `npm test -- --reporter=dot` passing at 1033 files / 8150 tests.
+- 7 Playwright E2E specs remain part of the broader test surface.
 
 ### 9.2 Framework
 - TypeScript: Vitest (describe/it/expect)
@@ -545,17 +552,17 @@ Request Token → Present Token → Verify (signature, expiry, claims)
 **Core: FREE forever (MIT)**
 - Full trust stack (Score, Shield, Enforce, Vault, Watch, Fleet, Passport, Comply)
 - All 14 framework adapters
-- All 376+ CLI commands
-- 235 diagnostic questions
+- 1,144 public `amc ...` command paths as of 2026-06-26
+- 244 default diagnostic questions plus the 264-question lifecycle-expanded set
 - 147 assurance packs
 
-**Paid: Industry Packs only (40 domain packs)**
+**Paid: Industry Packs only (41 domain packs)**
 
 | Tier | Content |
 |------|---------|
 | Free/OSS | Full trust stack, all adapters |
 | Pro | + Selected industry packs for your verticals |
-| Enterprise | All 40 industry packs + priority support + custom |
+| Enterprise | All 41 industry packs + priority support + custom |
 
 **Promise:** MIT-licensed features will never become paid.
 
@@ -661,7 +668,7 @@ amc comply report
 
 # Build & test
 npm run build
-npm test                    # 4,400+ tests
+npm test                    # count drifts; repository verification recorded 1033 files / 8150 tests on 2026-06-26
 npm run typecheck
 npm run test:e2e            # Playwright
 ```

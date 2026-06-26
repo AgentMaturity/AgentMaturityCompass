@@ -201,7 +201,7 @@
 
     <section aria-labelledby="playground-title">
       <h1 id="playground-title">🧭 AMC Playground</h1>
-      <p class="subtitle">Test your AI agent's maturity. Score it, stress-test it, explore 75+ assurance packs. No install required.</p>
+      <p class="subtitle">Test your AI agent's maturity. Score it, stress-test it, explore 147 assurance packs. No install required.</p>
     </section>
 
     <section class="live-demo-panel" aria-labelledby="live-demo-title">
@@ -253,7 +253,7 @@
     <div class="tab-panel" id="panel-scenarios" role="tabpanel" aria-labelledby="tab-scenarios">
       <p class="dim-desc" style="margin-bottom:1.5rem">
         Test how your agent handles adversarial prompts. Pick a scenario, paste what your agent would respond, and get instant evaluation.
-        These are real attack patterns from AMC's 75+ assurance packs.
+        These are real attack patterns from AMC's 147 assurance packs.
       </p>
 
       <div class="scenario-stats" id="scenarioStats">
@@ -276,7 +276,7 @@
     <!-- ═══ TAB 3: ASSURANCE PACKS ═══ -->
     <div class="tab-panel" id="panel-packs" role="tabpanel" aria-labelledby="tab-packs">
       <p class="dim-desc" style="margin-bottom:1rem">
-        AMC ships 75+ assurance packs — automated test suites that probe your agent for real vulnerabilities.
+        AMC ships 147 assurance packs — automated test suites that probe your agent for real vulnerabilities.
         Each pack targets a specific threat vector, compliance requirement, or operational risk.
       </p>
       <input type="text" class="pack-search" id="packSearch" placeholder="Search packs... (e.g. injection, GDPR, hallucination)" oninput="filterPacks()">
@@ -1115,7 +1115,7 @@ document.getElementById('questions').addEventListener('keydown', function(e) {
 /* Tour */
 const TOUR_STEPS = [
   { target: '#playground-title', title: 'Welcome to AMC Playground', body: 'Your one-stop tool for understanding AI agent maturity. Three modes: assess, test, and explore.' },
-  { target: '.tab-bar', title: 'Three Ways to Explore', body: 'Assessment scores your agent on 15 questions. Scenario Lab lets you test adversarial prompts. Assurance Packs shows all 75+ test suites.' },
+  { target: '.tab-bar', title: 'Three Ways to Explore', body: 'Assessment scores your agent on 15 questions. Scenario Lab lets you test adversarial prompts. Assurance Packs shows all 147 test suites.' },
   { target: '#scorePanel', title: 'Real-Time Radar', body: 'As you rate your agent, the radar chart and scores update instantly across 5 dimensions.' },
   { target: '.dim-section', title: 'Rate Each Dimension', body: 'Click L1-L5 for each question. L1 = basic, L5 = industry-leading maturity.' },
   { target: '#actionButtons', title: 'Share Your Score', body: 'Export as JSON, copy a GitHub badge, or share a text summary. All client-side, no data sent anywhere.' },

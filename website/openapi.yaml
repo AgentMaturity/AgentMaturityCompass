@@ -545,6 +545,53 @@ components:
           items:
             type: object
 
+    DomainProofCheckRequest:
+      type: object
+      required: [domain, manifest, input]
+      properties:
+        domain:
+          type: string
+          description: Domain proof fixture or rule lane. Current public P0 support is governance.
+          example: governance
+        manifest:
+          type: string
+          description: Workspace-relative source-to-rule manifest path.
+          example: fixtures/domain-proof/toy-governance/source-rule-manifest.json
+        input:
+          type: string
+          description: Workspace-relative claim input JSON path.
+          example: examples/domain-proof/toy-governance/proven.json
+        outFile:
+          type: string
+          description: Optional workspace-relative path for the emitted amcproof artifact.
+          example: out/proven.amcproof.json
+
+    DomainProofStatus:
+      type: object
+      properties:
+        status:
+          type: string
+          example: available
+        lane:
+          type: string
+          example: Domain Proof Lane
+        supportedDomains:
+          type: array
+          items:
+            type: string
+        proofClasses:
+          type: array
+          items:
+            type: string
+            enum: [evidence_integrity, runtime_policy, domain_correctness]
+        correctnessProofStatuses:
+          type: array
+          items:
+            type: string
+            enum: [proven, disproven, unsupported, not_applicable]
+        nonClaim:
+          type: string
+
 tags:
   - name: health
     description: Health and readiness checks
@@ -558,6 +605,8 @@ tags:
     description: Compliance frameworks, policy packs, waivers, and regulatory scoring
   - name: evidence
     description: Evidence lifecycle — ingest, list, gaps, bundles, attestation
+  - name: proof
+    description: Domain Proof Lane — source-to-rule correctness checks with amcproof artifacts
   - name: imports
     description: Framework-neutral importers for traces, runs, graphs, configs, memory, evals, and benchmarks
   - name: strategy
@@ -651,6 +700,46 @@ paths:
                     type: number
                   dbStatus:
                     type: string
+
+  # ── Domain Proof Lane ──────────────────────────────────────────
+  /v1/proof/status:
+    get:
+      tags: [proof]
+      summary: Domain Proof Lane status
+      description: Returns supported proof classes, correctness statuses, supported domains, and the non-claim boundary for source-to-rule proof checks.
+      responses:
+        '200':
+          description: Domain Proof Lane status
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/DomainProofStatus'
+
+  /v1/proof/check:
+    post:
+      tags: [proof]
+      summary: Run source-to-rule proof check
+      description: Checks a claim against a declared source-to-rule manifest and emits a fail-closed amcproof artifact. Unsupported correctness never raises the AMC maturity score.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DomainProofCheckRequest'
+      responses:
+        '200':
+          description: Domain proof check result and optional artifact metadata
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '400':
+          description: Missing required paths or failed proof check
 
   # ── Score ──────────────────────────────────────────────────────
   /v1/score/status:

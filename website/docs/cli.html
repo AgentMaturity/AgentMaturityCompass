@@ -93,8 +93,8 @@
         The AMC CLI currently registers 1,144 command paths. Every command supports <code>--help</code> for inline documentation.
       </div>
 
-      <!-- Top 20 -->
-      <h2 id="top-commands">Top 20 Commands</h2>
+      <!-- Common workflow commands -->
+      <h2 id="top-commands">Common Workflow Commands</h2>
       <p>The commands you'll use most, in order of typical workflow:</p>
 
       <table>
@@ -111,14 +111,17 @@
           <tr><td><code>amc wrap</code></td><td>Wrap any agent CLI for evidence capture</td><td><code>amc wrap claude -- claude "hello"</code></td></tr>
           <tr><td><code>amc adapters run</code></td><td>Run adapter with lease + gateway routing</td><td><code>amc adapters run --adapter claude-cli -- claude</code></td></tr>
           <tr><td><code>amc run</code></td><td>Run full maturity diagnostic</td><td><code>amc run --agent my-agent --window 30</code></td></tr>
-          <tr><td><code>amc run --question-set lifecycle</code></td><td>Run the explicit 260-question lifecycle-expanded diagnostic</td><td><code>amc run --question-set lifecycle</code></td></tr>
+          <tr><td><code>amc run --question-set lifecycle</code></td><td>Run the explicit 264-question lifecycle-expanded diagnostic</td><td><code>amc run --question-set lifecycle</code></td></tr>
+          <tr><td><code>amc proof check</code></td><td>Check a claim against a declared source-to-rule manifest and emit an <code>amcproof</code> artifact</td><td><code>amc proof check --domain clinical --manifest rules.json --input claim.json</code></td></tr>
+          <tr><td><code>amc evidence finding-proofs</code></td><td>Trace findings to evidence, resources, receipts, and recommendations</td><td><code>amc evidence finding-proofs list</code></td></tr>
           <tr><td><code>amc report</code></td><td>Render diagnostic report by run ID, alias, prefix, or latest</td><td><code>amc report q1-assessment --share --public-base-url https://reports.example.com/amc</code></td></tr>
           <tr><td><code>amc badge</code></td><td>Generate maturity badge</td><td><code>amc badge --format html</code></td></tr>
           <tr><td><code>amc assurance run</code></td><td>Run red team assurance packs</td><td><code>amc assurance run --scope full</code></td></tr>
           <tr><td><code>amc compliance report</code></td><td>Generate compliance mapping report</td><td><code>amc compliance report --framework EU_AI_ACT</code></td></tr>
           <tr><td><code>amc domain assess</code></td><td>Assess against an industry domain</td><td><code>amc domain assess --domain health</code></td></tr>
           <tr><td><code>amc vault init</code></td><td>Initialize encrypted key vault</td><td><code>amc vault init</code></td></tr>
-          <tr><td><code>amc fleet report</code></td><td>Cross-agent fleet report</td><td><code>amc fleet report --window 30</code></td></tr>
+          <tr><td><code>amc fleet overview</code></td><td>Executive fleet summary with verdict, coverage, drift, and next actions</td><td><code>amc fleet overview --json</code></td></tr>
+          <tr><td><code>amc fleet trust-graph</code></td><td>Export delegation trust topology as Mermaid, DOT, or JSON</td><td><code>amc fleet trust-graph --format mermaid</code></td></tr>
           <tr><td><code>amc compare</code></td><td>Compare two diagnostic runs</td><td><code>amc compare &lt;runA&gt; &lt;runB&gt;</code></td></tr>
           <tr><td><code>amc down</code></td><td>Stop Studio</td><td><code>amc down</code></td></tr>
         </tbody>
@@ -251,7 +254,7 @@
 
       <!-- SCORING -->
       <div class="ns-toggle" id="ns-scoring" onclick="this.classList.toggle('open')">
-        <h3>Scoring &amp; Diagnostics <span class="cmd-count">18 commands</span></h3>
+        <h3>Scoring &amp; Diagnostics <span class="cmd-count">19 commands</span></h3>
       </div>
       <div class="ns-body">
         <table>
@@ -259,6 +262,7 @@
           <tbody>
             <tr><td><code>amc run --agent &lt;id&gt; --window &lt;d&gt;</code></td><td>Run maturity diagnostic</td></tr>
             <tr><td><code>amc run --question-set lifecycle</code></td><td>Opt into lifecycle, evidence, runtime, proof, memory, and fleet question coverage</td></tr>
+            <tr><td><code>amc proof check --manifest &lt;path&gt; --input &lt;path&gt;</code></td><td>Emit a fail-closed <code>amcproof</code> artifact for declared source-to-rule correctness checks</td></tr>
             <tr><td><code>amc report &lt;runId|alias|latest&gt;</code></td><td>Render report for a run, saved alias, or latest run</td></tr>
             <tr><td><code>amc report &lt;id&gt; --html r.html</code></td><td>Styled HTML report (print to PDF)</td></tr>
             <tr><td><code>amc report &lt;alias&gt; --share --public-base-url &lt;url&gt;</code></td><td>Static report share bundle with local and public URL manifest</td></tr>
@@ -316,7 +320,7 @@
 
       <!-- FLEET -->
       <div class="ns-toggle" id="ns-fleet" onclick="this.classList.toggle('open')">
-        <h3>Fleet &amp; Agents <span class="cmd-count">28 commands</span></h3>
+        <h3>Fleet &amp; Agents <span class="cmd-count">31 commands</span></h3>
       </div>
       <div class="ns-body">
         <table>
@@ -324,6 +328,7 @@
           <tbody>
             <tr><td><code>amc fleet init</code></td><td>Create and sign <code>fleet.yaml</code></td></tr>
             <tr><td><code>amc fleet report --window &lt;d&gt;</code></td><td>Cross-agent fleet report</td></tr>
+            <tr><td><code>amc fleet overview</code></td><td>One-shot executive fleet summary with verdict, coverage, drift, and next actions</td></tr>
             <tr><td><code>amc fleet graph write --file graph.json</code></td><td>Write typed nodes, handoffs, tools, contracts, policies, permissions, and invariants</td></tr>
             <tr><td><code>amc fleet graph show</code></td><td>Inspect the latest typed graph, digest, node/edge counts, and validation status</td></tr>
             <tr><td><code>amc fleet graph validate</code></td><td>Fail invalid graph contracts, unsafe permissions, cycles, and unbounded fan-out with actionable errors</td></tr>
@@ -337,6 +342,8 @@
             <tr><td><code>amc fleet trust-init</code></td><td>Initialize trust composition</td></tr>
             <tr><td><code>amc fleet trust-add-edge</code></td><td>Add delegation edge</td></tr>
             <tr><td><code>amc fleet trust-report</code></td><td>Trust composition report</td></tr>
+            <tr><td><code>amc fleet trust-graph --format mermaid|dot|json</code></td><td>Export delegation trust graph for review, docs, or audit packets</td></tr>
+            <tr><td><code>amc fleet slo define|list|status</code></td><td>Define and check fleet governance SLOs such as L3+ coverage thresholds</td></tr>
             <tr><td><code>amc fleet dag</code></td><td>Visualize delegation graph</td></tr>
             <tr><td><code>amc fleet contradictions</code></td><td>Detect cross-agent contradictions</td></tr>
             <tr><td><code>amc agent add</code></td><td>Add agent to fleet</td></tr>

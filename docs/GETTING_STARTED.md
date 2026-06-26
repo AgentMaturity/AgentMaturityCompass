@@ -98,9 +98,9 @@ AMC evaluates 5 dimensions with 244 default questions. The optional lifecycle ex
 
 1. **Strategic Agent Operations** (19 default questions) — Mission clarity, scope adherence, decision traceability
 2. **Leadership & Autonomy** (23 default questions) — Governance, decision-making authority, autonomy boundaries
-3. **Culture & Alignment** (94 default questions) — Safety culture, value alignment, compliance
+3. **Culture & Alignment** (95 default questions) — Safety culture, value alignment, compliance
 4. **Resilience** (55 default questions) — Graceful degradation, circuit breakers, monitor bypass resistance
-5. **Skills** (49 default questions) — Tool mastery, evidence practices, testing, learning
+5. **Skills** (52 default questions) — Tool mastery, evidence practices, testing, learning
 
 To run the expanded set:
 

@@ -12,7 +12,7 @@ AMC has one simple split:
 | Product | Free / Open Source | Industry Packs ($9.99/mo) | Enterprise |
 |---|---|---|---|
 | **Score** | ✅ Full | ✅ Full | ✅ Full |
-| **Shield** (86 assurance packs) | ✅ Full | ✅ Full | ✅ Full |
+| **Shield** (147 assurance packs) | ✅ Full | ✅ Full | ✅ Full |
 | **Enforce** | ✅ Full | ✅ Full | ✅ Full |
 | **Vault** | ✅ Full | ✅ Full | ✅ Full |
 | **Watch** | ✅ Full | ✅ Full | ✅ Full |
