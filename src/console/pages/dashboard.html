@@ -1,15 +1,51 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head><meta charset="utf-8"><title>AMC Studio</title>
-<style>body{font-family:system-ui;max-width:800px;margin:40px auto;padding:20px;background:#0a0a0a;color:#e0e0e0}
-h1{color:#4AEF79}a{color:#4AEF79}.card{background:#1a1a1a;border-radius:8px;padding:24px;margin:16px 0}
-</style></head>
-<body>
-<h1>AMC Studio</h1>
-<div class="card"><p>Overview of your AMC workspace — scores, compliance, fleet health.</p>
-<p><strong>Quick links:</strong></p>
-<ul><li><a href="compass.html">Compass (maturity radar)</a></li>
-<li><a href="assurance.html">Assurance Packs</a></li>
-<li><a href="compliance.html">Compliance Reports</a></li>
-<li><a href="diagnosticView.html">Diagnostic Details</a></li></ul></div>
-</body></html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Compass Console - AMC Studio</title>
+    <link rel="manifest" href="./assets/manifest.json" />
+    <link rel="stylesheet" href="./assets/styles.css" />
+  </head>
+  <body data-page="home">
+    <div class="shell">
+      <nav>
+        <h1>amc</h1>
+        <a href="./home">Home</a>
+        <a href="./login">Login</a>
+        <a href="./org">Org</a>
+        <a href="./compare">Compare</a>
+        <a href="./systemic">Systemic</a>
+        <a href="./commitments-org">Org Commitments</a>
+        <a href="./agent">Agent</a>
+        <a href="./evidence">Evidence</a>
+        <a href="./fleet">Fleet</a>
+        <a href="./runtime">Runtime</a>
+        <a href="./firewall">Firewall</a>
+        <a href="./equalizer">Equalizer</a>
+        <a href="./governor">Governor</a>
+        <a href="./toolhub">ToolHub</a>
+        <a href="./approvals">Approvals</a>
+        <a href="./users">Users</a>
+        <a href="./leases">Leases</a>
+        <a href="./budgets">Budgets</a>
+        <a href="./drift">Drift</a>
+        <a href="./benchmarks">Benchmarks</a>
+        <a href="./compliance">Compliance</a>
+        <a href="./outcomes">Outcomes</a>
+        <a href="./experiments">Experiments</a>
+        <a href="./integrations">Integrations</a>
+        <a href="./transparency">Transparency</a>
+        <a href="./policypacks">Policy Packs</a>
+        <a href="./industrypacks">Industry Packs</a>
+        <a href="./workorders">Work Orders</a>
+      </nav>
+      <main>
+        <div id="ucBanner" class="card banner muted">Unified Clarity loading...</div>
+        <p id="status" class="muted">Authentication required.</p>
+        <div id="app"></div>
+      </main>
+    </div>
+    <script type="module" src="./assets/app.js"></script>
+  </body>
+</html>

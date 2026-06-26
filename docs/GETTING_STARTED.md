@@ -231,7 +231,7 @@ amc score transparency-log
 
 ## Studio (Local Control Plane)
 
-Studio is AMC's local web UI for managing agents, viewing scores, and running evaluations.
+Studio is AMC's local web UI for managing agents, viewing scores, and running evaluations. macOS and Windows desktop packages also include the `Agent Maturity Compass Studio` launcher app, which opens this same local console in the system browser.
 
 ```bash
 # Start Studio
@@ -250,6 +250,18 @@ Studio gives you:
 - Evaluation runner
 - Policy editor
 - Audit log viewer
+
+Desktop package users can launch Studio without typing the CLI command:
+
+```bash
+# macOS package
+open "Agent Maturity Compass Studio.app"
+```
+
+```powershell
+# Windows package
+.\Agent Maturity Compass Studio.cmd
+```
 
 ---
 

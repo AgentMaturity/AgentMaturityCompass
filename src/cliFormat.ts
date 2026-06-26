@@ -3,10 +3,11 @@
  * Used by all CLI commands for consistent, world-class terminal output.
  */
 import chalk from "chalk";
+import { AMC_VISUAL_IDENTITY } from "./brand/visualIdentity.js";
 
 /* ── BRAND COLORS ────────────────────────────────── */
-const g = chalk.hex("#00ff41");      // primary green
-const g2 = chalk.hex("#00cc33");     // muted green
+const g = chalk.hex(AMC_VISUAL_IDENTITY.colors.accent);
+const g2 = chalk.hex(AMC_VISUAL_IDENTITY.colors.accentMuted);
 const amber = chalk.hex("#f59e0b");  // warning
 const red = chalk.hex("#ef4444");    // critical
 const dim = chalk.gray;              // secondary text
@@ -45,8 +46,8 @@ function repeat(ch: string, n: number): string {
 export function logo(): string {
   return [
     "",
-    g("  🧭 Agent Maturity Compass"),
-    dim("  The credit score for AI agents"),
+    g(`  ${AMC_VISUAL_IDENTITY.productName}`),
+    dim(`  ${AMC_VISUAL_IDENTITY.tagline}`),
     "",
   ].join("\n");
 }

@@ -1044,6 +1044,23 @@ async function renderHome() {
       </div>
     </section>
 
+    <section class="card studio-desktop-note">
+      <div>
+        <div class="studio-kicker">Desktop app</div>
+        <h3>Same AMC surface on macOS, Windows, CLI, and web.</h3>
+        <p class="muted">
+          The desktop launcher opens this local Studio console, while the CLI keeps the same evidence-first flow:
+          244 default questions, 264 lifecycle questions, 147 assurance packs, 41 Industry Packs, and 1,144 CLI paths.
+        </p>
+      </div>
+      <div class="row wrap">
+        <span class="pill ok">macOS launcher</span>
+        <span class="pill ok">Windows launcher</span>
+        <span class="pill muted">system browser</span>
+        <span class="pill muted">no bundled runtime</span>
+      </div>
+    </section>
+
     ${card("First Run", `
       <div class="row spaced wrap">
         <div>

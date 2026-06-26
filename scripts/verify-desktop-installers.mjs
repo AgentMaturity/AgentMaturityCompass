@@ -57,6 +57,12 @@ if (manifest.legalPosture?.includesAcademicPaperText !== false) {
 if (manifest.legalPosture?.includesArxivPdfContent !== false) {
   fail("manifest must state that arXiv/PDF content is not bundled");
 }
+if (manifest.legalPosture?.includesElectronRuntime !== false) {
+  fail("manifest must state that Electron is not bundled");
+}
+if (manifest.legalPosture?.includesBundledBrowserRuntime !== false) {
+  fail("manifest must state that a browser runtime is not bundled");
+}
 
 const tarballPath = resolve(root, manifest.npmTarball.path);
 if (!existsSync(tarballPath)) {
@@ -85,9 +91,36 @@ for (const pkg of manifest.packages ?? []) {
   }
   const base = `amc-${manifest.packageVersion}-${pkg.platform}`;
   const platformEntries = pkg.kind === "windows"
-    ? [`${base}/install.ps1`, `${base}/install.cmd`, `${base}/README.md`, `${base}/LEGAL_NOTICE.md`, `${base}/agent-maturity-compass-${manifest.packageVersion}.tgz`]
-    : [`${base}/install.sh`, `${base}/README.md`, `${base}/LEGAL_NOTICE.md`, `${base}/agent-maturity-compass-${manifest.packageVersion}.tgz`];
+    ? [
+      `${base}/install.ps1`,
+      `${base}/install.cmd`,
+      `${base}/Agent Maturity Compass Studio.ps1`,
+      `${base}/Agent Maturity Compass Studio.cmd`,
+      `${base}/README.md`,
+      `${base}/LEGAL_NOTICE.md`,
+      `${base}/agent-maturity-compass-${manifest.packageVersion}.tgz`
+    ]
+    : [
+      `${base}/install.sh`,
+      `${base}/README.md`,
+      `${base}/LEGAL_NOTICE.md`,
+      `${base}/agent-maturity-compass-${manifest.packageVersion}.tgz`,
+      ...(pkg.platform === "macos-universal"
+        ? [
+          `${base}/Agent Maturity Compass Studio.app/Contents/Info.plist`,
+          `${base}/Agent Maturity Compass Studio.app/Contents/PkgInfo`,
+          `${base}/Agent Maturity Compass Studio.app/Contents/MacOS/Agent Maturity Compass Studio`,
+          `${base}/Agent Maturity Compass Studio.app/Contents/Resources/README.md`
+        ]
+        : [])
+    ];
   assertArchiveContains(archivePath, platformEntries);
+  if (pkg.platform === "macos-universal" && !pkg.appLaunchers?.some((launcher) => launcher.kind === "macos-app-bundle")) {
+    fail("macOS package must declare the Studio app launcher in appLaunchers");
+  }
+  if (pkg.kind === "windows" && !pkg.appLaunchers?.some((launcher) => launcher.kind === "windows-command-launcher")) {
+    fail("Windows package must declare the Studio command launcher in appLaunchers");
+  }
 }
 
 if (requiredPlatforms.size > 0) {

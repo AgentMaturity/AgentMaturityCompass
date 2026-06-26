@@ -607,6 +607,7 @@ The full trust stack is **free and MIT licensed**. The only paid surface is Indu
 |------|----------|------------|
 | **Browser** | First-touch evaluation, demos, understanding scoring | [Web Playground](https://agentmaturity.co/playground.html) |
 | **CLI** | Real agent scoring, evidence capture, shareable outputs | `npx agent-maturity-compass` |
+| **Desktop Studio** | macOS and Windows users who want a local launcher app | [Desktop Packages](docs/DESKTOP_PACKAGES.md) |
 | **CI/CD** | Release gates, score thresholds, PR comments | [CI Templates](docs/CI_TEMPLATES.md) |
 | **Enterprise** | Self-hosted, managed deployment | [Deployment Options](docs/DEPLOYMENT_OPTIONS.md) |
 | **Cloud self-hosting** | AWS, GCP, Azure reference architectures | [Cloud Reference Architectures](docs/CLOUD_REFERENCE_ARCHITECTURES.md) |
@@ -635,7 +636,8 @@ The full trust stack is **free and MIT licensed**. The only paid surface is Indu
 | [Cloud Reference Architectures](docs/CLOUD_REFERENCE_ARCHITECTURES.md) | [Deployment Options](docs/DEPLOYMENT_OPTIONS.md) |
 | [Assurance Lab](docs/ASSURANCE_LAB.md) | [Domain Packs](docs/SECTOR_PACKS.md) |
 | [EU AI Act Compliance](docs/EU_AI_ACT_COMPLIANCE.md) | [Multi-Agent Trust](docs/MULTI_AGENT_TRUST.md) |
-| [Executive Overview](docs/EXECUTIVE_OVERVIEW.md) | [Board L3 Risk Memo](docs/BOARD_RISK_L3_MEMO.md) |
+| [Executive Overview](docs/EXECUTIVE_OVERVIEW.md) | [Desktop Packages](docs/DESKTOP_PACKAGES.md) |
+| [Board L3 Risk Memo](docs/BOARD_RISK_L3_MEMO.md) | [Install Guide](docs/INSTALL.md) |
 | [White Paper](whitepaper/AMC_WHITEPAPER_v1.md) | [Example Projects](examples/) |
 | [Web Playground](https://agentmaturity.co/playground.html) | [Docs Index](docs/INDEX.md) |
 
@@ -663,6 +665,17 @@ The full trust stack is **free and MIT licensed**. The only paid surface is Indu
 - [docs/COMMUNITY_SUPPORT.md](docs/COMMUNITY_SUPPORT.md) — community and support
 
 </details>
+
+### Desktop Studio apps
+
+AMC desktop packages now include `Agent Maturity Compass Studio` launchers for macOS and Windows. The launcher installs AMC from the included tarball when needed, starts `amc up --demo --no-open`, and opens the same local Studio console in the system browser. It does not bundle Electron or a browser runtime; Studio, CLI, and the website share the same dark terminal visual identity.
+
+```bash
+npm run package:desktop
+npm run package:desktop:verify
+```
+
+See [docs/DESKTOP_PACKAGES.md](docs/DESKTOP_PACKAGES.md) for archive contents and platform commands.
 
 ### Single-binary install (experimental)
 

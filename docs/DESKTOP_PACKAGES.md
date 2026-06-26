@@ -1,6 +1,6 @@
 # AMC Desktop Packages
 
-AMC can produce portable installer archives for macOS, Linux, and Windows from the local repository build.
+AMC can produce portable installer archives for macOS, Linux, and Windows from the local repository build. The macOS and Windows archives now include an `Agent Maturity Compass Studio` launcher app so users can start the local Studio console without memorizing CLI commands.
 
 ```bash
 npm run package:desktop
@@ -16,9 +16,16 @@ The command writes:
 
 Each archive contains the AMC npm tarball built from this repository, a platform installer, a README, and a legal notice.
 
+macOS and Windows archives also contain:
+
+- macOS: `Agent Maturity Compass Studio.app`
+- Windows: `Agent Maturity Compass Studio.cmd` and `Agent Maturity Compass Studio.ps1`
+
+Each launcher app installs AMC from the included tarball if `amc` is not already available, runs `amc up --demo --no-open`, and opens the same local Studio console at `http://127.0.0.1:3212/w/demo/console`. The launcher app does not bundle Electron, Chromium, WebKit content, or another browser runtime; it uses the system browser.
+
 ## User Install
 
-macOS and Linux:
+macOS and Linux install:
 
 ```bash
 tar -xzf amc-<version>-macos-universal.tar.gz
@@ -26,6 +33,12 @@ cd amc-<version>-macos-universal
 sh ./install.sh
 amc --version
 amc doctor
+```
+
+macOS Studio app launch:
+
+```bash
+open "Agent Maturity Compass Studio.app"
 ```
 
 Windows PowerShell:
@@ -38,6 +51,12 @@ amc --version
 amc doctor
 ```
 
+Launch the Studio app:
+
+```powershell
+.\Agent Maturity Compass Studio.cmd
+```
+
 ## Requirements
 
 - Node.js 20 or 22 LTS
@@ -47,12 +66,13 @@ These packages intentionally install AMC from a local npm tarball, so they work 
 
 ## Legal And Source Safety
 
-The desktop packages include AMC's own npm tarball and installer scripts only. They do not include:
+The desktop packages include AMC's own npm tarball, installer scripts, and lightweight launcher app scripts only. They do not include:
 
 - competitor implementation code
 - cloned GitHub repository source snapshots
 - academic paper full text
 - arXiv PDFs or extracted text
+- Electron, Chromium, WebKit content, or a bundled browser runtime
 
 Research artifacts may inform AMC-original implementation work, but copied source text or third-party code must not be placed into AMC packages unless a license review explicitly allows it.
 
@@ -67,4 +87,4 @@ npm run package:desktop
 npm run package:desktop:verify
 ```
 
-The verifier checks archive hashes, required platform files, npm tarball contents, and the manifest legal posture.
+The verifier checks archive hashes, required platform files, macOS and Windows launcher files, npm tarball contents, and the manifest legal posture.

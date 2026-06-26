@@ -396,6 +396,24 @@ main {
   min-height: 126px;
 }
 
+.studio-desktop-note {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  border-color: rgba(74,239,121,.18);
+}
+
+.studio-desktop-note h3 {
+  margin-bottom: 8px;
+}
+
+.studio-desktop-note p {
+  margin: 0;
+  max-width: 780px;
+  line-height: 1.65;
+}
+
 .studio-kpi .muted {
   font-family: var(--mono);
   font-size: 11px;
@@ -784,6 +802,10 @@ a:hover {
     grid-template-columns: 1fr;
   }
   .hero-panel {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .studio-desktop-note {
     align-items: flex-start;
     flex-direction: column;
   }
