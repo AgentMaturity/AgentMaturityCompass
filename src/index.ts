@@ -1222,6 +1222,26 @@ export {
   assembleFromBudgetExceed,
   autoDetectAndAssemble
 } from "./incidents/autoAssembly.js";
+export {
+  buildIncidentRegressionReceipt,
+  buildIncidentRegressionWatchAlerts,
+  type BuildIncidentRegressionReceiptInput,
+  type IncidentRegressionAlertSeverity,
+  type IncidentRegressionClosureStatus,
+  type IncidentRegressionFailureCluster,
+  type IncidentRegressionGeneratedTest,
+  type IncidentRegressionGeneratedTestReceipt,
+  type IncidentRegressionLiveTrends,
+  type IncidentRegressionReceipt,
+  type IncidentRegressionReceiptStatus,
+  type IncidentRegressionTraceIndex,
+  type IncidentRegressionTraceIndexEntry,
+  type IncidentRegressionTraceRow,
+  type IncidentRegressionValidationRun,
+  type IncidentRegressionValidationRunReceipt,
+  type IncidentRegressionValidationStatus,
+  type IncidentRegressionWatchAlert
+} from "./incidents/incidentRegression.js";
 
 // Enhanced CGX Edge Semantics & Risk Propagation
 export {
