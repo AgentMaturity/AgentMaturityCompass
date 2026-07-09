@@ -9,9 +9,11 @@ Scope:
 - intended for local/internal use, not internet-facing provider compatibility
 
 Auth and stability:
-- this surface is rate-limited and IP-filtered by Studio, but currently not RBAC-gated
-- treat as internal; keep Studio network-restricted
-- programmatic keys can be managed locally with `amc api key create`, `amc api key list`, and `amc api key revoke`; the secret is shown only on creation and the local store keeps hashes plus public metadata under `.amc/auth/api-keys.json`
+- this surface is rate-limited and IP-filtered by Studio
+- protected routes require a signed Studio session with `VIEWER`, `OPERATOR`, `APPROVER`, `AUDITOR`, or `OWNER`, or the bootstrap `x-amc-admin-token`; agent and lease credentials cannot access internal `/api/v1` routes
+- only the explicit public compatibility paths in `PUBLIC_API_V1_PATHS` bypass Studio auth
+- treat the surface as internal and keep Studio network-restricted
+- `amc api key create`, `amc api key list`, and `amc api key revoke` manage a local hashed key lifecycle, but those keys are not an accepted Studio HTTP auth carrier in the current runtime
 
 Response envelope:
 - most `/api/v1` routes return success as `{ "ok": true, "data": ... }`

@@ -71,13 +71,21 @@ POST /api/v1/proof/check
 
 `POST /api/v1/proof/check` body:
 
-```json
-{
-  "domain": "governance",
-  "manifest": "fixtures/domain-proof/toy-governance/source-rule-manifest.json",
-  "input": "examples/domain-proof/toy-governance/proven.json"
-}
+```bash
+jq -n \
+  --slurpfile manifest fixtures/domain-proof/toy-governance/source-rule-manifest.json \
+  --slurpfile input examples/domain-proof/toy-governance/proven.json \
+  '{domain:"governance",manifest:$manifest[0],input:$input[0]}' \
+  | curl --fail-with-body \
+      -H "x-amc-admin-token: $AMC_ADMIN_TOKEN" \
+      -H "content-type: application/json" \
+      --data-binary @- \
+      http://localhost:3000/api/v1/proof/check
 ```
+
+The HTTP API accepts schema-validated manifest and input objects. For the current toy lane, the manifest must also match AMC's canonical toy source text, clause hashes, review metadata, and source-to-rule structure; schema shape alone cannot produce `proven`. The API does not accept `outFile` and never writes a proof artifact to a caller-selected server path; use the artifact returned in the response. The local CLI remains file-oriented and supports `--out`.
+
+For compatibility, HTTP path strings are temporarily accepted only under the built-in `fixtures/domain-proof/` manifest root and `examples/domain-proof/` input root. Absolute paths, traversal, non-proof workspace paths, files larger than 1 MiB, and symlinks escaping either realpath-checked root fail closed. Legacy path mode is deprecated and returns `requestMode: "legacy_fixture_path"` plus migration guidance.
 
 The response includes:
 
@@ -90,6 +98,15 @@ The response includes:
 - `artifactHash`
 - explicit `nonClaim`
 - mapped AMC surfaces
+- `requestMode`: `inline_json` or deprecated `legacy_fixture_path`
+
+## API security and migration
+
+The API contract changed on 2026-07-10 without changing Score methodology `2026.07.10-r221`: scoring, proof results, and artifact hashes are unchanged. The change closes a server filesystem boundary.
+
+API clients should migrate from path strings to inline JSON objects. Remove `outFile` from HTTP requests and persist the returned `artifact` on the client side when needed. CLI scripts do not need to migrate.
+
+Rejected requests return bounded errors. AMC does not echo host paths, attempted file names, file contents, or raw parser errors from this route.
 
 ## Open Compass Standard
 

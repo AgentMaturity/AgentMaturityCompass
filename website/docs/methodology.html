@@ -299,7 +299,7 @@ amc diagnostic render --agent my-agent --format md</code></pre>
       <p>Evidence integrity and answer correctness are separate claims. AMC receipts can prove what happened, but domain correctness requires a declared source-to-rule manifest and a passing <code>amc proof check</code> result. When correctness proof is missing, AMC reports <code>correctnessProofStatus: unsupported</code> instead of inflating the maturity score.</p>
 
       <pre><code><span class="comment"># Emit a source-to-rule proof artifact</span>
-amc proof check --domain clinical --manifest rules.json --input claim.json --out claim.amcproof.json</code></pre>
+amc proof check --domain governance --manifest fixtures/domain-proof/toy-governance/source-rule-manifest.json --input examples/domain-proof/toy-governance/proven.json --out claim.amcproof.json</code></pre>
 
       <!-- Anti-Cheat -->
       <h2 id="anti-cheat">Anti-Cheat Guarantees</h2>

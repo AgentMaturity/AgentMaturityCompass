@@ -112,7 +112,7 @@
           <tr><td><code>amc adapters run</code></td><td>Run adapter with lease + gateway routing</td><td><code>amc adapters run --adapter claude-cli -- claude</code></td></tr>
           <tr><td><code>amc run</code></td><td>Run full maturity diagnostic</td><td><code>amc run --agent my-agent --window 30</code></td></tr>
           <tr><td><code>amc run --question-set lifecycle</code></td><td>Run the explicit 264-question lifecycle-expanded diagnostic</td><td><code>amc run --question-set lifecycle</code></td></tr>
-          <tr><td><code>amc proof check</code></td><td>Check a claim against a declared source-to-rule manifest and emit an <code>amcproof</code> artifact</td><td><code>amc proof check --domain clinical --manifest rules.json --input claim.json</code></td></tr>
+          <tr><td><code>amc proof check</code></td><td>Check a claim against a declared source-to-rule manifest and emit an <code>amcproof</code> artifact</td><td><code>amc proof check --domain governance --manifest fixtures/domain-proof/toy-governance/source-rule-manifest.json --input examples/domain-proof/toy-governance/proven.json</code></td></tr>
           <tr><td><code>amc evidence finding-proofs</code></td><td>Trace findings to evidence, resources, receipts, and recommendations</td><td><code>amc evidence finding-proofs list</code></td></tr>
           <tr><td><code>amc report</code></td><td>Render diagnostic report by run ID, alias, prefix, or latest</td><td><code>amc report q1-assessment --share --public-base-url https://reports.example.com/amc</code></td></tr>
           <tr><td><code>amc badge</code></td><td>Generate maturity badge</td><td><code>amc badge --format html</code></td></tr>

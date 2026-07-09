@@ -1,5 +1,6 @@
-import { readFileSync, writeFileSync } from "node:fs";
+import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
+import { writeFileAtomic } from "../utils/fs.js";
 import { checkDomainProof, type DomainProofCheckResult } from "./domainProofCheck.js";
 import type { DomainProofDomainId } from "./domainProofArtifact.js";
 
@@ -25,7 +26,7 @@ export function domainProofCheckCli(options: DomainProofCheckCliOptions): Domain
   });
 
   if (options.outFile) {
-    writeFileSync(resolve(options.workspace, options.outFile), `${JSON.stringify(out.artifact, null, 2)}\n`);
+    writeFileAtomic(resolve(options.workspace, options.outFile), `${JSON.stringify(out.artifact, null, 2)}\n`);
   }
 
   return out;

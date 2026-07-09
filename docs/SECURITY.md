@@ -102,6 +102,12 @@ Key rotation is supported via `amc vault rotate-keys`, which maintains key histo
 
 ## Network Security
 
+### Domain Proof API Filesystem Boundary
+
+`POST /api/v1/proof/check` evaluates schema-validated inline manifest and input objects without arbitrary server filesystem access. The current toy checker also requires the canonical AMC source text and manifest structure; a caller cannot substitute a merely schema-valid source and obtain `proven`. API-side `outFile` writes are disabled. Deprecated path-string compatibility is limited to the built-in `fixtures/domain-proof/` and `examples/domain-proof/` roots with lexical containment, realpath containment, regular-file, and 1 MiB checks. Absolute paths, traversal, non-proof workspace paths, and symlink escapes fail closed with errors that omit host paths and file names.
+
+The local `amc proof check` CLI remains file-oriented because it runs under the invoking user's operating-system authority. This does not widen the HTTP API boundary.
+
 ### Gateway (Evidence Capture)
 
 All LLM traffic is routed through the AMC Gateway, which:

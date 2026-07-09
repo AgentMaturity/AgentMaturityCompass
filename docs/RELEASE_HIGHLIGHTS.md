@@ -8,6 +8,7 @@ This page exists to show momentum without making users read the entire changelog
 - help visitors see that AMC is active
 
 ## Current highlights
+- Domain Proof API containment: inline schema-validated checks, realpath-confined deprecated fixtures, bounded errors, and no caller-selected server writes
 - Evidence-readiness contract across CLI, Studio, lifecycle artifacts, report sharing, and executive briefs: `VALID` proves artifact integrity, while `READY` governs claim eligibility
 - Unified AMC visual identity across the website, Studio, desktop launchers, Docs, CLI output, and GitHub README
 - 244-question default diagnostic bank with a 264-question lifecycle-expanded option

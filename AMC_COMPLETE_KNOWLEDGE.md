@@ -22,7 +22,7 @@ AMC is an open-source, evidence-based framework for measuring, comparing, and co
 - 41 industry domain packs across 7 sectors
 - 94 scoring modules
 - 14 framework adapters
-- Test counts drift quickly; repository verification on 2026-07-10 recorded 1,036 Vitest files / 8,175 tests
+- Test counts drift quickly; repository verification on 2026-07-10 recorded 1,037 Vitest files / 8,191 tests
 - 1,144 public `amc ...` command paths in `docs/CLI_COMMAND_INVENTORY.md` as of 2026-06-26
 - ~700+ TypeScript source files plus late-stage/domain CLI registration splits
 
@@ -152,7 +152,7 @@ CLI (amc) → Studio API + Console → Workspace (.amc) + Ledger + Merkle
 | **Passport** | Agent identity, trust tokens, cross-platform portability |
 | **Comply** | EU AI Act, ISO 42001, NIST AI RMF, SOC 2, OWASP |
 
-**Domain Proof Lane (cross-surface, not a ninth surface):** `src/domainProof/` separates evidence integrity, runtime policy, and domain correctness proof. It adds fail-closed `correctnessProofStatus`, `amcproof` artifacts, source-to-rule manifests, a local toy governance checker, `amc proof check`, and `/api/v1/proof/check`. It maps to Score, Shield, Enforce, Vault, Watch, Comply, Fleet, and Passport without inflating score when correctness is `unsupported`.
+**Domain Proof Lane (cross-surface, not a ninth surface):** `src/domainProof/` separates evidence integrity, runtime policy, and domain correctness proof. It adds fail-closed `correctnessProofStatus`, `amcproof` artifacts, source-to-rule manifests, a local toy governance checker, `amc proof check`, and `/api/v1/proof/check`. The HTTP route prefers inline schema-validated objects, requires the canonical AMC toy manifest rather than shape-only substitutes, prohibits caller-selected server output files, realpath-confines deprecated fixture paths, and redacts filesystem errors; the local CLI retains file input/output. It maps to Score, Shield, Enforce, Vault, Watch, Comply, Fleet, and Passport without inflating score when correctness is `unsupported`.
 
 ---
 
@@ -504,7 +504,7 @@ Request Token → Present Token → Verify (signature, expiry, claims)
 
 ### 9.1 Scale
 - Counts drift quickly because the source-review wave adds many boundary suites.
-- Repository verification on 2026-07-10 recorded `npm test -- --reporter=dot` passing at 1,036 files / 8,175 tests.
+- Repository verification on 2026-07-10 recorded `npm test -- --reporter=dot` passing at 1,037 files / 8,191 tests.
 - 7 Playwright E2E specs remain part of the broader test surface.
 
 ### 9.2 Framework
@@ -680,7 +680,7 @@ amc comply report
 
 # Build & test
 npm run build
-npm test                    # count drifts; repository verification recorded 1,036 files / 8,175 tests on 2026-07-10
+npm test                    # count drifts; repository verification recorded 1,037 files / 8,191 tests on 2026-07-10
 npm run typecheck
 npm run test:e2e            # Playwright
 ```

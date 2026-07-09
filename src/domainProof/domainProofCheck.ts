@@ -11,6 +11,10 @@ import {
   type DomainProofRuleRef,
 } from "./domainProofArtifact.js";
 import { sourceRuleManifestSchema, type SourceRuleManifest, verifySourceRuleManifest } from "./sourceRuleManifestSchema.js";
+import {
+  buildToyGovernanceSourceRuleManifest,
+  TOY_GOVERNANCE_SOURCE_RULES,
+} from "./toyGovernanceRules.js";
 
 export const DOMAIN_PROOF_CHECK_SURFACES: AMCSurfaceName[] = ["Enforce", "Comply", "Score", "Vault", "Watch"];
 
@@ -19,9 +23,9 @@ export const domainProofCheckInputSchema = z.object({
   facts: z.object({
     age: z.number().int().optional(),
     residency: z.string().optional(),
-  }).default({}),
+  }).strict().default({}),
   evidenceRefs: z.array(z.string().min(1)).default([]),
-});
+}).strict();
 
 export type DomainProofCheckInput = z.infer<typeof domainProofCheckInputSchema>;
 export type DomainProofCheckResultStatus = "proven" | "disproven" | "unsupported";
@@ -151,7 +155,9 @@ export function checkDomainProof(params: {
   generatedTs?: number;
 }): DomainProofCheckResult {
   const manifest = sourceRuleManifestSchema.parse(params.manifest);
-  const manifestVerification = verifySourceRuleManifest(manifest);
+  const manifestVerification = verifySourceRuleManifest(manifest, {
+    sourceText: TOY_GOVERNANCE_SOURCE_RULES,
+  });
   if (!manifestVerification.ok) {
     throw new Error(`source manifest failed verification: ${manifestVerification.errors.join("; ")}`);
   }
@@ -160,6 +166,12 @@ export function checkDomainProof(params: {
   }
   if (params.domain !== "governance" || manifest.manifestId !== "srcmanifest_toy_governance_001") {
     throw new Error("P0 Domain Proof Lane only supports the local toy governance manifest");
+  }
+  const canonicalManifest = buildToyGovernanceSourceRuleManifest({
+    retrievedAt: manifest.retrievedAt,
+  });
+  if (canonicalize(manifest) !== canonicalize(canonicalManifest)) {
+    throw new Error("source manifest does not match the canonical toy governance fixture");
   }
 
   const input = domainProofCheckInputSchema.parse(params.input);

@@ -14,7 +14,7 @@ export const sourceRuleClauseSchema = z.object({
   dependencies: z.array(z.string().min(1)).default([]),
   exceptions: z.array(z.string().min(1)).default([]),
   clauseHash: z.string().length(64),
-});
+}).strict();
 
 export const sourceRuleReviewSchema = z.object({
   status: z.enum(["pending", "reviewed", "rejected"]),
@@ -22,7 +22,7 @@ export const sourceRuleReviewSchema = z.object({
   reviewedAt: z.string().min(1),
   notes: z.string().min(1).optional(),
   nonLegalDisclaimer: z.string().min(1),
-});
+}).strict();
 
 export const sourceRuleManifestSchema = z.object({
   v: z.literal(1),
@@ -40,8 +40,8 @@ export const sourceRuleManifestSchema = z.object({
     sourceClauseCount: z.number().int().min(0),
     formalizedCount: z.number().int().min(0),
     reviewedCount: z.number().int().min(0),
-  }),
-});
+  }).strict(),
+}).strict();
 
 export type SourceRuleClause = z.infer<typeof sourceRuleClauseSchema>;
 export type SourceRuleManifest = z.infer<typeof sourceRuleManifestSchema>;

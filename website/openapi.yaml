@@ -663,26 +663,125 @@ components:
           items:
             type: object
 
+    DomainProofSourceRuleManifest:
+      type: object
+      additionalProperties: false
+      required: [v, manifestId, domainId, jurisdiction, sourceTitle, sourceUrl, sourceHash, effectiveDate, retrievedAt, clauses, review, proofCoverage]
+      properties:
+        v:
+          type: integer
+          const: 1
+        manifestId:
+          type: string
+          pattern: '^srcmanifest_[A-Za-z0-9_-]{3,}$'
+        domainId:
+          type: string
+          enum: [health, education, environment, mobility, governance, technology, wealth]
+        jurisdiction:
+          type: string
+        sourceTitle:
+          type: string
+        sourceUrl:
+          type: string
+        sourceHash:
+          type: string
+          pattern: '^[a-f0-9]{64}$'
+        effectiveDate:
+          type: string
+          format: date
+        retrievedAt:
+          type: string
+        clauses:
+          type: array
+          minItems: 1
+          items:
+            type: object
+            additionalProperties: false
+            required: [clauseId, sourceSpan, formalClauseId, owner, reviewer, ambiguityFlags, staleAfter, dependencies, exceptions, clauseHash]
+            properties:
+              clauseId: { type: string }
+              sourceSpan: { type: string }
+              formalClauseId: { type: string }
+              owner: { type: string }
+              reviewer: { type: string }
+              ambiguityFlags:
+                type: array
+                items: { type: string }
+              staleAfter: { type: string, format: date }
+              dependencies:
+                type: array
+                items: { type: string }
+              exceptions:
+                type: array
+                items: { type: string }
+              clauseHash:
+                type: string
+                pattern: '^[a-f0-9]{64}$'
+        review:
+          type: object
+          additionalProperties: false
+          required: [status, reviewerRole, reviewedAt, nonLegalDisclaimer]
+          properties:
+            status:
+              type: string
+              enum: [pending, reviewed, rejected]
+            reviewerRole: { type: string }
+            reviewedAt: { type: string }
+            notes: { type: string }
+            nonLegalDisclaimer: { type: string }
+        proofCoverage:
+          type: object
+          additionalProperties: false
+          required: [sourceClauseCount, formalizedCount, reviewedCount]
+          properties:
+            sourceClauseCount: { type: integer, minimum: 0 }
+            formalizedCount: { type: integer, minimum: 0 }
+            reviewedCount: { type: integer, minimum: 0 }
+
+    DomainProofCheckInput:
+      type: object
+      additionalProperties: false
+      required: [claimText]
+      properties:
+        claimText:
+          type: string
+          minLength: 1
+        facts:
+          type: object
+          additionalProperties: false
+          properties:
+            age: { type: integer }
+            residency: { type: string }
+        evidenceRefs:
+          type: array
+          items: { type: string, minLength: 1 }
+
     DomainProofCheckRequest:
       type: object
+      additionalProperties: false
       required: [domain, manifest, input]
       properties:
         domain:
           type: string
           description: Domain proof fixture or rule lane. Current public P0 support is governance.
+          enum: [governance]
           example: governance
         manifest:
-          type: string
-          description: Workspace-relative source-to-rule manifest path.
-          example: fixtures/domain-proof/toy-governance/source-rule-manifest.json
+          description: Inline source-to-rule manifest. The current toy lane requires AMC's canonical toy source and manifest structure, not only schema shape. Deprecated path strings are accepted only inside the built-in fixtures/domain-proof root and cannot follow symlinks outside it.
+          oneOf:
+            - $ref: '#/components/schemas/DomainProofSourceRuleManifest'
+            - type: string
+              deprecated: true
+              pattern: '^fixtures/domain-proof/'
+              example: fixtures/domain-proof/toy-governance/source-rule-manifest.json
         input:
-          type: string
-          description: Workspace-relative claim input JSON path.
-          example: examples/domain-proof/toy-governance/proven.json
-        outFile:
-          type: string
-          description: Optional workspace-relative path for the emitted amcproof artifact.
-          example: out/proven.amcproof.json
+          description: Inline proof-check input. Deprecated path strings are accepted only inside the built-in examples/domain-proof root and cannot follow symlinks outside it.
+          oneOf:
+            - $ref: '#/components/schemas/DomainProofCheckInput'
+            - type: string
+              deprecated: true
+              pattern: '^examples/domain-proof/'
+              example: examples/domain-proof/toy-governance/proven.json
 
     DomainProofStatus:
       type: object
@@ -707,6 +806,15 @@ components:
           items:
             type: string
             enum: [proven, disproven, unsupported, not_applicable]
+        preferredInputMode:
+          type: string
+          enum: [inline_json]
+        legacyFixturePaths:
+          type: string
+          enum: [deprecated]
+        apiFileWrites:
+          type: string
+          enum: [disabled]
         nonClaim:
           type: string
 
@@ -842,7 +950,7 @@ paths:
     post:
       tags: [proof]
       summary: Run source-to-rule proof check
-      description: Checks a claim against a declared source-to-rule manifest and emits a fail-closed amcproof artifact. Unsupported correctness never raises the AMC maturity score.
+      description: Checks inline manifest and input objects and returns a fail-closed amcproof artifact without reading or writing arbitrary server paths. Unsupported correctness never raises the AMC maturity score. Built-in fixture path strings remain temporarily available as a deprecated compatibility mode.
       requestBody:
         required: true
         content:
@@ -851,13 +959,13 @@ paths:
               $ref: '#/components/schemas/DomainProofCheckRequest'
       responses:
         '200':
-          description: Domain proof check result and optional artifact metadata
+          description: Domain proof check result, artifact, and request mode
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiResponse'
         '400':
-          description: Missing required paths or failed proof check
+          description: Invalid input, rejected legacy path, prohibited output-file request, or failed proof check
 
   # ── Score ──────────────────────────────────────────────────────
   /v1/score/status:

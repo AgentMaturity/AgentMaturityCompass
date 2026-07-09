@@ -91,9 +91,14 @@ describe("Domain Proof Lane proof check CLI/API", () => {
 
     expect(handled).toBe(true);
     expect(state.statusCode).toBe(200);
-    const json = JSON.parse(state.body) as { ok: boolean; data: ReturnType<typeof domainProofCheckCli> };
+    const json = JSON.parse(state.body) as {
+      ok: boolean;
+      data: ReturnType<typeof domainProofCheckCli> & { requestMode: string; deprecation?: string };
+    };
     expect(json.ok).toBe(true);
     expect(json.data.result).toBe("disproven");
     expect(json.data.artifact.counterexample?.brokenClauseId).toBe("TG-1");
+    expect(json.data.requestMode).toBe("legacy_fixture_path");
+    expect(json.data.deprecation).toContain("deprecated");
   });
 });
