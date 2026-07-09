@@ -1,4 +1,4 @@
-import { execSync } from 'child_process';
+import { execFileSync } from 'child_process';
 import path from 'path';
 import { query } from './db.js';
 
@@ -17,14 +17,14 @@ export interface VitestResult {
 export async function runAmcTests(pattern?: string): Promise<{ runId: number; result: VitestResult }> {
   const startTime = Date.now();
 
-  const args = ['npx', 'vitest', 'run'];
+  const args = ['vitest', 'run'];
   if (pattern) args.push(pattern);
 
   let stdout: string;
   let exitCode = 0;
 
   try {
-    stdout = execSync(args.join(' '), {
+    stdout = execFileSync(process.platform === 'win32' ? 'npx.cmd' : 'npx', args, {
       encoding: 'utf8',
       timeout: 300_000,
       cwd: AMC_ROOT,
@@ -61,7 +61,7 @@ function stripAnsi(s: string): string {
   return s.replace(/\x1b\[[0-9;]*m/g, '').replace(/[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g, '');
 }
 
-function parseVitestOutput(rawStdout: string, durationMs: number, exitCode: number): VitestResult {
+export function parseVitestOutput(rawStdout: string, durationMs: number, exitCode: number): VitestResult {
   const stdout = stripAnsi(rawStdout);
   // Parse "Test Files  X passed | Y failed (Z)"
   const filesMatch = stdout.match(/Test Files\s+(?:(\d+) failed\s*\|?\s*)?(\d+) passed/);
@@ -84,7 +84,7 @@ function parseVitestOutput(rawStdout: string, durationMs: number, exitCode: numb
   }
 
   return {
-    status: exitCode === 0 && testsFailed === 0 ? 'passed' : testsFailed > 0 ? 'failed' : 'error',
+    status: exitCode === 0 && totalTests > 0 && testsFailed === 0 ? 'passed' : testsFailed > 0 ? 'failed' : 'error',
     totalTests,
     passed: testsPassed,
     failed: testsFailed,

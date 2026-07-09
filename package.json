@@ -115,11 +115,11 @@
     "@types/better-sqlite3": "^7.6.12",
     "@types/node": "^25.5.0",
     "@types/semver": "^7.7.1",
-    "@vitest/coverage-v8": "^4.1.2",
+    "@vitest/coverage-v8": "^4.1.10",
     "date-fns": "^4.1.0",
-    "tsx": "^4.19.2",
+    "tsx": "^4.23.0",
     "typescript": "^6.0.2",
-    "vitest": "^4.1.1"
+    "vitest": "^4.1.10"
   },
   "author": {
     "name": "Sid",
