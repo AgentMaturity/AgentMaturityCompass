@@ -32,7 +32,7 @@ jobs:
         run: npm run build
 
       - name: Pack npm tarball
-        run: npm pack --json > /tmp/amc-pack.json
+        run: npm pack --ignore-scripts --json > /tmp/amc-pack.json
 
       - name: Install packed CLI globally
         shell: bash
