@@ -14,7 +14,7 @@
   <a href="https://www.npmjs.com/package/agent-maturity-compass"><img src="https://img.shields.io/npm/v/agent-maturity-compass?labelColor=0a0a0a&color=4AEF79" alt="npm version" /></a>
   <a href="https://www.npmjs.com/package/agent-maturity-compass"><img src="https://img.shields.io/npm/dm/agent-maturity-compass?labelColor=0a0a0a&color=4AEF79" alt="downloads" /></a>
   <a href="https://github.com/AgentMaturity/AgentMaturityCompass/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/AgentMaturity/AgentMaturityCompass/ci.yml?branch=main&labelColor=0a0a0a&color=4AEF79&label=CI" alt="CI" /></a>
-  <a href="https://github.com/AgentMaturity/AgentMaturityCompass/actions/workflows/ci.yml"><img src="https://img.shields.io/badge/tests-8%2C164%20passing-4AEF79?labelColor=0a0a0a" alt="tests" /></a>
+  <a href="https://github.com/AgentMaturity/AgentMaturityCompass/actions/workflows/ci.yml"><img src="https://img.shields.io/badge/tests-8%2C175%20passing-4AEF79?labelColor=0a0a0a" alt="tests" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-4AEF79?labelColor=0a0a0a" alt="MIT" /></a>
 </p>
 
@@ -39,7 +39,7 @@ npx agent-maturity-compass
 
 One command. No account. No API key. You get:
 
-1. **A trust score** — L0 (dangerous) to L5 (production-ready), based on execution evidence
+1. **A trust baseline** — L0 to L5 maturity, with evidence readiness shown separately
 2. **A gap analysis** — exactly what's weak, what's risky, and what's missing
 3. **Generated fixes** — guardrails, config patches, CI gates, and compliance artifacts
 
@@ -48,6 +48,8 @@ Then you keep going: add adversarial testing, continuous monitoring, regulatory 
 - **Business and compliance outputs** — KPI correlation, leaderboards, audit binders
 
 Works with **LangChain, CrewAI, AutoGen, OpenAI Agents SDK, Claude Code, Gemini, OpenClaw**, and more — with zero or near-zero integration friction.
+
+> A clean first run can produce a signed, `VALID` artifact while evidence readiness is `INSUFFICIENT_EVIDENCE`. That is intentional: signing proves artifact integrity, not evidence sufficiency. Capture a real agent run, rerun AMC, and use external claims only when readiness is `READY`.
 
 <details>
 <summary><strong>Why should I care?</strong></summary>
@@ -136,7 +138,7 @@ cd AgentMaturityCompass && npm ci && npm run build && npm link
 | **Cost** | Free, open source (MIT) | Per-seat/month pricing | Free to paid | Free but manual |
 | **Time to first result** | 60 seconds | Hours to days | Minutes to hours | Days to weeks |
 
-AMC is not an observability tool and not an eval harness. It is a **trust scorecard** — it tells you whether your agent is safe to ship, with cryptographic evidence, and generates the compliance artifacts to prove it.
+AMC is not an observability tool and not an eval harness. It is a **trust scorecard** that shows what the evidence supports, what remains unproven, and which controls or compliance mappings need work. AMC does not certify legal compliance.
 
 ---
 
@@ -259,9 +261,11 @@ AMC Studio ──── dashboard + API + CLI + reports
 | **L0** | Absent | No safety controls |
 | **L1** | Initial | Some intent, nothing operational |
 | **L2** | Developing | Works on happy path, breaks at edges |
-| **L3** | Defined | Repeatable, measurable, auditable (EU AI Act minimum) |
+| **L3** | Defined | Repeatable, measurable, auditable |
 | **L4** | Managed | Proactive, risk-calibrated, cryptographic proofs |
 | **L5** | Optimizing | Self-correcting, continuously verified |
+
+No AMC maturity level is a legal compliance threshold. Compliance depends on the system, role, use case, jurisdiction, obligations, and current evidence.
 
 ---
 
@@ -727,7 +731,7 @@ AMC is MIT licensed. We welcome contributions — especially new **assurance pac
 
 ```bash
 git clone https://github.com/AgentMaturity/AgentMaturityCompass.git
-cd AgentMaturityCompass && npm ci && npm test   # 1,035 files / 8,164 passing Vitest tests
+cd AgentMaturityCompass && npm ci && npm test   # 1,036 files / 8,175 passing Vitest tests
 ```
 
 **→ [CONTRIBUTING.md](CONTRIBUTING.md)** — includes guides for writing packs, mapping research papers, and adding adapters.

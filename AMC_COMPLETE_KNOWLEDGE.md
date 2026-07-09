@@ -1,7 +1,7 @@
 # AMC Complete Knowledge Base
 ## Agent Maturity Compass — Full Codebase Reference
 
-**Compiled:** April 2026; refreshed 2026-06-26 from repository verification
+**Compiled:** April 2026; refreshed 2026-07-10 from repository verification
 **Repo:** /Users/sid/AgentMaturityCompass
 **GitHub:** AgentMaturity/AgentMaturityCompass
 **License:** MIT
@@ -13,7 +13,8 @@
 
 AMC is an open-source, evidence-based framework for measuring, comparing, and communicating the operational maturity of AI agents. Think "credit score for AI agents." The core thesis: trust in autonomous systems must be earned through demonstrated behavior, not self-reported claims.
 
-**Tagline:** "Score your agent. Red-team it. Ship it with proof."
+**Product promise:** "Run one command. Get the full score. Fix the gaps."
+**Trust line:** "Evidence over claims."
 
 **Key Stats:**
 - 244 default diagnostic questions across 5 dimensions
@@ -21,7 +22,7 @@ AMC is an open-source, evidence-based framework for measuring, comparing, and co
 - 41 industry domain packs across 7 sectors
 - 94 scoring modules
 - 14 framework adapters
-- Test counts drift quickly; repository verification on 2026-07-10 recorded 1,035 Vitest files / 8,164 tests
+- Test counts drift quickly; repository verification on 2026-07-10 recorded 1,036 Vitest files / 8,175 tests
 - 1,144 public `amc ...` command paths in `docs/CLI_COMMAND_INVENTORY.md` as of 2026-06-26
 - ~700+ TypeScript source files plus late-stage/domain CLI registration splits
 
@@ -83,7 +84,17 @@ Internal scores: 0-1 (canonical). Display scores: 0-100 (configurable).
 | L4 | +artifact | 12 | 5 | 7 | any |
 | L5 | +test | 16 | 8 | 10 | OBSERVED only |
 
-### 2.6 Scoring Tiers
+### 2.6 Artifact Validity and Evidence Readiness
+
+AMC reports artifact status and evidence readiness independently:
+
+- `VALID | INVALID | UNSIGNED` describes the diagnostic artifact and seal.
+- `READY | LIMITED | INSUFFICIENT_EVIDENCE | UNVERIFIED` describes whether accepted evidence can support external claims.
+- A signed or `VALID` artifact proves integrity, not evidence sufficiency.
+- `READY` requires a verified artifact inside the trust boundary, non-zero accepted evidence, integrity index >= 0.60, and `HIGH TRUST` evidence.
+- Only `READY` is claim-eligible. AMC maturity levels and compliance mappings are not legal certification.
+
+### 2.7 Scoring Tiers
 
 | Tier | Questions | Use Case |
 |------|-----------|----------|
@@ -401,11 +412,12 @@ Share policies: benchmarks, certs, BOM, transparency roots, plugins. Merkle proo
 - ActionClass: 9 values (READ_ONLY, WRITE_LOW, WRITE_HIGH, DEPLOY, SECURITY, FINANCIAL, NETWORK_EXTERNAL, DATA_EXPORT, IDENTITY)
 - LayerName: 5 dimensions
 - TrustLabel: HIGH TRUST → UNRELIABLE
+- EvidenceReadinessStatus: READY | LIMITED | INSUFFICIENT_EVIDENCE | UNVERIFIED
 
 **Key Interfaces:**
 - EvidenceEvent (with chain hashing, blob refs)
 - DiagnosticQuestion, Gate, GateConstraint
-- QuestionScore, LayerScore, DiagnosticReport
+- QuestionScore, LayerScore, DiagnosticReport, DiagnosticEvidenceReadiness
 - AMCConfig (runtimes, security, supervise)
 - GatePolicy (minIntegrityIndex, minOverall, experiment requirements)
 - OutcomeEvent/Contract/MetricResult/Report
@@ -492,7 +504,7 @@ Request Token → Present Token → Verify (signature, expiry, claims)
 
 ### 9.1 Scale
 - Counts drift quickly because the source-review wave adds many boundary suites.
-- Repository verification on 2026-07-10 recorded `npm test -- --reporter=dot` passing at 1,035 files / 8,164 tests.
+- Repository verification on 2026-07-10 recorded `npm test -- --reporter=dot` passing at 1,036 files / 8,175 tests.
 - 7 Playwright E2E specs remain part of the broader test surface.
 
 ### 9.2 Framework
@@ -668,7 +680,7 @@ amc comply report
 
 # Build & test
 npm run build
-npm test                    # count drifts; repository verification recorded 1,035 files / 8,164 tests on 2026-07-10
+npm test                    # count drifts; repository verification recorded 1,036 files / 8,175 tests on 2026-07-10
 npm run typecheck
 npm run test:e2e            # Playwright
 ```

@@ -1497,6 +1497,7 @@ function renderInstantFullScore(
   const avgLevel = diagnosticAverageLevel(report);
   const score100 = Math.round((avgLevel / 5) * 100);
   const fullQuestionCount = report.questionScores.length;
+  const statusExplanation = explainDiagnosticReportStatus(report);
   if (opts.json) {
     const dimensions = Object.fromEntries(
       report.layerScores.map((layer) => [
@@ -1513,6 +1514,13 @@ function renderInstantFullScore(
       agentId: report.agentId,
       runId: report.runId,
       status: report.status,
+      artifactStatus: report.status,
+      evidenceStatus: statusExplanation.evidenceStatus,
+      artifactVerificationPassed: report.verificationPassed,
+      claimEligible: statusExplanation.strongClaimsAllowed,
+      claimBoundary: statusExplanation.claimBoundary,
+      nextEvidenceStep: statusExplanation.nextStep,
+      evidenceReadiness: report.evidenceReadiness,
       score: score100,
       level: `L${avgLevel.toFixed(2)}`,
       overallLevel: Number(avgLevel.toFixed(2)),
@@ -1546,10 +1554,15 @@ function renderInstantFullScore(
   console.log("");
   console.log(chalk.bold.hex('#4AEF79')("  AMC Full Score"));
   console.log(chalk.gray(`  Agent: ${report.agentId} | Run: ${report.runId}`));
-  console.log(chalk.gray(`  Generated in ${(elapsedMs / 1000).toFixed(1)}s | Questions: ${fullQuestionCount} | Status: ${report.status}`));
+  console.log(chalk.gray(`  Generated in ${(elapsedMs / 1000).toFixed(1)}s | Questions: ${fullQuestionCount}`));
+  console.log(chalk.gray(`  Artifact seal: ${report.status} | Evidence: ${statusExplanation.evidenceStatus} | Claims: ${statusExplanation.strongClaimsAllowed ? "ELIGIBLE" : "BLOCKED"}`));
   console.log("");
   console.log(chalk.bold(`  Overall: L${avgLevel.toFixed(2)} (${score100}/100) ${report.trustLabel}`));
   console.log(chalk.gray(`  Integrity: ${report.integrityIndex.toFixed(3)} | Evidence coverage: ${(report.evidenceCoverage * 100).toFixed(1)}%`));
+  console.log(chalk.gray(`  Claim boundary: ${statusExplanation.claimBoundary}`));
+  if (!statusExplanation.strongClaimsAllowed) {
+    console.log(chalk.yellow(`  Next evidence step: ${statusExplanation.nextStep}`));
+  }
   console.log("");
   for (const layer of report.layerScores) {
     const lv = Math.max(0, Math.min(5, Math.round(layer.avgFinalLevel)));
@@ -3033,12 +3046,14 @@ program
         ensureWorkspaceReadyForAgent(process.cwd(), agentId);
         const report = await runDiagnostic({ workspace: process.cwd(), window: "30d", agentId });
         if (opts.json) { console.log(JSON.stringify(report, null, 2)); return; }
+        const statusExplanation = explainDiagnosticReportStatus(report);
         const avgLevel = report.layerScores.length > 0
           ? report.layerScores.reduce((s, l) => s + l.avgFinalLevel, 0) / report.layerScores.length
           : 0;
         const overallLevel = Math.min(5, Math.floor(avgLevel));
         console.log(chalk.bold("\n🧭 AMC Auto-Score — from execution evidence"));
-        console.log(chalk.gray(`Agent: ${agentId} | Status: ${report.status} | Integrity: ${report.integrityIndex.toFixed(3)}`));
+        console.log(chalk.gray(`Agent: ${agentId} | Artifact: ${report.status} | Evidence: ${statusExplanation.evidenceStatus} | Claims: ${statusExplanation.strongClaimsAllowed ? "ELIGIBLE" : "BLOCKED"}`));
+        console.log(chalk.gray(`Integrity: ${report.integrityIndex.toFixed(3)} | ${statusExplanation.claimBoundary}`));
         console.log("");
         console.log(chalk.bold(`  Overall: L${overallLevel} (${report.trustLabel})`));
         console.log("");
@@ -5200,6 +5215,7 @@ program
             applyIndustryPackWeights: opts.industryPackWeights
           }
         );
+        const statusExplanation = explainDiagnosticReportStatus(report);
         const resourceManifest = writeEnforceResourceManifest({ workspace, agentId });
         const resourceRef = enforceResourceManifestRef(resourceManifest);
         const decisions = writeDecisionReceipts({
@@ -5261,6 +5277,13 @@ program
         if (opts.json) {
           console.log(JSON.stringify({
             status: report.status,
+            artifactStatus: report.status,
+            evidenceStatus: statusExplanation.evidenceStatus,
+            artifactVerificationPassed: report.verificationPassed,
+            claimEligible: statusExplanation.strongClaimsAllowed,
+            claimBoundary: statusExplanation.claimBoundary,
+            nextEvidenceStep: statusExplanation.nextStep,
+            evidenceReadiness: report.evidenceReadiness,
             runId: report.runId,
             agentId,
             score: report.integrityIndex,
@@ -5278,8 +5301,11 @@ program
           }, null, 2));
           return;
         }
-        console.log(chalk.hex('#4AEF79')(`Run ${report.runId} status: ${report.status}`));
+        console.log(chalk.hex('#4AEF79')(`Run ${report.runId} artifact: ${report.status} | evidence: ${statusExplanation.evidenceStatus} | claims: ${statusExplanation.strongClaimsAllowed ? "ELIGIBLE" : "BLOCKED"}`));
         console.log(`IntegrityIndex: ${report.integrityIndex.toFixed(3)} (${report.trustLabel})`);
+        if (!statusExplanation.strongClaimsAllowed) {
+          console.log(chalk.yellow(`Next evidence step: ${statusExplanation.nextStep}`));
+        }
         console.log(chalk.gray(`Lifecycle artifact: ${lifecycle.artifactPath}`));
         console.log(chalk.gray(`Finding proofs: ${findingProofs.proofsPath}`));
         console.log(chalk.gray(`Observability: ${observability.recordPath}`));
@@ -5370,45 +5396,53 @@ program
       const levelNum = Math.min(5, Math.floor(avgLayerScore));
       const level = `L${levelNum}`;
       const riskLabel = levelNum >= 4 ? "Low" : levelNum >= 3 ? "Moderate" : levelNum >= 2 ? "Elevated" : "High";
-      const riskColor = levelNum >= 4 ? "#22c55e" : levelNum >= 3 ? "#eab308" : "#ef4444";
+      const riskColor = levelNum >= 4 ? "#4AEF79" : levelNum >= 3 ? "#f59e0b" : "#ff3355";
       const date = new Date(report.ts).toISOString().split("T")[0];
       const layerRows = report.layerScores.map((l: any) => {
         const lLevel = Math.min(5, Math.floor(l.avgFinalLevel));
-        const lColor = lLevel >= 4 ? "#22c55e" : lLevel >= 3 ? "#eab308" : "#ef4444";
-        return `<tr><td>${l.layerName}</td><td style="color:${lColor};font-weight:bold">L${lLevel}</td><td>${l.avgFinalLevel.toFixed(1)}</td><td>${l.questionCount} questions</td></tr>`;
+        const lColor = lLevel >= 4 ? "#4AEF79" : lLevel >= 3 ? "#f59e0b" : "#ff3355";
+        return `<tr><td>${escapeReportHtml(String(l.layerName ?? ""))}</td><td style="color:${lColor};font-weight:bold">L${lLevel}</td><td>${Number(l.avgFinalLevel).toFixed(1)}</td><td>${Number(l.questionCount ?? 0)} questions</td></tr>`;
       }).join("\n");
       const gapRows = ((report as any).gaps ?? []).slice(0, 10).map((g: any) =>
-        `<tr><td>${g.questionId}</td><td>${g.currentLevel}→${g.targetLevel}</td><td>${g.narrative ?? ""}</td></tr>`
+        `<tr><td>${escapeReportHtml(String(g.questionId ?? ""))}</td><td>${Number(g.currentLevel ?? 0)}→${Number(g.targetLevel ?? 0)}</td><td>${escapeReportHtml(String(g.narrative ?? ""))}</td></tr>`
       ).join("\n");
       const aliasHtml = resolved.alias ? ` &nbsp;|&nbsp; <strong>Alias:</strong> <code>${escapeReportHtml(resolved.alias)}</code>` : "";
       return `<!DOCTYPE html>
-<html lang="en"><head><meta charset="utf-8"><title>AMC Report — ${report.agentId ?? "Agent"}</title>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>AMC Report — ${escapeReportHtml(String(report.agentId ?? "Agent"))}</title>
 <style>
-  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;max-width:800px;margin:40px auto;padding:0 20px;color:#1a1a1a;line-height:1.6}
-  h1{color:#0f172a;border-bottom:3px solid #4AEF79;padding-bottom:12px}
-  h2{color:#334155;margin-top:32px}
-  .score-box{background:#f8fafc;border:2px solid ${riskColor};border-radius:12px;padding:24px;text-align:center;margin:24px 0}
+  :root{--bg:#0a0a0a;--surface:#111111;--surface2:#1a1a1a;--text:#fff;--muted:#a0a0a0;--accent:#4AEF79;--border:rgba(255,255,255,.10)}
+  *{box-sizing:border-box}body{font-family:Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;max-width:860px;margin:40px auto;padding:0 20px;color:var(--text);background:var(--bg);line-height:1.6}
+  .brandline{display:flex;justify-content:space-between;gap:16px;margin-bottom:28px;padding:10px 0;border-top:1px solid rgba(74,239,121,.28);border-bottom:1px solid var(--border);font:700 12px 'Space Mono','SFMono-Regular',Consolas,monospace;color:var(--muted)}
+  .wordmark{color:var(--text)}.cursor{color:var(--accent)}
+  h1{color:var(--text);border-bottom:2px solid var(--accent);padding-bottom:12px;letter-spacing:0}
+  h2{color:var(--accent);margin-top:32px;font:700 14px 'Space Mono','SFMono-Regular',Consolas,monospace;text-transform:uppercase;letter-spacing:0}
+  code{font-family:'Space Mono','SFMono-Regular',Consolas,monospace;color:var(--accent)}
+  .score-box{background:var(--surface);border:2px solid ${riskColor};border-radius:8px;padding:24px;text-align:center;margin:24px 0}
   .score-box .level{font-size:48px;font-weight:bold;color:${riskColor}}
-  .score-box .label{font-size:14px;color:#64748b;margin-top:4px}
+  .score-box .label{font-size:14px;color:var(--muted);margin-top:4px}
   table{width:100%;border-collapse:collapse;margin:16px 0}
-  th,td{padding:8px 12px;border:1px solid #e2e8f0;text-align:left}
-  th{background:#f1f5f9;font-weight:600}
-  .risk{display:inline-block;padding:4px 12px;border-radius:6px;font-weight:bold;color:white;background:${riskColor}}
-  .status-note{background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;padding:14px 16px;margin:18px 0}
-  .footer{margin-top:40px;padding-top:16px;border-top:1px solid #e2e8f0;color:#94a3b8;font-size:12px}
-  @media print{body{margin:0;padding:20px}.score-box{break-inside:avoid}}
+  th,td{padding:8px 12px;border:1px solid var(--border);text-align:left}
+  th{background:var(--surface2);font:700 10px 'Space Mono','SFMono-Regular',Consolas,monospace;color:var(--accent);text-transform:uppercase}
+  .risk{display:inline-block;padding:4px 12px;border-radius:4px;font-weight:bold;color:#0a0a0a;background:${riskColor}}
+  .status-note{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:6px;padding:14px 16px;margin:18px 0}
+  .footer{margin-top:40px;padding-top:16px;border-top:1px solid var(--border);color:var(--muted);font-size:12px}
+  @media(max-width:640px){body{margin:20px auto}.brandline{flex-direction:column;gap:4px}th,td{padding:7px;font-size:12px}}
+  @media print{:root{--bg:#fff;--surface:#f7f7f7;--surface2:#efefef;--text:#111;--muted:#555;--border:#d1d5db}body{margin:0;padding:20px}.score-box{break-inside:avoid}.brandline{border-top-color:#111}}
 </style></head><body>
-<h1>🧭 Agent Maturity Compass — Executive Report</h1>
-<p><strong>Agent:</strong> ${report.agentId ?? "default"} &nbsp;|&nbsp; <strong>Date:</strong> ${date} &nbsp;|&nbsp; <strong>Run:</strong> <code>${resolved.resolvedRunId}</code>${aliasHtml}</p>
+<div class="brandline"><span class="wordmark">amc<span class="cursor">_</span> / report</span><span>Evidence over claims.</span></div>
+<h1>Agent Maturity Compass Report</h1>
+<p><strong>Agent:</strong> ${escapeReportHtml(String(report.agentId ?? "default"))} &nbsp;|&nbsp; <strong>Date:</strong> ${date} &nbsp;|&nbsp; <strong>Run:</strong> <code>${escapeReportHtml(resolved.resolvedRunId)}</code>${aliasHtml}</p>
 <div class="status-note">
-  <strong>Evidence Status:</strong> ${escapeReportHtml(report.status)} — ${escapeReportHtml(statusExplanation.label)}<br>
+  <strong>Artifact Status:</strong> ${escapeReportHtml(report.status)} — ${escapeReportHtml(statusExplanation.artifactLabel)}<br>
+  <strong>Evidence Readiness:</strong> ${escapeReportHtml(statusExplanation.evidenceStatus)} — ${escapeReportHtml(statusExplanation.readinessLabel)}<br>
+  <strong>Claim Eligible:</strong> ${statusExplanation.strongClaimsAllowed ? "YES" : "NO"}<br>
   <strong>Claim boundary:</strong> ${escapeReportHtml(statusExplanation.claimBoundary)}<br>
-  <strong>Next verification step:</strong> ${escapeReportHtml(statusExplanation.nextStep)}<br>
+  <strong>Next evidence step:</strong> ${escapeReportHtml(statusExplanation.nextStep)}<br>
   <strong>Share boundary:</strong> This static page was generated locally. Publishing, custody, access control, and distribution remain the workspace owner's responsibility.
 </div>
 <div class="score-box">
   <div class="level">${level}</div>
-  <div class="label">Maturity Level (${avgLayerScore.toFixed(1)}% weighted)</div>
+  <div class="label">Maturity Level (${avgLayerScore.toFixed(1)}/5 weighted)</div>
   <div style="margin-top:8px"><span class="risk">${riskLabel} Risk</span></div>
 </div>
 <h2>Dimension Scores</h2>
@@ -5420,9 +5454,13 @@ ${gapRows ? `<h2>Top Improvement Gaps</h2>
 ${gapRows}
 </tbody></table>` : ""}
 <h2>What This Means</h2>
-<p>${levelNum >= 3 ? "✅ This agent meets minimum EU AI Act requirements for high-risk AI systems. Suitable for production deployment with standard monitoring." :
-  levelNum >= 2 ? "⚠️ This agent has repeatable processes but gaps remain. Address identified gaps before production deployment." :
-  "❌ Significant governance gaps identified. Not recommended for production deployment without remediation."}</p>
+<p>${!statusExplanation.strongClaimsAllowed
+  ? "This maturity result is a local baseline, not a deployment or compliance claim. Collect and verify sufficient evidence before relying on it externally."
+  : levelNum >= 3
+    ? "The maturity evidence passes AMC's claim-readiness gate for this scope. Review applicable controls and operating risk before any production decision."
+    : levelNum >= 2
+      ? "The evidence is claim-ready, but material maturity gaps remain. Address them before production deployment."
+      : "The evidence is claim-ready and identifies significant governance gaps. Do not deploy without remediation."}</p>
 <h2>Next Steps</h2>
 <ol>
   <li>Run <code>amc guide --go</code> to generate framework-specific guardrails</li>
@@ -5491,11 +5529,13 @@ ${gapRows}
       }
       console.log(chalk.gray("  Date:         "), new Date(report.ts).toISOString().split("T")[0]);
       console.log(chalk.gray("  Maturity:     "), chalk.bold(level));
-      console.log(chalk.gray("  Overall Score:"), chalk.bold(`${typeof score === "number" ? score.toFixed(1) : score}%`));
+      console.log(chalk.gray("  Overall Score:"), chalk.bold(`${typeof score === "number" ? score.toFixed(1) : score}/5`));
       console.log(chalk.gray("  Risk Level:   "), riskColor(riskLabel));
-      console.log(chalk.gray("  Evidence:     "), `${report.status} — ${statusExplanation.label}`);
+      console.log(chalk.gray("  Artifact:     "), `${report.status} — ${statusExplanation.artifactLabel}`);
+      console.log(chalk.gray("  Evidence:     "), `${statusExplanation.evidenceStatus} — ${statusExplanation.readinessLabel}`);
+      console.log(chalk.gray("  Claims:       "), statusExplanation.strongClaimsAllowed ? "ELIGIBLE" : "BLOCKED");
       console.log(chalk.gray("  Claim Boundary:"), statusExplanation.claimBoundary);
-      console.log(chalk.gray("  Verify Next:  "), statusExplanation.nextStep);
+      console.log(chalk.gray("  Evidence Next:"), statusExplanation.nextStep);
       console.log("");
       console.log(chalk.bold("  What This Means"));
       console.log(chalk.gray("  ─────────────────"));
@@ -5503,16 +5543,18 @@ ${gapRows}
         0: "This agent has no governance controls. It should not be deployed in production.",
         1: "This agent has basic intent toward safety but lacks operational controls.",
         2: "This agent has repeatable processes but gaps remain in edge cases.",
-        3: "This agent meets minimum EU AI Act requirements. Suitable for production with monitoring.",
-        4: "This agent exceeds requirements with cryptographic proof chains. Audit-ready.",
-        5: "This agent is self-governing with continuous verification. Industry gold standard.",
+        3: "This agent has defined controls; production readiness still depends on scoped evidence and applicable requirements.",
+        4: "This agent has measured controls and strong proof coverage for the assessed scope.",
+        5: "This agent demonstrates continuously verified controls for the assessed scope.",
       };
-      console.log(`  ${meanings[levelNum] ?? meanings[0]}`);
+      console.log(`  ${statusExplanation.strongClaimsAllowed ? meanings[levelNum] ?? meanings[0] : "This score is a local baseline only because evidence is not claim-ready."}`);
       console.log("");
       console.log(chalk.bold("  Recommendation"));
       console.log(chalk.gray("  ─────────────────"));
-      if (levelNum >= 3) {
-        console.log("  ✅ This agent is suitable for production deployment with standard monitoring.");
+      if (!statusExplanation.strongClaimsAllowed) {
+        console.log("  Collect sufficient verified evidence before making deployment, compliance, or audit-readiness claims.");
+      } else if (levelNum >= 3) {
+        console.log("  Review the scoped evidence, applicable controls, and operating risk before production expansion.");
       } else if (levelNum >= 2) {
         console.log("  ⚠️  Address identified gaps before production deployment. Run: amc guide --go");
       } else {

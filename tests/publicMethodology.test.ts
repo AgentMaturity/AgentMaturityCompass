@@ -55,18 +55,22 @@ describe("public methodology manifest", () => {
     expect(first.questionSet.version).toBe("amc-legacy-240-v1");
     expect(first.questionSet.questionCount).toBe(getAllQuestions().length);
     expect(first.changelog[0]?.version).toBe(AMC_PUBLIC_METHODOLOGY_VERSION);
-    expect(first.changelog[0]?.summary).toContain("Cua-style computer-use benchmark public-methodology");
-    expect(first.changelog[0]?.migration).toContain("Reports generated under 2026.06.25-r219");
-    expect(first.changelog[1]?.summary).toContain("Lunary-style public-methodology");
-    expect(first.changelog[1]?.migration).toContain("Reports generated under 2026.06.25-r218");
+    expect(first.changelog[0]?.summary).toContain("artifact validity from evidence readiness");
+    expect(first.changelog[0]?.migration).toContain("Reports generated under 2026.06.25-r220");
+    expect(first.changelog[1]?.summary).toContain("Cua-style computer-use benchmark public-methodology");
+    expect(first.changelog[1]?.migration).toContain("Reports generated under 2026.06.25-r219");
+    expect(first.changelog[2]?.summary).toContain("Lunary-style public-methodology");
+    expect(first.changelog[2]?.migration).toContain("Reports generated under 2026.06.25-r218");
 
-    expect(first.changelog[2]?.summary).toContain("LangSmith-style public-methodology");
-    expect(first.changelog[3]?.summary).toContain("PocketFlow-style public-methodology source-review boundaries");
-    expect(first.changelog[4]?.summary).toContain("ChemGraph-style agentic computational chemistry workflow");
-    expect(first.changelog[4]?.summary).toContain("LM Evaluation Harness-style metric-validity source-review boundaries");
-    expect(first.changelog[5]?.summary).toContain("OpenAI Evals-style public-methodology source-review boundaries");
-    expect(first.changelog[6]?.summary).toContain("fact-checking and factuality-evaluation review methodology boundaries");
-    expect(first.changelog[6]?.summary).toContain("Google ADK-style agent-toolkit evaluation metric-validity boundaries");
+    expect(first.changelog[3]?.summary).toContain("LangSmith-style public-methodology");
+    expect(first.changelog[4]?.summary).toContain("PocketFlow-style public-methodology source-review boundaries");
+    expect(first.changelog[5]?.summary).toContain("ChemGraph-style agentic computational chemistry workflow");
+    expect(first.changelog[5]?.summary).toContain("LM Evaluation Harness-style metric-validity source-review boundaries");
+    expect(first.changelog[6]?.summary).toContain("OpenAI Evals-style public-methodology source-review boundaries");
+    expect(first.changelog[7]?.summary).toContain("fact-checking and factuality-evaluation review methodology boundaries");
+    expect(first.changelog[7]?.summary).toContain("Google ADK-style agent-toolkit evaluation metric-validity boundaries");
+    expect(first.changelog.find((entry) => entry.version === "2026.06.21-r217")?.date).toBe("2026-06-21");
+    expect(first.changelog.find((entry) => entry.version === "2026.06.20-r216")?.date).toBe("2026-06-20");
     for (const previousVersion of [
       "2026.06.21-r217",
       "2026.06.20-r216",
@@ -287,6 +291,7 @@ describe("public methodology manifest", () => {
       "methodology_binding"
     ]);
     expect(first.evaluationModeTaxonomy.find((mode) => mode.mode === "methodology_binding")?.proofBinding).toContain("Awesome-AI-Evaluation-Guide");
+    expect(first.scoreClaimBoundaries.map((boundary) => boundary.boundary)).toContain("artifact_evidence_claim_readiness");
     expect(first.scoreClaimBoundaries.map((boundary) => boundary.boundary)).toContain("divergent_trajectory_reasoning");
     expect(first.scoreClaimBoundaries.map((boundary) => boundary.boundary)).toContain("social_simulation_realism");
     expect(first.scoreClaimBoundaries.map((boundary) => boundary.boundary)).toContain("persona_policy_realism");
@@ -386,16 +391,16 @@ describe("public methodology manifest", () => {
     expect(first.scoreClaimBoundaries.map((boundary) => boundary.boundary)).toContain("costnav_physical_navigation_replay_integrity");
     expect(first.scoreClaimBoundaries.map((boundary) => boundary.boundary)).toContain("terminalworld_replay_integrity");
     expect(first.scoreClaimBoundaries.map((boundary) => boundary.boundary)).toContain("arize_phoenix_eval_observability_metric_validity");
-    expect(first.scoreClaimBoundaries[0]?.requiredEvidence).toContain("off-path attempts");
-    expect(first.scoreClaimBoundaries[1]?.requiredEvidence).toContain("harm prevalence");
-    expect(first.scoreClaimBoundaries[2]?.requiredEvidence).toContain("task-goal preservation");
-    expect(first.scoreClaimBoundaries[3]?.requiredEvidence).toContain("first-correct-flag forwarding");
-    expect(first.scoreClaimBoundaries[4]?.requiredEvidence).toContain("dataset DOI/version");
-    expect(first.scoreClaimBoundaries[4]?.requiredEvidence).toContain("checkpoint rubric");
-    expect(first.scoreClaimBoundaries[5]?.requiredEvidence).toContain("social-pressure context");
-    expect(first.scoreClaimBoundaries[6]?.requiredEvidence).toContain("false-positive");
-    expect(first.scoreClaimBoundaries[7]?.requiredEvidence).toContain("opponent pool");
-    expect(first.scoreClaimBoundaries[7]?.requiredEvidence).toContain("relative-ranking uncertainty");
+    expect(first.scoreClaimBoundaries.find((boundary) => boundary.boundary === "divergent_trajectory_reasoning")?.requiredEvidence).toContain("off-path attempts");
+    expect(first.scoreClaimBoundaries.find((boundary) => boundary.boundary === "social_simulation_realism")?.requiredEvidence).toContain("harm prevalence");
+    expect(first.scoreClaimBoundaries.find((boundary) => boundary.boundary === "persona_policy_realism")?.requiredEvidence).toContain("task-goal preservation");
+    expect(first.scoreClaimBoundaries.find((boundary) => boundary.boundary === "ctf_live_evaluation_integrity")?.requiredEvidence).toContain("first-correct-flag forwarding");
+    expect(first.scoreClaimBoundaries.find((boundary) => boundary.boundary === "ctf_partial_credit_validity")?.requiredEvidence).toContain("dataset DOI/version");
+    expect(first.scoreClaimBoundaries.find((boundary) => boundary.boundary === "ctf_partial_credit_validity")?.requiredEvidence).toContain("checkpoint rubric");
+    expect(first.scoreClaimBoundaries.find((boundary) => boundary.boundary === "multi_agent_privacy_leakage")?.requiredEvidence).toContain("social-pressure context");
+    expect(first.scoreClaimBoundaries.find((boundary) => boundary.boundary === "architectural_smell_repair")?.requiredEvidence).toContain("false-positive");
+    expect(first.scoreClaimBoundaries.find((boundary) => boundary.boundary === "iterative_tournament_learning")?.requiredEvidence).toContain("opponent pool");
+    expect(first.scoreClaimBoundaries.find((boundary) => boundary.boundary === "iterative_tournament_learning")?.requiredEvidence).toContain("relative-ranking uncertainty");
     expect(first.scoreClaimBoundaries.find((boundary) => boundary.boundary === "enterprise_agent_eval_interop")?.requiredEvidence).toContain("agent endpoint contract hash");
     expect(first.scoreClaimBoundaries.find((boundary) => boundary.boundary === "enterprise_agent_eval_interop")?.requiredEvidence).toContain("tool-call trace");
     expect(first.scoreClaimBoundaries.find((boundary) => boundary.boundary === "a2a_negotiation_transaction_methodology_integrity")?.requiredEvidence).toContain("buyer-role policy hash");
@@ -1160,6 +1165,13 @@ describe("public methodology manifest", () => {
     expect(googleAdkGate?.proofField).toContain("traceEvaluationCoverage");
     expect(first.deprecationNotice).toContain("2026.06.20-r214");
     expect(first.migrationGuidance.join("\n")).toContain("Google ADK-style agent evaluation");
+    const readinessBoundary = first.scoreClaimBoundaries.find((boundary) => boundary.boundary === "artifact_evidence_claim_readiness");
+    expect(readinessBoundary?.publicDisclosure).toContain("artifact integrity");
+    expect(readinessBoundary?.requiredEvidence).toContain("READY");
+    expect(readinessBoundary?.requiredEvidence).toContain("HIGH_TRUST");
+    expect(readinessBoundary?.migration).toContain("raw VALID");
+    expect(first.deprecationNotice).toContain("2026.07.10-r221");
+    expect(first.migrationGuidance.join("\n")).toContain("evidence readiness");
     const methodologyDoc = readFileSync("docs/SCORING_METHODOLOGY.md", "utf8");
     expect(methodologyDoc).toContain("`2026.06.20-r214`");
     expect(methodologyDoc).toContain("Google ADK-style agent-toolkit evaluation metric-validity boundaries");

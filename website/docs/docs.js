@@ -295,7 +295,14 @@ function renderDoc(md, docName) {
     breaks: false,
     headerIds: true,
   });
-  content.innerHTML = html;
+  content.innerHTML = `
+    <div class="doc-brandline" aria-label="AMC documentation trust contract">
+      <span class="doc-brandline-wordmark">amc<span class="brand-cursor">_</span> docs</span>
+      <span>Evidence over claims.</span>
+      <span class="doc-brandline-status">artifact valid ≠ evidence ready</span>
+    </div>
+    <article class="doc-article" data-doc="${escHtml(docName)}">${html}</article>
+  `;
   addCopyButtons();
   window.scrollTo(0, 0);
 }
@@ -329,7 +336,7 @@ function showWelcome() {
       <section class="welcome-hero">
         <div class="welcome-kicker">Evidence over claims.</div>
         <h1>Run one command<span class="brand-cursor">_</span></h1>
-        <p class="welcome-lede"><strong>Get the full score. Fix the gaps.</strong> Use the same evidence-first workflow across CLI, Studio, API, desktop, and CI.</p>
+        <p class="welcome-lede"><strong>Get the full score. Fix the gaps.</strong> Use the same evidence-first workflow across CLI, Studio, API, desktop, and CI. A valid seal proves artifact integrity; evidence readiness decides whether claims are eligible.</p>
         <div class="welcome-command"><span>$</span> npx agent-maturity-compass</div>
       </section>
 

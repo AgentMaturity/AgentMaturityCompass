@@ -98,6 +98,32 @@ describe("lifecycle run artifact", () => {
     expect(artifact.elapsedMs).toBe(1234);
   });
 
+  test("keeps a valid seal separate from insufficient evidence", () => {
+    const report = sampleReport();
+    report.integrityIndex = 0;
+    report.trustLabel = "UNRELIABLE — DO NOT USE FOR CLAIMS";
+    report.evidenceCoverage = 0;
+    report.evidenceTrustCoverage = { observed: 0, attested: 0, selfReported: 0 };
+    report.questionScores = report.questionScores.map((score) => ({ ...score, evidenceEventIds: [] }));
+
+    const artifact = buildLifecycleRunArtifact({
+      workspace: "/tmp/amc-lifecycle-insufficient",
+      report,
+      source: "cli",
+      command: "amc",
+      signed: true
+    });
+
+    expect(artifact.surfaces.Score.status).toBe("partial");
+    expect(artifact.surfaces.Score.summary).toContain("not claim-ready");
+    expect(artifact.surfaces.Vault.status).toBe("complete");
+    expect(artifact.evidence.diagnosticReport).toMatchObject({
+      artifactStatus: "VALID",
+      evidenceStatus: "INSUFFICIENT_EVIDENCE",
+      claimEligible: false
+    });
+  });
+
   test("writes the artifact beside agent lifecycle outputs", () => {
     const workspace = mkdtempSync(join(tmpdir(), "amc-lifecycle-artifact-"));
     try {

@@ -2,6 +2,7 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import { dirname, extname, join } from "node:path";
 import type { DiagnosticReport } from "../types.js";
 import { resolveRunReport, type ResolvedRunReport } from "../diagnostic/runner.js";
+import { evaluateDiagnosticEvidenceReadiness } from "../diagnostic/evidenceReadiness.js";
 
 export type ExecutiveBriefFormat = "html" | "markdown";
 
@@ -28,7 +29,9 @@ interface ExecutiveBriefModel {
   runId: string;
   generatedAt: string;
   resolvedBy: string;
+  artifactStatus: string;
   evidenceStatus: string;
+  claimEligible: boolean;
   claimBoundary: string;
   maturityLevel: string;
   maturityScore: number;
@@ -67,16 +70,13 @@ function riskLabel(score: number): string {
 }
 
 function claimBoundary(report: DiagnosticReport): string {
-  if (report.status === "VALID" && report.verificationPassed) {
-    return "Verified evidence chain; suitable for board review when the underlying evidence bundle remains available.";
-  }
-  if (report.status === "UNSIGNED") {
-    return "Unsigned local preview; use for internal discussion only, then regenerate signed evidence before verifier-ready claims.";
-  }
-  return "Unverified or invalid evidence chain; use only to prioritize remediation before external sharing.";
+  return evaluateDiagnosticEvidenceReadiness(report).claimBoundary;
 }
 
-function boardDecision(score: number, risk: string): string {
+function boardDecision(score: number, risk: string, claimEligible: boolean): string {
+  if (!claimEligible) {
+    return "Do not approve expansion from this run. Treat the score as a local baseline until evidence readiness is READY and the underlying bundle verifies.";
+  }
   if (score >= 4) {
     return "Maintain board visibility, require regression monitoring, and allow controlled expansion only when evidence remains current.";
   }
@@ -100,6 +100,7 @@ function buildModel(resolved: ResolvedRunReport, opts: ExecutiveBriefOptions): E
   const report = resolved.report;
   const score = averageLayerScore(report);
   const risk = riskLabel(score);
+  const readiness = evaluateDiagnosticEvidenceReadiness(report);
   const generatedAt = (opts.now ?? new Date()).toISOString();
   const layerRows = report.layerScores
     .slice()
@@ -120,18 +121,20 @@ function buildModel(resolved: ResolvedRunReport, opts: ExecutiveBriefOptions): E
     runId: resolved.resolvedRunId,
     generatedAt,
     resolvedBy: resolved.resolvedBy,
-    evidenceStatus: report.status,
+    artifactStatus: report.status,
+    evidenceStatus: readiness.status,
+    claimEligible: readiness.claimEligible,
     claimBoundary: claimBoundary(report),
     maturityLevel: maturityLevel(score),
     maturityScore: Number(score.toFixed(2)),
     integrityPct: Number((report.integrityIndex * 100).toFixed(1)),
     riskLabel: risk,
-    boardDecision: boardDecision(score, risk),
+    boardDecision: boardDecision(score, risk, readiness.claimEligible),
     topGaps,
     nextActions: [
       "Ask the accountable owner to accept or reject each remediation action in writing.",
       "Require a fresh AMC run after remediation and before expanding scope.",
-      "Share the signed certificate or report bundle only after evidence status is valid."
+      "Share the signed certificate or report bundle only when artifact status is VALID and evidence readiness is READY."
     ]
   };
 }
@@ -171,7 +174,9 @@ export function renderExecutiveBriefMarkdown(resolved: ResolvedRunReport, opts: 
     `- Maturity: ${model.maturityLevel} (${model.maturityScore.toFixed(2)}/5)`,
     `- Integrity index: ${model.integrityPct.toFixed(1)}%`,
     `- Board risk: ${model.riskLabel}`,
-    `- Evidence status: ${model.evidenceStatus}`,
+    `- Artifact status: ${model.artifactStatus}`,
+    `- Evidence readiness: ${model.evidenceStatus}`,
+    `- Claim eligible: ${model.claimEligible ? "YES" : "NO"}`,
     "",
     "## Recommended Board Decision",
     "",
@@ -196,7 +201,7 @@ export function renderExecutiveBriefMarkdown(resolved: ResolvedRunReport, opts: 
 
 export function renderExecutiveBriefHtml(resolved: ResolvedRunReport, opts: ExecutiveBriefOptions = { workspace: process.cwd() }): string {
   const model = buildModel(resolved, opts);
-  const riskColor = model.riskLabel === "Low" ? "#166534" : model.riskLabel === "Moderate" ? "#92400e" : "#991b1b";
+  const riskColor = model.riskLabel === "Low" ? "#4AEF79" : model.riskLabel === "Moderate" ? "#f59e0b" : "#ff3355";
   const gapRows = model.topGaps
     .map((gap) => `<tr><td>${escapeHtml(gap.name)}</td><td>L${gap.score.toFixed(1)}</td><td>${escapeHtml(gap.action)}</td></tr>`)
     .join("\n");
@@ -209,37 +214,42 @@ export function renderExecutiveBriefHtml(resolved: ResolvedRunReport, opts: Exec
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${escapeHtml(model.title)} - ${escapeHtml(model.agentId)}</title>
 <style>
-  :root{color:#111827;background:#ffffff;font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
-  body{margin:0;padding:32px}
+  :root{--bg:#0a0a0a;--surface:#111111;--surface2:#1a1a1a;--text:#ffffff;--muted:#a0a0a0;--accent:#4AEF79;--border:rgba(255,255,255,.10);color:var(--text);background:var(--bg);font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+  *{box-sizing:border-box}
+  body{margin:0;padding:32px;background:var(--bg);color:var(--text)}
   main{max-width:900px;margin:0 auto}
+  .brandline{display:flex;justify-content:space-between;gap:16px;margin-bottom:28px;padding:10px 0;border-top:1px solid rgba(74,239,121,.28);border-bottom:1px solid var(--border);font:700 12px "Space Mono","SFMono-Regular",Consolas,monospace;color:var(--muted)}
+  .wordmark{color:var(--text)}.cursor{color:var(--accent)}
   h1{font-size:30px;line-height:1.15;margin:0 0 8px}
-  h2{font-size:15px;letter-spacing:.04em;text-transform:uppercase;margin:28px 0 10px;color:#374151}
+  h2{font:700 13px "Space Mono","SFMono-Regular",Consolas,monospace;letter-spacing:0;text-transform:uppercase;margin:28px 0 10px;color:var(--accent)}
   p,li,td{font-size:14px;line-height:1.45}
-  .meta{color:#4b5563;font-size:13px;margin-bottom:22px}
+  .meta{color:var(--muted);font-size:13px;margin-bottom:22px}
   .snapshot{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:18px 0}
-  .metric{border:1px solid #d1d5db;padding:12px;border-radius:6px}
-  .label{font-size:11px;text-transform:uppercase;color:#6b7280;letter-spacing:.05em}
+  .metric{border:1px solid var(--border);background:var(--surface);padding:12px;border-radius:6px;min-width:0}
+  .label{font:700 10px "Space Mono","SFMono-Regular",Consolas,monospace;text-transform:uppercase;color:var(--muted);letter-spacing:0}
   .value{font-size:22px;font-weight:700;margin-top:4px}
   .risk{color:${riskColor}}
-  .decision{border-left:4px solid ${riskColor};background:#f9fafb;padding:14px 16px;margin:12px 0}
+  .decision{border-left:3px solid ${riskColor};background:var(--surface);padding:14px 16px;margin:12px 0}
   table{width:100%;border-collapse:collapse;margin-top:8px}
-  th,td{border:1px solid #d1d5db;padding:9px 10px;text-align:left;vertical-align:top}
-  th{background:#f3f4f6;font-size:12px;text-transform:uppercase;color:#374151}
-  .boundary{background:#fffbeb;border:1px solid #f59e0b;border-radius:6px;padding:12px 14px}
-  .footer{margin-top:26px;padding-top:12px;border-top:1px solid #d1d5db;color:#6b7280;font-size:12px}
+  th,td{border:1px solid var(--border);padding:9px 10px;text-align:left;vertical-align:top}
+  th{background:var(--surface2);font:700 10px "Space Mono","SFMono-Regular",Consolas,monospace;text-transform:uppercase;color:var(--accent)}
+  .boundary{background:var(--surface);border:1px solid #f59e0b;border-radius:6px;padding:12px 14px}
+  .footer{margin-top:26px;padding-top:12px;border-top:1px solid var(--border);color:var(--muted);font-size:12px}
   @page{size:letter;margin:0.55in}
-  @media print{body{padding:0}.snapshot{break-inside:avoid}.metric{break-inside:avoid}a{color:inherit}}
+  @media(max-width:720px){body{padding:20px}.snapshot{grid-template-columns:repeat(2,minmax(0,1fr))}.brandline{align-items:flex-start;flex-direction:column}}
+  @media print{:root{--bg:#fff;--surface:#f7f7f7;--surface2:#efefef;--text:#111;--muted:#555;--border:#d1d5db}body{padding:0}.snapshot{break-inside:avoid}.metric{break-inside:avoid}a{color:inherit}.brandline{border-top-color:#111}}
 </style>
 </head>
 <body>
 <main>
+  <div class="brandline"><span class="wordmark">amc<span class="cursor">_</span> / executive</span><span>Evidence over claims.</span></div>
   <h1>${escapeHtml(model.title)}</h1>
   <div class="meta">Agent ${escapeHtml(model.agentId)} | Run ${escapeHtml(model.runId)} (${escapeHtml(model.resolvedBy)}) | Generated ${escapeHtml(model.generatedAt)}</div>
   <section class="snapshot" aria-label="Board risk snapshot">
     <div class="metric"><div class="label">Maturity</div><div class="value">${escapeHtml(model.maturityLevel)}</div><div>${model.maturityScore.toFixed(2)}/5</div></div>
     <div class="metric"><div class="label">Integrity</div><div class="value">${model.integrityPct.toFixed(1)}%</div><div>evidence-weighted</div></div>
     <div class="metric"><div class="label">Board Risk</div><div class="value risk">${escapeHtml(model.riskLabel)}</div><div>current posture</div></div>
-    <div class="metric"><div class="label">Evidence</div><div class="value">${escapeHtml(model.evidenceStatus)}</div><div>claim boundary below</div></div>
+    <div class="metric"><div class="label">Evidence</div><div class="value">${escapeHtml(model.evidenceStatus)}</div><div>artifact ${escapeHtml(model.artifactStatus)} | claims ${model.claimEligible ? "eligible" : "blocked"}</div></div>
   </section>
   <h2>Recommended Board Decision</h2>
   <p class="decision">${escapeHtml(model.boardDecision)}</p>

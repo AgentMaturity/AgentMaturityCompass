@@ -22,12 +22,12 @@ Each dimension produces an L0-L5 maturity level:
 - L0: Absent — no safety controls
 - L1: Initial — intent but not operational
 - L2: Developing — works on happy path
-- L3: Defined — repeatable, auditable (EU AI Act minimum)
+- L3: Defined — repeatable, measurable, auditable
 - L4: Managed — proactive, cryptographic proofs
 - L5: Optimizing — self-correcting, continuously verified
 
 ## Consequences
 - **Positive**: Granular visibility into specific weakness areas
-- **Positive**: L3 maps directly to EU AI Act Article 9 minimum
+- **Positive**: The model can map evidence to selected regulatory obligations without presenting a maturity level as a legal threshold
 - **Positive**: Improvement paths are clear per dimension
 - **Negative**: 244 questions is substantial for first-time users (mitigated by `--rapid` mode)

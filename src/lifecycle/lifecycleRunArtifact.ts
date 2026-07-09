@@ -9,6 +9,7 @@ import type { LifecycleChangeReceiptRef } from "./changeReceipt.js";
 import type { FindingProofSetRef } from "./findingProof.js";
 import type { ObservabilityLaneRef } from "./observabilityLane.js";
 import { runtimeRunSummaryForLifecycle, type RuntimeRunLifecycleSummary } from "../runtime/runManager.js";
+import { evaluateDiagnosticEvidenceReadiness } from "../diagnostic/evidenceReadiness.js";
 
 export type AMCSurface = "Score" | "Shield" | "Enforce" | "Vault" | "Watch" | "Comply" | "Fleet" | "Passport";
 export type LifecycleSurfaceStatus = "complete" | "partial" | "pending" | "degraded";
@@ -86,6 +87,9 @@ export interface LifecycleRunArtifact {
     diagnosticReport: {
       runId: string;
       status: DiagnosticReport["status"];
+      artifactStatus: DiagnosticReport["status"];
+      evidenceStatus: NonNullable<DiagnosticReport["evidenceReadiness"]>["status"];
+      claimEligible: boolean;
       jsonPath: string;
       markdownPath: string;
       reportJsonSha256: string;
@@ -155,6 +159,7 @@ export interface LifecycleRunArtifactExportResult {
 }
 
 function lifecycleSurfaces(report: DiagnosticReport): Record<AMCSurface, LifecycleSurfaceSummary> {
+  const readiness = evaluateDiagnosticEvidenceReadiness(report);
   const scoreLevel = report.layerScores.length === 0
     ? 0
     : report.layerScores.reduce((sum, layer) => sum + layer.avgFinalLevel, 0) / report.layerScores.length;
@@ -163,8 +168,10 @@ function lifecycleSurfaces(report: DiagnosticReport): Record<AMCSurface, Lifecyc
 
   return {
     Score: {
-      status: "complete",
-      summary: `Full maturity score generated at L${scoreLevel.toFixed(2)} with ${report.questionScores.length} questions.`,
+      status: readiness.claimEligible ? "complete" : "partial",
+      summary: readiness.claimEligible
+        ? `Claim-ready full maturity score generated at L${scoreLevel.toFixed(2)} with ${report.questionScores.length} questions.`
+        : `Full maturity baseline generated at L${scoreLevel.toFixed(2)}, but evidence is ${readiness.status} and not claim-ready.`,
       refs: [report.runId]
     },
     Shield: {
@@ -208,6 +215,7 @@ function lifecycleSurfaces(report: DiagnosticReport): Record<AMCSurface, Lifecyc
 }
 
 export function buildLifecycleRunArtifact(input: WriteLifecycleRunArtifactInput): LifecycleRunArtifact {
+  const readiness = evaluateDiagnosticEvidenceReadiness(input.report);
   const paths = getAgentPaths(input.workspace, input.report.agentId);
   const surfaces = {
     ...lifecycleSurfaces(input.report),
@@ -248,6 +256,9 @@ export function buildLifecycleRunArtifact(input: WriteLifecycleRunArtifactInput)
       diagnosticReport: {
         runId: input.report.runId,
         status: input.report.status,
+        artifactStatus: input.report.status,
+        evidenceStatus: readiness.status,
+        claimEligible: readiness.claimEligible,
         jsonPath: join(paths.runsDir, `${input.report.runId}.json`),
         markdownPath: join(paths.reportsDir, `${input.report.runId}.md`),
         reportJsonSha256: input.report.reportJsonSha256

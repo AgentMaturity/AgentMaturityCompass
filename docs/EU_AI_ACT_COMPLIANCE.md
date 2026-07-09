@@ -1,7 +1,7 @@
 # EU AI Act Compliance Framework — AMC Dimension Mapping
 
-Version: 1.0 | Date: 2026-02-23
-Regulation: EU AI Act (Regulation (EU) 2024/1689) — Full application: 2026-08-02
+Version: 1.1 | Date: 2026-07-10
+Regulation: EU AI Act (Regulation (EU) 2024/1689) — current high-risk timeline: 2027-12-02 for Annex III systems and 2028-08-02 for product-integrated systems
 Status: Engineering compliance mapping — not legal advice
 
 ---
@@ -9,6 +9,8 @@ Status: Engineering compliance mapping — not legal advice
 ## 1. Overview
 
 This document maps AMC's five maturity dimensions and evidence infrastructure to the EU AI Act's obligations for high-risk AI systems. AMC provides deterministic, evidence-linked compliance signals — not legal certifications.
+
+A signed or `VALID` AMC report proves artifact integrity, not evidence sufficiency. Use a mapping externally only when evidence readiness is `READY`; AMC does not classify a system as a matter of law, perform conformity assessment, or certify legal compliance.
 
 The EU AI Act applies a risk-based approach. AMC's compliance engine now supports `EU_AI_ACT` as a first-class framework alongside SOC2, NIST AI RMF, ISO 27001, and ISO 42001.
 
@@ -23,9 +25,9 @@ amc comply risk-classify --employment --json
 
 ### How AMC Maps Risk
 
-AMC uses **Domain Risk Classification** to determine which governance tier applies:
+AMC uses **Domain Risk Classification** as a technical pre-check for which governance tier may apply. Final classification depends on intended purpose, role, and use case and requires qualified review:
 
-| Domain Risk Class | EU AI Act Tier | AMC Governance Requirements |
+| Domain Risk Class | Candidate EU AI Act Tier | AMC Policy Response |
 |---|---|---|
 | `critical` | Unacceptable (Art. 5) | Prohibited unless exempted; AMC blocks deployment |
 | `high` | High-risk (Annex III) | Full Art. 9-15, 17 obligations; strict human oversight |
@@ -34,15 +36,15 @@ AMC uses **Domain Risk Classification** to determine which governance tier appli
 
 Domain classification is stored in `.amc/eu_ai_act_classification.json` and scored by `src/score/euAIActCompliance.ts`.
 
-High-risk domains include: healthcare, finance, employment, education, law enforcement, critical infrastructure, and immigration/asylum (per Annex III).
+Annex III identifies specific high-risk use cases in areas including biometrics, critical infrastructure, education, employment, essential services, law enforcement, migration, asylum, border control, and justice. An industry label alone does not establish classification.
 
 Use `amc comply risk-classify` for the CLI risk-tier pre-check. It is an alias for `amc compliance risk-classify` and maps capability flags to the EU AI Act risk tiers in Regulation (EU) 2024/1689, including Article 5 prohibited practices, Article 6 high-risk systems, Annex III use areas, and Article 50 transparency obligations. Official source: https://data.europa.eu/eli/reg/2024/1689/oj.
 
 ### Autonomy Duration Factor
 
-Agents operating in high-risk domains require stricter governance proportional to their autonomy duration — the time between human interventions:
+AMC can apply stricter internal policy targets as autonomy duration grows — the time between human interventions. These are product policy defaults, not statutory maturity thresholds:
 
-| Autonomy Duration | Required Oversight Level | AMC Signal |
+| Autonomy Duration | Suggested Oversight | Example AMC Policy Target |
 |---|---|---|
 | < 1 minute | Standard approval gates | Level 3+ maturity |
 | 1-15 minutes | Enhanced monitoring + circuit breakers | Level 4+ maturity |
@@ -202,15 +204,18 @@ AMC does not perform the conformity assessment itself — that requires a notifi
 
 ---
 
-## 5. Timeline Context (Art. 113)
+## 5. Timeline Context
 
 | Date | Milestone |
 |---|---|
 | 2024-08-01 | Regulation entered into force |
 | 2025-02-02 | Chapters I and II applicable |
 | 2025-08-02 | Chapter III Section 4, Chapter V (GPAI) applicable |
-| **2026-08-02** | **Full application of high-risk obligations (Arts. 9-15, 17)** |
-| 2027-08-02 | Art. 6(1) and related obligations |
+| 2026-08-02 | Relevant Article 50 transparency obligations apply; GPAI enforcement powers also enter application |
+| **2027-12-02** | **Annex III high-risk rules apply under the current AI Omnibus political agreement timeline** |
+| **2028-08-02** | **High-risk rules apply to systems integrated into regulated products under the current timeline** |
+
+The timeline can change. Verify it against the European Commission's [high-risk guidance](https://digital-strategy.ec.europa.eu/en/policies/guidelines-ai-high-risk-systems) and [AI Act policy page](https://digital-strategy.ec.europa.eu/en/policies/regulatory-framework-ai).
 
 ---
 
@@ -225,7 +230,7 @@ Healthcare, finance, employment, education, and law enforcement agents require s
 Time between human interventions is a key maturity indicator:
 
 - **Low autonomy** (frequent human checkpoints): Acceptable at lower maturity levels
-- **High autonomy** (extended unsupervised operation): Requires Level 4-5 maturity with comprehensive evidence
+- **High autonomy** (extended unsupervised operation): AMC recommends a Level 4-5 target with comprehensive evidence
 - **Self-limiting agents** (proactively pause when uncertain): Score bonus on oversight quality dimension
 
 This maps directly to Art. 14 human oversight requirements — the EU AI Act requires that oversight measures be "commensurate with the risks, level of autonomy and context of use."
@@ -235,6 +240,8 @@ This maps directly to Art. 14 human oversight requirements — the EU AI Act req
 ## References
 
 - EU AI Act text: https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024R1689
+- European Commission high-risk guidance: https://digital-strategy.ec.europa.eu/en/policies/guidelines-ai-high-risk-systems
+- European Commission AI Act policy page: https://digital-strategy.ec.europa.eu/en/policies/regulatory-framework-ai
 - AMC Compliance Engine: `src/compliance/complianceEngine.ts`
 - AMC EU AI Act Scorer: `src/score/euAIActCompliance.ts`
 - AMC Cross-Framework Mapping: `src/score/crossFrameworkMapping.ts`

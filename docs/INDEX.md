@@ -1,3 +1,12 @@
+<p align="center">
+  <img src="https://agentmaturity.co/amc-logo.png" width="132" alt="AMC wordmark" />
+</p>
+
+<p align="center">
+  <strong>Run one command. Get the full score. Fix the gaps.</strong><br>
+  <em>Evidence over claims.</em>
+</p>
+
 # AMC Docs Index
 
 This is the fastest routing page for AMC documentation.
@@ -14,6 +23,7 @@ This is the fastest routing page for AMC documentation.
 - **I need to explain L3 business risk to a board** → `docs/BOARD_RISK_L3_MEMO.md`
 - **I want the whitepaper or citation metadata** → `whitepaper/AMC_WHITEPAPER_v1.md`
 - **I want methodology exports or sample case-study rows** → `docs/SCORING_METHODOLOGY.md`
+- **I need to interpret VALID vs READY** → `docs/SCORING_METHODOLOGY.md#artifact-validity-vs-evidence-readiness`
 - **I want pricing/commercial packaging** → `docs/PRICING.md`
 - **I want deployment options** → `docs/DEPLOYMENT_OPTIONS.md`
 - **I want AWS/GCP/Azure self-hosting architecture** → `docs/CLOUD_REFERENCE_ARCHITECTURES.md`

@@ -13,7 +13,7 @@ describe("GAP-0629 OpenAI Evals public-methodology source-review boundary", () =
   it("publishes methodology-versioned Score/Shield/Watch boundaries without an OpenAI Evals subsystem", () => {
     const manifest = getPublicMethodologyManifest();
 
-    expect(AMC_PUBLIC_METHODOLOGY_VERSION).toBe("2026.06.25-r220");
+    expect(AMC_PUBLIC_METHODOLOGY_VERSION).toBe("2026.07.10-r221");
 
     const openaiEvalsChangelog = manifest.changelog.find((row) => row.version === "2026.06.20-r215");
     expect(openaiEvalsChangelog).toMatchObject({

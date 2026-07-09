@@ -105,7 +105,7 @@ code,pre{font-family:var(--mono)}
     <div class="blog-card" onclick="showArticle('eu-ai-act-checklist')">
       <div class="meta">February 2026 · 6 min read</div>
       <h2>EU AI Act Compliance Checklist for AI Agents</h2>
-      <p>The August 2026 deadline is real. Here's a practical checklist for getting your AI agents compliant before enforcement begins.</p>
+      <p>Updated for the current 2027 and 2028 high-risk timelines. Build an evidence packet without treating AMC maturity as legal certification.</p>
       <span class="read-more">Read article →</span>
     </div>
     <div class="blog-card" onclick="showArticle('84-point-gap')">
@@ -139,7 +139,7 @@ code,pre{font-family:var(--mono)}
       <li><strong>Continuous monitoring, not one-time testing.</strong> Agents drift. A safe agent today may not be safe tomorrow after a model update, config change, or prompt injection attack. You need ongoing evaluation.</li>
       <li><strong>Agent-level, not model-level.</strong> Test the full stack — the model, the tools, the memory, the policies, the approval flows. A model-level benchmark can't catch a misconfigured tool permission.</li>
       <li><strong>Anti-gaming protections.</strong> If the agent can influence its own evaluation, the evaluation is compromised. Temporal consistency checks, cross-reference validation, and evidence freshness rules prevent gaming.</li>
-      <li><strong>Regulatory readiness.</strong> The EU AI Act enforcement begins August 2026. If your agent operates in or serves the EU market, compliance isn't optional anymore.</li>
+      <li><strong>Regulatory readiness.</strong> Map the intended use and operator role to current obligations, then bind each supported statement to evidence and qualified review.</li>
     </ol>
 
     <h2>The AMC Approach</h2>
@@ -158,7 +158,7 @@ amc</code></pre>
     <ol>
       <li><strong>Audit your current evaluation.</strong> How much of it is based on what the agent claims vs. what it does?</li>
       <li><strong>Run a baseline AMC score.</strong> Most agents start at L0–L1. That's normal. It's the honest starting point.</li>
-      <li><strong>Set a target.</strong> L3 is the EU AI Act minimum. How far are you from it?</li>
+      <li><strong>Set a maturity target.</strong> Treat L3 as defined controls, not a legal threshold, and require evidence readiness <code>READY</code> before making trust claims.</li>
       <li><strong>Instrument your agent.</strong> One environment variable change to route through AMC's evidence-capturing gateway.</li>
     </ol>
 
@@ -177,7 +177,7 @@ amc</code></pre>
     <div class="meta">February 2026 · 6 min read</div>
     <h1>EU AI Act Compliance Checklist for AI Agents</h1>
 
-    <p>The EU AI Act enters full enforcement in <strong>August 2026</strong>. If your AI agent operates in or serves the EU market, compliance is no longer a nice-to-have — it's a legal requirement. Non-compliance means fines up to €35 million or 7% of global turnover.</p>
+    <p>The EU AI Act uses a staged timeline. Following the AI Omnibus political agreement, the European Commission says Annex III high-risk rules apply from <strong>2 December 2027</strong> and product-integrated high-risk rules from <strong>2 August 2028</strong>. Classification and obligations depend on the actual use case.</p>
 
     <p>Here's a practical checklist for getting your AI agents ready.</p>
 
@@ -274,10 +274,12 @@ amc</code></pre>
     <ul>
       <li><strong>February 2025</strong> — Prohibited AI practices enforced</li>
       <li><strong>August 2025</strong> — General-purpose AI rules apply</li>
-      <li><strong>August 2026</strong> — Full enforcement for high-risk AI systems</li>
+      <li><strong>August 2026</strong> — Relevant Article 50 transparency obligations apply</li>
+      <li><strong>December 2027</strong> — Annex III high-risk rules apply under the current timeline</li>
+      <li><strong>August 2028</strong> — Product-integrated high-risk rules apply under the current timeline</li>
     </ul>
 
-    <p>You have months, not years. Start now.</p>
+    <p>Verify the current dates in the <a href="https://digital-strategy.ec.europa.eu/en/policies/guidelines-ai-high-risk-systems">European Commission high-risk guidance</a>. AMC maps evidence to obligations but does not certify legal compliance. A signed <code>VALID</code> artifact may still be <code>INSUFFICIENT_EVIDENCE</code>.</p>
 
     <pre><code>npm i -g agent-maturity-compass
 amc init && amc assurance run --pack eu-ai-act</code></pre>

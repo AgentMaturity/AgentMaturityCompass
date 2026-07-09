@@ -42,6 +42,8 @@ Use the CLI.
 npx agent-maturity-compass
 ```
 
+The first run is an honest baseline. A signed `VALID` artifact can still be `INSUFFICIENT_EVIDENCE`; capture a real agent run and rerun before making external claims. Only evidence readiness `READY` is claim-eligible.
+
 Best for:
 - scoring a real project
 - getting a trust maturity level

@@ -31,7 +31,13 @@ function reportFixture(): DiagnosticReport {
     runId: "15f0d361-2c46-411f-8e16-0fb10838258a",
     agentId: "default",
     status: "UNSIGNED",
+    verificationPassed: false,
+    trustBoundaryViolated: false,
+    trustBoundaryMessage: null,
+    integrityIndex: 0.5,
     trustLabel: "LOW TRUST",
+    evidenceCoverage: 0.5,
+    evidenceTrustCoverage: { observed: 0.5, attested: 0, selfReported: 0.5 },
     reportJsonSha256: "report-sha"
   } as DiagnosticReport;
 }
@@ -76,6 +82,9 @@ describe("diagnostic report share bundles", () => {
       alias: "q1-client-assessment",
       agentId: "default",
       status: "UNSIGNED",
+      artifactStatus: "UNSIGNED",
+      evidenceStatus: "UNVERIFIED",
+      claimEligible: false,
       reportJsonSha256: "report-sha",
       htmlSha256: sha256Hex(html),
       publicUrl: "https://reports.example.com/amc/q1-client-assessment/index.html"

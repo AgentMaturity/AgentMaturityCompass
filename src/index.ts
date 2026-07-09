@@ -369,6 +369,17 @@ export {
 } from "./targets/targetProfile.js";
 
 export { runDiagnostic, generateReport, compareRuns } from "./diagnostic/runner.js";
+export {
+  CLAIM_READY_INTEGRITY,
+  INSUFFICIENT_INTEGRITY_BELOW,
+  evaluateDiagnosticEvidenceReadiness
+} from "./diagnostic/evidenceReadiness.js";
+export type { DiagnosticEvidenceReadinessInput } from "./diagnostic/evidenceReadiness.js";
+export type {
+  DiagnosticEvidenceReadiness,
+  EvidenceReadinessReasonCode,
+  EvidenceReadinessStatus
+} from "./types.js";
 export { runAutoAnswer } from "./diagnostic/autoAnswer/autoAnswerEngine.js";
 export {
   diagnoseEvalReplayCorpusBoundary,

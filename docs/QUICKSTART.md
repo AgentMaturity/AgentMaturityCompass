@@ -33,6 +33,8 @@ amc
 
 `amc` is the default path. It creates the `.amc/` workspace if needed, detects what it can score, runs the full maturity score, and prints the next action.
 
+On a clean project, the report can be signed and `VALID` while evidence readiness is `INSUFFICIENT_EVIDENCE`. This is the honest first baseline: the artifact is intact, but AMC has not yet observed enough execution evidence to support external claims.
+
 > **Tip:** For a demo workspace with sample data, run `amc setup --demo` and then `amc`.
 
 For a stripped-down startup setup that skips the vault prompt and immediate full-score prompt:
@@ -78,6 +80,15 @@ amc
 ```
 
 AMC returns a maturity level from **L0** (no governance) to **L5** (self-governing), plus a gap analysis showing what to fix first.
+
+Read the two status lines independently:
+
+| Status | What it answers |
+|---|---|
+| Artifact status: `VALID`, `INVALID`, or `UNSIGNED` | Is this report intact and verifiable? |
+| Evidence readiness: `READY`, `LIMITED`, `INSUFFICIENT_EVIDENCE`, or `UNVERIFIED` | Is the evidence strong enough for external claims? |
+
+Only `READY` is claim-eligible. Signing proves artifact integrity, not evidence sufficiency.
 
 **Optional expanded assessment:**
 

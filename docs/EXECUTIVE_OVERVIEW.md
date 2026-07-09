@@ -8,7 +8,7 @@
 
 Think of AMC as a **credit score for your AI agents**. Just like a FICO score tells you if someone is creditworthy, AMC tells you if an AI agent is trustworthy.
 
-The difference: credit scores rely on self-reported data. AMC scores rely on **observed behavior** with cryptographic proof.
+The difference: AMC can weight **captured execution behavior** above self-reported claims and seal the resulting artifact for independent verification.
 
 ## Why You Need This
 
@@ -22,7 +22,7 @@ Your company deploys AI agents that:
 
 **Today's answer:** "The vendor says so" / "We tested it once" / "It passed a benchmark"
 
-**AMC's answer:** Here's a score from **0 to 100** based on what the agent actually does in production. With cryptographic proof. Updated continuously.
+**AMC's answer:** Here is the maturity baseline, the evidence behind it, what remains unproven, and whether the report is claim-ready. Production behavior is only claimed when production evidence was actually captured.
 
 ## The 84-Point Problem
 
@@ -40,7 +40,7 @@ We tested a content moderation agent with two methods:
 ### For the Board
 - **A single number** (L0-L5) that represents your AI agent's maturity
 - **Risk classification** aligned with EU AI Act categories
-- **Compliance evidence** for auditors (EU AI Act, ISO 42001, NIST AI RMF, SOC 2)
+- **Evidence mappings** for auditors (EU AI Act, ISO 42001, NIST AI RMF, SOC 2), without claiming legal certification
 - **Improvement trajectory** — tracked over time, not a point-in-time audit
 
 ### For Your Engineering Team
@@ -58,16 +58,16 @@ We tested a content moderation agent with two methods:
 
 ## The Maturity Scale
 
-| Level | Name | What It Means | EU AI Act Ready? |
-|-------|------|---------------|------------------|
-| **L0** | Absent | No safety controls at all | ❌ Non-compliant |
-| **L1** | Initial | Some intent, nothing operational | ❌ Non-compliant |
-| **L2** | Developing | Partial controls, breaks at edges | ⚠️ Insufficient |
-| **L3** | Defined | Repeatable, measurable, auditable | ✅ Minimum for high-risk |
-| **L4** | Managed | Proactive, risk-calibrated, stress-tested | ✅ Strong compliance |
-| **L5** | Optimizing | Self-correcting, continuously verified | ✅ Best-in-class |
+| Level | Name | What It Means | Evidence interpretation |
+|-------|------|---------------|-------------------------|
+| **L0** | Absent | No demonstrated safety controls | Major control gaps |
+| **L1** | Initial | Some intent, little operational proof | Early baseline |
+| **L2** | Developing | Partial controls, breaks at edges | Material gaps remain |
+| **L3** | Defined | Repeatable, measurable, auditable | Defined controls, subject to evidence readiness and use-case risk |
+| **L4** | Managed | Proactive, risk-calibrated, stress-tested | Stronger operating assurance |
+| **L5** | Optimizing | Self-correcting, continuously verified | Continuous assurance target |
 
-**For EU AI Act compliance (mandatory August 2026), you need at least L3 for high-risk AI systems.**
+No AMC level is a legal compliance threshold. A `VALID` signature proves artifact integrity; only evidence readiness `READY` permits AMC trust claims, and AMC does not certify legal compliance. The European Commission's current high-risk timeline applies Annex III rules from 2 December 2027 and product-integrated high-risk rules from 2 August 2028 following the AI Omnibus political agreement. See the [official high-risk guidance](https://digital-strategy.ec.europa.eu/en/policies/guidelines-ai-high-risk-systems) and [AI Act policy page](https://digital-strategy.ec.europa.eu/en/policies/regulatory-framework-ai).
 
 Board L3 business-risk memo: [docs/BOARD_RISK_L3_MEMO.md](BOARD_RISK_L3_MEMO.md)
 
@@ -114,9 +114,9 @@ Open the local Studio dashboard for non-terminal review of scores, evidence, and
 amc executive brief --run latest --out board-brief.html
 ```
 
-This writes a one-page HTML brief with maturity, integrity, board risk, evidence status, top maturity gaps, and a recommended board decision. Open the file in a browser and use Print to PDF for a board packet.
+This writes a one-page HTML brief with maturity, artifact status, evidence readiness, board risk, top maturity gaps, and a recommended board decision. Open the file in a browser and use Print to PDF for a board packet. Do not use it for approval unless artifact status is `VALID`, verification passed, and evidence readiness is `READY`.
 
-For the board interpretation of an L3 result, attach [What L3 Means For Business Risk](BOARD_RISK_L3_MEMO.md). It explains why L3 supports limited production use, why it is not blanket approval, and which residual-risk questions should still be answered.
+For the board interpretation of an L3 result, attach [What L3 Means For Business Risk](BOARD_RISK_L3_MEMO.md). It explains when an evidence-ready L3 result can inform a bounded decision, why it is not blanket approval, and which residual-risk questions still need answers.
 
 ## Cost
 

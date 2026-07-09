@@ -10,6 +10,8 @@
  */
 
 import { generateBridgeOpenApiSpec, type OpenApiSpec } from "../setup/integrationScaffold.js";
+import { mkdirSync, writeFileSync } from "node:fs";
+import { dirname } from "node:path";
 import YAML from "yaml";
 
 interface OpenApiOperation {
@@ -115,6 +117,19 @@ function studioEndpoints(): Record<string, Record<string, OpenApiOperation>> {
         responses: {
           "200": okJson("Diagnostic run result", "#/components/schemas/RunAcceptedResponse"),
           "400": errJson("Invalid request"),
+        },
+      },
+    },
+    "/runs/{runId}/report": {
+      get: {
+        summary: "Load a diagnostic report with derived evidence readiness",
+        tags: ["Studio", "Diagnostic", "Score", "Vault"],
+        parameters: [{ name: "runId", in: "path", required: true, schema: { type: "string" } }],
+        security: [{ adminToken: [] }, { sessionCookie: [] }, { agentToken: [] }],
+        responses: {
+          "200": okJson("Diagnostic report", "#/components/schemas/DiagnosticReport"),
+          "403": errJson("Agent scope does not include this report"),
+          "404": errJson("Diagnostic report not found"),
         },
       },
     },
@@ -316,11 +331,49 @@ function studioSchemas(): Record<string, unknown> {
             ts: { type: "integer" },
             integrityIndex: { type: "number" },
             trustLabel: { type: "string" },
-            status: { type: "string" },
+            status: { type: "string", enum: ["VALID", "INVALID", "UNSIGNED"], description: "Artifact status, not evidence sufficiency." },
+            evidenceStatus: { type: "string", enum: ["READY", "LIMITED", "INSUFFICIENT_EVIDENCE", "UNVERIFIED"] },
+            claimEligible: { type: "boolean" },
           },
         },
       },
       required: ["agentId"],
+    },
+    EvidenceReadiness: {
+      type: "object",
+      properties: {
+        schemaVersion: { type: "string", const: "2026-07-10" },
+        status: { type: "string", enum: ["READY", "LIMITED", "INSUFFICIENT_EVIDENCE", "UNVERIFIED"] },
+        claimEligible: { type: "boolean" },
+        label: { type: "string" },
+        reasonCodes: { type: "array", items: { type: "string" } },
+        claimBoundary: { type: "string" },
+        nextStep: { type: "string" },
+        thresholds: {
+          type: "object",
+          properties: {
+            readyIntegrity: { type: "number", const: 0.6 },
+            insufficientIntegrityBelow: { type: "number", const: 0.4 },
+          },
+          required: ["readyIntegrity", "insufficientIntegrityBelow"],
+        },
+      },
+      required: ["schemaVersion", "status", "claimEligible", "label", "reasonCodes", "claimBoundary", "nextStep", "thresholds"],
+    },
+    DiagnosticReport: {
+      type: "object",
+      properties: {
+        runId: { type: "string" },
+        agentId: { type: "string" },
+        status: { type: "string", enum: ["VALID", "INVALID", "UNSIGNED"], description: "Artifact status, not evidence sufficiency." },
+        verificationPassed: { type: "boolean" },
+        integrityIndex: { type: "number" },
+        trustLabel: { type: "string" },
+        evidenceCoverage: { type: "number" },
+        evidenceReadiness: { $ref: "#/components/schemas/EvidenceReadiness" },
+      },
+      required: ["runId", "agentId", "status", "verificationPassed", "integrityIndex", "trustLabel", "evidenceCoverage", "evidenceReadiness"],
+      additionalProperties: true,
     },
     DiagnosticRunRequest: {
       type: "object",
@@ -620,9 +673,6 @@ export function openapiGenerateCli(options: { out?: string }): { path: string | 
   const spec = generateFullOpenApiSpec();
 
   if (options.out) {
-    const { writeFileSync } = require("node:fs") as typeof import("node:fs");
-    const { dirname } = require("node:path") as typeof import("node:path");
-    const { mkdirSync } = require("node:fs") as typeof import("node:fs");
     try {
       mkdirSync(dirname(options.out), { recursive: true });
     } catch {

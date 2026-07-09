@@ -1,6 +1,7 @@
 import { existsSync, readdirSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { getAgentPaths } from "../fleet/paths.js";
+import { evaluateDiagnosticEvidenceReadiness } from "../diagnostic/evidenceReadiness.js";
 import type { DiagnosticReport } from "../types.js";
 import { readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { trySignArtifactFile } from "./artifactSignature.js";
@@ -36,6 +37,8 @@ export interface LifecycleChangeReceipt {
   evaluationEvidence: {
     diagnosticRunId: string | null;
     diagnosticStatus: DiagnosticReport["status"] | null;
+    evidenceStatus: NonNullable<DiagnosticReport["evidenceReadiness"]>["status"] | null;
+    claimEligible: boolean;
     integrityIndex: number | null;
     evidenceCoverage: number | null;
   };
@@ -86,6 +89,7 @@ function baseReceipt(input: WriteLifecycleChangeReceiptsInput, type: LifecycleCh
   const createdAt = new Date(input.report.ts).toISOString();
   const decisionReceiptIds = (input.decisionReceipts ?? []).map((receipt) => receipt.receiptId);
   const findingProofSetIds = (input.findingProofs ?? []).map((proofSet) => proofSet.proofSetId);
+  const readiness = input.report.evidenceReadiness ?? evaluateDiagnosticEvidenceReadiness(input.report);
   return {
     schemaVersion: "2026-05-22",
     receiptId: `lifecycle-${type}-${input.report.runId}`,
@@ -107,6 +111,8 @@ function baseReceipt(input: WriteLifecycleChangeReceiptsInput, type: LifecycleCh
     evaluationEvidence: {
       diagnosticRunId: input.report.runId,
       diagnosticStatus: input.report.status,
+      evidenceStatus: readiness.status,
+      claimEligible: readiness.claimEligible,
       integrityIndex: input.report.integrityIndex,
       evidenceCoverage: input.report.evidenceCoverage
     },
@@ -126,6 +132,7 @@ function baseReceipt(input: WriteLifecycleChangeReceiptsInput, type: LifecycleCh
 
 function validationPolicyChecks(input: WriteLifecycleChangeReceiptsInput): LifecycleChangeReceipt["policyChecks"] {
   const report = input.report;
+  const readiness = report.evidenceReadiness ?? evaluateDiagnosticEvidenceReadiness(report);
   return [
     {
       policyId: "vault-report-signature",
@@ -140,6 +147,14 @@ function validationPolicyChecks(input: WriteLifecycleChangeReceiptsInput): Lifec
       evidenceRefs: report.questionScores.flatMap((score) => score.evidenceEventIds).slice(0, 25)
     },
     {
+      policyId: "evidence-claim-readiness",
+      passed: readiness.claimEligible,
+      summary: readiness.claimEligible
+        ? "Evidence readiness is READY for the configured scope."
+        : `Evidence readiness is ${readiness.status}; promotion remains blocked. ${readiness.claimBoundary}`,
+      evidenceRefs: report.questionScores.flatMap((score) => score.evidenceEventIds).slice(0, 25)
+    },
+    {
       policyId: "resource-manifest-present",
       passed: Boolean(input.resourceManifestIds?.length),
       summary: input.resourceManifestIds?.length ? "Enforce resource manifest is attached." : "No Enforce resource manifest was attached.",
@@ -149,14 +164,15 @@ function validationPolicyChecks(input: WriteLifecycleChangeReceiptsInput): Lifec
 }
 
 function monitorHealth(report: DiagnosticReport): LifecycleChangeReceipt["monitor"] {
-  if (report.status !== "VALID" || report.integrityIndex < 0.4) {
+  const readiness = report.evidenceReadiness ?? evaluateDiagnosticEvidenceReadiness(report);
+  if (readiness.status === "UNVERIFIED" || readiness.status === "INSUFFICIENT_EVIDENCE") {
     return {
       health: "critical",
       driftState: report.evidenceCoverage > 0 ? "regressed" : "needs-evidence",
       summary: "Post-score state needs attention before promotion."
     };
   }
-  if (report.integrityIndex < 0.7 || report.evidenceCoverage < 0.5) {
+  if (!readiness.claimEligible || report.integrityIndex < 0.7 || report.evidenceCoverage < 0.5) {
     return {
       health: "warning",
       driftState: report.evidenceCoverage > 0 ? "stable" : "needs-evidence",
@@ -276,6 +292,8 @@ export function buildRollbackLifecycleReceipt(input: {
     evaluationEvidence: {
       diagnosticRunId: null,
       diagnosticStatus: null,
+      evidenceStatus: null,
+      claimEligible: false,
       integrityIndex: null,
       evidenceCoverage: null
     },

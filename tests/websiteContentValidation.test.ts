@@ -50,4 +50,34 @@ describe("website content validation", () => {
     expect(audit).toContain("Whitepaper homepage/docs discoverability — ✅ Resolved 2026-06-16.");
     expect(audit).not.toContain("⚠️ Not linked from website homepage");
   });
+
+  test("current public surfaces do not turn maturity or signatures into legal compliance claims", () => {
+    const currentPublicSurfaces = [
+      "README.md",
+      "docs/EXECUTIVE_OVERVIEW.md",
+      "docs/BOARD_RISK_L3_MEMO.md",
+      "docs/EU_AI_ACT_COMPLIANCE.md",
+      "docs/adr/002-five-dimension-maturity-model.md",
+      "website/lite.html",
+      "website/compliance.html",
+      "website/compare.html",
+      "website/blog.html",
+      "website/blog/index.html",
+      "website/blog/eu-ai-act-agents.html",
+      "website/blog/amc-philosophy.html",
+      "website/blog/langchain-scoring-tutorial.html",
+      "website/blog/the-84-point-gap.html",
+      "website/docs/compliance.html",
+      "website/docs/getting-started.html",
+      "website/docs/methodology.html"
+    ].map(read).join("\n");
+
+    expect(currentPublicSurfaces).not.toMatch(/EU AI Act minimum|mandates L3|L3\+? (?:is|as) (?:a|the) legal threshold/i);
+    expect(currentPublicSurfaces).not.toMatch(/deadline (?:is|:) August 2026|mandatory (?:deadline: )?August 2026|five months remain/i);
+    expect(currentPublicSurfaces).not.toMatch(/signed evidence.{0,40}proves compliance/i);
+    expect(currentPublicSurfaces).not.toContain("Every API call, tool use, and decision is hash-chained");
+    expect(currentPublicSurfaces).toContain("INSUFFICIENT_EVIDENCE");
+    expect(currentPublicSurfaces).toContain("does not certify legal compliance");
+    expect(read("website/compliance.html")).toContain("Evidence Mapping, Not Certification");
+  });
 });

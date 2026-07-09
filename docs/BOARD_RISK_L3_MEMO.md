@@ -4,13 +4,13 @@ This memo is for boards and executives reviewing an AMC maturity result. It expl
 
 ## Executive Interpretation
 
-L3 means the agent has repeatable, measurable, auditable controls. It is the first level where a board can usually discuss limited production use, because the team can show what was tested, what evidence was captured, what failed, and what will be remediated.
+L3 means the score describes repeatable, measurable, auditable controls. A board should only rely on that interpretation when the artifact is `VALID`, verification passed, and evidence readiness is `READY`, because those conditions show that the result is intact and backed by sufficient accepted evidence.
 
-L3 is not a blanket approval. It does not mean the agent is safe for every workflow, user group, geography, data class, or autonomy level. It means the agent is ready for controlled use when residual risk is accepted by accountable owners and when monitoring stays active.
+L3 is not a blanket approval or a legal threshold. It does not mean the agent is safe for every workflow, user group, geography, data class, or autonomy level. An evidence-ready L3 result can inform a controlled-use decision when residual risk is accepted by accountable owners and monitoring stays active.
 
 ## What The Board Can Approve At L3
 
-At L3, boards can consider:
+With a `VALID`, verified, evidence-ready L3 report, boards can consider:
 
 - Limited production use with named business and technical owners.
 - Clearly bounded autonomy: which actions the agent can take, where human approval is required, and which data it may access.
@@ -33,11 +33,11 @@ Boards should avoid approving:
 | Can we prove the score was not self-reported? | Partially to strongly, depending on evidence mix. | Evidence coverage, integrity index, trust-tier breakdown |
 | Can we quantify residual risk? | Directionally, using incident frequency, impact, and maturity multipliers. | Business risk report, heatmap, appetite status |
 | Can we detect drift? | Yes, if monitoring is configured and owned. | Watch or monitor run status, thresholds, alert owners |
-| Can we satisfy high-risk governance expectations? | L3 is a minimum governance baseline, not the end state. | EU AI Act mapping, NIST AI RMF mapping, audit binder |
+| Can we assess high-risk governance expectations? | L3 is a maturity signal, not legal compliance or certification. | Applicable-obligation mapping, legal review, signed evidence refs, audit binder |
 
 ## Residual Risk Rules
 
-Use L3 as a controlled-use threshold:
+Use evidence-ready L3 as one input to a controlled-use decision:
 
 1. Define the approved use case in business language.
 2. Map the use case to data sensitivity, user impact, legal obligations, and operational blast radius.
@@ -50,14 +50,14 @@ If residual risk is above appetite, the right board decision is not "approve bec
 ## Source Alignment
 
 - NIST AI Risk Management Framework: NIST describes AI risk management as improving the ability to incorporate trustworthiness considerations into AI design, development, use, and evaluation.
-- EU AI Act: high-risk AI systems require governance, risk management, transparency, human oversight, accuracy, robustness, cybersecurity, and post-market monitoring obligations depending on use case.
-- AMC: L3 maps to repeatable and auditable controls. L4 and L5 are still needed for proactive risk management, stronger evidence, continuous verification, and certifiable operating posture.
+- EU AI Act: obligations depend on the system, role, use case, and classification. The European Commission's current timeline applies Annex III high-risk rules from 2 December 2027 and product-integrated high-risk rules from 2 August 2028 following the AI Omnibus political agreement. See the [official high-risk guidance](https://digital-strategy.ec.europa.eu/en/policies/guidelines-ai-high-risk-systems).
+- AMC: L3 maps to repeatable and auditable controls. L4 and L5 target stronger operating assurance and continuous verification; AMC does not certify legal compliance.
 
 ## Board Decision Template
 
 Use this language when an agent reaches L3:
 
-> The board approves limited production use for the stated scope only. Expansion requires current AMC evidence, residual risk inside appetite or explicit risk-owner acceptance, named remediation owners for remaining gaps, and monitoring that alerts the accountable owner before drift becomes operational harm.
+> The board approves limited production use for the stated scope only, based on a VALID and verified AMC artifact with evidence readiness READY. Expansion requires current evidence, residual risk inside appetite or explicit risk-owner acceptance, named remediation owners for remaining gaps, and monitoring that alerts the accountable owner before drift becomes operational harm. This decision is not a legal compliance certification.
 
 ## What To Ask Next
 

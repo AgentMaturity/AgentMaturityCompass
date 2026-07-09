@@ -24,7 +24,9 @@ mkdir my-agent && cd my-agent
 amc
 ```
 
-That's it. AMC creates the workspace if needed, runs the full evidence score, prints the maturity level (L0-L5), and shows the next action.
+That's it. AMC creates the workspace if needed, runs the full score, prints the maturity level (L0-L5), separates artifact validity from evidence readiness, and shows the next action.
+
+> **First-run trust contract:** a clean project can produce a signed, `VALID` report with `INSUFFICIENT_EVIDENCE`. The signature proves the report was not altered; it does not prove that AMC observed enough agent behavior. Capture a real run and rerun AMC. Only `READY` evidence is eligible for external claims.
 
 > **Why no setup command first?** The top-level `amc` command is the default onboarding path. It detects what is available, creates the minimum workspace state, and falls back to unsigned/demo-safe behavior when a local vault cannot be unlocked.
 
@@ -80,6 +82,8 @@ amc telemetry status # see exactly what is and isn't collected
 ---
 
 ## Understanding Your Score
+
+The maturity level and evidence-readiness status answer different questions. Maturity describes the controls demonstrated by the score. `READY`, `LIMITED`, `INSUFFICIENT_EVIDENCE`, or `UNVERIFIED` describes whether the underlying evidence can support claims. Never treat `VALID` or signed artifact status as a substitute for `READY`.
 
 AMC scores agents on a 5-level scale:
 
@@ -486,6 +490,8 @@ amc --json
 amc score calibration-gap --json
 amc doctor --json
 ```
+
+The top-level JSON keeps claim readiness explicit: `status` is the evidence-readiness status, `artifactStatus` is the seal result, and `claimEligible` is `true` only for `READY`. Use `claimBoundary` and `nextEvidenceStep` instead of inferring readiness from `signed: true`.
 
 Pipe into `jq` for scripting:
 

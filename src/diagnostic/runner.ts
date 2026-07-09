@@ -19,6 +19,7 @@ import { evaluateBudgetStatus, verifyBudgetsConfigSignature } from "../budgets/b
 import { activeFreezeStatus } from "../drift/freezeEngine.js";
 import { listApprovals } from "../approvals/approvalStore.js";
 import type {
+  DiagnosticEvidenceReadiness,
   DiagnosticReport,
   EvidenceEvent,
   EvidenceEventType,
@@ -61,6 +62,7 @@ import {
   summarizeConfidenceControls
 } from "./confidenceControls.js";
 import { buildQuestionExplainabilityReport, type QuestionExplainabilityInputRow } from "./questionScoreExplainability.js";
+import { evaluateDiagnosticEvidenceReadiness } from "./evidenceReadiness.js";
 
 function parseEventForRunner(workspace: string, event: EvidenceEvent): ParsedEvidenceEvent {
   const parsed = parseEvidenceEvent(event);
@@ -1530,11 +1532,15 @@ export async function runDiagnostic(input: RunDiagnosticInput, outputMarkdownPat
       reportJsonSha256: string;
     };
 
-    const reportJsonSha256 = sha256Hex(canonicalize(baseReport));
+    const reportBody = {
+      ...baseReport,
+      evidenceReadiness: evaluateDiagnosticEvidenceReadiness(baseReport)
+    };
+    const reportJsonSha256 = sha256Hex(canonicalize(reportBody));
     const runSealSig = input.noSign ? "unsigned" : ledger.signRunHash(reportJsonSha256);
 
     const report: DiagnosticReport = {
-      ...baseReport,
+      ...reportBody,
       runSealSig,
       reportJsonSha256
     };
@@ -1566,70 +1572,49 @@ export async function runDiagnostic(input: RunDiagnosticInput, outputMarkdownPat
 
 export interface DiagnosticReportStatusExplanation {
   status: DiagnosticReport["status"];
+  artifactLabel: string;
+  evidenceStatus: DiagnosticEvidenceReadiness["status"];
+  readinessLabel: string;
   label: string;
   verificationLabel: string;
   claimBoundary: string;
   nextStep: string;
   strongClaimsAllowed: boolean;
+  reasonCodes: DiagnosticEvidenceReadiness["reasonCodes"];
 }
 
 export function explainDiagnosticReportStatus(
   report: Pick<
     DiagnosticReport,
-    "status" | "verificationPassed" | "trustBoundaryViolated" | "trustBoundaryMessage" | "integrityIndex" | "trustLabel"
+    "status" | "verificationPassed" | "trustBoundaryViolated" | "trustBoundaryMessage" | "integrityIndex" | "trustLabel" | "evidenceCoverage" | "evidenceTrustCoverage"
   >
 ): DiagnosticReportStatusExplanation {
-  if (report.status === "VALID" && report.verificationPassed && !report.trustBoundaryViolated) {
-    return {
-      status: report.status,
-      label: "Verified evidence chain",
-      verificationLabel: "PASSED",
-      claimBoundary: "This report is verified and client-ready for the configured trust boundary and evidence window.",
-      nextStep: "Use the report for client, auditor, or internal governance review; rerun after material agent or policy changes.",
-      strongClaimsAllowed: true,
-    };
-  }
-
-  if (report.status === "UNSIGNED") {
-    return {
-      status: report.status,
-      label: "Unsigned local preview",
-      verificationLabel: report.verificationPassed ? "PASSED WITHOUT SIGNING" : "NOT CRYPTOGRAPHICALLY VERIFIED",
-      claimBoundary: "Vault signing was skipped. Use this for local diagnosis and CS previews, but do not present it as verified evidence.",
-      nextStep: "Unlock or initialize the vault and rerun without --no-sign to produce a signed, verifier-ready report.",
-      strongClaimsAllowed: false,
-    };
-  }
-
-  if (report.trustBoundaryViolated) {
-    return {
-      status: report.status,
-      label: "Trust boundary violation",
-      verificationLabel: report.verificationPassed ? "FAILED TRUST BOUNDARY" : "FAILED",
-      claimBoundary: "The report is not client-ready because AMC detected a trust-boundary violation in the evidence path.",
-      nextStep: report.trustBoundaryMessage ?? "Resolve the trust-boundary finding, then rerun the assessment.",
-      strongClaimsAllowed: false,
-    };
-  }
-
-  if (!report.verificationPassed) {
-    return {
-      status: report.status,
-      label: "Unverified evidence chain",
-      verificationLabel: "FAILED",
-      claimBoundary: "This report is useful for local diagnosis, but it is not client-ready or auditor-ready because the evidence chain did not verify.",
-      nextStep: "Run amc verify, inspect ledger/config signatures, fix invalid receipts or missing seals, then rerun the report.",
-      strongClaimsAllowed: false,
-    };
-  }
-
+  const evidenceReadiness = evaluateDiagnosticEvidenceReadiness(report);
+  const artifactLabel = report.status === "UNSIGNED"
+    ? "Unsigned local preview"
+    : report.trustBoundaryViolated
+      ? "Trust boundary violation"
+      : report.status === "VALID" && report.verificationPassed
+        ? "Verified evidence chain"
+        : "Unverified evidence chain";
+  const verificationLabel = report.status === "UNSIGNED"
+    ? report.verificationPassed ? "PASSED WITHOUT SIGNING" : "NOT CRYPTOGRAPHICALLY VERIFIED"
+    : report.trustBoundaryViolated
+      ? report.verificationPassed ? "FAILED TRUST BOUNDARY" : "FAILED"
+      : report.status === "VALID" && report.verificationPassed
+        ? "PASSED"
+        : "FAILED";
   return {
     status: report.status,
-    label: "Additional verification gate failed",
-    verificationLabel: "FAILED",
-    claimBoundary: "This report is not client-ready because an additional verification gate failed after ledger verification.",
-    nextStep: "Check target profile signatures, trust-boundary settings, and report metadata before sharing externally.",
-    strongClaimsAllowed: false,
+    artifactLabel,
+    evidenceStatus: evidenceReadiness.status,
+    readinessLabel: evidenceReadiness.label,
+    label: artifactLabel,
+    verificationLabel,
+    claimBoundary: evidenceReadiness.claimBoundary,
+    nextStep: evidenceReadiness.nextStep,
+    strongClaimsAllowed: evidenceReadiness.claimEligible,
+    reasonCodes: evidenceReadiness.reasonCodes
   };
 }
 
@@ -1934,10 +1919,12 @@ export function generateReport(report: DiagnosticReport, format: "md" | "json"):
     `# Agent Maturity Compass Report (${report.runId})`,
     "",
     `- Agent: ${report.agentId}`,
-    `- Status: **${report.status}** — ${statusExplanation.label}`,
-    `- Verification: ${statusExplanation.verificationLabel}`,
+    `- Artifact Status: **${report.status}** — ${statusExplanation.artifactLabel}`,
+    `- Artifact Verification: ${statusExplanation.verificationLabel}`,
+    `- Evidence Readiness: **${statusExplanation.evidenceStatus}** — ${statusExplanation.readinessLabel}`,
+    `- Claim Eligible: **${statusExplanation.strongClaimsAllowed ? "YES" : "NO"}**`,
     `- Claim Boundary: ${statusExplanation.claimBoundary}`,
-    `- Next Verification Step: ${statusExplanation.nextStep}`,
+    `- Next Evidence Step: ${statusExplanation.nextStep}`,
     `- Trust Boundary Violated: ${report.trustBoundaryViolated ? "YES" : "NO"}`,
     report.trustBoundaryMessage ? `- Trust Boundary Message: ${report.trustBoundaryMessage}` : "- Trust Boundary Message: none",
     `- IntegrityIndex: ${report.integrityIndex.toFixed(3)} (${report.trustLabel})`,

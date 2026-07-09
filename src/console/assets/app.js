@@ -928,12 +928,16 @@ async function refreshUnifiedBanner() {
     const agentId = currentAgent();
     let integrity = null;
     let trustLabel = "N/A";
+    let evidenceStatus = "NO RUN";
+    let claimEligible = false;
     const agentStatus = await apiGet(`/agents/${encodeURIComponent(agentId)}/status`).catch(() => null);
     if (agentStatus?.latestRun?.runId) {
       const report = await apiGet(`/runs/${encodeURIComponent(agentStatus.latestRun.runId)}/report`).catch(() => null);
       if (report) {
         integrity = Number(report.integrityIndex || 0);
         trustLabel = String(report.trustLabel || "N/A");
+        evidenceStatus = String(report.evidenceReadiness?.status || "UNVERIFIED");
+        claimEligible = report.evidenceReadiness?.claimEligible === true;
       }
     }
     const freezes = Array.isArray(status?.studio?.activeFreezes) ? status.studio.activeFreezes.length : 0;
@@ -945,9 +949,11 @@ async function refreshUnifiedBanner() {
         <span><strong>Agent:</strong> ${htmlEscape(agentId)}</span>
         <span><strong>Trust:</strong> ${htmlEscape(trustLabel)}</span>
         <span><strong>Integrity:</strong> ${integrity === null ? "N/A" : integrity.toFixed(3)}</span>
+        <span><strong>Evidence:</strong> ${htmlEscape(evidenceStatus)}</span>
+        <span><strong>Claims:</strong> ${claimEligible ? "ELIGIBLE" : "BLOCKED"}</span>
         <span><strong>Active freezes:</strong> ${freezes}</span>
         <span><strong>Config:</strong> ${status.readOnlyMode ? "UNTRUSTED CONFIG (READ-ONLY)" : "SIGNED"}</span>
-        <span><strong>Trust:</strong> ${htmlEscape(`${trustMode}${trustMode === "NOTARY" ? trustOk ? " (OK)" : " (BROKEN)" : ""}`)}</span>
+        <span><strong>Trust mode:</strong> ${htmlEscape(`${trustMode}${trustMode === "NOTARY" ? trustOk ? " (OK)" : " (BROKEN)" : ""}`)}</span>
         <span><strong>Transparency:</strong> ${transparency.ok ? "OK" : "BROKEN"}</span>
       </div>
     `;
@@ -1227,6 +1233,10 @@ async function renderAgent() {
       <p>Overall: <strong>${((report.layerScores || []).reduce((s, x) => s + x.avgFinalLevel, 0) / Math.max(1, (report.layerScores || []).length)).toFixed(3)}</strong></p>
       <p>IntegrityIndex: <strong>${Number(report.integrityIndex || 0).toFixed(3)}</strong> (${report.trustLabel})</p>
       <p>Evidence Coverage: ${(Number(report.evidenceCoverage || 0) * 100).toFixed(1)}%</p>
+      <p>Artifact Status: <strong>${htmlEscape(String(report.status || "UNKNOWN"))}</strong></p>
+      <p>Evidence Readiness: <strong>${htmlEscape(String(report.evidenceReadiness?.status || "UNVERIFIED"))}</strong></p>
+      <p>Claims: <strong>${report.evidenceReadiness?.claimEligible === true ? "ELIGIBLE" : "BLOCKED"}</strong></p>
+      <p class="muted">${htmlEscape(String(report.evidenceReadiness?.claimBoundary || "Verify evidence readiness before relying on this score."))}</p>
       <canvas id="layerBars" width="520" height="170" role="img" aria-label="Layer maturity bar chart for the selected agent."></canvas>
       `
       : "<p class='muted'>No run found.</p>"

@@ -91,15 +91,15 @@
       <h1 id="overview">Compliance Guide</h1>
       <p class="subtitle">Map your agent's maturity to regulatory requirements. AMC supports EU AI Act, ISO 42001, NIST AI RMF, SOC 2, and OWASP LLM Top 10 — with 41 industry-specific domain packs across 7 sectors.</p>
 
-      <!-- Deadline Banner -->
+      <!-- Current official timeline -->
       <div class="deadline-banner" id="deadline-banner">
         <div class="countdown" id="countdown">
-          <span id="countdown-days">—</span>
-          <small>days until deadline</small>
+          <span>2027</span>
+          <small>Annex III timeline</small>
         </div>
         <div class="detail">
-          <h3>EU AI Act — Full Application: August 2, 2026</h3>
-          <p>High-risk AI systems must comply with Articles 9–15 and 17. AMC maps your maturity score directly to these obligations with evidence-backed compliance signals.</p>
+          <h3>EU AI Act — current high-risk timeline</h3>
+          <p>Following the AI Omnibus political agreement, Annex III high-risk rules apply from 2 December 2027 and product-integrated high-risk rules from 2 August 2028. Confirm the current position in the official guidance.</p>
         </div>
       </div>
 
@@ -118,7 +118,7 @@ amc audit binder create --framework EU_AI_ACT</code></pre>
 
       <div class="callout callout-teal">
         <strong>⚖️ Important disclaimer</strong>
-        AMC provides deterministic, evidence-linked compliance <em>signals</em> — not legal certifications. Always consult qualified legal counsel for regulatory compliance decisions.
+        AMC provides deterministic, evidence-linked compliance <em>signals</em> — not legal certifications. A signed or <code>VALID</code> report proves artifact integrity, not evidence sufficiency; use mappings externally only when evidence readiness is <code>READY</code>. AMC does not certify legal compliance. Always consult qualified legal counsel. See the <a href="https://digital-strategy.ec.europa.eu/en/policies/guidelines-ai-high-risk-systems">European Commission high-risk guidance</a>.
       </div>
 
       <!-- Risk Classification -->
@@ -154,9 +154,9 @@ amc audit binder create --framework EU_AI_ACT</code></pre>
       <p>High-risk domains per Annex III include: <strong>healthcare, finance, employment, education, law enforcement, critical infrastructure, and immigration/asylum</strong>.</p>
 
       <h3>Autonomy Duration Factor</h3>
-      <p>Agents in high-risk domains require governance proportional to their autonomy duration — the time between human interventions:</p>
+      <p>Teams can configure stricter AMC policy targets as autonomy duration grows. These are AMC operating targets, not statutory maturity thresholds:</p>
       <table>
-        <thead><tr><th>Autonomy Duration</th><th>Required Oversight</th><th>Minimum AMC Level</th></tr></thead>
+        <thead><tr><th>Autonomy Duration</th><th>Suggested Oversight</th><th>Example AMC Policy Target</th></tr></thead>
         <tbody>
           <tr><td>&lt; 1 minute</td><td>Standard approval gates</td><td>L3+</td></tr>
           <tr><td>1–15 minutes</td><td>Enhanced monitoring + circuit breakers</td><td>L4+</td></tr>
@@ -213,7 +213,7 @@ amc compliance report --framework EU_AI_ACT --window 30d</code></pre>
         <div class="step-num">4</div>
         <div class="step-content">
           <h4>Fix and verify</h4>
-          <pre><code>amc fix --target-level L3       <span class="comment"># Generate remediation for EU AI Act minimum</span>
+          <pre><code>amc fix --target-level L3       <span class="comment"># Generate remediation toward defined controls</span>
 amc guide --compliance EU_AI_ACT  <span class="comment"># Map gaps to regulatory obligations</span></code></pre>
         </div>
       </div>
@@ -373,18 +373,6 @@ amc audit binder export-execute</code></pre>
 </div>
 
 <script>
-// Countdown to EU AI Act deadline
-const deadline = new Date('2026-08-02T00:00:00Z');
-function updateCountdown() {
-  const now = new Date();
-  const diff = deadline - now;
-  const days = Math.ceil(diff / (1000 * 60 * 60 * 24));
-  const el = document.getElementById('countdown-days');
-  if (el) el.textContent = days > 0 ? days : '0';
-}
-updateCountdown();
-setInterval(updateCountdown, 86400000);
-
 // Copy buttons
 document.querySelectorAll('pre').forEach(pre => {
   const btn = document.createElement('button');

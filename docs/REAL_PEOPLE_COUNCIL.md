@@ -86,7 +86,7 @@
 
 **3. Linda (HR Director) — 6/10**
 - Website: EU AI Act section is exactly what I need ✅
-- Website: "L3 = EU AI Act minimum" — clear and actionable ✅
+- Prior website copy presented L3 as a statutory minimum. It was clear but legally misleading and has been retired; L3 is a maturity signal, not certification.
 - README: Executive Overview link is perfect for me ✅
 - Playground: Questions are too technical for me to answer about our AI assistant
 - **Verdict:** Would forward Executive Overview to legal. Playground needs simpler language.

@@ -100,6 +100,34 @@ describe("lifecycle change receipts", () => {
     expect(receipts.some((receipt) => receipt.receiptType === "commit")).toBe(false);
   });
 
+  test("blocks promotion when an intact artifact is not evidence-ready", () => {
+    const report = sampleReport({
+      integrityIndex: 0.62,
+      trustLabel: "LOW TRUST",
+      evidenceCoverage: 0.5
+    });
+    const receipts = buildLifecycleChangeReceipts({
+      workspace: "/tmp/amc-change-receipts",
+      report,
+      command: "amc",
+      resourceManifestIds: ["manifest-1"]
+    });
+
+    const validation = receipts.find((receipt) => receipt.receiptType === "validation");
+    expect(validation?.status).toBe("blocked");
+    expect(validation?.evaluationEvidence).toMatchObject({
+      diagnosticStatus: "VALID",
+      evidenceStatus: "LIMITED",
+      claimEligible: false
+    });
+    expect(validation?.policyChecks).toContainEqual(expect.objectContaining({
+      policyId: "evidence-claim-readiness",
+      passed: false
+    }));
+    expect(receipts.some((receipt) => receipt.receiptType === "commit")).toBe(false);
+    expect(receipts.find((receipt) => receipt.receiptType === "monitor")?.monitor.health).toBe("warning");
+  });
+
   test("writes signed receipt bundles and redacted exports", () => {
     const workspace = mkdtempSync(join(tmpdir(), "amc-change-receipts-"));
     try {

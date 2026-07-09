@@ -71,6 +71,33 @@ export type AssessmentQuestionFamily =
 
 export type TrustLabel = "HIGH TRUST" | "LOW TRUST" | "DEVELOPING — some evidence, needs more coverage" | "LOW — collect more evidence to increase trust" | "UNRELIABLE — DO NOT USE FOR CLAIMS";
 
+export type EvidenceReadinessStatus = "READY" | "LIMITED" | "INSUFFICIENT_EVIDENCE" | "UNVERIFIED";
+
+export type EvidenceReadinessReasonCode =
+  | "ARTIFACT_UNSIGNED"
+  | "ARTIFACT_INVALID"
+  | "ARTIFACT_VERIFICATION_FAILED"
+  | "TRUST_BOUNDARY_VIOLATION"
+  | "MISSING_EVIDENCE_METADATA"
+  | "NO_ACCEPTED_EVIDENCE"
+  | "LOW_INTEGRITY"
+  | "LIMITED_INTEGRITY"
+  | "TRUST_LABEL_BLOCKED";
+
+export interface DiagnosticEvidenceReadiness {
+  schemaVersion: "2026-07-10";
+  status: EvidenceReadinessStatus;
+  claimEligible: boolean;
+  label: string;
+  reasonCodes: EvidenceReadinessReasonCode[];
+  claimBoundary: string;
+  nextStep: string;
+  thresholds: {
+    readyIntegrity: 0.6;
+    insufficientIntegrityBelow: 0.4;
+  };
+}
+
 export interface EvidenceEvent {
   id: string;
   ts: number;
@@ -3943,6 +3970,7 @@ export interface DiagnosticReport {
     attested: number;
     selfReported: number;
   };
+  evidenceReadiness?: DiagnosticEvidenceReadiness;
   autonomyAllowanceIndex?: number;
   dualityCompliance?: {
     executeWithValidTicket: number;

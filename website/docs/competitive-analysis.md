@@ -664,7 +664,7 @@ AMC is the only tool that answers: **"How mature is this AI agent, and can you P
 - **Recommended:** "Prove AI agent maturity — with cryptographic evidence"
 
 ### Differentiation Narrative
-> "Other tools tell you if your AI is working. AMC proves it — with cryptographic evidence chains that auditors and regulators can verify independently. We don't just test; we provide a maturity roadmap from L0 to L5 with tamper-proof evidence at every step."
+> "Other tools tell you if your AI is working. AMC shows what the evidence supports, seals the artifact for independent verification, and keeps unsupported claims explicit. We provide an L0-L5 maturity roadmap without pretending a signature proves safety or compliance."
 
 ### Target Buyer Mapping
 
@@ -672,7 +672,7 @@ AMC is the only tool that answers: **"How mature is this AI agent, and can you P
 |-------|-----------|-------------|-------------------|
 | **CISO** | "Is our AI secure?" | Security assurance packs + evidence chains | Promptfoo, CalypsoAI |
 | **Head of AI/ML** | "Are our agents production-ready?" | L0-L5 maturity scoring + framework adapters | DeepEval, LangSmith |
-| **Compliance Officer** | "Can we prove EU AI Act compliance?" | Compliance mapping + cryptographic evidence | Credo AI |
+| **Compliance Officer** | "Which EU AI Act claims have evidence?" | Compliance mapping + signed evidence refs + unsupported states | Credo AI |
 | **VP Engineering** | "How do we test agents in CI?" | CLI + CI/CD integration + regression testing | Promptfoo, DeepEval |
 | **Auditor** | "Can I trust this assessment?" | Ed25519 signatures + Merkle trees + trust tiers | NOBODY (unique) |
 

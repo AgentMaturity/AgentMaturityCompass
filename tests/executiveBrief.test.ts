@@ -12,7 +12,7 @@ function tempRoot(): string {
   return root;
 }
 
-function writeRun(root: string, runId: string): void {
+function writeRun(root: string, runId: string, overrides: Record<string, unknown> = {}): void {
   const runsDir = join(root, ".amc", "runs");
   mkdirSync(runsDir, { recursive: true });
   writeFileSync(join(runsDir, `${runId}.json`), JSON.stringify({
@@ -45,7 +45,8 @@ function writeRun(root: string, runId: string): void {
     invalidReceiptsCount: 0,
     correlationWarnings: [],
     evidenceCoverage: 0.76,
-    evidenceTrustCoverage: { observed: 1, attested: 0, selfReported: 0 }
+    evidenceTrustCoverage: { observed: 1, attested: 0, selfReported: 0 },
+    ...overrides
   }), "utf8");
 }
 
@@ -82,6 +83,8 @@ describe("executive brief artifact", () => {
 
     const html = readFileSync(join(root, "board-brief.html"), "utf8");
     expect(html).toContain("Board AI Risk Brief");
+    expect(html).toContain('class="wordmark">amc<span class="cursor">_</span> / executive');
+    expect(html).toContain("Evidence over claims.");
     expect(html).toContain("Recommended Board Decision");
     expect(html).toContain("Top Maturity Gaps");
     expect(html).toContain("@media print");
@@ -96,5 +99,35 @@ describe("executive brief artifact", () => {
     expect(read("docs/QUICKSTART.md")).toContain("Create a board one-pager");
     expect(read("docs/EXECUTIVE_OVERVIEW.md")).toContain("Board one-pager: amc executive brief");
     expect(read("docs/AUDIT_50_AGENTS_BATCH5.md")).toContain("PDF/exportable board one-pager — ✅ Resolved");
+  });
+
+  test("blocks board-ready claims when a signed report has no evidence", () => {
+    const root = tempRoot();
+    writeRun(root, "44444444-4444-4444-8444-444444444444", {
+      integrityIndex: 0,
+      trustLabel: "UNRELIABLE — DO NOT USE FOR CLAIMS",
+      evidenceCoverage: 0,
+      evidenceTrustCoverage: { observed: 0, attested: 0, selfReported: 0 }
+    });
+
+    const result = spawnSync(process.execPath, [
+      join(process.cwd(), "dist", "cli.js"),
+      "executive",
+      "brief",
+      "--run",
+      "latest",
+      "--out",
+      "board-brief.html"
+    ], {
+      cwd: root,
+      encoding: "utf8",
+      env: { ...process.env, AMC_VAULT_PASSPHRASE: "" }
+    });
+
+    expect(result.status, result.stderr || result.stdout).toBe(0);
+    const html = readFileSync(join(root, "board-brief.html"), "utf8");
+    expect(html).toContain("INSUFFICIENT_EVIDENCE");
+    expect(html).toContain("Signing proves integrity, not evidence sufficiency");
+    expect(html).not.toContain("suitable for board review");
   });
 });

@@ -71,6 +71,124 @@ components:
         integrityIndex:
           type: number
 
+    EvidenceReadiness:
+      type: object
+      description: Evidence sufficiency and external-claim readiness, evaluated separately from artifact validity.
+      required:
+        - schemaVersion
+        - status
+        - claimEligible
+        - label
+        - reasonCodes
+        - claimBoundary
+        - nextStep
+        - thresholds
+      properties:
+        schemaVersion:
+          type: string
+          enum: ['2026-07-10']
+        status:
+          type: string
+          enum: [READY, LIMITED, INSUFFICIENT_EVIDENCE, UNVERIFIED]
+        claimEligible:
+          type: boolean
+          description: True only when the evidence status is READY.
+        label:
+          type: string
+        reasonCodes:
+          type: array
+          items:
+            type: string
+            enum:
+              - ARTIFACT_UNSIGNED
+              - ARTIFACT_INVALID
+              - ARTIFACT_VERIFICATION_FAILED
+              - TRUST_BOUNDARY_VIOLATION
+              - MISSING_EVIDENCE_METADATA
+              - NO_ACCEPTED_EVIDENCE
+              - LOW_INTEGRITY
+              - LIMITED_INTEGRITY
+              - TRUST_LABEL_BLOCKED
+        claimBoundary:
+          type: string
+        nextStep:
+          type: string
+        thresholds:
+          type: object
+          required: [readyIntegrity, insufficientIntegrityBelow]
+          properties:
+            readyIntegrity:
+              type: number
+              enum: [0.6]
+            insufficientIntegrityBelow:
+              type: number
+              enum: [0.4]
+
+    DiagnosticReport:
+      type: object
+      description: Signed AMC diagnostic artifact. Current reports include evidenceReadiness inside the signed payload; legacy reports may omit it.
+      required:
+        - runId
+        - agentId
+        - status
+        - verificationPassed
+        - integrityIndex
+        - trustLabel
+        - evidenceCoverage
+      additionalProperties: true
+      properties:
+        runId:
+          type: string
+        agentId:
+          type: string
+        ts:
+          type: integer
+        status:
+          type: string
+          enum: [VALID, INVALID, UNSIGNED]
+          description: Artifact validity only; VALID does not mean that evidence is sufficient or claims are allowed.
+        verificationPassed:
+          type: boolean
+        trustBoundaryViolated:
+          type: boolean
+        trustBoundaryMessage:
+          type: string
+          nullable: true
+        integrityIndex:
+          type: number
+          minimum: 0
+          maximum: 1
+        trustLabel:
+          type: string
+        evidenceCoverage:
+          type: number
+          minimum: 0
+          maximum: 1
+        evidenceTrustCoverage:
+          type: object
+          required: [observed, attested, selfReported]
+          properties:
+            observed:
+              type: number
+            attested:
+              type: number
+            selfReported:
+              type: number
+        evidenceReadiness:
+          allOf:
+            - $ref: '#/components/schemas/EvidenceReadiness'
+          description: Present on reports generated with methodology 2026.07.10-r221 or later.
+
+    DiagnosticReportResponse:
+      type: object
+      required: [ok, data]
+      properties:
+        ok:
+          type: boolean
+          enum: [true]
+        data:
+          $ref: '#/components/schemas/DiagnosticReport'
+
     Incident:
       type: object
       properties:
@@ -788,7 +906,11 @@ paths:
                   description: Applies Industry Pack weighting only when the workspace has an active Industry Packs entitlement.
       responses:
         '200':
-          description: Diagnostic result with layer scores
+          description: Diagnostic report with separate artifact validity and evidence readiness
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DiagnosticReportResponse'
 
   /v1/score/quickscore:
     post:
@@ -865,6 +987,10 @@ paths:
       responses:
         '200':
           description: Latest run report
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DiagnosticReportResponse'
 
   /v1/score/history:
     get:
@@ -994,6 +1120,10 @@ paths:
       responses:
         '200':
           description: Run report
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DiagnosticReportResponse'
 
   /v1/score/report/{runId}:
     get:
@@ -1017,6 +1147,13 @@ paths:
       responses:
         '200':
           description: Report (JSON or Markdown)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DiagnosticReportResponse'
+            text/markdown:
+              schema:
+                type: string
 
   /v1/score/report:
     get:
@@ -1040,6 +1177,13 @@ paths:
       responses:
         '200':
           description: Report
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DiagnosticReportResponse'
+            text/markdown:
+              schema:
+                type: string
 
   /v1/score/session:
     post:

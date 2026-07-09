@@ -15,6 +15,7 @@ import { listAgents } from "../fleet/registry.js";
 import { getAgentPaths, resolveAgentId } from "../fleet/paths.js";
 import { createOnboardingState, loadOnboardingState } from "../setup/onboardingState.js";
 import { runDiagnostic, generateReport, loadRunReport } from "../diagnostic/runner.js";
+import { evaluateDiagnosticEvidenceReadiness, summarizeDiagnosticEvidenceReadiness } from "../diagnostic/evidenceReadiness.js";
 import { runAutoAnswer } from "../diagnostic/autoAnswer/autoAnswerEngine.js";
 import { runAssurance } from "../assurance/assuranceRunner.js";
 import {
@@ -1236,7 +1237,7 @@ interface AgentLatestRunSummary {
 
 interface AgentStatusResponse {
   agentId: string;
-  latestRun: AgentLatestRunSummary | null;
+  latestRun: (AgentLatestRunSummary & ReturnType<typeof summarizeDiagnosticEvidenceReadiness>) | null;
 }
 
 interface OutcomeHistoryRow {
@@ -1357,7 +1358,8 @@ function agentLastStatus(workspace: string, agentId: string): AgentStatusRespons
       ts: Number(last.ts ?? 0),
       integrityIndex: Number(last.integrityIndex ?? 0),
       trustLabel: String(last.trustLabel ?? "UNKNOWN"),
-      status: String(last.status ?? "INVALID")
+      status: String(last.status ?? "INVALID"),
+      ...summarizeDiagnosticEvidenceReadiness(last as Parameters<typeof summarizeDiagnosticEvidenceReadiness>[0])
     }
   };
 }
@@ -7237,7 +7239,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, 403, { error: "scope does not include this agent" });
           return;
         }
-        json(res, 200, report);
+        json(res, 200, { ...report, evidenceReadiness: evaluateDiagnosticEvidenceReadiness(report) });
         return;
       }
 

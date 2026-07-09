@@ -46,11 +46,13 @@ describe("diagnostic report status explanation", () => {
 
     const explanation = explainDiagnosticReportStatus(invalid);
     expect(explanation.label).toContain("Unverified evidence chain");
+    expect(explanation.evidenceStatus).toBe("UNVERIFIED");
     expect(explanation.claimBoundary).toContain("local diagnosis");
     expect(explanation.nextStep).toContain("verify");
 
     const markdown = generateReport(invalid, "md") as string;
-    expect(markdown).toContain("Status: **INVALID** — Unverified evidence chain");
+    expect(markdown).toContain("Artifact Status: **INVALID** — Unverified evidence chain");
+    expect(markdown).toContain("Evidence Readiness: **UNVERIFIED**");
     expect(markdown).toContain("Claim Boundary:");
     expect(markdown).toContain("not client-ready");
   });
@@ -65,20 +67,43 @@ describe("diagnostic report status explanation", () => {
 
     const explanation = explainDiagnosticReportStatus(unsigned);
     expect(explanation.label).toContain("Unsigned local preview");
+    expect(explanation.evidenceStatus).toBe("UNVERIFIED");
 
     const markdown = generateReport(unsigned, "md") as string;
-    expect(markdown).toContain("Status: **UNSIGNED** — Unsigned local preview");
+    expect(markdown).toContain("Artifact Status: **UNSIGNED** — Unsigned local preview");
+    expect(markdown).toContain("Evidence Readiness: **UNVERIFIED**");
     expect(markdown).toContain("Vault signing was skipped");
   });
 
-  test("states when a report is verified and client-ready", () => {
+  test("states when a report is verified and claim-ready", () => {
     const verified = report();
     const explanation = explainDiagnosticReportStatus(verified);
     expect(explanation.strongClaimsAllowed).toBe(true);
     expect(explanation.label).toBe("Verified evidence chain");
+    expect(explanation.evidenceStatus).toBe("READY");
 
     const markdown = generateReport(verified, "md") as string;
-    expect(markdown).toContain("Status: **VALID** — Verified evidence chain");
-    expect(markdown).toContain("client-ready");
+    expect(markdown).toContain("Artifact Status: **VALID** — Verified evidence chain");
+    expect(markdown).toContain("Evidence Readiness: **READY**");
+    expect(markdown).toContain("Claim Eligible: **YES**");
+    expect(markdown).toContain("claim-eligible");
+  });
+
+  test("blocks claims when a signed report has no evidence", () => {
+    const empty = report({
+      integrityIndex: 0,
+      trustLabel: "UNRELIABLE — DO NOT USE FOR CLAIMS",
+      evidenceCoverage: 0,
+      evidenceTrustCoverage: { observed: 0, attested: 0, selfReported: 0 }
+    });
+    const explanation = explainDiagnosticReportStatus(empty);
+    expect(explanation.strongClaimsAllowed).toBe(false);
+    expect(explanation.evidenceStatus).toBe("INSUFFICIENT_EVIDENCE");
+    expect(explanation.claimBoundary).toContain("Signing proves integrity, not evidence sufficiency");
+
+    const markdown = generateReport(empty, "md") as string;
+    expect(markdown).toContain("Artifact Status: **VALID** — Verified evidence chain");
+    expect(markdown).toContain("Evidence Readiness: **INSUFFICIENT_EVIDENCE**");
+    expect(markdown).toContain("Claim Eligible: **NO**");
   });
 });

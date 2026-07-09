@@ -31,6 +31,10 @@ describe("cross-surface AMC brand identity", () => {
       expect(source).toContain("Inter");
       expect(source).toContain("Space Mono");
     }
+    for (const path of ["website/style.css", "website/docs/docs.css"]) {
+      expect(read(path), path).not.toMatch(/letter-spacing:\s*-\.?\d/i);
+    }
+    expect(read("src/console/assets/app.js")).toContain("<strong>Trust mode:</strong>");
   });
 
   test("GitHub README opens with the same product promise and AMC wordmark", () => {
@@ -41,6 +45,18 @@ describe("cross-surface AMC brand identity", () => {
     expect(header).toContain("Run one command. Get the full score. Fix the gaps.");
     expect(header).toContain("Evidence over claims.");
     expect(header).not.toContain("img.shields.io/badge/🧭_AMC");
+    const whitepaper = read("whitepaper/AMC_WHITEPAPER_v1.md");
+    expect(whitepaper).toContain("Agent Maturity Compass (AMC) Framework");
+    expect(whitepaper).not.toContain("Agent Maturity Certification (AMC) Framework");
+  });
+
+  test("GitHub Docs front door uses the same wordmark and product promise", () => {
+    const docsIndex = read("docs/INDEX.md");
+    const header = docsIndex.slice(0, 1200);
+
+    expect(header).toContain('src="https://agentmaturity.co/amc-logo.png"');
+    expect(header).toContain("Run one command. Get the full score. Fix the gaps.");
+    expect(header).toContain("Evidence over claims.");
   });
 
   test("dynamic Docs home uses the website adoption promise and terminal treatment", () => {
@@ -53,6 +69,17 @@ describe("cross-surface AMC brand identity", () => {
     expect(docs).toContain("npx agent-maturity-compass");
     expect(styles).toContain(".welcome-hero");
     expect(styles).toContain(".welcome-command");
+  });
+
+  test("every dynamically rendered document receives the AMC evidence masthead", () => {
+    const docs = read("website/docs/docs.js");
+    const styles = read("website/docs/docs.css");
+
+    expect(docs).toContain('class="doc-brandline"');
+    expect(docs).toContain("artifact valid ≠ evidence ready");
+    expect(docs).toContain("Evidence over claims.");
+    expect(styles).toContain(".doc-brandline");
+    expect(styles).toContain(".doc-brandline-status");
   });
 
   test("standalone Docs pages use the AMC wordmark and dark surfaces", () => {

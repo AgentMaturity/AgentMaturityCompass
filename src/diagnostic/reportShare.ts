@@ -3,6 +3,7 @@ import { join } from "node:path";
 import type { DiagnosticReport } from "../types.js";
 import { ensureDir, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
+import { evaluateDiagnosticEvidenceReadiness } from "./evidenceReadiness.js";
 
 export interface DiagnosticReportShareManifest {
   schemaVersion: 1;
@@ -13,6 +14,9 @@ export interface DiagnosticReportShareManifest {
   alias: string | null;
   agentId: string;
   status: DiagnosticReport["status"];
+  artifactStatus: DiagnosticReport["status"];
+  evidenceStatus: NonNullable<DiagnosticReport["evidenceReadiness"]>["status"];
+  claimEligible: boolean;
   trustLabel: DiagnosticReport["trustLabel"];
   generatedTs: number;
   reportJsonSha256: string;
@@ -83,6 +87,7 @@ export function publicReportUrl(baseUrl: string, slug: string): string {
 }
 
 export function writeDiagnosticReportShareBundle(input: WriteDiagnosticReportShareBundleInput): DiagnosticReportShareBundle {
+  const readiness = evaluateDiagnosticEvidenceReadiness(input.report);
   const slug = sanitizeReportShareSlug(input.preferredSlug ?? input.alias ?? input.report.runId);
   const dir = join(input.outputRoot, slug);
   const htmlPath = join(dir, "index.html");
@@ -100,6 +105,9 @@ export function writeDiagnosticReportShareBundle(input: WriteDiagnosticReportSha
     alias: input.alias ?? null,
     agentId: input.report.agentId ?? "default",
     status: input.report.status,
+    artifactStatus: input.report.status,
+    evidenceStatus: readiness.status,
+    claimEligible: readiness.claimEligible,
     trustLabel: input.report.trustLabel,
     generatedTs: input.now ?? Date.now(),
     reportJsonSha256: input.report.reportJsonSha256,

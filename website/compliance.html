@@ -4,34 +4,34 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>AMC — EU AI Act Compliance for AI Agents</title>
-<meta name="description" content="Map your AI agent's maturity to EU AI Act requirements. Generate compliance evidence, audit binders, and regulatory reports — from open-source tooling.">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧭</text></svg>">
+<meta name="description" content="Map AI agent evidence to EU AI Act obligations without confusing maturity, artifact validity, or evidence readiness with legal certification.">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='4' fill='%230a0a0a'/%3E%3Ctext x='16' y='22' text-anchor='middle' fill='%234AEF79' font-family='monospace' font-size='18' font-weight='700'%3Ea%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#f9fafb;--card:#fff;--text:#111827;--muted:#6b7280;--accent:#2563eb;--accent2:#1d4ed8;--border:#e5e7eb;--green:#059669;--amber:#d97706;--red:#dc2626}
+:root{--bg:#0a0a0a;--card:#111111;--card2:#1a1a1a;--text:#fff;--muted:#a0a0a0;--accent:#4AEF79;--accent2:#3CD468;--border:rgba(255,255,255,.08);--green:#4AEF79;--amber:#f59e0b;--red:#ff3355;--mono:'Space Mono',monospace}
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.7}
 a{color:var(--accent);text-decoration:none}
 a:hover{text-decoration:underline}
 .w{max-width:800px;margin:0 auto;padding:0 1.5rem}
-nav{border-bottom:1px solid var(--border);padding:1rem 0;background:#fff;position:sticky;top:0;z-index:100}
+nav{border-bottom:1px solid var(--border);padding:1rem 0;background:rgba(10,10,10,.95);position:sticky;top:0;z-index:100;backdrop-filter:blur(12px)}
 nav .w{display:flex;justify-content:space-between;align-items:center}
-nav a.logo{font-weight:700;color:var(--text);font-size:1.1rem}
+nav a.logo{font-family:var(--mono);font-weight:700;color:var(--text);font-size:1rem}
 nav a.logo span{color:var(--muted);font-weight:400;font-size:.9rem}
 nav .links{display:flex;gap:1.5rem;align-items:center;font-size:.9rem}
 .hero{padding:4rem 0 3rem;text-align:center;border-bottom:1px solid var(--border)}
-.hero h1{font-size:2rem;font-weight:700;margin-bottom:.75rem;line-height:1.2}
+.hero h1{font-size:2rem;font-weight:700;margin-bottom:.75rem;line-height:1.2;letter-spacing:0}
 .hero h1 span{color:var(--accent)}
 .hero p{color:var(--muted);font-size:1.05rem;max-width:600px;margin:0 auto}
-.badge{display:inline-block;background:#fef3c7;color:#92400e;font-size:.75rem;font-weight:600;padding:.25rem .75rem;border-radius:999px;margin-bottom:1rem}
+.badge{display:inline-block;background:rgba(74,239,121,.06);color:var(--accent);border:1px solid rgba(74,239,121,.2);font-family:var(--mono);font-size:.72rem;font-weight:700;padding:.3rem .7rem;border-radius:4px;margin-bottom:1rem}
 section{padding:3rem 0;border-bottom:1px solid var(--border)}
 h2{font-size:1.4rem;font-weight:700;margin-bottom:1rem}
 h3{font-size:1.1rem;font-weight:600;margin-bottom:.5rem}
 .timeline{display:flex;flex-direction:column;gap:1.5rem;margin:1.5rem 0}
 .tl-item{display:flex;gap:1rem;align-items:flex-start}
 .tl-date{min-width:100px;font-weight:600;color:var(--accent);font-size:.85rem}
-.tl-dot{width:12px;height:12px;border-radius:50%;background:var(--accent);margin-top:.4rem;flex-shrink:0}
+.tl-dot{width:10px;height:10px;background:var(--accent);margin-top:.45rem;flex-shrink:0}
 .tl-text{font-size:.95rem}
 .checklist{list-style:none;padding:0}
 .checklist li{padding:.75rem 0;border-bottom:1px solid var(--border);display:flex;gap:.75rem}
@@ -46,12 +46,12 @@ h3{font-size:1.1rem;font-weight:600;margin-bottom:.5rem}
 .level-status.fail{color:var(--red)}
 .level-status.partial{color:var(--amber)}
 .level-status.pass{color:var(--green)}
-.cmd-box{background:#1e293b;color:#e2e8f0;border-radius:6px;padding:1rem 1.25rem;font-family:'JetBrains Mono',monospace;font-size:.85rem;margin:1rem 0;overflow-x:auto}
-.cmd-box .prompt{color:#94a3b8}
-.cmd-box .flag{color:#38bdf8}
-.cta-section{padding:3rem 0;text-align:center;background:#fff;border-top:2px solid var(--accent)}
+.cmd-box{background:var(--card);color:#e8e8e8;border:1px solid var(--border);border-radius:6px;padding:1rem 1.25rem;font-family:var(--mono);font-size:.85rem;margin:1rem 0;overflow-x:auto}
+.cmd-box .prompt{color:var(--accent)}
+.cmd-box .flag{color:#00e5ff}
+.cta-section{padding:3rem 0;text-align:center;background:var(--card);border-top:2px solid var(--accent)}
 .cta-section h2{font-size:1.6rem}
-.cta-btn{display:inline-block;background:var(--accent);color:#fff;padding:.75rem 2rem;border-radius:6px;font-weight:600;font-size:1rem;margin-top:1rem}
+.cta-btn{display:inline-block;background:var(--accent);color:#0a0a0a;padding:.75rem 2rem;border-radius:6px;font-weight:700;font-size:1rem;margin-top:1rem}
 .cta-btn:hover{background:var(--accent2);text-decoration:none}
 footer{padding:2rem 0;text-align:center;color:var(--muted);font-size:.85rem}
 @media(max-width:600px){
@@ -71,7 +71,7 @@ footer{padding:2rem 0;text-align:center;color:var(--muted);font-size:.85rem}
 
 <nav>
 <div class="w">
-  <a href="index.html" class="logo">🧭 AMC <span>/ Compliance</span></a>
+  <a href="index.html" class="logo">amc<span style="color:var(--accent)">_</span> <span>/ comply</span></a>
   <div class="links">
     <a href="index.html">Home</a>
     <a href="https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/GETTING_STARTED.md">Docs</a>
@@ -83,43 +83,43 @@ footer{padding:2rem 0;text-align:center;color:var(--muted);font-size:.85rem}
 
 <div class="hero">
 <div class="w">
-  <div class="badge">⏰ Mandatory deadline: August 2026</div>
-  <h1>EU AI Act Compliance<br>for <span>AI Agents</span></h1>
-  <p>High-risk AI systems must demonstrate conformity with Articles 9, 12, 13, 14, and 17 by August 2026. AMC maps your agent's actual behavior to these requirements — with cryptographic proof.</p>
+  <div class="badge">official timeline checked 10 July 2026</div>
+  <h1>EU AI Act Compliance <br>for <span>AI Agents</span></h1>
+  <p>AMC maps captured agent evidence to relevant obligations and shows what remains unsupported. It does not turn a maturity level or signed artifact into legal certification.</p>
 </div>
 </div>
 
 <section>
 <div class="w">
   <h2>Why Self-Reported Documentation Won't Work</h2>
-  <p>The EU AI Act requires <strong>evidence of conformity</strong>, not documentation of intent. Every existing framework lets agents grade their own homework. Under the Act, that's explicitly insufficient.</p>
-  <p style="margin-top:1rem">AMC captures agent behavior through a trusted gateway proxy, signs every event with Ed25519 keys, and produces scores from execution evidence — not claims. This is the difference between "we have a policy" and "here's cryptographic proof we enforce it."</p>
+  <p>Documentation of intent is not the same as evidence that a control operated. AMC can capture agent behavior through its gateway, sign evidence events, and link mappings back to the underlying receipts.</p>
+  <p style="margin-top:1rem"><strong>Trust contract:</strong> a <code>VALID</code> artifact proves integrity, not evidence sufficiency. Only evidence readiness <code>READY</code> is claim-eligible. AMC does not certify legal compliance; qualified counsel must determine which obligations apply.</p>
 </div>
 </section>
 
 <section>
 <div class="w">
-  <h2>Evidence Level Required</h2>
+  <h2>Maturity Is Not Legal Status</h2>
   <div class="level-grid">
     <div class="level-card">
       <div class="level-name">L0–L1</div>
-      <div class="level-status fail">INSUFFICIENT</div>
-      <p style="color:var(--muted);font-size:.8rem;margin-top:.5rem">No governance or self-reported only. Cannot deploy under the Act.</p>
+      <div class="level-status fail">EARLY</div>
+      <p style="color:var(--muted);font-size:.8rem;margin-top:.5rem">Major control and evidence gaps remain.</p>
     </div>
     <div class="level-card">
       <div class="level-name">L2</div>
-      <div class="level-status partial">PARTIAL</div>
+      <div class="level-status partial">DEVELOPING</div>
       <p style="color:var(--muted);font-size:.8rem;margin-top:.5rem">Managed processes exist but evidence gaps remain.</p>
     </div>
     <div class="level-card minimum">
       <div class="level-name">L3</div>
-      <div class="level-status pass">MINIMUM</div>
-      <p style="color:var(--muted);font-size:.8rem;margin-top:.5rem">Defined governance with evidence-backed claims. EU AI Act minimum threshold.</p>
+      <div class="level-status pass">DEFINED</div>
+      <p style="color:var(--muted);font-size:.8rem;margin-top:.5rem">Repeatable, measurable controls. Still requires READY evidence and obligation-specific review.</p>
     </div>
     <div class="level-card">
       <div class="level-name">L4–L5</div>
-      <div class="level-status pass">COMPLIANT</div>
-      <p style="color:var(--muted);font-size:.8rem;margin-top:.5rem">Cryptographic proof chains. Audit-ready. Exceeds requirements.</p>
+      <div class="level-status pass">MANAGED</div>
+      <p style="color:var(--muted);font-size:.8rem;margin-top:.5rem">Stronger assurance and continuous verification, not automatic compliance.</p>
     </div>
   </div>
 </div>
@@ -127,13 +127,13 @@ footer{padding:2rem 0;text-align:center;color:var(--muted);font-size:.85rem}
 
 <section>
 <div class="w">
-  <h2>Article-by-Article Mapping</h2>
+  <h2>Evidence Mapping, Not Certification</h2>
   <ul class="checklist">
-    <li><span class="check">✓</span><div><span class="article-ref">Article 9 — Risk Management</span><br>AMC's 142 assurance packs map to systematic risk identification. Each pack targets specific failure modes with documented mitigation paths.</div></li>
-    <li><span class="check">✓</span><div><span class="article-ref">Article 12 — Record Keeping</span><br>Merkle-tree evidence ledger with Ed25519 signatures. Every API call, tool use, and decision is hash-chained into a tamper-proof audit trail.</div></li>
-    <li><span class="check">✓</span><div><span class="article-ref">Article 13 — Transparency</span><br>L0–L5 scores with cryptographic provenance. Auditors can verify scores offline without trusting the operator — using <code>amc verify all --json</code>.</div></li>
-    <li><span class="check">✓</span><div><span class="article-ref">Article 14 — Human Oversight</span><br>Oversight quality scoring measures when the agent can act alone vs when humans must review. Policy-gated autonomy levels with signed action policies.</div></li>
-    <li><span class="check">✓</span><div><span class="article-ref">Article 17 — Quality Management</span><br>Fleet consistency scoring and policy canary detection. Continuous monitoring with drift alerts when scores drop below thresholds.</div></li>
+    <li><span class="check">✓</span><div><span class="article-ref">Article 9 — Risk Management</span><br>Relevant assurance receipts can support risk identification and mitigation review. Applicability and sufficiency remain system-specific.</div></li>
+    <li><span class="check">✓</span><div><span class="article-ref">Article 12 — Record Keeping</span><br>AMC hash-chains captured or ingested evidence events with Ed25519 signatures. Uncaptured activity is not represented in the ledger.</div></li>
+    <li><span class="check">✓</span><div><span class="article-ref">Article 13 — Transparency</span><br>Reports expose L0–L5 scores, evidence references, and unsupported states. Reviewers can verify AMC artifacts offline with <code>amc verify all --json</code>.</div></li>
+    <li><span class="check">✓</span><div><span class="article-ref">Article 14 — Human Oversight</span><br>Oversight scoring and signed action policies can provide evidence about approval boundaries; they do not establish legal conformity by themselves.</div></li>
+    <li><span class="check">✓</span><div><span class="article-ref">Article 17 — Quality Management</span><br>Fleet consistency, policy canaries, monitoring, and drift alerts can support an evidence review when those controls are configured and operating.</div></li>
   </ul>
 </div>
 </section>
@@ -144,9 +144,11 @@ footer{padding:2rem 0;text-align:center;color:var(--muted);font-size:.85rem}
   <div class="timeline">
     <div class="tl-item"><div class="tl-dot" style="background:var(--green)"></div><div><div class="tl-date">Feb 2025</div><div class="tl-text">AI Literacy obligations (Art. 4) took effect</div></div></div>
     <div class="tl-item"><div class="tl-dot" style="background:var(--green)"></div><div><div class="tl-date">Aug 2025</div><div class="tl-text">Prohibited AI practices ban entered into force (Art. 5)</div></div></div>
-    <div class="tl-item"><div class="tl-dot" style="background:var(--amber)"></div><div><div class="tl-date">Aug 2026</div><div class="tl-text"><strong>High-risk AI obligations</strong> — Articles 9, 12, 13, 14, 17 become mandatory</div></div></div>
-    <div class="tl-item"><div class="tl-dot"></div><div><div class="tl-date">Aug 2027</div><div class="tl-text">Full Act in force — all remaining provisions</div></div></div>
+    <div class="tl-item"><div class="tl-dot" style="background:var(--amber)"></div><div><div class="tl-date">Aug 2026</div><div class="tl-text">Article 50 transparency obligations apply for relevant interactive and generated-content systems</div></div></div>
+    <div class="tl-item"><div class="tl-dot"></div><div><div class="tl-date">2 Dec 2027</div><div class="tl-text"><strong>Annex III high-risk rules</strong> apply under the current AI Omnibus political agreement timeline</div></div></div>
+    <div class="tl-item"><div class="tl-dot"></div><div><div class="tl-date">2 Aug 2028</div><div class="tl-text">High-risk rules apply to systems integrated into regulated products</div></div></div>
   </div>
+  <p>Source: <a href="https://digital-strategy.ec.europa.eu/en/policies/guidelines-ai-high-risk-systems">European Commission high-risk guidance</a>. Check the official source for later legal changes.</p>
 </div>
 </section>
 
@@ -158,8 +160,8 @@ footer{padding:2rem 0;text-align:center;color:var(--muted);font-size:.85rem}
     <div><span class="prompt">$</span> npm i -g agent-maturity-compass</div>
     <div><span class="prompt">$</span> mkdir my-agent && cd my-agent</div>
     <div><span class="prompt">$</span> amc init</div>
-    <div><span class="prompt">501/span> amc compliance report <span class="flag">--framework EU_AI_ACT</span></div>
-    <div style="color:#4ade80;margin-top:.5rem">→ L2 (Managed) — ⚠️ IN PROGRESS for EU AI Act</div>
+    <div><span class="prompt">$</span> amc compliance report <span class="flag">--framework EU_AI_ACT</span></div>
+    <div style="color:#f59e0b;margin-top:.5rem">→ L2 (Developing) — mapping gaps remain; not a legal certification</div>
     <div style="margin-top:1rem"><span class="prompt">$</span> amc audit binder create <span class="flag">--framework eu-ai-act</span></div>
     <div style="color:#4ade80">→ Compliance evidence exported to .amc/audit/</div>
     <div style="margin-top:1rem"><span class="prompt">$</span> amc compliance report <span class="flag">--framework eu-ai-act</span></div>
@@ -170,8 +172,8 @@ footer{padding:2rem 0;text-align:center;color:var(--muted);font-size:.85rem}
 
 <div class="cta-section">
 <div class="w">
-  <h2>Your Deadline Is August 2026.</h2>
-  <p style="color:var(--muted)">Start measuring today. Free and open source.</p>
+  <h2>Build evidence before you need it.</h2>
+  <p style="color:var(--muted)">Start with an honest baseline, capture real execution evidence, and keep legal review separate.</p>
   <a href="https://github.com/AgentMaturity/AgentMaturityCompass" class="cta-btn" target="_blank" rel="noopener">Get Started →</a>
   <p style="color:var(--muted);font-size:.8rem;margin-top:1rem"><a href="index.html">← Back to AMC Home</a> · <a href="https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/GETTING_STARTED.md">Full Documentation</a></p>
 </div>
@@ -179,7 +181,7 @@ footer{padding:2rem 0;text-align:center;color:var(--muted);font-size:.85rem}
 
 <footer>
 <div class="w">
-  <p>🧭 Agent Maturity Compass · MIT License · Open Source · <a href="index.html">Home</a></p>
+  <p><span style="font-family:var(--mono);color:var(--text)">amc<span style="color:var(--accent)">_</span></span> · MIT License · Open Source · <a href="index.html">Home</a></p>
 </div>
 </footer>
 

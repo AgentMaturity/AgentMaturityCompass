@@ -9,6 +9,48 @@ function loadPublicOpenApi(): any {
 }
 
 describe("public OpenAPI webhook schemas", () => {
+  test("documents diagnostic artifact validity separately from evidence readiness", () => {
+    const spec = loadPublicOpenApi();
+    const schemas = spec.components.schemas;
+
+    expect(schemas.EvidenceReadiness.required).toEqual([
+      "schemaVersion",
+      "status",
+      "claimEligible",
+      "label",
+      "reasonCodes",
+      "claimBoundary",
+      "nextStep",
+      "thresholds"
+    ]);
+    expect(schemas.EvidenceReadiness.properties.status.enum).toEqual([
+      "READY",
+      "LIMITED",
+      "INSUFFICIENT_EVIDENCE",
+      "UNVERIFIED"
+    ]);
+    expect(schemas.DiagnosticReport.properties.status.description).toContain("Artifact validity only");
+    expect(schemas.DiagnosticReport.properties.evidenceReadiness.allOf[0].$ref).toBe(
+      "#/components/schemas/EvidenceReadiness"
+    );
+    expect(schemas.DiagnosticReportResponse.properties.data.$ref).toBe(
+      "#/components/schemas/DiagnosticReport"
+    );
+
+    for (const [path, method] of [
+      ["/v1/score/run", "post"],
+      ["/v1/score/latest", "get"],
+      ["/v1/score/run/{runId}", "get"],
+      ["/v1/score/report/{runId}", "get"],
+      ["/v1/score/report", "get"]
+    ]) {
+      const response = spec.paths[path][method].responses["200"];
+      expect(response.content["application/json"].schema.$ref).toBe(
+        "#/components/schemas/DiagnosticReportResponse"
+      );
+    }
+  });
+
   test("defines reusable webhook payload and receipt contracts", () => {
     const spec = loadPublicOpenApi();
     const schemas = spec.components.schemas;
