@@ -2114,6 +2114,17 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/auth/me" && req.method === "GET") {
+        const auth = authenticate(req, options.workspace, options.token);
+        if (auth?.isAdmin) {
+          json(res, 200, {
+            userId: "bootstrap-admin",
+            username: auth.username ?? "bootstrap-admin",
+            roles: [...auth.roles],
+            issuedTs: Date.now(),
+            expiresTs: Date.now() + 8 * 60 * 60_000
+          });
+          return;
+        }
         const usersSig = verifyUsersConfigSignature(options.workspace);
         if (!usersSig.valid) {
           json(res, 403, { error: "users config signature invalid" });

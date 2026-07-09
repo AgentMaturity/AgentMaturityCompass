@@ -1,20 +1,20 @@
 <p align="center">
-  <img src="https://img.shields.io/badge/🧭_AMC-Score_Fix_Ship_AI_Agents-4AEF79?style=for-the-badge&labelColor=0a0a0a" alt="AMC" />
+  <img src="website/amc-logo.png" width="148" alt="AMC wordmark" />
 </p>
 
 <h1 align="center">Agent Maturity Compass</h1>
 
 <p align="center">
-  <strong>Score your AI agent. Red-team it. Ship it with proof.</strong><br>
-  Open-source CLI for evidence-based trust scoring, adversarial testing, and compliance.<br>
-  Works with any framework. 60 seconds to your first score.
+  <strong>Run one command. Get the full score. Fix the gaps.</strong><br>
+  Score, red-team, and ship AI agents with execution evidence and portable proof.<br>
+  <em>Evidence over claims.</em>
 </p>
 
 <p align="center">
   <a href="https://www.npmjs.com/package/agent-maturity-compass"><img src="https://img.shields.io/npm/v/agent-maturity-compass?labelColor=0a0a0a&color=4AEF79" alt="npm version" /></a>
   <a href="https://www.npmjs.com/package/agent-maturity-compass"><img src="https://img.shields.io/npm/dm/agent-maturity-compass?labelColor=0a0a0a&color=4AEF79" alt="downloads" /></a>
   <a href="https://github.com/AgentMaturity/AgentMaturityCompass/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/AgentMaturity/AgentMaturityCompass/ci.yml?branch=main&labelColor=0a0a0a&color=4AEF79&label=CI" alt="CI" /></a>
-  <a href="https://github.com/AgentMaturity/AgentMaturityCompass/actions/workflows/ci.yml"><img src="https://img.shields.io/badge/tests-8%2C150%20collected-4AEF79?labelColor=0a0a0a" alt="tests" /></a>
+  <a href="https://github.com/AgentMaturity/AgentMaturityCompass/actions/workflows/ci.yml"><img src="https://img.shields.io/badge/tests-8%2C164%20passing-4AEF79?labelColor=0a0a0a" alt="tests" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-4AEF79?labelColor=0a0a0a" alt="MIT" /></a>
 </p>
 
@@ -130,7 +130,7 @@ cd AgentMaturityCompass && npm ci && npm run build && npm link
 |  | **AMC** | Observability platforms | Eval frameworks | Manual checklists |
 |---|---|---|---|---|
 | **Evidence model** | Execution-verified, cryptographic proofs | Logs and metrics, no trust scoring | Test pass/fail, no maturity model | Self-reported |
-| **Adversarial testing** | 147 attack simulations built in | Not a focus | Partial (prompt-level only) | None |
+| **Adversarial testing** | 142 assurance packs built in | Not a focus | Partial (prompt-level only) | None |
 | **Compliance mapping** | EU AI Act, ISO 42001, NIST, SOC 2, OWASP | Not included | Not included | Manual, labor-intensive |
 | **Framework support** | 14 adapters, zero code changes | Framework-specific agents | Framework-specific | N/A |
 | **Cost** | Free, open source (MIT) | Per-seat/month pricing | Free to paid | Free but manual |
@@ -152,7 +152,7 @@ AMC is not an observability tool and not an eval harness. It is a **trust scorec
 | Resilience | 55 | Graceful degradation, circuit breakers, memory safety, threat resistance, fact/simulation boundaries |
 | Skills | 52 | Tool mastery, injection defense, DLP, scenario traceability, replay safety |
 
-### 147 Assurance Packs
+### 142 Assurance Packs
 
 | Category | Examples |
 |----------|---------|
@@ -237,7 +237,7 @@ AMC Gateway ──── transparent proxy, agent doesn't know it's being watche
 Evidence Ledger ──── Ed25519 signatures + Merkle tree proof chains
     │
     ▼
-Scoring Engine ──── evidence-weighted diagnostics, research-backed scoring, 147 assurance packs
+Scoring Engine ──── evidence-weighted diagnostics, research-backed scoring, 142 assurance packs
     │
     ▼
 AMC Studio ──── dashboard + API + CLI + reports
@@ -668,7 +668,7 @@ The full trust stack is **free and MIT licensed**. The only paid surface is Indu
 
 ### Desktop Studio apps
 
-AMC desktop packages now include `Agent Maturity Compass Studio` launchers for macOS and Windows. The launcher installs AMC from the included tarball when needed, starts `amc up --demo --no-open`, and opens the same local Studio console in the system browser. It does not bundle Electron or a browser runtime; Studio, CLI, and the website share the same dark terminal visual identity.
+AMC desktop packages include `Agent Maturity Compass Studio` launchers for macOS and Windows. Each launcher verifies the included package digest and installs that exact build into a version-pinned per-user runtime, with mutable demo data kept in a separate persistent workspace. An older global CLI cannot start stale Studio code. The native macOS app uses a WebKit window; Windows opens the same loopback-only local Studio in the system browser. Neither bundles Electron or a browser runtime. Studio, CLI, docs, GitHub README, and the website share the same dark terminal identity.
 
 ```bash
 npm run package:desktop
@@ -727,7 +727,7 @@ AMC is MIT licensed. We welcome contributions — especially new **assurance pac
 
 ```bash
 git clone https://github.com/AgentMaturity/AgentMaturityCompass.git
-cd AgentMaturityCompass && npm ci && npm test   # 8,150 collected Vitest tests
+cd AgentMaturityCompass && npm ci && npm test   # 1,035 files / 8,164 passing Vitest tests
 ```
 
 **→ [CONTRIBUTING.md](CONTRIBUTING.md)** — includes guides for writing packs, mapping research papers, and adding adapters.
@@ -748,6 +748,6 @@ cd AgentMaturityCompass && npm ci && npm test   # 8,150 collected Vitest tests
 ---
 
 <p align="center">
-  <strong>244 default diagnostic questions + 20 lifecycle expansion questions · 147 assurance packs · 41 domain packs · 14 adapters · 1,144 CLI command paths</strong><br>
+  <strong>244 default diagnostic questions + 20 lifecycle expansion questions · 142 assurance packs · 41 domain packs · 14 adapters · 1,144 CLI command paths</strong><br>
   <em>Stop trusting. Start verifying.</em>
 </p>

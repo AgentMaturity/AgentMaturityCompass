@@ -11,7 +11,7 @@ The only paid surface is **Industry Packs** — 41 sector-specific domain packs 
 Everything except Industry Packs:
 
 - **Score** — full evidence-weighted trust scoring, gap analysis, maturity diagnostics
-- **Shield** — all 147 adversarial assurance packs
+- **Shield** — all 142 adversarial assurance packs
 - **Enforce** — policy controls, approval workflows, scoped actions, governance
 - **Vault** — Ed25519 signatures, Merkle chains, tamper-evident proof infrastructure
 - **Watch** — traces, anomalies, timelines, monitoring, operational drift detection

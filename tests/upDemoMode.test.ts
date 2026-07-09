@@ -30,7 +30,7 @@ afterEach(() => {
   }
 });
 
-describe("amc up demo/read-only mode", () => {
+describe("amc up local demo mode", () => {
   test("advertises a no-vault demo path and dry-runs it without starting sockets", () => {
     const dir = workspace();
 
@@ -43,7 +43,7 @@ describe("amc up demo/read-only mode", () => {
 
     const plan = runCli(dir, ["up", "--demo", "--dry-run"]);
     expect(plan.status, `${plan.stdout}\n${plan.stderr}`).toBe(0);
-    expect(plan.stdout).toContain("AMC Studio demo/read-only mode");
+    expect(plan.stdout).toContain("AMC Studio local demo mode");
     expect(plan.stdout).toContain("No vault passphrase required");
     expect(plan.stdout).toContain("amc up --demo");
     expect(plan.stdout).toContain("Auto-open: Compass Console after startup");
@@ -60,9 +60,13 @@ describe("amc up demo/read-only mode", () => {
     expect(cli).toContain("_studio-daemon");
     expect(cli).toContain("--host-dir");
     expect(cli).toContain("--default-workspace-id");
+    expect(cli).toContain("--allow-local-demo-workspace");
+    expect(cli).toContain("demo data is local and mutable");
+    expect(cli).toContain("no-login session is restricted to loopback");
     expect(cli).toContain("openExternalUrl(consoleUrl)");
     expect(supervisor).toContain("startStudioDaemon(workspace: string, options");
     expect(supervisor).toContain("hostDir");
+    expect(supervisor).toContain("allowLocalDemoWorkspace");
     expect(supervisor).toContain("writeStudioState(params.workspace, state)");
   });
 
@@ -77,6 +81,9 @@ describe("amc up demo/read-only mode", () => {
     expect(app).toContain("GET /api/v1/score/latest");
     expect(app).toContain("POST /api/v1/score/quickscore");
     expect(app).toContain("x-amc-admin-token");
+    expect(app).toContain("none (loopback-only demo)");
+    expect(app).toContain('"AMC-1.1":2');
+    expect(app).toContain("agentId=");
     expect(app).toContain("curl -s");
     expect(app).toContain("Response shape");
     expect(styles).toContain(".api-quickstart-grid");

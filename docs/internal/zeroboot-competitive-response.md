@@ -11,7 +11,7 @@ Smaller community, narrower scope, less technical depth than AMC.
 |---|---|---|
 | Scope | Full trust stack (8 products) | Testing only |
 | Maturity model | L0-L5 across 5 dimensions | No maturity model |
-| Assurance depth | 147 packs, evolutionary red-team | Basic test suites |
+| Assurance depth | 142 packs, evolutionary red-team | Basic test suites |
 | Compliance | EU AI Act, ISO 42001, NIST, SOC 2, OWASP | None |
 | Crypto evidence | Ed25519 + Merkle trees | None |
 | Domain packs | 41 industry packs | None |

@@ -24,7 +24,8 @@ Thumbs.db
 .amc/guard_events.sqlite
 .amc/guard_events.sqlite-shm
 .amc/guard_events.sqlite-wal
-.amc/studio/tmp/
+.amc/studio/
+.amc/studio-demo-host/
 .amc/release/working/
 .amc/local-vault-passphrase
 .amc/industry-packs-access.json

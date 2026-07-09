@@ -87,12 +87,12 @@ NeurIPS-style LaTeX paper (669 lines) with reported results:
 ## SECTION 2: WHAT AMC IS (Current State)
 
 - 1,364 TypeScript source files
-- 235 diagnostic questions across 5 dimensions
+- 244 default diagnostic questions across 5 dimensions
 - L0-L5 maturity scale with 4 evidence trust tiers
 - 79 scoring modules
-- 147 assurance packs (red-team attack scenarios)
-- 481 CLI commands
-- 4,161 tests across 299 test files
+- 142 assurance packs (red-team attack scenarios)
+- 1,144 CLI command paths
+- 8,150 tests across 1,033 test files
 - Full jailbreak detection subsystem (TAP, PAIR, Crescendo strategies)
 - Studio web dashboard (8,583-line server)
 - Ed25519 cryptographic evidence chain
@@ -202,7 +202,7 @@ const response = await steer.chat(messages, { model: 'gpt-4' });
 
 **Impact**: CRITICAL for credibility. Enterprise buyers and researchers need peer-reviewable evidence.
 
-**Recommendation**: Write and submit an AMC paper. You have the data: 235 questions, 4,161 tests, 147 assurance packs, MiroFish simulation results. Target: ACM FAccT, AAAI, or a safety-specific workshop.
+**Recommendation**: Write and submit an AMC paper. You have the data: 244 default questions, 8,150 tests, 142 assurance packs, MiroFish simulation results. Target: ACM FAccT, AAAI, or a safety-specific workshop.
 
 ---
 
@@ -217,7 +217,7 @@ const response = await steer.chat(messages, { model: 'gpt-4' });
 - Inter-rater reliability (do different evaluators get the same score?)
 - Baseline comparisons (AMC vs random scoring, vs simple heuristics)
 - Bootstrap CIs for all reported metrics
-- Ablation studies (which of the 235 questions actually matter?)
+- Ablation studies (which of the 244 default questions actually matter?)
 
 ---
 
@@ -270,12 +270,12 @@ const response = await steer.chat(messages, { model: 'gpt-4' });
 |---|---|---|
 | **235-question diagnostic** | None — G0DM0D3 doesn't score agents | Massive. AMC's core differentiator. |
 | **L0-L5 maturity model** | None | Provides a growth path, not just a snapshot |
-| **147 assurance packs** | 4 jailbreak combos in "Libertas" | 36x more attack scenarios |
+| **142 assurance packs** | 4 jailbreak combos in "Libertas" | 36x more attack scenarios |
 | **Ed25519 cryptographic evidence** | None | Tamper-evident proof chain |
 | **Merkle tree transparency** | None | Verifiable audit trail |
 | **Compliance frameworks** (EU AI Act, ISO 42001, NIST, SOC 2, OWASP) | None | Enterprise-ready |
 | **Multi-agent fleet management** | None — single-session only | Enterprise scale |
-| **481 CLI commands** | Web UI only | Developer-first, scriptable |
+| **1,144 CLI command paths** | Web UI only | Developer-first, scriptable |
 | **14 framework adapters** | OpenRouter only | Ecosystem integration |
 | **Domain packs** (7 industries) | None | Vertical expertise |
 | **Jailbreak detection** (TAP, PAIR, Crescendo, DAN) | Jailbreak GENERATION only | AMC defends; G0DM0D3 attacks |
@@ -291,7 +291,7 @@ const response = await steer.chat(messages, { model: 'gpt-4' });
 
 #### C1: RED-TEAMING
 - **G0DM0D3**: Parseltongue (input perturbation) + Libertas (4 jailbreak combos) + GODMODE system prompt. Research-grade perturbation engine.
-- **AMC**: 147 assurance packs + adversarial generator + multilingual attacks + jailbreak detector. Broader coverage but less principled perturbation engine.
+- **AMC**: 142 assurance packs + adversarial generator + multilingual attacks + jailbreak detector. Broader coverage but less principled perturbation engine.
 - **WINNER**: AMC on breadth, G0DM0D3 on the perturbation engineering.
 - **ACTION**: Adopt Parseltongue-style composable perturbation engine. AMC's adversarial generator should use systematic obfuscation (leetspeak, unicode homoglyphs, ZWJ, phonetic) instead of just prompt template variations.
 
@@ -357,7 +357,7 @@ Write and submit a paper. Suggested title:
 Include:
 - Formal evaluation of scoring calibration
 - Inter-rater reliability study
-- Ablation: which of 235 questions predict real-world agent quality?
+- Ablation: which of 244 default questions predict real-world agent quality?
 - Comparison against baseline scoring methods
 - Bootstrap CIs for all metrics
 - MiroFish simulation results with proper statistics
@@ -512,7 +512,7 @@ AMC should:
 ## SECTION 6: THE FUNDAMENTAL INSIGHT
 
 G0DM0D3 is ~2,500 lines of TypeScript with a NeurIPS paper.
-AMC is ~100,000+ lines of TypeScript with 4,161 tests and zero academic output.
+AMC is ~100,000+ lines of TypeScript with 8,150 tests and zero academic output.
 
 **The gap isn't features — it's rigor.**
 
@@ -537,7 +537,7 @@ G0DM0D3 deliberately uses regex classifiers (84%) instead of black-box ML (95%+)
 **Action**: For AMC's harm classifier and scoring, prefer transparent algorithms with published accuracy over opaque ML models. Publish the tradeoff.
 
 ### Lesson 3: COMPOSABILITY OVER COMPLETENESS
-G0DM0D3 has 5 primitives. AMC has 481 commands. Simplicity wins adoption.
+G0DM0D3 has 5 primitives. AMC has 1,144 CLI command paths. Simplicity wins adoption.
 
 **Action**: Identify AMC's "5 primitives" — the 5 things that, if used alone, deliver 80% of the value. Make them trivially easy to use. Everything else is advanced.
 

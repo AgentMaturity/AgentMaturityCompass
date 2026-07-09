@@ -1,5 +1,6 @@
+import { randomBytes } from "node:crypto";
 import { spawn } from "node:child_process";
-import { existsSync, openSync, readdirSync, statSync, unlinkSync } from "node:fs";
+import { existsSync, openSync, readFileSync, readdirSync, statSync, unlinkSync } from "node:fs";
 import { join } from "node:path";
 import { verifyGatewayConfigSignature } from "../gateway/config.js";
 import { initActionPolicy, verifyActionPolicySignature } from "../governor/actionPolicyEngine.js";
@@ -55,8 +56,23 @@ export interface StudioRuntime {
 export interface StartStudioDaemonOptions {
   hostDir?: string;
   defaultWorkspaceId?: string;
+  allowLocalDemoWorkspace?: boolean;
   apiPort?: number;
   dashboardPort?: number;
+}
+
+function ensureDemoVaultPassphrase(hostDir: string): string {
+  const file = join(hostDir, "demo-vault-passphrase");
+  ensureDir(hostDir);
+  if (existsSync(file)) {
+    const existing = readFileSync(file, "utf8").trim();
+    if (existing.length > 0) {
+      return existing;
+    }
+  }
+  const generated = `amc-demo-${randomBytes(32).toString("base64url")}`;
+  writeFileAtomic(file, `${generated}\n`, 0o600);
+  return generated;
 }
 
 function enforceStudioLogRetention(workspace: string, retentionDays: number): void {
@@ -244,6 +260,7 @@ export async function runStudioForeground(params: {
   workspace: string;
   hostDir?: string;
   defaultWorkspaceId?: string;
+  allowLocalDemoWorkspace?: boolean;
   apiPort?: number;
   dashboardPort?: number;
   apiHost?: string;
@@ -262,6 +279,9 @@ export async function runStudioForeground(params: {
 }): Promise<StudioRuntime> {
   if (params.hostDir) {
     const hostDir = params.hostDir;
+    if (params.allowLocalDemoWorkspace === true) {
+      process.env.AMC_VAULT_PASSPHRASE = ensureDemoVaultPassphrase(hostDir);
+    }
     const defaultWorkspaceId = params.defaultWorkspaceId ?? "default";
     initHostDb(hostDir);
     const existing = getWorkspaceRecord(hostDir, defaultWorkspaceId);
@@ -271,8 +291,11 @@ export async function runStudioForeground(params: {
         workspaceId: defaultWorkspaceId,
         name: "Default Workspace"
       });
+    }
+    const defaultWorkspaceDir = hostWorkspaceDir(hostDir, defaultWorkspaceId);
+    if (!existsSync(join(defaultWorkspaceDir, ".amc", "amc.config.yaml"))) {
       initWorkspace({
-        workspacePath: hostWorkspaceDir(hostDir, defaultWorkspaceId),
+        workspacePath: defaultWorkspaceDir,
         trustBoundaryMode: "isolated"
       });
     }
@@ -283,6 +306,7 @@ export async function runStudioForeground(params: {
       host: apiHost,
       port: apiPort,
       defaultWorkspaceId,
+      allowLocalDemoWorkspace: params.allowLocalDemoWorkspace,
       allowedCidrs: params.allowedCidrs,
       trustedProxyHops: params.trustedProxyHops,
       maxRequestBytes: params.maxRequestBytes,
@@ -568,6 +592,9 @@ export async function startStudioDaemon(workspace: string, options: StartStudioD
   }
   if (options.defaultWorkspaceId) {
     args.push("--default-workspace-id", options.defaultWorkspaceId);
+  }
+  if (options.allowLocalDemoWorkspace) {
+    args.push("--allow-local-demo-workspace");
   }
   if (typeof options.apiPort === "number") {
     args.push("--api-port", String(options.apiPort));

@@ -25,7 +25,7 @@ Try it in 60 seconds: `npx agent-maturity-compass`
 
 Key features:
 🧭 L0-L5 maturity scoring across 5 dimensions
-🛡️ 147 adversarial attack simulations
+🛡️ 142 assurance packs
 📋 EU AI Act / ISO 42001 compliance automation
 🔌 14 framework adapters (zero code changes)
 🔐 Ed25519 + Merkle tree proof chains

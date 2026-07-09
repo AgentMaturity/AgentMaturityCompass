@@ -14,11 +14,34 @@ describe("desktop app packaging and visual identity", () => {
     expect(script).toContain("Agent Maturity Compass Studio.app");
     expect(script).toContain("CFBundleIdentifier");
     expect(script).toContain("co.agentmaturity.studio");
-    expect(script).toContain("amc up --demo");
-    expect(script).toContain("open \"http://127.0.0.1:3212/w/demo/console\"");
+    expect(script).toContain("NSAllowsLocalNetworking");
+    expect(script).toContain("writeMacLauncherExecutable");
+    expect(script).toContain("studioMacBrowserOpenCommand");
+    expect(script).toContain("const macRuntime = writeMacLauncherExecutable");
+    expect(script).toContain("runtime: macRuntime");
+    expect(script).toContain('run("codesign"');
+    expect(script).toContain("launch-studio.sh");
+    expect(script).toContain("WebKit/WebKit.h");
+    expect(script).toContain("WKWebView");
+    expect(script).toContain("native-webkit");
+    expect(script).toContain("[task terminationStatus] != 0");
+    expect(script).toContain("Could not start AMC Studio. See the launcher log");
+    expect(script).toContain("/opt/homebrew/bin:/usr/local/bin");
+    expect(script).toContain("PACKAGE_DIGEST");
+    expect(script).toContain("npm install --prefix");
+    expect(script).toContain("node_modules/.bin/amc");
+    expect(script).toContain(String.raw`node_modules\\.bin\\amc.cmd`);
+    expect(script).toContain("studio-workspace");
+    expect(script).toContain('cd "$WORKSPACE_DIR"');
+    expect(script).toContain("Set-Location $WorkspaceDir");
+    expect(script).toContain('"$AMC_BIN" up --demo');
+    expect(script).toContain("& $AmcBin up --demo");
+    expect(script).toContain("Could not start AMC Studio. See $LogFile.");
+    expect(script).not.toContain('up --demo --no-open >>"$LOG_FILE" 2>&1 || true');
+    expect(script).not.toContain("open \\\"http://127.0.0.1:3212/w/demo/console/\\\"");
     expect(script).toContain("writeWindowsStudioApp");
     expect(script).toContain("Agent Maturity Compass Studio.cmd");
-    expect(script).toContain("Start-Process \"http://127.0.0.1:3212/w/demo/console\"");
+    expect(script).toContain("Start-Process \"http://127.0.0.1:3212/w/demo/console/\"");
     expect(script).toContain("appLaunchers");
   });
 
@@ -27,6 +50,7 @@ describe("desktop app packaging and visual identity", () => {
 
     expect(verifier).toContain("Agent Maturity Compass Studio.app/Contents/Info.plist");
     expect(verifier).toContain("Agent Maturity Compass Studio.app/Contents/MacOS/Agent Maturity Compass Studio");
+    expect(verifier).toContain("Agent Maturity Compass Studio.app/Contents/Resources/launch-studio.sh");
     expect(verifier).toContain("Agent Maturity Compass Studio.ps1");
     expect(verifier).toContain("Agent Maturity Compass Studio.cmd");
     expect(verifier).toContain("appLaunchers");
@@ -39,17 +63,30 @@ describe("desktop app packaging and visual identity", () => {
     const app = read("src/console/assets/app.js");
 
     expect(dashboard).toContain('<link rel="manifest" href="./assets/manifest.json" />');
-    expect(dashboard).toContain('<link rel="stylesheet" href="./assets/styles.css" />');
+    expect(dashboard).toContain('<link rel="stylesheet" href="./assets/styles.css?v=20260710b" />');
     expect(dashboard).toContain('data-page="home"');
-    expect(dashboard).toContain('<script type="module" src="./assets/app.js"></script>');
+    expect(dashboard).toContain('<script type="module" src="./assets/app.js?v=20260710b"></script>');
     expect(dashboard).not.toContain("<style>body{font-family:system-ui");
     expect(home).toContain("Compass Console - AMC Studio");
     expect(styles).toContain("--accent: #4AEF79");
     expect(styles).toContain("--bg-terminal: #2a2a2a");
     expect(styles).toContain(".studio-desktop-note");
+    expect(styles).toContain(".topbar");
+    expect(styles).toContain(".quick-action-grid");
+    expect(styles).toContain(".mobile-nav-toggle");
+    expect(styles).toContain("nav.mobile-nav-open a");
     expect(app).toContain("Desktop app");
-    expect(app).toContain("147 assurance packs");
+    expect(app).toContain("native WebKit");
+    expect(app).toContain("142 assurance packs");
     expect(app).toContain("1,144 CLI paths");
+    expect(app).toContain("workspace-authenticated trust boundary");
+    expect(app).toContain("mutable local data");
+    expect(app).toContain("const launchCommand = demoMode");
+    expect(app).toContain('setAttribute("aria-label", "Toggle navigation")');
+    expect(app).toContain('nav.classList.toggle("mobile-nav-open"');
+    expect(read("src/console/assets/sw.js")).toContain('CACHE_NAME = "amc-console-v5"');
+    expect(read("src/console/assets/sw.js")).toContain("self.skipWaiting()");
+    expect(read("src/console/assets/sw.js")).toContain('req.mode === "navigate"');
   });
 
   test("CLI format uses the same public website green and tagline", () => {
@@ -75,8 +112,12 @@ describe("desktop app packaging and visual identity", () => {
       expect(content).toContain("Windows");
     }
     expect(desktopDocs).toContain("launcher app");
+    expect(desktopDocs).toContain("version-pinned per-user runtime");
+    expect(desktopDocs).toContain("native WebKit");
     expect(desktopDocs).toContain("does not bundle Electron");
     expect(desktopDocs).toContain("opens the same local Studio console");
+    expect(readme).toContain("version-pinned per-user runtime");
+    expect(website).toContain("native WebKit");
     expect(website).toContain("macOS and Windows launcher apps");
   });
 });

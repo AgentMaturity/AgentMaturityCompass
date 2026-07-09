@@ -643,13 +643,13 @@ Options:
   --dashboard-port <port>
 
 # up --demo --dry-run:
-AMC Studio demo/read-only mode
+AMC Studio local demo mode
 No vault passphrase required.
 Verifier boundary: not verifier-ready; signed artifacts require vault setup and the standard `amc up` path.
 ```
 
 #### Friction Points:
-1. **Exploratory Studio startup is now available** — Carlos can run `amc up --demo` to explore the API without vault setup, while signed production startup remains vault-backed.
+1. **Exploratory Studio startup is now available** — Carlos can run `amc up --demo` to explore the API without vault setup, while signed production startup remains vault-backed. Demo data is mutable, and no-login access is restricted to a loopback listener.
 2. **`amc api` is nearly empty** — The `api` command only has `status`. Carlos expected things like `amc api docs`, `amc api routes`, or `amc api spec`. There's a full API reference in `docs/API_REFERENCE.md` but it's not discoverable from the CLI.
 3. **API endpoints not listed anywhere in CLI** — Carlos has no way to discover what endpoints exist without reading docs files. `studio ping` just checks if it's running.
 4. **`amc up` is the start command but isn't obvious** — `amc studio start` exists but `amc up` is the recommended path. Having two ways to start is confusing.

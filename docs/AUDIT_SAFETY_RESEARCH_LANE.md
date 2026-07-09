@@ -45,9 +45,9 @@
 ## 7. Schema Consistency
 **Status:** PASS
 **Findings:**
-- Verified total question count is 235 across schemas.
-- `bankSchema.ts`, `canonSchema.ts`, and `mechanicSchema.ts` all correctly demand `length(235)`.
-- `questionBank.ts` contains exactly 235 questions.
+- Historical audit note: the total question count at this March 2026 audit point was 235 across schemas; the current public default bank has since expanded to 244.
+- Historical schema note: those schema checks matched the then-current count; use live generated docs and tests for the current count.
+- Current-count caveat: do not use this historical audit as the current question-bank count.
 
 ## Overall Verdict
 **PASS.** The Safety Research Lane and all associated assurance packs, scoring modules, and diagnostic schemas are correctly integrated and functionally sound. No fixes were required.

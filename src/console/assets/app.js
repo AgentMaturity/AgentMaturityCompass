@@ -98,6 +98,62 @@ function card(title, body) {
   return `<section class="card"><h3>${htmlEscape(title)}</h3>${body}</section>`;
 }
 
+function currentWorkspaceLabel() {
+  const prefix = workspacePrefixFromPath();
+  if (!prefix) {
+    return "local";
+  }
+  return decodeURIComponent(prefix.replace(/^\/w\//, ""));
+}
+
+function decorateShell() {
+  const nav = document.querySelector("nav");
+  if (nav && !nav.querySelector(".mobile-nav-toggle")) {
+    nav.id = nav.id || "amc-main-navigation";
+    const toggle = document.createElement("button");
+    toggle.type = "button";
+    toggle.className = "mobile-nav-toggle";
+    toggle.setAttribute("aria-label", "Toggle navigation");
+    toggle.setAttribute("aria-controls", nav.id);
+    toggle.setAttribute("aria-expanded", "false");
+    toggle.title = "Toggle navigation";
+    toggle.innerHTML = '<span class="mobile-nav-icon" aria-hidden="true"></span>';
+    toggle.addEventListener("click", () => {
+      const open = nav.classList.toggle("mobile-nav-open");
+      toggle.setAttribute("aria-expanded", String(open));
+    });
+    nav.insertBefore(toggle, nav.querySelector("a"));
+  }
+
+  document.querySelectorAll("nav a").forEach((anchor) => {
+    const href = anchor.getAttribute("href") || "";
+    const normalizedHref = href.replace(/^\.\//, "").replace(/\.html$/, "");
+    anchor.classList.toggle("active", normalizedHref === page);
+  });
+
+  const main = document.querySelector("main");
+  if (!main || main.querySelector(".topbar")) {
+    return;
+  }
+  const workspace = currentWorkspaceLabel();
+  const demoMode = workspace === "demo";
+  const topbar = document.createElement("section");
+  topbar.className = "topbar";
+  topbar.innerHTML = `
+    <div>
+      <div class="topbar-kicker">Agent Maturity Compass</div>
+      <strong>Compass Console</strong>
+      <span class="muted">/ ${htmlEscape(workspace)} workspace</span>
+    </div>
+    <div class="topbar-actions">
+      ${demoMode ? '<span class="pill ok">local demo session</span>' : '<span class="pill muted">session protected</span>'}
+      <a class="button secondary" href="./evidence">Evidence</a>
+      <a class="button secondary" href="./standard">Open Standard</a>
+    </div>
+  `;
+  main.insertBefore(topbar, main.firstChild);
+}
+
 const FALLBACK_SURFACES = [
   {
     surface: "Score",
@@ -252,22 +308,25 @@ function renderOnboardingSteps(state) {
 
 function renderApiQuickstart(status, agentId) {
   const base = `${window.location.origin}${workspacePrefixFromPath()}`;
+  const demoMode = currentWorkspaceLabel() === "demo";
   const tokenHeader = 'x-amc-admin-token: <admin-token>';
+  const authDisplay = demoMode ? "none (loopback-only demo)" : tokenHeader;
+  const authArgument = demoMode ? "" : ` -H "${tokenHeader}"`;
   const examples = [
     {
       label: "GET /status",
       method: "GET",
       path: "/status",
       title: "Studio status",
-      command: `curl -s ${base}/status -H "${tokenHeader}"`,
+      command: `curl -s ${base}/status${authArgument}`,
       response: '{ "studio": { "running": true }, "vaultLocked": true }'
     },
     {
       label: "GET /api/v1/score/latest",
       method: "GET",
-      path: `/api/v1/score/latest?agent=${encodeURIComponent(agentId)}`,
+      path: `/api/v1/score/latest?agentId=${encodeURIComponent(agentId)}`,
       title: "Latest score",
-      command: `curl -s "${base}/api/v1/score/latest?agent=${encodeURIComponent(agentId)}" -H "${tokenHeader}"`,
+      command: `curl -s "${base}/api/v1/score/latest?agentId=${encodeURIComponent(agentId)}"${authArgument}`,
       response: '{ "runId": "...", "integrityIndex": 0.82, "trustLabel": "HIGH TRUST" }'
     },
     {
@@ -275,8 +334,8 @@ function renderApiQuickstart(status, agentId) {
       method: "POST",
       path: "/api/v1/score/quickscore",
       title: "Run quickscore",
-      command: `curl -s ${base}/api/v1/score/quickscore -H "content-type: application/json" -H "${tokenHeader}" -d '{"agentId":"${agentId}"}'`,
-      response: '{ "score": 0, "level": "L0", "nextActions": [...] }'
+      command: `curl -s ${base}/api/v1/score/quickscore -H "content-type: application/json"${authArgument} -d '{"answers":{"AMC-1.1":2,"AMC-2.1":2,"AMC-3.1.1":2,"AMC-4.1":2,"AMC-5.1":2}}'`,
+      response: '{ "ok": true, "data": { "result": { "preliminaryLevel": "L2", "percentage": 40 } } }'
     }
   ];
   return `
@@ -287,8 +346,8 @@ function renderApiQuickstart(status, agentId) {
           <code>${htmlEscape(base || window.location.origin)}</code>
         </div>
         <div>
-          <div class="muted">Auth header</div>
-          <code>${htmlEscape(tokenHeader)}</code>
+           <div class="muted">Auth header</div>
+           <code>${htmlEscape(authDisplay)}</code>
         </div>
         <div>
           <div class="muted">Current agent</div>
@@ -928,9 +987,12 @@ function renderAuthScreen() {
   if (!root) {
     return;
   }
+  const demoMode = currentWorkspaceLabel() === "demo";
   root.innerHTML = `
-    <div class="card">
+    <div class="card auth-card">
+      <div class="studio-kicker">AMC Studio access</div>
       <h2>AMC Studio Login</h2>
+      ${demoMode ? '<p class="banner">Local demo mode creates a no-login session on loopback only. If this screen remains after startup, refresh once or use the emergency admin token.</p>' : ''}
       <p class="muted">Login with username/password. Admin token fallback is available for emergency CLI access.</p>
       <div class="row wrap">
         <input id="loginUser" placeholder="username" />
@@ -1011,29 +1073,39 @@ async function renderHome() {
   const agentId = status.studio?.currentAgent || "default";
   const vaultState = status.vaultLocked ? "LOCKED" : "UNLOCKED";
   const studioRunning = status.studio?.running === false ? "STOPPED" : "RUNNING";
+  const demoMode = currentWorkspaceLabel() === "demo";
+  const modeDescription = demoMode
+    ? "explore the product in a loopback-only demo workspace."
+    : "operate through the workspace-authenticated trust boundary.";
+  const modeMeta = demoMode
+    ? '<span class="pill ok">loopback-only demo</span><span class="pill muted">mutable local data</span><span class="pill muted">unsigned outputs</span>'
+    : `<span class="pill ok">workspace authenticated</span><span class="pill muted">vault ${vaultState.toLowerCase()}</span><span class="pill muted">evidence-first runtime</span>`;
+  const launchCommand = demoMode ? "$ amc up --demo --no-open" : "$ amc up";
   root.innerHTML = `
-    <section class="card studio-hero">
+    <section class="card studio-hero studio-hero-polished">
       <div>
-        <div class="studio-kicker">amc studio</div>
-        <h2 class="studio-title">Run<span>Watch</span><strong>Prove_</strong></h2>
+        <div class="studio-kicker">local command center</div>
+        <h2 class="studio-title">Score<span>Watch</span><strong>Ship proof_</strong></h2>
         <p class="studio-sub">
-          A local control plane for the full AMC trust stack. Run the 244-question score,
-          inspect evidence, watch drift, browse Industry Packs, and export audit-ready proof
-          without leaving your workspace.
+          A polished local control plane for the full AMC trust stack. Run the 244-question score,
+          inspect evidence, watch drift, browse Industry Packs, and ${modeDescription}
         </p>
+        <div class="studio-hero-meta">
+          ${modeMeta}
+        </div>
         <div class="studio-actions">
           <button id="studioRunFullScore">run full score →</button>
-          <a class="secondary" href="./industrypacks" style="display:inline-flex;align-items:center;border:1px solid var(--border-strong);border-radius:6px;padding:9px 13px;font-family:var(--mono);font-size:12px;color:var(--ink)">industry packs →</a>
-          <a class="secondary" href="./evidence?agent=${encodeURIComponent(agentId)}" style="display:inline-flex;align-items:center;border:1px solid var(--border-strong);border-radius:6px;padding:9px 13px;font-family:var(--mono);font-size:12px;color:var(--ink)">lifecycle evidence →</a>
+          <a class="button secondary" href="./industrypacks">industry packs →</a>
+          <a class="button secondary" href="./evidence?agent=${encodeURIComponent(agentId)}">lifecycle evidence →</a>
         </div>
       </div>
-      <div class="studio-terminal">
+      <div class="studio-terminal studio-live-panel">
         <div class="studio-terminal-bar">
           <span class="studio-dot r"></span><span class="studio-dot y"></span><span class="studio-dot g"></span>
-          <span class="studio-terminal-title">amc up</span>
+          <span class="studio-terminal-title">live runtime</span>
         </div>
         <div class="studio-terminal-body">
-          <div class="studio-command">$ amc up</div>
+          <div class="studio-command">${launchCommand}</div>
           <div class="studio-terminal-line"><strong>Studio</strong><span>${htmlEscape(studioRunning)}</span></div>
           <div class="studio-terminal-line"><strong>Agent</strong><span>${htmlEscape(agentId)}</span></div>
           <div class="studio-terminal-line"><strong>Gateway</strong><span>${htmlEscape(status.studio?.gatewayPort || "-")}</span></div>
@@ -1044,20 +1116,26 @@ async function renderHome() {
       </div>
     </section>
 
+    <section class="quick-action-grid">
+      <a class="quick-action-card" href="./score"><span>01</span><strong>Score</strong><em>run diagnostics</em></a>
+      <a class="quick-action-card" href="./assurance"><span>02</span><strong>Assure</strong><em>attack packs</em></a>
+      <a class="quick-action-card" href="./evidence?agent=${encodeURIComponent(agentId)}"><span>03</span><strong>Evidence</strong><em>prove chain</em></a>
+      <a class="quick-action-card" href="./integrations"><span>04</span><strong>API</strong><em>curl-ready flows</em></a>
+    </section>
+
     <section class="card studio-desktop-note">
       <div>
         <div class="studio-kicker">Desktop app</div>
-        <h3>Same AMC surface on macOS, Windows, CLI, and web.</h3>
+        <h3>Native macOS shell, same AMC evidence-first surface.</h3>
         <p class="muted">
-          The desktop launcher opens this local Studio console, while the CLI keeps the same evidence-first flow:
-          244 default questions, 264 lifecycle questions, 147 assurance packs, 41 Industry Packs, and 1,144 CLI paths.
+          The macOS app now starts local demo-mode Studio and renders this Console inside a native WebKit window. Windows still launches the same local URL in the system browser. Both keep the same flow: 244 default questions, 264 lifecycle questions, 142 assurance packs, 41 Industry Packs, and 1,144 CLI paths.
         </p>
       </div>
       <div class="row wrap">
-        <span class="pill ok">macOS launcher</span>
-        <span class="pill ok">Windows launcher</span>
-        <span class="pill muted">system browser</span>
-        <span class="pill muted">no bundled runtime</span>
+        <span class="pill ok">macOS native WebKit</span>
+        <span class="pill ok">local demo session</span>
+        <span class="pill muted">Windows launcher</span>
+        <span class="pill muted">no Electron</span>
       </div>
     </section>
 
@@ -2660,6 +2738,7 @@ async function renderGeneric(title, endpoint) {
 }
 
 async function renderPage() {
+  decorateShell();
   renderOfflineBanner(!navigator.onLine);
   if (page === "login") {
     renderAuthScreen();
@@ -3008,6 +3087,6 @@ window.addEventListener("offline", () => {
 });
 
 document.addEventListener("DOMContentLoaded", async () => {
-  await installPwa();
+  void installPwa();
   await renderPage();
 });

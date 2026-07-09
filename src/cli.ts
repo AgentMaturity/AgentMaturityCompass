@@ -3496,8 +3496,8 @@ program
 program
   .command("up")
   .description("Start AMC control plane in one command (studio + gateway + bridge)")
-  .option("--demo", "Start no-vault demo/read-only Studio for exploration", false)
-  .option("--read-only", "Alias for --demo", false)
+  .option("--demo", "Start a no-vault local demo workspace for exploration", false)
+  .option("--read-only", "Legacy alias for --demo; demo data is local and mutable", false)
   .option("--dry-run", "Print the startup plan without binding ports", false)
   .option("--no-open", "Do not open the Compass Console browser after demo startup")
   .action(async (opts: { demo?: boolean; readOnly?: boolean; dryRun?: boolean; open?: boolean }) => {
@@ -3507,7 +3507,7 @@ program
       const demoHostDir = join(workspace, ".amc", "studio-demo-host");
       const defaultWorkspaceId = "demo";
       if (opts.dryRun) {
-        console.log(chalk.bold("AMC Studio demo/read-only mode"));
+        console.log(chalk.bold("AMC Studio local demo mode"));
         console.log("No vault passphrase required.");
         console.log(`Workspace: ${workspace}`);
         console.log(`Host data: ${demoHostDir}`);
@@ -3521,15 +3521,17 @@ program
 
       const state = await startStudioDaemon(workspace, {
         hostDir: demoHostDir,
-        defaultWorkspaceId
+        defaultWorkspaceId,
+        allowLocalDemoWorkspace: true
       });
-      console.log(chalk.green("AMC Studio demo/read-only mode is running"));
+      console.log(chalk.green("AMC Studio local demo mode is running"));
       console.log(chalk.yellow("No vault passphrase required; outputs are not verifier-ready."));
+      console.log(chalk.yellow("Local demo data is mutable and the no-login session is restricted to loopback."));
       console.log(`Workspace: ${workspace}`);
       console.log(`Host data: ${demoHostDir}`);
       console.log(`Default workspace: ${defaultWorkspaceId}`);
       console.log(`Studio API: http://${state.host}:${state.apiPort}`);
-      const consoleUrl = `http://${state.host}:${state.apiPort}/w/${defaultWorkspaceId}/console`;
+      const consoleUrl = `http://${state.host}:${state.apiPort}/w/${defaultWorkspaceId}/console/`;
       console.log(`Compass Console: ${consoleUrl}`);
       console.log("API examples: Compass Console home > API Quickstart.");
       if (opts.open !== false) {
@@ -3589,7 +3591,7 @@ program
             "Option 2 — first-time setup (generates passphrase):",
             "  amc setup",
             "",
-            "Option 3 — explore without signing (demo/read-only mode):",
+            "Option 3 — explore without signing (local demo mode):",
             "  amc up --demo",
             "  amc up --demo --dry-run"
           ].join("\n")
@@ -18456,7 +18458,8 @@ program
   .option("--dashboard-port <port>", "dashboard port")
   .option("--host-dir <path>", "host-mode data directory")
   .option("--default-workspace-id <id>", "host-mode default workspace id")
-  .action(async (opts: { workspace: string; apiPort?: string; dashboardPort?: string; hostDir?: string; defaultWorkspaceId?: string }) => {
+  .option("--allow-local-demo-workspace", "allow no-login access to the default demo workspace on loopback only")
+  .action(async (opts: { workspace: string; apiPort?: string; dashboardPort?: string; hostDir?: string; defaultWorkspaceId?: string; allowLocalDemoWorkspace?: boolean }) => {
     const explicitApiPort = opts.apiPort ? Number(opts.apiPort) : undefined;
     const explicitDashboardPort = opts.dashboardPort ? Number(opts.dashboardPort) : undefined;
     const runtimeConfig = loadStudioRuntimeConfig(process.env, {
@@ -18474,6 +18477,7 @@ program
       workspace: runtimeConfig.workspaceDir,
       hostDir: runtimeConfig.hostDir ?? undefined,
       defaultWorkspaceId: runtimeConfig.defaultWorkspaceId,
+      allowLocalDemoWorkspace: opts.allowLocalDemoWorkspace === true,
       apiPort: resolvedApiPort,
       dashboardPort: resolvedDashboardPort,
       apiHost: hostMode ? runtimeConfig.hostBind : runtimeConfig.bind,

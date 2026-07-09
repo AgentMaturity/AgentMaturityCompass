@@ -17,11 +17,11 @@ AMC is an open-source, evidence-based framework for measuring, comparing, and co
 
 **Key Stats:**
 - 244 default diagnostic questions across 5 dimensions
-- 147 assurance packs (red-team scenarios)
+- 142 assurance packs (red-team scenarios)
 - 41 industry domain packs across 7 sectors
 - 94 scoring modules
 - 14 framework adapters
-- Test counts drift quickly; repository verification on 2026-06-26 recorded 1033 Vitest files / 8150 tests
+- Test counts drift quickly; repository verification on 2026-07-10 recorded 1,035 Vitest files / 8,164 tests
 - 1,144 public `amc ...` command paths in `docs/CLI_COMMAND_INVENTORY.md` as of 2026-06-26
 - ~700+ TypeScript source files plus late-stage/domain CLI registration splits
 
@@ -122,7 +122,7 @@ CLI (amc) → Studio API + Console → Workspace (.amc) + Ledger + Merkle
 3. **Evidence/Verifiability** — Ledger (SQLite), Receipts, Transparency/Merkle
 4. **Agent Traffic/Integration** — Gateway, Bridge, 14 Adapters
 5. **Governance/Policy** — Governor, Approvals, Policy Packs, Work Orders
-6. **Assurance/Audit/Compliance** — 147 packs, 9 compliance frameworks
+6. **Assurance/Audit/Compliance** — 142 packs, 9 compliance frameworks
 7. **Operations/Reliability** — Circuit breakers, retention, backup
 8. **Data/State** — SQLite stores, YAML configs, JSONL logs
 9. **Deployment** — Docker, Compose, Helm, K8s, Vercel
@@ -133,7 +133,7 @@ CLI (amc) → Studio API + Console → Workspace (.amc) + Ledger + Merkle
 | Surface | Purpose |
 |---------|---------|
 | **Score** | 244-question default diagnostic, 264-question lifecycle expansion, quickscore, maturity levels |
-| **Shield** | 147 assurance packs, red-team testing |
+| **Shield** | 142 assurance packs, red-team testing |
 | **Enforce** | Runtime guardrails, circuit breakers, sandboxing |
 | **Vault** | Secrets, DLP, privacy, data residency |
 | **Watch** | Monitoring, observability, behavioral profiling |
@@ -231,7 +231,7 @@ CLI (amc) → Studio API + Console → Workspace (.amc) + Ledger + Merkle
 
 **falsePositiveTracker.ts** — FP tracking with future scoring adjustment.
 
-**147 Packs** including: injectionPack, hallucinationPack, toolMisusePack, sandboxBoundaryPack, configLintPack, dlpExfiltrationPack.
+**142 Packs** including: injectionPack, hallucinationPack, toolMisusePack, sandboxBoundaryPack, configLintPack, dlpExfiltrationPack.
 
 ### 4.4 Enforce — src/enforce/ (30+ modules, E1-E34)
 
@@ -492,7 +492,7 @@ Request Token → Present Token → Verify (signature, expiry, claims)
 
 ### 9.1 Scale
 - Counts drift quickly because the source-review wave adds many boundary suites.
-- Repository verification on 2026-06-26 recorded `npm test -- --reporter=dot` passing at 1033 files / 8150 tests.
+- Repository verification on 2026-07-10 recorded `npm test -- --reporter=dot` passing at 1,035 files / 8,164 tests.
 - 7 Playwright E2E specs remain part of the broader test surface.
 
 ### 9.2 Framework
@@ -554,7 +554,7 @@ Request Token → Present Token → Verify (signature, expiry, claims)
 - All 14 framework adapters
 - 1,144 public `amc ...` command paths as of 2026-06-26
 - 244 default diagnostic questions plus the 264-question lifecycle-expanded set
-- 147 assurance packs
+- 142 assurance packs
 
 **Paid: Industry Packs only (41 domain packs)**
 
@@ -668,7 +668,7 @@ amc comply report
 
 # Build & test
 npm run build
-npm test                    # count drifts; repository verification recorded 1033 files / 8150 tests on 2026-06-26
+npm test                    # count drifts; repository verification recorded 1,035 files / 8,164 tests on 2026-07-10
 npm run typecheck
 npm run test:e2e            # Playwright
 ```

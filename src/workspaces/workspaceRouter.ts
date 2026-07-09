@@ -50,6 +50,7 @@ interface WorkspaceApiRuntime {
   workspaceId: string;
   port: number;
   host: string;
+  token: string;
   close: () => Promise<void>;
 }
 
@@ -64,10 +65,16 @@ interface StartWorkspaceRouterOptions {
   host: string;
   port: number;
   defaultWorkspaceId?: string;
+  allowLocalDemoWorkspace?: boolean;
   allowedCidrs?: string[];
   trustedProxyHops?: number;
   maxRequestBytes?: number;
   corsAllowedOrigins?: string[];
+}
+
+function isLoopbackHost(host: string): boolean {
+  const normalized = host.trim().toLowerCase().replace(/^\[|\]$/g, "");
+  return normalized === "127.0.0.1" || normalized === "::1" || normalized === "localhost";
 }
 
 interface HostEventPayload {
@@ -644,6 +651,7 @@ async function proxyToWorkspace(
   targetPath: string
 ): Promise<void> {
   const method = (req.method ?? "GET").toUpperCase();
+  const { origin: _origin, host: _host, ...forwardHeaders } = req.headers;
   const upstream = httpRequest(
     {
       host: runtime.host,
@@ -651,8 +659,9 @@ async function proxyToWorkspace(
       method,
       path: targetPath,
       headers: {
-        ...req.headers,
-        host: `${runtime.host}:${runtime.port}`
+        ...forwardHeaders,
+        host: `${runtime.host}:${runtime.port}`,
+        "x-amc-admin-token": runtime.token
       }
     },
     (upstreamRes) => {
@@ -681,11 +690,15 @@ async function proxyToWorkspace(
 }
 
 export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions): Promise<HostRuntime> {
+  if (options.allowLocalDemoWorkspace === true && !isLoopbackHost(options.host)) {
+    throw new Error("Local demo workspace requires a loopback host (127.0.0.1, ::1, or localhost).");
+  }
   const manager = new WorkspaceManager({
     hostDir: options.hostDir,
     defaultWorkspaceId: options.defaultWorkspaceId ?? DEFAULT_WORKSPACE_ID,
     maxOpenWorkspaces: 32
   });
+  const defaultWorkspaceId = manager.resolveWorkspaceId(options.defaultWorkspaceId ?? DEFAULT_WORKSPACE_ID);
   const workspaceApis = new Map<string, WorkspaceApiRuntime>();
   const hostEvents = new HostSseHub();
   const hostLoginLimiter = makeRateLimiter(20, 60_000);
@@ -720,6 +733,7 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
       workspaceId: normalized,
       host: "127.0.0.1",
       port: localPort,
+      token: runtime.token,
       close: async () => api.close()
     };
     workspaceApis.set(normalized, result);
@@ -1393,20 +1407,15 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
         return;
       }
 
-      const aliasPrefix = (() => {
-        if (pathname.startsWith("/api/") || pathname === "/api") {
-          return "api";
-        }
-        if (pathname.startsWith("/console") || pathname.startsWith("/events/")) {
-          return "plain";
-        }
-        return null;
-      })();
-      if (aliasPrefix) {
+      const isDefaultWorkspaceAlias = pathname.startsWith("/api/") ||
+        pathname === "/api" ||
+        pathname.startsWith("/console") ||
+        pathname.startsWith("/events/");
+      if (isDefaultWorkspaceAlias) {
         const defaultId = manager.resolveWorkspaceId(options.defaultWorkspaceId ?? DEFAULT_WORKSPACE_ID);
-        const target = aliasPrefix === "api" ? pathname.replace(/^\/api/, "/") : pathname;
-        const runtime = await ensureWorkspaceApi(defaultId);
-        await proxyToWorkspace(req, res, runtime, target);
+        res.statusCode = 307;
+        res.setHeader("location", `/w/${encodeURIComponent(defaultId)}${pathname}${url.search}`);
+        res.end();
         return;
       }
 
@@ -1417,7 +1426,11 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
       }
       const urlWorkspaceId = normalizeWorkspaceId(wsMatch[1] ?? "");
       const rest = wsMatch[2] ?? "/";
-      const workspacePath = rest.startsWith("/api/") ? rest.slice("/api".length) : rest;
+      const workspacePath = rest === "/api/v1" || rest.startsWith("/api/v1/")
+        ? rest
+        : rest.startsWith("/api/")
+          ? rest.slice("/api".length)
+          : rest;
 
       if (workspacePath === "/healthz") {
         json(res, 200, {
@@ -1576,6 +1589,7 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
 
       if (!lease.leaseToken) {
         const hostAccess = resolveHostAccess(req, options.hostDir);
+        const allowLocalDemoAccess = options.allowLocalDemoWorkspace === true && urlWorkspaceId === defaultWorkspaceId;
         if (hostAccess.ok) {
           const roles = resolveWorkspaceRolesForHostAccess(options.hostDir, urlWorkspaceId, hostAccess);
           if (roles.length === 0) {
@@ -1593,14 +1607,32 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
             });
             setWorkspaceSessionCookie(res, urlWorkspaceId, issued.token, Math.floor((issued.payload.expiresTs - issued.payload.issuedTs) / 1000));
             res.statusCode = 302;
-            res.setHeader("location", pathname + url.search);
+            res.setHeader("location", workspacePath === "/console" ? `${pathname}/${url.search}` : pathname + url.search);
             res.end();
             return;
+          }
+        } else if (allowLocalDemoAccess) {
+          if (!workspaceSessionValid && req.method === "GET" && (workspacePath === "/" || workspacePath.startsWith("/console"))) {
+            const issued = issueSessionToken({
+              workspace: manager.withWorkspace(urlWorkspaceId, (context) => context.workspaceDir),
+              userId: "local-demo",
+              username: "demo",
+              roles: ["OWNER", "OPERATOR", "AUDITOR", "APPROVER", "VIEWER"],
+              ttlMs: 8 * 60 * 60_000
+            });
+            setWorkspaceSessionCookie(res, urlWorkspaceId, issued.token, Math.floor((issued.payload.expiresTs - issued.payload.issuedTs) / 1000));
           }
         } else if (!workspaceSessionValid) {
           json(res, 401, { error: "missing workspace session" });
           return;
         }
+      }
+
+      if (req.method === "GET" && workspacePath === "/console") {
+        res.statusCode = 302;
+        res.setHeader("location", `${pathname}/${url.search}`);
+        res.end();
+        return;
       }
 
       const runtime = await ensureWorkspaceApi(urlWorkspaceId);

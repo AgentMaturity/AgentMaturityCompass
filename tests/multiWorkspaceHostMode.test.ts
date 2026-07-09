@@ -18,6 +18,7 @@ import {
 import { hostMigrateCli } from "../src/workspaces/hostCli.js";
 import { hostWorkspaceDir } from "../src/workspaces/workspacePaths.js";
 import { startWorkspaceRouter } from "../src/workspaces/workspaceRouter.js";
+import { runStudioForeground } from "../src/studio/studioSupervisor.js";
 
 const roots: string[] = [];
 
@@ -53,6 +54,7 @@ async function httpRaw(params: {
   body?: unknown;
   cookie?: string;
   lease?: string;
+  headers?: Record<string, string>;
 }): Promise<{ status: number; body: string; headers: Record<string, string | string[] | undefined> }> {
   const raw = params.body === undefined ? "" : JSON.stringify(params.body);
   return new Promise((resolvePromise, rejectPromise) => {
@@ -65,7 +67,8 @@ async function httpRaw(params: {
           "content-type": "application/json",
           "content-length": Buffer.byteLength(raw),
           ...(params.cookie ? { cookie: params.cookie } : {}),
-          ...(params.lease ? { "x-amc-lease": params.lease } : {})
+          ...(params.lease ? { "x-amc-lease": params.lease } : {}),
+          ...(params.headers ?? {})
         }
       },
       (res) => {
@@ -199,6 +202,40 @@ describe("multi-workspace host mode", () => {
       const onlyB = listAccessibleWorkspaces(hostDir, "viewerb");
       expect(onlyB.map((row) => row.workspaceId)).toEqual(["ws-b"]);
       expect(readFileSync(join(workspaceB, ".amc", "amc.config.yaml"), "utf8")).toContain("trustBoundaryMode");
+    } finally {
+      await host.close();
+    }
+  }, 30_000);
+
+  test("default-workspace aliases redirect into the authenticated workspace namespace", async () => {
+    const { hostDir } = setupHostWithTwoWorkspaces();
+    const port = await pickFreePort();
+    const host = await startWorkspaceRouter({
+      hostDir,
+      host: "127.0.0.1",
+      port,
+      defaultWorkspaceId: "ws-a"
+    });
+
+    try {
+      const apiAlias = await httpRaw({
+        url: `http://127.0.0.1:${port}/api/status?source=alias`,
+        method: "GET"
+      });
+      const consoleAlias = await httpRaw({
+        url: `http://127.0.0.1:${port}/console/assets/app.js`,
+        method: "GET"
+      });
+      const unauthenticatedTarget = await httpRaw({
+        url: `http://127.0.0.1:${port}/w/ws-a/api/status`,
+        method: "GET"
+      });
+
+      expect(apiAlias.status).toBe(307);
+      expect(String(apiAlias.headers.location ?? "")).toBe("/w/ws-a/api/status?source=alias");
+      expect(consoleAlias.status).toBe(307);
+      expect(String(consoleAlias.headers.location ?? "")).toBe("/w/ws-a/console/assets/app.js");
+      expect(unauthenticatedTarget.status).toBe(401);
     } finally {
       await host.close();
     }
@@ -347,13 +384,14 @@ describe("multi-workspace host mode", () => {
         cookie: hostCookie
       });
       expect(workspaceBootstrap.status).toBe(302);
+      expect(String(workspaceBootstrap.headers.location ?? "")).toBe(`/w/ws-a/console/`);
       const workspaceCookie = Array.isArray(workspaceBootstrap.headers["set-cookie"])
         ? workspaceBootstrap.headers["set-cookie"][0] ?? ""
         : String(workspaceBootstrap.headers["set-cookie"] ?? "");
       const combinedCookie = `${hostCookie.split(";")[0] ?? ""}; ${workspaceCookie.split(";")[0] ?? ""}`;
 
       const workspaceConsole = await httpRaw({
-        url: `http://127.0.0.1:${port}/w/ws-a/console`,
+        url: `http://127.0.0.1:${port}/w/ws-a/console/`,
         method: "GET",
         cookie: combinedCookie
       });
@@ -372,6 +410,150 @@ describe("multi-workspace host mode", () => {
       expect(workspaceJs.body.includes("https://cdn")).toBe(false);
     } finally {
       await host.close();
+    }
+  }, 30_000);
+
+  test("explicit local demo mode lets the desktop launcher bootstrap the default workspace console", async () => {
+    const { hostDir } = setupHostWithTwoWorkspaces();
+    const port = await pickFreePort();
+    const host = await startWorkspaceRouter({
+      hostDir,
+      host: "127.0.0.1",
+      port,
+      defaultWorkspaceId: "ws-a",
+      allowLocalDemoWorkspace: true
+    });
+
+    try {
+      const defaultConsoleBootstrap = await httpRaw({
+        url: `http://127.0.0.1:${port}/w/ws-a/console`,
+        method: "GET"
+      });
+      expect(defaultConsoleBootstrap.status).toBe(302);
+      expect(String(defaultConsoleBootstrap.headers.location ?? "")).toBe(`/w/ws-a/console/`);
+      const workspaceCookie = Array.isArray(defaultConsoleBootstrap.headers["set-cookie"])
+        ? defaultConsoleBootstrap.headers["set-cookie"][0] ?? ""
+        : String(defaultConsoleBootstrap.headers["set-cookie"] ?? "");
+      expect(workspaceCookie).toContain("amc_session=");
+      expect(workspaceCookie).toContain("Path=/w/ws-a");
+
+      const defaultConsole = await httpRaw({
+        url: `http://127.0.0.1:${port}/w/ws-a/console/`,
+        method: "GET",
+        cookie: workspaceCookie
+      });
+      const defaultConsoleJs = await httpRaw({
+        url: `http://127.0.0.1:${port}/w/ws-a/console/assets/app.js`,
+        method: "GET",
+        cookie: workspaceCookie
+      });
+      const browserLikeConsoleJs = await httpRaw({
+        url: `http://127.0.0.1:${port}/w/ws-a/console/assets/app.js`,
+        method: "GET",
+        cookie: workspaceCookie,
+        headers: {
+          origin: `http://127.0.0.1:${port}`,
+          referer: `http://127.0.0.1:${port}/w/ws-a/console/`
+        }
+      });
+      const apiWithCookie = await httpRaw({
+        url: `http://127.0.0.1:${port}/w/ws-a/api/status`,
+        method: "GET",
+        cookie: workspaceCookie
+      });
+      const directApiWithoutCookie = await httpRaw({
+        url: `http://127.0.0.1:${port}/w/ws-a/api/status`,
+        method: "GET"
+      });
+      const quickscoreQuestions = await httpRaw({
+        url: `http://127.0.0.1:${port}/w/ws-a/api/v1/score/quickscore/questions`,
+        method: "GET"
+      });
+      const nonDefaultConsole = await httpRaw({
+        url: `http://127.0.0.1:${port}/w/ws-b/console`,
+        method: "GET"
+      });
+
+      expect(defaultConsole.status).toBe(200);
+      expect(defaultConsole.body).toContain("Compass Console - AMC Studio");
+      expect(defaultConsole.body).not.toContain("missing workspace session");
+      expect(defaultConsoleJs.status).toBe(200);
+      expect(defaultConsoleJs.body).toContain("Desktop app");
+      expect(browserLikeConsoleJs.status).toBe(200);
+      expect(browserLikeConsoleJs.body).toContain("Desktop app");
+      expect(apiWithCookie.status).toBe(200);
+      expect(apiWithCookie.body).not.toContain("missing or invalid token");
+      expect(directApiWithoutCookie.status).toBe(200);
+      expect(directApiWithoutCookie.body).not.toContain("missing or invalid token");
+      expect(quickscoreQuestions.status).toBe(200);
+      expect(quickscoreQuestions.body).toContain("AMC-1.1");
+      expect(nonDefaultConsole.status).toBe(401);
+    } finally {
+      await host.close();
+    }
+  }, 30_000);
+
+  test("local demo workspace refuses non-loopback exposure", async () => {
+    const { hostDir } = setupHostWithTwoWorkspaces();
+    const port = await pickFreePort();
+    const attempt = startWorkspaceRouter({
+      hostDir,
+      host: "0.0.0.0",
+      port,
+      defaultWorkspaceId: "ws-a",
+      allowLocalDemoWorkspace: true
+    }).then(async (runtime) => {
+      await runtime.close();
+      return runtime;
+    });
+
+    await expect(attempt).rejects.toThrow(/loopback/i);
+  });
+
+  test("host-mode Studio startup isolates its demo vault and repairs a partial default workspace", async () => {
+    const originalPassphrase = process.env.AMC_VAULT_PASSPHRASE;
+    process.env.AMC_VAULT_PASSPHRASE = "ambient-real-vault-passphrase";
+    const hostDir = newDir("amc-partial-demo-host-");
+    initHostDb(hostDir);
+    createWorkspaceRecord({ hostDir, workspaceId: "demo", name: "Demo Workspace" });
+    const port = await pickFreePort();
+    const runtime = await runStudioForeground({
+      workspace: newDir("amc-demo-shell-workspace-"),
+      hostDir,
+      defaultWorkspaceId: "demo",
+      allowLocalDemoWorkspace: true,
+      apiHost: "127.0.0.1",
+      apiPort: port
+    });
+
+    try {
+      const bootstrap = await httpRaw({
+        url: `http://127.0.0.1:${port}/w/demo/console`,
+        method: "GET"
+      });
+      const workspaceCookie = Array.isArray(bootstrap.headers["set-cookie"])
+        ? bootstrap.headers["set-cookie"][0] ?? ""
+        : String(bootstrap.headers["set-cookie"] ?? "");
+      const consolePage = await httpRaw({
+        url: `http://127.0.0.1:${port}/w/demo/console/`,
+        method: "GET",
+        cookie: workspaceCookie
+      });
+
+      expect(bootstrap.status).toBe(302);
+      expect(String(bootstrap.headers.location ?? "")).toBe(`/w/demo/console/`);
+      expect(process.env.AMC_VAULT_PASSPHRASE).not.toBe("ambient-real-vault-passphrase");
+      expect(process.env.AMC_VAULT_PASSPHRASE).toBe(readFileSync(join(hostDir, "demo-vault-passphrase"), "utf8").trim());
+      expect(readFileSync(join(hostWorkspaceDir(hostDir, "demo"), ".amc", "amc.config.yaml"), "utf8")).toContain("trustBoundaryMode");
+      expect(consolePage.status).toBe(200);
+      expect(consolePage.body).toContain("Compass Console - AMC Studio");
+    } finally {
+      await runtime.stop();
+      if (typeof originalPassphrase === "string") {
+        process.env.AMC_VAULT_PASSPHRASE = originalPassphrase;
+      } else {
+        delete process.env.AMC_VAULT_PASSPHRASE;
+      }
     }
   }, 30_000);
 

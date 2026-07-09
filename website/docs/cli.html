@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>CLI Reference — AMC Documentation</title>
   <meta name="description" content="Complete CLI reference for Agent Maturity Compass — all commands organized by namespace with examples, flags, and environment variables.">
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230D6E6E'/%3E%3Ctext x='16' y='22' text-anchor='middle' fill='white' font-size='18' font-weight='bold'%3EA%3C/text%3E%3C/svg%3E">
-  <link rel="stylesheet" href="shared.css">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230a0a0a'/%3E%3Ctext x='16' y='22' text-anchor='middle' fill='%234AEF79' font-size='18' font-weight='bold'%3Ea%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="shared.css?v=20260710b">
   <style>
     .ns-toggle { cursor: pointer; user-select: none; }
     .ns-toggle h3 { display: flex; align-items: center; gap: 8px; }
@@ -17,8 +17,8 @@
     .cmd-count { font-size: 0.75rem; color: var(--text-light); font-weight: 400; font-family: var(--mono); }
     .expand-all { font-size: 0.82rem; color: var(--teal); cursor: pointer; background: none; border: 1px solid var(--border); padding: 5px 14px; border-radius: 6px; font-family: var(--sans); }
     .expand-all:hover { background: rgba(74,239,121,0.06); }
-    #cmd-search { width: 100%; padding: 10px 16px; border: 1px solid var(--border); border-radius: 8px; font-size: 0.9rem; font-family: var(--mono); background: #fff; color: var(--text); outline: none; margin-bottom: 24px; }
-    #cmd-search:focus { border-color: var(--teal); box-shadow: 0 0 0 3px rgba(13,110,110,0.08); }
+    #cmd-search { width: 100%; padding: 10px 16px; border: 1px solid var(--border); border-radius: 8px; font-size: 0.9rem; font-family: var(--mono); background: var(--bg-alt); color: var(--text); outline: none; margin-bottom: 24px; }
+    #cmd-search:focus { border-color: var(--green); box-shadow: 0 0 0 3px rgba(74,239,121,0.1); }
     .highlight-match { background: var(--orange-pale); border-radius: 2px; }
   </style>
 </head>
@@ -27,7 +27,7 @@
 
 <div class="topbar">
   <button class="menu-btn" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
-  <a href="../" class="topbar-logo"><span class="logo-icon">A</span> AMC Docs</a>
+  <a href="../" class="topbar-logo">amc<span class="brand-cursor">_</span> docs</a>
   <nav class="topbar-nav">
     <a href="getting-started.html">Getting Started</a>
     <a href="cli.html" class="active">CLI Reference</a>

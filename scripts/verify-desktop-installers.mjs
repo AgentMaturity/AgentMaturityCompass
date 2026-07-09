@@ -110,7 +110,8 @@ for (const pkg of manifest.packages ?? []) {
           `${base}/Agent Maturity Compass Studio.app/Contents/Info.plist`,
           `${base}/Agent Maturity Compass Studio.app/Contents/PkgInfo`,
           `${base}/Agent Maturity Compass Studio.app/Contents/MacOS/Agent Maturity Compass Studio`,
-          `${base}/Agent Maturity Compass Studio.app/Contents/Resources/README.md`
+          `${base}/Agent Maturity Compass Studio.app/Contents/Resources/README.md`,
+          `${base}/Agent Maturity Compass Studio.app/Contents/Resources/launch-studio.sh`
         ]
         : [])
     ];

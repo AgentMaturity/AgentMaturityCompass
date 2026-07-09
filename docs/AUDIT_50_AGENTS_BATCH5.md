@@ -127,7 +127,7 @@ npx agent-maturity-compass quickscore
 **Website (`website/index.html`):**
 - `website/executive.html` now provides a dedicated board brief with plain-language framing, what the board sees, what engineering does, what changes, and a four-step operating path. ✅
 - Homepage desktop/mobile nav and footer now link to the executive path. ✅
-- Executive KPI copy uses current counts: 244 default diagnostic questions, 147 assurance packs, 41 industry packs, and 600 sector-specific questions. ✅
+- Executive KPI copy uses current counts: 244 default diagnostic questions, 142 assurance packs, 41 industry packs, and 600 sector-specific questions. ✅
 - The page uses `website/og-card.png` as an inspectable product visual and includes accessibility basics through the shared website shell. ✅
 
 **Dashboard:**

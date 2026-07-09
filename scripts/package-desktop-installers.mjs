@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { createHash } from "node:crypto";
-import { cpSync, mkdtempSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
+import { chmodSync, cpSync, mkdtempSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { basename, join, relative, resolve } from "node:path";
 import { spawnSync } from "node:child_process";
@@ -17,9 +17,9 @@ const studioAppName = "Agent Maturity Compass Studio";
 const studioMacAppBundleName = "Agent Maturity Compass Studio.app";
 const studioWindowsCmdName = "Agent Maturity Compass Studio.cmd";
 const studioWindowsPs1Name = "Agent Maturity Compass Studio.ps1";
-const studioUrl = "http://127.0.0.1:3212/w/demo/console";
-const studioMacOpenCommand = 'open "http://127.0.0.1:3212/w/demo/console"';
-const studioWindowsOpenCommand = 'Start-Process "http://127.0.0.1:3212/w/demo/console"';
+const studioUrl = "http://127.0.0.1:3212/w/demo/console/";
+const studioMacBrowserOpenCommand = `open "${studioUrl}"`;
+const studioWindowsOpenCommand = 'Start-Process "http://127.0.0.1:3212/w/demo/console/"';
 
 function run(command, args, options = {}) {
   const result = spawnSync(command, args, {
@@ -94,7 +94,156 @@ Write-Host "AMC installed. Run: amc --version; amc doctor"
   writeFileSync(join(targetDir, "install.cmd"), `@echo off\r\npowershell -ExecutionPolicy Bypass -File "%~dp0install.ps1"\r\n`);
 }
 
-function writeMacStudioApp(targetDir, tarballName) {
+function writeMacLauncherExecutable(executablePath) {
+  const sourcePath = join(workRoot, "amc-macos-studio-launcher.m");
+  writeFileSync(sourcePath, `#import <Cocoa/Cocoa.h>
+#import <WebKit/WebKit.h>
+
+static NSString * const AMCStudioURL = @"${studioUrl}";
+
+@interface AMCStudioDelegate : NSObject <NSApplicationDelegate, WKNavigationDelegate>
+@property (strong) NSWindow *window;
+@property (strong) WKWebView *webView;
+@property (strong) NSTextField *statusLabel;
+@end
+
+@implementation AMCStudioDelegate
+
+- (void)applicationDidFinishLaunching:(NSNotification *)notification {
+  [self buildWindow];
+  [self startStudioAndLoad];
+  [NSApp activateIgnoringOtherApps:YES];
+}
+
+- (BOOL)applicationShouldTerminateAfterLastWindowClosed:(NSApplication *)sender {
+  return YES;
+}
+
+- (void)buildWindow {
+  NSRect frame = NSMakeRect(0, 0, 1280, 820);
+  self.window = [[NSWindow alloc] initWithContentRect:frame
+                                            styleMask:(NSWindowStyleMaskTitled | NSWindowStyleMaskClosable | NSWindowStyleMaskMiniaturizable | NSWindowStyleMaskResizable)
+                                              backing:NSBackingStoreBuffered
+                                                defer:NO];
+  [self.window setTitle:@"${studioAppName}"];
+  [self.window setMinSize:NSMakeSize(980, 640)];
+  [self.window center];
+
+  WKWebViewConfiguration *configuration = [[WKWebViewConfiguration alloc] init];
+  configuration.preferences.javaScriptCanOpenWindowsAutomatically = YES;
+  self.webView = [[WKWebView alloc] initWithFrame:[[self.window contentView] bounds] configuration:configuration];
+  [self.webView setNavigationDelegate:self];
+  [self.webView setAutoresizingMask:(NSViewWidthSizable | NSViewHeightSizable)];
+
+  self.statusLabel = [NSTextField labelWithString:@"Starting local AMC Studio…"];
+  [self.statusLabel setFrame:NSMakeRect(0, 0, frame.size.width, frame.size.height)];
+  [self.statusLabel setAutoresizingMask:(NSViewWidthSizable | NSViewHeightSizable)];
+  [self.statusLabel setAlignment:NSTextAlignmentCenter];
+  [self.statusLabel setTextColor:[NSColor colorWithCalibratedRed:0.29 green:0.94 blue:0.47 alpha:1.0]];
+  [self.statusLabel setBackgroundColor:[NSColor colorWithCalibratedWhite:0.04 alpha:1.0]];
+  [self.statusLabel setFont:[NSFont monospacedSystemFontOfSize:18 weight:NSFontWeightSemibold]];
+  [self.statusLabel setSelectable:NO];
+  [self.statusLabel setBezeled:NO];
+  [self.statusLabel setDrawsBackground:YES];
+
+  [[self.window contentView] addSubview:self.webView];
+  [[self.window contentView] addSubview:self.statusLabel];
+  [self.window makeKeyAndOrderFront:nil];
+}
+
+- (void)startStudioAndLoad {
+  NSString *script = [[[NSBundle mainBundle] resourcePath] stringByAppendingPathComponent:@"launch-studio.sh"];
+  dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), ^{
+    @autoreleasepool {
+      NSTask *task = [[NSTask alloc] init];
+      [task setLaunchPath:@"/bin/sh"];
+      [task setArguments:@[script]];
+      @try {
+        [task launch];
+        [task waitUntilExit];
+      } @catch (NSException *exception) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+          [self.statusLabel setStringValue:[NSString stringWithFormat:@"Could not start AMC Studio: %@", [exception reason]]];
+        });
+        return;
+      }
+      if ([task terminationStatus] != 0) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+          [self.statusLabel setHidden:NO];
+          [self.statusLabel setStringValue:@"Could not start AMC Studio. See the launcher log in ~/Library/Logs/Agent Maturity Compass."];
+        });
+        return;
+      }
+      dispatch_async(dispatch_get_main_queue(), ^{
+        [self loadStudio];
+      });
+    }
+  });
+}
+
+- (void)loadStudio {
+  NSURL *url = [NSURL URLWithString:AMCStudioURL];
+  if (!url) {
+    [self.statusLabel setStringValue:@"Invalid AMC Studio URL."];
+    return;
+  }
+  [self.statusLabel setStringValue:@"Loading Compass Console…"];
+  [self.webView loadRequest:[NSURLRequest requestWithURL:url]];
+}
+
+- (void)webView:(WKWebView *)webView didFinishNavigation:(WKNavigation *)navigation {
+  [self.statusLabel setHidden:YES];
+}
+
+- (void)webView:(WKWebView *)webView didFailNavigation:(WKNavigation *)navigation withError:(NSError *)error {
+  [self.statusLabel setHidden:NO];
+  [self.statusLabel setStringValue:[NSString stringWithFormat:@"AMC Studio is not ready yet. %@", [error localizedDescription]]];
+}
+
+- (void)webView:(WKWebView *)webView didFailProvisionalNavigation:(WKNavigation *)navigation withError:(NSError *)error {
+  [self.statusLabel setHidden:NO];
+  [self.statusLabel setStringValue:[NSString stringWithFormat:@"AMC Studio is not ready yet. %@", [error localizedDescription]]];
+}
+
+@end
+
+int main(int argc, const char * argv[]) {
+  @autoreleasepool {
+    NSApplication *application = [NSApplication sharedApplication];
+    [application setActivationPolicy:NSApplicationActivationPolicyRegular];
+    AMCStudioDelegate *delegate = [[AMCStudioDelegate alloc] init];
+    [application setDelegate:delegate];
+    [application run];
+  }
+  return 0;
+}
+`);
+
+  if (process.platform === "darwin") {
+    run("clang", [
+      "-fobjc-arc",
+      "-framework", "Cocoa",
+      "-framework", "WebKit",
+      "-mmacosx-version-min=12.0",
+      "-arch", "arm64",
+      "-arch", "x86_64",
+      sourcePath,
+      "-o", executablePath
+    ], { timeoutMs: 180_000 });
+    chmodSync(executablePath, 0o755);
+    return "native-webkit";
+  }
+
+  writeFileSync(executablePath, `#!/usr/bin/env sh
+set -eu
+APP_BIN_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+/bin/sh "$APP_BIN_DIR/../Resources/launch-studio.sh"
+${studioMacBrowserOpenCommand}
+`, { mode: 0o755 });
+  return "system-browser";
+}
+
+function writeMacStudioApp(targetDir, tarballName, tarballDigest) {
   const appRoot = join(targetDir, studioMacAppBundleName);
   const contentsDir = join(appRoot, "Contents");
   const macosDir = join(contentsDir, "MacOS");
@@ -126,75 +275,119 @@ function writeMacStudioApp(targetDir, tarballName) {
   <string>${pkg.version}</string>
   <key>LSMinimumSystemVersion</key>
   <string>12.0</string>
-</dict>
+  <key>NSAppTransportSecurity</key>
+  <dict>
+    <key>NSAllowsLocalNetworking</key>
+    <true/>
+  </dict>
+  <key>NSHighResolutionCapable</key>
+  <true/>
+  </dict>
 </plist>
 `);
   writeFileSync(join(contentsDir, "PkgInfo"), "APPL????");
-  writeFileSync(join(resourcesDir, "README.md"), `# ${studioAppName}
 
-This lightweight macOS launcher installs AMC from the included npm tarball when needed, starts local demo-mode Studio, and opens ${studioUrl}.
-
-It does not bundle Electron, Chromium, WebKit content, or any third-party source snapshot.
-`);
-
-  const executable = `#!/usr/bin/env sh
+  const launchScript = `#!/usr/bin/env sh
 set -eu
 
-APP_BIN_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
-PACKAGE_DIR=$(CDPATH= cd -- "$APP_BIN_DIR/../../.." && pwd)
+APP_RESOURCES_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+PACKAGE_DIR=$(CDPATH= cd -- "$APP_RESOURCES_DIR/../../.." && pwd)
 PACKAGE="$PACKAGE_DIR/${tarballName}"
+PACKAGE_DIGEST="${tarballDigest}"
 LOG_DIR="$HOME/Library/Logs/Agent Maturity Compass"
 LOG_FILE="$LOG_DIR/studio-launcher.log"
+RUNTIME_DIR="$HOME/Library/Application Support/Agent Maturity Compass/runtime"
+WORKSPACE_DIR="$HOME/Library/Application Support/Agent Maturity Compass/studio-workspace"
+DIGEST_FILE="$RUNTIME_DIR/package.sha256"
+AMC_BIN="$RUNTIME_DIR/node_modules/.bin/amc"
+
+# Finder/LaunchServices apps do not inherit an interactive shell PATH. Include
+# the common Homebrew/npm locations so the desktop app behaves like Terminal.
+export PATH="/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:$PATH"
 
 mkdir -p "$LOG_DIR"
-cd "$PACKAGE_DIR"
 
-if ! command -v amc >/dev/null 2>&1; then
+CURRENT_DIGEST=""
+if [ -f "$DIGEST_FILE" ]; then
+  CURRENT_DIGEST=$(cat "$DIGEST_FILE")
+fi
+
+if [ "$CURRENT_DIGEST" != "$PACKAGE_DIGEST" ] || [ ! -x "$AMC_BIN" ]; then
   if ! command -v npm >/dev/null 2>&1; then
     osascript -e 'display dialog "Node.js 20 or 22 LTS with npm is required before launching Agent Maturity Compass Studio." buttons {"OK"} default button "OK"' >/dev/null 2>&1 || true
     exit 1
   fi
-  npm install -g "$PACKAGE" >>"$LOG_FILE" 2>&1
+  mkdir -p "$RUNTIME_DIR"
+  npm install --prefix "$RUNTIME_DIR" --no-audit --no-fund "$PACKAGE" >>"$LOG_FILE" 2>&1
+  printf '%s\n' "$PACKAGE_DIGEST" > "$DIGEST_FILE"
 fi
 
-amc up --demo --no-open >>"$LOG_FILE" 2>&1 || true
-${studioMacOpenCommand}
+mkdir -p "$WORKSPACE_DIR"
+cd "$WORKSPACE_DIR"
+"$AMC_BIN" up --demo --no-open >>"$LOG_FILE" 2>&1
 `;
-  writeFileSync(join(macosDir, studioAppName), executable, { mode: 0o755 });
+  writeFileSync(join(resourcesDir, "launch-studio.sh"), launchScript, { mode: 0o755 });
+  const macRuntime = writeMacLauncherExecutable(join(macosDir, studioAppName));
+  writeFileSync(join(resourcesDir, "README.md"), `# ${studioAppName}
+
+This lightweight macOS app installs the included AMC package into a version-pinned per-user runtime and starts local demo-mode Studio from a separate persistent per-user workspace. ${macRuntime === "native-webkit"
+    ? `It renders ${studioUrl} inside a native WebKit window.`
+    : `This cross-build fallback opens ${studioUrl} in the macOS system browser.`}
+
+It does not bundle Electron, Chromium, WebKit content, or any third-party source snapshot.
+`);
+  if (process.platform === "darwin") {
+    run("codesign", ["--force", "--deep", "--sign", "-", appRoot]);
+  }
 
   return [{
     name: studioMacAppBundleName,
     kind: "macos-app-bundle",
     entrypoint: `${studioMacAppBundleName}/Contents/MacOS/${studioAppName}`,
     opens: studioUrl,
-    runtime: "system-browser"
+    runtime: macRuntime
   }];
 }
 
-function writeWindowsStudioApp(targetDir, tarballName) {
+function writeWindowsStudioApp(targetDir, tarballName, tarballDigest) {
   const ps1Name = studioWindowsPs1Name;
   const cmdName = studioWindowsCmdName;
   const ps1 = `$ErrorActionPreference = "Stop"
 
 $Package = Join-Path $PSScriptRoot "${tarballName}"
+$PackageDigest = "${tarballDigest}"
 $LogDir = Join-Path $env:LOCALAPPDATA "Agent Maturity Compass\\Logs"
 $LogFile = Join-Path $LogDir "studio-launcher.log"
+$RuntimeDir = Join-Path $env:LOCALAPPDATA "Agent Maturity Compass\\runtime"
+$WorkspaceDir = Join-Path $env:LOCALAPPDATA "Agent Maturity Compass\\studio-workspace"
+$DigestFile = Join-Path $RuntimeDir "package.sha256"
+$AmcBin = Join-Path $RuntimeDir "node_modules\\.bin\\amc.cmd"
 New-Item -ItemType Directory -Force -Path $LogDir | Out-Null
-Set-Location $PSScriptRoot
 
 Write-Host ""
 Write-Host "Agent Maturity Compass Studio" -ForegroundColor Green
 Write-Host "Evidence over claims." -ForegroundColor DarkGray
 Write-Host ""
 
-if (-not (Get-Command amc -ErrorAction SilentlyContinue)) {
+$CurrentDigest = if (Test-Path $DigestFile) { (Get-Content $DigestFile -Raw).Trim() } else { "" }
+if ($CurrentDigest -ne $PackageDigest -or -not (Test-Path $AmcBin)) {
   if (-not (Get-Command npm -ErrorAction SilentlyContinue)) {
     Write-Error "Node.js 20 or 22 LTS with npm is required before launching Agent Maturity Compass Studio."
   }
-  npm install -g $Package *>> $LogFile
+  New-Item -ItemType Directory -Force -Path $RuntimeDir | Out-Null
+  npm install --prefix $RuntimeDir --no-audit --no-fund $Package *>> $LogFile
+  if ($LASTEXITCODE -ne 0) {
+    throw "Could not install the packaged AMC runtime. See $LogFile."
+  }
+  Set-Content -Path $DigestFile -Value $PackageDigest -NoNewline
 }
 
-amc up --demo --no-open *>> $LogFile
+New-Item -ItemType Directory -Force -Path $WorkspaceDir | Out-Null
+Set-Location $WorkspaceDir
+& $AmcBin up --demo --no-open *>> $LogFile
+if ($LASTEXITCODE -ne 0) {
+  throw "Could not start AMC Studio. See $LogFile."
+}
 ${studioWindowsOpenCommand}
 `;
   writeFileSync(join(targetDir, ps1Name), ps1);
@@ -214,7 +407,7 @@ ${studioWindowsOpenCommand}
   }];
 }
 
-function writePackageReadme(targetDir, platform, tarballName) {
+function writePackageReadme(targetDir, platform, tarballName, appLaunchers) {
   const installCommand = platform.kind === "windows"
     ? ".\\install.ps1"
     : "sh ./install.sh";
@@ -223,9 +416,14 @@ function writePackageReadme(targetDir, platform, tarballName) {
     : platform.kind === "windows"
       ? `.\\${studioWindowsCmdName}`
       : null;
+  const macRuntime = appLaunchers.find((launcher) => launcher.kind === "macos-app-bundle")?.runtime;
   writeFileSync(join(targetDir, "README.md"), `# Agent Maturity Compass ${platform.label} Installer
 
 This package installs AMC from the included npm tarball: \`${tarballName}\`.
+
+The Studio launcher uses the archive's exact package digest and installs that version into an isolated per-user runtime. It never falls back to an older global \`amc\` executable.
+
+Mutable demo data is stored in a separate persistent \`studio-workspace\` directory, not beside the extracted archive.
 
 ## Requirements
 
@@ -244,7 +442,11 @@ ${appCommand ? `## Launch Studio
 ${appCommand}
 \`\`\`
 
-The ${studioAppName} launcher starts local demo-mode Studio and opens ${studioUrl} in the system browser. It does not bundle Electron or a browser runtime.
+${platform.id === "macos-universal"
+    ? macRuntime === "native-webkit"
+      ? `The ${studioAppName} native app starts local demo-mode Studio and renders ${studioUrl} in a macOS WebKit window. It does not bundle Electron, Chromium, or a browser runtime.`
+      : `The ${studioAppName} cross-build fallback starts local demo-mode Studio and opens ${studioUrl} in the macOS system browser. It does not bundle Electron or a browser runtime.`
+    : `The ${studioAppName} launcher starts local demo-mode Studio and opens ${studioUrl} in the system browser. It does not bundle Electron or a browser runtime.`}
 
 ` : ""}
 ## Verify
@@ -294,6 +496,7 @@ mkdirSync(archivesRoot, { recursive: true });
 const tarball = join(packRoot, basename(packedTarball));
 cpSync(packedTarball, tarball);
 const tarballName = basename(tarball);
+const tarballDigest = sha256(tarball);
 const packages = [];
 
 for (const platform of platforms) {
@@ -303,14 +506,14 @@ for (const platform of platforms) {
   const appLaunchers = [];
   if (platform.kind === "windows") {
     writeWindowsInstaller(packageDir, tarballName);
-    appLaunchers.push(...writeWindowsStudioApp(packageDir, tarballName));
+    appLaunchers.push(...writeWindowsStudioApp(packageDir, tarballName, tarballDigest));
   } else {
     writeUnixInstaller(packageDir, tarballName);
     if (platform.id === "macos-universal") {
-      appLaunchers.push(...writeMacStudioApp(packageDir, tarballName));
+      appLaunchers.push(...writeMacStudioApp(packageDir, tarballName, tarballDigest));
     }
   }
-  writePackageReadme(packageDir, platform, tarballName);
+  writePackageReadme(packageDir, platform, tarballName, appLaunchers);
   writeFileSync(join(packageDir, "LEGAL_NOTICE.md"), `# Legal Notice
 
 This installer package is generated from Agent Maturity Compass source code.
@@ -348,7 +551,10 @@ const manifest = {
     includesBundledBrowserRuntime: false,
     notes: [
       "Packages are generated from AMC source plus its npm package tarball.",
-      "Desktop app launchers start local AMC Studio and open it in the user's system browser.",
+      packages.find((item) => item.platform === "macos-universal")?.appLaunchers?.some((launcher) => launcher.runtime === "native-webkit")
+        ? "The macOS Studio app uses the system WebKit framework to render local AMC Studio without bundling a browser runtime."
+        : "The cross-built macOS Studio fallback opens local AMC Studio in the system browser without bundling a browser runtime.",
+      "The Windows Studio launcher starts local AMC Studio and opens it in the user's system browser.",
       "Research artifacts must remain source-attributed and must not copy protected implementation text or code."
     ]
   },

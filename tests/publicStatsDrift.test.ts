@@ -2,9 +2,9 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, test } from "vitest";
 
-const CURRENT_TEST_COUNT = "8,150";
-const CURRENT_TEST_FILE_COUNT = "1,033";
-const STALE_TEST_COUNTS = ["5,394", "5%2C394", "5,098", "5%2C031", "4,161", "3,980", "2,723", "2,699"];
+const CURRENT_TEST_COUNT = "8,164";
+const CURRENT_TEST_FILE_COUNT = "1,035";
+const STALE_TEST_COUNTS = ["8,158", "8%2C158", "8,150", "8%2C150", "5,394", "5%2C394", "5,098", "5%2C031", "4,161", "3,980", "2,723", "2,699"];
 
 const CURRENT_PUBLIC_FILES = [
   "README.md",
@@ -19,14 +19,14 @@ const CURRENT_PUBLIC_FILES = [
 const readProjectFile = (path: string): string => readFileSync(join(process.cwd(), path), "utf8");
 
 describe("public test-count claims", () => {
-  test("current-facing public surfaces use the canonical collected Vitest count", () => {
+  test("current-facing public surfaces use the canonical verified Vitest count", () => {
     for (const path of CURRENT_PUBLIC_FILES) {
       const body = readProjectFile(path);
       expect(body, path).toContain(CURRENT_TEST_COUNT);
     }
 
     const whitepaper = readProjectFile("whitepaper/AMC_WHITEPAPER_v1.md");
-    expect(whitepaper).toContain(`${CURRENT_TEST_COUNT} Vitest tests across ${CURRENT_TEST_FILE_COUNT} files`);
+    expect(whitepaper).toContain(`${CURRENT_TEST_COUNT} passing Vitest tests across ${CURRENT_TEST_FILE_COUNT} files`);
   });
 
   test("current-facing public surfaces do not reintroduce stale test-count claims", () => {
@@ -38,9 +38,9 @@ describe("public test-count claims", () => {
     }
   });
 
-  test("README badge uses a collected inventory claim rather than a sandboxed pass claim", () => {
+  test("README badge uses the latest fully verified passing inventory", () => {
     const readme = readProjectFile("README.md");
-    expect(readme).toContain("tests-8%2C150%20collected");
-    expect(readme).not.toContain("tests-8%2C150%20passing");
+    expect(readme).toContain("tests-8%2C164%20passing");
+    expect(readme).not.toContain("tests-8%2C164%20collected");
   });
 });

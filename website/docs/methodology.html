@@ -5,12 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Scoring Methodology — AMC Documentation</title>
   <meta name="description" content="How AMC scores AI agents: 244 default questions, 5 dimensions, L0-L5 maturity scale, evidence weighting, and cryptographic seals.">
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230D6E6E'/%3E%3Ctext x='16' y='22' text-anchor='middle' fill='white' font-size='18' font-weight='bold'%3EA%3C/text%3E%3C/svg%3E">
-  <link rel="stylesheet" href="shared.css">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230a0a0a'/%3E%3Ctext x='16' y='22' text-anchor='middle' fill='%234AEF79' font-size='18' font-weight='bold'%3Ea%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="shared.css?v=20260710b">
   <style>
     .trust-tier {
       display: flex; align-items: center; gap: 16px; padding: 16px 20px;
-      background: #fff; border: 1px solid var(--border); border-radius: 10px;
+      background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
       margin-bottom: 10px;
     }
     .trust-tier .weight {
@@ -34,7 +34,7 @@
       display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px;
     }
     .anti-cheat .item {
-      background: #fff; border: 1px solid var(--border); border-radius: 10px;
+      background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
       padding: 16px 20px;
     }
     .anti-cheat .item h4 { margin: 0 0 4px; font-size: 0.9rem; color: var(--teal); }
@@ -47,7 +47,7 @@
 
 <div class="topbar">
   <button class="menu-btn" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
-  <a href="../" class="topbar-logo"><span class="logo-icon">A</span> AMC Docs</a>
+  <a href="../" class="topbar-logo">amc<span class="brand-cursor">_</span> docs</a>
   <nav class="topbar-nav">
     <a href="getting-started.html">Getting Started</a>
     <a href="cli.html">CLI Reference</a>

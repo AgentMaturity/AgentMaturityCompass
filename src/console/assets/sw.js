@@ -1,4 +1,4 @@
-const CACHE_NAME = "amc-console-v2";
+const CACHE_NAME = "amc-console-v5";
 
 function scopeBasePath() {
   const scope = new URL(self.registration.scope);
@@ -61,6 +61,7 @@ self.addEventListener("install", (event) => {
       } catch {
         // Snapshot can be absent on first run.
       }
+      await self.skipWaiting();
     })
   );
 });
@@ -86,6 +87,25 @@ self.addEventListener("fetch", (event) => {
   }
 
   const snapshotPath = assetPath("snapshot");
+
+  if (req.mode === "navigate") {
+    event.respondWith(
+      fetch(req)
+        .then(async (response) => {
+          if (response.ok) {
+            const cache = await caches.open(CACHE_NAME);
+            await cache.put(req, response.clone());
+          }
+          return response;
+        })
+        .catch(async () => {
+          const cached = await caches.match(req);
+          const fallback = await caches.match(assetPath("home"));
+          return cached || fallback || new Response("offline", { status: 503 });
+        })
+    );
+    return;
+  }
 
   if (url.pathname === snapshotPath) {
     event.respondWith(

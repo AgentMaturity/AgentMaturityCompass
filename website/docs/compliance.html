@@ -5,12 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Compliance Guide — AMC Documentation</title>
   <meta name="description" content="EU AI Act compliance, 7 industry domains, 41 domain packs, and regulatory mapping with Agent Maturity Compass.">
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230D6E6E'/%3E%3Ctext x='16' y='22' text-anchor='middle' fill='white' font-size='18' font-weight='bold'%3EA%3C/text%3E%3C/svg%3E">
-  <link rel="stylesheet" href="shared.css">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230a0a0a'/%3E%3Ctext x='16' y='22' text-anchor='middle' fill='%234AEF79' font-size='18' font-weight='bold'%3Ea%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="shared.css?v=20260710b">
   <style>
     .deadline-banner {
-      background: linear-gradient(135deg, var(--orange-pale), #FFF8F2);
-      border: 2px solid var(--orange); border-radius: 12px;
+      background: var(--orange-pale);
+      border: 2px solid var(--orange); border-radius: 8px;
       padding: 24px 28px; margin-bottom: 32px;
       display: flex; align-items: center; gap: 20px;
     }
@@ -23,14 +23,15 @@
     .deadline-banner .detail h3 { margin: 0 0 4px; font-size: 1.1rem; }
     .deadline-banner .detail p { margin: 0; color: var(--text-muted); font-size: 0.9rem; }
     .domain-card {
-      background: #fff; border: 1px solid var(--border); border-radius: 12px;
+      background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
+      min-width: 0;
       padding: 20px 24px; margin-bottom: 12px;
     }
     .domain-card h4 { margin: 0 0 8px; display: flex; align-items: center; gap: 8px; }
     .domain-card .stats { display: flex; gap: 16px; font-size: 0.82rem; color: var(--text-muted); margin-bottom: 8px; }
     .domain-card .stats span { display: flex; align-items: center; gap: 4px; }
     .framework-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px; }
-    @media (max-width: 640px) { .framework-grid { grid-template-columns: 1fr; } .deadline-banner { flex-direction: column; text-align: center; } }
+    @media (max-width: 640px) { .framework-grid { grid-template-columns: minmax(0, 1fr); } .deadline-banner { flex-direction: column; text-align: center; } }
   </style>
 </head>
 <body>
@@ -38,7 +39,7 @@
 
 <div class="topbar">
   <button class="menu-btn" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
-  <a href="../" class="topbar-logo"><span class="logo-icon">A</span> AMC Docs</a>
+  <a href="../" class="topbar-logo">amc<span class="brand-cursor">_</span> docs</a>
   <nav class="topbar-nav">
     <a href="getting-started.html">Getting Started</a>
     <a href="cli.html">CLI Reference</a>
@@ -177,7 +178,7 @@ amc audit binder create --framework EU_AI_ACT</code></pre>
           <tr><td><strong>Art. 12</strong></td><td>Record-keeping</td><td>Transparency log, Merkle tree, signed evidence ledger.</td></tr>
           <tr><td><strong>Art. 13</strong></td><td>Transparency</td><td>Transparency reports, capability disclosures, output attestation.</td></tr>
           <tr><td><strong>Art. 14</strong></td><td>Human Oversight</td><td>Governor policies, approval workflows, escalation gates.</td></tr>
-          <tr><td><strong>Art. 15</strong></td><td>Accuracy, Robustness, Cybersecurity</td><td>147 assurance packs, calibration gap, adversarial robustness, incident-to-regression closure.</td></tr>
+          <tr><td><strong>Art. 15</strong></td><td>Accuracy, Robustness, Cybersecurity</td><td>142 assurance packs, calibration gap, adversarial robustness, incident-to-regression closure.</td></tr>
           <tr><td><strong>Art. 17</strong></td><td>Quality Management System</td><td>Continuous loop, drift alerts, scheduled assurance runs.</td></tr>
         </tbody>
       </table>

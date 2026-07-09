@@ -21,7 +21,11 @@ macOS and Windows archives also contain:
 - macOS: `Agent Maturity Compass Studio.app`
 - Windows: `Agent Maturity Compass Studio.cmd` and `Agent Maturity Compass Studio.ps1`
 
-Each launcher app installs AMC from the included tarball if `amc` is not already available, runs `amc up --demo --no-open`, and opens the same local Studio console at `http://127.0.0.1:3212/w/demo/console`. The launcher app does not bundle Electron, Chromium, WebKit content, or another browser runtime; it uses the system browser.
+Each launcher app verifies the included tarball digest, installs that exact AMC package into a version-pinned per-user runtime, and runs its private `amc up --demo --no-open` executable. It never falls back to an older global `amc` install. The demo binds only to loopback, stores mutable local data, and produces unsigned evidence.
+
+The native macOS build renders the local Studio URL in a native WebKit window. The Windows launcher, and the macOS cross-build fallback, opens the same local Studio console in the system browser. The launcher app does not bundle Electron, Chromium, WebKit content, or another browser runtime.
+
+Launcher runtimes are stored under `~/Library/Application Support/Agent Maturity Compass/runtime` on macOS and `%LOCALAPPDATA%\Agent Maturity Compass\runtime` on Windows. Mutable demo data lives separately in the adjacent `studio-workspace` directory, so moving, replacing, or rebuilding an extracted app cannot corrupt the active workspace. A package digest marker makes launcher upgrades deterministic.
 
 ## User Install
 

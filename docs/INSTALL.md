@@ -50,7 +50,7 @@ npm run package:desktop
 npm run package:desktop:verify
 ```
 
-Archives are written to `dist/installers/archives/` and install AMC from the included AMC npm tarball. The macOS and Windows archives also include the `Agent Maturity Compass Studio` launcher app, which starts demo-mode Studio and opens the local console in the system browser. This works even before the public AMC npm registry package is available, though npm still needs access to AMC's public runtime dependencies unless they are already cached or mirrored.
+Archives are written to `dist/installers/archives/` and install AMC from the included AMC npm tarball. The macOS and Windows archives also include the `Agent Maturity Compass Studio` launcher app. It verifies the included package digest, installs that exact build into a version-pinned per-user runtime, and starts the loopback-only local demo from a separate persistent `studio-workspace` directory. The native macOS build uses a native WebKit window; Windows uses the system browser. Neither launcher falls back to a global `amc` installation or bundles a browser runtime. npm still needs access to AMC's public runtime dependencies unless they are already cached or mirrored.
 
 See `docs/DESKTOP_PACKAGES.md` for user install commands, manifest hashes, and legal/provenance notes.
 

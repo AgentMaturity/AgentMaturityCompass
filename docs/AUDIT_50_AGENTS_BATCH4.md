@@ -618,7 +618,7 @@ cat website/style.css | grep "color:" | head -20
 
 ### Findings
 
-1. **842 CLI commands.** The breadth is technically impressive but overwhelming for new users. Role-based "Start with a task" section partially mitigates this — but every persona in batches 1–4 has noted command count as a friction point.
+1. **CLI command breadth.** The audit observed 842 commands at the time; the current generated inventory is 1,144 CLI command paths. The breadth is technically impressive but still a first-touch risk, so role-based "Start with a task" entry points remain important.
 2. **Skip navigation resolved in the 2026-06-16 follow-up.** Static `website/**/*.html` pages now have one `href="#main-content"` skip link and one target, with regression coverage.
 3. **`focus-visible` styling resolved in the 2026-06-16 follow-up.** Static website pages now resolve to a high-contrast 2px `:focus-visible` outline through shared CSS or their standalone skip-link style block, with regression coverage.
 4. **Console pages (52 of them) use minimal ARIA.** No landmark roles on most pages. Screen reader navigation would be poor.
@@ -640,7 +640,7 @@ cat website/style.css | grep "color:" | head -20
 | Console pages lack landmark roles and ARIA structure | P2 |
 | No dark mode | P2 |
 | No `autocomplete` attributes on login page | P2 |
-| 842 command surface still overwhelming despite "start here" improvements | P2 |
+| Large CLI command surface still overwhelming despite "start here" improvements; current generated inventory is 1,144 paths | P2 |
 
 ### Rating: **8/10**
 

@@ -10,7 +10,7 @@ Accepted
 Trust infrastructure for AI agents should be accessible to everyone. But regulated industries need specialized domain knowledge that requires ongoing research and maintenance.
 
 ## Decision
-- **Free forever (MIT)**: The entire trust stack — Score, Shield, Enforce, Vault, Watch, Comply, Fleet, Passport. All 14 adapters, 244 default diagnostic questions plus a 20-question lifecycle expansion, 147 assurance packs, CI gates, MCP server, dashboard.
+- **Free forever (MIT)**: The entire trust stack — Score, Shield, Enforce, Vault, Watch, Comply, Fleet, Passport. All 14 adapters, 244 default diagnostic questions plus a 20-question lifecycle expansion, 142 assurance packs, CI gates, MCP server, dashboard.
 - **Paid**: Industry Packs — 41 sector-specific domain packs across 7 verticals (Health, Wealth, Education, Mobility, Technology, Environment, Governance) with 600 sector-specific diagnostic questions.
 
 Industry Packs contain regulatory-grounded assessments (HIPAA, MiFID II, FERPA, UNECE WP.29, etc.) that require domain expertise to create and maintain.
