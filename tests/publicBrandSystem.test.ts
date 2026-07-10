@@ -49,7 +49,7 @@ describe("AMC public brand system", () => {
     expect(tokens).toContain("--amc-muted: #a0a0a0");
     expect(tokens).toContain("--amc-accent: #4AEF79");
     expect(tokens).toContain("--amc-font-sans: 'Inter', system-ui, sans-serif");
-    expect(tokens).toContain("--amc-font-mono: 'Space Mono', monospace");
+    expect(tokens).toContain("--amc-font-mono: 'Space Mono', ui-monospace, monospace");
 
     const website = read("website/style.css");
     const docs = read("website/docs/docs.css");

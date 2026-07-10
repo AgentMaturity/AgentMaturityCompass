@@ -6,6 +6,7 @@ Every contribution makes AI agent trust scoring better for everyone. Whether you
 
 - [Quick Setup](#quick-setup)
 - [Running Tests](#running-tests)
+- [Public Site and Docs](#public-site-and-docs)
 - [Types of Contributions](#types-of-contributions)
 - [Writing an Assurance Pack](#writing-an-assurance-pack)
 - [Writing a Domain Pack](#writing-a-domain-pack)
@@ -26,7 +27,7 @@ git clone https://github.com/AgentMaturity/AgentMaturityCompass.git
 cd AgentMaturityCompass
 npm ci
 npm run build     # must compile with 0 TypeScript errors
-npm test          # 8,261 passing Vitest tests, all must pass in CI
+npm test          # 8,265 passing Vitest tests, all must pass in CI
 ```
 
 **Python platform:**
@@ -48,6 +49,20 @@ cd platform/python && python3 -m pytest tests/ -q # Python
 ```
 
 All tests must pass before submitting a PR.
+
+---
+
+## Public Site and Docs
+
+The source website remains under `website/`, and public guide sources remain under `docs/`. Build the exact GitHub Pages artifact with:
+
+```bash
+GITHUB_SHA=$(git rev-parse HEAD) npm run build:pages
+```
+
+The builder writes only to ignored `tmp/pages-site/`. It stages the public Docs allowlist, the lockfile-pinned Markdown renderer, and the required Inter and Space Mono WOFF2 files with SHA-256 manifests and OFL notices. Do not commit generated Docs content, `website/fonts/`, or third-party package trees.
+
+Public visual changes must use `website/brand.css` for the canonical black, white, signal-green, Inter, and Space Mono identity. Run the public brand, artifact, and Playwright regressions before opening a PR.
 
 ---
 

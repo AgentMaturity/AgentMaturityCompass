@@ -4,22 +4,26 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>AMC Methodology — Agent Maturity Compass</title>
+<link rel="stylesheet" href="brand.css">
 <style>
 :root { --bg: #0a0a0a; --fg: #e0e0e0; --accent: #4AEF79; --card: #1a1a1a; }
-body { font-family: system-ui, -apple-system, sans-serif; max-width: 900px; margin: 0 auto; padding: 40px 20px; background: var(--bg); color: var(--fg); line-height: 1.7; }
+* { box-sizing: border-box; }
+body { font-family: var(--amc-font-sans); max-width: 900px; margin: 0 auto; padding: 40px 20px; background: var(--bg); color: var(--fg); line-height: 1.7; }
 h1 { color: var(--accent); font-size: 2rem; }
 h2 { color: var(--accent); font-size: 1.4rem; border-bottom: 1px solid #333; padding-bottom: 8px; }
 a { color: var(--accent); }
 .card { background: var(--card); border-radius: 8px; padding: 24px; margin: 16px 0; }
-table { width: 100%; border-collapse: collapse; margin: 16px 0; }
+table { display: block; width: 100%; max-width: 100%; border-collapse: collapse; margin: 16px 0; overflow-x: auto; -webkit-overflow-scrolling: touch; }
 th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid #333; }
 th { color: var(--accent); }
-code { background: #222; padding: 2px 6px; border-radius: 4px; font-size: 0.9em; }
+code { background: #222; padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-family: var(--amc-font-mono); }
+pre { max-width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+pre code { display: block; width: max-content; min-width: 100%; }
 .nav { margin-bottom: 32px; }
 .nav a { margin-right: 16px; text-decoration: none; }
 </style>
 <style id="skip-link-style">
-.skip-link{position:fixed;left:-9999px;top:12px;z-index:10000;padding:8px 14px;background:#4AEF79;color:#0a0a0a;font:700 14px system-ui,sans-serif;text-decoration:none}
+.skip-link{position:fixed;left:-9999px;top:12px;z-index:10000;padding:8px 14px;background:#4AEF79;color:#0a0a0a;font:700 14px var(--amc-font-sans);text-decoration:none}
 .skip-link:focus,.skip-link:focus-visible{left:12px}
 :where(a,button,input,select,textarea,[tabindex]:not([tabindex="-1"])):focus-visible{outline:2px solid #4AEF79;outline-offset:3px}
 </style>

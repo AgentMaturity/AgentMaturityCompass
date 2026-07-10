@@ -4,15 +4,16 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>404 — Page Not Found | Agent Maturity Compass</title>
+<link rel="stylesheet" href="brand.css">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:#020802;color:#e0ffe0;font-family:'JetBrains Mono',monospace;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:2rem}
+body{background:#020802;color:#e0ffe0;font-family:var(--amc-font-mono);min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:2rem}
 h1{font-size:4rem;color:#00ff41;margin-bottom:.5rem;text-shadow:0 0 20px rgba(0,255,65,.3)}
 .code{font-size:1.2rem;color:#88aa88;margin-bottom:2rem}
 .msg{font-size:.9rem;color:#88aa88;max-width:500px;line-height:1.6;margin-bottom:2.5rem}
 .msg strong{color:#00ff41}
 .links{display:flex;gap:1rem;flex-wrap:wrap;justify-content:center}
-.links a{color:#000;background:#00ff41;text-decoration:none;padding:.6rem 1.5rem;border-radius:3px;font:700 .8rem 'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.1em;transition:opacity .2s}
+.links a{color:#000;background:#00ff41;text-decoration:none;padding:.6rem 1.5rem;border-radius:3px;font:700 .8rem var(--amc-font-mono);text-transform:uppercase;letter-spacing:.1em;transition:opacity .2s}
 .links a:hover{opacity:.85}
 .links a.outline{background:transparent;color:#00ff41;border:1px solid #00ff41}
 .links a.outline:hover{background:rgba(0,255,65,.1)}
@@ -20,7 +21,7 @@ h1{font-size:4rem;color:#00ff41;margin-bottom:.5rem;text-shadow:0 0 20px rgba(0,
 @keyframes spin{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}
 </style>
 <style id="skip-link-style">
-.skip-link{position:fixed;left:-9999px;top:12px;z-index:10000;padding:8px 14px;background:#4AEF79;color:#0a0a0a;font:700 14px system-ui,sans-serif;text-decoration:none}
+.skip-link{position:fixed;left:-9999px;top:12px;z-index:10000;padding:8px 14px;background:#4AEF79;color:#0a0a0a;font:700 14px var(--amc-font-sans);text-decoration:none}
 .skip-link:focus,.skip-link:focus-visible{left:12px}
 :where(a,button,input,select,textarea,[tabindex]:not([tabindex="-1"])):focus-visible{outline:2px solid #4AEF79;outline-offset:3px}
 </style>

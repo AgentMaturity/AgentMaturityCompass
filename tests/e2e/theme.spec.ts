@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixtures.js';
 import { INDEX_URL } from './urls.js';
 
 test.describe('Theme', () => {

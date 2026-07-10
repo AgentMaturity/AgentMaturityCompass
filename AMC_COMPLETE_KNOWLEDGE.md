@@ -22,7 +22,7 @@ AMC is an open-source, evidence-based framework for measuring, comparing, and co
 - 41 industry domain packs across 7 sectors
 - 94 scoring modules
 - 14 framework adapters
-- Test counts drift quickly; repository verification on 2026-07-10 recorded 1,049 Vitest files / 8,261 tests
+- Test counts drift quickly; repository verification on 2026-07-10 recorded 1,050 Vitest files / 8,265 tests
 - 1,144 public `amc ...` command paths in `docs/CLI_COMMAND_INVENTORY.md` as of 2026-06-26
 - ~700+ TypeScript source files plus late-stage/domain CLI registration splits
 
@@ -506,7 +506,7 @@ Request Token → Present Token → Verify (signature, expiry, claims)
 
 ### 9.1 Scale
 - Counts drift quickly because the source-review wave adds many boundary suites.
-- Repository verification on 2026-07-10 recorded `npm test -- --reporter=dot` passing at 1,049 files / 8,261 tests.
+- Repository verification on 2026-07-10 recorded `npm test -- --reporter=dot` passing at 1,050 files / 8,265 tests.
 - 7 Playwright E2E specs remain part of the broader test surface.
 
 ### 9.2 Framework
@@ -682,7 +682,7 @@ amc comply report
 
 # Build & test
 npm run build
-npm test                    # count drifts; repository verification recorded 1,049 files / 8,261 tests on 2026-07-10
+npm test                    # count drifts; repository verification recorded 1,050 files / 8,265 tests on 2026-07-10
 npm run typecheck
 npm run test:e2e            # Playwright
 ```

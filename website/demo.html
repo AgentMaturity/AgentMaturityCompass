@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AMC Terminal Demo — Agent Maturity Compass</title>
 <meta name="description" content="Watch the Agent Maturity Compass CLI in action — score, govern, and harden your AI agents from the terminal.">
+<link rel="stylesheet" href="brand.css">
 <style>
   :root {
     --bg: #0a0a0a;
@@ -13,7 +14,7 @@
     --text: #b0b0b0;
     --text2: #8cc88c;
     --border: rgba(0,255,65,0.12);
-    --mono: 'JetBrains Mono', 'Fira Code', monospace;
+    --mono: var(--amc-font-mono);
   }
   *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
   *:focus-visible { outline: 2px solid var(--green); outline-offset: 2px; }

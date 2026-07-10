@@ -116,6 +116,8 @@
   "devDependencies": {
     "@axe-core/playwright": "^4.11.1",
     "@changesets/cli": "^2.30.0",
+    "@fontsource/inter": "5.2.8",
+    "@fontsource/space-mono": "5.2.9",
     "@types/better-sqlite3": "^7.6.12",
     "@types/node": "^25.5.0",
     "@types/semver": "^7.7.1",

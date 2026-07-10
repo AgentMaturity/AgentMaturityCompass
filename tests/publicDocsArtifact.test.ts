@@ -137,7 +137,7 @@ describe("public Docs Pages artifact", () => {
 
   test("keeps manifest-bound Docs assets network-first through the root service worker", () => {
     const worker = readFileSync(resolve(root, "website/sw.js"), "utf8");
-    expect(worker).toContain("const CACHE_NAME = 'amc-v7'");
+    expect(worker).toContain("const CACHE_NAME = 'amc-v8'");
     expect(worker).toContain("url.pathname === '/docs/content-manifest.json'");
     expect(worker).toContain("url.pathname.startsWith('/docs/content/')");
     expect(worker).toContain("url.pathname.startsWith('/docs/vendor/')");

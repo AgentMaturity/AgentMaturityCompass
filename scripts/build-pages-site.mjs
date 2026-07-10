@@ -19,6 +19,18 @@ const websiteRoot = resolve(repositoryRoot, "website");
 const docsRoot = resolve(repositoryRoot, "docs");
 const defaultOutput = resolve(repositoryRoot, "tmp/pages-site");
 const manifestSchemaVersion = "2026-07-10";
+const brandAssetManifestSchemaVersion = "2026-07-10";
+const brandAssetDefinitions = [
+  { package: "@fontsource/inter", version: "5.2.8", source: "files/inter-latin-400-normal.woff2", asset: "fonts/inter-latin-400-normal.woff2", kind: "font", family: "Inter", weight: 400 },
+  { package: "@fontsource/inter", version: "5.2.8", source: "files/inter-latin-500-normal.woff2", asset: "fonts/inter-latin-500-normal.woff2", kind: "font", family: "Inter", weight: 500 },
+  { package: "@fontsource/inter", version: "5.2.8", source: "files/inter-latin-600-normal.woff2", asset: "fonts/inter-latin-600-normal.woff2", kind: "font", family: "Inter", weight: 600 },
+  { package: "@fontsource/inter", version: "5.2.8", source: "files/inter-latin-700-normal.woff2", asset: "fonts/inter-latin-700-normal.woff2", kind: "font", family: "Inter", weight: 700 },
+  { package: "@fontsource/inter", version: "5.2.8", source: "files/inter-latin-800-normal.woff2", asset: "fonts/inter-latin-800-normal.woff2", kind: "font", family: "Inter", weight: 800 },
+  { package: "@fontsource/inter", version: "5.2.8", source: "LICENSE", asset: "fonts/inter-OFL-1.1.txt", kind: "license" },
+  { package: "@fontsource/space-mono", version: "5.2.9", source: "files/space-mono-latin-400-normal.woff2", asset: "fonts/space-mono-latin-400-normal.woff2", kind: "font", family: "Space Mono", weight: 400 },
+  { package: "@fontsource/space-mono", version: "5.2.9", source: "files/space-mono-latin-700-normal.woff2", asset: "fonts/space-mono-latin-700-normal.woff2", kind: "font", family: "Space Mono", weight: 700 },
+  { package: "@fontsource/space-mono", version: "5.2.9", source: "LICENSE", asset: "fonts/space-mono-OFL-1.1.txt", kind: "license" },
+];
 
 function sha256(value) {
   return createHash("sha256").update(value).digest("hex");
@@ -58,15 +70,63 @@ function prepareOutput(output, explicit) {
 
 function copyWebsite(output) {
   const excluded = [
+    resolve(websiteRoot, "brand-assets.json"),
     resolve(websiteRoot, "docs/content"),
     resolve(websiteRoot, "docs/vendor"),
     resolve(websiteRoot, "docs/content-manifest.json"),
+    resolve(websiteRoot, "fonts"),
   ];
   cpSync(websiteRoot, output, {
     recursive: true,
     filter(source) {
       return !excluded.some(path => source === path || source.startsWith(`${path}${sep}`));
     },
+  });
+}
+
+export function validatePinnedPackageVersion(name, actual, expected) {
+  if (actual !== expected) {
+    throw new Error(`Pinned package version mismatch for ${name}: expected ${expected}, received ${actual}`);
+  }
+}
+
+function copyBrandAssets(output) {
+  const packageVersions = new Map();
+  const seenAssets = new Set();
+  return brandAssetDefinitions.map(definition => {
+    if (seenAssets.has(definition.asset)) throw new Error(`Duplicate brand asset target: ${definition.asset}`);
+    seenAssets.add(definition.asset);
+
+    const packageRoot = resolve(repositoryRoot, "node_modules", definition.package);
+    let actualVersion = packageVersions.get(definition.package);
+    if (!actualVersion) {
+      const packagePath = resolve(packageRoot, "package.json");
+      if (!existsSync(packagePath)) throw new Error(`Pinned brand package is missing: ${definition.package}`);
+      actualVersion = JSON.parse(readFileSync(packagePath, "utf8")).version;
+      validatePinnedPackageVersion(definition.package, actualVersion, definition.version);
+      packageVersions.set(definition.package, actualVersion);
+    }
+
+    const source = resolve(packageRoot, definition.source);
+    assertInside(packageRoot, source, `Brand source ${definition.asset}`);
+    if (!existsSync(source) || !statSync(source).isFile()) {
+      throw new Error(`Pinned brand asset is missing: ${definition.package}/${definition.source}`);
+    }
+    const target = resolve(output, definition.asset);
+    assertInside(output, target, `Brand target ${definition.asset}`);
+    mkdirSync(dirname(target), { recursive: true });
+    copyFileSync(source, target);
+    const bytes = readFileSync(source);
+    return {
+      package: definition.package,
+      version: actualVersion,
+      kind: definition.kind,
+      ...(definition.family ? { family: definition.family, style: "normal", weight: definition.weight } : {}),
+      source: `node_modules/${definition.package}/${definition.source}`,
+      asset: definition.asset,
+      bytes: bytes.byteLength,
+      sha256: sha256(bytes),
+    };
   });
 }
 
@@ -155,11 +215,12 @@ export async function buildPagesSite({ output = defaultOutput, explicit = false 
   const internalDocs = [...buildManifest.internalDocs].sort();
   validateGuideSets(publicDocs, internalDocs);
 
+  const revision = sourceRevision();
   const renderer = copyRenderer(resolvedOutput);
   const guides = copyGuides(resolvedOutput, publicDocs);
   const manifest = {
     schemaVersion: manifestSchemaVersion,
-    sourceRevision: sourceRevision(),
+    sourceRevision: revision,
     guideCount: guides.length,
     renderer,
     guides,
@@ -167,7 +228,17 @@ export async function buildPagesSite({ output = defaultOutput, explicit = false 
   const manifestPath = resolve(resolvedOutput, "docs/content-manifest.json");
   writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`, "utf8");
 
-  return { output: resolvedOutput, manifestPath, manifest };
+  const brandAssets = copyBrandAssets(resolvedOutput);
+  const brandManifest = {
+    schemaVersion: brandAssetManifestSchemaVersion,
+    sourceRevision: revision,
+    assetCount: brandAssets.length,
+    assets: brandAssets,
+  };
+  const brandManifestPath = resolve(resolvedOutput, "brand-assets.json");
+  writeFileSync(brandManifestPath, `${JSON.stringify(brandManifest, null, 2)}\n`, "utf8");
+
+  return { output: resolvedOutput, manifestPath, manifest, brandManifestPath, brandManifest };
 }
 
 async function main() {

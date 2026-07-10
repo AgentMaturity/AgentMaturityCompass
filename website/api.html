@@ -6,6 +6,7 @@
 <title>AMC API Playground — Agent Maturity Compass</title>
 <meta name="description" content="Interactive API explorer for the Agent Maturity Compass REST API. Test endpoints, explore schemas, and integrate with your AMC instance.">
 <link rel="manifest" href="manifest.json">
+<link rel="stylesheet" href="brand.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui.css">
 <style>
   :root {
@@ -15,7 +16,7 @@
     --text: #b0b0b0;
     --text2: #8cc88c;
     --border: rgba(0,255,65,0.1);
-    --mono: 'JetBrains Mono', monospace;
+    --mono: var(--amc-font-mono);
   }
   *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
   *:focus-visible { outline: 2px solid var(--green); outline-offset: 2px; }

@@ -1,6 +1,6 @@
 import { resolve } from "node:path";
 import AxeBuilder from "@axe-core/playwright";
-import { expect, test } from "@playwright/test";
+import { expect, test } from "./fixtures.js";
 
 const changelogUrl = `file://${resolve(process.cwd(), "website/changelog.html")}`;
 

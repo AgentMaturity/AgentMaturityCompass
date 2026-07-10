@@ -1,5 +1,5 @@
 /* AMC Service Worker — network-first for pages, cache-first for static assets */
-const CACHE_NAME = 'amc-v7';
+const CACHE_NAME = 'amc-v8';
 const STATIC_ASSETS = [
   'style.css',
   'particles.js',
@@ -27,6 +27,8 @@ self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
 
   const docsIntegrityAsset =
+    url.pathname === '/brand-assets.json' ||
+    url.pathname.startsWith('/fonts/') ||
     url.pathname === '/docs/content-manifest.json' ||
     url.pathname.startsWith('/docs/content/') ||
     url.pathname.startsWith('/docs/vendor/');

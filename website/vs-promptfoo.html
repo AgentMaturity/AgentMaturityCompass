@@ -6,9 +6,9 @@
 <title>AMC vs Promptfoo — Agent Maturity Compass</title>
 <meta name="description" content="How AMC compares to Promptfoo for AI agent evaluation. Different tools for different problems.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23000'/%3E%3Ccircle cx='16' cy='16' r='11' fill='none' stroke='%2300ff41' stroke-width='1.5'/%3E%3Cpath d='M16 5L17.5 14.5 16 18 14.5 14.5Z' fill='%2300ff41'/%3E%3Ccircle cx='16' cy='16' r='2' fill='%2300ff41'/%3E%3C/svg%3E">
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="brand.css">
 <style>
-:root{--bg:#000;--bg2:#060d06;--fg:#e0ffe0;--fg2:#b0d8b0;--muted:#5a8a5a;--green:#00ff41;--green2:#00cc33;--border:rgba(0,255,65,.12);--border2:rgba(0,255,65,.25);--amber:#f59e0b;--mono:'JetBrains Mono',monospace;--sans:'Inter',system-ui,sans-serif}
+:root{--bg:#000;--bg2:#060d06;--fg:#e0ffe0;--fg2:#b0d8b0;--muted:#5a8a5a;--green:#00ff41;--green2:#00cc33;--border:rgba(0,255,65,.12);--border2:rgba(0,255,65,.25);--amber:#f59e0b;--mono:var(--amc-font-mono);--sans:var(--amc-font-sans)}
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:var(--sans);background:var(--bg);color:var(--fg);line-height:1.7;min-height:100vh}
 a{color:var(--green);text-decoration:none}a:hover{text-decoration:underline}
@@ -21,7 +21,7 @@ a{color:var(--green);text-decoration:none}a:hover{text-decoration:underline}
 .fair{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:24px;margin:40px auto;max-width:700px;text-align:center}
 .fair h3{color:var(--amber);font-family:var(--mono);margin-bottom:8px}
 .fair p{color:var(--fg2);font-size:.95rem}
-table{width:100%;border-collapse:collapse;margin:32px 0;font-size:.9rem}
+table{display:block;width:100%;max-width:100%;border-collapse:collapse;margin:32px 0;font-size:.9rem;overflow-x:auto;-webkit-overflow-scrolling:touch}
 th{text-align:left;padding:12px 16px;background:var(--bg2);color:var(--green);font-family:var(--mono);font-size:.8rem;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border2)}
 td{padding:12px 16px;border-bottom:1px solid var(--border);color:var(--fg2)}
 td:first-child{color:var(--fg);font-weight:500}
@@ -37,9 +37,10 @@ tr:hover td{background:rgba(0,255,65,.03)}
 .cta{text-align:center;padding:48px 0}
 .btn{display:inline-block;padding:12px 28px;background:var(--green);color:#000;font-weight:600;border-radius:6px;font-family:var(--mono);transition:all .2s}
 .btn:hover{background:var(--green2);text-decoration:none}
+@media(max-width:600px){.nav{gap:12px;padding:12px 16px;flex-wrap:wrap}.container{padding:0 16px}.hero{padding:56px 16px 24px}.hero h1{font-size:1.8rem}.fair,.verdict{padding:20px}}
 </style>
 <style id="skip-link-style">
-.skip-link{position:fixed;left:-9999px;top:12px;z-index:10000;padding:8px 14px;background:#4AEF79;color:#0a0a0a;font:700 14px system-ui,sans-serif;text-decoration:none}
+.skip-link{position:fixed;left:-9999px;top:12px;z-index:10000;padding:8px 14px;background:#4AEF79;color:#0a0a0a;font:700 14px var(--amc-font-sans);text-decoration:none}
 .skip-link:focus,.skip-link:focus-visible{left:12px}
 :where(a,button,input,select,textarea,[tabindex]:not([tabindex="-1"])):focus-visible{outline:2px solid #4AEF79;outline-offset:3px}
 </style>
