@@ -202,6 +202,7 @@ describe("AMC aggregate maturity taxonomy", () => {
   it("keeps validity and demo guidance on current labels and domain", () => {
     const validity = read("docs/VALIDITY_FRAMEWORK.md");
     const demo = read("docs/content/demo-video-script-quickstart.md");
+    const lite = read("website/lite.html");
 
     expect(validity).toContain('L4 = "Managed with known gaps"');
     expect(validity).not.toContain('L4 = "Optimized with known gaps"');
@@ -209,5 +210,7 @@ describe("AMC aggregate maturity taxonomy", () => {
     expect(demo).toContain("agentmaturity.co");
     expect(demo).not.toContain("AMC-L3_Governed");
     expect(demo).not.toContain("agentmaturitycompass.com");
+    expect(lite).toContain("L0 (Absent) to L5 (Optimizing)");
+    expect(lite).not.toContain("L0 (dangerous) to L5 (trustworthy)");
   });
 });
