@@ -120,5 +120,5 @@ The `amc-pr-gate.yml` workflow automatically generates badge markdown in PR comm
 
 ## Next Steps
 
-- [Scoring Guide](../scoring.md)
-- [Improvement Guide](../improvement.md)
+- [Scoring Methodology](../SCORING_METHODOLOGY.md)
+- [After the First Score](../AFTER_FIRST_SCORE.md)

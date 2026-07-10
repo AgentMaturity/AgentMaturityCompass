@@ -2,7 +2,7 @@
 
 This is the readable, implementation-backed overview of how AMC is built today.
 
-If you want the file-by-file appendix, start with [ARCHITECTURE_MAP.md](ARCHITECTURE_MAP.md). If you want a status view of what is core, wrapper, experimental, or legacy, read [IMPLEMENTATION_REALITY_MAP.md](IMPLEMENTATION_REALITY_MAP.md). If you want a subsystem walk-through, continue into [deep-dive/INDEX.md](deep-dive/INDEX.md).
+If you want the file-by-file appendix, start with [ARCHITECTURE_MAP.md](ARCHITECTURE_MAP.md). If you want capabilities organized by AMC surface, read [SYSTEM_CAPABILITIES.md](SYSTEM_CAPABILITIES.md). If you want a subsystem walk-through, continue into [deep-dive/INDEX.md](deep-dive/INDEX.md).
 
 ## The Short Version
 
@@ -107,7 +107,7 @@ This plane lets external tools and operator environments attach to the TypeScrip
 - the GitHub Action lives in `amc-action/`
 - runnable samples live in `examples/`
 
-Some of these are deep runtime extensions. Others are intentionally thin shells over the CLI and gateway. That distinction matters, and it is documented in [IMPLEMENTATION_REALITY_MAP.md](IMPLEMENTATION_REALITY_MAP.md).
+Some of these are deep runtime extensions. Others are intentionally thin shells over the CLI and gateway. Use [ADAPTER_COMPATIBILITY.md](ADAPTER_COMPATIBILITY.md) for the supported integration contract and [SYSTEM_CAPABILITIES.md](SYSTEM_CAPABILITIES.md) for the product-surface map.
 
 ## Real Operator Paths
 
@@ -173,7 +173,7 @@ Those distinctions are deliberate because honest architecture docs are more usef
 
 ## Where To Go Next
 
-- Read [IMPLEMENTATION_REALITY_MAP.md](IMPLEMENTATION_REALITY_MAP.md) for core-versus-wrapper clarity.
-- Read [DOCS_DRIFT_CLEANUP_PLAN.md](DOCS_DRIFT_CLEANUP_PLAN.md) for the public remediation policy behind future doc updates.
+- Read [SYSTEM_CAPABILITIES.md](SYSTEM_CAPABILITIES.md) for capabilities organized by product surface.
+- Read [ADAPTER_COMPATIBILITY.md](ADAPTER_COMPATIBILITY.md) for integration depth and support boundaries.
 - Read [deep-dive/INDEX.md](deep-dive/INDEX.md) for subsystem-by-subsystem implementation detail.
 - Use [ARCHITECTURE_MAP.md](ARCHITECTURE_MAP.md) as the appendix when you want source-path orientation.

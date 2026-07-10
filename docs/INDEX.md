@@ -77,6 +77,6 @@ Use this page to reach the shortest evidence-backed path for your task. AMC's pu
 - [Scoring Methodology](SCORING_METHODOLOGY.md)
 - [Validity Framework and Limitations](VALIDITY_FRAMEWORK.md)
 - [Audit Binder](AUDIT_BINDER.md)
-- [Whitepaper](../whitepaper/AMC_WHITEPAPER_v1.md)
+- [Whitepaper](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/whitepaper/AMC_WHITEPAPER_v1.md)
 
 The web documentation at [agentmaturity.co/docs](https://agentmaturity.co/docs/) uses the same AMC wordmark, evidence promise, public catalog, and verified install contract as the website and README.

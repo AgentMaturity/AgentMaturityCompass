@@ -8,7 +8,7 @@ const CATEGORIES = [
   {
     name: 'Getting Started',
     icon: '01',
-    docs: ['INDEX', 'START_HERE', 'AFTER_FIRST_SCORE', 'GETTING_STARTED', 'QUICKSTART', 'INSTALL', 'INSTALL_PACKAGES', 'AGENT_GUIDE', 'SOLO_USER', 'SOLO_DEV_QUICKSTART', 'SOLO_DEV_PATH', 'PLATFORM_ENGINEER_QUICKSTART', 'PLATFORM_PATH', 'SECURITY_COMPLIANCE_QUICKSTART', 'SECURITY_PATH', 'EXECUTIVE_OVERVIEW', 'COMPATIBILITY_MATRIX', 'STARTER_BLUEPRINTS', 'OSS_ADOPTION_ROADMAP', 'BROWSER_SANDBOX', 'DEPLOYMENT_OPTIONS', 'EXAMPLES_INDEX', 'RECIPES', 'TROUBLESHOOTING']
+    docs: ['INDEX', 'START_HERE', 'AFTER_FIRST_SCORE', 'GETTING_STARTED', 'QUICKSTART', 'INSTALL', 'AGENT_GUIDE', 'COMPATIBILITY_MATRIX', 'STARTER_BLUEPRINTS', 'TROUBLESHOOTING']
   },
   {
     name: 'Architecture',
@@ -23,12 +23,12 @@ const CATEGORIES = [
   {
     name: 'Adapters & Integration',
     icon: '04',
-    docs: ['ADAPTERS', 'ADAPTER_COMPATIBILITY', 'agent-framework-compatibility', 'adapters/LANDING_LANGCHAIN', 'adapters/LANDING_OPENAI', 'adapters/LANDING_CREWAI', 'adapters/LANDING_CLAUDE_CODE', 'adapters/LANDING_GENERIC_CLI', 'adapters/langchain-python', 'adapters/langchain-node', 'adapters/langgraph-python', 'adapters/crewai', 'adapters/autogen', 'adapters/openai-agents-sdk', 'adapters/llamaindex', 'adapters/semantic-kernel', 'adapters/claude-code', 'adapters/gemini', 'adapters/openclaw', 'adapters/openhands', 'adapters/python-amc-sdk', 'adapters/generic-cli', 'BRIDGE', 'BRIDGE_PROMPT_ENFORCEMENT', 'CONNECT', 'INTEGRATIONS', 'integrations/ci-cd', 'MCP_SERVER', 'PAIRING', 'PAIRING_LAN_PWA', 'PROVIDERS', 'SDK', 'SDK_VERSIONING', 'CLI_WRAPPERS', 'VSCODE_EXTENSION']
+    docs: ['ADAPTERS', 'ADAPTER_COMPATIBILITY', 'CUSTOM_ADAPTER', 'agent-framework-compatibility', 'adapters/LANDING_LANGCHAIN', 'adapters/LANDING_OPENAI', 'adapters/LANDING_CREWAI', 'adapters/LANDING_CLAUDE_CODE', 'adapters/LANDING_GENERIC_CLI', 'adapters/langchain-python', 'adapters/langchain-node', 'adapters/langgraph-python', 'adapters/crewai', 'adapters/autogen', 'adapters/openai-agents-sdk', 'adapters/llamaindex', 'adapters/semantic-kernel', 'adapters/claude-code', 'adapters/gemini', 'adapters/openclaw', 'adapters/openhands', 'adapters/python-amc-sdk', 'adapters/generic-cli', 'BRIDGE', 'BRIDGE_PROMPT_ENFORCEMENT', 'CONNECT', 'INTEGRATIONS', 'integrations/ci-cd', 'MCP_SERVER', 'PAIRING', 'PAIRING_LAN_PWA', 'PROVIDERS', 'SDK', 'SDK_VERSIONING', 'CLI_WRAPPERS', 'VSCODE_EXTENSION']
   },
   {
     name: 'Scoring & Dimensions',
     icon: '05',
-    docs: ['DIAGNOSTIC_BANK', 'QUESTION_BANK', 'AMC_QUESTIONS_IN_DEPTH', 'AMC_MASTER_REFERENCE', 'ARCHETYPES', 'BENCHMARKS', 'BENCHMARKING', 'BENCH_REGISTRY', 'EQUALIZER_TARGETS', 'METRICS', 'OUTCOMES', 'FORECASTING', 'PREDICTION_LOG', 'PREDICTIVE_MAINTENANCE', 'self-calibration', 'VALIDITY_FRAMEWORK', 'score-history']
+    docs: ['DIAGNOSTIC_BANK', 'QUESTION_BANK', 'SCORING_METHODOLOGY', 'AMC_QUESTIONS_IN_DEPTH', 'AMC_MASTER_REFERENCE', 'ARCHETYPES', 'BENCHMARKS', 'BENCHMARKING', 'BENCH_REGISTRY', 'EQUALIZER_TARGETS', 'METRICS', 'OUTCOMES', 'FORECASTING', 'PREDICTION_LOG', 'PREDICTIVE_MAINTENANCE', 'self-calibration', 'VALIDITY_FRAMEWORK', 'score-history']
   },
   {
     name: 'Compliance & Regulatory',
@@ -48,7 +48,7 @@ const CATEGORIES = [
   {
     name: 'Operations',
     icon: '09',
-    docs: ['OPERATIONS', 'OPS_HARDENING', 'BACKUPS', 'DEPLOYMENT', 'DEPLOYMENT_CHECKLIST', 'CLOUD_REFERENCE_ARCHITECTURES', 'MIGRATION_RUNBOOK', 'RELEASE_RUNBOOK', 'RELEASING', 'RELEASE_CADENCE', 'CI_TEMPLATES', 'SINGLE_BINARY', 'PUBLISHING', 'UPGRADE_AUTOPILOT', 'INCIDENT_RESPONSE_READINESS', 'DRIFT_ALERTS', 'CONTINUOUS_MONITORING', 'CONTINUOUS_RECURRENCE', 'DOCTOR', 'MECHANIC_MODE', 'MECHANIC_WORKBENCH', 'CI', 'runbooks/amc-service-down', 'runbooks/evidence-corruption', 'runbooks/score-dispute']
+    docs: ['OPERATIONS', 'OPS_HARDENING', 'BACKUPS', 'DEPLOYMENT', 'DEPLOYMENT_OPTIONS', 'DEPLOYMENT_CHECKLIST', 'CLOUD_REFERENCE_ARCHITECTURES', 'MIGRATION_RUNBOOK', 'RELEASE_RUNBOOK', 'RELEASING', 'RELEASE_CADENCE', 'CI_TEMPLATES', 'SINGLE_BINARY', 'PUBLISHING', 'UPGRADE_AUTOPILOT', 'INCIDENT_RESPONSE_READINESS', 'DRIFT_ALERTS', 'CONTINUOUS_MONITORING', 'CONTINUOUS_RECURRENCE', 'DOCTOR', 'MECHANIC_MODE', 'MECHANIC_WORKBENCH', 'CI', 'runbooks/amc-service-down', 'runbooks/evidence-corruption', 'runbooks/score-dispute']
   },
   {
     name: 'Trust & Evidence',
@@ -58,12 +58,12 @@ const CATEGORIES = [
   {
     name: 'Product & UX',
     icon: '11',
-    docs: ['CONSOLE', 'DASHBOARD', 'STUDIO', 'TOOLHUB', 'PLUGINS', 'SANDBOX', 'WHATIF', 'PLAYGROUND', 'ACCESSIBILITY', 'DOMAIN_PACKS', 'SECTOR_PACKS', 'BUNDLES', 'CASEBOOKS', 'ORG_COMPASS', 'ORG_EOC', 'REAL_PEOPLE_COUNCIL', 'NORTHSTAR_PROMPTS', 'PRODUCT_EDITIONS', 'PRICING', 'BUYER_PACKAGES', 'SERVICES_AND_SUPPORT', 'BENCHMARK_GALLERY', 'COMMUNITY_SHOWCASE', 'RELEASE_HIGHLIGHTS', 'USE_CASES', 'PERSONAS', 'WHY_AMC']
+    docs: ['CONSOLE', 'DASHBOARD', 'STUDIO', 'TOOLHUB', 'PLUGINS', 'SANDBOX', 'BROWSER_SANDBOX', 'WHATIF', 'PLAYGROUND', 'ACCESSIBILITY', 'DOMAIN_PACKS', 'DOMAIN_PROOF_LANE', 'SECTOR_PACKS', 'BUNDLES', 'CASEBOOKS', 'ORG_COMPASS', 'ORG_EOC', 'REAL_PEOPLE_COUNCIL', 'NORTHSTAR_PROMPTS', 'PRODUCT_EDITIONS', 'PRICING', 'BUYER_PACKAGES', 'SERVICES_AND_SUPPORT', 'BENCHMARK_GALLERY', 'COMMUNITY_SHOWCASE', 'RELEASE_HIGHLIGHTS', 'USE_CASES', 'PERSONAS', 'WHY_AMC', 'EXAMPLES_INDEX', 'SOLO_DEV_QUICKSTART', 'SOLO_DEV_PATH', 'PLATFORM_ENGINEER_QUICKSTART', 'PLATFORM_PATH', 'SECURITY_COMPLIANCE_QUICKSTART', 'SECURITY_PATH', 'EXECUTIVE_OVERVIEW', 'BOARD_RISK_L3_MEMO']
   },
   {
     name: 'API Reference',
     icon: '12',
-    docs: ['API_REFERENCE', 'REALTIME', 'REGISTRY', 'FLEET', 'LOOP', 'TICKETS', 'WORK_ORDERS', 'EXPERIMENTS', 'FEDERATION', 'ENTERPRISE', 'ECOSYSTEM', 'ECOSYSTEM_VIEW', 'ECOSYSTEM_COMPARATIVE_VIEW', 'ECONOMIC_SIGNIFICANCE', 'db-schemas']
+    docs: ['API_REFERENCE', 'CLI_COMMAND_INVENTORY', 'REALTIME', 'REGISTRY', 'FLEET', 'LOOP', 'TICKETS', 'WORK_ORDERS', 'EXPERIMENTS', 'FEDERATION', 'ENTERPRISE', 'ECOSYSTEM', 'ECOSYSTEM_VIEW', 'ECOSYSTEM_COMPARATIVE_VIEW', 'ECONOMIC_SIGNIFICANCE', 'db-schemas']
   },
   {
     name: 'Multi-Agent & Advanced',
@@ -88,11 +88,11 @@ const ALL_DOCS = [
   'AMC_MASTER_REFERENCE','AMC_QUESTIONS_IN_DEPTH','ANTI_HALLUCINATION','API_REFERENCE','API_SURFACES',
   'APPROVALS','ARCHETYPES','ARCHITECTURE_BRIEF','ARCHITECTURE_MAP','ASSURANCE_CERTS','ASSURANCE_LAB',
   'ATTESTATION_EVIDENCE_PATHS','AUDIT_BINDER','BACKUPS','BENCHMARKING','BENCHMARKS',
-  'BENCH_REGISTRY','BOM','BRIDGE','BRIDGE_PROMPT_ENFORCEMENT','BUDGETS','BUNDLES',
+  'BENCH_REGISTRY','BOARD_RISK_L3_MEMO','BOM','BRIDGE','BRIDGE_PROMPT_ENFORCEMENT','BUDGETS','BUNDLES',
   'CANON','CASEBOOKS','CERTIFICATION','CHAIN_ARCHITECTURE','CI','CLAIM_PROVENANCE',
-  'CLI_WRAPPERS','CLOUD_REFERENCE_ARCHITECTURES','COMPLIANCE','COMPLIANCE_FRAMEWORKS','COMPLIANCE_MAPS','CONNECT','CONSOLE','CONTEXT_GRAPH',
+  'CLI_COMMAND_INVENTORY','CLI_WRAPPERS','CLOUD_REFERENCE_ARCHITECTURES','COMPLIANCE','COMPLIANCE_FRAMEWORKS','COMPLIANCE_MAPS','CONNECT','CONSOLE','CONTEXT_GRAPH','CUSTOM_ADAPTER',
   'CONTINUOUS_MONITORING','CONTINUOUS_RECURRENCE','DASHBOARD','DEPLOYMENT','DEPLOYMENT_CHECKLIST','DIAGNOSTIC_BANK',
-  'DOCS_DRIFT_CLEANUP_PLAN','DOCTOR','DOMAIN_PACKS','DRIFT_ALERTS','DUAL_CONTROL_APPROVALS','ECONOMIC_SIGNIFICANCE',
+  'DOCS_DRIFT_CLEANUP_PLAN','DOCTOR','DOMAIN_PACKS','DOMAIN_PROOF_LANE','DRIFT_ALERTS','DUAL_CONTROL_APPROVALS','ECONOMIC_SIGNIFICANCE',
   'ECOSYSTEM','ECOSYSTEM_COMPARATIVE_VIEW','ECOSYSTEM_VIEW','ENCRYPTION_AT_REST',
   'ENTERPRISE','EQUALIZER_TARGETS','EU_AI_ACT_COMPLIANCE','EVIDENCE_REQUESTS',
   'EVIDENCE_TRUST','EXECUTIVE_OVERVIEW','EXPERIMENTS','FEDERATION','FLEET','FORECASTING',
@@ -110,7 +110,7 @@ const ALL_DOCS = [
   'PREDICTIVE_MAINTENANCE','PROMPT_POLICY','PROVIDERS','PUBLISHING','PYTHON_MODULE_MAPPING',
   'QUESTION_BANK','QUICKSTART','RBAC','REALTIME','REAL_PEOPLE_COUNCIL','RECEIPTS',
   'RED_TEAMING_GUIDE','REGISTRY','RELEASE_RUNBOOK','RELEASING','RESEARCH_PAPERS_2026','RUNTIMES','RUNTIME_SDK',
-  'SANDBOX','SCIM','SDK','SDK_VERSIONING','SECTOR_PACKS','SECURITY',
+  'SANDBOX','SCIM','SCORING_METHODOLOGY','SDK','SDK_VERSIONING','SECTOR_PACKS','SECURITY',
   'SECURITY_ARCHITECTURE_OVERVIEW','SECURITY_DEPLOYMENT','SHIELD_ENFORCE_REFERENCE',
   'SOLO_USER','SSO_OIDC','SSO_SAML','STANDARDS_MAPPING','STUDIO','SUPPLY_CHAIN',
   'SYSTEM_CAPABILITIES','THREAT_MODEL','TICKETS','TOOLHUB','TRANSPARENCY',
@@ -160,8 +160,11 @@ const INTERNAL_DOCS = new Set([
 ]);
 const PUBLIC_DOC_IDS = new Set([
   // First score and adoption
-  'INDEX', 'START_HERE', 'AFTER_FIRST_SCORE', 'GETTING_STARTED', 'QUICKSTART',
+  'INDEX', 'START_HERE', 'AFTER_FIRST_SCORE', 'GETTING_STARTED', 'QUICKSTART', 'AGENT_GUIDE',
   'INSTALL', 'COMPATIBILITY_MATRIX', 'STARTER_BLUEPRINTS', 'BROWSER_SANDBOX', 'TROUBLESHOOTING',
+  'BOARD_RISK_L3_MEMO', 'CLI_COMMAND_INVENTORY', 'DEPLOYMENT_OPTIONS', 'EXAMPLES_INDEX', 'EXECUTIVE_OVERVIEW',
+  'SOLO_DEV_QUICKSTART', 'SOLO_DEV_PATH', 'PLATFORM_ENGINEER_QUICKSTART', 'PLATFORM_PATH',
+  'SECURITY_COMPLIANCE_QUICKSTART', 'SECURITY_PATH',
 
   // Architecture and deep dives
   'ARCHITECTURE_BRIEF', 'ARCHITECTURE_MAP', 'API_SURFACES', 'SYSTEM_CAPABILITIES', 'RUNTIMES', 'RUNTIME_SDK',
@@ -169,7 +172,7 @@ const PUBLIC_DOC_IDS = new Set([
   'deep-dive/governance-execution-plane', 'deep-dive/evaluation-assurance-plane', 'deep-dive/operations-ecosystem-plane',
 
   // Adapters and integration
-  'ADAPTERS', 'ADAPTER_COMPATIBILITY', 'agent-framework-compatibility',
+  'ADAPTERS', 'ADAPTER_COMPATIBILITY', 'CUSTOM_ADAPTER', 'agent-framework-compatibility',
   'adapters/LANDING_LANGCHAIN', 'adapters/LANDING_OPENAI', 'adapters/LANDING_CREWAI',
   'adapters/LANDING_CLAUDE_CODE', 'adapters/LANDING_GENERIC_CLI',
   'adapters/autogen', 'adapters/claude-code', 'adapters/crewai', 'adapters/gemini',
@@ -179,13 +182,13 @@ const PUBLIC_DOC_IDS = new Set([
   'PROVIDERS', 'SDK', 'SDK_VERSIONING', 'MCP_SERVER', 'integrations/ci-cd',
 
   // Score and metric validity
-  'AMC_QUESTIONS_IN_DEPTH', 'ARCHETYPES', 'BENCHMARKS', 'METRICS', 'OUTCOMES',
-  'VALIDITY_FRAMEWORK', 'self-calibration', 'score-history',
+  'AMC_QUESTIONS_IN_DEPTH', 'QUESTION_BANK', 'SCORING_METHODOLOGY', 'ARCHETYPES',
+  'BENCHMARKS', 'METRICS', 'OUTCOMES', 'VALIDITY_FRAMEWORK', 'self-calibration', 'score-history',
 
   // Compliance and regulation
   'EU_AI_ACT_COMPLIANCE', 'COMPLIANCE', 'COMPLIANCE_FRAMEWORKS', 'COMPLIANCE_MAPS',
   'ISO_42001_ALIGNMENT', 'GDPR_ARTICLE_COMPLIANCE', 'MITRE_ATLAS_MAPPING', 'STANDARDS_MAPPING',
-  'AUDIT_BINDER', 'enterprise-readiness-checklist', 'compliance/eu-ai-act-checklist',
+  'ASSURANCE_LAB', 'AUDIT_BINDER', 'enterprise-readiness-checklist', 'compliance/eu-ai-act-checklist',
   'compliance/iso-42001-aims-manual', 'compliance/nist-rmf-profile', 'compliance/SOC2_TYPE_II_CONTROLS_MAPPING',
 
   // Security, runtime policy, and identity
@@ -210,7 +213,7 @@ const PUBLIC_DOC_IDS = new Set([
 
   // Product, Studio, and user workflows
   'CONSOLE', 'DASHBOARD', 'STUDIO', 'TOOLHUB', 'PLAYGROUND', 'ACCESSIBILITY',
-  'DOMAIN_PACKS', 'SECTOR_PACKS', 'PRODUCT_EDITIONS', 'PRICING', 'BUYER_PACKAGES',
+  'DOMAIN_PACKS', 'DOMAIN_PROOF_LANE', 'SECTOR_PACKS', 'PRODUCT_EDITIONS', 'PRICING', 'BUYER_PACKAGES',
   'RELEASE_HIGHLIGHTS', 'USE_CASES', 'PERSONAS', 'WHY_AMC',
 
   // API, fleet, memory, research, and migration
@@ -266,6 +269,96 @@ function prettyName(doc) {
     .replace(/Vscode/g, 'VSCode');
 }
 
+const DOC_SECTION_SEPARATOR = '::';
+
+function safeDecode(value) {
+  try {
+    return decodeURIComponent(value);
+  } catch {
+    return value;
+  }
+}
+
+function docsRoute(docName, section = '') {
+  return section ? `${docName}${DOC_SECTION_SEPARATOR}${encodeURIComponent(section)}` : docName;
+}
+
+function parseDocsRoute(hash) {
+  const raw = hash.replace(/^#/, '');
+  const separator = raw.indexOf(DOC_SECTION_SEPARATOR);
+  if (separator === -1) return { docName: safeDecode(raw), section: '' };
+  return {
+    docName: safeDecode(raw.slice(0, separator)),
+    section: safeDecode(raw.slice(separator + DOC_SECTION_SEPARATOR.length))
+  };
+}
+
+function resolveRenderedGuideLink(docName, href) {
+  if (!href || href.startsWith('#') || /^(?:[a-z][a-z0-9+.-]*:|\/\/)/i.test(href)) return null;
+
+  try {
+    const base = new URL(`${docName}.md`, 'https://amc-docs.invalid/');
+    const resolved = new URL(href, base);
+    if (resolved.origin !== base.origin || !resolved.pathname.toLowerCase().endsWith('.md')) {
+      return { available: false };
+    }
+    const target = safeDecode(resolved.pathname.replace(/^\//, '').slice(0, -3));
+    if (!PUBLIC_DOCS.includes(target)) return { available: false };
+    return { available: true, docName: target, section: safeDecode(resolved.hash.replace(/^#/, '')) };
+  } catch {
+    return { available: false };
+  }
+}
+
+function ensureRenderedHeadingIds(article) {
+  const used = new Set(Array.from(article.querySelectorAll('[id]'), element => element.id));
+  article.querySelectorAll('h1, h2, h3, h4, h5, h6').forEach(heading => {
+    if (heading.id) return;
+    const base = heading.textContent
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-|-$/g, '') || 'section';
+    let id = base;
+    let suffix = 2;
+    while (used.has(id)) id = `${base}-${suffix++}`;
+    heading.id = id;
+    used.add(id);
+  });
+}
+
+function rewriteRenderedGuideLinks(article, docName) {
+  article.querySelectorAll('a[href]').forEach(link => {
+    const route = resolveRenderedGuideLink(docName, link.getAttribute('href'));
+    if (route === null) return;
+    if (!route.available) {
+      link.removeAttribute('href');
+      link.setAttribute('aria-disabled', 'true');
+      link.dataset.docLinkUnavailable = 'true';
+      link.title = 'This guide is not part of the public documentation.';
+      return;
+    }
+
+    link.href = `#${docsRoute(route.docName, route.section)}`;
+    link.dataset.docLink = route.docName;
+    link.addEventListener('click', event => {
+      event.preventDefault();
+      loadDoc(route.docName, route.section);
+    });
+  });
+}
+
+function focusDocSection(section) {
+  if (!section) return;
+  requestAnimationFrame(() => {
+    const target = document.getElementById(section);
+    if (!target) return;
+    if (!target.hasAttribute('tabindex')) target.setAttribute('tabindex', '-1');
+    target.focus({ preventScroll: true });
+    target.scrollIntoView({ block: 'start' });
+  });
+}
+
 // ─── Build Sidebar ───
 function buildSidebar() {
   const nav = document.getElementById('sidebar-nav');
@@ -308,13 +401,13 @@ function toggleSection(el) {
 }
 
 // ─── Load Document ───
-async function loadDoc(docName) {
+async function loadDoc(docName, section = '') {
   if (!PUBLIC_DOCS.includes(docName)) {
     showWelcome();
     return;
   }
   currentDoc = docName;
-  window.location.hash = docName;
+  window.location.hash = docsRoute(docName, section);
 
   const content = document.getElementById('doc-content');
   const breadcrumbs = document.getElementById('breadcrumbs');
@@ -352,7 +445,7 @@ async function loadDoc(docName) {
 
   // Check cache
   if (docCache[docName]) {
-    renderDoc(docCache[docName], docName);
+    renderDoc(docCache[docName], docName, section);
     return;
   }
 
@@ -370,7 +463,7 @@ async function loadDoc(docName) {
       searchIndex.push({ doc: docName, title: prettyName(docName), content: md.toLowerCase() });
     }
 
-    renderDoc(md, docName);
+    renderDoc(md, docName, section);
   } catch (err) {
     content.innerHTML = `<div class="doc-error">
       <h2>Document unavailable</h2>
@@ -381,7 +474,7 @@ async function loadDoc(docName) {
   }
 }
 
-function renderDoc(md, docName) {
+function renderDoc(md, docName, section = '') {
   const content = document.getElementById('doc-content');
   const html = marked.parse(md, {
     gfm: true,
@@ -396,8 +489,12 @@ function renderDoc(md, docName) {
     </div>
     <article class="doc-article" data-doc="${escHtml(docName)}">${html}</article>
   `;
+  const article = content.querySelector('.doc-article');
+  ensureRenderedHeadingIds(article);
+  rewriteRenderedGuideLinks(article, docName);
   addCopyButtons();
   window.scrollTo(0, 0);
+  focusDocSection(section);
 }
 
 function addCopyButtons() {
@@ -600,18 +697,18 @@ async function preloadSearchIndex() {
   initSearch();
 
   // Route
-  const hash = window.location.hash.replace('#', '');
-  if (hash && PUBLIC_DOCS.includes(hash)) {
-    loadDoc(hash);
+  const route = parseDocsRoute(window.location.hash);
+  if (route.docName && PUBLIC_DOCS.includes(route.docName)) {
+    loadDoc(route.docName, route.section);
   } else {
     showWelcome();
   }
 
   // Handle back/forward
   window.addEventListener('popstate', () => {
-    const h = window.location.hash.replace('#', '');
-    if (h && PUBLIC_DOCS.includes(h)) {
-      loadDoc(h);
+    const nextRoute = parseDocsRoute(window.location.hash);
+    if (nextRoute.docName && PUBLIC_DOCS.includes(nextRoute.docName)) {
+      loadDoc(nextRoute.docName, nextRoute.section);
     } else {
       showWelcome();
     }

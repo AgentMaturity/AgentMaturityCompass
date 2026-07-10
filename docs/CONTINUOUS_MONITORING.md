@@ -527,7 +527,7 @@ amc drift alerts test
 
 ## See Also
 
-- [Drift Detection](./DRIFT_DETECTION.md)
-- [Alert Configuration](./ALERTS.md)
-- [Dashboard API](./DASHBOARD_API.md)
+- [Drift Alerts](./DRIFT_ALERTS.md)
+- [Incident Response Readiness](./INCIDENT_RESPONSE_READINESS.md)
+- [Dashboard](./DASHBOARD.md)
 - [AMC Studio](./STUDIO.md)

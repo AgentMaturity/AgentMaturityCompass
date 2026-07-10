@@ -46,7 +46,7 @@ describe("website content validation", () => {
     expect(homepage).toContain("Agent Maturity Compass whitepaper");
     expect(homepage).toContain("https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/whitepaper/AMC_WHITEPAPER_v1.md");
     expect(docsIndex).toContain("## Understand The Proof");
-    expect(docsIndex).toContain("[Whitepaper](../whitepaper/AMC_WHITEPAPER_v1.md)");
+    expect(docsIndex).toContain("[Whitepaper](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/whitepaper/AMC_WHITEPAPER_v1.md)");
     expect(audit).toContain("Whitepaper homepage/docs discoverability — ✅ Resolved 2026-06-16.");
     expect(audit).not.toContain("⚠️ Not linked from website homepage");
   });

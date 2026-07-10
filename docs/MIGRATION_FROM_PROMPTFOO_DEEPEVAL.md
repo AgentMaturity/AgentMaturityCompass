@@ -302,4 +302,4 @@ A: For most projects: 15–30 minutes. `amc init` → `amc adapters detect` → 
 
 ---
 
-_Generated for AMC v1.0.0. See [full documentation](../docs/) for details._
+_See the [current AMC documentation](INDEX.md) for installation, evidence, scoring, and operating guidance._

@@ -35,8 +35,7 @@ test.describe("AMC Docs brand shell", () => {
     expect(layout.documentWidth).toBe(layout.viewportWidth);
     expect(layout.topbarHeight).toBe(56);
     expect(layout.mainLeft).toBe(280);
-    expect(layout.publicGuideCount).toBeGreaterThan(80);
-    expect(layout.publicGuideCount).toBeLessThanOrEqual(160);
+    expect(layout.publicGuideCount).toBe(168);
     expect(layout.firstCategoryCount).toBeLessThanOrEqual(10);
 
     await page.screenshot({ path: testInfo.outputPath("amc-docs-desktop.png"), fullPage: true });

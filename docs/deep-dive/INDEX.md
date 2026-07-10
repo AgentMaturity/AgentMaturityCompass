@@ -2,7 +2,7 @@
 
 This series walks subsystem-by-subsystem through AMC's current implementation.
 
-Use it after [../ARCHITECTURE_BRIEF.md](../ARCHITECTURE_BRIEF.md) when you want the next layer of detail, or after [../IMPLEMENTATION_REALITY_MAP.md](../IMPLEMENTATION_REALITY_MAP.md) when you want to understand the runtime boundaries behind each bucket.
+Use it after [../ARCHITECTURE_BRIEF.md](../ARCHITECTURE_BRIEF.md) when you want the next layer of detail, or after [../SYSTEM_CAPABILITIES.md](../SYSTEM_CAPABILITIES.md) when you want to understand the runtime boundaries behind each AMC surface.
 
 ## Reading Order
 
