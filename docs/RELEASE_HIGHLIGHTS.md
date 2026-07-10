@@ -8,6 +8,7 @@ This page exists to show momentum without making users read the entire changelog
 - help visitors see that AMC is active
 
 ## Current highlights
+- Least-privilege Studio module API authorization: route-level viewer, operator, approver, auditor, and owner boundaries replace the former shared human-role gate
 - Domain Proof API containment: inline schema-validated checks, realpath-confined deprecated fixtures, bounded errors, and no caller-selected server writes
 - Evidence-readiness contract across CLI, Studio, lifecycle artifacts, report sharing, and executive briefs: `VALID` proves artifact integrity, while `READY` governs claim eligibility
 - Unified AMC visual identity across the website, Studio, desktop launchers, Docs, CLI output, and GitHub README

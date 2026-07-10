@@ -3,7 +3,8 @@ info:
   title: Agent Maturity Compass API
   description: |
     REST API for the Agent Maturity Compass (AMC) — score, govern, and assure AI agent deployments.
-    Every endpoint requires a Bearer token unless noted otherwise.
+    Protected `/v1/*` routes use a signed AMC Studio session cookie or the Studio bootstrap admin token.
+    Studio applies a least-privilege role policy per route; public compatibility routes opt out explicitly.
   version: 1.0.0
   license:
     name: MIT
@@ -20,24 +21,21 @@ servers:
         description: DNS name for your self-hosted AMC deployment
 
 security:
-  - bearerAuth: []
+  - amcSessionCookie: []
+  - amcAdminToken: []
 
 components:
   securitySchemes:
-    bearerAuth:
-      type: http
-      scheme: bearer
-      bearerFormat: JWT
     amcSessionCookie:
       type: apiKey
       in: cookie
       name: amc_session
-      description: Studio session cookie. Value webhook ingestion requires an OWNER or OPERATOR role.
+      description: Signed Studio session cookie. Route access is least-privilege by role; VIEWER reads, OPERATOR runs workflows, APPROVER issues approved execution intents, AUDITOR verifies or attests, and OWNER controls secrets, signing, identity, and policy.
     amcAdminToken:
       type: apiKey
       in: header
       name: x-amc-admin-token
-      description: Studio bootstrap admin token; treated as OWNER/OPERATOR for value ingestion.
+      description: Studio bootstrap admin token with owner-equivalent emergency access. Keep local and rotate if exposed.
     valueWebhookToken:
       type: apiKey
       in: header
@@ -909,6 +907,7 @@ paths:
       tags: [health]
       summary: Health check
       description: Returns service health, version, uptime, and database status.
+      security: []
       responses:
         '200':
           description: Health payload

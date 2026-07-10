@@ -35,12 +35,13 @@ Header required for protected endpoints:
 - `x-amc-admin-token: <token>`
 
 API surface boundaries:
-- Lightweight module API: `/api/v1/*` (rate-limited; protected routes require a signed Studio session with `VIEWER+` or the bootstrap admin token; agent and lease credentials are denied)
+- Lightweight module API: `/api/v1/*` (rate-limited; protected routes require a signed Studio session or the bootstrap admin token; agent and lease credentials are denied)
 - Studio control plane API: `/*` (session/admin-token auth with RBAC on protected routes)
 - Public bridge surface: `/bridge/*` (lease-auth integration surface)
 - Reference: [API_SURFACES.md](./API_SURFACES.md)
 
 Security note:
+- Protected `/api/v1/*` routes use a centralized least-privilege policy: ordinary reads and explicitly side-effect-free checks are available to human roles; operational changes require `OPERATOR`/`OWNER`; verification, attestation, and approval use their named roles; secrets, identity, signing, keys, policies, and control-plane changes require `OWNER`.
 - Keep Studio network-restricted even though protected `/api/v1/*` routes enforce Studio auth and role checks. Only the explicit public API compatibility routes bypass that gate.
 
 CLI helper:

@@ -10,7 +10,7 @@ import { startStudioApiServer } from "../../src/studio/studioServer.js";
 import { issueLeaseForCli } from "../../src/leases/leaseCli.js";
 import { canonicalize } from "../../src/utils/json.js";
 import { getPrivateKeyPem } from "../../src/crypto/keys.js";
-import { initUsersConfig } from "../../src/auth/authApi.js";
+import { addUser, initUsersConfig } from "../../src/auth/authApi.js";
 import { initHostDb, createHostUser, createWorkspaceRecord, grantMembership } from "../../src/workspaces/hostDb.js";
 import { hostWorkspaceDir } from "../../src/workspaces/workspacePaths.js";
 import { startWorkspaceRouter } from "../../src/workspaces/workspaceRouter.js";
@@ -210,6 +210,135 @@ describe("API security hardening", () => {
       await api.close();
     }
   });
+
+  test("Studio sessions enforce least-privilege roles across protected /api/v1 routes", async () => {
+    const workspace = newWorkspace("amc-api-rbac-");
+    initUsersConfig({
+      workspace,
+      username: "owner",
+      password: "owner-pass-123"
+    });
+    addUser({ workspace, username: "viewer", password: "viewer-pass-123", roles: ["VIEWER"] });
+    addUser({ workspace, username: "auditor", password: "auditor-pass-123", roles: ["AUDITOR"] });
+    addUser({ workspace, username: "approver", password: "approver-pass-123", roles: ["APPROVER"] });
+    addUser({ workspace, username: "operator", password: "operator-pass-123", roles: ["OPERATOR"] });
+
+    const adminToken = "api-rbac-admin-token";
+    const api = await startStudioApiServer({
+      workspace,
+      host: "127.0.0.1",
+      port: await pickFreePort(),
+      token: adminToken
+    });
+    try {
+      const login = async (username: string, password: string): Promise<string> => {
+        const response = await httpCall({
+          method: "POST",
+          url: `${api.url}/auth/login`,
+          body: { username, password }
+        });
+        expect(response.status).toBe(200);
+        return firstSetCookie(response.headers).split(";", 1)[0] ?? "";
+      };
+
+      const viewerCookie = await login("viewer", "viewer-pass-123");
+      const viewerRead = await httpCall({
+        url: `${api.url}/api/v1/score/status`,
+        headers: { cookie: viewerCookie }
+      });
+      expect(viewerRead.status).toBe(200);
+
+      const viewerAnalyze = await httpCall({
+        method: "POST",
+        url: `${api.url}/api/v1/vault/redact`,
+        headers: { cookie: viewerCookie },
+        body: { text: "contact alice@example.com" }
+      });
+      expect(viewerAnalyze.status).toBe(200);
+
+      const viewerSecretRead = await httpCall({
+        url: `${api.url}/api/v1/vault/secret/provider-key`,
+        headers: { cookie: viewerCookie }
+      });
+      expect(viewerSecretRead.status).toBe(403);
+
+      const viewerExecution = await httpCall({
+        method: "POST",
+        url: `${api.url}/api/v1/sandbox/run`,
+        headers: { cookie: viewerCookie },
+        body: { command: "printf", args: ["blocked"] }
+      });
+      expect(viewerExecution.status).toBe(403);
+
+      const auditorCookie = await login("auditor", "auditor-pass-123");
+      const auditorMutation = await httpCall({
+        method: "POST",
+        url: `${api.url}/api/v1/vault/keys/rotate`,
+        headers: { cookie: auditorCookie },
+        body: {}
+      });
+      expect(auditorMutation.status).toBe(403);
+
+      const auditorAttest = await httpCall({
+        method: "POST",
+        url: `${api.url}/api/v1/evidence/attest`,
+        headers: { cookie: auditorCookie },
+        body: {}
+      });
+      expect(auditorAttest.status).not.toBe(403);
+
+      const approverCookie = await login("approver", "approver-pass-123");
+      const approverIssue = await httpCall({
+        method: "POST",
+        url: `${api.url}/api/v1/tickets/issue`,
+        headers: { cookie: approverCookie },
+        body: {}
+      });
+      expect(approverIssue.status).toBe(400);
+      const approverExecution = await httpCall({
+        method: "POST",
+        url: `${api.url}/api/v1/sandbox/run`,
+        headers: { cookie: approverCookie },
+        body: { command: "printf", args: ["blocked"] }
+      });
+      expect(approverExecution.status).toBe(403);
+
+      const operatorCookie = await login("operator", "operator-pass-123");
+      const operatorExecution = await httpCall({
+        method: "POST",
+        url: `${api.url}/api/v1/sandbox/run`,
+        headers: { cookie: operatorCookie },
+        body: {}
+      });
+      expect(operatorExecution.status).toBe(400);
+      const operatorIdentityMutation = await httpCall({
+        method: "POST",
+        url: `${api.url}/api/v1/identity/scim/token/create`,
+        headers: { cookie: operatorCookie },
+        body: {}
+      });
+      expect(operatorIdentityMutation.status).toBe(403);
+
+      const ownerCookie = await login("owner", "owner-pass-123");
+      const ownerIdentityMutation = await httpCall({
+        method: "POST",
+        url: `${api.url}/api/v1/identity/scim/token/create`,
+        headers: { cookie: ownerCookie },
+        body: {}
+      });
+      expect(ownerIdentityMutation.status).toBe(400);
+
+      const adminIdentityMutation = await httpCall({
+        method: "POST",
+        url: `${api.url}/api/v1/identity/scim/token/create`,
+        headers: { "x-amc-admin-token": adminToken },
+        body: {}
+      });
+      expect(adminIdentityMutation.status).toBe(400);
+    } finally {
+      await api.close();
+    }
+  }, 30_000);
 
   test("console snapshot is no longer anonymously accessible", async () => {
     const workspace = newWorkspace();

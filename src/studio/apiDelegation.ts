@@ -1,5 +1,6 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { handleApiRoute, isPublicApiRoute } from "../api/index.js";
+import { resolveApiRolePolicy } from "../api/accessPolicy.js";
 
 export interface StudioApiAuthContext {
   isAdmin: boolean;
@@ -37,8 +38,6 @@ export interface StudioApiDelegationParams {
   setRateLimitHeaders: (res: ServerResponse, decision: StudioApiRateLimitDecision) => void;
 }
 
-const API_VIEWER_ROLES = ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"];
-
 export async function handleStudioApiDelegation(params: StudioApiDelegationParams): Promise<boolean> {
   if (!params.pathname.startsWith("/api/v1/")) {
     return false;
@@ -64,12 +63,13 @@ export async function handleStudioApiDelegation(params: StudioApiDelegationParam
       params.json(params.res, 403, { error: "agent or lease auth cannot access internal /api/v1 routes" });
       return true;
     }
+    const accessPolicy = resolveApiRolePolicy(params.pathname, params.method);
     if (
       !params.requireRoles({
         auth: apiAuth,
         res: params.res,
         workspace: params.workspace,
-        roles: API_VIEWER_ROLES
+        roles: accessPolicy.roles
       })
     ) {
       return true;

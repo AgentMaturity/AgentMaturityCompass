@@ -10,7 +10,21 @@ Scope:
 
 Auth and stability:
 - this surface is rate-limited and IP-filtered by Studio
-- protected routes require a signed Studio session with `VIEWER`, `OPERATOR`, `APPROVER`, `AUDITOR`, or `OWNER`, or the bootstrap `x-amc-admin-token`; agent and lease credentials cannot access internal `/api/v1` routes
+- protected routes require a signed Studio session or the bootstrap `x-amc-admin-token`; agent and lease credentials cannot access internal `/api/v1` routes
+- Studio applies the following centralized least-privilege role policy before a module router receives the request:
+
+| Access class | Roles | Examples |
+| --- | --- | --- |
+| Read | `VIEWER`, `OPERATOR`, `APPROVER`, `AUDITOR`, `OWNER` | ordinary `GET`/`HEAD` status and report routes |
+| Side-effect-free analysis | all human roles | Domain Proof inline checks, DLP redact/classify, Shield scanners, Enforce/Governor evaluation |
+| Verify | `OPERATOR`, `AUDITOR`, `OWNER` | execution-ticket and work-order verification |
+| Attest | `AUDITOR`, `OWNER` | evidence and Watch attestation |
+| Approve | `APPROVER`, `OWNER` | execution-ticket issuance |
+| Operate | `OPERATOR`, `OWNER` | diagnostics, assurance runs, imports, runtime runs, and exports |
+| Owner control | `OWNER` | secrets, vault/key changes, identity, signing, policy, certificates, and control-plane configuration |
+
+- sensitive read exceptions also fail closed: vault secret values require `OWNER`, while Studio logs require `OPERATOR`, `AUDITOR`, or `OWNER`
+- unsupported HTTP methods require `OWNER` before normal route handling, and unknown state-changing routes default to `OPERATOR`/`OWNER`
 - only the explicit public compatibility paths in `PUBLIC_API_V1_PATHS` bypass Studio auth
 - treat the surface as internal and keep Studio network-restricted
 - `amc api key create`, `amc api key list`, and `amc api key revoke` manage a local hashed key lifecycle, but those keys are not an accepted Studio HTTP auth carrier in the current runtime

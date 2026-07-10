@@ -102,6 +102,12 @@ Key rotation is supported via `amc vault rotate-keys`, which maintains key histo
 
 ## Network Security
 
+### Studio module API authorization
+
+Protected `/api/v1` routes require a signed Studio session or the bootstrap admin token and reject agent and lease principals. A centralized least-privilege policy authorizes the request before module dispatch: ordinary reads and explicitly side-effect-free analyzers permit human roles, operational workflows require `OPERATOR`/`OWNER`, verification and attestation preserve auditor access, ticket issuance preserves approver access, and secret, identity, signing, key, policy, certificate, or control-plane actions require `OWNER`.
+
+The policy also treats vault secret reads as owner-only, restricts Studio log reads to operational/audit roles, defaults unknown state-changing routes to `OPERATOR`/`OWNER`, and requires `OWNER` for unsupported methods. This role boundary does not make Studio internet-safe; keep Studio bound to localhost or behind a trusted private ingress.
+
 ### Domain Proof API Filesystem Boundary
 
 `POST /api/v1/proof/check` evaluates schema-validated inline manifest and input objects without arbitrary server filesystem access. The current toy checker also requires the canonical AMC source text and manifest structure; a caller cannot substitute a merely schema-valid source and obtain `proven`. API-side `outFile` writes are disabled. Deprecated path-string compatibility is limited to the built-in `fixtures/domain-proof/` and `examples/domain-proof/` roots with lexical containment, realpath containment, regular-file, and 1 MiB checks. Absolute paths, traversal, non-proof workspace paths, and symlink escapes fail closed with errors that omit host paths and file names.
