@@ -1,5 +1,6 @@
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -8,13 +9,14 @@ const rawDocs = "https://raw.githubusercontent.com/AgentMaturity/AgentMaturityCo
 
 test("rendered guide links stay in the Docs router and unknown targets fail closed", async ({ page }) => {
   const fetchedDocs: string[] = [];
+  await page.setViewportSize({ width: 390, height: 844 });
   await page.route("https://cdn.jsdelivr.net/npm/marked/marked.min.js", route => route.fulfill({
     contentType: "application/javascript",
     body: `window.marked = {
       setOptions() {},
       parse(markdown) {
         if (markdown.includes("NESTED_ROUTE_FIXTURE")) {
-          return '<h1>Runtime plane</h1><p><a id="public-guide-link" href="../GETTING_STARTED.md#first-score">First score</a></p><p><a id="internal-guide-link" href="../IMPLEMENTATION_REALITY_MAP.md">Internal plan</a></p>';
+          return '<h1>Runtime plane</h1><p><a id="public-guide-link" href="../GETTING_STARTED.md#first-score">First score</a></p><p><a id="internal-guide-link" href="../IMPLEMENTATION_REALITY_MAP.md">Internal plan</a></p><p><code>INSUFFICIENT_EVIDENCE_WITH_A_VERY_LONG_UNBROKEN_REFERENCE_TOKEN</code></p>';
         }
         return '<h1>Getting started</h1><h2 id="first-score">First score</h2>';
       }
@@ -33,6 +35,10 @@ test("rendered guide links stay in the Docs router and unknown targets fail clos
 
   await page.goto(`${docsUrl}#deep-dive/INDEX`);
   await expect(page.locator('.doc-article[data-doc="deep-dive/INDEX"]')).toBeVisible();
+  const layout = await page.evaluate(() => ({ viewport: window.innerWidth, documentWidth: document.documentElement.scrollWidth }));
+  expect(layout.documentWidth).toBe(layout.viewport);
+  const axe = await new AxeBuilder({ page }).analyze();
+  expect(axe.violations).toEqual([]);
 
   const internal = page.locator("#internal-guide-link");
   await expect(internal).not.toHaveAttribute("href");
