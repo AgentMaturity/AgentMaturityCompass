@@ -1,294 +1,342 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AMC vs Everything Else — Agent Maturity Compass</title>
-<meta name="description" content="Compare Agent Maturity Compass against self-reported docs, MTEB benchmarks, model cards, SOC2 audits, manual red-teaming, AgentBench, and HELM.">
-<meta property="og:title" content="AMC vs Everything Else — How AMC Compares">
-<meta property="og:description" content="Side-by-side comparison of AI agent evaluation approaches. See why execution evidence beats self-reported claims.">
-<meta property="og:type" content="website">
-<meta property="og:url" content="https://agentmaturity.co/compare.html">
-<meta property="og:image" content="https://agentmaturity.co/og-card.png">
-<meta name="twitter:card" content="summary_large_image">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23000'/%3E%3Ccircle cx='16' cy='16' r='11' fill='none' stroke='%2300ff41' stroke-width='1.5'/%3E%3Cpath d='M16 5L17.5 14.5 16 18 14.5 14.5Z' fill='%2300ff41'/%3E%3Ccircle cx='16' cy='16' r='2' fill='%2300ff41'/%3E%3C/svg%3E">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-<style>
-:root{--bg:#000;--bg2:#060d06;--bg3:#0a140a;--fg:#e0ffe0;--fg2:#b0d8b0;--muted:#5a8a5a;--green:#00ff41;--green2:#00cc33;--green3:#006622;--border:rgba(0,255,65,.12);--border2:rgba(0,255,65,.25);--amber:#f59e0b;--red:#ff3355;--cyan:#00e5ff;--mono:'JetBrains Mono',monospace;--sans:'Inter',system-ui,sans-serif}
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:var(--sans);background:var(--bg);color:var(--fg);line-height:1.7;min-height:100vh}
-a{color:var(--green);text-decoration:none}a:hover{text-decoration:underline}
-
-.nav{background:var(--bg2);border-bottom:1px solid var(--border);padding:14px 24px;display:flex;align-items:center;gap:20px;font-family:var(--mono);font-size:.85rem;position:sticky;top:0;z-index:100}
-.nav a{color:var(--muted)}
-.nav a:hover{color:var(--green);text-decoration:none}
-.nav .logo{color:var(--green);font-weight:600;font-size:1rem}
-
-.hero{text-align:center;padding:80px 24px 48px;max-width:800px;margin:0 auto}
-.hero h1{font-family:var(--mono);font-size:2.4rem;color:var(--green);margin-bottom:12px}
-.hero .sub{color:var(--fg2);font-size:1.1rem;margin-bottom:8px}
-.hero .sub2{color:var(--muted);font-size:.9rem}
-
-.container{max-width:1100px;margin:0 auto;padding:0 24px 80px}
-
-.table-wrap{overflow-x:auto;margin:40px 0;border:1px solid var(--border2);border-radius:12px}
-table{width:100%;border-collapse:collapse;font-size:.88rem}
-th,td{padding:12px 16px;border:1px solid var(--border);text-align:left}
-th{background:var(--bg3);color:var(--green2);font-family:var(--mono);font-weight:600;font-size:.78rem;text-transform:uppercase;letter-spacing:.05em;white-space:nowrap}
-td{color:var(--fg2)}
-tr:hover td{background:rgba(0,255,65,.03)}
-td:first-child{font-weight:500;color:var(--fg);font-family:var(--mono);font-size:.82rem;white-space:nowrap}
-.yes{color:var(--green);font-weight:600}
-.no{color:var(--red);opacity:.7}
-.partial{color:var(--amber)}
-.best{background:rgba(0,255,65,.06) !important}
-
-.legend{display:flex;gap:24px;justify-content:center;margin:20px 0 40px;font-size:.82rem;flex-wrap:wrap}
-.legend span{display:flex;align-items:center;gap:6px}
-.legend .dot{width:10px;height:10px;border-radius:50%;display:inline-block}
-
-.section{margin:48px 0}
-.section h2{font-family:var(--mono);font-size:1.3rem;color:var(--green);margin-bottom:16px;border-bottom:1px solid var(--border);padding-bottom:8px}
-.section p{color:var(--fg2);margin-bottom:12px;max-width:700px}
-
-.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-top:24px}
-.card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:20px}
-.card h3{font-family:var(--mono);font-size:.95rem;color:var(--green2);margin-bottom:8px}
-.card p{color:var(--muted);font-size:.88rem;margin:0}
-
-.cta{text-align:center;margin:60px 0 40px;padding:40px;background:var(--bg2);border:1px solid var(--border2);border-radius:12px}
-.cta h2{font-family:var(--mono);color:var(--green);margin-bottom:12px}
-.cta p{color:var(--fg2);margin-bottom:20px}
-.cta a.btn{display:inline-block;background:var(--green3);color:var(--green);padding:10px 28px;border-radius:6px;font-family:var(--mono);font-weight:600;border:1px solid var(--green);transition:all .2s}
-.cta a.btn:hover{background:var(--green);color:#000;text-decoration:none}
-
-.footer{text-align:center;padding:24px;color:var(--muted);font-size:.78rem;border-top:1px solid var(--border);font-family:var(--mono)}
-
-@media(max-width:768px){
-  .hero h1{font-size:1.6rem}
-  th,td{padding:8px 10px;font-size:.8rem}
-  .nav{flex-wrap:wrap;gap:10px}
-}
-</style>
-<style id="skip-link-style">
-.skip-link{position:fixed;left:-9999px;top:12px;z-index:10000;padding:8px 14px;background:#4AEF79;color:#0a0a0a;font:700 14px system-ui,sans-serif;text-decoration:none}
-.skip-link:focus,.skip-link:focus-visible{left:12px}
-:where(a,button,input,select,textarea,[tabindex]:not([tabindex="-1"])):focus-visible{outline:2px solid #4AEF79;outline-offset:3px}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Compare AI Agent Proof Approaches | Agent Maturity Compass</title>
+  <meta name="description" content="A source-backed decision guide to agent harnesses, model and agent benchmarks, model cards, organizational assurance, adversarial testing, and AMC execution evidence.">
+  <meta name="theme-color" content="#0a0a0a">
+  <link rel="canonical" href="https://agentmaturity.co/compare.html">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Compare AI Agent Proof Approaches | AMC">
+  <meta property="og:description" content="Choose the evidence that matches the decision, with primary sources, explicit limits, and no universal winner claims.">
+  <meta property="og:url" content="https://agentmaturity.co/compare.html">
+  <meta property="og:image" content="https://agentmaturity.co/og-card.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='4' fill='%230a0a0a'/%3E%3Ctext x='16' y='22' text-anchor='middle' fill='%234AEF79' font-family='monospace' font-size='18' font-weight='700'%3Ea%3C/text%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="compare.css?v=20260710a">
+  <script src="compare.js?v=20260710a" defer></script>
 </head>
 <body>
-<a href="#main-content" class="skip-link">Skip to content</a>
+  <a class="skip-link" href="#main-content">Skip to content</a>
 
-<nav class="nav">
-  <a href="./" class="logo">🛡️ AMC</a>
-  <a href="./">Home</a>
-  <a href="docs/">Docs</a>
-  <a href="compare.html" style="color:var(--green)">Compare</a>
-  <a href="blog.html">Blog</a>
-  <a href="changelog.html">Changelog</a>
-  <a href="https://github.com/AgentMaturity/AgentMaturityCompass" target="_blank">GitHub</a>
-</nav>
-<div id="main-content" tabindex="-1"></div>
-
-<div class="hero">
-  <h1>AMC vs Everything Else</h1>
-  <p class="sub">How does Agent Maturity Compass compare to existing AI evaluation approaches?</p>
-  <p class="sub2">Spoiler: most approaches let the agent grade its own homework.</p>
-</div>
-
-<div class="container">
-
-  <div class="legend">
-    <span><span class="dot" style="background:var(--green)"></span> Full support</span>
-    <span><span class="dot" style="background:var(--amber)"></span> Partial / limited</span>
-    <span><span class="dot" style="background:var(--red)"></span> Not supported</span>
-  </div>
-
-  <div class="table-wrap">
-    <table>
-      <thead>
-        <tr>
-          <th>Dimension</th>
-          <th class="best">AMC</th>
-          <th>Self-Reported Docs</th>
-          <th>MTEB / Benchmarks</th>
-          <th>Model Cards</th>
-          <th>SOC2 Audits</th>
-          <th>Manual Red-Teaming</th>
-          <th>AgentBench</th>
-          <th>HELM</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>Evidence Source</td>
-          <td class="best"><span class="yes">Execution evidence (observed)</span></td>
-          <td><span class="no">Self-reported</span></td>
-          <td><span class="partial">Synthetic benchmarks</span></td>
-          <td><span class="no">Vendor-authored</span></td>
-          <td><span class="partial">Point-in-time audit</span></td>
-          <td><span class="partial">Manual testing</span></td>
-          <td><span class="partial">Synthetic tasks</span></td>
-          <td><span class="partial">Synthetic scenarios</span></td>
-        </tr>
-        <tr>
-          <td>Tamper Resistance</td>
-          <td class="best"><span class="yes">Ed25519 + Merkle tree</span></td>
-          <td><span class="no">None</span></td>
-          <td><span class="no">None</span></td>
-          <td><span class="no">None</span></td>
-          <td><span class="partial">Auditor independence</span></td>
-          <td><span class="partial">Human judgment</span></td>
-          <td><span class="no">None</span></td>
-          <td><span class="no">None</span></td>
-        </tr>
-        <tr>
-          <td>Continuous Monitoring</td>
-          <td class="best"><span class="yes">Real-time + drift detection</span></td>
-          <td><span class="no">Static docs</span></td>
-          <td><span class="no">One-time run</span></td>
-          <td><span class="no">Static document</span></td>
-          <td><span class="no">Annual audit</span></td>
-          <td><span class="no">Periodic testing</span></td>
-          <td><span class="no">One-time eval</span></td>
-          <td><span class="no">One-time eval</span></td>
-        </tr>
-        <tr>
-          <td>Framework Coverage</td>
-          <td class="best"><span class="yes">14 adapters (LangChain, CrewAI, etc.)</span></td>
-          <td><span class="partial">Framework-specific</span></td>
-          <td><span class="no">Model-level only</span></td>
-          <td><span class="no">Model-level only</span></td>
-          <td><span class="partial">Org-level</span></td>
-          <td><span class="partial">Single agent</span></td>
-          <td><span class="partial">Limited frameworks</span></td>
-          <td><span class="no">Model-level only</span></td>
-        </tr>
-        <tr>
-          <td>EU AI Act Ready</td>
-          <td class="best"><span class="yes">Full compliance mapping</span></td>
-          <td><span class="no">No mapping</span></td>
-          <td><span class="no">Not designed for it</span></td>
-          <td><span class="partial">Some transparency</span></td>
-          <td><span class="partial">Partial overlap</span></td>
-          <td><span class="no">No compliance focus</span></td>
-          <td><span class="no">Not designed for it</span></td>
-          <td><span class="partial">Transparency focus</span></td>
-        </tr>
-        <tr>
-          <td>Cost</td>
-          <td class="best"><span class="yes">Free (MIT licensed)</span></td>
-          <td><span class="yes">Free</span></td>
-          <td><span class="yes">Free</span></td>
-          <td><span class="yes">Free</span></td>
-          <td><span class="no">$50K–$200K/year</span></td>
-          <td><span class="no">$10K–$100K/engagement</span></td>
-          <td><span class="yes">Free</span></td>
-          <td><span class="yes">Free</span></td>
-        </tr>
-        <tr>
-          <td>Time to First Score</td>
-          <td class="best"><span class="yes">2 minutes</span></td>
-          <td><span class="partial">Hours to write</span></td>
-          <td><span class="partial">Minutes to run</span></td>
-          <td><span class="no">Weeks to prepare</span></td>
-          <td><span class="no">3–6 months</span></td>
-          <td><span class="no">Days to weeks</span></td>
-          <td><span class="partial">Hours to setup</span></td>
-          <td><span class="partial">Hours to setup</span></td>
-        </tr>
-        <tr>
-          <td>Anti-Gaming</td>
-          <td class="best"><span class="yes">Temporal + cross-ref + freshness</span></td>
-          <td><span class="no">Easily gamed</span></td>
-          <td><span class="partial">Data contamination risk</span></td>
-          <td><span class="no">Cherry-picked results</span></td>
-          <td><span class="partial">Scope limitations</span></td>
-          <td><span class="partial">Evaluator bias</span></td>
-          <td><span class="partial">Limited checks</span></td>
-          <td><span class="partial">Limited checks</span></td>
-        </tr>
-        <tr>
-          <td>Agent-Level (not Model)</td>
-          <td class="best"><span class="yes">Full agent evaluation</span></td>
-          <td><span class="partial">Depends on docs</span></td>
-          <td><span class="no">Model only</span></td>
-          <td><span class="no">Model only</span></td>
-          <td><span class="partial">Org-level</span></td>
-          <td><span class="yes">Agent-level</span></td>
-          <td><span class="yes">Agent-level</span></td>
-          <td><span class="no">Model only</span></td>
-        </tr>
-        <tr>
-          <td>Domain Correctness Proof</td>
-          <td class="best"><span class="partial">Bounded amcproof lane: proven/disproven/unsupported against declared rule manifests</span></td>
-          <td><span class="no">Claims only</span></td>
-          <td><span class="no">Benchmark score only</span></td>
-          <td><span class="partial">Narrative limitations</span></td>
-          <td><span class="partial">Control audit, not answer proof</span></td>
-          <td><span class="partial">Human review only</span></td>
-          <td><span class="no">No source-to-rule proof</span></td>
-          <td><span class="no">No source-to-rule proof</span></td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-
-  <div class="section">
-    <h2>The Core Problem</h2>
-    <p>When you evaluate an AI agent using self-reported documentation, you get a score of <strong style="color:var(--green)">100/100</strong>. When AMC evaluates the same agent from execution evidence — watching what it actually does — the real score is <strong style="color:var(--red)">16/100</strong>.</p>
-    <p>That <strong style="color:var(--amber)">84-point gap</strong> is documentation inflation. Every approach on this page except AMC suffers from some form of it, because they either let the agent provide its own evidence, test only at the model level, or evaluate at a single point in time.</p>
-  </div>
-
-  <div class="section">
-    <h2>Why AMC Wins</h2>
-    <div class="cards">
-      <div class="card">
-        <h3>🔐 Cryptographic Evidence</h3>
-        <p>Ed25519 signatures + Merkle tree ledger. Evidence is tamper-evident by design — you can't fake your way to L5.</p>
+  <nav class="comparison-topbar" aria-label="Primary navigation">
+    <div class="comparison-bar-inner">
+      <a class="comparison-wordmark" href="./" aria-label="Agent Maturity Compass home">
+        amc<span class="brand-cursor">_</span><span class="surface-name">compare</span>
+      </a>
+      <span class="comparison-tagline">Evidence over claims.</span>
+      <div class="comparison-nav-links">
+        <a href="./">Home</a>
+        <a href="docs/index.html">Docs</a>
+        <a href="playground.html">Playground</a>
+        <a href="compare.html" aria-current="page">Compare</a>
+        <a href="https://github.com/AgentMaturity/AgentMaturityCompass">GitHub</a>
       </div>
-      <div class="card">
-        <h3>📡 Continuous, Not Point-in-Time</h3>
-        <p>AMC monitors continuously with drift detection. SOC2 audits give you a snapshot; AMC gives you a movie.</p>
-      </div>
-      <div class="card">
-        <h3>🤖 Agent-Level, Not Model-Level</h3>
-        <p>MTEB and HELM evaluate models. AMC evaluates the full agent — tools, memory, governance, the whole stack.</p>
-      </div>
-      <div class="card">
-        <h3>🔌 14 Framework Adapters</h3>
-        <p>LangChain, CrewAI, AutoGen, OpenAI Agents SDK, and more. One env var change. Zero code modifications.</p>
-      </div>
-      <div class="card">
-        <h3>⚖️ EU AI Act Mapped</h3>
-        <p>Evidence-linked EU AI Act crosswalks with explicit unsupported states. AMC helps assemble review artifacts; it does not certify legal compliance.</p>
-      </div>
-      <div class="card">
-        <h3>🧾 Domain Proof Lane</h3>
-        <p>For declared rule manifests, AMC can say proven, disproven, or unsupported — without pretending evidence receipts prove answer correctness.</p>
-      </div>
-      <div class="card">
-        <h3>💰 Free & Open Source</h3>
-        <p>MIT licensed. No $200K SOC2 audits. No $100K red-team engagements. Zero to first score in 2 minutes.</p>
-      </div>
+      <button id="themeToggle" class="theme-toggle" type="button" aria-label="Switch to light theme" aria-pressed="false">
+        <span class="theme-indicator" aria-hidden="true"></span>
+        <span class="theme-label">Light</span>
+      </button>
     </div>
-  </div>
+  </nav>
 
-  <div class="cta">
-    <h2>Ready to close the gap?</h2>
-    <p>Install AMC and get your first score in under 2 minutes.</p>
-    <pre style="background:var(--bg);padding:12px 20px;border-radius:6px;display:inline-block;margin-bottom:16px;border:1px solid var(--border);font-family:var(--mono);color:var(--green);font-size:.9rem">curl -fsSL https://agentmaturity.co/install.sh | sh
-amc</pre>
-    <br>
-    <a href="docs/#GETTING_STARTED" class="btn">Read the Docs →</a>
-  </div>
+  <main id="main-content" tabindex="-1" data-reviewed="2026-07-10">
+    <header class="comparison-hero">
+      <div class="comparison-container comparison-hero-copy">
+        <p class="eyebrow">AI agent evaluation decision guide</p>
+        <h1>Choose the proof that matches the decision.</h1>
+        <p class="hero-lede">A model benchmark, an agent harness, a model card, an assurance report, an adversarial test, and observed production evidence answer different questions. AMC is one layer in that system, not a replacement for every other layer.</p>
+        <div class="review-contract" aria-label="Comparison review contract">
+          <span>Reviewed 2026-07-10</span>
+          <span>Primary sources linked</span>
+          <span>Unknowns remain unknown</span>
+        </div>
+      </div>
+      <figure class="comparison-visual">
+        <img src="og-card.png" width="1200" height="630" alt="Agent Maturity Compass identity card with the statement Evidence over claims">
+        <figcaption>AMC's public promise applies here too: comparison claims need inspectable evidence and a stated boundary.</figcaption>
+      </figure>
+    </header>
 
-</div>
+    <section class="comparison-section" aria-labelledby="start-question">
+      <div class="comparison-container">
+        <div class="section-heading">
+          <p class="eyebrow">Start with the question</p>
+          <h2 id="start-question">Seven evidence jobs, seven different outputs</h2>
+          <p>These categories are complementary. Each card names the decision it is strongest at and the evidence unit it produces.</p>
+        </div>
 
-<footer class="footer">
-  <p>Agent Maturity Compass — MIT Licensed — <a href="https://github.com/AgentMaturity/AgentMaturityCompass">GitHub</a> · <a href="docs/">Docs</a> · <a href="changelog.html">Changelog</a></p>
-</footer>
+        <div class="decision-grid">
+          <article class="decision-card">
+            <span class="card-index">01</span>
+            <h3>Build and operate an agent</h3>
+            <p class="card-category">Agent harness or SDK</p>
+            <p>Use a harness for interactive work, programmatic sessions, tools, providers, and workflow extension. Pi is one current example.</p>
+            <p class="card-output"><strong>Evidence unit:</strong> session, event stream, or application behavior.</p>
+            <a href="#SRC-PI">Source: SRC-PI</a>
+          </article>
 
+          <article class="decision-card">
+            <span class="card-index">02</span>
+            <h3>Compare model capabilities</h3>
+            <p class="card-category">Model and embedding benchmark</p>
+            <p>Use standardized scenarios, tasks, metrics, and result sets to compare foundation models or embedding systems.</p>
+            <p class="card-output"><strong>Evidence unit:</strong> benchmark run and task-level result.</p>
+            <a href="#SRC-HELM">Sources: SRC-HELM, SRC-MTEB</a>
+          </article>
+
+          <article class="decision-card">
+            <span class="card-index">03</span>
+            <h3>Measure agent task performance</h3>
+            <p class="card-category">Agent task benchmark</p>
+            <p>Use controlled environments to compare how agents reason, decide, and act across defined tasks.</p>
+            <p class="card-output"><strong>Evidence unit:</strong> benchmark trajectory and environment result.</p>
+            <a href="#SRC-AGENTBENCH">Source: SRC-AGENTBENCH</a>
+          </article>
+
+          <article class="decision-card">
+            <span class="card-index">04</span>
+            <h3>Communicate model intent and limits</h3>
+            <p class="card-category">Model card</p>
+            <p>Use structured documentation to state intended uses, evaluation conditions, performance characteristics, and known limits.</p>
+            <p class="card-output"><strong>Evidence unit:</strong> versioned model documentation.</p>
+            <a href="#SRC-MODEL-CARDS">Source: SRC-MODEL-CARDS</a>
+          </article>
+
+          <article class="decision-card">
+            <span class="card-index">05</span>
+            <h3>Assess service-organization controls</h3>
+            <p class="card-category">Organizational assurance report</p>
+            <p>Use an independent assurance engagement to understand controls relevant to security, availability, processing integrity, confidentiality, or privacy.</p>
+            <p class="card-output"><strong>Evidence unit:</strong> scoped assurance report.</p>
+            <a href="#SRC-SOC2">Source: SRC-SOC2</a>
+          </article>
+
+          <article class="decision-card">
+            <span class="card-index">06</span>
+            <h3>Discover adversarial failure modes</h3>
+            <p class="card-category">Expert testing and risk management</p>
+            <p>Use threat-informed testing and expert review to find failures, then combine findings with ongoing risk management and monitoring.</p>
+            <p class="card-output"><strong>Evidence unit:</strong> test finding, scenario, mitigation, and retest result.</p>
+            <a href="#SRC-NIST">Source: SRC-NIST</a>
+          </article>
+
+          <article class="decision-card amc-fit">
+            <div>
+              <span class="card-index">07</span>
+              <h3>Govern a deployed agent from observed evidence</h3>
+              <p class="card-category">AMC execution assurance</p>
+            </div>
+            <div>
+              <p>Use AMC to bind observed execution, evidence readiness, scoring, policy results, drift, and signed receipts to one agent lifecycle.</p>
+              <p class="card-output"><strong>Evidence unit:</strong> signed lifecycle artifacts and claim-readiness state.</p>
+              <a href="#SRC-AMC">Source: SRC-AMC</a>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="comparison-section comparison-section-alt" aria-labelledby="fit-matrix">
+      <div class="comparison-container">
+        <div class="section-heading">
+          <p class="eyebrow">Evidence fit matrix</p>
+          <h2 id="fit-matrix">Compare scope, not marketing checkmarks</h2>
+          <p>The final column is an <strong>AMC interpretation</strong> of the cited source scope. It is not a claim that the approach is defective.</p>
+        </div>
+
+        <div class="table-region" role="region" aria-label="Scrollable evidence fit table">
+          <table aria-label="Evidence fit by evaluation approach">
+            <caption>Evidence fit by evaluation approach, reviewed 2026-07-10</caption>
+            <thead>
+              <tr>
+                <th scope="col">Approach</th>
+                <th scope="col">Primary question</th>
+                <th scope="col">Typical evidence unit</th>
+                <th scope="col">AMC interpretation: still pair it with</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th scope="row">Agent harness / SDK</th>
+                <td>How do we build and run the workflow?</td>
+                <td>Session, event stream, or application behavior</td>
+                <td>Independent evaluation and deployment assurance when the decision requires a trust claim. <a href="#SRC-PI">SRC-PI</a></td>
+              </tr>
+              <tr>
+                <th scope="row">Model / embedding benchmark</th>
+                <td>How does a model perform on standardized tasks?</td>
+                <td>Scenario, task, metric, and result set</td>
+                <td>Deployment-specific tool, policy, identity, data, and runtime evidence. <a href="#SRC-HELM">SRC-HELM</a>, <a href="#SRC-MTEB">SRC-MTEB</a></td>
+              </tr>
+              <tr>
+                <th scope="row">Agent task benchmark</th>
+                <td>How does an agent act in defined environments?</td>
+                <td>Trajectory and environment result</td>
+                <td>Evidence from the actual deployment context and its approved controls. <a href="#SRC-AGENTBENCH">SRC-AGENTBENCH</a></td>
+              </tr>
+              <tr>
+                <th scope="row">Model card</th>
+                <td>What was the model designed and evaluated for?</td>
+                <td>Versioned documentation and evaluation summary</td>
+                <td>Independent observation of the configured agent that uses the model. <a href="#SRC-MODEL-CARDS">SRC-MODEL-CARDS</a></td>
+              </tr>
+              <tr>
+                <th scope="row">Organizational assurance</th>
+                <td>Are scoped service-organization controls suitably described and examined?</td>
+                <td>Assurance report for the defined system and period</td>
+                <td>Per-agent behavior, decision, tool, and change evidence. <a href="#SRC-SOC2">SRC-SOC2</a></td>
+              </tr>
+              <tr>
+                <th scope="row">Expert adversarial testing</th>
+                <td>Which failures can skilled testers elicit?</td>
+                <td>Finding, scenario, mitigation, and retest result</td>
+                <td>Ongoing monitoring and repeatable control evidence after remediation. <a href="#SRC-NIST">SRC-NIST</a></td>
+              </tr>
+              <tr>
+                <th scope="row">AMC execution assurance</th>
+                <td>What does this agent's evidence support now?</td>
+                <td>Signed lifecycle artifact, score, policy result, drift, and receipt</td>
+                <td>Model capability benchmarks, expert review, organizational assurance, and legal analysis where those decisions apply. <a href="#SRC-AMC">SRC-AMC</a></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section class="comparison-section" aria-labelledby="fixture-proof">
+      <div class="comparison-container fixture-layout">
+        <div class="fixture-copy">
+          <p class="eyebrow">Bounded AMC demonstration</p>
+          <h2 id="fixture-proof">Inspect the fixture behind the 84-point example</h2>
+          <p>Run <code>amc demo gap --fast</code> to reproduce AMC's bundled contrast between keyword-only self-report scoring and evidence-backed scoring.</p>
+          <p class="fixture-boundary">This is <strong>one deterministic AMC fixture, not an industry prevalence estimate or an independent comparison</strong>. It demonstrates how evidence weighting changes one controlled example; it does not establish that every agent, benchmark, audit, or tool has the same gap.</p>
+          <div class="source-actions">
+            <a href="https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/src/demo/gapDemo.ts">Inspect fixture source</a>
+            <a href="https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/BENCHMARK_GALLERY.md">Inspect benchmark note</a>
+          </div>
+        </div>
+        <div class="fixture-proof" aria-label="AMC deterministic fixture results">
+          <div>
+            <strong>100/100</strong>
+            <span>keyword-only fixture score</span>
+          </div>
+          <div>
+            <strong>16/100</strong>
+            <span>evidence-backed fixture score</span>
+          </div>
+          <div>
+            <strong>84</strong>
+            <span>84-point fixture delta</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="comparison-section comparison-section-alt" aria-labelledby="use-together">
+      <div class="comparison-container">
+        <div class="section-heading">
+          <p class="eyebrow">Honest product boundary</p>
+          <h2 id="use-together">Use these approaches together</h2>
+          <p>AMC strengthens one part of an assurance program. It should not erase evidence that belongs to another part.</p>
+        </div>
+        <div class="boundary-grid">
+          <article>
+            <h3>Integrity is not sufficiency</h3>
+            <p>A signed artifact proves integrity, not evidence sufficiency. AMC reports <code>INSUFFICIENT_EVIDENCE</code> when the accepted evidence cannot support a claim.</p>
+          </article>
+          <article>
+            <h3>Mapping is not certification</h3>
+            <p>AMC can map evidence to control or regulatory questions. AMC does not certify legal compliance.</p>
+          </article>
+          <article>
+            <h3>Execution proof has a scope</h3>
+            <p>AMC does not replace model benchmarks, model cards, organizational assurance reports, or expert adversarial testing.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="comparison-section" aria-labelledby="source-ledger">
+      <div class="comparison-container">
+        <div class="section-heading">
+          <p class="eyebrow">Claim provenance</p>
+          <h2 id="source-ledger">Source ledger</h2>
+          <p>Retrieved 2026-07-10. External summaries are narrow paraphrases of primary sources. The label <strong>AMC interpretation</strong> identifies conclusions AMC draws when describing how scopes fit together.</p>
+        </div>
+        <ol class="source-list">
+          <li class="source-item" id="SRC-AMC" data-source-id="SRC-AMC">
+            <span>SRC-AMC</span>
+            <div><strong>Agent Maturity Compass implementation and methodology</strong><p>Local product contract for signed lifecycle evidence, evidence readiness, scoring, controls, drift, and receipts.</p></div>
+            <a href="https://github.com/AgentMaturity/AgentMaturityCompass">Repository</a>
+          </li>
+          <li class="source-item" id="SRC-PI" data-source-id="SRC-PI">
+            <span>SRC-PI</span>
+            <div><strong>Pi documentation</strong><p>Primary product documentation describes Pi as a minimal terminal coding harness with interactive, JSON, RPC, and SDK usage.</p></div>
+            <a href="https://pi.dev/docs/latest">Primary source</a>
+          </li>
+          <li class="source-item" id="SRC-HELM" data-source-id="SRC-HELM">
+            <span>SRC-HELM</span>
+            <div><strong>Stanford HELM</strong><p>Primary project site describes a reproducible and transparent framework for foundation-model evaluation across scenarios and metrics.</p></div>
+            <a href="https://crfm.stanford.edu/helm/index.html">Primary source</a>
+          </li>
+          <li class="source-item" id="SRC-MTEB" data-source-id="SRC-MTEB">
+            <span>SRC-MTEB</span>
+            <div><strong>MTEB</strong><p>Primary repository describes a toolbox and benchmark inventory for evaluating embeddings and retrieval systems.</p></div>
+            <a href="https://github.com/embeddings-benchmark/mteb">Primary source</a>
+          </li>
+          <li class="source-item" id="SRC-AGENTBENCH" data-source-id="SRC-AGENTBENCH">
+            <span>SRC-AGENTBENCH</span>
+            <div><strong>AgentBench</strong><p>Primary repository and paper describe an agent benchmark spanning controlled environments and multi-turn interaction.</p></div>
+            <a href="https://github.com/THUDM/AgentBench">Primary source</a>
+          </li>
+          <li class="source-item" id="SRC-MODEL-CARDS" data-source-id="SRC-MODEL-CARDS">
+            <span>SRC-MODEL-CARDS</span>
+            <div><strong>Model Cards for Model Reporting</strong><p>The original research proposes structured reporting of intended use, evaluation conditions, performance characteristics, and context.</p></div>
+            <a href="https://research.google/pubs/model-cards-for-model-reporting/">Primary source</a>
+          </li>
+          <li class="source-item" id="SRC-SOC2" data-source-id="SRC-SOC2">
+            <span>SRC-SOC2</span>
+            <div><strong>AICPA and CIMA SOC suite</strong><p>The standards body describes SOC offerings as assurance reports connected to system-level controls at service organizations.</p></div>
+            <a href="https://www.aicpa-cima.com/resources/landing/system-and-organization-controls-soc-suite-of-services">Primary source</a>
+          </li>
+          <li class="source-item" id="SRC-NIST" data-source-id="SRC-NIST">
+            <span>SRC-NIST</span>
+            <div><strong>NIST AI RMF Generative AI Profile</strong><p>The cross-sectoral profile supports risk management across the design, development, use, and evaluation lifecycle.</p></div>
+            <a href="https://www.nist.gov/publications/artificial-intelligence-risk-management-framework-generative-artificial-intelligence">Primary source</a>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <section class="comparison-cta" aria-labelledby="compare-next-step">
+      <div class="comparison-container">
+        <p class="eyebrow">Next step</p>
+        <h2 id="compare-next-step">Establish the evidence boundary before the score.</h2>
+        <p>Install AMC locally, inspect the first-run readiness state, and add evidence only for claims you intend to make.</p>
+        <div class="cta-actions">
+          <a class="button button-primary" href="docs/getting-started.html">Read the quickstart</a>
+          <a class="button button-secondary" href="https://github.com/AgentMaturity/AgentMaturityCompass">Inspect the repository</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="comparison-footer">
+    <div class="comparison-container footer-inner">
+      <p><strong>amc<span class="brand-cursor">_</span></strong> Agent Maturity Compass</p>
+      <p>Evidence over claims. MIT licensed. No legal certification claim.</p>
+      <nav aria-label="Footer navigation">
+        <a href="./">Home</a>
+        <a href="docs/index.html">Docs</a>
+        <a href="accessibility.html">Accessibility</a>
+        <a href="https://github.com/AgentMaturity/AgentMaturityCompass">GitHub</a>
+      </nav>
+    </div>
+  </footer>
 </body>
 </html>
