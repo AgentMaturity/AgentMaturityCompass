@@ -1,31 +1,33 @@
-/* AMC Docs — Dark green on black design system */
+@import url("../brand.css");
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap');
+
+/* AMC Docs — Dark green on black design system */
 
 :root {
   /* Palette */
-  --bg: #0a0a0a;
-  --bg-alt: #111111;
-  --bg-card: #1a1a1a;
+  --bg: var(--amc-bg);
+  --bg-alt: var(--amc-panel);
+  --bg-card: var(--amc-card);
   --dark: #141414;
   --dark-soft: #1E1E1E;
-  --green: #4AEF79;
-  --green2: #3CD468;
-  --green3: #2A9D50;
+  --green: var(--amc-accent);
+  --green2: var(--amc-accent-muted);
+  --green3: var(--amc-accent-deep);
   --green-glow: rgba(74,239,121,0.12);
   --teal: var(--green);
-  --orange: #f59e0b;
+  --orange: var(--amc-warning);
   --orange-light: #fbbf24;
   --orange-pale: rgba(245,158,11,0.08);
-  --text: #FFFFFF;
-  --text-muted: #a0a0a0;
-  --text-light: rgba(255,255,255,0.30);
-  --border: rgba(255,255,255,0.08);
-  --border-green: rgba(74,239,121,0.2);
+  --text: var(--amc-text);
+  --text-muted: var(--amc-muted);
+  --text-light: var(--amc-dim);
+  --border: var(--amc-border);
+  --border-green: var(--amc-border-accent);
   --code-bg: rgba(255,255,255,0.05);
 
   /* Typography */
-  --sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  --mono: 'Space Mono', 'JetBrains Mono', 'SF Mono', 'Cascadia Code', 'Consolas', monospace;
+  --sans: var(--amc-font-sans);
+  --mono: var(--amc-font-mono);
 
   /* Layout */
   --sidebar-w: 280px;
@@ -84,10 +86,16 @@ a:hover { color: var(--green2); text-decoration: none; }
   font-family: var(--mono);
   font-weight: 700; font-size: 1rem;
   color: var(--text); display: flex; align-items: center; gap: 8px;
-  white-space: nowrap; text-decoration: none; letter-spacing: -0.02em;
+  white-space: nowrap; text-decoration: none; letter-spacing: 0;
 }
 .topbar-logo:hover { text-decoration: none; color: var(--green); }
 .brand-cursor { color: var(--green); }
+.topbar-tagline {
+  color: var(--text-muted);
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  white-space: nowrap;
+}
 .topbar-logo .logo-icon {
   width: 28px; height: 28px; background: var(--green);
   border-radius: 6px; display: flex; align-items: center; justify-content: center;
@@ -157,13 +165,13 @@ a:hover { color: var(--green2); text-decoration: none; }
 h1 {
   font-family: var(--sans); font-size: 2.2rem; font-weight: 700;
   color: var(--text); line-height: 1.25; margin-bottom: 12px;
-  letter-spacing: -0.02em;
+  letter-spacing: 0;
 }
 h2 {
   font-family: var(--sans); font-size: 1.55rem; font-weight: 700;
   color: var(--text); line-height: 1.3; margin: 48px 0 16px;
   padding-bottom: 10px; border-bottom: 1px solid var(--border);
-  letter-spacing: -0.01em;
+  letter-spacing: 0;
 }
 h3 {
   font-family: var(--sans); font-size: 1.15rem; font-weight: 700;
@@ -317,6 +325,7 @@ tr:hover td { background: rgba(255,255,255,0.02); }
 /* ─── Mobile ─── */
 @media (max-width: 860px) {
   .menu-btn { display: block; }
+  .topbar-tagline { display: none; }
   .sidebar {
     transform: translateX(-100%); transition: transform 0.25s ease;
     width: 280px; box-shadow: 4px 0 20px rgba(0,0,0,0.3);

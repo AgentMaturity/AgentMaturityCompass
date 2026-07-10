@@ -8,7 +8,7 @@
   <meta property="og:title" content="Getting Started — AMC Docs">
   <meta property="og:description" content="Install AMC and get your first AI agent trust score in 2 minutes.">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230a0a0a'/%3E%3Ctext x='16' y='22' text-anchor='middle' fill='%234AEF79' font-size='18' font-weight='bold'%3Ea%3C/text%3E%3C/svg%3E">
-  <link rel="stylesheet" href="shared.css?v=20260710b">
+  <link rel="stylesheet" href="shared.css?v=20260710c">
 </head>
 <body>
 <a href="#main-content" class="skip-link">Skip to content</a>
@@ -16,9 +16,10 @@
 <!-- Topbar -->
 <div class="topbar">
   <button class="menu-btn" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
-  <a href="../" class="topbar-logo">
+  <a href="./" class="topbar-logo">
     amc<span class="brand-cursor">_</span> docs
   </a>
+  <span class="topbar-tagline">Evidence over claims.</span>
   <nav class="topbar-nav">
     <a href="getting-started.html" class="active">Getting Started</a>
     <a href="cli.html">CLI Reference</a>
@@ -66,7 +67,7 @@
       <p class="subtitle">Install Agent Maturity Compass, run your first assessment, and get a trust score for your AI agent — all in under 2 minutes.</p>
 
       <div class="callout callout-teal">
-        <strong>🎯 No install? No problem.</strong>
+        <strong>Try AMC before installing.</strong>
         If you just want to try AMC without installing anything, use the <a href="../playground.html">Web Playground</a> — answer questions in your browser, explore scenarios, and get an instant score. Use the CLI when you want execution evidence, traces, datasets, and CI gates.
       </div>
 
@@ -143,7 +144,7 @@ npm link</code></pre>
       </div>
 
       <div class="callout callout-orange">
-        <strong>💡 Need a fast demo check?</strong>
+        <strong>Need a fast demo check?</strong>
         Run <code>amc quickscore --rapid</code> only when you want a lightweight pulse check. Use <code>amc</code> for the full score.
       </div>
 
@@ -158,19 +159,19 @@ npm link</code></pre>
 
       <div class="card-grid">
         <div class="card">
-          <h4>🎯 Overall Maturity Level</h4>
+          <h4>Overall Maturity Level</h4>
           <p>An L0–L5 maturity score with a percentage breakdown. No level is a legal threshold; external claims also require evidence readiness <code>READY</code>.</p>
         </div>
         <div class="card">
-          <h4>📊 Dimension Scores</h4>
+          <h4>Dimension Scores</h4>
           <p>5 dimension scores covering strategy, skills, resilience, leadership, and alignment.</p>
         </div>
         <div class="card">
-          <h4>📋 Gap Analysis</h4>
+          <h4>Gap Analysis</h4>
           <p>Specific gaps with severity, proof chains, evidence episodes, resource refs, and concrete actions to fix each one.</p>
         </div>
         <div class="card">
-          <h4>🏷️ README Badge</h4>
+          <h4>README Badge</h4>
           <p>A shields.io badge showing your agent's trust level. Run <code>amc badge</code> to generate it.</p>
         </div>
       </div>
@@ -227,19 +228,19 @@ npm link</code></pre>
 
       <div class="card-grid">
         <div class="card">
-          <h4>🔧 Auto-fix your gaps</h4>
+          <h4>Auto-fix your gaps</h4>
           <p>Run <code>amc fix</code> to generate guardrails, CI gates, and governance docs. Use <code>amc guide --go</code> to auto-apply guardrails to your framework config.</p>
         </div>
         <div class="card">
-          <h4>🔌 Connect your agent</h4>
+          <h4>Connect your agent</h4>
           <p>Use <code>amc evidence collect</code> for a guided wizard, or set up an <a href="adapters.html">adapter</a> for your framework. One environment variable — zero code changes.</p>
         </div>
         <div class="card">
-          <h4>📊 Generate reports</h4>
+          <h4>Generate reports</h4>
           <p>Name a run with <code>amc run-alias set q1-assessment latest</code>, then run <code>amc report q1-assessment --share --public-base-url https://reports.example.com/amc</code> for a static share bundle, or <code>amc report q1-assessment --executive</code> for a terminal summary.</p>
         </div>
         <div class="card">
-          <h4>⚖️ Check compliance</h4>
+          <h4>Check compliance</h4>
           <p>Use <code>amc compliance report --framework EU_AI_ACT</code> for EU AI Act mapping, or explore the full <a href="compliance.html">compliance guide</a>.</p>
         </div>
       </div>

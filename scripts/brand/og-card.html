@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1200, initial-scale=1.0">
+  <meta name="description" content="Run one command. Get the full score. Fix the gaps. Evidence over claims.">
+  <title>Agent Maturity Compass</title>
+  <style>
+    * { box-sizing: border-box; }
+    html, body { width: 1200px; height: 630px; margin: 0; overflow: hidden; }
+    body {
+      background: #0a0a0a;
+      color: #FFFFFF;
+      font-family: 'Inter', system-ui, sans-serif;
+    }
+    .frame {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      padding: 56px 64px 52px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      overflow: hidden;
+    }
+    .watermark {
+      position: absolute;
+      right: -28px;
+      bottom: -132px;
+      color: rgba(255, 255, 255, 0.025);
+      font-size: 390px;
+      font-weight: 900;
+      line-height: 1;
+      letter-spacing: 0;
+    }
+    .topbar {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      gap: 22px;
+      font-family: 'Space Mono', ui-monospace, monospace;
+    }
+    .wordmark { font-size: 34px; font-weight: 700; }
+    .cursor { color: #4AEF79; }
+    .product-name {
+      color: #a0a0a0;
+      font-size: 15px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+    }
+    .content {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: minmax(0, 1.45fr) minmax(330px, 0.75fr);
+      gap: 72px;
+      align-items: end;
+      height: 430px;
+    }
+    .eyebrow {
+      margin: 0 0 20px;
+      color: #4AEF79;
+      font-family: 'Space Mono', ui-monospace, monospace;
+      font-size: 15px;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+    }
+    h1 {
+      margin: 0;
+      max-width: 650px;
+      font-size: 64px;
+      line-height: 1.06;
+      letter-spacing: 0;
+    }
+    h1 span { color: #a0a0a0; font-weight: 500; }
+    .command {
+      display: flex;
+      gap: 13px;
+      margin-top: 34px;
+      padding: 17px 20px;
+      max-width: 630px;
+      border: 1px solid rgba(74, 239, 121, 0.20);
+      background: #111111;
+      color: #FFFFFF;
+      font-family: 'Space Mono', ui-monospace, monospace;
+      font-size: 14px;
+      white-space: nowrap;
+    }
+    .command span { color: #4AEF79; font-weight: 700; }
+    .proof-panel {
+      align-self: center;
+      border-top: 2px solid #4AEF79;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 22px 0 20px;
+      font-family: 'Space Mono', ui-monospace, monospace;
+    }
+    .proof-label {
+      margin-bottom: 18px;
+      color: #a0a0a0;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+    }
+    .surface-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px 18px;
+      color: #FFFFFF;
+      font-size: 15px;
+    }
+    .surface-grid span::before { content: '_ '; color: #4AEF79; }
+    .proof-note {
+      margin-top: 22px;
+      padding-top: 16px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      color: #a0a0a0;
+      font-size: 12px;
+      line-height: 1.55;
+    }
+    .footer {
+      position: absolute;
+      left: 64px;
+      right: 64px;
+      bottom: 28px;
+      z-index: 1;
+      display: flex;
+      justify-content: space-between;
+      color: #a0a0a0;
+      font-family: 'Space Mono', ui-monospace, monospace;
+      font-size: 13px;
+    }
+    .footer strong { color: #4AEF79; font-weight: 700; }
+  </style>
+</head>
+<body>
+  <div class="frame">
+    <div class="watermark" aria-hidden="true">amc</div>
+    <header class="topbar">
+      <div class="wordmark">amc<span class="cursor">_</span></div>
+      <div class="product-name">Agent Maturity Compass</div>
+    </header>
+
+    <main class="content">
+      <section>
+        <p class="eyebrow">AI agent trust, measured from evidence</p>
+        <h1>Run one command.<br><span>Get the full score.</span><br>Fix the gaps.</h1>
+        <div class="command"><span>$</span> curl -fsSL https://agentmaturity.co/install.sh | sh</div>
+      </section>
+
+      <aside class="proof-panel" aria-label="AMC trust stack">
+        <div class="proof-label">One proof chain / eight surfaces</div>
+        <div class="surface-grid">
+          <span>Score</span><span>Shield</span>
+          <span>Enforce</span><span>Vault</span>
+          <span>Watch</span><span>Fleet</span>
+          <span>Passport</span><span>Comply</span>
+        </div>
+        <div class="proof-note">Artifact validity and evidence readiness stay separate. Claims pass only when the receipts support them.</div>
+      </aside>
+    </main>
+
+    <footer class="footer">
+      <strong>Evidence over claims.</strong>
+      <span>agentmaturity.co</span>
+    </footer>
+  </div>
+</body>
+</html>

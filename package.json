@@ -21,6 +21,7 @@
   "scripts": {
     "build": "tsc -p tsconfig.json && chmod +x dist/cli.js && npm run copy-assets",
     "build:sea": "node scripts/build-sea.mjs",
+    "brand:render": "node scripts/render-brand-assets.mjs",
     "package:desktop": "node scripts/package-desktop-installers.mjs",
     "package:desktop:verify": "node scripts/verify-desktop-installers.mjs",
     "release:prepare-assets": "node scripts/prepare-public-release-assets.mjs",

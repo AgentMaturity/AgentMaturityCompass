@@ -146,7 +146,7 @@ describe("truthful public distribution and brand contract", () => {
     const docsIndex = read("docs/INDEX.md");
     const dynamicDocs = read("website/docs/docs.js");
 
-    expect(readme.slice(0, 2600)).toContain('src="website/amc-logo.png"');
+    expect(readme.slice(0, 2600)).toContain('src="website/og-card.png"');
     expect(readme.slice(0, 2600)).toContain("Run one command. Get the full score. Fix the gaps.");
     expect(readme.slice(0, 2600)).toContain("Evidence over claims.");
     expect(readme).toContain("img.shields.io/github/v/release/AgentMaturity/AgentMaturityCompass");

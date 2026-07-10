@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="website/amc-logo.png" width="148" alt="AMC wordmark" />
+  <img src="website/og-card.png" width="900" alt="Agent Maturity Compass — Run one command. Get the full score. Fix the gaps. Evidence over claims." />
 </p>
 
 <h1 align="center">Agent Maturity Compass</h1>
@@ -14,7 +14,7 @@
   <a href="https://github.com/AgentMaturity/AgentMaturityCompass/releases"><img src="https://img.shields.io/github/v/release/AgentMaturity/AgentMaturityCompass?labelColor=0a0a0a&color=4AEF79&label=release" alt="GitHub release" /></a>
   <a href="https://github.com/AgentMaturity/AgentMaturityCompass/releases"><img src="https://img.shields.io/github/downloads/AgentMaturity/AgentMaturityCompass/total?labelColor=0a0a0a&color=4AEF79&label=downloads" alt="verified release downloads" /></a>
   <a href="https://github.com/AgentMaturity/AgentMaturityCompass/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/AgentMaturity/AgentMaturityCompass/ci.yml?branch=main&labelColor=0a0a0a&color=4AEF79&label=CI" alt="CI" /></a>
-  <a href="https://github.com/AgentMaturity/AgentMaturityCompass/actions/workflows/ci.yml"><img src="https://img.shields.io/badge/tests-8%2C212%20passing-4AEF79?labelColor=0a0a0a" alt="tests" /></a>
+  <a href="https://github.com/AgentMaturity/AgentMaturityCompass/actions/workflows/ci.yml"><img src="https://img.shields.io/badge/tests-8%2C218%20passing-4AEF79?labelColor=0a0a0a" alt="tests" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-4AEF79?labelColor=0a0a0a" alt="MIT" /></a>
 </p>
 
@@ -22,7 +22,7 @@
   <a href="#60-seconds-to-your-first-score">Quick Start</a> ·
   <a href="https://agentmaturity.co/playground.html">Web Playground</a> ·
   <a href="docs/GETTING_STARTED.md">Docs</a> ·
-  <a href="#-recipes--copy-paste-examples">Recipes</a> ·
+  <a href="#recipes--copy-paste-examples">Recipes</a> ·
   <a href="https://github.com/AgentMaturity/AgentMaturityCompass/discussions">Community</a> ·
   <a href="CONTRIBUTING.md">Contribute</a>
 </p>
@@ -61,7 +61,7 @@ AMC focuses on **execution-verified evidence**.
 
 | How agents are evaluated today | How AMC evaluates |
 |---|---|
-| Agent says "I'm safe" → Score: 100 ✅ | AMC tests the agent and inspects evidence → Real score may be 16 ❌ |
+| Agent claims "I'm safe" → Claimed score: 100 | AMC tests the agent and inspects evidence → Evidence-backed score may be 16 |
 | Self-reported documentation | Execution-verified evidence |
 | Keyword matching | Weighted trust evidence |
 | "Trust me, bro" | Cryptographic proof chains |
@@ -131,7 +131,7 @@ cd AgentMaturityCompass && npm ci && npm run build && npm link
 
 ---
 
-## 🔍 How AMC Compares
+## How AMC Compares
 
 |  | **AMC** | Observability platforms | Eval frameworks | Manual checklists |
 |---|---|---|---|---|
@@ -146,7 +146,7 @@ AMC is not an observability tool and not an eval harness. It is a **trust scorec
 
 ---
 
-## 🧪 What AMC Tests
+## What AMC Tests
 
 ### 244 Default Diagnostic Questions × 5 Dimensions
 
@@ -173,17 +173,17 @@ AMC is not an observability tool and not an eval harness. It is a **trust scorec
 
 | Sector | Packs | Key Regulations |
 |--------|-------|-----------------|
-| 🏥 Health | 9 | HIPAA, FDA 21 CFR Part 11, EU MDR, ICH E6(R3) |
-| 💰 Wealth | 5 | MiFID II, PSD2, EU DORA, MiCA, FATF |
-| 🎓 Education | 5 | FERPA, COPPA, IDEA, EU AI Act Annex III |
-| 🚇 Mobility | 6 | UNECE WP.29, ETSI EN 303 645, EU NIS2, ISO 28000, GS1 EPCIS |
-| 💡 Technology | 5 | EU AI Act Art. 13, EU Data Act, DSA Art. 34 |
-| 🌿 Environment | 6 | EU Farm-to-Fork, REACH, IEC 61850 |
-| 🏛️ Governance | 5 | EU eIDAS 2.0, UNCAC, UNGPs |
+| Health | 9 | HIPAA, FDA 21 CFR Part 11, EU MDR, ICH E6(R3) |
+| Wealth | 5 | MiFID II, PSD2, EU DORA, MiCA, FATF |
+| Education | 5 | FERPA, COPPA, IDEA, EU AI Act Annex III |
+| Mobility | 6 | UNECE WP.29, ETSI EN 303 645, EU NIS2, ISO 28000, GS1 EPCIS |
+| Technology | 5 | EU AI Act Art. 13, EU Data Act, DSA Art. 34 |
+| Environment | 6 | EU Farm-to-Fork, REACH, IEC 61850 |
+| Governance | 5 | EU eIDAS 2.0, UNCAC, UNGPs |
 
 Industry Packs are paid content: `$9.99/month` unlocks all 41 packs in the CLI and Studio. Run `amc domain pack checkout` to open the subscription flow, then paste the returned key into Studio or run `amc domain pack activate --key <license-key>`.
 
-### 🔮 Simulation & Forecast Evaluation Lane
+### Simulation & Forecast Evaluation Lane
 
 Dedicated evaluation lane for simulation engines, forecast systems, and synthetic social environments. 5 scored dimensions:
 
@@ -231,7 +231,7 @@ amc score simulation-lane --system-type synthetic-social-environment --responses
 
 ---
 
-## 🏗️ Architecture
+## Architecture
 
 ```
 Agent (untrusted)
@@ -292,7 +292,7 @@ AMC is one trust stack with eight named product surfaces:
 
 ---
 
-## 📋 Recipes — Copy-Paste Examples
+## Recipes — Copy-Paste Examples
 
 ### Score any agent in one line
 
@@ -508,7 +508,7 @@ Result: ![AMC Score](https://img.shields.io/badge/AMC-L3_(72.5)-green)
 
 ---
 
-## 🔌 14 Framework Adapters
+## 14 Framework Adapters
 
 Zero code changes. One environment variable.
 
@@ -537,7 +537,7 @@ amc wrap <adapter> -- <your command>
 
 ---
 
-## 📊 Compliance Mapping
+## Compliance Mapping
 
 | Framework | Coverage |
 |-----------|----------|
@@ -579,7 +579,7 @@ cd AgentMaturityCompass && npm ci && npm run build && npm link
 
 ---
 
-## ☁️ Deploy (One-Click)
+## Deploy
 
 | Platform | Deploy |
 |----------|--------|
@@ -622,7 +622,7 @@ The full trust stack is **free and MIT licensed**. The only paid surface is Indu
 
 ---
 
-## 📚 Docs
+## Docs
 
 | | |
 |--|--|
@@ -723,13 +723,13 @@ Current MVP behavior:
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
 AMC is MIT licensed. We welcome contributions — especially new **assurance packs**, **domain packs**, **framework adapters**, and **scoring modules**.
 
 ```bash
 git clone https://github.com/AgentMaturity/AgentMaturityCompass.git
-cd AgentMaturityCompass && npm ci && npm test   # 1,040 files / 8,212 passing Vitest tests
+cd AgentMaturityCompass && npm ci && npm test   # 1,041 files / 8,218 passing Vitest tests
 ```
 
 **→ [CONTRIBUTING.md](CONTRIBUTING.md)** — includes guides for writing packs, mapping research papers, and adding adapters.
@@ -743,7 +743,7 @@ cd AgentMaturityCompass && npm ci && npm test   # 1,040 files / 8,212 passing Vi
 
 ---
 
-## 📄 License
+## License
 
 **MIT** — public trust infrastructure for the age of AI agents.
 

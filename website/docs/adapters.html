@@ -6,14 +6,15 @@
   <title>Adapter Guides — AMC Documentation</title>
   <meta name="description" content="14 framework adapters for Agent Maturity Compass — LangChain, CrewAI, Claude Code, OpenAI, and more. One env var, zero code changes.">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230a0a0a'/%3E%3Ctext x='16' y='22' text-anchor='middle' fill='%234AEF79' font-size='18' font-weight='bold'%3Ea%3C/text%3E%3C/svg%3E">
-  <link rel="stylesheet" href="shared.css?v=20260710b">
+  <link rel="stylesheet" href="shared.css?v=20260710c">
 </head>
 <body>
 <a href="#main-content" class="skip-link">Skip to content</a>
 
 <div class="topbar">
   <button class="menu-btn" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
-  <a href="../" class="topbar-logo">amc<span class="brand-cursor">_</span> docs</a>
+  <a href="./" class="topbar-logo">amc<span class="brand-cursor">_</span> docs</a>
+  <span class="topbar-tagline">Evidence over claims.</span>
   <nav class="topbar-nav">
     <a href="getting-started.html">Getting Started</a>
     <a href="cli.html">CLI Reference</a>
@@ -70,7 +71,7 @@
       <p class="subtitle">14 built-in adapters for every major AI agent framework. One environment variable change — zero code changes. AMC captures evidence transparently through its gateway proxy.</p>
 
       <div class="callout callout-teal">
-        <strong>🔑 The key insight</strong>
+        <strong>The key insight</strong>
         Adapters route your agent's LLM traffic through the AMC gateway, which captures signed evidence of every API call, tool use, and response. Your agent code doesn't change at all — AMC sits as a transparent proxy between your agent and the LLM provider.
       </div>
 
@@ -351,7 +352,7 @@ amc wrap any -- python bot.py</code></pre>
       </table>
 
       <div class="callout callout-green">
-        <strong>📖 Import existing evaluations</strong>
+        <strong>Import existing evaluations</strong>
         Already have evaluation data? Import it: <code>amc score evidence-ingest --format openai-evals</code>
       </div>
 

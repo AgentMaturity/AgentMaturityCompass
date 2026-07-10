@@ -129,11 +129,100 @@ const ALL_DOCS = [
   'adapters/generic-cli','adapters/langchain-node','adapters/langchain-python',
   'adapters/langgraph-python','adapters/llamaindex','adapters/openai-agents-sdk',
   'adapters/openclaw','adapters/openhands','adapters/python-amc-sdk','adapters/semantic-kernel',
+  'adapters/LANDING_LANGCHAIN','adapters/LANDING_OPENAI','adapters/LANDING_CREWAI',
+  'adapters/LANDING_CLAUDE_CODE','adapters/LANDING_GENERIC_CLI',
   'compliance/eu-ai-act-checklist','compliance/iso-42001-aims-manual',
   'compliance/nist-rmf-profile','compliance/SOC2_TYPE_II_CONTROLS_MAPPING',
   'integrations/ci-cd',
   'runbooks/amc-service-down','runbooks/evidence-corruption','runbooks/score-dispute'
 ];
+
+// Public Docs are a user product surface, not an index of AMC's operator backlog.
+const INTERNAL_DOCS = new Set([
+  'OSS_ADOPTION_ROADMAP',
+  'IMPLEMENTATION_REALITY_MAP',
+  'DOCS_DRIFT_CLEANUP_PLAN',
+  'FULL_MODULE_ROADMAP',
+  'INNOVATION_THESIS',
+  'GO_TO_MARKET_PACK',
+  'LAUNCH',
+  'NORTHSTAR_PROMPTS',
+  'REAL_PEOPLE_COUNCIL',
+  'NEW_GAPS_RESEARCH',
+  'wave4-agentic-ecosystem-audit',
+  'wave4-ai-safety-audit',
+  'wave4-documentation-audit',
+  'wave4-integration-audit',
+  'wave4-product-readiness-audit',
+  'wave4-regulatory-audit',
+  'wave4-supply-chain-audit',
+  'wave4-test-coverage-audit'
+]);
+const PUBLIC_DOC_IDS = new Set([
+  // First score and adoption
+  'INDEX', 'START_HERE', 'AFTER_FIRST_SCORE', 'GETTING_STARTED', 'QUICKSTART',
+  'INSTALL', 'COMPATIBILITY_MATRIX', 'STARTER_BLUEPRINTS', 'BROWSER_SANDBOX', 'TROUBLESHOOTING',
+
+  // Architecture and deep dives
+  'ARCHITECTURE_BRIEF', 'ARCHITECTURE_MAP', 'API_SURFACES', 'SYSTEM_CAPABILITIES', 'RUNTIMES', 'RUNTIME_SDK',
+  'deep-dive/INDEX', 'deep-dive/runtime-control-plane', 'deep-dive/trust-evidence-plane',
+  'deep-dive/governance-execution-plane', 'deep-dive/evaluation-assurance-plane', 'deep-dive/operations-ecosystem-plane',
+
+  // Adapters and integration
+  'ADAPTERS', 'ADAPTER_COMPATIBILITY', 'agent-framework-compatibility',
+  'adapters/LANDING_LANGCHAIN', 'adapters/LANDING_OPENAI', 'adapters/LANDING_CREWAI',
+  'adapters/LANDING_CLAUDE_CODE', 'adapters/LANDING_GENERIC_CLI',
+  'adapters/autogen', 'adapters/claude-code', 'adapters/crewai', 'adapters/gemini',
+  'adapters/generic-cli', 'adapters/langchain-node', 'adapters/langchain-python',
+  'adapters/langgraph-python', 'adapters/llamaindex', 'adapters/openai-agents-sdk',
+  'adapters/openclaw', 'adapters/openhands', 'adapters/python-amc-sdk', 'adapters/semantic-kernel',
+  'PROVIDERS', 'SDK', 'SDK_VERSIONING', 'MCP_SERVER', 'integrations/ci-cd',
+
+  // Score and metric validity
+  'AMC_QUESTIONS_IN_DEPTH', 'ARCHETYPES', 'BENCHMARKS', 'METRICS', 'OUTCOMES',
+  'VALIDITY_FRAMEWORK', 'self-calibration', 'score-history',
+
+  // Compliance and regulation
+  'EU_AI_ACT_COMPLIANCE', 'COMPLIANCE', 'COMPLIANCE_FRAMEWORKS', 'COMPLIANCE_MAPS',
+  'ISO_42001_ALIGNMENT', 'GDPR_ARTICLE_COMPLIANCE', 'MITRE_ATLAS_MAPPING', 'STANDARDS_MAPPING',
+  'AUDIT_BINDER', 'enterprise-readiness-checklist', 'compliance/eu-ai-act-checklist',
+  'compliance/iso-42001-aims-manual', 'compliance/nist-rmf-profile', 'compliance/SOC2_TYPE_II_CONTROLS_MAPPING',
+
+  // Security, runtime policy, and identity
+  'SECURITY', 'SECURITY_ARCHITECTURE_OVERVIEW', 'SECURITY_DEPLOYMENT', 'THREAT_MODEL',
+  'HARDENING', 'RED_TEAMING_GUIDE', 'SHIELD_ENFORCE_REFERENCE', 'ENCRYPTION_AT_REST',
+  'HARDWARE_TRUST', 'ZERO_KEYS', 'VAULT', 'RBAC', 'IDENTITY', 'SUPPLY_CHAIN', 'PLUGIN_SUPPLY_CHAIN',
+
+  // Governance and policy
+  'GOVERNANCE', 'MODEL_GOVERNANCE', 'POLICY_PACKS', 'PROMPT_POLICY', 'APPROVALS',
+  'DUAL_CONTROL_APPROVALS', 'WAIVERS', 'LEASES', 'BUDGETS', 'SUPPORT_POLICY', 'COMMUNITY',
+
+  // Operations and deployment
+  'OPERATIONS', 'BACKUPS', 'DEPLOYMENT', 'DEPLOYMENT_CHECKLIST', 'CLOUD_REFERENCE_ARCHITECTURES',
+  'MIGRATION_RUNBOOK', 'CI_TEMPLATES', 'SINGLE_BINARY', 'INCIDENT_RESPONSE_READINESS',
+  'DRIFT_ALERTS', 'CONTINUOUS_MONITORING', 'DOCTOR',
+  'runbooks/amc-service-down', 'runbooks/evidence-corruption', 'runbooks/score-dispute',
+
+  // Trust evidence and portable proof
+  'EVIDENCE_TRUST', 'EVIDENCE_REQUESTS', 'ATTESTATION_EVIDENCE_PATHS', 'CLAIM_PROVENANCE',
+  'NOTARY', 'TRANSPARENCY', 'TRANSPARENCY_MERKLE', 'TRANSPARENCY_REPORT',
+  'RECEIPTS', 'OPEN_RUBRIC_STANDARD', 'OPEN_STANDARD', 'AGENT_PASSPORT',
+
+  // Product, Studio, and user workflows
+  'CONSOLE', 'DASHBOARD', 'STUDIO', 'TOOLHUB', 'PLAYGROUND', 'ACCESSIBILITY',
+  'DOMAIN_PACKS', 'SECTOR_PACKS', 'PRODUCT_EDITIONS', 'PRICING', 'BUYER_PACKAGES',
+  'RELEASE_HIGHLIGHTS', 'USE_CASES', 'PERSONAS', 'WHY_AMC',
+
+  // API, fleet, memory, research, and migration
+  'API_REFERENCE', 'REALTIME', 'REGISTRY', 'FLEET', 'ENTERPRISE',
+  'MULTI_AGENT_TRUST', 'MULTI_MODEL_VALIDATION', 'AGENT_VS_WORKFLOW', 'MEMORY_MATURITY', 'CANON',
+  'RESEARCH_PAPERS_2026', 'MIGRATION_FROM_PROMPTFOO_DEEPEVAL'
+]);
+const PUBLIC_DOCS = ALL_DOCS.filter(doc => PUBLIC_DOC_IDS.has(doc) && !INTERNAL_DOCS.has(doc));
+const PUBLIC_CATEGORIES = CATEGORIES.map(category => ({
+  ...category,
+  docs: category.docs.filter(doc => PUBLIC_DOCS.includes(doc))
+})).filter(category => category.docs.length > 0);
 
 // ─── State ───
 const docCache = {};
@@ -181,18 +270,18 @@ function prettyName(doc) {
 function buildSidebar() {
   const nav = document.getElementById('sidebar-nav');
   const categorized = new Set();
-  CATEGORIES.forEach(cat => cat.docs.forEach(d => categorized.add(d)));
+  PUBLIC_CATEGORIES.forEach(cat => cat.docs.forEach(d => categorized.add(d)));
 
   // Find uncategorized
-  const uncategorized = ALL_DOCS.filter(d => !categorized.has(d));
+  const uncategorized = PUBLIC_DOCS.filter(d => !categorized.has(d));
 
   let html = '';
 
-  CATEGORIES.forEach((cat, ci) => {
+  PUBLIC_CATEGORIES.forEach((cat, ci) => {
     const count = cat.docs.length;
     html += `<div class="sidebar-section">
-      <h4 onclick="toggleSection(this)" class="${ci < 3 ? 'expanded' : ''}">${cat.icon} ${cat.name} <span class="sidebar-count">${count}</span></h4>
-      <div class="items ${ci < 3 ? 'expanded' : ''}">`;
+      <h4 onclick="toggleSection(this)" class="${ci === 0 ? 'expanded' : ''}">${cat.icon} ${cat.name} <span class="sidebar-count">${count}</span></h4>
+      <div class="items ${ci === 0 ? 'expanded' : ''}">`;
     cat.docs.forEach(doc => {
       html += `<a href="#${doc}" data-doc="${doc}" onclick="event.preventDefault();loadDoc('${doc}')">${prettyName(doc)}</a>`;
     });
@@ -201,7 +290,7 @@ function buildSidebar() {
 
   if (uncategorized.length > 0) {
     html += `<div class="sidebar-section">
-      <h4 onclick="toggleSection(this)">📄 Other Docs <span class="sidebar-count">${uncategorized.length}</span></h4>
+      <h4 onclick="toggleSection(this)">Reference <span class="sidebar-count">${uncategorized.length}</span></h4>
       <div class="items">`;
     uncategorized.forEach(doc => {
       html += `<a href="#${doc}" data-doc="${doc}" onclick="event.preventDefault();loadDoc('${doc}')">${prettyName(doc)}</a>`;
@@ -220,6 +309,10 @@ function toggleSection(el) {
 
 // ─── Load Document ───
 async function loadDoc(docName) {
+  if (!PUBLIC_DOCS.includes(docName)) {
+    showWelcome();
+    return;
+  }
   currentDoc = docName;
   window.location.hash = docName;
 
@@ -228,7 +321,7 @@ async function loadDoc(docName) {
 
   // Find category
   let catName = 'Docs';
-  for (const cat of CATEGORIES) {
+  for (const cat of PUBLIC_CATEGORIES) {
     if (cat.docs.includes(docName)) { catName = cat.name; break; }
   }
 
@@ -280,7 +373,7 @@ async function loadDoc(docName) {
     renderDoc(md, docName);
   } catch (err) {
     content.innerHTML = `<div class="doc-error">
-      <h2>⚠️ Failed to load</h2>
+      <h2>Document unavailable</h2>
       <p>Could not fetch <code>${docName}.md</code></p>
       <p style="font-size:0.8rem">${err.message}</p>
       <p style="margin-top:16px"><a href="${BASE_RAW}${docName}.md" target="_blank">Try opening directly →</a></p>
@@ -350,8 +443,8 @@ function showWelcome() {
       </section>
 
       <div class="stat-grid">
-        <div class="stat-card"><div class="num">${ALL_DOCS.length}</div><div class="label">Documentation Files</div></div>
-        <div class="stat-card"><div class="num">${CATEGORIES.length}</div><div class="label">Categories</div></div>
+        <div class="stat-card"><div class="num">${PUBLIC_DOCS.length}</div><div class="label">Public Guides</div></div>
+        <div class="stat-card"><div class="num">${PUBLIC_CATEGORIES.length}</div><div class="label">Categories</div></div>
         <div class="stat-card"><div class="num">244</div><div class="label">Default Questions</div></div>
         <div class="stat-card"><div class="num">1,144</div><div class="label">CLI Paths</div></div>
         <div class="stat-card"><div class="num">41</div><div class="label">Industry Packs</div></div>
@@ -386,12 +479,12 @@ function showWelcome() {
             <span>Steal the baseline →</span>
           </div>
         </a>
-        <a class="feature-card-link" href="#OSS_ADOPTION_ROADMAP" onclick="event.preventDefault();loadDoc('OSS_ADOPTION_ROADMAP')">
-          <div class="feature-card-icon">adopt</div>
+        <a class="feature-card-link" href="#EVIDENCE_TRUST" onclick="event.preventDefault();loadDoc('EVIDENCE_TRUST')">
+          <div class="feature-card-icon">proof</div>
           <div class="feature-card-body">
-            <h3>OSS Adoption Roadmap</h3>
-            <p>Prioritized plan for reducing adoption friction and turning curiosity into retained usage.</p>
-            <span>See what to build next →</span>
+            <h3>Evidence & Receipts</h3>
+            <p>Understand evidence readiness, signed receipts, claim eligibility, and what AMC can actually prove.</p>
+            <span>Follow the proof chain →</span>
           </div>
         </a>
         <a class="feature-card-link" href="#EU_AI_ACT_COMPLIANCE" onclick="event.preventDefault();loadDoc('EU_AI_ACT_COMPLIANCE')">
@@ -406,7 +499,7 @@ function showWelcome() {
 
       <h2>Browse by Category</h2>
       <div class="quick-links">
-        ${CATEGORIES.map(cat =>
+        ${PUBLIC_CATEGORIES.map(cat =>
           `<a href="#" onclick="event.preventDefault();loadDoc('${cat.docs[0]}')">${cat.icon} ${cat.name} <span style="color:var(--muted);font-size:0.75rem">(${cat.docs.length} docs)</span></a>`
         ).join('')}
       </div>
@@ -420,7 +513,7 @@ function initSearch() {
   const resultsEl = document.getElementById('search-results');
 
   // Pre-warm search index with doc titles
-  ALL_DOCS.forEach(doc => {
+  PUBLIC_DOCS.forEach(doc => {
     if (!searchIndex.find(s => s.doc === doc)) {
       searchIndex.push({ doc, title: prettyName(doc), content: doc.toLowerCase().replace(/[-_]/g, ' ') });
     }
@@ -443,7 +536,7 @@ function initSearch() {
         }
         // Find category
         let catName = 'Other';
-        for (const cat of CATEGORIES) {
+        for (const cat of PUBLIC_CATEGORIES) {
           if (cat.docs.includes(item.doc)) { catName = cat.name; break; }
         }
         results.push({ doc: item.doc, title: item.title, snippet, category: catName, priority: titleMatch ? 0 : 1 });
@@ -508,7 +601,7 @@ async function preloadSearchIndex() {
 
   // Route
   const hash = window.location.hash.replace('#', '');
-  if (hash && ALL_DOCS.includes(hash)) {
+  if (hash && PUBLIC_DOCS.includes(hash)) {
     loadDoc(hash);
   } else {
     showWelcome();
@@ -517,7 +610,7 @@ async function preloadSearchIndex() {
   // Handle back/forward
   window.addEventListener('popstate', () => {
     const h = window.location.hash.replace('#', '');
-    if (h && ALL_DOCS.includes(h)) {
+    if (h && PUBLIC_DOCS.includes(h)) {
       loadDoc(h);
     } else {
       showWelcome();

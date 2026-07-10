@@ -6,7 +6,7 @@
   <title>Scoring Methodology — AMC Documentation</title>
   <meta name="description" content="How AMC scores AI agents: 244 default questions, 5 dimensions, L0-L5 maturity scale, evidence weighting, and cryptographic seals.">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230a0a0a'/%3E%3Ctext x='16' y='22' text-anchor='middle' fill='%234AEF79' font-size='18' font-weight='bold'%3Ea%3C/text%3E%3C/svg%3E">
-  <link rel="stylesheet" href="shared.css?v=20260710b">
+  <link rel="stylesheet" href="shared.css?v=20260710c">
   <style>
     .trust-tier {
       display: flex; align-items: center; gap: 16px; padding: 16px 20px;
@@ -47,7 +47,8 @@
 
 <div class="topbar">
   <button class="menu-btn" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
-  <a href="../" class="topbar-logo">amc<span class="brand-cursor">_</span> docs</a>
+  <a href="./" class="topbar-logo">amc<span class="brand-cursor">_</span> docs</a>
+  <span class="topbar-tagline">Evidence over claims.</span>
   <nav class="topbar-nav">
     <a href="getting-started.html">Getting Started</a>
     <a href="cli.html">CLI Reference</a>
@@ -100,7 +101,7 @@
       <p class="subtitle">AMC scores AI agents using evidence-weighted diagnostic scoring across 5 dimensions, with cryptographic proof chains and trust-tiered evidence weighting. Agents cannot inflate their own scores.</p>
 
       <div class="callout callout-teal">
-        <strong>🎯 The core principle</strong>
+        <strong>The core principle</strong>
         Scores are derived from <em>what agents actually do</em>, not what they claim. Self-reported evidence is capped at 0.4× weight. Only observed or attested evidence can elevate high-confidence maturity levels.
       </div>
 
@@ -181,7 +182,7 @@ amc diagnostic bank verify
 amc diagnostic render --agent my-agent --format md</code></pre>
 
       <div class="callout callout-green">
-        <strong>📝 Question semantics are fixed, but phrasing adapts.</strong>
+        <strong>Question semantics are fixed, but phrasing adapts.</strong>
         AMC contextualizes question examples based on your agent's profile: <code>code-agent</code>, <code>support-agent</code>, <code>ops-agent</code>, <code>research-agent</code>, <code>sales-agent</code>, or <code>other</code>. The rubric levels and evidence requirements remain identical.
       </div>
 
@@ -305,19 +306,19 @@ amc proof check --domain governance --manifest fixtures/domain-proof/toy-governa
       <h2 id="anti-cheat">Anti-Cheat Guarantees</h2>
       <div class="anti-cheat">
         <div class="item">
-          <h4>🚫 No Self-Scoring</h4>
+          <h4>No Self-Scoring</h4>
           <p>Agents cannot submit question-level scores directly. All scores are derived from ledger events.</p>
         </div>
         <div class="item">
-          <h4>🔒 Auto-Answering</h4>
+          <h4>Auto-Answering</h4>
           <p>Measured levels come from receipts, approvals, policy checks, assurance runs, and signed config state.</p>
         </div>
         <div class="item">
-          <h4>✍️ Signed Artifacts</h4>
+          <h4>Signed Artifacts</h4>
           <p>All critical artifacts and state transitions are Ed25519 signed and auditable.</p>
         </div>
         <div class="item">
-          <h4>🎯 Conservative Defaults</h4>
+          <h4>Conservative Defaults</h4>
           <p>Missing evidence = capped score. AMC never assumes the best case.</p>
         </div>
       </div>

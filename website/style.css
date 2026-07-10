@@ -1,6 +1,8 @@
+@import url("./brand.css");
+
 /* ═══ RESET ═══ */
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-:root{--bg:#0a0a0a;--bg-alt:#111111;--bg-card:#1a1a1a;--bg-terminal:#2a2a2a;--text:#FFFFFF;--text-muted:#a0a0a0;--text-dim:rgba(255,255,255,0.30);--accent:#4AEF79;--accent2:#3CD468;--border:rgba(255,255,255,0.08);--mono:'Space Mono',monospace;--sans:'Inter',system-ui,sans-serif}
+:root{--bg:var(--amc-bg);--bg-alt:var(--amc-panel);--bg-card:var(--amc-card);--bg-terminal:var(--amc-terminal);--text:var(--amc-text);--text-muted:var(--amc-muted);--text-dim:var(--amc-dim);--accent:var(--amc-accent);--accent2:var(--amc-accent-muted);--border:var(--amc-border);--mono:var(--amc-font-mono);--sans:var(--amc-font-sans)}
 html{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
 body{font-family:var(--sans);background:var(--bg);color:var(--text-muted);line-height:1.65;font-size:16px;overflow-x:hidden}
 body.clean-theme{--bg:#ffffff;--bg-alt:#f7f9fb;--bg-card:#ffffff;--bg-terminal:#f1f5f9;--text:#101820;--text-muted:#4b5563;--text-dim:rgba(16,24,32,0.48);--accent:#2563eb;--accent2:#1d4ed8;--border:rgba(37,99,235,0.16)}

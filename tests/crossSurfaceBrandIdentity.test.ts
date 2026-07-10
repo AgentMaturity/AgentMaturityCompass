@@ -16,15 +16,27 @@ const standaloneDocs = [
 
 describe("cross-surface AMC brand identity", () => {
   test("website, Studio, docs, and CLI share the canonical palette and typography", () => {
-    const sources = [
+    const identity = read("website/brand.css");
+    for (const token of ["#0a0a0a", "#4AEF79", "#a0a0a0", "Inter", "Space Mono"]) {
+      expect(identity).toContain(token);
+    }
+
+    const mappedSources = [
       read("website/style.css"),
       read("website/docs/docs.css"),
-      read("website/docs/shared.css"),
+      read("website/docs/shared.css")
+    ];
+    for (const source of mappedSources) {
+      expect(source).toContain("brand.css");
+      expect(source).toContain("var(--amc-bg)");
+      expect(source).toContain("var(--amc-accent)");
+    }
+
+    const applicationSources = [
       read("src/console/assets/styles.css"),
       read("src/brand/visualIdentity.ts")
     ];
-
-    for (const source of sources) {
+    for (const source of applicationSources) {
       expect(source).toContain("#0a0a0a");
       expect(source).toContain("#4AEF79");
       expect(source).toContain("#a0a0a0");
@@ -41,7 +53,7 @@ describe("cross-surface AMC brand identity", () => {
     const readme = read("README.md");
     const header = readme.slice(0, 2200);
 
-    expect(header).toContain('src="website/amc-logo.png"');
+    expect(header).toContain('src="website/og-card.png"');
     expect(header).toContain("Run one command. Get the full score. Fix the gaps.");
     expect(header).toContain("Evidence over claims.");
     expect(header).not.toContain("img.shields.io/badge/🧭_AMC");
@@ -54,7 +66,7 @@ describe("cross-surface AMC brand identity", () => {
     const docsIndex = read("docs/INDEX.md");
     const header = docsIndex.slice(0, 1200);
 
-    expect(header).toContain('src="https://agentmaturity.co/amc-logo.png"');
+    expect(header).toContain('src="https://agentmaturity.co/og-card.png"');
     expect(header).toContain("Run one command. Get the full score. Fix the gaps.");
     expect(header).toContain("Evidence over claims.");
   });
@@ -90,7 +102,7 @@ describe("cross-surface AMC brand identity", () => {
       expect(html).not.toContain('<span class="logo-icon">A</span>');
       expect(html).not.toMatch(/background:\s*#fff\b/i);
       expect(html).not.toContain("%230D6E6E");
-      expect(html).toContain('shared.css?v=20260710b');
+      expect(html).toContain('shared.css?v=20260710c');
     }
 
     const shared = read("website/docs/shared.css");

@@ -6,7 +6,7 @@
   <title>Compliance Guide — AMC Documentation</title>
   <meta name="description" content="EU AI Act compliance, 7 industry domains, 41 domain packs, and regulatory mapping with Agent Maturity Compass.">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230a0a0a'/%3E%3Ctext x='16' y='22' text-anchor='middle' fill='%234AEF79' font-size='18' font-weight='bold'%3Ea%3C/text%3E%3C/svg%3E">
-  <link rel="stylesheet" href="shared.css?v=20260710b">
+  <link rel="stylesheet" href="shared.css?v=20260710c">
   <style>
     .deadline-banner {
       background: var(--orange-pale);
@@ -39,7 +39,8 @@
 
 <div class="topbar">
   <button class="menu-btn" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
-  <a href="../" class="topbar-logo">amc<span class="brand-cursor">_</span> docs</a>
+  <a href="./" class="topbar-logo">amc<span class="brand-cursor">_</span> docs</a>
+  <span class="topbar-tagline">Evidence over claims.</span>
   <nav class="topbar-nav">
     <a href="getting-started.html">Getting Started</a>
     <a href="cli.html">CLI Reference</a>
@@ -63,13 +64,13 @@
     <div class="sidebar-section">
       <h4>Domain Packs</h4>
       <a href="#domains">7 Domains Overview</a>
-      <a href="#domain-environment" class="sub">🌿 Environment</a>
-      <a href="#domain-health" class="sub">🏥 Health</a>
-      <a href="#domain-wealth" class="sub">💰 Wealth</a>
-      <a href="#domain-education" class="sub">🎓 Education</a>
-      <a href="#domain-mobility" class="sub">🚇 Mobility</a>
-      <a href="#domain-technology" class="sub">💡 Technology</a>
-      <a href="#domain-governance" class="sub">🏛️ Governance</a>
+      <a href="#domain-environment" class="sub">Environment</a>
+      <a href="#domain-health" class="sub">Health</a>
+      <a href="#domain-wealth" class="sub">Wealth</a>
+      <a href="#domain-education" class="sub">Education</a>
+      <a href="#domain-mobility" class="sub">Mobility</a>
+      <a href="#domain-technology" class="sub">Technology</a>
+      <a href="#domain-governance" class="sub">Governance</a>
     </div>
     <div class="sidebar-section">
       <h4>Frameworks</h4>
@@ -117,7 +118,7 @@ amc compliance report --framework EU_AI_ACT
 amc audit binder create --framework EU_AI_ACT</code></pre>
 
       <div class="callout callout-teal">
-        <strong>⚖️ Important disclaimer</strong>
+        <strong>Important disclaimer</strong>
         AMC provides deterministic, evidence-linked compliance <em>signals</em> — not legal certifications. A signed or <code>VALID</code> report proves artifact integrity, not evidence sufficiency; use mappings externally only when evidence readiness is <code>READY</code>. AMC does not certify legal compliance. Always consult qualified legal counsel. See the <a href="https://digital-strategy.ec.europa.eu/en/policies/guidelines-ai-high-risk-systems">European Commission high-risk guidance</a>.
       </div>
 
@@ -239,11 +240,11 @@ amc domain report --domain environment --output env.md  <span class="comment"># 
 
       <!-- Environment -->
       <div class="domain-card" id="domain-environment">
-        <h4>🌿 Environment</h4>
+        <h4>Environment</h4>
         <div class="stats">
-          <span>📦 6 packs</span>
-          <span>❓ 81 questions</span>
-          <span>📋 EU Farm-to-Fork, REACH, IEC 61850, EU Drinking Water Directive</span>
+          <span>6 packs</span>
+          <span>87 questions</span>
+          <span>EU Farm-to-Fork, REACH, IEC 61850, EU Drinking Water Directive</span>
         </div>
         <p>Agricultural AI, fashion/textile supply chains, advanced manufacturing, food systems, energy grids, water/sanitation.</p>
         <p style="font-size: 0.85rem; color: var(--text-muted);">Packs: <code>farm-to-fork</code>, <code>weave-to-wear</code>, <code>material-to-machines</code>, <code>source-to-sustenance</code>, <code>ubiquity-to-utility</code>, <code>sip-to-sanitation</code></p>
@@ -251,11 +252,11 @@ amc domain report --domain environment --output env.md  <span class="comment"># 
 
       <!-- Health -->
       <div class="domain-card" id="domain-health">
-        <h4>🏥 Health</h4>
+        <h4>Health</h4>
         <div class="stats">
-          <span>📦 9 packs</span>
-          <span>❓ 140 questions</span>
-          <span>📋 HIPAA §164.312, FDA 21 CFR Part 11, EU MDR 2017/745, ICH E6(R3)</span>
+          <span>9 packs</span>
+          <span>151 questions</span>
+          <span>HIPAA §164.312, FDA 21 CFR Part 11, EU MDR 2017/745, ICH E6(R3)</span>
         </div>
         <p>EHR systems, wellness AI, patient journey management, clinical operations, medical professional AI, medtech/devices, pharma research, clinical trials, rare/precision medicine.</p>
         <p style="font-size: 0.85rem; color: var(--text-muted);">Packs: <code>digital-health-record</code>, <code>wellness-management</code>, <code>patient-lifecycle</code>, <code>clinical-lifecycle</code>, <code>professional-practice</code>, <code>life-technology</code>, <code>drug-discovery</code>, <code>clinical-trials</code>, <code>specialized-medicine</code></p>
@@ -263,55 +264,55 @@ amc domain report --domain environment --output env.md  <span class="comment"># 
 
       <!-- Wealth -->
       <div class="domain-card" id="domain-wealth">
-        <h4>💰 Wealth</h4>
+        <h4>Wealth</h4>
         <div class="stats">
-          <span>📦 5 packs</span>
-          <span>❓ 70 questions</span>
-          <span>📋 MiFID II, PSD2, EU DORA, MiCA, FATF R1/R10</span>
+          <span>5 packs</span>
+          <span>70 questions</span>
+          <span>MiFID II, PSD2, EU DORA, MiCA, FATF R1/R10</span>
         </div>
         <p>Investment management, payments, insurance, DeFi/crypto, banking and lending.</p>
       </div>
 
       <!-- Education -->
       <div class="domain-card" id="domain-education">
-        <h4>🎓 Education</h4>
+        <h4>Education</h4>
         <div class="stats">
-          <span>📦 5 packs</span>
-          <span>❓ 72 questions</span>
-          <span>📋 FERPA 20 U.S.C. §1232g, COPPA §312, IDEA, EU AI Act Annex III</span>
+          <span>5 packs</span>
+          <span>72 questions</span>
+          <span>FERPA 20 U.S.C. §1232g, COPPA §312, IDEA, EU AI Act Annex III</span>
         </div>
         <p>K-12 learning, higher education, corporate training, special education, educational assessment.</p>
       </div>
 
       <!-- Mobility -->
       <div class="domain-card" id="domain-mobility">
-        <h4>🚇 Mobility</h4>
+        <h4>Mobility</h4>
         <div class="stats">
-          <span>📦 5 packs</span>
-          <span>❓ 70 questions</span>
-          <span>📋 EU EPBD 2024, UNECE WP.29 R155 §7, ETSI EN 303 645, EU NIS2</span>
+          <span>6 packs</span>
+          <span>78 questions</span>
+          <span>EU EPBD 2024, UNECE WP.29 R155 §7, ETSI EN 303 645, EU NIS2</span>
         </div>
         <p>Autonomous vehicles, smart buildings, IoT infrastructure, logistics/supply chain, urban mobility.</p>
       </div>
 
       <!-- Technology -->
       <div class="domain-card" id="domain-technology">
-        <h4>💡 Technology</h4>
+        <h4>Technology</h4>
         <div class="stats">
-          <span>📦 5 packs</span>
-          <span>❓ 71 questions</span>
-          <span>📋 EU AI Act Art. 13, EU Data Act 2023, DSA Art. 34, TRIPS Agreement</span>
+          <span>5 packs</span>
+          <span>71 questions</span>
+          <span>EU AI Act Art. 13, EU Data Act 2023, DSA Art. 34, TRIPS Agreement</span>
         </div>
         <p>SaaS platforms, cybersecurity AI, data analytics, developer tools, IP/patent management.</p>
       </div>
 
       <!-- Governance -->
       <div class="domain-card" id="domain-governance">
-        <h4>🏛️ Governance</h4>
+        <h4>Governance</h4>
         <div class="stats">
-          <span>📦 5 packs</span>
-          <span>❓ 71 questions</span>
-          <span>📋 EU eIDAS 2.0, EU AI Act Art. 5(1)(a), UNCAC Art. 7/9, UNGPs</span>
+          <span>5 packs</span>
+          <span>71 questions</span>
+          <span>EU eIDAS 2.0, EU AI Act Art. 5(1)(a), UNCAC Art. 7/9, UNGPs</span>
         </div>
         <p>Digital identity, public safety, anti-corruption, human rights impact, public administration.</p>
       </div>
@@ -360,7 +361,7 @@ amc audit binder export-request
 amc audit binder export-execute</code></pre>
 
       <div class="callout callout-green">
-        <strong>📖 Every domain pack includes:</strong> risk tier classification, EU AI Act classification, SDG alignment, certification path, key risks, and regulatory article references.
+        <strong>Every domain pack includes:</strong> risk tier classification, EU AI Act classification, SDG alignment, certification path, key risks, and regulatory article references.
       </div>
 
       <div class="doc-footer">

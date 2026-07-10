@@ -1,0 +1,19 @@
+/* Canonical public AMC identity tokens. Component styles map to these values. */
+:root {
+  --amc-bg: #0a0a0a;
+  --amc-panel: #111111;
+  --amc-card: #1a1a1a;
+  --amc-terminal: #2a2a2a;
+  --amc-text: #FFFFFF;
+  --amc-muted: #a0a0a0;
+  --amc-dim: rgba(255, 255, 255, 0.30);
+  --amc-accent: #4AEF79;
+  --amc-accent-muted: #3CD468;
+  --amc-accent-deep: #2A9D50;
+  --amc-warning: #f59e0b;
+  --amc-danger: #ef4444;
+  --amc-border: rgba(255, 255, 255, 0.08);
+  --amc-border-accent: rgba(74, 239, 121, 0.20);
+  --amc-font-sans: 'Inter', system-ui, sans-serif;
+  --amc-font-mono: 'Space Mono', monospace;
+}

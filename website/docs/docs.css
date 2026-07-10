@@ -1,25 +1,27 @@
+@import url("../brand.css");
+
 /* AMC Docs — Dark green on black design system */
 :root {
-  --bg: #0a0a0a;
-  --bg2: #111111;
-  --bg3: #1a1a1a;
+  --bg: var(--amc-bg);
+  --bg2: var(--amc-panel);
+  --bg3: var(--amc-card);
   --card: rgba(74,239,121,0.04);
-  --fg: #FFFFFF;
-  --fg2: #a0a0a0;
-  --muted: #a0a0a0;
-  --green: #4AEF79;
-  --green2: #3CD468;
-  --green3: #2A9D50;
+  --fg: var(--amc-text);
+  --fg2: var(--amc-muted);
+  --muted: var(--amc-muted);
+  --green: var(--amc-accent);
+  --green2: var(--amc-accent-muted);
+  --green3: var(--amc-accent-deep);
   --green-glow: rgba(74,239,121,0.12);
-  --amber: #f59e0b;
+  --amber: var(--amc-warning);
   --cyan: #00e5ff;
   --red: #ff3355;
-  --border: rgba(255,255,255,0.08);
-  --border2: rgba(74,239,121,0.2);
+  --border: var(--amc-border);
+  --border2: var(--amc-border-accent);
   --sidebar-w: 280px;
-  --topbar-h: 52px;
-  --mono: 'Space Mono', 'JetBrains Mono', monospace;
-  --sans: 'Inter', system-ui, sans-serif;
+  --topbar-h: 56px;
+  --mono: var(--amc-font-mono);
+  --sans: var(--amc-font-sans);
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
