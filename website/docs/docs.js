@@ -499,17 +499,49 @@ function renderDoc(md, docName, section = '') {
 
 function addCopyButtons() {
   document.querySelectorAll('.doc-content pre').forEach(pre => {
-    if (pre.querySelector('.copy-btn')) return;
+    if (pre.parentElement?.classList.contains('code-block')) return;
+
+    const wrapper = document.createElement('div');
+    wrapper.className = 'code-block';
+    pre.before(wrapper);
+    wrapper.appendChild(pre);
+
     const btn = document.createElement('button');
+    btn.type = 'button';
     btn.className = 'copy-btn';
     btn.textContent = 'Copy';
-    btn.onclick = () => {
-      const code = pre.querySelector('code');
-      navigator.clipboard.writeText((code || pre).textContent.replace('Copy', '').trim());
-      btn.textContent = 'Copied!';
-      setTimeout(() => btn.textContent = 'Copy', 1500);
+    btn.setAttribute('aria-label', 'Copy code');
+    btn.setAttribute('aria-live', 'polite');
+    btn.setAttribute('aria-atomic', 'true');
+
+    let resetTimer;
+    const reset = () => {
+      delete btn.dataset.state;
+      btn.textContent = 'Copy';
+      btn.setAttribute('aria-label', 'Copy code');
     };
-    pre.appendChild(btn);
+    const showResult = (state, text, label) => {
+      window.clearTimeout(resetTimer);
+      btn.dataset.state = state;
+      btn.textContent = text;
+      btn.setAttribute('aria-label', label);
+      resetTimer = window.setTimeout(reset, 1500);
+    };
+
+    btn.onclick = async () => {
+      const code = pre.querySelector('code');
+      const payload = (code || pre).textContent || '';
+      try {
+        if (!navigator.clipboard || typeof navigator.clipboard.writeText !== 'function') {
+          throw new Error('Clipboard API unavailable');
+        }
+        await navigator.clipboard.writeText(payload);
+        showResult('success', 'Copied', 'Code copied');
+      } catch {
+        showResult('error', 'Try again', 'Copy failed');
+      }
+    };
+    wrapper.appendChild(btn);
   });
 }
 

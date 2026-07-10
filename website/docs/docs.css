@@ -256,8 +256,46 @@ code, pre { font-family: var(--mono); }
 }
 .doc-content pre {
   background: var(--bg2); border: 1px solid var(--border);
-  padding: 16px; margin: 14px 0; overflow-x: auto;
+  padding: 48px 16px 16px; margin: 0; overflow-x: auto;
   font-size: 0.82rem; line-height: 1.6;
+}
+.code-block {
+  position: relative;
+  min-width: 0;
+  margin: 14px 0;
+}
+.copy-btn {
+  appearance: none;
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 1;
+  min-width: 76px;
+  height: 30px;
+  padding: 0 10px;
+  border: 1px solid var(--border2);
+  border-radius: 4px;
+  background: var(--bg3);
+  color: var(--fg2);
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0;
+  cursor: pointer;
+}
+.copy-btn:hover {
+  border-color: var(--green);
+  color: var(--green);
+}
+.copy-btn[data-state="success"] {
+  border-color: var(--green);
+  background: rgba(74,239,121,0.08);
+  color: var(--green);
+}
+.copy-btn[data-state="error"] {
+  border-color: var(--red);
+  background: rgba(255,51,85,0.08);
+  color: var(--red);
 }
 .doc-content pre code {
   background: none;

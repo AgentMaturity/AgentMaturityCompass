@@ -54,3 +54,107 @@ test("rendered guide links stay in the Docs router and unknown targets fail clos
   await expect(page.locator("#first-score")).toBeFocused();
   expect(fetchedDocs.some(url => url.endsWith("GETTING_STARTED.md"))).toBe(true);
 });
+
+test("rendered code controls preserve the AMC identity and announce copy outcomes", async ({ page }) => {
+  const codeText = "printf 'Copy this exact payload'\nsecond line\n";
+  const browserErrors: string[] = [];
+
+  page.on("console", message => {
+    if (message.type() === "error") browserErrors.push(`console: ${message.text()}`);
+  });
+  page.on("pageerror", error => browserErrors.push(`page: ${error.message}`));
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.addInitScript(() => {
+    Object.defineProperty(navigator, "clipboard", {
+      configurable: true,
+      value: {
+        async writeText(value: string) {
+          if ((window as typeof window & { __clipboardShouldFail?: boolean }).__clipboardShouldFail) {
+            throw new Error("clipboard denied by test fixture");
+          }
+          (window as typeof window & { __copiedText?: string }).__copiedText = value;
+        },
+      },
+    });
+  });
+  await page.route("https://cdn.jsdelivr.net/npm/marked/marked.min.js", route => route.fulfill({
+    contentType: "application/javascript",
+    body: `window.marked = {
+      setOptions() {},
+      parse() {
+        return "<h1>Copy control</h1><pre><code>printf 'Copy this exact payload'\\nsecond line\\n</code></pre>";
+      }
+    };`,
+  }));
+  await page.route(`${rawDocs}**`, route => route.fulfill({
+    body: "COPY_CONTROL_FIXTURE",
+    contentType: "text/markdown",
+    headers: { "Access-Control-Allow-Origin": "*" },
+  }));
+
+  await page.goto(`${docsUrl}#PLAYGROUND`);
+  await expect(page.locator('.doc-article[data-doc="PLAYGROUND"]')).toBeVisible();
+  const control = page.locator(".copy-btn");
+  await expect(control).toHaveCount(1);
+  await expect(control).toHaveAttribute("type", "button");
+  await expect(control).toHaveAttribute("aria-label", "Copy code");
+  await expect(control).toHaveAttribute("aria-live", "polite");
+
+  const initialLayout = await page.evaluate(() => {
+    const wrapper = document.querySelector<HTMLElement>(".code-block");
+    const pre = wrapper?.querySelector<HTMLElement>("pre");
+    const button = wrapper?.querySelector<HTMLElement>(".copy-btn");
+    if (!wrapper || !pre || !button) return null;
+    const wrapperRect = wrapper.getBoundingClientRect();
+    const buttonRect = button.getBoundingClientRect();
+    const style = getComputedStyle(button);
+    return {
+      viewportWidth: window.innerWidth,
+      documentWidth: document.documentElement.scrollWidth,
+      buttonAppearance: style.appearance,
+      buttonPosition: style.position,
+      buttonFont: style.fontFamily,
+      buttonBorder: style.borderTopColor,
+      buttonLeft: buttonRect.left,
+      buttonRight: buttonRect.right,
+      wrapperLeft: wrapperRect.left,
+      wrapperRight: wrapperRect.right,
+      preContainsButton: pre.contains(button),
+    };
+  });
+  expect(initialLayout).not.toBeNull();
+  expect(initialLayout?.documentWidth).toBe(initialLayout?.viewportWidth);
+  expect(initialLayout?.buttonAppearance).toBe("none");
+  expect(initialLayout?.buttonPosition).toBe("absolute");
+  expect(initialLayout?.buttonFont).toContain("Space Mono");
+  expect(initialLayout?.buttonBorder).toBe("rgba(74, 239, 121, 0.2)");
+  expect(initialLayout?.buttonLeft).toBeGreaterThanOrEqual(initialLayout?.wrapperLeft ?? 0);
+  expect(initialLayout?.buttonRight).toBeLessThanOrEqual(initialLayout?.wrapperRight ?? 0);
+  expect(initialLayout?.preContainsButton).toBe(false);
+
+  const beforeScroll = await control.evaluate(element => element.getBoundingClientRect().left);
+  await page.locator(".code-block pre").evaluate(element => {
+    element.scrollLeft = element.scrollWidth;
+  });
+  const afterScroll = await control.evaluate(element => element.getBoundingClientRect().left);
+  expect(afterScroll).toBe(beforeScroll);
+
+  await control.focus();
+  await page.keyboard.press("Enter");
+  await expect.poll(() => page.evaluate(() => (window as typeof window & { __copiedText?: string }).__copiedText)).toBe(codeText);
+  await expect(control).toHaveText("Copied");
+  await expect(control).toHaveAttribute("aria-label", "Code copied");
+  await expect(control).toHaveAttribute("data-state", "success");
+
+  await page.evaluate(() => {
+    (window as typeof window & { __clipboardShouldFail?: boolean }).__clipboardShouldFail = true;
+  });
+  await control.click();
+  await expect(control).toHaveText("Try again");
+  await expect(control).toHaveAttribute("aria-label", "Copy failed");
+  await expect(control).toHaveAttribute("data-state", "error");
+  expect(browserErrors).toEqual([]);
+
+  const axe = await new AxeBuilder({ page }).analyze();
+  expect(axe.violations).toEqual([]);
+});
