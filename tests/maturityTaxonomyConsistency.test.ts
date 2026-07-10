@@ -11,7 +11,11 @@ import {
   formatMaturityLevel,
   maturityLevelFromOrdinal,
 } from "../src/score/maturityTaxonomy.js";
-import { getPublicMethodologyManifest } from "../src/methodology/publicMethodology.js";
+import {
+  AMC_PUBLIC_METHODOLOGY_ID,
+  getPublicMethodologyManifest,
+  verifyPublicMethodologyReference,
+} from "../src/methodology/publicMethodology.js";
 import { probeEndpoint } from "../src/scanner/endpointProbe.js";
 import { scanLocal } from "../src/scanner/localScanner.js";
 
@@ -67,6 +71,35 @@ describe("AMC aggregate maturity taxonomy", () => {
     expect(manifest.migrationGuidance[0]).toContain("labels");
   });
 
+  it("verifies current and r221 methodology hashes while failing closed on tampering", () => {
+    const current = getPublicMethodologyManifest();
+    expect(verifyPublicMethodologyReference(current)).toMatchObject({
+      ok: true,
+      status: "current",
+    });
+
+    const r221 = {
+      id: AMC_PUBLIC_METHODOLOGY_ID,
+      version: "2026.07.10-r221",
+      hash: "7eb7fd5bd9e0fc9952fca8dc935647988e6a2d6c5fdf786cd70160a0290fba8f",
+    };
+    expect(verifyPublicMethodologyReference(r221)).toEqual({
+      ok: true,
+      status: "historical",
+      reason: null,
+    });
+    expect(verifyPublicMethodologyReference({ ...r221, hash: "0".repeat(64) })).toEqual({
+      ok: false,
+      status: "historical",
+      reason: "methodology hash mismatch",
+    });
+    expect(verifyPublicMethodologyReference({ ...r221, version: "2026.07.10-r999" })).toEqual({
+      ok: false,
+      status: "unknown",
+      reason: "unknown methodology version",
+    });
+  });
+
   it("uses the same labels in generated badges, guides, and scanners", async () => {
     expect(generateBadge({ level: 0 })).toContain("L0 Absent");
     expect(formatBadgeOutput({ level: 5 })).toContain("L5 Optimizing");
@@ -75,10 +108,14 @@ describe("AMC aggregate maturity taxonomy", () => {
 
     const workspace = mkdtempSync(join(tmpdir(), "amc-taxonomy-"));
     try {
-      expect(scanLocal(workspace).preliminaryScore.label).toBe("L1 — Initial");
+      expect(scanLocal(workspace).preliminaryScore).toMatchObject({ level: 0, label: "L0 — Absent" });
     } finally {
       rmSync(workspace, { recursive: true, force: true });
     }
+
+    vi.stubGlobal("fetch", vi.fn(async () => { throw new Error("unreachable"); }));
+    const unreachable = await probeEndpoint("https://unreachable.example");
+    expect(unreachable.preliminaryScore).toMatchObject({ level: 0, label: "L0 — Absent", confidence: 0 });
 
     vi.stubGlobal("fetch", vi.fn(async () => new Response(null, { status: 401 })));
     const endpoint = await probeEndpoint("https://agent.example");
@@ -115,6 +152,7 @@ describe("AMC aggregate maturity taxonomy", () => {
     const publicFiles = [
       "README.md",
       "AMC_COMPLETE_KNOWLEDGE.md",
+      "docs/AFTER_FIRST_SCORE.md",
       "docs/AMC_STANDARD_RFC.md",
       "docs/GETTING_STARTED.md",
       "docs/OPEN_RUBRIC_STANDARD.md",
@@ -135,5 +173,41 @@ describe("AMC aggregate maturity taxonomy", () => {
         ).toBe(true);
       }
     }
+  });
+
+  it("publishes exact aggregate score bands in the public rubric", () => {
+    const rubric = read("docs/OPEN_RUBRIC_STANDARD.md");
+    const ranges = getPublicMethodologyManifest().scoreScale.map(({ level, numericRange, label }) =>
+      `| **${level}** | **${label}** | ${numericRange[0]}-${numericRange[1]} |`,
+    );
+
+    for (const row of ranges) expect(rubric).toContain(row);
+    expect(rubric).not.toContain("0–0.9 = Ad-hoc");
+    expect(rubric).not.toContain("4.0–4.9 = Managed");
+    expect(rubric).not.toContain("5.0 = Optimizing");
+  });
+
+  it("uses canonical AMC labels in the public CMMI crosswalk without rewriting CMMI", () => {
+    const mapping = read("docs/STANDARDS_MAPPING.md");
+    for (const [level, label] of canonicalRows.slice(1)) {
+      expect(mapping).toContain(`${level} (${label})`);
+    }
+    expect(mapping).toContain("**Level 4 — Quantitatively Managed**");
+    expect(mapping).toContain("**Level 5 — Optimizing**");
+    expect(mapping).not.toContain("L1 (Ad Hoc)");
+    expect(mapping).not.toContain("L4 (Optimized)");
+    expect(mapping).not.toContain("L5 (Autonomous)");
+  });
+
+  it("keeps validity and demo guidance on current labels and domain", () => {
+    const validity = read("docs/VALIDITY_FRAMEWORK.md");
+    const demo = read("docs/content/demo-video-script-quickstart.md");
+
+    expect(validity).toContain('L4 = "Managed with known gaps"');
+    expect(validity).not.toContain('L4 = "Optimized with known gaps"');
+    expect(demo).toContain("AMC-L3_Defined");
+    expect(demo).toContain("agentmaturity.co");
+    expect(demo).not.toContain("AMC-L3_Governed");
+    expect(demo).not.toContain("agentmaturitycompass.com");
   });
 });

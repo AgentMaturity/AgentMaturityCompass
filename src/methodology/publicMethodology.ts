@@ -152,6 +152,16 @@ export interface PublicMethodologyReference {
   versioningAssuranceHash: string;
 }
 
+export interface PublicMethodologyVerificationResult {
+  ok: boolean;
+  status: "current" | "historical" | "unknown";
+  reason: "methodology id mismatch" | "unknown methodology version" | "methodology hash mismatch" | null;
+}
+
+const HISTORICAL_PUBLIC_METHODOLOGY_HASHES = new Map<string, string>([
+  ["2026.07.10-r221", "7eb7fd5bd9e0fc9952fca8dc935647988e6a2d6c5fdf786cd70160a0290fba8f"],
+]);
+
 export interface PublicMethodologyReproducibilityPacket {
   schemaVersion: 1;
   id: string;
@@ -4745,6 +4755,32 @@ export function getPublicMethodologyReference(questionSet?: DiagnosticQuestionSe
 
     }))
   };
+}
+
+export function verifyPublicMethodologyReference(
+  reference: Pick<PublicMethodologyReference, "id" | "version" | "hash">,
+): PublicMethodologyVerificationResult {
+  if (reference.id !== AMC_PUBLIC_METHODOLOGY_ID) {
+    return { ok: false, status: "unknown", reason: "methodology id mismatch" };
+  }
+
+  const current = getPublicMethodologyManifest();
+  const status = reference.version === current.version
+    ? "current"
+    : HISTORICAL_PUBLIC_METHODOLOGY_HASHES.has(reference.version)
+      ? "historical"
+      : "unknown";
+  if (status === "unknown") {
+    return { ok: false, status, reason: "unknown methodology version" };
+  }
+
+  const expectedHash = status === "current"
+    ? current.hash
+    : HISTORICAL_PUBLIC_METHODOLOGY_HASHES.get(reference.version);
+  if (reference.hash !== expectedHash) {
+    return { ok: false, status, reason: "methodology hash mismatch" };
+  }
+  return { ok: true, status, reason: null };
 }
 
 function publicQuestionRows(): PublicMethodologyReproducibilityPacket["questionBank"]["questions"] {

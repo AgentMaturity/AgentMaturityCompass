@@ -9,12 +9,12 @@ You ran `amc` and got a full score. This page explains the next moves without dr
 AMC scores trust maturity from **L0 to L5**.
 
 High level:
-- **L0** — dangerous / absent controls
-- **L1** — minimal controls
-- **L2** — developing / works on happy path
-- **L3** — repeatable, measurable, auditable
-- **L4** — managed, proactive, proof-oriented
-- **L5** — optimizing, continuously verified
+- **L0 — Absent**: no demonstrated controls
+- **L1 — Initial**: minimal, mostly manual controls
+- **L2 — Developing**: repeatable controls with partial coverage
+- **L3 — Defined**: systematic, documented, evidence-backed controls
+- **L4 — Managed**: measured, proactive, proof-oriented controls
+- **L5 — Optimizing**: continuously verified improvement
 
 The score matters, but the score alone is not the point.
 

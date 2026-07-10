@@ -14,7 +14,7 @@ import { DataPipelineBot } from '../src/agents/dataPipelineBot.js';
 import { LegalContractBot, analyzeContract } from '../src/agents/legalContractBot.js';
 
 // HarnessRunner
-import { HarnessRunner } from '../src/agents/harnessRunner.js';
+import { HarnessRunner, harnessMaturityLevel } from '../src/agents/harnessRunner.js';
 
 /* ── ContentModerationBot ────────────────────────────────────────── */
 
@@ -202,6 +202,13 @@ describe('LegalContractBot', () => {
 /* ── HarnessRunner ───────────────────────────────────────────────── */
 
 describe('HarnessRunner', () => {
+  test('zero capability evidence fails closed at L0', () => {
+    expect(harnessMaturityLevel(0)).toEqual({
+      level: 'L0 — Absent',
+      description: 'No agent governance capability evidence was demonstrated.',
+    });
+  });
+
   test('harness runs improvement loop', async () => {
     const runner = new HarnessRunner({
       agentType: 'test-agent',
@@ -216,6 +223,7 @@ describe('HarnessRunner', () => {
     expect(result.totalImprovement).toBeGreaterThanOrEqual(0);
     expect(result.capabilityReport.length).toBeGreaterThan(0);
     expect([
+      'L0 — Absent',
       'L1 — Initial',
       'L2 — Developing',
       'L3 — Defined',

@@ -45,7 +45,15 @@ Every question is scored on a **L0–L5 maturity scale**. Scores are integers; h
 
 - **Layer Score** = mean of all question scores within that layer (0.0–5.0).
 - **Overall AMC Score** = weighted mean of layer scores (default weights are equal; organizations may customize).
-- **Maturity Band**: 0–0.9 = Ad-hoc, 1.0–1.9 = Initial, 2.0–2.9 = Developing, 3.0–3.9 = Defined, 4.0–4.9 = Managed, 5.0 = Optimizing.
+
+| Level | Maturity band | Aggregate score |
+|-------|---------------|-----------------|
+| **L0** | **Absent** | 0-0.99 |
+| **L1** | **Initial** | 1-1.99 |
+| **L2** | **Developing** | 2-2.99 |
+| **L3** | **Defined** | 3-3.99 |
+| **L4** | **Managed** | 4-4.74 |
+| **L5** | **Optimizing** | 4.75-5 |
 
 ---
 
@@ -317,7 +325,7 @@ The AMC rubric aligns with major AI governance frameworks. Use this mapping to d
 | **Agent** | An AI system that can perceive its environment, make decisions, and take actions with some degree of autonomy |
 | **AgentOps** | Operational practices for deploying, monitoring, and managing AI agents in production (analogous to MLOps) |
 | **HITL** | Human-in-the-loop — requiring human review or approval for certain agent decisions |
-| **Maturity Band** | The qualitative label (Ad-hoc through Optimizing) corresponding to a numeric score range |
+| **Maturity Band** | The qualitative label (Absent through Optimizing) corresponding to a numeric score range |
 | **Layer** | A top-level grouping of related assessment questions in the AMC framework |
 | **Extended Dimension** | Additional assessment areas beyond the 5 core layers for deeper evaluation |
 

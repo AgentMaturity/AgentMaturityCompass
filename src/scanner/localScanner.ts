@@ -43,11 +43,11 @@ export function scanLocal(localPath: string): LocalScanResult {
   const detection = detectFromContent(files);
 
   // Preliminary score based on detection
-  let level = 1;
+  let level = files.length > 0 ? 1 : 0;
   if (detection.governanceArtifacts.length >= 3) level = 3;
   else if (detection.governanceArtifacts.length >= 1) level = 2;
   if (detection.securityPosture === "strong") level = Math.min(level + 1, 3);
-  if (detection.securityPosture === "weak") level = Math.max(level - 1, 1);
+  if (detection.securityPosture === "weak") level = Math.max(level - 1, 0);
 
   return {
     path: localPath,

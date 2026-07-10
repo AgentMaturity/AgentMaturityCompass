@@ -241,6 +241,10 @@ describe("generateTransparencyReport", () => {
     expect(report).toBeDefined();
     expect(report.agentId).toBe("test-agent");
     expect(report.dimensions).toBeInstanceOf(Array);
+    expect(report.identity.maturityLevel).toBe(0);
+    expect(report.identity.maturityLabel).toBe("L0 — Absent");
+    expect(report.identity.trustScore).toBe(0);
+    expect(report.identity.certificationStatus).toBe("not-certified");
   });
 
   it("handles agent with no BOM gracefully", () => {

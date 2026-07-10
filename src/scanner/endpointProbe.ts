@@ -50,7 +50,7 @@ export async function probeEndpoint(url: string): Promise<EndpointProbeResult> {
   }
 
   const responseTimeMs = Date.now() - start;
-  let level = 1;
+  let level = reachable ? 1 : 0;
   if (signals.includes("rate-limiting") && signals.includes("auth-required")) level = 3;
   else if (signals.includes("auth-required") || signals.length >= 3) level = 2;
 

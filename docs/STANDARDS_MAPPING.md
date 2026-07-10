@@ -277,15 +277,15 @@ All new controls require L3+ question-scoped compliance evidence and L4/L5 obser
 
 ## CMMI Level Alignment
 
-| CMMI Level | Description | AMC Maturity Level | Typical AMC Score |
+| CMMI Level | Description | AMC Maturity Level | Typical normalized score |
 |---|---|---|---|
-| **Level 1 — Initial** | Ad hoc, unpredictable | L1 (Ad Hoc) | 0–39 |
+| **Level 1 — Initial** | Ad hoc, unpredictable | L1 (Initial) | 0–39 |
 | **Level 2 — Managed** | Project-level management, some policies | L2 (Developing) | 40–59 |
 | **Level 3 — Defined** | Org-wide standards, tailored processes | L3 (Defined) | 60–74 |
-| **Level 4 — Quantitatively Managed** | Statistical process control, measurement | L4 (Optimized) | 75–89 |
-| **Level 5 — Optimizing** | Continuous improvement, innovation | L5 (Autonomous) | 90–100 |
+| **Level 4 — Quantitatively Managed** | Statistical process control, measurement | L4 (Managed) | 75–89 |
+| **Level 5 — Optimizing** | Continuous improvement, innovation | L5 (Optimizing) | 90–100 |
 
-AMC's L1→L5 scale directly mirrors CMMI's 1–5 progression, making AMC reports directly translatable for organizations already using CMMI for software processes.
+This crosswalk aligns AMC's L1-L5 progression with CMMI while preserving AMC's separate L0 Absent state. The 0-100 values above are normalized presentation bands, not AMC's canonical 0-5 aggregate score ranges.
 
 ---
 

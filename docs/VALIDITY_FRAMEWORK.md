@@ -51,7 +51,7 @@ This construct is operationalized through 5 dimensions and 138 questions, each m
 | Cost Efficiency Score | 75/100 |
 | Operating Model Score | 78/100 |
 | Known Production Gaps | No autonomous improvement loop; limited evaluation tooling |
-| Score Prediction | L4 = "Optimized with known gaps" |
+| Score Prediction | L4 = "Managed with known gaps" |
 | Actual System State | Confirmed: solid operational foundation, gaps in evaluation depth and self-correction |
 
 **Construct validity evidence:** DPB scored 80/100 — interpreted as "production-ready with known improvement areas." This accurately described the system: stable, monitored, but not yet running autonomous test-and-fix cycles. The score differentiated DPB from both L1 (chaotic) and L5 (self-optimizing) systems correctly.

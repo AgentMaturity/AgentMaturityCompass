@@ -150,7 +150,7 @@ amc badge
 
 **Expected output:**
 ```
-![AMC L3](https://img.shields.io/badge/AMC-L3_Governed-blue)
+![AMC L3](https://img.shields.io/badge/AMC-L3_Defined-blue)
 
 Paste this in your README to show your agent's maturity level.
 ```
@@ -158,7 +158,7 @@ Paste this in your README to show your agent's maturity level.
 **Screen:** Show the badge rendered in a GitHub README.
 
 **Narration:**
-> "Add the badge to your README. Let the world know your agent is measured, not just marketed. Get started at agentmaturitycompass.com."
+> "Add the badge to your README. Let the world know your agent is measured, not just marketed. Get started at agentmaturity.co."
 
 ---
 

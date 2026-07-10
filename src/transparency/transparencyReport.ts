@@ -71,7 +71,7 @@ export interface AgentTransparencyReport {
     merkleRootHash: string | null;
   };
 
-  /** Dimension Scores: L1-L5 per AMC dimension */
+  /** Dimension Scores: L0-L5 per AMC dimension */
   dimensions: Array<{
     name: string;
     level: number;
@@ -142,15 +142,15 @@ function levelLabel(level: number): string {
 }
 
 function overallLevel(layerScores: LayerScore[]): number {
-  if (layerScores.length === 0) return 1;
+  if (layerScores.length === 0) return 0;
   const avg =
     layerScores.reduce((s, r) => s + r.avgFinalLevel, 0) / layerScores.length;
-  return Math.max(1, Math.min(5, avg));
+  return Math.max(0, Math.min(5, avg));
 }
 
 function trustScoreFrom(level: number): number {
-  // Convert L1-L5 to 0-100
-  return Math.round(((level - 1) / 4) * 100);
+  // L0 and L1 both lack enough maturity proof for positive trust credit.
+  return Math.round(((Math.max(1, level) - 1) / 4) * 100);
 }
 
 /** Returns null if no data exists OR data is unreadable. Caller treats both as "no data available". */
