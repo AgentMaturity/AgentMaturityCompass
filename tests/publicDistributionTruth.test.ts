@@ -199,6 +199,11 @@ describe("truthful public distribution and brand contract", () => {
     expect(workflow).toContain("actions/download-artifact@v8");
     expect(workflow).not.toContain("actions/upload-artifact@v4");
     expect(workflow).not.toContain("actions/download-artifact@v4");
+    expect(workflow).toContain("workflow_dispatch:");
+    expect(workflow).toContain('AMC_RELEASE_TAG: ${{ github.event_name');
+    expect(workflow).toContain("tr '[:upper:]' '[:lower:]'");
+    expect(workflow).toContain("tag_name: ${{ env.AMC_RELEASE_TAG }}");
+    expect(workflow).not.toContain("ghcr.io/${{ github.repository_owner }}/amc-studio");
     expect(workflow).toContain("secrets.NPM_TOKEN");
     expect(workflow).toMatch(/if \[ -z "\$NODE_AUTH_TOKEN" \]/);
   });
