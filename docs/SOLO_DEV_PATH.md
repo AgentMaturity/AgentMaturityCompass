@@ -26,7 +26,7 @@
 - light **Watch** usage
 
 ## Suggested sequence
-1. run `npx agent-maturity-compass`
+1. run `curl -fsSL https://agentmaturity.co/install.sh | sh && amc`
 2. inspect the gaps
 3. run `amc fix`
 4. add one CI gate

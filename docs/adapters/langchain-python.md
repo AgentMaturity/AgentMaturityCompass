@@ -13,7 +13,7 @@ The LangChain Python adapter wraps LangChain-based agents, capturing all LLM cal
 
 - Python 3.11+
 - `langchain` and `langchain-core` installed
-- AMC installed (`npm i -g agent-maturity-compass`)
+- AMC installed (`curl -fsSL https://agentmaturity.co/install.sh | sh`)
 
 ## Quick Start
 

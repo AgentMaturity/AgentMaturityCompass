@@ -13,7 +13,7 @@ CrewAI is a framework for orchestrating role-playing autonomous AI agents. The A
 
 - Python 3.11+
 - `crewai` package installed
-- AMC installed (`npm i -g agent-maturity-compass`)
+- AMC installed (`curl -fsSL https://agentmaturity.co/install.sh | sh`)
 
 ## Quick Start
 

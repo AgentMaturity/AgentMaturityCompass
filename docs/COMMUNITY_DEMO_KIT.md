@@ -15,7 +15,8 @@ GitHub Docs attaching-files guidance lists SVG, GIF, PNG, and video formats as s
 Use this script when a developer asks what AMC does and why it is different from an eval harness.
 
 ```bash
-npx agent-maturity-compass quickscore
+curl -fsSL https://agentmaturity.co/install.sh | sh
+amc quickscore --rapid
 amc quickscore --answers answers.json --json
 amc quickstart --startup-plan --role cto --answers-out amc-startup-answers.json
 amc business risk --maturity 3 --baseline-frequency 4 --incident-cost 50000 --risk-appetite 75000 --json
@@ -40,7 +41,7 @@ Short post:
 
 Maintainer reply:
 
-> Try `npx agent-maturity-compass quickscore` for a pulse check, then use `amc quickstart --startup-plan --role cto` to create a measured path. If you need risk evidence, `amc business grc-export` turns a portfolio JSON into a treatment-plan register.
+> Install the verified GitHub release, then try `amc quickscore --rapid` for a pulse check and use `amc quickstart --startup-plan --role cto` to create a measured path. If you need risk evidence, `amc business grc-export` turns a portfolio JSON into a treatment-plan register.
 
 ## Caveats
 

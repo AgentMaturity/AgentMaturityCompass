@@ -13,7 +13,7 @@ After months of building AI agents and having no reliable way to know if they we
 - 147 adversarial test packs (prompt injection, exfiltration, alignment faking, sandbagging)
 - Evidence is cryptographically signed — tamper-evident proof chains
 - Works with any framework: LangChain, CrewAI, AutoGen, local models, etc.
-- `npx agent-maturity-compass` — 60 seconds, no account
+- `curl -fsSL https://agentmaturity.co/install.sh | sh && amc` — 60 seconds, no account
 
 **Why not just use Promptfoo?**
 Different tools for different jobs. Promptfoo evaluates prompt quality. AMC answers "is this agent safe to ship?" with a structured maturity model and compliance documentation. You can even import Promptfoo results into AMC.
@@ -22,7 +22,7 @@ Different tools for different jobs. Promptfoo evaluates prompt quality. AMC answ
 
 **What's paid:** 41 industry-specific domain packs for regulated verticals (healthcare, finance, education, logistics).
 
-8,198 passing Vitest tests. Would love feedback from this community.
+8,207 passing Vitest tests. Would love feedback from this community.
 
 GitHub: https://github.com/AgentMaturity/AgentMaturityCompass
 
@@ -46,7 +46,7 @@ Sharing a project I've been working on: an open-source framework for evaluating 
 
 The framework generates compliance mappings for EU AI Act, ISO 42001, NIST AI RMF, and OWASP LLM Top 10.
 
-MIT licensed, 8,198 passing Vitest tests, TypeScript.
+MIT licensed, 8,207 passing Vitest tests, TypeScript.
 
 Paper references and methodology: https://agentmaturity.co/methodology.html
 GitHub: https://github.com/AgentMaturity/AgentMaturityCompass

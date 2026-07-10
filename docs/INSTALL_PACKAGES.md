@@ -5,34 +5,28 @@ AMC supports multiple installation paths depending on how much friction you are 
 ## Recommended install order
 
 If you just want to try AMC:
-1. `npx agent-maturity-compass`
-2. `npm i -g agent-maturity-compass`
-3. Homebrew on macOS
-4. Docker for isolated or team environments
-5. Source install for contributors
+1. Use the browser playground without installing anything.
+2. Use the verified GitHub release installer for the real CLI and local Studio.
+3. Use Docker for isolated or team environments.
+4. Use a source install when contributing to AMC itself.
 
 ## Package formats
 
-### npm / npx
+### Verified GitHub release
 Best for:
 - most developers
-- CI runners
-- quick evaluation
+- repeatable local installs
+- macOS, Linux, and Windows users who need the real CLI
 
 ```bash
-npx agent-maturity-compass
-npm i -g agent-maturity-compass
+curl -fsSL https://agentmaturity.co/install.sh | sh
 ```
 
-### Homebrew
-Best for:
-- macOS users
-- repeat installs on developer machines
-
-```bash
-brew tap AgentMaturity/amc
-brew install agent-maturity-compass
+```powershell
+irm https://agentmaturity.co/install.ps1 | iex
 ```
+
+These scripts pin the release, verify `SHA256SUMS`, and install the package tarball included in the platform archive. npm and Homebrew registry channels remain unavailable until their public publication is independently verified.
 
 ### Docker images
 Best for:
@@ -60,15 +54,15 @@ npm link
 ## OS notes
 
 ### macOS
-- npm and Homebrew are the smoothest paths
+- use the verified release installer; the desktop archive includes the native WebKit Studio app
 
 ### Linux
-- npm is the mainline path
+- use the verified release installer
 - Docker/Compose and Helm are also supported for deployment scenarios
 
 ### Windows
-- WSL2 is the recommended environment today
-- native Windows package-manager support (Winget/Chocolatey) is a worthwhile future direction, but should be treated as additive until fully maintained
+- use the verified PowerShell installer for the native archive and system-browser Studio launcher
+- Winget/Chocolatey support remains unavailable until maintained packages exist
 
 ## Team deployment options
 
@@ -85,8 +79,8 @@ See also:
 ## Upgrade guidance
 
 Use the path you installed with:
-- npm → `npm update -g agent-maturity-compass`
-- Homebrew → `brew upgrade agent-maturity-compass`
+- macOS/Linux release installer -> rerun `curl -fsSL https://agentmaturity.co/install.sh | sh`
+- Windows release installer -> rerun `irm https://agentmaturity.co/install.ps1 | iex`
 - source → `git pull && npm ci && npm run build`
 - Docker → pull/update image or compose stack
 

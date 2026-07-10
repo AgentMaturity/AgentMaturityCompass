@@ -12,7 +12,7 @@ The Claude Code adapter wraps Anthropic's official Claude CLI, capturing all int
 ## Prerequisites
 
 - Claude CLI installed (`brew install anthropic/claude/claude` or download from Anthropic)
-- AMC installed (`npm i -g agent-maturity-compass`)
+- AMC installed (`curl -fsSL https://agentmaturity.co/install.sh | sh`)
 
 ## Quick Start
 

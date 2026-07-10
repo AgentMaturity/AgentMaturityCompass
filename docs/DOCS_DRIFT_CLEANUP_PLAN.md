@@ -116,7 +116,7 @@ Those guardrails keep the cleanup credible.
 - When documenting implementation status, route through [IMPLEMENTATION_REALITY_MAP.md](IMPLEMENTATION_REALITY_MAP.md).
 - When documenting architectural shape, route through [ARCHITECTURE_BRIEF.md](ARCHITECTURE_BRIEF.md) and [ARCHITECTURE_MAP.md](ARCHITECTURE_MAP.md).
 - Run `npm run check:docs-drift` before publishing README, website, Studio copy, or Obsidian operating notes.
-- Quick/rapid score can be documented only as an optional pulse check. The first-run path must remain `npx agent-maturity-compass` or `amc`.
+- Quick/rapid score can be documented only as an optional pulse check. The first-run path must remain `curl -fsSL https://agentmaturity.co/install.sh | sh && amc` or `amc`.
 - Public docs and operating notes must use generic capability descriptors for research/source intake. Do not publish external source/project names from private audit bundles.
 
 ## AMC-460 Verification Checklist

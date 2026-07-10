@@ -16,7 +16,7 @@ npm run build
 ## 1) Local Go-Live (single workspace)
 
 ```bash
-npm i -g agent-maturity-compass
+curl -fsSL https://agentmaturity.co/install.sh | sh
 amc setup --demo
 amc up
 amc doctor --json

@@ -68,7 +68,7 @@ In GitLab, open `Settings > CI/CD > Variables` and create a masked, protected va
 amc_signed_gate:
   image: node:20
   script:
-    - npm i -g agent-maturity-compass
+    - curl -fsSL https://agentmaturity.co/install.sh | sh
     - test -n "$AMC_VAULT_PASSPHRASE"
     - amc gate --bundle .amc/agents/<agentId>/bundles/latest.amcbundle --policy .amc/agents/<agentId>/gatePolicy.json
 ```
@@ -90,7 +90,7 @@ jobs:
       - image: cimg/node:20.11
     steps:
       - checkout
-      - run: npm i -g agent-maturity-compass
+      - run: curl -fsSL https://agentmaturity.co/install.sh | sh
       - run:
           name: AMC signed gate
           command: amc gate --bundle .amc/agents/<agentId>/bundles/latest.amcbundle --policy .amc/agents/<agentId>/gatePolicy.json
@@ -115,7 +115,7 @@ jobs:
         with:
           node-version: 20
       - run: npm ci
-      - run: npm i -g agent-maturity-compass
+      - run: curl -fsSL https://agentmaturity.co/install.sh | sh
       - run: amc doctor
       - run: amc
       - run: amc assurance run --all
@@ -132,7 +132,7 @@ amc_check:
   image: node:20
   script:
     - npm ci
-    - npm i -g agent-maturity-compass
+    - curl -fsSL https://agentmaturity.co/install.sh | sh
     - amc doctor
     - amc
     - amc assurance run --all
@@ -149,7 +149,7 @@ jobs:
     steps:
       - checkout
       - run: npm ci
-      - run: npm i -g agent-maturity-compass
+      - run: curl -fsSL https://agentmaturity.co/install.sh | sh
       - run: amc doctor
       - run: amc
       - run: amc assurance run --all

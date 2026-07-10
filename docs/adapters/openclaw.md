@@ -12,7 +12,7 @@ The OpenClaw adapter integrates OpenClaw's autonomous agent platform with AMC, c
 ## Prerequisites
 
 - OpenClaw installed (`npm i -g openclaw`)
-- AMC installed (`npm i -g agent-maturity-compass`)
+- AMC installed (`curl -fsSL https://agentmaturity.co/install.sh | sh`)
 
 ## Quick Start
 

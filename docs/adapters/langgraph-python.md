@@ -13,7 +13,7 @@ LangGraph is LangChain's framework for building stateful, multi-actor applicatio
 
 - Python 3.11+
 - `langgraph` package installed
-- AMC installed (`npm i -g agent-maturity-compass`)
+- AMC installed (`curl -fsSL https://agentmaturity.co/install.sh | sh`)
 
 ## Quick Start
 

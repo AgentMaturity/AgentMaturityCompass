@@ -74,8 +74,8 @@
           <p class="hero-sub">Agent Maturity Compass checks how ready your AI agent is for real work. <span class="hl">No account</span>. <span class="hl">No setup maze</span>. Run <span class="hl">amc</span> for the <span class="hl">244-question</span> default score, then expand into lifecycle proof, Watch, Fleet, and compliance receipts.</p>
         </div>
         <div class="hero-right gs">
-          <div class="hero-install" onclick="navigator.clipboard&&navigator.clipboard.writeText('npx agent-maturity-compass')" title="Click to copy">
-            <span class="hi-prompt">$</span> npx agent-maturity-compass
+          <div class="hero-install" onclick="navigator.clipboard&&navigator.clipboard.writeText('curl -fsSL https://agentmaturity.co/install.sh | sh')" title="Copy the verified macOS/Linux installer">
+            <span class="hi-prompt">$</span><code class="hero-install-command">curl -fsSL https://agentmaturity.co/install.sh | sh</code>
           </div>
           <div class="hero-btns">
             <a href="#install" class="btn btn-primary btn-xl">install amc →</a>
@@ -95,7 +95,7 @@
           <div class="stat gs"><span class="stat-value">1,144</span><span class="stat-label">CLI command paths</span></div>
           <div class="stat gs"><span class="stat-value">142</span><span class="stat-label">assurance packs</span></div>
           <div class="stat gs"><span class="stat-value">41</span><span class="stat-label">industry packs</span></div>
-          <div class="stat gs"><span class="stat-value">8,198</span><span class="stat-label">passing tests</span></div>
+          <div class="stat gs"><span class="stat-value">8,207</span><span class="stat-label">passing tests</span></div>
         </div>
       </div>
     </section>
@@ -105,22 +105,22 @@
         <div class="section-heading gs" style="text-align:center">
           <p class="label">install</p>
           <h2>Start with <strong>one command<span class="accent blink-cursor">_</span></strong></h2>
-          <p class="section-desc" style="margin:1rem auto 0;text-align:center">Copy this into your agent project. AMC creates the workspace, runs the full score, and prints the result.</p>
+          <p class="section-desc" style="margin:1rem auto 0;text-align:center">Install a pinned, SHA-256-verified GitHub release. Then run <code>amc</code> in your agent project for the full score.</p>
         </div>
         <div class="pricing-grid">
           <div class="pricing-card gs">
-            <span class="tier">recommended</span>
-            <h3>No install first run</h3>
-            <div class="items"><span class="hl">$</span> npx agent-maturity-compass</div>
-            <p>Best for trying AMC once. It runs the full score immediately.</p>
-            <a href="#" onclick="navigator.clipboard&&navigator.clipboard.writeText('npx agent-maturity-compass');return false;" class="btn btn-primary btn-xl">copy command →</a>
+            <span class="tier">macOS + Linux</span>
+            <h3>Verified release install</h3>
+            <div class="items install-command"><span class="hl">$</span> curl -fsSL https://agentmaturity.co/install.sh | sh<br><span class="hl">$</span> amc</div>
+            <p>Downloads the pinned platform archive and checks SHA-256 before installing its included AMC package.</p>
+            <a href="#" onclick="navigator.clipboard&&navigator.clipboard.writeText('curl -fsSL https://agentmaturity.co/install.sh | sh');return false;" class="btn btn-primary btn-xl">copy command →</a>
           </div>
           <div class="pricing-card gs">
-            <span class="tier">daily use</span>
-            <h3>Install globally</h3>
-            <div class="items"><span class="hl">$</span> npm i -g agent-maturity-compass<br><span class="hl">$</span> amc</div>
-            <p>Install once, then run <code>amc</code> in any agent project.</p>
-            <a href="#" onclick="navigator.clipboard&&navigator.clipboard.writeText('npm i -g agent-maturity-compass && amc');return false;" class="btn btn-outline btn-xl">copy command →</a>
+            <span class="tier">Windows</span>
+            <h3>PowerShell install</h3>
+            <div class="items install-command"><span class="hl">PS&gt;</span> irm https://agentmaturity.co/install.ps1 | iex<br><span class="hl">PS&gt;</span> amc</div>
+            <p>Uses the same pinned release and checksum contract, then opens the same CLI and local Studio.</p>
+            <a href="#" onclick="navigator.clipboard&&navigator.clipboard.writeText('irm https://agentmaturity.co/install.ps1 | iex');return false;" class="btn btn-outline btn-xl">copy command →</a>
           </div>
         </div>
       </div>
@@ -415,7 +415,7 @@
           <div class="faq-item gs"><button class="faq-q" aria-expanded="false">Which frameworks does AMC support?<span class="faq-icon">+</span></button><div class="faq-a"><p><span class="hl">14 adapters</span>: LangChain, LangGraph, CrewAI, AutoGen, OpenAI Agents SDK, LlamaIndex, Semantic Kernel, Claude Code, Gemini, OpenClaw, OpenHands, Python SDK, CLI, and OpenAI-compatible endpoints.</p></div></div>
           <div class="faq-item gs"><button class="faq-q" aria-expanded="false">Can I use AMC in CI/CD?<span class="faq-icon">+</span></button><div class="faq-a"><p>Yes. Use gates such as <code>amc gate --min-score L3</code> to fail builds below threshold and prevent trust regressions.</p></div></div>
           <div class="faq-item gs"><button class="faq-q" aria-expanded="false">Do I need an account?<span class="faq-icon">+</span></button><div class="faq-a"><p>No account is needed for the free core. Industry Packs require paid access.</p></div></div>
-          <div class="faq-item gs"><button class="faq-q" aria-expanded="false">Do I need Docker?<span class="faq-icon">+</span></button><div class="faq-a"><p>No. Use <code>npx agent-maturity-compass</code> or install with npm. Docker is optional.</p></div></div>
+          <div class="faq-item gs"><button class="faq-q" aria-expanded="false">Do I need Docker?<span class="faq-icon">+</span></button><div class="faq-a"><p>No. Use the verified macOS/Linux or Windows release installer above. Docker is optional.</p></div></div>
           <div class="faq-item gs"><button class="faq-q" aria-expanded="false">Can non-engineers use it?<span class="faq-icon">+</span></button><div class="faq-a"><p>Yes. Run <code>amc up</code> and use the local Studio dashboard.</p></div></div>
           <div class="faq-item gs"><button class="faq-q" aria-expanded="false">What is free and what is paid?<span class="faq-icon">+</span></button><div class="faq-a"><p>The core trust stack is MIT licensed: Score, Shield, Enforce, Vault, Watch, Comply, Fleet, Passport, adapters, Studio, reports, and CI gates. The paid add-on is <span class="hl">$9.99/month</span> access to all 41 Industry Domain Packs.</p></div></div>
         </div>

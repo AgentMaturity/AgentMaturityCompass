@@ -11,15 +11,15 @@
 </p>
 
 <p align="center">
-  <a href="https://www.npmjs.com/package/agent-maturity-compass"><img src="https://img.shields.io/npm/v/agent-maturity-compass?labelColor=0a0a0a&color=4AEF79" alt="npm version" /></a>
-  <a href="https://www.npmjs.com/package/agent-maturity-compass"><img src="https://img.shields.io/npm/dm/agent-maturity-compass?labelColor=0a0a0a&color=4AEF79" alt="downloads" /></a>
+  <a href="https://github.com/AgentMaturity/AgentMaturityCompass/releases"><img src="https://img.shields.io/github/v/release/AgentMaturity/AgentMaturityCompass?labelColor=0a0a0a&color=4AEF79&label=release" alt="GitHub release" /></a>
+  <a href="https://github.com/AgentMaturity/AgentMaturityCompass/releases"><img src="https://img.shields.io/github/downloads/AgentMaturity/AgentMaturityCompass/total?labelColor=0a0a0a&color=4AEF79&label=downloads" alt="verified release downloads" /></a>
   <a href="https://github.com/AgentMaturity/AgentMaturityCompass/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/AgentMaturity/AgentMaturityCompass/ci.yml?branch=main&labelColor=0a0a0a&color=4AEF79&label=CI" alt="CI" /></a>
-  <a href="https://github.com/AgentMaturity/AgentMaturityCompass/actions/workflows/ci.yml"><img src="https://img.shields.io/badge/tests-8%2C198%20passing-4AEF79?labelColor=0a0a0a" alt="tests" /></a>
+  <a href="https://github.com/AgentMaturity/AgentMaturityCompass/actions/workflows/ci.yml"><img src="https://img.shields.io/badge/tests-8%2C207%20passing-4AEF79?labelColor=0a0a0a" alt="tests" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-4AEF79?labelColor=0a0a0a" alt="MIT" /></a>
 </p>
 
 <p align="center">
-  <a href="#-60-seconds-to-your-first-score">Quick Start</a> ·
+  <a href="#60-seconds-to-your-first-score">Quick Start</a> ·
   <a href="https://agentmaturity.co/playground.html">Web Playground</a> ·
   <a href="docs/GETTING_STARTED.md">Docs</a> ·
   <a href="#-recipes--copy-paste-examples">Recipes</a> ·
@@ -34,7 +34,7 @@
 AMC scores AI agents from what they **actually do**, not what their docs say they do.
 
 ```bash
-npx agent-maturity-compass
+curl -fsSL https://agentmaturity.co/install.sh | sh
 ```
 
 One command. No account. No API key. You get:
@@ -72,21 +72,22 @@ That is the entire thesis: **trust, but verify — with receipts**.
 
 ---
 
-## ⚡ 60 Seconds to Your First Score
+## 60 Seconds to Your First Score
 
 ```bash
-# Install globally (or use npx below)
-npm i -g agent-maturity-compass
+# macOS or Linux: download the pinned GitHub release and verify SHA-256
+curl -fsSL https://agentmaturity.co/install.sh | sh
 
 # Score your agent
 cd your-agent-project
 amc
 ```
 
-Or skip the install entirely:
+On Windows PowerShell:
 
-```bash
-npx agent-maturity-compass
+```powershell
+irm https://agentmaturity.co/install.ps1 | iex
+amc
 ```
 
 Want a fast legacy pulse check instead of the full evidence score?
@@ -99,15 +100,16 @@ amc quickscore --answers answers.json --json  # non-interactive answer-based sco
 <details>
 <summary><strong>More install methods</strong></summary>
 
-**curl (no Node required)**
+**Verified release installer (Node.js 20 or 22 LTS required)**
 ```bash
 curl -fsSL https://agentmaturity.co/install.sh | sh
 ```
 
-**Homebrew**
-```bash
-brew tap AgentMaturity/amc && brew install agent-maturity-compass
+```powershell
+irm https://agentmaturity.co/install.ps1 | iex
 ```
+
+Each installer pins the AMC release, downloads the platform archive and `SHA256SUMS` from GitHub Releases, verifies the archive, then installs the included package. npm and Homebrew registry commands are intentionally not advertised until those public channels are live.
 
 **Docker**
 ```bash
@@ -293,7 +295,6 @@ AMC is one trust stack with eight named product surfaces:
 ### Score any agent in one line
 
 ```bash
-npx agent-maturity-compass        # full score, no setup
 amc                               # full score after global install
 amc run                           # explicit 8-surface maturity run
 amc run --question-set lifecycle  # opt-in 264-question lifecycle expansion
@@ -546,27 +547,19 @@ amc wrap <adapter> -- <your command>
 
 ---
 
-## 🚀 Install
+## Install AMC
 
-### npm (recommended)
-```bash
-npm i -g agent-maturity-compass
-```
-
-### npx (no install)
-```bash
-npx agent-maturity-compass
-```
-
-### Homebrew
-```bash
-brew tap AgentMaturity/amc && brew install agent-maturity-compass
-```
-
-### curl
+### macOS and Linux
 ```bash
 curl -fsSL https://agentmaturity.co/install.sh | sh
 ```
+
+### Windows PowerShell
+```powershell
+irm https://agentmaturity.co/install.ps1 | iex
+```
+
+Both scripts install a pinned GitHub release only after SHA-256 verification. They require Node.js 20 or 22 LTS. The npm registry and Homebrew tap are not public yet, so AMC does not present those channels as available.
 
 ### Docker
 ```bash
@@ -613,7 +606,7 @@ The full trust stack is **free and MIT licensed**. The only paid surface is Indu
 | Path | Best for | Start here |
 |------|----------|------------|
 | **Browser** | First-touch evaluation, demos, understanding scoring | [Web Playground](https://agentmaturity.co/playground.html) |
-| **CLI** | Real agent scoring, evidence capture, shareable outputs | `npx agent-maturity-compass` |
+| **CLI** | Real agent scoring, evidence capture, shareable outputs | [Install AMC](docs/INSTALL.md), then run `amc` |
 | **Desktop Studio** | macOS and Windows users who want a local launcher app | [Desktop Packages](docs/DESKTOP_PACKAGES.md) |
 | **CI/CD** | Release gates, score thresholds, PR comments | [CI Templates](docs/CI_TEMPLATES.md) |
 | **Enterprise** | Self-hosted, managed deployment | [Deployment Options](docs/DEPLOYMENT_OPTIONS.md) |
@@ -734,7 +727,7 @@ AMC is MIT licensed. We welcome contributions — especially new **assurance pac
 
 ```bash
 git clone https://github.com/AgentMaturity/AgentMaturityCompass.git
-cd AgentMaturityCompass && npm ci && npm test   # 1,038 files / 8,198 passing Vitest tests
+cd AgentMaturityCompass && npm ci && npm test   # 1,039 files / 8,207 passing Vitest tests
 ```
 
 **→ [CONTRIBUTING.md](CONTRIBUTING.md)** — includes guides for writing packs, mapping research papers, and adding adapters.

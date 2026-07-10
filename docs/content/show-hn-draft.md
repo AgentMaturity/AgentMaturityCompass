@@ -11,7 +11,7 @@ I built AMC (Agent Maturity Compass) because I got tired of agents that say "I'm
 AMC is an open-source CLI that scores AI agents from L0 (dangerous) to L5 (production-ready) based on what they actually do — not what their docs claim. One command, no account:
 
 ```
-npx agent-maturity-compass
+curl -fsSL https://agentmaturity.co/install.sh | sh && amc
 ```
 
 What makes it different from eval tools like Promptfoo:
@@ -30,6 +30,6 @@ What makes it different from eval tools like Promptfoo:
 
 The entire trust stack is MIT licensed and free. Only the industry-specific domain packs are paid.
 
-Tech: TypeScript, Commander CLI, Ed25519 crypto, SQLite evidence ledger, 8,198 passing Vitest tests, MCP server for AI coding assistants.
+Tech: TypeScript, Commander CLI, Ed25519 crypto, SQLite evidence ledger, 8,207 passing Vitest tests, MCP server for AI coding assistants.
 
 I'd love feedback on the scoring model and whether the evidence-weighted approach resonates. Happy to answer any questions about the architecture.

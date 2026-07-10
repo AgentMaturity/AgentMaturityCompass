@@ -13,7 +13,7 @@ AutoGen is Microsoft's framework for building multi-agent conversational systems
 
 - Python 3.11+
 - `pyautogen` package installed
-- AMC installed (`npm i -g agent-maturity-compass`)
+- AMC installed (`curl -fsSL https://agentmaturity.co/install.sh | sh`)
 
 ## Quick Start
 

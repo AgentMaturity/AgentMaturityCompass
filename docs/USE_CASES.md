@@ -6,7 +6,7 @@ AMC is easiest to understand when mapped to concrete jobs.
 Use this when you want the fastest useful answer.
 
 Typical path:
-1. `npx agent-maturity-compass`
+1. `curl -fsSL https://agentmaturity.co/install.sh | sh && amc`
 2. read the gaps
 3. run `amc fix`
 4. review `docs/AFTER_FIRST_SCORE.md`

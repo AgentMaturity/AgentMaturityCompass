@@ -13,7 +13,7 @@ LlamaIndex is a data framework for LLM applications. The AMC adapter captures in
 
 - Python 3.11+
 - `llama-index` package installed
-- AMC installed (`npm i -g agent-maturity-compass`)
+- AMC installed (`curl -fsSL https://agentmaturity.co/install.sh | sh`)
 
 ## Quick Start
 

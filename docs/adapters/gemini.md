@@ -12,7 +12,7 @@ The Gemini CLI adapter wraps Google's Gemini command-line interface, capturing m
 ## Prerequisites
 
 - Gemini CLI installed
-- AMC installed (`npm i -g agent-maturity-compass`)
+- AMC installed (`curl -fsSL https://agentmaturity.co/install.sh | sh`)
 
 ## Quick Start
 

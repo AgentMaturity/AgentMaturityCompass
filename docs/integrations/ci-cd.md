@@ -37,7 +37,7 @@ jobs:
 
 ```yaml
 - name: Install AMC
-  run: npm i -g agent-maturity-compass
+  run: curl -fsSL https://agentmaturity.co/install.sh | sh
 
 - name: Run AMC Score
   run: |
@@ -93,7 +93,7 @@ addopts = --amc-score --amc-min-level 3 --amc-fail-below
 - name: Install dependencies
   run: |
     pip install pytest pytest-amc
-    npm i -g agent-maturity-compass
+    curl -fsSL https://agentmaturity.co/install.sh | sh
 
 - name: Run tests with AMC gate
   run: pytest --amc-score --amc-min-level 3 --amc-fail-below

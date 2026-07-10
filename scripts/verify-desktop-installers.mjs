@@ -28,6 +28,23 @@ function run(command, args) {
   return result.stdout;
 }
 
+function readArchiveEntry(archivePath, entry) {
+  const command = archivePath.endsWith(".zip") ? "unzip" : "tar";
+  const args = archivePath.endsWith(".zip")
+    ? ["-p", archivePath, entry]
+    : ["-xOzf", archivePath, entry];
+  const result = spawnSync(command, args, {
+    cwd: root,
+    encoding: null,
+    timeout: 60_000,
+    maxBuffer: 100 * 1024 * 1024
+  });
+  if (result.status !== 0) {
+    fail(`could not read ${entry} from ${archivePath}\n${String(result.stderr ?? "")}`);
+  }
+  return result.stdout;
+}
+
 function assertArchiveContains(archivePath, entries) {
   const listing = archivePath.endsWith(".zip")
     ? run("unzip", ["-Z1", archivePath])
@@ -116,6 +133,22 @@ for (const pkg of manifest.packages ?? []) {
         : [])
     ];
   assertArchiveContains(archivePath, platformEntries);
+  const packageEntry = `${base}/agent-maturity-compass-${manifest.packageVersion}.tgz`;
+  const packagedTarball = readArchiveEntry(archivePath, packageEntry);
+  if (createHash("sha256").update(packagedTarball).digest("hex") !== manifest.npmTarball.sha256) {
+    fail(`nested npm tarball hash mismatch for ${pkg.platform}`);
+  }
+  const installerEntry = `${base}/${pkg.kind === "windows" ? "install.ps1" : "install.sh"}`;
+  const installer = readArchiveEntry(archivePath, installerEntry).toString("utf8");
+  if (!installer.includes(manifest.npmTarball.sha256)) {
+    fail(`installer does not pin the nested npm tarball hash for ${pkg.platform}`);
+  }
+  if (pkg.kind === "windows" && !installer.includes("Get-FileHash")) {
+    fail("Windows installer must verify the nested npm tarball with Get-FileHash");
+  }
+  if (pkg.kind !== "windows" && !installer.match(/sha256sum|shasum -a 256/)) {
+    fail(`Unix installer must verify the nested npm tarball for ${pkg.platform}`);
+  }
   if (pkg.platform === "macos-universal" && !pkg.appLaunchers?.some((launcher) => launcher.kind === "macos-app-bundle")) {
     fail("macOS package must declare the Studio app launcher in appLaunchers");
   }

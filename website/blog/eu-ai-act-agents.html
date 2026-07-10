@@ -211,7 +211,7 @@ tr:hover td{background:var(--bg2)}
 <h3>1. Assess your current state</h3>
 
 <pre><code><span style="color:#6a9955"># Install AMC</span>
-npm install -g agent-maturity-compass
+curl -fsSL https://agentmaturity.co/install.sh | sh
 
 <span style="color:#6a9955"># Get your baseline score with EU AI Act classification</span>
 amc compliance report --framework EU_AI_ACT</code></pre>
@@ -301,7 +301,8 @@ amc domain report --domain health --output reports/health-compliance.md</code></
 <div class="cta-box">
   <h3>Start your compliance assessment today</h3>
   <p>AMC is open source and MIT-licensed. Get your EU AI Act gap analysis in 2 minutes.</p>
-  <pre><code>npm install -g agent-maturity-compass && amc compliance report --framework EU_AI_ACT</code></pre>
+  <pre><code>curl -fsSL https://agentmaturity.co/install.sh | sh
+amc compliance report --framework EU_AI_ACT</code></pre>
 </div>
 
 <p>The current official timeline gives teams room to build evidence deliberately. Use that time to identify which obligations actually apply and close unsupported claims.</p>

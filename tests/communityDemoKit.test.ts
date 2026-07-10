@@ -13,7 +13,8 @@ describe("community demo kit", () => {
     expect(kit).toContain("# AMC Community Demo Kit");
     expect(kit).toContain("website/assets/amc-five-minute-terminal.svg");
     expect(kit).toContain("https://docs.github.com/en/get-started/writing-on-github/working-with-advanced-formatting/attaching-files");
-    expect(kit).toContain("npx agent-maturity-compass quickscore");
+    expect(kit).toContain("curl -fsSL https://agentmaturity.co/install.sh | sh");
+    expect(kit).toContain("amc quickscore --rapid");
     expect(kit).toContain("amc quickstart --startup-plan --role cto");
     expect(kit).toContain("amc business grc-export --portfolio risk-portfolio.json --out grc-treatment-plan.csv");
 
@@ -24,7 +25,7 @@ describe("community demo kit", () => {
 
     expect(svg).toContain(">AMC five-minute terminal demo</title>");
     expect(svg).toContain("role=\"img\"");
-    expect(svg).toContain("npx agent-maturity-compass quickscore");
+    expect(svg).toContain("amc quickscore --rapid");
     expect(svg).toContain("amc quickstart --startup-plan --role cto");
     expect(svg).toContain("L0 placeholder is not a measured maturity result");
   });

@@ -13,8 +13,16 @@ Get your AI agent's trust score in under 5 minutes. No code changes needed.
 ## 1. Install AMC (30 seconds)
 
 ```bash
-npm i -g agent-maturity-compass
+curl -fsSL https://agentmaturity.co/install.sh | sh
 ```
+
+Windows PowerShell:
+
+```powershell
+irm https://agentmaturity.co/install.ps1 | iex
+```
+
+The installer pins the GitHub release and verifies SHA-256 before execution. Node.js 20 or 22 LTS is required.
 
 Verify it worked:
 

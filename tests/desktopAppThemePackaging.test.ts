@@ -28,6 +28,9 @@ describe("desktop app packaging and visual identity", () => {
     expect(script).toContain("Could not start AMC Studio. See the launcher log");
     expect(script).toContain("/opt/homebrew/bin:/usr/local/bin");
     expect(script).toContain("PACKAGE_DIGEST");
+    expect(script).toContain("PACKAGE_SHA256");
+    expect(script).toContain("AMC package checksum mismatch");
+    expect(script).toContain("Get-FileHash");
     expect(script).toContain("npm install --prefix");
     expect(script).toContain("node_modules/.bin/amc");
     expect(script).toContain(String.raw`node_modules\\.bin\\amc.cmd`);
@@ -54,6 +57,8 @@ describe("desktop app packaging and visual identity", () => {
     expect(verifier).toContain("Agent Maturity Compass Studio.ps1");
     expect(verifier).toContain("Agent Maturity Compass Studio.cmd");
     expect(verifier).toContain("appLaunchers");
+    expect(verifier).toContain("nested npm tarball hash mismatch");
+    expect(verifier).toContain("installer does not pin the nested npm tarball hash");
   });
 
   test("Studio dashboard uses the shared website-aligned console shell", () => {

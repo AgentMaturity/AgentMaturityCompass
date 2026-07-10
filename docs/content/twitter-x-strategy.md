@@ -57,5 +57,5 @@ Better: [AMC's approach in 1 sentence]
 
 [Evidence/screenshot]
 
-`npx agent-maturity-compass`
+`curl -fsSL https://agentmaturity.co/install.sh | sh && amc`
 ```

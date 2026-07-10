@@ -66,7 +66,8 @@ describe("cross-surface AMC brand identity", () => {
     expect(docs).toContain("Run one command");
     expect(docs).toContain("Get the full score. Fix the gaps.");
     expect(docs).toContain("Evidence over claims.");
-    expect(docs).toContain("npx agent-maturity-compass");
+    expect(docs).toContain("curl -fsSL https://agentmaturity.co/install.sh | sh");
+    expect(docs).toContain("irm https://agentmaturity.co/install.ps1 | iex");
     expect(styles).toContain(".welcome-hero");
     expect(styles).toContain(".welcome-command");
   });

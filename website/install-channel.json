@@ -1,0 +1,33 @@
+{
+  "schemaVersion": "2026-07-10",
+  "packageVersion": "1.1.0",
+  "primary": {
+    "unix": {
+      "label": "macOS and Linux",
+      "command": "curl -fsSL https://agentmaturity.co/install.sh | sh"
+    },
+    "windows": {
+      "label": "Windows PowerShell",
+      "command": "irm https://agentmaturity.co/install.ps1 | iex"
+    }
+  },
+  "channels": {
+    "githubRelease": {
+      "status": "available",
+      "integrity": "SHA-256 release manifest",
+      "url": "https://github.com/AgentMaturity/AgentMaturityCompass/releases"
+    },
+    "npm": {
+      "status": "unavailable",
+      "reason": "The public npm package has not been published. AMC does not advertise npx or global registry installs until the registry confirms availability."
+    },
+    "homebrew": {
+      "status": "unavailable",
+      "reason": "The public Homebrew tap has not been released."
+    },
+    "source": {
+      "status": "available",
+      "url": "https://github.com/AgentMaturity/AgentMaturityCompass"
+    }
+  }
+}

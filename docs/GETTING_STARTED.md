@@ -10,9 +10,19 @@ AMC (Agent Maturity Compass) scores your AI agent's trustworthiness from actual 
 
 **Prerequisites:** Node.js ≥ 20. AMC uses `better-sqlite3` which includes prebuilt binaries for most platforms. If prebuilds aren't available for your OS/arch, you'll need Python 3 and a C++ compiler (`build-essential` on Linux, Xcode CLI tools on macOS).
 
+macOS or Linux:
+
 ```bash
-npm i -g agent-maturity-compass
+curl -fsSL https://agentmaturity.co/install.sh | sh
 ```
+
+Windows PowerShell:
+
+```powershell
+irm https://agentmaturity.co/install.ps1 | iex
+```
+
+The hosted installer pins a GitHub release and verifies the downloaded platform archive against `SHA256SUMS` before it runs the packaged installer. AMC does not advertise npm or Homebrew registry channels until they are public.
 
 ## Your First Full Score (2 minutes)
 

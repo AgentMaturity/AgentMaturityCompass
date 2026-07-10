@@ -2,19 +2,21 @@
 
 ## Overview
 
-AMC is distributed through 5 channels:
+AMC has five distribution channels with explicit availability:
 
 | Channel | Status | Command |
 |---------|--------|---------|
-| **npm** | ✅ Ready | `npm i -g agent-maturity-compass` |
-| **GitHub Releases** | ✅ Ready | `.amcrelease` bundles + SBOM |
-| **Docker / GHCR** | Release workflow ready; public visibility must be verified | local build first; GHCR after package visibility check |
-| **Single-binary (SEA)** | 🧪 Experimental | host-built `amc` binary artifact |
-| **Homebrew** | 🔜 Pending | `brew install AgentMaturity/tap/amc` |
+| **Verified GitHub release installer** | Available | `curl -fsSL https://agentmaturity.co/install.sh \| sh` or Windows PowerShell installer |
+| **npm** | Unavailable until the first registry publish is verified | Do not advertise `npx` or global registry installs |
+| **Docker / GHCR** | Release workflow ready; public visibility must be verified | local build first; GHCR after anonymous-pull verification |
+| **Single-binary (SEA)** | Experimental | host-built `amc` binary artifact |
+| **Homebrew** | Unavailable until the tap exists and formula is verified | Do not advertise a tap command |
 
 ---
 
-## 1. npm — `agent-maturity-compass`
+## 1. npm publication - `agent-maturity-compass`
+
+The package name currently returns 404 from the public npm registry. npm remains a conditional release output, not a user-facing install channel. The tag workflow skips npm without failing GitHub asset publication when `NPM_TOKEN` is absent.
 
 ### Pre-publish checklist
 ```bash
@@ -45,7 +47,7 @@ npm publish
 GitHub repo → Settings → Secrets → Actions
 Add secret: NPM_TOKEN = <your automation token>
 ```
-The `release.yml` workflow uses this automatically on `git push v*.*.*`.
+The `release.yml` workflow uses this automatically on `git push v*.*.*`. Until the package URL returns a real version, keep `website/install-channel.json` set to `unavailable` for npm.
 
 ### Package metadata (already in package.json)
 - `name: "agent-maturity-compass"` — the install name
@@ -55,26 +57,26 @@ The `release.yml` workflow uses this automatically on `git push v*.*.*`.
 
 ---
 
-## 2. GitHub Releases + SBOM
+## 2. Verified GitHub Releases
 
 Automatic on every `git tag v*.*.*` push:
 
 ```bash
-# Bump version
-npm version patch                    # updates package.json + commits
-git push origin main --follow-tags   # triggers release.yml CI
+# Apply pending Changesets, review the version/changelog, then tag the exact commit
+npm run version-packages
+git commit -am "Release AMC <version>"
+git tag -a v<version> -m "AMC v<version>"
+git push origin main
+git push origin v<version>
 
 # What CI does:
-# 1. npm test + build
-# 2. Build .amcrelease bundle (release pack)
-# 3. Build + push Docker image to GHCR
-# 4. npm publish
-# 5. Create GitHub Release with:
-#    - amc-{VERSION}.amcrelease bundle
-#    - sbom.cdx.json (CycloneDX SBOM)
-#    - licenses.json
-#    - provenance.json
-#    - release-verify.txt
+# 1. Run tests, build, and prepack guardrails
+# 2. Build native macOS plus Linux and Windows desktop archives on macOS CI
+# 3. Verify archives and emit SHA256SUMS + amc-release-manifest.json
+# 4. Build + push the Docker image to GHCR
+# 5. Build a signed .amcrelease only when AMC_RELEASE_SIGNING_KEY exists
+# 6. Publish npm only when NPM_TOKEN exists and the version is not already live
+# 7. Create the GitHub Release even when npm/signing credentials are absent
 ```
 
 ---
@@ -166,22 +168,22 @@ mkdir -p ~/homebrew-tap/Formula
 cp Formula/amc.rb ~/homebrew-tap/Formula/amc.rb
 cd ~/homebrew-tap && git init && git add . && git push AgentMaturity/homebrew-tap main
 
-# 3. Get the SHA256 of the npm tarball AFTER publishing
-curl -s https://registry.npmjs.org/agent-maturity-compass/latest | \
-  python3 -c "import json,sys; d=json.load(sys.stdin); print(d['dist']['tarball'])"
-# Download the tarball and sha256sum it
-curl -sL <tarball-url> | sha256sum
+# 3. Use the package tarball and SHA-256 attached to the verified GitHub release
+VERSION=<released-version>
+curl -fsSLO "https://github.com/AgentMaturity/AgentMaturityCompass/releases/download/v${VERSION}/SHA256SUMS"
+grep "agent-maturity-compass-${VERSION}.tgz" SHA256SUMS
 
 # 4. Update Formula/amc.rb with real sha256 and tarball URL
 # 5. Push to homebrew-tap repo
 
 # Users then install with:
-brew tap AgentMaturity/tap
-brew install amc
+# Do not publish a user command until the tap repository and formula test pass.
 ```
 
 ### Automate SHA256 update on release
-Add to `release.yml` after npm publish:
+The current `release.yml` already updates the tap from the GitHub release tarball when `HOMEBREW_TAP_TOKEN` is configured. Keep the channel unavailable until a clean-machine formula test passes.
+
+Reference shape:
 ```yaml
 - name: Update Homebrew formula
   if: startsWith(github.ref, 'refs/tags/v')
@@ -189,8 +191,8 @@ Add to `release.yml` after npm publish:
     HOMEBREW_TAP_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}
   run: |
     VERSION=$(node -e 'process.stdout.write(require("./package.json").version)')
-    TARBALL="https://registry.npmjs.org/agent-maturity-compass/-/agent-maturity-compass-${VERSION}.tgz"
-    SHA256=$(curl -sL "$TARBALL" | sha256sum | cut -d' ' -f1)
+    TARBALL="https://github.com/${GITHUB_REPOSITORY}/releases/download/v${VERSION}/agent-maturity-compass-${VERSION}.tgz"
+    SHA256=$(awk -v asset="agent-maturity-compass-${VERSION}.tgz" '$2 == asset { print $1 }' dist/release-assets/SHA256SUMS)
     
     git clone https://x-access-token:${HOMEBREW_TAP_TOKEN}@github.com/AgentMaturity/homebrew-tap.git /tmp/homebrew-tap
     sed -i "s|url \".*\"|url \"${TARBALL}\"|" /tmp/homebrew-tap/Formula/amc.rb
@@ -199,7 +201,7 @@ Add to `release.yml` after npm publish:
     
     cd /tmp/homebrew-tap
     git config user.name "AMC Release Bot"
-    git config user.email "releases@agentmaturitycompass.dev"
+    git config user.email "releases@agentmaturity.co"
     git add Formula/amc.rb
     git commit -m "chore: bump amc formula to v${VERSION}"
     git push
@@ -213,42 +215,35 @@ HOMEBREW_TAP_TOKEN = GitHub Personal Access Token with repo:write scope
 
 ---
 
-## 5. One-liner Install Script (optional)
+## 6. Hosted verified installers
 
-For `curl | sh` style installs — convenience for non-npm users:
+`website/install.sh` and `website/install.ps1` are the canonical public bootstrap paths. They:
 
-```bash
-# Create: website/install.sh
-#!/usr/bin/env bash
-set -euo pipefail
-
-if command -v npm &>/dev/null; then
-  npm install -g agent-maturity-compass
-elif command -v brew &>/dev/null; then
-  brew tap AgentMaturity/tap && brew install amc
-else
-  echo "Install Node.js from https://nodejs.org then run: npm i -g agent-maturity-compass"
-  exit 1
-fi
-
-echo "✓ AMC installed. Run: amc init && amc quickscore"
-```
+- pin a specific AMC release version;
+- download the exact platform archive and `SHA256SUMS` from that release;
+- reject missing, malformed, or mismatched hashes;
+- reject unsafe archive paths;
+- run only the installer contained in the verified archive;
+- require that archive installer to verify its included package tarball again.
 
 Host at: `agentmaturity.co/install.sh`
 
-Users run: `curl -fsSL https://agentmaturity.co/install.sh | sh`
+Users run `curl -fsSL https://agentmaturity.co/install.sh | sh` on macOS/Linux or `irm https://agentmaturity.co/install.ps1 | iex` in Windows PowerShell.
 
 ---
 
 ## Release Checklist
 
 ```
-[ ] npm version patch/minor/major
-[ ] git push origin main --follow-tags
-[ ] CI passes (test + build + publish)
-[ ] GitHub Release created with all artifacts
-[ ] Docker image live on GHCR
-[ ] Homebrew formula auto-updated
+[ ] Apply pending Changesets and review the resulting version/changelog
+[ ] Commit the release version and push `main`
+[ ] Create and push the matching annotated tag
+[ ] Release CI passes tests, builds, package verification, and checksums
+[ ] GitHub Release contains all three platform archives, npm-format tarball, manifest, and `SHA256SUMS`
+[ ] Run both checksum-negative and clean-install verification
+[ ] Verify Docker image visibility before publishing its pull command
+[ ] Verify npm independently before marking its channel available
+[ ] Verify Homebrew independently before marking its channel available
 [ ] Website install tabs updated if version shown
 [ ] Tweet / announce in community
 ```

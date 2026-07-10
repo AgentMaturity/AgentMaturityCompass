@@ -31,7 +31,7 @@
   <text x="84" y="188" class="sub">Score an agent, avoid placeholder confusion, then export business-risk proof.</text>
   <line x1="84" y1="214" x2="1114" y2="214" class="line"/>
 
-  <text x="84" y="260" class="mono cmd">$ npx agent-maturity-compass quickscore</text>
+  <text x="84" y="260" class="mono cmd">$ amc quickscore --rapid</text>
   <text x="112" y="296" class="mono out"><tspan class="accent">Score:</tspan> L0 / 50</text>
   <text x="112" y="326" class="mono out"><tspan class="warn">Warning:</tspan> L0 placeholder is not a measured maturity result</text>
 

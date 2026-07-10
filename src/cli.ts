@@ -56,6 +56,7 @@ import {
 import { gatewayStatus, startGateway } from "./gateway/server.js";
 import { sha256Hex } from "./utils/hash.js";
 import { canonicalize } from "./utils/json.js";
+import { amcVersion } from "./version.js";
 import {
   buildEnforceResourceManifest,
   diffEnforceResourceManifests,
@@ -1969,7 +1970,7 @@ const program = new Command();
 program
   .name("amc")
   .description("Agent Maturity Compass")
-  .version("1.0.0")
+  .version(amcVersion)
   .enablePositionalOptions()
   .passThroughOptions()
   .showSuggestionAfterError(true)

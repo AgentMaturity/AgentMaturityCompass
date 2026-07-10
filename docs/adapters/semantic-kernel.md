@@ -13,7 +13,7 @@ Microsoft's Semantic Kernel is an SDK for integrating LLMs with conventional pro
 
 - Node.js 22+ (for TypeScript/JavaScript) or .NET 8+ (for C#)
 - `@microsoft/semantic-kernel` npm package (Node.js)
-- AMC installed (`npm i -g agent-maturity-compass`)
+- AMC installed (`curl -fsSL https://agentmaturity.co/install.sh | sh`)
 
 ## Quick Start
 

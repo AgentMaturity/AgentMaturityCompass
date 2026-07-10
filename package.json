@@ -1,6 +1,6 @@
 {
   "name": "agent-maturity-compass",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Tamper-evident maturity scoring, red-team testing, and compliance toolkit for AI agents",
   "type": "module",
   "main": "dist/index.js",
@@ -23,6 +23,8 @@
     "build:sea": "node scripts/build-sea.mjs",
     "package:desktop": "node scripts/package-desktop-installers.mjs",
     "package:desktop:verify": "node scripts/verify-desktop-installers.mjs",
+    "release:prepare-assets": "node scripts/prepare-public-release-assets.mjs",
+    "release:verify-version": "node scripts/verify-release-version.mjs",
     "copy-assets": "rm -rf dist/console/pages dist/console/assets dist/dashboard/templates && mkdir -p dist/console dist/dashboard && cp -r src/console/pages dist/console/pages && cp -r src/console/assets dist/console/assets && cp -r src/dashboard/templates dist/dashboard/templates",
     "dev": "tsx src/cli.ts",
     "api:start": "tsx api/index.ts",

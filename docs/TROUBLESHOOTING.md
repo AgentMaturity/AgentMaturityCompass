@@ -17,13 +17,13 @@ If AMC feels broken, confusing, or half-initialized, start there.
 Install AMC first:
 
 ```bash
-npm i -g agent-maturity-compass
+curl -fsSL https://agentmaturity.co/install.sh | sh
 ```
 
 Or run without installing:
 
 ```bash
-npx agent-maturity-compass
+curl -fsSL https://agentmaturity.co/install.sh | sh && amc
 ```
 
 ### Install fails on Node version / native module issues

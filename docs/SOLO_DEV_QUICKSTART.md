@@ -9,13 +9,13 @@ Get from zero to first score with the least possible ceremony.
 ## Fast path
 
 ```bash
-npx agent-maturity-compass
+curl -fsSL https://agentmaturity.co/install.sh | sh && amc
 ```
 
 Or install AMC globally:
 
 ```bash
-npm i -g agent-maturity-compass
+curl -fsSL https://agentmaturity.co/install.sh | sh
 amc init
 amc doctor
 amc

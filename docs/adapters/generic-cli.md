@@ -12,7 +12,7 @@ The generic CLI adapter is the universal fallback for any command-line agent. It
 ## Prerequisites
 
 - Any executable agent (shell script, binary, Python script, Node.js app, etc.)
-- AMC installed (`npm i -g agent-maturity-compass`)
+- AMC installed (`curl -fsSL https://agentmaturity.co/install.sh | sh`)
 
 ## Quick Start
 

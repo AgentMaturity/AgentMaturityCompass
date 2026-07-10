@@ -56,7 +56,8 @@ section{padding:clamp(5rem,10vw,8rem) 0;position:relative;z-index:1}
 .hero-h1-gray{color:var(--text-muted);font-weight:400}
 .hero-h1-accent{color:var(--accent);font-weight:400}
 .hero-sub{font-size:clamp(1rem,1.5vw,1.15rem);color:var(--text-muted);margin-top:2rem;line-height:1.7;max-width:500px}
-.hero-install{font-family:var(--mono);font-size:.95rem;color:var(--text-muted);background:rgba(255,255,255,.04);border:1px solid var(--border);padding:1rem 1.8rem;cursor:pointer;transition:border-color .2s;display:inline-flex;align-items:center;gap:.6rem;width:100%;justify-content:flex-start}
+.hero-install{font-family:var(--mono);font-size:.82rem;color:var(--text-muted);background:rgba(255,255,255,.04);border:1px solid var(--border);padding:1rem 1.4rem;cursor:pointer;transition:border-color .2s;display:inline-flex;align-items:flex-start;gap:.6rem;width:100%;justify-content:flex-start}
+.hero-install-command{min-width:0;color:inherit;background:none;padding:0;overflow-wrap:anywhere;line-height:1.5}
 .hero-install:hover{border-color:var(--accent);color:var(--text)}
 .hi-prompt{color:var(--accent);font-weight:700}
 .hero-btns{display:flex;flex-direction:column;gap:.8rem;flex-wrap:wrap;width:100%;align-items:stretch}.hero-btns .btn{width:100%;justify-content:center}
@@ -211,6 +212,7 @@ section{padding:clamp(5rem,10vw,8rem) 0;position:relative;z-index:1}
 .pricing-card h3{font-size:1.2rem;margin-bottom:.75rem;text-transform:none}
 .pricing-card p{font-size:.88rem;color:var(--text-muted);line-height:1.55;margin-bottom:1.5rem}
 .pricing-card .items{font-family:var(--mono);font-size:.75rem;color:var(--text-muted);line-height:2;margin-bottom:2rem}
+.pricing-card .install-command{overflow-wrap:anywhere}
 .pricing-card .btn{width:100%;justify-content:center}
 .pricing-buyer-link{max-width:760px;margin:1.5rem auto 0;text-align:center;color:var(--text-muted);font-size:.86rem;line-height:1.65}
 .pricing-buyer-link a{color:var(--accent);text-decoration:underline;text-underline-offset:3px;font-weight:700}

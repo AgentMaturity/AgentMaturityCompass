@@ -14,7 +14,10 @@
 - [Governance](https://agentmaturity.co/docs/#GOVERNANCE)
 
 ## Install
-npm i -g agent-maturity-compass
+macOS/Linux: curl -fsSL https://agentmaturity.co/install.sh | sh
+Windows PowerShell: irm https://agentmaturity.co/install.ps1 | iex
+
+The installers pin a GitHub release and verify SHA-256 before execution. The npm registry and Homebrew tap are not public channels yet.
 
 ## Full Score
 amc
@@ -31,7 +34,7 @@ amc
 ## Links
 - [Website](https://agentmaturity.co/)
 - [GitHub](https://github.com/AgentMaturity/AgentMaturityCompass)
-- [npm](https://www.npmjs.com/package/agent-maturity-compass)
+- [Verified releases](https://github.com/AgentMaturity/AgentMaturityCompass/releases)
 - [Comparison](https://agentmaturity.co/compare.html)
 - [Blog](https://agentmaturity.co/blog.html)
 - [Changelog](https://agentmaturity.co/changelog.html)

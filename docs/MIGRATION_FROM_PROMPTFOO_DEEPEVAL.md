@@ -180,7 +180,7 @@ scenarios:
 ### 1. Install AMC
 
 ```bash
-npm i -g agent-maturity-compass
+curl -fsSL https://agentmaturity.co/install.sh | sh
 ```
 
 ### 2. Initialize in your project

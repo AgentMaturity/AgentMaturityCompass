@@ -13,7 +13,7 @@ OpenHands (formerly OpenDevin) is an open-source autonomous software engineer. T
 
 - Python 3.11+
 - OpenHands installed (`pip install openhands`)
-- AMC installed (`npm i -g agent-maturity-compass`)
+- AMC installed (`curl -fsSL https://agentmaturity.co/install.sh | sh`)
 
 ## Quick Start
 

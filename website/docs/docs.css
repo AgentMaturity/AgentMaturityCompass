@@ -344,6 +344,22 @@ code, pre { font-family: var(--mono); }
   color: var(--green);
   font-weight: 700;
 }
+.welcome-install-grid {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+.welcome-install-option { min-width: 0; }
+.welcome-platform {
+  margin-bottom: 6px;
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 0.64rem;
+  text-transform: uppercase;
+}
+.welcome-install-option .welcome-command { width: 100%; height: 100%; }
 .stat-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -467,7 +483,8 @@ code, pre { font-family: var(--mono); }
   .welcome-hero h1 { font-size: 2.25rem; }
   .stat-grid,
   .quick-links,
-  .feature-cards { grid-template-columns: 1fr; }
+  .feature-cards,
+  .welcome-install-grid { grid-template-columns: 1fr; }
   .doc-brandline {
     grid-template-columns: minmax(0, 1fr);
     gap: 4px;

@@ -12,7 +12,7 @@ Supported clients: Claude Code, Cursor, GitHub Copilot (VS Code), Windsurf, Kiro
 
 ```bash
 # 1. Install AMC globally
-npm install -g agent-maturity-compass
+curl -fsSL https://agentmaturity.co/install.sh | sh
 
 # 2. Add to your IDE's MCP config (see configs below)
 

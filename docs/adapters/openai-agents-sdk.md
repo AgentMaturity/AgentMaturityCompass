@@ -13,7 +13,7 @@ The OpenAI Agents SDK adapter provides first-class instrumentation for OpenAI's 
 
 - Node.js 22+
 - `@openai/agents-sdk` npm package
-- AMC installed (`npm i -g agent-maturity-compass`)
+- AMC installed (`curl -fsSL https://agentmaturity.co/install.sh | sh`)
 
 ## Quick Start
 

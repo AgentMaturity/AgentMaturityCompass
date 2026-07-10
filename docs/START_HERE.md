@@ -39,8 +39,11 @@ Next step:
 Use the CLI.
 
 ```bash
-npx agent-maturity-compass
+curl -fsSL https://agentmaturity.co/install.sh | sh
+amc
 ```
+
+On Windows PowerShell, install with `irm https://agentmaturity.co/install.ps1 | iex`, then run `amc`.
 
 The first run is an honest baseline. A signed `VALID` artifact can still be `INSUFFICIENT_EVIDENCE`; capture a real agent run and rerun before making external claims. Only evidence readiness `READY` is claim-eligible.
 
@@ -139,7 +142,7 @@ If you are new, start with:
 
 ## Recommended first 15 minutes
 
-1. Run `npx agent-maturity-compass`
+1. Install from the verified release script, then run `amc`
 2. Read the gaps
 3. Run `amc fix`
 4. Read `docs/AFTER_FIRST_SCORE.md`

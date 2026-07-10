@@ -91,7 +91,7 @@ Each question references specific regulatory articles — not vague guidelines.
 
 ### Option 1: Ask Your Engineering Team
 ```
-Install: npm i -g agent-maturity-compass
+Install: curl -fsSL https://agentmaturity.co/install.sh | sh
 First score: amc
 Board one-pager: amc executive brief --run latest --out board-brief.html
 Full report: amc report latest --executive --html executive-report.html

@@ -19,7 +19,7 @@ Most tools measure prompts, traces, or isolated eval cases. AMC measures operati
 ## Five-Minute Proof Path
 
 ```bash
-npx agent-maturity-compass quickscore
+curl -fsSL https://agentmaturity.co/install.sh | sh && amc quickscore --rapid
 amc quickstart --startup-plan --role cto
 amc business risk --maturity 3 --baseline-frequency 4 --incident-cost 50000 --json
 amc business grc-export --portfolio risk-portfolio.json --out grc-treatment-plan.csv

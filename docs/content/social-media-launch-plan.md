@@ -61,7 +61,7 @@ The credit score for AI agents. Open source, free, 60 seconds.
 
 One command. No account. No API key.
 
-npx agent-maturity-compass
+curl -fsSL https://agentmaturity.co/install.sh | sh && amc
 
 Thread 🧵
 ```

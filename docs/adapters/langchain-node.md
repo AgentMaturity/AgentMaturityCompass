@@ -13,7 +13,7 @@ The LangChain Node.js adapter captures evidence from LangChain.js agents. It use
 
 - Node.js 22+
 - `langchain` and `@langchain/core` npm packages
-- AMC installed (`npm i -g agent-maturity-compass`)
+- AMC installed (`curl -fsSL https://agentmaturity.co/install.sh | sh`)
 
 ## Quick Start
 

@@ -84,17 +84,15 @@ npm --version    <span class="comment"># Should be v9+ or higher</span></code></
 
       <!-- Install -->
       <h2 id="install">Installation</h2>
-      <h3>npm (recommended)</h3>
-      <pre><code>npm install -g agent-maturity-compass</code></pre>
-      <p>Verify the installation:</p>
-      <pre><code>amc --version</code></pre>
-
-      <h3>Homebrew (macOS / Linux)</h3>
-      <pre><code>brew tap AgentMaturity/amc
-brew install agent-maturity-compass</code></pre>
-
-      <h3>Quick install script</h3>
+      <h3>macOS and Linux</h3>
       <pre><code>curl -fsSL https://agentmaturity.co/install.sh | sh</code></pre>
+
+      <h3>Windows PowerShell</h3>
+      <pre><code>irm https://agentmaturity.co/install.ps1 | iex</code></pre>
+
+      <p>Both installers pin the GitHub release, download the platform archive and <code>SHA256SUMS</code>, and refuse to run the packaged installer when verification fails. Verify the installed CLI:</p>
+      <pre><code>amc --version
+amc doctor</code></pre>
 
       <h3>Docker (zero setup)</h3>
       <pre><code><span class="comment"># Build the quickstart image</span>

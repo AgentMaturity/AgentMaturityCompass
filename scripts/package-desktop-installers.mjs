@@ -59,35 +59,63 @@ function latestPackedTarball(searchRoot) {
   return files[0];
 }
 
-function writeUnixInstaller(targetDir, tarballName) {
+function writeUnixInstaller(targetDir, tarballName, tarballDigest) {
   const script = `#!/usr/bin/env sh
 set -eu
 
 SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 PACKAGE="$SCRIPT_DIR/${tarballName}"
+PACKAGE_SHA256="${tarballDigest}"
 
 if ! command -v npm >/dev/null 2>&1; then
   echo "npm is required. Install Node.js 20 or 22 LTS from https://nodejs.org and rerun this installer." >&2
   exit 1
 fi
 
-npm install -g "$PACKAGE"
+if command -v sha256sum >/dev/null 2>&1; then
+  ACTUAL_SHA256=$(sha256sum "$PACKAGE" | awk '{print $1}')
+elif command -v shasum >/dev/null 2>&1; then
+  ACTUAL_SHA256=$(shasum -a 256 "$PACKAGE" | awk '{print $1}')
+else
+  echo "sha256sum or shasum is required." >&2
+  exit 1
+fi
+if [ "$ACTUAL_SHA256" != "$PACKAGE_SHA256" ]; then
+  echo "AMC package checksum mismatch; refusing to install." >&2
+  exit 1
+fi
+
+if [ -n "\${AMC_INSTALL_PREFIX:-}" ]; then
+  npm install -g --prefix "$AMC_INSTALL_PREFIX" --no-audit --no-fund "$PACKAGE"
+else
+  npm install -g --no-audit --no-fund "$PACKAGE"
+fi
 echo "AMC installed. Run: amc --version && amc doctor"
 `;
   const path = join(targetDir, "install.sh");
   writeFileSync(path, script, { mode: 0o755 });
 }
 
-function writeWindowsInstaller(targetDir, tarballName) {
+function writeWindowsInstaller(targetDir, tarballName, tarballDigest) {
   const script = `$ErrorActionPreference = "Stop"
 
 $Package = Join-Path $PSScriptRoot "${tarballName}"
+$PackageSha256 = "${tarballDigest}"
 
 if (-not (Get-Command npm -ErrorAction SilentlyContinue)) {
   Write-Error "npm is required. Install Node.js 20 or 22 LTS from https://nodejs.org and rerun this installer."
 }
 
-npm install -g $Package
+$ActualSha256 = (Get-FileHash -Algorithm SHA256 -Path $Package).Hash.ToLowerInvariant()
+if ($ActualSha256 -ne $PackageSha256) {
+  throw "AMC package checksum mismatch; refusing to install."
+}
+
+if (-not [string]::IsNullOrWhiteSpace($env:AMC_INSTALL_PREFIX)) {
+  npm install -g --prefix $env:AMC_INSTALL_PREFIX --no-audit --no-fund $Package
+} else {
+  npm install -g --no-audit --no-fund $Package
+}
 Write-Host "AMC installed. Run: amc --version; amc doctor"
 `;
   writeFileSync(join(targetDir, "install.ps1"), script);
@@ -486,6 +514,7 @@ const platforms = [
 rmSync(outRoot, { recursive: true, force: true });
 
 run("npm", ["run", "build"], { stdio: "inherit", timeoutMs: 300_000 });
+run("npm", ["run", "release:verify-version"], { stdio: "inherit", timeoutMs: 60_000 });
 mkdirSync(packWorkRoot, { recursive: true });
 run("npm", ["pack", "--ignore-scripts", "--pack-destination", packWorkRoot], { stdio: "inherit", timeoutMs: 180_000 });
 
@@ -505,10 +534,10 @@ for (const platform of platforms) {
   cpSync(tarball, join(packageDir, tarballName));
   const appLaunchers = [];
   if (platform.kind === "windows") {
-    writeWindowsInstaller(packageDir, tarballName);
+    writeWindowsInstaller(packageDir, tarballName, tarballDigest);
     appLaunchers.push(...writeWindowsStudioApp(packageDir, tarballName, tarballDigest));
   } else {
-    writeUnixInstaller(packageDir, tarballName);
+    writeUnixInstaller(packageDir, tarballName, tarballDigest);
     if (platform.id === "macos-universal") {
       appLaunchers.push(...writeMacStudioApp(packageDir, tarballName, tarballDigest));
     }

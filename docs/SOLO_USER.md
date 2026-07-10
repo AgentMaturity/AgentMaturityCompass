@@ -6,7 +6,7 @@ Score your personal AI agent and improve over time. No enterprise setup needed.
 
 ```bash
 # Install
-npm i -g agent-maturity-compass
+curl -fsSL https://agentmaturity.co/install.sh | sh
 
 # Initialize workspace
 amc init

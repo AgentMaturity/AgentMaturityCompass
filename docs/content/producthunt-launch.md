@@ -21,7 +21,7 @@ I built AMC because I was tired of AI agents that say "I'm safe" with zero proof
 
 AMC is a CLI that scores agents based on what they actually do — not what their docs claim. Evidence is cryptographically signed so scores can't be tampered with.
 
-Try it in 60 seconds: `npx agent-maturity-compass`
+Try it in 60 seconds: `curl -fsSL https://agentmaturity.co/install.sh | sh && amc`
 
 Key features:
 🧭 L0-L5 maturity scoring across 5 dimensions

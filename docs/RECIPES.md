@@ -4,7 +4,7 @@ These are the smallest useful AMC workflows.
 
 ## 1. Get a first score
 ```bash
-npx agent-maturity-compass
+curl -fsSL https://agentmaturity.co/install.sh | sh && amc
 ```
 
 ## 2. Add a CI trust gate

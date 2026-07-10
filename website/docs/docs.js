@@ -337,7 +337,16 @@ function showWelcome() {
         <div class="welcome-kicker">Evidence over claims.</div>
         <h1>Run one command<span class="brand-cursor">_</span></h1>
         <p class="welcome-lede"><strong>Get the full score. Fix the gaps.</strong> Use the same evidence-first workflow across CLI, Studio, API, desktop, and CI. A valid seal proves artifact integrity; evidence readiness decides whether claims are eligible.</p>
-        <div class="welcome-command"><span>$</span> npx agent-maturity-compass</div>
+        <div class="welcome-install-grid">
+          <div class="welcome-install-option">
+            <div class="welcome-platform">macOS + Linux</div>
+            <div class="welcome-command"><span>$</span> curl -fsSL https://agentmaturity.co/install.sh | sh</div>
+          </div>
+          <div class="welcome-install-option">
+            <div class="welcome-platform">Windows PowerShell</div>
+            <div class="welcome-command"><span>PS&gt;</span> irm https://agentmaturity.co/install.ps1 | iex</div>
+          </div>
+        </div>
       </section>
 
       <div class="stat-grid">
