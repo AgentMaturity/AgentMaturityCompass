@@ -68,8 +68,10 @@ export async function handleConfigRoute(
   // GET /api/v1/config/doctor — run doctor checks
   if (pathname === '/api/v1/config/doctor' && method === 'GET') {
     try {
-      const { runDoctor } = await import('../workspace.js');
-      const result = await runDoctor(workspace);
+      const strictParam = queryParam(req.url ?? '', 'strict')?.trim().toLowerCase();
+      const strict = strictParam === 'true' || strictParam === '1';
+      const { runDoctorCli } = await import('../doctor/doctorCli.js');
+      const result = await runDoctorCli(workspace, { strict });
       apiSuccess(res, result);
     } catch (err) {
       apiError(res, 500, err instanceof Error ? err.message : 'Doctor check failed');

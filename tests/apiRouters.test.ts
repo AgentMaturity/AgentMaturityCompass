@@ -1426,6 +1426,14 @@ describe("AMC API routers", () => {
     expect(configData.nested.token).toBe("[REDACTED]");
     await assertJsonRoute(handleConfigRoute, { pathname: "/api/v1/config/logs", method: "GET", url: "/api/v1/config/logs?lines=2", workspace: ws });
     await assertJsonRoute(handleConfigRoute, { pathname: "/api/v1/config/doctor", method: "GET", workspace: ws });
+    expect(m.runDoctorCli).toHaveBeenLastCalledWith(ws, { strict: false });
+    await assertJsonRoute(handleConfigRoute, {
+      pathname: "/api/v1/config/doctor",
+      method: "GET",
+      url: "/api/v1/config/doctor?strict=true",
+      workspace: ws
+    });
+    expect(m.runDoctorCli).toHaveBeenLastCalledWith(ws, { strict: true });
     await assertJsonRoute(handleConfigRoute, { pathname: "/api/v1/config/version", method: "GET", workspace: ws });
     await assertJsonRoute(handleConfigRoute, { pathname: "/api/v1/config/status", method: "GET", workspace: ws });
   });

@@ -6,8 +6,16 @@ export function renderDoctorText(report: DoctorReport): string {
   const failCount = report.checks.filter(c => c.status === "FAIL").length;
   const warnCount = report.checks.filter(c => c.status === "WARN").length;
   const infoCount = report.checks.filter(c => c.status === "INFO").length;
-  const label = report.ok ? "PASS ✅" : (failCount === 0 ? "READY ✅" : failCount <= 2 ? "MOSTLY READY ⚙️" : "NEEDS SETUP ⚠️");
+  const label = report.mode === "INSTALL" && report.ok
+    ? "INSTALL READY ✅"
+    : report.ok
+      ? "PASS ✅"
+      : (failCount === 0 ? "READY ✅" : failCount <= 2 ? "MOSTLY READY ⚙️" : "NEEDS SETUP ⚠️");
+  lines.push(`Doctor mode: ${report.mode}${report.strict ? " (strict)" : ""}`);
   lines.push(`Doctor result: ${label} (${passCount} pass, ${failCount} fail, ${warnCount} warn, ${infoCount} info)`);
+  if (report.mode === "INSTALL" && report.ok) {
+    lines.push("  CLI installation is ready. Run `amc` to initialize this workspace and generate its first evidence result.");
+  }
   if (failCount > 0) {
     lines.push(`  💡 ${failCount <= 2 ? "Almost there! Just a few items to configure:" : "This is normal for a fresh install. Fix the items below to get to PASS:"}`);
   } else if (infoCount > 0) {
@@ -21,4 +29,3 @@ export function renderDoctorText(report: DoctorReport): string {
   }
   return lines.join("\n");
 }
-

@@ -33,7 +33,7 @@ import {
 import { loadTargetProfile, loadTargetProfileFromFile, setTargetProfileInteractive, verifyTargetProfileSignature } from "./targets/targetProfile.js";
 import { runTuneWizard, runUpgradeWizard } from "./tuning/tuneWizard.js";
 import { loadContextGraph } from "./context/contextGraph.js";
-import { applyAMCConfigProfile, initWorkspace, loadAMCConfig, quickstartWizard, runDoctor, saveAMCConfig } from "./workspace.js";
+import { applyAMCConfigProfile, initWorkspace, loadAMCConfig, quickstartWizard, saveAMCConfig } from "./workspace.js";
 import { runDoctorCli } from "./doctor/doctorCli.js";
 import {
   buildCommandInventory,
@@ -2257,22 +2257,24 @@ program
   .command("doctor")
   .description("Check runtime availability and wrap readiness")
   .option("--json", "emit structured JSON output", false)
-  .action(async (opts: { json: boolean }) => {
+  .option("--strict", "require an initialized, healthy AMC workspace", false)
+  .action(async (opts: { json: boolean; strict: boolean }) => {
     const runtimeConfig = loadStudioRuntimeConfig(process.env, {
       workspaceDir: process.cwd()
     });
     if (runtimeConfig.vaultPassphrase) {
       process.env.AMC_VAULT_PASSPHRASE = runtimeConfig.vaultPassphrase;
     }
-    const legacy = runDoctor(process.cwd());
-    const result = await runDoctorCli(process.cwd());
+    const result = await runDoctorCli(process.cwd(), { strict: opts.strict });
     if (opts.json) {
       console.log(
         JSON.stringify(
           {
             ok: result.ok,
+            mode: result.mode,
+            workspaceInitialized: result.workspaceInitialized,
+            strict: result.strict,
             checks: result.checks,
-            legacy: legacy.lines
           },
           null,
           2
@@ -2283,26 +2285,21 @@ program
     }
     console.log(result.text);
     console.log("");
-    console.log(chalk.hex('#4AEF79')("Legacy runtime checks:"));
-    for (const line of legacy.lines) {
-      console.log(line);
-    }
-    console.log("");
     const fmt = await import("./cliFormat.js");
-    if (!result.ok || !legacy.ok) {
+    if (!result.ok) {
       console.log(fmt.nextSteps([
-        { cmd: "amc doctor-fix", desc: "Auto-repair common issues" },
-        { cmd: "amc up", desc: "Start Studio (the local control plane)" },
-        { cmd: "amc", desc: "Generate your full maturity score" },
+        ...(result.workspaceInitialized
+          ? [{ cmd: "amc doctor-fix", desc: "Auto-repair common workspace issues" }]
+          : [{ cmd: "amc", desc: "Initialize this workspace and generate its first evidence result" }]),
         { cmd: "amc help", desc: "All available commands" },
       ]));
     } else {
-      console.log(fmt.pass("All checks passed. Your workspace is ready."));
+      console.log(fmt.pass(result.workspaceInitialized ? "All required checks passed. Your workspace is ready." : "CLI install checks passed."));
       console.log(fmt.nextSteps([
         { cmd: "amc", desc: "Get your first full maturity score" },
       ]));
     }
-    process.exit(result.ok && legacy.ok ? 0 : 1);
+    process.exit(result.ok ? 0 : 1);
   });
 
 program

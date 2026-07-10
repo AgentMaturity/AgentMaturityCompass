@@ -141,9 +141,12 @@ Run `irm https://agentmaturity.co/install.ps1 | iex` in PowerShell. It downloads
 
 ```bash
 amc --version       # prints version
-amc doctor          # checks all dependencies and workspace health
+amc doctor          # install readiness before init; full checks after init
+amc doctor --strict # require an initialized, healthy workspace
 amc doctor-fix      # auto-repairs common issues
 ```
+
+In a new directory, default doctor exits zero when the CLI is healthy and tells you to run `amc`; it does not treat not-yet-created signatures or Gateway config as failures. Use `--strict` in CI and production deployment checks.
 
 ## Upgrading
 

@@ -1,5 +1,7 @@
 import { request as httpRequest } from "node:http";
 import { randomBytes } from "node:crypto";
+import { existsSync } from "node:fs";
+import { join } from "node:path";
 import { versions } from "node:process";
 import { studioStatus } from "../studio/studioSupervisor.js";
 import { vaultStatusNow } from "../vault/vaultCli.js";
@@ -28,6 +30,13 @@ export interface DoctorCheck {
 export interface DoctorReport {
   ok: boolean;
   checks: DoctorCheck[];
+  mode: "INSTALL" | "WORKSPACE";
+  workspaceInitialized: boolean;
+  strict: boolean;
+}
+
+export interface DoctorOptions {
+  strict?: boolean;
 }
 
 async function httpJsonStatus(url: string, method: "GET" | "POST", headers: Record<string, string>, body?: string): Promise<number> {
@@ -76,14 +85,58 @@ function pushSignatureCheck(checks: DoctorCheck[], id: string, label: string, ve
   });
 }
 
-export async function runDoctorRules(workspace: string): Promise<DoctorReport> {
+function pushAdapterChecks(checks: DoctorCheck[], workspace: string, includePlugins: boolean): void {
+  for (const row of adaptersDetectCli({ workspace, timeoutMs: 250, includePlugins })) {
+    checks.push({
+      id: `adapter-${row.adapterId}`,
+      status: row.installed ? "PASS" : "WARN",
+      message: row.installed ? `${row.adapterId}: ${row.command} ${row.version ?? ""}`.trim() : `${row.adapterId}: ${row.detail}`,
+      fixHint: row.installed ? undefined : `Install/enable ${row.adapterId} CLI or use generic-cli`
+    });
+  }
+}
+
+function safeDoctorError(error: unknown, workspace: string): string {
+  const raw = error instanceof Error ? error.message : String(error);
+  return raw.replaceAll(workspace, ".").replace(/\s+/g, " ").trim().slice(0, 240) || "unknown error";
+}
+
+export async function runDoctorRules(workspace: string, options: DoctorOptions = {}): Promise<DoctorReport> {
   const checks: DoctorCheck[] = [];
+  const strict = options.strict ?? false;
+  const workspaceInitialized = existsSync(join(workspace, ".amc", "amc.config.yaml"));
+  const mode: DoctorReport["mode"] = workspaceInitialized ? "WORKSPACE" : "INSTALL";
   const nodeMajor = Number((versions.node ?? "0").split(".")[0] ?? "0");
   checks.push(
     nodeMajor >= 20
       ? { id: "node-version", status: "PASS", message: `Node ${versions.node}` }
       : { id: "node-version", status: "FAIL", message: `Node ${versions.node} is below required >=20`, fixHint: "Install Node.js 20+" }
   );
+
+  if (!workspaceInitialized) {
+    checks.push({
+      id: "workspace-initialized",
+      status: strict ? "FAIL" : "INFO",
+      message: strict
+        ? "AMC workspace is required in strict mode"
+        : "CLI installation is ready; no AMC workspace is initialized yet",
+      fixHint: "Run: amc"
+    });
+    pushAdapterChecks(checks, workspace, false);
+    return {
+      ok: checks.every((row) => row.status !== "FAIL"),
+      checks,
+      mode,
+      workspaceInitialized,
+      strict
+    };
+  }
+
+  checks.push({
+    id: "workspace-initialized",
+    status: "PASS",
+    message: "AMC workspace initialized"
+  });
 
   const studio = studioStatus(workspace);
   checks.push(
@@ -146,86 +199,89 @@ export async function runDoctorRules(workspace: string): Promise<DoctorReport> {
     }
   }
 
-  try {
-    const gateway = loadGatewayConfig(workspace);
-    const routes = routeBaseUrls(gateway);
-    for (const route of ["/openai", "/anthropic", "/gemini", "/grok", "/openrouter", "/local"]) {
-      const exists = routes.some((row) => row.prefix === route);
-      checks.push({
-        id: `route-${route}`,
-        status: exists ? "PASS" : "WARN",
-        message: exists ? `Gateway route mounted: ${route}` : `Gateway route missing: ${route}`,
-        fixHint: exists ? undefined : "Update .amc/gateway.yaml and restart gateway"
-      });
-    }
-
-    const deny = pathAllowedByPatterns(workspace, ".amc/forbidden.txt", ["./workspace/**"]);
-    checks.push(
-      !deny.ok
-        ? { id: "toolhub-denylist", status: "PASS", message: "ToolHub denylist blocks .amc path access" }
-        : { id: "toolhub-denylist", status: "FAIL", message: "ToolHub denylist check failed", fixHint: "Run: amc tools verify" }
-    );
-
-    if (studio.running && studio.state) {
-      const studioHost = studio.state.host === "0.0.0.0" || studio.state.host === "::" ? "127.0.0.1" : studio.state.host;
-      const gatewayBase = `http://${studioHost}:${studio.state.gatewayPort}`;
-      const route = routes[0]?.prefix ?? "/openai";
-      const lease = issueLeaseForCli({
-        workspace,
-        workspaceId: workspaceIdFromDirectory(workspace),
-        agentId: "default",
-        ttl: "5m",
-        scopes: "gateway:llm",
-        routes: route,
-        models: "*",
-        rpm: 20,
-        tpm: 20000,
-        maxCostUsdPerDay: null
-      }).token;
-      const payload = JSON.stringify({
-        model: "gpt-4o-mini",
-        messages: [{ role: "user", content: "doctor" }]
-      });
-      const statusAuth = await httpJsonStatus(`${gatewayBase}${route}/v1/chat/completions`, "POST", { "x-amc-agent-id": "default", authorization: `Bearer ${lease}` }, payload);
-      checks.push({
-        id: "lease-carrier-authorization",
-        status: statusAuth === 0 || statusAuth === 401 ? "FAIL" : "PASS",
-        message: statusAuth === 0 ? "Gateway request failed" : `Authorization carrier status ${statusAuth}`,
-        fixHint: statusAuth === 0 || statusAuth === 401 ? "Check gateway route and lease verification." : undefined
-      });
-      const statusXApi = await httpJsonStatus(`${gatewayBase}${route}/v1/chat/completions`, "POST", { "x-amc-agent-id": "default", "x-api-key": lease }, payload);
-      checks.push({
-        id: "lease-carrier-x-api-key",
-        status: statusXApi === 0 || statusXApi === 401 ? "FAIL" : "PASS",
-        message: statusXApi === 0 ? "Gateway request failed" : `x-api-key carrier status ${statusXApi}`,
-        fixHint: statusXApi === 0 || statusXApi === 401 ? "Check gateway route and lease verification." : undefined
-      });
-    } else {
-      checks.push({
-        id: "lease-carriers-live",
-        status: "WARN",
-        message: "Skipped live lease carrier checks (Studio not running)",
-        fixHint: "Run: amc up"
-      });
-    }
-  } catch (error) {
+  const gatewayConfigFile = join(workspace, ".amc", "gateway.yaml");
+  if (!existsSync(gatewayConfigFile)) {
     checks.push({
       id: "gateway-config",
       status: "FAIL",
-      message: `Gateway config check failed: ${String(error)}`,
+      message: "Gateway config missing",
       fixHint: "Run: amc gateway init"
     });
+  } else {
+    try {
+      const gateway = loadGatewayConfig(workspace);
+      const routes = routeBaseUrls(gateway);
+      for (const route of ["/openai", "/anthropic", "/gemini", "/grok", "/openrouter", "/local"]) {
+        const exists = routes.some((row) => row.prefix === route);
+        checks.push({
+          id: `route-${route}`,
+          status: exists ? "PASS" : "WARN",
+          message: exists ? `Gateway route mounted: ${route}` : `Gateway route missing: ${route}`,
+          fixHint: exists ? undefined : "Update .amc/gateway.yaml and restart gateway"
+        });
+      }
+
+      const deny = pathAllowedByPatterns(workspace, ".amc/forbidden.txt", ["./workspace/**"]);
+      checks.push(
+        !deny.ok
+          ? { id: "toolhub-denylist", status: "PASS", message: "ToolHub denylist blocks .amc path access" }
+          : { id: "toolhub-denylist", status: "FAIL", message: "ToolHub denylist check failed", fixHint: "Run: amc tools verify" }
+      );
+
+      if (studio.running && studio.state) {
+        const studioHost = studio.state.host === "0.0.0.0" || studio.state.host === "::" ? "127.0.0.1" : studio.state.host;
+        const gatewayBase = `http://${studioHost}:${studio.state.gatewayPort}`;
+        const route = routes[0]?.prefix ?? "/openai";
+        const lease = issueLeaseForCli({
+          workspace,
+          workspaceId: workspaceIdFromDirectory(workspace),
+          agentId: "default",
+          ttl: "5m",
+          scopes: "gateway:llm",
+          routes: route,
+          models: "*",
+          rpm: 20,
+          tpm: 20000,
+          maxCostUsdPerDay: null
+        }).token;
+        const payload = JSON.stringify({
+          model: "gpt-4o-mini",
+          messages: [{ role: "user", content: "doctor" }]
+        });
+        const statusAuth = await httpJsonStatus(`${gatewayBase}${route}/v1/chat/completions`, "POST", { "x-amc-agent-id": "default", authorization: `Bearer ${lease}` }, payload);
+        checks.push({
+          id: "lease-carrier-authorization",
+          status: statusAuth === 0 || statusAuth === 401 ? "FAIL" : "PASS",
+          message: statusAuth === 0 ? "Gateway request failed" : `Authorization carrier status ${statusAuth}`,
+          fixHint: statusAuth === 0 || statusAuth === 401 ? "Check gateway route and lease verification." : undefined
+        });
+        const statusXApi = await httpJsonStatus(`${gatewayBase}${route}/v1/chat/completions`, "POST", { "x-amc-agent-id": "default", "x-api-key": lease }, payload);
+        checks.push({
+          id: "lease-carrier-x-api-key",
+          status: statusXApi === 0 || statusXApi === 401 ? "FAIL" : "PASS",
+          message: statusXApi === 0 ? "Gateway request failed" : `x-api-key carrier status ${statusXApi}`,
+          fixHint: statusXApi === 0 || statusXApi === 401 ? "Check gateway route and lease verification." : undefined
+        });
+      } else {
+        checks.push({
+          id: "lease-carriers-live",
+          status: "WARN",
+          message: "Skipped live lease carrier checks (Studio not running)",
+          fixHint: "Run: amc up"
+        });
+      }
+    } catch (error) {
+      checks.push({
+        id: "gateway-config",
+        status: "FAIL",
+        message: `Gateway config invalid: ${safeDoctorError(error, workspace)}`,
+        fixHint: "Run: amc gateway init"
+      });
+    }
   }
 
-  for (const row of adaptersDetectCli({ timeoutMs: 250 })) {
-    checks.push({
-      id: `adapter-${row.adapterId}`,
-      status: row.installed ? "PASS" : "WARN",
-      message: row.installed ? `${row.adapterId}: ${row.command} ${row.version ?? ""}`.trim() : `${row.adapterId}: ${row.detail}`,
-      fixHint: row.installed ? undefined : `Install/enable ${row.adapterId} CLI or use generic-cli`
-    });
-  }
+  pushAdapterChecks(checks, workspace, true);
 
   const ok = checks.every((row) => row.status !== "FAIL");
-  return { ok, checks };
+  return { ok, checks, mode, workspaceInitialized, strict };
 }

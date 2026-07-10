@@ -19,7 +19,7 @@ npm run build
 curl -fsSL https://agentmaturity.co/install.sh | sh
 amc setup --demo
 amc up
-amc doctor --json
+amc doctor --strict --json
 amc verify all --json
 ```
 

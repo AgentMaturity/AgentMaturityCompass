@@ -3062,6 +3062,7 @@ Check runtime availability and wrap readiness
 | Option | Description |
 |--------|-------------|
 | `--json` | - |
+| `--strict` | - |
 
 #### `amc doctor-fix`
 

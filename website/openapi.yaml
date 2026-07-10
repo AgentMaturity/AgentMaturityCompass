@@ -3243,6 +3243,13 @@ paths:
     get:
       tags: [config]
       summary: Run doctor checks
+      parameters:
+        - name: strict
+          in: query
+          description: Require an initialized, healthy AMC workspace
+          schema:
+            type: boolean
+            default: false
       responses:
         '200':
           description: Doctor result

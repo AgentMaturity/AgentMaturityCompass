@@ -1,8 +1,8 @@
 class Amc < Formula
   desc "AI Agent Trust Scoring — execution-verified maturity scores with cryptographic evidence"
   homepage "https://agentmaturity.co/"
-  url "https://github.com/AgentMaturity/AgentMaturityCompass/releases/download/v1.1.0/agent-maturity-compass-1.1.0.tgz"
-  sha256 "c1a9931a50ff1c1e2be3e0965a4e37d34f8c6181040f98dafe24fb373fd440d7"
+  url "https://github.com/AgentMaturity/AgentMaturityCompass/releases/download/v1.1.1/agent-maturity-compass-1.1.1.tgz"
+  sha256 "dfc370a884803159a7d8b8a42830c3f8303747a8f2caaa0c5f00513d74f9fbf6"
   license "MIT"
   head "https://github.com/AgentMaturity/AgentMaturityCompass.git", branch: "main"
 

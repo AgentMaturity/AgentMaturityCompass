@@ -6,7 +6,7 @@ Complete these checks before going live. Every item is a real `amc` command.
 
 - [ ] Node.js ≥ 20 installed — `node --version`
 - [ ] AMC installed and built — `amc --version`
-- [ ] Health check passes — `amc doctor`
+- [ ] Strict workspace health check passes — `amc doctor --strict`
 
 ## Workspace Initialization
 

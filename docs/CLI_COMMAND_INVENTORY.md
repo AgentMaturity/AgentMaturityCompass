@@ -298,7 +298,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc diagnostic render` | Render contextualized 126-question diagnostic for an agent | `--agent <agentId>`<br>`--format <format>`<br>`--out <file>` | - |
 | `amc dlp` | DLP scanner for PII and secrets | - | - |
 | `amc dlp scan` | Scan text for PII and secrets | `--json`<br>`--redact` | - |
-| `amc doctor` | Check runtime availability and wrap readiness | `--json` | - |
+| `amc doctor` | Check runtime availability and wrap readiness | `--json`<br>`--strict` | - |
 | `amc doctor-fix` | Auto-repair common setup issues | `--dry-run`<br>`--json` | - |
 | `amc domain` | Domain-specific architecture and compliance operations | - | `sector` |
 | `amc domain apply` | Apply domain-specific guardrails and industry pack rules to an agent | `--agent <id>`<br>`--domain <domain>`<br>`--pack <packId>`<br>`--dry-run`<br>`--compliance <frameworks>`<br>`--file <path>`<br>`--json` | `sector apply` |

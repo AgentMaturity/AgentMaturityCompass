@@ -93,6 +93,7 @@ npm --version    <span class="comment"># Should be v9+ or higher</span></code></
       <p>Both installers pin the GitHub release, download the platform archive and <code>SHA256SUMS</code>, and refuse to run the packaged installer when verification fails. Verify the installed CLI:</p>
       <pre><code>amc --version
 amc doctor</code></pre>
+      <p>In a new directory, <code>amc doctor</code> verifies install readiness and exits successfully without pretending workspace configuration already exists. After initialization, it runs the full workspace checks. CI and production deployments should use <code>amc doctor --strict</code>.</p>
 
       <h3>Docker (zero setup)</h3>
       <pre><code><span class="comment"># Build the quickstart image</span>

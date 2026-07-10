@@ -14,7 +14,7 @@ This runbook is for post-launch AMC operation with verifiable controls.
 3. Verify runtime:
    ```bash
    amc studio healthcheck
-   amc doctor --json
+   amc doctor --strict --json
    amc verify all --json
    ```
 4. Verify trust and transparency state:

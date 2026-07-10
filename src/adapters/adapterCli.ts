@@ -38,9 +38,10 @@ export function adaptersListCli(workspace: string): {
   };
 }
 
-export function adaptersDetectCli(options?: { workspace?: string; timeoutMs?: number }): AdapterDetectionResult[] {
+export function adaptersDetectCli(options?: { workspace?: string; timeoutMs?: number; includePlugins?: boolean }): AdapterDetectionResult[] {
   const workspace = options?.workspace ?? process.cwd();
-  return listAvailableAdapters(workspace).map((adapter) => detectAdapter(adapter, { timeoutMs: options?.timeoutMs }));
+  const adapters = options?.includePlugins === false ? listBuiltInAdapters() : listAvailableAdapters(workspace);
+  return adapters.map((adapter) => detectAdapter(adapter, { timeoutMs: options?.timeoutMs }));
 }
 
 export function adaptersConfigureCli(params: {

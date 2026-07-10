@@ -20,7 +20,7 @@ Recover AMC when Studio/API is unavailable or readiness fails.
 2. Capture current diagnostics before restart attempts.
    ```bash
    amc logs --lines 200
-   amc doctor --json
+   amc doctor --strict --json
    amc verify all --json
    ```
 3. If trust/integrity checks are failing, treat as integrity incident, not just availability.

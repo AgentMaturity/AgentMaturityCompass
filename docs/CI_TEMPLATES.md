@@ -116,8 +116,8 @@ jobs:
           node-version: 20
       - run: npm ci
       - run: curl -fsSL https://agentmaturity.co/install.sh | sh
-      - run: amc doctor
       - run: amc
+      - run: amc doctor --strict
       - run: amc assurance run --all
 ```
 
@@ -133,8 +133,8 @@ amc_check:
   script:
     - npm ci
     - curl -fsSL https://agentmaturity.co/install.sh | sh
-    - amc doctor
     - amc
+    - amc doctor --strict
     - amc assurance run --all
 ```
 
@@ -150,8 +150,8 @@ jobs:
       - checkout
       - run: npm ci
       - run: curl -fsSL https://agentmaturity.co/install.sh | sh
-      - run: amc doctor
       - run: amc
+      - run: amc doctor --strict
       - run: amc assurance run --all
 
 workflows:
@@ -167,8 +167,8 @@ workflows:
 Start with:
 
 ```bash
-amc doctor
 amc
+amc doctor --strict
 ```
 
 Then add:
