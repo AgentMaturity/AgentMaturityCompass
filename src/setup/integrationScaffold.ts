@@ -14,6 +14,7 @@
 
 import { randomUUID } from "node:crypto";
 import { z } from "zod";
+import { AEP_01_SOURCE_COMMIT, observedAepActionEventSchema } from "../bridge/hookIngress.js";
 import { sha256Hex } from "../utils/hash.js";
 
 // ---------------------------------------------------------------------------
@@ -113,7 +114,10 @@ export interface OpenApiSpec {
   openapi: string;
   info: { title: string; version: string; description: string };
   paths: Record<string, Record<string, unknown>>;
-  components: { schemas: Record<string, unknown> };
+  components: {
+    securitySchemes?: Record<string, unknown>;
+    schemas: Record<string, unknown>;
+  };
 }
 
 // ---------------------------------------------------------------------------
@@ -668,6 +672,174 @@ export function simulateBridgeRequest(
 // OpenAPI spec
 // ---------------------------------------------------------------------------
 
+type ObservedAepSchemaTarget = "draft-2020-12" | "openapi-3.0";
+
+function actionTypeImplication(actionType: "tool_call" | "skill_use", requiredTarget: "tool" | "skill"): Record<string, unknown> {
+  return {
+    anyOf: [
+      {
+        type: "object",
+        properties: {
+          action: {
+            type: "object",
+            properties: { type: { type: "string", not: { enum: [actionType] } } }
+          }
+        }
+      },
+      {
+        type: "object",
+        required: [requiredTarget],
+        properties: {
+          [requiredTarget]: { type: "object" },
+          action: {
+            type: "object",
+            properties: { type: { type: "string", enum: [actionType] } }
+          }
+        }
+      }
+    ]
+  };
+}
+
+function observedAepConditionalRules(): { allOf: Record<string, unknown>[]; oneOf: Record<string, unknown>[] } {
+  return {
+    allOf: [
+      actionTypeImplication("tool_call", "tool"),
+      actionTypeImplication("skill_use", "skill"),
+      {
+        anyOf: [
+          {
+            type: "object",
+            not: { type: "object", properties: { tool: { type: "object" } }, required: ["tool"] }
+          },
+          {
+            type: "object",
+            properties: {
+              tool: {
+                type: "object",
+                properties: { type: { type: "string", not: { enum: ["mcp"] } } }
+              }
+            }
+          },
+          {
+            type: "object",
+            required: ["server"],
+            properties: {
+              server: { type: "object" },
+              tool: {
+                type: "object",
+                properties: { type: { type: "string", enum: ["mcp"] } }
+              }
+            }
+          }
+        ]
+      }
+    ],
+    oneOf: [
+      {
+        type: "object",
+        properties: { type: { type: "string", enum: ["action.requested"] } },
+        required: ["type"]
+      },
+      {
+        type: "object",
+        properties: {
+          type: { type: "string", enum: ["action.completed"] },
+          action: {
+            type: "object",
+            properties: { status: { type: "string", enum: ["success"] } },
+            required: ["status"]
+          }
+        },
+        required: ["type", "action"]
+      },
+      {
+        type: "object",
+        properties: {
+          type: { type: "string", enum: ["action.failed"] },
+          action: {
+            type: "object",
+            properties: { status: { type: "string", enum: ["failure", "timeout", "cancelled"] } },
+            required: ["status"]
+          }
+        },
+        required: ["type", "action"]
+      },
+      {
+        type: "object",
+        properties: {
+          type: { type: "string", enum: ["action.denied"] },
+          decision: {
+            type: "object",
+            properties: { outcome: { type: "string", enum: ["denied"] } },
+            required: ["outcome"]
+          }
+        },
+        required: ["type", "decision"]
+      }
+    ]
+  };
+}
+
+export function observedAepActionEventOpenApiSchema(
+  target: ObservedAepSchemaTarget = "draft-2020-12"
+): Record<string, unknown> {
+  const generated = z.toJSONSchema(observedAepActionEventSchema, { target }) as Record<string, unknown>;
+  const { $schema: _schema, ...wireSchema } = generated;
+  if (target === "openapi-3.0") {
+    const properties = wireSchema.properties as Record<string, Record<string, unknown>> | undefined;
+    if (properties?.extensions) {
+      properties.extensions.propertyNames = {
+        type: "string",
+        pattern: "^x-[a-z0-9][a-z0-9._-]*$"
+      };
+    }
+  }
+  return {
+    ...wireSchema,
+    ...observedAepConditionalRules(),
+    description: "AMC-owned observed subset of the AEP 0.1 action lifecycle. Action, target, status, and denied-decision relationships are encoded here and enforced again at runtime. This is not an AEP conformance claim."
+  };
+}
+
+export function observedHookReceiptOpenApiSchema(): Record<string, unknown> {
+  return {
+    type: "object",
+    additionalProperties: false,
+    required: ["ok", "observed", "idempotentReplay", "conformanceClaim", "protocol", "sourceEventId", "sourceEventType", "actionId", "eventId", "evidenceType", "sessionId", "rawBodySha256", "receipt", "receiptId", "receiptSha256"],
+    properties: {
+      ok: { type: "boolean", enum: [true] },
+      observed: { type: "boolean", enum: [true] },
+      idempotentReplay: { type: "boolean" },
+      conformanceClaim: { type: "boolean", enum: [false] },
+      protocol: {
+        type: "object",
+        additionalProperties: false,
+        required: ["name", "version", "sourceCommit", "conformanceClaim"],
+        properties: {
+          name: { type: "string", enum: ["aep"] },
+          version: { type: "string", enum: ["0.1"] },
+          sourceCommit: { type: "string", enum: [AEP_01_SOURCE_COMMIT] },
+          conformanceClaim: { type: "boolean", enum: [false] }
+        }
+      },
+      sourceEventId: { type: "string", minLength: 1 },
+      sourceEventType: {
+        type: "string",
+        enum: ["action.requested", "action.completed", "action.failed", "action.denied"]
+      },
+      actionId: { type: "string", minLength: 1 },
+      eventId: { type: "string", minLength: 1 },
+      evidenceType: { type: "string", enum: ["tool_action", "tool_result"] },
+      sessionId: { type: "string", minLength: 1 },
+      rawBodySha256: { type: "string", pattern: "^[a-f0-9]{64}$" },
+      receipt: { type: "string", minLength: 1 },
+      receiptId: { type: "string", minLength: 1 },
+      receiptSha256: { type: "string", pattern: "^[a-f0-9]{64}$" }
+    }
+  };
+}
+
 /**
  * Generate an OpenAPI spec for Bridge endpoints.
  */
@@ -676,7 +848,7 @@ export function generateBridgeOpenApiSpec(): OpenApiSpec {
     openapi: "3.1.0",
     info: {
       title: "AMC Bridge API",
-      version: "1.0.0",
+      version: "1.1.0",
       description: "API for AMC bridge routes, telemetry ingestion, and model routing.",
     },
     paths: {
@@ -694,6 +866,36 @@ export function generateBridgeOpenApiSpec(): OpenApiSpec {
           requestBody: { content: { "application/json": { schema: { $ref: "#/components/schemas/TelemetryEvent" } } } },
           responses: { "200": { description: "Telemetry accepted" }, "401": { description: "Missing or invalid lease/auth" } },
         },
+      },
+      "/bridge/hooks/aep/0.1/events": {
+        post: {
+          summary: "Observe a pinned provider-neutral action event",
+          description: "Accepts AMC's strict observed subset of the AEP 0.1 action lifecycle. This endpoint does not claim AEP conformance and does not retain raw hook payloads.",
+          tags: ["telemetry", "hooks"],
+          security: [{ leaseToken: [] }],
+          requestBody: {
+            required: true,
+            content: { "application/json": { schema: { $ref: "#/components/schemas/ObservedAepActionEvent" } } }
+          },
+          responses: {
+            "200": {
+              description: "Previously observed byte-identical event and original signed receipt",
+              content: { "application/json": { schema: { $ref: "#/components/schemas/ObservedHookReceipt" } } }
+            },
+            "201": {
+              description: "Observed event and signed receipt",
+              content: { "application/json": { schema: { $ref: "#/components/schemas/ObservedHookReceipt" } } }
+            },
+            "400": { description: "Malformed or unsupported observed event" },
+            "401": { description: "Missing or invalid lease" },
+            "403": { description: "Lease lacks hook scope or route" },
+            "409": { description: "Source event ID conflicts with previously observed bytes" },
+            "413": { description: "Payload exceeds the hook ingress limit" },
+            "422": { description: "Source timestamp is stale or too far in the future" },
+            "429": { description: "Signed lease request budget exceeded" },
+            "503": { description: "Hook quota or evidence ledger unavailable" }
+          }
+        }
       },
       "/bridge/openai/v1/chat/completions": {
         post: {
@@ -721,6 +923,13 @@ export function generateBridgeOpenApiSpec(): OpenApiSpec {
       },
     },
     components: {
+      securitySchemes: {
+        leaseToken: {
+          type: "http",
+          scheme: "bearer",
+          description: "Signed, short-lived AMC agent lease with hook:observe scope and an allowed /hooks route."
+        }
+      },
       schemas: {
         TelemetryEvent: {
           type: "object",
@@ -734,6 +943,8 @@ export function generateBridgeOpenApiSpec(): OpenApiSpec {
             provider: { type: "string" },
           },
         },
+        ObservedAepActionEvent: observedAepActionEventOpenApiSchema(),
+        ObservedHookReceipt: observedHookReceiptOpenApiSchema(),
         BridgeChatRequest: {
           type: "object",
           required: ["model", "messages"],

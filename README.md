@@ -390,6 +390,22 @@ amc wrap claude-code -- claude "analyze this code"
 amc wrap generic-cli -- python my_bot.py
 ```
 
+### Observe provider-neutral action hooks
+
+Use a dedicated observation lease; do not reuse a broad model-routing token:
+
+```bash
+LEASE="$(amc lease issue --agent hook-agent --ttl 30m --scopes hook:observe --routes /hooks --models '*' --rpm 60)"
+EVENT_TIME="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+
+curl -sS http://127.0.0.1:3212/bridge/hooks/aep/0.1/events \
+  -H "authorization: Bearer $LEASE" \
+  -H "content-type: application/json" \
+  --data "{\"aep_version\":\"0.1\",\"id\":\"evt-amc-001\",\"type\":\"action.requested\",\"time\":\"${EVENT_TIME}\",\"agent\":{\"slug\":\"example-agent\"},\"action\":{\"type\":\"tool_call\",\"id\":\"action-amc-001\"},\"tool\":{\"type\":\"native\",\"name\":\"Shell\"}}"
+```
+
+AMC observes four pinned AEP `0.1` action types, stores only an encrypted redacted projection, and returns a signed receipt. Byte-identical retries return the original receipt without growing the ledger; reuse of a source event ID with different bytes fails closed. This is an AMC-owned observed subset pinned to `2583cff9380f8f0a459d52c7112b6105c46496ed`, not an AEP conformance claim and not a control-response endpoint.
+
 ### Red-team your agent
 
 ```bash
@@ -732,7 +748,7 @@ AMC is MIT licensed. We welcome contributions — especially new **assurance pac
 
 ```bash
 git clone https://github.com/AgentMaturity/AgentMaturityCompass.git
-cd AgentMaturityCompass && npm ci && npm test   # 1,052 files / 8,295 passing Vitest tests
+cd AgentMaturityCompass && npm ci && npm test   # 1,053 files / 8,324 passing Vitest tests
 ```
 
 **→ [CONTRIBUTING.md](CONTRIBUTING.md)** — includes guides for writing packs, mapping research papers, and adding adapters.

@@ -866,6 +866,8 @@ export async function verifyEvidenceBundle(bundleFile: string): Promise<{
 }> {
   const extracted = withExtractedBundle(bundleFile);
   const errors: string[] = [];
+  let manifestSignatureVerified = false;
+  let manifestFilesVerified = false;
 
   try {
     let manifest: BundleManifest | null = null;
@@ -886,29 +888,35 @@ export async function verifyEvidenceBundle(bundleFile: string): Promise<{
       const manifestRaw = readFileSync(join(extracted.rootDir, "manifest.json"));
       const manifestSig = readBundleManifestSig(extracted.rootDir);
       const digest = sha256Hex(manifestRaw);
-      if (digest !== manifestSig.manifestSha256) {
+      const digestMatches = digest === manifestSig.manifestSha256;
+      if (!digestMatches) {
         errors.push("Manifest signature payload digest mismatch.");
       }
       const auditorKeys = collectAuditorKeysFromBundle(extracted.rootDir);
-      if (!verifyHexDigestAny(digest, manifestSig.signature, auditorKeys)) {
+      const signatureMatches = verifyHexDigestAny(digest, manifestSig.signature, auditorKeys);
+      if (!signatureMatches) {
         errors.push("Manifest signature verification failed.");
       }
+      manifestSignatureVerified = digestMatches && signatureMatches;
     } catch (error) {
       errors.push(`Manifest signature error: ${String(error)}`);
     }
 
     if (manifest) {
+      manifestFilesVerified = true;
       const actualFiles = collectFiles(extracted.rootDir).filter((path) => path !== "manifest.sig" && path !== "manifest.json");
       const expectedFiles = manifest.files.map((entry) => entry.path).sort((a, b) => a.localeCompare(b));
 
       for (const expected of expectedFiles) {
         if (!actualFiles.includes(expected)) {
           errors.push(`Manifest entry missing from archive: ${expected}`);
+          manifestFilesVerified = false;
         }
       }
       for (const actual of actualFiles) {
         if (!expectedFiles.includes(actual)) {
           errors.push(`Archive contains file not listed in manifest: ${actual}`);
+          manifestFilesVerified = false;
         }
       }
 
@@ -921,9 +929,11 @@ export async function verifyEvidenceBundle(bundleFile: string): Promise<{
         const digest = sha256Hex(bytes);
         if (digest !== entry.sha256) {
           errors.push(`File hash mismatch: ${entry.path}`);
+          manifestFilesVerified = false;
         }
         if (bytes.length !== entry.size) {
           errors.push(`File size mismatch: ${entry.path}`);
+          manifestFilesVerified = false;
         }
       }
     }
@@ -1005,7 +1015,22 @@ export async function verifyEvidenceBundle(bundleFile: string): Promise<{
     try {
       const verifyWorkspace = materializeBundleWorkspace(extracted.rootDir);
       try {
-        const ledgerResult = await verifyLedgerIntegrity(verifyWorkspace);
+        const externallyAuthenticatedPayloads = new Map<string, string>();
+        if (manifest && manifestSignatureVerified && manifestFilesVerified) {
+          for (const entry of manifest.files) {
+            if (entry.path.startsWith("evidence/blobs/")) {
+              externallyAuthenticatedPayloads.set(
+                `.amc/blobs/${entry.path.slice("evidence/blobs/".length)}`,
+                entry.sha256
+              );
+            } else if (entry.path.startsWith("payloads/")) {
+              externallyAuthenticatedPayloads.set(entry.path.slice("payloads/".length), entry.sha256);
+            }
+          }
+        }
+        const ledgerResult = await verifyLedgerIntegrity(verifyWorkspace, {
+          externallyAuthenticatedPayloads
+        });
         for (const error of ledgerResult.errors) {
           errors.push(`Ledger verify: ${error}`);
         }

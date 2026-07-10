@@ -24,11 +24,12 @@ import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { mintReceipt, verifyReceipt, type ReceiptKind } from "../receipts/receipt.js";
 import { loadOpsPolicy } from "../ops/policy.js";
-import { loadBlobMetadata, storeEncryptedBlob } from "../storage/blobs/blobStore.js";
+import { loadBlobPlaintext, storeEncryptedBlob } from "../storage/blobs/blobStore.js";
 import { getOrCreateSqlitePool, type SqliteConnectionLease } from "../storage/sqlitePool.js";
 import { createIncidentStore } from "../incidents/incidentStore.js";
 import type { Incident, CausalRelationship } from "../incidents/incidentTypes.js";
 import { queueEvidenceEventSpan } from "../observability/otelExporter.js";
+import { buildRetentionProofIndex, type RetentionProofIndex } from "../ops/retention/retentionArchive.js";
 
 export interface AppendEvidenceInput {
   sessionId: string;
@@ -64,6 +65,10 @@ export interface AppendEvidenceWithReceiptInput extends AppendEvidenceInput {
 export interface VerifyResult {
   ok: boolean;
   errors: string[];
+}
+
+export interface LedgerVerifyOptions {
+  externallyAuthenticatedPayloads?: ReadonlyMap<string, string>;
 }
 
 export interface AppendOutcomeEventInput {
@@ -559,6 +564,23 @@ const migrations: Migration[] = [
         SELECT RAISE(ABORT, 'sessions are append-only');
       END;
     `
+  },
+  {
+    version: 10,
+    sql: `
+      CREATE TABLE IF NOT EXISTS bridge_request_usage (
+        request_id TEXT PRIMARY KEY,
+        lease_id TEXT NOT NULL,
+        agent_id TEXT NOT NULL,
+        route TEXT NOT NULL,
+        ts INTEGER NOT NULL
+      );
+
+      CREATE INDEX IF NOT EXISTS idx_bridge_request_usage_lease_ts
+        ON bridge_request_usage(lease_id, ts);
+      CREATE INDEX IF NOT EXISTS idx_bridge_request_usage_ts
+        ON bridge_request_usage(ts);
+    `
   }
 ];
 
@@ -764,7 +786,12 @@ export class Ledger {
 
     this.dbLease = pool.acquire();
     this.db = this.dbLease.db;
-    reconcileLegacyMigrationState(this.db);
+    try {
+      reconcileLegacyMigrationState(this.db);
+    } catch (error) {
+      this.dbLease.release();
+      throw error;
+    }
   }
 
   close(): void {
@@ -1774,8 +1801,269 @@ export function openLedger(workspacePath: string): Ledger {
   return new Ledger(workspacePath);
 }
 
-function verifyEvents(ledger: Ledger, workspace: string, errors: string[]): void {
+function verifyEvidencePayload(
+  event: EvidenceEvent,
+  workspace: string,
+  errors: string[],
+  externallyAuthenticatedPayloads?: ReadonlyMap<string, string>,
+  retentionProofs?: RetentionProofIndex
+): void {
+  verifyEventRetentionState(event, workspace, errors, retentionProofs);
+  if (event.payload_inline !== null) {
+    const payloadSha = sha256Hex(Buffer.from(event.payload_inline, "utf8"));
+    if (payloadSha !== event.payload_sha256) errors.push(`Event ${event.id} payload hash mismatch`);
+    return;
+  }
+
+  const payloadPath = event.payload_pruned === 1
+    ? event.canonical_payload_path ?? event.payload_path ?? null
+    : event.payload_path ?? event.canonical_payload_path ?? null;
+  if (event.payload_pruned === 1 && (!payloadPath || !pathExists(join(workspace, payloadPath)))) return;
+  if (!payloadPath) {
+    if (event.payload_sha256 !== sha256Hex(Buffer.alloc(0))) errors.push(`Event ${event.id} payload hash mismatch`);
+    return;
+  }
+  if (!pathExists(join(workspace, payloadPath))) {
+    errors.push(`Missing blob file for event ${event.id}`);
+    return;
+  }
+
+  try {
+    const loaded = loadBlobPlaintext(workspace, payloadPath);
+    const plaintextSha = sha256Hex(loaded.bytes);
+    if (plaintextSha !== event.payload_sha256 || loaded.payloadSha256 !== event.payload_sha256) {
+      errors.push(`Event ${event.id} payload hash mismatch`);
+    }
+  } catch {
+    const normalizedPath = payloadPath.replace(/\\/g, "/");
+    const expectedStoredDigest = externallyAuthenticatedPayloads?.get(normalizedPath);
+    if (expectedStoredDigest) {
+      const actualStoredDigest = sha256Hex(readFileSync(join(workspace, payloadPath)));
+      if (actualStoredDigest === expectedStoredDigest) return;
+    }
+    errors.push(`Event ${event.id} payload authentication failed`);
+  }
+}
+
+function verifyArchivedEventRetentionProof(
+  event: EvidenceEvent,
+  errors: string[],
+  retentionProofs?: RetentionProofIndex
+): EvidenceEvent | null {
+  const archivedState = event.archived ?? 0;
+  if (archivedState === 0) {
+    if (event.archive_segment_id != null || event.archive_manifest_sha256 != null) {
+      errors.push(`Event ${event.id} archive references exist without archived state`);
+    }
+    return null;
+  }
+  if (archivedState !== 1 || !event.archive_segment_id || !event.archive_manifest_sha256) {
+    errors.push(`Event ${event.id} archived retention state invalid`);
+    return null;
+  }
+  if (!retentionProofs) {
+    errors.push(`Event ${event.id} signed retention proof missing`);
+    return null;
+  }
+  const archived = retentionProofs.archivedEvents.get(event.id);
+  if (!archived) {
+    errors.push(`Event ${event.id} archived retention proof missing`);
+    return null;
+  }
+  if (
+    archived.segmentId !== event.archive_segment_id
+    || archived.manifestSha256 !== event.archive_manifest_sha256
+  ) {
+    errors.push(`Event ${event.id} archive reference mismatch`);
+  }
+
+  const original = archived.event;
+  const immutableFields: Array<keyof EvidenceEvent> = [
+    "id",
+    "ts",
+    "session_id",
+    "runtime",
+    "event_type",
+    "payload_sha256",
+    "meta_json",
+    "prev_event_hash",
+    "event_hash",
+    "writer_sig",
+    "canonical_payload_path",
+    "canonical_payload_inline",
+    "blob_ref"
+  ];
+  for (const field of immutableFields) {
+    if ((event[field] ?? null) !== (original[field] ?? null)) {
+      errors.push(`Event ${event.id} archived ${field} mismatch`);
+    }
+  }
+  if ((original.archived ?? 0) !== 0 || (original.payload_pruned ?? 0) !== 0) {
+    errors.push(`Event ${event.id} archive does not contain the pre-retention row`);
+  }
+  return original;
+}
+
+function verifyEventRetentionState(
+  event: EvidenceEvent,
+  workspace: string,
+  errors: string[],
+  retentionProofs?: RetentionProofIndex
+): void {
+  const original = verifyArchivedEventRetentionProof(event, errors, retentionProofs);
+  const prunedState = event.payload_pruned ?? 0;
+  if (prunedState === 0) {
+    if (event.payload_pruned_ts != null) {
+      errors.push(`Event ${event.id} pruning timestamp exists without pruned state`);
+    }
+    return;
+  }
+  if (
+    prunedState !== 1
+    || event.archived !== 1
+    || !original
+    || !retentionProofs
+    || !Number.isInteger(event.payload_pruned_ts)
+    || Number(event.payload_pruned_ts) < event.ts
+    || event.payload_path !== null
+    || event.payload_inline !== null
+  ) {
+    errors.push(`Event ${event.id} pruned retention state invalid`);
+    return;
+  }
+
+  const originalInline = original.canonical_payload_inline ?? original.payload_inline ?? null;
+  if (originalInline !== null) {
+    if (sha256Hex(Buffer.from(originalInline, "utf8")) !== event.payload_sha256) {
+      errors.push(`Event ${event.id} archived payload hash mismatch`);
+    }
+    return;
+  }
+
+  const originalPath = original.canonical_payload_path ?? original.payload_path ?? null;
+  if (!originalPath) {
+    if (event.payload_sha256 !== sha256Hex(Buffer.alloc(0))) {
+      errors.push(`Event ${event.id} archived empty payload hash mismatch`);
+    }
+    return;
+  }
+  if (pathExists(join(workspace, originalPath))) return;
+  if (!event.blob_ref) {
+    errors.push(`Event ${event.id} missing retained payload without blob pruning proof`);
+    return;
+  }
+  const prunedBlob = retentionProofs.prunedBlobs.get(event.blob_ref);
+  if (!prunedBlob || prunedBlob.ts < Number(event.payload_pruned_ts)) {
+    errors.push(`Event ${event.id} signed blob pruning proof missing`);
+  }
+}
+
+export function verifyEvidenceEventIntegrity(input: {
+  ledger: Ledger;
+  eventId: string;
+  requireReceipt?: boolean;
+  requireSealedSession?: boolean;
+}): VerifyResult {
+  const errors: string[] = [];
+  const event = input.ledger.db.prepare(
+    "SELECT rowid AS row_id, * FROM evidence_events WHERE id = ? LIMIT 1"
+  ).get(input.eventId) as (EvidenceEvent & { row_id: number }) | undefined;
+  if (!event) {
+    return { ok: false, errors: [`Missing evidence event ${input.eventId}`] };
+  }
+
+  const monitorKeys = getPublicKeyHistory(input.ledger.workspace, "monitor");
+  const retentionProofs = event.archived === 1 || event.payload_pruned === 1
+    ? buildRetentionProofIndex(input.ledger.workspace)
+    : undefined;
+  if (retentionProofs && !retentionProofs.ok) errors.push(...retentionProofs.errors);
+  verifyEvidencePayload(event, input.ledger.workspace, errors, undefined, retentionProofs);
+  const prefix = input.ledger.db.prepare(
+    "SELECT * FROM evidence_events WHERE rowid <= ? ORDER BY rowid ASC"
+  ).all(event.row_id) as EvidenceEvent[];
+  let previousHash = "GENESIS";
+  for (const prefixEvent of prefix) {
+    if (prefixEvent.prev_event_hash !== previousHash) {
+      errors.push(`Event ${prefixEvent.id} previous hash mismatch`);
+    }
+    const canonicalMetadata = canonicalMetadataForHash({
+      id: prefixEvent.id,
+      ts: prefixEvent.ts,
+      sessionId: prefixEvent.session_id,
+      runtime: prefixEvent.runtime,
+      eventType: prefixEvent.event_type,
+      payloadPath: prefixEvent.canonical_payload_path ?? prefixEvent.payload_path,
+      payloadInline: prefixEvent.canonical_payload_inline ?? prefixEvent.payload_inline,
+      metaJson: prefixEvent.meta_json
+    });
+    const recalculated = sha256Hex(`${prefixEvent.prev_event_hash}${canonicalMetadata}${prefixEvent.payload_sha256}`);
+    if (recalculated !== prefixEvent.event_hash) errors.push(`Event ${prefixEvent.id} event_hash mismatch`);
+    if (!verifyHexDigestAny(prefixEvent.event_hash, prefixEvent.writer_sig, monitorKeys)) {
+      errors.push(`Event ${prefixEvent.id} writer signature invalid`);
+    }
+    previousHash = prefixEvent.event_hash;
+  }
+
+  let meta: Record<string, unknown> | null = null;
+  try {
+    meta = JSON.parse(event.meta_json) as Record<string, unknown>;
+  } catch {
+    errors.push(`Event ${event.id} metadata is invalid JSON`);
+  }
+  const receipt = typeof meta?.receipt === "string" && meta.receipt.length > 0 ? meta.receipt : null;
+  if (!receipt) {
+    if (input.requireReceipt) errors.push(`Event ${event.id} receipt missing`);
+  } else {
+    const verified = verifyReceipt(receipt, monitorKeys);
+    if (!verified.ok || !verified.payload) {
+      errors.push(`Event ${event.id} receipt verification failed`);
+    } else {
+      if (verified.payload.event_hash !== event.event_hash) errors.push(`Event ${event.id} receipt event_hash mismatch`);
+      if (verified.payload.session_id !== event.session_id) errors.push(`Event ${event.id} receipt session mismatch`);
+      const expectedBodySha = typeof meta?.bodySha256 === "string" && meta.bodySha256.length === 64
+        ? meta.bodySha256
+        : event.payload_sha256;
+      if (verified.payload.body_sha256 !== expectedBodySha) errors.push(`Event ${event.id} receipt body_sha256 mismatch`);
+      if (typeof meta?.receipt_id !== "string" || meta.receipt_id !== verified.payload.receipt_id) {
+        errors.push(`Event ${event.id} receipt_id mismatch`);
+      }
+    }
+    if (typeof meta?.receipt_sha256 !== "string" || sha256Hex(Buffer.from(receipt, "utf8")) !== meta.receipt_sha256) {
+      errors.push(`Event ${event.id} receipt_sha256 mismatch`);
+    }
+  }
+
+  if (input.requireSealedSession) {
+    const session = input.ledger.db.prepare(
+      "SELECT session_final_event_hash, session_seal_sig FROM sessions WHERE session_id = ? LIMIT 1"
+    ).get(event.session_id) as { session_final_event_hash: string | null; session_seal_sig: string | null } | undefined;
+    const last = input.ledger.db.prepare(
+      "SELECT event_hash FROM evidence_events WHERE session_id = ? ORDER BY rowid DESC LIMIT 1"
+    ).get(event.session_id) as { event_hash: string } | undefined;
+    if (!session || !session.session_final_event_hash || !session.session_seal_sig || !last) {
+      errors.push(`Session ${event.session_id} missing seal`);
+    } else {
+      if (session.session_final_event_hash !== last.event_hash) errors.push(`Session ${event.session_id} final hash mismatch`);
+      if (!verifyHexDigestAny(session.session_final_event_hash, session.session_seal_sig, monitorKeys)) {
+        errors.push(`Session ${event.session_id} seal signature invalid`);
+      }
+    }
+  }
+
+  return { ok: errors.length === 0, errors };
+}
+
+function verifyEvents(
+  ledger: Ledger,
+  workspace: string,
+  errors: string[],
+  externallyAuthenticatedPayloads?: ReadonlyMap<string, string>
+): void {
   const events = ledger.getAllEvents();
+  const retentionProofs = events.some((event) => event.archived === 1 || event.payload_pruned === 1)
+    ? buildRetentionProofIndex(workspace)
+    : undefined;
+  if (retentionProofs && !retentionProofs.ok) errors.push(...retentionProofs.errors);
   const monitorKeys = getPublicKeyHistory(workspace, "monitor");
   const eventByHash = new Map<string, EvidenceEvent>();
   for (const event of events) {
@@ -1784,37 +2072,7 @@ function verifyEvents(ledger: Ledger, workspace: string, errors: string[]): void
 
   let previous = "GENESIS";
   for (const event of events) {
-    if (event.payload_pruned !== 1) {
-      if (event.payload_inline !== null) {
-        const payloadSha = sha256Hex(Buffer.from(event.payload_inline, "utf8"));
-        if (payloadSha !== event.payload_sha256) {
-          errors.push(`Event ${event.id} payload hash mismatch`);
-        }
-      } else {
-        const payloadPath = event.payload_path ?? event.canonical_payload_path ?? null;
-        if (payloadPath !== null) {
-          const full = join(workspace, payloadPath);
-          if (!pathExists(full)) {
-            errors.push(`Missing blob file for event ${event.id}: ${full}`);
-          } else {
-            const metadata = loadBlobMetadata(workspace, payloadPath);
-            if (metadata.payloadSha256 !== event.payload_sha256) {
-              errors.push(`Event ${event.id} payload hash mismatch`);
-            }
-          }
-        } else if (event.payload_sha256 !== sha256Hex(Buffer.alloc(0))) {
-          errors.push(`Event ${event.id} payload hash mismatch`);
-        }
-      }
-    } else {
-      const path = event.canonical_payload_path ?? event.payload_path;
-      if (path && pathExists(join(workspace, path))) {
-        const metadata = loadBlobMetadata(workspace, path);
-        if (metadata.payloadSha256 !== event.payload_sha256) {
-          errors.push(`Event ${event.id} pruned payload hash mismatch`);
-        }
-      }
-    }
+    verifyEvidencePayload(event, workspace, errors, externallyAuthenticatedPayloads, retentionProofs);
 
     if (event.prev_event_hash !== previous) {
       errors.push(`Event ${event.id} previous hash mismatch`);
@@ -2048,12 +2306,15 @@ function verifyFleetAndAgents(workspace: string, errors: string[]): void {
   }
 }
 
-export async function verifyLedgerIntegrity(workspacePath: string): Promise<VerifyResult> {
+export async function verifyLedgerIntegrity(
+  workspacePath: string,
+  options: LedgerVerifyOptions = {}
+): Promise<VerifyResult> {
   const ledger = openLedger(workspacePath);
   const errors: string[] = [];
 
   try {
-    verifyEvents(ledger, workspacePath, errors);
+    verifyEvents(ledger, workspacePath, errors, options.externallyAuthenticatedPayloads);
     verifySessions(ledger, workspacePath, errors);
     verifyRuns(ledger, workspacePath, errors);
     verifyOutcomeEvents(ledger, workspacePath, errors);

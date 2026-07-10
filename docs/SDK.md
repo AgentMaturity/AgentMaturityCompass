@@ -37,6 +37,52 @@ Publication caveat: the repo contains SDK source and generators, but separately 
 
 ---
 
+## Provider-Neutral Hook Observation
+
+Agents that already emit a canonical hook envelope can post an AMC-owned observed subset of the AEP `0.1` action lifecycle to:
+
+```text
+POST /bridge/hooks/aep/0.1/events
+```
+
+Mint a narrow lease instead of reusing a model-routing lease:
+
+```bash
+LEASE="$(amc lease issue \
+  --agent hook-agent \
+  --ttl 30m \
+  --scopes hook:observe \
+  --routes /hooks \
+  --models '*' \
+  --rpm 60)"
+EVENT_TIME="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+```
+
+Then send one action event:
+
+```bash
+curl -sS http://127.0.0.1:3212/bridge/hooks/aep/0.1/events \
+  -H "authorization: Bearer $LEASE" \
+  -H "content-type: application/json" \
+  --data @- <<JSON
+  {
+    "aep_version":"0.1",
+    "id":"evt-amc-demo-001",
+    "type":"action.requested",
+    "time":"${EVENT_TIME}",
+    "agent":{"slug":"example-agent"},
+    "action":{"type":"tool_call","id":"action-amc-demo-001","input":{"command":"npm test"}},
+    "tool":{"type":"native","name":"Shell"}
+  }
+JSON
+```
+
+AMC accepts only `action.requested`, `action.completed`, `action.failed`, and `action.denied`. It hashes and discards the raw body, hashes free-text error messages, stores an encrypted redacted projection, and returns a signed receipt. A byte-identical retry returns `200` with the original receipt and `idempotentReplay: true` only after recalculating prefix metadata hashes and links, verifying every prefix writer signature, authenticating the target payload or its signed retention proof, and verifying the receipt signature/digest, session seal, source pin, and agent/provider binding; a reused source event ID with different bytes returns `409`. Full ledger verification separately authenticates every retained historical payload, archive segment, and pruning proof. Authenticated attempts consume the signed lease request budget atomically before body parsing, including malformed requests. The implementation is pinned to source commit `2583cff9380f8f0a459d52c7112b6105c46496ed` and does not claim AEP conformance; the draft does not yet provide the planned 1.0 reference schema or conformance fixtures.
+
+This endpoint observes. It does not return allow, deny, or approval decisions.
+
+---
+
 ## Node/TypeScript
 
 ```ts

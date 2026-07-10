@@ -160,6 +160,13 @@ describe("ops hardening pack", () => {
       ledger.close();
     }
 
+    const dryRun = retentionRunCli(workspace, true);
+    expect(dryRun.dryRun).toBe(true);
+    expect(dryRun.archivedEventCount).toBeGreaterThan(0);
+    expect(dryRun.segmentPath).toBeNull();
+    expect(dryRun.manifestPath).toBeNull();
+    expect(dryRun.manifestSha256).toBeNull();
+
     const result = retentionRunCli(workspace, false);
     expect(result.segmentId).toBeTruthy();
     expect(result.archivedEventCount).toBeGreaterThan(0);
@@ -170,6 +177,14 @@ describe("ops hardening pack", () => {
 
     const verifyLedger = await verifyLedgerIntegrity(workspace);
     expect(verifyLedger.ok).toBe(true);
+
+    writeFileSync(result.segmentPath!, Buffer.from("not-a-gzip-segment", "utf8"));
+    const invalidRetention = await retentionVerifyCli(workspace);
+    expect(invalidRetention.ok).toBe(false);
+    expect(invalidRetention.errors.join("\n")).toMatch(/segment sha mismatch|segment read failure/i);
+    const invalidLedger = await verifyLedgerIntegrity(workspace);
+    expect(invalidLedger.ok).toBe(false);
+    expect(invalidLedger.errors.join("\n")).toMatch(/segment sha mismatch|segment read failure/i);
   });
 
   test("backup create/verify/restore works and tamper fails verify", async () => {

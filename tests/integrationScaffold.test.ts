@@ -284,13 +284,14 @@ describe("OpenAPI spec generation", () => {
     const spec = generateBridgeOpenApiSpec();
     expect(spec.openapi).toBe("3.1.0");
     expect(spec.info.title).toBe("AMC Bridge API");
-    expect(spec.info.version).toBe("1.0.0");
+    expect(spec.info.version).toBe("1.1.0");
   });
 
   test("includes all bridge endpoints", () => {
     const spec = generateBridgeOpenApiSpec();
     expect(spec.paths).toHaveProperty("/healthz");
     expect(spec.paths).toHaveProperty("/bridge/telemetry");
+    expect(spec.paths).toHaveProperty("/bridge/hooks/aep/0.1/events");
     expect(spec.paths).toHaveProperty("/bridge/openai/v1/chat/completions");
     expect(spec.paths).toHaveProperty("/bridge/openai/v1/responses");
     expect(spec.paths).toHaveProperty("/bridge/openai/v1/batches");
@@ -299,6 +300,8 @@ describe("OpenAPI spec generation", () => {
   test("includes component schemas", () => {
     const spec = generateBridgeOpenApiSpec();
     expect(spec.components.schemas).toHaveProperty("TelemetryEvent");
+    expect(spec.components.schemas).toHaveProperty("ObservedAepActionEvent");
+    expect(spec.components.schemas).toHaveProperty("ObservedHookReceipt");
     expect(spec.components.schemas).toHaveProperty("BridgeChatRequest");
   });
 

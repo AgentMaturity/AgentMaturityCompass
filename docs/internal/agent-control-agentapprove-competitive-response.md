@@ -30,6 +30,8 @@ Agent Control is currently easier to understand as a policy engine. AgentApprove
 
 AMC-1461 closes the first P0: Guardrails state now persists, verifies, distinguishes requested from effective, and binds only real Runtime Firewall rules.
 
+AMC-1462 closes the second P0: Bridge now accepts a least-privilege, quota-safe, pinned provider-neutral action subset and turns it into encrypted Watch evidence plus idempotently recoverable signed receipts without retaining raw hook payloads or claiming AEP conformance.
+
 ## What each competitor does well
 
 ### Agent Control
@@ -122,7 +124,7 @@ AMC must not import these files as executable policy. A future AEP lane should:
 | # | Action | Existing AMC primitive | Acceptance boundary |
 | ---: | --- | --- | --- |
 | 1 | Persist signed Guardrails intent and effective status | Runtime Firewall, artifact signatures | Shipped in AMC-1461; restart, concurrency, API, Dashboard, runtime, and tamper tests pass |
-| 2 | Add a pinned provider-neutral hook ingress | Bridge, Watch events, receipts | Observe AEP 0.1 subset; no conformance claim without schema and fixtures |
+| 2 | Add a pinned provider-neutral hook ingress | Bridge, Watch events, receipts | Shipped in AMC-1462; four AEP 0.1 action types, exact source pin, least-privilege lease, transactional quota, raw-body non-retention, recoverable signed receipts, conflicting-replay rejection, and no conformance claim |
 | 3 | Add `amc connect hooks` install/status/remove | Adapter registry, Studio supervisor | Idempotent, reversible, dry-run, exact files shown, no shell-profile surprises |
 | 4 | Return provider-native signed control responses | Approval policy, action policy, ToolHub | Allow/deny/ask maps are fixture-tested and replay protected |
 | 5 | Publish adapter capability receipts | Adapter registry, Passport | Every adapter declares events, controls, lossiness, version, and verification result |

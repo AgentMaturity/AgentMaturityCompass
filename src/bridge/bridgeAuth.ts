@@ -5,7 +5,7 @@ import { issueLeaseToken } from "../leases/leaseSigner.js";
 import { extractLeaseCarrier, type LeaseCarrier } from "../leases/leaseCarriers.js";
 import { loadLeaseRevocations, verifyLeaseRevocationsSignature } from "../leases/leaseStore.js";
 import { verifyLeaseToken } from "../leases/leaseVerifier.js";
-import type { LeasePayload } from "../leases/leaseSchema.js";
+import type { LeasePayload, LeaseScope } from "../leases/leaseSchema.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { workspaceIdFromDirectory } from "../workspaces/workspaceId.js";
@@ -185,6 +185,7 @@ export function verifyBridgeLease(params: {
   expectedAgentId?: string;
   routePath?: string;
   model?: string | null;
+  requiredScope?: LeaseScope;
 }): BridgeLeaseAuthResult {
   const carrier = extractLeaseCarrier({
     headers: params.headers,
@@ -216,7 +217,7 @@ export function verifyBridgeLease(params: {
     token: carrier.leaseToken,
     expectedWorkspaceId: workspaceIdFromDirectory(params.workspace),
     expectedAgentId: params.expectedAgentId,
-    requiredScope: "gateway:llm",
+    requiredScope: params.requiredScope ?? "gateway:llm",
     routePath: params.routePath,
     model: params.model,
     revokedLeaseIds

@@ -5,7 +5,8 @@ info:
     REST API for the Agent Maturity Compass (AMC) — score, govern, and assure AI agent deployments.
     Protected `/v1/*` routes use a signed AMC Studio session cookie or the Studio bootstrap admin token.
     Studio applies a least-privilege role policy per route; public compatibility routes opt out explicitly.
-  version: 1.0.0
+    Bridge hook routes override the Studio server and auth defaults with their own Bridge server roots and lease scope.
+  version: 1.1.0
   license:
     name: MIT
     url: https://opensource.org/licenses/MIT
@@ -41,6 +42,10 @@ components:
       in: header
       name: x-amc-webhook-token
       description: Vault-backed value webhook token stored under value/webhook/token.
+    leaseToken:
+      type: http
+      scheme: bearer
+      description: Signed, short-lived AMC agent lease. Provider-neutral observation requires hook:observe and an allowed /hooks route.
 
   schemas:
     ApiResponse:
@@ -816,6 +821,12 @@ components:
         nonClaim:
           type: string
 
+    ObservedAepActionEvent:
+      $ref: './schemas/observed-aep-action-event-0.1.schema.json'
+
+    ObservedHookReceipt:
+      $ref: './schemas/observed-hook-receipt.schema.json'
+
 tags:
   - name: health
     description: Health and readiness checks
@@ -899,8 +910,57 @@ tags:
     description: Agent timeline data
   - name: agentTimeline
     description: Agent timeline events
+  - name: hooks
+    description: Lease-scoped provider-neutral action observation
 
 paths:
+  # ── Provider-neutral hook observation ─────────────────────────
+  /bridge/hooks/aep/0.1/events:
+    post:
+      tags: [hooks, watch]
+      summary: Observe a pinned provider-neutral action event
+      description: |
+        Accepts AMC's strict observed subset of four AEP 0.1 action events pinned to
+        commit 2583cff9380f8f0a459d52c7112b6105c46496ed. AMC does not claim AEP conformance,
+        does not retain the raw body, and does not return a control decision.
+      servers:
+        - url: http://127.0.0.1:3212
+          description: Local AMC Bridge
+        - url: https://{host}
+          description: Self-hosted AMC Bridge
+          variables:
+            host:
+              default: amc.example.com
+      security:
+        - leaseToken: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ObservedAepActionEvent'
+      responses:
+        '200':
+          description: Previously observed byte-identical event and original signed receipt
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ObservedHookReceipt'
+        '201':
+          description: Observed event and signed receipt
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ObservedHookReceipt'
+        '400': { description: Malformed or unsupported observed event }
+        '401': { description: Missing or invalid lease }
+        '403': { description: Lease lacks hook scope or route }
+        '409': { description: Source event ID conflicts with previously observed bytes }
+        '413': { description: Payload exceeds 256 KiB }
+        '422': { description: Source timestamp is stale or too far in the future }
+        '429': { description: Signed lease request budget exceeded }
+        '503': { description: Hook quota or evidence ledger unavailable }
+
   # ── Health ─────────────────────────────────────────────────────
   /v1/health:
     get:

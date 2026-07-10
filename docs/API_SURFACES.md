@@ -508,6 +508,20 @@ Implemented non-provider endpoints:
 - `POST /bridge/lease/verify` (body: `{ "token": "<lease>" }`)
 - `POST /bridge/evidence` (body: `{ "event_type": "...", "session_id": "...", "payload": {...} }`)
 - `POST /bridge/telemetry` (body: telemetry event object validated by bridge schema)
+- `POST /bridge/hooks/aep/0.1/events` (AMC-owned observed subset of four AEP `0.1` action events)
+
+Provider-neutral hook boundary:
+
+- Source draft is pinned to commit `2583cff9380f8f0a459d52c7112b6105c46496ed`; AMC does not claim AEP conformance.
+- Accepted source types are `action.requested`, `action.completed`, `action.failed`, and `action.denied`.
+- Auth requires a signed lease with `hook:observe` and a route allowance matching `/hooks`.
+- The signed requests-per-minute budget is consumed transactionally before body parsing, so concurrent in-flight or malformed authenticated requests cannot bypass it.
+- The raw request is capped at 256 KiB, hashed, and discarded. The ledger retains an encrypted redacted projection and a signed receipt that binds the projection containing the raw digest.
+- Free-text error messages are retained only as SHA-256 digests. Duplicate keys, unsupported versions/types, malformed action relationships, stale/future timestamps, lease-budget exhaustion, ledger unavailability, and conflicting event-ID reuse fail closed.
+- A byte-identical retry returns `200`, `idempotentReplay: true`, and the original signed receipt without growing the ledger, but only after recalculating prefix metadata hashes and links, verifying every prefix writer signature, authenticating the target payload or its signed retention proof, and verifying the receipt, seal, source pin, and identity. Full ledger verification additionally authenticates all retained historical payloads, archive segments, and pruning proofs. First acceptance returns `201`; conflicting reuse returns `409`.
+- Generated and hosted request schemas encode the same tool/skill/MCP target requirements and completed/failed/denied lifecycle rules as runtime. The strict receipt schema is shared by both contracts.
+- Accepted rows reuse `tool_action` and `tool_result` evidence types, so they appear in existing Watch/Observe timelines without a parallel event store.
+- Provider-native control responses are not returned by this observation endpoint.
 
 Implemented provider endpoints:
 - `POST /bridge/openai/v1/chat/completions`

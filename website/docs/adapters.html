@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Adapter Guides — AMC Documentation</title>
-  <meta name="description" content="14 framework adapters for Agent Maturity Compass — LangChain, CrewAI, Claude Code, OpenAI, and more. One env var, zero code changes.">
+  <meta name="description" content="14 framework adapters plus lease-scoped provider-neutral action hooks for Agent Maturity Compass.">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230a0a0a'/%3E%3Ctext x='16' y='22' text-anchor='middle' fill='%234AEF79' font-size='18' font-weight='bold'%3Ea%3C/text%3E%3C/svg%3E">
   <link rel="stylesheet" href="shared.css?v=20260710c">
 </head>
@@ -52,6 +52,7 @@
     </div>
     <div class="sidebar-section">
       <h4>Advanced</h4>
+      <a href="#provider-neutral-hooks">Provider-Neutral Hooks</a>
       <a href="#sdk-integration">SDK Integration</a>
       <a href="#evidence-types">Evidence Types</a>
     </div>
@@ -68,7 +69,7 @@
     <div class="content">
 
       <h1 id="overview">Adapter Guides</h1>
-      <p class="subtitle">14 built-in adapters for every major AI agent framework. One environment variable change — zero code changes. AMC captures evidence transparently through its gateway proxy.</p>
+      <p class="subtitle">14 built-in adapters plus a lease-scoped provider-neutral action ingress. AMC captures signed evidence through its gateway and Bridge without requiring a framework rewrite.</p>
 
       <div class="callout callout-teal">
         <strong>The key insight</strong>
@@ -314,6 +315,24 @@ amc wrap any -- python bot.py</code></pre>
       </div>
 
       <hr>
+
+      <!-- Provider-neutral hooks -->
+      <h2 id="provider-neutral-hooks">Provider-Neutral Action Hooks</h2>
+      <p>Use the Bridge hook ingress when an agent can emit a canonical action envelope but does not need a source-specific AMC adapter.</p>
+      <pre><code><span class="comment"># Mint a least-privilege observation lease</span>
+LEASE="$(amc lease issue --agent hook-agent --ttl 30m \
+  --scopes hook:observe --routes /hooks --models '*' --rpm 60)"
+EVENT_TIME="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+
+curl -sS http://127.0.0.1:3212/bridge/hooks/aep/0.1/events \
+  -H "authorization: Bearer $LEASE" \
+  -H "content-type: application/json" \
+  --data "{\"aep_version\":\"0.1\",\"id\":\"evt-amc-001\",\"type\":\"action.requested\",\"time\":\"${EVENT_TIME}\",\"agent\":{\"slug\":\"example-agent\"},\"action\":{\"type\":\"tool_call\",\"id\":\"action-amc-001\"},\"tool\":{\"type\":\"native\",\"name\":\"Shell\"}}"</code></pre>
+
+      <div class="callout callout-teal">
+        <strong>Observed, not conformant</strong>
+        AMC accepts four action events from an AMC-owned AEP 0.1 subset pinned to <code>2583cff9380f8f0a459d52c7112b6105c46496ed</code>. It does not claim AEP conformance or return control decisions. Raw bodies are hashed and discarded; encrypted redacted projections and signed receipts appear in Watch. Byte-identical retries return the original receipt, while conflicting source event IDs fail closed.
+      </div>
 
       <!-- SDK Integration -->
       <h2 id="sdk-integration">SDK Integration (Node.js)</h2>

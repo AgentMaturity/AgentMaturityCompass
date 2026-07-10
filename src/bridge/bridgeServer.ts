@@ -15,6 +15,14 @@ import { preparePromptForBridgeRequest, validateBridgeResponseWithPromptPolicy }
 import type { PromptPackProvider } from "../prompt/promptPackSchema.js";
 import type { PromptPolicy } from "../prompt/promptPolicySchema.js";
 import { evaluateRuntimeFirewall, runtimeFirewallEnabled, type RuntimeFirewallDecision } from "../runtime/firewall.js";
+import {
+  HookIngressError,
+  MAX_OBSERVED_HOOK_BODY_BYTES,
+  OBSERVED_AEP_HOOK_PATH,
+  OBSERVED_AEP_HOOK_ROUTE,
+  consumeObservedHookRateLimit,
+  ingestObservedAepHookEvent,
+} from "./hookIngress.js";
 
 interface HandleBridgeRequestOptions {
   workspace: string;
@@ -340,6 +348,71 @@ export async function handleBridgeRequest(options: HandleBridgeRequestOptions): 
         maxCostUsdPerDay: verification.payload.maxCostUsdPerDay
       }
     });
+    return true;
+  }
+
+  if (options.pathname === OBSERVED_AEP_HOOK_PATH) {
+    if ((options.req.method ?? "POST").toUpperCase() !== "POST") {
+      writeJson(options.res, 405, { error: "method not allowed" });
+      return true;
+    }
+    const auth = verifyBridgeLease({
+      workspace: options.workspace,
+      requestUrl: options.url,
+      headers: options.req.headers,
+      routePath: OBSERVED_AEP_HOOK_ROUTE,
+      requiredScope: "hook:observe"
+    });
+    if (!auth.ok || !auth.payload) {
+      writeJson(options.res, auth.status, { error: auth.error ?? "unauthorized" });
+      return true;
+    }
+    try {
+      const rateLimit = consumeObservedHookRateLimit({
+        workspace: options.workspace,
+        leaseId: auth.payload.leaseId,
+        authenticatedAgentId: auth.payload.agentId,
+        maxRequestsPerMinute: auth.payload.maxRequestsPerMinute
+      });
+      if (!rateLimit.allowed) {
+        options.res.setHeader("retry-after", String(rateLimit.retryAfterSeconds));
+        writeJson(options.res, 429, { error: "hook lease rate limit exceeded" });
+        return true;
+      }
+      const rawBody = await readBody(options.req, Math.min(options.maxRequestBytes, MAX_OBSERVED_HOOK_BODY_BYTES));
+      const observed = ingestObservedAepHookEvent({
+        workspace: options.workspace,
+        authenticatedAgentId: auth.payload.agentId,
+        rawBody
+      });
+      writeJson(options.res, observed.idempotentReplay ? 200 : 201, {
+        ok: true,
+        observed: observed.observed,
+        idempotentReplay: observed.idempotentReplay,
+        conformanceClaim: observed.protocol.conformanceClaim,
+        protocol: observed.protocol,
+        sourceEventId: observed.sourceEventId,
+        sourceEventType: observed.sourceEventType,
+        actionId: observed.actionId,
+        eventId: observed.eventId,
+        evidenceType: observed.evidenceType,
+        sessionId: observed.sessionId,
+        rawBodySha256: observed.rawBodySha256,
+        receipt: observed.receipt,
+        receiptId: observed.receiptId,
+        receiptSha256: observed.receiptSha256
+      });
+    } catch (error) {
+      if (String(error).includes("PAYLOAD_TOO_LARGE")) {
+        writeJson(options.res, 413, { error: "hook payload too large" });
+        return true;
+      }
+      if (error instanceof HookIngressError) {
+        writeJson(options.res, error.statusCode, { error: error.message });
+        return true;
+      }
+      writeJson(options.res, 500, { error: "hook event could not be recorded" });
+    }
     return true;
   }
 
@@ -1138,18 +1211,26 @@ export async function startBridgeServer(params: {
   close: () => Promise<void>;
 }> {
   const server = createServer(async (req, res) => {
-    const url = new URL(req.url ?? "/", `http://${params.host}:${params.port}`);
-    const handled = await handleBridgeRequest({
-      workspace: params.workspace,
-      req,
-      res,
-      url,
-      pathname: url.pathname,
-      maxRequestBytes: params.maxRequestBytes ?? 1_048_576,
-      gatewayBaseUrl: params.gatewayBaseUrl
-    });
-    if (!handled) {
-      writeJson(res, 404, { error: "not found" });
+    try {
+      const url = new URL(req.url ?? "/", `http://${params.host}:${params.port}`);
+      const handled = await handleBridgeRequest({
+        workspace: params.workspace,
+        req,
+        res,
+        url,
+        pathname: url.pathname,
+        maxRequestBytes: params.maxRequestBytes ?? 1_048_576,
+        gatewayBaseUrl: params.gatewayBaseUrl
+      });
+      if (!handled) {
+        writeJson(res, 404, { error: "not found" });
+      }
+    } catch {
+      if (!res.headersSent) {
+        writeJson(res, 500, { error: "bridge request failed" });
+      } else {
+        res.destroy();
+      }
     }
   });
   await new Promise<void>((resolvePromise, rejectPromise) => {

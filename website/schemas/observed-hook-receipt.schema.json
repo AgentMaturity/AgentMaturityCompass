@@ -1,0 +1,128 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "ok",
+    "observed",
+    "idempotentReplay",
+    "conformanceClaim",
+    "protocol",
+    "sourceEventId",
+    "sourceEventType",
+    "actionId",
+    "eventId",
+    "evidenceType",
+    "sessionId",
+    "rawBodySha256",
+    "receipt",
+    "receiptId",
+    "receiptSha256"
+  ],
+  "properties": {
+    "ok": {
+      "type": "boolean",
+      "enum": [
+        true
+      ]
+    },
+    "observed": {
+      "type": "boolean",
+      "enum": [
+        true
+      ]
+    },
+    "idempotentReplay": {
+      "type": "boolean"
+    },
+    "conformanceClaim": {
+      "type": "boolean",
+      "enum": [
+        false
+      ]
+    },
+    "protocol": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "version",
+        "sourceCommit",
+        "conformanceClaim"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "enum": [
+            "aep"
+          ]
+        },
+        "version": {
+          "type": "string",
+          "enum": [
+            "0.1"
+          ]
+        },
+        "sourceCommit": {
+          "type": "string",
+          "enum": [
+            "2583cff9380f8f0a459d52c7112b6105c46496ed"
+          ]
+        },
+        "conformanceClaim": {
+          "type": "boolean",
+          "enum": [
+            false
+          ]
+        }
+      }
+    },
+    "sourceEventId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "sourceEventType": {
+      "type": "string",
+      "enum": [
+        "action.requested",
+        "action.completed",
+        "action.failed",
+        "action.denied"
+      ]
+    },
+    "actionId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "eventId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "evidenceType": {
+      "type": "string",
+      "enum": [
+        "tool_action",
+        "tool_result"
+      ]
+    },
+    "sessionId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "rawBodySha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "receipt": {
+      "type": "string",
+      "minLength": 1
+    },
+    "receiptId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "receiptSha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    }
+  }
+}

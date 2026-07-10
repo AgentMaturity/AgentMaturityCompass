@@ -7,16 +7,16 @@ import { appendTransparencyEntry } from "../../transparency/logChain.js";
 import { rebuildTransparencyMerkle } from "../../transparency/merkleIndexStore.js";
 import { pathExists, readUtf8, writeFileAtomic } from "../../utils/fs.js";
 import { sha256Hex } from "../../utils/hash.js";
-import { canonicalize } from "../../utils/json.js";
 import { blobPathFromId } from "../../storage/blobs/blobStore.js";
-import {
-  blobPrunedRowSchema,
-  blobPrunedSealSchema,
-  type BlobPrunedRow
-} from "./retentionSchema.js";
-import { getPrivateKeyPem, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from "../../crypto/keys.js";
 import { appendOpsAuditEvent } from "../audit.js";
-import { listRetentionSegments, verifyRetentionSegment, writeRetentionSegment } from "./retentionArchive.js";
+import {
+  appendPrunedRow,
+  listRetentionSegments,
+  readPrunedRows,
+  verifyPrunedRows,
+  verifyRetentionSegment,
+  writeRetentionSegment
+} from "./retentionArchive.js";
 import { runVacuum } from "../maintenance/sqliteMaintenance.js";
 
 export interface RetentionRunResult {
@@ -74,112 +74,6 @@ function writeMaintenanceState(workspace: string, state: { lastVacuumTs: number 
 
 function cutoffTs(days: number): number {
   return nowMs() - Math.max(1, days) * 24 * 60 * 60 * 1000;
-}
-
-function prunedLogPath(workspace: string): string {
-  return join(workspace, ".amc", "blobs", "pruned.jsonl");
-}
-
-function prunedSealPath(workspace: string): string {
-  return join(workspace, ".amc", "blobs", "pruned.jsonl.sig");
-}
-
-function readPrunedRows(workspace: string): BlobPrunedRow[] {
-  const file = prunedLogPath(workspace);
-  if (!pathExists(file)) {
-    return [];
-  }
-  return readUtf8(file)
-    .split(/\r?\n/)
-    .map((line) => line.trim())
-    .filter((line) => line.length > 0)
-    .map((line) => blobPrunedRowSchema.parse(JSON.parse(line) as unknown));
-}
-
-function signPrunedRows(workspace: string, lastHash: string): void {
-  const digest = sha256Hex(pathExists(prunedLogPath(workspace)) ? readFileSync(prunedLogPath(workspace)) : Buffer.alloc(0));
-  const signature = signHexDigest(digest, getPrivateKeyPem(workspace, "auditor"));
-  const seal = blobPrunedSealSchema.parse({
-    v: 1,
-    ts: Date.now(),
-    lastHash,
-    digestSha256: digest,
-    signature,
-    signer: "auditor"
-  });
-  writeFileAtomic(prunedSealPath(workspace), JSON.stringify(seal, null, 2), 0o644);
-}
-
-function appendPrunedRow(workspace: string, blobId: string, sha256: string): void {
-  const rows = readPrunedRows(workspace);
-  const prev = rows.length > 0 ? rows[rows.length - 1]!.hash : "";
-  const ts = Date.now();
-  const row = blobPrunedRowSchema.parse({
-    v: 1,
-    ts,
-    blobId,
-    sha256,
-    prev,
-    hash: sha256Hex(
-      canonicalize({
-        v: 1,
-        ts,
-        blobId,
-        sha256,
-        prev
-      })
-    )
-  });
-  const current = pathExists(prunedLogPath(workspace)) ? readUtf8(prunedLogPath(workspace)) : "";
-  writeFileAtomic(prunedLogPath(workspace), `${current}${JSON.stringify(row)}\n`, 0o644);
-  signPrunedRows(workspace, row.hash);
-}
-
-function verifyPrunedRows(workspace: string): { ok: boolean; errors: string[] } {
-  const errors: string[] = [];
-  const rows = readPrunedRows(workspace);
-  let prev = "";
-  for (const row of rows) {
-    if (row.prev !== prev) {
-      errors.push(`blob pruned row chain mismatch at ${row.blobId}`);
-    }
-    const expected = sha256Hex(
-      canonicalize({
-        v: 1,
-        ts: row.ts,
-        blobId: row.blobId,
-        sha256: row.sha256,
-        prev: row.prev
-      })
-    );
-    if (row.hash !== expected) {
-      errors.push(`blob pruned row hash mismatch at ${row.blobId}`);
-    }
-    prev = row.hash;
-  }
-  if (pathExists(prunedSealPath(workspace))) {
-    try {
-      const seal = blobPrunedSealSchema.parse(JSON.parse(readUtf8(prunedSealPath(workspace))) as unknown);
-      const digest = sha256Hex(pathExists(prunedLogPath(workspace)) ? readFileSync(prunedLogPath(workspace)) : Buffer.alloc(0));
-      if (seal.digestSha256 !== digest) {
-        errors.push("blob pruned seal digest mismatch");
-      } else {
-        const valid = verifyHexDigestAny(digest, seal.signature, getPublicKeyHistory(workspace, "auditor"));
-        if (!valid) {
-          errors.push("blob pruned seal signature invalid");
-        }
-      }
-      if (seal.lastHash !== (rows.length > 0 ? rows[rows.length - 1]!.hash : "")) {
-        errors.push("blob pruned seal last hash mismatch");
-      }
-    } catch (error) {
-      errors.push(`invalid blob pruned seal: ${String(error)}`);
-    }
-  }
-  return {
-    ok: errors.length === 0,
-    errors
-  };
 }
 
 export function retentionStatus(workspace: string): {
@@ -248,31 +142,6 @@ export function runRetention(params: { workspace: string; dryRun: boolean }): Re
     let manifestPath: string | null = null;
     let manifestSha256: string | null = null;
 
-    if (segmentId) {
-      const prevSegments = listRetentionSegments(params.workspace);
-      const prevLast = prevSegments.length > 0 ? prevSegments[prevSegments.length - 1]!.manifest?.lastEventHash ?? null : null;
-      const lines = archiveEvents.map((row) => JSON.stringify(row));
-      const startTs = archiveEvents[0]!.ts;
-      const endTs = archiveEvents[archiveEvents.length - 1]!.ts;
-      const segment = writeRetentionSegment({
-        workspace: params.workspace,
-        segmentId,
-        startTs,
-        endTs,
-        eventLines: lines,
-        firstEventHash: archiveEvents[0]!.event_hash,
-        lastEventHash: archiveEvents[archiveEvents.length - 1]!.event_hash,
-        prevSegmentLastEventHash: prevLast,
-        prunePolicy: {
-          prunePayloadsAfterDays: policy.opsPolicy.retention.prunePayloadsAfterDays,
-          archivePayloadsAfterDays: policy.opsPolicy.retention.archivePayloadsAfterDays
-        }
-      });
-      segmentPath = segment.segmentPath;
-      manifestPath = segment.manifestPath;
-      manifestSha256 = sha256Hex(readFileSync(segment.manifestPath));
-    }
-
     const auditEventIds: string[] = [];
     if (params.dryRun) {
       const dryAudit = appendOpsAuditEvent({
@@ -297,6 +166,31 @@ export function runRetention(params: { workspace: string; dryRun: boolean }): Re
         auditEventIds,
         transparencyHash: null
       };
+    }
+
+    if (segmentId) {
+      const prevSegments = listRetentionSegments(params.workspace);
+      const prevLast = prevSegments.length > 0 ? prevSegments[prevSegments.length - 1]!.manifest?.lastEventHash ?? null : null;
+      const lines = archiveEvents.map((row) => JSON.stringify(row));
+      const startTs = archiveEvents[0]!.ts;
+      const endTs = archiveEvents[archiveEvents.length - 1]!.ts;
+      const segment = writeRetentionSegment({
+        workspace: params.workspace,
+        segmentId,
+        startTs,
+        endTs,
+        eventLines: lines,
+        firstEventHash: archiveEvents[0]!.event_hash,
+        lastEventHash: archiveEvents[archiveEvents.length - 1]!.event_hash,
+        prevSegmentLastEventHash: prevLast,
+        prunePolicy: {
+          prunePayloadsAfterDays: policy.opsPolicy.retention.prunePayloadsAfterDays,
+          archivePayloadsAfterDays: policy.opsPolicy.retention.archivePayloadsAfterDays
+        }
+      });
+      segmentPath = segment.segmentPath;
+      manifestPath = segment.manifestPath;
+      manifestSha256 = sha256Hex(readFileSync(segment.manifestPath));
     }
 
     if (segmentId && manifestSha256) {
