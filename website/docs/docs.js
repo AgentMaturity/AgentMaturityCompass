@@ -1,7 +1,9 @@
 // AMC Docs — Dynamic Documentation Hub
-// Loads markdown files from GitHub and renders them with marked.js
+// Loads build-verified, same-origin Markdown and renders it with pinned marked.js.
 
-const BASE_RAW = 'https://raw.githubusercontent.com/AgentMaturity/AgentMaturityCompass/main/docs/';
+const DOCS_CONTENT_BASE = globalThis.AMC_DOCS_CONTENT_BASE || './content/';
+const DOCS_MANIFEST_URL = globalThis.AMC_DOCS_MANIFEST_URL || './content-manifest.json';
+const DOCS_MANIFEST_SCHEMA_VERSION = '2026-07-10';
 
 // ─── Category Mapping ───
 const CATEGORIES = [
@@ -227,10 +229,99 @@ const PUBLIC_CATEGORIES = CATEGORIES.map(category => ({
   docs: category.docs.filter(doc => PUBLIC_DOCS.includes(doc))
 })).filter(category => category.docs.length > 0);
 
+globalThis.AMC_DOCS_BUILD_MANIFEST = Object.freeze({
+  publicDocs: Object.freeze([...PUBLIC_DOCS].sort()),
+  internalDocs: Object.freeze([...INTERNAL_DOCS].sort())
+});
+
 // ─── State ───
 const docCache = {};
 let currentDoc = null;
 let searchIndex = []; // {doc, title, content}
+let contentManifestPromise = null;
+
+function bytesToHex(bytes) {
+  return Array.from(bytes, byte => byte.toString(16).padStart(2, '0')).join('');
+}
+
+function validateContentManifest(manifest) {
+  if (!manifest || manifest.schemaVersion !== DOCS_MANIFEST_SCHEMA_VERSION) {
+    throw new Error('Docs content manifest schema is invalid.');
+  }
+  if (!Array.isArray(manifest.guides) || manifest.guideCount !== PUBLIC_DOCS.length) {
+    throw new Error('Docs content manifest guide count is invalid.');
+  }
+  const localArtifact = typeof window !== 'undefined' && (
+    window.location.protocol === 'file:' ||
+    window.location.hostname === 'localhost' ||
+    window.location.hostname === '127.0.0.1'
+  );
+  if (!/^[a-f0-9]{40}$/i.test(manifest.sourceRevision || '') && !(localArtifact && manifest.sourceRevision === null)) {
+    throw new Error('Docs content manifest revision is invalid.');
+  }
+  if (!manifest.renderer || manifest.renderer.package !== 'marked' ||
+      manifest.renderer.asset !== 'vendor/marked.min.js' ||
+      !/^\d+\.\d+\.\d+$/.test(manifest.renderer.version || '') ||
+      !Number.isInteger(manifest.renderer.bytes) || manifest.renderer.bytes <= 0 ||
+      !/^[a-f0-9]{64}$/.test(manifest.renderer.sha256 || '')) {
+    throw new Error('Docs renderer manifest is invalid.');
+  }
+
+  const expected = [...PUBLIC_DOCS].sort();
+  const actual = manifest.guides.map(guide => guide?.id).sort();
+  if (actual.length !== expected.length || actual.some((id, index) => id !== expected[index])) {
+    throw new Error('Docs content manifest does not match the public guide allowlist.');
+  }
+
+  const entries = new Map();
+  for (const guide of manifest.guides) {
+    if (!guide || !PUBLIC_DOCS.includes(guide.id) || entries.has(guide.id) ||
+        guide.source !== `docs/${guide.id}.md` ||
+        guide.asset !== `content/${guide.id}.md` ||
+        !Number.isInteger(guide.bytes) || guide.bytes < 0 ||
+        !/^[a-f0-9]{64}$/.test(guide.sha256 || '')) {
+      throw new Error('Docs content manifest contains an invalid guide record.');
+    }
+    entries.set(guide.id, guide);
+  }
+  return entries;
+}
+
+async function contentManifest() {
+  if (contentManifestPromise) return contentManifestPromise;
+  contentManifestPromise = (async () => {
+    const response = await fetch(DOCS_MANIFEST_URL, { cache: 'no-cache' });
+    if (!response.ok) throw new Error(`Docs content manifest returned HTTP ${response.status}.`);
+    return validateContentManifest(await response.json());
+  })();
+  try {
+    return await contentManifestPromise;
+  } catch (error) {
+    contentManifestPromise = null;
+    throw error;
+  }
+}
+
+async function fetchVerifiedGuide(docName) {
+  if (!PUBLIC_DOCS.includes(docName)) throw new Error('Guide is not in the public Docs allowlist.');
+  if (!globalThis.crypto?.subtle) throw new Error('Web Crypto is unavailable; guide integrity cannot be verified.');
+
+  const entries = await contentManifest();
+  const entry = entries.get(docName);
+  if (!entry) throw new Error('Guide is missing from the deployed Docs manifest.');
+  const manifestUrl = new URL(DOCS_MANIFEST_URL, window.location.href);
+  const guideUrl = new URL(entry.asset, manifestUrl);
+  const expectedUrl = new URL(`${docName}.md`, new URL(DOCS_CONTENT_BASE, window.location.href));
+  if (guideUrl.href !== expectedUrl.href) throw new Error('Guide asset path does not match the deployed Docs base.');
+
+  const response = await fetch(guideUrl.href, { cache: 'no-cache' });
+  if (!response.ok) throw new Error(`Guide returned HTTP ${response.status}.`);
+  const bytes = new Uint8Array(await response.arrayBuffer());
+  if (bytes.byteLength !== entry.bytes) throw new Error('Guide byte length failed the deployed manifest check.');
+  const digest = bytesToHex(new Uint8Array(await globalThis.crypto.subtle.digest('SHA-256', bytes)));
+  if (digest !== entry.sha256) throw new Error('Guide SHA-256 integrity check failed.');
+  return new TextDecoder('utf-8', { fatal: true }).decode(bytes);
+}
 
 // ─── Pretty name from filename ───
 function prettyName(doc) {
@@ -452,10 +543,7 @@ async function loadDoc(docName, section = '') {
   content.innerHTML = '<div class="loading">Loading documentation...</div>';
 
   try {
-    const url = BASE_RAW + docName + '.md';
-    const resp = await fetch(url);
-    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-    const md = await resp.text();
+    const md = await fetchVerifiedGuide(docName);
     docCache[docName] = md;
 
     // Add to search index
@@ -465,11 +553,12 @@ async function loadDoc(docName, section = '') {
 
     renderDoc(md, docName, section);
   } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
     content.innerHTML = `<div class="doc-error">
       <h2>Document unavailable</h2>
-      <p>Could not fetch <code>${docName}.md</code></p>
-      <p style="font-size:0.8rem">${err.message}</p>
-      <p style="margin-top:16px"><a href="${BASE_RAW}${docName}.md" target="_blank">Try opening directly →</a></p>
+      <p>Could not verify <code>${escHtml(docName)}.md</code> from the deployed Docs bundle.</p>
+      <p style="font-size:0.8rem">${escHtml(message)}</p>
+      <p style="margin-top:16px"><a href="#" onclick="event.preventDefault();showWelcome()">Return to Docs home</a></p>
     </div>`;
   }
 }
@@ -706,20 +795,17 @@ async function preloadSearchIndex() {
   for (const doc of priority) {
     if (docCache[doc]) continue;
     try {
-      const resp = await fetch(BASE_RAW + doc + '.md');
-      if (resp.ok) {
-        const md = await resp.text();
-        docCache[doc] = md;
-        const existing = searchIndex.find(s => s.doc === doc);
-        if (existing) existing.content = md.toLowerCase();
-        else searchIndex.push({ doc, title: prettyName(doc), content: md.toLowerCase() });
-      }
+      const md = await fetchVerifiedGuide(doc);
+      docCache[doc] = md;
+      const existing = searchIndex.find(s => s.doc === doc);
+      if (existing) existing.content = md.toLowerCase();
+      else searchIndex.push({ doc, title: prettyName(doc), content: md.toLowerCase() });
     } catch(e) { /* silent */ }
   }
 }
 
 // ─── Init ───
-(function init() {
+if (typeof document !== 'undefined' && typeof window !== 'undefined') (function init() {
   // Configure marked
   if (typeof marked !== 'undefined') {
     marked.setOptions({ gfm: true, breaks: false });

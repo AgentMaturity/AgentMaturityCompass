@@ -16,19 +16,33 @@ describe("GitHub Pages deployment runtime", () => {
     expect(workflow).not.toContain("FORCE_JAVASCRIPT_ACTIONS_TO_NODE24");
   });
 
-  test("preserves the narrow website deployment trigger and concurrency guard", () => {
+  test("triggers on every Pages artifact input and preserves the concurrency guard", () => {
     expect(workflow).toContain("branches: [main]");
-    expect(workflow).toContain("paths: [website/**]");
+    for (const path of [
+      "website/**",
+      "docs/**",
+      "scripts/build-pages-site.mjs",
+      "package.json",
+      "package-lock.json",
+      ".github/workflows/pages.yml",
+    ]) {
+      expect(workflow, path).toContain(path);
+    }
     expect(workflow).toContain("workflow_dispatch:");
     expect(workflow).toContain("group: pages");
     expect(workflow).toContain("cancel-in-progress: true");
   });
 
-  test("keeps least-privilege Pages permissions and the website artifact contract", () => {
+  test("builds a lockfile-pinned staged artifact with least-privilege Pages permissions", () => {
     expect(workflow).toContain("contents: read");
     expect(workflow).toContain("pages: write");
     expect(workflow).toContain("id-token: write");
-    expect(workflow).toContain("path: website");
+    expect(workflow).toContain("actions/setup-node@v6");
+    expect(workflow).toContain("node-version: 22");
+    expect(workflow).toContain("npm ci");
+    expect(workflow).toContain("npm run build:pages");
+    expect(workflow).toContain("path: tmp/pages-site");
+    expect(workflow).not.toContain("path: website");
     expect(workflow).toContain("url: ${{ steps.deployment.outputs.page_url }}");
     expect(workflow).toContain("id: deployment");
   });

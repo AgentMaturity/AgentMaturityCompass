@@ -1,5 +1,5 @@
 /* AMC Service Worker — network-first for pages, cache-first for static assets */
-const CACHE_NAME = 'amc-v6';
+const CACHE_NAME = 'amc-v7';
 const STATIC_ASSETS = [
   'style.css',
   'particles.js',
@@ -25,6 +25,27 @@ self.addEventListener('activate', (event) => {
 
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
+
+  const docsIntegrityAsset =
+    url.pathname === '/docs/content-manifest.json' ||
+    url.pathname.startsWith('/docs/content/') ||
+    url.pathname.startsWith('/docs/vendor/');
+
+  // Manifest-bound Docs assets must not be pinned behind an older cache online.
+  if (docsIntegrityAsset) {
+    event.respondWith(
+      fetch(event.request)
+        .then((response) => {
+          if (response.ok) {
+            const clone = response.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
+          }
+          return response;
+        })
+        .catch(() => caches.match(event.request))
+    );
+    return;
+  }
 
   // Network-first for API calls
   if (url.pathname.startsWith('/api/') || url.pathname.startsWith('/api')) {

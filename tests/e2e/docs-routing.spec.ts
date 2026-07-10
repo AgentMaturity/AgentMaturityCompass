@@ -1,18 +1,85 @@
+import { createHash } from "node:crypto";
+import { readFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import AxeBuilder from "@axe-core/playwright";
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const docsUrl = `file://${resolve(here, "../../website/docs/index.html")}`;
-const rawDocs = "https://raw.githubusercontent.com/AgentMaturity/AgentMaturityCompass/main/docs/";
+const contentBase = "https://docs.test/content/";
+const manifestUrl = "https://docs.test/content-manifest.json";
+const docsScript = readFileSync(resolve(here, "../../website/docs/docs.js"), "utf8");
+const publicBlock = docsScript.match(/const PUBLIC_DOC_IDS = new Set\(\[([\s\S]*?)\]\);/)?.[1] ?? "";
+const publicDocs = Array.from(publicBlock.matchAll(/'([^']+)'/g), match => match[1]).sort();
+
+function sha256(value: string): string {
+  return createHash("sha256").update(value).digest("hex");
+}
+
+async function configureDocsTransport(page: Page, options: {
+  markedScript: string;
+  bodyForDoc: (doc: string) => string;
+  manifestBodyForDoc?: (doc: string) => string;
+  fetchedDocs?: string[];
+}): Promise<void> {
+  await page.addInitScript(({ base, manifest }) => {
+    (globalThis as typeof globalThis & { AMC_DOCS_CONTENT_BASE?: string }).AMC_DOCS_CONTENT_BASE = base;
+    (globalThis as typeof globalThis & { AMC_DOCS_MANIFEST_URL?: string }).AMC_DOCS_MANIFEST_URL = manifest;
+  }, { base: contentBase, manifest: manifestUrl });
+  await page.route("**/vendor/marked.min.js", route => route.fulfill({
+    contentType: "application/javascript",
+    body: options.markedScript,
+  }));
+
+  const manifestBodyForDoc = options.manifestBodyForDoc ?? options.bodyForDoc;
+  const rendererHash = sha256(options.markedScript);
+  const guides = publicDocs.map(id => {
+    const body = manifestBodyForDoc(id);
+    return {
+      id,
+      source: `docs/${id}.md`,
+      asset: `content/${id}.md`,
+      bytes: Buffer.byteLength(body),
+      sha256: sha256(body),
+    };
+  });
+  await page.route(manifestUrl, route => route.fulfill({
+    contentType: "application/json",
+    headers: { "Access-Control-Allow-Origin": "*" },
+    body: JSON.stringify({
+      schemaVersion: "2026-07-10",
+      sourceRevision: "0123456789abcdef0123456789abcdef01234567",
+      guideCount: guides.length,
+      renderer: {
+        package: "marked",
+        version: "18.0.6",
+        asset: "vendor/marked.min.js",
+        bytes: Buffer.byteLength(options.markedScript),
+        sha256: rendererHash,
+      },
+      guides,
+    }),
+  }));
+  await page.route(`${contentBase}**`, route => {
+    const url = route.request().url();
+    options.fetchedDocs?.push(url);
+    const path = decodeURIComponent(new URL(url).pathname.replace(/^\/content\//, ""));
+    const doc = path.endsWith(".md") ? path.slice(0, -3) : path;
+    return route.fulfill({
+      body: options.bodyForDoc(doc),
+      contentType: "text/markdown",
+      headers: { "Access-Control-Allow-Origin": "*" },
+    });
+  });
+}
 
 test("rendered guide links stay in the Docs router and unknown targets fail closed", async ({ page }) => {
   const fetchedDocs: string[] = [];
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.route("https://cdn.jsdelivr.net/npm/marked/marked.min.js", route => route.fulfill({
-    contentType: "application/javascript",
-    body: `window.marked = {
+  await configureDocsTransport(page, {
+    fetchedDocs,
+    markedScript: `window.marked = {
       setOptions() {},
       parse(markdown) {
         if (markdown.includes("NESTED_ROUTE_FIXTURE")) {
@@ -21,16 +88,7 @@ test("rendered guide links stay in the Docs router and unknown targets fail clos
         return '<h1>Getting started</h1><h2 id="first-score">First score</h2>';
       }
     };`,
-  }));
-  await page.route(`${rawDocs}**`, route => {
-    const url = route.request().url();
-    fetchedDocs.push(url);
-    const body = url.endsWith("deep-dive/INDEX.md") ? "NESTED_ROUTE_FIXTURE" : "GETTING_STARTED_FIXTURE";
-    return route.fulfill({
-      body,
-      contentType: "text/markdown",
-      headers: { "Access-Control-Allow-Origin": "*" },
-    });
+    bodyForDoc: doc => doc === "deep-dive/INDEX" ? "NESTED_ROUTE_FIXTURE" : "GETTING_STARTED_FIXTURE",
   });
 
   await page.goto(`${docsUrl}#deep-dive/INDEX`);
@@ -77,20 +135,15 @@ test("rendered code controls preserve the AMC identity and announce copy outcome
       },
     });
   });
-  await page.route("https://cdn.jsdelivr.net/npm/marked/marked.min.js", route => route.fulfill({
-    contentType: "application/javascript",
-    body: `window.marked = {
+  await configureDocsTransport(page, {
+    markedScript: `window.marked = {
       setOptions() {},
       parse() {
         return "<h1>Copy control</h1><pre><code>printf 'Copy this exact payload'\\nsecond line\\n</code></pre>";
       }
     };`,
-  }));
-  await page.route(`${rawDocs}**`, route => route.fulfill({
-    body: "COPY_CONTROL_FIXTURE",
-    contentType: "text/markdown",
-    headers: { "Access-Control-Allow-Origin": "*" },
-  }));
+    bodyForDoc: () => "COPY_CONTROL_FIXTURE",
+  });
 
   await page.goto(`${docsUrl}#PLAYGROUND`);
   await expect(page.locator('.doc-article[data-doc="PLAYGROUND"]')).toBeVisible();
@@ -157,4 +210,23 @@ test("rendered code controls preserve the AMC identity and announce copy outcome
 
   const axe = await new AxeBuilder({ page }).analyze();
   expect(axe.violations).toEqual([]);
+});
+
+test("guide content with a stale or tampered hash fails closed before rendering", async ({ page }) => {
+  const browserErrors: string[] = [];
+  page.on("console", message => {
+    if (message.type() === "error") browserErrors.push(`console: ${message.text()}`);
+  });
+  page.on("pageerror", error => browserErrors.push(`page: ${error.message}`));
+  await configureDocsTransport(page, {
+    markedScript: "window.marked = { setOptions() {}, parse() { return '<h1>Must not render</h1>'; } };",
+    bodyForDoc: () => "TAMPERED",
+    manifestBodyForDoc: () => "EXPECTED",
+  });
+
+  await page.goto(`${docsUrl}#PLAYGROUND`);
+  await expect(page.locator(".doc-error")).toBeVisible();
+  await expect(page.locator(".doc-error")).toContainText("SHA-256 integrity check failed");
+  await expect(page.locator(".doc-article")).toHaveCount(0);
+  expect(browserErrors).toEqual([]);
 });

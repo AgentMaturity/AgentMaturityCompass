@@ -20,6 +20,7 @@
   },
   "scripts": {
     "build": "tsc -p tsconfig.json && chmod +x dist/cli.js && npm run copy-assets",
+    "build:pages": "node scripts/build-pages-site.mjs",
     "build:sea": "node scripts/build-sea.mjs",
     "brand:render": "node scripts/render-brand-assets.mjs",
     "package:desktop": "node scripts/package-desktop-installers.mjs",
@@ -120,6 +121,7 @@
     "@types/semver": "^7.7.1",
     "@vitest/coverage-v8": "^4.1.10",
     "date-fns": "^4.1.0",
+    "marked": "18.0.6",
     "tsx": "^4.23.0",
     "typescript": "^6.0.2",
     "vitest": "^4.1.10"
