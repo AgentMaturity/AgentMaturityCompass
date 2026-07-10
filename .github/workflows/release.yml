@@ -40,7 +40,7 @@ jobs:
         run: npm run release:prepare-assets
 
       - name: Upload public release assets
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: amc-public-release-assets
           path: |
@@ -102,7 +102,7 @@ jobs:
           fi
 
       - name: Download checksummed public release assets
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: amc-public-release-assets
           path: dist/release-assets

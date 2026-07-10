@@ -195,6 +195,10 @@ describe("truthful public distribution and brand contract", () => {
     expect(workflow).toContain("npm run package:desktop");
     expect(workflow).toContain("npm run package:desktop:verify");
     expect(workflow).toContain("dist/release-assets/SHA256SUMS");
+    expect(workflow).toContain("actions/upload-artifact@v7");
+    expect(workflow).toContain("actions/download-artifact@v8");
+    expect(workflow).not.toContain("actions/upload-artifact@v4");
+    expect(workflow).not.toContain("actions/download-artifact@v4");
     expect(workflow).toContain("secrets.NPM_TOKEN");
     expect(workflow).toMatch(/if \[ -z "\$NODE_AUTH_TOKEN" \]/);
   });
