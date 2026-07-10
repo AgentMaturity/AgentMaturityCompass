@@ -13,9 +13,7 @@ test.describe('Accessibility', () => {
 
   test('playground.html passes axe-core checks', async ({ page }) => {
     await page.goto(PLAYGROUND_URL);
-    const results = await new AxeBuilder({ page })
-      .disableRules(['color-contrast'])
-      .analyze();
+    const results = await new AxeBuilder({ page }).analyze();
     expect(results.violations).toEqual([]);
   });
 
