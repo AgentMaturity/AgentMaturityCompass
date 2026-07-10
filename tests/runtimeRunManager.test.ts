@@ -3,7 +3,7 @@ import { existsSync, mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { Readable } from "node:stream";
-import { afterEach, describe, expect, test } from "vitest";
+import { afterAll, afterEach, describe, expect, test } from "vitest";
 import { handleApiRoute } from "../src/api/index.js";
 import { writeLifecycleRunArtifact } from "../src/lifecycle/lifecycleRunArtifact.js";
 import { evaluateRuntimeFirewall, writeRuntimeFirewallPolicy } from "../src/runtime/firewall.js";
@@ -21,6 +21,9 @@ import {
 import type { DiagnosticReport } from "../src/types.js";
 
 const roots: string[] = [];
+const originalCheckpointDir = process.env.AMC_CONTROL_CHECKPOINT_DIR;
+const checkpointRoot = mkdtempSync(join(tmpdir(), "amc-runtime-run-checkpoints-"));
+process.env.AMC_CONTROL_CHECKPOINT_DIR = checkpointRoot;
 
 function workspace(): string {
   const dir = mkdtempSync(join(tmpdir(), "amc-runtime-runs-"));
@@ -112,6 +115,12 @@ afterEach(() => {
     const dir = roots.pop();
     if (dir) rmSync(dir, { recursive: true, force: true });
   }
+});
+
+afterAll(() => {
+  rmSync(checkpointRoot, { recursive: true, force: true });
+  if (originalCheckpointDir === undefined) delete process.env.AMC_CONTROL_CHECKPOINT_DIR;
+  else process.env.AMC_CONTROL_CHECKPOINT_DIR = originalCheckpointDir;
 });
 
 describe("runtime run manager", () => {

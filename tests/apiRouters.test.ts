@@ -80,6 +80,25 @@ const m = vi.hoisted(() => ({
   enableGuardrail: vi.fn(() => true),
   disableGuardrail: vi.fn(() => true),
   applyProfile: vi.fn(() => true),
+  setGuardrailRequested: vi.fn(() => ({ revision: 1, requestedGuardrails: ["safe-output"] })),
+  recoverGuardrailControlState: vi.fn(() => ({ integrity: "uninitialized", state: null })),
+  applyGuardrailControlProfile: vi.fn(() => ({
+    state: { revision: 1, requestedGuardrails: ["safe-output"] },
+    unsupported: []
+  })),
+  inspectGuardrailControlState: vi.fn(() => ({
+    integrity: "uninitialized",
+    state: null,
+    reason: "not initialized"
+  })),
+  listGuardrailsWithRuntimeStatus: vi.fn(() => [{
+    name: "safe-output",
+    enabled: true,
+    effective: true,
+    requestedEnabled: true,
+    mutable: true,
+    trusted: true
+  }]),
 
   pluginKeygenCli: vi.fn(() => ({ publicKeyPath: "pub.pem" })),
   pluginPackCli: vi.fn(() => ({ file: "plugin.amcplug" })),
@@ -452,6 +471,20 @@ vi.mock("../src/enforce/guardrailProfiles.js", () => ({
   enableGuardrail: m.enableGuardrail,
   disableGuardrail: m.disableGuardrail,
   applyProfile: m.applyProfile
+}));
+vi.mock("../src/enforce/guardrailControlState.js", () => ({
+  GUARDRAIL_RUNTIME_BINDINGS: {
+    "prompt-injection-detection": "promptInjection",
+    "data-exfiltration-guard": "secretExposure",
+    "context-window-guard": "payloadAnomaly"
+  },
+  inspectGuardrailControlState: m.inspectGuardrailControlState,
+  recoverGuardrailControlState: m.recoverGuardrailControlState,
+  setGuardrailRequested: m.setGuardrailRequested,
+  applyGuardrailControlProfile: m.applyGuardrailControlProfile
+}));
+vi.mock("../src/enforce/guardrailRuntimeBindings.js", () => ({
+  listGuardrailsWithRuntimeStatus: m.listGuardrailsWithRuntimeStatus
 }));
 vi.mock("../src/plugins/pluginCli.js", () => ({
   pluginKeygenCli: m.pluginKeygenCli,
@@ -1254,6 +1287,70 @@ describe("AMC API routers", () => {
     for (const [pathname, method, body, status] of cases) {
       await assertJsonRoute(handleToolsRoute, { pathname, method, body, workspace: ws }, status);
     }
+  });
+
+  test("guardrail API reports a committed mutation when only the post-commit status refresh races", async () => {
+    const ws = workspace();
+    m.listGuardrailsWithRuntimeStatus
+      .mockImplementationOnce(() => [{
+        name: "safe-output",
+        enabled: false,
+        effective: false,
+        requestedEnabled: false,
+        mutable: true,
+        trusted: false
+      }])
+      .mockImplementationOnce(() => {
+        throw new Error("policy changed during status refresh");
+      });
+
+    try {
+      const result = await callRoute(handleToolsRoute, {
+        pathname: "/api/v1/guardrails/enable",
+        method: "POST",
+        body: { name: "safe-output" },
+        workspace: ws
+      });
+      expect(result.status).toBe(200);
+      expect(result.json?.data).toMatchObject({
+        committed: true,
+        requested: true,
+        revision: 1,
+        guardrail: null,
+        statusError: "policy changed during status refresh"
+      });
+      expect(m.setGuardrailRequested).toHaveBeenCalledTimes(1);
+    } finally {
+      m.listGuardrailsWithRuntimeStatus.mockImplementation(() => [{
+        name: "safe-output",
+        enabled: true,
+        effective: true,
+        requestedEnabled: true,
+        mutable: true,
+        trusted: true
+      }]);
+    }
+  });
+
+  test("guardrail mutation APIs reject missing, mistyped, and unknown request fields", async () => {
+    const ws = workspace();
+    const cases = [
+      ["/api/v1/guardrails/enable", {}],
+      ["/api/v1/guardrails/enable", { name: 7 }],
+      ["/api/v1/guardrails/enable", { name: "safe-output", unexpected: true }],
+      ["/api/v1/guardrails/disable", { name: "" }],
+      ["/api/v1/guardrails/profile", { name: "default", unexpected: true }]
+    ] as const;
+
+    m.setGuardrailRequested.mockClear();
+    m.applyGuardrailControlProfile.mockClear();
+    for (const [pathname, body] of cases) {
+      const result = await callRoute(handleToolsRoute, { pathname, method: "POST", body, workspace: ws });
+      expect(result.status, pathname).toBe(400);
+      expect(result.json?.ok, pathname).toBe(false);
+    }
+    expect(m.setGuardrailRequested).not.toHaveBeenCalled();
+    expect(m.applyGuardrailControlProfile).not.toHaveBeenCalled();
   });
 
   test("compliance router covers compliance, policy, waiver, and regulatory routes", async () => {

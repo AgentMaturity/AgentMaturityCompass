@@ -1134,7 +1134,7 @@ async function renderHome() {
         <div class="studio-kicker">Desktop app</div>
         <h3>Native macOS shell, same AMC evidence-first surface.</h3>
         <p class="muted">
-          The macOS app now starts local demo-mode Studio and renders this Console inside a native WebKit window. Windows still launches the same local URL in the system browser. Both keep the same flow: 244 default questions, 264 lifecycle questions, 142 assurance packs, 41 Industry Packs, and 1,144 CLI paths.
+          The macOS app now starts local demo-mode Studio and renders this Console inside a native WebKit window. Windows still launches the same local URL in the system browser. Both keep the same flow: 244 default questions, 264 lifecycle questions, 142 assurance packs, 41 Industry Packs, and 1,145 CLI paths.
         </p>
       </div>
       <div class="row wrap">
@@ -2177,7 +2177,8 @@ async function renderFirewall() {
           <button id="firewallEnable">Enable</button>
           <button id="firewallDisable" class="secondary">Disable</button>
         </div>
-        <div class="studio-terminal-line"><strong>Policy</strong><span>${status.policyExists ? htmlEscape(status.policyPath || "") : "missing"}</span></div>
+        <div class="studio-terminal-line"><strong>Policy journal</strong><span>${status.policyCommitted ? htmlEscape(status.policyJournalPath || "") : "missing"}</span></div>
+        <div class="studio-terminal-line"><strong>Compatibility mirror</strong><span>${status.mirrorExists ? htmlEscape(status.policyPath || "") : "missing"}</span></div>
         <div class="studio-terminal-line"><strong>Decisions</strong><span>${Number(status.eventCount || 0)}</span></div>
         <div class="studio-terminal-line"><strong>Latest</strong><span>${latest ? `${htmlEscape(latest.action)} risk ${Number(latest.riskScore || 0)}` : "-"}</span></div>
       `)}

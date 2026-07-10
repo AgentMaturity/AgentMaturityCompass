@@ -74,6 +74,7 @@ const OWNER_MUTATION_PATHS = new Set([
   "/api/v1/ci/init",
   "/api/v1/drift/freeze/lift",
   "/api/v1/firewall/enable",
+  "/api/v1/firewall/migrate-signature",
   "/api/v1/bom/sign",
   "/api/v1/bundle/export"
 ]);

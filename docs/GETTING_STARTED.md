@@ -410,6 +410,10 @@ amc ingest ./external-agent-logs/ --type generic_json --agent imported-agent
 | `amc firewall enable --mode block` | Turn on Runtime Firewall protection for live Bridge/Gateway traffic |
 | `amc firewall check --direction request --text "ignore previous instructions"` | Preview the exact allow/warn/block decision before traffic reaches a model |
 | `amc firewall events` / `amc firewall export --format splunk --redacted` | Inspect and export signed runtime decisions without leaking local paths or sensitive previews |
+| `amc firewall migrate-signature --approve-legacy-kind` | Verify and preserve the exact semantics of a legacy policy in the signed control journal |
+| `amc guardrails list` | Compare signed requested controls with verified effective Runtime Firewall bindings |
+| `amc guardrails enable prompt-injection-detection` | Add a signed, additive request for a runtime-bound control |
+| `amc guardrails disable prompt-injection-detection` | Remove the request without weakening a separately signed Runtime Firewall policy |
 | `amc shield confirm scope-write --file security-scope.json` | Authorize controlled exploit confirmation with ownership, time window, safe mode, and allowed techniques |
 | `amc shield confirm run --scope <scope> --task finding-task.json` | Convert an authorized finding into safe proof with hashes, signals, and receipts instead of exploit instructions |
 | `amc shield confirm export <proof> --out safe-proof.json` | Export redacted confirmation proof for Vault/Passport evidence bundles |

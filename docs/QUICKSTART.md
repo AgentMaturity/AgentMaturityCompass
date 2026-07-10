@@ -259,6 +259,7 @@ amc wrap generic -- your-agent-command
 | Red-team your agent | `amc assurance run --all` |
 | Prove governed resources did not drift | `amc resource snapshot` / `amc resource validate` |
 | Protect live traffic | `amc firewall enable --mode block` / `amc firewall events` |
+| Inspect effective guardrails | `amc guardrails list` / `amc guardrails enable prompt-injection-detection` |
 | Confirm security findings safely | `amc shield confirm scope-write --file security-scope.json` / `amc shield confirm run --task finding-task.json` |
 | Import existing run evidence | `amc import ./agent-run --dry-run` / `amc import ./agent-run` |
 | Create a board one-pager | `amc executive brief --run latest --out board-brief.html` |

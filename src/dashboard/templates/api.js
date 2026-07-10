@@ -1,5 +1,5 @@
 /* AMC Dashboard API Client */
-const AMC_API = localStorage.getItem('amc_studio_url') || 'http://localhost:3210';
+const AMC_API = localStorage.getItem('amc_studio_url') || window.location.origin;
 
 async function amcApi(path, opts = {}) {
   try {
@@ -10,7 +10,14 @@ async function amcApi(path, opts = {}) {
 
     if (!res.ok) {
       const text = await res.text();
-      throw new Error(`API ${res.status}: ${text}`);
+      let detail = text;
+      try {
+        const parsed = JSON.parse(text);
+        detail = parsed.error || parsed.message || text;
+      } catch {
+        // Keep plain-text errors as provided by the local API.
+      }
+      throw new Error(`API ${res.status}: ${detail}`);
     }
 
     const text = await res.text();
@@ -45,7 +52,7 @@ async function amcApiWithFallback(paths, opts = {}) {
 
 async function checkStudio() {
   try {
-    await amcApiWithFallback(['/status', '/score/status', '/watch/status']);
+    await amcApi('/health');
     return true;
   } catch {
     return false;
@@ -75,7 +82,7 @@ async function applyDomain(domain, agent = 'default', opts = {}) {
 }
 
 async function getGuardrails() {
-  const data = await amcApiWithFallback(['/guardrails', '/guardrails/list']);
+  const data = await amcApi('/guardrails/list');
   if (Array.isArray(data)) {
     return data;
   }
@@ -89,14 +96,10 @@ async function getGuardrails() {
 }
 
 async function toggleGuardrail(id, enabled) {
-  try {
-    return await amcApi(`/guardrails/${id}`, { method: 'PATCH', body: JSON.stringify({ enabled }) });
-  } catch {
-    if (enabled) {
-      return amcApi('/guardrails/enable', { method: 'POST', body: JSON.stringify({ name: id }) });
-    }
-    return amcApi('/guardrails/disable', { method: 'POST', body: JSON.stringify({ name: id }) });
+  if (enabled) {
+    return amcApi('/guardrails/enable', { method: 'POST', body: JSON.stringify({ name: id }) });
   }
+  return amcApi('/guardrails/disable', { method: 'POST', body: JSON.stringify({ name: id }) });
 }
 
 async function getGuide(agent = 'default') {
@@ -123,11 +126,11 @@ function updateStudioBadge(connected) {
   _studioConnected = connected;
   const badge = document.getElementById('studio-status');
   if (!badge) return;
-  badge.textContent = connected ? '● Studio' : '○ Studio';
+  badge.textContent = connected ? '● Local API' : '○ Local API';
   badge.className = 'studio-badge ' + (connected ? 'studio-on' : 'studio-off');
   badge.title = connected
     ? `Connected to ${AMC_API}`
-    : 'Studio offline — start with: amc up';
+    : 'Local API offline — start with: amc dashboard open or amc up';
 }
 
 async function studioHeartbeat() {

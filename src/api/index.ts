@@ -499,7 +499,12 @@ export async function handleApiRoute(
   try {
     const route = matchApiRoute(pathname);
     if (route) {
-      return await route.handler(pathname, method, req, res, { workspace, apiToken });
+      const handled = await route.handler(pathname, method, req, res, { workspace, apiToken });
+      if (handled) {
+        return true;
+      }
+      apiError(res, 404, `API route not found: ${method} ${pathname}`);
+      return true;
     }
 
     // ── Legacy bridge redirects ───────────────────────────────────

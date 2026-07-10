@@ -3353,7 +3353,7 @@ paths:
       summary: Runtime Firewall status
       responses:
         '200':
-          description: Runtime Firewall policy mode and decision counts
+          description: Runtime Firewall mode, canonical policyCommitted/journal/checkpoint state, separate mirrorExists/policyPath compatibility state, integrity, and decision counts
 
   /v1/firewall/enable:
     post:
@@ -3364,6 +3364,7 @@ paths:
           application/json:
             schema:
               type: object
+              additionalProperties: false
               properties:
                 mode:
                   type: string
@@ -3374,7 +3375,46 @@ paths:
                   type: boolean
       responses:
         '201':
-          description: Runtime Firewall policy written
+          description: Runtime Firewall policy committed to its signed journal and separate host-local checkpoint
+        '400':
+          description: Invalid policy request
+        '409':
+          description: Existing policy or journal failed integrity verification or requires explicit legacy migration
+        '413':
+          description: JSON request body exceeds 1 MiB
+        '423':
+          description: Runtime Firewall policy writer is busy; retry the operation
+
+  /v1/firewall/migrate-signature:
+    post:
+      tags: [firewall]
+      summary: Verify and preserve legacy Runtime Firewall policy semantics in the signed control journal
+      description: OWNER-only in Studio. Captures and verifies one immutable policy/sidecar snapshot, validates the policy, commits its canonical semantics, and signs source and committed digests in migration metadata. Byte-for-byte preservation is not claimed.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [approveLegacyArtifactKind]
+              properties:
+                approveLegacyArtifactKind:
+                  type: boolean
+                  const: true
+      responses:
+        '201':
+          description: Exact verified policy semantics committed without default reconstruction
+        '400':
+          description: Malformed or non-boolean acknowledgement body
+        '403':
+          description: Studio session lacks the OWNER role
+        '409':
+          description: Legacy digest/signature invalid or an existing journal failed integrity verification
+        '413':
+          description: JSON request body exceeds 1 MiB
+        '423':
+          description: Runtime Firewall policy writer is busy; retry the operation
 
   /v1/firewall/check:
     post:
@@ -4960,61 +5000,113 @@ paths:
   /v1/guardrails/list:
     get:
       tags: [tools]
-      summary: List guardrails with status
+      summary: List signed requested state and effective runtime guardrail bindings
       responses:
         '200':
-          description: Guardrail list
+          description: Guardrail catalog with requested, effective, binding, mutability, trust, source, and reason fields
+        '409':
+          description: Guardrail control state or Runtime Firewall policy failed integrity verification
+        '423':
+          description: Guardrail control state is busy; retry the operation
 
   /v1/guardrails/enable:
     post:
       tags: [tools]
-      summary: Enable a guardrail
+      summary: Add a signed request for a runtime-bound guardrail
       requestBody:
+        required: true
         content:
           application/json:
             schema:
               type: object
+              additionalProperties: false
               required: [name]
               properties:
                 name:
                   type: string
+                  minLength: 1
+                  description: Guardrail ID. Runtime-bound IDs can be changed; known catalog-only IDs return 409 and unknown IDs return 404.
       responses:
         '200':
-          description: Guardrail enabled
+          description: Signed request persisted; statusError is populated only if post-commit status refresh raced
+        '400':
+          description: Malformed JSON or missing/invalid name
+        '403':
+          description: Local Dashboard mutation lacks its same-origin owner capability
+        '404':
+          description: Unknown guardrail
+        '409':
+          description: Catalog-only guardrail or failed artifact integrity
+        '413':
+          description: JSON request body exceeds 1 MiB
+        '423':
+          description: Guardrail control state is busy; retry the operation
 
   /v1/guardrails/disable:
     post:
       tags: [tools]
-      summary: Disable a guardrail
+      summary: Remove an additive guardrail request without weakening signed policy
       requestBody:
+        required: true
         content:
           application/json:
             schema:
               type: object
+              additionalProperties: false
               required: [name]
               properties:
                 name:
                   type: string
+                  minLength: 1
+                  description: Guardrail ID. Runtime-bound IDs can be changed; known catalog-only IDs return 409 and unknown IDs return 404.
       responses:
         '200':
-          description: Guardrail disabled
+          description: Signed request removed; statusError is populated only if post-commit status refresh raced
+        '400':
+          description: Malformed JSON or missing/invalid name
+        '403':
+          description: Local Dashboard mutation lacks its same-origin owner capability
+        '404':
+          description: Unknown guardrail
+        '409':
+          description: Catalog-only guardrail or failed artifact integrity
+        '413':
+          description: JSON request body exceeds 1 MiB
+        '423':
+          description: Guardrail control state is busy; retry the operation
 
   /v1/guardrails/profile:
     post:
       tags: [tools]
-      summary: Apply a guardrail profile
+      summary: Apply the runtime-bound subset of a signed additive profile
       requestBody:
+        required: true
         content:
           application/json:
             schema:
               type: object
+              additionalProperties: false
               required: [name]
               properties:
                 name:
                   type: string
+                  minLength: 1
+                  description: Profile ID. Known profiles are minimal, standard, strict, healthcare, and financial; unknown IDs return 404.
       responses:
         '200':
-          description: Profile applied
+          description: Profile committed with bound requests, effective controls, catalog-only exclusions, and optional statusError
+        '400':
+          description: Malformed JSON or missing/invalid name
+        '403':
+          description: Local Dashboard mutation lacks its same-origin owner capability
+        '404':
+          description: Unknown profile
+        '409':
+          description: Guardrail control state or Runtime Firewall policy failed integrity verification
+        '413':
+          description: JSON request body exceeds 1 MiB
+        '423':
+          description: Guardrail control state is busy; retry the operation
 
   /v1/plugins/list:
     get:

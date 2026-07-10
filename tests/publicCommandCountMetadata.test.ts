@@ -2,8 +2,8 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, test } from "vitest";
 
-const CURRENT_COMMAND_COUNT = "1,144";
-const CURRENT_COMMAND_COUNT_RAW = 1144;
+const CURRENT_COMMAND_COUNT = "1,145";
+const CURRENT_COMMAND_COUNT_RAW = 1145;
 const STALE_COMMAND_COUNT_PATTERNS = [
   /\b481 CLI commands\b/,
   /CLI \(481 commands\)/,
@@ -23,7 +23,14 @@ const CURRENT_COMMAND_COUNT_FILES = [
   "website/docs/cli.html",
   "website/docs/competitive-analysis.md",
   "docs/BENCHMARK_GALLERY.md",
-  "docs/AUDIT_50_AGENTS_BATCH5.md",
+];
+
+const HISTORICAL_COMMAND_COUNT_RECEIPTS = [
+  {
+    path: "docs/AUDIT_50_AGENTS_BATCH5.md",
+    count: "1,144",
+    observedAt: "2026-06-16",
+  },
 ];
 
 const REQUIRED_NPM_KEYWORDS = [
@@ -54,6 +61,14 @@ describe("public command-count and npm metadata claims", () => {
       for (const pattern of STALE_COMMAND_COUNT_PATTERNS) {
         expect(body, `${path} contains stale command count ${pattern}`).not.toMatch(pattern);
       }
+    }
+  });
+
+  test("dated audit receipts keep their observed command count and date", () => {
+    for (const receipt of HISTORICAL_COMMAND_COUNT_RECEIPTS) {
+      const body = readProjectFile(receipt.path);
+      expect(body, receipt.path).toContain(receipt.count);
+      expect(body, receipt.path).toContain(receipt.observedAt);
     }
   });
 

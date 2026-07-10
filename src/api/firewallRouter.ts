@@ -1,15 +1,36 @@
 import { resolve } from "node:path";
 import type { IncomingMessage, ServerResponse } from "node:http";
-import { apiError, apiSuccess, bodyJson, queryParam } from "./apiHelpers.js";
+import { z } from "zod";
+import { apiError, apiSuccess, bodyJson, isRequestBodyError, queryParam } from "./apiHelpers.js";
 import {
   evaluateRuntimeFirewall,
   exportRuntimeFirewallDecisions,
   listRuntimeFirewallDecisions,
+  migrateRuntimeFirewallPolicySignature,
   runtimeFirewallStatus,
   writeRuntimeFirewallPolicy,
   type RuntimeFirewallDirection,
   type RuntimeFirewallMode
 } from "../runtime/firewall.js";
+
+const firewallEnableBodySchema = z.object({
+  mode: z.enum(["observe", "warn", "block"]).optional(),
+  enabled: z.boolean().optional(),
+  failClosedOnMissingPolicy: z.boolean().optional()
+}).strict();
+
+const firewallMigrationBodySchema = z.object({
+  approveLegacyArtifactKind: z.literal(true)
+}).strict();
+
+function firewallErrorStatus(error: unknown): number {
+  if (isRequestBodyError(error)) return error.statusCode;
+  if (error instanceof z.ZodError) return 400;
+  const message = error instanceof Error ? error.message.toLowerCase() : "";
+  if (message.includes("busy")) return 423;
+  if (message.includes("integrity") || message.includes("invalid") || message.includes("legacy") || message.includes("checkpoint") || message.includes("journal")) return 409;
+  return 400;
+}
 
 function parseMode(mode: unknown): RuntimeFirewallMode {
   if (mode === "observe" || mode === "warn" || mode === "block") {
@@ -66,11 +87,7 @@ export async function handleFirewallRoute(
 
   if (pathname === "/api/v1/firewall/enable" && method === "POST") {
     try {
-      const body = await bodyJson<{
-        mode?: RuntimeFirewallMode;
-        enabled?: boolean;
-        failClosedOnMissingPolicy?: boolean;
-      }>(req);
+      const body = firewallEnableBodySchema.parse(await bodyJson<unknown>(req));
       const out = writeRuntimeFirewallPolicy({
         workspace,
         mode: parseMode(body.mode ?? "warn"),
@@ -79,7 +96,21 @@ export async function handleFirewallRoute(
       });
       apiSuccess(res, out, 201);
     } catch (err) {
-      apiError(res, 400, err instanceof Error ? err.message : "could not enable Runtime Firewall");
+      apiError(res, firewallErrorStatus(err), err instanceof Error ? err.message : "could not enable Runtime Firewall");
+    }
+    return true;
+  }
+
+  if (pathname === "/api/v1/firewall/migrate-signature" && method === "POST") {
+    try {
+      const body = firewallMigrationBodySchema.parse(await bodyJson<unknown>(req));
+      const out = migrateRuntimeFirewallPolicySignature({
+        workspace,
+        approveLegacyArtifactKind: body.approveLegacyArtifactKind
+      });
+      apiSuccess(res, out, 201);
+    } catch (err) {
+      apiError(res, firewallErrorStatus(err), err instanceof Error ? err.message : "could not migrate Runtime Firewall policy");
     }
     return true;
   }

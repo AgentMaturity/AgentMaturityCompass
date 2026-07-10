@@ -24,7 +24,7 @@ import { latestOutcomeReport, outcomeTrend, topValueGaps } from "../outcomes/out
 import { listDomainMetadata } from "../domains/domainRegistry.js";
 import { listIndustryPacks } from "../domains/industryPacks.js";
 import { getIndustryPackEntitlement, toIndustryPackCatalogItem } from "../domains/industryPackEntitlement.js";
-import { createGuardrailState, listGuardrailsWithStatus } from "../enforce/guardrailProfiles.js";
+import { listGuardrailsWithRuntimeStatus } from "../enforce/guardrailRuntimeBindings.js";
 
 export interface DashboardBuildInput {
   workspace: string;
@@ -239,21 +239,36 @@ function getPackSummaries(workspace: string): Array<{
   }));
 }
 
-function getGuardrailsList(): Array<{
+function getGuardrailsList(workspace: string): Array<{
   id: string;
   name: string;
   description: string;
   category: "security" | "compliance" | "quality" | "cost" | "safety";
   enabled: boolean;
+  requestedEnabled: boolean;
+  effective: boolean;
+  mutable: boolean;
+  trusted: boolean;
+  binding: string | null;
+  source: string;
+  reason: string;
+  stateRevision: number | null;
   triggeredCount: number;
 }> {
-  const state = createGuardrailState();
-  return listGuardrailsWithStatus(state).map((guardrail) => ({
+  return listGuardrailsWithRuntimeStatus(workspace).map((guardrail) => ({
     id: guardrail.name,
     name: guardrail.name,
     description: guardrail.description,
     category: guardrail.category,
     enabled: guardrail.enabled,
+    requestedEnabled: guardrail.requestedEnabled,
+    effective: guardrail.effective,
+    mutable: guardrail.mutable,
+    trusted: guardrail.trusted,
+    binding: guardrail.binding,
+    source: guardrail.source,
+    reason: guardrail.reason,
+    stateRevision: guardrail.stateRevision,
     triggeredCount: 0
   }));
 }
@@ -347,7 +362,7 @@ export function buildDashboard(input: DashboardBuildInput): DashboardBuildResult
     assurance,
     domains: getDomainSummaries(),
     industryPacks: getPackSummaries(input.workspace),
-    guardrails: getGuardrailsList(),
+    guardrails: getGuardrailsList(input.workspace),
     trustGraph: dashboardTrustGraph(input.workspace),
     approvalsSummary: {
       requested: 0,

@@ -83,9 +83,11 @@ describe("desktop app packaging and visual identity", () => {
     expect(app).toContain("Desktop app");
     expect(app).toContain("native WebKit");
     expect(app).toContain("142 assurance packs");
-    expect(app).toContain("1,144 CLI paths");
+    expect(app).toContain("1,145 CLI paths");
     expect(app).toContain("workspace-authenticated trust boundary");
     expect(app).toContain("mutable local data");
+    expect(app).toContain("status.policyCommitted");
+    expect(app).toContain("status.mirrorExists");
     expect(app).toContain("const launchCommand = demoMode");
     expect(app).toContain('setAttribute("aria-label", "Toggle navigation")');
     expect(app).toContain('nav.classList.toggle("mobile-nav-open"');

@@ -236,6 +236,10 @@ npm link</code></pre>
           <p>Use <code>amc evidence collect</code> for a guided wizard, or set up an <a href="adapters.html">adapter</a> for your framework. One environment variable — zero code changes.</p>
         </div>
         <div class="card">
+          <h4>Verify runtime controls</h4>
+          <p>Run <code>amc guardrails list</code> to separate signed control requests from effective Runtime Firewall bindings. Catalog-only controls stay inactive instead of being presented as protection.</p>
+        </div>
+        <div class="card">
           <h4>Generate reports</h4>
           <p>Name a run with <code>amc run-alias set q1-assessment latest</code>, then run <code>amc report q1-assessment --share --public-base-url https://reports.example.com/amc</code> for a static share bundle, or <code>amc report q1-assessment --executive</code> for a terminal summary.</p>
         </div>
@@ -256,6 +260,8 @@ npm link</code></pre>
           <tr><td><code>amc guide --status</code></td><td>One-line health check</td></tr>
           <tr><td><code>amc doctor</code></td><td>Check runtime and workspace health</td></tr>
           <tr><td><code>amc up</code></td><td>Start AMC Studio (gateway, proxy, dashboard, API)</td></tr>
+          <tr><td><code>amc guardrails list</code></td><td>Show requested, effective, bound, and signature-verified guardrail status</td></tr>
+          <tr><td><code>amc guardrails enable prompt-injection-detection</code></td><td>Persist a signed additive Runtime Firewall control request</td></tr>
           <tr><td><code>amc evidence collect</code></td><td>Interactive wizard to connect your agent</td></tr>
           <tr><td><code>amc evidence lifecycle list|inspect|export --redacted</code></td><td>Open or export the lifecycle artifacts behind full-score runs</td></tr>
           <tr><td><code>amc evidence episodes list|inspect|export --redacted</code></td><td>Open or export the evidence episodes behind full-score runs</td></tr>
@@ -275,6 +281,7 @@ npm link</code></pre>
           <tr><td><code>amc resource snapshot|validate|apply|rollback</code></td><td>Record, gate, accept, and rollback the resources governed by Enforce</td></tr>
           <tr><td><code>amc firewall enable --mode block</code></td><td>Protect live Bridge/Gateway traffic with allow, warn, or block decisions</td></tr>
           <tr><td><code>amc firewall events|export --redacted</code></td><td>Inspect and export signed runtime decisions for audit or SIEM review</td></tr>
+          <tr><td><code>amc firewall migrate-signature --approve-legacy-kind</code></td><td>Verify and preserve an exact legacy policy in the monotonic journal</td></tr>
           <tr><td><code>amc shield confirm scope-write --file security-scope.json</code></td><td>Authorize controlled exploit confirmation with ownership, time window, safe mode, and allowed techniques</td></tr>
           <tr><td><code>amc shield confirm run --scope &lt;scope&gt; --task finding-task.json</code></td><td>Convert an authorized finding into safe proof with hashes, signal refs, and receipts</td></tr>
           <tr><td><code>amc shield confirm export &lt;proof&gt; --out safe-proof.json</code></td><td>Export redacted confirmation proof without exploit instructions</td></tr>

@@ -91,7 +91,7 @@
 
       <div class="callout callout-green">
         <strong>By the numbers</strong>
-        The AMC CLI currently registers 1,144 command paths. Every command supports <code>--help</code> for inline documentation.
+        The AMC CLI currently registers 1,145 command paths. Every command supports <code>--help</code> for inline documentation.
       </div>
 
       <!-- Common workflow commands -->
@@ -309,6 +309,11 @@
             <tr><td><code>amc firewall events</code></td><td>List signed runtime decision events</td></tr>
             <tr><td><code>amc firewall export --format splunk --redacted</code></td><td>Export redacted SIEM-friendly decision logs</td></tr>
             <tr><td><code>amc firewall disable</code></td><td>Disable Runtime Firewall policy for the workspace</td></tr>
+            <tr><td><code>amc firewall migrate-signature --approve-legacy-kind</code></td><td>Verify and preserve an exact legacy policy in the monotonic journal</td></tr>
+            <tr><td><code>amc guardrails list</code></td><td>Compare signed requested state with effective, verified runtime bindings</td></tr>
+            <tr><td><code>amc guardrails enable &lt;id&gt;</code></td><td>Add a signed request for one of three Runtime Firewall-bound controls</td></tr>
+            <tr><td><code>amc guardrails disable &lt;id&gt;</code></td><td>Remove the additive request without weakening signed policy</td></tr>
+            <tr><td><code>amc guardrails profile &lt;name&gt;</code></td><td>Apply the bound subset and disclose catalog-only exclusions</td></tr>
             <tr><td><code>amc runtime status</code></td><td>Show persisted connected-agent run state counts</td></tr>
             <tr><td><code>amc runtime create --run &lt;id&gt;</code></td><td>Create a resumable runtime run</td></tr>
             <tr><td><code>amc runtime event &lt;id&gt; --type trace.received</code></td><td>Append a redacted runtime event</td></tr>

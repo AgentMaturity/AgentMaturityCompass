@@ -23,7 +23,7 @@ AMC is an open-source, evidence-based framework for measuring, comparing, and co
 - 94 scoring modules
 - 14 framework adapters
 - Test counts drift quickly; repository verification on 2026-07-10 recorded 1,050 Vitest files / 8,265 tests
-- 1,144 public `amc ...` command paths in `docs/CLI_COMMAND_INVENTORY.md` as of 2026-06-26
+- 1,145 public `amc ...` command paths in `docs/CLI_COMMAND_INVENTORY.md` as of 2026-07-10
 - ~700+ TypeScript source files plus late-stage/domain CLI registration splits
 
 ---
@@ -566,7 +566,7 @@ Request Token → Present Token → Verify (signature, expiry, claims)
 **Core: FREE forever (MIT)**
 - Full trust stack (Score, Shield, Enforce, Vault, Watch, Fleet, Passport, Comply)
 - All 14 framework adapters
-- 1,144 public `amc ...` command paths as of 2026-06-26
+- 1,145 public `amc ...` command paths as of 2026-07-10
 - 244 default diagnostic questions plus the 264-question lifecycle-expanded set
 - 142 assurance packs
 

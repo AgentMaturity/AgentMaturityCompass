@@ -4,7 +4,34 @@
  */
 
 import type { IncomingMessage, ServerResponse } from 'node:http';
-import { bodyJson, apiSuccess, apiError, queryParam, pathParam } from './apiHelpers.js';
+import { z } from 'zod';
+import { bodyJson, apiSuccess, apiError, isRequestBodyError, queryParam, pathParam } from './apiHelpers.js';
+
+const guardrailMutationBodySchema = z.object({
+  name: z.string().trim().min(1)
+}).strict();
+
+function guardrailErrorStatus(error: unknown): number {
+  if (isRequestBodyError(error)) return error.statusCode;
+  if (error instanceof z.ZodError) return 400;
+  if (error && typeof error === "object" && "code" in error) {
+    const code = String((error as { code?: unknown }).code ?? "");
+    if (code === "UNKNOWN_GUARDRAIL" || code === "UNKNOWN_PROFILE") return 404;
+    if (code === "UNBOUND_GUARDRAIL" || code === "INTEGRITY") return 409;
+    if (code === "LOCK_TIMEOUT") return 423;
+  }
+  if (error instanceof Error && error.message.toLowerCase().includes("integrity")) return 409;
+  return 500;
+}
+
+function guardrailName(body: unknown): string {
+  return guardrailMutationBodySchema.parse(body).name;
+}
+
+function guardrailErrorMessage(error: unknown, fallback: string): string {
+  if (error instanceof z.ZodError) return "Invalid guardrail request body";
+  return error instanceof Error ? error.message : fallback;
+}
 
 export async function handleToolsRoute(
   pathname: string,
@@ -61,12 +88,11 @@ export async function handleToolsRoute(
     // GET /api/v1/guardrails/list — list all guardrails with status
     if (pathname === '/api/v1/guardrails/list' && method === 'GET') {
       try {
-        const { createGuardrailState, listGuardrailsWithStatus } = await import('../enforce/guardrailProfiles.js');
-        const state = createGuardrailState();
-        const list = listGuardrailsWithStatus(state);
+        const { listGuardrailsWithRuntimeStatus } = await import('../enforce/guardrailRuntimeBindings.js');
+        const list = listGuardrailsWithRuntimeStatus(workspace);
         apiSuccess(res, { guardrails: list, total: list.length });
       } catch (err) {
-        apiError(res, 500, err instanceof Error ? err.message : 'Guardrails list failed');
+        apiError(res, guardrailErrorStatus(err), guardrailErrorMessage(err, 'Guardrails list failed'));
       }
       return true;
     }
@@ -74,15 +100,28 @@ export async function handleToolsRoute(
     // POST /api/v1/guardrails/enable — enable a guardrail
     if (pathname === '/api/v1/guardrails/enable' && method === 'POST') {
       try {
-        const body = await bodyJson<{ name: string }>(req);
-        if (!body.name) { apiError(res, 400, 'Required: name'); return true; }
-        const { createGuardrailState, enableGuardrail } = await import('../enforce/guardrailProfiles.js');
-        const state = createGuardrailState();
-        const ok = enableGuardrail(state, body.name);
-        if (!ok) { apiError(res, 404, `Unknown guardrail: ${body.name}`); return true; }
-        apiSuccess(res, { enabled: true, name: body.name });
+        const name = guardrailName(await bodyJson<unknown>(req));
+        const { recoverGuardrailControlState, setGuardrailRequested } = await import('../enforce/guardrailControlState.js');
+        const { listGuardrailsWithRuntimeStatus } = await import('../enforce/guardrailRuntimeBindings.js');
+        recoverGuardrailControlState(workspace);
+        listGuardrailsWithRuntimeStatus(workspace);
+        const state = setGuardrailRequested({
+          workspace,
+          name,
+          enabled: true,
+          source: 'api',
+          actor: 'local-api'
+        });
+        let guardrail = null;
+        let statusError: string | null = null;
+        try {
+          guardrail = listGuardrailsWithRuntimeStatus(workspace).find((row) => row.name === name) ?? null;
+        } catch (error) {
+          statusError = guardrailErrorMessage(error, 'Runtime status unavailable after commit');
+        }
+        apiSuccess(res, { committed: true, requested: true, name, revision: state.revision, guardrail, statusError });
       } catch (err) {
-        apiError(res, 500, err instanceof Error ? err.message : 'Guardrail enable failed');
+        apiError(res, guardrailErrorStatus(err), guardrailErrorMessage(err, 'Guardrail enable failed'));
       }
       return true;
     }
@@ -90,15 +129,28 @@ export async function handleToolsRoute(
     // POST /api/v1/guardrails/disable — disable a guardrail
     if (pathname === '/api/v1/guardrails/disable' && method === 'POST') {
       try {
-        const body = await bodyJson<{ name: string }>(req);
-        if (!body.name) { apiError(res, 400, 'Required: name'); return true; }
-        const { createGuardrailState, disableGuardrail } = await import('../enforce/guardrailProfiles.js');
-        const state = createGuardrailState();
-        const ok = disableGuardrail(state, body.name);
-        if (!ok) { apiError(res, 404, `Guardrail not found or not enabled: ${body.name}`); return true; }
-        apiSuccess(res, { disabled: true, name: body.name });
+        const name = guardrailName(await bodyJson<unknown>(req));
+        const { recoverGuardrailControlState, setGuardrailRequested } = await import('../enforce/guardrailControlState.js');
+        const { listGuardrailsWithRuntimeStatus } = await import('../enforce/guardrailRuntimeBindings.js');
+        recoverGuardrailControlState(workspace);
+        listGuardrailsWithRuntimeStatus(workspace);
+        const state = setGuardrailRequested({
+          workspace,
+          name,
+          enabled: false,
+          source: 'api',
+          actor: 'local-api'
+        });
+        let guardrail = null;
+        let statusError: string | null = null;
+        try {
+          guardrail = listGuardrailsWithRuntimeStatus(workspace).find((row) => row.name === name) ?? null;
+        } catch (error) {
+          statusError = guardrailErrorMessage(error, 'Runtime status unavailable after commit');
+        }
+        apiSuccess(res, { committed: true, requested: false, name, revision: state.revision, guardrail, statusError });
       } catch (err) {
-        apiError(res, 500, err instanceof Error ? err.message : 'Guardrail disable failed');
+        apiError(res, guardrailErrorStatus(err), guardrailErrorMessage(err, 'Guardrail disable failed'));
       }
       return true;
     }
@@ -106,16 +158,38 @@ export async function handleToolsRoute(
     // POST /api/v1/guardrails/profile — apply a guardrail profile
     if (pathname === '/api/v1/guardrails/profile' && method === 'POST') {
       try {
-        const body = await bodyJson<{ name: string }>(req);
-        if (!body.name) { apiError(res, 400, 'Required: name'); return true; }
-        const { createGuardrailState, applyProfile, listGuardrailsWithStatus } = await import('../enforce/guardrailProfiles.js');
-        const state = createGuardrailState();
-        const ok = applyProfile(state, body.name);
-        if (!ok) { apiError(res, 404, `Unknown profile: ${body.name}`); return true; }
-        const enabled = listGuardrailsWithStatus(state).filter(g => g.enabled);
-        apiSuccess(res, { applied: true, profile: body.name, enabledCount: enabled.length, enabled });
+        const name = guardrailName(await bodyJson<unknown>(req));
+        const { applyGuardrailControlProfile, recoverGuardrailControlState } = await import('../enforce/guardrailControlState.js');
+        const { listGuardrailsWithRuntimeStatus } = await import('../enforce/guardrailRuntimeBindings.js');
+        recoverGuardrailControlState(workspace);
+        listGuardrailsWithRuntimeStatus(workspace);
+        const applied = applyGuardrailControlProfile({
+          workspace,
+          profileName: name,
+          source: 'api',
+          actor: 'local-api'
+        });
+        let guardrails: ReturnType<typeof listGuardrailsWithRuntimeStatus> = [];
+        let statusError: string | null = null;
+        try {
+          guardrails = listGuardrailsWithRuntimeStatus(workspace);
+        } catch (error) {
+          statusError = guardrailErrorMessage(error, 'Runtime status unavailable after commit');
+        }
+        const effective = guardrails.filter((guardrail) => guardrail.effective);
+        apiSuccess(res, {
+          committed: true,
+          applied: true,
+          profile: name,
+          revision: applied.state.revision,
+          requestedCount: applied.state.requestedGuardrails.length,
+          effectiveCount: statusError ? null : effective.length,
+          unsupported: applied.unsupported,
+          guardrails,
+          statusError
+        });
       } catch (err) {
-        apiError(res, 500, err instanceof Error ? err.message : 'Guardrail profile failed');
+        apiError(res, guardrailErrorStatus(err), guardrailErrorMessage(err, 'Guardrail profile failed'));
       }
       return true;
     }

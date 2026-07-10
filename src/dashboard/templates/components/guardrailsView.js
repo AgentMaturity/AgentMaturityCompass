@@ -1,5 +1,5 @@
 (function () {
-  const GROUP_ORDER = ['Security', 'Privacy', 'Quality', 'Compliance'];
+  const GROUP_ORDER = ['Security', 'Privacy', 'Safety', 'Quality', 'Compliance'];
 
   function esc(v) {
     return String(v == null ? '' : v)
@@ -20,13 +20,13 @@
     const id = String(guardrail.id || guardrail.name || '').toLowerCase();
     const category = String(guardrail.category || '').toLowerCase();
 
-    if (id.includes('pii') || id.includes('data-exfiltration') || id.includes('credential') || id.includes('compliance-boundary')) {
+    if (id.includes('pii') || id.includes('data-exfiltration')) {
       return 'Privacy';
     }
     if (category === 'security') return 'Security';
     if (category === 'compliance') return 'Compliance';
     if (category === 'quality' || category === 'cost') return 'Quality';
-    if (category === 'safety') return 'Privacy';
+    if (category === 'safety') return 'Safety';
     return 'Quality';
   }
 
@@ -40,38 +40,51 @@
       name: prettyName(row.id || row.name),
       description: row.description || 'No description available.',
       category: row.category || 'quality',
-      enabled: !!row.enabled,
+      enabled: !!row.effective,
+      effective: !!row.effective,
+      requestedEnabled: !!row.requestedEnabled,
+      mutable: !!row.mutable,
+      trusted: !!row.trusted,
+      binding: row.binding || null,
+      source: row.source || 'none',
+      reason: row.reason || 'No effective runtime binding.',
       triggeredCount: Number(row.triggeredCount || row.triggered || 0)
     }));
   }
 
-  async function loadGuardrails(forceRefresh) {
-    if (!forceRefresh && Array.isArray(window.__amcGuardrailsCache)) {
-      return window.__amcGuardrailsCache;
-    }
+  function catalogFallbackGuardrails() {
+    return normalizeGuardrails((window.G && window.G.data && window.G.data.guardrails) || []).map((row) => ({
+      ...row,
+      enabled: false,
+      effective: false,
+      requestedEnabled: false,
+      mutable: false,
+      trusted: false,
+      source: 'catalog-only',
+      reason: 'Live integrity verification is unavailable; this build snapshot cannot establish effective runtime state.'
+    }));
+  }
 
-    const dataGuardrails = normalizeGuardrails((window.G && window.G.data && window.G.data.guardrails) || []);
-    if (dataGuardrails.length) {
-      window.__amcGuardrailsCache = dataGuardrails;
-    }
-
+  async function loadGuardrails() {
     if (typeof window.getGuardrails !== 'function') {
-      return window.__amcGuardrailsCache || [];
+      throw new Error('Live guardrail API is unavailable.');
     }
 
     try {
       const apiRows = await window.getGuardrails();
       const normalized = normalizeGuardrails(apiRows);
-      if (normalized.length) {
-        window.__amcGuardrailsCache = normalized;
+      if (!normalized.length) {
+        throw new Error('Live guardrail API returned no catalog rows.');
       }
-      return window.__amcGuardrailsCache || [];
-    } catch {
-      return window.__amcGuardrailsCache || [];
+      window.__amcGuardrailsCache = normalized;
+      return normalized;
+    } catch (error) {
+      window.__amcGuardrailsCache = null;
+      throw error;
     }
   }
 
-  function renderGuardrails(root, guardrails) {
+  function renderGuardrails(root, guardrails, integrityError) {
     const grouped = new Map(GROUP_ORDER.map((name) => [name, []]));
     for (const guardrail of guardrails) {
       const group = mapGroup(guardrail);
@@ -81,18 +94,22 @@
       grouped.get(group).push(guardrail);
     }
 
-    const enabledCount = guardrails.filter((g) => g.enabled).length;
+    const enabledCount = guardrails.filter((g) => g.effective).length;
+    const boundCount = guardrails.filter((g) => g.mutable).length;
     const triggeredCount = guardrails.filter((g) => g.triggeredCount > 0).length;
     const totalTriggers = guardrails.reduce((s, g) => s + g.triggeredCount, 0);
 
     root.innerHTML = `
       <div class="dim-page-header" style="margin-bottom:14px">
         <div class="dim-page-title">Guardrails</div>
-        <div class="dim-page-sub">Toggle runtime protections and monitor status by category</div>
+        <div class="dim-page-sub">Signed control intent, effective runtime bindings, and catalog boundaries</div>
       </div>
 
+      ${integrityError ? `<div class="guardrail-integrity-error" role="alert"><strong>Live integrity unavailable.</strong> ${esc(integrityError)} Controls are read-only until signed runtime state verifies.</div>` : ''}
+
       <div style="display:flex;gap:16px;margin-bottom:14px;font:400 12px/1 'Inter',sans-serif;color:var(--text-secondary)">
-        <span><strong style="color:var(--green)">${enabledCount}</strong> / ${guardrails.length} enabled</span>
+        <span><strong style="color:var(--green)">${enabledCount}</strong> effective</span>
+        <span><strong>${boundCount}</strong> runtime-bound / ${guardrails.length} cataloged</span>
         <span><strong style="color:${triggeredCount > 0 ? 'var(--amber)' : 'var(--text-tertiary)'}">${totalTriggers}</strong> triggers across <strong>${triggeredCount}</strong> guardrails</span>
       </div>
 
@@ -104,12 +121,19 @@
               <div class="ch"><span class="ch-dot"></span>${esc(group)}</div>
               <div class="guardrail-grid">
                 ${rows.length ? rows.map((item) => {
-                  const statusClass = item.triggeredCount > 0 ? 'triggered' : (item.enabled ? 'enabled' : 'disabled');
+                  const statusClass = item.triggeredCount > 0 ? 'triggered' : (item.effective ? 'enabled' : 'disabled');
                   const statusText = item.triggeredCount > 0
                     ? `Triggered ${item.triggeredCount}x`
-                    : item.enabled
-                      ? 'Enabled'
-                      : 'Disabled';
+                    : !item.mutable
+                      ? 'Catalog only'
+                      : item.effective
+                        ? `Effective · ${item.trusted ? 'verified' : 'unverified'}`
+                        : item.requestedEnabled
+                          ? 'Requested · not effective'
+                          : 'Inactive';
+                  const toggleTitle = item.mutable
+                    ? `${item.requestedEnabled ? 'Remove' : 'Add'} signed control request`
+                    : item.reason;
                   return `
                     <div class="guardrail-card" data-guardrail-id="${esc(item.id)}">
                       <div class="guardrail-head">
@@ -117,12 +141,14 @@
                           <div class="guardrail-name">${esc(item.name)}</div>
                           <div class="guardrail-desc">${esc(item.description)}</div>
                         </div>
-                        <button class="guardrail-toggle ${item.enabled ? 'on' : ''}" data-toggle-id="${esc(item.id)}" role="switch" aria-checked="${item.enabled ? 'true' : 'false'}" aria-label="Toggle ${esc(item.name)}">${item.enabled ? 'On' : 'Off'}</button>
+                        <button class="guardrail-toggle ${item.requestedEnabled ? 'on' : ''}" data-toggle-id="${esc(item.id)}" role="switch" aria-checked="${item.requestedEnabled ? 'true' : 'false'}" aria-label="Request ${esc(item.name)}" title="${esc(toggleTitle)}" ${item.mutable ? '' : 'disabled'}>${item.mutable ? (item.requestedEnabled ? 'On' : 'Off') : 'N/A'}</button>
                       </div>
                       <div class="guardrail-status ${statusClass}">
                         <span class="guardrail-dot"></span>
                         <span>${esc(statusText)}</span>
                       </div>
+                      <div class="guardrail-desc" style="margin-top:7px">${esc(item.reason)}</div>
+                      ${item.binding ? `<div class="guardrail-desc" style="margin-top:4px;font-family:'Space Mono',monospace">${esc(item.binding)}</div>` : ''}
                     </div>
                   `;
                 }).join('') : '<div class="empty"><span class="empty-i">🛡️</span><span class="empty-t">No guardrails in this category.</span></div>'}
@@ -139,13 +165,13 @@
   async function onToggle(id, button) {
     const guardrails = window.__amcGuardrailsCache || [];
     const item = guardrails.find((row) => row.id === id);
-    if (!item) return;
+    if (!item || !item.mutable) return;
 
-    const nextEnabled = !item.enabled;
+    const nextEnabled = !item.requestedEnabled;
 
     /* Confirm before disabling security-critical guardrails */
     if (!nextEnabled && SECURITY_GUARDRAILS.includes(id)) {
-      const ok = confirm(`⚠️ Disable "${item.name}"?\n\nThis is a security guardrail. Disabling it may expose your agent to risks.`);
+      const ok = confirm(`Remove the signed request for "${item.name}"?\n\nA separately signed Runtime Firewall policy remains authoritative.`);
       if (!ok) return;
     }
 
@@ -157,9 +183,8 @@
       if (typeof window.toggleGuardrail === 'function') {
         await window.toggleGuardrail(id, nextEnabled);
       }
-      item.enabled = nextEnabled;
       if (typeof window.showViewToast === 'function') {
-        window.showViewToast(`${item.name}: ${nextEnabled ? 'enabled' : 'disabled'}`);
+        window.showViewToast(`${item.name}: signed request ${nextEnabled ? 'added' : 'removed'}`);
       }
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
@@ -168,23 +193,32 @@
         window.showViewToast(`${msg} — fallback: ${fallback}`);
       }
     } finally {
+      window.__amcGuardrailsCache = null;
       button.disabled = false;
       button.textContent = originalText;
-      buildGuardrails();
+      buildGuardrails(true);
     }
   }
 
-  async function buildGuardrails() {
+  async function buildGuardrails(forceRefresh) {
     const root = document.getElementById('sec-guardrails');
     if (!root) return;
 
-    const guardrails = await loadGuardrails(false);
+    let guardrails;
+    let integrityError = null;
+    try {
+      guardrails = await loadGuardrails(!!forceRefresh);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      integrityError = message || 'The live guardrail state could not be verified.';
+      guardrails = catalogFallbackGuardrails();
+    }
     if (!guardrails.length) {
-      root.innerHTML = '<div class="empty"><span class="empty-i">🛡️</span><span class="empty-t">No guardrail metadata available yet.</span></div>';
+      root.innerHTML = `<div class="guardrail-integrity-error" role="alert"><strong>Live integrity unavailable.</strong> ${esc(integrityError || 'No guardrail metadata is available.')} Controls are disabled.</div>`;
       return;
     }
 
-    renderGuardrails(root, guardrails);
+    renderGuardrails(root, guardrails, integrityError);
 
     root.querySelectorAll('[data-toggle-id]').forEach((button) => {
       button.addEventListener('click', () => {

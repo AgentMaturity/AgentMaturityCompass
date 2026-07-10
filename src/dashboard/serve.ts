@@ -1,6 +1,8 @@
+import { randomBytes, timingSafeEqual } from "node:crypto";
 import { createReadStream } from "node:fs";
-import { createServer, type Server } from "node:http";
+import { createServer, type IncomingMessage, type Server } from "node:http";
 import { extname, join, normalize, resolve } from "node:path";
+import { handleApiRoute } from "../api/index.js";
 import { getAgentPaths, resolveAgentId } from "../fleet/paths.js";
 import { pathExists, readUtf8 } from "../utils/fs.js";
 
@@ -87,6 +89,46 @@ function safeResolve(root: string, pathname: string): string {
   return full;
 }
 
+const DASHBOARD_CAPABILITY_COOKIE = "amc_dashboard_cap";
+
+function requestCookie(req: IncomingMessage, name: string): string | null {
+  const cookie = req.headers.cookie;
+  if (!cookie) return null;
+  for (const segment of cookie.split(";")) {
+    const separator = segment.indexOf("=");
+    if (separator < 0) continue;
+    if (segment.slice(0, separator).trim() === name) return segment.slice(separator + 1).trim();
+  }
+  return null;
+}
+
+function constantTimeTokenEqual(actual: string | null, expected: string): boolean {
+  if (!actual) return false;
+  const actualBytes = Buffer.from(actual, "utf8");
+  const expectedBytes = Buffer.from(expected, "utf8");
+  return actualBytes.length === expectedBytes.length && timingSafeEqual(actualBytes, expectedBytes);
+}
+
+function allowedDashboardOrigins(server: Server): Set<string> {
+  const address = server.address();
+  if (!address || typeof address === "string") return new Set();
+  return new Set([
+    `http://127.0.0.1:${address.port}`,
+    `http://localhost:${address.port}`
+  ]);
+}
+
+function isAuthorizedDashboardMutation(input: {
+  server: Server;
+  req: IncomingMessage;
+  capability: string;
+}): boolean {
+  const origin = input.req.headers.origin;
+  return typeof origin === "string"
+    && allowedDashboardOrigins(input.server).has(origin)
+    && constantTimeTokenEqual(requestCookie(input.req, DASHBOARD_CAPABILITY_COOKIE), input.capability);
+}
+
 export async function serveDashboard(input: ServeDashboardInput): Promise<DashboardServerHandle> {
   const agentId = resolveAgentId(input.workspace, input.agentId);
   const paths = getAgentPaths(input.workspace, agentId);
@@ -96,8 +138,30 @@ export async function serveDashboard(input: ServeDashboardInput): Promise<Dashbo
     throw new Error(`Dashboard not built at ${rootDir}. Run 'amc dashboard build' first.`);
   }
 
-  const server: Server = createServer((req, res) => {
+  const dashboardCapability = randomBytes(32).toString("base64url");
+
+  const server: Server = createServer(async (req, res) => {
     const url = new URL(req.url ?? "/", "http://localhost");
+
+    if (url.pathname === "/api/v1/health" || url.pathname.startsWith("/api/v1/guardrails")) {
+      res.setHeader("cache-control", "no-store");
+      if (
+        (req.method ?? "GET").toUpperCase() !== "GET"
+        && !isAuthorizedDashboardMutation({ server, req, capability: dashboardCapability })
+      ) {
+        res.writeHead(403, { "content-type": "application/json; charset=utf-8" });
+        res.end(JSON.stringify({ ok: false, error: "Dashboard mutation requires its same-origin owner capability." }));
+        return;
+      }
+      await handleApiRoute(
+        url.pathname,
+        (req.method ?? "GET").toUpperCase(),
+        req,
+        res,
+        input.workspace
+      );
+      return;
+    }
 
     if (url.pathname === "/export.md") {
       try {
@@ -143,6 +207,13 @@ export async function serveDashboard(input: ServeDashboardInput): Promise<Dashbo
     }
     res.statusCode = 200;
     res.setHeader("content-type", contentType(file));
+    if (contentType(file).startsWith("text/html")) {
+      res.setHeader(
+        "set-cookie",
+        `${DASHBOARD_CAPABILITY_COOKIE}=${dashboardCapability}; HttpOnly; SameSite=Strict; Path=/`
+      );
+      res.setHeader("cache-control", "no-store");
+    }
     createReadStream(file).pipe(res);
   });
 

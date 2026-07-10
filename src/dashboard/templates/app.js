@@ -52,7 +52,7 @@ const ONBOARD_STEPS = [
   { icon: '📊', title: 'Your Trust Score', body: 'The overall score (0–5) reflects how mature and trustworthy your agent is across 5 dimensions: Strategy, Leadership, Culture, Resilience, and Skills. The L0→L5 maturity journey tracks your progress.' },
   { icon: '🔍', title: 'Evidence-Based', body: 'Unlike other frameworks, AMC verifies claims with cryptographic evidence chains. A claimed score of 5/5 might actually be 1/5 without evidence.' },
   { icon: '🏭', title: 'Industry Domains', body: '<strong>41 industry packs</strong> across 7 domains (Health, Education, Environment, Mobility, Governance, Technology, Wealth). Industry Packs are $9.99/month for all 41 packs. Click <strong>Domains</strong> in the sidebar to browse and unlock them.' },
-  { icon: '🛡️', title: 'Guardrails & Views', body: 'Toggle <strong>14 runtime guardrails</strong> (prompt injection, toxicity, PII, etc.) from the Guardrails section. Use the <strong>Engineer / CISO / Exec</strong> buttons (top-right) to switch views — each role sees only what matters to them.' },
+  { icon: '🛡️', title: 'Guardrails & Views', body: 'Manage <strong>signed guardrail intent</strong> and see which controls are truly runtime-bound and effective. Catalog-only controls stay visibly inactive. Use the <strong>Engineer / CISO / Exec</strong> buttons (top-right) to switch views.' },
   { icon: '🚀', title: 'Get Started', body: 'Run <code style="color:var(--accent);font-family:\'JetBrains Mono\',monospace">amc</code> to get a full score with no setup. Use <strong>Priority Actions</strong> to improve, or open the <strong>Terminal</strong> to run any AMC command. Press <kbd style="background:var(--bg-overlay);border:1px solid var(--border);border-radius:3px;padding:1px 5px;font-size:11px">⌘K</kbd> to search actions.' },
 ];
 
@@ -167,7 +167,7 @@ const CMD_ACTIONS = [
   { label: 'View evidence gaps', desc: 'See what evidence is missing', cmd: 'amc mechanic gap', nav: 'evidence' },
   { label: 'Check assurance packs', desc: 'Review all assurance pack results', cmd: 'amc assurance list', nav: 'assurance' },
   { label: 'Browse domain packs', desc: 'Open industry domain packs', cmd: null, nav: 'domains' },
-  { label: 'Manage guardrails', desc: 'Enable or disable runtime guardrails', cmd: 'amc guardrails list', nav: 'guardrails' },
+  { label: 'Manage guardrails', desc: 'Review signed intent and effective bindings', cmd: 'amc guardrails list', nav: 'guardrails' },
   { label: 'Open terminal', desc: 'View all registered agents', cmd: null, nav: 'fleet' },
   { label: 'View dimensions', desc: 'Explore dimension heatmap', cmd: null, nav: 'dimensions' },
   { label: 'Collect evidence', desc: 'Capture execution evidence logs', cmd: 'amc evidence collect', nav: 'evidence' },
@@ -401,6 +401,7 @@ function nav(section) {
     a.classList.toggle('on', a.dataset.s === section)
   );
   G.section = section;
+  window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
   if (section === 'dimensions' && !G.hm) { buildHm(); buildDimCards(); }
   if (section === 'assurance'  && !G.af) { buildAf(); }
   if (section === 'evidence'   && !G.ef) { buildEv(); }

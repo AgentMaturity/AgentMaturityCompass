@@ -1753,6 +1753,17 @@ code { font-family: 'Space Mono', monospace; }
   gap: 10px;
   margin-top: 12px;
 }
+.guardrail-integrity-error {
+  margin-bottom: 14px;
+  border: 1px solid color-mix(in srgb, var(--red) 48%, var(--border));
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--red) 9%, var(--bg-overlay));
+  color: var(--text-secondary);
+  font-size: 12px;
+  line-height: 1.5;
+  padding: 10px 12px;
+}
+.guardrail-integrity-error strong { color: var(--red); }
 .guardrail-card {
   border: 1px solid var(--border);
   border-radius: 12px;
@@ -1791,6 +1802,14 @@ code { font-family: 'Space Mono', monospace; }
 .guardrail-toggle:hover {
   transform: scale(1.05);
   border-color: var(--accent-border);
+}
+.guardrail-toggle:disabled,
+.guardrail-toggle:disabled:hover {
+  cursor: not-allowed;
+  opacity: .45;
+  transform: none;
+  border-color: var(--border);
+  box-shadow: none;
 }
 .guardrail-toggle.on {
   color: var(--green);

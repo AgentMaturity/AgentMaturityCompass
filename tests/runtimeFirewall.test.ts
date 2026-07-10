@@ -1,19 +1,34 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
-import { existsSync, mkdtempSync, readFileSync, rmSync } from "node:fs";
+import { spawn } from "node:child_process";
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, unlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { join, resolve } from "node:path";
 import { Readable } from "node:stream";
-import { afterEach, describe, expect, test } from "vitest";
+import { afterAll, afterEach, describe, expect, test } from "vitest";
 import { handleApiRoute } from "../src/api/index.js";
+import { ensureSigningKeys } from "../src/crypto/keys.js";
+import { signDigestWithPolicy } from "../src/crypto/signing/signer.js";
+import { artifactSigPath } from "../src/lifecycle/artifactSignature.js";
+import { signedControlPendingPath } from "../src/lifecycle/signedControlJournal.js";
 import {
+  defaultRuntimeFirewallPolicy,
   evaluateRuntimeFirewall,
   exportRuntimeFirewallDecisions,
+  inspectRuntimeFirewallPolicy,
   listRuntimeFirewallDecisions,
+  migrateRuntimeFirewallPolicySignature,
+  runtimeFirewallPolicyPath,
   runtimeFirewallStatus,
-  writeRuntimeFirewallPolicy
+  writeRuntimeFirewallPolicy,
+  type RuntimeFirewallPolicy
 } from "../src/runtime/firewall.js";
+import { sha256Hex } from "../src/utils/hash.js";
+import { canonicalize } from "../src/utils/json.js";
 
 const roots: string[] = [];
+const originalCheckpointDir = process.env.AMC_CONTROL_CHECKPOINT_DIR;
+const checkpointRoot = mkdtempSync(join(tmpdir(), "amc-firewall-checkpoints-"));
+process.env.AMC_CONTROL_CHECKPOINT_DIR = checkpointRoot;
 
 function workspace(): string {
   const dir = mkdtempSync(join(tmpdir(), "amc-runtime-firewall-"));
@@ -59,12 +74,52 @@ async function callApi(params: {
   return { status: state.statusCode, json: JSON.parse(state.body) as { ok: boolean; data?: any; error?: string } };
 }
 
+function writeLegacyPolicy(workspace: string, policy: RuntimeFirewallPolicy): string {
+  ensureSigningKeys(workspace);
+  const path = runtimeFirewallPolicyPath(workspace);
+  mkdirSync(join(workspace, ".amc", "firewall"), { recursive: true });
+  writeFileSync(path, `${JSON.stringify(policy, null, 2)}\n`);
+  const artifactSha256 = sha256Hex(readFileSync(path));
+  const signed = signDigestWithPolicy({ workspace, kind: "BUNDLE", digestHex: artifactSha256 });
+  writeFileSync(artifactSigPath(path), `${JSON.stringify({
+    schemaVersion: "2026-05-22",
+    artifactKind: "runtime-firewall-policy",
+    artifactSha256,
+    signature: signed.signature,
+    signedTs: signed.signedTs,
+    signer: "auditor",
+    envelope: signed.envelope
+  }, null, 2)}\n`);
+  return artifactSha256;
+}
+
 afterEach(() => {
   while (roots.length > 0) {
     const dir = roots.pop();
     if (dir) rmSync(dir, { recursive: true, force: true });
   }
 });
+
+afterAll(() => {
+  rmSync(checkpointRoot, { recursive: true, force: true });
+  if (originalCheckpointDir === undefined) delete process.env.AMC_CONTROL_CHECKPOINT_DIR;
+  else process.env.AMC_CONTROL_CHECKPOINT_DIR = originalCheckpointDir;
+});
+
+function runCliAsync(ws: string, args: string[]): Promise<void> {
+  return new Promise((resolvePromise, rejectPromise) => {
+    const child = spawn(process.execPath, [resolve(process.cwd(), "dist/cli.js"), ...args], {
+      cwd: ws,
+      stdio: "ignore",
+      env: { ...process.env, NO_COLOR: "1" }
+    });
+    child.once("error", rejectPromise);
+    child.once("exit", (code) => {
+      if (code === 0) resolvePromise();
+      else rejectPromise(new Error(`firewall CLI exited ${String(code)}`));
+    });
+  });
+}
 
 describe("Runtime Firewall", () => {
   test("enables signed policy, blocks risky requests, and writes signed decision events", () => {
@@ -73,6 +128,8 @@ describe("Runtime Firewall", () => {
     expect(policy.policy.mode).toBe("block");
     expect(existsSync(policy.path)).toBe(true);
     expect(policy.signaturePath).toBeTruthy();
+    expect(policy.revision).toBe(1);
+    expect(existsSync(policy.checkpointPath)).toBe(true);
 
     const decision = evaluateRuntimeFirewall({
       workspace: ws,
@@ -203,5 +260,246 @@ describe("Runtime Firewall", () => {
     expect(exported.status).toBe(201);
     expect(exported.json.data.count).toBe(1);
     expect(existsSync(join(ws, ".amc", "firewall", "api-export.jsonl"))).toBe(true);
+  });
+
+  test("rejects malformed enable booleans before committing any policy revision", async () => {
+    const ws = workspace();
+    const response = await callApi({
+      pathname: "/api/v1/firewall/enable",
+      method: "POST",
+      body: { mode: "block", enabled: "false", failClosedOnMissingPolicy: 0 },
+      workspace: ws
+    });
+
+    expect(response.status).toBe(400);
+    expect(inspectRuntimeFirewallPolicy(ws)).toMatchObject({ integrity: "uninitialized", revision: null });
+  });
+
+  test("requires an exact true legacy-migration acknowledgement body", async () => {
+    const ws = workspace();
+    for (const body of [
+      {},
+      { approveLegacyArtifactKind: false },
+      { approveLegacyArtifactKind: "true" },
+      { approveLegacyArtifactKind: true, unexpected: true }
+    ]) {
+      const response = await callApi({
+        pathname: "/api/v1/firewall/migrate-signature",
+        method: "POST",
+        body,
+        workspace: ws
+      });
+      expect(response.status).toBe(400);
+    }
+    expect(inspectRuntimeFirewallPolicy(ws)).toMatchObject({ integrity: "uninitialized", revision: null });
+  });
+
+  test("migrates a verified legacy sidecar without changing any policy semantics", async () => {
+    const ws = workspace();
+    ensureSigningKeys(ws);
+    const path = runtimeFirewallPolicyPath(ws);
+    mkdirSync(join(ws, ".amc", "firewall"), { recursive: true });
+    const policy = {
+      ...defaultRuntimeFirewallPolicy("block"),
+      enabled: false,
+      failClosedOnMissingPolicy: false,
+      thresholds: { warnAt: 11, blockAt: 91 },
+      rules: {
+        ...defaultRuntimeFirewallPolicy().rules,
+        promptInjection: false,
+        maxPayloadChars: 12_345
+      },
+      redaction: { redactSecrets: false, maxPreviewChars: 321 },
+      updatedAt: "2026-07-01T00:00:00.000Z"
+    };
+    writeFileSync(path, `${JSON.stringify(policy, null, 2)}\n`);
+    const artifactSha256 = sha256Hex(readFileSync(path));
+    const signed = signDigestWithPolicy({ workspace: ws, kind: "BUNDLE", digestHex: artifactSha256 });
+    writeFileSync(artifactSigPath(path), `${JSON.stringify({
+      schemaVersion: "2026-05-22",
+      artifactKind: "runtime-firewall-policy",
+      artifactSha256,
+      signature: signed.signature,
+      signedTs: signed.signedTs,
+      signer: "auditor",
+      envelope: signed.envelope
+    }, null, 2)}\n`);
+
+    expect(inspectRuntimeFirewallPolicy(ws)).toMatchObject({ integrity: "invalid", policy: null });
+    expect(() => migrateRuntimeFirewallPolicySignature({
+      workspace: ws,
+      approveLegacyArtifactKind: false
+    })).toThrow(/approve-legacy-kind/i);
+
+    const response = await callApi({
+      pathname: "/api/v1/firewall/migrate-signature",
+      method: "POST",
+      body: { approveLegacyArtifactKind: true },
+      workspace: ws
+    });
+    expect(response.status).toBe(201);
+    const migrated = response.json.data;
+    expect(migrated.migratedFrom).toBe("2026-05-22");
+    expect(migrated.policy).toEqual(policy);
+    expect(migrated.migrationReceipt).toMatchObject({
+      schemaVersion: "2026-07-10",
+      preservation: "semantic",
+      sourceSignatureSchemaVersion: "2026-05-22",
+      sourceArtifactSha256: artifactSha256,
+      committedPolicySha256: sha256Hex(canonicalize(policy))
+    });
+    const journalEntry = JSON.parse(readFileSync(
+      join(ws, ".amc", "firewall", "policy-revisions", "000000000001.json"),
+      "utf8"
+    )) as { metadata?: unknown };
+    expect(journalEntry.metadata).toEqual({
+      type: "legacy-runtime-firewall-migration",
+      receipt: migrated.migrationReceipt
+    });
+    expect(inspectRuntimeFirewallPolicy(ws)).toMatchObject({
+      integrity: "trusted",
+      revision: 1,
+      policy
+    });
+  });
+
+  test("API retry completes interrupted legacy migration and returns its signed provenance", async () => {
+    const crashWindows = [
+      {
+        name: "before-genesis-pin",
+        hook: { beforeCheckpointCommit: () => { throw new Error("before-genesis-pin"); } }
+      },
+      {
+        name: "after-genesis-pin",
+        hook: { afterTrustPinCommit: () => { throw new Error("after-genesis-pin"); } }
+      },
+      {
+        name: "after-checkpoint",
+        hook: { afterCheckpointCommit: () => { throw new Error("after-checkpoint"); } }
+      }
+    ] as const;
+
+    for (const crash of crashWindows) {
+      const ws = workspace();
+      const policy = {
+        ...defaultRuntimeFirewallPolicy("block"),
+        updatedAt: "2026-07-01T00:00:00.000Z"
+      };
+      const artifactSha256 = writeLegacyPolicy(ws, policy);
+      expect(() => migrateRuntimeFirewallPolicySignature({
+        workspace: ws,
+        approveLegacyArtifactKind: true,
+        ...crash.hook
+      }), crash.name).toThrow(crash.name);
+      expect(existsSync(signedControlPendingPath(ws, "runtime-firewall-policy"))).toBe(true);
+
+      const retry = await callApi({
+        pathname: "/api/v1/firewall/migrate-signature",
+        method: "POST",
+        body: { approveLegacyArtifactKind: true },
+        workspace: ws
+      });
+      expect(retry.status, crash.name).toBe(201);
+      expect(retry.json.data).toMatchObject({
+        migratedFrom: "2026-05-22",
+        revision: 1,
+        mirrorTrusted: true,
+        migrationReceipt: {
+          schemaVersion: "2026-07-10",
+          preservation: "semantic",
+          sourceSignatureSchemaVersion: "2026-05-22",
+          sourceArtifactSha256: artifactSha256,
+          committedPolicySha256: sha256Hex(canonicalize(policy))
+        }
+      });
+      expect(existsSync(signedControlPendingPath(ws, "runtime-firewall-policy"))).toBe(false);
+      expect(inspectRuntimeFirewallPolicy(ws)).toMatchObject({
+        integrity: "trusted",
+        revision: 1,
+        policy
+      });
+    }
+  });
+
+  test("migrates the exact verified legacy snapshot even if the mirror is swapped before commit", () => {
+    const ws = workspace();
+    ensureSigningKeys(ws);
+    const path = runtimeFirewallPolicyPath(ws);
+    mkdirSync(join(ws, ".amc", "firewall"), { recursive: true });
+    const verifiedPolicy = {
+      ...defaultRuntimeFirewallPolicy("block"),
+      updatedAt: "2026-07-01T00:00:00.000Z"
+    };
+    writeFileSync(path, `${JSON.stringify(verifiedPolicy, null, 2)}\n`);
+    const artifactSha256 = sha256Hex(readFileSync(path));
+    const signed = signDigestWithPolicy({ workspace: ws, kind: "BUNDLE", digestHex: artifactSha256 });
+    writeFileSync(artifactSigPath(path), `${JSON.stringify({
+      schemaVersion: "2026-05-22",
+      artifactKind: "runtime-firewall-policy",
+      artifactSha256,
+      signature: signed.signature,
+      signedTs: signed.signedTs,
+      signer: "auditor",
+      envelope: signed.envelope
+    }, null, 2)}\n`);
+
+    const swappedPolicy = { ...verifiedPolicy, enabled: false, mode: "observe" as const };
+    const migrated = migrateRuntimeFirewallPolicySignature({
+      workspace: ws,
+      approveLegacyArtifactKind: true,
+      beforeLegacyCommit: () => {
+        writeFileSync(path, `${JSON.stringify(swappedPolicy, null, 2)}\n`);
+      }
+    });
+
+    expect(migrated.policy).toEqual(verifiedPolicy);
+    expect(inspectRuntimeFirewallPolicy(ws).policy).toEqual(verifiedPolicy);
+  });
+
+  test("uses the checkpointed policy after mirror deletion and blocks local journal deletion", () => {
+    const ws = workspace();
+    const written = writeRuntimeFirewallPolicy({ workspace: ws, mode: "block" });
+    unlinkSync(written.path);
+    unlinkSync(written.signaturePath);
+    expect(inspectRuntimeFirewallPolicy(ws)).toMatchObject({
+      integrity: "trusted",
+      revision: 1,
+      policy: { mode: "block" }
+    });
+    expect(runtimeFirewallStatus(ws)).toMatchObject({
+      policyCommitted: true,
+      policyExists: false,
+      mirrorExists: false,
+      policyRevision: 1
+    });
+
+    rmSync(join(ws, ".amc", "firewall"), { recursive: true, force: true });
+    expect(inspectRuntimeFirewallPolicy(ws).integrity).toBe("invalid");
+    const decision = evaluateRuntimeFirewall({
+      workspace: ws,
+      source: "api",
+      direction: "request",
+      content: "benign",
+      record: false
+    });
+    expect(decision.action).toBe("block");
+    expect(decision.mode).toBe("invalid-policy");
+  });
+
+  test("serializes concurrent policy writers into valid monotonic revisions", async () => {
+    const ws = workspace();
+    ensureSigningKeys(ws);
+    await Promise.all([
+      runCliAsync(ws, ["firewall", "enable", "--mode", "observe"]),
+      runCliAsync(ws, ["firewall", "enable", "--mode", "warn"]),
+      runCliAsync(ws, ["firewall", "enable", "--mode", "block"])
+    ]);
+
+    const inspected = inspectRuntimeFirewallPolicy(ws);
+    expect(inspected.integrity).toBe("trusted");
+    expect(inspected.revision).toBe(3);
+    expect(["observe", "warn", "block"]).toContain(inspected.policy?.mode);
+    expect(existsSync(inspected.journalPath!)).toBe(true);
+    expect(existsSync(inspected.checkpointPath!)).toBe(true);
   });
 });

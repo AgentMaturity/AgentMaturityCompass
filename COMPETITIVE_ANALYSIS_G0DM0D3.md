@@ -91,7 +91,7 @@ NeurIPS-style LaTeX paper (669 lines) with reported results:
 - L0-L5 maturity scale with 4 evidence trust tiers
 - 79 scoring modules
 - 142 assurance packs (red-team attack scenarios)
-- 1,144 CLI command paths
+- 1,145 CLI command paths
 - 8,150 tests across 1,033 test files
 - Full jailbreak detection subsystem (TAP, PAIR, Crescendo strategies)
 - Studio web dashboard (8,583-line server)
@@ -275,7 +275,7 @@ const response = await steer.chat(messages, { model: 'gpt-4' });
 | **Merkle tree transparency** | None | Verifiable audit trail |
 | **Compliance frameworks** (EU AI Act, ISO 42001, NIST, SOC 2, OWASP) | None | Enterprise-ready |
 | **Multi-agent fleet management** | None — single-session only | Enterprise scale |
-| **1,144 CLI command paths** | Web UI only | Developer-first, scriptable |
+| **1,145 CLI command paths** | Web UI only | Developer-first, scriptable |
 | **14 framework adapters** | OpenRouter only | Ecosystem integration |
 | **Domain packs** (7 industries) | None | Vertical expertise |
 | **Jailbreak detection** (TAP, PAIR, Crescendo, DAN) | Jailbreak GENERATION only | AMC defends; G0DM0D3 attacks |
@@ -537,7 +537,7 @@ G0DM0D3 deliberately uses regex classifiers (84%) instead of black-box ML (95%+)
 **Action**: For AMC's harm classifier and scoring, prefer transparent algorithms with published accuracy over opaque ML models. Publish the tradeoff.
 
 ### Lesson 3: COMPOSABILITY OVER COMPLETENESS
-G0DM0D3 has 5 primitives. AMC has 1,144 CLI command paths. Simplicity wins adoption.
+G0DM0D3 has 5 primitives. AMC has 1,145 CLI command paths. Simplicity wins adoption.
 
 **Action**: Identify AMC's "5 primitives" — the 5 things that, if used alone, deliver 80% of the value. Make them trivially easy to use. Everything else is advanced.
 

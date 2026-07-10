@@ -6,9 +6,7 @@ import type { SignatureEnvelope } from "../crypto/signing/signerTypes.js";
 import { pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 
-const artifactSignatureSchema = z.object({
-  schemaVersion: z.literal("2026-05-22"),
-  artifactKind: z.enum([
+const artifactKindSchema = z.enum([
     "lifecycle-artifact",
     "lifecycle-receipt-bundle",
     "enforce-resource-manifest",
@@ -19,6 +17,8 @@ const artifactSignatureSchema = z.object({
     "org-run-artifact",
     "runtime-firewall-policy",
     "runtime-firewall-decision",
+    "guardrail-control-state",
+    "guardrail-control-head",
     "runtime-autonomy-boundary-decision",
     "runtime-run-state",
     "runtime-run-event",
@@ -38,13 +38,27 @@ const artifactSignatureSchema = z.object({
     "exploit-confirmation-proof",
     "neutral-import-artifact",
     "inference-strategy-run"
-  ]),
+]);
+
+const artifactSignatureFields = {
+  artifactKind: artifactKindSchema,
   artifactSha256: z.string().length(64),
   signature: z.string().min(1),
   signedTs: z.number().int(),
   signer: z.literal("auditor"),
   envelope: z.unknown().optional()
-});
+};
+
+const artifactSignatureSchema = z.discriminatedUnion("schemaVersion", [
+  z.object({
+    schemaVersion: z.literal("2026-05-22"),
+    ...artifactSignatureFields
+  }),
+  z.object({
+    schemaVersion: z.literal("2026-07-10"),
+    ...artifactSignatureFields
+  })
+]);
 
 export type ArtifactSignature = z.infer<typeof artifactSignatureSchema>;
 
@@ -57,8 +71,23 @@ export interface ArtifactSignatureVerification {
   artifactSha256: string | null;
 }
 
+export interface ArtifactSignatureSnapshotVerification extends ArtifactSignatureVerification {
+  artifactBytes: Buffer | null;
+  signature: ArtifactSignature | null;
+}
+
 export function artifactSigPath(path: string): string {
   return `${path}.sig`;
+}
+
+function domainSeparatedArtifactDigest(input: {
+  artifactKind: ArtifactSignature["artifactKind"];
+  artifactSha256: string;
+}): string {
+  return sha256Hex(Buffer.from(
+    `AMC_ARTIFACT_SIGNATURE_V2\0${input.artifactKind}\0${input.artifactSha256}`,
+    "utf8"
+  ));
 }
 
 export function signArtifactFile(input: {
@@ -68,13 +97,17 @@ export function signArtifactFile(input: {
 }): { sigPath: string; signature: ArtifactSignature } {
   ensureSigningKeys(input.workspace);
   const artifactSha256 = sha256Hex(readFileSync(input.path));
+  const digestHex = domainSeparatedArtifactDigest({
+    artifactKind: input.artifactKind,
+    artifactSha256
+  });
   const signed = signDigestWithPolicy({
     workspace: input.workspace,
     kind: "BUNDLE",
-    digestHex: artifactSha256
+    digestHex
   });
   const signature = artifactSignatureSchema.parse({
-    schemaVersion: "2026-05-22",
+    schemaVersion: "2026-07-10",
     artifactKind: input.artifactKind,
     artifactSha256,
     signature: signed.signature,
@@ -99,26 +132,83 @@ export function trySignArtifactFile(input: {
   }
 }
 
-export function verifyArtifactFileSignature(input: {
+export function readAndVerifyArtifactFileSignature(input: {
   workspace: string;
   path: string;
-}): ArtifactSignatureVerification {
+  artifactKind?: ArtifactSignature["artifactKind"];
+  requireDomainSeparated?: boolean;
+}): ArtifactSignatureSnapshotVerification {
   const sigPath = artifactSigPath(input.path);
   if (!pathExists(input.path)) {
-    return { valid: false, signatureExists: pathExists(sigPath), artifactPath: input.path, sigPath, reason: "artifact missing", artifactSha256: null };
+    return {
+      valid: false,
+      signatureExists: pathExists(sigPath),
+      artifactPath: input.path,
+      sigPath,
+      reason: "artifact missing",
+      artifactSha256: null,
+      artifactBytes: null,
+      signature: null
+    };
   }
   if (!pathExists(sigPath)) {
-    return { valid: false, signatureExists: false, artifactPath: input.path, sigPath, reason: "signature missing", artifactSha256: null };
+    return {
+      valid: false,
+      signatureExists: false,
+      artifactPath: input.path,
+      sigPath,
+      reason: "signature missing",
+      artifactSha256: null,
+      artifactBytes: null,
+      signature: null
+    };
   }
   try {
+    const artifactBytes = readFileSync(input.path);
     const signature = artifactSignatureSchema.parse(JSON.parse(readUtf8(sigPath)) as unknown);
-    const artifactSha256 = sha256Hex(readFileSync(input.path));
-    if (artifactSha256 !== signature.artifactSha256) {
-      return { valid: false, signatureExists: true, artifactPath: input.path, sigPath, reason: "digest mismatch", artifactSha256 };
+    if (input.artifactKind && signature.artifactKind !== input.artifactKind) {
+      return {
+        valid: false,
+        signatureExists: true,
+        artifactPath: input.path,
+        sigPath,
+        reason: `artifact kind mismatch: expected ${input.artifactKind}, got ${signature.artifactKind}`,
+        artifactSha256: null,
+        artifactBytes,
+        signature
+      };
     }
+    if (input.requireDomainSeparated && signature.schemaVersion !== "2026-07-10") {
+      return {
+        valid: false,
+        signatureExists: true,
+        artifactPath: input.path,
+        sigPath,
+        reason: "legacy artifact signature is not domain-separated",
+        artifactSha256: null,
+        artifactBytes,
+        signature
+      };
+    }
+    const artifactSha256 = sha256Hex(artifactBytes);
+    if (artifactSha256 !== signature.artifactSha256) {
+      return {
+        valid: false,
+        signatureExists: true,
+        artifactPath: input.path,
+        sigPath,
+        reason: "digest mismatch",
+        artifactSha256,
+        artifactBytes,
+        signature
+      };
+    }
+    const digestHex = signature.schemaVersion === "2026-07-10"
+      ? domainSeparatedArtifactDigest({ artifactKind: signature.artifactKind, artifactSha256 })
+      : artifactSha256;
     const valid = verifySignedDigest({
       workspace: input.workspace,
-      digestHex: artifactSha256,
+      digestHex,
       signed: {
         signature: signature.signature,
         envelope: signature.envelope as SignatureEnvelope | undefined
@@ -130,7 +220,9 @@ export function verifyArtifactFileSignature(input: {
       artifactPath: input.path,
       sigPath,
       reason: valid ? null : "signature verification failed",
-      artifactSha256
+      artifactSha256,
+      artifactBytes,
+      signature
     };
   } catch (error) {
     return {
@@ -139,7 +231,19 @@ export function verifyArtifactFileSignature(input: {
       artifactPath: input.path,
       sigPath,
       reason: error instanceof Error ? error.message : String(error),
-      artifactSha256: null
+      artifactSha256: null,
+      artifactBytes: null,
+      signature: null
     };
   }
+}
+
+export function verifyArtifactFileSignature(input: {
+  workspace: string;
+  path: string;
+  artifactKind?: ArtifactSignature["artifactKind"];
+  requireDomainSeparated?: boolean;
+}): ArtifactSignatureVerification {
+  const { artifactBytes: _artifactBytes, signature: _signature, ...verification } = readAndVerifyArtifactFileSignature(input);
+  return verification;
 }

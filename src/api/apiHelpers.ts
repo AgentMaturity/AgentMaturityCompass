@@ -61,7 +61,6 @@ function readBody(req: IncomingMessage): Promise<string> {
       totalBytes += buf.length;
       if (totalBytes > MAX_JSON_BODY_BYTES) {
         rejectOnce(new RequestBodyError(`JSON body exceeds ${MAX_JSON_BODY_BYTES} bytes`, 413));
-        req.destroy();
         return;
       }
       chunks.push(buf);

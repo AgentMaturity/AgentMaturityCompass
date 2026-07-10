@@ -63,6 +63,7 @@ describe("Studio /api/v1 least-privilege authorization", () => {
     await expect(requestedRoles("/api/v1/vault/keys/rotate", "POST")).resolves.toEqual(["OWNER"]);
     await expect(requestedRoles("/api/v1/identity/scim/token/create", "POST")).resolves.toEqual(["OWNER"]);
     await expect(requestedRoles("/api/v1/ci/policy/future-edit", "PATCH")).resolves.toEqual(["OWNER"]);
+    await expect(requestedRoles("/api/v1/firewall/migrate-signature", "POST")).resolves.toEqual(["OWNER"]);
   });
 
   test("separates operational execution from read-only and approval roles", async () => {
@@ -96,5 +97,30 @@ describe("Studio /api/v1 least-privilege authorization", () => {
       expect(doc).toContain("side-effect-free");
       expect(doc).toContain("agent and lease");
     }
+  });
+
+  test("keeps guardrail and migration value contracts aligned with runtime status semantics", () => {
+    const spec = YAML.parse(readFileSync("website/openapi.yaml", "utf8")) as any;
+    for (const pathname of [
+      "/v1/guardrails/enable",
+      "/v1/guardrails/disable",
+      "/v1/guardrails/profile"
+    ]) {
+      const schema = spec.paths[pathname].post.requestBody.content["application/json"].schema;
+      expect(schema.additionalProperties, pathname).toBe(false);
+      expect(schema.required, pathname).toContain("name");
+      expect(schema.properties.name.minLength, pathname).toBe(1);
+      expect(schema.properties.name, pathname).not.toHaveProperty("enum");
+      expect(spec.paths[pathname].post.responses).toHaveProperty("404");
+      expect(spec.paths[pathname].post.responses).toHaveProperty("409");
+    }
+
+    const migration = spec.paths["/v1/firewall/migrate-signature"].post;
+    const migrationSchema = migration.requestBody.content["application/json"].schema;
+    expect(migrationSchema.additionalProperties).toBe(false);
+    expect(migrationSchema.required).toEqual(["approveLegacyArtifactKind"]);
+    expect(migrationSchema.properties.approveLegacyArtifactKind.const).toBe(true);
+    expect(migration.responses["400"].description).toContain("acknowledgement");
+    expect(migration.responses["409"].description).not.toContain("acknowledgement");
   });
 });

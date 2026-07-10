@@ -175,6 +175,16 @@ describe("studio + vault + mode + loop", () => {
     const workspace = newWorkspace();
     setMode(workspace, "agent");
     expect(() => assertOwnerMode(workspace, "target set")).toThrow("blocked in agent mode");
+    for (const command of [
+      "firewall enable",
+      "firewall disable",
+      "firewall migrate-signature",
+      "guardrails enable",
+      "guardrails disable",
+      "guardrails profile"
+    ]) {
+      expect(() => assertOwnerMode(workspace, command), command).toThrow("blocked in agent mode");
+    }
     expect(() => assertOwnerMode(workspace, "run")).not.toThrow();
   });
 

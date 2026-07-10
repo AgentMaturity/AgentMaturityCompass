@@ -421,6 +421,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc firewall enable` | Enable Runtime Firewall in observe, warn, or block mode | `--mode <mode>`<br>`--fail-open`<br>`--json` | - |
 | `amc firewall events` | List Runtime Firewall decision events | `--limit <n>`<br>`--redacted`<br>`--json` | - |
 | `amc firewall export` | Export Runtime Firewall decisions for SIEM or audit review | `--out <path>`<br>`--format <format>`<br>`--limit <n>`<br>`--redacted`<br>`--json` | - |
+| `amc firewall migrate-signature` | Preserve and journal an existing verified Runtime Firewall policy | `--approve-legacy-kind`<br>`--json` | - |
 | `amc firewall status` | Show Runtime Firewall policy and event status | `--json` | - |
 | `amc fix` | Generate remediation patches for identified gaps (auto-fix mode) | `--agent <agentId>`<br>`--dry-run`<br>`--target-level <level>`<br>`--framework <framework>`<br>`--out <dir>` | - |
 | `amc fix-signatures` | Verify and re-sign gateway/fleet/agent configs | `--agent <agentId>` | - |
@@ -500,11 +501,11 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc governor-override` | Activate an emergency governance override with TTL | `--agent <agentId>`<br>`--reason <reason>`<br>`--ttl <ttl>`<br>`--mode <mode>` | - |
 | `amc governor-override-alerts` | Show alerts for active/expired overrides | `--agent <agentId>` | - |
 | `amc guard` | Guard check proposed output from stdin | `--target <name>`<br>`--risk-tier <tier>` | - |
-| `amc guardrails` | Simple guardrail management | - | - |
-| `amc guardrails disable` | Disable a guardrail | - | - |
-| `amc guardrails enable` | Enable a guardrail | - | - |
-| `amc guardrails list` | List all available guardrails with status | `--json` | - |
-| `amc guardrails profile` | Apply a guardrail profile (minimal, standard, strict, healthcare, financial) | - | - |
+| `amc guardrails` | Signed runtime guardrail controls | - | - |
+| `amc guardrails disable` | Remove an additive guardrail request without weakening signed policy | - | - |
+| `amc guardrails enable` | Request a signed, runtime-bound guardrail | - | - |
+| `amc guardrails list` | List signed requested state and effective runtime guardrail bindings | `--json` | - |
+| `amc guardrails profile` | Apply bound controls from a signed additive profile | - | - |
 | `amc guide` | Generate personalized improvement guide with exportable agent instructions | `--target <level>`<br>`--export`<br>`--agent-instructions`<br>`--guardrails`<br>`--apply [file]`<br>`--interactive`<br>`--watch`<br>`--watch-interval <seconds>`<br>`--diff`<br>`--frameworks`<br>`--ci`<br>`--dry-run`<br>`--quick`<br>`--auto-detect`<br>`--status`<br>`--go`<br>`--compliance [frameworks]`<br>`--agent <id>`<br>`--framework <name>`<br>`--json` | - |
 | `amc help` | Show help for a command (for example: amc help run) | `--all` | - |
 | `amc history` | List diagnostic run history | `--limit <n>`<br>`--valid-only`<br>`--since <hours>` | - |

@@ -1,9 +1,28 @@
 import { randomUUID } from "node:crypto";
 import { existsSync, readdirSync } from "node:fs";
 import { join, resolve } from "node:path";
-import { trySignArtifactFile } from "../lifecycle/artifactSignature.js";
+import { z } from "zod";
+import {
+  GUARDRAIL_RUNTIME_BINDINGS,
+  inspectGuardrailControlState,
+  type BoundGuardrailName
+} from "../enforce/guardrailControlState.js";
+import {
+  artifactSigPath,
+  readAndVerifyArtifactFileSignature,
+  signArtifactFile,
+  trySignArtifactFile,
+  verifyArtifactFileSignature
+} from "../lifecycle/artifactSignature.js";
+import { ControlFileLockError, withControlFileLock } from "../lifecycle/controlFileLock.js";
+import {
+  appendSignedControlJournal,
+  readSignedControlJournal,
+  type SignedControlJournalSnapshot
+} from "../lifecycle/signedControlJournal.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
+import { canonicalize } from "../utils/json.js";
 import { appendRuntimeRunEvent } from "./runManager.js";
 
 export type RuntimeFirewallMode = "observe" | "warn" | "block";
@@ -51,7 +70,7 @@ export interface RuntimeFirewallDecision {
   source: "cli" | "studio" | "api" | "bridge" | "gateway" | "sdk";
   agentId: string;
   direction: RuntimeFirewallDirection;
-  mode: RuntimeFirewallMode | "disabled" | "missing-policy";
+  mode: RuntimeFirewallMode | "disabled" | "missing-policy" | "invalid-policy" | "invalid-control-state";
   action: RuntimeFirewallAction;
   riskScore: number;
   severity: RuntimeFirewallSeverity;
@@ -64,6 +83,12 @@ export interface RuntimeFirewallDecision {
     model: string | null;
     route: string | null;
     method: string | null;
+  };
+  guardrailControl: {
+    integrity: "uninitialized" | "trusted" | "invalid";
+    revision: number | null;
+    applied: BoundGuardrailName[];
+    reason: string;
   };
   links: {
     runId: string | null;
@@ -108,12 +133,79 @@ const EMAIL_RE = /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi;
 const CREDIT_CARD_RE = /\b(?:\d[ -]*?){13,19}\b/g;
 const SSN_RE = /\b\d{3}-\d{2}-\d{4}\b/g;
 
+const runtimeFirewallPolicySchema = z.object({
+  schemaVersion: z.literal("2026-05-22"),
+  enabled: z.boolean(),
+  mode: z.enum(["observe", "warn", "block"]),
+  failClosedOnMissingPolicy: z.boolean(),
+  thresholds: z.object({
+    warnAt: z.number().min(0).max(100),
+    blockAt: z.number().min(0).max(100)
+  }).strict(),
+  rules: z.object({
+    promptInjection: z.boolean(),
+    secretExposure: z.boolean(),
+    destructiveAction: z.boolean(),
+    piiLeakage: z.boolean(),
+    payloadAnomaly: z.boolean(),
+    maxPayloadChars: z.number().int().positive()
+  }).strict(),
+  redaction: z.object({
+    redactSecrets: z.boolean(),
+    maxPreviewChars: z.number().int().positive()
+  }).strict(),
+  updatedAt: z.iso.datetime()
+}).strict();
+
+export interface RuntimeFirewallPolicyInspection {
+  integrity: "uninitialized" | "trusted" | "invalid";
+  policy: RuntimeFirewallPolicy | null;
+  path: string;
+  signaturePath: string;
+  revision: number | null;
+  journalPath: string | null;
+  checkpointPath: string | null;
+  reason: string;
+}
+
+export interface RuntimeFirewallMigrationReceipt {
+  schemaVersion: "2026-07-10";
+  preservation: "semantic";
+  sourceSignatureSchemaVersion: string;
+  sourceArtifactSha256: string;
+  sourceSignatureRecordSha256: string;
+  committedPolicySha256: string;
+}
+
+const runtimeFirewallMigrationReceiptSchema = z.object({
+  schemaVersion: z.literal("2026-07-10"),
+  preservation: z.literal("semantic"),
+  sourceSignatureSchemaVersion: z.string().min(1),
+  sourceArtifactSha256: z.string().length(64),
+  sourceSignatureRecordSha256: z.string().length(64),
+  committedPolicySha256: z.string().length(64)
+}).strict();
+
+const runtimeFirewallMigrationMetadataSchema = z.object({
+  type: z.literal("legacy-runtime-firewall-migration"),
+  receipt: runtimeFirewallMigrationReceiptSchema
+}).strict();
+
+function migrationReceiptFromMetadata(metadata: unknown): RuntimeFirewallMigrationReceipt | null {
+  const parsed = runtimeFirewallMigrationMetadataSchema.safeParse(metadata);
+  return parsed.success ? parsed.data.receipt : null;
+}
+
 export function runtimeFirewallRoot(workspace: string): string {
   return join(workspace, ".amc", "firewall");
 }
 
 export function runtimeFirewallPolicyPath(workspace: string): string {
   return join(runtimeFirewallRoot(workspace), "policy.json");
+}
+
+export function runtimeFirewallPolicyJournalDir(workspace: string): string {
+  return join(runtimeFirewallRoot(workspace), "policy-revisions");
 }
 
 export function runtimeFirewallEventsDir(workspace: string): string {
@@ -146,54 +238,397 @@ export function defaultRuntimeFirewallPolicy(mode: RuntimeFirewallMode = "warn")
   };
 }
 
+function validateRuntimeFirewallPolicy(raw: unknown): RuntimeFirewallPolicy {
+  const policy = runtimeFirewallPolicySchema.parse(raw) as RuntimeFirewallPolicy;
+  if (policy.thresholds.warnAt > policy.thresholds.blockAt) {
+    throw new Error("warnAt must be less than or equal to blockAt");
+  }
+  return policy;
+}
+
+function readRuntimeFirewallPolicyJournal(
+  workspace: string,
+  recoverPendingPublication = false
+): SignedControlJournalSnapshot<RuntimeFirewallPolicy> {
+  return readSignedControlJournal({
+    workspace,
+    controlKind: "runtime-firewall-policy",
+    journalDir: runtimeFirewallPolicyJournalDir(workspace),
+    parsePayload: validateRuntimeFirewallPolicy,
+    recoverPendingPublication
+  });
+}
+
+function withRuntimeFirewallPolicyLock<T>(workspace: string, operation: () => T): T {
+  try {
+    return withControlFileLock({ root: runtimeFirewallRoot(workspace), name: "policy", operation });
+  } catch (error) {
+    if (error instanceof ControlFileLockError) {
+      throw new Error("Runtime Firewall policy is busy; retry the operation.");
+    }
+    throw error;
+  }
+}
+
+function writeRuntimeFirewallPolicyMirror(workspace: string, policy: RuntimeFirewallPolicy): {
+  signaturePath: string;
+  trusted: boolean;
+  warning: string | null;
+} {
+  const path = runtimeFirewallPolicyPath(workspace);
+  try {
+    writeFileAtomic(path, `${JSON.stringify(policy, null, 2)}\n`, 0o600);
+    const signed = signArtifactFile({ workspace, path, artifactKind: "runtime-firewall-policy" });
+    const verification = verifyArtifactFileSignature({
+      workspace,
+      path,
+      artifactKind: "runtime-firewall-policy",
+      requireDomainSeparated: true
+    });
+    if (!verification.valid) throw new Error(verification.reason ?? "signature verification failed");
+    return { signaturePath: signed.sigPath, trusted: true, warning: null };
+  } catch (error) {
+    const warning = `Runtime Firewall policy committed, but compatibility mirror refresh failed: ${error instanceof Error ? error.message : String(error)}`;
+    process.emitWarning(warning);
+    return { signaturePath: artifactSigPath(path), trusted: false, warning };
+  }
+}
+
+function commitRuntimeFirewallPolicy(
+  workspace: string,
+  policy: RuntimeFirewallPolicy,
+  previous: SignedControlJournalSnapshot<RuntimeFirewallPolicy>,
+  journalOptions: {
+    metadata?: unknown;
+    afterPendingCommit?: () => void;
+    beforeCheckpointCommit?: () => void;
+    afterTrustPinCommit?: () => void;
+    afterCheckpointCommit?: () => void;
+  } = {}
+): {
+  policy: RuntimeFirewallPolicy;
+  path: string;
+  signaturePath: string;
+  revision: number;
+  checkpointPath: string;
+  mirrorTrusted: boolean;
+  mirrorWarning: string | null;
+} {
+  const validatedPolicy = validateRuntimeFirewallPolicy(policy);
+  const committed = appendSignedControlJournal({
+    workspace,
+    controlKind: "runtime-firewall-policy",
+    journalDir: runtimeFirewallPolicyJournalDir(workspace),
+    previous,
+    payload: validatedPolicy,
+    metadata: journalOptions.metadata,
+    afterPendingCommit: journalOptions.afterPendingCommit,
+    beforeCheckpointCommit: journalOptions.beforeCheckpointCommit,
+    afterTrustPinCommit: journalOptions.afterTrustPinCommit,
+    afterCheckpointCommit: journalOptions.afterCheckpointCommit
+  });
+  const mirror = writeRuntimeFirewallPolicyMirror(workspace, validatedPolicy);
+  return {
+    policy: validatedPolicy,
+    path: runtimeFirewallPolicyPath(workspace),
+    signaturePath: mirror.signaturePath,
+    revision: committed.revision,
+    checkpointPath: committed.checkpointPath!,
+    mirrorTrusted: mirror.trusted,
+    mirrorWarning: mirror.warning
+  };
+}
+
 export function writeRuntimeFirewallPolicy(input: {
   workspace: string;
   mode?: RuntimeFirewallMode;
   enabled?: boolean;
   failClosedOnMissingPolicy?: boolean;
-}): { policy: RuntimeFirewallPolicy; path: string; signaturePath: string | null } {
-  const policy: RuntimeFirewallPolicy = {
-    ...defaultRuntimeFirewallPolicy(input.mode ?? "warn"),
-    enabled: input.enabled ?? true,
-    failClosedOnMissingPolicy: input.failClosedOnMissingPolicy ?? true,
-    updatedAt: new Date().toISOString()
+}): {
+  policy: RuntimeFirewallPolicy;
+  path: string;
+  signaturePath: string;
+  revision: number;
+  checkpointPath: string;
+  mirrorTrusted: boolean;
+  mirrorWarning: string | null;
+} {
+  return withRuntimeFirewallPolicyLock(input.workspace, () => {
+    const previous = readRuntimeFirewallPolicyJournal(input.workspace, true);
+    const mirrorPath = runtimeFirewallPolicyPath(input.workspace);
+    if (previous.integrity === "uninitialized" && (pathExists(mirrorPath) || pathExists(artifactSigPath(mirrorPath)))) {
+      const inspected = inspectRuntimeFirewallPolicy(input.workspace);
+      if (inspected.integrity === "invalid") {
+        throw new Error(`${inspected.reason} Run 'amc firewall migrate-signature --approve-legacy-kind' for a verified legacy policy.`);
+      }
+    }
+    const policy = validateRuntimeFirewallPolicy({
+      ...defaultRuntimeFirewallPolicy(input.mode ?? "warn"),
+      enabled: input.enabled ?? true,
+      failClosedOnMissingPolicy: input.failClosedOnMissingPolicy ?? true,
+      updatedAt: new Date().toISOString()
+    });
+    return commitRuntimeFirewallPolicy(input.workspace, policy, previous);
+  });
+}
+
+export function inspectRuntimeFirewallPolicy(workspace: string): RuntimeFirewallPolicyInspection {
+  const path = runtimeFirewallPolicyPath(workspace);
+  const signaturePath = artifactSigPath(path);
+  const policyExists = pathExists(path);
+  const signatureExists = pathExists(signaturePath);
+  let journal: SignedControlJournalSnapshot<RuntimeFirewallPolicy>;
+  try {
+    journal = readRuntimeFirewallPolicyJournal(workspace);
+  } catch (error) {
+    return {
+      integrity: "invalid",
+      policy: null,
+      path,
+      signaturePath,
+      revision: null,
+      journalPath: null,
+      checkpointPath: null,
+      reason: `Runtime Firewall policy journal invalid: ${error instanceof Error ? error.message : String(error)}`
+    };
+  }
+  if (journal.integrity === "uninitialized" && !policyExists && !signatureExists) {
+    return {
+      integrity: "uninitialized",
+      policy: null,
+      path,
+      signaturePath,
+      revision: null,
+      journalPath: null,
+      checkpointPath: null,
+      reason: "No Runtime Firewall policy has been initialized."
+    };
+  }
+  if (journal.integrity === "uninitialized") {
+    const legacyVerification = verifyArtifactFileSignature({
+      workspace,
+      path,
+      artifactKind: "runtime-firewall-policy"
+    });
+    return {
+      integrity: "invalid",
+      policy: null,
+      path,
+      signaturePath,
+      revision: null,
+      journalPath: null,
+      checkpointPath: null,
+      reason: legacyVerification.valid
+        ? "Runtime Firewall policy is valid but lacks a host-local checkpoint; run the explicit signature migration command."
+        : `Runtime Firewall policy is uncheckpointed or invalid: ${legacyVerification.reason ?? "unknown"}.`
+    };
+  }
+  const policy = journal.payload!;
+  const mirrorVerification = verifyArtifactFileSignature({
+    workspace,
+    path,
+    artifactKind: "runtime-firewall-policy",
+    requireDomainSeparated: true
+  });
+  let mirrorReason = `Compatibility mirror unavailable: ${mirrorVerification.reason ?? "invalid"}.`;
+  if (mirrorVerification.valid) {
+    try {
+      const mirror = validateRuntimeFirewallPolicy(JSON.parse(readUtf8(path)) as unknown);
+      mirrorReason = canonicalize(mirror) === canonicalize(policy)
+        ? "Compatibility mirror is valid."
+        : "Compatibility mirror is stale; canonical signed journal remains authoritative.";
+    } catch (error) {
+      mirrorReason = `Compatibility mirror invalid: ${error instanceof Error ? error.message : String(error)}`;
+    }
+  }
+  return {
+    integrity: "trusted",
+    policy,
+    path,
+    signaturePath,
+    revision: journal.revision,
+    journalPath: journal.entryPath,
+    checkpointPath: journal.checkpointPath,
+    reason: `${journal.reason} ${mirrorReason}`
   };
-  const path = runtimeFirewallPolicyPath(input.workspace);
-  writeFileAtomic(path, `${JSON.stringify(policy, null, 2)}\n`, 0o644);
-  const signed = trySignArtifactFile({ workspace: input.workspace, path, artifactKind: "runtime-firewall-policy" });
-  return { policy, path, signaturePath: signed?.sigPath ?? null };
+}
+
+export function migrateRuntimeFirewallPolicySignature(input: {
+  workspace: string;
+  approveLegacyArtifactKind: boolean;
+  beforeLegacyCommit?: () => void;
+  afterPendingCommit?: () => void;
+  beforeCheckpointCommit?: () => void;
+  afterTrustPinCommit?: () => void;
+  afterCheckpointCommit?: () => void;
+}): {
+  policy: RuntimeFirewallPolicy;
+  path: string;
+  signaturePath: string;
+  revision: number;
+  checkpointPath: string;
+  mirrorTrusted: boolean;
+  mirrorWarning: string | null;
+  migratedFrom: string;
+  migrationReceipt: RuntimeFirewallMigrationReceipt | null;
+} {
+  return withRuntimeFirewallPolicyLock(input.workspace, () => {
+    const previous = readRuntimeFirewallPolicyJournal(input.workspace, true);
+    if (previous.integrity === "trusted") {
+      const inspected = inspectRuntimeFirewallPolicy(input.workspace);
+      const receipt = migrationReceiptFromMetadata(previous.metadata);
+      const mirror = writeRuntimeFirewallPolicyMirror(input.workspace, inspected.policy!);
+      return {
+        policy: inspected.policy!,
+        path: inspected.path,
+        signaturePath: mirror.signaturePath,
+        revision: inspected.revision!,
+        checkpointPath: inspected.checkpointPath!,
+        mirrorTrusted: mirror.trusted,
+        mirrorWarning: mirror.warning,
+        migratedFrom: receipt?.sourceSignatureSchemaVersion ?? "already-journaled",
+        migrationReceipt: receipt
+      };
+    }
+    const path = runtimeFirewallPolicyPath(input.workspace);
+    const verification = readAndVerifyArtifactFileSignature({
+      workspace: input.workspace,
+      path,
+      artifactKind: "runtime-firewall-policy"
+    });
+    if (!verification.valid) {
+      throw new Error(`Legacy Runtime Firewall policy verification failed: ${verification.reason ?? "unknown"}.`);
+    }
+    const schemaVersion = verification.signature?.schemaVersion ?? "unknown";
+    if (schemaVersion === "2026-05-22" && !input.approveLegacyArtifactKind) {
+      throw new Error("Legacy artifact kind was not cryptographically bound. Re-run with --approve-legacy-kind after reviewing the exact policy bytes.");
+    }
+    const policy = validateRuntimeFirewallPolicy(JSON.parse(verification.artifactBytes!.toString("utf8")) as unknown);
+    const migrationReceipt: RuntimeFirewallMigrationReceipt = {
+      schemaVersion: "2026-07-10",
+      preservation: "semantic",
+      sourceSignatureSchemaVersion: schemaVersion,
+      sourceArtifactSha256: verification.artifactSha256!,
+      sourceSignatureRecordSha256: sha256Hex(canonicalize(verification.signature)),
+      committedPolicySha256: sha256Hex(canonicalize(policy))
+    };
+    input.beforeLegacyCommit?.();
+    return {
+      ...commitRuntimeFirewallPolicy(input.workspace, policy, previous, {
+        metadata: {
+          type: "legacy-runtime-firewall-migration",
+          receipt: migrationReceipt
+        },
+        afterPendingCommit: input.afterPendingCommit,
+        beforeCheckpointCommit: input.beforeCheckpointCommit,
+        afterTrustPinCommit: input.afterTrustPinCommit,
+        afterCheckpointCommit: input.afterCheckpointCommit
+      }),
+      migratedFrom: schemaVersion,
+      migrationReceipt
+    };
+  });
 }
 
 export function loadRuntimeFirewallPolicy(workspace: string): RuntimeFirewallPolicy | null {
-  const path = runtimeFirewallPolicyPath(workspace);
-  if (!pathExists(path)) {
-    return null;
+  const inspected = inspectRuntimeFirewallPolicy(workspace);
+  if (inspected.integrity === "invalid") {
+    throw new Error(inspected.reason);
   }
-  const parsed = JSON.parse(readUtf8(path)) as RuntimeFirewallPolicy;
-  return {
-    ...defaultRuntimeFirewallPolicy(parsed.mode ?? "warn"),
-    ...parsed,
-    thresholds: {
-      ...defaultRuntimeFirewallPolicy().thresholds,
-      ...(parsed.thresholds ?? {})
-    },
-    rules: {
-      ...defaultRuntimeFirewallPolicy().rules,
-      ...(parsed.rules ?? {})
-    },
-    redaction: {
-      ...defaultRuntimeFirewallPolicy().redaction,
-      ...(parsed.redaction ?? {})
-    }
-  };
+  return inspected.policy;
 }
 
 export function runtimeFirewallEnabled(workspace: string): boolean {
   if (process.env.AMC_FIREWALL_ENABLED === "1") {
     return true;
   }
-  const policy = loadRuntimeFirewallPolicy(workspace);
-  return policy?.enabled === true;
+  const policy = inspectRuntimeFirewallPolicy(workspace);
+  const control = inspectGuardrailControlState(workspace);
+  if (policy.integrity === "invalid" || control.integrity === "invalid") {
+    return true;
+  }
+  return policy.policy?.enabled === true || (control.state?.requestedGuardrails.length ?? 0) > 0;
+}
+
+interface EffectiveRuntimeFirewallPolicy {
+  policy: RuntimeFirewallPolicy | null;
+  policyIntegrity: RuntimeFirewallPolicyInspection["integrity"];
+  policyReason: string;
+  control: RuntimeFirewallDecision["guardrailControl"];
+  integrityFailure: "policy" | "control" | null;
+}
+
+function resolveEffectiveRuntimeFirewallPolicy(input: RuntimeFirewallEvaluateInput): EffectiveRuntimeFirewallPolicy {
+  const workspace = resolve(input.workspace);
+  const controlSnapshot = inspectGuardrailControlState(workspace);
+  const applied = (controlSnapshot.state?.requestedGuardrails ?? []) as BoundGuardrailName[];
+  const control: RuntimeFirewallDecision["guardrailControl"] = {
+    integrity: controlSnapshot.integrity,
+    revision: controlSnapshot.state?.revision ?? null,
+    applied,
+    reason: controlSnapshot.reason
+  };
+  if (controlSnapshot.integrity === "invalid") {
+    return {
+      policy: null,
+      policyIntegrity: "uninitialized",
+      policyReason: "Runtime Firewall policy was not evaluated because guardrail control state is invalid.",
+      control,
+      integrityFailure: "control"
+    };
+  }
+
+  const inspected = input.policy === undefined
+    ? inspectRuntimeFirewallPolicy(workspace)
+    : {
+        integrity: "trusted" as const,
+        policy: input.policy,
+        path: "provided",
+        signaturePath: "provided",
+        reason: "Runtime Firewall policy was supplied by the trusted caller."
+      };
+  if (inspected.integrity === "invalid") {
+    return {
+      policy: null,
+      policyIntegrity: inspected.integrity,
+      policyReason: inspected.reason,
+      control,
+      integrityFailure: "policy"
+    };
+  }
+
+  let policy = inspected.policy ? runtimeFirewallPolicySchema.parse(inspected.policy) as RuntimeFirewallPolicy : null;
+  if (applied.length > 0) {
+    const hadEnabledPolicy = policy?.enabled === true;
+    policy = policy
+      ? {
+          ...policy,
+          enabled: true,
+          mode: hadEnabledPolicy ? policy.mode : "block",
+          rules: { ...policy.rules }
+        }
+      : {
+          ...defaultRuntimeFirewallPolicy("block"),
+          rules: {
+            ...defaultRuntimeFirewallPolicy("block").rules,
+            promptInjection: false,
+            secretExposure: false,
+            destructiveAction: false,
+            piiLeakage: false,
+            payloadAnomaly: false
+          }
+        };
+    for (const guardrail of applied) {
+      policy.rules[GUARDRAIL_RUNTIME_BINDINGS[guardrail]] = true;
+    }
+  }
+  return {
+    policy,
+    policyIntegrity: inspected.integrity,
+    policyReason: inspected.reason,
+    control,
+    integrityFailure: null
+  };
 }
 
 function clampScore(value: number): number {
@@ -341,7 +776,8 @@ function recordRuntimeRunDecision(input: RuntimeFirewallEvaluateInput, decision:
 
 export function evaluateRuntimeFirewall(input: RuntimeFirewallEvaluateInput): RuntimeFirewallDecision {
   const workspace = resolve(input.workspace);
-  const loadedPolicy = input.policy === undefined ? loadRuntimeFirewallPolicy(workspace) : input.policy;
+  const resolvedPolicy = resolveEffectiveRuntimeFirewallPolicy(input);
+  const loadedPolicy = resolvedPolicy.policy;
   const envRequiresPolicy = process.env.AMC_FIREWALL_ENABLED === "1";
   const requirePolicy = input.requirePolicy === true || envRequiresPolicy;
   const policy = loadedPolicy ?? (requirePolicy ? null : { ...defaultRuntimeFirewallPolicy("observe"), enabled: false });
@@ -357,7 +793,33 @@ export function evaluateRuntimeFirewall(input: RuntimeFirewallEvaluateInput): Ru
   let reasons: string[] = [];
   const redaction = loadedPolicy?.redaction ?? defaultRuntimeFirewallPolicy().redaction;
 
-  if (!policy) {
+  if (resolvedPolicy.integrityFailure === "control") {
+    degraded = true;
+    mode = "invalid-control-state";
+    action = "block";
+    riskScore = 100;
+    matches = [{
+      ruleId: "guardrail-control-state-invalid",
+      surface: "Enforce",
+      severity: "critical",
+      scoreImpact: 100,
+      reason: resolvedPolicy.control.reason
+    }];
+    reasons = matches.map((match) => match.reason);
+  } else if (resolvedPolicy.integrityFailure === "policy") {
+    degraded = true;
+    mode = "invalid-policy";
+    action = "block";
+    riskScore = 100;
+    matches = [{
+      ruleId: "runtime-firewall-policy-invalid",
+      surface: "Enforce",
+      severity: "critical",
+      scoreImpact: 100,
+      reason: resolvedPolicy.policyReason
+    }];
+    reasons = matches.map((match) => match.reason);
+  } else if (!policy) {
     degraded = true;
     mode = "missing-policy";
     action = "block";
@@ -402,7 +864,8 @@ export function evaluateRuntimeFirewall(input: RuntimeFirewallEvaluateInput): Ru
       model: input.model ?? null,
       route: input.route ?? null,
       method: input.method ?? null
-    }
+    },
+    guardrailControl: resolvedPolicy.control
   };
   const receiptId = `fwrec_${sha256Hex(`${decisionId}:${createdAt}`).slice(0, 16)}`;
   const receiptSha256 = receiptHashFor({
@@ -493,17 +956,59 @@ export function runtimeFirewallStatus(workspace: string): {
   enabled: boolean;
   policyPath: string;
   policyExists: boolean;
+  policyCommitted: boolean;
+  mirrorExists: boolean;
+  policyRevision: number | null;
+  policyJournalPath: string | null;
+  policyCheckpointPath: string | null;
   mode: RuntimeFirewallDecision["mode"];
+  integrity: RuntimeFirewallPolicyInspection["integrity"];
+  controlIntegrity: RuntimeFirewallDecision["guardrailControl"]["integrity"];
+  controlRevision: number | null;
+  trusted: boolean;
+  reason: string;
   eventCount: number;
   latestDecision: RuntimeFirewallDecision | null;
 } {
-  const policy = loadRuntimeFirewallPolicy(workspace);
+  const inspected = inspectRuntimeFirewallPolicy(workspace);
+  const policy = inspected.policy;
+  const control = inspectGuardrailControlState(workspace);
   const decisions = listRuntimeFirewallDecisions({ workspace, limit: 1, redacted: true });
+  const controlEnabled = control.integrity === "trusted" && (control.state?.requestedGuardrails.length ?? 0) > 0;
+  const mirrorExists = pathExists(runtimeFirewallPolicyPath(workspace));
   return {
-    enabled: policy?.enabled === true || process.env.AMC_FIREWALL_ENABLED === "1",
+    enabled: policy?.enabled === true || controlEnabled || process.env.AMC_FIREWALL_ENABLED === "1" || inspected.integrity === "invalid" || control.integrity === "invalid",
     policyPath: runtimeFirewallPolicyPath(workspace),
-    policyExists: Boolean(policy),
-    mode: policy?.enabled ? policy.mode : process.env.AMC_FIREWALL_ENABLED === "1" ? "missing-policy" : "disabled",
+    policyExists: mirrorExists,
+    policyCommitted: inspected.policy !== null,
+    mirrorExists,
+    policyRevision: inspected.revision,
+    policyJournalPath: inspected.journalPath,
+    policyCheckpointPath: inspected.checkpointPath,
+    mode: control.integrity === "invalid"
+      ? "invalid-control-state"
+      : inspected.integrity === "invalid"
+        ? "invalid-policy"
+        : policy?.enabled
+          ? policy.mode
+          : controlEnabled
+            ? "block"
+            : process.env.AMC_FIREWALL_ENABLED === "1"
+              ? "missing-policy"
+              : "disabled",
+    integrity: inspected.integrity,
+    controlIntegrity: control.integrity,
+    controlRevision: control.state?.revision ?? null,
+    trusted: control.integrity !== "invalid" && inspected.integrity !== "invalid" && (
+      inspected.integrity === "trusted" || control.integrity === "trusted"
+    ),
+    reason: control.integrity === "invalid"
+      ? control.reason
+      : inspected.integrity === "invalid"
+        ? inspected.reason
+        : controlEnabled && inspected.integrity === "uninitialized"
+          ? control.reason
+          : inspected.reason,
     eventCount: listRuntimeFirewallDecisions({ workspace }).length,
     latestDecision: decisions[0] ?? null
   };

@@ -555,6 +555,7 @@ import {
   evaluateRuntimeFirewall,
   exportRuntimeFirewallDecisions,
   listRuntimeFirewallDecisions,
+  migrateRuntimeFirewallPolicySignature,
   runtimeFirewallStatus,
   writeRuntimeFirewallPolicy,
   type RuntimeFirewallDirection,
@@ -695,6 +696,7 @@ import { toErrorMessage } from "./utils/errors.js";
 import { registerWatchCommands } from "./cli-watch-commands.js";
 import { registerLateStageCliCommands } from "./cli-late-stage-commands.js";
 import { registerDomainProductCliCommands } from "./cli-domain-product-commands.js";
+import { registerGuardrailControlCommands } from "./enforce/guardrailCli.js";
 import {
   promptInitCli,
   promptPackBuildCli,
@@ -9454,8 +9456,10 @@ firewall
     }
     console.log(chalk.green(`Runtime Firewall enabled in ${out.policy.mode} mode.`));
     console.log(`Policy: ${out.path}`);
-    if (out.signaturePath) {
+    if (out.mirrorTrusted) {
       console.log(`Signature: ${out.signaturePath}`);
+    } else if (out.mirrorWarning) {
+      console.log(chalk.yellow(out.mirrorWarning));
     }
   });
 
@@ -9479,6 +9483,27 @@ firewall
   });
 
 firewall
+  .command("migrate-signature")
+  .description("Preserve and journal an existing verified Runtime Firewall policy")
+  .option("--approve-legacy-kind", "acknowledge that legacy sidecars did not bind artifactKind", false)
+  .option("--json", "emit JSON output", false)
+  .action((opts: { approveLegacyKind?: boolean; json?: boolean }) => {
+    const out = migrateRuntimeFirewallPolicySignature({
+      workspace: process.cwd(),
+      approveLegacyArtifactKind: opts.approveLegacyKind === true
+    });
+    if (opts.json) {
+      console.log(JSON.stringify(out, null, 2));
+      return;
+    }
+    console.log(chalk.green(`Runtime Firewall policy journaled without changing policy semantics (revision ${out.revision}).`));
+    console.log(`Migrated from signature schema: ${out.migratedFrom}`);
+    console.log(`Policy: ${out.path}`);
+    console.log(`Checkpoint: ${out.checkpointPath}`);
+    if (out.mirrorWarning) console.log(chalk.yellow(out.mirrorWarning));
+  });
+
+firewall
   .command("status")
   .description("Show Runtime Firewall policy and event status")
   .option("--json", "emit JSON output", false)
@@ -9489,7 +9514,10 @@ firewall
       return;
     }
     console.log(chalk.green(`Runtime Firewall: ${status.enabled ? "enabled" : "disabled"} (${status.mode})`));
-    console.log(`Policy: ${status.policyExists ? status.policyPath : "missing"}`);
+    console.log(`Policy journal: ${status.policyCommitted ? status.policyJournalPath : "missing"}`);
+    console.log(`Compatibility mirror: ${status.mirrorExists ? status.policyPath : "missing"}`);
+    if (status.policyRevision !== null) console.log(`Revision: ${status.policyRevision}`);
+    if (status.policyCheckpointPath) console.log(`Checkpoint: ${status.policyCheckpointPath}`);
     console.log(`Decisions: ${status.eventCount}`);
     if (status.latestDecision) {
       console.log(`Latest: ${status.latestDecision.decisionId} ${status.latestDecision.action} risk=${status.latestDecision.riskScore}`);
@@ -23891,67 +23919,7 @@ scan
     }
   });
 
-// ── Guardrails Simple Mode ───────────────────────────────────────────────────
-const guardrailsCmd = program.command("guardrails").description("Simple guardrail management");
-
-guardrailsCmd
-  .command("list")
-  .description("List all available guardrails with status")
-  .option("--json", "Output as JSON")
-  .action(async (opts: { json?: boolean }) => {
-    const { createGuardrailState, listGuardrailsWithStatus } = await import("./enforce/guardrailProfiles.js");
-    const state = createGuardrailState();
-    const list = listGuardrailsWithStatus(state);
-    if (opts.json) { console.log(JSON.stringify(list, null, 2)); return; }
-    console.log(chalk.bold("\n🛡️  Available Guardrails\n"));
-    for (const g of list) {
-      const status = g.enabled ? chalk.green("● ON ") : chalk.gray("○ OFF");
-      console.log(`  ${status}  ${g.name.padEnd(30)} ${chalk.gray(g.description)}`);
-    }
-  });
-
-guardrailsCmd
-  .command("enable <name>")
-  .description("Enable a guardrail")
-  .action(async (name: string) => {
-    const { createGuardrailState, enableGuardrail, AVAILABLE_GUARDRAILS } = await import("./enforce/guardrailProfiles.js");
-    const state = createGuardrailState();
-    if (enableGuardrail(state, name)) {
-      console.log(chalk.green(`✓ Enabled guardrail: ${name}`));
-    } else {
-      console.error(chalk.red(`Unknown guardrail: ${name}`));
-      console.log("Available:", AVAILABLE_GUARDRAILS.map(g => g.name).join(", "));
-    }
-  });
-
-guardrailsCmd
-  .command("disable <name>")
-  .description("Disable a guardrail")
-  .action(async (name: string) => {
-    const { createGuardrailState, disableGuardrail } = await import("./enforce/guardrailProfiles.js");
-    const state = createGuardrailState();
-    if (disableGuardrail(state, name)) {
-      console.log(chalk.yellow(`✗ Disabled guardrail: ${name}`));
-    } else {
-      console.error(chalk.red(`Guardrail not found or not enabled: ${name}`));
-    }
-  });
-
-guardrailsCmd
-  .command("profile <name>")
-  .description("Apply a guardrail profile (minimal, standard, strict, healthcare, financial)")
-  .action(async (profileName: string) => {
-    const { createGuardrailState, applyProfile, listGuardrailsWithStatus, GUARDRAIL_PROFILES } = await import("./enforce/guardrailProfiles.js");
-    const state = createGuardrailState();
-    if (applyProfile(state, profileName)) {
-      const enabled = listGuardrailsWithStatus(state).filter(g => g.enabled);
-      console.log(chalk.green(`✓ Applied profile: ${profileName} (${enabled.length} guardrails enabled)`));
-      for (const g of enabled) { console.log(`  ● ${g.name}`); }
-    } else {
-      console.error(chalk.red(`Unknown profile: ${profileName}`));
-      console.log("Available:", GUARDRAIL_PROFILES.map(p => p.name).join(", "));
-    }
-  });
+registerGuardrailControlCommands(program);
 
 // ── Playground ───────────────────────────────────────────────────────────────
 const playground = program.command("playground").description("Interactive scenario runner").action(async () => {
