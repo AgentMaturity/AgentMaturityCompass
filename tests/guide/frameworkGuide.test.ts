@@ -23,6 +23,13 @@ describe("frameworkGuide", () => {
     }
     expect(guide.quickWins.length).toBeGreaterThan(0);
     expect(guide.maturityRoadmap.length).toBe(5);
+    expect(guide.maturityRoadmap.map((row) => row.level)).toEqual([
+      "L1 — Initial",
+      "L2 — Developing",
+      "L3 — Defined",
+      "L4 — Managed",
+      "L5 — Optimizing",
+    ]);
   });
 
   it("generates OpenAI Agents guide", () => {

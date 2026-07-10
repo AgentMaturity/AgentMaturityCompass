@@ -57,6 +57,7 @@ import { gatewayStatus, startGateway } from "./gateway/server.js";
 import { sha256Hex } from "./utils/hash.js";
 import { canonicalize } from "./utils/json.js";
 import { amcVersion } from "./version.js";
+import { AMC_MATURITY_LEGEND } from "./score/maturityTaxonomy.js";
 import {
   buildEnforceResourceManifest,
   diffEnforceResourceManifests,
@@ -3170,7 +3171,7 @@ program
       }
       console.log(`Score: ${result.totalScore}/${result.maxScore} (${result.percentage}%)`);
       console.log(`Preliminary maturity: ${result.preliminaryLevel}`);
-      console.log(chalk.dim("Maturity Levels: L0=Undocumented | L1=Documented | L2=Automated | L3=Evidence-backed | L4=Proactive | L5=Certifiable"));
+      console.log(chalk.dim(`Maturity Levels: ${AMC_MATURITY_LEGEND}`));
 
       // EU AI Act mapping (rapid)
       if (opts.euAiAct) {
@@ -3352,7 +3353,7 @@ program
     console.log("");
     console.log(chalk.bold(`  Overall: ${result.overallLevel} (${result.percentage}%)`));
     console.log(chalk.gray(`  ${result.questionCount} questions | ${result.totalScore}/${result.maxScore} points | completed in ${durationDisplay}`));
-    console.log(chalk.dim("  Maturity Levels: L0=Undocumented | L1=Documented | L2=Automated | L3=Evidence-backed | L4=Proactive | L5=Certifiable"));
+    console.log(chalk.dim(`  Maturity Levels: ${AMC_MATURITY_LEGEND}`));
     console.log("");
 
     // Per-layer bar chart
@@ -3441,7 +3442,7 @@ program
     }
     console.log(chalk.bold(`${explanation.questionId} - ${explanation.title}`));
     console.log(`Layer: ${explanation.layerName}`);
-    console.log(chalk.dim("Maturity Levels: L0=Undocumented | L1=Documented | L2=Automated | L3=Evidence-backed | L4=Proactive | L5=Certifiable"));
+    console.log(chalk.dim(`Maturity Levels: ${AMC_MATURITY_LEGEND}`));
     console.log("");
     console.log(chalk.hex('#4AEF79')("What it measures:"));
     console.log(explanation.whatItMeasures);

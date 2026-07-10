@@ -20,7 +20,7 @@ describe("GAP-0639 OpenAI Simple Evals metric-validity source-review boundary", 
   it("publishes Score/Shield/Watch metric-validity boundaries using existing primitives only", () => {
     const manifest = getPublicMethodologyManifest();
 
-    expect(AMC_PUBLIC_METHODOLOGY_VERSION).toBe("2026.07.10-r221");
+    expect(AMC_PUBLIC_METHODOLOGY_VERSION).toBe("2026.07.10-r222");
     const changelog = manifest.changelog.find((row) => row.version === "2026.06.21-r217");
     expect(changelog?.summary).toContain("OpenAI Simple Evals-style metric-validity source-review boundaries");
     expect(changelog?.migration).toContain("2026.06.20-r216");

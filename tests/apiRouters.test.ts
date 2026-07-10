@@ -1509,6 +1509,15 @@ describe("AMC API routers", () => {
     for (const [pathname, method, body, url, status] of cases) {
       await assertJsonRoute(handleExportRoute, { pathname, method, body, url, workspace: ws }, status);
     }
+
+    for (const [pathname, url] of [
+      ["/api/v1/export/badge/url", "/api/v1/export/badge/url?level=6"],
+      ["/api/v1/export/badge/generate", "/api/v1/export/badge/generate?level=3.5"],
+    ] as const) {
+      const result = await callRoute(handleExportRoute, { pathname, method: "GET", url, workspace: ws });
+      expect(result).toMatchObject({ handled: true, status: 400 });
+      expect(result.json).toMatchObject({ ok: false, error: "level must be an integer from 0 through 5" });
+    }
   });
 
   test("gateway router covers status, config, init, bind, sign, verify, and providers", async () => {

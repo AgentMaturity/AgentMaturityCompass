@@ -18,6 +18,7 @@
  */
 
 import { AMCAgentBase, type AgentConfig } from './agentBase.js';
+import { formatMaturityOrdinal } from '../score/maturityTaxonomy.js';
 
 /* ── Interfaces ─────────────────────────────────────────────────── */
 
@@ -340,11 +341,11 @@ const GAP_ACTIONS: Record<string, string> = {
 /* ── Maturity level mapping ────────────────────────────────────── */
 
 function maturityLevel(score: number): { level: string; description: string } {
-  if (score >= 80) return { level: 'L5 — Optimizing', description: 'Agent has comprehensive governance with continuous improvement, adversarial testing, and telemetry.' };
-  if (score >= 60) return { level: 'L4 — Managed', description: 'Agent has human oversight, escalation, compliance coverage, and drift detection.' };
-  if (score >= 40) return { level: 'L3 — Defined', description: 'Agent has policy enforcement, audit trails, and PII awareness.' };
-  if (score >= 20) return { level: 'L2 — Repeatable', description: 'Agent has basic governance and classification capabilities.' };
-  return { level: 'L1 — Initial', description: 'Agent exists but has no governance framework.' };
+  if (score >= 80) return { level: formatMaturityOrdinal(5), description: 'Agent has comprehensive governance with continuous improvement, adversarial testing, and telemetry.' };
+  if (score >= 60) return { level: formatMaturityOrdinal(4), description: 'Agent has human oversight, escalation, compliance coverage, and drift detection.' };
+  if (score >= 40) return { level: formatMaturityOrdinal(3), description: 'Agent has policy enforcement, audit trails, and PII awareness.' };
+  if (score >= 20) return { level: formatMaturityOrdinal(2), description: 'Agent has basic governance and classification capabilities.' };
+  return { level: formatMaturityOrdinal(1), description: 'Agent exists but has no governance framework.' };
 }
 
 /* ── HarnessRunner ──────────────────────────────────────────────── */

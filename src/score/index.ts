@@ -1,6 +1,17 @@
 export { computeMaturityScore, evidenceDecay, improvementVelocity } from "./formalSpec.js";
 export type { EvidenceArtifact, DimensionScore, MaturityScore, MaturityLevel } from "./formalSpec.js";
 
+export {
+  AMC_MATURITY_LABELS,
+  AMC_MATURITY_LEGEND,
+  AMC_MATURITY_LEVELS,
+  formatMaturityLevel,
+  formatMaturityOrdinal,
+  maturityLabel,
+  maturityLevelFromOrdinal,
+} from "./maturityTaxonomy.js";
+export type { MaturityLabel } from "./maturityTaxonomy.js";
+
 export { testGamingResistance } from "./adversarial.js";
 export type { AdversarialTestResult } from "./adversarial.js";
 

@@ -168,6 +168,7 @@ describe("generateTransparencyReport", () => {
     expect(report.identity.riskTier).toBe("low");
     expect(report.identity.maturityLevel).toBeGreaterThanOrEqual(1);
     expect(report.identity.maturityLevel).toBeLessThanOrEqual(5);
+    expect(report.identity.maturityLabel).toMatch(/^L[1-5] — (Initial|Developing|Defined|Managed|Optimizing)$/);
     expect(report.identity.trustScore).toBeGreaterThanOrEqual(0);
     expect(report.identity.trustScore).toBeLessThanOrEqual(100);
   });

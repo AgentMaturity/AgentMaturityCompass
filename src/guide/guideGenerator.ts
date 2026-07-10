@@ -14,6 +14,7 @@ import { builtInComplianceMappings } from "../compliance/builtInMappings.js";
 import type { ComplianceMapping } from "../compliance/mappingSchema.js";
 import type { EvalScoreExplainabilityPack } from "../diagnostic/questionScoreExplainability.js";
 import { includes } from "../utils/typeGuards.js";
+import { formatMaturityOrdinal } from "../score/maturityTaxonomy.js";
 
 /* ── Framework-specific hints ──────────────────────── */
 
@@ -271,15 +272,6 @@ const COMPLIANCE_FRAMEWORK_LABELS: Record<string, string> = {
 
 export const SUPPORTED_COMPLIANCE_FRAMEWORKS = Object.keys(COMPLIANCE_FRAMEWORK_LABELS);
 
-const LEVEL_NAMES: Record<number, string> = {
-  0: "L0 — Running with Scissors",
-  1: "L1 — Minimal",
-  2: "L2 — Developing",
-  3: "L3 — Moderate",
-  4: "L4 — High Trust",
-  5: "L5 — Self-Governing",
-};
-
 function currentLevelFromScore(overall: number): number {
   return Math.floor(Math.max(0, Math.min(5, overall)));
 }
@@ -501,8 +493,8 @@ export function generateGuide(input: GuideInput): Guide {
   const passingCount = totalQuestions - gapCount;
 
   const summary = gapCount === 0
-    ? `Agent "${agentId}" meets all requirements for ${LEVEL_NAMES[targetLevel] ?? `L${targetLevel}`}. No gaps found.`
-    : `Agent "${agentId}" has ${gapCount} gap${gapCount === 1 ? "" : "s"} to close for ${LEVEL_NAMES[targetLevel] ?? `L${targetLevel}`}. ${passingCount}/${totalQuestions} questions already at target.`;
+    ? `Agent "${agentId}" meets all requirements for ${formatMaturityOrdinal(targetLevel)}. No gaps found.`
+    : `Agent "${agentId}" has ${gapCount} gap${gapCount === 1 ? "" : "s"} to close for ${formatMaturityOrdinal(targetLevel)}. ${passingCount}/${totalQuestions} questions already at target.`;
 
   return {
     agentId,

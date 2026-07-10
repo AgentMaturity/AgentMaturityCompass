@@ -54,7 +54,7 @@ No existing tool combines:
 ### Short-term (3-6 months)
 - **Promptfoo adds maturity model**: Possible but unlikely — different product DNA (eval vs governance)
 - **LangSmith adds compliance**: Would be framework-locked to LangChain
-- **New entrant**: Low risk — AMC has 8,238 passing tests, 244 default questions, and 142 assurance packs
+- **New entrant**: Low risk — AMC has 8,243 passing tests, 244 default questions, and 142 assurance packs
 
 ### Medium-term (6-12 months)
 - **Cloud providers** (AWS, Azure, GCP) add agent evaluation: Would be provider-locked. AMC is provider-agnostic.

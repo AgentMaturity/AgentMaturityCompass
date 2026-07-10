@@ -14,6 +14,7 @@ import { getAgentPaths } from "../fleet/paths.js";
 import { loadAgentConfig } from "../fleet/registry.js";
 import type { MaturityBom } from "../bom/bomSchema.js";
 import type { DiagnosticReport, LayerScore } from "../types.js";
+import { formatMaturityOrdinal } from "../score/maturityTaxonomy.js";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -104,14 +105,6 @@ export interface AgentTransparencyReport {
 // Helpers
 // ---------------------------------------------------------------------------
 
-const MATURITY_LABELS: Record<number, string> = {
-  1: "L1 — Initial",
-  2: "L2 — Developing",
-  3: "L3 — Defined",
-  4: "L4 — Managed",
-  5: "L5 — Optimizing",
-};
-
 const IRREVERSIBLE_ACTION_CLASSES = new Set([
   "delete",
   "write",
@@ -145,7 +138,7 @@ function canTakeIrreversible(actionClasses: string[]): boolean {
 }
 
 function levelLabel(level: number): string {
-  return MATURITY_LABELS[Math.round(level)] ?? `L${Math.round(level)}`;
+  return formatMaturityOrdinal(Math.round(level));
 }
 
 function overallLevel(layerScores: LayerScore[]): number {

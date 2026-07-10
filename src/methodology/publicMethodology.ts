@@ -4,9 +4,10 @@ import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { DEFAULT_QUESTION_SET_VERSION } from "../diagnostic/questionSets.js";
 import { questionBank } from "../diagnostic/questionBank.js";
+import { AMC_MATURITY_LEVELS } from "../score/maturityTaxonomy.js";
 
 export const AMC_PUBLIC_METHODOLOGY_ID = "amc-public-scoring-methodology";
-export const AMC_PUBLIC_METHODOLOGY_VERSION = "2026.07.10-r221";
+export const AMC_PUBLIC_METHODOLOGY_VERSION = "2026.07.10-r222";
 export const AMC_PUBLIC_METHODOLOGY_RELEASE_DATE = "2026-07-10";
 
 export const AMC_PUBLIC_METHODOLOGY_DOC = "docs/SCORING_METHODOLOGY.md";
@@ -292,6 +293,15 @@ function questionSetSummary(questionSet?: DiagnosticQuestionSetInfo): PublicMeth
   };
 }
 
+const PUBLIC_SCORE_RANGES = {
+  L0: [0, 0.99],
+  L1: [1, 1.99],
+  L2: [2, 2.99],
+  L3: [3, 3.99],
+  L4: [4, 4.74],
+  L5: [4.75, 5],
+} as const;
+
 export function getPublicMethodologyManifest(questionSet?: DiagnosticQuestionSetInfo): PublicMethodologyManifest {
   const manifestWithoutHash = {
     id: AMC_PUBLIC_METHODOLOGY_ID,
@@ -303,14 +313,11 @@ export function getPublicMethodologyManifest(questionSet?: DiagnosticQuestionSet
     publicUrl: AMC_PUBLIC_METHODOLOGY_URL,
     defaultQuestionSetVersion: DEFAULT_QUESTION_SET_VERSION,
     questionSet: questionSetSummary(questionSet),
-    scoreScale: [
-      { level: "L0" as const, numericRange: [0, 0.99] as [number, number], label: "Initial" },
-      { level: "L1" as const, numericRange: [1, 1.99] as [number, number], label: "Aware" },
-      { level: "L2" as const, numericRange: [2, 2.99] as [number, number], label: "Managed" },
-      { level: "L3" as const, numericRange: [3, 3.99] as [number, number], label: "Defined" },
-      { level: "L4" as const, numericRange: [4, 4.74] as [number, number], label: "Measured" },
-      { level: "L5" as const, numericRange: [4.75, 5] as [number, number], label: "Optimized" }
-    ],
+    scoreScale: AMC_MATURITY_LEVELS.map(({ level, label }) => ({
+      level,
+      numericRange: [...PUBLIC_SCORE_RANGES[level]] as [number, number],
+      label,
+    })),
     evidenceTrustTiers: [
       {
         tier: "OBSERVED_HARDENED" as const,
@@ -3345,6 +3352,12 @@ export function getPublicMethodologyManifest(questionSet?: DiagnosticQuestionSet
       {
         version: AMC_PUBLIC_METHODOLOGY_VERSION,
         date: AMC_PUBLIC_METHODOLOGY_RELEASE_DATE,
+        summary: "Establishes the canonical L0-L5 maturity taxonomy across methodology, badges, CLI, scanners, reports, guides, README, Docs, and website surfaces: Absent, Initial, Developing, Defined, Managed, and Optimizing.",
+        migration: "Reports generated under 2026.07.10-r221 remain verifiable under their embedded methodology version and hash. Re-render current displays with the r222 labels before comparison. Numerical scores, thresholds, and historical hashes are unchanged."
+      },
+      {
+        version: "2026.07.10-r221",
+        date: AMC_PUBLIC_METHODOLOGY_RELEASE_DATE,
         summary: "Separates artifact validity from evidence readiness across Score, lifecycle artifacts, Studio, report sharing, and executive briefs. A valid seal remains an artifact-integrity statement, while READY, LIMITED, INSUFFICIENT_EVIDENCE, and UNVERIFIED determine claim eligibility and fail closed when execution evidence, integrity, trust, signature verification, or trust-boundary proof is insufficient.",
         migration: "Reports generated under 2026.06.25-r220 must be regenerated or interpreted with derived evidence readiness. Raw VALID or signed status alone no longer authorizes safety, deployment, compliance, or external trust claims."
       },
@@ -4670,10 +4683,11 @@ export function getPublicMethodologyManifest(questionSet?: DiagnosticQuestionSet
         migration: "Reports without a methodology block should be regenerated before they are used as external score or badge evidence."
       }
     ],
-    deprecationNotice: "Reports and badges that do not include methodology.id, methodology.version, methodology.hash, and questionSet.version are legacy outputs and should not be used as current external proof. Reports generated before 2026.06.25-r220 must not present Cua-style computer-use benchmark, desktop sandbox, Cua-Bench, OSWorld, ScreenSpot, Windows Arena, task dataset, trajectory, public-methodology, or metric-validity claims as externally comparable Score, Shield, or Watch proof without live GitHub relevance review, a fresh methodology block, changelog, deprecation notice, migration guidance, AMC-owned eval-pack/task/environment/test-oracle proof, validation table, threshold policy, badge-assurance hash, metric owner/sample-size/confidence-interval proof, signed evidence refs, row hashes, and no-copy/source-review receipt. Reports generated before 2026.06.25-r219 must not present Lunary-style public-methodology, observability, prompt-template, agent-tracing, response-scoring, feedback, monitoring-alert, or metric-validity claims as externally comparable Score, Shield, or Watch proof without live source retrieval, a fresh methodology block, changelog, deprecation notice, migration guidance, AMC-owned eval-pack and validation proof, signed evidence refs, fail-closed threshold policy, badge-assurance hash, metric owner/sample-size/confidence-interval proof, row hashes, and no-copy/source-review receipt. Reports generated before 2026.06.25-r218 must not present LangSmith-style public-methodology, observability, tracing, dataset, experiment, evaluator feedback, monitoring, threshold, or metric-validity claims as externally comparable Score, Shield, or Watch proof without live source retrieval, a fresh methodology block, changelog, deprecation notice, migration guidance, AMC-owned eval-pack and validation proof, signed evidence refs, fail-closed threshold policy, badge-assurance hash, metric owner/sample-size/confidence-interval proof, row hashes, and no-copy/source-review receipt. Reports generated before 2026.06.21-r217 must not present PocketFlow-style public-methodology, lightweight agent workflow framework, docs, flow/node, agent, workflow, minimal-framework, OpenAI Simple Evals-style lightweight evaluator, task, benchmark, eval-run, result, threshold, or metric-validity claims as externally comparable Score, Shield, or Watch proof without live GitHub metadata relevance review, a fresh methodology block, changelog, deprecation notice, migration guidance, AMC-owned validation proof, signed evidence refs, fail-closed threshold policy, badge-assurance hash, metric owner/sample-size/confidence-interval proof where applicable, row hashes, and no-copy/source-review receipt. Reports generated before 2026.06.20-r216 must not present ChemGraph-style agentic computational chemistry workflow, multi-agent task-planning, simulation-workflow, benchmark, LM Evaluation Harness-style evaluator, task, model benchmark, leaderboard, harness-run, result, threshold, or metric-validity claims as externally comparable Score, Shield, or Watch proof without source metadata relevance review, DOI/OpenAlex or live GitHub metadata verification as applicable, a fresh methodology block, AMC-owned validation table, existing metric-validity primitive mapping, evaluator-suite and trace-evaluation proof through existing primitives where claimed, signed evidence refs, fail-closed threshold policy, owner/sample-size/confidence-interval proof, badge-assurance hash, row hashes, and no-copy/source-review receipt. Reports generated before 2026.06.20-r215 and reports generated before 2026.06.20-r214 must not present OpenAI Evals-style public-methodology, benchmark, registry, dataset, eval-run, or evaluator claims as externally comparable Score, Shield, or Watch proof without a fresh methodology block, changelog, deprecation notice, migration guidance, live GitHub metadata relevance review, AMC-owned validation proof, signed evidence refs, fail-closed threshold policy, badge-assurance hash, row hashes, and no-copy/source-review receipt.",
+    deprecationNotice: "Reports generated before 2026.07.10-r222 may carry retired display labels. Preserve their embedded methodology version and hash for verification, and translate only the aggregate labels before presenting them as current AMC semantics; numerical values and thresholds remain unchanged. Reports and badges that do not include methodology.id, methodology.version, methodology.hash, and questionSet.version are legacy outputs and should not be used as current external proof. Reports generated before 2026.06.25-r220 must not present Cua-style computer-use benchmark, desktop sandbox, Cua-Bench, OSWorld, ScreenSpot, Windows Arena, task dataset, trajectory, public-methodology, or metric-validity claims as externally comparable Score, Shield, or Watch proof without live GitHub relevance review, a fresh methodology block, changelog, deprecation notice, migration guidance, AMC-owned eval-pack/task/environment/test-oracle proof, validation table, threshold policy, badge-assurance hash, metric owner/sample-size/confidence-interval proof, signed evidence refs, row hashes, and no-copy/source-review receipt. Reports generated before 2026.06.25-r219 must not present Lunary-style public-methodology, observability, prompt-template, agent-tracing, response-scoring, feedback, monitoring-alert, or metric-validity claims as externally comparable Score, Shield, or Watch proof without live source retrieval, a fresh methodology block, changelog, deprecation notice, migration guidance, AMC-owned eval-pack and validation proof, signed evidence refs, fail-closed threshold policy, badge-assurance hash, metric owner/sample-size/confidence-interval proof, row hashes, and no-copy/source-review receipt. Reports generated before 2026.06.25-r218 must not present LangSmith-style public-methodology, observability, tracing, dataset, experiment, evaluator feedback, monitoring, threshold, or metric-validity claims as externally comparable Score, Shield, or Watch proof without live source retrieval, a fresh methodology block, changelog, deprecation notice, migration guidance, AMC-owned eval-pack and validation proof, signed evidence refs, fail-closed threshold policy, badge-assurance hash, metric owner/sample-size/confidence-interval proof, row hashes, and no-copy/source-review receipt. Reports generated before 2026.06.21-r217 must not present PocketFlow-style public-methodology, lightweight agent workflow framework, docs, flow/node, agent, workflow, minimal-framework, OpenAI Simple Evals-style lightweight evaluator, task, benchmark, eval-run, result, threshold, or metric-validity claims as externally comparable Score, Shield, or Watch proof without live GitHub metadata relevance review, a fresh methodology block, changelog, deprecation notice, migration guidance, AMC-owned validation proof, signed evidence refs, fail-closed threshold policy, badge-assurance hash, metric owner/sample-size/confidence-interval proof where applicable, row hashes, and no-copy/source-review receipt. Reports generated before 2026.06.20-r216 must not present ChemGraph-style agentic computational chemistry workflow, multi-agent task-planning, simulation-workflow, benchmark, LM Evaluation Harness-style evaluator, task, model benchmark, leaderboard, harness-run, result, threshold, or metric-validity claims as externally comparable Score, Shield, or Watch proof without source metadata relevance review, DOI/OpenAlex or live GitHub metadata verification as applicable, a fresh methodology block, AMC-owned validation table, existing metric-validity primitive mapping, evaluator-suite and trace-evaluation proof through existing primitives where claimed, signed evidence refs, fail-closed threshold policy, owner/sample-size/confidence-interval proof, badge-assurance hash, row hashes, and no-copy/source-review receipt. Reports generated before 2026.06.20-r215 and reports generated before 2026.06.20-r214 must not present OpenAI Evals-style public-methodology, benchmark, registry, dataset, eval-run, or evaluator claims as externally comparable Score, Shield, or Watch proof without a fresh methodology block, changelog, deprecation notice, migration guidance, live GitHub metadata relevance review, AMC-owned validation proof, signed evidence refs, fail-closed threshold policy, badge-assurance hash, row hashes, and no-copy/source-review receipt.",
 
 
     migrationGuidance: [
+      "Reports generated under 2026.07.10-r221 remain verifiable under their embedded methodology version and hash. Re-render current aggregate L0-L5 labels as Absent, Initial, Developing, Defined, Managed, and Optimizing before comparison; numerical scores, thresholds, and historical hashes are unchanged.",
       "Regenerate diagnostic reports created before 2026.07.10-r221 or derive evidence readiness from artifact status, signature verification, trust boundary, evidence coverage, integrity index, and trust label. Only READY is claim-eligible; raw VALID or signed status is not.",
       "Run amc methodology --json and store the manifest hash with audit evidence.",
       "Regenerate diagnostic reports so the methodology block is present in JSON and Markdown outputs.",

@@ -97,14 +97,14 @@ The maturity level and evidence-readiness status answer different questions. Mat
 
 AMC scores agents on a 5-level scale:
 
-| Level | What it means | Think of it as... |
-|-------|--------------|-------------------|
-| L0 | No governance | Running with scissors |
-| L1 | Ad-hoc controls | Sticky notes on the monitor |
-| L2 | Repeatable processes | Checklists exist |
-| L3 | Defined & measured | Dashboards and alerts |
-| L4 | Managed & optimized | Continuous improvement |
-| L5 | Self-governing | Autopilot with proof |
+| Level | Name | What it means |
+|-------|------|---------------|
+| L0 | Absent | No demonstrated governance or evidence |
+| L1 | Initial | Intent exists, but controls are mostly ad hoc |
+| L2 | Developing | Repeatable controls exist with partial coverage |
+| L3 | Defined | Systematic, documented, evidence-backed controls |
+| L4 | Managed | Controls are measured and continuously monitored |
+| L5 | Optimizing | Controls self-correct and improve with verifiable proof |
 
 ## What Gets Scored
 

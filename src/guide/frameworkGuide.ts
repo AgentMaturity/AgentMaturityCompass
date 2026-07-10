@@ -6,6 +6,7 @@
  */
 
 import type { DiagnosticReport } from "../types.js";
+import { formatMaturityOrdinal } from "../score/maturityTaxonomy.js";
 
 /* ── Types ───────────────────────────────────────────────────────── */
 
@@ -563,7 +564,7 @@ export function generateFrameworkGuide(
   // Maturity roadmap
   const roadmap = [
     {
-      level: "L1 — Basic",
+      level: formatMaturityOrdinal(1),
       description: "Logging exists but is ad-hoc. No governance.",
       actions: [
         "Add AMC auto-instrumentation (one line)",
@@ -572,7 +573,7 @@ export function generateFrameworkGuide(
       ],
     },
     {
-      level: "L2 — Structured",
+      level: formatMaturityOrdinal(2),
       description: "Traces captured, basic cost awareness.",
       actions: [
         "Implement output safety guards",
@@ -581,7 +582,7 @@ export function generateFrameworkGuide(
       ],
     },
     {
-      level: "L3 — Governed",
+      level: formatMaturityOrdinal(3),
       description: "Formal governance gates, continuous monitoring.",
       actions: [
         "Add human-in-the-loop for high-stakes actions",
@@ -591,7 +592,7 @@ export function generateFrameworkGuide(
       ],
     },
     {
-      level: "L4 — Auditable",
+      level: formatMaturityOrdinal(4),
       description: "Complete audit trail, evidence-backed claims.",
       actions: [
         "Full AMC ledger integration",
@@ -601,7 +602,7 @@ export function generateFrameworkGuide(
       ],
     },
     {
-      level: "L5 — Trustworthy",
+      level: formatMaturityOrdinal(5),
       description: "Continuous improvement, predictable behavior.",
       actions: [
         "Longitudinal trend analysis",

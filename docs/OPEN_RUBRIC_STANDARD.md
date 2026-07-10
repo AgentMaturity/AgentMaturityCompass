@@ -34,12 +34,12 @@ Every question is scored on a **L0–L5 maturity scale**. Scores are integers; h
 
 | Level | Label | Description |
 |-------|-------|-------------|
-| **L0** | **None / Ad-hoc** | No awareness or capability. Agent operations are absent or entirely manual and unplanned. |
-| **L1** | **Initial / Reactive** | Some awareness exists. Efforts are sporadic, undocumented, and person-dependent. Problems are fixed only after they surface. |
-| **L2** | **Developing / Managed** | Defined processes exist for some areas. Documentation is partial. Practices are followed inconsistently across teams. |
-| **L3** | **Defined / Standardized** | Organization-wide standards are documented and followed. Roles and responsibilities are clear. Metrics are collected. |
-| **L4** | **Quantitatively Managed** | Metrics drive decisions. Continuous monitoring is in place. Processes are optimized based on data. Exceptions are rare and handled systematically. |
-| **L5** | **Optimizing / Leading** | Continuous improvement is embedded. The organization innovates on agent practices, contributes to industry standards, and adapts proactively to emerging risks. |
+| **L0** | **Absent** | No awareness or capability. Agent operations are absent or entirely manual and unplanned. |
+| **L1** | **Initial** | Some awareness exists. Efforts are sporadic, undocumented, and person-dependent. Problems are fixed only after they surface. |
+| **L2** | **Developing** | Defined processes exist for some areas. Documentation is partial. Practices are followed inconsistently across teams. |
+| **L3** | **Defined** | Organization-wide standards are documented and followed. Roles and responsibilities are clear. Metrics are collected. |
+| **L4** | **Managed** | Metrics drive decisions. Continuous monitoring is in place. Exceptions are handled systematically. |
+| **L5** | **Optimizing** | Continuous improvement is embedded. The organization adapts proactively to emerging risks and verifies those improvements. |
 
 ### Composite Scoring
 

@@ -18,7 +18,7 @@ describe("GAP-0633 LM Evaluation Harness metric-validity source-review boundary"
     const manifest = getPublicMethodologyManifest();
     const requirements = lmEvaluationHarnessMetricValidityRequirements();
 
-    expect(AMC_PUBLIC_METHODOLOGY_VERSION).toBe("2026.07.10-r221");
+    expect(AMC_PUBLIC_METHODOLOGY_VERSION).toBe("2026.07.10-r222");
     const lmEvaluationHarnessChangelog = manifest.changelog.find((row) => row.version === "2026.06.20-r216");
     expect(lmEvaluationHarnessChangelog).toMatchObject({
       version: "2026.06.20-r216",

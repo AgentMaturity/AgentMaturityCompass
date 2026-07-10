@@ -1,3 +1,5 @@
+import { formatMaturityOrdinal } from "../score/maturityTaxonomy.js";
+
 export interface EndpointProbeResult {
   url: string;
   reachable: boolean;
@@ -52,13 +54,12 @@ export async function probeEndpoint(url: string): Promise<EndpointProbeResult> {
   if (signals.includes("rate-limiting") && signals.includes("auth-required")) level = 3;
   else if (signals.includes("auth-required") || signals.length >= 3) level = 2;
 
-  const labels = ["", "L1 — Ad Hoc", "L2 — Emerging", "L3 — Defined"];
   return {
     url,
     reachable,
     responseTimeMs,
     headers,
     signals,
-    preliminaryScore: { level, label: labels[level] || `L${level}`, confidence: reachable ? 0.3 : 0 },
+    preliminaryScore: { level, label: formatMaturityOrdinal(level), confidence: reachable ? 0.3 : 0 },
   };
 }

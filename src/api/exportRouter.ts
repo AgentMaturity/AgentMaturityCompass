@@ -7,6 +7,11 @@
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import { bodyJson, apiSuccess, apiError, queryParam } from './apiHelpers.js';
 
+function parseBadgeLevel(value: string): number | null {
+  const level = Number(value);
+  return Number.isInteger(level) && level >= 0 && level <= 5 ? level : null;
+}
+
 export async function handleExportRoute(
   pathname: string,
   method: string,
@@ -72,8 +77,12 @@ export async function handleExportRoute(
       if (!level) {
         apiError(res, 400, 'level query parameter required'); return true;
       }
+      const parsedLevel = parseBadgeLevel(level);
+      if (parsedLevel === null) {
+        apiError(res, 400, 'level must be an integer from 0 through 5'); return true;
+      }
       const { badgeUrl } = await import('../badge/badgeCli.js');
-      const url = badgeUrl({ level: parseInt(level, 10), label: label ?? undefined, format });
+      const url = badgeUrl({ level: parsedLevel, label: label ?? undefined, format });
       apiSuccess(res, { url });
     } catch (err) {
       apiError(res, 500, err instanceof Error ? err.message : 'Badge URL generation failed');
@@ -90,8 +99,12 @@ export async function handleExportRoute(
       if (!level) {
         apiError(res, 400, 'level query parameter required'); return true;
       }
+      const parsedLevel = parseBadgeLevel(level);
+      if (parsedLevel === null) {
+        apiError(res, 400, 'level must be an integer from 0 through 5'); return true;
+      }
       const { generateBadge, formatBadgeOutput } = await import('../badge/badgeCli.js');
-      const opts = { level: parseInt(level, 10), label: label ?? undefined, format };
+      const opts = { level: parsedLevel, label: label ?? undefined, format };
       const badge = generateBadge(opts);
       const formatted = formatBadgeOutput(opts);
       apiSuccess(res, { badge, formatted });

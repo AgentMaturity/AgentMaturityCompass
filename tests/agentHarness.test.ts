@@ -215,7 +215,13 @@ describe('HarnessRunner', () => {
     expect(result.durationMs).toBeGreaterThanOrEqual(0);
     expect(result.totalImprovement).toBeGreaterThanOrEqual(0);
     expect(result.capabilityReport.length).toBeGreaterThan(0);
-    expect(result.maturityLevel).toBeDefined();
+    expect([
+      'L1 — Initial',
+      'L2 — Developing',
+      'L3 — Defined',
+      'L4 — Managed',
+      'L5 — Optimizing',
+    ]).toContain(result.maturityLevel);
   });
 
   test('harness iterations have expected structure', async () => {

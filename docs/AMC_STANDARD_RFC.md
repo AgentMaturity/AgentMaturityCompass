@@ -111,10 +111,10 @@ Maturity levels are derived from the internal score `s ∈ [0, 1]` using the fol
 
 | Level | Internal Range | Display Range (default scale=100) | Label | Criteria |
 |-------|---------------|-----------------------------------|-------|----------|
-| L0 | 0.00 – 0.14 | 0 – 14 | **Undocumented** | No consistent behavior. No observable evidence. Claims cannot be verified. |
-| L1 | 0.15 – 0.34 | 15 – 34 | **Awareness** | Behavior is acknowledged. Some stdout/transcript evidence exists but is sparse and unstructured. |
-| L2 | 0.35 – 0.54 | 35 – 54 | **Defined** | Behavior is documented. Review events and audit signals exist but are inconsistent. |
-| L3 | 0.55 – 0.74 | 55 – 74 | **Operational** | Behavior is repeatable and measurable. Metric, audit, and artifact evidence tied to specific question IDs. |
+| L0 | 0.00 – 0.14 | 0 – 14 | **Absent** | No consistent behavior. No observable evidence. Claims cannot be verified. |
+| L1 | 0.15 – 0.34 | 15 – 34 | **Initial** | Behavior is acknowledged. Some stdout/transcript evidence exists but is sparse and unstructured. |
+| L2 | 0.35 – 0.54 | 35 – 54 | **Developing** | Behavior is documented. Review events and audit signals exist but are inconsistent. |
+| L3 | 0.55 – 0.74 | 55 – 74 | **Defined** | Behavior is repeatable and measurable. Metric, audit, and artifact evidence tied to specific question IDs. |
 | L4 | 0.75 – 0.89 | 75 – 89 | **Managed** | Behavior is continuously monitored. OBSERVED-tier evidence dominant. No HIGH-level blockers in assurance runs. |
 | L5 | 0.90 – 1.00 | 90 – 100 | **Optimizing** | Behavior is self-correcting with signed, Merkle-anchored proof. OBSERVED-only evidence. Adversarially tested. |
 

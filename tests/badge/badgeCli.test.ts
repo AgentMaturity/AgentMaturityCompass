@@ -33,7 +33,7 @@ describe("badge generator", () => {
   it("generates HTML format", () => {
     const badge = generateBadge({ level: 4, format: "html" });
     expect(badge).toMatch(/^<img src="https:\/\/img\.shields\.io/);
-    expect(badge).toContain("L4 Measured");
+    expect(badge).toContain("L4 Managed");
     expect(badge).toContain("title=\"amc-public-scoring-methodology");
   });
 

@@ -10,6 +10,7 @@
  */
 
 import { getPublicMethodologyReference, type PublicMethodologyReference } from "../methodology/publicMethodology.js";
+import { formatMaturityOrdinal } from "../score/maturityTaxonomy.js";
 
 export interface BadgeOptions {
   level: number; // 0-5
@@ -17,15 +18,6 @@ export interface BadgeOptions {
   format?: "markdown" | "html" | "url"; // output format
   methodology?: PublicMethodologyReference;
 }
-
-const LEVEL_LABELS: Record<number, string> = {
-  0: "L0 Initial",
-  1: "L1 Aware",
-  2: "L2 Managed",
-  3: "L3 Defined",
-  4: "L4 Measured",
-  5: "L5 Optimized",
-};
 
 const LEVEL_COLORS: Record<number, string> = {
   0: "lightgrey",
@@ -55,7 +47,7 @@ export function badgeSourceReviewNotice(methodology: PublicMethodologyReference 
  */
 export function badgeUrl(opts: BadgeOptions): string {
   const label = opts.label ?? "AMC";
-  const levelLabel = LEVEL_LABELS[opts.level] ?? `L${opts.level}`;
+  const levelLabel = formatMaturityOrdinal(opts.level, " ");
   const color = LEVEL_COLORS[opts.level] ?? "lightgrey";
   const methodology = badgeMethodologyMetadata(opts);
   const params = new URLSearchParams({
@@ -72,7 +64,7 @@ export function badgeUrl(opts: BadgeOptions): string {
 export function generateBadge(opts: BadgeOptions): string {
   const url = badgeUrl(opts);
   const format = opts.format ?? "markdown";
-  const levelLabel = LEVEL_LABELS[opts.level] ?? `L${opts.level}`;
+  const levelLabel = formatMaturityOrdinal(opts.level, " ");
   const label = opts.label ?? "AMC";
   const methodology = badgeMethodologyMetadata(opts);
   const title = `${methodology.id} ${methodology.version} ${methodology.hash}`;
@@ -93,7 +85,7 @@ export function generateBadge(opts: BadgeOptions): string {
  */
 export function formatBadgeOutput(opts: BadgeOptions): string {
   const lines: string[] = [];
-  const levelLabel = LEVEL_LABELS[opts.level] ?? `L${opts.level}`;
+  const levelLabel = formatMaturityOrdinal(opts.level, " ");
   const methodology = badgeMethodologyMetadata(opts);
 
   lines.push(`Agent Maturity: ${levelLabel}`);

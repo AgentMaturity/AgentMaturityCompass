@@ -1,6 +1,7 @@
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import { join, extname } from "node:path";
 import { detectFromContent, type DetectionResult } from "./autoDetect.js";
+import { formatMaturityOrdinal } from "../score/maturityTaxonomy.js";
 
 const SCAN_EXTENSIONS = new Set([".ts", ".js", ".py", ".yaml", ".yml", ".json", ".toml", ".cfg", ".md"]);
 const MAX_FILE_SIZE = 512 * 1024; // 512KB
@@ -48,11 +49,10 @@ export function scanLocal(localPath: string): LocalScanResult {
   if (detection.securityPosture === "strong") level = Math.min(level + 1, 3);
   if (detection.securityPosture === "weak") level = Math.max(level - 1, 1);
 
-  const labels = ["", "L1 — Ad Hoc", "L2 — Emerging", "L3 — Defined"];
   return {
     path: localPath,
     filesScanned: files.length,
     detection,
-    preliminaryScore: { level, label: labels[level] || `L${level}`, confidence: detection.confidence },
+    preliminaryScore: { level, label: formatMaturityOrdinal(level), confidence: detection.confidence },
   };
 }

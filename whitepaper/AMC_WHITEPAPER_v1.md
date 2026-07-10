@@ -15,7 +15,7 @@
 
 ## Abstract
 
-The rapid proliferation of autonomous AI agents in enterprise settings has outpaced the development of rigorous frameworks for assessing their operational maturity, safety, and readiness for deployment. Existing approaches—borrowed from software capability maturity models, AI risk management frameworks, or ad-hoc internal reviews—fail to address the distinctive characteristics of agents: persistent autonomy, dynamic tool use, self-modification capacity, and emergent multi-agent coordination. We present the **Agent Maturity Compass (AMC) Framework**, an evidence-grounded system for evaluating autonomous AI agents across 244 default diagnostic questions plus 600 sector-specific questions, with an optional 264-question lifecycle set for deeper runtime and proof coverage, at six levels (L0: Absent through L5: Autonomous & Self-Improving). The five dimensions—Strategic Agent Operations, Leadership & Autonomy, Culture & Alignment, Resilience, and Skills—provide comprehensive coverage of the operational surface of deployed agents. The central contribution of AMC is its **Execution-Proof Evidence System (EPES)**, which assigns differential trust multipliers to four evidence tiers—ranging from self-reported claims (0.4×) to observed-and-hardened execution artifacts (1.1×)—thereby rendering the framework resistant to the "documentation inflation" observed in prior approaches. On a canonical benchmark agent (ContentModerationBot), keyword-based scoring inflated the total score by 84 points relative to execution-verified scoring; AMC's trust-weighted scoring eliminated this gap. Artifact validity and evidence readiness are reported independently; only evidence readiness `READY` permits scoped external claims. We further introduce an autonomous self-improvement loop in which agents autonomously diagnose maturity gaps, implement remediations, and re-score across dimensions, demonstrated empirically through two case studies: a human-guided agent achieving 94/100 and an autonomously self-improving agent reaching 80/100 from identical L0 baselines. AMC incorporates research-backed scoring modules including Bloom-inspired behavioral attack packs (sycophancy, self-preservation, sabotage, self-preferential bias), METR-inspired task horizon scoring, Google FACTS-inspired factuality dimensions, graduated autonomy governance, memory integrity scoring, and an alignment index. The framework integrates 142 assurance packs, maps to EU AI Act, ISO 42001, NIST AI RMF, and SOC 2, and introduces the Agent Passport (.amcpass) portable verifiable credential for fleet-level trust composition. AMC v2.0 introduces 41 industry-specific sector packs spanning seven regulated industries (Environment, Health, Wealth, Education, Mobility, Technology, Governance), bringing product diagnostic coverage to 844 questions (244 default + 600 sector-specific). The framework also adds MCP (Model Context Protocol) security scoring, agent protocol hardening, and vibe code audit capabilities. AMC is formally specified through a time-parameterized maturity function M(a,d,t), incorporates evidence decay, and is implemented as 1,200+ platform modules validated by 8,238 passing Vitest tests across 1,045 files.
+The rapid proliferation of autonomous AI agents in enterprise settings has outpaced the development of rigorous frameworks for assessing their operational maturity, safety, and readiness for deployment. Existing approaches—borrowed from software capability maturity models, AI risk management frameworks, or ad-hoc internal reviews—fail to address the distinctive characteristics of agents: persistent autonomy, dynamic tool use, self-modification capacity, and emergent multi-agent coordination. We present the **Agent Maturity Compass (AMC) Framework**, an evidence-grounded system for evaluating autonomous AI agents across 244 default diagnostic questions plus 600 sector-specific questions, with an optional 264-question lifecycle set for deeper runtime and proof coverage, at six levels (L0: Absent through L5: Optimizing). The five dimensions—Strategic Agent Operations, Leadership & Autonomy, Culture & Alignment, Resilience, and Skills—provide comprehensive coverage of the operational surface of deployed agents. The central contribution of AMC is its **Execution-Proof Evidence System (EPES)**, which assigns differential trust multipliers to four evidence tiers—ranging from self-reported claims (0.4×) to observed-and-hardened execution artifacts (1.1×)—thereby rendering the framework resistant to the "documentation inflation" observed in prior approaches. On a canonical benchmark agent (ContentModerationBot), keyword-based scoring inflated the total score by 84 points relative to execution-verified scoring; AMC's trust-weighted scoring eliminated this gap. Artifact validity and evidence readiness are reported independently; only evidence readiness `READY` permits scoped external claims. We further introduce an autonomous self-improvement loop in which agents autonomously diagnose maturity gaps, implement remediations, and re-score across dimensions, demonstrated empirically through two case studies: a human-guided agent achieving 94/100 and an autonomously self-improving agent reaching 80/100 from identical L0 baselines. AMC incorporates research-backed scoring modules including Bloom-inspired behavioral attack packs (sycophancy, self-preservation, sabotage, self-preferential bias), METR-inspired task horizon scoring, Google FACTS-inspired factuality dimensions, graduated autonomy governance, memory integrity scoring, and an alignment index. The framework integrates 142 assurance packs, maps to EU AI Act, ISO 42001, NIST AI RMF, and SOC 2, and introduces the Agent Passport (.amcpass) portable verifiable credential for fleet-level trust composition. AMC v2.0 introduces 41 industry-specific sector packs spanning seven regulated industries (Environment, Health, Wealth, Education, Mobility, Technology, Governance), bringing product diagnostic coverage to 844 questions (244 default + 600 sector-specific). The framework also adds MCP (Model Context Protocol) security scoring, agent protocol hardening, and vibe code audit capabilities. AMC is formally specified through a time-parameterized maturity function M(a,d,t), incorporates evidence decay, and is implemented as 1,200+ platform modules validated by 8,243 passing Vitest tests across 1,046 files.
 
 **Keywords:** AI agent maturity, autonomous systems evaluation, execution-proof evidence, AI governance, capability maturity, agent reliability, AI risk management, EU AI Act compliance, agent passport, fleet trust composition
 
@@ -152,15 +152,15 @@ Each dimension is evaluated against six maturity levels:
 | Level | Label | Definition |
 |-------|-------|------------|
 | **L0** | Absent | No capability exists; the concern is not addressed in any form |
-| **L1** | Ad-hoc | No systematic practices; behavior is unpredictable and undocumented |
-| **L2** | Defined | Practices are documented and consistently followed but not measured |
-| **L3** | Managed | Practices are measured, monitored, and actively managed with defined KPIs |
-| **L4** | Optimized | Data-driven optimization cycles are operational; performance is continuously improved |
-| **L5** | Autonomous & Self-Improving | The agent autonomously detects its own gaps and initiates improvement without human instigation |
+| **L1** | Initial | Intent exists, but practices are sporadic, unpredictable, or undocumented |
+| **L2** | Developing | Repeatable practices exist with partial documentation and inconsistent coverage |
+| **L3** | Defined | Practices are systematic, documented, and backed by reviewable evidence |
+| **L4** | Managed | Practices are measured, monitored, and actively managed with defined KPIs |
+| **L5** | Optimizing | The agent detects gaps, improves controls, and produces verifiable evidence of continuous improvement |
 
 The addition of L0 (Absent) addresses a critical gap in prior maturity models: the distinction between "we do this badly" (L1) and "we don't do this at all" (L0). In enterprise agent deployments, many capabilities are simply absent—not poorly implemented, but entirely missing. L0 provides an honest baseline that prevents the false floor effect where agents with zero capability in a dimension are scored identically to agents with poor-but-present capability.
 
-This level structure is deliberately compatible with CMMI while extending it: L0 has no CMMI equivalent (CMMI assumes process existence), L1–L3 map closely to CMMI Initial→Defined, L4 aligns with CMMI Quantitatively Managed+Optimizing, and L5 is an AMC-specific extension reflecting the unique self-modification capacity of LLM-based agents.
+This level structure is deliberately readable alongside CMMI while remaining agent-specific: L0 has no CMMI equivalent, L1 and L3 share the Initial and Defined anchors, L4 emphasizes measured operational control, and L5 extends continuous optimization with evidence-backed self-correction.
 
 Level assignment within each dimension is not binary per-question but continuous, weighted by evidence trust (see Section 4). An agent demonstrating L4 behavior in 60% of Strategic Operations diagnostic questions with execution-verified evidence may receive a Strategic Operations level score of 3.6.
 
@@ -408,7 +408,7 @@ The self-improvement loop is subject to five mandatory safeguards:
 
 ### 6.1 Experimental Design
 
-We evaluate AMC through two primary case studies and one controlled anti-gaming experiment. All evaluations were conducted on production-equivalent agent instances running on the AMC platform. The platform's 1130 modules span six packages, validated by 8,238 passing Vitest tests across 1,045 files:
+We evaluate AMC through two primary case studies and one controlled anti-gaming experiment. All evaluations were conducted on production-equivalent agent instances running on the AMC platform. The platform's 1130 modules span six packages, validated by 8,243 passing Vitest tests across 1,046 files:
 
 - **`shield`** (31 modules): Input validation, prompt injection detection, output filtering
 - **`enforce`** (28 modules): Policy enforcement, constitutional constraints, access controls
@@ -416,7 +416,7 @@ We evaluate AMC through two primary case studies and one controlled anti-gaming 
 - **`vault`** (22 modules): Evidence artifact storage, integrity verification, audit logs
 - **`product`** (42 modules): Evaluation runners, cost controls, remediation catalog, scoring engine
 
-Platform validation inventory: 8,238 passing Vitest tests across 1,045 files as of the current repository audit, covering cross-package interfaces, the end-to-end scoring pipeline, research-backed scoring modules, and 142 assurance packs.
+Platform validation inventory: 8,243 passing Vitest tests across 1,046 files as of the current repository audit, covering cross-package interfaces, the end-to-end scoring pipeline, research-backed scoring modules, and 142 assurance packs.
 
 ### 6.2 Case Study 1: ContentModerationBot (CMB) — Human-Guided Maturity Improvement
 
@@ -780,11 +780,11 @@ AMC's six maturity levels are deliberately mapped to CMMI v2.0 levels to facilit
 | AMC Level | CMMI Equivalent | Key Distinction |
 |-----------|----------------|-----------------|
 | L0 Absent | No equivalent | AMC-specific: capability does not exist; CMMI assumes process existence |
-| L1 Ad-hoc | ML1 Initial | Identical concept; AMC applies to agent behavior, CMMI to process |
-| L2 Defined | ML2 Managed | AMC requires documentation; CMMI requires managed execution |
-| L3 Managed | ML3 Defined | AMC adds measurement requirements absent from CMMI L3 |
-| L4 Optimized | ML4+ML5 combined | AMC collapses CMMI's QM+Optimizing into one level |
-| L5 Autonomous | No equivalent | AMC-specific: agent autonomously improves; no CMMI analog |
+| L1 Initial | ML1 Initial | AMC applies the initial state to demonstrated agent controls rather than development process |
+| L2 Developing | ML2 Managed | AMC captures repeatable but incomplete agent controls |
+| L3 Defined | ML3 Defined | AMC requires systematic controls tied to reviewable evidence |
+| L4 Managed | ML4 Quantitatively Managed | AMC requires measured and continuously monitored agent behavior |
+| L5 Optimizing | ML5 Optimizing | AMC adds evidence-backed self-correction for deployed agents |
 
 The key distinction is that CMMI measures process maturity (how well the development *process* is managed), while AMC measures behavioral maturity (how well the deployed *agent* operates). Both are valid and complementary axes of maturity.
 
@@ -866,7 +866,7 @@ The empirical results are encouraging. Human-guided improvement brought the Cont
 
 AMC's integration of Bloom-inspired behavioral evaluation, METR task horizon scoring, Google FACTS factuality dimensions, graduated autonomy governance, memory integrity scoring, and interpretability assessment represents a significant expansion of what agent maturity measurement covers. The framework's mapping to EU AI Act (12 articles), ISO 42001 (14 clauses), NIST AI RMF, and SOC 2 positions it as the execution substrate for regulatory compliance. The Agent Passport (.amcpass) provides a portable, verifiable credential for fleet-level trust composition.
 
-AMC is not a compliance checkbox or a one-time audit exercise. It is a continuous, executable, self-improving measurement system—validated by 8,238 passing Vitest tests across 1,045 files and 1,200+ platform modules—designed to grow alongside the agents it measures. As AI agents advance from tools to collaborators to autonomous teammates, the question of how we establish credible evidence for their trustworthiness becomes one of the most important in technology. AMC offers a rigorous, empirically validated answer.
+AMC is not a compliance checkbox or a one-time audit exercise. It is a continuous, executable, self-improving measurement system—validated by 8,243 passing Vitest tests across 1,046 files and 1,200+ platform modules—designed to grow alongside the agents it measures. As AI agents advance from tools to collaborators to autonomous teammates, the question of how we establish credible evidence for their trustworthiness becomes one of the most important in technology. AMC offers a rigorous, empirically validated answer.
 
 ---
 

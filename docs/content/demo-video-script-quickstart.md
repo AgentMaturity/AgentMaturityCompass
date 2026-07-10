@@ -100,7 +100,7 @@ Calculating maturity score...
 ╭─────────────────────────────────────────╮
 │  AMC Full Score Result                  │
 │                                         │
-│  Overall Level:  L3 — Governed          │
+│  Overall Level:  L3 — Defined           │
 │  Trust Score:    72/100                  │
 │  Dimensions:                            │
 │    Security      ████████░░  L3         │

@@ -729,7 +729,7 @@ AMC is MIT licensed. We welcome contributions — especially new **assurance pac
 
 ```bash
 git clone https://github.com/AgentMaturity/AgentMaturityCompass.git
-cd AgentMaturityCompass && npm ci && npm test   # 1,045 files / 8,238 passing Vitest tests
+cd AgentMaturityCompass && npm ci && npm test   # 1,046 files / 8,243 passing Vitest tests
 ```
 
 **→ [CONTRIBUTING.md](CONTRIBUTING.md)** — includes guides for writing packs, mapping research papers, and adding adapters.
