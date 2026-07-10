@@ -1,0 +1,163 @@
+@import url("./blog/editorial.css");
+
+.changelog-hero {
+  border-bottom: 1px solid var(--amc-border);
+  background: var(--amc-bg);
+  color: var(--amc-text);
+  font-family: var(--amc-font-sans);
+}
+
+main#main-content:focus {
+  outline: none;
+}
+
+:where(a, button, input, select, textarea, [tabindex]:not([tabindex="-1"])):focus-visible {
+  outline: 2px solid var(--amc-accent);
+  outline-offset: 3px;
+}
+
+.changelog-hero::before {
+  color: var(--amc-accent);
+  content: "AMC RELEASES";
+  font-family: var(--amc-font-mono);
+}
+
+.changelog-hero p {
+  color: var(--amc-muted);
+}
+
+.changelog-shell {
+  width: min(100% - 48px, 820px);
+  margin: 0 auto;
+  padding: 44px 0 88px;
+}
+
+.release-entry {
+  padding: 28px;
+  overflow-wrap: anywhere;
+  border: 1px solid var(--amc-border-accent);
+  border-radius: 8px;
+  background: var(--amc-panel);
+}
+
+.release-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  padding-bottom: 22px;
+  border-bottom: 1px solid var(--amc-border);
+}
+
+.release-kicker {
+  margin: 0 0 6px;
+  color: var(--amc-accent);
+  font-family: var(--amc-font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.release-entry h2,
+.history-band h2 {
+  margin: 0;
+  color: var(--amc-text);
+}
+
+.release-entry h2 {
+  font-family: var(--amc-font-mono);
+  font-size: 1.75rem;
+}
+
+.release-source-link {
+  flex: 0 0 auto;
+  padding: 8px 11px;
+  border: 1px solid var(--amc-border-accent);
+  border-radius: 4px;
+  color: var(--amc-accent);
+  font-family: var(--amc-font-mono);
+  font-size: 0.74rem;
+  text-decoration: none;
+}
+
+.release-source-link:hover {
+  border-color: var(--amc-accent);
+  text-decoration: none;
+}
+
+.release-summary {
+  max-width: 660px;
+  margin: 24px 0 0;
+  color: var(--amc-text);
+  font-size: 1.05rem;
+}
+
+.change-group {
+  margin-top: 30px;
+}
+
+.change-group h3 {
+  margin-top: 0;
+}
+
+.change-group ul {
+  margin-bottom: 0;
+}
+
+.change-group li {
+  margin-bottom: 12px;
+}
+
+.change-group li:last-child {
+  margin-bottom: 0;
+}
+
+.history-band {
+  margin-top: 48px;
+  padding-top: 32px;
+  border-top: 1px solid var(--amc-border);
+  overflow-wrap: anywhere;
+}
+
+.history-band p:not(.release-kicker) {
+  max-width: 640px;
+  color: var(--amc-muted);
+}
+
+.history-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 20px;
+  font-family: var(--amc-font-mono);
+  font-size: 0.78rem;
+}
+
+.history-links a {
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+@media (max-width: 760px) {
+  .changelog-shell {
+    width: min(100% - 36px, 820px);
+    padding: 30px 0 64px;
+  }
+
+  .release-entry {
+    padding: 20px;
+  }
+
+  .release-header {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .release-source-link {
+    align-self: flex-start;
+  }
+
+  .history-band {
+    margin-top: 36px;
+  }
+}

@@ -17,15 +17,15 @@ describe("website content validation", () => {
     expect(blog).not.toMatch(/coming soon|placeholder blog|lorem ipsum/i);
   });
 
-  test("changelog page has a static fallback if remote changelog loading fails", () => {
+  test("changelog page publishes current static notes without a remote runtime", () => {
     const changelog = read("website/changelog.html");
 
-    expect(changelog).toContain("Static release notes fallback");
-    expect(changelog).toContain("Version 1.0.0");
-    expect(changelog).toContain("GRC treatment-plan export");
-    expect(changelog).toContain("Community demo kit");
-    expect(changelog).toContain("https://developer.mozilla.org/en-US/docs/Web/HTML/Element/noscript");
-    expect(changelog).toContain("<noscript>");
+    expect(changelog).toContain('<h2 id="release-1-1-1">1.1.1</h2>');
+    expect(changelog).toContain("Make <code>amc doctor</code> report healthy install readiness");
+    expect(changelog).toContain("supported Node.js 24 action versions");
+    expect(changelog).toContain("Complete changelog");
+    expect(changelog).not.toContain("<script");
+    expect(changelog).not.toContain("raw.githubusercontent.com");
     expect(changelog).not.toContain("content of those pages not audited for staleness");
   });
 
