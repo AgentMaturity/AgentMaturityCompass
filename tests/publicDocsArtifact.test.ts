@@ -55,6 +55,7 @@ describe("public Docs Pages artifact", () => {
     const lock = JSON.parse(readFileSync(resolve(root, "package-lock.json"), "utf8"));
 
     expect(html).toContain('src="vendor/marked.min.js"');
+    expect(html).toContain('src="docs.js?v=13"');
     expect(html).not.toContain("cdn.jsdelivr.net");
     expect(script).toContain("./content/");
     expect(script).toContain("./content-manifest.json");
@@ -137,10 +138,12 @@ describe("public Docs Pages artifact", () => {
 
   test("keeps manifest-bound Docs assets network-first through the root service worker", () => {
     const worker = readFileSync(resolve(root, "website/sw.js"), "utf8");
-    expect(worker).toContain("const CACHE_NAME = 'amc-v8'");
+    expect(worker).toContain("const CACHE_NAME = 'amc-v9'");
     expect(worker).toContain("url.pathname === '/docs/content-manifest.json'");
     expect(worker).toContain("url.pathname.startsWith('/docs/content/')");
     expect(worker).toContain("url.pathname.startsWith('/docs/vendor/')");
-    expect(worker).toMatch(/if \(docsIntegrityAsset\)[\s\S]*fetch\(event\.request\)[\s\S]*caches\.match\(event\.request\)/);
+    expect(worker).toContain("event.request.destination === 'script'");
+    expect(worker).toContain("event.request.destination === 'style'");
+    expect(worker).toMatch(/if \(docsIntegrityAsset \|\| releaseShellAsset\)[\s\S]*fetch\(event\.request\)[\s\S]*caches\.match\(event\.request\)/);
   });
 });

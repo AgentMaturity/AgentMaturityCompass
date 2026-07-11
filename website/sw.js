@@ -1,5 +1,5 @@
-/* AMC Service Worker — network-first for pages, cache-first for static assets */
-const CACHE_NAME = 'amc-v8';
+/* AMC Service Worker — fresh release shells online, offline fallback for cached assets */
+const CACHE_NAME = 'amc-v9';
 const STATIC_ASSETS = [
   'style.css',
   'particles.js',
@@ -32,9 +32,12 @@ self.addEventListener('fetch', (event) => {
     url.pathname === '/docs/content-manifest.json' ||
     url.pathname.startsWith('/docs/content/') ||
     url.pathname.startsWith('/docs/vendor/');
+  const releaseShellAsset =
+    url.origin === self.location.origin &&
+    (event.request.destination === 'script' || event.request.destination === 'style');
 
-  // Manifest-bound Docs assets must not be pinned behind an older cache online.
-  if (docsIntegrityAsset) {
+  // Docs proof assets and release shell code must not be pinned behind an older cache online.
+  if (docsIntegrityAsset || releaseShellAsset) {
     event.respondWith(
       fetch(event.request)
         .then((response) => {
