@@ -5,7 +5,7 @@
 - AMC surfaces requested: Watch, Vault, CLI, Studio
 - Sources reviewed: Claude Code hooks documentation; Gemini CLI hooks documentation; AgentApprove product setup; pinned AEP draft
 - Retrieval: primary sources reviewed 2026-07-10
-- Status: shipped and release-verified locally; remote CI/deploy verification pending commit
+- Status: Done; locally and remotely release-verified
 
 ## Relevance decision
 
@@ -52,4 +52,7 @@ No AgentApprove adapter, Agent Control compatibility layer, AEP mapping importer
 - Release gate: `tmp/release-gate/amc-1463-final.json` passed; URL-enabled gate `tmp/release-gate/amc-1463-live.json` also verified `https://agentmaturity.co` at HTTP 200.
 - Package verification: npm tarball, SBOM, license inventory, release scan, release bundle, and release bundle verification passed.
 - TLS verification: `agentmaturity.co` presented a Let's Encrypt certificate valid from 2026-06-26 through 2026-09-24 and returned HTTP/2 200.
-- Remote GitHub CI and deployed-content verification: pending commit and push.
+- Feature commit `e767006ba099565229ebc846aac3e1cd7c2477fd` is pushed to synchronized `main` / `origin/main`.
+- Remote CI `29138243066`, Pages `29138243050`, Docker `29138243071`, and npm validation `29138243077` passed. npm publishing correctly skipped because no release token was configured.
+- Production serves the new hook setup copy, 1,149 public command paths, 8,348 passing tests, and commit-pinned brand and Docs manifests for `e767006ba099565229ebc846aac3e1cd7c2477fd`.
+- Linear `AMC-1463` is Done; completion comment `6c8fe0f9-b9b8-4189-a9fd-a79af484b357`.
