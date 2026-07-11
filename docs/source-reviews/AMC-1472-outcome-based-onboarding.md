@@ -6,7 +6,7 @@
 - Source reviewed: first-party Agent Control and AgentApprove/AEP material already pinned by the competitive review
 - Retrieval: public sites and repositories reviewed 2026-07-10; implementation review 2026-07-11
 - Immutable source commits: Agent Control `83188b62c63e2b4ff9ada87048fd99605184ee5a`; Agent Event Protocol `2583cff9380f8f0a459d52c7112b6105c46496ed`
-- Status: Verified locally; publication pending
+- Status: Done; published and verified
 
 ## Relevance decision
 
@@ -56,4 +56,9 @@ No onboarding event store, analytics stream, sample agent, synthetic task, provi
 - macOS universal, Linux x64, and Windows x64 desktop packages build and pass package verification.
 - Playwright passes 55 tests with 2 intentional i18n skips; the focused homepage suite passes 6/6 after the final public copy update.
 - Manual Studio review at 1280x720 and 390x844 shows all four bounded milestones, 1,153 CLI paths, no horizontal overflow, and no warning/error logs. This review exposed the stale service-worker contract, which was repaired and reverified before publication.
-- Production revision, HTTPS, deployed bytes, live browser, and live release-gate evidence remain pending until the exact tested commit is pushed.
+- Implementation commit `74b4619dc612beb42b90956adee5796affe72afb` is pushed. Exact-head CI `29159237484`, npm validation `29159237594`, Docker Runner Image `29159237525`, and Pages `29159237538` pass. Registry/tag publication was correctly skipped because this was not a tagged release.
+- Production Docs manifest reports source revision `74b4619dc612beb42b90956adee5796affe72afb` and 170 guides. Live homepage, public OpenAPI, and Getting Started content are byte-identical to the committed files.
+- Production homepage exposes `8,444`, `READY setup is not COMPLETE`, and `amc connect --status`, while stale `8,434` is absent. Public OpenAPI exposes `/onboarding/status` and the activation schemas.
+- Apex HTTPS returns 200, `www` redirects to the apex, and the certificate is valid through 2026-09-24.
+- Live desktop, 390x844 mobile, and Getting Started browser checks pass without horizontal overflow, warnings, or errors. The activation boundary and command are present on the deployed pages.
+- Post-deploy quick release gate passes live HTTP health. Receipt: `tmp/release-gate/amc-1472-live.json`.
