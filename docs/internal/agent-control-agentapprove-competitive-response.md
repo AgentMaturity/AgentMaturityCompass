@@ -32,6 +32,8 @@ AMC-1461 closes the first P0: Guardrails state now persists, verifies, distingui
 
 AMC-1462 closes the second P0: Bridge now accepts a least-privilege, quota-safe, pinned provider-neutral action subset and turns it into encrypted Watch evidence plus idempotently recoverable signed receipts without retaining raw hook payloads or claiming AEP conformance.
 
+AMC-1463 closes the third P0: one reversible command now installs, verifies, or removes primary-source-pinned Claude Code and Gemini CLI project hooks. A signed ownership manifest binds the exact handler, provider source, agent, Bridge origin, ignore protection, and dedicated `hook:observe` lease; the hidden forwarder cannot read arbitrary workspace secrets or deliver to unsigned destinations. Tool inputs and raw session identifiers remain outside the Watch receipt path.
+
 ## What each competitor does well
 
 ### Agent Control
@@ -125,7 +127,7 @@ AMC must not import these files as executable policy. A future AEP lane should:
 | ---: | --- | --- | --- |
 | 1 | Persist signed Guardrails intent and effective status | Runtime Firewall, artifact signatures | Shipped in AMC-1461; restart, concurrency, API, Dashboard, runtime, and tamper tests pass |
 | 2 | Add a pinned provider-neutral hook ingress | Bridge, Watch events, receipts | Shipped in AMC-1462; four AEP 0.1 action types, exact source pin, least-privilege lease, transactional quota, raw-body non-retention, recoverable signed receipts, conflicting-replay rejection, and no conformance claim |
-| 3 | Add `amc connect hooks` install/status/remove | Adapter registry, Studio supervisor | Idempotent, reversible, dry-run, exact files shown, no shell-profile surprises |
+| 3 | Add `amc connect hooks` install/status/remove | Adapter registry, Studio supervisor | Shipped in AMC-1463; idempotent, reversible, dry-run, exact files shown, signed ownership, managed credential ignore rule, no shell-profile surprises |
 | 4 | Return provider-native signed control responses | Approval policy, action policy, ToolHub | Allow/deny/ask maps are fixture-tested and replay protected |
 | 5 | Publish adapter capability receipts | Adapter registry, Passport | Every adapter declares events, controls, lossiness, version, and verification result |
 | 6 | Correlate hook action lifecycle end to end | Runtime runs, episodes, lifecycle graph | requested/decision/completed or failed share one stable action ID |

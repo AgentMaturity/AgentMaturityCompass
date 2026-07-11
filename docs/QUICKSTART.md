@@ -122,6 +122,16 @@ If `amc quickscore` cannot open terminal prompts, its placeholder L0 output incl
 
 If `amc quickscore --auto --json` cannot find captured execution evidence, it returns `scoreStatus: "AUTO_NO_EVIDENCE"` and no measured score fields. Use `amc wrap <runtime> -- <your-agent-command>` to capture evidence first, or use `amc quickscore --answers answers.json --json` when you want CI-safe survey scoring.
 
+For Claude Code or Gemini CLI, observe native tool requests with one reversible project setup:
+
+```bash
+amc connect hooks install --provider claude-code --agent my-agent --dry-run
+amc connect hooks install --provider claude-code --agent my-agent
+amc connect hooks status --provider claude-code
+```
+
+Replace `claude-code` with `gemini-cli` for Gemini CLI. The observer sends no tool arguments and makes no allow or deny decision. Run `amc connect hooks remove --provider claude-code` to remove only AMC's owned handler and revoke its lease.
+
 ---
 
 ## 4. Import eval results from your framework (optional, 1 minute)

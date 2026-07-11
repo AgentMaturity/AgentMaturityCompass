@@ -452,6 +452,21 @@ export { runAdapterCommand, initAdapterProjectSample } from "./adapters/adapterR
 export { listBuiltInAdapters, getBuiltInAdapter } from "./adapters/registry.js";
 export { loadAdaptersConfig, verifyAdaptersConfigSignature } from "./adapters/adapterConfigStore.js";
 export {
+  CLAUDE_CODE_HOOK_SOURCE,
+  GEMINI_CLI_HOOK_SOURCE,
+  HOOK_INTEGRATION_ID,
+  HookIntegrationError,
+  forwardProviderHookEvent,
+  getHookIntegrationStatus,
+  installHookIntegration,
+  mapProviderHookEvent,
+  removeHookIntegration,
+  type HookFileChange,
+  type HookIntegrationStatus,
+  type HookMutationResult,
+  type HookProvider
+} from "./adapters/hookIntegration.js";
+export {
   defaultBridgeConfig,
   bridgeConfigSchema,
   bridgeProviderSchema,

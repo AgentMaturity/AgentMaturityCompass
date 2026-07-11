@@ -130,6 +130,8 @@ describe("studio connect wizard", () => {
     expect(out.leaseCarrierHint).toContain("API key env vars");
     expect(out.envLines.some((line) => line.includes("AMC_LEASE=lease-token-1"))).toBe(true);
     expect(out.workOrderId).toBe("wo-1");
+    expect(out.hookObservation.recommendedProvider).toBeNull();
+    expect(out.hookObservation.supportedProviders).toEqual(["claude-code", "gemini-cli"]);
   });
 
   test("prompts for mode and falls back to gateway route when agent config load fails", async () => {
@@ -143,6 +145,30 @@ describe("studio connect wizard", () => {
     expect(out.routeUrl).toBe("http://127.0.0.1:3210/openai");
     expect(out.command).toContain("amc sandbox run --agent agent-2");
     expect(out.leaseCarrierHint).toContain("Authorization Bearer");
+  });
+
+  test("recommends the verified native hook installer for Claude and Gemini adapters", async () => {
+    mocks.loadAdaptersConfig.mockReturnValue({
+      adapters: {
+        perAgent: {
+          "agent-1": {
+            preferredAdapter: "claude-cli"
+          }
+        }
+      }
+    });
+
+    const out = await buildConnectInstructions({
+      workspace: workspace(),
+      agentId: "agent-1",
+      mode: "supervise"
+    });
+
+    expect(out.hookObservation.recommendedProvider).toBe("claude-code");
+    expect(out.hookObservation.installCommand).toBe(
+      "amc connect hooks install --provider claude-code --agent agent-1"
+    );
+    expect(out.hookObservation.controlDecision).toBe(false);
   });
 });
 

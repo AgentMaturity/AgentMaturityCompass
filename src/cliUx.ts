@@ -227,11 +227,15 @@ function commandPathSet(program: Command): Set<string> {
   return new Set(flattenCommandPaths(program));
 }
 
+function isInternalCommand(command: Command): boolean {
+  return command.name().startsWith("_") || Boolean((command as Command & { _hidden?: boolean })._hidden);
+}
+
 export function buildCommandInventory(program: Command, options: { includeInternal?: boolean } = {}): CliCommandInventoryEntry[] {
   const entries: CliCommandInventoryEntry[] = [];
   const walk = (cmd: Command, prefix: string[], aliasPrefixes: string[][]): void => {
     for (const child of cmd.commands) {
-      if (!options.includeInternal && child.name().startsWith("_")) {
+      if (!options.includeInternal && isInternalCommand(child)) {
         continue;
       }
       const next = [...prefix, child.name()];
@@ -245,7 +249,9 @@ export function buildCommandInventory(program: Command, options: { includeIntern
         description: child.description(),
         aliases: [...aliases],
         options: child.options.map((option) => option.flags),
-        subcommands: child.commands.map((grandchild) => grandchild.name())
+        subcommands: child.commands
+          .filter((grandchild) => options.includeInternal || !isInternalCommand(grandchild))
+          .map((grandchild) => grandchild.name())
       });
 
       const childAliasPrefixes = [

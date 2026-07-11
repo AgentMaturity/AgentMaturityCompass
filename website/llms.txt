@@ -27,7 +27,7 @@ amc
 - Ed25519 + Merkle tree cryptographic proof chains
 - 244 default diagnostic questions across 5 trust dimensions, plus a 264-question lifecycle-expanded set
 - 14 framework adapters (LangChain, CrewAI, AutoGen, etc.)
-- 1,145 public CLI command paths
+- 1,149 public CLI command paths
 - Domain Proof Lane with amcproof artifacts for source-to-rule correctness checks
 - Evidence trust tiers: SELF_REPORTED (0.4x), OBSERVED (1.0x), CRYPTOGRAPHIC (1.0x)
 

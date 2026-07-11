@@ -83,9 +83,11 @@ describe("cliUx", () => {
   it("omits internal helper commands unless requested", () => {
     const program = new Command();
     program.command("_daemon");
+    program.command("forward", { hidden: true });
     program.command("run");
 
     expect(buildCommandInventory(program).map((entry) => entry.path)).toEqual(["run"]);
-    expect(buildCommandInventory(program, { includeInternal: true }).map((entry) => entry.path)).toEqual(["_daemon", "run"]);
+    expect(buildCommandInventory(program, { includeInternal: true }).map((entry) => entry.path))
+      .toEqual(["_daemon", "forward", "run"]);
   });
 });

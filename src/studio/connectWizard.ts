@@ -21,6 +21,13 @@ export interface ConnectOutput {
   leaseCarrierHint: string;
   nodeSnippet: string;
   pythonSnippet: string;
+  hookObservation: {
+    supportedProviders: ["claude-code", "gemini-cli"];
+    recommendedProvider: "claude-code" | "gemini-cli" | null;
+    installCommand: string | null;
+    statusCommand: string | null;
+    controlDecision: false;
+  };
 }
 
 export async function buildConnectInstructions(params: {
@@ -137,6 +144,12 @@ export async function buildConnectInstructions(params: {
     "print(json.dumps(trace, separators=(',',':')))"
   ].join("\n");
 
+  const recommendedHookProvider = selectedAdapterId === "claude-cli"
+    ? "claude-code"
+    : selectedAdapterId === "gemini-cli"
+      ? "gemini-cli"
+      : null;
+
   return {
     agentId,
     adapterId: selectedAdapterId,
@@ -148,6 +161,17 @@ export async function buildConnectInstructions(params: {
     workOrderId: activeWorkOrder?.workOrderId ?? null,
     leaseCarrierHint,
     nodeSnippet,
-    pythonSnippet
+    pythonSnippet,
+    hookObservation: {
+      supportedProviders: ["claude-code", "gemini-cli"],
+      recommendedProvider: recommendedHookProvider,
+      installCommand: recommendedHookProvider
+        ? `amc connect hooks install --provider ${recommendedHookProvider} --agent ${agentId}`
+        : null,
+      statusCommand: recommendedHookProvider
+        ? `amc connect hooks status --provider ${recommendedHookProvider}`
+        : null,
+      controlDecision: false
+    }
   };
 }

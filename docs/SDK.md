@@ -39,6 +39,21 @@ Publication caveat: the repo contains SDK source and generators, but separately 
 
 ## Provider-Neutral Hook Observation
 
+For Claude Code or Gemini CLI, install the project-local observer instead of hand-editing hook configuration:
+
+```bash
+amc connect hooks install --provider claude-code --agent my-agent --dry-run
+amc connect hooks install --provider claude-code --agent my-agent
+amc connect hooks status --provider claude-code
+amc connect hooks remove --provider claude-code
+
+# Or use --provider gemini-cli
+```
+
+The installer uses a dedicated `hook:observe` lease with a `/hooks` route allowlist, adds a managed `.gitignore` block for `.amc/hooks/`, keeps the bearer token out of provider config, requires token mode `0600`, signs its ownership manifest, and preserves unrelated settings on install and removal. Its forwarder sends only tool identity, provider surface, event time, and a hashed session correlation. It does not send tool arguments, cwd, transcript paths, or raw session IDs. It observes only `action.requested`; it does not approve, deny, or steer a provider action.
+
+Codex, Cursor, OpenCode, and other providers are not advertised by this installer until AMC has a pinned and fixture-tested native per-tool hook contract for them.
+
 Agents that already emit a canonical hook envelope can post an AMC-owned observed subset of the AEP `0.1` action lifecycle to:
 
 ```text

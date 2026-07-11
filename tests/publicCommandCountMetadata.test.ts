@@ -2,8 +2,8 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, test } from "vitest";
 
-const CURRENT_COMMAND_COUNT = "1,145";
-const CURRENT_COMMAND_COUNT_RAW = 1145;
+const CURRENT_COMMAND_COUNT = "1,149";
+const CURRENT_COMMAND_COUNT_RAW = 1149;
 const STALE_COMMAND_COUNT_PATTERNS = [
   /\b481 CLI commands\b/,
   /CLI \(481 commands\)/,
@@ -11,6 +11,7 @@ const STALE_COMMAND_COUNT_PATTERNS = [
   /\b842 commands\b/,
   /\b1,084\b/,
   /\b1036 CLI commands\b/,
+  /\b1,145\b/,
 ];
 
 const CURRENT_COMMAND_COUNT_FILES = [

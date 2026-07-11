@@ -74,6 +74,18 @@ If a no-prompt run prints a placeholder L0 score, AMC now shows: "Did you mean t
 
 If `amc quickscore --auto --json` has no captured ledger evidence, AMC fails closed with `scoreStatus: "AUTO_NO_EVIDENCE"` and no measured score fields. Capture evidence first with `amc wrap <runtime> -- <your-agent-command>`, or use `amc quickscore --answers answers.json --json` for a CI-safe survey score.
 
+### Observe Claude Code or Gemini CLI actions
+
+Use a dry run to inspect the exact project files, then install the reversible observer:
+
+```bash
+amc connect hooks install --provider claude-code --agent my-agent --dry-run
+amc connect hooks install --provider claude-code --agent my-agent
+amc connect hooks status --provider claude-code
+```
+
+Use `--provider gemini-cli` for Gemini CLI. AMC keeps a narrow observation lease out of provider config and forwards no tool arguments, cwd, transcript path, or raw session ID. This records signed Watch evidence; it does not approve or deny provider actions. Remove it with `amc connect hooks remove --provider claude-code`.
+
 **Add a badge to your README:**
 
 ```bash

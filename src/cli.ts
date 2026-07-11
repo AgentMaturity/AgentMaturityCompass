@@ -239,6 +239,7 @@ import inquirer from "inquirer";
 import { assertOwnerMode, getMode, setMode, type AMCMode } from "./mode/mode.js";
 import { initVaultInteractive, lockVaultNow, rotateVaultKeysInteractive, unlockVaultInteractive, vaultStatusNow } from "./vault/vaultCli.js";
 import { buildConnectInstructions } from "./studio/connectWizard.js";
+import { registerHookIntegrationCommands } from "./adapters/hookIntegrationCli.js";
 import { runStudioForeground, startStudioDaemon, stopStudioDaemon, studioStatus } from "./studio/studioSupervisor.js";
 import { readAdminToken, readStudioState, studioLogsDir } from "./studio/studioState.js";
 import { fixSignatures, inspectSignatures } from "./studio/signatures.js";
@@ -4258,7 +4259,7 @@ studioLan
     console.log(`Signature: ${out.sigPath}`);
   });
 
-program
+const connect = program
   .command("connect")
   .description("Connect wizard for any agent/provider runtime")
   .option("--agent <agentId>", "agent ID (overrides global --agent)")
@@ -4369,6 +4370,12 @@ program
         console.log(chalk.hex('#4AEF79')(`Adapter lease carrier:`));
         console.log(output.leaseCarrierHint);
       }
+      if (output.hookObservation.installCommand) {
+        console.log("");
+        console.log(chalk.hex('#4AEF79')("Observe native tool actions:"));
+        console.log(output.hookObservation.installCommand);
+        console.log("Observation only; this does not change provider allow or deny behavior.");
+      }
       console.log("");
       console.log(chalk.hex('#4AEF79')("Node snippet:"));
       console.log(output.nodeSnippet);
@@ -4377,6 +4384,8 @@ program
       console.log(output.pythonSnippet);
     }
   );
+
+registerHookIntegrationCommands(connect, () => activeAgent(program));
 
 const adapters = program.command("adapters").description("Built-in adapter system for one-line agent integration");
 

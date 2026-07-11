@@ -318,7 +318,24 @@ amc wrap any -- python bot.py</code></pre>
 
       <!-- Provider-neutral hooks -->
       <h2 id="provider-neutral-hooks">Provider-Neutral Action Hooks</h2>
-      <p>Use the Bridge hook ingress when an agent can emit a canonical action envelope but does not need a source-specific AMC adapter.</p>
+      <p>For Claude Code or Gemini CLI, install a project-local observer without hand-editing provider configuration:</p>
+      <pre><code><span class="comment"># Preview exact files, then install</span>
+amc connect hooks install --provider claude-code --agent my-agent --dry-run
+amc connect hooks install --provider claude-code --agent my-agent
+
+<span class="comment"># Verify or remove it</span>
+amc connect hooks status --provider claude-code
+amc connect hooks remove --provider claude-code
+
+<span class="comment"># Gemini CLI uses the same lifecycle</span>
+amc connect hooks install --provider gemini-cli --agent my-agent</code></pre>
+
+      <div class="callout callout-green">
+        <strong>Reversible and privacy-minimal</strong>
+        AMC preserves unrelated provider settings, adds a managed <code>.gitignore</code> block for <code>.amc/hooks/</code>, keeps its dedicated <code>hook:observe</code> lease out of provider config with mode <code>0600</code>, signs the ownership manifest, and removes only its own handler and ignore block. The forwarder omits tool arguments, cwd, transcript paths, and raw session IDs. It observes requested actions; it does not allow, deny, or steer them.
+      </div>
+
+      <p>For a custom runtime that already emits a canonical action envelope, call the Bridge ingress directly:</p>
       <pre><code><span class="comment"># Mint a least-privilege observation lease</span>
 LEASE="$(amc lease issue --agent hook-agent --ttl 30m \
   --scopes hook:observe --routes /hooks --models '*' --rpm 60)"
@@ -331,7 +348,7 @@ curl -sS http://127.0.0.1:3212/bridge/hooks/aep/0.1/events \
 
       <div class="callout callout-teal">
         <strong>Observed, not conformant</strong>
-        AMC accepts four action events from an AMC-owned AEP 0.1 subset pinned to <code>2583cff9380f8f0a459d52c7112b6105c46496ed</code>. It does not claim AEP conformance or return control decisions. Raw bodies are hashed and discarded; encrypted redacted projections and signed receipts appear in Watch. Byte-identical retries return the original receipt, while conflicting source event IDs fail closed.
+        AMC accepts four action events from an AMC-owned AEP 0.1 subset pinned to <code>2583cff9380f8f0a459d52c7112b6105c46496ed</code>. The installer currently maps only privacy-minimal <code>action.requested</code> observations for Claude Code and Gemini CLI. AMC does not claim AEP conformance or return control decisions. Codex, Cursor, OpenCode, and other providers are not advertised until their per-tool hook contracts are pinned and fixture-tested. Raw ingress bodies are hashed and discarded; encrypted redacted projections and signed receipts appear in Watch.
       </div>
 
       <!-- SDK Integration -->

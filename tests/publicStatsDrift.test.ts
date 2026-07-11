@@ -2,9 +2,9 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, test } from "vitest";
 
-const CURRENT_TEST_COUNT = "8,324";
-const CURRENT_TEST_FILE_COUNT = "1,053";
-const STALE_TEST_COUNTS = ["8,265", "8%2C265", "8,257", "8%2C257", "8,252", "8%2C252", "8,248", "8%2C248", "8,243", "8%2C243", "8,238", "8%2C238", "8,235", "8%2C235", "8,229", "8%2C229", "8,223", "8%2C223", "8,218", "8%2C218", "8,212", "8%2C212", "8,207", "8%2C207", "8,206", "8%2C206", "8,198", "8%2C198", "8,191", "8%2C191", "8,175", "8%2C175", "8,164", "8%2C164", "8,158", "8%2C158", "8,150", "8%2C150", "5,394", "5%2C394", "5,098", "5%2C031", "4,161", "3,980", "2,723", "2,699"];
+const CURRENT_TEST_COUNT = "8,348";
+const CURRENT_TEST_FILE_COUNT = "1,055";
+const STALE_TEST_COUNTS = ["8,324", "8%2C324", "8,265", "8%2C265", "8,257", "8%2C257", "8,252", "8%2C252", "8,248", "8%2C248", "8,243", "8%2C243", "8,238", "8%2C238", "8,235", "8%2C235", "8,229", "8%2C229", "8,223", "8%2C223", "8,218", "8%2C218", "8,212", "8%2C212", "8,207", "8%2C207", "8,206", "8%2C206", "8,198", "8%2C198", "8,191", "8%2C191", "8,175", "8%2C175", "8,164", "8%2C164", "8,158", "8%2C158", "8,150", "8%2C150", "5,394", "5%2C394", "5,098", "5%2C031", "4,161", "3,980", "2,723", "2,699"];
 
 const CURRENT_PUBLIC_FILES = [
   "README.md",
@@ -40,7 +40,7 @@ describe("public test-count claims", () => {
 
   test("README badge uses the latest fully verified passing inventory", () => {
     const readme = readProjectFile("README.md");
-    expect(readme).toContain("tests-8%2C273%20passing");
-    expect(readme).not.toContain("tests-8%2C273%20collected");
+    expect(readme).toContain("tests-8%2C348%20passing");
+    expect(readme).not.toContain("tests-8%2C348%20collected");
   });
 });

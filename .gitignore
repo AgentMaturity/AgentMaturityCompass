@@ -42,6 +42,7 @@ Thumbs.db
 .amc/lifecycle-runs/
 .amc/observability-lane/
 .amc/onboarding/
+.amc/hooks/
 .amc/runs/
 .amc/trace-indexes/
 .amc/**/*.json.sig
