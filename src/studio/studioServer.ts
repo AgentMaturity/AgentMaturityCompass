@@ -107,17 +107,26 @@ import { serveConsolePath } from "../console/consoleServer.js";
 import { handleStudioApiDelegation } from "./apiDelegation.js";
 import { openLedger } from "../ledger/ledger.js";
 import { sha256Hex } from "../utils/hash.js";
+import { approvalStatusPayload } from "../approvals/approvalEngine.js";
 import {
-  approvalStatusPayload,
-  decideApprovalForIntent
-} from "../approvals/approvalEngine.js";
-import {
-  cancelApprovalRequest,
   listApprovalDecisions,
-  listApprovalRequests,
   loadApprovalRequestRecord
 } from "../approvals/approvalChainStore.js";
 import { parseApprovalStatus } from "../approvals/approvalCli.js";
+import {
+  getApprovalInboxItem,
+  listApprovalInbox,
+  projectApprovalInboxSummary
+} from "../approvals/approvalInbox.js";
+import { deliverApprovalLifecycle } from "../approvals/approvalDelivery.js";
+import {
+  ApprovalStudioError,
+  cancelApprovalInStudio,
+  decideApprovalInStudio,
+  observeApprovalStatusInStudio,
+  studioApprovalDecisionInputSchema,
+  studioApprovalDenyInputSchema
+} from "../approvals/approvalStudioService.js";
 import { questionBank } from "../diagnostic/questionBank.js";
 import { loadTargetProfile, saveTargetProfile } from "../targets/targetProfile.js";
 import { simulateTargetWhatIf } from "../simulator/targetWhatIf.js";
@@ -168,7 +177,7 @@ import { parseUserRoles } from "../auth/roles.js";
 import { claimPairingForResponse, clearPairingCookie, pairingCookieValid } from "../pairing/pairingApi.js";
 import { loadLanMode, verifyLanModeSignature } from "../pairing/lanMode.js";
 import { createPairingCode } from "../pairing/pairingCodes.js";
-import { loadApprovalPolicy, verifyApprovalPolicySignature } from "../approvals/approvalPolicyEngine.js";
+import { verifyApprovalPolicySignature } from "../approvals/approvalPolicyEngine.js";
 import { loadGatewayConfig } from "../gateway/config.js";
 import { policyPackApplyCli, policyPackDescribeCli, policyPackDiffCli, policyPackListCli } from "../policyPacks/packCli.js";
 import { tailTransparencyEntries, verifyTransparencyLog } from "../transparency/logCli.js";
@@ -188,7 +197,10 @@ import { complianceFleetReportCli } from "../compliance/complianceCli.js";
 import { federateExportCli, federateImportCli, federatePeerListCli, federateVerifyCli } from "../federation/federationCli.js";
 import { integrationsDispatchCli, integrationsStatusCli, integrationsTestCli, integrationsVerifyCli } from "../integrations/integrationsCli.js";
 import { verifyOpsReceiptForEvent } from "../integrations/opsReceipt.js";
-import { dispatchIntegrationEvent } from "../integrations/integrationDispatcher.js";
+import {
+  dispatchIntegrationEvent,
+  drainDueIntegrationDeliveries
+} from "../integrations/integrationDispatcher.js";
 import { resolveSecretRef } from "../integrations/integrationStore.js";
 import {
   outcomesFleetReportCli,
@@ -243,7 +255,6 @@ import {
   maintenanceVacuumCli
 } from "../ops/maintenance/maintenanceCli.js";
 import {
-  recordApprovalDecisionMetric,
   recordApprovalRequestMetric,
   recordHttpRequestMetric,
   recordLeaseIssuedMetric,
@@ -391,6 +402,7 @@ interface StudioApiOptions {
   maxRequestBytes?: number;
   corsAllowedOrigins?: string[];
   minFreeDiskMb?: number;
+  publicConsoleBasePath?: string;
 }
 
 interface AuthContext {
@@ -399,6 +411,7 @@ interface AuthContext {
   scopes: Set<string>;
   roles: Set<UserRole>;
   username: string | null;
+  sessionAuthSource?: "LOCAL_USER" | "WORKSPACE_ROUTER";
 }
 
 async function readBody(req: IncomingMessage, maxBytes = 1_048_576): Promise<string> {
@@ -992,6 +1005,15 @@ function leaseQueryCarrierEnabled(workspace: string): boolean {
   }
 }
 
+function requestUsesHttps(req: IncomingMessage): boolean {
+  const forwarded = req.headers["x-forwarded-proto"];
+  const first = (Array.isArray(forwarded) ? forwarded[0] : forwarded)?.split(",", 1)[0]?.trim().toLowerCase();
+  if (first === "https") {
+    return true;
+  }
+  return (req.socket as Socket & { encrypted?: boolean }).encrypted === true;
+}
+
 function authenticate(req: IncomingMessage, workspace: string, adminToken: string): AuthContext | null {
   const suppliedAdmin = req.headers["x-amc-admin-token"];
   if (typeof suppliedAdmin === "string" && suppliedAdmin === adminToken) {
@@ -1004,21 +1026,19 @@ function authenticate(req: IncomingMessage, workspace: string, adminToken: strin
     };
   }
 
-  const usersVerify = verifyUsersConfigSignature(workspace);
-  if (usersVerify.valid) {
-    const session = sessionFromRequest({
-      workspace,
-      req
-    });
-    if (session.ok && session.payload) {
-      return {
-        isAdmin: false,
-        agentId: null,
-        scopes: new Set(["console:session"]),
-        roles: new Set(session.payload.roles),
-        username: session.payload.username
-      };
-    }
+  const session = sessionFromRequest({
+    workspace,
+    req
+  });
+  if (session.ok && session.payload) {
+    return {
+      isAdmin: false,
+      agentId: null,
+      scopes: new Set(["console:session"]),
+      roles: new Set(session.payload.roles),
+      username: session.payload.username,
+      sessionAuthSource: session.authSource
+    };
   }
 
   const suppliedAgent = req.headers["x-amc-agent-token"];
@@ -1122,7 +1142,7 @@ function requireRoles(params: {
   const check = enforceRoleOrAdmin({
     access: accessContext(params.auth),
     requiredAny: params.roles,
-    usersConfigValid: usersSig.valid
+    usersConfigValid: usersSig.valid || params.auth.sessionAuthSource === "WORKSPACE_ROUTER"
   });
   if (!check.ok) {
     json(params.res, check.status, { error: check.error ?? "forbidden" });
@@ -1630,8 +1650,16 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
     }
   };
 
+  const drainIntegrationQueue = (): void => {
+    void drainDueIntegrationDeliveries({ workspace: options.workspace }).catch(() => {
+      // Delivery state remains durable in SQLite and will be retried on a later tick.
+    });
+  };
+  drainIntegrationQueue();
+
   const schedulerTimer = setInterval(() => {
     try {
+      drainIntegrationQueue();
       const readiness = buildReadiness(options);
       void readiness.then(async (state) => {
         const tick = schedulerTick({
@@ -2079,7 +2107,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           user: authUser.user
         });
         const maxAgeSec = Math.max(60, Math.floor((session.payload.expiresTs - Date.now()) / 1000));
-        setSessionCookie(res, session.token, maxAgeSec);
+        setSessionCookie(res, session.token, maxAgeSec, "/", requestUsesHttps(req));
         writeStudioAuditEvent({
           workspace: options.workspace,
           auditType: "HUMAN_LOGIN_SUCCESS",
@@ -2109,7 +2137,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
             token
           });
         }
-        clearSessionCookie(res);
+        clearSessionCookie(res, "/", requestUsesHttps(req));
         clearPairingCookie(res);
         json(res, 200, { ok: true });
         return;
@@ -2125,11 +2153,6 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
             issuedTs: Date.now(),
             expiresTs: Date.now() + 8 * 60 * 60_000
           });
-          return;
-        }
-        const usersSig = verifyUsersConfigSignature(options.workspace);
-        if (!usersSig.valid) {
-          json(res, 403, { error: "users config signature invalid" });
           return;
         }
         const session = sessionFromRequest({
@@ -6386,7 +6409,22 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         if (response.approvalRequired) {
           recordApprovalRequestMetric(actionClass, "med");
         }
-        json(res, 200, response);
+        const approvalDelivery = response.approvalRequired && response.approvalRequestId
+          ? await deliverApprovalLifecycle({
+              workspace: options.workspace,
+              agentId,
+              approvalRequestId: response.approvalRequestId,
+              trigger: "REQUEST_CREATED",
+              reviewBasePath: options.publicConsoleBasePath
+            })
+          : undefined;
+        if (response.approvalRequired && response.approvalRequestId) {
+          emitOrgEvent("APPROVAL_REQUEST_CREATED", orgNodeIdsForAgent(agentId));
+        }
+        json(res, 200, {
+          ...response,
+          ...(approvalDelivery ? { approvalDelivery } : {})
+        });
         return;
       }
 
@@ -6433,7 +6471,27 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, 403, { error: "scope does not include this agent" });
           return;
         }
-        json(res, 200, response);
+        const consumedApprovalId = intentRecord?.approvalRequestId;
+        const approvalDelivery = response.allowed && consumedApprovalId && getApprovalInboxItem({
+          workspace: options.workspace,
+          agentId: response.agentId,
+          approvalRequestId: consumedApprovalId
+        }).status === "CONSUMED"
+          ? await deliverApprovalLifecycle({
+              workspace: options.workspace,
+              agentId: response.agentId,
+              approvalRequestId: consumedApprovalId,
+              trigger: "STATUS_CHECK",
+              reviewBasePath: options.publicConsoleBasePath
+            })
+          : undefined;
+        if (approvalDelivery) {
+          emitOrgEvent("APPROVAL_CONSUMED", orgNodeIdsForAgent(response.agentId));
+        }
+        json(res, 200, {
+          ...response,
+          ...(approvalDelivery ? { approvalDelivery } : {})
+        });
         return;
       }
 
@@ -6477,22 +6535,12 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         }
         const agentId = resolveAgentId(options.workspace, url.searchParams.get("agentId") ?? "default");
         const statusFilter = parseApprovalStatus(url.searchParams.get("status") ?? undefined);
-        const approvals = listApprovalRequests({
+        const approvals = listApprovalInbox({
           workspace: options.workspace,
-          agentId
+          agentId,
+          status: statusFilter
         })
-          .map((row) => {
-            const status = approvalStatusPayload({
-              workspace: options.workspace,
-              agentId,
-              approvalId: row.approvalRequestId
-            });
-            return {
-              ...row,
-              ...status
-            };
-          })
-          .filter((row) => (statusFilter ? row.status === statusFilter : true));
+          .map(projectApprovalInboxSummary);
         json(res, 200, {
           agentId,
           approvals
@@ -6506,35 +6554,12 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         }
         const agentId = resolveAgentId(options.workspace, url.searchParams.get("agentId") ?? "default");
         const statusFilter = parseApprovalStatus(url.searchParams.get("status") ?? undefined);
-        const requests = listApprovalRequests({
+        const requests = listApprovalInbox({
           workspace: options.workspace,
-          agentId
+          agentId,
+          status: statusFilter
         })
-          .map((request) => {
-            const status = approvalStatusPayload({
-              workspace: options.workspace,
-              agentId,
-              approvalId: request.approvalRequestId
-            });
-            const decisions = listApprovalDecisions({
-              workspace: options.workspace,
-              agentId,
-              approvalRequestId: request.approvalRequestId
-            });
-            return {
-              ...request,
-              status: status.status,
-              quorum: status.quorum,
-              decisions: decisions.map((row) => ({
-                approvalDecisionId: row.approvalDecisionId,
-                userId: row.userId,
-                username: row.username,
-                decision: row.decision,
-                decisionTs: row.decisionTs
-              }))
-            };
-          })
-          .filter((row) => (statusFilter ? row.status === statusFilter : true));
+          .map(projectApprovalInboxSummary);
         json(res, 200, {
           agentId,
           requests
@@ -6553,13 +6578,19 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, 404, { error: "approval not found" });
           return;
         }
+        const observed = await observeApprovalStatusInStudio({
+          workspace: options.workspace,
+          agentId: found.agentId,
+          approvalRequestId: approvalId,
+          reviewBasePath: options.publicConsoleBasePath
+        });
+        if (observed.approvalEvent) {
+          emitOrgEvent(observed.approvalEvent, orgNodeIdsForAgent(found.agentId));
+        }
         json(res, 200, {
           ...found.approval,
-          status: approvalStatusPayload({
-            workspace: options.workspace,
-            agentId: found.agentId,
-            approvalId
-          }).status
+          status: observed.status.status,
+          ...(observed.approvalDelivery ? { approvalDelivery: observed.approvalDelivery } : {})
         });
         return;
       }
@@ -6575,21 +6606,29 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, 404, { error: "approval not found" });
           return;
         }
-        const decisions = listApprovalDecisions({
+        const observed = await observeApprovalStatusInStudio({
+          workspace: options.workspace,
+          agentId: found.agentId,
+          approvalRequestId: approvalId,
+          reviewBasePath: options.publicConsoleBasePath
+        });
+        if (observed.approvalEvent) {
+          emitOrgEvent(observed.approvalEvent, orgNodeIdsForAgent(found.agentId));
+        }
+        const inbox = getApprovalInboxItem({
           workspace: options.workspace,
           agentId: found.agentId,
           approvalRequestId: approvalId
         });
-        const status = approvalStatusPayload({
-          workspace: options.workspace,
-          agentId: found.agentId,
-          approvalId
-        });
         json(res, 200, {
-          request: found.approval,
-          decisions,
-          quorum: status.quorum,
-          status: status.status
+          request: inbox.request,
+          decisions: inbox.decisions,
+          quorum: inbox.quorum,
+          status: inbox.status,
+          requestIntegrity: inbox.requestIntegrity,
+          contextIntegrity: inbox.contextIntegrity,
+          executionReady: inbox.executionReady,
+          ...(observed.approvalDelivery ? { approvalDelivery: observed.approvalDelivery } : {})
         });
         return;
       }
@@ -6606,100 +6645,46 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, 404, { error: "approval not found" });
           return;
         }
-        const policy = loadApprovalPolicy(options.workspace);
-        const rule = policy.approvalPolicy.actionClasses[found.approval.actionClass];
-        const rolesAllowed = new Set((rule?.rolesAllowed ?? ["APPROVER", "OWNER"]) as UserRole[]);
-        const sessionRoles = [...auth.roles];
-        const roleOk = auth.isAdmin || sessionRoles.some((role) => rolesAllowed.has(role));
-        if (!roleOk) {
-          json(res, 403, { error: `roles not allowed for ${found.approval.actionClass}` });
-          return;
-        }
         const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
-        const parsed = body
-          ? (JSON.parse(body) as {
-              mode?: "SIMULATE" | "EXECUTE";
-              decision?: "APPROVE_EXECUTE" | "APPROVE_SIMULATE" | "DENY";
-              reason?: string;
-            })
-          : {};
-        const requestedMode = parsed.mode ?? (parsed.decision === "APPROVE_SIMULATE" ? "SIMULATE" : "EXECUTE");
-        const decisionType = parsed.decision ?? (requestedMode === "SIMULATE" ? "APPROVE_SIMULATE" : "APPROVE_EXECUTE");
-        recordApprovalDecisionMetric(decisionType, found.approval.actionClass);
-        const existingDecisions = listApprovalDecisions({
-          workspace: options.workspace,
-          agentId: found.agentId,
-          approvalRequestId: approvalId
-        });
-        const currentUser = auth.username ?? "admin-token";
-        if (
-          (rule?.requireDistinctUsers ?? false) &&
-          existingDecisions.some((row) => row.username === currentUser && row.decision !== "DENY") &&
-          decisionType !== "DENY"
-        ) {
-          writeStudioAuditEvent({
-            workspace: options.workspace,
-            auditType: "APPROVAL_QUORUM_FAILED",
-            severity: "HIGH",
-            agentId: found.agentId,
-            payload: {
-              approvalRequestId: approvalId,
-              reason: "distinct approver required",
-              username: currentUser
-            }
-          });
-          json(res, 409, { error: "distinct approver required; same user cannot approve twice" });
+        let input: unknown;
+        try {
+          input = body ? JSON.parse(body) : {};
+        } catch {
+          json(res, 400, { error: "invalid approval decision JSON" });
           return;
         }
-        const audit = writeStudioAuditEvent({
-          workspace: options.workspace,
-          auditType: "APPROVAL_DECISION_RECORDED",
-          severity: "MEDIUM",
-          agentId: found.agentId,
-          payload: {
+        const parsedResult = studioApprovalDecisionInputSchema.safeParse(input);
+        if (!parsedResult.success) {
+          json(res, 400, { error: "invalid approval decision" });
+          return;
+        }
+        let decided: Awaited<ReturnType<typeof decideApprovalInStudio>>;
+        try {
+          decided = await decideApprovalInStudio({
+            workspace: options.workspace,
+            agentId: found.agentId,
             approvalRequestId: approvalId,
-            decision: decisionType,
-            mode: requestedMode,
-            reason: parsed.reason ?? "Approved"
+            actor: {
+              isAdmin: auth.isAdmin,
+              username: auth.username ?? "admin-token",
+              roles: [...auth.roles]
+            },
+            input: parsedResult.data,
+            requireExplicitDecision: Boolean(approvalRequestDecideMatch),
+            reviewBasePath: options.publicConsoleBasePath,
+            writeAudit: (entry) => writeStudioAuditEvent({ workspace: options.workspace, ...entry })
+          });
+        } catch (error) {
+          if (error instanceof ApprovalStudioError) {
+            json(res, error.statusCode, { error: error.message });
+            return;
           }
-        });
-        writeStudioAuditEvent({
-          workspace: options.workspace,
-          auditType: "CONSOLE_APPROVAL_DECIDED",
-          severity: "LOW",
-          agentId: found.agentId,
-          payload: {
-            approvalRequestId: approvalId,
-            decision: decisionType,
-            mode: requestedMode
-          }
-        });
-        writeStudioAuditEvent({
-          workspace: options.workspace,
-          auditType: "APPROVAL_DECIDED",
-          severity: "MEDIUM",
-          agentId: found.agentId,
-          payload: {
-            approvalRequestId: approvalId,
-            decision: decisionType,
-            mode: requestedMode,
-            reason: parsed.reason ?? "Approved"
-          }
-        });
-        const decided = decideApprovalForIntent({
-          workspace: options.workspace,
-          agentId: found.agentId,
-          approvalId,
-          decision: decisionType === "DENY" ? "DENIED" : "APPROVED",
-          mode: requestedMode,
-          reason: parsed.reason ?? "Approved",
-          decisionReceiptId: audit.receiptId,
-          username: currentUser,
-          userId: auth.username ?? "admin-token",
-          userRoles: sessionRoles.length > 0 ? sessionRoles : ["OWNER"]
-        });
+          throw error;
+        }
+        emitOrgEvent(decided.approvalEvent, orgNodeIdsForAgent(found.agentId));
         json(res, 200, {
-          approval: decided.approval
+          approval: decided.approval,
+          approvalDelivery: decided.approvalDelivery
         });
         return;
       }
@@ -6716,54 +6701,45 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           return;
         }
         const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
-        const parsed = body ? (JSON.parse(body) as { reason?: string }) : {};
-        recordApprovalDecisionMetric("DENY", found.approval.actionClass);
-        const audit = writeStudioAuditEvent({
-          workspace: options.workspace,
-          auditType: "APPROVAL_DECISION_RECORDED",
-          severity: "MEDIUM",
-          agentId: found.agentId,
-          payload: {
+        let input: unknown;
+        try {
+          input = body ? JSON.parse(body) : {};
+        } catch {
+          json(res, 400, { error: "invalid approval denial JSON" });
+          return;
+        }
+        const parsedResult = studioApprovalDenyInputSchema.safeParse(input);
+        if (!parsedResult.success) {
+          json(res, 400, { error: "invalid approval denial" });
+          return;
+        }
+        let denied: Awaited<ReturnType<typeof decideApprovalInStudio>>;
+        try {
+          denied = await decideApprovalInStudio({
+            workspace: options.workspace,
+            agentId: found.agentId,
             approvalRequestId: approvalId,
-            decision: "DENIED",
-            reason: parsed.reason ?? "Denied by owner"
+            actor: {
+              isAdmin: auth.isAdmin,
+              username: auth.username ?? "admin-token",
+              roles: [...auth.roles]
+            },
+            input: { decision: "DENY", reason: parsedResult.data.reason },
+            requireExplicitDecision: true,
+            reviewBasePath: options.publicConsoleBasePath,
+            writeAudit: (entry) => writeStudioAuditEvent({ workspace: options.workspace, ...entry })
+          });
+        } catch (error) {
+          if (error instanceof ApprovalStudioError) {
+            json(res, error.statusCode, { error: error.message });
+            return;
           }
-        });
-        writeStudioAuditEvent({
-          workspace: options.workspace,
-          auditType: "CONSOLE_APPROVAL_DECIDED",
-          severity: "LOW",
-          agentId: found.agentId,
-          payload: {
-            approvalRequestId: approvalId,
-            decision: "DENIED"
-          }
-        });
-        writeStudioAuditEvent({
-          workspace: options.workspace,
-          auditType: "APPROVAL_DECIDED",
-          severity: "MEDIUM",
-          agentId: found.agentId,
-          payload: {
-            approvalRequestId: approvalId,
-            decision: "DENIED",
-            reason: parsed.reason ?? "Denied by owner"
-          }
-        });
-        const denied = decideApprovalForIntent({
-          workspace: options.workspace,
-          agentId: found.agentId,
-          approvalId,
-          decision: "DENIED",
-          mode: "SIMULATE",
-          reason: parsed.reason ?? "Denied by owner",
-          decisionReceiptId: audit.receiptId,
-          username: auth.username ?? "admin-token",
-          userId: auth.username ?? "admin-token",
-          userRoles: [...auth.roles].length > 0 ? [...auth.roles] : ["OWNER"]
-        });
+          throw error;
+        }
+        emitOrgEvent(denied.approvalEvent, orgNodeIdsForAgent(found.agentId));
         json(res, 200, {
-          approval: denied.approval
+          approval: denied.approval,
+          approvalDelivery: denied.approvalDelivery
         });
         return;
       }
@@ -6779,12 +6755,23 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, 404, { error: "approval not found" });
           return;
         }
-        const cancelled = cancelApprovalRequest({
-          workspace: options.workspace,
-          agentId: found.agentId,
-          approvalRequestId: approvalId
-        });
-        json(res, 200, { request: cancelled });
+        let cancelled: Awaited<ReturnType<typeof cancelApprovalInStudio>>;
+        try {
+          cancelled = await cancelApprovalInStudio({
+            workspace: options.workspace,
+            agentId: found.agentId,
+            approvalRequestId: approvalId,
+            reviewBasePath: options.publicConsoleBasePath
+          });
+        } catch (error) {
+          if (error instanceof ApprovalStudioError) {
+            json(res, error.statusCode, { error: error.message });
+            return;
+          }
+          throw error;
+        }
+        emitOrgEvent("APPROVAL_CANCELLED", orgNodeIdsForAgent(found.agentId));
+        json(res, 200, cancelled);
         return;
       }
 
@@ -6806,12 +6793,19 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, leaseCheck.status, { error: leaseCheck.error });
           return;
         }
-        const status = approvalStatusPayload({
+        const observed = await observeApprovalStatusInStudio({
           workspace: options.workspace,
           agentId: found.agentId,
-          approvalId
+          approvalRequestId: approvalId,
+          reviewBasePath: options.publicConsoleBasePath
         });
-        json(res, 200, status);
+        if (observed.approvalEvent) {
+          emitOrgEvent(observed.approvalEvent, orgNodeIdsForAgent(found.agentId));
+        }
+        json(res, 200, {
+          ...observed.status,
+          ...(observed.approvalDelivery ? { approvalDelivery: observed.approvalDelivery } : {})
+        });
         return;
       }
 

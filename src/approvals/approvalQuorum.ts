@@ -50,6 +50,17 @@ export function evaluateApprovalQuorum(params: {
       remainingRequired: request.requiredApprovals
     };
   }
+  if (request.status === "DENIED" || request.status === "EXPIRED") {
+    return {
+      status: request.status,
+      required: request.requiredApprovals,
+      received: 0,
+      approverUserIds: [],
+      deniedBy: [],
+      duplicateApproverRejected: [],
+      remainingRequired: request.requiredApprovals
+    };
+  }
   if (now > request.expiresTs) {
     return {
       status: "EXPIRED",

@@ -1,6 +1,7 @@
-import { appendFileSync, readFileSync } from "node:fs";
+import { appendFileSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { ensureDir, pathExists } from "../utils/fs.js";
+import { normalizeWebhookDeliveryError, redactWebhookDestination } from "./webhookDelivery.js";
 
 export interface IntegrationDeadLetterEntry {
   v: 1;
@@ -21,10 +22,24 @@ export function integrationDeadLetterPath(workspace: string): string {
   return join(workspace, ".amc", "integrations", "dead-letters.jsonl");
 }
 
+function sanitizeDeadLetterEntry(entry: IntegrationDeadLetterEntry): IntegrationDeadLetterEntry {
+  return {
+    ...entry,
+    url: redactWebhookDestination(entry.url),
+    reason: normalizeWebhookDeliveryError(entry.reason)
+  };
+}
+
 export function appendIntegrationDeadLetter(workspace: string, entry: IntegrationDeadLetterEntry): string {
   const path = integrationDeadLetterPath(workspace);
   ensureDir(join(workspace, ".amc", "integrations"));
-  appendFileSync(path, `${JSON.stringify(entry)}\n`, { encoding: "utf8", mode: 0o600 });
+  if (pathExists(path)) {
+    const existing = loadIntegrationDeadLetters(workspace, Number.MAX_SAFE_INTEGER);
+    if (existing.some((row) => row.deadLetterId === entry.deadLetterId)) {
+      return path;
+    }
+  }
+  appendFileSync(path, `${JSON.stringify(sanitizeDeadLetterEntry(entry))}\n`, { encoding: "utf8", mode: 0o600 });
   return path;
 }
 
@@ -56,11 +71,16 @@ export function loadIntegrationDeadLetters(workspace: string, limit = 100): Inte
         typeof parsed.reason === "string" &&
         typeof parsed.ts === "number"
       ) {
-        out.push(parsed as IntegrationDeadLetterEntry);
+        out.push(sanitizeDeadLetterEntry(parsed as IntegrationDeadLetterEntry));
       }
     } catch {
       // Skip malformed lines.
     }
+  }
+  const sanitizedText = out.map((entry) => JSON.stringify(entry)).join("\n");
+  const normalizedFile = sanitizedText.length > 0 ? `${sanitizedText}\n` : "";
+  if (normalizedFile !== text) {
+    writeFileSync(path, normalizedFile, { encoding: "utf8", mode: 0o600 });
   }
   return out.slice(-Math.max(0, limit));
 }

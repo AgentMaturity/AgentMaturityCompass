@@ -1,15 +1,10 @@
 import type { ExecutionMode } from "../types.js";
-import type { ApprovalStatus } from "./approvalSchema.js";
+import { parseApprovalInboxStatus } from "./approvalInbox.js";
+import type { ApprovalRequestStatus } from "./approvalChainStore.js";
+import { parseUserRoles, type UserRole } from "../auth/roles.js";
 
-export function parseApprovalStatus(value?: string): ApprovalStatus | undefined {
-  if (!value) {
-    return undefined;
-  }
-  const normalized = value.trim().toUpperCase();
-  if (normalized === "PENDING" || normalized === "APPROVED" || normalized === "DENIED" || normalized === "CONSUMED" || normalized === "EXPIRED") {
-    return normalized;
-  }
-  throw new Error(`Invalid approval status: ${value}`);
+export function parseApprovalStatus(value?: string): ApprovalRequestStatus | undefined {
+  return parseApprovalInboxStatus(value);
 }
 
 export function parseApprovalMode(value: string): ExecutionMode {
@@ -20,3 +15,11 @@ export function parseApprovalMode(value: string): ExecutionMode {
   throw new Error(`Invalid approval mode: ${value}`);
 }
 
+export function parseApprovalReviewerRoles(value: string): UserRole[] {
+  const tokens = value.split(",").map((role) => role.trim()).filter((role) => role.length > 0);
+  const roles = parseUserRoles(tokens);
+  if (tokens.length === 0 || roles.length !== new Set(tokens.map((role) => role.toUpperCase())).size) {
+    throw new Error(`Invalid approval reviewer roles: ${value}`);
+  }
+  return roles;
+}

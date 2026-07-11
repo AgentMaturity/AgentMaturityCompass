@@ -27,6 +27,8 @@ export interface SessionStoreRecord {
   expiresTs: number;
   revoked: boolean;
   revokedTs?: number;
+  tokenSha256?: string;
+  authSource?: "LOCAL_USER" | "WORKSPACE_ROUTER";
 }
 
 function usersPath(workspace: string): string {
@@ -293,16 +295,19 @@ export function authenticateUser(params: {
   };
 }
 
-export function createSession(params: {
+export function createTrackedSession(params: {
   workspace: string;
-  user: UserRecord;
+  userId: string;
+  username: string;
+  roles: UserRole[];
   ttlMs?: number;
+  authSource: "LOCAL_USER" | "WORKSPACE_ROUTER";
 }): { token: string; payload: SessionPayload } {
   const issued = issueSessionToken({
     workspace: params.workspace,
-    userId: params.user.userId,
-    username: params.user.username,
-    roles: params.user.roles,
+    userId: params.userId,
+    username: params.username,
+    roles: params.roles,
     ttlMs: params.ttlMs
   });
   const sessionId = `sess_${sha256Hex(issued.token).slice(0, 24)}_${randomUUID().replace(/-/g, "").slice(0, 8)}`;
@@ -313,11 +318,28 @@ export function createSession(params: {
     roles: issued.payload.roles,
     issuedTs: issued.payload.issuedTs,
     expiresTs: issued.payload.expiresTs,
-    revoked: false
+    revoked: false,
+    tokenSha256: sha256Hex(issued.token),
+    authSource: params.authSource
   };
   ensureDir(sessionsDir(params.workspace));
   writeFileAtomic(sessionStorePath(params.workspace, sessionId), JSON.stringify(store, null, 2), 0o600);
   return issued;
+}
+
+export function createSession(params: {
+  workspace: string;
+  user: UserRecord;
+  ttlMs?: number;
+}): { token: string; payload: SessionPayload } {
+  return createTrackedSession({
+    workspace: params.workspace,
+    userId: params.user.userId,
+    username: params.user.username,
+    roles: params.user.roles,
+    ttlMs: params.ttlMs,
+    authSource: "LOCAL_USER"
+  });
 }
 
 export function revokeSessionByToken(params: {
@@ -336,11 +358,17 @@ export function revokeSessionByToken(params: {
     return;
   }
   const files = readdirSync(dir).filter((name) => name.endsWith(".json"));
+  const tokenSha256 = sha256Hex(params.token);
   for (const file of files) {
     const path = join(dir, file);
     try {
       const parsed = JSON.parse(readUtf8(path)) as SessionStoreRecord;
-      if (parsed.userId === verified.payload.userId && parsed.expiresTs === verified.payload.expiresTs && parsed.issuedTs === verified.payload.issuedTs) {
+      const matchesToken = parsed.tokenSha256
+        ? parsed.tokenSha256 === tokenSha256
+        : parsed.userId === verified.payload.userId &&
+          parsed.expiresTs === verified.payload.expiresTs &&
+          parsed.issuedTs === verified.payload.issuedTs;
+      if (matchesToken) {
         writeFileAtomic(
           path,
           JSON.stringify(
@@ -361,6 +389,89 @@ export function revokeSessionByToken(params: {
   }
 }
 
+export function verifyTrackedSessionToken(params: {
+  workspace: string;
+  token: string;
+}): {
+  ok: boolean;
+  payload: SessionPayload | null;
+  error?: string;
+  authSource?: "LOCAL_USER" | "WORKSPACE_ROUTER";
+} {
+  const token = params.token;
+  const verified = verifySessionToken({
+    workspace: params.workspace,
+    token
+  });
+  if (!verified.ok || !verified.payload) {
+    return verified;
+  }
+
+  const dir = sessionsDir(params.workspace);
+  if (!pathExists(dir)) {
+    return { ok: false, payload: null, error: "session not found" };
+  }
+  const tokenSha256 = sha256Hex(token);
+  let session: SessionStoreRecord | null = null;
+  for (const file of readdirSync(dir).filter((name) => name.endsWith(".json"))) {
+    try {
+      const parsed = JSON.parse(readUtf8(join(dir, file))) as SessionStoreRecord;
+      const matchesToken = parsed.tokenSha256
+        ? parsed.tokenSha256 === tokenSha256
+        : parsed.userId === verified.payload.userId &&
+          parsed.username === verified.payload.username &&
+          parsed.issuedTs === verified.payload.issuedTs &&
+          parsed.expiresTs === verified.payload.expiresTs;
+      if (matchesToken) {
+        session = parsed;
+        break;
+      }
+    } catch {
+      continue;
+    }
+  }
+  if (!session) {
+    return { ok: false, payload: null, error: "session not found" };
+  }
+  if (session.revoked) {
+    return { ok: false, payload: null, error: "session revoked" };
+  }
+  const sameRoles = (left: readonly UserRole[], right: readonly UserRole[]): boolean =>
+    [...left].sort().join("\n") === [...right].sort().join("\n");
+  if (
+    session.userId !== verified.payload.userId ||
+    session.username !== verified.payload.username ||
+    session.issuedTs !== verified.payload.issuedTs ||
+    session.expiresTs !== verified.payload.expiresTs ||
+    !sameRoles(session.roles, verified.payload.roles)
+  ) {
+    return { ok: false, payload: null, error: "session record mismatch" };
+  }
+
+  if (session.authSource !== "WORKSPACE_ROUTER") {
+    let users: UsersFile;
+    try {
+      users = loadUsersConfig(params.workspace, { requireValidSignature: true });
+    } catch {
+      return { ok: false, payload: null, error: "users config invalid" };
+    }
+    const user = users.users.find((row) =>
+      row.userId === verified.payload!.userId && row.username === verified.payload!.username
+    );
+    if (!user || user.status !== "ACTIVE") {
+      return { ok: false, payload: null, error: "user revoked" };
+    }
+    if (!sameRoles(user.roles, verified.payload.roles)) {
+      return { ok: false, payload: null, error: "session roles changed" };
+    }
+  }
+
+  return {
+    ...verified,
+    authSource: session.authSource
+  };
+}
+
 export function sessionFromRequest(params: {
   workspace: string;
   req: IncomingMessage;
@@ -368,6 +479,7 @@ export function sessionFromRequest(params: {
   ok: boolean;
   payload: SessionPayload | null;
   error?: string;
+  authSource?: "LOCAL_USER" | "WORKSPACE_ROUTER";
 } {
   const token = parseCookieHeader(params.req.headers.cookie, "amc_session");
   if (!token) {
@@ -377,19 +489,25 @@ export function sessionFromRequest(params: {
       error: "missing session cookie"
     };
   }
-  return verifySessionToken({
-    workspace: params.workspace,
-    token
-  });
+  return verifyTrackedSessionToken({ workspace: params.workspace, token });
 }
 
-export function clearSessionCookie(res: ServerResponse, path = "/"): void {
-  res.setHeader("set-cookie", `amc_session=; HttpOnly; SameSite=Strict; Path=${path}; Max-Age=0`);
-}
-
-export function setSessionCookie(res: ServerResponse, token: string, maxAgeSeconds: number, path = "/"): void {
+export function clearSessionCookie(res: ServerResponse, path = "/", secure = false): void {
   res.setHeader(
     "set-cookie",
-    `amc_session=${encodeURIComponent(token)}; HttpOnly; SameSite=Strict; Path=${path}; Max-Age=${Math.max(60, maxAgeSeconds)}`
+    `amc_session=; HttpOnly${secure ? "; Secure" : ""}; SameSite=Strict; Path=${path}; Max-Age=0`
+  );
+}
+
+export function setSessionCookie(
+  res: ServerResponse,
+  token: string,
+  maxAgeSeconds: number,
+  path = "/",
+  secure = false
+): void {
+  res.setHeader(
+    "set-cookie",
+    `amc_session=${encodeURIComponent(token)}; HttpOnly${secure ? "; Secure" : ""}; SameSite=Strict; Path=${path}; Max-Age=${Math.max(60, maxAgeSeconds)}`
   );
 }

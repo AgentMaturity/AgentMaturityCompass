@@ -10,8 +10,13 @@ import {
 import {
   enqueueIntegrationDeliveries,
   getIntegrationDeliveryStatusByQueueIds,
+  listDueIntegrationChannelIds,
+  listIntegrationDeliveriesNeedingFinalization,
+  markIntegrationDeliveriesFinalized,
   processIntegrationChannelQueue,
-  type IntegrationQueueItemInput
+  type IntegrationQueueDeliveryStatus,
+  type IntegrationQueueItemInput,
+  type ProcessedIntegrationDelivery
 } from "./integrationDeliveryQueue.js";
 import { appendIntegrationDeadLetter } from "./integrationDeadLetters.js";
 import {
@@ -40,6 +45,23 @@ export interface IntegrationDispatchResult {
   eventId: string;
   receiptId: string;
   receipt: string;
+}
+
+export interface IntegrationQueuedDispatchResult {
+  queueId: string;
+  channelId: string;
+  eventName: string;
+  payloadSha256: string;
+  orderedSequence: number | null;
+  attemptRound: number;
+  maxRounds: number;
+  nextAttemptTs: number;
+}
+
+export interface IntegrationDispatchOutcome {
+  dispatched: IntegrationDispatchResult[];
+  queued: IntegrationQueuedDispatchResult[];
+  skipped: string[];
 }
 
 function slackWebhookPayload(body: IntegrationDispatchPayload, channel?: string): string {
@@ -239,8 +261,6 @@ function buildQueueDeliveries(params: {
         agentId: params.payload.agentId,
         payloadBody: params.standardPayloadBody,
         orderedSequence,
-        destinationUrl: channel.url,
-        secretRef: channel.secretRef,
         extraHeaders: {
           "x-amc-channel-id": channel.id
         },
@@ -262,7 +282,6 @@ function buildQueueDeliveries(params: {
         agentId: params.payload.agentId,
         payloadBody: slackWebhookPayload(params.payload, channel.channel),
         orderedSequence,
-        destinationRef: channel.webhookUrlRef,
         extraHeaders: {
           "x-amc-channel-id": channel.id
         },
@@ -278,6 +297,102 @@ function buildQueueDeliveries(params: {
   };
 }
 
+async function processChannelQueue(params: {
+  workspace: string;
+  channelId: string;
+  policy?: ChannelDeliveryPolicy;
+  now?: () => number;
+}): Promise<ProcessedIntegrationDelivery[]> {
+  return withChannelProcessingLock(params.workspace, params.channelId, async () => {
+    const result = await processIntegrationChannelQueue({
+      workspace: params.workspace,
+      channelId: params.channelId,
+      deliveryPolicy: params.policy?.retry ?? {},
+      now: params.now,
+      onDelivered: async (input) => writeIntegrationEvidence({
+        workspace: params.workspace,
+        channelId: input.channelId,
+        eventName: input.eventName,
+        agentId: input.agentId,
+        payloadBody: input.payloadBody,
+        payloadSha256: input.payloadSha256,
+        orderedSequence: input.orderedSequence,
+        attempts: input.receipt.attempts.length,
+        httpStatus: input.httpStatus
+      })
+    });
+    return result.processed;
+  });
+}
+
+function finalizeTerminalDelivery(params: {
+  workspace: string;
+  status: IntegrationQueueDeliveryStatus;
+  recordDeadLetters: boolean;
+}): void {
+  const status = params.status;
+  if (status.deliveryReceipt) {
+    const sequence = status.orderedSequence ?? status.seq;
+    recordIntegrationDelivery({
+      workspace: params.workspace,
+      channelId: status.channelId,
+      eventName: status.eventName,
+      agentId: status.agentId,
+      sequence,
+      payloadSha256: status.payloadSha256,
+      receipt: status.deliveryReceipt
+    });
+    if (status.state === "DEAD_LETTER" && params.recordDeadLetters) {
+      addIntegrationDeadLetter({
+        workspace: params.workspace,
+        channelId: status.channelId,
+        eventName: status.eventName,
+        agentId: status.agentId,
+        sequence,
+        payloadSha256: status.payloadSha256,
+        receipt: status.deliveryReceipt
+      });
+      appendIntegrationDeadLetter(params.workspace, {
+        v: 1,
+        deadLetterId: `idl_${status.queueId}`,
+        ts: status.deadLetterTs ?? Date.now(),
+        channelId: status.channelId,
+        eventName: status.eventName,
+        agentId: status.agentId,
+        url: status.deliveryReceipt.url,
+        orderedSequence: sequence,
+        payloadSha256: status.payloadSha256,
+        attemptCount: status.deliveryReceipt.attempts.length,
+        lastHttpStatus: status.lastHttpStatus,
+        reason: status.lastError ?? "dead-letter"
+      });
+    }
+  }
+  markIntegrationDeliveriesFinalized({
+    workspace: params.workspace,
+    queueIds: [status.queueId]
+  });
+}
+
+function finalizePendingTerminals(params: {
+  workspace: string;
+  policiesByChannelId: Map<string, ChannelDeliveryPolicy>;
+}): string[] {
+  const failures: string[] = [];
+  for (const status of listIntegrationDeliveriesNeedingFinalization(params.workspace)) {
+    try {
+      finalizeTerminalDelivery({
+        workspace: params.workspace,
+        status,
+        recordDeadLetters: params.policiesByChannelId.get(status.channelId)?.recordDeadLetters ?? true
+      });
+    } catch {
+      failures.push(`${status.channelId}:delivery-finalization-failed`);
+    }
+  }
+  return failures;
+}
+
 export async function dispatchIntegrationEvent(params: {
   workspace: string;
   eventName: string;
@@ -285,10 +400,7 @@ export async function dispatchIntegrationEvent(params: {
   summary: string;
   details?: Record<string, unknown>;
   forceChannelId?: string;
-}): Promise<{
-  dispatched: IntegrationDispatchResult[];
-  skipped: string[];
-}> {
+}): Promise<IntegrationDispatchOutcome> {
   const verify = verifyIntegrationsConfigSignature(params.workspace);
   if (!verify.valid) {
     throw new Error(`integrations config signature invalid: ${verify.reason ?? "unknown"}`);
@@ -325,6 +437,7 @@ export async function dispatchIntegrationEvent(params: {
   if (deliveries.length === 0) {
     return {
       dispatched: [],
+      queued: [],
       skipped
     };
   }
@@ -343,27 +456,17 @@ export async function dispatchIntegrationEvent(params: {
 
   for (const channelId of channelOrder) {
     const channelPolicy = policiesByChannelId.get(channelId);
-    await withChannelProcessingLock(params.workspace, channelId, async () => {
-      await processIntegrationChannelQueue({
-        workspace: params.workspace,
-        channelId,
-        deliveryPolicy: channelPolicy?.retry ?? {},
-        onDelivered: async (input) => {
-          return writeIntegrationEvidence({
-            workspace: params.workspace,
-            channelId: input.channelId,
-            eventName: input.eventName,
-            agentId: input.agentId,
-            payloadBody: input.payloadBody,
-            payloadSha256: input.payloadSha256,
-            orderedSequence: input.orderedSequence,
-            attempts: input.receipt.attempts.length,
-            httpStatus: input.httpStatus
-          });
-        }
-      });
+    await processChannelQueue({
+      workspace: params.workspace,
+      channelId,
+      policy: channelPolicy
     });
   }
+
+  skipped.push(...finalizePendingTerminals({
+    workspace: params.workspace,
+    policiesByChannelId
+  }));
 
   const statuses = getIntegrationDeliveryStatusByQueueIds(
     params.workspace,
@@ -372,49 +475,12 @@ export async function dispatchIntegrationEvent(params: {
   const statusByQueueId = new Map(statuses.map((row) => [row.queueId, row]));
 
   const dispatched: IntegrationDispatchResult[] = [];
+  const stillQueued: IntegrationQueuedDispatchResult[] = [];
   for (const queuedRow of queued) {
     const status = statusByQueueId.get(queuedRow.queueId);
     if (!status) {
       skipped.push(`${queuedRow.channelId}:dispatch-status-missing`);
       continue;
-    }
-
-    if (status.deliveryReceipt && (status.state === "DELIVERED" || status.state === "DEAD_LETTER")) {
-      const sequence = status.orderedSequence ?? status.seq;
-      recordIntegrationDelivery({
-        workspace: params.workspace,
-        channelId: status.channelId,
-        eventName: status.eventName,
-        agentId: status.agentId,
-        sequence,
-        payloadSha256: status.payloadSha256,
-        receipt: status.deliveryReceipt
-      });
-      if (status.state === "DEAD_LETTER" && (policiesByChannelId.get(status.channelId)?.recordDeadLetters ?? true)) {
-        addIntegrationDeadLetter({
-          workspace: params.workspace,
-          channelId: status.channelId,
-          eventName: status.eventName,
-          agentId: status.agentId,
-          sequence,
-          payloadSha256: status.payloadSha256,
-          receipt: status.deliveryReceipt
-        });
-        appendIntegrationDeadLetter(params.workspace, {
-          v: 1,
-          deadLetterId: `idl_${status.queueId}`,
-          ts: Date.now(),
-          channelId: status.channelId,
-          eventName: status.eventName,
-          agentId: status.agentId,
-          url: status.deliveryReceipt.url,
-          orderedSequence: sequence,
-          payloadSha256: status.payloadSha256,
-          attemptCount: status.deliveryReceipt.attempts.length,
-          lastHttpStatus: status.lastHttpStatus,
-          reason: status.lastError ?? "dead-letter"
-        });
-      }
     }
 
     if (status.state === "DELIVERED") {
@@ -442,12 +508,68 @@ export async function dispatchIntegrationEvent(params: {
       continue;
     }
 
-    skipped.push(`${status.channelId}:queued-pending-ordering`);
+    stillQueued.push({
+      queueId: status.queueId,
+      channelId: status.channelId,
+      eventName: status.eventName,
+      payloadSha256: status.payloadSha256,
+      orderedSequence: status.orderedSequence,
+      attemptRound: status.attemptRound,
+      maxRounds: status.maxRounds,
+      nextAttemptTs: status.nextAttemptTs
+    });
   }
 
   return {
     dispatched,
+    queued: stillQueued,
     skipped
+  };
+}
+
+export async function drainDueIntegrationDeliveries(params: {
+  workspace: string;
+  nowTs?: number;
+  maxChannels?: number;
+}): Promise<{
+  channelIds: string[];
+  processed: ProcessedIntegrationDelivery[];
+  finalizationFailures: string[];
+}> {
+  const verified = verifyIntegrationsConfigSignature(params.workspace);
+  if (!verified.valid) {
+    throw new Error(`integrations config signature invalid: ${verified.reason ?? "unknown"}`);
+  }
+  const config = loadIntegrationsConfig(params.workspace);
+  const policiesByChannelId = new Map<string, ChannelDeliveryPolicy>();
+  for (const channel of config.integrations.channels) {
+    policiesByChannelId.set(channel.id, mergeChannelDeliveryPolicy({
+      defaults: config.integrations.defaults.delivery,
+      channel
+    }));
+  }
+  const channelIds = listDueIntegrationChannelIds({
+    workspace: params.workspace,
+    nowTs: params.nowTs,
+    limit: params.maxChannels
+  });
+  const processed: ProcessedIntegrationDelivery[] = [];
+  for (const channelId of channelIds) {
+    processed.push(...await processChannelQueue({
+      workspace: params.workspace,
+      channelId,
+      policy: policiesByChannelId.get(channelId),
+      now: typeof params.nowTs === "number" ? () => params.nowTs! : undefined
+    }));
+  }
+  const finalizationFailures = finalizePendingTerminals({
+    workspace: params.workspace,
+    policiesByChannelId
+  });
+  return {
+    channelIds,
+    processed,
+    finalizationFailures
   };
 }
 
@@ -465,6 +587,7 @@ export async function dispatchIntegrationEventsBatch(params: {
     eventName: string;
     agentId: string;
     dispatched: IntegrationDispatchResult[];
+    queued: IntegrationQueuedDispatchResult[];
     skipped: string[];
   }>;
 }> {
@@ -472,6 +595,7 @@ export async function dispatchIntegrationEventsBatch(params: {
     eventName: string;
     agentId: string;
     dispatched: IntegrationDispatchResult[];
+    queued: IntegrationQueuedDispatchResult[];
     skipped: string[];
   }> = [];
 
@@ -488,6 +612,7 @@ export async function dispatchIntegrationEventsBatch(params: {
       eventName: event.eventName,
       agentId: event.agentId,
       dispatched: out.dispatched,
+      queued: out.queued,
       skipped: out.skipped
     });
   }
@@ -500,10 +625,7 @@ export async function dispatchIntegrationEventsBatch(params: {
 export async function dispatchIntegrationTest(params: {
   workspace: string;
   channelId?: string;
-}): Promise<{
-  dispatched: IntegrationDispatchResult[];
-  skipped: string[];
-}> {
+}): Promise<IntegrationDispatchOutcome> {
   return dispatchIntegrationEvent({
     workspace: params.workspace,
     eventName: "INTEGRATION_TEST",

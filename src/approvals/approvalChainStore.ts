@@ -93,6 +93,11 @@ export type ApprovalConsumedRecord = z.infer<typeof approvalConsumedSchema>;
 export type ApprovalRequestStatus = z.infer<typeof approvalRequestStatusSchema>;
 export type ApprovalDecisionKind = z.infer<typeof approvalDecisionKindSchema>;
 
+export interface ApprovalChainIntegrity {
+  valid: boolean;
+  reasonCodes: string[];
+}
+
 function approvalsRoot(workspace: string, agentId?: string): string {
   return join(getAgentPaths(workspace, resolveAgentId(workspace, agentId)).rootDir, "approvals");
 }
@@ -353,8 +358,16 @@ export function markApprovalConsumed(params: {
   });
   const path = consumedPath(params.workspace, request.agentId, request.approvalRequestId);
   if (pathExists(path)) {
+    const consumed = loadApprovalConsumed({
+      workspace: params.workspace,
+      agentId: request.agentId,
+      approvalRequestId: request.approvalRequestId
+    });
+    if (!consumed) {
+      throw new Error("approval consumption artifact missing");
+    }
     return {
-      consumed: approvalConsumedSchema.parse(JSON.parse(readUtf8(path)) as unknown),
+      consumed,
       path,
       sigPath: sigPathFor(path),
       replay: true
@@ -399,7 +412,11 @@ export function loadApprovalConsumed(params: {
   if (!verification.valid) {
     throw new Error(`invalid approval consumed signature: ${verification.reason ?? "unknown"}`);
   }
-  return approvalConsumedSchema.parse(JSON.parse(readUtf8(path)) as unknown);
+  const consumed = approvalConsumedSchema.parse(JSON.parse(readUtf8(path)) as unknown);
+  if (consumed.approvalRequestId !== params.approvalRequestId || consumed.agentId !== agentId) {
+    throw new Error("invalid approval consumed binding");
+  }
+  return consumed;
 }
 
 export function listApprovalRequests(params: {
@@ -429,11 +446,80 @@ export function listApprovalRequests(params: {
   return out.sort((a, b) => b.createdTs - a.createdTs);
 }
 
+export function inspectApprovalChainIntegrity(params: {
+  workspace: string;
+  agentId?: string;
+  approvalRequestId: string;
+}): ApprovalChainIntegrity {
+  const agentId = resolveAgentId(params.workspace, params.agentId);
+  const reasonCodes: string[] = [];
+  const requestVerification = verifyArtifact(
+    params.workspace,
+    requestPath(params.workspace, agentId, params.approvalRequestId)
+  );
+  if (!requestVerification.valid) {
+    reasonCodes.push("REQUEST_INTEGRITY_INVALID");
+  }
+
+  const decisionRoot = decisionsDir(params.workspace, agentId);
+  if (pathExists(decisionRoot)) {
+    for (const file of readdirSync(decisionRoot)) {
+      if (!file.endsWith(".json")) continue;
+      const path = join(decisionRoot, file);
+      let decision: ApprovalDecisionRecord;
+      try {
+        decision = approvalDecisionSchema.parse(JSON.parse(readUtf8(path)) as unknown);
+      } catch {
+        reasonCodes.push("DECISION_ARTIFACT_UNPARSEABLE");
+        continue;
+      }
+      if (decision.approvalRequestId !== params.approvalRequestId) continue;
+      if (!verifyArtifact(params.workspace, path).valid) {
+        reasonCodes.push("DECISION_INTEGRITY_INVALID");
+      }
+    }
+  }
+
+  const consumed = consumedPath(params.workspace, agentId, params.approvalRequestId);
+  if (pathExists(consumed)) {
+    if (!verifyArtifact(params.workspace, consumed).valid) {
+      reasonCodes.push("CONSUMPTION_INTEGRITY_INVALID");
+    } else {
+      try {
+        const record = approvalConsumedSchema.parse(JSON.parse(readUtf8(consumed)) as unknown);
+        if (record.approvalRequestId !== params.approvalRequestId || record.agentId !== agentId) {
+          reasonCodes.push("CONSUMPTION_BINDING_INVALID");
+        }
+      } catch {
+        reasonCodes.push("CONSUMPTION_ARTIFACT_UNPARSEABLE");
+      }
+    }
+  }
+
+  const unique = [...new Set(reasonCodes)].sort((a, b) => a.localeCompare(b));
+  return {
+    valid: unique.length === 0,
+    reasonCodes: unique
+  };
+}
+
 export function cancelApprovalRequest(params: {
   workspace: string;
   agentId?: string;
   approvalRequestId: string;
 }): ApprovalRequestRecord {
+  const current = loadApprovalRequestRecord({
+    workspace: params.workspace,
+    agentId: params.agentId,
+    approvalRequestId: params.approvalRequestId,
+    requireValidSignature: true
+  });
+  const effectiveStatus = current.status === "PENDING" && current.expiresTs <= Date.now()
+    ? "EXPIRED"
+    : current.status;
+  if (effectiveStatus !== "PENDING") {
+    throw new Error(`approval request is not pending: ${effectiveStatus}`);
+  }
   return updateApprovalRequestStatus({
     workspace: params.workspace,
     agentId: params.agentId,

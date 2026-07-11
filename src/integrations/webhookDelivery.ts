@@ -62,6 +62,55 @@ export interface WebhookDeliveryReceipt {
   attempts: WebhookAttemptReceipt[];
 }
 
+export function redactWebhookDestination(url: string): string {
+  if (/^sha256:[a-f0-9]{64}$/i.test(url)) {
+    return url.toLowerCase();
+  }
+  return `sha256:${sha256Hex(url)}`;
+}
+
+export function normalizeWebhookDeliveryError(error: unknown): string {
+  const message = error instanceof Error ? error.message : String(error);
+  const httpStatus = message.match(/^HTTP\s+([1-5][0-9]{2})$/i);
+  if (httpStatus?.[1]) {
+    return `HTTP_${httpStatus[1]}`;
+  }
+  if (/^(?:HTTP_[1-5][0-9]{2}|TRANSPORT_[A-Z_]+|DELIVERY_[A-Z_]+)$/.test(message)) {
+    return message;
+  }
+  const normalized = message.toLowerCase();
+  if (normalized.includes("timeout") || normalized.includes("etimedout")) {
+    return "TRANSPORT_TIMEOUT";
+  }
+  if (normalized.includes("enotfound") || normalized.includes("eai_again") || normalized.includes("dns")) {
+    return "TRANSPORT_DNS_ERROR";
+  }
+  if (normalized.includes("econnrefused")) {
+    return "TRANSPORT_CONNECTION_REFUSED";
+  }
+  if (normalized.includes("econnreset") || normalized.includes("socket hang up")) {
+    return "TRANSPORT_CONNECTION_RESET";
+  }
+  if (normalized.includes("certificate") || normalized.includes("tls") || normalized.includes("ssl")) {
+    return "TRANSPORT_TLS_ERROR";
+  }
+  if (normalized.includes("destination") || normalized.includes("secret") || normalized.includes("config")) {
+    return "DELIVERY_CONFIGURATION_ERROR";
+  }
+  return "TRANSPORT_ERROR";
+}
+
+export function redactWebhookDeliveryReceipt(receipt: WebhookDeliveryReceipt): WebhookDeliveryReceipt {
+  return {
+    ...receipt,
+    url: redactWebhookDestination(receipt.url),
+    attempts: receipt.attempts.map((attempt) => ({
+      ...attempt,
+      error: attempt.error ? normalizeWebhookDeliveryError(attempt.error) : null
+    }))
+  };
+}
+
 function requestImpl(url: URL) {
   return url.protocol === "https:" ? httpsRequest : httpRequest;
 }

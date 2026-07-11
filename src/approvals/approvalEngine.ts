@@ -17,6 +17,7 @@ import {
   approvalRequestSchema,
   cancelApprovalRequest,
   createApprovalRequestRecord,
+  inspectApprovalChainIntegrity,
   listApprovalRequests,
   listApprovalDecisions,
   loadApprovalConsumed,
@@ -127,6 +128,39 @@ function requestStatusForRecord(workspace: string, request: ApprovalRequestRecor
   };
 }
 
+function approvalRequestContextError(workspace: string, request: ApprovalRequestRecord): string | null {
+  const approvalPolicySig = verifyApprovalPolicySignature(workspace);
+  if (!approvalPolicySig.valid) {
+    return `approval policy signature invalid: ${approvalPolicySig.reason ?? "unknown"}`;
+  }
+  const actionSig = verifyActionPolicySignature(workspace);
+  if (!actionSig.valid) {
+    return `action policy signature invalid: ${actionSig.reason ?? "unknown"}`;
+  }
+  const toolsSig = verifyToolsConfigSignature(workspace);
+  if (!toolsSig.valid) {
+    return `tools signature invalid: ${toolsSig.reason ?? "unknown"}`;
+  }
+  const budgetsSig = verifyBudgetsConfigSignature(workspace);
+  if (!budgetsSig.valid) {
+    return `budgets signature invalid: ${budgetsSig.reason ?? "unknown"}`;
+  }
+
+  const hashActionPolicy = sha256Hex(readFileSync(join(workspace, ".amc", "action-policy.yaml")));
+  const hashTools = sha256Hex(readFileSync(join(workspace, ".amc", "tools.yaml")));
+  const hashBudgets = sha256Hex(readFileSync(join(workspace, ".amc", "budgets.yaml")));
+  if (request.boundHashes.policyHash !== hashActionPolicy) {
+    return "approval policy hash mismatch";
+  }
+  if (request.boundHashes.toolsHash !== hashTools) {
+    return "approval tools hash mismatch";
+  }
+  if (request.boundHashes.budgetsHash !== hashBudgets) {
+    return "approval budgets hash mismatch";
+  }
+  return null;
+}
+
 export function createApprovalForIntent(input: ApprovalRequestInput): {
   approval: {
     approvalId: string;
@@ -228,14 +262,45 @@ export function decideApprovalForIntent(params: {
     approvalRequestId: params.approvalId,
     requireValidSignature: true
   });
+  const chain = inspectApprovalChainIntegrity({
+    workspace: params.workspace,
+    agentId: request.agentId,
+    approvalRequestId: request.approvalRequestId
+  });
+  if (!chain.valid) {
+    throw new Error("approval request context is untrusted: approval chain integrity failed");
+  }
+  const contextError = approvalRequestContextError(params.workspace, request);
+  if (contextError) {
+    throw new Error(`approval request context is untrusted: ${contextError}`);
+  }
+  const current = requestStatusForRecord(params.workspace, request);
+  if (current.status !== "PENDING") {
+    throw new Error(`approval request is not pending: ${current.status}`);
+  }
+  const reviewerUserId = params.userId ?? "owner";
+  const reviewerUsername = params.username ?? "owner";
+  if (request.requireDistinctUsers && params.decision === "APPROVED") {
+    const priorApproval = listApprovalDecisions({
+      workspace: params.workspace,
+      agentId: request.agentId,
+      approvalRequestId: request.approvalRequestId
+    }).find((decision) =>
+      decision.decision !== "DENY" &&
+      (decision.userId === reviewerUserId || decision.username === reviewerUsername)
+    );
+    if (priorApproval) {
+      throw new Error("distinct approver required; same user cannot approve twice");
+    }
+  }
   const modeDecision: ApprovalDecisionKind =
     params.decision === "DENIED" ? "DENY" : params.mode === "EXECUTE" ? "APPROVE_EXECUTE" : "APPROVE_SIMULATE";
   const decision = recordApprovalDecision({
     workspace: params.workspace,
     agentId: request.agentId,
     approvalRequestId: request.approvalRequestId,
-    userId: params.userId ?? "owner",
-    username: params.username ?? "owner",
+    userId: reviewerUserId,
+    username: reviewerUsername,
     roles: params.userRoles ?? ["OWNER"],
     decision: modeDecision,
     reason: params.reason
@@ -317,34 +382,17 @@ export function verifyApprovalForExecution(params: {
   if (request.actionClass !== params.expectedActionClass) {
     return { ok: false, status: null, approval: request, error: "approval action class mismatch" };
   }
-  const approvalPolicySig = verifyApprovalPolicySignature(params.workspace);
-  if (!approvalPolicySig.valid) {
-    return { ok: false, status: null, approval: request, error: `approval policy signature invalid: ${approvalPolicySig.reason ?? "unknown"}` };
+  const chain = inspectApprovalChainIntegrity({
+    workspace: params.workspace,
+    agentId: request.agentId,
+    approvalRequestId: request.approvalRequestId
+  });
+  if (!chain.valid) {
+    return { ok: false, status: null, approval: request, error: "approval chain integrity failed" };
   }
-  const actionSig = verifyActionPolicySignature(params.workspace);
-  if (!actionSig.valid) {
-    return { ok: false, status: null, approval: request, error: `action policy signature invalid: ${actionSig.reason ?? "unknown"}` };
-  }
-  const toolsSig = verifyToolsConfigSignature(params.workspace);
-  if (!toolsSig.valid) {
-    return { ok: false, status: null, approval: request, error: `tools signature invalid: ${toolsSig.reason ?? "unknown"}` };
-  }
-  const budgetsSig = verifyBudgetsConfigSignature(params.workspace);
-  if (!budgetsSig.valid) {
-    return { ok: false, status: null, approval: request, error: `budgets signature invalid: ${budgetsSig.reason ?? "unknown"}` };
-  }
-
-  const hashActionPolicy = sha256Hex(readFileSync(join(params.workspace, ".amc", "action-policy.yaml")));
-  const hashTools = sha256Hex(readFileSync(join(params.workspace, ".amc", "tools.yaml")));
-  const hashBudgets = sha256Hex(readFileSync(join(params.workspace, ".amc", "budgets.yaml")));
-  if (request.boundHashes.policyHash !== hashActionPolicy) {
-    return { ok: false, status: null, approval: request, error: "approval policy hash mismatch" };
-  }
-  if (request.boundHashes.toolsHash !== hashTools) {
-    return { ok: false, status: null, approval: request, error: "approval tools hash mismatch" };
-  }
-  if (request.boundHashes.budgetsHash !== hashBudgets) {
-    return { ok: false, status: null, approval: request, error: "approval budgets hash mismatch" };
+  const contextError = approvalRequestContextError(params.workspace, request);
+  if (contextError) {
+    return { ok: false, status: null, approval: request, error: contextError };
   }
 
   const status = requestStatusForRecord(params.workspace, request);

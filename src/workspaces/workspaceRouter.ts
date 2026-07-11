@@ -12,6 +12,7 @@ import {
   createHostUser,
   createWorkspaceRecord,
   disableHostUser,
+  findHostUserById,
   getWorkspaceRecord,
   grantMembership,
   listAccessibleWorkspaces,
@@ -20,7 +21,12 @@ import {
   setWorkspaceStatus
 } from "./hostDb.js";
 import { issueHostSessionToken, verifyHostSessionToken } from "./hostAuth.js";
-import { parseCookieHeader, issueSessionToken, verifySessionToken, type SessionPayload } from "../auth/sessionTokens.js";
+import { parseCookieHeader, type SessionPayload } from "../auth/sessionTokens.js";
+import {
+  createTrackedSession,
+  revokeSessionByToken,
+  verifyTrackedSessionToken
+} from "../auth/authApi.js";
 import { extractLeaseCarrier } from "../leases/leaseCarriers.js";
 import { verifyLeaseToken } from "../leases/leaseVerifier.js";
 import { loadLeaseRevocations, verifyLeaseRevocationsSignature } from "../leases/leaseStore.js";
@@ -189,34 +195,52 @@ function hostSessionCookieName(): string {
   return "amc_host_session";
 }
 
-function setHostSessionCookie(res: ServerResponse, token: string, maxAgeSeconds: number): void {
+function requestUsesHttps(req: IncomingMessage): boolean {
+  const forwarded = req.headers["x-forwarded-proto"];
+  const first = (Array.isArray(forwarded) ? forwarded[0] : forwarded)?.split(",", 1)[0]?.trim().toLowerCase();
+  if (first === "https") {
+    return true;
+  }
+  return (req.socket as { encrypted?: boolean }).encrypted === true;
+}
+
+function setHostSessionCookie(res: ServerResponse, token: string, maxAgeSeconds: number, secure = false): void {
   res.setHeader(
     "set-cookie",
-    `${hostSessionCookieName()}=${encodeURIComponent(token)}; HttpOnly; SameSite=Strict; Path=${hostSessionCookiePath()}; Max-Age=${Math.max(
+    `${hostSessionCookieName()}=${encodeURIComponent(token)}; HttpOnly${secure ? "; Secure" : ""}; SameSite=Strict; Path=${hostSessionCookiePath()}; Max-Age=${Math.max(
       60,
       maxAgeSeconds
     )}`
   );
 }
 
-function clearHostSessionCookie(res: ServerResponse): void {
+function clearHostSessionCookie(res: ServerResponse, secure = false): void {
   res.setHeader(
     "set-cookie",
-    `${hostSessionCookieName()}=; HttpOnly; SameSite=Strict; Path=${hostSessionCookiePath()}; Max-Age=0`
+    `${hostSessionCookieName()}=; HttpOnly${secure ? "; Secure" : ""}; SameSite=Strict; Path=${hostSessionCookiePath()}; Max-Age=0`
   );
 }
 
-function setWorkspaceSessionCookie(res: ServerResponse, workspaceId: string, token: string, maxAgeSeconds: number): void {
+function setWorkspaceSessionCookie(
+  res: ServerResponse,
+  workspaceId: string,
+  token: string,
+  maxAgeSeconds: number,
+  secure = false
+): void {
   const path = `/w/${workspaceId}`;
   res.setHeader(
     "set-cookie",
-    `amc_session=${encodeURIComponent(token)}; HttpOnly; SameSite=Strict; Path=${path}; Max-Age=${Math.max(60, maxAgeSeconds)}`
+    `amc_session=${encodeURIComponent(token)}; HttpOnly${secure ? "; Secure" : ""}; SameSite=Strict; Path=${path}; Max-Age=${Math.max(60, maxAgeSeconds)}`
   );
 }
 
-function clearWorkspaceSessionCookie(res: ServerResponse, workspaceId: string): void {
+function clearWorkspaceSessionCookie(res: ServerResponse, workspaceId: string, secure = false): void {
   const path = `/w/${workspaceId}`;
-  res.setHeader("set-cookie", `amc_session=; HttpOnly; SameSite=Strict; Path=${path}; Max-Age=0`);
+  res.setHeader(
+    "set-cookie",
+    `amc_session=; HttpOnly${secure ? "; Secure" : ""}; SameSite=Strict; Path=${path}; Max-Age=0`
+  );
 }
 
 function workspaceFromLeaseToken(token: string): string | null {
@@ -501,12 +525,26 @@ function resolveHostAccess(req: IncomingMessage, hostDir: string): ResolvedHostA
       error: legacy.error
     };
   }
+  const currentUser = legacy.payload.userId
+    ? findHostUserById(hostDir, legacy.payload.userId)
+    : null;
+  if (
+    !currentUser ||
+    currentUser.disabled ||
+    currentUser.username !== legacy.payload.username
+  ) {
+    return {
+      ok: false,
+      status: 401,
+      error: "host session user is no longer active"
+    };
+  }
   return {
     ok: true,
     status: 200,
     username: legacy.payload.username,
     userId: legacy.payload.userId ?? null,
-    isHostAdmin: legacy.payload.isHostAdmin,
+    isHostAdmin: currentUser.isHostAdmin,
     csrfToken: null,
     usingIdentitySession: false
   };
@@ -576,23 +614,36 @@ function parseUrlEncodedForm(raw: string): Record<string, string> {
   return out;
 }
 
-function hasValidWorkspaceSession(
+function replaceSessionCookie(cookieHeader: string | undefined, token: string): string {
+  const retained = (cookieHeader ?? "")
+    .split(";")
+    .map((part) => part.trim())
+    .filter((part) => part.length > 0 && !part.startsWith("amc_session="));
+  retained.push(`amc_session=${encodeURIComponent(token)}`);
+  return retained.join("; ");
+}
+
+function verifyWorkspaceSession(
   manager: WorkspaceManager,
   workspaceId: string,
   cookieHeader: string | undefined
-): boolean {
+): { ok: boolean; payload: SessionPayload | null } {
   const token = parseCookieHeader(cookieHeader, "amc_session");
   if (!token) {
-    return false;
+    return { ok: false, payload: null };
   }
   try {
     const workspace = manager.withWorkspace(workspaceId, (context) => context.workspaceDir);
-    return verifySessionToken({
+    const verified = verifyTrackedSessionToken({
       workspace,
       token
-    }).ok;
+    });
+    return {
+      ok: verified.ok && Boolean(verified.payload),
+      payload: verified.payload ?? null
+    };
   } catch {
-    return false;
+    return { ok: false, payload: null };
   }
 }
 
@@ -651,7 +702,12 @@ async function proxyToWorkspace(
   targetPath: string
 ): Promise<void> {
   const method = (req.method ?? "GET").toUpperCase();
-  const { origin: _origin, host: _host, ...forwardHeaders } = req.headers;
+  const {
+    origin: _origin,
+    host: _host,
+    "x-amc-admin-token": _clientAdminToken,
+    ...forwardHeaders
+  } = req.headers;
   const upstream = httpRequest(
     {
       host: runtime.host,
@@ -660,8 +716,7 @@ async function proxyToWorkspace(
       path: targetPath,
       headers: {
         ...forwardHeaders,
-        host: `${runtime.host}:${runtime.port}`,
-        "x-amc-admin-token": runtime.token
+        host: `${runtime.host}:${runtime.port}`
       }
     },
     (upstreamRes) => {
@@ -727,7 +782,8 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
       allowedCidrs: options.allowedCidrs,
       trustedProxyHops: options.trustedProxyHops,
       maxRequestBytes: options.maxRequestBytes,
-      corsAllowedOrigins: options.corsAllowedOrigins
+      corsAllowedOrigins: options.corsAllowedOrigins,
+      publicConsoleBasePath: `/w/${normalized}/console`
     });
     const result: WorkspaceApiRuntime = {
       workspaceId: normalized,
@@ -859,7 +915,7 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
             isHostAdmin: local.user.isHostAdmin
           });
           const existingSetCookie = res.getHeader("set-cookie");
-          const legacy = `${hostSessionCookieName()}=${encodeURIComponent(issued.token)}; HttpOnly; SameSite=Strict; Path=${hostSessionCookiePath()}; Max-Age=${Math.max(
+          const legacy = `${hostSessionCookieName()}=${encodeURIComponent(issued.token)}; HttpOnly${requestUsesHttps(req) ? "; Secure" : ""}; SameSite=Strict; Path=${hostSessionCookiePath()}; Max-Age=${Math.max(
             60,
             Math.floor((issued.payload.expiresTs - issued.payload.issuedTs) / 1000)
           )}`;
@@ -894,7 +950,8 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
             setHostSessionCookie(
               res,
               issued.token,
-              Math.floor((issued.payload.expiresTs - issued.payload.issuedTs) / 1000)
+              Math.floor((issued.payload.expiresTs - issued.payload.issuedTs) / 1000),
+              requestUsesHttps(req)
             );
             appendHostAudit(options.hostDir, "HUMAN_LOGIN_SUCCESS", legacyAuth.user.username, {
               route: "/host/api/login",
@@ -959,7 +1016,7 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
       }
 
       if ((pathname === "/host/api/auth/logout" || pathname === "/host/api/logout") && req.method === "POST") {
-        clearHostSessionCookie(res);
+        clearHostSessionCookie(res, requestUsesHttps(req));
         clearIdentityCookieHeader({
           config: identityConfig,
           setHeader: (name, value) => {
@@ -1492,14 +1549,21 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
         }
         const runtime = await ensureWorkspaceApi(urlWorkspaceId).catch(() => null);
         const workspaceDir = manager.withWorkspace(urlWorkspaceId, (context) => context.workspaceDir);
-        const issued = issueSessionToken({
+        const issued = createTrackedSession({
           workspace: workspaceDir,
           userId,
           username,
           roles,
-          ttlMs: 8 * 60 * 60_000
+          ttlMs: 8 * 60 * 60_000,
+          authSource: "WORKSPACE_ROUTER"
         });
-        setWorkspaceSessionCookie(res, urlWorkspaceId, issued.token, Math.floor((issued.payload.expiresTs - issued.payload.issuedTs) / 1000));
+        setWorkspaceSessionCookie(
+          res,
+          urlWorkspaceId,
+          issued.token,
+          Math.floor((issued.payload.expiresTs - issued.payload.issuedTs) / 1000),
+          requestUsesHttps(req)
+        );
         json(res, 200, {
           ok: true,
           workspaceId: urlWorkspaceId,
@@ -1513,12 +1577,18 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
       }
 
       if ((workspacePath === "/logout" || workspacePath === "/api/logout" || workspacePath === "/auth/logout") && req.method === "POST") {
-        clearWorkspaceSessionCookie(res, urlWorkspaceId);
+        const token = parseCookieHeader(req.headers.cookie, "amc_session");
+        if (token) {
+          const workspace = manager.withWorkspace(urlWorkspaceId, (context) => context.workspaceDir);
+          revokeSessionByToken({ workspace, token });
+        }
+        clearWorkspaceSessionCookie(res, urlWorkspaceId, requestUsesHttps(req));
         json(res, 200, { ok: true });
         return;
       }
 
-      const workspaceSessionValid = hasValidWorkspaceSession(manager, urlWorkspaceId, req.headers.cookie);
+      const workspaceSession = verifyWorkspaceSession(manager, urlWorkspaceId, req.headers.cookie);
+      let workspaceSessionValid = workspaceSession.ok;
       const lease = extractLeaseCarrier({
         headers: req.headers,
         url,
@@ -1590,6 +1660,41 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
       if (!lease.leaseToken) {
         const hostAccess = resolveHostAccess(req, options.hostDir);
         const allowLocalDemoAccess = options.allowLocalDemoWorkspace === true && urlWorkspaceId === defaultWorkspaceId;
+        if (workspaceSessionValid && workspaceSession.payload) {
+          if (workspaceSession.payload.userId === "local-demo") {
+            if (!allowLocalDemoAccess) {
+              clearWorkspaceSessionCookie(res, urlWorkspaceId, requestUsesHttps(req));
+              json(res, 401, { error: "local demo session is not enabled" });
+              return;
+            }
+          } else {
+            const currentUser = findHostUserById(options.hostDir, workspaceSession.payload.userId);
+            const currentRoles = currentUser && !currentUser.disabled
+              ? resolveWorkspaceRolesForHostAccess(options.hostDir, urlWorkspaceId, {
+                  ok: true,
+                  status: 200,
+                  username: currentUser.username,
+                  userId: currentUser.userId,
+                  isHostAdmin: currentUser.isHostAdmin
+                })
+              : [];
+            const tokenRoles = [...workspaceSession.payload.roles].sort();
+            const activeRoles = [...currentRoles].sort();
+            const sessionCurrent = Boolean(
+              currentUser &&
+              !currentUser.disabled &&
+              currentUser.username === workspaceSession.payload.username &&
+              tokenRoles.length === activeRoles.length &&
+              tokenRoles.every((role, index) => role === activeRoles[index])
+            );
+            if (!sessionCurrent) {
+              workspaceSessionValid = false;
+              clearWorkspaceSessionCookie(res, urlWorkspaceId, requestUsesHttps(req));
+              json(res, 401, { error: "workspace session authority changed" });
+              return;
+            }
+          }
+        }
         if (hostAccess.ok) {
           const roles = resolveWorkspaceRolesForHostAccess(options.hostDir, urlWorkspaceId, hostAccess);
           if (roles.length === 0) {
@@ -1598,29 +1703,44 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
           }
           const canMintWorkspaceSession = hostAccess.username && hostAccess.userId;
           if (!workspaceSessionValid && canMintWorkspaceSession && (workspacePath === "/" || workspacePath.startsWith("/console"))) {
-            const issued = issueSessionToken({
+            const issued = createTrackedSession({
               workspace: manager.withWorkspace(urlWorkspaceId, (context) => context.workspaceDir),
               userId: hostAccess.userId!,
               username: hostAccess.username!,
               roles,
-              ttlMs: 8 * 60 * 60_000
+              ttlMs: 8 * 60 * 60_000,
+              authSource: "WORKSPACE_ROUTER"
             });
-            setWorkspaceSessionCookie(res, urlWorkspaceId, issued.token, Math.floor((issued.payload.expiresTs - issued.payload.issuedTs) / 1000));
+            setWorkspaceSessionCookie(
+              res,
+              urlWorkspaceId,
+              issued.token,
+              Math.floor((issued.payload.expiresTs - issued.payload.issuedTs) / 1000),
+              requestUsesHttps(req)
+            );
             res.statusCode = 302;
             res.setHeader("location", workspacePath === "/console" ? `${pathname}/${url.search}` : pathname + url.search);
             res.end();
             return;
           }
         } else if (allowLocalDemoAccess) {
-          if (!workspaceSessionValid && req.method === "GET" && (workspacePath === "/" || workspacePath.startsWith("/console"))) {
-            const issued = issueSessionToken({
+          if (!workspaceSessionValid) {
+            const issued = createTrackedSession({
               workspace: manager.withWorkspace(urlWorkspaceId, (context) => context.workspaceDir),
               userId: "local-demo",
               username: "demo",
               roles: ["OWNER", "OPERATOR", "AUDITOR", "APPROVER", "VIEWER"],
-              ttlMs: 8 * 60 * 60_000
+              ttlMs: 8 * 60 * 60_000,
+              authSource: "WORKSPACE_ROUTER"
             });
-            setWorkspaceSessionCookie(res, urlWorkspaceId, issued.token, Math.floor((issued.payload.expiresTs - issued.payload.issuedTs) / 1000));
+            setWorkspaceSessionCookie(
+              res,
+              urlWorkspaceId,
+              issued.token,
+              Math.floor((issued.payload.expiresTs - issued.payload.issuedTs) / 1000),
+              requestUsesHttps(req)
+            );
+            req.headers.cookie = replaceSessionCookie(req.headers.cookie, issued.token);
           }
         } else if (!workspaceSessionValid) {
           json(res, 401, { error: "missing workspace session" });

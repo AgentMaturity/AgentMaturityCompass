@@ -237,18 +237,46 @@ function studioEndpoints(): Record<string, Record<string, OpenApiOperation>> {
         responses: { "200": okJson("Lease revoked", "#/components/schemas/LeaseRevocationResponse") },
       },
     },
-    "/api/approvals": {
+    "/approvals/requests": {
       get: {
-        summary: "List pending approval requests",
-        tags: ["Studio", "Approvals"],
+        summary: "List canonical approval requests",
+        tags: ["Studio", "Approvals", "Enforce"],
+        parameters: [
+          { name: "agentId", in: "query", required: false, schema: { type: "string" } },
+          {
+            name: "status",
+            in: "query",
+            required: false,
+            schema: {
+              type: "string",
+              enum: ["PENDING", "QUORUM_MET", "DENIED", "EXPIRED", "CANCELLED", "CONSUMED"]
+            }
+          }
+        ],
         security: [{ adminToken: [] }, { sessionCookie: [] }],
-        responses: { "200": okJson("List of approval requests", "#/components/schemas/ApprovalListResponse") },
+        responses: {
+          "200": okJson("List of canonical approval requests", "#/components/schemas/ApprovalListResponse"),
+          "401": errJson("Unauthorized")
+        },
       },
     },
-    "/api/approvals/{id}/decide": {
+    "/approvals/requests/{id}": {
+      get: {
+        summary: "Get a canonical approval request",
+        tags: ["Studio", "Approvals", "Enforce"],
+        parameters: [{ name: "id", in: "path", required: true, schema: { type: "string" } }],
+        security: [{ adminToken: [] }, { sessionCookie: [] }],
+        responses: {
+          "200": okJson("Canonical approval request", "#/components/schemas/ApprovalDetailResponse"),
+          "401": errJson("Unauthorized"),
+          "404": errJson("Approval request not found")
+        }
+      }
+    },
+    "/approvals/requests/{id}/decide": {
       post: {
-        summary: "Approve or reject an approval request",
-        tags: ["Studio", "Approvals"],
+        summary: "Record a canonical approval decision",
+        tags: ["Studio", "Approvals", "Enforce"],
         parameters: [{ name: "id", in: "path", required: true, schema: { type: "string" } }],
         security: [{ adminToken: [] }, { sessionCookie: [] }],
         requestBody: {
@@ -257,16 +285,39 @@ function studioEndpoints(): Record<string, Record<string, OpenApiOperation>> {
             "application/json": {
               schema: {
                 type: "object",
+                additionalProperties: false,
                 properties: {
-                  decision: { type: "string", enum: ["APPROVE", "REJECT"] },
-                  reason: { type: "string" },
+                  decision: { type: "string", enum: ["APPROVE_EXECUTE", "APPROVE_SIMULATE", "DENY"] },
+                  mode: { type: "string", enum: ["SIMULATE", "EXECUTE"] },
+                  reason: { type: "string", minLength: 1, maxLength: 1000 },
                 },
                 required: ["decision"],
               },
             },
           },
         },
-        responses: { "200": okJson("Decision recorded", "#/components/schemas/DecisionResponse") },
+        responses: {
+          "200": okJson("Decision recorded", "#/components/schemas/DecisionResponse"),
+          "400": errJson("Invalid decision"),
+          "401": errJson("Unauthorized"),
+          "403": errJson("Reviewer role is not allowed"),
+          "409": errJson("Approval request is no longer pending")
+        },
+      },
+    },
+    "/approvals/requests/{id}/cancel": {
+      post: {
+        summary: "Cancel a pending canonical approval request",
+        tags: ["Studio", "Approvals", "Enforce"],
+        parameters: [{ name: "id", in: "path", required: true, schema: { type: "string" } }],
+        security: [{ adminToken: [] }, { sessionCookie: [] }],
+        responses: {
+          "200": okJson("Approval request cancelled", "#/components/schemas/ApprovalCancelResponse"),
+          "401": errJson("Unauthorized"),
+          "403": errJson("Owner role required"),
+          "404": errJson("Approval request not found"),
+          "409": errJson("Approval request is no longer pending")
+        }
       },
     },
     "/api/v1/adapters/capability-receipts": {
@@ -772,16 +823,39 @@ function studioSchemas(): Record<string, unknown> {
     ApprovalListResponse: {
       type: "object",
       properties: {
-        approvals: { type: "array", items: { type: "object" } },
+        agentId: { type: "string" },
+        requests: { type: "array", items: { type: "object" } },
       },
-      required: ["approvals"],
+      required: ["agentId", "requests"],
+    },
+    ApprovalDetailResponse: {
+      type: "object",
+      properties: {
+        request: { type: "object" },
+        decisions: { type: "array", items: { type: "object" } },
+        quorum: { type: "object" },
+        status: { type: "string" },
+        requestIntegrity: { type: "object" },
+        contextIntegrity: { type: "object" },
+        executionReady: { type: "boolean" },
+      },
+      required: ["request", "decisions", "quorum", "status", "requestIntegrity", "contextIntegrity", "executionReady"],
     },
     DecisionResponse: {
       type: "object",
       properties: {
-        recorded: { type: "boolean" },
+        approval: { type: "object" },
+        approvalDelivery: { type: "object" },
       },
-      required: ["recorded"],
+      required: ["approval", "approvalDelivery"],
+    },
+    ApprovalCancelResponse: {
+      type: "object",
+      properties: {
+        request: { type: "object" },
+        approvalDelivery: { type: "object" },
+      },
+      required: ["request", "approvalDelivery"],
     },
     PluginListResponse: {
       type: "object",
@@ -964,7 +1038,7 @@ export function generateFullOpenApiSpec(): OpenApiSpec {
         sessionCookie: {
           type: "apiKey",
           in: "cookie",
-          name: "amc-session",
+          name: "amc_session",
           description: "Console session cookie (RBAC)",
         },
         leaseToken: {

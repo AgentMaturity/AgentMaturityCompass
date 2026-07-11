@@ -489,9 +489,19 @@ Scope:
 - primary owner/operator console API implemented in `src/studio/studioServer.ts`
 - examples: `/status`, `/assurance/*`, `/audit/*`, `/value/*`, `/passport/*`, `/plugins/*`, `/toolhub/*`
 
+Canonical approval routes:
+- `GET /approvals/requests?agentId=<id>&status=<status>` lists the signed quorum-chain projection.
+- `GET /approvals/requests/:id` returns request, decision, quorum, integrity, and execution-readiness state.
+- `POST /approvals/requests/:id/decide` accepts only `APPROVE_EXECUTE`, `APPROVE_SIMULATE`, or `DENY` plus an optional bounded reason.
+- `POST /approvals/requests/:id/cancel` permits an `OWNER` to cancel only a pending request.
+- `GET /agent/approvals/:id/status` remains the lease-scoped agent polling route.
+
+Decision and cancel contracts document `403` role/policy denials separately from `401` authentication failures. Approval API responses include bounded `DELIVERED`, `QUEUED`, `SKIPPED`, `FAILED`, or `BLOCKED` delivery state and signed receipt references. Lifecycle notifications are metadata-only, workspace-aware pointers to authenticated Studio review; they are never approval credentials or proof.
+
 Auth:
 - session cookie or admin token
 - RBAC enforced for protected actions
+- `amc_session` is HttpOnly and SameSite=Strict; it is also Secure when Studio receives HTTPS directly or through `x-forwarded-proto: https`
 
 This is the largest API surface today and should be treated as internal operational contract.
 

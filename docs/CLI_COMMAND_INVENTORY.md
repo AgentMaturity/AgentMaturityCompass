@@ -49,8 +49,8 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc api start` | Start the AMC API server (alias for 'amc up') | `--port <port>` | - |
 | `amc api status` | Show API integration status | - | - |
 | `amc approvals` | Signed approval inbox operations | - | - |
-| `amc approvals approve` | - | `--agent <agentId>`<br>`--mode <simulate|execute>`<br>`--reason <text>` | - |
-| `amc approvals deny` | - | `--agent <agentId>`<br>`--reason <text>` | - |
+| `amc approvals approve` | - | `--agent <agentId>`<br>`--mode <simulate|execute>`<br>`--reason <text>`<br>`--username <username>`<br>`--roles <roles>`<br>`--user-id <userId>` | - |
+| `amc approvals deny` | - | `--agent <agentId>`<br>`--reason <text>`<br>`--username <username>`<br>`--roles <roles>`<br>`--user-id <userId>` | - |
 | `amc approvals list` | - | `--agent <agentId>`<br>`--status <status>` | - |
 | `amc approvals show` | - | `--agent <agentId>` | - |
 | `amc archetype` | Archetype packs | - | - |

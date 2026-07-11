@@ -1299,27 +1299,40 @@ async function renderEqualizer() {
 
 async function renderApprovals() {
   const agentId = currentAgent();
-  const data = await apiGet(`/approvals/requests?agentId=${encodeURIComponent(agentId)}&status=PENDING`);
-  const rows = data.requests || [];
+  const selectedApprovalId = qs("approval");
+  const rows = selectedApprovalId
+    ? await apiGet(`/approvals/requests/${encodeURIComponent(selectedApprovalId)}`).then((data) => [{
+        ...data.request,
+        status: data.status,
+        quorum: data.quorum,
+        decisions: data.decisions || [],
+        requestIntegrity: data.requestIntegrity,
+        contextIntegrity: data.contextIntegrity,
+        executionReady: data.executionReady
+      }])
+    : await apiGet(`/approvals/requests?agentId=${encodeURIComponent(agentId)}&status=PENDING`).then((data) => data.requests || []);
   root.innerHTML = `
     ${card("Approvals Inbox", `
       <p class="muted">Pending approvals with quorum progress.</p>
-      <div class="scroll"><table><thead><tr><th>Request</th><th>Intent</th><th>Action</th><th>Quorum</th><th>Decisions</th><th>Decision</th></tr></thead><tbody id="apprRows"></tbody></table></div>
+      ${selectedApprovalId ? `<p><a href="./approvals?agent=${encodeURIComponent(agentId)}">View all pending approvals</a></p>` : ""}
+      <div class="scroll"><table><thead><tr><th>Request</th><th>${selectedApprovalId ? "Intent" : "Risk"}</th><th>Action</th><th>Quorum</th><th>Decisions</th><th>Decision</th></tr></thead><tbody id="apprRows"></tbody></table></div>
     `)}
   `;
   const body = document.getElementById("apprRows");
   body.innerHTML = rows.map((row) => `
-    <tr>
-      <td>${row.approvalRequestId}</td>
-      <td>${row.intentId}</td>
-      <td>${row.actionClass}</td>
-      <td>${row.quorum?.received || 0}/${row.quorum?.required || 0} (${row.quorum?.status || "PENDING"})</td>
-      <td>${(row.decisions || []).map((d) => `${d.username}:${d.decision}`).join(", ") || "-"}</td>
+    <tr${row.approvalRequestId === selectedApprovalId ? ' class="selected"' : ""}>
+      <td>${htmlEscape(row.approvalRequestId)}</td>
+      <td>${htmlEscape(row.intentId || row.riskTier || "-")}</td>
+      <td>${htmlEscape(row.actionClass)}</td>
+      <td>${Number(row.quorum?.received || 0)}/${Number(row.quorum?.required || 0)} (${htmlEscape(row.quorum?.status || "PENDING")})</td>
+      <td>${row.decisions
+        ? row.decisions.map((d) => `${htmlEscape(d.username)}:${htmlEscape(d.decision)}`).join(", ") || "-"
+        : Number(row.decisionCount || 0)}</td>
       <td>
         <div class="row">
-          <button data-approve="${row.approvalRequestId}">Approve</button>
-          <button class="secondary" data-sim="${row.approvalRequestId}">Simulate</button>
-          <button class="danger" data-deny="${row.approvalRequestId}">Deny</button>
+          <button data-approve="${htmlEscape(row.approvalRequestId)}">Approve</button>
+          <button class="secondary" data-sim="${htmlEscape(row.approvalRequestId)}">Simulate</button>
+          <button class="danger" data-deny="${htmlEscape(row.approvalRequestId)}">Deny</button>
         </div>
       </td>
     </tr>
@@ -1359,6 +1372,11 @@ async function renderApprovals() {
       });
       await renderApprovals();
     });
+  });
+  subscribeOrgSse((event) => {
+    if (String(event?.type || "").startsWith("APPROVAL_")) {
+      void renderApprovals();
+    }
   });
 }
 
@@ -1865,6 +1883,13 @@ function subscribeOrgSse(onUpdate) {
       "FREEZE_APPLIED",
       "FREEZE_LIFTED",
       "POLICY_PACK_APPLIED",
+      "APPROVAL_REQUEST_CREATED",
+      "APPROVAL_DECISION_RECORDED",
+      "APPROVAL_QUORUM_MET",
+      "APPROVAL_DENIED",
+      "APPROVAL_CANCELLED",
+      "APPROVAL_EXPIRED",
+      "APPROVAL_CONSUMED",
       "BENCHMARK_INGESTED",
       "FEDERATION_IMPORTED"
     ].forEach((type) => orgEventStream.addEventListener(type, handler));

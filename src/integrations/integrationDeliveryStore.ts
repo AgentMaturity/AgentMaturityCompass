@@ -2,7 +2,12 @@ import { randomUUID } from "node:crypto";
 import { dirname, join, resolve } from "node:path";
 import { z } from "zod";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
-import type { WebhookDeliveryReceipt } from "./webhookDelivery.js";
+import {
+  normalizeWebhookDeliveryError,
+  redactWebhookDeliveryReceipt,
+  redactWebhookDestination,
+  type WebhookDeliveryReceipt
+} from "./webhookDelivery.js";
 
 const DEFAULT_MAX_RECEIPTS = 2_000;
 const DEFAULT_MAX_DEAD_LETTERS = 1_000;
@@ -73,13 +78,44 @@ export function loadIntegrationDeliveryJournal(workspace: string): IntegrationDe
   if (!pathExists(path)) {
     return defaultJournal();
   }
-  return integrationDeliveryJournalSchema.parse(JSON.parse(readUtf8(path)) as unknown);
+  const parsed = integrationDeliveryJournalSchema.parse(JSON.parse(readUtf8(path)) as unknown);
+  const sanitizeReceipt = (value: unknown): unknown => {
+    if (
+      value &&
+      typeof value === "object" &&
+      !Array.isArray(value) &&
+      typeof (value as { url?: unknown }).url === "string" &&
+      Array.isArray((value as { attempts?: unknown }).attempts)
+    ) {
+      return redactWebhookDeliveryReceipt(value as WebhookDeliveryReceipt);
+    }
+    return { redacted: true };
+  };
+  const sanitized = integrationDeliveryJournalSchema.parse({
+    ...parsed,
+    receipts: parsed.receipts.map((row) => ({
+      ...row,
+      url: redactWebhookDestination(row.url),
+      error: row.error ? normalizeWebhookDeliveryError(row.error) : null,
+      receipt: sanitizeReceipt(row.receipt)
+    })),
+    deadLetters: parsed.deadLetters.map((row) => ({
+      ...row,
+      url: redactWebhookDestination(row.url),
+      error: row.error ? normalizeWebhookDeliveryError(row.error) : null,
+      receipt: sanitizeReceipt(row.receipt)
+    }))
+  });
+  if (JSON.stringify(parsed) !== JSON.stringify(sanitized)) {
+    writeFileAtomic(path, JSON.stringify(sanitized, null, 2), 0o600);
+  }
+  return sanitized;
 }
 
 function saveIntegrationDeliveryJournal(workspace: string, journal: IntegrationDeliveryJournal): string {
   ensureDir(join(workspace, ".amc"));
   const path = integrationDeliveryJournalPath(workspace);
-  writeFileAtomic(path, JSON.stringify(integrationDeliveryJournalSchema.parse(journal), null, 2), 0o644);
+  writeFileAtomic(path, JSON.stringify(integrationDeliveryJournalSchema.parse(journal), null, 2), 0o600);
   return path;
 }
 
@@ -122,25 +158,30 @@ export function recordIntegrationDelivery(params: {
   const maxReceipts = Number.isFinite(params.maxReceipts)
     ? Math.max(1, Math.floor(params.maxReceipts!))
     : DEFAULT_MAX_RECEIPTS;
-  const finalAttempt = terminalAttempt(params.receipt);
+  const receipt = redactWebhookDeliveryReceipt(params.receipt);
+  const journal = loadIntegrationDeliveryJournal(params.workspace);
+  const existing = journal.receipts.find((row) => row.deliveryId === receipt.deliveryId);
+  if (existing) {
+    return existing;
+  }
+  const finalAttempt = terminalAttempt(receipt);
   const record: IntegrationDeliveryRecord = {
     recordId: `idr_${randomUUID().replace(/-/g, "")}`,
     ts: Date.now(),
     channelId: params.channelId,
     eventName: params.eventName,
     agentId: params.agentId,
-    deliveryId: params.receipt.deliveryId,
+    deliveryId: receipt.deliveryId,
     sequence: params.sequence,
-    delivered: params.receipt.delivered,
-    attempts: params.receipt.attempts.length,
+    delivered: receipt.delivered,
+    attempts: receipt.attempts.length,
     httpStatus: finalAttempt.httpStatus,
     error: finalAttempt.error,
     payloadSha256: params.payloadSha256,
-    url: params.receipt.url,
-    receipt: params.receipt
+    url: receipt.url,
+    receipt
   };
 
-  const journal = loadIntegrationDeliveryJournal(params.workspace);
   journal.receipts.push(record);
   if (journal.receipts.length > maxReceipts) {
     journal.receipts = journal.receipts.slice(journal.receipts.length - maxReceipts);
@@ -163,26 +204,31 @@ export function addIntegrationDeadLetter(params: {
   const maxDeadLetters = Number.isFinite(params.maxDeadLetters)
     ? Math.max(1, Math.floor(params.maxDeadLetters!))
     : DEFAULT_MAX_DEAD_LETTERS;
-  const finalAttempt = terminalAttempt(params.receipt);
+  const receipt = redactWebhookDeliveryReceipt(params.receipt);
+  const journal = loadIntegrationDeliveryJournal(params.workspace);
+  const existing = journal.deadLetters.find((row) => row.deliveryId === receipt.deliveryId);
+  if (existing) {
+    return existing;
+  }
+  const finalAttempt = terminalAttempt(receipt);
   const entry: IntegrationDeadLetter = {
     deadLetterId: `idl_${randomUUID().replace(/-/g, "")}`,
     ts: Date.now(),
     channelId: params.channelId,
     eventName: params.eventName,
     agentId: params.agentId,
-    deliveryId: params.receipt.deliveryId,
+    deliveryId: receipt.deliveryId,
     sequence: params.sequence,
     payloadSha256: params.payloadSha256,
-    url: params.receipt.url,
-    attempts: params.receipt.attempts.length,
+    url: receipt.url,
+    attempts: receipt.attempts.length,
     httpStatus: finalAttempt.httpStatus,
     error: finalAttempt.error,
     resolved: false,
     resolvedTs: null,
-    receipt: params.receipt
+    receipt
   };
 
-  const journal = loadIntegrationDeliveryJournal(params.workspace);
   journal.deadLetters.push(entry);
   if (journal.deadLetters.length > maxDeadLetters) {
     journal.deadLetters = journal.deadLetters.slice(journal.deadLetters.length - maxDeadLetters);

@@ -280,9 +280,7 @@ import { initAlertsConfig, sendTestAlert, verifyAlertsConfigSignature } from "./
 import { startTrustDriftMonitor } from "./monitor/trustDriftMonitor.js";
 import { generateBom } from "./bom/bomGenerator.js";
 import { signBomFile, verifyBomSignature } from "./bom/bomVerifier.js";
-import { listApprovals, loadApproval } from "./approvals/approvalStore.js";
-import { decideApprovalForIntent } from "./approvals/approvalEngine.js";
-import { parseApprovalMode, parseApprovalStatus } from "./approvals/approvalCli.js";
+import { registerApprovalCliCommands } from "./approvals/approvalCliCommands.js";
 import { initApprovalPolicy, verifyApprovalPolicySignature } from "./approvals/approvalPolicyEngine.js";
 import { simulateTargetWhatIf } from "./simulator/targetWhatIf.js";
 import { parseSetPairs, parseTargetMappingFile } from "./simulator/whatIfCli.js";
@@ -16311,77 +16309,7 @@ bom
     console.log(chalk.green("BOM verified"));
   });
 
-const approvals = program.command("approvals").description("Signed approval inbox operations");
-
-approvals
-  .command("list")
-  .requiredOption("--agent <agentId>", "agent ID")
-  .option("--status <status>", "pending|approved|denied|consumed|expired")
-  .action((opts: { agent: string; status?: string }) => {
-    const rows = listApprovals({
-      workspace: process.cwd(),
-      agentId: opts.agent,
-      status: parseApprovalStatus(opts.status?.toUpperCase())
-    });
-    if (rows.length === 0) {
-      console.log("No approvals found.");
-      return;
-    }
-    for (const row of rows) {
-      console.log(
-        `${row.approval.approvalId} | ${row.status} | ${row.approval.toolName} | ${row.approval.actionClass} | intent=${row.approval.intentId}`
-      );
-    }
-  });
-
-approvals
-  .command("show")
-  .requiredOption("--agent <agentId>", "agent ID")
-  .argument("<approvalId>")
-  .action((approvalId: string, opts: { agent: string }) => {
-    const approval = loadApproval({
-      workspace: process.cwd(),
-      agentId: opts.agent,
-      approvalId,
-      requireValidSignature: true
-    });
-    console.log(JSON.stringify(approval, null, 2));
-  });
-
-approvals
-  .command("approve")
-  .requiredOption("--agent <agentId>", "agent ID")
-  .requiredOption("--mode <simulate|execute>", "approved mode")
-  .requiredOption("--reason <text>", "decision reason")
-  .argument("<approvalId>")
-  .action((approvalId: string, opts: { agent: string; mode: string; reason: string }) => {
-    const out = decideApprovalForIntent({
-      workspace: process.cwd(),
-      agentId: opts.agent,
-      approvalId,
-      decision: "APPROVED",
-      mode: parseApprovalMode(opts.mode),
-      reason: opts.reason
-    });
-    console.log(chalk.green(`Approval decided: ${out.approval.approvalId}`));
-  });
-
-approvals
-  .command("deny")
-  .requiredOption("--agent <agentId>", "agent ID")
-  .requiredOption("--reason <text>", "decision reason")
-  .argument("<approvalId>")
-  .action((approvalId: string, opts: { agent: string; reason: string }) => {
-    const out = decideApprovalForIntent({
-      workspace: process.cwd(),
-      agentId: opts.agent,
-      approvalId,
-      decision: "DENIED",
-      mode: "SIMULATE",
-      reason: opts.reason
-    });
-    console.log(chalk.green(`Approval denied: ${out.approval.approvalId}`));
-  });
+registerApprovalCliCommands(program);
 
 const whatif = program.command("whatif").description("Equalizer what-if simulator");
 

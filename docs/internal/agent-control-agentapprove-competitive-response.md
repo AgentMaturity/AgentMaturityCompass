@@ -34,6 +34,8 @@ AMC-1462 closes the second P0: Bridge now accepts a least-privilege, quota-safe,
 
 AMC-1463 closes the third P0: one reversible command now installs, verifies, or removes primary-source-pinned Claude Code and Gemini CLI project hooks. A signed ownership manifest binds the exact handler, provider source, agent, Bridge origin, ignore protection, and dedicated `hook:observe` lease; the hidden forwarder cannot read arbitrary workspace secrets or deliver to unsigned destinations. Tool inputs and raw session identifiers remain outside the Watch receipt path.
 
+AMC-1471 closes the approval-delivery P0: every operator surface now projects the canonical signed quorum chain, ToolHub and decision routes dispatch metadata-only lifecycle events through the existing Vault-backed integration queue, Studio refreshes over privacy-safe SSE, and notifications remain non-authoritative pointers to authenticated review.
+
 ## What each competitor does well
 
 ### Agent Control
@@ -133,7 +135,7 @@ AMC must not import these files as executable policy. A future AEP lane should:
 | 6 | Correlate hook action lifecycle end to end | Runtime runs, episodes, lifecycle graph | Shipped in AMC-1466; requested, signed decision, and completed or failed receipts share one stable action ID, terminal ambiguity and impossible lifecycles fail closed, and no second event store was added |
 | 7 | Build one control projection | Existing policies, Runtime Firewall, approvals | Shipped in AMC-1469; one read-only Scope / When / Then / Status projection verifies existing signed modules, exposes catalog-only gaps, and fails closed without a second policy engine |
 | 8 | Add control simulation with explanation | Policy decision receipts | Shipped in AMC-1470; Runtime Firewall, Action Policy, and Approval Policy simulations use their production evaluators, expose exact matched rules and structured conditions, fail closed on untrusted state, and create no receipt or proof |
-| 9 | Add approval delivery service | Approval store, leases, quorum | Signed request, expiry, deny by default, push payload contains no secret data |
+| 9 | Add approval delivery service | Approval store, leases, quorum | Shipped in AMC-1471; canonical quorum projection, metadata-only signed delivery, ordered retry/dead-letter evidence, SSE refresh, terminal replay denial, session revalidation, and no notification authority |
 | 10 | Make onboarding outcome based | Quickstart, connect wizard | User sees connected agent, first observed action, first decision, and first proof |
 
 ### P1: operator speed without weaker governance

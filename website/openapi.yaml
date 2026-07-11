@@ -1171,6 +1171,68 @@ components:
           type: object
           description: Existing AMC auditor signature over the canonical receipt hash.
 
+    ApprovalQuorum:
+      type: object
+      additionalProperties: false
+      required: [required, received, status]
+      properties:
+        required: { type: integer, minimum: 0 }
+        received: { type: integer, minimum: 0 }
+        status:
+          type: string
+          enum: [PENDING, QUORUM_MET, DENIED, EXPIRED, CANCELLED, CONSUMED]
+
+    ApprovalInboxSummary:
+      type: object
+      additionalProperties: false
+      required: [schemaVersion, approvalRequestId, requestDigestSha256, agentId, actionClass, riskTier, requestedMode, effectiveMode, createdTs, expiresTs, status, quorum, decisionCount, requestIntegrity, chainIntegrity, contextIntegrity, executionReady]
+      properties:
+        schemaVersion: { type: string, enum: ['2026-07-11'] }
+        approvalRequestId: { type: string, pattern: '^apprreq_' }
+        requestDigestSha256: { type: string, pattern: '^[a-f0-9]{64}$' }
+        agentId: { type: string }
+        actionClass: { type: string, enum: [READ_ONLY, WRITE_LOW, WRITE_HIGH, DEPLOY, SECURITY, FINANCIAL, NETWORK_EXTERNAL, DATA_EXPORT, IDENTITY] }
+        riskTier: { type: string, enum: [low, medium, high, critical] }
+        requestedMode: { type: string, enum: [SIMULATE, EXECUTE] }
+        effectiveMode: { type: string, enum: [SIMULATE, EXECUTE] }
+        createdTs: { type: integer }
+        expiresTs: { type: integer }
+        status: { type: string, enum: [PENDING, QUORUM_MET, DENIED, EXPIRED, CANCELLED, CONSUMED] }
+        quorum: { $ref: '#/components/schemas/ApprovalQuorum' }
+        decisionCount: { type: integer, minimum: 0 }
+        requestIntegrity: { type: object }
+        chainIntegrity: { type: object }
+        contextIntegrity: { type: object }
+        executionReady: { type: boolean }
+
+    ApprovalDeliverySummary:
+      type: object
+      additionalProperties: false
+      required: [schemaVersion, approvalRequestId, status, reasonCode, eventName, requestDigestSha256, expiresTs, channels, queued, skipped, notificationOnly, proofEligible, evidence]
+      properties:
+        schemaVersion: { type: string, enum: ['2026-07-11'] }
+        approvalRequestId: { type: string }
+        status: { type: string, enum: [DELIVERED, QUEUED, SKIPPED, FAILED, BLOCKED] }
+        reasonCode: { type: string, nullable: true }
+        eventName: { type: string, nullable: true }
+        requestDigestSha256: { type: string, nullable: true }
+        expiresTs: { type: integer, nullable: true }
+        channels: { type: array, items: { type: object } }
+        queued: { type: array, items: { type: object } }
+        skipped: { type: array, items: { type: string } }
+        notificationOnly: { type: boolean, enum: [true] }
+        proofEligible: { type: boolean, enum: [false] }
+        evidence: { type: object, nullable: true }
+
+    ApprovalDecisionRequest:
+      type: object
+      additionalProperties: false
+      required: [decision]
+      properties:
+        decision: { type: string, enum: [APPROVE_EXECUTE, APPROVE_SIMULATE, DENY] }
+        mode: { type: string, enum: [SIMULATE, EXECUTE] }
+        reason: { type: string, minLength: 1, maxLength: 1000 }
+
 tags:
   - name: health
     description: Health and readiness checks
@@ -1256,8 +1318,103 @@ tags:
     description: Agent timeline events
   - name: hooks
     description: Lease-scoped provider action observation and explicit loopback control
+  - name: approvals
+    description: Signed quorum approvals and privacy-safe lifecycle delivery
 
 paths:
+  # ── Canonical approval inbox ──────────────────────────────────
+  /approvals/requests:
+    get:
+      tags: [approvals, enforce]
+      summary: List canonical signed approval requests
+      description: Returns bounded summaries. Tool names, intent/work-order IDs, reasons, bound hashes, credentials, Vault refs, tokens, local paths, and destination URLs are omitted.
+      servers:
+        - url: http://localhost:3000
+          description: Local AMC Studio instance
+        - url: https://{host}
+          description: Self-hosted AMC Studio root
+          variables:
+            host: { default: amc.example.com }
+      parameters:
+        - { name: agentId, in: query, required: false, schema: { type: string } }
+        - { name: status, in: query, required: false, schema: { type: string, enum: [PENDING, QUORUM_MET, DENIED, EXPIRED, CANCELLED, CONSUMED] } }
+      responses:
+        '200':
+          description: Canonical approval summaries
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [agentId, requests]
+                properties:
+                  agentId: { type: string }
+                  requests: { type: array, items: { $ref: '#/components/schemas/ApprovalInboxSummary' } }
+        '401': { description: Unauthorized }
+
+  /approvals/requests/{id}:
+    get:
+      tags: [approvals, enforce]
+      summary: Read signed approval detail for authenticated review
+      servers:
+        - url: http://localhost:3000
+          description: Local AMC Studio instance
+        - url: https://{host}
+          description: Self-hosted AMC Studio root
+          variables:
+            host: { default: amc.example.com }
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+      responses:
+        '200': { description: Signed request, decisions, quorum, integrity, and execution-readiness detail }
+        '401': { description: Unauthorized }
+        '404': { description: Approval request not found }
+
+  /approvals/requests/{id}/decide:
+    post:
+      tags: [approvals, enforce]
+      summary: Record one signed approval decision
+      servers:
+        - url: http://localhost:3000
+          description: Local AMC Studio instance
+        - url: https://{host}
+          description: Self-hosted AMC Studio root
+          variables:
+            host: { default: amc.example.com }
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ApprovalDecisionRequest' }
+      responses:
+        '200':
+          description: Decision and bounded non-authoritative delivery summary
+        '400': { description: Invalid decision }
+        '401': { description: Unauthorized }
+        '403': { description: Reviewer role is not allowed }
+        '409': { description: Request is no longer pending }
+
+  /approvals/requests/{id}/cancel:
+    post:
+      tags: [approvals, enforce]
+      summary: Cancel one pending approval request
+      servers:
+        - url: http://localhost:3000
+          description: Local AMC Studio instance
+        - url: https://{host}
+          description: Self-hosted AMC Studio root
+          variables:
+            host: { default: amc.example.com }
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+      responses:
+        '200': { description: Cancelled request and bounded delivery summary }
+        '401': { description: Unauthorized }
+        '403': { description: Owner role required }
+        '404': { description: Approval request not found }
+        '409': { description: Request is no longer pending }
+
   # ── Provider-neutral hook observation ─────────────────────────
   /bridge/hooks/aep/0.1/events:
     post:

@@ -18,7 +18,7 @@ import { verifyActionPolicySignature } from "../governor/actionPolicyEngine.js";
 import { verifyToolsConfigSignature } from "../toolhub/toolhubValidators.js";
 import { activeFreezeStatus } from "../drift/freezeEngine.js";
 import { lastDriftCheckSummary } from "../drift/driftDetector.js";
-import { listApprovals } from "../approvals/approvalStore.js";
+import { listApprovalInbox } from "../approvals/approvalInbox.js";
 import { benchmarkStats } from "../benchmarks/benchStats.js";
 import { latestOutcomeReport, outcomeTrend, topValueGaps } from "../outcomes/outcomeDashboard.js";
 import { listDomainMetadata } from "../domains/domainRegistry.js";
@@ -439,13 +439,13 @@ export function buildDashboard(input: DashboardBuildInput): DashboardBuildResult
       }
     });
     const scoped = tagged.length > 0 ? tagged : events;
-    const approvals = listApprovals({
+    const approvals = listApprovalInbox({
       workspace: input.workspace,
       agentId
-    }).filter((row) => row.approval.createdTs >= latestRun.windowStartTs && row.approval.createdTs <= latestRun.windowEndTs);
+    }).filter((row) => row.request.createdTs >= latestRun.windowStartTs && row.request.createdTs <= latestRun.windowEndTs);
     data.approvalsSummary = {
       requested: approvals.length,
-      approved: approvals.filter((row) => row.status === "APPROVED" || row.status === "CONSUMED").length,
+      approved: approvals.filter((row) => row.status === "QUORUM_MET" || row.status === "CONSUMED").length,
       denied: approvals.filter((row) => row.status === "DENIED").length,
       expired: approvals.filter((row) => row.status === "EXPIRED").length,
       consumed: approvals.filter((row) => row.status === "CONSUMED").length,

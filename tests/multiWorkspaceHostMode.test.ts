@@ -10,15 +10,19 @@ import { issueLeaseForCli } from "../src/leases/leaseCli.js";
 import {
   createHostUser,
   createWorkspaceRecord,
+  disableHostUser,
   getWorkspaceRecord,
   grantMembership,
   initHostDb,
-  listAccessibleWorkspaces
+  listAccessibleWorkspaces,
+  revokeMembershipRole
 } from "../src/workspaces/hostDb.js";
 import { hostMigrateCli } from "../src/workspaces/hostCli.js";
 import { hostWorkspaceDir } from "../src/workspaces/workspacePaths.js";
 import { startWorkspaceRouter } from "../src/workspaces/workspaceRouter.js";
 import { runStudioForeground } from "../src/studio/studioSupervisor.js";
+import { ToolHubService } from "../src/toolhub/toolhubServer.js";
+import { getApprovalInboxItem } from "../src/approvals/approvalInbox.js";
 
 const roots: string[] = [];
 
@@ -156,13 +160,15 @@ describe("multi-workspace host mode", () => {
       const hostLogin = await httpRaw({
         url: `http://127.0.0.1:${port}/host/api/login`,
         method: "POST",
-        body: { username: "admin", password: "admin-pass-123" }
+        body: { username: "admin", password: "admin-pass-123" },
+        headers: { "x-forwarded-proto": "https" }
       });
       expect(hostLogin.status).toBe(200);
       const hostCookie = Array.isArray(hostLogin.headers["set-cookie"])
         ? hostLogin.headers["set-cookie"][0] ?? ""
         : String(hostLogin.headers["set-cookie"] ?? "");
       expect(hostCookie).toContain("amc_host_session=");
+      expect(hostCookie).toContain("; Secure;");
 
       const hostWorkspaces = await httpRaw({
         url: `http://127.0.0.1:${port}/host/api/workspaces`,
@@ -176,13 +182,15 @@ describe("multi-workspace host mode", () => {
       const workspaceLogin = await httpRaw({
         url: `http://127.0.0.1:${port}/w/ws-b/api/login`,
         method: "POST",
-        body: { username: "viewerb", password: "viewer-pass-123" }
+        body: { username: "viewerb", password: "viewer-pass-123" },
+        headers: { "x-forwarded-proto": "https" }
       });
       expect(workspaceLogin.status).toBe(200);
       const wsCookie = Array.isArray(workspaceLogin.headers["set-cookie"])
         ? workspaceLogin.headers["set-cookie"][0] ?? ""
         : String(workspaceLogin.headers["set-cookie"] ?? "");
       expect(wsCookie).toContain("Path=/w/ws-b");
+      expect(wsCookie).toContain("; Secure;");
 
       const forbidden = await httpRaw({
         url: `http://127.0.0.1:${port}/w/ws-a/api/status`,
@@ -202,6 +210,125 @@ describe("multi-workspace host mode", () => {
       const onlyB = listAccessibleWorkspaces(hostDir, "viewerb");
       expect(onlyB.map((row) => row.workspaceId)).toEqual(["ws-b"]);
       expect(readFileSync(join(workspaceB, ".amc", "amc.config.yaml"), "utf8")).toContain("trustBoundaryMode");
+    } finally {
+      await host.close();
+    }
+  }, 30_000);
+
+  test("workspace sessions fail closed after membership or user authority changes", async () => {
+    const { hostDir } = setupHostWithTwoWorkspaces();
+    const port = await pickFreePort();
+    const host = await startWorkspaceRouter({
+      hostDir,
+      host: "127.0.0.1",
+      port,
+      defaultWorkspaceId: "ws-a"
+    });
+
+    try {
+      const login = await httpRaw({
+        url: `http://127.0.0.1:${port}/w/ws-b/api/login`,
+        method: "POST",
+        body: { username: "viewerb", password: "viewer-pass-123" }
+      });
+      const sessionCookie = Array.isArray(login.headers["set-cookie"])
+        ? login.headers["set-cookie"][0] ?? ""
+        : String(login.headers["set-cookie"] ?? "");
+      expect((await httpRaw({
+        url: `http://127.0.0.1:${port}/w/ws-b/api/status`,
+        method: "GET",
+        cookie: sessionCookie
+      })).status).toBe(200);
+
+      revokeMembershipRole({
+        hostDir,
+        username: "viewerb",
+        workspaceId: "ws-b",
+        role: "VIEWER"
+      });
+      expect((await httpRaw({
+        url: `http://127.0.0.1:${port}/w/ws-b/api/status`,
+        method: "GET",
+        cookie: sessionCookie
+      })).status).toBe(401);
+
+      grantMembership({
+        hostDir,
+        username: "viewerb",
+        workspaceId: "ws-b",
+        role: "VIEWER"
+      });
+      const secondLogin = await httpRaw({
+        url: `http://127.0.0.1:${port}/w/ws-b/api/login`,
+        method: "POST",
+        body: { username: "viewerb", password: "viewer-pass-123" }
+      });
+      const secondCookie = Array.isArray(secondLogin.headers["set-cookie"])
+        ? secondLogin.headers["set-cookie"][0] ?? ""
+        : String(secondLogin.headers["set-cookie"] ?? "");
+      disableHostUser(hostDir, "viewerb");
+      expect((await httpRaw({
+        url: `http://127.0.0.1:${port}/w/ws-b/api/status`,
+        method: "GET",
+        cookie: secondCookie
+      })).status).toBe(401);
+    } finally {
+      await host.close();
+    }
+  }, 30_000);
+
+  test("workspace proxy preserves viewer RBAC and logout revokes the tracked session", async () => {
+    const { hostDir, workspaceB } = setupHostWithTwoWorkspaces();
+    const intent = new ToolHubService(workspaceB).createIntent({
+      agentId: "default",
+      toolName: "process.spawn",
+      args: { binary: "node", argv: ["-v"] },
+      requestedMode: "EXECUTE"
+    });
+    if (!intent.approvalRequestId) throw new Error("expected approval request");
+    const port = await pickFreePort();
+    const host = await startWorkspaceRouter({
+      hostDir,
+      host: "127.0.0.1",
+      port,
+      defaultWorkspaceId: "ws-a"
+    });
+
+    try {
+      const login = await httpRaw({
+        url: `http://127.0.0.1:${port}/w/ws-b/api/login`,
+        method: "POST",
+        body: { username: "viewerb", password: "viewer-pass-123" }
+      });
+      expect(login.status).toBe(200);
+      const sessionCookie = Array.isArray(login.headers["set-cookie"])
+        ? login.headers["set-cookie"][0] ?? ""
+        : String(login.headers["set-cookie"] ?? "");
+
+      const decision = await httpRaw({
+        url: `http://127.0.0.1:${port}/w/ws-b/approvals/requests/${encodeURIComponent(intent.approvalRequestId)}/decide`,
+        method: "POST",
+        cookie: sessionCookie,
+        body: { decision: "APPROVE_EXECUTE", reason: "viewer must not approve" }
+      });
+      expect(decision.status).toBe(403);
+      expect(getApprovalInboxItem({
+        workspace: workspaceB,
+        agentId: "default",
+        approvalRequestId: intent.approvalRequestId
+      }).decisions).toHaveLength(0);
+
+      const logout = await httpRaw({
+        url: `http://127.0.0.1:${port}/w/ws-b/api/logout`,
+        method: "POST",
+        cookie: sessionCookie
+      });
+      expect(logout.status).toBe(200);
+      expect((await httpRaw({
+        url: `http://127.0.0.1:${port}/w/ws-b/api/status`,
+        method: "GET",
+        cookie: sessionCookie
+      })).status).toBe(401);
     } finally {
       await host.close();
     }

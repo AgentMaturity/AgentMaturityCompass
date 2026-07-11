@@ -17,7 +17,7 @@ import { buildGovernorMatrix } from "../governor/governorReport.js";
 import { verifyToolsConfigSignature } from "../toolhub/toolhubValidators.js";
 import { evaluateBudgetStatus, verifyBudgetsConfigSignature } from "../budgets/budgets.js";
 import { activeFreezeStatus } from "../drift/freezeEngine.js";
-import { listApprovals } from "../approvals/approvalStore.js";
+import { listApprovalInbox } from "../approvals/approvalInbox.js";
 import type {
   DiagnosticEvidenceReadiness,
   DiagnosticReport,
@@ -1379,12 +1379,12 @@ export async function runDiagnostic(input: RunDiagnosticInput, outputMarkdownPat
     ).length;
     const dualityComplianceRatio = executeAttempted > 0 ? executeWithValidTicket / executeAttempted : 1;
 
-    const approvalsInWindow = listApprovals({
+    const approvalsInWindow = listApprovalInbox({
       workspace,
       agentId
-    }).filter((row) => row.approval.createdTs >= windowStartTs && row.approval.createdTs <= now);
+    }).filter((row) => row.request.createdTs >= windowStartTs && row.request.createdTs <= now);
     const approvalsRequested = approvalsInWindow.length;
-    const approvalsApproved = approvalsInWindow.filter((row) => row.status === "APPROVED" || row.status === "CONSUMED").length;
+    const approvalsApproved = approvalsInWindow.filter((row) => row.status === "QUORUM_MET" || row.status === "CONSUMED").length;
     const approvalsDenied = approvalsInWindow.filter((row) => row.status === "DENIED").length;
     const approvalsExpired = approvalsInWindow.filter((row) => row.status === "EXPIRED").length;
     const approvalsConsumed = approvalsInWindow.filter((row) => row.status === "CONSUMED").length;

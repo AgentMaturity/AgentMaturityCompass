@@ -52,7 +52,14 @@ export interface OrgSseEvent {
     | "AUDIT_BINDER_UPDATED"
     | "AUDIT_EVIDENCE_REQUEST_UPDATED"
     | "PASSPORT_UPDATED"
-    | "STANDARD_UPDATED";
+    | "STANDARD_UPDATED"
+    | "APPROVAL_REQUEST_CREATED"
+    | "APPROVAL_DECISION_RECORDED"
+    | "APPROVAL_QUORUM_MET"
+    | "APPROVAL_DENIED"
+    | "APPROVAL_CANCELLED"
+    | "APPROVAL_EXPIRED"
+    | "APPROVAL_CONSUMED";
   nodeIds: string[];
   ts: number;
   summaryHash: string;

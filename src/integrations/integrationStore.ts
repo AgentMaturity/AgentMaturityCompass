@@ -64,7 +64,12 @@ function defaultIntegrationsConfig(): IntegrationsConfig {
       },
       routing: {
         APPROVAL_REQUEST_CREATED: ["ops-webhook"],
+        APPROVAL_DECISION_RECORDED: ["ops-webhook"],
         APPROVAL_QUORUM_MET: ["ops-webhook"],
+        APPROVAL_DENIED: ["ops-webhook"],
+        APPROVAL_CANCELLED: ["ops-webhook"],
+        APPROVAL_EXPIRED: ["ops-webhook"],
+        APPROVAL_CONSUMED: ["ops-webhook"],
         INCIDENT_CREATED: ["ops-webhook", "ops-slack"],
         FREEZE_APPLIED: ["ops-webhook"],
         DRIFT_REGRESSION_DETECTED: ["ops-webhook", "ops-slack"],

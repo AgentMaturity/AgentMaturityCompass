@@ -553,6 +553,23 @@ export {
   approvalStatusPayload
 } from "./approvals/approvalEngine.js";
 export {
+  getApprovalInboxItem,
+  listApprovalInbox,
+  parseApprovalInboxStatus,
+  projectApprovalInboxSummary,
+  summarizeApprovalInbox
+} from "./approvals/approvalInbox.js";
+export type {
+  ApprovalInboxItem,
+  ApprovalInboxSummary
+} from "./approvals/approvalInbox.js";
+export {
+  approvalDeliveryEnvelopeSchema,
+  approvalDeliveryTriggerSchema,
+  buildApprovalDeliveryEnvelope,
+  deliverApprovalLifecycle
+} from "./approvals/approvalDelivery.js";
+export {
   createApprovalRequest,
   listApprovals,
   loadApproval,
