@@ -5,7 +5,7 @@
 - AMC surfaces requested: release/CI gates only
 - Sources reviewed: GitHub Actions annotation; official Docker Metadata Action and Setup Buildx Action repositories and releases
 - Retrieval: live primary-source review on 2026-07-11
-- Status: Implemented; local verification passed, remote publication verification pending
+- Status: Implemented; local and exact-head remote verification passed
 
 ## Relevance decision
 
@@ -47,4 +47,7 @@ No AMC runtime Node requirement changed. No package dependency, Docker image nam
 - Typecheck passed.
 - Full Vitest passed: 1,064 files / 8,396 tests.
 - The focused regression parsed every workflow YAML file and verified the preserved Docker metadata/publication contract.
-- Docs drift, diff, and exact-head remote workflow results are pending.
+- Docs drift passed across 1,485 files, the final diff check passed, and no deprecated Docker action major remained under `.github/workflows`.
+- Commit `a4f22dd083ec48f4ae49171b3fe23f9aa106b8c9` (`Upgrade Docker Actions to Node 24`) was pushed to `origin/main`.
+- Exact-head [Docker Runner Image 29146350088](https://github.com/AgentMaturity/AgentMaturityCompass/actions/runs/29146350088) passed Buildx setup, metadata generation, GHCR build/push, and the unchanged container smoke test. Check run `86528455961` returned an empty annotation list, proving the prior Node.js 20 warning is absent.
+- Exact-head [CI 29146350080](https://github.com/AgentMaturity/AgentMaturityCompass/actions/runs/29146350080), [npm validation 29146350076](https://github.com/AgentMaturity/AgentMaturityCompass/actions/runs/29146350076), and [Pages 29146350099](https://github.com/AgentMaturity/AgentMaturityCompass/actions/runs/29146350099) passed. npm validation passed typecheck, full tests, build, prepack, and release preflight; registry publication was intentionally skipped because `NPM_TOKEN` is not configured.
