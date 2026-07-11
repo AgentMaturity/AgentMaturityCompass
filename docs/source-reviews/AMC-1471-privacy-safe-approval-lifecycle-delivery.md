@@ -6,7 +6,7 @@
 - Source reviewed: first-party Agent Control and AgentApprove/AEP material already pinned by the competitive review
 - Retrieval: public sites and repositories reviewed 2026-07-10; implementation review 2026-07-11
 - Immutable source commits: Agent Control `83188b62c63e2b4ff9ada87048fd99605184ee5a`; Agent Event Protocol `2583cff9380f8f0a459d52c7112b6105c46496ed`
-- Status: Implemented; local release verification complete; publication pending
+- Status: Published and verified
 
 ## Relevance decision
 
@@ -67,4 +67,8 @@ AMC did not add a second approval store, queue, event database, push provider, W
 - Desktop packaging and verification pass for macOS universal, Linux x64, and Windows x64.
 - Full Playwright passes 55 tests with 2 intentional i18n skips.
 - Manual Studio review passes at 1280x720 and 390x844: the authenticated inbox exposes request/intent IDs, action class, `0/2 (PENDING)`, and decision controls without raw arguments or secrets; only the table scrolls horizontally on mobile, and browser warning/error logs are empty.
-- Commit, exact-head CI, and production evidence will be recorded before the issue is closed.
+- Implementation commit `cc314c1df0f6a0949d948cf573ece330e8d320ef` is pushed to `main` and `origin/main`.
+- Exact-head CI `29156322970`, npm validation `29156322967`, Docker Runner Image `29156322959`, and Pages `29156323008` passed. Node 20/22 full suites, local E2E, Helm, security, Docker smoke, release guardrails, and release preflight are green; registry/tag publication was intentionally skipped by release policy.
+- Production Docs manifest reports the exact source revision and 170 guides. The live homepage, public OpenAPI, and approval guide are byte-identical to the committed files; the homepage exposes 8,434 and not the stale 8,413 proof.
+- Apex returns `200`, `www` redirects to the apex, and the authorized certificate covers both names through 2026-09-24.
+- Live desktop and 390x844 browser checks keep the homepage and rendered Approvals guide within viewport bounds with no console/page errors. Post-deploy quick release gate passes with receipt `tmp/release-gate/amc-1471-live.json`.
