@@ -962,6 +962,118 @@ components:
         data:
           $ref: '#/components/schemas/ControlProjection'
 
+    ControlSimulationRequest:
+      type: object
+      additionalProperties: false
+      required: [controlId]
+      properties:
+        controlId:
+          type: string
+          minLength: 1
+          maxLength: 100
+          description: Control ID returned by amc policy controls
+        content:
+          type: string
+          minLength: 1
+          maxLength: 250000
+          description: Runtime Firewall input; transient and never returned or recorded
+        direction:
+          type: string
+          enum: [request, response]
+        agentId:
+          type: string
+          minLength: 1
+          maxLength: 200
+        riskTier:
+          type: string
+          enum: [low, med, high, critical]
+        requestedMode:
+          type: string
+          enum: [SIMULATE, EXECUTE]
+        hasExecTicket:
+          type: boolean
+
+    ControlSimulationCondition:
+      type: object
+      additionalProperties: false
+      required: [conditionId, label, passed, actual, expected, reason]
+      properties:
+        conditionId: { type: string }
+        label: { type: string }
+        passed:
+          type: [boolean, 'null']
+        actual:
+          type: [string, number, boolean, 'null']
+        expected:
+          type: [string, number, boolean, 'null']
+        reason: { type: string }
+
+    ControlSimulation:
+      type: object
+      additionalProperties: false
+      required: [schemaVersion, simulatedAt, familyId, controlId, label, sourceIntegrity, evaluator, evaluatorParity, outcome, matched, matchedRuleIds, matchedControlIds, conditions, reasons, inputSha256, simulationOnly, recorded, proofEligible, failClosed]
+      properties:
+        schemaVersion:
+          type: string
+          enum: ['2026-07-11']
+        simulatedAt:
+          type: string
+          format: date-time
+        familyId:
+          type: string
+          enum: [runtime-traffic, action-policy, approval-policy]
+        controlId: { type: string }
+        label: { type: string }
+        sourceIntegrity:
+          type: string
+          enum: [trusted, uninitialized, invalid]
+        evaluator:
+          type: string
+          enum: [runtime-firewall, action-policy, approval-policy]
+        evaluatorParity:
+          type: string
+          enum: [production]
+        outcome:
+          type: string
+          enum: [observe, warn, block, execute, simulate, deny, require_approval, allow]
+        matched: { type: boolean }
+        matchedRuleIds:
+          type: array
+          items: { type: string }
+        matchedControlIds:
+          type: array
+          items: { type: string }
+        conditions:
+          type: array
+          items: { $ref: '#/components/schemas/ControlSimulationCondition' }
+        reasons:
+          type: array
+          items: { type: string }
+        inputSha256:
+          type: string
+          pattern: '^[a-f0-9]{64}$'
+        simulationOnly:
+          type: boolean
+          enum: [true]
+        recorded:
+          type: boolean
+          enum: [false]
+        proofEligible:
+          type: boolean
+          enum: [false]
+        failClosed: { type: boolean }
+
+    ControlSimulationResponse:
+      type: object
+      additionalProperties: false
+      required: [ok, data]
+      properties:
+        ok:
+          type: boolean
+          enum: [true]
+        data:
+          $ref: '#/components/schemas/ControlSimulation'
+
     HookActionLifecycle:
       type: object
       additionalProperties: false
@@ -2173,6 +2285,30 @@ paths:
           description: Unauthorized
         '500':
           description: Control projection failed
+
+  /v1/policy/simulate:
+    post:
+      tags: [policy, enforce]
+      summary: Simulate one projected control through its production evaluator without recording
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ControlSimulationRequest'
+      responses:
+        '200':
+          description: Read-only evaluator-backed control simulation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ControlSimulationResponse'
+        '400':
+          description: Invalid control simulation request
+        '401':
+          description: Unauthorized
+        '500':
+          description: Control simulation failed
 
   /v1/policy/action/init:
     post:

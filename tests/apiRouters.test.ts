@@ -1382,6 +1382,7 @@ describe("AMC API routers", () => {
       ["/api/v1/compliance/regulatory/check", "POST", undefined, undefined, 200],
       ["/api/v1/compliance/regulatory/changes", "GET", undefined, "/api/v1/compliance/regulatory/changes?framework=EU&severity=high", 200],
       ["/api/v1/policy/controls", "GET", undefined, undefined, 200],
+      ["/api/v1/policy/simulate", "POST", { controlId: "approval:DEPLOY" }, undefined, 200],
       ["/api/v1/policy/action/init", "POST", undefined, undefined, 201],
       ["/api/v1/policy/action/verify", "GET", undefined, undefined, 200],
       ["/api/v1/policy/approval/init", "POST", undefined, undefined, 201],

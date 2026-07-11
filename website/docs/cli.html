@@ -91,7 +91,7 @@
 
       <div class="callout callout-green">
         <strong>By the numbers</strong>
-        The AMC CLI currently registers 1,152 command paths. Every command supports <code>--help</code> for inline documentation.
+        The AMC CLI currently registers 1,153 command paths. Every command supports <code>--help</code> for inline documentation.
       </div>
 
       <!-- Common workflow commands -->
@@ -113,6 +113,7 @@
           <tr><td><code>amc adapters run</code></td><td>Run adapter with lease + gateway routing</td><td><code>amc adapters run --agent my-agent --adapter claude-cli -- claude</code></td></tr>
           <tr><td><code>amc adapters capabilities</code></td><td>Issue a signed declared/effective capability receipt</td><td><code>amc adapters capabilities --agent my-agent --adapter claude-cli --json</code></td></tr>
           <tr><td><code>amc policy controls</code></td><td>Inspect verified Scope, When, Then, and Status across existing signed controls</td><td><code>amc policy controls --json</code></td></tr>
+          <tr><td><code>amc policy simulate</code></td><td>Preview one control through its production evaluator without recording</td><td><code>amc policy simulate action:DEPLOY --risk high --mode execute</code></td></tr>
           <tr><td><code>amc run</code></td><td>Run full maturity diagnostic</td><td><code>amc run --agent my-agent --window 30</code></td></tr>
           <tr><td><code>amc run --question-set lifecycle</code></td><td>Run the explicit 264-question lifecycle-expanded diagnostic</td><td><code>amc run --question-set lifecycle</code></td></tr>
           <tr><td><code>amc proof check</code></td><td>Check a claim against a declared source-to-rule manifest and emit an <code>amcproof</code> artifact</td><td><code>amc proof check --domain governance --manifest fixtures/domain-proof/toy-governance/source-rule-manifest.json --input examples/domain-proof/toy-governance/proven.json</code></td></tr>
@@ -318,6 +319,7 @@
             <tr><td><code>amc firewall disable</code></td><td>Disable Runtime Firewall policy for the workspace</td></tr>
             <tr><td><code>amc firewall migrate-signature --approve-legacy-kind</code></td><td>Verify and preserve an exact legacy policy in the monotonic journal</td></tr>
             <tr><td><code>amc policy controls [--json]</code></td><td>Read the verified Runtime Firewall, Guardrails, Action Policy, and Approval Policy projection; invalid evidence reports the real fail-closed outcome and exits 2</td></tr>
+            <tr><td><code>amc policy simulate &lt;controlId&gt; [--json]</code></td><td>Return exact matched rules, structured conditions, and the safe outcome from the owning production evaluator; inputs stay transient and the result is not proof</td></tr>
             <tr><td><code>amc guardrails list</code></td><td>Compare signed requested state with effective, verified runtime bindings</td></tr>
             <tr><td><code>amc guardrails enable &lt;id&gt;</code></td><td>Add a signed request for one of three Runtime Firewall-bound controls</td></tr>
             <tr><td><code>amc guardrails disable &lt;id&gt;</code></td><td>Remove the additive request without weakening signed policy</td></tr>

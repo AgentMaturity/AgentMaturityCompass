@@ -5,6 +5,7 @@ import { z } from "zod";
 import {
   GUARDRAIL_RUNTIME_BINDINGS,
   inspectGuardrailControlState,
+  inspectGuardrailControlStateReadOnly,
   type BoundGuardrailName
 } from "../enforce/guardrailControlState.js";
 import {
@@ -560,7 +561,9 @@ interface EffectiveRuntimeFirewallPolicy {
 
 function resolveEffectiveRuntimeFirewallPolicy(input: RuntimeFirewallEvaluateInput): EffectiveRuntimeFirewallPolicy {
   const workspace = resolve(input.workspace);
-  const controlSnapshot = inspectGuardrailControlState(workspace);
+  const controlSnapshot = input.record === false
+    ? inspectGuardrailControlStateReadOnly(workspace)
+    : inspectGuardrailControlState(workspace);
   const applied = (controlSnapshot.state?.requestedGuardrails ?? []) as BoundGuardrailName[];
   const control: RuntimeFirewallDecision["guardrailControl"] = {
     integrity: controlSnapshot.integrity,

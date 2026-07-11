@@ -310,6 +310,25 @@ function studioEndpoints(): Record<string, Record<string, OpenApiOperation>> {
         },
       },
     },
+    "/api/v1/policy/simulate": {
+      post: {
+        summary: "Simulate one projected control through its production evaluator without recording",
+        tags: ["Studio", "Enforce", "Policy"],
+        security: [{ adminToken: [] }, { sessionCookie: [] }],
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": { schema: { $ref: "#/components/schemas/ControlSimulationRequest" } },
+          },
+        },
+        responses: {
+          "200": okJson("Read-only evaluator-backed control simulation", "#/components/schemas/ControlSimulationResponse"),
+          "400": errJson("Invalid control simulation request"),
+          "401": errJson("Unauthorized"),
+          "500": errJson("Control simulation failed"),
+        },
+      },
+    },
     "/api/v1/watch/hook-actions/{actionId}": {
       get: {
         summary: "Verify one provider hook action lifecycle",
@@ -541,6 +560,72 @@ function studioSchemas(): Record<string, unknown> {
       properties: {
         ok: { type: "boolean", const: true },
         data: { $ref: "#/components/schemas/ControlProjection" },
+      },
+      required: ["ok", "data"],
+    },
+    ControlSimulationRequest: {
+      type: "object",
+      additionalProperties: false,
+      properties: {
+        controlId: { type: "string", minLength: 1, maxLength: 100, description: "Control ID returned by amc policy controls" },
+        content: { type: "string", minLength: 1, maxLength: 250000, description: "Runtime Firewall input; transient and never returned or recorded" },
+        direction: { type: "string", enum: ["request", "response"] },
+        agentId: { type: "string", minLength: 1, maxLength: 200 },
+        riskTier: { type: "string", enum: ["low", "med", "high", "critical"] },
+        requestedMode: { type: "string", enum: ["SIMULATE", "EXECUTE"] },
+        hasExecTicket: { type: "boolean" },
+      },
+      required: ["controlId"],
+    },
+    ControlSimulationCondition: {
+      type: "object",
+      additionalProperties: false,
+      properties: {
+        conditionId: { type: "string" },
+        label: { type: "string" },
+        passed: { type: ["boolean", "null"] },
+        actual: { type: ["string", "number", "boolean", "null"] },
+        expected: { type: ["string", "number", "boolean", "null"] },
+        reason: { type: "string" },
+      },
+      required: ["conditionId", "label", "passed", "actual", "expected", "reason"],
+    },
+    ControlSimulation: {
+      type: "object",
+      additionalProperties: false,
+      properties: {
+        schemaVersion: { type: "string", const: "2026-07-11" },
+        simulatedAt: { type: "string", format: "date-time" },
+        familyId: { type: "string", enum: ["runtime-traffic", "action-policy", "approval-policy"] },
+        controlId: { type: "string" },
+        label: { type: "string" },
+        sourceIntegrity: { type: "string", enum: ["trusted", "uninitialized", "invalid"] },
+        evaluator: { type: "string", enum: ["runtime-firewall", "action-policy", "approval-policy"] },
+        evaluatorParity: { type: "string", const: "production" },
+        outcome: { type: "string", enum: ["observe", "warn", "block", "execute", "simulate", "deny", "require_approval", "allow"] },
+        matched: { type: "boolean" },
+        matchedRuleIds: { type: "array", items: { type: "string" } },
+        matchedControlIds: { type: "array", items: { type: "string" } },
+        conditions: { type: "array", items: { $ref: "#/components/schemas/ControlSimulationCondition" } },
+        reasons: { type: "array", items: { type: "string" } },
+        inputSha256: { type: "string", pattern: "^[a-f0-9]{64}$" },
+        simulationOnly: { type: "boolean", const: true },
+        recorded: { type: "boolean", const: false },
+        proofEligible: { type: "boolean", const: false },
+        failClosed: { type: "boolean" },
+      },
+      required: [
+        "schemaVersion", "simulatedAt", "familyId", "controlId", "label", "sourceIntegrity", "evaluator",
+        "evaluatorParity", "outcome", "matched", "matchedRuleIds", "matchedControlIds", "conditions", "reasons",
+        "inputSha256", "simulationOnly", "recorded", "proofEligible", "failClosed",
+      ],
+    },
+    ControlSimulationResponse: {
+      type: "object",
+      additionalProperties: false,
+      properties: {
+        ok: { type: "boolean", const: true },
+        data: { $ref: "#/components/schemas/ControlSimulation" },
       },
       required: ["ok", "data"],
     },

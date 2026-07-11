@@ -18,6 +18,7 @@ export function runGovernorCheck(params: {
   actionClass: ActionClass;
   riskTier: RiskTier;
   mode: ExecutionMode;
+  hasExecTicket?: boolean;
 }) {
   const agentId = resolveAgentId(params.workspace, params.agentId);
   const policy = loadActionPolicy(params.workspace);
@@ -37,6 +38,7 @@ export function runGovernorCheck(params: {
     requestedMode: params.mode,
     freezeStatus: freeze,
     budgetStatus: budget,
+    hasExecTicket: params.hasExecTicket,
     policy,
     policySignatureValid: signature.valid
   });

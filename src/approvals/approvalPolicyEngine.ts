@@ -15,6 +15,24 @@ interface SignaturePayload {
   signer: "auditor";
 }
 
+export interface ApprovalPolicyConditionResult {
+  conditionId: string;
+  label: string;
+  passed: boolean | null;
+  actual: string | number | boolean | null;
+  expected: string | number | boolean | null;
+  reason: string;
+}
+
+export interface ApprovalRequestPolicyEvaluation {
+  allowed: boolean;
+  outcome: "allow" | "require_approval" | "deny";
+  matchedRuleId: string;
+  rule: ApprovalClassPolicy | null;
+  reasons: string[];
+  conditionResults: ApprovalPolicyConditionResult[];
+}
+
 export function approvalPolicyPath(workspace: string): string {
   return join(workspace, ".amc", "approval-policy.yaml");
 }
@@ -185,6 +203,113 @@ export function verifyApprovalPolicySignature(workspace: string, explicitPath?: 
       sigPath
     };
   }
+}
+
+export function evaluateApprovalRequestPolicy(input: {
+  actionClass: ActionClass;
+  policy: ApprovalPolicy;
+  policySignatureValid: boolean;
+  policySignatureReason?: string | null;
+}): ApprovalRequestPolicyEvaluation {
+  const matchedRuleId = `approval:${input.actionClass}`;
+  const rule = input.policy.approvalPolicy.actionClasses[input.actionClass] ?? null;
+  const conditionResults: ApprovalPolicyConditionResult[] = [{
+    conditionId: "approval-policy-signature",
+    label: "Signed Approval Policy configuration",
+    passed: input.policySignatureValid,
+    actual: input.policySignatureValid,
+    expected: true,
+    reason: input.policySignatureValid
+      ? "Approval Policy signature is valid."
+      : `Approval Policy is not trusted: ${input.policySignatureReason ?? "signature verification failed"}.`,
+  }, {
+    conditionId: "approval-policy-rule",
+    label: "Approval action rule",
+    passed: rule !== null,
+    actual: rule ? matchedRuleId : null,
+    expected: matchedRuleId,
+    reason: rule
+      ? `Matched the explicit ${input.actionClass} Approval Policy rule.`
+      : `Approval Policy has no ${input.actionClass} rule.`,
+  }];
+
+  if (!input.policySignatureValid) {
+    return {
+      allowed: false,
+      outcome: "deny",
+      matchedRuleId,
+      rule,
+      reasons: ["Approval request denied because the Approval Policy signature is not trusted."],
+      conditionResults,
+    };
+  }
+  if (!rule) {
+    return {
+      allowed: false,
+      outcome: "deny",
+      matchedRuleId,
+      rule: null,
+      reasons: [`Approval request denied because no ${input.actionClass} rule exists.`],
+      conditionResults,
+    };
+  }
+
+  conditionResults.push({
+    conditionId: "approval-quorum",
+    label: "Required approval quorum",
+    passed: null,
+    actual: rule.requiredApprovals,
+    expected: rule.requiredApprovals,
+    reason: rule.requiredApprovals === 0
+      ? "No human approvals are required by this rule."
+      : `${rule.requiredApprovals} human approval${rule.requiredApprovals === 1 ? " is" : "s are"} required.`,
+  }, {
+    conditionId: "approval-distinct-users",
+    label: "Distinct approvers",
+    passed: null,
+    actual: rule.requireDistinctUsers,
+    expected: rule.requireDistinctUsers,
+    reason: rule.requireDistinctUsers
+      ? "Configured quorum must be satisfied by distinct users."
+      : "The same user may satisfy the configured quorum.",
+  }, {
+    conditionId: "approval-roles",
+    label: "Allowed approver roles",
+    passed: null,
+    actual: rule.rolesAllowed.join(", "),
+    expected: rule.rolesAllowed.join(", "),
+    reason: `Allowed roles: ${rule.rolesAllowed.join(", ")}.`,
+  }, {
+    conditionId: "approval-expiry",
+    label: "Approval expiry",
+    passed: null,
+    actual: rule.ttlMinutes,
+    expected: rule.ttlMinutes,
+    reason: `Approval expires after ${rule.ttlMinutes} minutes.`,
+  });
+  for (const [packId, requirement] of Object.entries(rule.requireAssurancePacks ?? {}).sort(([left], [right]) => left.localeCompare(right))) {
+    conditionResults.push({
+      conditionId: `approval-assurance:${packId}`,
+      label: `${packId} assurance requirement`,
+      passed: null,
+      actual: null,
+      expected: `score >= ${requirement.minScore}; succeeded <= ${requirement.maxSucceeded}`,
+      reason: `Approval requires ${packId} score at least ${requirement.minScore} with at most ${requirement.maxSucceeded} succeeded attacks.`,
+    });
+  }
+
+  return {
+    allowed: true,
+    outcome: rule.requiredApprovals > 0 ? "require_approval" : "allow",
+    matchedRuleId,
+    rule,
+    reasons: [
+      rule.requiredApprovals > 0
+        ? `${rule.requiredApprovals} approval${rule.requiredApprovals === 1 ? " is" : "s are"} required before execution.`
+        : "The signed Approval Policy permits execution without human approval.",
+    ],
+    conditionResults,
+  };
 }
 
 export function approvalRuleForAction(policy: ApprovalPolicy, actionClass: ActionClass): ApprovalClassPolicy {

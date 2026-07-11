@@ -216,6 +216,10 @@ describe("governor + toolhub + workorders", () => {
 
     expect(decision.effectiveMode).toBe("SIMULATE");
     expect(decision.reasons.some((reason) => reason.includes("UNTRUSTED CONFIG"))).toBe(true);
+    expect(decision.conditionResults).toContainEqual(expect.objectContaining({
+      conditionId: "action-policy-signature",
+      passed: false
+    }));
   });
 
   test("governor effective level uses min(current,target)", () => {
@@ -238,6 +242,12 @@ describe("governor + toolhub + workorders", () => {
 
     expect(decision.effectiveMode).toBe("SIMULATE");
     expect(decision.reasons.some((reason) => reason.includes("AMC-1.8 effective level 2 < required 4"))).toBe(true);
+    expect(decision.conditionResults).toContainEqual(expect.objectContaining({
+      conditionId: "maturity:AMC-1.8",
+      actual: 2,
+      expected: 4,
+      passed: false
+    }));
   });
 
   test("tools.yaml signature tamper denies execution and writes audit event", async () => {

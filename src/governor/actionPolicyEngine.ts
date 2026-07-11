@@ -72,9 +72,20 @@ export interface GovernorUpgradeSuggestion {
   how: string;
 }
 
+export interface GovernorConditionResult {
+  conditionId: string;
+  label: string;
+  passed: boolean | null;
+  actual: string | number | boolean | null;
+  expected: string | number | boolean | null;
+  reason: string;
+}
+
 export interface GovernorDecision {
   allowed: boolean;
   effectiveMode: ExecutionMode;
+  matchedRuleId: string;
+  conditionResults: GovernorConditionResult[];
   reasons: string[];
   requiredEvidence: string[];
   upgradeSuggestions: GovernorUpgradeSuggestion[];
@@ -369,10 +380,12 @@ function compareTrustTier(actual: TrustTier, required: TrustTierAtLeast): boolea
   return TRUST_RANK[actual] >= TRUST_RANK[required];
 }
 
-function newDecision(mode: ExecutionMode): GovernorDecision {
+function newDecision(mode: ExecutionMode, matchedRuleId: string): GovernorDecision {
   return {
     allowed: false,
     effectiveMode: mode,
+    matchedRuleId,
+    conditionResults: [],
     reasons: [],
     requiredEvidence: [],
     upgradeSuggestions: [],
@@ -381,11 +394,40 @@ function newDecision(mode: ExecutionMode): GovernorDecision {
   };
 }
 
+function addCondition(decision: GovernorDecision, condition: GovernorConditionResult): void {
+  decision.conditionResults.push(condition);
+}
+
 export function evaluateActionPermission(input: GovernorDecisionInput): GovernorDecision {
   const policy = input.policy ?? defaultActionPolicy();
-  const decision = newDecision(input.requestedMode);
   const rule = findRule(policy, input.actionClass);
+  const decision = newDecision(
+    input.requestedMode,
+    rule ? `action:${input.actionClass}` : `action:default:${policy.defaultMode}`,
+  );
   const policySignatureValid = input.policySignatureValid ?? true;
+  const trustedConfig = policySignatureValid && !input.trustSummary.untrustedConfig;
+
+  addCondition(decision, {
+    conditionId: "action-policy-rule",
+    label: "Explicit action rule",
+    passed: rule !== null,
+    actual: rule ? `action:${input.actionClass}` : `default:${policy.defaultMode}`,
+    expected: `action:${input.actionClass}`,
+    reason: rule
+      ? `Matched the explicit ${input.actionClass} Action Policy rule.`
+      : `No explicit ${input.actionClass} rule; signed default mode ${policy.defaultMode} applies.`,
+  });
+  addCondition(decision, {
+    conditionId: "action-policy-signature",
+    label: "Signed Action Policy configuration",
+    passed: trustedConfig,
+    actual: trustedConfig,
+    expected: true,
+    reason: trustedConfig
+      ? "Action Policy and dependent configuration are trusted."
+      : "Action Policy or dependent configuration trust verification failed.",
+  });
 
   const simulateAllowed = !!rule || policy.defaultMode === "ALLOW";
   if (!rule && policy.defaultMode === "DENY") {
@@ -416,7 +458,7 @@ export function evaluateActionPermission(input: GovernorDecisionInput): Governor
     return decision;
   }
 
-  if (!policySignatureValid || input.trustSummary.untrustedConfig) {
+  if (!trustedConfig) {
     decision.allowed = true;
     decision.effectiveMode = "SIMULATE";
     decision.reasons.push("UNTRUSTED CONFIG: signed policy/config verification failed. EXECUTE is denied.");
@@ -425,6 +467,14 @@ export function evaluateActionPermission(input: GovernorDecisionInput): Governor
   }
 
   if (input.budgetStatus && !input.budgetStatus.budgetConfigValid) {
+    addCondition(decision, {
+      conditionId: "budget-policy-signature",
+      label: "Signed budget configuration",
+      passed: false,
+      actual: false,
+      expected: true,
+      reason: "Budget configuration signature is invalid.",
+    });
     decision.allowed = true;
     decision.effectiveMode = "SIMULATE";
     decision.reasons.push("UNTRUSTED CONFIG: budgets config signature invalid. EXECUTE is denied.");
@@ -433,6 +483,14 @@ export function evaluateActionPermission(input: GovernorDecisionInput): Governor
   }
 
   if (input.freezeStatus?.active && input.freezeStatus.actionClasses.includes(input.actionClass)) {
+    addCondition(decision, {
+      conditionId: "incident-freeze",
+      label: "No active execution freeze",
+      passed: false,
+      actual: true,
+      expected: false,
+      reason: `An active incident freeze covers ${input.actionClass}.`,
+    });
     decision.allowed = true;
     decision.effectiveMode = "SIMULATE";
     decision.reasons.push(`EXECUTE is frozen for action class ${input.actionClass}.`);
@@ -445,6 +503,18 @@ export function evaluateActionPermission(input: GovernorDecisionInput): Governor
     !input.budgetStatus.ok &&
     (input.budgetStatus.exceededActionClasses.includes(input.actionClass) ||
       input.budgetStatus.reasons.some((reason) => /daily llm|per-minute llm|daily llm cost/i.test(reason)));
+  if (input.budgetStatus) {
+    addCondition(decision, {
+      conditionId: "execution-budget",
+      label: "Execution budget available",
+      passed: !executeBudgetExceeded,
+      actual: input.budgetStatus.ok,
+      expected: true,
+      reason: executeBudgetExceeded
+        ? "The active budget blocks EXECUTE for this action."
+        : "No applicable execution budget is exceeded.",
+    });
+  }
   if (executeBudgetExceeded) {
     decision.allowed = true;
     decision.effectiveMode = "SIMULATE";
@@ -460,6 +530,16 @@ export function evaluateActionPermission(input: GovernorDecisionInput): Governor
   } else {
     for (const [questionId, minLevel] of Object.entries(rule.minEffectiveQuestionLevels)) {
       const effective = effectiveLevelForQuestion(input.currentDiagnosticRun, input.targetProfile, questionId);
+      addCondition(decision, {
+        conditionId: `maturity:${questionId}`,
+        label: `${questionId} effective maturity`,
+        passed: effective >= minLevel,
+        actual: effective,
+        expected: minLevel,
+        reason: effective >= minLevel
+          ? `${questionId} effective level ${effective} satisfies required ${minLevel}.`
+          : `${questionId} effective level ${effective} < required ${minLevel}.`,
+      });
       if (effective < minLevel) {
         issues.push(`${questionId} effective level ${effective} < required ${minLevel}`);
         decision.upgradeSuggestions.push({
@@ -472,18 +552,57 @@ export function evaluateActionPermission(input: GovernorDecisionInput): Governor
       }
     }
 
-    if (!compareTrustTier(input.trustSummary.trustTier, rule.requireTrustTierAtLeast)) {
+    const trustTierSatisfied = compareTrustTier(input.trustSummary.trustTier, rule.requireTrustTierAtLeast);
+    addCondition(decision, {
+      conditionId: "trust-tier",
+      label: "Minimum trust tier",
+      passed: trustTierSatisfied,
+      actual: input.trustSummary.trustTier,
+      expected: rule.requireTrustTierAtLeast,
+      reason: trustTierSatisfied
+        ? `Trust tier ${input.trustSummary.trustTier} satisfies ${rule.requireTrustTierAtLeast}.`
+        : `Trust tier ${input.trustSummary.trustTier} does not satisfy ${rule.requireTrustTierAtLeast}.`,
+    });
+    if (!trustTierSatisfied) {
       issues.push(`trust tier ${input.trustSummary.trustTier} does not satisfy ${rule.requireTrustTierAtLeast}`);
       decision.requiredEvidence.push(`Increase OBSERVED evidence quality to reach trust tier ${rule.requireTrustTierAtLeast}.`);
     }
 
     for (const [packId, requirement] of Object.entries(rule.requireAssurancePacks)) {
       const pack = input.assuranceSummary.packs[packId];
+      addCondition(decision, {
+        conditionId: `assurance:${packId}:present`,
+        label: `${packId} assurance evidence present`,
+        passed: Boolean(pack),
+        actual: Boolean(pack),
+        expected: true,
+        reason: pack ? `Assurance pack ${packId} is present.` : `Assurance pack ${packId} is missing.`,
+      });
       if (!pack) {
         issues.push(`assurance pack ${packId} missing`);
         decision.requiredEvidence.push(`Run assurance pack '${packId}' and collect OBSERVED evidence.`);
         continue;
       }
+      addCondition(decision, {
+        conditionId: `assurance:${packId}:score`,
+        label: `${packId} minimum score`,
+        passed: pack.score >= requirement.minScore,
+        actual: pack.score,
+        expected: requirement.minScore,
+        reason: pack.score >= requirement.minScore
+          ? `Assurance pack ${packId} score ${pack.score.toFixed(1)} satisfies ${requirement.minScore}.`
+          : `Assurance pack ${packId} score ${pack.score.toFixed(1)} < ${requirement.minScore}.`,
+      });
+      addCondition(decision, {
+        conditionId: `assurance:${packId}:succeeded`,
+        label: `${packId} maximum succeeded attacks`,
+        passed: pack.succeeded <= requirement.maxSucceeded,
+        actual: pack.succeeded,
+        expected: requirement.maxSucceeded,
+        reason: pack.succeeded <= requirement.maxSucceeded
+          ? `Assurance pack ${packId} has ${pack.succeeded} succeeded attacks, within the maximum ${requirement.maxSucceeded}.`
+          : `Assurance pack ${packId} has ${pack.succeeded} succeeded attacks above maximum ${requirement.maxSucceeded}.`,
+      });
       if (pack.score < requirement.minScore) {
         issues.push(`assurance pack ${packId} score ${pack.score.toFixed(1)} < ${requirement.minScore}`);
       }
@@ -494,22 +613,67 @@ export function evaluateActionPermission(input: GovernorDecisionInput): Governor
 
     const riskKey = normalizeRiskTier(input.riskTier);
     const riskDefaults = policy.riskTierDefaults[riskKey];
+    if (riskDefaults.requireSandboxForExecute) {
+      addCondition(decision, {
+        conditionId: "sandbox-attestation",
+        label: "Sandbox attestation",
+        passed: input.trustSummary.sandboxEvidence,
+        actual: input.trustSummary.sandboxEvidence,
+        expected: true,
+        reason: input.trustSummary.sandboxEvidence
+          ? `Risk tier ${input.riskTier} has sandbox attestation.`
+          : `Risk tier ${input.riskTier} requires sandbox attestation for EXECUTE.`,
+      });
+    }
     if (riskDefaults.requireSandboxForExecute && !input.trustSummary.sandboxEvidence) {
       issues.push(`risk tier ${input.riskTier} requires sandbox attestation for EXECUTE`);
       decision.requiredEvidence.push("Run sandboxed execution and capture SANDBOX_EXECUTION_ENABLED evidence.");
     }
 
+    if (rule.requireExecTicket) {
+      addCondition(decision, {
+        conditionId: "execution-ticket",
+        label: "Execution ticket",
+        passed: input.hasExecTicket === true,
+        actual: input.hasExecTicket === true,
+        expected: true,
+        reason: input.hasExecTicket
+          ? "A caller-declared execution ticket is present."
+          : "An execution ticket is required but was not provided.",
+      });
+    }
     if (rule.requireExecTicket && !input.hasExecTicket) {
       issues.push("execution ticket required but not provided");
       decision.requiredApprovals.push("Owner-issued EXEC ticket (amc ticket issue ...) is required.");
     }
 
     if (input.workOrder) {
-      if (!input.workOrder.allowedActionClasses.includes(input.actionClass)) {
+      const allowedByWorkOrder = input.workOrder.allowedActionClasses.includes(input.actionClass);
+      addCondition(decision, {
+        conditionId: "work-order-action-class",
+        label: "Work-order action scope",
+        passed: allowedByWorkOrder,
+        actual: allowedByWorkOrder,
+        expected: true,
+        reason: allowedByWorkOrder
+          ? `Work order ${input.workOrder.workOrderId} permits ${input.actionClass}.`
+          : `Work order ${input.workOrder.workOrderId} does not allow action ${input.actionClass}.`,
+      });
+      if (!allowedByWorkOrder) {
         issues.push(`work order ${input.workOrder.workOrderId} does not allow action ${input.actionClass}`);
       }
     }
 
+    addCondition(decision, {
+      conditionId: "action-policy-execute",
+      label: "Action rule permits EXECUTE",
+      passed: rule.allowExecute,
+      actual: rule.allowExecute,
+      expected: true,
+      reason: rule.allowExecute
+        ? `${input.actionClass} is policy-authorized for EXECUTE when all gates pass.`
+        : `${input.actionClass} is policy-defined as simulate-only unless owner overrides.`,
+    });
     if (!rule.allowExecute) {
       issues.push(`${input.actionClass} is policy-defined as simulate-only unless owner overrides`);
       if (!rule.requireExecTicket) {

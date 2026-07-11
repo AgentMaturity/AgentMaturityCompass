@@ -132,7 +132,7 @@ AMC must not import these files as executable policy. A future AEP lane should:
 | 5 | Publish adapter capability receipts | Adapter registry, Passport | Shipped in AMC-1465; every built-in declares events, controls, lossiness, version source, activation conditions, and verification evidence in the authoritative registry, while signed receipts separate declared from effective state and plugins fail closed |
 | 6 | Correlate hook action lifecycle end to end | Runtime runs, episodes, lifecycle graph | Shipped in AMC-1466; requested, signed decision, and completed or failed receipts share one stable action ID, terminal ambiguity and impossible lifecycles fail closed, and no second event store was added |
 | 7 | Build one control projection | Existing policies, Runtime Firewall, approvals | Shipped in AMC-1469; one read-only Scope / When / Then / Status projection verifies existing signed modules, exposes catalog-only gaps, and fails closed without a second policy engine |
-| 8 | Add control simulation with explanation | Policy decision receipts | Same evaluator as runtime, no separate demo logic, exact matched condition shown |
+| 8 | Add control simulation with explanation | Policy decision receipts | Shipped in AMC-1470; Runtime Firewall, Action Policy, and Approval Policy simulations use their production evaluators, expose exact matched rules and structured conditions, fail closed on untrusted state, and create no receipt or proof |
 | 9 | Add approval delivery service | Approval store, leases, quorum | Signed request, expiry, deny by default, push payload contains no secret data |
 | 10 | Make onboarding outcome based | Quickstart, connect wizard | User sees connected agent, first observed action, first decision, and first proof |
 

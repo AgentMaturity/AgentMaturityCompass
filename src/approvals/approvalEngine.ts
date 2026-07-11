@@ -7,7 +7,12 @@ import { verifyBudgetsConfigSignature } from "../budgets/budgets.js";
 import { loadWorkOrder, workOrderDigest } from "../workorders/workorderEngine.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
-import { initApprovalPolicy, loadApprovalPolicy, verifyApprovalPolicySignature } from "./approvalPolicyEngine.js";
+import {
+  evaluateApprovalRequestPolicy,
+  initApprovalPolicy,
+  loadApprovalPolicy,
+  verifyApprovalPolicySignature,
+} from "./approvalPolicyEngine.js";
 import {
   approvalRequestSchema,
   cancelApprovalRequest,
@@ -148,10 +153,16 @@ export function createApprovalForIntent(input: ApprovalRequestInput): {
     throw new Error(`approval policy signature invalid: ${policySig.reason ?? "unknown"}`);
   }
   const policy = loadApprovalPolicy(input.workspace);
-  const rule = policy.approvalPolicy.actionClasses[input.actionClass];
-  if (!rule) {
-    throw new Error(`approval policy missing action class rule: ${input.actionClass}`);
+  const evaluation = evaluateApprovalRequestPolicy({
+    actionClass: input.actionClass,
+    policy,
+    policySignatureValid: policySig.valid,
+    policySignatureReason: policySig.reason,
+  });
+  if (!evaluation.allowed || !evaluation.rule) {
+    throw new Error(evaluation.reasons[0] ?? `approval policy missing action class rule: ${input.actionClass}`);
   }
+  const rule = evaluation.rule;
   const created = createApprovalRequestRecord({
     workspace: input.workspace,
     agentId: input.agentId,

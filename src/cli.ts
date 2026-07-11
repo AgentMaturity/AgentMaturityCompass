@@ -699,6 +699,7 @@ import { registerWatchCommands } from "./cli-watch-commands.js";
 import { registerLateStageCliCommands } from "./cli-late-stage-commands.js";
 import { registerDomainProductCliCommands } from "./cli-domain-product-commands.js";
 import { registerGuardrailControlCommands } from "./enforce/guardrailCli.js";
+import { registerControlInspectionCommands } from "./enforce/controlInspectionCli.js";
 import {
   promptInitCli,
   promptPackBuildCli,
@@ -7505,17 +7506,7 @@ admin
     }
   });
 
-policy
-  .command("controls")
-  .description("Show one verified Scope / When / Then projection of existing controls")
-  .option("--json", "Output as JSON")
-  .action(async (opts: { json?: boolean }) => {
-    const { buildControlProjection, renderControlProjectionText } = await import("./enforce/controlProjection.js");
-    const projection = buildControlProjection(process.cwd());
-    if (opts.json) console.log(JSON.stringify(projection, null, 2));
-    else process.stdout.write(renderControlProjectionText(projection));
-    if (projection.status === "fail_closed") process.exitCode = 2;
-  });
+registerControlInspectionCommands(policy);
 
 policyAction
   .command("init")

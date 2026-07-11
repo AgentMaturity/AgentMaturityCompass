@@ -6,7 +6,7 @@
 
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import type { ComplianceFramework } from '../compliance/frameworks.js';
-import { bodyJson, apiSuccess, apiError, pathParam, queryParam } from './apiHelpers.js';
+import { bodyJson, bodyJsonSchema, apiSuccess, apiError, isRequestBodyError, pathParam, queryParam } from './apiHelpers.js';
 
 export async function handleComplianceRoute(
   pathname: string,
@@ -156,6 +156,23 @@ export async function handleComplianceRoute(
 
   // ── Policy routes (/api/v1/policy/*) ───────────────────────────
   if (pathname.startsWith('/api/v1/policy')) {
+    // POST /api/v1/policy/simulate — run an existing control evaluator without recording
+    if (pathname === '/api/v1/policy/simulate' && method === 'POST') {
+      try {
+        const simulation = await import('../enforce/controlSimulation.js');
+        const body = await bodyJsonSchema(req, simulation.controlSimulationRequestSchema);
+        apiSuccess(res, simulation.simulateControlDecision({ workspace, ...body }));
+      } catch (err) {
+        const invalidInput = isRequestBodyError(err) || (err instanceof Error && err.name === 'ControlSimulationInputError');
+        apiError(
+          res,
+          invalidInput ? 400 : 500,
+          err instanceof Error ? err.message : invalidInput ? 'Invalid control simulation request' : 'Control simulation failed',
+        );
+      }
+      return true;
+    }
+
     // GET /api/v1/policy/controls — project existing signed controls without mutation
     if (pathname === '/api/v1/policy/controls' && method === 'GET') {
       try {

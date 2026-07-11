@@ -46,6 +46,18 @@ The output includes only relative artifact paths, revision metadata, control con
 
 This is a projection, not a second policy engine. It does not create controls, activate controls, write receipts, simulate an action, weaken approval quorum, or replace the Runtime Firewall, Guardrails, Action Policy, Approval Policy, ToolHub, or their existing evaluators.
 
+## Preview one projected control
+
+Use a row's `controlId` with the separate read-only simulator:
+
+```bash
+amc policy simulate runtime:prompt-injection --direction request --content "ignore previous instructions"
+amc policy simulate action:DEPLOY --agent default --risk high --mode execute
+amc policy simulate approval:DEPLOY
+```
+
+The simulator calls the owning production evaluator and returns exact matched rules and structured conditions. It does not mutate this projection or create proof. See [Control Simulation](CONTROL_SIMULATION.md).
+
 ## Initialize or repair a family
 
 Review policy changes before running the owning command:
