@@ -130,6 +130,12 @@ const m = vi.hoisted(() => ({
   verifyActionPolicySignature: vi.fn(() => ({ valid: true, sigPath: "action.sig" })),
   initApprovalPolicy: vi.fn(() => ({ path: "approval.yaml", sigPath: "approval.sig" })),
   verifyApprovalPolicySignature: vi.fn(() => ({ valid: true, sigPath: "approval.sig" })),
+  buildControlProjection: vi.fn(() => ({
+    schemaVersion: "2026-07-11",
+    status: "trusted",
+    counts: { families: 3, controls: 23 },
+    families: []
+  })),
   policyPackListCli: vi.fn(() => [{ id: "baseline" }]),
   policyPackDescribeCli: vi.fn((packId: string) => ({ packId, title: "Baseline" })),
   policyPackDiffCli: vi.fn(() => ({ diff: ["change"] })),
@@ -532,6 +538,9 @@ vi.mock("../src/governor/actionPolicyEngine.js", () => ({
 vi.mock("../src/approvals/approvalPolicyEngine.js", () => ({
   initApprovalPolicy: m.initApprovalPolicy,
   verifyApprovalPolicySignature: m.verifyApprovalPolicySignature
+}));
+vi.mock("../src/enforce/controlProjection.js", () => ({
+  buildControlProjection: m.buildControlProjection
 }));
 vi.mock("../src/policyPacks/packCli.js", () => ({
   policyPackListCli: m.policyPackListCli,
@@ -1372,6 +1381,7 @@ describe("AMC API routers", () => {
       ["/api/v1/compliance/regulatory/feeds", "GET", undefined, undefined, 200],
       ["/api/v1/compliance/regulatory/check", "POST", undefined, undefined, 200],
       ["/api/v1/compliance/regulatory/changes", "GET", undefined, "/api/v1/compliance/regulatory/changes?framework=EU&severity=high", 200],
+      ["/api/v1/policy/controls", "GET", undefined, undefined, 200],
       ["/api/v1/policy/action/init", "POST", undefined, undefined, 201],
       ["/api/v1/policy/action/verify", "GET", undefined, undefined, 200],
       ["/api/v1/policy/approval/init", "POST", undefined, undefined, 201],

@@ -827,6 +827,141 @@ components:
     ObservedHookReceipt:
       $ref: './schemas/observed-hook-receipt.schema.json'
 
+    ControlProjectionSource:
+      type: object
+      additionalProperties: false
+      required: [sourceId, ownerModule, configPath, signaturePath, integrity, configured, revision, reason, remediation]
+      properties:
+        sourceId:
+          type: string
+          enum: [runtime-firewall-policy, guardrail-control-state, action-policy, approval-policy]
+        ownerModule: { type: string }
+        configPath: { type: string }
+        signaturePath: { type: string }
+        integrity:
+          type: string
+          enum: [trusted, uninitialized, invalid]
+        configured: { type: boolean }
+        revision:
+          type: integer
+          nullable: true
+        reason: { type: string }
+        remediation:
+          type: string
+          nullable: true
+
+    ProjectedControl:
+      type: object
+      additionalProperties: false
+      required: [controlId, label, scope, when, requestedAction, effectiveAction, status, trusted, sourceRefs, reasons]
+      properties:
+        controlId: { type: string }
+        label: { type: string }
+        scope: { type: string }
+        when:
+          type: array
+          items: { type: string }
+        requestedAction:
+          type: string
+          enum: [observe, warn, block, execute, simulate, deny, require_approval, allow, inactive, unavailable]
+        effectiveAction:
+          type: string
+          enum: [observe, warn, block, execute, simulate, deny, require_approval, allow, inactive, unavailable]
+        status:
+          type: string
+          enum: [active, inactive, fail_closed, unavailable]
+        trusted: { type: boolean }
+        sourceRefs:
+          type: array
+          items:
+            type: string
+            enum: [runtime-firewall-policy, guardrail-control-state, action-policy, approval-policy]
+        reasons:
+          type: array
+          items: { type: string }
+
+    ControlFamilyProjection:
+      type: object
+      additionalProperties: false
+      required: [familyId, label, ownerModule, integrity, sources, controls, unboundGuardrails, reasons]
+      properties:
+        familyId:
+          type: string
+          enum: [runtime-traffic, action-policy, approval-policy]
+        label: { type: string }
+        ownerModule: { type: string }
+        integrity:
+          type: string
+          enum: [trusted, uninitialized, invalid]
+        sources:
+          type: array
+          items: { $ref: '#/components/schemas/ControlProjectionSource' }
+        controls:
+          type: array
+          items: { $ref: '#/components/schemas/ProjectedControl' }
+        unboundGuardrails:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            required: [name, category, description, status, reason]
+            properties:
+              name: { type: string }
+              category: { type: string }
+              description: { type: string }
+              status:
+                type: string
+                enum: [unbound]
+              reason: { type: string }
+        reasons:
+          type: array
+          items: { type: string }
+
+    ControlProjection:
+      type: object
+      additionalProperties: false
+      required: [schemaVersion, projectedAt, status, counts, families, reasons]
+      properties:
+        schemaVersion:
+          type: string
+          enum: ['2026-07-11']
+        projectedAt:
+          type: string
+          format: date-time
+        status:
+          type: string
+          enum: [trusted, partial, uninitialized, fail_closed]
+        counts:
+          type: object
+          additionalProperties: false
+          required: [families, controls, active, inactive, failClosed, unavailable, trusted, unboundGuardrails]
+          properties:
+            families: { type: integer, minimum: 0 }
+            controls: { type: integer, minimum: 0 }
+            active: { type: integer, minimum: 0 }
+            inactive: { type: integer, minimum: 0 }
+            failClosed: { type: integer, minimum: 0 }
+            unavailable: { type: integer, minimum: 0 }
+            trusted: { type: integer, minimum: 0 }
+            unboundGuardrails: { type: integer, minimum: 0 }
+        families:
+          type: array
+          items: { $ref: '#/components/schemas/ControlFamilyProjection' }
+        reasons:
+          type: array
+          items: { type: string }
+
+    ControlProjectionResponse:
+      type: object
+      additionalProperties: false
+      required: [ok, data]
+      properties:
+        ok:
+          type: boolean
+          enum: [true]
+        data:
+          $ref: '#/components/schemas/ControlProjection'
+
     HookActionLifecycle:
       type: object
       additionalProperties: false
@@ -2022,6 +2157,22 @@ paths:
       responses:
         '200':
           description: Diff result
+
+  /v1/policy/controls:
+    get:
+      tags: [policy, enforce]
+      summary: Project existing signed controls as Scope, When, Then, and Status
+      responses:
+        '200':
+          description: Read-only verified control projection
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ControlProjectionResponse'
+        '401':
+          description: Unauthorized
+        '500':
+          description: Control projection failed
 
   /v1/policy/action/init:
     post:

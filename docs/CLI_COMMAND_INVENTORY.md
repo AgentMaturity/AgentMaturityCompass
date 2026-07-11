@@ -816,6 +816,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc policy approval` | Signed dual-control approval policy | - | - |
 | `amc policy approval init` | Create and sign .amc/approval-policy.yaml | - | - |
 | `amc policy approval verify` | Verify approval-policy signature | - | - |
+| `amc policy controls` | Show one verified Scope / When / Then projection of existing controls | `--json` | - |
 | `amc policy pack` | Policy packs by archetype and risk tier | - | - |
 | `amc policy pack apply` | Apply policy pack and sign updated configs/targets | `--agent <agentId>` | - |
 | `amc policy pack describe` | Describe policy pack contents | - | - |

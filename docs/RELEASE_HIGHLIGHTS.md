@@ -14,7 +14,7 @@ This page exists to show momentum without making users read the entire changelog
 - Evidence-readiness contract across CLI, Studio, lifecycle artifacts, report sharing, and executive briefs: `VALID` proves artifact integrity, while `READY` governs claim eligibility
 - Unified AMC visual identity across the website, Studio, desktop launchers, Docs, CLI output, and GitHub README
 - 244-question default diagnostic bank with a 264-question lifecycle-expanded option
-- 1,151 generated CLI command paths in the public command inventory
+- 1,152 generated CLI command paths in the public command inventory
 - Domain Proof Lane with `amc proof check`, `amcproof` artifacts, and fail-closed correctness status
 - Watch/Fleet evidence upgrades: session correlation, risk/cost/latency SLOs, incident-to-regression closure, fleet overview, and trust graph export
 - 142 assurance packs, 14 adapters, 41 Industry Packs, API/OpenAPI docs, and Studio/browser/docs paths refreshed around the same eight AMC surfaces

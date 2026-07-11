@@ -156,6 +156,17 @@ export async function handleComplianceRoute(
 
   // ── Policy routes (/api/v1/policy/*) ───────────────────────────
   if (pathname.startsWith('/api/v1/policy')) {
+    // GET /api/v1/policy/controls — project existing signed controls without mutation
+    if (pathname === '/api/v1/policy/controls' && method === 'GET') {
+      try {
+        const { buildControlProjection } = await import('../enforce/controlProjection.js');
+        apiSuccess(res, buildControlProjection(workspace));
+      } catch (err) {
+        apiError(res, 500, err instanceof Error ? err.message : 'Control projection failed');
+      }
+      return true;
+    }
+
     // POST /api/v1/policy/action/init — create and sign action policy
     if (pathname === '/api/v1/policy/action/init' && method === 'POST') {
       try {

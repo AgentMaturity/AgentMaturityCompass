@@ -229,25 +229,37 @@ export function recoverGuardrailControlState(workspace: string): GuardrailContro
   return withGuardrailControlLock(workspace, () => readGuardrailControlStateUnlocked(workspace, true));
 }
 
+function invalidInspection(workspace: string, error: unknown): GuardrailControlSnapshot {
+  const path = guardrailControlStatePath(workspace);
+  return {
+    integrity: "invalid",
+    initialized: pathExists(path)
+      || pathExists(artifactSigPath(path))
+      || pathExists(guardrailControlHeadsDir(workspace))
+      || pathExists(controlCheckpointDir(workspace, "guardrail-control")),
+    state: null,
+    path,
+    signaturePath: artifactSigPath(path),
+    headRevision: null,
+    headPath: null,
+    checkpointPath: null,
+    reason: error instanceof Error ? error.message : String(error)
+  };
+}
+
 export function inspectGuardrailControlState(workspace: string): GuardrailControlSnapshot {
   try {
     return readGuardrailControlState(workspace);
   } catch (error) {
-    const path = guardrailControlStatePath(workspace);
-    return {
-      integrity: "invalid",
-      initialized: pathExists(path)
-        || pathExists(artifactSigPath(path))
-        || pathExists(guardrailControlHeadsDir(workspace))
-        || pathExists(controlCheckpointDir(workspace, "guardrail-control")),
-      state: null,
-      path,
-      signaturePath: artifactSigPath(path),
-      headRevision: null,
-      headPath: null,
-      checkpointPath: null,
-      reason: error instanceof Error ? error.message : String(error)
-    };
+    return invalidInspection(workspace, error);
+  }
+}
+
+export function inspectGuardrailControlStateReadOnly(workspace: string): GuardrailControlSnapshot {
+  try {
+    return readGuardrailControlStateUnlocked(workspace);
+  } catch (error) {
+    return invalidInspection(workspace, error);
   }
 }
 

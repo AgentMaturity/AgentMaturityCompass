@@ -524,7 +524,7 @@ The AI evaluation, security, and governance landscape has exploded into a fragme
 | **Multi-Regulation Packs** | ⚠️ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅✅ | ❌ | ❌ |
 | **Open Source Core** | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ | ❌ | ❌ | ⚠️ |
 | **Docker/Self-Host** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ |
-| **CLI (1,151 command paths)** | ✅ | ✅ | ✅ | ⚠️ | ❌ | ✅ | ❌ | ❌ | ❌ |
+| **CLI (1,152 command paths)** | ✅ | ✅ | ✅ | ⚠️ | ❌ | ✅ | ❌ | ❌ | ❌ |
 
 Legend: ✅ = Has feature | ✅✅ = Industry-leading | ⚠️ = Partial/basic | ❌ = Missing
 
@@ -580,7 +580,7 @@ These are our moats. No competitor replicates these:
 | **Deep diagnostic coverage + broad assurance library** | Deepest assessment library in the market by far. Orders of magnitude more than any competitor. | Promptfoo has ~50 vulnerability types. DeepEval has ~50 metrics. AMC goes far beyond point-in-time vuln checks. |
 | **14 framework adapters** | Direct integration with actual agent frameworks (LangChain, CrewAI, AutoGen, etc.) for behavior capture. | Promptfoo connects to apps via API. Nobody adapts to the agent framework itself. |
 | **Gateway behavioral capture** | Sits between agent and LLM, captures real behavior without agent cooperation. | LangSmith requires SDK integration. AMC gateway is transparent. |
-| **Developer-first + governance depth** | CLI (1,151 command paths) + REST API + Docker + Browser playground. Both developer and governance buyer. | Credo AI is enterprise-only. Promptfoo/DeepEval are dev-only. AMC bridges both. |
+| **Developer-first + governance depth** | CLI (1,152 command paths) + REST API + Docker + Browser playground. Both developer and governance buyer. | Credo AI is enterprise-only. Promptfoo/DeepEval are dev-only. AMC bridges both. |
 
 ### Strategic Positioning Summary
 

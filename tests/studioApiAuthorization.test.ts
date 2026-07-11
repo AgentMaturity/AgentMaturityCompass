@@ -52,6 +52,7 @@ async function requestedRoles(pathname: string, method: string): Promise<string[
 describe("Studio /api/v1 least-privilege authorization", () => {
   test("keeps ordinary reads and explicitly side-effect-free checks available to human roles", async () => {
     await expect(requestedRoles("/api/v1/score/status", "GET")).resolves.toEqual(HUMAN_ROLES);
+    await expect(requestedRoles("/api/v1/policy/controls", "GET")).resolves.toEqual(HUMAN_ROLES);
     await expect(requestedRoles("/api/v1/proof/check", "POST")).resolves.toEqual(HUMAN_ROLES);
     await expect(requestedRoles("/api/v1/vault/redact", "POST")).resolves.toEqual(HUMAN_ROLES);
   });

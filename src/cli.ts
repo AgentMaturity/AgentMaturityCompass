@@ -7505,6 +7505,18 @@ admin
     }
   });
 
+policy
+  .command("controls")
+  .description("Show one verified Scope / When / Then projection of existing controls")
+  .option("--json", "Output as JSON")
+  .action(async (opts: { json?: boolean }) => {
+    const { buildControlProjection, renderControlProjectionText } = await import("./enforce/controlProjection.js");
+    const projection = buildControlProjection(process.cwd());
+    if (opts.json) console.log(JSON.stringify(projection, null, 2));
+    else process.stdout.write(renderControlProjectionText(projection));
+    if (projection.status === "fail_closed") process.exitCode = 2;
+  });
+
 policyAction
   .command("init")
   .description("Create and sign .amc/action-policy.yaml")
