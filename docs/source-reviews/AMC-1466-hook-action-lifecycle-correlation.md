@@ -5,7 +5,7 @@
 - AMC surfaces requested: Watch, Enforce, Vault, Passport, CLI, API, Docs
 - Sources reviewed: Agent Event Protocol draft; Claude Code hooks; Gemini CLI hooks; Agent Control
 - Retrieval: primary repositories and documentation reviewed 2026-07-11
-- Status: Implemented; local release verification passed, publication verification pending
+- Status: Done; implementation, release, publication, and production verification passed
 
 ## Relevance decision
 
@@ -54,5 +54,9 @@ No second event store, lifecycle graph, policy engine, daemon, queue, SDK, provi
 - Desktop packaging and checksum verification passed for macOS universal, Windows x64, and Linux x64.
 - All 10 clean-install personas passed at 10/10.
 - Prepack, SBOM, licenses, package scan, release pack, release verification, OpenAPI parse, command inventory, 1,484-file Docs drift, architecture boundaries, and runtime dependency audit with 0 vulnerabilities passed.
-- Consolidated release gate status: passed; receipt `tmp/release-gate/amc-1466-final.json`. Live deploy health was intentionally deferred until the commit is pushed and Pages publishes the exact head.
-- Remote workflow and production verification remain pending before Linear Done.
+- Consolidated full release gate passed; receipt `tmp/release-gate/amc-1466-final.json` includes the full 1,063-file / 8,393-test suite and all ten install personas.
+- Feature commit `1e958d615723e3b8f8010ed19706da8c088bc726` (`Correlate provider hook action lifecycles`) was pushed to `origin/main`.
+- Exact-head GitHub Actions passed: [CI 29145382683](https://github.com/AgentMaturity/AgentMaturityCompass/actions/runs/29145382683), [npm validation 29145382700](https://github.com/AgentMaturity/AgentMaturityCompass/actions/runs/29145382700), [Docker Runner Image 29145382714](https://github.com/AgentMaturity/AgentMaturityCompass/actions/runs/29145382714), and [Pages 29145382716](https://github.com/AgentMaturity/AgentMaturityCompass/actions/runs/29145382716). CI passed Node 20 and 22 build/test/release-smoke matrices, local E2E smoke, Helm, security, and Docker smoke. npm validation passed typecheck, the full suite, build, prepack guardrails, and release preflight; registry publication was intentionally skipped because `NPM_TOKEN` is not configured.
+- Production verification passed at `https://agentmaturity.co/`: apex returned HTTP 200; `www` redirected to the apex; the certificate covered both names and was valid from 2026-06-26 through 2026-09-24; the homepage published 1,151 CLI paths and 8,393 tests; lifecycle CLI/docs and both OpenAPI routes were present.
+- The post-deploy quick release gate passed live HTTPS health with HTTP 200; receipt `tmp/release-gate/amc-1466-live.json`, created `2026-07-11T08:07:47.351Z`. Its full-suite and install-persona steps were intentionally skipped because the non-quick release gate had already passed both.
+- Desktop and 390 px mobile browser verification found no horizontal overflow, overlap, warning, or error on the homepage and adapter documentation. Visual receipts: `tmp/visual-proof/amc-1466-home-desktop.png`, `tmp/visual-proof/amc-1466-home-mobile.png`, `tmp/visual-proof/amc-1466-adapters-desktop.png`, and `tmp/visual-proof/amc-1466-adapters-mobile.png`.
