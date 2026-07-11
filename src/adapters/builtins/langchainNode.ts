@@ -1,4 +1,5 @@
 import type { AdapterDefinition } from "../adapterTypes.js";
+import { builtInAdapterCapabilities } from "../adapterCapabilities.js";
 
 export const langchainNodeAdapter: AdapterDefinition = {
   id: "langchain-node",
@@ -31,6 +32,9 @@ export const langchainNodeAdapter: AdapterDefinition = {
     executable: "node",
     args: [".amc/adapters-samples/langchain-node/run.mjs"],
     supportsStdin: false
-  }
+  },
+  capabilities: builtInAdapterCapabilities({
+    versionSource: "host_runtime",
+    evidenceRefs: ["docs/adapters/langchain-node.md"]
+  })
 };
-

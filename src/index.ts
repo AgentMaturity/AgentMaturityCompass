@@ -444,12 +444,27 @@ export {
   adaptersListCli,
   adaptersDetectCli,
   adaptersConfigureCli,
+  adaptersCapabilitiesCli,
   adaptersRunCli,
   adaptersEnvCli,
   adaptersInitProjectCli
 } from "./adapters/adapterCli.js";
 export { runAdapterCommand, initAdapterProjectSample } from "./adapters/adapterRunner.js";
 export { listBuiltInAdapters, getBuiltInAdapter } from "./adapters/registry.js";
+export {
+  adapterCapabilityActivationSchema,
+  adapterCapabilityControlIdSchema,
+  adapterCapabilityDeclarationSchema,
+  adapterCapabilityEventIdSchema,
+  adapterVersionSourceSchema
+} from "./adapters/adapterTypes.js";
+export type {
+  AdapterCapabilityActivation,
+  AdapterCapabilityControlId,
+  AdapterCapabilityDeclaration,
+  AdapterCapabilityEventId,
+  AdapterVersionSource
+} from "./adapters/adapterTypes.js";
 export { loadAdaptersConfig, verifyAdaptersConfigSignature } from "./adapters/adapterConfigStore.js";
 export {
   CLAUDE_CODE_HOOK_SOURCE,
@@ -2032,6 +2047,23 @@ export type {
   InteroperableReceiptSubject,
   InteroperableReceiptVerification,
 } from "./passport/receiptInterchange.js";
+
+// ── Adapter Capability Receipts (portable signed adapter truth) ─
+export {
+  ADAPTER_CAPABILITY_RECEIPT_VERSION,
+  adapterCapabilityInspectionSchema,
+  adapterCapabilityReceiptSchema,
+  issueAdapterCapabilityReceipt,
+  trustedAdapterCapabilityReceiptKeys,
+  verifyAdapterCapabilityReceipt
+} from "./passport/adapterCapabilityReceipt.js";
+export type {
+  AdapterCapabilityInspection,
+  AdapterCapabilityReceipt,
+  AdapterCapabilityVerification,
+  IssueAdapterCapabilityReceiptInput,
+  VerifyAdapterCapabilityReceiptOptions
+} from "./passport/adapterCapabilityReceipt.js";
 
 // ── Passport Schema Compatibility (versioned import/export matrix) ─
 export {

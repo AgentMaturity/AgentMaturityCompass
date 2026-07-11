@@ -281,10 +281,9 @@ describe("R3-05 Adapter Standardization", () => {
     }
   });
 
-  test("native adapters have highest coverage", () => {
+  test("native tier is reserved for package-probed adapters", () => {
     const natives = getAdaptersByTier("native");
-    expect(natives.length).toBeGreaterThanOrEqual(3);
-    for (const n of natives) expect(n.coverageScore).toBeGreaterThanOrEqual(85);
+    expect(natives.map((row) => row.adapterId)).toEqual(["python-amc-sdk"]);
   });
 
   test("CLI adapters have lower coverage", () => {
@@ -293,10 +292,10 @@ describe("R3-05 Adapter Standardization", () => {
     for (const c of clis) expect(c.coverageScore).toBeLessThanOrEqual(70);
   });
 
-  test("native adapters meet minimum spec", () => {
-    for (const p of getAdaptersByTier("native")) {
-      expect(meetsMinimumSpec(p).meets).toBe(true);
-    }
+  test("minimum spec reports missing capability proof instead of inferring it", () => {
+    const result = meetsMinimumSpec(getAdapterProfile("python-amc-sdk")!);
+    expect(result.meets).toBe(false);
+    expect(result.missingCapabilities).toContain("toolCallCapture");
   });
 
   test("score adjustment doesn't penalize CLI", () => {
@@ -315,7 +314,8 @@ describe("R3-05 Adapter Standardization", () => {
   test("getAdapterProfile returns correct profile", () => {
     const p = getAdapterProfile("langchainNode");
     expect(p).toBeDefined();
-    expect(p!.tier).toBe("native");
+    expect(p!.adapterId).toBe("langchain-node");
+    expect(p!.tier).toBe("bridge");
     expect(p!.framework).toContain("LangChain");
   });
 

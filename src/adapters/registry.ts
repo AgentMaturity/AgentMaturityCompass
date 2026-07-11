@@ -42,7 +42,14 @@ function cloneAdapter(row: AdapterDefinition): AdapterDefinition {
       proxyEnv: { ...row.envStrategy.proxyEnv }
     },
     commandTemplate: { ...row.commandTemplate },
-    detection: { ...row.detection }
+    detection: { ...row.detection },
+    capabilities: {
+      ...row.capabilities,
+      events: row.capabilities.events.map((entry) => ({ ...entry, activeWhen: [...entry.activeWhen] })),
+      controls: row.capabilities.controls.map((entry) => ({ ...entry, activeWhen: [...entry.activeWhen] })),
+      lossiness: { ...row.capabilities.lossiness, omitted: [...row.capabilities.lossiness.omitted] },
+      verification: { ...row.capabilities.verification, evidenceRefs: [...row.capabilities.verification.evidenceRefs] }
+    }
   };
 }
 

@@ -67,6 +67,41 @@ export async function handleAdaptersRoute(
     return true;
   }
 
+  // POST /api/v1/adapters/capability-receipts — issue a signed Passport adapter receipt
+  if (pathname === '/api/v1/adapters/capability-receipts' && method === 'POST') {
+    try {
+      const body = await bodyJson<unknown>(req);
+      if (!body || typeof body !== 'object' || Array.isArray(body)) {
+        apiError(res, 400, 'Request body must be an object');
+        return true;
+      }
+      const record = body as Record<string, unknown>;
+      if (Object.keys(record).some((key) => key !== 'agentId' && key !== 'adapterId')) {
+        apiError(res, 400, 'Unknown request field');
+        return true;
+      }
+      if (typeof record.adapterId !== 'string' || record.adapterId.trim().length === 0) {
+        apiError(res, 400, 'Required: adapterId');
+        return true;
+      }
+      if (record.agentId !== undefined && (typeof record.agentId !== 'string' || record.agentId.trim().length === 0)) {
+        apiError(res, 400, 'agentId must be a non-empty string');
+        return true;
+      }
+      const { adaptersCapabilitiesCli } = await import('../adapters/adapterCli.js');
+      const receipt = adaptersCapabilitiesCli({
+        workspace,
+        agentId: record.agentId as string | undefined,
+        adapterId: record.adapterId,
+      });
+      apiSuccess(res, { receipt }, 201);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Adapter capability receipt failed';
+      apiError(res, message.startsWith('Unknown adapter:') ? 404 : 500, message);
+    }
+    return true;
+  }
+
   // POST /api/v1/adapters/configure — set adapter profile for an agent
   if (pathname === '/api/v1/adapters/configure' && method === 'POST') {
     try {

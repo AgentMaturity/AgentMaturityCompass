@@ -1,4 +1,5 @@
 import type { AdapterDefinition } from "../adapterTypes.js";
+import { builtInAdapterCapabilities } from "../adapterCapabilities.js";
 
 export const openhandsCliAdapter: AdapterDefinition = {
   id: "openhands-cli",
@@ -31,6 +32,9 @@ export const openhandsCliAdapter: AdapterDefinition = {
     executable: "openhands",
     args: [],
     supportsStdin: true
-  }
+  },
+  capabilities: builtInAdapterCapabilities({
+    versionSource: "adapter_binary",
+    evidenceRefs: ["docs/adapters/openhands.md"]
+  })
 };
-

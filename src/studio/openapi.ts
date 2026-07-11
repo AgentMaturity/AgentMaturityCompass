@@ -269,6 +269,35 @@ function studioEndpoints(): Record<string, Record<string, OpenApiOperation>> {
         responses: { "200": okJson("Decision recorded", "#/components/schemas/DecisionResponse") },
       },
     },
+    "/api/v1/adapters/capability-receipts": {
+      post: {
+        summary: "Issue a signed adapter capability receipt",
+        tags: ["Studio", "Adapters", "Passport"],
+        security: [{ adminToken: [] }, { sessionCookie: [] }],
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                additionalProperties: false,
+                properties: {
+                  agentId: { type: "string" },
+                  adapterId: { type: "string" },
+                },
+                required: ["adapterId"],
+              },
+            },
+          },
+        },
+        responses: {
+          "201": okJson("Signed declaration, effective-state, lossiness, and verification receipt", "#/components/schemas/AdapterCapabilityReceiptResponse"),
+          "400": errJson("Invalid adapter receipt request"),
+          "401": errJson("Unauthorized"),
+          "404": errJson("Adapter not found"),
+        },
+      },
+    },
     "/api/plugins": {
       get: {
         summary: "List installed plugins",
@@ -338,6 +367,56 @@ function studioSchemas(): Record<string, unknown> {
         },
       },
       required: ["agentId"],
+    },
+    AdapterCapabilityReceiptResponse: {
+      type: "object",
+      additionalProperties: false,
+      properties: {
+        ok: { type: "boolean", const: true },
+        data: {
+          type: "object",
+          additionalProperties: false,
+          properties: {
+            receipt: {
+              type: "object",
+              additionalProperties: false,
+              properties: {
+                receiptVersion: { type: "string", const: "amc.adapter-capability-receipt.v1" },
+                receiptId: { type: "string" },
+                issuedAt: { type: "string", format: "date-time" },
+                subject: { type: "object" },
+                adapter: { type: "object" },
+                inspection: { type: "object" },
+                effective: { type: "object" },
+                verification: {
+                  type: "object",
+                  properties: {
+                    status: { type: "string", enum: ["verified", "partial", "fail_closed"] },
+                    reasons: { type: "array", items: { type: "string" } },
+                  },
+                  required: ["status", "reasons"],
+                },
+                receiptHash: { type: "string", pattern: "^[a-f0-9]{64}$" },
+                signature: { type: "object" },
+              },
+              required: [
+                "receiptVersion",
+                "receiptId",
+                "issuedAt",
+                "subject",
+                "adapter",
+                "inspection",
+                "effective",
+                "verification",
+                "receiptHash",
+                "signature",
+              ],
+            },
+          },
+          required: ["receipt"],
+        },
+      },
+      required: ["ok", "data"],
     },
     EvidenceReadiness: {
       type: "object",

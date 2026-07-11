@@ -76,6 +76,7 @@ describe("Studio /api/v1 least-privilege authorization", () => {
   test("retains auditor verification and attestation without granting broad mutation access", async () => {
     await expect(requestedRoles("/api/v1/tickets/verify", "POST")).resolves.toEqual(["OPERATOR", "AUDITOR", "OWNER"]);
     await expect(requestedRoles("/api/v1/evidence/attest", "POST")).resolves.toEqual(["AUDITOR", "OWNER"]);
+    await expect(requestedRoles("/api/v1/adapters/capability-receipts", "POST")).resolves.toEqual(["AUDITOR", "OWNER"]);
   });
 
   test("fails closed for unsupported methods", async () => {

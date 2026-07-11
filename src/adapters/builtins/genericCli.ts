@@ -1,4 +1,5 @@
 import type { AdapterDefinition } from "../adapterTypes.js";
+import { builtInAdapterCapabilities } from "../adapterCapabilities.js";
 
 export const genericCliAdapter: AdapterDefinition = {
   id: "generic-cli",
@@ -42,5 +43,9 @@ export const genericCliAdapter: AdapterDefinition = {
     args: [],
     supportsStdin: true
   },
+  capabilities: builtInAdapterCapabilities({
+    versionSource: "shell_runtime",
+    evidenceRefs: ["docs/adapters/generic-cli.md"]
+  }),
   notes: "Wraps any command provided after `--`."
 };

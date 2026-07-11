@@ -14,7 +14,7 @@
   <a href="https://github.com/AgentMaturity/AgentMaturityCompass/releases"><img src="https://img.shields.io/github/v/release/AgentMaturity/AgentMaturityCompass?labelColor=0a0a0a&color=4AEF79&label=release" alt="GitHub release" /></a>
   <a href="https://github.com/AgentMaturity/AgentMaturityCompass/releases"><img src="https://img.shields.io/github/downloads/AgentMaturity/AgentMaturityCompass/total?labelColor=0a0a0a&color=4AEF79&label=downloads" alt="verified release downloads" /></a>
   <a href="https://github.com/AgentMaturity/AgentMaturityCompass/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/AgentMaturity/AgentMaturityCompass/ci.yml?branch=main&labelColor=0a0a0a&color=4AEF79&label=CI" alt="CI" /></a>
-  <a href="https://github.com/AgentMaturity/AgentMaturityCompass/actions/workflows/ci.yml"><img src="https://img.shields.io/badge/tests-8%2C366%20passing-4AEF79?labelColor=0a0a0a" alt="tests" /></a>
+  <a href="https://github.com/AgentMaturity/AgentMaturityCompass/actions/workflows/ci.yml"><img src="https://img.shields.io/badge/tests-8%2C380%20passing-4AEF79?labelColor=0a0a0a" alt="tests" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-4AEF79?labelColor=0a0a0a" alt="MIT" /></a>
 </p>
 
@@ -552,28 +552,38 @@ Result: ![AMC Score](https://img.shields.io/badge/AMC-L3_(72.5)-green)
 
 ## 14 Framework Adapters
 
-Zero code changes. One environment variable.
+Route a supported CLI or generated framework sample through AMC without replacing the agent runtime.
 
 ```bash
-amc wrap <adapter> -- <your command>
+amc adapters init
+amc adapters configure --agent my-agent --adapter generic-cli --route /openai --model gpt-4o --mode SUPERVISE
+amc adapters run --agent my-agent --adapter generic-cli -- python bot.py
 ```
 
-| Adapter | Command |
-|---------|---------|
-| LangChain | `amc wrap langchain -- python app.py` |
-| LangGraph | `amc wrap langgraph -- python graph.py` |
-| CrewAI | `amc wrap crewai -- python crew.py` |
-| AutoGen | `amc wrap autogen -- python autogen.py` |
-| OpenAI Agents SDK | `amc wrap openai-agents -- python agent.py` |
-| LlamaIndex | `amc wrap llamaindex -- python rag.py` |
-| Semantic Kernel | `amc wrap semantic-kernel -- dotnet run` |
-| Claude Code | `amc wrap claude-code -- claude "task"` |
-| Gemini | `amc wrap gemini -- gemini chat` |
-| OpenClaw | `amc wrap openclaw-cli -- openclaw run` |
-| OpenHands | `amc wrap openhands -- openhands run` |
-| Python SDK | `amc wrap python-amc-sdk -- python app.py` |
-| Generic CLI | `amc wrap generic-cli -- python bot.py` |
-| OpenAI-compatible | `amc wrap openai-compat -- node server.js` |
+| Adapter | Canonical ID | Version probe |
+|---------|--------------|---------------|
+| AutoGen | `autogen-cli` | CLI when present, otherwise host Python |
+| Claude Code | `claude-cli` | Claude binary |
+| CrewAI | `crewai-cli` | CLI when present, otherwise host Python |
+| Gemini CLI | `gemini-cli` | Gemini binary |
+| Generic CLI | `generic-cli` | Shell runtime only |
+| LangChain Node | `langchain-node` | Host Node.js only |
+| LangChain Python | `langchain-python` | Host Python only |
+| LangGraph Python | `langgraph-python` | Host Python only |
+| LlamaIndex Python | `llamaindex-python` | Host Python only |
+| OpenAI Agents SDK | `openai-agents-sdk` | Host Node.js only |
+| OpenClaw | `openclaw-cli` | OpenClaw binary |
+| OpenHands | `openhands-cli` | OpenHands binary |
+| Python AMC SDK | `python-amc-sdk` | Installed package |
+| Semantic Kernel | `semantic-kernel` | Host Node.js only |
+
+Do not treat a detected runtime as proof of event/control coverage. Issue a portable signed receipt that separates declared from currently effective capabilities and records lossiness:
+
+```bash
+amc adapters capabilities --agent my-agent --adapter claude-cli --out adapter-capabilities.json --json
+```
+
+Claude Code receipts can verify native allow/deny/ask only with a valid signed control hook. Gemini CLI receipts expose allow/deny and explicitly record that ask degrades to deny. Metadata-only plugin adapters fail closed instead of inheriting a compatibility claim.
 
 > [Full adapter docs](docs/ADAPTERS.md)
 
@@ -637,7 +647,7 @@ The full trust stack is **free and MIT licensed**. The only paid surface is Indu
 
 | Tier | What you get |
 |---|---|
-| **Free / Open Source** | Everything — Score, Shield, Enforce, Vault, Watch, Comply, Fleet, Passport, all 14 adapters, 1,149 registered CLI command paths, browser playground, CI gates |
+| **Free / Open Source** | Everything — Score, Shield, Enforce, Vault, Watch, Comply, Fleet, Passport, all 14 adapters, 1,150 registered CLI command paths, browser playground, CI gates |
 | **Industry Packs** | Everything in Free + all 41 Industry Domain Packs for `$9.99/month` |
 | **Enterprise** | Everything in Industry Packs + priority support + custom pack development + deployment assistance |
 
@@ -672,7 +682,7 @@ The full trust stack is **free and MIT licensed**. The only paid surface is Indu
 | [Community Demo Kit](docs/COMMUNITY_DEMO_KIT.md) | [Why AMC One-Pager](docs/WHY_AMC_ONE_PAGER.md) |
 | [Solo Dev Quickstart](docs/SOLO_DEV_QUICKSTART.md) | [Platform Engineer Quickstart](docs/PLATFORM_ENGINEER_QUICKSTART.md) |
 | [Security & Compliance Quickstart](docs/SECURITY_COMPLIANCE_QUICKSTART.md) | [Troubleshooting](docs/TROUBLESHOOTING.md) |
-| [CLI Reference (1,149 command paths)](docs/CLI_COMMAND_INVENTORY.md) | [Architecture](docs/ARCHITECTURE_MAP.md) |
+| [CLI Reference (1,150 command paths)](docs/CLI_COMMAND_INVENTORY.md) | [Architecture](docs/ARCHITECTURE_MAP.md) |
 | [Compatibility Matrix](docs/COMPATIBILITY_MATRIX.md) | [Starter Blueprints](docs/STARTER_BLUEPRINTS.md) |
 | [Install Packages](docs/INSTALL_PACKAGES.md) | [Support Policy](docs/SUPPORT_POLICY.md) |
 | [Release Cadence](docs/RELEASE_CADENCE.md) | [CI Templates](docs/CI_TEMPLATES.md) |
@@ -771,7 +781,7 @@ AMC is MIT licensed. We welcome contributions — especially new **assurance pac
 
 ```bash
 git clone https://github.com/AgentMaturity/AgentMaturityCompass.git
-cd AgentMaturityCompass && npm ci && npm test   # 1,057 files / 8,366 passing Vitest tests
+cd AgentMaturityCompass && npm ci && npm test   # 1,060 files / 8,380 passing Vitest tests
 ```
 
 **→ [CONTRIBUTING.md](CONTRIBUTING.md)** — includes guides for writing packs, mapping research papers, and adding adapters.
@@ -792,6 +802,6 @@ cd AgentMaturityCompass && npm ci && npm test   # 1,057 files / 8,366 passing Vi
 ---
 
 <p align="center">
-  <strong>244 default diagnostic questions + 20 lifecycle expansion questions · 142 assurance packs · 41 domain packs · 14 adapters · 1,149 CLI command paths</strong><br>
+  <strong>244 default diagnostic questions + 20 lifecycle expansion questions · 142 assurance packs · 41 domain packs · 14 adapters · 1,150 CLI command paths</strong><br>
   <em>Stop trusting. Start verifying.</em>
 </p>

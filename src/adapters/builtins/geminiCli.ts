@@ -1,4 +1,5 @@
 import type { AdapterDefinition } from "../adapterTypes.js";
+import { builtInAdapterCapabilities } from "../adapterCapabilities.js";
 
 export const geminiCliAdapter: AdapterDefinition = {
   id: "gemini-cli",
@@ -31,6 +32,13 @@ export const geminiCliAdapter: AdapterDefinition = {
     executable: "gemini",
     args: [],
     supportsStdin: true
-  }
+  },
+  capabilities: builtInAdapterCapabilities({
+    versionSource: "adapter_binary",
+    hookProvider: "gemini-cli",
+    evidenceRefs: [
+      "docs/adapters/gemini.md",
+      "https://github.com/google-gemini/gemini-cli/blob/f354eebaf43b25bacb176007e449bb9a638fd101/docs/hooks/reference.md"
+    ]
+  })
 };
-

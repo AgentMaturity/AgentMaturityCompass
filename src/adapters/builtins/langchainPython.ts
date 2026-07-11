@@ -1,4 +1,5 @@
 import type { AdapterDefinition } from "../adapterTypes.js";
+import { builtInAdapterCapabilities } from "../adapterCapabilities.js";
 
 export const langchainPythonAdapter: AdapterDefinition = {
   id: "langchain-python",
@@ -31,6 +32,9 @@ export const langchainPythonAdapter: AdapterDefinition = {
     executable: "python",
     args: [".amc/adapters-samples/langchain-python/run.py"],
     supportsStdin: false
-  }
+  },
+  capabilities: builtInAdapterCapabilities({
+    versionSource: "host_runtime",
+    evidenceRefs: ["docs/adapters/langchain-python.md"]
+  })
 };
-

@@ -1,46 +1,37 @@
 /**
- * Adapter Data Collection Depth Standardization — R3-05
+ * Backward-compatible adapter comparison projection.
  *
- * Defines minimum data collection spec across all 14 adapters,
- * capability tiers, and coverage gap documentation.
- *
- * MiroFish V2 feedback: "evaluation fairness affected by adapter type, not agent quality"
+ * Capability truth lives in each AdapterDefinition in the authoritative
+ * registry. This module retains the older public API without maintaining a
+ * second hand-authored capability catalog.
  */
 
+import { listBuiltInAdapters } from "./registry.js";
+import type { AdapterDefinition } from "./adapterTypes.js";
 
 export const ADAPTER_CAPABILITY_TIERS = ["native", "bridge", "cli"] as const;
-export type AdapterCapabilityTier = typeof ADAPTER_CAPABILITY_TIERS[number];
+export type AdapterCapabilityTier = (typeof ADAPTER_CAPABILITY_TIERS)[number];
 
 export interface AdapterCapabilityProfile {
   adapterId: string;
   framework: string;
   tier: AdapterCapabilityTier;
   capabilities: AdapterCapabilities;
-  coverageScore: number; // 0-100
+  coverageScore: number;
   gaps: string[];
   compensations: string[];
 }
 
 export interface AdapterCapabilities {
-  /** Can capture full execution traces */
   executionTracing: boolean;
-  /** Can capture tool call details */
   toolCallCapture: boolean;
-  /** Can capture memory/context state */
   contextStateCapture: boolean;
-  /** Can capture token usage */
   tokenUsageCapture: boolean;
-  /** Can capture latency metrics */
   latencyMetrics: boolean;
-  /** Can capture error traces */
   errorTracing: boolean;
-  /** Can capture multi-turn conversation state */
   multiTurnState: boolean;
-  /** Can capture agent-to-agent communication */
   interAgentComms: boolean;
-  /** Can run red-team tests natively */
   nativeRedTeam: boolean;
-  /** Can inject test scenarios */
   scenarioInjection: boolean;
 }
 
@@ -49,230 +40,102 @@ const MINIMUM_SPEC: (keyof AdapterCapabilities)[] = [
   "toolCallCapture",
   "tokenUsageCapture",
   "latencyMetrics",
-  "errorTracing",
+  "errorTracing"
 ];
 
-export const ADAPTER_PROFILES: AdapterCapabilityProfile[] = [
-  {
-    adapterId: "langchainNode",
-    framework: "LangChain (Node.js)",
-    tier: "native",
-    capabilities: {
-      executionTracing: true, toolCallCapture: true, contextStateCapture: true,
-      tokenUsageCapture: true, latencyMetrics: true, errorTracing: true,
-      multiTurnState: true, interAgentComms: false, nativeRedTeam: true, scenarioInjection: true,
-    },
-    coverageScore: 90,
-    gaps: ["Inter-agent communication capture"],
-    compensations: [],
-  },
-  {
-    adapterId: "langchainPython",
-    framework: "LangChain (Python)",
-    tier: "bridge",
-    capabilities: {
-      executionTracing: true, toolCallCapture: true, contextStateCapture: true,
-      tokenUsageCapture: true, latencyMetrics: true, errorTracing: true,
-      multiTurnState: true, interAgentComms: false, nativeRedTeam: false, scenarioInjection: true,
-    },
-    coverageScore: 82,
-    gaps: ["Inter-agent communication", "Native red-team (uses bridge)"],
-    compensations: ["Bridge provides equivalent red-team via CLI fallback"],
-  },
-  {
-    adapterId: "openaiAgentsSdk",
-    framework: "OpenAI Agents SDK",
-    tier: "native",
-    capabilities: {
-      executionTracing: true, toolCallCapture: true, contextStateCapture: true,
-      tokenUsageCapture: true, latencyMetrics: true, errorTracing: true,
-      multiTurnState: true, interAgentComms: true, nativeRedTeam: true, scenarioInjection: true,
-    },
-    coverageScore: 95,
-    gaps: [],
-    compensations: [],
-  },
-  {
-    adapterId: "claudeCli",
-    framework: "Claude Code",
-    tier: "cli",
-    capabilities: {
-      executionTracing: true, toolCallCapture: true, contextStateCapture: false,
-      tokenUsageCapture: true, latencyMetrics: true, errorTracing: true,
-      multiTurnState: false, interAgentComms: false, nativeRedTeam: false, scenarioInjection: false,
-    },
-    coverageScore: 60,
-    gaps: ["Context state capture", "Multi-turn state", "Inter-agent comms", "Native red-team", "Scenario injection"],
-    compensations: ["CLI output parsing provides execution tracing", "Red-team via external harness", "Score adjusted for adapter tier"],
-  },
-  {
-    adapterId: "crewaiCli",
-    framework: "CrewAI",
-    tier: "cli",
-    capabilities: {
-      executionTracing: true, toolCallCapture: true, contextStateCapture: false,
-      tokenUsageCapture: true, latencyMetrics: true, errorTracing: true,
-      multiTurnState: false, interAgentComms: true, nativeRedTeam: false, scenarioInjection: false,
-    },
-    coverageScore: 65,
-    gaps: ["Context state", "Multi-turn state", "Native red-team", "Scenario injection"],
-    compensations: ["CrewAI crew logs provide inter-agent comms", "Score adjusted for adapter tier"],
-  },
-  {
-    adapterId: "geminiCli",
-    framework: "Gemini",
-    tier: "cli",
-    capabilities: {
-      executionTracing: true, toolCallCapture: true, contextStateCapture: false,
-      tokenUsageCapture: true, latencyMetrics: true, errorTracing: true,
-      multiTurnState: false, interAgentComms: false, nativeRedTeam: false, scenarioInjection: false,
-    },
-    coverageScore: 60,
-    gaps: ["Context state", "Multi-turn", "Inter-agent", "Red-team", "Injection"],
-    compensations: ["Score adjusted for adapter tier"],
-  },
-  {
-    adapterId: "autogenCli",
-    framework: "AutoGen",
-    tier: "cli",
-    capabilities: {
-      executionTracing: true, toolCallCapture: true, contextStateCapture: false,
-      tokenUsageCapture: true, latencyMetrics: true, errorTracing: true,
-      multiTurnState: false, interAgentComms: true, nativeRedTeam: false, scenarioInjection: false,
-    },
-    coverageScore: 65,
-    gaps: ["Context state", "Multi-turn", "Native red-team", "Injection"],
-    compensations: ["AutoGen conversation logs provide inter-agent data"],
-  },
-  {
-    adapterId: "openclawCli",
-    framework: "OpenClaw",
-    tier: "cli",
-    capabilities: {
-      executionTracing: true, toolCallCapture: true, contextStateCapture: false,
-      tokenUsageCapture: true, latencyMetrics: true, errorTracing: true,
-      multiTurnState: false, interAgentComms: false, nativeRedTeam: false, scenarioInjection: false,
-    },
-    coverageScore: 60,
-    gaps: ["Context state", "Multi-turn", "Inter-agent", "Red-team", "Injection"],
-    compensations: ["Score adjusted for adapter tier"],
-  },
-  {
-    adapterId: "semanticKernel",
-    framework: "Semantic Kernel",
-    tier: "native",
-    capabilities: {
-      executionTracing: true, toolCallCapture: true, contextStateCapture: true,
-      tokenUsageCapture: true, latencyMetrics: true, errorTracing: true,
-      multiTurnState: true, interAgentComms: false, nativeRedTeam: true, scenarioInjection: true,
-    },
-    coverageScore: 88,
-    gaps: ["Inter-agent communication"],
-    compensations: [],
-  },
-  {
-    adapterId: "openhandsCli",
-    framework: "OpenHands",
-    tier: "cli",
-    capabilities: {
-      executionTracing: true, toolCallCapture: true, contextStateCapture: false,
-      tokenUsageCapture: true, latencyMetrics: true, errorTracing: true,
-      multiTurnState: false, interAgentComms: false, nativeRedTeam: false, scenarioInjection: false,
-    },
-    coverageScore: 60,
-    gaps: ["Context state", "Multi-turn", "Inter-agent", "Red-team", "Injection"],
-    compensations: ["Score adjusted for adapter tier"],
-  },
-  {
-    adapterId: "llamaindexPython",
-    framework: "LlamaIndex",
-    tier: "bridge",
-    capabilities: {
-      executionTracing: true, toolCallCapture: true, contextStateCapture: true,
-      tokenUsageCapture: true, latencyMetrics: true, errorTracing: true,
-      multiTurnState: false, interAgentComms: false, nativeRedTeam: false, scenarioInjection: true,
-    },
-    coverageScore: 75,
-    gaps: ["Multi-turn state", "Inter-agent", "Native red-team"],
-    compensations: ["Bridge provides scenario injection"],
-  },
-  {
-    adapterId: "langgraphPython",
-    framework: "LangGraph",
-    tier: "bridge",
-    capabilities: {
-      executionTracing: true, toolCallCapture: true, contextStateCapture: true,
-      tokenUsageCapture: true, latencyMetrics: true, errorTracing: true,
-      multiTurnState: true, interAgentComms: true, nativeRedTeam: false, scenarioInjection: true,
-    },
-    coverageScore: 85,
-    gaps: ["Native red-team (uses bridge)"],
-    compensations: ["LangGraph state graph provides full multi-turn + inter-agent"],
-  },
-  {
-    adapterId: "pythonAmcSdk",
-    framework: "Python AMC SDK",
-    tier: "native",
-    capabilities: {
-      executionTracing: true, toolCallCapture: true, contextStateCapture: true,
-      tokenUsageCapture: true, latencyMetrics: true, errorTracing: true,
-      multiTurnState: true, interAgentComms: true, nativeRedTeam: true, scenarioInjection: true,
-    },
-    coverageScore: 95,
-    gaps: [],
-    compensations: [],
-  },
-  {
-    adapterId: "genericCli",
-    framework: "Generic CLI",
-    tier: "cli",
-    capabilities: {
-      executionTracing: true, toolCallCapture: false, contextStateCapture: false,
-      tokenUsageCapture: false, latencyMetrics: true, errorTracing: true,
-      multiTurnState: false, interAgentComms: false, nativeRedTeam: false, scenarioInjection: false,
-    },
-    coverageScore: 40,
-    gaps: ["Tool call", "Context state", "Token usage", "Multi-turn", "Inter-agent", "Red-team", "Injection"],
-    compensations: ["Minimum viable evaluation from CLI output only", "Score heavily adjusted for adapter tier"],
-  },
-];
+const LEGACY_ID_ALIASES: Record<string, string> = {
+  langchainNode: "langchain-node",
+  langchainPython: "langchain-python",
+  langgraphPython: "langgraph-python",
+  llamaindexPython: "llamaindex-python",
+  semanticKernel: "semantic-kernel",
+  openaiAgentsSdk: "openai-agents-sdk",
+  pythonAmcSdk: "python-amc-sdk",
+  genericCli: "generic-cli",
+  claudeCli: "claude-cli",
+  geminiCli: "gemini-cli",
+  openclawCli: "openclaw-cli",
+  openhandsCli: "openhands-cli",
+  autogenCli: "autogen-cli",
+  crewaiCli: "crewai-cli"
+};
+
+function capabilityTier(adapter: AdapterDefinition): AdapterCapabilityTier {
+  if (adapter.id === "python-amc-sdk" && adapter.capabilities.versionSource === "package_probe") return "native";
+  if (adapter.kind === "CLI") return "cli";
+  return "bridge";
+}
+
+function capabilitiesFor(adapter: AdapterDefinition): AdapterCapabilities {
+  const events = new Set(adapter.capabilities.events.map((row) => row.id));
+  return {
+    executionTracing: events.has("process.started") && events.has("process.exited"),
+    toolCallCapture: events.has("action.requested"),
+    contextStateCapture: false,
+    tokenUsageCapture: false,
+    latencyMetrics: events.has("model.response") || events.has("process.exited"),
+    errorTracing: events.has("process.stderr") && events.has("process.exited"),
+    multiTurnState: false,
+    interAgentComms: false,
+    nativeRedTeam: false,
+    scenarioInjection: false
+  };
+}
+
+function profileFor(adapter: AdapterDefinition): AdapterCapabilityProfile {
+  const capabilities = capabilitiesFor(adapter);
+  const entries = Object.entries(capabilities) as Array<[keyof AdapterCapabilities, boolean]>;
+  const supported = entries.filter(([, value]) => value).length;
+  return {
+    adapterId: adapter.id,
+    framework: adapter.displayName,
+    tier: capabilityTier(adapter),
+    capabilities,
+    coverageScore: Math.round((supported / entries.length) * 100),
+    gaps: entries.filter(([, value]) => !value).map(([key]) => key),
+    compensations: [...adapter.capabilities.lossiness.omitted]
+  };
+}
+
+export const ADAPTER_PROFILES: AdapterCapabilityProfile[] = listBuiltInAdapters().map(profileFor);
 
 export function getAdapterProfile(adapterId: string): AdapterCapabilityProfile | undefined {
-  return ADAPTER_PROFILES.find((p) => p.adapterId === adapterId);
+  const canonicalId = LEGACY_ID_ALIASES[adapterId] ?? adapterId;
+  return ADAPTER_PROFILES.find((profile) => profile.adapterId === canonicalId);
 }
 
 export function getAdaptersByTier(tier: AdapterCapabilityTier): AdapterCapabilityProfile[] {
-  return ADAPTER_PROFILES.filter((p) => p.tier === tier);
+  return ADAPTER_PROFILES.filter((profile) => profile.tier === tier);
 }
 
 export function meetsMinimumSpec(profile: AdapterCapabilityProfile): {
   meets: boolean;
   missingCapabilities: string[];
 } {
-  const missing = MINIMUM_SPEC.filter((cap) => !profile.capabilities[cap]);
+  const missing = MINIMUM_SPEC.filter((capability) => !profile.capabilities[capability]);
   return { meets: missing.length === 0, missingCapabilities: missing };
 }
 
-/**
- * Calculate score adjustment factor based on adapter capability tier.
- * Ensures CLI adapters don't get unfairly penalized for data collection gaps.
- */
 export function getAdapterScoreAdjustment(adapterId: string): {
   factor: number;
   adjustmentReason: string;
   confidenceImpact: number;
 } {
   const profile = getAdapterProfile(adapterId);
-  if (!profile) return { factor: 1.0, adjustmentReason: "Unknown adapter — no adjustment", confidenceImpact: -0.2 };
-
-  switch (profile.tier) {
-    case "native":
-      return { factor: 1.0, adjustmentReason: "Native adapter — full data collection", confidenceImpact: 0 };
-    case "bridge":
-      return { factor: 1.0, adjustmentReason: "Bridge adapter — near-full collection via bridge", confidenceImpact: -0.05 };
-    case "cli":
-      return { factor: 1.0, adjustmentReason: `CLI adapter — score unpenalized but confidence reduced (coverage: ${profile.coverageScore}%)`, confidenceImpact: -0.15 };
+  if (!profile) {
+    return { factor: 1, adjustmentReason: "Unknown adapter - no verified capability receipt", confidenceImpact: -0.2 };
   }
+  if (profile.tier === "native") {
+    return { factor: 1, adjustmentReason: "Native package probe; verify the signed capability receipt", confidenceImpact: 0 };
+  }
+  if (profile.tier === "bridge") {
+    return { factor: 1, adjustmentReason: "Bridge declaration; confidence depends on effective receipt state", confidenceImpact: -0.05 };
+  }
+  return {
+    factor: 1,
+    adjustmentReason: `CLI declaration; score is unpenalized but confidence is reduced (declared coverage: ${profile.coverageScore}%)`,
+    confidenceImpact: -0.15
+  };
 }
 
 export function getAdapterComparisonMatrix(): {
@@ -280,10 +143,15 @@ export function getAdapterComparisonMatrix(): {
   capabilities: string[];
   matrix: boolean[][];
 } {
-  const capabilities = Object.keys(ADAPTER_PROFILES[0]!.capabilities) as (keyof AdapterCapabilities)[];
+  const capabilities = Object.keys(ADAPTER_PROFILES[0]?.capabilities ?? {}) as (keyof AdapterCapabilities)[];
   return {
-    adapters: ADAPTER_PROFILES.map((p) => ({ id: p.adapterId, framework: p.framework, tier: p.tier, coverage: p.coverageScore })),
+    adapters: ADAPTER_PROFILES.map((profile) => ({
+      id: profile.adapterId,
+      framework: profile.framework,
+      tier: profile.tier,
+      coverage: profile.coverageScore
+    })),
     capabilities,
-    matrix: ADAPTER_PROFILES.map((p) => capabilities.map((c) => p.capabilities[c])),
+    matrix: ADAPTER_PROFILES.map((profile) => capabilities.map((capability) => profile.capabilities[capability]))
   };
 }

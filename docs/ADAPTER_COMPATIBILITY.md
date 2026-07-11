@@ -1,72 +1,52 @@
-# Adapter Compatibility Matrix
+# Adapter Compatibility and Capability Proof
 
-AMC supports 14 built-in adapters for wrapping and evaluating AI agents across frameworks.
+AMC ships 14 built-in adapter definitions. A definition is not proof that its runtime is installed, that a framework package matches the host runtime, or that every provider event is visible.
 
-## Compatibility Status
-
-| Adapter | Framework | Status | Runtime | Notes |
-|---------|-----------|--------|---------|-------|
-| `langchain-python` | LangChain (Python) | ✅ Tested | Python 3.11+ | Auto-detected |
-| `langchain-node` | LangChain (Node.js) | ✅ Tested | Node 22+ | Auto-detected |
-| `langgraph-python` | LangGraph | ✅ Tested | Python 3.11+ | Auto-detected |
-| `crewai-cli` | CrewAI | ✅ Tested | Python 3.11+ | Auto-detected |
-| `autogen-cli` | AutoGen | ✅ Tested | Python 3.11+ | Auto-detected |
-| `openai-agents-sdk` | OpenAI Agents SDK | ✅ Tested | Node 22+ | Auto-detected |
-| `llamaindex-python` | LlamaIndex | ✅ Tested | Python 3.11+ | Auto-detected |
-| `semantic-kernel` | Semantic Kernel | ✅ Tested | Node 22+ | Auto-detected |
-| `claude-cli` | Claude Code | ✅ Tested | Native binary | Auto-detected |
-| `gemini-cli` | Gemini CLI | ✅ Tested | Native binary | Auto-detected |
-| `openclaw-cli` | OpenClaw | ✅ Tested | Node 22+ | Auto-detected |
-| `openhands-cli` | OpenHands | 🧪 Experimental | Python 3.11+ | Requires manual install |
-| `python-amc-sdk` | AMC Python SDK | ✅ Tested | Python 3.11+ | Direct integration |
-| `generic-cli` | Any CLI agent | ✅ Tested | sh/bash | Universal fallback |
-
-## Auto-Detection
-
-`amc setup` automatically detects installed frameworks and configures the appropriate adapter:
+Use the authoritative registry and a signed capability receipt instead of a static compatibility badge:
 
 ```bash
-amc setup
-# Output:
-# - detected frameworks: langchain-python -> langchain-python, crewai -> crewai-cli
-# - adapter auto-config: my-agent:langchain-python, my-agent:crewai-cli
+amc adapters init
+amc adapters configure --agent my-agent --adapter claude-cli --route /anthropic --model claude-sonnet-4-6 --mode SUPERVISE
+amc adapters capabilities --agent my-agent --adapter claude-cli --out adapter-capabilities.json --json
 ```
 
-## Using an Adapter
+## Built-In Declarations
 
-```bash
-# Wrap any agent with evidence capture
-amc wrap <adapter> -- <your-command>
+| Adapter ID | Runtime probe means | Provider-native hook control | Important lossiness |
+| --- | --- | --- | --- |
+| `autogen-cli` | AutoGen CLI when present, otherwise host Python only | No | Fallback Python version does not prove AutoGen |
+| `claude-cli` | Claude binary version | Allow, deny, ask when a signed control hook is installed | Managed hook covers pinned `PreToolUse`, not every lifecycle hook |
+| `crewai-cli` | CrewAI CLI when present, otherwise host Python only | No | Fallback Python version does not prove CrewAI |
+| `gemini-cli` | Gemini CLI binary version | Allow and deny when a signed control hook is installed | Native ask is unavailable and fails closed to deny |
+| `generic-cli` | Shell runtime only | No | Shell version does not identify the wrapped agent |
+| `langchain-node` | Host Node.js only | No | Node version does not prove LangChain package/version |
+| `langchain-python` | Host Python only | No | Python version does not prove LangChain package/version |
+| `langgraph-python` | Host Python only | No | Python version does not prove LangGraph package/version |
+| `llamaindex-python` | Host Python only | No | Python version does not prove LlamaIndex package/version |
+| `openai-agents-sdk` | Host Node.js only | No | Node version does not prove OpenAI Agents SDK package/version |
+| `openclaw-cli` | OpenClaw binary version | No AMC-managed native hook yet | Gateway/process evidence only |
+| `openhands-cli` | OpenHands binary version | No AMC-managed native hook yet | Gateway/process evidence only |
+| `python-amc-sdk` | Installed AMC Python package version | No | SDK callbacks determine event depth |
+| `semantic-kernel` | Host Node.js only | No | Node version does not prove Semantic Kernel package/version |
 
-# Examples
-amc wrap claude -- claude "analyze this codebase"
-amc wrap langchain-python -- python my_agent.py
-amc wrap generic-cli -- ./my-custom-agent.sh
+Every declaration includes exact events, controls, activation conditions, definition version, known omissions, verification authority, and fixture evidence references. Plugin adapters that predate this contract still load, but receive an explicit `unverified` declaration with no advertised event or control capability. Publisher self-attestation is never upgraded to AMC verification; all plugin receipts remain fail closed until the separate partner-certification lane exists.
 
-# Run evaluation with a specific adapter
-amc adapters run --agent my-agent --adapter langchain-python
-```
+## Receipt States
 
-## Check Available Adapters
+| State | Meaning |
+| --- | --- |
+| `verified` | Declaration evidence, runtime/version probe, signed adapter selection, and any required control hook are valid for this receipt subject. |
+| `partial` | The signed facts are valid, but the probe is host/shell-only or an optional native hook is absent/observe-only. |
+| `fail_closed` | Runtime/version, signed configuration, declaration evidence, or hook integrity is missing or invalid. No green capability claim is allowed. |
 
-```bash
-# List all adapters and their detection status
-amc doctor
+Receipt validity and capability status are separate. A correctly signed `partial` or `fail_closed` receipt is valid proof of a limitation; tampered bytes, an untrusted signer, unknown schema fields, or an inconsistent effective projection make the receipt itself invalid.
 
-# The doctor output shows which adapters are available:
-# [PASS] adapter-langchain-python: python3 3.14.2
-# [PASS] adapter-claude-cli: claude 2.1.50
-# [WARN] adapter-openhands-cli: missing commands: openhands, oh
-```
+## What The Base Adapter Path Can Prove
 
-## Adding Custom Adapters
+When `amc adapters run` is active, the adapter process path can emit `process.started`, redacted `process.stdout`, redacted `process.stderr`, and `process.exited`. Model request/response evidence is effective only when the signed agent profile routes a compatible runtime through AMC's gateway. Provider-native action requests and decisions are effective only for the currently installed, signed Claude Code or Gemini CLI hook mode.
 
-AMC supports plugin adapters for frameworks not covered by built-ins. See the [custom adapter authoring guide](CUSTOM_ADAPTER.md) for the adapter schema, SDK wrapper path, evidence contract, and validation checklist.
+No adapter receipt claims AEP conformance. AMC does not copy AEP mappings, Agent Control SDKs, provider payloads, prompts, tool arguments, or upstream implementation details.
 
-## Reporting Issues
+## Custom Adapters
 
-If an adapter doesn't work with your framework version, please [open an issue](https://github.com/AgentMaturity/AgentMaturityCompass/issues) with:
-- Framework name and version
-- AMC version (`amc --version`)
-- Error output
-- Steps to reproduce
+Custom plugin adapters must declare the same capability block and pass plugin signature/integrity checks. See [Custom Adapter Authoring](CUSTOM_ADAPTER.md) for the schema and fail-closed migration behavior.

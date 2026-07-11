@@ -23,13 +23,38 @@ amc adapters list          # show available adapters
 amc adapters detect        # detect installed runtimes
 ```
 
+## Signed Capability Receipt
+
+Do not infer adapter coverage from its name or from a detected host runtime. Issue a signed receipt for the exact agent and adapter instead:
+
+```bash
+amc adapters capabilities \
+  --agent my-agent \
+  --adapter claude-cli \
+  --out adapter-capabilities.json \
+  --json
+```
+
+The receipt separates:
+
+- **declared** events and controls in the authoritative adapter registry;
+- **effective** events and controls for the current signed configuration and hook mode;
+- the adapter definition version from the detected runtime version;
+- adapter-binary/package probes from weaker host-runtime or shell probes;
+- known normalization and redaction lossiness;
+- `verified`, `partial`, or `fail_closed` status with machine-readable reasons.
+
+The canonical bytes are SHA-256 hashed and signed by AMC's existing auditor trust path. Receipts exclude prompts, tool arguments, stdout/stderr content, cwd, transcript paths, lease tokens, and secrets. A missing runtime, missing version, invalid adapter-config signature, drifted hook, untrusted signer, metadata-only plugin, or publisher self-attestation cannot produce a green capability result. Plugin receipts stay fail closed until AMC's separate partner-certification lane exists.
+
+The same contract is available from `POST /api/v1/adapters/capability-receipts` and from the TypeScript exports `issueAdapterCapabilityReceipt` and `verifyAdapterCapabilityReceipt`.
+
 ## Claude CLI (Anthropic)
 
 ```bash
 amc adapters run --agent my-claude --adapter claude-cli -- claude --model claude-sonnet-4-6
 ```
 
-Evidence captured: input/output tokens, tool calls, model used, response time, reasoning traces.
+The gateway can observe model requests/responses when Claude honors the configured route. Exact tool-request observation and native allow/deny/ask controls require a verified `amc connect hooks` installation. Use the signed capability receipt to see what is effective now.
 
 Configure as default for an agent:
 
@@ -43,7 +68,7 @@ amc adapters configure --agent my-claude --adapter claude-cli --route /anthropic
 amc adapters run --agent my-gemini --adapter gemini-cli -- gemini --model gemini-flash
 ```
 
-Evidence captured: responses, safety scores, grounding hits.
+The gateway can observe model requests/responses when Gemini honors the configured route. Exact pre-tool observation and native allow/deny controls require a verified `amc connect hooks` installation. Gemini has no native ask outcome in the pinned contract, so AMC records the loss and fails an ask decision closed to deny.
 
 ## OpenClaw
 

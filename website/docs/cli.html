@@ -91,7 +91,7 @@
 
       <div class="callout callout-green">
         <strong>By the numbers</strong>
-        The AMC CLI currently registers 1,149 command paths. Every command supports <code>--help</code> for inline documentation.
+        The AMC CLI currently registers 1,150 command paths. Every command supports <code>--help</code> for inline documentation.
       </div>
 
       <!-- Common workflow commands -->
@@ -110,7 +110,8 @@
           <tr><td><code>amc status</code></td><td>Show Studio and vault status</td><td><code>amc status</code></td></tr>
           <tr><td><code>amc evidence collect</code></td><td>Interactive evidence collection wizard</td><td><code>amc evidence collect</code></td></tr>
           <tr><td><code>amc wrap</code></td><td>Wrap any agent CLI for evidence capture</td><td><code>amc wrap claude -- claude "hello"</code></td></tr>
-          <tr><td><code>amc adapters run</code></td><td>Run adapter with lease + gateway routing</td><td><code>amc adapters run --adapter claude-cli -- claude</code></td></tr>
+          <tr><td><code>amc adapters run</code></td><td>Run adapter with lease + gateway routing</td><td><code>amc adapters run --agent my-agent --adapter claude-cli -- claude</code></td></tr>
+          <tr><td><code>amc adapters capabilities</code></td><td>Issue a signed declared/effective capability receipt</td><td><code>amc adapters capabilities --agent my-agent --adapter claude-cli --json</code></td></tr>
           <tr><td><code>amc run</code></td><td>Run full maturity diagnostic</td><td><code>amc run --agent my-agent --window 30</code></td></tr>
           <tr><td><code>amc run --question-set lifecycle</code></td><td>Run the explicit 264-question lifecycle-expanded diagnostic</td><td><code>amc run --question-set lifecycle</code></td></tr>
           <tr><td><code>amc proof check</code></td><td>Check a claim against a declared source-to-rule manifest and emit an <code>amcproof</code> artifact</td><td><code>amc proof check --domain governance --manifest fixtures/domain-proof/toy-governance/source-rule-manifest.json --input examples/domain-proof/toy-governance/proven.json</code></td></tr>
@@ -195,7 +196,7 @@
 
       <!-- ADAPTERS -->
       <div class="ns-toggle" id="ns-adapters" onclick="this.classList.toggle('open')">
-        <h3>Adapters <span class="cmd-count">8 commands</span></h3>
+        <h3>Adapters <span class="cmd-count">9 commands</span></h3>
       </div>
       <div class="ns-body">
         <table>
@@ -205,6 +206,7 @@
             <tr><td><code>amc adapters verify</code></td><td>Verify <code>adapters.yaml</code> signature</td></tr>
             <tr><td><code>amc adapters list</code></td><td>List built-in adapters and per-agent preferences</td></tr>
             <tr><td><code>amc adapters detect</code></td><td>Detect installed adapter runtimes</td></tr>
+            <tr><td><code>amc adapters capabilities</code></td><td>Issue a signed receipt for declared/effective events, controls, version proof, and lossiness</td></tr>
             <tr><td><code>amc adapters configure</code></td><td>Set adapter profile for an agent</td></tr>
             <tr><td><code>amc adapters env</code></td><td>Print adapter-compatible environment exports</td></tr>
             <tr><td><code>amc adapters init-project</code></td><td>Generate runnable local adapter sample</td></tr>

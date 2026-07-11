@@ -1,4 +1,5 @@
 import type { AdapterDefinition } from "../adapterTypes.js";
+import { builtInAdapterCapabilities } from "../adapterCapabilities.js";
 
 export const openaiAgentsSdkAdapter: AdapterDefinition = {
   id: "openai-agents-sdk",
@@ -31,6 +32,9 @@ export const openaiAgentsSdkAdapter: AdapterDefinition = {
     executable: "node",
     args: [".amc/adapters-samples/openai-agents-sdk/run.mjs"],
     supportsStdin: false
-  }
+  },
+  capabilities: builtInAdapterCapabilities({
+    versionSource: "host_runtime",
+    evidenceRefs: ["docs/adapters/openai-agents-sdk.md"]
+  })
 };
-

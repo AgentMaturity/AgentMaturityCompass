@@ -1,4 +1,5 @@
 import type { AdapterDefinition } from "../adapterTypes.js";
+import { builtInAdapterCapabilities } from "../adapterCapabilities.js";
 
 export const autogenCliAdapter: AdapterDefinition = {
   id: "autogen-cli",
@@ -32,6 +33,9 @@ export const autogenCliAdapter: AdapterDefinition = {
     args: ["-m", "autogen"],
     supportsStdin: true
   },
+  capabilities: builtInAdapterCapabilities({
+    versionSource: "mixed_runtime",
+    evidenceRefs: ["docs/adapters/autogen.md"]
+  }),
   notes: "If `python -m autogen` is unavailable, provide a custom command with `--`."
 };
-

@@ -1,4 +1,5 @@
 import type { AdapterDefinition } from "../adapterTypes.js";
+import { builtInAdapterCapabilities } from "../adapterCapabilities.js";
 
 export const semanticKernelAdapter: AdapterDefinition = {
   id: "semantic-kernel",
@@ -31,6 +32,9 @@ export const semanticKernelAdapter: AdapterDefinition = {
     executable: "node",
     args: [".amc/adapters-samples/semantic-kernel/run.mjs"],
     supportsStdin: false
-  }
+  },
+  capabilities: builtInAdapterCapabilities({
+    versionSource: "host_runtime",
+    evidenceRefs: ["docs/adapters/semantic-kernel.md"]
+  })
 };
-

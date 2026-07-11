@@ -4,6 +4,7 @@
  * Modules: shield/ (16), enforce/ (35), vault/ (14), watch/ (10), score/ (7), product/ (81).
  */
 import type { AdapterDefinition } from "../adapterTypes.js";
+import { builtInAdapterCapabilities } from "../adapterCapabilities.js";
 
 export const pythonAmcSdkAdapter: AdapterDefinition = {
   id: "python-amc-sdk",
@@ -36,5 +37,9 @@ export const pythonAmcSdkAdapter: AdapterDefinition = {
     executable: "python3",
     args: ["run_full_validation.py"],
     supportsStdin: false
-  }
+  },
+  capabilities: builtInAdapterCapabilities({
+    versionSource: "package_probe",
+    evidenceRefs: ["docs/adapters/python-amc-sdk.md"]
+  })
 };

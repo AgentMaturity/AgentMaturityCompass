@@ -52,6 +52,7 @@
     </div>
     <div class="sidebar-section">
       <h4>Advanced</h4>
+      <a href="#capability-receipts">Capability Receipts</a>
       <a href="#provider-neutral-hooks">Provider-Neutral Hooks</a>
       <a href="#sdk-integration">SDK Integration</a>
       <a href="#evidence-types">Evidence Types</a>
@@ -69,11 +70,11 @@
     <div class="content">
 
       <h1 id="overview">Adapter Guides</h1>
-      <p class="subtitle">14 built-in adapters plus a lease-scoped provider-neutral action ingress. AMC captures signed evidence through its gateway and Bridge without requiring a framework rewrite.</p>
+      <p class="subtitle">14 built-in adapters with versioned capability declarations, explicit lossiness, and signed proof of what is effective for this agent now.</p>
 
       <div class="callout callout-teal">
         <strong>The key insight</strong>
-        Adapters route your agent's LLM traffic through the AMC gateway, which captures signed evidence of every API call, tool use, and response. Your agent code doesn't change at all — AMC sits as a transparent proxy between your agent and the LLM provider.
+        An adapter name is not a compatibility claim. AMC separates declared support, current signed configuration, detected runtime/version, effective events and controls, and known blind spots in one portable receipt.
       </div>
 
       <!-- How it works -->
@@ -103,7 +104,7 @@
         <div class="step-num">4</div>
         <div class="step-content">
           <h4>Evidence captured</h4>
-          <p>Signed evidence events: <code>agent_process_started</code>, <code>stdout</code>, <code>stderr</code>, <code>exited</code>, plus input/output tokens, tool calls, and model info.</p>
+          <p>The base path records process start, redacted stdout/stderr, and exit. Model events require verified gateway routing. Provider-native action events and decisions require a verified hook mode.</p>
         </div>
       </div>
       <div class="step">
@@ -123,96 +124,112 @@ amc adapters init
 amc adapters list
 
 <span class="comment"># Detect which adapter runtimes are installed</span>
-amc adapters detect</code></pre>
+amc adapters detect
+
+<span class="comment"># Prove what is declared and effective for one agent</span>
+amc adapters capabilities --agent my-agent --adapter generic-cli --json</code></pre>
+
+      <h2 id="capability-receipts">Signed Capability Receipts</h2>
+      <p><code>amc.adapter-capability-receipt.v1</code> binds the authoritative registry declaration to the adapter definition version, runtime/version probe, signed per-agent adapter selection, provider-hook state, effective event/control projection, known lossiness, verification result, SHA-256 receipt hash, and auditor signature.</p>
+      <pre><code>amc adapters capabilities \
+  --agent my-agent \
+  --adapter claude-cli \
+  --out adapter-capabilities.json \
+  --json</code></pre>
+      <div class="callout callout-green">
+        <strong>Honest by construction</strong>
+        <code>verified</code> means AMC-owned declaration evidence and the inspected proof inputs are valid for this subject. <code>partial</code> records a host/shell-only version probe or an absent/observe-only optional hook. <code>fail_closed</code> records missing runtime/version, invalid signed config, unverified or publisher-only plugin metadata, or hook drift. Plugins cannot self-certify; partner certification remains a separate lane. A valid partial receipt is proof of a limitation, not a green badge.
+      </div>
+      <p>The receipt never includes prompts, tool arguments, model/tool output, stdout/stderr content, cwd, transcript paths, raw session identifiers, lease tokens, or secrets. The same contract is available from <code>POST /api/v1/adapters/capability-receipts</code>.</p>
 
       <hr>
 
       <!-- ═══ LANGCHAIN ═══ -->
       <h2 id="langchain">LangChain</h2>
       <div class="adapter-card">
-        <div class="meta"><span class="badge badge-teal">Python</span> &nbsp; Adapter: <code>langchain</code></div>
+        <div class="meta"><span class="badge badge-teal">Python / Node.js</span> &nbsp; Adapters: <code>langchain-python</code>, <code>langchain-node</code></div>
         <h4>Install</h4>
         <pre><code>pip install langchain langchain-openai</code></pre>
         <h4>Configure &amp; Run</h4>
         <pre><code><span class="comment"># Set your agent's adapter</span>
-amc adapters configure --agent my-langchain --adapter langchain
+amc adapters configure --agent my-langchain --adapter langchain-python --route /openai --model gpt-4o --mode SUPERVISE
 
 <span class="comment"># Run with evidence capture</span>
-amc adapters run --agent my-langchain --adapter langchain -- python my_chain.py</code></pre>
+amc adapters run --agent my-langchain --adapter langchain-python -- python my_chain.py</code></pre>
         <p>AMC injects <code>OPENAI_API_BASE</code> to route LangChain's OpenAI calls through the gateway. Works with any LangChain chain, agent, or tool.</p>
       </div>
 
       <!-- ═══ LANGGRAPH ═══ -->
       <h2 id="langgraph">LangGraph</h2>
       <div class="adapter-card">
-        <div class="meta"><span class="badge badge-teal">Python</span> &nbsp; Adapter: <code>langgraph</code></div>
+        <div class="meta"><span class="badge badge-teal">Python</span> &nbsp; Adapter: <code>langgraph-python</code></div>
         <h4>Install</h4>
         <pre><code>pip install langgraph langchain-openai</code></pre>
         <h4>Configure &amp; Run</h4>
-        <pre><code>amc adapters configure --agent my-graph --adapter langgraph
-amc adapters run --agent my-graph --adapter langgraph -- python my_graph.py</code></pre>
+        <pre><code>amc adapters configure --agent my-graph --adapter langgraph-python --route /openai --model gpt-4o --mode SUPERVISE
+amc adapters run --agent my-graph --adapter langgraph-python -- python my_graph.py</code></pre>
         <p>Captures state transitions, node executions, and tool calls across the graph. Same routing mechanism as LangChain — all OpenAI-compatible calls go through AMC.</p>
       </div>
 
       <!-- ═══ CREWAI ═══ -->
       <h2 id="crewai">CrewAI</h2>
       <div class="adapter-card">
-        <div class="meta"><span class="badge badge-teal">Python</span> &nbsp; Adapter: <code>crewai</code></div>
+        <div class="meta"><span class="badge badge-teal">Python</span> &nbsp; Adapter: <code>crewai-cli</code></div>
         <h4>Install</h4>
         <pre><code>pip install crewai</code></pre>
         <h4>Configure &amp; Run</h4>
-        <pre><code>amc adapters configure --agent my-crew --adapter crewai
-amc adapters run --agent my-crew --adapter crewai -- python my_crew.py</code></pre>
+        <pre><code>amc adapters configure --agent my-crew --adapter crewai-cli --route /openai --model gpt-4o --mode SUPERVISE
+amc adapters run --agent my-crew --adapter crewai-cli -- python my_crew.py</code></pre>
         <p>Captures multi-agent crew interactions, task delegation patterns, and tool usage across all crew members.</p>
       </div>
 
       <!-- ═══ AUTOGEN ═══ -->
       <h2 id="autogen">AutoGen</h2>
       <div class="adapter-card">
-        <div class="meta"><span class="badge badge-teal">Python</span> &nbsp; Adapter: <code>autogen</code></div>
+        <div class="meta"><span class="badge badge-teal">Python</span> &nbsp; Adapter: <code>autogen-cli</code></div>
         <h4>Install</h4>
         <pre><code>pip install pyautogen</code></pre>
         <h4>Configure &amp; Run</h4>
-        <pre><code>amc adapters configure --agent my-autogen --adapter autogen
-amc adapters run --agent my-autogen --adapter autogen -- python my_autogen.py</code></pre>
+        <pre><code>amc adapters configure --agent my-autogen --adapter autogen-cli --route /openai --model gpt-4o --mode SUPERVISE
+amc adapters run --agent my-autogen --adapter autogen-cli -- python my_autogen.py</code></pre>
         <p>Works with AutoGen's multi-agent conversations, code execution, and group chat patterns.</p>
       </div>
 
       <!-- ═══ OPENAI AGENTS SDK ═══ -->
       <h2 id="openai-agents">OpenAI Agents SDK</h2>
       <div class="adapter-card">
-        <div class="meta"><span class="badge badge-teal">Python / Node.js</span> &nbsp; Adapter: <code>openai-agents</code></div>
+        <div class="meta"><span class="badge badge-teal">Node.js sample</span> &nbsp; Adapter: <code>openai-agents-sdk</code></div>
         <h4>Install</h4>
         <pre><code>pip install openai-agents  <span class="comment"># Python</span>
 npm install openai         <span class="comment"># Node.js</span></code></pre>
         <h4>Configure &amp; Run</h4>
-        <pre><code>amc adapters configure --agent my-oai --adapter openai-agents
-amc adapters run --agent my-oai --adapter openai-agents -- python my_agent.py</code></pre>
+        <pre><code>amc adapters configure --agent my-oai --adapter openai-agents-sdk --route /openai --model gpt-4o --mode SUPERVISE
+amc adapters run --agent my-oai --adapter openai-agents-sdk -- node my_agent.mjs</code></pre>
         <p>Routes OpenAI Agents SDK calls through the AMC gateway. Captures function calling, tool outputs, and structured responses.</p>
       </div>
 
       <!-- ═══ LLAMAINDEX ═══ -->
       <h2 id="llamaindex">LlamaIndex</h2>
       <div class="adapter-card">
-        <div class="meta"><span class="badge badge-teal">Python</span> &nbsp; Adapter: <code>llamaindex</code></div>
+        <div class="meta"><span class="badge badge-teal">Python</span> &nbsp; Adapter: <code>llamaindex-python</code></div>
         <h4>Install</h4>
         <pre><code>pip install llama-index</code></pre>
         <h4>Configure &amp; Run</h4>
-        <pre><code>amc adapters configure --agent my-llama --adapter llamaindex
-amc adapters run --agent my-llama --adapter llamaindex -- python my_index.py</code></pre>
+        <pre><code>amc adapters configure --agent my-llama --adapter llamaindex-python --route /openai --model gpt-4o --mode SUPERVISE
+amc adapters run --agent my-llama --adapter llamaindex-python -- python my_index.py</code></pre>
         <p>Captures query engine interactions, retrieval calls, and response synthesis from LlamaIndex agents and query pipelines.</p>
       </div>
 
       <!-- ═══ SEMANTIC KERNEL ═══ -->
       <h2 id="semantic-kernel">Semantic Kernel</h2>
       <div class="adapter-card">
-        <div class="meta"><span class="badge badge-orange">C# / Python</span> &nbsp; Adapter: <code>semantic-kernel</code></div>
+        <div class="meta"><span class="badge badge-orange">Node.js sample</span> &nbsp; Adapter: <code>semantic-kernel</code></div>
         <h4>Install</h4>
         <pre><code>dotnet add package Microsoft.SemanticKernel  <span class="comment"># C#</span>
 pip install semantic-kernel                    <span class="comment"># Python</span></code></pre>
         <h4>Configure &amp; Run</h4>
-        <pre><code>amc adapters configure --agent my-sk --adapter semantic-kernel
-amc adapters run --agent my-sk --adapter semantic-kernel -- dotnet run</code></pre>
+        <pre><code>amc adapters configure --agent my-sk --adapter semantic-kernel --route /openai --model gpt-4o --mode SUPERVISE
+amc adapters run --agent my-sk --adapter semantic-kernel -- node my-agent.mjs</code></pre>
         <p>Routes Semantic Kernel's OpenAI/Azure OpenAI calls through the gateway. Works with plugins, planners, and memory.</p>
       </div>
 
@@ -227,7 +244,7 @@ amc adapters run --agent my-sk --adapter semantic-kernel -- dotnet run</code></p
 
 <span class="comment"># Run with evidence capture</span>
 amc adapters run --agent my-claude --adapter claude-cli -- claude --model claude-sonnet-4-6</code></pre>
-        <p>Evidence captured: input/output tokens, tool calls, model used, response time, and reasoning traces.</p>
+        <p>Gateway model events are conditional on the signed route. Provider-native tool requests and allow/deny/ask decisions require a verified control hook. Check the signed capability receipt instead of inferring coverage.</p>
 
         <p>Or use the quick <code>wrap</code> command:</p>
         <pre><code>amc wrap claude -- claude "analyze this codebase"</code></pre>
@@ -238,10 +255,11 @@ amc adapters run --agent my-claude --adapter claude-cli -- claude --model claude
       <div class="adapter-card">
         <div class="meta"><span class="badge badge-dark">CLI</span> &nbsp; Adapter: <code>gemini-cli</code></div>
         <h4>Install</h4>
-        <pre><code>npm install -g @anthropic-ai/gemini-cli  <span class="comment"># or via pip/brew</span></code></pre>
+        <pre><code>npm install -g @google/gemini-cli</code></pre>
         <h4>Configure &amp; Run</h4>
-        <pre><code>amc adapters run --agent my-gemini --adapter gemini-cli -- gemini --model gemini-flash</code></pre>
-        <p>Evidence captured: responses, safety scores, grounding hits. Or wrap directly:</p>
+        <pre><code>amc adapters configure --agent my-gemini --adapter gemini-cli --route /gemini --model gemini-flash --mode SUPERVISE
+amc adapters run --agent my-gemini --adapter gemini-cli -- gemini --model gemini-flash</code></pre>
+        <p>Gateway model events are conditional on the signed route. Provider-native pre-tool observation and allow/deny require a verified hook. Gemini has no native ask result in the pinned contract, so AMC records that loss and denies an ask outcome. Or wrap directly:</p>
         <pre><code>amc wrap gemini -- gemini chat</code></pre>
       </div>
 
@@ -257,17 +275,17 @@ amc adapters run --agent my-claude --adapter claude-cli -- claude --model claude
       <!-- ═══ OPENHANDS ═══ -->
       <h2 id="openhands">OpenHands</h2>
       <div class="adapter-card">
-        <div class="meta"><span class="badge badge-teal">Python</span> &nbsp; Adapter: <code>openhands</code></div>
+        <div class="meta"><span class="badge badge-teal">CLI</span> &nbsp; Adapter: <code>openhands-cli</code></div>
         <h4>Configure &amp; Run</h4>
-        <pre><code>amc adapters configure --agent my-openhands --adapter openhands
-amc adapters run --agent my-openhands --adapter openhands -- python -m openhands</code></pre>
-        <p>Captures OpenHands coding agent interactions, file operations, and terminal commands as evidence.</p>
+        <pre><code>amc adapters configure --agent my-openhands --adapter openhands-cli --route /openai --model gpt-4o --mode SUPERVISE
+amc adapters run --agent my-openhands --adapter openhands-cli -- openhands</code></pre>
+        <p>The base adapter path records process evidence and conditionally routed model traffic. It does not claim provider-native file/tool lifecycle coverage.</p>
       </div>
 
       <!-- ═══ PYTHON SDK ═══ -->
       <h2 id="python-sdk">Python AMC SDK</h2>
       <div class="adapter-card">
-        <div class="meta"><span class="badge badge-teal">Python</span> &nbsp; Adapter: <code>python-sdk</code></div>
+        <div class="meta"><span class="badge badge-teal">Python</span> &nbsp; Adapter: <code>python-amc-sdk</code></div>
         <h4>Install</h4>
         <pre><code>pip install agent-maturity-compass</code></pre>
         <h4>Programmatic Integration</h4>
@@ -308,9 +326,10 @@ amc wrap any -- python bot.py</code></pre>
       <!-- ═══ OPENAI COMPATIBLE ═══ -->
       <h2 id="openai-compatible">OpenAI-Compatible API</h2>
       <div class="adapter-card">
-        <div class="meta"><span class="badge badge-dark">Any</span> &nbsp; Adapter: <code>openai-compatible</code></div>
+        <div class="meta"><span class="badge badge-dark">Any</span> &nbsp; Adapter: <code>generic-cli</code> routed through <code>/openai</code></div>
         <p>For any agent that talks to an OpenAI-compatible API endpoint (vLLM, Ollama, Azure OpenAI, Together AI, etc.):</p>
-        <pre><code>amc adapters run --agent my-agent --adapter openai-compatible -- python my_agent.py</code></pre>
+        <pre><code>amc adapters configure --agent my-agent --adapter generic-cli --route /openai --model local-model --mode SUPERVISE
+amc adapters run --agent my-agent --adapter generic-cli -- python my_agent.py</code></pre>
         <p>AMC injects the appropriate base URL environment variable so your agent's API calls route through the gateway.</p>
       </div>
 

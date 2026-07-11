@@ -827,6 +827,62 @@ components:
     ObservedHookReceipt:
       $ref: './schemas/observed-hook-receipt.schema.json'
 
+    AdapterCapabilityReceipt:
+      type: object
+      additionalProperties: false
+      required: [receiptVersion, receiptId, issuedAt, subject, adapter, inspection, effective, verification, receiptHash, signature]
+      properties:
+        receiptVersion:
+          type: string
+          enum: [amc.adapter-capability-receipt.v1]
+        receiptId:
+          type: string
+          pattern: '^adcap_[a-f0-9]{32}$'
+        issuedAt:
+          type: string
+          format: date-time
+        subject:
+          type: object
+          additionalProperties: false
+          required: [agentId, adapterId]
+          properties:
+            agentId: { type: string }
+            adapterId: { type: string }
+        adapter:
+          type: object
+          description: Authoritative adapter identity and versioned capability declaration.
+        inspection:
+          type: object
+          description: Runtime/version, signed configuration, and provider-hook state inspected for this subject.
+        effective:
+          type: object
+          additionalProperties: false
+          required: [events, controls]
+          properties:
+            events:
+              type: array
+              items: { type: string }
+            controls:
+              type: array
+              items: { type: string }
+        verification:
+          type: object
+          additionalProperties: false
+          required: [status, reasons]
+          properties:
+            status:
+              type: string
+              enum: [verified, partial, fail_closed]
+            reasons:
+              type: array
+              items: { type: string }
+        receiptHash:
+          type: string
+          pattern: '^[a-f0-9]{64}$'
+        signature:
+          type: object
+          description: Existing AMC auditor signature over the canonical receipt hash.
+
 tags:
   - name: health
     description: Health and readiness checks
@@ -871,7 +927,7 @@ tags:
   - name: identity
     description: Identity, SCIM tokens, OIDC/SAML providers, group mapping
   - name: adapters
-    description: Adapter management — init, verify, list, detect, configure
+    description: Adapter management — init, verify, list, detect, configure, and portable signed capability receipts
   - name: assurance
     description: Assurance packs — list, run, cert issue/verify, scheduler, waivers, false-positive tracking
   - name: benchmark
@@ -4010,6 +4066,49 @@ paths:
       responses:
         '200':
           description: Detected adapters
+
+  /v1/adapters/capability-receipts:
+    post:
+      tags: [adapters, passport]
+      summary: Issue a signed adapter capability receipt
+      description: Returns declared and effective events/controls, version-probe semantics, current signed configuration and hook state, explicit lossiness, verification result, receipt hash, and auditor signature. Raw prompts, tool arguments, outputs, paths, tokens, and secrets are excluded.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [adapterId]
+              properties:
+                agentId:
+                  type: string
+                adapterId:
+                  type: string
+      responses:
+        '201':
+          description: Signed adapter capability receipt
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                required: [ok, data]
+                properties:
+                  ok:
+                    type: boolean
+                    enum: [true]
+                  data:
+                    type: object
+                    additionalProperties: false
+                    required: [receipt]
+                    properties:
+                      receipt:
+                        $ref: '#/components/schemas/AdapterCapabilityReceipt'
+        '400': { description: Invalid or unknown request field }
+        '401': { description: Missing or invalid Studio authorization }
+        '404': { description: Adapter not found }
+        '500': { description: Receipt issuance failed closed }
 
   /v1/adapters/configure:
     post:

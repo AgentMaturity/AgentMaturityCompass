@@ -59,6 +59,42 @@ commandTemplate:
   args:
     - run
   supportsStdin: true
+capabilities:
+  declarationVersion: "1"
+  definitionVersion: 1.0.0
+  versionSource: adapter_binary
+  events:
+    - id: process.started
+      activeWhen: [adapter_run]
+    - id: process.stdout
+      activeWhen: [adapter_run]
+    - id: process.stderr
+      activeWhen: [adapter_run]
+    - id: process.exited
+      activeWhen: [adapter_run]
+    - id: model.request
+      activeWhen: [gateway_routed]
+    - id: model.response
+      activeWhen: [gateway_routed]
+  controls:
+    - id: gateway.route
+      activeWhen: [gateway_routed]
+    - id: gateway.model
+      activeWhen: [gateway_routed]
+    - id: gateway.budget
+      activeWhen: [gateway_routed]
+    - id: gateway.freeze
+      activeWhen: [gateway_routed]
+  lossiness:
+    level: partial
+    omitted:
+      - Provider-native session and tool lifecycle is not guaranteed by gateway wrapping
+      - Configured redaction excludes secrets and raw sensitive fields from evidence
+  verification:
+    status: fixture_verified
+    authority: publisher
+    evidenceRefs:
+      - tests/my-framework-adapter.test.ts
 notes: Routes My Framework through the AMC gateway using a short-lived lease.
 ```
 
@@ -76,7 +112,10 @@ Field contract:
 | `defaultRunMode` | yes | `SUPERVISE` for local process execution or `SANDBOX` for hardened execution |
 | `envStrategy` | yes | Environment variables that carry gateway URL, lease token, and proxy settings |
 | `commandTemplate` | yes | Default executable and args before user-supplied args |
+| `capabilities` | yes for publishable claims | Versioned events, controls, activation conditions, version-probe semantics, known lossiness, and fixture evidence |
 | `notes` | no | Short operational note |
+
+Older plugin definitions without `capabilities` still parse for compatibility, but AMC assigns them `definitionVersion: unverified`, `versionSource: unknown`, empty event/control lists, and `verification.status: unverified`. Publisher declarations remain visible for review but cannot become effective AMC claims: plugin receipts stay `fail_closed` with `declaration:plugin-not-certified` until the separate public partner-certification lane exists.
 
 Minimal plugin manifest shape:
 
@@ -134,6 +173,7 @@ amc plugin install --registry local ./dist/my-framework-adapter.amcplug
 amc plugin workspace-verify
 amc adapters list
 amc adapters detect
+amc adapters capabilities --agent my-agent --adapter my-framework-cli --json
 ```
 
 Configure and run:
@@ -234,6 +274,7 @@ Before publishing or contributing a custom adapter:
 - `amc adapters run --adapter <id> -- <small command>` writes `agent_process_started`, stdout/stderr when present, and `agent_process_exited`.
 - Secrets in stdout/stderr are redacted.
 - The adapter works with a minimal real-world task and exits with an accurate code.
+- `amc adapters capabilities --agent <id> --adapter <id> --json` returns a trusted fail-closed receipt whose declaration and limitations match the publisher fixture evidence; host-runtime metadata or publisher self-attestation must not produce `verified`.
 
 ## Current Limits
 

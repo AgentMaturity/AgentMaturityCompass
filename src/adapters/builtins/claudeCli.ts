@@ -1,4 +1,5 @@
 import type { AdapterDefinition } from "../adapterTypes.js";
+import { builtInAdapterCapabilities } from "../adapterCapabilities.js";
 
 export const claudeCliAdapter: AdapterDefinition = {
   id: "claude-cli",
@@ -31,6 +32,13 @@ export const claudeCliAdapter: AdapterDefinition = {
     executable: "claude",
     args: [],
     supportsStdin: true
-  }
+  },
+  capabilities: builtInAdapterCapabilities({
+    versionSource: "adapter_binary",
+    hookProvider: "claude-code",
+    evidenceRefs: [
+      "docs/adapters/claude-code.md",
+      "https://code.claude.com/docs/en/hooks.md#sha256-e94e721874efc802248a7808e35ac917306088c5eaada2aa21e1def3fecc32e1"
+    ]
+  })
 };
-

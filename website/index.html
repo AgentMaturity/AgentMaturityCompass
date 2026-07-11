@@ -89,10 +89,10 @@
         <div class="stats-row">
           <div class="stat gs"><span class="stat-value">244</span><span class="stat-label">default questions</span></div>
           <div class="stat gs"><span class="stat-value">264</span><span class="stat-label">lifecycle questions</span></div>
-          <div class="stat gs"><span class="stat-value">1,149</span><span class="stat-label">CLI command paths</span></div>
+          <div class="stat gs"><span class="stat-value">1,150</span><span class="stat-label">CLI command paths</span></div>
           <div class="stat gs"><span class="stat-value">142</span><span class="stat-label">assurance packs</span></div>
           <div class="stat gs"><span class="stat-value">41</span><span class="stat-label">industry packs</span></div>
-          <div class="stat gs"><span class="stat-value">8,366</span><span class="stat-label">passing tests</span></div>
+          <div class="stat gs"><span class="stat-value">8,380</span><span class="stat-label">passing tests</span></div>
         </div>
       </div>
     </section>
@@ -177,7 +177,7 @@
           <div class="product-info-card"><span>watch + enforce</span><strong>Observed actions, signed decisions</strong><p>Observe Claude Code and Gemini CLI actions by default, or opt into loopback control that reuses AMC policies and binds the exact native response to a signed receipt.</p></div>
           <div class="product-info-card"><span>fleet</span><strong>Overview + trust graph</strong><p>Use fleet overview, graph validation, SLO status, and trust-graph exports before scoring multi-agent systems.</p></div>
           <div class="product-info-card"><span>enforce + shield</span><strong>Policy and safe proof</strong><p>Runtime firewall decisions, resource snapshots, safe confirmation proof, and 142 assurance packs stay in the free core.</p></div>
-          <div class="product-info-card"><span>docs + API</span><strong>1,149 CLI paths</strong><p>The generated command inventory, API reference, OpenAPI playground, and docs hub expose the same product surface users run locally.</p></div>
+          <div class="product-info-card"><span>docs + API</span><strong>1,150 CLI paths</strong><p>The generated command inventory, API reference, OpenAPI playground, and docs hub expose the same product surface users run locally.</p></div>
         </div>
       </div>
     </section>
@@ -249,7 +249,7 @@
         <div class="section-heading gs" style="text-align:center">
           <p class="label">integrations</p>
           <h2>Works with <strong>your stack<span class="accent blink-cursor">_</span></strong></h2>
-          <p class="section-desc" style="margin:1rem auto 0;text-align:center">14 built-in adapters, one-command Claude Code and Gemini CLI observation hooks, and explicit loopback signed control. No framework rewrite or second policy engine required.</p>
+          <p class="section-desc" style="margin:1rem auto 0;text-align:center">14 built-in adapters, one-command Claude Code and Gemini CLI hooks, and portable signed receipts that show exact events, controls, runtime version, effective mode, and lossiness. No second policy engine required.</p>
         </div>
         <div class="logos-grid logos-grid-icons gs">
           <div class="logo-icon-item"><img src="https://cdn.simpleicons.org/langchain/ffffff" alt="LangChain" loading="lazy"><p>LangChain</p></div>
@@ -409,7 +409,7 @@
           <div class="faq-item gs"><button class="faq-q" aria-expanded="false">Is this just a quick score?<span class="faq-icon">+</span></button><div class="faq-a"><p>No. The default <code>amc</code> command generates the full 244-question score. Use <code>amc run --question-set lifecycle</code> for the 264-question lifecycle-expanded set.</p></div></div>
           <div class="faq-item gs"><button class="faq-q" aria-expanded="false">What is the 84-point documentation inflation gap?<span class="faq-icon">+</span></button><div class="faq-a"><p>Self-reported documentation can claim 100/100 while execution-verified evidence shows a much weaker score. AMC closes that gap with observed evidence, signed artifacts, and repeatable proof chains.</p></div></div>
           <div class="faq-item gs"><button class="faq-q" aria-expanded="false">How is AMC different from other evaluation tools?<span class="faq-icon">+</span></button><div class="faq-a"><p>AMC is a trusted observer. Self-reported evidence is capped at <span class="hl">0.4x weight</span>; observed runtime evidence carries <span class="hl">1.0x weight</span>. It scores maturity, finds gaps, runs assurance packs, and preserves verifiable evidence.</p></div></div>
-          <div class="faq-item gs"><button class="faq-q" aria-expanded="false">Which frameworks does AMC support?<span class="faq-icon">+</span></button><div class="faq-a"><p><span class="hl">14 adapters</span>: LangChain, LangGraph, CrewAI, AutoGen, OpenAI Agents SDK, LlamaIndex, Semantic Kernel, Claude Code, Gemini, OpenClaw, OpenHands, Python SDK, CLI, and OpenAI-compatible endpoints.</p></div></div>
+          <div class="faq-item gs"><button class="faq-q" aria-expanded="false">Which frameworks does AMC support?<span class="faq-icon">+</span></button><div class="faq-a"><p><span class="hl">14 adapters</span>: AutoGen, Claude Code, CrewAI, Gemini CLI, Generic CLI, LangChain for Node and Python, LangGraph, LlamaIndex, OpenAI Agents SDK, OpenClaw, OpenHands, Python AMC SDK, and Semantic Kernel. OpenAI-compatible endpoints use the Generic CLI adapter with the <code>/openai</code> gateway route. Run <code>amc adapters capabilities</code> for signed, current coverage instead of relying on a static badge.</p></div></div>
           <div class="faq-item gs"><button class="faq-q" aria-expanded="false">Can I use AMC in CI/CD?<span class="faq-icon">+</span></button><div class="faq-a"><p>Yes. Use gates such as <code>amc gate --min-score L3</code> to fail builds below threshold and prevent trust regressions.</p></div></div>
           <div class="faq-item gs"><button class="faq-q" aria-expanded="false">Do I need an account?<span class="faq-icon">+</span></button><div class="faq-a"><p>No account is needed for the free core. Industry Packs require paid access.</p></div></div>
           <div class="faq-item gs"><button class="faq-q" aria-expanded="false">Do I need Docker?<span class="faq-icon">+</span></button><div class="faq-a"><p>No. Use the verified macOS/Linux or Windows release installer above. Docker is optional.</p></div></div>

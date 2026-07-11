@@ -13,7 +13,7 @@
 
 ## CLI Commands
 
-AMC provides 1,149 public CLI command paths in the live command inventory.
+AMC provides 1,150 public CLI command paths in the live command inventory.
 
 | # | Command | Description |
 |---|---------|-------------|
@@ -1166,6 +1166,7 @@ AMC provides 1,149 public CLI command paths in the live command inventory.
 | 1147 | `amc workorder show` | Show signed work order JSON |
 | 1148 | `amc workorder verify` | Verify work order signature |
 | 1149 | `amc wrap` | Wrap runtime and capture tamper-evident evidence |
+| 1150 | `amc adapters capabilities` | Issue a signed Passport receipt for declared and effective adapter capabilities |
 
 ### Command Details
 
@@ -1190,6 +1191,17 @@ Set adapter profile for an agent (signed adapters.yaml)
 | `--route <route>` | - |
 | `--model <model>` | - |
 | `--mode <mode>` | - |
+
+#### `amc adapters capabilities`
+
+Issue a signed Passport receipt for declared and effective adapter capabilities
+
+| Option | Description |
+|--------|-------------|
+| `--agent <agentId>` | - |
+| `--adapter <adapterId>` | - |
+| `--out <path>` | - |
+| `--json` | - |
 
 #### `amc adapters env`
 

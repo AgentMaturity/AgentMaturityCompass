@@ -54,7 +54,8 @@ const VERIFIER_PATHS = new Set([
 
 const ATTESTER_PATHS = new Set([
   "/api/v1/evidence/attest",
-  "/api/v1/watch/attest"
+  "/api/v1/watch/attest",
+  "/api/v1/adapters/capability-receipts"
 ]);
 
 const OWNER_MUTATION_PATHS = new Set([

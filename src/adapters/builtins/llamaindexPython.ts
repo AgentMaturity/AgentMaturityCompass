@@ -1,4 +1,5 @@
 import type { AdapterDefinition } from "../adapterTypes.js";
+import { builtInAdapterCapabilities } from "../adapterCapabilities.js";
 
 export const llamaindexPythonAdapter: AdapterDefinition = {
   id: "llamaindex-python",
@@ -31,6 +32,9 @@ export const llamaindexPythonAdapter: AdapterDefinition = {
     executable: "python",
     args: [".amc/adapters-samples/llamaindex-python/run.py"],
     supportsStdin: false
-  }
+  },
+  capabilities: builtInAdapterCapabilities({
+    versionSource: "host_runtime",
+    evidenceRefs: ["docs/adapters/llamaindex.md"]
+  })
 };
-

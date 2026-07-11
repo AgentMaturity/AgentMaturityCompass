@@ -1,4 +1,5 @@
 import type { AdapterDefinition } from "../adapterTypes.js";
+import { builtInAdapterCapabilities } from "../adapterCapabilities.js";
 
 export const crewaiCliAdapter: AdapterDefinition = {
   id: "crewai-cli",
@@ -31,6 +32,9 @@ export const crewaiCliAdapter: AdapterDefinition = {
     executable: "crewai",
     args: [],
     supportsStdin: true
-  }
+  },
+  capabilities: builtInAdapterCapabilities({
+    versionSource: "mixed_runtime",
+    evidenceRefs: ["docs/adapters/crewai.md"]
+  })
 };
-

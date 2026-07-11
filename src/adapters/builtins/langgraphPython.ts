@@ -1,4 +1,5 @@
 import type { AdapterDefinition } from "../adapterTypes.js";
+import { builtInAdapterCapabilities } from "../adapterCapabilities.js";
 
 export const langgraphPythonAdapter: AdapterDefinition = {
   id: "langgraph-python",
@@ -31,6 +32,9 @@ export const langgraphPythonAdapter: AdapterDefinition = {
     executable: "python",
     args: [".amc/adapters-samples/langgraph-python/run.py"],
     supportsStdin: false
-  }
+  },
+  capabilities: builtInAdapterCapabilities({
+    versionSource: "host_runtime",
+    evidenceRefs: ["docs/adapters/langgraph-python.md"]
+  })
 };
-

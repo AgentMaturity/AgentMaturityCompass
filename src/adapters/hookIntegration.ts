@@ -186,6 +186,7 @@ export interface HookMutationResult {
 
 export interface HookIntegrationStatus {
   provider: HookProvider;
+  agentId: string | null;
   mode: HookMode | null;
   state: "not-installed" | "installed" | "drifted" | "expired" | "invalid";
   source: typeof CLAUDE_CODE_HOOK_SOURCE | typeof GEMINI_CLI_HOOK_SOURCE;
@@ -1080,6 +1081,7 @@ export function getHookIntegrationStatus(input: { workspace: string; provider: H
   } catch (error) {
     return {
       provider,
+      agentId: null,
       mode: null,
       state: "invalid",
       source: providerSource(provider),
@@ -1101,6 +1103,7 @@ export function getHookIntegrationStatus(input: { workspace: string; provider: H
   if (!anyArtifact && owned.length === 0) {
     return {
       provider,
+      agentId: null,
       mode: null,
       state: "not-installed",
       source: providerSource(provider),
@@ -1165,6 +1168,7 @@ export function getHookIntegrationStatus(input: { workspace: string; provider: H
   }
   return {
     provider,
+    agentId: manifest?.agentId ?? null,
     mode: manifest?.mode ?? null,
     state,
     source: providerSource(provider),

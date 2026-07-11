@@ -6,6 +6,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 |---|---|---|---|
 | `amc action-queue` | Show prioritized actions sorted by risk-reduction-per-effort | `--limit <n>` | - |
 | `amc adapters` | Built-in adapter system for one-line agent integration | - | - |
+| `amc adapters capabilities` | Issue a signed Passport receipt for declared and effective adapter capabilities | `--agent <agentId>`<br>`--adapter <adapterId>`<br>`--out <path>`<br>`--json` | - |
 | `amc adapters configure` | Set adapter profile for an agent (signed adapters.yaml) | `--agent <agentId>`<br>`--adapter <adapterId>`<br>`--route <route>`<br>`--model <model>`<br>`--mode <mode>` | - |
 | `amc adapters detect` | Detect installed adapter runtimes and versions | - | - |
 | `amc adapters env` | Print adapter-compatible environment exports without lease token | `--agent <agentId>`<br>`--adapter <adapterId>` | - |

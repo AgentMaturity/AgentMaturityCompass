@@ -63,6 +63,20 @@ amc passport export-latest --scope agent --id <agentId> --out ./agent-latest.amc
 
 If any critical check fails, verification returns fail and the artifact is treated as untrusted.
 
+## Adapter Capability Receipts
+
+Passport also provides a standalone, portable adapter capability receipt for integration proof:
+
+```bash
+amc adapters capabilities --agent <agentId> --adapter <adapterId> --out adapter-capabilities.json --json
+```
+
+`amc.adapter-capability-receipt.v1` binds the authoritative adapter declaration to the current runtime/version probe, signed adapter selection, provider-hook state, effective event/control projection, explicit lossiness, verification reasons, receipt hash, and auditor signature. It does not change the `.amcpass` v1 schema and does not imply AEP or provider parity.
+
+Receipt integrity and capability status are deliberately separate. A trusted `partial` or `fail_closed` receipt is valid portable proof that a limitation exists. Unknown fields, hash mismatch, effective-state mismatch, receipt-ID mismatch, signature tamper, or an untrusted public key makes the receipt itself invalid.
+
+The receipt contains no prompt, tool arguments, model/tool output, stdout/stderr content, cwd, transcript path, raw session identifier, lease token, or secret.
+
 ## Schema Compatibility
 
 Passport schema compatibility can be recorded with a passport schema compatibility report using `amc.passport.compatibility.v1`. The report is a signed-evidence companion for `.amcpass` exchange, not a replacement for `amc passport verify`.

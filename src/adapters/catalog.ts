@@ -12,7 +12,14 @@ function cloneAdapter(definition: AdapterDefinition): AdapterDefinition {
       proxyEnv: { ...definition.envStrategy.proxyEnv }
     },
     commandTemplate: { ...definition.commandTemplate },
-    detection: { ...definition.detection }
+    detection: { ...definition.detection },
+    capabilities: {
+      ...definition.capabilities,
+      events: definition.capabilities.events.map((entry) => ({ ...entry, activeWhen: [...entry.activeWhen] })),
+      controls: definition.capabilities.controls.map((entry) => ({ ...entry, activeWhen: [...entry.activeWhen] })),
+      lossiness: { ...definition.capabilities.lossiness, omitted: [...definition.capabilities.lossiness.omitted] },
+      verification: { ...definition.capabilities.verification, evidenceRefs: [...definition.capabilities.verification.evidenceRefs] }
+    }
   };
 }
 

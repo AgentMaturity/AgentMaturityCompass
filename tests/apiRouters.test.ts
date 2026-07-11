@@ -378,6 +378,10 @@ const m = vi.hoisted(() => ({
   adaptersVerifyCli: vi.fn(() => ({ valid: true })),
   adaptersListCli: vi.fn(() => ({ adapters: [{ id: "a1" }] })),
   adaptersDetectCli: vi.fn(() => [{ id: "node" }]),
+  adaptersCapabilitiesCli: vi.fn((params: { adapterId: string }) => {
+    if (params.adapterId === "does-not-exist") throw new Error("Unknown adapter: does-not-exist");
+    return { receiptVersion: "amc.adapter-capability-receipt.v1", receiptHash: "a".repeat(64) };
+  }),
   adaptersConfigureCli: vi.fn(() => ({ route: "/openai" })),
   adaptersEnvCli: vi.fn(() => ({ exports: ["A=B"] })),
   adaptersRunCli: vi.fn(async () => ({ exitCode: 0 })),
@@ -794,6 +798,7 @@ vi.mock("../src/adapters/adapterCli.js", () => ({
   adaptersVerifyCli: m.adaptersVerifyCli,
   adaptersListCli: m.adaptersListCli,
   adaptersDetectCli: m.adaptersDetectCli,
+  adaptersCapabilitiesCli: m.adaptersCapabilitiesCli,
   adaptersConfigureCli: m.adaptersConfigureCli,
   adaptersEnvCli: m.adaptersEnvCli,
   adaptersRunCli: m.adaptersRunCli,
@@ -1908,7 +1913,7 @@ describe("AMC API routers", () => {
     }
   });
 
-  test("adapters router covers init, verify, list, detect, configure, env, run, and init-project routes", async () => {
+  test("adapters router covers init, verify, list, detect, capability receipts, configure, env, run, and init-project routes", async () => {
     const ws = workspace();
     const cases = [
       ["/api/v1/adapters/init", "POST", undefined, undefined, 201],
@@ -1923,6 +1928,29 @@ describe("AMC API routers", () => {
     for (const [pathname, method, body, url, status] of cases) {
       await assertJsonRoute(handleAdaptersRoute, { pathname, method, body, url, workspace: ws }, status);
     }
+    const capability = await callRoute(handleAdaptersRoute, {
+      pathname: "/api/v1/adapters/capability-receipts",
+      method: "POST",
+      body: { adapterId: "generic-cli", agentId: "agent-1" },
+      workspace: ws
+    });
+    expect(capability.handled).toBe(true);
+    expect(capability.status, capability.body).toBe(201);
+    expect(capability.json?.ok).toBe(true);
+    const rejected = await callRoute(handleAdaptersRoute, {
+      pathname: "/api/v1/adapters/capability-receipts",
+      method: "POST",
+      body: { adapterId: "generic-cli", rawInput: "SECRET" },
+      workspace: ws
+    });
+    expect(rejected).toMatchObject({ handled: true, status: 400, json: { ok: false } });
+    const unknown = await callRoute(handleAdaptersRoute, {
+      pathname: "/api/v1/adapters/capability-receipts",
+      method: "POST",
+      body: { adapterId: "does-not-exist" },
+      workspace: ws
+    });
+    expect(unknown).toMatchObject({ handled: true, status: 404, json: { ok: false } });
   });
 
   test("product router covers batch and portal routes", async () => {

@@ -616,6 +616,7 @@ import {
   type TemporalDecaySourceRun
 } from "./trust/temporalDecay.js";
 import {
+  adaptersCapabilitiesCli,
   adaptersConfigureCli,
   adaptersDetectCli,
   adaptersEnvCli,
@@ -4419,7 +4420,11 @@ adapters
     const out = adaptersListCli(process.cwd());
     console.log(chalk.hex('#4AEF79')("Built-in adapters:"));
     for (const row of out.builtins) {
-      console.log(`- ${row.id} (${row.kind}) defaultMode=${row.defaultRunMode} provider=${row.providerFamily}`);
+      console.log(
+        `- ${row.id} (${row.kind}) defaultMode=${row.defaultRunMode} provider=${row.providerFamily}`
+        + ` events=${row.capabilities.events.length} controls=${row.capabilities.controls.length}`
+        + ` lossiness=${row.capabilities.lossiness.level} version=${row.capabilities.definitionVersion}`
+      );
     }
     console.log("");
     console.log(chalk.hex('#4AEF79')("Configured per-agent profiles:"));
@@ -4430,6 +4435,43 @@ adapters
     for (const row of out.configured) {
       console.log(`- ${row.agentId}: adapter=${row.adapterId} route=${row.route} model=${row.model} mode=${row.mode}`);
     }
+  });
+
+adapters
+  .command("capabilities")
+  .description("Issue a signed Passport receipt for declared and effective adapter capabilities")
+  .requiredOption("--agent <agentId>", "agent ID")
+  .requiredOption("--adapter <adapterId>", "adapter ID")
+  .option("--out <path>", "write the signed receipt to a JSON file")
+  .option("--json", "print the complete signed receipt as JSON")
+  .action((opts: { agent: string; adapter: string; out?: string; json?: boolean }) => {
+    const receipt = adaptersCapabilitiesCli({
+      workspace: process.cwd(),
+      agentId: opts.agent,
+      adapterId: opts.adapter
+    });
+    if (opts.out) {
+      const outPath = resolve(opts.out);
+      mkdirSync(dirname(outPath), { recursive: true });
+      writeFileSync(outPath, `${JSON.stringify(receipt, null, 2)}\n`, { encoding: "utf8", mode: 0o644 });
+      if (!opts.json) console.log(chalk.green(`Adapter capability receipt: ${outPath}`));
+    }
+    if (opts.json) {
+      console.log(JSON.stringify(receipt, null, 2));
+      return;
+    }
+    console.log(chalk.hex('#4AEF79')(`${receipt.subject.adapterId} capability receipt`));
+    console.log(`Agent: ${receipt.subject.agentId}`);
+    console.log(`Verification: ${receipt.verification.status}`);
+    console.log(`Runtime: ${receipt.inspection.runtime.status} ${receipt.inspection.runtime.version ?? ""}`.trim());
+    console.log(`Configuration: ${receipt.inspection.configuration.status}`);
+    console.log(`Hook: ${receipt.inspection.hook.status}`);
+    console.log(`Effective events: ${receipt.effective.events.join(", ") || "none"}`);
+    console.log(`Effective controls: ${receipt.effective.controls.join(", ") || "none"}`);
+    if (receipt.verification.reasons.length > 0) {
+      console.log(`Reasons: ${receipt.verification.reasons.join(", ")}`);
+    }
+    console.log(`Receipt hash: ${receipt.receiptHash}`);
   });
 
 adapters

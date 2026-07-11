@@ -7,6 +7,7 @@ import { initAdaptersConfig, loadAdaptersConfig, setAgentAdapterProfile, verifyA
 import { runAdapterCommand, initAdapterProjectSample } from "./adapterRunner.js";
 import { assembleAdapterEnv } from "./envAssembler.js";
 import type { AdapterRunMode } from "./adapterTypes.js";
+import { issueAdapterCapabilityReceipt } from "../passport/adapterCapabilityReceipt.js";
 
 export function adaptersInitCli(workspace: string): { configPath: string; sigPath: string } {
   return initAdaptersConfig(workspace);
@@ -42,6 +43,18 @@ export function adaptersDetectCli(options?: { workspace?: string; timeoutMs?: nu
   const workspace = options?.workspace ?? process.cwd();
   const adapters = options?.includePlugins === false ? listBuiltInAdapters() : listAvailableAdapters(workspace);
   return adapters.map((adapter) => detectAdapter(adapter, { timeoutMs: options?.timeoutMs }));
+}
+
+export function adaptersCapabilitiesCli(params: {
+  workspace: string;
+  agentId?: string;
+  adapterId: string;
+}): ReturnType<typeof issueAdapterCapabilityReceipt> {
+  return issueAdapterCapabilityReceipt({
+    workspace: params.workspace,
+    agentId: params.agentId,
+    adapterId: params.adapterId
+  });
 }
 
 export function adaptersConfigureCli(params: {

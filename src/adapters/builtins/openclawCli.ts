@@ -1,4 +1,5 @@
 import type { AdapterDefinition } from "../adapterTypes.js";
+import { builtInAdapterCapabilities } from "../adapterCapabilities.js";
 
 export const openclawCliAdapter: AdapterDefinition = {
   id: "openclaw-cli",
@@ -31,6 +32,9 @@ export const openclawCliAdapter: AdapterDefinition = {
     executable: "openclaw",
     args: [],
     supportsStdin: true
-  }
+  },
+  capabilities: builtInAdapterCapabilities({
+    versionSource: "adapter_binary",
+    evidenceRefs: ["docs/adapters/openclaw.md"]
+  })
 };
-
