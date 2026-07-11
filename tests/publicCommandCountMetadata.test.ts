@@ -27,6 +27,7 @@ const CURRENT_COMMAND_COUNT_FILES = [
   "website/docs/cli.html",
   "website/docs/competitive-analysis.md",
   "docs/BENCHMARK_GALLERY.md",
+  "src/console/assets/app.js",
 ];
 
 const HISTORICAL_COMMAND_COUNT_RECEIPTS = [

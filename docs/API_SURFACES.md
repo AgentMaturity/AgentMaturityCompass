@@ -489,6 +489,13 @@ Scope:
 - primary owner/operator console API implemented in `src/studio/studioServer.ts`
 - examples: `/status`, `/assurance/*`, `/audit/*`, `/value/*`, `/passport/*`, `/plugins/*`, `/toolhub/*`
 
+Outcome-based onboarding:
+- `GET /onboarding/status?agentId=<id>` returns existing workspace setup detail separately from a read-only four-milestone activation projection.
+- The activation milestones are connected agent, first observed action, first control decision, and first signed proof. Signed configuration can report `READY`; only verified runtime receipts can report a milestone `COMPLETE`.
+- Agent credentials may inspect only their own agent ID. Admin and authenticated Studio sessions retain their existing workspace scope.
+- The response contains bounded event/receipt identifiers, receipt hash, timestamp, source, and an authenticated relative evidence path. It excludes payloads, prompts, tool arguments, lease/auth credentials, provider secrets, and absolute filesystem paths.
+- Status inspection does not mint a lease, call a provider, generate traffic, append evidence, or create an onboarding event store. Invalid signatures, malformed candidate metadata, missing receipts, lifecycle ambiguity, and ledger tampering fail closed with bounded reason codes.
+
 Canonical approval routes:
 - `GET /approvals/requests?agentId=<id>&status=<status>` lists the signed quorum-chain projection.
 - `GET /approvals/requests/:id` returns request, decision, quorum, integrity, and execution-readiness state.

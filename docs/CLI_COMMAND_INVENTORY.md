@@ -258,7 +258,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc config explain` | Explain config source precedence and risky settings | `--json` | - |
 | `amc config print` | Print resolved runtime config (secret-safe) | `--json` | - |
 | `amc config profile` | Print or apply workspace config profile (dev\|ci\|prod) | - | - |
-| `amc connect` | Connect wizard for any agent/provider runtime | `--agent <agentId>`<br>`--adapter <adapterId>`<br>`--token-file <path>`<br>`--bridge-url <url>`<br>`--mode <mode>`<br>`--print-env`<br>`--print-cmd` | - |
+| `amc connect` | Connect an agent runtime and track first action, decision, and proof | `--agent <agentId>`<br>`--adapter <adapterId>`<br>`--token-file <path>`<br>`--bridge-url <url>`<br>`--mode <mode>`<br>`--status`<br>`--json`<br>`--print-env`<br>`--print-cmd` | - |
 | `amc connect hooks` | Install, inspect, or remove provider-native AMC observation and control hooks | - | - |
 | `amc connect hooks install` | Install a reversible project hook for Claude Code or Gemini CLI | `--provider <provider>`<br>`--mode <mode>`<br>`--agent <agentId>`<br>`--bridge-url <url>`<br>`--ttl <ttl>`<br>`--rpm <rpm>`<br>`--dry-run`<br>`--json` | - |
 | `amc connect hooks lifecycle` | Verify one requested, controlled, and terminal provider action lifecycle | `--agent <agentId>`<br>`--action <actionId>`<br>`--json` | - |

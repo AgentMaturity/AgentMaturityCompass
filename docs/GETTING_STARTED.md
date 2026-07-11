@@ -96,6 +96,19 @@ amc connect hooks install --provider claude-code --mode control --agent my-agent
 
 Control is loopback-only. It evaluates raw tool input in memory, retains no raw args, and returns a receipt-bound native decision from AMC's existing signed policies. Claude Code supports `allow`, `deny`, and `ask`; Gemini CLI has no native `ask`, so AMC returns `deny` for that outcome. Provider-local ask is not proof of AMC quorum, and multi-user policies remain denied.
 
+### Verify first-run activation outcomes
+
+After connecting an agent, inspect the same read-only activation projection used by Studio:
+
+```bash
+amc connect --status --agent my-agent
+amc connect --status --agent my-agent --json
+```
+
+AMC tracks four outcomes: connected agent, first observed action, first control decision, and first signed proof. A valid signed adapter or hook configuration can make the connection `READY`, but it cannot make activation `COMPLETE`. Completion requires receipt-backed runtime evidence for that exact agent. Metadata-only events, missing receipts, malformed metadata, cross-agent evidence, invalid hook ownership, and ledger or configuration tampering fail closed.
+
+The status command is pure inspection. It does not mint a lease, call a provider, run a sample task, generate traffic, append evidence, or create a second onboarding record. Run your own agent action through AMC, then refresh the command or the Studio Activation path.
+
 **Add a badge to your README:**
 
 ```bash

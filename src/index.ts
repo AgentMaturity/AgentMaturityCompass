@@ -439,6 +439,19 @@ export { createUnifiedClaritySnapshot } from "./snapshot/snapshot.js";
 export { initLoop, loopPlan, loopRun, loopSchedule } from "./loop/loop.js";
 export { buildConnectInstructions } from "./studio/connectWizard.js";
 export {
+  projectOnboardingActivation,
+  renderOnboardingActivationText
+} from "./setup/onboardingActivation.js";
+export type {
+  OnboardingActivationEvidenceRef,
+  OnboardingActivationMilestone,
+  OnboardingActivationMilestoneId,
+  OnboardingActivationMilestoneStatus,
+  OnboardingActivationProjection,
+  OnboardingActivationReasonCode,
+  OnboardingActivationStatus
+} from "./setup/onboardingActivation.js";
+export {
   adaptersInitCli,
   adaptersVerifyCli,
   adaptersListCli,

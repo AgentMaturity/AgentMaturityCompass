@@ -306,6 +306,34 @@ function renderOnboardingSteps(state) {
   `;
 }
 
+function renderOnboardingActivation(activation) {
+  const milestones = Array.isArray(activation?.milestones) ? activation.milestones : [];
+  if (milestones.length === 0) {
+    return "<p class='muted'>No verified activation outcomes yet.</p>";
+  }
+  return `
+    <div class="activation-list">
+      ${milestones.map((row, index) => `
+        <div class="activation-row">
+          <span class="activation-index">0${index + 1}</span>
+          <div class="activation-copy">
+            <strong>${htmlEscape(row.label || row.id || "Outcome")}</strong>
+            <p class="muted">${htmlEscape(row.summary || "")}</p>
+            ${row.evidence?.studioPath ? `<a href="${htmlEscape(row.evidence.studioPath.replace(/^\/console\//, "./"))}">View signed proof</a>` : ""}
+          </div>
+          ${statusPill(row.status || "WAITING")}
+        </div>
+      `).join("")}
+    </div>
+    ${activation.nextAction ? `
+      <div class="activation-next">
+        <span>Next</span>
+        <code>${htmlEscape(activation.nextAction.command || "")}</code>
+      </div>
+    ` : ""}
+  `;
+}
+
 function renderApiQuickstart(status, agentId) {
   const base = `${window.location.origin}${workspacePrefixFromPath()}`;
   const demoMode = currentWorkspaceLabel() === "demo";
@@ -1072,11 +1100,12 @@ function renderAuthScreen() {
 async function renderHome() {
   const status = await apiGet("/status");
   const agentsResp = await apiGet("/agents");
-  const onboarding = await apiGet("/onboarding/status").catch(() => ({ state: null }));
+  const agentId = status.studio?.currentAgent || "default";
+  const onboarding = await apiGet(`/onboarding/status?agentId=${encodeURIComponent(agentId)}`)
+    .catch(() => ({ state: null, activation: null }));
   const benchmarkStats = await apiGet("/benchmarks/stats").catch(() => ({ count: 0, groups: [], scatter: [] }));
   const agents = agentsResp.agents || [];
   const activeFreezes = Array.isArray(status.studio?.activeFreezes) ? status.studio.activeFreezes.length : 0;
-  const agentId = status.studio?.currentAgent || "default";
   const vaultState = status.vaultLocked ? "LOCKED" : "UNLOCKED";
   const studioRunning = status.studio?.running === false ? "STOPPED" : "RUNNING";
   const demoMode = currentWorkspaceLabel() === "demo";
@@ -1134,7 +1163,7 @@ async function renderHome() {
         <div class="studio-kicker">Desktop app</div>
         <h3>Native macOS shell, same AMC evidence-first surface.</h3>
         <p class="muted">
-          The macOS app now starts local demo-mode Studio and renders this Console inside a native WebKit window. Windows still launches the same local URL in the system browser. Both keep the same flow: 244 default questions, 264 lifecycle questions, 142 assurance packs, 41 Industry Packs, and 1,152 CLI paths.
+          The macOS app now starts local demo-mode Studio and renders this Console inside a native WebKit window. Windows still launches the same local URL in the system browser. Both keep the same flow: 244 default questions, 264 lifecycle questions, 142 assurance packs, 41 Industry Packs, and 1,153 CLI paths.
         </p>
       </div>
       <div class="row wrap">
@@ -1145,19 +1174,26 @@ async function renderHome() {
       </div>
     </section>
 
-    ${card("First Run", `
+    ${card("Activation path", `
       <div class="row spaced wrap">
         <div>
-          <div class="muted">Status</div>
-          <div class="tile-value">${htmlEscape(onboarding?.state?.status || "not_started")}</div>
+          <div class="muted">Verified outcomes</div>
+          <div class="tile-value">${htmlEscape(`${onboarding?.activation?.progress?.completed || 0}/4`)}</div>
         </div>
         <div class="row wrap">
-          <button id="studioRunOnboarding">run amc</button>
+          <button id="studioRefreshActivation" class="icon-button" aria-label="refresh activation" title="Refresh activation">&#8635;</button>
           <a class="button secondary" href="./evidence?agent=${encodeURIComponent(agentId)}">Evidence</a>
         </div>
       </div>
-      ${renderOnboardingSteps(onboarding?.state)}
-      <pre id="onboardingOut" class="scroll muted"></pre>
+      ${renderOnboardingActivation(onboarding?.activation)}
+      <details class="activation-setup">
+        <summary>Workspace setup</summary>
+        ${renderOnboardingSteps(onboarding?.state)}
+        <div class="row wrap activation-setup-actions">
+          <button id="studioRunOnboarding">run baseline</button>
+        </div>
+        <pre id="onboardingOut" class="scroll muted"></pre>
+      </details>
     `)}
 
     ${renderApiQuickstart(status, agentId)}
@@ -1216,6 +1252,17 @@ async function renderHome() {
     } finally {
       button.disabled = false;
       button.textContent = original;
+    }
+  });
+  document.getElementById("studioRefreshActivation")?.addEventListener("click", async (event) => {
+    const button = event.currentTarget;
+    button.disabled = true;
+    try {
+      await renderHome();
+      setStatus("Activation refreshed.");
+    } catch (error) {
+      button.disabled = false;
+      setStatus(`Activation refresh failed: ${errText(error)}`, true);
     }
   });
 }

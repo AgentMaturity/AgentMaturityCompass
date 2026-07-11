@@ -13,7 +13,7 @@ import { spawnSync } from "node:child_process";
 import { parse as parseYaml } from "yaml";
 import { listAgents } from "../fleet/registry.js";
 import { getAgentPaths, resolveAgentId } from "../fleet/paths.js";
-import { createOnboardingState, loadOnboardingState } from "../setup/onboardingState.js";
+import { onboardingRunForApi, onboardingStatusForApi } from "./onboardingApi.js";
 import { runDiagnostic, generateReport, loadRunReport } from "../diagnostic/runner.js";
 import { evaluateDiagnosticEvidenceReadiness, summarizeDiagnosticEvidenceReadiness } from "../diagnostic/evidenceReadiness.js";
 import { runAutoAnswer } from "../diagnostic/autoAnswer/autoAnswerEngine.js";
@@ -8750,28 +8750,22 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/onboarding/status" && req.method === "GET") {
-        const current = loadOnboardingState(options.workspace) ?? createOnboardingState({
+        const result = onboardingStatusForApi({
           workspace: options.workspace,
-          agentId: auth.agentId ?? "default",
-          mode: "studio"
+          requestedAgentId: url.searchParams.get("agentId"),
+          authAgentId: auth.agentId,
+          isAdmin: auth.isAdmin
         });
-        json(res, 200, { state: current });
+        json(res, result.status, result.body);
         return;
       }
 
       if (pathname === "/onboarding/run" && method === "POST") {
-        const result = await cliBridgeExec(options.workspace, {
-          command: "amc",
-          format: "json",
-          timeout: 120_000
-        });
-        const state = loadOnboardingState(options.workspace) ?? createOnboardingState({
+        const result = await onboardingRunForApi({
           workspace: options.workspace,
-          agentId: auth.agentId ?? "default",
-          mode: "studio",
-          status: result.ok ? "complete" : "failed"
+          authAgentId: auth.agentId
         });
-        json(res, result.ok ? 200 : 422, { result, state });
+        json(res, result.status, result.body);
         return;
       }
 

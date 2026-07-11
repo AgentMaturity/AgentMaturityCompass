@@ -1,4 +1,4 @@
-const CACHE_NAME = "amc-console-v5";
+const CACHE_NAME = "amc-console-v6";
 
 function scopeBasePath() {
   const scope = new URL(self.registration.scope);
@@ -125,28 +125,22 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
+  if (!url.pathname.includes("/assets/")) {
+    return;
+  }
+
   event.respondWith(
-    caches.match(req).then((cached) => {
-      if (cached) {
-        return cached;
-      }
-      return fetch(req)
-        .then(async (response) => {
-          if (response.ok && (url.pathname.includes("/assets/") || url.pathname.startsWith(`${base}/`) || url.pathname === base)) {
-            const cache = await caches.open(CACHE_NAME);
-            await cache.put(req, response.clone());
-          }
-          return response;
-        })
-        .catch(async () => {
-          if ((url.pathname.startsWith(`${base}/`) || url.pathname === base) && !url.pathname.includes("/assets/")) {
-            const fallback = await caches.match(assetPath("home"));
-            if (fallback) {
-              return fallback;
-            }
-          }
-          return new Response("offline", { status: 503 });
-        });
-    })
+    fetch(req)
+      .then(async (response) => {
+        if (response.ok) {
+          const cache = await caches.open(CACHE_NAME);
+          await cache.put(req, response.clone());
+        }
+        return response;
+      })
+      .catch(async () => {
+        const cached = await caches.match(req) || await caches.match(url.pathname);
+        return cached || new Response("offline", { status: 503 });
+      })
   );
 });

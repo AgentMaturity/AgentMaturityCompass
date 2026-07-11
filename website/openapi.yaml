@@ -1233,6 +1233,120 @@ components:
         mode: { type: string, enum: [SIMULATE, EXECUTE] }
         reason: { type: string, minLength: 1, maxLength: 1000 }
 
+    OnboardingSetupDetail:
+      type: object
+      additionalProperties: false
+      required: [schemaVersion, agentId, mode, status, createdAt, updatedAt, provider, detectedFrameworks, refs, steps, errorPresent]
+      properties:
+        schemaVersion: { type: string, enum: ['2026-05-22'] }
+        agentId: { type: string }
+        mode: { type: string, enum: [cli, studio] }
+        status: { type: string, enum: [not_started, in_progress, complete, failed] }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+        provider: { type: string, nullable: true }
+        detectedFrameworks: { type: array, items: { type: string } }
+        refs:
+          type: object
+          additionalProperties: false
+          required: [runId, reportReady, lifecycleReady, episodeReady, studioEvidenceReady]
+          properties:
+            runId: { type: string, nullable: true }
+            reportReady: { type: boolean }
+            lifecycleReady: { type: boolean }
+            episodeReady: { type: boolean }
+            studioEvidenceReady: { type: boolean }
+        steps:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            required: [id, label, status, summary, updatedAt]
+            properties:
+              id: { type: string, enum: [detect, workspace, provider, score, studio] }
+              label: { type: string }
+              status: { type: string, enum: [pending, running, complete, skipped, failed] }
+              summary: { type: string, nullable: true }
+              updatedAt: { type: string, format: date-time, nullable: true }
+        errorPresent: { type: boolean }
+
+    OnboardingActivationEvidenceRef:
+      type: object
+      additionalProperties: false
+      required: [eventId, eventType, receiptId, receiptSha256, observedAt, source, studioPath]
+      properties:
+        eventId: { type: string }
+        eventType: { type: string, enum: [llm_request, tool_action, audit] }
+        receiptId: { type: string }
+        receiptSha256: { type: string, pattern: '^[a-f0-9]{64}$' }
+        observedAt: { type: string, format: date-time }
+        source: { type: string, enum: [gateway, hook, hook_control, toolhub] }
+        studioPath: { type: string, pattern: '^/console/evidence\?' }
+
+    OnboardingActivationMilestone:
+      type: object
+      additionalProperties: false
+      required: [id, label, status, summary, evidence]
+      properties:
+        id: { type: string, enum: [connected_agent, observed_action, control_decision, signed_proof] }
+        label: { type: string }
+        status: { type: string, enum: [WAITING, READY, COMPLETE, BLOCKED] }
+        summary: { type: string }
+        evidence:
+          allOf:
+            - { $ref: '#/components/schemas/OnboardingActivationEvidenceRef' }
+          nullable: true
+
+    OnboardingActivation:
+      type: object
+      additionalProperties: false
+      required: [schemaVersion, agentId, status, progress, milestones, nextAction, integrity, claimBoundary]
+      properties:
+        schemaVersion: { type: string, enum: ['2026-07-11'] }
+        agentId: { type: string }
+        status: { type: string, enum: [NOT_STARTED, IN_PROGRESS, COMPLETE, BLOCKED] }
+        progress:
+          type: object
+          additionalProperties: false
+          required: [completed, total, percent]
+          properties:
+            completed: { type: integer, minimum: 0, maximum: 4 }
+            total: { type: integer, enum: [4] }
+            percent: { type: integer, minimum: 0, maximum: 100 }
+        milestones:
+          type: array
+          minItems: 4
+          maxItems: 4
+          items: { $ref: '#/components/schemas/OnboardingActivationMilestone' }
+        nextAction:
+          type: object
+          nullable: true
+          additionalProperties: false
+          required: [label, command]
+          properties:
+            label: { type: string }
+            command: { type: string }
+        integrity:
+          type: object
+          additionalProperties: false
+          required: [valid, reasonCodes]
+          properties:
+            valid: { type: boolean }
+            reasonCodes:
+              type: array
+              items:
+                type: string
+                enum: [ADAPTER_CONFIG_INVALID, EVIDENCE_CHAIN_INVALID, EVIDENCE_METADATA_INVALID, EVIDENCE_RECEIPT_INVALID, HOOK_AGENT_MISMATCH, HOOK_INTEGRATION_INVALID]
+        claimBoundary: { type: string }
+
+    OnboardingStatusResponse:
+      type: object
+      additionalProperties: false
+      required: [state, activation]
+      properties:
+        state: { $ref: '#/components/schemas/OnboardingSetupDetail' }
+        activation: { $ref: '#/components/schemas/OnboardingActivation' }
+
 tags:
   - name: health
     description: Health and readiness checks
@@ -1320,8 +1434,39 @@ tags:
     description: Lease-scoped provider action observation and explicit loopback control
   - name: approvals
     description: Signed quorum approvals and privacy-safe lifecycle delivery
+  - name: onboarding
+    description: Read-only first-run activation outcomes backed by signed runtime evidence
 
 paths:
+  # ── Outcome-based activation ──────────────────────────────────
+  /onboarding/status:
+    get:
+      tags: [onboarding, watch, enforce]
+      summary: Read setup detail and verified first-run activation outcomes
+      description: Signed connection configuration can report READY, but only verified agent-bound runtime receipts complete activation milestones. Inspection creates no traffic, lease, evidence, or onboarding record.
+      servers:
+        - url: http://localhost:3000
+          description: Local AMC Studio instance
+        - url: https://{host}
+          description: Self-hosted AMC Studio root
+          variables:
+            host: { default: amc.example.com }
+      security:
+        - amcSessionCookie: []
+        - amcAdminToken: []
+        - leaseToken: []
+      parameters:
+        - { name: agentId, in: query, required: false, schema: { type: string } }
+      responses:
+        '200':
+          description: Existing setup state and read-only four-milestone activation projection
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/OnboardingStatusResponse' }
+        '400': { description: Invalid agent ID }
+        '401': { description: Unauthorized }
+        '403': { description: Agent scope does not include the requested agent }
+
   # ── Canonical approval inbox ──────────────────────────────────
   /approvals/requests:
     get:

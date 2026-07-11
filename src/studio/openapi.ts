@@ -74,6 +74,22 @@ function studioEndpoints(): Record<string, Record<string, OpenApiOperation>> {
         },
       },
     },
+    "/onboarding/status": {
+      get: {
+        summary: "Read setup detail and verified first-run activation outcomes",
+        tags: ["Studio", "Watch", "Enforce"],
+        security: [{ adminToken: [] }, { sessionCookie: [] }, { agentToken: [] }],
+        parameters: [
+          { name: "agentId", in: "query", required: false, schema: { type: "string" } },
+        ],
+        responses: {
+          "200": okJson("Workspace setup state and read-only activation projection", "#/components/schemas/OnboardingStatusResponse"),
+          "400": errJson("Invalid agent ID"),
+          "401": errJson("Unauthorized"),
+          "403": errJson("Agent scope denied"),
+        },
+      },
+    },
     "/api/agents": {
       get: {
         summary: "List registered agents",
@@ -445,6 +461,149 @@ function studioSchemas(): Record<string, unknown> {
         checks: { type: "object" },
       },
       required: ["ok", "reasons", "checks"],
+    },
+    OnboardingSetupDetail: {
+      type: "object",
+      additionalProperties: false,
+      properties: {
+        schemaVersion: { type: "string", const: "2026-05-22" },
+        agentId: { type: "string" },
+        mode: { type: "string", enum: ["cli", "studio"] },
+        status: { type: "string", enum: ["not_started", "in_progress", "complete", "failed"] },
+        createdAt: { type: "string", format: "date-time" },
+        updatedAt: { type: "string", format: "date-time" },
+        provider: { oneOf: [{ type: "string" }, { type: "null" }] },
+        detectedFrameworks: { type: "array", items: { type: "string" } },
+        refs: {
+          type: "object",
+          additionalProperties: false,
+          properties: {
+            runId: { oneOf: [{ type: "string" }, { type: "null" }] },
+            reportReady: { type: "boolean" },
+            lifecycleReady: { type: "boolean" },
+            episodeReady: { type: "boolean" },
+            studioEvidenceReady: { type: "boolean" },
+          },
+          required: ["runId", "reportReady", "lifecycleReady", "episodeReady", "studioEvidenceReady"],
+        },
+        steps: {
+          type: "array",
+          items: {
+            type: "object",
+            additionalProperties: false,
+            properties: {
+              id: { type: "string", enum: ["detect", "workspace", "provider", "score", "studio"] },
+              label: { type: "string" },
+              status: { type: "string", enum: ["pending", "running", "complete", "skipped", "failed"] },
+              summary: { oneOf: [{ type: "string" }, { type: "null" }] },
+              updatedAt: { oneOf: [{ type: "string", format: "date-time" }, { type: "null" }] },
+            },
+            required: ["id", "label", "status", "summary", "updatedAt"],
+          },
+        },
+        errorPresent: { type: "boolean" },
+      },
+      required: ["schemaVersion", "agentId", "mode", "status", "createdAt", "updatedAt", "provider", "detectedFrameworks", "refs", "steps", "errorPresent"],
+    },
+    OnboardingActivationEvidenceRef: {
+      type: "object",
+      additionalProperties: false,
+      properties: {
+        eventId: { type: "string" },
+        eventType: { type: "string", enum: ["llm_request", "tool_action", "audit"] },
+        receiptId: { type: "string" },
+        receiptSha256: { type: "string", pattern: "^[a-f0-9]{64}$" },
+        observedAt: { type: "string", format: "date-time" },
+        source: { type: "string", enum: ["gateway", "hook", "hook_control", "toolhub"] },
+        studioPath: { type: "string", pattern: "^/console/evidence\\?" },
+      },
+      required: ["eventId", "eventType", "receiptId", "receiptSha256", "observedAt", "source", "studioPath"],
+    },
+    OnboardingActivationMilestone: {
+      type: "object",
+      additionalProperties: false,
+      properties: {
+        id: { type: "string", enum: ["connected_agent", "observed_action", "control_decision", "signed_proof"] },
+        label: { type: "string" },
+        status: { type: "string", enum: ["WAITING", "READY", "COMPLETE", "BLOCKED"] },
+        summary: { type: "string" },
+        evidence: {
+          oneOf: [
+            { $ref: "#/components/schemas/OnboardingActivationEvidenceRef" },
+            { type: "null" },
+          ],
+        },
+      },
+      required: ["id", "label", "status", "summary", "evidence"],
+    },
+    OnboardingActivation: {
+      type: "object",
+      additionalProperties: false,
+      properties: {
+        schemaVersion: { type: "string", const: "2026-07-11" },
+        agentId: { type: "string" },
+        status: { type: "string", enum: ["NOT_STARTED", "IN_PROGRESS", "COMPLETE", "BLOCKED"] },
+        progress: {
+          type: "object",
+          additionalProperties: false,
+          properties: {
+            completed: { type: "integer", minimum: 0, maximum: 4 },
+            total: { type: "integer", const: 4 },
+            percent: { type: "integer", minimum: 0, maximum: 100 },
+          },
+          required: ["completed", "total", "percent"],
+        },
+        milestones: {
+          type: "array",
+          minItems: 4,
+          maxItems: 4,
+          items: { $ref: "#/components/schemas/OnboardingActivationMilestone" },
+        },
+        nextAction: {
+          oneOf: [
+            {
+              type: "object",
+              additionalProperties: false,
+              properties: { label: { type: "string" }, command: { type: "string" } },
+              required: ["label", "command"],
+            },
+            { type: "null" },
+          ],
+        },
+        integrity: {
+          type: "object",
+          additionalProperties: false,
+          properties: {
+            valid: { type: "boolean" },
+            reasonCodes: {
+              type: "array",
+              items: {
+                type: "string",
+                enum: [
+                  "ADAPTER_CONFIG_INVALID",
+                  "EVIDENCE_CHAIN_INVALID",
+                  "EVIDENCE_METADATA_INVALID",
+                  "EVIDENCE_RECEIPT_INVALID",
+                  "HOOK_AGENT_MISMATCH",
+                  "HOOK_INTEGRATION_INVALID",
+                ],
+              },
+            },
+          },
+          required: ["valid", "reasonCodes"],
+        },
+        claimBoundary: { type: "string" },
+      },
+      required: ["schemaVersion", "agentId", "status", "progress", "milestones", "nextAction", "integrity", "claimBoundary"],
+    },
+    OnboardingStatusResponse: {
+      type: "object",
+      additionalProperties: false,
+      properties: {
+        state: { $ref: "#/components/schemas/OnboardingSetupDetail" },
+        activation: { $ref: "#/components/schemas/OnboardingActivation" },
+      },
+      required: ["state", "activation"],
     },
     AgentSummary: {
       type: "object",

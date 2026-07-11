@@ -251,6 +251,10 @@ import {
   setOnboardingStep,
   type OnboardingState
 } from "./setup/onboardingState.js";
+import {
+  projectOnboardingActivation,
+  renderOnboardingActivationText
+} from "./setup/onboardingActivation.js";
 import { createUnifiedClaritySnapshot } from "./snapshot/snapshot.js";
 import { initLoop, loopPlan, loopRun, loopSchedule } from "./loop/loop.js";
 import {
@@ -4261,12 +4265,14 @@ studioLan
 
 const connect = program
   .command("connect")
-  .description("Connect wizard for any agent/provider runtime")
+  .description("Connect an agent runtime and track first action, decision, and proof")
   .option("--agent <agentId>", "agent ID (overrides global --agent)")
   .option("--adapter <adapterId>", "adapter ID (e.g. claude-cli, gemini-cli, generic-cli)")
   .option("--token-file <path>", "lease token file (pair redeem output)")
   .option("--bridge-url <url>", "bridge base URL (e.g. http://127.0.0.1:3212)")
   .option("--mode <mode>", "supervise|sandbox")
+  .option("--status", "show read-only activation outcomes without minting a lease", false)
+  .option("--json", "emit activation status as JSON (requires --status)", false)
   .option("--print-env", "print environment export lines", false)
   .option("--print-cmd", "print only command line", false)
   .action(
@@ -4276,9 +4282,25 @@ const connect = program
       tokenFile?: string;
       bridgeUrl?: string;
       mode?: "supervise" | "sandbox";
+      status: boolean;
+      json: boolean;
       printEnv: boolean;
       printCmd: boolean;
     }) => {
+      if (opts.status) {
+        if (opts.tokenFile || opts.printEnv || opts.printCmd || opts.mode || opts.adapter || opts.bridgeUrl) {
+          throw new Error("--status cannot be combined with connection mutation or output options");
+        }
+        const activation = projectOnboardingActivation({
+          workspace: process.cwd(),
+          agentId: resolveAgentId(process.cwd(), opts.agent ?? activeAgent(program))
+        });
+        console.log(opts.json ? JSON.stringify(activation, null, 2) : renderOnboardingActivationText(activation));
+        return;
+      }
+      if (opts.json) {
+        throw new Error("--json requires --status");
+      }
       if (opts.tokenFile) {
         const tokenPath = resolve(process.cwd(), opts.tokenFile);
         if (!pathExists(tokenPath)) {
@@ -4382,6 +4404,9 @@ const connect = program
       console.log("");
       console.log(chalk.hex('#4AEF79')("Python snippet:"));
       console.log(output.pythonSnippet);
+      console.log("");
+      console.log(chalk.hex('#4AEF79')("Track activation:"));
+      console.log(`amc connect --status --agent ${output.agentId}`);
     }
   );
 

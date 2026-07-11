@@ -36,6 +36,26 @@ export interface OnboardingState {
   error: string | null;
 }
 
+export interface OnboardingSetupDetail {
+  schemaVersion: OnboardingState["schemaVersion"];
+  agentId: string;
+  mode: OnboardingMode;
+  status: OnboardingStatus;
+  createdAt: string;
+  updatedAt: string;
+  provider: string | null;
+  detectedFrameworks: string[];
+  refs: {
+    runId: string | null;
+    reportReady: boolean;
+    lifecycleReady: boolean;
+    episodeReady: boolean;
+    studioEvidenceReady: boolean;
+  };
+  steps: OnboardingStepState[];
+  errorPresent: boolean;
+}
+
 const STEP_LABELS: Record<OnboardingStepId, string> = {
   detect: "Detect project",
   workspace: "Create workspace",
@@ -94,6 +114,28 @@ export function loadOnboardingState(workspace: string): OnboardingState | null {
     return null;
   }
   return JSON.parse(readUtf8(file)) as OnboardingState;
+}
+
+export function projectOnboardingSetupDetail(state: OnboardingState): OnboardingSetupDetail {
+  return {
+    schemaVersion: state.schemaVersion,
+    agentId: state.agentId,
+    mode: state.mode,
+    status: state.status,
+    createdAt: state.createdAt,
+    updatedAt: state.updatedAt,
+    provider: state.provider,
+    detectedFrameworks: [...state.detectedFrameworks],
+    refs: {
+      runId: state.refs.runId,
+      reportReady: Boolean(state.refs.reportJsonPath || state.refs.reportMarkdownPath),
+      lifecycleReady: Boolean(state.refs.lifecycleArtifactPath),
+      episodeReady: Boolean(state.refs.episodeRecordPath),
+      studioEvidenceReady: Boolean(state.refs.studioEvidenceUrl),
+    },
+    steps: state.steps.map((step) => ({ ...step })),
+    errorPresent: state.error !== null,
+  };
 }
 
 export function saveOnboardingState(workspace: string, state: OnboardingState): OnboardingState {
