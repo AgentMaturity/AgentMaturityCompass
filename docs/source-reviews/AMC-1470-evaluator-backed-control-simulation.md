@@ -6,7 +6,7 @@
 - Source reviewed: first-party control-model material and repository already pinned by the competitive review
 - Retrieval: public material reviewed 2026-07-10; implementation review 2026-07-11
 - Immutable source commit: `83188b62c63e2b4ff9ada87048fd99605184ee5a`
-- Status: Published; Linear closeout pending
+- Status: Done
 
 ## Relevance decision
 
@@ -75,3 +75,5 @@ Browser verification then found an existing-client cache defect: the server and 
 - The live homepage exposes 1,153 CLI paths and 8,413 tests; public OpenAPI contains `/v1/policy/simulate`, `ControlSimulationRequest`, and `ControlSimulationResponse`.
 - A stale existing browser session upgraded to the new shell and resolved `#CONTROL_SIMULATION` without console warnings or errors. Desktop had no overflow; the 390x844 production render had a 384-pixel document width and no horizontal overflow.
 - The post-deploy quick release gate passed typecheck, build, OpenAPI parsing, architecture boundaries, 1,488-file Docs drift, runtime audit with 0 vulnerabilities, smoke checks, and live HTTP health. Receipt: `tmp/release-gate/amc-1470-live.json`.
+- Publication-evidence commit `2470e3e15ce7e7a7e1cebe5245060eb8dcc18554` (`Record AMC-1470 publication evidence`) is pushed; exact-head CI `29152489801`, npm validation `29152489802`, and Pages `29152489794` passed.
+- All 16 acceptance criteria are checked. Linear `AMC-1470` is Done; completion comment `16f2b27b-5b61-47a5-b2ff-94ef3134fe86` records the implementation, verification, production, and no-bloat evidence.
