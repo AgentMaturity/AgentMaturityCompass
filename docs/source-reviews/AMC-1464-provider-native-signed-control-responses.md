@@ -5,7 +5,7 @@
 - AMC surfaces requested: Enforce, Watch, Vault, CLI, API
 - Sources reviewed: Claude Code hook contract; Gemini CLI hook contract; AEP draft; Agent Control controls documentation
 - Retrieval: primary sources reviewed 2026-07-11
-- Status: Locally verified; remote publication pending
+- Status: Done and published
 
 ## Relevance decision
 
@@ -52,7 +52,7 @@ No second policy engine, second approval store, event database, Agent Control co
 - Canonical public-stat and AMC-1464 documentation guards: 2 files / 6 tests passed.
 - `npm run typecheck`: passed.
 - `npm run build`: passed.
-- `npm run check:docs-drift`: passed, 1,481 files scanned.
+- `npm run check:docs-drift`: passed at 1,481 files in the release gate and 1,482 after the final AMC OS handoff was added.
 - `npm run check:architecture-boundaries`: passed with no failures.
 - Full Vitest after remote-failure hardening: 1,057 files / 8,366 tests passed.
 - Remote npm validation `29139877125` exposed a pre-existing process-monitor race: delayed parent input could reach an already closed child stdin, emit an unhandled `EPIPE`, and lose the expected stdout event. The success fixture now waits for input, the monitor guards ended streams, expected closed-pipe codes are handled, and unexpected stream errors remain visible after session sealing.
@@ -62,4 +62,12 @@ No second policy engine, second approval store, event database, Agent Control co
 - Runtime dependency audit: 0 vulnerabilities.
 - Prepack verification: npm archive, SBOM, license inventory, archive scan, release bundle, and release signature checks passed.
 - Final consolidated release gate passed at the 8,366-test boundary, including all 10 install personas and live HTTP 200; receipt at `tmp/release-gate/amc-1464-final-v2.json`.
-- Remote workflows and production verification remain pending until the verified commit is pushed.
+- Replacement remote workflows passed after the monitored-stdin fix: Pages `29140459439`, Docker Runner Image `29140459426`, npm validation `29140459417`, and CI `29140459424`.
+
+## Publication
+
+- Feature commit: `40899a3ede3984832bced4d35eb1112f667eb771` (`Add provider-native signed hook controls`).
+- Release-blocker fix: `1affdc8db70863bb3d3a20a4e657eb1f2388652d` (`Handle monitored child stdin closure`).
+- `main` and `origin/main` are synchronized at the release-blocker fix commit.
+- Production serves the 8,366-test proof, Watch + Enforce control copy, adapter setup, and `/bridge/hooks/control/v1` OpenAPI route.
+- `https://agentmaturity.co` returns HTTP 200; `www` redirects to the apex; the Let's Encrypt certificate covers both names and is valid through 2026-09-24.
