@@ -6,7 +6,7 @@
 - Source reviewed: first-party Agent Control and AgentApprove/AEP material pinned by the competitive review
 - Retrieval: public sites and repositories reviewed 2026-07-10; implementation review 2026-07-11
 - Immutable source commits: Agent Control `83188b62c63e2b4ff9ada87048fd99605184ee5a`; Agent Event Protocol `2583cff9380f8f0a459d52c7112b6105c46496ed`
-- Status: Implemented and locally release-verified; CI and production verification pending
+- Status: Done - implemented, release-verified, published, and production-verified
 
 ## Relevance decision
 
@@ -60,4 +60,8 @@ No competitor code, prose, examples, schemas, mappings, prompts, screenshots, co
 - Full Vitest passes at 1,069 files / 8,455 tests. The final release receipt at `tmp/release-gate/amc-1473-final.json` passed syntax, OpenAPI parse, typecheck, adversarial regression, full Vitest, build, 1,155-path CLI inventory, architecture, docs drift, zero-vulnerability runtime audit, CLI/domain smoke, and isolated install-persona QA.
 - Desktop packaging and verification pass for package version `1.1.1` across macOS Universal, Windows x64, and Linux x64. The final macOS archive SHA-256 is `6005ab201943bb0f2e5bc9da1d6fdb2b8f58531dd3bcb268dc5ec3ca58621c25`; Windows is `55d5647677ecf9362fb251af363fb1ff0cf4592fa004d8b9488250641446a853`.
 - Playwright passes 55 tests with 2 established i18n skips. A live disposable Studio run exercised snapshot, drift, exact-confirm activation, previous-version projection, exact-confirm rollback, and verification at 1280x720 and 390x844 with no overflow, button overlap, failed responses, console/page errors, or absolute workspace-path leakage.
-- CI, deployment, TLS, and production content verification remain pending until the implementation commit is pushed.
+- Implementation commit `601395c9d2258d7746c659ff5fc658ccda14765e` is pushed to synchronized `main` / `origin/main`.
+- Exact-head workflows passed: CI `29162654316`, npm validation `29162654336`, Docker Runner Image `29162654309`, and Pages `29162654323`. CI passed Node 20/22, Helm, local E2E, security, Docker smoke, architecture, and release smoke; npm validation passed full Vitest, build, and prepack guardrails.
+- Production `docs/content-manifest.json` reports exact source revision `601395c9d2258d7746c659ff5fc658ccda14765e` and 170 guides. The homepage exposes 1,155 CLI paths and 8,455 tests; public OpenAPI exposes status, verify, apply, and rollback paths.
+- `https://agentmaturity.co/` returns HTTP 200 and `https://www.agentmaturity.co/` redirects to the apex. The valid Let's Encrypt certificate covers both names from 2026-06-26 through 2026-09-24.
+- Production desktop and 390x844 mobile checks passed without overflow, failed responses, console errors, or page errors. Post-deploy quick release gate with live HTTP health passed at `tmp/release-gate/amc-1473-live.json`.
