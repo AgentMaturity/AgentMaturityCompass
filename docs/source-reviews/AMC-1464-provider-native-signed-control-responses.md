@@ -54,10 +54,12 @@ No second policy engine, second approval store, event database, Agent Control co
 - `npm run build`: passed.
 - `npm run check:docs-drift`: passed, 1,481 files scanned.
 - `npm run check:architecture-boundaries`: passed with no failures.
-- Full Vitest: 1,057 files / 8,365 tests passed. The consolidated release gate independently repeated the same inventory and passed.
+- Full Vitest after remote-failure hardening: 1,057 files / 8,366 tests passed.
+- Remote npm validation `29139877125` exposed a pre-existing process-monitor race: delayed parent input could reach an already closed child stdin, emit an unhandled `EPIPE`, and lose the expected stdout event. The success fixture now waits for input, the monitor guards ended streams, expected closed-pipe codes are handled, and unexpected stream errors remain visible after session sealing.
+- Process-monitor regression: 1 file / 7 tests passed, including early child stdin closure; the same file passed 10 consecutive stress runs.
 - Playwright E2E: 55 passed / 2 intentionally skipped.
 - Install-persona QA: all 10 personas passed at 10/10; receipt at `tmp/persona-install-qa/latest.json`.
 - Runtime dependency audit: 0 vulnerabilities.
 - Prepack verification: npm archive, SBOM, license inventory, archive scan, release bundle, and release signature checks passed.
-- Consolidated release gate: passed; receipt at `tmp/release-gate/amc-1464-final.json`. Live deploy health was correctly skipped until publication.
+- Final consolidated release gate passed at the 8,366-test boundary, including all 10 install personas and live HTTP 200; receipt at `tmp/release-gate/amc-1464-final-v2.json`.
 - Remote workflows and production verification remain pending until the verified commit is pushed.

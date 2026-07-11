@@ -16,6 +16,13 @@ function versionProbe(command: string): string {
   return "unknown";
 }
 
+function isClosedChildStdinError(error: unknown): boolean {
+  const code = typeof error === "object" && error !== null && "code" in error
+    ? String((error as { code?: unknown }).code ?? "")
+    : "";
+  return code === "EPIPE" || code === "ERR_STREAM_DESTROYED" || code === "ERR_STREAM_WRITE_AFTER_END";
+}
+
 async function spawnMonitoredProcess(params: {
   workspace: string;
   runtime: RuntimeName;
@@ -61,7 +68,24 @@ async function spawnMonitoredProcess(params: {
       }
     });
 
+    let stdinForwardError: Error | null = null;
+    const childStdinErrorHandler = (error: Error): void => {
+      if (!isClosedChildStdinError(error) && stdinForwardError === null) {
+        stdinForwardError = error;
+      }
+    };
+    child.stdin.on("error", childStdinErrorHandler);
+
     const stdinHandler = (chunk: Buffer): void => {
+      if (
+        child.exitCode !== null
+        || child.stdin.destroyed
+        || child.stdin.writableEnded
+        || child.stdin.writableFinished
+        || !child.stdin.writable
+      ) {
+        return;
+      }
       ledger.appendEvidence({
         sessionId,
         runtime: params.runtime,
@@ -75,7 +99,11 @@ async function spawnMonitoredProcess(params: {
             ...(params.meta ?? {})
           }
         });
-      child.stdin.write(chunk);
+      try {
+        child.stdin.write(chunk);
+      } catch (error) {
+        childStdinErrorHandler(error instanceof Error ? error : new Error(String(error)));
+      }
     };
 
     process.stdin.on("data", stdinHandler);
@@ -136,6 +164,10 @@ async function spawnMonitoredProcess(params: {
     });
 
     ledger.sealSession(sessionId);
+    child.stdin.off("error", childStdinErrorHandler);
+    if (stdinForwardError !== null) {
+      throw stdinForwardError;
+    }
     return sessionId;
   } finally {
     ledger.close();

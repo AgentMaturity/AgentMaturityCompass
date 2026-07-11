@@ -205,7 +205,7 @@ describe("ledger and diagnostics", () => {
       "mock",
       [
         "-e",
-        'process.stdin.on("data", d => process.stdout.write(d)); setTimeout(() => process.exit(0), 80);'
+        'process.stdin.once("data", d => process.stdout.write(d, () => process.exit(0))); setTimeout(() => process.exit(2), 5000);'
       ],
       {
         workspace,
@@ -231,5 +231,34 @@ describe("ledger and diagnostics", () => {
     expect(events.some((event) => event.event_type === "stdout")).toBe(true);
     expect(session?.session_seal_sig).toBeTruthy();
     expect(session?.session_final_event_hash).toBeTruthy();
+  });
+
+  test("wrap mode tolerates a child closing stdin before later parent input", async () => {
+    const workspace = newWorkspace();
+    const config = loadAMCConfig(workspace);
+    config.runtimes.mock.command = "node";
+    saveAMCConfig(workspace, config);
+
+    const runPromise = wrapRuntime(
+      "mock",
+      [
+        "-e",
+        'process.stdin.destroy(); setTimeout(() => process.exit(0), 200);'
+      ],
+      { workspace, config }
+    );
+
+    await new Promise<void>((resolve) => {
+      setTimeout(() => {
+        (process.stdin as unknown as { emit: (event: string, data: Buffer) => void }).emit("data", Buffer.from("late input\n"));
+        resolve();
+      }, 30);
+    });
+
+    const sessionId = await runPromise;
+    const ledger = openLedger(workspace);
+    const session = ledger.getAllSessions().find((row) => row.session_id === sessionId);
+    ledger.close();
+    expect(session?.session_seal_sig).toBeTruthy();
   });
 });
