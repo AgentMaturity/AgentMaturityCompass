@@ -8,6 +8,7 @@ This page exists to show momentum without making users read the entire changelog
 - help visitors see that AMC is active
 
 ## Current highlights
+- Explicit provider-native signed control for Claude Code and Gemini CLI: observe by default, opt into loopback-only Enforce decisions backed by existing signed policies and receipts
 - Least-privilege Studio module API authorization: route-level viewer, operator, approver, auditor, and owner boundaries replace the former shared human-role gate
 - Domain Proof API containment: inline schema-validated checks, realpath-confined deprecated fixtures, bounded errors, and no caller-selected server writes
 - Evidence-readiness contract across CLI, Studio, lifecycle artifacts, report sharing, and executive briefs: `VALID` proves artifact integrity, while `READY` governs claim eligibility

@@ -33,6 +33,8 @@ import { loadLeaseRevocations } from "../src/leases/leaseStore.js";
 import { verifyLeaseToken } from "../src/leases/leaseVerifier.js";
 import { verifyReceipt } from "../src/receipts/receipt.js";
 import { initWorkspace } from "../src/workspace.js";
+import { approvalPolicyPath, approvalPolicySigPath } from "../src/approvals/approvalPolicyEngine.js";
+import { signFileWithAuditor } from "../src/org/orgSigner.js";
 
 const roots: string[] = [];
 
@@ -277,6 +279,112 @@ describe("AMC provider hook integration", () => {
     expect(existsSync(paths.signature)).toBe(false);
     expect(existsSync(paths.ignore)).toBe(false);
     expect(getHookIntegrationStatus({ workspace, provider: "gemini-cli" }).state).toBe("not-installed");
+  });
+
+  test("keeps observation as the default and refuses remote raw-input control mode", () => {
+    const workspace = newWorkspace();
+    const observed = installHookIntegration({
+      workspace,
+      provider: "claude-code",
+      agentId: "observed-default",
+    });
+    expect(observed.mode).toBe("observe");
+    expect(observed.lease.scopes).toEqual(["hook:observe"]);
+    expect(getHookIntegrationStatus({ workspace, provider: "claude-code" }).mode).toBe("observe");
+
+    expect(() => installHookIntegration({
+      workspace: newWorkspace(),
+      provider: "gemini-cli",
+      agentId: "remote-control",
+      bridgeBase: "https://control.example.test",
+      mode: "control",
+    })).toThrowError(expect.objectContaining<Partial<HookIntegrationError>>({
+      code: "HOOK_CONTROL_REMOTE_UNSUPPORTED",
+    }));
+  });
+
+  test("upgrades observation to control by rotating and revoking the narrow lease exactly once", () => {
+    const workspace = newWorkspace();
+    const paths = hookPaths(workspace, "claude-code");
+    installHookIntegration({
+      workspace,
+      provider: "claude-code",
+      agentId: "mode-upgrade-agent",
+    });
+    const oldToken = readFileSync(paths.token, "utf8").trim();
+    const oldLease = decodeLease(oldToken);
+
+    const plan = installHookIntegration({
+      workspace,
+      provider: "claude-code",
+      agentId: "mode-upgrade-agent",
+      mode: "control",
+      dryRun: true,
+    });
+    expect(plan.files.slice(-2)).toEqual([
+      { path: approvalPolicyPath(workspace), action: "would-create", sensitive: false },
+      { path: approvalPolicySigPath(workspace), action: "would-create", sensitive: false },
+    ]);
+    expect(existsSync(approvalPolicyPath(workspace))).toBe(false);
+    expect(existsSync(approvalPolicySigPath(workspace))).toBe(false);
+
+    const upgraded = installHookIntegration({
+      workspace,
+      provider: "claude-code",
+      agentId: "mode-upgrade-agent",
+      mode: "control",
+    });
+    expect(upgraded).toMatchObject({ mode: "control", applied: true, changed: true });
+    expect(upgraded.lease.scopes).toEqual(["hook:observe", "hook:control"]);
+    expect(upgraded.files.slice(-2)).toEqual([
+      { path: approvalPolicyPath(workspace), action: "create", sensitive: false },
+      { path: approvalPolicySigPath(workspace), action: "create", sensitive: false },
+    ]);
+    expect(existsSync(approvalPolicyPath(workspace))).toBe(true);
+    expect(existsSync(approvalPolicySigPath(workspace))).toBe(true);
+    const nextToken = readFileSync(paths.token, "utf8").trim();
+    const nextLease = decodeLease(nextToken);
+    expect(nextLease.leaseId).not.toBe(oldLease.leaseId);
+    expect(nextLease.scopes).toEqual(["hook:observe", "hook:control"]);
+    expect(loadLeaseRevocations(workspace).revocations).toContainEqual(expect.objectContaining({
+      leaseId: oldLease.leaseId,
+      reason: "AMC provider hook integration lease rotated",
+    }));
+
+    const repeated = installHookIntegration({
+      workspace,
+      provider: "claude-code",
+      agentId: "mode-upgrade-agent",
+      mode: "control",
+    });
+    expect(repeated).toMatchObject({ mode: "control", applied: false, changed: false });
+    expect(readFileSync(paths.token, "utf8").trim()).toBe(nextToken);
+    expect(repeated.files.slice(-2).every((row) => row.action === "unchanged")).toBe(true);
+  });
+
+  test("binds signed control manifests to each provider's exact native outcome set", () => {
+    for (const provider of ["claude-code", "gemini-cli"] as const) {
+      const workspace = newWorkspace();
+      const paths = hookPaths(workspace, provider);
+      installHookIntegration({ workspace, provider, agentId: `${provider}-outcomes`, mode: "control" });
+      const manifest = readJson(paths.manifest) as {
+        control: { providerOutcomes: string[] };
+      };
+      expect(manifest.control.providerOutcomes).toEqual(
+        provider === "claude-code" ? ["allow", "deny", "ask"] : ["allow", "deny"],
+      );
+
+      manifest.control.providerOutcomes = provider === "claude-code"
+        ? ["allow", "deny"]
+        : ["allow", "deny", "ask"];
+      writeJson(paths.manifest, manifest);
+      signFileWithAuditor(workspace, paths.manifest);
+
+      expect(getHookIntegrationStatus({ workspace, provider })).toMatchObject({
+        state: "invalid",
+        manifestValid: false,
+      });
+    }
   });
 
   test("preserves unrelated CRLF gitignore rules across install and removal", () => {

@@ -45,7 +45,7 @@ components:
     leaseToken:
       type: http
       scheme: bearer
-      description: Signed, short-lived AMC agent lease. Provider-neutral observation requires hook:observe and an allowed /hooks route.
+      description: Signed, short-lived AMC agent lease. Observation requires hook:observe; explicit loopback control also requires hook:control. Both require an allowed /hooks route.
 
   schemas:
     ApiResponse:
@@ -911,7 +911,7 @@ tags:
   - name: agentTimeline
     description: Agent timeline events
   - name: hooks
-    description: Lease-scoped provider-neutral action observation
+    description: Lease-scoped provider action observation and explicit loopback control
 
 paths:
   # ── Provider-neutral hook observation ─────────────────────────
@@ -960,6 +960,47 @@ paths:
         '422': { description: Source timestamp is stale or too far in the future }
         '429': { description: Signed lease request budget exceeded }
         '503': { description: Hook quota or evidence ledger unavailable }
+
+  # ── Provider-native signed hook control ───────────────────────
+  /bridge/hooks/control/v1:
+    post:
+      tags: [hooks, enforce]
+      summary: Return a provider-native signed pre-tool control response
+      description: |
+        Loopback-only AMC control route for an explicitly installed control hook. Raw provider
+        input is evaluated in memory and not retained. Existing signed ToolHub, Action Policy,
+        Approval Policy, budget, freeze, maturity, and assurance state remains authoritative.
+        The exact provider-native response is bound to a signed guard_check receipt.
+      servers:
+        - url: http://127.0.0.1:3212
+          description: Local AMC Bridge only
+      security:
+        - leaseToken: []
+      parameters:
+        - in: header
+          name: x-amc-hook-provider
+          required: true
+          schema:
+            type: string
+            enum: [claude-code, gemini-cli]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+            description: Native provider PreToolUse or BeforeTool input. Evaluated transiently and never retained.
+      responses:
+        '200': { description: Previously evaluated byte-identical action and original signed response }
+        '201': { description: Provider-native decision and signed receipt }
+        '400': { description: Malformed, ambiguous, or unsupported provider input }
+        '401': { description: Missing or invalid lease }
+        '403': { description: Non-loopback request or lease lacks hook:control }
+        '409': { description: Stable action ID conflicts with different input bytes }
+        '413': { description: Payload exceeds 256 KiB }
+        '429': { description: Signed lease request budget exceeded }
+        '503': { description: Control evaluation or signed receipt unavailable }
 
   # ── Health ─────────────────────────────────────────────────────
   /v1/health:

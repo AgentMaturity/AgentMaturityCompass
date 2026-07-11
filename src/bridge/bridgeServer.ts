@@ -23,6 +23,14 @@ import {
   consumeObservedHookRateLimit,
   ingestObservedAepHookEvent,
 } from "./hookIngress.js";
+import {
+  CONTROL_HOOK_PATH,
+  CONTROL_HOOK_ROUTE,
+  HookControlError,
+  MAX_CONTROL_HOOK_BODY_BYTES,
+  evaluateProviderHookControl,
+  type HookProvider,
+} from "./hookControl.js";
 
 interface HandleBridgeRequestOptions {
   workspace: string;
@@ -78,6 +86,11 @@ function writeJson(res: ServerResponse, status: number, payload: unknown): void 
   res.statusCode = status;
   res.setHeader("content-type", "application/json");
   res.end(JSON.stringify(payload));
+}
+
+function isLoopbackAddress(address: string | undefined): boolean {
+  if (!address) return false;
+  return address === "::1" || address.startsWith("127.") || address.startsWith("::ffff:127.");
 }
 
 function parseJsonBody(body: Buffer): unknown {
@@ -412,6 +425,67 @@ export async function handleBridgeRequest(options: HandleBridgeRequestOptions): 
         return true;
       }
       writeJson(options.res, 500, { error: "hook event could not be recorded" });
+    }
+    return true;
+  }
+
+  if (options.pathname === CONTROL_HOOK_PATH) {
+    if ((options.req.method ?? "POST").toUpperCase() !== "POST") {
+      writeJson(options.res, 405, { error: "method not allowed" });
+      return true;
+    }
+    if (!isLoopbackAddress(options.req.socket.remoteAddress)) {
+      writeJson(options.res, 403, { error: "hook control accepts loopback requests only" });
+      return true;
+    }
+    const providerHeader = options.req.headers["x-amc-hook-provider"];
+    const provider = Array.isArray(providerHeader) ? providerHeader[0] : providerHeader;
+    if (provider !== "claude-code" && provider !== "gemini-cli") {
+      writeJson(options.res, 400, { error: "supported hook provider header required" });
+      return true;
+    }
+    const auth = verifyBridgeLease({
+      workspace: options.workspace,
+      requestUrl: options.url,
+      headers: options.req.headers,
+      routePath: CONTROL_HOOK_ROUTE,
+      requiredScope: "hook:control",
+    });
+    if (!auth.ok || !auth.payload) {
+      writeJson(options.res, auth.status, { error: auth.error ?? "unauthorized" });
+      return true;
+    }
+    try {
+      const rateLimit = consumeObservedHookRateLimit({
+        workspace: options.workspace,
+        leaseId: auth.payload.leaseId,
+        authenticatedAgentId: auth.payload.agentId,
+        maxRequestsPerMinute: auth.payload.maxRequestsPerMinute,
+        routePath: CONTROL_HOOK_ROUTE,
+      });
+      if (!rateLimit.allowed) {
+        options.res.setHeader("retry-after", String(rateLimit.retryAfterSeconds));
+        writeJson(options.res, 429, { error: "hook lease rate limit exceeded" });
+        return true;
+      }
+      const rawBody = await readBody(options.req, Math.min(options.maxRequestBytes, MAX_CONTROL_HOOK_BODY_BYTES));
+      const controlled = evaluateProviderHookControl({
+        workspace: options.workspace,
+        authenticatedAgentId: auth.payload.agentId,
+        provider: provider as HookProvider,
+        rawInput: rawBody.toString("utf8"),
+      });
+      writeJson(options.res, controlled.idempotentReplay ? 200 : 201, controlled);
+    } catch (error) {
+      if (String(error).includes("PAYLOAD_TOO_LARGE")) {
+        writeJson(options.res, 413, { error: "hook payload too large" });
+        return true;
+      }
+      if (error instanceof HookControlError) {
+        writeJson(options.res, error.statusCode, { error: error.message });
+        return true;
+      }
+      writeJson(options.res, 500, { error: "hook control could not be evaluated" });
     }
     return true;
   }

@@ -419,6 +419,7 @@ export function consumeObservedHookRateLimit(input: {
   leaseId: string;
   authenticatedAgentId: string;
   maxRequestsPerMinute: number;
+  routePath?: string;
   now?: number;
 }): ObservedHookRateLimitStatus {
   const now = input.now ?? Date.now();
@@ -430,12 +431,13 @@ export function consumeObservedHookRateLimit(input: {
     ledger.db.exec("BEGIN IMMEDIATE");
     transactionOpen = true;
     const cutoff = now - 60_000;
+    const routePath = input.routePath ?? OBSERVED_AEP_HOOK_ROUTE;
     ledger.db.prepare("DELETE FROM bridge_request_usage WHERE ts < ?").run(cutoff);
     const row = ledger.db.prepare(
       `SELECT COUNT(*) AS count, MIN(ts) AS oldest_ts
        FROM bridge_request_usage
-       WHERE lease_id = ? AND ts >= ?`
-    ).get(input.leaseId, cutoff) as { count: number; oldest_ts: number | null };
+       WHERE lease_id = ? AND route = ? AND ts >= ?`
+    ).get(input.leaseId, routePath, cutoff) as { count: number; oldest_ts: number | null };
     const used = Number(row.count ?? 0);
     if (used >= limit) {
       ledger.db.exec("COMMIT");
@@ -448,7 +450,7 @@ export function consumeObservedHookRateLimit(input: {
     ledger.db.prepare(
       `INSERT INTO bridge_request_usage(request_id, lease_id, agent_id, route, ts)
        VALUES (?, ?, ?, ?, ?)`
-    ).run(randomUUID(), input.leaseId, input.authenticatedAgentId, OBSERVED_AEP_HOOK_ROUTE, now);
+    ).run(randomUUID(), input.leaseId, input.authenticatedAgentId, routePath, now);
     ledger.db.exec("COMMIT");
     transactionOpen = false;
     return {

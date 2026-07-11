@@ -86,6 +86,15 @@ amc connect hooks status --provider claude-code
 
 Use `--provider gemini-cli` for Gemini CLI. AMC keeps a narrow observation lease out of provider config and forwards no tool arguments, cwd, transcript path, or raw session ID. This records signed Watch evidence; it does not approve or deny provider actions. Remove it with `amc connect hooks remove --provider claude-code`.
 
+For explicit signed control, run the local Studio/Bridge and opt in:
+
+```bash
+amc up
+amc connect hooks install --provider claude-code --mode control --agent my-agent
+```
+
+Control is loopback-only. It evaluates raw tool input in memory, retains no raw args, and returns a receipt-bound native decision from AMC's existing signed policies. Claude Code supports `allow`, `deny`, and `ask`; Gemini CLI has no native `ask`, so AMC returns `deny` for that outcome. Provider-local ask is not proof of AMC quorum, and multi-user policies remain denied.
+
 **Add a badge to your README:**
 
 ```bash

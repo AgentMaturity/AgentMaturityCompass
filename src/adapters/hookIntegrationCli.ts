@@ -3,13 +3,17 @@ import type { Command } from "commander";
 import { stdin } from "node:process";
 import { unlockVaultInteractive, vaultStatusNow } from "../vault/vaultCli.js";
 import {
+  failClosedProviderControlResponse,
+  forwardProviderHookControl,
   forwardProviderHookEvent,
   getHookIntegrationStatus,
   installHookIntegration,
   removeHookIntegration,
   type HookFileChange,
+  type HookMode,
   type HookProvider
 } from "./hookIntegration.js";
+import { serializeProviderControlResponse } from "../bridge/hookControl.js";
 
 async function readStdinAll(): Promise<string> {
   return new Promise((resolve) => {
@@ -34,12 +38,13 @@ export function registerHookIntegrationCommands(
 ): void {
   const hooks = connect
     .command("hooks")
-    .description("Install, inspect, or remove provider-native AMC observation hooks");
+    .description("Install, inspect, or remove provider-native AMC observation and control hooks");
 
   hooks
     .command("install")
     .description("Install a reversible project hook for Claude Code or Gemini CLI")
     .requiredOption("--provider <provider>", "claude-code|gemini-cli")
+    .option("--mode <mode>", "observe|control", "observe")
     .option("--agent <agentId>", "agent ID (defaults to active agent)")
     .option("--bridge-url <url>", "Bridge origin", "http://127.0.0.1:3212")
     .option("--ttl <ttl>", "dedicated observation lease TTL", "7d")
@@ -48,6 +53,7 @@ export function registerHookIntegrationCommands(
     .option("--json", "emit structured JSON", false)
     .action(async (opts: {
       provider: HookProvider;
+      mode: HookMode;
       agent?: string;
       bridgeUrl: string;
       ttl: string;
@@ -61,6 +67,7 @@ export function registerHookIntegrationCommands(
       const result = installHookIntegration({
         workspace: process.cwd(),
         provider: opts.provider,
+        mode: opts.mode,
         agentId: opts.agent ?? activeAgent() ?? "default",
         bridgeBase: opts.bridgeUrl,
         ttl: opts.ttl,
@@ -73,16 +80,19 @@ export function registerHookIntegrationCommands(
       }
       console.log(chalk.hex("#4AEF79")(opts.dryRun ? "AMC hook install plan" : result.changed ? "AMC hook installed" : "AMC hook already installed"));
       console.log(`Provider: ${result.provider}`);
-      console.log(`Observation lease: ${result.lease.scope} on ${result.lease.route}`);
+      console.log(`Mode: ${result.mode}`);
+      console.log(`Hook lease: ${result.lease.scopes.join(", ")} on ${result.lease.route}`);
       if (result.lease.expiresTs) console.log(`Expires: ${new Date(result.lease.expiresTs).toISOString()}`);
       console.log("Files:");
       printFileChanges(result.files);
-      console.log("Boundary: observation only; provider control decisions are unchanged.");
+      console.log(result.mode === "control"
+        ? "Boundary: control is loopback-only and raw provider input is never retained."
+        : "Boundary: observation only; provider control decisions are unchanged.");
     });
 
   hooks
     .command("status")
-    .description("Verify provider config ownership, signed manifest, and observation lease")
+    .description("Verify provider config ownership, mode, signed manifest, and hook lease")
     .requiredOption("--provider <provider>", "claude-code|gemini-cli")
     .option("--json", "emit structured JSON", false)
     .action((opts: { provider: HookProvider; json: boolean }) => {
@@ -93,6 +103,7 @@ export function registerHookIntegrationCommands(
         const color = status.state === "installed" ? chalk.green : status.state === "not-installed" ? chalk.gray : chalk.yellow;
         console.log(color(`AMC hook: ${status.state}`));
         console.log(`Provider: ${status.provider}`);
+        if (status.mode) console.log(`Mode: ${status.mode}`);
         console.log(`Config owned: ${status.configOwned ? "yes" : "no"}`);
         console.log(`Manifest valid: ${status.manifestValid ? "yes" : "no"}`);
         console.log(`Lease valid: ${status.leaseValid ? "yes" : "no"}`);
@@ -131,15 +142,34 @@ export function registerHookIntegrationCommands(
     .command("forward", { hidden: true })
     .description("Internal provider hook observation forwarder")
     .requiredOption("--provider <provider>", "claude-code|gemini-cli")
+    .option("--mode <mode>", "observe|control", "observe")
     .requiredOption("--agent <agentId>", "agent ID")
     .requiredOption("--token-file <path>", "dedicated hook lease token")
     .option("--bridge-url <url>", "Bridge origin", "http://127.0.0.1:3212")
-    .action(async (opts: { provider: HookProvider; agent: string; tokenFile: string; bridgeUrl: string }) => {
+    .action(async (opts: { provider: HookProvider; mode: HookMode; agent: string; tokenFile: string; bridgeUrl: string }) => {
       const rawInput = await readStdinAll();
       if (!rawInput.trim()) throw new Error("provider hook input is required on stdin");
+      if (opts.mode === "control") {
+        try {
+          const result = await forwardProviderHookControl({
+            workspace: process.cwd(),
+            provider: opts.provider,
+            agentId: opts.agent,
+            tokenFile: opts.tokenFile,
+            bridgeBase: opts.bridgeUrl,
+            rawInput
+          });
+          process.stdout.write(`${serializeProviderControlResponse(result.control.providerResponse)}\n`);
+        } catch {
+          process.stderr.write("AMC hook control unavailable; action denied.\n");
+          process.stdout.write(`${serializeProviderControlResponse(failClosedProviderControlResponse(opts.provider))}\n`);
+        }
+        return;
+      }
       await forwardProviderHookEvent({
         workspace: process.cwd(),
         provider: opts.provider,
+        mode: "observe",
         agentId: opts.agent,
         tokenFile: opts.tokenFile,
         bridgeBase: opts.bridgeUrl,

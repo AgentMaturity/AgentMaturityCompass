@@ -15,10 +15,11 @@ function workspace(): string {
   return root;
 }
 
-function run(cwd: string, args: string[]): ReturnType<typeof spawnSync> {
+function run(cwd: string, args: string[], input?: string): ReturnType<typeof spawnSync> {
   return spawnSync(process.execPath, [cliPath, ...args], {
     cwd,
     encoding: "utf8",
+    input,
     env: {
       ...process.env,
       NO_COLOR: "1",
@@ -84,5 +85,44 @@ describe("amc connect hooks CLI", () => {
     ]);
     expect(result.status).toBe(0);
     expect(result.stdout).toContain("amc supervise --agent default");
+  });
+
+  test("returns a provider-native deny when an installed control hook cannot reach Bridge", () => {
+    const cwd = workspace();
+    const installed = run(cwd, [
+      "connect", "hooks", "install",
+      "--provider", "claude-code",
+      "--mode", "control",
+      "--agent", "control-cli-agent",
+      "--json",
+    ]);
+    expect(installed.status).toBe(0);
+    expect(JSON.parse(installed.stdout)).toMatchObject({
+      mode: "control",
+      lease: { scopes: ["hook:observe", "hook:control"] },
+    });
+
+    const forwarded = run(cwd, [
+      "connect", "hooks", "forward",
+      "--provider", "claude-code",
+      "--mode", "control",
+      "--agent", "control-cli-agent",
+      "--token-file", ".amc/hooks/claude-code.lease",
+    ], JSON.stringify({
+      hook_event_name: "PreToolUse",
+      tool_name: "Read",
+      tool_use_id: "toolu_cli_outage_01",
+      tool_input: { file_path: "/private/never-forwarded.txt" },
+    }));
+    expect(forwarded.status).toBe(0);
+    expect(JSON.parse(forwarded.stdout)).toEqual({
+      hookSpecificOutput: {
+        hookEventName: "PreToolUse",
+        permissionDecision: "deny",
+        permissionDecisionReason: "AMC control is unavailable; the action is denied fail closed.",
+      },
+    });
+    expect(forwarded.stderr).toContain("AMC hook control unavailable; action denied.");
+    expect(forwarded.stdout).not.toContain("never-forwarded");
   });
 });

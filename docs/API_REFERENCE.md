@@ -1,6 +1,6 @@
 # AMC API Reference
 
-> Auto-generated from source on 2026-07-10
+> Auto-generated from source on 2026-07-11
 
 ## Table of Contents
 
@@ -271,7 +271,7 @@ AMC provides 1,149 public CLI command paths in the live command inventory.
 | 252 | `amc config print` | Print resolved runtime config (secret-safe) |
 | 253 | `amc config profile` | Print or apply workspace config profile (dev|ci|prod) |
 | 254 | `amc connect` | Connect wizard for any agent/provider runtime |
-| 255 | `amc connect hooks` | Install, inspect, or remove provider-native AMC observation hooks |
+| 255 | `amc connect hooks` | Install, inspect, or remove provider-native AMC observation and control hooks |
 | 256 | `amc connect hooks install` | Install a reversible project hook for Claude Code or Gemini CLI |
 | 257 | `amc connect hooks remove` | Remove only the signed AMC-owned hook and revoke its lease |
 | 258 | `amc connect hooks status` | Verify provider config ownership, signed manifest, and observation lease |
@@ -2754,6 +2754,7 @@ Install a reversible project hook for Claude Code or Gemini CLI
 | Option | Description |
 |--------|-------------|
 | `--provider <provider>` | - |
+| `--mode <mode>` | - |
 | `--agent <agentId>` | - |
 | `--bridge-url <url>` | - |
 | `--ttl <ttl>` | - |

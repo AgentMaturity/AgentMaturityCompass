@@ -132,6 +132,15 @@ amc connect hooks status --provider claude-code
 
 Replace `claude-code` with `gemini-cli` for Gemini CLI. The observer sends no tool arguments and makes no allow or deny decision. Run `amc connect hooks remove --provider claude-code` to remove only AMC's owned handler and revoke its lease.
 
+To opt into signed pre-tool control, keep Studio/Bridge on the loopback interface and install control mode:
+
+```bash
+amc up
+amc connect hooks install --provider claude-code --mode control --agent my-agent
+```
+
+Control reuses signed ToolHub, Action Policy, Approval Policy, budget, freeze, maturity, and assurance gates. Raw tool input crosses only the loopback connection, is evaluated in memory, and is not retained. Claude Code supports native `allow`, `deny`, and `ask`; Gemini CLI does not support `ask`, so AMC fails that outcome closed as `deny`. Multi-user AMC quorum is never represented as one provider-local ask.
+
 ---
 
 ## 4. Import eval results from your framework (optional, 1 minute)

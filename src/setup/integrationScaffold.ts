@@ -897,6 +897,29 @@ export function generateBridgeOpenApiSpec(): OpenApiSpec {
           }
         }
       },
+      "/bridge/hooks/control/v1": {
+        post: {
+          summary: "Return a provider-native signed pre-tool control response",
+          description: "Loopback-only AMC control route. Raw provider input is evaluated in memory and not retained. The exact provider response is bound to a signed guard_check receipt.",
+          tags: ["hooks", "control"],
+          security: [{ leaseToken: [] }],
+          requestBody: {
+            required: true,
+            content: { "application/json": { schema: { type: "object", additionalProperties: true } } }
+          },
+          responses: {
+            "200": { description: "Previously evaluated byte-identical action and original signed response" },
+            "201": { description: "Provider-native decision and signed receipt" },
+            "400": { description: "Malformed, ambiguous, or unsupported provider input" },
+            "401": { description: "Missing or invalid lease" },
+            "403": { description: "Non-loopback request or lease lacks hook:control" },
+            "409": { description: "Stable action ID conflicts with different input bytes" },
+            "413": { description: "Payload exceeds the hook control limit" },
+            "429": { description: "Signed lease request budget exceeded" },
+            "503": { description: "Control evaluation or signed receipt unavailable" }
+          }
+        }
+      },
       "/bridge/openai/v1/chat/completions": {
         post: {
           summary: "OpenAI chat completions via bridge",
@@ -927,7 +950,7 @@ export function generateBridgeOpenApiSpec(): OpenApiSpec {
         leaseToken: {
           type: "http",
           scheme: "bearer",
-          description: "Signed, short-lived AMC agent lease with hook:observe scope and an allowed /hooks route."
+          description: "Signed, short-lived AMC agent lease. Observation requires hook:observe; explicit loopback control also requires hook:control. Both use an allowed /hooks route."
         }
       },
       schemas: {

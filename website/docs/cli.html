@@ -227,8 +227,8 @@
             <tr><td><code>amc sandbox run --agent &lt;id&gt; -- &lt;cmd&gt;</code></td><td>Run in hardened Docker sandbox</td></tr>
             <tr><td><code>amc monitor --stdin --runtime &lt;n&gt;</code></td><td>Record stdin stream as evidence</td></tr>
             <tr><td><code>amc connect</code></td><td>Connect wizard for any agent/provider</td></tr>
-            <tr><td><code>amc connect hooks install --provider &lt;id&gt;</code></td><td>Install a reversible Claude Code or Gemini CLI observation hook</td></tr>
-            <tr><td><code>amc connect hooks status --provider &lt;id&gt;</code></td><td>Verify provider config ownership, signed manifest, and narrow lease</td></tr>
+            <tr><td><code>amc connect hooks install --provider &lt;id&gt; [--mode observe|control]</code></td><td>Install a reversible observer by default, or opt into loopback signed control</td></tr>
+            <tr><td><code>amc connect hooks status --provider &lt;id&gt;</code></td><td>Verify provider config ownership, mode, signed manifest, and narrow lease</td></tr>
             <tr><td><code>amc connect hooks remove --provider &lt;id&gt;</code></td><td>Remove only AMC's handler and revoke its observation lease</td></tr>
             <tr><td><code>amc ingest</code></td><td>Ingest external logs as SELF_REPORTED evidence</td></tr>
             <tr><td><code>amc attest</code></td><td>Auditor-attest to upgrade trust to ATTESTED</td></tr>

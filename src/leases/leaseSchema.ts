@@ -6,6 +6,7 @@ export const leaseScopeSchema = z.enum([
   "toolhub:intent",
   "toolhub:execute",
   "hook:observe",
+  "hook:control",
   "governor:check",
   "receipt:verify",
   "diagnostic:self-run"

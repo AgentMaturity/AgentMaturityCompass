@@ -197,6 +197,70 @@ export function argvAllowed(tool: ToolDefinition, argv: string[]): { ok: boolean
   return { ok: true };
 }
 
+export function validateToolRequest(input: {
+  workspace: string;
+  tool: ToolDefinition;
+  args: Record<string, unknown>;
+}): { ok: boolean; reason?: string } {
+  const cwd = resolve(input.workspace, String(input.args.cwd ?? input.workspace));
+
+  if (input.tool.name === "fs.read" || input.tool.name === "fs.write") {
+    const pathValue = String(input.args.path ?? "");
+    if (!pathValue) {
+      return { ok: false, reason: "path is required" };
+    }
+    const pathResult = pathAllowedByPatterns(
+      input.workspace,
+      resolve(input.workspace, pathValue),
+      input.tool.allow?.paths ?? [],
+      input.tool.deny?.paths ?? []
+    );
+    if (!pathResult.ok) {
+      return { ok: false, reason: pathResult.reason };
+    }
+  }
+
+  if (input.tool.name === "http.fetch") {
+    const urlText = String(input.args.url ?? "");
+    if (!urlText) {
+      return { ok: false, reason: "url is required" };
+    }
+    let host = "";
+    try {
+      host = new URL(urlText).hostname;
+    } catch {
+      return { ok: false, reason: "invalid url" };
+    }
+    if (!hostAllowedForTool(input.tool, host)) {
+      return { ok: false, reason: `host not allowed by tool policy: ${host}` };
+    }
+  }
+
+  if (input.tool.name === "process.spawn") {
+    const binary = String(input.args.binary ?? "");
+    const argv = Array.isArray(input.args.argv) ? input.args.argv.map(String) : [];
+    if (!binary) {
+      return { ok: false, reason: "binary is required" };
+    }
+    if (!binaryAllowedForTool(input.tool, binary)) {
+      return { ok: false, reason: `binary not allowed: ${binary}` };
+    }
+    const argvCheck = argvAllowed(input.tool, [binary, ...argv]);
+    if (!argvCheck.ok) {
+      return { ok: false, reason: argvCheck.reason };
+    }
+  }
+
+  if (input.tool.name.startsWith("git.")) {
+    const pathResult = pathAllowedByPatterns(input.workspace, cwd, ["./workspace/**", "./**"], ["**/.amc/**"]);
+    if (!pathResult.ok) {
+      return { ok: false, reason: pathResult.reason };
+    }
+  }
+
+  return { ok: true };
+}
+
 export function resolveToolPath(workspace: string, value: string): string {
   if (isAbsolute(value)) {
     return normalize(value);

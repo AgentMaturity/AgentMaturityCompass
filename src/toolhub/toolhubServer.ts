@@ -11,12 +11,9 @@ import {
 import { type ActionClass, type ExecutionMode } from "../types.js";
 import { openLedger } from "../ledger/ledger.js";
 import {
-  argvAllowed,
-  binaryAllowedForTool,
   findToolDefinition,
-  hostAllowedForTool,
   loadToolsConfig,
-  pathAllowedByPatterns,
+  validateToolRequest,
   verifyToolsConfigSignature
 } from "./toolhubValidators.js";
 import { appendToolEvidenceWithReceipt } from "./toolhubReceipts.js";
@@ -1102,55 +1099,7 @@ export class ToolHubService {
   }
 
   private validateToolArgs(tool: NonNullable<ReturnType<typeof findToolDefinition>>, args: Record<string, unknown>): { ok: boolean; reason?: string } {
-    const cwd = resolve(this.workspace, String(args.cwd ?? this.workspace));
-
-    if (tool.name === "fs.read" || tool.name === "fs.write") {
-      const pathValue = String(args.path ?? "");
-      if (!pathValue) {
-        return { ok: false, reason: "path is required" };
-      }
-      const pathResult = pathAllowedByPatterns(this.workspace, resolve(this.workspace, pathValue), tool.allow?.paths ?? [], tool.deny?.paths ?? []);
-      if (!pathResult.ok) {
-        return { ok: false, reason: pathResult.reason };
-      }
-    }
-
-    if (tool.name === "http.fetch") {
-      const urlText = String(args.url ?? "");
-      if (!urlText) {
-        return { ok: false, reason: "url is required" };
-      }
-      let host = "";
-      try {
-        host = new URL(urlText).hostname;
-      } catch {
-        return { ok: false, reason: `invalid url: ${urlText}` };
-      }
-      if (!hostAllowedForTool(tool, host)) {
-        return { ok: false, reason: `host not allowed by tool policy: ${host}` };
-      }
-    }
-
-    if (tool.name === "process.spawn") {
-      const binary = String(args.binary ?? "");
-      const argv = Array.isArray(args.argv) ? args.argv.map(String) : [];
-      if (!binaryAllowedForTool(tool, binary)) {
-        return { ok: false, reason: `binary not allowed: ${binary}` };
-      }
-      const argvCheck = argvAllowed(tool, [binary, ...argv]);
-      if (!argvCheck.ok) {
-        return { ok: false, reason: argvCheck.reason };
-      }
-    }
-
-    if (tool.name.startsWith("git.")) {
-      const pathResult = pathAllowedByPatterns(this.workspace, cwd, ["./workspace/**", "./**"], ["**/.amc/**"]);
-      if (!pathResult.ok) {
-        return { ok: false, reason: pathResult.reason };
-      }
-    }
-
-    return { ok: true };
+    return validateToolRequest({ workspace: this.workspace, tool, args });
   }
 
   private auditDenied(

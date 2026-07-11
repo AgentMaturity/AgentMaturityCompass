@@ -54,6 +54,15 @@ The installer uses a dedicated `hook:observe` lease with a `/hooks` route allowl
 
 Codex, Cursor, OpenCode, and other providers are not advertised by this installer until AMC has a pinned and fixture-tested native per-tool hook contract for them.
 
+For an explicit Enforce decision, start the local Studio/Bridge and install control mode:
+
+```bash
+amc up
+amc connect hooks install --provider claude-code --mode control --agent my-agent
+```
+
+Control is loopback-only and adds a dedicated `hook:control` scope. Raw provider input is evaluated in memory and not retained. The exact provider response is bound to a signed `guard_check` receipt. Claude Code supports native `allow`, `deny`, and `ask`; Gemini CLI does not support `ask`, so AMC returns an explicit deny instead. A provider-local ask is not AMC quorum evidence, and multi-user or distinct-user approval policies fail closed.
+
 Agents that already emit a canonical hook envelope can post an AMC-owned observed subset of the AEP `0.1` action lifecycle to:
 
 ```text
