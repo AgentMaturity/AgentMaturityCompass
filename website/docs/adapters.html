@@ -344,6 +344,7 @@ amc connect hooks install --provider claude-code --agent my-agent
 
 <span class="comment"># Verify or remove it</span>
 amc connect hooks status --provider claude-code
+amc connect hooks lifecycle --agent my-agent --action &lt;action-id&gt;
 amc connect hooks remove --provider claude-code
 
 <span class="comment"># Gemini CLI uses the same lifecycle</span>
@@ -351,7 +352,7 @@ amc connect hooks install --provider gemini-cli --agent my-agent</code></pre>
 
       <div class="callout callout-green">
         <strong>Reversible and privacy-minimal</strong>
-        AMC preserves unrelated provider settings, adds a managed <code>.gitignore</code> block for <code>.amc/hooks/</code>, keeps its dedicated <code>hook:observe</code> lease out of provider config with mode <code>0600</code>, signs the ownership manifest, and removes only its own handler and ignore block. The forwarder omits tool arguments, cwd, transcript paths, and raw session IDs. It observes requested actions; it does not allow, deny, or steer them.
+        AMC preserves unrelated provider settings, signs the exact requested, completed, and failed handler set, keeps its dedicated <code>hook:observe</code> lease out of provider config with mode <code>0600</code>, and removes only its own handlers and ignore block. The lifecycle view verifies immutable receipts under one stable action ID; missing, ambiguous, conflicting, cross-agent, out-of-order, or tampered evidence must fail closed. Raw tool input, output, error messages, cwd, transcript paths, and session IDs are not retained. Observation does not allow, deny, or steer actions.
       </div>
 
       <h3>Opt-in signed control</h3>

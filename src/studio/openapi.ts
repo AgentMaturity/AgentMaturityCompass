@@ -298,6 +298,22 @@ function studioEndpoints(): Record<string, Record<string, OpenApiOperation>> {
         },
       },
     },
+    "/api/v1/watch/hook-actions/{actionId}": {
+      get: {
+        summary: "Verify one provider hook action lifecycle",
+        tags: ["Studio", "Watch", "Hooks"],
+        security: [{ adminToken: [] }, { sessionCookie: [] }],
+        parameters: [
+          { name: "actionId", in: "path", required: true, schema: { type: "string", minLength: 1, maxLength: 160 } },
+          { name: "agentId", in: "query", required: false, schema: { type: "string", default: "default", minLength: 1, maxLength: 160 } },
+        ],
+        responses: {
+          "200": okJson("Verified request, decision, and terminal lifecycle projection", "#/components/schemas/HookActionLifecycleResponse"),
+          "400": errJson("Invalid agent or action identifier"),
+          "401": errJson("Unauthorized"),
+        },
+      },
+    },
     "/api/plugins": {
       get: {
         summary: "List installed plugins",
@@ -414,6 +430,34 @@ function studioSchemas(): Record<string, unknown> {
             },
           },
           required: ["receipt"],
+        },
+      },
+      required: ["ok", "data"],
+    },
+    HookActionLifecycleResponse: {
+      type: "object",
+      additionalProperties: false,
+      properties: {
+        ok: { type: "boolean", const: true },
+        data: {
+          type: "object",
+          additionalProperties: false,
+          properties: {
+            schemaVersion: { type: "string", const: "2026-07-11" },
+            agentId: { type: "string" },
+            actionId: { type: "string" },
+            provider: { type: ["string", "null"], enum: ["claude-code", "gemini-cli", null] },
+            status: { type: "string", enum: ["requested", "awaiting_terminal", "completed", "failed", "denied", "fail_closed"] },
+            valid: { type: "boolean" },
+            failClosed: { type: "boolean" },
+            reasonCodes: { type: "array", items: { type: "string" } },
+            phases: { type: "object" },
+            evidenceEventIds: { type: "array", items: { type: "string" } },
+            receiptIds: { type: "array", items: { type: "string" } },
+            rawProviderPayloadStored: { type: "boolean", const: false },
+            claimBoundary: { type: "string" },
+          },
+          required: ["schemaVersion", "agentId", "actionId", "provider", "status", "valid", "failClosed", "reasonCodes", "phases", "evidenceEventIds", "receiptIds", "rawProviderPayloadStored", "claimBoundary"],
         },
       },
       required: ["ok", "data"],

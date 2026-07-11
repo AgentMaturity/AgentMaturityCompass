@@ -128,9 +128,10 @@ For Claude Code or Gemini CLI, observe native tool requests with one reversible 
 amc connect hooks install --provider claude-code --agent my-agent --dry-run
 amc connect hooks install --provider claude-code --agent my-agent
 amc connect hooks status --provider claude-code
+amc connect hooks lifecycle --agent my-agent --action <action-id>
 ```
 
-Replace `claude-code` with `gemini-cli` for Gemini CLI. The observer sends no tool arguments and makes no allow or deny decision. Run `amc connect hooks remove --provider claude-code` to remove only AMC's owned handler and revoke its lease.
+Replace `claude-code` with `gemini-cli` for Gemini CLI. The observer retains no raw tool input, output, error message, or session ID and makes no allow or deny decision. It records requested actions and completed or failed terminal events under one stable action ID; ambiguous terminal correlation fails closed. Run `amc connect hooks remove --provider claude-code` to remove only AMC's owned handlers and revoke its lease.
 
 To opt into signed pre-tool control, keep Studio/Bridge on the loopback interface and install control mode:
 

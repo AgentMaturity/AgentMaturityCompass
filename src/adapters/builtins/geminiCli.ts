@@ -34,6 +34,7 @@ export const geminiCliAdapter: AdapterDefinition = {
     supportsStdin: true
   },
   capabilities: builtInAdapterCapabilities({
+    definitionVersion: "1.1.0",
     versionSource: "adapter_binary",
     hookProvider: "gemini-cli",
     evidenceRefs: [

@@ -173,7 +173,12 @@ describe("signed adapter capability receipts", () => {
     });
 
     expect(receipt.verification).toEqual({ status: "verified", reasons: [] });
-    expect(receipt.effective.events).toContain("action.requested");
+    expect(receipt.effective.events).toEqual(expect.arrayContaining([
+      "action.requested",
+      "action.completed",
+      "action.failed",
+      "action.decision",
+    ]));
     expect(receipt.effective.controls).toEqual(expect.arrayContaining([
       "provider.allow",
       "provider.deny",

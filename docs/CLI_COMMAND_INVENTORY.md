@@ -261,6 +261,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc connect` | Connect wizard for any agent/provider runtime | `--agent <agentId>`<br>`--adapter <adapterId>`<br>`--token-file <path>`<br>`--bridge-url <url>`<br>`--mode <mode>`<br>`--print-env`<br>`--print-cmd` | - |
 | `amc connect hooks` | Install, inspect, or remove provider-native AMC observation and control hooks | - | - |
 | `amc connect hooks install` | Install a reversible project hook for Claude Code or Gemini CLI | `--provider <provider>`<br>`--mode <mode>`<br>`--agent <agentId>`<br>`--bridge-url <url>`<br>`--ttl <ttl>`<br>`--rpm <rpm>`<br>`--dry-run`<br>`--json` | - |
+| `amc connect hooks lifecycle` | Verify one requested, controlled, and terminal provider action lifecycle | `--agent <agentId>`<br>`--action <actionId>`<br>`--json` | - |
 | `amc connect hooks remove` | Remove only the signed AMC-owned hook and revoke its lease | `--provider <provider>`<br>`--dry-run`<br>`--json` | - |
 | `amc connect hooks status` | Verify provider config ownership, mode, signed manifest, and hook lease | `--provider <provider>`<br>`--json` | - |
 | `amc contract-tests` | Generate and display contract test suite for bridge API | - | - |

@@ -5,14 +5,17 @@ import { z } from "zod";
 import { getPublicKeyHistory } from "../crypto/keys.js";
 import { openLedger, hashBinaryOrPath, verifyEvidenceEventIntegrity } from "../ledger/ledger.js";
 import { verifyReceipt, type ReceiptKind } from "../receipts/receipt.js";
-import type { EvidenceEventType } from "../types.js";
+import type { EvidenceEvent, EvidenceEventType } from "../types.js";
 import { sha256Hex } from "../utils/hash.js";
 import { redactBridgeText } from "./bridgeRedaction.js";
 
 export const AEP_01_SOURCE_COMMIT = "2583cff9380f8f0a459d52c7112b6105c46496ed";
 export const OBSERVED_AEP_HOOK_PATH = "/bridge/hooks/aep/0.1/events";
 export const OBSERVED_AEP_HOOK_ROUTE = "/hooks/aep/0.1/events";
+export const OBSERVED_HOOK_CORRELATION_PATH = "/bridge/hooks/aep/0.1/correlation";
+export const OBSERVED_HOOK_CORRELATION_ROUTE = "/hooks/aep/0.1/correlation";
 export const MAX_OBSERVED_HOOK_BODY_BYTES = 262_144;
+export const MAX_HOOK_CORRELATION_BODY_BYTES = 4_096;
 
 const MAX_EVENT_AGE_MS = 24 * 60 * 60_000;
 const MAX_EVENT_FUTURE_SKEW_MS = 5 * 60_000;
@@ -26,6 +29,9 @@ export type HookIngressErrorCode =
   | "HOOK_EVENT_STALE"
   | "HOOK_EVENT_FUTURE"
   | "HOOK_EVENT_REPLAY"
+  | "HOOK_ACTION_NOT_FOUND"
+  | "HOOK_ACTION_AMBIGUOUS"
+  | "HOOK_ACTION_CONFLICT"
   | "HOOK_LEDGER_UNAVAILABLE";
 
 export class HookIngressError extends Error {
@@ -185,6 +191,21 @@ const extensionsSchema = z.record(
   z.unknown()
 );
 
+const amcCorrelationExtensionSchema = z.object({
+  v: z.literal(1),
+  provider: z.enum(["claude-code", "gemini-cli"]),
+  sha256: z.string().regex(/^[a-f0-9]{64}$/),
+  source: z.enum(["provider-call-id", "derived-request-id", "bridge-unmatched-request"]),
+  rawStored: z.literal(false),
+}).strict();
+
+type AmcCorrelationExtension = z.infer<typeof amcCorrelationExtensionSchema>;
+
+const hookCorrelationLookupSchema = z.object({
+  provider: z.enum(["claude-code", "gemini-cli"]),
+  correlationSha256: z.string().regex(/^[a-f0-9]{64}$/),
+}).strict();
+
 export const observedAepActionEventSchema = z.object({
   aep_version: z.literal("0.1"),
   id: idSchema,
@@ -207,6 +228,15 @@ export const observedAepActionEventSchema = z.object({
   lifecycle: lifecycleSchema.optional(),
   extensions: extensionsSchema.optional()
 }).strict().superRefine((event, context) => {
+  const correlation = event.extensions?.["x-amc-correlation"];
+  if (correlation !== undefined) {
+    const parsed = amcCorrelationExtensionSchema.safeParse(correlation);
+    if (!parsed.success) {
+      context.addIssue({ code: "custom", path: ["extensions", "x-amc-correlation"], message: "AMC correlation extension is invalid" });
+    } else if (event.agent.surface !== parsed.data.provider) {
+      context.addIssue({ code: "custom", path: ["agent", "surface"], message: "AMC correlation provider must match agent surface" });
+    }
+  }
   if (event.action.type === "tool_call" && !event.tool) {
     context.addIssue({ code: "custom", path: ["tool"], message: "tool is required for tool_call actions" });
   }
@@ -282,6 +312,17 @@ function parseUnambiguousJson(rawBody: Buffer): unknown {
   return parsed;
 }
 
+export function parseHookCorrelationLookup(rawBody: Buffer): z.infer<typeof hookCorrelationLookupSchema> {
+  if (rawBody.byteLength > MAX_HOOK_CORRELATION_BODY_BYTES) {
+    throw new HookIngressError("HOOK_PAYLOAD_TOO_LARGE", 413, "hook correlation payload too large");
+  }
+  const parsed = hookCorrelationLookupSchema.safeParse(parseUnambiguousJson(rawBody));
+  if (!parsed.success) {
+    throw new HookIngressError("HOOK_SCHEMA_INVALID", 400, "hook correlation request does not match schema");
+  }
+  return parsed.data;
+}
+
 function validateEvent(rawBody: Buffer, now: number): ObservedAepActionEvent {
   const parsed = parseUnambiguousJson(rawBody);
   const result = observedAepActionEventSchema.safeParse(parsed);
@@ -323,7 +364,15 @@ function omittedFields(event: ObservedAepActionEvent): string[] {
   return omitted.sort();
 }
 
+function amcCorrelation(event: ObservedAepActionEvent): AmcCorrelationExtension | null {
+  const value = event.extensions?.["x-amc-correlation"];
+  if (value === undefined) return null;
+  const parsed = amcCorrelationExtensionSchema.safeParse(value);
+  return parsed.success ? parsed.data : null;
+}
+
 function buildProjection(event: ObservedAepActionEvent, authenticatedAgentId: string, rawBodySha256: string): Record<string, unknown> {
+  const correlation = amcCorrelation(event);
   return {
     schemaVersion: "2026-07-10",
     protocol: {
@@ -344,6 +393,7 @@ function buildProjection(event: ObservedAepActionEvent, authenticatedAgentId: st
     producer: {
       authenticatedAgentId,
       claimedAgentSlug: event.agent.slug,
+      providerSurface: event.agent.surface ? redactBridgeText(event.agent.surface).slice(0, 512) : null,
       claimedAgentVersion: event.agent.version ? redactBridgeText(event.agent.version).slice(0, 512) : null,
       modelId: event.model?.id ? redactBridgeText(event.model.id).slice(0, 512) : null,
       modelProvider: event.model?.provider ? redactBridgeText(event.model.provider).slice(0, 512) : null
@@ -351,7 +401,10 @@ function buildProjection(event: ObservedAepActionEvent, authenticatedAgentId: st
     correlation: {
       actionId: event.action.id,
       sessionIdSha256: digestOptional(event.session?.id),
-      conversationIdSha256: digestOptional(event.session?.conversation_id)
+      conversationIdSha256: digestOptional(event.session?.conversation_id),
+      providerCorrelationSha256: correlation?.sha256 ?? null,
+      providerCorrelationSource: correlation?.source ?? null,
+      rawProviderCorrelationStored: correlation?.rawStored ?? null,
     },
     action: {
       type: event.action.type,
@@ -567,6 +620,111 @@ function recoverObservedHookReceipt(input: {
   };
 }
 
+const correlatedHookMetaSchema = z.object({
+  trustTier: z.literal("OBSERVED"),
+  agentId: z.string().min(1),
+  sourceProtocol: z.literal("aep"),
+  sourceEventType: z.enum(["action.requested", "action.completed", "action.failed", "action.denied"]),
+  actionId: z.string().min(1),
+  provider: z.enum(["claude-code", "gemini-cli"]),
+  providerCorrelationSha256: z.string().regex(/^[a-f0-9]{64}$/),
+  rawProviderCorrelationStored: z.literal(false),
+}).passthrough();
+
+const controlLifecycleMetaSchema = z.object({
+  trustTier: z.literal("OBSERVED"),
+  controlSchemaVersion: z.literal(1),
+  agentId: z.string().min(1),
+  provider: z.enum(["claude-code", "gemini-cli"]),
+  actionId: z.string().min(1),
+  decision: z.enum(["allow", "deny", "ask"]),
+}).passthrough();
+
+function parseEventMeta(event: EvidenceEvent): unknown {
+  try {
+    return JSON.parse(event.meta_json) as unknown;
+  } catch {
+    return null;
+  }
+}
+
+function resolveUnmatchedHookActionFromLedger(input: {
+  ledger: ReturnType<typeof openLedger>;
+  authenticatedAgentId: string;
+  provider: "claude-code" | "gemini-cli";
+  correlationSha256: string;
+}): { actionId: string; requestEventId: string; correlationSha256: string } {
+  const requests: Array<{ event: EvidenceEvent; actionId: string }> = [];
+  const terminalActionIds = new Set<string>();
+  const deniedActionIds = new Set<string>();
+
+  for (const event of input.ledger.getAllEvents()) {
+    const meta = parseEventMeta(event);
+    const hook = correlatedHookMetaSchema.safeParse(meta);
+    if (hook.success
+      && hook.data.agentId === input.authenticatedAgentId
+      && hook.data.provider === input.provider) {
+      if (hook.data.sourceEventType === "action.requested"
+        && hook.data.providerCorrelationSha256 === input.correlationSha256) {
+        requests.push({ event, actionId: hook.data.actionId });
+      }
+      if (hook.data.sourceEventType !== "action.requested") {
+        terminalActionIds.add(hook.data.actionId);
+      }
+    }
+    const control = controlLifecycleMetaSchema.safeParse(meta);
+    if (control.success
+      && control.data.agentId === input.authenticatedAgentId
+      && control.data.provider === input.provider
+      && control.data.decision === "deny") {
+      deniedActionIds.add(control.data.actionId);
+    }
+  }
+
+  const eligible = requests.filter((row) => !terminalActionIds.has(row.actionId) && !deniedActionIds.has(row.actionId));
+  if (eligible.length === 0) {
+    throw new HookIngressError("HOOK_ACTION_NOT_FOUND", 409, "no unmatched hook request has this correlation");
+  }
+  if (eligible.length !== 1) {
+    throw new HookIngressError("HOOK_ACTION_AMBIGUOUS", 409, "multiple unmatched hook requests have this correlation");
+  }
+  const selected = eligible[0]!;
+  const integrity = verifyEvidenceEventIntegrity({
+    ledger: input.ledger,
+    eventId: selected.event.id,
+    requireReceipt: true,
+    requireSealedSession: true,
+  });
+  if (!integrity.ok) {
+    throw new HookIngressError("HOOK_LEDGER_UNAVAILABLE", 503, "matched hook request evidence failed integrity verification");
+  }
+  return {
+    actionId: selected.actionId,
+    requestEventId: selected.event.id,
+    correlationSha256: input.correlationSha256,
+  };
+}
+
+export function resolveUnmatchedObservedHookAction(input: {
+  workspace: string;
+  authenticatedAgentId: string;
+  provider: "claude-code" | "gemini-cli";
+  correlationSha256: string;
+}): { actionId: string; requestEventId: string; correlationSha256: string } {
+  if (!SAFE_ID.test(input.authenticatedAgentId) || input.authenticatedAgentId.length > 160) {
+    throw new HookIngressError("HOOK_SCHEMA_INVALID", 400, "authenticated agent identity is invalid");
+  }
+  if (!/^[a-f0-9]{64}$/.test(input.correlationSha256)) {
+    throw new HookIngressError("HOOK_SCHEMA_INVALID", 400, "hook correlation digest is invalid");
+  }
+  const ledger = openLedger(input.workspace);
+  try {
+    return resolveUnmatchedHookActionFromLedger({ ...input, ledger });
+  } finally {
+    ledger.close();
+  }
+}
+
 export function ingestObservedAepHookEvent(input: {
   workspace: string;
   authenticatedAgentId: string;
@@ -578,6 +736,7 @@ export function ingestObservedAepHookEvent(input: {
     throw new HookIngressError("HOOK_SCHEMA_INVALID", 400, "authenticated agent identity is invalid");
   }
   const event = validateEvent(input.rawBody, now);
+  const correlation = amcCorrelation(event);
   const rawBodySha256 = sha256Hex(input.rawBody);
   const eventId = deterministicEventId(input.authenticatedAgentId, event.id);
   const sessionId = deterministicSessionId(input.authenticatedAgentId, event);
@@ -594,6 +753,18 @@ export function ingestObservedAepHookEvent(input: {
       rawBodySha256
     });
     if (recovered) return recovered;
+
+    if (correlation && event.type !== "action.requested") {
+      const resolved = resolveUnmatchedHookActionFromLedger({
+        ledger,
+        authenticatedAgentId: input.authenticatedAgentId,
+        provider: correlation.provider,
+        correlationSha256: correlation.sha256,
+      });
+      if (resolved.actionId !== event.action.id) {
+        throw new HookIngressError("HOOK_ACTION_CONFLICT", 409, "terminal hook action ID does not match the unmatched request");
+      }
+    }
 
     const session = ledger.db.prepare("SELECT session_id, session_final_event_hash FROM sessions WHERE session_id = ? LIMIT 1").get(sessionId) as
       | { session_id: string; session_final_event_hash: string | null }
@@ -640,6 +811,10 @@ export function ingestObservedAepHookEvent(input: {
           actionType: event.action.type,
           actionStatus: event.action.status ?? null,
           claimedAgentSlug: event.agent.slug,
+          provider: event.agent.surface ? redactBridgeText(event.agent.surface).slice(0, 512) : null,
+          providerCorrelationSha256: correlation?.sha256 ?? null,
+          providerCorrelationSource: correlation?.source ?? null,
+          rawProviderCorrelationStored: correlation?.rawStored ?? null,
           toolName: event.tool?.name ? redactBridgeText(event.tool.name).slice(0, 512) : null,
           toolType: event.tool?.type ?? null,
           rawBodySha256,

@@ -17,11 +17,16 @@ import type { PromptPolicy } from "../prompt/promptPolicySchema.js";
 import { evaluateRuntimeFirewall, runtimeFirewallEnabled, type RuntimeFirewallDecision } from "../runtime/firewall.js";
 import {
   HookIngressError,
+  MAX_HOOK_CORRELATION_BODY_BYTES,
   MAX_OBSERVED_HOOK_BODY_BYTES,
   OBSERVED_AEP_HOOK_PATH,
   OBSERVED_AEP_HOOK_ROUTE,
+  OBSERVED_HOOK_CORRELATION_PATH,
+  OBSERVED_HOOK_CORRELATION_ROUTE,
   consumeObservedHookRateLimit,
   ingestObservedAepHookEvent,
+  parseHookCorrelationLookup,
+  resolveUnmatchedObservedHookAction,
 } from "./hookIngress.js";
 import {
   CONTROL_HOOK_PATH,
@@ -361,6 +366,58 @@ export async function handleBridgeRequest(options: HandleBridgeRequestOptions): 
         maxCostUsdPerDay: verification.payload.maxCostUsdPerDay
       }
     });
+    return true;
+  }
+
+  if (options.pathname === OBSERVED_HOOK_CORRELATION_PATH) {
+    if ((options.req.method ?? "POST").toUpperCase() !== "POST") {
+      writeJson(options.res, 405, { error: "method not allowed" });
+      return true;
+    }
+    const auth = verifyBridgeLease({
+      workspace: options.workspace,
+      requestUrl: options.url,
+      headers: options.req.headers,
+      routePath: OBSERVED_HOOK_CORRELATION_ROUTE,
+      requiredScope: "hook:observe",
+    });
+    if (!auth.ok || !auth.payload) {
+      writeJson(options.res, auth.status, { error: auth.error ?? "unauthorized" });
+      return true;
+    }
+    try {
+      const rateLimit = consumeObservedHookRateLimit({
+        workspace: options.workspace,
+        leaseId: auth.payload.leaseId,
+        authenticatedAgentId: auth.payload.agentId,
+        maxRequestsPerMinute: auth.payload.maxRequestsPerMinute,
+        routePath: OBSERVED_HOOK_CORRELATION_ROUTE,
+      });
+      if (!rateLimit.allowed) {
+        options.res.setHeader("retry-after", String(rateLimit.retryAfterSeconds));
+        writeJson(options.res, 429, { error: "hook lease rate limit exceeded" });
+        return true;
+      }
+      const rawBody = await readBody(options.req, Math.min(options.maxRequestBytes, MAX_HOOK_CORRELATION_BODY_BYTES));
+      const row = parseHookCorrelationLookup(rawBody);
+      const resolved = resolveUnmatchedObservedHookAction({
+        workspace: options.workspace,
+        authenticatedAgentId: auth.payload.agentId,
+        provider: row.provider,
+        correlationSha256: row.correlationSha256,
+      });
+      writeJson(options.res, 200, { ok: true, resolved: true, ...resolved });
+    } catch (error) {
+      if (String(error).includes("PAYLOAD_TOO_LARGE")) {
+        writeJson(options.res, 413, { error: "hook correlation payload too large" });
+        return true;
+      }
+      if (error instanceof HookIngressError) {
+        writeJson(options.res, error.statusCode, { error: error.message, code: error.code });
+        return true;
+      }
+      writeJson(options.res, 500, { error: "hook action correlation failed" });
+    }
     return true;
   }
 

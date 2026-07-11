@@ -45,6 +45,7 @@ For Claude Code or Gemini CLI, install the project-local observer instead of han
 amc connect hooks install --provider claude-code --agent my-agent --dry-run
 amc connect hooks install --provider claude-code --agent my-agent
 amc connect hooks status --provider claude-code
+amc connect hooks lifecycle --agent my-agent --action <action-id>
 amc connect hooks remove --provider claude-code
 
 # Or use --provider gemini-cli

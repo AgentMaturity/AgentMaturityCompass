@@ -28,12 +28,15 @@ export function builtInAdapterCapabilities(
   options: BuiltInAdapterCapabilityOptions
 ): AdapterCapabilityDeclaration {
   const hookEvidence = options.hookProvider
-    ? ["tests/connectHookIntegration.test.ts", "tests/hookControl.test.ts"]
+    ? ["tests/connectHookIntegration.test.ts", "tests/hookControl.test.ts", "tests/hookActionLifecycle.test.ts"]
     : [];
   const hookOmissions = options.hookProvider === "gemini-cli"
-    ? ["Gemini CLI has no native ask outcome; AMC fails an ask decision closed to deny"]
+    ? [
+        "Gemini CLI has no native ask outcome; AMC fails an ask decision closed to deny",
+        "Gemini CLI has no general provider call ID; missing or ambiguous terminal correlation fails closed",
+      ]
     : options.hookProvider === "claude-code"
-      ? ["AMC's managed Claude hook covers the pinned PreToolUse boundary, not every provider lifecycle hook"]
+      ? ["AMC's managed Claude hook covers the pinned tool request, success, and failure boundary, not every provider event"]
       : [];
   const versionOmissions = options.versionSource === "host_runtime"
     ? ["host runtime version does not prove the framework package version"]
@@ -57,6 +60,8 @@ export function builtInAdapterCapabilities(
       ...(options.hookProvider
         ? [
             { id: "action.requested" as const, activeWhen: ["hook_observe" as const, "hook_control" as const] },
+            { id: "action.completed" as const, activeWhen: ["hook_observe" as const, "hook_control" as const] },
+            { id: "action.failed" as const, activeWhen: ["hook_observe" as const, "hook_control" as const] },
             { id: "action.decision" as const, activeWhen: ["hook_control" as const] }
           ]
         : [])

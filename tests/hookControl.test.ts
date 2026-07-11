@@ -6,8 +6,10 @@ import { afterEach, describe, expect, test } from "vitest";
 import { defaultApprovalPolicy, initApprovalPolicy } from "../src/approvals/approvalPolicyEngine.js";
 import {
   forwardProviderHookControl,
+  forwardProviderHookEvent,
   getHookIntegrationStatus,
   installHookIntegration,
+  mapProviderHookEvent,
 } from "../src/adapters/hookIntegration.js";
 import { startBridgeServer } from "../src/bridge/bridgeServer.js";
 import {
@@ -28,6 +30,7 @@ import type { DiagnosticReport } from "../src/types.js";
 import { verifyLeaseToken } from "../src/leases/leaseVerifier.js";
 import { canonicalize } from "../src/utils/json.js";
 import { sha256Hex } from "../src/utils/hash.js";
+import { inspectHookActionLifecycle } from "../src/watch/hookActionLifecycle.js";
 
 const roots: string[] = [];
 
@@ -208,6 +211,38 @@ describe("provider-native signed hook control", () => {
     ledger.close();
     expect(event?.meta_json).not.toContain("private-session");
     expect(event?.meta_json).not.toContain(join(workspace, "workspace", "public.txt"));
+  });
+
+  test("uses one stable derived Gemini action ID for request observation and policy decision", () => {
+    const workspace = newWorkspace();
+    const agentId = "gemini-correlated-reader";
+    installObservedRun(workspace, agentId);
+    permitReadAndWrite(workspace);
+    mkdirSync(join(workspace, "workspace"), { recursive: true });
+    writeFileSync(join(workspace, "workspace", "public.txt"), "public fixture");
+    const rawInput = JSON.stringify({
+      session_id: "private-gemini-session",
+      timestamp: "2026-07-11T07:00:00.000Z",
+      hook_event_name: "BeforeTool",
+      tool_name: "read_file",
+      tool_input: { file_path: join(workspace, "workspace", "public.txt") },
+    });
+
+    const observed = mapProviderHookEvent({
+      provider: "gemini-cli",
+      agentId,
+      rawInput,
+      observedAt: Date.parse("2026-07-11T07:00:01.000Z"),
+    });
+    const controlled = evaluateProviderHookControl({
+      workspace,
+      authenticatedAgentId: agentId,
+      provider: "gemini-cli",
+      rawInput,
+    });
+
+    expect(controlled.actionId).toBe(observed.action.id);
+    expect(controlled.actionId).toMatch(/^action_[a-f0-9]{32}$/);
   });
 
   test("recovers an empty unsealed control session but rejects a sealed session without a receipt", () => {
@@ -577,6 +612,34 @@ describe("provider-native signed hook control", () => {
       }));
       expect(result.observation.receiptId).toBeTruthy();
       expect(verifyReceipt(result.control.receipt, getPublicKeyHistory(workspace, "monitor")).ok).toBe(true);
+      const terminal = await forwardProviderHookEvent({
+        workspace,
+        provider: "claude-code",
+        mode: "control",
+        agentId,
+        bridgeBase,
+        tokenFile,
+        rawInput: JSON.stringify({
+          session_id: "private-bridge-session",
+          hook_event_name: "PostToolUse",
+          tool_name: "Read",
+          tool_use_id: "toolu_bridge_control_01",
+          tool_input: { file_path: fixturePath },
+          tool_response: { content: "private result" },
+        }),
+      });
+      expect(terminal.actionId).toBe(result.control.actionId);
+      const lifecycle = inspectHookActionLifecycle({
+        workspace,
+        agentId,
+        actionId: result.control.actionId,
+      });
+      expect(lifecycle).toEqual(expect.objectContaining({
+        status: "completed",
+        valid: true,
+        failClosed: false,
+      }));
+      expect(lifecycle.phases.decision).toEqual(expect.objectContaining({ decision: "allow" }));
       const ledger = openLedger(workspace);
       const events = ledger.getAllEvents();
       ledger.close();
@@ -584,6 +647,7 @@ describe("provider-native signed hook control", () => {
       expect(events.some((event) => event.id === result.control.eventId && event.event_type === "audit")).toBe(true);
       expect(JSON.stringify(events)).not.toContain("private-bridge-session");
       expect(JSON.stringify(events)).not.toContain(fixturePath);
+      expect(JSON.stringify(events)).not.toContain("private result");
     } finally {
       await bridge.close();
     }

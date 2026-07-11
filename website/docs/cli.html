@@ -91,7 +91,7 @@
 
       <div class="callout callout-green">
         <strong>By the numbers</strong>
-        The AMC CLI currently registers 1,150 command paths. Every command supports <code>--help</code> for inline documentation.
+        The AMC CLI currently registers 1,151 command paths. Every command supports <code>--help</code> for inline documentation.
       </div>
 
       <!-- Common workflow commands -->
@@ -218,7 +218,7 @@
 
       <!-- EVIDENCE -->
       <div class="ns-toggle" id="ns-evidence" onclick="this.classList.toggle('open')">
-        <h3>Agent Wrapping &amp; Evidence Capture <span class="cmd-count">10 commands</span></h3>
+        <h3>Agent Wrapping &amp; Evidence Capture <span class="cmd-count">11 commands</span></h3>
       </div>
       <div class="ns-body">
         <table>
@@ -231,6 +231,7 @@
             <tr><td><code>amc connect</code></td><td>Connect wizard for any agent/provider</td></tr>
             <tr><td><code>amc connect hooks install --provider &lt;id&gt; [--mode observe|control]</code></td><td>Install a reversible observer by default, or opt into loopback signed control</td></tr>
             <tr><td><code>amc connect hooks status --provider &lt;id&gt;</code></td><td>Verify provider config ownership, mode, signed manifest, and narrow lease</td></tr>
+            <tr><td><code>amc connect hooks lifecycle --agent &lt;id&gt; --action &lt;id&gt;</code></td><td>Verify requested, decision, and completed or failed receipts for one action</td></tr>
             <tr><td><code>amc connect hooks remove --provider &lt;id&gt;</code></td><td>Remove only AMC's handler and revoke its observation lease</td></tr>
             <tr><td><code>amc ingest</code></td><td>Ingest external logs as SELF_REPORTED evidence</td></tr>
             <tr><td><code>amc attest</code></td><td>Auditor-attest to upgrade trust to ATTESTED</td></tr>

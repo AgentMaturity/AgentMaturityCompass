@@ -20,6 +20,8 @@ export const adapterCapabilityEventIdSchema = z.enum([
   "model.request",
   "model.response",
   "action.requested",
+  "action.completed",
+  "action.failed",
   "action.decision"
 ]);
 export const adapterCapabilityControlIdSchema = z.enum([

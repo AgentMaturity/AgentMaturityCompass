@@ -25,6 +25,31 @@ export async function handleWatchRoute(
 ): Promise<boolean> {
   if (!pathname.startsWith('/api/v1/watch')) return false;
 
+  const hookActionMatch = pathname.match(/^\/api\/v1\/watch\/hook-actions\/([^/]+)$/);
+  if (hookActionMatch) {
+    if (method !== 'GET') {
+      apiError(res, 405, 'Method not allowed');
+      return true;
+    }
+    try {
+      const actionId = decodeURIComponent(hookActionMatch[1]!);
+      const agentId = queryParam(req.url ?? '', 'agentId') ?? 'default';
+      const { inspectHookActionLifecycle, isSafeHookActionLookupId } = await import('../watch/hookActionLifecycle.js');
+      if (!isSafeHookActionLookupId(agentId) || !isSafeHookActionLookupId(actionId)) {
+        apiError(res, 400, 'agentId and actionId must be stable 1-160 character identifiers');
+        return true;
+      }
+      apiSuccess(res, inspectHookActionLifecycle({ workspace, agentId, actionId }));
+    } catch (err) {
+      if (err instanceof URIError) {
+        apiError(res, 400, 'actionId encoding is invalid');
+      } else {
+        apiError(res, 500, err instanceof Error ? err.message : 'Hook action lifecycle inspection failed');
+      }
+    }
+    return true;
+  }
+
   // GET /api/v1/watch/status
   if (pathname === '/api/v1/watch/status' && method === 'GET') {
     apiSuccess(res, { status: 'operational', module: 'watch' });

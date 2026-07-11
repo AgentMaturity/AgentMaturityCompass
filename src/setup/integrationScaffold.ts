@@ -897,6 +897,39 @@ export function generateBridgeOpenApiSpec(): OpenApiSpec {
           }
         }
       },
+      "/bridge/hooks/aep/0.1/correlation": {
+        post: {
+          summary: "Resolve one unmatched privacy-safe hook request correlation",
+          description: "Internal managed-hook lookup. Accepts only provider and a SHA-256 correlation digest; zero or multiple unmatched requests fail closed and no raw provider input is accepted.",
+          tags: ["telemetry", "hooks"],
+          security: [{ leaseToken: [] }],
+          requestBody: {
+            required: true,
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  additionalProperties: false,
+                  required: ["provider", "correlationSha256"],
+                  properties: {
+                    provider: { type: "string", enum: ["claude-code", "gemini-cli"] },
+                    correlationSha256: { type: "string", pattern: "^[a-f0-9]{64}$" }
+                  }
+                }
+              }
+            }
+          },
+          responses: {
+            "200": { description: "Exactly one unmatched request resolved" },
+            "400": { description: "Malformed correlation request" },
+            "401": { description: "Missing or invalid lease" },
+            "403": { description: "Lease lacks hook scope or route" },
+            "409": { description: "No unique unmatched request exists" },
+            "429": { description: "Signed lease request budget exceeded" },
+            "503": { description: "Evidence integrity verification unavailable" }
+          }
+        }
+      },
       "/bridge/hooks/control/v1": {
         post: {
           summary: "Return a provider-native signed pre-tool control response",

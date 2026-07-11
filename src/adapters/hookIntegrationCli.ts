@@ -7,6 +7,7 @@ import {
   forwardProviderHookControl,
   forwardProviderHookEvent,
   getHookIntegrationStatus,
+  inspectProviderHookEvent,
   installHookIntegration,
   removeHookIntegration,
   type HookFileChange,
@@ -14,6 +15,7 @@ import {
   type HookProvider
 } from "./hookIntegration.js";
 import { serializeProviderControlResponse } from "../bridge/hookControl.js";
+import { inspectHookActionLifecycle } from "../watch/hookActionLifecycle.js";
 
 async function readStdinAll(): Promise<string> {
   return new Promise((resolve) => {
@@ -139,6 +141,32 @@ export function registerHookIntegrationCommands(
     });
 
   hooks
+    .command("lifecycle")
+    .description("Verify one requested, controlled, and terminal provider action lifecycle")
+    .requiredOption("--agent <agentId>", "agent ID")
+    .requiredOption("--action <actionId>", "provider action ID")
+    .option("--json", "emit structured JSON", false)
+    .action((opts: { agent: string; action: string; json: boolean }) => {
+      const lifecycle = inspectHookActionLifecycle({
+        workspace: process.cwd(),
+        agentId: opts.agent,
+        actionId: opts.action,
+      });
+      if (opts.json) {
+        console.log(JSON.stringify(lifecycle, null, 2));
+      } else {
+        const color = lifecycle.valid ? chalk.hex("#4AEF79") : chalk.red;
+        console.log(color(`AMC hook action: ${lifecycle.status}`));
+        console.log(`Agent: ${lifecycle.agentId}`);
+        console.log(`Action: ${lifecycle.actionId}`);
+        console.log(`Provider: ${lifecycle.provider ?? "unverified"}`);
+        console.log(`Evidence: ${lifecycle.evidenceEventIds.length} signed event(s)`);
+        for (const reason of lifecycle.reasonCodes) console.log(chalk.yellow(`Issue: ${reason}`));
+      }
+      if (lifecycle.failClosed) process.exitCode = 1;
+    });
+
+  hooks
     .command("forward", { hidden: true })
     .description("Internal provider hook observation forwarder")
     .requiredOption("--provider <provider>", "claude-code|gemini-cli")
@@ -149,7 +177,16 @@ export function registerHookIntegrationCommands(
     .action(async (opts: { provider: HookProvider; mode: HookMode; agent: string; tokenFile: string; bridgeUrl: string }) => {
       const rawInput = await readStdinAll();
       if (!rawInput.trim()) throw new Error("provider hook input is required on stdin");
-      if (opts.mode === "control") {
+      let inspection: ReturnType<typeof inspectProviderHookEvent>;
+      try {
+        inspection = inspectProviderHookEvent({ provider: opts.provider, rawInput });
+      } catch (error) {
+        if (opts.mode !== "control") throw error;
+        process.stderr.write("AMC hook control input invalid; action denied.\n");
+        process.stdout.write(`${serializeProviderControlResponse(failClosedProviderControlResponse(opts.provider))}\n`);
+        return;
+      }
+      if (opts.mode === "control" && inspection.phase === "requested") {
         try {
           const result = await forwardProviderHookControl({
             workspace: process.cwd(),
@@ -169,7 +206,7 @@ export function registerHookIntegrationCommands(
       await forwardProviderHookEvent({
         workspace: process.cwd(),
         provider: opts.provider,
-        mode: "observe",
+        mode: opts.mode,
         agentId: opts.agent,
         tokenFile: opts.tokenFile,
         bridgeBase: opts.bridgeUrl,

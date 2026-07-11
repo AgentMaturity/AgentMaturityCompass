@@ -35,6 +35,7 @@ import { verifyReceipt } from "../src/receipts/receipt.js";
 import { initWorkspace } from "../src/workspace.js";
 import { approvalPolicyPath, approvalPolicySigPath } from "../src/approvals/approvalPolicyEngine.js";
 import { signFileWithAuditor } from "../src/org/orgSigner.js";
+import { sha256Hex } from "../src/utils/hash.js";
 
 const roots: string[] = [];
 
@@ -168,7 +169,8 @@ describe("AMC provider hook integration", () => {
       hooks: Record<string, Array<{ matcher: string; hooks: Array<Record<string, unknown>> }>>;
     };
     expect(config.env.KEEP_ME).toBe("yes");
-    expect(config.hooks.PostToolUse).toHaveLength(1);
+    expect(config.hooks.PostToolUse).toHaveLength(2);
+    expect(config.hooks.PostToolUseFailure).toHaveLength(1);
     expect(config.hooks.PreToolUse).toHaveLength(1);
     const handler = config.hooks.PreToolUse[0]!.hooks[0]!;
     expect(handler.command).toBe("amc");
@@ -186,6 +188,23 @@ describe("AMC provider hook integration", () => {
     expect(statSync(paths.token).mode & 0o077).toBe(0);
     expect(existsSync(paths.manifest)).toBe(true);
     expect(existsSync(paths.signature)).toBe(true);
+    const manifest = readJson(paths.manifest) as {
+      v: number;
+      handlers: Array<{ eventName: string; phase: string; handlerSha256: string }>;
+      observation: { eventTypes: string[] };
+    };
+    expect(manifest.v).toBe(2);
+    expect(manifest.handlers.map((row) => [row.eventName, row.phase])).toEqual([
+      ["PostToolUse", "completed"],
+      ["PostToolUseFailure", "failed"],
+      ["PreToolUse", "requested"],
+    ]);
+    expect(manifest.handlers.every((row) => /^[a-f0-9]{64}$/.test(row.handlerSha256))).toBe(true);
+    expect(manifest.observation.eventTypes).toEqual([
+      "action.requested",
+      "action.completed",
+      "action.failed",
+    ]);
 
     const lease = readFileSync(paths.token, "utf8").trim();
     const verified = verifyLeaseToken({
@@ -237,6 +256,74 @@ describe("AMC provider hook integration", () => {
     expect(owned).toHaveLength(1);
   });
 
+  test("reinstall migrates a signed v1 single-handler manifest without rotating its lease or removing user hooks", () => {
+    const workspace = newWorkspace();
+    const paths = hookPaths(workspace, "claude-code");
+    writeJson(paths.config, {
+      hooks: {
+        PostToolUse: [{ matcher: "Write", hooks: [{ type: "command", command: "npm test" }] }],
+      },
+    });
+    const options = {
+      workspace,
+      provider: "claude-code" as const,
+      agentId: "migration-agent",
+      bridgeBase: "http://localhost:3212",
+    };
+    installHookIntegration(options);
+    const leaseBefore = readFileSync(paths.token, "utf8");
+    const v2 = readJson(paths.manifest) as Record<string, any>;
+    const config = readJson(paths.config) as {
+      hooks: Record<string, Array<{ hooks: Array<Record<string, unknown>> }>>;
+    };
+    config.hooks.PostToolUse = config.hooks.PostToolUse!.filter((group) =>
+      !group.hooks.some((handler) => handler.command === "amc"),
+    );
+    delete config.hooks.PostToolUseFailure;
+    const configText = `${JSON.stringify(config, null, 2)}\n`;
+    writeFileSync(paths.config, configText, "utf8");
+    const preToolHandler = v2.handlers.find((row: { eventName: string }) => row.eventName === "PreToolUse");
+    const { handlers: _handlers, observation: v2Observation, ...common } = v2;
+    writeJson(paths.manifest, {
+      ...common,
+      v: 1,
+      source: {
+        provider: "claude-code",
+        contract: "Claude Code project-local PreToolUse command hook",
+        url: CLAUDE_CODE_HOOK_SOURCE.url,
+        reference: CLAUDE_CODE_HOOK_SOURCE.reference,
+      },
+      configSha256: sha256Hex(Buffer.from(configText, "utf8")),
+      handlerSha256: preToolHandler.handlerSha256,
+      observation: {
+        eventType: "action.requested",
+        controlDecision: v2Observation.controlDecision,
+        rawProviderInputForwarded: false,
+        correlation: "provider-call-id",
+      },
+    });
+    signFileWithAuditor(workspace, paths.manifest);
+
+    const legacyStatus = getHookIntegrationStatus({ workspace, provider: "claude-code" });
+    expect(legacyStatus.state).toBe("drifted");
+    expect(legacyStatus.issues).toContain("legacy single-handler manifest requires reinstall for terminal lifecycle coverage");
+
+    const migrated = installHookIntegration(options);
+    expect(migrated.changed).toBe(true);
+    expect(readFileSync(paths.token, "utf8")).toBe(leaseBefore);
+    const migratedManifest = readJson(paths.manifest) as { v: number; handlers: unknown[] };
+    expect(migratedManifest.v).toBe(2);
+    expect(migratedManifest.handlers).toHaveLength(3);
+    const migratedConfig = readJson(paths.config) as {
+      hooks: Record<string, Array<{ hooks: Array<Record<string, unknown>> }>>;
+    };
+    expect(migratedConfig.hooks.PostToolUse).toHaveLength(2);
+    expect(migratedConfig.hooks.PostToolUse!.some((group) =>
+      group.hooks.some((handler) => handler.command === "npm test"),
+    )).toBe(true);
+    expect(getHookIntegrationStatus({ workspace, provider: "claude-code" }).state).toBe("installed");
+  });
+
   test("installs and removes Gemini CLI hooks while preserving user config", () => {
     const workspace = newWorkspace();
     const paths = hookPaths(workspace, "gemini-cli");
@@ -259,7 +346,7 @@ describe("AMC provider hook integration", () => {
       hooks: Record<string, Array<{ matcher: string; hooks: Array<Record<string, unknown>> }>>;
     };
     expect(config.theme).toBe("ANSI");
-    expect(config.hooks.AfterTool).toHaveLength(1);
+    expect(config.hooks.AfterTool).toHaveLength(2);
     const handler = config.hooks.BeforeTool[0]!.hooks[0]!;
     expect(handler.name).toBe("amc-observe-v1");
     expect(handler.command).toContain("amc connect hooks forward");
@@ -438,7 +525,7 @@ describe("AMC provider hook integration", () => {
 
     const status = getHookIntegrationStatus({ workspace, provider: "claude-code" });
     expect(status.state).toBe("drifted");
-    expect(status.issues).toContain("managed hook handler differs from the signed installation manifest");
+    expect(status.issues).toContain("managed hook handler set differs from the signed installation manifest");
     expect(() => removeHookIntegration({ workspace, provider: "claude-code" })).toThrowError(
       expect.objectContaining<Partial<HookIntegrationError>>({ code: "HOOK_OWNERSHIP_CONFLICT" })
     );
@@ -598,6 +685,80 @@ describe("AMC provider hook integration", () => {
     expect(JSON.stringify(event)).not.toContain("/private/.env");
   });
 
+  test("maps Claude terminal hooks to the original provider action without retaining result or error content", () => {
+    const completed = mapProviderHookEvent({
+      provider: "claude-code",
+      agentId: "claude-terminal-agent",
+      observedAt: Date.parse("2026-07-10T18:01:00.000Z"),
+      rawInput: JSON.stringify({
+        session_id: "private-session",
+        hook_event_name: "PostToolUse",
+        tool_name: "Write",
+        tool_use_id: "toolu_terminal_01",
+        tool_input: { file_path: "/private/customer.txt", content: "secret input" },
+        tool_response: { ok: true, content: "secret output" },
+      }),
+    });
+    const failed = mapProviderHookEvent({
+      provider: "claude-code",
+      agentId: "claude-terminal-agent",
+      observedAt: Date.parse("2026-07-10T18:02:00.000Z"),
+      rawInput: JSON.stringify({
+        session_id: "private-session",
+        hook_event_name: "PostToolUseFailure",
+        tool_name: "Write",
+        tool_use_id: "toolu_terminal_01",
+        tool_input: { file_path: "/private/customer.txt", content: "secret input" },
+        error: "secret provider error",
+      }),
+    });
+
+    expect(completed.type).toBe("action.completed");
+    expect(completed.action).toEqual(expect.objectContaining({ id: "toolu_terminal_01", status: "success" }));
+    expect(failed.type).toBe("action.failed");
+    expect(failed.action).toEqual(expect.objectContaining({
+      id: "toolu_terminal_01",
+      status: "failure",
+      error: { code: "PROVIDER_TOOL_FAILURE" },
+    }));
+    const serialized = JSON.stringify([completed, failed]);
+    for (const privateValue of ["secret input", "secret output", "secret provider error", "/private/customer.txt", "private-session"]) {
+      expect(serialized).not.toContain(privateValue);
+    }
+  });
+
+  test("requires an explicitly resolved unmatched request before mapping Gemini terminal hooks", () => {
+    const rawInput = JSON.stringify({
+      session_id: "private-gemini-session",
+      hook_event_name: "AfterTool",
+      timestamp: "2026-07-10T18:03:00.000Z",
+      tool_name: "write_file",
+      tool_input: { file_path: "/private/customer.txt", content: "secret input" },
+      tool_response: { error: "secret provider error" },
+    });
+
+    expect(() => mapProviderHookEvent({
+      provider: "gemini-cli",
+      agentId: "gemini-terminal-agent",
+      rawInput,
+    })).toThrowError(expect.objectContaining<Partial<HookIntegrationError>>({ code: "HOOK_CORRELATION_REQUIRED" }));
+
+    const event = mapProviderHookEvent({
+      provider: "gemini-cli",
+      agentId: "gemini-terminal-agent",
+      rawInput,
+      resolvedActionId: "action_resolved_01",
+    });
+    expect(event.type).toBe("action.failed");
+    expect(event.action).toEqual(expect.objectContaining({
+      id: "action_resolved_01",
+      status: "failure",
+      error: { code: "PROVIDER_TOOL_FAILURE" },
+    }));
+    expect(JSON.stringify(event)).not.toContain("secret provider error");
+    expect(JSON.stringify(event)).not.toContain("secret input");
+  });
+
   test("delivers an installed hook through the real Bridge into a verifiable ledger receipt", async () => {
     const workspace = newWorkspace();
     const paths = hookPaths(workspace, "claude-code");
@@ -644,6 +805,122 @@ describe("AMC provider hook integration", () => {
       expect(metadata.receipt_id).toBe(delivered.receiptId);
       expect(receipt.payload?.receipt_id).toBe(delivered.receiptId);
       expect(JSON.stringify(metadata)).not.toContain("/private/customer.txt");
+    } finally {
+      await bridge.close();
+    }
+  });
+
+  test("correlates one Gemini terminal hook through the Bridge and rejects ambiguous matches without writing a terminal event", async () => {
+    const workspace = newWorkspace();
+    const paths = hookPaths(workspace, "gemini-cli");
+    const port = await freePort();
+    const bridgeBase = `http://127.0.0.1:${port}`;
+    const bridge = await startBridgeServer({
+      workspace,
+      host: "127.0.0.1",
+      port,
+      gatewayBaseUrl: "http://127.0.0.1:1",
+    });
+    try {
+      installHookIntegration({
+        workspace,
+        provider: "gemini-cli",
+        agentId: "gemini-lifecycle-agent",
+        bridgeBase,
+      });
+      const token = readFileSync(paths.token, "utf8").trim();
+      const ambiguousCorrelationBody = `{"provider":"gemini-cli","provider":"claude-code","correlationSha256":"${"a".repeat(64)}"}`;
+      const ambiguousCorrelationResponse = await fetch(`${bridgeBase}/bridge/hooks/aep/0.1/correlation`, {
+        method: "POST",
+        headers: {
+          authorization: `Bearer ${token}`,
+          "content-type": "application/json",
+        },
+        body: ambiguousCorrelationBody,
+      });
+      expect(ambiguousCorrelationResponse.status).toBe(400);
+      expect(await ambiguousCorrelationResponse.json()).toEqual(expect.objectContaining({
+        code: "HOOK_JSON_AMBIGUOUS",
+      }));
+      const requestInput = {
+        session_id: "private-gemini-session",
+        hook_event_name: "BeforeTool",
+        timestamp: new Date().toISOString(),
+        tool_name: "read_file",
+        tool_input: { file_path: "/private/customer.txt" },
+      };
+      const requested = await forwardProviderHookEvent({
+        workspace,
+        provider: "gemini-cli",
+        agentId: "gemini-lifecycle-agent",
+        bridgeBase,
+        tokenFile: paths.token,
+        rawInput: JSON.stringify(requestInput),
+      });
+      const terminal = await forwardProviderHookEvent({
+        workspace,
+        provider: "gemini-cli",
+        agentId: "gemini-lifecycle-agent",
+        bridgeBase,
+        tokenFile: paths.token,
+        rawInput: JSON.stringify({
+          ...requestInput,
+          hook_event_name: "AfterTool",
+          timestamp: new Date(Date.now() + 1).toISOString(),
+          tool_response: { result: "private output" },
+        }),
+      });
+
+      expect(terminal.actionId).toBe(requested.actionId);
+      expect(terminal.sourceEventType).toBe("action.completed");
+
+      const duplicateRequest = {
+        ...requestInput,
+        timestamp: new Date(Date.now() + 2).toISOString(),
+      };
+      await forwardProviderHookEvent({
+        workspace,
+        provider: "gemini-cli",
+        agentId: "gemini-lifecycle-agent",
+        bridgeBase,
+        tokenFile: paths.token,
+        rawInput: JSON.stringify(duplicateRequest),
+      });
+      await forwardProviderHookEvent({
+        workspace,
+        provider: "gemini-cli",
+        agentId: "gemini-lifecycle-agent",
+        bridgeBase,
+        tokenFile: paths.token,
+        rawInput: JSON.stringify({
+          ...duplicateRequest,
+          timestamp: new Date(Date.now() + 3).toISOString(),
+        }),
+      });
+
+      await expect(forwardProviderHookEvent({
+        workspace,
+        provider: "gemini-cli",
+        agentId: "gemini-lifecycle-agent",
+        bridgeBase,
+        tokenFile: paths.token,
+        rawInput: JSON.stringify({
+          ...duplicateRequest,
+          hook_event_name: "AfterTool",
+          timestamp: new Date(Date.now() + 4).toISOString(),
+          tool_response: { result: "must not be retained" },
+        }),
+      })).rejects.toMatchObject({ code: "HOOK_CORRELATION_REQUIRED" });
+
+      const ledger = openLedger(workspace);
+      const metas = ledger.getAllEvents().map((event) => JSON.parse(event.meta_json) as {
+        sourceEventType?: string;
+        actionId?: string;
+      });
+      ledger.close();
+      expect(metas.filter((meta) => meta.sourceEventType === "action.completed")).toHaveLength(1);
+      expect(JSON.stringify(metas)).not.toContain("private output");
+      expect(JSON.stringify(metas)).not.toContain("must not be retained");
     } finally {
       await bridge.close();
     }

@@ -827,6 +827,47 @@ components:
     ObservedHookReceipt:
       $ref: './schemas/observed-hook-receipt.schema.json'
 
+    HookActionLifecycle:
+      type: object
+      additionalProperties: false
+      required: [schemaVersion, agentId, actionId, provider, status, valid, failClosed, reasonCodes, phases, evidenceEventIds, receiptIds, rawProviderPayloadStored, claimBoundary]
+      properties:
+        schemaVersion:
+          type: string
+          enum: ['2026-07-11']
+        agentId:
+          type: string
+        actionId:
+          type: string
+        provider:
+          type: string
+          nullable: true
+          enum: [claude-code, gemini-cli]
+        status:
+          type: string
+          enum: [requested, awaiting_terminal, completed, failed, denied, fail_closed]
+        valid:
+          type: boolean
+        failClosed:
+          type: boolean
+        reasonCodes:
+          type: array
+          items: { type: string }
+        phases:
+          type: object
+          description: Receipt-bound requested, optional decision, and optional terminal evidence references.
+        evidenceEventIds:
+          type: array
+          items: { type: string }
+        receiptIds:
+          type: array
+          items: { type: string }
+        rawProviderPayloadStored:
+          type: boolean
+          enum: [false]
+        claimBoundary:
+          type: string
+
     AdapterCapabilityReceipt:
       type: object
       additionalProperties: false
@@ -1016,6 +1057,40 @@ paths:
         '422': { description: Source timestamp is stale or too far in the future }
         '429': { description: Signed lease request budget exceeded }
         '503': { description: Hook quota or evidence ledger unavailable }
+
+  /bridge/hooks/aep/0.1/correlation:
+    post:
+      tags: [hooks, watch]
+      summary: Resolve one unmatched privacy-safe hook request correlation
+      description: |
+        Internal managed-hook lookup for providers without a stable tool-call ID. Accepts only
+        provider and a SHA-256 correlation digest. Zero or multiple unmatched requests fail closed;
+        raw provider input is neither accepted nor retained.
+      security:
+        - leaseToken: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [provider, correlationSha256]
+              properties:
+                provider:
+                  type: string
+                  enum: [claude-code, gemini-cli]
+                correlationSha256:
+                  type: string
+                  pattern: '^[a-f0-9]{64}$'
+      responses:
+        '200': { description: Exactly one unmatched request resolved }
+        '400': { description: Malformed correlation request }
+        '401': { description: Missing or invalid lease }
+        '403': { description: Lease lacks hook scope or route }
+        '409': { description: No unique unmatched request exists }
+        '429': { description: Signed lease request budget exceeded }
+        '503': { description: Evidence integrity verification unavailable }
 
   # ── Provider-native signed hook control ───────────────────────
   /bridge/hooks/control/v1:
@@ -5379,6 +5454,40 @@ paths:
       responses:
         '200':
           description: Status
+
+  /v1/watch/hook-actions/{actionId}:
+    get:
+      tags: [watch, hooks]
+      summary: Verify one provider hook action lifecycle
+      description: Returns the receipt-verified requested, optional decision, and terminal lifecycle for one agent/action key. Missing, duplicate, conflicting, cross-agent, out-of-order, or tampered evidence fails closed.
+      parameters:
+        - name: actionId
+          in: path
+          required: true
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 160
+        - name: agentId
+          in: query
+          schema:
+            type: string
+            default: default
+            minLength: 1
+            maxLength: 160
+      responses:
+        '200':
+          description: Verified action lifecycle projection
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [ok, data]
+                properties:
+                  ok: { type: boolean, enum: [true] }
+                  data:
+                    $ref: '#/components/schemas/HookActionLifecycle'
+        '400': { description: Invalid agent or action identifier }
 
   /v1/watch/guard:
     post:

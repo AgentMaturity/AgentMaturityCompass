@@ -82,9 +82,10 @@ Use a dry run to inspect the exact project files, then install the reversible ob
 amc connect hooks install --provider claude-code --agent my-agent --dry-run
 amc connect hooks install --provider claude-code --agent my-agent
 amc connect hooks status --provider claude-code
+amc connect hooks lifecycle --agent my-agent --action <action-id>
 ```
 
-Use `--provider gemini-cli` for Gemini CLI. AMC keeps a narrow observation lease out of provider config and forwards no tool arguments, cwd, transcript path, or raw session ID. This records signed Watch evidence; it does not approve or deny provider actions. Remove it with `amc connect hooks remove --provider claude-code`.
+Use `--provider gemini-cli` for Gemini CLI. AMC keeps a narrow observation lease out of provider config and retains no raw tool input, output, error message, cwd, transcript path, or session ID. Requested, completed, and failed receipts share one stable action ID; missing or ambiguous terminal correlation fails closed. Observation does not approve or deny provider actions. Remove it with `amc connect hooks remove --provider claude-code`.
 
 For explicit signed control, run the local Studio/Bridge and opt in:
 

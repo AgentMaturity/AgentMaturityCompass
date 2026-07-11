@@ -24,6 +24,7 @@ import type { ActionClass, RiskTier, RuntimeName } from "../types.js";
 import { sha256Hex } from "../utils/hash.js";
 import { redactBridgeText } from "./bridgeRedaction.js";
 import { verifyActionPolicySignature } from "../governor/actionPolicyEngine.js";
+import { resolveProviderHookRequestIdentity } from "./hookActionIdentity.js";
 
 export const CONTROL_HOOK_PATH = "/bridge/hooks/control/v1";
 export const CONTROL_HOOK_ROUTE = "/hooks/control/v1";
@@ -329,19 +330,19 @@ function normalizeProviderRequest(input: {
     );
   }
   const rawInputSha256 = sha256Hex(Buffer.from(input.rawInput, "utf8"));
-  const providedActionId = parsed.tool_use_id ?? parsed.tool_call_id;
-  const actionId = providedActionId && SAFE_ID.test(providedActionId)
-    ? providedActionId
-    : `action_${sha256Hex(canonicalize({
-        provider: input.provider,
-        session: parsed.session_id ?? null,
-        timestamp: parsed.timestamp ?? null,
-        rawInputSha256,
-      })).slice(0, 32)}`;
+  const identity = resolveProviderHookRequestIdentity({
+    provider: input.provider,
+    providerActionId: parsed.tool_use_id ?? parsed.tool_call_id,
+    sessionId: parsed.session_id,
+    timestamp: parsed.timestamp,
+    toolName: parsed.tool_name,
+    toolInput: parsed.tool_input,
+    rawInputSha256,
+  });
   const mapped = canonicalToolRequest(input.provider, parsed.tool_name, parsed.tool_input, input.workspace);
   return {
     provider: input.provider,
-    actionId,
+    actionId: identity.actionId,
     providerToolName: redactBridgeText(parsed.tool_name).slice(0, 512),
     canonicalToolName: mapped?.name ?? null,
     args: mapped?.args ?? {},

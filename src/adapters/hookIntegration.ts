@@ -14,6 +14,7 @@ import YAML from "yaml";
 import { z } from "zod";
 import {
   OBSERVED_AEP_HOOK_PATH,
+  OBSERVED_HOOK_CORRELATION_PATH,
   observedAepActionEventSchema,
   type ObservedAepActionEvent
 } from "../bridge/hookIngress.js";
@@ -47,19 +48,39 @@ import { canonicalize } from "../utils/json.js";
 import { sha256Hex } from "../utils/hash.js";
 import { writeFileAtomic } from "../utils/fs.js";
 import { workspaceIdFromDirectory } from "../workspaces/workspaceId.js";
+import {
+  isSafeProviderActionId,
+  resolveProviderHookRequestIdentity,
+  type HookActionIdentitySource,
+} from "../bridge/hookActionIdentity.js";
 
 export const CLAUDE_CODE_HOOK_SOURCE = {
   provider: "claude-code",
-  contract: "Claude Code project-local PreToolUse command hook",
+  contract: "Claude Code project-local tool lifecycle command hooks",
   url: "https://code.claude.com/docs/en/hooks.md",
   reference: "sha256:e94e721874efc802248a7808e35ac917306088c5eaada2aa21e1def3fecc32e1"
 } as const;
 
 export const GEMINI_CLI_HOOK_SOURCE = {
   provider: "gemini-cli",
-  contract: "Gemini CLI project BeforeTool command hook",
+  contract: "Gemini CLI project tool lifecycle command hooks",
   url: "https://github.com/google-gemini/gemini-cli/blob/f354eebaf43b25bacb176007e449bb9a638fd101/docs/hooks/reference.md",
   reference: "f354eebaf43b25bacb176007e449bb9a638fd101"
+} as const;
+
+const LEGACY_HOOK_SOURCES = {
+  "claude-code": {
+    provider: "claude-code",
+    contract: "Claude Code project-local PreToolUse command hook",
+    url: CLAUDE_CODE_HOOK_SOURCE.url,
+    reference: CLAUDE_CODE_HOOK_SOURCE.reference,
+  },
+  "gemini-cli": {
+    provider: "gemini-cli",
+    contract: "Gemini CLI project BeforeTool command hook",
+    url: GEMINI_CLI_HOOK_SOURCE.url,
+    reference: GEMINI_CLI_HOOK_SOURCE.reference,
+  },
 } as const;
 
 export const HOOK_INTEGRATION_ID = "amc-observe-v1";
@@ -99,6 +120,7 @@ export type HookIntegrationErrorCode =
   | "HOOK_INPUT_INVALID"
   | "HOOK_INPUT_AMBIGUOUS"
   | "HOOK_INPUT_UNSUPPORTED"
+  | "HOOK_CORRELATION_REQUIRED"
   | "HOOK_DELIVERY_FAILED";
 
 export class HookIntegrationError extends Error {
@@ -113,6 +135,14 @@ export class HookIntegrationError extends Error {
 
 const hookProviderSchema = z.enum(["claude-code", "gemini-cli"]);
 const hookModeSchema = z.enum(["observe", "control"]);
+const nativeHookEventNameSchema = z.enum([
+  "AfterTool",
+  "BeforeTool",
+  "PostToolUse",
+  "PostToolUseFailure",
+  "PreToolUse",
+]);
+const lifecyclePhaseSchema = z.enum(["requested", "completed", "failed", "completed-or-failed"]);
 const sourceSchema = z.object({
   provider: hookProviderSchema,
   contract: z.string().min(1),
@@ -120,8 +150,7 @@ const sourceSchema = z.object({
   reference: z.string().min(1)
 }).strict();
 
-const manifestSchema = z.object({
-  v: z.literal(1),
+const manifestCommonSchema = z.object({
   installationId: z.enum([HOOK_INTEGRATION_ID, HOOK_CONTROL_INTEGRATION_ID]),
   mode: hookModeSchema.default("observe"),
   provider: hookProviderSchema,
@@ -138,15 +167,8 @@ const manifestSchema = z.object({
   ignoreExistedBefore: z.boolean(),
   ignoreBlockSha256: z.string().regex(/^[a-f0-9]{64}$/),
   configSha256: z.string().regex(/^[a-f0-9]{64}$/),
-  handlerSha256: z.string().regex(/^[a-f0-9]{64}$/),
   installedTs: z.number().int(),
   updatedTs: z.number().int(),
-  observation: z.object({
-    eventType: z.literal("action.requested"),
-    controlDecision: z.boolean(),
-    rawProviderInputForwarded: z.literal(false),
-    correlation: z.enum(["provider-call-id", "derived-event-id"])
-  }).strict(),
   control: z.object({
     endpoint: z.literal(CONTROL_HOOK_ROUTE),
     localOnly: z.literal(true),
@@ -156,7 +178,37 @@ const manifestSchema = z.object({
   }).strict().nullable().default(null)
 }).strict();
 
+const manifestV1Schema = manifestCommonSchema.extend({
+  v: z.literal(1),
+  handlerSha256: z.string().regex(/^[a-f0-9]{64}$/),
+  observation: z.object({
+    eventType: z.literal("action.requested"),
+    controlDecision: z.boolean(),
+    rawProviderInputForwarded: z.literal(false),
+    correlation: z.enum(["provider-call-id", "derived-event-id"])
+  }).strict(),
+}).strict();
+
+const manifestV2Schema = manifestCommonSchema.extend({
+  v: z.literal(2),
+  handlers: z.array(z.object({
+    eventName: nativeHookEventNameSchema,
+    phase: lifecyclePhaseSchema,
+    handlerSha256: z.string().regex(/^[a-f0-9]{64}$/),
+  }).strict()).min(2),
+  observation: z.object({
+    eventTypes: z.array(z.enum(["action.requested", "action.completed", "action.failed"])).min(2),
+    controlDecision: z.boolean(),
+    rawProviderInputForwarded: z.literal(false),
+    correlation: z.enum(["provider-call-id", "derived-request-id-with-terminal-resolution"])
+  }).strict(),
+}).strict();
+
+const manifestSchema = z.discriminatedUnion("v", [manifestV1Schema, manifestV2Schema]);
+
 type HookManifest = z.infer<typeof manifestSchema>;
+type NativeHookEventName = z.infer<typeof nativeHookEventNameSchema>;
+type LifecyclePhase = z.infer<typeof lifecyclePhaseSchema>;
 type JsonObject = Record<string, unknown>;
 
 export interface HookFileChange {
@@ -238,10 +290,35 @@ interface FileSnapshot {
 }
 
 interface LocatedHandler {
-  eventName: "PreToolUse" | "BeforeTool";
+  eventName: NativeHookEventName;
   groupIndex: number;
   handlerIndex: number;
   handler: JsonObject;
+}
+
+interface ProviderHookSpec {
+  eventName: NativeHookEventName;
+  phase: LifecyclePhase;
+  eventType: "action.requested" | "action.completed" | "action.failed";
+}
+
+function providerHookSpecs(provider: HookProvider): ProviderHookSpec[] {
+  return provider === "claude-code"
+    ? [
+        { eventName: "PostToolUse", phase: "completed", eventType: "action.completed" },
+        { eventName: "PostToolUseFailure", phase: "failed", eventType: "action.failed" },
+        { eventName: "PreToolUse", phase: "requested", eventType: "action.requested" },
+      ]
+    : [
+        { eventName: "AfterTool", phase: "completed-or-failed", eventType: "action.completed" },
+        { eventName: "BeforeTool", phase: "requested", eventType: "action.requested" },
+      ];
+}
+
+function providerObservedEventTypes(provider: HookProvider): Array<"action.requested" | "action.completed" | "action.failed"> {
+  return provider === "claude-code"
+    ? ["action.requested", "action.completed", "action.failed"]
+    : ["action.requested", "action.completed", "action.failed"];
 }
 
 function providerSource(provider: HookProvider): typeof CLAUDE_CODE_HOOK_SOURCE | typeof GEMINI_CLI_HOOK_SOURCE {
@@ -543,33 +620,78 @@ function isOwnedHandler(provider: HookProvider, handler: unknown): handler is Js
 }
 
 function locateOwnedHandlers(config: JsonObject, provider: HookProvider): LocatedHandler[] {
-  const eventName = provider === "claude-code" ? "PreToolUse" : "BeforeTool";
-  const groups = eventGroups(config, eventName, false) ?? [];
   const found: LocatedHandler[] = [];
-  groups.forEach((group, groupIndex) => {
-    if (!isJsonObject(group)) {
-      throw new HookIntegrationError("HOOK_CONFIG_INVALID", `${eventName} hook groups must be JSON objects`);
-    }
-    if (!Array.isArray(group.hooks)) {
-      throw new HookIntegrationError("HOOK_CONFIG_INVALID", `${eventName} hook group hooks must be an array`);
-    }
-    group.hooks.forEach((handler, handlerIndex) => {
-      if (isOwnedHandler(provider, handler)) {
-        found.push({ eventName, groupIndex, handlerIndex, handler });
+  for (const { eventName } of providerHookSpecs(provider)) {
+    const groups = eventGroups(config, eventName, false) ?? [];
+    groups.forEach((group, groupIndex) => {
+      if (!isJsonObject(group)) {
+        throw new HookIntegrationError("HOOK_CONFIG_INVALID", `${eventName} hook groups must be JSON objects`);
       }
+      if (!Array.isArray(group.hooks)) {
+        throw new HookIntegrationError("HOOK_CONFIG_INVALID", `${eventName} hook group hooks must be an array`);
+      }
+      group.hooks.forEach((handler, handlerIndex) => {
+        if (isOwnedHandler(provider, handler)) {
+          found.push({ eventName, groupIndex, handlerIndex, handler });
+        }
+      });
     });
-  });
+  }
   return found;
 }
 
-function addOwnedHandler(config: JsonObject, provider: HookProvider, handler: JsonObject): void {
-  const eventName = provider === "claude-code" ? "PreToolUse" : "BeforeTool";
+function addOwnedHandler(
+  config: JsonObject,
+  provider: HookProvider,
+  eventName: NativeHookEventName,
+  handler: JsonObject,
+): void {
   const groups = eventGroups(config, eventName, true)!;
   groups.push({
     matcher: provider === "claude-code" ? "*" : ".*",
     ...(provider === "gemini-cli" ? { sequential: false } : {}),
     hooks: [handler]
   });
+}
+
+function removeOwnedHandlers(config: JsonObject, located: LocatedHandler[]): void {
+  const ordered = [...located].sort((left, right) => {
+    if (left.eventName !== right.eventName) return left.eventName.localeCompare(right.eventName);
+    if (left.groupIndex !== right.groupIndex) return right.groupIndex - left.groupIndex;
+    return right.handlerIndex - left.handlerIndex;
+  });
+  for (const handler of ordered) removeOwnedHandler(config, handler);
+}
+
+function handlerBindings(located: LocatedHandler[]): Array<{
+  eventName: NativeHookEventName;
+  handlerSha256: string;
+}> {
+  return located
+    .map((row) => ({ eventName: row.eventName, handlerSha256: handlerHash(row.handler) }))
+    .sort((left, right) => left.eventName.localeCompare(right.eventName));
+}
+
+function manifestBindings(manifest: HookManifest): Array<{
+  eventName: NativeHookEventName;
+  handlerSha256: string;
+}> {
+  if (manifest.v === 1) {
+    return [{
+      eventName: manifest.provider === "claude-code" ? "PreToolUse" : "BeforeTool",
+      handlerSha256: manifest.handlerSha256,
+    }];
+  }
+  return manifest.handlers
+    .map((row) => ({ eventName: row.eventName, handlerSha256: row.handlerSha256 }))
+    .sort((left, right) => left.eventName.localeCompare(right.eventName));
+}
+
+function bindingsEqual(
+  left: Array<{ eventName: NativeHookEventName; handlerSha256: string }>,
+  right: Array<{ eventName: NativeHookEventName; handlerSha256: string }>,
+): boolean {
+  return canonicalize(left) === canonicalize(right);
 }
 
 function removeOwnedHandler(config: JsonObject, located: LocatedHandler): void {
@@ -647,8 +769,18 @@ function loadSignedManifest(workspace: string, paths: ManagedPaths): HookManifes
 }
 
 function validateManifestPaths(workspace: string, provider: HookProvider, paths: ManagedPaths, manifest: HookManifest): void {
-  const expectedSource = providerSource(provider);
+  const expectedSource = manifest.v === 1 ? LEGACY_HOOK_SOURCES[provider] : providerSource(provider);
   const expectedControl = manifest.mode === "control";
+  const lifecycleBindingValid = manifest.v === 1
+    ? manifest.observation.eventType === "action.requested"
+      && manifest.observation.correlation === (provider === "claude-code" ? "provider-call-id" : "derived-event-id")
+    : canonicalize(manifest.handlers.map(({ eventName, phase }) => ({ eventName, phase }))) === canonicalize(
+        providerHookSpecs(provider).map(({ eventName, phase }) => ({ eventName, phase })),
+      )
+      && canonicalize(manifest.observation.eventTypes) === canonicalize(providerObservedEventTypes(provider))
+      && manifest.observation.correlation === (
+        provider === "claude-code" ? "provider-call-id" : "derived-request-id-with-terminal-resolution"
+      );
   if (
     manifest.installationId !== integrationId(manifest.mode) ||
     manifest.provider !== provider ||
@@ -658,6 +790,7 @@ function validateManifestPaths(workspace: string, provider: HookProvider, paths:
     manifest.tokenPath !== relativePortable(workspace, paths.token) ||
     manifest.ignoreBlockSha256 !== ignoreBlockHash() ||
     manifest.observation.controlDecision !== expectedControl ||
+    !lifecycleBindingValid ||
     (expectedControl
       ? manifest.control?.endpoint !== CONTROL_HOOK_ROUTE
         || manifest.control.leaseScope !== "hook:control"
@@ -812,11 +945,11 @@ export function installHookIntegration(options: InstallHookIntegrationOptions): 
     const existingManifest = loadSignedManifest(workspace, paths);
     if (existingManifest) validateManifestPaths(workspace, provider, paths, existingManifest);
     const owned = locateOwnedHandlers(config.value, provider);
-    if (owned.length > 1 || (!existingManifest && owned.length > 0)) {
-      throw new HookIntegrationError("HOOK_OWNERSHIP_CONFLICT", "provider config contains an unowned or duplicate AMC hook handler");
+    if (!existingManifest && owned.length > 0) {
+      throw new HookIntegrationError("HOOK_OWNERSHIP_CONFLICT", "provider config contains an AMC-marked hook without a signed installation manifest");
     }
-    if (existingManifest && owned.length === 1 && handlerHash(owned[0]!.handler) !== existingManifest.handlerSha256) {
-      throw new HookIntegrationError("HOOK_OWNERSHIP_CONFLICT", "managed hook handler differs from the signed installation manifest");
+    if (existingManifest && !bindingsEqual(handlerBindings(owned), manifestBindings(existingManifest))) {
+      throw new HookIntegrationError("HOOK_OWNERSHIP_CONFLICT", "managed hook handler set differs from the signed installation manifest");
     }
 
     const approvalPath = approvalPolicyPath(workspace);
@@ -843,15 +976,25 @@ export function installHookIntegration(options: InstallHookIntegrationOptions): 
 
     const desiredHandler = expectedHandler({ workspace, provider, mode, agentId, bridgeBase, tokenPath: paths.token });
     const desiredHandlerHash = handlerHash(desiredHandler);
+    const desiredHandlers = providerHookSpecs(provider).map((spec) => ({
+      ...spec,
+      handler: desiredHandler,
+      handlerSha256: desiredHandlerHash,
+    }));
+    const desiredBindings = desiredHandlers.map((row) => ({
+      eventName: row.eventName,
+      handlerSha256: row.handlerSha256,
+    }));
     const existingLease = verifyManagedLease({ workspace, tokenPath: paths.token, expectedAgentId: agentId, mode });
     const currentConfigSha = config.raw === null ? null : sha256Hex(Buffer.from(config.raw, "utf8"));
     if (
       existingManifest &&
+      existingManifest.v === 2 &&
       existingManifest.mode === mode &&
-      owned.length === 1 &&
       existingManifest.agentId === agentId &&
       existingManifest.bridgeBase === bridgeBase &&
-      existingManifest.handlerSha256 === desiredHandlerHash &&
+      bindingsEqual(handlerBindings(owned), desiredBindings) &&
+      bindingsEqual(manifestBindings(existingManifest), desiredBindings) &&
       existingManifest.configSha256 === currentConfigSha &&
       hasManagedIgnoreBlock(ignoreRaw) &&
       existingLease.valid &&
@@ -866,8 +1009,10 @@ export function installHookIntegration(options: InstallHookIntegrationOptions): 
       });
     }
 
-    if (owned.length === 1) removeOwnedHandler(config.value, owned[0]!);
-    addOwnedHandler(config.value, provider, desiredHandler);
+    removeOwnedHandlers(config.value, owned);
+    for (const row of desiredHandlers) {
+      addOwnedHandler(config.value, provider, row.eventName, row.handler);
+    }
     const configText = serializeConfig(config.value);
     const configBytes = Buffer.from(configText, "utf8");
 
@@ -940,7 +1085,7 @@ export function installHookIntegration(options: InstallHookIntegrationOptions): 
 
     const now = Date.now();
     const manifest = manifestSchema.parse({
-      v: 1,
+      v: 2,
       installationId: integrationId(mode),
       mode,
       provider,
@@ -957,14 +1102,18 @@ export function installHookIntegration(options: InstallHookIntegrationOptions): 
       ignoreExistedBefore: existingManifest?.ignoreExistedBefore ?? ignoreBefore.existed,
       ignoreBlockSha256: ignoreBlockHash(),
       configSha256: sha256Hex(configBytes),
-      handlerSha256: desiredHandlerHash,
+      handlers: desiredHandlers.map((row) => ({
+        eventName: row.eventName,
+        phase: row.phase,
+        handlerSha256: row.handlerSha256,
+      })),
       installedTs: existingManifest?.installedTs ?? now,
       updatedTs: now,
       observation: {
-        eventType: "action.requested",
+        eventTypes: providerObservedEventTypes(provider),
         controlDecision: mode === "control",
         rawProviderInputForwarded: false,
-        correlation: provider === "claude-code" ? "provider-call-id" : "derived-event-id"
+        correlation: provider === "claude-code" ? "provider-call-id" : "derived-request-id-with-terminal-resolution"
       },
       control: mode === "control" ? {
         endpoint: CONTROL_HOOK_ROUTE,
@@ -1127,15 +1276,14 @@ export function getHookIntegrationStatus(input: { workspace: string; provider: H
   } catch (error) {
     issues.push(error instanceof Error ? error.message : String(error));
   }
-  let configOwned = owned.length === 1;
-  if (owned.length > 1) {
-    issues.push("provider config contains duplicate AMC hook handlers");
+  let configOwned = manifest ? bindingsEqual(handlerBindings(owned), manifestBindings(manifest)) : false;
+  if (manifest && owned.length === 0) issues.push("managed hook handler is missing from provider config");
+  if (manifest && owned.length > 0 && !configOwned) {
+    issues.push("managed hook handler set differs from the signed installation manifest");
     configOwned = false;
   }
-  if (manifest && owned.length === 0) issues.push("managed hook handler is missing from provider config");
-  if (manifest && owned.length === 1 && handlerHash(owned[0]!.handler) !== manifest.handlerSha256) {
-    issues.push("managed hook handler differs from the signed installation manifest");
-    configOwned = false;
+  if (manifest?.v === 1) {
+    issues.push("legacy single-handler manifest requires reinstall for terminal lifecycle coverage");
   }
   if (manifest && config.raw !== null && sha256Hex(Buffer.from(config.raw, "utf8")) !== manifest.configSha256) {
     issues.push("provider config changed after installation");
@@ -1163,7 +1311,7 @@ export function getHookIntegrationStatus(input: { workspace: string; provider: H
     state = "invalid";
   } else if (lease.expired) {
     state = "expired";
-  } else if (!configOwned || (manifest && config.raw !== null && sha256Hex(Buffer.from(config.raw, "utf8")) !== manifest.configSha256)) {
+  } else if (!configOwned || manifest?.v === 1 || (manifest && config.raw !== null && sha256Hex(Buffer.from(config.raw, "utf8")) !== manifest.configSha256)) {
     state = "drifted";
   }
   return {
@@ -1218,10 +1366,10 @@ export function removeHookIntegration(options: RemoveHookIntegrationOptions): Ho
     const ignoreBefore = snapshot(paths.ignore);
     const ignoreRaw = ignoreBefore.existed ? (ignoreBefore.bytes ?? Buffer.alloc(0)).toString("utf8") : "";
     const owned = locateOwnedHandlers(config.value, provider);
-    if (owned.length !== 1 || handlerHash(owned[0]!.handler) !== manifest.handlerSha256) {
-      throw new HookIntegrationError("HOOK_OWNERSHIP_CONFLICT", "managed hook handler differs from the signed installation manifest");
+    if (!bindingsEqual(handlerBindings(owned), manifestBindings(manifest))) {
+      throw new HookIntegrationError("HOOK_OWNERSHIP_CONFLICT", "managed hook handler set differs from the signed installation manifest");
     }
-    removeOwnedHandler(config.value, owned[0]!);
+    removeOwnedHandlers(config.value, owned);
     const shouldDeleteConfig = !manifest.configExistedBefore && Object.keys(config.value).length === 0;
     const nextConfig = shouldDeleteConfig ? null : Buffer.from(serializeConfig(config.value), "utf8");
     const nextIgnoreText = removeManagedIgnoreBlock(ignoreRaw);
@@ -1298,9 +1446,22 @@ const baseProviderInputSchema = z.object({
   hook_event_name: z.string().min(1).max(128),
   tool_name: z.string().min(1).max(4096),
   tool_input: z.unknown().optional(),
+  tool_response: z.unknown().optional(),
+  error: z.unknown().optional(),
   timestamp: z.string().datetime({ offset: true }).optional(),
-  tool_use_id: z.string().min(1).max(4096).optional()
+  tool_use_id: z.string().min(1).max(4096).optional(),
+  tool_call_id: z.string().min(1).max(4096).optional(),
 }).passthrough();
+
+type ParsedProviderHookInput = z.infer<typeof baseProviderInputSchema>;
+type ProviderCorrelationSource = HookActionIdentitySource | "bridge-unmatched-request";
+
+export interface ProviderHookEventInspection {
+  eventName: NativeHookEventName;
+  eventType: "action.requested" | "action.completed" | "action.failed";
+  phase: LifecyclePhase;
+  correlationSha256: string;
+}
 
 function stablePrivateId(prefix: string, provider: HookProvider, value: string): string {
   return `${prefix}_${sha256Hex(`${provider}:${value}`).slice(0, 32)}`;
@@ -1311,55 +1472,127 @@ function safeToolName(raw: string): string {
   return redacted || "unknown-tool";
 }
 
+function parseProviderHookInput(rawInput: string): ParsedProviderHookInput {
+  const parsed = parseUnambiguousJson(rawInput, "input");
+  const result = baseProviderInputSchema.safeParse(parsed);
+  if (!result.success) {
+    throw new HookIntegrationError("HOOK_INPUT_INVALID", "provider hook input does not contain the required tool event fields");
+  }
+  return result.data;
+}
+
+function hasProviderError(value: unknown): boolean {
+  if (!isJsonObject(value) || !("error" in value)) return false;
+  const error = value.error;
+  return error !== undefined && error !== null && error !== false && error !== "";
+}
+
+function hookEventSpec(provider: HookProvider, parsed: ParsedProviderHookInput): ProviderHookSpec {
+  const spec = providerHookSpecs(provider).find((row) => row.eventName === parsed.hook_event_name);
+  if (!spec) {
+    throw new HookIntegrationError(
+      "HOOK_INPUT_UNSUPPORTED",
+      `${provider} hook forwarder does not support ${parsed.hook_event_name}`,
+    );
+  }
+  if (provider === "gemini-cli" && spec.eventName === "AfterTool" && hasProviderError(parsed.tool_response)) {
+    return { ...spec, eventType: "action.failed" };
+  }
+  return spec;
+}
+
+function hookCorrelationSha256(provider: HookProvider, parsed: ParsedProviderHookInput, rawInputSha256: string): {
+  actionId: string;
+  correlationSha256: string;
+  source: HookActionIdentitySource;
+} {
+  return resolveProviderHookRequestIdentity({
+    provider,
+    providerActionId: parsed.tool_use_id ?? parsed.tool_call_id,
+    sessionId: parsed.session_id,
+    timestamp: parsed.timestamp,
+    toolName: parsed.tool_name,
+    toolInput: parsed.tool_input,
+    rawInputSha256,
+  });
+}
+
+export function inspectProviderHookEvent(input: {
+  provider: HookProvider;
+  rawInput: string;
+}): ProviderHookEventInspection {
+  const provider = parseProvider(input.provider);
+  const parsed = parseProviderHookInput(input.rawInput);
+  const spec = hookEventSpec(provider, parsed);
+  const rawInputSha256 = sha256Hex(Buffer.from(input.rawInput, "utf8"));
+  return {
+    eventName: spec.eventName,
+    eventType: spec.eventType,
+    phase: spec.phase,
+    correlationSha256: hookCorrelationSha256(provider, parsed, rawInputSha256).correlationSha256,
+  };
+}
+
 export function mapProviderHookEvent(input: {
   provider: HookProvider;
   agentId: string;
   rawInput: string;
   observedAt?: number;
+  resolvedActionId?: string;
 }): ObservedAepActionEvent {
   const provider = parseProvider(input.provider);
   const agentId = validateAgentId(input.agentId);
-  const parsed = parseUnambiguousJson(input.rawInput, "input");
-  const result = baseProviderInputSchema.safeParse(parsed);
-  if (!result.success) {
-    throw new HookIntegrationError("HOOK_INPUT_INVALID", "provider hook input does not contain the required tool event fields");
-  }
-  const expectedEvent = provider === "claude-code" ? "PreToolUse" : "BeforeTool";
-  if (result.data.hook_event_name !== expectedEvent) {
-    throw new HookIntegrationError(
-      "HOOK_INPUT_UNSUPPORTED",
-      `${provider} hook forwarder accepts only ${expectedEvent} observation events`
-    );
-  }
+  const parsed = parseProviderHookInput(input.rawInput);
+  const spec = hookEventSpec(provider, parsed);
   const observedAt = input.observedAt ?? Date.now();
   if (!Number.isFinite(observedAt)) {
     throw new HookIntegrationError("HOOK_INPUT_INVALID", "observed timestamp must be finite");
   }
   const rawHash = sha256Hex(Buffer.from(input.rawInput, "utf8"));
   const eventId = `evt_${sha256Hex(`${provider}:${observedAt}:${rawHash}`).slice(0, 32)}`;
-  const providerActionId = provider === "claude-code" && result.data.tool_use_id &&
-    result.data.tool_use_id.length <= 160 && SAFE_ID.test(result.data.tool_use_id)
-    ? result.data.tool_use_id
-    : `action_${sha256Hex(`${provider}:${observedAt}:${rawHash}:action`).slice(0, 32)}`;
-  const toolName = safeToolName(result.data.tool_name);
+  const requestIdentity = hookCorrelationSha256(provider, parsed, rawHash);
+  let actionId = requestIdentity.actionId;
+  let correlationSource: ProviderCorrelationSource = requestIdentity.source;
+  if (spec.phase !== "requested") {
+    const providerActionId = parsed.tool_use_id ?? parsed.tool_call_id;
+    if (provider === "claude-code" && isSafeProviderActionId(providerActionId)) {
+      actionId = providerActionId;
+      correlationSource = "provider-call-id";
+    } else if (provider === "gemini-cli" && isSafeProviderActionId(input.resolvedActionId)) {
+      actionId = input.resolvedActionId;
+      correlationSource = "bridge-unmatched-request";
+    } else {
+      throw new HookIntegrationError(
+        "HOOK_CORRELATION_REQUIRED",
+        `${provider} terminal hook requires a verified request correlation before it can be observed`,
+      );
+    }
+  }
+  const toolName = safeToolName(parsed.tool_name);
   const isMcp = provider === "claude-code" ? toolName.startsWith("mcp__") : toolName.startsWith("mcp_");
+  const action = {
+    type: "tool_call" as const,
+    id: actionId,
+    ...(spec.eventType === "action.completed" ? { status: "success" as const } : {}),
+    ...(spec.eventType === "action.failed" ? {
+      status: "failure" as const,
+      error: { code: "PROVIDER_TOOL_FAILURE" },
+    } : {}),
+  };
   const event = {
     aep_version: "0.1",
     id: eventId,
-    type: "action.requested",
+    type: spec.eventType,
     time: new Date(observedAt).toISOString(),
-    hook: expectedEvent,
+    hook: spec.eventName,
     agent: {
       slug: agentId,
       surface: provider
     },
-    ...(result.data.session_id ? {
-      session: { id: stablePrivateId("session", provider, result.data.session_id) }
+    ...(parsed.session_id ? {
+      session: { id: stablePrivateId("session", provider, parsed.session_id) }
     } : {}),
-    action: {
-      type: "tool_call",
-      id: providerActionId
-    },
+    action,
     tool: {
       type: isMcp ? "mcp" : "native",
       name: toolName,
@@ -1367,7 +1600,16 @@ export function mapProviderHookEvent(input: {
     },
     ...(isMcp ? {
       server: { name: "provider-declared-mcp" }
-    } : {})
+    } : {}),
+    extensions: {
+      "x-amc-correlation": {
+        v: 1,
+        provider,
+        sha256: requestIdentity.correlationSha256,
+        source: correlationSource,
+        rawStored: false,
+      },
+    },
   } as const;
   const validated = observedAepActionEventSchema.safeParse(event);
   if (!validated.success) {
@@ -1411,8 +1653,8 @@ function authorizeForwardInvocation(input: {
 
   const config = loadConfig(paths.config);
   const owned = locateOwnedHandlers(config.value, input.provider);
-  if (owned.length !== 1 || handlerHash(owned[0]!.handler) !== manifest.handlerSha256) {
-    throw new HookIntegrationError("HOOK_OWNERSHIP_CONFLICT", "managed hook handler differs from the signed installation manifest");
+  if (!bindingsEqual(handlerBindings(owned), manifestBindings(manifest))) {
+    throw new HookIntegrationError("HOOK_OWNERSHIP_CONFLICT", "managed hook handler set differs from the signed installation manifest");
   }
 
   const lease = verifyManagedLease({
@@ -1435,6 +1677,64 @@ function delay(ms: number): Promise<void> {
   return ms <= 0 ? Promise.resolve() : new Promise((resolvePromise) => setTimeout(resolvePromise, ms));
 }
 
+async function resolveProviderTerminalAction(input: {
+  authorization: { bridgeBase: string; token: string };
+  provider: HookProvider;
+  correlationSha256: string;
+  retryDelayMs: number;
+  timeoutMs: number;
+}): Promise<string> {
+  const body = JSON.stringify({
+    provider: input.provider,
+    correlationSha256: input.correlationSha256,
+  });
+  const url = `${input.authorization.bridgeBase}${OBSERVED_HOOK_CORRELATION_PATH}`;
+  let lastError: string | null = null;
+  for (let attempt = 0; attempt < 2; attempt += 1) {
+    try {
+      const response = await fetch(url, {
+        method: "POST",
+        redirect: "error",
+        signal: AbortSignal.timeout(input.timeoutMs),
+        headers: {
+          authorization: `Bearer ${input.authorization.token}`,
+          "content-type": "application/json",
+          "content-length": String(Buffer.byteLength(body)),
+        },
+        body,
+      });
+      if (response.status >= 500 && attempt === 0) {
+        await response.arrayBuffer();
+        await delay(input.retryDelayMs);
+        continue;
+      }
+      const payload = await response.json().catch(() => null) as Record<string, unknown> | null;
+      if (!response.ok) {
+        const reason = typeof payload?.error === "string" ? payload.error : `HTTP ${response.status}`;
+        throw new HookIntegrationError(
+          "HOOK_CORRELATION_REQUIRED",
+          `terminal hook correlation failed closed: ${reason}`,
+        );
+      }
+      if (payload?.resolved !== true || !isSafeProviderActionId(payload.actionId)) {
+        throw new HookIntegrationError("HOOK_CORRELATION_REQUIRED", "terminal hook correlation response is incomplete");
+      }
+      return payload.actionId;
+    } catch (error) {
+      if (error instanceof HookIntegrationError) throw error;
+      lastError = error instanceof Error ? error.message : String(error);
+      if (attempt === 0) {
+        await delay(input.retryDelayMs);
+        continue;
+      }
+    }
+  }
+  throw new HookIntegrationError(
+    "HOOK_CORRELATION_REQUIRED",
+    `terminal hook correlation failed before a verified response${lastError ? `: ${lastError}` : ""}`,
+  );
+}
+
 export async function forwardProviderHookEvent(input: {
   workspace: string;
   provider: HookProvider;
@@ -1446,7 +1746,13 @@ export async function forwardProviderHookEvent(input: {
   observedAt?: number;
   retryDelayMs?: number;
   timeoutMs?: number;
-}): Promise<{ status: number; receiptId: string; idempotentReplay: boolean }> {
+}): Promise<{
+  status: number;
+  receiptId: string;
+  idempotentReplay: boolean;
+  actionId: string;
+  sourceEventType: ObservedAepActionEvent["type"];
+}> {
   const workspace = resolve(input.workspace);
   const provider = parseProvider(input.provider);
   const mode = parseMode(input.mode);
@@ -1460,16 +1766,27 @@ export async function forwardProviderHookEvent(input: {
     bridgeBase,
     tokenFile: input.tokenFile
   });
+  const retryDelayMs = input.retryDelayMs ?? 100;
+  const timeoutMs = input.timeoutMs ?? 5_000;
+  const inspection = inspectProviderHookEvent({ provider, rawInput: input.rawInput });
+  const resolvedActionId = provider === "gemini-cli" && inspection.phase !== "requested"
+    ? await resolveProviderTerminalAction({
+        authorization,
+        provider,
+        correlationSha256: inspection.correlationSha256,
+        retryDelayMs,
+        timeoutMs,
+      })
+    : undefined;
   const event = mapProviderHookEvent({
     provider,
     agentId,
     rawInput: input.rawInput,
-    observedAt: input.observedAt
+    observedAt: input.observedAt,
+    resolvedActionId,
   });
   const body = JSON.stringify(event);
   const url = `${authorization.bridgeBase}${OBSERVED_AEP_HOOK_PATH}`;
-  const retryDelayMs = input.retryDelayMs ?? 100;
-  const timeoutMs = input.timeoutMs ?? 5_000;
   let lastStatus: number | null = null;
   let lastError: string | null = null;
   for (let attempt = 0; attempt < 2; attempt += 1) {
@@ -1501,7 +1818,9 @@ export async function forwardProviderHookEvent(input: {
       return {
         status: response.status,
         receiptId: payload.receiptId,
-        idempotentReplay: payload.idempotentReplay === true
+        idempotentReplay: payload.idempotentReplay === true,
+        actionId: typeof payload.actionId === "string" ? payload.actionId : event.action.id,
+        sourceEventType: event.type,
       };
     } catch (error) {
       if (error instanceof HookIntegrationError) throw error;

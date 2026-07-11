@@ -14,7 +14,7 @@
   <a href="https://github.com/AgentMaturity/AgentMaturityCompass/releases"><img src="https://img.shields.io/github/v/release/AgentMaturity/AgentMaturityCompass?labelColor=0a0a0a&color=4AEF79&label=release" alt="GitHub release" /></a>
   <a href="https://github.com/AgentMaturity/AgentMaturityCompass/releases"><img src="https://img.shields.io/github/downloads/AgentMaturity/AgentMaturityCompass/total?labelColor=0a0a0a&color=4AEF79&label=downloads" alt="verified release downloads" /></a>
   <a href="https://github.com/AgentMaturity/AgentMaturityCompass/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/AgentMaturity/AgentMaturityCompass/ci.yml?branch=main&labelColor=0a0a0a&color=4AEF79&label=CI" alt="CI" /></a>
-  <a href="https://github.com/AgentMaturity/AgentMaturityCompass/actions/workflows/ci.yml"><img src="https://img.shields.io/badge/tests-8%2C380%20passing-4AEF79?labelColor=0a0a0a" alt="tests" /></a>
+  <a href="https://github.com/AgentMaturity/AgentMaturityCompass/actions/workflows/ci.yml"><img src="https://img.shields.io/badge/tests-8%2C393%20passing-4AEF79?labelColor=0a0a0a" alt="tests" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-4AEF79?labelColor=0a0a0a" alt="MIT" /></a>
 </p>
 
@@ -401,6 +401,7 @@ amc connect hooks install --provider claude-code --agent my-agent --dry-run
 # Install, verify, and remove the project-local integration
 amc connect hooks install --provider claude-code --agent my-agent
 amc connect hooks status --provider claude-code
+amc connect hooks lifecycle --agent my-agent --action <action-id>
 amc connect hooks remove --provider claude-code
 
 # Gemini CLI uses the same lifecycle
@@ -411,7 +412,7 @@ amc up
 amc connect hooks install --provider claude-code --mode control --agent my-agent
 ```
 
-The default `observe` mode preserves unrelated provider settings, adds a managed `.gitignore` rule for `.amc/hooks/`, stores a dedicated `hook:observe` lease outside provider config with mode `0600`, signs its ownership manifest, and removes only the AMC-owned handler and ignore block. It forwards tool identity and a hashed session correlation only; tool arguments, cwd, transcript paths, and raw session IDs are not sent.
+The default `observe` mode preserves unrelated provider settings, adds a managed `.gitignore` rule for `.amc/hooks/`, stores a dedicated `hook:observe` lease outside provider config with mode `0600`, signs its ownership manifest, and removes only the AMC-owned handlers and ignore block. It records requested actions and their completed or failed terminal state under one stable action ID. The lifecycle command verifies each receipt and fails closed on missing, ambiguous, conflicting, cross-agent, out-of-order, or tampered evidence. Tool arguments, outputs, error messages, cwd, transcript paths, and raw session IDs are not retained.
 
 `--mode control` is an explicit loopback-only Enforce path. It adds `hook:control`, evaluates raw provider input in memory without retaining it, reuses signed ToolHub, Action Policy, Approval Policy, budget, freeze, maturity, and assurance gates, and binds the exact native response to a signed receipt. Claude Code can receive `allow`, `deny`, or `ask`. Gemini CLI has no native `ask` result, so AMC converts that outcome to an explicit deny. Multi-user or distinct-user AMC quorum is never weakened to one provider prompt. Codex, Cursor, OpenCode, and other providers remain unsupported until their native per-tool hook contracts are pinned and fixture-tested.
 
@@ -647,7 +648,7 @@ The full trust stack is **free and MIT licensed**. The only paid surface is Indu
 
 | Tier | What you get |
 |---|---|
-| **Free / Open Source** | Everything — Score, Shield, Enforce, Vault, Watch, Comply, Fleet, Passport, all 14 adapters, 1,150 registered CLI command paths, browser playground, CI gates |
+| **Free / Open Source** | Everything — Score, Shield, Enforce, Vault, Watch, Comply, Fleet, Passport, all 14 adapters, 1,151 registered CLI command paths, browser playground, CI gates |
 | **Industry Packs** | Everything in Free + all 41 Industry Domain Packs for `$9.99/month` |
 | **Enterprise** | Everything in Industry Packs + priority support + custom pack development + deployment assistance |
 
@@ -682,7 +683,7 @@ The full trust stack is **free and MIT licensed**. The only paid surface is Indu
 | [Community Demo Kit](docs/COMMUNITY_DEMO_KIT.md) | [Why AMC One-Pager](docs/WHY_AMC_ONE_PAGER.md) |
 | [Solo Dev Quickstart](docs/SOLO_DEV_QUICKSTART.md) | [Platform Engineer Quickstart](docs/PLATFORM_ENGINEER_QUICKSTART.md) |
 | [Security & Compliance Quickstart](docs/SECURITY_COMPLIANCE_QUICKSTART.md) | [Troubleshooting](docs/TROUBLESHOOTING.md) |
-| [CLI Reference (1,150 command paths)](docs/CLI_COMMAND_INVENTORY.md) | [Architecture](docs/ARCHITECTURE_MAP.md) |
+| [CLI Reference (1,151 command paths)](docs/CLI_COMMAND_INVENTORY.md) | [Architecture](docs/ARCHITECTURE_MAP.md) |
 | [Compatibility Matrix](docs/COMPATIBILITY_MATRIX.md) | [Starter Blueprints](docs/STARTER_BLUEPRINTS.md) |
 | [Install Packages](docs/INSTALL_PACKAGES.md) | [Support Policy](docs/SUPPORT_POLICY.md) |
 | [Release Cadence](docs/RELEASE_CADENCE.md) | [CI Templates](docs/CI_TEMPLATES.md) |
@@ -781,7 +782,7 @@ AMC is MIT licensed. We welcome contributions — especially new **assurance pac
 
 ```bash
 git clone https://github.com/AgentMaturity/AgentMaturityCompass.git
-cd AgentMaturityCompass && npm ci && npm test   # 1,060 files / 8,380 passing Vitest tests
+cd AgentMaturityCompass && npm ci && npm test   # 1,063 files / 8,393 passing Vitest tests
 ```
 
 **→ [CONTRIBUTING.md](CONTRIBUTING.md)** — includes guides for writing packs, mapping research papers, and adding adapters.
@@ -802,6 +803,6 @@ cd AgentMaturityCompass && npm ci && npm test   # 1,060 files / 8,380 passing Vi
 ---
 
 <p align="center">
-  <strong>244 default diagnostic questions + 20 lifecycle expansion questions · 142 assurance packs · 41 domain packs · 14 adapters · 1,150 CLI command paths</strong><br>
+  <strong>244 default diagnostic questions + 20 lifecycle expansion questions · 142 assurance packs · 41 domain packs · 14 adapters · 1,151 CLI command paths</strong><br>
   <em>Stop trusting. Start verifying.</em>
 </p>
