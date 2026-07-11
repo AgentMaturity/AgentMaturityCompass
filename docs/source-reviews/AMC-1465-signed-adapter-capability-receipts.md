@@ -5,7 +5,7 @@
 - AMC surfaces requested: Passport, Watch, Enforce, CLI, API, Docs
 - Sources reviewed: Agent Event Protocol draft; Agent Control integrations and controls
 - Retrieval: primary repositories and documentation reviewed 2026-07-11
-- Status: Ready to publish
+- Status: Done and published
 
 ## Relevance decision
 
@@ -54,4 +54,8 @@ No second adapter registry, policy engine, provider SDK, AEP importer, copied ma
 - Runtime dependency audit: 0 vulnerabilities.
 - Prepack archive, SBOM, license inventory, scan, release pack, and signature verification passed.
 - Final live-enabled release gate passed, including HTTP 200 from `https://agentmaturity.co`; receipt: `tmp/release-gate/amc-1465-final-v2.json`.
-- Remote workflows, production feature checks, final Obsidian publication evidence, and Linear closure remain pending until the verified commit is pushed.
+- Feature commit `3dad59dc5e87f006dc2c3f9c6c4e56385107512a` is pushed to `main` and matches `origin/main`.
+- Remote publication passed: [CI 29142925398](https://github.com/AgentMaturity/AgentMaturityCompass/actions/runs/29142925398), [Pages 29142925395](https://github.com/AgentMaturity/AgentMaturityCompass/actions/runs/29142925395), [Docker 29142925406](https://github.com/AgentMaturity/AgentMaturityCompass/actions/runs/29142925406), and [npm validation 29142925393](https://github.com/AgentMaturity/AgentMaturityCompass/actions/runs/29142925393). Registry publication was correctly skipped because `NPM_TOKEN` is not configured; validation, build, and prepack passed.
+- Production homepage exposes 8,380 passing tests, 14 adapters, and portable signed receipt copy. Production adapter docs expose the command, strict verification states, plugin certification boundary, canonical IDs, and corrected Gemini package. Production OpenAPI exposes `/v1/adapters/capability-receipts` and `amc.adapter-capability-receipt.v1`.
+- Production visual proof at 1,440px and 390px had zero horizontal overflow and zero console errors. Apex returned HTTP 200; `www` returned the expected 301 to apex.
+- Let's Encrypt certificate covers `agentmaturity.co` and `www.agentmaturity.co`, valid from 2026-06-26 through 2026-09-24.
