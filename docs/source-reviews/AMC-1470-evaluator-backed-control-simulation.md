@@ -6,7 +6,7 @@
 - Source reviewed: first-party control-model material and repository already pinned by the competitive review
 - Retrieval: public material reviewed 2026-07-10; implementation review 2026-07-11
 - Immutable source commit: `83188b62c63e2b4ff9ada87048fd99605184ee5a`
-- Status: Verified locally; publication pending
+- Status: Published; Linear closeout pending
 
 ## Relevance decision
 
@@ -64,4 +64,14 @@ Browser verification then found an existing-client cache defect: the server and 
 - After the release-shell cache repair, focused service-worker/Docs/control verification passed 4 files / 22 tests, focused Docs browser checks passed 11 tests, and the full suite passed again at 1,066 files / 8,413 tests.
 - Desktop packaging and verification passed for macOS universal (`18a6df7b2211d2756cbdae1bf2f02e1d160895676076ad238876e880d1f07911`), Linux x64 (`6500d996c9588960b9f129c926df54a3960c92011b2c1e1dc405ff3bdeaf1e75`), and Windows x64 (`2b3eb7c1c3de78fe8a418b3a2de88391508f8415a8ce7e3eb6c715b739847221`).
 - Prepack archive, SBOM, license inventory, secret scan, signed release pack, and offline verification passed.
-- Commit, exact-head CI, deployment, and production receipts will be appended only after they pass.
+
+## Publication evidence
+
+- Implementation commit `329a1f65908500aa59b10aa0802429e0c5f14d5d` (`Simulate AMC control decisions`) is pushed to `origin/main`; exact-head CI `29151292732`, npm validation `29151292748`, Docker `29151292741`, and Pages `29151292734` passed.
+- Public Docs repair commit `bf1767fbf2d67494871897c53f94f17d1a46fdaa` (`Publish AMC control guides`) is pushed; exact-head CI `29151721268`, npm validation `29151721276`, and Pages `29151721263` passed.
+- Release-shell repair commit `9b39033c157673cc2f9e324184471f9c6a7acfa7` (`Refresh AMC Docs release shell`) is pushed; exact-head CI `29151970204`, npm validation `29151970209`, and Pages `29151970190` passed.
+- Production `content-manifest.json` reports source revision `9b39033c157673cc2f9e324184471f9c6a7acfa7`, 170 guides, and both `CONTROL_PROJECTION` and `CONTROL_SIMULATION`. Both live guide SHA-256 hashes equal their repository sources.
+- Production returned HTTP 200 at the apex and HTTP 301 from `www` to the apex. The valid Let's Encrypt certificate covers both hostnames from 2026-06-26 through 2026-09-24.
+- The live homepage exposes 1,153 CLI paths and 8,413 tests; public OpenAPI contains `/v1/policy/simulate`, `ControlSimulationRequest`, and `ControlSimulationResponse`.
+- A stale existing browser session upgraded to the new shell and resolved `#CONTROL_SIMULATION` without console warnings or errors. Desktop had no overflow; the 390x844 production render had a 384-pixel document width and no horizontal overflow.
+- The post-deploy quick release gate passed typecheck, build, OpenAPI parsing, architecture boundaries, 1,488-file Docs drift, runtime audit with 0 vulnerabilities, smoke checks, and live HTTP health. Receipt: `tmp/release-gate/amc-1470-live.json`.
