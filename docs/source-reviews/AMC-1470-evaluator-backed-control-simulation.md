@@ -45,6 +45,10 @@ Unknown or catalog-only control IDs fail input validation. Runtime content is re
 
 AMC did not add a second evaluator, policy AST, policy language, store, editor, template system, simulator runtime, source-specific module, or compatibility claim. No external code, prose, examples, schemas, policies, screenshots, mappings, assets, or generated output were copied.
 
+## Publication defect found and fixed
+
+The first production check found that the new Control Simulation guide and AMC-1469 Control Projection guide were linked from repository docs but absent from the deterministic public Docs allowlist, so their canonical `/docs/content/*.md` routes returned 404. Both guides now use the existing same-origin Docs artifact and Governance & Policy category. The allowlisted artifact increased from 168 to 170 guides; graph and artifact tests prevent either guide from silently disappearing again.
+
 ## Verification
 
 - Expected-red: the focused suite failed because `src/enforce/controlSimulation.ts` and least-privilege POST authorization did not exist.
@@ -54,6 +58,7 @@ AMC did not add a second evaluator, policy AST, policy language, store, editor, 
 - Direct and release-gate full suites passed: 1,066 files / 8,413 tests each.
 - The consolidated release gate passed at `tmp/release-gate/amc-1470-final.json`, including 1,153 public CLI paths, the 24,373-line architecture ceiling, 1,487-file Docs drift, 0 runtime vulnerabilities, and all 10 clean-install personas at 10/10.
 - Playwright passed 55 browser tests with 2 intentional i18n skips.
+- After the Docs publication repair, the focused control/Docs suite passed 4 files / 26 tests, focused Docs browser routing and brand checks passed 11 tests, and the full suite passed again at 1,066 files / 8,413 tests.
 - Desktop packaging and verification passed for macOS universal (`18a6df7b2211d2756cbdae1bf2f02e1d160895676076ad238876e880d1f07911`), Linux x64 (`6500d996c9588960b9f129c926df54a3960c92011b2c1e1dc405ff3bdeaf1e75`), and Windows x64 (`2b3eb7c1c3de78fe8a418b3a2de88391508f8415a8ce7e3eb6c715b739847221`).
 - Prepack archive, SBOM, license inventory, secret scan, signed release pack, and offline verification passed.
 - Commit, exact-head CI, deployment, and production receipts will be appended only after they pass.

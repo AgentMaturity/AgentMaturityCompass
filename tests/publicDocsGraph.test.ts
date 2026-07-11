@@ -82,6 +82,8 @@ describe("AMC public Docs graph", () => {
       "AGENT_GUIDE",
       "ASSURANCE_LAB",
       "CLI_COMMAND_INVENTORY",
+      "CONTROL_PROJECTION",
+      "CONTROL_SIMULATION",
       "CUSTOM_ADAPTER",
       "DEPLOYMENT_OPTIONS",
       "DOMAIN_PROOF_LANE",
