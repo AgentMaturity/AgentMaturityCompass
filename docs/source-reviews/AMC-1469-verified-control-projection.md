@@ -5,7 +5,7 @@
 - AMC surfaces requested: Enforce, Shield, Watch, Vault, CLI, API, Docs
 - Source reviewed: Agent Control repository and public product documentation
 - Retrieval: primary source reviewed 2026-07-11 at commit `83188b62c63e2b4ff9ada87048fd99605184ee5a`
-- Status: implementation and local release verification passed; publication verification pending
+- Status: implementation, local release, implementation-head workflows, and production verification passed; publication-evidence head pending
 
 ## Relevance decision
 
@@ -54,4 +54,10 @@ No second policy engine, evaluator, store, generic policy language, rule editor,
 - Prepack npm archive, SBOM, licenses, secret scan, signed release pack, and offline release verification passed.
 - All 10 isolated install personas passed at 10/10. Runtime dependency audit found 0 vulnerabilities.
 - Consolidated release gate passed every local step; receipt `tmp/release-gate/amc-1469-final.json`. Live deploy health was correctly skipped until the implementation commit is published.
-- Exact-head CI, Pages, Docker, npm validation, production HTTPS, and post-deploy browser/API checks remain pending and will be recorded before Linear is marked Done.
+- Implementation commit `a27032bb081cad0b60cf3c4fe4b2cadc261571dd` (`Project existing AMC controls`) was pushed to `origin/main`.
+- Exact-head [CI 29148853727](https://github.com/AgentMaturity/AgentMaturityCompass/actions/runs/29148853727) passed Node 20/22 full tests, build, architecture, release smoke, local E2E smoke, Helm, security, and Docker smoke. [npm validation 29148853748](https://github.com/AgentMaturity/AgentMaturityCompass/actions/runs/29148853748) passed typecheck, full tests, build, prepack guardrails, and release preflight; registry publication was intentionally skipped because no release publish was requested. [Docker Runner Image 29148853737](https://github.com/AgentMaturity/AgentMaturityCompass/actions/runs/29148853737) and [Pages 29148853736](https://github.com/AgentMaturity/AgentMaturityCompass/actions/runs/29148853736) passed.
+- Production verification passed at `https://agentmaturity.co/`: apex returned HTTP 200; `www` redirected to the apex; the Let's Encrypt certificate verified with SANs for both names and validity from 2026-06-26 through 2026-09-24.
+- The deployed homepage publishes 1,152 CLI paths and 8,404 tests. Deployed CLI Docs include `amc policy controls`; public OpenAPI includes `/v1/policy/controls` and `ControlProjectionResponse`.
+- Desktop 1280 px and mobile 390 px production checks found no horizontal overflow, warning, or error on the homepage or CLI Docs. Visual receipts: `tmp/visual-proof/amc-1469-home-desktop.png`, `tmp/visual-proof/amc-1469-home-mobile.png`, `tmp/visual-proof/amc-1469-cli-desktop.png`, and `tmp/visual-proof/amc-1469-cli-mobile.png`.
+- Post-deploy quick release gate passed live HTTPS health; receipt `tmp/release-gate/amc-1469-live.json`. Its full-suite and install-persona steps were intentionally skipped because the non-quick release gate had already passed both.
+- The publication-evidence commit and its exact-head workflows remain pending; Linear stays In Progress until they pass.
