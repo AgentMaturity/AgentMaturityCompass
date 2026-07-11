@@ -823,6 +823,10 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc policy pack describe` | Describe policy pack contents | - | - |
 | `amc policy pack diff` | Show deterministic diff for applying a policy pack | `--agent <agentId>` | - |
 | `amc policy pack list` | List built-in policy packs | - | - |
+| `amc policy scope` | Compile reusable action-class scopes into existing signed policies | - | - |
+| `amc policy scope apply` | Apply a scope preview after exact compile-ID confirmation | `--pack <packId>`<br>`--confirm <compileId>`<br>`--json` | - |
+| `amc policy scope compile` | Preview a deterministic selected-rule merge without writing | `--pack <packId>`<br>`--json` | - |
+| `amc policy scope list` | List immutable AMC action-class scope templates | `--json` | - |
 | `amc policy simulate` | Simulate one projected control through its production evaluator without recording | `--content <text>`<br>`--direction <direction>`<br>`--agent <agentId>`<br>`--risk <tier>`<br>`--mode <mode>`<br>`--exec-ticket`<br>`--json` | - |
 | `amc policy-canary-report` | Generate canary mode report for an agent | `--agent <agentId>` | - |
 | `amc policy-canary-start` | Start policy canary mode (observation-only) | `--agent <agentId>`<br>`--pack <packId>`<br>`--duration <duration>` | - |

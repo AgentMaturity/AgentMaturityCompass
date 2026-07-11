@@ -51,6 +51,7 @@ test.describe("AMC comparison brand and evidence boundary", () => {
 
   test("is accessible and bounded at 390px in both themes", async ({ page }, testInfo) => {
     await page.setViewportSize({ width: 390, height: 844 });
+    await expect(page.locator(".table-region")).toHaveAttribute("tabindex", "0");
     for (const theme of ["dark", "light"] as const) {
       if (theme === "light") await page.locator("#themeToggle").click();
 

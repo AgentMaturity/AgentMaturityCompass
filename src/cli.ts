@@ -706,6 +706,7 @@ import { registerLateStageCliCommands } from "./cli-late-stage-commands.js";
 import { registerDomainProductCliCommands } from "./cli-domain-product-commands.js";
 import { registerGuardrailControlCommands } from "./enforce/guardrailCli.js";
 import { registerControlInspectionCommands } from "./enforce/controlInspectionCli.js";
+import { registerScopeTemplateCommands } from "./enforce/scopeTemplateCli.js";
 import {
   promptInitCli,
   promptPackBuildCli,
@@ -7534,6 +7535,7 @@ admin
   });
 
 registerControlInspectionCommands(policy);
+registerScopeTemplateCommands(policy);
 
 policyAction
   .command("init")

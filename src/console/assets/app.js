@@ -1222,7 +1222,7 @@ async function renderHome() {
         <div class="studio-kicker">Desktop app</div>
         <h3>Native macOS shell, same AMC evidence-first surface.</h3>
         <p class="muted">
-          The macOS app now starts local demo-mode Studio and renders this Console inside a native WebKit window. Windows still launches the same local URL in the system browser. Both keep the same flow: 244 default questions, 264 lifecycle questions, 142 assurance packs, 41 Industry Packs, and 1,155 CLI paths.
+          The macOS app now starts local demo-mode Studio and renders this Console inside a native WebKit window. Windows still launches the same local URL in the system browser. Both keep the same flow: 244 default questions, 264 lifecycle questions, 142 assurance packs, 41 Industry Packs, and 1,159 CLI paths.
         </p>
       </div>
       <div class="row wrap">
@@ -1583,13 +1583,117 @@ async function renderTransparency() {
 }
 
 async function renderPolicyPacks() {
-  const packs = await apiGet("/policy-packs/list");
+  const [packs, scopeEnvelope] = await Promise.all([
+    apiGet("/policy-packs/list"),
+    apiGet("/api/v1/policy/scope-templates")
+  ]);
+  const scopeTemplates = apiPayload(scopeEnvelope)?.templates || [];
   root.innerHTML = `
+    ${card("Reusable scopes", `
+      <div class="row wrap">
+        <label>
+          <span class="muted">Scope</span>
+          <select id="scopeTemplateSelect">
+            ${scopeTemplates.map((template) => `<option value="${htmlEscape(template.templateId)}">${htmlEscape(template.label)}</option>`).join("")}
+          </select>
+        </label>
+        <label>
+          <span class="muted">Policy Pack</span>
+          <select id="scopePackSelect">
+            ${(packs.packs || []).map((pack) => `<option value="${htmlEscape(pack.id)}">${htmlEscape(pack.id)}</option>`).join("")}
+          </select>
+        </label>
+        <button id="scopePreview" class="secondary">Preview</button>
+      </div>
+      <div class="row wrap">
+        <label>
+          <span class="muted">Exact compile ID</span>
+          <input id="scopeConfirm" type="text" placeholder="scope-compile-..." autocomplete="off" spellcheck="false" />
+        </label>
+        <button id="scopeApply" disabled>Apply</button>
+      </div>
+      <pre id="scopeOut" class="muted scroll"></pre>
+    `)}
     ${card("Policy Packs", `
       <div id="packRows" class="scroll"></div>
       <pre id="packOut" class="muted"></pre>
     `)}
   `;
+  const scopeTemplateSelect = document.getElementById("scopeTemplateSelect");
+  const scopePackSelect = document.getElementById("scopePackSelect");
+  const scopePreviewButton = document.getElementById("scopePreview");
+  const scopeConfirm = document.getElementById("scopeConfirm");
+  const scopeApplyButton = document.getElementById("scopeApply");
+  const scopeOut = document.getElementById("scopeOut");
+  let scopePreview = null;
+  let scopeBusy = false;
+  const updateScopeApplyState = () => {
+    scopeTemplateSelect.disabled = scopeBusy;
+    scopePackSelect.disabled = scopeBusy;
+    scopePreviewButton.disabled = scopeBusy;
+    scopeConfirm.disabled = scopeBusy;
+    scopeApplyButton.disabled = scopeBusy || !scopePreview?.canApply || scopeConfirm.value.trim() !== scopePreview.compileId;
+  };
+  const clearScopePreview = () => {
+    scopePreview = null;
+    scopeConfirm.value = "";
+    scopeOut.textContent = "";
+    updateScopeApplyState();
+  };
+  scopeTemplateSelect.addEventListener("change", clearScopePreview);
+  scopePackSelect.addEventListener("change", clearScopePreview);
+  scopePreviewButton.addEventListener("click", async () => {
+    if (scopeBusy) return;
+    scopeBusy = true;
+    updateScopeApplyState();
+    try {
+      const envelope = await apiPost("/api/v1/policy/scope-templates/compile", {
+        templateId: scopeTemplateSelect.value,
+        packId: scopePackSelect.value
+      });
+      scopePreview = apiPayload(envelope);
+      scopeConfirm.value = "";
+      scopeOut.textContent = JSON.stringify(scopePreview, null, 2);
+      updateScopeApplyState();
+      setStatus(scopePreview.canApply ? "Scope preview ready." : "Scope preview has no changes.");
+    } catch (error) {
+      scopePreview = null;
+      scopeOut.textContent = errText(error);
+      updateScopeApplyState();
+      setStatus("Scope preview blocked.", true);
+    } finally {
+      scopeBusy = false;
+      updateScopeApplyState();
+    }
+  });
+  scopeConfirm.addEventListener("input", updateScopeApplyState);
+  scopeApplyButton.addEventListener("click", async () => {
+    if (scopeBusy || !scopePreview || scopeConfirm.value.trim() !== scopePreview.compileId) return;
+    scopeBusy = true;
+    updateScopeApplyState();
+    try {
+      const envelope = await apiPost("/api/v1/policy/scope-templates/apply", {
+        templateId: scopePreview.template.templateId,
+        packId: scopePreview.pack.packId,
+        confirmCompileId: scopePreview.compileId
+      });
+      const applied = apiPayload(envelope);
+      scopeOut.textContent = JSON.stringify(applied, null, 2);
+      scopePreview = null;
+      scopeConfirm.value = "";
+      updateScopeApplyState();
+      setStatus(applied.applied ? "Scope applied." : "Scope unchanged.");
+      await refreshUnifiedBanner();
+    } catch (error) {
+      scopeOut.textContent = errText(error);
+      scopePreview = null;
+      scopeConfirm.value = "";
+      setStatus("Scope apply blocked.", true);
+    } finally {
+      scopeBusy = false;
+      updateScopeApplyState();
+    }
+  });
   const rows = document.getElementById("packRows");
   rows.innerHTML = (packs.packs || [])
     .map(

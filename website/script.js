@@ -72,15 +72,15 @@ var PRODUCTS=[
     {label:'generated fix',value:'.amc/guardrails/dlp-base64.yaml'},
     {label:'report',value:'.amc/shield/latest.md'}
   ]},
-  {name:'amc enforce',title:'Enforce',headline:'Wrap agent actions in policy',summary:'Approval gates, scoped permissions, and runtime controls for sensitive operations.',badges:['policy engine','step-up auth','budget controls'],info:[{label:'what it does',title:'Constrains dangerous actions',text:'Puts hard rules around delete, send, deploy, spend, and prod access.'},{label:'why it matters',title:'Trust without enforcement is theater',text:'Policies must bite at runtime, not live as dead docs in a repo.'},{label:'output',title:'Enforced runtime config',text:'Applies governance rules that your operator and auditor can inspect.'}],lines:[
-    {type:'code',label:'$ amc enforce --policy strict --require-approval delete,send'},
-    {label:'policy profile',value:'strict'},
-    {label:'approval gates',value:'delete · send · deploy'},
-    {label:'scope limits',value:'read-only on /prod/*'},
-    {label:'budget cap',value:'$2.50 per run'},
-    {label:'active rules',value:'14 runtime controls'},
-    {label:'step-up auth',value:'enabled on sensitive actions'},
-    {label:'config',value:'.amc/enforce/policy.yaml'}
+  {name:'amc enforce',title:'Enforce',headline:'Reuse policy without losing proof',summary:'Preview one immutable action-class scope, merge rules from an existing Policy Pack, and apply only after exact confirmation.',badges:['signed policies','exact confirmation','fleet-wide scope'],info:[{label:'what it does',title:'Changes only the selected action classes',text:'Compiles a bounded scope into the existing signed Action and Approval Policies while preserving every unselected rule.'},{label:'why it matters',title:'Narrow changes need a clear blast radius',text:'Workspace policies remain fleet-wide, and stale or untrusted state fails closed before mutation.'},{label:'output',title:'Verified policy + evidence',text:'Returns candidate hashes, a content-bound compile ID, transparency proof, and a ledger receipt.'}],lines:[
+    {type:'code',label:'$ amc policy scope compile release-external --pack code-agent.high'},
+    {label:'scope',value:'workspace · fleet-wide'},
+    {label:'action classes',value:'DEPLOY · NETWORK_EXTERNAL'},
+    {label:'unselected rules',value:'preserved'},
+    {label:'compile ID',value:'scope-compile-...'},
+    {type:'code',label:'$ amc policy scope apply release-external --pack code-agent.high --confirm <compileId>'},
+    {label:'policy signatures',value:'verified'},
+    {label:'evidence',value:'transparency + ledger receipt'}
   ]},
   {name:'amc vault',title:'Vault',headline:'Cryptographically prove what happened',summary:'Signs evidence, verifies ledgers, and gives auditors a tamper-evident chain of custody.',badges:['Ed25519 signing','Merkle chain','audit-ready'],info:[{label:'what it does',title:'Creates verifiable evidence',text:'Every artifact can be signed, chained, and checked independently.'},{label:'why it matters',title:'Because “trust me” is not evidence',text:'Teams need proof that survives handoffs, audits, and disputes.'},{label:'output',title:'Evidence chain + signatures',text:'Produces a ledger with hashes, proofs, and verification metadata.'}],lines:[
     {type:'code',label:'$ amc vault verify --chain .amc/evidence/'},

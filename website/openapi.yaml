@@ -853,7 +853,7 @@ components:
     ProjectedControl:
       type: object
       additionalProperties: false
-      required: [controlId, label, scope, when, requestedAction, effectiveAction, status, trusted, sourceRefs, reasons]
+      required: [controlId, label, scope, when, requestedAction, effectiveAction, status, trusted, scopeTemplateIds, sourceRefs, reasons]
       properties:
         controlId: { type: string }
         label: { type: string }
@@ -871,6 +871,12 @@ components:
           type: string
           enum: [active, inactive, fail_closed, unavailable]
         trusted: { type: boolean }
+        scopeTemplateIds:
+          type: array
+          maxItems: 1
+          items:
+            type: string
+            enum: [read-only, workspace-change, release-external, privileged-sensitive]
         sourceRefs:
           type: array
           items:
@@ -961,6 +967,178 @@ components:
           enum: [true]
         data:
           $ref: '#/components/schemas/ControlProjection'
+
+    ScopeTemplate:
+      type: object
+      additionalProperties: false
+      required: [schemaVersion, templateId, version, label, description, actionClasses]
+      properties:
+        schemaVersion:
+          type: string
+          enum: ['2026-07-11']
+        templateId:
+          type: string
+          enum: [read-only, workspace-change, release-external, privileged-sensitive]
+        version:
+          type: integer
+          enum: [1]
+        label: { type: string, minLength: 1, maxLength: 80 }
+        description: { type: string, minLength: 1, maxLength: 240 }
+        actionClasses:
+          type: array
+          minItems: 1
+          maxItems: 9
+          uniqueItems: true
+          items:
+            type: string
+            enum: [READ_ONLY, WRITE_LOW, WRITE_HIGH, DEPLOY, SECURITY, FINANCIAL, NETWORK_EXTERNAL, DATA_EXPORT, IDENTITY]
+
+    ScopeTemplateCompileRequest:
+      type: object
+      additionalProperties: false
+      required: [templateId, packId]
+      properties:
+        templateId:
+          type: string
+          enum: [read-only, workspace-change, release-external, privileged-sensitive]
+        packId: { type: string, pattern: '^[a-z0-9][a-z0-9.-]*$', maxLength: 120 }
+
+    ScopeTemplateApplyRequest:
+      type: object
+      additionalProperties: false
+      required: [templateId, packId, confirmCompileId]
+      properties:
+        templateId:
+          type: string
+          enum: [read-only, workspace-change, release-external, privileged-sensitive]
+        packId: { type: string, pattern: '^[a-z0-9][a-z0-9.-]*$', maxLength: 120 }
+        confirmCompileId: { type: string, pattern: '^scope-compile-[a-f0-9]{16}$' }
+
+    ScopeTemplatePolicyChangeCell:
+      type: object
+      additionalProperties: false
+      required: [changed, beforeSha256, afterSha256]
+      properties:
+        changed: { type: boolean }
+        beforeSha256: { type: string, pattern: '^[a-f0-9]{64}$' }
+        afterSha256: { type: string, pattern: '^[a-f0-9]{64}$' }
+
+    ScopeTemplatePolicyChange:
+      type: object
+      additionalProperties: false
+      required: [actionClass, actionPolicy, approvalPolicy]
+      properties:
+        actionClass:
+          type: string
+          enum: [READ_ONLY, WRITE_LOW, WRITE_HIGH, DEPLOY, SECURITY, FINANCIAL, NETWORK_EXTERNAL, DATA_EXPORT, IDENTITY]
+        actionPolicy: { $ref: '#/components/schemas/ScopeTemplatePolicyChangeCell' }
+        approvalPolicy: { $ref: '#/components/schemas/ScopeTemplatePolicyChangeCell' }
+
+    ScopeTemplatePolicyHashes:
+      type: object
+      additionalProperties: false
+      required: [actionPolicySha256, approvalPolicySha256]
+      properties:
+        actionPolicySha256: { type: string, pattern: '^[a-f0-9]{64}$' }
+        approvalPolicySha256: { type: string, pattern: '^[a-f0-9]{64}$' }
+
+    ScopeTemplateCompilation:
+      type: object
+      additionalProperties: false
+      required: [schemaVersion, compileId, scope, fleetBoundary, template, pack, status, canApply, baseline, candidate, changes]
+      properties:
+        schemaVersion:
+          type: string
+          enum: ['2026-07-11']
+        compileId: { type: string, pattern: '^scope-compile-[a-f0-9]{16}$' }
+        scope:
+          type: string
+          enum: [workspace]
+        fleetBoundary: { type: string }
+        template: { $ref: '#/components/schemas/ScopeTemplate' }
+        pack:
+          type: object
+          additionalProperties: false
+          required: [packId, name, riskTier]
+          properties:
+            packId: { type: string }
+            name: { type: string }
+            riskTier:
+              type: string
+              enum: [low, medium, high, critical]
+        status:
+          type: string
+          enum: [ready, no_changes]
+        canApply: { type: boolean }
+        baseline: { $ref: '#/components/schemas/ScopeTemplatePolicyHashes' }
+        candidate: { $ref: '#/components/schemas/ScopeTemplatePolicyHashes' }
+        changes:
+          type: array
+          minItems: 1
+          maxItems: 4
+          items: { $ref: '#/components/schemas/ScopeTemplatePolicyChange' }
+
+    ScopeTemplateApplyResult:
+      type: object
+      additionalProperties: false
+      required: [schemaVersion, applied, reason, compileId, compilation, transparencyHash, auditEventId]
+      properties:
+        schemaVersion:
+          type: string
+          enum: ['2026-07-11']
+        applied: { type: boolean }
+        reason:
+          type: string
+          enum: [NO_CHANGES]
+          nullable: true
+        compileId: { type: string, pattern: '^scope-compile-[a-f0-9]{16}$' }
+        compilation: { $ref: '#/components/schemas/ScopeTemplateCompilation' }
+        transparencyHash:
+          type: string
+          pattern: '^[a-f0-9]{64}$'
+          nullable: true
+        auditEventId:
+          type: string
+          nullable: true
+
+    ScopeTemplateCatalogResponse:
+      type: object
+      additionalProperties: false
+      required: [ok, data]
+      properties:
+        ok:
+          type: boolean
+          enum: [true]
+        data:
+          type: object
+          additionalProperties: false
+          required: [templates]
+          properties:
+            templates:
+              type: array
+              minItems: 4
+              maxItems: 4
+              items: { $ref: '#/components/schemas/ScopeTemplate' }
+
+    ScopeTemplateCompilationResponse:
+      type: object
+      additionalProperties: false
+      required: [ok, data]
+      properties:
+        ok:
+          type: boolean
+          enum: [true]
+        data: { $ref: '#/components/schemas/ScopeTemplateCompilation' }
+
+    ScopeTemplateApplyResponse:
+      type: object
+      additionalProperties: false
+      required: [ok, data]
+      properties:
+        ok:
+          type: boolean
+          enum: [true]
+        data: { $ref: '#/components/schemas/ScopeTemplateApplyResult' }
 
     EnforceResourceIntegrity:
       type: object
@@ -2785,6 +2963,61 @@ paths:
           description: Unauthorized
         '500':
           description: Control projection failed
+
+  /v1/policy/scope-templates:
+    get:
+      tags: [policy, enforce, fleet]
+      summary: List immutable AMC action-class scope templates
+      responses:
+        '200':
+          description: Bounded scope template catalog
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ScopeTemplateCatalogResponse' }
+        '401': { description: Unauthorized }
+        '500': { description: Scope template catalog unavailable }
+
+  /v1/policy/scope-templates/compile:
+    post:
+      tags: [policy, enforce, fleet]
+      summary: Compile a selected action-class scope without writing policy
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ScopeTemplateCompileRequest' }
+      responses:
+        '200':
+          description: Deterministic read-only scope preview
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ScopeTemplateCompilationResponse' }
+        '400': { description: Unknown template, Policy Pack, or invalid policy schema }
+        '401': { description: Unauthorized }
+        '409': { description: Current signed policy baseline is untrusted or changed }
+        '500': { description: Scope template compilation failed }
+
+  /v1/policy/scope-templates/apply:
+    post:
+      tags: [policy, enforce, fleet]
+      summary: Apply a scope preview after exact compile-ID confirmation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ScopeTemplateApplyRequest' }
+      responses:
+        '200':
+          description: No-op or signed scope apply result
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ScopeTemplateApplyResponse' }
+        '400': { description: Unknown template, Policy Pack, or invalid policy schema }
+        '401': { description: Unauthorized }
+        '403': { description: Owner role required or read-only mode active }
+        '409': { description: Exact compile confirmation or trusted baseline is unavailable }
+        '423': { description: Another policy scope operation holds the writer lock }
+        '500': { description: Policy write, sign, or post-verification failed }
 
   /v1/policy/simulate:
     post:

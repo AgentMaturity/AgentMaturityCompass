@@ -45,7 +45,7 @@ const CATEGORIES = [
   {
     name: 'Governance & Policy',
     icon: '08',
-    docs: ['GOVERNANCE', 'COMMUNITY', 'SUPPORT_POLICY', 'MODEL_GOVERNANCE', 'GOVERNOR', 'CONTROL_PROJECTION', 'CONTROL_SIMULATION', 'POLICY_EXPORT', 'POLICY_PACKS', 'PROMPT_POLICY', 'APPROVALS', 'DUAL_CONTROL_APPROVALS', 'WAIVERS', 'LEASES', 'BUDGETS', 'NO_CODE_GOVERNANCE', 'VALUE_CONTRACTS', 'VALUE_GATES', 'VALUE_INGESTION', 'VALUE_REALIZATION']
+    docs: ['GOVERNANCE', 'COMMUNITY', 'SUPPORT_POLICY', 'MODEL_GOVERNANCE', 'GOVERNOR', 'CONTROL_PROJECTION', 'CONTROL_SIMULATION', 'SCOPE_TEMPLATES', 'POLICY_EXPORT', 'POLICY_PACKS', 'PROMPT_POLICY', 'APPROVALS', 'DUAL_CONTROL_APPROVALS', 'WAIVERS', 'LEASES', 'BUDGETS', 'NO_CODE_GOVERNANCE', 'VALUE_CONTRACTS', 'VALUE_GATES', 'VALUE_INGESTION', 'VALUE_REALIZATION']
   },
   {
     name: 'Operations',
@@ -114,7 +114,7 @@ const ALL_DOCS = [
   'RED_TEAMING_GUIDE','REGISTRY','RELEASE_RUNBOOK','RELEASING','RESEARCH_PAPERS_2026','RUNTIMES','RUNTIME_SDK',
   'SANDBOX','SCIM','SCORING_METHODOLOGY','SDK','SDK_VERSIONING','SECTOR_PACKS','SECURITY',
   'SECURITY_ARCHITECTURE_OVERVIEW','SECURITY_DEPLOYMENT','SHIELD_ENFORCE_REFERENCE',
-  'SOLO_USER','SSO_OIDC','SSO_SAML','STANDARDS_MAPPING','STUDIO','SUPPLY_CHAIN',
+  'SOLO_USER','SCOPE_TEMPLATES','SSO_OIDC','SSO_SAML','STANDARDS_MAPPING','STUDIO','SUPPLY_CHAIN',
   'SYSTEM_CAPABILITIES','THREAT_MODEL','TICKETS','TOOLHUB','TRANSPARENCY',
   'TRANSPARENCY_MERKLE','TRANSPARENCY_REPORT','TRUTHGUARD','UPGRADE_AUTOPILOT',
   'VALIDITY_FRAMEWORK','VALUE_CONTRACTS','VALUE_GATES',
@@ -199,7 +199,7 @@ const PUBLIC_DOC_IDS = new Set([
   'HARDWARE_TRUST', 'ZERO_KEYS', 'VAULT', 'RBAC', 'IDENTITY', 'SUPPLY_CHAIN', 'PLUGIN_SUPPLY_CHAIN',
 
   // Governance and policy
-  'GOVERNANCE', 'MODEL_GOVERNANCE', 'CONTROL_PROJECTION', 'CONTROL_SIMULATION', 'POLICY_PACKS', 'PROMPT_POLICY', 'APPROVALS',
+  'GOVERNANCE', 'MODEL_GOVERNANCE', 'CONTROL_PROJECTION', 'CONTROL_SIMULATION', 'SCOPE_TEMPLATES', 'POLICY_PACKS', 'PROMPT_POLICY', 'APPROVALS',
   'DUAL_CONTROL_APPROVALS', 'WAIVERS', 'LEASES', 'BUDGETS', 'SUPPORT_POLICY', 'COMMUNITY',
 
   // Operations and deployment
@@ -664,7 +664,7 @@ function showWelcome() {
         <div class="stat-card"><div class="num">${PUBLIC_DOCS.length}</div><div class="label">Public Guides</div></div>
         <div class="stat-card"><div class="num">${PUBLIC_CATEGORIES.length}</div><div class="label">Categories</div></div>
         <div class="stat-card"><div class="num">244</div><div class="label">Default Questions</div></div>
-        <div class="stat-card"><div class="num">1,155</div><div class="label">CLI Paths</div></div>
+        <div class="stat-card"><div class="num">1,159</div><div class="label">CLI Paths</div></div>
         <div class="stat-card"><div class="num">41</div><div class="label">Industry Packs</div></div>
         <div class="stat-card"><div class="num">14</div><div class="label">Framework Adapters</div></div>
       </div>

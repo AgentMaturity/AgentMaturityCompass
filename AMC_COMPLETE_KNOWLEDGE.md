@@ -1,7 +1,7 @@
 # AMC Complete Knowledge Base
 ## Agent Maturity Compass — Full Codebase Reference
 
-**Compiled:** April 2026; refreshed 2026-07-10 from repository verification
+**Compiled:** April 2026; refreshed 2026-07-11 from repository verification
 **Repo:** /Users/sid/AgentMaturityCompass
 **GitHub:** AgentMaturity/AgentMaturityCompass
 **License:** MIT
@@ -22,8 +22,8 @@ AMC is an open-source, evidence-based framework for measuring, comparing, and co
 - 41 industry domain packs across 7 sectors
 - 94 scoring modules
 - 14 framework adapters
-- Test counts drift quickly; repository verification on 2026-07-10 recorded 1,050 Vitest files / 8,265 tests
-- 1,145 public `amc ...` command paths in `docs/CLI_COMMAND_INVENTORY.md` as of 2026-07-10
+- Test counts drift quickly; repository verification on 2026-07-11 recorded 1,070 Vitest files / 8,468 tests
+- 1,159 public `amc ...` command paths in `docs/CLI_COMMAND_INVENTORY.md` as of 2026-07-11
 - ~700+ TypeScript source files plus late-stage/domain CLI registration splits
 
 ---
@@ -255,6 +255,7 @@ CLI (amc) → Studio API + Console → Workspace (.amc) + Ledger + Merkle
 **Safety:** safetyDSL (E15, inspired by AgentSpec/NeMo Colang), formalVerification (E34, 994 lines), semanticGuardrails
 **Operational:** dryRun (E17), idempotency (E29), temporalControls (E27), geoFence (E28)
 **Evidence:** evidenceEmitter (SQLite guard_events), evidenceContract (E24), consensus, modeSwitcher
+**Reusable scopes:** `scopeTemplates.ts` groups the nine existing action classes into four immutable workspace-wide templates. It compiles selected rules from existing built-in Policy Packs into the signed Action and Approval Policy schemas, preserves unselected rules, previews without writes, requires an exact content-bound compile ID, restores prior policy/signature bytes on write/sign/verification failure, and emits existing transparency plus ledger evidence. CLI, API, Studio, OpenAPI, and the verified control projection share the same compiler; no second policy language or per-agent scope exists.
 
 ### 4.5 Shield — src/shield/ (23+ modules, S-codes)
 
@@ -506,7 +507,7 @@ Request Token → Present Token → Verify (signature, expiry, claims)
 
 ### 9.1 Scale
 - Counts drift quickly because the source-review wave adds many boundary suites.
-- Repository verification on 2026-07-10 recorded `npm test -- --reporter=dot` passing at 1,050 files / 8,265 tests.
+- Repository verification on 2026-07-11 recorded `npm test -- --reporter=dot` passing at 1,070 files / 8,468 tests.
 - 7 Playwright E2E specs remain part of the broader test surface.
 
 ### 9.2 Framework
@@ -566,7 +567,7 @@ Request Token → Present Token → Verify (signature, expiry, claims)
 **Core: FREE forever (MIT)**
 - Full trust stack (Score, Shield, Enforce, Vault, Watch, Fleet, Passport, Comply)
 - All 14 framework adapters
-- 1,145 public `amc ...` command paths as of 2026-07-10
+- 1,159 public `amc ...` command paths as of 2026-07-11
 - 244 default diagnostic questions plus the 264-question lifecycle-expanded set
 - 142 assurance packs
 
@@ -682,7 +683,7 @@ amc comply report
 
 # Build & test
 npm run build
-npm test                    # count drifts; repository verification recorded 1,050 files / 8,265 tests on 2026-07-10
+npm test                    # count drifts; repository verification recorded 1,070 files / 8,468 tests on 2026-07-11
 npm run typecheck
 npm run test:e2e            # Playwright
 ```

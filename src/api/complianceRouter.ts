@@ -6,7 +6,48 @@
 
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import type { ComplianceFramework } from '../compliance/frameworks.js';
+import { verifyUsersConfigSignature } from '../auth/authApi.js';
 import { bodyJson, bodyJsonSchema, apiSuccess, apiError, isRequestBodyError, pathParam, queryParam } from './apiHelpers.js';
+import { verifyTrustConfigSignature } from '../trust/trustConfig.js';
+
+const SCOPE_TEMPLATE_ERROR_CODES = new Set([
+  'TEMPLATE_NOT_FOUND',
+  'PACK_NOT_FOUND',
+  'BASELINE_UNTRUSTED',
+  'POLICY_SCHEMA_INVALID',
+  'POLICY_DUPLICATE_ACTION',
+  'PACK_SCOPE_INCOMPLETE',
+  'CONFIRMATION_REQUIRED',
+  'STATE_CHANGED',
+  'LOCK_BUSY',
+  'APPLY_FAILED',
+]);
+
+function scopeTemplateErrorCode(error: unknown): string | null {
+  if (!(error instanceof Error) || error.name !== 'ScopeTemplateError') return null;
+  const code = (error as Error & { code?: unknown }).code;
+  return typeof code === 'string' && SCOPE_TEMPLATE_ERROR_CODES.has(code) ? code : null;
+}
+
+function scopeTemplateHttpStatus(error: unknown): number {
+  if (isRequestBodyError(error)) return 400;
+  const code = scopeTemplateErrorCode(error);
+  if (!code) return 500;
+  if (code === 'LOCK_BUSY') return 423;
+  if (code === 'APPLY_FAILED') return 500;
+  if (
+    code === 'BASELINE_UNTRUSTED'
+    || code === 'CONFIRMATION_REQUIRED'
+    || code === 'STATE_CHANGED'
+  ) return 409;
+  return 400;
+}
+
+function scopeTemplateHttpMessage(error: unknown): string {
+  const code = scopeTemplateErrorCode(error);
+  if (code && error instanceof Error) return `${code}: ${error.message}`;
+  return isRequestBodyError(error) ? 'INVALID_REQUEST: Invalid scope template request.' : 'APPLY_FAILED: Scope template operation failed.';
+}
 
 export async function handleComplianceRoute(
   pathname: string,
@@ -156,6 +197,44 @@ export async function handleComplianceRoute(
 
   // ── Policy routes (/api/v1/policy/*) ───────────────────────────
   if (pathname.startsWith('/api/v1/policy')) {
+    if (pathname === '/api/v1/policy/scope-templates' && method === 'GET') {
+      try {
+        const { listScopeTemplates } = await import('../enforce/scopeTemplates.js');
+        apiSuccess(res, { templates: listScopeTemplates() });
+      } catch {
+        apiError(res, 500, 'APPLY_FAILED: Scope template catalog failed.');
+      }
+      return true;
+    }
+
+    if (pathname === '/api/v1/policy/scope-templates/compile' && method === 'POST') {
+      try {
+        const { compileScopeTemplate, scopeTemplateCompileRequestSchema } = await import('../enforce/scopeTemplates.js');
+        const body = await bodyJsonSchema(req, scopeTemplateCompileRequestSchema);
+        apiSuccess(res, compileScopeTemplate({ workspace, ...body }));
+      } catch (error) {
+        apiError(res, scopeTemplateHttpStatus(error), scopeTemplateHttpMessage(error));
+      }
+      return true;
+    }
+
+    if (pathname === '/api/v1/policy/scope-templates/apply' && method === 'POST') {
+      try {
+        const { applyScopeTemplate, scopeTemplateApplyRequestSchema } = await import('../enforce/scopeTemplates.js');
+        const users = verifyUsersConfigSignature(workspace);
+        const trust = verifyTrustConfigSignature(workspace);
+        if ((users.signatureExists && !users.valid) || !trust.valid) {
+          apiError(res, 403, 'READ_ONLY_MODE: Signed identity or trust configuration is not valid.');
+          return true;
+        }
+        const body = await bodyJsonSchema(req, scopeTemplateApplyRequestSchema);
+        apiSuccess(res, applyScopeTemplate({ workspace, ...body }));
+      } catch (error) {
+        apiError(res, scopeTemplateHttpStatus(error), scopeTemplateHttpMessage(error));
+      }
+      return true;
+    }
+
     // POST /api/v1/policy/simulate — run an existing control evaluator without recording
     if (pathname === '/api/v1/policy/simulate' && method === 'POST') {
       try {

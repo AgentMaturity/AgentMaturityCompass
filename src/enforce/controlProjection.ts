@@ -20,6 +20,7 @@ import {
 } from "./guardrailControlState.js";
 import { AVAILABLE_GUARDRAILS } from "./guardrailProfiles.js";
 import { inspectRuntimeFirewallPolicy, type RuntimeFirewallMode } from "../runtime/firewall.js";
+import { scopeTemplateIdsForActionClass, type ScopeTemplateId } from "./scopeTemplates.js";
 
 export const CONTROL_PROJECTION_SCHEMA_VERSION = "2026-07-11" as const;
 
@@ -59,6 +60,7 @@ export interface ProjectedControl {
   effectiveAction: ProjectedControlAction;
   status: ProjectedControlStatus;
   trusted: boolean;
+  scopeTemplateIds: ScopeTemplateId[];
   sourceRefs: ControlProjectionSource["sourceId"][];
   reasons: string[];
 }
@@ -246,6 +248,7 @@ function runtimeFamily(workspace: string): ControlFamilyProjection {
       effectiveAction: forceBlock ? "block" : requestedAction,
       status: forceBlock ? "fail_closed" : requested ? "active" : "inactive",
       trusted: integrity === "trusted",
+      scopeTemplateIds: [],
       sourceRefs,
       reasons,
     };
@@ -343,6 +346,7 @@ function actionFamily(workspace: string): ControlFamilyProjection {
           effectiveAction: integrity === "trusted" ? requestedAction : "simulate",
           status: integrity === "trusted" ? "active" : "fail_closed",
           trusted: integrity === "trusted",
+          scopeTemplateIds: scopeTemplateIdsForActionClass(actionClass),
           sourceRefs: ["action-policy"],
           reasons: integrity === "trusted"
             ? [rule ? "Projected from the signed Action Policy rule." : `Signed default mode ${policy!.defaultMode} applies.`]
@@ -359,6 +363,7 @@ function actionFamily(workspace: string): ControlFamilyProjection {
           effectiveAction: "simulate",
           status: "fail_closed",
           trusted: false,
+          scopeTemplateIds: scopeTemplateIdsForActionClass(actionClass),
           sourceRefs: ["action-policy"],
           reasons: [reason, "EXECUTE is unavailable; the Action Policy evaluator fails closed to SIMULATE."],
         }))
@@ -438,6 +443,7 @@ function approvalFamily(workspace: string): ControlFamilyProjection {
           effectiveAction: integrity === "trusted" ? requestedAction : "deny",
           status: integrity === "trusted" ? "active" : "fail_closed",
           trusted: integrity === "trusted",
+          scopeTemplateIds: scopeTemplateIdsForActionClass(actionClass),
           sourceRefs: ["approval-policy"],
           reasons: integrity === "trusted"
             ? [rule ? "Projected from the signed Approval Policy rule." : "The signed policy omits this action class, so approval creation is denied."]
@@ -454,6 +460,7 @@ function approvalFamily(workspace: string): ControlFamilyProjection {
           effectiveAction: "deny",
           status: "fail_closed",
           trusted: false,
+          scopeTemplateIds: scopeTemplateIdsForActionClass(actionClass),
           sourceRefs: ["approval-policy"],
           reasons: [reason, "Approval requests are denied when Approval Policy trust is unavailable."],
         }))

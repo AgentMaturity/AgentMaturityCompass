@@ -19,6 +19,7 @@ Each row answers four operator questions:
 | When | The signed conditions, threshold, quorum, trust tier, or assurance requirement that applies |
 | Then | Requested action followed by the effective action AMC can safely take now |
 | Status | Active, inactive, unavailable, or fail closed, plus whether the source is trusted |
+| Scope template | The one immutable AMC action-class group for Action and Approval controls; Runtime controls have none |
 
 The three families are:
 
@@ -67,7 +68,11 @@ amc firewall enable --mode warn
 amc guardrails enable prompt-injection-detection
 amc policy action init
 amc policy approval init
+amc policy scope list
+amc policy scope compile release-external --pack code-agent.high
 amc policy controls
 ```
 
 For automation, treat CLI exit 2 or JSON `status: "fail_closed"` as an integrity failure. Do not infer that a requested action was executed, approved, or blocked from this read-only inventory; use the existing signed decision and lifecycle receipts for execution proof.
+
+Reusable scope templates do not change evaluator semantics. They compile selected rules from an existing built-in Policy Pack into the same signed Action and Approval Policy schemas while preserving unselected rules. See [Reusable Policy Scope Templates](SCOPE_TEMPLATES.md).

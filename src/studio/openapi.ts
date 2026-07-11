@@ -377,6 +377,56 @@ function studioEndpoints(): Record<string, Record<string, OpenApiOperation>> {
         },
       },
     },
+    "/api/v1/policy/scope-templates": {
+      get: {
+        summary: "List immutable AMC action-class scope templates",
+        tags: ["Studio", "Enforce", "Fleet", "Policy"],
+        security: [{ adminToken: [] }, { sessionCookie: [] }],
+        responses: {
+          "200": okJson("Bounded scope template catalog", "#/components/schemas/ScopeTemplateCatalogResponse"),
+          "401": errJson("Unauthorized"),
+          "500": errJson("Scope template catalog unavailable"),
+        },
+      },
+    },
+    "/api/v1/policy/scope-templates/compile": {
+      post: {
+        summary: "Compile a selected action-class scope without writing policy",
+        tags: ["Studio", "Enforce", "Fleet", "Policy"],
+        security: [{ adminToken: [] }, { sessionCookie: [] }],
+        requestBody: {
+          required: true,
+          content: { "application/json": { schema: { $ref: "#/components/schemas/ScopeTemplateCompileRequest" } } },
+        },
+        responses: {
+          "200": okJson("Deterministic read-only scope preview", "#/components/schemas/ScopeTemplateCompilationResponse"),
+          "400": errJson("Unknown template, Policy Pack, or invalid policy schema"),
+          "401": errJson("Unauthorized"),
+          "409": errJson("Current signed policy baseline is untrusted or changed"),
+          "500": errJson("Scope template compilation failed"),
+        },
+      },
+    },
+    "/api/v1/policy/scope-templates/apply": {
+      post: {
+        summary: "Apply a scope preview after exact compile-ID confirmation",
+        tags: ["Studio", "Enforce", "Fleet", "Policy"],
+        security: [{ adminToken: [] }, { sessionCookie: [] }],
+        requestBody: {
+          required: true,
+          content: { "application/json": { schema: { $ref: "#/components/schemas/ScopeTemplateApplyRequest" } } },
+        },
+        responses: {
+          "200": okJson("No-op or signed scope apply result", "#/components/schemas/ScopeTemplateApplyResponse"),
+          "400": errJson("Unknown template, Policy Pack, or invalid policy schema"),
+          "401": errJson("Unauthorized"),
+          "403": errJson("Owner role required or read-only mode active"),
+          "409": errJson("Exact compile confirmation or trusted baseline is unavailable"),
+          "423": errJson("Another policy scope operation holds the writer lock"),
+          "500": errJson("Policy write, sign, or post-verification failed"),
+        },
+      },
+    },
     "/api/v1/enforce/resources/status": {
       get: {
         summary: "Read the signed active, previous, rollback, drift, and integrity state",
@@ -770,10 +820,15 @@ function studioSchemas(): Record<string, unknown> {
         effectiveAction: { type: "string", enum: ["observe", "warn", "block", "execute", "simulate", "deny", "require_approval", "allow", "inactive", "unavailable"] },
         status: { type: "string", enum: ["active", "inactive", "fail_closed", "unavailable"] },
         trusted: { type: "boolean" },
+        scopeTemplateIds: {
+          type: "array",
+          maxItems: 1,
+          items: { type: "string", enum: ["read-only", "workspace-change", "release-external", "privileged-sensitive"] },
+        },
         sourceRefs: { type: "array", items: { type: "string", enum: ["runtime-firewall-policy", "guardrail-control-state", "action-policy", "approval-policy"] } },
         reasons: { type: "array", items: { type: "string" } },
       },
-      required: ["controlId", "label", "scope", "when", "requestedAction", "effectiveAction", "status", "trusted", "sourceRefs", "reasons"],
+      required: ["controlId", "label", "scope", "when", "requestedAction", "effectiveAction", "status", "trusted", "scopeTemplateIds", "sourceRefs", "reasons"],
     },
     ControlFamilyProjection: {
       type: "object",
@@ -838,6 +893,140 @@ function studioSchemas(): Record<string, unknown> {
         ok: { type: "boolean", const: true },
         data: { $ref: "#/components/schemas/ControlProjection" },
       },
+      required: ["ok", "data"],
+    },
+    ScopeTemplate: {
+      type: "object",
+      additionalProperties: false,
+      properties: {
+        schemaVersion: { type: "string", const: "2026-07-11" },
+        templateId: { type: "string", enum: ["read-only", "workspace-change", "release-external", "privileged-sensitive"] },
+        version: { type: "integer", const: 1 },
+        label: { type: "string", minLength: 1, maxLength: 80 },
+        description: { type: "string", minLength: 1, maxLength: 240 },
+        actionClasses: {
+          type: "array",
+          minItems: 1,
+          maxItems: 9,
+          uniqueItems: true,
+          items: { type: "string", enum: ["READ_ONLY", "WRITE_LOW", "WRITE_HIGH", "DEPLOY", "SECURITY", "FINANCIAL", "NETWORK_EXTERNAL", "DATA_EXPORT", "IDENTITY"] },
+        },
+      },
+      required: ["schemaVersion", "templateId", "version", "label", "description", "actionClasses"],
+    },
+    ScopeTemplateCompileRequest: {
+      type: "object",
+      additionalProperties: false,
+      properties: {
+        templateId: { type: "string", enum: ["read-only", "workspace-change", "release-external", "privileged-sensitive"] },
+        packId: { type: "string", pattern: "^[a-z0-9][a-z0-9.-]*$", maxLength: 120 },
+      },
+      required: ["templateId", "packId"],
+    },
+    ScopeTemplateApplyRequest: {
+      type: "object",
+      additionalProperties: false,
+      properties: {
+        templateId: { type: "string", enum: ["read-only", "workspace-change", "release-external", "privileged-sensitive"] },
+        packId: { type: "string", pattern: "^[a-z0-9][a-z0-9.-]*$", maxLength: 120 },
+        confirmCompileId: { type: "string", pattern: "^scope-compile-[a-f0-9]{16}$" },
+      },
+      required: ["templateId", "packId", "confirmCompileId"],
+    },
+    ScopeTemplatePolicyChange: {
+      type: "object",
+      additionalProperties: false,
+      properties: {
+        actionClass: { type: "string", enum: ["READ_ONLY", "WRITE_LOW", "WRITE_HIGH", "DEPLOY", "SECURITY", "FINANCIAL", "NETWORK_EXTERNAL", "DATA_EXPORT", "IDENTITY"] },
+        actionPolicy: { $ref: "#/components/schemas/ScopeTemplatePolicyChangeCell" },
+        approvalPolicy: { $ref: "#/components/schemas/ScopeTemplatePolicyChangeCell" },
+      },
+      required: ["actionClass", "actionPolicy", "approvalPolicy"],
+    },
+    ScopeTemplatePolicyChangeCell: {
+      type: "object",
+      additionalProperties: false,
+      properties: {
+        changed: { type: "boolean" },
+        beforeSha256: { type: "string", pattern: "^[a-f0-9]{64}$" },
+        afterSha256: { type: "string", pattern: "^[a-f0-9]{64}$" },
+      },
+      required: ["changed", "beforeSha256", "afterSha256"],
+    },
+    ScopeTemplateCompilation: {
+      type: "object",
+      additionalProperties: false,
+      properties: {
+        schemaVersion: { type: "string", const: "2026-07-11" },
+        compileId: { type: "string", pattern: "^scope-compile-[a-f0-9]{16}$" },
+        scope: { type: "string", const: "workspace" },
+        fleetBoundary: { type: "string" },
+        template: { $ref: "#/components/schemas/ScopeTemplate" },
+        pack: {
+          type: "object",
+          additionalProperties: false,
+          properties: {
+            packId: { type: "string" },
+            name: { type: "string" },
+            riskTier: { type: "string", enum: ["low", "medium", "high", "critical"] },
+          },
+          required: ["packId", "name", "riskTier"],
+        },
+        status: { type: "string", enum: ["ready", "no_changes"] },
+        canApply: { type: "boolean" },
+        baseline: { $ref: "#/components/schemas/ScopeTemplatePolicyHashes" },
+        candidate: { $ref: "#/components/schemas/ScopeTemplatePolicyHashes" },
+        changes: { type: "array", minItems: 1, maxItems: 4, items: { $ref: "#/components/schemas/ScopeTemplatePolicyChange" } },
+      },
+      required: ["schemaVersion", "compileId", "scope", "fleetBoundary", "template", "pack", "status", "canApply", "baseline", "candidate", "changes"],
+    },
+    ScopeTemplatePolicyHashes: {
+      type: "object",
+      additionalProperties: false,
+      properties: {
+        actionPolicySha256: { type: "string", pattern: "^[a-f0-9]{64}$" },
+        approvalPolicySha256: { type: "string", pattern: "^[a-f0-9]{64}$" },
+      },
+      required: ["actionPolicySha256", "approvalPolicySha256"],
+    },
+    ScopeTemplateApplyResult: {
+      type: "object",
+      additionalProperties: false,
+      properties: {
+        schemaVersion: { type: "string", const: "2026-07-11" },
+        applied: { type: "boolean" },
+        reason: { type: ["string", "null"], enum: ["NO_CHANGES", null] },
+        compileId: { type: "string", pattern: "^scope-compile-[a-f0-9]{16}$" },
+        compilation: { $ref: "#/components/schemas/ScopeTemplateCompilation" },
+        transparencyHash: { type: ["string", "null"], pattern: "^[a-f0-9]{64}$" },
+        auditEventId: { type: ["string", "null"] },
+      },
+      required: ["schemaVersion", "applied", "reason", "compileId", "compilation", "transparencyHash", "auditEventId"],
+    },
+    ScopeTemplateCatalogResponse: {
+      type: "object",
+      additionalProperties: false,
+      properties: {
+        ok: { type: "boolean", const: true },
+        data: {
+          type: "object",
+          additionalProperties: false,
+          properties: { templates: { type: "array", minItems: 4, maxItems: 4, items: { $ref: "#/components/schemas/ScopeTemplate" } } },
+          required: ["templates"],
+        },
+      },
+      required: ["ok", "data"],
+    },
+    ScopeTemplateCompilationResponse: {
+      type: "object",
+      additionalProperties: false,
+      properties: { ok: { type: "boolean", const: true }, data: { $ref: "#/components/schemas/ScopeTemplateCompilation" } },
+      required: ["ok", "data"],
+    },
+    ScopeTemplateApplyResponse: {
+      type: "object",
+      additionalProperties: false,
+      properties: { ok: { type: "boolean", const: true }, data: { $ref: "#/components/schemas/ScopeTemplateApplyResult" } },
       required: ["ok", "data"],
     },
     EnforceResourceIntegrity: {
