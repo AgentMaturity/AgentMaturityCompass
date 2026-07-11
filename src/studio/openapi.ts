@@ -377,6 +377,73 @@ function studioEndpoints(): Record<string, Record<string, OpenApiOperation>> {
         },
       },
     },
+    "/api/v1/enforce/resources/status": {
+      get: {
+        summary: "Read the signed active, previous, rollback, drift, and integrity state",
+        tags: ["Studio", "Enforce"],
+        security: [{ adminToken: [] }, { sessionCookie: [] }, { agentToken: [] }],
+        parameters: [
+          { name: "agentId", in: "query", required: false, schema: { type: "string", default: "default" } },
+        ],
+        responses: {
+          "200": okJson("Bounded signed resource lifecycle status", "#/components/schemas/EnforceResourceLifecycleStatusResponse"),
+          "401": errJson("Unauthorized"),
+        },
+      },
+    },
+    "/api/v1/enforce/resources/verify": {
+      get: {
+        summary: "Verify a canonical signed resource manifest against current workspace state",
+        tags: ["Studio", "Enforce"],
+        security: [{ adminToken: [] }, { sessionCookie: [] }, { agentToken: [] }],
+        parameters: [
+          { name: "agentId", in: "query", required: false, schema: { type: "string", default: "default" } },
+          { name: "manifestPath", in: "query", required: false, schema: { type: "string", description: "Workspace-relative canonical manifest reference" } },
+        ],
+        responses: {
+          "200": okJson("Manifest and workspace state match", "#/components/schemas/EnforceResourceVerificationResponse"),
+          "401": errJson("Unauthorized"),
+          "409": errJson("Manifest integrity failed or workspace drift was detected"),
+        },
+      },
+    },
+    "/api/v1/enforce/resources/apply": {
+      post: {
+        summary: "Preview or activate the current resource state; dry-run by default",
+        tags: ["Studio", "Enforce"],
+        security: [{ adminToken: [] }, { sessionCookie: [] }],
+        requestBody: {
+          required: false,
+          content: { "application/json": { schema: { $ref: "#/components/schemas/EnforceResourceApplyRequest" } } },
+        },
+        responses: {
+          "200": okJson("Activation preview", "#/components/schemas/EnforceResourceMutationResponse"),
+          "201": okJson("Signed resource version activated", "#/components/schemas/EnforceResourceMutationResponse"),
+          "400": errJson("Exact activation manifest confirmation required"),
+          "401": errJson("Unauthorized"),
+          "403": errJson("Owner role required"),
+          "409": errJson("Resource integrity or lifecycle gate failed"),
+        },
+      },
+    },
+    "/api/v1/enforce/resources/rollback": {
+      post: {
+        summary: "Preview or activate a canonical signed rollback target; dry-run by default",
+        tags: ["Studio", "Enforce"],
+        security: [{ adminToken: [] }, { sessionCookie: [] }],
+        requestBody: {
+          required: false,
+          content: { "application/json": { schema: { $ref: "#/components/schemas/EnforceResourceRollbackRequest" } } },
+        },
+        responses: {
+          "200": okJson("Rollback preview or signed rollback result", "#/components/schemas/EnforceResourceMutationResponse"),
+          "400": errJson("Exact rollback manifest confirmation required"),
+          "401": errJson("Unauthorized"),
+          "403": errJson("Owner role required"),
+          "409": errJson("Manifest, signature, snapshot, digest, or race integrity failed"),
+        },
+      },
+    },
     "/api/v1/policy/simulate": {
       post: {
         summary: "Simulate one projected control through its production evaluator without recording",
@@ -770,6 +837,168 @@ function studioSchemas(): Record<string, unknown> {
       properties: {
         ok: { type: "boolean", const: true },
         data: { $ref: "#/components/schemas/ControlProjection" },
+      },
+      required: ["ok", "data"],
+    },
+    EnforceResourceIntegrity: {
+      type: "object",
+      additionalProperties: false,
+      properties: {
+        valid: { type: "boolean" },
+        reasonCodes: {
+          type: "array",
+          items: {
+            type: "string",
+            enum: [
+              "MANIFEST_MISSING",
+              "MANIFEST_SCHEMA_INVALID",
+              "MANIFEST_HASH_INVALID",
+              "MANIFEST_ID_INVALID",
+              "MANIFEST_COUNT_INVALID",
+              "MANIFEST_DUPLICATE_RESOURCE",
+              "MANIFEST_SIGNATURE_INVALID",
+              "MANIFEST_SCOPE_INVALID",
+              "MANIFEST_PATH_INVALID",
+              "SNAPSHOT_MISSING",
+              "SNAPSHOT_MANIFEST_INVALID",
+              "SNAPSHOT_SIGNATURE_INVALID",
+              "SNAPSHOT_RESOURCE_INVALID",
+              "ACTIVATION_CONFIRMATION_REQUIRED",
+              "ROLLBACK_CONFIRMATION_REQUIRED",
+              "ROLLBACK_TARGET_MISSING",
+              "ROLLBACK_STATE_CHANGED",
+              "RESOURCE_STATE_CHANGED",
+              "RESOURCE_STATE_BUSY",
+              "RECEIPT_SIGNATURE_INVALID",
+            ],
+          },
+        },
+      },
+      required: ["valid", "reasonCodes"],
+    },
+    EnforceResourceDiffEntry: {
+      type: "object",
+      additionalProperties: false,
+      properties: {
+        id: { type: "string" },
+        kind: { type: "string" },
+        path: { type: "string" },
+        beforeDigest: { type: ["string", "null"], pattern: "^[a-f0-9]{64}$" },
+        afterDigest: { type: ["string", "null"], pattern: "^[a-f0-9]{64}$" },
+      },
+      required: ["id", "kind", "path"],
+    },
+    EnforceResourceDiff: {
+      type: "object",
+      additionalProperties: false,
+      properties: {
+        added: { type: "array", items: { $ref: "#/components/schemas/EnforceResourceDiffEntry" } },
+        removed: { type: "array", items: { $ref: "#/components/schemas/EnforceResourceDiffEntry" } },
+        changed: { type: "array", items: { $ref: "#/components/schemas/EnforceResourceDiffEntry" } },
+        unchanged: { type: "integer", minimum: 0 },
+      },
+      required: ["added", "removed", "changed", "unchanged"],
+    },
+    EnforceResourceVersionRef: {
+      type: "object",
+      additionalProperties: false,
+      properties: {
+        manifestId: { type: "string", pattern: "^enforce-resources-[a-f0-9]{16}$" },
+        version: { type: "string" },
+        resourcesSha256: { type: "string", pattern: "^[a-f0-9]{64}$" },
+        resourceCount: { type: "integer", minimum: 0 },
+        createdAt: { type: "string", format: "date-time" },
+        ref: { type: "string", description: "Workspace-relative canonical manifest reference" },
+      },
+      required: ["manifestId", "version", "resourcesSha256", "resourceCount", "createdAt", "ref"],
+    },
+    EnforceResourceLifecycleStatus: {
+      type: "object",
+      additionalProperties: false,
+      properties: {
+        schemaVersion: { type: "string", const: "2026-07-11" },
+        agentId: { type: "string" },
+        state: { type: "string", enum: ["NOT_INITIALIZED", "ACTIVE", "DRIFTED", "BLOCKED"] },
+        active: { oneOf: [{ $ref: "#/components/schemas/EnforceResourceVersionRef" }, { type: "null" }] },
+        previous: { oneOf: [{ $ref: "#/components/schemas/EnforceResourceVersionRef" }, { type: "null" }] },
+        rollbackTarget: { oneOf: [{ $ref: "#/components/schemas/EnforceResourceVersionRef" }, { type: "null" }] },
+        pendingDiff: { $ref: "#/components/schemas/EnforceResourceDiff" },
+        integrity: { $ref: "#/components/schemas/EnforceResourceIntegrity" },
+        nextAction: {
+          oneOf: [
+            {
+              type: "object",
+              additionalProperties: false,
+              properties: { label: { type: "string" }, command: { type: "string" } },
+              required: ["label", "command"],
+            },
+            { type: "null" },
+          ],
+        },
+        claimBoundary: { type: "string" },
+      },
+      required: ["schemaVersion", "agentId", "state", "active", "previous", "rollbackTarget", "pendingDiff", "integrity", "nextAction", "claimBoundary"],
+    },
+    EnforceResourceLifecycleStatusResponse: {
+      type: "object",
+      additionalProperties: false,
+      properties: {
+        ok: { type: "boolean", const: true },
+        data: { $ref: "#/components/schemas/EnforceResourceLifecycleStatus" },
+      },
+      required: ["ok", "data"],
+    },
+    EnforceResourceVerificationResponse: {
+      type: "object",
+      additionalProperties: false,
+      properties: {
+        ok: { type: "boolean", const: true },
+        data: {
+          type: "object",
+          additionalProperties: false,
+          properties: {
+            valid: { type: "boolean" },
+            manifestPath: { type: "string" },
+            expectedManifestId: { type: "string" },
+            currentManifestId: { type: "string" },
+            diff: { $ref: "#/components/schemas/EnforceResourceDiff" },
+            signature: { type: "object" },
+            integrity: { $ref: "#/components/schemas/EnforceResourceIntegrity" },
+          },
+          required: ["valid", "manifestPath", "expectedManifestId", "currentManifestId", "diff", "signature", "integrity"],
+        },
+      },
+      required: ["ok", "data"],
+    },
+    EnforceResourceApplyRequest: {
+      type: "object",
+      additionalProperties: false,
+      properties: {
+        agentId: { type: "string" },
+        manifestPath: { type: "string", description: "Workspace-relative canonical baseline reference" },
+        dryRun: { type: "boolean", default: true },
+        force: { type: "boolean", default: false, description: "Cannot bypass signature, scope, path, schema, hash, or snapshot integrity" },
+        confirmManifestId: { type: "string", pattern: "^enforce-resources-[a-f0-9]{16}$", description: "Required when dryRun is false; must equal the preview currentManifestId" },
+      },
+    },
+    EnforceResourceRollbackRequest: {
+      type: "object",
+      additionalProperties: false,
+      properties: {
+        agentId: { type: "string" },
+        manifestPath: { type: "string", description: "Workspace-relative canonical signed snapshot reference" },
+        resource: { type: "string" },
+        apply: { type: "boolean", default: false },
+        includeImmutable: { type: "boolean", default: false },
+        confirmManifestId: { type: "string", pattern: "^enforce-resources-[a-f0-9]{16}$", description: "Required when apply is true; must equal the selected targetManifestId" },
+      },
+    },
+    EnforceResourceMutationResponse: {
+      type: "object",
+      additionalProperties: false,
+      properties: {
+        ok: { type: "boolean", const: true },
+        data: { type: "object", description: "Bounded activation preview/result or rollback preview/result" },
       },
       required: ["ok", "data"],
     },

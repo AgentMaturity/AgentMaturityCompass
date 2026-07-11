@@ -402,6 +402,12 @@ function renderApiQuickstart(status, agentId) {
 
 async function renderEvidence() {
   const agentId = currentAgent();
+  const resourceStatusEnvelope = await apiGet(`/api/v1/enforce/resources/status?agentId=${encodeURIComponent(agentId)}`)
+    .catch((error) => ({ state: "BLOCKED", integrity: { valid: false, reasonCodes: [errText(error)] } }));
+  const resourceStatusPreview = apiPayload(resourceStatusEnvelope) || {};
+  const resourceProofReady = resourceStatusPreview?.state === "ACTIVE" || resourceStatusPreview?.state === "DRIFTED";
+  const resourceVerificationReady = resourceStatusPreview?.state === "ACTIVE";
+  const resourceProofError = resourceStatusPreview?.integrity?.reasonCodes?.[0] || "MANIFEST_MISSING";
   const [
     surfaces,
     lifecycleList,
@@ -415,6 +421,7 @@ async function renderEvidence() {
     proofEnvelope,
     lifecycleReceiptsEnvelope,
     reasoningMemoryEnvelope,
+    resourceStatus,
     resourceVerify,
     resourceValidation,
     resourceHistory,
@@ -434,8 +441,13 @@ async function renderEvidence() {
     apiGet(`/api/v1/evidence/finding-proofs?agentId=${encodeURIComponent(agentId)}&limit=12`).catch(() => ({ proofs: [] })),
     apiGet(`/api/v1/evidence/lifecycle-receipts?agentId=${encodeURIComponent(agentId)}&limit=12`).catch(() => ({ receipts: [] })),
     apiGet(`/api/v1/memory/reasoning?agentId=${encodeURIComponent(agentId)}&consumer=studio&limit=8`).catch(() => ({ items: [] })),
-    apiGet(`/api/v1/enforce/resources/verify?agentId=${encodeURIComponent(agentId)}`).catch((error) => ({ valid: false, error: errText(error) })),
-    apiGet(`/api/v1/enforce/resources/validate?agentId=${encodeURIComponent(agentId)}`).catch((error) => ({ status: "blocked", error: errText(error), gates: [] })),
+    Promise.resolve(resourceStatusEnvelope),
+    resourceVerificationReady
+      ? apiGet(`/api/v1/enforce/resources/verify?agentId=${encodeURIComponent(agentId)}`).catch((error) => ({ valid: false, error: errText(error) }))
+      : Promise.resolve({ valid: false, error: resourceProofError }),
+    resourceProofReady
+      ? apiGet(`/api/v1/enforce/resources/validate?agentId=${encodeURIComponent(agentId)}`).catch((error) => ({ status: "blocked", error: errText(error), gates: [] }))
+      : Promise.resolve({ status: "blocked", error: resourceProofError, gates: [] }),
     apiGet(`/api/v1/enforce/resources/history?agentId=${encodeURIComponent(agentId)}`).catch(() => ({ entries: [] })),
     apiGet("/api/v1/enforce/resources/contract").catch(() => ({ verbs: [], resourceKinds: [], gates: [] })),
     apiGet("/api/v1/imports?limit=6").catch(() => ({ imports: [] })),
@@ -453,6 +465,7 @@ async function renderEvidence() {
   const proofsData = apiPayload(proofEnvelope) || {};
   const lifecycleReceiptsData = apiPayload(lifecycleReceiptsEnvelope) || {};
   const reasoningMemoryData = apiPayload(reasoningMemoryEnvelope) || {};
+  const resourceStatusData = apiPayload(resourceStatus) || {};
   const resourceVerifyData = apiPayload(resourceVerify) || {};
   const resourceValidationData = apiPayload(resourceValidation) || {};
   const resourceHistoryData = apiPayload(resourceHistory) || {};
@@ -480,7 +493,9 @@ async function renderEvidence() {
   const surfaceComplete = latestRun?.surfaces
     ? Object.values(latestRun.surfaces).filter((item) => item?.status === "complete").length
     : 0;
-  const resourceSignature = resourceVerifyData?.signature?.valid === true
+  const resourceSignature = resourceStatusData?.integrity?.valid === false
+    ? "INVALID"
+    : resourceVerifyData?.signature?.valid === true
     ? "VALID"
     : resourceVerifyData?.signature?.missing
       ? "MISSING"
@@ -513,7 +528,7 @@ async function renderEvidence() {
           <div class="studio-terminal-line"><strong>Latest run</strong><span>${htmlEscape(shortId(latestRun?.runId, 16))}</span></div>
           <div class="studio-terminal-line"><strong>Full score latency</strong><span>${latestRun?.elapsedMs === null || latestRun?.elapsedMs === undefined ? "-" : `${Number(latestRun.elapsedMs)}ms`}</span></div>
           <div class="studio-terminal-line"><strong>Evidence coverage</strong><span>${latestRun ? `${(Number(latestRun.evidence?.evidenceCoverage || 0) * 100).toFixed(1)}%` : "-"}</span></div>
-          <div class="studio-terminal-line"><strong>Resource proof</strong><span>${htmlEscape(resourceVerifyData?.valid ? "VALID" : "CHECK")}</span></div>
+          <div class="studio-terminal-line"><strong>Resource state</strong><span>${htmlEscape(resourceStatusData?.state || "NOT_INITIALIZED")}</span></div>
           <div class="studio-terminal-line"><strong>Resource gates</strong><span>${htmlEscape(resourceValidationData?.status || "unknown")}</span></div>
           <div class="studio-terminal-line"><strong>Signature</strong><span>${htmlEscape(resourceSignature)}</span></div>
         </div>
@@ -620,13 +635,16 @@ async function renderEvidence() {
       `)}
       ${card("Enforce Resource Proof", `
         <div class="lifecycle-summary">
-          <div><span class="muted">Manifest</span><strong>${htmlEscape(shortId(resourceVerifyData?.manifestId, 18))}</strong></div>
-          <div><span class="muted">State</span>${statusPill(resourceVerifyData?.valid ? "VALID" : "CHECK")}</div>
+          <div><span class="muted">Active</span><strong>${htmlEscape(shortId(resourceStatusData?.active?.manifestId, 18))}</strong></div>
+          <div><span class="muted">Previous</span><strong>${htmlEscape(shortId(resourceStatusData?.previous?.manifestId, 18))}</strong></div>
+          <div><span class="muted">Rollback</span><strong>${htmlEscape(shortId(resourceStatusData?.rollbackTarget?.manifestId, 18))}</strong></div>
+          <div><span class="muted">State</span>${statusPill(resourceStatusData?.state || "NOT_INITIALIZED")}</div>
           <div><span class="muted">Gates</span>${statusPill(resourceValidationData?.status || "UNKNOWN")}</div>
           <div><span class="muted">Signature</span>${statusPill(resourceSignature)}</div>
-          <div><span class="muted">Changed</span><strong>${Number(resourceVerifyData?.diff?.changed?.length || 0)}</strong></div>
+          <div><span class="muted">Changed</span><strong>${Number(resourceStatusData?.pendingDiff?.changed?.length || 0)}</strong></div>
         </div>
         <pre id="resourceProofOut" class="scroll">${htmlEscape(JSON.stringify({
+          status: resourceStatusData || {},
           verification: resourceVerifyData || {},
           validation: resourceValidationData || {},
           contract: {
@@ -641,6 +659,8 @@ async function renderEvidence() {
           <button id="evidenceValidateResources" class="secondary">validate gates</button>
           <button id="evidenceApplyDryRun" class="secondary">dry-run apply</button>
           <button id="evidenceRestoreDryRun" class="secondary">dry-run restore</button>
+          <button id="evidenceActivateResources" ${resourceStatusData?.state === "DRIFTED" ? "" : "disabled"}>activate changes</button>
+          <button id="evidenceRollbackResources" ${resourceStatusData?.rollbackTarget?.manifestId ? "" : "disabled"}>rollback previous</button>
         </div>
       `)}
       ${card("Neutral Import", `
@@ -802,6 +822,43 @@ async function renderEvidence() {
       proofOut.textContent = JSON.stringify(out, null, 2);
     }
   });
+  document.getElementById("evidenceActivateResources")?.addEventListener("click", async () => {
+    const previewEnvelope = await apiPost("/api/v1/enforce/resources/apply", { agentId, dryRun: true });
+    const preview = apiPayload(previewEnvelope) || {};
+    const targetManifestId = preview?.proposal?.currentManifestId;
+    if (!targetManifestId) {
+      setStatus("No verified resource activation target is available.", true);
+      return;
+    }
+    if (!window.confirm(`Activate resource version ${targetManifestId}?`)) return;
+    const out = await apiPost("/api/v1/enforce/resources/apply", {
+      agentId,
+      dryRun: false,
+      confirmManifestId: targetManifestId
+    });
+    const proofOut = document.getElementById("resourceProofOut");
+    if (proofOut) proofOut.textContent = JSON.stringify(out, null, 2);
+    setStatus(`Activated resource version ${targetManifestId}.`);
+    await renderEvidence();
+  });
+  document.getElementById("evidenceRollbackResources")?.addEventListener("click", async () => {
+    const rollbackTarget = resourceStatusData?.rollbackTarget;
+    if (!rollbackTarget?.manifestId || !rollbackTarget?.ref) {
+      setStatus("No verified rollback target is available.", true);
+      return;
+    }
+    if (!window.confirm(`Rollback to signed resource version ${rollbackTarget.manifestId}?`)) return;
+    const out = await apiPost("/api/v1/enforce/resources/rollback", {
+      agentId,
+      manifestPath: rollbackTarget.ref,
+      apply: true,
+      confirmManifestId: rollbackTarget.manifestId
+    });
+    const proofOut = document.getElementById("resourceProofOut");
+    if (proofOut) proofOut.textContent = JSON.stringify(out, null, 2);
+    setStatus(`Rolled back to resource version ${rollbackTarget.manifestId}.`);
+    await renderEvidence();
+  });
   const runNeutralImport = async (dryRun) => {
     const input = document.getElementById("neutralImportPath");
     const outNode = document.getElementById("neutralImportOut");
@@ -958,7 +1015,9 @@ async function refreshUnifiedBanner() {
     let trustLabel = "N/A";
     let evidenceStatus = "NO RUN";
     let claimEligible = false;
-    const agentStatus = await apiGet(`/agents/${encodeURIComponent(agentId)}/status`).catch(() => null);
+    const agentStatus = currentWorkspaceLabel() === "demo"
+      ? null
+      : await apiGet(`/agents/${encodeURIComponent(agentId)}/status`).catch(() => null);
     if (agentStatus?.latestRun?.runId) {
       const report = await apiGet(`/runs/${encodeURIComponent(agentStatus.latestRun.runId)}/report`).catch(() => null);
       if (report) {
@@ -1163,7 +1222,7 @@ async function renderHome() {
         <div class="studio-kicker">Desktop app</div>
         <h3>Native macOS shell, same AMC evidence-first surface.</h3>
         <p class="muted">
-          The macOS app now starts local demo-mode Studio and renders this Console inside a native WebKit window. Windows still launches the same local URL in the system browser. Both keep the same flow: 244 default questions, 264 lifecycle questions, 142 assurance packs, 41 Industry Packs, and 1,153 CLI paths.
+          The macOS app now starts local demo-mode Studio and renders this Console inside a native WebKit window. Windows still launches the same local URL in the system browser. Both keep the same flow: 244 default questions, 264 lifecycle questions, 142 assurance packs, 41 Industry Packs, and 1,155 CLI paths.
         </p>
       </div>
       <div class="row wrap">

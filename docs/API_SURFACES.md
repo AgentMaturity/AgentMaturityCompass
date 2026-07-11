@@ -58,6 +58,14 @@ Implemented routes:
 - `POST /api/v1/shield/sanitize`
 - `GET /api/v1/enforce/status`
 - `POST /api/v1/enforce/evaluate`
+- `GET /api/v1/enforce/resources/status?agentId=<id>`
+- `GET /api/v1/enforce/resources/manifest?agentId=<id>&manifestPath=<canonical-ref>`
+- `GET /api/v1/enforce/resources/verify?agentId=<id>&manifestPath=<canonical-ref>`
+- `GET /api/v1/enforce/resources/diff?agentId=<id>&manifestPath=<canonical-ref>`
+- `GET /api/v1/enforce/resources/history?agentId=<id>`
+- `POST /api/v1/enforce/resources/snapshot`
+- `POST /api/v1/enforce/resources/apply`
+- `POST /api/v1/enforce/resources/rollback`
 - `GET /api/v1/vault/status`
 - `POST /api/v1/vault/redact`
 - `POST /api/v1/vault/classify`
@@ -81,6 +89,8 @@ Implemented routes:
 - `POST /api/v1/benchmarks/provider-drift`
 - `POST /api/v1/benchmarks/replay-corpus`
 
+Enforce resource lifecycle responses expose workspace-relative references only. `status` distinguishes `NOT_INITIALIZED`, `ACTIVE`, `DRIFTED`, and `BLOCKED`; drift never becomes an activated version implicitly. Manifest selectors are limited to the selected agent's active manifest or canonical signed snapshots. Applied activation and rollback are owner-only, exact-manifest-confirmed, serialized, fully preflighted, published with atomic file replacement and recovery, post-verified, and receipt-backed. Schema, hash, ID, count, duplicate, signature, scope, path, snapshot, resource-digest, confirmation, concurrent-state, and lock failures return bounded errors and do not produce a success receipt. `force` cannot bypass these hard integrity checks.
+
 Required request fields (per route family):
 
 | Route | Required fields | Optional fields |
@@ -102,6 +112,13 @@ Required request fields (per route family):
 | `POST /api/v1/shield/detect/injection` | `input` | — |
 | `POST /api/v1/shield/sanitize` | `input` | — |
 | `POST /api/v1/enforce/evaluate` | `action` | `tool`, `agentId`, `context` |
+| `GET /api/v1/enforce/resources/status` | none | `agentId` |
+| `GET /api/v1/enforce/resources/manifest` | none | `agentId`, workspace-relative canonical `manifestPath` |
+| `GET /api/v1/enforce/resources/verify` / `diff` | none | `agentId`, workspace-relative canonical `manifestPath` |
+| `GET /api/v1/enforce/resources/history` | none | `agentId` |
+| `POST /api/v1/enforce/resources/snapshot` | none | `agentId` |
+| `POST /api/v1/enforce/resources/apply` | none for preview | `agentId`, canonical `manifestPath`, `dryRun` (default `true`), `force`; when `dryRun=false`, exact preview `currentManifestId` in `confirmManifestId` |
+| `POST /api/v1/enforce/resources/rollback` | none for preview | `agentId`, canonical signed `manifestPath`, `resource`, `apply` (default `false`), `includeImmutable`; when `apply=true`, exact preview `targetManifestId` in `confirmManifestId` |
 | `POST /api/v1/vault/redact` | `text` | `categories` |
 | `POST /api/v1/vault/classify` | `content` | — |
 | `POST /api/v1/watch/attest` | `output`, `agentId` | `metadata` |

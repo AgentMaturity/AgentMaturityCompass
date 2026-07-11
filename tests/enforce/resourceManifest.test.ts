@@ -191,6 +191,7 @@ describe("enforce resource manifest", () => {
     const contract = enforceResourceLifecycleContract();
     expect(contract.surface).toBe("Enforce");
     expect(contract.verbs).toEqual([
+      "status",
       "list",
       "get",
       "snapshot",

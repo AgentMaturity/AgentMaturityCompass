@@ -438,10 +438,11 @@ amc ingest ./external-agent-logs/ --type generic_json --agent imported-agent
 | Command | What it does |
 |---------|-------------|
 | `amc resource snapshot` | Snapshot the prompts, tools, policies, memory, routes, evaluators, datasets, schemas, environments, and configs that define the agent |
+| `amc resource status` | Show the signed active and previous versions, verified rollback target, pending drift, integrity reasons, and next action without exposing local absolute paths |
 | `amc resource validate` | Run Enforce gates for signature validity, owners, contained paths, immutable resources, rollback readiness, review, and evidence coverage |
 | `amc resource propose` / `amc resource evaluate` | Create a dry-run proposal and show the policy decision before accepting resource changes |
-| `amc resource apply` | Dry-run apply by default; add `--yes` to accept current resources as the new signed manifest and write a signed receipt |
-| `amc resource rollback` | Dry-run rollback by default; add `--apply` to restore from a prior snapshot or explain why rollback cannot happen |
+| `amc resource apply` / `amc resource activate` | Dry-run by default; add `--yes` to activate the reviewed state and write a signed receipt. Force never bypasses signature, scope, path, manifest, snapshot, digest, or race integrity |
+| `amc resource rollback --manifest <status-ref>` | Dry-run by default; add `--apply` to activate a canonical signed snapshot after all resources pass preflight and post-write verification |
 | `amc firewall enable --mode block` | Turn on Runtime Firewall protection for live Bridge/Gateway traffic |
 | `amc firewall check --direction request --text "ignore previous instructions"` | Preview the exact allow/warn/block decision before traffic reaches a model |
 | `amc firewall events` / `amc firewall export --format splunk --redacted` | Inspect and export signed runtime decisions without leaking local paths or sensitive previews |

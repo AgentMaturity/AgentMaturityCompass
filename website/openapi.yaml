@@ -962,6 +962,136 @@ components:
         data:
           $ref: '#/components/schemas/ControlProjection'
 
+    EnforceResourceIntegrity:
+      type: object
+      additionalProperties: false
+      required: [valid, reasonCodes]
+      properties:
+        valid: { type: boolean }
+        reasonCodes:
+          type: array
+          items:
+            type: string
+            enum:
+              - MANIFEST_MISSING
+              - MANIFEST_SCHEMA_INVALID
+              - MANIFEST_HASH_INVALID
+              - MANIFEST_ID_INVALID
+              - MANIFEST_COUNT_INVALID
+              - MANIFEST_DUPLICATE_RESOURCE
+              - MANIFEST_SIGNATURE_INVALID
+              - MANIFEST_SCOPE_INVALID
+              - MANIFEST_PATH_INVALID
+              - SNAPSHOT_MISSING
+              - SNAPSHOT_MANIFEST_INVALID
+              - SNAPSHOT_SIGNATURE_INVALID
+              - SNAPSHOT_RESOURCE_INVALID
+              - ACTIVATION_CONFIRMATION_REQUIRED
+              - ROLLBACK_CONFIRMATION_REQUIRED
+              - ROLLBACK_TARGET_MISSING
+              - ROLLBACK_STATE_CHANGED
+              - RESOURCE_STATE_CHANGED
+              - RESOURCE_STATE_BUSY
+              - RECEIPT_SIGNATURE_INVALID
+
+    EnforceResourceDiff:
+      type: object
+      additionalProperties: false
+      required: [added, removed, changed, unchanged]
+      properties:
+        added: { type: array, items: { type: object } }
+        removed: { type: array, items: { type: object } }
+        changed: { type: array, items: { type: object } }
+        unchanged: { type: integer, minimum: 0 }
+
+    EnforceResourceVersionRef:
+      type: object
+      additionalProperties: false
+      required: [manifestId, version, resourcesSha256, resourceCount, createdAt, ref]
+      properties:
+        manifestId: { type: string, pattern: '^enforce-resources-[a-f0-9]{16}$' }
+        version: { type: string }
+        resourcesSha256: { type: string, pattern: '^[a-f0-9]{64}$' }
+        resourceCount: { type: integer, minimum: 0 }
+        createdAt: { type: string, format: date-time }
+        ref: { type: string, description: Workspace-relative canonical manifest reference }
+
+    EnforceResourceLifecycleStatus:
+      type: object
+      additionalProperties: false
+      required: [schemaVersion, agentId, state, active, previous, rollbackTarget, pendingDiff, integrity, nextAction, claimBoundary]
+      properties:
+        schemaVersion: { type: string, enum: ['2026-07-11'] }
+        agentId: { type: string }
+        state: { type: string, enum: [NOT_INITIALIZED, ACTIVE, DRIFTED, BLOCKED] }
+        active:
+          nullable: true
+          allOf: [{ $ref: '#/components/schemas/EnforceResourceVersionRef' }]
+        previous:
+          nullable: true
+          allOf: [{ $ref: '#/components/schemas/EnforceResourceVersionRef' }]
+        rollbackTarget:
+          nullable: true
+          allOf: [{ $ref: '#/components/schemas/EnforceResourceVersionRef' }]
+        pendingDiff: { $ref: '#/components/schemas/EnforceResourceDiff' }
+        integrity: { $ref: '#/components/schemas/EnforceResourceIntegrity' }
+        nextAction:
+          type: object
+          nullable: true
+          additionalProperties: false
+          properties:
+            label: { type: string }
+            command: { type: string }
+        claimBoundary: { type: string }
+
+    EnforceResourceLifecycleStatusResponse:
+      type: object
+      additionalProperties: false
+      required: [ok, data]
+      properties:
+        ok: { type: boolean, enum: [true] }
+        data: { $ref: '#/components/schemas/EnforceResourceLifecycleStatus' }
+
+    EnforceResourceVerificationResponse:
+      type: object
+      additionalProperties: false
+      required: [ok, data]
+      properties:
+        ok: { type: boolean, enum: [true] }
+        data:
+          type: object
+          additionalProperties: false
+          required: [valid, manifestPath, expectedManifestId, currentManifestId, diff, signature, integrity]
+          properties:
+            valid: { type: boolean }
+            manifestPath: { type: string }
+            expectedManifestId: { type: string }
+            currentManifestId: { type: string }
+            diff: { $ref: '#/components/schemas/EnforceResourceDiff' }
+            signature: { type: object }
+            integrity: { $ref: '#/components/schemas/EnforceResourceIntegrity' }
+
+    EnforceResourceApplyRequest:
+      type: object
+      additionalProperties: false
+      properties:
+        agentId: { type: string }
+        manifestPath: { type: string, description: Workspace-relative canonical baseline reference }
+        dryRun: { type: boolean, default: true }
+        force: { type: boolean, default: false, description: Cannot bypass hard integrity failures }
+        confirmManifestId: { type: string, pattern: '^enforce-resources-[a-f0-9]{16}$', description: Required for activation and must equal the preview currentManifestId }
+
+    EnforceResourceRollbackRequest:
+      type: object
+      additionalProperties: false
+      properties:
+        agentId: { type: string }
+        manifestPath: { type: string, description: Workspace-relative canonical signed snapshot reference }
+        resource: { type: string }
+        apply: { type: boolean, default: false }
+        includeImmutable: { type: boolean, default: false }
+        confirmManifestId: { type: string, pattern: '^enforce-resources-[a-f0-9]{16}$', description: Required for applied rollback and must equal the preview targetManifestId }
+
     ControlSimulationRequest:
       type: object
       additionalProperties: false
@@ -2571,6 +2701,74 @@ paths:
       responses:
         '200':
           description: Diff result
+
+  /v1/enforce/resources/status:
+    get:
+      tags: [enforce]
+      summary: Read signed active, previous, rollback, drift, and integrity state
+      parameters:
+        - name: agentId
+          in: query
+          schema: { type: string, default: default }
+      responses:
+        '200':
+          description: Bounded signed resource lifecycle status
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/EnforceResourceLifecycleStatusResponse' }
+        '401': { description: Unauthorized }
+
+  /v1/enforce/resources/verify:
+    get:
+      tags: [enforce]
+      summary: Verify a canonical signed resource manifest against current state
+      parameters:
+        - name: agentId
+          in: query
+          schema: { type: string, default: default }
+        - name: manifestPath
+          in: query
+          description: Workspace-relative canonical manifest reference
+          schema: { type: string }
+      responses:
+        '200':
+          description: Manifest and workspace state match
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/EnforceResourceVerificationResponse' }
+        '401': { description: Unauthorized }
+        '409': { description: Manifest integrity failed or drift was detected }
+
+  /v1/enforce/resources/apply:
+    post:
+      tags: [enforce]
+      summary: Preview or activate current resource state; dry-run by default
+      requestBody:
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/EnforceResourceApplyRequest' }
+      responses:
+        '200': { description: Activation preview }
+        '201': { description: Signed resource version activated }
+        '400': { description: Exact activation manifest confirmation required }
+        '401': { description: Unauthorized }
+        '403': { description: Owner role required }
+        '409': { description: Resource integrity or lifecycle gate failed }
+
+  /v1/enforce/resources/rollback:
+    post:
+      tags: [enforce]
+      summary: Preview or activate a canonical signed rollback target; dry-run by default
+      requestBody:
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/EnforceResourceRollbackRequest' }
+      responses:
+        '200': { description: Rollback preview or signed rollback result }
+        '400': { description: Exact rollback manifest confirmation required }
+        '401': { description: Unauthorized }
+        '403': { description: Owner role required }
+        '409': { description: Manifest, snapshot, resource digest, or race integrity failed }
 
   /v1/policy/controls:
     get:

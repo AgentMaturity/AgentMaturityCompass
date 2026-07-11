@@ -338,7 +338,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc enforce formal-verify` | Formally verify safety properties using proof trees and certificates | `--property <name>`<br>`--all`<br>`--strategy <strategy>` | - |
 | `amc enforce numeric-check` | Validate a numeric value within bounds | `--json` | - |
 | `amc enforce resources` | Snapshot, diff, and verify agent resources governed by Enforce | - | - |
-| `amc enforce resources apply` | Accept current resources as the new signed manifest; dry-run unless --yes is set | `--agent <agentId>`<br>`--manifest <path>`<br>`--yes`<br>`--force`<br>`--json` | - |
+| `amc enforce resources apply` | Accept current resources as the new signed manifest; dry-run unless --yes is set | `--agent <agentId>`<br>`--manifest <path>`<br>`--yes`<br>`--force`<br>`--json` | `activate` |
 | `amc enforce resources contract` | Show the AMC-native governed resource lifecycle contract | `--json` | - |
 | `amc enforce resources diff` | Diff two Enforce resource manifests, or a manifest against the current workspace | `--agent <agentId>`<br>`--from <path>`<br>`--to <path>`<br>`--json` | - |
 | `amc enforce resources evaluate` | Evaluate a resource proposal against Enforce gates | `--agent <agentId>`<br>`--manifest <path>`<br>`--json` | - |
@@ -348,8 +348,9 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc enforce resources list` | List resources in an Enforce resource manifest | `--agent <agentId>`<br>`--manifest <path>`<br>`--json` | - |
 | `amc enforce resources propose` | Create a dry-run resource change proposal from the latest manifest to current workspace state | `--agent <agentId>`<br>`--manifest <path>`<br>`--json` | - |
 | `amc enforce resources restore` | Restore resources from an Enforce snapshot; dry-run unless --apply is set | `--agent <agentId>`<br>`--manifest <path>`<br>`--resource <idOrPath>`<br>`--apply`<br>`--include-immutable`<br>`--json` | - |
-| `amc enforce resources rollback` | Alias for restore: rollback resources from an Enforce snapshot | `--agent <agentId>`<br>`--manifest <path>`<br>`--resource <idOrPath>`<br>`--apply`<br>`--include-immutable`<br>`--json` | - |
+| `amc enforce resources rollback` | Roll back to the signed previous version, or an explicit canonical snapshot | `--agent <agentId>`<br>`--manifest <path>`<br>`--resource <idOrPath>`<br>`--apply`<br>`--include-immutable`<br>`--json` | - |
 | `amc enforce resources snapshot` | Write the current Enforce resource manifest | `--agent <agentId>`<br>`--json` | - |
+| `amc enforce resources status` | Show the signed active, previous, rollback, drift, and integrity state | `--agent <agentId>`<br>`--json` | - |
 | `amc enforce resources validate` | Validate governed resource changes before accepting them | `--agent <agentId>`<br>`--manifest <path>`<br>`--json` | - |
 | `amc enforce resources verify` | Verify the current workspace resources against an Enforce resource manifest | `--agent <agentId>`<br>`--manifest <path>`<br>`--json` | - |
 | `amc enforce taint` | Track tainted input through the system | `--json` | - |
@@ -886,7 +887,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc residency-policy` | Create or list data residency policies | `--list`<br>`--region <region>`<br>`--isolation <level>`<br>`--custody <mode>` | - |
 | `amc residency-report` | Generate data residency compliance report for a tenant | `--tenant <id>`<br>`--redaction-tests` | - |
 | `amc resource` | Govern prompts, tools, memory, policies, routes, and other agent-defining resources | - | - |
-| `amc resource apply` | Accept current resources as the new signed manifest; dry-run unless --yes is set | `--agent <agentId>`<br>`--manifest <path>`<br>`--yes`<br>`--force`<br>`--json` | - |
+| `amc resource apply` | Accept current resources as the new signed manifest; dry-run unless --yes is set | `--agent <agentId>`<br>`--manifest <path>`<br>`--yes`<br>`--force`<br>`--json` | `activate` |
 | `amc resource contract` | Show the AMC-native governed resource lifecycle contract | `--json` | - |
 | `amc resource diff` | Diff an Enforce resource manifest against the current workspace | `--agent <agentId>`<br>`--from <path>`<br>`--to <path>`<br>`--json` | - |
 | `amc resource evaluate` | Evaluate a resource proposal against Enforce gates | `--agent <agentId>`<br>`--manifest <path>`<br>`--json` | - |
@@ -895,8 +896,9 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc resource list` | List resources in an Enforce resource manifest | `--agent <agentId>`<br>`--manifest <path>`<br>`--json` | - |
 | `amc resource propose` | Create a dry-run resource change proposal from the latest manifest to current workspace state | `--agent <agentId>`<br>`--manifest <path>`<br>`--json` | - |
 | `amc resource restore` | Restore resources from an Enforce snapshot; dry-run unless --apply is set | `--agent <agentId>`<br>`--manifest <path>`<br>`--resource <idOrPath>`<br>`--apply`<br>`--include-immutable`<br>`--json` | - |
-| `amc resource rollback` | Alias for restore: rollback resources from an Enforce snapshot | `--agent <agentId>`<br>`--manifest <path>`<br>`--resource <idOrPath>`<br>`--apply`<br>`--include-immutable`<br>`--json` | - |
+| `amc resource rollback` | Roll back to the signed previous version, or an explicit canonical snapshot | `--agent <agentId>`<br>`--manifest <path>`<br>`--resource <idOrPath>`<br>`--apply`<br>`--include-immutable`<br>`--json` | - |
 | `amc resource snapshot` | Write the current Enforce resource manifest | `--agent <agentId>`<br>`--json` | - |
+| `amc resource status` | Show the signed active, previous, rollback, drift, and integrity state | `--agent <agentId>`<br>`--json` | - |
 | `amc resource validate` | Validate governed resource changes before accepting them | `--agent <agentId>`<br>`--manifest <path>`<br>`--json` | - |
 | `amc retention` | Retention/archive payload lifecycle operations | - | - |
 | `amc retention run` | Run archival + payload prune lifecycle | `--dry-run` | - |

@@ -664,7 +664,7 @@ function showWelcome() {
         <div class="stat-card"><div class="num">${PUBLIC_DOCS.length}</div><div class="label">Public Guides</div></div>
         <div class="stat-card"><div class="num">${PUBLIC_CATEGORIES.length}</div><div class="label">Categories</div></div>
         <div class="stat-card"><div class="num">244</div><div class="label">Default Questions</div></div>
-        <div class="stat-card"><div class="num">1,153</div><div class="label">CLI Paths</div></div>
+        <div class="stat-card"><div class="num">1,155</div><div class="label">CLI Paths</div></div>
         <div class="stat-card"><div class="num">41</div><div class="label">Industry Packs</div></div>
         <div class="stat-card"><div class="num">14</div><div class="label">Framework Adapters</div></div>
       </div>

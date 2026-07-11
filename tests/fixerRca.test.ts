@@ -1,16 +1,18 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
-import { existsSync, mkdtempSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { dirname, join } from "node:path";
+import { join } from "node:path";
 import { Readable } from "node:stream";
 import { afterEach, describe, expect, test } from "vitest";
 import { handleApiRoute } from "../src/api/index.js";
-import { latestEnforceResourceManifestPath, type EnforceResourceManifest } from "../src/enforce/resourceManifest.js";
+import { writeEnforceResourceManifest } from "../src/enforce/resourceManifest.js";
 import { listFixerRcaReports, loadFixerRcaReport, writeFixerRcaReport } from "../src/mechanic/fixerRca.js";
 import { writeEpisodeRecord } from "../src/lifecycle/episodeRecord.js";
 import type { DiagnosticReport } from "../src/types.js";
+import { initWorkspace } from "../src/workspace.js";
 
 const roots: string[] = [];
+const originalVaultPassphrase = process.env.AMC_VAULT_PASSPHRASE;
 
 function workspace(): string {
   const dir = mkdtempSync(join(tmpdir(), "amc-fixer-rca-"));
@@ -72,43 +74,10 @@ function report(runId = "trace-run-rca-1"): DiagnosticReport {
 }
 
 function writeMutableManifest(ws: string): void {
-  mkdirSync(join(ws, ".amc"), { recursive: true });
+  process.env.AMC_VAULT_PASSPHRASE = "amc-fixer-rca-test-passphrase";
+  initWorkspace({ workspacePath: ws, trustBoundaryMode: "isolated" });
   writeFileSync(join(ws, ".amc", "prompt-addendum.md"), "Always cite evidence.\n");
-  const manifestPath = latestEnforceResourceManifestPath(ws, "default");
-  mkdirSync(dirname(manifestPath), { recursive: true });
-  const manifest: EnforceResourceManifest = {
-    schemaVersion: "2026-05-22",
-    manifestId: "enforce-resources-test",
-    agentId: "default",
-    workspace: ws,
-    createdAt: new Date(Date.UTC(2026, 4, 22, 12, 0, 0)).toISOString(),
-    resourcesSha256: "test-sha",
-    resourceCount: 1,
-    resources: [
-      {
-        id: "prompt:.amc/prompt-addendum.md",
-        type: "prompt",
-        kind: "prompt",
-        path: ".amc/prompt-addendum.md",
-        exists: true,
-        digest: "digest",
-        owner: "AMC",
-        mutable: true,
-        version: "v1",
-        parentVersion: null,
-        currentVersion: "v1",
-        schema: "prompt-addendum.md",
-        dependencies: [],
-        lastEvaluation: null,
-        validationStatus: "valid",
-        lastVerifiedAt: new Date(Date.UTC(2026, 4, 22, 12, 0, 0)).toISOString(),
-        rollbackTarget: "rollback://prompt-addendum/v1",
-        rollbackPointer: "rollback://prompt-addendum/v1",
-        evidenceRefs: [],
-      },
-    ],
-  };
-  writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`);
+  writeEnforceResourceManifest({ workspace: ws, agentId: "default" });
 }
 
 function mockReq(method: string, url: string, body?: unknown): IncomingMessage {
@@ -154,6 +123,11 @@ afterEach(() => {
     const dir = roots.pop();
     if (dir) rmSync(dir, { recursive: true, force: true });
   }
+  if (originalVaultPassphrase === undefined) {
+    delete process.env.AMC_VAULT_PASSPHRASE;
+  } else {
+    process.env.AMC_VAULT_PASSPHRASE = originalVaultPassphrase;
+  }
 });
 
 describe("fixer RCA lane", () => {
@@ -175,7 +149,7 @@ describe("fixer RCA lane", () => {
     expect(written.report.rootCauses.length).toBeGreaterThanOrEqual(2);
     expect(written.report.regressionTests.length).toBe(written.report.rootCauses.length);
     expect(written.report.proposals.every((proposal) => proposal.status === "proposed")).toBe(true);
-    expect(written.report.proposals.every((proposal) => proposal.rollbackPointer)).toBe(true);
+    expect(written.report.proposals.every((proposal) => proposal.rollbackPointer?.includes("/snapshots/"))).toBe(true);
     expect(written.report.validationReceipt.status).toBe("passed");
 
     const listed = listFixerRcaReports({ workspace: ws, agentId: "default", redacted: true });

@@ -1,8 +1,8 @@
-import { existsSync, mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { dirname, join } from "node:path";
+import { join } from "node:path";
 import { afterEach, describe, expect, test } from "vitest";
-import { latestEnforceResourceManifestPath, type EnforceResourceManifest } from "../src/enforce/resourceManifest.js";
+import { writeEnforceResourceManifest } from "../src/enforce/resourceManifest.js";
 import {
   listGovernedOptimizerRuns,
   loadGovernedOptimizerRun,
@@ -12,8 +12,10 @@ import {
 import { writeEpisodeRecord } from "../src/lifecycle/episodeRecord.js";
 import { writeFixerRcaReport, type FixerRcaReport } from "../src/mechanic/fixerRca.js";
 import type { DiagnosticReport } from "../src/types.js";
+import { initWorkspace } from "../src/workspace.js";
 
 const roots: string[] = [];
+const originalVaultPassphrase = process.env.AMC_VAULT_PASSPHRASE;
 
 function workspace(): string {
   const dir = mkdtempSync(join(tmpdir(), "amc-governed-optimizer-"));
@@ -76,44 +78,11 @@ function diagnosticReport(runId = "trace-run-opt-1", questions = 2): DiagnosticR
 }
 
 function writeMutableManifest(ws: string): string {
-  mkdirSync(join(ws, ".amc"), { recursive: true });
+  process.env.AMC_VAULT_PASSPHRASE = "amc-governed-optimizer-test-passphrase";
+  initWorkspace({ workspacePath: ws, trustBoundaryMode: "isolated" });
   const resourcePath = join(ws, ".amc", "prompt-addendum.md");
   writeFileSync(resourcePath, "Always cite evidence.\n");
-  const manifestPath = latestEnforceResourceManifestPath(ws, "default");
-  mkdirSync(dirname(manifestPath), { recursive: true });
-  const manifest: EnforceResourceManifest = {
-    schemaVersion: "2026-05-22",
-    manifestId: "enforce-resources-optimizer-test",
-    agentId: "default",
-    workspace: ws,
-    createdAt: new Date(Date.UTC(2026, 4, 22, 12, 0, 0)).toISOString(),
-    resourcesSha256: "test-sha",
-    resourceCount: 1,
-    resources: [
-      {
-        id: "prompt:.amc/prompt-addendum.md",
-        type: "prompt",
-        kind: "prompt",
-        path: ".amc/prompt-addendum.md",
-        exists: true,
-        digest: "digest",
-        owner: "AMC",
-        mutable: true,
-        version: "v1",
-        parentVersion: null,
-        currentVersion: "v1",
-        schema: "prompt-addendum.md",
-        dependencies: [],
-        lastEvaluation: null,
-        validationStatus: "valid",
-        lastVerifiedAt: new Date(Date.UTC(2026, 4, 22, 12, 0, 0)).toISOString(),
-        rollbackTarget: "rollback://prompt-addendum/v1",
-        rollbackPointer: "rollback://prompt-addendum/v1",
-        evidenceRefs: [],
-      },
-    ],
-  };
-  writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`);
+  writeEnforceResourceManifest({ workspace: ws, agentId: "default" });
   return resourcePath;
 }
 
@@ -131,6 +100,11 @@ afterEach(() => {
   while (roots.length > 0) {
     const dir = roots.pop();
     if (dir) rmSync(dir, { recursive: true, force: true });
+  }
+  if (originalVaultPassphrase === undefined) {
+    delete process.env.AMC_VAULT_PASSPHRASE;
+  } else {
+    process.env.AMC_VAULT_PASSPHRASE = originalVaultPassphrase;
   }
 });
 

@@ -7,6 +7,10 @@ import { z } from "zod";
 import { bodyJsonSchema, apiSuccess, apiError, isRequestBodyError, queryParam } from './apiHelpers.js';
 import { PolicyFirewall } from '../enforce/policyFirewall.js';
 import type { PolicyDecision, PolicyRule } from '../enforce/policyFirewall.js';
+import {
+  isEnforceResourceIntegrityError,
+  projectEnforceResourcePublicValue,
+} from '../enforce/resourceManifest.js';
 
 const DEFAULT_POLICY_RULES: PolicyRule[] = [
   {
@@ -55,6 +59,36 @@ const enforceEvaluateBodySchema = z.object({
 
 type EnforceEvaluateBody = z.infer<typeof enforceEvaluateBodySchema>;
 
+const resourceRestoreBodySchema = z.object({
+  agentId: z.string().trim().min(1).optional(),
+  manifestPath: z.string().trim().min(1).optional(),
+  resource: z.string().trim().min(1).optional(),
+  apply: z.boolean().optional(),
+  includeImmutable: z.boolean().optional(),
+  confirmManifestId: z.string().regex(/^enforce-resources-[a-f0-9]{16}$/).optional(),
+}).strict();
+
+const resourceApplyBodySchema = z.object({
+  agentId: z.string().trim().min(1).optional(),
+  manifestPath: z.string().trim().min(1).optional(),
+  dryRun: z.boolean().optional(),
+  force: z.boolean().optional(),
+  confirmManifestId: z.string().regex(/^enforce-resources-[a-f0-9]{16}$/).optional(),
+}).strict();
+
+function resourceApiError(
+  res: ServerResponse,
+  error: unknown,
+  fallbackStatus: number,
+  fallbackMessage: string,
+): void {
+  if (isEnforceResourceIntegrityError(error)) {
+    apiError(res, 409, error.code);
+    return;
+  }
+  apiError(res, fallbackStatus, fallbackMessage);
+}
+
 export async function handleEnforceRoute(
   pathname: string,
   method: string,
@@ -62,6 +96,10 @@ export async function handleEnforceRoute(
   res: ServerResponse,
   workspace = process.cwd(),
 ): Promise<boolean> {
+  const resourceSuccess = (data: unknown, status = 200): void => {
+    apiSuccess(res, projectEnforceResourcePublicValue(data, workspace), status);
+  };
+
   if (pathname === '/api/v1/enforce/status' && method === 'GET') {
     apiSuccess(res, { status: 'operational', module: 'enforce', capabilities: ['policy-evaluate', 'resource-manifest', 'resource-lifecycle-protocol'] });
     return true;
@@ -101,6 +139,18 @@ export async function handleEnforceRoute(
     return true;
   }
 
+  // GET /api/v1/enforce/resources/status — one signed active/previous/rollback projection
+  if (pathname === '/api/v1/enforce/resources/status' && method === 'GET') {
+    try {
+      const agentId = queryParam(req.url ?? '', 'agentId') ?? 'default';
+      const { projectEnforceResourceLifecycleStatus } = await import('../enforce/resourceManifest.js');
+      resourceSuccess(projectEnforceResourceLifecycleStatus({ workspace, agentId }));
+    } catch (err) {
+      resourceApiError(res, err, 500, 'Could not project Enforce resource status');
+    }
+    return true;
+  }
+
   // POST /api/v1/enforce/resources/snapshot — write the latest Enforce resource manifest and rollback bundle
   if (pathname === '/api/v1/enforce/resources/snapshot' && method === 'POST') {
     try {
@@ -109,10 +159,10 @@ export async function handleEnforceRoute(
       }).strict());
       const { writeEnforceResourceManifest } = await import('../enforce/resourceManifest.js');
       const result = writeEnforceResourceManifest({ workspace, agentId: body.agentId });
-      apiSuccess(res, result, 201);
+      resourceSuccess(result, 201);
     } catch (err) {
       if (isRequestBodyError(err)) { apiError(res, err.statusCode, err.message); return true; }
-      apiError(res, 500, err instanceof Error ? err.message : 'Could not write Enforce resource manifest');
+      resourceApiError(res, err, 500, 'Could not write Enforce resource manifest');
     }
     return true;
   }
@@ -125,9 +175,9 @@ export async function handleEnforceRoute(
       const { latestEnforceResourceManifestPath, listEnforceResources } = await import('../enforce/resourceManifest.js');
       const path = manifestPath ?? latestEnforceResourceManifestPath(workspace, agentId);
       const resources = listEnforceResources({ workspace, agentId, manifestPath: path });
-      apiSuccess(res, { agentId, manifestPath: path, resources, total: resources.length });
+      resourceSuccess({ agentId, manifestPath: path, resources, total: resources.length });
     } catch (err) {
-      apiError(res, 404, err instanceof Error ? err.message : 'Enforce resource manifest not found');
+      resourceApiError(res, err, 404, 'Enforce resource manifest not found');
     }
     return true;
   }
@@ -137,12 +187,16 @@ export async function handleEnforceRoute(
     try {
       const agentId = queryParam(req.url ?? '', 'agentId') ?? 'default';
       const manifestPath = queryParam(req.url ?? '', 'manifestPath');
-      const { latestEnforceResourceManifestPath, loadEnforceResourceManifest } = await import('../enforce/resourceManifest.js');
-      const path = manifestPath ?? latestEnforceResourceManifestPath(workspace, agentId);
-      const manifest = loadEnforceResourceManifest(path);
-      apiSuccess(res, { manifestPath: path, manifest });
+      const { loadEnforceResourceManifest, verifyEnforceResourceManifest } = await import('../enforce/resourceManifest.js');
+      const verification = verifyEnforceResourceManifest({ workspace, agentId, manifestPath });
+      if (!verification.integrity.valid) {
+        apiError(res, 409, verification.integrity.reasonCodes[0] ?? 'MANIFEST_SIGNATURE_INVALID');
+        return true;
+      }
+      const manifest = loadEnforceResourceManifest(verification.manifestPath);
+      resourceSuccess({ manifestPath: verification.manifestPath, manifest });
     } catch (err) {
-      apiError(res, 404, err instanceof Error ? err.message : 'Enforce resource manifest not found');
+      resourceApiError(res, err, 404, 'Enforce resource manifest not found');
     }
     return true;
   }
@@ -156,9 +210,9 @@ export async function handleEnforceRoute(
       const manifestPath = queryParam(req.url ?? '', 'manifestPath');
       const { inspectEnforceResource } = await import('../enforce/resourceManifest.js');
       const entry = inspectEnforceResource({ workspace, agentId, manifestPath, selector: resource });
-      apiSuccess(res, entry);
+      resourceSuccess(entry);
     } catch (err) {
-      apiError(res, 404, err instanceof Error ? err.message : 'Enforce resource not found');
+      resourceApiError(res, err, 404, 'Enforce resource not found');
     }
     return true;
   }
@@ -170,9 +224,9 @@ export async function handleEnforceRoute(
       const manifestPath = queryParam(req.url ?? '', 'manifestPath');
       const { verifyEnforceResourceManifest } = await import('../enforce/resourceManifest.js');
       const result = verifyEnforceResourceManifest({ workspace, agentId, manifestPath });
-      apiSuccess(res, result, result.valid ? 200 : 409);
+      resourceSuccess(result, result.valid ? 200 : 409);
     } catch (err) {
-      apiError(res, 404, err instanceof Error ? err.message : 'Enforce resource manifest not found');
+      resourceApiError(res, err, 404, 'Enforce resource manifest not found');
     }
     return true;
   }
@@ -184,9 +238,9 @@ export async function handleEnforceRoute(
       const manifestPath = queryParam(req.url ?? '', 'manifestPath');
       const { verifyEnforceResourceManifest } = await import('../enforce/resourceManifest.js');
       const result = verifyEnforceResourceManifest({ workspace, agentId, manifestPath });
-      apiSuccess(res, result.diff);
+      resourceSuccess(result.diff);
     } catch (err) {
-      apiError(res, 404, err instanceof Error ? err.message : 'Enforce resource manifest not found');
+      resourceApiError(res, err, 404, 'Enforce resource manifest not found');
     }
     return true;
   }
@@ -194,26 +248,28 @@ export async function handleEnforceRoute(
   // POST /api/v1/enforce/resources/restore — dry-run or apply rollback from the latest snapshot bundle
   if (pathname === '/api/v1/enforce/resources/restore' && method === 'POST') {
     try {
-      const body = await bodyJsonSchema(req, z.object({
-        agentId: z.string().trim().min(1).optional(),
-        manifestPath: z.string().trim().min(1).optional(),
-        resource: z.string().trim().min(1).optional(),
-        apply: z.boolean().optional(),
-        includeImmutable: z.boolean().optional(),
-      }).strict());
+      const body = await bodyJsonSchema(req, resourceRestoreBodySchema);
       const { restoreEnforceResourceSnapshot } = await import('../enforce/resourceManifest.js');
-      const result = restoreEnforceResourceSnapshot({
+      const restoreInput = {
         workspace,
         agentId: body.agentId,
         manifestPath: body.manifestPath,
         resource: body.resource,
-        apply: body.apply,
         includeImmutable: body.includeImmutable,
-      });
-      apiSuccess(res, result);
+        confirmManifestId: body.confirmManifestId,
+      };
+      const preview = restoreEnforceResourceSnapshot({ ...restoreInput, apply: false });
+      if (body.apply === true && body.confirmManifestId !== preview.targetManifestId) {
+        apiError(res, 400, 'ROLLBACK_CONFIRMATION_REQUIRED');
+        return true;
+      }
+      const result = body.apply === true
+        ? restoreEnforceResourceSnapshot({ ...restoreInput, apply: true })
+        : preview;
+      resourceSuccess(result);
     } catch (err) {
       if (isRequestBodyError(err)) { apiError(res, err.statusCode, err.message); return true; }
-      apiError(res, 500, err instanceof Error ? err.message : 'Could not restore Enforce resources');
+      resourceApiError(res, err, 409, 'Could not restore Enforce resources');
     }
     return true;
   }
@@ -227,9 +283,9 @@ export async function handleEnforceRoute(
       const manifestPath = queryParam(req.url ?? '', 'manifestPath');
       const { inspectEnforceResource } = await import('../enforce/resourceManifest.js');
       const entry = inspectEnforceResource({ workspace, agentId, manifestPath, selector: resource });
-      apiSuccess(res, entry);
+      resourceSuccess(entry);
     } catch (err) {
-      apiError(res, 404, err instanceof Error ? err.message : 'Enforce resource not found');
+      resourceApiError(res, err, 404, 'Enforce resource not found');
     }
     return true;
   }
@@ -238,9 +294,9 @@ export async function handleEnforceRoute(
   if (pathname === '/api/v1/enforce/resources/contract' && method === 'GET') {
     try {
       const { enforceResourceLifecycleContract } = await import('../enforce/resourceManifest.js');
-      apiSuccess(res, enforceResourceLifecycleContract());
+      resourceSuccess(enforceResourceLifecycleContract());
     } catch (err) {
-      apiError(res, 500, err instanceof Error ? err.message : 'Could not load resource lifecycle contract');
+      resourceApiError(res, err, 500, 'Could not load resource lifecycle contract');
     }
     return true;
   }
@@ -251,9 +307,9 @@ export async function handleEnforceRoute(
       const agentId = queryParam(req.url ?? '', 'agentId') ?? 'default';
       const { listEnforceResourceHistory } = await import('../enforce/resourceManifest.js');
       const entries = listEnforceResourceHistory({ workspace, agentId });
-      apiSuccess(res, { agentId, entries, total: entries.length });
+      resourceSuccess({ agentId, entries, total: entries.length });
     } catch (err) {
-      apiError(res, 500, err instanceof Error ? err.message : 'Could not load Enforce resource history');
+      resourceApiError(res, err, 500, 'Could not load Enforce resource history');
     }
     return true;
   }
@@ -265,9 +321,9 @@ export async function handleEnforceRoute(
       const manifestPath = queryParam(req.url ?? '', 'manifestPath');
       const { validateEnforceResourceLifecycle } = await import('../enforce/resourceManifest.js');
       const result = validateEnforceResourceLifecycle({ workspace, agentId, manifestPath });
-      apiSuccess(res, result, result.status === 'blocked' ? 409 : 200);
+      resourceSuccess(result, result.status === 'blocked' ? 409 : 200);
     } catch (err) {
-      apiError(res, 404, err instanceof Error ? err.message : 'Enforce resource manifest not found');
+      resourceApiError(res, err, 404, 'Enforce resource manifest not found');
     }
     return true;
   }
@@ -279,9 +335,9 @@ export async function handleEnforceRoute(
       const manifestPath = queryParam(req.url ?? '', 'manifestPath');
       const { proposeEnforceResourceLifecycle } = await import('../enforce/resourceManifest.js');
       const result = proposeEnforceResourceLifecycle({ workspace, agentId, manifestPath });
-      apiSuccess(res, result);
+      resourceSuccess(result);
     } catch (err) {
-      apiError(res, 404, err instanceof Error ? err.message : 'Enforce resource manifest not found');
+      resourceApiError(res, err, 404, 'Enforce resource manifest not found');
     }
     return true;
   }
@@ -293,9 +349,9 @@ export async function handleEnforceRoute(
       const manifestPath = queryParam(req.url ?? '', 'manifestPath');
       const { evaluateEnforceResourceLifecycle } = await import('../enforce/resourceManifest.js');
       const result = evaluateEnforceResourceLifecycle({ workspace, agentId, manifestPath });
-      apiSuccess(res, result, result.decision === 'block' ? 409 : 200);
+      resourceSuccess(result, result.decision === 'block' ? 409 : 200);
     } catch (err) {
-      apiError(res, 404, err instanceof Error ? err.message : 'Enforce resource manifest not found');
+      resourceApiError(res, err, 404, 'Enforce resource manifest not found');
     }
     return true;
   }
@@ -303,24 +359,27 @@ export async function handleEnforceRoute(
   // POST /api/v1/enforce/resources/apply — accept current resources as the new signed manifest; dry-run by default
   if (pathname === '/api/v1/enforce/resources/apply' && method === 'POST') {
     try {
-      const body = await bodyJsonSchema(req, z.object({
-        agentId: z.string().trim().min(1).optional(),
-        manifestPath: z.string().trim().min(1).optional(),
-        dryRun: z.boolean().optional(),
-        force: z.boolean().optional(),
-      }).strict());
+      const body = await bodyJsonSchema(req, resourceApplyBodySchema);
       const { applyEnforceResourceLifecycle } = await import('../enforce/resourceManifest.js');
-      const result = applyEnforceResourceLifecycle({
+      const applyInput = {
         workspace,
         agentId: body.agentId,
         manifestPath: body.manifestPath,
-        dryRun: body.dryRun ?? true,
         force: body.force,
-      });
-      apiSuccess(res, result, result.applied ? 201 : 200);
+        confirmManifestId: body.confirmManifestId,
+      };
+      const preview = applyEnforceResourceLifecycle({ ...applyInput, dryRun: true });
+      if (body.dryRun === false && body.confirmManifestId !== preview.proposal.currentManifestId) {
+        apiError(res, 400, 'ACTIVATION_CONFIRMATION_REQUIRED');
+        return true;
+      }
+      const result = body.dryRun === false
+        ? applyEnforceResourceLifecycle({ ...applyInput, dryRun: false })
+        : preview;
+      resourceSuccess(result, result.applied ? 201 : 200);
     } catch (err) {
       if (isRequestBodyError(err)) { apiError(res, err.statusCode, err.message); return true; }
-      apiError(res, 409, err instanceof Error ? err.message : 'Could not apply Enforce resource proposal');
+      resourceApiError(res, err, 409, 'Could not apply Enforce resource proposal');
     }
     return true;
   }
@@ -328,26 +387,34 @@ export async function handleEnforceRoute(
   // POST /api/v1/enforce/resources/rollback — protocol alias for restore
   if (pathname === '/api/v1/enforce/resources/rollback' && method === 'POST') {
     try {
-      const body = await bodyJsonSchema(req, z.object({
-        agentId: z.string().trim().min(1).optional(),
-        manifestPath: z.string().trim().min(1).optional(),
-        resource: z.string().trim().min(1).optional(),
-        apply: z.boolean().optional(),
-        includeImmutable: z.boolean().optional(),
-      }).strict());
-      const { restoreEnforceResourceSnapshot } = await import('../enforce/resourceManifest.js');
-      const result = restoreEnforceResourceSnapshot({
+      const body = await bodyJsonSchema(req, resourceRestoreBodySchema);
+      const {
+        resolveEnforceResourceRollbackTarget,
+        restoreEnforceResourceSnapshot,
+      } = await import('../enforce/resourceManifest.js');
+      const rollbackTarget = body.manifestPath
+        ? null
+        : resolveEnforceResourceRollbackTarget({ workspace, agentId: body.agentId });
+      const restoreInput = {
         workspace,
         agentId: body.agentId,
-        manifestPath: body.manifestPath,
+        manifestPath: body.manifestPath ?? rollbackTarget?.ref,
         resource: body.resource,
-        apply: body.apply,
         includeImmutable: body.includeImmutable,
-      });
-      apiSuccess(res, result);
+        confirmManifestId: body.confirmManifestId,
+      };
+      const preview = restoreEnforceResourceSnapshot({ ...restoreInput, apply: false });
+      if (body.apply === true && body.confirmManifestId !== preview.targetManifestId) {
+        apiError(res, 400, 'ROLLBACK_CONFIRMATION_REQUIRED');
+        return true;
+      }
+      const result = body.apply === true
+        ? restoreEnforceResourceSnapshot({ ...restoreInput, apply: true })
+        : preview;
+      resourceSuccess(result);
     } catch (err) {
       if (isRequestBodyError(err)) { apiError(res, err.statusCode, err.message); return true; }
-      apiError(res, 500, err instanceof Error ? err.message : 'Could not rollback Enforce resources');
+      resourceApiError(res, err, 409, 'Could not rollback Enforce resources');
     }
     return true;
   }

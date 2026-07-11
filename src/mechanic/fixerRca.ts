@@ -1,7 +1,12 @@
 import { existsSync, readdirSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { getAgentPaths } from "../fleet/paths.js";
-import { listEnforceResources, type EnforceResource, type EnforceResourceKind } from "../enforce/resourceManifest.js";
+import {
+  listEnforceResources,
+  projectEnforceResourceLifecycleStatus,
+  type EnforceResource,
+  type EnforceResourceKind
+} from "../enforce/resourceManifest.js";
 import { trySignArtifactFile } from "../lifecycle/artifactSignature.js";
 import { loadEpisodeRecord, type EpisodeRecord } from "../lifecycle/episodeRecord.js";
 import { loadTraceFailureIndex, type TraceFailureCluster, type TraceFailureIndex, type TraceFailureClass } from "../watch/traceFailureIndex.js";
@@ -226,6 +231,10 @@ export function buildFixerRcaReport(input: {
   const workspace = resolve(input.workspace);
   const agentId = input.agentId ?? input.traceIndex.agentId;
   const resources = resourcesFor(workspace, agentId);
+  const lifecycleStatus = projectEnforceResourceLifecycleStatus({ workspace, agentId });
+  const activeRollbackPointer = lifecycleStatus.integrity.valid
+    ? lifecycleStatus.active?.ref ?? null
+    : null;
   const callRecords = normalizeAgentCallRecords(input.traceIndex);
   const validations = callRecords.flatMap(validateAgentCallRecord);
   const regressionTests = input.traceIndex.clusters.map(regressionTestFor);
@@ -259,7 +268,7 @@ export function buildFixerRcaReport(input: {
       resourceKind: cause.affectedResourceKind,
       resourceId: resource?.id ?? null,
       resourcePath: resource ? resolve(workspace, resource.path) : null,
-      rollbackPointer: resource?.rollbackPointer ?? resource?.rollbackTarget ?? null,
+      rollbackPointer: resource?.rollbackPointer ?? resource?.rollbackTarget ?? activeRollbackPointer,
       patchSummary: blockedReason
         ? "No patch generated because the mutation surface is unsupported or immutable."
         : `Update ${resource!.kind} resource ${resource!.id} to address ${cause.failureClass}.`,

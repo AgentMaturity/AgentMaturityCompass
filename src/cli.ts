@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { randomBytes, randomUUID } from "node:crypto";
 import { spawn } from "node:child_process";
-import { basename, dirname, join, resolve } from "node:path";
+import { basename, dirname, join, relative, resolve } from "node:path";
 import { stdin } from "node:process";
 import { tmpdir } from "node:os";
 import { pathToFileURL } from "node:url";
@@ -68,6 +68,7 @@ import {
   type EnforceResourceDiff,
   type EnforceResourceEvaluation,
   type EnforceResourceHistoryEntry,
+  type EnforceResourceLifecycleStatus,
   type EnforceResourceManifestRef,
   type EnforceResourcePolicyGate,
   type EnforceResourceProposal,
@@ -75,10 +76,13 @@ import {
   type EnforceResourceValidation,
   inspectEnforceResource,
   latestEnforceResourceManifestPath,
+  loadCanonicalEnforceResourceManifest,
   listEnforceResourceHistory,
   listEnforceResources,
-  loadEnforceResourceManifest,
   proposeEnforceResourceLifecycle,
+  projectEnforceResourceLifecycleStatus,
+  projectEnforceResourcePublicValue,
+  resolveEnforceResourceRollbackTarget,
   restoreEnforceResourceSnapshot,
   validateEnforceResourceLifecycle,
   verifyEnforceResourceManifest,
@@ -20392,6 +20396,11 @@ function enforceResourceDiffSummary(diff: EnforceResourceDiff): string {
   return `${diff.added.length} added, ${diff.changed.length} changed, ${diff.removed.length} removed, ${diff.unchanged} unchanged`;
 }
 
+function enforceResourceCliRef(workspace: string, path: string): string {
+  const ref = relative(resolve(workspace), resolve(path)).replaceAll("\\", "/");
+  return ref || ".";
+}
+
 function printEnforceResourceDiff(diff: EnforceResourceDiff): void {
   console.log(chalk.gray("Diff:"), enforceResourceDiffSummary(diff));
   for (const entry of diff.added) {
@@ -20409,8 +20418,8 @@ function printEnforceResourceRestorePlan(plan: EnforceResourceRestorePlan): void
   console.log(chalk.gray("Manifest:"), plan.manifestId);
   console.log(chalk.gray("Mode:"), plan.apply ? "apply" : "dry-run");
   for (const entry of plan.entries) {
-    const marker = entry.status === "restored" ? chalk.green("✓")
-      : entry.status === "would-restore" ? chalk.yellow("•")
+    const marker = entry.status === "restored" || entry.status === "removed" ? chalk.green("✓")
+      : entry.status === "would-restore" || entry.status === "would-remove" ? chalk.yellow("•")
       : entry.status === "immutable-skipped" ? chalk.gray("⊘")
       : chalk.red("!");
     console.log(`  ${marker} ${entry.status.padEnd(18)} ${entry.id}`);
@@ -20471,6 +20480,23 @@ function printEnforceResourceHistory(entries: EnforceResourceHistoryEntry[]): vo
     console.log(`  ${entry.kind.padEnd(15)} ${entry.id}`);
     console.log(chalk.gray(`    ${entry.createdAt ?? "unknown-time"} ${sig} ${entry.path}`));
   }
+}
+
+function printEnforceResourceStatus(status: EnforceResourceLifecycleStatus): void {
+  const state = status.state === "ACTIVE" ? chalk.green(status.state)
+    : status.state === "DRIFTED" ? chalk.yellow(status.state)
+    : status.state === "BLOCKED" ? chalk.red(status.state)
+    : chalk.gray(status.state);
+  console.log(chalk.gray("Agent:"), status.agentId);
+  console.log(chalk.gray("State:"), state);
+  console.log(chalk.gray("Active:"), status.active?.manifestId ?? "none");
+  console.log(chalk.gray("Previous:"), status.previous?.manifestId ?? "none");
+  console.log(chalk.gray("Rollback target:"), status.rollbackTarget?.manifestId ?? "none");
+  console.log(chalk.gray("Integrity:"), status.integrity.valid
+    ? chalk.green("valid")
+    : chalk.red(status.integrity.reasonCodes.join(", ")));
+  printEnforceResourceDiff(status.pendingDiff);
+  if (status.nextAction) console.log(chalk.gray("Next:"), status.nextAction.command);
 }
 
 function registerResourceProtocolCommands(root: Command, includeCore: boolean): void {
@@ -20582,22 +20608,22 @@ function registerResourceProtocolCommands(root: Command, includeCore: boolean): 
           const workspace = process.cwd();
           const agentId = resolveAgentId(workspace, opts.agent ?? activeAgent(program));
           const fromPath = opts.from ? resolve(opts.from) : latestEnforceResourceManifestPath(workspace, agentId);
-          const before = loadEnforceResourceManifest(fromPath);
+          const before = loadCanonicalEnforceResourceManifest({ workspace, agentId, manifestPath: fromPath });
           const after = opts.to
-            ? loadEnforceResourceManifest(resolve(opts.to))
+            ? loadCanonicalEnforceResourceManifest({ workspace, agentId, manifestPath: resolve(opts.to) })
             : buildEnforceResourceManifest({ workspace, agentId: before.agentId });
           const diff = diffEnforceResourceManifests(before, after);
           if (opts.json) {
             console.log(JSON.stringify({
-              from: fromPath,
-              to: opts.to ? resolve(opts.to) : "current-workspace",
+              from: enforceResourceCliRef(workspace, fromPath),
+              to: opts.to ? enforceResourceCliRef(workspace, resolve(opts.to)) : "current-workspace",
               diff
             }, null, 2));
             return;
           }
           console.log(chalk.bold.hex("#4AEF79")("\nEnforce Resource Diff"));
-          console.log(chalk.gray("From:"), fromPath);
-          console.log(chalk.gray("To:"), opts.to ? resolve(opts.to) : "current workspace");
+          console.log(chalk.gray("From:"), enforceResourceCliRef(workspace, fromPath));
+          console.log(chalk.gray("To:"), opts.to ? enforceResourceCliRef(workspace, resolve(opts.to)) : "current workspace");
           printEnforceResourceDiff(diff);
         } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
       });
@@ -20624,7 +20650,7 @@ function registerResourceProtocolCommands(root: Command, includeCore: boolean): 
             includeImmutable: Boolean(opts.includeImmutable)
           });
           if (opts.json) {
-            console.log(JSON.stringify(plan, null, 2));
+            console.log(JSON.stringify(projectEnforceResourcePublicValue(plan, workspace), null, 2));
             return;
           }
           console.log(chalk.bold.hex("#4AEF79")("\nEnforce Resource Restore"));
@@ -20666,6 +20692,26 @@ function registerResourceProtocolCommands(root: Command, includeCore: boolean): 
         } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
       });
   }
+
+  root
+    .command("status")
+    .description("Show the signed active, previous, rollback, drift, and integrity state")
+    .option("--agent <agentId>", "agent id to inspect")
+    .option("--json", "Output as JSON")
+    .action(async (opts: { agent?: string; json?: boolean }) => {
+      try {
+        const workspace = process.cwd();
+        const agentId = resolveAgentId(workspace, opts.agent ?? activeAgent(program));
+        const status = projectEnforceResourceLifecycleStatus({ workspace, agentId });
+        if (opts.json) {
+          console.log(JSON.stringify(status, null, 2));
+          return;
+        }
+        console.log(chalk.bold.hex("#4AEF79")("\nEnforce Resource Status"));
+        printEnforceResourceStatus(status);
+        if (status.state === "BLOCKED") process.exitCode = 1;
+      } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
+    });
 
   root
     .command("validate")
@@ -20743,11 +20789,12 @@ function registerResourceProtocolCommands(root: Command, includeCore: boolean): 
 
   root
     .command("apply")
+    .alias("activate")
     .description("Accept current resources as the new signed manifest; dry-run unless --yes is set")
     .option("--agent <agentId>", "agent id to apply")
     .option("--manifest <path>", "baseline manifest path")
     .option("--yes", "accept current resource state and write a signed receipt", false)
-    .option("--force", "override blocked gates and record the override in the signed receipt", false)
+    .option("--force", "record override intent; hard integrity and lifecycle gates remain enforced", false)
     .option("--json", "Output as JSON")
     .action(async (opts: { agent?: string; manifest?: string; yes?: boolean; force?: boolean; json?: boolean }) => {
       try {
@@ -20761,15 +20808,15 @@ function registerResourceProtocolCommands(root: Command, includeCore: boolean): 
           force: Boolean(opts.force)
         });
         if (opts.json) {
-          console.log(JSON.stringify(result, null, 2));
+          console.log(JSON.stringify(projectEnforceResourcePublicValue(result, workspace), null, 2));
           return;
         }
         console.log(chalk.bold.hex("#4AEF79")("\nEnforce Resource Apply"));
         printEnforceResourceEvaluation(result.evaluation);
         if (result.applied) {
           console.log(chalk.gray("Accepted manifest:"), result.acceptedManifest?.manifest.manifestId ?? "none");
-          console.log(chalk.gray("Receipt:"), result.receiptPath ?? "not written");
-          console.log(chalk.gray("Receipt signature:"), result.receiptSigPath ?? "not signed");
+          console.log(chalk.gray("Receipt:"), result.receiptPath ? enforceResourceCliRef(workspace, result.receiptPath) : "not written");
+          console.log(chalk.gray("Receipt signature:"), result.receiptSigPath ? enforceResourceCliRef(workspace, result.receiptSigPath) : "not signed");
         } else {
           console.log(chalk.gray("\nDry run only. Re-run with --yes to accept current resources."));
         }
@@ -20778,7 +20825,7 @@ function registerResourceProtocolCommands(root: Command, includeCore: boolean): 
 
   root
     .command("rollback")
-    .description("Alias for restore: rollback resources from an Enforce snapshot")
+    .description("Roll back to the signed previous version, or an explicit canonical snapshot")
     .option("--agent <agentId>", "agent id to rollback")
     .option("--manifest <path>", "manifest path to restore from")
     .option("--resource <idOrPath>", "restore one resource id or path")
@@ -20789,16 +20836,19 @@ function registerResourceProtocolCommands(root: Command, includeCore: boolean): 
       try {
         const workspace = process.cwd();
         const agentId = resolveAgentId(workspace, opts.agent ?? activeAgent(program));
+        const rollbackTarget = opts.manifest
+          ? null
+          : resolveEnforceResourceRollbackTarget({ workspace, agentId });
         const plan = restoreEnforceResourceSnapshot({
           workspace,
           agentId,
-          manifestPath: opts.manifest ? resolve(opts.manifest) : undefined,
+          manifestPath: opts.manifest ? resolve(opts.manifest) : rollbackTarget?.ref,
           resource: opts.resource,
           apply: Boolean(opts.apply),
           includeImmutable: Boolean(opts.includeImmutable)
         });
         if (opts.json) {
-          console.log(JSON.stringify(plan, null, 2));
+          console.log(JSON.stringify(projectEnforceResourcePublicValue(plan, workspace), null, 2));
           return;
         }
         console.log(chalk.bold.hex("#4AEF79")("\nEnforce Resource Rollback"));
@@ -20961,11 +21011,11 @@ enforceResources
         manifestPath: opts.manifest ? resolve(opts.manifest) : undefined
       });
       if (opts.json) {
-        console.log(JSON.stringify(verification, null, 2));
+        console.log(JSON.stringify(projectEnforceResourcePublicValue(verification, workspace), null, 2));
         return;
       }
       console.log(chalk.bold.hex("#4AEF79")("\nEnforce Resource Verify"));
-      console.log(chalk.gray("Manifest:"), verification.manifestPath);
+      console.log(chalk.gray("Manifest:"), enforceResourceCliRef(workspace, verification.manifestPath));
       console.log(chalk.gray("Status:"), verification.valid ? chalk.green("valid") : chalk.red("changed"));
       console.log(chalk.gray("Signature:"), verification.signature.valid ? chalk.green("valid") : chalk.yellow(verification.signature.reason ?? "missing"));
       printEnforceResourceDiff(verification.diff);
@@ -20987,22 +21037,22 @@ enforceResources
       const workspace = process.cwd();
       const agentId = resolveAgentId(workspace, opts.agent ?? activeAgent(program));
       const fromPath = opts.from ? resolve(opts.from) : latestEnforceResourceManifestPath(workspace, agentId);
-      const before = loadEnforceResourceManifest(fromPath);
+      const before = loadCanonicalEnforceResourceManifest({ workspace, agentId, manifestPath: fromPath });
       const after = opts.to
-        ? loadEnforceResourceManifest(resolve(opts.to))
+        ? loadCanonicalEnforceResourceManifest({ workspace, agentId, manifestPath: resolve(opts.to) })
         : buildEnforceResourceManifest({ workspace, agentId: before.agentId });
       const diff = diffEnforceResourceManifests(before, after);
       if (opts.json) {
         console.log(JSON.stringify({
-          from: fromPath,
-          to: opts.to ? resolve(opts.to) : "current-workspace",
+          from: enforceResourceCliRef(workspace, fromPath),
+          to: opts.to ? enforceResourceCliRef(workspace, resolve(opts.to)) : "current-workspace",
           diff
         }, null, 2));
         return;
       }
       console.log(chalk.bold.hex("#4AEF79")("\nEnforce Resource Diff"));
-      console.log(chalk.gray("From:"), fromPath);
-      console.log(chalk.gray("To:"), opts.to ? resolve(opts.to) : "current workspace");
+      console.log(chalk.gray("From:"), enforceResourceCliRef(workspace, fromPath));
+      console.log(chalk.gray("To:"), opts.to ? enforceResourceCliRef(workspace, resolve(opts.to)) : "current workspace");
       printEnforceResourceDiff(diff);
     } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
   });
@@ -21029,7 +21079,7 @@ enforceResources
         includeImmutable: Boolean(opts.includeImmutable)
       });
       if (opts.json) {
-        console.log(JSON.stringify(plan, null, 2));
+        console.log(JSON.stringify(projectEnforceResourcePublicValue(plan, workspace), null, 2));
         return;
       }
       console.log(chalk.bold.hex("#4AEF79")("\nEnforce Resource Restore"));

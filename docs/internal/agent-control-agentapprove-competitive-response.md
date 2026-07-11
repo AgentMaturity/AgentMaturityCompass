@@ -38,6 +38,8 @@ AMC-1471 closes the approval-delivery P0: every operator surface now projects th
 
 AMC-1472 closes the outcome-onboarding P0: CLI and Studio now share one read-only activation projection over signed connection state and existing runtime receipts. Configuration can become ready, but only a verified action, control decision, and signed proof for the selected agent can complete onboarding.
 
+AMC-1473 closes the first operator-speed P1: existing Enforce resource manifests now project one signed active, previous, rollback, drift, and integrity state across CLI, API, Studio, and OpenAPI. Activation and rollback are dry-run first, exact-manifest-confirmed on remote surfaces, serialized, canonical-path-bound, digest-verified, post-verified, and signed-receipt-backed; hard integrity failures cannot be forced through.
+
 ## What each competitor does well
 
 ### Agent Control
@@ -144,7 +146,7 @@ AMC must not import these files as executable policy. A future AEP lane should:
 
 | # | Action | AMC surface | No-bloat boundary |
 | ---: | --- | --- | --- |
-| 11 | Version, diff, activate, and roll back controls | Enforce | Reuse resource manifests and lifecycle receipts |
+| 11 | Version, diff, activate, and roll back controls | Enforce | Shipped in AMC-1473; reuses signed resource manifests and lifecycle receipts, exposes one bounded status projection, rejects noncanonical selectors and stale confirmations, and writes no success receipt on integrity failure |
 | 12 | Add reusable scope templates | Enforce/Fleet | Templates compile to existing policy schema |
 | 13 | Add nested condition authoring | Enforce | Use one AST, no source-specific rule languages |
 | 14 | Add steer outcome where provider supports it | Enforce | Capability-gated; never report steer when mapped to warn |
