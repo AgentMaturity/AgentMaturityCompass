@@ -6,7 +6,7 @@
 - Source reviewed: [Agent Control controls](https://docs.agentcontrol.dev/concepts/controls), [Agent Control repository](https://github.com/agentcontrol/agent-control), and the existing AMC competitive review
 - Retrieval: live first-party docs and immutable repository source reviewed 2026-07-11
 - Immutable source commit: Agent Control `83188b62c63e2b4ff9ada87048fd99605184ee5a`
-- Status: Locally verified; commit, publication, and production verification pending
+- Status: Shipped and production verified
 
 ## Relevance decision
 
@@ -58,4 +58,8 @@ No competitor code, prose, examples, schemas, mappings, prompts, policies, scree
 - Full Vitest passes at 1,070 files / 8,468 tests. Full Playwright passes 55 with two intentionally conditional i18n cases skipped. Desktop packaging and verification pass for macOS universal, Linux x64, and Windows x64.
 - Authenticated disposable-workspace Studio proof passed real preview and apply with exact confirmation, transparency and ledger IDs, 1280px and 390px overflow checks, and zero console, page, or failed-network errors.
 - `tmp/release-gate/amc-1474-final.json` records a passed full release gate, including a second 1,070-file / 8,468-test run, zero runtime dependency vulnerabilities, architecture/docs checks, CLI/domain smoke, and install-persona QA.
-- Exact-head CI, deployment, TLS, and production verification remain pending.
+- Implementation commit `6a86dc849a23eb5b0c3af2b190d3081bf93442cb` is pushed to `main`. Exact-SHA CI (`29165525358`), Docker Runner Image (`29165525363`), Pages (`29165525377`), and npm validation (`29165525386`) completed successfully.
+- Production publishes exact source revision `6a86dc849a23eb5b0c3af2b190d3081bf93442cb`, 171 public guides, `SCOPE_TEMPLATES` at 3,612 bytes with SHA-256 `c4d73b5e2412280489d92e5b5cb74803dda94544c860cf18776581d3b022e8d3`, 1,159 CLI paths, 8,468 tests, the three scope-template OpenAPI paths, and the current Enforce command copy.
+- Desktop and 390px production-browser checks passed the homepage and `docs/#SCOPE_TEMPLATES` with HTTP 200, expected guide content, no horizontal overflow, and zero console, page, or failed-network errors.
+- The apex returns HTTP 200 and `www` returns HTTP 301 to the apex. The Let's Encrypt certificate verifies with return code 0, covers both hostnames, and is valid from 2026-06-26 through 2026-09-24.
+- `tmp/release-gate/amc-1474-live.json` records a passed quick live release gate at 2026-07-11T19:54:14.155Z, including typecheck, focused adversarial regression, build, architecture/docs checks, zero runtime dependency vulnerabilities, CLI/domain smoke, and live HTTP 200.

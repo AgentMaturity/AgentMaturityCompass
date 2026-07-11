@@ -551,7 +551,7 @@ describe("AMC-1474 reusable action-class scope templates", () => {
     expect(readFileSync(".changeset/amc-reusable-scope-templates.md", "utf8"))
       .toContain("reusable action-class scope templates");
     expect(readFileSync("docs/internal/agent-control-agentapprove-competitive-response.md", "utf8"))
-      .toContain("Implemented in AMC-1474");
+      .toContain("Shipped in AMC-1474");
     expect(readFileSync("website/docs/docs.js", "utf8")).toContain("'SCOPE_TEMPLATES'");
     const website = readFileSync("website/script.js", "utf8");
     expect(website).toContain("amc policy scope compile release-external");
