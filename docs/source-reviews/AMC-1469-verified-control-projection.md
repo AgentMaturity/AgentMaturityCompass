@@ -5,7 +5,7 @@
 - AMC surfaces requested: Enforce, Shield, Watch, Vault, CLI, API, Docs
 - Source reviewed: Agent Control repository and public product documentation
 - Retrieval: primary source reviewed 2026-07-11 at commit `83188b62c63e2b4ff9ada87048fd99605184ee5a`
-- Status: implementation, local release, implementation-head workflows, and production verification passed; publication-evidence head pending
+- Status: Done; implementation, local release, remote workflows, publication, and production verification passed
 
 ## Relevance decision
 
@@ -60,4 +60,4 @@ No second policy engine, evaluator, store, generic policy language, rule editor,
 - The deployed homepage publishes 1,152 CLI paths and 8,404 tests. Deployed CLI Docs include `amc policy controls`; public OpenAPI includes `/v1/policy/controls` and `ControlProjectionResponse`.
 - Desktop 1280 px and mobile 390 px production checks found no horizontal overflow, warning, or error on the homepage or CLI Docs. Visual receipts: `tmp/visual-proof/amc-1469-home-desktop.png`, `tmp/visual-proof/amc-1469-home-mobile.png`, `tmp/visual-proof/amc-1469-cli-desktop.png`, and `tmp/visual-proof/amc-1469-cli-mobile.png`.
 - Post-deploy quick release gate passed live HTTPS health; receipt `tmp/release-gate/amc-1469-live.json`. Its full-suite and install-persona steps were intentionally skipped because the non-quick release gate had already passed both.
-- The publication-evidence commit and its exact-head workflows remain pending; Linear stays In Progress until they pass.
+- Publication-evidence commit `b8276104198a83130171a4e1aa00b376afa4572f` (`Record AMC-1469 publication evidence`) was pushed to `origin/main`. Exact-head [CI 29149259796](https://github.com/AgentMaturity/AgentMaturityCompass/actions/runs/29149259796), [npm validation 29149259804](https://github.com/AgentMaturity/AgentMaturityCompass/actions/runs/29149259804), and [Pages 29149259801](https://github.com/AgentMaturity/AgentMaturityCompass/actions/runs/29149259801) passed. Docker correctly did not retrigger for the docs-only evidence commit.
