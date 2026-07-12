@@ -307,5 +307,8 @@ describe("AMC-1478 signed evaluator registry metadata", () => {
     ]) expect(review).toContain(boundary);
     expect(readFileSync("docs/internal/agent-control-agentapprove-competitive-response.md", "utf8"))
       .toContain("Implemented in AMC-1478");
+
+    const docsStyles = readFileSync("website/docs/docs.css", "utf8");
+    expect(docsStyles).toMatch(/\.doc-content td code\s*\{[^}]*white-space:\s*nowrap;[^}]*\}/s);
   });
 });

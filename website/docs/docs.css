@@ -319,6 +319,12 @@ code, pre { font-family: var(--mono); }
   padding: 8px 12px; border-bottom: 1px solid var(--border);
   color: var(--fg2);
 }
+.doc-content td code {
+  display: inline-block;
+  white-space: nowrap;
+  overflow-wrap: normal;
+  word-break: normal;
+}
 .doc-content tr:hover td { background: rgba(255,255,255,0.02); }
 .doc-content img { max-width: 100%; border: 1px solid var(--border); }
 .doc-content hr { border: none; border-top: 1px solid var(--border); margin: 24px 0; }
