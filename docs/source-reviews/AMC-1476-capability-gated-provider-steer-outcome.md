@@ -6,7 +6,7 @@
 - Sources reviewed: [Agent Control steer action demo](https://docs.agentcontrol.dev/examples/steer-action-demo), [Agent Control repository](https://github.com/agentcontrol/agent-control), [Claude Code hooks](https://code.claude.com/docs/en/hooks), and [Gemini CLI hook authoring](https://github.com/google-gemini/gemini-cli/blob/main/docs/hooks/writing-hooks.md)
 - Retrieval: live first-party docs and immutable repository source reviewed 2026-07-12
 - Immutable source commit: Agent Control `83188b62c63e2b4ff9ada87048fd99605184ee5a`
-- Status: Implemented and locally verified; publication verification pending
+- Status: Shipped and production verified
 
 ## Relevance decision
 
@@ -59,4 +59,9 @@ No competitor code, prose, schema, examples, policies, retry loop, adapter, scre
 - Clean-install QA: all 10 isolated user personas passed with an average rating of 10/10.
 - Desktop distribution: npm package plus macOS universal, Linux x64, and Windows x64 artifacts rebuilt and verified. Packed npm SHA-256: `a593c7a5c4211c659a4286bc51f5e850b70e73a4460ab6cefb62ced710a04ed0` (4,797,067 bytes).
 - Local receipts: `tmp/release-gate/amc-1476-final.json`, `tmp/persona-install-qa/latest.json`, and `dist/installers/manifest.json`.
-- Publication, exact-SHA CI, and production checks remain pending before closure.
+- Implementation commit: `d0166a9db7b9b8a6766d35fc3d431f93016b36b5`.
+- Exact-SHA GitHub verification: Pages run `29187142923`, CI run `29187142945`, Docker Runner Image run `29187142948`, and npm Publish run `29187142991` all completed successfully. Node 20 and Node 22 build/test jobs, security scan, local E2E, Docker smoke, Helm validation, image smoke, and package preflight were green.
+- Production revision: `https://agentmaturity.co/docs/content-manifest.json` reported source revision `d0166a9db7b9b8a6766d35fc3d431f93016b36b5`, 172 public guides, and the repository-exact `ADAPTERS` guide hash `a0105a18858ba45624f83deb4ceb0291b36824c066cadab7412475c18eee7a64`.
+- Live contract: the public adapter guide states that Claude corrective steer blocks the current call without input rewrite and that Gemini maps the request to a lossy deny without reporting effective steer. The public OpenAPI exposes lifecycle schema `2026-07-12`, status `steered`, requested/effective outcome separation, `fail_closed_deny`, and strict request/decision/terminal phase objects.
+- Live release gate: `tmp/release-gate/amc-1476-live.json` passed, including typecheck, build, OpenAPI parse, architecture boundaries, Docs drift across 1,494 files, runtime audit with 0 vulnerabilities, CLI/domain smoke, and HTTP 200 production health. The full 8,490-test suite and 10-persona install QA are proven by the authoritative non-quick local gate and exact-SHA CI above.
+- Production browser/TLS: homepage and adapter docs returned HTTP 200 without console errors, page errors, missing contract text, or horizontal overflow at 1,440 x 900 and 390 x 844. The apex returned HTTP 200, `www` redirected to the apex, and the Let's Encrypt certificate covered `agentmaturity.co` plus `www.agentmaturity.co` from 2026-06-26 through 2026-09-24.
