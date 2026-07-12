@@ -363,6 +363,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc enterprise usage` | Show multi-tenant usage metering and quota utilization | - | - |
 | `amc eval` | Eval interop import and coverage status | - | - |
 | `amc eval import` | Import eval outputs (LangSmith, DeepEval, Promptfoo, OpenAI Evals, W&B, Langfuse, LangWatch) into signed AMC evidence | `--format <format>`<br>`--file <path>`<br>`--agent <agentId>`<br>`--trust-tier <tier>`<br>`--json` | - |
+| `amc eval registry` | Show signed metadata for existing AMC evaluators | `--refresh`<br>`--json` | - |
 | `amc eval run` | One-shot evaluation: read amcconfig.yaml, run all diagnostic tests, output results | `--format <format>`<br>`--output <path>`<br>`--window <window>`<br>`--agent <agentId>`<br>`--fail-on-error`<br>`--threshold <n>` | - |
 | `amc eval status` | Show imported eval coverage per AMC dimension | `--agent <agentId>`<br>`--window <window>`<br>`--json` | - |
 | `amc evidence` | Evidence lifecycle workflows | - | - |

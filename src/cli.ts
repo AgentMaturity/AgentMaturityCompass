@@ -6996,6 +6996,28 @@ vaultDlp
   });
 
 evalCmd
+  .command("registry")
+  .description("Show signed metadata for existing AMC evaluators")
+  .option("--refresh", "write and sign the current derived evaluator metadata", false)
+  .option("--json", "emit JSON output", false)
+  .action(async (opts: { refresh: boolean; json: boolean }) => {
+    const {
+      evaluatorRegistryStatus,
+      refreshEvaluatorRegistry,
+      renderEvaluatorRegistryStatusText,
+    } = await import("./eval/evaluatorRegistryMetadata.js");
+    const workspace = process.cwd();
+    const status = opts.refresh
+      ? refreshEvaluatorRegistry({ workspace })
+      : evaluatorRegistryStatus({ workspace });
+    if (opts.json) {
+      console.log(JSON.stringify(status, null, 2));
+      return;
+    }
+    process.stdout.write(renderEvaluatorRegistryStatusText(status));
+  });
+
+evalCmd
   .command("import")
   .description("Import eval outputs (LangSmith, DeepEval, Promptfoo, OpenAI Evals, W&B, Langfuse, LangWatch) into signed AMC evidence")
   .requiredOption("--format <format>", "eval format: openai|langsmith|deepeval|promptfoo|wandb|langfuse|langwatch")

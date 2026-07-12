@@ -91,7 +91,7 @@
 
       <div class="callout callout-green">
         <strong>By the numbers</strong>
-        The AMC CLI currently registers 1,163 command paths. Every command supports <code>--help</code> for inline documentation.
+        The AMC CLI currently registers 1,164 command paths. Every command supports <code>--help</code> for inline documentation.
       </div>
 
       <!-- Common workflow commands -->
@@ -415,7 +415,7 @@
 
       <!-- DATASETS -->
       <div class="ns-toggle" id="ns-evals" onclick="this.classList.toggle('open')">
-        <h3>Datasets &amp; Lite Scoring <span class="cmd-count">8+ commands</span></h3>
+        <h3>Datasets &amp; Lite Scoring <span class="cmd-count">9+ commands</span></h3>
       </div>
       <div class="ns-body">
         <table>
@@ -433,6 +433,7 @@
             <tr><td><code>amc strategy compare --file strategies.json --apply --approve</code></td><td>Commit a recommended route through policy approval, resource manifest evidence, and rollback data</td></tr>
             <tr><td><code>amc strategy list|show|rollback</code></td><td>Inspect strategy receipts and roll back accepted route changes</td></tr>
             <tr><td><code>amc lite-score</code></td><td>Lite scoring for non-agent chatbots and vanilla LLM apps</td></tr>
+            <tr><td><code>amc eval registry [--refresh] [--json]</code></td><td>Inspect or explicitly refresh the signed metadata catalog for existing AMC evaluators</td></tr>
             <tr><td><code>amc eval import</code></td><td>Import results from LangSmith, DeepEval, Promptfoo, and more</td></tr>
             <tr><td><code>amc eval status</code></td><td>Check imported eval coverage</td></tr>
           </tbody>

@@ -78,9 +78,9 @@ describe("public Docs Pages artifact", () => {
     expect(firstManifestRaw).toBe(secondManifestRaw);
     expect(manifest.schemaVersion).toBe("2026-07-10");
     expect(manifest.sourceRevision).toBe(revision);
-    expect(manifest.guideCount).toBe(172);
+    expect(manifest.guideCount).toBe(173);
     expect(manifest.guides.map((guide: { id: string }) => guide.id)).toEqual(publicDocs);
-    expect(new Set(manifest.guides.map((guide: { id: string }) => guide.id)).size).toBe(172);
+    expect(new Set(manifest.guides.map((guide: { id: string }) => guide.id)).size).toBe(173);
 
     for (const guide of manifest.guides as Array<{ id: string; source: string; asset: string; bytes: number; sha256: string }>) {
       const sourcePath = resolve(root, guide.source);
@@ -101,7 +101,7 @@ describe("public Docs Pages artifact", () => {
     expect(statSync(rendererPath).isFile()).toBe(true);
 
     const deployedMarkdown = filesUnder(resolve(first, "docs/content")).filter(path => path.endsWith(".md"));
-    expect(deployedMarkdown).toHaveLength(172);
+    expect(deployedMarkdown).toHaveLength(173);
     expect(deployedMarkdown).not.toContain("FULL_MODULE_ROADMAP.md");
     expect(deployedMarkdown).not.toContain("IMPLEMENTATION_REALITY_MAP.md");
     expect(deployedMarkdown).not.toContain("OSS_ADOPTION_ROADMAP.md");

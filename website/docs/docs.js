@@ -30,7 +30,7 @@ const CATEGORIES = [
   {
     name: 'Scoring & Dimensions',
     icon: '05',
-    docs: ['DIAGNOSTIC_BANK', 'QUESTION_BANK', 'SCORING_METHODOLOGY', 'AMC_QUESTIONS_IN_DEPTH', 'AMC_MASTER_REFERENCE', 'ARCHETYPES', 'BENCHMARKS', 'BENCHMARKING', 'BENCH_REGISTRY', 'EQUALIZER_TARGETS', 'METRICS', 'OUTCOMES', 'FORECASTING', 'PREDICTION_LOG', 'PREDICTIVE_MAINTENANCE', 'self-calibration', 'VALIDITY_FRAMEWORK', 'score-history']
+    docs: ['DIAGNOSTIC_BANK', 'QUESTION_BANK', 'SCORING_METHODOLOGY', 'EVALUATOR_REGISTRY', 'AMC_QUESTIONS_IN_DEPTH', 'AMC_MASTER_REFERENCE', 'ARCHETYPES', 'BENCHMARKS', 'BENCHMARKING', 'BENCH_REGISTRY', 'EQUALIZER_TARGETS', 'METRICS', 'OUTCOMES', 'FORECASTING', 'PREDICTION_LOG', 'PREDICTIVE_MAINTENANCE', 'self-calibration', 'VALIDITY_FRAMEWORK', 'score-history']
   },
   {
     name: 'Compliance & Regulatory',
@@ -96,7 +96,7 @@ const ALL_DOCS = [
   'CONTINUOUS_MONITORING','CONTINUOUS_RECURRENCE','DASHBOARD','DEPLOYMENT','DEPLOYMENT_CHECKLIST','DIAGNOSTIC_BANK',
   'DOCS_DRIFT_CLEANUP_PLAN','DOCTOR','DOMAIN_PACKS','DOMAIN_PROOF_LANE','DRIFT_ALERTS','DUAL_CONTROL_APPROVALS','ECONOMIC_SIGNIFICANCE',
   'ECOSYSTEM','ECOSYSTEM_COMPARATIVE_VIEW','ECOSYSTEM_VIEW','ENCRYPTION_AT_REST',
-  'ENTERPRISE','EQUALIZER_TARGETS','EU_AI_ACT_COMPLIANCE','EVIDENCE_REQUESTS',
+  'ENTERPRISE','EQUALIZER_TARGETS','EU_AI_ACT_COMPLIANCE','EVALUATOR_REGISTRY','EVIDENCE_REQUESTS',
   'EVIDENCE_TRUST','EXECUTIVE_OVERVIEW','EXPERIMENTS','FEDERATION','FLEET','FORECASTING',
   'FULL_MODULE_ROADMAP','GDPR_ARTICLE_COMPLIANCE','GETTING_STARTED','GOVERNANCE','GOVERNOR','GO_TO_MARKET_PACK',
   'HARDWARE_TRUST','IDENTITY','IDENTITY_STABILITY','INCIDENT_RESPONSE_READINESS',
@@ -184,7 +184,7 @@ const PUBLIC_DOC_IDS = new Set([
   'PROVIDERS', 'SDK', 'SDK_VERSIONING', 'MCP_SERVER', 'integrations/ci-cd',
 
   // Score and metric validity
-  'AMC_QUESTIONS_IN_DEPTH', 'QUESTION_BANK', 'SCORING_METHODOLOGY', 'ARCHETYPES',
+  'AMC_QUESTIONS_IN_DEPTH', 'QUESTION_BANK', 'SCORING_METHODOLOGY', 'EVALUATOR_REGISTRY', 'ARCHETYPES',
   'BENCHMARKS', 'METRICS', 'OUTCOMES', 'VALIDITY_FRAMEWORK', 'self-calibration', 'score-history',
 
   // Compliance and regulation
@@ -664,7 +664,7 @@ function showWelcome() {
         <div class="stat-card"><div class="num">${PUBLIC_DOCS.length}</div><div class="label">Public Guides</div></div>
         <div class="stat-card"><div class="num">${PUBLIC_CATEGORIES.length}</div><div class="label">Categories</div></div>
         <div class="stat-card"><div class="num">244</div><div class="label">Default Questions</div></div>
-        <div class="stat-card"><div class="num">1,163</div><div class="label">CLI Paths</div></div>
+        <div class="stat-card"><div class="num">1,164</div><div class="label">CLI Paths</div></div>
         <div class="stat-card"><div class="num">41</div><div class="label">Industry Packs</div></div>
         <div class="stat-card"><div class="num">14</div><div class="label">Framework Adapters</div></div>
       </div>

@@ -3,7 +3,7 @@
 ## Council Roles Simulated
 
 ### 🎯 Product Manager
-**Assessment**: AMC has exceptional technical depth (94 score modules, 142 assurance packs, 8,481 passing tests) but the first-touch experience needs simplification. 1,163 CLI command paths is powerful but intimidating. The task-first `amc` entry point should remain the default front door.
+**Assessment**: AMC has exceptional technical depth (94 score modules, 142 assurance packs, 8,481 passing tests) but the first-touch experience needs simplification. 1,164 CLI command paths is powerful but intimidating. The task-first `amc` entry point should remain the default front door.
 **Score**: 7/10 — depth is there, onboarding needs work.
 
 ### 🔒 Security Researcher  

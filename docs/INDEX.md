@@ -75,6 +75,7 @@ Use this page to reach the shortest evidence-backed path for your task. AMC's pu
 - [Receipts](RECEIPTS.md)
 - [Claim Provenance](CLAIM_PROVENANCE.md)
 - [Scoring Methodology](SCORING_METHODOLOGY.md)
+- [Evaluator Registry](EVALUATOR_REGISTRY.md)
 - [Validity Framework and Limitations](VALIDITY_FRAMEWORK.md)
 - [Audit Binder](AUDIT_BINDER.md)
 - [Whitepaper](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/whitepaper/AMC_WHITEPAPER_v1.md)

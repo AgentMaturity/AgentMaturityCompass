@@ -499,8 +499,12 @@ amc dataset create support-bot                           # create a reusable eva
 amc dataset add-case support-bot --prompt "..." --expected "..."
 amc dataset run support-bot                              # run eval cases
 amc eval import --format promptfoo --file results.json   # import external eval results
+amc eval registry                                        # inspect signed evaluator metadata
+amc eval registry --refresh                              # explicitly refresh and sign the derived snapshot
 amc lite-score                                           # score a non-agent chatbot / LLM app
 ```
+
+`amc eval registry` reads one deterministic catalog over AMC's existing deterministic metrics, LLM judges, and assurance packs. The default command is read-only; `--refresh` is the only write path. A trusted snapshot binds package-relative owners, versions, and implementation hashes, while custom runtime metrics remain visible but unverified. Registry metadata is not evaluator-result evidence and cannot prove that an evaluator ran or passed. See [Evaluator Registry](docs/EVALUATOR_REGISTRY.md).
 
 ### Business, inventory, and reporting
 
@@ -691,7 +695,7 @@ The full trust stack is **free and MIT licensed**. The only paid surface is Indu
 
 | Tier | What you get |
 |---|---|
-| **Free / Open Source** | Everything — Score, Shield, Enforce, Vault, Watch, Comply, Fleet, Passport, all 14 adapters, 1,163 registered CLI command paths, browser playground, CI gates |
+| **Free / Open Source** | Everything — Score, Shield, Enforce, Vault, Watch, Comply, Fleet, Passport, all 14 adapters, 1,164 registered CLI command paths, browser playground, CI gates |
 | **Industry Packs** | Everything in Free + all 41 Industry Domain Packs for `$9.99/month` |
 | **Enterprise** | Everything in Industry Packs + priority support + custom pack development + deployment assistance |
 
@@ -726,7 +730,7 @@ The full trust stack is **free and MIT licensed**. The only paid surface is Indu
 | [Community Demo Kit](docs/COMMUNITY_DEMO_KIT.md) | [Why AMC One-Pager](docs/WHY_AMC_ONE_PAGER.md) |
 | [Solo Dev Quickstart](docs/SOLO_DEV_QUICKSTART.md) | [Platform Engineer Quickstart](docs/PLATFORM_ENGINEER_QUICKSTART.md) |
 | [Security & Compliance Quickstart](docs/SECURITY_COMPLIANCE_QUICKSTART.md) | [Troubleshooting](docs/TROUBLESHOOTING.md) |
-| [CLI Reference (1,163 command paths)](docs/CLI_COMMAND_INVENTORY.md) | [Architecture](docs/ARCHITECTURE_MAP.md) |
+| [CLI Reference (1,164 command paths)](docs/CLI_COMMAND_INVENTORY.md) | [Architecture](docs/ARCHITECTURE_MAP.md) |
 | [Compatibility Matrix](docs/COMPATIBILITY_MATRIX.md) | [Starter Blueprints](docs/STARTER_BLUEPRINTS.md) |
 | [Install Packages](docs/INSTALL_PACKAGES.md) | [Support Policy](docs/SUPPORT_POLICY.md) |
 | [Release Cadence](docs/RELEASE_CADENCE.md) | [CI Templates](docs/CI_TEMPLATES.md) |
@@ -846,6 +850,6 @@ cd AgentMaturityCompass && npm ci && npm test   # 1,071 files / 8,481 passing Vi
 ---
 
 <p align="center">
-  <strong>244 default diagnostic questions + 20 lifecycle expansion questions · 142 assurance packs · 41 domain packs · 14 adapters · 1,163 CLI command paths</strong><br>
+  <strong>244 default diagnostic questions + 20 lifecycle expansion questions · 142 assurance packs · 41 domain packs · 14 adapters · 1,164 CLI command paths</strong><br>
   <em>Stop trusting. Start verifying.</em>
 </p>
