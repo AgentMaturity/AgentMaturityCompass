@@ -625,7 +625,7 @@ Do not treat a detected runtime as proof of event/control coverage. Issue a port
 amc adapters capabilities --agent my-agent --adapter claude-cli --out adapter-capabilities.json --json
 ```
 
-Claude Code receipts can verify native allow/deny/ask only with a valid signed control hook. Gemini CLI receipts expose allow/deny and explicitly record that ask degrades to deny. Metadata-only plugin adapters fail closed instead of inheriting a compatibility claim.
+Claude Code receipts can verify allow/deny/ask and bounded corrective steer only with a valid signed control hook. Steer blocks the current call, rewrites no input, and requires a new fully governed action for retry. Gemini CLI receipts expose allow/deny and explicitly record that ask or requested steer degrades to a lossy deny. Metadata-only plugin adapters fail closed instead of inheriting a compatibility claim.
 
 > [Full adapter docs](docs/ADAPTERS.md)
 

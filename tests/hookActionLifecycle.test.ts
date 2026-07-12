@@ -152,7 +152,7 @@ describe("verified hook action lifecycle", () => {
     const lifecycle = inspectHookActionLifecycle({ workspace, agentId, actionId });
 
     expect(lifecycle).toEqual(expect.objectContaining({
-      schemaVersion: "2026-07-11",
+      schemaVersion: "2026-07-12",
       agentId,
       actionId,
       provider: "claude-code",

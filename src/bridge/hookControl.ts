@@ -32,6 +32,8 @@ export const MAX_CONTROL_HOOK_BODY_BYTES = 262_144;
 
 export type HookProvider = "claude-code" | "gemini-cli";
 export type HookControlDecision = "allow" | "deny" | "ask";
+export type HookControlOutcome = HookControlDecision | "steer";
+export type HookControlProviderMapping = "native" | "corrective_deny" | "fail_closed_deny";
 export type ProviderControlResponse = Record<string, unknown>;
 
 export type HookControlErrorCode =
@@ -62,8 +64,10 @@ export interface ProviderHookControlResult {
   eventId: string;
   sessionId: string;
   canonicalToolName: string | null;
-  requestedDecision: HookControlDecision;
+  requestedDecision: HookControlOutcome;
   decision: HookControlDecision;
+  effectiveOutcome: HookControlOutcome;
+  providerMapping: HookControlProviderMapping;
   capabilityLossy: boolean;
   reason: string;
   providerResponse: ProviderControlResponse;
@@ -84,6 +88,9 @@ interface NormalizedProviderToolRequest {
 
 const SAFE_ID = /^[A-Za-z0-9][A-Za-z0-9._:-]*$/;
 const providerSchema = z.enum(["claude-code", "gemini-cli"]);
+const controlDecisionSchema = z.enum(["allow", "deny", "ask"]);
+const controlOutcomeSchema = z.enum(["allow", "deny", "ask", "steer"]);
+const controlProviderMappingSchema = z.enum(["native", "corrective_deny", "fail_closed_deny"]);
 const providerHookInputSchema = z.object({
   hook_event_name: z.string().min(1).max(160),
   tool_name: z.string().min(1).max(512),
@@ -97,10 +104,20 @@ const providerHookInputSchema = z.object({
 const claudeControlResponseSchema = z.object({
   hookSpecificOutput: z.object({
     hookEventName: z.literal("PreToolUse"),
-    permissionDecision: z.enum(["allow", "deny", "ask"]),
+    permissionDecision: controlDecisionSchema,
     permissionDecisionReason: z.string().min(1).max(1_024),
+    additionalContext: z.string().min(1).max(1_024).optional(),
   }).strict(),
-}).strict();
+}).strict().superRefine((value, ctx) => {
+  if (value.hookSpecificOutput.additionalContext
+    && value.hookSpecificOutput.permissionDecision !== "deny") {
+    ctx.addIssue({
+      code: "custom",
+      path: ["hookSpecificOutput", "additionalContext"],
+      message: "corrective context requires a blocking deny decision",
+    });
+  }
+});
 
 const geminiControlResponseSchema = z.union([
   z.object({ decision: z.literal("allow") }).strict(),
@@ -110,7 +127,7 @@ const geminiControlResponseSchema = z.union([
   }).strict(),
 ]);
 
-const storedControlMetaSchema = z.object({
+const storedControlMetaV1Schema = z.object({
   trustTier: z.literal("OBSERVED"),
   controlSchemaVersion: z.literal(1),
   agentId: z.string().min(1),
@@ -119,8 +136,8 @@ const storedControlMetaSchema = z.object({
   rawInputSha256: z.string().regex(/^[a-f0-9]{64}$/),
   rawPayloadStored: z.literal(false),
   canonicalToolName: z.string().nullable(),
-  requestedDecision: z.enum(["allow", "deny", "ask"]),
-  decision: z.enum(["allow", "deny", "ask"]),
+  requestedDecision: controlDecisionSchema,
+  decision: controlDecisionSchema,
   capabilityLossy: z.boolean(),
   reason: z.string().min(1),
   providerResponse: z.record(z.string(), z.unknown()),
@@ -130,7 +147,38 @@ const storedControlMetaSchema = z.object({
   receipt_sha256: z.string().regex(/^[a-f0-9]{64}$/),
 }).passthrough();
 
-const providerHookControlResultSchema = z.object({
+const storedControlMetaV2Schema = z.object({
+  trustTier: z.literal("OBSERVED"),
+  controlSchemaVersion: z.literal(2),
+  agentId: z.string().min(1),
+  provider: providerSchema,
+  actionId: z.string().min(1),
+  rawInputSha256: z.string().regex(/^[a-f0-9]{64}$/),
+  rawPayloadStored: z.literal(false),
+  canonicalToolName: z.string().nullable(),
+  requestedDecision: controlOutcomeSchema,
+  decision: controlDecisionSchema,
+  effectiveOutcome: controlOutcomeSchema,
+  providerMapping: controlProviderMappingSchema,
+  capabilityLossy: z.boolean(),
+  reason: z.string().min(1).max(1_024),
+  providerResponse: z.record(z.string(), z.unknown()),
+  providerResponseSha256: z.string().regex(/^[a-f0-9]{64}$/),
+  receipt: z.string().min(1),
+  receipt_id: z.string().min(1),
+  receipt_sha256: z.string().regex(/^[a-f0-9]{64}$/),
+}).passthrough().superRefine((value, ctx) => {
+  if (!controlMappingValid(value)) {
+    ctx.addIssue({ code: "custom", path: ["providerMapping"], message: "provider outcome mapping is inconsistent" });
+  }
+});
+
+const storedControlMetaSchema = z.discriminatedUnion("controlSchemaVersion", [
+  storedControlMetaV1Schema,
+  storedControlMetaV2Schema,
+]);
+
+const providerHookControlResultV1Schema = z.object({
   controlled: z.literal(true),
   idempotentReplay: z.boolean(),
   provider: providerSchema,
@@ -138,8 +186,8 @@ const providerHookControlResultSchema = z.object({
   eventId: z.string().min(1),
   sessionId: z.string().min(1),
   canonicalToolName: z.string().nullable(),
-  requestedDecision: z.enum(["allow", "deny", "ask"]),
-  decision: z.enum(["allow", "deny", "ask"]),
+  requestedDecision: controlDecisionSchema,
+  decision: controlDecisionSchema,
   capabilityLossy: z.boolean(),
   reason: z.string().min(1),
   providerResponse: z.record(z.string(), z.unknown()),
@@ -148,6 +196,72 @@ const providerHookControlResultSchema = z.object({
   receiptId: z.string().min(1),
   receiptSha256: z.string().regex(/^[a-f0-9]{64}$/),
 }).strict();
+
+const providerHookControlResultV2Schema = providerHookControlResultV1Schema.extend({
+  requestedDecision: controlOutcomeSchema,
+  effectiveOutcome: controlOutcomeSchema,
+  providerMapping: controlProviderMappingSchema,
+}).strict();
+
+const providerHookControlResultSchema = z.union([
+  providerHookControlResultV2Schema,
+  providerHookControlResultV1Schema,
+]);
+
+interface ControlMappingFields {
+  provider: HookProvider;
+  requestedDecision: HookControlOutcome;
+  decision: HookControlDecision;
+  effectiveOutcome: HookControlOutcome;
+  providerMapping: HookControlProviderMapping;
+  capabilityLossy: boolean;
+}
+
+function controlMappingValid(value: ControlMappingFields): boolean {
+  if (value.providerMapping === "native") {
+    return value.requestedDecision !== "steer"
+      && value.requestedDecision === value.decision
+      && value.effectiveOutcome === value.decision
+      && !value.capabilityLossy;
+  }
+  if (value.providerMapping === "corrective_deny") {
+    return value.provider === "claude-code"
+      && value.requestedDecision === "steer"
+      && value.decision === "deny"
+      && value.effectiveOutcome === "steer"
+      && !value.capabilityLossy;
+  }
+  return value.provider === "gemini-cli"
+    && (value.requestedDecision === "ask" || value.requestedDecision === "steer")
+    && value.decision === "deny"
+    && value.effectiveOutcome === "deny"
+    && value.capabilityLossy;
+}
+
+function normalizeLegacyControlFields(value: {
+  provider: HookProvider;
+  requestedDecision: HookControlDecision;
+  decision: HookControlDecision;
+  capabilityLossy: boolean;
+}): Pick<ControlMappingFields, "effectiveOutcome" | "providerMapping"> {
+  if (value.provider === "gemini-cli"
+    && value.requestedDecision === "ask"
+    && value.decision === "deny"
+    && value.capabilityLossy) {
+    return { effectiveOutcome: "deny", providerMapping: "fail_closed_deny" };
+  }
+  if (value.requestedDecision === value.decision && !value.capabilityLossy) {
+    return { effectiveOutcome: value.decision, providerMapping: "native" };
+  }
+  throw new Error("legacy provider outcome mapping is inconsistent");
+}
+
+function normalizeControlResult(
+  value: z.infer<typeof providerHookControlResultSchema>,
+): ProviderHookControlResult {
+  if ("effectiveOutcome" in value && "providerMapping" in value) return value;
+  return { ...value, ...normalizeLegacyControlFields(value) };
+}
 
 function parseProvider(provider: unknown): HookProvider {
   const parsed = providerSchema.safeParse(provider);
@@ -191,15 +305,20 @@ export function renderProviderControlResponse(
   providerInput: HookProvider,
   decision: HookControlDecision,
   reasonInput: string,
+  additionalContextInput?: string,
 ): ProviderControlResponse {
   const provider = parseProvider(providerInput);
   const reason = cleanReason(reasonInput);
   if (provider === "claude-code") {
+    const additionalContext = decision === "deny" && additionalContextInput
+      ? cleanReason(additionalContextInput)
+      : null;
     return {
       hookSpecificOutput: {
         hookEventName: "PreToolUse",
         permissionDecision: decision,
         permissionDecisionReason: reason,
+        ...(additionalContext ? { additionalContext } : {}),
       },
     };
   }
@@ -361,7 +480,7 @@ function requestedControlDecision(input: {
   workspace: string;
   agentId: string;
   request: NormalizedProviderToolRequest;
-}): { decision: HookControlDecision; reason: string } {
+}): { decision: HookControlOutcome; reason: string } {
   if (!input.request.canonicalToolName) {
     return {
       decision: "deny",
@@ -396,7 +515,10 @@ function requestedControlDecision(input: {
       args: input.request.args,
     });
     if (!argsValidation.ok) {
-      return { decision: "deny", reason: "Tool arguments are denied by signed ToolHub policy." };
+      return {
+        decision: "steer",
+        reason: `Signed ToolHub policy rejected the current ${tool.name} arguments.`,
+      };
     }
 
     const governor = runGovernorCheck({
@@ -441,23 +563,66 @@ function requestedControlDecision(input: {
 
 function materializeProviderDecision(input: {
   provider: HookProvider;
-  requestedDecision: HookControlDecision;
+  requestedDecision: HookControlOutcome;
   reason: string;
 }): {
   decision: HookControlDecision;
+  effectiveOutcome: HookControlOutcome;
+  providerMapping: HookControlProviderMapping;
   capabilityLossy: boolean;
   reason: string;
   providerResponse: ProviderControlResponse;
   providerResponseSha256: string;
 } {
-  const capabilityLossy = input.provider === "gemini-cli" && input.requestedDecision === "ask";
-  const decision: HookControlDecision = capabilityLossy ? "deny" : input.requestedDecision;
-  const providerResponse = renderProviderControlResponse(input.provider, input.requestedDecision, input.reason);
-  const reason = capabilityLossy
-    ? cleanReason(`${input.reason} Gemini CLI BeforeTool does not support ask, so AMC denied the action.`)
-    : cleanReason(input.reason);
+  let decision: HookControlDecision;
+  let effectiveOutcome: HookControlOutcome;
+  let providerMapping: HookControlProviderMapping;
+  let capabilityLossy: boolean;
+  let reason: string;
+  let providerResponse: ProviderControlResponse;
+
+  if (input.requestedDecision === "steer") {
+    decision = "deny";
+    if (input.provider === "claude-code") {
+      effectiveOutcome = "steer";
+      providerMapping = "corrective_deny";
+      capabilityLossy = false;
+      reason = cleanReason(input.reason);
+      providerResponse = renderProviderControlResponse(
+        input.provider,
+        "deny",
+        reason,
+        "Correct the tool arguments to satisfy the signed ToolHub constraints, then retry as a new action. AMC did not rewrite the input and will re-evaluate every control on the retry.",
+      );
+    } else {
+      effectiveOutcome = "deny";
+      providerMapping = "fail_closed_deny";
+      capabilityLossy = true;
+      reason = cleanReason(
+        `${input.reason} Gemini CLI BeforeTool does not support a verified corrective retry outcome, so AMC denied the action.`,
+      );
+      providerResponse = renderProviderControlResponse(input.provider, "deny", reason);
+    }
+  } else if (input.provider === "gemini-cli" && input.requestedDecision === "ask") {
+    decision = "deny";
+    effectiveOutcome = "deny";
+    providerMapping = "fail_closed_deny";
+    capabilityLossy = true;
+    providerResponse = renderProviderControlResponse(input.provider, "ask", input.reason);
+    reason = cleanReason(`${input.reason} Gemini CLI BeforeTool does not support ask, so AMC denied the action.`);
+  } else {
+    decision = input.requestedDecision;
+    effectiveOutcome = input.requestedDecision;
+    providerMapping = "native";
+    capabilityLossy = false;
+    reason = cleanReason(input.reason);
+    providerResponse = renderProviderControlResponse(input.provider, decision, reason);
+  }
+
   return {
     decision,
+    effectiveOutcome,
+    providerMapping,
     capabilityLossy,
     reason,
     providerResponse,
@@ -581,7 +746,17 @@ function recoverControlResult(input: {
   ) {
     throw new HookControlError("HOOK_CONTROL_LEDGER_UNAVAILABLE", 503, "stored hook control metadata is invalid");
   }
-  if (parsed.data.rawInputSha256 !== input.request.rawInputSha256) {
+  let stored: (
+    z.infer<typeof storedControlMetaV1Schema> | z.infer<typeof storedControlMetaV2Schema>
+  ) & Pick<ControlMappingFields, "effectiveOutcome" | "providerMapping">;
+  try {
+    stored = parsed.data.controlSchemaVersion === 1
+      ? { ...parsed.data, ...normalizeLegacyControlFields(parsed.data) }
+      : parsed.data;
+  } catch {
+    throw new HookControlError("HOOK_CONTROL_LEDGER_UNAVAILABLE", 503, "stored hook control outcome mapping is invalid");
+  }
+  if (stored.rawInputSha256 !== input.request.rawInputSha256) {
     throw new HookControlError(
       "HOOK_CONTROL_REPLAY_CONFLICT",
       409,
@@ -596,30 +771,30 @@ function recoverControlResult(input: {
     requireReceipt: true,
     requireSealedSession: true,
   });
-  const receipt = verifyReceipt(parsed.data.receipt, getPublicKeyHistory(input.ledger.workspace, "monitor"));
+  const receipt = verifyReceipt(stored.receipt, getPublicKeyHistory(input.ledger.workspace, "monitor"));
   const responseSha256 = sha256Hex(Buffer.from(
-    serializeProviderControlResponse(parsed.data.providerResponse),
+    serializeProviderControlResponse(stored.providerResponse),
     "utf8",
   ));
   if (
     !integrity.ok
-    || !validateProviderControlResponse(parsed.data.provider, parsed.data.providerResponse)
+    || !validateProviderControlResponse(stored.provider, stored.providerResponse)
     || !receipt.ok
     || receipt.payload?.kind !== "guard_check"
     || receipt.payload.agentId !== input.agentId
     || receipt.payload.providerId !== `hook-control:${input.request.provider}`
-    || receipt.payload.body_sha256 !== parsed.data.providerResponseSha256
-    || responseSha256 !== parsed.data.providerResponseSha256
+    || receipt.payload.body_sha256 !== stored.providerResponseSha256
+    || responseSha256 !== stored.providerResponseSha256
   ) {
     const diagnostics = [
       ...integrity.errors,
-      !validateProviderControlResponse(parsed.data.provider, parsed.data.providerResponse) ? "provider response shape invalid" : null,
+      !validateProviderControlResponse(stored.provider, stored.providerResponse) ? "provider response shape invalid" : null,
       receipt.error ?? null,
       receipt.payload?.kind !== "guard_check" ? "receipt kind mismatch" : null,
       receipt.payload?.agentId !== input.agentId ? "receipt agent mismatch" : null,
       receipt.payload?.providerId !== `hook-control:${input.request.provider}` ? "receipt provider mismatch" : null,
-      receipt.payload?.body_sha256 !== parsed.data.providerResponseSha256 ? "receipt response hash mismatch" : null,
-      responseSha256 !== parsed.data.providerResponseSha256 ? "stored response hash mismatch" : null,
+      receipt.payload?.body_sha256 !== stored.providerResponseSha256 ? "receipt response hash mismatch" : null,
+      responseSha256 !== stored.providerResponseSha256 ? "stored response hash mismatch" : null,
     ].filter((item): item is string => Boolean(item));
     throw new HookControlError(
       "HOOK_CONTROL_LEDGER_UNAVAILABLE",
@@ -630,20 +805,22 @@ function recoverControlResult(input: {
   return {
     controlled: true,
     idempotentReplay: true,
-    provider: parsed.data.provider,
-    actionId: parsed.data.actionId,
+    provider: stored.provider,
+    actionId: stored.actionId,
     eventId: existing.id,
     sessionId: input.sessionId,
-    canonicalToolName: parsed.data.canonicalToolName,
-    requestedDecision: parsed.data.requestedDecision,
-    decision: parsed.data.decision,
-    capabilityLossy: parsed.data.capabilityLossy,
-    reason: parsed.data.reason,
-    providerResponse: parsed.data.providerResponse,
-    providerResponseSha256: parsed.data.providerResponseSha256,
-    receipt: parsed.data.receipt,
-    receiptId: parsed.data.receipt_id,
-    receiptSha256: parsed.data.receipt_sha256,
+    canonicalToolName: stored.canonicalToolName,
+    requestedDecision: stored.requestedDecision,
+    decision: stored.decision,
+    effectiveOutcome: stored.effectiveOutcome,
+    providerMapping: stored.providerMapping,
+    capabilityLossy: stored.capabilityLossy,
+    reason: stored.reason,
+    providerResponse: stored.providerResponse,
+    providerResponseSha256: stored.providerResponseSha256,
+    receipt: stored.receipt,
+    receiptId: stored.receipt_id,
+    receiptSha256: stored.receipt_sha256,
   };
 }
 
@@ -667,6 +844,7 @@ export function verifyProviderHookControlResult(input: {
 
   let ledger: ReturnType<typeof openLedger> | null = null;
   try {
+    const suppliedResult = normalizeControlResult(parsed.data);
     const request = normalizeProviderRequest({
       workspace: input.workspace,
       provider: input.provider,
@@ -675,9 +853,9 @@ export function verifyProviderHookControlResult(input: {
     const eventId = deterministicEventId(input.authenticatedAgentId, input.provider, request.actionId);
     const sessionId = deterministicSessionId(input.authenticatedAgentId, input.provider, request.actionId);
     if (
-      parsed.data.actionId !== request.actionId
-      || parsed.data.eventId !== eventId
-      || parsed.data.sessionId !== sessionId
+      suppliedResult.actionId !== request.actionId
+      || suppliedResult.eventId !== eventId
+      || suppliedResult.sessionId !== sessionId
     ) {
       return { ok: false, error: "hook control response is not bound to the current provider request" };
     }
@@ -693,7 +871,7 @@ export function verifyProviderHookControlResult(input: {
     if (!recovered) {
       return { ok: false, error: "hook control response has no matching sealed ledger event" };
     }
-    const normalizedResult = { ...parsed.data, idempotentReplay: true };
+    const normalizedResult = { ...suppliedResult, idempotentReplay: true };
     return canonicalize(normalizedResult) === canonicalize(recovered)
       ? { ok: true, error: null }
       : { ok: false, error: "hook control response differs from its sealed ledger event" };
@@ -766,13 +944,15 @@ export function evaluateProviderHookControl(input: {
     });
     const payload = {
       kind: "hook_control_decision",
-      version: 1,
+      version: 2,
       agentId: input.authenticatedAgentId,
       provider,
       actionId: request.actionId,
       canonicalToolName: request.canonicalToolName,
       requestedDecision: requested.decision,
       decision: materialized.decision,
+      effectiveOutcome: materialized.effectiveOutcome,
+      providerMapping: materialized.providerMapping,
       capabilityLossy: materialized.capabilityLossy,
       reason: materialized.reason,
       providerResponseSha256: materialized.providerResponseSha256,
@@ -789,7 +969,7 @@ export function evaluateProviderHookControl(input: {
       inline: false,
       meta: {
         trustTier: "OBSERVED",
-        controlSchemaVersion: 1,
+        controlSchemaVersion: 2,
         agentId: input.authenticatedAgentId,
         provider,
         actionId: request.actionId,
@@ -799,6 +979,8 @@ export function evaluateProviderHookControl(input: {
         canonicalToolName: request.canonicalToolName,
         requestedDecision: requested.decision,
         decision: materialized.decision,
+        effectiveOutcome: materialized.effectiveOutcome,
+        providerMapping: materialized.providerMapping,
         capabilityLossy: materialized.capabilityLossy,
         reason: materialized.reason,
         providerResponse: materialized.providerResponse,
@@ -824,6 +1006,8 @@ export function evaluateProviderHookControl(input: {
       canonicalToolName: request.canonicalToolName,
       requestedDecision: requested.decision,
       decision: materialized.decision,
+      effectiveOutcome: materialized.effectiveOutcome,
+      providerMapping: materialized.providerMapping,
       capabilityLossy: materialized.capabilityLossy,
       reason: materialized.reason,
       providerResponse: materialized.providerResponse,

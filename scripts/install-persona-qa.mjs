@@ -124,7 +124,8 @@ function run(command, args, options) {
     timeout: options.timeoutMs ?? 60_000
   });
   const stdout = result.stdout ?? "";
-  const stderr = result.stderr ?? "";
+  const spawnError = result.error instanceof Error ? result.error.message : result.error ? String(result.error) : "";
+  const stderr = [result.stderr ?? "", spawnError].filter(Boolean).join("\n");
   const step = {
     command: `${command} ${args.join(" ")}`,
     status: result.status === 0 ? "passed" : "failed",
@@ -310,7 +311,9 @@ function installPackedPackage(dir, tarball, qaEnv) {
   return preserveRaw(install, {
     ...install,
     command: `npm install --no-audit --fund=false --package-lock=false ${tarball}`,
-    stdout: `${install.stdout}\nPacked tarball installed with npm in an isolated persona workspace.`.trim()
+    stdout: install.status === "passed"
+      ? `${install.stdout}\nPacked tarball installed with npm in an isolated persona workspace.`.trim()
+      : install.stdout
   });
 }
 

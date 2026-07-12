@@ -32,7 +32,8 @@ export const adapterCapabilityControlIdSchema = z.enum([
   "tool.allowlist",
   "provider.allow",
   "provider.deny",
-  "provider.ask"
+  "provider.ask",
+  "provider.steer"
 ]);
 export const adapterCapabilityActivationSchema = z.enum([
   "adapter_run",

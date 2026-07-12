@@ -43,6 +43,8 @@ describe("release readiness scripts", () => {
     expect(script).toContain("renderMarkdownReport");
     expect(script).toContain("Ease-of-use feedback");
     expect(script).toContain("npm install --no-audit --fund=false --package-lock=false");
+    expect(script).toContain('const spawnError = result.error instanceof Error');
+    expect(script).toContain('stdout: install.status === "passed"');
     expect(script).not.toContain("symlinkSync");
   });
 

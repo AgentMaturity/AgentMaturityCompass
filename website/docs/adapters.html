@@ -244,7 +244,7 @@ amc adapters run --agent my-sk --adapter semantic-kernel -- node my-agent.mjs</c
 
 <span class="comment"># Run with evidence capture</span>
 amc adapters run --agent my-claude --adapter claude-cli -- claude --model claude-sonnet-4-6</code></pre>
-        <p>Gateway model events are conditional on the signed route. Provider-native tool requests and allow/deny/ask decisions require a verified control hook. Check the signed capability receipt instead of inferring coverage.</p>
+        <p>Gateway model events are conditional on the signed route. Provider-native tool requests and allow/deny/ask/corrective-steer outcomes require a verified control hook. Steer blocks the current call, returns bounded correction, performs no input rewrite, and requires a new fully governed action for retry. Check the signed capability receipt instead of inferring coverage.</p>
 
         <p>Or use the quick <code>wrap</code> command:</p>
         <pre><code>amc wrap claude -- claude "analyze this codebase"</code></pre>
@@ -259,7 +259,7 @@ amc adapters run --agent my-claude --adapter claude-cli -- claude --model claude
         <h4>Configure &amp; Run</h4>
         <pre><code>amc adapters configure --agent my-gemini --adapter gemini-cli --route /gemini --model gemini-flash --mode SUPERVISE
 amc adapters run --agent my-gemini --adapter gemini-cli -- gemini --model gemini-flash</code></pre>
-        <p>Gateway model events are conditional on the signed route. Provider-native pre-tool observation and allow/deny require a verified hook. Gemini has no native ask result in the pinned contract, so AMC records that loss and denies an ask outcome. Or wrap directly:</p>
+        <p>Gateway model events are conditional on the signed route. Provider-native pre-tool observation and allow/deny require a verified hook. Gemini has no verified native ask or corrective-steer result in the pinned contract, so AMC records the loss, denies either request, and never reports effective steer. Or wrap directly:</p>
         <pre><code>amc wrap gemini -- gemini chat</code></pre>
       </div>
 

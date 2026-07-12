@@ -3,13 +3,14 @@ import { openLedger, verifyEvidenceEventIntegrity } from "../ledger/ledger.js";
 import type { EvidenceEvent } from "../types.js";
 
 export type HookActionLifecycleProvider = "claude-code" | "gemini-cli";
-export type HookActionLifecycleStatus = "requested" | "awaiting_terminal" | "completed" | "failed" | "denied" | "fail_closed";
+export type HookActionLifecycleStatus = "requested" | "awaiting_terminal" | "completed" | "failed" | "denied" | "steered" | "fail_closed";
 export type HookActionLifecycleReasonCode =
   | "ACTION_ID_COLLISION"
   | "CORRELATION_MISMATCH"
   | "DECISION_BEFORE_REQUEST"
   | "DECISION_CONFLICT"
   | "DECISION_DUPLICATE"
+  | "DECISION_METADATA_INVALID"
   | "DENIED_THEN_EXECUTED"
   | "EVIDENCE_INTEGRITY_FAILED"
   | "PROVIDER_MISMATCH"
@@ -28,7 +29,7 @@ export interface HookActionLifecycleEvidenceRef {
 }
 
 export interface HookActionLifecycleInspection {
-  schemaVersion: "2026-07-11";
+  schemaVersion: "2026-07-12";
   agentId: string;
   actionId: string;
   provider: HookActionLifecycleProvider | null;
@@ -38,7 +39,12 @@ export interface HookActionLifecycleInspection {
   reasonCodes: HookActionLifecycleReasonCode[];
   phases: {
     requested: (HookActionLifecycleEvidenceRef & { type: "action.requested" }) | null;
-    decision: (HookActionLifecycleEvidenceRef & { decision: "allow" | "deny" | "ask" }) | null;
+    decision: (HookActionLifecycleEvidenceRef & {
+      decision: "allow" | "deny" | "ask";
+      requestedDecision: "allow" | "deny" | "ask" | "steer";
+      effectiveOutcome: "allow" | "deny" | "ask" | "steer";
+      providerMapping: "native" | "corrective_deny" | "fail_closed_deny";
+    }) | null;
     terminal: (HookActionLifecycleEvidenceRef & {
       type: "action.completed" | "action.failed" | "action.denied";
       status: "success" | "failure" | "timeout" | "cancelled" | null;
@@ -70,9 +76,8 @@ const hookMetaSchema = z.object({
   receipt_sha256: z.string().regex(/^[a-f0-9]{64}$/),
 }).passthrough();
 
-const decisionMetaSchema = z.object({
+const decisionMetaBaseSchema = z.object({
   trustTier: z.literal("OBSERVED"),
-  controlSchemaVersion: z.literal(1),
   agentId: z.string().min(1),
   provider: z.enum(["claude-code", "gemini-cli"]),
   actionId: z.string().min(1),
@@ -80,7 +85,53 @@ const decisionMetaSchema = z.object({
   rawPayloadStored: z.literal(false),
   receipt_id: z.string().min(1),
   receipt_sha256: z.string().regex(/^[a-f0-9]{64}$/),
-}).passthrough();
+});
+
+const decisionMetaV1Schema = decisionMetaBaseSchema.extend({
+  controlSchemaVersion: z.literal(1),
+  requestedDecision: z.enum(["allow", "deny", "ask"]),
+  capabilityLossy: z.boolean(),
+}).passthrough().superRefine((value, ctx) => {
+  const native = value.requestedDecision === value.decision && !value.capabilityLossy;
+  const geminiAskFallback = value.provider === "gemini-cli"
+    && value.requestedDecision === "ask"
+    && value.decision === "deny"
+    && value.capabilityLossy;
+  if (!native && !geminiAskFallback) {
+    ctx.addIssue({ code: "custom", path: ["decision"], message: "legacy decision mapping is inconsistent" });
+  }
+});
+
+const decisionMetaV2Schema = decisionMetaBaseSchema.extend({
+  controlSchemaVersion: z.literal(2),
+  requestedDecision: z.enum(["allow", "deny", "ask", "steer"]),
+  effectiveOutcome: z.enum(["allow", "deny", "ask", "steer"]),
+  providerMapping: z.enum(["native", "corrective_deny", "fail_closed_deny"]),
+  capabilityLossy: z.boolean(),
+}).passthrough().superRefine((value, ctx) => {
+  const native = value.providerMapping === "native"
+    && value.requestedDecision !== "steer"
+    && value.requestedDecision === value.decision
+    && value.effectiveOutcome === value.decision
+    && !value.capabilityLossy;
+  const corrective = value.providerMapping === "corrective_deny"
+    && value.provider === "claude-code"
+    && value.requestedDecision === "steer"
+    && value.decision === "deny"
+    && value.effectiveOutcome === "steer"
+    && !value.capabilityLossy;
+  const fallback = value.providerMapping === "fail_closed_deny"
+    && value.provider === "gemini-cli"
+    && (value.requestedDecision === "ask" || value.requestedDecision === "steer")
+    && value.decision === "deny"
+    && value.effectiveOutcome === "deny"
+    && value.capabilityLossy;
+  if (!native && !corrective && !fallback) {
+    ctx.addIssue({ code: "custom", path: ["providerMapping"], message: "provider outcome mapping is inconsistent" });
+  }
+});
+
+const decisionMetaSchema = z.union([decisionMetaV2Schema, decisionMetaV1Schema]);
 
 interface IndexedHookEvent {
   kind: "hook";
@@ -105,6 +156,7 @@ const REASON_ORDER: HookActionLifecycleReasonCode[] = [
   "REQUEST_DUPLICATE",
   "PROVIDER_MISMATCH",
   "CORRELATION_MISMATCH",
+  "DECISION_METADATA_INVALID",
   "DECISION_DUPLICATE",
   "DECISION_CONFLICT",
   "TERMINAL_DUPLICATE",
@@ -122,18 +174,59 @@ function parseMeta(event: EvidenceEvent): unknown {
   }
 }
 
+function projectedDecision(meta: z.infer<typeof decisionMetaSchema>): {
+  decision: "allow" | "deny" | "ask";
+  requestedDecision: "allow" | "deny" | "ask" | "steer";
+  effectiveOutcome: "allow" | "deny" | "ask" | "steer";
+  providerMapping: "native" | "corrective_deny" | "fail_closed_deny";
+} {
+  if (meta.controlSchemaVersion === 2) {
+    return {
+      decision: meta.decision,
+      requestedDecision: meta.requestedDecision,
+      effectiveOutcome: meta.effectiveOutcome,
+      providerMapping: meta.providerMapping,
+    };
+  }
+  const fallback = meta.provider === "gemini-cli"
+    && meta.requestedDecision === "ask"
+    && meta.decision === "deny"
+    && meta.capabilityLossy;
+  return {
+    decision: meta.decision,
+    requestedDecision: meta.requestedDecision,
+    effectiveOutcome: fallback ? "deny" : meta.decision,
+    providerMapping: fallback ? "fail_closed_deny" : "native",
+  };
+}
+
+function isInvalidDecisionCandidate(meta: unknown, agentId: string, actionId: string): boolean {
+  if (!meta || typeof meta !== "object" || Array.isArray(meta)) return false;
+  const row = meta as Record<string, unknown>;
+  if (row.agentId !== agentId || row.actionId !== actionId) return false;
+  if (row.controlSchemaVersion !== 1 && row.controlSchemaVersion !== 2) return false;
+  return !decisionMetaSchema.safeParse(meta).success;
+}
+
 function lifecycleEvents(events: EvidenceEvent[], actionId: string): IndexedLifecycleEvent[] {
   const rows: IndexedLifecycleEvent[] = [];
   events.forEach((event, index) => {
     const meta = parseMeta(event);
-    const hook = hookMetaSchema.safeParse(meta);
-    if (hook.success && hook.data.actionId === actionId) {
-      rows.push({ kind: "hook", index, event, meta: hook.data });
-      return;
+    if (event.event_type === "tool_action" || event.event_type === "tool_result") {
+      const hook = hookMetaSchema.safeParse(meta);
+      const expectedEventType = hook.success && hook.data.sourceEventType === "action.requested"
+        ? "tool_action"
+        : "tool_result";
+      if (hook.success && event.event_type === expectedEventType && hook.data.actionId === actionId) {
+        rows.push({ kind: "hook", index, event, meta: hook.data });
+        return;
+      }
     }
-    const decision = decisionMetaSchema.safeParse(meta);
-    if (decision.success && decision.data.actionId === actionId) {
-      rows.push({ kind: "decision", index, event, meta: decision.data });
+    if (event.event_type === "audit") {
+      const decision = decisionMetaSchema.safeParse(meta);
+      if (decision.success && decision.data.actionId === actionId) {
+        rows.push({ kind: "decision", index, event, meta: decision.data });
+      }
     }
   });
   return rows;
@@ -168,6 +261,11 @@ export function inspectHookActionLifecycle(input: {
     const targetRows = allRows.filter((row) => row.meta.agentId === input.agentId);
     const reasons = new Set<HookActionLifecycleReasonCode>();
 
+    if (events.some((event) => event.event_type === "audit"
+      && isInvalidDecisionCandidate(parseMeta(event), input.agentId, input.actionId))) {
+      reasons.add("DECISION_METADATA_INVALID");
+    }
+
     const lastEvent = events.at(-1);
     if (lastEvent) {
       const chain = verifyEvidenceEventIntegrity({ ledger, eventId: lastEvent.id });
@@ -194,7 +292,9 @@ export function inspectHookActionLifecycle(input: {
     if (requests.length === 0) reasons.add("REQUEST_MISSING");
     if (requests.length > 1) reasons.add("REQUEST_DUPLICATE");
     if (decisions.length > 1) reasons.add("DECISION_DUPLICATE");
-    if (unique(decisions.map((row) => row.meta.decision)).length > 1) reasons.add("DECISION_CONFLICT");
+    if (unique(decisions.map((row) => JSON.stringify(projectedDecision(row.meta)))).length > 1) {
+      reasons.add("DECISION_CONFLICT");
+    }
     if (terminals.length > 1) reasons.add("TERMINAL_DUPLICATE");
     if (unique(terminals.map((row) => row.meta.sourceEventType)).length > 1) reasons.add("TERMINAL_CONFLICT");
 
@@ -210,6 +310,7 @@ export function inspectHookActionLifecycle(input: {
     if (firstRequest && firstTerminal && firstTerminal.index < firstRequest.index) reasons.add("TERMINAL_BEFORE_REQUEST");
 
     const deniedByControl = decisions.some((row) => row.meta.decision === "deny");
+    const steeredByControl = decisions.some((row) => projectedDecision(row.meta).effectiveOutcome === "steer");
     const deniedByTerminal = terminals.some((row) => row.meta.sourceEventType === "action.denied");
     const executedTerminal = terminals.some((row) => row.meta.sourceEventType === "action.completed" || row.meta.sourceEventType === "action.failed");
     if ((deniedByControl || deniedByTerminal) && executedTerminal) reasons.add("DENIED_THEN_EXECUTED");
@@ -218,6 +319,8 @@ export function inspectHookActionLifecycle(input: {
     let status: HookActionLifecycleStatus;
     if (reasonCodes.length > 0) {
       status = "fail_closed";
+    } else if (steeredByControl) {
+      status = "steered";
     } else if (deniedByControl || deniedByTerminal) {
       status = "denied";
     } else if (firstTerminal?.meta.sourceEventType === "action.completed") {
@@ -232,7 +335,7 @@ export function inspectHookActionLifecycle(input: {
 
     const orderedRows = [...targetRows].sort((left, right) => left.index - right.index);
     return {
-      schemaVersion: "2026-07-11",
+      schemaVersion: "2026-07-12",
       agentId: input.agentId,
       actionId: input.actionId,
       provider: providers.length === 1 ? providers[0]! : null,
@@ -242,7 +345,7 @@ export function inspectHookActionLifecycle(input: {
       reasonCodes,
       phases: {
         requested: firstRequest ? { ...evidenceRef(firstRequest), type: "action.requested" } : null,
-        decision: firstDecision ? { ...evidenceRef(firstDecision), decision: firstDecision.meta.decision } : null,
+        decision: firstDecision ? { ...evidenceRef(firstDecision), ...projectedDecision(firstDecision.meta) } : null,
         terminal: firstTerminal ? {
           ...evidenceRef(firstTerminal),
           type: firstTerminal.meta.sourceEventType as "action.completed" | "action.failed" | "action.denied",
@@ -252,7 +355,7 @@ export function inspectHookActionLifecycle(input: {
       evidenceEventIds: orderedRows.map((row) => row.event.id),
       receiptIds: orderedRows.map((row) => row.meta.receipt_id),
       rawProviderPayloadStored: false,
-      claimBoundary: "Verified AMC evidence lifecycle only; no provider execution or protocol conformance is inferred beyond signed receipts.",
+      claimBoundary: "Verified AMC evidence lifecycle only; steer proves a blocked corrective signal, not retry execution, success, or protocol conformance beyond signed receipts.",
     };
   } finally {
     ledger.close();

@@ -633,7 +633,7 @@ const correlatedHookMetaSchema = z.object({
 
 const controlLifecycleMetaSchema = z.object({
   trustTier: z.literal("OBSERVED"),
-  controlSchemaVersion: z.literal(1),
+  controlSchemaVersion: z.union([z.literal(1), z.literal(2)]),
   agentId: z.string().min(1),
   provider: z.enum(["claude-code", "gemini-cli"]),
   actionId: z.string().min(1),
@@ -660,24 +660,32 @@ function resolveUnmatchedHookActionFromLedger(input: {
 
   for (const event of input.ledger.getAllEvents()) {
     const meta = parseEventMeta(event);
-    const hook = correlatedHookMetaSchema.safeParse(meta);
-    if (hook.success
-      && hook.data.agentId === input.authenticatedAgentId
-      && hook.data.provider === input.provider) {
-      if (hook.data.sourceEventType === "action.requested"
-        && hook.data.providerCorrelationSha256 === input.correlationSha256) {
-        requests.push({ event, actionId: hook.data.actionId });
-      }
-      if (hook.data.sourceEventType !== "action.requested") {
-        terminalActionIds.add(hook.data.actionId);
+    if (event.event_type === "tool_action" || event.event_type === "tool_result") {
+      const hook = correlatedHookMetaSchema.safeParse(meta);
+      const expectedEventType = hook.success && hook.data.sourceEventType === "action.requested"
+        ? "tool_action"
+        : "tool_result";
+      if (hook.success
+        && event.event_type === expectedEventType
+        && hook.data.agentId === input.authenticatedAgentId
+        && hook.data.provider === input.provider) {
+        if (hook.data.sourceEventType === "action.requested"
+          && hook.data.providerCorrelationSha256 === input.correlationSha256) {
+          requests.push({ event, actionId: hook.data.actionId });
+        }
+        if (hook.data.sourceEventType !== "action.requested") {
+          terminalActionIds.add(hook.data.actionId);
+        }
       }
     }
-    const control = controlLifecycleMetaSchema.safeParse(meta);
-    if (control.success
-      && control.data.agentId === input.authenticatedAgentId
-      && control.data.provider === input.provider
-      && control.data.decision === "deny") {
-      deniedActionIds.add(control.data.actionId);
+    if (event.event_type === "audit") {
+      const control = controlLifecycleMetaSchema.safeParse(meta);
+      if (control.success
+        && control.data.agentId === input.authenticatedAgentId
+        && control.data.provider === input.provider
+        && control.data.decision === "deny") {
+        deniedActionIds.add(control.data.actionId);
+      }
     }
   }
 

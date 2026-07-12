@@ -1567,7 +1567,7 @@ components:
       properties:
         schemaVersion:
           type: string
-          enum: ['2026-07-11']
+          enum: ['2026-07-12']
         agentId:
           type: string
         actionId:
@@ -1578,7 +1578,7 @@ components:
           enum: [claude-code, gemini-cli]
         status:
           type: string
-          enum: [requested, awaiting_terminal, completed, failed, denied, fail_closed]
+          enum: [requested, awaiting_terminal, completed, failed, denied, steered, fail_closed]
         valid:
           type: boolean
         failClosed:
@@ -1588,7 +1588,62 @@ components:
           items: { type: string }
         phases:
           type: object
-          description: Receipt-bound requested, optional decision, and optional terminal evidence references.
+          additionalProperties: false
+          required: [requested, decision, terminal]
+          properties:
+            requested:
+              type: object
+              nullable: true
+              additionalProperties: false
+              description: Receipt-bound provider action request phase, or null when the request is missing.
+              required: [eventId, eventHash, receiptId, receiptSha256, observedAt, type]
+              properties:
+                eventId: { type: string }
+                eventHash: { type: string, pattern: '^[a-f0-9]{64}$' }
+                receiptId: { type: string }
+                receiptSha256: { type: string, pattern: '^[a-f0-9]{64}$' }
+                observedAt: { type: string, format: date-time }
+                type: { type: string, enum: [action.requested] }
+            decision:
+              type: object
+              nullable: true
+              additionalProperties: false
+              required: [eventId, eventHash, receiptId, receiptSha256, observedAt, decision, requestedDecision, effectiveOutcome, providerMapping]
+              properties:
+                eventId: { type: string }
+                eventHash: { type: string, pattern: '^[a-f0-9]{64}$' }
+                receiptId: { type: string }
+                receiptSha256: { type: string, pattern: '^[a-f0-9]{64}$' }
+                observedAt: { type: string, format: date-time }
+                decision:
+                  type: string
+                  enum: [allow, deny, ask]
+                requestedDecision:
+                  type: string
+                  enum: [allow, deny, ask, steer]
+                effectiveOutcome:
+                  type: string
+                  enum: [allow, deny, ask, steer]
+                providerMapping:
+                  type: string
+                  enum: [native, corrective_deny, fail_closed_deny]
+            terminal:
+              type: object
+              nullable: true
+              additionalProperties: false
+              description: Receipt-bound provider terminal phase, or null when the current call was blocked or remains unresolved.
+              required: [eventId, eventHash, receiptId, receiptSha256, observedAt, type, status]
+              properties:
+                eventId: { type: string }
+                eventHash: { type: string, pattern: '^[a-f0-9]{64}$' }
+                receiptId: { type: string }
+                receiptSha256: { type: string, pattern: '^[a-f0-9]{64}$' }
+                observedAt: { type: string, format: date-time }
+                type: { type: string, enum: [action.completed, action.failed, action.denied] }
+                status:
+                  type: string
+                  nullable: true
+                  enum: [success, failure, timeout, cancelled]
         evidenceEventIds:
           type: array
           items: { type: string }

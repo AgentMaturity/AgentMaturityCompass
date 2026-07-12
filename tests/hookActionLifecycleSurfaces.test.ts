@@ -101,7 +101,7 @@ describe("hook action lifecycle CLI and Watch API", () => {
     expect(api.status).toBe(200);
     expect(api.body).toEqual({ ok: true, data: cli });
     expect(cli).toEqual(expect.objectContaining({
-      schemaVersion: "2026-07-11",
+      schemaVersion: "2026-07-12",
       agentId,
       actionId,
       status: "requested",

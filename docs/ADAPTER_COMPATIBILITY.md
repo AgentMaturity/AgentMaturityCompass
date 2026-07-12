@@ -15,9 +15,9 @@ amc adapters capabilities --agent my-agent --adapter claude-cli --out adapter-ca
 | Adapter ID | Runtime probe means | Provider-native hook control | Important lossiness |
 | --- | --- | --- | --- |
 | `autogen-cli` | AutoGen CLI when present, otherwise host Python only | No | Fallback Python version does not prove AutoGen |
-| `claude-cli` | Claude binary version | Allow, deny, ask when a signed control hook is installed | Managed hooks cover pinned request, completed, and failed tool events, not every provider event |
+| `claude-cli` | Claude binary version | Allow, deny, ask, and corrective steer when a signed control hook is installed | Steer blocks the current call and returns bounded correction; it does not rewrite input or prove retry success |
 | `crewai-cli` | CrewAI CLI when present, otherwise host Python only | No | Fallback Python version does not prove CrewAI |
-| `gemini-cli` | Gemini CLI binary version | Allow and deny when a signed control hook is installed | Native ask is unavailable; terminal events without one unique request correlation fail closed |
+| `gemini-cli` | Gemini CLI binary version | Allow and deny when a signed control hook is installed | Native ask and verified corrective steer are unavailable; both fail closed to deny |
 | `generic-cli` | Shell runtime only | No | Shell version does not identify the wrapped agent |
 | `langchain-node` | Host Node.js only | No | Node version does not prove LangChain package/version |
 | `langchain-python` | Host Python only | No | Python version does not prove LangChain package/version |
@@ -43,7 +43,7 @@ Receipt validity and capability status are separate. A correctly signed `partial
 
 ## What The Base Adapter Path Can Prove
 
-When `amc adapters run` is active, the adapter process path can emit `process.started`, redacted `process.stdout`, redacted `process.stderr`, and `process.exited`. Model request/response evidence is effective only when the signed agent profile routes a compatible runtime through AMC's gateway. Provider-native requested, completed, and failed action evidence is effective only for a current signed Claude Code or Gemini CLI hook installation. Control mode can also add a signed decision.
+When `amc adapters run` is active, the adapter process path can emit `process.started`, redacted `process.stdout`, redacted `process.stderr`, and `process.exited`. Model request/response evidence is effective only when the signed agent profile routes a compatible runtime through AMC's gateway. Provider-native requested, completed, and failed action evidence is effective only for a current signed Claude Code or Gemini CLI hook installation. Control mode also records the requested outcome, actual provider wire decision, effective outcome, capability mapping, and whether the mapping was lossy.
 
 Inspect one action without opening raw provider data:
 
@@ -51,7 +51,7 @@ Inspect one action without opening raw provider data:
 amc connect hooks lifecycle --agent my-agent --action <action-id>
 ```
 
-The projection joins immutable receipts by agent and stable action ID. It fails closed on a missing or duplicate request, ambiguous terminal correlation, conflicting decision or terminal state, execution after denial, cross-agent collision, impossible order, receipt mismatch, or ledger tamper. Gemini CLI exposes no general provider call ID, so AMC resolves an `AfterTool` event only when exactly one unmatched hash-only request correlation exists.
+The projection joins immutable receipts by agent and stable action ID. A verified Claude steer means the current call was denied with bounded corrective context; any retry must use a new action ID and pass every AMC control again. Gemini maps a requested steer to a lossy hard deny and is never labeled steered. The projection fails closed on a missing or duplicate request, invalid decision mapping, ambiguous terminal correlation, conflicting decision or terminal state, execution after denial, cross-agent collision, impossible order, receipt mismatch, or ledger tamper. Gemini CLI exposes no general provider call ID, so AMC resolves an `AfterTool` event only when exactly one unmatched hash-only request correlation exists.
 
 No adapter receipt claims AEP conformance. AMC does not copy AEP mappings, Agent Control SDKs, provider payloads, prompts, tool arguments, or upstream implementation details.
 

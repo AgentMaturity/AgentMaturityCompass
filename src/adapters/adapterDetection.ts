@@ -11,7 +11,7 @@ export interface AdapterDetectionResult {
   detail: string;
 }
 
-const DEFAULT_DETECTION_TIMEOUT_MS = 400;
+const DEFAULT_DETECTION_TIMEOUT_MS = 3_000;
 const parseRegexCache = new Map<string, RegExp>();
 
 interface ProbeResult {

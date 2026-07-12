@@ -28,11 +28,17 @@ export function builtInAdapterCapabilities(
   options: BuiltInAdapterCapabilityOptions
 ): AdapterCapabilityDeclaration {
   const hookEvidence = options.hookProvider
-    ? ["tests/connectHookIntegration.test.ts", "tests/hookControl.test.ts", "tests/hookActionLifecycle.test.ts"]
+    ? [
+        "tests/connectHookIntegration.test.ts",
+        "tests/hookControl.test.ts",
+        "tests/hookActionLifecycle.test.ts",
+        "tests/amc1476ProviderSteerOutcome.test.ts",
+      ]
     : [];
   const hookOmissions = options.hookProvider === "gemini-cli"
     ? [
         "Gemini CLI has no native ask outcome; AMC fails an ask decision closed to deny",
+        "Gemini CLI has no verified corrective retry outcome; AMC fails a requested steer closed to deny",
         "Gemini CLI has no general provider call ID; missing or ambiguous terminal correlation fails closed",
       ]
     : options.hookProvider === "claude-code"
@@ -77,7 +83,10 @@ export function builtInAdapterCapabilities(
             { id: "provider.allow" as const, activeWhen: ["hook_control" as const] },
             { id: "provider.deny" as const, activeWhen: ["hook_control" as const] },
             ...(options.hookProvider === "claude-code"
-              ? [{ id: "provider.ask" as const, activeWhen: ["hook_control" as const] }]
+              ? [
+                  { id: "provider.ask" as const, activeWhen: ["hook_control" as const] },
+                  { id: "provider.steer" as const, activeWhen: ["hook_control" as const] },
+                ]
               : [])
           ]
         : [])

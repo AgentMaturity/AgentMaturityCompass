@@ -243,12 +243,12 @@ describe("lease carriers, adapters, and doctor", () => {
     }
   }, 20000);
 
-  test("adapters detect finds a fake claude binary in PATH", () => {
+  test("adapters detect tolerates a bounded cold-starting claude version probe", () => {
     const workspace = newWorkspace();
     const binDir = join(workspace, "bin");
     mkdirSync(binDir, { recursive: true });
     const fakeClaude = join(binDir, "claude");
-    writeFileSync(fakeClaude, "#!/bin/sh\necho \"claude 9.9.9\"\n", { mode: 0o755 });
+    writeFileSync(fakeClaude, "#!/bin/sh\nsleep 1\necho \"claude 9.9.9\"\n", { mode: 0o755 });
     chmodSync(fakeClaude, 0o755);
     const oldPath = process.env.PATH ?? "";
     process.env.PATH = `${binDir}:${oldPath}`;
@@ -257,6 +257,7 @@ describe("lease carriers, adapters, and doctor", () => {
       const claude = rows.find((row) => row.adapterId === "claude-cli");
       expect(claude?.installed).toBe(true);
       expect(claude?.command).toBe("claude");
+      expect(claude?.version).toBe("9.9.9");
     } finally {
       process.env.PATH = oldPath;
     }

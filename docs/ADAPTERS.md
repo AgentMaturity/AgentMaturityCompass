@@ -54,13 +54,13 @@ The same contract is available from `POST /api/v1/adapters/capability-receipts` 
 amc adapters run --agent my-claude --adapter claude-cli -- claude --model claude-sonnet-4-6
 ```
 
-The gateway can observe model requests/responses when Claude honors the configured route. A verified `amc connect hooks` installation records requested actions plus completed or failed terminal events; control mode also records native allow/deny/ask decisions. Use the signed capability receipt to see what is effective now.
+The gateway can observe model requests/responses when Claude honors the configured route. A verified `amc connect hooks` installation records requested actions plus completed or failed terminal events; control mode also records allow, deny, ask, and corrective steer outcomes. Steer is available only for a trusted ToolHub argument rejection: AMC blocks the current call, returns bounded corrective context, performs no input rewrite, and requires a new fully governed action for retry. Use the signed capability receipt to see what is effective now.
 
 ```bash
 amc connect hooks lifecycle --agent my-agent --action <action-id>
 ```
 
-This Watch projection verifies the immutable request, optional decision, and terminal receipts under one action ID. Missing, duplicate, conflicting, cross-agent, out-of-order, or tampered evidence fails closed. Raw tool input, output, and provider error messages are not retained.
+This Watch projection verifies the immutable request, optional decision, and terminal receipts under one action ID. It separates the requested outcome, provider wire decision, effective outcome, and capability mapping. A steered action is still blocked; execution under that same action ID fails closed. Missing, duplicate, conflicting, cross-agent, out-of-order, or tampered evidence fails closed. Raw tool input, output, and provider error messages are not retained.
 
 Configure as default for an agent:
 
@@ -74,7 +74,7 @@ amc adapters configure --agent my-claude --adapter claude-cli --route /anthropic
 amc adapters run --agent my-gemini --adapter gemini-cli -- gemini --model gemini-flash
 ```
 
-The gateway can observe model requests/responses when Gemini honors the configured route. A verified `amc connect hooks` installation records requested actions and completed or failed terminal events; control mode also records native allow/deny decisions. Gemini has no native ask outcome or general provider call ID in the pinned contract. AMC fails ask closed to deny and accepts a terminal event only when one unmatched hash-only request correlation exists.
+The gateway can observe model requests/responses when Gemini honors the configured route. A verified `amc connect hooks` installation records requested actions and completed or failed terminal events; control mode also records native allow/deny decisions. Gemini has no verified native ask or corrective-steer outcome in the pinned contract. AMC fails either request closed to deny, marks the mapping lossy, never reports effective steer, and accepts a terminal event only when one unmatched hash-only request correlation exists.
 
 ## OpenClaw
 
