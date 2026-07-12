@@ -19,7 +19,7 @@ Everything except Industry Packs:
 - **Fleet** — multi-agent oversight, comparison, delegation graphs
 - **Passport** — portable identity, credentials, trust portability artifacts
 - **All 14 framework adapters** — LangChain, CrewAI, OpenAI, Claude Code, Gemini, AutoGen, LlamaIndex, Semantic Kernel, OpenClaw, OpenHands, Python SDK, generic CLI, OpenAI-compatible
-- **1,159 CLI command paths**
+- **1,163 CLI command paths**
 - **244 default diagnostic questions** plus the free, opt-in 20-question lifecycle expansion
 - **Browser playground**
 - **CI trust gates**

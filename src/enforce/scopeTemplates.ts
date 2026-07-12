@@ -15,8 +15,10 @@ import { ACTION_CLASSES } from "../governor/actionCatalog.js";
 import {
   actionPolicyPath,
   actionPolicySigPath,
+  actionPolicyWriterPendingPath,
+  ACTION_POLICY_WRITER_LOCK,
   loadActionPolicy,
-  signActionPolicy,
+  signActionPolicyWithLockHeld,
   verifyActionPolicySignature,
 } from "../governor/actionPolicyEngine.js";
 import { actionPolicySchema, type ActionPolicy, type ActionPolicyRule } from "../governor/actionPolicySchema.js";
@@ -202,7 +204,7 @@ function boundedError(code: ScopeTemplateErrorCode): ScopeTemplateError {
     PACK_SCOPE_INCOMPLETE: "The selected Policy Pack does not define every action class in this scope.",
     CONFIRMATION_REQUIRED: "Exact current compile ID confirmation is required.",
     STATE_CHANGED: "Policy state changed during compilation; retry from a fresh preview.",
-    LOCK_BUSY: "Another policy scope operation is in progress; retry later.",
+    LOCK_BUSY: "Another Action Policy writer is in progress; retry later.",
     APPLY_FAILED: "Scope template apply failed and prior policy bytes were restored.",
   };
   return new ScopeTemplateError(code, messages[code]);
@@ -229,6 +231,7 @@ function rejectSymlink(path: string): void {
 }
 
 function readTrustedBaseline(workspace: string): TrustedBaseline {
+  if (pathExists(actionPolicyWriterPendingPath(workspace))) throw boundedError("STATE_CHANGED");
   const actionPath = actionPolicyPath(workspace);
   const approvalPath = approvalPolicyPath(workspace);
   const actionSigPath = actionPolicySigPath(workspace);
@@ -420,6 +423,19 @@ function restoreBaseline(workspace: string, baseline: TrustedBaseline): void {
   writeFileAtomic(approvalPolicySigPath(workspace), baseline.approvalSigBytes, 0o644);
 }
 
+function assertBaselineCurrent(workspace: string, baseline: TrustedBaseline): void {
+  const paths = [
+    [actionPolicyPath(workspace), baseline.actionBytes],
+    [actionPolicySigPath(workspace), baseline.actionSigBytes],
+    [approvalPolicyPath(workspace), baseline.approvalBytes],
+    [approvalPolicySigPath(workspace), baseline.approvalSigBytes],
+  ] as const;
+  for (const [path, expected] of paths) {
+    rejectSymlink(path);
+    if (!readFileSync(path).equals(expected)) throw boundedError("STATE_CHANGED");
+  }
+}
+
 function verifyAppliedCandidate(workspace: string, compiled: CompiledScopeTemplate): void {
   const actionPath = actionPolicyPath(workspace);
   const approvalPath = approvalPolicyPath(workspace);
@@ -506,14 +522,18 @@ function applyLocked(input: {
     };
   }
 
+  let policyWriteStarted = false;
   try {
+    assertBaselineCurrent(input.workspace, compiled.baseline);
+    policyWriteStarted = true;
     writeFileAtomic(actionPolicyPath(input.workspace), compiled.candidateActionBytes, 0o644);
-    signActionPolicy(input.workspace);
+    signActionPolicyWithLockHeld(input.workspace);
     writeFileAtomic(approvalPolicyPath(input.workspace), compiled.candidateApprovalBytes, 0o644);
     signApprovalPolicy(input.workspace);
     verifyAppliedCandidate(input.workspace, compiled);
-  } catch {
-    restoreBaseline(input.workspace, compiled.baseline);
+  } catch (error) {
+    if (!policyWriteStarted && error instanceof ScopeTemplateError) throw error;
+    if (policyWriteStarted) restoreBaseline(input.workspace, compiled.baseline);
     throw boundedError("APPLY_FAILED");
   }
 
@@ -549,7 +569,7 @@ export function applyScopeTemplate(input: {
   try {
     return withControlFileLock({
       root: dirname(actionPolicyPath(workspace)),
-      name: "scope-template",
+      name: ACTION_POLICY_WRITER_LOCK,
       timeoutMs: 500,
       operation: () => applyLocked({ ...input, workspace }),
     });

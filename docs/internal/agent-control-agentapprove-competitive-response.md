@@ -148,7 +148,7 @@ AMC must not import these files as executable policy. A future AEP lane should:
 | ---: | --- | --- | --- |
 | 11 | Version, diff, activate, and roll back controls | Enforce | Shipped in AMC-1473; reuses signed resource manifests and lifecycle receipts, exposes one bounded status projection, rejects noncanonical selectors and stale confirmations, and writes no success receipt on integrity failure |
 | 12 | Add reusable scope templates | Enforce/Fleet | Shipped in AMC-1474; four immutable action-class groups compile selected built-in Policy Pack rules into the existing signed Action and Approval Policy schemas with read-only preview, exact confirmation, transaction rollback, and an explicit fleet-wide boundary |
-| 13 | Add nested condition authoring | Enforce | Use one AST, no source-specific rule languages |
+| 13 | Add nested condition authoring | Enforce | Implemented in AMC-1475 as one bounded `gate` / `all` / `any` tree over existing signed Action Policy requirements; hard gates remain mandatory and no selector/evaluator DSL was added |
 | 14 | Add steer outcome where provider supports it | Enforce | Capability-gated; never report steer when mapped to warn |
 | 15 | Add observe-only rollout and counters | Watch | Same policy with mode, not duplicate controls |
 | 16 | Add evaluator registry metadata | Score/Shield | Registry points to existing evaluators and signed versions |

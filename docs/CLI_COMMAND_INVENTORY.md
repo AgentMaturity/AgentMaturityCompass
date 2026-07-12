@@ -813,6 +813,10 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc policy` | Policy-as-code operations | - | - |
 | `amc policy action` | Signed autonomy action policy | - | - |
 | `amc policy action init` | Create and sign .amc/action-policy.yaml | - | - |
+| `amc policy action logic` | Compose existing Action Policy evidence requirements | - | - |
+| `amc policy action logic apply` | Apply evidence logic after exact confirmation | `--file <path>`<br>`--confirm <compileId>`<br>`--acknowledge-alternatives`<br>`--json` | - |
+| `amc policy action logic compile` | Preview a deterministic evidence-logic change without writing | `--file <path>`<br>`--json` | - |
+| `amc policy action logic show` | Show declared evidence gates and effective logic | `--json` | - |
 | `amc policy action verify` | Verify action policy signature | - | - |
 | `amc policy approval` | Signed dual-control approval policy | - | - |
 | `amc policy approval init` | Create and sign .amc/approval-policy.yaml | - | - |

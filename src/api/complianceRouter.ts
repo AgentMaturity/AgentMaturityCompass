@@ -23,6 +23,49 @@ const SCOPE_TEMPLATE_ERROR_CODES = new Set([
   'APPLY_FAILED',
 ]);
 
+const ACTION_EVIDENCE_LOGIC_ERROR_CODES = new Set([
+  'ACTION_RULE_MISSING',
+  'BASELINE_UNTRUSTED',
+  'POLICY_SCHEMA_INVALID',
+  'POLICY_DUPLICATE_ACTION',
+  'LOGIC_INVALID',
+  'NO_EVIDENCE_GATES',
+  'CONFIRMATION_REQUIRED',
+  'ALTERNATIVE_ACK_REQUIRED',
+  'STATE_CHANGED',
+  'LOCK_BUSY',
+  'APPLY_FAILED',
+]);
+
+function actionEvidenceLogicErrorCode(error: unknown): string | null {
+  if (!(error instanceof Error) || error.name !== 'ActionEvidenceLogicError') return null;
+  const code = (error as Error & { code?: unknown }).code;
+  return typeof code === 'string' && ACTION_EVIDENCE_LOGIC_ERROR_CODES.has(code) ? code : null;
+}
+
+function actionEvidenceLogicHttpStatus(error: unknown): number {
+  if (isRequestBodyError(error)) return 400;
+  const code = actionEvidenceLogicErrorCode(error);
+  if (!code) return 500;
+  if (code === 'LOCK_BUSY') return 423;
+  if (code === 'APPLY_FAILED') return 500;
+  if (
+    code === 'BASELINE_UNTRUSTED'
+    || code === 'CONFIRMATION_REQUIRED'
+    || code === 'ALTERNATIVE_ACK_REQUIRED'
+    || code === 'STATE_CHANGED'
+  ) return 409;
+  return 400;
+}
+
+function actionEvidenceLogicHttpMessage(error: unknown): string {
+  const code = actionEvidenceLogicErrorCode(error);
+  if (code && error instanceof Error) return `${code}: ${error.message}`;
+  return isRequestBodyError(error)
+    ? 'LOGIC_INVALID: Invalid Action Policy evidence-logic request.'
+    : 'APPLY_FAILED: Action Policy evidence-logic operation failed.';
+}
+
 function scopeTemplateErrorCode(error: unknown): string | null {
   if (!(error instanceof Error) || error.name !== 'ScopeTemplateError') return null;
   const code = (error as Error & { code?: unknown }).code;
@@ -197,6 +240,49 @@ export async function handleComplianceRoute(
 
   // ── Policy routes (/api/v1/policy/*) ───────────────────────────
   if (pathname.startsWith('/api/v1/policy')) {
+    if (pathname === '/api/v1/policy/action/evidence-logic' && method === 'GET') {
+      try {
+        const actionClass = queryParam(req.url ?? pathname, 'actionClass');
+        if (!actionClass) {
+          apiError(res, 400, 'ACTION_RULE_MISSING: actionClass query parameter is required.');
+          return true;
+        }
+        const { inspectActionEvidenceLogic } = await import('../enforce/actionEvidenceLogic.js');
+        apiSuccess(res, inspectActionEvidenceLogic({ workspace, actionClass }));
+      } catch (error) {
+        apiError(res, actionEvidenceLogicHttpStatus(error), actionEvidenceLogicHttpMessage(error));
+      }
+      return true;
+    }
+
+    if (pathname === '/api/v1/policy/action/evidence-logic/compile' && method === 'POST') {
+      try {
+        const module = await import('../enforce/actionEvidenceLogic.js');
+        const body = await bodyJsonSchema(req, module.actionEvidenceLogicCompileRequestSchema);
+        apiSuccess(res, module.compileActionEvidenceLogic({ workspace, ...body }));
+      } catch (error) {
+        apiError(res, actionEvidenceLogicHttpStatus(error), actionEvidenceLogicHttpMessage(error));
+      }
+      return true;
+    }
+
+    if (pathname === '/api/v1/policy/action/evidence-logic/apply' && method === 'POST') {
+      try {
+        const users = verifyUsersConfigSignature(workspace);
+        const trust = verifyTrustConfigSignature(workspace);
+        if ((users.signatureExists && !users.valid) || !trust.valid) {
+          apiError(res, 403, 'READ_ONLY_MODE: Signed identity or trust configuration is not valid.');
+          return true;
+        }
+        const module = await import('../enforce/actionEvidenceLogic.js');
+        const body = await bodyJsonSchema(req, module.actionEvidenceLogicApplyRequestSchema);
+        apiSuccess(res, module.applyActionEvidenceLogic({ workspace, ...body }));
+      } catch (error) {
+        apiError(res, actionEvidenceLogicHttpStatus(error), actionEvidenceLogicHttpMessage(error));
+      }
+      return true;
+    }
+
     if (pathname === '/api/v1/policy/scope-templates' && method === 'GET') {
       try {
         const { listScopeTemplates } = await import('../enforce/scopeTemplates.js');

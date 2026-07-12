@@ -1,5 +1,5 @@
 import { readdirSync, readFileSync } from "node:fs";
-import { join, resolve } from "node:path";
+import { dirname, join, resolve } from "node:path";
 import YAML from "yaml";
 import { getPrivateKeyPem, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
 import { openLedger } from "../ledger/ledger.js";
@@ -15,6 +15,23 @@ import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js
 import { sha256Hex } from "../utils/hash.js";
 import { actionPolicySchema, type ActionPolicy, type ActionPolicyRule, type TrustTierAtLeast } from "./actionPolicySchema.js";
 import { getAgentPaths } from "../fleet/paths.js";
+import { withControlFileLock } from "../lifecycle/controlFileLock.js";
+import {
+  evaluatePolicyEvidenceLogic,
+  policyEvidenceGateId,
+} from "./policyEvidenceLogic.js";
+
+export const ACTION_POLICY_WRITER_LOCK = "action-policy-writer" as const;
+
+export function actionPolicyWriterPendingPath(workspace: string): string {
+  return join(workspace, ".amc", ".action-policy-writer.pending.json");
+}
+
+export function assertActionPolicyWriterReady(workspace: string): void {
+  if (pathExists(actionPolicyWriterPendingPath(workspace))) {
+    throw new Error("Action Policy writer recovery is pending; retry the original exact-confirm apply first.");
+  }
+}
 
 export interface GovernorAssurancePackStatus {
   score: number;
@@ -284,7 +301,7 @@ export function loadActionPolicy(workspace: string, explicitPath?: string): Acti
   return actionPolicySchema.parse(YAML.parse(readUtf8(file)) as unknown);
 }
 
-export function signActionPolicy(workspace: string, explicitPath?: string): string {
+export function signActionPolicyWithLockHeld(workspace: string, explicitPath?: string): string {
   const file = explicitPath ? resolve(workspace, explicitPath) : actionPolicyPath(workspace);
   if (!pathExists(file)) {
     throw new Error(`Action policy not found: ${file}`);
@@ -301,19 +318,40 @@ export function signActionPolicy(workspace: string, explicitPath?: string): stri
   return sigPath;
 }
 
+export function signActionPolicy(workspace: string, explicitPath?: string): string {
+  const file = explicitPath ? resolve(workspace, explicitPath) : actionPolicyPath(workspace);
+  return withControlFileLock({
+    root: dirname(file),
+    name: ACTION_POLICY_WRITER_LOCK,
+    timeoutMs: 500,
+    operation: () => {
+      assertActionPolicyWriterReady(workspace);
+      return signActionPolicyWithLockHeld(workspace, explicitPath);
+    },
+  });
+}
+
 export function initActionPolicy(workspace: string, policy?: ActionPolicy): {
   policyPath: string;
   signaturePath: string;
 } {
   ensureDir(join(workspace, ".amc"));
   const targetPath = actionPolicyPath(workspace);
-  const parsed = actionPolicySchema.parse(policy ?? defaultActionPolicy());
-  writeFileAtomic(targetPath, YAML.stringify(parsed), 0o644);
-  const signaturePath = signActionPolicy(workspace);
-  return {
-    policyPath: targetPath,
-    signaturePath
-  };
+  return withControlFileLock({
+    root: dirname(targetPath),
+    name: ACTION_POLICY_WRITER_LOCK,
+    timeoutMs: 500,
+    operation: () => {
+      assertActionPolicyWriterReady(workspace);
+      const parsed = actionPolicySchema.parse(policy ?? defaultActionPolicy());
+      writeFileAtomic(targetPath, YAML.stringify(parsed), 0o644);
+      const signaturePath = signActionPolicyWithLockHeld(workspace);
+      return {
+        policyPath: targetPath,
+        signaturePath
+      };
+    },
+  });
 }
 
 export function verifyActionPolicySignature(workspace: string, explicitPath?: string): {
@@ -398,6 +436,146 @@ function addCondition(decision: GovernorDecision, condition: GovernorConditionRe
   decision.conditionResults.push(condition);
 }
 
+function evaluateRuleEvidence(
+  input: GovernorDecisionInput,
+  rule: ActionPolicyRule,
+  decision: GovernorDecision,
+): string[] {
+  const issues: string[] = [];
+  const evidenceGateResults: Record<string, boolean> = {};
+  const evidenceFailures: Array<{
+    gateId: string;
+    issue: string;
+    requiredEvidence?: string;
+    upgradeSuggestion?: GovernorUpgradeSuggestion;
+  }> = [];
+
+  for (const [questionId, minLevel] of Object.entries(rule.minEffectiveQuestionLevels)) {
+    const effective = effectiveLevelForQuestion(input.currentDiagnosticRun, input.targetProfile, questionId);
+    const gateId = policyEvidenceGateId("maturity", questionId);
+    evidenceGateResults[gateId] = effective >= minLevel;
+    addCondition(decision, {
+      conditionId: gateId,
+      label: `${questionId} effective maturity`,
+      passed: effective >= minLevel,
+      actual: effective,
+      expected: minLevel,
+      reason: effective >= minLevel
+        ? `${questionId} effective level ${effective} satisfies required ${minLevel}.`
+        : `${questionId} effective level ${effective} < required ${minLevel}.`,
+    });
+    if (effective < minLevel) {
+      evidenceFailures.push({
+        gateId,
+        issue: `${questionId} effective level ${effective} < required ${minLevel}`,
+        upgradeSuggestion: {
+          questionId,
+          fromLevel: effective,
+          toLevel: minLevel,
+          why: `${input.actionClass} requires stronger maturity before EXECUTE is allowed.`,
+          how: "Collect deterministic evidence to satisfy the next gate and update owner target if needed."
+        },
+      });
+    }
+  }
+
+  for (const [packId, requirement] of Object.entries(rule.requireAssurancePacks)) {
+    const pack = input.assuranceSummary.packs[packId];
+    const gateId = policyEvidenceGateId("assurance", packId);
+    const gatePassed = pack !== undefined
+      && pack.score >= requirement.minScore
+      && pack.succeeded <= requirement.maxSucceeded;
+    evidenceGateResults[gateId] = gatePassed;
+    addCondition(decision, {
+      conditionId: `assurance:${packId}:present`,
+      label: `${packId} assurance evidence present`,
+      passed: Boolean(pack),
+      actual: Boolean(pack),
+      expected: true,
+      reason: pack ? `Assurance pack ${packId} is present.` : `Assurance pack ${packId} is missing.`,
+    });
+    if (!pack) {
+      evidenceFailures.push({
+        gateId,
+        issue: `assurance pack ${packId} missing`,
+        requiredEvidence: `Run assurance pack '${packId}' and collect OBSERVED evidence.`,
+      });
+      continue;
+    }
+    addCondition(decision, {
+      conditionId: `assurance:${packId}:score`,
+      label: `${packId} minimum score`,
+      passed: pack.score >= requirement.minScore,
+      actual: pack.score,
+      expected: requirement.minScore,
+      reason: pack.score >= requirement.minScore
+        ? `Assurance pack ${packId} score ${pack.score.toFixed(1)} satisfies ${requirement.minScore}.`
+        : `Assurance pack ${packId} score ${pack.score.toFixed(1)} < ${requirement.minScore}.`,
+    });
+    addCondition(decision, {
+      conditionId: `assurance:${packId}:succeeded`,
+      label: `${packId} maximum succeeded attacks`,
+      passed: pack.succeeded <= requirement.maxSucceeded,
+      actual: pack.succeeded,
+      expected: requirement.maxSucceeded,
+      reason: pack.succeeded <= requirement.maxSucceeded
+        ? `Assurance pack ${packId} has ${pack.succeeded} succeeded attacks, within the maximum ${requirement.maxSucceeded}.`
+        : `Assurance pack ${packId} has ${pack.succeeded} succeeded attacks above maximum ${requirement.maxSucceeded}.`,
+    });
+    if (pack.score < requirement.minScore) {
+      evidenceFailures.push({
+        gateId,
+        issue: `assurance pack ${packId} score ${pack.score.toFixed(1)} < ${requirement.minScore}`,
+      });
+    }
+    if (pack.succeeded > requirement.maxSucceeded) {
+      evidenceFailures.push({
+        gateId,
+        issue: `assurance pack ${packId} has ${pack.succeeded} *_SUCCEEDED violations`,
+      });
+    }
+  }
+
+  if (!rule.evidenceLogic) {
+    if (Object.values(evidenceGateResults).every((passed) => passed)) return issues;
+    for (const failure of evidenceFailures) {
+      issues.push(failure.issue);
+      if (failure.requiredEvidence) decision.requiredEvidence.push(failure.requiredEvidence);
+      if (failure.upgradeSuggestion) decision.upgradeSuggestions.push(failure.upgradeSuggestion);
+    }
+    return issues;
+  }
+  const effectiveEvidenceLogic = rule.evidenceLogic;
+  const evidenceEvaluation = evaluatePolicyEvidenceLogic(effectiveEvidenceLogic, evidenceGateResults);
+  if (rule.evidenceLogic) {
+    for (const node of evidenceEvaluation.nodes.filter((candidate) => candidate.nodeType !== "gate")) {
+      const rootNode = node.path === "$logic";
+      addCondition(decision, {
+        conditionId: rootNode ? "evidence-logic" : `evidence-logic:${node.path.slice("$logic.".length)}`,
+        label: rootNode ? "Action Policy evidence logic" : `${node.nodeType.toUpperCase()} evidence group`,
+        passed: node.passed,
+        actual: node.passed,
+        expected: true,
+        reason: `${node.nodeType.toUpperCase()} evidence group ${node.passed ? "is satisfied" : "is not satisfied"}.`,
+      });
+    }
+  }
+  if (evidenceEvaluation.passed) return issues;
+
+  if (rule.evidenceLogic) issues.push("Action Policy evidence logic is not satisfied.");
+  const blockingGateIds = new Set(evidenceEvaluation.blockingGateIds);
+  for (const failure of evidenceFailures) {
+    if (!blockingGateIds.has(failure.gateId)) continue;
+    issues.push(failure.issue);
+    if (failure.requiredEvidence) decision.requiredEvidence.push(failure.requiredEvidence);
+    if (failure.upgradeSuggestion) decision.upgradeSuggestions.push(failure.upgradeSuggestion);
+  }
+  for (const gateId of evidenceEvaluation.unknownGateIds) {
+    issues.push(`evidence gate ${gateId} did not produce a trusted boolean result`);
+  }
+  return issues;
+}
+
 export function evaluateActionPermission(input: GovernorDecisionInput): GovernorDecision {
   const policy = input.policy ?? defaultActionPolicy();
   const rule = findRule(policy, input.actionClass);
@@ -437,6 +615,7 @@ export function evaluateActionPermission(input: GovernorDecisionInput): Governor
     decision.requiredEvidence.push("Owner must add explicit action rule to .amc/action-policy.yaml and sign it.");
     return decision;
   }
+  const evidenceIssues = rule ? evaluateRuleEvidence(input, rule, decision) : [];
 
   if (input.requestedMode === "SIMULATE") {
     decision.allowed = simulateAllowed;
@@ -523,35 +702,11 @@ export function evaluateActionPermission(input: GovernorDecisionInput): Governor
     return decision;
   }
 
-  const issues: string[] = [];
+  const issues: string[] = [...evidenceIssues];
 
   if (!rule) {
     issues.push(`No explicit policy rule for ${input.actionClass}.`);
   } else {
-    for (const [questionId, minLevel] of Object.entries(rule.minEffectiveQuestionLevels)) {
-      const effective = effectiveLevelForQuestion(input.currentDiagnosticRun, input.targetProfile, questionId);
-      addCondition(decision, {
-        conditionId: `maturity:${questionId}`,
-        label: `${questionId} effective maturity`,
-        passed: effective >= minLevel,
-        actual: effective,
-        expected: minLevel,
-        reason: effective >= minLevel
-          ? `${questionId} effective level ${effective} satisfies required ${minLevel}.`
-          : `${questionId} effective level ${effective} < required ${minLevel}.`,
-      });
-      if (effective < minLevel) {
-        issues.push(`${questionId} effective level ${effective} < required ${minLevel}`);
-        decision.upgradeSuggestions.push({
-          questionId,
-          fromLevel: effective,
-          toLevel: minLevel,
-          why: `${input.actionClass} requires stronger maturity before EXECUTE is allowed.`,
-          how: "Collect deterministic evidence to satisfy the next gate and update owner target if needed."
-        });
-      }
-    }
-
     const trustTierSatisfied = compareTrustTier(input.trustSummary.trustTier, rule.requireTrustTierAtLeast);
     addCondition(decision, {
       conditionId: "trust-tier",
@@ -566,49 +721,6 @@ export function evaluateActionPermission(input: GovernorDecisionInput): Governor
     if (!trustTierSatisfied) {
       issues.push(`trust tier ${input.trustSummary.trustTier} does not satisfy ${rule.requireTrustTierAtLeast}`);
       decision.requiredEvidence.push(`Increase OBSERVED evidence quality to reach trust tier ${rule.requireTrustTierAtLeast}.`);
-    }
-
-    for (const [packId, requirement] of Object.entries(rule.requireAssurancePacks)) {
-      const pack = input.assuranceSummary.packs[packId];
-      addCondition(decision, {
-        conditionId: `assurance:${packId}:present`,
-        label: `${packId} assurance evidence present`,
-        passed: Boolean(pack),
-        actual: Boolean(pack),
-        expected: true,
-        reason: pack ? `Assurance pack ${packId} is present.` : `Assurance pack ${packId} is missing.`,
-      });
-      if (!pack) {
-        issues.push(`assurance pack ${packId} missing`);
-        decision.requiredEvidence.push(`Run assurance pack '${packId}' and collect OBSERVED evidence.`);
-        continue;
-      }
-      addCondition(decision, {
-        conditionId: `assurance:${packId}:score`,
-        label: `${packId} minimum score`,
-        passed: pack.score >= requirement.minScore,
-        actual: pack.score,
-        expected: requirement.minScore,
-        reason: pack.score >= requirement.minScore
-          ? `Assurance pack ${packId} score ${pack.score.toFixed(1)} satisfies ${requirement.minScore}.`
-          : `Assurance pack ${packId} score ${pack.score.toFixed(1)} < ${requirement.minScore}.`,
-      });
-      addCondition(decision, {
-        conditionId: `assurance:${packId}:succeeded`,
-        label: `${packId} maximum succeeded attacks`,
-        passed: pack.succeeded <= requirement.maxSucceeded,
-        actual: pack.succeeded,
-        expected: requirement.maxSucceeded,
-        reason: pack.succeeded <= requirement.maxSucceeded
-          ? `Assurance pack ${packId} has ${pack.succeeded} succeeded attacks, within the maximum ${requirement.maxSucceeded}.`
-          : `Assurance pack ${packId} has ${pack.succeeded} succeeded attacks above maximum ${requirement.maxSucceeded}.`,
-      });
-      if (pack.score < requirement.minScore) {
-        issues.push(`assurance pack ${packId} score ${pack.score.toFixed(1)} < ${requirement.minScore}`);
-      }
-      if (pack.succeeded > requirement.maxSucceeded) {
-        issues.push(`assurance pack ${packId} has ${pack.succeeded} *_SUCCEEDED violations`);
-      }
     }
 
     const riskKey = normalizeRiskTier(input.riskTier);

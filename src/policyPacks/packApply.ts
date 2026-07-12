@@ -4,7 +4,13 @@ import YAML from "yaml";
 import { getPolicyPack } from "./builtInPacks.js";
 import { resolveAgentId } from "../fleet/paths.js";
 import { ensureDir, writeFileAtomic } from "../utils/fs.js";
-import { signActionPolicy } from "../governor/actionPolicyEngine.js";
+import {
+  ACTION_POLICY_WRITER_LOCK,
+  actionPolicyPath as canonicalActionPolicyPath,
+  assertActionPolicyWriterReady,
+  signActionPolicyWithLockHeld,
+} from "../governor/actionPolicyEngine.js";
+import { withControlFileLock } from "../lifecycle/controlFileLock.js";
 import { signToolsConfig } from "../toolhub/toolhubValidators.js";
 import { signBudgetsConfig } from "../budgets/budgets.js";
 import { signAlertsConfig } from "../drift/alerts.js";
@@ -70,11 +76,12 @@ function writeAudit(workspace: string, agentId: string, payload: Record<string, 
   }
 }
 
-export function applyPolicyPack(params: {
+function applyPolicyPackLocked(params: {
   workspace: string;
   agentId?: string;
   packId: string;
 }): PolicyPackApplyResult {
+  assertActionPolicyWriterReady(params.workspace);
   const pack = getPolicyPack(params.packId);
   if (!pack) {
     throw new Error(`unknown policy pack: ${params.packId}`);
@@ -92,7 +99,7 @@ export function applyPolicyPack(params: {
 
   const actionPolicyPath = join(params.workspace, ".amc", "action-policy.yaml");
   writeAndTrack(actionPolicyPath, YAML.stringify(pack.actionPolicy));
-  signActionPolicy(params.workspace);
+  signActionPolicyWithLockHeld(params.workspace);
 
   const toolsPath = join(params.workspace, ".amc", "tools.yaml");
   writeAndTrack(toolsPath, YAML.stringify(pack.tools));
@@ -182,4 +189,18 @@ export function applyPolicyPack(params: {
     transparencyHash: transparency.hash,
     auditEventId
   };
+}
+
+export function applyPolicyPack(params: {
+  workspace: string;
+  agentId?: string;
+  packId: string;
+}): PolicyPackApplyResult {
+  const policyPath = canonicalActionPolicyPath(params.workspace);
+  return withControlFileLock({
+    root: dirname(policyPath),
+    name: ACTION_POLICY_WRITER_LOCK,
+    timeoutMs: 500,
+    operation: () => applyPolicyPackLocked(params),
+  });
 }

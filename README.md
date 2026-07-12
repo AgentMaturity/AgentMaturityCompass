@@ -14,7 +14,7 @@
   <a href="https://github.com/AgentMaturity/AgentMaturityCompass/releases"><img src="https://img.shields.io/github/v/release/AgentMaturity/AgentMaturityCompass?labelColor=0a0a0a&color=4AEF79&label=release" alt="GitHub release" /></a>
   <a href="https://github.com/AgentMaturity/AgentMaturityCompass/releases"><img src="https://img.shields.io/github/downloads/AgentMaturity/AgentMaturityCompass/total?labelColor=0a0a0a&color=4AEF79&label=downloads" alt="verified release downloads" /></a>
   <a href="https://github.com/AgentMaturity/AgentMaturityCompass/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/AgentMaturity/AgentMaturityCompass/ci.yml?branch=main&labelColor=0a0a0a&color=4AEF79&label=CI" alt="CI" /></a>
-  <a href="https://github.com/AgentMaturity/AgentMaturityCompass/actions/workflows/ci.yml"><img src="https://img.shields.io/badge/tests-8%2C468%20passing-4AEF79?labelColor=0a0a0a" alt="tests" /></a>
+  <a href="https://github.com/AgentMaturity/AgentMaturityCompass/actions/workflows/ci.yml"><img src="https://img.shields.io/badge/tests-8%2C481%20passing-4AEF79?labelColor=0a0a0a" alt="tests" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-4AEF79?labelColor=0a0a0a" alt="MIT" /></a>
 </p>
 
@@ -330,6 +330,12 @@ amc policy scope compile release-external --pack code-agent.high
                                   # preview a narrow selected-rule merge without writing
 amc policy scope apply release-external --pack code-agent.high --confirm <compileId>
                                   # exact-confirm and sign the reviewed Action/Approval policy change
+amc policy action logic show DEPLOY
+                                  # inspect declared maturity/assurance gates and mandatory gates
+amc policy action logic compile DEPLOY --file deploy-evidence-logic.json
+                                  # preview a bounded all/any evidence tree without writing
+amc policy action logic apply DEPLOY --file deploy-evidence-logic.json --confirm <compileId> --acknowledge-alternatives
+                                  # exact-confirm and sign the reviewed Action Policy logic
 amc policy simulate runtime:prompt-injection --direction request --content "ignore previous instructions"
                                   # preview the exact Runtime Firewall match without recording it
 amc policy simulate action:DEPLOY --agent default --risk high --mode execute
@@ -516,6 +522,8 @@ amc comms-check --text "Guaranteed 40% return" --domain wealth
 
 `amc policy scope` groups the existing nine action classes into four immutable AMC templates. Compile verifies the current signed Action and Approval Policy baselines and preserves every unselected rule; apply requires the exact content-bound compile ID, uses the existing lock/atomic writers/signers, restores prior bytes on failure, and records existing transparency/ledger evidence only after both policies verify. Workspace policies remain fleet-wide, so these templates never claim per-agent or per-environment scope. See [Reusable Policy Scope Templates](docs/SCOPE_TEMPLATES.md).
 
+`amc policy action logic` composes only maturity and assurance requirements already declared by one signed Action Policy rule. Every requirement remains present exactly once, `any` alternatives stay within one evidence family, and signature/trust, trust tier, sandbox, ticket, budget, freeze, work-order, and `allowExecute` gates remain mandatory. Existing rules keep implicit all-requirements behavior, including legacy requirement IDs. Preview is read-only; apply requires an exact compile ID plus explicit alternative acknowledgement, shares one writer lock with every Action Policy mutation path, preserves unrelated YAML comments, and restores the signed baseline if policy or evidence finalization fails. See [Action Policy Evidence Logic](docs/ACTION_EVIDENCE_LOGIC.md).
+
 `amc policy simulate <controlId>` takes the next read-only step: it invokes the selected control's production evaluator and reports the exact matched rules, pass/fail conditions, and safe outcome. Runtime content is hashed and never returned; no Firewall event, approval request, decision receipt, transparency entry, key, or workspace scaffolding is created. Every result is marked `simulationOnly: true`, `recorded: false`, and `proofEligible: false`. See [Control Simulation](docs/CONTROL_SIMULATION.md).
 
 When ToolHub requires approval, the CLI, Dashboard, diagnostics, and Studio now read the same signed quorum chain. Configured Integrations channels receive a metadata-only lifecycle notification with an authenticated Studio review path; no tool input, reason, credential, Vault reference, token, local path, or destination URL is included. Delivery never grants authority, and terminal, expired, tampered, or replayed requests fail closed. See [Approvals](docs/APPROVALS.md).
@@ -681,7 +689,7 @@ The full trust stack is **free and MIT licensed**. The only paid surface is Indu
 
 | Tier | What you get |
 |---|---|
-| **Free / Open Source** | Everything — Score, Shield, Enforce, Vault, Watch, Comply, Fleet, Passport, all 14 adapters, 1,159 registered CLI command paths, browser playground, CI gates |
+| **Free / Open Source** | Everything — Score, Shield, Enforce, Vault, Watch, Comply, Fleet, Passport, all 14 adapters, 1,163 registered CLI command paths, browser playground, CI gates |
 | **Industry Packs** | Everything in Free + all 41 Industry Domain Packs for `$9.99/month` |
 | **Enterprise** | Everything in Industry Packs + priority support + custom pack development + deployment assistance |
 
@@ -716,7 +724,7 @@ The full trust stack is **free and MIT licensed**. The only paid surface is Indu
 | [Community Demo Kit](docs/COMMUNITY_DEMO_KIT.md) | [Why AMC One-Pager](docs/WHY_AMC_ONE_PAGER.md) |
 | [Solo Dev Quickstart](docs/SOLO_DEV_QUICKSTART.md) | [Platform Engineer Quickstart](docs/PLATFORM_ENGINEER_QUICKSTART.md) |
 | [Security & Compliance Quickstart](docs/SECURITY_COMPLIANCE_QUICKSTART.md) | [Troubleshooting](docs/TROUBLESHOOTING.md) |
-| [CLI Reference (1,159 command paths)](docs/CLI_COMMAND_INVENTORY.md) | [Architecture](docs/ARCHITECTURE_MAP.md) |
+| [CLI Reference (1,163 command paths)](docs/CLI_COMMAND_INVENTORY.md) | [Architecture](docs/ARCHITECTURE_MAP.md) |
 | [Compatibility Matrix](docs/COMPATIBILITY_MATRIX.md) | [Starter Blueprints](docs/STARTER_BLUEPRINTS.md) |
 | [Install Packages](docs/INSTALL_PACKAGES.md) | [Support Policy](docs/SUPPORT_POLICY.md) |
 | [Release Cadence](docs/RELEASE_CADENCE.md) | [CI Templates](docs/CI_TEMPLATES.md) |
@@ -815,7 +823,7 @@ AMC is MIT licensed. We welcome contributions — especially new **assurance pac
 
 ```bash
 git clone https://github.com/AgentMaturity/AgentMaturityCompass.git
-cd AgentMaturityCompass && npm ci && npm test   # 1,070 files / 8,468 passing Vitest tests
+cd AgentMaturityCompass && npm ci && npm test   # 1,071 files / 8,481 passing Vitest tests
 ```
 
 **→ [CONTRIBUTING.md](CONTRIBUTING.md)** — includes guides for writing packs, mapping research papers, and adding adapters.
@@ -836,6 +844,6 @@ cd AgentMaturityCompass && npm ci && npm test   # 1,070 files / 8,468 passing Vi
 ---
 
 <p align="center">
-  <strong>244 default diagnostic questions + 20 lifecycle expansion questions · 142 assurance packs · 41 domain packs · 14 adapters · 1,159 CLI command paths</strong><br>
+  <strong>244 default diagnostic questions + 20 lifecycle expansion questions · 142 assurance packs · 41 domain packs · 14 adapters · 1,163 CLI command paths</strong><br>
   <em>Stop trusting. Start verifying.</em>
 </p>

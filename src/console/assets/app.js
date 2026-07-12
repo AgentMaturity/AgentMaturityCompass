@@ -1222,7 +1222,7 @@ async function renderHome() {
         <div class="studio-kicker">Desktop app</div>
         <h3>Native macOS shell, same AMC evidence-first surface.</h3>
         <p class="muted">
-          The macOS app now starts local demo-mode Studio and renders this Console inside a native WebKit window. Windows still launches the same local URL in the system browser. Both keep the same flow: 244 default questions, 264 lifecycle questions, 142 assurance packs, 41 Industry Packs, and 1,159 CLI paths.
+          The macOS app now starts local demo-mode Studio and renders this Console inside a native WebKit window. Windows still launches the same local URL in the system browser. Both keep the same flow: 244 default questions, 264 lifecycle questions, 142 assurance packs, 41 Industry Packs, and 1,163 CLI paths.
         </p>
       </div>
       <div class="row wrap">
@@ -1583,12 +1583,46 @@ async function renderTransparency() {
 }
 
 async function renderPolicyPacks() {
-  const [packs, scopeEnvelope] = await Promise.all([
+  const actionEvidenceClasses = [
+    "READ_ONLY", "WRITE_LOW", "WRITE_HIGH", "DEPLOY", "SECURITY",
+    "FINANCIAL", "NETWORK_EXTERNAL", "DATA_EXPORT", "IDENTITY"
+  ];
+  const [packs, scopeEnvelope, initialEvidenceEnvelope] = await Promise.all([
     apiGet("/policy-packs/list"),
-    apiGet("/api/v1/policy/scope-templates")
+    apiGet("/api/v1/policy/scope-templates"),
+    apiGet("/api/v1/policy/action/evidence-logic?actionClass=DEPLOY").catch((error) => ({ evidenceLogicError: errText(error) }))
   ]);
   const scopeTemplates = apiPayload(scopeEnvelope)?.templates || [];
+  const initialEvidenceInspection = initialEvidenceEnvelope?.evidenceLogicError
+    ? null
+    : apiPayload(initialEvidenceEnvelope);
   root.innerHTML = `
+    ${card("Action evidence logic", `
+      <div class="row wrap">
+        <label>
+          <span class="muted">Action class</span>
+          <select id="evidenceLogicActionClass">
+            ${actionEvidenceClasses.map((actionClass) => `<option value="${actionClass}"${actionClass === "DEPLOY" ? " selected" : ""}>${actionClass}</option>`).join("")}
+          </select>
+        </label>
+        <button id="evidenceLogicAddGroup" class="secondary">Add alternative group</button>
+        <button id="evidenceLogicPreview" class="secondary">Preview</button>
+      </div>
+      <div id="evidenceLogicGateList" class="muted"></div>
+      <div id="evidenceLogicAlternativeGroups"></div>
+      <div class="row wrap">
+        <label>
+          <span class="muted">Exact compile ID</span>
+          <input id="evidenceLogicConfirm" type="text" placeholder="action-logic-compile-..." autocomplete="off" spellcheck="false" />
+        </label>
+        <label class="row">
+          <input id="evidenceLogicAcknowledge" type="checkbox" />
+          <span>Acknowledge alternatives</span>
+        </label>
+        <button id="evidenceLogicApply" disabled>Apply</button>
+      </div>
+      <pre id="evidenceLogicOut" class="muted scroll">${htmlEscape(initialEvidenceEnvelope?.evidenceLogicError || "")}</pre>
+    `)}
     ${card("Reusable scopes", `
       <div class="row wrap">
         <label>
@@ -1619,6 +1653,241 @@ async function renderPolicyPacks() {
       <pre id="packOut" class="muted"></pre>
     `)}
   `;
+  const evidenceLogicActionClass = document.getElementById("evidenceLogicActionClass");
+  const evidenceLogicAddGroup = document.getElementById("evidenceLogicAddGroup");
+  const evidenceLogicPreviewButton = document.getElementById("evidenceLogicPreview");
+  const evidenceLogicGateList = document.getElementById("evidenceLogicGateList");
+  const evidenceLogicAlternativeGroups = document.getElementById("evidenceLogicAlternativeGroups");
+  const evidenceLogicConfirm = document.getElementById("evidenceLogicConfirm");
+  const evidenceLogicAcknowledge = document.getElementById("evidenceLogicAcknowledge");
+  const evidenceLogicApplyButton = document.getElementById("evidenceLogicApply");
+  const evidenceLogicOut = document.getElementById("evidenceLogicOut");
+  let evidenceLogicInspection = initialEvidenceInspection;
+  let evidenceLogicGroups = [];
+  let evidenceLogicPreview = null;
+  let evidenceLogicRequest = null;
+  let evidenceLogicBusy = false;
+  let evidenceLogicBuilderCompatible = true;
+
+  const gateById = () => new Map((evidenceLogicInspection?.gates || []).map((gate) => [gate.gateId, gate]));
+  const seedEvidenceLogicGroups = () => {
+    const logic = evidenceLogicInspection?.effectiveLogic;
+    evidenceLogicBuilderCompatible = true;
+    const top = logic?.all || (logic ? [logic] : []);
+    const groups = [];
+    for (const node of top) {
+      if (node?.gate) continue;
+      if (Array.isArray(node?.any) && node.any.length >= 2 && node.any.every((child) => typeof child?.gate === "string")) {
+        groups.push(node.any.map((child) => child.gate));
+        continue;
+      }
+      evidenceLogicBuilderCompatible = false;
+      return [];
+    }
+    return groups;
+  };
+  const clearEvidenceLogicPreview = () => {
+    evidenceLogicPreview = null;
+    evidenceLogicRequest = null;
+    evidenceLogicConfirm.value = "";
+    evidenceLogicAcknowledge.checked = false;
+    evidenceLogicOut.textContent = "";
+  };
+  const evidenceLogicFromBuilder = () => {
+    if (!evidenceLogicBuilderCompatible) {
+      throw new Error("This nested tree is read-only in Studio; use the CLI or API to edit it.");
+    }
+    const gates = evidenceLogicInspection?.gates || [];
+    if (gates.length === 0) throw new Error("No evidence gates are available for this action class.");
+    const assigned = new Set();
+    const nodes = [];
+    for (const group of evidenceLogicGroups) {
+      if (group.length < 2) throw new Error("Each alternative group requires at least two gates.");
+      const families = new Set(group.map((gateId) => gateById().get(gateId)?.family));
+      if (families.has(undefined) || families.size !== 1) throw new Error("Alternative groups must use one evidence family.");
+      for (const gateId of group) {
+        if (assigned.has(gateId)) throw new Error("An evidence gate can appear in only one alternative group.");
+        assigned.add(gateId);
+      }
+      nodes.push({ any: group.map((gate) => ({ gate })) });
+    }
+    for (const gate of gates) {
+      if (!assigned.has(gate.gateId)) nodes.push({ gate: gate.gateId });
+    }
+    if (nodes.length === 1) return nodes[0];
+    return { all: nodes };
+  };
+  const updateEvidenceLogicState = () => {
+    const acknowledgementReady = !evidenceLogicPreview?.requiresAlternativeAcknowledgement || evidenceLogicAcknowledge.checked;
+    evidenceLogicActionClass.disabled = evidenceLogicBusy;
+    evidenceLogicAddGroup.disabled = evidenceLogicBusy || !evidenceLogicInspection || !evidenceLogicBuilderCompatible;
+    evidenceLogicPreviewButton.disabled = evidenceLogicBusy || !evidenceLogicInspection || !evidenceLogicBuilderCompatible;
+    evidenceLogicConfirm.disabled = evidenceLogicBusy;
+    evidenceLogicAcknowledge.disabled = evidenceLogicBusy || !evidenceLogicPreview?.requiresAlternativeAcknowledgement;
+    evidenceLogicApplyButton.disabled = evidenceLogicBusy
+      || !evidenceLogicPreview?.canApply
+      || evidenceLogicConfirm.value.trim() !== evidenceLogicPreview.compileId
+      || !acknowledgementReady;
+    evidenceLogicAlternativeGroups.querySelectorAll("select,button").forEach((element) => {
+      element.disabled = evidenceLogicBusy;
+    });
+  };
+  const renderEvidenceLogicBuilder = () => {
+    const gates = evidenceLogicInspection?.gates || [];
+    const assigned = new Map();
+    evidenceLogicGroups.forEach((group, index) => group.forEach((gateId) => assigned.set(gateId, index)));
+    evidenceLogicGateList.innerHTML = gates.length === 0
+      ? ""
+      : gates.map((gate) => `<div><code>${htmlEscape(gate.gateId)}</code> <span>${htmlEscape(
+        !evidenceLogicBuilderCompatible
+          ? "nested tree (CLI/API editing)"
+          : assigned.has(gate.gateId)
+            ? `alternative ${Number(assigned.get(gate.gateId)) + 1}`
+            : "mandatory"
+      )}</span></div>`).join("");
+    evidenceLogicAlternativeGroups.innerHTML = evidenceLogicGroups.map((group, index) => {
+      const family = gateById().get(group[0])?.family;
+      const options = gates
+        .filter((gate) => !family || gate.family === family)
+        .map((gate) => {
+          const usedElsewhere = assigned.has(gate.gateId) && assigned.get(gate.gateId) !== index;
+          return `<option value="${htmlEscape(gate.gateId)}"${group.includes(gate.gateId) ? " selected" : ""}${usedElsewhere ? " disabled" : ""}>${htmlEscape(gate.gateId)}</option>`;
+        }).join("");
+      return `<div class="row wrap" data-evidence-logic-group="${index}">
+        <label>
+          <span class="muted">${htmlEscape(family || "evidence")} alternatives</span>
+          <select multiple size="${Math.min(6, Math.max(2, gates.filter((gate) => !family || gate.family === family).length))}">${options}</select>
+        </label>
+        <button type="button" class="secondary" data-remove-evidence-logic-group="${index}" aria-label="Remove alternative group">&times;</button>
+      </div>`;
+    }).join("");
+    evidenceLogicAlternativeGroups.querySelectorAll("[data-evidence-logic-group] select").forEach((select) => {
+      select.addEventListener("change", () => {
+        const row = select.closest("[data-evidence-logic-group]");
+        const index = Number(row?.getAttribute("data-evidence-logic-group"));
+        evidenceLogicGroups[index] = [...select.selectedOptions].map((option) => option.value);
+        clearEvidenceLogicPreview();
+        renderEvidenceLogicBuilder();
+        updateEvidenceLogicState();
+      });
+    });
+    evidenceLogicAlternativeGroups.querySelectorAll("[data-remove-evidence-logic-group]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const index = Number(button.getAttribute("data-remove-evidence-logic-group"));
+        evidenceLogicGroups.splice(index, 1);
+        clearEvidenceLogicPreview();
+        renderEvidenceLogicBuilder();
+        updateEvidenceLogicState();
+      });
+    });
+    updateEvidenceLogicState();
+  };
+  const loadEvidenceLogicInspection = async () => {
+    evidenceLogicBusy = true;
+    clearEvidenceLogicPreview();
+    updateEvidenceLogicState();
+    try {
+      const envelope = await apiGet(`/api/v1/policy/action/evidence-logic?actionClass=${encodeURIComponent(evidenceLogicActionClass.value)}`);
+      evidenceLogicInspection = apiPayload(envelope);
+      evidenceLogicGroups = seedEvidenceLogicGroups();
+      renderEvidenceLogicBuilder();
+      if (evidenceLogicBuilderCompatible) {
+        setStatus("Evidence logic loaded.");
+      } else {
+        evidenceLogicOut.textContent = "This valid nested tree is read-only in Studio. Use the CLI or API to edit it.";
+        setStatus("Nested evidence logic loaded read-only.");
+      }
+    } catch (error) {
+      evidenceLogicInspection = null;
+      evidenceLogicGroups = [];
+      evidenceLogicOut.textContent = errText(error);
+      renderEvidenceLogicBuilder();
+      setStatus("Evidence logic unavailable.", true);
+    } finally {
+      evidenceLogicBusy = false;
+      updateEvidenceLogicState();
+    }
+  };
+  evidenceLogicGroups = seedEvidenceLogicGroups();
+  renderEvidenceLogicBuilder();
+  evidenceLogicActionClass.addEventListener("change", loadEvidenceLogicInspection);
+  evidenceLogicAddGroup.addEventListener("click", () => {
+    if (evidenceLogicBusy || !evidenceLogicInspection || !evidenceLogicBuilderCompatible) return;
+    const assigned = new Set(evidenceLogicGroups.flat());
+    const candidates = ["maturity", "assurance"]
+      .map((family) => (evidenceLogicInspection.gates || []).filter((gate) => gate.family === family && !assigned.has(gate.gateId)))
+      .find((gates) => gates.length >= 2);
+    if (!candidates) {
+      setStatus("No same-family gate pair is available.", true);
+      return;
+    }
+    evidenceLogicGroups.push(candidates.slice(0, 2).map((gate) => gate.gateId));
+    clearEvidenceLogicPreview();
+    renderEvidenceLogicBuilder();
+  });
+  evidenceLogicPreviewButton.addEventListener("click", async () => {
+    if (evidenceLogicBusy || !evidenceLogicInspection) return;
+    evidenceLogicBusy = true;
+    clearEvidenceLogicPreview();
+    updateEvidenceLogicState();
+    try {
+      evidenceLogicRequest = evidenceLogicFromBuilder();
+      const envelope = await apiPost("/api/v1/policy/action/evidence-logic/compile", {
+        actionClass: evidenceLogicActionClass.value,
+        logic: evidenceLogicRequest
+      });
+      evidenceLogicPreview = apiPayload(envelope);
+      evidenceLogicOut.textContent = JSON.stringify(evidenceLogicPreview, null, 2);
+      setStatus(evidenceLogicPreview.canApply ? "Evidence logic preview ready." : "Evidence logic has no changes.");
+    } catch (error) {
+      evidenceLogicPreview = null;
+      evidenceLogicRequest = null;
+      evidenceLogicOut.textContent = errText(error);
+      setStatus("Evidence logic preview blocked.", true);
+    } finally {
+      evidenceLogicBusy = false;
+      updateEvidenceLogicState();
+    }
+  });
+  evidenceLogicConfirm.addEventListener("input", updateEvidenceLogicState);
+  evidenceLogicAcknowledge.addEventListener("change", updateEvidenceLogicState);
+  evidenceLogicApplyButton.addEventListener("click", async () => {
+    if (
+      evidenceLogicBusy
+      || !evidenceLogicPreview
+      || !evidenceLogicRequest
+      || evidenceLogicConfirm.value.trim() !== evidenceLogicPreview.compileId
+    ) return;
+    evidenceLogicBusy = true;
+    updateEvidenceLogicState();
+    try {
+      const envelope = await apiPost("/api/v1/policy/action/evidence-logic/apply", {
+        actionClass: evidenceLogicPreview.actionClass,
+        logic: evidenceLogicRequest,
+        confirmCompileId: evidenceLogicPreview.compileId,
+        acknowledgeAlternatives: evidenceLogicAcknowledge.checked
+      });
+      const applied = apiPayload(envelope);
+      evidenceLogicOut.textContent = JSON.stringify(applied, null, 2);
+      setStatus(applied.applied ? "Evidence logic applied." : "Evidence logic unchanged.");
+      evidenceLogicPreview = null;
+      evidenceLogicRequest = null;
+      evidenceLogicConfirm.value = "";
+      evidenceLogicAcknowledge.checked = false;
+      await refreshUnifiedBanner();
+      await loadEvidenceLogicInspection();
+    } catch (error) {
+      evidenceLogicOut.textContent = errText(error);
+      evidenceLogicPreview = null;
+      evidenceLogicRequest = null;
+      evidenceLogicConfirm.value = "";
+      evidenceLogicAcknowledge.checked = false;
+      setStatus("Evidence logic apply blocked.", true);
+    } finally {
+      evidenceLogicBusy = false;
+      updateEvidenceLogicState();
+    }
+  });
   const scopeTemplateSelect = document.getElementById("scopeTemplateSelect");
   const scopePackSelect = document.getElementById("scopePackSelect");
   const scopePreviewButton = document.getElementById("scopePreview");

@@ -176,8 +176,8 @@ describe("AMC-1469 verified control projection", () => {
       trusted: true,
     });
     expect(control(projection, "action:WRITE_HIGH").when).toEqual(expect.arrayContaining([
-      "trust tier at least OBSERVED_HARDENED",
-      "execution ticket required",
+      "mandatory: trust tier at least OBSERVED_HARDENED",
+      "mandatory: execution ticket required",
     ]));
     expect(control(projection, "approval:WRITE_HIGH")).toMatchObject({
       scope: "action class WRITE_HIGH",

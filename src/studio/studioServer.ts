@@ -5723,7 +5723,11 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       const agentStatusMatch = pathname.match(/^\/agents\/([^/]+)\/status$/);
       if (agentStatusMatch && req.method === "GET") {
         const agentId = resolveAgentId(options.workspace, decodeURIComponent(agentStatusMatch[1] ?? ""));
-        if (!auth.isAdmin && auth.agentId !== agentId) {
+        const canViewWorkspaceAgent = hasAnyRole(
+          [...auth.roles],
+          ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"],
+        );
+        if (!auth.isAdmin && auth.agentId !== agentId && !canViewWorkspaceAgent) {
           json(res, 403, { error: "scope does not include this agent" });
           return;
         }

@@ -27,8 +27,13 @@ describe("release readiness scripts", () => {
     expect(gate).toContain("install-persona-qa");
     expect(gate).toContain("qa:install-personas");
     expect(gate).toContain("full-test-suite");
-    expect(gate).toContain("\"npm\", [\"test\"]");
+    expect(gate).toContain('"npx", ["vitest", "run", "--reporter=dot"]');
     expect(gate).toContain("audit:runtime");
+    expect(gate).toContain("const child = spawn(command, args");
+    expect(gate).toContain("const timer = setTimeout(() =>");
+    expect(gate).toContain('detached: process.platform !== "win32"');
+    expect(gate).toContain('process.kill(-child.pid, "SIGKILL")');
+    expect(gate.indexOf('runStep("build"')).toBeLessThan(gate.indexOf('runStep("full-test-suite"'));
   });
 
   test("install persona QA emits a readable feedback report", () => {

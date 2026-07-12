@@ -45,7 +45,7 @@ const CATEGORIES = [
   {
     name: 'Governance & Policy',
     icon: '08',
-    docs: ['GOVERNANCE', 'COMMUNITY', 'SUPPORT_POLICY', 'MODEL_GOVERNANCE', 'GOVERNOR', 'CONTROL_PROJECTION', 'CONTROL_SIMULATION', 'SCOPE_TEMPLATES', 'POLICY_EXPORT', 'POLICY_PACKS', 'PROMPT_POLICY', 'APPROVALS', 'DUAL_CONTROL_APPROVALS', 'WAIVERS', 'LEASES', 'BUDGETS', 'NO_CODE_GOVERNANCE', 'VALUE_CONTRACTS', 'VALUE_GATES', 'VALUE_INGESTION', 'VALUE_REALIZATION']
+    docs: ['GOVERNANCE', 'COMMUNITY', 'SUPPORT_POLICY', 'MODEL_GOVERNANCE', 'GOVERNOR', 'CONTROL_PROJECTION', 'CONTROL_SIMULATION', 'ACTION_EVIDENCE_LOGIC', 'SCOPE_TEMPLATES', 'POLICY_EXPORT', 'POLICY_PACKS', 'PROMPT_POLICY', 'APPROVALS', 'DUAL_CONTROL_APPROVALS', 'WAIVERS', 'LEASES', 'BUDGETS', 'NO_CODE_GOVERNANCE', 'VALUE_CONTRACTS', 'VALUE_GATES', 'VALUE_INGESTION', 'VALUE_REALIZATION']
   },
   {
     name: 'Operations',
@@ -86,7 +86,7 @@ const CATEGORIES = [
 
 // All known doc filenames (without .md)
 const ALL_DOCS = [
-  'ACCESSIBILITY','ADAPTERS','ADAPTER_COMPATIBILITY','AGENT_GUIDE','AGENT_PASSPORT','AGENT_VS_WORKFLOW',
+  'ACCESSIBILITY','ACTION_EVIDENCE_LOGIC','ADAPTERS','ADAPTER_COMPATIBILITY','AGENT_GUIDE','AGENT_PASSPORT','AGENT_VS_WORKFLOW',
   'AMC_MASTER_REFERENCE','AMC_QUESTIONS_IN_DEPTH','ANTI_HALLUCINATION','API_REFERENCE','API_SURFACES',
   'APPROVALS','ARCHETYPES','ARCHITECTURE_BRIEF','ARCHITECTURE_MAP','ASSURANCE_CERTS','ASSURANCE_LAB',
   'ATTESTATION_EVIDENCE_PATHS','AUDIT_BINDER','BACKUPS','BENCHMARKING','BENCHMARKS',
@@ -199,7 +199,7 @@ const PUBLIC_DOC_IDS = new Set([
   'HARDWARE_TRUST', 'ZERO_KEYS', 'VAULT', 'RBAC', 'IDENTITY', 'SUPPLY_CHAIN', 'PLUGIN_SUPPLY_CHAIN',
 
   // Governance and policy
-  'GOVERNANCE', 'MODEL_GOVERNANCE', 'CONTROL_PROJECTION', 'CONTROL_SIMULATION', 'SCOPE_TEMPLATES', 'POLICY_PACKS', 'PROMPT_POLICY', 'APPROVALS',
+  'GOVERNANCE', 'MODEL_GOVERNANCE', 'CONTROL_PROJECTION', 'CONTROL_SIMULATION', 'ACTION_EVIDENCE_LOGIC', 'SCOPE_TEMPLATES', 'POLICY_PACKS', 'PROMPT_POLICY', 'APPROVALS',
   'DUAL_CONTROL_APPROVALS', 'WAIVERS', 'LEASES', 'BUDGETS', 'SUPPORT_POLICY', 'COMMUNITY',
 
   // Operations and deployment
@@ -664,7 +664,7 @@ function showWelcome() {
         <div class="stat-card"><div class="num">${PUBLIC_DOCS.length}</div><div class="label">Public Guides</div></div>
         <div class="stat-card"><div class="num">${PUBLIC_CATEGORIES.length}</div><div class="label">Categories</div></div>
         <div class="stat-card"><div class="num">244</div><div class="label">Default Questions</div></div>
-        <div class="stat-card"><div class="num">1,159</div><div class="label">CLI Paths</div></div>
+        <div class="stat-card"><div class="num">1,163</div><div class="label">CLI Paths</div></div>
         <div class="stat-card"><div class="num">41</div><div class="label">Industry Packs</div></div>
         <div class="stat-card"><div class="num">14</div><div class="label">Framework Adapters</div></div>
       </div>

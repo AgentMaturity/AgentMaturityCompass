@@ -76,3 +76,5 @@ amc policy controls
 For automation, treat CLI exit 2 or JSON `status: "fail_closed"` as an integrity failure. Do not infer that a requested action was executed, approved, or blocked from this read-only inventory; use the existing signed decision and lifecycle receipts for execution proof.
 
 Reusable scope templates do not change evaluator semantics. They compile selected rules from an existing built-in Policy Pack into the same signed Action and Approval Policy schemas while preserving unselected rules. See [Reusable Policy Scope Templates](SCOPE_TEMPLATES.md).
+
+Action Policy evidence logic projects the effective `ALL` / `ANY` tree separately from mandatory signature, trust, sandbox, ticket, budget, freeze, work-order, and execute-flag gates. See [Action Policy Evidence Logic](ACTION_EVIDENCE_LOGIC.md).

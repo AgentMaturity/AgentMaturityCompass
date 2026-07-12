@@ -25,6 +25,7 @@ const HUMAN_ANALYZER_PATHS = new Set([
   "/api/v1/enforce/evaluate",
   "/api/v1/policy/simulate",
   "/api/v1/policy/scope-templates/compile",
+  "/api/v1/policy/action/evidence-logic/compile",
   "/api/v1/governor/check",
   "/api/v1/governor/explain",
   "/api/v1/sandbox/docker-args",

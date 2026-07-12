@@ -21,6 +21,12 @@ import {
 import { AVAILABLE_GUARDRAILS } from "./guardrailProfiles.js";
 import { inspectRuntimeFirewallPolicy, type RuntimeFirewallMode } from "../runtime/firewall.js";
 import { scopeTemplateIdsForActionClass, type ScopeTemplateId } from "./scopeTemplates.js";
+import {
+  defaultPolicyEvidenceLogicForRule,
+  POLICY_EVIDENCE_LOGIC_MAX_GATES,
+  policyEvidenceGateId,
+  renderPolicyEvidenceLogic,
+} from "../governor/policyEvidenceLogic.js";
 
 export const CONTROL_PROJECTION_SCHEMA_VERSION = "2026-07-11" as const;
 
@@ -282,14 +288,28 @@ function runtimeFamily(workspace: string): ControlFamilyProjection {
 
 function actionConditions(rule: ActionPolicyRule | undefined, defaultMode: ActionPolicy["defaultMode"]): string[] {
   if (!rule) return [`no explicit rule; default mode ${defaultMode}`];
-  const conditions = [`trust tier at least ${rule.requireTrustTierAtLeast}`];
+  const conditions = [
+    `mandatory: signed and trusted Action Policy`,
+    `mandatory: trust tier at least ${rule.requireTrustTierAtLeast}`,
+    "mandatory: sandbox when the selected risk-tier default requires it",
+    "mandatory: active budget, incident-freeze, and work-order gates",
+  ];
+  const evidenceLogic = rule.evidenceLogic ?? defaultPolicyEvidenceLogicForRule(rule);
+  if (evidenceLogic) conditions.push(`evidence logic: ${renderPolicyEvidenceLogic(evidenceLogic)}`);
+  else {
+    const gateCount = Object.keys(rule.minEffectiveQuestionLevels).length + Object.keys(rule.requireAssurancePacks).length;
+    if (gateCount > 0) {
+      conditions.push(`evidence logic: implicit ALL across ${gateCount} declared gates; bounded authoring supports at most ${POLICY_EVIDENCE_LOGIC_MAX_GATES}`);
+    }
+  }
   for (const [questionId, level] of Object.entries(rule.minEffectiveQuestionLevels).sort(([left], [right]) => left.localeCompare(right))) {
-    conditions.push(`${questionId} effective level at least L${level}`);
+    conditions.push(`evidence gate ${policyEvidenceGateId("maturity", questionId)}: effective level at least L${level}`);
   }
   for (const [packId, requirement] of Object.entries(rule.requireAssurancePacks).sort(([left], [right]) => left.localeCompare(right))) {
-    conditions.push(`${packId} assurance score at least ${requirement.minScore} with at most ${requirement.maxSucceeded} succeeded attacks`);
+    conditions.push(`evidence gate ${policyEvidenceGateId("assurance", packId)}: score at least ${requirement.minScore} with at most ${requirement.maxSucceeded} succeeded attacks`);
   }
-  if (rule.requireExecTicket) conditions.push("execution ticket required");
+  if (rule.requireExecTicket) conditions.push("mandatory: execution ticket required");
+  conditions.push(`mandatory: Action Policy execute flag is ${rule.allowExecute ? "enabled" : "disabled"}`);
   return conditions;
 }
 

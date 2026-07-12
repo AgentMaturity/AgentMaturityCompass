@@ -23,6 +23,7 @@ import {
 } from "../src/enforce/scopeTemplates.js";
 import { ACTION_CLASSES } from "../src/governor/actionCatalog.js";
 import {
+  ACTION_POLICY_WRITER_LOCK,
   actionPolicyPath,
   initActionPolicy,
   loadActionPolicy,
@@ -338,7 +339,7 @@ describe("AMC-1474 reusable action-class scope templates", () => {
 
     withControlFileLock({
       root: join(root, ".amc"),
-      name: "scope-template",
+      name: ACTION_POLICY_WRITER_LOCK,
       operation: () => {
         expect(() => applyScopeTemplate({
           workspace: root,
@@ -515,7 +516,7 @@ describe("AMC-1474 reusable action-class scope templates", () => {
     expect(scopeUi).toContain('scopeApplyButton.disabled');
     expect(scopeUi).not.toContain('window.confirm');
     expect(readFileSync("src/console/pages/policypacks.html", "utf8"))
-      .toContain('app.js?v=20260711b');
+      .toContain('app.js?v=20260711c');
   });
 
   test("projects one scope template per action control and keeps source provenance unique", () => {

@@ -1,5 +1,9 @@
 import { z } from "zod";
 import { ACTION_CLASSES } from "./actionCatalog.js";
+import {
+  policyEvidenceLogicSchema,
+  validatePolicyEvidenceLogicForRule,
+} from "./policyEvidenceLogic.js";
 
 const actionClassSchema = z.enum(ACTION_CLASSES as [
   "READ_ONLY",
@@ -29,8 +33,20 @@ export const actionPolicyRuleSchema = z.object({
   minEffectiveQuestionLevels: z.record(z.string().min(1), z.number().int().min(0).max(5)).default({}),
   requireTrustTierAtLeast: trustTierAtLeastSchema.default("OBSERVED"),
   requireAssurancePacks: z.record(z.string().min(1), assurancePackRequirementSchema).default({}),
+  evidenceLogic: policyEvidenceLogicSchema.optional(),
   allowExecute: z.boolean().default(false),
   requireExecTicket: z.boolean().default(false)
+}).superRefine((rule, context) => {
+  if (!rule.evidenceLogic) return;
+  try {
+    validatePolicyEvidenceLogicForRule(rule.evidenceLogic, rule);
+  } catch (error) {
+    context.addIssue({
+      code: "custom",
+      path: ["evidenceLogic"],
+      message: error instanceof Error ? error.message : "Invalid Action Policy evidence logic.",
+    });
+  }
 });
 
 export const actionPolicySchema = z.object({

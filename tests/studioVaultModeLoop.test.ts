@@ -17,6 +17,7 @@ import { createUnifiedClaritySnapshot } from "../src/snapshot/snapshot.js";
 import { buildDashboard } from "../src/dashboard/build.js";
 import { buildAgentConfig, initFleet, scaffoldAgent } from "../src/fleet/registry.js";
 import { pathExists, readUtf8 } from "../src/utils/fs.js";
+import { initUsersConfig } from "../src/auth/authApi.js";
 
 const roots: string[] = [];
 
@@ -148,6 +149,36 @@ describe("studio + vault + mode + loop", () => {
 
       const authorized = await httpGet(`http://127.0.0.1:${port}/agents`, token);
       expect(authorized.status).toBe(200);
+    } finally {
+      await server.close();
+    }
+  });
+
+  test("signed human sessions can read workspace agent status without bootstrap admin", async () => {
+    const workspace = newWorkspace();
+    initUsersConfig({ workspace, username: "owner", password: "owner-pass" });
+    const port = await pickFreePort();
+    const server = await startStudioApiServer({
+      workspace,
+      host: "127.0.0.1",
+      port,
+      token: "bootstrap-token",
+    });
+    try {
+      const login = await fetch(`http://127.0.0.1:${port}/auth/login`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ username: "owner", password: "owner-pass" }),
+      });
+      expect(login.status).toBe(200);
+      const cookie = login.headers.get("set-cookie")?.split(";", 1)[0];
+      expect(cookie).toMatch(/^amc_session=/);
+
+      const status = await fetch(`http://127.0.0.1:${port}/agents/default/status`, {
+        headers: { cookie: cookie! },
+      });
+      expect(status.status).toBe(200);
+      expect(await status.json()).toHaveProperty("agentId", "default");
     } finally {
       await server.close();
     }
