@@ -6,7 +6,7 @@
 - Source reviewed: [Agent Control repository](https://github.com/agentcontrol/agent-control)
 - Retrieval: live first-party repository reviewed 2026-07-12
 - Immutable source commit: Agent Control `83188b62c63e2b4ff9ada87048fd99605184ee5a`
-- Status: Implementation and local release verification complete; publication pending
+- Status: Shipped and production verified
 
 ## Relevance decision
 
@@ -58,6 +58,11 @@ Only package-relative module labels and SHA-256 fingerprints are emitted. Source
 - The authoritative release gate passed syntax, OpenAPI parse, typecheck, clean build, adversarial regression, full Vitest, 1,164-command inventory, architecture at 24,395 CLI / 8,874 Studio lines, 1,496-file Docs drift, zero-vulnerability runtime audit, CLI/domain smoke, and all 10 isolated install personas. Receipt: `tmp/release-gate/amc-1478-final.json`.
 - npm plus macOS universal, Linux x64, and Windows x64 packages built and verified. SHA-256: npm `91cc531bf4757289142ef8aea4de3c471728e0f1fc2561b03f10b06776b3703f`; macOS `5877371611133789638de9f3bf0f10a41b7a1c555041ce8f41815e0167bbe24b`; Linux `76595eef31b14b78800b50def4fee454f1e56a6ffa16534c18d75c4bbad3357d`; Windows `79bc0e58829789adacafb81883e131c5fba8c98d10754bb137867234bc01a55d`.
 - Playwright passed 55 tests with 2 established conditional i18n skips, including the 173-guide Docs artifact and responsive CLI page.
-- Production, exact-SHA workflow, and publication evidence remain pending until the implementation commit is pushed.
+- Implementation commit `9dc863f675b96e5c1524d042ff6e39d5cf0b2b72` passed exact-SHA CI `29192948558`, Pages `29192948560`, npm validation `29192948580`, and Docker Runner Image `29192948604`.
+- Visual review identified one mobile Docs defect after the implementation deploy: table status tokens wrapped mid-word at 390 px. The follow-up `2d385f0e1fa050b4afc4f9b537811a227347b3b0` added a focused regression and a shared inline-code no-wrap rule; the final focused test, typecheck, 173-guide Pages build, 1,074-file / 8,511-test suite, 55-pass Playwright suite, and quick release gate all passed.
+- Closeout commit `2d385f0e1fa050b4afc4f9b537811a227347b3b0` passed exact-SHA Pages `29193798301`, CI `29193798340` on Node 20 and 22 plus Helm/E2E/Docker/security jobs, and npm validation `29193798376` including prepack guardrails.
+- Production `content-manifest.json` reports exact source revision `2d385f0e1fa050b4afc4f9b537811a227347b3b0`, 173 public guides, and evaluator-guide SHA-256 `fd1428d8c7d6bfc89af4a768336b8e3a983fb5a77273ff4f20a2ff71bb72b008`. Deployed evaluator guide, CLI page, homepage, and responsive stylesheet matched their local bytes; stylesheet SHA-256 is `a09b0c64167043e4cbffe84dd769c81474871df0169a23952091f39ab3ad055f`.
+- Live browser checks passed at 1,440 px and 390 px for the homepage, expanded CLI evaluator group, and dynamically rendered evaluator guide with no missing copy, failed requests, console/page errors, or viewport overflow. The final 390 px production geometry check proved `TRUSTED`, `PARTIAL`, `STALE`, `INVALID`, and `UNINITIALIZED` each render on one line.
+- Live release gate passed against `https://agentmaturity.co` (`tmp/release-gate/amc-1478-live.json`). Apex returned HTTP 200, `www` redirected to apex, and the Let's Encrypt certificate covers both SANs from 2026-06-26 through 2026-09-24.
 
 Registry metadata is not evaluator-result evidence and never proves that an evaluator ran, passed, or supports a maturity claim.
