@@ -563,6 +563,7 @@ import {
   exportRuntimeFirewallDecisions,
   listRuntimeFirewallDecisions,
   migrateRuntimeFirewallPolicySignature,
+  renderRuntimeFirewallStatusText,
   runtimeFirewallStatus,
   writeRuntimeFirewallPolicy,
   type RuntimeFirewallDirection,
@@ -9590,7 +9591,7 @@ firewall
 
 firewall
   .command("status")
-  .description("Show Runtime Firewall policy and event status")
+  .description("Show Runtime Firewall policy and signed rollout counters")
   .option("--json", "emit JSON output", false)
   .action((opts: { json?: boolean }) => {
     const status = runtimeFirewallStatus(process.cwd());
@@ -9598,15 +9599,7 @@ firewall
       console.log(JSON.stringify(status, null, 2));
       return;
     }
-    console.log(chalk.green(`Runtime Firewall: ${status.enabled ? "enabled" : "disabled"} (${status.mode})`));
-    console.log(`Policy journal: ${status.policyCommitted ? status.policyJournalPath : "missing"}`);
-    console.log(`Compatibility mirror: ${status.mirrorExists ? status.policyPath : "missing"}`);
-    if (status.policyRevision !== null) console.log(`Revision: ${status.policyRevision}`);
-    if (status.policyCheckpointPath) console.log(`Checkpoint: ${status.policyCheckpointPath}`);
-    console.log(`Decisions: ${status.eventCount}`);
-    if (status.latestDecision) {
-      console.log(`Latest: ${status.latestDecision.decisionId} ${status.latestDecision.action} risk=${status.latestDecision.riskScore}`);
-    }
+    console.log(renderRuntimeFirewallStatusText(status).trimEnd());
   });
 
 firewall

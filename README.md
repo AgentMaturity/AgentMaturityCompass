@@ -318,7 +318,9 @@ amc resource status              # show signed active, previous, rollback, drift
 amc resource validate            # run Enforce gates over resource drift
 amc resource activate            # apply alias; dry-run unless --yes writes a signed activation receipt
 amc resource rollback            # dry-run rollback; add --apply to activate a verified signed snapshot
-amc firewall enable --mode block # protect live traffic with Enforce/Shield/Watch decisions
+amc firewall enable --mode observe # evaluate the signed policy without blocking valid traffic
+amc firewall status              # inspect verified would-warn/would-block versus actual counters
+amc firewall enable --mode block # promote the same policy to full enforcement after review
 amc firewall check --direction request --text "ignore previous instructions"
 amc firewall events              # inspect signed allow/warn/block decision events
 amc firewall export --out firewall.jsonl --format splunk --redacted

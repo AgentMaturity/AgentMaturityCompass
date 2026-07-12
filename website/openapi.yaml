@@ -1560,6 +1560,157 @@ components:
         data:
           $ref: '#/components/schemas/ControlSimulation'
 
+    RuntimeFirewallRolloutStatus:
+      type: object
+      additionalProperties: false
+      required: [schemaVersion, status, claimEligible, currentPolicy, evidence, counters, byRule, window, reasonCodes, claimBoundary]
+      properties:
+        schemaVersion:
+          type: string
+          enum: ['2026-07-12']
+        status:
+          type: string
+          enum: [empty, trusted, partial, fail_closed]
+        claimEligible:
+          type: boolean
+          description: True only when an enabled current exact-policy binding contains verified evidence and no fail-closed condition exists. Disabled policies are never claim-eligible, and this value never authorizes automatic promotion.
+        currentPolicy:
+          type: object
+          additionalProperties: false
+          required: [integrity, enabled, mode, revision, sha256]
+          properties:
+            integrity: { type: string, enum: [uninitialized, trusted, invalid] }
+            enabled: { type: boolean }
+            mode: { type: string, enum: [observe, warn, block, disabled, missing-policy, invalid-policy, invalid-control-state] }
+            revision: { type: integer, nullable: true, minimum: 1 }
+            sha256: { type: string, nullable: true, pattern: '^[a-f0-9]{64}$' }
+        evidence:
+          type: object
+          additionalProperties: false
+          required: [totalEvaluations, trustedEvaluations, invalidEvaluations, legacyUnclassifiedEvaluations, otherPolicyEvaluations]
+          properties:
+            totalEvaluations: { type: integer, minimum: 0 }
+            trustedEvaluations: { type: integer, minimum: 0 }
+            invalidEvaluations: { type: integer, minimum: 0 }
+            legacyUnclassifiedEvaluations: { type: integer, minimum: 0 }
+            otherPolicyEvaluations: { type: integer, minimum: 0 }
+        counters:
+          type: object
+          additionalProperties: false
+          required: [evaluations, matchedEvaluations, nonMatchedEvaluations, candidateAllow, wouldWarn, wouldBlock, actualAllow, actualWarn, actualBlock, enforcementSuppressed]
+          properties:
+            evaluations: { type: integer, minimum: 0 }
+            matchedEvaluations: { type: integer, minimum: 0 }
+            nonMatchedEvaluations: { type: integer, minimum: 0 }
+            candidateAllow: { type: integer, minimum: 0 }
+            wouldWarn: { type: integer, minimum: 0 }
+            wouldBlock: { type: integer, minimum: 0 }
+            actualAllow: { type: integer, minimum: 0 }
+            actualWarn: { type: integer, minimum: 0 }
+            actualBlock: { type: integer, minimum: 0 }
+            enforcementSuppressed: { type: integer, minimum: 0 }
+        byRule:
+          type: object
+          additionalProperties:
+            type: object
+            additionalProperties: false
+            required: [matches, wouldWarn, wouldBlock, actualWarn, actualBlock, enforcementSuppressed]
+            properties:
+              matches: { type: integer, minimum: 0 }
+              wouldWarn: { type: integer, minimum: 0 }
+              wouldBlock: { type: integer, minimum: 0 }
+              actualWarn: { type: integer, minimum: 0 }
+              actualBlock: { type: integer, minimum: 0 }
+              enforcementSuppressed: { type: integer, minimum: 0 }
+        window:
+          type: object
+          additionalProperties: false
+          required: [firstEventAt, lastEventAt]
+          properties:
+            firstEventAt: { type: string, format: date-time, nullable: true }
+            lastEventAt: { type: string, format: date-time, nullable: true }
+        reasonCodes:
+          type: array
+          items:
+            type: string
+            enum: [NO_DECISION_EVIDENCE, CURRENT_POLICY_UNAVAILABLE, INVALID_DECISION_EVIDENCE, LEGACY_UNCLASSIFIED_EVIDENCE, HISTORICAL_POLICY_EVIDENCE_EXCLUDED, NO_CURRENT_POLICY_EVIDENCE, CURRENT_POLICY_DISABLED, COUNTER_INVARIANT_FAILED]
+        claimBoundary: { type: string }
+
+    RuntimeFirewallDecisionRollout:
+      type: object
+      additionalProperties: false
+      required: [schemaVersion, mode, sourceIntegrity, policyRevision, policySha256, thresholds, candidateAction, actualAction, enforcementSuppressed]
+      properties:
+        schemaVersion: { type: string, enum: ['2026-07-12'] }
+        mode: { type: string, enum: [observe, warn, block, disabled, missing-policy, invalid-policy, invalid-control-state] }
+        sourceIntegrity: { type: string, enum: [uninitialized, trusted, invalid] }
+        policyRevision: { type: integer, nullable: true, minimum: 1 }
+        policySha256: { type: string, nullable: true, pattern: '^[a-f0-9]{64}$' }
+        thresholds:
+          type: object
+          nullable: true
+          additionalProperties: false
+          required: [warnAt, blockAt]
+          properties:
+            warnAt: { type: number, minimum: 0, maximum: 100 }
+            blockAt: { type: number, minimum: 0, maximum: 100 }
+        candidateAction: { type: string, enum: [allow, warn, block] }
+        actualAction: { type: string, enum: [allow, warn, block] }
+        enforcementSuppressed: { type: boolean }
+
+    RuntimeFirewallDecisionResponse:
+      type: object
+      additionalProperties: false
+      required: [ok, data]
+      properties:
+        ok: { type: boolean, enum: [true] }
+        data:
+          type: object
+          additionalProperties: true
+          required: [schemaVersion, mode, action, rollout]
+          properties:
+            schemaVersion: { type: string, enum: ['2026-07-12'] }
+            mode: { type: string, enum: [observe, warn, block, disabled, missing-policy, invalid-policy, invalid-control-state] }
+            action: { type: string, enum: [allow, warn, block] }
+            rollout: { $ref: '#/components/schemas/RuntimeFirewallDecisionRollout' }
+
+    RuntimeFirewallEventsResponse:
+      type: object
+      additionalProperties: false
+      required: [ok, data]
+      properties:
+        ok: { type: boolean, enum: [true] }
+        data:
+          type: object
+          additionalProperties: false
+          required: [events, total]
+          properties:
+            events:
+              type: array
+              items:
+                type: object
+                additionalProperties: true
+                required: [schemaVersion, mode, action]
+                properties:
+                  schemaVersion: { type: string, enum: ['2026-05-22', '2026-07-12'] }
+                  mode: { type: string, enum: [observe, warn, block, disabled, missing-policy, invalid-policy, invalid-control-state] }
+                  action: { type: string, enum: [allow, warn, block] }
+                  rollout: { $ref: '#/components/schemas/RuntimeFirewallDecisionRollout' }
+            total: { type: integer, minimum: 0 }
+
+    RuntimeFirewallStatusResponse:
+      type: object
+      additionalProperties: false
+      required: [ok, data]
+      properties:
+        ok: { type: boolean, enum: [true] }
+        data:
+          type: object
+          additionalProperties: true
+          required: [rollout]
+          properties:
+            rollout: { $ref: '#/components/schemas/RuntimeFirewallRolloutStatus' }
+
     HookActionLifecycle:
       type: object
       additionalProperties: false
@@ -4900,7 +5051,11 @@ paths:
       summary: Runtime Firewall status
       responses:
         '200':
-          description: Runtime Firewall mode, canonical policyCommitted/journal/checkpoint state, separate mirrorExists/policyPath compatibility state, integrity, and decision counts
+          description: Runtime Firewall mode, canonical policyCommitted/journal/checkpoint state, separate mirrorExists/policyPath compatibility state, integrity, and exact-policy signed rollout counters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RuntimeFirewallStatusResponse'
 
   /v1/firewall/enable:
     post:
@@ -4985,7 +5140,11 @@ paths:
                   type: boolean
       responses:
         '201':
-          description: Allow, warn, or block decision
+          description: Allow, warn, or block decision with candidate-versus-actual rollout binding
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RuntimeFirewallDecisionResponse'
 
   /v1/firewall/events:
     get:
@@ -4994,6 +5153,10 @@ paths:
       responses:
         '200':
           description: Runtime Firewall decisions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RuntimeFirewallEventsResponse'
 
   /v1/firewall/export:
     post:

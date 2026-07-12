@@ -429,7 +429,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc firewall events` | List Runtime Firewall decision events | `--limit <n>`<br>`--redacted`<br>`--json` | - |
 | `amc firewall export` | Export Runtime Firewall decisions for SIEM or audit review | `--out <path>`<br>`--format <format>`<br>`--limit <n>`<br>`--redacted`<br>`--json` | - |
 | `amc firewall migrate-signature` | Preserve and journal an existing verified Runtime Firewall policy | `--approve-legacy-kind`<br>`--json` | - |
-| `amc firewall status` | Show Runtime Firewall policy and event status | `--json` | - |
+| `amc firewall status` | Show Runtime Firewall policy and signed rollout counters | `--json` | - |
 | `amc fix` | Generate remediation patches for identified gaps (auto-fix mode) | `--agent <agentId>`<br>`--dry-run`<br>`--target-level <level>`<br>`--framework <framework>`<br>`--out <dir>` | - |
 | `amc fix-signatures` | Verify and re-sign gateway/fleet/agent configs | `--agent <agentId>` | - |
 | `amc fleet` | Fleet operations | - | - |

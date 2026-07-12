@@ -84,6 +84,14 @@ Runtime Firewall produces a blocking `guardrail-control-state-invalid` decision 
 
 Guardrail and firewall writers use one hard-linked contender per process. Exactly one process can claim a dead owner's contender before removing the common lock, and an interrupted reaper claim can itself be resumed. Concurrent writers therefore cannot remove a successor lock or publish mismatched bytes/signatures.
 
+## Observe-only rollout evidence
+
+`amc firewall enable --mode observe` evaluates the same signed Runtime Firewall policy used by warn and block modes. For a valid policy match, the signed decision records both the candidate action under full block semantics and the actual action selected by the current mode. Observe can suppress a candidate warn or block to allow; warn can suppress a candidate block to warn. Invalid or missing policy state and invalid signed Guardrails state remain actual blocks and are never marked as mode-suppressed.
+
+`amc firewall status` and `GET /api/v1/firewall/status` expose one rollout projection. Would-warn and would-block counters include only strict, domain-separated, signature-verified decisions whose policy hash, mode, revision, source integrity, and thresholds match the current exact effective policy. Historical policy revisions are disclosed and excluded. Verified legacy decisions without the rollout binding are `legacy-unclassified`; AMC does not reconstruct candidate actions from current thresholds. Any tampered, malformed, unsigned, wrong-kind, path-mismatched, receipt-mismatched, or internally inconsistent decision makes rollout status fail closed and contributes nothing to trusted counters. A disabled policy can expose verified history but is never claim-eligible.
+
+The counters are evidence, not an automatic promotion decision. AMC does not switch modes, change thresholds, or rewrite rules from traffic statistics. Review the matched rule counts and signed events, then explicitly activate the intended mode through the existing policy writer.
+
 Before writing a local revision, publication writes the already-signed planned checkpoint to `pending.json` in the separate checkpoint store. It then writes and verifies the immutable local revision, writes the genesis signer pin before the first checkpoint, atomically publishes the checkpoint as the commit point, removes the pending marker, and refreshes the compatibility mirror last. Ordinary reads fail closed while an authenticated publication is pending. The next serialized, authorized mutation may recover only the exact entry named by that signed pending checkpoint; an unexplained local tail is never overwritten. A failure after the checkpoint cannot roll enforcement back; recovery removes a matching leftover marker, and a missing mirror is reported but reconstructed on the next successful mutation.
 
 ## Recovery

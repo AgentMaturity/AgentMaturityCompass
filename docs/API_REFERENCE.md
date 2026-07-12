@@ -442,7 +442,7 @@ AMC provides 1,163 public CLI command paths in the live command inventory.
 | 423 | `amc firewall events` | List Runtime Firewall decision events |
 | 424 | `amc firewall export` | Export Runtime Firewall decisions for SIEM or audit review |
 | 425 | `amc firewall migrate-signature` | Preserve and journal an existing verified Runtime Firewall policy |
-| 426 | `amc firewall status` | Show Runtime Firewall policy and event status |
+| 426 | `amc firewall status` | Show Runtime Firewall policy and signed rollout counters |
 | 427 | `amc fix` | Generate remediation patches for identified gaps (auto-fix mode) |
 | 428 | `amc fix-signatures` | Verify and re-sign gateway/fleet/agent configs |
 | 429 | `amc fleet` | Fleet operations |
@@ -4202,7 +4202,7 @@ Preserve and journal an existing verified Runtime Firewall policy
 
 #### `amc firewall status`
 
-Show Runtime Firewall policy and event status
+Show Runtime Firewall policy and signed rollout counters
 
 
 | Option | Description |

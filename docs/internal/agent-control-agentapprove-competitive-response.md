@@ -150,7 +150,7 @@ AMC must not import these files as executable policy. A future AEP lane should:
 | 12 | Add reusable scope templates | Enforce/Fleet | Shipped in AMC-1474; four immutable action-class groups compile selected built-in Policy Pack rules into the existing signed Action and Approval Policy schemas with read-only preview, exact confirmation, transaction rollback, and an explicit fleet-wide boundary |
 | 13 | Add nested condition authoring | Enforce | Shipped in AMC-1475 as one bounded `gate` / `all` / `any` tree over existing signed Action Policy requirements; hard gates remain mandatory and no selector/evaluator DSL was added |
 | 14 | Add steer outcome where provider supports it | Enforce | Implemented in AMC-1476: only trusted ToolHub argument rejection can request steer; Claude uses a blocked corrective response, Gemini fails closed to deny, and no input rewrite or warning-only claim exists |
-| 15 | Add observe-only rollout and counters | Watch | Same policy with mode, not duplicate controls |
+| 15 | Add observe-only rollout and counters | Watch | Implemented in AMC-1477: the existing signed Runtime Firewall policy binds candidate versus actual mode action, and current-policy counters fail closed on invalid evidence without a second control or telemetry store |
 | 16 | Add evaluator registry metadata | Score/Shield | Registry points to existing evaluators and signed versions |
 | 17 | Add policy test fixtures in CI | Enforce | Deterministic AMC-owned fixtures only |
 | 18 | Add hook health and last-event diagnostics | Watch | No background daemon unless Studio already runs |
