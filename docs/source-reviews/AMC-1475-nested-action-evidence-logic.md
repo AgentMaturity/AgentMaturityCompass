@@ -6,7 +6,7 @@
 - Source reviewed: [Agent Control controls](https://docs.agentcontrol.dev/concepts/controls), [Agent Control quickstart](https://docs.agentcontrol.dev/core/quickstart), and [Agent Control repository](https://github.com/agentcontrol/agent-control)
 - Retrieval: live first-party docs and immutable repository source reviewed 2026-07-11
 - Immutable source commit: Agent Control `83188b62c63e2b4ff9ada87048fd99605184ee5a`
-- Status: Implemented and locally verified; commit, publication, and production proof pending
+- Status: Shipped and production verified
 
 ## Relevance decision
 
@@ -65,3 +65,9 @@ No competitor code, prose, examples, schemas, policies, selectors, evaluators, r
 - `tmp/release-gate/amc-1475-final.json` records the final post-audit passed consolidated gate: syntax, executable OpenAPI contracts, typecheck, clean build before `dist`-dependent tests, adversarial regression, 1,071 files / 8,481 Vitest tests, 1,163-command inventory, architecture, 1,493-file Docs drift, zero runtime dependency vulnerabilities, CLI/domain smoke, and all 10 isolated install personas at 10/10.
 - Release-gate timeout handling now uses asynchronous child processes, kills the whole process group from the timeout callback, records explicit timeout errors, builds before tests that use `dist`, and invokes Vitest directly after that build. This keeps clean checkouts valid and prevents a timed-out child from deleting `dist` or corrupting downstream checks.
 - Final post-audit packaging and archive verification pass for macOS universal, Linux x64, and Windows x64. The npm tarball SHA-256 is `fa4f2d16decc32f7dd82d7feccecb9a5d9aca16ab09d4ea9810d3b0b682c02d5`.
+- Implementation commit `8f89da89a355f398e46e0f4a025822e038b7be29` is pushed to `main`. Exact-SHA CI (`29178289373`), Docker Runner Image (`29178289366`), Pages (`29178289377`), and npm validation (`29178289382`) completed successfully.
+- Production published that exact source revision with 172 public guides. `ACTION_EVIDENCE_LOGIC` is 5,920 bytes with SHA-256 `8d05411db309feb623a2c6a0e6671c546877efc960d68f1fb557d85b2f3b572b`, matching the repository source byte for byte.
+- The live homepage publishes 1,163 CLI paths and 8,481 passing tests. Public OpenAPI 3.0.3 publishes all three evidence-logic paths, its compatible nullable tree wrapper, and the enforced 60-gate ceiling.
+- Desktop 1280px and mobile 390px production-browser checks passed the homepage and rendered `docs/#ACTION_EVIDENCE_LOGIC`: HTTP 200, expected content, no horizontal overflow, and zero console, page, failed-request, or 4xx responses. Visual receipts are under `tmp/visual-proof/amc-1475-*`.
+- The apex returns HTTP 200 and `www` returns HTTP 301 to the apex. The Let's Encrypt certificate verifies for both names with return code 0 and is valid from 2026-06-26 through 2026-09-24.
+- `tmp/release-gate/amc-1475-live.json` records a passed quick live release gate at `2026-07-12T03:39:12.247Z`, including typecheck, build, executable OpenAPI parsing, architecture and Docs checks, zero runtime dependency vulnerabilities, CLI/domain smoke, and live HTTP 200.

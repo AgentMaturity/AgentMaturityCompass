@@ -911,7 +911,7 @@ describe("AMC-1475 bounded nested Action Policy evidence logic", () => {
     expect(readFileSync("docs/ACTION_EVIDENCE_LOGIC.md", "utf8")).toContain("Mandatory Gates");
     expect(readFileSync("docs/source-reviews/AMC-1475-nested-action-evidence-logic.md", "utf8")).toContain("83188b62c63e2b4ff9ada87048fd99605184ee5a");
     expect(readFileSync("docs/source-reviews/AMC-1475-nested-action-evidence-logic.md", "utf8")).toContain("No-bloat boundary");
-    expect(readFileSync("docs/internal/agent-control-agentapprove-competitive-response.md", "utf8")).toContain("Implemented in AMC-1475");
+    expect(readFileSync("docs/internal/agent-control-agentapprove-competitive-response.md", "utf8")).toContain("Shipped in AMC-1475");
     expect(readFileSync(".changeset/amc-nested-action-evidence-logic.md", "utf8")).toContain("minor");
     expect(readFileSync("website/docs/docs.js", "utf8")).toContain("'ACTION_EVIDENCE_LOGIC'");
     const source = [
