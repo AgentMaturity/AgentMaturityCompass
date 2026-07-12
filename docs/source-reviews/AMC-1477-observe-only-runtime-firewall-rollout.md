@@ -6,7 +6,7 @@
 - Sources reviewed: [Agent Control concepts](https://docs.agentcontrol.dev/concepts/overview), [Agent Control UI monitoring](https://docs.agentcontrol.dev/core/ui-quickstart), and [Agent Control repository](https://github.com/agentcontrol/agent-control)
 - Retrieval: live first-party docs and immutable repository source reviewed 2026-07-12
 - Immutable source commit: Agent Control `83188b62c63e2b4ff9ada87048fd99605184ee5a`
-- Status: Locally verified; exact-SHA CI and production publication pending
+- Status: Implementation shipped and production verified; publication checkpoint pending
 
 ## Relevance decision
 
@@ -65,4 +65,11 @@ No competitor code, prose, schemas, examples, policies, database model, API, das
 - Desktop packaging: npm plus macOS universal, Linux x64, and Windows x64 artifacts built and verified.
 - Package SHA-256: npm `d461a91c413f55956f148666d2afdbdcbf3a455023c4269bb371f4e11dcbdf71`; macOS `b055f044b9f9f9938e3ae2307af846e62be50a924c91e57d25d963e9a2faf6dc`; Linux `84a1919fe95dc2dacabadceb489519bed20a9e4c0d16bc6f48480c2ab25548be`; Windows `2cb509d64e6dc2345a7853213ffeb8a1f10d0f3b63a78f2c427890d4afc81b0a`.
 - Playwright: 55 passed with 2 established conditional i18n skips, including desktop/mobile Docs shell and CLI page coverage.
-- Exact-SHA CI and production checks remain pending before closure.
+- Implementation commit `5d590cec745d01c6e321939698c66e4bd719cf0e` is pushed to synchronized `main` / `origin/main`.
+- Exact implementation-SHA workflows passed: CI `29190350311`, Pages `29190350297`, Docker Runner Image `29190350331`, and npm Publish validation `29190350320`.
+- Production reports the exact implementation revision and 172 public guides.
+- Public OpenAPI and CLI page bytes match the repository at SHA-256 `50ff72f6366f9009cf5734ec64f3f76a9b6e973bb3608a5046d8b47680fddf53` and `2c4fe3ced2bc933b859ec590d84f36bd0abd2ea148a59b2d2e25e5de5c70bfe0`.
+- The live OpenAPI exposes all five Runtime Firewall rollout schemas and the exact response references for status, check, and events.
+- Post-deploy quick release gate passed at `tmp/release-gate/amc-1477-live.json`.
+- Apex/`www` canonical routing and certificate validation passed; the certificate covers both names through 2026-09-24.
+- Live 1440px and 390px homepage/CLI browser checks passed after expanding the Runtime Firewall namespace, with no overflow, browser errors, failed requests, or missing rollout copy.
