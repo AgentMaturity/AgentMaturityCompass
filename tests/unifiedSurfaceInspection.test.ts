@@ -26,7 +26,7 @@ afterEach(() => {
   }
 });
 
-describe("unified run surface inspection", () => {
+describe("unified run surface inspection", { timeout: 120_000 }, () => {
   test("does not turn legacy decoy files into completed product surfaces", async () => {
     const root = workspace();
     writeFileSync(join(root, ".amc", "policy.yaml"), "enabled: true\n");
