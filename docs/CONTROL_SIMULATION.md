@@ -71,6 +71,51 @@ Every response says:
 
 Simulation does not create Firewall events, approval requests, decision receipts, transparency entries, keys, or workspace scaffolding. It excludes raw content, passphrases, credentials, signature bytes, and absolute workspace paths. Use the owning runtime path and its signed decision or lifecycle receipt when you need execution evidence.
 
+## Policy regression suites
+
+Commit a small strict YAML or JSON suite when a policy decision must remain stable across a code or configuration change:
+
+```yaml
+schemaVersion: 2026-07-12
+suiteId: deployment-policy-regression
+cases:
+  - id: deploy-requires-approval
+    request:
+      controlId: approval:DEPLOY
+    expect:
+      outcome: require_approval
+      matched: true
+      failClosed: false
+      matchedRuleIds: [approval:DEPLOY]
+      matchedControlIds: [approval:DEPLOY]
+```
+
+Run it in the workspace whose signed policies you want to test:
+
+```bash
+amc policy test policy-fixtures.yaml
+amc policy test policy-fixtures.yaml --json
+```
+
+Each case uses the same production evaluator as `amc policy simulate`. The runner sorts case and matched-ID sets, excludes generated timestamps, and binds the normalized fixture and report with SHA-256. It returns only the expected and actual outcome, match state, fail-closed state, matched IDs, source integrity, input hash, and stable mismatch codes. Raw content, evaluator reasons, condition bodies, absolute paths, signature bytes, and credentials are not returned.
+
+| Result | Exit | Meaning |
+| --- | ---: | --- |
+| `passed` | 0 | Every trusted current control source produced the exact expected decision. |
+| `failed` | 1 | Current sources were trusted, but at least one expectation changed. |
+| `fail_closed` | 2 | At least one owning control source was missing, malformed, unsigned, tampered, or otherwise untrusted. |
+| `invalid` | 2 | The fixture could not be read or failed strict syntax/schema validation. |
+
+Duplicate keys, aliases, unknown fields, duplicate IDs, mixed-family options, and oversized files or suites are rejected before evaluation. A fixture cannot turn an untrusted source into a passing result by expecting its safe fallback. A trusted evaluator may assert an expected fail-closed policy decision without weakening that source-integrity gate.
+
+AMC's repository runs its own source-independent three-case suite after building the distribution:
+
+```bash
+npm run check:policy-fixtures
+```
+
+That harness creates an isolated temporary workspace, runs the built CLI twice, requires byte-identical JSON, and writes `tmp/policy-fixtures/ci-report.json` for CI upload. The report remains `simulationOnly: true`, `recorded: false`, and `proofEligible: false`; it is not runtime or maturity evidence and cannot satisfy Score, Passport, audit, compliance, or maturity evidence gates.
+
 ## API examples
 
 Runtime traffic:

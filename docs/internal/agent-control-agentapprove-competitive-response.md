@@ -152,7 +152,7 @@ AMC must not import these files as executable policy. A future AEP lane should:
 | 14 | Add steer outcome where provider supports it | Enforce | Implemented in AMC-1476: only trusted ToolHub argument rejection can request steer; Claude uses a blocked corrective response, Gemini fails closed to deny, and no input rewrite or warning-only claim exists |
 | 15 | Add observe-only rollout and counters | Watch | Implemented in AMC-1477: the existing signed Runtime Firewall policy binds candidate versus actual mode action, and current-policy counters fail closed on invalid evidence without a second control or telemetry store |
 | 16 | Add evaluator registry metadata | Score/Shield | Implemented in AMC-1478: one derived, domain-separated signed catalog points to existing evaluators, package-relative owners, versions, and implementation hashes; drift and custom evaluators fail closed without a registry service or evaluator-result claim |
-| 17 | Add policy test fixtures in CI | Enforce | Deterministic AMC-owned fixtures only |
+| 17 | Add policy test fixtures in CI | Enforce | Implemented in AMC-1479: strict AMC-authored suites reuse production control simulation, distinguish mismatches from untrusted-source fail-closed state, expose deterministic non-proof reports, and run the built CLI twice in CI without another policy engine or fixture service |
 | 18 | Add hook health and last-event diagnostics | Watch | No background daemon unless Studio already runs |
 | 19 | Add approval activity search and filters | Enforce/Watch | Query existing receipts, no new activity database |
 | 20 | Group MCP server and tool context | Enforce/Fleet | Normalize into ToolHub identities and trust graph |

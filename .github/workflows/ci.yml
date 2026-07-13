@@ -65,6 +65,18 @@ jobs:
       - name: Build
         run: npm run build
 
+      - name: Policy fixture regression
+        if: matrix.node-version == '20'
+        run: npm run check:policy-fixtures
+
+      - name: Upload policy fixture report
+        if: ${{ always() && matrix.node-version == '20' }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: policy-fixture-report
+          path: tmp/policy-fixtures/ci-report.json
+          if-no-files-found: ignore
+
       - name: Architecture boundary compatibility
         run: npm run check:architecture-boundaries
 

@@ -9,6 +9,8 @@
     "!dist/sea/**",
     "!dist/installers/**",
     "scripts/postinstall.js",
+    "scripts/run-policy-fixtures-ci.mjs",
+    "fixtures/policy/amc-ci-policy-fixtures.yaml",
     "README.md",
     "LICENSE"
   ],
@@ -50,6 +52,7 @@
     "check:incident-readiness": "node scripts/incident-readiness-check.mjs",
     "check:architecture-boundaries": "node scripts/architecture-boundaries-check.mjs",
     "check:docs-drift": "node scripts/docs-drift-check.mjs",
+    "check:policy-fixtures": "node scripts/run-policy-fixtures-ci.mjs",
     "clean": "rm -rf dist",
     "prebuild": "npm run clean",
     "prepack": "npm run release:gate -- --json --out tmp/release-gate/prepack.json && npm run release:prepack-check",

@@ -833,6 +833,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc policy scope compile` | Preview a deterministic selected-rule merge without writing | `--pack <packId>`<br>`--json` | - |
 | `amc policy scope list` | List immutable AMC action-class scope templates | `--json` | - |
 | `amc policy simulate` | Simulate one projected control through its production evaluator without recording | `--content <text>`<br>`--direction <direction>`<br>`--agent <agentId>`<br>`--risk <tier>`<br>`--mode <mode>`<br>`--exec-ticket`<br>`--json` | - |
+| `amc policy test` | Run deterministic policy fixtures through production control evaluators | `--json` | - |
 | `amc policy-canary-report` | Generate canary mode report for an agent | `--agent <agentId>` | - |
 | `amc policy-canary-start` | Start policy canary mode (observation-only) | `--agent <agentId>`<br>`--pack <packId>`<br>`--duration <duration>` | - |
 | `amc policy-debt-add` | Register a temporary policy waiver (debt) | `--agent <agentId>`<br>`--requirement <req>`<br>`--justification <text>`<br>`--expires <ts>`<br>`--created-by <who>` | - |

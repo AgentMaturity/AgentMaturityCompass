@@ -50,4 +50,30 @@ export function registerControlInspectionCommands(policy: Command): void {
       else process.stdout.write(renderControlSimulationText(simulation));
       if (simulation.failClosed) process.exitCode = 2;
     });
+
+  policy
+    .command("test")
+    .description("Run deterministic policy fixtures through production control evaluators")
+    .argument("<file>", "Strict AMC policy fixture suite in YAML or JSON")
+    .option("--json", "Output as JSON")
+    .action(async (file: string, opts: { json?: boolean }) => {
+      const {
+        policyFixtureExitCode,
+        policyFixtureInvalidResult,
+        renderPolicyFixtureInvalidText,
+        renderPolicyFixtureReportText,
+        runPolicyFixtureFile,
+      } = await import("./policyFixtureRunner.js");
+      try {
+        const report = runPolicyFixtureFile({ workspace: process.cwd(), filePath: file });
+        if (opts.json) console.log(JSON.stringify(report, null, 2));
+        else process.stdout.write(renderPolicyFixtureReportText(report));
+        process.exitCode = policyFixtureExitCode(report);
+      } catch (error) {
+        const invalid = policyFixtureInvalidResult(error);
+        if (opts.json) console.log(JSON.stringify(invalid, null, 2));
+        else process.stdout.write(renderPolicyFixtureInvalidText(invalid));
+        process.exitCode = 2;
+      }
+    });
 }
