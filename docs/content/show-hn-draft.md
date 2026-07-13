@@ -30,6 +30,6 @@ What makes it different from eval tools like Promptfoo:
 
 The entire trust stack is MIT licensed and free. Only the industry-specific domain packs are paid.
 
-Tech: TypeScript, Commander CLI, Ed25519 crypto, SQLite evidence ledger, 8,538 passing Vitest tests, MCP server for AI coding assistants.
+Tech: TypeScript, Commander CLI, Ed25519 crypto, SQLite evidence ledger, 8,544 passing Vitest tests, MCP server for AI coding assistants.
 
 I'd love feedback on the scoring model and whether the evidence-weighted approach resonates. Happy to answer any questions about the architecture.
