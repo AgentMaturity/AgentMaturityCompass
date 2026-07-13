@@ -62,7 +62,7 @@ export function isSafeHookActionLookupId(value: unknown): value is string {
   return typeof value === "string" && value.length >= 1 && value.length <= 160 && SAFE_ID.test(value);
 }
 
-const hookMetaSchema = z.object({
+export const hookActionEvidenceMetaSchema = z.object({
   trustTier: z.literal("OBSERVED"),
   agentId: z.string().min(1),
   sourceProtocol: z.literal("aep"),
@@ -137,7 +137,7 @@ interface IndexedHookEvent {
   kind: "hook";
   index: number;
   event: EvidenceEvent;
-  meta: z.infer<typeof hookMetaSchema>;
+  meta: z.infer<typeof hookActionEvidenceMetaSchema>;
 }
 
 interface IndexedDecisionEvent {
@@ -213,7 +213,7 @@ function lifecycleEvents(events: EvidenceEvent[], actionId: string): IndexedLife
   events.forEach((event, index) => {
     const meta = parseMeta(event);
     if (event.event_type === "tool_action" || event.event_type === "tool_result") {
-      const hook = hookMetaSchema.safeParse(meta);
+      const hook = hookActionEvidenceMetaSchema.safeParse(meta);
       const expectedEventType = hook.success && hook.data.sourceEventType === "action.requested"
         ? "tool_action"
         : "tool_result";

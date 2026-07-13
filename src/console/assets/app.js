@@ -1222,7 +1222,7 @@ async function renderHome() {
         <div class="studio-kicker">Desktop app</div>
         <h3>Native macOS shell, same AMC evidence-first surface.</h3>
         <p class="muted">
-          The macOS app now starts local demo-mode Studio and renders this Console inside a native WebKit window. Windows still launches the same local URL in the system browser. Both keep the same flow: 244 default questions, 264 lifecycle questions, 142 assurance packs, 41 Industry Packs, and 1,165 CLI paths.
+          The macOS app now starts local demo-mode Studio and renders this Console inside a native WebKit window. Windows still launches the same local URL in the system browser. Both keep the same flow: 244 default questions, 264 lifecycle questions, 142 assurance packs, 41 Industry Packs, and 1,166 CLI paths.
         </p>
       </div>
       <div class="row wrap">
@@ -2122,14 +2122,67 @@ async function renderCompliance() {
 }
 
 async function renderIntegrations() {
-  const status = await apiGet("/integrations/status");
+  const [status, ...hookHealth] = await Promise.all([
+    apiGet("/integrations/status"),
+    ...["claude-code", "gemini-cli"].map(async (provider) => {
+      try {
+        return apiPayload(await apiGet(`/api/v1/watch/hooks/${provider}/health`));
+      } catch {
+        return {
+          provider,
+          agentId: null,
+          mode: null,
+          status: "unavailable",
+          reasonCodes: ["HOOK_HEALTH_UNAVAILABLE"],
+          evidence: { eventCount: 0, lastEvent: null }
+        };
+      }
+    })
+  ]);
+  const hookRows = hookHealth.map((health) => {
+    const statusClass = health.status === "observed" ? "ok" : "warn";
+    const lastEvent = health.evidence?.lastEvent;
+    const lastObserved = lastEvent
+      ? `${lastEvent.eventType} at ${new Date(lastEvent.observedAt).toLocaleString()}`
+      : "No verified event";
+    return `<tr>
+      <td><strong>${htmlEscape(health.provider)}</strong></td>
+      <td><span class="pill ${statusClass}">${htmlEscape(health.status)}</span></td>
+      <td>${htmlEscape(health.agentId || "not bound")}</td>
+      <td>${htmlEscape(health.mode || "none")}</td>
+      <td>${htmlEscape(lastObserved)}</td>
+      <td>${htmlEscape((health.reasonCodes || []).join(", ") || "none")}</td>
+    </tr>`;
+  }).join("");
+  const integrationStatus = status.status || {};
+  const integrationReady = status.signature?.valid === true;
+  const integrationChannels = Array.isArray(integrationStatus.channels) ? integrationStatus.channels : [];
+  const queueStats = integrationStatus.queueStats || {};
+  const integrationGuidance = integrationReady
+    ? `${integrationChannels.filter((channel) => channel.enabled).length} enabled channel(s). Test events use the signed routing configuration.`
+    : "Run amc integrations init in this workspace before dispatching a test event.";
   root.innerHTML = `
     ${card("Integration Hub", `
-      <p>Signature: <strong>${status.signature?.valid ? "VALID" : "INVALID"}</strong></p>
+      <p>Signature: <strong>${integrationReady ? "VALID" : "NOT CONFIGURED"}</strong></p>
       <div class="row wrap">
-        <button id="integrationTestBtn">Dispatch Test Event</button>
+        <span class="pill">${integrationChannels.length} channels</span>
+        <span class="pill">${Number(queueStats.pending || 0)} pending</span>
+        <span class="pill">${Number(queueStats.deadLetter || 0)} dead letters</span>
       </div>
-      <pre id="integrationOut" class="scroll">${JSON.stringify(status.status || status, null, 2)}</pre>
+      <p class="muted">${htmlEscape(integrationGuidance)}</p>
+      <div class="row wrap">
+        <button id="integrationTestBtn"${integrationReady ? "" : ' disabled aria-disabled="true"'}>Dispatch Test Event</button>
+      </div>
+      <pre id="integrationOut" class="scroll">No test event dispatched.</pre>
+    `)}
+    ${card("Provider Hook Health", `
+      <p class="muted">Read on demand from signed installation state and existing Watch evidence. Last verified event is historical, not a current-liveness signal.</p>
+      <div class="scroll">
+        <table>
+          <thead><tr><th>Provider</th><th>State</th><th>Agent</th><th>Mode</th><th>Last verified event</th><th>Reason</th></tr></thead>
+          <tbody>${hookRows}</tbody>
+        </table>
+      </div>
     `)}
   `;
   document.getElementById("integrationTestBtn")?.addEventListener("click", async () => {

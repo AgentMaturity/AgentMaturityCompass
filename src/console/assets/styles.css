@@ -908,6 +908,14 @@ button:hover {
   transform: translateY(-1px);
 }
 
+button:disabled,
+button:disabled:hover {
+  opacity: 0.45;
+  cursor: not-allowed;
+  filter: grayscale(0.35);
+  transform: none;
+}
+
 button.secondary {
   background: rgba(255,255,255,.035);
   border: 1px solid var(--border-strong);

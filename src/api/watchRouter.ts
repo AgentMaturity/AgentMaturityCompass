@@ -25,6 +25,30 @@ export async function handleWatchRoute(
 ): Promise<boolean> {
   if (!pathname.startsWith('/api/v1/watch')) return false;
 
+  const hookHealthMatch = pathname.match(/^\/api\/v1\/watch\/hooks\/([^/]+)\/health$/);
+  if (hookHealthMatch) {
+    if (method !== 'GET') {
+      apiError(res, 405, 'Method not allowed');
+      return true;
+    }
+    try {
+      const provider = decodeURIComponent(hookHealthMatch[1]!);
+      if (provider !== 'claude-code' && provider !== 'gemini-cli') {
+        apiError(res, 400, 'provider must be claude-code or gemini-cli');
+        return true;
+      }
+      const { inspectHookHealth } = await import('../watch/hookHealthDiagnostics.js');
+      apiSuccess(res, inspectHookHealth({ workspace, provider }));
+    } catch (err) {
+      if (err instanceof URIError) {
+        apiError(res, 400, 'provider encoding is invalid');
+      } else {
+        apiError(res, 500, 'Hook health inspection failed');
+      }
+    }
+    return true;
+  }
+
   const hookActionMatch = pathname.match(/^\/api\/v1\/watch\/hook-actions\/([^/]+)$/);
   if (hookActionMatch) {
     if (method !== 'GET') {

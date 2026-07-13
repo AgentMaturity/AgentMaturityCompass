@@ -571,6 +571,26 @@ function studioEndpoints(): Record<string, Record<string, OpenApiOperation>> {
         },
       },
     },
+    "/api/v1/watch/hooks/{provider}/health": {
+      get: {
+        summary: "Inspect signed hook setup and the latest verified provider event",
+        tags: ["Studio", "Watch", "Hooks"],
+        security: [{ adminToken: [] }, { sessionCookie: [] }],
+        parameters: [
+          {
+            name: "provider",
+            in: "path",
+            required: true,
+            schema: { type: "string", enum: ["claude-code", "gemini-cli"] },
+          },
+        ],
+        responses: {
+          "200": okJson("Read-only signed hook health projection", "#/components/schemas/HookHealthResponse"),
+          "400": errJson("Unsupported provider"),
+          "401": errJson("Unauthorized"),
+        },
+      },
+    },
     "/api/v1/watch/hook-actions/{actionId}": {
       get: {
         summary: "Verify one provider hook action lifecycle",
@@ -1455,6 +1475,82 @@ function studioSchemas(): Record<string, unknown> {
       properties: {
         ok: { type: "boolean", const: true },
         data: { $ref: "#/components/schemas/ControlSimulation" },
+      },
+      required: ["ok", "data"],
+    },
+    HookHealthResponse: {
+      type: "object",
+      additionalProperties: false,
+      properties: {
+        ok: { type: "boolean", const: true },
+        data: {
+          type: "object",
+          additionalProperties: false,
+          properties: {
+            schemaVersion: { type: "string", const: "2026-07-13" },
+            provider: { type: "string", enum: ["claude-code", "gemini-cli"] },
+            agentId: { type: ["string", "null"] },
+            mode: { type: ["string", "null"], enum: ["observe", "control", null] },
+            status: { type: "string", enum: ["not_installed", "awaiting_first_event", "observed", "fail_closed"] },
+            failClosed: { type: "boolean" },
+            reasonCodes: {
+              type: "array",
+              items: {
+                type: "string",
+                enum: [
+                  "HOOK_NOT_INSTALLED", "HOOK_INSTALLATION_DRIFTED", "HOOK_INSTALLATION_EXPIRED",
+                  "HOOK_INSTALLATION_INVALID", "HOOK_EVENT_NOT_OBSERVED", "HOOK_EVENT_METADATA_INVALID",
+                  "HOOK_EVIDENCE_INTEGRITY_FAILED", "HOOK_EVIDENCE_UNAVAILABLE",
+                ],
+              },
+            },
+            installation: {
+              type: "object",
+              additionalProperties: false,
+              properties: {
+                state: { type: "string", enum: ["not-installed", "installed", "drifted", "expired", "invalid"] },
+                configOwned: { type: "boolean" },
+                manifestValid: { type: "boolean" },
+                leaseValid: { type: "boolean" },
+                expiresAt: { type: ["string", "null"], format: "date-time" },
+              },
+              required: ["state", "configOwned", "manifestValid", "leaseValid", "expiresAt"],
+            },
+            evidence: {
+              type: "object",
+              additionalProperties: false,
+              properties: {
+                state: { type: "string", enum: ["missing", "verified", "invalid", "unavailable"] },
+                eventCount: { type: "integer", minimum: 0 },
+                lastEvent: {
+                  type: ["object", "null"],
+                  additionalProperties: false,
+                  properties: {
+                    eventId: { type: "string" },
+                    eventHash: { type: "string", pattern: "^[a-f0-9]{64}$" },
+                    eventType: { type: "string", enum: ["action.requested", "action.completed", "action.failed", "action.denied"] },
+                    actionId: { type: "string" },
+                    observedAt: { type: "string", format: "date-time" },
+                    receiptId: { type: "string" },
+                    receiptSha256: { type: "string", pattern: "^[a-f0-9]{64}$" },
+                    integrity: { type: "string", const: "verified" },
+                  },
+                  required: ["eventId", "eventHash", "eventType", "actionId", "observedAt", "receiptId", "receiptSha256", "integrity"],
+                },
+              },
+              required: ["state", "eventCount", "lastEvent"],
+            },
+            repairCommands: { type: "array", items: { type: "string" } },
+            derivedDiagnostic: { type: "boolean", const: true },
+            recorded: { type: "boolean", const: false },
+            proofEligible: { type: "boolean", const: false },
+            claimBoundary: { type: "string" },
+          },
+          required: [
+            "schemaVersion", "provider", "agentId", "mode", "status", "failClosed", "reasonCodes",
+            "installation", "evidence", "repairCommands", "derivedDiagnostic", "recorded", "proofEligible", "claimBoundary",
+          ],
+        },
       },
       required: ["ok", "data"],
     },

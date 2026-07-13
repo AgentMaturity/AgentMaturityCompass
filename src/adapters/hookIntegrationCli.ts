@@ -2,6 +2,7 @@ import chalk from "chalk";
 import type { Command } from "commander";
 import { stdin } from "node:process";
 import { unlockVaultInteractive, vaultStatusNow } from "../vault/vaultCli.js";
+import { unlockVault } from "../vault/vault.js";
 import {
   failClosedProviderControlResponse,
   forwardProviderHookControl,
@@ -16,6 +17,7 @@ import {
 } from "./hookIntegration.js";
 import { serializeProviderControlResponse } from "../bridge/hookControl.js";
 import { inspectHookActionLifecycle } from "../watch/hookActionLifecycle.js";
+import { inspectHookHealth } from "../watch/hookHealthDiagnostics.js";
 
 async function readStdinAll(): Promise<string> {
   return new Promise((resolve) => {
@@ -32,6 +34,10 @@ function printFileChanges(files: HookFileChange[]): void {
     const sensitivity = file.sensitive ? " (secret, mode 0600)" : "";
     console.log(`  ${file.action.padEnd(12)} ${file.path}${sensitivity}`);
   }
+}
+
+function isHookProvider(value: string): value is HookProvider {
+  return value === "claude-code" || value === "gemini-cli";
 }
 
 export function registerHookIntegrationCommands(
@@ -113,6 +119,53 @@ export function registerHookIntegrationCommands(
         for (const issue of status.issues) console.log(chalk.yellow(`Issue: ${issue}`));
       }
       if (!["installed", "not-installed"].includes(status.state)) process.exitCode = 1;
+    });
+
+  hooks
+    .command("health")
+    .description("Verify signed hook setup and show the latest verified provider event")
+    .requiredOption("--provider <provider>", "claude-code|gemini-cli")
+    .option("--json", "emit structured JSON", false)
+    .action((opts: { provider: string; json: boolean }) => {
+      if (!isHookProvider(opts.provider)) {
+        const message = "provider must be claude-code or gemini-cli";
+        if (opts.json) console.log(JSON.stringify({ ok: false, error: message }, null, 2));
+        else console.error(chalk.red(message));
+        process.exitCode = 2;
+        return;
+      }
+      const workspace = process.cwd();
+      const passphrase = process.env.AMC_VAULT_PASSPHRASE;
+      if (!vaultStatusNow(workspace).unlocked && passphrase) {
+        try {
+          unlockVault(workspace, passphrase);
+        } catch {
+          // The diagnostic below reports unavailable evidence without exposing credential errors.
+        }
+      }
+      const health = inspectHookHealth({ workspace, provider: opts.provider });
+      if (opts.json) {
+        console.log(JSON.stringify(health, null, 2));
+      } else {
+        const color = health.status === "observed"
+          ? chalk.hex("#4AEF79")
+          : health.status === "fail_closed"
+            ? chalk.red
+            : chalk.yellow;
+        console.log(color(`AMC hook health: ${health.status}`));
+        console.log(`Provider: ${health.provider}`);
+        console.log(`Agent: ${health.agentId ?? "not bound"}`);
+        console.log(`Installation: ${health.installation.state}`);
+        console.log(`Observed events: ${health.evidence.eventCount}`);
+        if (health.evidence.lastEvent) {
+          console.log(`Last verified event: ${health.evidence.lastEvent.eventType}`);
+          console.log(`Observed at: ${health.evidence.lastEvent.observedAt}`);
+          console.log(`Action: ${health.evidence.lastEvent.actionId}`);
+        }
+        for (const reason of health.reasonCodes) console.log(chalk.yellow(`Issue: ${reason}`));
+        console.log(chalk.gray(`Boundary: ${health.claimBoundary}`));
+      }
+      process.exitCode = health.status === "observed" ? 0 : health.status === "fail_closed" ? 2 : 1;
     });
 
   hooks

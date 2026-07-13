@@ -45,13 +45,16 @@ For Claude Code or Gemini CLI, install the project-local observer instead of han
 amc connect hooks install --provider claude-code --agent my-agent --dry-run
 amc connect hooks install --provider claude-code --agent my-agent
 amc connect hooks status --provider claude-code
+amc connect hooks health --provider claude-code
 amc connect hooks lifecycle --agent my-agent --action <action-id>
 amc connect hooks remove --provider claude-code
 
 # Or use --provider gemini-cli
 ```
 
-The installer uses a dedicated `hook:observe` lease with a `/hooks` route allowlist, adds a managed `.gitignore` block for `.amc/hooks/`, keeps the bearer token out of provider config, requires token mode `0600`, signs its ownership manifest, and preserves unrelated settings on install and removal. Its forwarder sends only tool identity, provider surface, event time, and a hashed session correlation. It does not send tool arguments, cwd, transcript paths, or raw session IDs. It observes only `action.requested`; it does not approve, deny, or steer a provider action.
+The installer uses a dedicated `hook:observe` lease with a `/hooks` route allowlist, adds a managed `.gitignore` block for `.amc/hooks/`, keeps the bearer token out of provider config, requires token mode `0600`, signs its ownership manifest, and preserves unrelated settings on install and removal. Its forwarder sends only tool identity, provider surface, event time, and a hashed session correlation. It does not send tool arguments, cwd, transcript paths, or raw session IDs. It observes requested, completed, and failed tool phases; observation does not approve, deny, or steer a provider action.
+
+`amc connect hooks health` and `GET /api/v1/watch/hooks/{provider}/health` return the same read-only projection over signed installation state and existing Watch evidence. `awaiting_first_event` means configuration is intact but runtime delivery is not yet proven. `observed` requires the latest event chain, receipt, sealed session, and encrypted body to verify. Drift, expiry, malformed matching metadata, tamper, or an unavailable locked Vault returns `fail_closed`; run `amc vault unlock`, or set `AMC_VAULT_PASSPHRASE` for non-interactive CLI use. The timestamp and event count are historical context only, not a heartbeat or current-liveness claim.
 
 Codex, Cursor, OpenCode, and other providers are not advertised by this installer until AMC has a pinned and fixture-tested native per-tool hook contract for them.
 

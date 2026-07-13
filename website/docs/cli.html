@@ -91,7 +91,7 @@
 
       <div class="callout callout-green">
         <strong>By the numbers</strong>
-        The AMC CLI currently registers 1,165 command paths. Every command supports <code>--help</code> for inline documentation.
+        The AMC CLI currently registers 1,166 command paths. Every command supports <code>--help</code> for inline documentation.
       </div>
 
       <!-- Common workflow commands -->
@@ -234,6 +234,7 @@
             <tr><td><code>amc connect</code></td><td>Connect wizard for any agent/provider</td></tr>
             <tr><td><code>amc connect hooks install --provider &lt;id&gt; [--mode observe|control]</code></td><td>Install a reversible observer by default, or opt into loopback signed control</td></tr>
             <tr><td><code>amc connect hooks status --provider &lt;id&gt;</code></td><td>Verify provider config ownership, mode, signed manifest, and narrow lease</td></tr>
+            <tr><td><code>amc connect hooks health --provider &lt;id&gt;</code></td><td>Join signed setup state with the latest receipt-verified provider event; encrypted evidence fails closed while Vault is locked</td></tr>
             <tr><td><code>amc connect hooks lifecycle --agent &lt;id&gt; --action &lt;id&gt;</code></td><td>Verify requested, decision, and completed or failed receipts for one action</td></tr>
             <tr><td><code>amc connect hooks remove --provider &lt;id&gt;</code></td><td>Remove only AMC's handler and revoke its observation lease</td></tr>
             <tr><td><code>amc ingest</code></td><td>Ingest external logs as SELF_REPORTED evidence</td></tr>

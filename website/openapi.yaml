@@ -1711,6 +1711,61 @@ components:
           properties:
             rollout: { $ref: '#/components/schemas/RuntimeFirewallRolloutStatus' }
 
+    HookHealthDiagnostic:
+      type: object
+      additionalProperties: false
+      required: [schemaVersion, provider, agentId, mode, status, failClosed, reasonCodes, installation, evidence, repairCommands, derivedDiagnostic, recorded, proofEligible, claimBoundary]
+      properties:
+        schemaVersion: { type: string, enum: ['2026-07-13'] }
+        provider: { type: string, enum: [claude-code, gemini-cli] }
+        agentId: { type: string, nullable: true }
+        mode: { type: string, nullable: true, enum: [observe, control] }
+        status: { type: string, enum: [not_installed, awaiting_first_event, observed, fail_closed] }
+        failClosed: { type: boolean }
+        reasonCodes:
+          type: array
+          items:
+            type: string
+            enum: [HOOK_NOT_INSTALLED, HOOK_INSTALLATION_DRIFTED, HOOK_INSTALLATION_EXPIRED, HOOK_INSTALLATION_INVALID, HOOK_EVENT_NOT_OBSERVED, HOOK_EVENT_METADATA_INVALID, HOOK_EVIDENCE_INTEGRITY_FAILED, HOOK_EVIDENCE_UNAVAILABLE]
+        installation:
+          type: object
+          additionalProperties: false
+          required: [state, configOwned, manifestValid, leaseValid, expiresAt]
+          properties:
+            state: { type: string, enum: [not-installed, installed, drifted, expired, invalid] }
+            configOwned: { type: boolean }
+            manifestValid: { type: boolean }
+            leaseValid: { type: boolean }
+            expiresAt: { type: string, format: date-time, nullable: true }
+        evidence:
+          type: object
+          additionalProperties: false
+          required: [state, eventCount, lastEvent]
+          properties:
+            state: { type: string, enum: [missing, verified, invalid, unavailable] }
+            eventCount: { type: integer, minimum: 0 }
+            lastEvent:
+              type: object
+              nullable: true
+              additionalProperties: false
+              required: [eventId, eventHash, eventType, actionId, observedAt, receiptId, receiptSha256, integrity]
+              properties:
+                eventId: { type: string }
+                eventHash: { type: string, pattern: '^[a-f0-9]{64}$' }
+                eventType: { type: string, enum: [action.requested, action.completed, action.failed, action.denied] }
+                actionId: { type: string }
+                observedAt: { type: string, format: date-time }
+                receiptId: { type: string }
+                receiptSha256: { type: string, pattern: '^[a-f0-9]{64}$' }
+                integrity: { type: string, enum: [verified] }
+        repairCommands:
+          type: array
+          items: { type: string }
+        derivedDiagnostic: { type: boolean, enum: [true] }
+        recorded: { type: boolean, enum: [false] }
+        proofEligible: { type: boolean, enum: [false] }
+        claimBoundary: { type: string }
+
     HookActionLifecycle:
       type: object
       additionalProperties: false
@@ -6932,6 +6987,32 @@ paths:
       responses:
         '200':
           description: Status
+
+  /v1/watch/hooks/{provider}/health:
+    get:
+      tags: [watch, hooks]
+      summary: Inspect signed hook setup and the latest verified provider event
+      description: Joins the signed installation and lease state with the latest receipt-verified event. Last-observed time is historical evidence, not a current-liveness claim.
+      parameters:
+        - name: provider
+          in: path
+          required: true
+          schema:
+            type: string
+            enum: [claude-code, gemini-cli]
+      responses:
+        '200':
+          description: Read-only hook health projection
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [ok, data]
+                properties:
+                  ok: { type: boolean, enum: [true] }
+                  data:
+                    $ref: '#/components/schemas/HookHealthDiagnostic'
+        '400': { description: Unsupported provider }
 
   /v1/watch/hook-actions/{actionId}:
     get:

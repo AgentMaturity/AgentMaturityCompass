@@ -49,6 +49,23 @@ export function integrationsStatusCli(workspace: string): {
   }>;
 } {
   const signature = verifyIntegrationsConfigSignature(workspace);
+  if (!signature.signatureExists && signature.reason === "integrations config missing") {
+    return {
+      signature,
+      deliveryJournalPath: integrationDeliveryJournalPath(workspace),
+      queueStats: {
+        pending: 0,
+        delivered: 0,
+        deadLetter: 0,
+        oldestPendingTs: null,
+        newestDeadLetterTs: null,
+      },
+      queueDeadLetters: [],
+      recentDeliveries: [],
+      unresolvedDeadLetters: [],
+      channels: [],
+    };
+  }
   const config = loadIntegrationsConfig(workspace);
   const channels = config.integrations.channels.map((channel) => ({
     id: channel.id,

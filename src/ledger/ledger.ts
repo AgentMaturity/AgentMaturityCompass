@@ -67,6 +67,11 @@ export interface VerifyResult {
   errors: string[];
 }
 
+export interface EvidenceLedgerReader {
+  readonly workspace: string;
+  readonly db: Database.Database;
+}
+
 export interface LedgerVerifyOptions {
   externallyAuthenticatedPayloads?: ReadonlyMap<string, string>;
 }
@@ -1959,7 +1964,7 @@ function verifyEventRetentionState(
 }
 
 export function verifyEvidenceEventIntegrity(input: {
-  ledger: Ledger;
+  ledger: EvidenceLedgerReader;
   eventId: string;
   requireReceipt?: boolean;
   requireSealedSession?: boolean;

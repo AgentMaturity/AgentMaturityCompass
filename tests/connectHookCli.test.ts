@@ -42,6 +42,7 @@ describe("amc connect hooks CLI", () => {
     expect(result.status).toBe(0);
     expect(result.stdout).toContain("install");
     expect(result.stdout).toContain("status");
+    expect(result.stdout).toContain("health");
     expect(result.stdout).toContain("remove");
     expect(result.stdout).not.toContain("forward");
   });
@@ -71,6 +72,14 @@ describe("amc connect hooks CLI", () => {
     expect(status.status).toBe(0);
     expect(JSON.parse(status.stdout)).toEqual(expect.objectContaining({ state: "installed", leaseValid: true }));
 
+    const health = run(cwd, ["connect", "hooks", "health", "--provider", "claude-code", "--json"]);
+    expect(health.status).toBe(1);
+    expect(JSON.parse(health.stdout)).toEqual(expect.objectContaining({
+      status: "awaiting_first_event",
+      failClosed: false,
+      reasonCodes: ["HOOK_EVENT_NOT_OBSERVED"],
+    }));
+
     const removed = run(cwd, ["connect", "hooks", "remove", "--provider", "claude-code", "--json"]);
     expect(removed.status).toBe(0);
     expect(JSON.parse(removed.stdout)).toEqual(expect.objectContaining({ applied: true, changed: true }));
@@ -85,6 +94,15 @@ describe("amc connect hooks CLI", () => {
     ]);
     expect(result.status).toBe(0);
     expect(result.stdout).toContain("amc supervise --agent default");
+  });
+
+  test("rejects unsupported health providers with a stable machine-readable exit", () => {
+    const result = run(workspace(), ["connect", "hooks", "health", "--provider", "cursor", "--json"]);
+    expect(result.status).toBe(2);
+    expect(JSON.parse(result.stdout)).toEqual({
+      ok: false,
+      error: "provider must be claude-code or gemini-cli",
+    });
   });
 
   test("returns a provider-native deny when an installed control hook cannot reach Bridge", () => {

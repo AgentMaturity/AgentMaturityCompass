@@ -260,6 +260,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc config profile` | Print or apply workspace config profile (dev\|ci\|prod) | - | - |
 | `amc connect` | Connect an agent runtime and track first action, decision, and proof | `--agent <agentId>`<br>`--adapter <adapterId>`<br>`--token-file <path>`<br>`--bridge-url <url>`<br>`--mode <mode>`<br>`--status`<br>`--json`<br>`--print-env`<br>`--print-cmd` | - |
 | `amc connect hooks` | Install, inspect, or remove provider-native AMC observation and control hooks | - | - |
+| `amc connect hooks health` | Verify signed hook setup and show the latest verified provider event | `--provider <provider>`<br>`--json` | - |
 | `amc connect hooks install` | Install a reversible project hook for Claude Code or Gemini CLI | `--provider <provider>`<br>`--mode <mode>`<br>`--agent <agentId>`<br>`--bridge-url <url>`<br>`--ttl <ttl>`<br>`--rpm <rpm>`<br>`--dry-run`<br>`--json` | - |
 | `amc connect hooks lifecycle` | Verify one requested, controlled, and terminal provider action lifecycle | `--agent <agentId>`<br>`--action <actionId>`<br>`--json` | - |
 | `amc connect hooks remove` | Remove only the signed AMC-owned hook and revoke its lease | `--provider <provider>`<br>`--dry-run`<br>`--json` | - |
