@@ -1,8 +1,10 @@
+import { generateKeyPairSync } from "node:crypto";
 import { existsSync, mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
 import { applyDomainToAgent } from "../src/domains/domainApply.js";
+import { createIndustryPackLicenseKey } from "../src/domains/industryPackEntitlement.js";
 
 const workspaces: string[] = [];
 
@@ -13,7 +15,9 @@ function createWorkspace(): string {
 }
 
 afterEach(() => {
-  delete process.env.AMC_INDUSTRY_PACKS_ACTIVE;
+  delete process.env.AMC_INDUSTRY_PACKS_LICENSE_KEY;
+  delete process.env.AMC_INDUSTRY_PACKS_LICENSE_PRIVATE_KEY;
+  delete process.env.AMC_INDUSTRY_PACKS_LICENSE_PUBLIC_KEY;
   while (workspaces.length > 0) {
     const workspace = workspaces.pop();
     if (!workspace) continue;
@@ -23,7 +27,13 @@ afterEach(() => {
 
 describe("domain apply", () => {
   beforeEach(() => {
-    process.env.AMC_INDUSTRY_PACKS_ACTIVE = "1";
+    const { privateKey, publicKey } = generateKeyPairSync("ed25519");
+    process.env.AMC_INDUSTRY_PACKS_LICENSE_PRIVATE_KEY = privateKey.export({ type: "pkcs8", format: "pem" }).toString();
+    process.env.AMC_INDUSTRY_PACKS_LICENSE_PUBLIC_KEY = publicKey.export({ type: "spki", format: "pem" }).toString();
+    process.env.AMC_INDUSTRY_PACKS_LICENSE_KEY = createIndustryPackLicenseKey({
+      subscriptionId: "sub_domain_apply_test",
+      expiresAt: "2099-01-01T00:00:00.000Z"
+    });
   });
 
   test("apply health domain to default agent", async () => {

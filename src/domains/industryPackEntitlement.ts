@@ -1,4 +1,4 @@
-import { createHmac, timingSafeEqual } from "node:crypto";
+import { createHmac, createPrivateKey, createPublicKey, sign as signEd25519, timingSafeEqual, verify as verifyEd25519 } from "node:crypto";
 import { join } from "node:path";
 import { sha256Hex } from "../utils/hash.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
@@ -56,6 +56,8 @@ interface StoredEntitlement {
   planId?: string;
   expiresAt?: string | null;
   licenseKeySha256?: string;
+  licensePayload?: string;
+  licenseSignature?: string;
   activatedAt?: string;
   customerId?: string;
   subscriptionId?: string;
@@ -70,13 +72,6 @@ export class IndustryPackAccessError extends Error {
     this.name = "IndustryPackAccessError";
     this.entitlement = entitlement;
   }
-}
-
-function isTruthy(value: string | undefined): boolean {
-  if (!value) {
-    return false;
-  }
-  return new Set(["1", "true", "yes", "on"]).has(value.trim().toLowerCase());
 }
 
 function configuredCheckoutUrl(env: NodeJS.ProcessEnv): string | null {
@@ -106,6 +101,43 @@ function parseStoredEntitlement(workspace: string): StoredEntitlement | null {
   } catch {
     return null;
   }
+}
+
+function licensePrivateKeyPem(env: NodeJS.ProcessEnv): string | null {
+  return env.AMC_INDUSTRY_PACKS_LICENSE_PRIVATE_KEY
+    ?? env.AMC_DOMAIN_PACKS_LICENSE_PRIVATE_KEY
+    ?? null;
+}
+
+function licensePublicKeyPem(env: NodeJS.ProcessEnv): string | null {
+  return env.AMC_INDUSTRY_PACKS_LICENSE_PUBLIC_KEY
+    ?? env.AMC_DOMAIN_PACKS_LICENSE_PUBLIC_KEY
+    ?? null;
+}
+
+function signPayloadEd25519(payloadPart: string, privateKeyPem: string): string {
+  return signEd25519(null, Buffer.from(payloadPart, "utf8"), createPrivateKey(privateKeyPem)).toString("base64url");
+}
+
+function verifyPayloadEd25519(payloadPart: string, signaturePart: string, publicKeyPem: string): boolean {
+  try {
+    return verifyEd25519(
+      null,
+      Buffer.from(payloadPart, "utf8"),
+      createPublicKey(publicKeyPem),
+      Buffer.from(signaturePart, "base64url")
+    );
+  } catch {
+    return false;
+  }
+}
+
+function storedProofValid(stored: StoredEntitlement, env: NodeJS.ProcessEnv): boolean {
+  if (!stored.licensePayload || !stored.licenseSignature) {
+    return false;
+  }
+  const reconstructed = `${INDUSTRY_PACKS_LICENSE_PREFIX}.${stored.licensePayload}.${stored.licenseSignature}`;
+  return verifyIndustryPackLicenseKey(reconstructed, env).valid;
 }
 
 function isNotExpired(expiresAt: string | null | undefined, now = Date.now()): boolean {
@@ -181,9 +213,12 @@ export function createIndustryPackLicenseKey(params: {
   env?: NodeJS.ProcessEnv;
 }): string {
   const env = params.env ?? process.env;
+  const privateKeyPem = licensePrivateKeyPem(env);
   const secret = licenseSecret(env);
-  if (!secret) {
-    throw new Error("AMC_INDUSTRY_PACKS_LICENSE_SECRET is required to issue Industry Packs licenses.");
+  if (!privateKeyPem && !secret) {
+    throw new Error(
+      "AMC_INDUSTRY_PACKS_LICENSE_PRIVATE_KEY (Ed25519 PEM) or AMC_INDUSTRY_PACKS_LICENSE_SECRET is required to issue Industry Packs licenses."
+    );
   }
   const payload: IndustryPackLicensePayload = {
     v: 1,
@@ -196,7 +231,10 @@ export function createIndustryPackLicenseKey(params: {
     ...(params.email ? { emailHash: sha256Hex(params.email.trim().toLowerCase()) } : {})
   };
   const payloadPart = base64UrlJson(payload);
-  return `${INDUSTRY_PACKS_LICENSE_PREFIX}.${payloadPart}.${signatureFor(payloadPart, secret)}`;
+  const signaturePart = privateKeyPem
+    ? signPayloadEd25519(payloadPart, privateKeyPem)
+    : signatureFor(payloadPart, secret as string);
+  return `${INDUSTRY_PACKS_LICENSE_PREFIX}.${payloadPart}.${signaturePart}`;
 }
 
 export function verifyIndustryPackLicenseKey(
@@ -219,12 +257,15 @@ export function verifyIndustryPackLicenseKey(
   if (prefix !== INDUSTRY_PACKS_LICENSE_PREFIX || !payloadPart || !signaturePart) {
     return { valid: false, payload: null, reason: "invalid license format" };
   }
+  const publicKeyPem = licensePublicKeyPem(env);
   const secret = licenseSecret(env);
-  if (!secret) {
-    return { valid: false, payload: null, reason: "license verification secret is not configured" };
+  if (!publicKeyPem && !secret) {
+    return { valid: false, payload: null, reason: "license verification key is not configured" };
   }
-  const expected = signatureFor(payloadPart, secret);
-  if (!constantTimeEqual(expected, signaturePart)) {
+  const signatureValid =
+    (publicKeyPem ? verifyPayloadEd25519(payloadPart, signaturePart, publicKeyPem) : false)
+    || (secret ? constantTimeEqual(signatureFor(payloadPart, secret), signaturePart) : false);
+  if (!signatureValid) {
     return { valid: false, payload: null, reason: "license signature mismatch" };
   }
   let payload: unknown;
@@ -263,7 +304,10 @@ export function buildIndustryPackCheckoutUrl(params: {
   try {
     parsed = new URL(raw);
   } catch {
-    return raw;
+    throw new Error("Industry Packs checkout URL is not a valid https URL.");
+  }
+  if (parsed.protocol !== "https:") {
+    throw new Error("Industry Packs checkout URL must use https.");
   }
   parsed.searchParams.set("plan", INDUSTRY_PACKS_PLAN_ID);
   parsed.searchParams.set("price", INDUSTRY_PACKS_MONTHLY_PRICE_USD);
@@ -287,18 +331,6 @@ export function getIndustryPackEntitlement(
     expiresAt: null as string | null
   };
 
-  if (
-    isTruthy(env.AMC_INDUSTRY_PACKS_ACTIVE)
-    || isTruthy(env.AMC_DOMAIN_PACKS_ACTIVE)
-  ) {
-    return {
-      ...base,
-      active: true,
-      source: "env",
-      message: `Industry Packs active via environment entitlement.`
-    };
-  }
-
   const envLicense = env.AMC_INDUSTRY_PACKS_LICENSE_KEY ?? env.AMC_DOMAIN_PACKS_LICENSE_KEY;
   if (envLicense) {
     const verified = verifyIndustryPackLicenseKey(envLicense, env);
@@ -317,7 +349,7 @@ export function getIndustryPackEntitlement(
   }
 
   const stored = parseStoredEntitlement(workspace);
-  if (stored?.active === true && isNotExpired(stored.expiresAt)) {
+  if (stored?.active === true && isNotExpired(stored.expiresAt) && storedProofValid(stored, env)) {
     return {
       ...base,
       active: true,
@@ -375,11 +407,15 @@ export function activateIndustryPackAccess(params: {
   }
   const file = entitlementPath(workspace);
   ensureDir(join(workspace, ".amc"));
+  const [, storedPayloadPart, storedSignaturePart] = key.split(".");
   const stored: StoredEntitlement = {
     active: true,
     planId: INDUSTRY_PACKS_PLAN_ID,
     expiresAt: verified.payload?.expiresAt ?? params.expiresAt ?? null,
     licenseKeySha256: sha256Hex(Buffer.from(key, "utf8")),
+    ...(storedPayloadPart && storedSignaturePart
+      ? { licensePayload: storedPayloadPart, licenseSignature: storedSignaturePart }
+      : {}),
     activatedAt: new Date().toISOString(),
     customerId: verified.payload?.customerId,
     subscriptionId: verified.payload?.subscriptionId,
@@ -425,11 +461,15 @@ export async function activateIndustryPackAccessOnline(params: {
   const workspace = params.workspace ?? process.cwd();
   const file = entitlementPath(workspace);
   ensureDir(join(workspace, ".amc"));
+  const [, storedPayloadPart, storedSignaturePart] = key.split(".");
   const stored: StoredEntitlement = {
     active: true,
     planId: INDUSTRY_PACKS_PLAN_ID,
     expiresAt: payload.license?.expiresAt ?? params.expiresAt ?? null,
     licenseKeySha256: sha256Hex(Buffer.from(key, "utf8")),
+    ...(storedPayloadPart && storedSignaturePart
+      ? { licensePayload: storedPayloadPart, licenseSignature: storedSignaturePart }
+      : {}),
     activatedAt: new Date().toISOString(),
     customerId: payload.license?.customerId,
     subscriptionId: payload.license?.subscriptionId,

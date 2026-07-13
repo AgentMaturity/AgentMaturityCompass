@@ -1,3 +1,5 @@
+import { generateKeyPairSync } from "node:crypto";
+import { createIndustryPackLicenseKey } from "../src/domains/industryPackEntitlement.js";
 import { mkdtempSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
@@ -76,11 +78,21 @@ describe("diagnostic question sets", () => {
       applyIndustryPackWeights: true,
       env: {}
     });
+    const { privateKey, publicKey } = generateKeyPairSync("ed25519");
+    const licenseKey = createIndustryPackLicenseKey({
+      expiresAt: "2099-01-01T00:00:00.000Z",
+      env: {
+        AMC_INDUSTRY_PACKS_LICENSE_PRIVATE_KEY: privateKey.export({ type: "pkcs8", format: "pem" }).toString()
+      } as NodeJS.ProcessEnv
+    });
     const unlocked = getQuestionSet({
       version: LIFECYCLE_QUESTION_SET_VERSION,
       workspace: workspace(),
       applyIndustryPackWeights: true,
-      env: { AMC_INDUSTRY_PACKS_ACTIVE: "1" } as NodeJS.ProcessEnv
+      env: {
+        AMC_INDUSTRY_PACKS_LICENSE_KEY: licenseKey,
+        AMC_INDUSTRY_PACKS_LICENSE_PUBLIC_KEY: publicKey.export({ type: "spki", format: "pem" }).toString()
+      } as NodeJS.ProcessEnv
     });
 
     expect(locked.info.domainPackWeighting?.requested).toBe(true);

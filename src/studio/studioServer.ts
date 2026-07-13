@@ -8563,10 +8563,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         const { buildIndustryPackCheckoutUrl, getIndustryPackEntitlement } = await import("../domains/industryPackEntitlement.js");
         const entitlement = getIndustryPackEntitlement(options.workspace);
         if (!entitlement.checkoutAvailable) {
-          json(res, 503, {
-            error: "Industry Packs checkout is not publicly available or configured yet.",
-            entitlement
-          });
+          json(res, 503, { error: "Industry Packs checkout is not publicly available or configured yet.", entitlement });
           return;
         }
         const parsed = req.method === "POST"

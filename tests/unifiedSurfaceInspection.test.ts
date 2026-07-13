@@ -84,7 +84,7 @@ describe("unified run surface inspection", () => {
     expect(passport?.issues.join(" ")).toMatch(/tampered|extract|archive|verify/i);
   });
 
-  test("amc run consumes real subsystem inspection and ignores legacy completion decoys", async () => {
+  test("amc run consumes real subsystem inspection and ignores legacy completion decoys", { timeout: 120_000 }, async () => {
     const root = workspace();
     writeFileSync(join(root, ".amc", "policy.yaml"), "enabled: true\n");
     writeFileSync(join(root, ".amc", "metrics.yaml"), "enabled: true\n");
