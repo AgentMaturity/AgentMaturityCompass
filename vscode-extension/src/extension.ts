@@ -1,8 +1,31 @@
 import * as vscode from "vscode";
-import { exec } from "child_process";
+import { execFile } from "child_process";
 import { promisify } from "util";
 
-const execAsync = promisify(exec);
+const execFileAsync = promisify(execFile);
+const UNIX_INSTALL_COMMAND = "curl -fsSL https://agentmaturity.co/install.sh | sh";
+const WINDOWS_INSTALL_COMMAND = "irm https://agentmaturity.co/install.ps1 | iex";
+
+function installCommand(): string {
+  return process.platform === "win32" ? WINDOWS_INSTALL_COMMAND : UNIX_INSTALL_COMMAND;
+}
+
+async function ensureAmcCli(): Promise<boolean> {
+  try {
+    await execFileAsync("amc", ["--version"], { timeout: 5000 });
+    return true;
+  } catch {
+    vscode.window.showErrorMessage(`AMC CLI not found. Install with: ${installCommand()}`);
+    return false;
+  }
+}
+
+async function openAmcTerminal(command: string): Promise<void> {
+  if (!(await ensureAmcCli())) return;
+  const terminal = vscode.window.createTerminal("AMC");
+  terminal.show();
+  terminal.sendText(command);
+}
 
 export function activate(context: vscode.ExtensionContext) {
   console.log("AMC extension activated");
@@ -10,18 +33,14 @@ export function activate(context: vscode.ExtensionContext) {
   // Quick Score command
   context.subscriptions.push(
     vscode.commands.registerCommand("amc.quickscore", async () => {
-      const terminal = vscode.window.createTerminal("AMC");
-      terminal.show();
-      terminal.sendText("npx agent-maturity-compass quickscore --rapid");
+      await openAmcTerminal("amc quickscore --rapid");
     })
   );
 
   // Lint command
   context.subscriptions.push(
     vscode.commands.registerCommand("amc.lint", async () => {
-      const terminal = vscode.window.createTerminal("AMC");
-      terminal.show();
-      terminal.sendText("npx agent-maturity-compass lint");
+      await openAmcTerminal("amc lint");
     })
   );
 
@@ -29,7 +48,7 @@ export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(
     vscode.commands.registerCommand("amc.doctor", async () => {
       try {
-        const { stdout } = await execAsync("npx agent-maturity-compass doctor --json", {
+        const { stdout } = await execFileAsync("amc", ["doctor", "--json"], {
           cwd: vscode.workspace.workspaceFolders?.[0]?.uri.fsPath,
           timeout: 30000,
         });
@@ -43,7 +62,7 @@ export function activate(context: vscode.ExtensionContext) {
           );
         }
       } catch {
-        vscode.window.showErrorMessage("AMC not found. Install with: npm i -g agent-maturity-compass");
+        vscode.window.showErrorMessage(`AMC Doctor could not run. Verify with 'amc --help' or install with: ${installCommand()}`);
       }
     })
   );
@@ -51,9 +70,7 @@ export function activate(context: vscode.ExtensionContext) {
   // Dashboard command
   context.subscriptions.push(
     vscode.commands.registerCommand("amc.dashboard", async () => {
-      const terminal = vscode.window.createTerminal("AMC");
-      terminal.show();
-      terminal.sendText("npx agent-maturity-compass dashboard open");
+      await openAmcTerminal("amc dashboard open");
     })
   );
 

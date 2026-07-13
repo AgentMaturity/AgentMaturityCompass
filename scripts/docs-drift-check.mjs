@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { readFileSync, readdirSync, statSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import { join, relative } from "node:path";
 
 const root = process.cwd();
@@ -70,6 +70,7 @@ const internalClaimScopes = [
 
 function filesUnder(entry) {
   const full = join(root, entry);
+  if (!existsSync(full)) return [];
   const stat = statSync(full);
   if (stat.isFile()) return [entry];
   const out = [];

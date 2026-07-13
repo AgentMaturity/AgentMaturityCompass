@@ -16,7 +16,7 @@ body:
       label: Steps to reproduce
       description: Minimal steps to reproduce the behavior
       value: |
-        1. Install AMC: `npm i -g agent-maturity-compass`
+        1. Install AMC: `curl -fsSL https://agentmaturity.co/install.sh | sh`
         2. Run: `amc ...`
         3. See error
     validations:

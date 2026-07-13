@@ -12,9 +12,9 @@ const msg = `
   │   Quick start:                               │
   │     amc                                      │
   │     amc up                                   │
-  │     npx agent-maturity-compass               │
+  │     amc quickscore --rapid                   │
   │                                              │
-  │   Docs:  npx amc help                        │
+  │   Docs:  amc --help                          │
   │                                              │
   └──────────────────────────────────────────────┘
 `;

@@ -534,6 +534,19 @@ export function registerLateStageCliCommands({
         ].filter(Boolean).join("\n"),
       });
 
+      // Generate: explicit CI survey answers. These start at L0 and require human review.
+      fixes.push({
+        file: ".amc/ci-answers.json",
+        description: "CI-safe survey answers (review before raising any level)",
+        content: JSON.stringify({
+          "AMC-1.1": 0,
+          "AMC-2.1": 0,
+          "AMC-3.1.1": 0,
+          "AMC-4.1": 0,
+          "AMC-5.1": 0,
+        }, null, 2),
+      });
+
       // Generate: CI config
       fixes.push({
         file: ".github/workflows/amc-gate.yml",
@@ -549,11 +562,9 @@ export function registerLateStageCliCommands({
           "      - uses: actions/setup-node@v4",
           "        with:",
           "          node-version: '20'",
-          "      - run: npm i -g agent-maturity-compass",
+          "      - run: curl -fsSL https://agentmaturity.co/install.sh | sh",
           `      - run: |`,
-          `          export AMC_VAULT_PASSPHRASE='ci-gate-$\{GITHUB_SHA}'`,
-          "          amc init",
-          "          amc quickscore --json > score.json",
+          "          amc quickscore --rapid --answers .amc/ci-answers.json --json > score.json",
           `      - name: Check maturity level`,
           `        run: |`,
           `          LEVEL=$(node -e "const s=require('./score.json');console.log(s.preliminaryLevel)")`,

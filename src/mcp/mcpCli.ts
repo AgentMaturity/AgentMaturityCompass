@@ -44,6 +44,9 @@ const IDE_CONFIGS: Record<string, { file: string; config: unknown }> = {
 };
 
 const MCP_TOOLS = MCP_TOOL_METADATA;
+const VERIFIED_INSTALL_COMMAND = process.platform === "win32"
+  ? "irm https://agentmaturity.co/install.ps1 | iex"
+  : "curl -fsSL https://agentmaturity.co/install.sh | sh";
 
 export function registerMcpCommands(program: Command): void {
   const mcp = program
@@ -109,7 +112,7 @@ export function registerMcpCommands(program: Command): void {
       }
 
       console.log(chalk.bold("\nQuick start:"));
-      console.log(chalk.white("  1. Install AMC:  ") + chalk.cyan("npm install -g agent-maturity-compass"));
+      console.log(chalk.white("  1. Install AMC:  ") + chalk.cyan(VERIFIED_INSTALL_COMMAND));
       console.log(chalk.white("  2. Paste config above into your IDE's MCP config file"));
       console.log(chalk.white("  3. Restart your IDE — AMC tools will appear in the assistant"));
       console.log();
