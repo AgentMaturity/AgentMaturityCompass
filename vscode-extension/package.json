@@ -13,7 +13,8 @@
     "workspaceContains:.amc/**",
     "onCommand:amc.quickscore",
     "onCommand:amc.lint",
-    "onCommand:amc.doctor"
+    "onCommand:amc.doctor",
+    "onCommand:amc.dashboard"
   ],
   "main": "./out/extension.js",
   "contributes": {

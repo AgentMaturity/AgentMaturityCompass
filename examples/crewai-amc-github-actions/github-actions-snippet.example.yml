@@ -10,6 +10,6 @@ jobs:
         with:
           node-version: 20
       - run: npm ci
-      - run: npm i -g agent-maturity-compass
-      - run: amc quickscore
+      - run: curl -fsSL https://agentmaturity.co/install.sh | sh
+      - run: amc quickscore --rapid --answers ./amc-ci-answers.json --json
       - run: amc assurance run --scope full

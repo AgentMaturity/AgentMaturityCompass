@@ -179,6 +179,58 @@ describe("truthful public distribution and brand contract", () => {
     }
   });
 
+  test("keeps installed launchers on the canonical amc binary without registry fallback or shell execution", () => {
+    const postinstall = read("scripts/postinstall.js");
+    const extensionSource = read("vscode-extension/src/extension.ts");
+    const extensionOutput = read("vscode-extension/out/extension.js");
+    const mcpOnboarding = read("src/mcp/mcpCli.ts");
+    const generatedCi = read("src/cli-late-stage-commands.ts");
+    const githubAction = read("amc-action/action.yml");
+    const reusableWorkflow = read(".github/workflows/amc-score.yml");
+    const exampleWorkflow = read("examples/crewai-amc-github-actions/github-actions-snippet.example.yml");
+    const issueTemplate = read(".github/ISSUE_TEMPLATE/bug_report.yml");
+    const installedLaunchers = [
+      ["scripts/postinstall.js", postinstall],
+      ["vscode-extension/src/extension.ts", extensionSource],
+      ["vscode-extension/out/extension.js", extensionOutput],
+      ["src/mcp/mcpCli.ts", mcpOnboarding],
+      ["src/cli-late-stage-commands.ts", generatedCi],
+      ["amc-action/action.yml", githubAction],
+      [".github/workflows/amc-score.yml", reusableWorkflow],
+      ["examples/crewai-amc-github-actions/github-actions-snippet.example.yml", exampleWorkflow],
+      [".github/ISSUE_TEMPLATE/bug_report.yml", issueTemplate],
+    ] as const;
+
+    for (const [path, content] of installedLaunchers) {
+      expect(content, path).not.toMatch(/\bnpx\s+(?:agent-maturity-compass|amc)\b/);
+      expect(content, path).not.toMatch(/\bnpm\s+(?:i|install)\s+-g\s+agent-maturity-compass\b/);
+    }
+
+    expect(postinstall).toContain("amc --help");
+    expect(extensionSource).toContain("terminal.sendText(command)");
+    expect(extensionSource).toContain('await openAmcTerminal("amc quickscore --rapid")');
+    expect(extensionSource).toContain('await openAmcTerminal("amc lint")');
+    expect(extensionSource).toContain('await openAmcTerminal("amc dashboard open")');
+    expect(extensionSource).toContain('execFileAsync("amc", ["doctor", "--json"]');
+    expect(extensionSource).not.toMatch(/\bexecAsync\b|\bexec\(/);
+    expect(extensionOutput).not.toMatch(/\bexecAsync\b|\bexec\(/);
+    expect(mcpOnboarding).toContain("https://agentmaturity.co/install.sh");
+    expect(generatedCi).toContain("curl -fsSL https://agentmaturity.co/install.sh | sh");
+    expect(githubAction).toContain("curl -fsSL https://agentmaturity.co/install.sh | sh");
+    expect(githubAction).toContain("amc quickscore --rapid --answers");
+    expect(githubAction).toContain("amc quickscore --auto");
+    expect(githubAction).not.toMatch(/fallback=\{score:0|quickscore[^\n]*\|\|\s*true/);
+    expect(reusableWorkflow).not.toContain('echo \'{"score":0,"level":"L0"}\'');
+    expect(exampleWorkflow).toContain("--answers ./amc-ci-answers.json --json");
+  });
+
+  test("does not require gitignored internal workspaces in a clean release checkout", () => {
+    const docsDriftCheck = read("scripts/docs-drift-check.mjs");
+
+    expect(read(".gitignore")).toMatch(/^AMC_OS\/$/m);
+    expect(docsDriftCheck).toContain("if (!existsSync(full)) return [];");
+  });
+
   test("pins and verifies release assets before either hosted installer executes them", () => {
     const unix = read("website/install.sh");
     const windows = read("website/install.ps1");
