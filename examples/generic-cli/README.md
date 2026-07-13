@@ -10,7 +10,7 @@ Wrap **any** CLI-based AI agent with AMC evidence collection using environment v
 
 ## Prerequisites
 
-- AMC CLI installed (`npm i -g agent-maturity-compass`)
+- AMC CLI installed with the checksum-verified GitHub Release installer (npm is not public yet; see the root README)
 - Any CLI-based AI agent
 
 ## Run with AMC

@@ -159,6 +159,7 @@ describe("truthful public distribution and brand contract", () => {
   test("does not promote unavailable registry commands from public adoption front doors", () => {
     const publicFrontDoors = [
       "README.md",
+      "install.sh",
       "docs/GETTING_STARTED.md",
       "docs/INSTALL.md",
       "docs/INSTALL_PACKAGES.md",
@@ -232,6 +233,7 @@ describe("truthful public distribution and brand contract", () => {
   });
 
   test("pins and verifies release assets before either hosted installer executes them", () => {
+    const repositoryUnix = read("install.sh");
     const unix = read("website/install.sh");
     const windows = read("website/install.ps1");
     const workflow = read(".github/workflows/release.yml");
@@ -240,6 +242,7 @@ describe("truthful public distribution and brand contract", () => {
     expect(unix).toContain("SHA256SUMS");
     expect(unix).toMatch(/sha256sum|shasum -a 256/);
     expect(unix).toContain("checksum mismatch");
+    expect(repositoryUnix).toBe(unix);
     expect(windows).toContain("$AmcReleaseVersion");
     expect(windows).toContain("SHA256SUMS");
     expect(windows).toContain("Get-FileHash");

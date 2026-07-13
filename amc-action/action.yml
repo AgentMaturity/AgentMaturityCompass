@@ -32,9 +32,9 @@ inputs:
     required: false
     default: '20'
   amc-version:
-    description: 'agent-maturity-compass npm version (semver, "latest", or "local" for this checkout)'
+    description: 'Verified GitHub Release version (currently "1.1.1"), or "local" to build the action checkout'
     required: false
-    default: 'latest'
+    default: '1.1.1'
   working-directory:
     description: 'Directory to run AMC in (repo root by default)'
     required: false
@@ -66,13 +66,21 @@ runs:
       shell: bash
       run: |
         set -euo pipefail
-        if [ "${{ inputs.amc-version }}" = "local" ]; then
-          npm ci
-          npm run build
-          npm install -g "$GITHUB_WORKSPACE"
-        else
-          npm i -g agent-maturity-compass@${{ inputs.amc-version }}
-        fi
+        case "${{ inputs.amc-version }}" in
+          local)
+            ACTION_REPOSITORY=$(CDPATH= cd -- "$GITHUB_ACTION_PATH/.." && pwd)
+            npm ci --prefix "$ACTION_REPOSITORY"
+            npm run --prefix "$ACTION_REPOSITORY" build
+            npm install -g "$ACTION_REPOSITORY"
+            ;;
+          1.1.1)
+            curl -fsSL https://agentmaturity.co/install.sh | sh
+            ;;
+          *)
+            echo "Unsupported AMC release input. This preview action currently verifies only 1.1.1 or local." >&2
+            exit 1
+            ;;
+        esac
 
     - name: Initialize AMC workspace
       shell: bash

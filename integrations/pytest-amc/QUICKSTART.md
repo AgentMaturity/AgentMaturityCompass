@@ -6,7 +6,7 @@ Get AMC scoring integrated into your pytest workflow in 5 minutes.
 
 ```bash
 pip install pytest-amc
-npm i -g agent-maturity-compass
+curl -fsSL https://agentmaturity.co/install.sh | sh
 ```
 
 ## 2. Initialize AMC
@@ -36,7 +36,7 @@ pytest --amc-score --amc-min-level 3 --amc-fail-below
 - name: Install dependencies
   run: |
     pip install pytest pytest-amc
-    npm i -g agent-maturity-compass
+    curl -fsSL https://agentmaturity.co/install.sh | sh
 
 - name: Run tests with AMC gate
   run: pytest --amc-score --amc-min-level 3 --amc-fail-below
@@ -80,7 +80,7 @@ addopts = "--amc-score --amc-min-level 3 --amc-fail-below"
 
 **"AMC CLI not found"**
 ```bash
-npm i -g agent-maturity-compass
+curl -fsSL https://agentmaturity.co/install.sh | sh
 which amc  # Should show path
 ```
 

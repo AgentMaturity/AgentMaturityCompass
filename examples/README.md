@@ -33,7 +33,7 @@ Your Agent → AMC Gateway (captures evidence) → LLM Provider (OpenAI, Anthrop
 
 ```bash
 # Install AMC
-npm i -g agent-maturity-compass
+curl -fsSL https://agentmaturity.co/install.sh | sh
 
 # Start the gateway
 amc up

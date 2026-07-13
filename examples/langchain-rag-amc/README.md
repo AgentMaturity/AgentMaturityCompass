@@ -17,7 +17,7 @@ Runnable starter blueprint for a LangChain app evaluated with AMC.
 Manual flow:
 
 ```bash
-npm i -g agent-maturity-compass
+curl -fsSL https://agentmaturity.co/install.sh | sh
 amc up
 amc wrap langchain-python -- python examples/langchain-python/main.py
 amc quickscore
@@ -30,7 +30,7 @@ amc trace list
 ## Quick start (Node)
 
 ```bash
-npm i -g agent-maturity-compass
+curl -fsSL https://agentmaturity.co/install.sh | sh
 amc up
 amc wrap langchain-node -- node examples/langchain-node/index.ts
 amc quickscore

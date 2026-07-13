@@ -19,7 +19,7 @@ Starter blueprint for scoring a plain chatbot or LLM app that is not yet a full 
 Manual flow:
 
 ```bash
-npm i -g agent-maturity-compass
+curl -fsSL https://agentmaturity.co/install.sh | sh
 amc lite-score
 amc dataset create app-baseline
 amc dataset import app-baseline --file examples/openai-compatible-lite-score/dataset-cases.example.jsonl

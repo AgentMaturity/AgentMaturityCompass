@@ -5,7 +5,7 @@ ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 cd "$ROOT"
 
 if ! command -v amc >/dev/null 2>&1; then
-  echo "AMC CLI not found. Install with: npm i -g agent-maturity-compass"
+  echo "AMC CLI not found. Use the checksum-verified GitHub Release installer from the repository README."
   exit 1
 fi
 

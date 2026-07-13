@@ -71,6 +71,7 @@ describe("unified run", () => {
       ],
       overallGrade: "B-" as LetterGrade,
       overallScore: 80,
+      surfaceCoverage: { evaluated: 2, total: 8, pending: ["Enforce", "Vault", "Watch", "Comply", "Fleet", "Passport"], failed: [] },
       topFixes: [
         { action: "Fix injection defense", impact: "Shield → B+", command: "amc shield analyze" },
       ],
@@ -81,6 +82,7 @@ describe("unified run", () => {
     expect(output).toContain("Score");
     expect(output).toContain("Shield");
     expect(output).toContain("Overall Grade");
+    expect(output).toContain("Surface coverage");
     expect(output).toContain("Top fixes");
     expect(output.length).toBeGreaterThan(200);
   });
@@ -110,6 +112,7 @@ describe("unified run", () => {
       ],
       overallGrade: "D" as LetterGrade,
       overallScore: 63,
+      surfaceCoverage: { evaluated: 2, total: 8, pending: [], failed: [] },
       topFixes: [],
     };
     const output = renderCIAnnotations(result);

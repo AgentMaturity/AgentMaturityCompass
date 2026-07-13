@@ -20,7 +20,7 @@ pip install -e .
 The AMC CLI must be installed:
 
 ```bash
-npm i -g agent-maturity-compass
+curl -fsSL https://agentmaturity.co/install.sh | sh
 ```
 
 ## Usage

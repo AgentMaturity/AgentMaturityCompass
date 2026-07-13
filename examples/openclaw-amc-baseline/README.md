@@ -25,7 +25,8 @@ This blueprint gives you a practical path to:
 Manual flow:
 
 ```bash
-npm i -g openclaw agent-maturity-compass
+npm i -g openclaw
+curl -fsSL https://agentmaturity.co/install.sh | sh
 amc up
 amc wrap openclaw-cli -- openclaw run --config examples/openclaw/config.yaml
 amc quickscore

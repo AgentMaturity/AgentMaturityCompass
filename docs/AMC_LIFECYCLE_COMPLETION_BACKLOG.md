@@ -237,7 +237,7 @@ Implement:
 - Confirm all packs are discoverable and grouped.
 - Enforce entitlement before premium content is used.
 - Support locked preview, checkout, activation, verification, restore, and offline states.
-- State that $9.99/month unlocks all industry domain packs.
+- Treat $9.99/month as the planned tier and state clearly that checkout is unavailable until independently verified live.
 - Ensure full `amc` can recommend a domain pack without bypassing the paywall.
 
 Done when:

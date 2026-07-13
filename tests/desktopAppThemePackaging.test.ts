@@ -31,6 +31,10 @@ describe("desktop app packaging and visual identity", () => {
     expect(script).toContain("PACKAGE_SHA256");
     expect(script).toContain("AMC package checksum mismatch");
     expect(script).toContain("Get-FileHash");
+    expect(script).toContain('ACTUAL_PACKAGE_DIGEST=$(shasum -a 256 "$PACKAGE"');
+    expect(script).toContain('if [ "$ACTUAL_PACKAGE_DIGEST" != "$PACKAGE_DIGEST" ]');
+    expect(script).toContain("$ActualPackageDigest = (Get-FileHash -LiteralPath $Package -Algorithm SHA256).Hash.ToLowerInvariant()");
+    expect(script).toContain('if ($ActualPackageDigest -ne $PackageDigest.ToLowerInvariant())');
     expect(script).toContain("npm install --prefix");
     expect(script).toContain("node_modules/.bin/amc");
     expect(script).toContain(String.raw`node_modules\\.bin\\amc.cmd`);

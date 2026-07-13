@@ -11,7 +11,7 @@ A .NET Semantic Kernel agent with function calling, routed through the AMC Gatew
 ## Prerequisites
 
 - .NET 8.0 SDK
-- AMC CLI installed (`npm i -g agent-maturity-compass`)
+- AMC CLI installed with the checksum-verified GitHub Release installer (npm is not public yet; see the root README)
 - An OpenAI API key
 
 ## Install

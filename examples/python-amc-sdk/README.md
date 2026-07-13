@@ -11,7 +11,7 @@ The simplest possible AMC integration. No framework — just Python and the AMC 
 ## Prerequisites
 
 - Python ≥ 3.10
-- AMC CLI installed (`npm i -g agent-maturity-compass`)
+- AMC CLI installed with the checksum-verified GitHub Release installer (npm is not public yet; see the root README)
 - An OpenAI API key (optional — runs with simulated evidence without one)
 
 ## Install

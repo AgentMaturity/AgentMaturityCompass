@@ -146,7 +146,7 @@ Generate compliance reports.
 ## Requirements
 
 - Python 3.9+
-- AMC CLI installed (`npm i -g agent-maturity-compass`)
+- AMC CLI installed with the checksum-verified GitHub Release installer (npm is not public yet; see the repository README)
 
 ## License
 

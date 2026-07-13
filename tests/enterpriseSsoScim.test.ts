@@ -143,6 +143,7 @@ function createFakeOidcProvider(params: {
   clientId: string;
   clientSecret: string;
   kid?: string;
+  emailVerified?: boolean | "missing";
 }): {
   server: ReturnType<typeof createServer>;
   close: () => Promise<void>;
@@ -222,9 +223,11 @@ function createFakeOidcProvider(params: {
         sub: "oidc-user-1",
         name: "OIDC User",
         nonce,
-        email_verified: true,
         groups: ["amc-ws-default-owner"]
       };
+      if (params.emailVerified !== "missing") {
+        payload.email_verified = params.emailVerified ?? true;
+      }
       if (code === "badnonce") {
         payload.nonce = "wrong-nonce";
       }
@@ -404,6 +407,62 @@ describe("enterprise identity (OIDC/SAML/SCIM)", () => {
 
       expect(callback.body.includes("super-secret-client")).toBe(false);
       expect(me.body.includes("super-secret-client")).toBe(false);
+    } finally {
+      await host.close();
+      await provider.close();
+    }
+  }, 40_000);
+
+  test("OIDC rejects identity tokens without an affirmative email_verified claim", async () => {
+    const { hostDir } = initHostWorkspace("amc-identity-oidc-email-proof-");
+    const routerPort = await pickPort();
+    const oidcPort = await pickPort();
+    const issuer = `http://127.0.0.1:${oidcPort}`;
+    const clientSecretFile = join(hostDir, "oidc-secret.txt");
+    writeFileSync(clientSecretFile, "oidc-email-proof-secret");
+
+    identityInitCli(hostDir);
+    identityProviderAddOidcCli({
+      hostDir,
+      providerId: "oidcemailproof",
+      displayName: "OIDC Email Proof",
+      issuer,
+      clientId: "oidc-email-proof-client",
+      clientSecretFile,
+      redirectUri: `http://127.0.0.1:${routerPort}/host/api/auth/oidc/oidcemailproof/callback`
+    });
+
+    const provider = createFakeOidcProvider({
+      issuerBase: issuer,
+      clientId: "oidc-email-proof-client",
+      clientSecret: "oidc-email-proof-secret",
+      emailVerified: "missing"
+    });
+    await new Promise<void>((resolvePromise) => provider.server.listen(oidcPort, "127.0.0.1", () => resolvePromise()));
+    const host = await startWorkspaceRouter({
+      hostDir,
+      host: "127.0.0.1",
+      port: routerPort,
+      defaultWorkspaceId: "default"
+    });
+
+    try {
+      const login = await httpCall({
+        url: `http://127.0.0.1:${routerPort}/host/api/auth/oidc/oidcemailproof/login`,
+        method: "GET"
+      });
+      expect(login.status).toBe(302);
+      const authorize = await httpCall({
+        url: String(login.headers.location ?? ""),
+        method: "GET"
+      });
+      expect(authorize.status).toBe(302);
+      const callback = await httpCall({
+        url: String(authorize.headers.location ?? ""),
+        method: "GET"
+      });
+      expect(callback.status).toBe(401);
+      expect(parseSetCookie(callback.headers)).not.toContain("amc_session=");
     } finally {
       await host.close();
       await provider.close();

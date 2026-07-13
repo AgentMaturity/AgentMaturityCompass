@@ -14,7 +14,8 @@ AMC is an OSS trust/security tool. That means users need:
 
 ### Stable
 - Intended for most users
-- Published via npm and GitHub Releases
+- Published through independently verified GitHub Release assets
+- npm and Homebrew are not stable channels until the publication manifest marks them live
 - Receives bug fixes and documentation updates
 
 ### Main / Development

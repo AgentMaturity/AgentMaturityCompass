@@ -111,8 +111,8 @@ export async function completeOidcCallback(params: {
   if (!email) {
     throw new Error("OIDC id_token missing email");
   }
-  if (typeof emailVerified === "boolean" && !emailVerified) {
-    throw new Error("OIDC email not verified");
+  if (emailVerified !== true) {
+    throw new Error("OIDC email_verified must be true");
   }
 
   const grants = evaluateRoleMapping(params.config, {

@@ -335,6 +335,17 @@ export PATH="/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:$PAT
 
 mkdir -p "$LOG_DIR"
 
+if [ ! -f "$PACKAGE" ]; then
+  printf '%s\n' "Included AMC package is missing: $PACKAGE" >>"$LOG_FILE"
+  exit 1
+fi
+ACTUAL_PACKAGE_DIGEST=$(shasum -a 256 "$PACKAGE" | awk '{print $1}')
+if [ "$ACTUAL_PACKAGE_DIGEST" != "$PACKAGE_DIGEST" ]; then
+  printf '%s\n' "AMC package checksum mismatch; refusing to launch." >>"$LOG_FILE"
+  osascript -e 'display dialog "The included AMC package failed integrity verification. Re-download the desktop archive." buttons {"OK"} default button "OK"' >/dev/null 2>&1 || true
+  exit 1
+fi
+
 CURRENT_DIGEST=""
 if [ -f "$DIGEST_FILE" ]; then
   CURRENT_DIGEST=$(cat "$DIGEST_FILE")
@@ -396,6 +407,14 @@ Write-Host ""
 Write-Host "Agent Maturity Compass Studio" -ForegroundColor Green
 Write-Host "Evidence over claims." -ForegroundColor DarkGray
 Write-Host ""
+
+if (-not (Test-Path -LiteralPath $Package -PathType Leaf)) {
+  throw "Included AMC package is missing: $Package"
+}
+$ActualPackageDigest = (Get-FileHash -LiteralPath $Package -Algorithm SHA256).Hash.ToLowerInvariant()
+if ($ActualPackageDigest -ne $PackageDigest.ToLowerInvariant()) {
+  throw "AMC package checksum mismatch; refusing to launch. Re-download the desktop archive."
+}
 
 $CurrentDigest = if (Test-Path $DigestFile) { (Get-Content $DigestFile -Raw).Trim() } else { "" }
 if ($CurrentDigest -ne $PackageDigest -or -not (Test-Path $AmcBin)) {
