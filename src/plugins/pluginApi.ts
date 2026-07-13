@@ -13,6 +13,7 @@ import {
   resolveRegistryPackage
 } from "./pluginRegistryClient.js";
 import { verifyPluginPackage } from "./pluginPackage.js";
+import { pluginIdSchema, pluginVersionSchema } from "./pluginIdentifiers.js";
 import {
   defaultInstalledPluginsLock,
   defaultPluginRegistriesConfig,
@@ -43,8 +44,8 @@ const pendingPluginActionSchema = z.object({
   agentId: z.string().min(1),
   registryId: z.string().min(1).nullable(),
   registryFingerprint: z.string().length(64).nullable(),
-  pluginId: z.string().min(1),
-  version: z.string().min(1).nullable(),
+  pluginId: pluginIdSchema,
+  version: pluginVersionSchema.nullable(),
   packageSha256: z.string().length(64).nullable(),
   publisherFingerprint: z.string().length(64).nullable(),
   riskCategory: pluginRiskCategorySchema.nullable(),

@@ -12,11 +12,8 @@ import { runAssurance } from "../assurance/assuranceRunner.js";
 import type { DiagnosticReport, AssuranceReport } from "../types.js";
 import { listAssurancePacks } from "../assurance/packs/index.js";
 import { vaultExists, vaultStatus } from "../vault/vault.js";
-import { verifyLedgerIntegrity } from "../ledger/ledger.js";
-import { loadComplianceMaps, generateComplianceReport } from "../compliance/complianceEngine.js";
-import { collectPassportData } from "../passport/passportCollector.js";
-import { loadRunReport } from "../diagnostic/runner.js";
-import { pathExists, readUtf8 } from "../utils/fs.js";
+import { loadComplianceMaps } from "../compliance/complianceEngine.js";
+import { pathExists } from "../utils/fs.js";
 import { join } from "node:path";
 import { enforceResourceManifestRef, writeEnforceResourceManifest } from "../enforce/resourceManifest.js";
 import { observeDecisionOutcomes, writeDecisionReceipts } from "../lifecycle/decisionReceipt.js";
@@ -25,6 +22,10 @@ import { writeFindingProofs } from "../lifecycle/findingProof.js";
 import { writeLifecycleChangeReceipts } from "../lifecycle/changeReceipt.js";
 import { AMC_SURFACE_ORDER, writeLifecycleRunArtifact, type AMCSurface, type LifecycleSurfaceStatus, type LifecycleSurfaceSummary } from "../lifecycle/lifecycleRunArtifact.js";
 import { writeObservabilityLaneRecord } from "../lifecycle/observabilityLane.js";
+import {
+  inspectUnifiedConfiguredSurfaces,
+  type UnifiedSurfaceModuleResult,
+} from "./unifiedSurfaceInspection.js";
 
 /* ── Types ──────────────────────────────────────────────────── */
 
@@ -37,8 +38,11 @@ export interface ModuleResult {
   score: number;      // 0-100 normalized
   summary: string;
   issues: string[];   // only critical/failing items
+  status?: UnifiedSurfaceModuleResult["status"];
   skipped?: boolean;
   skipReason?: string;
+  evidenceRefs?: string[];
+  upgradePath?: string;
 }
 
 export interface UnifiedRunResult {
@@ -47,6 +51,12 @@ export interface UnifiedRunResult {
   modules: ModuleResult[];
   overallGrade: LetterGrade;
   overallScore: number;
+  surfaceCoverage: {
+    evaluated: number;
+    total: number;
+    pending: string[];
+    failed: string[];
+  };
   topFixes: Array<{ action: string; impact: string; command?: string }>;
   reportPath?: string;
   diagnosticRunId?: string;
@@ -105,6 +115,9 @@ const MODULE_WEIGHTS: Record<string, number> = {
 };
 
 function lifecycleStatusForModule(module: ModuleResult): LifecycleSurfaceStatus {
+  if (module.status === "failed") {
+    return "degraded";
+  }
   if (module.skipped) {
     return "pending";
   }
@@ -126,10 +139,35 @@ function lifecycleSurfaceOverridesFromModules(modules: ModuleResult[]): Partial<
     overrides[module.name as AMCSurface] = {
       status: lifecycleStatusForModule(module),
       summary: module.skipped && module.skipReason ? module.skipReason : module.summary,
-      refs: module.issues
+      refs: module.evidenceRefs ?? module.issues
     };
   }
   return overrides;
+}
+
+const SURFACE_ICONS: Record<UnifiedSurfaceModuleResult["name"], string> = {
+  Enforce: "③",
+  Vault: "④",
+  Watch: "⑤",
+  Comply: "⑥",
+  Fleet: "⑦",
+  Passport: "⑧",
+};
+
+function unifiedSurfaceToModule(surface: UnifiedSurfaceModuleResult): ModuleResult {
+  return {
+    name: surface.name,
+    icon: SURFACE_ICONS[surface.name],
+    grade: scoreToGrade(surface.score),
+    score: surface.score,
+    summary: surface.summary,
+    issues: surface.issues,
+    status: surface.status,
+    skipped: surface.status === "skipped",
+    skipReason: surface.status === "skipped" ? surface.issues[0] ?? surface.summary : undefined,
+    evidenceRefs: surface.evidenceRefs,
+    upgradePath: surface.upgradePath,
+  };
 }
 
 /* ── Individual module runners ──────────────────────────────── */
@@ -176,6 +214,7 @@ async function runScoreModule(params: {
       module: {
         name: "Score",
         icon: "①",
+        status: "success",
         grade: scoreToGrade(normalized),
         score: Math.round(normalized),
         summary: `${totalQuestions} questions scored, ${belowTarget} below target`,
@@ -188,6 +227,7 @@ async function runScoreModule(params: {
       module: {
         name: "Score",
         icon: "①",
+        status: "failed",
         grade: "F",
         score: 0,
         summary: "Diagnostic failed to run",
@@ -223,6 +263,7 @@ async function runShieldModule(workspace: string, agentId: string): Promise<Modu
     return {
       name: "Shield",
       icon: "②",
+      status: "success",
       grade: scoreToGrade(passRate),
       score: Math.round(passRate),
       summary: `${totalScenarios} scenarios: ${passedScenarios} passed, ${totalScenarios - passedScenarios} failed`,
@@ -232,6 +273,7 @@ async function runShieldModule(workspace: string, agentId: string): Promise<Modu
     return {
       name: "Shield",
       icon: "②",
+      status: "failed",
       grade: "F",
       score: 0,
       summary: "Assurance run failed",
@@ -573,7 +615,8 @@ export async function unifiedRun(input: UnifiedRunInput): Promise<UnifiedRunResu
   const { workspace, agentId, window = "14d" } = input;
   const started = Date.now();
 
-  // Run all modules (Score and Shield are async, rest are sync checks)
+  // Run Score and Shield, then inspect the remaining surfaces from their real,
+  // signed/persisted subsystem artifacts rather than legacy file-existence probes.
   const [scoreOutput, shieldResult] = await Promise.all([
     runScoreModule({
       workspace,
@@ -587,35 +630,33 @@ export async function unifiedRun(input: UnifiedRunInput): Promise<UnifiedRunResu
   ]);
   const scoreResult = scoreOutput.module;
 
-  const enforceResult = runEnforceModule(workspace);
-  const vaultResult = runVaultModule(workspace);
-  const watchResult = runWatchModule(workspace);
-  const complyResult = runComplyModule(workspace);
-  const fleetResult = runFleetModule(workspace);
-  const passportResult = runPassportModule(workspace, agentId);
+  const configuredSurfaces = await inspectUnifiedConfiguredSurfaces({ workspace, agentId });
 
   const modules = [
     scoreResult,
     shieldResult,
-    enforceResult,
-    vaultResult,
-    watchResult,
-    complyResult,
-    fleetResult,
-    passportResult,
+    ...configuredSurfaces.map(unifiedSurfaceToModule),
   ];
 
-  // Calculate weighted overall score (skip skipped modules, redistribute weight)
-  let totalWeight = 0;
+  // Keep all eight surface weights fixed. Pending surfaces retain only the
+  // partial score they actually earned; their weight is never redistributed.
+  // Any failed surface caps the full assessment at F.
   let weightedSum = 0;
   for (const mod of modules) {
     const w = MODULE_WEIGHTS[mod.name] ?? 0.05;
-    if (mod.skipped) continue;
-    totalWeight += w;
     weightedSum += mod.score * w;
   }
-  const overallScore = totalWeight > 0 ? Math.round(weightedSum / totalWeight) : 0;
+  const failedSurfaces = modules.filter((module) => module.status === "failed").map((module) => module.name);
+  const pendingSurfaces = modules.filter((module) => module.skipped).map((module) => module.name);
+  const rawOverallScore = Math.round(weightedSum);
+  const overallScore = failedSurfaces.length > 0 ? Math.min(rawOverallScore, 59) : rawOverallScore;
   const overallGrade = scoreToGrade(overallScore);
+  const surfaceCoverage = {
+    evaluated: modules.length - pendingSurfaces.length,
+    total: modules.length,
+    pending: pendingSurfaces,
+    failed: failedSurfaces,
+  };
 
   const topFixes = generateTopFixes(modules);
   let diagnosticRunId: string | undefined;
@@ -707,6 +748,7 @@ export async function unifiedRun(input: UnifiedRunInput): Promise<UnifiedRunResu
     modules,
     overallGrade,
     overallScore,
+    surfaceCoverage,
     topFixes,
   };
   if (diagnosticRunId) {

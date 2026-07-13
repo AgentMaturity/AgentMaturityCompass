@@ -4,6 +4,7 @@ import YAML from "yaml";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { signFileWithAuditor, verifySignedFileWithAuditor } from "../org/orgSigner.js";
+import { resolvePluginInstallPath } from "./pluginIdentifiers.js";
 import {
   installedPluginsLockSchema,
   pluginOverridesSchema,
@@ -38,7 +39,11 @@ export function pluginsInstalledLockPath(workspace: string): string {
 }
 
 export function pluginInstallFolder(workspace: string, pluginId: string, version: string): string {
-  return join(pluginsInstalledDir(workspace), pluginId, version);
+  return resolvePluginInstallPath({
+    installedRoot: pluginsInstalledDir(workspace),
+    pluginId,
+    version,
+  });
 }
 
 export function pluginInstalledPackagePath(workspace: string, pluginId: string, version: string): string {

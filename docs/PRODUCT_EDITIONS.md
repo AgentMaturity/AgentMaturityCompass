@@ -5,11 +5,11 @@
 AMC has one simple split:
 
 - **Free / Open Source**: the entire trust stack
-- **Industry Packs / Enterprise**: paid sector-specific domain diagnostics
+- **Industry Packs / Enterprise (planned)**: sector-specific domain diagnostics; public checkout is not live
 
 ## Full edition matrix
 
-| Product | Free / Open Source | Industry Packs ($9.99/mo) | Enterprise |
+| Product | Free / Open Source | Industry Packs (planned $9.99/mo) | Enterprise (contact-first) |
 |---|---|---|---|
 | **Score** | ✅ Full | ✅ Full | ✅ Full |
 | **Shield** (142 assurance packs) | ✅ Full | ✅ Full | ✅ Full |
@@ -33,6 +33,8 @@ AMC has one simple split:
 Most open-source projects gate core features behind paid tiers, which kills adoption. AMC gates only **domain-specific content** (Industry Packs) — the part that requires ongoing regulatory expertise and maintenance.
 
 The trust stack itself is free. Always.
+
+Commercial availability boundary: the entitlement and license machinery exists, but public checkout and automatic issuance are not live. Do not present this matrix as a purchase-ready offer until `website/publication-status.json` marks that channel live.
 
 ## Read next
 - `docs/PRICING.md`

@@ -1,7 +1,6 @@
 import { mkdtempSync, readdirSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
-import { spawnSync } from "node:child_process";
 import { sha256Hex } from "../utils/hash.js";
 import { pathExists, readUtf8 } from "../utils/fs.js";
 import { canonicalize } from "../utils/json.js";
@@ -15,6 +14,18 @@ import {
   getPassportRevocation
 } from "./passportStore.js";
 import { computePassportExpiresTs } from "./passportConstants.js";
+import {
+  extractValidatedTarGzipArchive,
+  type TarArchiveLimits,
+} from "../security/safeTarArchive.js";
+
+const PASSPORT_ARCHIVE_LIMITS: TarArchiveLimits = {
+  maxEntries: 10_000,
+  maxCompressedBytes: 64 * 1024 * 1024,
+  maxEntryBytes: 64 * 1024 * 1024,
+  maxTotalBytes: 256 * 1024 * 1024,
+  maxPathBytes: 1024,
+};
 
 interface PassportVerifyError {
   code: string;
@@ -37,10 +48,12 @@ function cleanup(path: string): void {
 }
 
 function tarExtract(bundleFile: string, outDir: string): void {
-  const out = spawnSync("tar", ["-xzf", bundleFile, "-C", outDir], { encoding: "utf8" });
-  if (out.status !== 0) {
-    throw new Error(`failed to extract passport bundle: ${(`${out.stdout ?? ""}${out.stderr ?? ""}`).trim()}`);
-  }
+  extractValidatedTarGzipArchive({
+    file: bundleFile,
+    destination: outDir,
+    label: "passport bundle",
+    limits: PASSPORT_ARCHIVE_LIMITS,
+  });
 }
 
 function resolveRoot(dir: string): string {

@@ -181,7 +181,7 @@ AMC is not an observability tool and not an eval harness. It is a **trust scorec
 | Environment | 6 | EU Farm-to-Fork, REACH, IEC 61850 |
 | Governance | 5 | EU eIDAS 2.0, UNCAC, UNGPs |
 
-Industry Packs are paid content: `$9.99/month` unlocks all 41 packs in the CLI and Studio. Run `amc domain pack checkout` to open the subscription flow, then paste the returned key into Studio or run `amc domain pack activate --key <license-key>`.
+Industry Packs are implemented behind an entitlement boundary, with a planned commercial price of `$9.99/month` for all 41 packs. **Public checkout and automatic license issuance are not yet publicly live or available.** `amc domain pack access` reports this state; `amc domain pack checkout` fails closed unless an operator has configured a verified checkout provider. Do not send payment based on repository copy alone.
 
 ### Simulation & Forecast Evaluation Lane
 
@@ -561,30 +561,9 @@ amc domain assess --domain health                        # HIPAA assessment
 amc domain assess --domain wealth                        # MiFID II / DORA
 ```
 
-### GitHub Actions — CI trust gate
+### GitHub Actions — preview boundary
 
-```yaml
-# .github/workflows/amc.yml — copy this entire file
-name: AMC Trust Gate
-on:
-  pull_request:
-  push:
-    branches: [main]
-
-jobs:
-  amc-score:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: AgentMaturity/AgentMaturityCompass/amc-action@main
-        with:
-          agent-id: my-agent
-          target-level: 3
-          fail-on-drop: true
-          comment: true
-          upload-artifacts: true
-```
+The repository contains a composite action prototype, but no GitHub Marketplace publication has been independently verified. Do not use `@main` as a production trust boundary. Until an immutable action release is published and tested, run AMC from a reviewed source checkout in CI or pin the prototype to an exact reviewed commit; see [`amc-action/README.md`](amc-action/README.md).
 
 ### Badge for your README
 
@@ -702,15 +681,15 @@ cd AgentMaturityCompass && npm ci && npm run build && npm link
 
 ## Pricing
 
-The full trust stack is **free and MIT licensed**. The only paid surface is Industry Packs.
+The full trust stack is **free and MIT licensed**. Industry Packs are the planned commercial add-on, but checkout and license issuance are not yet publicly live.
 
 | Tier | What you get |
 |---|---|
 | **Free / Open Source** | Everything — Score, Shield, Enforce, Vault, Watch, Comply, Fleet, Passport, all 14 adapters, 1,166 registered CLI command paths, browser playground, CI gates |
-| **Industry Packs** | Everything in Free + all 41 Industry Domain Packs for `$9.99/month` |
-| **Enterprise** | Everything in Industry Packs + priority support + custom pack development + deployment assistance |
+| **Industry Packs (planned; not yet purchasable)** | Planned `$9.99/month` tier for all 41 Industry Domain Packs; public checkout is not live |
+| **Enterprise (contact-first; not self-serve)** | Planned Industry Packs access plus priority support, custom pack development, and deployment assistance |
 
-> Industry Packs are 41 sector-specific domain packs (healthcare, finance, education, logistics, government, etc.) that require ongoing regulatory research and maintenance. The core trust stack stays free forever.
+> Industry Packs are 41 sector-specific domain packs (healthcare, finance, education, logistics, government, etc.) that require ongoing regulatory research and maintenance. The core trust stack stays MIT licensed. See [`website/publication-status.json`](website/publication-status.json) before making any availability claim.
 
 ---
 

@@ -15,7 +15,7 @@ export function registerDomainProductCliCommands({ product, productGlossary, dom
   sectorPack
     .command("access")
     .alias("subscribe")
-    .description("Show Industry Packs subscription status and unlock instructions")
+    .description("Show Industry Packs entitlement and public-checkout readiness")
     .option("--json", "Output as JSON")
     .action(async (opts: { json?: boolean }) => {
       const { getIndustryPackEntitlement, formatIndustryPackPaywallMessage } = await import("./domains/industryPackEntitlement.js");
@@ -26,8 +26,9 @@ export function registerDomainProductCliCommands({ product, productGlossary, dom
       }
       console.log(chalk.bold.hex('#4AEF79')("\n🏭  Industry Packs Access"));
       console.log(chalk.gray("Plan:"), entitlement.planId);
-      console.log(chalk.gray("Price:"), `$${entitlement.priceUsdMonthly}/month`);
+      console.log(chalk.gray("Planned price:"), `$${entitlement.priceUsdMonthly}/month`);
       console.log(chalk.gray("Status:"), entitlement.active ? chalk.green("active") : chalk.yellow("locked"));
+      console.log(chalk.gray("Public checkout:"), entitlement.checkoutAvailable ? chalk.green("available") : chalk.yellow("not live"));
       console.log(chalk.gray("Source:"), entitlement.source);
       if (!entitlement.active) {
         console.log("");
@@ -38,7 +39,7 @@ export function registerDomainProductCliCommands({ product, productGlossary, dom
 
   sectorPack
     .command("checkout")
-    .description("Create an Industry Packs checkout link")
+    .description("Create a checkout link only when a verified provider is configured")
     .option("--success-url <url>", "Return URL after successful payment")
     .option("--cancel-url <url>", "Return URL if checkout is cancelled")
     .option("--email <email>", "Customer email to prefill at checkout")
@@ -66,7 +67,7 @@ export function registerDomainProductCliCommands({ product, productGlossary, dom
 
   sectorPack
     .command("activate")
-    .description("Activate Industry Packs after purchase")
+    .description("Activate Industry Packs with a valid issued license key")
     .requiredOption("--key <licenseKey>", "License key from checkout")
     .option("--expires-at <isoDate>", "Optional entitlement expiry timestamp")
     .option("--json", "Output as JSON")

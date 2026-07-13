@@ -1257,7 +1257,7 @@ async function renderHome() {
           <div class="studio-terminal-line"><strong>Gateway</strong><span>${htmlEscape(status.studio?.gatewayPort || "-")}</span></div>
           <div class="studio-terminal-line"><strong>ToolHub/API</strong><span>${htmlEscape(status.studio?.apiPort || "-")}</span></div>
           <div class="studio-terminal-line"><strong>Vault</strong><span>${htmlEscape(vaultState)}</span></div>
-          <div class="studio-terminal-line"><strong>Industry Packs</strong><span>$9.99/month</span></div>
+          <div class="studio-terminal-line"><strong>Industry Packs</strong><span>planned tier · checkout not live</span></div>
         </div>
       </div>
     </section>
@@ -2185,6 +2185,7 @@ async function renderIndustryPacks() {
   const entitlement = response.entitlement || {};
   const packs = response.packs || [];
   const locked = !entitlement.active;
+  const checkoutAvailable = entitlement.checkoutAvailable === true;
   root.innerHTML = `
     ${card("Industry Packs", `
       <div class="grid">
@@ -2194,21 +2195,23 @@ async function renderIndustryPacks() {
         </div>
         <div>
           <div class="muted">Plan</div>
-          <div class="tile-value">$${htmlEscape(entitlement.priceUsdMonthly || "9.99")}/mo</div>
+          <div class="tile-value">planned $${htmlEscape(entitlement.priceUsdMonthly || "9.99")}/mo</div>
         </div>
       </div>
       ${locked ? `
-        <p class="muted">$${htmlEscape(entitlement.priceUsdMonthly || "9.99")}/month unlocks all 41 Industry Domain Packs.</p>
+        <p class="muted">${checkoutAvailable
+          ? `$${htmlEscape(entitlement.priceUsdMonthly || "9.99")}/month for all 41 Industry Domain Packs.`
+          : "Public checkout and automatic license issuance are not live yet. Do not send payment based on this preview."}</p>
         <div class="row">
-          <button id="industryCheckout">Open checkout</button>
-          <a class="button secondary" href="${htmlEscape(entitlement.checkoutUrl || "https://agentmaturity.co/pricing#industry-packs")}" target="_blank" rel="noopener">Pricing</a>
+          ${checkoutAvailable ? `<button id="industryCheckout">Open verified checkout</button>` : ""}
+          <a class="button secondary" href="https://github.com/AgentMaturity/AgentMaturityCompass/discussions" target="_blank" rel="noopener">Launch status</a>
         </div>
         <div class="form-row">
           <label for="industryLicenseKey">License key</label>
           <input id="industryLicenseKey" placeholder="AMC-INDUSTRY-PACKS..." autocomplete="off" />
         </div>
         <button id="industryActivate" class="secondary">Activate access</button>
-        <p class="muted">After purchase, paste the license key here or run <code>amc domain pack activate --key &lt;license-key&gt;</code>.</p>
+        <p class="muted">If an authorized AMC operator has already issued a valid key, paste it here or run <code>amc domain pack activate --key &lt;license-key&gt;</code>.</p>
       ` : `<p class="status-ok">All 41 Industry Domain Packs are unlocked.</p>`}
     `)}
     ${card("Pack Catalog", `<div id="industryPackRows" class="scroll"></div><pre id="industryPackOut" class="muted"></pre>`)}
@@ -2253,7 +2256,9 @@ async function renderIndustryPacks() {
     button.addEventListener("click", async () => {
       const id = button.getAttribute("data-industry-pack");
       if (locked) {
-        out.textContent = `Industry Packs are locked. $${entitlement.priceUsdMonthly || "9.99"}/month unlocks all 41 packs.\n${entitlement.checkoutUrl || ""}`;
+        out.textContent = checkoutAvailable
+          ? `Industry Packs are locked. Use the verified checkout for the planned $${entitlement.priceUsdMonthly || "9.99"}/month tier.\n${entitlement.checkoutUrl || ""}`
+          : "Industry Packs are locked. Public checkout and automatic license issuance are not live yet.";
         return;
       }
       const detail = await apiGet(`/industry-packs/${encodeURIComponent(id)}`);

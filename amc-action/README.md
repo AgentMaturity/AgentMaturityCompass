@@ -2,7 +2,7 @@
 
 > Run AMC eval on every PR. Post results as a comment. Fail on score drops. Upload artifacts.
 
-[![GitHub Marketplace](https://img.shields.io/badge/Marketplace-AMC%20Score-blue?logo=github)](https://github.com/marketplace/actions/amc-score-agent-maturity-compass)
+> **Preview boundary:** this composite action is repository source, not a verified GitHub Marketplace listing. Pin a reviewed commit when testing it; do not use `@main` as a production trust boundary.
 
 ## Quick Start
 
@@ -25,7 +25,8 @@ jobs:
         with:
           fetch-depth: 0
 
-      - uses: AgentMaturity/AgentMaturityCompass/amc-action@main
+      # Replace <reviewed-commit-sha> with an immutable revision you reviewed.
+      - uses: AgentMaturity/AgentMaturityCompass/amc-action@<reviewed-commit-sha>
         with:
           target-level: '3'
 ```
@@ -40,7 +41,7 @@ jobs:
 | `comment` | `true` | Post/update PR comment with results |
 | `upload-artifacts` | `true` | Upload result JSON + badge as artifacts |
 | `node-version` | `20` | Node.js version |
-| `amc-version` | `latest` | `agent-maturity-compass` npm version |
+| `amc-version` | `1.1.1` | Verified GitHub Release version; `local` builds the action checkout. npm is not a live channel. |
 | `working-directory` | `.` | Directory to run AMC in |
 
 ## Outputs
@@ -63,7 +64,7 @@ jobs:
 ## Advanced: Use Outputs in Downstream Steps
 
 ```yaml
-- uses: AgentMaturity/AgentMaturityCompass/amc-action@main
+- uses: AgentMaturity/AgentMaturityCompass/amc-action@<reviewed-commit-sha>
   id: amc
   with:
     target-level: '2'
@@ -74,7 +75,7 @@ jobs:
 ## Advanced: Score-Drop Protection
 
 ```yaml
-- uses: AgentMaturity/AgentMaturityCompass/amc-action@main
+- uses: AgentMaturity/AgentMaturityCompass/amc-action@<reviewed-commit-sha>
   with:
     fail-on-drop: 'true'
     target-level: '3'

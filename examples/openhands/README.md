@@ -11,7 +11,7 @@ Score OpenHands (formerly OpenDevin) coding agent sessions with AMC evidence col
 ## Prerequisites
 
 - OpenHands installed ([github.com/All-Hands-AI/OpenHands](https://github.com/All-Hands-AI/OpenHands))
-- AMC CLI installed (`npm i -g agent-maturity-compass`)
+- AMC CLI installed with the checksum-verified GitHub Release installer (npm is not public yet; see the root README)
 - An OpenAI API key
 
 ## Quick Start

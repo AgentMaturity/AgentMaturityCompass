@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { pluginIdSchema, pluginVersionSchema } from "./pluginIdentifiers.js";
 import { pluginRegistryTypeSchema, pluginRiskCategorySchema } from "./pluginTypes.js";
 
 export const pluginRegistryConfigSchema = z.object({
@@ -28,11 +29,11 @@ export const pluginRegistryIndexSchema = z.object({
   }),
   plugins: z.array(
     z.object({
-      id: z.string().min(1),
+      id: pluginIdSchema,
       versions: z
         .array(
           z.object({
-            version: z.string().min(1),
+            version: pluginVersionSchema,
             sha256: z.string().length(64),
             url: z.string().min(1),
             publisherFingerprint: z.string().length(64),
@@ -56,8 +57,8 @@ export const installedPluginsLockSchema = z.object({
   updatedTs: z.number().int(),
   installed: z.array(
     z.object({
-      id: z.string().min(1),
-      version: z.string().min(1),
+      id: pluginIdSchema,
+      version: pluginVersionSchema,
       sha256: z.string().length(64),
       registryFingerprint: z.string().length(64),
       publisherFingerprint: z.string().length(64),

@@ -5,7 +5,7 @@ A minimal example showing how to score an AI agent with AMC in under 5 minutes.
 ## Prerequisites
 
 - Node.js ≥ 20
-- AMC installed: `npm i -g agent-maturity-compass`
+- AMC installed with the checksum-verified GitHub Release installer (npm is not public yet; see the root README)
 
 ## Quick Start
 

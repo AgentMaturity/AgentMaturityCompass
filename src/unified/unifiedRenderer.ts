@@ -75,6 +75,7 @@ export function renderUnifiedResult(result: UnifiedRunResult, opts?: { ci?: bool
   lines.push(`  ${"─".repeat(W)}`);
   const overallColor = gradeColor(result.overallGrade);
   lines.push(`  ${BOLD}${WHITE}Overall Grade:${RESET}  ${overallColor}${BOLD}${result.overallGrade}${RESET}  ${DIM}(${result.overallScore}/100)${RESET}`);
+  lines.push(`  ${BOLD}${WHITE}Surface coverage:${RESET} ${result.surfaceCoverage.evaluated}/${result.surfaceCoverage.total} evaluated${result.surfaceCoverage.pending.length > 0 ? `; ${result.surfaceCoverage.pending.length} pending` : ""}${result.surfaceCoverage.failed.length > 0 ? `; ${RED}${result.surfaceCoverage.failed.length} failed${RESET}` : ""}`);
   lines.push(`  ${"─".repeat(W)}`);
   lines.push("");
 
@@ -132,6 +133,10 @@ export function renderCIAnnotations(result: UnifiedRunResult): string {
     }
   }
 
+  if (result.surfaceCoverage.failed.length > 0) {
+    lines.push(`::error title=AMC Failed Surfaces::${result.surfaceCoverage.failed.join(", ")}`);
+  }
+  lines.push(`::notice title=AMC Surface Coverage::${result.surfaceCoverage.evaluated}/${result.surfaceCoverage.total} evaluated; ${result.surfaceCoverage.pending.length} pending`);
   lines.push(`::notice title=AMC Overall Grade::${result.overallGrade} (${result.overallScore}/100)`);
   return lines.join("\n");
 }

@@ -1,0 +1,36 @@
+{
+  "schemaVersion": "amc.publication-status.v1",
+  "asOf": "2026-07-13",
+  "sourceRevision": "278a4145013994afe7d449ca94d3a12b81503f76",
+  "channels": {
+    "website": {
+      "status": "live",
+      "evidence": "https://agentmaturity.co/ returned HTTP 200 and content-manifest.json reported sourceRevision 278a4145013994afe7d449ca94d3a12b81503f76."
+    },
+    "githubRelease": {
+      "status": "live",
+      "evidence": "GitHub Release v1.1.1 is public with SHA256SUMS and macOS, Windows, Linux, npm-tarball, and experimental SEA assets; it predates sourceRevision."
+    },
+    "desktopArchives": {
+      "status": "live_stale",
+      "evidence": "Public v1.1.1 macOS universal and Windows x64 archives exist, but they do not include post-v1.1.1 main-branch changes."
+    },
+    "npm": {
+      "status": "not_live",
+      "evidence": "https://registry.npmjs.org/agent-maturity-compass returned HTTP 404 on 2026-07-13; the npm Publish workflow passed tests but skipped publication."
+    },
+    "homebrew": {
+      "status": "not_live",
+      "evidence": "The advertised Homebrew formula repository path returned HTTP 404 on 2026-07-13."
+    },
+    "industryPacksCheckout": {
+      "status": "not_live",
+      "evidence": "https://agentmaturity.co/pricing and /api/industry-packs/checkout returned HTTP 404 on 2026-07-13, and no verified public checkout URL is configured."
+    },
+    "containerRegistry": {
+      "status": "unverified",
+      "evidence": "No anonymous public image pull was verified during the 2026-07-13 readiness audit."
+    }
+  },
+  "claimBoundary": "A green CI workflow or GitHub Release is not evidence that npm, Homebrew, paid checkout, container images, or the latest source revision are publicly distributed."
+}

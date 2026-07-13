@@ -16,7 +16,7 @@ body:
       label: Steps to reproduce
       description: Minimal steps to reproduce the behavior
       value: |
-        1. Install AMC: `npm i -g agent-maturity-compass`
+        1. Install AMC with the checksum-verified GitHub Release installer from the README.
         2. Run: `amc ...`
         3. See error
     validations:

@@ -309,20 +309,61 @@ export function upsertIdentityUser(params: {
   if (!email) {
     throw new Error("email is required");
   }
+  const providerId = params.providerId?.trim() || null;
+  const subject = params.subject?.trim() || null;
+  const externalId = params.externalId?.trim() || null;
+  if ((params.authType === "OIDC" || params.authType === "SAML") && (!providerId || !subject)) {
+    throw new Error(`${params.authType} identity requires providerId and subject`);
+  }
   const now = Date.now();
   const handle = openHostDb(params.hostDir);
   try {
-    const existing = handle.db
-      .prepare(
-        `SELECT user_id AS userId, username, disabled, is_host_admin AS isHostAdmin
-         FROM users
-         WHERE username_lc = ? OR (provider_id IS NOT NULL AND provider_id = ? AND subject IS NOT NULL AND subject = ?)
-         LIMIT 1`
-      )
-      .get(username, params.providerId ?? "", params.subject ?? "") as
-      | { userId: string; username: string; disabled: number; isHostAdmin: number }
-      | undefined;
+    type IdentityRow = {
+      userId: string;
+      username: string;
+      disabled: number;
+      isHostAdmin: number;
+      authType: IdentityAuthType;
+      providerId: string | null;
+      subject: string | null;
+      externalId: string | null;
+    };
+    const select = `SELECT user_id AS userId, username, disabled, is_host_admin AS isHostAdmin,
+                           auth_type AS authType, provider_id AS providerId, subject,
+                           external_id AS externalId
+                    FROM users`;
+    let existing: IdentityRow | undefined;
+    if (providerId && subject) {
+      existing = handle.db
+        .prepare(`${select} WHERE provider_id = ? AND subject = ? LIMIT 1`)
+        .get(providerId, subject) as IdentityRow | undefined;
+    } else if (params.authType === "SCIM" && externalId) {
+      existing = handle.db
+        .prepare(`${select} WHERE external_id = ? LIMIT 1`)
+        .get(externalId) as IdentityRow | undefined;
+    }
+
+    const usernameOwner = handle.db
+      .prepare(`${select} WHERE username_lc = ? LIMIT 1`)
+      .get(username) as IdentityRow | undefined;
+    if (!existing && params.authType === "SCIM" && usernameOwner?.authType === "SCIM") {
+      existing = usernameOwner;
+    }
+    if (usernameOwner && usernameOwner.userId !== existing?.userId) {
+      throw new Error(
+        `identity username collision: ${params.username.trim()} already belongs to another account; explicit account linking is required`,
+      );
+    }
     if (existing) {
+      if ((params.authType === "OIDC" || params.authType === "SAML")
+        && (
+          existing.authType !== params.authType
+          || existing.providerId !== providerId
+          || existing.subject !== subject
+        )) {
+        throw new Error("federated identity binding mismatch");
+      }
+      const nextExternalId = params.externalId === undefined ? existing.externalId : externalId;
       handle.db
         .prepare(
           `UPDATE users
@@ -348,11 +389,11 @@ export function upsertIdentityUser(params: {
           email,
           params.displayName ?? null,
           params.authType,
-          params.providerId ?? null,
-          params.subject ?? null,
-          params.externalId ?? null,
+          providerId,
+          subject,
+          nextExternalId,
           params.disabled ? 1 : 0,
-          params.isHostAdmin ? 1 : existing.isHostAdmin,
+          params.isHostAdmin ? 1 : 0,
           hashHostPassword(randomUUID()),
           existing.userId
         );
@@ -360,7 +401,7 @@ export function upsertIdentityUser(params: {
         userId: existing.userId,
         username: params.username.trim(),
         email,
-        isHostAdmin: params.isHostAdmin ? true : existing.isHostAdmin === 1,
+        isHostAdmin: Boolean(params.isHostAdmin),
         disabled: Boolean(params.disabled)
       };
     }
@@ -382,11 +423,11 @@ export function upsertIdentityUser(params: {
         params.disabled ? 1 : 0,
         params.isHostAdmin ? 1 : 0,
         params.authType,
-        params.providerId ?? null,
-        params.subject ?? null,
+        providerId,
+        subject,
         email,
         params.displayName ?? null,
-        params.externalId ?? null
+        externalId
       );
     return {
       userId,

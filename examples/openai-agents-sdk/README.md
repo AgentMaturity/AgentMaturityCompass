@@ -11,7 +11,7 @@ An OpenAI Agents SDK app with tool use, routed through the AMC Gateway.
 ## Prerequisites
 
 - Python ≥ 3.10
-- AMC CLI installed (`npm i -g agent-maturity-compass`)
+- AMC CLI installed with the checksum-verified GitHub Release installer (npm is not public yet; see the root README)
 - An OpenAI API key
 
 ## Install

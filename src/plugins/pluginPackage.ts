@@ -22,6 +22,20 @@ import {
   verifyPluginManifestSignature
 } from "./pluginSigner.js";
 import type { PluginArtifactKind } from "./pluginTypes.js";
+import {
+  assertSafeTarMemberPath,
+  extractValidatedTarGzipArchive,
+  inspectTarGzipArchive,
+  type TarArchiveLimits,
+} from "../security/safeTarArchive.js";
+
+const PLUGIN_ARCHIVE_LIMITS: TarArchiveLimits = {
+  maxEntries: 10_000,
+  maxCompressedBytes: 128 * 1024 * 1024,
+  maxEntryBytes: 128 * 1024 * 1024,
+  maxTotalBytes: 512 * 1024 * 1024,
+  maxPathBytes: 1024,
+};
 
 function cleanupDir(path: string): void {
   if (pathExists(path)) {
@@ -38,11 +52,25 @@ function tarCreate(sourceDir: string, outFile: string): void {
   }
 }
 
+export function assertSafePluginArchiveMember(rawPath: string): string {
+  return assertSafeTarMemberPath({
+    rawPath,
+    label: "plugin archive",
+    maxPathBytes: PLUGIN_ARCHIVE_LIMITS.maxPathBytes,
+  });
+}
+
+function validatePluginArchive(file: string): void {
+  inspectTarGzipArchive({ file, label: "plugin archive", limits: PLUGIN_ARCHIVE_LIMITS });
+}
+
 function tarExtract(bundleFile: string, outDir: string): void {
-  const out = spawnSync("tar", ["-xzf", bundleFile, "-C", outDir], { encoding: "utf8" });
-  if (out.status !== 0) {
-    throw new Error(`failed to extract plugin archive: ${(`${out.stdout ?? ""}${out.stderr ?? ""}`).trim()}`);
-  }
+  extractValidatedTarGzipArchive({
+    file: bundleFile,
+    destination: outDir,
+    label: "plugin archive",
+    limits: PLUGIN_ARCHIVE_LIMITS,
+  });
 }
 
 function resolvePluginRoot(dir: string): string {

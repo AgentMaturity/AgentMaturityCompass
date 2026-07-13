@@ -1,12 +1,13 @@
 import { z } from "zod";
+import { pluginArtifactPathSchema, pluginIdSchema, pluginVersionSchema } from "./pluginIdentifiers.js";
 import { pluginArtifactKindSchema, pluginRiskCategorySchema } from "./pluginTypes.js";
 
 export const pluginManifestSchema = z.object({
   v: z.literal(1),
   plugin: z.object({
-    id: z.string().min(1),
+    id: pluginIdSchema,
     name: z.string().min(1),
-    version: z.string().min(1),
+    version: pluginVersionSchema,
     description: z.string().min(1),
     publisher: z.object({
       org: z.string().min(1),
@@ -48,7 +49,7 @@ export const pluginManifestSchema = z.object({
   }),
   artifacts: z.array(
     z.object({
-      path: z.string().min(1),
+      path: pluginArtifactPathSchema,
       sha256: z.string().length(64),
       bytes: z.number().int().nonnegative(),
       kind: pluginArtifactKindSchema

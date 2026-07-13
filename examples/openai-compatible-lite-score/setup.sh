@@ -2,5 +2,5 @@
 set -euo pipefail
 
 echo "No framework install required for the lite-score starter."
-echo "Make sure AMC CLI is installed: npm i -g agent-maturity-compass"
+echo "Install AMC with the checksum-verified GitHub Release installer from the repository README."
 echo "Then run: ./run.sh"

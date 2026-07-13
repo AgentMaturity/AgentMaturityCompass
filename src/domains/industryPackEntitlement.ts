@@ -30,6 +30,7 @@ export interface IndustryPackEntitlement {
   source: "env" | "file" | "none";
   planId: string;
   priceUsdMonthly: string;
+  checkoutAvailable: boolean;
   checkoutUrl: string;
   expiresAt: string | null;
   customerId?: string;
@@ -78,10 +79,10 @@ function isTruthy(value: string | undefined): boolean {
   return new Set(["1", "true", "yes", "on"]).has(value.trim().toLowerCase());
 }
 
-function checkoutUrl(env: NodeJS.ProcessEnv): string {
+function configuredCheckoutUrl(env: NodeJS.ProcessEnv): string | null {
   return env.AMC_INDUSTRY_PACKS_CHECKOUT_URL
     ?? env.AMC_DOMAIN_PACKS_CHECKOUT_URL
-    ?? INDUSTRY_PACKS_DEFAULT_CHECKOUT_URL;
+    ?? null;
 }
 
 function licenseSecret(env: NodeJS.ProcessEnv): string | null {
@@ -115,8 +116,23 @@ function isNotExpired(expiresAt: string | null | undefined, now = Date.now()): b
   return Number.isFinite(ts) && ts > now;
 }
 
-export function validLegacyIndustryPackLicenseKey(value: string): boolean {
+function isLegacyIndustryPackLicenseKey(value: string): boolean {
   return /^AMC-(INDUSTRY|DOMAIN)-PACKS-[A-Z0-9_-]{8,}$/i.test(value.trim());
+}
+
+export function validLegacyIndustryPackLicenseKey(
+  value: string,
+  env: NodeJS.ProcessEnv = process.env,
+): boolean {
+  if (!isLegacyIndustryPackLicenseKey(value)) {
+    return false;
+  }
+  const digest = sha256Hex(value.trim());
+  const allowlist = (env.AMC_INDUSTRY_PACKS_LEGACY_KEY_SHA256_ALLOWLIST ?? "")
+    .split(",")
+    .map((entry) => entry.trim().toLowerCase())
+    .filter((entry) => /^[a-f0-9]{64}$/.test(entry));
+  return allowlist.some((allowedDigest) => constantTimeEqual(allowedDigest, digest));
 }
 
 function base64UrlJson(value: unknown): string {
@@ -189,8 +205,15 @@ export function verifyIndustryPackLicenseKey(
   now = Date.now()
 ): { valid: boolean; payload: IndustryPackLicensePayload | null; reason?: string } {
   const key = licenseKey.trim();
-  if (validLegacyIndustryPackLicenseKey(key)) {
+  if (validLegacyIndustryPackLicenseKey(key, env)) {
     return { valid: true, payload: null };
+  }
+  if (isLegacyIndustryPackLicenseKey(key)) {
+    return {
+      valid: false,
+      payload: null,
+      reason: "legacy license key is not in the operator SHA-256 allowlist",
+    };
   }
   const [prefix, payloadPart, signaturePart] = key.split(".");
   if (prefix !== INDUSTRY_PACKS_LICENSE_PREFIX || !payloadPart || !signaturePart) {
@@ -230,7 +253,12 @@ export function buildIndustryPackCheckoutUrl(params: {
   env?: NodeJS.ProcessEnv;
 } = {}): string {
   const env = params.env ?? process.env;
-  const raw = checkoutUrl(env);
+  const raw = configuredCheckoutUrl(env);
+  if (!raw) {
+    throw new Error(
+      "Industry Packs checkout is not configured or publicly available yet. Set AMC_INDUSTRY_PACKS_CHECKOUT_URL only after a live checkout has been verified.",
+    );
+  }
   let parsed: URL;
   try {
     parsed = new URL(raw);
@@ -250,11 +278,12 @@ export function getIndustryPackEntitlement(
   workspace = process.cwd(),
   env: NodeJS.ProcessEnv = process.env
 ): IndustryPackEntitlement {
-  const url = checkoutUrl(env);
+  const configuredUrl = configuredCheckoutUrl(env);
   const base = {
     planId: INDUSTRY_PACKS_PLAN_ID,
     priceUsdMonthly: INDUSTRY_PACKS_MONTHLY_PRICE_USD,
-    checkoutUrl: url,
+    checkoutAvailable: Boolean(configuredUrl),
+    checkoutUrl: configuredUrl ?? INDUSTRY_PACKS_DEFAULT_CHECKOUT_URL,
     expiresAt: null as string | null
   };
 
@@ -306,16 +335,22 @@ export function getIndustryPackEntitlement(
     ...base,
     active: false,
     source: "none",
-    message: `Industry Packs require the $${INDUSTRY_PACKS_MONTHLY_PRICE_USD}/month Industry Packs subscription.`
+    message: configuredUrl
+      ? `Industry Packs require the planned $${INDUSTRY_PACKS_MONTHLY_PRICE_USD}/month Industry Packs subscription.`
+      : "Industry Packs commercial checkout is planned but not publicly available or configured yet."
   };
 }
 
 export function formatIndustryPackPaywallMessage(entitlement: IndustryPackEntitlement): string {
   return [
     `Industry Packs are locked.`,
-    `$${entitlement.priceUsdMonthly}/month unlocks all ${INDUSTRY_PACKS_PUBLIC_COUNT} Industry Domain Packs.`,
-    `Subscribe: ${entitlement.checkoutUrl}`,
-    `After purchase, run: amc domain pack activate --key <license-key>`
+    `The planned commercial tier is $${entitlement.priceUsdMonthly}/month for all ${INDUSTRY_PACKS_PUBLIC_COUNT} Industry Domain Packs.`,
+    entitlement.checkoutAvailable
+      ? `Verified checkout: ${entitlement.checkoutUrl}`
+      : "Public checkout and automatic license issuance are not live yet.",
+    entitlement.checkoutAvailable
+      ? "After purchase, run: amc domain pack activate --key <license-key>"
+      : "Do not send payment or expect a license until AMC marks this channel live."
   ].join("\n");
 }
 
@@ -369,7 +404,7 @@ export async function activateIndustryPackAccessOnline(params: {
 }): Promise<IndustryPackEntitlement> {
   const key = params.licenseKey.trim();
   const local = verifyIndustryPackLicenseKey(key);
-  if (local.valid || validLegacyIndustryPackLicenseKey(key)) {
+  if (local.valid) {
     return activateIndustryPackAccess(params);
   }
   const verifyUrl = params.verifyUrl ?? process.env.AMC_INDUSTRY_PACKS_VERIFY_URL ?? INDUSTRY_PACKS_DEFAULT_VERIFY_URL;
@@ -424,7 +459,9 @@ export function toIndustryPackCatalogItem(
     locked: !unlocked,
     description: unlocked
       ? pack.description
-      : "Subscribe to Industry Packs to access sector diagnostics, regulatory mappings, scoring, and apply actions.",
+      : entitlement.checkoutAvailable
+        ? "Use the verified Industry Packs checkout to access sector diagnostics, regulatory mappings, scoring, and apply actions."
+        : "Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.",
     regulatoryBasis: unlocked ? pack.regulatoryBasis : undefined,
     complianceFrameworks: unlocked ? pack.complianceFrameworks : undefined
   };
