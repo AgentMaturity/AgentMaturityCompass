@@ -62,6 +62,8 @@ amc connect hooks lifecycle --agent my-agent --action <action-id>
 
 This Watch projection verifies the immutable request, optional decision, and terminal receipts under one action ID. It separates the requested outcome, provider wire decision, effective outcome, and capability mapping. A steered action is still blocked; execution under that same action ID fails closed. Missing, duplicate, conflicting, cross-agent, out-of-order, or tampered evidence fails closed. Raw tool input, output, and provider error messages are not retained.
 
+For supported shell input, control mode performs one compound-command blast-radius review over every bounded segment through the existing signed ToolHub, Action Policy, Approval Policy, budget, freeze, maturity, and assurance controls. The most restrictive segment determines the provider outcome. Unsupported shell expansion, malformed syntax, excess bounds, or untrusted signed authority fails closed with no partial step decisions. Receipts retain only canonical tool names, action classes, connectors, outcomes, reason codes, and aggregate counts; the raw command and argument values are never stored.
+
 Configure as default for an agent:
 
 ```bash

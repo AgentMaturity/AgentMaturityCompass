@@ -53,6 +53,8 @@ amc connect hooks lifecycle --agent my-agent --action <action-id>
 
 The projection joins immutable receipts by agent and stable action ID. A verified Claude steer means the current call was denied with bounded corrective context; any retry must use a new action ID and pass every AMC control again. Gemini maps a requested steer to a lossy hard deny and is never labeled steered. The projection fails closed on a missing or duplicate request, invalid decision mapping, ambiguous terminal correlation, conflicting decision or terminal state, execution after denial, cross-agent collision, impossible order, receipt mismatch, or ledger tamper. Gemini CLI exposes no general provider call ID, so AMC resolves an `AfterTool` event only when exactly one unmatched hash-only request correlation exists.
 
+Supported shell calls also receive a compound-command blast-radius review. AMC parses a bounded quote-aware subset, maps every segment to an existing ToolHub tool, evaluates every segment against the same signed controls, and returns the most restrictive outcome. Substitution, redirection, grouping, background execution, unquoted pathname expansion, malformed separators, and exceeded bounds fail closed before partial policy output. The signed review excludes the raw command and argument values.
+
 No adapter receipt claims AEP conformance. AMC does not copy AEP mappings, Agent Control SDKs, provider payloads, prompts, tool arguments, or upstream implementation details.
 
 ## Custom Adapters

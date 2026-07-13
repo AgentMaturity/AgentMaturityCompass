@@ -14,7 +14,7 @@
   <a href="https://github.com/AgentMaturity/AgentMaturityCompass/releases"><img src="https://img.shields.io/github/v/release/AgentMaturity/AgentMaturityCompass?labelColor=0a0a0a&color=4AEF79&label=release" alt="GitHub release" /></a>
   <a href="https://github.com/AgentMaturity/AgentMaturityCompass/releases"><img src="https://img.shields.io/github/downloads/AgentMaturity/AgentMaturityCompass/total?labelColor=0a0a0a&color=4AEF79&label=downloads" alt="verified release downloads" /></a>
   <a href="https://github.com/AgentMaturity/AgentMaturityCompass/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/AgentMaturity/AgentMaturityCompass/ci.yml?branch=main&labelColor=0a0a0a&color=4AEF79&label=CI" alt="CI" /></a>
-  <a href="https://github.com/AgentMaturity/AgentMaturityCompass/actions/workflows/ci.yml"><img src="https://img.shields.io/badge/tests-8%2C544%20passing-4AEF79?labelColor=0a0a0a" alt="tests" /></a>
+  <a href="https://github.com/AgentMaturity/AgentMaturityCompass/actions/workflows/ci.yml"><img src="https://img.shields.io/badge/tests-8%2C554%20passing-4AEF79?labelColor=0a0a0a" alt="tests" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-4AEF79?labelColor=0a0a0a" alt="MIT" /></a>
 </p>
 
@@ -642,6 +642,8 @@ amc adapters capabilities --agent my-agent --adapter claude-cli --out adapter-ca
 
 Claude Code receipts can verify allow/deny/ask and bounded corrective steer only with a valid signed control hook. Steer blocks the current call, rewrites no input, and requires a new fully governed action for retry. Gemini CLI receipts expose allow/deny and explicitly record that ask or requested steer degrades to a lossy deny. Metadata-only plugin adapters fail closed instead of inheriting a compatibility claim.
 
+For supported shell input, the same hook performs a compound-command blast-radius review across every bounded segment and applies the most restrictive result. Unsupported expansion or syntax fails closed before partial policy output. Signed evidence keeps only action classes, canonical tool names, outcomes, reason codes, and counts; the raw command and argument values are never retained.
+
 > [Full adapter docs](docs/ADAPTERS.md)
 
 ---
@@ -838,7 +840,7 @@ AMC is MIT licensed. We welcome contributions — especially new **assurance pac
 
 ```bash
 git clone https://github.com/AgentMaturity/AgentMaturityCompass.git
-cd AgentMaturityCompass && npm ci && npm test   # 1,078 files / 8,544 passing Vitest tests
+cd AgentMaturityCompass && npm ci && npm test   # 1,079 files / 8,554 passing Vitest tests
 ```
 
 **→ [CONTRIBUTING.md](CONTRIBUTING.md)** — includes guides for writing packs, mapping research papers, and adding adapters.

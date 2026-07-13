@@ -27,7 +27,7 @@ git clone https://github.com/AgentMaturity/AgentMaturityCompass.git
 cd AgentMaturityCompass
 npm ci
 npm run build     # must compile with 0 TypeScript errors
-npm test          # 8,544 passing Vitest tests, all must pass in CI
+npm test          # 8,554 passing Vitest tests, all must pass in CI
 ```
 
 **Python platform:**

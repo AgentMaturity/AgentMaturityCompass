@@ -2581,7 +2581,11 @@ paths:
         Loopback-only AMC control route for an explicitly installed control hook. Raw provider
         input is evaluated in memory and not retained. Existing signed ToolHub, Action Policy,
         Approval Policy, budget, freeze, maturity, and assurance state remains authoritative.
-        The exact provider-native response is bound to a signed guard_check receipt.
+        Supported shell input receives a compound-command blast-radius review across every
+        bounded segment, and the most restrictive outcome determines the response. Unsupported
+        expansion, malformed syntax, excess bounds, or untrusted authority fails closed before
+        partial policy output. The exact provider-native response and privacy-safe review are
+        bound to a signed guard_check receipt; the raw command and argument values are not retained.
       servers:
         - url: http://127.0.0.1:3212
           description: Local AMC Bridge only

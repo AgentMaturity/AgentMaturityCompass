@@ -219,8 +219,9 @@ export function pathAllowedByPatterns(workspace: string, candidatePath: string, 
     return { ok: false, reason: "access to .amc/vault paths is always denied", resolvedPath };
   }
 
-  const rel = normalize(relative(workspace, resolvedPath)).replace(/\\/g, "/");
-  const relWithDot = rel.startsWith(".") ? rel : `./${rel}`;
+  const relativePath = relative(workspace, resolvedPath);
+  const rel = relativePath ? normalize(relativePath).replace(/\\/g, "/") : "";
+  const relWithDot = rel ? (rel.startsWith(".") ? rel : `./${rel}`) : "./";
 
   if (allow.length > 0) {
     const allowed = allow.some((pattern) => globToRegex(normalizePattern(pattern)).test(relWithDot));

@@ -24,7 +24,14 @@ import type { ActionClass, RiskTier, RuntimeName } from "../types.js";
 import { sha256Hex } from "../utils/hash.js";
 import { redactBridgeText } from "./bridgeRedaction.js";
 import { verifyActionPolicySignature } from "../governor/actionPolicyEngine.js";
+import { ACTION_CLASSES } from "../governor/actionCatalog.js";
 import { resolveProviderHookRequestIdentity } from "./hookActionIdentity.js";
+import {
+  parseShellCommandPlan,
+  type ShellCommandConnector,
+  type ShellCommandPlan,
+  type ShellCommandSegment,
+} from "../enforce/shellCommandPlan.js";
 
 export const CONTROL_HOOK_PATH = "/bridge/hooks/control/v1";
 export const CONTROL_HOOK_ROUTE = "/hooks/control/v1";
@@ -35,6 +42,43 @@ export type HookControlDecision = "allow" | "deny" | "ask";
 export type HookControlOutcome = HookControlDecision | "steer";
 export type HookControlProviderMapping = "native" | "corrective_deny" | "fail_closed_deny";
 export type ProviderControlResponse = Record<string, unknown>;
+
+export type CompoundCommandBlastRadiusReasonCode =
+  | "SIGNED_AUTHORITY_UNTRUSTED"
+  | "COMMAND_PLAN_INVALID"
+  | "TOOL_NOT_ALLOWED"
+  | "TOOL_ARGUMENTS_REJECTED"
+  | "ACTION_POLICY_DENIED"
+  | "APPROVAL_QUORUM_UNSUPPORTED"
+  | "APPROVAL_REQUIRED"
+  | "POLICY_ALLOW"
+  | "CONTROL_EVALUATION_FAILED";
+
+export interface CompoundCommandBlastRadiusStep {
+  index: number;
+  connector: ShellCommandConnector;
+  canonicalToolName: string;
+  actionClass: ActionClass | null;
+  outcome: HookControlOutcome;
+  reasonCode: CompoundCommandBlastRadiusReasonCode;
+}
+
+export interface CompoundCommandBlastRadiusReview {
+  schemaVersion: "2026-07-13";
+  parseStatus: "parsed" | "invalid";
+  trustStatus: "verified" | "untrusted";
+  completeEvaluation: boolean;
+  compound: boolean;
+  segmentCount: number;
+  highestActionClass: ActionClass | null;
+  aggregateOutcome: HookControlOutcome;
+  decisiveStepIndex: number | null;
+  outcomeCounts: Record<HookControlOutcome, number>;
+  steps: CompoundCommandBlastRadiusStep[];
+  reasonCodes: string[];
+  rawCommandStored: false;
+  argumentValuesStored: false;
+}
 
 export type HookControlErrorCode =
   | "HOOK_CONTROL_INPUT_INVALID"
@@ -64,6 +108,7 @@ export interface ProviderHookControlResult {
   eventId: string;
   sessionId: string;
   canonicalToolName: string | null;
+  commandBlastRadius: CompoundCommandBlastRadiusReview | null;
   requestedDecision: HookControlOutcome;
   decision: HookControlDecision;
   effectiveOutcome: HookControlOutcome;
@@ -82,8 +127,16 @@ interface NormalizedProviderToolRequest {
   actionId: string;
   providerToolName: string;
   canonicalToolName: string | null;
-  args: Record<string, unknown>;
+  canonicalRequests: CanonicalToolRequest[];
+  commandPlan: ShellCommandPlan | null;
   rawInputSha256: string;
+}
+
+interface CanonicalToolRequest {
+  name: string;
+  args: Record<string, unknown>;
+  segment: ShellCommandSegment | null;
+  argumentsReviewable: boolean;
 }
 
 const SAFE_ID = /^[A-Za-z0-9][A-Za-z0-9._:-]*$/;
@@ -91,6 +144,49 @@ const providerSchema = z.enum(["claude-code", "gemini-cli"]);
 const controlDecisionSchema = z.enum(["allow", "deny", "ask"]);
 const controlOutcomeSchema = z.enum(["allow", "deny", "ask", "steer"]);
 const controlProviderMappingSchema = z.enum(["native", "corrective_deny", "fail_closed_deny"]);
+const actionClassSchema = z.enum(ACTION_CLASSES as [ActionClass, ...ActionClass[]]);
+const shellCommandConnectorSchema = z.enum(["and", "or", "pipe", "sequence", "newline"])
+  .nullable();
+const compoundCommandBlastRadiusReasonCodeSchema = z.enum([
+  "SIGNED_AUTHORITY_UNTRUSTED",
+  "COMMAND_PLAN_INVALID",
+  "TOOL_NOT_ALLOWED",
+  "TOOL_ARGUMENTS_REJECTED",
+  "ACTION_POLICY_DENIED",
+  "APPROVAL_QUORUM_UNSUPPORTED",
+  "APPROVAL_REQUIRED",
+  "POLICY_ALLOW",
+  "CONTROL_EVALUATION_FAILED",
+]);
+const compoundCommandBlastRadiusStepSchema = z.object({
+  index: z.number().int().nonnegative(),
+  connector: shellCommandConnectorSchema,
+  canonicalToolName: z.string().min(1),
+  actionClass: actionClassSchema.nullable(),
+  outcome: controlOutcomeSchema,
+  reasonCode: compoundCommandBlastRadiusReasonCodeSchema,
+}).strict();
+const compoundCommandBlastRadiusReviewSchema = z.object({
+  schemaVersion: z.literal("2026-07-13"),
+  parseStatus: z.enum(["parsed", "invalid"]),
+  trustStatus: z.enum(["verified", "untrusted"]),
+  completeEvaluation: z.boolean(),
+  compound: z.boolean(),
+  segmentCount: z.number().int().nonnegative().max(32),
+  highestActionClass: actionClassSchema.nullable(),
+  aggregateOutcome: controlOutcomeSchema,
+  decisiveStepIndex: z.number().int().nonnegative().max(31).nullable(),
+  outcomeCounts: z.object({
+    allow: z.number().int().nonnegative(),
+    deny: z.number().int().nonnegative(),
+    ask: z.number().int().nonnegative(),
+    steer: z.number().int().nonnegative(),
+  }).strict(),
+  steps: z.array(compoundCommandBlastRadiusStepSchema).max(32),
+  reasonCodes: z.array(z.string().min(1).max(160)).max(64),
+  rawCommandStored: z.literal(false),
+  argumentValuesStored: z.literal(false),
+}).strict();
 const providerHookInputSchema = z.object({
   hook_event_name: z.string().min(1).max(160),
   tool_name: z.string().min(1).max(512),
@@ -156,6 +252,7 @@ const storedControlMetaV2Schema = z.object({
   rawInputSha256: z.string().regex(/^[a-f0-9]{64}$/),
   rawPayloadStored: z.literal(false),
   canonicalToolName: z.string().nullable(),
+  commandBlastRadius: compoundCommandBlastRadiusReviewSchema.nullable().optional(),
   requestedDecision: controlOutcomeSchema,
   decision: controlDecisionSchema,
   effectiveOutcome: controlOutcomeSchema,
@@ -186,6 +283,7 @@ const providerHookControlResultV1Schema = z.object({
   eventId: z.string().min(1),
   sessionId: z.string().min(1),
   canonicalToolName: z.string().nullable(),
+  commandBlastRadius: z.null().optional(),
   requestedDecision: controlDecisionSchema,
   decision: controlDecisionSchema,
   capabilityLossy: z.boolean(),
@@ -201,6 +299,7 @@ const providerHookControlResultV2Schema = providerHookControlResultV1Schema.exte
   requestedDecision: controlOutcomeSchema,
   effectiveOutcome: controlOutcomeSchema,
   providerMapping: controlProviderMappingSchema,
+  commandBlastRadius: compoundCommandBlastRadiusReviewSchema.nullable().optional(),
 }).strict();
 
 const providerHookControlResultSchema = z.union([
@@ -259,8 +358,14 @@ function normalizeLegacyControlFields(value: {
 function normalizeControlResult(
   value: z.infer<typeof providerHookControlResultSchema>,
 ): ProviderHookControlResult {
-  if ("effectiveOutcome" in value && "providerMapping" in value) return value;
-  return { ...value, ...normalizeLegacyControlFields(value) };
+  if ("effectiveOutcome" in value && "providerMapping" in value) {
+    return { ...value, commandBlastRadius: value.commandBlastRadius ?? null };
+  }
+  return {
+    ...value,
+    ...normalizeLegacyControlFields(value),
+    commandBlastRadius: null,
+  };
 }
 
 function parseProvider(provider: unknown): HookProvider {
@@ -357,81 +462,103 @@ function firstString(input: Record<string, unknown>, keys: string[]): string | n
   return null;
 }
 
-function parseSimpleCommand(command: string): { binary: string; argv: string[] } | null {
-  if (!command.trim() || /[\0\r\n;&|`$<>()[\]{}\\]/.test(command)) return null;
-  const args: string[] = [];
-  let current = "";
-  let quote: "'" | "\"" | null = null;
-  for (const char of command.trim()) {
-    if (quote) {
-      if (char === quote) quote = null;
-      else current += char;
-      continue;
-    }
-    if (char === "'" || char === "\"") {
-      quote = char;
-    } else if (/\s/.test(char)) {
-      if (current) {
-        args.push(current);
-        current = "";
-      }
-    } else {
-      current += char;
-    }
+function canonicalShellToolRequest(
+  segment: ShellCommandSegment,
+  workspace: string,
+): CanonicalToolRequest {
+  if (segment.binary === "git") {
+    const firstArgument = segment.argv[0] ?? "";
+    const subcommands = new Set(segment.argv);
+    const name = subcommands.has("push")
+      ? "git.push"
+      : subcommands.has("commit")
+        ? "git.commit"
+        : subcommands.has("status")
+          ? "git.status"
+          : "git.push";
+    return {
+      name,
+      args: { cwd: workspace },
+      segment,
+      argumentsReviewable: !firstArgument.startsWith("-"),
+    };
   }
-  if (quote) return null;
-  if (current) args.push(current);
-  const [binary, ...argv] = args;
-  return binary ? { binary, argv } : null;
+  return {
+    name: "process.spawn",
+    args: { binary: segment.binary, argv: segment.argv },
+    segment,
+    argumentsReviewable: true,
+  };
 }
 
-function canonicalToolRequest(
+function shellCommandForProviderTool(
+  provider: HookProvider,
+  toolName: string,
+  toolInput: Record<string, unknown>,
+): string | null {
+  if (provider === "claude-code" && toolName === "Bash") {
+    return firstString(toolInput, ["command"]) ?? "";
+  }
+  if (provider === "gemini-cli" && toolName === "run_shell_command") {
+    return firstString(toolInput, ["command"]) ?? "";
+  }
+  return null;
+}
+
+function canonicalToolRequests(
   provider: HookProvider,
   toolName: string,
   toolInput: Record<string, unknown>,
   workspace: string,
-): { name: string; args: Record<string, unknown> } | null {
-  if (provider === "claude-code") {
-    if (["Read", "Glob", "Grep"].includes(toolName)) {
-      return {
-        name: "fs.read",
-        args: { path: firstString(toolInput, ["file_path", "path"]) ?? workspace },
-      };
-    }
-    if (["Write", "Edit", "MultiEdit", "NotebookEdit"].includes(toolName)) {
-      const path = firstString(toolInput, ["file_path", "notebook_path", "path"]);
-      return path ? { name: "fs.write", args: { path } } : null;
-    }
-    if (toolName === "Bash") {
-      const parsed = parseSimpleCommand(firstString(toolInput, ["command"]) ?? "");
-      return parsed ? { name: "process.spawn", args: parsed } : null;
-    }
-    if (toolName === "WebFetch") {
-      const url = firstString(toolInput, ["url"]);
-      return url ? { name: "http.fetch", args: { url, method: "GET" } } : null;
-    }
-    return null;
-  }
-
-  if (["read_file", "list_directory", "glob", "search_file_content"].includes(toolName)) {
+): { requests: CanonicalToolRequest[]; commandPlan: ShellCommandPlan | null } {
+  const command = shellCommandForProviderTool(provider, toolName, toolInput);
+  if (command !== null) {
+    const commandPlan = parseShellCommandPlan(command);
     return {
-      name: "fs.read",
-      args: { path: firstString(toolInput, ["file_path", "path", "dir_path"]) ?? workspace },
+      commandPlan,
+      requests: commandPlan.status === "parsed"
+        ? commandPlan.segments.map((segment) => canonicalShellToolRequest(segment, workspace))
+        : [],
     };
   }
-  if (["write_file", "replace"].includes(toolName)) {
+
+  let request: Omit<CanonicalToolRequest, "segment"> | null = null;
+  if (provider === "claude-code") {
+    if (["Read", "Glob", "Grep"].includes(toolName)) {
+      request = {
+        name: "fs.read",
+        args: { path: firstString(toolInput, ["file_path", "path"]) ?? workspace },
+        argumentsReviewable: true,
+      };
+    } else if (["Write", "Edit", "MultiEdit", "NotebookEdit"].includes(toolName)) {
+      const path = firstString(toolInput, ["file_path", "notebook_path", "path"]);
+      request = path ? { name: "fs.write", args: { path }, argumentsReviewable: true } : null;
+    } else if (toolName === "WebFetch") {
+      const url = firstString(toolInput, ["url"]);
+      request = url
+        ? { name: "http.fetch", args: { url, method: "GET" }, argumentsReviewable: true }
+        : null;
+    }
+  } else if (["read_file", "list_directory", "glob", "search_file_content"].includes(toolName)) {
+    request = {
+      name: "fs.read",
+      args: { path: firstString(toolInput, ["file_path", "path", "dir_path"]) ?? workspace },
+      argumentsReviewable: true,
+    };
+  } else if (["write_file", "replace"].includes(toolName)) {
     const path = firstString(toolInput, ["file_path", "path"]);
-    return path ? { name: "fs.write", args: { path } } : null;
-  }
-  if (toolName === "run_shell_command") {
-    const parsed = parseSimpleCommand(firstString(toolInput, ["command"]) ?? "");
-    return parsed ? { name: "process.spawn", args: parsed } : null;
-  }
-  if (toolName === "web_fetch") {
+    request = path ? { name: "fs.write", args: { path }, argumentsReviewable: true } : null;
+  } else if (toolName === "web_fetch") {
     const url = firstString(toolInput, ["url"]);
-    return url ? { name: "http.fetch", args: { url, method: "GET" } } : null;
+    request = url
+      ? { name: "http.fetch", args: { url, method: "GET" }, argumentsReviewable: true }
+      : null;
   }
-  return null;
+
+  return {
+    commandPlan: null,
+    requests: request ? [{ ...request, segment: null }] : [],
+  };
 }
 
 function normalizeProviderRequest(input: {
@@ -458,13 +585,15 @@ function normalizeProviderRequest(input: {
     toolInput: parsed.tool_input,
     rawInputSha256,
   });
-  const mapped = canonicalToolRequest(input.provider, parsed.tool_name, parsed.tool_input, input.workspace);
+  const mapped = canonicalToolRequests(input.provider, parsed.tool_name, parsed.tool_input, input.workspace);
+  const canonicalToolName = mapped.requests.length === 1 ? mapped.requests[0]?.name ?? null : null;
   return {
     provider: input.provider,
     actionId: identity.actionId,
     providerToolName: redactBridgeText(parsed.tool_name).slice(0, 512),
-    canonicalToolName: mapped?.name ?? null,
-    args: mapped?.args ?? {},
+    canonicalToolName,
+    canonicalRequests: mapped.requests,
+    commandPlan: mapped.commandPlan,
     rawInputSha256,
   };
 }
@@ -476,18 +605,208 @@ function riskTierFor(actionClass: ActionClass): RiskTier {
   return "critical";
 }
 
+const OUTCOME_RANK: Record<HookControlOutcome, number> = {
+  allow: 0,
+  ask: 1,
+  steer: 2,
+  deny: 3,
+};
+
+const ACTION_CLASS_RANK: Record<ActionClass, number> = {
+  READ_ONLY: 0,
+  WRITE_LOW: 1,
+  WRITE_HIGH: 2,
+  NETWORK_EXTERNAL: 2,
+  DATA_EXPORT: 3,
+  DEPLOY: 3,
+  SECURITY: 4,
+  FINANCIAL: 4,
+  IDENTITY: 4,
+};
+
+interface EvaluatedControlStep {
+  request: CanonicalToolRequest;
+  actionClass: ActionClass | null;
+  outcome: HookControlOutcome;
+  reason: string;
+  reasonCode: CompoundCommandBlastRadiusReasonCode;
+}
+
+function emptyOutcomeCounts(): Record<HookControlOutcome, number> {
+  return { allow: 0, deny: 0, ask: 0, steer: 0 };
+}
+
+function incompleteCommandReview(input: {
+  plan: ShellCommandPlan;
+  trustStatus: "verified" | "untrusted";
+  reasonCodes: string[];
+}): CompoundCommandBlastRadiusReview {
+  return {
+    schemaVersion: "2026-07-13",
+    parseStatus: input.plan.status,
+    trustStatus: input.trustStatus,
+    completeEvaluation: false,
+    compound: input.plan.compound,
+    segmentCount: input.plan.segments.length,
+    highestActionClass: null,
+    aggregateOutcome: "deny",
+    decisiveStepIndex: null,
+    outcomeCounts: emptyOutcomeCounts(),
+    steps: [],
+    reasonCodes: input.reasonCodes,
+    rawCommandStored: false,
+    argumentValuesStored: false,
+  };
+}
+
+function evaluateCanonicalRequest(input: {
+  workspace: string;
+  agentId: string;
+  request: CanonicalToolRequest;
+  tools: ReturnType<typeof loadToolsConfig>;
+  approvalPolicy: ReturnType<typeof loadApprovalPolicy>;
+}): EvaluatedControlStep {
+  const tool = findToolDefinition(input.tools, input.request.name);
+  if (!tool) {
+    return {
+      request: input.request,
+      actionClass: null,
+      outcome: "deny",
+      reason: `Canonical tool ${input.request.name} is not allowed by signed ToolHub config.`,
+      reasonCode: "TOOL_NOT_ALLOWED",
+    };
+  }
+  if (!input.request.argumentsReviewable) {
+    return {
+      request: input.request,
+      actionClass: tool.actionClass,
+      outcome: "steer",
+      reason: `Signed ToolHub policy cannot verify the current ${tool.name} argument context.`,
+      reasonCode: "TOOL_ARGUMENTS_REJECTED",
+    };
+  }
+  const argsValidation = validateToolRequest({
+    workspace: input.workspace,
+    tool,
+    args: input.request.args,
+  });
+  if (!argsValidation.ok) {
+    return {
+      request: input.request,
+      actionClass: tool.actionClass,
+      outcome: "steer",
+      reason: `Signed ToolHub policy rejected the current ${tool.name} arguments.`,
+      reasonCode: "TOOL_ARGUMENTS_REJECTED",
+    };
+  }
+
+  const governor = runGovernorCheck({
+    workspace: input.workspace,
+    agentId: input.agentId,
+    actionClass: tool.actionClass,
+    riskTier: riskTierFor(tool.actionClass),
+    mode: "EXECUTE",
+  });
+  if (!governor.allowed || governor.effectiveMode !== "EXECUTE") {
+    return {
+      request: input.request,
+      actionClass: tool.actionClass,
+      outcome: "deny",
+      reason: governor.reasons.length > 0
+        ? `Signed Action Policy denied native execution: ${governor.reasons.join(" ")}`
+        : "Signed Action Policy denied native execution.",
+      reasonCode: "ACTION_POLICY_DENIED",
+    };
+  }
+
+  const approvalRule = input.approvalPolicy.approvalPolicy.actionClasses[tool.actionClass];
+  const requiredApprovals = approvalRule?.requiredApprovals ?? 0;
+  if (requiredApprovals > 0) {
+    if (requiredApprovals !== 1 || approvalRule?.requireDistinctUsers === true) {
+      return {
+        request: input.request,
+        actionClass: tool.actionClass,
+        outcome: "deny",
+        reason: `Signed Approval Policy requires ${requiredApprovals} distinct or multi-user approvals and cannot be reduced to one provider-local ask.`,
+        reasonCode: "APPROVAL_QUORUM_UNSUPPORTED",
+      };
+    }
+    return {
+      request: input.request,
+      actionClass: tool.actionClass,
+      outcome: "ask",
+      reason: `Signed Approval Policy requires ${requiredApprovals} human approval before ${tool.actionClass}.`,
+      reasonCode: "APPROVAL_REQUIRED",
+    };
+  }
+  return {
+    request: input.request,
+    actionClass: tool.actionClass,
+    outcome: "allow",
+    reason: `Signed AMC policies allow ${tool.actionClass} through ${tool.name}.`,
+    reasonCode: "POLICY_ALLOW",
+  };
+}
+
+function completeCommandReview(
+  plan: ShellCommandPlan,
+  evaluations: EvaluatedControlStep[],
+): CompoundCommandBlastRadiusReview {
+  const outcomeCounts = emptyOutcomeCounts();
+  for (const evaluation of evaluations) outcomeCounts[evaluation.outcome] += 1;
+  const aggregateOutcome = evaluations.reduce<HookControlOutcome>(
+    (current, evaluation) => OUTCOME_RANK[evaluation.outcome] > OUTCOME_RANK[current]
+      ? evaluation.outcome
+      : current,
+    "allow",
+  );
+  const decisiveStepIndex = evaluations.findIndex(
+    (evaluation) => evaluation.outcome === aggregateOutcome,
+  );
+  const actionClasses = evaluations
+    .map((evaluation) => evaluation.actionClass)
+    .filter((actionClass): actionClass is ActionClass => actionClass !== null);
+  const highestActionClass = actionClasses.reduce<ActionClass | null>(
+    (current, actionClass) => current === null
+      || ACTION_CLASS_RANK[actionClass] > ACTION_CLASS_RANK[current]
+      ? actionClass
+      : current,
+    null,
+  );
+  return {
+    schemaVersion: "2026-07-13",
+    parseStatus: "parsed",
+    trustStatus: "verified",
+    completeEvaluation: true,
+    compound: plan.compound,
+    segmentCount: plan.segments.length,
+    highestActionClass,
+    aggregateOutcome,
+    decisiveStepIndex: decisiveStepIndex >= 0 ? decisiveStepIndex : null,
+    outcomeCounts,
+    steps: evaluations.map((evaluation, index) => ({
+      index,
+      connector: evaluation.request.segment?.connector ?? null,
+      canonicalToolName: evaluation.request.name,
+      actionClass: evaluation.actionClass,
+      outcome: evaluation.outcome,
+      reasonCode: evaluation.reasonCode,
+    })),
+    reasonCodes: [...new Set(evaluations.map((evaluation) => evaluation.reasonCode))],
+    rawCommandStored: false,
+    argumentValuesStored: false,
+  };
+}
+
 function requestedControlDecision(input: {
   workspace: string;
   agentId: string;
   request: NormalizedProviderToolRequest;
-}): { decision: HookControlOutcome; reason: string } {
-  if (!input.request.canonicalToolName) {
-    return {
-      decision: "deny",
-      reason: `Provider tool ${input.request.providerToolName} is not mapped to an allowed ToolHub tool.`,
-    };
-  }
-
+}): {
+  decision: HookControlOutcome;
+  reason: string;
+  commandBlastRadius: CompoundCommandBlastRadiusReview | null;
+} {
   const signatureChecks = [
     ["action policy", verifyActionPolicySignature(input.workspace)],
     ["approval policy", verifyApprovalPolicySignature(input.workspace)],
@@ -496,68 +815,78 @@ function requestedControlDecision(input: {
   ] as const;
   for (const [label, check] of signatureChecks) {
     if (!check.valid) {
-      return { decision: "deny", reason: `${label} signature invalid; control fails closed.` };
+      return {
+        decision: "deny",
+        reason: `${label} signature invalid; control fails closed.`,
+        commandBlastRadius: input.request.commandPlan
+          ? incompleteCommandReview({
+              plan: input.request.commandPlan,
+              trustStatus: "untrusted",
+              reasonCodes: ["SIGNED_AUTHORITY_UNTRUSTED"],
+            })
+          : null,
+      };
     }
+  }
+
+  if (input.request.commandPlan?.status === "invalid") {
+    return {
+      decision: "deny",
+      reason: `Provider command syntax is unsupported or invalid: ${input.request.commandPlan.reasonCodes[0] ?? "COMMAND_PLAN_INVALID"}.`,
+      commandBlastRadius: incompleteCommandReview({
+        plan: input.request.commandPlan,
+        trustStatus: "verified",
+        reasonCodes: ["COMMAND_PLAN_INVALID", ...input.request.commandPlan.reasonCodes],
+      }),
+    };
+  }
+  if (input.request.canonicalRequests.length === 0) {
+    return {
+      decision: "deny",
+      reason: `Provider tool ${input.request.providerToolName} is not mapped to an allowed ToolHub tool.`,
+      commandBlastRadius: null,
+    };
   }
 
   try {
     const tools = loadToolsConfig(input.workspace);
-    const tool = findToolDefinition(tools, input.request.canonicalToolName);
-    if (!tool) {
-      return {
-        decision: "deny",
-        reason: `Canonical tool ${input.request.canonicalToolName} is not allowed by signed ToolHub config.`,
-      };
-    }
-    const argsValidation = validateToolRequest({
-      workspace: input.workspace,
-      tool,
-      args: input.request.args,
-    });
-    if (!argsValidation.ok) {
-      return {
-        decision: "steer",
-        reason: `Signed ToolHub policy rejected the current ${tool.name} arguments.`,
-      };
-    }
-
-    const governor = runGovernorCheck({
+    const approvalPolicy = loadApprovalPolicy(input.workspace);
+    const evaluations = input.request.canonicalRequests.map((request) => evaluateCanonicalRequest({
       workspace: input.workspace,
       agentId: input.agentId,
-      actionClass: tool.actionClass,
-      riskTier: riskTierFor(tool.actionClass),
-      mode: "EXECUTE",
-    });
-    if (!governor.allowed || governor.effectiveMode !== "EXECUTE") {
+      request,
+      tools,
+      approvalPolicy,
+    }));
+    if (!input.request.commandPlan) {
+      const evaluation = evaluations[0];
+      if (!evaluation) throw new Error("control evaluation produced no result");
       return {
-        decision: "deny",
-        reason: governor.reasons.length > 0
-          ? `Signed Action Policy denied native execution: ${governor.reasons.join(" ")}`
-          : "Signed Action Policy denied native execution.",
+        decision: evaluation.outcome,
+        reason: evaluation.reason,
+        commandBlastRadius: null,
       };
     }
-
-    const approvalPolicy = loadApprovalPolicy(input.workspace);
-    const approvalRule = approvalPolicy.approvalPolicy.actionClasses[tool.actionClass];
-    const requiredApprovals = approvalRule?.requiredApprovals ?? 0;
-    if (requiredApprovals > 0) {
-      if (requiredApprovals !== 1 || approvalRule?.requireDistinctUsers === true) {
-        return {
-          decision: "deny",
-          reason: `Signed Approval Policy requires ${requiredApprovals} distinct or multi-user approvals and cannot be reduced to one provider-local ask.`,
-        };
-      }
-      return {
-        decision: "ask",
-        reason: `Signed Approval Policy requires ${requiredApprovals} human approval${requiredApprovals === 1 ? "" : "s"} before ${tool.actionClass}.`,
-      };
-    }
-    return {
-      decision: "allow",
-      reason: `Signed AMC policies allow ${tool.actionClass} through ${tool.name}.`,
-    };
+    const review = completeCommandReview(input.request.commandPlan, evaluations);
+    const decisive = review.decisiveStepIndex === null
+      ? null
+      : evaluations[review.decisiveStepIndex] ?? null;
+    const reason = review.compound
+      ? `Compound command review: ${review.segmentCount} steps; highest action class ${review.highestActionClass ?? "UNKNOWN"}; step ${(review.decisiveStepIndex ?? 0) + 1} requires ${review.aggregateOutcome}.`
+      : decisive?.reason ?? "AMC control evaluation failed closed.";
+    return { decision: review.aggregateOutcome, reason, commandBlastRadius: review };
   } catch {
-    return { decision: "deny", reason: "AMC control evaluation failed closed." };
+    return {
+      decision: "deny",
+      reason: "AMC control evaluation failed closed.",
+      commandBlastRadius: input.request.commandPlan
+        ? incompleteCommandReview({
+            plan: input.request.commandPlan,
+            trustStatus: "verified",
+            reasonCodes: ["CONTROL_EVALUATION_FAILED"],
+          })
+        : null,
+    };
   }
 }
 
@@ -810,6 +1139,9 @@ function recoverControlResult(input: {
     eventId: existing.id,
     sessionId: input.sessionId,
     canonicalToolName: stored.canonicalToolName,
+    commandBlastRadius: stored.controlSchemaVersion === 2
+      ? stored.commandBlastRadius ?? null
+      : null,
     requestedDecision: stored.requestedDecision,
     decision: stored.decision,
     effectiveOutcome: stored.effectiveOutcome,
@@ -949,6 +1281,7 @@ export function evaluateProviderHookControl(input: {
       provider,
       actionId: request.actionId,
       canonicalToolName: request.canonicalToolName,
+      commandBlastRadius: requested.commandBlastRadius,
       requestedDecision: requested.decision,
       decision: materialized.decision,
       effectiveOutcome: materialized.effectiveOutcome,
@@ -977,6 +1310,7 @@ export function evaluateProviderHookControl(input: {
         rawInputSha256: request.rawInputSha256,
         rawPayloadStored: false,
         canonicalToolName: request.canonicalToolName,
+        commandBlastRadius: requested.commandBlastRadius,
         requestedDecision: requested.decision,
         decision: materialized.decision,
         effectiveOutcome: materialized.effectiveOutcome,
@@ -1004,6 +1338,7 @@ export function evaluateProviderHookControl(input: {
       eventId: appended.id,
       sessionId,
       canonicalToolName: request.canonicalToolName,
+      commandBlastRadius: requested.commandBlastRadius,
       requestedDecision: requested.decision,
       decision: materialized.decision,
       effectiveOutcome: materialized.effectiveOutcome,

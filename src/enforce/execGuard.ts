@@ -1,4 +1,6 @@
 import { emitGuardEvent } from './evidenceEmitter.js';
+import { sha256Hex } from '../utils/hash.js';
+import { parseShellCommandPlan, type ShellCommandPlan } from './shellCommandPlan.js';
 /**
  * Shell execution guard — blocks dangerous commands.
  */
@@ -7,6 +9,7 @@ import { emitGuardEvent } from './evidenceEmitter.js';
 export interface ExecGuardResult {
   allowed: boolean;
   blockedPattern?: string;
+  commandPlan: ShellCommandPlan;
 }
 
 const BLOCKED_PATTERNS = [
@@ -28,13 +31,52 @@ const BLOCKED_PATTERNS = [
 ];
 
 export function checkExec(command: string): ExecGuardResult {
-  const lower = command.toLowerCase().replace(/\s+/g, ' ');
+  const commandPlan = parseShellCommandPlan(command);
+  const safeMeta = {
+    commandSha256: sha256Hex(Buffer.from(command, 'utf8')),
+    parseStatus: commandPlan.status,
+    compound: commandPlan.compound,
+    segmentCount: commandPlan.segments.length,
+    reasonCodes: commandPlan.reasonCodes,
+    rawCommandStored: false,
+  };
+  if (commandPlan.status === 'invalid') {
+    const blockedPattern = commandPlan.reasonCodes[0] ?? 'COMMAND_SYNTAX_UNSUPPORTED';
+    emitGuardEvent({
+      agentId: 'system',
+      moduleCode: 'E2',
+      decision: 'deny',
+      reason: `Command plan rejected: ${blockedPattern}`,
+      severity: 'critical',
+      meta: { ...safeMeta, blockedPattern },
+    });
+    return { allowed: false, blockedPattern, commandPlan };
+  }
+
+  const candidates = [
+    command,
+    ...commandPlan.segments.map((segment) => [segment.binary, ...segment.argv].join(' ')),
+  ].map((candidate) => candidate.toLowerCase().replace(/\s+/g, ' '));
   for (const pattern of BLOCKED_PATTERNS) {
-    if (lower.includes(pattern.toLowerCase())) {
-      emitGuardEvent({ agentId: 'system', moduleCode: 'E2', decision: 'deny', reason: `Blocked pattern: ${pattern}`, severity: 'critical', meta: { command, pattern } });
-      return { allowed: false, blockedPattern: pattern };
+    if (candidates.some((candidate) => candidate.includes(pattern.toLowerCase()))) {
+      emitGuardEvent({
+        agentId: 'system',
+        moduleCode: 'E2',
+        decision: 'deny',
+        reason: `Blocked pattern: ${pattern}`,
+        severity: 'critical',
+        meta: { ...safeMeta, blockedPattern: pattern },
+      });
+      return { allowed: false, blockedPattern: pattern, commandPlan };
     }
   }
-  emitGuardEvent({ agentId: 'system', moduleCode: 'E2', decision: 'allow', reason: 'Command allowed', severity: 'low', meta: { command } });
-  return { allowed: true };
+  emitGuardEvent({
+    agentId: 'system',
+    moduleCode: 'E2',
+    decision: 'allow',
+    reason: 'Command allowed',
+    severity: 'low',
+    meta: safeMeta,
+  });
+  return { allowed: true, commandPlan };
 }
