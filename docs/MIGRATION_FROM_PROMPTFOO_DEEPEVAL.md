@@ -13,7 +13,7 @@
 | **What it tests** | Prompt → response quality | Prompt → response quality | Security, governance, reliability, cost, observability, compliance |
 | **Maturity scoring** | ❌ | ❌ | L0–L5 maturity levels |
 | **Adversarial testing** | Basic red-team prompts | Basic red-team prompts | 85 adversarial assurance packs |
-| **Framework adapters** | Provider configs | Pytest-based | 14 adapters (LangChain, CrewAI, AutoGen, Claude Code, OpenAI SDK…) |
+| **Framework adapters** | Provider configs | Pytest-based | 15 adapters (LangChain, CrewAI, AutoGen, Claude Code, Hermes, OpenAI SDK…) |
 | **Compliance mapping** | ❌ | ❌ | EU AI Act, OWASP LLM Top 10, SOC2, HIPAA |
 | **CI/CD gates** | Pass/fail thresholds | Pass/fail thresholds | Score gates + signed evidence chain |
 | **Agent vs. LLM** | LLM-focused | LLM-focused | Agent-native (tools, memory, delegation, autonomy) |

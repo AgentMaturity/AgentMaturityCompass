@@ -67,7 +67,7 @@ afterAll(() => {
 describe("adapter capability declarations", () => {
   test("all built-ins declare exact events, controls, lossiness, version semantics, and fixture evidence", () => {
     const adapters = listBuiltInAdapters();
-    expect(adapters).toHaveLength(14);
+    expect(adapters).toHaveLength(15);
 
     for (const adapter of adapters) {
       const declaration = adapter.capabilities;

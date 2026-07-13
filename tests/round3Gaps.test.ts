@@ -269,7 +269,7 @@ describe("R3-03 Quickscore Variance Stabilization", () => {
 // ─── R3-05: Adapter Standardization ─────────────────
 
 describe("R3-05 Adapter Standardization", () => {
-  test("14 adapter profiles defined", () => { expect(ADAPTER_PROFILES.length).toBe(14); });
+  test("15 adapter profiles defined", () => { expect(ADAPTER_PROFILES.length).toBe(15); });
 
   test("all adapters have required fields", () => {
     for (const p of ADAPTER_PROFILES) {
@@ -306,8 +306,8 @@ describe("R3-05 Adapter Standardization", () => {
 
   test("comparison matrix has correct dimensions", () => {
     const matrix = getAdapterComparisonMatrix();
-    expect(matrix.adapters.length).toBe(14);
-    expect(matrix.matrix.length).toBe(14);
+    expect(matrix.adapters.length).toBe(15);
+    expect(matrix.matrix.length).toBe(15);
     expect(matrix.capabilities.length).toBe(10);
   });
 

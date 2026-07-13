@@ -55,6 +55,7 @@ const LEGACY_ID_ALIASES: Record<string, string> = {
   claudeCli: "claude-cli",
   geminiCli: "gemini-cli",
   openclawCli: "openclaw-cli",
+  hermesCli: "hermes-cli",
   openhandsCli: "openhands-cli",
   autogenCli: "autogen-cli",
   crewaiCli: "crewai-cli"

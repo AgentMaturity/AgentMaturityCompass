@@ -68,7 +68,7 @@
           <h1 style="white-space:nowrap">Run one command<span class="accent blink-cursor">_</span></h1>
           <h1 class="hero-h1-gray">Get the full score<span style="color:var(--text)">.</span></h1>
           <h1 class="hero-h1-accent">Fix the gaps<span style="color:var(--text)">.</span></h1>
-          <p class="hero-sub">Agent Maturity Compass checks how ready your AI agent is for real work. <span class="hl">No account</span>. <span class="hl">No setup maze</span>. Run <span class="hl">amc</span> for the <span class="hl">244-question</span> default score, then expand into lifecycle proof, Watch, Fleet, and compliance receipts.</p>
+          <p class="hero-sub">Agent Maturity Compass checks how ready your AI agent is for real work. <span class="hl">No account</span>. <span class="hl">No setup maze</span>. One command — <span class="hl">amc start</span> — scores your agent across <span class="hl">8 areas</span> and opens your report card. Free and open source. Everything stays on your machine.</p>
         </div>
         <div class="hero-right gs">
           <div class="hero-install" onclick="navigator.clipboard&&navigator.clipboard.writeText('curl -fsSL https://agentmaturity.co/install.sh | sh')" title="Copy the verified macOS/Linux installer">
@@ -87,10 +87,10 @@
     <section class="stats-strip">
       <div class="container">
         <div class="stats-row">
-          <div class="stat gs"><span class="stat-value">244</span><span class="stat-label">default questions</span></div>
-          <div class="stat gs"><span class="stat-value">264</span><span class="stat-label">lifecycle questions</span></div>
-          <div class="stat gs"><span class="stat-value">1,166</span><span class="stat-label">CLI command paths</span></div>
-          <div class="stat gs"><span class="stat-value">142</span><span class="stat-label">assurance packs</span></div>
+          <div class="stat gs"><span class="stat-value">244</span><span class="stat-label">checks in the full score</span></div>
+          <div class="stat gs"><span class="stat-value">264</span><span class="stat-label">deep-dive checks</span></div>
+          <div class="stat gs"><span class="stat-value">1,166</span><span class="stat-label">CLI commands</span></div>
+          <div class="stat gs"><span class="stat-value">142</span><span class="stat-label">attack test packs</span></div>
           <div class="stat gs"><span class="stat-value">41</span><span class="stat-label">industry packs</span></div>
           <div class="stat gs"><span class="stat-value">8,604</span><span class="stat-label">passing tests</span></div>
         </div>
@@ -249,7 +249,7 @@
         <div class="section-heading gs" style="text-align:center">
           <p class="label">integrations</p>
           <h2>Works with <strong>your stack<span class="accent blink-cursor">_</span></strong></h2>
-          <p class="section-desc" style="margin:1rem auto 0;text-align:center">14 built-in adapters, one-command Claude Code and Gemini CLI hooks, and portable signed receipts that show exact events, controls, runtime version, effective mode, and lossiness. No second policy engine required.</p>
+          <p class="section-desc" style="margin:1rem auto 0;text-align:center">15 built-in adapters, one-command Claude Code and Gemini CLI hooks, and portable signed receipts that show exact events, controls, runtime version, effective mode, and lossiness. No second policy engine required.</p>
         </div>
         <div class="logos-grid logos-grid-icons gs">
           <div class="logo-icon-item"><img src="https://cdn.simpleicons.org/langchain/ffffff" alt="LangChain" loading="lazy"><p>LangChain</p></div>
@@ -407,9 +407,12 @@
         <div class="section-heading gs" style="text-align:center"><p class="label">faq</p><h2>Common <strong>questions<span class="accent blink-cursor">_</span></strong></h2></div>
         <div class="faq-list">
           <div class="faq-item gs"><button class="faq-q" aria-expanded="false">Is this just a quick score?<span class="faq-icon">+</span></button><div class="faq-a"><p>No. The default <code>amc</code> command generates the full 244-question score. Use <code>amc run --question-set lifecycle</code> for the 264-question lifecycle-expanded set.</p></div></div>
+          <div class="faq-item gs"><button class="faq-q" aria-expanded="false">Do I need an account?<span class="faq-icon">+</span></button><div class="faq-a"><p>No. No account, no API key, no cloud. AMC runs on your machine and your data stays there.</p></div></div>
+          <div class="faq-item gs"><button class="faq-q" aria-expanded="false">My first score was terrible. Is that normal?<span class="faq-icon">+</span></button><div class="faq-a"><p>Yes — and it's the point. A fresh agent with no evidence starts at L0. The score grows as AMC watches your agent actually work.</p></div></div>
+          <div class="faq-item gs"><button class="faq-q" aria-expanded="false">What does a signed score mean?<span class="faq-icon">+</span></button><div class="faq-a"><p>Every report carries a cryptographic signature. Change one character and verification fails. That is why you can hand it to an auditor or a customer — they can check it without trusting you.</p></div></div>
           <div class="faq-item gs"><button class="faq-q" aria-expanded="false">What is the 84-point documentation inflation gap?<span class="faq-icon">+</span></button><div class="faq-a"><p>Self-reported documentation can claim 100/100 while execution-verified evidence shows a much weaker score. AMC closes that gap with observed evidence, signed artifacts, and repeatable proof chains.</p></div></div>
           <div class="faq-item gs"><button class="faq-q" aria-expanded="false">How is AMC different from other evaluation tools?<span class="faq-icon">+</span></button><div class="faq-a"><p>AMC is a trusted observer. Self-reported evidence is capped at <span class="hl">0.4x weight</span>; observed runtime evidence carries <span class="hl">1.0x weight</span>. It scores maturity, finds gaps, runs assurance packs, and preserves verifiable evidence.</p></div></div>
-          <div class="faq-item gs"><button class="faq-q" aria-expanded="false">Which frameworks does AMC support?<span class="faq-icon">+</span></button><div class="faq-a"><p><span class="hl">14 adapters</span>: AutoGen, Claude Code, CrewAI, Gemini CLI, Generic CLI, LangChain for Node and Python, LangGraph, LlamaIndex, OpenAI Agents SDK, OpenClaw, OpenHands, Python AMC SDK, and Semantic Kernel. OpenAI-compatible endpoints use the Generic CLI adapter with the <code>/openai</code> gateway route. Run <code>amc adapters capabilities</code> for signed, current coverage instead of relying on a static badge.</p></div></div>
+          <div class="faq-item gs"><button class="faq-q" aria-expanded="false">Which frameworks does AMC support?<span class="faq-icon">+</span></button><div class="faq-a"><p><span class="hl">15 adapters</span>: AutoGen, Claude Code, CrewAI, Gemini CLI, Generic CLI, Hermes Agent, LangChain for Node and Python, LangGraph, LlamaIndex, OpenAI Agents SDK, OpenClaw, OpenHands, Python AMC SDK, and Semantic Kernel. OpenAI-compatible endpoints use the Generic CLI adapter with the <code>/openai</code> gateway route. Run <code>amc adapters capabilities</code> for signed, current coverage instead of relying on a static badge.</p></div></div>
           <div class="faq-item gs"><button class="faq-q" aria-expanded="false">Can I use AMC in CI/CD?<span class="faq-icon">+</span></button><div class="faq-a"><p>Yes. Use gates such as <code>amc gate --min-score L3</code> to fail builds below threshold and prevent trust regressions.</p></div></div>
           <div class="faq-item gs"><button class="faq-q" aria-expanded="false">Do I need an account?<span class="faq-icon">+</span></button><div class="faq-a"><p>No account is needed for the free core. Industry Packs are a planned commercial add-on; checkout is not publicly live.</p></div></div>
           <div class="faq-item gs"><button class="faq-q" aria-expanded="false">Do I need Docker?<span class="faq-icon">+</span></button><div class="faq-a"><p>No. Use the verified macOS/Linux or Windows release installer above. Docker is optional.</p></div></div>

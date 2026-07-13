@@ -6,7 +6,7 @@
 
 <p align="center">
   <strong>Run one command. Get the full score. Fix the gaps.</strong><br>
-  Score, red-team, and ship AI agents with execution evidence and portable proof.<br>
+  Is your AI agent safe to ship? Find out in one minute.<br>
   <em>Evidence over claims.</em>
 </p>
 
@@ -31,33 +31,58 @@
 
 ## What is this?
 
-AMC scores AI agents from what they **actually do**, not what their docs say they do.
+AMC gives your AI agent a score, from L0 to L5.
+Think of it like a credit score — but for agents.
+
+It scores what your agent **actually does**, not what its docs say.
+Every point is backed by evidence you can verify. No evidence, no points.
 
 ```bash
 curl -fsSL https://agentmaturity.co/install.sh | sh
+amc start
 ```
 
-One command. No account. No API key. You get:
+That's the whole setup. `amc start` does everything:
 
-1. **A trust baseline** — L0 to L5 maturity, with evidence readiness shown separately
-2. **A gap analysis** — exactly what's weak, what's risky, and what's missing
-3. **Generated fixes** — guardrails, config patches, CI gates, and compliance artifacts
+- Sets up your workspace and keys. **No account. No API key. No cloud.**
+- Checks your agent across all 8 areas (see below).
+- Opens a report card in your browser.
 
-Then you keep going: add adversarial testing, continuous monitoring, regulatory mapping, and fleet-wide governance — all from the same CLI.
-- **Evaluation workflows** — golden datasets, imported evals, lite scoring for non-agent apps
-- **Business and compliance outputs** — KPI correlation, leaderboards, audit binders
+Run it again tomorrow — it remembers your setup and just starts.
 
-Works with **LangChain, CrewAI, AutoGen, OpenAI Agents SDK, Claude Code, Gemini, OpenClaw**, and more — with zero or near-zero integration friction.
+**What you get:**
 
-> A clean first run can produce a signed, `VALID` artifact while evidence readiness is `INSUFFICIENT_EVIDENCE`. That is intentional: signing proves artifact integrity, not evidence sufficiency. Capture a real agent run, rerun AMC, and use external claims only when readiness is `READY`.
+1. **A score you can trust.** L0 (no evidence) to L5 (fully proven). Signed, so nobody can fake it.
+2. **A fix list.** Exactly what's weak, and generated fixes: guardrails, config patches, CI gates.
+3. **Proof you can hand to anyone.** Auditors, customers, your boss. They can verify it without trusting you.
+
+**The 8 areas AMC covers:**
+
+| Area | Plain meaning |
+|---|---|
+| **Score** | How mature is this agent, really? |
+| **Shield** | Does it survive attacks? (142 attack packs included) |
+| **Enforce** | Can it be stopped from doing dangerous things? |
+| **Vault** | Are its secrets and keys protected? |
+| **Watch** | Do you see what it does in real time? |
+| **Comply** | Does it meet the rules? (EU AI Act, NIST AI RMF, ISO 42001, SOC 2) |
+| **Fleet** | Do many agents work together safely? |
+| **Passport** | Can it prove its record anywhere it goes? |
+
+Works with **LangChain, CrewAI, AutoGen, OpenAI Agents SDK, Claude Code, Gemini, OpenClaw, Hermes**, and more — with zero or near-zero integration friction.
+
+> Your first score will probably be low. That's honest: a fresh agent with no evidence starts at L0.
+> The signature proves the report is real — not that your agent is good. Capture a real agent run,
+> score again, and watch the evidence build. Use scores externally only when readiness says `READY`.
 
 <details>
 <summary><strong>Why should I care?</strong></summary>
 
-Today, many agents are evaluated by what they claim in docs, prompts, or self-reported checklists.
-That is structurally weak.
+Today, most agents are "checked" by reading their docs.
+That's like grading a student by asking them how smart they are.
 
-AMC focuses on **execution-verified evidence**.
+AMC watches the agent work. It collects evidence. It only scores what it can prove.
+When it can't prove something, it says so — clearly.
 
 | How agents are evaluated today | How AMC evaluates |
 |---|---|
@@ -78,8 +103,11 @@ That is the entire thesis: **trust, but verify — with receipts**.
 # macOS or Linux: download the pinned GitHub release and verify SHA-256
 curl -fsSL https://agentmaturity.co/install.sh | sh
 
-# Score your agent
+# Start everything: workspace, keys, all 8 areas, report card in your browser
 cd your-agent-project
+amc start
+
+# Or just print the full score in your terminal
 amc
 ```
 
@@ -89,7 +117,7 @@ On Windows PowerShell:
 
 ```powershell
 irm https://agentmaturity.co/install.ps1 | iex
-amc
+amc start
 ```
 
 Want a fast legacy pulse check instead of the full evidence score?
@@ -138,7 +166,7 @@ cd AgentMaturityCompass && npm ci && npm run build && npm link
 | **Evidence model** | Execution-verified, cryptographic proofs | Logs and metrics, no trust scoring | Test pass/fail, no maturity model | Self-reported |
 | **Adversarial testing** | 142 assurance packs built in | Not a focus | Partial (prompt-level only) | None |
 | **Compliance mapping** | EU AI Act, ISO 42001, NIST, SOC 2, OWASP | Not included | Not included | Manual, labor-intensive |
-| **Framework support** | 14 adapters, zero code changes | Framework-specific agents | Framework-specific | N/A |
+| **Framework support** | 15 adapters, zero code changes | Framework-specific agents | Framework-specific | N/A |
 | **Cost** | Free, open source (MIT) | Per-seat/month pricing | Free to paid | Free but manual |
 | **Time to first result** | 60 seconds | Hours to days | Minutes to hours | Days to weeks |
 
@@ -685,7 +713,7 @@ The full trust stack is **free and MIT licensed**. Industry Packs are the planne
 
 | Tier | What you get |
 |---|---|
-| **Free / Open Source** | Everything — Score, Shield, Enforce, Vault, Watch, Comply, Fleet, Passport, all 14 adapters, 1,166 registered CLI command paths, browser playground, CI gates |
+| **Free / Open Source** | Everything — Score, Shield, Enforce, Vault, Watch, Comply, Fleet, Passport, all 15 adapters, 1,166 registered CLI command paths, browser playground, CI gates |
 | **Industry Packs (planned; not yet purchasable)** | Planned `$9.99/month` tier for all 41 Industry Domain Packs; public checkout is not live |
 | **Enterprise (contact-first; not self-serve)** | Planned Industry Packs access plus priority support, custom pack development, and deployment assistance |
 
@@ -840,6 +868,6 @@ cd AgentMaturityCompass && npm ci && npm test   # 1,087 files / 8,604 passing Vi
 ---
 
 <p align="center">
-  <strong>244 default diagnostic questions + 20 lifecycle expansion questions · 142 assurance packs · 41 domain packs · 14 adapters · 1,166 CLI command paths</strong><br>
+  <strong>244 default diagnostic questions + 20 lifecycle expansion questions · 142 assurance packs · 41 domain packs · 15 adapters · 1,166 CLI command paths</strong><br>
   <em>Stop trusting. Start verifying.</em>
 </p>

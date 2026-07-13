@@ -425,7 +425,7 @@ PRs are reviewed by maintainers. One approval required. Squash merge preferred.
 
 ```
 src/
-├── adapters/           # 14 framework adapters
+├── adapters/           # 15 framework adapters
 │   └── builtins/       # One file per adapter
 ├── assurance/          # Red-team engine
 │   └── packs/          # 147 attack packs (one file each)

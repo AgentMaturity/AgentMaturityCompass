@@ -3,6 +3,7 @@ import { genericCliAdapter } from "./builtins/genericCli.js";
 import { claudeCliAdapter } from "./builtins/claudeCli.js";
 import { geminiCliAdapter } from "./builtins/geminiCli.js";
 import { openclawCliAdapter } from "./builtins/openclawCli.js";
+import { hermesCliAdapter } from "./builtins/hermesCli.js";
 import { openhandsCliAdapter } from "./builtins/openhandsCli.js";
 import { autogenCliAdapter } from "./builtins/autogenCli.js";
 import { crewaiCliAdapter } from "./builtins/crewaiCli.js";
@@ -20,6 +21,7 @@ const BUILTINS = [
   claudeCliAdapter,
   geminiCliAdapter,
   openclawCliAdapter,
+  hermesCliAdapter,
   openhandsCliAdapter,
   autogenCliAdapter,
   crewaiCliAdapter,

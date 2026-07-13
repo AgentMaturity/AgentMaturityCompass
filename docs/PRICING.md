@@ -18,7 +18,7 @@ Everything except Industry Packs:
 - **Comply** — regulatory mapping (EU AI Act, ISO 42001, NIST AI RMF, OWASP), audit binders, governance reports
 - **Fleet** — multi-agent oversight, comparison, delegation graphs
 - **Passport** — portable identity, credentials, trust portability artifacts
-- **All 14 framework adapters** — LangChain, CrewAI, OpenAI, Claude Code, Gemini, AutoGen, LlamaIndex, Semantic Kernel, OpenClaw, OpenHands, Python SDK, generic CLI, OpenAI-compatible
+- **All 15 framework adapters** — LangChain, CrewAI, OpenAI, Claude Code, Gemini, AutoGen, LlamaIndex, Semantic Kernel, OpenClaw, OpenHands, Hermes, Python SDK, generic CLI, OpenAI-compatible
 - **1,166 CLI command paths**
 - **244 default diagnostic questions** plus the free, opt-in 20-question lifecycle expansion
 - **Browser playground**
