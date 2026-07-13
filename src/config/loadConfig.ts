@@ -171,7 +171,7 @@ export function loadStudioRuntimeConfig(
     hostBind: parsed.AMC_HOST_BIND,
     hostPort: parsed.AMC_HOST_PORT,
     hostPublicBaseUrl: parsed.AMC_HOST_PUBLIC_BASEURL ? parsed.AMC_HOST_PUBLIC_BASEURL.trim() : null,
-    workspaceDir: resolve(parsed.AMC_WORKSPACE_DIR),
+    workspaceDir: resolve(parsed.AMC_WORKSPACE_DIR ?? process.cwd()),
     bind: parsed.AMC_BIND,
     studioPort: parsed.AMC_STUDIO_PORT,
     gatewayPort: parsed.AMC_GATEWAY_PORT,

@@ -33,7 +33,7 @@ import { verifyAuditPolicySignature } from "../audit/auditPolicyStore.js";
 import { verifyAuditMapActiveSignature, verifyAuditMapBuiltinSignature } from "../audit/auditMapStore.js";
 import { listExportedAuditBinders } from "../audit/binderArtifact.js";
 import { verifyAuditBinderFile, verifyAuditWorkspace } from "../audit/binderVerifier.js";
-import { verifyPassportPolicySignature } from "../passport/passportStore.js";
+import { listPassportExportFiles, verifyPassportPolicySignature } from "../passport/passportStore.js";
 import { verifyPassportWorkspace } from "../passport/passportVerifier.js";
 import { verifyStandardSchemas } from "../standard/standardGenerator.js";
 
@@ -267,19 +267,34 @@ export async function verifyAll(params: {
   );
 
   const passportPolicy = verifyPassportPolicySignature(workspace);
-  checks.push(
-    passportPolicy.valid
-      ? pass("passport-policy-signature", true, [passportPolicy.path])
-      : fail("passport-policy-signature", true, [passportPolicy.reason ?? "invalid"])
-  );
-  const passportWorkspace = verifyPassportWorkspace({
-    workspace
-  });
-  checks.push(
-    passportWorkspace.ok
-      ? pass("passport-workspace-integrity", false, ["passport exports/cache verified"])
-      : fail("passport-workspace-integrity", false, passportWorkspace.errors)
-  );
+  const passportPolicyFileMissing =
+    !passportPolicy.valid && (passportPolicy.reason ?? "").toLowerCase().includes("file missing");
+  const passportCachePath = join(workspace, ".amc", "passport", "cache");
+  const passportCacheEntries = statExists(passportCachePath)
+    ? readdirSync(passportCachePath).filter((name) => name.startsWith("latest_") && name.endsWith(".json"))
+    : [];
+  const passportUninitialized =
+    passportPolicyFileMissing &&
+    listPassportExportFiles(workspace).length === 0 &&
+    passportCacheEntries.length === 0;
+  if (passportUninitialized) {
+    checks.push(skip("passport-policy-signature", true, ["passport not initialized yet"]));
+    checks.push(skip("passport-workspace-integrity", false, ["passport not initialized yet"]));
+  } else {
+    checks.push(
+      passportPolicy.valid
+        ? pass("passport-policy-signature", true, [passportPolicy.path])
+        : fail("passport-policy-signature", true, [passportPolicy.reason ?? "invalid"])
+    );
+    const passportWorkspace = verifyPassportWorkspace({
+      workspace
+    });
+    checks.push(
+      passportWorkspace.ok
+        ? pass("passport-workspace-integrity", false, ["passport exports/cache verified"])
+        : fail("passport-workspace-integrity", false, passportWorkspace.errors)
+    );
+  }
 
   const standard = verifyStandardSchemas(workspace);
   if (!standard.meta && standard.errors.some((row) => row.toLowerCase().includes("meta.json missing"))) {

@@ -4139,7 +4139,7 @@ studio
 studio
   .command("start")
   .description("Start Studio in foreground (non-interactive, deployment-safe)")
-  .option("--workspace <path>", "workspace directory (defaults to AMC_WORKSPACE_DIR)")
+  .option("--workspace <path>", "workspace directory (defaults to AMC_WORKSPACE_DIR or current directory)")
   .option("--bind <host>", "api bind host override")
   .option("--port <port>", "api port override")
   .option("--dashboard-port <port>", "dashboard port override")
@@ -4220,7 +4220,7 @@ studio
 studio
   .command("healthcheck")
   .description("Health/readiness probe for deployment runtime")
-  .option("--workspace <path>", "workspace directory (defaults to AMC_WORKSPACE_DIR)")
+  .option("--workspace <path>", "workspace directory (defaults to AMC_WORKSPACE_DIR or current directory)")
   .action(async (opts: { workspace?: string }) => {
     const runtime = loadStudioRuntimeConfig(process.env, {
       workspaceDir: opts.workspace ? resolve(opts.workspace) : undefined
@@ -18533,7 +18533,7 @@ const e2e = program.command("e2e").description("End-to-end smoke verification");
 e2e
   .command("smoke")
   .description("Run go-live smoke tests: local, docker, or helm-template")
-  .requiredOption("--mode <mode>", "local|docker|helm-template")
+  .option("--mode <mode>", "local|docker|helm-template", "local")
   .option("--workspace <path>", "workspace path (local mode only)")
   .option("--repo-root <path>", "repository root", process.cwd())
   .option("--json", "emit structured JSON output", false)
@@ -22284,17 +22284,18 @@ score
   });
 
 score
-  .command("production-ready <agentId>")
+  .command("production-ready [agentId]")
   .description("Run production readiness gate for an agent")
   .option("--strict", "require all readiness gates", false)
   .option("--json", "Output as JSON")
-  .action(async (agentId: string, opts: { strict?: boolean; json?: boolean }) => {
+  .action(async (agentId: string | undefined, opts: { strict?: boolean; json?: boolean }) => {
     try {
       const { assessProductionReadiness } = await import("./score/productionReadiness.js");
-      const result = assessProductionReadiness(agentId, { strictMode: !!opts.strict });
+      const resolvedAgentId = resolveAgentId(process.cwd(), agentId ?? activeAgent(program));
+      const result = assessProductionReadiness(resolvedAgentId, { strictMode: !!opts.strict });
       if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
       console.log(chalk.bold.hex('#4AEF79')("\n🛠  Production Readiness"));
-      console.log(chalk.gray("Agent:"), agentId);
+      console.log(chalk.gray("Agent:"), resolvedAgentId);
       console.log(chalk.gray("Ready:"), result.ready ? chalk.green("yes") : chalk.red("no"));
       console.log(chalk.gray("Score:"), result.score);
       console.log(chalk.gray("Gate failures:"), result.blockers.join(", ") || "none");

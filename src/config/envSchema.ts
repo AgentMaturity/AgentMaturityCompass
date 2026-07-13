@@ -44,7 +44,7 @@ export const studioEnvSchema = z.object({
   AMC_HOST_BIND: z.string().min(1).default("127.0.0.1"),
   AMC_HOST_PORT: portish.default(3212),
   AMC_HOST_PUBLIC_BASEURL: z.string().optional(),
-  AMC_WORKSPACE_DIR: z.string().min(1).default("/data/amc"),
+  AMC_WORKSPACE_DIR: z.string().min(1).optional(),
   AMC_BIND: z.string().min(1).default("127.0.0.1"),
   AMC_STUDIO_PORT: portish.default(3212),
   AMC_GATEWAY_PORT: portish.default(3210),

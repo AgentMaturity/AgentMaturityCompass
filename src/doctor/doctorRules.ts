@@ -1,4 +1,5 @@
 import { request as httpRequest } from "node:http";
+import { createRequire } from "node:module";
 import { randomBytes } from "node:crypto";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
@@ -96,6 +97,30 @@ function pushAdapterChecks(checks: DoctorCheck[], workspace: string, includePlug
   }
 }
 
+function nativeModuleCheck(): DoctorCheck {
+  try {
+    const requireModule = createRequire(import.meta.url);
+    requireModule("better-sqlite3");
+    return { id: "native-modules", status: "PASS", message: "better-sqlite3 native module loads (Node ABI matches)" };
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    if (message.includes("NODE_MODULE_VERSION")) {
+      return {
+        id: "native-modules",
+        status: "FAIL",
+        message: `better-sqlite3 was compiled for a different Node version (running Node ${versions.node})`,
+        fixHint: "Run: npm rebuild better-sqlite3 in the AMC package directory, or reinstall AMC with this Node version active"
+      };
+    }
+    return {
+      id: "native-modules",
+      status: "FAIL",
+      message: `better-sqlite3 failed to load: ${message.replace(/\s+/g, " ").slice(0, 160)}`,
+      fixHint: "Reinstall AMC dependencies with the Node version you run AMC with"
+    };
+  }
+}
+
 function safeDoctorError(error: unknown, workspace: string): string {
   const raw = error instanceof Error ? error.message : String(error);
   return raw.replaceAll(workspace, ".").replace(/\s+/g, " ").trim().slice(0, 240) || "unknown error";
@@ -112,6 +137,7 @@ export async function runDoctorRules(workspace: string, options: DoctorOptions =
       ? { id: "node-version", status: "PASS", message: `Node ${versions.node}` }
       : { id: "node-version", status: "FAIL", message: `Node ${versions.node} is below required >=20`, fixHint: "Install Node.js 20+" }
   );
+  checks.push(nativeModuleCheck());
 
   if (!workspaceInitialized) {
     checks.push({
