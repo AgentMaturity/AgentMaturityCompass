@@ -31,6 +31,17 @@ const root = document.getElementById("app");
 const statusEl = document.getElementById("status");
 const bannerEl = document.getElementById("ucBanner");
 const OFFLINE_BANNER_ID = "offlineBanner";
+const approvalActivityState = {
+  query: "",
+  status: "PENDING",
+  actionClass: "",
+  riskTier: "",
+  effectiveMode: "",
+  createdAfter: "",
+  createdBefore: "",
+  order: "newest",
+  limit: "50"
+};
 
 function workspacePrefixFromPath() {
   const path = window.location.pathname || "/";
@@ -1406,6 +1417,23 @@ async function renderEqualizer() {
 async function renderApprovals() {
   const agentId = currentAgent();
   const selectedApprovalId = qs("approval");
+  const activity = selectedApprovalId
+    ? null
+    : await (() => {
+        const params = new URLSearchParams({ agentId });
+        for (const [key, value] of Object.entries(approvalActivityState)) {
+          if (!value) continue;
+          if (key === "createdAfter" || key === "createdBefore") {
+            const timestamp = Date.parse(value);
+            if (Number.isFinite(timestamp)) {
+              params.set(key, new Date(timestamp).toISOString());
+            }
+            continue;
+          }
+          params.set(key, value);
+        }
+        return apiGet(`/approvals/requests?${params.toString()}`);
+      })();
   const rows = selectedApprovalId
     ? await apiGet(`/approvals/requests/${encodeURIComponent(selectedApprovalId)}`).then((data) => [{
         ...data.request,
@@ -1413,36 +1441,135 @@ async function renderApprovals() {
         quorum: data.quorum,
         decisions: data.decisions || [],
         requestIntegrity: data.requestIntegrity,
+        chainIntegrity: data.chainIntegrity,
         contextIntegrity: data.contextIntegrity,
         executionReady: data.executionReady
       }])
-    : await apiGet(`/approvals/requests?agentId=${encodeURIComponent(agentId)}&status=PENDING`).then((data) => data.requests || []);
+    : activity.requests || [];
+  const integrityValid = selectedApprovalId || activity?.integrity?.valid === true;
+  const statusOptions = ["", "PENDING", "QUORUM_MET", "DENIED", "EXPIRED", "CANCELLED", "CONSUMED"];
+  const actionClasses = ["", "READ_ONLY", "WRITE_LOW", "WRITE_HIGH", "DEPLOY", "SECURITY", "FINANCIAL", "NETWORK_EXTERNAL", "DATA_EXPORT", "IDENTITY"];
   root.innerHTML = `
     ${card("Approvals Inbox", `
-      <p class="muted">Pending approvals with quorum progress.</p>
       ${selectedApprovalId ? `<p><a href="./approvals?agent=${encodeURIComponent(agentId)}">View all pending approvals</a></p>` : ""}
-      <div class="scroll"><table><thead><tr><th>Request</th><th>${selectedApprovalId ? "Intent" : "Risk"}</th><th>Action</th><th>Quorum</th><th>Decisions</th><th>Decision</th></tr></thead><tbody id="apprRows"></tbody></table></div>
+      ${selectedApprovalId ? "" : `
+        <form id="approvalActivityFilters" class="row wrap">
+          <label>
+            <span class="muted">Request ID</span>
+            <input id="approvalActivityQuery" type="search" maxlength="128" value="${htmlEscape(approvalActivityState.query)}" autocomplete="off" spellcheck="false" />
+          </label>
+          <label>
+            <span class="muted">Status</span>
+            <select id="approvalStatus">${statusOptions.map((value) => `<option value="${value}"${approvalActivityState.status === value ? " selected" : ""}>${value || "All"}</option>`).join("")}</select>
+          </label>
+          <label>
+            <span class="muted">Action class</span>
+            <select id="approvalActionClass">${actionClasses.map((value) => `<option value="${value}"${approvalActivityState.actionClass === value ? " selected" : ""}>${value || "All"}</option>`).join("")}</select>
+          </label>
+          <label>
+            <span class="muted">Risk</span>
+            <select id="approvalRiskTier">
+              ${["", "low", "medium", "high", "critical"].map((value) => `<option value="${value}"${approvalActivityState.riskTier === value ? " selected" : ""}>${value || "All"}</option>`).join("")}
+            </select>
+          </label>
+          <label>
+            <span class="muted">Mode</span>
+            <select id="approvalEffectiveMode">
+              ${["", "SIMULATE", "EXECUTE"].map((value) => `<option value="${value}"${approvalActivityState.effectiveMode === value ? " selected" : ""}>${value || "All"}</option>`).join("")}
+            </select>
+          </label>
+          <label>
+            <span class="muted">Created after</span>
+            <input id="approvalCreatedAfter" type="datetime-local" value="${htmlEscape(approvalActivityState.createdAfter)}" />
+          </label>
+          <label>
+            <span class="muted">Created before</span>
+            <input id="approvalCreatedBefore" type="datetime-local" value="${htmlEscape(approvalActivityState.createdBefore)}" />
+          </label>
+          <label>
+            <span class="muted">Order</span>
+            <select id="approvalOrder">
+              <option value="newest"${approvalActivityState.order === "newest" ? " selected" : ""}>Newest</option>
+              <option value="oldest"${approvalActivityState.order === "oldest" ? " selected" : ""}>Oldest</option>
+            </select>
+          </label>
+          <label>
+            <span class="muted">Limit</span>
+            <select id="approvalLimit">
+              ${["25", "50", "100", "200"].map((value) => `<option value="${value}"${approvalActivityState.limit === value ? " selected" : ""}>${value}</option>`).join("")}
+            </select>
+          </label>
+          <button type="submit">Search</button>
+          <button id="approvalFiltersReset" type="button" class="secondary">Reset</button>
+        </form>
+        <p id="approvalActivityIntegrity" class="${activity?.integrity?.valid ? "status-ok" : "status-bad"}">
+          ${activity?.integrity?.valid
+            ? `${Number(activity.returned || 0)} of ${Number(activity.totalMatched || 0)} matching approvals | signed inventory verified`
+            : `Approval activity unavailable | ${htmlEscape((activity?.integrity?.reasonCodes || ["INTEGRITY_UNAVAILABLE"]).join(", "))}`}
+        </p>
+      `}
+      <div class="scroll"><table><thead><tr><th>Request</th><th>${selectedApprovalId ? "Intent" : "Risk"}</th><th>Action</th><th>Mode</th><th>Status</th><th>Quorum</th><th>Decisions</th><th>Decision</th></tr></thead><tbody id="apprRows"></tbody></table></div>
     `)}
   `;
   const body = document.getElementById("apprRows");
-  body.innerHTML = rows.map((row) => `
+  body.innerHTML = integrityValid ? rows.map((row) => {
+    const canDecide = row.status === "PENDING" &&
+      row.requestIntegrity?.valid === true &&
+      row.chainIntegrity?.valid === true &&
+      row.contextIntegrity?.valid === true;
+    const requestLabel = row.approvalRequestId.length > 30
+      ? `${row.approvalRequestId.slice(0, 18)}...${row.approvalRequestId.slice(-8)}`
+      : row.approvalRequestId;
+    return `
     <tr${row.approvalRequestId === selectedApprovalId ? ' class="selected"' : ""}>
-      <td>${htmlEscape(row.approvalRequestId)}</td>
+      <td>${selectedApprovalId
+        ? htmlEscape(row.approvalRequestId)
+        : `<a title="${htmlEscape(row.approvalRequestId)}" href="./approvals?agent=${encodeURIComponent(agentId)}&approval=${encodeURIComponent(row.approvalRequestId)}">${htmlEscape(requestLabel)}</a>`}</td>
       <td>${htmlEscape(row.intentId || row.riskTier || "-")}</td>
       <td>${htmlEscape(row.actionClass)}</td>
+      <td>${htmlEscape(row.effectiveMode || "-")}</td>
+      <td>${htmlEscape(row.status || "-")}</td>
       <td>${Number(row.quorum?.received || 0)}/${Number(row.quorum?.required || 0)} (${htmlEscape(row.quorum?.status || "PENDING")})</td>
       <td>${row.decisions
         ? row.decisions.map((d) => `${htmlEscape(d.username)}:${htmlEscape(d.decision)}`).join(", ") || "-"
         : Number(row.decisionCount || 0)}</td>
       <td>
-        <div class="row">
-          <button data-approve="${htmlEscape(row.approvalRequestId)}">Approve</button>
-          <button class="secondary" data-sim="${htmlEscape(row.approvalRequestId)}">Simulate</button>
-          <button class="danger" data-deny="${htmlEscape(row.approvalRequestId)}">Deny</button>
-        </div>
+        ${canDecide ? `<div class="row">
+            <button data-approve="${htmlEscape(row.approvalRequestId)}">Approve</button>
+            <button class="secondary" data-sim="${htmlEscape(row.approvalRequestId)}">Simulate</button>
+            <button class="danger" data-deny="${htmlEscape(row.approvalRequestId)}">Deny</button>
+          </div>` : '<span class="muted">Unavailable</span>'}
       </td>
     </tr>
-  `).join("");
+  `;
+  }).join("") : "";
+  document.getElementById("approvalActivityFilters")?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    approvalActivityState.query = document.getElementById("approvalActivityQuery")?.value.trim() || "";
+    approvalActivityState.status = document.getElementById("approvalStatus")?.value || "";
+    approvalActivityState.actionClass = document.getElementById("approvalActionClass")?.value || "";
+    approvalActivityState.riskTier = document.getElementById("approvalRiskTier")?.value || "";
+    approvalActivityState.effectiveMode = document.getElementById("approvalEffectiveMode")?.value || "";
+    approvalActivityState.createdAfter = document.getElementById("approvalCreatedAfter")?.value || "";
+    approvalActivityState.createdBefore = document.getElementById("approvalCreatedBefore")?.value || "";
+    approvalActivityState.order = document.getElementById("approvalOrder")?.value || "newest";
+    approvalActivityState.limit = document.getElementById("approvalLimit")?.value || "50";
+    await renderApprovals();
+  });
+  document.getElementById("approvalFiltersReset")?.addEventListener("click", async () => {
+    Object.assign(approvalActivityState, {
+      query: "",
+      status: "PENDING",
+      actionClass: "",
+      riskTier: "",
+      effectiveMode: "",
+      createdAfter: "",
+      createdBefore: "",
+      order: "newest",
+      limit: "50"
+    });
+    await renderApprovals();
+  });
   body.querySelectorAll("button[data-approve]").forEach((button) => {
     button.addEventListener("click", async () => {
       const id = button.getAttribute("data-approve");

@@ -485,7 +485,7 @@
             <tr><td><code>npm run release:gate</code></td><td>Run the release gate and write a JSON receipt for CLI, Studio assets, OpenAPI, docs drift, domain packs, and optional live health</td></tr>
             <tr><td><code>amc commands --markdown</code></td><td>Generate the live CLI inventory from the registered command map so docs can stay in sync</td></tr>
             <tr><td><code>amc enforce resources snapshot|diff|verify</code></td><td>Advanced aliases for the same signed Enforce resource engine</td></tr>
-            <tr><td><code>amc approvals list</code></td><td>List pending approvals</td></tr>
+            <tr><td><code>amc approvals list --agent &lt;id&gt; [--query &lt;requestId&gt;] [--status &lt;status&gt;] [--action-class &lt;class&gt;] [--risk-tier &lt;tier&gt;] [--effective-mode &lt;mode&gt;] [--created-after &lt;time&gt;] [--created-before &lt;time&gt;] [--order newest|oldest] [--limit 1-200] [--json]</code></td><td>Search the privacy-safe signed approval view; untrusted activity returns no rows</td></tr>
             <tr><td><code>amc approvals approve &lt;id&gt;</code></td><td>Approve execution intent</td></tr>
             <tr><td><code>amc approvals deny &lt;id&gt;</code></td><td>Deny execution intent</td></tr>
             <tr><td><code>amc workorder create|list|show</code></td><td>Signed work order lifecycle</td></tr>

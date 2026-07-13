@@ -167,9 +167,11 @@ amc policy pack apply --agent my-agent code-agent.high
 Manage execution approval inbox.
 ```bash
 amc approvals list --agent my-agent --status pending
+amc approvals list --agent my-agent --action-class DEPLOY --risk-tier high --effective-mode execute --created-after 2026-07-01T00:00:00Z --limit 50 --json
 amc approvals approve --agent my-agent <approvalId> --mode execute --reason "approved"
 amc approvals deny --agent my-agent <approvalId> --reason "too risky"
 ```
+The list command is a read-only, fail-closed projection of the existing signed approval chain. It searches only stable request IDs, exposes privacy-safe filters, and returns no rows if any canonical request, decision, consumption record, or detached signature is malformed, tampered, misbound, or orphaned.
 
 ### `amc workorder create|list|show|verify|expire`
 Signed work orders that scope what an agent can do.

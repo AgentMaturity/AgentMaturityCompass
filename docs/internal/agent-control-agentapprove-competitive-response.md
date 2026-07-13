@@ -154,7 +154,7 @@ AMC must not import these files as executable policy. A future AEP lane should:
 | 16 | Add evaluator registry metadata | Score/Shield | Implemented in AMC-1478: one derived, domain-separated signed catalog points to existing evaluators, package-relative owners, versions, and implementation hashes; drift and custom evaluators fail closed without a registry service or evaluator-result claim |
 | 17 | Add policy test fixtures in CI | Enforce | Implemented in AMC-1479: strict AMC-authored suites reuse production control simulation, distinguish mismatches from untrusted-source fail-closed state, expose deterministic non-proof reports, and run the built CLI twice in CI without another policy engine or fixture service |
 | 18 | Add hook health and last-event diagnostics | Watch | Implemented in AMC-1480: one read-only projection joins signed install/lease state with the latest receipt-verified event across CLI, API, and on-demand Studio; no heartbeat, daemon, second store, or current-liveness claim |
-| 19 | Add approval activity search and filters | Enforce/Watch | Query existing receipts, no new activity database |
+| 19 | Add approval activity search and filters | Enforce/Watch | Implemented (AMC-1481): one fail-closed read projection audits the existing signed request/decision/consumption inventory, searches only stable request IDs, and shares bounded privacy-safe filters across CLI, API, and Studio without an activity database |
 | 20 | Group MCP server and tool context | Enforce/Fleet | Normalize into ToolHub identities and trust graph |
 | 21 | Show compound-command blast radius | Enforce | Reuse command parser and blast-radius consent |
 | 22 | Add deny-with-feedback round trip | Enforce | Feedback signed and redacted before provider return |

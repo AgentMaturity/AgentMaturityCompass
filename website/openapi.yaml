@@ -1929,6 +1929,33 @@ components:
           type: string
           enum: [PENDING, QUORUM_MET, DENIED, EXPIRED, CANCELLED, CONSUMED]
 
+    ApprovalActivityFilters:
+      type: object
+      additionalProperties: false
+      required: [query, status, actionClass, riskTier, effectiveMode, createdAfterTs, createdBeforeTs, order, limit]
+      properties:
+        query: { type: string, nullable: true, maxLength: 128 }
+        status: { type: string, nullable: true, enum: [PENDING, QUORUM_MET, DENIED, EXPIRED, CANCELLED, CONSUMED] }
+        actionClass: { type: string, nullable: true, enum: [READ_ONLY, WRITE_LOW, WRITE_HIGH, DEPLOY, SECURITY, FINANCIAL, NETWORK_EXTERNAL, DATA_EXPORT, IDENTITY] }
+        riskTier: { type: string, nullable: true, enum: [low, medium, high, critical] }
+        effectiveMode: { type: string, nullable: true, enum: [SIMULATE, EXECUTE] }
+        createdAfterTs: { type: integer, nullable: true }
+        createdBeforeTs: { type: integer, nullable: true }
+        order: { type: string, enum: [newest, oldest] }
+        limit: { type: integer, minimum: 1, maximum: 200 }
+
+    ApprovalActivityIntegrity:
+      type: object
+      additionalProperties: false
+      required: [valid, reasonCodes, scannedRequests, trustedRequests, scannedDecisions, scannedConsumptions]
+      properties:
+        valid: { type: boolean }
+        reasonCodes: { type: array, items: { type: string } }
+        scannedRequests: { type: integer, minimum: 0 }
+        trustedRequests: { type: integer, minimum: 0 }
+        scannedDecisions: { type: integer, minimum: 0 }
+        scannedConsumptions: { type: integer, minimum: 0 }
+
     ApprovalInboxSummary:
       type: object
       additionalProperties: false
@@ -2218,8 +2245,8 @@ paths:
   /approvals/requests:
     get:
       tags: [approvals, enforce]
-      summary: List canonical signed approval requests
-      description: Returns bounded summaries. Tool names, intent/work-order IDs, reasons, bound hashes, credentials, Vault refs, tokens, local paths, and destination URLs are omitted.
+      summary: Search canonical signed approval activity
+      description: Audits the complete signed request, decision, consumption, and detached-signature inventory before applying privacy-safe filters. An untrusted inventory returns no rows. Only stable request IDs are searched; tool names, intent/work-order IDs, reviewer identities, reasons, commands, MCP servers, prompts, payloads, credentials, Vault refs, tokens, local paths, and destination URLs are omitted.
       servers:
         - url: http://localhost:3000
           description: Local AMC Studio instance
@@ -2229,18 +2256,38 @@ paths:
             host: { default: amc.example.com }
       parameters:
         - { name: agentId, in: query, required: false, schema: { type: string } }
+        - { name: query, in: query, required: false, description: Case-insensitive stable request-ID substring, schema: { type: string, maxLength: 128, pattern: '^[A-Za-z0-9_-]+$' } }
         - { name: status, in: query, required: false, schema: { type: string, enum: [PENDING, QUORUM_MET, DENIED, EXPIRED, CANCELLED, CONSUMED] } }
+        - { name: actionClass, in: query, required: false, schema: { type: string, enum: [READ_ONLY, WRITE_LOW, WRITE_HIGH, DEPLOY, SECURITY, FINANCIAL, NETWORK_EXTERNAL, DATA_EXPORT, IDENTITY] } }
+        - { name: riskTier, in: query, required: false, schema: { type: string, enum: [low, medium, high, critical] } }
+        - { name: effectiveMode, in: query, required: false, schema: { type: string, enum: [SIMULATE, EXECUTE] } }
+        - { name: createdAfter, in: query, required: false, description: Inclusive RFC3339 or epoch-millisecond lower bound, schema: { type: string } }
+        - { name: createdBefore, in: query, required: false, description: Inclusive RFC3339 or epoch-millisecond upper bound, schema: { type: string } }
+        - { name: order, in: query, required: false, schema: { type: string, enum: [newest, oldest], default: newest } }
+        - { name: limit, in: query, required: false, schema: { type: integer, minimum: 1, maximum: 200, default: 50 } }
       responses:
         '200':
-          description: Canonical approval summaries
+          description: Fail-closed derived approval activity view
           content:
             application/json:
               schema:
                 type: object
-                required: [agentId, requests]
+                additionalProperties: false
+                required: [schemaVersion, agentId, filters, integrity, totalMatched, returned, truncated, requests, derivedView, recorded, proofEligible, claimBoundary]
                 properties:
+                  schemaVersion: { type: string, enum: ['2026-07-13'] }
                   agentId: { type: string }
+                  filters: { $ref: '#/components/schemas/ApprovalActivityFilters' }
+                  integrity: { $ref: '#/components/schemas/ApprovalActivityIntegrity' }
+                  totalMatched: { type: integer, minimum: 0 }
+                  returned: { type: integer, minimum: 0 }
+                  truncated: { type: boolean }
                   requests: { type: array, items: { $ref: '#/components/schemas/ApprovalInboxSummary' } }
+                  derivedView: { type: boolean, enum: [true] }
+                  recorded: { type: boolean, enum: [false] }
+                  proofEligible: { type: boolean, enum: [false] }
+                  claimBoundary: { type: string }
+        '400': { description: Invalid approval activity filters }
         '401': { description: Unauthorized }
 
   /approvals/requests/{id}:

@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { readdirSync, readFileSync } from "node:fs";
+import { lstatSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { z } from "zod";
 import { getPrivateKeyPem, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
@@ -96,6 +96,16 @@ export type ApprovalDecisionKind = z.infer<typeof approvalDecisionKindSchema>;
 export interface ApprovalChainIntegrity {
   valid: boolean;
   reasonCodes: string[];
+}
+
+export interface ApprovalActivityInventory {
+  valid: boolean;
+  reasonCodes: string[];
+  scannedRequests: number;
+  trustedRequests: number;
+  scannedDecisions: number;
+  scannedConsumptions: number;
+  requests: ApprovalRequestRecord[];
 }
 
 function approvalsRoot(workspace: string, agentId?: string): string {
@@ -444,6 +454,172 @@ export function listApprovalRequests(params: {
     }
   }
   return out.sort((a, b) => b.createdTs - a.createdTs);
+}
+
+function isRegularFile(path: string): boolean {
+  try {
+    return lstatSync(path).isFile();
+  } catch {
+    return false;
+  }
+}
+
+function jsonArtifacts(dir: string): string[] {
+  if (!pathExists(dir)) {
+    return [];
+  }
+  return readdirSync(dir).filter((file) => file.endsWith(".json")).sort((a, b) => a.localeCompare(b));
+}
+
+function hasOrphanedSignatures(dir: string): boolean {
+  if (!pathExists(dir)) {
+    return false;
+  }
+  return readdirSync(dir).some((file) => {
+    if (!file.endsWith(".json.sig")) {
+      return false;
+    }
+    return !isRegularFile(join(dir, file.slice(0, -4)));
+  });
+}
+
+/**
+ * Audits every canonical approval artifact before a filtered activity view is
+ * allowed to claim completeness. The returned reason codes are intentionally
+ * path-free so callers can fail closed without exposing local identifiers.
+ */
+export function inspectApprovalActivityInventory(params: {
+  workspace: string;
+  agentId?: string;
+}): ApprovalActivityInventory {
+  const agentId = resolveAgentId(params.workspace, params.agentId);
+  const reasonCodes: string[] = [];
+  const requests: ApprovalRequestRecord[] = [];
+  const requestIds = new Set<string>();
+
+  const requestRoot = requestsDir(params.workspace, agentId);
+  const requestFiles = jsonArtifacts(requestRoot);
+  if (hasOrphanedSignatures(requestRoot)) {
+    reasonCodes.push("REQUEST_ARTIFACT_MISSING");
+  }
+  for (const file of requestFiles) {
+    const path = join(requestRoot, file);
+    if (!isRegularFile(path) || !isRegularFile(sigPathFor(path)) || !verifyArtifact(params.workspace, path).valid) {
+      reasonCodes.push("REQUEST_INTEGRITY_INVALID");
+      continue;
+    }
+    let request: ApprovalRequestRecord;
+    try {
+      request = approvalRequestSchema.parse(JSON.parse(readUtf8(path)) as unknown);
+    } catch {
+      reasonCodes.push("REQUEST_ARTIFACT_UNPARSEABLE");
+      continue;
+    }
+    const fileRequestId = file.slice(0, -5);
+    if (request.approvalRequestId !== fileRequestId) {
+      reasonCodes.push("REQUEST_BINDING_INVALID");
+      continue;
+    }
+    if (request.agentId !== agentId) {
+      reasonCodes.push("REQUEST_AGENT_INVALID");
+      continue;
+    }
+    if (requestIds.has(request.approvalRequestId)) {
+      reasonCodes.push("REQUEST_DUPLICATE");
+      continue;
+    }
+    requestIds.add(request.approvalRequestId);
+    requests.push(request);
+  }
+
+  const decisionRoot = decisionsDir(params.workspace, agentId);
+  const decisionFiles = jsonArtifacts(decisionRoot);
+  if (hasOrphanedSignatures(decisionRoot)) {
+    reasonCodes.push("DECISION_ARTIFACT_MISSING");
+  }
+  const decisionIds = new Set<string>();
+  for (const file of decisionFiles) {
+    const path = join(decisionRoot, file);
+    if (!isRegularFile(path) || !isRegularFile(sigPathFor(path)) || !verifyArtifact(params.workspace, path).valid) {
+      reasonCodes.push("DECISION_INTEGRITY_INVALID");
+      continue;
+    }
+    let decision: ApprovalDecisionRecord;
+    try {
+      decision = approvalDecisionSchema.parse(JSON.parse(readUtf8(path)) as unknown);
+    } catch {
+      reasonCodes.push("DECISION_ARTIFACT_UNPARSEABLE");
+      continue;
+    }
+    const fileDecisionId = file.slice(0, -5);
+    if (decision.approvalDecisionId !== fileDecisionId) {
+      reasonCodes.push("DECISION_BINDING_INVALID");
+      continue;
+    }
+    if (decision.agentId !== agentId) {
+      reasonCodes.push("DECISION_AGENT_INVALID");
+      continue;
+    }
+    if (!requestIds.has(decision.approvalRequestId)) {
+      reasonCodes.push("DECISION_REQUEST_UNKNOWN");
+      continue;
+    }
+    if (decisionIds.has(decision.approvalDecisionId)) {
+      reasonCodes.push("DECISION_DUPLICATE");
+      continue;
+    }
+    decisionIds.add(decision.approvalDecisionId);
+  }
+
+  const consumptionRoot = consumedDir(params.workspace, agentId);
+  const consumptionFiles = jsonArtifacts(consumptionRoot);
+  if (hasOrphanedSignatures(consumptionRoot)) {
+    reasonCodes.push("CONSUMPTION_ARTIFACT_MISSING");
+  }
+  const consumedRequestIds = new Set<string>();
+  for (const file of consumptionFiles) {
+    const path = join(consumptionRoot, file);
+    if (!isRegularFile(path) || !isRegularFile(sigPathFor(path)) || !verifyArtifact(params.workspace, path).valid) {
+      reasonCodes.push("CONSUMPTION_INTEGRITY_INVALID");
+      continue;
+    }
+    let consumed: ApprovalConsumedRecord;
+    try {
+      consumed = approvalConsumedSchema.parse(JSON.parse(readUtf8(path)) as unknown);
+    } catch {
+      reasonCodes.push("CONSUMPTION_ARTIFACT_UNPARSEABLE");
+      continue;
+    }
+    const fileRequestId = file.slice(0, -5);
+    if (consumed.approvalRequestId !== fileRequestId) {
+      reasonCodes.push("CONSUMPTION_BINDING_INVALID");
+      continue;
+    }
+    if (consumed.agentId !== agentId) {
+      reasonCodes.push("CONSUMPTION_AGENT_INVALID");
+      continue;
+    }
+    if (!requestIds.has(consumed.approvalRequestId)) {
+      reasonCodes.push("CONSUMPTION_REQUEST_UNKNOWN");
+      continue;
+    }
+    if (consumedRequestIds.has(consumed.approvalRequestId)) {
+      reasonCodes.push("CONSUMPTION_DUPLICATE");
+      continue;
+    }
+    consumedRequestIds.add(consumed.approvalRequestId);
+  }
+
+  const uniqueReasons = [...new Set(reasonCodes)].sort((a, b) => a.localeCompare(b));
+  return {
+    valid: uniqueReasons.length === 0,
+    reasonCodes: uniqueReasons,
+    scannedRequests: requestFiles.length,
+    trustedRequests: requests.length,
+    scannedDecisions: decisionFiles.length,
+    scannedConsumptions: consumptionFiles.length,
+    requests: requests.sort((a, b) => b.createdTs - a.createdTs || a.approvalRequestId.localeCompare(b.approvalRequestId))
+  };
 }
 
 export function inspectApprovalChainIntegrity(params: {

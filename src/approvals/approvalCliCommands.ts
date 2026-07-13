@@ -4,13 +4,11 @@ import { deliverApprovalLifecycle } from "./approvalDelivery.js";
 import { decideApprovalForIntent } from "./approvalEngine.js";
 import {
   getApprovalInboxItem,
-  listApprovalInbox,
-  projectApprovalInboxSummary
 } from "./approvalInbox.js";
+import { parseApprovalActivityQuery, searchApprovalActivity } from "./approvalActivity.js";
 import {
   parseApprovalMode,
-  parseApprovalReviewerRoles,
-  parseApprovalStatus
+  parseApprovalReviewerRoles
 } from "./approvalCli.js";
 
 interface ApprovalReviewerOptions {
@@ -28,21 +26,66 @@ export function registerApprovalCliCommands(program: Command): void {
     .command("list")
     .requiredOption("--agent <agentId>", "agent ID")
     .option("--status <status>", "pending|quorum-met|approved|denied|consumed|expired|cancelled")
-    .action((opts: { agent: string; status?: string }) => {
-      const rows = listApprovalInbox({
+    .option("--query <requestId>", "case-insensitive approval request ID substring")
+    .option("--action-class <class>", "approval action class")
+    .option("--risk-tier <tier>", "low|medium|high|critical")
+    .option("--effective-mode <mode>", "simulate|execute")
+    .option("--created-after <timestamp>", "inclusive RFC3339 or epoch-ms lower bound")
+    .option("--created-before <timestamp>", "inclusive RFC3339 or epoch-ms upper bound")
+    .option("--order <order>", "newest|oldest", "newest")
+    .option("--limit <count>", "maximum rows (1-200)", "50")
+    .option("--json", "emit the shared machine-readable activity projection")
+    .action((opts: {
+      agent: string;
+      status?: string;
+      query?: string;
+      actionClass?: string;
+      riskTier?: string;
+      effectiveMode?: string;
+      createdAfter?: string;
+      createdBefore?: string;
+      order?: string;
+      limit?: string;
+      json?: boolean;
+    }) => {
+      const result = searchApprovalActivity({
         workspace: process.cwd(),
         agentId: opts.agent,
-        status: parseApprovalStatus(opts.status?.toUpperCase())
+        filters: parseApprovalActivityQuery({
+          query: opts.query,
+          status: opts.status,
+          actionClass: opts.actionClass,
+          riskTier: opts.riskTier,
+          effectiveMode: opts.effectiveMode,
+          createdAfter: opts.createdAfter,
+          createdBefore: opts.createdBefore,
+          order: opts.order,
+          limit: opts.limit
+        })
       });
-      if (rows.length === 0) {
+      if (opts.json) {
+        console.log(JSON.stringify(result, null, 2));
+        if (!result.integrity.valid) {
+          process.exitCode = 2;
+        }
+        return;
+      }
+      if (!result.integrity.valid) {
+        console.error(`Approval activity unavailable: ${result.integrity.reasonCodes.join(", ")}`);
+        process.exitCode = 2;
+        return;
+      }
+      if (result.requests.length === 0) {
         console.log("No approvals found.");
         return;
       }
-      for (const row of rows) {
-        const summary = projectApprovalInboxSummary(row);
+      for (const summary of result.requests) {
         console.log(
           `${summary.approvalRequestId} | ${summary.status} | ${summary.actionClass} | risk=${summary.riskTier} | quorum=${summary.quorum.received}/${summary.quorum.required}`
         );
+      }
+      if (result.truncated) {
+        console.log(`Showing ${result.returned} of ${result.totalMatched} matching approvals.`);
       }
     });
 

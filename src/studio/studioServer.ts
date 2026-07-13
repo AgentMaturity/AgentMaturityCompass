@@ -118,6 +118,7 @@ import {
   listApprovalInbox,
   projectApprovalInboxSummary
 } from "../approvals/approvalInbox.js";
+import { parseApprovalActivitySearchParams, searchApprovalActivity } from "../approvals/approvalActivity.js";
 import { deliverApprovalLifecycle } from "../approvals/approvalDelivery.js";
 import {
   ApprovalStudioError,
@@ -6557,17 +6558,18 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           return;
         }
         const agentId = resolveAgentId(options.workspace, url.searchParams.get("agentId") ?? "default");
-        const statusFilter = parseApprovalStatus(url.searchParams.get("status") ?? undefined);
-        const requests = listApprovalInbox({
+        let filters: ReturnType<typeof parseApprovalActivitySearchParams>;
+        try {
+          filters = parseApprovalActivitySearchParams(url.searchParams);
+        } catch (error) {
+          json(res, 400, { error: error instanceof Error ? error.message : "invalid approval activity filters" });
+          return;
+        }
+        json(res, 200, searchApprovalActivity({
           workspace: options.workspace,
           agentId,
-          status: statusFilter
-        })
-          .map(projectApprovalInboxSummary);
-        json(res, 200, {
-          agentId,
-          requests
-        });
+          filters
+        }));
         return;
       }
 
@@ -6630,6 +6632,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           quorum: inbox.quorum,
           status: inbox.status,
           requestIntegrity: inbox.requestIntegrity,
+          chainIntegrity: inbox.chainIntegrity,
           contextIntegrity: inbox.contextIntegrity,
           executionReady: inbox.executionReady,
           ...(observed.approvalDelivery ? { approvalDelivery: observed.approvalDelivery } : {})

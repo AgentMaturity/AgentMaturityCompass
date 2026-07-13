@@ -1414,6 +1414,15 @@ Start the AMC API server (alias for 'amc up')
 |--------|-------------|
 | `--agent <agentId>` | - |
 | `--status <status>` | - |
+| `--query <requestId>` | - |
+| `--action-class <class>` | - |
+| `--risk-tier <tier>` | - |
+| `--effective-mode <mode>` | - |
+| `--created-after <timestamp>` | - |
+| `--created-before <timestamp>` | - |
+| `--order <order>` | - |
+| `--limit <count>` | - |
+| `--json` | - |
 
 #### `amc approvals show`
 

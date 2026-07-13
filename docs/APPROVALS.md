@@ -25,12 +25,19 @@ The CLI, Dashboard, diagnostics, and Studio all read this chain. There is no sep
 
 ```bash
 amc approvals list --agent <agentId> --status pending
+amc approvals list --agent <agentId> --query <requestId-fragment> --action-class DEPLOY --risk-tier high --effective-mode execute --created-after 2026-07-01T00:00:00Z --created-before 2026-08-01T00:00:00Z --order newest --limit 50 --json
 amc approvals show --agent <agentId> <requestId>
 amc approvals approve --agent <agentId> <requestId> --mode execute --reason "approved by owner" --username <reviewer> --roles OWNER
 amc approvals deny --agent <agentId> <requestId> --reason "not approved" --username <reviewer> --roles APPROVER
 ```
 
-`--username` and `--roles` are required for decisions; `--user-id` can bind a stable identity distinct from its display name. Unknown roles and a repeated reviewer on a distinct-user request fail closed. CLI decisions use the same lifecycle delivery path as Studio. `APPROVED` remains an input compatibility alias for canonical `QUORUM_MET`. List output is a bounded summary and omits tool names, raw arguments, intent or work-order IDs, reasons, bound hashes, credentials, Vault references, tokens, absolute paths, and destination URLs. `show` is the explicit authenticated local detail command for an approver who needs to inspect signed request context.
+`--username` and `--roles` are required for decisions; `--user-id` can bind a stable identity distinct from its display name. Unknown roles and a repeated reviewer on a distinct-user request fail closed. CLI decisions use the same lifecycle delivery path as Studio. `APPROVED` remains an input compatibility alias for canonical `QUORUM_MET`.
+
+The list command searches only a case-insensitive stable request-ID fragment. It filters status, action class, approval risk tier, effective mode, inclusive RFC3339 or epoch-millisecond creation bounds, deterministic order, and a 1-200 row limit. It does not search tool names, raw arguments, intent or work-order IDs, reviewer identities, decision reasons, commands, MCP servers, prompts, payloads, credentials, Vault references, tokens, absolute paths, or destination URLs. `show` is the explicit authenticated local detail command for an approver who needs to inspect signed request context.
+
+Every list result is the same schema-versioned projection used by Studio and `GET /approvals/requests`. It reports normalized filters, aggregate inventory counts, total matches, returned rows, truncation, and generic integrity reason codes. The result says `derivedView: true`, `recorded: false`, and `proofEligible: false`: it is not a new activity record and does not prove that an approved action executed.
+
+Before filtering, AMC audits every canonical request, decision, consumption record, and detached signature. Invalid signatures, malformed artifacts, filename or agent binding failures, unknown request references, duplicate bindings, or detached signatures without their artifact fail closed with an empty result. A narrow filter cannot hide corrupt activity and then imply a complete history. Current policy/context drift remains visible on each historical row, but does not rewrite the integrity of the signed historical inventory.
 
 ## Studio and API
 
@@ -42,9 +49,9 @@ Studio Approvals supports a direct authenticated review link:
 
 Hosted workspace notifications use the router-aware form `/w/<workspaceId>/console/approvals?approval=<requestId>`. AMC accepts only these relative same-origin path shapes; absolute or arbitrary review targets are rejected.
 
-The inbox refreshes on privacy-safe approval SSE events. The current Studio routes are:
+The inbox refreshes on privacy-safe approval SSE events. It starts in pending mode, supports the same bounded search and filters as the CLI, and shows decision controls only for pending rows whose request, chain, and current context are trusted. The current Studio routes are:
 
-- `GET /approvals/requests`
+- `GET /approvals/requests?agentId=<id>&query=<requestId-fragment>&status=<status>&actionClass=<class>&riskTier=<tier>&effectiveMode=<mode>&createdAfter=<timestamp>&createdBefore=<timestamp>&order=<newest|oldest>&limit=<1-200>`
 - `GET /approvals/requests/:id`
 - `POST /approvals/requests/:id/decide`
 - `POST /approvals/requests/:id/cancel`

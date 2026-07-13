@@ -514,8 +514,10 @@ Outcome-based onboarding:
 - Status inspection does not mint a lease, call a provider, generate traffic, append evidence, or create an onboarding event store. Invalid signatures, malformed candidate metadata, missing receipts, lifecycle ambiguity, and ledger tampering fail closed with bounded reason codes.
 
 Canonical approval routes:
-- `GET /approvals/requests?agentId=<id>&status=<status>` lists the signed quorum-chain projection.
-- `GET /approvals/requests/:id` returns request, decision, quorum, integrity, and execution-readiness state.
+- `GET /approvals/requests?agentId=<id>&query=<requestId-fragment>&status=<status>&actionClass=<class>&riskTier=<tier>&effectiveMode=<mode>&createdAfter=<timestamp>&createdBefore=<timestamp>&order=<newest|oldest>&limit=<1-200>` returns the fail-closed signed quorum-chain activity projection.
+- The list response includes normalized filters, full-inventory integrity counts/reason codes, total matches, returned count, truncation, privacy-safe summaries, and `derivedView: true`, `recorded: false`, `proofEligible: false`. Invalid signatures, malformed or misbound artifacts, and orphan requests/decisions/consumption/signatures return no rows; filters never hide corruption.
+- Request-ID search is the only text search. Tool names, intent/work-order IDs, reviewer identities, reasons, commands, MCP servers, prompts, and payloads are not query fields or list output.
+- `GET /approvals/requests/:id` returns request, decision, quorum, request/chain/context integrity, and execution-readiness state.
 - `POST /approvals/requests/:id/decide` accepts only `APPROVE_EXECUTE`, `APPROVE_SIMULATE`, or `DENY` plus an optional bounded reason.
 - `POST /approvals/requests/:id/cancel` permits an `OWNER` to cancel only a pending request.
 - `GET /agent/approvals/:id/status` remains the lease-scoped agent polling route.

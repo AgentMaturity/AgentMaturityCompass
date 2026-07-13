@@ -347,6 +347,8 @@ amc policy test policy-fixtures.yaml --json
                                   # block CI when expected control decisions regress
 amc approvals list --agent default --status pending
                                   # inspect the canonical signed approval inbox
+amc approvals list --agent default --action-class DEPLOY --risk-tier high --created-after 2026-07-01T00:00:00Z --json
+                                  # search the fail-closed privacy-safe approval activity view
 amc approvals approve --agent default <requestId> --mode execute --reason "reviewed"
                                   # record one signed quorum decision
 amc guardrails list              # compare signed intent with effective runtime bindings
@@ -537,7 +539,7 @@ amc comms-check --text "Guaranteed 40% return" --domain wealth
 
 `amc policy test <file> [--json]` turns those same production simulations into a deterministic CI regression suite. Strict YAML/JSON cases assert exact outcomes and matched IDs; untrusted current policy sources fail closed instead of passing an expected safe result. Reports omit raw inputs, reasons, paths, signatures, and timestamps, create no runtime evidence, and use exit 0 for pass, 1 for mismatch, and 2 for invalid or untrusted state. See [Control Simulation](docs/CONTROL_SIMULATION.md#policy-regression-suites).
 
-When ToolHub requires approval, the CLI, Dashboard, diagnostics, and Studio now read the same signed quorum chain. Configured Integrations channels receive a metadata-only lifecycle notification with an authenticated Studio review path; no tool input, reason, credential, Vault reference, token, local path, or destination URL is included. Delivery never grants authority, and terminal, expired, tampered, or replayed requests fail closed. See [Approvals](docs/APPROVALS.md).
+When ToolHub requires approval, the CLI, Dashboard, diagnostics, and Studio read the same signed quorum chain. `amc approvals list` can search the stable request ID and filter privacy-safe status, action, risk, mode, time, order, and limit fields. It audits every canonical request, decision, consumption record, and detached signature before filtering; malformed, tampered, misbound, or orphaned activity returns no rows. The view never searches tool names, intent/work-order IDs, reviewer identities, reasons, commands, prompts, or payloads, and it is marked `derivedView: true`, `recorded: false`, and `proofEligible: false`. Configured Integrations channels still receive only metadata-only lifecycle notifications. See [Approvals](docs/APPROVALS.md).
 
 ### Auto-fix everything
 

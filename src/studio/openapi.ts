@@ -259,6 +259,7 @@ function studioEndpoints(): Record<string, Record<string, OpenApiOperation>> {
         tags: ["Studio", "Approvals", "Enforce"],
         parameters: [
           { name: "agentId", in: "query", required: false, schema: { type: "string" } },
+          { name: "query", in: "query", required: false, description: "Case-insensitive approval request ID substring (max 128 characters)", schema: { type: "string", maxLength: 128 } },
           {
             name: "status",
             in: "query",
@@ -267,11 +268,24 @@ function studioEndpoints(): Record<string, Record<string, OpenApiOperation>> {
               type: "string",
               enum: ["PENDING", "QUORUM_MET", "DENIED", "EXPIRED", "CANCELLED", "CONSUMED"]
             }
-          }
+          },
+          {
+            name: "actionClass",
+            in: "query",
+            required: false,
+            schema: { type: "string", enum: ["READ_ONLY", "WRITE_LOW", "WRITE_HIGH", "DEPLOY", "SECURITY", "FINANCIAL", "NETWORK_EXTERNAL", "DATA_EXPORT", "IDENTITY"] }
+          },
+          { name: "riskTier", in: "query", required: false, schema: { type: "string", enum: ["low", "medium", "high", "critical"] } },
+          { name: "effectiveMode", in: "query", required: false, schema: { type: "string", enum: ["SIMULATE", "EXECUTE"] } },
+          { name: "createdAfter", in: "query", required: false, description: "Inclusive RFC3339 or epoch-millisecond lower bound", schema: { type: "string" } },
+          { name: "createdBefore", in: "query", required: false, description: "Inclusive RFC3339 or epoch-millisecond upper bound", schema: { type: "string" } },
+          { name: "order", in: "query", required: false, schema: { type: "string", enum: ["newest", "oldest"], default: "newest" } },
+          { name: "limit", in: "query", required: false, schema: { type: "integer", minimum: 1, maximum: 200, default: 50 } }
         ],
         security: [{ adminToken: [] }, { sessionCookie: [] }],
         responses: {
-          "200": okJson("List of canonical approval requests", "#/components/schemas/ApprovalListResponse"),
+          "200": okJson("Fail-closed derived view of canonical signed approval activity", "#/components/schemas/ApprovalListResponse"),
+          "400": errJson("Invalid approval activity filters"),
           "401": errJson("Unauthorized")
         },
       },
@@ -1758,11 +1772,93 @@ function studioSchemas(): Record<string, unknown> {
     },
     ApprovalListResponse: {
       type: "object",
+      additionalProperties: false,
       properties: {
+        schemaVersion: { type: "string", const: "2026-07-13" },
         agentId: { type: "string" },
-        requests: { type: "array", items: { type: "object" } },
+        filters: { $ref: "#/components/schemas/ApprovalActivityFilters" },
+        integrity: { $ref: "#/components/schemas/ApprovalActivityIntegrity" },
+        totalMatched: { type: "integer", minimum: 0 },
+        returned: { type: "integer", minimum: 0 },
+        truncated: { type: "boolean" },
+        requests: { type: "array", items: { $ref: "#/components/schemas/ApprovalInboxSummary" } },
+        derivedView: { type: "boolean", const: true },
+        recorded: { type: "boolean", const: false },
+        proofEligible: { type: "boolean", const: false },
+        claimBoundary: { type: "string" },
       },
-      required: ["agentId", "requests"],
+      required: ["schemaVersion", "agentId", "filters", "integrity", "totalMatched", "returned", "truncated", "requests", "derivedView", "recorded", "proofEligible", "claimBoundary"],
+    },
+    ApprovalActivityFilters: {
+      type: "object",
+      additionalProperties: false,
+      properties: {
+        query: { type: ["string", "null"] },
+        status: { type: ["string", "null"], enum: ["PENDING", "QUORUM_MET", "DENIED", "EXPIRED", "CANCELLED", "CONSUMED", null] },
+        actionClass: { type: ["string", "null"], enum: ["READ_ONLY", "WRITE_LOW", "WRITE_HIGH", "DEPLOY", "SECURITY", "FINANCIAL", "NETWORK_EXTERNAL", "DATA_EXPORT", "IDENTITY", null] },
+        riskTier: { type: ["string", "null"], enum: ["low", "medium", "high", "critical", null] },
+        effectiveMode: { type: ["string", "null"], enum: ["SIMULATE", "EXECUTE", null] },
+        createdAfterTs: { type: ["integer", "null"] },
+        createdBeforeTs: { type: ["integer", "null"] },
+        order: { type: "string", enum: ["newest", "oldest"] },
+        limit: { type: "integer", minimum: 1, maximum: 200 },
+      },
+      required: ["query", "status", "actionClass", "riskTier", "effectiveMode", "createdAfterTs", "createdBeforeTs", "order", "limit"],
+    },
+    ApprovalActivityIntegrity: {
+      type: "object",
+      additionalProperties: false,
+      properties: {
+        valid: { type: "boolean" },
+        reasonCodes: { type: "array", items: { type: "string" } },
+        scannedRequests: { type: "integer", minimum: 0 },
+        trustedRequests: { type: "integer", minimum: 0 },
+        scannedDecisions: { type: "integer", minimum: 0 },
+        scannedConsumptions: { type: "integer", minimum: 0 },
+      },
+      required: ["valid", "reasonCodes", "scannedRequests", "trustedRequests", "scannedDecisions", "scannedConsumptions"],
+    },
+    ApprovalIntegrityState: {
+      type: "object",
+      additionalProperties: false,
+      properties: {
+        valid: { type: "boolean" },
+        reasonCode: { type: ["string", "null"] },
+      },
+      required: ["valid", "reasonCode"],
+    },
+    ApprovalInboxSummary: {
+      type: "object",
+      additionalProperties: false,
+      properties: {
+        schemaVersion: { type: "string", const: "2026-07-11" },
+        approvalRequestId: { type: "string" },
+        requestDigestSha256: { type: "string", pattern: "^[a-f0-9]{64}$" },
+        agentId: { type: "string" },
+        actionClass: { type: "string", enum: ["READ_ONLY", "WRITE_LOW", "WRITE_HIGH", "DEPLOY", "SECURITY", "FINANCIAL", "NETWORK_EXTERNAL", "DATA_EXPORT", "IDENTITY"] },
+        riskTier: { type: "string", enum: ["low", "medium", "high", "critical"] },
+        requestedMode: { type: "string", enum: ["SIMULATE", "EXECUTE"] },
+        effectiveMode: { type: "string", enum: ["SIMULATE", "EXECUTE"] },
+        createdTs: { type: "integer" },
+        expiresTs: { type: "integer" },
+        status: { type: "string", enum: ["PENDING", "QUORUM_MET", "DENIED", "EXPIRED", "CANCELLED", "CONSUMED"] },
+        quorum: {
+          type: "object",
+          additionalProperties: false,
+          properties: {
+            required: { type: "integer", minimum: 0 },
+            received: { type: "integer", minimum: 0 },
+            status: { type: "string", enum: ["PENDING", "QUORUM_MET", "DENIED", "EXPIRED", "CANCELLED", "CONSUMED"] },
+          },
+          required: ["required", "received", "status"],
+        },
+        decisionCount: { type: "integer", minimum: 0 },
+        requestIntegrity: { $ref: "#/components/schemas/ApprovalIntegrityState" },
+        chainIntegrity: { $ref: "#/components/schemas/ApprovalIntegrityState" },
+        contextIntegrity: { $ref: "#/components/schemas/ApprovalIntegrityState" },
+        executionReady: { type: "boolean" },
+      },
+      required: ["schemaVersion", "approvalRequestId", "requestDigestSha256", "agentId", "actionClass", "riskTier", "requestedMode", "effectiveMode", "createdTs", "expiresTs", "status", "quorum", "decisionCount", "requestIntegrity", "chainIntegrity", "contextIntegrity", "executionReady"],
     },
     ApprovalDetailResponse: {
       type: "object",
@@ -1772,10 +1868,11 @@ function studioSchemas(): Record<string, unknown> {
         quorum: { type: "object" },
         status: { type: "string" },
         requestIntegrity: { type: "object" },
+        chainIntegrity: { type: "object" },
         contextIntegrity: { type: "object" },
         executionReady: { type: "boolean" },
       },
-      required: ["request", "decisions", "quorum", "status", "requestIntegrity", "contextIntegrity", "executionReady"],
+      required: ["request", "decisions", "quorum", "status", "requestIntegrity", "chainIntegrity", "contextIntegrity", "executionReady"],
     },
     DecisionResponse: {
       type: "object",
