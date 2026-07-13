@@ -14,7 +14,7 @@
   <a href="https://github.com/AgentMaturity/AgentMaturityCompass/releases"><img src="https://img.shields.io/github/v/release/AgentMaturity/AgentMaturityCompass?labelColor=0a0a0a&color=4AEF79&label=release" alt="GitHub release" /></a>
   <a href="https://github.com/AgentMaturity/AgentMaturityCompass/releases"><img src="https://img.shields.io/github/downloads/AgentMaturity/AgentMaturityCompass/total?labelColor=0a0a0a&color=4AEF79&label=downloads" alt="verified release downloads" /></a>
   <a href="https://github.com/AgentMaturity/AgentMaturityCompass/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/AgentMaturity/AgentMaturityCompass/ci.yml?branch=main&labelColor=0a0a0a&color=4AEF79&label=CI" alt="CI" /></a>
-  <a href="https://github.com/AgentMaturity/AgentMaturityCompass/actions/workflows/ci.yml"><img src="https://img.shields.io/badge/tests-8%2C527%20passing-4AEF79?labelColor=0a0a0a" alt="tests" /></a>
+  <a href="https://github.com/AgentMaturity/AgentMaturityCompass/actions/workflows/ci.yml"><img src="https://img.shields.io/badge/tests-8%2C538%20passing-4AEF79?labelColor=0a0a0a" alt="tests" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-4AEF79?labelColor=0a0a0a" alt="MIT" /></a>
 </p>
 
@@ -836,7 +836,7 @@ AMC is MIT licensed. We welcome contributions — especially new **assurance pac
 
 ```bash
 git clone https://github.com/AgentMaturity/AgentMaturityCompass.git
-cd AgentMaturityCompass && npm ci && npm test   # 1,076 files / 8,527 passing Vitest tests
+cd AgentMaturityCompass && npm ci && npm test   # 1,077 files / 8,538 passing Vitest tests
 ```
 
 **→ [CONTRIBUTING.md](CONTRIBUTING.md)** — includes guides for writing packs, mapping research papers, and adding adapters.
