@@ -217,7 +217,7 @@ Telemetry is **off by default**. When enabled, only sends: OS, Node version, AMC
 
 | Command | Description |
 |---------|-------------|
-| `amc tools init\|verify\|list` | ToolHub tools config |
+| `amc tools init\|verify\|list [--json]` | Signed ToolHub config and fail-closed native/MCP server grouping |
 
 ## Vault
 

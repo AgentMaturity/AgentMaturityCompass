@@ -75,6 +75,38 @@ const m = vi.hoisted(() => ({
   initToolhubConfig: vi.fn(() => ({ path: "tools.yaml", sigPath: "tools.sig" })),
   verifyToolhubConfig: vi.fn(() => ({ valid: true })),
   listToolhubTools: vi.fn(() => ["search", "fetch"]),
+  inspectToolhubContextForCli: vi.fn(() => ({
+    schemaVersion: "2026-07-13",
+    authority: { kind: "signed-toolhub-config", configSha256: "a".repeat(64) },
+    integrity: { status: "trusted", signatureValid: true, reasonCodes: [] },
+    groups: [{
+      groupIdentity: "tool-group:native",
+      kind: "native",
+      label: "Native tools",
+      server: null,
+      tools: [{
+        toolIdentity: `tool:native:${"b".repeat(64)}`,
+        name: "search",
+        kind: "native",
+        actionClass: "READ_ONLY",
+        requireExecTicket: false,
+        serverIdentity: null
+      }]
+    }],
+    tools: [{
+      toolIdentity: `tool:native:${"b".repeat(64)}`,
+      name: "search",
+      kind: "native",
+      actionClass: "READ_ONLY",
+      requireExecTicket: false,
+      serverIdentity: null
+    }],
+    total: 1,
+    derivedView: true,
+    recorded: false,
+    proofEligible: false,
+    claimBoundary: "Declared ToolHub context only."
+  })),
   createGuardrailState: vi.fn(() => ({ enabled: [] })),
   listGuardrailsWithStatus: vi.fn(() => [{ name: "safe-output", enabled: true }]),
   enableGuardrail: vi.fn(() => true),
@@ -473,7 +505,8 @@ vi.mock("../src/lanes/safetyResearchLane.js", () => ({
 vi.mock("../src/toolhub/toolhubCli.js", () => ({
   initToolhubConfig: m.initToolhubConfig,
   verifyToolhubConfig: m.verifyToolhubConfig,
-  listToolhubTools: m.listToolhubTools
+  listToolhubTools: m.listToolhubTools,
+  inspectToolhubContextForCli: m.inspectToolhubContextForCli
 }));
 vi.mock("../src/enforce/guardrailProfiles.js", () => ({
   createGuardrailState: m.createGuardrailState,
@@ -1301,6 +1334,19 @@ describe("AMC API routers", () => {
     for (const [pathname, method, body, status] of cases) {
       await assertJsonRoute(handleToolsRoute, { pathname, method, body, workspace: ws }, status);
     }
+    const context = await assertJsonRoute(handleToolsRoute, {
+      pathname: "/api/v1/tools/list",
+      method: "GET",
+      workspace: ws
+    });
+    expect(context).toMatchObject({
+      schemaVersion: "2026-07-13",
+      integrity: { status: "trusted" },
+      total: 1,
+      derivedView: true,
+      recorded: false,
+      proofEligible: false
+    });
   });
 
   test("guardrail API reports a committed mutation when only the post-commit status refresh races", async () => {

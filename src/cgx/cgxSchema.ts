@@ -49,6 +49,7 @@ export const cgxNodeSchema = z.object({
     "AgentType",
     "ModelProvider",
     "ModelFamily",
+    "MCPServer",
     "Tool",
     "PolicyPack",
     "Budget",
@@ -91,7 +92,8 @@ export const cgxEdgeSchema = z.object({
     "PATCHES",
     "SUPERSEDES",
     "BLOCKS",
-    "ENABLES"
+    "ENABLES",
+    "PROVIDES"
   ]),
   from: z.string().min(1),
   to: z.string().min(1),

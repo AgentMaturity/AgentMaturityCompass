@@ -70,9 +70,8 @@ export async function handleToolsRoute(
     // GET /api/v1/tools/list — list allowed ToolHub tools
     if (pathname === '/api/v1/tools/list' && method === 'GET') {
       try {
-        const { listToolhubTools } = await import('../toolhub/toolhubCli.js');
-        const tools = listToolhubTools(workspace);
-        apiSuccess(res, { tools, total: tools.length });
+        const { inspectToolhubContextForCli } = await import('../toolhub/toolhubCli.js');
+        apiSuccess(res, inspectToolhubContextForCli(workspace));
       } catch (err) {
         apiError(res, 500, err instanceof Error ? err.message : 'Tools list failed');
       }

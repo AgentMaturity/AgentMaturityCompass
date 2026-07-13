@@ -58,6 +58,143 @@ components:
         error:
           type: string
 
+    ToolContextServer:
+      type: object
+      additionalProperties: false
+      required: [serverIdentity, id, name, version, transport]
+      properties:
+        serverIdentity:
+          type: string
+          pattern: '^mcp-server:[a-f0-9]{64}$'
+        id:
+          type: string
+          minLength: 1
+          maxLength: 160
+        name:
+          type: string
+          minLength: 1
+          maxLength: 160
+        version:
+          type: string
+          nullable: true
+        transport:
+          type: string
+          nullable: true
+          enum: [stdio, streamable-http, sse, http, null]
+
+    ToolContextTool:
+      type: object
+      additionalProperties: false
+      required: [toolIdentity, name, kind, actionClass, requireExecTicket, serverIdentity]
+      properties:
+        toolIdentity:
+          type: string
+          pattern: '^tool:(native|mcp):[a-f0-9]{64}$'
+        name:
+          type: string
+        kind:
+          type: string
+          enum: [native, mcp]
+        actionClass:
+          type: string
+          enum: [READ_ONLY, WRITE_LOW, WRITE_HIGH, DEPLOY, SECURITY, FINANCIAL, NETWORK_EXTERNAL, DATA_EXPORT, IDENTITY]
+        requireExecTicket:
+          type: boolean
+        serverIdentity:
+          type: string
+          nullable: true
+          pattern: '^mcp-server:[a-f0-9]{64}$'
+
+    ToolContextGroup:
+      type: object
+      additionalProperties: false
+      required: [groupIdentity, kind, label, server, tools]
+      properties:
+        groupIdentity:
+          type: string
+        kind:
+          type: string
+          enum: [native, mcp-server]
+        label:
+          type: string
+        server:
+          allOf:
+            - $ref: '#/components/schemas/ToolContextServer'
+          nullable: true
+        tools:
+          type: array
+          items:
+            $ref: '#/components/schemas/ToolContextTool'
+
+    ToolContextProjection:
+      type: object
+      additionalProperties: false
+      required: [schemaVersion, authority, integrity, groups, tools, total, derivedView, recorded, proofEligible, claimBoundary]
+      properties:
+        schemaVersion:
+          type: string
+          enum: ['2026-07-13']
+        authority:
+          type: object
+          additionalProperties: false
+          required: [kind, configSha256]
+          properties:
+            kind:
+              type: string
+              enum: [signed-toolhub-config]
+            configSha256:
+              type: string
+              nullable: true
+              pattern: '^[a-f0-9]{64}$'
+        integrity:
+          type: object
+          additionalProperties: false
+          required: [status, signatureValid, reasonCodes]
+          properties:
+            status:
+              type: string
+              enum: [trusted, untrusted]
+            signatureValid:
+              type: boolean
+            reasonCodes:
+              type: array
+              items:
+                type: string
+                enum: [TOOL_CONTEXT_CONFIG_MISSING, TOOL_CONTEXT_SIGNATURE_MISSING, TOOL_CONTEXT_SIGNATURE_INVALID, TOOL_CONTEXT_SCHEMA_INVALID, TOOL_CONTEXT_DUPLICATE_TOOL_NAME, TOOL_CONTEXT_DUPLICATE_IDENTITY, TOOL_CONTEXT_SERVER_METADATA_CONFLICT]
+        groups:
+          type: array
+          items:
+            $ref: '#/components/schemas/ToolContextGroup'
+        tools:
+          type: array
+          items:
+            $ref: '#/components/schemas/ToolContextTool'
+        total:
+          type: integer
+          minimum: 0
+        derivedView:
+          type: boolean
+          enum: [true]
+        recorded:
+          type: boolean
+          enum: [false]
+        proofEligible:
+          type: boolean
+          enum: [false]
+        claimBoundary:
+          type: string
+
+    ToolContextApiResponse:
+      type: object
+      additionalProperties: false
+      required: [ok, data]
+      properties:
+        ok:
+          type: boolean
+          enum: [true]
+        data:
+          $ref: '#/components/schemas/ToolContextProjection'
+
     ScoreResult:
       type: object
       properties:
@@ -6847,10 +6984,14 @@ paths:
   /v1/tools/list:
     get:
       tags: [tools]
-      summary: List allowed ToolHub tools
+      summary: List signed ToolHub tools grouped by declared provider context
       responses:
         '200':
-          description: Tool list
+          description: Fail-closed read-only ToolHub context projection
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ToolContextApiResponse'
 
   /v1/guardrails/list:
     get:

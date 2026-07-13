@@ -713,6 +713,31 @@ main {
   color: var(--warn);
 }
 
+.pill.bad {
+  border-color: rgba(239,68,68,.48);
+  color: var(--danger);
+}
+
+.tool-context-group {
+  margin-top: 14px;
+  min-width: 0;
+}
+
+.tool-context-group + .tool-context-group {
+  border-top: 1px solid var(--border);
+  padding-top: 14px;
+}
+
+.tool-context-group > .row {
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.table-wrap {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
 .lifecycle-summary {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));

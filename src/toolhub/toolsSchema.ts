@@ -12,6 +12,27 @@ const toolDenySchema = z.object({
   argvRegexDenylist: z.array(z.string()).optional()
 }).default({});
 
+const stableServerIdSchema = z.string()
+  .trim()
+  .min(1)
+  .max(160)
+  .regex(/^[a-z0-9][a-z0-9._:/-]*$/, "must be a lowercase stable identifier");
+
+export const toolContextSchema = z.discriminatedUnion("kind", [
+  z.object({
+    kind: z.literal("native")
+  }).strict(),
+  z.object({
+    kind: z.literal("mcp"),
+    server: z.object({
+      id: stableServerIdSchema,
+      name: z.string().trim().min(1).max(160),
+      version: z.string().trim().min(1).max(120).optional(),
+      transport: z.enum(["stdio", "streamable-http", "sse", "http"]).optional()
+    }).strict()
+  }).strict()
+]);
+
 export const toolDefinitionSchema = z.object({
   name: z.string().min(1),
   actionClass: z.enum(ACTION_CLASSES as [
@@ -29,7 +50,8 @@ export const toolDefinitionSchema = z.object({
   deny: toolDenySchema.optional(),
   maxBytes: z.number().int().positive().optional(),
   requireExecTicket: z.boolean().optional(),
-  denyByDefault: z.boolean().optional()
+  denyByDefault: z.boolean().optional(),
+  context: toolContextSchema.optional()
 });
 
 export const toolsConfigSchema = z.object({

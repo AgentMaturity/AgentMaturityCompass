@@ -39,6 +39,7 @@ const PROPAGATION_EDGE_TYPES = new Set([
   "ENABLES",
   "GOVERNED_BY",
   "CONSTRAINED_BY",
+  "PROVIDES",
   "USES",
   "OWNS",
   "BLOCKS",
@@ -51,6 +52,7 @@ const EDGE_WEIGHT: Record<string, number> = {
   BLOCKS: 0.85,
   GOVERNED_BY: 0.5,
   CONSTRAINED_BY: 0.5,
+  PROVIDES: 0.8,
   USES: 0.4,
   OWNS: 0.3,
 };

@@ -1060,7 +1060,7 @@ AMC provides 1,166 public CLI command paths in the live command inventory.
 | 1041 | `amc ticket verify` | Verify signed execution ticket |
 | 1042 | `amc tools` | ToolHub tools config |
 | 1043 | `amc tools init` | Create and sign .amc/tools.yaml |
-| 1044 | `amc tools list` | List allowed ToolHub tools and action classes |
+| 1044 | `amc tools list` | List signed ToolHub tools grouped by provider context |
 | 1045 | `amc tools verify` | Verify tools.yaml signature |
 | 1046 | `amc trace` | Trace explorer — inspect agent execution traces, sessions, and tool calls |
 | 1047 | `amc trace failures` | Show top recurring failure clusters mined from trace indexes |
@@ -8664,6 +8664,15 @@ Issue short-lived signed execution ticket
 | `--tool <name>` | - |
 | `--ttl <ttl>` | - |
 | `--agent <agentId>` | - |
+
+#### `amc tools list`
+
+List signed ToolHub tools grouped by provider context
+
+
+| Option | Description |
+|--------|-------------|
+| `--json` | - |
 
 #### `amc trace failures`
 

@@ -3,7 +3,7 @@ import { join } from "node:path";
 import { listAgents, loadAgentConfig } from "../fleet/registry.js";
 import { resolveAgentId } from "../fleet/paths.js";
 import { loadBridgeConfig } from "../bridge/bridgeConfigStore.js";
-import { listToolhubTools } from "../toolhub/toolhubCli.js";
+import { requireTrustedToolhubContext } from "../toolhub/toolContext.js";
 import { loadActionPolicy } from "../governor/actionPolicyEngine.js";
 import { loadBudgetsConfig, budgetForAgent } from "../budgets/budgets.js";
 import { loadApprovalPolicy } from "../approvals/approvalPolicyEngine.js";
@@ -364,27 +364,63 @@ function buildGraph(params: {
     }
   }
 
-  for (const tool of listToolhubTools(params.workspace)) {
-    const toolNodeId = `tool:${tool.name.toLowerCase().replaceAll(/[^a-z0-9]+/g, "-")}`;
-    addNode(nodeMap, {
-      id: toolNodeId,
-      type: "Tool",
-      label: tool.name,
-      evidenceRefs: {
-        runIds: [],
-        eventHashes: []
+  const toolContext = requireTrustedToolhubContext(params.workspace);
+  for (const group of toolContext.groups) {
+    if (group.server) {
+      addNode(nodeMap, {
+        id: group.server.serverIdentity,
+        type: "MCPServer",
+        label: group.server.name,
+        evidenceRefs: {
+          runIds: [],
+          eventHashes: []
+        }
+      });
+      addEdge(edgeMap, {
+        id: `edge:${wsNodeId}:${group.server.serverIdentity}:constrained-by`,
+        type: "CONSTRAINED_BY",
+        from: wsNodeId,
+        to: group.server.serverIdentity,
+        evidenceRefs: {
+          runIds: [],
+          eventHashes: []
+        }
+      });
+    }
+    for (const tool of group.tools) {
+      const toolNodeId = tool.toolIdentity;
+      addNode(nodeMap, {
+        id: toolNodeId,
+        type: "Tool",
+        label: tool.name,
+        evidenceRefs: {
+          runIds: [],
+          eventHashes: []
+        }
+      });
+      addEdge(edgeMap, {
+        id: `edge:${wsNodeId}:${toolNodeId}:constrained-by`,
+        type: "CONSTRAINED_BY",
+        from: wsNodeId,
+        to: toolNodeId,
+        evidenceRefs: {
+          runIds: [],
+          eventHashes: []
+        }
+      });
+      if (group.server) {
+        addEdge(edgeMap, {
+          id: `edge:${group.server.serverIdentity}:${toolNodeId}:provides`,
+          type: "PROVIDES",
+          from: group.server.serverIdentity,
+          to: toolNodeId,
+          evidenceRefs: {
+            runIds: [],
+            eventHashes: []
+          }
+        });
       }
-    });
-    addEdge(edgeMap, {
-      id: `edge:${wsNodeId}:${toolNodeId}:constrained-by`,
-      type: "CONSTRAINED_BY",
-      from: wsNodeId,
-      to: toolNodeId,
-      evidenceRefs: {
-        runIds: [],
-        eventHashes: []
-      }
-    });
+    }
   }
 
   const actionPolicy = loadActionPolicy(params.workspace);

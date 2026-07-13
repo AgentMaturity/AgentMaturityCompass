@@ -109,6 +109,47 @@ function card(title, body) {
   return `<section class="card"><h3>${htmlEscape(title)}</h3>${body}</section>`;
 }
 
+function renderToolContext(projection) {
+  const integrity = projection?.integrity?.status === "trusted" ? "trusted" : "untrusted";
+  const groups = Array.isArray(projection?.groups) ? projection.groups : [];
+  const reasonCodes = Array.isArray(projection?.integrity?.reasonCodes)
+    ? projection.integrity.reasonCodes
+    : [];
+  const body = integrity === "trusted"
+    ? groups.map((group) => {
+      const server = group?.server;
+      const heading = group?.kind === "native"
+        ? "Native tools"
+        : `${server?.name || group?.label || "MCP server"} · ${server?.id || "unknown"}`;
+      const context = server
+        ? [server.version ? `v${server.version}` : "", server.transport || ""].filter(Boolean).join(" · ")
+        : "local provider";
+      const rows = (Array.isArray(group?.tools) ? group.tools : []).map((tool) => `
+        <tr>
+          <td><code>${htmlEscape(tool.name || "unknown")}</code></td>
+          <td>${htmlEscape(tool.actionClass || "unknown")}</td>
+          <td>${tool.requireExecTicket ? "Required" : "No"}</td>
+          <td><code title="${htmlEscape(tool.toolIdentity || "")}">${htmlEscape(String(tool.toolIdentity || "").slice(0, 24))}</code></td>
+        </tr>
+      `).join("");
+      return `
+        <div class="tool-context-group">
+          <div class="row"><strong>${htmlEscape(heading)}</strong><span class="muted">${htmlEscape(context)}</span></div>
+          <div class="table-wrap"><table>
+            <thead><tr><th>Tool</th><th>Action class</th><th>Exec ticket</th><th>Identity</th></tr></thead>
+            <tbody>${rows}</tbody>
+          </table></div>
+        </div>
+      `;
+    }).join("")
+    : `<p class="status-bad">Tool context unavailable: ${htmlEscape(reasonCodes.join(", ") || "integrity check failed")}</p>`;
+  return `
+    <div class="row"><span class="pill ${integrity === "trusted" ? "ok" : "bad"}">${htmlEscape(integrity)}</span><span class="muted">${Number(projection?.total || 0)} tools</span></div>
+    ${body || '<p class="muted">No signed tools declared.</p>'}
+    <p class="muted">${htmlEscape(projection?.claimBoundary || "Declared ToolHub context only.")}</p>
+  `;
+}
+
 function currentWorkspaceLabel() {
   const prefix = workspacePrefixFromPath();
   if (!prefix) {
@@ -3482,10 +3523,10 @@ async function renderPage() {
       return;
     }
     if (page === "toolhub") {
-      const tools = await apiGet("/toolhub/tools");
+      const toolContext = await apiGet("/toolhub/tools");
       const intents = await apiGet("/toolhub/pending-intents").catch(() => ({ intents: [] }));
       root.innerHTML = `
-        ${card("Allowed Tools", `<pre>${JSON.stringify(tools, null, 2)}</pre>`)}
+        ${card("Allowed Tools", renderToolContext(toolContext))}
         ${card("Pending Intents", `<pre>${JSON.stringify(intents, null, 2)}</pre>`)}
       `;
       return;

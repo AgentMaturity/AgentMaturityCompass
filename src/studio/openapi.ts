@@ -253,6 +253,17 @@ function studioEndpoints(): Record<string, Record<string, OpenApiOperation>> {
         responses: { "200": okJson("Lease revoked", "#/components/schemas/LeaseRevocationResponse") },
       },
     },
+    "/toolhub/tools": {
+      get: {
+        summary: "List signed ToolHub tools grouped by declared provider context",
+        tags: ["Studio", "Enforce", "Fleet", "ToolHub"],
+        security: [{ adminToken: [] }, { sessionCookie: [] }, { agentToken: [] }],
+        responses: {
+          "200": okJson("Fail-closed read-only ToolHub context projection", "#/components/schemas/ToolContextProjection"),
+          "401": errJson("Unauthorized")
+        }
+      }
+    },
     "/approvals/requests": {
       get: {
         summary: "List canonical approval requests",
@@ -1769,6 +1780,91 @@ function studioSchemas(): Record<string, unknown> {
         leaseId: { type: "string" },
       },
       required: ["revoked", "leaseId"],
+    },
+    ToolContextServer: {
+      type: "object",
+      additionalProperties: false,
+      properties: {
+        serverIdentity: { type: "string", pattern: "^mcp-server:[a-f0-9]{64}$" },
+        id: { type: "string", minLength: 1, maxLength: 160 },
+        name: { type: "string", minLength: 1, maxLength: 160 },
+        version: { type: ["string", "null"] },
+        transport: { type: ["string", "null"], enum: ["stdio", "streamable-http", "sse", "http", null] }
+      },
+      required: ["serverIdentity", "id", "name", "version", "transport"]
+    },
+    ToolContextTool: {
+      type: "object",
+      additionalProperties: false,
+      properties: {
+        toolIdentity: { type: "string", pattern: "^tool:(native|mcp):[a-f0-9]{64}$" },
+        name: { type: "string" },
+        kind: { type: "string", enum: ["native", "mcp"] },
+        actionClass: { type: "string", enum: ["READ_ONLY", "WRITE_LOW", "WRITE_HIGH", "DEPLOY", "SECURITY", "FINANCIAL", "NETWORK_EXTERNAL", "DATA_EXPORT", "IDENTITY"] },
+        requireExecTicket: { type: "boolean" },
+        serverIdentity: { type: ["string", "null"], pattern: "^mcp-server:[a-f0-9]{64}$" }
+      },
+      required: ["toolIdentity", "name", "kind", "actionClass", "requireExecTicket", "serverIdentity"]
+    },
+    ToolContextGroup: {
+      type: "object",
+      additionalProperties: false,
+      properties: {
+        groupIdentity: { type: "string" },
+        kind: { type: "string", enum: ["native", "mcp-server"] },
+        label: { type: "string" },
+        server: { oneOf: [{ $ref: "#/components/schemas/ToolContextServer" }, { type: "null" }] },
+        tools: { type: "array", items: { $ref: "#/components/schemas/ToolContextTool" } }
+      },
+      required: ["groupIdentity", "kind", "label", "server", "tools"]
+    },
+    ToolContextProjection: {
+      type: "object",
+      additionalProperties: false,
+      properties: {
+        schemaVersion: { type: "string", const: "2026-07-13" },
+        authority: {
+          type: "object",
+          additionalProperties: false,
+          properties: {
+            kind: { type: "string", const: "signed-toolhub-config" },
+            configSha256: { type: ["string", "null"], pattern: "^[a-f0-9]{64}$" }
+          },
+          required: ["kind", "configSha256"]
+        },
+        integrity: {
+          type: "object",
+          additionalProperties: false,
+          properties: {
+            status: { type: "string", enum: ["trusted", "untrusted"] },
+            signatureValid: { type: "boolean" },
+            reasonCodes: {
+              type: "array",
+              items: {
+                type: "string",
+                enum: [
+                  "TOOL_CONTEXT_CONFIG_MISSING",
+                  "TOOL_CONTEXT_SIGNATURE_MISSING",
+                  "TOOL_CONTEXT_SIGNATURE_INVALID",
+                  "TOOL_CONTEXT_SCHEMA_INVALID",
+                  "TOOL_CONTEXT_DUPLICATE_TOOL_NAME",
+                  "TOOL_CONTEXT_DUPLICATE_IDENTITY",
+                  "TOOL_CONTEXT_SERVER_METADATA_CONFLICT"
+                ]
+              }
+            }
+          },
+          required: ["status", "signatureValid", "reasonCodes"]
+        },
+        groups: { type: "array", items: { $ref: "#/components/schemas/ToolContextGroup" } },
+        tools: { type: "array", items: { $ref: "#/components/schemas/ToolContextTool" } },
+        total: { type: "integer", minimum: 0 },
+        derivedView: { type: "boolean", const: true },
+        recorded: { type: "boolean", const: false },
+        proofEligible: { type: "boolean", const: false },
+        claimBoundary: { type: "string" }
+      },
+      required: ["schemaVersion", "authority", "integrity", "groups", "tools", "total", "derivedView", "recorded", "proofEligible", "claimBoundary"]
     },
     ApprovalListResponse: {
       type: "object",

@@ -270,7 +270,12 @@ import {
   initActionPolicy,
   verifyActionPolicySignature
 } from "./governor/actionPolicyEngine.js";
-import { initToolhubConfig, listToolhubTools, verifyToolhubConfig } from "./toolhub/toolhubCli.js";
+import {
+  formatToolhubContextText,
+  initToolhubConfig,
+  inspectToolhubContextForCli,
+  verifyToolhubConfig
+} from "./toolhub/toolhubCli.js";
 import { parseActionClasses, parseRiskTier } from "./workorders/workorderCli.js";
 import {
   createWorkOrder,
@@ -9369,10 +9374,13 @@ tools
 
 tools
   .command("list")
-  .description("List allowed ToolHub tools and action classes")
-  .action(() => {
-    for (const toolRow of listToolhubTools(process.cwd())) {
-      console.log(`- ${toolRow.name} (${toolRow.actionClass}) execTicket=${toolRow.requireExecTicket ? "required" : "no"}`);
+  .description("List signed ToolHub tools grouped by provider context")
+  .option("--json", "emit the complete tool context projection as JSON", false)
+  .action((opts: { json?: boolean }) => {
+    const projection = inspectToolhubContextForCli(process.cwd());
+    console.log(opts.json ? JSON.stringify(projection, null, 2) : formatToolhubContextText(projection));
+    if (projection.integrity.status !== "trusted") {
+      process.exitCode = 1;
     }
   });
 

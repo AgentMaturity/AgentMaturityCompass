@@ -541,6 +541,8 @@ amc comms-check --text "Guaranteed 40% return" --domain wealth
 
 When ToolHub requires approval, the CLI, Dashboard, diagnostics, and Studio read the same signed quorum chain. `amc approvals list` can search the stable request ID and filter privacy-safe status, action, risk, mode, time, order, and limit fields. It audits every canonical request, decision, consumption record, and detached signature before filtering; malformed, tampered, misbound, or orphaned activity returns no rows. The view never searches tool names, intent/work-order IDs, reviewer identities, reasons, commands, prompts, or payloads, and it is marked `derivedView: true`, `recorded: false`, and `proofEligible: false`. Configured Integrations channels still receive only metadata-only lifecycle notifications. See [Approvals](docs/APPROVALS.md).
 
+`amc tools list --json` verifies the signed ToolHub allowlist, derives stable tool and MCP server identities, groups tools by declared provider context, and reuses those identities in the Fleet CGX trust graph. Existing version 1 configs remain native when context is omitted. Missing or invalid signatures, malformed declarations, duplicate tools, or conflicting server metadata return no rows. The projection is read-only and explicitly non-proof; it does not discover or attest a live MCP server. See [ToolHub](docs/TOOLHUB.md).
+
 ### Auto-fix everything
 
 ```bash

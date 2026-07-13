@@ -42,6 +42,12 @@ import {
   verifyApprovalForExecution
 } from "../approvals/approvalEngine.js";
 import { loadApprovalPolicy, verifyApprovalPolicySignature } from "../approvals/approvalPolicyEngine.js";
+import {
+  inspectToolhubContext,
+  requireTrustedToolhubContext,
+  type ToolContextTool,
+  type ToolHubContextProjection
+} from "./toolContext.js";
 
 export interface ToolIntentRequest {
   agentId: string;
@@ -143,13 +149,12 @@ export class ToolHubService {
 
   constructor(private readonly workspace: string) {}
 
-  listTools(): Array<{ name: string; actionClass: ActionClass; requireExecTicket: boolean }> {
-    const config = loadToolsConfig(this.workspace);
-    return config.tools.allowedTools.map((tool) => ({
-      name: tool.name,
-      actionClass: tool.actionClass,
-      requireExecTicket: tool.requireExecTicket === true
-    }));
+  listToolContext(): ToolHubContextProjection {
+    return inspectToolhubContext(this.workspace);
+  }
+
+  listTools(): ToolContextTool[] {
+    return requireTrustedToolhubContext(this.workspace).tools;
   }
 
   listRecentExecutions(limit = 10): ExecutionRecord[] {

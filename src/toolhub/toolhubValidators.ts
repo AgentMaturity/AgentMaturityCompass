@@ -14,6 +14,22 @@ interface SignedDigest {
   signer: "auditor";
 }
 
+interface VerifiedToolsConfigBytes {
+  valid: boolean;
+  signatureExists: boolean;
+  reason: string | null;
+  digestSha256: string | null;
+  bytes: Buffer | null;
+}
+
+export interface VerifiedToolsConfigSnapshot {
+  signatureValid: boolean;
+  signatureExists: boolean;
+  reason: string | null;
+  digestSha256: string | null;
+  config: ToolsConfig | null;
+}
+
 function globToRegex(glob: string): RegExp {
   const escaped = glob
     .replace(/[.+^${}()|[\]\\]/g, "\\$&")
@@ -57,6 +73,59 @@ export function signToolsConfig(workspace: string, explicitPath?: string): strin
   return sigPath;
 }
 
+function verifyToolsConfigBytes(workspace: string, explicitPath?: string): VerifiedToolsConfigBytes {
+  const path = explicitPath ? resolve(workspace, explicitPath) : toolsConfigPath(workspace);
+  const sigPath = `${path}.sig`;
+  if (!pathExists(path)) {
+    return {
+      valid: false,
+      signatureExists: false,
+      reason: "tools config missing",
+      digestSha256: null,
+      bytes: null
+    };
+  }
+  if (!pathExists(sigPath)) {
+    return {
+      valid: false,
+      signatureExists: false,
+      reason: "tools config signature missing",
+      digestSha256: null,
+      bytes: null
+    };
+  }
+  try {
+    const bytes = readFileSync(path);
+    const sig = JSON.parse(readUtf8(sigPath)) as SignedDigest;
+    const digest = sha256Hex(bytes);
+    if (digest !== sig.digestSha256) {
+      return {
+        valid: false,
+        signatureExists: true,
+        reason: "digest mismatch",
+        digestSha256: digest,
+        bytes: null
+      };
+    }
+    const valid = verifyHexDigestAny(digest, sig.signature, getPublicKeyHistory(workspace, "auditor"));
+    return {
+      valid,
+      signatureExists: true,
+      reason: valid ? null : "signature verification failed",
+      digestSha256: digest,
+      bytes: valid ? bytes : null
+    };
+  } catch (error) {
+    return {
+      valid: false,
+      signatureExists: true,
+      reason: `invalid signature payload: ${String(error)}`,
+      digestSha256: null,
+      bytes: null
+    };
+  }
+}
+
 export function verifyToolsConfigSignature(workspace: string, explicitPath?: string): {
   valid: boolean;
   signatureExists: boolean;
@@ -66,33 +135,42 @@ export function verifyToolsConfigSignature(workspace: string, explicitPath?: str
 } {
   const path = explicitPath ? resolve(workspace, explicitPath) : toolsConfigPath(workspace);
   const sigPath = `${path}.sig`;
-  if (!pathExists(path)) {
-    return { valid: false, signatureExists: false, reason: "tools config missing", path, sigPath };
-  }
-  if (!pathExists(sigPath)) {
-    return { valid: false, signatureExists: false, reason: "tools config signature missing", path, sigPath };
+  const verification = verifyToolsConfigBytes(workspace, explicitPath);
+  return {
+    valid: verification.valid,
+    signatureExists: verification.signatureExists,
+    reason: verification.reason,
+    path,
+    sigPath
+  };
+}
+
+export function loadVerifiedToolsConfigSnapshot(workspace: string, explicitPath?: string): VerifiedToolsConfigSnapshot {
+  const verification = verifyToolsConfigBytes(workspace, explicitPath);
+  if (!verification.valid || !verification.bytes) {
+    return {
+      signatureValid: false,
+      signatureExists: verification.signatureExists,
+      reason: verification.reason,
+      digestSha256: verification.digestSha256,
+      config: null
+    };
   }
   try {
-    const sig = JSON.parse(readUtf8(sigPath)) as SignedDigest;
-    const digest = sha256Hex(readFileSync(path));
-    if (digest !== sig.digestSha256) {
-      return { valid: false, signatureExists: true, reason: "digest mismatch", path, sigPath };
-    }
-    const valid = verifyHexDigestAny(digest, sig.signature, getPublicKeyHistory(workspace, "auditor"));
     return {
-      valid,
+      signatureValid: true,
       signatureExists: true,
-      reason: valid ? null : "signature verification failed",
-      path,
-      sigPath
+      reason: null,
+      digestSha256: verification.digestSha256,
+      config: toolsConfigSchema.parse(YAML.parse(verification.bytes.toString("utf8")) as unknown)
     };
-  } catch (error) {
+  } catch {
     return {
-      valid: false,
+      signatureValid: true,
       signatureExists: true,
-      reason: `invalid signature payload: ${String(error)}`,
-      path,
-      sigPath
+      reason: "tools config schema invalid",
+      digestSha256: verification.digestSha256,
+      config: null
     };
   }
 }

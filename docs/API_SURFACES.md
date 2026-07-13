@@ -88,6 +88,9 @@ Implemented routes:
 - `GET /api/v1/observe/anomalies?agentId=<id>&limit=<n>&maxRuns=<n>`
 - `POST /api/v1/benchmarks/provider-drift`
 - `POST /api/v1/benchmarks/replay-corpus`
+- `GET /api/v1/tools/list`
+
+`GET /api/v1/tools/list` returns the `2026-07-13` ToolHub context projection inside the standard success envelope. It verifies the full signed allowlist before returning rows, groups native tools separately and MCP tools by exact server identity, and returns zero rows with bounded reason codes when config, signature, schema, duplicate, identity, or server-metadata integrity fails. The result is `derivedView: true`, `recorded: false`, and `proofEligible: false`; it is declared context, not live discovery, attestation, availability, or invocation proof.
 
 Enforce resource lifecycle responses expose workspace-relative references only. `status` distinguishes `NOT_INITIALIZED`, `ACTIVE`, `DRIFTED`, and `BLOCKED`; drift never becomes an activated version implicitly. Manifest selectors are limited to the selected agent's active manifest or canonical signed snapshots. Applied activation and rollback are owner-only, exact-manifest-confirmed, serialized, fully preflighted, published with atomic file replacement and recovery, post-verified, and receipt-backed. Schema, hash, ID, count, duplicate, signature, scope, path, snapshot, resource-digest, confirmation, concurrent-state, and lock failures return bounded errors and do not produce a success receipt. `force` cannot bypass these hard integrity checks.
 
@@ -505,6 +508,11 @@ SSE reconnect contract:
 Scope:
 - primary owner/operator console API implemented in `src/studio/studioServer.ts`
 - examples: `/status`, `/assurance/*`, `/audit/*`, `/value/*`, `/passport/*`, `/plugins/*`, `/toolhub/*`
+
+ToolHub context:
+- `GET /toolhub/tools` returns the same signed, fail-closed projection used by `amc tools list` and `/api/v1/tools/list`.
+- Studio groups tools under native or MCP server headings and displays integrity plus the declared-context claim boundary.
+- CGX consumes the same derived tool/server identities; it does not maintain a second registry or infer server identity from tool names.
 
 Outcome-based onboarding:
 - `GET /onboarding/status?agentId=<id>` returns existing workspace setup detail separately from a read-only four-milestone activation projection.

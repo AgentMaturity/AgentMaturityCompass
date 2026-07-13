@@ -6363,9 +6363,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, 403, { error: "missing scope toolhub:intent" });
           return;
         }
-        json(res, 200, {
-          tools: toolhub.listTools()
-        });
+        json(res, 200, toolhub.listToolContext());
         return;
       }
 

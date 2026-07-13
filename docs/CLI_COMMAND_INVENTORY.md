@@ -1047,7 +1047,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc ticket verify` | Verify signed execution ticket | - | - |
 | `amc tools` | ToolHub tools config | - | - |
 | `amc tools init` | Create and sign .amc/tools.yaml | - | - |
-| `amc tools list` | List allowed ToolHub tools and action classes | - | - |
+| `amc tools list` | List signed ToolHub tools grouped by provider context | `--json` | - |
 | `amc tools verify` | Verify tools.yaml signature | - | - |
 | `amc trace` | Trace explorer — inspect agent execution traces, sessions, and tool calls | - | - |
 | `amc trace failures` | Show top recurring failure clusters mined from trace indexes | `--agent <agentId>`<br>`--limit <n>`<br>`--redacted`<br>`--json` | - |
