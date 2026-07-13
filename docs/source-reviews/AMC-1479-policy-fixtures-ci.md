@@ -6,7 +6,7 @@
 - Source reviewed: [Agent Control repository](https://github.com/agentcontrol/agent-control)
 - Retrieval: live first-party repository reviewed 2026-07-12
 - Immutable source commit: Agent Control `83188b62c63e2b4ff9ada87048fd99605184ee5a`
-- Status: Implemented; publication verification pending
+- Status: Implemented and production verified
 
 ## Relevance decision
 
@@ -69,4 +69,10 @@ No upstream test, fixture, schema, policy, example, prose, config, output, scree
 - `npm run release:prepack-check` passed npm packing, SBOM, license inventory, release scan, release bundle creation, and bundle verification.
 - Desktop packaging and manifest verification passed for macOS universal, Linux x64, and Windows x64. Final SHA-256 values: npm `b8395232cbab8f83b8825823b9e68b8e1613cef507ffaf3921a709680b21e329`; macOS `680b39cfdb5562441ac5a8a1d66b390d045728d83c65d1e5e9e681ad0c5f5f0a`; Linux `d12442b40bc530f8914ca0131bcaeaae1c5e18ef007bfb5e380bba47b1e3b7fb`; Windows `85c117470a7a6860a1883e6aa92c15f859875e5e28e41f31d0f48b3bb55f1504`.
 - Playwright passed 55 tests with the same 2 intentional i18n skips, and the Pages artifact built with 173 public guides.
-- Exact-SHA GitHub workflows and production evidence will be appended before Done.
+- Implementation commit `0ce35bc1167e0dd554a29081378f3ecf630cc1f3` was pushed to `main`.
+- Exact-SHA workflows passed: CI `29226069137`, Pages `29226069142`, npm Publish `29226069159`, and Docker Runner Image `29226069189`. CI passed both Node matrices, security, local E2E, Docker, and Helm jobs. The Node 20 job passed `Policy fixture regression` and `Upload policy fixture report`.
+- CI artifact `8269973868` (`policy-fixture-report`, 840 bytes) downloaded successfully. Its three cases passed, its report SHA-256 matched local output at `bf869e5375c15b7e14bfbd8b1cb797a272fbfe7d3f94fc87e2de3c8a4eaa88cd`, and it retained `simulationOnly: true`, `recorded: false`, and `proofEligible: false`.
+- Production `content-manifest.json` reported exact source revision `0ce35bc1167e0dd554a29081378f3ecf630cc1f3` and 173 public guides. The deployed Control Simulation guide matched local SHA-256 `4644ce90f395fc15f425b09e09fc8810f1ac32f2bbdb9388911adaae6e83cc46`; the generated CLI inventory matched `461bd4397f659218a6c5fa760e3979d33cb3165db8e131bdb6195f0e5fa9c8d9`.
+- Deployed CLI, homepage, and Docs stylesheet bytes matched local SHA-256 values `b2cade709face8ffb65865fc3eb956f48c43cf7babacc67743422e1c15de797f`, `f330020c5bf2ff398a91f8d945939559b98c652feb5e8186938c7e65886a7a80`, and `a09b0c64167043e4cbffe84dd769c81474871df0169a23952091f39ab3ad055f`. Live content exposed `amc policy test`, 1,165 CLI paths, and 8,520 passing tests.
+- Headless production checks passed for homepage and CLI docs at 1440x900 and 390x844: HTTP 200, no horizontal overflow, and no console or page errors. The quick live release receipt `tmp/release-gate/amc-1479-live.json` passed with HTTP 200.
+- TLS verification passed: apex HTTP 200, `www` HTTP 301 to the apex, SANs for both hostnames, and a Let's Encrypt certificate valid from 2026-06-26 through 2026-09-24.
