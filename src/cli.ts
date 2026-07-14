@@ -3670,21 +3670,11 @@ program
 
     const state = await startStudioDaemon(workspace);
     const latest = latestRunSummary(workspace, state.currentAgent);
-    console.log(chalk.green("AMC Studio is running"));
-    console.log(`Agent: ${state.currentAgent}`);
-    console.log(`Gateway: http://${state.host}:${state.gatewayPort}`);
-    if (state.proxyPort > 0) {
-      console.log(`Proxy: http://${state.host}:${state.proxyPort}`);
-    }
-    console.log(`Dashboard: http://${state.host}:${state.dashboardPort}`);
-    console.log(`Studio API: http://${state.host}:${state.apiPort}`);
-    console.log(`Bridge: http://${state.host}:${state.apiPort}/bridge`);
-    console.log(`Compass Console: http://${state.host}:${state.apiPort}/console`);
-    if (latest) {
-      console.log(`Latest run: ${latest.runId} | IntegrityIndex ${latest.integrityIndex.toFixed(3)} (${latest.trustLabel})`);
-    } else {
-      console.log("Latest run: none");
-    }
+    console.log(chalk.green("\n\u2713 AMC is running.") + chalk.gray(` (agent: ${state.currentAgent})`));
+    console.log(`\n  ${chalk.bold("Open your report card:")}  ${chalk.hex("#4AEF79").bold(`http://${state.host}:${state.apiPort}/console`)}`);
+    const advancedEndpoints = [`Gateway :${state.gatewayPort}`, state.proxyPort > 0 ? `Proxy :${state.proxyPort}` : "", `Dashboard :${state.dashboardPort}`, `Studio API :${state.apiPort}`, `Bridge :${state.apiPort}/bridge`].filter(Boolean).join(" · ");
+    console.log(chalk.gray(`  Advanced endpoints (optional): ${advancedEndpoints}`));
+    console.log(chalk.gray(latest ? `  Latest run: ${latest.runId} | IntegrityIndex ${latest.integrityIndex.toFixed(3)} (${latest.trustLabel})` : "  Latest run: none — running your first one below"));
     await runFirstBaselineIfNeeded({
       workspace,
       agentId: state.currentAgent,

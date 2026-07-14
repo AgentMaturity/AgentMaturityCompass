@@ -38,7 +38,7 @@ function dots(label: string, totalWidth: number): string {
 
 /* ── Main renderer ──────────────────────────────────────────── */
 
-export function renderUnifiedResult(result: UnifiedRunResult, opts?: { ci?: boolean }): string {
+export function renderUnifiedResult(result: UnifiedRunResult, opts?: { ci?: boolean; firstRun?: boolean }): string {
   const lines: string[] = [];
   const W = 56; // content width
 
@@ -48,6 +48,17 @@ export function renderUnifiedResult(result: UnifiedRunResult, opts?: { ci?: bool
   lines.push(`  ${DIM}│${RESET}  ${BOLD}${WHITE}AMC Full Assessment${RESET} ${DIM}—${RESET} ${WHITE}${result.agentId}${RESET}${" ".repeat(Math.max(0, W - 26 - result.agentId.length))}${DIM}│${RESET}`);
   lines.push(`  ${DIM}╰${"─".repeat(W)}╯${RESET}`);
   lines.push("");
+
+  // First run: a fresh agent legitimately scores low because there is little
+  // observed evidence yet. Say so plainly instead of alarming a new user.
+  if (opts?.firstRun) {
+    lines.push(`  ${GREEN}${BOLD}First run — a low score here is completely normal.${RESET}`);
+    lines.push(`  ${DIM}AMC hasn't watched your agent do real work yet, so there is little${RESET}`);
+    lines.push(`  ${DIM}to score. Nothing is inflated: every grade below is only what AMC${RESET}`);
+    lines.push(`  ${DIM}can prove right now. Connect your agent and let it run — the score${RESET}`);
+    lines.push(`  ${DIM}climbs as real evidence builds up.${RESET}`);
+    lines.push("");
+  }
 
   // Module rows
   for (const mod of result.modules) {
@@ -93,25 +104,30 @@ export function renderUnifiedResult(result: UnifiedRunResult, opts?: { ci?: bool
     lines.push("");
   }
 
-  // Footer actions
-  if (result.lifecycleArtifactPath) {
-    lines.push(`  ${DIM}Lifecycle:${RESET} ${WHITE}${result.lifecycleArtifactPath}${RESET}`);
+  // Footer — collapse the internal evidence file paths into one human line.
+  // The full paths stay in the JSON result for machines and power users.
+  const evidenceRecords = [
+    result.lifecycleArtifactPath,
+    result.episodeRecordPath,
+    result.findingProofsPath,
+    result.lifecycleReceiptsPath,
+    result.observabilityPath,
+  ].filter(Boolean).length;
+  if (evidenceRecords > 0) {
+    lines.push(`  ${DIM}Evidence:${RESET}   ${WHITE}${evidenceRecords} signed record${evidenceRecords > 1 ? "s" : ""} saved under .amc/${RESET} ${DIM}(full paths in the JSON report)${RESET}`);
   }
-  if (result.episodeRecordPath) {
-    lines.push(`  ${DIM}Episode:${RESET}   ${WHITE}${result.episodeRecordPath}${RESET}`);
+
+  if (opts?.firstRun) {
+    lines.push("");
+    lines.push(`  ${BOLD}${WHITE}What to do next${RESET}`);
+    lines.push(`  ${GREEN}1.${RESET} Open the Compass Console shown above and follow the steps.`);
+    lines.push(`  ${GREEN}2.${RESET} Let AMC watch your agent work: ${WHITE}amc connect --status${RESET}`);
+    lines.push(`  ${GREEN}3.${RESET} Re-run anytime with one command: ${WHITE}amc start${RESET}`);
+  } else {
+    lines.push(`  ${DIM}CI gate:${RESET}    ${WHITE}amc run --fail-below B${RESET}`);
+    lines.push(`  ${DIM}Badge:${RESET}      ${WHITE}amc badge --style full${RESET}`);
+    lines.push(`  ${DIM}Improve:${RESET}    ${WHITE}amc mechanic plan${RESET}`);
   }
-  if (result.findingProofsPath) {
-    lines.push(`  ${DIM}Proofs:${RESET}    ${WHITE}${result.findingProofsPath}${RESET}`);
-  }
-  if (result.lifecycleReceiptsPath) {
-    lines.push(`  ${DIM}Receipts:${RESET}  ${WHITE}${result.lifecycleReceiptsPath}${RESET}`);
-  }
-  if (result.observabilityPath) {
-    lines.push(`  ${DIM}Observe:${RESET}   ${WHITE}${result.observabilityPath}${RESET}`);
-  }
-  lines.push(`  ${DIM}CI gate:${RESET}    ${WHITE}amc run --fail-below B${RESET}`);
-  lines.push(`  ${DIM}Badge:${RESET}      ${WHITE}amc badge --style full${RESET}`);
-  lines.push(`  ${DIM}Improve:${RESET}    ${WHITE}amc mechanic plan${RESET}`);
   lines.push("");
 
   return lines.join("\n");

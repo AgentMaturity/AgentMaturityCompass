@@ -120,8 +120,8 @@ export async function runFirstBaselineIfNeeded(params: {
       createdAgentContext: instant.createdAgentContext,
       vaultReason: instant.vault.reason
     });
-    console.log(renderUnifiedResult(baseline, { ci: false }));
-    console.log(chalk.gray("Baseline complete. Open the Compass Console to work through all eight surfaces."));
+    console.log(renderUnifiedResult(baseline, { ci: false, firstRun: true }));
+    console.log(chalk.green("\u2713 Baseline complete — your first score is saved. Follow \"What to do next\" above."));
   } catch (error) {
     console.log(chalk.yellow(`Baseline assessment could not run: ${error instanceof Error ? error.message : String(error)}. Run \`amc run\` manually.`));
   }
