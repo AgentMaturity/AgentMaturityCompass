@@ -10650,6 +10650,28 @@ exportGroup
   });
 
 exportGroup
+  .command("grc")
+  .description("Export the latest run as a GRC control-evidence manifest (Vanta/Drata/OneTrust-ingestible) + SARIF")
+  .requiredOption("--framework <framework>", "SOC2 | NIST_AI_RMF | ISO_42001 | EU_AI_ACT")
+  .requiredOption("--out <file>", "output manifest JSON path")
+  .option("--sarif <file>", "also write a SARIF 2.1.0 file for security tooling")
+  .option("--agent <agentId>", "agent ID (overrides global --agent)")
+  .option("--json", "print the manifest to stdout")
+  .action(async (opts: { framework: string; out: string; sarif?: string; agent?: string; json?: boolean }) => {
+    try {
+      const { runGrcExportCli } = await import("./exports/grcCli.js");
+      runGrcExportCli({
+        workspace: process.cwd(),
+        agentId: resolveAgentId(process.cwd(), opts.agent ?? activeAgent(program)),
+        framework: opts.framework,
+        out: opts.out,
+        sarif: opts.sarif,
+        json: opts.json
+      });
+    } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
+  });
+
+exportGroup
   .command("badge")
   .description("Export deterministic maturity badge SVG for a run")
   .requiredOption("--run <runId>", "run ID")
@@ -20320,6 +20342,19 @@ shield
       const tt = result.stages.trustToken;
       console.log(chalk.gray("  Trust Token:"), tt.issued ? chalk.green("issued") : chalk.red("not issued"), tt.tokenId ? `(${tt.tokenId.slice(0, 12)}...)` : "");
       console.log(chalk.gray("Evidence chain:"), result.evidenceChain.length, "hashes");
+    } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
+  });
+
+shield
+  .command("mcp-ledger <targets...>")
+  .description("Signed MCP trust ledger: scan a set of MCP servers and record a clean-as-of receipt")
+  .option("--json", "Output as JSON")
+  .option("--out <path>", "Save the signed receipt to JSON file")
+  .option("--previous <path>", "Prior receipt JSON to compute what changed since last check")
+  .action(async (targets: string[], opts: { json?: boolean; out?: string; previous?: string }) => {
+    try {
+      const { runMcpLedgerCli } = await import("./shield/mcpLedgerCli.js");
+      runMcpLedgerCli({ workspace: process.cwd(), targets, now: Date.now(), json: opts.json, out: opts.out, previous: opts.previous });
     } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
   });
 

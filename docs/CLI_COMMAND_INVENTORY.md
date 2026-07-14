@@ -315,9 +315,9 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc domain list` | List all 7 domains with metadata | `--json` | `sector list` |
 | `amc domain modules` | Show module activation map for domain | `--domain <d>`<br>`--json` | `sector modules` |
 | `amc domain pack` | Industry sector packs — 41 packs across 7 domains | - | `sector pack` |
-| `amc domain pack access` | Show Industry Packs subscription status and unlock instructions | `--json` | `subscribe`, `sector pack access` |
-| `amc domain pack activate` | Activate Industry Packs after purchase | `--key <licenseKey>`<br>`--expires-at <isoDate>`<br>`--json` | `sector pack activate` |
-| `amc domain pack checkout` | Create an Industry Packs checkout link | `--success-url <url>`<br>`--cancel-url <url>`<br>`--email <email>`<br>`--reference <id>`<br>`--json` | `sector pack checkout` |
+| `amc domain pack access` | Show Industry Packs entitlement and public-checkout readiness | `--json` | `subscribe`, `sector pack access` |
+| `amc domain pack activate` | Activate Industry Packs with a valid issued license key | `--key <licenseKey>`<br>`--expires-at <isoDate>`<br>`--json` | `sector pack activate` |
+| `amc domain pack checkout` | Create a checkout link only when a verified provider is configured | `--success-url <url>`<br>`--cancel-url <url>`<br>`--email <email>`<br>`--reference <id>`<br>`--json` | `sector pack checkout` |
 | `amc domain pack describe` | Show details of a specific industry sector pack | `--pack <packId>`<br>`--json` | `sector pack describe` |
 | `amc domain pack list` | List all available industry sector packs | `--domain <d>`<br>`--json` | `sector pack list` |
 | `amc domain pack run` | Run an industry sector pack — interactive assessment or baseline score | `--pack <packId>`<br>`--baseline`<br>`--json` | `sector pack run` |
@@ -414,6 +414,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc explain` | Plain-English explanation for a diagnostic question (example: AMC-2.1) | `--json` | - |
 | `amc export` | Export policy packs and badges | - | - |
 | `amc export badge` | Export deterministic maturity badge SVG for a run | `--run <runId>`<br>`--out <file>`<br>`--agent <agentId>` | - |
+| `amc export grc` | Export the latest run as a GRC control-evidence manifest (Vanta/Drata/OneTrust-ingestible) + SARIF | `--framework <framework>`<br>`--out <file>`<br>`--sarif <file>`<br>`--agent <agentId>`<br>`--json` | - |
 | `amc export policy` | Export framework-agnostic North Star policy integration pack | `--target <name>`<br>`--out <dir>`<br>`--agent <agentId>` | - |
 | `amc federate` | Offline federation sync operations | - | - |
 | `amc federate export` | Export offline federation sync package (.amcfed) | `--out <file>` | - |
@@ -1004,6 +1005,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc shield confirm scopes` | List exploit-confirmation authorization scopes | `--json` | - |
 | `amc shield conversation-integrity` | Check conversation integrity for an agent (demo) | `--json` | - |
 | `amc shield detect-injection` | Detect prompt injection attempts in text | `--json` | - |
+| `amc shield mcp-ledger` | Signed MCP trust ledger: scan a set of MCP servers and record a clean-as-of receipt | `--json`<br>`--out <path>`<br>`--previous <path>` | - |
 | `amc shield red-team` | Run a quick red team campaign (5 attacks on demo target). Tip: For full red-team suite with strategies, use `amc redteam run` | `--rounds <n>`<br>`--categories <list>`<br>`--target <profile>` | - |
 | `amc shield red-team-status` | Show current red team capabilities and attack template count | - | - |
 | `amc shield reputation` | Check reputation score for a tool | `--json` | - |
@@ -1088,7 +1090,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc truthguard validate` | Validate structured agent output claims against deterministic truth constraints | `--file <json>` | - |
 | `amc tune` | Mechanic mode tuning wizard | `--target <name>` | - |
 | `amc unknowns` | List known unknowns for an agent's latest diagnostic run | `--agent <id>` | - |
-| `amc up` | Start AMC control plane in one command (studio + gateway + bridge) | `--demo`<br>`--read-only`<br>`--dry-run`<br>`--no-open` | - |
+| `amc up` | Start AMC control plane in one command (studio + gateway + bridge) | `--demo`<br>`--read-only`<br>`--dry-run`<br>`--no-open`<br>`--no-remember`<br>`--no-baseline` | `start` |
 | `amc upgrade` | Generate upgrade plan | `--to <destination>` | - |
 | `amc user` | Multi-user RBAC account management | - | - |
 | `amc user add` | Add a user with RBAC roles | `--username <name>`<br>`--role <roles>` | - |
@@ -1130,6 +1132,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc vault dsar status` | Show a persistent DSAR request | `--json` | - |
 | `amc vault dsar submit` | Submit a persistent DSAR request | `--subject <id>`<br>`--type <type>`<br>`--json` | - |
 | `amc vault dsar-status` | Show DSAR (Data Subject Access Request) status | `--json` | - |
+| `amc vault forget` | Remove the remembered vault passphrase for this workspace (Keychain or credentials file) | - | - |
 | `amc vault init` | Initialize encrypted vault for signing keys | - | - |
 | `amc vault lock` | Lock vault and clear in-memory private keys | - | - |
 | `amc vault privacy-budget` | Check privacy budget for an agent | `--json` | - |
