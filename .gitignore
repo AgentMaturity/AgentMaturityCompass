@@ -86,6 +86,8 @@ AMC_IMPROVEMENT_ROADMAP.md
 COMPETITIVE_ANALYSIS.md
 ..bfg-report/
 exports/
+!src/exports/
+!src/exports/**
 tmp/
 
 # AMC workspace artifacts (assurance blobs, ledger)
