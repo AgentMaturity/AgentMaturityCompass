@@ -1012,6 +1012,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc shield sandbox` | Check sandbox configuration for an agent | `--json` | - |
 | `amc shield sanitize` | Sanitize text — strip LLM prompt injection and dangerous AI patterns (not SQL/XSS) | `--json` | - |
 | `amc shield sbom` | Generate software bill of materials from package.json | `--json` | - |
+| `amc shield scan-config` | Scan the coding-agent config surface (CLAUDE.md, settings, hooks, MCP, agent defs) for security risks (L0–L5, signed receipt) | `--json`<br>`--out <path>` | - |
 | `amc shield threat-intel` | Check threat intelligence for an input | `--json` | - |
 | `amc shield trust-pipeline` | Run end-to-end trust pipeline for an agent action | `--agent <id>`<br>`--action <action>`<br>`--tool <tool>`<br>`--session <id>`<br>`--workspace <id>`<br>`--json` | - |
 | `amc simulate-bridge` | Run a simulated bridge request for local testing | `--model <model>`<br>`--prompt <prompt>`<br>`--error-rate <rate>` | - |
