@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Verify Our Claims - Agent Maturity Compass</title>
+  <meta name="description" content="Don't trust AMC — check it. Download a real signed evidence bundle and verify it yourself with one command.">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Verify Our Claims - Agent Maturity Compass">
+  <meta property="og:description" content="Download a real signed AMC evidence bundle and verify it yourself with one command. No account, no trust required.">
+  <meta property="og:url" content="https://agentmaturity.co/verify.html">
+  <meta property="og:image" content="https://agentmaturity.co/og-card.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="stylesheet" href="style.css?v=14">
+  <style>
+    .plain-page{min-height:100vh;padding:8rem 0 4rem}
+    .plain-page .label{margin-bottom:.75rem}
+    .plain-page h1{white-space:normal;margin-bottom:1.5rem}
+    .plain-page p,.plain-page li{max-width:760px;color:var(--text-muted);line-height:1.75}
+    .plain-page ul,.plain-page ol{margin:1rem 0 2rem 1.25rem}
+    .plain-page h2{font-size:1.15rem;text-transform:none;letter-spacing:0;color:var(--text);margin:2rem 0 .75rem}
+    .plain-page a{color:var(--accent);text-decoration:underline;text-underline-offset:3px}
+    .plain-page pre{max-width:760px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:1rem;overflow-x:auto;margin:0 0 1.5rem}
+    .plain-page code{font-size:.9rem}
+  </style>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <nav class="nav scrolled">
+    <div class="nav-inner">
+      <a href="./" class="nav-brand">amc<span class="accent">_</span></a>
+      <ul class="nav-links">
+        <li><a href="./#install">install</a></li>
+        <li><a href="./playground.html">playground</a></li>
+        <li><a href="./docs/index.html">docs</a></li>
+        <li><a href="https://github.com/AgentMaturity/AgentMaturityCompass">github</a></li>
+      </ul>
+    </div>
+  </nav>
+  <span id="main-content" tabindex="-1"></span>
+  <main class="plain-page">
+    <div class="container">
+      <p class="label">evidence over claims</p>
+      <h1>Don't trust us. Check us.</h1>
+
+      <p>Every AMC score ships inside a signed evidence bundle. Anyone can verify a bundle offline — without an account, without our servers, and without trusting the person who sent it. This page lets you try that right now, on a real bundle we generated and published.</p>
+
+      <h2>Verify a real bundle in two minutes</h2>
+      <p>1. Install AMC (free, open source):</p>
+      <pre><code>curl -fsSL https://agentmaturity.co/install.sh | sh</code></pre>
+      <p>2. Download the sample bundle we published:</p>
+      <pre><code>curl -fsSLO https://agentmaturity.co/verify/amc-sample-evidence.amcbundle</code></pre>
+      <p>3. Verify it:</p>
+      <pre><code>amc bundle verify amc-sample-evidence.amcbundle</code></pre>
+      <p>You should see:</p>
+      <pre><code>Bundle verification PASSED</code></pre>
+
+      <p>AMC checks the bundle's signatures, hash chain, and manifest — fully offline. If a single byte had been edited after signing, verification would fail. Try it: flip one character anywhere in the file and run the command again. We did exactly that while publishing this page, and verification failed as it should.</p>
+
+      <p>The published sample's SHA-256, if you want to checksum the download itself:</p>
+      <pre><code>b5860614cf52ef621693e41241c0c608c455538431263ac58aa1e18bb6029441</code></pre>
+
+      <h2>What this proves — and what it doesn't</h2>
+      <ul>
+        <li><strong>It proves integrity.</strong> The bundle you verified is exactly what was signed. Nobody edited the score, the evidence, or the timestamps afterward.</li>
+        <li><strong>It does not prove quality by itself.</strong> A signed bundle of weak evidence is still weak evidence — that's why AMC reports evidence readiness separately from the artifact seal, and marks scores claim-eligible only when readiness is <code>READY</code>. The published sample is a fresh baseline run: valid, signed, and honest about containing no accepted evidence yet.</li>
+      </ul>
+
+      <h2>Verify anyone's agent the same way</h2>
+      <p>When someone hands you an AMC bundle — a vendor, a contractor, a teammate — run the same commands. You don't need their infrastructure or their word:</p>
+      <pre><code>amc bundle verify their-agent-evidence.amcbundle
+amc bundle inspect their-agent-evidence.amcbundle</code></pre>
+
+      <h2>Verify our releases too</h2>
+      <p>The installer itself is verifiable: it downloads a pinned GitHub Release, checks every archive against the published <code>SHA256SUMS</code>, and refuses anything that doesn't match. Our published test counts are enforced by the test suite itself — the number and the suite are checked against each other, so the badge can't silently drift.</p>
+
+      <h2>How the scoring works</h2>
+      <p>The full methodology — levels, evidence tiers, decay, gates, and the compliance-framework crosswalk — is public: <a href="methodology.html">methodology</a> · <a href="https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/METHODOLOGY_CROSSWALK.md">framework crosswalk</a>.</p>
+    </div>
+  </main>
+</body>
+</html>

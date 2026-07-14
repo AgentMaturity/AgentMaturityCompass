@@ -17,6 +17,7 @@
 macOS/Linux: curl -fsSL https://agentmaturity.co/install.sh | sh
 Windows PowerShell: irm https://agentmaturity.co/install.ps1 | iex
 
+Verify a real signed evidence bundle yourself: https://agentmaturity.co/verify.html
 The installers pin a GitHub release and verify SHA-256 before execution. The npm registry and Homebrew tap are not public channels yet.
 
 ## Full Score
