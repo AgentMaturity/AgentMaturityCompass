@@ -1006,6 +1006,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc shield conversation-integrity` | Check conversation integrity for an agent (demo) | `--json` | - |
 | `amc shield detect-injection` | Detect prompt injection attempts in text | `--json` | - |
 | `amc shield mcp-ledger` | Signed MCP trust ledger: scan a set of MCP servers and record a clean-as-of receipt | `--json`<br>`--out <path>`<br>`--previous <path>` | - |
+| `amc shield posture` | One-command agent-security posture scorecard (config, MCP trust, secrets, isolation, supply-chain) — L0–L5, signed receipt | `--json`<br>`--out <path>` | - |
 | `amc shield red-team` | Run a quick red team campaign (5 attacks on demo target). Tip: For full red-team suite with strategies, use `amc redteam run` | `--rounds <n>`<br>`--categories <list>`<br>`--target <profile>` | - |
 | `amc shield red-team-status` | Show current red team capabilities and attack template count | - | - |
 | `amc shield reputation` | Check reputation score for a tool | `--json` | - |

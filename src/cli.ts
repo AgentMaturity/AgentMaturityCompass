@@ -20346,6 +20346,18 @@ shield
   });
 
 shield
+  .command("posture [dir]")
+  .description("One-command agent-security posture scorecard (config, MCP trust, secrets, isolation, supply-chain) — L0–L5, signed receipt")
+  .option("--json", "Output as JSON")
+  .option("--out <path>", "Save the scorecard to JSON file")
+  .action(async (dir: string | undefined, opts: { json?: boolean; out?: string }) => {
+    try {
+      const { runPostureCli } = await import("./shield/postureCli.js");
+      runPostureCli({ dir, now: Date.now(), json: opts.json, out: opts.out });
+    } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
+  });
+
+shield
   .command("scan-config [dir]")
   .description("Scan the coding-agent config surface (CLAUDE.md, settings, hooks, MCP, agent defs) for security risks (L0–L5, signed receipt)")
   .option("--json", "Output as JSON")

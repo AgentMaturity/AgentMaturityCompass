@@ -13,7 +13,7 @@
 
 ## CLI Commands
 
-AMC provides 1,170 public CLI command paths in the live command inventory.
+AMC provides 1,171 public CLI command paths in the live command inventory.
 
 | # | Command | Description |
 |---|---------|-------------|
@@ -1182,7 +1182,7 @@ AMC provides 1,170 public CLI command paths in the live command inventory.
 | 1163 | `amc workorder list` | List work orders for agent |
 | 1164 | `amc workorder show` | Show signed work order JSON |
 | 1165 | `amc workorder verify` | Verify work order signature |
-| 1170 | `amc wrap` | Wrap runtime and capture tamper-evident evidence |
+| 1171 | `amc wrap` | Wrap runtime and capture tamper-evident evidence |
 
 ### Command Details
 

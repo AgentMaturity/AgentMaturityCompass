@@ -29,7 +29,7 @@ amc
 - 244 default diagnostic questions across 5 trust dimensions, plus a 264-question lifecycle-expanded set
 - 14 framework adapters (LangChain, CrewAI, AutoGen, etc.)
 - Signed adapter capability receipts separate declared/effective events and controls, runtime/version proof, hook mode, and lossiness; metadata-only adapters fail closed
-- 1,170 public CLI command paths
+- 1,171 public CLI command paths
 - Domain Proof Lane with amcproof artifacts for source-to-rule correctness checks
 - Evidence trust tiers: SELF_REPORTED (0.4x), OBSERVED (1.0x), CRYPTOGRAPHIC (1.0x)
 
