@@ -2,10 +2,10 @@ import { test, expect } from './fixtures.js';
 import { INDEX_URL } from './urls.js';
 
 test.describe('Theme', () => {
-  test('theme toggle exists on homepage', async ({ page }) => {
+  test('homepage is dark-only with no light-theme toggle', async ({ page }) => {
     await page.goto(INDEX_URL);
-    const toggle = page.locator('#themeToggle, .theme-toggle, [aria-label*="theme" i]');
-    expect(await toggle.count()).toBeGreaterThan(0);
+    const toggle = page.locator('#themeToggle, .theme-toggle');
+    expect(await toggle.count()).toBe(0);
   });
 
   test('switching theme changes CSS variables', async ({ page }) => {
