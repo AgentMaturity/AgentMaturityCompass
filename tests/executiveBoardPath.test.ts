@@ -27,7 +27,7 @@ describe("executive and board-facing path", () => {
     expect(combined).toContain("41");
     expect(combined).toContain("600 sector");
     expect(docs).toContain("**Mobility** | 6");
-    expect(docs).toContain("$9.99/month");
+    expect(docs).toContain("$19/month");
     expect(docs).toContain("amc up");
 
     expect(combined).not.toContain("593 sector-specific");

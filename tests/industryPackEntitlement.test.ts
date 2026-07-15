@@ -228,7 +228,7 @@ describe("industry pack entitlement", () => {
 
     expect(url.origin).toBe("https://payments.example.test");
     expect(url.searchParams.get("plan")).toBe("industry-packs-monthly");
-    expect(url.searchParams.get("price")).toBe("9.99");
+    expect(url.searchParams.get("price")).toBe("19");
     expect(url.searchParams.get("success_url")).toBe("https://agentmaturity.co/success");
     expect(url.searchParams.get("client_reference_id")).toBe("agent-123");
   });

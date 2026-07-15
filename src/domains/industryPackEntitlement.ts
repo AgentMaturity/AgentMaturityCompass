@@ -5,7 +5,7 @@ import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js
 import type { IndustryPack } from "./industryPacks.js";
 
 export const INDUSTRY_PACKS_PLAN_ID = "industry-packs-monthly";
-export const INDUSTRY_PACKS_MONTHLY_PRICE_USD = "9.99";
+export const INDUSTRY_PACKS_MONTHLY_PRICE_USD = "19";
 export const INDUSTRY_PACKS_ACCESS_FILE = "industry-packs-access.json";
 export const INDUSTRY_PACKS_PUBLIC_COUNT = 41;
 export const INDUSTRY_PACKS_LICENSE_PREFIX = "AMC-INDUSTRY-PACKS";
