@@ -282,7 +282,7 @@
         if (!pack) return;
         if (action === 'unlock' || pack.locked) {
           if (typeof window.showViewToast === 'function') {
-            window.showViewToast('Industry Packs are $19/month per user. Run amc domain pack access to subscribe or activate.');
+            window.showViewToast('Industry Packs are $9.99/month per user. Run amc domain pack access to subscribe or activate.');
           }
           return;
         }

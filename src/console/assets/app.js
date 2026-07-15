@@ -2195,12 +2195,12 @@ async function renderIndustryPacks() {
         </div>
         <div>
           <div class="muted">Plan</div>
-          <div class="tile-value">planned $${htmlEscape(entitlement.priceUsdMonthly || "19")}/mo</div>
+          <div class="tile-value">planned $${htmlEscape(entitlement.priceUsdMonthly || "9.99")}/mo</div>
         </div>
       </div>
       ${locked ? `
         <p class="muted">${checkoutAvailable
-          ? `$${htmlEscape(entitlement.priceUsdMonthly || "19")}/month for all 41 Industry Domain Packs.`
+          ? `$${htmlEscape(entitlement.priceUsdMonthly || "9.99")}/month for all 41 Industry Domain Packs.`
           : "Public checkout and automatic license issuance are not live yet. Do not send payment based on this preview."}</p>
         <div class="row">
           ${checkoutAvailable ? `<button id="industryCheckout">Open verified checkout</button>` : ""}
@@ -2257,7 +2257,7 @@ async function renderIndustryPacks() {
       const id = button.getAttribute("data-industry-pack");
       if (locked) {
         out.textContent = checkoutAvailable
-          ? `Industry Packs are locked. Use the verified checkout for the planned $${entitlement.priceUsdMonthly || "19"}/month tier.\n${entitlement.checkoutUrl || ""}`
+          ? `Industry Packs are locked. Use the verified checkout for the planned $${entitlement.priceUsdMonthly || "9.99"}/month tier.\n${entitlement.checkoutUrl || ""}`
           : "Industry Packs are locked. Public checkout and automatic license issuance are not live yet.";
         return;
       }

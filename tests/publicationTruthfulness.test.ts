@@ -48,8 +48,8 @@ describe("public distribution and pricing truthfulness", () => {
       text("src/console/assets/app.js"),
     ].join("\n");
     expect(combined).not.toContain("Run `amc domain pack checkout` to open the subscription flow");
-    expect(combined).not.toContain("One $19/month subscription unlocks all 41 packs");
-    expect(combined).not.toContain("$19/month unlock");
+    expect(combined).not.toContain("One $9.99/month subscription unlocks all 41 packs");
+    expect(combined).not.toContain("$9.99/month unlock");
   });
 
   test("current examples and integration guides do not advertise the unpublished npm package", () => {

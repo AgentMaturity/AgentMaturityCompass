@@ -4,7 +4,7 @@
 
 AMC is open source and MIT licensed. The full trust stack is free.
 
-The planned commercial surface is **Industry Packs** — 41 sector-specific domain packs that map trust scoring to regulated and specialized verticals. The target price is **$19/month per user** for all 41 packs. **Public checkout and automatic license issuance are not yet publicly live or available.**
+The planned commercial surface is **Industry Packs** — 41 sector-specific domain packs that map trust scoring to regulated and specialized verticals. The target price is **$9.99/month per user** for all 41 packs. **Public checkout and automatic license issuance are not yet publicly live or available.**
 
 ## What is free
 
@@ -45,7 +45,7 @@ Examples:
 Industry packs require deep domain expertise, regulatory research, and ongoing maintenance as regulations evolve. Keeping them as the paid tier funds the open-source core sustainably.
 
 ### Current access status
-- **Industry Packs** — implemented behind an entitlement boundary; target price $19/month per user; not yet publicly purchasable
+- **Industry Packs** — implemented behind an entitlement boundary; target price $9.99/month per user; not yet publicly purchasable
 - **Enterprise** — contact-first planning only; no self-serve checkout claim
 
 CLI:
@@ -64,7 +64,7 @@ For a future production checkout, an operator must first verify a real payment l
 | Tier | What you get | Who it's for |
 |---|---|---|
 | **Free / Open Source** | Full AMC trust stack (Score, Shield, Enforce, Vault, Watch, Comply, Fleet, Passport), all adapters, all CLI commands, browser playground, CI gates | Everyone — solo devs, teams, enterprises evaluating |
-| **Industry Packs (planned)** | Everything in Free + all 41 Industry Packs; target $19/month per user; checkout not live | Teams in regulated industries who need sector-specific diagnostics |
+| **Industry Packs (planned)** | Everything in Free + all 41 Industry Packs; target $9.99/month per user; checkout not live | Teams in regulated industries who need sector-specific diagnostics |
 | **Enterprise (contact-first)** | Planned Industry Packs access + priority support + custom pack development + deployment assistance | Regulated organizations, platform teams at scale |
 
 ## FAQ

@@ -9,7 +9,7 @@ AMC has one simple split:
 
 ## Full edition matrix
 
-| Product | Free / Open Source | Industry Packs (planned $19/mo per user) | Enterprise (contact-first) |
+| Product | Free / Open Source | Industry Packs (planned $9.99/mo per user) | Enterprise (contact-first) |
 |---|---|---|---|
 | **Score** | ✅ Full | ✅ Full | ✅ Full |
 | **Shield** (142 assurance packs) | ✅ Full | ✅ Full | ✅ Full |

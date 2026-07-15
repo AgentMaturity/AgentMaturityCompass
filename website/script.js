@@ -5,7 +5,11 @@ function initReveals(){
   var els=document.querySelectorAll('.gs');
   els.forEach(function(el){ el.style.opacity='1'; el.style.transform='translateY(0)'; });
 
-  if(typeof gsap==='undefined'||typeof ScrollTrigger==='undefined') return;
+  if(typeof gsap==='undefined'||typeof ScrollTrigger==='undefined'){
+    // CDN unavailable (blocked network, script blocker): show everything.
+    document.querySelectorAll('.gs').forEach(function(el){ el.style.opacity='1'; el.style.transform='none'; });
+    return;
+  }
   gsap.registerPlugin(ScrollTrigger);
   ScrollTrigger.config({limitCallbacks:true});
   var gsEls=gsap.utils.toArray('.gs');

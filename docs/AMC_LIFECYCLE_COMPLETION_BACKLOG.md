@@ -237,7 +237,7 @@ Implement:
 - Confirm all packs are discoverable and grouped.
 - Enforce entitlement before premium content is used.
 - Support locked preview, checkout, activation, verification, restore, and offline states.
-- Treat $19/month per user as the planned tier and state clearly that checkout is unavailable until independently verified live.
+- Treat $9.99/month per user as the planned tier and state clearly that checkout is unavailable until independently verified live.
 - Ensure full `amc` can recommend a domain pack without bypassing the paywall.
 
 Done when:
