@@ -6,6 +6,11 @@
 html{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
 body{font-family:var(--sans);background:var(--bg);color:var(--text-muted);line-height:1.65;font-size:16px;overflow-x:hidden}
 .desktop-download{display:flex;gap:1rem;flex-wrap:wrap;margin-top:1.75rem}
+.hero-download{display:flex;gap:.75rem;flex-wrap:wrap}
+.hero-reassure{font-family:var(--mono);font-size:.82rem;color:var(--text-muted);margin:.9rem 0 1.1rem}
+.hero-browser{margin-bottom:1.5rem}
+.hero-dev{border-top:1px solid var(--border);padding-top:1.1rem;margin-top:.4rem}
+.hero-dev-label{display:block;font-family:var(--mono);font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;color:var(--text-dim);margin-bottom:.55rem}
 .amc-watermark{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);font-family:var(--sans);font-size:clamp(28rem,50vw,55rem);font-weight:900;color:rgba(255,255,255,.011);line-height:.85;letter-spacing:0;pointer-events:none;z-index:0;text-transform:lowercase;white-space:nowrap;will-change:auto}
 a{color:inherit;text-decoration:none}img,svg{display:block;max-width:100%}button{cursor:pointer;border:none;background:none;font:inherit}
 :where(a,button,input,select,textarea,[tabindex]:not([tabindex="-1"])):focus-visible{outline:2px solid var(--accent);outline-offset:3px}

@@ -53,19 +53,24 @@
       <canvas id="hero-canvas" aria-hidden="true"></canvas>
       <div class="container hero-grid">
         <div class="hero-left gs">
-          <p class="label">ai agent trust scoring</p>
-          <h1 style="white-space:nowrap">Run one command<span class="accent blink-cursor">_</span></h1>
+          <p class="label">score &amp; fix your ai agent</p>
+          <h1 style="white-space:nowrap">Download it<span class="accent blink-cursor">_</span></h1>
           <h1 class="hero-h1-gray">Get the full score<span style="color:var(--text)">.</span></h1>
           <h1 class="hero-h1-accent">Fix the gaps<span style="color:var(--text)">.</span></h1>
-          <p class="hero-sub">Agent Maturity Compass grades how ready your AI agent is for real work — like a report card. <span class="hl">No account</span>. <span class="hl">No signup</span>. <span class="hl">No setup maze</span>. One command — <span class="hl">amc start</span> — scores your agent across <span class="hl">8 areas</span> shows what to fix, and opens your report card in your browser. Free and open source. Everything stays on your machine.</p>
+          <p class="hero-sub">It's like a report card for your AI agent. Download AMC, open it, and in about a minute you'll see what's strong, what's weak, and exactly what to fix. Then AMC <span class="hl">fixes the gaps for you</span> and writes them into your agent. <span class="hl">No account</span>. <span class="hl">No signup</span>. <span class="hl">No terminal</span>. <span class="hl">Free forever</span>, bring your own AI key.</p>
         </div>
         <div class="hero-right gs">
-          <div class="hero-install" onclick="navigator.clipboard&&navigator.clipboard.writeText('curl -fsSL https://agentmaturity.co/install.sh | sh')" title="Copy the verified macOS/Linux installer">
-            <span class="hi-prompt">$</span><code class="hero-install-command">curl -fsSL https://agentmaturity.co/install.sh | sh</code>
+          <div class="hero-download">
+            <a href="https://github.com/AgentMaturity/AgentMaturityCompass/releases/latest" class="btn btn-primary btn-xl" rel="noopener">Download for macOS →</a>
+            <a href="https://github.com/AgentMaturity/AgentMaturityCompass/releases/latest" class="btn btn-primary btn-xl" rel="noopener">Download for Windows →</a>
           </div>
-          <div class="hero-btns">
-            <a href="#install" class="btn btn-primary btn-xl">install amc →</a>
-            <a href="playground.html" class="btn btn-outline btn-xl">try in browser →</a>
+          <p class="hero-reassure">No Docker · No terminal · No signup · Free forever</p>
+          <a href="playground.html" class="btn btn-outline btn-xl hero-browser">Try it in your browser →</a>
+          <div class="hero-dev">
+            <span class="hero-dev-label">Prefer the terminal?</span>
+            <div class="hero-install" onclick="navigator.clipboard&&navigator.clipboard.writeText('curl -fsSL https://agentmaturity.co/install.sh | sh')" title="Copy the verified macOS/Linux installer">
+              <span class="hi-prompt">$</span><code class="hero-install-command">curl -fsSL https://agentmaturity.co/install.sh | sh</code>
+            </div>
           </div>
         </div>
       </div>
@@ -90,8 +95,8 @@
       <div class="container">
         <div class="section-heading gs" style="text-align:center">
           <p class="label">install</p>
-          <h2>Start with <strong>one command<span class="accent blink-cursor">_</span></strong></h2>
-          <p class="section-desc" style="margin:1rem auto 0;text-align:center">Install a pinned, SHA-256-verified GitHub release. Then run <code>amc</code> in your agent project for the full score.</p>
+          <h2>Get AMC in <strong>under a minute<span class="accent blink-cursor">_</span></strong></h2>
+          <p class="section-desc" style="margin:1rem auto 0;text-align:center">Two easy ways: download the app for macOS or Windows, or paste one line into your terminal. Both give you the same full score and one-click fix — every download is a pinned, SHA-256-verified GitHub release.</p>
         </div>
         <div class="pricing-grid">
           <div class="pricing-card gs">
@@ -308,18 +313,18 @@
       <div class="container">
         <div class="section-heading gs" style="text-align:center">
           <p class="label">pricing</p>
-          <h2>Free core<span class="accent">.</span> <strong>paid domain depth<span class="accent blink-cursor">_</span></strong></h2>
+          <h2>Free forever<span class="accent">.</span> <strong>Pro packs for industries<span class="accent blink-cursor">_</span></strong></h2>
         </div>
         <div class="pricing-grid">
           <div class="pricing-card gs">
             <span class="tier">free / open source</span>
             <h3>AMC Core</h3>
-            <p>CLI, Desktop Studio, full score, assurance, evidence, reports, and CI gates.</p>
+            <p>Everything to score and fix your agent: the app, the CLI, the full score, one-click fix, assurance packs, reports, and CI gates. Bring your own AI key.</p>
             <div class="items"><span class="hl">244</span> default questions · <span class="hl">264</span> lifecycle questions · <span class="hl">142</span> assurance packs · <span class="hl">14</span> adapters · <span class="hl">MIT</span> licensed</div>
             <a href="#install" class="btn btn-primary btn-xl">start free →</a>
           </div>
           <div class="pricing-card gs">
-            <span class="tier">planned · $9.99 / month</span>
+            <span class="tier">planned · $19 / month · per user</span>
             <h3>Industry Packs — preview</h3>
             <p><span class="hl">All 41 Industry Domain Packs</span> for regulated verticals. Public checkout is not yet publicly live or available.</p>
             <div class="items">Health · Wealth · Education · Mobility · Technology · Governance · Environment</div>
@@ -339,7 +344,7 @@
         <div class="section-heading gs" style="text-align:center">
           <p class="label">industry packs</p>
           <h2>7 stations<span class="accent">.</span> 41 packs<span class="accent">.</span><br><strong>regulated depth<span class="accent blink-cursor">_</span></strong></h2>
-          <p class="section-desc" style="margin:1rem auto 0;text-align:center;max-width:680px">The planned commercial packs add sector-specific diagnostics grounded in real regulations: EU AI Act, HIPAA, FDA, NERC CIP, CITES, ILO, ISO, and other domain frameworks. The target tier is $9.99/month for all 41 packs; public checkout and license issuance are not live.</p>
+          <p class="section-desc" style="margin:1rem auto 0;text-align:center;max-width:680px">The planned commercial packs add sector-specific diagnostics grounded in real regulations: EU AI Act, HIPAA, FDA, NERC CIP, CITES, ILO, ISO, and other domain frameworks. The target tier is $19/month per user for all 41 packs; public checkout and license issuance are not live.</p>
         </div>
         <div class="station-cards gs">
           <a href="station-environment.html" class="station-card">
@@ -410,7 +415,7 @@
           <div class="faq-item gs"><button class="faq-q" aria-expanded="false">Do I need an account?<span class="faq-icon">+</span></button><div class="faq-a"><p>No account is needed for the free core. Industry Packs are a planned commercial add-on; checkout is not publicly live.</p></div></div>
           <div class="faq-item gs"><button class="faq-q" aria-expanded="false">Do I need Docker?<span class="faq-icon">+</span></button><div class="faq-a"><p>No. Use the verified macOS/Linux or Windows release installer above. Docker is optional.</p></div></div>
           <div class="faq-item gs"><button class="faq-q" aria-expanded="false">Can non-engineers use it?<span class="faq-icon">+</span></button><div class="faq-a"><p>Yes. Run <code>amc up</code> and use the local Studio dashboard.</p></div></div>
-          <div class="faq-item gs"><button class="faq-q" aria-expanded="false">What is free and what is paid?<span class="faq-icon">+</span></button><div class="faq-a"><p>The core trust stack is MIT licensed: Score, Shield, Enforce, Vault, Watch, Comply, Fleet, Passport, adapters, Studio, reports, and CI gates. AMC plans a <span class="hl">$9.99/month</span> Industry Packs add-on, but public checkout and automatic license issuance are not yet available.</p></div></div>
+          <div class="faq-item gs"><button class="faq-q" aria-expanded="false">What is free and what is paid?<span class="faq-icon">+</span></button><div class="faq-a"><p>The core trust stack is MIT licensed: Score, Shield, Enforce, Vault, Watch, Comply, Fleet, Passport, adapters, Studio, reports, and CI gates. AMC plans a <span class="hl">$19/month per user</span> Industry Packs add-on, but public checkout and automatic license issuance are not yet available.</p></div></div>
         </div>
       </div>
     </section>
