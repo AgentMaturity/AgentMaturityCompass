@@ -4,7 +4,7 @@ import inquirer from "inquirer";
 import { presetGatewayConfigForProvider, saveGatewayConfig, signGatewayConfig, type GatewayConfig } from "../gateway/config.js";
 import { pathExists } from "../utils/fs.js";
 import { initWorkspace } from "../workspace.js";
-import { detectFrameworksForOnboarding as detectFrameworks, type FrameworkDetection } from "./setupWizard.js";
+import { detectFrameworksForOnboarding as detectFrameworks, detectAgentInstructionSources, type FrameworkDetection } from "./setupWizard.js";
 import {
   createOnboardingState,
   saveOnboardingState,
@@ -187,22 +187,21 @@ export async function runQuickSetup(options: QuickSetupOptions): Promise<QuickSe
   const detectedProviderIds = detectedProviderIdsFromEnv(process.env);
   const frameworks = detectFrameworks(workspace);
 
-  logger.log("Detecting your environment...");
+  const instructionSources = detectAgentInstructionSources(workspace);
+  const detectedKeyNames = PROVIDERS.filter((provider) => detectedProviderIds.has(provider.id)).map((provider) => provider.displayName);
+
+  logger.log("Setting up Agent Maturity Compass. Everything runs locally and stays on your machine.");
   logger.log("");
-  logger.log("Found API keys:");
-  for (const provider of PROVIDERS) {
-    const detected = detectedProviderIds.has(provider.id);
-    logger.log(`  ${detected ? "[x]" : "[ ]"} ${provider.apiKeyEnv} -> ${provider.displayName}`);
-  }
-  logger.log("");
-  logger.log("Found frameworks:");
-  if (frameworks.length === 0) {
-    logger.log("  [ ] none");
-  } else {
-    for (const framework of frameworks) {
-      logger.log(`  [x] ${framework.framework}`);
-    }
-  }
+  logger.log("What AMC found in this folder:");
+  logger.log(`  AI provider keys:       ${detectedKeyNames.length > 0 ? detectedKeyNames.join(", ") : "none yet — your first score needs none"}`);
+  logger.log(`  Agent frameworks:       ${frameworks.length > 0 ? frameworks.map((framework) => framework.framework).join(", ") : "none detected"}`);
+  logger.log(
+    `  Instructions & skills:  ${
+      instructionSources.length > 0
+        ? `${instructionSources.map((source) => source.tool).join(", ")}  (AMC reads these)`
+        : "none yet — AMC can generate AGENTS.md guardrails for you"
+    }`
+  );
   logger.log("");
 
   const selectedProvider = await selectProvider({
@@ -240,24 +239,28 @@ export async function runQuickSetup(options: QuickSetupOptions): Promise<QuickSe
     provider: selectedProvider.displayName,
     detectedFrameworks: frameworks.map((framework) => framework.framework)
   });
-  onboarding = setOnboardingStep(onboarding, "detect", "complete", `${frameworks.length} framework signal(s), ${detectedProviderIds.size} provider key(s).`);
+  onboarding = setOnboardingStep(onboarding, "detect", "complete", `${frameworks.length} framework(s), ${detectedProviderIds.size} provider key(s), ${instructionSources.length} instruction source(s).`);
   onboarding = setOnboardingStep(onboarding, "workspace", "complete", bootstrapped ? "Created .amc workspace." : "Existing workspace reused.");
   onboarding = setOnboardingStep(onboarding, "provider", "complete", `${selectedProvider.displayName} gateway preset saved.`);
   onboarding = setOnboardingStep(onboarding, "score", "pending", "Run `amc` to generate the full score.");
   onboarding = setOnboardingStep(onboarding, "studio", "pending", "Run `amc up` to open Studio.");
   saveOnboardingState(workspace, onboarding);
 
-  logger.log(`Configured gateway for ${selectedProvider.displayName}`);
-  logger.log(`Gateway config: ${configPath}`);
+  logger.log(`Saved a ${selectedProvider.displayName} gateway preset for optional live model routing (${configPath}).`);
   logger.log("");
-  logger.log("Set this environment variable for your agent:");
+  logger.log("You're ready. Do this next:");
+  logger.log("");
+  logger.log("  amc             ->  run your full agent score (no key or account needed)");
+  logger.log("  amc up          ->  open the Studio dashboard in your browser (buttons, no terminal)");
+  logger.log("  amc guide --go  ->  auto-fix the top gaps and write guardrails into your agent files");
+  logger.log("");
+  logger.log("Your first score needs no AI key and no account. A key is only for routing or");
+  logger.log("watching live model calls. To enable that, set your own key and re-run `amc setup`:");
+  logger.log(`  export ${selectedProvider.apiKeyEnv}=<your-key>`);
   logger.log(`  export ${selectedProvider.baseUrlEnv}=${baseUrl}`);
   if (selectedProvider.id === "gemini") {
     logger.log("  export GEMINI_API_KEY=$GOOGLE_AI_KEY");
   }
-  logger.log("");
-  logger.log("Next command:");
-  logger.log("  amc");
 
   const detectedApiKeys = PROVIDERS
     .filter((provider) => detectedProviderIds.has(provider.id))

@@ -183,6 +183,53 @@ export function detectFrameworksForOnboarding(workspace: string): FrameworkDetec
   return detections.sort((a, b) => a.framework.localeCompare(b.framework));
 }
 
+export interface AgentInstructionSource {
+  /** Human-friendly tool/standard name, e.g. "AGENTS.md", "Claude Code", "Skills". */
+  tool: string;
+  /** Workspace-relative path that matched. */
+  path: string;
+}
+
+// Well-known coding-agent instruction, skill, and config surfaces. Onboarding
+// recognizes these so AMC can ground its guidance in the user's real setup —
+// the deep security scan of the same surface lives in `amc shield` /
+// scanAgentConfig; this is a fast, dependency-free lister for the setup flow.
+const INSTRUCTION_SOURCE_CANDIDATES: ReadonlyArray<{ tool: string; rel: string }> = [
+  { tool: "AGENTS.md", rel: "AGENTS.md" },
+  { tool: "Claude Code", rel: "CLAUDE.md" },
+  { tool: "Claude Code", rel: ".claude" },
+  { tool: "Skills", rel: ".claude/skills" },
+  { tool: "Skills", rel: "skills" },
+  { tool: "Gemini CLI", rel: "GEMINI.md" },
+  { tool: "Gemini CLI", rel: ".gemini" },
+  { tool: "Cursor", rel: ".cursorrules" },
+  { tool: "Cursor", rel: ".cursor" },
+  { tool: "Windsurf", rel: ".windsurfrules" },
+  { tool: "GitHub Copilot", rel: ".github/copilot-instructions.md" },
+  { tool: "MCP servers", rel: ".mcp.json" }
+];
+
+/**
+ * Detect the agent instruction, skill, and tool-config sources present in a
+ * workspace (AGENTS.md, CLAUDE.md, GEMINI.md, Cursor, skills, MCP, ...), one
+ * entry per distinct tool. Used by onboarding to show the user that AMC can see
+ * and read their existing agent setup.
+ */
+export function detectAgentInstructionSources(workspace: string): AgentInstructionSource[] {
+  const found: AgentInstructionSource[] = [];
+  const seenTool = new Set<string>();
+  for (const candidate of INSTRUCTION_SOURCE_CANDIDATES) {
+    if (seenTool.has(candidate.tool)) {
+      continue;
+    }
+    if (pathExists(join(workspace, candidate.rel))) {
+      found.push({ tool: candidate.tool, path: candidate.rel });
+      seenTool.add(candidate.tool);
+    }
+  }
+  return found;
+}
+
 function listTestFiles(workspace: string): number {
   const candidates = [join(workspace, "tests"), join(workspace, "test"), join(workspace, "__tests__")];
   let total = 0;

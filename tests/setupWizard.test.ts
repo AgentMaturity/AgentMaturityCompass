@@ -3,6 +3,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, expect, test } from "vitest";
 import {
+  detectAgentInstructionSources,
   detectFrameworksForOnboarding,
   estimateTimeToL3,
   generateFirstWeekPlan,
@@ -52,6 +53,37 @@ describe("setupWizard framework detection", () => {
 
       const detections = detectFrameworksForOnboarding(workspace);
       expect(detections.map((d) => d.framework)).toEqual(["AutoGen", "CrewAI"]);
+    } finally {
+      cleanupWorkspace(workspace);
+    }
+  });
+});
+
+describe("setupWizard instruction & skill detection", () => {
+  test("detects AGENTS.md, Claude Code, skills, and MCP as distinct sources", () => {
+    const workspace = createTempWorkspace();
+    try {
+      writeFileSync(join(workspace, "AGENTS.md"), "# Agent instructions");
+      writeFileSync(join(workspace, "CLAUDE.md"), "# Claude instructions");
+      mkdirSync(join(workspace, ".claude", "skills"), { recursive: true });
+      writeFileSync(join(workspace, ".mcp.json"), "{}");
+
+      const sources = detectAgentInstructionSources(workspace);
+      const tools = sources.map((source) => source.tool);
+      expect(tools).toContain("AGENTS.md");
+      expect(tools).toContain("Claude Code");
+      expect(tools).toContain("Skills");
+      expect(tools).toContain("MCP servers");
+      expect(new Set(tools).size).toBe(tools.length);
+    } finally {
+      cleanupWorkspace(workspace);
+    }
+  });
+
+  test("returns an empty list for a workspace with no agent instructions", () => {
+    const workspace = createTempWorkspace();
+    try {
+      expect(detectAgentInstructionSources(workspace)).toEqual([]);
     } finally {
       cleanupWorkspace(workspace);
     }
