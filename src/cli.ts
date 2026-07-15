@@ -645,6 +645,7 @@ import { loadStudioRuntimeConfig } from "./config/loadConfig.js";
 import { configExplainCli, configPrintCli } from "./config/configCli.js";
 import { runBootstrap } from "./bootstrap/bootstrap.js";
 import { registerQuickSetupCommand } from "./setup/quickSetupCli.js";
+import { registerFixCommand } from "./guide/fixCli.js";
 import { registerDomainApplyCommand } from "./domains/domainApplyCli.js";
 import { registerReplCommand } from "./repl/replCli.js";
 import { registerApiCommands } from "./api/apiCli.js";
@@ -2345,6 +2346,7 @@ program
 
 
 registerQuickSetupCommand(program);
+registerFixCommand(program);
 registerReplCommand(program);
 
 program

@@ -1,6 +1,6 @@
 # Design: One-click "fix & upgrade my agent" (`amc fix`)
 
-**Status:** Design — approved direction ("feature now, design the one-click flow").
+**Status:** Shipped — `amc fix` is live (engine `src/guide/oneClickFix.ts`, CLI `src/guide/fixCli.ts`). The Studio "Fix my agent" button remains the follow-up.
 **Goal:** Anyone — including someone who has never opened a terminal — can go from
 "I have an AI agent" to "AMC found the problems and fixed them" in a single click
 or a single command, then watch the score go up.

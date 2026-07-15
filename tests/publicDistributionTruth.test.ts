@@ -185,7 +185,7 @@ describe("truthful public distribution and brand contract", () => {
     const extensionSource = read("vscode-extension/src/extension.ts");
     const extensionOutput = read("vscode-extension/out/extension.js");
     const mcpOnboarding = read("src/mcp/mcpCli.ts");
-    const generatedCi = read("src/cli-late-stage-commands.ts");
+    const generatedCi = read("src/guide/oneClickFix.ts");
     const githubAction = read("amc-action/action.yml");
     const reusableWorkflow = read(".github/workflows/amc-score.yml");
     const exampleWorkflow = read("examples/crewai-amc-github-actions/github-actions-snippet.example.yml");
@@ -195,7 +195,7 @@ describe("truthful public distribution and brand contract", () => {
       ["vscode-extension/src/extension.ts", extensionSource],
       ["vscode-extension/out/extension.js", extensionOutput],
       ["src/mcp/mcpCli.ts", mcpOnboarding],
-      ["src/cli-late-stage-commands.ts", generatedCi],
+      ["src/guide/oneClickFix.ts", generatedCi],
       ["amc-action/action.yml", githubAction],
       [".github/workflows/amc-score.yml", reusableWorkflow],
       ["examples/crewai-amc-github-actions/github-actions-snippet.example.yml", exampleWorkflow],

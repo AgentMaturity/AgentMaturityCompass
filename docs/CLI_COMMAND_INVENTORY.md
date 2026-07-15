@@ -433,7 +433,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc firewall export` | Export Runtime Firewall decisions for SIEM or audit review | `--out <path>`<br>`--format <format>`<br>`--limit <n>`<br>`--redacted`<br>`--json` | - |
 | `amc firewall migrate-signature` | Preserve and journal an existing verified Runtime Firewall policy | `--approve-legacy-kind`<br>`--json` | - |
 | `amc firewall status` | Show Runtime Firewall policy and signed rollout counters | `--json` | - |
-| `amc fix` | Generate remediation patches for identified gaps (auto-fix mode) | `--agent <agentId>`<br>`--dry-run`<br>`--target-level <level>`<br>`--framework <framework>`<br>`--out <dir>` | - |
+| `amc fix` | Score your agent, explain the top gaps in plain language, and write guardrail fixes into your agent's own config file | `--yes`<br>`--dry-run`<br>`--interactive`<br>`--agent <id>`<br>`--target <level>`<br>`--target-level <level>`<br>`--framework <name>`<br>`--ci`<br>`--file <path>`<br>`--json` | - |
 | `amc fix-signatures` | Verify and re-sign gateway/fleet/agent configs | `--agent <agentId>` | - |
 | `amc fleet` | Fleet operations | - | - |
 | `amc fleet contradictions` | Detect cross-agent contradictions | `--scope <scope>`<br>`--window <window>`<br>`--min-delta <n>` | - |
