@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import "./storage/nativeGuard.js";
 import { randomBytes, randomUUID } from "node:crypto";
 import { spawn } from "node:child_process";
 import { basename, dirname, join, relative, resolve } from "node:path";

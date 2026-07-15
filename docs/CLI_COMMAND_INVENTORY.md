@@ -308,7 +308,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc doctor` | Check runtime availability and wrap readiness | `--json`<br>`--strict` | - |
 | `amc doctor-fix` | Auto-repair common setup issues | `--dry-run`<br>`--json` | - |
 | `amc domain` | Domain-specific architecture and compliance operations | - | `sector` |
-| `amc domain apply` | Apply domain-specific guardrails and industry pack rules to an agent | `--agent <id>`<br>`--domain <domain>`<br>`--pack <packId>`<br>`--dry-run`<br>`--compliance <frameworks>`<br>`--file <path>`<br>`--json` | `sector apply` |
+| `amc domain apply` | Apply domain-specific guardrails and industry pack rules to an agent | `--agent <id>`<br>`--domain <domain>`<br>`--pack <packId>`<br>`--dry-run`<br>`--compliance <frameworks>`<br>`--file <path>`<br>`--audit`<br>`--responses <path>`<br>`--framework <id>`<br>`--audit-bundle <path>`<br>`--json` | `sector apply` |
 | `amc domain assess` | Run full domain assessment | `--agent <id>`<br>`--domain <d>`<br>`--json` | `sector assess` |
 | `amc domain assurance` | Run domain-specific assurance packs | `--agent <id>`<br>`--domain <d>`<br>`--json` | `sector assurance` |
 | `amc domain gaps` | Show compliance gaps for an agent and domain | `--agent <id>`<br>`--domain <d>`<br>`--json` | `sector gaps` |
@@ -918,7 +918,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc retention verify` | Verify archive manifests/signatures and ledger continuity | - | - |
 | `amc role-presets` | List available dashboard role presets | - | - |
 | `amc rollback-create` | Create a rollback pack from the current policy file | `--agent <agentId>`<br>`--reason <reason>`<br>`--policy-file <path>` | - |
-| `amc run` | Full assessment — Score + Shield + Enforce + Vault + Watch + Comply + Fleet + Passport in one command | `--window <window>`<br>`--fail-below <grade>`<br>`--ci`<br>`--score-only`<br>`--question-set <version>`<br>`--industry-pack-weights`<br>`--json` | - |
+| `amc run` | Full assessment — Score + Shield + Enforce + Vault + Watch + Comply + Fleet + Passport in one command | `--window <window>`<br>`--fail-below <grade>`<br>`--ci`<br>`--score-only`<br>`--question-set <version>`<br>`--industry-pack-weights`<br>`--json`<br>`--fix` | - |
 | `amc run-alias` | Name diagnostic runs for report and history workflows | - | `run-name` |
 | `amc run-alias list` | List diagnostic run aliases for the active agent | - | `run-name list` |
 | `amc run-alias remove` | Remove a diagnostic run alias | - | `rm`, `run-name remove` |
