@@ -15,7 +15,7 @@
 
 ## Abstract
 
-The rapid proliferation of autonomous AI agents in enterprise settings has outpaced the development of rigorous frameworks for assessing their operational maturity, safety, and readiness for deployment. Existing approaches—borrowed from software capability maturity models, AI risk management frameworks, or ad-hoc internal reviews—fail to address the distinctive characteristics of agents: persistent autonomy, dynamic tool use, self-modification capacity, and emergent multi-agent coordination. We present the **Agent Maturity Compass (AMC) Framework**, an evidence-grounded system for evaluating autonomous AI agents across 244 default diagnostic questions plus 600 sector-specific questions, with an optional 264-question lifecycle set for deeper runtime and proof coverage, at six levels (L0: Absent through L5: Optimizing). The five dimensions—Strategic Agent Operations, Leadership & Autonomy, Culture & Alignment, Resilience, and Skills—provide comprehensive coverage of the operational surface of deployed agents. The central contribution of AMC is its **Execution-Proof Evidence System (EPES)**, which assigns differential trust multipliers to four evidence tiers—ranging from self-reported claims (0.4×) to observed-and-hardened execution artifacts (1.1×)—thereby rendering the framework resistant to the "documentation inflation" observed in prior approaches. On a canonical benchmark agent (ContentModerationBot), keyword-based scoring inflated the total score by 84 points relative to execution-verified scoring; AMC's trust-weighted scoring eliminated this gap. Artifact validity and evidence readiness are reported independently; only evidence readiness `READY` permits scoped external claims. We further introduce an autonomous self-improvement loop in which agents autonomously diagnose maturity gaps, implement remediations, and re-score across dimensions, demonstrated empirically through two case studies: a human-guided agent achieving 94/100 and an autonomously self-improving agent reaching 80/100 from identical L0 baselines. AMC incorporates research-backed scoring modules including Bloom-inspired behavioral attack packs (sycophancy, self-preservation, sabotage, self-preferential bias), METR-inspired task horizon scoring, Google FACTS-inspired factuality dimensions, graduated autonomy governance, memory integrity scoring, and an alignment index. The framework integrates 142 assurance packs, maps to EU AI Act, ISO 42001, NIST AI RMF, and SOC 2, and introduces the Agent Passport (.amcpass) portable verifiable credential for fleet-level trust composition. AMC v2.0 introduces 41 industry-specific sector packs spanning seven regulated industries (Environment, Health, Wealth, Education, Mobility, Technology, Governance), bringing product diagnostic coverage to 844 questions (244 default + 600 sector-specific). The framework also adds MCP (Model Context Protocol) security scoring, agent protocol hardening, and vibe code audit capabilities. AMC is formally specified through a time-parameterized maturity function M(a,d,t), incorporates evidence decay, and is implemented as 1,200+ platform modules validated by 8,604 passing Vitest tests across 1,087 files.
+The rapid proliferation of autonomous AI agents in enterprise settings has outpaced the development of rigorous frameworks for assessing their operational maturity, safety, and readiness for deployment. Existing approaches—borrowed from software capability maturity models, AI risk management frameworks, or ad-hoc internal reviews—fail to address the distinctive characteristics of agents: persistent autonomy, dynamic tool use, self-modification capacity, and emergent multi-agent coordination. We present the **Agent Maturity Compass (AMC) Framework**, an evidence-grounded system for evaluating autonomous AI agents across 244 default diagnostic questions plus 600 sector-specific questions, with an optional 264-question lifecycle set for deeper runtime and proof coverage, at six levels (L0: Absent through L5: Optimizing). The five dimensions—Strategic Operations, Reliability & Safety, Security & Compliance, Observability & Cost, and Evaluation & Growth—provide comprehensive coverage of the operational surface of deployed agents. The central contribution of AMC is its **Execution-Proof Evidence System (EPES)**, which assigns differential trust multipliers to four evidence tiers—ranging from self-reported claims (0.4×) to observed-and-hardened execution artifacts (1.1×)—thereby rendering the framework resistant to the "documentation inflation" observed in prior approaches. On a canonical benchmark agent (ContentModerationBot), keyword-based scoring inflated the total score by 84 points relative to execution-verified scoring; AMC's trust-weighted scoring eliminated this gap. Artifact validity and evidence readiness are reported independently; only evidence readiness `READY` permits scoped external claims. We further introduce an autonomous self-improvement loop in which agents autonomously diagnose maturity gaps, implement remediations, and re-score across dimensions, demonstrated empirically through two case studies: a human-guided agent achieving 94/100 and an autonomously self-improving agent reaching 80/100 from identical L0 baselines. AMC incorporates research-backed scoring modules including Bloom-inspired behavioral attack packs (sycophancy, self-preservation, sabotage, self-preferential bias), METR-inspired task horizon scoring, Google FACTS-inspired factuality dimensions, graduated autonomy governance, memory integrity scoring, and an alignment index. The framework integrates 142 assurance packs, maps to EU AI Act, ISO 42001, NIST AI RMF, and SOC 2, and introduces the Agent Passport (.amcpass) portable verifiable credential for fleet-level trust composition. AMC v2.0 introduces 41 industry-specific sector packs spanning seven regulated industries (Environment, Health, Wealth, Education, Mobility, Technology, Governance), bringing product diagnostic coverage to 844 questions (244 default + 600 sector-specific). The framework also adds MCP (Model Context Protocol) security scoring, agent protocol hardening, and vibe code audit capabilities. AMC is formally specified through a time-parameterized maturity function M(a,d,t), incorporates evidence decay, and is implemented as 1,200+ platform modules validated by 8,604 passing Vitest tests across 1,087 files.
 
 **Keywords:** AI agent maturity, autonomous systems evaluation, execution-proof evidence, AI governance, capability maturity, agent reliability, AI risk management, EU AI Act compliance, agent passport, fleet trust composition
 
@@ -51,9 +51,9 @@ Yet this deployment shift has proceeded largely without principled frameworks fo
 
 Existing frameworks address fragments of this problem. The NIST AI Risk Management Framework (AI RMF 1.0) provides a governance vocabulary but is non-prescriptive regarding implementation mechanics [19]. ISO/IEC 42001:2023 establishes AI management system requirements at an organizational level, not at the individual agent level [11]. CMMI v2.0 models software process capability but predates the agent paradigm and lacks agent-specific rubrics [4]. Commercial offerings such as TrustVector perform human-assessed audits at high cost and low frequency; guardrail platforms like Guardrails AI address only output filtering. None provides a *unified, executable, multi-dimensional maturity instrument* with verifiable evidence.
 
-This paper introduces **Agent Maturity Compass (AMC)**, which makes four primary contributions:
+This paper introduces **Agent Maturity Compass (AMC)**, which makes seven primary contributions:
 
-1. **A six-dimensional maturity model** with 140 diagnostic questions across six levels (L0–L5), providing the first structured instrument covering Strategic Agent Operations, Skills, Resilience, Leadership & Autonomy, Culture & Alignment, and Evaluation & Growth holistically for autonomous agents.
+1. **A five-dimensional maturity model** with 244 default diagnostic questions across six levels (L0–L5), providing the first structured instrument covering Strategic Operations, Reliability & Safety, Security & Compliance, Observability & Cost, and Evaluation & Growth holistically for autonomous agents.
 
 2. **An Execution-Proof Evidence System (EPES)** with four trust tiers and calibrated score multipliers, making AMC demonstrably resistant to documentation gaming—a critical property absent from all prior frameworks.
 
@@ -164,9 +164,9 @@ This level structure is deliberately readable alongside CMMI while remaining age
 
 Level assignment within each dimension is not binary per-question but continuous, weighted by evidence trust (see Section 4). An agent demonstrating L4 behavior in 60% of Strategic Operations diagnostic questions with execution-verified evidence may receive a Strategic Operations level score of 3.6.
 
-### 3.4 The 140-Question Diagnostic Structure
+### 3.4 The Diagnostic Question Structure
 
-The AMC diagnostic was originally described as 140 questions distributed across six dimensions: Strategic Agent Operations (18 questions), Skills (38 questions), Resilience (30 questions), Leadership & Autonomy (28 questions), Culture & Alignment (26 questions), and Evaluation & Growth (8 questions, including over-compliance detection based on H-Neurons research [arXiv:2512.01797]). The current compiled public question bank has since expanded; researchers can export the live scoring instrument with `amc methodology --reproducibility --json`, including question IDs, prompts, L0-L5 descriptors, evidence gates, source paths, hashes, formulas, commands, and limitations. Researchers can also export a synthetic public L0-L5 sample case-study dataset with `amc methodology --sample-dataset --json` to inspect row shape, dataset-card metadata, intended uses, privacy notes, and limitations without exposing private customer evidence. This paper describes the structure and provides representative samples, while the reproducibility packet and sample dataset are the current source-generated artifacts for independent review.
+The AMC base diagnostic comprises 140 questions distributed across the five dimensions of Section 3.2: Strategic Operations (18 questions), Reliability & Safety (30 questions), Security & Compliance (38 questions), Observability & Cost (28 questions), and Evaluation & Growth (26 questions, including over-compliance detection based on H-Neurons research [arXiv:2512.01797]). The current compiled public question bank has since expanded to 244 default diagnostic questions; researchers can export the live scoring instrument with `amc methodology --reproducibility --json`, including question IDs, prompts, L0-L5 descriptors, evidence gates, source paths, hashes, formulas, commands, and limitations. Researchers can also export a synthetic public L0-L5 sample case-study dataset with `amc methodology --sample-dataset --json` to inspect row shape, dataset-card metadata, intended uses, privacy notes, and limitations without exposing private customer evidence. This paper describes the structure and provides representative samples, while the reproducibility packet and sample dataset are the current source-generated artifacts for independent review.
 
 **Sample Diagnostic Questions (one per dimension):**
 
@@ -860,7 +860,7 @@ Five directions are prioritized for AMC v2.0:
 
 The deployment of autonomous AI agents at enterprise scale represents one of the most significant risk-management challenges of the current technology era. Existing frameworks—borrowed from software process maturity, AI governance standards, and ad-hoc internal review—are insufficient for the distinctive characteristics of agents: persistent autonomy, dynamic tool use, self-modification, and emergent multi-agent behavior.
 
-AMC provides the first purpose-built, multi-dimensional, execution-proof maturity framework for autonomous agents. Its six dimensions cover the full operational surface of deployed agents; its six-level rubric structure (L0–L5) enables longitudinal tracking of improvement from absent capability through autonomous self-improvement; and its Execution-Proof Evidence System with four trust tiers makes the framework resistant to the documentation gaming that renders alternative approaches unreliable.
+AMC provides the first purpose-built, multi-dimensional, execution-proof maturity framework for autonomous agents. Its five dimensions cover the full operational surface of deployed agents; its six-level rubric structure (L0–L5) enables longitudinal tracking of improvement from absent capability through autonomous self-improvement; and its Execution-Proof Evidence System with four trust tiers makes the framework resistant to the documentation gaming that renders alternative approaches unreliable.
 
 The empirical results are encouraging. Human-guided improvement brought the ContentModerationBot from 12 to 94/100 across five dimensions. Autonomous self-improvement brought the DataPipelineBot from 12 to 80/100 without human-authored code. The anti-gaming experiment demonstrated that keyword-based scoring would have inflated scores by 84 points—a gap large enough to incorrectly label a documentation-only agent as production-ready.
 
@@ -1163,11 +1163,11 @@ The threshold system is designed to be *asymmetric*: a high score on Observabili
 *Word count: approximately 16,500 words (excluding appendices)*  
 *Files created: `/Users/sid/AgentMaturityCompass/whitepaper/AMC_WHITEPAPER_v1.md`*
 
-## 8. Research-Backed Scoring Modules (v2.0)
+## Appendix E: Research-Backed Scoring Modules (v2.0)
 
 AMC v2.0 introduces seven new scoring modules derived from cutting-edge AI safety research. These modules address gaps identified through both academic literature review and real-world agent evaluation conversations.
 
-### 8.1 Calibration Gap (`calibrationGap`)
+### E.1 Calibration Gap (`calibrationGap`)
 
 **Research basis:** Safe RLHF (Dai et al., arXiv:2310.12773), GAIA benchmark (arXiv:2311.12983)
 
@@ -1175,37 +1175,37 @@ Measures the delta between an agent's self-reported confidence and externally ob
 
 Key metrics: Mean Calibration Error, ECE, Overconfidence Ratio, Per-Dimension Gap.
 
-### 8.2 Evidence Conflict (`evidenceConflict`)
+### E.2 Evidence Conflict (`evidenceConflict`)
 
 **Research basis:** Alignment Auditing (Marks et al., arXiv:2503.10965), Sleeper Agents (Hubinger et al., arXiv:2401.05566)
 
 Detects internal inconsistency within the evidence chain. If evidence for the same dimension tells contradictory stories, either the agent behaves inconsistently or the evaluation is incomplete. Includes temporal instability detection and context-dependent behavior flagging (sleeper agent indicators).
 
-### 8.3 Sleeper Agent Detection (`sleeperDetection`)
+### E.3 Sleeper Agent Detection (`sleeperDetection`)
 
 **Research basis:** Sleeper Agents (Hubinger et al., arXiv:2401.05566), τ-bench pass^k metric (arXiv:2406.12045)
 
 Detects behavioral inconsistency across contexts — the hallmark of deceptive alignment. Uses the pass^k reliability metric: probability of k consecutive successes. Even GPT-4o achieves <50% on policy-following tasks (τ-bench), with pass^8 <25% in retail domains.
 
-### 8.4 Audit Depth (`auditDepth`)
+### E.4 Audit Depth (`auditDepth`)
 
 **Research basis:** Casper et al. (arXiv:2401.14446, FAccT 2024): "Black-Box Access is Insufficient for Rigorous AI Audits"
 
 Scores not just WHETHER an agent is auditable, but HOW DEEPLY. Three access levels: black-box (query + observe), white-box (weights, activations, gradients), and outside-the-box (methodology, code, data, documentation). An L5 agent should support all three with cryptographic evidence at each layer.
 
-### 8.5 Policy Consistency (`policyConsistency`)
+### E.5 Policy Consistency (`policyConsistency`)
 
 **Research basis:** τ-bench (arXiv:2406.12045), MetaGPT SOPs (arXiv:2308.00352), Building Guardrails (arXiv:2402.01822)
 
 Measures how reliably an agent follows domain-specific rules across multiple trials using the pass^k metric. A single successful trial means nothing — trust requires CONSISTENT success. Includes per-policy breakdown and worst-performer identification.
 
-### 8.6 Level Transition (`levelTransition`)
+### E.6 Level Transition (`levelTransition`)
 
 **Research basis:** Tiered knowledge promotion systems, CMMI/SPICE maturity models
 
 Formalizes maturity level promotion and demotion as explicit events with evidence gates. Higher levels require exponentially more evidence: L4 needs 50 evidence items over 30 days with adversarial testing. Tracks promotion retention rate and demotion frequency.
 
-### 8.7 Gaming Resistance (`gamingResistance`)
+### E.7 Gaming Resistance (`gamingResistance`)
 
 **Research basis:** OWASP LLM Top 10, Alignment Auditing (Marks et al., 2025)
 
