@@ -5223,6 +5223,7 @@ program
   .option("--question-set <version>", "assessment question set: legacy or lifecycle")
   .option("--industry-pack-weights", "apply entitled Industry Pack weighting to expanded assessment questions", false)
   .option("--json", "emit structured JSON output", false)
+  .option("--fix", "after scoring, generate a signed one-command fix plan to improve the agent", false)
   .action(
     async (opts: {
       window: string;
@@ -5232,6 +5233,7 @@ program
       questionSet?: string;
       industryPackWeights: boolean;
       json: boolean;
+      fix: boolean;
     }) => {
       const workspace = process.cwd();
       const agentId = resolveAgentId(workspace, activeAgent(program));
@@ -5383,6 +5385,23 @@ program
         console.log(renderUnifiedResult(result, { ci: opts.ci }));
       } else {
         console.log(renderUnifiedResult(result, { ci: opts.ci }));
+      }
+
+      // One-command fix: generate a signed plan to improve the agent
+      if (opts.fix) {
+        try {
+          const { buildAgentFixPlan, writeAgentFixPlan, renderAgentFixPlanText } = await import("./mechanic/agentFixPlan.js");
+          const fixPlan = buildAgentFixPlan({ result, agentId, now: Date.now() });
+          const fixWritten = writeAgentFixPlan({ plan: fixPlan, workspace, stamp: result.diagnosticRunId ?? String(result.ts) });
+          if (!opts.json) {
+            console.log("");
+            console.log(chalk.hex('#4AEF79')(`  \u2699 AMC Fix \u2014 ${fixPlan.stepCount} improvement${fixPlan.stepCount === 1 ? "" : "s"} generated, staged, and signed`));
+            console.log(renderAgentFixPlanText(fixPlan));
+            console.log(chalk.gray(`  Plan: ${fixWritten.planMarkdownPath}`));
+          }
+        } catch (fixErr: unknown) {
+          console.log(chalk.yellow(`  Fix plan could not be generated: ${fixErr instanceof Error ? fixErr.message : String(fixErr)}`));
+        }
       }
 
       // CI gate: exit non-zero if below threshold

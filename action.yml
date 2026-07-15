@@ -1,0 +1,26 @@
+name: "Agent Maturity Compass"
+description: "Score your AI agent across 8 trust surfaces in CI, fail the build below a grade, and optionally generate a signed fix plan."
+branding:
+  icon: "shield"
+  color: "green"
+inputs:
+  fail-below:
+    description: "Fail the job if the overall grade is below this (A+, A, A-, B+, B, B-, C+, C, C-, D+, D, D-, F)."
+    required: false
+    default: "B"
+  fix:
+    description: "Also generate a signed fix plan for any gaps (true/false)."
+    required: false
+    default: "false"
+runs:
+  using: "composite"
+  steps:
+    - name: Install AMC
+      shell: bash
+      run: curl -fsSL https://agentmaturity.co/install.sh | sh
+    - name: Run AMC assessment
+      shell: bash
+      run: |
+        FIX=""
+        if [ "${{ inputs.fix }}" = "true" ]; then FIX="--fix"; fi
+        amc run --ci --fail-below "${{ inputs.fail-below }}" $FIX
