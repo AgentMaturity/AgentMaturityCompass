@@ -246,7 +246,7 @@ export async function runQuickSetup(options: QuickSetupOptions): Promise<QuickSe
   onboarding = setOnboardingStep(onboarding, "studio", "pending", "Run `amc up` to open Studio.");
   saveOnboardingState(workspace, onboarding);
 
-  logger.log(`Saved a ${selectedProvider.displayName} gateway preset for optional live model routing (${configPath}).`);
+  logger.log(`Saved the ${selectedProvider.displayName} gateway preset for optional live model routing (${configPath}).`);
   logger.log("");
   logger.log("You're ready. Do this next:");
   logger.log("");
