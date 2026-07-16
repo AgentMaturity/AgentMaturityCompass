@@ -117,7 +117,7 @@
     "qs": "6.15.2"
   },
   "devDependencies": {
-    "@axe-core/playwright": "^4.11.1",
+    "@axe-core/playwright": "^4.12.1",
     "@changesets/cli": "^2.30.0",
     "@fontsource/inter": "5.2.8",
     "@fontsource/space-mono": "5.2.9",
@@ -125,8 +125,8 @@
     "@types/node": "^25.5.0",
     "@types/semver": "^7.7.1",
     "@vitest/coverage-v8": "^4.1.10",
-    "ajv": "8.18.0",
-    "date-fns": "^4.1.0",
+    "ajv": "8.20.0",
+    "date-fns": "^4.4.0",
     "marked": "18.0.6",
     "tsx": "^4.23.0",
     "typescript": "^6.0.2",
