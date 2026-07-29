@@ -198,6 +198,18 @@ export {
   type RunBishengObservabilityLiveDriftInput,
 } from './bishengObservabilityLiveDrift.js';
 export {
+  OPENCOMPASS_LIVE_DRIFT_METADATA,
+  runOpenCompassLiveDrift,
+  type OpenCompassLiveDriftMetadataProof,
+  type OpenCompassLiveDriftResult,
+  type OpenCompassLiveDriftRow,
+  type OpenCompassLiveDriftRowProof,
+  type OpenCompassLiveDriftSignal,
+  type OpenCompassLiveDriftStatistic,
+  type OpenCompassLiveDriftSurface,
+  type RunOpenCompassLiveDriftInput,
+} from './openCompassLiveDrift.js';
+export {
   buildLiveDriftWatchAlerts,
   defaultLiveDriftThresholds,
   runLiveScoreBehaviorDrift,

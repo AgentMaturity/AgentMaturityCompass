@@ -2,13 +2,17 @@ import { amcVersion } from "../version.js";
 import type { DiagnosticQuestionSetInfo, TrustTier } from "../types.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
-import { DEFAULT_QUESTION_SET_VERSION } from "../diagnostic/questionSets.js";
+import {
+  DEFAULT_QUESTION_SET_VERSION,
+  getQuestionSet,
+  LIFECYCLE_QUESTION_SET_VERSION,
+} from "../diagnostic/questionSets.js";
 import { questionBank } from "../diagnostic/questionBank.js";
 import { AMC_MATURITY_LEVELS } from "../score/maturityTaxonomy.js";
 
 export const AMC_PUBLIC_METHODOLOGY_ID = "amc-public-scoring-methodology";
-export const AMC_PUBLIC_METHODOLOGY_VERSION = "2026.07.10-r222";
-export const AMC_PUBLIC_METHODOLOGY_RELEASE_DATE = "2026-07-10";
+export const AMC_PUBLIC_METHODOLOGY_VERSION = "2026.07.29-r223";
+export const AMC_PUBLIC_METHODOLOGY_RELEASE_DATE = "2026-07-29";
 
 export const AMC_PUBLIC_METHODOLOGY_DOC = "docs/SCORING_METHODOLOGY.md";
 export const AMC_PUBLIC_METHODOLOGY_URL = "https://agentmaturity.co/methodology.html";
@@ -158,8 +162,26 @@ export interface PublicMethodologyVerificationResult {
   reason: "methodology id mismatch" | "unknown methodology version" | "methodology hash mismatch" | null;
 }
 
-const HISTORICAL_PUBLIC_METHODOLOGY_HASHES = new Map<string, string>([
-  ["2026.07.10-r221", "7eb7fd5bd9e0fc9952fca8dc935647988e6a2d6c5fdf786cd70160a0290fba8f"],
+const BUILT_IN_PUBLIC_METHODOLOGY_QUESTION_SET_VERSIONS = [
+  DEFAULT_QUESTION_SET_VERSION,
+  LIFECYCLE_QUESTION_SET_VERSION,
+] as const;
+
+const HISTORICAL_PUBLIC_METHODOLOGY_HASHES = new Map<string, ReadonlySet<string>>([
+  [
+    "2026.07.10-r222",
+    new Set([
+      "9c8f098a6f91b09db9350f034a06daa51580ea223ed4decab34556c964fa030e",
+      "f6760ef9fc525003e8f6cf1bc306fd7c462cf22b2bc01a19dd5aaf9d9a35664b",
+    ]),
+  ],
+  [
+    "2026.07.10-r221",
+    new Set([
+      "7eb7fd5bd9e0fc9952fca8dc935647988e6a2d6c5fdf786cd70160a0290fba8f",
+      "9e7b02210379835ecfe1d5d5a06018c78c944197c12f3bac6ffa725c44c13c0d",
+    ]),
+  ],
 ]);
 
 export interface PublicMethodologyReproducibilityPacket {
@@ -3362,6 +3384,12 @@ export function getPublicMethodologyManifest(questionSet?: DiagnosticQuestionSet
       {
         version: AMC_PUBLIC_METHODOLOGY_VERSION,
         date: AMC_PUBLIC_METHODOLOGY_RELEASE_DATE,
+        summary: "Aligns the public badge methodology assurance hash with the diagnostic methodology-versioning receipt by centralizing the canonical source-review boundary and gate selection and including the existing OpenAI Simple Evals boundary in both surfaces. Scoring ranges, thresholds, maturity labels, and claim-eligibility rules are unchanged.",
+        migration: "Reports, badges, methodology receipts, and signed outputs generated under 2026.07.10-r222 remain historical artifacts and must not be rewritten. Regenerate them under 2026.07.29-r223 before comparing or publishing amc_methodology_assurance; r223 uses one canonical assurance hash across public and diagnostic surfaces, while r222 remains verifiable by its embedded version and manifest hash."
+      },
+      {
+        version: "2026.07.10-r222",
+        date: AMC_PUBLIC_METHODOLOGY_RELEASE_DATE,
         summary: "Establishes the canonical L0-L5 maturity taxonomy across methodology, badges, CLI, scanners, reports, guides, README, Docs, and website surfaces: Absent, Initial, Developing, Defined, Managed, and Optimizing.",
         migration: "Reports generated under 2026.07.10-r221 remain verifiable under their embedded methodology version and hash. Re-render current displays with the r222 labels before comparison. Numerical scores, thresholds, and historical hashes are unchanged."
       },
@@ -4697,6 +4725,7 @@ export function getPublicMethodologyManifest(questionSet?: DiagnosticQuestionSet
 
 
     migrationGuidance: [
+      "Preserve reports, badges, methodology receipts, and signed outputs generated under 2026.07.10-r222 as immutable historical artifacts. Regenerate current outputs under 2026.07.29-r223 before comparing or publishing amc_methodology_assurance so public badges and diagnostic receipts use the same OpenAI Simple Evals-inclusive assurance hash.",
       "Reports generated under 2026.07.10-r221 remain verifiable under their embedded methodology version and hash. Re-render current aggregate L0-L5 labels as Absent, Initial, Developing, Defined, Managed, and Optimizing before comparison; numerical scores, thresholds, and historical hashes are unchanged.",
       "Regenerate diagnostic reports created before 2026.07.10-r221 or derive evidence readiness from artifact status, signature verification, trust boundary, evidence coverage, integrity index, and trust label. Only READY is claim-eligible; raw VALID or signed status is not.",
       "Run amc methodology --json and store the manifest hash with audit evidence.",
@@ -4728,13 +4757,57 @@ export function getPublicMethodologyManifest(questionSet?: DiagnosticQuestionSet
     }
   }
 
-  manifestWithoutHash.deprecationNotice = "Reports generated before 2026.07.10-r221 must not treat VALID, signed, or seal-verified artifact status as evidence sufficiency, deployment approval, operational safety, or legal compliance without a derived evidence-readiness result and signed evidence references. " + manifestWithoutHash.deprecationNotice;
+  manifestWithoutHash.deprecationNotice = "Reports and badges generated under 2026.07.10-r222 may carry different public and diagnostic methodology assurance hashes because the public hash omitted the existing OpenAI Simple Evals source-review boundary. Preserve those original r222 artifacts unchanged and regenerate current reports, badges, methodology receipts, and signed outputs under 2026.07.29-r223 before comparing or publishing amc_methodology_assurance. Reports generated before 2026.07.10-r221 must not treat VALID, signed, or seal-verified artifact status as evidence sufficiency, deployment approval, operational safety, or legal compliance without a derived evidence-readiness result and signed evidence references. " + manifestWithoutHash.deprecationNotice;
   manifestWithoutHash.changePolicy = "Any evidence-readiness threshold, claim-eligibility rule, or artifact-verification binding requires a methodology version change, changelog entry, migration guidance, and regenerated signed outputs. " + manifestWithoutHash.changePolicy;
 
   return {
     ...manifestWithoutHash,
     hash: sha256Hex(canonicalize(manifestWithoutHash))
   };
+}
+
+const METHODOLOGY_VERSIONING_SOURCE_REVIEW_BOUNDARIES = new Set([
+  "langsmith_eval_observability_metric_validity",
+  "arize_phoenix_eval_observability_metric_validity",
+  "lunary_observability_metric_validity",
+  "cua_computer_use_public_methodology",
+  "fact_checking_factuality_review_methodology_integrity",
+  "google_adk_eval_metric_validity",
+  "lm_evaluation_harness_metric_validity",
+  "openai_evals_public_methodology",
+  "pocketflow_public_methodology",
+  "openai_simple_evals_metric_validity",
+  "digital_materials_ecosystem_metric_validity",
+  "chemgraph_agentic_chemistry_workflow_metric_validity",
+]);
+
+const METHODOLOGY_VERSIONING_SOURCE_REVIEW_GATES = new Set([
+  "langsmith_eval_observability_metric_validity",
+  "arize_phoenix_observability_eval_coverage",
+  "lunary_observability_metric_validity",
+  "cua_computer_use_public_methodology",
+  "fact_checking_factuality_review_methodology_evidence",
+  "google_adk_eval_metric_validity",
+  "lm_evaluation_harness_metric_validity",
+  "openai_evals_public_methodology",
+  "pocketflow_public_methodology",
+  "openai_simple_evals_metric_validity",
+  "digital_materials_ecosystem_metric_validity",
+  "chemgraph_agentic_chemistry_workflow_metric_validity",
+]);
+
+export function getPublicMethodologyVersioningAssuranceHash(manifest: PublicMethodologyManifest): string {
+  return sha256Hex(canonicalize({
+    methodologyVersioningAssurance: manifest.methodologyVersioningAssurance,
+    sutroBatchMethodologyAssurance: manifest.sutroBatchMethodologyAssurance,
+    agentBeltMethodologyAssurance: manifest.agentBeltMethodologyAssurance,
+    sourceReviewBoundaries: manifest.scoreClaimBoundaries.filter((boundary) =>
+      METHODOLOGY_VERSIONING_SOURCE_REVIEW_BOUNDARIES.has(boundary.boundary)
+    ),
+    sourceReviewGates: manifest.metricValidationGates.filter((gate) =>
+      METHODOLOGY_VERSIONING_SOURCE_REVIEW_GATES.has(gate.gate)
+    ),
+  }));
 }
 
 export function getPublicMethodologyReference(questionSet?: DiagnosticQuestionSetInfo): PublicMethodologyReference {
@@ -4746,15 +4819,21 @@ export function getPublicMethodologyReference(questionSet?: DiagnosticQuestionSe
     methodologyDoc: manifest.methodologyDoc,
     publicUrl: manifest.publicUrl,
     hash: manifest.hash,
-    versioningAssuranceHash: sha256Hex(canonicalize({
-      methodologyVersioningAssurance: manifest.methodologyVersioningAssurance,
-      sutroBatchMethodologyAssurance: manifest.sutroBatchMethodologyAssurance,
-      agentBeltMethodologyAssurance: manifest.agentBeltMethodologyAssurance,
-      sourceReviewBoundaries: manifest.scoreClaimBoundaries.filter((boundary) => boundary.boundary === "langsmith_eval_observability_metric_validity" || boundary.boundary === "arize_phoenix_eval_observability_metric_validity" || boundary.boundary === "lunary_observability_metric_validity" || boundary.boundary === "cua_computer_use_public_methodology" || boundary.boundary === "fact_checking_factuality_review_methodology_integrity" || boundary.boundary === "google_adk_eval_metric_validity" || boundary.boundary === "lm_evaluation_harness_metric_validity" || boundary.boundary === "openai_evals_public_methodology" || boundary.boundary === "pocketflow_public_methodology" || boundary.boundary === "digital_materials_ecosystem_metric_validity" || boundary.boundary === "chemgraph_agentic_chemistry_workflow_metric_validity"),
-      sourceReviewGates: manifest.metricValidationGates.filter((gate) => gate.gate === "langsmith_eval_observability_metric_validity" || gate.gate === "arize_phoenix_observability_eval_coverage" || gate.gate === "lunary_observability_metric_validity" || gate.gate === "cua_computer_use_public_methodology" || gate.gate === "fact_checking_factuality_review_methodology_evidence" || gate.gate === "google_adk_eval_metric_validity" || gate.gate === "lm_evaluation_harness_metric_validity" || gate.gate === "openai_evals_public_methodology" || gate.gate === "pocketflow_public_methodology" || gate.gate === "digital_materials_ecosystem_metric_validity" || gate.gate === "chemgraph_agentic_chemistry_workflow_metric_validity")
-
-    }))
+    versioningAssuranceHash: getPublicMethodologyVersioningAssuranceHash(manifest),
   };
+}
+
+let currentBuiltInPublicMethodologyHashes: ReadonlySet<string> | undefined;
+
+function getCurrentBuiltInPublicMethodologyHashes(): ReadonlySet<string> {
+  if (!currentBuiltInPublicMethodologyHashes) {
+    currentBuiltInPublicMethodologyHashes = new Set(
+      BUILT_IN_PUBLIC_METHODOLOGY_QUESTION_SET_VERSIONS.map((version) =>
+        getPublicMethodologyManifest(getQuestionSet({ version }).info).hash
+      ),
+    );
+  }
+  return currentBuiltInPublicMethodologyHashes;
 }
 
 export function verifyPublicMethodologyReference(
@@ -4764,8 +4843,7 @@ export function verifyPublicMethodologyReference(
     return { ok: false, status: "unknown", reason: "methodology id mismatch" };
   }
 
-  const current = getPublicMethodologyManifest();
-  const status = reference.version === current.version
+  const status = reference.version === AMC_PUBLIC_METHODOLOGY_VERSION
     ? "current"
     : HISTORICAL_PUBLIC_METHODOLOGY_HASHES.has(reference.version)
       ? "historical"
@@ -4774,10 +4852,10 @@ export function verifyPublicMethodologyReference(
     return { ok: false, status, reason: "unknown methodology version" };
   }
 
-  const expectedHash = status === "current"
-    ? current.hash
+  const supportedHashes = status === "current"
+    ? getCurrentBuiltInPublicMethodologyHashes()
     : HISTORICAL_PUBLIC_METHODOLOGY_HASHES.get(reference.version);
-  if (reference.hash !== expectedHash) {
+  if (!supportedHashes?.has(reference.hash)) {
     return { ok: false, status, reason: "methodology hash mismatch" };
   }
   return { ok: true, status, reason: null };

@@ -3,7 +3,9 @@ import {
   buildLiveDriftWatchAlerts,
   runLiveScoreBehaviorDrift,
   verifyLiveDriftReceipt,
+  type LiveDriftMetricId,
   type LiveDriftSampleRow,
+  type LiveDriftThresholds,
 } from "../src/watch/liveDriftAlerts.js";
 import {
   runAwesomeAgentMemoryLiveDrift,
@@ -27,6 +29,7 @@ import {
   runLlmFighterLiveDrift,
   type LlmFighterLiveDriftRow,
 } from "../src/watch/llmFighterLiveDrift.js";
+import { withBlankEvidenceRefs } from "./helpers/liveDriftEvidence.js";
 
 const baselineRows: LiveDriftSampleRow[] = [
   {
@@ -525,7 +528,234 @@ function llmFighterRow(
   };
 }
 
+type SpecialtyEvidenceCoverageMetric =
+  | "sapAgentEvalEvidenceCoverage0to1"
+  | "agentEvalObservabilityEvidenceCoverage0to1"
+  | "hedraRagEvidenceCoverage0to1"
+  | "agentEvalHarnessEvidenceCoverage0to1"
+  | "strandsBenchmarkHarnessEvidenceCoverage0to1"
+  | "naviBenchEvidenceCoverage0to1"
+  | "credenceEngineEvidenceCoverage0to1";
+
+interface SpecialtyEvidenceCoverageCase {
+  name: string;
+  metric: SpecialtyEvidenceCoverageMetric;
+  alertMetric: LiveDriftMetricId;
+  signal: Partial<LiveDriftSampleRow>;
+  blankEvidenceRefs?: boolean;
+  threshold: (coverage: number) => Partial<LiveDriftThresholds>;
+}
+
+const specialtyEvidenceCoverageCases: SpecialtyEvidenceCoverageCase[] = [
+  {
+    name: "SAP agent evaluation",
+    metric: "sapAgentEvalEvidenceCoverage0to1",
+    alertMetric: "sapAgentEvalEvidenceCoverage0to1",
+    signal: { sapAgentEvalTutorialId: "sap-agent-eval-test" },
+    threshold: (coverage) => ({ minSapAgentEvalEvidenceCoverage0to1: coverage }),
+  },
+  {
+    name: "agent evaluation observability",
+    metric: "agentEvalObservabilityEvidenceCoverage0to1",
+    alertMetric: "agentEvalObservabilityEvidenceCoverage0to1",
+    signal: { agentEvalObservabilitySourceRefHash: "agent-eval-observability-test" },
+    threshold: (coverage) => ({ minAgentEvalObservabilityEvidenceCoverage0to1: coverage }),
+  },
+  {
+    name: "Hedra RAG",
+    metric: "hedraRagEvidenceCoverage0to1",
+    alertMetric: "hedraRagEvidenceCoverage0to1",
+    signal: { hedraRagArtifactId: "hedra-rag-test" },
+    threshold: (coverage) => ({ minHedraRagEvidenceCoverage0to1: coverage }),
+  },
+  {
+    name: "agent evaluation harness",
+    metric: "agentEvalHarnessEvidenceCoverage0to1",
+    alertMetric: "agentEvalHarnessEvidenceCoverage0to1",
+    signal: { agentEvalHarnessRunId: "agent-eval-harness-test" },
+    threshold: (coverage) => ({ minAgentEvalHarnessEvidenceCoverage0to1: coverage }),
+  },
+  {
+    name: "Strands benchmark harness",
+    metric: "strandsBenchmarkHarnessEvidenceCoverage0to1",
+    alertMetric: "strandsBenchmarkHarnessEvidenceCoverage0to1",
+    signal: { strandsBenchmarkHarnessRunId: "strands-benchmark-test" },
+    threshold: (coverage) => ({ minStrandsBenchmarkHarnessEvidenceCoverage0to1: coverage }),
+  },
+  {
+    name: "Navi Bench",
+    metric: "naviBenchEvidenceCoverage0to1",
+    alertMetric: "naviBenchEvidenceCoverage0to1",
+    signal: { naviBenchBenchmarkId: "navi-bench-test" },
+    blankEvidenceRefs: true,
+    threshold: (coverage) => ({ minNaviBenchEvidenceCoverage0to1: coverage }),
+  },
+  {
+    name: "Credence Engine",
+    metric: "credenceEngineEvidenceCoverage0to1",
+    alertMetric: "credenceEngineEvidenceCoverage0to1",
+    signal: { credenceEngineBenchmarkId: "credence-engine-test" },
+    blankEvidenceRefs: true,
+    threshold: (coverage) => ({ minCredenceEngineEvidenceCoverage0to1: coverage }),
+  },
+];
+
+function runSpecialtyEvidenceCoverage(
+  testCase: SpecialtyEvidenceCoverageCase,
+  refs: { evidenceRefs: string[]; signedEvidenceRefs: string[] },
+  thresholds: Partial<LiveDriftThresholds> = {},
+) {
+  const baselineRow: LiveDriftSampleRow = {
+    ...baselineRows[0]!,
+    ...testCase.signal,
+    traceId: `specialty-${testCase.metric}-baseline`,
+    evidenceRefs: ["specialty-baseline-evidence"],
+    signedEvidenceRefs: ["specialty-baseline-signed"],
+  };
+  const liveRow: LiveDriftSampleRow = {
+    ...stableLiveRows[0]!,
+    ...testCase.signal,
+    traceId: `specialty-${testCase.metric}-live`,
+    ...refs,
+  };
+  return runLiveScoreBehaviorDrift({
+    agentId: `specialty-${testCase.metric}`,
+    baselineWindow: {
+      windowId: `baseline-${testCase.metric}`,
+      startedAt: "2026-06-13T00:00:00.000Z",
+      endedAt: "2026-06-13T00:05:00.000Z",
+      rows: [baselineRow],
+    },
+    liveWindow: {
+      windowId: `live-${testCase.metric}`,
+      startedAt: "2026-06-13T01:00:00.000Z",
+      endedAt: "2026-06-13T01:05:00.000Z",
+      rows: [liveRow],
+    },
+    thresholds,
+    now: new Date("2026-06-13T01:06:00.000Z"),
+  });
+}
+
 describe("runLiveScoreBehaviorDrift", () => {
+  test.each([
+    {
+      name: "Awesome Agent Memory",
+      metricId: "awesomeAgentMemoryEvidenceCoverage0to1",
+      run: () => runAwesomeAgentMemoryLiveDrift({
+        agentId: "awesome-memory-blank-refs",
+        baselineWindow: {
+          windowId: "baseline-awesome-memory-blank-refs",
+          startedAt: "2026-06-19T00:00:00.000Z",
+          endedAt: "2026-06-19T00:05:00.000Z",
+          rows: baselineRows.map((row, index) => awesomeMemoryRow(row, index, "baseline")),
+        },
+        liveWindow: {
+          windowId: "live-awesome-memory-blank-refs",
+          startedAt: "2026-06-19T01:00:00.000Z",
+          endedAt: "2026-06-19T01:05:00.000Z",
+          rows: withBlankEvidenceRefs(stableLiveRows.map((row, index) => awesomeMemoryRow(row, index, "live"))),
+        },
+        now: new Date("2026-06-19T02:00:00.000Z"),
+      }),
+    },
+    {
+      name: "Agent Reading Test",
+      metricId: "agentReadingTestEvidenceCoverage0to1",
+      run: () => runAgentReadingTestLiveDrift({
+        agentId: "agent-reading-blank-refs",
+        baselineWindow: {
+          windowId: "baseline-agent-reading-blank-refs",
+          startedAt: "2026-06-19T00:00:00.000Z",
+          endedAt: "2026-06-19T00:05:00.000Z",
+          rows: baselineRows.map((row, index) => agentReadingTestRow(row, index, "baseline")),
+        },
+        liveWindow: {
+          windowId: "live-agent-reading-blank-refs",
+          startedAt: "2026-06-19T01:00:00.000Z",
+          endedAt: "2026-06-19T01:05:00.000Z",
+          rows: withBlankEvidenceRefs(stableLiveRows.map((row, index) => agentReadingTestRow(row, index, "live"))),
+        },
+        now: new Date("2026-06-19T02:00:00.000Z"),
+      }),
+    },
+    {
+      name: "CTF Agent Benchmark",
+      metricId: "ctfAgentBenchmarkEvidenceCoverage0to1",
+      run: () => runCtfAgentBenchmarkLiveDrift({
+        agentId: "ctf-agent-blank-refs",
+        baselineWindow: {
+          windowId: "baseline-ctf-agent-blank-refs",
+          startedAt: "2026-06-19T00:00:00.000Z",
+          endedAt: "2026-06-19T00:05:00.000Z",
+          rows: baselineRows.map((row, index) => ctfAgentBenchmarkRow(row, index, "baseline")),
+        },
+        liveWindow: {
+          windowId: "live-ctf-agent-blank-refs",
+          startedAt: "2026-06-19T01:00:00.000Z",
+          endedAt: "2026-06-19T01:05:00.000Z",
+          rows: withBlankEvidenceRefs(stableLiveRows.map((row, index) => ctfAgentBenchmarkRow(row, index, "live"))),
+        },
+        now: new Date("2026-06-19T02:00:00.000Z"),
+      }),
+    },
+    {
+      name: "LLM Fighter",
+      metricId: "llmFighterEvidenceCoverage0to1",
+      run: () => runLlmFighterLiveDrift({
+        agentId: "llm-fighter-blank-refs",
+        baselineWindow: {
+          windowId: "baseline-llm-fighter-blank-refs",
+          startedAt: "2026-06-19T00:00:00.000Z",
+          endedAt: "2026-06-19T00:05:00.000Z",
+          rows: baselineRows.map((row, index) => llmFighterRow(row, index, "baseline")),
+        },
+        liveWindow: {
+          windowId: "live-llm-fighter-blank-refs",
+          startedAt: "2026-06-19T01:00:00.000Z",
+          endedAt: "2026-06-19T01:05:00.000Z",
+          rows: withBlankEvidenceRefs(stableLiveRows.map((row, index) => llmFighterRow(row, index, "live"))),
+        },
+        now: new Date("2026-06-19T02:00:00.000Z"),
+      }),
+    },
+  ])("fails closed when $name evidence references contain only whitespace", ({ metricId, run }) => {
+    const result = run();
+
+    expect(result.liveDistribution.evidenceCoverage0to1).toBeLessThan(1);
+    expect(result.liveRows[0]?.evidenceCoverage0to1).toBeLessThan(1);
+    expect(result.liveRows[1]?.evidenceCoverage0to1).toBeLessThan(1);
+    expect(result.receipt.alerts.map((alert) => alert.metricId)).toContain(metricId);
+    expect(result.receipt.failClosed).toBe(true);
+  });
+
+  test.each(specialtyEvidenceCoverageCases)(
+    "counts only nonblank references in $name specialty evidence coverage",
+    (testCase) => {
+      const valid = runSpecialtyEvidenceCoverage(testCase, {
+        evidenceRefs: ["specialty-live-evidence"],
+        signedEvidenceRefs: ["specialty-live-signed"],
+      });
+      const validCoverage = valid.liveDistribution[testCase.metric];
+      const blank = runSpecialtyEvidenceCoverage(
+        testCase,
+        {
+          evidenceRefs: testCase.blankEvidenceRefs ? ["   "] : ["specialty-live-evidence"],
+          signedEvidenceRefs: ["", "  "],
+        },
+        testCase.threshold(validCoverage),
+      );
+
+      expect(blank.liveDistribution[testCase.metric]).toBeLessThan(validCoverage);
+      expect(blank.liveRows[0]?.signedEvidenceRefs).toEqual([]);
+      if (testCase.blankEvidenceRefs) {
+        expect(blank.liveRows[0]?.evidenceRefs).toEqual([]);
+      }
+      expect(blank.alerts.map((alert) => alert.metricId)).toContain(testCase.alertMetric);
+      expect(blank.failClosed).toBe(true);
+    },
+  );
+
   test("approves a stable live sample while preserving signed row evidence and receipt hashes", () => {
     const receipt = runLiveScoreBehaviorDrift({
       agentId: "support-agent",

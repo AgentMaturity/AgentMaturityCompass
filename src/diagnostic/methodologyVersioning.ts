@@ -1,5 +1,8 @@
 import type { DiagnosticMethodologyVersioningReceipt } from "../types.js";
-import type { PublicMethodologyManifest } from "../methodology/publicMethodology.js";
+import {
+  getPublicMethodologyVersioningAssuranceHash,
+  type PublicMethodologyManifest,
+} from "../methodology/publicMethodology.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 
@@ -49,18 +52,6 @@ function hasText(value: unknown): boolean {
 
 function hasArrayValue(value: unknown): boolean {
   return Array.isArray(value) && value.length > 0;
-}
-
-function versioningAssuranceHash(manifest: PublicMethodologyManifest): string {
-  return sha256Hex(canonicalize({
-    methodologyVersioningAssurance: manifest.methodologyVersioningAssurance,
-    sutroBatchMethodologyAssurance: manifest.sutroBatchMethodologyAssurance,
-    agentBeltMethodologyAssurance: manifest.agentBeltMethodologyAssurance,
-    sourceReviewBoundaries: manifest.scoreClaimBoundaries.filter((boundary) => boundary.boundary === "langsmith_eval_observability_metric_validity" || boundary.boundary === "arize_phoenix_eval_observability_metric_validity" || boundary.boundary === "lunary_observability_metric_validity" || boundary.boundary === "cua_computer_use_public_methodology" || boundary.boundary === "fact_checking_factuality_review_methodology_integrity" || boundary.boundary === "google_adk_eval_metric_validity" || boundary.boundary === "lm_evaluation_harness_metric_validity" || boundary.boundary === "openai_evals_public_methodology" || boundary.boundary === "pocketflow_public_methodology" || boundary.boundary === "openai_simple_evals_metric_validity" || boundary.boundary === "digital_materials_ecosystem_metric_validity" || boundary.boundary === "chemgraph_agentic_chemistry_workflow_metric_validity"),
-    sourceReviewGates: manifest.metricValidationGates.filter((gate) => gate.gate === "langsmith_eval_observability_metric_validity" || gate.gate === "arize_phoenix_observability_eval_coverage" || gate.gate === "lunary_observability_metric_validity" || gate.gate === "cua_computer_use_public_methodology" || gate.gate === "fact_checking_factuality_review_methodology_evidence" || gate.gate === "google_adk_eval_metric_validity" || gate.gate === "lm_evaluation_harness_metric_validity" || gate.gate === "openai_evals_public_methodology" || gate.gate === "pocketflow_public_methodology" || gate.gate === "openai_simple_evals_metric_validity" || gate.gate === "digital_materials_ecosystem_metric_validity" || gate.gate === "chemgraph_agentic_chemistry_workflow_metric_validity")
-
-
-  }));
 }
 
 export function buildDiagnosticMethodologyVersioningReceipt(
@@ -233,7 +224,7 @@ export function buildDiagnosticMethodologyVersioningReceipt(
   const presentAuditFields = checks.filter((check) => check.present).map((check) => check.field);
   const missingAuditFields = checks.filter((check) => !check.present).map((check) => check.field);
   const failClosedReasons = missingAuditFields.map((field) => `Missing methodology-versioning audit field: ${field}`);
-  const assuranceHash = versioningAssuranceHash(manifest);
+  const assuranceHash = getPublicMethodologyVersioningAssuranceHash(manifest);
   const receiptWithoutHash = {
     schemaVersion: 1 as const,
     id: "amc-methodology-versioning-receipt",

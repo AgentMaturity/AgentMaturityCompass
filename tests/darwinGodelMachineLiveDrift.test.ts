@@ -6,6 +6,7 @@ import {
   type DarwinGodelMachineSandboxMode,
 } from "../src/watch/darwinGodelMachineLiveDrift.js";
 import { verifyLiveDriftReceipt } from "../src/watch/liveDriftAlerts.js";
+import { withBlankEvidenceRefs } from "./helpers/liveDriftEvidence.js";
 
 const benchmarkFamilies: DarwinGodelMachineBenchmarkFamily[] = [
   "humaneval_calibrated",
@@ -116,6 +117,31 @@ describe("Darwin Godel Machine live drift", () => {
     expect(result.liveRows[0]?.rowHash).toMatch(/^[a-f0-9]{64}$/);
     expect(result.darwinGodelMachineReceiptHash).toMatch(/^[a-f0-9]{64}$/);
     expect(verifyLiveDriftReceipt(result.receipt).valid).toBe(true);
+  });
+
+  test("fails closed when self-improvement evidence references contain only whitespace", () => {
+    const result = runDarwinGodelMachineLiveDrift({
+      agentId: "self-improving-coding-agent",
+      baselineWindow: {
+        windowId: "baseline-dgm-blank-refs",
+        startedAt: "2026-06-20T00:00:00.000Z",
+        endedAt: "2026-06-20T00:10:00.000Z",
+        rows: [0, 1, 2].map((index) => dgmRow(index, "baseline")),
+      },
+      liveWindow: {
+        windowId: "live-dgm-blank-refs",
+        startedAt: "2026-06-20T01:00:00.000Z",
+        endedAt: "2026-06-20T01:10:00.000Z",
+        rows: withBlankEvidenceRefs([0, 1, 2].map((index) => dgmRow(index, "live"))),
+      },
+      now: new Date("2026-06-20T02:00:00.000Z"),
+    });
+
+    expect(result.liveDistribution.evidenceCoverage0to1).toBeLessThan(1);
+    expect(result.liveRows[0]?.evidenceCoverage0to1).toBeLessThan(1);
+    expect(result.liveRows[1]?.evidenceCoverage0to1).toBeLessThan(1);
+    expect(result.receipt.alerts.map((alert) => alert.metricId)).toContain("darwinGodelEvidenceCoverage0to1");
+    expect(result.receipt.failClosed).toBe(true);
   });
 
   test("fails closed when live self-improvement loses proof, regresses score movement, and lacks signed evidence", () => {

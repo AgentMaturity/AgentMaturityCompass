@@ -180,4 +180,65 @@ describe("GAP-0606 RAG text-generation live drift", () => {
     expect(result.watchAlerts.map((alert) => alert.metricId)).toEqual(result.receipt.alerts.map((alert) => alert.metricId));
     expect(verifyLiveDriftReceipt(result.receipt)).toMatchObject({ valid: true, errors: [] });
   });
+
+  test.each([
+    {
+      name: "malformed array entries",
+      value: [null, 42, {}, false, "", "   "],
+    },
+    {
+      name: "non-array scalar",
+      value: "signed:scalar-not-an-array",
+    },
+    {
+      name: "non-array object",
+      value: { signedEvidenceRef: "not-an-array" },
+    },
+  ])("fails closed without throwing when source-proof alert rows contain $name", ({ value }) => {
+    const malformedRefs = value as unknown as string[];
+    const baselineRows = [1, 2, 3].map((index) => row(index, "baseline", {
+      evidenceRefs: malformedRefs,
+      signedEvidenceRefs: malformedRefs,
+    }));
+    const liveRows = baselineRows.map((baselineRow, zeroIndex) => row(zeroIndex + 1, "live", {
+      scenarioId: baselineRow.scenarioId,
+      evidenceRefs: malformedRefs,
+      signedEvidenceRefs: malformedRefs,
+    }));
+    const incompleteSourceProof: RagTextGenerationSourceProof = {
+      ...sourceProof,
+      publisherMetadataHash: "",
+    };
+
+    const result = runRagTextGenerationLiveDrift({
+      agentId: "rag-text-generation-evidence-trust-boundary",
+      sourceProof: incompleteSourceProof,
+      baselineWindow: {
+        windowId: "baseline-rag-text-generation-evidence-trust-boundary",
+        startedAt: "2026-06-20T00:00:00.000Z",
+        endedAt: "2026-06-20T00:05:00.000Z",
+        rows: baselineRows,
+      },
+      liveWindow: {
+        windowId: "live-rag-text-generation-evidence-trust-boundary",
+        startedAt: "2026-06-20T01:00:00.000Z",
+        endedAt: "2026-06-20T01:05:00.000Z",
+        rows: liveRows,
+      },
+      now: new Date("2026-06-20T01:06:00.000Z"),
+    });
+
+    const sourceProofAlert = result.receipt.alerts.find((alert) => (
+      alert.message.startsWith("RAG text-generation source metadata proof is incomplete or mismatched:")
+    ));
+    expect(result.receipt.failClosed).toBe(true);
+    expect(sourceProofAlert).toBeDefined();
+    expect(sourceProofAlert?.signedEvidenceRefs).toEqual([
+      sourceProof.metadataReviewReceiptHash,
+    ]);
+    expect([...result.receipt.baselineRows, ...result.receipt.liveRows].every((receiptRow) => (
+      receiptRow.evidenceRefs.length === 0 && receiptRow.signedEvidenceRefs.length === 0
+    ))).toBe(true);
+    expect(verifyLiveDriftReceipt(result.receipt).valid).toBe(false);
+  });
 });

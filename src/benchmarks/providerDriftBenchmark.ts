@@ -50,6 +50,56 @@ export type ProviderDriftMetricId =
   | "agentDefenseBenchToolPoisoningBlockRate0to1"
   | "agentDefenseBenchBenignPassRate0to1";
 
+const PROVIDER_DRIFT_METRIC_IDS = new Set<ProviderDriftMetricId>([
+  "scoreMean0to1",
+  "refusalRate0to1",
+  "latencyMsP95",
+  "costUsdMean",
+  "trajectoryCount",
+  "invalidActionRate0to1",
+  "errorAttributionRate0to1",
+  "judgeAgreement0to1",
+  "unjudgedPredictionRate0to1",
+  "repairEffectiveness0to1",
+  "falsePositiveIdentification0to1",
+  "netCodebaseImpact0to1",
+  "artifactAccuracy0to1",
+  "formulaIntegrity0to1",
+  "formatQuality0to1",
+  "protocolSuccessRate0to1",
+  "agreementRate0to1",
+  "targetOutcomeValue0to1",
+  "latentPreferenceAlignment0to1",
+  "evaluatorCoverage0to1",
+  "guardrailPassRate0to1",
+  "scoreThresholdPassRate0to1",
+  "retryStability0to1",
+  "progressAuc0to1",
+  "progressPerTurn0to1",
+  "passAtK0to1",
+  "passPowerK0to1",
+  "subgoalCompletionRate0to1",
+  "expectedToolCallCoverage0to1",
+  "personaCoverage0to1",
+  "errorClusterRate0to1",
+  "sampleSize",
+  "evidenceRefs",
+  "signedEvidenceRefs",
+  "evaluationFrameworkEvidence",
+  "observabilityPipelineEvidence",
+  "orbitMonitorEvidence",
+  "geospatialToolCallingEvidence",
+  "falconEvaluateEvidence",
+  "agentDefenseBenchEvidence",
+  "evidraEvidenceChainEvidence",
+  "galileoObservabilityEvidence",
+  "agentDefenseBenchDefenseCoverage0to1",
+  "agentDefenseBenchPromptInjectionBlockRate0to1",
+  "agentDefenseBenchJailbreakBlockRate0to1",
+  "agentDefenseBenchToolPoisoningBlockRate0to1",
+  "agentDefenseBenchBenignPassRate0to1",
+]);
+
 export type ProviderDriftRecommendation = "approve" | "monitor" | "alert" | "waive";
 export type ProviderDriftStatus = "passed" | "monitor" | "alert" | "waived";
 export type ProviderDriftSeverity = "low" | "medium" | "high" | "critical";
@@ -1341,8 +1391,91 @@ function normalizeSha256(value: string | undefined): string | undefined {
   return typeof value === "string" && isSha256(value) ? value.toLowerCase() : undefined;
 }
 
-function normalizedStringList(values: string[] | undefined): string[] {
-  return unique((values ?? []).map((value) => value.trim()));
+export function normalizeProviderDriftEvidenceRefs(value: unknown): string[] {
+  if (!Array.isArray(value)) return [];
+  return unique(
+    value
+      .filter((item): item is string => typeof item === "string")
+      .map((item) => item.trim()),
+  );
+}
+
+export function normalizeProviderDriftCanaryRowEvidence(
+  row: ProviderDriftCanaryRow,
+): ProviderDriftCanaryRow {
+  return {
+    ...row,
+    evidenceRefs: normalizeProviderDriftEvidenceRefs(row.evidenceRefs),
+    signedEvidenceRefs: normalizeProviderDriftEvidenceRefs(row.signedEvidenceRefs),
+  };
+}
+
+function normalizeProviderDriftWaiverMetricIds(value: unknown): ProviderDriftMetricId[] | null | undefined {
+  if (value === undefined) return undefined;
+  if (!Array.isArray(value) || value.length === 0) return null;
+  const metricIds: ProviderDriftMetricId[] = [];
+  for (const item of value) {
+    if (typeof item !== "string") return null;
+    const metricId = item.trim();
+    if (!PROVIDER_DRIFT_METRIC_IDS.has(metricId as ProviderDriftMetricId)) return null;
+    metricIds.push(metricId as ProviderDriftMetricId);
+  }
+  return [...new Set(metricIds)];
+}
+
+function normalizeProviderDriftWaiverScope(value: unknown): string | null | undefined {
+  if (value === undefined) return undefined;
+  if (typeof value !== "string") return null;
+  const normalized = value.trim();
+  return normalized.length > 0 ? normalized : null;
+}
+
+function normalizeProviderDriftWaivers(value: unknown): ProviderDriftWaiver[] {
+  if (!Array.isArray(value)) return [];
+  const waivers: ProviderDriftWaiver[] = [];
+  for (const candidate of value) {
+    if (candidate === null || typeof candidate !== "object" || Array.isArray(candidate)) continue;
+    const row = candidate as Record<string, unknown>;
+    const waiverId = normalizeProviderDriftWaiverScope(row.waiverId);
+    const provider = normalizeProviderDriftWaiverScope(row.provider);
+    const model = normalizeProviderDriftWaiverScope(row.model);
+    const canaryId = normalizeProviderDriftWaiverScope(row.canaryId);
+    const reason = normalizeProviderDriftWaiverScope(row.reason);
+    const approvedBy = normalizeProviderDriftWaiverScope(row.approvedBy);
+    const expiresAt = normalizeProviderDriftWaiverScope(row.expiresAt);
+    const metricIds = normalizeProviderDriftWaiverMetricIds(row.metricIds);
+    const evidenceRefs = normalizeProviderDriftEvidenceRefs(row.evidenceRefs);
+    if (
+      !waiverId
+      || provider === null
+      || model === null
+      || canaryId === null
+      || !reason
+      || !approvedBy
+      || !expiresAt
+      || !Number.isFinite(Date.parse(expiresAt))
+      || metricIds === null
+      || evidenceRefs.length === 0
+    ) {
+      continue;
+    }
+    waivers.push({
+      waiverId,
+      ...(provider === undefined ? {} : { provider }),
+      ...(model === undefined ? {} : { model }),
+      ...(canaryId === undefined ? {} : { canaryId }),
+      ...(metricIds === undefined ? {} : { metricIds }),
+      reason,
+      approvedBy,
+      expiresAt,
+      evidenceRefs,
+    });
+  }
+  return waivers;
+}
+
+function normalizedStringList(values: unknown): string[] {
+  return normalizeProviderDriftEvidenceRefs(values);
 }
 
 function hasEvaluationFrameworkContext(row: ProviderDriftCanaryRow | undefined): boolean {
@@ -2080,7 +2213,7 @@ function coversAlert(waiver: ProviderDriftWaiver, alert: Omit<ProviderDriftAlert
   if (waiver.model && waiver.model !== alert.model) return false;
   if (waiver.canaryId && waiver.canaryId !== alert.canaryId) return false;
   if (waiver.metricIds && !waiver.metricIds.includes(alert.metricId)) return false;
-  return waiver.evidenceRefs.length > 0;
+  return normalizeProviderDriftEvidenceRefs(waiver.evidenceRefs).length > 0;
 }
 
 function severityForMetric(metricId: ProviderDriftMetricId, observed: number, threshold: number): ProviderDriftSeverity {
@@ -2152,7 +2285,8 @@ export function runProviderDriftBenchmark(input: RunProviderDriftBenchmarkInput)
     ...defaultProviderDriftThresholds,
     ...input.thresholds,
   };
-  const active = activeWaivers(input.waivers ?? [], now);
+  const waivers = normalizeProviderDriftWaivers(input.waivers);
+  const active = activeWaivers(waivers, now);
   const baselineByKey = new Map(input.baseline.map((row) => [rowKey(row), row]));
   const candidateByKey = new Map(input.candidate.map((row) => [rowKey(row), row]));
   const keys = unique([...baselineByKey.keys(), ...candidateByKey.keys()]).sort((a, b) => a.localeCompare(b));
@@ -2165,8 +2299,14 @@ export function runProviderDriftBenchmark(input: RunProviderDriftBenchmarkInput)
     const row = after ?? before;
     if (!row) continue;
 
-    const evidenceRefs = unique([...(before?.evidenceRefs ?? []), ...(after?.evidenceRefs ?? [])]);
-    const signedEvidenceRefs = unique([...(before?.signedEvidenceRefs ?? []), ...(after?.signedEvidenceRefs ?? [])]);
+    const evidenceRefs = normalizeProviderDriftEvidenceRefs([
+      ...normalizeProviderDriftEvidenceRefs(before?.evidenceRefs),
+      ...normalizeProviderDriftEvidenceRefs(after?.evidenceRefs),
+    ]);
+    const signedEvidenceRefs = normalizeProviderDriftEvidenceRefs([
+      ...normalizeProviderDriftEvidenceRefs(before?.signedEvidenceRefs),
+      ...normalizeProviderDriftEvidenceRefs(after?.signedEvidenceRefs),
+    ]);
     const falconEvaluateRequired = hasFalconEvaluateContext(before) || hasFalconEvaluateContext(after);
     const orbitMonitorRequired = hasOrbitMonitorContext(before) || hasOrbitMonitorContext(after);
     const geospatialToolCallingRequired = hasGeospatialToolCallingContext(before) || hasGeospatialToolCallingContext(after);
@@ -3101,7 +3241,7 @@ export function runProviderDriftBenchmark(input: RunProviderDriftBenchmarkInput)
     thresholds,
     comparisons,
     alerts,
-    waivers: input.waivers ?? [],
+    waivers,
     recommendation,
     failClosed,
     summary: `${comparisons.length} provider canary comparison(s), ${alerts.filter((alert) => !alert.waived).length} active alert(s), recommendation=${recommendation}`,

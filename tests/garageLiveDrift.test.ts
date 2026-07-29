@@ -6,6 +6,7 @@ import {
   type GarageQuestionType,
   type GarageLiveDriftRow,
 } from "../src/watch/garageLiveDrift.js";
+import { withBlankEvidenceRefs } from "./helpers/liveDriftEvidence.js";
 
 const complexities: GarageQuestionComplexity[] = ["simple", "multi_hop", "aggregation"];
 const questionTypes: GarageQuestionType[] = ["slow_changing", "fast_changing", "non_time_sensitive"];
@@ -105,6 +106,31 @@ describe("runGarageLiveDrift", () => {
       errors: [],
       receiptHash: result.receipt.receiptHash,
     });
+  });
+
+  test("fails closed when GaRAGe evidence references contain only whitespace", () => {
+    const result = runGarageLiveDrift({
+      agentId: "rag-grounding-agent",
+      baselineWindow: {
+        windowId: "baseline-garage-blank-refs",
+        startedAt: "2026-06-20T00:00:00.000Z",
+        endedAt: "2026-06-20T00:05:00.000Z",
+        rows: complexities.map((_, index) => garageRow(index, "baseline")),
+      },
+      liveWindow: {
+        windowId: "live-garage-blank-refs",
+        startedAt: "2026-06-20T01:00:00.000Z",
+        endedAt: "2026-06-20T01:05:00.000Z",
+        rows: withBlankEvidenceRefs(complexities.map((_, index) => garageRow(index, "live"))),
+      },
+      now: new Date("2026-06-20T01:06:00.000Z"),
+    });
+
+    expect(result.liveDistribution.evidenceCoverage0to1).toBeLessThan(1);
+    expect(result.liveRows[0]?.evidenceCoverage0to1).toBeLessThan(1);
+    expect(result.liveRows[1]?.evidenceCoverage0to1).toBeLessThan(1);
+    expect(result.receipt.alerts.map((alert) => alert.metricId)).toContain("garageEvidenceCoverage0to1");
+    expect(result.receipt.failClosed).toBe(true);
   });
 
   test("fails closed when GaRAGe live rows lose source/dataset proof, signed evidence, and grounding quality", () => {

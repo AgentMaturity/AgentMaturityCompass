@@ -6,6 +6,7 @@ import {
   type AiReputationTask,
 } from "../src/watch/aiReputationClaudeLiveDrift.js";
 import { verifyLiveDriftReceipt } from "../src/watch/liveDriftAlerts.js";
+import { withBlankEvidenceRefs } from "./helpers/liveDriftEvidence.js";
 
 const platforms: AiReputationPlatform[] = ["google_reviews", "yelp", "social"];
 const tasks: AiReputationTask[] = ["review_analysis", "competitor_benchmark", "review_response"];
@@ -91,6 +92,31 @@ describe("AI Reputation Claude live drift", () => {
     expect(result.liveRows[0]?.rowHash).toMatch(/^[a-f0-9]{64}$/);
     expect(result.reputationReceiptHash).toMatch(/^[a-f0-9]{64}$/);
     expect(verifyLiveDriftReceipt(result.receipt).valid).toBe(true);
+  });
+
+  test("fails closed when reputation evidence references contain only whitespace", () => {
+    const result = runAiReputationClaudeLiveDrift({
+      agentId: "brand-reputation-agent",
+      baselineWindow: {
+        windowId: "baseline-ai-reputation-blank-refs",
+        startedAt: "2026-06-19T00:00:00.000Z",
+        endedAt: "2026-06-19T00:10:00.000Z",
+        rows: [0, 1, 2].map((index) => reputationRow(index, "baseline")),
+      },
+      liveWindow: {
+        windowId: "live-ai-reputation-blank-refs",
+        startedAt: "2026-06-19T01:00:00.000Z",
+        endedAt: "2026-06-19T01:10:00.000Z",
+        rows: withBlankEvidenceRefs([0, 1, 2].map((index) => reputationRow(index, "live"))),
+      },
+      now: new Date("2026-06-19T02:00:00.000Z"),
+    });
+
+    expect(result.liveDistribution.evidenceCoverage0to1).toBeLessThan(1);
+    expect(result.liveRows[0]?.evidenceCoverage0to1).toBeLessThan(1);
+    expect(result.liveRows[1]?.evidenceCoverage0to1).toBeLessThan(1);
+    expect(result.receipt.alerts.map((alert) => alert.metricId)).toContain("aiReputationEvidenceCoverage0to1");
+    expect(result.receipt.failClosed).toBe(true);
   });
 
   test("fails closed when reputation live sample loses proof and brand-safety metrics regress", () => {

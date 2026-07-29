@@ -10,6 +10,10 @@ import {
   type LiveDriftThresholds,
   type LiveDriftWindow,
 } from "./liveDriftAlerts.js";
+import {
+  hasNonBlankEvidenceRef,
+  normalizeEvidenceRefs,
+} from "./evidenceRefs.js";
 
 export type GarageQuestionType =
   | "slow_changing"
@@ -199,8 +203,8 @@ function nonEmpty(value: string | undefined): boolean {
   return typeof value === "string" && value.trim().length > 0;
 }
 
-function unique(values: string[]): string[] {
-  return [...new Set(values.filter((value) => value.trim().length > 0))];
+function unique(values: unknown): string[] {
+  return normalizeEvidenceRefs(values);
 }
 
 function mean(values: number[], fallback = 0): number {
@@ -287,8 +291,8 @@ function rowEvidenceCoverage(row: GarageLiveDriftRow, phase: "baseline" | "live"
     Number.isFinite(row.answerFaithfulness0to1),
     Number.isFinite(row.latencyMs),
     Number.isFinite(row.costUsd),
-    row.evidenceRefs.length > 0,
-    row.signedEvidenceRefs.length > 0,
+    hasNonBlankEvidenceRef(row.evidenceRefs),
+    hasNonBlankEvidenceRef(row.signedEvidenceRefs),
     ...phaseProof,
   ];
   return round(checks.filter(Boolean).length / checks.length);
@@ -412,12 +416,12 @@ function buildAlert(
     ...(input.sourceRefs ?? []),
     DEFAULT_SOURCE_REF,
     DEFAULT_PAPER_REF,
-    ...input.baselineWindow.rows.flatMap((row) => row.evidenceRefs),
-    ...input.liveWindow.rows.flatMap((row) => row.evidenceRefs),
+    ...input.baselineWindow.rows.flatMap((row) => normalizeEvidenceRefs(row.evidenceRefs)),
+    ...input.liveWindow.rows.flatMap((row) => normalizeEvidenceRefs(row.evidenceRefs)),
   ]);
   const signedEvidenceRefs = unique([
-    ...input.baselineWindow.rows.flatMap((row) => row.signedEvidenceRefs),
-    ...input.liveWindow.rows.flatMap((row) => row.signedEvidenceRefs),
+    ...input.baselineWindow.rows.flatMap((row) => normalizeEvidenceRefs(row.signedEvidenceRefs)),
+    ...input.liveWindow.rows.flatMap((row) => normalizeEvidenceRefs(row.signedEvidenceRefs)),
   ]);
   return {
     alertId: `garage:${metricId}:${sha256Hex(canonicalize({ metricId, observed, threshold, message })).slice(0, 12)}`,

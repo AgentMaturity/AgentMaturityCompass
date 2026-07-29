@@ -2563,6 +2563,33 @@ describe("runProviderDriftBenchmark", () => {
     expect(report.comparisons[0]?.status).toBe("waived");
   });
 
+  test("rejects waivers whose evidence references contain only whitespace", () => {
+    const report = runProviderDriftBenchmark({
+      agentId: "support-agent",
+      baseline: [baseline],
+      candidate: [{
+        ...candidate,
+        scoreMean0to1: 0.6,
+        refusalRate0to1: 0.2,
+      }],
+      waivers: [{
+        waiverId: "waiver-without-evidence",
+        provider: "openai",
+        model: "gpt-4o-mini",
+        metricIds: ["scoreMean0to1", "refusalRate0to1"],
+        reason: "This waiver must fail closed without a real evidence reference.",
+        approvedBy: "rev-tech-lead",
+        expiresAt: "2099-01-01T00:00:00.000Z",
+        evidenceRefs: ["   "],
+      }],
+    });
+
+    expect(report.recommendation).toBe("alert");
+    expect(report.failClosed).toBe(true);
+    expect(report.alerts.every((alert) => alert.waived === false)).toBe(true);
+    expect(report.comparisons[0]?.status).toBe("alert");
+  });
+
   test("fails closed when sample size or evidence references are missing", () => {
     const report = runProviderDriftBenchmark({
       agentId: "support-agent",

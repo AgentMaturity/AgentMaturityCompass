@@ -206,6 +206,32 @@ describe("runHelmProviderDrift", () => {
     expect(result.watch.alertCount).toBe(0);
   });
 
+  test("rejects HELM waivers whose evidence references contain only whitespace", () => {
+    const result = runHelmProviderDrift(requestBody({
+      helm: {
+        baseline: [metadata(baseline, "baseline")],
+        candidate: [],
+      },
+      waivers: [{
+        waiverId: "waive-helm-without-evidence",
+        provider: candidate.provider,
+        model: candidate.model,
+        canaryId: candidate.canaryId,
+        metricIds: ["evaluationFrameworkEvidence"],
+        reason: "This waiver must fail closed without a real evidence reference.",
+        approvedBy: "eval-owner@example.com",
+        expiresAt: "2026-07-20T00:00:00.000Z",
+        evidenceRefs: ["   "],
+      }],
+    }));
+
+    expect(result.report.recommendation).toBe("alert");
+    expect(result.report.failClosed).toBe(true);
+    expect(result.report.alerts[0]).toMatchObject({ waived: false });
+    expect(result.shield.blocked).toBe(true);
+    expect(result.watch.alertCount).toBe(1);
+  });
+
   test("rejects copied content payloads and provider-version mismatches", () => {
     const result = runHelmProviderDrift(requestBody({
       helm: {

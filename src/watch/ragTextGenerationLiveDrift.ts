@@ -15,6 +15,7 @@ import {
   type LiveDriftWatchAlert,
   type LiveDriftWindow,
 } from "./liveDriftAlerts.js";
+import { normalizeEvidenceRefs } from "./evidenceRefs.js";
 
 export interface RagTextGenerationSourceProof {
   openAlexWorkId: string;
@@ -132,8 +133,8 @@ function nonEmpty(value: string | undefined): boolean {
   return typeof value === "string" && value.trim().length > 0;
 }
 
-function unique(values: string[]): string[] {
-  return [...new Set(values.filter((value) => value.trim().length > 0))];
+function unique(values: unknown): string[] {
+  return normalizeEvidenceRefs(values);
 }
 
 function mean(values: number[], fallback = 0): number {
@@ -256,8 +257,8 @@ function buildSourceProofAlert(
     evidenceRefs: sourceRefsFor(input),
     signedEvidenceRefs: unique([
       input.sourceProof.metadataReviewReceiptHash,
-      ...input.baselineWindow.rows.flatMap((row) => row.signedEvidenceRefs),
-      ...input.liveWindow.rows.flatMap((row) => row.signedEvidenceRefs),
+      ...input.baselineWindow.rows.flatMap((row) => normalizeEvidenceRefs(row.signedEvidenceRefs)),
+      ...input.liveWindow.rows.flatMap((row) => normalizeEvidenceRefs(row.signedEvidenceRefs)),
     ]),
   };
 }

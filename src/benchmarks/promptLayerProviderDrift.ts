@@ -4,6 +4,8 @@ import {
   buildProviderDriftCiGate,
   buildProviderDriftEvalPack,
   buildProviderDriftWatchAlerts,
+  normalizeProviderDriftCanaryRowEvidence,
+  normalizeProviderDriftEvidenceRefs,
   runProviderDriftBenchmark,
   type BuildProviderDriftCiGateInput,
   type BuildProviderDriftEvalPackInput,
@@ -149,8 +151,11 @@ function waiverCoversPromptLayerAlert(waiver: ProviderDriftWaiver, alert: Omit<P
   if (waiver.provider && waiver.provider !== alert.provider) return false;
   if (waiver.model && waiver.model !== alert.model) return false;
   if (waiver.canaryId && waiver.canaryId !== alert.canaryId) return false;
-  if (waiver.metricIds && !waiver.metricIds.includes(alert.metricId)) return false;
-  return waiver.evidenceRefs.length > 0;
+  if (
+    waiver.metricIds !== undefined
+    && (!Array.isArray(waiver.metricIds) || !waiver.metricIds.includes(alert.metricId))
+  ) return false;
+  return normalizeProviderDriftEvidenceRefs(waiver.evidenceRefs).length > 0;
 }
 
 function recommendationFromReport(report: ProviderDriftBenchmarkReport): ProviderDriftRecommendation {
@@ -218,7 +223,7 @@ function promptLayerAlert(
   const missingReasons = proofs.flatMap((proof) => proof.missingReasons);
   if (missingReasons.length === 0) return undefined;
   const evidenceRefs = [...new Set([
-    ...row.evidenceRefs,
+    ...normalizeProviderDriftEvidenceRefs(row.evidenceRefs),
     ...proofs.map((proof) => `promptlayer-proof:${proof.proofHash}`),
   ])];
   const base = {
@@ -243,18 +248,20 @@ function promptLayerAlert(
 
 export function runPromptLayerProviderDrift(input: RunPromptLayerProviderDriftInput): PromptLayerProviderDriftResult {
   const now = input.now ?? new Date();
+  const baseline = input.baseline.map(normalizeProviderDriftCanaryRowEvidence);
+  const candidate = input.candidate.map(normalizeProviderDriftCanaryRowEvidence);
   const baseReport = runProviderDriftBenchmark({
     agentId: input.agentId,
-    baseline: input.baseline,
-    candidate: input.candidate,
+    baseline,
+    candidate,
     thresholds: input.thresholds,
     waivers: input.waivers,
     now,
   });
   const baselineMetadata = new Map((input.promptLayer.baseline ?? []).map((row) => [metadataKey(row), row]));
   const candidateMetadata = new Map((input.promptLayer.candidate ?? []).map((row) => [metadataKey(row), row]));
-  const active = activeWaivers(input.waivers ?? [], now);
-  const rowsByKey = new Map([...input.baseline, ...input.candidate].map((row) => [rowKey(row), row]));
+  const active = activeWaivers(baseReport.waivers, now);
+  const rowsByKey = new Map([...baseline, ...candidate].map((row) => [rowKey(row), row]));
   const promptLayerEvidence: PromptLayerProviderDriftProof[] = [];
   const promptLayerAlerts: ProviderDriftAlert[] = [];
 
@@ -262,8 +269,8 @@ export function runPromptLayerProviderDrift(input: RunPromptLayerProviderDriftIn
     const key = rowKey(comparison);
     const row = rowsByKey.get(key);
     if (!row) continue;
-    const baselineRow = input.baseline.find((item) => rowKey(item) === key) ?? row;
-    const candidateRow = input.candidate.find((item) => rowKey(item) === key) ?? row;
+    const baselineRow = baseline.find((item) => rowKey(item) === key) ?? row;
+    const candidateRow = candidate.find((item) => rowKey(item) === key) ?? row;
     const proofs = [
       buildPromptLayerProof("baseline", baselineRow, baselineMetadata.get(key)),
       buildPromptLayerProof("candidate", candidateRow, candidateMetadata.get(key)),

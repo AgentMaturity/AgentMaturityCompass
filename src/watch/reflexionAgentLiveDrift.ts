@@ -1,6 +1,10 @@
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import {
+  hasNonBlankEvidenceRef,
+  normalizeEvidenceRefs,
+} from "./evidenceRefs.js";
+import {
   buildLiveDriftWatchAlerts,
   runLiveScoreBehaviorDrift,
   type LiveDriftAlert,
@@ -118,8 +122,8 @@ const REQUIRED_ROW_PROOF_FIELDS: Array<keyof ReflexionAgentLiveDriftRow> = [
   "reflexionNoSourceCopyProofHash",
 ];
 
-function unique(values: string[]): string[] {
-  return Array.from(new Set(values.filter((value) => value.trim().length > 0))).sort();
+function unique(values: unknown): string[] {
+  return normalizeEvidenceRefs(values).sort();
 }
 
 function isPresent(value: unknown): boolean {
@@ -190,12 +194,12 @@ function proofStats(proof: ReflexionAgentSourceProof, rows: ReflexionAgentLiveDr
       }
     }
     total += 2;
-    if ((row.evidenceRefs ?? []).length > 0) {
+    if (hasNonBlankEvidenceRef(row.evidenceRefs)) {
       present += 1;
     } else {
       missingReasons.push(`${row.traceId}.evidenceRefs`);
     }
-    if ((row.signedEvidenceRefs ?? []).length > 0) {
+    if (hasNonBlankEvidenceRef(row.signedEvidenceRefs)) {
       present += 1;
     } else {
       missingReasons.push(`${row.traceId}.signedEvidenceRefs`);

@@ -16,6 +16,10 @@ import {
   getPublicMethodologyManifest,
   verifyPublicMethodologyReference,
 } from "../src/methodology/publicMethodology.js";
+import {
+  getQuestionSet,
+  LIFECYCLE_QUESTION_SET_VERSION,
+} from "../src/diagnostic/questionSets.js";
 import { probeEndpoint } from "../src/scanner/endpointProbe.js";
 import { scanLocal } from "../src/scanner/localScanner.js";
 
@@ -51,10 +55,11 @@ describe("AMC aggregate maturity taxonomy", () => {
     expect(() => maturityLevelFromOrdinal(6)).toThrow(/maturity ordinal/i);
   });
 
-  it("publishes the corrected labels without changing score ranges", () => {
+  it("publishes the current methodology release and corrected labels without changing score ranges", () => {
     const manifest = getPublicMethodologyManifest();
 
-    expect(manifest.version).toBe("2026.07.10-r222");
+    expect(manifest.version).toBe("2026.07.29-r223");
+    expect(manifest.releaseDate).toBe("2026-07-29");
     expect(manifest.scoreScale.map(({ level, label }) => [level, label])).toEqual(canonicalRows);
     expect(manifest.scoreScale.map(({ numericRange }) => numericRange)).toEqual([
       [0, 0.99],
@@ -64,39 +69,111 @@ describe("AMC aggregate maturity taxonomy", () => {
       [4, 4.74],
       [4.75, 5],
     ]);
-    expect(manifest.changelog[0]).toMatchObject({ version: "2026.07.10-r222" });
-    expect(manifest.changelog[0]?.summary).toContain("canonical L0-L5 maturity taxonomy");
-    expect(manifest.changelog[0]?.migration).toContain("Numerical scores, thresholds, and historical hashes are unchanged");
-    expect(manifest.migrationGuidance[0]).toContain("2026.07.10-r221");
-    expect(manifest.migrationGuidance[0]).toContain("labels");
+    expect(manifest.changelog[0]).toMatchObject({ version: "2026.07.29-r223", date: "2026-07-29" });
+    expect(manifest.changelog[0]?.summary).toContain("public badge methodology assurance hash");
+    expect(manifest.changelog[0]?.migration).toContain("2026.07.10-r222");
+    expect(manifest.changelog[1]).toMatchObject({ version: "2026.07.10-r222", date: "2026-07-10" });
+    expect(manifest.changelog[1]?.summary).toContain("canonical L0-L5 maturity taxonomy");
+    expect(manifest.changelog[1]?.migration).toContain("Numerical scores, thresholds, and historical hashes are unchanged");
+    expect(manifest.migrationGuidance[0]).toContain("2026.07.10-r222");
+    expect(manifest.migrationGuidance[0]).toContain("amc_methodology_assurance");
   });
 
-  it("verifies current and r221 methodology hashes while failing closed on tampering", () => {
+  it("verifies current manifests for both supported built-in question sets", () => {
+    const lifecycle = getQuestionSet({ version: LIFECYCLE_QUESTION_SET_VERSION });
+    const manifests = [
+      getPublicMethodologyManifest(),
+      getPublicMethodologyManifest(lifecycle.info),
+    ];
+
+    for (const manifest of manifests) {
+      expect(verifyPublicMethodologyReference(manifest)).toEqual({
+        ok: true,
+        status: "current",
+        reason: null,
+      });
+    }
+  });
+
+  it("verifies default and lifecycle manifests from historical r222 and r221", () => {
+    const historicalReferences = [
+      {
+        version: "2026.07.10-r222",
+        hash: "9c8f098a6f91b09db9350f034a06daa51580ea223ed4decab34556c964fa030e",
+      },
+      {
+        version: "2026.07.10-r222",
+        hash: "f6760ef9fc525003e8f6cf1bc306fd7c462cf22b2bc01a19dd5aaf9d9a35664b",
+      },
+      {
+        version: "2026.07.10-r221",
+        hash: "7eb7fd5bd9e0fc9952fca8dc935647988e6a2d6c5fdf786cd70160a0290fba8f",
+      },
+      {
+        version: "2026.07.10-r221",
+        hash: "9e7b02210379835ecfe1d5d5a06018c78c944197c12f3bac6ffa725c44c13c0d",
+      },
+    ];
+
+    for (const reference of historicalReferences) {
+      expect(verifyPublicMethodologyReference({
+        id: AMC_PUBLIC_METHODOLOGY_ID,
+        ...reference,
+      })).toEqual({
+        ok: true,
+        status: "historical",
+        reason: null,
+      });
+    }
+  });
+
+  it("fails closed for tampered, unknown-version, and custom-question-set hashes", () => {
     const current = getPublicMethodologyManifest();
-    expect(verifyPublicMethodologyReference(current)).toMatchObject({
-      ok: true,
-      status: "current",
+    const lifecycle = getQuestionSet({ version: LIFECYCLE_QUESTION_SET_VERSION });
+    const custom = getPublicMethodologyManifest({
+      ...lifecycle.info,
+      version: "amc-custom-review-v1",
+      title: "Custom review question set",
+      includedVersions: ["amc-custom-review-v1"],
+      default: false,
     });
 
-    const r221 = {
-      id: AMC_PUBLIC_METHODOLOGY_ID,
-      version: "2026.07.10-r221",
-      hash: "7eb7fd5bd9e0fc9952fca8dc935647988e6a2d6c5fdf786cd70160a0290fba8f",
-    };
-    expect(verifyPublicMethodologyReference(r221)).toEqual({
-      ok: true,
-      status: "historical",
-      reason: null,
+    expect(verifyPublicMethodologyReference({ ...current, hash: "0".repeat(64) })).toEqual({
+      ok: false,
+      status: "current",
+      reason: "methodology hash mismatch",
     });
-    expect(verifyPublicMethodologyReference({ ...r221, hash: "0".repeat(64) })).toEqual({
+    expect(verifyPublicMethodologyReference({
+      id: AMC_PUBLIC_METHODOLOGY_ID,
+      version: "2026.07.10-r222",
+      hash: "0".repeat(64),
+    })).toEqual({
       ok: false,
       status: "historical",
       reason: "methodology hash mismatch",
     });
-    expect(verifyPublicMethodologyReference({ ...r221, version: "2026.07.10-r999" })).toEqual({
+    expect(verifyPublicMethodologyReference(custom)).toEqual({
+      ok: false,
+      status: "current",
+      reason: "methodology hash mismatch",
+    });
+    expect(verifyPublicMethodologyReference({
+      id: AMC_PUBLIC_METHODOLOGY_ID,
+      version: "2026.07.10-r999",
+      hash: current.hash,
+    })).toEqual({
       ok: false,
       status: "unknown",
       reason: "unknown methodology version",
+    });
+    expect(verifyPublicMethodologyReference({
+      id: "unknown-methodology",
+      version: current.version,
+      hash: current.hash,
+    })).toEqual({
+      ok: false,
+      status: "unknown",
+      reason: "methodology id mismatch",
     });
   });
 
@@ -173,6 +250,21 @@ describe("AMC aggregate maturity taxonomy", () => {
         ).toBe(true);
       }
     }
+
+    for (const path of [
+      "docs/SCORING_METHODOLOGY.md",
+      "website/docs/methodology.html",
+      "website/methodology.html",
+    ]) {
+      expect(read(path), `${path} should publish the current methodology version`).toContain("2026.07.29-r223");
+      expect(read(path), `${path} should publish the current methodology release date`).toContain("2026-07-29");
+    }
+
+    const methodologyDoc = read("docs/SCORING_METHODOLOGY.md");
+    expect(methodologyDoc).toContain("supported built-in question sets");
+    expect(methodologyDoc).toContain("`amc-legacy-240-v1`");
+    expect(methodologyDoc).toContain("`amc-lifecycle-2026-v1`");
+    expect(methodologyDoc).toContain("Custom question-set hashes fail closed");
   });
 
   it("publishes exact aggregate score bands in the public rubric", () => {

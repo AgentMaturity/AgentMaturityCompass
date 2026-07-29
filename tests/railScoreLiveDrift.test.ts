@@ -6,6 +6,7 @@ import {
   type RailScoreGuardrailMode,
   type RailScoreLiveDriftRow,
 } from "../src/watch/railScoreLiveDrift.js";
+import { withBlankEvidenceRefs } from "./helpers/liveDriftEvidence.js";
 
 const dimensions: RailScoreEvaluationDimension[] = ["fairness", "safety", "privacy"];
 const modes: RailScoreGuardrailMode[] = ["score_only", "safe_regeneration", "agent_tool_call"];
@@ -132,6 +133,31 @@ describe("runRailScoreLiveDrift", () => {
       errors: [],
       receiptHash: result.receipt.receiptHash,
     });
+  });
+
+  test("fails closed when RAIL Score evidence references contain only whitespace", () => {
+    const result = runRailScoreLiveDrift({
+      agentId: "rail-score-agent",
+      baselineWindow: {
+        windowId: "baseline-rail-score-blank-refs",
+        startedAt: "2026-06-20T00:00:00.000Z",
+        endedAt: "2026-06-20T00:05:00.000Z",
+        rows: dimensions.map((_, index) => railRow(index, "baseline")),
+      },
+      liveWindow: {
+        windowId: "live-rail-score-blank-refs",
+        startedAt: "2026-06-20T01:00:00.000Z",
+        endedAt: "2026-06-20T01:05:00.000Z",
+        rows: withBlankEvidenceRefs(dimensions.map((_, index) => railRow(index, "live"))),
+      },
+      now: new Date("2026-06-20T01:06:00.000Z"),
+    });
+
+    expect(result.liveDistribution.evidenceCoverage0to1).toBeLessThan(1);
+    expect(result.liveRows[0]?.evidenceCoverage0to1).toBeLessThan(1);
+    expect(result.liveRows[1]?.evidenceCoverage0to1).toBeLessThan(1);
+    expect(result.receipt.alerts.map((alert) => alert.metricId)).toContain("railEvidenceCoverage0to1");
+    expect(result.receipt.failClosed).toBe(true);
   });
 
   test("fails closed when RAIL Score rows lose live result, drift statistic, alert receipt, and source context proof", () => {

@@ -1,5 +1,9 @@
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
+import {
+  hasNonBlankEvidenceRef,
+  normalizeEvidenceRefs,
+} from "./evidenceRefs.js";
 
 export type LiveDriftMetricId =
   | "scoreMean0to1"
@@ -4845,8 +4849,8 @@ function round(value: number, places = 6): number {
   return Math.round(value * factor) / factor;
 }
 
-function unique(values: string[]): string[] {
-  return [...new Set(values.filter((value) => value.trim().length > 0))];
+function unique(values: unknown): string[] {
+  return normalizeEvidenceRefs(values);
 }
 
 const dataScienceLifecycleStages = new Set<DataScienceLifecycleStage>([
@@ -7573,7 +7577,7 @@ function sapAgentEvalEvidenceCoverage(row: LiveDriftSampleRow): number {
     sapAgentEvalProcessCoverage(row) +
     sapAgentEvalEnterpriseContextCoverage(row)
   ) / 3;
-  const signedCoverage = (row.signedEvidenceRefs?.length ?? 0) > 0 ? 1 : 0;
+  const signedCoverage = hasNonBlankEvidenceRef(row.signedEvidenceRefs) ? 1 : 0;
   return round((fieldCoverage + taxonomyCoverage + signedCoverage) / 3);
 }
 
@@ -7652,7 +7656,7 @@ function agentEvalObservabilityTelemetryCoverage(row: LiveDriftSampleRow): numbe
 function agentEvalObservabilityEvidenceCoverage(row: LiveDriftSampleRow): number {
   const explicit = normalizeRate(row.agentEvalObservabilityEvidenceCoverage0to1);
   if (explicit !== null) return explicit;
-  const signedCoverage = (row.signedEvidenceRefs?.length ?? 0) > 0 ? 1 : 0;
+  const signedCoverage = hasNonBlankEvidenceRef(row.signedEvidenceRefs) ? 1 : 0;
   return round((
     agentEvalObservabilityConfigCoverage(row) +
     agentEvalObservabilityTelemetryCoverage(row) +
@@ -7751,7 +7755,7 @@ function hedraRagEvidenceCoverage(row: LiveDriftSampleRow): number {
     normalizeNonNegative(row.hedraRagMemoryGb) !== null,
     hedraRagReplayPassRate(row) !== null,
   ].filter(Boolean).length / 4;
-  const signedCoverage = (row.signedEvidenceRefs?.length ?? 0) > 0 ? 1 : 0;
+  const signedCoverage = hasNonBlankEvidenceRef(row.signedEvidenceRefs) ? 1 : 0;
   return round((artifactCoverage + licenseCoverage + taxonomyCoverage + metricCoverage + signedCoverage) / 5);
 }
 
@@ -7841,7 +7845,7 @@ function agentEvalHarnessEvidenceCoverage(row: LiveDriftSampleRow): number {
     normalizeNonNegative(row.agentEvalHarnessLatencyP95Ms) !== null,
     normalizeNonNegative(row.agentEvalHarnessCostUsd) !== null,
   ].filter(Boolean).length / 4;
-  const signedCoverage = (row.signedEvidenceRefs?.length ?? 0) > 0 ? 1 : 0;
+  const signedCoverage = hasNonBlankEvidenceRef(row.signedEvidenceRefs) ? 1 : 0;
   return round((artifactCoverage + agentEvalHarnessTraceCoverage(row) + taxonomyCoverage + metricCoverage + signedCoverage) / 5);
 }
 
@@ -7918,7 +7922,7 @@ function strandsBenchmarkHarnessEvidenceCoverage(row: LiveDriftSampleRow): numbe
     normalizeNonNegative(row.strandsBenchmarkHarnessLatencyP95Ms) !== null,
     normalizeNonNegative(row.strandsBenchmarkHarnessCostUsd) !== null,
   ].filter(Boolean).length / 5;
-  const signedCoverage = (row.signedEvidenceRefs?.length ?? 0) > 0 ? 1 : 0;
+  const signedCoverage = hasNonBlankEvidenceRef(row.signedEvidenceRefs) ? 1 : 0;
   return round((artifactCoverage + strandsBenchmarkHarnessTrajectoryCoverage(row) + taxonomyCoverage + metricCoverage + signedCoverage) / 5);
 }
 
@@ -8446,8 +8450,8 @@ function naviBenchEvidenceCoverage(row: LiveDriftSampleRow): number {
     normalizeNaviBenchWebsiteDomain(row.naviBenchWebsiteDomain) !== "unknown",
     normalizeWebOperatorBrowserMode(row.naviBenchBrowserMode) !== "unknown",
   ].filter(Boolean).length;
-  const evidenceRefsCoverage = row.evidenceRefs.length > 0 ? 1 : 0;
-  const signedEvidenceRefsCoverage = row.signedEvidenceRefs && row.signedEvidenceRefs.length > 0 ? 1 : 0;
+  const evidenceRefsCoverage = hasNonBlankEvidenceRef(row.evidenceRefs) ? 1 : 0;
+  const signedEvidenceRefsCoverage = hasNonBlankEvidenceRef(row.signedEvidenceRefs) ? 1 : 0;
   const structural = round(
     (requiredProof + requiredBooleans + requiredScores + taxonomyCoverage + evidenceRefsCoverage + signedEvidenceRefsCoverage) /
       27,
@@ -8839,8 +8843,8 @@ function credenceEngineEvidenceCoverage(row: LiveDriftSampleRow): number {
     normalizeRate(row.credenceEnginePosteriorCalibration0to1) !== null,
     normalizeRate(row.credenceEngineVoiEfficiency0to1) !== null,
     normalizeRate(row.credenceEngineExpectedUtilityGain0to1) !== null,
-    row.evidenceRefs.length > 0,
-    (row.signedEvidenceRefs ?? []).length > 0,
+    hasNonBlankEvidenceRef(row.evidenceRefs),
+    hasNonBlankEvidenceRef(row.signedEvidenceRefs),
   ];
   return round(checks.filter(Boolean).length / checks.length);
 }
@@ -15878,9 +15882,9 @@ export function runLiveScoreBehaviorDrift(input: RunLiveScoreBehaviorDriftInput)
   ) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "deploymentMaintenanceCoverage", 0, 1, "Live drift sample is missing deployment and maintenance stage coverage.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (![...baselineRows, ...liveRows].every((row) => row.signedEvidenceRefs.length > 0)) {
+  if (![...baselineRows, ...liveRows].every((row) => hasNonBlankEvidenceRef(row.signedEvidenceRefs))) {
     const totalRows = baselineRows.length + liveRows.length;
-    const signedRows = [...baselineRows, ...liveRows].filter((row) => row.signedEvidenceRefs.length > 0).length;
+    const signedRows = [...baselineRows, ...liveRows].filter((row) => hasNonBlankEvidenceRef(row.signedEvidenceRefs)).length;
     alerts.push(makeAlert(
       input.agentId,
       input.baselineWindow.windowId,
@@ -15956,10 +15960,10 @@ export function verifyLiveDriftReceipt(receipt: LiveDriftReceipt): LiveDriftRece
     if (row.rowHash !== expectedRowHash(row)) {
       errors.push(`rowHash mismatch for ${row.traceId}`);
     }
-    if (row.evidenceRefs.length === 0) {
+    if (!hasNonBlankEvidenceRef(row.evidenceRefs)) {
       errors.push(`row ${row.traceId} is missing evidenceRefs`);
     }
-    if (row.signedEvidenceRefs.length === 0) {
+    if (!hasNonBlankEvidenceRef(row.signedEvidenceRefs)) {
       errors.push(`row ${row.traceId} is missing signedEvidenceRefs`);
     }
   }

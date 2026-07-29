@@ -7,7 +7,7 @@ import {
   type OpenCompassLiveDriftRow,
   type OpenCompassLiveDriftSignal,
   type OpenCompassLiveDriftSurface,
-} from "../src/watch/openCompassLiveDrift.js";
+} from "../src/index.js";
 
 const metadataProof: OpenCompassLiveDriftMetadataProof = {
   requestedSourceUrl: OPENCOMPASS_LIVE_DRIFT_METADATA.requestedSourceUrl,
@@ -163,6 +163,26 @@ describe("runOpenCompassLiveDrift", () => {
     expect(result.receipt.alerts.map((alert) => alert.metricId)).toContain("agentEvalHarnessEvidenceCoverage0to1");
     expect(result.watchAlerts.map((alert) => alert.metricId)).toContain("agentEvalHarnessEvidenceCoverage0to1");
     expect(verifyLiveDriftReceipt(result.receipt)).toMatchObject({ valid: true });
+  });
+
+  test("fails closed when evidence references contain only whitespace", () => {
+    const liveRows = stableLiveRows.map((sample, index): OpenCompassLiveDriftRow => {
+      if (index === 0) return { ...sample, evidenceRefs: ["   "] };
+      if (index === 1) return { ...sample, signedEvidenceRefs: ["", "  "] };
+      return sample;
+    });
+
+    const result = run(metadataProof, liveRows);
+
+    expect(result.openCompassEvidenceCoverage0to1).toBeLessThan(1);
+    expect(result.missingReasons).toEqual(expect.arrayContaining([
+      "live-opencompass-1.evidenceRefs",
+      "live-opencompass-2.signedEvidenceRefs",
+    ]));
+    expect(result.receipt.failClosed).toBe(true);
+    expect(result.rowProofs.find((proof) => proof.traceId === "live-opencompass-1")?.evidenceRefs).toEqual([]);
+    expect(result.rowProofs.find((proof) => proof.traceId === "live-opencompass-2")?.signedEvidenceRefs).toEqual([]);
+    expect(verifyLiveDriftReceipt(result.receipt).valid).toBe(false);
   });
 
   test("alerts when live Score/Shield/Watch OpenCompass sample drifts from baseline", () => {

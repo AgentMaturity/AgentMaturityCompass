@@ -175,6 +175,27 @@ describe("GAP-0635 Bisheng observability live drift", () => {
     expect(verifyLiveDriftReceipt(result.receipt)).toMatchObject({ valid: true, errors: [] });
   });
 
+  test("fails closed when evidence references contain only whitespace", () => {
+    const liveRows = stableLiveRows.map((sample, index): BishengObservabilityLiveDriftRow => {
+      if (index === 0) return { ...sample, evidenceRefs: ["   "] };
+      if (index === 1) return { ...sample, signedEvidenceRefs: ["", "  "] };
+      return sample;
+    });
+
+    const result = run(metadataProof, liveRows);
+
+    expect(result.bishengObservabilityEvidenceCoverage0to1).toBeLessThan(1);
+    expect(result.missingReasons).toEqual(expect.arrayContaining([
+      "live-bisheng-1.evidenceRefs",
+      "live-bisheng-2.signedEvidenceRefs",
+    ]));
+    expect(result.receipt.failClosed).toBe(true);
+    expect(result.shieldSurface.verification).toBe("failed");
+    expect(result.rowProofs.find((proof) => proof.traceId === "live-bisheng-1")?.evidenceRefs).toEqual([]);
+    expect(result.rowProofs.find((proof) => proof.traceId === "live-bisheng-2")?.signedEvidenceRefs).toEqual([]);
+    expect(verifyLiveDriftReceipt(result.receipt).valid).toBe(false);
+  });
+
   test("alerts when live Score, Shield, and Watch observability samples drift from baseline", () => {
     const driftingRows = stableLiveRows.map((sample, index): BishengObservabilityLiveDriftRow => ({
       ...sample,

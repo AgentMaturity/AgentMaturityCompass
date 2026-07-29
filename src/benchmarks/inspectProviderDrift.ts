@@ -4,6 +4,8 @@ import {
   buildProviderDriftCiGate,
   buildProviderDriftEvalPack,
   buildProviderDriftWatchAlerts,
+  normalizeProviderDriftCanaryRowEvidence,
+  normalizeProviderDriftEvidenceRefs,
   runProviderDriftBenchmark,
   type BuildProviderDriftCiGateInput,
   type BuildProviderDriftEvalPackInput,
@@ -210,8 +212,11 @@ function waiverCoversInspectAlert(waiver: ProviderDriftWaiver, alert: Omit<Provi
   if (waiver.provider && waiver.provider !== alert.provider) return false;
   if (waiver.model && waiver.model !== alert.model) return false;
   if (waiver.canaryId && waiver.canaryId !== alert.canaryId) return false;
-  if (waiver.metricIds && !waiver.metricIds.includes(alert.metricId)) return false;
-  return waiver.evidenceRefs.length > 0;
+  if (
+    waiver.metricIds !== undefined
+    && (!Array.isArray(waiver.metricIds) || !waiver.metricIds.includes(alert.metricId))
+  ) return false;
+  return normalizeProviderDriftEvidenceRefs(waiver.evidenceRefs).length > 0;
 }
 
 function recommendationFromReport(report: ProviderDriftBenchmarkReport): ProviderDriftRecommendation {
@@ -290,7 +295,7 @@ function inspectAlert(
   const missingReasons = proofs.flatMap((proof) => proof.missingReasons);
   if (missingReasons.length === 0) return undefined;
   const evidenceRefs = [...new Set([
-    ...row.evidenceRefs,
+    ...normalizeProviderDriftEvidenceRefs(row.evidenceRefs),
     ...proofs.map((proof) => `inspect-proof:${proof.proofHash}`),
   ])];
   const base = {
@@ -364,18 +369,20 @@ export function runInspectProviderDrift(input: RunInspectProviderDriftInput): In
   if (!Number.isFinite(now.getTime())) {
     throw new Error("Invalid Inspect provider drift timestamp");
   }
+  const baseline = input.baseline.map(normalizeProviderDriftCanaryRowEvidence);
+  const candidate = input.candidate.map(normalizeProviderDriftCanaryRowEvidence);
   const baseReport = runProviderDriftBenchmark({
     agentId: input.agentId,
-    baseline: input.baseline,
-    candidate: input.candidate,
+    baseline,
+    candidate,
     thresholds: input.thresholds,
     waivers: input.waivers,
     now,
   });
   const baselineMetadata = new Map((input.inspect.baseline ?? []).map((row) => [metadataKey(row), row]));
   const candidateMetadata = new Map((input.inspect.candidate ?? []).map((row) => [metadataKey(row), row]));
-  const active = activeWaivers(input.waivers ?? [], now);
-  const rowsByKey = new Map([...input.baseline, ...input.candidate].map((row) => [rowKey(row), row]));
+  const active = activeWaivers(baseReport.waivers, now);
+  const rowsByKey = new Map([...baseline, ...candidate].map((row) => [rowKey(row), row]));
   const inspectEvidence: InspectProviderDriftProof[] = [];
   const inspectAlerts: ProviderDriftAlert[] = [];
 
@@ -383,8 +390,8 @@ export function runInspectProviderDrift(input: RunInspectProviderDriftInput): In
     const key = rowKey(comparison);
     const row = rowsByKey.get(key);
     if (!row) continue;
-    const baselineRow = input.baseline.find((item) => rowKey(item) === key) ?? row;
-    const candidateRow = input.candidate.find((item) => rowKey(item) === key) ?? row;
+    const baselineRow = baseline.find((item) => rowKey(item) === key) ?? row;
+    const candidateRow = candidate.find((item) => rowKey(item) === key) ?? row;
     const proofs = [
       buildInspectProof("baseline", baselineRow, baselineMetadata.get(key)),
       buildInspectProof("candidate", candidateRow, candidateMetadata.get(key)),
