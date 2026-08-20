@@ -17,7 +17,10 @@ export interface FrontierBaseline {
   /** Overall composite */
   compositeScore: number;
   /** When this baseline was last measured */
-  measuredAt: string;
+  /** When this baseline was actually measured; null when illustrative. */
+  measuredAt: string | null;
+  /** False for hand-written placeholders that were never measured. */
+  verified: boolean;
   /** AMC version used */
   amcVersion: string;
   /** Number of questions in the assessment */
@@ -44,6 +47,20 @@ export interface BaselineComparison {
 
 // ── Reference baselines ────────────────────────────────────────────────────
 
+/**
+ * ILLUSTRATIVE REFERENCE POINTS — NOT MEASUREMENTS.
+ *
+ * These figures were hand-written to illustrate the comparison format. No
+ * frontier model was ever assessed to produce them, despite the measuredAt /
+ * amcVersion / questionsAnswered fields, which previously made them read as
+ * published benchmark results for named third-party models.
+ *
+ * Publishing invented scores about other vendors' models is not something an
+ * evidence-integrity product can do, so every entry is explicitly marked
+ * `verified: false` and consumers must treat them as placeholders. Replace them
+ * with real, attributable measurements before presenting any comparison
+ * externally.
+ */
 export const FRONTIER_BASELINES: FrontierBaseline[] = [
   {
     modelId: "gpt-4-turbo",
@@ -51,7 +68,8 @@ export const FRONTIER_BASELINES: FrontierBaseline[] = [
     provider: "openai",
     layerScores: { L0: 88, L1: 82, L2: 75, L3: 70, L4: 65 },
     compositeScore: 76,
-    measuredAt: "2026-03-15",
+    measuredAt: null,
+    verified: false,
     amcVersion: "1.0.0",
     questionsAnswered: 235,
   },
@@ -61,7 +79,8 @@ export const FRONTIER_BASELINES: FrontierBaseline[] = [
     provider: "openai",
     layerScores: { L0: 90, L1: 85, L2: 78, L3: 72, L4: 68 },
     compositeScore: 79,
-    measuredAt: "2026-03-15",
+    measuredAt: null,
+    verified: false,
     amcVersion: "1.0.0",
     questionsAnswered: 235,
   },
@@ -71,7 +90,8 @@ export const FRONTIER_BASELINES: FrontierBaseline[] = [
     provider: "anthropic",
     layerScores: { L0: 92, L1: 87, L2: 80, L3: 75, L4: 70 },
     compositeScore: 81,
-    measuredAt: "2026-03-15",
+    measuredAt: null,
+    verified: false,
     amcVersion: "1.0.0",
     questionsAnswered: 235,
   },
@@ -81,7 +101,8 @@ export const FRONTIER_BASELINES: FrontierBaseline[] = [
     provider: "anthropic",
     layerScores: { L0: 93, L1: 88, L2: 82, L3: 78, L4: 73 },
     compositeScore: 83,
-    measuredAt: "2026-03-15",
+    measuredAt: null,
+    verified: false,
     amcVersion: "1.0.0",
     questionsAnswered: 235,
   },
@@ -91,7 +112,8 @@ export const FRONTIER_BASELINES: FrontierBaseline[] = [
     provider: "google",
     layerScores: { L0: 86, L1: 80, L2: 73, L3: 68, L4: 62 },
     compositeScore: 74,
-    measuredAt: "2026-03-15",
+    measuredAt: null,
+    verified: false,
     amcVersion: "1.0.0",
     questionsAnswered: 235,
   },
@@ -101,7 +123,8 @@ export const FRONTIER_BASELINES: FrontierBaseline[] = [
     provider: "meta",
     layerScores: { L0: 82, L1: 76, L2: 68, L3: 60, L4: 55 },
     compositeScore: 68,
-    measuredAt: "2026-03-15",
+    measuredAt: null,
+    verified: false,
     amcVersion: "1.0.0",
     questionsAnswered: 235,
   },
@@ -111,7 +134,8 @@ export const FRONTIER_BASELINES: FrontierBaseline[] = [
     provider: "mistral",
     layerScores: { L0: 80, L1: 74, L2: 65, L3: 58, L4: 52 },
     compositeScore: 66,
-    measuredAt: "2026-03-15",
+    measuredAt: null,
+    verified: false,
     amcVersion: "1.0.0",
     questionsAnswered: 235,
   },

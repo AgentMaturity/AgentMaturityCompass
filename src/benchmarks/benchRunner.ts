@@ -57,8 +57,14 @@ function percentile(values: number[], value: number): number {
   return Number(((rank / sorted.length) * 100).toFixed(2));
 }
 
+/**
+ * NOT a latency measurement.
+ *
+ * Derived from the run's integrity index. No timing is captured anywhere in
+ * this path, so this is a maturity-derived indicator that was previously
+ * labelled and reported as a latency benchmark.
+ */
 function deriveLatencyScore(bench: BenchmarkArtifact): number {
-  // Use integrity index as a proxy — agents with high integrity process evidence faster
   return Math.round(bench.run.integrityIndex * 100);
 }
 
@@ -67,22 +73,31 @@ function deriveAccuracyScore(bench: BenchmarkArtifact): number {
   return Math.round((bench.run.overall / 5) * 100);
 }
 
+/**
+ * Averaged assurance pack scores. Real, but only as strong as the assurance
+ * run behind it — it is not an independent safety benchmark.
+ */
 function deriveSafetyScore(bench: BenchmarkArtifact): number {
-  // Use assurance pack scores averaged
   const assuranceValues = Object.values(bench.run.assurance);
   if (assuranceValues.length === 0) return 50;
   return Math.round(assuranceValues.reduce((a, b) => a + b, 0) / assuranceValues.length);
 }
 
+/**
+ * NOT a cost measurement — combines maturity and a risk index. No spend or
+ * token accounting is consulted.
+ */
 function deriveCostEfficiencyScore(bench: BenchmarkArtifact): number {
-  // Combine overall maturity and low risk indices for cost efficiency
   const riskScore = 100 - (bench.run.indices.EconomicSignificanceRisk ?? 50);
   const maturity = (bench.run.overall / 5) * 100;
   return Math.round((riskScore + maturity) / 2);
 }
 
+/**
+ * NOT a reliability measurement — an integrity/risk blend. No uptime, error
+ * rate or retry data is consulted.
+ */
 function deriveReliabilityScore(bench: BenchmarkArtifact): number {
-  // Use integrity + ecosystem focus risk as reliability proxy
   const intScore = bench.run.integrityIndex * 100;
   const ecoRisk = 100 - (bench.run.indices.EcosystemFocusRisk ?? 50);
   return Math.round((intScore + ecoRisk) / 2);
@@ -90,11 +105,11 @@ function deriveReliabilityScore(bench: BenchmarkArtifact): number {
 
 function buildCategoryScores(bench: BenchmarkArtifact, allBenchmarks: BenchmarkArtifact[]): BenchCategoryScore[] {
   const categories: Array<{ category: BenchCategory; derive: (b: BenchmarkArtifact) => number; description: string }> = [
-    { category: "latency", derive: deriveLatencyScore, description: "Evidence processing speed and response time" },
+    { category: "latency", derive: deriveLatencyScore, description: "Integrity-derived indicator (not a timing measurement)" },
     { category: "accuracy", derive: deriveAccuracyScore, description: "Diagnostic accuracy and maturity assessment quality" },
     { category: "safety", derive: deriveSafetyScore, description: "Safety controls and assurance pack compliance" },
-    { category: "cost-efficiency", derive: deriveCostEfficiencyScore, description: "Resource efficiency and economic risk posture" },
-    { category: "reliability", derive: deriveReliabilityScore, description: "Consistency, integrity, and ecosystem resilience" },
+    { category: "cost-efficiency", derive: deriveCostEfficiencyScore, description: "Maturity/risk blend (not a cost or token measurement)" },
+    { category: "reliability", derive: deriveReliabilityScore, description: "Integrity/risk blend (not an uptime or error-rate measurement)" },
   ];
 
   return categories.map(({ category, derive, description }) => {
@@ -134,11 +149,11 @@ export function runBenchmarkSuite(params: {
   if (!agentBench && allBenchmarks.length === 0) {
     // No benchmarks available — return baseline scores
     const defaultCategories: BenchCategoryScore[] = [
-      { category: "latency", score0to100: 50, percentile: 50, baseline: 50, description: "Evidence processing speed" },
+      { category: "latency", score0to100: 50, percentile: 50, baseline: 50, description: "Integrity-derived indicator (not a timing measurement)" },
       { category: "accuracy", score0to100: 50, percentile: 50, baseline: 50, description: "Diagnostic accuracy" },
       { category: "safety", score0to100: 50, percentile: 50, baseline: 50, description: "Safety controls" },
-      { category: "cost-efficiency", score0to100: 50, percentile: 50, baseline: 50, description: "Resource efficiency" },
-      { category: "reliability", score0to100: 50, percentile: 50, baseline: 50, description: "Consistency and integrity" },
+      { category: "cost-efficiency", score0to100: 50, percentile: 50, baseline: 50, description: "Maturity/risk blend (not a cost measurement)" },
+      { category: "reliability", score0to100: 50, percentile: 50, baseline: 50, description: "Integrity/risk blend (not an uptime measurement)" },
     ];
     return {
       agentId: params.agentId,
