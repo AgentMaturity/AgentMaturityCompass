@@ -475,11 +475,24 @@ describe("outcome compass", () => {
       candidateFile
     });
 
+    // An experiment must compare two real runs. Without a candidate evidence
+    // window there is nothing real to compare, so it must refuse rather than
+    // synthesizing the candidate from the baseline plus jitter.
+    expect(() =>
+      runExperiment({
+        workspace,
+        agentId: "default",
+        experimentId: created.experimentId,
+        mode: "sandbox"
+      })
+    ).toThrow(/candidate evidence window/i);
+
     const run = runExperiment({
       workspace,
       agentId: "default",
       experimentId: created.experimentId,
-      mode: "sandbox"
+      mode: "sandbox",
+      candidateWindow: "14d"
     });
     expect(typeof run.report.baselineCostPerSuccess).toBe("number");
     expect(typeof run.report.upliftSuccessRate).toBe("number");

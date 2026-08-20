@@ -15639,7 +15639,29 @@ program
     baselineKind: string;
     candidateKind: string;
   }) => {
-    const { quickArchitectureComparison } = await import("./experiments/architectureExperiment.js");
+    const { quickArchitectureComparison, simulateProbeOutcomes } = await import(
+      "./experiments/architectureExperiment.js"
+    );
+    // Architecture comparison needs a probe runner that invokes the real model.
+    // Until one is wired, refuse rather than reporting LCG-generated scores as
+    // a measured comparison.
+    if (!process.env.AMC_ARCHITECTURE_ALLOW_SIMULATED) {
+      console.error(
+        chalk.red("Architecture comparison aborted — no real probe runner is configured.")
+      );
+      console.error(
+        chalk.gray(
+          "This command previously reported deterministic pseudo-random scores, tokens and latencies as a measured comparison."
+        )
+      );
+      console.error(
+        chalk.cyan(
+          "Set AMC_ARCHITECTURE_ALLOW_SIMULATED=1 to run it explicitly as a simulation for pipeline testing."
+        )
+      );
+      process.exitCode = 2;
+      return;
+    }
     const fs = await import("node:fs");
     let baselineContent = "{}";
     let candidateContent = "{}";
@@ -15658,6 +15680,7 @@ program
       candidateName: `Candidate (${opts.candidateFile})`,
       candidateKind,
       candidateContent,
+      probeRunner: simulateProbeOutcomes,
       candidateDescription: `Loaded from ${opts.candidateFile}`,
     });
     console.log(markdown);

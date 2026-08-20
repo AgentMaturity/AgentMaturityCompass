@@ -19,6 +19,14 @@ Gate for every gap: `tsc --noEmit` clean + affected tests pass + real behavior v
 | G1-10 offline scenarios `passed: true` | ✅ DONE | `2f8ae363` | Now `pending`; summary reports "N not executed" instead of counting them as passes. |
 | G1-11 agentSimulator fake evidence | ✅ DONE | `ec8e6e34` | Explicit policy-preview vs agent mode; `evidenceGenerated` truthful. Refusing vs leaking agent now differ. |
 | G1-12 mock LLM judge | ✅ DONE | `e6b13107` | Wired the real OpenAI/Anthropic client (was `{score:0.8,"Mock judge response"}`). Also fixed hardcoded `hitRate: 0`. |
+| G1-13 hallucination judge silent failure | ✅ DONE | `bd7850a4` | Failed judge now throws instead of returning `[]` ("clean"). Added `createProductionJudgeFn`. |
+| G1-14 cognitionLab simulated scores | ✅ DONE | `98891582` | Explicit "no model called" warning + header. |
+| G1-15 product facades via live CLI | ✅ DONE | `222c271f` | Deleted devSandbox/jobs/planGenerator/workflowEngine + 2 fabricating CLI commands. |
+| G1-16/17 self-referential scoring | ✅ DONE | `8c0a4d28` | **Customer repos no longer scored ~0 for not being AMC.** Scope guard on 3 CLI cmds, 4 API routes (422), CI gate. |
+| G1-18 unifiedRun file-existence grades | ✅ DONE | `4f02bee8` | Removed 6 dead heuristic scorers (~6.8k chars); live path does real signature/ledger verification. |
+| G1-19/20 synthetic runs in run store | ✅ DONE | `9bfe830b` | org-runs/ + imported-runs/ segregation; integrity/confidence no longer perfect. |
+| G1-21 buildMockReportForUx | ✅ DONE | `2adc70fe` | **4 dashboards no longer render a fake "VALID / HIGH TRUST" diagnostic.** |
+| G1-22/23 demo + dogfood labeling | ✅ DONE | `98891582` | Scripted-illustration banner; dogfood OBSERVED-seeding warning. |
 
 ## Shared infrastructure built
 

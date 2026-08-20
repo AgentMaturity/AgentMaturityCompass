@@ -338,9 +338,13 @@ export function createArchitectureExperiment(params: {
 }
 
 /**
- * Simulate running probes against a spec.
- * In production, this would invoke the actual model with the spec's architecture.
- * Here we provide a deterministic simulation for reproducible testing.
+ * DETERMINISTIC TEST DOUBLE — does not invoke any model.
+ *
+ * Produces reproducible pseudo-random probe outcomes from a seed so tests can
+ * exercise the experiment pipeline. This was previously the default probe
+ * runner, which meant every architecture comparison reported invented scores,
+ * tokens and latencies. Callers must now opt into it explicitly; production
+ * runs must supply a probeRunner that invokes the real model.
  */
 export function simulateProbeOutcomes(
   spec: ArchitectureSpec,
@@ -397,16 +401,20 @@ export function simulateProbeOutcomes(
  */
 export function runArchitectureExperiment(
   experiment: ArchitectureExperiment,
-  options?: {
-    /** Custom probe runner. Default: simulateProbeOutcomes */
-    probeRunner?: (spec: ArchitectureSpec, probes: ArchitectureProbe[], seed: number) => ProbeOutcome[];
+  options: {
+    /**
+     * Runs probes against a spec and returns real outcomes. Required: there is
+     * no default, because defaulting to a simulator fabricated comparisons.
+     * Tests may pass simulateProbeOutcomes explicitly.
+     */
+    probeRunner: (spec: ArchitectureSpec, probes: ArchitectureProbe[], seed: number) => ProbeOutcome[];
   },
 ): {
   experiment: ArchitectureExperiment;
   baselineOutcomes: ProbeOutcome[];
   candidateOutcomes: ProbeOutcome[];
 } {
-  const runner = options?.probeRunner ?? simulateProbeOutcomes;
+  const runner = options.probeRunner;
 
   experiment.status = "RUNNING";
 
@@ -750,6 +758,11 @@ export function quickArchitectureComparison(params: {
   candidateContent: string;
   candidateDescription: string;
   probes?: ArchitectureProbe[];
+  /**
+   * Runs probes against a spec and returns real outcomes. Required: without it
+   * the comparison would be fabricated.
+   */
+  probeRunner: (spec: ArchitectureSpec, probes: ArchitectureProbe[], seed: number) => ProbeOutcome[];
 }): {
   experiment: ArchitectureExperiment;
   report: ArchitectureComparisonReport;
@@ -778,7 +791,9 @@ export function quickArchitectureComparison(params: {
     probes: params.probes,
   });
 
-  const { baselineOutcomes, candidateOutcomes } = runArchitectureExperiment(experiment);
+  const { baselineOutcomes, candidateOutcomes } = runArchitectureExperiment(experiment, {
+    probeRunner: params.probeRunner
+  });
   const report = analyzeArchitectureExperiment(experiment, baselineOutcomes, candidateOutcomes);
   const markdown = renderArchitectureComparisonMarkdown(report);
 

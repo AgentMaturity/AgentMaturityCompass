@@ -45,6 +45,9 @@ export function experimentRunCli(params: {
   agentId?: string;
   experimentId: string;
   mode: "supervise" | "sandbox";
+  /** Evidence window covering the candidate configuration's own run. */
+  candidateWindow?: string;
+  candidateAgentId?: string;
 }) {
   return runExperiment(params);
 }

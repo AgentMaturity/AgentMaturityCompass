@@ -224,7 +224,7 @@ describe("runArchitectureExperiment", () => {
       candidateSpec: candidate,
     });
 
-    const result = runArchitectureExperiment(experiment);
+    const result = runArchitectureExperiment(experiment, { probeRunner: simulateProbeOutcomes });
     expect(result.experiment.status).toBe("COMPLETED");
     expect(result.baselineOutcomes.length).toBeGreaterThan(0);
     expect(result.candidateOutcomes.length).toBeGreaterThan(0);
@@ -295,7 +295,7 @@ describe("analyzeArchitectureExperiment", () => {
       candidateSpec: candidate,
     });
 
-    const { baselineOutcomes, candidateOutcomes } = runArchitectureExperiment(experiment);
+    const { baselineOutcomes, candidateOutcomes } = runArchitectureExperiment(experiment, { probeRunner: simulateProbeOutcomes });
     const report = analyzeArchitectureExperiment(experiment, baselineOutcomes, candidateOutcomes);
 
     expect(report.reportId).toMatch(/^acr_/);
@@ -324,7 +324,7 @@ describe("analyzeArchitectureExperiment", () => {
       probes,
     });
 
-    const { baselineOutcomes, candidateOutcomes } = runArchitectureExperiment(experiment);
+    const { baselineOutcomes, candidateOutcomes } = runArchitectureExperiment(experiment, { probeRunner: simulateProbeOutcomes });
     const report = analyzeArchitectureExperiment(experiment, baselineOutcomes, candidateOutcomes);
 
     // Each probe has a unique dimension, so we should have multiple dimension comparisons
@@ -365,7 +365,7 @@ describe("analyzeArchitectureExperiment", () => {
       candidateSpec: candidate,
     });
 
-    const { baselineOutcomes, candidateOutcomes } = runArchitectureExperiment(experiment);
+    const { baselineOutcomes, candidateOutcomes } = runArchitectureExperiment(experiment, { probeRunner: simulateProbeOutcomes });
     const report = analyzeArchitectureExperiment(experiment, baselineOutcomes, candidateOutcomes);
 
     expect(typeof report.deterministicSeed).toBe("number");
@@ -377,6 +377,7 @@ describe("analyzeArchitectureExperiment", () => {
 // Markdown rendering
 // ---------------------------------------------------------------------------
 describe("renderArchitectureComparisonMarkdown", () => {
+      probeRunner: simulateProbeOutcomes,
   test("renders all sections", () => {
     const baseline = makeSpec({ artifactSha256: "a".repeat(64) });
     const candidate = makeSpec({ artifactSha256: "b".repeat(64) });
@@ -387,7 +388,7 @@ describe("renderArchitectureComparisonMarkdown", () => {
       candidateSpec: candidate,
     });
 
-    const { baselineOutcomes, candidateOutcomes } = runArchitectureExperiment(experiment);
+    const { baselineOutcomes, candidateOutcomes } = runArchitectureExperiment(experiment, { probeRunner: simulateProbeOutcomes });
     const report = analyzeArchitectureExperiment(experiment, baselineOutcomes, candidateOutcomes);
     const md = renderArchitectureComparisonMarkdown(report);
 
@@ -407,6 +408,7 @@ describe("renderArchitectureComparisonMarkdown", () => {
 describe("quickArchitectureComparison", () => {
   test("runs end-to-end comparison", () => {
     const result = quickArchitectureComparison({
+      probeRunner: simulateProbeOutcomes,
       name: "Quick test",
       modelId: "claude-3",
       baselineName: "Conservative policy",
@@ -431,6 +433,7 @@ describe("quickArchitectureComparison", () => {
     ];
 
     const result = quickArchitectureComparison({
+      probeRunner: simulateProbeOutcomes,
       name: "Custom probes",
       modelId: "claude-3",
       baselineName: "A",

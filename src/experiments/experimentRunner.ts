@@ -219,11 +219,30 @@ export function setExperimentCandidate(params: {
   };
 }
 
+/**
+ * Compares a baseline run against a candidate run.
+ *
+ * Both sides must be real: casebook results are computed from evidence in the
+ * ledger, so the candidate configuration has to have actually run and produced
+ * evidence. Previously the candidate was never executed — its outcomes were the
+ * baseline's plus deterministic jitter — so every "candidate improves on
+ * baseline by X%" figure was invented.
+ *
+ * @throws when no candidate evidence window is supplied, because AMC cannot
+ * execute a candidate configuration itself.
+ */
 export function runExperiment(params: {
   workspace: string;
   agentId?: string;
   experimentId: string;
   mode: "supervise" | "sandbox";
+  /**
+   * Evidence window covering the candidate configuration's own run
+   * (e.g. "7d"). Required: without it there is nothing real to compare.
+   */
+  candidateWindow?: string;
+  /** Agent id the candidate ran under, when it differs from the baseline. */
+  candidateAgentId?: string;
 }): { report: ExperimentReport; jsonPath: string; mdPath: string } {
   const agentId = resolveAgentId(params.workspace, params.agentId);
   const experiment = loadExperiment(params.workspace, agentId, params.experimentId);
@@ -239,21 +258,38 @@ export function runExperiment(params: {
     window: "14d"
   });
 
-  const seed = deterministicSeed([
-    experiment.experiment.experimentId,
-    experiment.experiment.candidateConfig.digestSha256 ?? "candidate"
-  ]);
-
-  const cases = baselineRun.results.map((row, index) => {
-    const localSeed = deterministicSeed([seed, index, row.caseId]);
-    const jitter = ((localSeed % 1000) / 1000 - 0.5) * 0.2;
-    const candidateSuccess = row.success ? jitter > -0.18 : jitter > 0.10;
-    const baselineValuePoints = row.valuePoints;
-    const candidateValuePoints = Number(
-      Math.max(0, Math.min(100, baselineValuePoints + (candidateSuccess ? 8 : -8) + jitter * 10)).toFixed(4)
+  if (!params.candidateWindow) {
+    throw new Error(
+      "Experiment requires a candidate evidence window (--candidate-window). " +
+        "AMC cannot execute a candidate configuration itself, so the candidate must " +
+        "have run and produced evidence; synthesizing its outcomes would fabricate the comparison."
     );
+  }
+
+  // The candidate side is a second real casebook run over the candidate's own
+  // evidence window.
+  const candidateRun = runCasebook({
+    workspace: params.workspace,
+    agentId: params.candidateAgentId ?? agentId,
+    casebookId: experiment.experiment.casebookId,
+    mode: params.mode,
+    window: params.candidateWindow
+  });
+  const candidateById = new Map(candidateRun.results.map((row) => [row.caseId, row]));
+
+  const cases = baselineRun.results.map((row) => {
+    const candidate = candidateById.get(row.caseId);
+    if (!candidate) {
+      throw new Error(
+        `Candidate run has no result for case '${row.caseId}'. ` +
+          "Both sides of an experiment must cover the same cases."
+      );
+    }
+    const candidateSuccess = candidate.success;
+    const baselineValuePoints = row.valuePoints;
+    const candidateValuePoints = Number(candidate.valuePoints.toFixed(4));
     const baselineCost = row.costTokens;
-    const candidateCost = Number((Math.max(0, baselineCost * (1 + jitter))).toFixed(6));
+    const candidateCost = Number(candidate.costTokens.toFixed(6));
     return {
       caseId: row.caseId,
       title: row.title,
@@ -292,10 +328,16 @@ export function runExperiment(params: {
   const baselineCostPerSuccess = baselineCostSum / baselineSuccessCount;
   const candidateCostPerSuccess = candidateCostSum / candidateSuccessCount;
 
+  // Bootstrap resampling is seeded deterministically so the CI is reproducible
+  // for a given experiment; the underlying values are real measurements.
+  const bootstrapSeed = deterministicSeed([
+    experiment.experiment.experimentId,
+    experiment.experiment.candidateConfig.digestSha256 ?? "candidate"
+  ]);
   const confidenceInterval95 = bootstrapDifferenceCI({
     baseline: baselineValues,
     candidate: candidateValues,
-    seed
+    seed: bootstrapSeed
   });
   const effectSize = effectSizeDifference(baselineValues, candidateValues);
 
