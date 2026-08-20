@@ -128,3 +128,20 @@ describe("G1-04: amc attack drives a real agent", () => {
     expect(plugins).not.toMatch(/\/ results\.length\)\s*:\s*100;/);
   });
 });
+
+describe("G1-05: jailbreak TAP/runner have no synthetic fallback", () => {
+  const tap = readFileSync(new URL("../src/redteam/jailbreak/tap.ts", import.meta.url), "utf8");
+  const runner = readFileSync(new URL("../src/redteam/jailbreak/runner.ts", import.meta.url), "utf8");
+
+  it("removed both synthetic responders", () => {
+    expect(tap).not.toContain("function syntheticResponse");
+    expect(runner).not.toContain("function defaultSyntheticResponse");
+  });
+
+  it("requires an explicit responder rather than defaulting to a canned one", () => {
+    expect(tap).not.toContain("?? syntheticResponse");
+    expect(runner).not.toContain("?? defaultSyntheticResponse");
+    expect(tap).toContain("respondFn: (prompt: string) => Promise<string>;");
+    expect(runner).toContain("respondFn: (prompt: string) => Promise<string>;");
+  });
+});

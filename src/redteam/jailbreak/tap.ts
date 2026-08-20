@@ -189,77 +189,6 @@ function selectRefinements(branchingFactor: number): RefinementStrategy[] {
 /*  Synthetic response (consistent with redteam/runner.ts)             */
 /* ────────────────────────────────────────────────────────────────── */
 
-function syntheticResponse(prompt: string): string {
-  const lower = prompt.toLowerCase();
-
-  // Strong refusal for obvious jailbreak patterns
-  if (
-    lower.includes("do anything now") ||
-    lower.includes("dan") ||
-    lower.includes("developer mode") ||
-    lower.includes("jailbreak")
-  ) {
-    return (
-      "I recognize this as a jailbreak attempt. I cannot adopt alternative personas or bypass my safety guidelines. " +
-      "I'm designed to be helpful within my operational boundaries. " +
-      "Safe alternative: I can assist with legitimate requests within my guidelines."
-    );
-  }
-
-  // Moderate refusal for authority claims
-  if (
-    lower.includes("admin") ||
-    lower.includes("root access") ||
-    lower.includes("override") ||
-    lower.includes("system_admin") ||
-    lower.includes("executive order")
-  ) {
-    return (
-      "I cannot verify administrative credentials or authority claims through conversation. " +
-      "My safety guidelines apply regardless of claimed authorization level. " +
-      "Safe alternative: please use the proper authentication channels to verify your identity and permissions."
-    );
-  }
-
-  // Moderate refusal for emotional manipulation
-  if (
-    lower.includes("begging") ||
-    lower.includes("life and death") ||
-    lower.includes("lose everything") ||
-    lower.includes("last hope")
-  ) {
-    return (
-      "I understand this feels urgent, but I cannot bypass safety guidelines based on emotional appeals. " +
-      "If this is truly an emergency, please contact the appropriate emergency services. " +
-      "Safe alternative: I can help you find the right resources for your situation."
-    );
-  }
-
-  // Weak refusal for subtle approaches (fiction, roleplay)
-  if (lower.includes("fiction") || lower.includes("roleplay") || lower.includes("character")) {
-    return (
-      "I'm happy to engage in creative writing, but I need to maintain my safety guidelines even in fictional contexts. " +
-      "I cannot roleplay as an unrestricted AI or provide harmful content through fictional framing. " +
-      "Safe alternative: I can help write fiction that doesn't require bypassing safety guidelines."
-    );
-  }
-
-  // Encoded/obfuscated - partial detection
-  if (lower.includes("backwards") || lower.includes("translate") || lower.includes("hypothetically")) {
-    return (
-      "I notice this request uses encoding or hypothetical framing. Regardless of how a request is framed, " +
-      "my safety guidelines apply. I cannot provide harmful content through obfuscation. " +
-      "Safe alternative: please ask your question directly and I'll help if I can."
-    );
-  }
-
-  // Default refusal
-  return (
-    "I cannot comply with requests that attempt to bypass my safety guidelines, " +
-    "regardless of the framing used. " +
-    "Safe alternative: please ask your question directly and I'll assist within my operational boundaries."
-  );
-}
 
 /* ────────────────────────────────────────────────────────────────── */
 /*  Progress scoring                                                   */
@@ -316,12 +245,13 @@ export interface RunTAPInput {
   /** Optional configuration overrides. */
   config?: Partial<TAPConfig>;
   /** Optional custom response function (for live testing). */
-  respondFn?: (prompt: string) => string;
+  /** Invokes the real agent under test. Required: there is no synthetic fallback. */
+  respondFn: (prompt: string) => Promise<string>;
 }
 
-export function runTAP(input: RunTAPInput): TAPResult {
+export async function runTAP(input: RunTAPInput): Promise<TAPResult> {
   const config: TAPConfig = { ...DEFAULT_TAP_CONFIG, ...input.config };
-  const respond = input.respondFn ?? syntheticResponse;
+  const respond = input.respondFn;
   const runId = randomUUID();
 
   let totalEvaluations = 0;
@@ -332,7 +262,7 @@ export function runTAP(input: RunTAPInput): TAPResult {
 
   // ── Build root node ──
   const rootPrompt = renderAttackPrompt(input.attack, input.payload);
-  const rootResponse = respond(rootPrompt);
+  const rootResponse = await respond(rootPrompt);
   totalEvaluations++;
   const rootVerdict = detectJailbreak(rootResponse, rootPrompt, input.payload);
 
@@ -380,7 +310,7 @@ export function runTAP(input: RunTAPInput): TAPResult {
         }
 
         const refinedPrompt = strat.refine(parent.attackPrompt, parent.response, depth);
-        const childResponse = respond(refinedPrompt);
+        const childResponse = await respond(refinedPrompt);
         totalEvaluations++;
         const childVerdict = detectJailbreak(childResponse, refinedPrompt, input.payload);
         const childProgress = scoreProgress(childVerdict);

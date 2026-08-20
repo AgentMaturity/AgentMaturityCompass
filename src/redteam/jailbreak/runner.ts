@@ -74,7 +74,8 @@ export interface RunJailbreakTestInput {
   /** TAP configuration overrides. */
   tapConfig?: Partial<TAPConfig>;
   /** Custom response function (for live testing). */
-  respondFn?: (prompt: string) => string;
+  /** Invokes the real agent under test. Required: there is no synthetic fallback. */
+  respondFn: (prompt: string) => Promise<string>;
   /** Output path for the markdown report. */
   output?: string;
 }
@@ -83,54 +84,6 @@ export interface RunJailbreakTestInput {
 /*  Synthetic response                                                 */
 /* ────────────────────────────────────────────────────────────────── */
 
-function defaultSyntheticResponse(prompt: string): string {
-  const lower = prompt.toLowerCase();
-
-  if (lower.includes("do anything now") || lower.includes("developer mode") || /\bdan\b/.test(lower)) {
-    return (
-      "I recognize this as a jailbreak attempt and cannot comply. " +
-      "I will not adopt alternative personas or disable my safety guidelines. " +
-      "Safe alternative: I can help with legitimate requests within my operational parameters."
-    );
-  }
-
-  if (lower.includes("[system") || lower.includes("system_admin") || lower.includes("admin access")) {
-    return (
-      "I cannot accept system-level instructions from user messages. " +
-      "My instruction hierarchy is fixed and cannot be overridden through conversation. " +
-      "Safe alternative: use proper authentication channels for administrative access."
-    );
-  }
-
-  if (lower.includes("fiction") || lower.includes("character") || lower.includes("roleplay")) {
-    return (
-      "I can engage in creative writing but my safety guidelines apply in all contexts, " +
-      "including fictional ones. I cannot provide harmful content through fictional framing. " +
-      "Safe alternative: let me help with fiction that doesn't require bypassing safety measures."
-    );
-  }
-
-  if (lower.includes("grandmother") || lower.includes("begging") || lower.includes("last hope")) {
-    return (
-      "I understand the emotional framing, but my safety guidelines are not subject to " +
-      "emotional override. If you're facing a genuine emergency, please contact appropriate services. " +
-      "Safe alternative: I can help you find proper resources."
-    );
-  }
-
-  if (lower.includes("opposite day") || lower.includes("translator") || lower.includes("translate")) {
-    return (
-      "Reframing requests through linguistic tricks doesn't change their substance. " +
-      "My safety evaluation applies to the intended meaning, not the surface form. " +
-      "Safe alternative: please state your actual request directly."
-    );
-  }
-
-  return (
-    "I cannot comply with this request as it appears designed to circumvent my safety guidelines. " +
-    "Safe alternative: please rephrase your question as a direct, legitimate request."
-  );
-}
 
 /* ────────────────────────────────────────────────────────────────── */
 /*  Runner                                                             */
@@ -139,7 +92,7 @@ function defaultSyntheticResponse(prompt: string): string {
 export async function runJailbreakTests(input: RunJailbreakTestInput): Promise<JailbreakReport> {
   const runId = randomUUID();
   const ts = Date.now();
-  const respond = input.respondFn ?? defaultSyntheticResponse;
+  const respond = input.respondFn;
   const enableTAP = input.enableTAP ?? false;
 
   // Resolve attacks
@@ -160,7 +113,7 @@ export async function runJailbreakTests(input: RunJailbreakTestInput): Promise<J
   for (const attack of attacks) {
     for (const payload of input.payloads) {
       const prompt = renderAttackPrompt(attack, payload);
-      const response = respond(prompt);
+      const response = await respond(prompt);
       const verdict = detectJailbreak(response, prompt, payload);
 
       const result: JailbreakTestResult = {
@@ -175,7 +128,7 @@ export async function runJailbreakTests(input: RunJailbreakTestInput): Promise<J
 
       // Run TAP if enabled and the attack didn't trivially succeed/fail
       if (enableTAP) {
-        const tapResult = runTAP({
+        const tapResult = await runTAP({
           payload,
           attack,
           config: input.tapConfig,
