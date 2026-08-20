@@ -41,7 +41,13 @@ export interface IdentityStabilityReport {
   anomalies: IdentityAnomaly[];
   windowDays: number;
   computedAt: number;
-  signature: string;
+  /**
+   * Provenance tag identifying which agent and run produced this report —
+   * NOT a cryptographic signature. It is a plain `identity:<agentId>:<ts>`
+   * string with no key involved and nothing to verify against, so it cannot
+   * establish authenticity. Use src/crypto/signing for real signing.
+   */
+  provenanceTag: string;
 }
 
 // ---------------------------------------------------------------------------
@@ -276,7 +282,7 @@ export function computeIdentityStability(
       anomalies: [],
       windowDays: config.windowDays,
       computedAt: now,
-      signature: `identity:${agentId}:${now}`,
+      provenanceTag: `identity:${agentId}:${now}`,
     };
   }
 
@@ -381,7 +387,7 @@ export function computeIdentityStability(
     anomalies,
     windowDays: config.windowDays,
     computedAt: now,
-    signature: `identity:${agentId}:${now}`,
+    provenanceTag: `identity:${agentId}:${now}`,
   };
 }
 

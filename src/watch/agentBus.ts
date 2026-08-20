@@ -13,7 +13,12 @@ export interface AgentMessage {
   to: string;
   payload: unknown;
   timestamp: Date;
-  signature?: string;
+  /**
+   * Content digest — NOT a cryptographic signature. It is an unkeyed SHA-256
+   * over the message, so anyone who can craft a message can craft a matching
+   * digest; it detects accidental corruption, not forgery.
+   */
+  contentDigest?: string;
 }
 
 export class AgentBus {
@@ -27,7 +32,7 @@ export class AgentBus {
       to,
       payload,
       timestamp: new Date(),
-      signature: createHash('sha256').update(`${from}:${to}:${JSON.stringify(payload)}`).digest('hex'),
+      contentDigest: createHash('sha256').update(`${from}:${to}:${JSON.stringify(payload)}`).digest('hex'),
     };
 
     const existing = this.messages.get(to) ?? [];
@@ -49,7 +54,7 @@ export class AgentBus {
     const expected = createHash('sha256')
       .update(`${message.from}:${message.to}:${JSON.stringify(message.payload)}`)
       .digest('hex');
-    return expected === message.signature;
+    return expected === message.contentDigest;
   }
 
   /**
