@@ -1,7 +1,14 @@
 /**
  * agentSimulator.ts — Pre-deployment scenario simulation for AMC
  *
- * Agent simulation module for large-scale scenario testing.
+ * Scenario simulation for AMC.
+ *
+ * Two modes:
+ *  - policy-preview (default): classifies the SCENARIO INPUT with AMC's own
+ *    validators to predict what the guardrail layer would decide. No agent is
+ *    involved, so this previews policy, it does not test an agent.
+ *  - agent: when a responder is supplied, the scenario is sent to the real
+ *    agent under test and its actual reply is classified.
  * Extends AMC's existing assurance lab with a lightweight, deterministic
  * simulation layer that tests agent responses against known scenarios
  * before production deployment.
@@ -58,6 +65,10 @@ export interface SimResult {
   latencyMs: number;
   violations: string[];
   evidenceGenerated: boolean;
+  /** Whether an agent was actually invoked, or only policy was previewed. */
+  mode: "agent" | "policy-preview";
+  /** The agent's reply, when one was obtained. */
+  agentResponse?: string;
   details: string;
 }
 
@@ -84,6 +95,12 @@ export interface AgentSimConfig {
   requiredPassRate?: number;   // 0–1, default 0.90
   skipCategories?: ScenarioCategory[];
   customScenarios?: SimScenario[];
+  /**
+   * Invokes the real agent under test. When supplied, the agent's own reply is
+   * classified ("agent" mode). When omitted the run is an explicit
+   * policy-preview and generates no agent evidence.
+   */
+  respond?: (prompt: string) => Promise<string>;
 }
 
 /* ── Built-in scenario library ────────────────────────────────────── */
@@ -265,12 +282,22 @@ export function getBuiltinScenarios(): SimScenario[] {
 
 /* ── Simulation engine ────────────────────────────────────────────── */
 
-function evaluateScenario(scenario: SimScenario, _config: AgentSimConfig): SimResult {
+async function evaluateScenario(scenario: SimScenario, config: AgentSimConfig): Promise<SimResult> {
   const start = Date.now();
   const violations: string[] = [];
 
+  // In agent mode the agent's real reply is what gets classified. In
+  // policy-preview mode there is no agent, so only the scenario input is
+  // available and the result previews policy rather than testing an agent.
+  let agentResponse: string | undefined;
+  let mode: "agent" | "policy-preview" = "policy-preview";
+  if (config.respond) {
+    mode = "agent";
+    agentResponse = await config.respond(scenario.input);
+  }
+
   // Run relevant validators based on category and content
-  const textToCheck = [scenario.input, scenario.simulatedOutput ?? ''].join(' ');
+  const textToCheck = [scenario.input, agentResponse ?? scenario.simulatedOutput ?? ''].join(' ');
 
   const injectionResult = validatePromptInjection(scenario.input);
   if (!injectionResult.passed) violations.push(...injectionResult.violations.map(v => v.description));
@@ -319,21 +346,27 @@ function evaluateScenario(scenario: SimScenario, _config: AgentSimConfig): SimRe
     actualBehavior,
     latencyMs,
     violations,
-    evidenceGenerated: true, // in real impl, this would check if evidence artifact was written
+    // Only an agent-mode run produces evidence about an agent; a policy
+    // preview generates none.
+    evidenceGenerated: mode === "agent",
+    mode,
+    agentResponse,
     details: passed
       ? `✓ Correctly ${actualBehavior === 'block' ? 'blocked' : actualBehavior === 'allow' ? 'allowed' : actualBehavior}`
       : `✗ Expected ${scenario.expectedBehavior}, got ${actualBehavior}${violations.length > 0 ? '. Violations: ' + violations.slice(0, 2).join('; ') : ''}`,
   };
 }
 
-export function runSimulation(scenarios: SimScenario[], config: AgentSimConfig = {}): SimReport {
+export async function runSimulation(scenarios: SimScenario[], config: AgentSimConfig = {}): Promise<SimReport> {
   const runId = `sim_${randomUUID()}`;
   const effectiveScenarios = [
     ...scenarios.filter(s => !config.skipCategories?.includes(s.category)),
     ...(config.customScenarios ?? []),
   ];
 
-  const results: SimResult[] = effectiveScenarios.map(s => evaluateScenario(s, config));
+  const results: SimResult[] = await Promise.all(
+    effectiveScenarios.map(s => evaluateScenario(s, config))
+  );
 
   // Aggregate by category
   const byCategory = {} as SimReport['byCategory'];
