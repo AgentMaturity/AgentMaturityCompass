@@ -14,7 +14,14 @@ export interface Fix {
   moduleName: string;
   code: string;
   description: string;
-  confidence: number;
+  /**
+   * Match quality of the gap-to-module lookup, NOT a predicted success rate.
+   *
+   * 0.75 = exact module mapping, 0.65 = partial key match, 0.5 = generic
+   * fallback. Nothing here estimates whether the generated fix will work; the
+   * value describes how confidently the gap was routed to a module.
+   */
+  matchConfidence: number;
   effort: 'low' | 'medium' | 'high';
 }
 
@@ -80,7 +87,7 @@ export function generateFix(gap: Gap, availableModules: string[]): Fix | null {
       moduleName: mapping.module,
       code: mapping.template,
       description: `Fix for ${gap.description}: integrate ${mapping.module}`,
-      confidence: 0.75,
+      matchConfidence: 0.75, // exact module mapping
       effort: mapping.effort,
     };
   }
@@ -94,7 +101,7 @@ export function generateFix(gap: Gap, availableModules: string[]): Fix | null {
           moduleName: m.module,
           code: m.template,
           description: `Fix for ${gap.description}: integrate ${m.module}`,
-          confidence: 0.65,
+          matchConfidence: 0.65, // partial key match
           effort: m.effort,
         };
       }
@@ -109,7 +116,7 @@ export function generateFix(gap: Gap, availableModules: string[]): Fix | null {
       moduleName: match,
       code: `// TODO: integrate ${match} to address ${gap.description}`,
       description: `Suggested fix: integrate ${match}`,
-      confidence: 0.5,
+      matchConfidence: 0.5, // generic fallback
       effort: 'medium',
     };
   }

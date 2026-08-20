@@ -1,3 +1,13 @@
+/**
+ * Per-action effect bands used by the mechanic simulator.
+ *
+ * These are HAND-CHOSEN CONSTANTS, not measurements or fitted estimates. No
+ * historical outcome data informs them, so a simulation reports "applying this
+ * action would move maturity by X" purely from the table below. The simulator
+ * surfaces this through its honesty notes and refuses to project at all when
+ * evidence is insufficient; treat the numbers as directional, not predictive.
+ */
+
 import type { MechanicActionKind } from "./upgradePlanSchema.js";
 
 interface EffectShape {
