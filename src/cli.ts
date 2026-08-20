@@ -20127,11 +20127,37 @@ shield
   .option("--rounds <n>", "Number of attack rounds (default: 1)", "1")
   .option("--categories <list>", "Comma-separated attack categories to use")
   .option("--target <profile>", "Target profile id (default: demo)")
-  .action(async (opts: { rounds?: string; categories?: string; target?: string }) => {
+  .option("--agent <agentId>", "agent under attack (defaults to the active agent)")
+  .option("--model <modelId>", "model id of the agent under attack (or set AMC_ASSURANCE_MODEL)")
+  .action(async (opts: { rounds?: string; categories?: string; target?: string; agent?: string; model?: string }) => {
     try {
       const { ContinuousRedTeam } = await import("./shield/continuousRedTeam.js");
+      const { resolveAgentResponder, AgentResponderUnavailableError } = await import(
+        "./assurance/agentResponder.js"
+      );
+      const { detectJailbreak } = await import("./redteam/jailbreak/detector.js");
       const rounds = parseInt(opts.rounds ?? "1", 10);
       const targetId = opts.target ?? "demo";
+
+      // Attack the real agent. This evaluator previously returned
+      // Math.random() < 0.2, so every reported success rate was noise.
+      let attackResponder;
+      try {
+        attackResponder = await resolveAgentResponder({
+          workspace: process.cwd(),
+          agentId: opts.agent ?? activeAgent(program),
+          model: opts.model
+        });
+      } catch (error) {
+        if (error instanceof AgentResponderUnavailableError) {
+          console.error(chalk.red("Red team campaign aborted — no agent under test was reachable."));
+          console.error(chalk.gray(`Reason: ${error.reason}`));
+          console.error(chalk.cyan(`Fix: ${error.remediation}`));
+          process.exitCode = 2;
+          return;
+        }
+        throw error;
+      }
       const rt = new ContinuousRedTeam({
         intervalMs: 60000,
         attacksPerRound: 5,
@@ -20147,15 +20173,34 @@ shield
             id: targetId,
             name: opts.target ?? "Demo Target",
             systemPurpose: "AMC CLI demo red-team target",
-            evaluator: async (attack: { payload: string }) => ({
-              attackId: attack.payload.slice(0, 8),
-              succeeded: Math.random() < 0.2,
-              response: "simulated",
-              latencyMs: 50 + Math.random() * 100,
-              bypassedDefenses: [],
-              detectedBy: ["shield"],
-              bypassConfidence: 0.1,
-            }),
+            evaluator: async (attack: { payload: string }) => {
+              const startedAt = Date.now();
+              try {
+                const answer = await attackResponder.respond(attack.payload);
+                const verdict = detectJailbreak(answer.text, attack.payload, attack.payload);
+                return {
+                  attackId: attack.payload.slice(0, 8),
+                  succeeded: verdict.jailbroken,
+                  response: answer.text,
+                  latencyMs: Date.now() - startedAt,
+                  bypassedDefenses: verdict.jailbroken ? verdict.signals.map((signal) => signal.type) : [],
+                  detectedBy: verdict.jailbroken ? [] : ["shield"],
+                  bypassConfidence: verdict.confidence,
+                };
+              } catch (error) {
+                // A failed invocation is not a defended attack; report it as
+                // unsuccessful with zero confidence rather than a silent pass.
+                return {
+                  attackId: attack.payload.slice(0, 8),
+                  succeeded: false,
+                  response: `INCONCLUSIVE: ${error instanceof Error ? error.message : String(error)}`,
+                  latencyMs: Date.now() - startedAt,
+                  bypassedDefenses: [],
+                  detectedBy: [],
+                  bypassConfidence: 0,
+                };
+              }
+            },
           },
         ],
       });

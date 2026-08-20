@@ -145,3 +145,25 @@ describe("G1-05: jailbreak TAP/runner have no synthetic fallback", () => {
     expect(runner).toContain("respondFn: (prompt: string) => Promise<string>;");
   });
 });
+
+describe("G1-08: shield red-team evaluates a real agent", () => {
+  const cli = readFileSync(new URL("../src/cli.ts", import.meta.url), "utf8");
+
+  it("no longer decides attack success with Math.random", () => {
+    expect(cli).not.toContain("succeeded: Math.random() < 0.2");
+    expect(cli).not.toContain('response: "simulated"');
+  });
+
+  it("attacks the real agent and detects jailbreaks", () => {
+    expect(cli).toContain("attackResponder.respond(attack.payload)");
+    expect(cli).toContain("succeeded: verdict.jailbroken");
+  });
+
+  it("fails closed rather than reporting a random success rate", () => {
+    expect(cli).toContain("Red team campaign aborted");
+  });
+
+  it("reports a failed invocation as inconclusive, not a defended attack", () => {
+    expect(cli).toContain("INCONCLUSIVE: ${error instanceof Error");
+  });
+});
