@@ -649,7 +649,7 @@ export function validateNeutralImport(input: {
     wouldWrite: [
       join(wouldWriteBase, "normalized.json"),
       importManifestPath(workspace, parsed.importId),
-      join(getAgentPaths(workspace, agentId).runsDir, `${parsed.importId}.json`),
+      join(getAgentPaths(workspace, agentId).runsDir, "..", "imported-runs", `${parsed.importId}.json`),
       join(getAgentPaths(workspace, agentId).rootDir, "episodes", `${parsed.importId}.json`),
       join(getAgentPaths(workspace, agentId).rootDir, "lifecycle-runs", `${parsed.importId}.json`),
       join(getAgentPaths(workspace, agentId).rootDir, "trace-indexes", `${parsed.importId}.json`),
@@ -852,8 +852,15 @@ export function runNeutralImport(input: {
   const paths = getAgentPaths(workspace, agentId);
   const runDir = importRunDir(workspace, plan.importId);
   const normalizedPath = join(runDir, "normalized.json");
-  const diagnosticReportPath = join(paths.runsDir, `${plan.importId}.json`);
-  const diagnosticMarkdownPath = join(paths.reportsDir, `${plan.importId}.md`);
+  // Imported reports are heuristic reconstructions of someone else's trace, not
+  // measured AMC runs. They go to a dedicated directory because callers such as
+  // `amc report` read the newest file in runs/ as the agent's actual score.
+  const importedRunsDir = join(paths.runsDir, "..", "imported-runs");
+  const importedReportsDir = join(paths.reportsDir, "..", "imported-reports");
+  ensureDir(importedRunsDir);
+  ensureDir(importedReportsDir);
+  const diagnosticReportPath = join(importedRunsDir, `${plan.importId}.json`);
+  const diagnosticMarkdownPath = join(importedReportsDir, `${plan.importId}.md`);
   ensureDir(runDir);
 
   writeFileAtomic(normalizedPath, normalizedImportBody({ plan, parsedCandidates: parsed.candidates }), 0o600);
