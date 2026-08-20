@@ -77,7 +77,7 @@ const DECAY_PER_DAY = 0.015;
 
 export function createChallenge(
   challenger: AgentIdentity,
-  signingKey: string = "amc-default-key"
+  signingKey: string
 ): VerificationChallenge {
   const nonce = randomBytes(32).toString("hex");
   const ts = Date.now();
@@ -91,7 +91,7 @@ export function createChallenge(
 export function respondToChallenge(
   challenge: VerificationChallenge,
   responder: AgentIdentity,
-  signingKey: string = "amc-default-key"
+  signingKey: string
 ): VerificationResponse {
   const ts = Date.now();
   const payload = JSON.stringify({
@@ -114,8 +114,8 @@ export function respondToChallenge(
 export function verifyMutualTrust(
   challenge: VerificationChallenge,
   response: VerificationResponse,
-  challengerKey: string = "amc-default-key",
-  responderKey: string = "amc-default-key",
+  challengerKey: string,
+  responderKey: string,
   currentTime?: number
 ): MutualTrustResult {
   const now = currentTime ?? Date.now();

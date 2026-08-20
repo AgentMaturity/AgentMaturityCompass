@@ -103,10 +103,34 @@ const DECAY_RATE = 0.02; // 2% per day
 
 // ── Core Functions ───────────────────────────────────────────────────────────
 
+/**
+ * Rejects absent or trivially guessable signing keys.
+ *
+ * These functions previously defaulted to the literal "amc-default-key", which
+ * meant cross-agent "verifiable trust" was forgeable by anyone who read the
+ * source. A key must now be supplied explicitly and must not be a known weak
+ * value.
+ */
+export function assertSigningKey(signingKey: string): void {
+  const key = signingKey?.trim() ?? "";
+  // Check known-weak values first so the error names the actual problem.
+  if (key === "amc-default-key" || key === "default" || key === "changeme") {
+    throw new Error(
+      `Refusing to sign with the well-known key '${key}'. Supply a per-agent secret.`
+    );
+  }
+  if (key.length < 16) {
+    throw new Error(
+      "A signing key of at least 16 characters is required; attestations signed with a short or empty key are forgeable."
+    );
+  }
+}
+
 export function createAttestation(
   input: AttestationInput,
-  signingKey: string = "amc-default-key"
+  signingKey: string
 ): Attestation {
+  assertSigningKey(signingKey);
   const ts = input.timestamp ?? Date.now();
   const outputStr = typeof input.output === "string"
     ? input.output
@@ -144,7 +168,7 @@ export function createAttestation(
 
 export function verifyAttestation(
   attestation: Attestation,
-  signingKey: string = "amc-default-key",
+  signingKey: string,
   currentTime?: number
 ): AttestationVerification {
   const now = currentTime ?? Date.now();

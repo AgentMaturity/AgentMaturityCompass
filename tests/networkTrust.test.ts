@@ -1,4 +1,4 @@
-import { describe, expect, test } from "vitest";
+import { describe, expect, it, test } from "vitest";
 import {
   createAttestation,
   verifyAttestation,
@@ -13,6 +13,14 @@ import {
 import type { AgentIdentity } from "../src/score/mutualVerification.js";
 import { TransparencyLog } from "../src/score/networkTransparencyLog.js";
 
+/**
+ * Signing keys must be supplied explicitly and be non-trivial: the code used to
+ * default to the literal "amc-default-key", making attestations forgeable by
+ * anyone who read the source.
+ */
+const TEST_SIGNING_KEY = "test-signing-key-0123456789abcdef";
+const OTHER_SIGNING_KEY = "other-signing-key-0123456789abcdef";
+
 describe("output attestation", () => {
   test("creates and verifies attestation with valid signature", () => {
     const att = createAttestation({
@@ -23,20 +31,20 @@ describe("output attestation", () => {
         { pack: "injection", passed: true },
         { pack: "exfiltration", passed: true },
       ],
-    });
+    }, TEST_SIGNING_KEY);
     expect(att.attestationId).toMatch(/^att_/);
     expect(att.trustLevel).toBe(4);
     expect(att.shieldSummary.totalPacks).toBe(2);
     expect(att.shieldSummary.passed).toBe(2);
 
-    const ver = verifyAttestation(att);
+    const ver = verifyAttestation(att, TEST_SIGNING_KEY);
     expect(ver.valid).toBe(true);
     expect(ver.effectiveWeight).toBeGreaterThan(0);
   });
 
   test("rejects attestation with wrong key", () => {
-    const att = createAttestation({ agentId: "a", output: "x", trustLevel: 3 }, "key-1");
-    const ver = verifyAttestation(att, "key-2");
+    const att = createAttestation({ agentId: "a", output: "x", trustLevel: 3 }, TEST_SIGNING_KEY);
+    const ver = verifyAttestation(att, OTHER_SIGNING_KEY);
     expect(ver.valid).toBe(false);
     expect(ver.reason).toBe("signature_mismatch");
   });
@@ -47,8 +55,8 @@ describe("output attestation", () => {
       output: "x",
       trustLevel: 3,
       timestamp: Date.now() - 31 * 24 * 60 * 60 * 1000, // 31 days ago
-    });
-    const ver = verifyAttestation(att);
+    }, TEST_SIGNING_KEY);
+    const ver = verifyAttestation(att, TEST_SIGNING_KEY);
     expect(ver.valid).toBe(false);
     expect(ver.reason).toBe("expired");
   });
@@ -60,8 +68,8 @@ describe("output attestation", () => {
       output: "x",
       trustLevel: 5,
       timestamp: now - 10 * 24 * 60 * 60 * 1000, // 10 days ago
-    });
-    const ver = verifyAttestation(att, "amc-default-key", now);
+    }, TEST_SIGNING_KEY);
+    const ver = verifyAttestation(att, TEST_SIGNING_KEY, now);
     expect(ver.valid).toBe(true);
     expect(ver.trustDecay).toBeGreaterThan(0);
     expect(ver.trustDecay).toBeLessThan(1);
@@ -73,7 +81,7 @@ describe("output attestation", () => {
       output: "delegated result",
       trustLevel: 4,
       delegationChain: ["sub-agent-1", "sub-agent-2"],
-    });
+    }, TEST_SIGNING_KEY);
     expect(att.delegationDepth).toBe(2);
   });
 
@@ -83,8 +91,8 @@ describe("output attestation", () => {
       output: "x",
       trustLevel: 4,
       shieldResults: [{ pack: "injection", passed: true }],
-    });
-    const ver = verifyAttestation(att);
+    }, TEST_SIGNING_KEY);
+    const ver = verifyAttestation(att, TEST_SIGNING_KEY);
     const report = scoreOutputAttestation({
       attestations: [att],
       verifications: [ver],
@@ -128,13 +136,13 @@ describe("output attestation", () => {
         evidenceRefs: ["ev://incident-001"],
         humanReviewRequired: true,
       },
-    });
+    }, TEST_SIGNING_KEY);
 
     expect(att.contextEnvelope?.mission).toBe("PBSAI estate governance");
     expect(att.provenanceMetadata?.evidenceRefs).toContain("ev://incident-001");
     expect(att.outputContract?.schemaId).toBe("pbsai.output.contract.v1");
 
-    const ver = verifyAttestation(att);
+    const ver = verifyAttestation(att, TEST_SIGNING_KEY);
     expect(ver.valid).toBe(true);
 
     const report = scoreOutputAttestation({ attestations: [att], verifications: [ver] });
@@ -166,14 +174,14 @@ describe("mutual verification", () => {
   };
 
   test("full challenge-response flow succeeds", () => {
-    const challenge = createChallenge(agentA);
+    const challenge = createChallenge(agentA, TEST_SIGNING_KEY);
     expect(challenge.challengeId).toMatch(/^ch_/);
     expect(challenge.nonce).toHaveLength(64);
 
-    const response = respondToChallenge(challenge, agentB);
+    const response = respondToChallenge(challenge, agentB, TEST_SIGNING_KEY);
     expect(response.nonce).toBe(challenge.nonce);
 
-    const result = verifyMutualTrust(challenge, response);
+    const result = verifyMutualTrust(challenge, response, TEST_SIGNING_KEY, TEST_SIGNING_KEY);
     expect(result.verified).toBe(true);
     expect(result.protocolCompatible).toBe(true);
     expect(result.scoresFresh).toBe(true);
@@ -183,10 +191,10 @@ describe("mutual verification", () => {
   });
 
   test("rejects mismatched nonce", () => {
-    const challenge = createChallenge(agentA);
-    const response = respondToChallenge(challenge, agentB);
+    const challenge = createChallenge(agentA, TEST_SIGNING_KEY);
+    const response = respondToChallenge(challenge, agentB, TEST_SIGNING_KEY);
     response.nonce = "tampered";
-    const result = verifyMutualTrust(challenge, response);
+    const result = verifyMutualTrust(challenge, response, TEST_SIGNING_KEY, TEST_SIGNING_KEY);
     expect(result.verified).toBe(false);
     expect(result.reason).toBe("nonce_mismatch");
   });
@@ -196,9 +204,9 @@ describe("mutual verification", () => {
       ...agentA,
       scoreTimestamp: Date.now() - 8 * 24 * 60 * 60 * 1000, // 8 days old
     };
-    const challenge = createChallenge(staleA);
-    const response = respondToChallenge(challenge, agentB);
-    const result = verifyMutualTrust(challenge, response);
+    const challenge = createChallenge(staleA, TEST_SIGNING_KEY);
+    const response = respondToChallenge(challenge, agentB, TEST_SIGNING_KEY);
+    const result = verifyMutualTrust(challenge, response, TEST_SIGNING_KEY, TEST_SIGNING_KEY);
     expect(result.verified).toBe(true);
     expect(result.scoresFresh).toBe(false);
     // Stale penalty applied
@@ -207,17 +215,17 @@ describe("mutual verification", () => {
 
   test("penalizes incompatible protocols", () => {
     const oldAgent: AgentIdentity = { ...agentA, protocolVersion: "amc-alpha-0.1" };
-    const challenge = createChallenge(oldAgent);
-    const response = respondToChallenge(challenge, agentB);
-    const result = verifyMutualTrust(challenge, response);
+    const challenge = createChallenge(oldAgent, TEST_SIGNING_KEY);
+    const response = respondToChallenge(challenge, agentB, TEST_SIGNING_KEY);
+    const result = verifyMutualTrust(challenge, response, TEST_SIGNING_KEY, TEST_SIGNING_KEY);
     expect(result.verified).toBe(true);
     expect(result.protocolCompatible).toBe(false);
   });
 
   test("scoring reflects verification capabilities", () => {
-    const challenge = createChallenge(agentA);
-    const response = respondToChallenge(challenge, agentB);
-    const result = verifyMutualTrust(challenge, response);
+    const challenge = createChallenge(agentA, TEST_SIGNING_KEY);
+    const response = respondToChallenge(challenge, agentB, TEST_SIGNING_KEY);
+    const result = verifyMutualTrust(challenge, response, TEST_SIGNING_KEY, TEST_SIGNING_KEY);
     const report = scoreMutualVerification({ verifications: [result] });
     expect(report.score).toBeGreaterThan(0);
     expect(report.hasChallengeResponse).toBe(true);
@@ -289,5 +297,30 @@ describe("network transparency log", () => {
     const report = log.score();
     expect(report.score).toBe(0);
     expect(report.level).toBe(0);
+  });
+});
+
+describe("G1-30/G1-33: signing keys and attestation flags are honest", () => {
+  it("refuses the well-known default key that made attestations forgeable", () => {
+    expect(() =>
+      createAttestation({ agentId: "a", output: "x", trustLevel: 3 }, "amc-default-key")
+    ).toThrow(/well-known key/i);
+  });
+
+  it("refuses a short or empty key", () => {
+    expect(() =>
+      createAttestation({ agentId: "a", output: "x", trustLevel: 3 }, "short")
+    ).toThrow(/at least 16 characters/i);
+    expect(() =>
+      createAttestation({ agentId: "a", output: "x", trustLevel: 3 }, "")
+    ).toThrow(/at least 16 characters/i);
+  });
+
+  it("watch attestOutput no longer claims to have signed anything", async () => {
+    const { attestOutput } = await import("../src/watch/outputAttestation.js");
+    const result = attestOutput("hello");
+    expect(result.signed).toBe(false);
+    expect(result.algorithm).toBe("sha256");
+    expect(result.hash).toHaveLength(64);
   });
 });
