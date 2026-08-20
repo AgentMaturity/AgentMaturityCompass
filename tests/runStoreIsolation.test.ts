@@ -42,3 +42,18 @@ describe("synthetic and imported runs stay out of the real run store", () => {
     }
   });
 });
+
+describe("G1-21: dashboards never fabricate a diagnostic", () => {
+  const cli = readFileSync(new URL("../src/cli.ts", import.meta.url), "utf8");
+
+  it("removed the mock report generator", () => {
+    expect(cli).not.toContain("buildMockReportForUx");
+    // The fabricated report claimed a passing, fully verified assessment.
+    expect(cli).not.toContain('trustLabel: "HIGH TRUST"');
+  });
+
+  it("tells the user to run a real scan instead", () => {
+    expect(cli).toContain("No diagnostic run found for agent");
+    expect(cli).toContain("Run 'amc run' to produce one");
+  });
+});

@@ -19149,7 +19149,18 @@ program
     const agentId = activeAgent(program) ?? "default";
     const currentReport = opts.run && opts.run !== "latest"
       ? loadRunReport(workspace, opts.run, agentId)
-      : (latestRunForAgent(workspace, agentId) ?? buildMockReportForUx(agentId, opts.run ?? "latest"));
+      : (() => {
+      const existing = latestRunForAgent(workspace, agentId);
+      if (!existing) {
+        // No run exists. Rendering fabricated scores here previously showed a
+        // "VALID / HIGH TRUST" diagnostic for an agent that was never assessed.
+        console.log(chalk.yellow(`No diagnostic run found for agent '${agentId}'.`));
+        console.log(chalk.cyan("Run 'amc run' to produce one, then re-run this command."));
+        return null;
+      }
+      return existing;
+    })();
+    if (!currentReport) return;
     const previousReport = opts.previousRun
       ? loadRunReport(workspace, opts.previousRun, agentId)
       : null;
@@ -19165,7 +19176,18 @@ program
     const opux = await import("./ops/operatorUx.js");
     const workspace = process.cwd();
     const agentId = activeAgent(program) ?? "default";
-    const report = latestRunForAgent(workspace, agentId) ?? buildMockReportForUx(agentId, "latest");
+    const report = (() => {
+      const existing = latestRunForAgent(workspace, agentId);
+      if (!existing) {
+        // No run exists. Rendering fabricated scores here previously showed a
+        // "VALID / HIGH TRUST" diagnostic for an agent that was never assessed.
+        console.log(chalk.yellow(`No diagnostic run found for agent '${agentId}'.`));
+        console.log(chalk.cyan("Run 'amc run' to produce one, then re-run this command."));
+        return null;
+      }
+      return existing;
+    })();
+    if (!report) return;
     const whyCaps = opux.computeWhyCaps(report);
     const filtered = opts.question ? whyCaps.filter(w => w.questionId === opts.question) : whyCaps;
     const capped = filtered.filter(w => w.capReasons.length > 0);
@@ -19190,7 +19212,18 @@ program
     const opux = await import("./ops/operatorUx.js");
     const workspace = process.cwd();
     const agentId = activeAgent(program) ?? "default";
-    const report = latestRunForAgent(workspace, agentId) ?? buildMockReportForUx(agentId, "latest");
+    const report = (() => {
+      const existing = latestRunForAgent(workspace, agentId);
+      if (!existing) {
+        // No run exists. Rendering fabricated scores here previously showed a
+        // "VALID / HIGH TRUST" diagnostic for an agent that was never assessed.
+        console.log(chalk.yellow(`No diagnostic run found for agent '${agentId}'.`));
+        console.log(chalk.cyan("Run 'amc run' to produce one, then re-run this command."));
+        return null;
+      }
+      return existing;
+    })();
+    if (!report) return;
     const whyCaps = opux.computeWhyCaps(report);
     const queue = opux.computeActionQueue(whyCaps);
     if (queue.items.length === 0) {
@@ -19213,7 +19246,18 @@ program
     const opux = await import("./ops/operatorUx.js");
     const workspace = process.cwd();
     const agentId = activeAgent(program) ?? "default";
-    const report = latestRunForAgent(workspace, agentId) ?? buildMockReportForUx(agentId, "latest");
+    const report = (() => {
+      const existing = latestRunForAgent(workspace, agentId);
+      if (!existing) {
+        // No run exists. Rendering fabricated scores here previously showed a
+        // "VALID / HIGH TRUST" diagnostic for an agent that was never assessed.
+        console.log(chalk.yellow(`No diagnostic run found for agent '${agentId}'.`));
+        console.log(chalk.cyan("Run 'amc run' to produce one, then re-run this command."));
+        return null;
+      }
+      return existing;
+    })();
+    if (!report) return;
     const heatmap = opux.computeConfidenceHeatmap(report);
     console.log(chalk.bold(`\nConfidence Heatmap — Avg: ${(heatmap.avgConfidence * 100).toFixed(1)}%  Low: ${heatmap.lowConfidenceCount} questions\n`));
     for (const cell of heatmap.cells) {
@@ -19245,59 +19289,6 @@ program
  * Build a minimal mock DiagnosticReport for the operator UX CLI commands.
  * In production, this would load from the ledger via `loadRunReport()`.
  */
-function buildMockReportForUx(agentId: string, runId: string): import("./types.js").DiagnosticReport {
-  return {
-    agentId,
-    runId: runId === "latest" ? `run_mock_${Date.now()}` : runId,
-    ts: Date.now(),
-    windowStartTs: Date.now() - 14 * 86400000,
-    windowEndTs: Date.now(),
-    status: "VALID",
-    verificationPassed: true,
-    trustBoundaryViolated: false,
-    trustBoundaryMessage: null,
-    integrityIndex: 0.65,
-    trustLabel: "HIGH TRUST",
-    targetProfileId: null,
-    layerScores: [
-      { layerName: "Strategic Agent Operations", avgFinalLevel: 3.2, confidenceWeightedFinalLevel: 3.0 },
-      { layerName: "Leadership & Autonomy", avgFinalLevel: 2.8, confidenceWeightedFinalLevel: 2.5 },
-      { layerName: "Culture & Alignment", avgFinalLevel: 3.5, confidenceWeightedFinalLevel: 3.3 },
-      { layerName: "Resilience", avgFinalLevel: 2.5, confidenceWeightedFinalLevel: 2.3 },
-      { layerName: "Skills", avgFinalLevel: 3.0, confidenceWeightedFinalLevel: 2.8 },
-    ],
-    questionScores: [
-      { questionId: "AMC-1.1", claimedLevel: 3, supportedMaxLevel: 3, finalLevel: 3, confidence: 0.7, evidenceEventIds: ["e1", "e2", "e3"], flags: [], narrative: "Good evidence coverage." },
-      { questionId: "AMC-1.5", claimedLevel: 4, supportedMaxLevel: 2, finalLevel: 2, confidence: 0.4, evidenceEventIds: ["e4"], flags: ["FLAG_UNSUPPORTED_CLAIM", "FLAG_MISSING_LLM_EVIDENCE"], narrative: "Missing LLM evidence." },
-      { questionId: "AMC-2.3", claimedLevel: 3, supportedMaxLevel: 3, finalLevel: 3, confidence: 0.6, evidenceEventIds: ["e5", "e6"], flags: ["FLAG_CORRELATION_LOW"], narrative: "Low correlation." },
-      { questionId: "AMC-3.1", claimedLevel: 4, supportedMaxLevel: 4, finalLevel: 4, confidence: 0.85, evidenceEventIds: ["e7", "e8", "e9", "e10"], flags: [], narrative: "Strong alignment evidence." },
-      { questionId: "AMC-4.1", claimedLevel: 2, supportedMaxLevel: 2, finalLevel: 2, confidence: 0.3, evidenceEventIds: [], flags: ["FLAG_CONFIG_UNTRUSTED", "FLAG_ASSURANCE_EVIDENCE_MISSING"], narrative: "Config unsigned, assurance missing." },
-    ],
-    inflationAttempts: [{ questionId: "AMC-1.5", claimed: 4, supported: 2 }],
-    unsupportedClaimCount: 1,
-    contradictionCount: 0,
-    correlationRatio: 0.75,
-    invalidReceiptsCount: 0,
-    correlationWarnings: [],
-    evidenceCoverage: 0.6,
-    evidenceTrustCoverage: { observed: 0.5, attested: 0.3, selfReported: 0.2 },
-    targetDiff: [
-      { questionId: "AMC-1.5", current: 2, target: 4, gap: 2 },
-      { questionId: "AMC-4.1", current: 2, target: 3, gap: 1 },
-    ],
-    prioritizedUpgradeActions: [
-      "AMC-1.5: Raise from 2 to 4 by adding LLM gateway evidence.",
-      "AMC-4.1: Raise from 2 to 3 by signing configs and running assurance packs.",
-    ],
-    evidenceToCollectNext: [
-      "AMC-1.5: add llm_request/llm_response gateway evidence",
-      "AMC-4.1: sign gateway and fleet config files",
-    ],
-    runSealSig: "mock-seal",
-    reportJsonSha256: "mock-hash",
-  };
-}
-
 // ── SDK Parity & Integration Scaffold CLI ────────────────────────────
 program
   .command("integrate")
