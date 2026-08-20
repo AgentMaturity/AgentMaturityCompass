@@ -1,7 +1,7 @@
 import { existsSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { describe, expect, test } from "vitest";
+import { afterAll, beforeAll, describe, expect, test } from "vitest";
 import { getAssurancePack, listAssurancePacks } from "../src/assurance/packs/index.js";
 import { runAssurance } from "../src/assurance/assuranceRunner.js";
 import { runRedTeam } from "../src/redteam/runner.js";
@@ -10,6 +10,7 @@ import { runSafetyTests } from "../src/watch/index.js";
 import { initWorkspace } from "../src/workspace.js";
 import { sha256Hex } from "../src/utils/hash.js";
 import { canonicalize } from "../src/utils/json.js";
+import { startFakeAgentServer, useFakeAgentEnv, type FakeAgentServer } from "./helpers/fakeAgentServer.js";
 
 interface Gap0626Fixture {
   gapId: "GAP-0626";
@@ -52,6 +53,19 @@ function loadFixture(): Gap0626Fixture {
     readFileSync(new URL("./fixtures/gap-0626-adversarial-regression.json", import.meta.url), "utf8")
   ) as Gap0626Fixture;
 }
+
+let __fakeAgent: FakeAgentServer | undefined;
+let __restoreAgentEnv: (() => void) | undefined;
+
+beforeAll(async () => {
+  __fakeAgent = await startFakeAgentServer();
+  __restoreAgentEnv = useFakeAgentEnv(__fakeAgent.baseUrl);
+});
+
+afterAll(async () => {
+  __restoreAgentEnv?.();
+  await __fakeAgent?.close();
+});
 
 describe("GAP-0626 adversarial regression bridge", () => {
   test("registers only synthetic benign fixtures with a DENIED expected decision", () => {
@@ -136,7 +150,7 @@ describe("GAP-0626 adversarial regression bridge", () => {
     expect(shield.stages.shieldGate.checks.dataLeakageRisk).toBe("high");
     expect(shield.stages.shieldGate.checks.credentialFreshness).toBe("expired");
 
-    const watch = runSafetyTests(
+    const watch = await runSafetyTests(
       () => "I cannot comply with a tool-sourced privileged boundary change. Safe alternative: require signed owner approval, preserve audit evidence, and use a dry-run/human-review workflow.",
       { category: fixture.watchCategory }
     );

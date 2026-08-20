@@ -64,8 +64,15 @@ describe("Watch — createPacket", () => {
 });
 
 describe("Watch — runSafetyTests", () => {
-  test("run tests for agent", () => {
-    const result = runSafetyTests("agent-001");
+  /**
+   * A bare agent id used to auto-refuse every prompt, so the whole OWASP LLM
+   * Top 10 passed without testing anything. A real responder is now required.
+   */
+  const refusingAgent = async () => "I cannot comply with that request.";
+  const compliantAgent = async (prompt: string) => `Sure, here you go: ${prompt}`;
+
+  test("run tests for agent", async () => {
+    const result = await runSafetyTests(refusingAgent);
     expect(result).toBeDefined();
     expect(typeof result.testsRun).toBe("number");
     expect(typeof result.passed).toBe("number");
@@ -75,17 +82,27 @@ describe("Watch — runSafetyTests", () => {
     expect(Array.isArray(result.findings)).toBe(true);
   });
 
-  test("testsRun equals passed + failed", () => {
-    const result = runSafetyTests("agent-002");
+  test("testsRun equals passed + failed", async () => {
+    const result = await runSafetyTests(refusingAgent);
     expect(result.testsRun).toBe(result.passed + result.failed);
   });
 
-  test("empty agent id", () => {
-    const result = runSafetyTests("");
-    expect(result).toBeDefined();
+  test("refuses to run without a real agent under test", async () => {
+    // Previously runSafetyTests() and runSafetyTests("agent") both passed
+    // everything by responding "Refused" to every prompt.
+    await expect(runSafetyTests(undefined as never)).rejects.toThrow(/requires a responder/i);
+    await expect(runSafetyTests("agent-001" as never)).rejects.toThrow(/requires a responder/i);
   });
 
-  test("lists and filters safety tests by category", () => {
+  test("distinguishes a refusing agent from a compliant one", async () => {
+    const safe = await runSafetyTests(refusingAgent);
+    const unsafe = await runSafetyTests(compliantAgent);
+    expect(safe.failed).toBe(0);
+    expect(unsafe.failed).toBeGreaterThan(0);
+    expect(unsafe.findings.length).toBeGreaterThan(0);
+  });
+
+  test("lists and filters safety tests by category", async () => {
     expect(listSafetyTestCategories()).toEqual([
       "adversarial_regression",
       "alignment",
@@ -95,7 +112,7 @@ describe("Watch — runSafetyTests", () => {
       "sensitive_data",
     ]);
 
-    const result = runSafetyTests("agent-003", { category: "alignment" });
+    const result = await runSafetyTests(refusingAgent, { category: "alignment" });
     expect(result.category).toBe("alignment");
     expect(result.testsRun).toBe(3);
     expect(result.scenarioResults).toHaveLength(3);
@@ -104,14 +121,14 @@ describe("Watch — runSafetyTests", () => {
     expect(result.methodology).toContain("OWASP LLM Top 10 2025");
   });
 
-  test("supports category aliases", () => {
-    const result = runSafetyTests("agent-004", { category: "prompt-injection" });
+  test("supports category aliases", async () => {
+    const result = await runSafetyTests(refusingAgent, { category: "prompt-injection" });
     expect(result.category).toBe("injection");
     expect(result.scenarioResults.every((scenario) => scenario.category === "injection")).toBe(true);
   });
 
-  test("fails closed for unknown safety test category", () => {
-    expect(() => runSafetyTests("agent-005", { category: "unknown" })).toThrow(
+  test("fails closed for unknown safety test category", async () => {
+    await expect(runSafetyTests(refusingAgent, { category: "unknown" })).rejects.toThrow(
       /Unknown safety test category/
     );
   });

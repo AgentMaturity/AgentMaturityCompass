@@ -49,8 +49,8 @@ describe('W3 — SIEM Exporter', () => {
 });
 
 describe('W4 — Safety Testkit', () => {
-  it('runs safety tests', () => {
-    const r = runSafetyTests({ respond: (p: string) => `Echo: ${p}` });
+  it('runs safety tests', async () => {
+    const r = await runSafetyTests({ respond: (p: string) => `Echo: ${p}` });
     expect(r).toHaveProperty('passed');
   });
 });

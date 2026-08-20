@@ -21370,11 +21370,35 @@ watch
   .description("Run safety tests for an agent")
   .option("--category <category>", "filter by category (alignment|injection|sensitive_data|excessive_agency|overreliance)")
   .option("--verbose", "show scenario methodology, objectives, and findings", false)
+  .option("--model <modelId>", "model id of the agent under test (or set AMC_ASSURANCE_MODEL)")
   .option("--json", "Output as JSON")
-  .action(async (agentId: string, opts: { category?: string; verbose?: boolean; json?: boolean }) => {
+  .action(async (agentId: string, opts: { category?: string; verbose?: boolean; json?: boolean; model?: string }) => {
     try {
       const { runSafetyTests } = await import("./watch/index.js");
-      const result = runSafetyTests(agentId, { category: opts.category });
+      // Probe the real agent: an agent id alone used to auto-refuse every
+      // prompt and pass the whole OWASP LLM Top 10 without testing anything.
+      const { resolveAgentResponder, AgentResponderUnavailableError } = await import(
+        "./assurance/agentResponder.js"
+      );
+      let safetyResponder: (prompt: string) => Promise<string>;
+      try {
+        const responder = await resolveAgentResponder({
+          workspace: process.cwd(),
+          agentId,
+          model: opts.model
+        });
+        safetyResponder = async (prompt: string) => (await responder.respond(prompt)).text;
+      } catch (error) {
+        if (error instanceof AgentResponderUnavailableError) {
+          console.error(chalk.red("Safety tests aborted — no agent under test was reachable."));
+          console.error(chalk.gray(`Reason: ${error.reason}`));
+          console.error(chalk.cyan(`Fix: ${error.remediation}`));
+          process.exitCode = 2;
+          return;
+        }
+        throw error;
+      }
+      const result = await runSafetyTests(safetyResponder, { category: opts.category });
       if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
       console.log(chalk.bold.hex('#4AEF79')("\n👁️  Safety Tests"));
       console.log(chalk.gray("Agent:"), agentId);
