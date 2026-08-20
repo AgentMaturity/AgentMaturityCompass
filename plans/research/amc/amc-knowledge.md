@@ -1,0 +1,56 @@
+# AMC Self-Knowledge Report
+
+## 1. STRUCTURE
+
+- **Repo root** `/Users/sid/AgentMaturityCompass` — ~700+ TS source files, MIT, npm pkg `agent-maturity-compass`, binary `amc`.
+- **Self-knowledge docs (root):** `AMC_COMPLETE_KNOWLEDGE.md` (canonical codebase reference, refreshed 2026-07-11), `AMC_IMPROVEMENT_ROADMAP.md` (2026-02-17, TRP-inspired gap analysis), `COMPETITIVE_ANALYSIS_G0DM0D3.md` + `COMPETITIVE_GAP_REPORT_G0DM0D3.md` (Apr 2026), `CHANGELOG.md`, `README.md`. Also agentic-persona files (`SOUL.md`, `NOW.md`, `CONTINUATION.md`, `MEMORY.md`, `IDENTITY.md`) from an OpenClaw agent ("Satanic Pope") that works on the repo.
+- **docs/** ~300 files. Key: `AMC_MASTER_REFERENCE.md` (full CLI reference), `ARCHITECTURE_MAP.md` (code-backed path map), `AMC_STANDARD_RFC.md` (v1.0 open standard, 2026-03-14), `AMC_TRUST_PROTOCOL.md` (agent-to-agent trust tokens), `CLI_COMMAND_INVENTORY.md` (1,163 command paths), `ONE_COMMAND_FIX.md`/`ONE_CLICK_FIX.md` (`amc run --fix`), `FULL_MODULE_ROADMAP.md` (Python→TS module port matrix S1–S16, E1–E35).
+- **whitepaper/** — `AMC_WHITEPAPER_v1.md` (v2.0, Mar 2026; repository preprint, **no arXiv/DOI as of 2026-06-16**).
+- **plans/** — **EMPTY directory** (no active plan files).
+- **src/** planes (per `docs/ARCHITECTURE_MAP.md`): `cli.ts` + `cli-domain-product-commands.ts` + `cli-late-stage-commands.ts`; `diagnostic/` (37 files; `questionBank.ts` 4,755 lines, 244 questions); `score/` (94 modules); `assurance/` (142 packs); `enforce/` (E1–E34); `shield/`; `vault/`; `watch/`; `fleet/`; `bridge/` (952-line LLM proxy); `gateway/` (1,831-line HTTP proxy); `mcp/amcMcpServer.ts`; `sdk/autoInstrument.ts` (monkey-patches 9 LLM clients); `adapters/` (14 built-in); `api/` (35 files, 200+ REST endpoints, 31 routers); `ledger/`, `transparency/`, `notary/`, `claims/`, `incidents/`, `mechanic/`, `governor/`, `forecast/`, `experiments/`, `federation/`, `passport/`, `identity/`.
+- **Workspace state:** `.amc/` tree (keys, blobs, runs, SQLite ledgers, signed YAML configs) built by `src/workspace.ts`.
+- **Deployment:** `Dockerfile`, `deploy/compose/`, `deploy/helm/amc/`, `action.yml`/`amc-action` (GitHub Action), `vscode-extension/`, `website/`, `Formula/` (Homebrew).
+
+## 2. HOW IT ACTUALLY WORKS
+
+**Positioning (stated):** "Credit score for AI agents." Product promise: "Run one command. Get the full score. Fix the gaps." Trust line: "Evidence over claims." Category claim: "trust scorecard for AI agents — GREENFIELD" — explicitly *not* an observability tool or eval harness (README: "AMC is not an observability tool and not an eval harness"). Whitepaper positions AMC as the "execution layer" beneath NIST RMF/ISO 42001.
+
+**Mechanism:** Evidence flows in via wrappers (`amc wrap/supervise/monitor/ingest`), the Gateway/Bridge transparent LLM proxy (lease-authed, per-request verification), SDK auto-instrumentation, or 14 framework adapters. Events land in a hash-chained, Ed25519-signed SQLite ledger + JSONL transparency log with Merkle anchoring (`src/ledger/`, `src/transparency/`). Scoring (`src/score/formalSpec.ts`) computes `M(a,d,t) = Σ w_i(kind)·s_i·decay(t−t_i) / Σ w_i(kind)·decay(t−t_i)` with trust-tier weights (OBSERVED_HARDENED 1.1×, OBSERVED 1.0×, ATTESTED 0.8×, SELF_REPORTED 0.4×) and 90-day-half-life decay. 244 default questions across 5 dimensions map scores to L0–L5 with per-level evidence gates (L5 requires OBSERVED-only, 16 events, 8 sessions, 10 days). Artifact validity (`VALID|INVALID|UNSIGNED`) is reported independently of evidence readiness (`READY|LIMITED|INSUFFICIENT_EVIDENCE|UNVERIFIED`); only `READY` is claim-eligible. Entry points: `src/cli.ts`, `src/studio/studioServer.ts` (Studio API + Console), `src/gateway/server.ts`, `src/bridge/bridgeServer.ts`, `src/mcp/amcMcpServer.ts`. `amc run --fix` (commit 3d6b8d4a) generates a signed, hashed fix plan under `.amc/fix-plan/<runId>/` reusing existing AMC commands; `src/mechanic/` maps question IDs → typed fix plans with rollback.
+
+## 3. CAPABILITY INVENTORY
+
+- **Scoring:** `amc` (full evidence score), `amc quickscore [--rapid|--auto|--answers]`, `amc run --agent --window`, tiers Rapid(5)/Quick(10)/Standard(244)/Deep(264); risk-tier auto-escalation (50→244 q); `amc report/history/compare/snapshot/indices`; `amc methodology --reproducibility|--sample-dataset --json`.
+- **Fix loop:** `amc run --fix`, `amc fix` (newest), `amc mechanic gap/plan create|execute|simulate`, `amc tune/upgrade/learn/own/commit`, `amc doctor-fix`.
+- **Capture:** `amc wrap claude|gemini|openclaw|any`, `amc supervise`, `amc sandbox run`, `amc monitor --stdin`, `amc connect`, `amc ingest` (SELF_REPORTED) + `amc attest` (→ATTESTED), `amc adapters run` (lease + gateway + evidence).
+- **Runtime services:** `amc up/down/status` (Studio), `amc gateway start` (CONNECT tunneling, CIDR allowlists, rate limits, circuit breaker), `amc bridge start` (lease→prompt-pack→forward→truthguard→receipt; OpenAI/Anthropic/Gemini/OpenRouter/xAI/local compat), `amc mcp serve` (14 MCP tools per changelog; Claude Code/Cursor/Copilot/Windsurf compatible), `amc notary start`.
+- **Assurance/red-team:** `amc assurance run` (142 packs, TAP/PAIR/Crescendo, Bloom behavioral packs), certs, scheduler, waivers; micro-canary; false-positive tracker.
+- **Governance:** `amc governor check/explain/report`, signed action/approval policies, policy packs, canary rollout, emergency override (48h postmortem), policy debt, work orders, execution tickets, dual-control approvals, scope templates.
+- **Trust artifacts:** `amc badge`, `amc certify`/`cert verify` (offline `.amccert`), `amc passport issue/verify` (`.amcpass`), AMC Trust Token (HMAC-SHA256; trust levels full≥0.80/conditional≥0.60/limited≥0.40; BFS graph, 3 hops, 30% attenuation/hop), `amc bundle export/verify`, `amc gate` (CI release gate), `amc bom`, `amc transparency merkle prove`.
+- **Fleet/org/federation:** trust composition, delegation edges, DAG, handoffs, cross-agent contradictions, cascade simulator; `amc org score/report`; Ed25519-signed federation bundles.
+- **Compliance:** `amc comply init/report` — EU AI Act (12 articles), ISO 42001, NIST AI RMF, SOC 2, GDPR, OWASP, MITRE ATLAS; 41 paid industry sector packs (7 sectors, 600 questions).
+- **Enterprise:** OIDC/SAML/SCIM, RBAC, host multi-workspace mode, vault (AES-256-GCM, ZK privacy: Schnorr/Pedersen/Shamir), retention/backup, Prometheus metrics, SIEM export (CEF/LEEF/Splunk/Elastic).
+- **APIs:** ~200+ REST endpoints (raw Node HTTP, Zod), least-privilege role matrix (`src/api/accessPolicy.ts`), `/api/v1/proof/check`, OpenAPI generation; Python SDK generator.
+- **CI/CD:** GitHub Action (`amc-pr-gate` "fail on drop", target L3), 9 workflows, Docker/Helm/K8s hardened deploys, SEA single binary, signed `.amcrelease` bundles + SBOM.
+
+## 4. REUSE VERDICTS
+
+- **Ledger + transparency/Merkle + crypto (`src/ledger/`, `src/transparency/`, `src/crypto/`)** — **KEEP-AS-SERVICE.** Self-contained evidence backbone; every harness needs signed append-only evidence.
+- **Scoring engine (`src/score/formalSpec.ts` + gates + question bank)** — **KEEP-AS-SERVICE.** Deterministic formula + 244-question bank is the moat; expose as a scoring service consuming harness traces.
+- **Gateway/Bridge proxies** — **REFACTOR.** Battle-tested capture but monolithic (1,831/952-line servers) and coupled to lease/workspace internals; decompose capture middleware from policy enforcement before plugging into a harness runtime.
+- **Assurance runner + 142 packs** — **KEEP-AS-SERVICE.** Pack format is portable; runner already parallel/concurrency-controlled.
+- **MCP server + SDK autoInstrument + 14 adapters** — **REFACTOR.** Right idea, thin per-target implementations (3-tier adapters); a harness-native instrumentation layer should absorb them, keeping the trace-normalization contracts.
+- **CLI (1,163 command paths across 3 registration files)** — **REPLACE.** Own docs concede "Composability over completeness… 5 primitives" lesson; a harness front-end supersedes the sprawl; keep `amc`/`amc fix`/`amc verify` verbs.
+- **Enforce/Shield runtime guards (E1–E34, S1–S16)** — **REFACTOR.** Valuable policies but Python-port lineage, many modules with no CLI wiring; wrap as pluggable guard modules.
+- **Mechanic/fix-plan engine** — **KEEP-AS-SERVICE.** Signed fix-plan artifact generation is a differentiator and already deterministic.
+- **Studio/Console + website** — **REPLACE** for harness purposes (viewer UX, not infra).
+- **Steer module (`src/steer/`, ~2,962 LOC, thermostat CLI)** — **REFACTOR.** Built post-G0DM0D3; parity claimed but no research evals validating it.
+
+## 5. SURPRISES & DEBT
+
+- **plans/ is empty** — no formal active plan; direction lives in commit stream (current: `amc fix` one-click flow, branch `codex/reconcile-stale-worktrees`) and in the roadmap doc's P0 list, verbatim: "1. Claim Object Model… 2. Promotion Quarantine Gate… 3. Calibrated Confidence Per Question (ECE/Brier) 4. Incident Object Model with causal edges 5. Correction Log with effectiveness tracking 6. Auto-Assembly of incidents from evidence" (~22–34 weeks total). Yet `AMC_COMPLETE_KNOWLEDGE.md` shows `src/claims/`, `src/incidents/`, `src/corrections/`, calibration already **built** — the roadmap is stale relative to code.
+- **Rigor gap is the acknowledged #1 weakness:** G0DM0D3 analysis concludes "The gap isn't features — it's rigor… Write the paper. Prove the claims. Publish the baselines." Whitepaper remains unpublished (no arXiv ID after searches, 2026-06-16); its headline claims — keyword scoring inflated **+84 points** (89% relative), human-guided agent **94/100** vs autonomous **80/100** from identical L0 baselines, test-retest ICC 0.97, inter-rater κ 0.82 — rest on two internal case studies (CMB/DPB) with no external replication.
+- **Number drift everywhere:** questions 235/240/244/264/844; tests 4,161/4,992/8,150/8,481/8,604; modules 79/94/1,130/1,200+; whitepaper's five dimensions (Strategic Ops, Reliability & Safety, Security & Compliance, Observability & Cost, Evaluation & Growth) differ from the code's five layers (Strategic Agent Ops, Leadership & Autonomy, Culture & Alignment, Resilience, Skills) — partially reconciled by commit 2f4d83f2 but both taxonomies still circulate.
+- **License inconsistency:** root says MIT; `AMC_STANDARD_RFC.md` says Apache 2.0.
+- **Harness overlap already latent:** wrap/supervise/adapters/bridge/MCP/eval/replay-corpus receipts (massive 1.1.0 changelog wave of fail-closed benchmark/replay/drift receipts) constitute a de-facto evaluation harness despite README's "not an eval harness" claim; `/Users/sid/Downloads/deepseek-harness-master` sits as an additional working dir — no AMC doc references it yet.
+- **Distribution is fail-closed by choice:** npm/Homebrew "intentionally not advertised until live"; npm publish, Stripe links, hosted SaaS all blocked on Sid (hosted Studio was flagged "the #1 go-to-market gap").
+- **Agent-persona files (`SOUL.md`, `NOW.md` dated 2026-02-17) are stale bootstrap artifacts** referencing Moltbook tasks and a `/Users/sid/Downloads/AMC/docs/` path that predates this repo layout.

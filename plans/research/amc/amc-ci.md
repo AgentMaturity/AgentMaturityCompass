@@ -1,0 +1,64 @@
+# AMC Engineering System — Tests, CI, Release Gating, Build
+
+## 1. STRUCTURE
+
+- **`/Users/sid/AgentMaturityCompass/tests/`** — 1,118 files, ~275K lines (13MB), 4,223 `it()` blocks / 1,944 `describe()` blocks. Flat root holds the bulk (~1,040 files); 28 subdirs hold themed suites (`score/` 28, `security/` 11, `assurance/` 7, `lifecycle/` 6, `watch/` 4, plus 1–3-file dirs: `badge, benchmarks, compliance, diagnostic, dx, enforce, evaluation, guide, hallucination, integration, integrations, lint, mechanic, mirofish, observability, outcomes, performance, redteam, setup, telemetry`). Naming convention: 547 files are `gapNNNN*.test.ts` ("GAP" research-gap boundary tests), 21 `amcNNNN*.test.ts`, ~472 feature-named. Shared bits: `tests/helpers/liveDriftEvidence.ts` (one tiny helper), `tests/fixtures/` (3 JSON fixtures incl. `gap-0626-adversarial-regression.json`), `tests/e2e/` (13 Playwright specs + `playwright.config.ts` running against `file://…/website/`).
+- **`vitest.config.ts`** — node env, 30s timeout, includes `tests/**/*.test.ts`, v8 coverage over `src/**` excluding `src/console/**` and `src/dashboard/**`, **all coverage thresholds = 0**.
+- **`.github/workflows/`** — 9 workflows: `ci.yml` (main gate), `npm-publish.yml` (Changesets automation), `release.yml` (tag-driven artifacts), `amc-pr-gate.yml` (dogfoods `./amc-action`), `amc-score.yml` (reusable `workflow_call` scorer), `nightly-compatibility-matrix.yml`, `docker-build.yml`, `docker-runner.yml`, `pages.yml`.
+- **`scripts/`** — 26 scripts: release gating (`release-gate.mjs`, `prepack-release-check.mjs`, `verify-release-version.mjs`, `prepare-public-release-assets.mjs`), drift/boundary checks (`architecture-boundaries-check.mjs`, `docs-drift-check.mjs`, `incident-readiness-check.mjs`), QA (`install-persona-qa.mjs` 562 ln, `amc-dogfood-8-agents.mjs` 664 ln, `swarm-test.py`/`swarm-test-v2.py` 50-persona testers), security (`security-scan-lite.mjs`), build (`build-sea.mjs`, `build-pages-site.mjs`, `package-desktop-installers.mjs`), research (`research-amc-landscape.mjs` 1,700 ln), fixtures (`run-policy-fixtures-ci.mjs`).
+- **`.changeset/`** — standard config + **33 pending changesets** (dated Jul 10–13, 2026) not yet versioned (package.json still 1.1.1).
+- **`tsconfig.json`** — strict + `noUncheckedIndexedAccess`, NodeNext, `rootDir: src`, only `src` included (tests typecheck via vitest, not `npm run typecheck`).
+- **`sbom.json`** — 497KB CycloneDX 1.5 snapshot generated 2026-03-25 by cyclonedx-npm (repo also generates SBOMs live via `amc release sbom`).
+- **`qa/`** — separate "AMC QA RelOps" Express+Postgres+Claude-bot subproject (own package.json, migrations, bot engine, GitHub integration, vitest runner wrapper).
+- **`security-audit/`** — three **empty** directories (`awesome-agent-skills`, `awesome-openclaw-skills`, `voltagent`) + `.DS_Store`.
+- Two GitHub Actions: root `action.yml` (thin composite: curl install.sh + `amc run --ci --fail-below`) and `amc-action/action.yml` (full-featured: score, PR comment, fail-on-drop, artifacts, pin-to-1.1.1 or local build).
+
+## 2. HOW IT ACTUALLY WORKS
+
+- **Test flow**: `npm test` → `pretest` runs full `npm run build` (tsc → chmod cli → copy console/dashboard assets) because ~29 test files spawn `dist/cli.js` as a subprocess; the other 2,340 imports are direct `../src/*.js` (vitest transpiles). GAP tests follow a rigid template (see `tests/gap4201RagPoisoningStalenessBoundary.test.ts`): pin an external-source citation (OpenAlex/DOI URLs, retrieval dates), assert a `docs/source-reviews/GAP-*.md` exists, exercise a receipt-building API in a `mkdtemp` workspace, verify Ed25519 artifact signatures, clean up in `afterEach`. Tests are hermetic (tmpdir workspaces), no network.
+- **CI gate (`ci.yml`)**: PR + main. Jobs: (1) changeset-presence check via github-script (bypass with `skip-changeset` label); (2) `build-test` matrix Node 20/22/24 → lint(=typecheck)/typecheck (duplicated)/test/build, plus Node-20-only policy-fixture regression, architecture-boundaries check, and release smoke (`npm pack` + `amc release sbom|licenses|provenance|scan`); (3) `e2e-smoke-local` = `amc e2e smoke --mode local` (CLI-native smoke, **not** Playwright); (4) `docker-smoke` boots the Studio container with file-based secrets, polls `/readyz`, greps logs for leaked secrets; (5) `helm-lint-template` asserts rendered kinds + security contexts; (6) `security-scan-lite` scans repo + a signed `.amcrelease` bundle.
+- **Release gating is 3-layered**: (a) `npm run release:gate` (`scripts/release-gate.mjs`) — 13-step receipt-producing gate (console JS syntax, openapi parse, typecheck, build, GAP-0626 adversarial regression as a named step, full vitest, CLI command-inventory regen, architecture boundaries, docs-drift, `npm audit --omit=dev`, CLI smoke in tmpdir, install-persona QA, optional live-URL health via `AMC_RELEASE_GATE_LIVE_URL`); writes JSON receipt to `.amc/release-gate/latest.json`, `--quick` skips suite+personas. Wired into **`prepack`**, so any `npm pack`/`publish` runs it. (b) `prepack-release-check.mjs` — packs with `--ignore-scripts`, then sbom/licenses/secret-scan/sign-with-throwaway-ed25519-key/`release verify` round-trip. (c) `verify-release-version.mjs` — package.json/lock/`website/install-channel.json`/install.sh/install.ps1 version agreement.
+- **Publish flow**: changesets land via PR (enforced by ci.yml) → `npm-publish.yml` on main opens/updates "Version Packages" PR → merge publishes to npm with provenance (only if `NPM_TOKEN` + `CHANGESETS_GITHUB_TOKEN` secrets exist; otherwise gracefully skips) → creates `vX.Y.Z` tag + GitHub Release → tag fires `release.yml`: macOS runner builds desktop archives + SHA256SUMS, ubuntu runner re-tests, validates tag==package.json, pushes Docker to GHCR, builds signed `.amcrelease` (only if `AMC_RELEASE_SIGNING_KEY` secret), SEA linux binary, optional Homebrew tap bump, attaches everything to the GitHub Release.
+- **Nightly matrix**: ubuntu/macos × Node 20/22 — pack, global-install the tarball, run `amc doctor --json`, full score JSON, help paths; emits `compat-matrix-report.mjs` JSON artifacts.
+- **Architecture boundaries check** enforces shrinking line budgets on the two megafiles (`src/cli.ts` < 24,417 lines; `src/studio/studioServer.ts` < 8,883), registry-based API dispatch (`API_ROUTE_REGISTRY`, ≤2 `pathname.startsWith`), and CLI command-inventory invariants by importing built `dist/api/index.js`.
+- **Docs-drift check** greps public docs for forbidden upstream-source names (AgentScope, Karpathy, etc.), stale `quickscore` primary-path commands, and prohibited capability claims ("hidden coordination runtime" …).
+
+## 3. CAPABILITY INVENTORY
+
+- npm scripts: `build`, `build:pages`, `build:sea`, `brand:render`, `package:desktop[:verify]`, `release:prepare-assets|verify-version|gate|prepack-check`, `dev` (tsx), `api:start`, `lint`/`typecheck` (identical), `test`, `test:watch`, `test:e2e` (Playwright), `accessibility:release-evidence`, `changeset`/`version-packages`/`release`, `qa:install-personas`, `qa:dogfood-8-agents`, `research:amc-landscape[:verify]`, `audit:runtime`, `check:incident-readiness|architecture-boundaries|docs-drift|policy-fixtures`, `clean`, `prepack`, `postinstall`.
+- Release-gate receipt schema (`schemaVersion: 2026-05-23`, `receiptType: release-gate`) with per-step stdout/stderr tails, remediation strings, `--json/--quick/--out`.
+- CLI self-verification commands used by CI: `amc release sbom|licenses|provenance|scan|pack|verify`, `amc commands --json|--markdown`, `amc e2e smoke`, `amc doctor --json`, `amc policy test <fixtures> --json`, `amc bootstrap`, `amc studio start`.
+- Reusable CI surface for consumers: `amc-score.yml` (workflow_call with score/level outputs), root `action.yml` (fail-below-grade), `amc-action/` (PR comments, drop detection, artifacts).
+- Policy fixture regression: `fixtures/policy/amc-ci-policy-fixtures.yaml` run twice for determinism in a throwaway workspace with random vault passphrase (`run-policy-fixtures-ci.mjs`); shipped in the npm package (`files` list).
+- Persona install QA: isolated `npm i` of packed tarball into tmp projects per persona fixture, exercising one-command score and domain packs.
+- Swarm/dogfood harnesses: 8-agent maturity-evidence dogfood; 50-persona swarm testers (Python).
+- Docker smoke incl. secret-leak grep of container logs; Helm chart contract assertions; Pages build with commit-pinned artifacts; nightly OS×Node matrix; SEA single-binary build; desktop installer packaging + verification.
+
+## 4. REUSE VERDICTS
+
+- **`release-gate.mjs`** — **KEEP-AS-SERVICE**: clean receipt-emitting step-runner with timeouts/process-tree kill; steps are data, trivially wrappable; only the hardcoded step list is AMC-specific.
+- **Vitest suite (root gap tests)** — **REFACTOR**: hermetic and consistent per-file, but 1,040 files in one flat dir with duplicated tmpdir/afterEach boilerplate and 547 template-clone GAP tests; needs shared helpers + directory taxonomy before anything wraps it.
+- **`ci.yml` build-test job** — **KEEP-AS-SERVICE**: conventional matrix; lint/typecheck duplication is the only wart.
+- **`npm-publish.yml` + Changesets** — **KEEP-AS-SERVICE**: textbook changesets/action flow with graceful secret-absence degradation.
+- **`release.yml`** — **REFACTOR**: 250-line monolith mixing desktop, Docker, npm, Homebrew, SEA; each artifact channel should be a separate job/reusable workflow.
+- **`prepack-release-check.mjs`** — **KEEP-AS-SERVICE**, though its verbose `debugSnapshot` logging is leftover debugging of a past npm-cache issue.
+- **`architecture-boundaries-check.mjs` / `docs-drift-check.mjs`** — **KEEP-AS-SERVICE**: ratchet-style checks; budgets/patterns are config-like already.
+- **`install-persona-qa.mjs` / dogfood / swarm scripts** — **REFACTOR**: valuable end-user simulation, but personas are inlined; swarm-test.py v1 is superseded by v2 (REPLACE v1).
+- **`amc-score.yml` + root `action.yml`** — **REPLACE**: both `curl | sh` an unpinned installer, contradicting README's own warning; `amc-action/` (pinned 1.1.1 or local) is the survivor.
+- **Playwright `tests/e2e/`** — **REFACTOR**: real brand/a11y specs, but `@playwright/test` is not a devDependency and no workflow runs `test:e2e` — currently manual-only.
+- **`qa/` RelOps subproject** — **REPLACE** (or spin out): parallel AI-bot release-ops stack with its own DB; overlaps release-gate/npm-publish and its README stats are stale.
+- **`research-amc-landscape.mjs`** — **REPLACE/archive**: 1,700-line one-shot research harvester pinned to 2026-06-13 outputs.
+
+## 5. SURPRISES & DEBT
+
+- **Coverage thresholds are all 0** in `vitest.config.ts` despite the repo's assurance positioning — coverage is collected, never enforced.
+- **README badge claims "8,604 tests passing"** (static shield, not computed); actual `it()` count is 4,223 (parameterized tests may inflate runtime count, but the number is hand-maintained). `qa/README.md` claims "5031 tests / 336 files" vs. actual 1,118 files — three mutually inconsistent counts.
+- **33 pending changesets since mid-July with no version bump** — release automation likely blocked (secrets unconfigured or workflow failing); version frozen at 1.1.1 while `amc fix` shipped Jul 15.
+- **`security-audit/` contains only empty directories** — an audit that apparently never ran or whose outputs were removed.
+- **Playwright e2e is unwired**: no CI job, `@playwright/test` missing from devDependencies (only `@axe-core/playwright` present); `test-results/` clutter at repo root plus stray untracked `--json` and `--verbose` files (artifacts of a mis-quoted command).
+- `check:incident-readiness`, `qa:dogfood-8-agents`, swarm testers, and `accessibility:release-evidence` are **not referenced by any workflow** — aspirational gates that run only by hand; docs-drift + persona-QA run only inside release-gate (i.e., at prepack), not on PRs.
+- `amc-score.yml` and root `action.yml` install via `curl -fsSL https://agentmaturity.co/install.sh | sh` while README line 594 explicitly warns against unpinned action trust — the repo contradicts its own guidance.
+- `lint` is an alias of `typecheck` (no eslint/prettier), and ci.yml runs both — pure duplication; `tsconfig` excludes `tests/`, so test files are never typechecked standalone.
+- The full vitest suite runs 3× per release (ci.yml matrix, npm-publish test-build, release.yml) plus inside release-gate at prepack — significant redundancy given `pretest` also rebuilds each time.
+- `tests/integration/` vs `tests/integrations/` (one file each) — duplicated taxonomy; root `sbom.json` (Mar 25) and root `compliance-*.json` snapshots are stale committed artifacts duplicating live `amc release sbom`/`amc compliance` output.
+- Release gate hardcodes one named regression (`gap-0626-adversarial-regression`) as a first-class step — an undocumented "golden test" convention.

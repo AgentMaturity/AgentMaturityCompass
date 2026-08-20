@@ -1,0 +1,68 @@
+# AMC Trust Plane — Exploration Report
+
+## 1. STRUCTURE
+
+- **`src/ledger/ledger.ts`** (2,367 lines) — the evidence ledger: SQLite schema + 10 migrations, hash-chained append APIs, session/run seals, retention (archive/prune) proofs, and full-chain verification. **`src/ledger/monitor.ts`** (321) — spawns/wraps evaluated agent processes and streams stdin/stdout/stderr into the ledger.
+- **`src/crypto/keys.ts`** — Ed25519 key management for four key roles (monitor, auditor, lease, session): public keys + JSON key history under `.amc/keys/`. **`src/crypto/signing/`** — `signer.ts` (policy router: vault vs notary), `signerVault.ts`, `signerNotary.ts`, `signatureEnvelope.ts`, `signerTypes.ts` (12 `SignKind`s, `SignatureEnvelope`).
+- **`src/vault/vault.ts`** — passphrase-encrypted private-key vault (`.amc/vault.amcvault`, AES via `vaultCrypto.ts`); also `zkPrivacy.ts` (730 lines of hand-rolled ZK primitives) plus ~20 unrelated privacy modules.
+- **`src/receipts/`** — `receipt.ts` (JWS-style signed receipts), `receiptChain.ts` (cross-agent delegation chains, in-memory store).
+- **`src/transparency/`** — `logChain.ts` (JSONL hash chain + signed seal), `merkle.ts` (pure Merkle math), `merkleIndexStore.ts` (Merkle index, inclusion proofs, signed roots, proof bundles), `proofSchema.ts`, `transparencyReport.ts` (narrative report), CLIs.
+- **`src/notary/`** — standalone notary HTTP/unix-socket server (`notaryServer.ts`), signer backends (`notarySigner.ts`: FILE_SEALED / EXTERNAL_SIGNER), HMAC request auth, hash-chained notary log, attestation bundles, client verification (`notaryVerify.ts`), CLI.
+- **`src/passport/`** — portable trust artifact (`.amcpass`): `passportSchema.ts`, `passportCollector.ts` (554), `passportArtifact.ts`, `passportVerifier.ts`, `passportStore.ts` (policy, cache, revocations), `passportSigner.ts`, `passportProofs.ts`, interchange formats (`receiptInterchange.ts`, `trustInterchange.ts`, `passportSchemaCompatibility.ts`), `agentDiscovery.ts`, HTTP API/CLI/SSE.
+- **`src/audit/`** — audit binder (`.amcaudit`): `binderCollector.ts` (1,173), `binderArtifact/Signer/Verifier/Proofs/Redaction/Store/Schema`, audit maps + policies, evidence-request workflow, scheduler, plus analytics (`insiderRisk.ts`, `posthocAuditSampling.ts`, `reviewerIndependence.ts`, `enterpriseAuditExport.ts`).
+- **`src/bom/`** — signed maturity BOM. **`src/cert/`** — `trustCertificate.ts` (signed/preview cert with embedded chain snapshot), `badgeGenerator.ts` (SVG). **`src/badge/badgeCli.ts`** — badge URL/markdown.
+- **`src/bench/benchProofs.ts`** — shared proof-bundle builder reused by passport and binder. **`src/trust/trustConfig.ts`** — signed trust-mode config (LOCAL_VAULT vs NOTARY). No `src/attestation` dir; attestation lives in notary.
+
+## 2. HOW IT ACTUALLY WORKS
+
+**Evidence ledger.** `.amc/evidence.sqlite` (better-sqlite3, pooled, WAL, `synchronous=FULL` default). Each event: `event_hash = sha256(prev_hash + canonicalized(metadata) + payload_sha256)`, seeded `"GENESIS"`; `writer_sig` = Ed25519(monitor key) over the hash (`ledger.ts:1127`). `sanitizeMetaForHash` strips `receipt`/`receipt_sha256` from meta before hashing, so `appendEvidenceWithReceipt` can mint a receipt against the event hash and embed it in meta without changing the hash. Outcome events form a second chain (`GENESIS_OUTCOME`), each with a mandatory receipt. Append-only is enforced by SQLite triggers; migration 5 relaxed the UPDATE trigger to permit retention columns while freezing hash-relevant fields; migration 9 added sealed-session immutability. Payloads go inline, to sha-named blobs, or encrypted blobs (`storage/blobs`). Sessions seal with monitor-signed final hash; runs/assurance runs seal with auditor signature. `verifyLedgerIntegrity` (`ledger.ts:2314`) rewalks the entire chain, recomputes hashes, verifies signatures against key *history*, verifies embedded receipts, retention proofs (`ops/retention`), and signed configs across gateway/fleet/action-policy/toolhub/work-orders. Writer trust boundary: `AMC_EVALUATED_AGENT=1` blocks writes (`assertTrustedWriter`); `monitor.ts` spawns wrapped agents with that env plus stripped provider keys, and `detectTrustBoundaryViolation` requires `security.trustBoundaryMode=isolated`.
+
+**Keys & signing.** Four Ed25519 keypairs live only inside the passphrase-encrypted vault (`AMC_VAULT_PASSPHRASE`; test fallback `amc-test-passphrase`); public keys + append-only JSON history in `.amc/keys/`; verification accepts any historical key (rotation-tolerant). Artifact signing goes through `signDigestWithPolicy` (`signer.ts:153`): trust config decides LOCAL_VAULT vs NOTARY; NOTARY mode POSTs the digest to the notary (HMAC header + timestamp, replay guard, rate limit), verifies the response signature, pinned pubkey fingerprint, SOFTWARE/HARDWARE attestation level, and clock skew, then **auto-appends the notary pubkey to auditor key history**. Results carry a `SignatureEnvelope` (pubkey, fingerprint, signer type, attestation level).
+
+**Receipts.** `base64url(canonical payload).base64url(ed25519 sig)`; kinds `llm_request|llm_response|tool_action|tool_result|guard_check`; bound to `event_hash`, `body_sha256`, `session_id`. `receiptChain.ts` adds `parent_receipt_id`/`delegation_chain` — but its store is a process-local `Map`.
+
+**Transparency log + Merkle.** Every published artifact (cert, bundle, bench, audit, passport, bom, policy, approval, plugin, scan reports) appends a hash-chained entry to `.amc/transparency/log.jsonl`; a seal (`log.seal.json` + sig, kind `TRANSPARENCY_ROOT`) is rewritten after each append; the Merkle index (`leaves.jsonl`, `roots.jsonl`, `current.root.json` + signed `MERKLE_ROOT`) is rebuilt after each append (failure only logs a warning). `merkle.ts` uses `leaf:`/`node:` domain separation. Inclusion proofs and tar.gz proof/transparency bundles are offline-verifiable with embedded `auditor.pub`.
+
+**Passport issuance.** `createPassportArtifact` (`passportArtifact.ts:109`): verify signed passport policy → `collectPassportData` (latest diagnostic run, 5-layer maturity, value dimensions, strategy risks, governance summary, checkpoint hashes of last cert/bench/binder/value snapshot, calculation manifest) → PII scan → build proof bundle via `benchProofs` (transparency seal + Merkle root + ≤40 inclusion proofs) → sign canonical `passport.json` with auditor-policy signer → deterministic tar.gz `.amcpass` (passport.json, passport.sig, signer.pub, proofs/inclusion/*) → two transparency entries + signed latest-cache. Verification (`passportVerifier.ts:101`) uses limit-validated tar extraction, schema parse, expiry (computed default), revocation list, digest match, envelope-or-history-or-embedded-pubkey signature check, and Merkle inclusion proof checks. Audit binders mirror this pipeline exactly (`binderArtifact`/`binderVerifier`). `trustCertificate.ts` embeds an evidence hash-chain snapshot (genesis/head/chainDigest/samples/brokenLinks) and supports an explicit `UNSIGNED_PREVIEW` mode with a claim-boundary disclaimer.
+
+## 3. CAPABILITY INVENTORY
+
+- **Ledger APIs**: `appendEvidence[Detailed|Batch|WithReceipt]`, `appendOutcomeEvent`, `insertOutcomeContract`, `startSession`/`sealSession`, `insertRun`/`insertAssuranceRun`, event/session/run queries, retention (`markEventsArchived`, `pruneEventPayloadColumns`, `listBlobReferences`), `verifyLedgerIntegrity`, `verifyEvidenceEventIntegrity`, auto-linking of evidence to open incidents (signed link + causal-edge rows).
+- **Process capture**: `wrapRuntime`, `wrapAny`, `superviseProcess` (rewrites ~10 provider base-URL envs to gateway route, dummy keys, optional proxy env), `startMonitor` (stdin pipe).
+- **Crypto**: `signHexDigest`/`verifyHexDigestAny`, key history, `signDigestWithPolicy`, `verifySignedDigest`, signature envelopes, vault secrets store.
+- **Receipts**: mint/parse/verify; chained receipts + `verifyDelegationChain` (CLI ~`cli.ts:19525` and `api/cryptoRouter.ts`).
+- **Transparency**: append/read/tail/verify log; export/verify transparency bundle; Merkle rebuild/root/list-roots/inclusion-proof/export-proof-bundle/verify-proof-bundle; `transparencyFingerprint`; narrative transparency report (markdown/JSON, also via MCP server).
+- **Notary**: `amc notary init|start|status|pubkey|attest|verify-attest|sign|log verify`; server endpoints incl. `/sign`; FILE_SEALED and EXTERNAL_SIGNER (hardware-capable) backends; hash-chained notary log; attestation bundles.
+- **Passport**: init/policy print/apply, create, verify, show, badge, export-latest, share (QR/public URL), compare; revoke; SSE; interoperable receipt + trust interchange + schema-compat matrix; agent discovery.
+- **Audit**: policy + map (builtin control families) manage/verify; binder create/verify/list/export (request+execute two-step); evidence requests create/approve/reject/fulfill; scheduler; enterprise export; insider-risk, post-hoc sampling, reviewer-independence analytics.
+- **Cert/BOM/Badge**: signed trust certificate (PDF/JSON + sidecar), BOM generate/sign/verify, SVG badge + shields URL.
+- **Config/env**: `AMC_NO_SIGN`, `AMC_VAULT_PASSPHRASE`, `AMC_NOTARY_PASSPHRASE[_FILE]`, `AMC_NOTARY_AUTH_SECRET[_FILE]`, `AMC_LEDGER_SQLITE_POOL_SIZE`, `AMC_LEDGER_SQLITE_SYNCHRONOUS`, `AMC_EVALUATED_AGENT`, trust config (mode, pinned notary fingerprint, requireNotaryFor kinds, clock skew).
+
+## 4. REUSE VERDICTS
+
+- **Ledger core (hash chain, receipts-in-tx, seals)** — **REFACTOR**: design is sound, but the 2,367-line file mixes migrations, retention, and verification that imports gateway/governor/toolhub/fleet/workorders; decompose and sever cross-module verify coupling before wrapping.
+- **`ledger/monitor.ts`** — **KEEP-AS-SERVICE**: small, clean process-capture wrapper.
+- **`crypto/keys.ts` + `signing/*` + vault key core** — **KEEP-AS-SERVICE**: policy signer + envelope model is the right seam; converge the two signing stacks (raw digest vs envelope) during wrap.
+- **`receipts/receipt.ts`** — **KEEP-AS-SERVICE**: minimal, format-stable. **`receiptChain.ts`** — **REPLACE**: in-memory store makes it non-functional across processes; harness-native persistent delegation records supersede it.
+- **`transparency/logChain.ts` + `merkle.ts`** — **KEEP-AS-SERVICE**. **`merkleIndexStore.ts`** — **REFACTOR**: full O(n) rebuild per append and swallowed failures need incremental update + error propagation.
+- **Notary suite** — **KEEP-AS-SERVICE**: self-contained server/client with auth, replay guard, attestation; already service-shaped.
+- **Passport artifact/verifier/schema/store** — **KEEP-AS-SERVICE**; **`passportCollector.ts`** — **REFACTOR**: hard-couples to diagnostic/value/forecast/governance internals and business-methodology fields.
+- **Audit binder** — **REFACTOR**: same pattern as passport but `binderCollector.ts` is 1,173 lines; analytics modules are separable products.
+- **`cert/trustCertificate.ts`, `bom/*`, `badge/*`** — **KEEP-AS-SERVICE**: thin, signed, self-verifying outputs.
+- **`transparencyReport.ts`** — **REPLACE**: unsigned narrative generator overlapping passport/binder claims.
+- **`vault/zkPrivacy.ts`** — **REPLACE**: hand-rolled crypto; use an audited library or drop the ZK claim.
+
+## 5. SURPRISES & DEBT
+
+- **`AMC_NO_SIGN=1`** writes literal `"unsigned"` writer sigs (`ledger.ts:768,815`) — chains produced this way fail every verifier; an undocumented integrity escape hatch.
+- **Delegation chains are ephemeral**: `receiptChain.ts`'s store is a `Map`; the CLI/API verify commands can only ever see receipts minted in the same process.
+- **zkPrivacy is placeholder crypto**: hand-rolled bigint field ops, Fiat–Shamir Schnorr, Pedersen over a mislabeled "safe prime" (actually secp256k1 order), and a comment admitting "For production: replace with secp256k1 or BN254" — while marketing implies ZK capability.
+- **Trust root is the filesystem**: key-history JSON is unsigned; anyone with workspace write access can append a pubkey and pass `verifyHexDigestAny`. Notary responses also auto-append to auditor history (`signer.ts:131`), permanently trusting any notary key that ever passed pinning.
+- **Inconsistent tar handling**: `passportVerifier` uses limit-validated extraction, but `binderVerifier.ts:36` and `passportArtifact`/transparency bundles still shell out to raw `tar -xzf` on untrusted files; the create/extract helpers are copy-pasted across ~6 files.
+- **Merkle rebuild per append** re-reads and re-hashes the entire transparency log; failures log to `console.error` and continue, so the signed Merkle root can silently lag the log.
+- **Receipts are signature-bound, not hash-bound**: `sanitizeMetaForHash` deliberately excludes the receipt from the event hash — correct for the mint flow, but means receipt removal from meta is only caught by the separate `receipt_sha256` check.
+- **Sessions were mutable until migration 9**; pre-existing ledgers may contain historically alterable session rows.
+- **Test passphrase backdoor**: vault defaults to `amc-test-passphrase` when `NODE_ENV=test`/`VITEST`.
+- **Business-methodology bleed**: passports embed `questionScores42`, five-layer scores (strategicOps/leadership/culture/resilience/skills), and strategy-risk fields — organizational-maturity content inside an "agent trust" artifact, complicating any harness-neutral reuse.
+- **Naming trap**: `transparencyReport.ts` is unrelated to the transparency log — it renders unsigned "certification status" prose, including via the MCP server.
+- **Cross-cutting verify**: `verifyLedgerIntegrity` fails the whole ledger on unrelated config-signature problems (fleet/toolhub/work orders), conflating evidence integrity with config governance.
