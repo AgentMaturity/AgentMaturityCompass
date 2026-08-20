@@ -18689,7 +18689,7 @@ program
 
 program
   .command("lab-simulate")
-  .description("Simulate running all probes for an experiment")
+  .description("Simulate the lab workflow with placeholder probe results (no model is called)")
   .requiredOption("--experiment <id>", "experiment ID")
   .action(async (opts: { experiment: string }) => {
     const lab = await import("./lab/cognitionLab.js");
@@ -18698,6 +18698,11 @@ program
       console.log(chalk.red("No results — experiment not found or has no probes."));
       return;
     }
+    console.log(
+      chalk.yellow(
+        "\n⚠️  Simulated results — no model was called. Scores are deterministic placeholders derived from ids, not measurements."
+      )
+    );
     console.log(chalk.bold(`\nSimulated ${results.length} probe results:\n`));
     for (const r of results) {
       const primaryDim = Object.keys(r.scores)[0] ?? "";
@@ -21737,37 +21742,6 @@ product
     } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
   });
 
-product
-  .command("plan <goal>")
-  .description("Generate an execution plan for a goal")
-  .option("--json", "Output as JSON")
-  .action(async (goal: string, opts: { json?: boolean }) => {
-    try {
-      const { generatePlan } = await import("./product/index.js");
-      const result = generatePlan(goal);
-      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
-      console.log(chalk.bold.yellow("\n📦  Plan"));
-      console.log(chalk.gray("Goal:"), goal);
-      console.log(chalk.gray("Steps:"), JSON.stringify(result.steps || result, null, 2));
-    } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
-  });
-
-const workflowCmd = product.command("workflow").description("Workflow management");
-workflowCmd
-  .command("create <name>")
-  .description("Create a new workflow")
-  .option("--json", "Output as JSON")
-  .action(async (name: string, opts: { json?: boolean }) => {
-    try {
-      const { WorkflowEngine } = await import("./product/index.js");
-      const engine = new WorkflowEngine();
-      const result = engine.createWorkflow(name, []);
-      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
-      console.log(chalk.bold.yellow("\n📦  Workflow Created"));
-      console.log(chalk.gray("Name:"), name);
-      console.log(chalk.gray("ID:"), result.workflowId || "N/A");
-    } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
-  });
 
 // ============================================================
 // VAULT extensions (added to existing `vault` variable)

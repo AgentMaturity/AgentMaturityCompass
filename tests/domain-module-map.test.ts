@@ -7,9 +7,9 @@ import {
 } from "../src/domains/domainModuleMap.js";
 
 describe("domain module map", () => {
-  test("maps all 165 modules", () => {
-    expect(TOTAL_MODULE_COUNT).toBe(165);
-    expect(DOMAIN_MODULE_MAP.length).toBe(165);
+  test("maps all 161 modules", () => {
+    expect(TOTAL_MODULE_COUNT).toBe(161);
+    expect(DOMAIN_MODULE_MAP.length).toBe(161);
   });
 
   test("every module has domain coverage entries", () => {
@@ -30,7 +30,7 @@ describe("domain module map", () => {
     expect(counts.enforce).toBe(35);
     expect(counts.vault).toBe(14);
     expect(counts.watch).toBe(10);
-    expect(counts.product).toBe(90);
+    expect(counts.product).toBe(86);
   });
 
   test("critical module overrides are preserved", () => {
@@ -58,8 +58,8 @@ describe("domain module map", () => {
     const healthcareModules = getDomainModuleActivations("health");
     const technologyModules = getDomainModuleActivations("technology");
 
-    expect(healthcareModules.length).toBe(165);
-    expect(technologyModules.length).toBe(165);
+    expect(healthcareModules.length).toBe(161);
+    expect(technologyModules.length).toBe(161);
     expect(technologyModules[0]?.relevance).toBe("critical");
   });
 });

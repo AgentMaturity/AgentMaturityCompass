@@ -8,7 +8,6 @@ import { scoreConfidence } from '../src/product/confidence.js';
 import { buildContextPack, compressContext, extractKeyContext } from '../src/product/contextPack.js';
 import { ConversationManager } from '../src/product/conversationState.js';
 import { assessQuality, flagAnomalies } from '../src/product/dataQuality.js';
-import { DevSandboxManager } from '../src/product/devSandbox.js';
 import { DocumentIngester } from '../src/product/docsIngestion.js';
 import { assembleDocument, exportDocument } from '../src/product/documentAssembler.js';
 import { translateError } from '../src/product/errorTranslator.js';
@@ -19,7 +18,6 @@ import { FailureClusterer } from '../src/product/failureClustering.js';
 import { GoalTracker } from '../src/product/goalTracker.js';
 import { suggestImprovement } from '../src/product/improvement.js';
 import { formatInstruction } from '../src/product/instructionFormatter.js';
-import { JobQueue } from '../src/product/jobs.js';
 import { KnowledgeBaseBuilder } from '../src/product/kbBuilder.js';
 import { KnowledgeGraph } from '../src/product/knowledgeGraph.js';
 import { LongTermMemory } from '../src/product/longTermMemory.js';
@@ -159,16 +157,6 @@ describe('Product — Long-Term Memory', () => {
   });
 });
 
-describe('Product — Jobs', () => {
-  it('creates and processes jobs', () => {
-    const q = new JobQueue();
-    const job = q.createJob({ type: 'test', payload: {}, priority: 1 });
-    q.enqueueJob(job.id);
-    expect(q.getJobStatus(job.id)?.status).toBe('queued');
-    q.processJob(job.id);
-    expect(q.getJobStatus(job.id)?.status).toBe('completed');
-  });
-});
 
 describe('Product — Rollout Manager', () => {
   it('creates rollout and checks user', () => {

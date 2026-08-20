@@ -15,7 +15,6 @@ import { ToolChainBuilder, buildToolChain } from '../src/product/toolChainBuilde
 import { ToolParallelizer, parallelizeTools } from '../src/product/toolParallelizer.js';
 import { ApprovalManager, createApproval } from '../src/product/approvalWorkflow.js';
 import { ContextPackBuilder, createContextPack } from '../src/product/contextPackBuilder.js';
-import { DevSandboxManager, createDevSandbox, getDevSandboxManager } from '../src/product/devSandbox.js';
 import { LongTermMemory, getLongTermMemory } from '../src/product/longTermMemory.js';
 
 /* ── ChunkingPipeline ───────────────────────────────────────────────── */
@@ -492,47 +491,7 @@ describe('ContextPackBuilder', () => {
   });
 });
 
-/* ── DevSandboxManager ──────────────────────────────────────────────── */
 
-describe('DevSandboxManager', () => {
-  it('creates and runs code in sandbox', () => {
-    const mgr = new DevSandboxManager();
-    const sb = mgr.createDevSandbox({ language: 'typescript', timeout: 5000 });
-    expect(sb.active).toBe(true);
-    const result = mgr.runCode(sb.id, 'console.log("hello")');
-    expect(result.output).toContain('typescript');
-    expect(result.hasErrors).toBe(false);
-  });
-
-  it('creates and rolls back snapshots', () => {
-    const mgr = new DevSandboxManager();
-    const sb = mgr.createDevSandbox();
-    mgr.setState(sb.id, 'counter', 1);
-    const snapshot = mgr.createSnapshot(sb.id, 'v1');
-    expect(snapshot).toBeDefined();
-    mgr.setState(sb.id, 'counter', 99);
-    expect(mgr.getState(sb.id)!.counter).toBe(99);
-    mgr.rollbackToSnapshot(sb.id, snapshot!.snapshotId);
-    expect(mgr.getState(sb.id)!.counter).toBe(1);
-  });
-
-  it('destroys sandbox', () => {
-    const mgr = new DevSandboxManager();
-    const sb = mgr.createDevSandbox();
-    expect(mgr.destroySandbox(sb.id)).toBe(true);
-    expect(mgr.inspectSandbox(sb.id)!.active).toBe(false);
-  });
-
-  it('backward-compat createDevSandbox function', () => {
-    const session = createDevSandbox();
-    expect(session.sessionId).toBeDefined();
-    expect(session.active).toBe(true);
-  });
-
-  it('singleton works', () => {
-    expect(getDevSandboxManager()).toBe(getDevSandboxManager());
-  });
-});
 
 /* ── LongTermMemory (enhanced) ──────────────────────────────────────── */
 

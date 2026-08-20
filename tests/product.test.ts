@@ -5,9 +5,6 @@ import {
   LoopDetector,
   Metering,
   withRetry,
-  generatePlan,
-  WorkflowEngine,
-  createBatchJob,
   chunkText,
   checkClarification,
 } from "../src/product/index.js";
@@ -136,69 +133,8 @@ describe("Product — withRetry", () => {
   });
 });
 
-describe("Product — generatePlan", () => {
-  test("generate plan for goal", () => {
-    const result = generatePlan("Deploy new feature");
-    expect(result).toBeDefined();
-    expect(typeof result.planId).toBe("string");
-    expect(result.goal).toBe("Deploy new feature");
-    expect(Array.isArray(result.steps)).toBe(true);
-    expect(typeof result.estimatedTotalMs).toBe("number");
-  });
 
-  test("simple goal", () => {
-    const result = generatePlan("Say hello");
-    expect(result.steps.length).toBeGreaterThanOrEqual(1);
-  });
 
-  test("empty goal", () => {
-    const result = generatePlan("");
-    expect(result).toBeDefined();
-  });
-});
-
-describe("Product — WorkflowEngine", () => {
-  test("create workflow", () => {
-    const engine = new WorkflowEngine();
-    const wf = engine.createWorkflow("test-wf", [
-      { name: "step1", action: "validate" },
-      { name: "step2", action: "execute" },
-    ]);
-    expect(wf).toBeDefined();
-  });
-
-  test("empty steps", () => {
-    const engine = new WorkflowEngine();
-    const wf = engine.createWorkflow("empty-wf", []);
-    expect(wf).toBeDefined();
-  });
-
-  test("single step", () => {
-    const engine = new WorkflowEngine();
-    const wf = engine.createWorkflow("single", [{ name: "only", action: "do" }]);
-    expect(wf).toBeDefined();
-  });
-});
-
-describe("Product — createBatchJob", () => {
-  test("create batch with items", () => {
-    const result = createBatchJob(["item1", "item2", "item3"]);
-    expect(result).toBeDefined();
-    expect(typeof result.jobId).toBe("string");
-    expect(result.items).toHaveLength(3);
-    expect(result.status).toBeDefined();
-  });
-
-  test("empty batch", () => {
-    const result = createBatchJob([]);
-    expect(result.items).toHaveLength(0);
-  });
-
-  test("single item", () => {
-    const result = createBatchJob(["only"]);
-    expect(result.items).toHaveLength(1);
-  });
-});
 
 describe("Product — chunkText", () => {
   test("chunk long text", () => {

@@ -17,14 +17,10 @@ export { LoopDetector } from './loopDetector.js';
 export type { LoopDetectionResult } from './loopDetector.js';
 export { withRetry } from './retryEngine.js';
 export type { RetryConfig, RetryResult } from './retryEngine.js';
-export { generatePlan } from './planGenerator.js';
-export type { PlanStep, Plan } from './planGenerator.js';
 export { checkContract } from './toolContract.js';
 export type { ToolContract, ContractCheckResult } from './toolContract.js';
 export { estimateCost, estimateBatchCost, compareModelCosts, getModelPricing, listModels, registerModelPricing } from './toolCostEstimator.js';
 export type { CostEstimate, ModelPricing, BatchCostEstimate } from './toolCostEstimator.js';
-export { WorkflowEngine } from './workflowEngine.js';
-export type { WorkflowStep, Workflow } from './workflowEngine.js';
 export { generateFix, generateFixPlan } from './fixGenerator.js';
 export type { Gap, Fix, FixPlan } from './fixGenerator.js';
 
@@ -174,8 +170,6 @@ export { ContextPackBuilder, createContextPack } from './contextPackBuilder.js';
 export type { ContextEntry, ContextPack, PackSummary } from './contextPackBuilder.js';
 
 // DevSandbox
-export { DevSandboxManager, createDevSandbox, getDevSandboxManager } from './devSandbox.js';
-export type { SandboxConfig, SandboxEvent, SandboxSnapshot, Sandbox, SandboxSession, ExecutionResult as SandboxExecutionResult } from './devSandbox.js';
 
 // LongTermMemory
 export { LongTermMemory, getLongTermMemory } from './longTermMemory.js';
@@ -214,5 +208,3 @@ export type {
 } from './clarificationOptimizer.js';
 
 // Batch job helpers
-export { createBatchJob } from './jobs.js';
-export type { BatchJob } from './jobs.js';

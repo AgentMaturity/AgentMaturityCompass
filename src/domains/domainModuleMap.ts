@@ -139,7 +139,6 @@ const PRODUCT_MODULE_KEYS: string[] = [
   "dataQuality",
   "dependencyGraph",
   "determinism",
-  "devSandbox",
   "docsIngestion",
   "documentAssembler",
   "errorTranslator",
@@ -153,7 +152,6 @@ const PRODUCT_MODULE_KEYS: string[] = [
   "goalTracker",
   "improvement",
   "instructionFormatter",
-  "jobs",
   "kbBuilder",
   "knowledgeGraph",
   "longTermMemory",
@@ -167,7 +165,6 @@ const PRODUCT_MODULE_KEYS: string[] = [
   "paramAutofiller",
   "persistence",
   "persona",
-  "planGenerator",
   "proactiveReminders",
   "promptModules",
   "reasoningCoach",
@@ -194,7 +191,6 @@ const PRODUCT_MODULE_KEYS: string[] = [
   "toolSemanticDocs",
   "versionControl",
   "whiteLabel",
-  "workflowEngine",
   "workflowTemplates",
   "agentPersonaSafety",
   "crossDomainPolicyRouter",
@@ -220,8 +216,10 @@ function humanizeModuleName(raw: string): string {
   return withSpaces.charAt(0).toUpperCase() + withSpaces.slice(1);
 }
 
-if (PRODUCT_MODULE_KEYS.length !== 90) {
-  throw new Error(`Expected 90 product modules, received ${PRODUCT_MODULE_KEYS.length}.`);
+// Count guard: keep in step with src/product. Four fabricating modules
+// (devSandbox, jobs, planGenerator, workflowEngine) were removed in G1-15.
+if (PRODUCT_MODULE_KEYS.length !== 86) {
+  throw new Error(`Expected 86 product modules, received ${PRODUCT_MODULE_KEYS.length}.`);
 }
 
 const PRODUCT_MODULES: ModuleDefinition[] = PRODUCT_MODULE_KEYS.map((key, index) => ({

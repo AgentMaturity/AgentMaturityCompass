@@ -359,8 +359,15 @@ export function cancelLabExperiment(experimentId: string): LabExperiment | null 
 // ---------------------------------------------------------------------------
 
 /**
- * Simulate running all probes for an experiment.
- * Uses deterministic scoring based on experiment/probe IDs for reproducibility.
+ * Produces DETERMINISTIC PLACEHOLDER results for an experiment's probes.
+ *
+ * No model is called. Scores are derived from a hash of the experiment/probe
+ * ids purely so repeated runs are reproducible — they are not measurements and
+ * must never be presented as model performance or used as evidence. Every
+ * result is tagged `metadata.simulated = true`.
+ *
+ * Use this to exercise the lab workflow (wiring, reporting, storage), not to
+ * evaluate a model.
  */
 export function simulateExperiment(experimentId: string): LabProbeResult[] {
   const experiment = getLabExperiment(experimentId);
