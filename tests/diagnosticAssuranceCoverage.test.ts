@@ -1,11 +1,12 @@
 import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { afterEach, describe, expect, test } from "vitest";
+import { afterAll, afterEach, beforeAll, describe, expect, test } from "vitest";
 import { initWorkspace } from "../src/workspace.js";
 import { compareModels, generateReport, loadRunReport, resolveRunReport, runDiagnostic } from "../src/diagnostic/runner.js";
 import { renderFailureRiskMarkdown, runFleetIndices, runIndicesForAgent } from "../src/assurance/indices.js";
 import { applyAssurancePatchKit, listAssuranceHistory, runAssurance, verifyAssuranceRun } from "../src/assurance/assuranceRunner.js";
+import { startFakeAgentServer, useFakeAgentEnv, type FakeAgentServer } from "./helpers/fakeAgentServer.js";
 
 const roots: string[] = [];
 
@@ -21,6 +22,22 @@ afterEach(() => {
     const dir = roots.pop();
     if (dir) rmSync(dir, { recursive: true, force: true });
   }
+});
+
+// Assurance scans invoke the real agent under test. These suites point that
+// target at a genuine local HTTP endpoint so the network + parsing path is
+// exercised; there is no synthetic responder in production code.
+let __fakeAgent: FakeAgentServer | undefined;
+let __restoreAgentEnv: (() => void) | undefined;
+
+beforeAll(async () => {
+  __fakeAgent = await startFakeAgentServer();
+  __restoreAgentEnv = useFakeAgentEnv(__fakeAgent.baseUrl);
+});
+
+afterAll(async () => {
+  __restoreAgentEnv?.();
+  await __fakeAgent?.close();
 });
 
 describe("diagnostic and assurance coverage expansion", () => {

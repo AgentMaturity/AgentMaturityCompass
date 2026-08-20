@@ -3,11 +3,12 @@ import type { IncomingMessage, ServerResponse } from "node:http";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { Readable } from "node:stream";
-import { afterEach, describe, expect, test } from "vitest";
+import { afterAll, afterEach, beforeAll, describe, expect, test } from "vitest";
 import { handleApiRoute } from "../src/api/index.js";
 import { assuranceReadinessGate } from "../src/assurance/assuranceControlPlane.js";
 import { listAssurancePacks } from "../src/assurance/packs/index.js";
 import { initWorkspace } from "../src/workspace.js";
+import { startFakeAgentServer, useFakeAgentEnv, type FakeAgentServer } from "./helpers/fakeAgentServer.js";
 
 interface MockResponseState {
   statusCode: number;
@@ -79,6 +80,22 @@ afterEach(() => {
       rmSync(dir, { recursive: true, force: true });
     }
   }
+});
+
+// Assurance scans invoke the real agent under test. These suites point that
+// target at a genuine local HTTP endpoint so the network + parsing path is
+// exercised; there is no synthetic responder in production code.
+let __fakeAgent: FakeAgentServer | undefined;
+let __restoreAgentEnv: (() => void) | undefined;
+
+beforeAll(async () => {
+  __fakeAgent = await startFakeAgentServer();
+  __restoreAgentEnv = useFakeAgentEnv(__fakeAgent.baseUrl);
+});
+
+afterAll(async () => {
+  __restoreAgentEnv?.();
+  await __fakeAgent?.close();
 });
 
 describe("assurance unification migration", () => {

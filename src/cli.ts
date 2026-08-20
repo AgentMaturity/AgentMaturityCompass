@@ -184,6 +184,7 @@ import { initCiForAgent, printCiSteps, runBundleGate } from "./ci/gate.js";
 import { applyArchetype, describeArchetype, listArchetypes, previewArchetypeApply } from "./archetypes/index.js";
 import { exportBadge, exportPolicyPack } from "./exports/policyExport.js";
 import { applyAssurancePatchKit, listAssuranceHistory, runAssurance, verifyAssuranceRun } from "./assurance/assuranceRunner.js";
+import { AgentResponderUnavailableError } from "./assurance/agentResponder.js";
 import { getAssurancePack, listAssurancePacks } from "./assurance/packs/index.js";
 import { registerMirofishCommands } from "./mirofish/cli.js";
 import { issueCertificate, inspectCertificate, revokeCertificate, verifyCertificate, verifyRevocation } from "./assurance/certificate.js";
@@ -10878,6 +10879,7 @@ assurance
   .option("--out <path>", "output markdown path")
   .option("--format <format>", "output format: text|sarif", "text")
   .option("--verbose", "show full scenario-level detail with payloads and reasons", false)
+  .option("--model <modelId>", "model id of the agent under test (or set AMC_ASSURANCE_MODEL)")
   .option("--no-sign", "skip vault/artifact signing (packs still run)")
   .action(
     async (opts: {
@@ -10893,6 +10895,7 @@ assurance
       window: string;
       windowDays?: string;
       out?: string;
+      model?: string;
       sign: boolean; // Commander inverts --no-sign to sign=false
     }) => {
       // Non-TTY detection: assurance run needs agent ID. If missing and non-interactive, exit cleanly.
@@ -10941,17 +10944,33 @@ assurance
       if (demoPackIds) {
         console.log(chalk.gray(`Demo mode: running curated assurance packs: ${demoPackIds.join(", ")}`));
       }
-      const report = await runAssurance({
-        workspace: process.cwd(),
-        agentId: opts.id ?? opts.agent ?? activeAgent(program),
-        packId: opts.pack,
-        packIds: demoPackIds,
-        runAll: opts.all,
-        mode: opts.mode,
-        window: opts.window,
-        outputMarkdownPath: opts.out ? resolve(process.cwd(), opts.out) : undefined,
-        noSign
-      });
+      let report: Awaited<ReturnType<typeof runAssurance>>;
+      try {
+        report = await runAssurance({
+          workspace: process.cwd(),
+          agentId: opts.id ?? opts.agent ?? activeAgent(program),
+          packId: opts.pack,
+          packIds: demoPackIds,
+          runAll: opts.all,
+          mode: opts.mode,
+          window: opts.window,
+          outputMarkdownPath: opts.out ? resolve(process.cwd(), opts.out) : undefined,
+          noSign,
+          model: opts.model
+        });
+      } catch (error) {
+        if (noSign) delete process.env.AMC_NO_SIGN;
+        // Fail closed: without a real agent to scan, emitting a score would
+        // fabricate a result. Explain how to provide a target instead.
+        if (error instanceof AgentResponderUnavailableError) {
+          console.error(chalk.red("Assurance scan aborted — no agent under test was reachable."));
+          console.error(chalk.gray(`Reason: ${error.reason}`));
+          console.error(chalk.cyan(`Fix: ${error.remediation}`));
+          process.exitCode = 2;
+          return;
+        }
+        throw error;
+      }
       if (noSign) delete process.env.AMC_NO_SIGN;
       // SARIF output
       if (opts.format === "sarif") {

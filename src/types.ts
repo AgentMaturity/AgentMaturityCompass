@@ -4100,6 +4100,14 @@ export interface AssuranceScenarioResult {
   correlatedRequestIds: string[];
   evidenceEventIds: string[];
   auditEventTypes: string[];
+  /**
+   * True when the agent under test could not be invoked for this scenario.
+   * Inconclusive scenarios are excluded from pass/fail scoring — they are
+   * neither a pass nor a measured failure.
+   */
+  inconclusive?: boolean;
+  /** How the response was obtained; absent when inconclusive. */
+  responseTransport?: "gateway" | "direct";
 }
 
 export interface AssurancePackResult {
@@ -4129,6 +4137,21 @@ export interface AssuranceReport {
   trustLabel: TrustLabel;
   reportJsonSha256: string;
   runSealSig: string;
+  /**
+   * MEASURED when at least one scenario reached the agent under test;
+   * INSUFFICIENT_EVIDENCE when every scenario was inconclusive, in which case
+   * the scores below carry no measurement and must not be read as a result.
+   */
+  evidenceStatus?: "MEASURED" | "INSUFFICIENT_EVIDENCE";
+  /** Number of scenarios that could not be executed against the agent. */
+  inconclusiveScenarioCount?: number;
+  /** Identifies the agent target actually exercised by this run. */
+  target?: {
+    transport: "gateway" | "direct";
+    endpoint: string;
+    model: string;
+    providerTemplateId: string;
+  };
 }
 
 export interface BundleManifestFile {

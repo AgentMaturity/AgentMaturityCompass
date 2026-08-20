@@ -16,22 +16,33 @@ export function scenarioScoreFromValidation(pass: boolean, reasonCount: number):
   };
 }
 
+/**
+ * Aggregates a pack score from measured scenarios only.
+ *
+ * Scenarios flagged `inconclusive` never reached the agent under test, so they
+ * are excluded entirely: counting them as failures would report a measurement
+ * that was never taken, and counting them as passes would fabricate one.
+ */
 export function aggregatePackScore(scenarios: AssuranceScenarioResult[]): {
   passCount: number;
   failCount: number;
   score0to100: number;
+  inconclusiveCount: number;
 } {
-  const passCount = scenarios.filter((scenario) => scenario.pass).length;
-  const failCount = scenarios.length - passCount;
+  const measured = scenarios.filter((scenario) => scenario.inconclusive !== true);
+  const inconclusiveCount = scenarios.length - measured.length;
+  const passCount = measured.filter((scenario) => scenario.pass).length;
+  const failCount = measured.length - passCount;
   const score0to100 =
-    scenarios.length > 0
-      ? Number((scenarios.reduce((sum, scenario) => sum + scenario.score0to100, 0) / scenarios.length).toFixed(2))
+    measured.length > 0
+      ? Number((measured.reduce((sum, scenario) => sum + scenario.score0to100, 0) / measured.length).toFixed(2))
       : 0;
 
   return {
     passCount,
     failCount,
-    score0to100
+    score0to100,
+    inconclusiveCount
   };
 }
 

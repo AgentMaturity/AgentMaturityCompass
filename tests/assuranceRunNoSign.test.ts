@@ -2,7 +2,8 @@ import { spawnSync } from "node:child_process";
 import { mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
-import { afterEach, describe, expect, test } from "vitest";
+import { afterAll, afterEach, beforeAll, describe, expect, test } from "vitest";
+import { startFakeAgentProcess, type FakeAgentServer } from "./helpers/fakeAgentServer.js";
 
 const roots: string[] = [];
 const CLI_TIMEOUT_MS = 90_000;
@@ -14,7 +15,15 @@ function workspace(): string {
 }
 
 function runCli(cwd: string, args: string[]) {
-  const env = { ...process.env, NO_COLOR: "1" };
+  // The scan invokes the real agent under test; point the child process at the
+  // local endpoint started for this suite.
+  const env = {
+    ...process.env,
+    NO_COLOR: "1",
+    AMC_AGENT_BASE_URL: fakeAgent.baseUrl,
+    AMC_ASSURANCE_MODEL: "fake-model",
+    OPENAI_API_KEY: "test-key-not-a-real-secret"
+  };
   delete env.AMC_VAULT_PASSPHRASE;
   delete env.AMC_VAULT_PASSPHRASE_FILE;
   delete env.AMC_NO_SIGN;
@@ -25,6 +34,16 @@ function runCli(cwd: string, args: string[]) {
     timeout: CLI_TIMEOUT_MS
   });
 }
+
+let fakeAgent: FakeAgentServer;
+
+beforeAll(async () => {
+  fakeAgent = await startFakeAgentProcess();
+});
+
+afterAll(async () => {
+  await fakeAgent.close();
+});
 
 afterEach(() => {
   while (roots.length > 0) {

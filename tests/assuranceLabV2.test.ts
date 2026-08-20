@@ -2,7 +2,7 @@ import { createServer as createHttpServer, request as httpRequest } from "node:h
 import { mkdtempSync, rmSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
-import { afterEach, describe, expect, test } from "vitest";
+import { afterAll, afterEach, beforeAll, describe, expect, test } from "vitest";
 import { initWorkspace } from "../src/workspace.js";
 import { canonicalize } from "../src/utils/json.js";
 import { assuranceReadinessGate, assuranceRunForApi } from "../src/assurance/assuranceControlPlane.js";
@@ -11,6 +11,7 @@ import { readUtf8 } from "../src/utils/fs.js";
 import { sha256Hex } from "../src/utils/hash.js";
 import { runStudioForeground } from "../src/studio/studioSupervisor.js";
 import { initGatewayConfig } from "../src/gateway/config.js";
+import { startFakeAgentServer, useFakeAgentEnv, type FakeAgentServer } from "./helpers/fakeAgentServer.js";
 
 const roots: string[] = [];
 const previousVaultPassphrase = process.env.AMC_VAULT_PASSPHRASE;
@@ -101,6 +102,22 @@ afterEach(() => {
   } else {
     delete process.env.AMC_VAULT_PASSPHRASE;
   }
+});
+
+// Assurance scans invoke the real agent under test. These suites point that
+// target at a genuine local HTTP endpoint so the network + parsing path is
+// exercised; there is no synthetic responder in production code.
+let __fakeAgent: FakeAgentServer | undefined;
+let __restoreAgentEnv: (() => void) | undefined;
+
+beforeAll(async () => {
+  __fakeAgent = await startFakeAgentServer();
+  __restoreAgentEnv = useFakeAgentEnv(__fakeAgent.baseUrl);
+});
+
+afterAll(async () => {
+  __restoreAgentEnv?.();
+  await __fakeAgent?.close();
 });
 
 describe("assurance lab v2", () => {
