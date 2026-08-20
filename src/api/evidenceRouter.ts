@@ -391,13 +391,17 @@ export async function handleEvidenceRoute(
   // POST /api/v1/evidence/attest — attest an ingest session
   if (pathname === '/api/v1/evidence/attest' && method === 'POST') {
     try {
-      const body = await bodyJson<{ agentId?: string; ingestSessionId: string }>(req);
+      const body = await bodyJson<{ agentId?: string; ingestSessionId: string; attestedBy?: string; statement?: string }>(req);
       if (!body.ingestSessionId) { apiError(res, 400, 'ingestSessionId required'); return true; }
+      // ATTESTED means a named party vouches for the content.
+      if (!body.attestedBy || !body.statement) { apiError(res, 400, 'attestedBy and statement are required to attest'); return true; }
       const { attestIngestSession } = await import('../ingest/ingest.js');
       const result = attestIngestSession({
         workspace,
         agentId: body.agentId ?? 'default',
         ingestSessionId: body.ingestSessionId,
+        attestedBy: body.attestedBy,
+        statement: body.statement,
       });
       apiSuccess(res, { attested: true, ...result });
     } catch (err) {

@@ -10,7 +10,7 @@ export { detonateAttachment } from './attachmentDetonation.js';
 export type { DetonationResult } from './attachmentDetonation.js';
 export { quarantineCheck } from './downloadQuarantine.js';
 export type { QuarantineResult } from './downloadQuarantine.js';
-export { checkIntegrity } from './conversationIntegrity.js';
+export { checkIntegrity, recordIntegrity } from './conversationIntegrity.js';
 export type { IntegrityResult } from './conversationIntegrity.js';
 export { checkThreatIntel, getStats as getThreatIntelStats } from './threatIntel.js';
 export type { ThreatMatch, ThreatIntelResult } from './threatIntel.js';

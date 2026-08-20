@@ -5,6 +5,7 @@ import {
   generateSbom,
   checkReputation,
   checkIntegrity,
+  recordIntegrity,
   checkThreatIntel,
   validateManifest,
   sanitize,
@@ -108,28 +109,35 @@ describe("Shield — checkReputation", () => {
 });
 
 describe("Shield — checkIntegrity", () => {
-  test("valid message chain", () => {
+  test("verifies a message chain against its baseline", () => {
     const messages = [
       { role: "user", content: "Hello" },
       { role: "assistant", content: "Hi there" },
     ];
-    const result = checkIntegrity(messages);
-    expect(result).toBeDefined();
-    expect(typeof result.valid).toBe("boolean");
+    const baseline = recordIntegrity(messages);
+    const result = checkIntegrity(messages, baseline);
+    expect(result.valid).toBe(true);
+    expect(result.verified).toBe(true);
     expect(Array.isArray(result.tamperedTurns)).toBe(true);
     expect(typeof result.hash).toBe("string");
   });
 
+  test("without a baseline nothing is verified", () => {
+    // Previously this returned valid: true, so an unverified conversation was
+    // indistinguishable from a verified one.
+    const result = checkIntegrity([{ role: "user", content: "Hello" }]);
+    expect(result.valid).toBeNull();
+    expect(result.verified).toBe(false);
+  });
+
   test("empty messages", () => {
-    const result = checkIntegrity([]);
-    expect(result).toBeDefined();
+    const result = checkIntegrity([], recordIntegrity([]));
     expect(result.valid).toBe(true);
     expect(result.tamperedTurns).toHaveLength(0);
   });
 
   test("single message", () => {
     const result = checkIntegrity([{ role: "user", content: "Test" }]);
-    expect(result).toBeDefined();
     expect(result.hash).toBeDefined();
   });
 });

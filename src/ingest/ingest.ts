@@ -108,15 +108,39 @@ function payloadForEvent(workspace: string, event: { payload_inline: string | nu
   return "";
 }
 
+/**
+ * Records a human or system attestation over an ingest session.
+ *
+ * ATTESTED means "a named party vouches for this content". Previously this
+ * function re-appended the identical, unverified payloads with
+ * trustTier: "ATTESTED" and no attester at all, so the tier upgrade asserted
+ * that someone had vouched when nobody had — and the audit event claimed
+ * OBSERVED, a tier reserved for evidence AMC captured itself.
+ *
+ * The attester and their statement are now required and recorded, so the
+ * upgrade is traceable to whoever made the claim.
+ */
 export function attestIngestSession(params: {
   workspace: string;
   ingestSessionId: string;
   agentId?: string;
+  /** Identity of the party vouching for this content (person or system id). */
+  attestedBy: string;
+  /** What they are attesting to (e.g. provenance of the exported logs). */
+  statement: string;
 }): {
   attestedEventCount: number;
   bundleHash: string;
 } {
   const workspace = params.workspace;
+  const attestedBy = params.attestedBy?.trim() ?? "";
+  const statement = params.statement?.trim() ?? "";
+  if (attestedBy.length === 0 || statement.length === 0) {
+    throw new Error(
+      "Attestation requires attestedBy and statement: ATTESTED means a named party vouches for the content, " +
+        "and re-signing unverified payloads without naming an attester would upgrade trust on nobody's word."
+    );
+  }
   const agentId = resolveAgentId(workspace, params.agentId);
   const ledger = openLedger(workspace);
   try {
@@ -153,7 +177,9 @@ export function attestIngestSession(params: {
           source: "attested_ingest",
           agentId,
           ingestSessionId: params.ingestSessionId,
-          originalEventId: event.id
+          originalEventId: event.id,
+          attestedBy,
+          attestationStatement: statement
         }
       });
     }
@@ -177,7 +203,11 @@ export function attestIngestSession(params: {
         ingestSessionId: params.ingestSessionId,
         bundleHash,
         signature: attestationSig,
-        trustTier: "OBSERVED",
+        attestedBy,
+        attestationStatement: statement,
+        // A vouched-for import is ATTESTED. OBSERVED is reserved for evidence
+        // AMC captured itself.
+        trustTier: "ATTESTED",
         agentId
       }
     });

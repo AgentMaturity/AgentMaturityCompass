@@ -253,7 +253,9 @@ describe("fleet mode and trust tiers", () => {
     const attested = attestIngestSession({
       workspace,
       ingestSessionId: ingested.ingestSessionId,
-      agentId: "default"
+      agentId: "default",
+      attestedBy: "auditor@example.com",
+      statement: "Verified provenance of exported logs for this test."
     });
     expect(attested.attestedEventCount).toBeGreaterThan(0);
 

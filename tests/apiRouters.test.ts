@@ -1670,7 +1670,7 @@ describe("AMC API routers", () => {
       ["/api/v1/evidence/ingest", "POST", { agentId: "default", type: "generic_text", content: "hello" }],
       ["/api/v1/evidence/collect", "POST", { agentId: "default", inputPath: ".", type: "generic_text" }],
       ["/api/v1/evidence/export", "GET", undefined],
-      ["/api/v1/evidence/attest", "POST", { agentId: "default", ingestSessionId: "ingest-1" }],
+      ["/api/v1/evidence/attest", "POST", { agentId: "default", ingestSessionId: "ingest-1", attestedBy: "auditor@example.com", statement: "verified provenance" }],
       ["/api/v1/evidence/bundle", "POST", { agentId: "default", runId: "run-1" }]
     ] as const;
     for (const [pathname, method, body] of cases) {

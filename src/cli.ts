@@ -15329,12 +15329,16 @@ program
   .command("attest")
   .description("Auditor-attest an ingest session to upgrade trust tier to ATTESTED")
   .requiredOption("--ingest-session <id>", "ingest session ID")
+  .requiredOption("--attested-by <identity>", "who is vouching for this content (person or system id)")
+  .requiredOption("--statement <text>", "what is being attested (e.g. provenance of the exported logs)")
   .option("--agent <agentId>", "agent ID (overrides global --agent)")
-  .action((opts: { ingestSession: string; agent?: string }) => {
+  .action((opts: { ingestSession: string; agent?: string; attestedBy: string; statement: string }) => {
     const attested = attestIngestSession({
       workspace: process.cwd(),
       ingestSessionId: opts.ingestSession,
-      agentId: opts.agent ?? activeAgent(program)
+      agentId: opts.agent ?? activeAgent(program),
+      attestedBy: opts.attestedBy,
+      statement: opts.statement
     });
     console.log(chalk.green(`Attested events: ${attested.attestedEventCount}`));
     console.log(`Bundle hash: ${attested.bundleHash}`);
