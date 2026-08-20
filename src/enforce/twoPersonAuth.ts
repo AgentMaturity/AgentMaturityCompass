@@ -59,6 +59,7 @@ const defaultAuth = new TwoPersonAuth();
 
 export function checkTwoPersonApproval(approvals: string[]): TwoPersonResult {
   const unique = new Set(approvals).size;
-  emitGuardEvent({ agentId: 'system', moduleCode: 'E19', decision: 'allow', reason: 'E19 decision', severity: 'high' });
+    const __e19Allowed = unique >= 2;
+  emitGuardEvent({ agentId: 'system', moduleCode: 'E19', severity: 'high', decision: __e19Allowed ? 'allow' : 'deny', reason: `E19 ${__e19Allowed ? 'allowed' : 'denied'}` });
   return { approved: unique >= 2, approvals: unique, required: 2 };
 }

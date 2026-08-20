@@ -29,6 +29,7 @@ export function checkNumeric(value: number, opts: {
     if (value < 0) flags.push('Negative currency value');
   }
 
-  emitGuardEvent({ agentId: 'system', moduleCode: 'E23', decision: 'allow', reason: 'E23 decision', severity: 'medium' });
+    const __e23Allowed = flags.length === 0;
+  emitGuardEvent({ agentId: 'system', moduleCode: 'E23', severity: 'medium', decision: __e23Allowed ? 'allow' : 'deny', reason: `E23 ${__e23Allowed ? 'allowed' : 'denied'}` });
   return { valid: flags.length === 0, flags };
 }

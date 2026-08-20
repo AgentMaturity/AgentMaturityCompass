@@ -23,6 +23,6 @@ export function fingerprint(sessionData: Record<string, unknown>): FingerprintRe
   const sorted = JSON.stringify(sessionData, Object.keys(sessionData).sort());
   const fp = createHash('sha256').update(sorted).digest('hex').slice(0, 16);
 
-  emitGuardEvent({ agentId: 'system', moduleCode: 'S16', decision: 'allow', reason: 'S16 decision', severity: 'medium' });
+  emitGuardEvent({ agentId: 'system', moduleCode: 'S16', decision: 'allow', reason: 'S16 observation (no allow/deny decision was made here)', severity: 'medium' });
   return { sessionId, fingerprint: fp, anomalies };
 }

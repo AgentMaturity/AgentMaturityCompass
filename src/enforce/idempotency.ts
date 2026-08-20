@@ -46,6 +46,7 @@ const defaultStore = new IdempotencyStore();
 export function checkIdempotency(workflowId: string, action: string, params: Record<string, unknown>): IdempotencyCheck {
   const key = `${workflowId}:${action}:${JSON.stringify(params)}`;
   const { found, result } = defaultStore.check(key);
-  emitGuardEvent({ agentId: 'system', moduleCode: 'E29', decision: 'deny', reason: 'E29 decision', severity: 'low' });
+    const __e29Allowed = !found;
+  emitGuardEvent({ agentId: 'system', moduleCode: 'E29', severity: 'low', decision: __e29Allowed ? 'allow' : 'deny', reason: `E29 ${__e29Allowed ? 'allowed' : 'denied'}` });
   return { canProceed: !found, existingResult: result, key };
 }

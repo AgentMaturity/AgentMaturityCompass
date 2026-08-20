@@ -69,6 +69,7 @@ const defaultManager = new WatchdogManager();
 
 export function watchdogReview(toolName: string, _params: Record<string, unknown>): WatchdogDecision {
   const highRisk = ['send_payment', 'delete', 'deploy'].includes(toolName);
-  emitGuardEvent({ agentId: 'system', moduleCode: 'E33', decision: 'deny', reason: 'E33 decision', severity: 'high' });
+    const __e33Allowed = !highRisk;
+  emitGuardEvent({ agentId: 'system', moduleCode: 'E33', severity: 'high', decision: __e33Allowed ? 'allow' : 'deny', reason: `E33 ${__e33Allowed ? 'allowed' : 'denied'}` });
   return { approved: !highRisk, requiresEvidence: highRisk, riskScore: highRisk ? 85 : 20 };
 }

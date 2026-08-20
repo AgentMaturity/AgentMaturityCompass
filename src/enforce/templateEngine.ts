@@ -29,7 +29,7 @@ export function renderTemplate(template: string, vars: Record<string, string>, p
   for (const m of matches) {
     const varName = m[1]!.trim();
     if (DANGEROUS_VARS.includes(varName)) {
-      emitGuardEvent({ agentId: 'system', moduleCode: 'E32', decision: 'allow', reason: 'E32 decision', severity: 'low' });
+      emitGuardEvent({ agentId: 'system', moduleCode: 'E32', decision: 'allow', reason: 'E32 observation (no allow/deny decision was made here)', severity: 'low' });
       return { rendered: '', variablesUsed: [], warnings: [`Blocked: dangerous variable reference {{${varName}}}`], blocked: true };
     }
   }
@@ -63,6 +63,6 @@ export function renderTemplate(template: string, vars: Record<string, string>, p
     warnings.push('Output truncated to max length');
   }
 
-  emitGuardEvent({ agentId: 'system', moduleCode: 'E32', decision: 'allow', reason: 'E32 decision', severity: 'low' });
+  emitGuardEvent({ agentId: 'system', moduleCode: 'E32', decision: 'allow', reason: 'E32 observation (no allow/deny decision was made here)', severity: 'low' });
   return { rendered, variablesUsed, warnings, blocked: false };
 }

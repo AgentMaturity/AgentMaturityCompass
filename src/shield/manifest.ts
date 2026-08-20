@@ -51,9 +51,9 @@ export function validateManifest(manifest: SkillManifest): ManifestValidation {
     }
   }
 
-  emitGuardEvent({ agentId: 'system', moduleCode: 'S6', decision: 'allow', reason: 'S6 decision', severity: 'medium' });
-  return {
-    valid: errors.length === 0,
+    const __s6Allowed = errors.length === 0;
+  emitGuardEvent({ agentId: 'system', moduleCode: 'S6', severity: 'medium', decision: __s6Allowed ? 'allow' : 'deny', reason: `S6 ${__s6Allowed ? 'allowed' : 'denied'}` });
+  return { valid: errors.length === 0,
     errors,
     warnings,
     permissions,

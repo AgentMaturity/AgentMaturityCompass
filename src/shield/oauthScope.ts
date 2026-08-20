@@ -55,9 +55,9 @@ export function checkOAuthScopes(requested: string[], allowed: string[]): OAuthS
     }
   }
 
-  emitGuardEvent({ agentId: 'system', moduleCode: 'S12', decision: 'allow', reason: 'S12 decision', severity: 'medium' });
-  return {
-    valid: denied.length === 0,
+    const __s12Allowed = denied.length === 0;
+  emitGuardEvent({ agentId: 'system', moduleCode: 'S12', severity: 'medium', decision: __s12Allowed ? 'allow' : 'deny', reason: `S12 ${__s12Allowed ? 'allowed' : 'denied'}` });
+  return { valid: denied.length === 0,
     granted,
     denied,
     excessive,

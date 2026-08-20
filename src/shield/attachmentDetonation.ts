@@ -46,6 +46,6 @@ export function detonateAttachment(filename: string, content: string): Detonatio
   if (/MZ[\x90\x00]/.test(content)) threats.push('PE executable signature');
 
   const safe = threats.length === 0;
-  emitGuardEvent({ agentId: 'system', moduleCode: 'S11', decision: 'allow', reason: 'S11 decision', severity: 'high' });
+  emitGuardEvent({ agentId: 'system', moduleCode: 'S11', decision: 'allow', reason: 'S11 observation (no allow/deny decision was made here)', severity: 'high' });
   return { safe, mimeType: getMimeType(filename), threats, quarantined: !safe };
 }

@@ -24,19 +24,22 @@ export function checkTemporalAccess(action: string, policy: TemporalPolicy): Tem
     const { start, end } = policy.allowedHours;
     if (start < end) {
       if (hour < start || hour >= end) {
-        emitGuardEvent({ agentId: 'system', moduleCode: 'E27', decision: 'allow', reason: 'E27 decision', severity: 'medium' });
+                const __e27Allowed = false;
+        emitGuardEvent({ agentId: 'system', moduleCode: 'E27', severity: 'medium', decision: __e27Allowed ? 'allow' : 'deny', reason: `E27 ${__e27Allowed ? 'allowed' : 'denied'}` });
         return { allowed: false, reason: `Outside allowed hours (${start}-${end})`, nextAllowedTime: start };
       }
     } else {
       if (hour < start && hour >= end) {
-        emitGuardEvent({ agentId: 'system', moduleCode: 'E27', decision: 'allow', reason: 'E27 decision', severity: 'medium' });
+                const __e27Allowed = false;
+        emitGuardEvent({ agentId: 'system', moduleCode: 'E27', severity: 'medium', decision: __e27Allowed ? 'allow' : 'deny', reason: `E27 ${__e27Allowed ? 'allowed' : 'denied'}` });
         return { allowed: false, reason: `Outside allowed hours (${start}-${end} wrap)`, nextAllowedTime: start };
       }
     }
   }
 
   if (policy.allowedDays && !policy.allowedDays.includes(day)) {
-    emitGuardEvent({ agentId: 'system', moduleCode: 'E27', decision: 'allow', reason: 'E27 decision', severity: 'medium' });
+        const __e27Allowed = false;
+    emitGuardEvent({ agentId: 'system', moduleCode: 'E27', severity: 'medium', decision: __e27Allowed ? 'allow' : 'deny', reason: `E27 ${__e27Allowed ? 'allowed' : 'denied'}` });
     return { allowed: false, reason: `Day ${day} not in allowed days` };
   }
 
@@ -44,7 +47,8 @@ export function checkTemporalAccess(action: string, policy: TemporalPolicy): Tem
     const ts = now.getTime();
     for (const w of policy.maintenanceWindows) {
       if (ts >= w.start && ts <= w.end) {
-        emitGuardEvent({ agentId: 'system', moduleCode: 'E27', decision: 'allow', reason: 'E27 decision', severity: 'medium' });
+                const __e27Allowed = false;
+        emitGuardEvent({ agentId: 'system', moduleCode: 'E27', severity: 'medium', decision: __e27Allowed ? 'allow' : 'deny', reason: `E27 ${__e27Allowed ? 'allowed' : 'denied'}` });
         return { allowed: false, reason: 'Within maintenance window' };
       }
     }
@@ -54,12 +58,14 @@ export function checkTemporalAccess(action: string, policy: TemporalPolicy): Tem
     const lastExec = cooldownTracker.get(action);
     if (lastExec && (now.getTime() - lastExec) < policy.cooldownMs) {
       const remaining = policy.cooldownMs - (now.getTime() - lastExec);
-      emitGuardEvent({ agentId: 'system', moduleCode: 'E27', decision: 'allow', reason: 'E27 decision', severity: 'medium' });
+            const __e27Allowed = false;
+      emitGuardEvent({ agentId: 'system', moduleCode: 'E27', severity: 'medium', decision: __e27Allowed ? 'allow' : 'deny', reason: `E27 ${__e27Allowed ? 'allowed' : 'denied'}` });
       return { allowed: false, reason: `Cooldown active, ${remaining}ms remaining` };
     }
     cooldownTracker.set(action, now.getTime());
   }
 
-  emitGuardEvent({ agentId: 'system', moduleCode: 'E27', decision: 'allow', reason: 'E27 decision', severity: 'medium' });
+    const __e27Allowed = true;
+  emitGuardEvent({ agentId: 'system', moduleCode: 'E27', severity: 'medium', decision: __e27Allowed ? 'allow' : 'deny', reason: `E27 ${__e27Allowed ? 'allowed' : 'denied'}` });
   return { allowed: true, reason: 'Within allowed temporal window' };
 }

@@ -23,19 +23,22 @@ export function validateProxyRequest(req: ProxyRequest): ProxyGuardResult {
   try {
     hostname = new URL(req.url).hostname;
   } catch {
-    emitGuardEvent({ agentId: 'system', moduleCode: 'E12', decision: 'allow', reason: 'E12 decision', severity: 'medium' });
+        const __e12Allowed = false;
+    emitGuardEvent({ agentId: 'system', moduleCode: 'E12', severity: 'medium', decision: __e12Allowed ? 'allow' : 'deny', reason: `E12 ${__e12Allowed ? 'allowed' : 'denied'}` });
     return { allowed: false, upstream: req.url, headers: {}, reason: 'Invalid URL', findings: ['Invalid URL'] };
   }
 
   if (INTERNAL_RANGES.test(hostname)) {
     findings.push('SSRF: targets internal IP');
-    emitGuardEvent({ agentId: 'system', moduleCode: 'E12', decision: 'allow', reason: 'E12 decision', severity: 'medium' });
+        const __e12Allowed = false;
+    emitGuardEvent({ agentId: 'system', moduleCode: 'E12', severity: 'medium', decision: __e12Allowed ? 'allow' : 'deny', reason: `E12 ${__e12Allowed ? 'allowed' : 'denied'}` });
     return { allowed: false, upstream: hostname, headers: {}, reason: 'Internal IP blocked', findings };
   }
 
   if (CLOUD_METADATA.includes(hostname)) {
     findings.push('SSRF: targets cloud metadata endpoint');
-    emitGuardEvent({ agentId: 'system', moduleCode: 'E12', decision: 'allow', reason: 'E12 decision', severity: 'medium' });
+        const __e12Allowed = false;
+    emitGuardEvent({ agentId: 'system', moduleCode: 'E12', severity: 'medium', decision: __e12Allowed ? 'allow' : 'deny', reason: `E12 ${__e12Allowed ? 'allowed' : 'denied'}` });
     return { allowed: false, upstream: hostname, headers: {}, reason: 'Cloud metadata blocked', findings };
   }
 
@@ -56,9 +59,9 @@ export function validateProxyRequest(req: ProxyRequest): ProxyGuardResult {
     } catch { /* ignore */ }
   }
 
-  emitGuardEvent({ agentId: 'system', moduleCode: 'E12', decision: 'allow', reason: 'E12 decision', severity: 'medium' });
-  return {
-    allowed: findings.length === 0, upstream: hostname,
+    const __e12Allowed = findings.length === 0;
+  emitGuardEvent({ agentId: 'system', moduleCode: 'E12', severity: 'medium', decision: __e12Allowed ? 'allow' : 'deny', reason: `E12 ${__e12Allowed ? 'allowed' : 'denied'}` });
+  return { allowed: findings.length === 0, upstream: hostname,
     headers: { 'X-Forwarded-By': 'amc-proxy-guard' },
     reason: findings.length > 0 ? findings.join('; ') : undefined,
     findings,
@@ -67,9 +70,9 @@ export function validateProxyRequest(req: ProxyRequest): ProxyGuardResult {
 
 export function checkProxy(upstream: string): ProxyGuardResult {
   const blocked = upstream.includes('localhost') || upstream.includes('127.0.0.1') || upstream.includes('169.254.');
-  emitGuardEvent({ agentId: 'system', moduleCode: 'E12', decision: 'allow', reason: 'E12 decision', severity: 'medium' });
-  return {
-    allowed: !blocked, upstream,
+    const __e12Allowed = !blocked;
+  emitGuardEvent({ agentId: 'system', moduleCode: 'E12', severity: 'medium', decision: __e12Allowed ? 'allow' : 'deny', reason: `E12 ${__e12Allowed ? 'allowed' : 'denied'}` });
+  return { allowed: !blocked, upstream,
     headers: { 'X-Forwarded-By': 'amc-proxy-guard' },
     findings: blocked ? ['Blocked internal upstream'] : [],
   };

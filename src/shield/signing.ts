@@ -20,7 +20,7 @@ export function generateKeyPair(): { publicKey: KeyObject; privateKey: KeyObject
 export function signSkill(skillCode: string, privateKey: KeyObject): SignResult {
   const data = Buffer.from(skillCode, 'utf-8');
   const signature = sign(null, data, privateKey);
-  emitGuardEvent({ agentId: 'system', moduleCode: 'S3', decision: 'allow', reason: 'S3 decision', severity: 'high' });
+  emitGuardEvent({ agentId: 'system', moduleCode: 'S3', decision: 'allow', reason: 'S3 observation (no allow/deny decision was made here)', severity: 'high' });
   return {
     signature,
     signedAt: new Date().toISOString(),
@@ -31,7 +31,7 @@ export function signSkill(skillCode: string, privateKey: KeyObject): SignResult 
 export function verifySkill(skillCode: string, signature: Buffer, publicKey: KeyObject): VerifyResult {
   const data = Buffer.from(skillCode, 'utf-8');
   const valid = verify(null, data, publicKey, signature);
-  emitGuardEvent({ agentId: 'system', moduleCode: 'S3', decision: 'allow', reason: 'S3 decision', severity: 'high' });
+  emitGuardEvent({ agentId: 'system', moduleCode: 'S3', decision: 'allow', reason: 'S3 observation (no allow/deny decision was made here)', severity: 'high' });
   return {
     valid,
     algorithm: 'ed25519',

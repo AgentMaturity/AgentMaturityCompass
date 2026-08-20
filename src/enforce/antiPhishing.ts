@@ -56,7 +56,8 @@ export function checkApprovalRequest(request: ApprovalCheckRequest): PhishingRes
   if (/-(login|signin|verify|secure|update)/i.test(text)) indicators.push('Suspicious keywords');
 
   const confidence = Math.min(indicators.length * 0.2, 1);
-  emitGuardEvent({ agentId: 'system', moduleCode: 'E16', decision: 'deny', reason: 'E16 decision', severity: 'high' });
+    const __e16Allowed = !(indicators.length >= 2);
+  emitGuardEvent({ agentId: 'system', moduleCode: 'E16', severity: 'high', decision: __e16Allowed ? 'allow' : 'deny', reason: `E16 ${__e16Allowed ? 'allowed' : 'denied'}` });
   return { isPhishing: indicators.length >= 2, indicators, confidence };
 }
 

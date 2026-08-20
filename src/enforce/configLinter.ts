@@ -52,6 +52,7 @@ export function lintConfig(config: Record<string, unknown>): LintResult {
   for (const f of findings) riskScore += weights[f.severity];
   riskScore = Math.min(100, riskScore);
 
-  emitGuardEvent({ agentId: 'system', moduleCode: 'E25', decision: 'allow', reason: 'E25 decision', severity: 'low' });
+    const __e25Allowed = findings.length === 0;
+  emitGuardEvent({ agentId: 'system', moduleCode: 'E25', severity: 'low', decision: __e25Allowed ? 'allow' : 'deny', reason: `E25 ${__e25Allowed ? 'allowed' : 'denied'}` });
   return { passed: findings.length === 0, findings, overallRisk: computeRisk(riskScore), riskScore, score: riskScore };
 }

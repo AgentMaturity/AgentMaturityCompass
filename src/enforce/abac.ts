@@ -62,7 +62,7 @@ export function checkAccess(request: ABACRequest, policies: ABACPolicy[]): ABACR
 
   // deny-overrides
   const allowed = hasDeny ? false : hasAllow;
-  emitGuardEvent({ agentId: 'system', moduleCode: 'E15', decision: 'allow', reason: 'E15 decision', severity: 'medium' });
+  emitGuardEvent({ agentId: 'system', moduleCode: 'E15', decision: 'allow', reason: 'E15 observation (no allow/deny decision was made here)', severity: 'medium' });
   return {
     allowed,
     matchedPolicies,
@@ -76,9 +76,9 @@ export function checkABAC(subjectAttrs: Record<string, string>, requiredAttrs: R
   for (const [k, v] of Object.entries(requiredAttrs)) {
     if (subjectAttrs[k] === v) matched.push(k);
   }
-  emitGuardEvent({ agentId: 'system', moduleCode: 'E15', decision: 'allow', reason: 'E15 decision', severity: 'medium' });
-  return {
-    allowed: matched.length === Object.keys(requiredAttrs).length,
+    const __e15Allowed = matched.length === Object.keys(requiredAttrs).length;
+  emitGuardEvent({ agentId: 'system', moduleCode: 'E15', severity: 'medium', decision: __e15Allowed ? 'allow' : 'deny', reason: `E15 ${__e15Allowed ? 'allowed' : 'denied'}` });
+  return { allowed: matched.length === Object.keys(requiredAttrs).length,
     matchedPolicies: [],
     matchedAttributes: matched,
     reason: matched.length === Object.keys(requiredAttrs).length ? 'All attributes matched' : 'Missing attributes',

@@ -16,13 +16,15 @@ export function verifyWebhook(payload: string, signature: string, secret: string
   if (timestamp) {
     const age = Math.abs(Date.now() - timestamp);
     if (age > FRESHNESS_WINDOW_MS) {
-      emitGuardEvent({ agentId: 'system', moduleCode: 'E14', decision: 'allow', reason: 'E14 decision', severity: 'medium' });
+            const __e14Allowed = false;
+      emitGuardEvent({ agentId: 'system', moduleCode: 'E14', severity: 'medium', decision: __e14Allowed ? 'allow' : 'deny', reason: `E14 ${__e14Allowed ? 'allowed' : 'denied'}` });
       return { valid: false, source: 'unknown', replayDetected: false, reason: 'Timestamp outside freshness window' };
     }
   }
 
   if (seenSignatures.has(signature)) {
-    emitGuardEvent({ agentId: 'system', moduleCode: 'E14', decision: 'allow', reason: 'E14 decision', severity: 'medium' });
+        const __e14Allowed = false;
+    emitGuardEvent({ agentId: 'system', moduleCode: 'E14', severity: 'medium', decision: __e14Allowed ? 'allow' : 'deny', reason: `E14 ${__e14Allowed ? 'allowed' : 'denied'}` });
     return { valid: false, source: 'unknown', replayDetected: true, reason: 'Replay detected' };
   }
 
@@ -32,7 +34,8 @@ export function verifyWebhook(payload: string, signature: string, secret: string
   const sigValue = signature.startsWith('sha256=') ? signature.slice(7) : signature;
 
   if (sigValue.length !== expected.length) {
-    emitGuardEvent({ agentId: 'system', moduleCode: 'E14', decision: 'allow', reason: 'E14 decision', severity: 'medium' });
+        const __e14Allowed = false;
+    emitGuardEvent({ agentId: 'system', moduleCode: 'E14', severity: 'medium', decision: __e14Allowed ? 'allow' : 'deny', reason: `E14 ${__e14Allowed ? 'allowed' : 'denied'}` });
     return { valid: false, source: 'unknown', replayDetected: false, reason: 'Invalid signature' };
   }
 
@@ -42,18 +45,21 @@ export function verifyWebhook(payload: string, signature: string, secret: string
   }
 
   if (mismatch !== 0) {
-    emitGuardEvent({ agentId: 'system', moduleCode: 'E14', decision: 'allow', reason: 'E14 decision', severity: 'medium' });
+        const __e14Allowed = false;
+    emitGuardEvent({ agentId: 'system', moduleCode: 'E14', severity: 'medium', decision: __e14Allowed ? 'allow' : 'deny', reason: `E14 ${__e14Allowed ? 'allowed' : 'denied'}` });
     return { valid: false, source: 'unknown', replayDetected: false, reason: 'Signature mismatch' };
   }
 
   if (seenSignatures.size >= MAX_SEEN) seenSignatures.clear();
   seenSignatures.add(signature);
 
-  emitGuardEvent({ agentId: 'system', moduleCode: 'E14', decision: 'allow', reason: 'E14 decision', severity: 'medium' });
+    const __e14Allowed = true;
+  emitGuardEvent({ agentId: 'system', moduleCode: 'E14', severity: 'medium', decision: __e14Allowed ? 'allow' : 'deny', reason: `E14 ${__e14Allowed ? 'allowed' : 'denied'}` });
   return { valid: true, source: 'verified', replayDetected: false };
 }
 
 export function validateWebhook(source: string, signature: string, body: string): WebhookValidation {
-  emitGuardEvent({ agentId: 'system', moduleCode: 'E14', decision: 'allow', reason: 'E14 decision', severity: 'medium' });
+    const __e14Allowed = signature.length > 10;
+  emitGuardEvent({ agentId: 'system', moduleCode: 'E14', severity: 'medium', decision: __e14Allowed ? 'allow' : 'deny', reason: `E14 ${__e14Allowed ? 'allowed' : 'denied'}` });
   return { valid: signature.length > 10, source, replayDetected: false };
 }

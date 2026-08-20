@@ -34,6 +34,7 @@ export function verifyCrossSources(claim: string, sources: string[]): Verificati
   }
 
   const confidence = sources.length > 0 ? supporting / sources.length : 0;
-  emitGuardEvent({ agentId: 'system', moduleCode: 'E30', decision: 'allow', reason: 'E30 decision', severity: 'medium' });
+    const __e30Allowed = conflicts.length === 0;
+  emitGuardEvent({ agentId: 'system', moduleCode: 'E30', severity: 'medium', decision: __e30Allowed ? 'allow' : 'deny', reason: `E30 ${__e30Allowed ? 'allowed' : 'denied'}` });
   return { consistent: conflicts.length === 0, conflicts, confidence };
 }

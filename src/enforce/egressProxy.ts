@@ -24,9 +24,9 @@ export function checkEgressRequest(request: EgressRequest): EgressResult {
   try {
     domain = new URL(url).hostname;
   } catch {
-    emitGuardEvent({ agentId: 'system', moduleCode: 'E4', decision: 'allow', reason: 'E4 decision', severity: 'high' });
-    return {
-      allowed: false, domain: 'invalid', logged: true, strippedHeaders: [],
+        const __e4Allowed = false;
+    emitGuardEvent({ agentId: 'system', moduleCode: 'E4', severity: 'high', decision: __e4Allowed ? 'allow' : 'deny', reason: `E4 ${__e4Allowed ? 'allowed' : 'denied'}` });
+    return { allowed: false, domain: 'invalid', logged: true, strippedHeaders: [],
       auditEntry: { timestamp: Date.now(), url, method, decision: 'blocked:invalid-url' },
     };
   }
@@ -35,9 +35,9 @@ export function checkEgressRequest(request: EgressRequest): EgressResult {
     allowedDomains.some(d => domain === d || domain.endsWith('.' + d));
 
   if (!domainAllowed) {
-    emitGuardEvent({ agentId: 'system', moduleCode: 'E4', decision: 'allow', reason: 'E4 decision', severity: 'high' });
-    return {
-      allowed: false, domain, logged: true, strippedHeaders: [],
+        const __e4Allowed = false;
+    emitGuardEvent({ agentId: 'system', moduleCode: 'E4', severity: 'high', decision: __e4Allowed ? 'allow' : 'deny', reason: `E4 ${__e4Allowed ? 'allowed' : 'denied'}` });
+    return { allowed: false, domain, logged: true, strippedHeaders: [],
       auditEntry: { timestamp: Date.now(), url, method, decision: 'blocked:domain-not-allowed' },
     };
   }
@@ -51,9 +51,9 @@ export function checkEgressRequest(request: EgressRequest): EgressResult {
     }
   }
 
-  emitGuardEvent({ agentId: 'system', moduleCode: 'E4', decision: 'allow', reason: 'E4 decision', severity: 'high' });
-  return {
-    allowed: true, domain, logged: true, strippedHeaders,
+    const __e4Allowed = true;
+  emitGuardEvent({ agentId: 'system', moduleCode: 'E4', severity: 'high', decision: __e4Allowed ? 'allow' : 'deny', reason: `E4 ${__e4Allowed ? 'allowed' : 'denied'}` });
+  return { allowed: true, domain, logged: true, strippedHeaders,
     auditEntry: { timestamp: Date.now(), url, method, decision: 'allowed' },
   };
 }

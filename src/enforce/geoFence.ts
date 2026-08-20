@@ -72,15 +72,18 @@ export function checkGeoFence(location: GeoLocation, policy: GeoPolicy): GeoFenc
   }
 
   if (policy.blockedRegions && policy.blockedRegions.includes(region)) {
-    emitGuardEvent({ agentId: 'system', moduleCode: 'E28', decision: 'allow', reason: 'E28 decision', severity: 'medium' });
+        const __e28Allowed = false;
+    emitGuardEvent({ agentId: 'system', moduleCode: 'E28', severity: 'medium', decision: __e28Allowed ? 'allow' : 'deny', reason: `E28 ${__e28Allowed ? 'allowed' : 'denied'}` });
     return { allowed: false, region, reason: `Region ${region} is blocked` };
   }
 
   if (policy.allowedRegions && policy.allowedRegions.length > 0 && !policy.allowedRegions.includes(region)) {
-    emitGuardEvent({ agentId: 'system', moduleCode: 'E28', decision: 'allow', reason: 'E28 decision', severity: 'medium' });
+        const __e28Allowed = false;
+    emitGuardEvent({ agentId: 'system', moduleCode: 'E28', severity: 'medium', decision: __e28Allowed ? 'allow' : 'deny', reason: `E28 ${__e28Allowed ? 'allowed' : 'denied'}` });
     return { allowed: false, region, reason: `Region ${region} not in allowed list` };
   }
 
-  emitGuardEvent({ agentId: 'system', moduleCode: 'E28', decision: 'allow', reason: 'E28 decision', severity: 'medium' });
+    const __e28Allowed = true;
+  emitGuardEvent({ agentId: 'system', moduleCode: 'E28', severity: 'medium', decision: __e28Allowed ? 'allow' : 'deny', reason: `E28 ${__e28Allowed ? 'allowed' : 'denied'}` });
   return { allowed: true, region };
 }

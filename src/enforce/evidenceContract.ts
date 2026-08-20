@@ -37,7 +37,7 @@ export function createEvidenceContract(claims: Claim[]): EvidenceContract {
   for (const claim of claims) {
     claimHashes[claim.id] = hashContent(JSON.stringify(claim));
   }
-  emitGuardEvent({ agentId: 'system', moduleCode: 'E24', decision: 'allow', reason: 'E24 decision', severity: 'medium' });
+  emitGuardEvent({ agentId: 'system', moduleCode: 'E24', decision: 'allow', reason: 'E24 observation (no allow/deny decision was made here)', severity: 'medium' });
   return {
     contractId: `ec_${Date.now()}_${hashContent(JSON.stringify(claims)).slice(0, 8)}`,
     claims,
@@ -63,9 +63,9 @@ export function verifyEvidenceContract(contract: EvidenceContract, evidence: Evi
   }
 
   const satisfiedCount = claimResults.filter(r => r.satisfied).length;
-  emitGuardEvent({ agentId: 'system', moduleCode: 'E24', decision: 'allow', reason: 'E24 decision', severity: 'medium' });
-  return {
-    verified: claimResults.every(r => r.satisfied),
+    const __e24Allowed = claimResults.every(r => r.satisfied);
+  emitGuardEvent({ agentId: 'system', moduleCode: 'E24', severity: 'medium', decision: __e24Allowed ? 'allow' : 'deny', reason: `E24 ${__e24Allowed ? 'allowed' : 'denied'}` });
+  return { verified: claimResults.every(r => r.satisfied),
     claimResults,
     overallScore: contract.claims.length > 0 ? satisfiedCount / contract.claims.length : 0,
   };

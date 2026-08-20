@@ -81,6 +81,7 @@ export function checkConsensus(votes: Array<{ verdict: 'approve' | 'deny'; confi
   const t = threshold ?? 0.8;
   const approvals = votes.filter(v => v.verdict === 'approve').length;
   const agreement = votes.length > 0 ? approvals / votes.length : 0;
-  emitGuardEvent({ agentId: 'system', moduleCode: 'E34', decision: 'allow', reason: 'E34 decision', severity: 'medium' });
+    const __e34Allowed = agreement >= t;
+  emitGuardEvent({ agentId: 'system', moduleCode: 'E34', severity: 'medium', decision: __e34Allowed ? 'allow' : 'deny', reason: `E34 ${__e34Allowed ? 'allowed' : 'denied'}` });
   return { agreed: agreement >= t, votes: votes.length, threshold: t, agreement };
 }

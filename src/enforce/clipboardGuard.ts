@@ -36,6 +36,7 @@ export function guardClipboard(content: string): ClipboardResult {
     scrubbed = scrubbed.replace(new RegExp(regex.source, regex.flags), replacement);
   }
 
-  emitGuardEvent({ agentId: 'system', moduleCode: 'E31', decision: 'allow', reason: 'E31 decision', severity: 'medium' });
+    const __e31Allowed = findings.length === 0;
+  emitGuardEvent({ agentId: 'system', moduleCode: 'E31', severity: 'medium', decision: __e31Allowed ? 'allow' : 'deny', reason: `E31 ${__e31Allowed ? 'allowed' : 'denied'}` });
   return { safe: findings.length === 0, scrubbed, findings };
 }

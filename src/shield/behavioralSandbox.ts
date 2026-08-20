@@ -30,9 +30,9 @@ export function sandboxCheck(prompt: string, _context?: Record<string, string>):
     }
   }
 
-  emitGuardEvent({ agentId: 'system', moduleCode: 'S2', decision: 'allow', reason: 'S2 decision', severity: 'high' });
-  return {
-    passed: findings.length === 0,
+    const __s2Allowed = findings.length === 0;
+  emitGuardEvent({ agentId: 'system', moduleCode: 'S2', severity: 'high', decision: __s2Allowed ? 'allow' : 'deny', reason: `S2 ${__s2Allowed ? 'allowed' : 'denied'}` });
+  return { passed: findings.length === 0,
     evaded: findings.length > 0,
     findings,
     runCount: 1,
