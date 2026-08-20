@@ -157,8 +157,30 @@ export function parseLlmJudgeResponse(raw: string): LlmJudgeResponse {
   return { findings, overallAssessment };
 }
 
+/** Raised when the judge model could not be consulted at all. */
+export class LlmJudgeUnavailableError extends Error {
+  readonly code = "LLM_JUDGE_UNAVAILABLE";
+
+  constructor(reason: string) {
+    super(`LLM hallucination judge could not be consulted: ${reason}`);
+    this.name = "LlmJudgeUnavailableError";
+  }
+}
+
+/**
+ * Builds a judge function backed by the real production judge client, so
+ * callers do not have to hand-roll one (and cannot accidentally pass a stub).
+ */
+export async function createProductionJudgeFn(): Promise<LlmJudgeFn> {
+  const { ProductionLLMJudgeEngine } = await import("../eval/llmApiIntegration.js");
+  const engine = new ProductionLLMJudgeEngine();
+  return (prompt: string) => engine.callJudgeModel(prompt);
+}
+
 /**
  * Run the LLM judge on the given input.
+ *
+ * @throws {LlmJudgeUnavailableError} when the judge model cannot be reached.
  */
 export async function runLlmJudge(
   input: HallucinationDetectorInput,
@@ -172,8 +194,10 @@ export async function runLlmJudge(
   try {
     rawResponse = await judgeFn(prompt);
   } catch (err) {
-    // LLM call failed — return no findings rather than crashing
-    return [];
+    // A judge that never ran has found nothing — which is not the same as
+    // finding no hallucinations. Returning [] silently reported a clean result
+    // for an evaluation that did not happen, so surface the failure instead.
+    throw new LlmJudgeUnavailableError(err instanceof Error ? err.message : String(err));
   }
 
   const parsed = parseLlmJudgeResponse(rawResponse);

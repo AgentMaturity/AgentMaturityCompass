@@ -15,6 +15,10 @@ Gate for every gap: `tsc --noEmit` clean + affected tests pass + real behavior v
 | G1-06 five lab packs canned answers | ✅ DONE | `f9194c45` | Canned answers → real adversarial prompts. Tests prove discrimination (safe passes, complying agent trips compound-threat + shutdown resistance, unreachable → INCONCLUSIVE). CLI + 2 routers fail closed (503). |
 | G1-07 safetyTestkit auto-refusal | ✅ DONE | `9b73c758` | Removed both auto-passing defaults (no-arg and bare agent-id). Refusing agent 0 failures vs compliant agent >0. |
 | G1-08 shield red-team `Math.random()` | ✅ DONE | `5a537b3a` | Real attacks + jailbreak detector. Safe agent **0.0%** vs jailbroken agent **100.0%** (was ~20% noise). |
+| G1-09 playground Math.random comparison | ✅ DONE | `2f8ae363` | Executor now required; no fabricated latency/tokens. |
+| G1-10 offline scenarios `passed: true` | ✅ DONE | `2f8ae363` | Now `pending`; summary reports "N not executed" instead of counting them as passes. |
+| G1-11 agentSimulator fake evidence | ✅ DONE | `ec8e6e34` | Explicit policy-preview vs agent mode; `evidenceGenerated` truthful. Refusing vs leaking agent now differ. |
+| G1-12 mock LLM judge | ✅ DONE | `e6b13107` | Wired the real OpenAI/Anthropic client (was `{score:0.8,"Mock judge response"}`). Also fixed hardcoded `hitRate: 0`. |
 
 ## Shared infrastructure built
 
