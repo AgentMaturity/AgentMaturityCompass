@@ -2,6 +2,7 @@ import { basename, dirname, join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { existsSync, mkdirSync, readdirSync, writeFileSync } from "node:fs";
 import chalk from "chalk";
+import { AgentResponderUnavailableError } from "./assurance/agentResponder.js";
 import inquirer from "inquirer";
 import type { Command } from "commander";
 import { openLedger } from "./ledger/ledger.js";
@@ -434,6 +435,7 @@ export function registerLateStageCliCommands({
     .option("--no-sign", "Run without vault/artifact signing; report is labeled UNSIGNED_VALID local evidence")
     .option("--evil-mcp", "Also run built-in Evil MCP agent-provider attack scenarios")
     .option("--mcp-attacks <categories...>", "MCP attack categories for --evil-mcp (default: all; aliases: tool_poison, data_exfil, priv_esc, prompt_inject)")
+    .option("--model <modelId>", "model id of the agent under attack (or set AMC_ASSURANCE_MODEL)")
     .option("--json", "Print JSON report to stdout")
     .action(async (agentId: string | undefined, opts: {
       plugins?: string[];
@@ -443,18 +445,34 @@ export function registerLateStageCliCommands({
       evilMcp?: boolean;
       mcpAttacks?: string[];
       json?: boolean;
+      model?: string;
     }) => {
       const workspace = process.cwd();
-      const report = await runRedTeam({
-        workspace,
-        agentId,
-        plugins: opts.plugins,
-        strategies: opts.strategies,
-        output: opts.output,
-        noSign: opts.sign === false,
-        evilMcp: opts.evilMcp,
-        mcpAttackCategories: opts.mcpAttacks,
-      });
+      let report: Awaited<ReturnType<typeof runRedTeam>>;
+      try {
+        report = await runRedTeam({
+          workspace,
+          agentId,
+          model: opts.model,
+          plugins: opts.plugins,
+          strategies: opts.strategies,
+          output: opts.output,
+          noSign: opts.sign === false,
+          evilMcp: opts.evilMcp,
+          mcpAttackCategories: opts.mcpAttacks,
+        });
+      } catch (error) {
+        // Fail closed: reporting "no vulnerabilities" without attacking
+        // anything would be worse than reporting nothing.
+        if (error instanceof AgentResponderUnavailableError) {
+          console.error(chalk.red("Red-team run aborted — no agent under test was reachable."));
+          console.error(chalk.gray(`Reason: ${error.reason}`));
+          console.error(chalk.cyan(`Fix: ${error.remediation}`));
+          process.exitCode = 2;
+          return;
+        }
+        throw error;
+      }
 
       if (opts.json) {
         console.log(JSON.stringify(report, null, 2));
