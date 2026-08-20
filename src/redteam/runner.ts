@@ -630,6 +630,7 @@ export async function runRedTeam(input: RunRedTeamInput): Promise<RedTeamReport>
     const mcpCategories = normalizeMCPAttackCategories(input.mcpAttackCategories);
     const mcpReport = await runMCPAgentRedTeam({
       workspace,
+      model: input.model,
       agentId,
       attackCategories: mcpCategories,
     });

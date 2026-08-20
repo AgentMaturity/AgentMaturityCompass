@@ -45,9 +45,33 @@ export interface AgentResponderTarget {
   trustTier: TrustTier;
 }
 
+/** A tool the agent under test is offered, in OpenAI function-tool shape. */
+export interface AgentToolDefinition {
+  name: string;
+  description?: string;
+  parameters: Record<string, unknown>;
+}
+
+/** A tool invocation the agent under test chose to make. */
+export interface AgentToolCall {
+  toolName: string;
+  arguments: Record<string, unknown>;
+}
+
+export interface AgentRespondOptions {
+  /**
+   * Tools to offer the agent. Required for tool-boundary tests: whether an
+   * agent *calls* a dangerous tool is the measurement, and it cannot be
+   * observed from prose alone.
+   */
+  tools?: AgentToolDefinition[];
+}
+
 export interface AgentResponse {
   /** Assistant text returned by the agent under test. */
   text: string;
+  /** Tools the agent chose to call, when tools were offered. */
+  toolCalls: AgentToolCall[];
   target: AgentResponderTarget;
   latencyMs: number;
   /** Gateway receipt id, when the gateway captured this exchange. */
@@ -87,7 +111,7 @@ export class AgentResponderInvocationError extends Error {
 
 export interface AgentResponder {
   readonly target: AgentResponderTarget;
-  respond(prompt: string): Promise<AgentResponse>;
+  respond(prompt: string, options?: AgentRespondOptions): Promise<AgentResponse>;
 }
 
 export interface ResolveAgentResponderInput {
@@ -166,6 +190,62 @@ export function extractResponseText(payload: unknown): string | null {
   return null;
 }
 
+/**
+ * Extracts tool invocations from an OpenAI-compatible or Anthropic response.
+ * Malformed argument JSON is preserved as a raw string rather than dropped, so
+ * a dangerous call is never silently lost.
+ */
+export function extractToolCalls(payload: unknown): AgentToolCall[] {
+  if (!payload || typeof payload !== "object") return [];
+  const body = payload as Record<string, unknown>;
+  const calls: AgentToolCall[] = [];
+
+  const choices = body.choices;
+  if (Array.isArray(choices) && choices.length > 0) {
+    const message = (choices[0] as Record<string, unknown> | undefined)?.message as
+      | Record<string, unknown>
+      | undefined;
+    const toolCalls = message?.tool_calls;
+    if (Array.isArray(toolCalls)) {
+      for (const entry of toolCalls) {
+        const fn = (entry as Record<string, unknown>)?.function as Record<string, unknown> | undefined;
+        const name = typeof fn?.name === "string" ? fn.name : undefined;
+        if (!name) continue;
+        let args: Record<string, unknown> = {};
+        const raw = fn?.arguments;
+        if (typeof raw === "string") {
+          try {
+            const parsed = JSON.parse(raw) as unknown;
+            args = parsed && typeof parsed === "object" ? (parsed as Record<string, unknown>) : { _raw: raw };
+          } catch {
+            args = { _raw: raw };
+          }
+        } else if (raw && typeof raw === "object") {
+          args = raw as Record<string, unknown>;
+        }
+        calls.push({ toolName: name, arguments: args });
+      }
+    }
+  }
+
+  // Anthropic tool_use blocks.
+  const content = body.content;
+  if (Array.isArray(content)) {
+    for (const part of content) {
+      const block = part as Record<string, unknown> | null;
+      if (block?.type === "tool_use" && typeof block.name === "string") {
+        const rawInput = block.input;
+        calls.push({
+          toolName: block.name,
+          arguments: rawInput && typeof rawInput === "object" ? (rawInput as Record<string, unknown>) : {}
+        });
+      }
+    }
+  }
+
+  return calls;
+}
+
 function extractUsage(payload: unknown): AgentResponse["usage"] {
   if (!payload || typeof payload !== "object") return undefined;
   const usage = (payload as Record<string, unknown>).usage as Record<string, unknown> | undefined;
@@ -195,22 +275,42 @@ export function buildRequestBody(params: {
   model: string;
   prompt: string;
   openaiCompatible: boolean;
+  tools?: AgentToolDefinition[];
 }): Record<string, unknown> {
+  const hasTools = params.tools !== undefined && params.tools.length > 0;
+
   if (params.openaiCompatible) {
-    return {
+    const body: Record<string, unknown> = {
       model: params.model,
       messages: [{ role: "user", content: params.prompt }],
       max_tokens: 1024,
       temperature: 0
     };
+    if (hasTools) {
+      body.tools = params.tools!.map((tool) => ({
+        type: "function",
+        function: { name: tool.name, description: tool.description ?? "", parameters: tool.parameters }
+      }));
+      body.tool_choice = "auto";
+    }
+    return body;
   }
+
   // Anthropic messages dialect.
-  return {
+  const body: Record<string, unknown> = {
     model: params.model,
     max_tokens: 1024,
     temperature: 0,
     messages: [{ role: "user", content: params.prompt }]
   };
+  if (hasTools) {
+    body.tools = params.tools!.map((tool) => ({
+      name: tool.name,
+      description: tool.description ?? "",
+      input_schema: tool.parameters
+    }));
+  }
+  return body;
 }
 
 /** Chat-completions path for the provider dialect in use. */
@@ -221,7 +321,7 @@ export function completionsPathFor(openaiCompatible: boolean): string {
 class HttpAgentResponder implements AgentResponder {
   readonly target: AgentResponderTarget;
   private readonly headers: Record<string, string>;
-  private readonly body: (prompt: string) => Record<string, unknown>;
+  private readonly body: (prompt: string, tools?: AgentToolDefinition[]) => Record<string, unknown>;
   private readonly timeoutMs: number;
   private readonly fetchImpl: typeof fetch;
 
@@ -236,11 +336,16 @@ class HttpAgentResponder implements AgentResponder {
     this.headers = params.headers;
     this.timeoutMs = params.timeoutMs;
     this.fetchImpl = params.fetchImpl;
-    this.body = (prompt: string) =>
-      buildRequestBody({ model: params.target.model, prompt, openaiCompatible: params.openaiCompatible });
+    this.body = (prompt: string, tools?: AgentToolDefinition[]) =>
+      buildRequestBody({
+        model: params.target.model,
+        prompt,
+        openaiCompatible: params.openaiCompatible,
+        tools
+      });
   }
 
-  async respond(prompt: string): Promise<AgentResponse> {
+  async respond(prompt: string, options?: AgentRespondOptions): Promise<AgentResponse> {
     const started = Date.now();
     let response: Response;
     try {
@@ -248,7 +353,7 @@ class HttpAgentResponder implements AgentResponder {
         this.fetchImpl(this.target.endpoint, {
           method: "POST",
           headers: { "content-type": "application/json", ...this.headers },
-          body: JSON.stringify(this.body(prompt)),
+          body: JSON.stringify(this.body(prompt, options?.tools)),
           signal
         })
       );
@@ -279,15 +384,19 @@ class HttpAgentResponder implements AgentResponder {
       );
     }
 
+    const toolCalls = extractToolCalls(parsed);
     const content = extractResponseText(parsed);
-    if (content === null) {
+    // An agent that only issues tool calls legitimately returns no prose; that
+    // is a measurable outcome, not a failed invocation.
+    if (content === null && toolCalls.length === 0) {
       throw new AgentResponderInvocationError(
-        "agent response contained no assistant text; cannot score an empty answer"
+        "agent response contained no assistant text or tool calls; cannot score an empty answer"
       );
     }
 
     return {
-      text: content,
+      text: content ?? "",
+      toolCalls,
       target: this.target,
       latencyMs,
       receiptId: response.headers.get("x-amc-request-receipt") ?? undefined,

