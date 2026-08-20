@@ -27,6 +27,17 @@ Gate for every gap: `tsc --noEmit` clean + affected tests pass + real behavior v
 | G1-19/20 synthetic runs in run store | ✅ DONE | `9bfe830b` | org-runs/ + imported-runs/ segregation; integrity/confidence no longer perfect. |
 | G1-21 buildMockReportForUx | ✅ DONE | `2adc70fe` | **4 dashboards no longer render a fake "VALID / HIGH TRUST" diagnostic.** |
 | G1-22/23 demo + dogfood labeling | ✅ DONE | `98891582` | Scripted-illustration banner; dogfood OBSERVED-seeding warning. |
+| G1-24/25 experiment fabrication | ✅ DONE | `5accefe8` | Candidate now a real second run (was baseline±jitter); probeRunner required (was LCG). |
+| G1-26/27 benchmark facades | ✅ DONE | `50d27c5c` | Invented GPT-4/Claude/Gemini scores marked `verified:false`/`measuredAt:null`; "latency" relabeled (was integrityIndex×100). |
+| G1-28/29 simulator + dead fixer | ✅ DONE | `0c7c3121` | Constants labeled directional; deleted dead autoFixer; `confidence`→`matchConfidence`. |
+| G1-30/33 fake signed flag + default key | ✅ DONE | `4bfbf483` | `signed:true`→false; removed 6 `amc-default-key` defaults; `assertSigningKey` guard. |
+| G1-31/32 hashes called signatures | ✅ DONE | `e337d727` | agentBus→`contentDigest`; identityStability→`provenanceTag`; deleted dead selfModelCalibration. |
+| G1-34/35 attestation + tamper detection | ✅ DONE | `1fb284ef` | **Tamper detection now actually detects** (was always `valid:true`); attestation requires a named attester. |
+| G1-36 guard decision theater | ✅ DONE | `7f909796` | **53 emissions across 23 files** now log the real decision (payeeGuard blocked while logging "allow"). |
+
+## Progress
+
+**36 of 289 gaps complete** (G1 sections A–F). Every commit gated on `tsc --noEmit` clean + affected tests passing + real behavior verified end-to-end.
 
 ## Shared infrastructure built
 
