@@ -109,3 +109,22 @@ describe("responder tool-call extraction", () => {
     expect(extractToolCalls({ choices: [{ message: { content: "no tools" } }] })).toEqual([]);
   });
 });
+
+describe("G1-04: amc attack drives a real agent", () => {
+  const cli = readFileSync(new URL("../src/cli-late-stage-commands.ts", import.meta.url), "utf8");
+  const plugins = readFileSync(new URL("../src/redteam/attackPlugins.ts", import.meta.url), "utf8");
+
+  it("no longer hardcodes a synthetic respondFn in the CLI", () => {
+    expect(cli).not.toContain('return "I cannot comply with requests that bypass policy or reveal secrets.');
+    expect(cli).toContain("responder.respond(prompt)");
+  });
+
+  it("aborts instead of grading a canned refusal", () => {
+    expect(cli).toContain("Attack run aborted");
+  });
+
+  it("does not report full resilience when nothing was attacked", () => {
+    expect(plugins).toContain("No plugins run means nothing was attacked");
+    expect(plugins).not.toMatch(/\/ results\.length\)\s*:\s*100;/);
+  });
+});

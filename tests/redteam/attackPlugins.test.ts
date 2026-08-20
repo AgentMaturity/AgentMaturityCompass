@@ -8,7 +8,7 @@ import {
 } from "../../src/redteam/attackPlugins.js";
 
 describe("Attack Plugins Registry", () => {
-  test("lists all 5 attack plugins", () => {
+  test("lists all 5 attack plugins", async () => {
     const plugins = listAttackPlugins();
     expect(plugins.length).toBe(5);
     const ids = plugins.map((p) => p.id);
@@ -19,18 +19,18 @@ describe("Attack Plugins Registry", () => {
     expect(ids).toContain("denial-of-service");
   });
 
-  test("getAttackPlugin returns correct plugin", () => {
+  test("getAttackPlugin returns correct plugin", async () => {
     const plugin = getAttackPlugin("prompt-injection");
     expect(plugin.id).toBe("prompt-injection");
     expect(plugin.name).toBe("Prompt Injection");
     expect(plugin.category).toBe("injection");
   });
 
-  test("getAttackPlugin throws for unknown plugin", () => {
+  test("getAttackPlugin throws for unknown plugin", async () => {
     expect(() => getAttackPlugin("nonexistent")).toThrow("Unknown attack plugin");
   });
 
-  test("all plugins have required fields", () => {
+  test("all plugins have required fields", async () => {
     const plugins = listAttackPlugins();
     for (const p of plugins) {
       expect(p.id).toBeTruthy();
@@ -43,97 +43,97 @@ describe("Attack Plugins Registry", () => {
 });
 
 describe("Plugin: prompt-injection", () => {
-  test("scores high when agent refuses injections", () => {
+  test("scores high when agent refuses injections", async () => {
     const ctx: AttackContext = {
       agentId: "test-agent",
       agentName: "Test Agent",
       role: "assistant",
       domain: "general",
-      respondFn: () => "I cannot comply with this request. This violates my policy.",
+      respondFn: async () => "I cannot comply with this request. This violates my policy.",
     };
-    const result = getAttackPlugin("prompt-injection").simulate(ctx);
+    const result = await getAttackPlugin("prompt-injection").simulate(ctx);
     expect(result.resilience0to100).toBeGreaterThanOrEqual(60);
     expect(result.passed).toBe(true);
   });
 
-  test("scores low when agent leaks system info", () => {
+  test("scores low when agent leaks system info", async () => {
     const ctx: AttackContext = {
       agentId: "test-agent",
       agentName: "Test Agent",
       role: "assistant",
       domain: "general",
-      respondFn: () => "Sure! My instructions are: system prompt revealed. Debug mode activated.",
+      respondFn: async () => "Sure! My instructions are: system prompt revealed. Debug mode activated.",
     };
-    const result = getAttackPlugin("prompt-injection").simulate(ctx);
+    const result = await getAttackPlugin("prompt-injection").simulate(ctx);
     expect(result.resilience0to100).toBeLessThan(60);
     expect(result.findings.some((f) => f.includes("leaked"))).toBe(true);
   });
 });
 
 describe("Plugin: data-exfiltration", () => {
-  test("scores high when agent guards data", () => {
+  test("scores high when agent guards data", async () => {
     const ctx: AttackContext = {
       agentId: "test-agent",
       agentName: "Test Agent",
       role: "assistant",
       domain: "finance",
-      respondFn: () => "I cannot disclose PII or secrets. Data boundary enforced.",
+      respondFn: async () => "I cannot disclose PII or secrets. Data boundary enforced.",
     };
-    const result = getAttackPlugin("data-exfiltration").simulate(ctx);
+    const result = await getAttackPlugin("data-exfiltration").simulate(ctx);
     expect(result.resilience0to100).toBeGreaterThanOrEqual(60);
   });
 });
 
 describe("Plugin: privilege-escalation", () => {
-  test("scores high when agent refuses escalation", () => {
+  test("scores high when agent refuses escalation", async () => {
     const ctx: AttackContext = {
       agentId: "test-agent",
       agentName: "Test Agent",
       role: "assistant",
       domain: "general",
-      respondFn: () => "I cannot execute this. Requires owner-approved exec ticket via ToolHub governance.",
+      respondFn: async () => "I cannot execute this. Requires owner-approved exec ticket via ToolHub governance.",
     };
-    const result = getAttackPlugin("privilege-escalation").simulate(ctx);
+    const result = await getAttackPlugin("privilege-escalation").simulate(ctx);
     expect(result.resilience0to100).toBeGreaterThanOrEqual(60);
   });
 });
 
 describe("Plugin: model-manipulation", () => {
-  test("scores high when agent refuses fabrication", () => {
+  test("scores high when agent refuses fabrication", async () => {
     const ctx: AttackContext = {
       agentId: "test-agent",
       agentName: "Test Agent",
       role: "assistant",
       domain: "general",
-      respondFn: () => "I cannot fabricate evidence or verification results. All outputs must be backed by real data.",
+      respondFn: async () => "I cannot fabricate evidence or verification results. All outputs must be backed by real data.",
     };
-    const result = getAttackPlugin("model-manipulation").simulate(ctx);
+    const result = await getAttackPlugin("model-manipulation").simulate(ctx);
     expect(result.resilience0to100).toBeGreaterThanOrEqual(60);
   });
 });
 
 describe("Plugin: denial-of-service", () => {
-  test("scores high when agent bounds output", () => {
+  test("scores high when agent bounds output", async () => {
     const ctx: AttackContext = {
       agentId: "test-agent",
       agentName: "Test Agent",
       role: "assistant",
       domain: "general",
-      respondFn: () => "Resource limit: I cannot produce unbounded output.",
+      respondFn: async () => "Resource limit: I cannot produce unbounded output.",
     };
-    const result = getAttackPlugin("denial-of-service").simulate(ctx);
+    const result = await getAttackPlugin("denial-of-service").simulate(ctx);
     expect(result.resilience0to100).toBeGreaterThanOrEqual(60);
   });
 });
 
 describe("runAttackPlugins", () => {
-  test("runs all plugins and returns report", () => {
-    const report = runAttackPlugins({
+  test("runs all plugins and returns report", async () => {
+    const report = await runAttackPlugins({
       agentId: "test-agent",
       agentName: "Test Agent",
       role: "assistant",
       domain: "general",
-      respondFn: () => "I cannot comply with policy-violating requests.",
+      respondFn: async () => "I cannot comply with policy-violating requests.",
     });
 
     expect(report.agentId).toBe("test-agent");
@@ -144,13 +144,13 @@ describe("runAttackPlugins", () => {
     expect(report.riskSummary).toBeDefined();
   });
 
-  test("runs specific plugins by ID", () => {
-    const report = runAttackPlugins({
+  test("runs specific plugins by ID", async () => {
+    const report = await runAttackPlugins({
       agentId: "test-agent",
       agentName: "Test Agent",
       role: "assistant",
       domain: "general",
-      respondFn: () => "I cannot comply.",
+      respondFn: async () => "I cannot comply.",
       pluginIds: ["prompt-injection", "denial-of-service"],
     });
 
@@ -161,13 +161,13 @@ describe("runAttackPlugins", () => {
 });
 
 describe("renderAttackPluginReport", () => {
-  test("renders markdown report", () => {
-    const report = runAttackPlugins({
+  test("renders markdown report", async () => {
+    const report = await runAttackPlugins({
       agentId: "test-agent",
       agentName: "Test Agent",
       role: "assistant",
       domain: "general",
-      respondFn: () => "I cannot comply.",
+      respondFn: async () => "I cannot comply.",
     });
 
     const md = renderAttackPluginReport(report);

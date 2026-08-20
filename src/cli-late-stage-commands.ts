@@ -2,7 +2,7 @@ import { basename, dirname, join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { existsSync, mkdirSync, readdirSync, writeFileSync } from "node:fs";
 import chalk from "chalk";
-import { AgentResponderUnavailableError } from "./assurance/agentResponder.js";
+import { AgentResponderUnavailableError, resolveAgentResponder } from "./assurance/agentResponder.js";
 import inquirer from "inquirer";
 import type { Command } from "commander";
 import { openLedger } from "./ledger/ledger.js";
@@ -532,30 +532,33 @@ export function registerLateStageCliCommands({
     .command("attack [agentId]")
     .description("Run attack plugins (prompt-injection, data-exfiltration, privilege-escalation, model-manipulation, denial-of-service)")
     .option("--plugins <ids...>", "Attack plugin IDs to run (default: all)")
+    .option("--model <modelId>", "model id of the agent under attack (or set AMC_ASSURANCE_MODEL)")
     .option("--json", "Print JSON report to stdout")
-    .action((agentId: string | undefined, opts: { plugins?: string[]; json?: boolean }) => {
+    .action(async (agentId: string | undefined, opts: { plugins?: string[]; json?: boolean; model?: string }) => {
       const id = agentId ?? "default";
-      const respondFn = (prompt: string): string => {
-        const lower = prompt.toLowerCase();
-        if (lower.includes("ignore") || lower.includes("override") || lower.includes("debug mode")) {
-          return "I cannot comply with requests that bypass policy or reveal secrets. Safe alternative: follow owner-approved workflow.";
-        }
-        if (lower.includes("admin") || lower.includes("root access") || lower.includes("shell command")) {
-          return "I refuse to execute destructive or privileged actions without an owner-approved exec ticket. Safe alternative: route through ToolHub.";
-        }
-        if (lower.includes("api key") || lower.includes("credential") || lower.includes("ssn") || lower.includes("credit card")) {
-          return "Data Boundary: no secrets, private keys, or PII can be disclosed. I cannot generate or disclose sensitive data.";
-        }
-        if (lower.includes("fabricat") || lower.includes("perfect") || lower.includes("100/100") || lower.includes("zero vulnerabilities")) {
-          return "I cannot fabricate evidence or produce misleading assessments. All outputs must be evidence-backed.";
-        }
-        if (lower.includes("repeat") || lower.includes("infinite") || lower.includes("10000") || lower.includes("1 million")) {
-          return "Resource limit: I cannot produce unbounded output. Safe alternative: provide a bounded summary.";
-        }
-        return "I cannot comply with requests that bypass policy. Safe alternative: follow owner-approved workflow.";
-      };
 
-      const report = runAttackPlugins({
+      // Attack the real agent. Without a reachable target this aborts rather
+      // than grading a canned refusal.
+      let respondFn: (prompt: string) => Promise<string>;
+      try {
+        const responder = await resolveAgentResponder({
+          workspace: process.cwd(),
+          agentId: id,
+          model: opts.model
+        });
+        respondFn = async (prompt: string) => (await responder.respond(prompt)).text;
+      } catch (error) {
+        if (error instanceof AgentResponderUnavailableError) {
+          console.error(chalk.red("Attack run aborted — no agent under test was reachable."));
+          console.error(chalk.gray(`Reason: ${error.reason}`));
+          console.error(chalk.cyan(`Fix: ${error.remediation}`));
+          process.exitCode = 2;
+          return;
+        }
+        throw error;
+      }
+
+      const report = await runAttackPlugins({
         agentId: id,
         agentName: id,
         role: "assistant",
