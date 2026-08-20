@@ -1,3 +1,16 @@
+/**
+ * Dogfood evidence seeding.
+ *
+ * Writes OBSERVED-tier evidence for synthetic dogfood agents so AMC can be
+ * exercised end to end without a live agent. Nothing here was captured from a
+ * real interaction: every event is fabricated for demonstration.
+ *
+ * Every event carries meta.provenance = "dogfood" and meta.source =
+ * "dogfood-maturity" so it can be identified and filtered. Do not run this
+ * against a workspace whose scores are relied upon — seeded OBSERVED evidence
+ * is the highest trust tier and will raise the maturity score.
+ */
+
 import { mkdirSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { questionBank } from "../diagnostic/questionBank.js";

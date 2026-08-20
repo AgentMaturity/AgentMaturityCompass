@@ -174,7 +174,7 @@ export function registerLateStageCliCommands({
 
   demo
     .command("gap")
-    .description("The 84-point documentation inflation gap — keyword vs execution scoring")
+    .description("Scripted illustration of the 84-point documentation inflation gap (no agent is executed)")
     .option("--json", "Output as JSON")
     .option("--fast", "Skip the dramatic reveal (instant output)")
     .action(async (opts: { json?: boolean; fast?: boolean }) => {
@@ -192,6 +192,9 @@ export function registerLateStageCliCommands({
       console.log("");
       console.log(chalk.bold("  🧭 AMC — The 84-Point Documentation Inflation Gap"));
       console.log(chalk.gray("  Same agent. Two scoring methods. Very different results."));
+      console.log(
+        chalk.yellow("  Scripted illustration — no agent is executed; all figures are fixed examples.")
+      );
       console.log("");
 
       // Phase 1: Keyword scoring

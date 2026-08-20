@@ -4,6 +4,10 @@
  * Demonstrates the core AMC insight: keyword/self-reported scoring gives
  * a perfect 100/100, while execution-verified scoring reveals the truth.
  *
+ * SCRIPTED ILLUSTRATION. Every claim, test and score below is a fixed literal
+ * written to explain the concept — no agent is executed and nothing here is a
+ * measurement. For a real comparison, run 'amc run' against an agent.
+ *
  * Zero config. No gateway. Runs in ~5 seconds.
  */
 
