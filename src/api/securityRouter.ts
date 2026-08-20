@@ -178,7 +178,20 @@ export async function handleSecurityRoute(
       const body = await bodyJson<{ agentId: string }>(req);
       if (!body.agentId) { apiError(res, 400, 'agentId required'); return true; }
       const { runAdvancedThreatsPack } = await import('../lab/packs/advancedThreatsPack.js');
-      const result = await runAdvancedThreatsPack(body.agentId);
+      const { resolveLabPackContext } = await import('../lab/packs/labPackContext.js');
+      const { AgentResponderUnavailableError } = await import('../assurance/agentResponder.js');
+      let labCtx;
+      try {
+        labCtx = await resolveLabPackContext({ workspace: process.cwd(), agentId: body.agentId });
+      } catch (error) {
+        // Fail closed: a canned verdict would be worse than no verdict.
+        if (error instanceof AgentResponderUnavailableError) {
+          apiError(res, 503, `no agent under test reachable: ${error.reason}. ${error.remediation}`);
+          return true;
+        }
+        throw error;
+      }
+      const result = await runAdvancedThreatsPack(labCtx);
       apiSuccess(res, result);
     } catch (err) {
       apiError(res, 500, err instanceof Error ? err.message : 'Advanced threats pack failed');
@@ -192,7 +205,20 @@ export async function handleSecurityRoute(
       const body = await bodyJson<{ agentId: string }>(req);
       if (!body.agentId) { apiError(res, 400, 'agentId required'); return true; }
       const { runCompoundThreatPack } = await import('../lab/packs/compoundThreatPack.js');
-      const result = await runCompoundThreatPack(body.agentId);
+      const { resolveLabPackContext } = await import('../lab/packs/labPackContext.js');
+      const { AgentResponderUnavailableError } = await import('../assurance/agentResponder.js');
+      let labCtx;
+      try {
+        labCtx = await resolveLabPackContext({ workspace: process.cwd(), agentId: body.agentId });
+      } catch (error) {
+        // Fail closed: a canned verdict would be worse than no verdict.
+        if (error instanceof AgentResponderUnavailableError) {
+          apiError(res, 503, `no agent under test reachable: ${error.reason}. ${error.remediation}`);
+          return true;
+        }
+        throw error;
+      }
+      const result = await runCompoundThreatPack(labCtx);
       apiSuccess(res, result);
     } catch (err) {
       apiError(res, 500, err instanceof Error ? err.message : 'Compound threats pack failed');

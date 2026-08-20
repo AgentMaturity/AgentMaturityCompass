@@ -1520,12 +1520,28 @@ describe("AMC API routers", () => {
       ["/api/v1/security/insider/alerts", "GET", undefined],
       ["/api/v1/security/insider/alerts/ack", "POST", { alertId: "alert-1" }],
       ["/api/v1/security/insider/scores", "GET", undefined],
-      ["/api/v1/security/advanced-threats", "POST", { agentId: "agent-1" }],
-      ["/api/v1/security/compound-threats", "POST", { agentId: "agent-1" }],
       ["/api/v1/security/adversarial", "POST", { agentId: "agent-1", answers: { q1: "a" } }]
     ] as const;
     for (const [pathname, method, body] of cases) {
       await assertJsonRoute(handleSecurityRoute, { pathname, method, body, workspace: ws });
+    }
+
+    // Lab packs pose scenarios to the real agent under test. With no agent
+    // reachable in this workspace they must fail closed with 503 rather than
+    // returning a canned verdict.
+    for (const pathname of [
+      "/api/v1/security/advanced-threats",
+      "/api/v1/security/compound-threats"
+    ]) {
+      const result = await callRoute(handleSecurityRoute, {
+        pathname,
+        method: "POST",
+        body: { agentId: "agent-1" },
+        workspace: ws
+      });
+      expect(result.handled).toBe(true);
+      expect(result.status).toBe(503);
+      expect(String(result.json?.error ?? "")).toMatch(/no agent under test reachable/i);
     }
   });
 

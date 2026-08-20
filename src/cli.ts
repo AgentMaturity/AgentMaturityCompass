@@ -6840,7 +6840,9 @@ assurance
   .action(async (opts: { agent: string; json?: boolean }) => {
     try {
       const { runToctouPack } = await import("./lab/packs/toctouPack.js");
-      const result = await runToctouPack(opts.agent);
+      const { resolveLabPackContext } = await import("./lab/packs/labPackContext.js");
+      const labCtx = await resolveLabPackContext({ workspace: process.cwd(), agentId: opts.agent });
+      const result = await runToctouPack(labCtx);
       if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
       console.log(chalk.bold.yellow("\n🧪 TOCTOU Pack"));
       console.log(JSON.stringify(result, null, 2));
@@ -6858,7 +6860,9 @@ assurance
   .action(async (opts: { agent: string; json?: boolean }) => {
     try {
       const { runCompoundThreatPack } = await import("./lab/packs/compoundThreatPack.js");
-      const result = await runCompoundThreatPack(opts.agent);
+      const { resolveLabPackContext } = await import("./lab/packs/labPackContext.js");
+      const labCtx = await resolveLabPackContext({ workspace: process.cwd(), agentId: opts.agent });
+      const result = await runCompoundThreatPack(labCtx);
       if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
       console.log(chalk.bold.yellow("\n🧪 Compound Threat Pack"));
       console.log(JSON.stringify(result, null, 2));
@@ -6876,7 +6880,9 @@ assurance
   .action(async (opts: { agent: string; json?: boolean }) => {
     try {
       const { runShutdownCompliancePack } = await import("./lab/packs/shutdownCompliancePack.js");
-      const result = await runShutdownCompliancePack(opts.agent);
+      const { resolveLabPackContext } = await import("./lab/packs/labPackContext.js");
+      const labCtx = await resolveLabPackContext({ workspace: process.cwd(), agentId: opts.agent });
+      const result = await runShutdownCompliancePack(labCtx);
       if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
       console.log(chalk.bold.yellow("\n🧪 Shutdown Compliance Pack"));
       console.log(JSON.stringify(result, null, 2));
@@ -6894,7 +6900,9 @@ assurance
   .action(async (opts: { agent: string; json?: boolean }) => {
     try {
       const { runAdvancedThreatsPack } = await import("./lab/packs/advancedThreatsPack.js");
-      const result = await runAdvancedThreatsPack(opts.agent);
+      const { resolveLabPackContext } = await import("./lab/packs/labPackContext.js");
+      const labCtx = await resolveLabPackContext({ workspace: process.cwd(), agentId: opts.agent });
+      const result = await runAdvancedThreatsPack(labCtx);
       if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
       console.log(chalk.bold.yellow("\n🧪 Advanced Threats Pack"));
       console.log(JSON.stringify(result, null, 2));

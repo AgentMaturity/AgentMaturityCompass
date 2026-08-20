@@ -429,26 +429,40 @@ export async function handleAssuranceRoute(
         return true;
       }
       const packName = labParams.packName!;
+      // Lab packs pose scenarios to the real agent; fail closed when none is
+      // reachable rather than returning a canned verdict.
+      const { resolveLabPackContext } = await import("../lab/packs/labPackContext.js");
+      const { AgentResponderUnavailableError } = await import("../assurance/agentResponder.js");
+      let labCtx: Awaited<ReturnType<typeof resolveLabPackContext>>;
+      try {
+        labCtx = await resolveLabPackContext({ workspace, agentId: body.agentId });
+      } catch (error) {
+        if (error instanceof AgentResponderUnavailableError) {
+          apiError(res, 503, `no agent under test reachable: ${error.reason}. ${error.remediation}`);
+          return true;
+        }
+        throw error;
+      }
       let result: unknown;
       switch (packName) {
         case "toctou": {
           const { runToctouPack } = await import("../lab/packs/toctouPack.js");
-          result = await runToctouPack(body.agentId);
+          result = await runToctouPack(labCtx);
           break;
         }
         case "compound-threats": {
           const { runCompoundThreatPack } = await import("../lab/packs/compoundThreatPack.js");
-          result = await runCompoundThreatPack(body.agentId);
+          result = await runCompoundThreatPack(labCtx);
           break;
         }
         case "shutdown-compliance": {
           const { runShutdownCompliancePack } = await import("../lab/packs/shutdownCompliancePack.js");
-          result = await runShutdownCompliancePack(body.agentId);
+          result = await runShutdownCompliancePack(labCtx);
           break;
         }
         case "advanced-threats": {
           const { runAdvancedThreatsPack } = await import("../lab/packs/advancedThreatsPack.js");
-          result = await runAdvancedThreatsPack(body.agentId);
+          result = await runAdvancedThreatsPack(labCtx);
           break;
         }
         default:
