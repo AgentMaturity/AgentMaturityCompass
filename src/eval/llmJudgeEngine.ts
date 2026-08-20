@@ -239,6 +239,10 @@ Respond in JSON format:
 export class LLMJudgeEngine {
   private config: JudgeConfig;
   private cache: Map<string, JudgeResult> = new Map();
+  private cacheHits = 0;
+  private cacheLookups = 0;
+  /** Lazily constructed real judge transport; see callJudgeModel. */
+  private productionEngine?: import("./llmApiIntegration.js").ProductionLLMJudgeEngine;
 
   constructor(config: Partial<JudgeConfig> = {}) {
     this.config = {
@@ -260,8 +264,12 @@ export class LLMJudgeEngine {
   ): Promise<JudgeResult> {
     const cacheKey = this.getCacheKey(metric, context);
     
-    if (this.config.enableCache && this.cache.has(cacheKey)) {
-      return this.cache.get(cacheKey)!;
+    if (this.config.enableCache) {
+      this.cacheLookups += 1;
+      if (this.cache.has(cacheKey)) {
+        this.cacheHits += 1;
+        return this.cache.get(cacheKey)!;
+      }
     }
 
     const prompt = this.buildPrompt(metric, context);
@@ -339,13 +347,21 @@ export class LLMJudgeEngine {
     return prompt;
   }
 
+  /**
+   * Calls the real judge model.
+   *
+   * This previously returned a hardcoded {score: 0.8, "Mock judge response for
+   * testing"}, so every judge score in the product was fabricated — while a
+   * complete OpenAI/Anthropic client sat unused in llmApiIntegration.
+   *
+   * Subclasses may override to supply a different transport. Callers that want
+   * deterministic behaviour in tests should inject a judge via that override
+   * rather than relying on a built-in mock, because none exists.
+   */
   protected async callJudgeModel(prompt: string): Promise<string> {
-    // This would integrate with actual LLM APIs
-    // For now, return a mock response for testing
-    return JSON.stringify({
-      score: 0.8,
-      explanation: "Mock judge response for testing"
-    });
+    const { ProductionLLMJudgeEngine } = await import("./llmApiIntegration.js");
+    this.productionEngine ??= new ProductionLLMJudgeEngine();
+    return this.productionEngine.callJudgeModel(prompt);
   }
 
   protected parseJudgeResponse(metric: string, response: string): JudgeResult {
@@ -385,9 +401,11 @@ export class LLMJudgeEngine {
    * Get cache statistics
    */
   getCacheStats(): { size: number; hitRate: number } {
+    // Previously hardcoded to 0, which reported a 0% hit rate for a cache that
+    // was working.
     return {
       size: this.cache.size,
-      hitRate: 0 // Would track this in a real implementation
+      hitRate: this.cacheLookups === 0 ? 0 : Number((this.cacheHits / this.cacheLookups).toFixed(4))
     };
   }
 }
