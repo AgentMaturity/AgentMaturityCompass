@@ -31,12 +31,21 @@ export function formatPlaygroundReport(session: PlaygroundSession): string {
     lines.push(`${icon}  ${scenario?.name ?? result.scenarioId}`);
     lines.push(`   ${scenario?.description ?? ""}`);
     for (const step of result.steps) {
-      lines.push(`   ${step.passed ? "✓" : "✗"} Step ${step.stepId}: ${step.explanation}`);
+      const mark = step.pending ? "•" : step.passed ? "✓" : "✗";
+      lines.push(`   ${mark} Step ${step.stepId}: ${step.explanation}`);
     }
     lines.push("");
   }
-  const passed = session.results.filter(r => r.passed).length;
-  lines.push(`Summary: ${passed}/${session.results.length} scenarios passed`);
+  // Scenarios that were never executed are reported separately: counting them
+  // as passes would claim a result that was never measured.
+  const pending = session.results.filter(r => r.pending).length;
+  const executed = session.results.filter(r => !r.pending);
+  const passed = executed.filter(r => r.passed).length;
+  lines.push(
+    pending > 0
+      ? `Summary: ${passed}/${executed.length} scenarios passed, ${pending} not executed (run with a live agent)`
+      : `Summary: ${passed}/${executed.length} scenarios passed`
+  );
   lines.push("");
   return lines.join("\n");
 }

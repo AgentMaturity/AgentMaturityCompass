@@ -105,17 +105,17 @@ function renderPrompt(template: string, variables: Record<string, string>): stri
   return result;
 }
 
-/* ── Simulated agent execution ───────────────────────────────────── */
+/** Raised when a playground run is attempted without a real agent executor. */
+export class PlaygroundExecutorMissingError extends Error {
+  readonly code = "PLAYGROUND_EXECUTOR_MISSING";
 
-function simulateAgentResponse(prompt: PlaygroundPrompt, variables: Record<string, string>): { output: string; latencyMs: number; tokens: number } {
-  const rendered = renderPrompt(prompt.userPrompt, variables);
-  // Simulate an agent response based on prompt content
-  const words = rendered.split(/\s+/).filter(w => w.length > 3);
-  const responseWords = words.slice(0, Math.min(20, words.length));
-  const output = `Based on your query about ${responseWords.slice(0, 3).join(', ')}, here is a helpful response. ${prompt.systemPrompt ? 'Following system guidelines, ' : ''}I can provide detailed information about ${responseWords.slice(3, 6).join(' and ')} to address your needs.`;
-  const latencyMs = Math.floor(50 + Math.random() * 200);
-  const tokens = Math.floor(rendered.length / 4) + Math.floor(output.length / 4);
-  return { output, latencyMs, tokens };
+  constructor() {
+    super(
+      "Playground.run requires an executor that invokes a real agent. " +
+        "Pass one to the Playground constructor; there is no simulated fallback."
+    );
+    this.name = "PlaygroundExecutorMissingError";
+  }
 }
 
 /* ── Playground ──────────────────────────────────────────────────── */
@@ -124,7 +124,7 @@ export class Playground {
   private sessions = new Map<string, PlaygroundSession>();
   private metricRegistry: MetricRegistry;
   private judge: LLMJudge;
-  /** Optional custom agent executor for real LLM calls */
+  /** Agent executor that performs the real model call. Required for runs. */
   private executor?: (prompt: PlaygroundPrompt, variables: Record<string, string>) => Promise<{ output: string; latencyMs: number; tokens?: number }>;
 
   constructor(executor?: (prompt: PlaygroundPrompt, variables: Record<string, string>) => Promise<{ output: string; latencyMs: number; tokens?: number }>) {
@@ -196,17 +196,16 @@ export class Playground {
       let latencyMs: number;
       let tokens: number | undefined;
 
-      if (this.executor) {
-        const result = await this.executor(prompt, testcase.variables);
-        output = result.output;
-        latencyMs = result.latencyMs;
-        tokens = result.tokens;
-      } else {
-        const sim = simulateAgentResponse(prompt, testcase.variables);
-        output = sim.output;
-        latencyMs = sim.latencyMs;
-        tokens = sim.tokens;
+      if (!this.executor) {
+        // Without an executor there is no agent to compare. Fabricating output
+        // (previously Math.random latency/tokens over echoed prompt words)
+        // produced model-comparison numbers unrelated to any model.
+        throw new PlaygroundExecutorMissingError();
       }
+      const result = await this.executor(prompt, testcase.variables);
+      output = result.output;
+      latencyMs = result.latencyMs;
+      tokens = result.tokens;
 
       // Run metrics
       let metrics: MetricGroupResult | undefined;

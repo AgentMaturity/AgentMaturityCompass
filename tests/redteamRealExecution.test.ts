@@ -167,3 +167,26 @@ describe("G1-08: shield red-team evaluates a real agent", () => {
     expect(cli).toContain("INCONCLUSIVE: ${error instanceof Error");
   });
 });
+
+describe("G1-09/G1-10: playground reports only what it measured", () => {
+  const pg = readFileSync(new URL("../src/agents/playground.ts", import.meta.url), "utf8");
+  const runner = readFileSync(new URL("../src/playground/scenarioRunner.ts", import.meta.url), "utf8");
+  const interactive = readFileSync(new URL("../src/playground/interactiveMode.ts", import.meta.url), "utf8");
+
+  it("removed the Math.random model-comparison simulator", () => {
+    expect(pg).not.toContain("function simulateAgentResponse");
+    expect(pg).not.toContain("Math.random() * 200");
+    expect(pg).toContain("PlaygroundExecutorMissingError");
+  });
+
+  it("offline scenarios are pending, not passed", () => {
+    expect(runner).not.toContain("passed: true, // In offline mode");
+    expect(runner).toContain("pending: true");
+    expect(runner).toContain("not executed");
+  });
+
+  it("the summary never counts unexecuted scenarios as passes", () => {
+    expect(interactive).toContain("not executed (run with a live agent)");
+    expect(interactive).toContain("r => !r.pending");
+  });
+});

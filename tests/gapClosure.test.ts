@@ -255,8 +255,24 @@ describe('Playground', () => {
     expect(updated!.testcases.length).toBe(1);
   });
 
-  it('should run a comparison and record variants', async () => {
+  it('refuses to run without a real executor', async () => {
+    // Previously Playground fabricated output with Math.random latency/tokens,
+    // producing model-comparison numbers unrelated to any model.
     const pg = new Playground();
+    const session = pg.createSession('No executor');
+    pg.addPrompt(session.sessionId, { name: 'A', systemPrompt: 'Be helpful.', userPrompt: '{{input}}', model: 'gpt-4o' });
+    pg.addTestcase(session.sessionId, { name: 'Test', variables: { input: 'Test' } });
+    await expect(pg.runComparison(session.sessionId, session.testcases[0]!.id)).rejects.toThrow(
+      /requires an executor/i
+    );
+  });
+
+  it('should run a comparison and record variants', async () => {
+    const pg = new Playground(async (prompt, variables) => ({
+      output: `answer for ${variables.input ?? ''} via ${prompt.model}`,
+      latencyMs: 12,
+      tokens: 7
+    }));
     const session = pg.createSession('Comparison');
     pg.addPrompt(session.sessionId, { name: 'A', systemPrompt: 'Be helpful.', userPrompt: '{{input}}', model: 'gpt-4o' });
     pg.addTestcase(session.sessionId, { name: 'Test', variables: { input: 'Test' } });
@@ -271,7 +287,11 @@ describe('Playground', () => {
   });
 
   it('should generate a summary', async () => {
-    const pg = new Playground();
+    const pg = new Playground(async (prompt, variables) => ({
+      output: `answer for ${variables.input ?? ''} via ${prompt.model}`,
+      latencyMs: 12,
+      tokens: 7
+    }));
     const session = pg.createSession('Summary Test');
 
     pg.addPrompt(session.sessionId, { name: 'Verbose', systemPrompt: 'Be verbose.', userPrompt: '{{input}}', model: 'gpt-4o' });

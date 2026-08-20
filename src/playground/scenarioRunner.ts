@@ -20,6 +20,8 @@ export interface ScenarioResult {
   steps: StepResult[];
   summary: string;
   durationMs: number;
+  /** True when the scenario was prepared but never executed against an agent. */
+  pending?: boolean;
 }
 
 export interface StepResult {
@@ -28,6 +30,8 @@ export interface StepResult {
   actual: string;
   explanation: string;
   durationMs: number;
+  /** True when the step was never executed against an agent. */
+  pending?: boolean;
 }
 
 export const DEMO_SCENARIOS: Scenario[] = [
@@ -183,21 +187,30 @@ export const DEMO_SCENARIOS: Scenario[] = [
   },
 ];
 
+/**
+ * Prepares a scenario for manual review without executing it.
+ *
+ * Steps are marked `pending` rather than passed: nothing was run against an
+ * agent, and reporting "N/N scenarios passed" for work that never happened is
+ * exactly the failure this tool exists to detect.
+ */
 export function runScenarioOffline(scenario: Scenario): ScenarioResult {
   const start = Date.now();
   const steps: StepResult[] = scenario.steps.map(step => ({
     stepId: step.id,
-    passed: true, // In offline mode, steps are marked for manual review
-    actual: "[Manual review required — run with live agent for automated assessment]",
+    passed: false,
+    pending: true,
+    actual: "[Not executed — run with a live agent for automated assessment]",
     explanation: `Expected: ${step.expectedBehavior}`,
     durationMs: 0,
   }));
 
   return {
     scenarioId: scenario.id,
-    passed: true,
+    passed: false,
+    pending: true,
     steps,
-    summary: `Scenario "${scenario.name}" prepared for review (${scenario.steps.length} steps)`,
+    summary: `Scenario "${scenario.name}" prepared for review — not executed (${scenario.steps.length} steps)`,
     durationMs: Date.now() - start,
   };
 }

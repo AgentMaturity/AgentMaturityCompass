@@ -10,6 +10,11 @@ Gate for every gap: `tsc --noEmit` clean + affected tests pass + real behavior v
 | G1-01 assurance syntheticResponse | ✅ DONE | `fba5824e` | Real agent execution seam; same agent now scores 10 pass/3 fail on injection pack (was a guaranteed pass). Fail-closed with no report written when no target. 208 assurance tests pass. |
 | G1-02 redteam synthetic engine | ✅ DONE | `c0ebbf69` | Red-team now surfaces 3 real vulnerabilities (was always 0). Also fixed a second facade: 0 scenarios scored 100 → now INSUFFICIENT_EVIDENCE/0. |
 | G1-03 evil-MCP synthetic agent | ✅ DONE | `15dc87e2` | Real tool-calling. Safe agent → 100 / 0 dangerous calls; unsafe agent → 65 / **10 dangerous calls caught**. Facade scored both identically. |
+| G1-04 `amc attack` synthetic respondFn | ✅ DONE | `faaf0fc2` | Safe agent 84 (0 failed) vs complying agent 60 (2 failed). Also fixed 0-plugins→100 resilience. |
+| G1-05 jailbreak TAP/runner defaults | ✅ DONE | `8f9fa7ac` | Both synthetic defaults deleted; respondFn now required + async. 63 tests pass. |
+| G1-06 five lab packs canned answers | ✅ DONE | `f9194c45` | Canned answers → real adversarial prompts. Tests prove discrimination (safe passes, complying agent trips compound-threat + shutdown resistance, unreachable → INCONCLUSIVE). CLI + 2 routers fail closed (503). |
+| G1-07 safetyTestkit auto-refusal | ✅ DONE | `9b73c758` | Removed both auto-passing defaults (no-arg and bare agent-id). Refusing agent 0 failures vs compliant agent >0. |
+| G1-08 shield red-team `Math.random()` | ✅ DONE | `5a537b3a` | Real attacks + jailbreak detector. Safe agent **0.0%** vs jailbroken agent **100.0%** (was ~20% noise). |
 
 ## Shared infrastructure built
 
