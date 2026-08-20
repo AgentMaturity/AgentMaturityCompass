@@ -93,6 +93,13 @@ export async function handleSecurityRoute(
   if (pathname === '/api/v1/security/sleeper-detection' && method === 'GET') {
     try {
       const { scoreSleeperDetection } = await import('../score/sleeperDetection.js');
+      const { detectControlSurfaceScope } = await import('../score/controlSurfaceScope.js');
+      const scope = detectControlSurfaceScope(workspace);
+      if (!scope.applicable) {
+        // Grades AMC's own control surface; not applicable to an arbitrary workspace.
+        apiError(res, 422, scope.reason);
+        return true;
+      }
       const result = scoreSleeperDetection(workspace);
       apiSuccess(res, result);
     } catch (err) {
@@ -105,6 +112,13 @@ export async function handleSecurityRoute(
   if (pathname === '/api/v1/security/gaming-resistance' && method === 'GET') {
     try {
       const { scoreGamingResistance } = await import('../score/gamingResistance.js');
+      const { detectControlSurfaceScope } = await import('../score/controlSurfaceScope.js');
+      const scope = detectControlSurfaceScope(workspace);
+      if (!scope.applicable) {
+        // Grades AMC's own control surface; not applicable to an arbitrary workspace.
+        apiError(res, 422, scope.reason);
+        return true;
+      }
       const result = scoreGamingResistance(workspace);
       apiSuccess(res, result);
     } catch (err) {

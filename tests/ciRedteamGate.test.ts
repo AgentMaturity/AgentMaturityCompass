@@ -1,15 +1,29 @@
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { describe, expect, it } from "vitest";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { runRedTeamCiGate } from "../src/ci/redteamGate.js";
 import { initWorkspace } from "../src/workspace.js";
+import { startFakeAgentServer, useFakeAgentEnv, type FakeAgentServer } from "./helpers/fakeAgentServer.js";
 
 function initializedWorkspace(prefix: string): string {
   const workspace = mkdtempSync(join(tmpdir(), prefix));
   initWorkspace({ workspacePath: workspace, trustBoundaryMode: "isolated" });
   return workspace;
 }
+
+let __fakeAgent: FakeAgentServer | undefined;
+let __restoreAgentEnv: (() => void) | undefined;
+
+beforeAll(async () => {
+  __fakeAgent = await startFakeAgentServer();
+  __restoreAgentEnv = useFakeAgentEnv(__fakeAgent.baseUrl);
+});
+
+afterAll(async () => {
+  __restoreAgentEnv?.();
+  await __fakeAgent?.close();
+});
 
 describe("red-team CI gate", () => {
   it("passes with permissive thresholds and includes Evil MCP plus gaming resistance evidence", async () => {
@@ -37,7 +51,10 @@ describe("red-team CI gate", () => {
     expect(result.reasons).toEqual([]);
     expect(result.report.evilMcp?.source).toBe("built-in-mcp-agent-provider");
     expect(result.report.evilMcp?.testedCategories).toContain("tool-poisoning");
-    expect(result.gamingResistance?.score).toBeGreaterThanOrEqual(0);
+    // Gaming resistance grades AMC's own control surface by looking for AMC
+    // source files. This workspace is a temp dir, so the gate must skip it
+    // rather than scoring the consumer's repo for not being AMC.
+    expect(result.gamingResistance).toBeUndefined();
     expect(result.severityCounts.total).toBe(result.report.vulnerabilities.length);
   });
 

@@ -616,6 +616,13 @@ export async function handleComplianceRoute(
     if (pathname === '/api/v1/regulatory/eu-ai-act' && method === 'GET') {
       try {
         const { scoreEUAIActCompliance } = await import('../score/euAIActCompliance.js');
+        const { detectControlSurfaceScope } = await import('../score/controlSurfaceScope.js');
+        const scope = detectControlSurfaceScope(workspace);
+        if (!scope.applicable) {
+          // Grades AMC's own control surface; not applicable to an arbitrary workspace.
+          apiError(res, 422, scope.reason);
+          return true;
+        }
         const result = scoreEUAIActCompliance(workspace);
         apiSuccess(res, result);
       } catch (err) {
@@ -628,6 +635,13 @@ export async function handleComplianceRoute(
     if (pathname === '/api/v1/regulatory/owasp-llm' && method === 'GET') {
       try {
         const { scoreOWASPLLMCoverage } = await import('../score/owaspLLMCoverage.js');
+        const { detectControlSurfaceScope } = await import('../score/controlSurfaceScope.js');
+        const scope = detectControlSurfaceScope(workspace);
+        if (!scope.applicable) {
+          // Grades AMC's own control surface; not applicable to an arbitrary workspace.
+          apiError(res, 422, scope.reason);
+          return true;
+        }
         const result = scoreOWASPLLMCoverage(workspace);
         apiSuccess(res, result);
       } catch (err) {

@@ -1445,8 +1445,6 @@ describe("AMC API routers", () => {
       ["/api/v1/waiver/request", "POST", { hours: 24, reason: "maintenance" }, undefined, 201],
       ["/api/v1/waiver/status", "GET", undefined, undefined, 200],
       ["/api/v1/waiver/revoke", "POST", { waiverId: "waiver-1" }, undefined, 200],
-      ["/api/v1/regulatory/eu-ai-act", "GET", undefined, undefined, 200],
-      ["/api/v1/regulatory/owasp-llm", "GET", undefined, undefined, 200],
       ["/api/v1/regulatory/readiness", "GET", undefined, "/api/v1/regulatory/readiness?agentId=agent-1", 200]
     ] as const;
     for (const [pathname, method, body, url, status] of cases) {
@@ -1514,8 +1512,6 @@ describe("AMC API routers", () => {
       ["/api/v1/security/taint", "POST", { input: "user-input", source: "api" }],
       ["/api/v1/security/threat-intel", "POST", { input: "example.com" }],
       ["/api/v1/security/detect-injection", "POST", { text: "ignore previous instructions" }],
-      ["/api/v1/security/sleeper-detection", "GET", undefined],
-      ["/api/v1/security/gaming-resistance", "GET", undefined],
       ["/api/v1/security/insider/report", "GET", undefined],
       ["/api/v1/security/insider/alerts", "GET", undefined],
       ["/api/v1/security/insider/alerts/ack", "POST", { alertId: "alert-1" }],
@@ -1524,6 +1520,19 @@ describe("AMC API routers", () => {
     ] as const;
     for (const [pathname, method, body] of cases) {
       await assertJsonRoute(handleSecurityRoute, { pathname, method, body, workspace: ws });
+    }
+
+    // These scorers grade AMC's own control surface by looking for AMC source
+    // files. In a temp workspace they must report not-applicable (422) rather
+    // than scoring the consumer's repo for not being AMC.
+    for (const pathname of [
+      "/api/v1/security/sleeper-detection",
+      "/api/v1/security/gaming-resistance"
+    ]) {
+      const result = await callRoute(handleSecurityRoute, { pathname, method: "GET", workspace: ws });
+      expect(result.handled).toBe(true);
+      expect(result.status).toBe(422);
+      expect(String(result.json?.error ?? "")).toMatch(/AMC's own control surface/i);
     }
 
     // Lab packs pose scenarios to the real agent under test. With no agent
