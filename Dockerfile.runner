@@ -1,5 +1,9 @@
 # amc-runner — CI/CD runner image with AMC pre-installed
 # Usage: docker run --rm -v $(pwd):/workspace ghcr.io/agentmaturity/amc-runner:latest quickscore --json
+#
+# NOTE: this image is not confirmed published — website/publication-status.json
+# reports containerRegistry: unverified. Build it locally until that changes:
+#   docker build -f Dockerfile.runner -t ghcr.io/agentmaturity/amc-runner:latest .
 # Or in GitHub Actions:
 #   container:
 #     image: ghcr.io/agentmaturity/amc-runner:latest

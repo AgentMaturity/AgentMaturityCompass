@@ -56,7 +56,10 @@
     "clean": "rm -rf dist",
     "prebuild": "npm run clean",
     "prepack": "npm run release:gate -- --json --out tmp/release-gate/prepack.json && npm run release:prepack-check",
-    "postinstall": "node scripts/postinstall.js || true"
+    "postinstall": "node scripts/postinstall.js || true",
+    "gen-counts": "node scripts/gen-counts.mjs --write",
+    "check:counts": "node scripts/gen-counts.mjs --check",
+    "check:question-bank-export": "node scripts/gen-question-bank-export.mjs --check"
   },
   "keywords": [
     "ai-agent",

@@ -5,8 +5,22 @@ LABEL org.opencontainers.image.description="Zero-dependency AMC quickstart conta
 LABEL org.opencontainers.image.source="https://github.com/AgentMaturity/AgentMaturityCompass"
 LABEL org.opencontainers.image.licenses="MIT"
 
-# Install AMC globally
-RUN npm i -g agent-maturity-compass && npm cache clean --force
+# Install AMC from the GitHub release.
+#
+# This previously ran `npm i -g agent-maturity-compass`, but the npm channel is
+# not published (website/publication-status.json reports npm: not_live), so the
+# image could not build at all. The GitHub release is live and carries an
+# npm-tarball asset, so the quickstart installs from there and stays pinned to a
+# known version rather than tracking a moving tag.
+ARG AMC_VERSION=1.1.1
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends curl ca-certificates \
+    && rm -rf /var/lib/apt/lists/* \
+    && curl -fsSL -o /tmp/amc.tgz \
+       "https://github.com/AgentMaturity/AgentMaturityCompass/releases/download/v${AMC_VERSION}/agent-maturity-compass-${AMC_VERSION}.tgz" \
+    && npm i -g /tmp/amc.tgz \
+    && rm -f /tmp/amc.tgz \
+    && npm cache clean --force
 
 # Create a workspace directory
 WORKDIR /workspace

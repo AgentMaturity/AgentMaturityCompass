@@ -1,6 +1,11 @@
 # AMC Domain Packs
 
-AMC domain packs extend the base 138-question AMC rubric. Additionally, 283 domain-level questions and 600 industry-specific questions across 41 packs and 7 domain stations bring the total diagnostic surface to **1,021 questions**.
+AMC domain packs extend the base 244-question AMC rubric with industry-specific questions across 41 packs and 7 domain stations.
+
+> Counts here are maintained by hand. The authoritative figure for the base
+> rubric is whatever `node scripts/gen-counts.mjs` reports (244 today); the
+> earlier "138-question rubric" and "1,021 total" predate several expansions
+> and did not reconcile with the code.
 
 - Base AMC remains mandatory for every agent.
 - Domain packs add regulated vertical controls.
@@ -51,7 +56,7 @@ External regulatory and standards anchors confirm this is a real operational sur
 
 ## Composition Model
 
-1. Run base AMC scoring (138-question rubric).
+1. Run base AMC scoring (244-question rubric).
 2. Run domain pack scoring (domain-specific questions).
 3. Run domain assurance pack(s) for evidence generation.
 4. Evaluate compliance gaps and module activation state.

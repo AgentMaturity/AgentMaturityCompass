@@ -80,6 +80,16 @@ jobs:
       - name: Architecture boundary compatibility
         run: npm run check:architecture-boundaries
 
+      # Fails when a published count (adapters, packs, questions, tests) drifts
+      # from what the repository actually contains.
+      - name: Published counts match reality
+        run: npm run check:counts
+
+      # The question-bank export is generated; fail if it has drifted from the
+      # live bank.
+      - name: Generated docs are current
+        run: npm run check:question-bank-export
+
       - name: Release smoke checks
         run: |
           npm pack --ignore-scripts --json > /tmp/amc-pack.json

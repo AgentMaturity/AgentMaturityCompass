@@ -1,6 +1,6 @@
 # Equalizer Targets
 
-Equalizer targets define the desired maturity state (`0..5`) for all 67 diagnostic questions.
+Equalizer targets define the desired maturity state (`0..5`) for every diagnostic question in the bank (244 today; run `node scripts/gen-counts.mjs` for the current figure). The previous "67" was a stale snapshot.
 
 ## Principles
 

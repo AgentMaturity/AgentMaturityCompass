@@ -5,7 +5,12 @@
 **Version:** 1.0  
 **Date:** 2026-03-14  
 **Repository:** https://github.com/AgentMaturity/AgentMaturityCompass  
-**License:** Apache 2.0
+**License:** ⚠️ UNRESOLVED — this document says Apache 2.0 while the repository
+ships MIT (`LICENSE`, `package.json`). Licensing a specification separately from
+its implementation is a legitimate choice, but it has to be a stated one: as it
+stands a reader cannot tell whether this is deliberate or an error. Until the
+owner confirms, treat the repository licence (MIT) as authoritative for
+everything in this repo, including this document.
 
 ---
 

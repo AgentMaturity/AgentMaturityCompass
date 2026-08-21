@@ -14,7 +14,7 @@
   <a href="https://github.com/AgentMaturity/AgentMaturityCompass/releases"><img src="https://img.shields.io/github/v/release/AgentMaturity/AgentMaturityCompass?labelColor=0a0a0a&color=4AEF79&label=release" alt="GitHub release" /></a>
   <a href="https://github.com/AgentMaturity/AgentMaturityCompass/releases"><img src="https://img.shields.io/github/downloads/AgentMaturity/AgentMaturityCompass/total?labelColor=0a0a0a&color=4AEF79&label=downloads" alt="verified release downloads" /></a>
   <a href="https://github.com/AgentMaturity/AgentMaturityCompass/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/AgentMaturity/AgentMaturityCompass/ci.yml?branch=main&labelColor=0a0a0a&color=4AEF79&label=CI" alt="CI" /></a>
-  <a href="https://github.com/AgentMaturity/AgentMaturityCompass/actions/workflows/ci.yml"><img src="https://img.shields.io/badge/tests-8%2C604%20passing-4AEF79?labelColor=0a0a0a" alt="tests" /></a>
+  <a href="https://github.com/AgentMaturity/AgentMaturityCompass/actions/workflows/ci.yml"><img src="https://img.shields.io/badge/tests-8%2C478%20passing-4AEF79?labelColor=0a0a0a" alt="tests" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-4AEF79?labelColor=0a0a0a" alt="MIT" /></a>
 </p>
 
@@ -164,9 +164,9 @@ cd AgentMaturityCompass && npm ci && npm run build && npm link
 |  | **AMC** | Observability platforms | Eval frameworks | Manual checklists |
 |---|---|---|---|---|
 | **Evidence model** | Execution-verified, cryptographic proofs | Logs and metrics, no trust scoring | Test pass/fail, no maturity model | Self-reported |
-| **Adversarial testing** | 142 assurance packs built in | Not a focus | Partial (prompt-level only) | None |
+| **Adversarial testing** | <!-- amc:count:assurancePacksRegistered -->143<!-- /amc:count --> assurance packs built in | Not a focus | Partial (prompt-level only) | None |
 | **Compliance mapping** | EU AI Act, ISO 42001, NIST, SOC 2, OWASP | Not included | Not included | Manual, labor-intensive |
-| **Framework support** | 15 adapters, zero code changes | Framework-specific agents | Framework-specific | N/A |
+| **Framework support** | <!-- amc:count:adapters -->15<!-- /amc:count --> adapters, zero code changes | Framework-specific agents | Framework-specific | N/A |
 | **Cost** | Free, open source (MIT) | Per-seat/month pricing | Free to paid | Free but manual |
 | **Time to first result** | 60 seconds | Hours to days | Minutes to hours | Days to weeks |
 
@@ -271,7 +271,7 @@ AMC Gateway ──── transparent proxy, agent doesn't know it's being watche
 Evidence Ledger ──── Ed25519 signatures + Merkle tree proof chains
     │
     ▼
-Scoring Engine ──── evidence-weighted diagnostics, research-backed scoring, 142 assurance packs
+Scoring Engine ──── evidence-weighted diagnostics, research-backed scoring, <!-- amc:count:assurancePacksRegistered -->143<!-- /amc:count --> assurance packs
     │
     ▼
 AMC Studio ──── dashboard + API + CLI + reports
@@ -614,7 +614,7 @@ Result: ![AMC Score](https://img.shields.io/badge/AMC-L3_(72.5)-green)
 
 ---
 
-## 14 Framework Adapters
+## <!-- amc:count:adapters -->15<!-- /amc:count --> Framework Adapters
 
 Route a supported CLI or generated framework sample through AMC without replacing the agent runtime.
 
@@ -713,7 +713,7 @@ The full trust stack is **free and MIT licensed**. Industry Packs are the planne
 
 | Tier | What you get |
 |---|---|
-| **Free / Open Source** | Everything — Score, Shield, Enforce, Vault, Watch, Comply, Fleet, Passport, all 15 adapters, 1,171 registered CLI command paths, browser playground, CI gates |
+| **Free / Open Source** | Everything — Score, Shield, Enforce, Vault, Watch, Comply, Fleet, Passport, all <!-- amc:count:adapters -->15<!-- /amc:count --> adapters, 1,171 registered CLI command paths, browser playground, CI gates |
 | **Industry Packs (planned; not yet purchasable)** | Planned `$9.99/month` tier for all 41 Industry Domain Packs; public checkout is not live |
 | **Enterprise (contact-first; not self-serve)** | Planned Industry Packs access plus priority support, custom pack development, and deployment assistance |
 
@@ -847,7 +847,7 @@ AMC is MIT licensed. We welcome contributions — especially new **assurance pac
 
 ```bash
 git clone https://github.com/AgentMaturity/AgentMaturityCompass.git
-cd AgentMaturityCompass && npm ci && npm test   # 1,087 files / 8,604 passing Vitest tests
+cd AgentMaturityCompass && npm ci && npm test   # <!-- amc:count:testFiles -->1,122<!-- /amc:count --> files / <!-- amc:count:testBlocks -->8,478<!-- /amc:count --> passing Vitest tests
 ```
 
 **→ [CONTRIBUTING.md](CONTRIBUTING.md)** — includes guides for writing packs, mapping research papers, and adding adapters.
@@ -868,6 +868,6 @@ cd AgentMaturityCompass && npm ci && npm test   # 1,087 files / 8,604 passing Vi
 ---
 
 <p align="center">
-  <strong>244 default diagnostic questions + 20 lifecycle expansion questions · 142 assurance packs · 41 domain packs · 15 adapters · 1,171 CLI command paths</strong><br>
+  <strong><!-- amc:count:diagnosticQuestions -->244<!-- /amc:count --> default diagnostic questions + 20 lifecycle expansion questions · <!-- amc:count:assurancePacksRegistered -->143<!-- /amc:count --> assurance packs · 41 domain packs · <!-- amc:count:adapters -->15<!-- /amc:count --> adapters · 1,171 CLI command paths</strong><br>
   <em>Stop trusting. Start verifying.</em>
 </p>

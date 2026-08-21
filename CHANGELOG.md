@@ -534,7 +534,14 @@
 
 All notable changes to AMC are documented here.
 
-## [Unreleased]
+<!--
+  The section below is a legacy changelog that predates the entries above it.
+  Its "[Unreleased]" heading is historical: the items listed shipped long ago,
+  and the counts in it (for example "235-question") are the figures of that era,
+  not current ones. Run `node scripts/gen-counts.mjs` for current numbers.
+-->
+
+## [Unreleased — historical; these changes shipped]
 
 ### Added
 

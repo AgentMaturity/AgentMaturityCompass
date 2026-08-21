@@ -1,3 +1,7 @@
+# NOTE: the ghcr.io images below are unverified — website/publication-status.json
+# reports containerRegistry: unverified, so a pull may 404. Build locally with
+#   docker build -f ../Dockerfile -t ghcr.io/agentmaturity/amc-studio:latest ..
+# until the registry channel is confirmed published.
 version: "3.9"
 
 services:
