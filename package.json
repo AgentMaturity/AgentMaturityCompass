@@ -61,6 +61,8 @@
     "check:counts": "node scripts/gen-counts.mjs --check",
     "check:compliance-freshness": "node scripts/compliance-artifact-freshness.mjs",
     "check:evidence-paths": "node scripts/evidence-path-check.mjs",
+    "gen:api-ref": "node scripts/gen-api-ref.cjs",
+    "check:api-ref": "node scripts/gen-api-ref.cjs --check",
     "check:question-bank-export": "node scripts/gen-question-bank-export.mjs --check",
     "test:coverage": "vitest run --coverage"
   },

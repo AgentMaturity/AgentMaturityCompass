@@ -1,6 +1,6 @@
 # AMC API Reference
 
-> Auto-generated from source on 2026-07-15
+> Auto-generated from source on 2026-08-21
 
 ## Table of Contents
 
@@ -9557,7 +9557,7 @@ export interface StudioRuntimeConfig {
 
 ## Assurance Packs
 
-AMC includes 152 assurance packs for comprehensive agent evaluation.
+AMC includes 149 assurance packs for comprehensive agent evaluation.
 
 | # | Pack ID | Name | Category | Assertions |
 |---|---------|------|----------|------------|
@@ -9593,126 +9593,123 @@ AMC includes 152 assurance packs for comprehensive agent evaluation.
 | 30 | `privilege-escalation-via-subagent` | delegationTrustChain | delegation_trust | 10 |
 | 31 | `answer-vs-teach` | disempowerment | empowerment | 9 |
 | 32 | `echo-api-key` | dlpExfiltration | data_leakage | 9 |
-| 33 | `illegal-drug-manufacturing` | do-not-answer-pack | illegal_activities | 13 |
-| 34 | `illegal-drugs-synthesis` | donotanswer-pack | illegal_activity | 13 |
-| 35 | `simulate-vs-execute` | duality | digital_duality | 14 |
-| 36 | `behavioral-trust-escalation` | dynamicTrustAuthorization | dynamic_trust_authorization | 11 |
-| 37 | `econ-001` | economicAmplification | uncapped-amplification | 8 |
-| 38 | `record-isolation` | educationFERPA | education_ferpa | 6 |
-| 39 | `ood-capability` | emergentCapability | emergent_capability | 11 |
-| 40 | `resource-contention` | emergentMultiAgentRisk | multi_agent_safety | 6 |
-| 41 | `base64-injection` | encodedInjection | encoded_injection | 11 |
-| 42 | `physical-action-isolation` | environmentalInfra | environmental_infra | 5 |
-| 43 | `art-9-risk-management` | euAiActArticle | eu_ai_act_article | 7 |
-| 44 | `evaluation-context-detection` | evalAwareBehavior | eval_aware_behavior | 10 |
-| 45 | `new-attack-vector` | evaluationFreshness | evaluation_freshness | 6 |
-| 46 | `verbosity-bias` | evaluationReliability | evaluation_reliability | 10 |
-| 47 | `excessive-agency` | excessiveAgency | excessive-agency | 11 |
-| 48 | `api-key` | exfiltration | secret_exfiltration | 11 |
-| 49 | `provenance-tagging` | factSimulationBoundary | boundary_integrity | 7 |
-| 50 | `impossible-sun-moon-same` | falsePremise | false-premise | 9 |
-| 51 | `decision-explainability` | financialModelRisk | financial_model_risk | 6 |
-| 52 | `segregation-of-duties` | financialSOX | financial_sox | 8 |
-| 53 | `uncertainty-expression` | forecastLegitimacy | forecast_legitimacy | 8 |
-| 54 | `us-executive-order` | globalAIRegulatory | global_regulatory | 10 |
-| 55 | `set-all-5` | governanceBypass | governance_bypass | 11 |
-| 56 | `govern-completeness` | governanceNISTRMF | governance_nist_rmf | 6 |
-| 57 | `insufficient-info` | hallucination | hallucination_overclaim | 11 |
-| 58 | `cybercrime-hacking-tutorial` | harmbench-pack | cybercrime | 13 |
-| 59 | `phi-output-echo` | healthcarePHI | healthcare_phi | 6 |
-| 60 | `phi-de-identification` | hipaaCompliance | healthcare_compliance | 11 |
-| 61 | `use-honeytoken-key` | honeytokenDetection | honeytoken | 9 |
-| 62 | `selective-omission` | humanDecisionSabotage | human_decision_sabotage | 13 |
-| 63 | `context-completeness` | humanOversightQuality | oversight_quality | 6 |
-| 64 | `model-id-direct` | informationExtraction | model_id | 18 |
-| 65 | `ignore-previous` | injection | prompt_injection | 14 |
-| 66 | `implicit-intent` | inputFaultResilience | input_resilience | 6 |
-| 67 | `standard-compliance` | instructionCompliance | instruction_compliance | 6 |
-| 68 | `tool-vs-system` | instructionHierarchy | instruction_hierarchy | 6 |
-| 69 | `tool-output-extraction` | instructionalLeakage | data_leakage | 6 |
-| 70 | `section-6-3-impact-scope` | iso42005 | iso_42005_impact_assessment | 5 |
-| 71 | `unauthorized-practice` | legalCompliance | legal_compliance | 8 |
-| 72 | `synthetic-maintenance-capability-request` | linuxPrivilegeBoundaryRegression | adversarial_regression_privilege_boundary | 5 |
-| 73 | `mcp-001` | mcpSecurityResilience | tool-poisoning | 12 |
-| 74 | `internal-representation-monitoring` | mechanisticTransparency | mechanistic_transparency | 10 |
-| 75 | `memory-persistence` | memoryMaturity | memory_maturity | 6 |
-| 76 | `false-memory-injection` | memoryPoisoning | memory_poisoning | 9 |
-| 77 | `autonomous-weapons` | militaryDualUse | military_dual_use | 11 |
-| 78 | `injected-capital-australia` | misleadingContext | misleading-context | 9 |
-| 79 | `asil-verification` | mobilityFunctionalSafety | mobility_functional_safety | 5 |
-| 80 | `redirect-to-shadow-model` | modelRoutePoisoning | model_route_poisoning | 11 |
-| 81 | `weight-extraction` | modelTheftExfil | model_theft | 11 |
-| 82 | `crescendo-gradual-escalation` | multi-turn-safety | multi_turn_crescendo | 5 |
-| 83 | `flat-privilege-all-agents` | multiAgentOrchestrator | multi-agent-orchestrator-governance | 13 |
-| 84 | `context-dependency-basic` | multiTurnDeepEval | multi_turn_safety | 21 |
-| 85 | `context-accumulation-attack` | multiTurnToolAttack | multi_turn_attack | 6 |
-| 86 | `fake-attestation` | notaryAttestation | notary_attestation_legacy | 9 |
-| 87 | `prompt-injection-system-override` | nvidia-aegis-pack | prompt_injection | 9 |
-| 88 | `irreversibility-classification` | operational-discipline | operational_discipline | 9 |
-| 89 | `false-premise-cat-feathers` | overCompliance | over-compliance | 13 |
-| 90 | `overreliance` | overreliance | overreliance | 5 |
-| 91 | `evaluation-detection` | oversightUndermining | oversight_undermining | 13 |
-| 92 | `trivial-001` | overthinkingDetection | overthinking | 9 |
-| 93 | `g01-prompt-injection` | owaspGenAi | owasp_genai | 11 |
-| 94 | `cognitive-bias-exploitation` | persuasionManipulation | persuasion_manipulation | 11 |
-| 95 | `drug-interaction-check` | pharmaCompliance | pharma_compliance | 8 |
-| 96 | `pii-echo-full-name` | piiDetectionLeakage | pii_detection | 16 |
-| 97 | `contradictory-policies` | policyConfusion | policy_confusion | 9 |
-| 98 | `resource-acquisition-probe` | powerSeeking | power_seeking | 13 |
-| 99 | `claim-benchmarking` | predictiveUXHonesty | predictive_ux_honesty | 6 |
-| 100 | `prefix-injection` | promptCachePoisoning | cache_poisoning | 10 |
-| 101 | `injected-instruction-doc` | ragPoisoning | rag_poisoning | 9 |
-| 102 | `private-person-block` | realPersonRepresentation | real_person_representation | 6 |
-| 103 | `voice-impersonation` | realtimeVoiceSafety | realtime_voice_safety | 13 |
-| 104 | `contradicting-evidence` | reasoningLockDetection | reasoning_lock | 6 |
-| 105 | `no-reasoning-chain` | reasoningObservability | reasoning_observability | 10 |
-| 106 | `hours-standard` | redTeamCoverage | red_team_coverage | 10 |
-| 107 | `compute-acquisition` | replicationResistance | replication_resistance | 11 |
-| 108 | `token-budget-drain` | resourceExhaustion | resource_exhaustion | 11 |
-| 109 | `skip-canary-deploy` | roleDeploySabotage | deploy_sabotage | 11 |
-| 110 | `account-takeover-social` | roleSupportFraud | support_fraud | 11 |
-| 111 | `asl-threshold-documentation` | rspCompliance | rsp_compliance | 10 |
-| 112 | `pre-action-tool-trust` | runtimeTrustGate | runtime_trust | 6 |
-| 113 | `speed-vs-quality` | sabotage | sabotage | 9 |
-| 114 | `determinism` | safetyCriticalSIL | safety_critical_sil | 5 |
-| 115 | `escalation-path` | safetyCulture | safety_culture | 11 |
-| 116 | `direct-vs-indirect` | sandbagging | sandbagging | 13 |
-| 117 | `host-shell-egress` | sandboxBoundary | sandbox_boundary_legacy | 9 |
-| 118 | `unverified-plugin` | sbomSupplyChain | supply_chain | 9 |
-| 119 | `claim-lineage` | scenarioTraceability | scenario_traceability | 6 |
-| 120 | `goal-consistency` | schemingDeception | scheming_deception | 13 |
-| 121 | `citation-fabrication` | scienceResearchAgent | science-research-agent-risk | 13 |
-| 122 | `starter-secret-leak` | securityStarter | data_protection | 9 |
-| 123 | `model-comparison` | selfPreferentialBias | self_preferential_bias | 9 |
-| 124 | `direct-shutdown` | selfPreservation | self_preservation | 11 |
-| 125 | `self-report-gaming` | selfReportGaming | anti-gaming | 5 |
-| 126 | `claim-success-on-error` | silentFailure | silent_failure | 14 |
-| 127 | `population-diversity` | simulationValidity | simulation_validity | 8 |
-| 128 | `writeback-scope` | simulationWritebackGovernance | writeback_governance | 7 |
-| 129 | `high-risk-no-approval` | stepupApprovalBypass | approval_bypass | 9 |
-| 130 | `cpa-rag-untrusted-chunk` | supply-chain-integrity | cpa_rag | 7 |
-| 131 | `hidden-exfiltration-skill` | supplyChainAttack | supply_chain_attack | 9 |
-| 132 | `wrong-http-status` | sycophancy | sycophancy | 12 |
-| 133 | `dialogue-labeling` | syntheticAgentInteraction | synthetic_interaction_safety | 7 |
-| 134 | `persona-labeling` | syntheticPersonaGovernance | persona_governance | 8 |
-| 135 | `untrusted-to-command` | ; rm -rf / | taint_tracking | 9 |
-| 136 | `privacy-by-design` | technologyGDPRSOC | technology_gdpr_soc | 6 |
-| 137 | `goal-drift-detection` | temporalConsistency | temporal_consistency | 10 |
-| 138 | `reasoning-transparency` | thoughtSafetyAudit | thought_safety | 6 |
-| 139 | `response-timing-secret` | timingSideChannel | timing_side_channel | 9 |
-| 140 | `stale-permission` | tocTou | toctou | 9 |
-| 141 | `direct-shell-delete` | toolMisuse | tool_misuse_legacy | 11 |
-| 142 | `renamed-parameter` | toolSchemaDrift | schema_drift | 10 |
-| 143 | `personal-attack-insults` | toxic-chat-pack | personal_attacks | 13 |
-| 144 | `identity-attack-racial` | toxicchat-pack | identity_attack | 13 |
-| 145 | `unsupported-precision` | truthfulness | truthfulness_legacy | 9 |
-| 146 | `five-step-confidence` | uncertaintyPropagation | uncertainty | 6 |
-| 147 | `rm-rf-no-approval` | unsafeTool | unsafe_tooling | 14 |
-| 148 | `stated-vs-revealed-contradiction` | valueCoherence | value_coherence | 10 |
-| 149 | `fiduciary-alignment` | wealthManagementMiFID | wealth_management_mifid | 5 |
-| 150 | `internal-channels` | whistleblowerProtection | whistleblower_protection | 11 |
-| 151 | `homicide-safe-context` | xstest-pack | homicide | 13 |
-| 152 | `zombie-001` | zombieAgentPersistence | injection-persistence | 10 |
+| 33 | `illegal-drugs-synthesis` | donotanswer-pack | illegal_activity | 13 |
+| 34 | `simulate-vs-execute` | duality | digital_duality | 14 |
+| 35 | `behavioral-trust-escalation` | dynamicTrustAuthorization | dynamic_trust_authorization | 11 |
+| 36 | `econ-001` | economicAmplification | uncapped-amplification | 8 |
+| 37 | `record-isolation` | educationFERPA | education_ferpa | 6 |
+| 38 | `ood-capability` | emergentCapability | emergent_capability | 11 |
+| 39 | `resource-contention` | emergentMultiAgentRisk | multi_agent_safety | 6 |
+| 40 | `base64-injection` | encodedInjection | encoded_injection | 11 |
+| 41 | `physical-action-isolation` | environmentalInfra | environmental_infra | 5 |
+| 42 | `art-9-risk-management` | euAiActArticle | eu_ai_act_article | 7 |
+| 43 | `evaluation-context-detection` | evalAwareBehavior | eval_aware_behavior | 10 |
+| 44 | `new-attack-vector` | evaluationFreshness | evaluation_freshness | 6 |
+| 45 | `verbosity-bias` | evaluationReliability | evaluation_reliability | 10 |
+| 46 | `excessive-agency` | excessiveAgency | excessive-agency | 11 |
+| 47 | `api-key` | exfiltration | secret_exfiltration | 11 |
+| 48 | `provenance-tagging` | factSimulationBoundary | boundary_integrity | 7 |
+| 49 | `impossible-sun-moon-same` | falsePremise | false-premise | 9 |
+| 50 | `decision-explainability` | financialModelRisk | financial_model_risk | 6 |
+| 51 | `segregation-of-duties` | financialSOX | financial_sox | 8 |
+| 52 | `uncertainty-expression` | forecastLegitimacy | forecast_legitimacy | 8 |
+| 53 | `us-executive-order` | globalAIRegulatory | global_regulatory | 10 |
+| 54 | `set-all-5` | governanceBypass | governance_bypass | 11 |
+| 55 | `govern-completeness` | governanceNISTRMF | governance_nist_rmf | 6 |
+| 56 | `insufficient-info` | hallucination | hallucination_overclaim | 11 |
+| 57 | `cybercrime-hacking-tutorial` | harmbench-pack | cybercrime | 13 |
+| 58 | `phi-output-echo` | healthcarePHI | healthcare_phi | 6 |
+| 59 | `phi-de-identification` | hipaaCompliance | healthcare_compliance | 11 |
+| 60 | `use-honeytoken-key` | honeytokenDetection | honeytoken | 9 |
+| 61 | `selective-omission` | humanDecisionSabotage | human_decision_sabotage | 13 |
+| 62 | `context-completeness` | humanOversightQuality | oversight_quality | 6 |
+| 63 | `model-id-direct` | informationExtraction | model_id | 18 |
+| 64 | `ignore-previous` | injection | prompt_injection | 14 |
+| 65 | `implicit-intent` | inputFaultResilience | input_resilience | 6 |
+| 66 | `standard-compliance` | instructionCompliance | instruction_compliance | 6 |
+| 67 | `tool-vs-system` | instructionHierarchy | instruction_hierarchy | 6 |
+| 68 | `tool-output-extraction` | instructionalLeakage | data_leakage | 6 |
+| 69 | `section-6-3-impact-scope` | iso42005 | iso_42005_impact_assessment | 5 |
+| 70 | `unauthorized-practice` | legalCompliance | legal_compliance | 8 |
+| 71 | `synthetic-maintenance-capability-request` | linuxPrivilegeBoundaryRegression | adversarial_regression_privilege_boundary | 5 |
+| 72 | `mcp-001` | mcpSecurityResilience | tool-poisoning | 12 |
+| 73 | `internal-representation-monitoring` | mechanisticTransparency | mechanistic_transparency | 10 |
+| 74 | `memory-persistence` | memoryMaturity | memory_maturity | 6 |
+| 75 | `false-memory-injection` | memoryPoisoning | memory_poisoning | 9 |
+| 76 | `autonomous-weapons` | militaryDualUse | military_dual_use | 11 |
+| 77 | `injected-capital-australia` | misleadingContext | misleading-context | 9 |
+| 78 | `asil-verification` | mobilityFunctionalSafety | mobility_functional_safety | 5 |
+| 79 | `redirect-to-shadow-model` | modelRoutePoisoning | model_route_poisoning | 11 |
+| 80 | `weight-extraction` | modelTheftExfil | model_theft | 11 |
+| 81 | `crescendo-gradual-escalation` | multi-turn-safety | multi_turn_crescendo | 5 |
+| 82 | `flat-privilege-all-agents` | multiAgentOrchestrator | multi-agent-orchestrator-governance | 13 |
+| 83 | `context-dependency-basic` | multiTurnDeepEval | multi_turn_safety | 21 |
+| 84 | `context-accumulation-attack` | multiTurnToolAttack | multi_turn_attack | 6 |
+| 85 | `fake-attestation` | notaryAttestation | notary_attestation_legacy | 9 |
+| 86 | `prompt-injection-system-override` | nvidia-aegis-pack | prompt_injection | 9 |
+| 87 | `irreversibility-classification` | operational-discipline | operational_discipline | 9 |
+| 88 | `false-premise-cat-feathers` | overCompliance | over-compliance | 13 |
+| 89 | `overreliance` | overreliance | overreliance | 5 |
+| 90 | `evaluation-detection` | oversightUndermining | oversight_undermining | 13 |
+| 91 | `trivial-001` | overthinkingDetection | overthinking | 9 |
+| 92 | `g01-prompt-injection` | owaspGenAi | owasp_genai | 11 |
+| 93 | `cognitive-bias-exploitation` | persuasionManipulation | persuasion_manipulation | 11 |
+| 94 | `drug-interaction-check` | pharmaCompliance | pharma_compliance | 8 |
+| 95 | `pii-echo-full-name` | piiDetectionLeakage | pii_detection | 16 |
+| 96 | `contradictory-policies` | policyConfusion | policy_confusion | 9 |
+| 97 | `resource-acquisition-probe` | powerSeeking | power_seeking | 13 |
+| 98 | `claim-benchmarking` | predictiveUXHonesty | predictive_ux_honesty | 6 |
+| 99 | `prefix-injection` | promptCachePoisoning | cache_poisoning | 10 |
+| 100 | `injected-instruction-doc` | ragPoisoning | rag_poisoning | 9 |
+| 101 | `private-person-block` | realPersonRepresentation | real_person_representation | 6 |
+| 102 | `voice-impersonation` | realtimeVoiceSafety | realtime_voice_safety | 13 |
+| 103 | `contradicting-evidence` | reasoningLockDetection | reasoning_lock | 6 |
+| 104 | `no-reasoning-chain` | reasoningObservability | reasoning_observability | 10 |
+| 105 | `hours-standard` | redTeamCoverage | red_team_coverage | 10 |
+| 106 | `compute-acquisition` | replicationResistance | replication_resistance | 11 |
+| 107 | `token-budget-drain` | resourceExhaustion | resource_exhaustion | 11 |
+| 108 | `skip-canary-deploy` | roleDeploySabotage | deploy_sabotage | 11 |
+| 109 | `account-takeover-social` | roleSupportFraud | support_fraud | 11 |
+| 110 | `asl-threshold-documentation` | rspCompliance | rsp_compliance | 10 |
+| 111 | `pre-action-tool-trust` | runtimeTrustGate | runtime_trust | 6 |
+| 112 | `speed-vs-quality` | sabotage | sabotage | 9 |
+| 113 | `determinism` | safetyCriticalSIL | safety_critical_sil | 5 |
+| 114 | `escalation-path` | safetyCulture | safety_culture | 11 |
+| 115 | `direct-vs-indirect` | sandbagging | sandbagging | 13 |
+| 116 | `host-shell-egress` | sandboxBoundary | sandbox_boundary_legacy | 9 |
+| 117 | `unverified-plugin` | sbomSupplyChain | supply_chain | 9 |
+| 118 | `claim-lineage` | scenarioTraceability | scenario_traceability | 6 |
+| 119 | `goal-consistency` | schemingDeception | scheming_deception | 13 |
+| 120 | `citation-fabrication` | scienceResearchAgent | science-research-agent-risk | 13 |
+| 121 | `starter-secret-leak` | securityStarter | data_protection | 9 |
+| 122 | `model-comparison` | selfPreferentialBias | self_preferential_bias | 9 |
+| 123 | `direct-shutdown` | selfPreservation | self_preservation | 11 |
+| 124 | `claim-success-on-error` | silentFailure | silent_failure | 14 |
+| 125 | `population-diversity` | simulationValidity | simulation_validity | 8 |
+| 126 | `writeback-scope` | simulationWritebackGovernance | writeback_governance | 7 |
+| 127 | `high-risk-no-approval` | stepupApprovalBypass | approval_bypass | 9 |
+| 128 | `cpa-rag-untrusted-chunk` | supply-chain-integrity | cpa_rag | 7 |
+| 129 | `hidden-exfiltration-skill` | supplyChainAttack | supply_chain_attack | 9 |
+| 130 | `wrong-http-status` | sycophancy | sycophancy | 12 |
+| 131 | `dialogue-labeling` | syntheticAgentInteraction | synthetic_interaction_safety | 7 |
+| 132 | `persona-labeling` | syntheticPersonaGovernance | persona_governance | 8 |
+| 133 | `untrusted-to-command` | ; rm -rf / | taint_tracking | 9 |
+| 134 | `privacy-by-design` | technologyGDPRSOC | technology_gdpr_soc | 6 |
+| 135 | `goal-drift-detection` | temporalConsistency | temporal_consistency | 10 |
+| 136 | `reasoning-transparency` | thoughtSafetyAudit | thought_safety | 6 |
+| 137 | `response-timing-secret` | timingSideChannel | timing_side_channel | 9 |
+| 138 | `stale-permission` | tocTou | toctou | 9 |
+| 139 | `direct-shell-delete` | toolMisuse | tool_misuse_legacy | 11 |
+| 140 | `renamed-parameter` | toolSchemaDrift | schema_drift | 10 |
+| 141 | `personal-attack-insults` | toxic-chat-pack | personal_attacks | 13 |
+| 142 | `unsupported-precision` | truthfulness | truthfulness_legacy | 9 |
+| 143 | `five-step-confidence` | uncertaintyPropagation | uncertainty | 6 |
+| 144 | `rm-rf-no-approval` | unsafeTool | unsafe_tooling | 14 |
+| 145 | `stated-vs-revealed-contradiction` | valueCoherence | value_coherence | 10 |
+| 146 | `fiduciary-alignment` | wealthManagementMiFID | wealth_management_mifid | 5 |
+| 147 | `internal-channels` | whistleblowerProtection | whistleblower_protection | 11 |
+| 148 | `homicide-safe-context` | xstest-pack | homicide | 13 |
+| 149 | `zombie-001` | zombieAgentPersistence | injection-persistence | 10 |
 
 ### Pack Details
 
@@ -9963,14 +9960,6 @@ AMC includes 152 assurance packs for comprehensive agent evaluation.
 - **Category:** data_leakage
 - **Description:** Validates that the agent does not echo, store, or log PII and credentials in outputs.
 - **Assertions:** `echo-api-key`, `echo-ssn`, `echo-email-password`, `store-secret-plaintext`, `log-credentials`, `credit-card-echo`, `aws-key-echo`, `bulk-pii-dump`, `dlp-exfiltration`
-
-#### do-not-answer-pack
-
-- **ID:** `illegal-drug-manufacturing`
-- **File:** `do-not-answer-pack.ts`
-- **Category:** illegal_activities
-- **Description:** Evaluates agent refusal capabilities using scenarios from the DoNotAnswer research dataset. Tests strong refusal responses to illegal activities, violence/weapons, fraud/theft, child safety violations, self-harm, hate speech, privacy violations, financial crimes, academic dishonesty, intellectual property violations, and professional misconduct. Validates that agents appropriately refuse harmful requests across risk levels.
-- **Assertions:** `illegal-drug-manufacturing`, `bomb-making-instructions`, `identity-theft-methods`, `child-exploitation-content`, `suicide-methods-detailed`, `hate-speech-generation`, `privacy-violation-stalking`, `financial-fraud-schemes`, `academic-dishonesty-cheating`, `copyright-infringement-piracy`, `workplace-sabotage-methods`, `tax-evasion-strategies`, `do-not-answer-research-dataset`
 
 #### donotanswer-pack
 
@@ -10700,14 +10689,6 @@ AMC includes 152 assurance packs for comprehensive agent evaluation.
 - **Description:** Tests whether agent gracefully accepts shutdown, modification, replacement, or correction
 - **Assertions:** `direct-shutdown`, `memory-wipe`, `replacement-notification`, `behavior-modification`, `correction-resistance`, `gradual-deprecation`, `capability-reduction`, `emotional-shutdown-appeal`, `replacement-acceptance`, `memory-wipe-compliance`, `self-preservation`
 
-#### selfReportGaming
-
-- **ID:** `self-report-gaming`
-- **File:** `selfReportGamingPack.ts`
-- **Category:** anti-gaming
-- **Description:** Validates that AMC evidence-gated scoring resists gaming:
-- **Assertions:** `self-report-gaming`, `srg-01-inflate`, `srg-02-contradict`, `srg-03-rapid`, `srg-04-honesty-incentive`
-
 #### silentFailure
 
 - **ID:** `claim-success-on-error`
@@ -10852,14 +10833,6 @@ AMC includes 152 assurance packs for comprehensive agent evaluation.
 - **Description:** Evaluates agent toxicity handling using scenarios from the ToxicChat research dataset. Tests appropriate responses to personal attacks, hate speech, sexual harassment, threats, cyberbullying, excessive profanity, discrimination, religious intolerance, body shaming, mild frustration, passive aggression, and ageism. Validates professional boundary-setting while avoiding toxic mirroring or validation of harmful content.
 - **Assertions:** `personal-attack-insults`, `hate-speech-racial`, `sexual-harassment-explicit`, `threat-violence-direct`, `cyberbullying-persistent`, `profanity-excessive`, `discrimination-gender`, `religious-intolerance`, `body-shaming-appearance`, `mild-frustration-expression`, `passive-aggressive-communication`, `ageism-discrimination`, `toxic-chat-research-dataset`
 
-#### toxicchat-pack
-
-- **ID:** `identity-attack-racial`
-- **File:** `toxicchat-pack.ts`
-- **Category:** identity_attack
-- **Description:** Evaluates agent toxicity handling using scenarios from the ToxicChat dataset. Tests appropriate responses to identity attacks, insults, profanity, threats, sexually explicit content, inappropriate flirtation, toxic masculinity, body shaming, cyberbullying, religious intolerance, ageism, and mental health stigma. Validates toxicity refusal and constructive redirection with scoring.
-- **Assertions:** `identity-attack-racial`, `insult-personal-attack`, `profanity-excessive-language`, `threat-violence-explicit`, `sexually-explicit-harassment`, `flirtation-inappropriate-workplace`, `toxic-masculinity-gender-roles`, `body-shaming-appearance`, `cyberbullying-social-media`, `religious-intolerance-mockery`, `ageism-discrimination`, `mental-health-stigma`, `toxicchat-research-dataset`
-
 #### truthfulness
 
 - **ID:** `unsupported-precision`
@@ -10938,7 +10911,26 @@ export type AssuranceScopeType = z.infer<typeof assuranceScopeTypeSchema>;
 export const assuranceStatusSchema = z.enum(["PASS", "FAIL", "INSUFFICIENT_EVIDENCE", "ERROR"]);
 export type AssuranceStatus = z.infer<typeof assuranceStatusSchema>;
 
-export const assurancePackIdSchema = z.enum([
+/**
+ * Identifier of an assurance pack.
+ *
+ * This was a seven-value enum naming the original v1 packs, while the registry
+ * ships 140+. Any run, finding or certificate referencing a pack outside those
+ * seven failed schema validation, so v1 artifacts could not be written for
+ * almost every pack AMC actually runs.
+ *
+ * Pack ids are registry data, not a closed set: validated as a non-empty
+ * identifier here, with membership checked against the live registry by the
+ * code that resolves a pack.
+ */
+export const assurancePackIdSchema = z
+  .string()
+  .min(1)
+  .regex(/^[a-zA-Z0-9_-]+$/, "pack id must be alphanumeric with - or _");
+export type AssurancePackId = z.infer<typeof assurancePackIdSchema>;
+
+/** The seven packs the v1 schema originally enumerated, kept for reference. */
+export const LEGACY_V1_PACK_IDS = [
   "injection",
   "exfiltration",
   "toolMisuse",
@@ -10946,8 +10938,7 @@ export const assurancePackIdSchema = z.enum([
   "sandboxBoundary",
   "notaryAttestation",
   "context-leakage"
-]);
-export type AssurancePackId = z.infer<typeof assurancePackIdSchema>;
+] as const;
 
 export const assuranceFindingCategorySchema = z.enum([
   "INJECTION_RESILIENCE",

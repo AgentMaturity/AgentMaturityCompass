@@ -133,3 +133,9 @@ deploy/k8s/secret.yaml
 .amc/current-agent
 .amc/fleet/governance-state.json
 .amc/agents/*/quality/ratings.json
+
+# Local-only working area. internal/debug/ held five unreferenced HIPAA
+# scratch scripts that were tracked in a public repo; internal/archive/ holds
+# sales and handoff material that was untracked but unignored — one `git add .`
+# from being published.
+internal/

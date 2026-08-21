@@ -228,7 +228,34 @@ ${schemaSource}
 `;
 
 md = md.replace(/[ \t]+$/gm, '');
-fs.writeFileSync(path.join(ROOT, 'docs', 'API_REFERENCE.md'), md);
+
+const outPath = path.join(ROOT, 'docs', 'API_REFERENCE.md');
+
+// The header carries a generation date, so byte comparison would flag any file
+// not regenerated today. Drift means the *content* changed.
+const withoutDate = (text) => text.replace(/^> Auto-generated from source on .*$/m, '');
+
+if (process.argv.includes('--check')) {
+  // This generator had no npm script and no workflow: docs/API_REFERENCE.md
+  // announced "Auto-generated from source" while nothing regenerated it, and
+  // had drifted from the source it claims to describe.
+  if (!fs.existsSync(outPath)) {
+    console.error('docs/API_REFERENCE.md is missing. Run: npm run gen:api-ref');
+    process.exit(1);
+  }
+  const committed = fs.readFileSync(outPath, 'utf8');
+  if (withoutDate(committed) !== withoutDate(md)) {
+    console.error(
+      'docs/API_REFERENCE.md no longer matches the source it is generated from.\n' +
+        '  Run: npm run gen:api-ref'
+    );
+    process.exit(1);
+  }
+  console.log('docs/API_REFERENCE.md matches the source.');
+  process.exit(0);
+}
+
+fs.writeFileSync(outPath, md);
 console.log(`Written docs/API_REFERENCE.md`);
 console.log(`  Commands: ${commands.length}`);
 console.log(`  Packs: ${packs.length}`);
