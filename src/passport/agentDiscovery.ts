@@ -4,6 +4,8 @@
  * Extends Agent Passport with capability declarations, searchable maturity,
  * cross-platform identity linking, and reputation portability.
  */
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { dirname, join } from "node:path";
 import { z } from "zod";
 import { sha256Hex } from "../utils/hash.js";
 
@@ -93,6 +95,55 @@ export const platformLinkSchema = z.object({
 
 export function createDiscoveryRegistry(): AgentDiscoveryRegistry {
   return { agents: new Map() };
+}
+
+// ── Persistence ────────────────────────────────────────────────────────────
+
+/**
+ * Path of the on-disk discovery registry for a workspace.
+ */
+export function discoveryRegistryPath(workspace: string): string {
+  return join(workspace, ".amc", "passport", "discovery.json");
+}
+
+/**
+ * Loads the registry from disk, or an empty one when none exists.
+ *
+ * Every CLI command previously built a fresh in-memory registry, so an added
+ * capability vanished the moment the process exited and searches always
+ * returned nothing.
+ */
+export function loadDiscoveryRegistry(workspace: string): AgentDiscoveryRegistry {
+  const path = discoveryRegistryPath(workspace);
+  if (!existsSync(path)) return createDiscoveryRegistry();
+  try {
+    const parsed = JSON.parse(readFileSync(path, "utf8")) as {
+      agents?: AgentDiscoveryEntry[];
+    };
+    const registry = createDiscoveryRegistry();
+    for (const entry of parsed.agents ?? []) {
+      registry.agents.set(entry.agentId, entry);
+    }
+    return registry;
+  } catch {
+    // A corrupt registry must not silently present as empty-but-fine.
+    throw new Error(`Discovery registry at ${path} is unreadable or corrupt.`);
+  }
+}
+
+/** Persists the registry so later commands can see it. */
+export function saveDiscoveryRegistry(
+  workspace: string,
+  registry: AgentDiscoveryRegistry
+): string {
+  const path = discoveryRegistryPath(workspace);
+  mkdirSync(dirname(path), { recursive: true });
+  writeFileSync(
+    path,
+    `${JSON.stringify({ v: 1, agents: [...registry.agents.values()] }, null, 2)}\n`,
+    { mode: 0o600 }
+  );
+  return path;
 }
 
 export function ensureAgentEntry(

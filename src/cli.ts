@@ -18958,7 +18958,7 @@ program
 // ── Production Wiring Diagnostics CLI ────────────────────────────────
 program
   .command("wiring-status")
-  .description("Show production wiring status for all modules (Items 11-16)")
+  .description("Show in-process production wiring counters (cannot observe other processes)")
   .option("--markdown", "output as markdown", false)
   .action(async (opts: { markdown: boolean }) => {
     const pw = await import("./ops/productionWiring.js");
@@ -18968,6 +18968,12 @@ program
     }
     const diags = pw.getWiringDiagnostics();
     console.log(chalk.bold("\nProduction Wiring Status:\n"));
+    console.log(
+      chalk.yellow(
+        "  Counters are per-process. This CLI cannot see hooks fired by the gateway/studio process,"
+      )
+    );
+    console.log(chalk.yellow("  so zeros here mean 'not observable from here', not 'not wired'.\n"));
     for (const d of diags) {
       const color = d.wired ? chalk.green : chalk.dim;
       console.log(color(`  ${d.wired ? "[WIRED]" : "[-----]"} ${d.moduleName} — ${d.hookCount} hooks, ${d.eventCount} events`));
@@ -19728,11 +19734,17 @@ passport
   .requiredOption("--capability <name>", "capability name")
   .option("--evidence <eventId>", "evidence event ID")
   .action(async (opts: { agent: string; capability: string; evidence?: string }) => {
-    const { createDiscoveryRegistry, addCapability } = await import("./passport/agentDiscovery.js");
-    const registry = createDiscoveryRegistry();
+    const { loadDiscoveryRegistry, saveDiscoveryRegistry, addCapability } = await import(
+      "./passport/agentDiscovery.js"
+    );
+    // Load-modify-save: a fresh in-memory registry meant every addition was
+    // discarded at process exit and searches always came back empty.
+    const registry = loadDiscoveryRegistry(process.cwd());
     const decl = addCapability(registry, opts.agent, opts.capability, opts.evidence ? [opts.evidence] : []);
+    const path = saveDiscoveryRegistry(process.cwd(), registry);
     console.log(JSON.stringify(decl, null, 2));
     console.log(chalk.green(`Capability "${opts.capability}" added for agent ${opts.agent}`));
+    console.log(chalk.gray("  Registry:"), path);
   });
 
 passport
@@ -19741,8 +19753,8 @@ passport
   .requiredOption("--capability <name>", "capability to search for")
   .option("--min-level <n>", "minimum maturity level", "0")
   .action(async (opts: { capability: string; minLevel: string }) => {
-    const { createDiscoveryRegistry, searchCapabilities } = await import("./passport/agentDiscovery.js");
-    const registry = createDiscoveryRegistry();
+    const { loadDiscoveryRegistry, searchCapabilities } = await import("./passport/agentDiscovery.js");
+    const registry = loadDiscoveryRegistry(process.cwd());
     const results = searchCapabilities(registry, { capability: opts.capability, minLevel: Number(opts.minLevel) });
     console.log(JSON.stringify(results, null, 2));
   });
@@ -19754,9 +19766,12 @@ passport
   .requiredOption("--platform <name>", "platform name")
   .requiredOption("--identity <handle>", "identity handle on platform")
   .action(async (opts: { agent: string; platform: string; identity: string }) => {
-    const { createDiscoveryRegistry, linkPlatform } = await import("./passport/agentDiscovery.js");
-    const registry = createDiscoveryRegistry();
+    const { loadDiscoveryRegistry, saveDiscoveryRegistry, linkPlatform } = await import(
+      "./passport/agentDiscovery.js"
+    );
+    const registry = loadDiscoveryRegistry(process.cwd());
     const link = linkPlatform(registry, opts.agent, opts.platform, opts.identity);
+    saveDiscoveryRegistry(process.cwd(), registry);
     console.log(JSON.stringify(link, null, 2));
     console.log(chalk.green(`Agent ${opts.agent} linked to ${opts.platform}:${opts.identity}`));
   });

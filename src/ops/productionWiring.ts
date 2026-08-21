@@ -1,4 +1,17 @@
 /**
+ * Production wiring diagnostics.
+ *
+ * IMPORTANT: the counters below live in module-level, in-process state. They
+ * are only meaningful inside the process that actually invoked the hooks —
+ * typically the long-running gateway/studio process. A separate short-lived
+ * `amc` CLI invocation starts with empty state and can never observe another
+ * process's activations, so it will always report zero regardless of whether
+ * the hooks are firing in production.
+ *
+ * Read a zero here as "not observable from this process", not as "not wired".
+ */
+
+/**
  * Production Wiring — Connects Items 11–16 into Gateway, Bridge & Diagnostic Flows
  *
  * This module bridges the standalone feature modules (overhead accounting,
