@@ -1,4 +1,14 @@
 /**
+ * In-memory drift detection primitives.
+ *
+ * NOT AMC'S DRIFT PRODUCT. Continuous monitoring ships from src/drift and
+ * src/watch — drift/continuousMonitor is what the CLI, realtime assurance and
+ * the dashboard feed actually use, and it persists. The classes here keep state
+ * in process memory and are exported for embedders composing their own monitor.
+ *
+ * Do not read "AMC has continuous monitoring" from this file.
+ */
+/**
  * Model Drift Detection — R4-03
  *
  * Continuous monitoring for score drift, behavior drift,

@@ -1,4 +1,11 @@
 /**
+ * i18n scaffold — ENGLISH ONLY.
+ *
+ * SUPPORTED_LOCALES lists the locales the framework is designed to accept, not
+ * locales AMC has strings for: only English messages ship, and no CLI or report
+ * path calls t() today. Treat the list as a schema, not as multilingual support.
+ */
+/**
  * Internationalization Framework — MF-07
  *
  * Provides:

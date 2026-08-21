@@ -1,3 +1,23 @@
+/**
+ * Scoring modules.
+ *
+ * Two kinds of module live here and the difference matters:
+ *
+ *  1. Scorers the diagnostic runner actually calls, which produce the levels
+ *     and evidence tiers a report is built from.
+ *  2. Standalone analysis libraries exported for callers embedding AMC —
+ *     nlpMetrics, statisticalAnalysis, safetyMetrics, antiGaming,
+ *     crossFrameworkMapping, ragGroundingEval and scoreExplainer among them.
+ *     Nothing inside AMC calls these.
+ *
+ * Note in particular that scoreExplainer is NOT the explainability AMC ships:
+ * reports are explained by diagnostic/questionScoreExplainability, which the
+ * runner, guide generator and passport collector all use. Two implementations
+ * of the same idea exist; the diagnostic one is authoritative.
+ *
+ * Being exported here is not evidence that a metric contributes to a score.
+ */
+
 export { computeMaturityScore, evidenceDecay, improvementVelocity } from "./formalSpec.js";
 export type { EvidenceArtifact, DimensionScore, MaturityScore, MaturityLevel } from "./formalSpec.js";
 

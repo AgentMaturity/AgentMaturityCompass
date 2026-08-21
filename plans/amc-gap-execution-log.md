@@ -44,7 +44,7 @@ Gate for every gap: `tsc --noEmit` clean + affected tests pass + real behavior v
 
 ## Progress
 
-**50 of 289 gaps complete — all of G1 (integrity facades).** Every commit gated on `tsc --noEmit` clean + affected tests passing + real behavior verified end-to-end.
+**96 of 289 gaps complete — G1 (integrity facades) and G2 (dead code).** Every commit gated on `tsc --noEmit` clean + affected tests passing + real behavior verified end-to-end.
 
 ## Shared infrastructure built
 
@@ -66,3 +66,21 @@ Gate for every gap: `tsc --noEmit` clean + affected tests pass + real behavior v
    actually exercised.
 4. **Tests exercise real paths.** Facade-era tests that certified fabricated behavior are
    rewritten against genuine endpoints rather than deleted.
+
+## G2 — Dead code (46 gaps) — COMPLETE
+
+| Gap | Status | Commit | Note |
+|---|---|---|---|
+| G2-01 product DEAD cluster | ✅ DONE | `af77881e` | **25 files deleted**; barrel exported the real builders, not these; 11 coverage-inflating test blocks removed. |
+| G2-02 assurance orphan packs | ✅ DONE | `af77881e` | 3 dead packs + 6 v1 fixtures deleted; **multiTurnDeepEvalPack registered** (143 packs). |
+| G2-03 stranded v1 chain | ✅ DONE | `af77881e` | `saveAssuranceRunArtifacts` had zero callers → **cert issuance failed on every workspace**. Now written; issuance reaches its real evidence gate. |
+| G5-11 pack-id enum (blocker) | ✅ DONE | `af77881e` | 7-value enum vs 143 packs → registry owns membership. |
+| G2-04..G2-23 dead tier | ✅ DONE | `ec271345` | **55 files / 6,079 lines deleted.** Kept 3 the register wrongly listed as dead (benchCli, enterprise/gates, bishengDrift — all live). |
+| G2-29 declarative config | ✅ DONE | `5336874d` | ~1,100 lines advertised `amc eval run --config`, a command that never existed → now `amc config init\|validate\|run`. |
+| G2-38 real LLM client | ✅ DONE | (G1-12) | Already wired by the G1 judge fix. |
+| G2-44 vscode pattern rules | ✅ DONE | `bfb0cd66` | 8 anti-pattern rules ran nowhere → **wired into `amc scan`**, now detect planted secrets/untimed fetch. |
+| G2-39/43/46 | ✅ DONE | `bfb0cd66` | enterpriseIam scoped (2nd RBAC would be worse); public barrel documented + drift guard added; empty `src/harness` removed. |
+| G2-30..G2-37, G2-40/42 | ✅ DONE | `6ea0453f` | Analysis libraries documented with **why they can't be wired** — hallucination needs grounding context an assurance scenario lacks (tried, measured zero findings, reverted). |
+| G2-45 replayBenchmarkCorpus | ⏭️ DEFER | — | Not dead (5 importers, 69 tests) — 29k-line size issue belongs to G4-02. |
+
+**G2 COMPLETE — 80 files removed, ~6,100 lines of dead code gone, 3 subsystems wired.**
