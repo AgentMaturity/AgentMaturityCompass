@@ -103,6 +103,9 @@ jobs:
       - name: Incident readiness
         run: npm run check:incident-readiness
 
+      - name: Compliance artifact freshness
+        run: npm run check:compliance-freshness
+
       - name: Release smoke checks
         run: |
           npm pack --ignore-scripts --json > /tmp/amc-pack.json

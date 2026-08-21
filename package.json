@@ -59,6 +59,7 @@
     "postinstall": "node scripts/postinstall.js || true",
     "gen-counts": "node scripts/gen-counts.mjs --write",
     "check:counts": "node scripts/gen-counts.mjs --check",
+    "check:compliance-freshness": "node scripts/compliance-artifact-freshness.mjs",
     "check:question-bank-export": "node scripts/gen-question-bank-export.mjs --check",
     "test:coverage": "vitest run --coverage"
   },

@@ -89,6 +89,8 @@ AMC_IMPROVEMENT_ROADMAP.md
 # COMPETITIVE_GAP_REPORT_G0DM0D3.md, which this pattern missed, so both stayed
 # tracked in a public repo. Widened so future competitive material is excluded.
 COMPETITIVE_*.md
+# Internal reference; embeds the author's local filesystem paths.
+AMC_COMPLETE_KNOWLEDGE.md
 ..bfg-report/
 exports/
 !src/exports/
