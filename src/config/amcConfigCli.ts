@@ -167,7 +167,7 @@ export function configInit(options: ConfigInitOptions): void {
 
   writeFileSync(outputPath, STARTER_CONFIG, "utf8");
   console.log(chalk.green(`✓ Created ${outputPath}`));
-  console.log(chalk.gray("  Edit the file, then run: amc eval run"));
+  console.log(chalk.gray("  Edit the file, then run: amc config run"));
 }
 
 // ---------------------------------------------------------------------------

@@ -8,7 +8,7 @@
  *   4. Check thresholds
  *   5. Output results
  *
- * This is the engine behind `amc eval run --config amcconfig.yaml`.
+ * This is the engine behind `amc config run`.
  */
 
 import { resolve } from "node:path";

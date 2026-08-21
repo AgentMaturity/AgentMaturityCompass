@@ -3980,6 +3980,64 @@ program
 
 const configCmd = program.command("config").description("Inspect resolved runtime configuration");
 
+// ── Declarative amcconfig.yaml pipeline ──────────────────────────────────
+// The loader, validator and runner existed as ~1,100 lines with no CLI path:
+// the runner's own header advertised `amc eval run --config`, a command that
+// was never registered, so a documented amcconfig.yaml could not be executed.
+configCmd
+  .command("init")
+  .description("Write a starter amcconfig.yaml")
+  .option("--output <path>", "output path (default amcconfig.yaml)")
+  .option("--force", "overwrite an existing file", false)
+  .action(async (opts: { output?: string; force: boolean }) => {
+    try {
+      const { configInit } = await import("./config/amcConfigCli.js");
+      configInit({ workspace: process.cwd(), output: opts.output, force: opts.force });
+    } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
+  });
+
+configCmd
+  .command("validate")
+  .description("Validate amcconfig.yaml without running anything")
+  .option("--config <path>", "config file path")
+  .action(async (opts: { config?: string }) => {
+    try {
+      const { configValidate } = await import("./config/amcConfigCli.js");
+      configValidate({ workspace: process.cwd(), config: opts.config });
+    } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
+  });
+
+configCmd
+  .command("run")
+  .description("Run the evaluation pipeline declared in amcconfig.yaml")
+  .option("--config <path>", "config file path")
+  .option("--window <window>", "evidence window override")
+  .option("--format <format>", "json|html|terminal|markdown")
+  .option("--output <path>", "report output path")
+  .option("--dry-run", "resolve and report without executing", false)
+  .option("--verbose", "print the resolved configuration", false)
+  .option("--json", "emit the machine-readable result", false)
+  .action(async (opts: {
+    config?: string; window?: string; format?: string; output?: string;
+    dryRun: boolean; verbose: boolean; json: boolean;
+  }) => {
+    try {
+      const { runFromConfig } = await import("./config/amcConfigRunner.js");
+      const result = await runFromConfig({
+        workspace: process.cwd(),
+        configPath: opts.config,
+        window: opts.window,
+        format: opts.format as "json" | "html" | "terminal" | "markdown" | undefined,
+        outputPath: opts.output,
+        dryRun: opts.dryRun,
+        verbose: opts.verbose
+      });
+      if (opts.json) { console.log(JSON.stringify(result, null, 2)); }
+      // A failing threshold is a non-zero exit so CI can gate on it.
+      if (!result.overallPassed && !result.dryRun) process.exit(1);
+    } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
+  });
+
 configCmd
   .command("profile [name]")
   .description("Print or apply workspace config profile (dev|ci|prod)")
