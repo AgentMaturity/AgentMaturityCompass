@@ -11,7 +11,7 @@
 
 import { existsSync } from "fs";
 import { join } from "path";
-import { evidencePathExists } from "./controlSurfaceScope.js";
+import { assessCriterion, scoreWeightedCriteria, notAssessableNote } from "./controlSurfaceScope.js";
 
 export interface ScenarioProvenanceReport {
   /** Per-question scores (0-1) keyed by question ID */
@@ -246,15 +246,23 @@ export function scanScenarioProvenanceInfrastructure(root: string): ScenarioProv
     },
   ];
 
-  for (const check of checks) {
-    const found = check.paths.some((p) => evidencePathExists(root, p));
-    if (found) {
-      infraScore += check.points;
+  const entries = checks.map((check) => ({
+    outcome: assessCriterion(root, check.paths),
+    points: check.points,
+    check
+  }));
+  for (const { outcome, check } of entries) {
+    if (outcome.met) {
       evidenceFound.push(check.evidence);
-    } else {
+    } else if (outcome.assessable) {
+      // A criterion we could not judge is not a gap; it is reported below.
       gaps.push(check.gap);
     }
   }
+  const weighted = scoreWeightedCriteria(entries);
+  infraScore = weighted.score;
+  const skipped = notAssessableNote(weighted.notAssessable, weighted.total);
+  if (skipped) gaps.push(skipped);
 
   const score = Math.min(100, infraScore);
   const level = scoreToLevel(score);

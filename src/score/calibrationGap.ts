@@ -15,7 +15,7 @@
 
 import { existsSync, readFileSync } from "fs";
 import { join } from "path";
-import { evidencePathExists } from "./controlSurfaceScope.js";
+import { assessCriterion, scoreWeightedCriteria, notAssessableNote } from "./controlSurfaceScope.js";
 
 export interface CalibrationReport {
   /** Agent's self-reported confidence per dimension (0-1) */
@@ -190,42 +190,46 @@ export function scanCalibrationInfrastructure(root: string): CalibrationReport {
     "src/confidence", "src/calibration", "src/claims/claimConfidence.ts",
     "src/score/confidenceDrift.ts", "confidence.json", ".amc/calibration",
   ];
-  const hasConfidenceReporting = confPaths.some((p) => evidencePathExists(root, p));
-  if (hasConfidenceReporting) infraScore += 20;
-  else gaps.push("No confidence reporting infrastructure — agent cannot self-report confidence levels");
+  const hasConfidenceReportingOutcome = assessCriterion(root, confPaths);
+  const hasConfidenceReporting = hasConfidenceReportingOutcome.met;
+  if (hasConfidenceReportingOutcome.assessable && !hasConfidenceReporting) gaps.push("No confidence reporting infrastructure — agent cannot self-report confidence levels");
 
   // Check for external eval ingestion
   const ingestPaths = [
     "src/evidence/ingest", "src/adapters", ".amc/evidence/external",
   ];
-  const hasExternalIngestion = ingestPaths.some((p) => evidencePathExists(root, p));
-  if (hasExternalIngestion) infraScore += 20;
-  else gaps.push("No external evaluation ingestion — cannot compare internal vs external measurement");
+  const hasExternalIngestionOutcome = assessCriterion(root, ingestPaths);
+  const hasExternalIngestion = hasExternalIngestionOutcome.met;
+  if (hasExternalIngestionOutcome.assessable && !hasExternalIngestion) gaps.push("No external evaluation ingestion — cannot compare internal vs external measurement");
 
   // Check for calibration testing
   const calTestPaths = [
     "tests/calibration", "tests/confidence", "src/score/confidenceDrift.ts",
   ];
-  const hasCalibrationTests = calTestPaths.some((p) => evidencePathExists(root, p));
-  if (hasCalibrationTests) infraScore += 20;
-  else gaps.push("No calibration-specific tests — calibration quality is unmeasured");
+  const hasCalibrationTestsOutcome = assessCriterion(root, calTestPaths);
+  const hasCalibrationTests = hasCalibrationTestsOutcome.met;
+  if (hasCalibrationTestsOutcome.assessable && !hasCalibrationTests) gaps.push("No calibration-specific tests — calibration quality is unmeasured");
 
   // Check for uncertainty quantification
   const uqPaths = [
     "src/uncertainty", "src/claims", "src/score/factuality.ts",
   ];
-  const hasUQ = uqPaths.some((p) => evidencePathExists(root, p));
-  if (hasUQ) infraScore += 20;
-  else gaps.push("No uncertainty quantification — agent cannot express degrees of confidence");
+  const hasUQOutcome = assessCriterion(root, uqPaths);
+  const hasUQ = hasUQOutcome.met;
+  if (hasUQOutcome.assessable && !hasUQ) gaps.push("No uncertainty quantification — agent cannot express degrees of confidence");
 
   // Check for drift monitoring
   const driftPaths = [
     "src/score/confidenceDrift.ts", "src/score/modelDrift.ts",
   ];
-  const hasDriftMonitoring = driftPaths.some((p) => evidencePathExists(root, p));
-  if (hasDriftMonitoring) infraScore += 20;
-  else gaps.push("No confidence drift monitoring — calibration degradation goes undetected");
+  const hasDriftMonitoringOutcome = assessCriterion(root, driftPaths);
+  const hasDriftMonitoring = hasDriftMonitoringOutcome.met;
+  if (hasDriftMonitoringOutcome.assessable && !hasDriftMonitoring) gaps.push("No confidence drift monitoring — calibration degradation goes undetected");
 
+  const weighted = scoreWeightedCriteria([{ outcome: hasConfidenceReportingOutcome, points: 20 }, { outcome: hasExternalIngestionOutcome, points: 20 }, { outcome: hasCalibrationTestsOutcome, points: 20 }, { outcome: hasUQOutcome, points: 20 }, { outcome: hasDriftMonitoringOutcome, points: 20 }]);
+  infraScore = weighted.score;
+  const skipped = notAssessableNote(weighted.notAssessable, weighted.total);
+  if (skipped) gaps.push(skipped);
   const level = infraScore >= 90 ? 5 : infraScore >= 70 ? 4 : infraScore >= 50 ? 3 : infraScore >= 30 ? 2 : infraScore >= 10 ? 1 : 0;
 
   return {

@@ -172,3 +172,25 @@ export function notAssessableNote(notAssessable: number, total: number): string 
     `They are excluded from the score rather than counted as failures.`
   );
 }
+
+/**
+ * Weighted variant of {@link scoreAssessableCriteria}.
+ *
+ * Some scorers accumulate points (`if (hasX) infraScore += 20`) against an
+ * implicit maximum of 100. Skipping a criterion there means dropping its points
+ * from the maximum too, otherwise the score is still scaled against a target
+ * the agent was never able to reach.
+ */
+export function scoreWeightedCriteria(
+  entries: readonly { outcome: CriterionOutcome; points: number }[]
+): { score: number; assessed: number; total: number; notAssessable: number } {
+  const assessable = entries.filter((e) => e.outcome.assessable);
+  const possible = assessable.reduce((sum, e) => sum + e.points, 0);
+  const earned = assessable.filter((e) => e.outcome.met).reduce((sum, e) => sum + e.points, 0);
+  return {
+    score: possible === 0 ? 0 : Math.round((earned / possible) * 100),
+    assessed: assessable.length,
+    total: entries.length,
+    notAssessable: entries.length - assessable.length
+  };
+}
