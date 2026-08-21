@@ -38,14 +38,14 @@ export interface FixPlan {
 const MODULE_MAP: Record<string, { module: string; template: string; effort: 'low' | 'medium' | 'high' }> = {
   // Shield
   'shield': { module: 'shield/analyzer', template: 'import { analyzeSkill } from "./shield/analyzer.js";\nconst result = analyzeSkill(code);', effort: 'medium' },
-  'injection': { module: 'shield/injectionDetector', template: 'import { detectInjection } from "./shield/injectionDetector.js";\nconst result = detectInjection(input);', effort: 'low' },
+  'injection': { module: 'shield/detector', template: 'import { detectInjection } from "./shield/detector.js";\nconst result = detectInjection(input);', effort: 'low' },
   'sanitization': { module: 'shield/sanitizer', template: 'import { sanitize } from "./shield/sanitizer.js";\nconst clean = sanitize(input);', effort: 'low' },
   'skill': { module: 'shield/analyzer', template: 'import { analyzeSkill } from "./shield/analyzer.js";\nconst result = analyzeSkill(code);', effort: 'medium' },
 
   // Enforce
   'enforce': { module: 'enforce/policyFirewall', template: 'import { PolicyFirewall } from "./enforce/policyFirewall.js";\nconst fw = new PolicyFirewall();\nfw.addRule({ id: "r1", pattern: ".*", action: "allow" });', effort: 'medium' },
   'policy': { module: 'enforce/policyFirewall', template: 'import { PolicyFirewall } from "./enforce/policyFirewall.js";\nconst fw = new PolicyFirewall();', effort: 'medium' },
-  'governance': { module: 'enforce/governor', template: 'import { Governor } from "./enforce/governor.js";\nconst gov = new Governor();', effort: 'high' },
+  'governance': { module: 'governor/governorCli', template: 'import { runGovernorCheck } from "./governor/governorCli.js";\nconst decision = runGovernorCheck({ workspace, agentId, actionClass });', effort: 'high' },
   'budget': { module: 'budgets/budgets', template: 'import { evaluateBudgetStatus } from "./budgets/budgets.js";\nconst status = evaluateBudgetStatus(agentId);', effort: 'medium' },
 
   // Vault
