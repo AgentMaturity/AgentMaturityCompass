@@ -23,12 +23,18 @@ For each incoming execution event, AMC will:
 
 ## Register a Platform Webhook
 
-Use the new CLI command to register source webhooks:
+> **No CLI command registers these yet.** `amc adapter add` was documented here
+> but has never existed; the no-code adapters are a library surface today.
+> Ingest an execution event programmatically:
 
-```bash
-amc adapter add --type n8n --webhook-url https://hooks.example.com/n8n/executions
-amc adapter add --type make --webhook-url https://hooks.example.com/make/executions
-amc adapter add --type zapier --webhook-url https://hooks.example.com/zapier/runs
+```ts
+import { ingestNoCodeWebhookEvent } from "agent-maturity-compass";
+
+ingestNoCodeWebhookEvent({
+  source: "n8n",          // "n8n" | "make" | "zapier"
+  workspace: process.cwd(),
+  payload,                 // the raw webhook body
+});
 ```
 
 This writes signed config to:

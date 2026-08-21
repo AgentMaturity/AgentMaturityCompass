@@ -406,9 +406,9 @@ amc assurance run --pack technologyGDPRSOC
 # Cross-framework matrix (GDPR + EU AI Act)
 amc compliance matrix --frameworks GDPR,EU_AI_ACT --out .amc/reports/cross-framework.md
 
-# Install GDPR policy pack
-amc policy-pack install --pack gdpr
-amc policy-pack activate --pack gdpr
+# GDPR is a built-in framework, selected per report — there is no policy-pack
+# command to install or activate.
+amc compliance report --framework GDPR --output gdpr-report.json
 ```
 
 ---

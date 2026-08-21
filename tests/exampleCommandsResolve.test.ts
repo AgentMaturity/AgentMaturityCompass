@@ -59,6 +59,57 @@ describe("documented commands resolve", () => {
     expect(known.size).toBeGreaterThan(500);
   });
 
+  const USER_FACING_DOCS = [
+    "README.md",
+    "docs/GETTING_STARTED.md",
+    "docs/QUICKSTART.md",
+    "docs/INSTALL.md",
+    "docs/COMPLIANCE_FRAMEWORKS.md",
+    "docs/GDPR_ARTICLE_COMPLIANCE.md",
+    "docs/NO_CODE_GOVERNANCE.md",
+    "docs/score-history.md",
+    "docs/AMC_MASTER_REFERENCE.md"
+  ];
+
+  /** Shell words that follow "amc" as an argument, not a subcommand. */
+  const SHELL = new Set([
+    "curl", "kubectl", "helm", "docker", "rm", "image", "amc", "sudo", "npm",
+    "npx", "bash", "sh", "cd", "export", "echo", "cat", "git", "deploy"
+  ]);
+
+  const referencedIn = (body: string): Map<string, string> => {
+    const found = new Map<string, string>();
+    for (const match of body.matchAll(/\bamc\s+([a-z][a-z0-9-]*)(?:\s+([a-z][a-z0-9-]*))?/g)) {
+      const [whole, first, second] = match;
+      if (PROSE.has(first) || SHELL.has(first)) continue;
+      const two = second && !PROSE.has(second) ? `${first} ${second}` : null;
+      const path = two && known.has(two) ? two : first;
+      if (!found.has(path)) found.set(path, whole);
+    }
+    return found;
+  };
+
+  it("every amc command shown in user-facing docs exists", () => {
+    // docs/GETTING_STARTED.md told a new user to run `amc telemetry on` for a
+    // feature AMC does not have; docs/score-history.md documented a whole CLI
+    // for a module imported only by its own test.
+    const missing: string[] = [];
+    for (const doc of USER_FACING_DOCS) {
+      const path = join(process.cwd(), doc);
+      if (!existsSync(path)) continue;
+      const body = readFileSync(path, "utf8");
+      for (const [command, context] of referencedIn(body)) {
+        // A doc may name a command precisely to say it does not exist.
+        if (/never existed|there is no|no CLI command|There are none/i.test(body) &&
+            !known.has(command)) {
+          continue;
+        }
+        if (!known.has(command)) missing.push(`${doc}: "${context.trim()}"`);
+      }
+    }
+    expect(missing).toEqual([]);
+  });
+
   it("every amc command shown in examples/ exists", () => {
     const files = walk(join(process.cwd(), "examples"));
     const referenced = new Map<string, string>();

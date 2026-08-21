@@ -123,15 +123,17 @@ amc compliance report --framework ISO_42001 --output iso42001-report.json
 amc compliance report --framework GDPR --output gdpr-report.json
 amc compliance report --framework EU_AI_ACT --output euai-report.json
 
-# Install policy pack
-amc policy-pack install --pack nist-ai-rmf
-amc policy-pack activate --pack nist-ai-rmf
+# Frameworks are selected per report, not installed — there is no policy-pack
+# command. The framework list is fixed and validated by `compliance report`.
+amc compliance report --framework NIST_AI_RMF --output nist-report.json
 
-# List installed packs
-amc policy-pack list
+# Assurance packs, which are installable, are a different thing:
+amc pack search nist
+amc pack install <name>
+amc pack list
 
-# Run marketplace scan
-amc policy-pack scan
+# Scan installed packs
+amc pack list
 ```
 
 ## Compliance Mapping Structure

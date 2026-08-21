@@ -1,6 +1,8 @@
 # Score History & Regression Testing
 
-AMC's score history system provides enterprise-grade regression testing by storing historical score snapshots per agent, detecting score degradation over time, alerting on regressions, and generating trend reports.
+> **Status: library only.** This module has no CLI commands — see [CLI Commands](#cli-commands).
+
+AMC's score history system provides regression testing by storing historical score snapshots per agent, detecting score degradation over time, alerting on regressions, and generating trend reports.
 
 ## Features
 
@@ -109,46 +111,23 @@ for (const dim of report.dimensions) {
 
 ## CLI Commands
 
-### View Score History
-
-```bash
-amc score-history show --agent-id my-agent --limit 10
-amc score-history show --agent-id my-agent --days 30
-```
-
-### Check for Regressions
-
-```bash
-amc score-history check --agent-id my-agent
-amc score-history check --agent-id my-agent --min-delta 0.1 --min-percent-change 15
-```
-
-### View Open Alerts
-
-```bash
-amc score-history alerts --agent-id my-agent
-```
-
-### Resolve Alerts
-
-```bash
-amc score-history resolve --alert-id abc123 --status resolved --notes "Fixed by code update"
-amc score-history resolve --alert-id abc123 --status false_positive
-```
-
-### Generate Trend Report
-
-```bash
-amc score-history trends --agent-id my-agent --days 30
-amc score-history trends --agent-id my-agent --days 90
-```
-
-### Verify Integrity
-
-```bash
-amc score-history verify
-amc score-history verify --agent-id my-agent
-```
+> **There are none yet.** `amc score-history …` was documented here but has
+> never been registered: `src/score/scoreHistory.ts` is imported only by its own
+> test, and `score_history.sqlite` is never written. The module is complete and
+> tested — it is one CLI registration away from being real — but a command that
+> does not exist must not be documented as though it does.
+>
+> The shipped equivalents today:
+>
+> | Documented above | Use instead |
+> |---|---|
+> | `score-history show` | `amc history` — diagnostic run history |
+> | `score-history check` | `amc drift` — drift and regression detection |
+> | `score-history trends` | `amc observe anomalies` |
+> | `score-history verify` | `amc verify` — ledger integrity |
+>
+> The programmatic API in **Usage** above is accurate and works today via
+> `createScoreHistoryStore(workspace)`.
 
 ## Regression Severity Levels
 

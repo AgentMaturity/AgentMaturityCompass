@@ -105,9 +105,7 @@ amc badge
 
 | Command | Description |
 |---------|-------------|
-| `amc telemetry on` | Enable anonymous opt-in telemetry |
-| `amc telemetry off` | Disable telemetry |
-| `amc telemetry status` | Show current telemetry config + what is/isn't collected |
+| _(none)_ | AMC collects no telemetry and has no telemetry commands. Every outbound call has a command behind it — your LLM provider, an observability provider you connected with `amc watch connect`, or the pack registry. |
 
 Telemetry is **off by default**. When enabled, only sends: OS, Node version, AMC version, command name, score level (L0–L5), adapter name. **Never**: agent data, evidence, API keys, scores, file paths, or any PII.
 
@@ -531,7 +529,7 @@ Telemetry is **off by default**. When enabled, only sends: OS, Node version, AMC
 | `amc integrate-list` | Available integration frameworks |
 | `amc contract-tests` | Contract test suite for bridge API |
 | `amc simulate-bridge` | Simulated bridge request |
-| `amc code-scan` | Semantic code edge scanning |
+| `amc cgx code-scan` | Semantic code edge scanning |
 | `amc claims-stale\|claims-sweep` | Stale claim management |
 | `amc confidence-drift` | Confidence drift tracking |
 | `amc lessons-list\|lessons-promote` | Correction lessons |
@@ -539,7 +537,7 @@ Telemetry is **off by default**. When enabled, only sends: OS, Node version, AMC
 | `amc receipts-chain` | Full delegation chain for a receipt |
 | `amc unknowns` | Known unknowns for latest diagnostic |
 | `amc meta-confidence` | Confidence in the score itself |
-| `amc confidence-check` | Action allowed given confidence |
+| `amc claim-confidence-gate` | Action allowed given confidence |
 | `amc confidence\|confidence-components` | Per-component confidence |
 | `amc insider-risk-report\|insider-alerts\|insider-risk-scores` | Insider risk analytics |
 | `amc lab-templates\|lab-create\|lab-simulate\|lab-report\|lab-compare\|lab-list` | Lab experiments |
@@ -566,4 +564,4 @@ Telemetry is **off by default**. When enabled, only sends: OS, Node version, AMC
 | `amc debt-add\|debt-list` | Policy debt entries |
 | `amc governor-override\|governor-override-alerts` | Emergency governance |
 | `amc blobs` | Encrypted evidence blobs |
-| `amc limits` | Plugin sandbox resource limits |
+| `amc plugin limits` | Plugin sandbox resource limits |
