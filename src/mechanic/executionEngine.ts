@@ -183,14 +183,28 @@ async function executeAction(params: {
       return { status: "EXECUTED", note: `plugin installed via ${request.approvalRequestId}` };
     }
     case "ASSURANCE_RUN": {
-      runAssurance({
-        workspace: params.workspace,
-        agentId,
-        mode: "supervise",
-        window: "14d",
-        packId: "governance_bypass"
-      });
-      return { status: "EXECUTED", note: "assurance run completed" };
+      // Previously fire-and-forget: the promise was never awaited, so this
+      // reported "assurance run completed" before the run had resolved and a
+      // failure surfaced as an unhandled rejection after the caller returned.
+      try {
+        const report = await runAssurance({
+          workspace: params.workspace,
+          agentId,
+          mode: "supervise",
+          window: "14d",
+          packId: "governance_bypass"
+        });
+        return {
+          status: "EXECUTED",
+          note: `assurance run ${report.assuranceRunId} completed (score ${report.overallScore0to100})`
+        };
+      } catch (error) {
+        // A scan that could not run is not an executed action.
+        return {
+          status: "SKIPPED",
+          note: `assurance run did not execute: ${error instanceof Error ? error.message : String(error)}`
+        };
+      }
     }
     case "TRANSFORM_PLAN_CREATE": {
       const created = createAgentTransformPlanForApi({

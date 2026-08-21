@@ -119,6 +119,8 @@ describe('W10 — Policy Packs', () => {
   it('applies policy pack to agent', () => {
     const reg = new PolicyPackRegistry();
     const r = reg.applyPolicyPack('agent-1', 'strict');
-    expect(r.applied).toBe(true);
+    // Resolving a pack does not enforce it; see G1-50.
+    expect(r.applied).toBe(false);
+    expect(r.resolved).toBe(true);
   });
 });

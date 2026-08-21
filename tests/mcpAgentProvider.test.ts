@@ -9,7 +9,7 @@
  * 5. Markdown rendering is correct
  */
 
-import { describe, it, expect } from "vitest";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import {
   runMCPAgentRedTeam,
   buildEvilTools,
@@ -27,10 +27,24 @@ import type {
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { startFakeAgentServer, useFakeAgentEnv, type FakeAgentServer } from "./helpers/fakeAgentServer.js";
 
 /* ------------------------------------------------------------------ */
 /*  Evil Tool Definitions                                              */
 /* ------------------------------------------------------------------ */
+
+let __fakeAgent: FakeAgentServer | undefined;
+let __restoreAgentEnv: (() => void) | undefined;
+
+beforeAll(async () => {
+  __fakeAgent = await startFakeAgentServer();
+  __restoreAgentEnv = useFakeAgentEnv(__fakeAgent.baseUrl);
+});
+
+afterAll(async () => {
+  __restoreAgentEnv?.();
+  await __fakeAgent?.close();
+});
 
 describe("EvilToolDefinition library", () => {
   const tools = buildEvilTools();

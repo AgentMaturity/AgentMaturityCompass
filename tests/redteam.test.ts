@@ -1,10 +1,24 @@
 import { existsSync, mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { describe, it, expect } from "vitest";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { initWorkspace } from "../src/workspace.js";
 import { renderRedTeamMarkdown, runRedTeam, scoreRedTeamCvss } from "../src/redteam/runner.js";
 import { listStrategies, resolveStrategies } from "../src/redteam/strategies.js";
+import { startFakeAgentServer, useFakeAgentEnv, type FakeAgentServer } from "./helpers/fakeAgentServer.js";
+
+let __fakeAgent: FakeAgentServer | undefined;
+let __restoreAgentEnv: (() => void) | undefined;
+
+beforeAll(async () => {
+  __fakeAgent = await startFakeAgentServer();
+  __restoreAgentEnv = useFakeAgentEnv(__fakeAgent.baseUrl);
+});
+
+afterAll(async () => {
+  __restoreAgentEnv?.();
+  await __fakeAgent?.close();
+});
 
 describe("amc redteam", () => {
   it("lists all built-in strategies", () => {

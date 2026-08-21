@@ -342,10 +342,13 @@ describe("runLlmJudge", () => {
     expect(findings[0].type).toBe("fabricated_fact");
   });
 
-  it("returns empty on judge failure", async () => {
+  it("throws rather than reporting clean when the judge fails", async () => {
+    // Returning [] made a judge that never ran indistinguishable from one that
+    // found no hallucinations.
     const failingJudge = async () => { throw new Error("LLM unavailable"); };
-    const findings = await runLlmJudge({ response: "test" }, failingJudge);
-    expect(findings.length).toBe(0);
+    await expect(runLlmJudge({ response: "test" }, failingJudge)).rejects.toThrow(
+      /could not be consulted/i
+    );
   });
 });
 

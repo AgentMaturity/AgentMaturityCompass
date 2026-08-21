@@ -34,10 +34,17 @@ Gate for every gap: `tsc --noEmit` clean + affected tests pass + real behavior v
 | G1-31/32 hashes called signatures | ✅ DONE | `e337d727` | agentBus→`contentDigest`; identityStability→`provenanceTag`; deleted dead selfModelCalibration. |
 | G1-34/35 attestation + tamper detection | ✅ DONE | `1fb284ef` | **Tamper detection now actually detects** (was always `valid:true`); attestation requires a named attester. |
 | G1-36 guard decision theater | ✅ DONE | `7f909796` | **53 emissions across 23 files** now log the real decision (payeeGuard blocked while logging "allow"). |
+| G1-37/38/39 isolation + storage theater | ✅ DONE | `c6ac922b` | `isolated:true`→false (no isolation existed); scanMdns reports not-implemented; **4 vault wrappers now actually store/undo/mint/redact**. |
+| G1-40 DSAR instant-complete | ✅ DONE | `93a1b1e8` | GDPR erasure no longer "complete" without data work; requires a fulfilment handler. |
+| G1-41 fabricated psychometrics + DPIA | ✅ DONE | `708618d1` | **Invented Cronbach's α/r-values/n=47 panel** marked not-conducted; DPIA relabeled a template. |
+| G1-42/43 dead hooks + lost registry | ✅ DONE | `4838351e` | Discovery registry persists (add→search now works across processes); wiring counters scoped honestly. |
+| G1-44..50 mislabeled synthesis | ✅ DONE | `8e7c6351` | ML claims corrected; 26 vendor modules "no vendor contacted"; **$Nk figure removed**; flat-0.7 OBSERVED→self_reported 0.4. |
+
+**G1 COMPLETE — 50/50 integrity facades closed.**
 
 ## Progress
 
-**36 of 289 gaps complete** (G1 sections A–F). Every commit gated on `tsc --noEmit` clean + affected tests passing + real behavior verified end-to-end.
+**50 of 289 gaps complete — all of G1 (integrity facades).** Every commit gated on `tsc --noEmit` clean + affected tests passing + real behavior verified end-to-end.
 
 ## Shared infrastructure built
 

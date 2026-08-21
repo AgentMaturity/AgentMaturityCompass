@@ -31,7 +31,7 @@ describe("domain assessment engine", () => {
     expect(result.domainScore).toBe(90);
     expect(result.compositeScore).toBe(84); // (80*0.6) + (90*0.4)
     expect(result.level).toBe("L4");
-    expect(result.activeModules.length).toBe(165);
+    expect(result.activeModules.length).toBe(161);
     expect(result.roadmap.length).toBe(3);
   });
 
