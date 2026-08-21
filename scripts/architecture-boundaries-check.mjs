@@ -30,7 +30,24 @@ const budgetsPath = join(root, "scripts/line-budgets.json");
 const budgetsFile = JSON.parse(readFileSync(budgetsPath, "utf8"));
 const CAP = budgetsFile.cap ?? 800;
 const recorded = budgetsFile.budgets ?? {};
+const dataRegistries = budgetsFile.dataRegistries ?? [];
 const updateMode = process.argv.includes("--update");
+
+// Data registries: append-only catalogs (question banks, compliance mappings,
+// industry packs) where the 800-line cap does not apply, because the cap exists
+// to keep *logic* reviewable and there is nearly none here.
+//
+// The exemption is verified, not asserted: a listed file must stay below
+// MAX_LOGIC_RATIO, so nobody can park logic in one to dodge the cap.
+const MAX_LOGIC_RATIO = 0.03;
+const LOGIC_PATTERN =
+  /^\s*(if|for|while|switch|return|throw|try|catch|function |export function |export async function |class |=>\s*\{)/;
+
+function logicRatio(file) {
+  const lines = readFileSync(join(root, file), "utf8").split("\n");
+  const logic = lines.filter((l) => LOGIC_PATTERN.test(l)).length;
+  return lines.length === 0 ? 0 : logic / lines.length;
+}
 
 function allSourceFiles(dir, out = []) {
   for (const entry of readdirSync(dir, { withFileTypes: true })) {
@@ -49,6 +66,19 @@ for (const file of allSourceFiles(join(root, "src")).map((f) => f.slice(root.len
   const actual = lineCount(file);
   lineCounts[file] = actual;
   const baseline = recorded[file];
+
+  if (dataRegistries.includes(file)) {
+    // Exempt from the cap, but only while it really is data.
+    const ratio = logicRatio(file);
+    if (ratio > MAX_LOGIC_RATIO) {
+      fail(
+        `${file} is listed as a data registry but ${(ratio * 100).toFixed(1)}% of its ` +
+          `lines are logic (limit ${(MAX_LOGIC_RATIO * 100).toFixed(0)}%). ` +
+          `Move the logic out, or remove it from dataRegistries and split the file.`
+      );
+    }
+    continue;
+  }
 
   if (baseline === undefined) {
     // Not currently over the cap and not tracked: only a fresh violation matters.

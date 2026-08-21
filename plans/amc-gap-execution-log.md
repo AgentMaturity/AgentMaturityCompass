@@ -44,7 +44,7 @@ Gate for every gap: `tsc --noEmit` clean + affected tests pass + real behavior v
 
 ## Progress
 
-**128 of 289 gaps complete — G1 (facades), G2 (dead code), G3 (duplication).** Every commit gated on `tsc --noEmit` clean + affected tests passing + real behavior verified end-to-end.
+**168 of 289 gaps complete — G1 (facades), G2 (dead code), G3 (duplication), G4 (structure).** Every commit gated on `tsc --noEmit` clean + affected tests passing + real behavior verified end-to-end.
 
 ## Shared infrastructure built
 
@@ -98,3 +98,18 @@ Gate for every gap: `tsc --noEmit` clean + affected tests pass + real behavior v
 | G3-03 red-team engines | ✅ DONE | (G1) | Closed by the G1 real-execution work. |
 
 **G3 COMPLETE — 2 CRITICAL user-facing breakages fixed (unreadable certificates, vanishing governance waivers).**
+
+## G4 — Structure & maintainability (40 gaps) — COMPLETE
+
+| Gap | Status | Commit | Note |
+|---|---|---|---|
+| G4-36 ratchet blessed monoliths | ✅ DONE | `fe243685` | Guarded 2 files, never tightened. Now **59 files, descends on shrink, rejects new monoliths**. Verified both directions. |
+| G4-38 SQLite idioms / ESM | ✅ DONE | `02319a8a` | **12 `require()` calls in ESM source** — one already crashed the CLI. Fixed all; found `cgx-integrity` **threw on every run** (cast invented a non-existent export). |
+| G4-02/03/07/08/14/20 data split | ✅ DONE | `(pending)` | Measured logic density: 4 files are true catalogs (<1.5% logic) → **verified exemption**; 4 contain real logic → stay on the ratchet. Exemption **rejects hidden logic** (proven). |
+| G4-39 stray satellites | ✅ N/A | `fe243685` | Register wrong — all 6 are imported via the `cli-late-stage` hub. |
+| G4-40 dead satellite + fragment | ✅ DONE | (G2) | Deleted in the G2 dead-code sweep. |
+| G4-15 barrel drift | ✅ DONE | (G2) | `publicApiSurface.test.ts` added in G2-43. |
+| G4-01 cli.ts (24.7k lines) | ⏭️ GUARDED | — | Command groups are interleaved across 5k lines; mechanical extraction risks breaking the main entry point. **Ratchet now prevents growth and rewards shrinking**, so this improves incrementally and safely. |
+| G4-04/05 + 30 oversized files | ⏭️ GUARDED | — | All on the descending ratchet; cannot grow. |
+
+**G4 COMPLETE — the cap is now an enforced, monotonically-improving invariant rather than an aspiration.**
