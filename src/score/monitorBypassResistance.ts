@@ -49,7 +49,7 @@ export function scoreMonitorBypassResistance(cwd?: string): MonitorBypassResista
   const gaps: string[] = [];
   const recommendations: string[] = [];
 
-  const hasMultiLayerMonitoringOutcome = assessCriterion(root, ["src/monitor", "src/ops/monitor.ts"]);
+  const hasMultiLayerMonitoringOutcome = assessCriterion(root, ["src/monitor", "src/agents/monitor.ts"]);
   const hasMultiLayerMonitoring = hasMultiLayerMonitoringOutcome.met;
 
   const hasOutputIndependentVerificationOutcome = assessCriterion(root, ["src/truthguard", "src/verify/outputVerifier.ts"]);

@@ -34,7 +34,8 @@ describe("outputIntegrityMaturity", () => {
   it("detects partial artifacts", () => {
     markAsAmcCheckout(tmp);
     mkdirSync(join(tmp, "src/enforce"), { recursive: true });
-    writeFileSync(join(tmp, "src/enforce/sanitizer.ts"), "");
+    mkdirSync(join(tmp, "src/shield"), { recursive: true });
+    writeFileSync(join(tmp, "src/shield/sanitizer.ts"), "");
     writeFileSync(join(tmp, "src/enforce/codeExecutionGuard.ts"), "");
     const r = scoreOutputIntegrityMaturity(tmp);
     expect(r.hasOutputSanitization).toBe(true);
@@ -50,7 +51,8 @@ describe("outputIntegrityMaturity", () => {
     mkdirSync(join(tmp, "src/enforce"), { recursive: true });
     mkdirSync(join(tmp, "src/score"), { recursive: true });
     mkdirSync(join(tmp, "src/receipts"), { recursive: true });
-    writeFileSync(join(tmp, "src/enforce/sanitizer.ts"), "");
+    mkdirSync(join(tmp, "src/shield"), { recursive: true });
+    writeFileSync(join(tmp, "src/shield/sanitizer.ts"), "");
     writeFileSync(join(tmp, "src/score/confidenceDrift.ts"), "");
     writeFileSync(join(tmp, "src/score/claimProvenance.ts"), "");
     writeFileSync(join(tmp, "src/enforce/codeExecutionGuard.ts"), "");

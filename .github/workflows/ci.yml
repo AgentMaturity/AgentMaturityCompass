@@ -106,6 +106,9 @@ jobs:
       - name: Compliance artifact freshness
         run: npm run check:compliance-freshness
 
+      - name: Evidence path check
+        run: npm run check:evidence-paths
+
       - name: Release smoke checks
         run: |
           npm pack --ignore-scripts --json > /tmp/amc-pack.json

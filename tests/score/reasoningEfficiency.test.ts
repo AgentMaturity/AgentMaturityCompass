@@ -78,7 +78,8 @@ describe("reasoning efficiency maturity", () => {
     writeFileSync(join(tmp, "src/ops/circuitBreaker.ts"), "");
     // Output length governance
     mkdirSync(join(tmp, "src/enforce"), { recursive: true });
-    writeFileSync(join(tmp, "src/enforce/rateLimit.ts"), "");
+    mkdirSync(join(tmp, "src/product"), { recursive: true });
+    writeFileSync(join(tmp, "src/product/toolRateLimiter.ts"), "");
     // Accuracy-length monitoring
     writeFileSync(join(tmp, "src/score/confidenceDrift.ts"), "");
     // Early stopping

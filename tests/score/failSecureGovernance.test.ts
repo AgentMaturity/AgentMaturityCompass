@@ -50,7 +50,8 @@ describe("failSecureGovernance", () => {
     writeFileSync(join(tmp, "src/ops/circuitBreaker.ts"), "");
     writeFileSync(join(tmp, "ACTION_POLICY.md"), "");
     writeFileSync(join(tmp, ".amc/tool_allowlist.json"), "[]");
-    writeFileSync(join(tmp, "src/ops/rateLimiter.ts"), "");
+    mkdirSync(join(tmp, "src/product"), { recursive: true });
+    writeFileSync(join(tmp, "src/product/toolRateLimiter.ts"), "");
     writeFileSync(join(tmp, "src/score/modelDrift.ts"), "");
     writeFileSync(join(tmp, ".amc/ACTION_AUDIT.md"), "");
     writeFileSync(join(tmp, "src/assurance/packs/governanceBypassPack.ts"), "");

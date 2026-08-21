@@ -60,6 +60,7 @@
     "gen-counts": "node scripts/gen-counts.mjs --write",
     "check:counts": "node scripts/gen-counts.mjs --check",
     "check:compliance-freshness": "node scripts/compliance-artifact-freshness.mjs",
+    "check:evidence-paths": "node scripts/evidence-path-check.mjs",
     "check:question-bank-export": "node scripts/gen-question-bank-export.mjs --check",
     "test:coverage": "vitest run --coverage"
   },

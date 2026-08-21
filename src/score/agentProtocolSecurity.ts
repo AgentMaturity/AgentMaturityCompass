@@ -49,10 +49,10 @@ export function scoreAgentProtocolSecurity(cwd?: string): AgentProtocolSecurityR
   const hasProtocolAuthZOutcome = assessCriterion(root, ["src/enforce", "src/policy"]);
   const hasProtocolAuthZ = hasProtocolAuthZOutcome.met;
 
-  const hasProtocolInputValidationOutcome = assessCriterion(root, ["src/enforce/inputValidator.ts", "src/bridge/sanitize.ts", "src/shield/ingress.ts"]);
+  const hasProtocolInputValidationOutcome = assessCriterion(root, ["src/enforce/inputValidator.ts", "src/shield/sanitizer.ts", "src/shield/ingress.ts"]);
   const hasProtocolInputValidation = hasProtocolInputValidationOutcome.met;
 
-  const hasProtocolRateLimitingOutcome = assessCriterion(root, ["src/enforce/rateLimit.ts", "src/ops/rateLimiter.ts"]);
+  const hasProtocolRateLimitingOutcome = assessCriterion(root, ["src/product/toolRateLimiter.ts", "src/product/toolRateLimiter.ts"]);
   const hasProtocolRateLimiting = hasProtocolRateLimitingOutcome.met;
 
   const hasProtocolAuditOutcome = assessCriterion(root, [".amc/audit_log.jsonl", "src/audit", "src/ledger"]);

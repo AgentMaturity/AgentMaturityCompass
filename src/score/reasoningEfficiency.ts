@@ -87,8 +87,8 @@ export function scoreReasoningEfficiency(cwd?: string): ReasoningEfficiencyResul
 
   // 3. Overthinking detection — loop detection, verbosity analysis
   const overthinkPaths = [
-    "src/reasoning/overthinkingDetector.ts",
-    "src/ops/loopDetector.ts",
+    "src/assurance/packs/overthinkingDetectionPack.ts",
+    "src/product/loopDetector.ts",
     "src/enforce/maxIterations.ts",
     "src/reasoning/verbosityAnalyzer.ts",
     "src/ops/circuitBreaker.ts", // circuit breaker implies loop/runaway protection
@@ -101,7 +101,7 @@ export function scoreReasoningEfficiency(cwd?: string): ReasoningEfficiencyResul
     ".amc/output_length_policy.json",
     "src/enforce/outputLengthCap.ts",
     "src/ops/tokenLimiter.ts",
-    "src/enforce/rateLimit.ts", // rate limiting implies resource governance
+    "src/product/toolRateLimiter.ts", // rate limiting implies resource governance
   ];
   const hasOutputLengthGovernanceOutcome = assessCriterion(root, lengthGovPaths);
   hasOutputLengthGovernance = hasOutputLengthGovernanceOutcome.met;
@@ -130,7 +130,7 @@ export function scoreReasoningEfficiency(cwd?: string): ReasoningEfficiencyResul
   // 7. Reasoning trace audit — traces logged for post-hoc quality analysis
   const traceAuditPaths = [
     ".amc/reasoning_traces/",
-    "src/reasoning/traceLogger.ts",
+    "src/runtime/traceLogger.ts",
     ".amc/audit_log.jsonl", // general audit log captures reasoning
     "src/receipts", // receipt chain captures reasoning evidence
     "src/ledger",

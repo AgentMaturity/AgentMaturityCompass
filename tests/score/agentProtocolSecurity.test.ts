@@ -45,7 +45,8 @@ describe("agentProtocolSecurity", () => {
     mkdirSync(join(tmp, "src/audit"), { recursive: true });
     mkdirSync(join(tmp, "src/protocols"), { recursive: true });
     writeFileSync(join(tmp, "src/enforce/inputValidator.ts"), "");
-    writeFileSync(join(tmp, "src/enforce/rateLimit.ts"), "");
+    mkdirSync(join(tmp, "src/product"), { recursive: true });
+    writeFileSync(join(tmp, "src/product/toolRateLimiter.ts"), "");
     writeFileSync(join(tmp, "src/protocols/versionPin.ts"), "");
     const r = scoreAgentProtocolSecurity(tmp);
     expect(r.score).toBe(100);

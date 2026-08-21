@@ -51,7 +51,7 @@ export function scoreSelfKnowledgeMaturity(cwd?: string): SelfKnowledgeMaturityR
   const hasTypedRelationships = hasTypedRelationshipsOutcome.met;
 
   // prior art #2: Interpretability — can show which evidence/connections drove a decision
-  const interpPaths = ["src/score/claimProvenance.ts", "src/truthguard/truthProtocol.ts", "src/score/confidenceDrift.ts"];
+  const interpPaths = ["src/score/claimProvenance.ts", "src/runtime/truthProtocol.ts", "src/score/confidenceDrift.ts"];
   const hasInterpretabilityLayerOutcome = assessCriterion(root, interpPaths);
   const hasInterpretabilityLayer = hasInterpretabilityLayerOutcome.met;
 

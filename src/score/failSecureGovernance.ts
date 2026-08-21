@@ -59,12 +59,12 @@ export function scoreFailSecureGovernance(cwd?: string): FailSecureGovernanceRes
   hasToolCallWhitelist = hasToolCallWhitelistOutcome.met;
 
   // Rate limiting
-  const ratePaths = ["src/ops/rateLimiter.ts", "src/enforce/rateLimit.ts"];
+  const ratePaths = ["src/product/toolRateLimiter.ts", "src/product/toolRateLimiter.ts"];
   const hasRateLimitingOutcome = assessCriterion(root, ratePaths);
   hasRateLimiting = hasRateLimitingOutcome.met;
 
   // Semantic anomaly detection (Z-score / behavioral baseline)
-  const anomalyPaths = ["src/score/modelDrift.ts", "src/drift", "src/ops/anomalyDetector.ts"];
+  const anomalyPaths = ["src/score/modelDrift.ts", "src/drift", "src/observability/anomalyDetector.ts"];
   const hasSemanticAnomalyDetectionOutcome = assessCriterion(root, anomalyPaths);
   hasSemanticAnomalyDetection = hasSemanticAnomalyDetectionOutcome.met;
 

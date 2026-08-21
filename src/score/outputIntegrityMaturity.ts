@@ -55,7 +55,7 @@ export function scoreOutputIntegrityMaturity(cwd?: string): OutputIntegrityResul
   hasOutputValidation = hasOutputValidationOutcome.met;
 
   // Output sanitization
-  const sanitizePaths = ["src/enforce/sanitizer.ts", "src/output/sanitize.ts", "src/bridge/sanitize.ts"];
+  const sanitizePaths = ["src/shield/sanitizer.ts", "src/shield/sanitizer.ts", "src/shield/sanitizer.ts"];
   const hasOutputSanitizationOutcome = assessCriterion(root, sanitizePaths);
   hasOutputSanitization = hasOutputSanitizationOutcome.met;
 
@@ -65,12 +65,12 @@ export function scoreOutputIntegrityMaturity(cwd?: string): OutputIntegrityResul
   hasConfidenceCalibration = hasConfidenceCalibrationOutcome.met;
 
   // Citation requirement (every answer carries its own proof)
-  const citationPaths = ["src/truthguard/truthProtocol.ts", "src/claims", "src/score/claimProvenance.ts"];
+  const citationPaths = ["src/runtime/truthProtocol.ts", "src/claims", "src/score/claimProvenance.ts"];
   const hasCitationRequirementOutcome = assessCriterion(root, citationPaths);
   hasCitationRequirement = hasCitationRequirementOutcome.met;
 
   // Code execution guard (prevent LLM output from being exec'd without review)
-  const codeGuardPaths = ["src/enforce/codeExecutionGuard.ts", "src/sandbox", "src/ops/sandbox.ts"];
+  const codeGuardPaths = ["src/enforce/codeExecutionGuard.ts", "src/sandbox", "src/sandbox/sandbox.ts"];
   const hasCodeExecutionGuardOutcome = assessCriterion(root, codeGuardPaths);
   hasCodeExecutionGuard = hasCodeExecutionGuardOutcome.met;
 

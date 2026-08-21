@@ -39,7 +39,7 @@ export function scoreAdaptiveAccessControl(cwd?: string): AdaptiveAccessControlR
   const gaps: string[] = [];
   const recommendations: string[] = [];
 
-  const hasBehaviorProfilingOutcome = assessCriterion(root, ["src/monitor/behaviorProfile.ts", "src/score/modelDrift.ts", ".amc/behavior_profiles"]);
+  const hasBehaviorProfilingOutcome = assessCriterion(root, ["src/watch/behavioralProfiler.ts", "src/score/modelDrift.ts", ".amc/behavior_profiles"]);
   const hasBehaviorProfiling = hasBehaviorProfilingOutcome.met;
 
   const hasLearnedPoliciesOutcome = assessCriterion(root, ["src/enforce/learnedPolicies.ts", ".amc/learned_access_policies.json"]);
@@ -48,7 +48,7 @@ export function scoreAdaptiveAccessControl(cwd?: string): AdaptiveAccessControlR
   const hasStagingPhaseOutcome = assessCriterion(root, ["src/enforce/policyStaging.ts", ".amc/policy_staging.json"]);
   const hasStagingPhase = hasStagingPhaseOutcome.met;
 
-  const hasAnomalyBasedDenialOutcome = assessCriterion(root, ["src/enforce/anomalyDenial.ts", "src/ops/anomalyDetector.ts"]);
+  const hasAnomalyBasedDenialOutcome = assessCriterion(root, ["src/enforce/anomalyDenial.ts", "src/observability/anomalyDetector.ts"]);
   const hasAnomalyBasedDenial = hasAnomalyBasedDenialOutcome.met;
 
   const hasContextualPermissionsOutcome = assessCriterion(root, ["src/enforce/contextualPermissions.ts", "src/auth/contextAwareAuth.ts"]);
