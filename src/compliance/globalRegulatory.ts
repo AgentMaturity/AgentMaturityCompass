@@ -318,9 +318,26 @@ export interface ConstructValidityReport {
   factorLoadings: Record<string, number>;
   conclusion: string;
   limitations: string[];
-  peerReviewStatus: "submitted" | "under-review" | "published" | "pre-print";
+  peerReviewStatus: "not-conducted" | "submitted" | "under-review" | "published" | "pre-print";
+  /**
+   * False when the figures are illustrative targets rather than results from a
+   * study that was actually run.
+   */
+  validated: boolean;
 }
 
+/**
+ * ILLUSTRATIVE TARGETS — NO STUDY HAS BEEN CONDUCTED.
+ *
+ * Every figure below was hand-written to show the shape of a psychometric
+ * validation report. There was no expert panel, no test-retest interval and no
+ * factor analysis, so the correlations, Cronbach's alpha and factor loadings
+ * are not measurements and must never be cited as evidence that AMC's scoring
+ * is validated. The limitations list describes a study design, not one that
+ * took place.
+ *
+ * Replace this with real, attributable results before making any validity claim.
+ */
 export const CONSTRUCT_VALIDITY_DATA: ConstructValidityReport = {
   studyId: "amc-cv-2026-001",
   methodology: "Mixed-methods: expert panel correlation + test-retest + convergent/discriminant analysis",
@@ -338,14 +355,18 @@ export const CONSTRUCT_VALIDITY_DATA: ConstructValidityReport = {
     "Resilience": 0.83,
     "Skills": 0.79,
   },
-  conclusion: "L0-L5 scoring demonstrates good construct validity with expert correlation r=0.82, excellent test-retest reliability (r=0.91 after variance stabilization), and strong internal consistency (α=0.89). Factor structure confirms five distinct maturity dimensions.",
+  conclusion:
+    "NOT A RESULT: no construct-validity study has been conducted for AMC's L0-L5 scoring. " +
+    "The figures in this record are illustrative targets showing what such a study would report.",
   limitations: [
-    "Expert panel limited to English-speaking AI practitioners (n=47)",
+    "No study has been run; the entries below describe an intended design, not observed constraints",
+    "Intended expert panel: English-speaking AI practitioners (n=47)",
     "Test-retest interval: 2 weeks — longer intervals needed",
     "Discriminant validity moderate (0.68) — some dimension overlap expected",
     "Cross-cultural validation pending",
   ],
-  peerReviewStatus: "pre-print",
+  peerReviewStatus: "not-conducted",
+  validated: false,
 };
 
 // ---------------------------------------------------------------------------
@@ -389,8 +410,20 @@ export interface DpiaMitigation {
   effectivenessRating: "partial" | "full";
 }
 
+/**
+ * TEMPLATE — NOT A COMPLETED DPIA FOR YOUR DEPLOYMENT.
+ *
+ * A Data Protection Impact Assessment is a legal document about a specific
+ * controller's specific processing. This is a pre-filled example describing
+ * AMC's own reference architecture: the data flows, legal bases, risks and
+ * mitigations below were written by hand, not determined by assessing your
+ * systems, and no DPO or supervisory authority has reviewed them.
+ *
+ * Use it as a starting structure. Relying on it as your assessment would
+ * document processing you have not actually evaluated.
+ */
 export const AMC_EVALUATION_DPIA: DpiaAssessment = {
-  assessmentId: "dpia-amc-eval-2026",
+  assessmentId: "dpia-amc-eval-2026-template",
   dataFlows: [
     { flowId: "df-1", source: "Agent Under Evaluation", destination: "AMC CLI (Local)", dataTypes: ["agent-config", "execution-traces", "tool-call-logs", "token-usage"], legalBasis: "Legitimate interest (Article 6(1)(f))", crossBorder: false },
     { flowId: "df-2", source: "AMC CLI (Local)", destination: "Local Score Storage", dataTypes: ["maturity-scores", "evidence-chains", "dimension-breakdowns"], legalBasis: "Legitimate interest", crossBorder: false },
