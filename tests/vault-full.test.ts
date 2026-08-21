@@ -12,7 +12,7 @@ import { checkInvoice } from '../src/vault/invoiceFraud.js';
 import { scrubMetadata } from '../src/vault/metadataScrubber.js';
 import { classifyData } from '../src/vault/dataClassification.js';
 import { PrivacyBudget } from '../src/vault/privacyBudget.js';
-import { rotateMonitorKey } from '../src/vault/keyRotation.js';
+import { rotateMonitorKeyInVault } from '../src/vault/vault.js';
 
 describe('V1 — Secrets Broker', () => {
   it('stores and retrieves secrets', () => {
@@ -160,7 +160,7 @@ describe('V13 — Privacy Budget', () => {
 });
 
 describe('V14 — Key Rotation', () => {
-  it('exports rotateMonitorKey', () => {
-    expect(typeof rotateMonitorKey).toBe('function');
+  it('exports rotateMonitorKeyInVault', () => {
+    expect(typeof rotateMonitorKeyInVault).toBe('function');
   });
 });

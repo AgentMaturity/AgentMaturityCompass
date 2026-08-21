@@ -12,9 +12,14 @@
 import { execFileSync } from "node:child_process";
 import { basename, extname } from "node:path";
 
-function grepImporters(stem) {
-  // Match `from "...<stem>.js"` / `import("...<stem>.js")` across sources.
-  const pattern = `(from|import\\()\\s*['"\`][^'"\`]*/${stem}\\.js['"\`]`;
+function grepImporters(file, stem) {
+  // For a barrel (index.ts) the bare stem matches every other index import, so
+  // qualify it with its parent directory.
+  const parts = file.split("/");
+  const needle =
+    stem === "index" ? `${parts[parts.length - 2]}/index` : stem;
+  // Match `from "...<needle>.js"` / `import("...<needle>.js")` across sources.
+  const pattern = `(from|import\\()\\s*['"\`][^'"\`]*${needle}\\.js['"\`]`;
   try {
     const out = execFileSync(
       "grep",
@@ -32,7 +37,22 @@ const results = [];
 
 for (const file of process.argv.slice(2)) {
   const stem = basename(file, extname(file));
-  const importers = grepImporters(stem).filter((f) => f !== file);
+  let importers = grepImporters(file, stem).filter((f) => f !== file);
+  if (stem === "index") {
+    const dir = file.split("/").slice(0, -1).join("/").replace(/^src\//, "");
+    try {
+      const extra = execFileSync(
+        "grep",
+        ["-rEl", `from\\s*['"\`][^'"\`]*${dir}['"\`]`, "src", "tests"],
+        { encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }
+      )
+        .split("\n")
+        .filter(Boolean);
+      importers = [...new Set([...importers, ...extra])].filter((f) => f !== file);
+    } catch {
+      /* no directory-form importers */
+    }
+  }
   const barrels = importers.filter((f) => BARRELS.has(basename(f)));
   const tests = importers.filter((f) => f.startsWith("tests/"));
   const real = importers.filter(

@@ -31,7 +31,6 @@ const TITLE = "AstrBot";
 const IDENTIFIER = "astrbot_interoperability_fixture";
 const IMPLEMENTATION_FILES = [
   "src/integrations/partnerInteroperability.ts",
-  "src/integrations/index.ts",
   "src/index.ts",
   "src/lifecycle/artifactSignature.ts"
 ];

@@ -3,7 +3,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { beforeEach, describe, expect, test } from "vitest";
 import { runDiagnostic } from "../../src/diagnostic/runner.js";
-import { runSetupCli } from "../../src/setup/setupCli.js";
+import { runQuickSetup } from "../../src/setup/quickSetup.js";
 import { createAMCClient, instrumentOpenAIClient } from "../../src/index.js";
 
 function makeWorkspace(): string {
@@ -19,18 +19,21 @@ describe("5-minute quickstart integration", () => {
     process.env.AMC_VAULT_PASSPHRASE = "dx-quickstart-passphrase";
   });
 
-  test("setup --demo, run diagnostic, and instrument OpenAI client", async () => {
+  test("quick setup, run diagnostic, and instrument OpenAI client", async () => {
     try {
-      const setup = await runSetupCli({
+      // setupCli was one of three overlapping onboarding paths and has been
+      // removed; quickSetup is the flow the CLI actually ships.
+      const setup = await runQuickSetup({
         cwd: workspace,
-        demo: true,
-        nonInteractive: true
+        provider: "openai",
+        auto: true,
+        logger: { log: () => {} }
       });
 
-      expect(setup.mode).toBe("single");
+      expect(setup.workspace).toBe(workspace);
       expect(existsSync(join(workspace, ".amc"))).toBe(true);
       expect(existsSync(join(workspace, ".amc", "gateway.yaml"))).toBe(true);
-      expect(existsSync(join(workspace, ".amc", "vault.amcvault"))).toBe(true);
+      expect(existsSync(setup.gatewayConfigPath)).toBe(true);
 
       const report = await runDiagnostic({
         workspace,

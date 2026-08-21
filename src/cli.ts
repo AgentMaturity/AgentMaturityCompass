@@ -712,7 +712,6 @@ import { contextualizedDiagnosticRenderCli } from "./diagnostic/contextualizer/c
 import { truthguardValidateCli } from "./truthguard/truthguardCli.js";
 import { domainProofCheckCli } from "./domainProof/domainProofCli.js";
 import { toErrorMessage } from "./utils/errors.js";
-import { registerWatchCommands } from "./cli-watch-commands.js";
 import { registerLateStageCliCommands } from "./cli-late-stage-commands.js";
 import { registerDomainProductCliCommands } from "./cli-domain-product-commands.js";
 import { registerGuardrailControlCommands } from "./enforce/guardrailCli.js";
