@@ -128,6 +128,77 @@ for (const rel of TRACKED_FILES) {
   }
 }
 
+// ── Prose surfaces ───────────────────────────────────────────────────────
+/**
+ * Nine public files state the same counts as plain prose rather than markers,
+ * so `--write` updated README and left the badge, both websites, CONTRIBUTING,
+ * the launch drafts and the whitepaper to be hand-edited. That is precisely the
+ * drift this script exists to end, and it is what let the published figure sit
+ * at 8,604 while the repository held 8,478.
+ *
+ * Each pattern is anchored to its surrounding words so only genuine count
+ * claims are rewritten, never an unrelated number that happens to look similar.
+ */
+const PROSE_PATTERNS = [
+  // README CI badge, where the thousands separator is URL-encoded.
+  { key: "testBlocks", encoded: true, re: /(tests-)([\d,]|%2C)+(%20passing)/g, wrap: (m, truth) => `tests-${truth}%20passing` },
+  { key: "testBlocks", re: /([\d,]+)( passing Vitest tests)/g },
+  { key: "testBlocks", re: /([\d,]+)( passing tests)/g },
+  { key: "testBlocks", re: /([\d,]+)( Passing Tests)/g },
+  { key: "testBlocks", re: /(?<=stat-value">)([\d,]+)(?=<\/span><span class="stat-label">passing tests)/g },
+  { key: "testBlocks", re: /(?<=<b>)([\d,]+)(?=<\/b><span>Tests)/g },
+  { key: "testFiles", re: /(across )([\d,]+)( files)/g, group: 2 }
+];
+
+const PROSE_SURFACES = [
+  "README.md",
+  "CONTRIBUTING.md",
+  "website/index.html",
+  "website/lite.html",
+  "website/i18n.js",
+  "docs/content/show-hn-draft.md",
+  "docs/content/reddit-launch-drafts.md",
+  "docs/internal/competitive-landscape.md",
+  "docs/internal/mirofish-simulation-council.md",
+  "whitepaper/AMC_WHITEPAPER_v1.md"
+];
+
+const plain = (key) => counts[key].toLocaleString("en-US");
+const encoded = (key) => plain(key).replace(/,/g, "%2C");
+
+for (const rel of PROSE_SURFACES) {
+  const path = join(root, rel);
+  if (!existsSync(path)) continue;
+  const original = readFileSync(path, "utf8");
+  let updated = original;
+
+  for (const pattern of PROSE_PATTERNS) {
+    const truth = pattern.encoded ? encoded(pattern.key) : plain(pattern.key);
+    updated = updated.replace(pattern.re, (whole, ...groups) => {
+      if (pattern.wrap) return pattern.wrap(whole, truth);
+      if (pattern.group === 2) {
+        const [before, current, after] = groups;
+        return current === truth ? whole : `${before}${truth}${after}`;
+      }
+      // Lookaround patterns capture the bare number; the rest carry a suffix.
+      if (groups.length >= 2 && typeof groups[1] === "string") {
+        const [current, after] = groups;
+        return current === truth ? whole : `${truth}${after}`;
+      }
+      return whole === truth ? whole : truth;
+    });
+  }
+
+  if (updated !== original) {
+    if (mode === "check") {
+      failures.push(`${rel}: published counts are stale. Run: node scripts/gen-counts.mjs --write`);
+    } else if (mode === "write") {
+      writeFileSync(path, updated);
+      rewrote += 1;
+    }
+  }
+}
+
 if (mode === "check") {
   if (failures.length > 0) {
     console.error("Count drift detected:\n" + failures.map((f) => `  - ${f}`).join("\n"));

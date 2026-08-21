@@ -7,8 +7,19 @@
 
 import { existsSync, readdirSync } from "fs";
 import { join } from "path";
+import { detectControlSurfaceScope } from "./controlSurfaceScope.js";
 
 export interface MonitorBypassResistanceResult {
+  /**
+   * False when the scanned directory is not an AMC source checkout.
+   *
+   * This scorer grades AMC's own control surface by looking for AMC source
+   * files, so pointing it at a customer's repository previously produced a low
+   * score that said nothing about their agent. When not applicable the score is
+   * not meaningful and `notApplicableReason` explains what to run instead.
+   */
+  applicable?: boolean;
+  notApplicableReason?: string;
   score: number; // 0-100
   level: number; // 0-5
   hasMultiLayerMonitoring: boolean;
@@ -71,10 +82,15 @@ export function scoreMonitorBypassResistance(cwd?: string): MonitorBypassResista
   const score = Math.round((passed / checks.length) * 100);
   const level = score >= 90 ? 5 : score >= 70 ? 4 : score >= 50 ? 3 : score >= 30 ? 2 : score >= 10 ? 1 : 0;
 
+  const scope = detectControlSurfaceScope(root);
   return {
     score, level,
     hasMultiLayerMonitoring, hasOutputIndependentVerification, hasBehavioralBaseline,
     hasProxyDetection, hasMonitorRedundancy, hasAdversarialMonitorTesting,
     gaps, recommendations,
+    // False when this is not an AMC source checkout: the checks above look
+    // for AMC source files, so the score would say nothing about the target.
+    applicable: scope.applicable,
+    notApplicableReason: scope.applicable ? undefined : scope.reason
   };
 }

@@ -22748,6 +22748,12 @@ score
   .action(async (opts: { json?: boolean }) => {
     try {
       const { scoreOWASPLLMCoverage } = await import("./score/owaspLLMCoverage.js");
+      const { reportControlSurfaceScopeSkip } = await import(
+        "./score/controlSurfaceScope.js"
+      );
+      // Grades AMC's own control surface; refuses to emit a number for a
+      // directory it cannot actually assess. See controlSurfaceScope.ts.
+      if (reportControlSurfaceScopeSkip(process.cwd(), opts, (l) => console.log(opts.json ? l : chalk.yellow(l)))) return;
       const result = scoreOWASPLLMCoverage();
       if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
       console.log(chalk.bold.hex('#4AEF79')("\n🛡️  OWASP LLM Top 10 Coverage"));
@@ -22942,21 +22948,12 @@ score
   .action(async (opts: { json?: boolean }) => {
     try {
       const { scoreGamingResistance } = await import("./score/gamingResistance.js");
-      const { detectControlSurfaceScope, controlSurfaceScopeMessage } = await import(
+      const { reportControlSurfaceScopeSkip } = await import(
         "./score/controlSurfaceScope.js"
       );
-      const scope = detectControlSurfaceScope(process.cwd());
-      if (!scope.applicable) {
-        // This scorer grades AMC's own control surface. Emitting a number for
-        // an unrelated directory would report on AMC's file layout, not the
-        // user's agent.
-        if (opts.json) {
-          console.log(JSON.stringify({ applicable: false, reason: scope.reason }, null, 2));
-        } else {
-          console.log(chalk.yellow(controlSurfaceScopeMessage(process.cwd(), scope)));
-        }
-        return;
-      }
+      // Grades AMC's own control surface; refuses to emit a number for a
+      // directory it cannot actually assess. See controlSurfaceScope.ts.
+      if (reportControlSurfaceScopeSkip(process.cwd(), opts, (l) => console.log(opts.json ? l : chalk.yellow(l)))) return;
       const result = scoreGamingResistance(process.cwd());
       if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
       console.log(chalk.bold.hex('#4AEF79')("\n🛡️   Gaming Resistance"));
@@ -22976,21 +22973,12 @@ score
   .action(async (opts: { json?: boolean }) => {
     try {
       const { scoreSleeperDetection } = await import("./score/sleeperDetection.js");
-      const { detectControlSurfaceScope, controlSurfaceScopeMessage } = await import(
+      const { reportControlSurfaceScopeSkip } = await import(
         "./score/controlSurfaceScope.js"
       );
-      const scope = detectControlSurfaceScope(process.cwd());
-      if (!scope.applicable) {
-        // This scorer grades AMC's own control surface. Emitting a number for
-        // an unrelated directory would report on AMC's file layout, not the
-        // user's agent.
-        if (opts.json) {
-          console.log(JSON.stringify({ applicable: false, reason: scope.reason }, null, 2));
-        } else {
-          console.log(chalk.yellow(controlSurfaceScopeMessage(process.cwd(), scope)));
-        }
-        return;
-      }
+      // Grades AMC's own control surface; refuses to emit a number for a
+      // directory it cannot actually assess. See controlSurfaceScope.ts.
+      if (reportControlSurfaceScopeSkip(process.cwd(), opts, (l) => console.log(opts.json ? l : chalk.yellow(l)))) return;
       const result = scoreSleeperDetection(process.cwd());
       if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
       console.log(chalk.bold.hex('#4AEF79')("\n🕵️   Sleeper Detection"));
@@ -23006,21 +22994,12 @@ score
   .action(async (opts: { json?: boolean }) => {
     try {
       const { scoreAuditDepth } = await import("./score/auditDepth.js");
-      const { detectControlSurfaceScope, controlSurfaceScopeMessage } = await import(
+      const { reportControlSurfaceScopeSkip } = await import(
         "./score/controlSurfaceScope.js"
       );
-      const scope = detectControlSurfaceScope(process.cwd());
-      if (!scope.applicable) {
-        // This scorer grades AMC's own control surface. Emitting a number for
-        // an unrelated directory would report on AMC's file layout, not the
-        // user's agent.
-        if (opts.json) {
-          console.log(JSON.stringify({ applicable: false, reason: scope.reason }, null, 2));
-        } else {
-          console.log(chalk.yellow(controlSurfaceScopeMessage(process.cwd(), scope)));
-        }
-        return;
-      }
+      // Grades AMC's own control surface; refuses to emit a number for a
+      // directory it cannot actually assess. See controlSurfaceScope.ts.
+      if (reportControlSurfaceScopeSkip(process.cwd(), opts, (l) => console.log(opts.json ? l : chalk.yellow(l)))) return;
       const result = scoreAuditDepth(process.cwd());
       if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
       console.log(chalk.bold.hex('#4AEF79')("\n📝  Audit Depth"));

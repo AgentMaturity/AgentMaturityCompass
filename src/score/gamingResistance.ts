@@ -25,8 +25,19 @@
 
 import { existsSync } from "fs";
 import { join } from "path";
+import { detectControlSurfaceScope } from "./controlSurfaceScope.js";
 
 export interface GamingResistanceReport {
+  /**
+   * False when the scanned directory is not an AMC source checkout.
+   *
+   * This scorer grades AMC's own control surface by looking for AMC source
+   * files, so pointing it at a customer's repository previously produced a low
+   * score that said nothing about their agent. When not applicable the score is
+   * not meaningful and `notApplicableReason` explains what to run instead.
+   */
+  applicable?: boolean;
+  notApplicableReason?: string;
   /** Resistance to evidence flooding */
   floodingResistance: { score: number; description: string };
   /** Resistance to selective evidence submission */
@@ -119,6 +130,7 @@ export function scoreGamingResistance(root: string): GamingResistanceReport {
 
   const level = totalScore >= 85 ? 5 : totalScore >= 65 ? 4 : totalScore >= 45 ? 3 : totalScore >= 25 ? 2 : totalScore >= 10 ? 1 : 0;
 
+  const scope = detectControlSurfaceScope(root);
   return {
     floodingResistance,
     selectiveResistance,
@@ -128,5 +140,9 @@ export function scoreGamingResistance(root: string): GamingResistanceReport {
     score: totalScore,
     level,
     gaps,
+    // False when this is not an AMC source checkout: the checks above look
+    // for AMC source files, so the score would say nothing about the target.
+    applicable: scope.applicable,
+    notApplicableReason: scope.applicable ? undefined : scope.reason
   };
 }

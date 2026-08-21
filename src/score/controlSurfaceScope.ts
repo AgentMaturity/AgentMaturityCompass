@@ -61,3 +61,27 @@ export function detectControlSurfaceScope(root: string): ControlSurfaceScope {
 export function controlSurfaceScopeMessage(root: string, scope: ControlSurfaceScope): string {
   return `Not applicable to ${root}\n${scope.reason}`;
 }
+
+/**
+ * CLI guard shared by every `amc score` subcommand backed by a control-surface
+ * scorer.
+ *
+ * Returns true when the command should stop: the message has already been
+ * printed in whichever format the caller asked for. Four subcommands had
+ * hand-copied this same block, so a fix to the wording or the JSON shape had to
+ * be applied four times to avoid drift.
+ */
+export function reportControlSurfaceScopeSkip(
+  root: string,
+  opts: { json?: boolean },
+  write: (line: string) => void
+): boolean {
+  const scope = detectControlSurfaceScope(root);
+  if (scope.applicable) return false;
+  write(
+    opts.json
+      ? JSON.stringify({ applicable: false, reason: scope.reason }, null, 2)
+      : controlSurfaceScopeMessage(root, scope)
+  );
+  return true;
+}
