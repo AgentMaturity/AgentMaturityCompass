@@ -1,3 +1,11 @@
+/**
+ * Truth-protocol section validator.
+ *
+ * SUPERSEDED for product use. Two other implementations of this idea are live:
+ * assurance/validators.hasTruthProtocol, which the assurance packs call, and
+ * the src/truthguard subsystem behind `amc truthguard`. This module is exported
+ * for callers composing their own checks and is not on either path.
+ */
 import type { RiskTier } from "../types.js";
 
 const REQUIRED_HEADINGS = [

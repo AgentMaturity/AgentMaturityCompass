@@ -1,4 +1,12 @@
 /**
+ * Operator console view models.
+ *
+ * NOTE: the IncidentTimeline interface here is a display shape for the operator
+ * console — a list of entries to render. It is unrelated to
+ * incidents/incidentTimeline, which builds the actual incident timeline from
+ * evidence. Same name, different jobs; do not wire one expecting the other.
+ */
+/**
  * Operator UX — "Why Capped + How to Unlock" View
  *
  * Provides single-pane views for operators showing:
