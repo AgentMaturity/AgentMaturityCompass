@@ -161,3 +161,17 @@ Gate for every gap: `tsc --noEmit` clean + affected tests pass + real behavior v
 | G7-01/02 template clones & prose assertions | ⏭️ NOT ATTEMPTED | 547 clone files + 559 prose-assertion files. Mechanically rewriting ~1,100 test files on pattern-match would risk silently weakening real coverage; the coverage floor now makes weak tests visible instead. |
 
 **G7 COMPLETE — the coverage gate can now fail, and the three ship-critical blind spots have real tests.**
+
+## G8 — Architecture, data & hygiene (34 gaps) — IN PROGRESS
+
+| Gap | Status | Note |
+|---|---|---|
+| G8-15/16 divergent trust weights | ✅ DONE | Three tables disagreed on the same tiers (`SELF_REPORTED` was 0.4 in two, 0.5 in one). One canonical table in `src/score/trustWeights.ts`. |
+| G8-19 redaction violated at write time | ✅ DONE | Policy hardcoded `storeRawPrompts:false` while both writers stored raw text; payloads now redacted at write with a recorded reason + hash. |
+| G8-17 self-paths as evidence | ✅ DONE | **A false pass, not just a false zero:** an unrelated project with `src/policy`+`src/enforce` scored 43 on fail-secure governance and was credited with three controls it does not implement. 111 probes across 25 modules now ignore `src/` outside an AMC checkout. |
+| G8-17b unsatisfiable criteria | ✅ DONE | Measuring the above exposed a wider fault: **55 of 131 criteria could only ever be met by AMC's own tree**, capping ISO 42001 at 5/8 for every customer. Unassessable criteria are excluded from the denominator *and disclosed*. |
+| G8-27 stray root artifacts | ✅ DONE | A file named `--json` had sat in the root since February. Cause: two scripts took `argv[2]` as an output path unchecked. `.gitignore` had been made to hide the symptom; the cause is now fixed and the rule explains itself. |
+| G8-04 1.2GB npm cache in-tree | ✅ DONE | `createReleaseBundle` pointed npm's cache **inside the worktree** with nothing pruning it. Moved to the OS temp dir, matching the sibling release scripts. `.amc`: 1.3GB → 116MB. |
+| G8-05 mutable state in git | ✅ DONE | An ordinary `amc rate` dirtied a tracked file, and the committed `ratings.json` held a real rating from a test run (`traceId "test-trace-123"`). Three files untracked. **`context-graph.json` was left tracked — the register grouped it wrongly; it is signed-paired with `targets/default.target.json`, which pins its hash.** |
+| G8-01..03, 10, 11, 22..26, 28..34 | ⏳ TODO | Persistence fragmentation, dead enterprise code, remaining hygiene. |
+

@@ -4,9 +4,16 @@ import { dirname, join, resolve } from "node:path";
 import { tmpdir } from "node:os";
 import process from "node:process";
 import { scanDirectoryForSecrets } from "../dist/release/releaseSecretScan.js";
+import { readOutputPathArg } from "./lib/outputPathArg.mjs";
 
 const cwd = resolve(process.cwd());
-const outPath = resolve(process.argv[2] ?? join(cwd, ".amc", "security-scan-lite.json"));
+/** Output path for the report; a flag here is a mistake, not a path. */
+const outArg = readOutputPathArg(
+  process.argv,
+  "security-scan-lite",
+  "node scripts/security-scan-lite.mjs [out.json]"
+);
+const outPath = resolve(outArg ?? join(cwd, ".amc", "security-scan-lite.json"));
 
 function ensureDir(path) {
   mkdirSync(path, { recursive: true });

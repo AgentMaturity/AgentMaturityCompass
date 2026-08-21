@@ -79,7 +79,9 @@ AMC_OS/
 ASSETS/
 security-audit/
 
-# Stray CLI artifacts
+# Stray CLI artifacts. These were the symptom of scripts taking argv[2] as an
+# output path without checking it was not a flag; the cause is fixed in
+# scripts/lib/outputPathArg.mjs, so nothing should land here again.
 --json
 --verbose
 AMC_IMPROVEMENT_ROADMAP.md
@@ -115,3 +117,17 @@ deploy/compose/secrets/*.txt
 !deploy/compose/secrets/*.txt.example
 deploy/k8s/secret.yaml
 !deploy/k8s/secret.example.yaml
+
+# Per-workspace runtime state, not source.
+#
+# These were tracked, so an ordinary `amc rate` dirtied the working tree and
+# the committed ratings.json carried a real rating from a test run
+# (traceId "test-trace-123"). Each is regenerated on demand: resolveAgentId
+# falls back to "default", loadGovernanceState returns defaults when absent,
+# and the quality store creates its own file.
+#
+# .amc/context-graph.json is deliberately NOT here — it is signed-paired with
+# .amc/targets/default.target.json, which pins its hash.
+.amc/current-agent
+.amc/fleet/governance-state.json
+.amc/agents/*/quality/ratings.json

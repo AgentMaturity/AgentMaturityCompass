@@ -12,6 +12,7 @@ import { readVersionFromPackage, writeProvenanceRecord } from "./releaseProvenan
 import { canonicalize } from "../utils/json.js";
 import { ensureDir, pathExists, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
+import { tmpdir } from "node:os";
 
 interface PackOptions {
   workspace: string;
@@ -123,7 +124,14 @@ export function createReleaseBundle(options: PackOptions): {
 } {
   const workspace = resolve(options.workspace);
   const outFile = resolve(options.outFile);
-  const npmCacheDir = join(workspace, ".amc", "release", "working", "npm-cache");
+  // The npm cache lives outside the worktree.
+  //
+  // It used to be .amc/release/working/npm-cache — inside the repository, with
+  // nothing ever pruning it. It had reached 1.2GB, which every editor index,
+  // ripgrep sweep and file-watcher in the tree had to walk past. The sibling
+  // release scripts already cache under the OS temp dir; this matches them, so
+  // repeated releases still reuse a warm cache without the repo carrying it.
+  const npmCacheDir = join(tmpdir(), "amc-release-npm-cache");
   const skipSecretScan = options.skipSecretScan ?? true;
   ensureDir(npmCacheDir);
   const npmEnv = {

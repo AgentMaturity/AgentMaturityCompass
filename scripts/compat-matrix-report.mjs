@@ -2,8 +2,11 @@
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { readOutputPathArg } from './lib/outputPathArg.mjs';
 
-const outPath = process.argv[2] || path.join(process.cwd(), 'compat-matrix.json');
+const outPath =
+  readOutputPathArg(process.argv, "compat-matrix-report", "node scripts/compat-matrix-report.mjs [out.json]") ||
+  path.join(process.cwd(), 'compat-matrix.json');
 const payload = {
   generatedAt: new Date().toISOString(),
   platform: process.platform,
