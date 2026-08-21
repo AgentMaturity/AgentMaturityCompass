@@ -364,7 +364,7 @@ export async function enableNotaryTrust(params: {
       }
     }
   });
-  addPublicKeyToHistory(params.workspace, "auditor", pubPem);
+  addPublicKeyToHistory(params.workspace, "auditor", pubPem, "notary");
   const saved = saveTrustConfig(params.workspace, next);
   return {
     path: saved.path,

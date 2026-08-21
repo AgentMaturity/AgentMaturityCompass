@@ -83,7 +83,10 @@ security-audit/
 --json
 --verbose
 AMC_IMPROVEMENT_ROADMAP.md
-COMPETITIVE_ANALYSIS.md
+# The real files are COMPETITIVE_ANALYSIS_G0DM0D3.md and
+# COMPETITIVE_GAP_REPORT_G0DM0D3.md, which this pattern missed, so both stayed
+# tracked in a public repo. Widened so future competitive material is excluded.
+COMPETITIVE_*.md
 ..bfg-report/
 exports/
 !src/exports/
@@ -101,3 +104,7 @@ swarm-report.json
 qa/node_modules/
 qa/dist/
 qa/.env
+
+# Stray artifacts that were committed before these rules existed
+.tmp-*
+test_model.pkl

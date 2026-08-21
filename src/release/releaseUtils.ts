@@ -4,6 +4,24 @@ import { tmpdir } from "node:os";
 import { dirname, join, relative, resolve } from "node:path";
 import { ensureDir, pathExists, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
+import { extractValidatedTarGzipArchive, type TarArchiveLimits } from "../security/safeTarArchive.js";
+
+/**
+ * Extraction limits for AMC archives.
+ *
+ * Raw `tar -xzf` on an archive from outside the workspace is a path-traversal
+ * and zip-bomb risk: a member named ../../etc/x escapes the destination, and a
+ * small archive can expand without bound. These bounds mirror the ones the
+ * passport and plugin verifiers already use.
+ */
+const AMC_ARCHIVE_LIMITS: TarArchiveLimits = {
+  maxEntries: 10_000,
+  maxCompressedBytes: 128 * 1024 * 1024,
+  maxEntryBytes: 128 * 1024 * 1024,
+  maxTotalBytes: 512 * 1024 * 1024,
+  maxPathBytes: 1024,
+};
+
 
 export function mkTmp(prefix: string): string {
   return mkdtempSync(join(tmpdir(), prefix));
@@ -46,9 +64,8 @@ export function runTarCreate(sourceDir: string, outputBundle: string): void {
 }
 
 export function runTarExtract(bundleFile: string, outputDir: string): void {
-  const out = spawnSync("tar", ["-xzf", bundleFile, "-C", outputDir], {
-    encoding: "utf8"
-  });
+  extractValidatedTarGzipArchive({ file: bundleFile, destination: outputDir, label: "archive", limits: AMC_ARCHIVE_LIMITS });
+  const out = { status: 0, stderr: "", stdout: "" };
   if (out.status !== 0) {
     throw new Error(`Failed to extract archive: ${(`${out.stdout ?? ""}${out.stderr ?? ""}`).trim()}`);
   }

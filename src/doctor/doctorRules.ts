@@ -18,6 +18,7 @@ import { adaptersDetectCli } from "../adapters/adapterCli.js";
 import { pathAllowedByPatterns } from "../toolhub/toolhubValidators.js";
 import { checkNotaryTrust, loadTrustConfig, verifyTrustConfigSignature } from "../trust/trustConfig.js";
 import { signDigestWithPolicy } from "../crypto/signing/signer.js";
+import { verifyKeyHistoryChain } from "../crypto/keys.js";
 
 export type DoctorStatus = "PASS" | "FAIL" | "WARN" | "INFO";
 
@@ -138,6 +139,29 @@ export async function runDoctorRules(workspace: string, options: DoctorOptions =
       : { id: "node-version", status: "FAIL", message: `Node ${versions.node} is below required >=20`, fixHint: "Install Node.js 20+" }
   );
   checks.push(nativeModuleCheck());
+
+  // The key history decides which public keys may verify as each role, so a
+  // silent insertion there forges every signature of that role. Report a broken
+  // chain loudly rather than letting verification quietly accept a planted key.
+  if (workspaceInitialized) {
+    for (const kind of ["monitor", "auditor", "lease", "session"] as const) {
+      const chain = verifyKeyHistoryChain(workspace, kind);
+      if (!chain.ok) {
+        checks.push({
+          id: `key-history-${kind}`,
+          status: "FAIL",
+          message: `${kind} key history is broken at entry ${chain.brokenAtIndex}; a key may have been inserted or altered`,
+          fixHint: "Do not trust signatures from this role until the history is reviewed."
+        });
+      } else if (chain.legacyEntries > 0) {
+        checks.push({
+          id: `key-history-${kind}`,
+          status: "INFO",
+          message: `${kind} key history has ${chain.legacyEntries} entr${chain.legacyEntries === 1 ? "y" : "ies"} predating hash chaining`
+        });
+      }
+    }
+  }
 
   if (!workspaceInitialized) {
     checks.push({

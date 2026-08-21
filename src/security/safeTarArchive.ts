@@ -52,13 +52,28 @@ export function assertSafeTarMemberPath(input: {
     throw new Error(`${label} contains an absolute member path: ${rawPath}`);
   }
   const portablePath = rawPath.replace(/\/+$/, "");
-  const normalized = posix.normalize(portablePath);
+  // "." and "./" are the archive's own root entry, which `tar -czf -C dir .`
+  // always emits. Extracting it is a no-op inside the destination, not an
+  // escape, so it is permitted; ".." in any position still is not.
+  if (portablePath === "." || portablePath === "") {
+    return ".";
+  }
+  // A single leading "./" is how tar writes members of an archive created with
+  // `-C dir .`; it is semantically identical to the bare path. Strip it before
+  // the traversal checks so "./secret.txt" is treated as "secret.txt". Internal
+  // "/./" and any ".." are left for the checks below to reject.
+  const withoutLeadingDot = portablePath.startsWith("./")
+    ? portablePath.slice(2)
+    : portablePath;
+  if (withoutLeadingDot === "" || withoutLeadingDot === ".") {
+    return ".";
+  }
+  const normalized = posix.normalize(withoutLeadingDot);
   if (
-    normalized === "."
-    || normalized === ".."
+    normalized === ".."
     || normalized.startsWith("../")
     || normalized.includes("/../")
-    || normalized !== portablePath
+    || normalized !== withoutLeadingDot
     || normalized.split("/").some((segment) => segment.length === 0 || segment === "." || segment === "..")
   ) {
     throw new Error(`${label} member escapes the extraction root: ${rawPath}`);

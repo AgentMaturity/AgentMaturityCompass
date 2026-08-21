@@ -14,6 +14,24 @@ import { scanBenchForPii } from "./benchRedaction.js";
 import { buildBenchProofs, writeBenchProofFiles } from "./benchProofs.js";
 import { benchBuildMetaSchema, benchPiiScanSchema, benchArtifactSchema, benchSignatureSchema, type BenchArtifact, type BenchBuildMeta } from "./benchSchema.js";
 import { loadBenchPolicy, verifyBenchPolicySignature, benchExportsDir } from "./benchPolicyStore.js";
+import { extractValidatedTarGzipArchive, type TarArchiveLimits } from "../security/safeTarArchive.js";
+
+/**
+ * Extraction limits for AMC archives.
+ *
+ * Raw `tar -xzf` on an archive from outside the workspace is a path-traversal
+ * and zip-bomb risk: a member named ../../etc/x escapes the destination, and a
+ * small archive can expand without bound. These bounds mirror the ones the
+ * passport and plugin verifiers already use.
+ */
+const AMC_ARCHIVE_LIMITS: TarArchiveLimits = {
+  maxEntries: 10_000,
+  maxCompressedBytes: 128 * 1024 * 1024,
+  maxEntryBytes: 128 * 1024 * 1024,
+  maxTotalBytes: 512 * 1024 * 1024,
+  maxPathBytes: 1024,
+};
+
 
 function cleanupDir(path: string): void {
   if (pathExists(path)) {
@@ -46,7 +64,8 @@ function tarCreateDeterministic(sourceDir: string, outFile: string): void {
 }
 
 function tarExtract(bundleFile: string, outDir: string): void {
-  const out = spawnSync("tar", ["-xzf", bundleFile, "-C", outDir], { encoding: "utf8" });
+  extractValidatedTarGzipArchive({ file: bundleFile, destination: outDir, label: "archive", limits: AMC_ARCHIVE_LIMITS });
+  const out = { status: 0, stderr: "", stdout: "" };
   if (out.status !== 0) {
     throw new Error(`failed to extract bench artifact: ${(`${out.stdout ?? ""}${out.stderr ?? ""}`).trim()}`);
   }

@@ -128,7 +128,7 @@ function signWithNotary(params: {
   if (signedSkewMs > trust.trust.enforcement.notaryMaxClockSkewSeconds * 1000) {
     throw new Error("notary signed timestamp outside allowed clock skew");
   }
-  addPublicKeyToHistory(params.workspace, "auditor", verified.parsed.pubkeyPem);
+  addPublicKeyToHistory(params.workspace, "auditor", verified.parsed.pubkeyPem, "notary");
   return {
     digestSha256: params.digestHex,
     signature: verified.parsed.signatureB64,

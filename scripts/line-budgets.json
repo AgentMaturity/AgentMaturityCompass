@@ -35,8 +35,8 @@
     "src/guide/guideGenerator.ts": 1274,
     "src/toolhub/toolhubServer.ts": 1261,
     "src/workspaces/hostDb.ts": 1248,
+    "src/bundles/bundle.ts": 1177,
     "src/audit/binderCollector.ts": 1174,
-    "src/bundles/bundle.ts": 1160,
     "src/watch/observabilityBridge.ts": 1158,
     "src/integrations/integrationDeliveryQueue.ts": 1135,
     "src/org/orgRun.ts": 1127,
@@ -61,7 +61,7 @@
     "src/bridge/hookIngress.ts": 884,
     "src/governor/policyCanary.ts": 845,
     "src/prompt/promptPackApi.ts": 839,
-    "src/compliance/regulatoryAutomation.ts": 803,
+    "src/compliance/regulatoryAutomation.ts": 802,
     "src/experiments/architectureExperiment.ts": 802
   }
 }

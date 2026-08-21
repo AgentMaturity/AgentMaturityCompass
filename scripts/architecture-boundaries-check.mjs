@@ -123,6 +123,9 @@ if (improvements.length > 0) {
         {
           _comment: budgetsFile._comment,
           cap: CAP,
+          // Must be carried through: dropping it turns every exempt registry
+          // into a "new file over the cap" on the next run.
+          dataRegistries,
           budgets: Object.fromEntries(
             Object.entries(nextBudgets).sort((a, b) => b[1] - a[1])
           )
