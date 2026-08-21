@@ -1,3 +1,11 @@
+/**
+ * Pure residency checks.
+ *
+ * NOT the residency policy system. Policies are created, stored and queried by
+ * src/compliance/dataResidency.ts, which is what `amc` commands use. The two
+ * functions here take a policy you already hold and answer a single question,
+ * and are exported for callers composing their own checks.
+ */
 export interface DataRecord {
   classification: string;
   currentRegion: string;

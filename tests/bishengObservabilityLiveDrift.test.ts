@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { extractBishengObservabilityDriftStatistic } from "../src/drift/bishengObservabilityLiveDrift.js";
+import { extractBishengObservabilityDriftStatistic } from "../src/watch/bishengObservabilityLiveDrift.js";
 import { projectBishengObservabilityScoreSurface } from "../src/score/bishengObservabilityLiveDriftScore.js";
 import {
   BISHENG_OBSERVABILITY_METADATA,

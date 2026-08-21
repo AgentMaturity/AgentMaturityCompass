@@ -1,3 +1,4 @@
+import { MODEL_PRICING, blendedCostPer1k } from './modelPricing.js';
 /**
  * Cost/latency routing — routes tasks to optimal model profiles.
  */
@@ -15,11 +16,22 @@ export interface RouteResult {
   rationale: string;
 }
 
+// Derived from the shared pricing table so routing and cost estimation cannot
+// disagree about the same model. See src/product/modelPricing.ts.
 const DEFAULT_PROFILES: RoutingProfile[] = [
-  { name: 'gpt-4o', model: 'gpt-4o', estimatedCostPer1k: 0.005, estimatedLatencyMs: 800, qualityScore: 0.95 },
-  { name: 'claude-sonnet', model: 'claude-sonnet-4-20250514', estimatedCostPer1k: 0.003, estimatedLatencyMs: 600, qualityScore: 0.93 },
-  { name: 'gemini-flash', model: 'gemini-flash', estimatedCostPer1k: 0.0005, estimatedLatencyMs: 300, qualityScore: 0.82 },
-];
+  { name: 'gpt-4o', model: 'gpt-4o' },
+  { name: 'claude-sonnet', model: 'claude-sonnet-4-20250514' },
+  { name: 'gemini-flash', model: 'gemini-flash' },
+].map(({ name, model }) => {
+  const price = MODEL_PRICING[model]!;
+  return {
+    name,
+    model,
+    estimatedCostPer1k: blendedCostPer1k(price),
+    estimatedLatencyMs: price.typicalLatencyMs,
+    qualityScore: price.qualityScore,
+  };
+});
 
 export class CostLatencyRouter {
   private profiles: RoutingProfile[] = [...DEFAULT_PROFILES];

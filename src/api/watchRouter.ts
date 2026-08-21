@@ -240,7 +240,7 @@ export async function handleWatchRoute(
         apiError(res, 400, 'Required: baseline[], candidate[], and promptLayer metadata');
         return true;
       }
-      const { runPromptLayerProviderDrift } = await import('../watch/promptLayerProviderDrift.js');
+      const { runPromptLayerProviderDrift } = await import('../benchmarks/promptLayerProviderDrift.js');
       const result = runPromptLayerProviderDrift({
         ...body,
         agentId: body.agentId ?? 'default',
@@ -265,7 +265,7 @@ export async function handleWatchRoute(
         apiError(res, 400, 'Required: baseline[], candidate[], and humanloop metadata');
         return true;
       }
-      const { runHumanloopProviderDrift } = await import('../watch/humanloopProviderDrift.js');
+      const { runHumanloopProviderDrift } = await import('../benchmarks/humanloopProviderDrift.js');
       const result = runHumanloopProviderDrift({
         ...body,
         agentId: body.agentId ?? 'default',
@@ -294,7 +294,7 @@ export async function handleWatchRoute(
         apiError(res, 400, 'Required: baseline[], candidate[], and promptfoo metadata');
         return true;
       }
-      const { runPromptfooProviderDrift } = await import('../watch/promptfooProviderDrift.js');
+      const { runPromptfooProviderDrift } = await import('../benchmarks/promptfooProviderDrift.js');
       const result = runPromptfooProviderDrift({
         ...body,
         agentId: body.agentId ?? 'default',
@@ -319,7 +319,7 @@ export async function handleWatchRoute(
         apiError(res, 400, 'Required: baseline[], candidate[], and patronus metadata');
         return true;
       }
-      const { runPatronusProviderDrift } = await import('../watch/patronusProviderDrift.js');
+      const { runPatronusProviderDrift } = await import('../benchmarks/patronusProviderDrift.js');
       const result = runPatronusProviderDrift({
         ...body,
         agentId: body.agentId ?? 'default',
@@ -348,7 +348,7 @@ export async function handleWatchRoute(
         apiError(res, 400, 'Required: baseline[], candidate[], and inspect metadata');
         return true;
       }
-      const { runInspectProviderDrift } = await import('../watch/inspectProviderDrift.js');
+      const { runInspectProviderDrift } = await import('../benchmarks/inspectProviderDrift.js');
       const result = runInspectProviderDrift({
         ...body,
         agentId: body.agentId ?? 'default',
@@ -377,7 +377,7 @@ export async function handleWatchRoute(
         apiError(res, 400, 'Required: baseline[], candidate[], and tensorZero metadata');
         return true;
       }
-      const { runTensorZeroProviderDrift } = await import('../watch/tensorZeroProviderDrift.js');
+      const { runTensorZeroProviderDrift } = await import('../benchmarks/tensorZeroProviderDrift.js');
       const result = runTensorZeroProviderDrift({
         ...body,
         agentId: body.agentId ?? 'default',
@@ -406,7 +406,7 @@ export async function handleWatchRoute(
         apiError(res, 400, 'Required: baseline[], candidate[], and helm metadata');
         return true;
       }
-      const { runHelmProviderDrift } = await import('../watch/helmProviderDrift.js');
+      const { runHelmProviderDrift } = await import('../benchmarks/helmProviderDrift.js');
       const result = runHelmProviderDrift({
         ...body,
         agentId: body.agentId ?? 'default',

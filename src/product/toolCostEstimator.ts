@@ -1,3 +1,4 @@
+import { MODEL_PRICING as SHARED_MODEL_PRICING } from './modelPricing.js';
 /**
  * toolCostEstimator.ts — Model-specific pricing registry with batch
  * cost estimation and budget tracking.
@@ -28,16 +29,9 @@ export interface BatchCostEstimate {
 
 /* ── Model pricing registry ──────────────────────────────────────── */
 
-const MODEL_PRICING: Record<string, ModelPricing> = {
-  'gpt-4o': { model: 'gpt-4o', inputPer1kTokens: 0.0025, outputPer1kTokens: 0.01, contextWindow: 128000 },
-  'gpt-4o-mini': { model: 'gpt-4o-mini', inputPer1kTokens: 0.00015, outputPer1kTokens: 0.0006, contextWindow: 128000 },
-  'gpt-4-turbo': { model: 'gpt-4-turbo', inputPer1kTokens: 0.01, outputPer1kTokens: 0.03, contextWindow: 128000 },
-  'claude-3.5-sonnet': { model: 'claude-3.5-sonnet', inputPer1kTokens: 0.003, outputPer1kTokens: 0.015, contextWindow: 200000 },
-  'claude-3-opus': { model: 'claude-3-opus', inputPer1kTokens: 0.015, outputPer1kTokens: 0.075, contextWindow: 200000 },
-  'claude-3-haiku': { model: 'claude-3-haiku', inputPer1kTokens: 0.00025, outputPer1kTokens: 0.00125, contextWindow: 200000 },
-  'gemini-1.5-pro': { model: 'gemini-1.5-pro', inputPer1kTokens: 0.00125, outputPer1kTokens: 0.005, contextWindow: 2000000 },
-  'gemini-1.5-flash': { model: 'gemini-1.5-flash', inputPer1kTokens: 0.000075, outputPer1kTokens: 0.0003, contextWindow: 1000000 },
-};
+// Pricing comes from the shared table; a second copy previously disagreed with
+// costLatencyRouter about the same model. See ./modelPricing.ts.
+const MODEL_PRICING: Record<string, ModelPricing> = SHARED_MODEL_PRICING;
 
 const customPricing = new Map<string, ModelPricing>();
 

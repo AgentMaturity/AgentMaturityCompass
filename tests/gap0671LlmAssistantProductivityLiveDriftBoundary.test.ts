@@ -38,7 +38,7 @@ function rows(prefix: "baseline" | "live", score0to1: number, behavior: string):
 
 const implementationFiles = [
   "src/watch/liveDriftAlerts.ts",
-  "src/drift/bishengObservabilityLiveDrift.ts",
+  "src/watch/bishengObservabilityLiveDrift.ts",
   "src/score/bishengObservabilityLiveDriftScore.ts",
 ];
 

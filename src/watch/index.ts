@@ -98,7 +98,7 @@ export {
   type PromptLayerProviderDriftResult,
   type PromptLayerProviderDriftSide,
   type RunPromptLayerProviderDriftInput,
-} from './promptLayerProviderDrift.js';
+} from '../benchmarks/promptLayerProviderDrift.js';
 export {
   HUMANLOOP_PROVIDER_DRIFT_SOURCE_REFS,
   runHumanloopProviderDrift,
@@ -110,7 +110,7 @@ export {
   type HumanloopProviderDriftSide,
   type HumanloopProviderDriftWatchSurface,
   type RunHumanloopProviderDriftInput,
-} from './humanloopProviderDrift.js';
+} from '../benchmarks/humanloopProviderDrift.js';
 export {
   runPromptfooProviderDrift,
   type PromptfooProviderDriftMetadata,
@@ -118,7 +118,7 @@ export {
   type PromptfooProviderDriftResult,
   type PromptfooProviderDriftSide,
   type RunPromptfooProviderDriftInput,
-} from './promptfooProviderDrift.js';
+} from '../benchmarks/promptfooProviderDrift.js';
 export {
   PATRONUS_PROVIDER_DRIFT_SOURCE_REFS,
   runPatronusProviderDrift,
@@ -130,7 +130,7 @@ export {
   type PatronusProviderDriftSide,
   type PatronusProviderDriftWatchSurface,
   type RunPatronusProviderDriftInput,
-} from './patronusProviderDrift.js';
+} from '../benchmarks/patronusProviderDrift.js';
 export {
   INSPECT_PROVIDER_DRIFT_SOURCE_REFS,
   runInspectProviderDrift,
@@ -142,7 +142,7 @@ export {
   type InspectProviderDriftSide,
   type InspectProviderDriftWatchSurface,
   type RunInspectProviderDriftInput,
-} from './inspectProviderDrift.js';
+} from '../benchmarks/inspectProviderDrift.js';
 export {
   TENSORZERO_PROVIDER_DRIFT_SOURCE_REFS,
   runTensorZeroProviderDrift,
@@ -154,7 +154,7 @@ export {
   type TensorZeroProviderDriftShieldSurface,
   type TensorZeroProviderDriftSide,
   type TensorZeroProviderDriftWatchSurface,
-} from './tensorZeroProviderDrift.js';
+} from '../benchmarks/tensorZeroProviderDrift.js';
 export {
   HELM_PROVIDER_DRIFT_SOURCE_REFS,
   runHelmProviderDrift,
@@ -166,7 +166,7 @@ export {
   type HelmProviderDriftSide,
   type HelmProviderDriftWatchSurface,
   type RunHelmProviderDriftInput,
-} from './helmProviderDrift.js';
+} from '../benchmarks/helmProviderDrift.js';
 export {
   LMNR_OBSERVABILITY_METADATA,
   runLmnrObservabilityLiveDrift,

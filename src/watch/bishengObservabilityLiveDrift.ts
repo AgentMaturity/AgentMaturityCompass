@@ -503,3 +503,15 @@ export function runBishengObservabilityLiveDrift(input: RunBishengObservabilityL
     watchSurface,
   };
 }
+
+/**
+ * Reads the drift statistic out of a Bisheng live-drift result.
+ *
+ * Previously lived in a src/drift re-wrap of this module; consolidated here
+ * next to the types it operates on.
+ */
+export function extractBishengObservabilityDriftStatistic(
+  result: BishengObservabilityLiveDriftResult,
+): BishengObservabilityDriftStatistic {
+  return result.driftStatistic;
+}
