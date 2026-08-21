@@ -14,6 +14,7 @@ import { canonicalize } from "../utils/json.js";
 import { signHexDigest, getPrivateKeyPem } from "../crypto/keys.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { getCorrectionById } from "./correctionStore.js";
+import { readdirSync } from "node:fs";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -87,7 +88,6 @@ function lessonFilePath(workspace: string, lessonId: string): string {
 export function loadAllLessons(workspace: string): Lesson[] {
   const dir = lessonsDir(workspace);
   if (!pathExists(dir)) return [];
-  const { readdirSync } = require("node:fs") as typeof import("node:fs");
   const files = readdirSync(dir).filter((f: string) => f.endsWith(".json"));
   return files.map((f: string) => {
     const content = readUtf8(join(dir, f));

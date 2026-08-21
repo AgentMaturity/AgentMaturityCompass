@@ -12,6 +12,7 @@ import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { signHexDigest, getPrivateKeyPem } from "../crypto/keys.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
+import { readdirSync } from "node:fs";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -77,7 +78,6 @@ function overrideFilePath(workspace: string, overrideId: string): string {
 function loadAllOverrides(workspace: string): EmergencyOverrideEntry[] {
   const dir = overrideDir(workspace);
   if (!pathExists(dir)) return [];
-  const { readdirSync } = require("node:fs") as typeof import("node:fs");
   return readdirSync(dir)
     .filter((f: string) => f.endsWith(".json"))
     .map((f: string) => JSON.parse(readUtf8(join(dir, f))) as EmergencyOverrideEntry);

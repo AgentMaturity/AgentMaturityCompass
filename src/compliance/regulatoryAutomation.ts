@@ -9,7 +9,7 @@
  * - Audit trail for all regulatory changes
  */
 
-import { randomUUID } from "node:crypto";
+import { createHash, randomUUID } from "node:crypto";
 import { EventEmitter } from "node:events";
 
 // ── Types ──────────────────────────────────────────────────────────────────
@@ -466,7 +466,6 @@ export class RegulatoryMonitor extends EventEmitter {
   }
 
   private hashContent(content: string): string {
-    const { createHash } = require("node:crypto");
     return createHash("sha256").update(content).digest("hex");
   }
 

@@ -14,6 +14,7 @@ import { buildNotaryAuthSignature } from "../../notary/notaryAuth.js";
 import { verifyNotarySignResponse } from "../../notary/notaryVerify.js";
 import { verifySignatureEnvelope } from "./signatureEnvelope.js";
 import type { SignatureEnvelope } from "./signerTypes.js";
+import * as http from "node:http";
 
 function postNotarySync(params: {
   baseUrl: string;
@@ -23,7 +24,6 @@ function postNotarySync(params: {
   headers: Record<string, string>;
 }): { status: number; body: string } {
   const bridgeScript = `
-const http = require("node:http");
 const params = JSON.parse(process.argv[1]);
 const finish = (status, body) => {
   process.stdout.write(JSON.stringify({ status, body }));

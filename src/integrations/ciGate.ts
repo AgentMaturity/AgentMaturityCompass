@@ -11,6 +11,7 @@ import { request as httpRequest } from "node:http";
 import { request as httpsRequest } from "node:https";
 import { ensureDir, writeFileAtomic } from "../utils/fs.js";
 import type { ObservabilityProvider } from "../watch/observabilityBridge.js";
+import * as fs from 'node:fs';
 
 /* ── Types ───────────────────────────────────────────────────────── */
 
@@ -192,7 +193,6 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            const fs = require('fs');
             const report = JSON.parse(fs.readFileSync('amc-report.json', 'utf8'));
             const score = (report.integrityIndex * 100).toFixed(1);
             const status = score >= ${minScore} ? '✅' : '❌';

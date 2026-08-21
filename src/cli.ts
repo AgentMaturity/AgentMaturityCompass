@@ -16012,8 +16012,17 @@ program
   .option("--max-contradictions <n>", "max allowed contradictions", "5")
   .action(async (opts: { maxContradictions: string }) => {
     const { checkGraphIntegrity, createSemanticOverlay, renderIntegrityCheckMarkdown } = await import("./cgx/cgxPropagation.js");
-    const { loadLatestGraph } = require("./cgx/cgxStore.js") as { loadLatestGraph: (workspace: string) => any };
-    const graph = loadLatestGraph(process.cwd());
+    // cgxStore exports no loadLatestGraph — the previous require(...) cast
+    // invented that name, so this command threw "loadLatestGraph is not a
+    // function" the moment it ran. Read the graph from its recorded path.
+    const { cgxLatestGraphPath } = await import("./cgx/cgxStore.js");
+    const { cgxGraphSchema } = await import("./cgx/cgxSchema.js");
+    const graphPath = cgxLatestGraphPath(process.cwd(), { type: "workspace", id: "workspace" });
+    // Parse through the schema so a malformed graph fails here with a clear
+    // error rather than deeper in the integrity check.
+    const graph = existsSync(graphPath)
+      ? cgxGraphSchema.parse(JSON.parse(readFileSync(graphPath, "utf8")))
+      : null;
     if (!graph) {
       console.log(chalk.yellow("No CGX graph found. Run cgx-build first."));
       return;
@@ -16032,8 +16041,17 @@ program
   .option("--max-depth <n>", "max propagation depth", "5")
   .action(async (nodeId: string, opts: { maxDepth: string }) => {
     const { simulateRiskPropagation, createSemanticOverlay, renderPropagationMarkdown } = await import("./cgx/cgxPropagation.js");
-    const { loadLatestGraph } = require("./cgx/cgxStore.js") as { loadLatestGraph: (workspace: string) => any };
-    const graph = loadLatestGraph(process.cwd());
+    // cgxStore exports no loadLatestGraph — the previous require(...) cast
+    // invented that name, so this command threw "loadLatestGraph is not a
+    // function" the moment it ran. Read the graph from its recorded path.
+    const { cgxLatestGraphPath } = await import("./cgx/cgxStore.js");
+    const { cgxGraphSchema } = await import("./cgx/cgxSchema.js");
+    const graphPath = cgxLatestGraphPath(process.cwd(), { type: "workspace", id: "workspace" });
+    // Parse through the schema so a malformed graph fails here with a clear
+    // error rather than deeper in the integrity check.
+    const graph = existsSync(graphPath)
+      ? cgxGraphSchema.parse(JSON.parse(readFileSync(graphPath, "utf8")))
+      : null;
     if (!graph) {
       console.log(chalk.yellow("No CGX graph found. Run cgx-build first."));
       return;

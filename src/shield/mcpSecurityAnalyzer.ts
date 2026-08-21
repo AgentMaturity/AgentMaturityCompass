@@ -13,6 +13,7 @@
 
 import { readFileSync } from "node:fs";
 import { resolve, extname } from "node:path";
+import { execSync } from "node:child_process";
 
 export type McpSecurityLevel = "L0" | "L1" | "L2" | "L3" | "L4" | "L5";
 export type McpFindingSeverity = "CRITICAL" | "HIGH" | "MEDIUM" | "LOW" | "INFO";
@@ -103,7 +104,6 @@ function loadContent(pathOrUrl: string): { content: string; isUrl: boolean } {
   if (pathOrUrl.startsWith("http://") || pathOrUrl.startsWith("https://")) {
     // Synchronous URL fetch using execSync (child_process is already imported above)
     try {
-      const { execSync } = require("node:child_process");
       const result = execSync(
         `curl -sS --max-time 10 --max-filesize 1048576 -L ${JSON.stringify(pathOrUrl)}`,
         { encoding: "utf8", timeout: 15_000 }

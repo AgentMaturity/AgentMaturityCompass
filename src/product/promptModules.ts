@@ -4,6 +4,7 @@
 import { randomUUID } from 'node:crypto';
 import { join } from 'node:path';
 import { mkdirSync } from 'node:fs';
+import Database from 'better-sqlite3';
 
 let _db: import('better-sqlite3').Database | null = null;
 
@@ -11,7 +12,6 @@ function getDb(): import('better-sqlite3').Database {
   if (_db) return _db;
   const dir = join(process.cwd(), '.amc');
   mkdirSync(dir, { recursive: true });
-  const Database = require('better-sqlite3') as typeof import('better-sqlite3');
   _db = new Database(join(dir, 'prompt_modules.sqlite'));
   _db.pragma('journal_mode = WAL');
   _db.exec(`

@@ -7,6 +7,7 @@
 
 import { join } from 'node:path';
 import { mkdirSync } from 'node:fs';
+import Database from 'better-sqlite3';
 
 /** Cached singleton database handle. */
 let _db: import('better-sqlite3').Database | null = null;
@@ -32,7 +33,6 @@ export function openProductDb(
   const dir = resolvedPath.substring(0, resolvedPath.lastIndexOf('/'));
   mkdirSync(dir, { recursive: true });
 
-  const Database = require('better-sqlite3') as typeof import('better-sqlite3');
   _db = new Database(resolvedPath);
   _db.pragma('journal_mode = WAL');
   _db.pragma('foreign_keys = ON');

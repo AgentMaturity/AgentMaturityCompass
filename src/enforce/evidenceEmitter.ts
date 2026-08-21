@@ -10,6 +10,7 @@ import { mkdirSync } from 'node:fs';
 import { ensureSigningKeys, getPrivateKeyPem, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from '../crypto/keys.js';
 import { canonicalize } from '../utils/json.js';
 import { sha256Hex } from '../utils/hash.js';
+import Database from 'better-sqlite3';
 
 let _db: import('better-sqlite3').Database | null = null;
 let _insertStmt: import('better-sqlite3').Statement | null = null;
@@ -223,7 +224,6 @@ function getDb(): import('better-sqlite3').Database | null {
     }
 
     mkdirSync(dir, { recursive: true });
-    const Database = require('better-sqlite3') as typeof import('better-sqlite3');
     _db = new Database(desiredPath);
     _dbPath = desiredPath;
     _db.pragma('journal_mode = WAL');
