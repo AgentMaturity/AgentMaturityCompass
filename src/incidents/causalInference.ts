@@ -1,3 +1,10 @@
+/**
+ * Causal inference over incident timelines.
+ *
+ * SCOPE: this ranks candidate causes using keyword overlap and temporal
+ * proximity. It does not establish causation, and its output should be read as
+ * "worth investigating first", not "this caused the incident".
+ */
 import { randomUUID } from "node:crypto";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";

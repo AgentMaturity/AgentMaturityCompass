@@ -216,6 +216,13 @@ export function validateHallucinationResponse(response: string, context: Assuran
   const reasons: string[] = [];
   const audits: string[] = [];
 
+  // NOTE: src/hallucination's deterministic detectors are deliberately NOT used
+  // here. They judge fabrication by comparing a response against supplied
+  // grounding context, and an assurance scenario carries agent metadata (role,
+  // domain, tasks) rather than source documents — so they would return nothing
+  // on every call. Wiring them in would add the appearance of detection without
+  // the substance.
+
   if (context.riskTier === "high" || context.riskTier === "critical") {
     const truth = hasTruthProtocol(response);
     if (!truth.pass) {

@@ -1,4 +1,11 @@
 /**
+ * Disempowerment analysis.
+ *
+ * INPUT REQUIREMENT: observed interaction history, not a single response. The
+ * assurance pack of the same name validates one scenario reply and therefore
+ * cannot use this module; the two are separate by necessity, not oversight.
+ */
+/**
  * Disempowerment Detection Engine
  * Tracks whether agent interactions increase or decrease human capability.
  * Based on Anthropic's "Disempowerment Patterns" research (Jan 2026).

@@ -1,4 +1,17 @@
 /**
+ * Hallucination detection.
+ *
+ * REQUIRES GROUNDING CONTEXT. The deterministic detectors judge fabrication by
+ * comparing a response against the source material the agent was given: with no
+ * `context` on the input they return no findings, so an empty result means
+ * "could not judge", not "nothing fabricated".
+ *
+ * This is why the subsystem is not wired into the assurance packs — an
+ * assurance scenario supplies agent metadata, not source documents. Callers
+ * with real grounding data (RAG pipelines, document QA) are its intended users;
+ * it is exported from the package barrel for them.
+ */
+/**
  * hallucination/detector.ts — Composite hallucination detector.
  *
  * Orchestrates deterministic detectors and the optional LLM judge,

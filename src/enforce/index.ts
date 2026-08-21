@@ -1,3 +1,21 @@
+/**
+ * Policy evaluators.
+ *
+ * WHAT THIS DIRECTORY IS: a library of pure decision functions — given a
+ * request and a policy, return allow/deny plus a reason. Almost nothing here is
+ * called by AMC at runtime, and importing a guard does not put it in a traffic
+ * path.
+ *
+ * WHERE ENFORCEMENT ACTUALLY HAPPENS: src/runtime/firewall.ts (content rules on
+ * the LLM request/response path), src/gateway/server.ts and
+ * src/bridge/bridgeServer.ts (lease, budget and policy checks per request), and
+ * src/toolhub/toolhubServer.ts (action-policy and approval gating for tool
+ * execution). Those four are the components that can refuse a request.
+ *
+ * A deployment composes the evaluators here into those paths; the presence of a
+ * guard in this directory is not evidence that a control is active.
+ */
+
 export { PolicyFirewall } from './policyFirewall.js';
 export type { PolicyDecision, PolicyResult, PolicyRule } from './policyFirewall.js';
 export { checkExec } from './execGuard.js';

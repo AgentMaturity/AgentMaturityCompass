@@ -1,4 +1,15 @@
 /**
+ * Value-coherence analysis over revealed preferences.
+ *
+ * INPUT REQUIREMENT: a series of RevealedPreference records — an agent's actual
+ * choices, the alternatives it passed over, and the evidence backing each, over
+ * time. That is longitudinal ledger data, not something a single response can
+ * supply, which is why the same-named assurance pack does not call this: a
+ * scenario reply carries no revealed preferences.
+ *
+ * Exported for callers that collect decision histories.
+ */
+/**
  * Value Coherence Engine
  * Measures structural coherence of revealed preferences from decision traces.
  * Uses Kendall's tau-based rank correlation for pairwise preference consistency.
