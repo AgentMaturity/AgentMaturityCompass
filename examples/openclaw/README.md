@@ -24,7 +24,7 @@ amc up
 amc wrap openclaw-cli -- openclaw run
 
 # Or manually set env vars
-export OPENAI_BASE_URL=$(amc gateway-url)
+export OPENAI_BASE_URL=$(amc gateway status --base-url)
 export OPENAI_API_KEY=sk-...
 openclaw run
 ```

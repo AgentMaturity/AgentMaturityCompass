@@ -180,35 +180,74 @@ export function registerCorrectionCommands(program: Command, activeAgent: (p: Co
         const Database = (await import("better-sqlite3")).default;
         const { join } = await import("node:path");
         const { mkdirSync } = await import("node:fs");
-        const { initCorrectionTables, insertCorrection } = await import("./corrections/correctionStore.js");
-        const { computeCorrectionHash } = await import("./corrections/correctionTracker.js");
+        const { initCorrectionTables, insertCorrection, getLastCorrectionHash } = await import(
+          "./corrections/correctionStore.js"
+        );
+        const { buildOwnerCorrection } = await import("./corrections/correctionTracker.js");
+        const { latestRunForAgent } = await import("./governor/actionPolicyEngine.js");
         const agentId = opts.agent ?? activeAgent(program) ?? "default";
+        const questionIds = opts.questions.split(",").map(q => q.trim()).filter(Boolean);
+        if (questionIds.length === 0) {
+          throw new Error("--questions must name at least one question ID, e.g. --questions AMC-1.1");
+        }
+
+        // A correction records what changed relative to a baseline; without a
+        // run to compare against, effectiveness can never be verified. The
+        // schema enforces this with NOT NULL on baseline_run_id, so say why
+        // rather than surfacing the constraint error.
+        const baseline = latestRunForAgent(process.cwd(), agentId);
+        if (!baseline) {
+          throw new Error(
+            `No diagnostic run found for agent "${agentId}". A correction is measured against a ` +
+              `baseline run, so record one first:\n  amc score --agent ${agentId}`
+          );
+        }
+        const baselineLevels: Record<string, number> = {};
+        for (const question of baseline.questionScores) {
+          if (questionIds.includes(question.questionId)) {
+            baselineLevels[question.questionId] = question.finalLevel;
+          }
+        }
+        const unknown = questionIds.filter(id => !(id in baselineLevels));
+        if (unknown.length > 0) {
+          throw new Error(
+            `Run ${baseline.runId} has no score for: ${unknown.join(", ")}. ` +
+              `A correction can only target questions the baseline actually scored.`
+          );
+        }
+
         const dbDir = join(process.cwd(), ".amc");
         mkdirSync(dbDir, { recursive: true });
         const dbPath = join(dbDir, "corrections.sqlite");
         const db = new Database(dbPath);
-        initCorrectionTables(db);
-        const correction = {
-          correctionId: randomUUID(),
-          agentId,
-          triggerType: "human_feedback" as any,
-          triggerId: randomUUID(),
-          questionIds: opts.questions.split(",").map(q => q.trim()),
-          correctionDescription: opts.description,
-          appliedAction: opts.action,
-          status: "APPLIED" as const,
-          hash: "",
-          linkedEvidenceIds: [] as string[],
-          ts: Date.now(),
-        };
-        correction.hash = computeCorrectionHash(correction as any);
-        insertCorrection(db, correction as any);
-        db.close();
-        if (opts.json) {
-          console.log(JSON.stringify(correction, null, 2));
-          return;
+        try {
+          initCorrectionTables(db);
+          const correction = buildOwnerCorrection({
+            agentId,
+            questionIds,
+            description: opts.description,
+            appliedAction: opts.action,
+            baselineRunId: baseline.runId,
+            baselineLevels,
+            previousCorrectionHash: getLastCorrectionHash(db, agentId),
+            correctionId: randomUUID(),
+            triggerId: randomUUID(),
+            now: Date.now()
+          });
+          insertCorrection(db, correction);
+          if (opts.json) {
+            console.log(JSON.stringify(correction, null, 2));
+            return;
+          }
+          console.log(
+            chalk.green(`✅ Correction added: ${questionIds.join(", ")} (${correction.correctionId.slice(0, 8)})`)
+          );
+          console.log(
+            chalk.gray(`   Baseline run ${baseline.runId.slice(0, 12)} — verify with: amc correction verify --agent ${agentId}`)
+          );
+        } finally {
+          db.close();
         }
-        console.log(chalk.green(`✅ Correction added: ${opts.questions} (${correction.correctionId.slice(0, 8)})`));
       } catch (e: any) {
         console.error(chalk.red(e.message));
         process.exit(1);

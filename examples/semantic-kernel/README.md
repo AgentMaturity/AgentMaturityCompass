@@ -27,7 +27,7 @@ dotnet restore
 amc up
 
 # Set env vars and run
-export OPENAI_BASE_URL=$(amc gateway-url)
+export OPENAI_BASE_URL=$(amc gateway status --base-url)
 export OPENAI_API_KEY=sk-...
 dotnet run
 

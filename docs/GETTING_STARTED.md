@@ -117,13 +117,19 @@ amc badge
 # ![AMC L3](https://img.shields.io/badge/AMC-L3%20Defined-blue)
 ```
 
-**Anonymous telemetry** (off by default — opt-in only):
+**Telemetry: there is none.**
 
-```bash
-amc telemetry on    # help improve AMC — only sends OS, version, command, level
-amc telemetry off   # disable at any time
-amc telemetry status # see exactly what is and isn't collected
-```
+AMC collects no usage data and has no telemetry commands. Nothing is sent
+anywhere unless you ask for it explicitly, and every outbound call has a
+command behind it:
+
+| Destination | Reached only when |
+|---|---|
+| Your LLM provider | You route calls through the gateway or run a scored agent |
+| Langfuse / Helicone / Lunary | You ran `amc watch connect` for that provider |
+| The pack registry | You ran `amc pack search`, `install`, or `publish` |
+
+Scores, evidence and the ledger stay in your workspace under `.amc/`.
 
 ---
 

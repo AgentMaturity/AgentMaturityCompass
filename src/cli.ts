@@ -10225,8 +10225,24 @@ gateway
   .command("status")
   .description("Check gateway reachability and route URLs")
   .option("--config <path>", "gateway config path", ".amc/gateway.yaml")
-  .action(async (opts: { config: string }) => {
+  .option("--json", "Output as JSON")
+  .option(
+    "--base-url",
+    "Print only the gateway base URL, for `export OPENAI_BASE_URL=$(amc gateway status --base-url)`"
+  )
+  .action(async (opts: { config: string; json?: boolean; baseUrl?: boolean }) => {
     const status = await gatewayStatus(process.cwd(), opts.config);
+    // Two examples told users to run `amc gateway-url`, a command that has
+    // never existed, because the base URL was only available inside prose.
+    // Scripting it needs a machine-readable form.
+    if (opts.baseUrl) {
+      console.log(status.baseUrl);
+      return;
+    }
+    if (opts.json) {
+      console.log(JSON.stringify(status, null, 2));
+      return;
+    }
     console.log(`Gateway base URL: ${status.baseUrl}`);
     console.log(`Reachable: ${status.reachable ? "YES" : "NO"}`);
     console.log(`Config signature: ${status.signatureValid ? "VALID" : status.signatureExists ? "INVALID" : "MISSING"}`);

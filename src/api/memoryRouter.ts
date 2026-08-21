@@ -167,14 +167,17 @@ export async function handleMemoryRoute(
       const { openLedger } = await import('../ledger/ledger.js');
       const { initLessonTables, extractLessonsFromCorrections } = await import('../learning/correctionMemory.js');
       const ledger = openLedger(workspace);
-      const db = ledger.db;
-      initLessonTables(db);
-      const agentId = body.agentId ?? 'default';
-      const lessons = extractLessonsFromCorrections(db, agentId, workspace, {
-        minEffectivenessForLesson: body.minEffectiveness ?? 0.3,
-      });
-      ledger.close();
-      apiSuccess(res, { agentId, lessons, total: lessons.length });
+      try {
+        const db = ledger.db;
+        initLessonTables(db);
+        const agentId = body.agentId ?? 'default';
+        const lessons = extractLessonsFromCorrections(db, agentId, workspace, {
+          minEffectivenessForLesson: body.minEffectiveness ?? 0.3,
+        });
+        apiSuccess(res, { agentId, lessons, total: lessons.length });
+      } finally {
+        ledger.close();
+      }
     } catch (err) {
       apiError(res, 500, err instanceof Error ? err.message : 'Memory extract failed');
     }
@@ -188,11 +191,14 @@ export async function handleMemoryRoute(
       const { openLedger } = await import('../ledger/ledger.js');
       const { initLessonTables, buildLessonAdvisories } = await import('../learning/correctionMemory.js');
       const ledger = openLedger(workspace);
-      const db = ledger.db;
-      initLessonTables(db);
-      const advisories = buildLessonAdvisories(db, agentId);
-      ledger.close();
-      apiSuccess(res, { agentId, advisories, total: advisories.length });
+      try {
+        const db = ledger.db;
+        initLessonTables(db);
+        const advisories = buildLessonAdvisories(db, agentId);
+        apiSuccess(res, { agentId, advisories, total: advisories.length });
+      } finally {
+        ledger.close();
+      }
     } catch (err) {
       apiError(res, 500, err instanceof Error ? err.message : 'Memory advisories failed');
     }
@@ -209,18 +215,24 @@ export async function handleMemoryRoute(
       const { initLessonTables, generateCorrectionMemoryReport, renderCorrectionMemoryMarkdown } = await import('../learning/correctionMemory.js');
       const { parseWindowToMs } = await import('../utils/time.js');
       const ledger = openLedger(workspace);
-      const db = ledger.db;
-      initLessonTables(db);
-      const now = Date.now();
-      const windowMs = parseWindowToMs(window);
-      const report = generateCorrectionMemoryReport(db, agentId, now - windowMs, now);
-      ledger.close();
-      if (format === 'md') {
-        res.writeHead(200, { 'Content-Type': 'text/markdown; charset=utf-8' });
-        res.end(renderCorrectionMemoryMarkdown(report));
-        return true;
+      try {
+        const db = ledger.db;
+        initLessonTables(db);
+        const now = Date.now();
+        // parseWindowToMs throws on a malformed ?window=, which is why the
+        // close below has to sit in a finally: an unparseable query string
+        // used to leak this connection permanently.
+        const windowMs = parseWindowToMs(window);
+        const report = generateCorrectionMemoryReport(db, agentId, now - windowMs, now);
+        if (format === 'md') {
+          res.writeHead(200, { 'Content-Type': 'text/markdown; charset=utf-8' });
+          res.end(renderCorrectionMemoryMarkdown(report));
+          return true;
+        }
+        apiSuccess(res, report);
+      } finally {
+        ledger.close();
       }
-      apiSuccess(res, report);
     } catch (err) {
       apiError(res, 500, err instanceof Error ? err.message : 'Memory report failed');
     }
@@ -235,11 +247,14 @@ export async function handleMemoryRoute(
       const { openLedger } = await import('../ledger/ledger.js');
       const { initLessonTables, expireStaleLessons } = await import('../learning/correctionMemory.js');
       const ledger = openLedger(workspace);
-      const db = ledger.db;
-      initLessonTables(db);
-      const expired = expireStaleLessons(db, agentId);
-      ledger.close();
-      apiSuccess(res, { agentId, expired, total: expired.length });
+      try {
+        const db = ledger.db;
+        initLessonTables(db);
+        const expired = expireStaleLessons(db, agentId);
+        apiSuccess(res, { agentId, expired, total: expired.length });
+      } finally {
+        ledger.close();
+      }
     } catch (err) {
       apiError(res, 500, err instanceof Error ? err.message : 'Memory expire failed');
     }

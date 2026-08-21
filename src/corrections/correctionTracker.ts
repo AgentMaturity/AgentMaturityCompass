@@ -324,3 +324,59 @@ export function computeEffectivenessReport(
     recommendations
   };
 }
+
+/**
+ * Builds a complete, schema-valid CorrectionEvent for an operator-entered
+ * correction.
+ *
+ * `amc correction add` previously assembled its own object literal with three
+ * `as any` casts, which silenced the compiler while the shape was wrong in
+ * three ways at once: triggerType was "human_feedback" (the CHECK constraint
+ * allows only OWNER_MANUAL, ASSURANCE_FAILURE, DRIFT_EVENT, EXPERIMENT_RESULT,
+ * INCIDENT_RESPONSE, POLICY_CHANGE); twelve NOT NULL columns were absent; and
+ * two invented fields (`hash`, `ts`) were supplied instead. Every invocation
+ * died on `NOT NULL constraint failed: corrections.baseline_run_id`, so the
+ * whole `amc correction` family had never worked from any code path — the CLI
+ * was its only caller.
+ *
+ * Constructing the event in one typed place means the compiler checks it.
+ */
+export function buildOwnerCorrection(params: {
+  agentId: string;
+  questionIds: string[];
+  description: string;
+  appliedAction: string;
+  /** Run the correction is measured against; effectiveness is meaningless without one. */
+  baselineRunId: string;
+  /** questionId -> level at the baseline, for the later effectiveness delta. */
+  baselineLevels: Record<string, number>;
+  previousCorrectionHash: string;
+  correctionId: string;
+  triggerId: string;
+  now: number;
+}): CorrectionEvent {
+  const correction: CorrectionEvent = {
+    correctionId: params.correctionId,
+    agentId: params.agentId,
+    triggerType: "OWNER_MANUAL",
+    triggerId: params.triggerId,
+    questionIds: params.questionIds,
+    correctionDescription: params.description,
+    appliedAction: params.appliedAction,
+    status: "PENDING_VERIFICATION",
+    baselineRunId: params.baselineRunId,
+    baselineLevels: params.baselineLevels,
+    verificationRunId: null,
+    verificationLevels: null,
+    effectivenessScore: null,
+    verifiedTs: null,
+    verifiedBy: null,
+    createdTs: params.now,
+    updatedTs: params.now,
+    prev_correction_hash: params.previousCorrectionHash,
+    correction_hash: "",
+    signature: ""
+  };
+  correction.correction_hash = computeCorrectionHash(correction);
+  return correction;
+}
