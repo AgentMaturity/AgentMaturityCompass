@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 import { spawnSync } from "node:child_process";
@@ -15,19 +15,95 @@ function lineCount(file) {
   return readFileSync(join(root, file), "utf8").split("\n").length;
 }
 
-const lineBudgets = [
-  { file: "src/cli.ts", legacyAuditLineCount: 24417 },
-  { file: "src/studio/studioServer.ts", legacyAuditLineCount: 8883 }
-];
+// ── Descending line-count ratchet ────────────────────────────────────────
+//
+// The previous version tracked two files and only checked "stayed under the
+// audit baseline". That permanently blessed the two worst monoliths: cli.ts
+// could shrink to 20,000 lines and grow straight back to 24,416 without
+// complaint, and the other 57 files over the cap were unguarded entirely.
+//
+// Now every file over CAP carries a baseline that only moves down. Shrinking a
+// file lowers its baseline (with --update); growing past it fails. A new file
+// over CAP is rejected outright, so the set cannot expand.
 
-const lineCounts = Object.fromEntries(
-  lineBudgets.map((budget) => [budget.file, lineCount(budget.file)])
-);
+const budgetsPath = join(root, "scripts/line-budgets.json");
+const budgetsFile = JSON.parse(readFileSync(budgetsPath, "utf8"));
+const CAP = budgetsFile.cap ?? 800;
+const recorded = budgetsFile.budgets ?? {};
+const updateMode = process.argv.includes("--update");
 
-for (const budget of lineBudgets) {
-  const actual = lineCounts[budget.file];
-  if (actual >= budget.legacyAuditLineCount) {
-    fail(`${budget.file} has ${actual} lines; expected below audit baseline ${budget.legacyAuditLineCount}.`);
+function allSourceFiles(dir, out = []) {
+  for (const entry of readdirSync(dir, { withFileTypes: true })) {
+    const full = join(dir, entry.name);
+    if (entry.isDirectory()) allSourceFiles(full, out);
+    else if (entry.name.endsWith(".ts")) out.push(full);
+  }
+  return out;
+}
+
+const lineCounts = {};
+const improvements = [];
+const nextBudgets = {};
+
+for (const file of allSourceFiles(join(root, "src")).map((f) => f.slice(root.length + 1))) {
+  const actual = lineCount(file);
+  lineCounts[file] = actual;
+  const baseline = recorded[file];
+
+  if (baseline === undefined) {
+    // Not currently over the cap and not tracked: only a fresh violation matters.
+    if (actual > CAP) {
+      fail(
+        `${file} is a new file of ${actual} lines, over the ${CAP}-line cap. ` +
+          `Split it, or record a deliberate exception in scripts/line-budgets.json.`
+      );
+    }
+    continue;
+  }
+
+  if (actual > baseline) {
+    fail(
+      `${file} grew to ${actual} lines, past its ${baseline}-line baseline. ` +
+        `Files over the cap may shrink but must not grow.`
+    );
+    nextBudgets[file] = baseline;
+    continue;
+  }
+
+  if (actual < baseline) improvements.push({ file, from: baseline, to: actual });
+  // Ratchet: the new baseline is wherever the file now sits.
+  nextBudgets[file] = actual <= CAP ? undefined : actual;
+}
+
+// Files that fell to or below the cap leave the manifest entirely.
+for (const key of Object.keys(nextBudgets)) {
+  if (nextBudgets[key] === undefined) delete nextBudgets[key];
+}
+
+if (improvements.length > 0) {
+  const total = improvements.reduce((sum, i) => sum + (i.from - i.to), 0);
+  console.log(`Line ratchet: ${improvements.length} file(s) shrank by ${total} lines.`);
+  for (const i of improvements.slice(0, 10)) {
+    console.log(`  ${i.file}: ${i.from} -> ${i.to}`);
+  }
+  if (updateMode) {
+    writeFileSync(
+      budgetsPath,
+      `${JSON.stringify(
+        {
+          _comment: budgetsFile._comment,
+          cap: CAP,
+          budgets: Object.fromEntries(
+            Object.entries(nextBudgets).sort((a, b) => b[1] - a[1])
+          )
+        },
+        null,
+        2
+      )}\n`
+    );
+    console.log(`Updated ${budgetsPath}. Commit it to lock in the improvement.`);
+  } else {
+    console.log("Run with --update to lower the baselines and lock this in.");
   }
 }
 
