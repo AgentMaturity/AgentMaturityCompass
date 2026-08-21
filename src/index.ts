@@ -1,3 +1,22 @@
+/**
+ * Public package API for `agent-maturity-compass`.
+ *
+ * This barrel is the contract for callers importing AMC as a library. It is
+ * deliberately NOT imported by AMC's own CLI, API routers or studio server,
+ * which import the modules they need directly.
+ *
+ * Two consequences worth stating, because both have caused confusion:
+ *
+ *  1. A module being exported here does not mean AMC runs it. Several exports
+ *     are toolkits for embedders (for example auth/enterpriseIam) that AMC
+ *     itself never calls; presence in this file is not evidence of a capability
+ *     being active in a deployment.
+ *
+ *  2. Because nothing internal imports this barrel, drift between it and the
+ *     modules it re-exports will not break the build. tests/publicApiSurface
+ *     guards the surface instead.
+ */
+
 export { quickstartWizard, initWorkspace, runDoctor } from "./workspace.js";
 export { runDoctorCli } from "./doctor/doctorCli.js";
 export {

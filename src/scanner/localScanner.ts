@@ -1,5 +1,6 @@
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import { join, extname } from "node:path";
+import { scanCodeForAmcPatterns } from "./patterns/patternScanner.js";
 import { detectFromContent, type DetectionResult } from "./autoDetect.js";
 import { formatMaturityOrdinal } from "../score/maturityTaxonomy.js";
 
@@ -12,6 +13,20 @@ export interface LocalScanResult {
   filesScanned: number;
   detection: DetectionResult;
   preliminaryScore: { level: number; label: string; confidence: number };
+  /**
+   * Source-level anti-patterns found in the scanned files (hardcoded secrets,
+   * unguarded shell execution, fetch without a timeout, and so on), each tied
+   * to the diagnostic question it affects.
+   */
+  patternFindings: Array<{
+    file: string;
+    line: number;
+    ruleId: string;
+    questionId: string;
+    title: string;
+    message: string;
+    severity: string;
+  }>;
 }
 
 function collectFiles(dir: string, files: string[] = [], depth = 0): string[] {
@@ -42,6 +57,20 @@ export function scanLocal(localPath: string): LocalScanResult {
   });
   const detection = detectFromContent(files);
 
+  // Source anti-pattern rules. These previously lived behind an unreachable
+  // barrel in src/vscode and ran nowhere; `amc scan` is where they belong.
+  const patternFindings = files.flatMap((file) =>
+    scanCodeForAmcPatterns(file.content).map((match) => ({
+      file: file.path,
+      line: match.line,
+      ruleId: match.ruleId,
+      questionId: match.questionId,
+      title: match.title,
+      message: match.message,
+      severity: match.severity
+    }))
+  );
+
   // Preliminary score based on detection
   let level = files.length > 0 ? 1 : 0;
   if (detection.governanceArtifacts.length >= 3) level = 3;
@@ -54,5 +83,6 @@ export function scanLocal(localPath: string): LocalScanResult {
     filesScanned: files.length,
     detection,
     preliminaryScore: { level, label: formatMaturityOrdinal(level), confidence: detection.confidence },
+    patternFindings,
   };
 }

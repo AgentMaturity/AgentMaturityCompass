@@ -10,6 +10,19 @@
  * 3. Comprehensive audit log system with tamper-evident chain
  * 4. Session management
  * 5. Permission resolution engine
+ *
+ * SCOPE — this is a library for embedders, not AMC's own authorization path.
+ *
+ * Nothing inside AMC calls these functions. Requests to AMC's own Studio/host
+ * API are authorized by src/api/accessPolicy.ts together with
+ * src/studio/apiDelegation.ts and the role tables in src/workspaces/hostDb.ts.
+ * Wiring a second RBAC engine into that path would give a security product two
+ * competing sources of authorization truth, so this module is deliberately
+ * kept as a standalone toolkit exported from the package barrel for callers
+ * embedding AMC in their own service.
+ *
+ * Do not read "AMC ships RBAC" from the presence of this file: enabling these
+ * controls is the embedder's responsibility.
  */
 
 import { z } from "zod";

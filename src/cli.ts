@@ -23910,6 +23910,20 @@ scan
     console.log(chalk.gray(`Governance: ${result.detection.governanceArtifacts.join(", ") || "none detected"}`));
     console.log(chalk.bold(`Preliminary Score: ${result.preliminaryScore.label}`));
     for (const s of result.detection.signals) { console.log(`  → ${s}`); }
+
+    if (result.patternFindings.length > 0) {
+      console.log(chalk.bold("\nSource anti-patterns:"));
+      for (const finding of result.patternFindings) {
+        const color = finding.severity === "critical" ? chalk.red : chalk.yellow;
+        console.log(
+          color(`  ${finding.severity.toUpperCase()}`) +
+            chalk.gray(` ${finding.file}:${finding.line} `) +
+            `${finding.title} ` +
+            chalk.gray(`(${finding.questionId})`)
+        );
+        console.log(chalk.gray(`      ${finding.message}`));
+      }
+    }
   });
 
 scan
