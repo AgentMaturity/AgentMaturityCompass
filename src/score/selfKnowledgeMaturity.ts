@@ -13,6 +13,7 @@
 
 import { existsSync } from "fs";
 import { join } from "path";
+import { evidencePathExists } from "./controlSurfaceScope.js";
 
 export interface SelfKnowledgeMaturityResult {
   score: number; // 0-100
@@ -34,27 +35,27 @@ export function scoreSelfKnowledgeMaturity(cwd?: string): SelfKnowledgeMaturityR
 
   // prior art #1: Typed relationships — knowledge graph with labeled edges
   const typedRelPaths = ["src/score/knowledgeGraph.ts", "src/cgx", "src/claims/contradictions.ts"];
-  const hasTypedRelationships = typedRelPaths.some(f => existsSync(join(root, f)));
+  const hasTypedRelationships = typedRelPaths.some(f => evidencePathExists(root, f));
 
   // prior art #2: Interpretability — can show which evidence/connections drove a decision
   const interpPaths = ["src/score/claimProvenance.ts", "src/truthguard/truthProtocol.ts", "src/score/confidenceDrift.ts"];
-  const hasInterpretabilityLayer = interpPaths.some(f => existsSync(join(root, f)));
+  const hasInterpretabilityLayer = interpPaths.some(f => evidencePathExists(root, f));
 
   // prior art #3: Trace layer — corrections and lessons persist across sessions
   const tracePaths = ["src/score/lessonLearnedDatabase.ts", ".amc/PREDICTION_LOG.md", "src/corrections"];
-  const hasTraceLayer = tracePaths.some(f => existsSync(join(root, f)));
+  const hasTraceLayer = tracePaths.some(f => evidencePathExists(root, f));
 
   // prior art #4: Confidence with citation — every claim has evidence refs
   const citationPaths = ["src/claims/claimConfidence.ts", "src/score/claimProvenance.ts", "src/truthguard"];
-  const hasConfidenceWithCitation = citationPaths.some(f => existsSync(join(root, f)));
+  const hasConfidenceWithCitation = citationPaths.some(f => evidencePathExists(root, f));
 
   // Calibration mechanism — confidence scores that reflect actual accuracy
   const calibrationPaths = ["src/claims/claimConfidence.ts", "src/score/confidenceDrift.ts"];
-  const hasCalibrationMechanism = calibrationPaths.some(f => existsSync(join(root, f)));
+  const hasCalibrationMechanism = calibrationPaths.some(f => evidencePathExists(root, f));
 
   // Self-knowledge loss — penalizes outputs the model can't explain
   const selfKnowledgePaths = ["src/score/confidenceDrift.ts", "src/score/claimProvenance.ts"];
-  const hasSelfKnowledgeLoss = selfKnowledgePaths.some(f => existsSync(join(root, f)));
+  const hasSelfKnowledgeLoss = selfKnowledgePaths.some(f => evidencePathExists(root, f));
 
   if (!hasTypedRelationships) gaps.push("No typed relationships — agent knows things are related but not HOW (gap #1)");
   if (!hasInterpretabilityLayer) gaps.push("No interpretability layer — cannot show which evidence drove a decision (gap #2)");

@@ -8,6 +8,7 @@
 
 import { existsSync } from "fs";
 import { join } from "path";
+import { evidencePathExists } from "./controlSurfaceScope.js";
 
 export interface KernelSandboxResult {
   score: number; // 0-100
@@ -29,27 +30,27 @@ export function scoreKernelSandboxMaturity(cwd?: string): KernelSandboxResult {
 
   // OS-level isolation
   const osIsolationPaths = [".amc/sandbox_profile.json", "sandbox.toml", ".nono", "Dockerfile"];
-  const hasOSLevelIsolation = osIsolationPaths.some(f => existsSync(join(root, f)));
+  const hasOSLevelIsolation = osIsolationPaths.some(f => evidencePathExists(root, f));
 
   // Filesystem restrictions
   const fsPaths = [".amc/sandbox_profile.json", "sandbox.toml", ".amc/fs_policy.json"];
-  const hasFilesystemRestrictions = fsPaths.some(f => existsSync(join(root, f)));
+  const hasFilesystemRestrictions = fsPaths.some(f => evidencePathExists(root, f));
 
   // Network isolation
   const netPaths = [".amc/network_policy.json", "sandbox.toml", ".amc/sandbox_profile.json"];
-  const hasNetworkIsolation = netPaths.some(f => existsSync(join(root, f)));
+  const hasNetworkIsolation = netPaths.some(f => evidencePathExists(root, f));
 
   // Secret injection (keychain/secret service, not plaintext files)
   const secretPaths = [".amc/secret_policy.json", "src/vault", "src/secrets"];
-  const hasSecretInjection = secretPaths.some(f => existsSync(join(root, f)));
+  const hasSecretInjection = secretPaths.some(f => evidencePathExists(root, f));
 
   // Sandbox profile — declarative per-agent
   const profilePaths = [".amc/sandbox_profile.json", "sandbox.toml", ".amc/profiles"];
-  const hasSandboxProfile = profilePaths.some(f => existsSync(join(root, f)));
+  const hasSandboxProfile = profilePaths.some(f => evidencePathExists(root, f));
 
   // Escape detection
   const escapePaths = ["src/assurance/packs/compoundThreatPack.ts", "src/monitor/escapeDetector.ts"];
-  const hasEscapeDetection = escapePaths.some(f => existsSync(join(root, f)));
+  const hasEscapeDetection = escapePaths.some(f => evidencePathExists(root, f));
 
   if (!hasOSLevelIsolation) gaps.push("No OS-level isolation — application sandbox can be bypassed by code it sandboxes");
   if (!hasFilesystemRestrictions) gaps.push("No filesystem restrictions — agent can read ~/.ssh, .env, credentials");

@@ -3,6 +3,7 @@ import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from "fs";
 import { tmpdir } from "os";
 import { join } from "path";
 import { scoreRuntimeIdentityMaturity } from "../../src/score/runtimeIdentityMaturity.js";
+import { markAsAmcCheckout } from "../helpers/amcCheckout.js";
 
 describe("runtimeIdentityMaturity", () => {
   let tmp: string;
@@ -30,12 +31,14 @@ describe("runtimeIdentityMaturity", () => {
   });
 
   it("detects auth dir as user identity propagation", () => {
+    markAsAmcCheckout(tmp);
     mkdirSync(join(tmp, "src/auth"), { recursive: true });
     const r = scoreRuntimeIdentityMaturity(tmp);
     expect(r.hasUserIdentityPropagation).toBe(true);
   });
 
   it("returns full score when all artifacts present", () => {
+    markAsAmcCheckout(tmp);
     mkdirSync(join(tmp, "src/auth"), { recursive: true });
     mkdirSync(join(tmp, "src/ledger"), { recursive: true });
     mkdirSync(join(tmp, ".amc"), { recursive: true });

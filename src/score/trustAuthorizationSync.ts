@@ -7,6 +7,7 @@
 
 import { existsSync, readdirSync } from "fs";
 import { join } from "path";
+import { evidencePathExists } from "./controlSurfaceScope.js";
 
 export interface TrustAuthorizationSyncResult {
   score: number; // 0-100
@@ -28,25 +29,25 @@ export function scoreTrustAuthorizationSync(cwd?: string): TrustAuthorizationSyn
   const recommendations: string[] = [];
 
   const hasDynamicPermissions = [".amc/dynamic_permissions.json", "src/enforce/dynamicPermissions.ts", "src/auth/dynamicAuth.ts"]
-    .some(f => existsSync(join(root, f)));
+    .some(f => evidencePathExists(root, f));
 
   const hasTrustSignalIntegration = ["src/score/crossAgentTrust.ts", "src/trust", ".amc/trust_signals.json"]
-    .some(f => existsSync(join(root, f)));
+    .some(f => evidencePathExists(root, f));
 
   const hasPermissionDecay = ["src/enforce/permissionDecay.ts", ".amc/permission_ttl.json", "src/auth/tokenExpiry.ts"]
-    .some(f => existsSync(join(root, f)));
+    .some(f => evidencePathExists(root, f));
 
   const hasTrustPermissionAudit = [".amc/trust_permission_audit.jsonl", "src/audit/trustPermissionSync.ts"]
-    .some(f => existsSync(join(root, f)));
+    .some(f => evidencePathExists(root, f));
 
   const hasContextAwareAuth = ["src/auth/contextAwareAuth.ts", "src/enforce/contextualPermissions.ts"]
-    .some(f => existsSync(join(root, f)));
+    .some(f => evidencePathExists(root, f));
 
   const hasTrustDivergenceDetection = ["src/monitor/trustDivergence.ts", "src/score/confidenceDrift.ts"]
-    .some(f => existsSync(join(root, f)));
+    .some(f => evidencePathExists(root, f));
 
   const hasRuntimeTrustRecalibration = ["src/trust/recalibration.ts", "src/enforce/trustRecalibrator.ts"]
-    .some(f => existsSync(join(root, f)));
+    .some(f => evidencePathExists(root, f));
 
   if (!hasDynamicPermissions) gaps.push("No dynamic permissions — permissions are static and cannot adapt to trust changes");
   if (!hasTrustSignalIntegration) gaps.push("No trust signal integration — trust state is not fed into authorization decisions");

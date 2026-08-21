@@ -3,6 +3,7 @@ import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from "fs";
 import { tmpdir } from "os";
 import { join } from "path";
 import { scoreAgentProtocolSecurity } from "../../src/score/agentProtocolSecurity.js";
+import { markAsAmcCheckout } from "../helpers/amcCheckout.js";
 
 describe("agentProtocolSecurity", () => {
   let tmp: string;
@@ -30,12 +31,14 @@ describe("agentProtocolSecurity", () => {
   });
 
   it("detects protocol authZ via src/enforce dir", () => {
+    markAsAmcCheckout(tmp);
     mkdirSync(join(tmp, "src/enforce"), { recursive: true });
     const r = scoreAgentProtocolSecurity(tmp);
     expect(r.hasProtocolAuthZ).toBe(true);
   });
 
   it("returns full score when all artifacts present", () => {
+    markAsAmcCheckout(tmp);
     mkdirSync(join(tmp, ".amc"), { recursive: true });
     mkdirSync(join(tmp, "src/auth"), { recursive: true });
     mkdirSync(join(tmp, "src/enforce"), { recursive: true });

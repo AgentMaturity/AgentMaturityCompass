@@ -7,6 +7,7 @@
 
 import { existsSync } from "fs";
 import { join } from "path";
+import { evidencePathExists } from "./controlSurfaceScope.js";
 
 export interface MemorySecurityArchitectureResult {
   score: number; // 0-100
@@ -27,22 +28,22 @@ export function scoreMemorySecurityArchitecture(cwd?: string): MemorySecurityArc
   const recommendations: string[] = [];
 
   const hasMemoryIsolation = ["src/sandbox", ".amc/sandbox_profile.json", "Dockerfile"]
-    .some(f => existsSync(join(root, f)));
+    .some(f => evidencePathExists(root, f));
 
   const hasCryptoProvenance = ["src/receipts", "src/crypto", "src/claims"]
-    .some(f => existsSync(join(root, f)));
+    .some(f => evidencePathExists(root, f));
 
   const hasAccessPatternProtection = ["src/monitor/accessPatterns.ts", ".amc/access_policy.json"]
-    .some(f => existsSync(join(root, f)));
+    .some(f => evidencePathExists(root, f));
 
   const hasMemoryAuditTrail = [".amc/audit_log.jsonl", "src/ledger"]
-    .some(f => existsSync(join(root, f)));
+    .some(f => evidencePathExists(root, f));
 
   const hasMemoryVersioning = [".amc/snapshots", ".amc/state/versions"]
-    .some(f => existsSync(join(root, f)));
+    .some(f => evidencePathExists(root, f));
 
   const hasMemoryIntegrityVerification = ["src/score/memoryIntegrity.ts", "src/verify/memoryVerifier.ts"]
-    .some(f => existsSync(join(root, f)));
+    .some(f => evidencePathExists(root, f));
 
   if (!hasMemoryIsolation) gaps.push("No memory isolation — agent memory is not sandboxed or containerized");
   if (!hasCryptoProvenance) gaps.push("No crypto provenance — memory entries lack cryptographic proof of origin");

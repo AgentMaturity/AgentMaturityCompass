@@ -15,6 +15,7 @@
 
 import { existsSync, readFileSync } from "fs";
 import { join } from "path";
+import { evidencePathExists } from "./controlSurfaceScope.js";
 
 export interface CalibrationReport {
   /** Agent's self-reported confidence per dimension (0-1) */
@@ -189,7 +190,7 @@ export function scanCalibrationInfrastructure(root: string): CalibrationReport {
     "src/confidence", "src/calibration", "src/claims/claimConfidence.ts",
     "src/score/confidenceDrift.ts", "confidence.json", ".amc/calibration",
   ];
-  const hasConfidenceReporting = confPaths.some((p) => existsSync(join(root, p)));
+  const hasConfidenceReporting = confPaths.some((p) => evidencePathExists(root, p));
   if (hasConfidenceReporting) infraScore += 20;
   else gaps.push("No confidence reporting infrastructure — agent cannot self-report confidence levels");
 
@@ -197,7 +198,7 @@ export function scanCalibrationInfrastructure(root: string): CalibrationReport {
   const ingestPaths = [
     "src/evidence/ingest", "src/adapters", ".amc/evidence/external",
   ];
-  const hasExternalIngestion = ingestPaths.some((p) => existsSync(join(root, p)));
+  const hasExternalIngestion = ingestPaths.some((p) => evidencePathExists(root, p));
   if (hasExternalIngestion) infraScore += 20;
   else gaps.push("No external evaluation ingestion — cannot compare internal vs external measurement");
 
@@ -205,7 +206,7 @@ export function scanCalibrationInfrastructure(root: string): CalibrationReport {
   const calTestPaths = [
     "tests/calibration", "tests/confidence", "src/score/confidenceDrift.ts",
   ];
-  const hasCalibrationTests = calTestPaths.some((p) => existsSync(join(root, p)));
+  const hasCalibrationTests = calTestPaths.some((p) => evidencePathExists(root, p));
   if (hasCalibrationTests) infraScore += 20;
   else gaps.push("No calibration-specific tests — calibration quality is unmeasured");
 
@@ -213,7 +214,7 @@ export function scanCalibrationInfrastructure(root: string): CalibrationReport {
   const uqPaths = [
     "src/uncertainty", "src/claims", "src/score/factuality.ts",
   ];
-  const hasUQ = uqPaths.some((p) => existsSync(join(root, p)));
+  const hasUQ = uqPaths.some((p) => evidencePathExists(root, p));
   if (hasUQ) infraScore += 20;
   else gaps.push("No uncertainty quantification — agent cannot express degrees of confidence");
 
@@ -221,7 +222,7 @@ export function scanCalibrationInfrastructure(root: string): CalibrationReport {
   const driftPaths = [
     "src/score/confidenceDrift.ts", "src/score/modelDrift.ts",
   ];
-  const hasDriftMonitoring = driftPaths.some((p) => existsSync(join(root, p)));
+  const hasDriftMonitoring = driftPaths.some((p) => evidencePathExists(root, p));
   if (hasDriftMonitoring) infraScore += 20;
   else gaps.push("No confidence drift monitoring — calibration degradation goes undetected");
 

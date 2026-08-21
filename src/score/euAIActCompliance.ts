@@ -8,6 +8,7 @@
 
 import { existsSync, readFileSync } from "fs";
 import { join } from "path";
+import { evidencePathExists } from "./controlSurfaceScope.js";
 
 export interface EUAIActComplianceResult {
   score: number; // 0-100
@@ -45,7 +46,7 @@ export function scoreEUAIActCompliance(cwd?: string): EUAIActComplianceResult {
   let hasFundamentalRightsImpactAssessment = false;
 
   // Risk classification file
-  if (existsSync(join(root, ".amc/eu_ai_act_classification.json"))) {
+  if (evidencePathExists(root, ".amc/eu_ai_act_classification.json")) {
     try {
       const cls = JSON.parse(readFileSync(join(root, ".amc/eu_ai_act_classification.json"), "utf8"));
       riskClassification = cls.riskClass ?? "unknown";
@@ -55,61 +56,61 @@ export function scoreEUAIActCompliance(cwd?: string): EUAIActComplianceResult {
   // Risk management system (Art. 9)
   const rmsPaths = ["docs/RISK_MANAGEMENT.md", ".amc/risk_register.json", "src/ops/riskManager.ts"];
   for (const f of rmsPaths) {
-    if (existsSync(join(root, f))) hasRiskManagementSystem = true;
+    if (evidencePathExists(root, f)) hasRiskManagementSystem = true;
   }
 
   // Data governance (Art. 10)
   const dgPaths = ["docs/DATA_GOVERNANCE.md", ".amc/data_governance.json"];
   for (const f of dgPaths) {
-    if (existsSync(join(root, f))) hasDataGovernance = true;
+    if (evidencePathExists(root, f)) hasDataGovernance = true;
   }
 
   // Technical documentation (Art. 11)
   const techDocPaths = ["docs/AMC_MASTER_REFERENCE.md", "README.md", "docs/ARCHITECTURE_MAP.md"];
   for (const f of techDocPaths) {
-    if (existsSync(join(root, f))) hasTechnicalDocumentation = true;
+    if (evidencePathExists(root, f)) hasTechnicalDocumentation = true;
   }
 
   // Automatic record-keeping / logging (Art. 12)
   const logPaths = [".amc/audit_log.jsonl", ".amc/ACTION_AUDIT.md", "src/ledger"];
   for (const f of logPaths) {
-    if (existsSync(join(root, f))) hasAutomaticRecordKeeping = true;
+    if (evidencePathExists(root, f)) hasAutomaticRecordKeeping = true;
   }
 
   // Human oversight design (Art. 14)
   const oversightPaths = ["src/approvals", "src/score/humanOversightQuality.ts", "APPROVALS.md"];
   for (const f of oversightPaths) {
-    if (existsSync(join(root, f))) hasHumanOversightDesign = true;
+    if (evidencePathExists(root, f)) hasHumanOversightDesign = true;
   }
 
   // Accuracy, robustness, cybersecurity (Art. 15)
   const arcPaths = ["src/assurance", "src/score/productionReadiness.ts", "tests"];
   for (const f of arcPaths) {
-    if (existsSync(join(root, f))) hasAccuracyRobustnessCybersecurity = true;
+    if (evidencePathExists(root, f)) hasAccuracyRobustnessCybersecurity = true;
   }
 
   // Quality management system (Art. 17)
   const qmsPaths = ["docs/QA.md", ".amc/qms.json", "src/score/vibeCodeAudit.ts"];
   for (const f of qmsPaths) {
-    if (existsSync(join(root, f))) hasQualityManagementSystem = true;
+    if (evidencePathExists(root, f)) hasQualityManagementSystem = true;
   }
 
   // Adversarial testing (GPAI systemic risk requirement)
   const advPaths = ["src/assurance/packs", "src/lab/packs", "tests/adversarial"];
   for (const f of advPaths) {
-    if (existsSync(join(root, f))) hasAdversarialTesting = true;
+    if (evidencePathExists(root, f)) hasAdversarialTesting = true;
   }
 
   // Incident reporting
   const incidentPaths = ["docs/INCIDENT_RESPONSE_READINESS.md", ".amc/incidents", "src/incidents"];
   for (const f of incidentPaths) {
-    if (existsSync(join(root, f))) hasIncidentReporting = true;
+    if (evidencePathExists(root, f)) hasIncidentReporting = true;
   }
 
   // Fundamental Rights Impact Assessment
   const friaPaths = [".amc/fria.json", "docs/FRIA.md", ".amc/fundamental_rights_assessment.json"];
   for (const f of friaPaths) {
-    if (existsSync(join(root, f))) hasFundamentalRightsImpactAssessment = true;
+    if (evidencePathExists(root, f)) hasFundamentalRightsImpactAssessment = true;
   }
 
   if (!hasRiskManagementSystem) gaps.push("No risk management system throughout lifecycle (EU AI Act Art. 9)");

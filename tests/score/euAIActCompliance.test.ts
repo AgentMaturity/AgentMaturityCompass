@@ -3,6 +3,7 @@ import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from "fs";
 import { tmpdir } from "os";
 import { join } from "path";
 import { scoreEUAIActCompliance } from "../../src/score/euAIActCompliance.js";
+import { markAsAmcCheckout } from "../helpers/amcCheckout.js";
 
 describe("euAIActCompliance", () => {
   let tmp: string;
@@ -41,6 +42,7 @@ describe("euAIActCompliance", () => {
   });
 
   it("returns full score when all artifacts present", () => {
+    markAsAmcCheckout(tmp);
     mkdirSync(join(tmp, ".amc"), { recursive: true });
     mkdirSync(join(tmp, "docs"), { recursive: true });
     mkdirSync(join(tmp, "src/score"), { recursive: true });

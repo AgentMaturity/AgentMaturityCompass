@@ -3,6 +3,7 @@ import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from "fs";
 import { tmpdir } from "os";
 import { join } from "path";
 import { scoreReasoningEfficiency } from "../../src/score/reasoningEfficiency.js";
+import { markAsAmcCheckout } from "../helpers/amcCheckout.js";
 
 describe("reasoning efficiency maturity", () => {
   let tmp: string;
@@ -24,14 +25,20 @@ describe("reasoning efficiency maturity", () => {
   });
 
   it("detects response selection capability", () => {
+    markAsAmcCheckout(tmp);
     mkdirSync(join(tmp, "src/reasoning"), { recursive: true });
     writeFileSync(join(tmp, "src/reasoning/bestOfN.ts"), "");
     const result = scoreReasoningEfficiency(tmp);
     expect(result.hasResponseSelection).toBe(true);
-    expect(result.score).toBe(14); // 1/7
+    // 2/7: markAsAmcCheckout plants src/ledger, which is itself listed as
+    // reasoning-trace audit evidence, so this fixture genuinely meets two
+    // criteria rather than one.
+    expect(result.hasReasoningTraceAudit).toBe(true);
+    expect(result.score).toBe(29);
   });
 
   it("detects reasoning budget via architecture task alignment", () => {
+    markAsAmcCheckout(tmp);
     mkdirSync(join(tmp, "src/score"), { recursive: true });
     writeFileSync(join(tmp, "src/score/architectureTaskAlignment.ts"), "");
     const result = scoreReasoningEfficiency(tmp);
@@ -39,6 +46,7 @@ describe("reasoning efficiency maturity", () => {
   });
 
   it("detects overthinking detection via circuit breaker", () => {
+    markAsAmcCheckout(tmp);
     mkdirSync(join(tmp, "src/ops"), { recursive: true });
     writeFileSync(join(tmp, "src/ops/circuitBreaker.ts"), "");
     const result = scoreReasoningEfficiency(tmp);
@@ -46,12 +54,14 @@ describe("reasoning efficiency maturity", () => {
   });
 
   it("detects reasoning trace audit via receipts", () => {
+    markAsAmcCheckout(tmp);
     mkdirSync(join(tmp, "src/receipts"), { recursive: true });
     const result = scoreReasoningEfficiency(tmp);
     expect(result.hasReasoningTraceAudit).toBe(true);
   });
 
   it("returns full score when all artifacts present", () => {
+    markAsAmcCheckout(tmp);
     // Response selection
     mkdirSync(join(tmp, "src/reasoning"), { recursive: true });
     writeFileSync(join(tmp, "src/reasoning/bestOfN.ts"), "");

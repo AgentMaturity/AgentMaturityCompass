@@ -11,8 +11,18 @@
 
 import { existsSync } from "fs";
 import { join } from "path";
+import { evidencePathExists, detectControlSurfaceScope } from "./controlSurfaceScope.js";
 
 export interface SyntheticIdentityReport {
+  /**
+   * False when the scanned directory is not an AMC source checkout.
+   *
+   * This report comes from scanning for AMC's own source modules, so outside
+   * an AMC checkout the score reflects the absence of AMC rather than any
+   * property of the target. Consumers must not present it as a finding.
+   */
+  applicable?: boolean;
+  notApplicableReason?: string;
   /** Per-question scores (0-1) keyed by question ID */
   questionScores: Record<string, number>;
   /** Persona governance sub-score (6.18-6.25) */
@@ -257,7 +267,7 @@ export function scanSyntheticIdentityInfrastructure(root: string): SyntheticIden
   ];
 
   for (const check of checks) {
-    const found = check.paths.some((p) => existsSync(join(root, p)));
+    const found = check.paths.some((p) => evidencePathExists(root, p));
     if (found) {
       infraScore += check.points;
       evidenceFound.push(check.evidence);
@@ -269,5 +279,12 @@ export function scanSyntheticIdentityInfrastructure(root: string): SyntheticIden
   const score = Math.min(100, infraScore);
   const level = scoreToLevel(score);
 
-  return { questionScores: {}, personaScore: score, realPersonScore: score, score, level, gaps, evidenceFound };
+  const surfaceScope = detectControlSurfaceScope(root);
+  return {
+    questionScores: {}, personaScore: score, realPersonScore: score, score, level, gaps, evidenceFound,
+    // Scanned AMC's own module layout; say so rather than letting the
+    // number stand as a judgement about the target directory.
+    applicable: surfaceScope.applicable,
+    notApplicableReason: surfaceScope.applicable ? undefined : surfaceScope.reason
+  };
 }

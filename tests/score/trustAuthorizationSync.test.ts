@@ -3,6 +3,7 @@ import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from "fs";
 import { tmpdir } from "os";
 import { join } from "path";
 import { scoreTrustAuthorizationSync } from "../../src/score/trustAuthorizationSync.js";
+import { markAsAmcCheckout } from "../helpers/amcCheckout.js";
 
 describe("trustAuthorizationSync", () => {
   let tmp: string;
@@ -31,12 +32,14 @@ describe("trustAuthorizationSync", () => {
   });
 
   it("detects trust signal integration via src/trust dir", () => {
+    markAsAmcCheckout(tmp);
     mkdirSync(join(tmp, "src/trust"), { recursive: true });
     const r = scoreTrustAuthorizationSync(tmp);
     expect(r.hasTrustSignalIntegration).toBe(true);
   });
 
   it("returns full score when all artifacts present", () => {
+    markAsAmcCheckout(tmp);
     mkdirSync(join(tmp, ".amc"), { recursive: true });
     mkdirSync(join(tmp, "src/enforce"), { recursive: true });
     mkdirSync(join(tmp, "src/trust"), { recursive: true });

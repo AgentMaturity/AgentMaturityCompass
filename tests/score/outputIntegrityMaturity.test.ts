@@ -3,6 +3,7 @@ import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from "fs";
 import { tmpdir } from "os";
 import { join } from "path";
 import { scoreOutputIntegrityMaturity } from "../../src/score/outputIntegrityMaturity.js";
+import { markAsAmcCheckout } from "../helpers/amcCheckout.js";
 
 describe("outputIntegrityMaturity", () => {
   let tmp: string;
@@ -24,12 +25,14 @@ describe("outputIntegrityMaturity", () => {
   });
 
   it("detects truthguard dir as output validation", () => {
+    markAsAmcCheckout(tmp);
     mkdirSync(join(tmp, "src/truthguard"), { recursive: true });
     const r = scoreOutputIntegrityMaturity(tmp);
     expect(r.hasOutputValidation).toBe(true);
   });
 
   it("detects partial artifacts", () => {
+    markAsAmcCheckout(tmp);
     mkdirSync(join(tmp, "src/enforce"), { recursive: true });
     writeFileSync(join(tmp, "src/enforce/sanitizer.ts"), "");
     writeFileSync(join(tmp, "src/enforce/codeExecutionGuard.ts"), "");
@@ -42,6 +45,7 @@ describe("outputIntegrityMaturity", () => {
   });
 
   it("returns full score when all artifacts present", () => {
+    markAsAmcCheckout(tmp);
     mkdirSync(join(tmp, "src/truthguard"), { recursive: true });
     mkdirSync(join(tmp, "src/enforce"), { recursive: true });
     mkdirSync(join(tmp, "src/score"), { recursive: true });

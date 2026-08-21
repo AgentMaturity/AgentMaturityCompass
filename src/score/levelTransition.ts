@@ -18,6 +18,7 @@
 
 import { existsSync, readFileSync } from "fs";
 import { join } from "path";
+import { evidencePathExists } from "./controlSurfaceScope.js";
 
 export interface LevelTransition {
   /** Agent identifier */
@@ -192,7 +193,7 @@ export function scanLevelTransitionInfra(root: string): LevelTransitionReport {
   ];
 
   for (const [path, desc, points] of checks) {
-    if (existsSync(join(root, path))) {
+    if (evidencePathExists(root, path)) {
       infraScore += points;
     } else {
       gaps.push(`Missing: ${desc}`);

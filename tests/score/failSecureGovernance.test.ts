@@ -3,6 +3,7 @@ import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from "fs";
 import { tmpdir } from "os";
 import { join } from "path";
 import { scoreFailSecureGovernance } from "../../src/score/failSecureGovernance.js";
+import { markAsAmcCheckout } from "../helpers/amcCheckout.js";
 
 describe("failSecureGovernance", () => {
   let tmp: string;
@@ -24,6 +25,7 @@ describe("failSecureGovernance", () => {
   });
 
   it("detects enforce dir as fail-closed", () => {
+    markAsAmcCheckout(tmp);
     mkdirSync(join(tmp, "src/enforce"), { recursive: true });
     const r = scoreFailSecureGovernance(tmp);
     expect(r.failsClosedByDefault).toBe(true);
@@ -38,6 +40,7 @@ describe("failSecureGovernance", () => {
   });
 
   it("returns full score when all artifacts present", () => {
+    markAsAmcCheckout(tmp);
     mkdirSync(join(tmp, "src/enforce"), { recursive: true });
     mkdirSync(join(tmp, "src/ops"), { recursive: true });
     mkdirSync(join(tmp, "src/score"), { recursive: true });

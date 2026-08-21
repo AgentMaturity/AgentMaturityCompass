@@ -3,6 +3,7 @@ import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from "fs";
 import { tmpdir } from "os";
 import { join } from "path";
 import { scoreMemorySecurityArchitecture } from "../../src/score/memorySecurityArchitecture.js";
+import { markAsAmcCheckout } from "../helpers/amcCheckout.js";
 
 describe("memorySecurityArchitecture", () => {
   let tmp: string;
@@ -30,12 +31,14 @@ describe("memorySecurityArchitecture", () => {
   });
 
   it("detects crypto provenance via src/receipts dir", () => {
+    markAsAmcCheckout(tmp);
     mkdirSync(join(tmp, "src/receipts"), { recursive: true });
     const r = scoreMemorySecurityArchitecture(tmp);
     expect(r.hasCryptoProvenance).toBe(true);
   });
 
   it("returns full score when all artifacts present", () => {
+    markAsAmcCheckout(tmp);
     mkdirSync(join(tmp, "src/sandbox"), { recursive: true });
     mkdirSync(join(tmp, "src/receipts"), { recursive: true });
     mkdirSync(join(tmp, "src/ledger"), { recursive: true });

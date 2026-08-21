@@ -3,6 +3,7 @@ import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from "fs";
 import { tmpdir } from "os";
 import { join } from "path";
 import { scoreSelfKnowledgeMaturity } from "../../src/score/selfKnowledgeMaturity.js";
+import { markAsAmcCheckout } from "../helpers/amcCheckout.js";
 
 describe("selfKnowledgeMaturity", () => {
   let tmp: string;
@@ -24,6 +25,7 @@ describe("selfKnowledgeMaturity", () => {
   });
 
   it("detects claimProvenance as interpretability + citation + self-knowledge loss", () => {
+    markAsAmcCheckout(tmp);
     mkdirSync(join(tmp, "src/score"), { recursive: true });
     writeFileSync(join(tmp, "src/score/claimProvenance.ts"), "");
     const r = scoreSelfKnowledgeMaturity(tmp);
@@ -33,6 +35,7 @@ describe("selfKnowledgeMaturity", () => {
   });
 
   it("detects confidenceDrift as calibration mechanism", () => {
+    markAsAmcCheckout(tmp);
     mkdirSync(join(tmp, "src/score"), { recursive: true });
     writeFileSync(join(tmp, "src/score/confidenceDrift.ts"), "");
     const r = scoreSelfKnowledgeMaturity(tmp);
@@ -41,6 +44,7 @@ describe("selfKnowledgeMaturity", () => {
   });
 
   it("returns full score when all artifacts present", () => {
+    markAsAmcCheckout(tmp);
     mkdirSync(join(tmp, "src/score"), { recursive: true });
     mkdirSync(join(tmp, "src/claims"), { recursive: true });
     writeFileSync(join(tmp, "src/score/knowledgeGraph.ts"), "");

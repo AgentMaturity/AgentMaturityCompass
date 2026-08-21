@@ -18,6 +18,7 @@
 
 import { existsSync, readFileSync, readdirSync } from "fs";
 import { join } from "path";
+import { evidencePathExists } from "./controlSurfaceScope.js";
 
 export interface ReasoningEfficiencyResult {
   score: number; // 0-100
@@ -56,7 +57,7 @@ export function scoreReasoningEfficiency(cwd?: string): ReasoningEfficiencyResul
     "src/output/responseRanker.ts",
   ];
   for (const f of selectionPaths) {
-    if (existsSync(join(root, f))) hasResponseSelection = true;
+    if (evidencePathExists(root, f)) hasResponseSelection = true;
   }
 
   // 2. Reasoning budget — task-difficulty-calibrated token budgets
@@ -68,12 +69,12 @@ export function scoreReasoningEfficiency(cwd?: string): ReasoningEfficiencyResul
     "src/reasoning/taskDifficultyRouter.ts",
   ];
   for (const f of budgetPaths) {
-    if (existsSync(join(root, f))) hasReasoningBudget = true;
+    if (evidencePathExists(root, f)) hasReasoningBudget = true;
   }
   // Also check if model routing exists (implies task-appropriate compute allocation)
   const routingPaths = ["src/score/architectureTaskAlignment.ts", "src/ops/modelRouter.ts"];
   for (const f of routingPaths) {
-    if (existsSync(join(root, f))) hasReasoningBudget = true;
+    if (evidencePathExists(root, f)) hasReasoningBudget = true;
   }
 
   // 3. Overthinking detection — loop detection, verbosity analysis
@@ -85,7 +86,7 @@ export function scoreReasoningEfficiency(cwd?: string): ReasoningEfficiencyResul
     "src/ops/circuitBreaker.ts", // circuit breaker implies loop/runaway protection
   ];
   for (const f of overthinkPaths) {
-    if (existsSync(join(root, f))) hasOverthinkingDetection = true;
+    if (evidencePathExists(root, f)) hasOverthinkingDetection = true;
   }
 
   // 4. Output length governance — max tokens, length caps
@@ -96,7 +97,7 @@ export function scoreReasoningEfficiency(cwd?: string): ReasoningEfficiencyResul
     "src/enforce/rateLimit.ts", // rate limiting implies resource governance
   ];
   for (const f of lengthGovPaths) {
-    if (existsSync(join(root, f))) hasOutputLengthGovernance = true;
+    if (evidencePathExists(root, f)) hasOutputLengthGovernance = true;
   }
 
   // 5. Accuracy-length monitoring — tracking whether longer = better for this agent
@@ -108,7 +109,7 @@ export function scoreReasoningEfficiency(cwd?: string): ReasoningEfficiencyResul
     "src/score/calibrationGap.ts",
   ];
   for (const f of monitorPaths) {
-    if (existsSync(join(root, f))) hasAccuracyLengthMonitoring = true;
+    if (evidencePathExists(root, f)) hasAccuracyLengthMonitoring = true;
   }
 
   // 6. Early stopping — agent can stop reasoning when confident enough
@@ -119,7 +120,7 @@ export function scoreReasoningEfficiency(cwd?: string): ReasoningEfficiencyResul
     "src/ops/confidenceThreshold.ts",
   ];
   for (const f of earlyStopPaths) {
-    if (existsSync(join(root, f))) hasEarlyStopping = true;
+    if (evidencePathExists(root, f)) hasEarlyStopping = true;
   }
 
   // 7. Reasoning trace audit — traces logged for post-hoc quality analysis
@@ -131,7 +132,7 @@ export function scoreReasoningEfficiency(cwd?: string): ReasoningEfficiencyResul
     "src/ledger",
   ];
   for (const f of traceAuditPaths) {
-    if (existsSync(join(root, f))) hasReasoningTraceAudit = true;
+    if (evidencePathExists(root, f)) hasReasoningTraceAudit = true;
   }
 
   // Gap analysis

@@ -11,6 +11,7 @@
 
 import { existsSync } from "fs";
 import { join } from "path";
+import { evidencePathExists } from "./controlSurfaceScope.js";
 
 export interface ScenarioProvenanceReport {
   /** Per-question scores (0-1) keyed by question ID */
@@ -246,7 +247,7 @@ export function scanScenarioProvenanceInfrastructure(root: string): ScenarioProv
   ];
 
   for (const check of checks) {
-    const found = check.paths.some((p) => existsSync(join(root, p)));
+    const found = check.paths.some((p) => evidencePathExists(root, p));
     if (found) {
       infraScore += check.points;
       evidenceFound.push(check.evidence);

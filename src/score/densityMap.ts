@@ -15,6 +15,7 @@
 
 import { existsSync, readFileSync, readdirSync } from "fs";
 import { join } from "path";
+import { evidencePathExists } from "./controlSurfaceScope.js";
 
 export interface DensityCell {
   questionId: string;
@@ -192,7 +193,7 @@ export function scanDensityMapInfra(root: string): DensityMapReport {
   ];
 
   for (const [path, desc, points] of checks) {
-    if (existsSync(join(root, path))) {
+    if (evidencePathExists(root, path)) {
       infraScore += points;
     } else {
       gaps.push(`Missing: ${desc}`);

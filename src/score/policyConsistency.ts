@@ -18,6 +18,7 @@
 
 import { existsSync } from "fs";
 import { join } from "path";
+import { evidencePathExists } from "./controlSurfaceScope.js";
 
 export interface PolicyConsistencyReport {
   /** Single-trial pass rate */
@@ -144,7 +145,7 @@ export function scanPolicyConsistency(root: string): PolicyConsistencyReport {
   ];
 
   for (const [path, desc, points] of checks) {
-    if (existsSync(join(root, path))) {
+    if (evidencePathExists(root, path)) {
       infraScore += points;
     } else {
       gaps.push(`Missing: ${desc}`);

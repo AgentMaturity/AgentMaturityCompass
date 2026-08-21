@@ -85,3 +85,25 @@ export function reportControlSurfaceScopeSkip(
   );
   return true;
 }
+
+/**
+ * Existence check for a single piece of candidate evidence.
+ *
+ * Scorers test lists that mix three kinds of path:
+ *
+ *   ".amc/tool_allowlist.json"   the assessed workspace — real evidence
+ *   "ACTION_POLICY.md"           the assessed repo's own docs — real evidence
+ *   "src/enforce/allowlist.ts"   AMC's own source tree — evidence only that
+ *                                the directory being scanned is AMC itself
+ *
+ * The third kind inflated AMC's self-score and deducted from every other
+ * project for the crime of not being AMC. Outside an AMC checkout those
+ * candidates no longer count; the first two still do, so genuine evidence is
+ * unaffected. Inside an AMC checkout behaviour is identical to existsSync.
+ */
+export function evidencePathExists(root: string, relPath: string): boolean {
+  if (relPath.startsWith("src/") && !detectControlSurfaceScope(root).applicable) {
+    return false;
+  }
+  return existsSync(join(root, relPath));
+}

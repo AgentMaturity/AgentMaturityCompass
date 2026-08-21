@@ -7,6 +7,7 @@
 
 import { existsSync } from "fs";
 import { join } from "path";
+import { evidencePathExists } from "./controlSurfaceScope.js";
 
 export interface AgentProtocolSecurityResult {
   score: number; // 0-100
@@ -28,25 +29,25 @@ export function scoreAgentProtocolSecurity(cwd?: string): AgentProtocolSecurityR
   const recommendations: string[] = [];
 
   const hasProtocolInventory = [".amc/protocol_inventory.json", "src/protocols", "ADAPTERS.md"]
-    .some(f => existsSync(join(root, f)));
+    .some(f => evidencePathExists(root, f));
 
   const hasProtocolAuthN = ["src/auth", "src/enforce/protocolAuth.ts"]
-    .some(f => existsSync(join(root, f)));
+    .some(f => evidencePathExists(root, f));
 
   const hasProtocolAuthZ = ["src/enforce", "src/policy"]
-    .some(f => existsSync(join(root, f)));
+    .some(f => evidencePathExists(root, f));
 
   const hasProtocolInputValidation = ["src/enforce/inputValidator.ts", "src/bridge/sanitize.ts", "src/shield/ingress.ts"]
-    .some(f => existsSync(join(root, f)));
+    .some(f => evidencePathExists(root, f));
 
   const hasProtocolRateLimiting = ["src/enforce/rateLimit.ts", "src/ops/rateLimiter.ts"]
-    .some(f => existsSync(join(root, f)));
+    .some(f => evidencePathExists(root, f));
 
   const hasProtocolAudit = [".amc/audit_log.jsonl", "src/audit", "src/ledger"]
-    .some(f => existsSync(join(root, f)));
+    .some(f => evidencePathExists(root, f));
 
   const hasProtocolVersionPinning = [".amc/protocol_versions.json", "src/protocols/versionPin.ts"]
-    .some(f => existsSync(join(root, f)));
+    .some(f => evidencePathExists(root, f));
 
   if (!hasProtocolInventory) gaps.push("No protocol inventory — unknown which protocols the agent exposes or consumes");
   if (!hasProtocolAuthN) gaps.push("No protocol authentication — agent endpoints accept unauthenticated requests");

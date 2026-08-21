@@ -3,6 +3,7 @@ import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { afterEach, describe, expect, test } from "vitest";
 import { scoreISO42001Coverage, scoreRegulatoryReadiness } from "../src/score/regulatoryReadiness.js";
+import { markAsAmcCheckout } from "./helpers/amcCheckout.js";
 
 const roots: string[] = [];
 
@@ -26,6 +27,12 @@ function writeRun(workspace: string, agentId: string, runId: string, ts: number,
 }
 
 function populateHighCoverageArtifacts(workspace: string): void {
+  // This fixture stands in for a fully-covered AMC checkout: most of the
+  // artifacts below are AMC's own source modules. It exercises the aggregation
+  // math across EU/ISO/OWASP, not what a customer agent can reach — 55 of 131
+  // evidence criteria still list only src/ paths, so a real agent cannot yet
+  // satisfy them (tracked separately).
+  markAsAmcCheckout(workspace);
   const artifacts = [
     "docs/AI_GOVERNANCE.md",
     "docs/POLICY.md",
@@ -85,8 +92,8 @@ describe("scoreISO42001Coverage", () => {
   test("detects covered ISO controls from workspace artifacts", () => {
     const workspace = newWorkspace();
     writeArtifact(workspace, "docs/AI_GOVERNANCE.md");
-    writeArtifact(workspace, "src/policy/index.ts");
-    writeArtifact(workspace, "src/drift/index.ts");
+    writeArtifact(workspace, "docs/POLICY.md");
+    writeArtifact(workspace, "docs/MONITORING.md");
 
     const score = scoreISO42001Coverage(workspace);
     expect(score.passedControls).toBeGreaterThanOrEqual(3);

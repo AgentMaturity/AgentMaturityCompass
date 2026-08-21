@@ -3,6 +3,7 @@ import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from "fs";
 import { tmpdir } from "os";
 import { join } from "path";
 import { scoreKernelSandboxMaturity } from "../../src/score/kernelSandboxMaturity.js";
+import { markAsAmcCheckout } from "../helpers/amcCheckout.js";
 
 describe("kernelSandboxMaturity", () => {
   let tmp: string;
@@ -34,12 +35,14 @@ describe("kernelSandboxMaturity", () => {
   });
 
   it("detects vault dir as secret injection", () => {
+    markAsAmcCheckout(tmp);
     mkdirSync(join(tmp, "src/vault"), { recursive: true });
     const r = scoreKernelSandboxMaturity(tmp);
     expect(r.hasSecretInjection).toBe(true);
   });
 
   it("returns full score when all artifacts present", () => {
+    markAsAmcCheckout(tmp);
     mkdirSync(join(tmp, ".amc"), { recursive: true });
     mkdirSync(join(tmp, "src/vault"), { recursive: true });
     mkdirSync(join(tmp, "src/assurance/packs"), { recursive: true });

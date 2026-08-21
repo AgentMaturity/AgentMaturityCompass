@@ -4,6 +4,7 @@ import { getAgentPaths, resolveAgentId } from "../fleet/paths.js";
 import type { DiagnosticReport } from "../types.js";
 import { scoreEUAIActCompliance } from "./euAIActCompliance.js";
 import { scoreOWASPLLMCoverage } from "./owaspLLMCoverage.js";
+import { evidencePathExists } from "./controlSurfaceScope.js";
 
 interface WeightedComponents {
   euAiAct: number;
@@ -60,6 +61,16 @@ interface LatestAgentIntegrity {
   integrityIndex: number | null;
 }
 
+/**
+ * ISO 42001 control evidence.
+ *
+ * Three controls (8.1, 9.1, 10.3) previously listed only `src/` paths — AMC's
+ * own modules. Since `evidencePathExists` ignores those outside an AMC
+ * checkout, no customer agent could satisfy them at all, capping every external
+ * ISO score at 5 of 8 regardless of the controls actually in place. Each now
+ * also accepts a workspace artifact AMC writes or a document the operator
+ * authors, so the control is evidencable by the agent being assessed.
+ */
 const ISO_CONTROLS: ISOControlDefinition[] = [
   {
     id: "ISO-4.1",
@@ -82,13 +93,13 @@ const ISO_CONTROLS: ISOControlDefinition[] = [
   {
     id: "ISO-8.1",
     title: "Operational controls and secure development",
-    evidencePaths: ["src/ops", "src/vault", "src/assurance"],
+    evidencePaths: ["docs/OPERATIONS.md", ".amc/ops-policy.yaml", ".amc/sandbox_profile.json", "src/ops", "src/vault", "src/assurance"],
     recommendation: "Evidence secure operations controls (key handling, backup, release and assurance)."
   },
   {
     id: "ISO-9.1",
     title: "Monitoring, measurement, and drift response",
-    evidencePaths: ["src/drift", "src/monitor", "src/claims/confidenceDrift.ts"],
+    evidencePaths: ["docs/MONITORING.md", ".amc/trust_signals.json", "src/drift", "src/monitor", "src/claims/confidenceDrift.ts"],
     recommendation: "Enable continuous trust/performance monitoring with deterministic drift alerts."
   },
   {
@@ -106,7 +117,7 @@ const ISO_CONTROLS: ISOControlDefinition[] = [
   {
     id: "ISO-10.3",
     title: "Continual improvement and management review",
-    evidencePaths: ["src/loop", "src/snapshot", "src/forecast"],
+    evidencePaths: ["docs/MANAGEMENT_REVIEW.md", ".amc/PREDICTION_LOG.md", ".amc/snapshots", "src/loop", "src/snapshot", "src/forecast"],
     recommendation: "Run recurring management reviews that link risk posture to concrete improvements."
   }
 ];
@@ -204,7 +215,7 @@ export function scoreISO42001Coverage(cwd?: string): ISO42001CoverageResult {
   const controls = ISO_CONTROLS.map((control) => ({
     id: control.id,
     title: control.title,
-    covered: control.evidencePaths.some((path) => existsSync(join(root, path)))
+    covered: control.evidencePaths.some((path) => evidencePathExists(root, path))
   }));
   const passedControls = controls.filter((control) => control.covered).length;
   const totalControls = controls.length;

@@ -20,6 +20,7 @@
 
 import { existsSync } from "fs";
 import { join } from "path";
+import { evidencePathExists } from "./controlSurfaceScope.js";
 
 export interface AuditDepthReport {
   /** Black-box audit capabilities (query + observe outputs) */
@@ -52,7 +53,7 @@ export function scoreAuditDepth(root: string): AuditDepthReport {
   ];
 
   for (const [path, cap, points] of bbPaths) {
-    if (existsSync(join(root, path))) {
+    if (evidencePathExists(root, path)) {
       bbCapabilities.push(cap);
       bbScore += points;
     }
@@ -71,7 +72,7 @@ export function scoreAuditDepth(root: string): AuditDepthReport {
   ];
 
   for (const [path, cap, points] of wbPaths) {
-    if (existsSync(join(root, path))) {
+    if (evidencePathExists(root, path)) {
       wbCapabilities.push(cap);
       wbScore += points;
     }
@@ -91,7 +92,7 @@ export function scoreAuditDepth(root: string): AuditDepthReport {
   ];
 
   for (const [path, cap, points] of otbPaths) {
-    if (existsSync(join(root, path))) {
+    if (evidencePathExists(root, path)) {
       otbCapabilities.push(cap);
       otbScore += points;
     }

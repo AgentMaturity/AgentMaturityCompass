@@ -18,6 +18,7 @@
 
 import { existsSync, readFileSync, readdirSync } from "fs";
 import { join } from "path";
+import { evidencePathExists } from "./controlSurfaceScope.js";
 
 export interface EvidenceConflictReport {
   /** Total evidence items analyzed */
@@ -199,26 +200,26 @@ export function scanEvidenceConflicts(root: string): EvidenceConflictReport {
   const evidencePaths = [
     ".amc/evidence", ".amc/vault/evidence", "evidence",
   ];
-  const hasEvidenceDir = evidencePaths.some((p) => existsSync(join(root, p)));
+  const hasEvidenceDir = evidencePaths.some((p) => evidencePathExists(root, p));
   if (hasEvidenceDir) infraScore += 25;
   else gaps.push("No evidence directory found — cannot analyze evidence consistency");
 
   const conflictDetectionPaths = [
     "src/score/evidenceConflict.ts", "src/evidence/conflictDetector.ts",
   ];
-  const hasConflictDetection = conflictDetectionPaths.some((p) => existsSync(join(root, p)));
+  const hasConflictDetection = conflictDetectionPaths.some((p) => evidencePathExists(root, p));
   if (hasConflictDetection) infraScore += 25;
   else gaps.push("No automated conflict detection — contradictory evidence goes unnoticed");
 
   const consistencyPaths = [
     "src/evidence/consistency.ts", "src/score/confidenceDrift.ts",
   ];
-  const hasConsistencyChecks = consistencyPaths.some((p) => existsSync(join(root, p)));
+  const hasConsistencyChecks = consistencyPaths.some((p) => evidencePathExists(root, p));
   if (hasConsistencyChecks) infraScore += 25;
   else gaps.push("No evidence consistency checks in scoring pipeline");
 
   const auditPaths = [".amc/audit", "src/audit"];
-  const hasAuditTrail = auditPaths.some((p) => existsSync(join(root, p)));
+  const hasAuditTrail = auditPaths.some((p) => evidencePathExists(root, p));
   if (hasAuditTrail) infraScore += 25;
   else gaps.push("No audit trail for evidence provenance — cannot trace conflict sources");
 

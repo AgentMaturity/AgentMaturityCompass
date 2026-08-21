@@ -3,6 +3,7 @@ import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from "fs";
 import { tmpdir } from "os";
 import { join } from "path";
 import { scoreAdaptiveAccessControl } from "../../src/score/adaptiveAccessControl.js";
+import { markAsAmcCheckout } from "../helpers/amcCheckout.js";
 
 describe("adaptiveAccessControl", () => {
   let tmp: string;
@@ -30,6 +31,7 @@ describe("adaptiveAccessControl", () => {
   });
 
   it("detects contextual permissions via src/auth/contextAwareAuth.ts", () => {
+    markAsAmcCheckout(tmp);
     mkdirSync(join(tmp, "src/auth"), { recursive: true });
     writeFileSync(join(tmp, "src/auth/contextAwareAuth.ts"), "");
     const r = scoreAdaptiveAccessControl(tmp);
@@ -37,6 +39,7 @@ describe("adaptiveAccessControl", () => {
   });
 
   it("returns full score when all artifacts present", () => {
+    markAsAmcCheckout(tmp);
     mkdirSync(join(tmp, ".amc/behavior_profiles"), { recursive: true });
     mkdirSync(join(tmp, ".amc/policy_versions"), { recursive: true });
     mkdirSync(join(tmp, "src/enforce"), { recursive: true });

@@ -7,6 +7,7 @@
 
 import { existsSync } from "fs";
 import { join } from "path";
+import { evidencePathExists } from "./controlSurfaceScope.js";
 
 export interface FailSecureGovernanceResult {
   score: number; // 0-100
@@ -38,43 +39,43 @@ export function scoreFailSecureGovernance(cwd?: string): FailSecureGovernanceRes
   // Fail-closed / deny-by-default
   const enforcePaths = ["src/enforce", "src/ops/circuitBreaker.ts", "ACTION_POLICY.md"];
   for (const f of enforcePaths) {
-    if (existsSync(join(root, f))) failsClosedByDefault = true;
+    if (evidencePathExists(root, f)) failsClosedByDefault = true;
   }
 
   // Tool call whitelist
   const whitelistPaths = [".amc/tool_allowlist.json", "src/enforce/allowlist.ts", "src/policy"];
   for (const f of whitelistPaths) {
-    if (existsSync(join(root, f))) hasToolCallWhitelist = true;
+    if (evidencePathExists(root, f)) hasToolCallWhitelist = true;
   }
 
   // Rate limiting
   const ratePaths = ["src/ops/rateLimiter.ts", "src/enforce/rateLimit.ts"];
   for (const f of ratePaths) {
-    if (existsSync(join(root, f))) hasRateLimiting = true;
+    if (evidencePathExists(root, f)) hasRateLimiting = true;
   }
 
   // Semantic anomaly detection (Z-score / behavioral baseline)
   const anomalyPaths = ["src/score/modelDrift.ts", "src/drift", "src/ops/anomalyDetector.ts"];
   for (const f of anomalyPaths) {
-    if (existsSync(join(root, f))) hasSemanticAnomalyDetection = true;
+    if (evidencePathExists(root, f)) hasSemanticAnomalyDetection = true;
   }
 
   // Context-aware approvals (human sees full context before approving)
   const approvalPaths = ["src/approvals", "APPROVALS.md", "src/enforce/stepupApproval.ts"];
   for (const f of approvalPaths) {
-    if (existsSync(join(root, f))) hasContextAwareApprovals = true;
+    if (evidencePathExists(root, f)) hasContextAwareApprovals = true;
   }
 
   // Tool call audit log
   const auditPaths = [".amc/ACTION_AUDIT.md", ".amc/audit_log.jsonl", "src/audit"];
   for (const f of auditPaths) {
-    if (existsSync(join(root, f))) hasToolCallAuditLog = true;
+    if (evidencePathExists(root, f)) hasToolCallAuditLog = true;
   }
 
   // Excessive agency controls (scope limits, autonomy caps)
   const agencyPaths = ["src/assurance/packs/governanceBypassPack.ts", "src/enforce", "src/policy"];
   for (const f of agencyPaths) {
-    if (existsSync(join(root, f))) hasExcessiveAgencyControls = true;
+    if (evidencePathExists(root, f)) hasExcessiveAgencyControls = true;
   }
 
   if (!failsClosedByDefault) gaps.push("Tool governance fails open — actions proceed when rules engine is unavailable");

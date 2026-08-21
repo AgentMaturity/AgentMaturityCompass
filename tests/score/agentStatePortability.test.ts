@@ -3,6 +3,7 @@ import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from "fs";
 import { tmpdir } from "os";
 import { join } from "path";
 import { scoreAgentStatePortability } from "../../src/score/agentStatePortability.js";
+import { markAsAmcCheckout } from "../helpers/amcCheckout.js";
 
 describe("agentStatePortability", () => {
   let tmp: string;
@@ -38,6 +39,7 @@ describe("agentStatePortability", () => {
   });
 
   it("returns full score when all artifacts present", () => {
+    markAsAmcCheckout(tmp);
     mkdirSync(join(tmp, ".amc/snapshots"), { recursive: true });
     mkdirSync(join(tmp, ".amc/state/versions"), { recursive: true });
     mkdirSync(join(tmp, "tests/portability"), { recursive: true });

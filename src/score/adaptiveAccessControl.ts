@@ -7,6 +7,7 @@
 
 import { existsSync } from "fs";
 import { join } from "path";
+import { evidencePathExists } from "./controlSurfaceScope.js";
 
 export interface AdaptiveAccessControlResult {
   score: number; // 0-100
@@ -27,22 +28,22 @@ export function scoreAdaptiveAccessControl(cwd?: string): AdaptiveAccessControlR
   const recommendations: string[] = [];
 
   const hasBehaviorProfiling = ["src/monitor/behaviorProfile.ts", "src/score/modelDrift.ts", ".amc/behavior_profiles"]
-    .some(f => existsSync(join(root, f)));
+    .some(f => evidencePathExists(root, f));
 
   const hasLearnedPolicies = ["src/enforce/learnedPolicies.ts", ".amc/learned_access_policies.json"]
-    .some(f => existsSync(join(root, f)));
+    .some(f => evidencePathExists(root, f));
 
   const hasStagingPhase = ["src/enforce/policyStaging.ts", ".amc/policy_staging.json"]
-    .some(f => existsSync(join(root, f)));
+    .some(f => evidencePathExists(root, f));
 
   const hasAnomalyBasedDenial = ["src/enforce/anomalyDenial.ts", "src/ops/anomalyDetector.ts"]
-    .some(f => existsSync(join(root, f)));
+    .some(f => evidencePathExists(root, f));
 
   const hasContextualPermissions = ["src/enforce/contextualPermissions.ts", "src/auth/contextAwareAuth.ts"]
-    .some(f => existsSync(join(root, f)));
+    .some(f => evidencePathExists(root, f));
 
   const hasPolicyEvolution = ["src/enforce/policyEvolution.ts", ".amc/policy_versions"]
-    .some(f => existsSync(join(root, f)));
+    .some(f => evidencePathExists(root, f));
 
   if (!hasBehaviorProfiling) gaps.push("No behavior profiling — access control cannot learn from observed agent actions");
   if (!hasLearnedPolicies) gaps.push("No learned policies — all access rules are manually defined");

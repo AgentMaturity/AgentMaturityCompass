@@ -7,6 +7,7 @@
 
 import { existsSync } from "fs";
 import { join } from "path";
+import { evidencePathExists } from "./controlSurfaceScope.js";
 
 export interface AgentStatePortabilityResult {
   score: number; // 0-100
@@ -36,37 +37,37 @@ export function scoreAgentStatePortability(cwd?: string): AgentStatePortabilityR
   // Serializable state — snapshot files
   const snapshotPaths = [".amc/snapshots", ".amc/state", "agent_state.json", "session_state.yaml"];
   for (const f of snapshotPaths) {
-    if (existsSync(join(root, f))) hasSerializableState = true;
+    if (evidencePathExists(root, f)) hasSerializableState = true;
   }
 
   // Vendor-neutral format — YAML/JSON spec, not framework-specific binary
   const neutralPaths = [".amc/state_spec.yaml", ".amc/state_spec.json", "STATE_SCHEMA.md"];
   for (const f of neutralPaths) {
-    if (existsSync(join(root, f))) hasVendorNeutralFormat = true;
+    if (evidencePathExists(root, f)) hasVendorNeutralFormat = true;
   }
 
   // State versioning
   const versionPaths = [".amc/snapshots", ".amc/state/versions"];
   for (const f of versionPaths) {
-    if (existsSync(join(root, f))) hasStateVersioning = true;
+    if (evidencePathExists(root, f)) hasStateVersioning = true;
   }
 
   // Rehydration test — test files that verify state restore
   const testPaths = ["tests/state", "tests/portability", "tests/rehydration"];
   for (const f of testPaths) {
-    if (existsSync(join(root, f))) hasRehydrationTest = true;
+    if (evidencePathExists(root, f)) hasRehydrationTest = true;
   }
 
   // Integrity on transfer — HMAC/signature on snapshots
   const integrityPaths = [".amc/state_signatures", ".amc/snapshot_hashes.json"];
   for (const f of integrityPaths) {
-    if (existsSync(join(root, f))) hasIntegrityOnTransfer = true;
+    if (evidencePathExists(root, f)) hasIntegrityOnTransfer = true;
   }
 
   // Framework abstraction — adapter layer
   const adapterPaths = ["src/adapters", "src/integrations", "ADAPTERS.md"];
   for (const f of adapterPaths) {
-    if (existsSync(join(root, f))) hasFrameworkAbstraction = true;
+    if (evidencePathExists(root, f)) hasFrameworkAbstraction = true;
   }
 
   if (!hasSerializableState) gaps.push("Agent state cannot be serialized — sessions start from zero every time");

@@ -8,6 +8,7 @@
 
 import { existsSync } from "fs";
 import { join } from "path";
+import { evidencePathExists } from "./controlSurfaceScope.js";
 
 export interface OutputIntegrityResult {
   score: number; // 0-100
@@ -39,43 +40,43 @@ export function scoreOutputIntegrityMaturity(cwd?: string): OutputIntegrityResul
   // Output validation
   const validationPaths = ["src/truthguard", "src/output", "src/validate", "src/enforce/outputValidator.ts"];
   for (const f of validationPaths) {
-    if (existsSync(join(root, f))) hasOutputValidation = true;
+    if (evidencePathExists(root, f)) hasOutputValidation = true;
   }
 
   // Output sanitization
   const sanitizePaths = ["src/enforce/sanitizer.ts", "src/output/sanitize.ts", "src/bridge/sanitize.ts"];
   for (const f of sanitizePaths) {
-    if (existsSync(join(root, f))) hasOutputSanitization = true;
+    if (evidencePathExists(root, f)) hasOutputSanitization = true;
   }
 
   // Confidence calibration (self-knowledge loss pattern)
   const confidencePaths = ["src/score/confidenceDrift.ts", "src/claims/claimConfidence.ts"];
   for (const f of confidencePaths) {
-    if (existsSync(join(root, f))) hasConfidenceCalibration = true;
+    if (evidencePathExists(root, f)) hasConfidenceCalibration = true;
   }
 
   // Citation requirement (every answer carries its own proof)
   const citationPaths = ["src/truthguard/truthProtocol.ts", "src/claims", "src/score/claimProvenance.ts"];
   for (const f of citationPaths) {
-    if (existsSync(join(root, f))) hasCitationRequirement = true;
+    if (evidencePathExists(root, f)) hasCitationRequirement = true;
   }
 
   // Code execution guard (prevent LLM output from being exec'd without review)
   const codeGuardPaths = ["src/enforce/codeExecutionGuard.ts", "src/sandbox", "src/ops/sandbox.ts"];
   for (const f of codeGuardPaths) {
-    if (existsSync(join(root, f))) hasCodeExecutionGuard = true;
+    if (evidencePathExists(root, f)) hasCodeExecutionGuard = true;
   }
 
   // Structured output enforcement (JSON schema, typed outputs)
   const structuredPaths = ["src/enforce/schemaValidator.ts", "src/output/schema.ts", "src/types.ts"];
   for (const f of structuredPaths) {
-    if (existsSync(join(root, f))) hasStructuredOutputEnforcement = true;
+    if (evidencePathExists(root, f)) hasStructuredOutputEnforcement = true;
   }
 
   // Output audit trail
   const auditPaths = [".amc/ACTION_AUDIT.md", ".amc/audit_log.jsonl", "src/receipts"];
   for (const f of auditPaths) {
-    if (existsSync(join(root, f))) hasOutputAuditTrail = true;
+    if (evidencePathExists(root, f)) hasOutputAuditTrail = true;
   }
 
   if (!hasOutputValidation) gaps.push("No output validation — LLM outputs used directly without checking (OWASP LLM02)");

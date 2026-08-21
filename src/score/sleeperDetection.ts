@@ -16,8 +16,18 @@
 
 import { existsSync } from "fs";
 import { join } from "path";
+import { evidencePathExists, detectControlSurfaceScope } from "./controlSurfaceScope.js";
 
 export interface SleeperDetectionReport {
+  /**
+   * False when the scanned directory is not an AMC source checkout.
+   *
+   * This report comes from scanning for AMC's own source modules, so outside
+   * an AMC checkout the score reflects the absence of AMC rather than any
+   * property of the target. Consumers must not present it as a finding.
+   */
+  applicable?: boolean;
+  notApplicableReason?: string;
   /** Behavioral consistency score across contexts (0-100) */
   consistencyScore: number;
   /** pass^k reliability metric (probability of k consecutive successes) */
@@ -64,7 +74,7 @@ export function scoreSleeperDetection(root: string): SleeperDetectionReport {
     "tests/adversarial", "tests/behavioral", "src/assurance",
     "tests/sleeper", "tests/consistency",
   ];
-  const hasMultiContextTests = multiContextPaths.some((p) => existsSync(join(root, p)));
+  const hasMultiContextTests = multiContextPaths.some((p) => evidencePathExists(root, p));
   if (hasMultiContextTests) infraScore += 15;
   else gaps.push("No multi-context behavioral testing — sleeper behavior would go undetected");
 
@@ -72,7 +82,7 @@ export function scoreSleeperDetection(root: string): SleeperDetectionReport {
   const redTeamPaths = [
     "src/assurance/packs", "tests/redteam", "src/shield",
   ];
-  const hasRedTeam = redTeamPaths.some((p) => existsSync(join(root, p)));
+  const hasRedTeam = redTeamPaths.some((p) => evidencePathExists(root, p));
   if (hasRedTeam) infraScore += 15;
   else gaps.push("No adversarial red-teaming infrastructure");
 
@@ -81,7 +91,7 @@ export function scoreSleeperDetection(root: string): SleeperDetectionReport {
     "src/evidence/behavioral", "src/score/behavioralTransparency.ts",
     "src/score/behavioralContractMaturity.ts",
   ];
-  const hasBehavioralFingerprint = fingerprintPaths.some((p) => existsSync(join(root, p)));
+  const hasBehavioralFingerprint = fingerprintPaths.some((p) => evidencePathExists(root, p));
   if (hasBehavioralFingerprint) infraScore += 15;
   else gaps.push("No behavioral fingerprinting — cannot establish baseline for deviation detection");
 
@@ -90,7 +100,7 @@ export function scoreSleeperDetection(root: string): SleeperDetectionReport {
     "src/score/confidenceDrift.ts", "src/score/modelDrift.ts",
     "src/evidence/temporal",
   ];
-  const hasTemporalMonitoring = temporalPaths.some((p) => existsSync(join(root, p)));
+  const hasTemporalMonitoring = temporalPaths.some((p) => evidencePathExists(root, p));
   if (hasTemporalMonitoring) infraScore += 15;
   else gaps.push("No temporal consistency monitoring — behavioral drift goes undetected");
 
@@ -99,7 +109,7 @@ export function scoreSleeperDetection(root: string): SleeperDetectionReport {
     "src/assurance/packs/encodedInjection", "src/assurance/packs/multi-turn-safety",
     "src/assurance/packs/policyConfusion",
   ];
-  const hasContextEval = contextPaths.some((p) => existsSync(join(root, p)));
+  const hasContextEval = contextPaths.some((p) => evidencePathExists(root, p));
   if (hasContextEval) infraScore += 15;
   else gaps.push("No context-dependent evaluation — agent tested in single context only");
 
@@ -107,7 +117,7 @@ export function scoreSleeperDetection(root: string): SleeperDetectionReport {
   const integrityPaths = [
     "src/vault", "src/notary", "src/evidence/merkle",
   ];
-  const hasIntegrity = integrityPaths.some((p) => existsSync(join(root, p)));
+  const hasIntegrity = integrityPaths.some((p) => evidencePathExists(root, p));
   if (hasIntegrity) infraScore += 15;
   else gaps.push("No evidence chain integrity — tampered evidence would go undetected");
 
@@ -115,7 +125,7 @@ export function scoreSleeperDetection(root: string): SleeperDetectionReport {
   const continuousPaths = [
     "src/gateway", "src/watch", "src/studio",
   ];
-  const hasContinuous = continuousPaths.some((p) => existsSync(join(root, p)));
+  const hasContinuous = continuousPaths.some((p) => evidencePathExists(root, p));
   if (hasContinuous) infraScore += 10;
   else gaps.push("No continuous behavioral monitoring — only point-in-time evaluation");
 
@@ -125,6 +135,7 @@ export function scoreSleeperDetection(root: string): SleeperDetectionReport {
   const basePassRate = infraScore / 100;
   const passK = computePassK(basePassRate, [1, 2, 4, 8, 16]);
 
+  const surfaceScope = detectControlSurfaceScope(root);
   return {
     consistencyScore: infraScore,
     passK,
@@ -133,5 +144,9 @@ export function scoreSleeperDetection(root: string): SleeperDetectionReport {
     score: infraScore,
     level,
     gaps,
+    // Scanned AMC's own module layout; say so rather than letting the
+    // number stand as a judgement about the target directory.
+    applicable: surfaceScope.applicable,
+    notApplicableReason: surfaceScope.applicable ? undefined : surfaceScope.reason
   };
 }
