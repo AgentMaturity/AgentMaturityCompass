@@ -18,6 +18,28 @@ import { signHexDigest, getPrivateKeyPem } from "../crypto/keys.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { join } from "node:path";
 import { addDebtEntry, loadAllDebt } from "./policyDebt.js";
+// Rollback packs and emergency overrides live in canaryRegisters.ts; they are
+// re-exported here so the public surface is unchanged.
+import {
+  createRollbackPack,
+  getRollbackPacks,
+  getLatestRollbackPack,
+  activateEmergencyOverride,
+  getActiveOverrides,
+  filePostmortem,
+  getOverridesMissingPostmortem,
+  resetCanaryRegisters
+} from "./canaryRegisters.js";
+
+export {
+  createRollbackPack,
+  getRollbackPacks,
+  getLatestRollbackPack,
+  activateEmergencyOverride,
+  getActiveOverrides,
+  filePostmortem,
+  getOverridesMissingPostmortem
+};
 
 // ---------------------------------------------------------------------------
 // Types
@@ -318,144 +340,6 @@ export function computeCanaryStats(): CanaryStats | null {
 }
 
 // ---------------------------------------------------------------------------
-// Rollback packs
-// ---------------------------------------------------------------------------
-
-const rollbackPacks: RollbackPack[] = [];
-
-/**
- * Create a rollback pack — a signed snapshot of a known-good policy.
- */
-export function createRollbackPack(
-  agentId: string,
-  policyContent: string,
-  reason: string,
-  workspace?: string,
-): RollbackPack {
-  const packId = `rbp_${randomUUID().slice(0, 12)}`;
-  const policyFileSha256 = sha256Hex(policyContent);
-  const now = Date.now();
-
-  const body = { packId, agentId, policyFileSha256, reason, createdTs: now };
-  const digest = sha256Hex(canonicalize(body));
-
-  let signature = "unsigned";
-  if (workspace) {
-    try {
-      signature = signHexDigest(digest, getPrivateKeyPem(workspace, "auditor"));
-    } catch { /* no key */ }
-  }
-
-  const pack: RollbackPack = {
-    ...body,
-    policyContent,
-    signature,
-  };
-
-  rollbackPacks.push(pack);
-  return pack;
-}
-
-/**
- * Get all rollback packs for an agent.
- */
-export function getRollbackPacks(agentId: string): RollbackPack[] {
-  return rollbackPacks.filter((p) => p.agentId === agentId);
-}
-
-/**
- * Get the latest rollback pack for an agent.
- */
-export function getLatestRollbackPack(agentId: string): RollbackPack | null {
-  const packs = getRollbackPacks(agentId);
-  return packs.length > 0 ? packs[packs.length - 1]! : null;
-}
-
-// ---------------------------------------------------------------------------
-// Emergency overrides
-// ---------------------------------------------------------------------------
-
-const emergencyOverrides: EmergencyOverride[] = [];
-
-/**
- * Activate an emergency override with strict TTL.
- */
-export function activateEmergencyOverride(
-  params: {
-    agentId: string;
-    reason: string;
-    actionDescription: string;
-    ttlMs: number;
-  },
-  workspace?: string,
-): EmergencyOverride {
-  const overrideId = `emo_${randomUUID().slice(0, 12)}`;
-  const now = Date.now();
-
-  const body = {
-    overrideId,
-    agentId: params.agentId,
-    reason: params.reason,
-    actionDescription: params.actionDescription,
-    ttlMs: params.ttlMs,
-    startedTs: now,
-    expiresTs: now + params.ttlMs,
-  };
-
-  const digest = sha256Hex(canonicalize(body));
-  let signature = "unsigned";
-  if (workspace) {
-    try {
-      signature = signHexDigest(digest, getPrivateKeyPem(workspace, "auditor"));
-    } catch { /* no key */ }
-  }
-
-  const override: EmergencyOverride = {
-    ...body,
-    postmortemFiled: false,
-    postmortemArtifactId: null,
-    signature,
-  };
-
-  emergencyOverrides.push(override);
-  return override;
-}
-
-/**
- * Check if an emergency override is currently active for an agent.
- */
-export function getActiveOverrides(agentId: string): EmergencyOverride[] {
-  const now = Date.now();
-  return emergencyOverrides.filter(
-    (o) => o.agentId === agentId && o.expiresTs > now,
-  );
-}
-
-/**
- * File a postmortem for an emergency override.
- */
-export function filePostmortem(
-  overrideId: string,
-  artifactId: string,
-): boolean {
-  const override = emergencyOverrides.find((o) => o.overrideId === overrideId);
-  if (!override) return false;
-  override.postmortemFiled = true;
-  override.postmortemArtifactId = artifactId;
-  return true;
-}
-
-/**
- * Get overrides missing postmortems.
- */
-export function getOverridesMissingPostmortem(agentId: string): EmergencyOverride[] {
-  const now = Date.now();
-  return emergencyOverrides.filter(
-    (o) => o.agentId === agentId && o.expiresTs <= now && !o.postmortemFiled,
-  );
-}
-
-// ---------------------------------------------------------------------------
 // Policy debt register
 // ---------------------------------------------------------------------------
 
@@ -686,11 +570,12 @@ export function checkSLOCompliance(
  */
 export function detectGovernanceDrift(
   agentId: string,
+  workspace?: string,
 ): GovernanceDriftResult {
   const driftItems: GovernanceDriftResult["driftItems"] = [];
 
   // Check for expired overrides without postmortems
-  const missingPostmortems = getOverridesMissingPostmortem(agentId);
+  const missingPostmortems = getOverridesMissingPostmortem(agentId, workspace);
   if (missingPostmortems.length > 0) {
     driftItems.push({
       category: "OVERRIDE_HYGIENE",
@@ -729,20 +614,20 @@ export function detectGovernanceDrift(
 // Report generation
 // ---------------------------------------------------------------------------
 
-export function generatePolicyCanaryReport(agentId: string): PolicyCanaryReport {
+export function generatePolicyCanaryReport(agentId: string, workspace?: string): PolicyCanaryReport {
   const reportId = `pcr_${randomUUID().slice(0, 12)}`;
   const now = Date.now();
 
   const config = getCanaryConfig();
   const stats = computeCanaryStats();
-  const packs = getRollbackPacks(agentId);
-  const activeOverrides = getActiveOverrides(agentId);
+  const packs = getRollbackPacks(agentId, workspace);
+  const activeOverrides = getActiveOverrides(agentId, workspace);
   const activeDebt = getActivePolicyDebt(agentId);
   const expiredDebt = getExpiredPolicyDebt(agentId);
   const slo = computeGovernanceSLO();
   const sloTarget = defaultGovernanceSLOTarget();
   const sloCompliance = checkSLOCompliance(slo, sloTarget);
-  const drift = detectGovernanceDrift(agentId);
+  const drift = detectGovernanceDrift(agentId, workspace);
 
   const recommendations: string[] = [];
   if (stats?.shouldRollback) {
@@ -837,8 +722,7 @@ export function renderPolicyCanaryMarkdown(report: PolicyCanaryReport): string {
 export function resetPolicyCanaryState(): void {
   activeCanaryConfig = null;
   canaryDecisions.length = 0;
-  rollbackPacks.length = 0;
-  emergencyOverrides.length = 0;
+  resetCanaryRegisters();
   policyDebtRegister.length = 0;
   sloMeasurements.length = 0;
 }

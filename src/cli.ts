@@ -15902,7 +15902,7 @@ program
   .action(async (opts: { agent?: string }) => {
     const { generatePolicyCanaryReport, renderPolicyCanaryMarkdown } = await import("./governor/policyCanary.js");
     const agentId = opts.agent ?? activeAgent(program) ?? "default";
-    const report = generatePolicyCanaryReport(agentId);
+    const report = generatePolicyCanaryReport(agentId, process.cwd());
     console.log(renderPolicyCanaryMarkdown(report));
   });
 
@@ -16010,7 +16010,7 @@ program
   .action(async (opts: { agent?: string }) => {
     const { detectGovernanceDrift } = await import("./governor/policyCanary.js");
     const agentId = opts.agent ?? activeAgent(program) ?? "default";
-    const result = detectGovernanceDrift(agentId);
+    const result = detectGovernanceDrift(agentId, process.cwd());
     if (!result.drifted) {
       console.log(chalk.green("No governance drift detected."));
     } else {
