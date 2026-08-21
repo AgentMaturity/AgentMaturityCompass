@@ -18848,7 +18848,7 @@ program
       name: opts.name,
       description: opts.description || `${opts.kind} experiment on ${opts.model}`,
       modelId: opts.model,
-    });
+    }, process.cwd());
     console.log(chalk.green(`Experiment created: ${experiment.experimentId}`));
     console.log(`  Kind: ${experiment.kind} | Model: ${experiment.modelId} | Probes: ${experiment.probes.length}`);
     console.log(chalk.yellow(`  Boundary: ${experiment.boundaryMarker}`));
@@ -18920,7 +18920,7 @@ program
   .option("--kind <kind>", "filter by experiment kind")
   .action(async (opts: { kind?: string }) => {
     const lab = await import("./lab/cognitionLab.js");
-    const exps = lab.listLabExperiments(opts.kind as never);
+    const exps = lab.listLabExperiments(opts.kind as never, process.cwd());
     if (exps.length === 0) {
       console.log(chalk.yellow("No lab experiments found."));
       return;
@@ -19017,7 +19017,7 @@ program
       response: "",
       justification: opts.justification,
       reportedBy: opts.reporter,
-    });
+    }, process.cwd());
     console.log(chalk.green(`FP report submitted: ${report.reportId}`));
   });
 
@@ -19032,7 +19032,7 @@ program
     const result = fp.resolveFPReport(opts.id, {
       status: opts.status as "confirmed" | "rejected",
       reason: opts.reason,
-    });
+    }, process.cwd());
     if (!result) {
       console.log(chalk.red("Report not found or already resolved."));
       return;
@@ -19050,7 +19050,7 @@ program
     const reports = fp.listFPReports({
       packId: opts.pack,
       status: opts.status as "open" | "confirmed" | "rejected" | undefined,
-    });
+    }, process.cwd());
     if (reports.length === 0) {
       console.log(chalk.green("No false positive reports found."));
       return;
@@ -19068,7 +19068,7 @@ program
   .option("--pack <id>", "filter by pack ID")
   .action(async (opts: { pack?: string }) => {
     const fp = await import("./assurance/falsePositiveTracker.js");
-    const summaries = fp.computeFPCostSummary(opts.pack);
+    const summaries = fp.computeFPCostSummary(opts.pack, process.cwd());
     if (summaries.length === 0) {
       console.log(chalk.green("No FP cost data available."));
       return;

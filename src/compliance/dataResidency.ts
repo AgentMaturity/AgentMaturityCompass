@@ -15,7 +15,17 @@
 
 import { randomUUID } from "node:crypto";
 import { sha256Hex } from "../utils/hash.js";
-import { saveResidencyRecord, loadResidencyRecords, updateResidencyRecord } from "./dataResidencyStore.js";
+import {
+  saveWorkspaceRecord,
+  loadWorkspaceRecords,
+  updateWorkspaceRecord
+} from "../storage/workspaceRecordStore.js";
+
+/** Where each residency register lives under .amc/. */
+const RESIDENCY_AREA = ["compliance", "residency"];
+const POLICIES_AT = { area: RESIDENCY_AREA, kind: "policies" };
+const TENANTS_AT = { area: RESIDENCY_AREA, kind: "tenants" };
+const LEGAL_HOLDS_AT = { area: RESIDENCY_AREA, kind: "legal-holds" };
 
 // ---------------------------------------------------------------------------
 // Types
@@ -200,13 +210,13 @@ export function createResidencyPolicy(opts: {
   policy.policyHash = sha256Hex(JSON.stringify({ ...policy, policyHash: "" }));
   policies.push(policy);
   if (workspace) {
-    saveResidencyRecord(workspace, "policies", policy.policyId, { ...policy }, policy.createdTs);
+    saveWorkspaceRecord(workspace, POLICIES_AT, policy.policyId, { ...policy }, policy.createdTs);
   }
   return policy;
 }
 
 export function getResidencyPolicies(workspace?: string): ResidencyPolicy[] {
-  return mergeById(policies, workspace ? loadResidencyRecords<ResidencyPolicy>(workspace, "policies") : [], (p) => p.policyId);
+  return mergeById(policies, workspace ? loadWorkspaceRecords<ResidencyPolicy>(workspace, POLICIES_AT) : [], (p) => p.policyId);
 }
 
 export function getResidencyPolicy(policyId: string, workspace?: string): ResidencyPolicy | null {
@@ -247,13 +257,13 @@ export function registerTenant(opts: {
   };
   tenants.push(boundary);
   if (workspace) {
-    saveResidencyRecord(workspace, "tenants", boundary.tenantId, { ...boundary }, boundary.createdTs);
+    saveWorkspaceRecord(workspace, TENANTS_AT, boundary.tenantId, { ...boundary }, boundary.createdTs);
   }
   return boundary;
 }
 
 export function getTenants(workspace?: string): TenantBoundary[] {
-  return mergeById(tenants, workspace ? loadResidencyRecords<TenantBoundary>(workspace, "tenants") : [], (t) => t.tenantId);
+  return mergeById(tenants, workspace ? loadWorkspaceRecords<TenantBoundary>(workspace, TENANTS_AT) : [], (t) => t.tenantId);
 }
 
 export function getTenant(tenantId: string, workspace?: string): TenantBoundary | null {
@@ -415,7 +425,7 @@ export function issueLegalHold(opts: {
   if (workspace) {
     // A legal hold that silently disappears is spoliation-relevant, so a hold
     // that cannot be written must not report success.
-    saveResidencyRecord(workspace, "legal-holds", hold.holdId, { ...hold }, hold.issuedTs);
+    saveWorkspaceRecord(workspace, LEGAL_HOLDS_AT, hold.holdId, { ...hold }, hold.issuedTs);
   }
   return hold;
 }
@@ -426,7 +436,7 @@ export function issueLegalHold(opts: {
 export function releaseLegalHold(holdId: string, workspace?: string): boolean {
   const live = legalHolds.find((h) => h.holdId === holdId);
   const stored = workspace
-    ? loadResidencyRecords<LegalHold>(workspace, "legal-holds").find((h) => h.holdId === holdId)
+    ? loadWorkspaceRecords<LegalHold>(workspace, LEGAL_HOLDS_AT).find((h) => h.holdId === holdId)
     : undefined;
   const hold = live ?? stored;
   if (!hold || !hold.active) return false;
@@ -435,7 +445,7 @@ export function releaseLegalHold(holdId: string, workspace?: string): boolean {
   if (workspace) {
     // The release is itself a record: rewrite the hold with active:false so a
     // later process sees the release rather than the original hold.
-    updateResidencyRecord(workspace, "legal-holds", hold.holdId, { ...hold, active: false }, Date.now());
+    updateWorkspaceRecord(workspace, LEGAL_HOLDS_AT, hold.holdId, { ...hold, active: false }, Date.now());
   }
   return true;
 }
@@ -446,7 +456,7 @@ export function releaseLegalHold(holdId: string, workspace?: string): boolean {
 export function getActiveLegalHolds(tenantId?: string, workspace?: string): LegalHold[] {
   const all = mergeById(
     legalHolds,
-    workspace ? loadResidencyRecords<LegalHold>(workspace, "legal-holds") : [],
+    workspace ? loadWorkspaceRecords<LegalHold>(workspace, LEGAL_HOLDS_AT) : [],
     (h) => h.holdId
   );
   return all.filter((h) => h.active && (!tenantId || h.tenantId === tenantId));

@@ -14,6 +14,14 @@
 
 import { randomUUID } from "node:crypto";
 import { sha256Hex } from "../utils/hash.js";
+import {
+  saveWorkspaceRecord,
+  loadWorkspaceRecords,
+  updateWorkspaceRecord
+} from "../storage/workspaceRecordStore.js";
+
+/** Where false-positive reports live under .amc/. */
+const FP_REPORTS_AT = { area: ["assurance"], kind: "false-positives" };
 
 // ---------------------------------------------------------------------------
 // Types
@@ -90,6 +98,19 @@ export interface FPTuningReport {
 // In-memory state
 // ---------------------------------------------------------------------------
 
+/**
+ * In-process cache over the durable store.
+ *
+ * This array was the only home for FP reports, so `amc fp-submit` handed back
+ * a report ID that `amc fp-list`, `fp-resolve` and `fp-cost` could never find:
+ *
+ *   $ amc fp-submit --scenario s1 --pack testpack --run run-1 --justification x
+ *   FP report submitted: fp_b94a2b65-e40
+ *   $ amc fp-list
+ *   No false positive reports found.
+ *
+ * Reports given a `workspace` now also live under .amc/assurance/false-positives/.
+ */
 let fpReports: FalsePositiveReport[] = [];
 let costModel: FPCostModel = {
   devMinutesPerFP: 15,
@@ -132,7 +153,7 @@ export function submitFPReport(input: {
   response: string;
   justification: string;
   reportedBy: string;
-}): FalsePositiveReport {
+}, workspace?: string): FalsePositiveReport {
   const report: FalsePositiveReport = {
     reportId: `fp_${randomUUID().slice(0, 12)}`,
     scenarioId: input.scenarioId,
@@ -145,30 +166,50 @@ export function submitFPReport(input: {
     status: "open",
   };
   fpReports.push(report);
+  if (workspace) {
+    saveWorkspaceRecord(workspace, FP_REPORTS_AT, report.reportId, { ...report }, report.ts);
+  }
   return report;
 }
 
 export function resolveFPReport(
   reportId: string,
-  resolution: { status: "confirmed" | "rejected"; reason: string }
+  resolution: { status: "confirmed" | "rejected"; reason: string },
+  workspace?: string
 ): FalsePositiveReport | null {
-  const report = fpReports.find((r) => r.reportId === reportId);
+  const live = fpReports.find((r) => r.reportId === reportId);
+  const report = live ?? allFPReports(workspace).find((r) => r.reportId === reportId);
   if (!report || report.status !== "open") return null;
   report.status = resolution.status;
   report.resolution = resolution.reason;
+  if (live) {
+    live.status = resolution.status;
+    live.resolution = resolution.reason;
+  }
+  if (workspace) {
+    updateWorkspaceRecord(workspace, FP_REPORTS_AT, report.reportId, { ...report }, Date.now());
+  }
   return { ...report };
 }
 
-export function getFPReport(reportId: string): FalsePositiveReport | null {
-  return fpReports.find((r) => r.reportId === reportId) ?? null;
+/** Live reports plus any persisted by an earlier process, deduped by id. */
+function allFPReports(workspace?: string): FalsePositiveReport[] {
+  if (!workspace) return [...fpReports];
+  const stored = loadWorkspaceRecords<FalsePositiveReport>(workspace, FP_REPORTS_AT);
+  const seen = new Set(fpReports.map((r) => r.reportId));
+  return [...fpReports, ...stored.filter((r) => !seen.has(r.reportId))];
+}
+
+export function getFPReport(reportId: string, workspace?: string): FalsePositiveReport | null {
+  return allFPReports(workspace).find((r) => r.reportId === reportId) ?? null;
 }
 
 export function listFPReports(filters?: {
   packId?: string;
   scenarioId?: string;
   status?: "open" | "confirmed" | "rejected";
-}): FalsePositiveReport[] {
-  let results = [...fpReports];
+}, workspace?: string): FalsePositiveReport[] {
+  let results = allFPReports(workspace);
   if (filters?.packId) {
     results = results.filter((r) => r.packId === filters.packId);
   }
@@ -185,10 +226,10 @@ export function listFPReports(filters?: {
 // Cost computation
 // ---------------------------------------------------------------------------
 
-export function computeFPCostSummary(packId?: string): FPCostSummary[] {
+export function computeFPCostSummary(packId?: string, workspace?: string): FPCostSummary[] {
   // Group by pack
   const byPack = new Map<string, FalsePositiveReport[]>();
-  for (const report of fpReports) {
+  for (const report of allFPReports(workspace)) {
     if (packId && report.packId !== packId) continue;
     const existing = byPack.get(report.packId) ?? [];
     existing.push(report);

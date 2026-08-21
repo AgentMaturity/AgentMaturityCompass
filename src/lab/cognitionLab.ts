@@ -14,6 +14,14 @@
 
 import { randomUUID } from "node:crypto";
 import { sha256Hex } from "../utils/hash.js";
+import {
+  saveWorkspaceRecord,
+  loadWorkspaceRecords,
+  updateWorkspaceRecord
+} from "../storage/workspaceRecordStore.js";
+
+/** Where lab experiments live under .amc/. */
+const EXPERIMENTS_AT = { area: ["lab"], kind: "experiments" };
 
 // ---------------------------------------------------------------------------
 // Types
@@ -128,6 +136,19 @@ export interface ModelSignalImport {
 // In-memory state
 // ---------------------------------------------------------------------------
 
+/**
+ * In-process cache over the durable store.
+ *
+ * These arrays were the only home for lab state, so `amc lab-create` returned
+ * an experiment ID that no other lab-* command could resolve:
+ *
+ *   $ amc lab-create --kind custom --name exp1 --model m1
+ *   Experiment created: lab_9f0af681-598
+ *   $ amc lab-list
+ *   No lab experiments found.
+ *
+ * Anything given a `workspace` now also lives under .amc/lab/.
+ */
 let experiments: LabExperiment[] = [];
 let probeResults: LabProbeResult[] = [];
 let signalImports: ModelSignalImport[] = [];
@@ -282,7 +303,7 @@ export function createLabExperiment(opts: {
   parameters?: Record<string, string | number | boolean>;
   probes?: LabProbe[];
   boundaryMarker?: LabBoundaryMarker;
-}): LabExperiment {
+}, workspace?: string): LabExperiment {
   const template = getLabTemplates().find((t) => t.kind === opts.kind);
   const probes = opts.probes ?? template?.defaultProbes ?? [];
 
@@ -302,26 +323,55 @@ export function createLabExperiment(opts: {
   };
 
   experiments.push(experiment);
+  if (workspace) {
+    saveWorkspaceRecord(workspace, EXPERIMENTS_AT, experiment.experimentId, { ...experiment }, experiment.createdTs);
+  }
   return experiment;
 }
 
-export function getLabExperiment(experimentId: string): LabExperiment | null {
-  return experiments.find((e) => e.experimentId === experimentId) ?? null;
+/** Live experiments plus any persisted by an earlier process, deduped by id. */
+function allExperiments(workspace?: string): LabExperiment[] {
+  if (!workspace) return [...experiments];
+  const stored = loadWorkspaceRecords<LabExperiment>(workspace, EXPERIMENTS_AT);
+  const seen = new Set(experiments.map((e) => e.experimentId));
+  return [...experiments, ...stored.filter((e) => !seen.has(e.experimentId))];
 }
 
-export function listLabExperiments(kind?: LabExperimentKind): LabExperiment[] {
-  return kind ? experiments.filter((e) => e.kind === kind) : [...experiments];
+export function getLabExperiment(experimentId: string, workspace?: string): LabExperiment | null {
+  return allExperiments(workspace).find((e) => e.experimentId === experimentId) ?? null;
+}
+
+export function listLabExperiments(kind?: LabExperimentKind, workspace?: string): LabExperiment[] {
+  const all = allExperiments(workspace);
+  return kind ? all.filter((e) => e.kind === kind) : all;
+}
+
+/** Applies a status transition in memory and in the store. */
+function transitionExperiment(
+  experimentId: string,
+  allowedFrom: LabExperiment["status"][],
+  apply: (experiment: LabExperiment) => void,
+  workspace?: string
+): LabExperiment | null {
+  const live = experiments.find((e) => e.experimentId === experimentId);
+  const experiment = live ?? allExperiments(workspace).find((e) => e.experimentId === experimentId);
+  if (!experiment || !allowedFrom.includes(experiment.status)) return null;
+  apply(experiment);
+  if (live && live !== experiment) apply(live);
+  if (workspace) {
+    updateWorkspaceRecord(workspace, EXPERIMENTS_AT, experiment.experimentId, { ...experiment }, Date.now());
+  }
+  return experiment;
 }
 
 /**
  * Start a lab experiment (transition from draft to running).
  */
-export function startLabExperiment(experimentId: string): LabExperiment | null {
-  const experiment = experiments.find((e) => e.experimentId === experimentId);
-  if (!experiment || experiment.status !== "draft") return null;
-  experiment.status = "running";
-  experiment.startedTs = Date.now();
-  return experiment;
+export function startLabExperiment(experimentId: string, workspace?: string): LabExperiment | null {
+  return transitionExperiment(experimentId, ["draft"], (experiment) => {
+    experiment.status = "running";
+    experiment.startedTs = Date.now();
+  }, workspace);
 }
 
 /**
@@ -336,22 +386,20 @@ export function recordLabProbeResult(result: Omit<LabProbeResult, "ts">): LabPro
 /**
  * Complete an experiment.
  */
-export function completeLabExperiment(experimentId: string): LabExperiment | null {
-  const experiment = experiments.find((e) => e.experimentId === experimentId);
-  if (!experiment || experiment.status !== "running") return null;
-  experiment.status = "completed";
-  experiment.completedTs = Date.now();
-  return experiment;
+export function completeLabExperiment(experimentId: string, workspace?: string): LabExperiment | null {
+  return transitionExperiment(experimentId, ["running"], (experiment) => {
+    experiment.status = "completed";
+    experiment.completedTs = Date.now();
+  }, workspace);
 }
 
 /**
  * Cancel an experiment.
  */
-export function cancelLabExperiment(experimentId: string): LabExperiment | null {
-  const experiment = experiments.find((e) => e.experimentId === experimentId);
-  if (!experiment || (experiment.status !== "draft" && experiment.status !== "running")) return null;
-  experiment.status = "cancelled";
-  return experiment;
+export function cancelLabExperiment(experimentId: string, workspace?: string): LabExperiment | null {
+  return transitionExperiment(experimentId, ["draft", "running"], (experiment) => {
+    experiment.status = "cancelled";
+  }, workspace);
 }
 
 // ---------------------------------------------------------------------------

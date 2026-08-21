@@ -1,5 +1,5 @@
 /**
- * Durable store for data-residency configuration.
+ * Durable, signed, hash-chained record store scoped to a workspace.
  *
  * Residency policies, tenant boundaries and legal holds lived only in
  * module-level arrays (`let policies`, `let tenants`, `let legalHolds` in
@@ -28,24 +28,32 @@ import { canonicalize } from "../utils/json.js";
 import { signHexDigest, getPrivateKeyPem } from "../crypto/keys.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 
-/** Record kinds kept under .amc/compliance/residency/. */
-export type ResidencyRecordKind = "policies" | "tenants" | "legal-holds";
+/**
+ * Where a family of records lives, relative to the workspace root.
+ *
+ * e.g. { area: ["compliance", "residency"], kind: "legal-holds" } stores under
+ * .amc/compliance/residency/legal-holds/.
+ */
+export interface RecordLocation {
+  area: string[];
+  kind: string;
+}
 
 /** Chain and signature fields appended to every stored record. */
-export interface ResidencyRecordEnvelope {
+export interface RecordEnvelope {
   prev_record_hash: string;
   record_hash: string;
   signature: string;
   storedTs: number;
 }
 
-function recordDir(workspace: string, kind: ResidencyRecordKind): string {
-  return join(workspace, ".amc", "compliance", "residency", kind);
+function recordDir(workspace: string, at: RecordLocation): string {
+  return join(workspace, ".amc", ...at.area, at.kind);
 }
 
 /** Reads every stored record of one kind. Unreadable files are skipped. */
-export function loadResidencyRecords<T>(workspace: string, kind: ResidencyRecordKind): T[] {
-  const dir = recordDir(workspace, kind);
+export function loadWorkspaceRecords<T>(workspace: string, at: RecordLocation): T[] {
+  const dir = recordDir(workspace, at);
   if (!pathExists(dir)) return [];
   const out: T[] = [];
   for (const file of readdirSync(dir)) {
@@ -59,9 +67,9 @@ export function loadResidencyRecords<T>(workspace: string, kind: ResidencyRecord
   return out;
 }
 
-function lastRecordHash(workspace: string, kind: ResidencyRecordKind): string {
-  const entries = loadResidencyRecords<ResidencyRecordEnvelope>(workspace, kind);
-  if (entries.length === 0) return `GENESIS_${kind.toUpperCase().replace(/-/g, "_")}`;
+function lastRecordHash(workspace: string, at: RecordLocation): string {
+  const entries = loadWorkspaceRecords<RecordEnvelope>(workspace, at);
+  if (entries.length === 0) return `GENESIS_${at.kind.toUpperCase().replace(/-/g, "_")}`;
   const sorted = [...entries].sort((a, b) => (a.storedTs ?? 0) - (b.storedTs ?? 0));
   return sorted[sorted.length - 1]?.record_hash ?? "GENESIS";
 }
@@ -72,14 +80,14 @@ function lastRecordHash(workspace: string, kind: ResidencyRecordKind): string {
  * Throws if the write fails: a residency record that cannot be persisted must
  * not report success, which is the failure this store exists to prevent.
  */
-export function saveResidencyRecord<T extends Record<string, unknown>>(
+export function saveWorkspaceRecord<T extends Record<string, unknown>>(
   workspace: string,
-  kind: ResidencyRecordKind,
+  at: RecordLocation,
   id: string,
   body: T,
   now: number
-): T & ResidencyRecordEnvelope {
-  const prev = lastRecordHash(workspace, kind);
+): T & RecordEnvelope {
+  const prev = lastRecordHash(workspace, at);
   const hash = sha256Hex(canonicalize({ ...body, prev_record_hash: prev }));
   let signature = "unsigned";
   try {
@@ -93,21 +101,21 @@ export function saveResidencyRecord<T extends Record<string, unknown>>(
     record_hash: hash,
     signature,
     storedTs: now
-  } as T & ResidencyRecordEnvelope;
+  } as T & RecordEnvelope;
 
-  const dir = recordDir(workspace, kind);
+  const dir = recordDir(workspace, at);
   ensureDir(dir);
   writeFileAtomic(join(dir, `${id}.json`), JSON.stringify(record, null, 2), 0o644);
   return record;
 }
 
 /** Replaces a stored record in place, keeping its id. Used for hold release. */
-export function updateResidencyRecord<T extends Record<string, unknown>>(
+export function updateWorkspaceRecord<T extends Record<string, unknown>>(
   workspace: string,
-  kind: ResidencyRecordKind,
+  at: RecordLocation,
   id: string,
   body: T,
   now: number
 ): void {
-  saveResidencyRecord(workspace, kind, id, body, now);
+  saveWorkspaceRecord(workspace, at, id, body, now);
 }
