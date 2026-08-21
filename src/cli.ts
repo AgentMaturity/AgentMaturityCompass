@@ -11355,7 +11355,10 @@ cert
   .requiredOption("--agent <id>", "agent ID")
   .requiredOption("--output <path>", "output certificate path (.pdf or .json)")
   .option("--valid-days <n>", "certificate validity period in days", "30")
-  .option("--no-sign", "generate an unsigned preview without vault signing; not verifier-ready", false)
+  // No default here: commander already defaults `sign` to true for a --no-x
+  // flag. Passing `false` made every certificate an unsigned preview, so the
+  // signed path was unreachable no matter what the caller asked for.
+  .option("--no-sign", "generate an unsigned preview without vault signing; not verifier-ready")
   .option("--preview", "alias for --no-sign; generate an unsigned preview", false)
   .option("--badge", "also generate an SVG badge alongside the certificate", false)
   .option("--url", "also generate a shareable verification URL", false)
@@ -11410,14 +11413,53 @@ cert
     }
   });
 
+/**
+ * Reads an AMC trust-certificate envelope when the file is one.
+ *
+ * `amc cert generate` writes a JSON envelope while `amc certify` writes an
+ * .amccert tarball. Both live under the same command group, so verify and
+ * inspect previously failed with "Unrecognized archive format" on a
+ * certificate AMC itself had just produced.
+ */
+function readTrustCertificateEnvelope(
+  filePath: string
+): { type: string; [key: string]: unknown } | null {
+  try {
+    const parsed = JSON.parse(readFileSync(filePath, "utf8")) as { type?: string };
+    return parsed?.type === "amc-trust-certificate"
+      ? (parsed as { type: string; [key: string]: unknown })
+      : null;
+  } catch {
+    // Not JSON — an .amccert bundle, handled by the tarball verifier.
+    return null;
+  }
+}
+
 cert
   .command("verify")
-  .description("Verify certificate bundle offline")
+  .description("Verify any AMC certificate offline (.amccert bundle or trust-certificate JSON)")
   .argument("<file>")
   .option("--revocation <path>", "optional revocation file")
   .action(async (file: string, opts: { revocation?: string }) => {
+    const certPath = resolve(process.cwd(), file);
+
+    const envelope = readTrustCertificateEnvelope(certPath);
+    if (envelope) {
+      const { verifyTrustCertificateEnvelope } = await import("./cert/trustCertificate.js");
+      const verdict = verifyTrustCertificateEnvelope(envelope as never);
+      if (verdict.ok) {
+        console.log(chalk.green("Certificate verification PASSED"));
+        console.log(`certId=${(envelope as { certId?: string }).certId ?? "unknown"}`);
+        console.log(`type=amc-trust-certificate`);
+        return;
+      }
+      console.log(chalk.red("Certificate verification FAILED"));
+      for (const error of verdict.errors) console.log(`- ${error}`);
+      process.exit(1);
+    }
+
     const result = await verifyCertificate({
-      certFile: resolve(process.cwd(), file),
+      certFile: certPath,
       revocationFile: opts.revocation ? resolve(process.cwd(), opts.revocation) : undefined
     });
     if (result.ok) {
@@ -11434,10 +11476,16 @@ cert
 
 cert
   .command("inspect")
-  .description("Inspect certificate bundle contents")
+  .description("Inspect any AMC certificate (.amccert bundle or trust-certificate JSON)")
   .argument("<file>")
   .action((file: string) => {
-    const inspected = inspectCertificate(resolve(process.cwd(), file));
+    const certPath = resolve(process.cwd(), file);
+    const envelope = readTrustCertificateEnvelope(certPath);
+    if (envelope) {
+      console.log(JSON.stringify(envelope, null, 2));
+      return;
+    }
+    const inspected = inspectCertificate(certPath);
     console.log(
       JSON.stringify(
         {
