@@ -1,5 +1,5 @@
 import { readdirSync, readFileSync, statSync } from "node:fs";
-import { basename, join } from "node:path";
+import { basename, join, relative as nodeRelative } from "node:path";
 import { z } from "zod";
 import { canonicalize } from "../utils/json.js";
 import { pathExists, writeFileAtomic } from "../utils/fs.js";
@@ -86,7 +86,12 @@ function collectFiles(rootDir: string): string[] {
 }
 
 function scanFile(fullPath: string, rootDir: string, findings: SecretScanReport["findings"]): void {
-  const relative = fullPath.slice(rootDir.length + 1).replace(/\\/g, "/");
+  // `join()` normalises the root while walking ("./qa" becomes "qa"), so
+  // slicing rootDir.length + 1 off the full path ate real characters whenever
+  // the caller passed a "./" prefix or a trailing slash: a secret in ".env"
+  // was reported as living in "nv". A security finding that names a file which
+  // does not exist cannot be acted on. `relative()` normalises both sides.
+  const relative = nodeRelative(rootDir, fullPath).replace(/\\/g, "/");
   const fileName = basename(fullPath);
   for (const re of SECRET_FILENAMES) {
     if (re.test(fileName)) {
