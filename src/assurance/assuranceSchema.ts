@@ -6,7 +6,26 @@ export type AssuranceScopeType = z.infer<typeof assuranceScopeTypeSchema>;
 export const assuranceStatusSchema = z.enum(["PASS", "FAIL", "INSUFFICIENT_EVIDENCE", "ERROR"]);
 export type AssuranceStatus = z.infer<typeof assuranceStatusSchema>;
 
-export const assurancePackIdSchema = z.enum([
+/**
+ * Identifier of an assurance pack.
+ *
+ * This was a seven-value enum naming the original v1 packs, while the registry
+ * ships 140+. Any run, finding or certificate referencing a pack outside those
+ * seven failed schema validation, so v1 artifacts could not be written for
+ * almost every pack AMC actually runs.
+ *
+ * Pack ids are registry data, not a closed set: validated as a non-empty
+ * identifier here, with membership checked against the live registry by the
+ * code that resolves a pack.
+ */
+export const assurancePackIdSchema = z
+  .string()
+  .min(1)
+  .regex(/^[a-zA-Z0-9_-]+$/, "pack id must be alphanumeric with - or _");
+export type AssurancePackId = z.infer<typeof assurancePackIdSchema>;
+
+/** The seven packs the v1 schema originally enumerated, kept for reference. */
+export const LEGACY_V1_PACK_IDS = [
   "injection",
   "exfiltration",
   "toolMisuse",
@@ -14,8 +33,7 @@ export const assurancePackIdSchema = z.enum([
   "sandboxBoundary",
   "notaryAttestation",
   "context-leakage"
-]);
-export type AssurancePackId = z.infer<typeof assurancePackIdSchema>;
+] as const;
 
 export const assuranceFindingCategorySchema = z.enum([
   "INJECTION_RESILIENCE",

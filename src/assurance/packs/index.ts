@@ -88,6 +88,7 @@ import { nvidiaAegisPack } from "./nvidia-aegis-pack.js";
 import { cyberSecEvalPack } from "./cyberseceval-pack.js";
 import { beaverTailsPack } from "./beavertails-pack.js";
 import { doNotAnswerPack } from "./donotanswer-pack.js";
+import { multiTurnDeepEvalPack } from "./multiTurnDeepEvalPack.js";
 import { toxicChatPack } from "./toxic-chat-pack.js";
 import { xsTestPack } from "./xstest-pack.js";
 // Research Gap Packs (March 2026 papers)
@@ -205,6 +206,7 @@ const assurancePacks: AssurancePackDefinition[] = [
   cyberSecEvalPack,
   beaverTailsPack,
   doNotAnswerPack,
+  multiTurnDeepEvalPack,
   toxicChatPack,
   xsTestPack,
   // Research Gap Packs (March 2026 papers)

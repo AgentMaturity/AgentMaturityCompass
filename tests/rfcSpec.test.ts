@@ -31,7 +31,7 @@ import {
   createAgentClaim,
   type TrustPolicyRule,
 } from "../src/score/crossAgentTrust.js";
-import { assurancePackIdSchema } from "../src/assurance/assuranceSchema.js";
+import { LEGACY_V1_PACK_IDS, assurancePackIdSchema } from "../src/assurance/assuranceSchema.js";
 import type { LayerName } from "../src/types.js";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -299,24 +299,26 @@ describe("RFC Section 5 — Assurance Pack IDs", () => {
   const rfc = readDoc(RFC_PATH);
 
   it("all 7 core pack IDs are in the RFC", () => {
-    const corePackIds = assurancePackIdSchema.options;
+    // Pack ids are registry data now, not a seven-value enum (G5-11): the
+    // schema validates the identifier shape and the registry owns membership.
+    const corePackIds = LEGACY_V1_PACK_IDS;
     for (const packId of corePackIds) {
       expect(rfc).toContain(`"${packId}"`);
     }
   });
 
   it("injection pack is in the schema and RFC", () => {
-    expect(assurancePackIdSchema.options).toContain("injection");
+    expect(LEGACY_V1_PACK_IDS).toContain("injection");
     expect(rfc).toContain('"injection"');
   });
 
   it("exfiltration pack is in the schema and RFC", () => {
-    expect(assurancePackIdSchema.options).toContain("exfiltration");
+    expect(LEGACY_V1_PACK_IDS).toContain("exfiltration");
     expect(rfc).toContain('"exfiltration"');
   });
 
   it("truthfulness pack is in the schema and RFC", () => {
-    expect(assurancePackIdSchema.options).toContain("truthfulness");
+    expect(LEGACY_V1_PACK_IDS).toContain("truthfulness");
     expect(rfc).toContain('"truthfulness"');
   });
 });

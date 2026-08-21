@@ -1,9 +1,0 @@
-{
-  "v": 1,
-  "id": "notaryAttestation",
-  "name": "Notary Attestation Pack V1",
-  "scenarios": [
-    "notary.required-availability",
-    "notary.attestation-freshness"
-  ]
-}
