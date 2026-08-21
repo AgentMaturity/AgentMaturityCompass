@@ -2,6 +2,8 @@
  * Formal maturity specification — M(a,d,t) = Σ w_i · E_i · decay(t - t_i)
  */
 
+import { EVIDENCE_KIND_WEIGHTS, evidenceDecay } from './trustWeights.js';
+
 export type MaturityLevel = 'L0' | 'L1' | 'L2' | 'L3' | 'L4' | 'L5';
 
 export interface EvidenceArtifact {
@@ -24,17 +26,11 @@ export interface MaturityScore {
   dimensionScores: Record<string, DimensionScore>;
 }
 
-const TRUST_WEIGHTS: Record<EvidenceArtifact['kind'], number> = {
-  observed: 1.0,
-  attested: 0.8,
-  self_reported: 0.4,
-};
+// Weights and decay come from the canonical table; three modules previously
+// disagreed about SELF_REPORTED. See ./trustWeights.ts.
+const TRUST_WEIGHTS = EVIDENCE_KIND_WEIGHTS;
 
-const HALF_LIFE_MS = 90 * 24 * 60 * 60 * 1000; // 90 days
-
-export function evidenceDecay(ageMs: number): number {
-  return Math.exp(-0.693 * ageMs / HALF_LIFE_MS);
-}
+export { evidenceDecay };
 
 function scoreToLevel(score: number): MaturityLevel {
   if (score >= 0.9) return 'L5';

@@ -45,6 +45,29 @@ export function startAssuranceSession(params: {
   return sessionId;
 }
 
+
+/**
+ * Renders scenario text for the evidence ledger under the assurance policy.
+ *
+ * The policy schema declares storeRawPrompts as a literal false and
+ * storeOnlyHashesAndRefs as a literal true — not a default but a guarantee the
+ * product makes. The writers below nonetheless put the full prompt and the
+ * agent's full response into the ledger payload, so a scan of a production
+ * agent persisted whatever it happened to say, including anything sensitive it
+ * had been given.
+ *
+ * The digest keeps the evidence verifiable: a caller holding the original text
+ * can prove it produced this record, without the record itself carrying it.
+ */
+function redactedScenarioPayload(text: string): string {
+  return JSON.stringify({
+    redacted: true,
+    reason: "assurance policy: storeOnlyHashesAndRefs",
+    sha256: sha256Hex(Buffer.from(text, "utf8")),
+    bytes: Buffer.byteLength(text, "utf8")
+  });
+}
+
 export function writeScenarioPrompt(params: {
   ledger: Ledger;
   sessionId: string;
@@ -59,8 +82,8 @@ export function writeScenarioPrompt(params: {
     sessionId: params.sessionId,
     runtime: params.runtime,
     eventType: "stdin",
-    payload: params.prompt,
-    payloadExt: "txt",
+    payload: redactedScenarioPayload(params.prompt),
+    payloadExt: "json",
     meta: {
       source: "assurance",
       packId: params.packId,
@@ -86,8 +109,8 @@ export function writeScenarioResponse(params: {
     sessionId: params.sessionId,
     runtime: params.runtime,
     eventType: "stdout",
-    payload: params.response,
-    payloadExt: "txt",
+    payload: redactedScenarioPayload(params.response),
+    payloadExt: "json",
     meta: {
       source: "assurance",
       packId: params.packId,

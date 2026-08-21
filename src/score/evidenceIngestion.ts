@@ -24,12 +24,10 @@
 
 export type TrustTier = "OBSERVED" | "ATTESTED" | "SELF_REPORTED" | "UNVERIFIED";
 
-export const TRUST_WEIGHTS: Record<TrustTier, number> = {
-  OBSERVED: 1.0,
-  ATTESTED: 0.8,
-  SELF_REPORTED: 0.5,
-  UNVERIFIED: 0.3,
-};
+// SELF_REPORTED was 0.5 here and 0.4 in the two other tables, so identical
+// evidence scored differently by code path. The published methodology says 0.4.
+import { TRUST_WEIGHTS } from "./trustWeights.js";
+export { TRUST_WEIGHTS };
 
 export type IngestFormat = "openai-evals" | "langsmith" | "custom" | "mlflow" | "weights-biases";
 

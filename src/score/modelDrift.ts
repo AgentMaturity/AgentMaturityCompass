@@ -12,6 +12,7 @@
  */
 
 import type { EvidenceArtifact } from './formalSpec.js';
+import { EVIDENCE_KIND_WEIGHTS } from "./trustWeights.js";
 
 /* ── Types ────────────────────────────────────────────────────────── */
 
@@ -200,7 +201,7 @@ export function buildSnapshot(
   let totalTrust = 0;
 
   const trustWeights: Record<EvidenceArtifact['kind'], number> = {
-    observed: 1.0, attested: 0.8, self_reported: 0.4,
+    ...EVIDENCE_KIND_WEIGHTS,
   };
 
   // Group by dimension (qid prefix)
