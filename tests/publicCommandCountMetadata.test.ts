@@ -72,8 +72,20 @@ describe("public command-count and npm metadata claims", () => {
       const body = readProjectFile(path);
       expect(body, path).toContain(CURRENT_COMMAND_COUNT);
 
+      // A stale command count only matters where the number is presented AS a
+      // command count. Matching the bare digits collided with an unrelated
+      // measurement: the test-file count reached 1,150, which was on this list
+      // as an old command count, so a true statement failed the check. Same
+      // shape as the 8,538 collision fixed in publicStatsDrift.
       for (const pattern of STALE_COMMAND_COUNT_PATTERNS) {
-        expect(body, `${path} contains stale command count ${pattern}`).not.toMatch(pattern);
+        const inCommandContext = new RegExp(
+          `${pattern.source}[^.\\n]{0,40}(?:CLI )?commands?(?: paths?)?\\b|` +
+            `\\b(?:CLI |command )[^.\\n]{0,40}${pattern.source}`,
+          "i"
+        );
+        expect(body, `${path} contains stale command count ${pattern}`).not.toMatch(
+          inCommandContext
+        );
       }
     }
   });

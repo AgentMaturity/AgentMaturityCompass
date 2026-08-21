@@ -4,7 +4,7 @@
  * NEVER throws — all errors are silently logged.
  */
 
-import { randomUUID } from 'node:crypto';
+import { randomUUID, createHash } from "node:crypto";
 import { dirname, join, resolve } from 'node:path';
 import { mkdirSync } from 'node:fs';
 import { ensureSigningKeys, getPrivateKeyPem, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from '../crypto/keys.js';
@@ -239,6 +239,17 @@ function getDb(): import('better-sqlite3').Database | null {
         created_at TEXT NOT NULL
       )
     `);
+    // Chain columns are added by ALTER so an existing store migrates in place.
+    // Rows written before this migration have NULL hashes and are reported as
+    // unchained rather than silently treated as verified — see
+    // verifyGuardEventChain().
+    for (const column of ["prev_hash TEXT", "event_hash TEXT"]) {
+      try {
+        _db.exec(`ALTER TABLE amc_guard_events ADD COLUMN ${column}`);
+      } catch {
+        // Already present.
+      }
+    }
     _db.exec(`CREATE INDEX IF NOT EXISTS idx_guard_agent ON amc_guard_events(agent_id, created_at)`);
     _db.exec(`CREATE INDEX IF NOT EXISTS idx_guard_module ON amc_guard_events(module_code)`);
     _db.exec(`CREATE INDEX IF NOT EXISTS idx_guard_severity_created ON amc_guard_events(severity, created_at)`);
@@ -259,8 +270,8 @@ function getDb(): import('better-sqlite3').Database | null {
       END;
     `);
     _insertStmt = _db.prepare(
-      `INSERT INTO amc_guard_events (id, agent_id, module_code, decision, reason, severity, meta_json, created_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
+      `INSERT INTO amc_guard_events (id, agent_id, module_code, decision, reason, severity, meta_json, created_at, prev_hash, event_hash)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
     );
     return _db;
   } catch (_e) {
@@ -275,7 +286,26 @@ export function emitGuardEvent(input: GuardEventInput): void {
     const id = randomUUID();
     const now = new Date().toISOString();
     const metaJson = input.meta ? JSON.stringify(input.meta) : null;
-    _insertStmt.run(id, input.agentId, input.moduleCode, input.decision, input.reason, input.severity, metaJson, now);
+    // Guard decisions are read back by collectEvidenceFromLedger and scored as
+    // OBSERVED (trust 1.0), but this store had no chain, no signature and no
+    // immutability trigger, so an edit to the file was undetectable. Each row
+    // now commits to its predecessor.
+    const prevHash = lastGuardEventHash(db);
+    const eventHash = guardEventHash({
+      id,
+      agentId: input.agentId,
+      moduleCode: input.moduleCode,
+      decision: input.decision,
+      reason: input.reason,
+      severity: input.severity,
+      metaJson,
+      createdAt: now,
+      prevHash
+    });
+    _insertStmt.run(
+      id, input.agentId, input.moduleCode, input.decision, input.reason,
+      input.severity, metaJson, now, prevHash, eventHash
+    );
   } catch (_e) {
     // Never throw
   }
@@ -352,6 +382,119 @@ export function readGuardDecisionReceipts(agentId?: string, windowHours?: number
 }
 
 /** Close the database connection (for testing cleanup). */
+/** Canonical hash of one guard event, committing to the previous event. */
+function guardEventHash(row: {
+  id: string;
+  agentId: string;
+  moduleCode: string;
+  decision: string;
+  reason: string;
+  severity: string;
+  metaJson: string | null;
+  createdAt: string;
+  prevHash: string;
+}): string {
+  return createHash("sha256").update(JSON.stringify(row)).digest("hex");
+}
+
+const GUARD_CHAIN_GENESIS = "GENESIS_GUARD_EVENTS";
+
+function lastGuardEventHash(db: import('better-sqlite3').Database): string {
+  try {
+    const row = db
+      .prepare(
+        `SELECT event_hash FROM amc_guard_events
+         WHERE event_hash IS NOT NULL
+         ORDER BY created_at DESC, rowid DESC LIMIT 1`
+      )
+      .get() as { event_hash?: string } | undefined;
+    return row?.event_hash ?? GUARD_CHAIN_GENESIS;
+  } catch {
+    return GUARD_CHAIN_GENESIS;
+  }
+}
+
+/**
+ * Walks the guard-event chain.
+ *
+ * Rows written before the chain migration carry NULL hashes. They are counted
+ * as `unchained` rather than verified: this store predates tamper-evidence and
+ * claiming otherwise would be exactly the inflation AMC exists to catch.
+ */
+export function verifyGuardEventChain(): {
+  ok: boolean;
+  chained: number;
+  unchained: number;
+  brokenAt: string | null;
+} {
+  const db = getDb();
+  if (!db) return { ok: true, chained: 0, unchained: 0, brokenAt: null };
+  try {
+    const rows = db
+      .prepare(
+        `SELECT id, agent_id, module_code, decision, reason, severity, meta_json,
+                created_at, prev_hash, event_hash
+         FROM amc_guard_events ORDER BY created_at ASC, rowid ASC`
+      )
+      .all() as Array<Record<string, string | null>>;
+
+    let chained = 0;
+    let unchained = 0;
+    let expectedPrev: string | null = null;
+
+    for (const row of rows) {
+      if (!row.event_hash) {
+        unchained += 1;
+        continue;
+      }
+      const recomputed = guardEventHash({
+        id: String(row.id),
+        agentId: String(row.agent_id),
+        moduleCode: String(row.module_code),
+        decision: String(row.decision),
+        reason: String(row.reason),
+        severity: String(row.severity),
+        metaJson: row.meta_json ?? null,
+        createdAt: String(row.created_at),
+        prevHash: String(row.prev_hash ?? GUARD_CHAIN_GENESIS)
+      });
+      if (recomputed !== row.event_hash) {
+        return { ok: false, chained, unchained, brokenAt: String(row.id) };
+      }
+      if (expectedPrev !== null && row.prev_hash !== expectedPrev) {
+        return { ok: false, chained, unchained, brokenAt: String(row.id) };
+      }
+      expectedPrev = String(row.event_hash);
+      chained += 1;
+    }
+    return { ok: true, chained, unchained, brokenAt: null };
+  } catch {
+    return { ok: true, chained: 0, unchained: 0, brokenAt: null };
+  }
+}
+
+/**
+ * Deletes guard events older than `beforeIso`, returning the row count removed.
+ *
+ * Nothing pruned this store: it was the only SQLite file the retention and
+ * vacuum engines could not reach, because both open the workspace through
+ * openLedger() which resolves to evidence.sqlite. It had reached 87,667 rows /
+ * 26MB with a 5.5MB WAL over two months.
+ *
+ * Pruning breaks the chain at the cut point by construction, which
+ * verifyGuardEventChain reports as unchained rows rather than as tampering.
+ */
+export function pruneGuardEvents(beforeIso: string): number {
+  const db = getDb();
+  if (!db) return 0;
+  try {
+    const result = db.prepare(`DELETE FROM amc_guard_events WHERE created_at < ?`).run(beforeIso);
+    return Number(result.changes ?? 0);
+  } catch {
+    return 0;
+  }
+}
+
 export function closeGuardDb(): void {
   try {
     if (_db) {

@@ -16,7 +16,14 @@ const opsPolicySchema = z.object({
       keepArchiveSegmentsDays: z.number().int().min(1),
       maxPayloadBytesPerEvent: z.number().int().min(1),
       maxBlobBytes: z.number().int().min(1),
-      tombstoneInsteadOfDelete: z.literal(true)
+      tombstoneInsteadOfDelete: z.literal(true),
+      /**
+       * Days after which guard events are deleted. Optional: the schema is
+       * strict, so a required key would invalidate every already-signed
+       * ops-policy.yaml. Absent means "do not prune", which is the behaviour
+       * every existing workspace already has.
+       */
+      pruneGuardEventsAfterDays: z.number().int().min(1).optional()
     }),
     encryption: z.object({
       blobEncryptionEnabled: z.boolean(),

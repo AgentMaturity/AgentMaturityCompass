@@ -18,11 +18,14 @@ import {
   writeRetentionSegment
 } from "./retentionArchive.js";
 import { runVacuum } from "../maintenance/sqliteMaintenance.js";
+import { pruneGuardEvents } from "../../enforce/evidenceEmitter.js";
 
 export interface RetentionRunResult {
   dryRun: boolean;
   archivedEventCount: number;
   prunedEventCount: number;
+  /** Guard events deleted; 0 unless retention.pruneGuardEventsAfterDays is set. */
+  prunedGuardEventCount: number;
   prunedBlobCount: number;
   segmentId: string | null;
   segmentPath: string | null;
@@ -128,6 +131,15 @@ export function runRetention(params: { workspace: string; dryRun: boolean }): Re
   const policy = loadOpsPolicy(params.workspace);
   const archiveBeforeTs = cutoffTs(policy.opsPolicy.retention.archivePayloadsAfterDays);
   const pruneBeforeTs = cutoffTs(policy.opsPolicy.retention.prunePayloadsAfterDays);
+  // guard_events.sqlite is the one store retention could not reach: it is not
+  // the ledger, and both this engine and the vacuum engine open a workspace via
+  // openLedger(), which resolves to evidence.sqlite. It had grown to 87,667
+  // rows with no prune path of any kind.
+  const guardEventDays = policy.opsPolicy.retention.pruneGuardEventsAfterDays;
+  let prunedGuardEventCount = 0;
+  if (guardEventDays !== undefined && !params.dryRun) {
+    prunedGuardEventCount = pruneGuardEvents(new Date(cutoffTs(guardEventDays)).toISOString());
+  }
   const ledger = openLedger(params.workspace);
   try {
     const eligible = ledger.getRetentionEligibleEvents({
@@ -158,6 +170,7 @@ export function runRetention(params: { workspace: string; dryRun: boolean }): Re
         dryRun: true,
         archivedEventCount: archiveEvents.length,
         prunedEventCount: pruneEvents.length,
+        prunedGuardEventCount,
         prunedBlobCount: 0,
         segmentId,
         segmentPath,
@@ -249,6 +262,7 @@ export function runRetention(params: { workspace: string; dryRun: boolean }): Re
         auditType: "RETENTION_PAYLOAD_PRUNED",
         payload: {
           prunedEventCount: pruneIds.length,
+          prunedGuardEventCount,
           prunedBlobCount
         }
       });
@@ -297,6 +311,7 @@ export function runRetention(params: { workspace: string; dryRun: boolean }): Re
       dryRun: false,
       archivedEventCount: archiveEvents.length,
       prunedEventCount: pruneIds.length,
+      prunedGuardEventCount,
       prunedBlobCount,
       segmentId,
       segmentPath,
