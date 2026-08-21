@@ -1,3 +1,20 @@
+/**
+ * Standalone SCIM 2.0 adapter for embedding AMC in a host application.
+ *
+ * AMC contains two SCIM implementations and it was not obvious which one an
+ * operator should reach for. This one is a self-contained request handler over
+ * a pluggable store (InMemoryScimUserStore ships for tests and prototypes); it
+ * is exported from the package for embedders and is deliberately NOT mounted by
+ * the AMC server.
+ *
+ * The server's own SCIM endpoints live in src/identity/scim/ — scimRoutes.ts
+ * and friends — and are the ones `amc` actually serves. Provisioning against a
+ * running AMC talks to those, not to this module.
+ *
+ * Do not wire this into the server as a second live SCIM surface: two
+ * provisioning paths over the same identities is how directories and local
+ * state silently diverge.
+ */
 import { randomUUID } from "node:crypto";
 import { resolveSsoRole, type EnterpriseRole, type SsoRoleMapping } from "../auth/ssoConfig.js";
 

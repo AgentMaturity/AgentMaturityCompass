@@ -41,6 +41,16 @@ function schemaByName(name: SchemaName): Record<string, unknown> {
     // The published standard is intentionally permissive so third parties can
     // extend it. AMC itself validates against stricter internal zod schemas, so
     // passing this schema does NOT mean an artifact would be accepted by AMC.
+    //
+    // That caveat used to live only in this comment, which no consumer of the
+    // published .schema.json ever sees — and the bundle is signed, so it reads
+    // as an authoritative statement of what AMC requires. It now travels with
+    // the artifact.
+    $comment:
+      "Permissive interchange schema. Validating against this schema does NOT " +
+      "mean AMC would accept the artifact: AMC enforces stricter internal " +
+      "schemas, including field-level constraints this file does not express. " +
+      "Use `amc standard validate` for an authoritative check.",
     additionalProperties: true
   };
   if (name === "amcbench.schema.json") {
