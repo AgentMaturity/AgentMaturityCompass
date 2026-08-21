@@ -15972,7 +15972,8 @@ program
   .action(async (opts: { agent?: string; all: boolean }) => {
     const { getActivePolicyDebt, getExpiredPolicyDebt } = await import("./governor/policyCanary.js");
     const agentId = opts.agent ?? activeAgent(program) ?? "default";
-    const active = getActivePolicyDebt(agentId);
+    // Pass the workspace so waivers persisted by earlier processes are visible.
+    const active = getActivePolicyDebt(agentId, process.cwd());
     console.log(chalk.bold(`Active policy debt for ${agentId}: ${active.length}`));
     for (const d of active) {
       console.log(`  ${d.debtId}: ${d.waivedRequirement} (expires ${new Date(d.expiresTs).toISOString()})`);

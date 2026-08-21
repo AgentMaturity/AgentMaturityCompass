@@ -11,6 +11,7 @@ import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { signHexDigest, getPrivateKeyPem } from "../crypto/keys.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
+import { readdirSync } from "node:fs";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -71,7 +72,6 @@ function debtFilePath(workspace: string, debtId: string): string {
 export function loadAllDebt(workspace: string): PolicyDebtEntry[] {
   const dir = debtDir(workspace);
   if (!pathExists(dir)) return [];
-  const { readdirSync } = require("node:fs") as typeof import("node:fs");
   return readdirSync(dir)
     .filter((f: string) => f.endsWith(".json"))
     .map((f: string) => JSON.parse(readUtf8(join(dir, f))) as PolicyDebtEntry);

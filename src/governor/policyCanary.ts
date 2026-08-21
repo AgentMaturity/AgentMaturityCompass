@@ -17,6 +17,7 @@ import { canonicalize } from "../utils/json.js";
 import { signHexDigest, getPrivateKeyPem } from "../crypto/keys.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { join } from "node:path";
+import { addDebtEntry, loadAllDebt } from "./policyDebt.js";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -501,17 +502,61 @@ export function registerPolicyDebt(
   };
 
   policyDebtRegister.push(entry);
+
+  // Persist through the durable, hash-chained store. This previously lived only
+  // in the module-level array above, so a governance waiver recorded here
+  // vanished when the process exited and neither list command could see it.
+  if (workspace) {
+    try {
+      addDebtEntry(workspace, {
+        type: "waiver",
+        reason: `${params.waivedRequirement}: ${params.justification}`,
+        expiryTs: params.expiresTs,
+        affectedPolicies: [params.waivedRequirement],
+        riskAssessment: "MEDIUM",
+        agentId: params.agentId,
+        createdBy: params.createdBy
+      });
+    } catch (error) {
+      // A waiver that cannot be persisted must not look recorded.
+      throw new Error(
+        `policy debt could not be persisted: ${
+          error instanceof Error ? error.message : String(error)
+        }`
+      );
+    }
+  }
+
   return entry;
 }
 
 /**
  * Get active policy debt entries (not expired).
  */
-export function getActivePolicyDebt(agentId: string): PolicyDebtEntry[] {
+export function getActivePolicyDebt(agentId: string, workspace?: string): PolicyDebtEntry[] {
   const now = Date.now();
-  return policyDebtRegister.filter(
+  const inMemory = policyDebtRegister.filter(
     (d) => d.agentId === agentId && d.active && d.expiresTs > now,
   );
+  if (!workspace) return inMemory;
+
+  // Include waivers persisted by any earlier process.
+  const persisted = loadAllDebt(workspace)
+    .filter((d) => d.agentId === agentId && !d.resolved && d.expiryTs > now)
+    .map((d): PolicyDebtEntry => ({
+      debtId: d.debtId,
+      agentId: d.agentId,
+      waivedRequirement: d.affectedPolicies[0] ?? d.type,
+      justification: d.reason,
+      expiresTs: d.expiryTs,
+      createdTs: d.createdTs,
+      createdBy: d.createdBy,
+      active: true,
+      signature: d.signature
+    }));
+
+  const seen = new Set(inMemory.map((d) => d.debtId));
+  return [...inMemory, ...persisted.filter((d) => !seen.has(d.debtId))];
 }
 
 /**
