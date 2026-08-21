@@ -37,8 +37,16 @@ USER 10001:10001
 
 WORKDIR /workspace
 
-# Auto-generate a vault passphrase if not provided
-ENV AMC_VAULT_PASSPHRASE="amc-docker-default-passphrase"
+# The vault passphrase MUST be supplied at run time.
+#
+# This image previously baked a fixed default, so every container that did not
+# override it encrypted its vault — holding the auditor key that signs evidence
+# and certificates — with a passphrase published in this repository. Anyone with
+# the image could decrypt any such vault.
+#
+# Supply one instead:
+#   docker run -e AMC_VAULT_PASSPHRASE="$(openssl rand -base64 32)" ...
+# or mount a secret and use AMC_VAULT_PASSPHRASE_FILE.
 
 # Health check for Studio mode
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \

@@ -3,7 +3,7 @@ import { join } from "node:path";
 import inquirer from "inquirer";
 import YAML from "yaml";
 import { detectAllRuntimes } from "./runtimes/index.js";
-import { ensureSigningKeys } from "./crypto/keys.js";
+import { ensureSigningKeys, getPrivateKeyPem, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from "./crypto/keys.js";
 import type { AMCConfig, AMCConfigProfileName, RiskTier } from "./types.js";
 import { questionIds } from "./diagnostic/questionBank.js";
 import { createSignedTargetProfile, defaultTargetMapping, saveTargetProfile } from "./targets/targetProfile.js";
@@ -48,6 +48,8 @@ import { initPromptPolicy, promptPolicyPath } from "./prompt/promptPolicyStore.j
 import { assurancePolicyPath, initAssurancePolicy } from "./assurance/assurancePolicyStore.js";
 import { auditPolicyPath, initAuditPolicy } from "./audit/auditPolicyStore.js";
 import { auditMapActivePath, auditMapBuiltinPath, initAuditMaps } from "./audit/auditMapStore.js";
+import { readFileSync } from "node:fs";
+import { signAmcConfig } from "./config/amcConfigSignature.js";
 
 export interface WorkspacePaths {
   agentId: string;
@@ -407,6 +409,9 @@ export function initWorkspace(opts: InitWorkspaceOptions = {}): { workspacePath:
   if (!opts.agentId) {
     ensureDefaultFleetAgent(workspace);
   }
+
+  // Sign the security config so its trustBoundaryMode claim is verifiable.
+  try { signAmcConfig(workspace); } catch { /* vault locked; amc verify --sign-config can sign later */ }
 
   return {
     workspacePath: workspace,
@@ -770,3 +775,5 @@ export async function quickstartWizard(workspace = process.cwd()): Promise<{
     firstRunReport: reportOutput
   };
 }
+
+export { signAmcConfig, verifyAmcConfigSignature } from "./config/amcConfigSignature.js";

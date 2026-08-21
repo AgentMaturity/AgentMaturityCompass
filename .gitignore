@@ -108,3 +108,10 @@ qa/.env
 # Stray artifacts that were committed before these rules existed
 .tmp-*
 test_model.pkl
+
+# Deployment secrets: only the .example templates are tracked, so an operator
+# filling in real values cannot commit them by accident.
+deploy/compose/secrets/*.txt
+!deploy/compose/secrets/*.txt.example
+deploy/k8s/secret.yaml
+!deploy/k8s/secret.example.yaml

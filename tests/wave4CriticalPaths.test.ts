@@ -229,15 +229,23 @@ describe("wave4 critical scoring + verification paths", () => {
         trustBoundaryMode: "shared"
       }
     } as never);
-    const ok = detectTrustBoundaryViolation("/tmp/unused", {
+
+    expect(violated.violated).toBe(true);
+    expect(violated.message).toContain("trust boundary violated");
+  });
+
+  test("an isolated claim from an unsigned config is not accepted", () => {
+    // G6-20: amc.config.yaml was the one root config without a signature, so an
+    // "isolated" trust boundary could be granted by editing plain YAML. The
+    // claim now has to be backed by a signature over the config.
+    const unsignedWorkspace = detectTrustBoundaryViolation("/tmp/unused", {
       security: {
         trustBoundaryMode: "isolated"
       }
     } as never);
 
-    expect(violated.violated).toBe(true);
-    expect(violated.message).toContain("trust boundary violated");
-    expect(ok).toEqual({ violated: false, message: null });
+    expect(unsignedWorkspace.violated).toBe(true);
+    expect(unsignedWorkspace.message).toMatch(/unsigned|signature/i);
   });
 
   test("verifyAllTopReasons returns only top 5 critical failures", () => {

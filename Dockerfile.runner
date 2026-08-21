@@ -55,7 +55,7 @@ RUN amc --help > /dev/null 2>&1
 WORKDIR /workspace
 
 # Default vault passphrase for CI (non-sensitive, deterministic)
-ENV AMC_VAULT_PASSPHRASE="amc-ci-runner-default"
+# The vault passphrase MUST be supplied at run time; see above.
 
 # Drop to non-root for security (CI runners can override with --user root)
 USER 1001:1001

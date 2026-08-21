@@ -52,17 +52,20 @@ services:
       retries: 3
       start_period: 10s
     secrets:
+  # These point at the tracked .example templates so the stack starts out of the
+  # box. For anything real, copy each to the same name without .example (those
+  # are gitignored) and update these paths.
       - amc_vault_passphrase
       - amc_owner_username
       - amc_owner_password
 
 secrets:
   amc_vault_passphrase:
-    file: ./secrets/amc_vault_passphrase.txt
+    file: ./secrets/amc_vault_passphrase.txt.example
   amc_owner_username:
-    file: ./secrets/amc_owner_username.txt
+    file: ./secrets/amc_owner_username.txt.example
   amc_owner_password:
-    file: ./secrets/amc_owner_password.txt
+    file: ./secrets/amc_owner_password.txt.example
 
 volumes:
   amc_data:

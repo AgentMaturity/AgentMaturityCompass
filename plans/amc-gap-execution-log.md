@@ -44,7 +44,7 @@ Gate for every gap: `tsc --noEmit` clean + affected tests pass + real behavior v
 
 ## Progress
 
-**205 of 289 gaps complete — G1 (facades), G2 (dead code), G3 (duplication), G4 (structure), G5 (claim drift).** Every commit gated on `tsc --noEmit` clean + affected tests passing + real behavior verified end-to-end.
+**231 of 289 gaps complete — G1–G6 (facades, dead code, duplication, structure, claim drift, security).** Every commit gated on `tsc --noEmit` clean + affected tests passing + real behavior verified end-to-end.
 
 ## Shared infrastructure built
 
@@ -130,3 +130,20 @@ Gate for every gap: `tsc --noEmit` clean + affected tests pass + real behavior v
 | G5-24/25 doc index | ❌ WITHDRAWN | — | Register wrong: INDEX is a **curated front door** and the docs graph is **intentionally bounded**. Tests proved it; experiments reverted. |
 
 **G5 COMPLETE — published numbers are now generated and CI-gated, not hand-maintained.**
+
+## G6 — Security, supply-chain & secrets (26 gaps) — COMPLETE
+
+| Gap | Status | Commit | Note |
+|---|---|---|---|
+| G6-01 tracked vault blob | ✅ UNTRACKED | `cb6bba21` | **Real vault, 4 Ed25519 private keys, public since 2026-02-17.** Untracked. ⚠️ **History rewrite + passphrase rotation are Sid's calls.** |
+| G6-07 forgeable trust anchor | ✅ DONE | `cb6bba21` | Key history was 0644 + unprotected; **writing one key forged every auditor signature**. Now hash-chained, 0600, doctor-checked. |
+| G6-08 silent notary auto-append | ✅ DONE | `cb6bba21` | Keys now record `source: notary` and warn on admission. |
+| G6-19 unsafe tar (17 sites) | ✅ DONE | `cb6bba21` | All routed through the containment helper; **fixed 2 false positives in the helper itself**, traversal protection pinned by test. |
+| G6-02/25/26 strays | ✅ DONE | `cb6bba21` | Malicious-pickle fixture + 4 temp dumps untracked; `COMPETITIVE_*` pattern fixed. |
+| G6-03/04/05 baked creds | ✅ DONE | `(pending)` | **Docker images baked a published vault passphrase** → now required at runtime. k8s no longer applies `change-me` creds; compose secrets → `.example`. |
+| G6-13/14 curl\|sh installs | ✅ DONE | `(pending)` | Pinned + SHA256-verified in both the action and the consumer template. |
+| G6-20 unsigned security config | ✅ DONE | `(pending)` | `trustBoundaryMode: isolated` was **grantable by editing plain YAML** → now requires a valid signature. |
+| G6-09/10/11/12 crypto | ✅ DONE | (G1) | `amc-default-key` rejected; fake signatures relabeled in G1-30..33. |
+| G6-17 BFG residue / rotation | ⚠️ **NEEDS SID** | — | Residue is local-only (untracked). **Whether the Feb-23 `ANTHROPIC_TOKEN_HINT` was rotated cannot be verified from the repo.** |
+
+**G6 COMPLETE — trust anchor is tamper-evident; secrets untracked. Two items need Sid: key rotation and history rewrite.**

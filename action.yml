@@ -17,7 +17,18 @@ runs:
   steps:
     - name: Install AMC
       shell: bash
-      run: curl -fsSL https://agentmaturity.co/install.sh | sh
+      # Pinned + checksum-verified rather than piping a moving target into a
+      # shell. The previous `curl -fsSL .../install.sh | sh` executed whatever
+      # the site served at that moment, in CI, with repository credentials
+      # available — and this action's own README tells consumers to pin.
+      run: |
+        set -euo pipefail
+        VERSION="1.1.1"
+        BASE="https://github.com/AgentMaturity/AgentMaturityCompass/releases/download/v${VERSION}"
+        curl -fsSL -o /tmp/amc.tgz "${BASE}/agent-maturity-compass-${VERSION}.tgz"
+        curl -fsSL -o /tmp/SHA256SUMS "${BASE}/SHA256SUMS"
+        grep "agent-maturity-compass-${VERSION}.tgz" /tmp/SHA256SUMS | (cd /tmp && sha256sum -c -)
+        npm i -g /tmp/amc.tgz
     - name: Run AMC assessment
       shell: bash
       run: |

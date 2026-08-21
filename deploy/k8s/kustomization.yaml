@@ -2,7 +2,10 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
   - configmap.yaml
-  - secret.yaml
+  # secret.yaml is deliberately NOT listed. It previously was, so
+  # `kubectl apply -k deploy/k8s` deployed the change-me placeholder credentials
+  # verbatim. Copy secret.example.yaml to secret.yaml, fill in real values
+  # (it is gitignored), and add it here or apply it separately.
   - pvc.yaml
   - deployment.yaml
   - service.yaml

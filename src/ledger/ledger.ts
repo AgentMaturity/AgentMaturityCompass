@@ -30,6 +30,8 @@ import { createIncidentStore } from "../incidents/incidentStore.js";
 import type { Incident, CausalRelationship } from "../incidents/incidentTypes.js";
 import { queueEvidenceEventSpan } from "../observability/otelExporter.js";
 import { buildRetentionProofIndex, type RetentionProofIndex } from "../ops/retention/retentionArchive.js";
+import { verifyAmcConfigSignature } from "../config/amcConfigSignature.js";
+
 
 export interface AppendEvidenceInput {
   sessionId: string;
@@ -2362,5 +2364,20 @@ export function detectTrustBoundaryViolation(workspace: string, config: AMCConfi
         "trust boundary violated: runtime and signing keys are not marked isolated (set security.trustBoundaryMode=isolated only when monitor/auditor keys are isolated from evaluated agent)"
     };
   }
+
+  // An "isolated" claim is only worth the signature behind it. amc.config.yaml
+  // was the one root config without one, so this assurance could be granted by
+  // editing plain YAML — exactly the kind of self-asserted claim AMC exists to
+  // reject. An unsigned or tampered config no longer clears the boundary.
+  const signature = verifyAmcConfigSignature(workspace);
+  if (!signature.valid) {
+    return {
+      violated: true,
+      message: signature.signatureExists
+        ? `trust boundary violated: amc.config.yaml signature is not valid (${signature.reason ?? "unknown"})`
+        : "trust boundary violated: amc.config.yaml is unsigned, so its trustBoundaryMode=isolated claim is unverifiable (sign it with: amc verify --sign-config)"
+    };
+  }
+
   return { violated: false, message: null };
 }
