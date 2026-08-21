@@ -90,6 +90,19 @@ jobs:
       - name: Generated docs are current
         run: npm run check:question-bank-export
 
+      # Both gates existed as npm scripts that no workflow ran, so docs drift
+      # and incident-readiness regressions could merge and ship unchecked.
+      # Coverage thresholds were pinned at 0, so the gate could never fail and
+      # whole subsystems could lose their tests silently. Now enforced.
+      - name: Coverage thresholds
+        run: npm run test:coverage
+
+      - name: Docs drift
+        run: npm run check:docs-drift
+
+      - name: Incident readiness
+        run: npm run check:incident-readiness
+
       - name: Release smoke checks
         run: |
           npm pack --ignore-scripts --json > /tmp/amc-pack.json

@@ -72,7 +72,16 @@ describe("public test-count claims", () => {
   test("current-facing public surfaces do not reintroduce stale test-count claims", () => {
     for (const path of CURRENT_PUBLIC_FILES) {
       const body = readProjectFile(path);
-      for (const staleCount of STALE_TEST_COUNTS) {
+      // A number the suite has legitimately grown back to is not stale. The
+      // blocklist is historical, so it can collide with the measured truth —
+      // exactly what happened when the count reached 8,538 a second time.
+      const currentForms = new Set([
+        CURRENT_TEST_COUNT,
+        CURRENT_TEST_COUNT.replace(",", "%2C"),
+        CURRENT_TEST_FILE_COUNT,
+        CURRENT_TEST_FILE_COUNT.replace(",", "%2C")
+      ]);
+      for (const staleCount of STALE_TEST_COUNTS.filter((c) => !currentForms.has(c))) {
         expect(body, `${path} contains stale test count ${staleCount}`).not.toContain(staleCount);
       }
     }
@@ -83,16 +92,13 @@ describe("public test-count claims", () => {
 
   test("README badge uses the latest fully verified passing inventory", () => {
     const readme = readProjectFile("README.md");
-    expect(readme).toContain(`tests-${CURRENT_TEST_COUNT.replace(",", "%2C")}%20passing`);
-    expect(readme).not.toContain("tests-8%2C544");
-    expect(readme).not.toContain("tests-8%2C538");
-    expect(readme).not.toContain("tests-8%2C527");
-    expect(readme).not.toContain("tests-8%2C481");
-    expect(readme).not.toContain("tests-8%2C480");
-    expect(readme).not.toContain("tests-8%2C468");
-    expect(readme).not.toContain("tests-8%2C455");
-    expect(readme).not.toContain("tests-8%2C444");
-    expect(readme).not.toContain("tests-8%2C413");
-    expect(readme).not.toContain("tests-8%2C396");
+    const current = `tests-${CURRENT_TEST_COUNT.replace(",", "%2C")}%20passing`;
+    expect(readme).toContain(current);
+
+    // Previously a hand-maintained list of old badge values, which broke the
+    // moment the suite grew back to a number already on it. Any badge that is
+    // not the measured one is stale by definition.
+    const badges = [...readme.matchAll(/tests-(\d[\d%A-C]*)%20passing/g)].map((m) => m[0]);
+    expect(new Set(badges)).toEqual(new Set([current]));
   });
 });

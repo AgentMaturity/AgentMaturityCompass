@@ -36,7 +36,7 @@
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "pretest": "npm run build",
     "test": "vitest run",
-    "test:e2e": "npx playwright test --config tests/e2e/playwright.config.ts",
+    "test:e2e": "node scripts/run-e2e.mjs",
     "accessibility:release-evidence": "node scripts/write-accessibility-release-evidence.mjs --report tmp/accessibility-playwright.json --out docs/runbooks/accessibility-release-evidence-latest.md",
     "test:watch": "vitest",
     "changeset": "changeset",
@@ -59,7 +59,8 @@
     "postinstall": "node scripts/postinstall.js || true",
     "gen-counts": "node scripts/gen-counts.mjs --write",
     "check:counts": "node scripts/gen-counts.mjs --check",
-    "check:question-bank-export": "node scripts/gen-question-bank-export.mjs --check"
+    "check:question-bank-export": "node scripts/gen-question-bank-export.mjs --check",
+    "test:coverage": "vitest run --coverage"
   },
   "keywords": [
     "ai-agent",
@@ -124,6 +125,7 @@
     "@changesets/cli": "^2.30.0",
     "@fontsource/inter": "5.2.8",
     "@fontsource/space-mono": "5.2.9",
+    "@playwright/test": "^1.56.0",
     "@types/better-sqlite3": "^7.6.12",
     "@types/node": "^25.5.0",
     "@types/semver": "^7.7.1",
