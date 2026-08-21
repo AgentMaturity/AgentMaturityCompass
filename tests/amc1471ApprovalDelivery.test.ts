@@ -497,6 +497,11 @@ describe("AMC-1471 privacy-safe approval delivery", () => {
         JSON.stringify(receipt),
         row.queue_id
       );
+      // A workspace written before the redaction migration has user_version 0.
+      // The delivery above stamped the current version, so reset it: otherwise
+      // this fixture describes a state that cannot occur — an already-migrated
+      // queue holding unredacted rows, when every write path redacts.
+      db.pragma("user_version = 0");
       db.close();
 
       const journalPath = join(workspace, ".amc", "integrations-delivery-journal.json");

@@ -5,7 +5,7 @@
  * under `.amc/amc_product_queues.db` (configurable via env or argument).
  */
 
-import { join } from 'node:path';
+import { dirname, join } from 'node:path';
 import { mkdirSync } from 'node:fs';
 import Database from 'better-sqlite3';
 
@@ -30,8 +30,12 @@ export function openProductDb(
     process.env['AMC_PRODUCT_DB_PATH'] ??
     join(process.cwd(), '.amc', 'amc_product_queues.db');
 
-  const dir = resolvedPath.substring(0, resolvedPath.lastIndexOf('/'));
-  mkdirSync(dir, { recursive: true });
+  // dirname() rather than lastIndexOf('/'): a path with no forward slash gave
+  // substring(0, -1) === '', and mkdirSync('') throws ENOENT. Both inputs are
+  // reachable — a bare filename in AMC_PRODUCT_DB_PATH, and on Windows the
+  // default join() path, which is entirely backslash-separated. dirname()
+  // handles both separators and returns '.' for a bare filename.
+  mkdirSync(dirname(resolvedPath), { recursive: true });
 
   _db = new Database(resolvedPath);
   _db.pragma('journal_mode = WAL');

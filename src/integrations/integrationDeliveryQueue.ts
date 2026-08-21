@@ -19,6 +19,7 @@ import {
   type WebhookDeliveryPolicy,
   type WebhookDeliveryReceipt
 } from "./webhookDelivery.js";
+import { ensureSchema } from "./integrationQueueSchema.js";
 import {
   loadIntegrationsConfig,
   resolveSecretRef,
@@ -94,7 +95,7 @@ export interface ProcessIntegrationQueueResult {
   blockedByOrdering: boolean;
 }
 
-interface IntegrationQueueRow {
+export interface IntegrationQueueRow {
   seq: number;
   queue_id: string;
   channel_id: string;
@@ -150,105 +151,25 @@ function integrationQueuePath(workspace: string): string {
   return join(workspace, ".amc", "integration-delivery.sqlite");
 }
 
-function ensureSchema(db: Database.Database): boolean {
-  db.exec(`
-    CREATE TABLE IF NOT EXISTS integration_delivery_queue (
-      seq INTEGER PRIMARY KEY AUTOINCREMENT,
-      queue_id TEXT NOT NULL UNIQUE,
-      channel_id TEXT NOT NULL,
-      channel_type TEXT NOT NULL,
-      event_name TEXT NOT NULL,
-      agent_id TEXT NOT NULL,
-      payload_body TEXT NOT NULL,
-      payload_sha256 TEXT NOT NULL,
-      ordered_sequence INTEGER,
-      binding_digest TEXT,
-      binding_signature TEXT,
-      destination_url TEXT,
-      destination_ref TEXT,
-      secret_ref TEXT,
-      extra_headers_json TEXT NOT NULL,
-      state TEXT NOT NULL,
-      attempt_round INTEGER NOT NULL DEFAULT 0,
-      max_rounds INTEGER NOT NULL DEFAULT 3,
-      next_attempt_ts INTEGER NOT NULL,
-      last_error TEXT,
-      last_http_status INTEGER,
-      delivery_receipt_json TEXT,
-      created_ts INTEGER NOT NULL,
-      updated_ts INTEGER NOT NULL,
-      delivered_ts INTEGER,
-      dead_letter_ts INTEGER,
-      event_id TEXT,
-      receipt_id TEXT,
-      receipt TEXT,
-      finalized_ts INTEGER,
-      CHECK(state IN ('PENDING','DELIVERED','DEAD_LETTER'))
-    );
-    CREATE INDEX IF NOT EXISTS idx_integration_queue_channel_pending_order
-      ON integration_delivery_queue(channel_id, state, seq);
-    CREATE INDEX IF NOT EXISTS idx_integration_queue_state_ts
-      ON integration_delivery_queue(state, updated_ts);
-  `);
-  const columns = db.prepare("PRAGMA table_info(integration_delivery_queue)").all() as Array<{
-    name: string;
-  }>;
-  const columnNames = new Set(columns.map((column) => column.name));
-  if (!columnNames.has("binding_digest")) {
-    db.exec("ALTER TABLE integration_delivery_queue ADD COLUMN binding_digest TEXT");
+
+/**
+ * Deletes delivered rows older than `beforeTs`, returning the count removed.
+ *
+ * Nothing ever deleted from this table, so DELIVERED rows accumulated forever
+ * and every queue operation — including studio's 60-second drain tick — got
+ * permanently slower. Only terminal, successfully-delivered rows are removed;
+ * PENDING and DEAD_LETTER rows are left for the operator.
+ */
+export function pruneDeliveredIntegrationQueue(workspace: string, beforeTs: number): number {
+  const db = openIntegrationQueueDb(workspace);
+  try {
+    const result = db
+      .prepare(`DELETE FROM integration_delivery_queue WHERE state = 'DELIVERED' AND updated_ts < ?`)
+      .run(beforeTs);
+    return Number(result.changes ?? 0);
+  } finally {
+    db.close();
   }
-  if (!columnNames.has("binding_signature")) {
-    db.exec("ALTER TABLE integration_delivery_queue ADD COLUMN binding_signature TEXT");
-  }
-  if (!columnNames.has("finalized_ts")) {
-    db.exec("ALTER TABLE integration_delivery_queue ADD COLUMN finalized_ts INTEGER");
-  }
-  const rows = db.prepare(
-    `SELECT queue_id, destination_url, destination_ref, secret_ref,
-            extra_headers_json, last_error, delivery_receipt_json
-     FROM integration_delivery_queue`
-  ).all() as Array<Pick<IntegrationQueueRow,
-    "queue_id" |
-    "destination_url" |
-    "destination_ref" |
-    "secret_ref" |
-    "extra_headers_json" |
-    "last_error" |
-    "delivery_receipt_json"
-  >>;
-  const update = db.prepare(
-    `UPDATE integration_delivery_queue
-     SET destination_url = NULL,
-         destination_ref = NULL,
-         secret_ref = NULL,
-         extra_headers_json = '{}',
-         last_error = ?,
-         delivery_receipt_json = ?
-     WHERE queue_id = ?`
-  );
-  let scrubbed = false;
-  const transaction = db.transaction(() => {
-    for (const row of rows) {
-      const receipt = parseWebhookReceipt(row.delivery_receipt_json);
-      const safeReceipt = receipt ? JSON.stringify(redactWebhookDeliveryReceipt(receipt)) : null;
-      const safeError = row.last_error ? normalizeWebhookDeliveryError(row.last_error) : null;
-      const needsScrub = Boolean(
-        row.destination_url ||
-        row.destination_ref ||
-        row.secret_ref ||
-        row.extra_headers_json !== "{}" ||
-        row.last_error !== safeError ||
-        row.delivery_receipt_json !== safeReceipt
-      );
-      if (!needsScrub) {
-        continue;
-      }
-      update.run(safeError, safeReceipt, row.queue_id);
-      scrubbed = true;
-    }
-  });
-  transaction();
-  return scrubbed;
 }
 
 function openIntegrationQueueDb(workspace: string): Database.Database {
