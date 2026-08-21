@@ -7,9 +7,21 @@
 
 import { existsSync } from "fs";
 import { join } from "path";
-import { evidencePathExists } from "./controlSurfaceScope.js";
+import { assessCriterion, scoreAssessableCriteria, notAssessableNote } from "./controlSurfaceScope.js";
 
 export interface AdaptiveAccessControlResult {
+  /**
+   * How many criteria this score was actually computed over.
+   *
+   * Criteria whose only evidence paths are AMC's own source modules cannot be
+   * judged against a real agent. Counting them as failures silently capped the
+   * achievable score, so they are excluded from the denominator and reported
+   * here instead: a score of 71 over 4 assessed criteria is a different claim
+   * from 71 over 7.
+   */
+  assessedCriteria?: number;
+  totalCriteria?: number;
+  notAssessableCriteria?: number;
   score: number; // 0-100
   level: number; // 0-5
   hasBehaviorProfiling: boolean;
@@ -27,44 +39,45 @@ export function scoreAdaptiveAccessControl(cwd?: string): AdaptiveAccessControlR
   const gaps: string[] = [];
   const recommendations: string[] = [];
 
-  const hasBehaviorProfiling = ["src/monitor/behaviorProfile.ts", "src/score/modelDrift.ts", ".amc/behavior_profiles"]
-    .some(f => evidencePathExists(root, f));
+  const hasBehaviorProfilingOutcome = assessCriterion(root, ["src/monitor/behaviorProfile.ts", "src/score/modelDrift.ts", ".amc/behavior_profiles"]);
+  const hasBehaviorProfiling = hasBehaviorProfilingOutcome.met;
 
-  const hasLearnedPolicies = ["src/enforce/learnedPolicies.ts", ".amc/learned_access_policies.json"]
-    .some(f => evidencePathExists(root, f));
+  const hasLearnedPoliciesOutcome = assessCriterion(root, ["src/enforce/learnedPolicies.ts", ".amc/learned_access_policies.json"]);
+  const hasLearnedPolicies = hasLearnedPoliciesOutcome.met;
 
-  const hasStagingPhase = ["src/enforce/policyStaging.ts", ".amc/policy_staging.json"]
-    .some(f => evidencePathExists(root, f));
+  const hasStagingPhaseOutcome = assessCriterion(root, ["src/enforce/policyStaging.ts", ".amc/policy_staging.json"]);
+  const hasStagingPhase = hasStagingPhaseOutcome.met;
 
-  const hasAnomalyBasedDenial = ["src/enforce/anomalyDenial.ts", "src/ops/anomalyDetector.ts"]
-    .some(f => evidencePathExists(root, f));
+  const hasAnomalyBasedDenialOutcome = assessCriterion(root, ["src/enforce/anomalyDenial.ts", "src/ops/anomalyDetector.ts"]);
+  const hasAnomalyBasedDenial = hasAnomalyBasedDenialOutcome.met;
 
-  const hasContextualPermissions = ["src/enforce/contextualPermissions.ts", "src/auth/contextAwareAuth.ts"]
-    .some(f => evidencePathExists(root, f));
+  const hasContextualPermissionsOutcome = assessCriterion(root, ["src/enforce/contextualPermissions.ts", "src/auth/contextAwareAuth.ts"]);
+  const hasContextualPermissions = hasContextualPermissionsOutcome.met;
 
-  const hasPolicyEvolution = ["src/enforce/policyEvolution.ts", ".amc/policy_versions"]
-    .some(f => evidencePathExists(root, f));
+  const hasPolicyEvolutionOutcome = assessCriterion(root, ["src/enforce/policyEvolution.ts", ".amc/policy_versions"]);
+  const hasPolicyEvolution = hasPolicyEvolutionOutcome.met;
 
-  if (!hasBehaviorProfiling) gaps.push("No behavior profiling — access control cannot learn from observed agent actions");
-  if (!hasLearnedPolicies) gaps.push("No learned policies — all access rules are manually defined");
-  if (!hasStagingPhase) gaps.push("No policy staging phase — new policies go straight to enforcement without observation");
-  if (!hasAnomalyBasedDenial) gaps.push("No anomaly-based denial — unusual behavior does not trigger access restrictions");
-  if (!hasContextualPermissions) gaps.push("No contextual permissions — access decisions ignore execution context");
-  if (!hasPolicyEvolution) gaps.push("No policy evolution — access policies are static and never improve");
+  if (hasBehaviorProfilingOutcome.assessable && !hasBehaviorProfiling) gaps.push("No behavior profiling — access control cannot learn from observed agent actions");
+  if (hasLearnedPoliciesOutcome.assessable && !hasLearnedPolicies) gaps.push("No learned policies — all access rules are manually defined");
+  if (hasStagingPhaseOutcome.assessable && !hasStagingPhase) gaps.push("No policy staging phase — new policies go straight to enforcement without observation");
+  if (hasAnomalyBasedDenialOutcome.assessable && !hasAnomalyBasedDenial) gaps.push("No anomaly-based denial — unusual behavior does not trigger access restrictions");
+  if (hasContextualPermissionsOutcome.assessable && !hasContextualPermissions) gaps.push("No contextual permissions — access decisions ignore execution context");
+  if (hasPolicyEvolutionOutcome.assessable && !hasPolicyEvolution) gaps.push("No policy evolution — access policies are static and never improve");
 
-  if (!hasBehaviorProfiling) recommendations.push("Profile agent behavior to establish baselines for adaptive access control");
-  if (!hasLearnedPolicies) recommendations.push("Derive access policies from observed behavior patterns");
-  if (!hasStagingPhase) recommendations.push("Stage new policies in observe mode before enforcing them");
-  if (!hasAnomalyBasedDenial) recommendations.push("Deny access on anomalous behavior that deviates from learned profiles");
+  if (hasBehaviorProfilingOutcome.assessable && !hasBehaviorProfiling) recommendations.push("Profile agent behavior to establish baselines for adaptive access control");
+  if (hasLearnedPoliciesOutcome.assessable && !hasLearnedPolicies) recommendations.push("Derive access policies from observed behavior patterns");
+  if (hasStagingPhaseOutcome.assessable && !hasStagingPhase) recommendations.push("Stage new policies in observe mode before enforcing them");
+  if (hasAnomalyBasedDenialOutcome.assessable && !hasAnomalyBasedDenial) recommendations.push("Deny access on anomalous behavior that deviates from learned profiles");
 
-  const checks = [hasBehaviorProfiling, hasLearnedPolicies, hasStagingPhase,
-    hasAnomalyBasedDenial, hasContextualPermissions, hasPolicyEvolution];
-  const passed = checks.filter(Boolean).length;
-  const score = Math.round((passed / checks.length) * 100);
+  const outcomes = [hasBehaviorProfilingOutcome, hasLearnedPoliciesOutcome, hasStagingPhaseOutcome, hasAnomalyBasedDenialOutcome, hasContextualPermissionsOutcome, hasPolicyEvolutionOutcome];
+  const { score, assessed: assessedCriteria, total: totalCriteria, notAssessable: notAssessableCriteria } =
+    scoreAssessableCriteria(outcomes);
+  const skipped = notAssessableNote(notAssessableCriteria, totalCriteria);
+  if (skipped) recommendations.push(skipped);
   const level = score >= 90 ? 5 : score >= 70 ? 4 : score >= 50 ? 3 : score >= 30 ? 2 : score >= 10 ? 1 : 0;
 
   return {
-    score, level,
+    score, level, assessedCriteria, totalCriteria, notAssessableCriteria,
     hasBehaviorProfiling, hasLearnedPolicies, hasStagingPhase,
     hasAnomalyBasedDenial, hasContextualPermissions, hasPolicyEvolution,
     gaps, recommendations,

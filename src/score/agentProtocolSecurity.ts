@@ -7,9 +7,21 @@
 
 import { existsSync } from "fs";
 import { join } from "path";
-import { evidencePathExists } from "./controlSurfaceScope.js";
+import { assessCriterion, scoreAssessableCriteria, notAssessableNote } from "./controlSurfaceScope.js";
 
 export interface AgentProtocolSecurityResult {
+  /**
+   * How many criteria this score was actually computed over.
+   *
+   * Criteria whose only evidence paths are AMC's own source modules cannot be
+   * judged against a real agent. Counting them as failures silently capped the
+   * achievable score, so they are excluded from the denominator and reported
+   * here instead: a score of 71 over 4 assessed criteria is a different claim
+   * from 71 over 7.
+   */
+  assessedCriteria?: number;
+  totalCriteria?: number;
+  notAssessableCriteria?: number;
   score: number; // 0-100
   level: number; // 0-5
   hasProtocolInventory: boolean;
@@ -28,48 +40,49 @@ export function scoreAgentProtocolSecurity(cwd?: string): AgentProtocolSecurityR
   const gaps: string[] = [];
   const recommendations: string[] = [];
 
-  const hasProtocolInventory = [".amc/protocol_inventory.json", "src/protocols", "ADAPTERS.md"]
-    .some(f => evidencePathExists(root, f));
+  const hasProtocolInventoryOutcome = assessCriterion(root, [".amc/protocol_inventory.json", "src/protocols", "ADAPTERS.md"]);
+  const hasProtocolInventory = hasProtocolInventoryOutcome.met;
 
-  const hasProtocolAuthN = ["src/auth", "src/enforce/protocolAuth.ts"]
-    .some(f => evidencePathExists(root, f));
+  const hasProtocolAuthNOutcome = assessCriterion(root, ["src/auth", "src/enforce/protocolAuth.ts"]);
+  const hasProtocolAuthN = hasProtocolAuthNOutcome.met;
 
-  const hasProtocolAuthZ = ["src/enforce", "src/policy"]
-    .some(f => evidencePathExists(root, f));
+  const hasProtocolAuthZOutcome = assessCriterion(root, ["src/enforce", "src/policy"]);
+  const hasProtocolAuthZ = hasProtocolAuthZOutcome.met;
 
-  const hasProtocolInputValidation = ["src/enforce/inputValidator.ts", "src/bridge/sanitize.ts", "src/shield/ingress.ts"]
-    .some(f => evidencePathExists(root, f));
+  const hasProtocolInputValidationOutcome = assessCriterion(root, ["src/enforce/inputValidator.ts", "src/bridge/sanitize.ts", "src/shield/ingress.ts"]);
+  const hasProtocolInputValidation = hasProtocolInputValidationOutcome.met;
 
-  const hasProtocolRateLimiting = ["src/enforce/rateLimit.ts", "src/ops/rateLimiter.ts"]
-    .some(f => evidencePathExists(root, f));
+  const hasProtocolRateLimitingOutcome = assessCriterion(root, ["src/enforce/rateLimit.ts", "src/ops/rateLimiter.ts"]);
+  const hasProtocolRateLimiting = hasProtocolRateLimitingOutcome.met;
 
-  const hasProtocolAudit = [".amc/audit_log.jsonl", "src/audit", "src/ledger"]
-    .some(f => evidencePathExists(root, f));
+  const hasProtocolAuditOutcome = assessCriterion(root, [".amc/audit_log.jsonl", "src/audit", "src/ledger"]);
+  const hasProtocolAudit = hasProtocolAuditOutcome.met;
 
-  const hasProtocolVersionPinning = [".amc/protocol_versions.json", "src/protocols/versionPin.ts"]
-    .some(f => evidencePathExists(root, f));
+  const hasProtocolVersionPinningOutcome = assessCriterion(root, [".amc/protocol_versions.json", "src/protocols/versionPin.ts"]);
+  const hasProtocolVersionPinning = hasProtocolVersionPinningOutcome.met;
 
-  if (!hasProtocolInventory) gaps.push("No protocol inventory — unknown which protocols the agent exposes or consumes");
-  if (!hasProtocolAuthN) gaps.push("No protocol authentication — agent endpoints accept unauthenticated requests");
-  if (!hasProtocolAuthZ) gaps.push("No protocol authorization — no enforcement of who can call what");
-  if (!hasProtocolInputValidation) gaps.push("No protocol input validation — malformed or malicious inputs are not filtered");
-  if (!hasProtocolRateLimiting) gaps.push("No protocol rate limiting — agent is vulnerable to resource exhaustion");
-  if (!hasProtocolAudit) gaps.push("No protocol audit trail — cross-protocol interactions are not logged");
-  if (!hasProtocolVersionPinning) gaps.push("No protocol version pinning — protocol upgrades may introduce breaking changes silently");
+  if (hasProtocolInventoryOutcome.assessable && !hasProtocolInventory) gaps.push("No protocol inventory — unknown which protocols the agent exposes or consumes");
+  if (hasProtocolAuthNOutcome.assessable && !hasProtocolAuthN) gaps.push("No protocol authentication — agent endpoints accept unauthenticated requests");
+  if (hasProtocolAuthZOutcome.assessable && !hasProtocolAuthZ) gaps.push("No protocol authorization — no enforcement of who can call what");
+  if (hasProtocolInputValidationOutcome.assessable && !hasProtocolInputValidation) gaps.push("No protocol input validation — malformed or malicious inputs are not filtered");
+  if (hasProtocolRateLimitingOutcome.assessable && !hasProtocolRateLimiting) gaps.push("No protocol rate limiting — agent is vulnerable to resource exhaustion");
+  if (hasProtocolAuditOutcome.assessable && !hasProtocolAudit) gaps.push("No protocol audit trail — cross-protocol interactions are not logged");
+  if (hasProtocolVersionPinningOutcome.assessable && !hasProtocolVersionPinning) gaps.push("No protocol version pinning — protocol upgrades may introduce breaking changes silently");
 
-  if (!hasProtocolInventory) recommendations.push("Create a protocol inventory documenting all agent communication protocols");
-  if (!hasProtocolInputValidation) recommendations.push("Validate and sanitize inputs at every protocol boundary");
-  if (!hasProtocolRateLimiting) recommendations.push("Add rate limiting per protocol endpoint to prevent resource exhaustion");
-  if (!hasProtocolVersionPinning) recommendations.push("Pin protocol versions and test upgrades before deployment");
+  if (hasProtocolInventoryOutcome.assessable && !hasProtocolInventory) recommendations.push("Create a protocol inventory documenting all agent communication protocols");
+  if (hasProtocolInputValidationOutcome.assessable && !hasProtocolInputValidation) recommendations.push("Validate and sanitize inputs at every protocol boundary");
+  if (hasProtocolRateLimitingOutcome.assessable && !hasProtocolRateLimiting) recommendations.push("Add rate limiting per protocol endpoint to prevent resource exhaustion");
+  if (hasProtocolVersionPinningOutcome.assessable && !hasProtocolVersionPinning) recommendations.push("Pin protocol versions and test upgrades before deployment");
 
-  const checks = [hasProtocolInventory, hasProtocolAuthN, hasProtocolAuthZ,
-    hasProtocolInputValidation, hasProtocolRateLimiting, hasProtocolAudit, hasProtocolVersionPinning];
-  const passed = checks.filter(Boolean).length;
-  const score = Math.round((passed / checks.length) * 100);
+  const outcomes = [hasProtocolInventoryOutcome, hasProtocolAuthNOutcome, hasProtocolAuthZOutcome, hasProtocolInputValidationOutcome, hasProtocolRateLimitingOutcome, hasProtocolAuditOutcome, hasProtocolVersionPinningOutcome];
+  const { score, assessed: assessedCriteria, total: totalCriteria, notAssessable: notAssessableCriteria } =
+    scoreAssessableCriteria(outcomes);
+  const skipped = notAssessableNote(notAssessableCriteria, totalCriteria);
+  if (skipped) recommendations.push(skipped);
   const level = score >= 90 ? 5 : score >= 70 ? 4 : score >= 50 ? 3 : score >= 30 ? 2 : score >= 10 ? 1 : 0;
 
   return {
-    score, level,
+    score, level, assessedCriteria, totalCriteria, notAssessableCriteria,
     hasProtocolInventory, hasProtocolAuthN, hasProtocolAuthZ,
     hasProtocolInputValidation, hasProtocolRateLimiting, hasProtocolAudit,
     hasProtocolVersionPinning, gaps, recommendations,

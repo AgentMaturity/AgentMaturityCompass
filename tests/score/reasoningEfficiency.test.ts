@@ -20,7 +20,12 @@ describe("reasoning efficiency maturity", () => {
     const result = scoreReasoningEfficiency(tmp);
     expect(result.score).toBe(0);
     expect(result.level).toBe(0);
-    expect(result.gaps.length).toBe(7);
+    // Two of the seven criteria list only src/ paths, so they cannot be judged
+    // against a non-AMC directory: they are reported as not-assessable rather
+    // than counted as gaps. Gaps + skipped still accounts for every criterion.
+    expect(result.gaps.length).toBe(5);
+    expect(result.notAssessableCriteria).toBe(2);
+    expect(result.gaps.length + (result.notAssessableCriteria ?? 0)).toBe(result.totalCriteria);
     expect(result.recommendations.length).toBeGreaterThan(0);
   });
 

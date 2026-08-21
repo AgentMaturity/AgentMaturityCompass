@@ -3,6 +3,7 @@ import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from "fs";
 import { tmpdir } from "os";
 import { join } from "path";
 import { scoreMonitorBypassResistance } from "../../src/score/monitorBypassResistance.js";
+import { markAsAmcCheckout } from "../helpers/amcCheckout.js";
 
 describe("monitorBypassResistance", () => {
   let tmp: string;
@@ -24,12 +25,14 @@ describe("monitorBypassResistance", () => {
   });
 
   it("detects multi-layer monitoring via src/monitor dir", () => {
+    markAsAmcCheckout(tmp);
     mkdirSync(join(tmp, "src/monitor"), { recursive: true });
     const r = scoreMonitorBypassResistance(tmp);
     expect(r.hasMultiLayerMonitoring).toBe(true);
   });
 
   it("detects monitor redundancy via 2+ files in src/monitor/", () => {
+    markAsAmcCheckout(tmp);
     mkdirSync(join(tmp, "src/monitor"), { recursive: true });
     writeFileSync(join(tmp, "src/monitor/a.ts"), "");
     writeFileSync(join(tmp, "src/monitor/b.ts"), "");
@@ -38,6 +41,7 @@ describe("monitorBypassResistance", () => {
   });
 
   it("returns full score when all artifacts present", () => {
+    markAsAmcCheckout(tmp);
     mkdirSync(join(tmp, "src/monitor"), { recursive: true });
     mkdirSync(join(tmp, "src/truthguard"), { recursive: true });
     mkdirSync(join(tmp, "src/score"), { recursive: true });

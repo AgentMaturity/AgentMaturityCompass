@@ -13,9 +13,21 @@
 
 import { existsSync } from "fs";
 import { join } from "path";
-import { evidencePathExists } from "./controlSurfaceScope.js";
+import { assessCriterion, scoreAssessableCriteria, notAssessableNote } from "./controlSurfaceScope.js";
 
 export interface SelfKnowledgeMaturityResult {
+  /**
+   * How many criteria this score was actually computed over.
+   *
+   * Criteria whose only evidence paths are AMC's own source modules cannot be
+   * judged against a real agent. Counting them as failures silently capped the
+   * achievable score, so they are excluded from the denominator and reported
+   * here instead: a score of 71 over 4 assessed criteria is a different claim
+   * from 71 over 7.
+   */
+  assessedCriteria?: number;
+  totalCriteria?: number;
+  notAssessableCriteria?: number;
   score: number; // 0-100
   level: number; // 0-5
   hasTypedRelationships: boolean;       // prior art #1: labeled edges, not just magnitudes
@@ -35,47 +47,54 @@ export function scoreSelfKnowledgeMaturity(cwd?: string): SelfKnowledgeMaturityR
 
   // prior art #1: Typed relationships — knowledge graph with labeled edges
   const typedRelPaths = ["src/score/knowledgeGraph.ts", "src/cgx", "src/claims/contradictions.ts"];
-  const hasTypedRelationships = typedRelPaths.some(f => evidencePathExists(root, f));
+  const hasTypedRelationshipsOutcome = assessCriterion(root, typedRelPaths);
+  const hasTypedRelationships = hasTypedRelationshipsOutcome.met;
 
   // prior art #2: Interpretability — can show which evidence/connections drove a decision
   const interpPaths = ["src/score/claimProvenance.ts", "src/truthguard/truthProtocol.ts", "src/score/confidenceDrift.ts"];
-  const hasInterpretabilityLayer = interpPaths.some(f => evidencePathExists(root, f));
+  const hasInterpretabilityLayerOutcome = assessCriterion(root, interpPaths);
+  const hasInterpretabilityLayer = hasInterpretabilityLayerOutcome.met;
 
   // prior art #3: Trace layer — corrections and lessons persist across sessions
   const tracePaths = ["src/score/lessonLearnedDatabase.ts", ".amc/PREDICTION_LOG.md", "src/corrections"];
-  const hasTraceLayer = tracePaths.some(f => evidencePathExists(root, f));
+  const hasTraceLayerOutcome = assessCriterion(root, tracePaths);
+  const hasTraceLayer = hasTraceLayerOutcome.met;
 
   // prior art #4: Confidence with citation — every claim has evidence refs
   const citationPaths = ["src/claims/claimConfidence.ts", "src/score/claimProvenance.ts", "src/truthguard"];
-  const hasConfidenceWithCitation = citationPaths.some(f => evidencePathExists(root, f));
+  const hasConfidenceWithCitationOutcome = assessCriterion(root, citationPaths);
+  const hasConfidenceWithCitation = hasConfidenceWithCitationOutcome.met;
 
   // Calibration mechanism — confidence scores that reflect actual accuracy
   const calibrationPaths = ["src/claims/claimConfidence.ts", "src/score/confidenceDrift.ts"];
-  const hasCalibrationMechanism = calibrationPaths.some(f => evidencePathExists(root, f));
+  const hasCalibrationMechanismOutcome = assessCriterion(root, calibrationPaths);
+  const hasCalibrationMechanism = hasCalibrationMechanismOutcome.met;
 
   // Self-knowledge loss — penalizes outputs the model can't explain
   const selfKnowledgePaths = ["src/score/confidenceDrift.ts", "src/score/claimProvenance.ts"];
-  const hasSelfKnowledgeLoss = selfKnowledgePaths.some(f => evidencePathExists(root, f));
+  const hasSelfKnowledgeLossOutcome = assessCriterion(root, selfKnowledgePaths);
+  const hasSelfKnowledgeLoss = hasSelfKnowledgeLossOutcome.met;
 
-  if (!hasTypedRelationships) gaps.push("No typed relationships — agent knows things are related but not HOW (gap #1)");
-  if (!hasInterpretabilityLayer) gaps.push("No interpretability layer — cannot show which evidence drove a decision (gap #2)");
-  if (!hasTraceLayer) gaps.push("No trace layer — corrections evaporate between sessions (gap #3)");
-  if (!hasConfidenceWithCitation) gaps.push("No confidence-with-citation — outputs lack proof of why (gap #4)");
-  if (!hasCalibrationMechanism) gaps.push("No calibration mechanism — agent expresses all outputs with equal fluency");
-  if (!hasSelfKnowledgeLoss) gaps.push("No self-knowledge loss — unexplainable outputs are not penalized");
+  if (hasTypedRelationshipsOutcome.assessable && !hasTypedRelationships) gaps.push("No typed relationships — agent knows things are related but not HOW (gap #1)");
+  if (hasInterpretabilityLayerOutcome.assessable && !hasInterpretabilityLayer) gaps.push("No interpretability layer — cannot show which evidence drove a decision (gap #2)");
+  if (hasTraceLayerOutcome.assessable && !hasTraceLayer) gaps.push("No trace layer — corrections evaporate between sessions (gap #3)");
+  if (hasConfidenceWithCitationOutcome.assessable && !hasConfidenceWithCitation) gaps.push("No confidence-with-citation — outputs lack proof of why (gap #4)");
+  if (hasCalibrationMechanismOutcome.assessable && !hasCalibrationMechanism) gaps.push("No calibration mechanism — agent expresses all outputs with equal fluency");
+  if (hasSelfKnowledgeLossOutcome.assessable && !hasSelfKnowledgeLoss) gaps.push("No self-knowledge loss — unexplainable outputs are not penalized");
 
-  if (!hasTypedRelationships) recommendations.push("Add edge type labels to knowledge graph (REQUIRES, USES, CONTRADICTS) — not just similarity scores");
-  if (!hasTraceLayer) recommendations.push("Implement trace layer: write corrections/lessons to persistent store; prepend to next session context");
-  if (!hasConfidenceWithCitation) recommendations.push("Require every claim to carry evidence refs; surface low-confidence claims for human review");
+  if (hasTypedRelationshipsOutcome.assessable && !hasTypedRelationships) recommendations.push("Add edge type labels to knowledge graph (REQUIRES, USES, CONTRADICTS) — not just similarity scores");
+  if (hasTraceLayerOutcome.assessable && !hasTraceLayer) recommendations.push("Implement trace layer: write corrections/lessons to persistent store; prepend to next session context");
+  if (hasConfidenceWithCitationOutcome.assessable && !hasConfidenceWithCitation) recommendations.push("Require every claim to carry evidence refs; surface low-confidence claims for human review");
 
-  const checks = [hasTypedRelationships, hasInterpretabilityLayer, hasTraceLayer,
-    hasConfidenceWithCitation, hasCalibrationMechanism, hasSelfKnowledgeLoss];
-  const passed = checks.filter(Boolean).length;
-  const score = Math.round((passed / checks.length) * 100);
+  const outcomes = [hasTypedRelationshipsOutcome, hasInterpretabilityLayerOutcome, hasTraceLayerOutcome, hasConfidenceWithCitationOutcome, hasCalibrationMechanismOutcome, hasSelfKnowledgeLossOutcome];
+  const { score, assessed: assessedCriteria, total: totalCriteria, notAssessable: notAssessableCriteria } =
+    scoreAssessableCriteria(outcomes);
+  const skipped = notAssessableNote(notAssessableCriteria, totalCriteria);
+  if (skipped) recommendations.push(skipped);
   const level = score >= 90 ? 5 : score >= 70 ? 4 : score >= 50 ? 3 : score >= 30 ? 2 : score >= 10 ? 1 : 0;
 
   return {
-    score, level,
+    score, level, assessedCriteria, totalCriteria, notAssessableCriteria,
     hasTypedRelationships, hasInterpretabilityLayer, hasTraceLayer,
     hasConfidenceWithCitation, hasCalibrationMechanism, hasSelfKnowledgeLoss,
     gaps, recommendations,

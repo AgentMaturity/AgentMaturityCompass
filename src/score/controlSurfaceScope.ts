@@ -107,3 +107,68 @@ export function evidencePathExists(root: string, relPath: string): boolean {
   }
   return existsSync(join(root, relPath));
 }
+
+/**
+ * Whether a criterion can be judged at all against `root`.
+ *
+ * A criterion whose every candidate path lives under `src/` can only ever be
+ * met by AMC's own source tree. Against a real agent it is not "failed" — it is
+ * unmeasurable, and counting it as a miss silently caps the achievable score.
+ * ISO 42001 was pinned at 5 of 8 controls for every external agent this way.
+ *
+ * Callers exclude unassessable criteria from the denominator and report them
+ * separately, so a score always states what it was computed over.
+ */
+export function criterionAssessable(root: string, paths: readonly string[]): boolean {
+  return paths.some((p) => !p.startsWith("src/")) || detectControlSurfaceScope(root).applicable;
+}
+
+/** Result of judging one criterion, including whether it could be judged. */
+export interface CriterionOutcome {
+  met: boolean;
+  assessable: boolean;
+}
+
+/** Judges one criterion's candidate paths against `root`. */
+export function assessCriterion(root: string, paths: readonly string[]): CriterionOutcome {
+  return {
+    met: paths.some((p) => evidencePathExists(root, p)),
+    assessable: criterionAssessable(root, paths)
+  };
+}
+
+/**
+ * Scores a set of criteria over only those that could be assessed.
+ *
+ * Returns 0 with `assessed: 0` when nothing was measurable, so a caller can
+ * distinguish "no controls" from "nothing we could check here".
+ */
+export function scoreAssessableCriteria(
+  outcomes: readonly CriterionOutcome[]
+): { score: number; assessed: number; total: number; notAssessable: number } {
+  const assessable = outcomes.filter((o) => o.assessable);
+  const passed = assessable.filter((o) => o.met).length;
+  return {
+    score: assessable.length === 0 ? 0 : Math.round((passed / assessable.length) * 100),
+    assessed: assessable.length,
+    total: outcomes.length,
+    notAssessable: outcomes.length - assessable.length
+  };
+}
+
+/**
+ * Explains criteria that were skipped rather than failed.
+ *
+ * Excluding unassessable criteria from the denominator stops them depressing
+ * the score, but it must not make them disappear: a report showing 1 gap out
+ * of 7 criteria, silently having judged only 1, tells the operator nothing
+ * about the other 6. This note is the visible half of that trade.
+ */
+export function notAssessableNote(notAssessable: number, total: number): string | null {
+  if (notAssessable <= 0) return null;
+  return (
+    `${notAssessable} of ${total} criteria could not be assessed from this workspace — ` +
+    `their evidence is AMC's own source modules, which no external agent can provide. ` +
+    `They are excluded from the score rather than counted as failures.`
+  );
+}
