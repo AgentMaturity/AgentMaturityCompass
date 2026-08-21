@@ -21883,9 +21883,18 @@ dsar
   .action(async (requestId: string, opts: { json?: boolean }) => {
     try {
       const { completeDsarForCli } = await import("./vault/dsarCli.js");
-      const result = completeDsarForCli({ workspace: process.cwd(), requestId });
+      const result = await completeDsarForCli({ workspace: process.cwd(), requestId });
       if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
-      console.log(chalk.green(`DSAR request completed: ${result.request.requestId}`));
+      if (result.request.status === "complete") {
+        console.log(chalk.green(`DSAR request completed: ${result.request.requestId}`));
+      } else {
+        // No fulfilment handler ran, so no data was accessed, exported or erased.
+        console.log(chalk.yellow(`DSAR request awaiting fulfilment: ${result.request.requestId}`));
+        console.log(
+          chalk.gray("  AMC recorded the request but did not access, export or erase any data.")
+        );
+        console.log(chalk.gray("  Complete the data work in your systems, then record it here."));
+      }
       console.log(chalk.gray("  Audit:"), result.auditPath);
     } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
   });

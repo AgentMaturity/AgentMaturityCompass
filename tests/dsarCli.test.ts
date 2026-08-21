@@ -27,7 +27,7 @@ afterEach(() => {
 });
 
 describe("DSAR CLI persistence", () => {
-  test("submits, persists, lists, and completes DSAR requests with audit events", () => {
+  test("submits, persists, lists, and completes DSAR requests with audit events", async () => {
     const workspace = tempWorkspace();
     const submitted = submitDsarForCli({
       workspace,
@@ -49,8 +49,24 @@ describe("DSAR CLI persistence", () => {
     const status = getDsarStatusForCli({ workspace, requestId: submitted.request.requestId });
     expect(status.request.status).toBe("pending");
 
-    const completed = completeDsarForCli({ workspace, requestId: submitted.request.requestId });
+    // Without a fulfilment handler no data is accessed, exported or erased, so
+    // the request must not be recorded as satisfied.
+    const unfulfilled = await completeDsarForCli({ workspace, requestId: submitted.request.requestId });
+    expect(unfulfilled.request.status).toBe("awaiting-fulfilment");
+    expect(unfulfilled.request.completedTs).toBeNull();
+
+    const completed = await completeDsarForCli({
+      workspace,
+      requestId: submitted.request.requestId,
+      fulfil: () => ({
+        performedBy: "privacy-team",
+        systems: ["crm", "warehouse"],
+        recordsAffected: 3,
+        performedTs: Date.now()
+      })
+    });
     expect(completed.request.status).toBe("complete");
+    expect(completed.request.fulfilment?.recordsAffected).toBe(3);
     expect(completed.request.completedTs).toBeGreaterThanOrEqual(completed.request.createdTs);
 
     const afterComplete = getDsarStatusForCli({ workspace, requestId: submitted.request.requestId });
@@ -67,14 +83,14 @@ describe("DSAR CLI persistence", () => {
     expect(store.requests).toHaveLength(1);
 
     const auditLines = readFileSync(paths.auditPath, "utf8").trim().split("\n").map((line) => JSON.parse(line) as { action: string; subjectSha256: string });
-    expect(auditLines.map((line) => line.action)).toEqual(["submitted", "completed"]);
+    expect(auditLines.map((line) => line.action)).toEqual(["submitted", "awaiting-fulfilment", "completed"]);
     expect(auditLines[0]?.subjectSha256).toMatch(/^[a-f0-9]{64}$/);
     expect(readFileSync(paths.auditPath, "utf8")).not.toContain("user-123@example.com");
   });
 
-  test("throws for missing DSAR requests", () => {
+  test("throws for missing DSAR requests", async () => {
     const workspace = tempWorkspace();
     expect(() => getDsarStatusForCli({ workspace, requestId: "missing" })).toThrow("DSAR request not found");
-    expect(() => completeDsarForCli({ workspace, requestId: "missing" })).toThrow("DSAR request not found");
+    await expect(completeDsarForCli({ workspace, requestId: "missing" })).rejects.toThrow("DSAR request not found");
   });
 });

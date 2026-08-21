@@ -9,7 +9,7 @@ export type DsarCliType = "access" | "delete" | "deletion" | "portability";
 export interface DsarAuditEvent {
   eventId: string;
   ts: number;
-  action: "submitted" | "completed";
+  action: "submitted" | "completed" | "awaiting-fulfilment";
   requestId: string;
   subjectSha256: string;
   type: DsarRequest["type"];
@@ -138,18 +138,30 @@ export function getDsarStatusForCli(params: {
   };
 }
 
-export function completeDsarForCli(params: {
+/**
+ * Advances a DSAR.
+ *
+ * Without a fulfilment handler the request moves to 'awaiting-fulfilment', not
+ * 'complete': AMC does not know where a subject's data lives, and recording a
+ * GDPR erasure as satisfied without erasing anything would be a false
+ * compliance record.
+ */
+export async function completeDsarForCli(params: {
   workspace: string;
   requestId: string;
-}): {
+  fulfil?: import("./dsarAutopilot.js").DsarFulfilmentHandler;
+}): Promise<{
   request: DsarRequest;
   storePath: string;
   auditPath: string;
-} {
+}> {
   const autopilot = loadAutopilot(params.workspace);
-  const request = autopilot.processRequest(params.requestId);
+  const request = await autopilot.processRequest(params.requestId, params.fulfil);
   const storePath = saveAutopilot(params.workspace, autopilot);
-  const auditPath = appendAuditEvent(params.workspace, auditEventFor(request, "completed"));
+  const auditPath = appendAuditEvent(
+    params.workspace,
+    auditEventFor(request, request.status === "complete" ? "completed" : "awaiting-fulfilment")
+  );
   return {
     request,
     storePath,

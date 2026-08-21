@@ -8,11 +8,39 @@ export interface DsarRequest {
   requestId: string;
   subject: string;
   type: 'access' | 'delete' | 'portability';
-  status: 'pending' | 'processing' | 'complete';
+  /**
+   * 'complete' requires a fulfilment handler to have actually accessed,
+   * exported or erased the subject's data. 'awaiting-fulfilment' means the
+   * request is recorded but nothing has been done yet.
+   */
+  status: 'pending' | 'processing' | 'awaiting-fulfilment' | 'complete';
   createdTs: number;
   updatedTs: number;
   completedTs: number | null;
+  /** What the fulfilment handler reported doing, when one ran. */
+  fulfilment?: DsarFulfilmentRecord;
 }
+
+/** Evidence that a request was actually carried out. */
+export interface DsarFulfilmentRecord {
+  /** Who or what performed the work. */
+  performedBy: string;
+  /** Systems the handler touched. */
+  systems: string[];
+  /** Records accessed, exported or erased. */
+  recordsAffected: number;
+  performedTs: number;
+}
+
+/**
+ * Performs the real data access, export or erasure for a request.
+ *
+ * AMC does not know where a subject's data lives, so fulfilment must be
+ * supplied by the deploying system.
+ */
+export type DsarFulfilmentHandler = (
+  request: DsarRequest
+) => DsarFulfilmentRecord | Promise<DsarFulfilmentRecord>;
 
 export interface DsarAutopilotSnapshot {
   v: 1;
@@ -70,10 +98,35 @@ export class DsarAutopilot {
     return req;
   }
 
-  processRequest(request: string | DsarRequest): DsarRequest {
+  /**
+   * Runs a request to completion.
+   *
+   * A DSAR is only complete once the subject's data has actually been accessed,
+   * exported or erased. This previously flipped status straight to 'complete'
+   * without touching any data, so an erasure request could be reported as
+   * satisfied while the data remained — a false compliance record.
+   *
+   * Without a fulfilment handler the request moves to 'awaiting-fulfilment'.
+   */
+  async processRequest(
+    request: string | DsarRequest,
+    fulfil?: DsarFulfilmentHandler
+  ): Promise<DsarRequest> {
     const requestId = typeof request === 'string' ? request : request.requestId;
     const req = this.requests.get(requestId);
     if (!req) throw new Error(`DSAR request not found: ${requestId}`);
+
+    if (!fulfil) {
+      req.status = 'awaiting-fulfilment';
+      req.updatedTs = this.now();
+      req.completedTs = null;
+      return req;
+    }
+
+    req.status = 'processing';
+    req.updatedTs = this.now();
+    const fulfilment = await fulfil({ ...req });
+    req.fulfilment = fulfilment;
     req.status = 'complete';
     req.updatedTs = this.now();
     req.completedTs = req.updatedTs;
