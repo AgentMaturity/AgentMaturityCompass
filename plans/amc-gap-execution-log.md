@@ -180,5 +180,8 @@ Gate for every gap: `tsc --noEmit` clean + affected tests pass + real behavior v
 | G8-24/32 scratch & orphan generator | ✅ DONE | Removed five unreferenced HIPAA debug scripts; `internal/` now ignored (it also held untracked sales material, one `git add .` from publication). `docs/API_REFERENCE.md` announced "Auto-generated from source" with **no script or workflow** regenerating it — now `npm run gen:api-ref` + a drift gate in CI. |
 | G8-21 attestation | ✅ VERIFIED | Already correct: `attestIngestSession` requires and records a named attester. |
 | G8-08 unused LLM client | ✅ VERIFIED | Already wired: `llmJudgeEngine.ts` imports `ProductionLLMJudgeEngine`. |
-| G8-01..03, 22, 25, 26, 29, 31, 33, 34 | ⏳ TODO | SQLite persistence fragmentation; remaining local-worktree hygiene. |
+| G8-25 secret scanner paths | ✅ DONE | Found by dogfooding: scanning `qa/` reported a secret in a file called **"nv"** — the real file is `.env`. `fullPath.slice(rootDir.length + 1)` ate two characters whenever the root carried `./`. The same scan **throws** to block plugin packaging, and builds its error from these paths. `relative()` now aligns it with the archiver it guards. |
+| G8-22/29/31/34 worktree noise | ✅ VERIFIED — no repo action | All already untracked **and** ignored: `AMC_OS/` (55M), `memory/`, `amc_ai_army/`, `..bfg-report/`, `test_model.pkl`, and the persona files. These are Sid's local working files, not repo content — they do not ship, and deleting them is not mine to do. The one live concern (whether the Feb-23 token was rotated) remains flagged under G6. |
+| G8-33 quality gates | ✅ DONE (G7) | Coverage thresholds were 0; a measured floor now fails CI, and `check:docs-drift` / `check:incident-readiness` are wired. |
+| G8-01..03, 26 | ⏳ IN PROGRESS | SQLite persistence fragmentation (audit running); `examples/` generations. |
 
