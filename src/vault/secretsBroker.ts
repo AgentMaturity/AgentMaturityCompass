@@ -80,8 +80,35 @@ export class SecretsBroker {
   }
 }
 
-/** Backward-compatible wrapper */
+/**
+ * Mints a scoped, expiring reference to a stored secret.
+ *
+ * The token is recorded so it can be resolved and expired. Previously this
+ * returned a random id that was never stored anywhere, so the "token" referred
+ * to nothing and could never be redeemed or revoked.
+ */
+const mintedTokens = new Map<
+  string,
+  { secretName: string; scope: string; expiresAt: number }
+>();
+
 export function mintSecretToken(secretName: string, scope: string, ttlSeconds?: number) {
   const ttl = ttlSeconds ?? 300;
-  return { tokenId: randomUUID(), maskedValue: `****${secretName.slice(-4)}`, scope, expiresAt: new Date(Date.now() + ttl * 1000) };
+  const tokenId = randomUUID();
+  const expiresAt = new Date(Date.now() + ttl * 1000);
+  mintedTokens.set(tokenId, { secretName, scope, expiresAt: expiresAt.getTime() });
+  return { tokenId, maskedValue: `****${secretName.slice(-4)}`, scope, expiresAt };
+}
+
+/** Resolves a minted token, or null when unknown or expired. */
+export function resolveSecretToken(
+  tokenId: string
+): { secretName: string; scope: string; expiresAt: number } | null {
+  const entry = mintedTokens.get(tokenId);
+  if (!entry) return null;
+  if (Date.now() >= entry.expiresAt) {
+    mintedTokens.delete(tokenId);
+    return null;
+  }
+  return entry;
 }

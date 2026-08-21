@@ -47,11 +47,35 @@ export class UndoLayer {
   }
 }
 
-/** Backward-compatible wrappers */
-export function snapshotBeforeChange(resourceId: string, operation: string, _data: unknown) {
-  return { snapshotId: randomUUID(), resourceId, operation, canUndo: true };
+/**
+ * Process-wide undo history backing the convenience wrappers below.
+ */
+const defaultUndoLayer = new UndoLayer();
+
+/**
+ * Records a reversible change against the module-level history.
+ *
+ * This previously discarded `data` and returned `canUndo: true` without
+ * recording anything, so undoChange could never restore what it claimed to.
+ */
+export function snapshotBeforeChange(resourceId: string, operation: string, data: unknown) {
+  const snapshotId = randomUUID();
+  defaultUndoLayer.recordAction(snapshotId, { resourceId, operation }, data);
+  return {
+    snapshotId,
+    resourceId,
+    operation,
+    canUndo: defaultUndoLayer.canUndo(snapshotId)
+  };
 }
 
+/**
+ * Reverses a change recorded by {@link snapshotBeforeChange}.
+ *
+ * Returns `restored: false` for an unknown or already-undone snapshot; this
+ * previously always reported success.
+ */
 export function undoChange(snapshotId: string) {
-  return { restored: true, snapshotId };
+  const result = defaultUndoLayer.undoAction(snapshotId);
+  return { restored: result.undone, snapshotId, reversePayload: result.reversePayload };
 }

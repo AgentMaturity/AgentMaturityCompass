@@ -1,3 +1,4 @@
+import { readFileSync, writeFileSync } from 'node:fs';
 export interface RedactResult {
   redacted: boolean;
   strippedSegments: string[];
@@ -57,7 +58,25 @@ export function redactScreenshotMetadata(buffer: Buffer): RedactResult {
   };
 }
 
-/** Backward-compatible wrapper */
-export function redactScreenshot(imagePath: string) {
-  return { redacted: true, redactionsCount: 0, outputPath: imagePath.replace(/(\.\w+)$/, '_redacted$1') };
+/**
+ * Redacts metadata from an image file on disk and writes the result.
+ *
+ * This wrapper previously returned `redacted: true` with a synthesised output
+ * path without reading, redacting or writing anything — so a caller believed a
+ * screenshot had been scrubbed of EXIF data when the original was untouched.
+ */
+export function redactScreenshot(imagePath: string): {
+  redacted: boolean;
+  redactionsCount: number;
+  outputPath: string;
+} {
+  const outputPath = imagePath.replace(/(\.\w+)$/, '_redacted$1');
+  const buffer = readFileSync(imagePath);
+  const result = redactScreenshotMetadata(buffer);
+  writeFileSync(outputPath, result.outputBuffer);
+  return {
+    redacted: result.redacted,
+    redactionsCount: result.strippedSegments.length,
+    outputPath
+  };
 }

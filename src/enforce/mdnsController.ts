@@ -5,6 +5,11 @@ export interface MdnsResult {
   blocked: string[];
   hostname: string;
   reason?: string;
+  /**
+   * False when no discovery was actually attempted, so an empty `discovered`
+   * list must not be read as "nothing is on the network".
+   */
+  scanned?: boolean;
 }
 
 const queryLog = new Map<string, { count: number; firstSeen: number; lastSeen: number }>();
@@ -46,8 +51,28 @@ export function checkMdnsAccess(hostname: string, allowlist?: string[]): MdnsRes
   return { allowed: true, discovered: [hostname], blocked: [], hostname };
 }
 
+/**
+ * Reports that mDNS discovery is not implemented.
+ *
+ * This previously returned `{ allowed: true, discovered: [], blocked: [] }`,
+ * which reads as a completed scan that found nothing on the network. No mDNS
+ * query is performed here — use checkMdnsAccess to apply policy to a hostname
+ * you already have.
+ */
 export function scanMdns(): MdnsResult {
-    const __e11Allowed = true;
-  emitGuardEvent({ agentId: 'system', moduleCode: 'E11', severity: 'low', decision: __e11Allowed ? 'allow' : 'deny', reason: `E11 ${__e11Allowed ? 'allowed' : 'denied'}` });
-  return { allowed: true, discovered: [], blocked: [], hostname: '' };
+  emitGuardEvent({
+    agentId: 'system',
+    moduleCode: 'E11',
+    severity: 'low',
+    decision: 'allow',
+    reason: 'E11 observation (mDNS discovery not implemented; no scan performed)'
+  });
+  return {
+    allowed: true,
+    discovered: [],
+    blocked: [],
+    hostname: '',
+    scanned: false,
+    reason: 'mDNS discovery is not implemented; no network scan was performed'
+  };
 }
