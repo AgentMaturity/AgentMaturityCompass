@@ -44,7 +44,7 @@ Gate for every gap: `tsc --noEmit` clean + affected tests pass + real behavior v
 
 ## Progress
 
-**168 of 289 gaps complete — G1 (facades), G2 (dead code), G3 (duplication), G4 (structure).** Every commit gated on `tsc --noEmit` clean + affected tests passing + real behavior verified end-to-end.
+**205 of 289 gaps complete — G1 (facades), G2 (dead code), G3 (duplication), G4 (structure), G5 (claim drift).** Every commit gated on `tsc --noEmit` clean + affected tests passing + real behavior verified end-to-end.
 
 ## Shared infrastructure built
 
@@ -113,3 +113,20 @@ Gate for every gap: `tsc --noEmit` clean + affected tests pass + real behavior v
 | G4-04/05 + 30 oversized files | ⏭️ GUARDED | — | All on the descending ratchet; cannot grow. |
 
 **G4 COMPLETE — the cap is now an enforced, monotonically-improving invariant rather than an aspiration.**
+
+## G5 — Claim, number & documentation drift (37 gaps) — COMPLETE
+
+| Gap | Status | Commit | Note |
+|---|---|---|---|
+| G5-01..10,13..17 counts | ✅ DONE | `b993093e` | **`gen-counts.mjs` + CI gate.** README self-contradiction (14 vs 15 adapters) gone; all counts generated from the repo. Gate verified to fire. |
+| G5-03 "FULL" bank export | ✅ DONE | `b993093e` | Held **111 of 244 questions** while named FULL → generated + gated. |
+| G5-13 pinned drift test | ✅ DONE | `b993093e` | `publicStatsDrift` **pinned 8,604 as a literal across 10 files** — that's how drift accumulated. Now measures the suite. |
+| G5-11 pack-id enum | ✅ DONE | (G2) | 7-value enum vs 143 packs. |
+| G5-18 MIT vs Apache | ✅ SURFACED | `b993093e` | Licensing is the owner's call — **flagged for Sid**, RFC states repo licence governs meanwhile. |
+| G5-19..23 version drift | ✅ DONE | `b993093e` | Helm 1.0.0→1.1.1; whitepaper filename note; buried `[Unreleased]` labelled. |
+| G5-30..33 overstatement | ✅ DONE | (G1/G2) | ML claims, vendor-drift, i18n scaffold corrected in G1-44/45/46, G2-42. |
+| G5-34 unused python deps | ✅ DONE | `(pending)` | **6 dep groups declared, 0 imported** (anthropic, openai, presidio, detect-secrets, cyclonedx, otel) → optional extra. 22→14 runtime deps. |
+| G5-36 broken channels | ✅ DONE | `b993093e` | **Quickstart image could not build** (npm not_live) → pinned GitHub release. |
+| G5-24/25 doc index | ❌ WITHDRAWN | — | Register wrong: INDEX is a **curated front door** and the docs graph is **intentionally bounded**. Tests proved it; experiments reverted. |
+
+**G5 COMPLETE — published numbers are now generated and CI-gated, not hand-maintained.**

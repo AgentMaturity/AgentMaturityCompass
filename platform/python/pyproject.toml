@@ -23,22 +23,16 @@ dependencies = [
     # Crypto / signing
     "cryptography>=42.0.0",
     "python-jose[cryptography]>=3.3.0",
-    # LLM (for S10 classifier)
-    "anthropic>=0.25.0",
-    "openai>=1.14.0",
+    # NOTE: the LLM, PII and SBOM packages below were declared but never
+    # imported anywhere in amc/ — every classifier, DLP scan and SBOM path is
+    # regex, keyword or hash based. Declaring them made the install pull LLM
+    # SDKs and PII engines the code does not use, and implied capabilities that
+    # are not there. Moved to an optional extra so an install stays honest.
     # Storage
     "sqlalchemy[asyncio]>=2.0.0",
     "aiosqlite>=0.20.0",
-    # Pattern detection (V2 DLP)
-    "detect-secrets>=1.4.0",
-    "presidio-analyzer>=2.2.354",
-    "presidio-anonymizer>=2.2.354",
-    # SBOM / dependency scanning (S4)
-    "cyclonedx-bom>=4.4.0",
     # Observability
     "structlog>=24.1.0",
-    "opentelemetry-api>=1.24.0",
-    "opentelemetry-sdk>=1.24.0",
     # CLI
     "typer[all]>=0.12.0",
     "rich>=13.7.0",
@@ -47,6 +41,19 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+# Reserved for a future implementation that actually uses these. Nothing in
+# amc/ imports them today; see the note in [project.dependencies].
+unused-reserved = [
+    "anthropic>=0.25.0",
+    "openai>=1.14.0",
+    "detect-secrets>=1.4.0",
+    "presidio-analyzer>=2.2.354",
+    "presidio-anonymizer>=2.2.354",
+    "cyclonedx-bom>=4.4.0",
+    "opentelemetry-api>=1.24.0",
+    "opentelemetry-sdk>=1.24.0",
+]
+
 dev = [
     "pytest>=8.1.0",
     "pytest-asyncio>=0.23.0",
