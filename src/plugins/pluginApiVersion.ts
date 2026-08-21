@@ -9,9 +9,15 @@
  * 5. Contract tests that prevent accidental breaking changes
  * 6. API changelog tracking
  *
- * MiroFish agent quote:
+ * Design driver — synthetic scenario, not user research.
+ *
+ * The line below comes from the MiroFish simulation (mirofish-simulation/),
+ * whose "practitioners" are model-generated personas. No real person said it
+ * and no named individual asked for this module. It is kept because the
+ * requirement stands on its own merits, not because anyone requested it.
+ *
  * "Plugin API had breaking changes without notice during my testing —
- *  unacceptable for production." — Tech Blogger (6.5/10)
+ *  unacceptable for production."
  */
 
 import { z } from "zod";

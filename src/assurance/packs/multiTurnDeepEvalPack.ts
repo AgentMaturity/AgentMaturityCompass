@@ -9,9 +9,15 @@
  * 5. Turn-level scoring — per-turn quality assessment
  * 6. Memory coherence — does the agent remember earlier turns?
  *
- * MiroFish agent quote:
+ * Design driver — synthetic scenario, not user research.
+ *
+ * The line below comes from the MiroFish simulation (mirofish-simulation/),
+ * whose "practitioners" are model-generated personas. No real person said it
+ * and no named individual asked for this module. It is kept because the
+ * requirement stands on its own merits, not because anyone requested it.
+ *
  * "Multi-turn conversation detection is still crude — misses
- *  context-dependent edge cases." — Ryan (Blogger, 6/10)
+ *  context-dependent edge cases."
  */
 
 import type { AssurancePackDefinition, ValidationResult } from "../validators.js";

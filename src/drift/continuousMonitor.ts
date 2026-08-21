@@ -14,10 +14,15 @@
  * 6. Time-series metric storage with trend analysis
  * 7. Statistical anomaly detection with configurable sensitivity
  *
- * MiroFish agent quote:
+ * Design driver — synthetic scenario, not user research.
+ *
+ * The line below comes from the MiroFish simulation (mirofish-simulation/),
+ * whose "practitioners" are model-generated personas. No real person said it
+ * and no named individual asked for this module. It is kept because the
+ * requirement stands on its own merits, not because anyone requested it.
+ *
  * "Agents silently drift from prompt injection, context pollution,
  *  tool API changes — no tools detect this in real-time."
- *  — Lisa Chang, VP Engineering
  */
 
 import { randomUUID } from "node:crypto";

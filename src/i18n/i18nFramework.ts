@@ -15,9 +15,14 @@
  * 4. Cultural context awareness for evaluations
  * 5. Multilingual question bank foundation
  *
- * MiroFish agent quote:
+ * Design driver — synthetic scenario, not user research.
+ *
+ * The line below comes from the MiroFish simulation (mirofish-simulation/),
+ * whose "practitioners" are model-generated personas. No real person said it
+ * and no named individual asked for this module. It is kept because the
+ * requirement stands on its own merits, not because anyone requested it.
+ *
  * "Testing in Russian, Chinese, Arabic revealed significant accuracy gaps."
- *  — Olga Kuznetsova
  */
 
 import { z } from "zod";

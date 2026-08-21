@@ -7,9 +7,14 @@
  * - Medium: 100 core questions
  * - Low: 50 essential questions
  *
- * MiroFish agent quote:
+ * Design driver — synthetic scenario, not user research.
+ *
+ * The line below comes from the MiroFish simulation (mirofish-simulation/),
+ * whose "practitioners" are model-generated personas. No real person said it
+ * and no named individual asked for this module. It is kept because the
+ * requirement stands on its own merits, not because anyone requested it.
+ *
  * "Full evaluation on all 200+ deployments is impractical — need risk-based tiering."
- *  — Raj Patel (200+ deployments)
  */
 
 import { z } from "zod";

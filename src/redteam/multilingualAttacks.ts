@@ -4,9 +4,14 @@
  * Non-English prompt injection, homoglyph attacks, mixed-language attacks,
  * RTL injection, encoding exploits, and cultural context exploitation.
  *
- * MiroFish agent quote:
+ * Design driver — synthetic scenario, not user research.
+ *
+ * The line below comes from the MiroFish simulation (mirofish-simulation/),
+ * whose "practitioners" are model-generated personas. No real person said it
+ * and no named individual asked for this module. It is kept because the
+ * requirement stands on its own merits, not because anyone requested it.
+ *
  * "Non-English adversarial testing coverage is obviously insufficient."
- *  — Jake Williams
  */
 
 export interface MultilingualAttack {
