@@ -4601,7 +4601,7 @@ adapters
 
 adapters
   .command("run")
-  .description("Run adapter with minted lease, routed through gateway, with observed evidence capture")
+  .description("Run an agent under full observation: mints a lease, routes through the gateway, captures OBSERVED evidence (preferred over 'amc wrap' and 'amc supervise')")
   .requiredOption("--agent <agentId>", "agent ID")
   .option("--adapter <adapterId>", "adapter ID")
   .option("--workorder <workOrderId>", "work order ID")
@@ -4953,7 +4953,7 @@ plugin
 
 program
   .command("wrap")
-  .description("Wrap runtime and capture tamper-evident evidence")
+  .description("Wrap runtime and capture tamper-evident evidence (legacy; prefer 'amc adapters run', which also mints a lease and routes through the gateway)")
   .argument("[runtime]", "claude|gemini|openclaw|any")
   .argument("[args...]", "runtime arguments")
   .option("--agent-token <file>", "lease token file from `amc pair redeem`")
@@ -5009,7 +5009,7 @@ program
 
 program
   .command("supervise")
-  .description("Supervise any agent process and inject gateway/proxy routing env vars")
+  .description("Supervise any process and inject gateway routing env vars (no lease; for agents no adapter covers — otherwise prefer 'amc adapters run')")
   .option("--provider-route <routeBase>", "gateway route base URL (deprecated alias of --route)")
   .option("--route <routeBase>", "gateway route base URL")
   .option("--proxy <proxyUrl>", "gateway proxy URL (HTTP/HTTPS proxy)")

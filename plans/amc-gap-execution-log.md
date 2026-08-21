@@ -44,7 +44,7 @@ Gate for every gap: `tsc --noEmit` clean + affected tests pass + real behavior v
 
 ## Progress
 
-**96 of 289 gaps complete — G1 (integrity facades) and G2 (dead code).** Every commit gated on `tsc --noEmit` clean + affected tests passing + real behavior verified end-to-end.
+**128 of 289 gaps complete — G1 (facades), G2 (dead code), G3 (duplication).** Every commit gated on `tsc --noEmit` clean + affected tests passing + real behavior verified end-to-end.
 
 ## Shared infrastructure built
 
@@ -84,3 +84,17 @@ Gate for every gap: `tsc --noEmit` clean + affected tests pass + real behavior v
 | G2-45 replayBenchmarkCorpus | ⏭️ DEFER | — | Not dead (5 importers, 69 tests) — 29k-line size issue belongs to G4-02. |
 
 **G2 COMPLETE — 80 files removed, ~6,100 lines of dead code gone, 3 subsystems wired.**
+
+## G3 — Duplication (32 gaps) — COMPLETE
+
+| Gap | Status | Commit | Note |
+|---|---|---|---|
+| G3-01 three cert systems | ✅ DONE | `67cc095e` | **`cert generate` produced an artifact `cert verify` could not read.** Now format-aware. Found+fixed: a bad commander default meant **no signed certificate could ever be produced**. |
+| G3-08 duplicate governance | ✅ DONE | `936994df` | **Governance waivers silently vanished** — one stack was in-memory. Now persisted, hash-chained, signed; both command families share one store. |
+| G3-02 five fix systems | ✅ DONE | `9c7885c7` | Generated fixes imported **modules that don't exist**; repointed + guarded by test. |
+| G3-05/20/24/32 | ✅ DONE | `68684dc8` | 7 drift shims removed; **two pricing tables disagreed on gpt-4o** → one dated source. |
+| G3-12/23/28/29/30 | ✅ DONE | `9923d76c` | Stale duplicate compliance reports → pointers; installer parity guarded; dup scratch deleted. |
+| G3-16/26/27 | ✅ DONE | `(pending)` | wrap/supervise/adapters-run now state which to use; **Python platform declared non-canonical** (200 modules, not the claimed 1,130). |
+| G3-03 red-team engines | ✅ DONE | (G1) | Closed by the G1 real-execution work. |
+
+**G3 COMPLETE — 2 CRITICAL user-facing breakages fixed (unreadable certificates, vanishing governance waivers).**
