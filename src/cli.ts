@@ -19170,7 +19170,7 @@ program
   .action(async (opts: { list: boolean; region?: string; isolation: string; custody: string }) => {
     const dr = await import("./compliance/dataResidency.js");
     if (opts.list) {
-      const policies = dr.getResidencyPolicies();
+      const policies = dr.getResidencyPolicies(process.cwd());
       if (policies.length === 0) {
         console.log(chalk.yellow("No residency policies configured."));
         return;
@@ -19188,7 +19188,7 @@ program
       region: opts.region as never,
       isolationLevel: opts.isolation as never,
       keyCustodyMode: opts.custody as never,
-    });
+    }, process.cwd());
     console.log(chalk.green(`Residency policy created: ${policy.policyId} for ${policy.region}`));
   });
 
@@ -19206,7 +19206,7 @@ program
       workspaceId: opts.workspace,
       region: opts.region as never,
       isolationLevel: opts.isolation as never,
-    });
+    }, process.cwd());
     console.log(chalk.green(`Tenant ${boundary.tenantId} registered in ${boundary.region} (${boundary.isolationLevel})`));
   });
 
@@ -19215,7 +19215,7 @@ program
   .description("Check tenant isolation between all registered tenants")
   .action(async () => {
     const dr = await import("./compliance/dataResidency.js");
-    const checks = dr.checkAllTenantIsolation();
+    const checks = dr.checkAllTenantIsolation(process.cwd());
     if (checks.length === 0) {
       console.log(chalk.yellow("No tenant pairs to check (need at least 2 tenants)."));
       return;
@@ -19241,7 +19241,7 @@ program
   .action(async (opts: { issue: boolean; release?: string; list: boolean; tenant?: string; reason?: string; issuedBy?: string }) => {
     const dr = await import("./compliance/dataResidency.js");
     if (opts.list) {
-      const holds = dr.getActiveLegalHolds(opts.tenant);
+      const holds = dr.getActiveLegalHolds(opts.tenant, process.cwd());
       if (holds.length === 0) {
         console.log(chalk.green("No active legal holds."));
         return;
@@ -19252,12 +19252,12 @@ program
       return;
     }
     if (opts.release) {
-      const released = dr.releaseLegalHold(opts.release);
+      const released = dr.releaseLegalHold(opts.release, process.cwd());
       console.log(released ? chalk.green(`Legal hold ${opts.release} released.`) : chalk.red("Hold not found or already released."));
       return;
     }
     if (opts.issue && opts.tenant && opts.reason && opts.issuedBy) {
-      const hold = dr.issueLegalHold({ tenantId: opts.tenant, reason: opts.reason, issuedBy: opts.issuedBy });
+      const hold = dr.issueLegalHold({ tenantId: opts.tenant, reason: opts.reason, issuedBy: opts.issuedBy }, process.cwd());
       console.log(chalk.green(`Legal hold issued: ${hold.holdId}`));
       return;
     }
@@ -19285,7 +19285,7 @@ program
   .option("--redaction-tests", "include privacy redaction tests", false)
   .action(async (opts: { tenant: string; redactionTests: boolean }) => {
     const dr = await import("./compliance/dataResidency.js");
-    const report = dr.generateResidencyReport(opts.tenant, { includeRedactionTests: opts.redactionTests });
+    const report = dr.generateResidencyReport(opts.tenant, { includeRedactionTests: opts.redactionTests }, process.cwd());
     console.log(dr.renderResidencyReportMarkdown(report));
   });
 

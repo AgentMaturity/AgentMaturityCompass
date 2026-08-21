@@ -15,6 +15,7 @@
 
 import { randomUUID } from "node:crypto";
 import { sha256Hex } from "../utils/hash.js";
+import { saveResidencyRecord, loadResidencyRecords, updateResidencyRecord } from "./dataResidencyStore.js";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -140,6 +141,14 @@ export interface ResidencyComplianceReport {
 // In-memory state
 // ---------------------------------------------------------------------------
 
+/**
+ * In-process cache over the durable store.
+ *
+ * These were the only home for residency state, so each CLI invocation began
+ * empty while the commands still printed success. They are now a same-process
+ * cache; anything given a `workspace` also reads and writes
+ * .amc/compliance/residency/ so the record survives the process.
+ */
 let policies: ResidencyPolicy[] = [];
 let tenants: TenantBoundary[] = [];
 let legalHolds: LegalHold[] = [];
@@ -170,7 +179,7 @@ export function createResidencyPolicy(opts: {
   retentionMaxDays?: number;
   legalHoldEnabled?: boolean;
   privacyRedactionEnabled?: boolean;
-}): ResidencyPolicy {
+}, workspace?: string): ResidencyPolicy {
   const policy: ResidencyPolicy = {
     policyId: `rp_${randomUUID().slice(0, 12)}`,
     region: opts.region,
@@ -190,19 +199,28 @@ export function createResidencyPolicy(opts: {
   };
   policy.policyHash = sha256Hex(JSON.stringify({ ...policy, policyHash: "" }));
   policies.push(policy);
+  if (workspace) {
+    saveResidencyRecord(workspace, "policies", policy.policyId, { ...policy }, policy.createdTs);
+  }
   return policy;
 }
 
-export function getResidencyPolicies(): ResidencyPolicy[] {
-  return [...policies];
+export function getResidencyPolicies(workspace?: string): ResidencyPolicy[] {
+  return mergeById(policies, workspace ? loadResidencyRecords<ResidencyPolicy>(workspace, "policies") : [], (p) => p.policyId);
 }
 
-export function getResidencyPolicy(policyId: string): ResidencyPolicy | null {
-  return policies.find((p) => p.policyId === policyId) ?? null;
+export function getResidencyPolicy(policyId: string, workspace?: string): ResidencyPolicy | null {
+  return getResidencyPolicies(workspace).find((p) => p.policyId === policyId) ?? null;
 }
 
-export function getPolicyForRegion(region: DataRegion): ResidencyPolicy | null {
-  return policies.find((p) => p.region === region) ?? null;
+export function getPolicyForRegion(region: DataRegion, workspace?: string): ResidencyPolicy | null {
+  return getResidencyPolicies(workspace).find((p) => p.region === region) ?? null;
+}
+
+/** In-process entries win over stored copies of the same id. */
+function mergeById<T>(live: T[], stored: T[], id: (item: T) => string): T[] {
+  const seen = new Set(live.map(id));
+  return [...live, ...stored.filter((item) => !seen.has(id(item)))];
 }
 
 // ---------------------------------------------------------------------------
@@ -218,7 +236,7 @@ export function registerTenant(opts: {
   region: DataRegion;
   isolationLevel?: IsolationLevel;
   keyCustodyMode?: KeyCustodyMode;
-}): TenantBoundary {
+}, workspace?: string): TenantBoundary {
   const boundary: TenantBoundary = {
     tenantId: opts.tenantId,
     workspaceId: opts.workspaceId,
@@ -228,15 +246,18 @@ export function registerTenant(opts: {
     createdTs: Date.now(),
   };
   tenants.push(boundary);
+  if (workspace) {
+    saveResidencyRecord(workspace, "tenants", boundary.tenantId, { ...boundary }, boundary.createdTs);
+  }
   return boundary;
 }
 
-export function getTenants(): TenantBoundary[] {
-  return [...tenants];
+export function getTenants(workspace?: string): TenantBoundary[] {
+  return mergeById(tenants, workspace ? loadResidencyRecords<TenantBoundary>(workspace, "tenants") : [], (t) => t.tenantId);
 }
 
-export function getTenant(tenantId: string): TenantBoundary | null {
-  return tenants.find((t) => t.tenantId === tenantId) ?? null;
+export function getTenant(tenantId: string, workspace?: string): TenantBoundary | null {
+  return getTenants(workspace).find((t) => t.tenantId === tenantId) ?? null;
 }
 
 // ---------------------------------------------------------------------------
@@ -246,9 +267,13 @@ export function getTenant(tenantId: string): TenantBoundary | null {
 /**
  * Check isolation between two tenants for boundary violations.
  */
-export function checkTenantIsolation(tenantIdA: string, tenantIdB: string): TenantIsolationCheck {
-  const a = getTenant(tenantIdA);
-  const b = getTenant(tenantIdB);
+export function checkTenantIsolation(
+  tenantIdA: string,
+  tenantIdB: string,
+  workspace?: string,
+): TenantIsolationCheck {
+  const a = getTenant(tenantIdA, workspace);
+  const b = getTenant(tenantIdB, workspace);
 
   const violations: TenantViolation[] = [];
 
@@ -348,11 +373,15 @@ export function checkTenantIsolation(tenantIdA: string, tenantIdB: string): Tena
 /**
  * Check all registered tenants for pairwise isolation.
  */
-export function checkAllTenantIsolation(): TenantIsolationCheck[] {
+export function checkAllTenantIsolation(workspace?: string): TenantIsolationCheck[] {
+  // Read through the store: previously this saw only tenants registered in the
+  // current process, so `amc tenant-isolation-check` always reported "need at
+  // least 2 tenants" and could never detect a cross-tenant violation.
+  const known = getTenants(workspace);
   const checks: TenantIsolationCheck[] = [];
-  for (let i = 0; i < tenants.length; i++) {
-    for (let j = i + 1; j < tenants.length; j++) {
-      checks.push(checkTenantIsolation(tenants[i]!.tenantId, tenants[j]!.tenantId));
+  for (let i = 0; i < known.length; i++) {
+    for (let j = i + 1; j < known.length; j++) {
+      checks.push(checkTenantIsolation(known[i]!.tenantId, known[j]!.tenantId, workspace));
     }
   }
   return checks;
@@ -370,7 +399,7 @@ export function issueLegalHold(opts: {
   reason: string;
   issuedBy: string;
   expiresTs?: number | null;
-}): LegalHold {
+}, workspace?: string): LegalHold {
   const hold: LegalHold = {
     holdId: `lh_${randomUUID().slice(0, 12)}`,
     tenantId: opts.tenantId,
@@ -383,34 +412,52 @@ export function issueLegalHold(opts: {
   };
   hold.holdHash = sha256Hex(JSON.stringify({ ...hold, holdHash: "" }));
   legalHolds.push(hold);
+  if (workspace) {
+    // A legal hold that silently disappears is spoliation-relevant, so a hold
+    // that cannot be written must not report success.
+    saveResidencyRecord(workspace, "legal-holds", hold.holdId, { ...hold }, hold.issuedTs);
+  }
   return hold;
 }
 
 /**
  * Release a legal hold by ID.
  */
-export function releaseLegalHold(holdId: string): boolean {
-  const hold = legalHolds.find((h) => h.holdId === holdId);
+export function releaseLegalHold(holdId: string, workspace?: string): boolean {
+  const live = legalHolds.find((h) => h.holdId === holdId);
+  const stored = workspace
+    ? loadResidencyRecords<LegalHold>(workspace, "legal-holds").find((h) => h.holdId === holdId)
+    : undefined;
+  const hold = live ?? stored;
   if (!hold || !hold.active) return false;
   hold.active = false;
+  if (live) live.active = false;
+  if (workspace) {
+    // The release is itself a record: rewrite the hold with active:false so a
+    // later process sees the release rather than the original hold.
+    updateResidencyRecord(workspace, "legal-holds", hold.holdId, { ...hold, active: false }, Date.now());
+  }
   return true;
 }
 
 /**
  * Get all active legal holds for a tenant.
  */
-export function getActiveLegalHolds(tenantId?: string): LegalHold[] {
-  return legalHolds.filter(
-    (h) => h.active && (!tenantId || h.tenantId === tenantId),
+export function getActiveLegalHolds(tenantId?: string, workspace?: string): LegalHold[] {
+  const all = mergeById(
+    legalHolds,
+    workspace ? loadResidencyRecords<LegalHold>(workspace, "legal-holds") : [],
+    (h) => h.holdId
   );
+  return all.filter((h) => h.active && (!tenantId || h.tenantId === tenantId));
 }
 
 /**
  * Check if a tenant is under legal hold.
  */
-export function isTenantUnderLegalHold(tenantId: string): boolean {
-  return legalHolds.some(
-    (h) => h.tenantId === tenantId && h.active && (h.expiresTs === null || h.expiresTs > Date.now()),
+export function isTenantUnderLegalHold(tenantId: string, workspace?: string): boolean {
+  return getActiveLegalHolds(tenantId, workspace).some(
+    (h) => h.expiresTs === null || h.expiresTs > Date.now()
   );
 }
 
@@ -621,14 +668,18 @@ export function validateDataTransfer(
 export function generateResidencyReport(
   tenantId: string,
   opts?: { includeRedactionTests?: boolean },
+  workspace?: string,
 ): ResidencyComplianceReport {
-  const tenant = getTenant(tenantId);
+  const tenant = getTenant(tenantId, workspace);
+  // The us-east-1 fallback previously fired for every tenant, because the
+  // lookup only ever saw tenants registered in this same process. It now means
+  // what it says: no registration for this tenant exists anywhere.
   const region = tenant?.region ?? "us-east-1";
-  const policy = getPolicyForRegion(region) ?? createDefaultPolicy(region);
-  const isolationChecks = tenants
+  const policy = getPolicyForRegion(region, workspace) ?? createDefaultPolicy(region);
+  const isolationChecks = getTenants(workspace)
     .filter((t) => t.tenantId !== tenantId)
-    .map((t) => checkTenantIsolation(tenantId, t.tenantId));
-  const holds = getActiveLegalHolds(tenantId);
+    .map((t) => checkTenantIsolation(tenantId, t.tenantId, workspace));
+  const holds = getActiveLegalHolds(tenantId, workspace);
   const keyCustody = getKeyCustodyConfig(tenant?.keyCustodyMode ?? "local");
 
   let redactionSuite: RedactionTestSuite | null = null;
