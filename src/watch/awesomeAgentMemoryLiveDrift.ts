@@ -1,3 +1,13 @@
+/**
+ * Vendor-named drift receipt builder — NO VENDOR API IS CONTACTED.
+ *
+ * The caller supplies the sample rows; this module validates them, computes
+ * drift against thresholds and emits a hash-canonicalised receipt. The vendor
+ * in the module name identifies the ecosystem the samples are expected to come
+ * from, and any URLs below are documentation references. Nothing here fetches
+ * from, authenticates to, or verifies anything with that vendor, so a receipt
+ * attests only to the data the caller provided.
+ */
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import {

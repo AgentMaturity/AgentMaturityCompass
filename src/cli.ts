@@ -22374,16 +22374,26 @@ score
 
 score
   .command("collect-evidence <agentId>")
-  .description("Collect evidence for scoring an agent")
+  .description("Collect an agent's evidence from the ledger")
+  .option("--window-days <n>", "evidence window in days", "14")
   .option("--json", "Output as JSON")
-  .action(async (agentId: string, opts: { json?: boolean }) => {
+  .action(async (agentId: string, opts: { json?: boolean; windowDays?: string }) => {
     try {
-      const { collectEvidence } = await import("./score/index.js");
-      const result = collectEvidence({ [agentId]: { collected: true, timestamp: Date.now() } });
+      // Read the agent's real evidence from the ledger. This previously called
+      // collectEvidence({[agentId]: {collected: true}}), fabricating a single
+      // artifact from a literal and labelling it OBSERVED.
+      const { collectEvidenceFromLedger } = await import("./score/evidenceCollector.js");
+      const result = collectEvidenceFromLedger(agentId, Number(opts.windowDays ?? 14));
       if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
       console.log(chalk.bold.hex('#4AEF79')("\n📊  Evidence Collection"));
       console.log(chalk.gray("Agent:"), agentId);
-      console.log(chalk.gray("Evidence:"), JSON.stringify(result, null, 2));
+      console.log(chalk.gray("Artifacts:"), result.artifacts.length);
+      console.log(chalk.gray("Total trust:"), result.totalTrust.toFixed(2));
+      if (result.artifacts.length === 0) {
+        console.log(
+          chalk.yellow("No evidence found in the ledger for this agent and window.")
+        );
+      }
     } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
   });
 

@@ -38,6 +38,9 @@ type SchemaName = (typeof STANDARD_SCHEMA_NAMES)[number];
 function schemaByName(name: SchemaName): Record<string, unknown> {
   const common = {
     $schema: "https://json-schema.org/draft/2020-12/schema",
+    // The published standard is intentionally permissive so third parties can
+    // extend it. AMC itself validates against stricter internal zod schemas, so
+    // passing this schema does NOT mean an artifact would be accepted by AMC.
     additionalProperties: true
   };
   if (name === "amcbench.schema.json") {

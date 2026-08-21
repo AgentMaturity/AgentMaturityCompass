@@ -1,5 +1,10 @@
 /**
- * ML-Powered Behavioral Profiling for AMC Watch
+ * Statistical Behavioral Profiling for AMC Watch
+ *
+ * Uses robust z-scores and median absolute deviation — classical statistics,
+ * not machine learning. The header previously read "ML-Powered", which
+ * overstates the method; "online learning (no training phase)" below means
+ * incrementally updated running statistics.
  *
  * Extends Watch's statistical anomaly detection (robust Z, MAD) with
  * behavioral pattern recognition:

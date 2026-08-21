@@ -108,8 +108,11 @@ export function registerBusinessCommands(program: Command, activeAgent: (p: Comm
           ? report.layerScores.reduce((s, l) => s + l.avgFinalLevel, 0) / report.layerScores.length
           : 0;
         
-        // Business impact estimates based on maturity level
-        const riskReductionPct = Math.min(avgLevel * 18, 90); // L5 = ~90% risk reduction
+        // Indices derived from the maturity level alone. These are NOT measured
+        // business outcomes: no incident history, loss data or spend is
+        // consulted. For a monetary estimate use `amc business roi`, which takes
+        // real loss inputs (see src/business/roiCalculator.ts).
+        const riskReductionPct = Math.min(avgLevel * 18, 90);
         const complianceReadiness = Math.min(avgLevel * 20, 100);
         const incidentLikelihood = Math.max(100 - avgLevel * 20, 5); // Lower is better
         const auditReadiness = avgLevel >= 3 ? "Ready" : avgLevel >= 2 ? "Partial" : "Not Ready";
@@ -126,7 +129,10 @@ export function registerBusinessCommands(program: Command, activeAgent: (p: Comm
             incidentLikelihoodPct: Math.round(incidentLikelihood),
             auditReadiness,
             regulatoryRisk,
-            estimatedAnnualRiskReduction: `$${Math.round(riskReductionPct * 1000)}k`,
+            // A dollar figure derived only from the maturity level would be
+            // invented; `amc business roi` produces one from real loss inputs.
+            estimatedAnnualRiskReduction: null,
+            derivedFrom: "maturity level only — not measured business outcomes",
           },
           dimensions: report.layerScores.map(l => ({
             name: l.layerName,
@@ -150,6 +156,9 @@ export function registerBusinessCommands(program: Command, activeAgent: (p: Comm
         }
         
         console.log(chalk.bold(`\n📊 Business KPIs for ${agentId}\n`));
+        console.log(
+          chalk.gray("  Indices below are derived from the maturity level, not from incident or loss data.\n")
+        );
         console.log(`  Maturity Level:           ${chalk.bold(kpis.maturityLevel)} (${avgLevel.toFixed(2)}/5)`);
         console.log(`  Integrity Index:          ${(report.integrityIndex * 100).toFixed(1)}%`);
         console.log(`  Risk Reduction:           ${chalk.green(`${kpis.businessImpact.riskReductionPct}%`)}`);
@@ -157,7 +166,9 @@ export function registerBusinessCommands(program: Command, activeAgent: (p: Comm
         console.log(`  Incident Likelihood:      ${kpis.businessImpact.incidentLikelihoodPct}%`);
         console.log(`  Audit Readiness:          ${auditReadiness}`);
         console.log(`  Regulatory Risk:          ${regulatoryRisk}`);
-        console.log(`  Est. Annual Risk Savings: ${kpis.businessImpact.estimatedAnnualRiskReduction}`);
+        console.log(
+          chalk.gray("  Est. Annual Risk Savings: run 'amc business roi' with real loss inputs")
+        );
         
         console.log(chalk.bold("\n  Dimension Status:"));
         for (const d of kpis.dimensions) {

@@ -1,6 +1,11 @@
 /**
- * Dynamic Attack Generator - ML-powered attack synthesis like Promptfoo
- * Replaces static pattern matching with intelligent, context-aware generation
+ * Dynamic Attack Generator — template-based attack synthesis.
+ *
+ * Builds attack prompts by selecting templates for the target's risk profile
+ * and shuffling/parameterising them with Math.random. There is no model and no
+ * learned component: `generationMethod` is 'template' for every attack
+ * produced. The header previously described this as machine-learning-based
+ * synthesis comparable to Promptfoo, which overstates what it does.
  */
 
 import { emitGuardEvent } from '../enforce/evidenceEmitter.js';

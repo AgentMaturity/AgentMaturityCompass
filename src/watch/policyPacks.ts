@@ -7,9 +7,13 @@ export interface PolicyPack {
 }
 
 export interface ApplyResult {
+  /** Always false here: this resolver does not enforce anything. */
   applied: boolean;
+  /** True when the pack was found and its modules resolved. */
+  resolved?: boolean;
   agentId: string;
   packId: string;
+  /** Modules the pack WOULD enable, not modules now in force. */
   modulesEnabled: string[];
 }
 
@@ -45,10 +49,19 @@ export class PolicyPackRegistry {
     return this.packs.get(packId) ?? null;
   }
 
+  /**
+   * Resolves which modules a pack would enable for an agent.
+   *
+   * This does not enforce anything: no configuration is written and no control
+   * is activated. `applied` previously read true, implying the pack had taken
+   * effect. Applying a policy pack for real goes through the signed policy
+   * store (see src/policyPacks and `amc policy pack`).
+   */
   applyPolicyPack(agentId: string, packId: string): ApplyResult {
     const pack = this.packs.get(packId);
     if (!pack) return { applied: false, agentId, packId, modulesEnabled: [] };
-    return { applied: true, agentId, packId, modulesEnabled: [...pack.modules] };
+    // Resolved, not applied — nothing was enforced by this call.
+    return { applied: false, resolved: true, agentId, packId, modulesEnabled: [...pack.modules] };
   }
 
   listPolicyPacks(): PolicyPack[] {

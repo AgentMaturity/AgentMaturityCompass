@@ -11,17 +11,27 @@ export interface CollectedEvidence {
   totalTrust: number;
 }
 
-/** Original collector — backward compatible. */
+/**
+ * Wraps caller-supplied module outputs as SELF-REPORTED evidence.
+ *
+ * These artifacts did not come from the ledger: AMC did not capture them, so
+ * they cannot be OBSERVED. This function previously stamped every non-null
+ * input `kind: 'observed'` with a flat trust of 0.7, which contradicted the
+ * trust-tier methodology and let any caller mint top-tier evidence.
+ *
+ * Use collectEvidenceFromLedger for real captured evidence.
+ */
 export function collectEvidence(moduleOutputs: Record<string, unknown>): CollectedEvidence {
   const artifacts: EvidenceArtifact[] = [];
   const trustBreakdown: Record<string, number> = {};
   let totalTrust = 0;
 
   for (const [qid, output] of Object.entries(moduleOutputs)) {
-    const trust = output !== null && output !== undefined ? 0.7 : 0;
+    // Self-reported weight, matching the canonical trust table.
+    const trust = output !== null && output !== undefined ? 0.4 : 0;
     const artifact: EvidenceArtifact = {
       qid,
-      kind: 'observed',
+      kind: 'self_reported',
       trust,
       payload: output,
       timestamp: new Date(),
