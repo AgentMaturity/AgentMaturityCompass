@@ -463,6 +463,39 @@ const migrations: Migration[] = [
       CREATE INDEX IF NOT EXISTS idx_bridge_request_usage_ts
         ON bridge_request_usage(ts);
     `
+  },
+  {
+    // P2.1 consolidation: guard events move into the pooled evidence store.
+    //
+    // They lived in their own .amc/guard_events.sqlite, which is why retention
+    // could not reach them — every ops engine opens a workspace through
+    // openLedger(), which resolves to evidence.sqlite. That store had grown to
+    // 87,667 rows with no prune path at all. Anything outside this file is
+    // outside retention, vacuum, backup and integrity verification by
+    // construction, so the fix is to stop having a second file rather than to
+    // teach each engine about it.
+    //
+    // The table is created here first and written in parallel with the legacy
+    // file; nothing reads from it until parity has been verified and cutover
+    // is switched on explicitly.
+    version: 11,
+    sql: `
+      CREATE TABLE IF NOT EXISTS amc_guard_events (
+        id TEXT PRIMARY KEY,
+        agent_id TEXT NOT NULL,
+        module_code TEXT NOT NULL,
+        decision TEXT NOT NULL CHECK (decision IN ('allow', 'deny', 'stepup', 'warn')),
+        reason TEXT NOT NULL,
+        severity TEXT NOT NULL CHECK (severity IN ('low', 'medium', 'high', 'critical')),
+        meta_json TEXT,
+        created_at TEXT NOT NULL,
+        prev_hash TEXT,
+        event_hash TEXT
+      );
+      CREATE INDEX IF NOT EXISTS idx_guard_agent ON amc_guard_events(agent_id, created_at);
+      CREATE INDEX IF NOT EXISTS idx_guard_module ON amc_guard_events(module_code);
+      CREATE INDEX IF NOT EXISTS idx_guard_severity_created ON amc_guard_events(severity, created_at);
+    `
   }
 ];
 

@@ -11,6 +11,7 @@ import { ensureSigningKeys, getPrivateKeyPem, getPublicKeyHistory, signHexDigest
 import { canonicalize } from '../utils/json.js';
 import { sha256Hex } from '../utils/hash.js';
 import Database from 'better-sqlite3';
+import { writeConsolidatedGuardEvent, currentStage } from '../storage/consolidation/guardEventConsolidation.js';
 
 let _db: import('better-sqlite3').Database | null = null;
 let _insertStmt: import('better-sqlite3').Statement | null = null;
@@ -203,10 +204,17 @@ export function verifyGuardDecisionReceipt(
 
 function getDb(): import('better-sqlite3').Database | null {
   try {
-    const configuredPath = process.env.AMC_GUARD_EVENTS_DB_PATH;
-    const desiredPath = configuredPath
-      ? resolve(configuredPath)
+    // P2.1 consolidation. Under CUTOVER the emitter opens the evidence store
+    // instead of the separate file, so every reader here — the query path, the
+    // chain verifier, the retention prune — follows without knowing about the
+    // move. The legacy file is left untouched and complete, which is what makes
+    // reverting a setting change rather than a restore.
+    const legacyPath = process.env.AMC_GUARD_EVENTS_DB_PATH
+      ? resolve(process.env.AMC_GUARD_EVENTS_DB_PATH)
       : join(process.cwd(), '.amc', 'guard_events.sqlite');
+    const desiredPath = currentStage() === 'CUTOVER'
+      ? join(dirname(legacyPath), 'evidence.sqlite')
+      : legacyPath;
     const dir = dirname(desiredPath);
     if (_db && _dbPath === desiredPath) {
       return _db;
@@ -306,9 +314,41 @@ export function emitGuardEvent(input: GuardEventInput): void {
       id, input.agentId, input.moduleCode, input.decision, input.reason,
       input.severity, metaJson, now, prevHash, eventHash
     );
+
+    // P2.1 consolidation, DUAL_WRITE stage: the same row also goes into the
+    // pooled evidence store. The legacy file above stays authoritative for
+    // reads until parity has been verified and cutover is switched on, so this
+    // stage cannot change any answer — it can only make the second store
+    // complete enough to be compared against the first.
+    if (currentStage() !== 'CUTOVER') writeConsolidatedGuardEvent(guardEventsWorkspace(), {
+      id,
+      agent_id: input.agentId,
+      module_code: input.moduleCode,
+      decision: input.decision,
+      reason: input.reason,
+      severity: input.severity,
+      meta_json: metaJson,
+      created_at: now,
+      prev_hash: prevHash,
+      event_hash: eventHash
+    });
   } catch (_e) {
     // Never throw
   }
+}
+
+/**
+ * The workspace whose evidence store receives the consolidated copy.
+ *
+ * Derived from the legacy database path so the two stores always belong to the
+ * same workspace: AMC_GUARD_EVENTS_DB_PATH is honoured by tests and by
+ * multi-workspace hosts, and writing the copy to process.cwd() regardless would
+ * scatter rows across whichever directory the process happened to start in.
+ */
+function guardEventsWorkspace(): string {
+  const configured = process.env.AMC_GUARD_EVENTS_DB_PATH;
+  // .amc/guard_events.sqlite -> the workspace is two levels up.
+  return configured ? resolve(dirname(configured), '..') : process.cwd();
 }
 
 export function emitGuardDecisionReceipt(input: EmitGuardDecisionReceiptInput): GuardDecisionReceipt | null {

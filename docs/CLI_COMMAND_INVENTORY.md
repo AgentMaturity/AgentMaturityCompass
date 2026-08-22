@@ -399,6 +399,9 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc evidence observability inspect` | Inspect one observability lane record by observability id, lifecycle id, or run id | `--agent <agentId>`<br>`--json` | - |
 | `amc evidence observability list` | List persisted observability lane records | `--agent <agentId>`<br>`--limit <n>`<br>`--json` | - |
 | `amc evidence verify` | Run full workspace verification suite | `--json` | - |
+| `amc evidence-stores` | Inspect the staged consolidation of databases outside evidence.sqlite | - | - |
+| `amc evidence-stores backfill` | Copy guard events written before dual-write into evidence.sqlite | - | - |
+| `amc evidence-stores parity` | Compare the legacy guard-event store against the consolidated one | `--json` | - |
 | `amc executive` | Executive and board-ready AMC artifacts | - | - |
 | `amc executive brief` | Generate a board-ready one-page executive brief from a diagnostic run | `--agent <agentId>`<br>`--run <runId>`<br>`--out <path>`<br>`--format <format>`<br>`--title <title>` | - |
 | `amc experiment` | Deterministic baseline vs candidate experiments | - | - |

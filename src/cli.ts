@@ -189,6 +189,7 @@ import { getAssurancePack, listAssurancePacks } from "./assurance/packs/index.js
 import { registerMirofishCommands } from "./mirofish/cli.js";
 import { registerCompositionCommands } from "./cli-composition-commands.js";
 import { registerVaultZkCommands } from "./cli-vault-zk-commands.js";
+import { registerEvidenceStoreCommands } from "./cli-evidence-store-commands.js";
 import { issueCertificate, inspectCertificate, revokeCertificate, verifyCertificate, verifyRevocation } from "./assurance/certificate.js";
 import { generateTrustCertificate } from "./cert/trustCertificate.js";
 import { renderFailureRiskMarkdown, runFleetIndices, runIndicesForAgent } from "./assurance/indices.js";
@@ -19722,36 +19723,6 @@ program
     console.log(renderFeedbackClosureReport(report));
   });
 
-// ── Receipt Chain CLI ───────────────────────────────────────────────────
-program
-  .command("receipts-chain")
-  .description("Show full delegation chain for a receipt")
-  .argument("<receiptId>", "receipt ID to trace")
-  .action(async (receiptId: string) => {
-    const { verifyDelegationChain, renderDelegationChainMarkdown } = await import("./receipts/receiptChain.js");
-    // In practice, public keys would be loaded from workspace
-    const publicKeys: string[] = [];
-    try {
-      const { getPublicKeyHistory } = await import("./crypto/keys.js");
-      const keys = getPublicKeyHistory(process.cwd(), "monitor");
-      publicKeys.push(...keys);
-    } catch { /* no keys */ }
-    const result = verifyDelegationChain(receiptId, publicKeys, process.cwd());
-    console.log(renderDelegationChainMarkdown(result));
-    const { countStoredReceipts } = await import("./receipts/receiptChain.js");
-    if (!result.valid && countStoredReceipts(process.cwd()) === 0) {
-      // Otherwise "not found in store" reads as a mistyped id, when in fact
-      // this workspace has never recorded a chained receipt: the ledger mints
-      // plain receipts, and delegation chains come only from callers that opt
-      // into mintChainedReceipt.
-      console.log(
-        chalk.yellow(
-          "No chained receipts are recorded in this workspace, so no delegation chain can be traced yet."
-        )
-      );
-    }
-  });
-
 // ── Policy Canary Mode CLI ──────────────────────────────────────────────
 program
   .command("policy-canary-start")
@@ -22119,6 +22090,7 @@ vault
   });
 
 registerVaultZkCommands(vault);
+registerEvidenceStoreCommands(program);
 
 // ── Watch Behavioral Profiler ─────────────────────────────────────────────────
 watch
