@@ -1,0 +1,10 @@
+[
+  {
+    "createdTs": 1787409933078,
+    "fingerprint": "36e52fc1eadf167adfaed70d516aa1eaa81874b5a3624073c0bf8505c359a227",
+    "publicKeyPem": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAC/hrleByza0yJjKiN0LkCTQgrs7SJwov71wO8JSL/r0=\n-----END PUBLIC KEY-----\n",
+    "prevHash": "GENESIS",
+    "entryHash": "d5e2e61a77400710922911169efc815849965a0f90d67b25483d6823097bf81d",
+    "source": "local"
+  }
+]

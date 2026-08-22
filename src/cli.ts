@@ -189,7 +189,7 @@ import { getAssurancePack, listAssurancePacks } from "./assurance/packs/index.js
 import { registerMirofishCommands } from "./mirofish/cli.js";
 import { registerCompositionCommands } from "./cli-composition-commands.js";
 import { registerVaultZkCommands } from "./cli-vault-zk-commands.js";
-import { registerEvidenceStoreCommands } from "./cli-evidence-store-commands.js";
+import { registerEvidenceStoreCommands, renderLedgerVerdict } from "./cli-evidence-store-commands.js";
 import { issueCertificate, inspectCertificate, revokeCertificate, verifyCertificate, verifyRevocation } from "./assurance/certificate.js";
 import { generateTrustCertificate } from "./cert/trustCertificate.js";
 import { renderFailureRiskMarkdown, runFleetIndices, runIndicesForAgent } from "./assurance/indices.js";
@@ -6287,7 +6287,7 @@ verifyCmd
     }
     const result = await verifyLedgerIntegrity(process.cwd());
     if (result.ok) {
-      console.log(chalk.green("Ledger verification PASSED"));
+      console.log(renderLedgerVerdict(result));
       return;
     }
 

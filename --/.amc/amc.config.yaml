@@ -1,0 +1,25 @@
+profile: dev
+runtimes:
+  claude:
+    command: claude
+    argsTemplate: []
+  gemini:
+    command: gemini
+    argsTemplate: []
+  openclaw:
+    command: openclaw
+    argsTemplate: []
+  mock:
+    command: node
+    argsTemplate:
+      - -e
+      - '{"claimedLevels":{}}'
+  any:
+    command: ""
+    argsTemplate: []
+security:
+  trustBoundaryMode: isolated
+supervise:
+  extraEnv: {}
+  includeProxyEnv: true
+  customBaseUrlEnvKeys: []

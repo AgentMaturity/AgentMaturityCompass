@@ -17,7 +17,7 @@
  */
 import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
-import { getPublicKeyHistory, verifyHexDigestAny } from "../crypto/keys.js";
+import { getPublicKeyHistory, getPublicKeyPem, verifyHexDigestAny } from "../crypto/keys.js";
 import { pathExists } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
@@ -54,10 +54,37 @@ export interface VerifyResult {
    * not that recorded evidence was altered.
    */
   governance: { ok: boolean; errors: string[] };
+  /**
+   * What the verdict above actually rests on.
+   *
+   * `anchored` is false when no expected fingerprint was supplied, which means
+   * the run proved internal consistency and nothing about authorship. Reporting
+   * a bare "PASSED" for that case overstates it, so the flag is part of the
+   * result rather than a detail of the CLI.
+   */
+  trustRoot: {
+    anchored: boolean;
+    monitorFingerprint: string | null;
+    expectedFingerprint: string | null;
+  };
 }
 
 export interface LedgerVerifyOptions {
   externallyAuthenticatedPayloads?: ReadonlyMap<string, string>;
+  /**
+   * SHA-256 of the monitor public key PEM this workspace is expected to use.
+   *
+   * Without it, verification is not adversarial. Every signature is checked
+   * against `.amc/keys/monitor_ed25519.pub`, which lives inside the workspace,
+   * so anyone who can rewrite the evidence can also replace the key it is
+   * checked against and re-sign everything. Demonstrated, not theorised: doing
+   * exactly that yields chain.ok = true with no errors.
+   *
+   * The fingerprint therefore has to come from outside the workspace — an
+   * operator's records, a deployment manifest, a notary — or the verdict says
+   * only "these bytes are internally consistent".
+   */
+  expectedMonitorFingerprint?: string;
 }
 
 
@@ -325,7 +352,9 @@ function chainOnlyResult(errors: string[]): VerifyResult {
     ok: errors.length === 0,
     errors,
     chain: { ok: errors.length === 0, errors },
-    governance: { ok: true, errors: [] }
+    governance: { ok: true, errors: [] },
+    // Unanchored: this check inspected rows, not the key they were signed with.
+    trustRoot: { anchored: false, monitorFingerprint: null, expectedFingerprint: null }
   };
 }
 
@@ -590,6 +619,32 @@ export async function verifyLedgerIntegrity(
   const chainErrors: string[] = [];
   const governanceErrors: string[] = [];
 
+  // The trust root comes first: if the key every signature is checked against
+  // is not the key the operator expects, nothing below this line means
+  // anything. An explicit option wins over the environment so a caller can
+  // verify one workspace against a specific key without changing process state.
+  const expectedFingerprint =
+    options.expectedMonitorFingerprint ?? process.env["AMC_EXPECTED_MONITOR_FINGERPRINT"] ?? null;
+  let monitorFingerprint: string | null = null;
+  try {
+    monitorFingerprint = sha256Hex(Buffer.from(getPublicKeyPem(workspacePath, "monitor"), "utf8"));
+  } catch {
+    // No monitor key at all. verifyEvents reports the consequences per event;
+    // recording null here keeps the trust-root verdict honest rather than
+    // claiming a match against a key that is absent.
+    monitorFingerprint = null;
+  }
+  if (expectedFingerprint) {
+    if (!monitorFingerprint) {
+      chainErrors.push("trust root: no monitor public key present to compare against the expected fingerprint");
+    } else if (monitorFingerprint !== expectedFingerprint) {
+      chainErrors.push(
+        `trust root: monitor key fingerprint ${monitorFingerprint.slice(0, 16)}… does not match the expected ` +
+          `${expectedFingerprint.slice(0, 16)}… — the evidence may have been re-signed with a substituted key`
+      );
+    }
+  }
+
   try {
     verifyEvents(ledger, workspacePath, chainErrors, options.externallyAuthenticatedPayloads);
     verifySessions(ledger, workspacePath, chainErrors);
@@ -610,6 +665,11 @@ export async function verifyLedgerIntegrity(
     ok: errors.length === 0,
     errors,
     chain: { ok: chainErrors.length === 0, errors: chainErrors },
-    governance: { ok: governanceErrors.length === 0, errors: governanceErrors }
+    governance: { ok: governanceErrors.length === 0, errors: governanceErrors },
+    trustRoot: {
+      anchored: Boolean(expectedFingerprint) && monitorFingerprint === expectedFingerprint,
+      monitorFingerprint,
+      expectedFingerprint
+    }
   };
 }

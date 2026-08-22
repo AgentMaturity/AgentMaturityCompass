@@ -112,3 +112,36 @@ export function registerEvidenceStoreCommands(program: Command): void {
       );
     });
 }
+
+/**
+ * Renders a ledger verdict together with what it actually rests on.
+ *
+ * "Ledger verification PASSED" on its own overstates an unanchored run. Every
+ * signature is checked against `.amc/keys/monitor_ed25519.pub`, which lives
+ * inside the workspace — so someone who can rewrite the evidence can replace
+ * that key and re-sign everything, and the run still passes. (There is a test
+ * that performs exactly that forgery and asserts it succeeds.) Saying so at the
+ * point the verdict is delivered is the difference between evidence and a green
+ * tick.
+ */
+export function renderLedgerVerdict(result: {
+  ok: boolean;
+  trustRoot: { anchored: boolean; monitorFingerprint: string | null; expectedFingerprint: string | null };
+}): string {
+  const headline = result.ok
+    ? chalk.green("Ledger verification PASSED")
+    : chalk.red("Ledger verification FAILED");
+  const fingerprint = result.trustRoot.monitorFingerprint;
+  if (result.trustRoot.anchored) {
+    return `${headline}\n${chalk.gray(`  Anchored to the expected monitor key ${fingerprint?.slice(0, 16)}…`)}`;
+  }
+  return (
+    `${headline}\n` +
+    chalk.yellow("  Unanchored: this checked internal consistency, not authorship.\n") +
+    chalk.gray(
+      `  Signed by monitor key ${fingerprint?.slice(0, 16) ?? "(absent)"}…, read from inside the workspace.\n` +
+        "  To make this adversarial, pin the expected fingerprint out of band:\n" +
+        "    AMC_EXPECTED_MONITOR_FINGERPRINT=<sha256 of the monitor .pub>"
+    )
+  );
+}

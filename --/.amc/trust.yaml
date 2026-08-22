@@ -1,0 +1,35 @@
+trust:
+  version: 1
+  mode: LOCAL_VAULT
+  notary:
+    baseUrl: http://127.0.0.1:4343
+    unixSocketPath: null
+    pinnedPubkeyFingerprint: "0000000000000000000000000000000000000000000000000000000000000000"
+    auth:
+      secretRef: vault:notary/auth
+      headerName: x-amc-notary-auth
+      hmacAlg: sha256
+    requiredAttestationLevel: SOFTWARE
+    allowedSignKinds:
+      - TRANSPARENCY_ROOT
+      - MERKLE_ROOT
+      - CERT
+      - BUNDLE
+      - BOM
+      - INSTALLED_LOCK
+      - RELEASE_MANIFEST
+      - BACKUP_MANIFEST
+      - ORG_SCORECARD
+      - TRANSFORM_PLAN
+      - COMPLIANCE_MAPS
+      - OPS_POLICY
+  enforcement:
+    requireNotaryFor:
+      - TRANSPARENCY_ROOT
+      - MERKLE_ROOT
+      - CERT
+      - INSTALLED_LOCK
+      - RELEASE_MANIFEST
+      - BACKUP_MANIFEST
+    denyLocalVaultSigningIfNotaryEnabled: true
+    notaryMaxClockSkewSeconds: 120
