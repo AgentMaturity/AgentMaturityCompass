@@ -5,7 +5,7 @@ import { join } from "node:path";
 
 /**
  * examples/ and the README tell a new user exactly what to type. Nothing
- * checked that those commands still exist, so a rename anywhere in a 1,172-path
+ * checked that those commands still exist, so a rename anywhere in a 1,175-path
  * CLI would silently turn the onboarding path into an error message — the worst
  * possible place for one.
  *
