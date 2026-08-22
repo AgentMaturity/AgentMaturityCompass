@@ -1159,8 +1159,8 @@ AMC provides 1,172 public CLI command paths in the live command inventory.
 | 1140 | `amc vault status` | Show vault status |
 | 1141 | `amc vault unlock` | Unlock vault into memory for signing operations |
 | 1142 | `amc vault zk-commit` | Create a Pedersen commitment to a value |
-| 1143 | `amc vault zk-range-proof` | Create a zero-knowledge range proof that an AMC score meets a threshold |
-| 1144 | `amc vault zk-verify` | Verify a ZK range proof (pass JSON as string) |
+| 1143 | `amc vault zk-range-proof` | Create a range commitment for an AMC score threshold (NOT a zero-knowledge proof; unsound, does not verify) |
+| 1144 | `amc vault zk-verify` | Check a range commitment (NOT a zero-knowledge verification; unsound) |
 | 1145 | `amc verify` | Verify integrity across AMC artifacts |
 | 1146 | `amc verify all` | Verify trust/policies/plugins/logs/ledger/artifacts in one pass |
 | 1147 | `amc vibe-audit` | Run static safety checks for AI-generated code |
@@ -9280,7 +9280,7 @@ Create a Pedersen commitment to a value
 
 #### `amc vault zk-range-proof`
 
-Create a zero-knowledge range proof that an AMC score meets a threshold
+Create a range commitment for an AMC score threshold (NOT a zero-knowledge proof; unsound, does not verify)
 
 
 | Option | Description |

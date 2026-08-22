@@ -6308,7 +6308,15 @@ verifyCmd
       }
     }
 
-    console.log(chalk.red("Ledger verification FAILED"));
+    // Say which of the two failed. "Ledger verification FAILED" over a
+    // gateway config signature reads as evidence tampering, which devalues the
+    // alarm for the case where evidence really was altered.
+    if (!result.chain.ok) {
+      console.log(chalk.red("Ledger verification FAILED — evidence chain"));
+    } else {
+      console.log(chalk.red("Ledger verification FAILED — configuration signatures"));
+      console.log(chalk.gray("  The evidence chain itself verified; the failures below are unsigned or edited configs."));
+    }
     const sigErrors = result.errors.filter((e: string) => e.includes("signature invalid"));
     const otherErrors = result.errors.filter((e: string) => !e.includes("signature invalid"));
     if (sigErrors.length > 0 && sigErrors.length === result.errors.length) {

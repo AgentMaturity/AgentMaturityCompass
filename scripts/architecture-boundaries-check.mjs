@@ -140,6 +140,41 @@ if (improvements.length > 0) {
   }
 }
 
+// ── Workspace-package imports stay inside the kernel boundary ────────────
+//
+// @amc/core and the vendored @amc/cordis packages are workspace packages, not
+// published ones: the npm tarball does not contain them. A src/ module that
+// imports one is fine only if nothing on a normal CLI path reaches it —
+// otherwise `npm install agent-maturity-compass` produces a CLI that throws
+// ERR_MODULE_NOT_FOUND on first use.
+//
+// The rule: only src/kernel/** and the composition command module may name
+// them, and both are reached exclusively through `amc composition` or a
+// composed runtime, which only exist in a repository checkout.
+const KERNEL_IMPORT_ALLOWED = [/^src\/kernel\//, /^src\/cli-composition-commands\.ts$/];
+
+function walkSources(dir, out = []) {
+  for (const entry of readdirSync(join(root, dir), { withFileTypes: true })) {
+    const rel = `${dir}/${entry.name}`;
+    if (entry.isDirectory()) walkSources(rel, out);
+    else if (entry.name.endsWith(".ts")) out.push(rel);
+  }
+  return out;
+}
+
+for (const file of walkSources("src")) {
+  if (KERNEL_IMPORT_ALLOWED.some((allowed) => allowed.test(file))) continue;
+  const source = readFileSync(join(root, file), "utf8");
+  // Type-only imports are erased by tsc, so they cost nothing at runtime.
+  const runtimeImport = /(?<!import type )(?:from|import\()\s*["'`]@amc\/(core|cordis)/;
+  if (runtimeImport.test(source.replace(/import type[^;]*;/g, ""))) {
+    fail(
+      `${file} imports a workspace package (@amc/core or @amc/cordis) outside src/kernel/. ` +
+        `Those packages are not in the published tarball, so an npm install would fail at runtime.`
+    );
+  }
+}
+
 const apiSource = readFileSync(join(root, "src/api/index.ts"), "utf8");
 const prefixBranchCount = (apiSource.match(/pathname\.startsWith/g) ?? []).length;
 if (!apiSource.includes("API_ROUTE_REGISTRY")) {
