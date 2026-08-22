@@ -120,6 +120,7 @@
     }
   },
   "dependencies": {
+    "@amc/core": "workspace:*",
     "@modelcontextprotocol/sdk": "^1.27.1",
     "better-sqlite3": "^12.8.0",
     "chalk": "^5.4.1",

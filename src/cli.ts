@@ -187,6 +187,7 @@ import { applyAssurancePatchKit, listAssuranceHistory, runAssurance, verifyAssur
 import { AgentResponderUnavailableError } from "./assurance/agentResponder.js";
 import { getAssurancePack, listAssurancePacks } from "./assurance/packs/index.js";
 import { registerMirofishCommands } from "./mirofish/cli.js";
+import { registerCompositionCommands } from "./cli-composition-commands.js";
 import { issueCertificate, inspectCertificate, revokeCertificate, verifyCertificate, verifyRevocation } from "./assurance/certificate.js";
 import { generateTrustCertificate } from "./cert/trustCertificate.js";
 import { renderFailureRiskMarkdown, runFleetIndices, runIndicesForAgent } from "./assurance/indices.js";
@@ -24655,6 +24656,7 @@ registerLateStageCliCommands({
 
 /* ── Mirofish simulation ──────────────────────────── */
 registerMirofishCommands(program);
+registerCompositionCommands(program);
 
 function isTopLevelHelpRequest(argv: string[]): boolean {
   const args = argv.slice(2);

@@ -1,0 +1,17 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "lib/types"
+  },
+  "include": ["src"],
+  "references": [
+    { "path": "../../vendor/cordis" },
+    { "path": "../../vendor/loader" },
+    { "path": "../../vendor/include" },
+    { "path": "../../vendor/group" },
+    { "path": "../../vendor/timer" },
+    { "path": "../../vendor/schemastery" },
+    { "path": "../../vendor/cosmokit" }
+  ]
+}

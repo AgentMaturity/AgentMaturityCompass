@@ -19,18 +19,28 @@ import { join, dirname, relative } from "node:path";
 import { spawnSync } from "node:child_process";
 
 const root = process.cwd();
-const vendorDir = join(root, "vendor");
 
-const packages = readdirSync(vendorDir).filter((entry) =>
-  existsSync(join(vendorDir, entry, "package.json"))
-);
+/**
+ * Every workspace package that builds to `lib/`.
+ *
+ * Covers `packages/*` as well as `vendor/*`: AMC's own packages declare the
+ * same manifest shape, so they need the same entry reconciliation. Keeping one
+ * builder means a carved-out package cannot be forgotten here.
+ */
+const WORKSPACE_DIRS = ["vendor", "packages"];
+const packages = [];
+for (const group of WORKSPACE_DIRS) {
+  const groupDir = join(root, group);
+  if (!existsSync(groupDir)) continue;
+  for (const entry of readdirSync(groupDir)) {
+    if (existsSync(join(groupDir, entry, "package.json"))) {
+      packages.push(join(group, entry));
+    }
+  }
+}
 
 // tsc -b resolves project references, so building the leaves builds the rest.
-const build = spawnSync(
-  "npx",
-  ["tsc", "-b", ...packages.map((p) => join("vendor", p))],
-  { cwd: root, encoding: "utf8" }
-);
+const build = spawnSync("npx", ["tsc", "-b", ...packages], { cwd: root, encoding: "utf8" });
 if (build.status !== 0) {
   console.error(`vendor build failed:\n${build.stdout}\n${build.stderr}`);
   process.exit(1);
@@ -45,7 +55,7 @@ if (build.status !== 0) {
  */
 let written = 0;
 for (const pkg of packages) {
-  const manifestPath = join(vendorDir, pkg, "package.json");
+  const manifestPath = join(root, pkg, "package.json");
   const manifest = JSON.parse(readFileSync(manifestPath, "utf8"));
   // Some packages declare dual entries (schemastery ships .mjs and .cjs, per
   // dsh's ledger §2 — its CJS entry's lazy require would otherwise race ESM
@@ -55,15 +65,22 @@ for (const pkg of packages) {
   );
 
   for (const entryPath of entries) {
-    const target = join(vendorDir, pkg, entryPath);
+    const target = join(root, pkg, entryPath);
     if (existsSync(target)) continue;
 
     const entryName = entryPath.slice("lib/".length).replace(/\.(js|mjs|cjs)$/, "");
-    const emitted = join(vendorDir, pkg, "lib", "types", `${entryName}.js`);
+    const emitted = join(root, pkg, "lib", "types", `${entryName}.js`);
     if (!existsSync(emitted)) {
-      console.error(`vendor/${pkg}: expected ${relative(root, emitted)} after tsc -b, but it is absent.`);
+      console.error(`${pkg}: expected ${relative(root, emitted)} after tsc -b, but it is absent.`);
       process.exit(1);
     }
+
+    // `export *` deliberately does not re-export a default binding, so a shim
+    // built only from it left `import Loader from "@amc/cordis-plugin-loader"`
+    // undefined and Cordis rejected it as "invalid plugin ... received
+    // undefined". Re-export the default too, when the entry has one.
+    const emittedSource = readFileSync(emitted, "utf8");
+    const hasDefault = /^export\s*\{[^}]*\bdefault\b|^export default\b/m.test(emittedSource);
 
     mkdirSync(dirname(target), { recursive: true });
     if (entryPath.endsWith(".cjs")) {
@@ -74,17 +91,14 @@ for (const pkg of packages) {
           `  .createRequire(__filename)("./types/${entryName}.js");\n`
       );
     } else {
-      writeFileSync(target, `export * from "./types/${entryName}.js";\n`);
-      if (entryPath.endsWith(".mjs")) {
-        writeFileSync(
-          target,
-          `export * from "./types/${entryName}.js";\n` +
-            `export { default } from "./types/${entryName}.js";\n`
-        );
+      const lines = [`export * from "./types/${entryName}.js";`];
+      if (hasDefault || entryPath.endsWith(".mjs")) {
+        lines.push(`export { default } from "./types/${entryName}.js";`);
       }
+      writeFileSync(target, `${lines.join("\n")}\n`);
     }
     written += 1;
   }
 }
 
-console.log(`Vendor build complete (${packages.length} packages, ${written} entry shim(s) written).`);
+console.log(`Workspace build complete (${packages.length} packages, ${written} entry shim(s) written).`);
