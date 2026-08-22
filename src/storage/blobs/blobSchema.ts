@@ -4,7 +4,11 @@ export const blobIndexRowSchema = z.object({
   v: z.literal(1),
   ts: z.number().int(),
   blobId: z.string().min(1),
-  keyVersion: z.number().int().min(1),
+  // 0 marks a blob whose key was generated without a vault (AMC_NO_SIGN):
+  // random and per-workspace, but stored beside the blobs rather than sealed.
+  // Versions start at 1, so no pre-existing record carries it, and an auditor
+  // reading an index can tell which blobs had the weaker protection.
+  keyVersion: z.number().int().min(0),
   path: z.string().min(1),
   payloadSha256: z.string().length(64),
   encryptedBytes: z.number().int().min(0),
@@ -27,7 +31,11 @@ export type BlobIndexSignature = z.infer<typeof blobIndexSignatureSchema>;
 
 export const blobKeyCurrentSchema = z.object({
   v: z.literal(1),
-  keyVersion: z.number().int().min(1),
+  // 0 marks a blob whose key was generated without a vault (AMC_NO_SIGN):
+  // random and per-workspace, but stored beside the blobs rather than sealed.
+  // Versions start at 1, so no pre-existing record carries it, and an auditor
+  // reading an index can tell which blobs had the weaker protection.
+  keyVersion: z.number().int().min(0),
   createdTs: z.number().int(),
   algorithm: z.literal("AES-256-GCM")
 });

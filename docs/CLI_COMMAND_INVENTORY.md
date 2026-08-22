@@ -248,6 +248,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc compliance risk-classify` | Classify agent into EU AI Act risk tiers (UNACCEPTABLE / HIGH / LIMITED / MINIMAL) | `--agent <agentId>`<br>`--capabilities <json>`<br>`--biometric`<br>`--critical-infra`<br>`--education`<br>`--employment`<br>`--essential-services`<br>`--law-enforcement`<br>`--migration`<br>`--justice`<br>`--realtime-biometric`<br>`--social-scoring`<br>`--subliminal`<br>`--exploits-vulnerabilities`<br>`--emotion-recognition`<br>`--chatbot`<br>`--synthetic-content`<br>`--human-interaction`<br>`--safety-component`<br>`--json` | `comply risk-classify` |
 | `amc compliance roadmap` | Generate step-by-step compliance plan for a framework | `--framework <framework>`<br>`--agent <agentId>`<br>`--capabilities <json>`<br>`--risk-tier <tier>`<br>`--out <path>`<br>`--json` | `comply roadmap` |
 | `amc compliance verify` | Verify compliance maps signature | - | `comply verify` |
+| `amc composition` | Inspect the declarative plugin composition (amc.cordis.yml) | `--config <path>`<br>`--json` | - |
 | `amc confidence` | Confidence drift tracking | - | - |
 | `amc confidence calibration` | Show calibration report | `--json` | - |
 | `amc confidence drift` | Show drift trend | `--json` | - |

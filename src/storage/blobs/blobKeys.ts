@@ -126,22 +126,66 @@ export function initBlobKey(workspace: string): BlobKeyCurrent {
   return current;
 }
 
-// Deterministic fallback key used in --no-sign / AMC_NO_SIGN=1 mode.
-// Not secret — only used when vault is intentionally bypassed for read-only/unsigned runs.
-const NO_SIGN_FALLBACK_KEY = Buffer.from("amc-no-sign-fallback-key-32bytes!", "utf8").subarray(0, 32);
+/**
+ * The key this code used to encrypt every blob written without a vault.
+ *
+ * It is a constant in public source, so anything encrypted with it is readable
+ * by anyone holding the workspace — and blob files travel: `exportEvidenceBundle`
+ * copies `.amc/blobs/*` into the portable `.amcbundle`, which is precisely the
+ * artifact the product tells an operator to hand to a third party.
+ *
+ * Its comment claimed the mode is "intentionally bypassed", but no-sign is not
+ * always a choice: a vault that fails to unlock sets AMC_NO_SIGN=1 on its own
+ * (src/cli.ts, instant full-score recovery), so an operator who loses a
+ * passphrase silently starts producing evidence encrypted with this string.
+ *
+ * Retained for READ ONLY, so blobs already written this way remain
+ * recoverable. Nothing writes with it again.
+ */
+const LEGACY_NO_SIGN_KEY = Buffer.from("amc-no-sign-fallback-key-32bytes!", "utf8").subarray(0, 32);
+
+/** Marks a blob key generated without vault protection. */
+const UNVAULTED_KEY_VERSION = 0;
+
+function unvaultedKeyPath(workspace: string): string {
+  return join(blobsRoot(workspace), "unvaulted.key");
+}
+
+/**
+ * A real random key for workspaces operating without a vault.
+ *
+ * Kept outside the vault by necessity, at 0600, and marked with a distinct key
+ * version so an auditor can tell these blobs were written without vault
+ * protection. That is a weaker guarantee than the vault's, and it is stated
+ * rather than disguised — but it is not the same as no guarantee at all, which
+ * is what a published constant amounts to.
+ */
+function ensureUnvaultedKeyMaterial(workspace: string): Buffer {
+  const path = unvaultedKeyPath(workspace);
+  if (pathExists(path)) {
+    const key = Buffer.from(readUtf8(path).trim(), "base64");
+    if (key.length === 32) return key;
+  }
+  ensureDir(blobsRoot(workspace));
+  const material = randomBytes(32).toString("base64");
+  writeFileAtomic(path, material, 0o600);
+  return Buffer.from(material, "base64");
+}
 
 function makeFallbackBlobKey(): BlobKeyCurrent {
   return blobKeyCurrentSchema.parse({
     v: 1,
-    keyVersion: 1,
+    keyVersion: UNVAULTED_KEY_VERSION,
     createdTs: 0,
     algorithm: "AES-256-GCM"
   });
 }
 
 export function ensureBlobKey(workspace: string): BlobKeyCurrent {
-  // In --no-sign mode, skip vault-dependent key init/load
+  // Without a vault, keys cannot be sealed — but they can still be random and
+  // per-workspace, which is the difference between weak protection and none.
   if (process.env.AMC_NO_SIGN === "1") {
+    ensureUnvaultedKeyMaterial(workspace);
     return makeFallbackBlobKey();
   }
   if (!pathExists(blobCurrentKeyPath(workspace))) {
@@ -151,6 +195,13 @@ export function ensureBlobKey(workspace: string): BlobKeyCurrent {
 }
 
 export function rotateBlobKey(workspace: string): BlobKeyCurrent {
+  if (process.env.AMC_NO_SIGN === "1") {
+    // Rotating would mint version 1 and seal it in the vault — but reads in
+    // this mode resolve version 1 to the legacy constant, so every blob
+    // written after the rotation would come back undecryptable. Refuse rather
+    // than produce evidence that cannot be reopened.
+    throw new Error("cannot rotate blob key without a vault (AMC_NO_SIGN=1)");
+  }
   const current = ensureBlobKey(workspace);
   const next = blobKeyCurrentSchema.parse({
     v: 1,
@@ -164,9 +215,17 @@ export function rotateBlobKey(workspace: string): BlobKeyCurrent {
 }
 
 export function readBlobKeyMaterial(workspace: string, keyVersion: number): Buffer {
-  // In --no-sign mode, use fallback key so vault isn't required for blob ops
+  // Version 0 is issued only by this code path, so it unambiguously means a
+  // real random key held beside the blobs.
+  if (keyVersion === UNVAULTED_KEY_VERSION) {
+    return ensureUnvaultedKeyMaterial(workspace);
+  }
   if (process.env.AMC_NO_SIGN === "1") {
-    return NO_SIGN_FALLBACK_KEY;
+    // A versioned blob read without a vault: written before this change, when
+    // no-sign mode stamped keyVersion 1 and encrypted with the published
+    // constant. The vault is unreachable in this mode, so that constant is the
+    // only key that can still open it. Read-only; nothing writes it again.
+    return LEGACY_NO_SIGN_KEY;
   }
   const value = getVaultSecret(workspace, blobKeySecretName(keyVersion));
   if (!value) {
