@@ -4,6 +4,7 @@ import { join } from "node:path";
 import { ensureDir, pathExists, writeFileAtomic, readUtf8 } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { decryptVaultPayload, encryptVaultPayload, type VaultEnvelope } from "./vaultCrypto.js";
+import { buildKeyHistoryEntry, type KeyHistoryEntry } from "../crypto/keyHistoryChain.js";
 
 export type VaultKeyKind = "monitor" | "auditor" | "lease" | "session";
 
@@ -144,17 +145,19 @@ function readEnvelope(workspace: string): VaultEnvelope {
 function writePublicAndHistory(file: string, historyFile: string, publicPem: string): void {
   writeFileAtomic(file, publicPem, 0o644);
   const existing = pathExists(historyFile)
-    ? (JSON.parse(readUtf8(historyFile)) as Array<{ createdTs: number; fingerprint: string; publicKeyPem: string }>)
+    ? (JSON.parse(readUtf8(historyFile)) as KeyHistoryEntry[])
     : [];
   const fingerprint = sha256Hex(Buffer.from(publicPem, "utf8"));
   if (!existing.some((row) => row.fingerprint === fingerprint)) {
-    existing.push({
-      createdTs: Date.now(),
-      fingerprint,
-      publicKeyPem: publicPem
-    });
+    // Chained, through the shared helper. This writer runs first — on every
+    // `amc init` — and previously appended entries with no chain fields, so
+    // every workspace's history was entirely "legacy" and the chain verifier
+    // waved all of it through. The protection existed and did nothing.
+    existing.push(buildKeyHistoryEntry(publicPem, existing));
   }
-  writeFileAtomic(historyFile, JSON.stringify(existing, null, 2), 0o644);
+  // 0600, not 0644: this file decides which keys may sign for this role, so it
+  // must not be readable or writable by other users on the host.
+  writeFileAtomic(historyFile, JSON.stringify(existing, null, 2), 0o600);
 }
 
 function ensurePublicKeys(paths: ReturnType<typeof vaultPaths>, monitorPub: string, auditorPub: string, leasePub: string, sessionPub: string): void {

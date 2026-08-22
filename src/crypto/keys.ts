@@ -4,6 +4,10 @@ import { join } from "node:path";
 import { ensureDir, pathExists, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { ensureVaultAndPublicKeys, getVaultPrivateKeyPem, vaultPaths } from "../vault/vault.js";
+import {
+  buildKeyHistoryEntry,
+  verifyKeyHistoryEntries
+} from "./keyHistoryChain.js";
 
 interface KeyHistoryItem {
   createdTs: number;
@@ -37,14 +41,6 @@ interface KeyHistoryItem {
 }
 
 /** Computes the chain hash for an entry. */
-function keyHistoryEntryHash(
-  item: Pick<KeyHistoryItem, "createdTs" | "fingerprint" | "publicKeyPem">,
-  prevHash: string
-): string {
-  return sha256Hex(
-    Buffer.from(`${prevHash}|${item.createdTs}|${item.fingerprint}|${item.publicKeyPem}`, "utf8")
-  );
-}
 
 /**
  * Verifies the key-history chain for a role.
@@ -58,23 +54,7 @@ export function verifyKeyHistoryChain(
 ): { ok: boolean; brokenAtIndex: number | null; legacyEntries: number } {
   const file = historyPath(workspace, kind);
   if (!pathExists(file)) return { ok: true, brokenAtIndex: null, legacyEntries: 0 };
-  const entries = JSON.parse(readFileSync(file, "utf8")) as KeyHistoryItem[];
-  let prev = "GENESIS";
-  let legacy = 0;
-  for (let i = 0; i < entries.length; i += 1) {
-    const entry = entries[i]!;
-    if (!entry.entryHash) {
-      legacy += 1;
-      prev = "GENESIS";
-      continue;
-    }
-    const expected = keyHistoryEntryHash(entry, entry.prevHash ?? prev);
-    if (expected !== entry.entryHash) {
-      return { ok: false, brokenAtIndex: i, legacyEntries: legacy };
-    }
-    prev = entry.entryHash;
-  }
-  return { ok: true, brokenAtIndex: null, legacyEntries: legacy };
+  return verifyKeyHistoryEntries(JSON.parse(readFileSync(file, "utf8")) as KeyHistoryItem[]);
 }
 
 function keyDir(workspace: string): string {
@@ -98,13 +78,9 @@ function ensureHistoryEntry(
   const file = historyPath(workspace, kind);
   const existing: KeyHistoryItem[] = pathExists(file) ? JSON.parse(readFileSync(file, "utf8")) as KeyHistoryItem[] : [];
   if (!existing.some((item) => item.publicKeyPem === publicPem)) {
-    const prevHash = existing.length > 0 ? (existing[existing.length - 1]!.entryHash ?? "GENESIS") : "GENESIS";
-    const base = {
-      createdTs: Date.now(),
-      fingerprint: sha256Hex(Buffer.from(publicPem, "utf8")),
-      publicKeyPem: publicPem
-    };
-    existing.push({ ...base, prevHash, entryHash: keyHistoryEntryHash(base, prevHash), source });
+    const entry = buildKeyHistoryEntry(publicPem, existing, source);
+    existing.push(entry);
+    const base = { fingerprint: entry.fingerprint };
     if (source !== "local") {
       // Admitting an external key permanently widens who can sign for this
       // role; say so rather than doing it silently.
@@ -183,6 +159,27 @@ export function getPublicKeyHistory(workspace: string, kind: "monitor" | "audito
     return [getPublicKeyPem(workspace, kind)];
   }
   const entries: KeyHistoryItem[] = JSON.parse(readFileSync(file, "utf8")) as KeyHistoryItem[];
+
+  // Fail closed on a broken chain.
+  //
+  // verifyHexDigestAny accepts a signature if ANY key returned here validates
+  // it, so returning the history without checking its integrity is what makes
+  // an appended key a trusted signer. Chaining the file detected tampering but
+  // nothing consulted the chain — the protection was built and never wired in.
+  //
+  // Refusing here covers every consumer at once, rather than asking twenty
+  // call sites to remember. The workspace's own current public key is still
+  // returned, so a tampered history degrades to "only the live key is
+  // trusted" rather than failing every operation outright.
+  const chain = verifyKeyHistoryEntries(entries);
+  if (!chain.ok) {
+    console.warn(
+      `[amc] ${kind} key history failed its integrity chain at entry ${chain.brokenAtIndex}. ` +
+        `Historical keys are not trusted until this is resolved. Review with: amc doctor`
+    );
+    return [getPublicKeyPem(workspace, kind)];
+  }
+
   const out = new Set<string>(entries.map((entry) => entry.publicKeyPem));
   out.add(getPublicKeyPem(workspace, kind));
   return [...out];
