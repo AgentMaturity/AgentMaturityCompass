@@ -43,10 +43,6 @@ function tarCreate(sourceDir: string, outFile: string): void {
 
 function tarExtract(archiveFile: string, outDir: string): void {
   extractValidatedTarGzipArchive({ file: archiveFile, destination: outDir, label: "archive", limits: AMC_ARCHIVE_LIMITS });
-  const out = { status: 0, stderr: "", stdout: "" };
-  if (out.status !== 0) {
-    throw new Error(`failed to extract tarball: ${(`${out.stdout ?? ""}${out.stderr ?? ""}`).trim()}`);
-  }
 }
 
 function packageVersion(workspace: string): string {

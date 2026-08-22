@@ -64,10 +64,6 @@ function runTarCreate(sourceDir: string, outputBundle: string): void {
 
 function runTarExtract(bundleFile: string, outputDir: string): void {
   extractValidatedTarGzipArchive({ file: bundleFile, destination: outputDir, label: "archive", limits: AMC_ARCHIVE_LIMITS });
-  const out = { status: 0, stderr: "", stdout: "" };
-  if (out.status !== 0) {
-    throw new Error(`Failed to extract bundle archive: ${(`${out.stdout ?? ""}${out.stderr ?? ""}`).trim()}`);
-  }
 }
 
 function collectFiles(rootDir: string): string[] {

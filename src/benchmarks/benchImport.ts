@@ -26,10 +26,6 @@ const AMC_ARCHIVE_LIMITS: TarArchiveLimits = {
 
 function runTarExtract(bundleFile: string, outputDir: string): void {
   extractValidatedTarGzipArchive({ file: bundleFile, destination: outputDir, label: "archive", limits: AMC_ARCHIVE_LIMITS });
-  const out = { status: 0, stderr: "", stdout: "" };
-  if (out.status !== 0) {
-    throw new Error(`Failed to extract benchmark artifact: ${(`${out.stdout ?? ""}${out.stderr ?? ""}`).trim()}`);
-  }
 }
 
 function importOne(workspace: string, file: string): { benchId: string; dir: string } {

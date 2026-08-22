@@ -64,10 +64,6 @@ function tarCreateDeterministic(sourceDir: string, outFile: string): void {
 
 function tarExtract(bundleFile: string, outDir: string): void {
   extractValidatedTarGzipArchive({ file: bundleFile, destination: outDir, label: "archive", limits: AMC_ARCHIVE_LIMITS });
-  const out = { status: 0, stderr: "", stdout: "" };
-  if (out.status !== 0) {
-    throw new Error(`failed to extract passport artifact: ${(`${out.stdout ?? ""}${out.stderr ?? ""}`).trim()}`);
-  }
 }
 
 function resolvePassportRoot(dir: string): string {
