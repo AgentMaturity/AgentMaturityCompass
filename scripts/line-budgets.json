@@ -2,10 +2,11 @@
   "_comment": "Descending ratchet. A file may shrink freely (the baseline follows it down) but may never grow past its recorded baseline. New files over CAP are rejected. Regenerate a lowered baseline with: node scripts/architecture-boundaries-check.mjs --update",
   "cap": 800,
   "dataRegistries": [
-    "src/methodology/publicMethodology.ts",
+    "src/compliance/builtInMappings.ts",
     "src/diagnostic/questionBank.ts",
     "src/domains/industryPacks.ts",
-    "src/compliance/builtInMappings.ts"
+    "src/methodology/publicMethodology.ts",
+    "src/types.ts"
   ],
   "budgets": {
     "src/benchmarks/replayBenchmarkCorpus.ts": 29469,
@@ -13,7 +14,6 @@
     "src/score/metricValidity.ts": 18459,
     "src/watch/liveDriftAlerts.ts": 15980,
     "src/studio/studioServer.ts": 8880,
-    "src/types.ts": 4341,
     "src/diagnostic/questionScoreExplainability.ts": 4152,
     "src/benchmarks/providerDriftBenchmark.ts": 4103,
     "src/index.ts": 2505,

@@ -71,9 +71,33 @@ function writeBlobIndexSig(workspace: string, lastHash: string): void {
   writeFileAtomic(blobIndexSigPath(workspace), JSON.stringify(payload, null, 2), 0o644);
 }
 
+/**
+ * The hash of the last row in the index, or "" if the index is empty.
+ *
+ * Reads only the final line rather than parsing every row through zod. The
+ * append path needs exactly this one value to chain the new row, and doing it
+ * by materialising the whole index made each append O(number of blobs) — which
+ * is O(n^2) over a session that stores a blob per content event, the largest
+ * cost on the P2.2 content path. The index file is still the authority (not the
+ * separately-written signature, which can lag it across a crash), so the chain
+ * output is byte-identical to the previous whole-file read.
+ */
+function lastBlobIndexHash(workspace: string): string {
+  const path = blobIndexPath(workspace);
+  if (!pathExists(path)) {
+    return "";
+  }
+  const text = readUtf8(path);
+  let end = text.length;
+  while (end > 0 && (text[end - 1] === "\n" || text[end - 1] === "\r")) end -= 1;
+  if (end === 0) return "";
+  const start = text.lastIndexOf("\n", end - 1) + 1;
+  const lastLine = text.slice(start, end);
+  return blobIndexRowSchema.parse(JSON.parse(lastLine) as unknown).hash;
+}
+
 function appendBlobIndexRow(workspace: string, row: Omit<BlobIndexRow, "v" | "prev" | "hash">): BlobIndexRow {
-  const rows = readBlobIndexRows(workspace);
-  const prev = rows.length > 0 ? rows[rows.length - 1]!.hash : "";
+  const prev = lastBlobIndexHash(workspace);
   const hash = sha256Hex(
     canonicalize({
       v: 1,

@@ -1,5 +1,5 @@
 import Database from "better-sqlite3";
-import { randomUUID } from "node:crypto";
+import { createPrivateKey, randomUUID, type KeyObject } from "node:crypto";
 import { readdirSync, readFileSync } from "node:fs";
 import { join, relative, resolve } from "node:path";
 import type {
@@ -13,7 +13,7 @@ import type {
   RuntimeName,
   SessionRecord
 } from "../types.js";
-import { ensureSigningKeys, getPrivateKeyPem, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
+import { ensureSigningKeys, getPrivateKeyPem, getPublicKeyHistory, signHexDigest, signHexDigestWith, verifyHexDigestAny } from "../crypto/keys.js";
 import { verifyGatewayConfigSignature } from "../gateway/config.js";
 import { verifyActionPolicySignature } from "../governor/actionPolicyEngine.js";
 import { verifyToolsConfigSignature } from "../toolhub/toolhubValidators.js";
@@ -87,6 +87,7 @@ export interface AppendOutcomeEventInput {
 }
 
 import { hasTable, runMigrations, reconcileLegacyMigrationState } from "./ledgerSchema.js";
+import { canonicalMetadataForHash, sanitizeMetaForHash } from "./eventHash.js";
 
 function ledgerPath(workspace: string): string {
   return join(workspace, ".amc", "evidence.sqlite");
@@ -95,6 +96,8 @@ function ledgerPath(workspace: string): string {
 function blobDir(workspace: string): string {
   return join(workspace, ".amc", "blobs");
 }
+
+export { canonicalMetadataForHash, sanitizeMetaForHash } from "./eventHash.js";
 
 export function targetsDir(workspace: string): string {
   return join(workspace, ".amc", "targets");
@@ -134,43 +137,6 @@ function ledgerPoolKey(workspace: string): string {
 }
 
 
-function sanitizeMetaForHash(metaJson: string): string {
-  let parsed: Record<string, unknown> = {};
-  try {
-    parsed = JSON.parse(metaJson) as Record<string, unknown>;
-  } catch {
-    return metaJson;
-  }
-  if (typeof parsed !== "object" || parsed === null) {
-    return metaJson;
-  }
-  const clone: Record<string, unknown> = { ...parsed };
-  delete clone.receipt;
-  delete clone.receipt_sha256;
-  return JSON.stringify(clone);
-}
-
-export function canonicalMetadataForHash(params: {
-  id: string;
-  ts: number;
-  sessionId: string;
-  runtime: RuntimeName;
-  eventType: EvidenceEventType;
-  payloadPath: string | null;
-  payloadInline: string | null;
-  metaJson: string;
-}): string {
-  return canonicalize({
-    id: params.id,
-    ts: params.ts,
-    session_id: params.sessionId,
-    runtime: params.runtime,
-    event_type: params.eventType,
-    payload_path: params.payloadPath,
-    payload_inline: params.payloadInline,
-    meta_json: sanitizeMetaForHash(params.metaJson)
-  });
-}
 
 function firstString(
   source: Record<string, unknown>,
@@ -253,6 +219,18 @@ export class Ledger {
   private readonly unsignedSignatures: boolean;
   private incidentStoreInitialized = false;
 
+  // Read-only config for the life of this connection. loadOpsPolicy re-reads and
+  // re-validates .amc/ops-policy.yaml on every call (~156µs), and the append path
+  // consulted it once per event; it is cached here and every hot path reads the
+  // cache instead of the file. A single writer owns a connection, and a policy
+  // change lands through a fresh connection, so there is nothing to invalidate.
+  private opsPolicyCache: ReturnType<typeof loadOpsPolicy> | null = null;
+
+  // The monitor private key, parsed once. sign() re-parses the PEM on every call
+  // (~64µs); reusing a KeyObject drops that to ~27µs/sign. Held only in memory,
+  // alongside the already-unlocked vault payload the PEM itself came from.
+  private monitorKeyObjectCache: KeyObject | null = null;
+
   constructor(workspace: string) {
     this.workspace = workspace;
     this.unsignedSignatures = process.env.AMC_NO_SIGN === "1";
@@ -301,8 +279,27 @@ export class Ledger {
     return getPrivateKeyPem(this.workspace, "auditor");
   }
 
+  // The ops policy, loaded (and validated) at most once per connection. See the
+  // field declaration for why caching is safe.
+  private getOpsPolicy(): ReturnType<typeof loadOpsPolicy> {
+    if (this.opsPolicyCache === null) {
+      this.opsPolicyCache = loadOpsPolicy(this.workspace);
+    }
+    return this.opsPolicyCache;
+  }
+
+  // The monitor private key as a parsed KeyObject, created at most once per
+  // connection. Never reached under AMC_NO_SIGN: signMonitorDigest short-circuits
+  // before this, so a workspace with no vault is not forced to parse a key.
+  private monitorSigningKey(): KeyObject {
+    if (this.monitorKeyObjectCache === null) {
+      this.monitorKeyObjectCache = createPrivateKey(this.monitorPrivateKey());
+    }
+    return this.monitorKeyObjectCache;
+  }
+
   private signMonitorDigest(digestHex: string): string {
-    return this.unsignedSignatures ? "unsigned" : signHexDigest(digestHex, this.monitorPrivateKey());
+    return this.unsignedSignatures ? "unsigned" : signHexDigestWith(this.monitorSigningKey(), digestHex);
   }
 
   private signAuditorDigest(digestHex: string): string {
@@ -346,7 +343,7 @@ export class Ledger {
   }
 
   private storeBlob(payload: Buffer, _ext: "txt" | "json"): { path: string; sha: string; blobRef: string | null } {
-    const policy = loadOpsPolicy(this.workspace);
+    const policy = this.getOpsPolicy();
     if (payload.byteLength > policy.opsPolicy.retention.maxBlobBytes) {
       throw new Error(
         `payload exceeds max blob bytes (${payload.byteLength} > ${policy.opsPolicy.retention.maxBlobBytes})`
@@ -574,7 +571,7 @@ export class Ledger {
     result: AppendEvidenceResult;
   } {
     const { input, id, ts, prevHash } = params;
-    const policy = params.policy ?? loadOpsPolicy(this.workspace);
+    const policy = params.policy ?? this.getOpsPolicy();
     const payload = input.payload;
     let payloadPath: string | null = null;
     let payloadInline: string | null = null;
@@ -697,7 +694,7 @@ export class Ledger {
     }> = [];
     const insert = this.db.prepare(EVIDENCE_EVENT_INSERT_SQL);
     const spanRows: EvidenceEvent[] = [];
-    const policy = loadOpsPolicy(this.workspace);
+    const policy = this.getOpsPolicy();
     this.runImmediateTransaction(() => {
       let previousHash = this.latestEventHash();
       for (const input of inputs) {
@@ -749,7 +746,7 @@ export class Ledger {
     this.assertTrustedWriter();
     const id = input.id ?? randomUUID();
     const ts = input.ts ?? Date.now();
-    const policy = loadOpsPolicy(this.workspace);
+    const policy = this.getOpsPolicy();
     const payload = input.payload;
     let payloadPath: string | null = null;
     let payloadInline: string | null = null;

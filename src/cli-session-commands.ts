@@ -1,0 +1,163 @@
+/**
+ * CLI surface for the turn-sealed session spine (P2.2): verify a workspace's
+ * per-session lifecycle, inspect a single session's projected conversation and
+ * event spine, and recover a crashed session by appending synthetic closers.
+ *
+ * Registered as a HIDDEN command group. There are no other callers of the spine
+ * yet, so this is an operator/debug surface rather than a product one; hiding it
+ * keeps it out of `buildCommandInventory` (isInternalCommand treats a hidden
+ * command as internal), so the published command-count claim is unaffected. It
+ * lives in its own module because src/cli.ts is at its line-ratchet floor.
+ */
+import type { Command } from "commander";
+import { hostname } from "node:os";
+import { randomUUID } from "node:crypto";
+import chalk from "chalk";
+
+export function registerSessionCommands(program: Command): void {
+  const session = program
+    .command("session", { hidden: true })
+    .description("Turn-sealed session spine: verify, inspect, and recover agent sessions (internal)");
+
+  session
+    .command("verify")
+    .description("Verify the ledger and report per-session lifecycle verdicts (open / interrupted / closed)")
+    .option("--json", "Output as JSON")
+    .option(
+      "--expect-monitor <fingerprint>",
+      "Expected monitor public-key fingerprint, supplied out of band (sha256 of the monitor .pub)"
+    )
+    .action(async (opts: { json?: boolean; expectMonitor?: string }) => {
+      const { verifyLedgerIntegrity } = await import("./ledger/ledger.js");
+      const { renderLedgerVerdict } = await import("./cli-evidence-store-commands.js");
+      const result = await verifyLedgerIntegrity(process.cwd(), {
+        ...(opts.expectMonitor ? { expectedMonitorFingerprint: opts.expectMonitor } : {})
+      });
+      if (opts.json) {
+        console.log(JSON.stringify(result, null, 2));
+        process.exit(result.ok ? 0 : 1);
+        return;
+      }
+      console.log(renderLedgerVerdict(result));
+      const { open, interrupted, closed } = result.sessions;
+      console.log("");
+      console.log(chalk.bold("Agent sessions"));
+      console.log(`  ${chalk.green("closed")}      ${closed.length}`);
+      console.log(`  ${chalk.cyan("open")}        ${open.length}`);
+      console.log(`  ${chalk.yellow("interrupted")} ${interrupted.length}`);
+      for (const id of interrupted) {
+        // Surfaced, never laundered: an interrupted session is reported distinctly
+        // so an operator can decide whether to `session recover` it.
+        console.log(chalk.yellow(`    interrupted: ${id}`));
+      }
+      process.exit(result.ok ? 0 : 1);
+    });
+
+  session
+    .command("show")
+    .description("Show a session's projected conversation and its event spine")
+    .argument("<id>", "session id")
+    .option("--json", "Output as JSON")
+    .action(async (id: string, opts: { json?: boolean }) => {
+      const { openLedger } = await import("./ledger/ledger.js");
+      const { projectSurface } = await import("./session/surfaceProjection.js");
+      const { extractEnvelope } = await import("./session/sessionTypes.js");
+      const ledger = openLedger(process.cwd());
+      try {
+        const events = ledger.getAllEvents().filter((event) => event.session_id === id);
+        if (events.length === 0) {
+          console.error(chalk.red(`No events found for session ${id}.`));
+          process.exit(1);
+          return;
+        }
+        const history = projectSurface(events);
+        const spine = events.map((event) => {
+          const envelope = extractEnvelope(event.meta_json);
+          return {
+            seq: envelope?.seq ?? null,
+            turn: envelope?.turn ?? null,
+            step: envelope?.step ?? null,
+            eventType: event.event_type,
+            eventId: event.id,
+            surface: envelope?.surface.op ?? "n/a"
+          };
+        });
+        if (opts.json) {
+          console.log(JSON.stringify({ sessionId: id, spine, history }, null, 2));
+          return;
+        }
+        console.log(chalk.bold(`Session ${id}`));
+        console.log(chalk.gray(`  ${events.length} events`));
+        console.log("");
+        console.log(chalk.bold("Projected conversation (model-visible)"));
+        for (const message of history) {
+          console.log(`  ${chalk.cyan(message.role)}:`);
+          for (const part of message.parts) {
+            console.log(`    - ${part.kind} ${chalk.gray(part.sha256.slice(0, 16))}…`);
+          }
+        }
+        console.log("");
+        console.log(chalk.bold("Event spine"));
+        for (const row of spine) {
+          const label = `seq ${String(row.seq).padStart(3)} · turn ${row.turn ?? "-"} · step ${row.step ?? "-"}`;
+          console.log(`  ${chalk.gray(label)}  ${row.eventType}  ${chalk.gray(row.surface)}`);
+        }
+      } finally {
+        ledger.close();
+      }
+    });
+
+  session
+    .command("recover")
+    .description("Recover a crashed session by appending synthetic closers under a fenced claim (append-only)")
+    .argument("<id>", "session id")
+    .option("--force", "Bypass the liveness gate (recover even a session that is not yet stale)")
+    .option("--close", "Also append session/close and seal the row (a synthetic, clearly-marked close)")
+    .option("--stale-after <ms>", "Staleness window in milliseconds before a session is deemed crashed")
+    .option("--json", "Output as JSON")
+    .action(async (id: string, opts: { force?: boolean; close?: boolean; staleAfter?: string; json?: boolean }) => {
+      const { recoverSession } = await import("./session/sessionRecovery.js");
+      const staleAfterMs = opts.staleAfter === undefined ? undefined : Number.parseInt(opts.staleAfter, 10);
+      if (staleAfterMs !== undefined && (!Number.isFinite(staleAfterMs) || staleAfterMs < 0)) {
+        console.error(chalk.red(`Invalid --stale-after value: ${opts.staleAfter}`));
+        process.exit(1);
+        return;
+      }
+      const report = recoverSession({
+        workspace: process.cwd(),
+        sessionId: id,
+        claimant: {
+          pid: process.pid,
+          hostId: hostname(),
+          bootId: process.env.AMC_BOOT_ID ?? randomUUID(),
+          startedAt: Math.round(Date.now() - process.uptime() * 1000)
+        },
+        force: Boolean(opts.force),
+        close: Boolean(opts.close),
+        ...(staleAfterMs !== undefined ? { staleAfterMs } : {})
+      });
+      if (opts.json) {
+        console.log(JSON.stringify(report, null, 2));
+        process.exit(report.verdict === "TAMPERED" ? 1 : 0);
+        return;
+      }
+      const verdictColor =
+        report.verdict === "RECOVERED"
+          ? chalk.green
+          : report.verdict === "TAMPERED"
+            ? chalk.red
+            : chalk.yellow;
+      console.log(verdictColor(`Recovery ${report.verdict}`));
+      if (report.reason) {
+        console.log(chalk.gray(`  ${report.reason}`));
+      }
+      console.log(`  won claim:            ${report.wonClaim ? "yes" : "no"}`);
+      console.log(`  synthetic turn ends:  ${report.syntheticTurnEnds}`);
+      console.log(`  unknown tool results: ${report.unknownToolOutcomes}`);
+      console.log(`  unsealed tail before: ${report.unsealedTailCountBefore}`);
+      console.log(`  closed:               ${report.closed ? "yes" : "no"}`);
+      // A broken per-session chain is a tamper finding, never a crash; make it a
+      // non-zero exit so an operator or CI treats it as the alarm it is.
+      process.exit(report.verdict === "TAMPERED" ? 1 : 0);
+    });
+}

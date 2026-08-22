@@ -23,7 +23,25 @@ export type EvidenceEventType =
   | "agent_handoff_sent"
   | "agent_handoff_received"
   | "agent_delegation_started"
-  | "agent_delegation_completed";
+  | "agent_delegation_completed"
+  | "session/open"
+  | "session/close"
+  | "turn/start"
+  | "turn/end"
+  | "turn/seal"
+  | "step/start"
+  | "step/end"
+  | "request/header"
+  | "system/prompt"
+  | "user/message"
+  | "assistant/block"
+  | "tool/call"
+  | "tool/result"
+  | "approval/request"
+  | "approval/answer"
+  | "sandbox/mode"
+  | "session/recovery-claim"
+  | "session/recovered";
 
 export type RiskTier = "low" | "med" | "high" | "critical";
 

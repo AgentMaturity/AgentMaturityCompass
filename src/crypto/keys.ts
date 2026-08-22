@@ -1,4 +1,4 @@
-import { sign, verify } from "node:crypto";
+import { sign, verify, type KeyObject } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { ensureDir, pathExists, writeFileAtomic } from "../utils/fs.js";
@@ -187,6 +187,20 @@ export function getPublicKeyHistory(workspace: string, kind: "monitor" | "audito
 
 export function signHexDigest(digestHex: string, privateKeyPem: string): string {
   const signature = sign(null, Buffer.from(digestHex, "hex"), privateKeyPem);
+  return signature.toString("base64");
+}
+
+/**
+ * Signs a hex digest with an already-parsed private key.
+ *
+ * `sign(null, data, pem)` re-parses the PEM into a key object on every call.
+ * A caller that signs in a hot loop — the ledger, once per appended event —
+ * pays that parse each time for a key that never changes. Passing a KeyObject
+ * it parsed once (via crypto.createPrivateKey) avoids the re-parse; the produced
+ * signature is byte-identical to signHexDigest's, so verification is unaffected.
+ */
+export function signHexDigestWith(privateKey: KeyObject, digestHex: string): string {
+  const signature = sign(null, Buffer.from(digestHex, "hex"), privateKey);
   return signature.toString("base64");
 }
 

@@ -190,6 +190,7 @@ import { registerMirofishCommands } from "./mirofish/cli.js";
 import { registerCompositionCommands } from "./cli-composition-commands.js";
 import { registerVaultZkCommands } from "./cli-vault-zk-commands.js";
 import { registerEvidenceStoreCommands, renderLedgerVerdict } from "./cli-evidence-store-commands.js";
+import { registerSessionCommands } from "./cli-session-commands.js";
 import { issueCertificate, inspectCertificate, revokeCertificate, verifyCertificate, verifyRevocation } from "./assurance/certificate.js";
 import { generateTrustCertificate } from "./cert/trustCertificate.js";
 import { renderFailureRiskMarkdown, runFleetIndices, runIndicesForAgent } from "./assurance/indices.js";
@@ -24570,10 +24571,9 @@ registerLateStageCliCommands({
   integrations,
   openExternalUrl
 });
-
-/* ── Mirofish simulation ──────────────────────────── */
 registerMirofishCommands(program);
 registerCompositionCommands(program);
+registerSessionCommands(program);
 
 function isTopLevelHelpRequest(argv: string[]): boolean {
   const args = argv.slice(2);
