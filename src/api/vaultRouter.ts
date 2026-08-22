@@ -170,7 +170,14 @@ export async function handleVaultRoute(
       }
       const { createZKRangeProof } = await import('../vault/zkPrivacy.js');
       const proof = createZKRangeProof(body.value, body.threshold, body.agentId ?? 'api');
-      apiSuccess(res, proof);
+      // The response carries the disclaimer so a consumer of this API cannot
+      // mistake the object for a zero-knowledge proof. See src/vault/zkPrivacy.ts.
+      apiSuccess(res, {
+        ...proof,
+        zeroKnowledge: false,
+        warning:
+          'Not a zero-knowledge proof: this construction is unsound and does not verify. Do not present it as evidence.'
+      });
     } catch (err) {
       apiError(res, 500, err instanceof Error ? err.message : 'ZK range proof failed');
     }
@@ -184,7 +191,12 @@ export async function handleVaultRoute(
       if (!body.proof) { apiError(res, 400, 'proof required'); return true; }
       const { verifyZKRangeProof } = await import('../vault/zkPrivacy.js');
       const valid = verifyZKRangeProof(body.proof as unknown as Parameters<typeof verifyZKRangeProof>[0]);
-      apiSuccess(res, { valid });
+      apiSuccess(res, {
+        valid,
+        zeroKnowledge: false,
+        warning:
+          'Not a zero-knowledge verification: this construction is unsound. A true result carries no assurance.'
+      });
     } catch (err) {
       apiError(res, 500, err instanceof Error ? err.message : 'ZK proof verification failed');
     }

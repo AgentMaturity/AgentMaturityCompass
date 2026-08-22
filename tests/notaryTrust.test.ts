@@ -1,5 +1,5 @@
 import { createServer as createHttpServer, request as httpRequest } from "node:http";
-import { mkdtempSync, rmSync } from "node:fs";
+import { mkdtempSync, rmSync, mkdirSync, readFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { tmpdir } from "node:os";
 import { describe, expect, it } from "vitest";
@@ -10,6 +10,7 @@ import { startNotaryServer } from "../src/notary/notaryServer.js";
 import { buildNotaryAuthSignature } from "../src/notary/notaryAuth.js";
 import { verifyNotarySignResponse } from "../src/notary/notaryVerify.js";
 import { checkNotaryTrust, enableNotaryTrust } from "../src/trust/trustConfig.js";
+import { getPublicKeyHistory } from "../src/crypto/keys.js";
 import { tailNotaryLog } from "../src/notary/notaryLog.js";
 
 function newWorkspace(prefix: string): string {
@@ -278,6 +279,52 @@ describe("notary + trust hard mode", () => {
         const down = await checkNotaryTrust(workspace);
         expect(down.ok).toBe(false);
         expect(down.reasons.some((reason) => reason.includes("NOTARY_UNREACHABLE"))).toBe(true);
+      }
+    );
+
+    rmSync(workspace, { recursive: true, force: true });
+    rmSync(notaryDir, { recursive: true, force: true });
+  });
+
+  it("does not widen the auditor trust set when enabling notary trust fails", async () => {
+    // enableNotaryTrust admitted the pinned key before saving the config it
+    // belongs to. A failure in between — an unwritable trust directory, a vault
+    // that will not sign — left the auditor trust set permanently expanded for
+    // a notary that was never enabled, with no revocation path.
+    const workspace = newWorkspace("amc-notary-partial");
+    const notaryDir = newNotaryDir("amc-notary-partial");
+
+    await withEnv(
+      {
+        AMC_NOTARY_PASSPHRASE: "partial-notary-passphrase",
+        AMC_NOTARY_AUTH_SECRET: "partial-notary-auth-secret"
+      },
+      async () => {
+        const init = await notaryInitCli({ notaryDir });
+        // Fail the signing step specifically: the signature lands at
+        // .amc/trust.yaml.sig, so a directory in its place makes the write
+        // throw after trust.yaml itself was written — exactly the window in
+        // which the key used to be admitted.
+        const sigPath = join(workspace, ".amc", "trust.yaml.sig");
+        rmSync(sigPath, { force: true });
+        mkdirSync(sigPath, { recursive: true });
+
+        try {
+          await expect(
+            enableNotaryTrust({
+              workspace,
+              baseUrl: "http://127.0.0.1:1",
+              pinPubkeyPath: init.publicKeyPath,
+              requiredAttestationLevel: "SOFTWARE"
+            })
+          ).rejects.toThrow();
+
+          const pubPem = readFileSync(init.publicKeyPath, "utf8");
+          const admitted = getPublicKeyHistory(workspace, "auditor");
+          expect(admitted, "a notary that was never enabled must not be trusted").not.toContain(pubPem);
+        } finally {
+          rmSync(sigPath, { recursive: true, force: true });
+        }
       }
     );
 

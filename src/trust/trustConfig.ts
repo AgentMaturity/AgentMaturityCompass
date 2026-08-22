@@ -364,8 +364,13 @@ export async function enableNotaryTrust(params: {
       }
     }
   });
-  addPublicKeyToHistory(params.workspace, "auditor", pubPem, "notary");
+  // Admit the key only once the config it belongs to is durably saved and
+  // signed. Doing it first meant a failure in saveTrustConfig — an unwritable
+  // trust directory, a locked vault at the signing step — left the auditor
+  // trust set permanently widened for a notary that was never enabled. There
+  // is no revocation path, so that widening would have been silent and final.
   const saved = saveTrustConfig(params.workspace, next);
+  addPublicKeyToHistory(params.workspace, "auditor", pubPem, "notary");
   return {
     path: saved.path,
     sigPath: saved.sigPath,

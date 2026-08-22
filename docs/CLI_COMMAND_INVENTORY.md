@@ -1146,8 +1146,8 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc vault status` | Show vault status | - | - |
 | `amc vault unlock` | Unlock vault into memory for signing operations | - | - |
 | `amc vault zk-commit` | Create a Pedersen commitment to a value | `--value <n>` | - |
-| `amc vault zk-range-proof` | Create a zero-knowledge range proof that an AMC score meets a threshold | `--value <n>`<br>`--threshold <n>`<br>`--agent <id>` | - |
-| `amc vault zk-verify` | Verify a ZK range proof (pass JSON as string) | - | - |
+| `amc vault zk-range-proof` | Create a range commitment for an AMC score threshold (NOT a zero-knowledge proof; unsound, does not verify) | `--value <n>`<br>`--threshold <n>`<br>`--agent <id>` | - |
+| `amc vault zk-verify` | Check a range commitment (NOT a zero-knowledge verification; unsound) | - | - |
 | `amc verify` | Verify integrity across AMC artifacts | `--repair` | - |
 | `amc verify all` | Verify trust/policies/plugins/logs/ledger/artifacts in one pass | `--json` | - |
 | `amc vibe-audit` | Run static safety checks for AI-generated code | `--file <path>`<br>`--json` | - |

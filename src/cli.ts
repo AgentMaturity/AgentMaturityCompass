@@ -188,6 +188,7 @@ import { AgentResponderUnavailableError } from "./assurance/agentResponder.js";
 import { getAssurancePack, listAssurancePacks } from "./assurance/packs/index.js";
 import { registerMirofishCommands } from "./mirofish/cli.js";
 import { registerCompositionCommands } from "./cli-composition-commands.js";
+import { registerVaultZkCommands } from "./cli-vault-zk-commands.js";
 import { issueCertificate, inspectCertificate, revokeCertificate, verifyCertificate, verifyRevocation } from "./assurance/certificate.js";
 import { generateTrustCertificate } from "./cert/trustCertificate.js";
 import { renderFailureRiskMarkdown, runFleetIndices, runIndicesForAgent } from "./assurance/indices.js";
@@ -19727,8 +19728,20 @@ program
       const keys = getPublicKeyHistory(process.cwd(), "monitor");
       publicKeys.push(...keys);
     } catch { /* no keys */ }
-    const result = verifyDelegationChain(receiptId, publicKeys);
+    const result = verifyDelegationChain(receiptId, publicKeys, process.cwd());
     console.log(renderDelegationChainMarkdown(result));
+    const { countStoredReceipts } = await import("./receipts/receiptChain.js");
+    if (!result.valid && countStoredReceipts(process.cwd()) === 0) {
+      // Otherwise "not found in store" reads as a mistyped id, when in fact
+      // this workspace has never recorded a chained receipt: the ledger mints
+      // plain receipts, and delegation chains come only from callers that opt
+      // into mintChainedReceipt.
+      console.log(
+        chalk.yellow(
+          "No chained receipts are recorded in this workspace, so no delegation chain can be traced yet."
+        )
+      );
+    }
   });
 
 // ── Policy Canary Mode CLI ──────────────────────────────────────────────
@@ -22097,83 +22110,7 @@ vault
     } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
   });
 
-// ── Vault ZK Privacy ─────────────────────────────────────────────────────────
-vault
-  .command("zk-range-proof")
-  .description("Create a zero-knowledge range proof that an AMC score meets a threshold")
-  .requiredOption("--value <n>", "Score value (0-100 display scale)")
-  .requiredOption("--threshold <n>", "Minimum threshold to prove")
-  .requiredOption("--agent <id>", "Agent ID")
-  .action(async (opts: { value: string; threshold: string; agent: string }) => {
-    try {
-      const { createZKRangeProof } = await import("./vault/zkPrivacy.js");
-      const value = parseFloat(opts.value);
-      const threshold = parseFloat(opts.threshold);
-      const proof = createZKRangeProof(value, threshold, opts.agent);
-      console.log(chalk.bold.green("\n🔒  ZK Range Proof"));
-      console.log(chalk.gray("Agent:"), opts.agent);
-      console.log(chalk.gray("Claim:"), proof.claim);
-      console.log(chalk.gray("Verified:"), proof.verified ? chalk.green("✓ yes") : chalk.red("✗ no"));
-      console.log(chalk.gray("Value commitment:"), proof.valueCommitment.slice(0, 16) + "...");
-      console.log(chalk.gray("Delta commitment:"), proof.deltaCommitment.slice(0, 16) + "...");
-      console.log(chalk.gray("Bit proofs:"), proof.bitProofs.length);
-      console.log(chalk.gray("Challenge hash:"), proof.challengeHash.slice(0, 16) + "...");
-      console.log(chalk.gray("Proof ID:"), proof.id);
-    } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
-  });
-
-vault
-  .command("zk-verify <proofJson>")
-  .description("Verify a ZK range proof (pass JSON as string)")
-  .action(async (proofJson: string) => {
-    try {
-      const { verifyZKRangeProof } = await import("./vault/zkPrivacy.js");
-      const proof = JSON.parse(proofJson);
-      const valid = verifyZKRangeProof(proof);
-      console.log(chalk.bold.green("\n🔒  ZK Proof Verification"));
-      console.log(chalk.gray("Claim:"), proof.claim ?? "N/A");
-      console.log(chalk.gray("Valid:"), valid ? chalk.green("✓ yes") : chalk.red("✗ no"));
-    } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
-  });
-
-vault
-  .command("zk-commit")
-  .description("Create a Pedersen commitment to a value")
-  .requiredOption("--value <n>", "Value to commit to (integer)")
-  .action(async (opts: { value: string }) => {
-    try {
-      const { pedersenCommit } = await import("./vault/zkPrivacy.js");
-      const commitment = pedersenCommit(BigInt(Math.floor(parseFloat(opts.value))));
-      console.log(chalk.bold.green("\n🔒  Pedersen Commitment"));
-      console.log(chalk.gray("Value:"), opts.value);
-      console.log(chalk.gray("Commitment:"), commitment.commitment.slice(0, 32) + "...");
-      console.log(chalk.gray("Blinding factor:"), "[redacted]");
-    } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
-  });
-
-vault
-  .command("secret-share")
-  .description("Split a secret into shares using Shamir's Secret Sharing")
-  .requiredOption("--secret <value>", "Secret integer value to split")
-  .requiredOption("--shares <n>", "Total number of shares to create")
-  .requiredOption("--threshold <k>", "Minimum shares required to reconstruct")
-  .action(async (opts: { secret: string; shares: string; threshold: string }) => {
-    try {
-      const { shamirSplit } = await import("./vault/zkPrivacy.js");
-      const secret = BigInt(Math.floor(parseFloat(opts.secret)));
-      const n = parseInt(opts.shares, 10);
-      const k = parseInt(opts.threshold, 10);
-      const shares = shamirSplit(secret, n, k);
-      console.log(chalk.bold.green("\n🔒  Secret Sharing"));
-      console.log(chalk.gray("Total shares:"), n);
-      console.log(chalk.gray("Threshold:"), k);
-      console.log(chalk.gray("Shares created:"), shares.length);
-      for (const share of shares) {
-        const valuePreview = share.value.slice(0, 8);
-        console.log(chalk.gray(`  share #${share.index}: index=${share.index} value=0x${valuePreview}... [redacted]`));
-      }
-    } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
-  });
+registerVaultZkCommands(vault);
 
 // ── Watch Behavioral Profiler ─────────────────────────────────────────────────
 watch

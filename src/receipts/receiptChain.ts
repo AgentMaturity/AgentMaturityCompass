@@ -6,6 +6,9 @@
  */
 
 import { randomUUID, sign, verify } from "node:crypto";
+import { join } from "node:path";
+import { readdirSync } from "node:fs";
+import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import type { ReceiptPayloadV1, ReceiptKind } from "./receipt.js";
@@ -40,27 +43,90 @@ export interface ChainVerificationResult {
 }
 
 // ---------------------------------------------------------------------------
-// In-memory Receipt Store (for chaining lookups)
+// Receipt Store (for chaining lookups)
 // ---------------------------------------------------------------------------
 
+/**
+ * Chained receipts, in memory and on disk.
+ *
+ * The store used to be only this Map. Every consumer of the chain — `amc
+ * receipts-chain` and the /crypto chain route — runs in a process that never
+ * minted anything, so the Map was always empty and verification could only ever
+ * report "Receipt <id> not found in store". The command failed closed, which is
+ * the right direction, but it could not succeed for any input.
+ *
+ * Receipts are now written under the workspace so a later process can find
+ * them. Only the signed receipt string is persisted: the payload is decoded
+ * back out of it on read, so an edited file cannot present a payload that
+ * disagrees with the bytes that were signed.
+ */
 const receiptStore = new Map<string, { receipt: string; payload: ChainedReceiptPayloadV1 }>();
+
+function chainDir(workspace: string): string {
+  return join(workspace, ".amc", "receipts", "chain");
+}
+
+function chainPath(workspace: string, receiptId: string): string {
+  // Receipt ids reach here from CLI arguments and HTTP routes, so a traversal
+  // in the id must not escape the store directory.
+  return join(chainDir(workspace), `${encodeURIComponent(receiptId)}.receipt`);
+}
 
 /**
  * Register a receipt in the chain store for later lookup.
+ *
+ * With a workspace, the receipt is also persisted so other processes can
+ * verify the chain; without one, the registration stays in-process.
  */
 export function registerChainedReceipt(
   receiptId: string,
   receipt: string,
   payload: ChainedReceiptPayloadV1,
+  workspace?: string | null,
 ): void {
   receiptStore.set(receiptId, { receipt, payload });
+  if (workspace) {
+    ensureDir(chainDir(workspace));
+    writeFileAtomic(chainPath(workspace, receiptId), receipt, 0o600);
+  }
 }
 
 /**
- * Look up a stored receipt by ID.
+ * How many chained receipts this workspace has recorded.
+ *
+ * Lets a caller tell "that id is not here" apart from "nothing has ever
+ * recorded a chained receipt", which are very different answers for someone
+ * trying to trace a delegation.
  */
-export function getStoredReceipt(receiptId: string): { receipt: string; payload: ChainedReceiptPayloadV1 } | null {
-  return receiptStore.get(receiptId) ?? null;
+export function countStoredReceipts(workspace: string): number {
+  const dir = chainDir(workspace);
+  if (!pathExists(dir)) return 0;
+  return readdirSync(dir).filter((name) => name.endsWith(".receipt")).length;
+}
+
+/**
+ * Look up a stored receipt by ID, in memory first and then on disk.
+ */
+export function getStoredReceipt(
+  receiptId: string,
+  workspace?: string | null,
+): { receipt: string; payload: ChainedReceiptPayloadV1 } | null {
+  const inMemory = receiptStore.get(receiptId);
+  if (inMemory) return inMemory;
+  if (!workspace) return null;
+  const path = chainPath(workspace, receiptId);
+  if (!pathExists(path)) return null;
+  try {
+    const receipt = readUtf8(path).trim();
+    // Decoded from the signed bytes, never from a separately stored copy.
+    const payload = parseReceipt(receipt).payload as ChainedReceiptPayloadV1;
+    if (payload.receipt_id !== receiptId) return null;
+    return { receipt, payload };
+  } catch {
+    // A corrupt or truncated file is a missing receipt, and the caller reports
+    // it as such rather than treating the chain as verified.
+    return null;
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -87,6 +153,8 @@ export interface MintChainedReceiptInput {
   privateKeyPem: string;
   parentReceiptId?: string | null;
   receiptId?: string;
+  /** Workspace to persist the receipt in, so other processes can verify it. */
+  workspace?: string | null;
 }
 
 /**
@@ -100,7 +168,7 @@ export function mintChainedReceipt(input: MintChainedReceiptInput): {
   // Build delegation chain from parent
   let delegationChain: string[] = [];
   if (input.parentReceiptId) {
-    const parent = receiptStore.get(input.parentReceiptId);
+    const parent = getStoredReceipt(input.parentReceiptId, input.workspace);
     if (parent) {
       delegationChain = [...parent.payload.delegation_chain, input.parentReceiptId];
     } else {
@@ -131,7 +199,7 @@ export function mintChainedReceipt(input: MintChainedReceiptInput): {
   const receiptSha256 = sha256Hex(Buffer.from(receipt, "utf8"));
 
   // Auto-register in store
-  registerChainedReceipt(receiptId, receipt, payload);
+  registerChainedReceipt(receiptId, receipt, payload, input.workspace);
 
   return { payload, receipt, receiptSha256 };
 }
@@ -146,6 +214,7 @@ export function mintChainedReceipt(input: MintChainedReceiptInput): {
 export function verifyDelegationChain(
   leafReceiptId: string,
   publicKeysPem: string[],
+  workspace?: string | null,
 ): ChainVerificationResult {
   const errors: string[] = [];
   const entries: DelegationChainEntry[] = [];
@@ -159,7 +228,7 @@ export function verifyDelegationChain(
     }
     visited.add(currentId);
 
-    const stored = receiptStore.get(currentId);
+    const stored = getStoredReceipt(currentId, workspace);
     if (!stored) {
       errors.push(`Receipt ${currentId} not found in store`);
       break;

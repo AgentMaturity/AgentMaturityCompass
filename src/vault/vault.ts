@@ -107,7 +107,15 @@ function defaultPassphrase(): string {
   if (process.env.AMC_VAULT_PASSPHRASE && process.env.AMC_VAULT_PASSPHRASE.length > 0) {
     return process.env.AMC_VAULT_PASSPHRASE;
   }
-  if (process.env.NODE_ENV === "test" || process.env.VITEST === "true" || process.env.VITEST === "1") {
+  // Only the test runner, never NODE_ENV.
+  //
+  // This passphrase is published in this file, so a vault sealed with it can be
+  // opened by anyone holding the file — private monitor and auditor signing
+  // keys included. NODE_ENV=test is set routinely by CI images and application
+  // frameworks, so `amc init` in such an environment used to mint a real
+  // workspace whose keys were recoverable. VITEST is set by the runner itself
+  // and does not leak into deployed environments.
+  if (process.env.VITEST === "true" || process.env.VITEST === "1") {
     return "amc-test-passphrase";
   }
   throw new Error(

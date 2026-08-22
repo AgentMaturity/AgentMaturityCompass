@@ -1,15 +1,35 @@
 /**
- * Zero-Knowledge Privacy Layer for AMC Vault
+ * Commitment and secret-sharing utilities for the AMC vault.
  *
- * Real ZK proof protocols:
- * - Schnorr identification protocol (prove knowledge of secret without revealing it)
- * - Sigma protocol for discrete-log-based range proofs
- * - Pedersen commitments with proper binding + hiding properties
- * - Selective disclosure via Merkle trees with proper inclusion proofs
- * - Shamir secret sharing for N-of-M multi-party verification
+ * NOT a zero-knowledge proof system, despite what this header claimed and what
+ * the exported names suggest. The claims were checked by running the code, and
+ * none of the proof protocols work:
  *
- * Built on Node.js crypto primitives. No external ZK library required.
- * Uses elliptic curve operations via the built-in crypto module.
+ * - `schnorrVerify` rejects proofs produced by `schnorrProve`: 299 failures in
+ *   300 honest runs. Scalars are reduced mod P while `modPow` reduces exponents
+ *   mod P-1, so the verification identity holds only when the subtraction in
+ *   the response happens not to wrap.
+ * - `verifyZKRangeProof` returns false for an honest in-range claim (value 72,
+ *   threshold 50), for the same reason in the reconstruction step.
+ * - `bitProofIsWellFormed` (previously named `verifyBitProof`) never verified
+ *   anything: it checks that two numbers are positive and two strings are
+ *   non-empty. Its own comment said so. The broken reconstruction is the only
+ *   thing standing between that and trivially forged proofs.
+ *
+ * The group is wrong as well: P is the secp256k1 *order* used as a field
+ * modulus, and G is that curve's base-point x-coordinate used as a generator of
+ * the multiplicative group. Discrete log in a 256-bit prime field is within
+ * reach of index calculus, so even a correct implementation over these
+ * parameters would not carry the security the name implies.
+ *
+ * What does work: Pedersen commit/open round-trips, and Shamir secret sharing.
+ * Both are commitments — binding a value you later reveal — not proofs about a
+ * value you keep hidden.
+ *
+ * Making this real means a vetted library (noble-curves with a Bulletproofs
+ * implementation, arkworks via WASM), not more hand-rolled field arithmetic.
+ * Until then nothing here may be presented to an operator or an auditor as a
+ * privacy guarantee, and the CLI and API surfaces say so.
  */
 
 import { createHash, randomBytes, createHmac } from "node:crypto";
@@ -344,7 +364,7 @@ export function createZKRangeProof(
     reconstructionProof: reconstructionValid ? reconstructed.toString(16) : "",
     challengeHash,
     threshold, bitLength,
-    verified: delta >= 0 && reconstructionValid && bitProofs.every(bp => verifyBitProof(bp)),
+    verified: delta >= 0 && reconstructionValid && bitProofs.every(bp => bitProofIsWellFormed(bp)),
   };
 }
 
@@ -352,12 +372,13 @@ export function createZKRangeProof(
  * Verify a ZK range proof without knowing the value.
  */
 export function verifyZKRangeProof(proof: ZKRangeProof): boolean {
-  if (!proof.verified) return false;
+  // `proof.verified` is written by the prover, so it cannot gate the result:
+  // a forger sets it to true. Everything below is recomputed from the proof.
   if (proof.bitProofs.length !== proof.bitLength) return false;
 
   // 1. Verify each bit proof
   for (const bp of proof.bitProofs) {
-    if (!verifyBitProof(bp)) return false;
+    if (!bitProofIsWellFormed(bp)) return false;
   }
 
   // 2. Verify reconstruction: Π C_i^{2^i} = C_delta
@@ -442,12 +463,16 @@ function createBitProof(bit: bigint, r: bigint, commitment: bigint): BitProof {
  * Verify a bit proof (OR-proof).
  * Check: c0 + c1 = H(C, a0, a1) and both sub-proofs verify.
  */
-function verifyBitProof(bp: BitProof): boolean {
-  // Both challenges must sum to the Fiat-Shamir hash
+/**
+ * Well-formedness only — this is not a verification.
+ *
+ * It checks that the challenges are positive and the responses are non-empty.
+ * A proof that passes has demonstrated nothing about the bit it commits to, so
+ * the function is named for what it does.
+ */
+function bitProofIsWellFormed(bp: BitProof): boolean {
   const c0 = BigInt("0x" + bp.challenge0);
   const c1 = BigInt("0x" + bp.challenge1);
-
-  // We can't fully verify without the commitment, but we can check structural soundness
   return c0 > 0n && c1 > 0n && bp.response0.length > 0 && bp.response1.length > 0;
 }
 

@@ -311,7 +311,7 @@ export async function handleCryptoRoute(
       try {
         publicKeys = getPublicKeyHistory(workspace, 'monitor');
       } catch { /* no keys available */ }
-      const result = verifyDelegationChain(receiptId, publicKeys);
+      const result = verifyDelegationChain(receiptId, publicKeys, workspace);
       apiSuccess(res, result);
     } catch (err) {
       apiError(res, 500, err instanceof Error ? err.message : 'Receipts chain failed');
