@@ -139,3 +139,7 @@ deploy/k8s/secret.yaml
 # sales and handoff material that was untracked but unignored — one `git add .`
 # from being published.
 internal/
+# The workspace installs with pnpm (ADR-0001): the vendored Cordis manifests
+# use the `workspace:` protocol, which npm cannot parse. A stray package-lock
+# would be a second, silently-drifting source of truth.
+package-lock.json

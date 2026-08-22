@@ -1,0 +1,23 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "lib/types",
+    "module": "preserve",
+    "noUncheckedIndexedAccess": false,
+    "exactOptionalPropertyTypes": false,
+    "noImplicitOverride": false,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "moduleResolution": "bundler"
+  },
+  "include": [
+    "src"
+  ],
+  "references": [
+    {
+      "path": "../cosmokit"
+    }
+  ],
+  "//": "module: preserve (upstream) requires moduleResolution bundler; the base sets NodeNext for every other package. AMC-local: recorded in VENDOR_DIVERGENCE.md."
+}

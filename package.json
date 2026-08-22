@@ -48,7 +48,7 @@
     "qa:dogfood-8-agents": "node scripts/amc-dogfood-8-agents.mjs",
     "research:amc-landscape": "node scripts/research-amc-landscape.mjs",
     "research:amc-landscape:verify": "node scripts/verify-amc-landscape.mjs",
-    "audit:runtime": "npm audit --omit=dev --audit-level=moderate",
+    "audit:runtime": "pnpm audit --prod --audit-level moderate",
     "check:incident-readiness": "node scripts/incident-readiness-check.mjs",
     "check:architecture-boundaries": "node scripts/architecture-boundaries-check.mjs",
     "check:docs-drift": "node scripts/docs-drift-check.mjs",
@@ -66,7 +66,13 @@
     "check:question-bank-export": "node scripts/gen-question-bank-export.mjs --check",
     "test:coverage": "vitest run --coverage",
     "gen:changelog-page": "node scripts/gen-changelog-page.mjs",
-    "check:changelog-page": "node scripts/gen-changelog-page.mjs --check"
+    "check:changelog-page": "node scripts/gen-changelog-page.mjs --check",
+    "vendor:rescope": "node scripts/vendor/rescope-vendor.mjs --apply",
+    "check:vendor-links": "node scripts/vendor/verify-vendored-links.mjs",
+    "check:vendor-rescope": "node scripts/vendor/rescope-vendor.mjs --check",
+    "gen:third-party-notices": "node scripts/vendor/gen-third-party-notices.mjs",
+    "check:third-party-notices": "node scripts/vendor/gen-third-party-notices.mjs --check",
+    "build:vendor": "tsc -b vendor/cordis vendor/loader vendor/include vendor/group vendor/timer vendor/hmr vendor/logger-console vendor/schemastery"
   },
   "keywords": [
     "ai-agent",
@@ -127,6 +133,7 @@
     "qs": "6.15.2"
   },
   "devDependencies": {
+    "@amc/cordis": "workspace:*",
     "@axe-core/playwright": "^4.11.1",
     "@changesets/cli": "^2.30.0",
     "@fontsource/inter": "5.2.8",
@@ -146,5 +153,6 @@
   "author": {
     "name": "Sid",
     "url": "https://github.com/AgentMaturity"
-  }
+  },
+  "packageManager": "pnpm@10.33.0"
 }

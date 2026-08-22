@@ -23,7 +23,7 @@ describe("GitHub Pages deployment runtime", () => {
       "docs/**",
       "scripts/build-pages-site.mjs",
       "package.json",
-      "package-lock.json",
+      "pnpm-lock.yaml",
       ".github/workflows/pages.yml",
     ]) {
       expect(workflow, path).toContain(path);
@@ -39,7 +39,7 @@ describe("GitHub Pages deployment runtime", () => {
     expect(workflow).toContain("id-token: write");
     expect(workflow).toContain("actions/setup-node@v6");
     expect(workflow).toContain("node-version: 22");
-    expect(workflow).toContain("npm ci");
+    expect(workflow).toContain("pnpm install --frozen-lockfile");
     expect(workflow).toContain("npm run build:pages");
     expect(workflow).toContain("path: tmp/pages-site");
     expect(workflow).not.toContain("path: website");

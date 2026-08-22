@@ -1,11 +1,18 @@
 #!/usr/bin/env node
-import { readFileSync } from "node:fs";
+import { readFileSync, existsSync } from "node:fs";
 import { resolve } from "node:path";
 import { spawnSync } from "node:child_process";
 
 const root = resolve(process.cwd());
 const packageJson = JSON.parse(readFileSync(resolve(root, "package.json"), "utf8"));
-const packageLock = JSON.parse(readFileSync(resolve(root, "package-lock.json"), "utf8"));
+// The repo installs with pnpm (ADR-0001: the vendored manifests use the
+// `workspace:` protocol, which npm cannot parse). pnpm-lock.yaml records no
+// root package version, so there is no lockfile version to cross-check —
+// its presence is what is verified instead.
+const pnpmLockPath = resolve(root, "pnpm-lock.yaml");
+if (!existsSync(pnpmLockPath)) {
+  fail("pnpm-lock.yaml is missing; the workspace install is not reproducible.");
+}
 const channel = JSON.parse(readFileSync(resolve(root, "website/install-channel.json"), "utf8"));
 const unixInstaller = readFileSync(resolve(root, "website/install.sh"), "utf8");
 const windowsInstaller = readFileSync(resolve(root, "website/install.ps1"), "utf8");
@@ -31,8 +38,6 @@ if (builtCli.status !== 0) {
 
 const versions = {
   packageJson: packageJson.version,
-  packageLock: packageLock.version,
-  packageLockRoot: packageLock.packages?.[""]?.version,
   builtCli: builtCli.stdout.trim(),
   installChannel: channel.packageVersion,
   unixInstaller: matchVersion(unixInstaller, /PINNED_AMC_RELEASE_VERSION="([^"]+)"/, "Unix installer"),

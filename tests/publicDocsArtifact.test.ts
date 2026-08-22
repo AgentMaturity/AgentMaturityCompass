@@ -4,6 +4,7 @@ import { tmpdir } from "node:os";
 import { join, relative, resolve } from "node:path";
 import { spawnSync } from "node:child_process";
 import { afterAll, describe, expect, test } from "vitest";
+import { pnpmIntegrityFor } from "./helpers/pnpmLock.js";
 
 const root = process.cwd();
 const docsScript = readFileSync(resolve(root, "website/docs/docs.js"), "utf8");
@@ -52,7 +53,7 @@ describe("public Docs Pages artifact", () => {
     const html = readFileSync(resolve(root, "website/docs/index.html"), "utf8");
     const script = readFileSync(resolve(root, "website/docs/docs.js"), "utf8");
     const pkg = JSON.parse(readFileSync(resolve(root, "package.json"), "utf8"));
-    const lock = JSON.parse(readFileSync(resolve(root, "package-lock.json"), "utf8"));
+
 
     expect(html).toContain('src="vendor/marked.min.js"');
     expect(html).toContain('src="docs.js?v=13"');
@@ -61,8 +62,12 @@ describe("public Docs Pages artifact", () => {
     expect(script).toContain("./content-manifest.json");
     expect(script).not.toContain("raw.githubusercontent.com");
     expect(pkg.devDependencies.marked).toMatch(/^\d+\.\d+\.\d+$/);
-    expect(lock.packages["node_modules/marked"].version).toBe(pkg.devDependencies.marked);
-    expect(lock.packages["node_modules/marked"].integrity).toMatch(/^sha512-/);
+    // The bundled renderer stays pinned to the exact declared version with an
+    // integrity hash, so a swapped marked build fails here.
+    expect(
+      pnpmIntegrityFor("marked", String(pkg.devDependencies.marked), root),
+      `marked@${pkg.devDependencies.marked} pinned with an integrity hash`
+    ).not.toBeNull();
   });
 
   test("builds a deterministic allowlisted artifact with source and renderer hashes", () => {

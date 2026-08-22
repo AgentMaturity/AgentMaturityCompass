@@ -53,7 +53,13 @@ describe("release readiness scripts", () => {
     const dependencies = pkg.dependencies ?? {};
 
     expect(dependencies.semver).toBeTruthy();
-    expect(pkg.scripts?.["audit:runtime"]).toContain("npm audit --omit=dev");
+    // The repo installs with pnpm (ADR-0001), so `npm audit` has no lockfile to
+    // read. What must hold is that the audit covers production dependencies
+    // only and fails at moderate severity — not which tool spells it.
+    const audit = String(pkg.scripts?.["audit:runtime"] ?? "");
+    expect(audit).toMatch(/^(npm|pnpm) audit\b/);
+    expect(audit, "must exclude devDependencies").toMatch(/--prod\b|--omit=dev\b/);
+    expect(audit, "must fail at moderate severity").toMatch(/--audit-level[= ]moderate/);
   });
 
   test("prepack release bundle check does not mutate the workspace install", () => {

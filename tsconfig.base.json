@@ -1,0 +1,44 @@
+{
+  "//": [
+    "Shared compiler options for the workspace.",
+    "",
+    "The vendored Cordis packages each extend this file (vendor/README.md",
+    "modification 3, where it was dsh's repo-root base). AMC's own",
+    "tsconfig.json now extends it too, so the root build and the vendored",
+    "packages cannot drift apart on target/module resolution \u2014 the vendored",
+    "source uses explicit .ts specifiers (modification 4) and needs",
+    "allowImportingTsExtensions, which the root build does not otherwise set.",
+    "",
+    "Strictness is deliberately NOT set here: the root keeps its own strict",
+    "settings, and each vendored package relaxes the flags upstream Cordis was",
+    "not written against. Putting strictness in the base would silently",
+    "loosen AMC's own build.",
+    "composite: the vendored packages declare project references to each other, which TypeScript only permits between composite projects.",
+    "lib/types: cosmokit is dual-runtime \u2014 it uses Buffer (node) and btoa/atob (DOM) in the same file \u2014 so the vendored build needs both. AMC's own tsconfig keeps its narrower settings.",
+    "ES2024: the vendored timer plugin uses Promise.withResolvers.",
+    "verbatimModuleSyntax is deliberately NOT set: dsh marked erased imports explicitly across cordis/loader/include/hmr/schemastery (their ledger 10) but not logger-console, so imposing it here would mean patching vendored source to satisfy a setting they never had."
+  ],
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": [
+      "ES2024",
+      "DOM"
+    ],
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "forceConsistentCasingInFileNames": true,
+    "allowImportingTsExtensions": true,
+    "rewriteRelativeImportExtensions": true,
+    "strict": true,
+    "composite": true,
+    "types": [
+      "node"
+    ]
+  }
+}

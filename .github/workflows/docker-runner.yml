@@ -8,7 +8,7 @@ on:
       - "Dockerfile.runner"
       - "src/**"
       - "package.json"
-      - "package-lock.json"
+      - "pnpm-lock.yaml"
       - ".github/workflows/docker-runner.yml"
   pull_request:
     paths:

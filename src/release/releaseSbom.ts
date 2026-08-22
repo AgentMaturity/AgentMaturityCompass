@@ -4,6 +4,7 @@ import { packageMeta } from "./releaseManifest.js";
 import { deterministicTimestamp } from "./releaseUtils.js";
 import { writeFileAtomic } from "../utils/fs.js";
 import { canonicalize } from "../utils/json.js";
+import { readResolvedDependencies } from "./lockfileDependencies.js";
 
 interface LockPackageEntry {
   version?: string;
@@ -29,14 +30,15 @@ function parseNameFromPath(pathKey: string): string {
 }
 
 export function generateCycloneDxSbom(workspace: string): Record<string, unknown> {
-  const lockPath = join(workspace, "package-lock.json");
-  const lock = JSON.parse(readFileSync(lockPath, "utf8")) as PackageLockV2;
+  // Reads whichever lockfile the workspace has. This module parsed
+  // package-lock.json directly, so it could not produce an SBOM for AMC's own
+  // repository once that moved to pnpm — the repository whose compliance
+  // artifacts it exists to generate.
   const pkg = packageMeta(workspace);
-  const components = Object.entries(lock.packages ?? {})
-    .filter(([pathKey]) => pathKey !== "")
-    .map(([pathKey, entry]) => {
-      const name = parseNameFromPath(pathKey);
-      const version = entry.version ?? "0.0.0";
+  const components = readResolvedDependencies(workspace)
+    .map((dependency) => {
+      const name = dependency.name;
+      const version = dependency.version;
       const purlName = encodeURIComponent(name);
       return {
         type: "library",
@@ -46,15 +48,15 @@ export function generateCycloneDxSbom(workspace: string): Record<string, unknown
         licenses: [
           {
             license: {
-              id: entry.license ?? "UNKNOWN"
+              id: dependency.license ?? "UNKNOWN"
             }
           }
         ],
-        hashes: entry.integrity
+        hashes: dependency.integrity
           ? [
               {
                 alg: "SHA-512",
-                content: entry.integrity.replace(/^sha512-/, "")
+                content: dependency.integrity.replace(/^sha512-/, "")
               }
             ]
           : []

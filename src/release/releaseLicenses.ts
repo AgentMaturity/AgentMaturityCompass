@@ -5,6 +5,7 @@ import { canonicalize } from "../utils/json.js";
 import { sha256Hex } from "../utils/hash.js";
 import { packageMeta } from "./releaseManifest.js";
 import { deterministicTimestamp } from "./releaseUtils.js";
+import { readResolvedDependencies } from "./lockfileDependencies.js";
 
 interface LockPackageEntry {
   version?: string;
@@ -49,14 +50,11 @@ function findLicenseTextHash(depDir: string): string | null {
 
 export function generateLicenseInventory(workspace: string): Record<string, unknown> {
   const pkg = packageMeta(workspace);
-  const lock = JSON.parse(readFileSync(join(workspace, "package-lock.json"), "utf8")) as PackageLockV2;
+  // Reads whichever lockfile the workspace has; see lockfileDependencies.ts.
   const rows: LicenseRow[] = [];
-  for (const [pathKey, entry] of Object.entries(lock.packages ?? {})) {
-    if (pathKey === "") {
-      continue;
-    }
-    const name = parseNameFromPath(pathKey);
-    const version = entry.version ?? "0.0.0";
+  for (const dependency of readResolvedDependencies(workspace)) {
+    const name = dependency.name;
+    const version = dependency.version;
     const depDir = join(workspace, "node_modules", name);
     let license = "UNKNOWN";
     let repository: string | null = null;

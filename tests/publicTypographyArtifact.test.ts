@@ -4,6 +4,7 @@ import { tmpdir } from "node:os";
 import { join, relative, resolve } from "node:path";
 import { spawnSync } from "node:child_process";
 import { afterAll, describe, expect, test } from "vitest";
+import { pnpmIntegrityFor } from "./helpers/pnpmLock.js";
 
 const root = process.cwd();
 const buildScript = resolve(root, "scripts/build-pages-site.mjs");
@@ -57,15 +58,22 @@ afterAll(() => {
 describe("AMC first-party typography artifact", () => {
   test("pins the OFL font packages and declares the canonical faces once", () => {
     const pkg = JSON.parse(readFileSync(resolve(root, "package.json"), "utf8"));
-    const lock = JSON.parse(readFileSync(resolve(root, "package-lock.json"), "utf8"));
+
     const brand = readFileSync(resolve(root, "website/brand.css"), "utf8");
 
     expect(pkg.devDependencies["@fontsource/inter"]).toBe("5.2.8");
     expect(pkg.devDependencies["@fontsource/space-mono"]).toBe("5.2.9");
-    expect(lock.packages["node_modules/@fontsource/inter"].version).toBe("5.2.8");
-    expect(lock.packages["node_modules/@fontsource/space-mono"].version).toBe("5.2.9");
-    expect(lock.packages["node_modules/@fontsource/inter"].integrity).toMatch(/^sha512-/);
-    expect(lock.packages["node_modules/@fontsource/space-mono"].integrity).toMatch(/^sha512-/);
+    // Both font packages stay pinned to an exact version with an integrity
+    // hash, so a supply-chain swap fails here.
+    for (const [name, version] of [
+      ["@fontsource/inter", "5.2.8"],
+      ["@fontsource/space-mono", "5.2.9"]
+    ]) {
+      expect(
+        pnpmIntegrityFor(name!, version!, root),
+        `${name}@${version} pinned with an integrity hash`
+      ).not.toBeNull();
+    }
 
     expect(brand.match(/@font-face\s*\{/g)).toHaveLength(7);
     expect(brand.match(/font-display:\s*swap/g)).toHaveLength(7);

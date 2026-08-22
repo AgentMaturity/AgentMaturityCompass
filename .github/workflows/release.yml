@@ -39,14 +39,19 @@ jobs:
             exit 1
           }
 
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.0
+
       - name: Set up Node
         uses: actions/setup-node@v6
         with:
           node-version: "20"
-          cache: npm
+          cache: pnpm
 
       - name: Install dependencies
-        run: npm ci
+        run: pnpm install --frozen-lockfile
 
       - name: Build desktop release archives
         run: env -u GITHUB_REF_NAME AMC_RELEASE_TAG="$AMC_RELEASE_TAG" npm run package:desktop
@@ -79,12 +84,17 @@ jobs:
           fetch-depth: 0
           ref: ${{ env.AMC_RELEASE_TAG }}
 
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.0
+
       - name: Set up Node
         uses: actions/setup-node@v6
         with:
           node-version: "20"
           registry-url: "https://registry.npmjs.org"
-          cache: npm
+          cache: pnpm
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v4
@@ -97,7 +107,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Install dependencies
-        run: npm ci
+        run: pnpm install --frozen-lockfile
 
       - name: Test
         run: npm test
