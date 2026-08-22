@@ -9,7 +9,7 @@
   ],
   "budgets": {
     "src/benchmarks/replayBenchmarkCorpus.ts": 29469,
-    "src/cli.ts": 24643,
+    "src/cli.ts": 24615,
     "src/score/metricValidity.ts": 18459,
     "src/watch/liveDriftAlerts.ts": 15980,
     "src/studio/studioServer.ts": 8880,
