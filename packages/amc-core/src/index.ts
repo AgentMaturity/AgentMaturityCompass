@@ -34,3 +34,24 @@ export {
   type SettingsLayer,
   type SettingsStoreOptions
 } from "./settings.ts";
+export { AmcSeam, defineSeam, type SeamDefinition } from "./seam.ts";
+export {
+  checkDisposal,
+  describeDisposal,
+  type DisposalReport,
+  type CheckDisposalOptions,
+  type DisposalProbe
+} from "./hmrSafety.ts";
+export {
+  createAgentScope,
+  emitPlatformEvent,
+  type AgentScope,
+  type Scoped
+} from "./scope.ts";
+export type {
+  AmcEventOrigin,
+  AmcAction,
+  AmcGuardDecision,
+  AmcDenyDecision,
+  AmcScopedEnvelope
+} from "./events.ts";

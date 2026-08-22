@@ -10,4 +10,7 @@ export { loadComposition, CompositionError, DEFAULT_COMPOSITION_FILE } from "./c
 export { dumpComposition, renderCompositionDump } from "./dumpConfig.js";
 export { watchFibers, describeUnsettled } from "./bootAudit.js";
 export { SettingsStore, SettingsConflictError, SettingsPathError } from "./settings.js";
+export { AmcSeam, defineSeam } from "./seam.js";
+export { checkDisposal, describeDisposal } from "./hmrSafety.js";
+export { createAgentScope, emitPlatformEvent } from "./scope.js";
 //# sourceMappingURL=index.js.map

@@ -10,4 +10,8 @@ export { loadComposition, CompositionError, DEFAULT_COMPOSITION_FILE, type Compo
 export { dumpComposition, renderCompositionDump, type CompositionDump, type DumpedEntry } from "./dumpConfig.ts";
 export { watchFibers, describeUnsettled, type UnsettledFiber } from "./bootAudit.ts";
 export { SettingsStore, SettingsConflictError, SettingsPathError, type SettingsSnapshot, type SettingValue, type SettingsWrite, type SettingsLayer, type SettingsStoreOptions } from "./settings.ts";
+export { AmcSeam, defineSeam, type SeamDefinition } from "./seam.ts";
+export { checkDisposal, describeDisposal, type DisposalReport, type CheckDisposalOptions, type DisposalProbe } from "./hmrSafety.ts";
+export { createAgentScope, emitPlatformEvent, type AgentScope, type Scoped } from "./scope.ts";
+export type { AmcEventOrigin, AmcAction, AmcGuardDecision, AmcDenyDecision, AmcScopedEnvelope } from "./events.ts";
 //# sourceMappingURL=index.d.ts.map
