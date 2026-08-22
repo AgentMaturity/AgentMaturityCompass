@@ -32,6 +32,7 @@ import {
 import { initActionPolicy } from "../src/governor/actionPolicyEngine.js";
 import { writeRuntimeFirewallPolicy } from "../src/runtime/firewall.js";
 import { initWorkspace } from "../src/workspace.js";
+import { releaseNotesFor } from "./helpers/releaseNotes.js";
 
 const roots: string[] = [];
 const cliPath = resolve(process.cwd(), "dist/cli.js");
@@ -500,10 +501,10 @@ describe("AMC-1479 deterministic policy fixtures in CI", () => {
       "docs/CONTROL_SIMULATION.md",
       "docs/CLI_COMMAND_INVENTORY.md",
       "website/docs/cli.html",
-      ".changeset/amc-policy-fixtures-ci.md",
     ]) {
       expect(readFileSync(path, "utf8"), path).toContain("amc policy test");
     }
+    expect(releaseNotesFor("amc-policy-fixtures-ci.md")).toContain("amc policy test");
     expect(readFileSync("docs/internal/agent-control-agentapprove-competitive-response.md", "utf8"))
       .toContain("Implemented in AMC-1479");
     const docsShell = readFileSync("website/docs/docs.js", "utf8");

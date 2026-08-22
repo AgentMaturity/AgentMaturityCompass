@@ -1,6 +1,6 @@
 {
   "name": "agent-maturity-compass",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "description": "Tamper-evident maturity scoring, red-team testing, and compliance toolkit for AI agents",
   "type": "module",
   "main": "dist/index.js",
@@ -53,7 +53,7 @@
     "check:architecture-boundaries": "node scripts/architecture-boundaries-check.mjs",
     "check:docs-drift": "node scripts/docs-drift-check.mjs",
     "check:policy-fixtures": "node scripts/run-policy-fixtures-ci.mjs",
-    "clean": "rm -rf dist",
+    "clean": "node scripts/clean-dist.mjs",
     "prebuild": "npm run clean",
     "prepack": "npm run release:gate -- --json --out tmp/release-gate/prepack.json && npm run release:prepack-check",
     "postinstall": "node scripts/postinstall.js || true",
@@ -64,7 +64,9 @@
     "gen:api-ref": "node scripts/gen-api-ref.cjs",
     "check:api-ref": "node scripts/gen-api-ref.cjs --check",
     "check:question-bank-export": "node scripts/gen-question-bank-export.mjs --check",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "gen:changelog-page": "node scripts/gen-changelog-page.mjs",
+    "check:changelog-page": "node scripts/gen-changelog-page.mjs --check"
   },
   "keywords": [
     "ai-agent",

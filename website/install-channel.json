@@ -1,6 +1,6 @@
 {
   "schemaVersion": "2026-07-10",
-  "packageVersion": "1.1.1",
+  "packageVersion": "1.2.0",
   "primary": {
     "unix": {
       "label": "macOS and Linux",

@@ -41,7 +41,7 @@ jobs:
 | `comment` | `true` | Post/update PR comment with results |
 | `upload-artifacts` | `true` | Upload result JSON + badge as artifacts |
 | `node-version` | `20` | Node.js version |
-| `amc-version` | `1.1.1` | Verified GitHub Release version; `local` builds the action checkout. npm is not a live channel. |
+| `amc-version` | `1.2.0` | Verified GitHub Release version; `local` builds the action checkout. npm is not a live channel. |
 | `working-directory` | `.` | Directory to run AMC in |
 
 ## Outputs

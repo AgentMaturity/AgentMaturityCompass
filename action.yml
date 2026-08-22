@@ -23,7 +23,7 @@ runs:
       # available — and this action's own README tells consumers to pin.
       run: |
         set -euo pipefail
-        VERSION="1.1.1"
+        VERSION="1.2.0"
         BASE="https://github.com/AgentMaturity/AgentMaturityCompass/releases/download/v${VERSION}"
         curl -fsSL -o /tmp/amc.tgz "${BASE}/agent-maturity-compass-${VERSION}.tgz"
         curl -fsSL -o /tmp/SHA256SUMS "${BASE}/SHA256SUMS"

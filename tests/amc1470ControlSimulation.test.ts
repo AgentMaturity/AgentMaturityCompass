@@ -43,6 +43,7 @@ import {
 } from "../src/runtime/firewall.js";
 import { generateFullOpenApiSpec } from "../src/studio/openapi.js";
 import { initWorkspace } from "../src/workspace.js";
+import { releaseNotesFor } from "./helpers/releaseNotes.js";
 
 const roots: string[] = [];
 const cliPath = resolve(process.cwd(), "dist/cli.js");
@@ -510,7 +511,7 @@ describe("AMC-1470 evaluator-backed control simulation", () => {
       "No-bloat boundary",
       "not reported as matched effective controls",
     ]) expect(review).toContain(required);
-    expect(readFileSync(".changeset/amc-evaluator-backed-control-simulation.md", "utf8"))
+    expect(releaseNotesFor("amc-evaluator-backed-control-simulation.md"))
       .toContain("evaluator-backed control simulation");
   });
 });

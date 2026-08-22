@@ -39,6 +39,7 @@ import { trustConfigPath } from "../src/trust/trustConfig.js";
 import { lockVault } from "../src/vault/vault.js";
 import { initWorkspace } from "../src/workspace.js";
 import { sha256Hex } from "../src/utils/hash.js";
+import { releaseNotesFor } from "./helpers/releaseNotes.js";
 
 const roots: string[] = [];
 const cliPath = resolve(process.cwd(), "dist/cli.js");
@@ -549,7 +550,7 @@ describe("AMC-1474 reusable action-class scope templates", () => {
     expect(review).toContain("No-bloat boundary");
     expect(review).toContain("compatibility layer");
 
-    expect(readFileSync(".changeset/amc-reusable-scope-templates.md", "utf8"))
+    expect(releaseNotesFor("amc-reusable-scope-templates.md"))
       .toContain("reusable action-class scope templates");
     expect(readFileSync("docs/internal/agent-control-agentapprove-competitive-response.md", "utf8"))
       .toContain("Shipped in AMC-1474");

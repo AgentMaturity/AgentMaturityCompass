@@ -5,7 +5,28 @@ import { describe, expect, test } from "vitest";
 const read = (path: string): string => readFileSync(resolve(process.cwd(), path), "utf8");
 
 function visibleText(html: string): string {
-  return html.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+  // Entities have to be decoded, not just tags stripped: a bullet containing
+  // `amc policy simulate <controlId>` is correctly written to the page as
+  // &lt;controlId&gt;, and a reader sees the angle brackets. Comparing the raw
+  // entity against the CHANGELOG text reported a bullet as missing when it was
+  // present and rendering correctly.
+  return html
+    .replace(/<[^>]+>/g, " ")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&amp;/g, "&")
+    .replace(/\s+/g, " ")
+    // Tags collapse to a space, so `<code>--status</code>,` became "--status ,".
+    // Punctuation does not float away from the word it follows on the rendered
+    // page, and the CHANGELOG text it is compared against does not either.
+    // Only *trailing* punctuation: `<code>--status</code>,` must lose its space,
+    // but `managed <code>.gitignore</code> block` must keep the one before the
+    // leading dot, or the words run together.
+    .replace(/\s+([,.;:)\]])(?=\s|$)/g, "$1")
+    .replace(/([(\[])\s+/g, "$1")
+    .trim();
 }
 
 describe("AMC public changelog identity", () => {

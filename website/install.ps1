@@ -1,6 +1,6 @@
 $ErrorActionPreference = "Stop"
 
-$PinnedAmcReleaseVersion = "1.1.1"
+$PinnedAmcReleaseVersion = "1.2.0"
 $RequestedAmcReleaseVersion = $env:AMC_RELEASE_VERSION
 $AmcReleaseVersion = $PinnedAmcReleaseVersion
 $AmcReleaseBaseUrl = "https://github.com/AgentMaturity/AgentMaturityCompass/releases/download/v$AmcReleaseVersion"

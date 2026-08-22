@@ -49,6 +49,7 @@ import type { DiagnosticReport } from "../src/types.js";
 import { sha256Hex } from "../src/utils/hash.js";
 import { lockVault } from "../src/vault/vault.js";
 import { initWorkspace } from "../src/workspace.js";
+import { releaseNotesFor } from "./helpers/releaseNotes.js";
 
 const roots: string[] = [];
 const cliPath = resolve(process.cwd(), "dist/cli.js");
@@ -912,7 +913,7 @@ describe("AMC-1475 bounded nested Action Policy evidence logic", () => {
     expect(readFileSync("docs/source-reviews/AMC-1475-nested-action-evidence-logic.md", "utf8")).toContain("83188b62c63e2b4ff9ada87048fd99605184ee5a");
     expect(readFileSync("docs/source-reviews/AMC-1475-nested-action-evidence-logic.md", "utf8")).toContain("No-bloat boundary");
     expect(readFileSync("docs/internal/agent-control-agentapprove-competitive-response.md", "utf8")).toContain("Shipped in AMC-1475");
-    expect(readFileSync(".changeset/amc-nested-action-evidence-logic.md", "utf8")).toContain("minor");
+    expect(releaseNotesFor("amc-nested-action-evidence-logic.md")).toBeTruthy();
     expect(readFileSync("website/docs/docs.js", "utf8")).toContain("'ACTION_EVIDENCE_LOGIC'");
     const source = [
       readFileSync("src/governor/policyEvidenceLogic.ts", "utf8"),
