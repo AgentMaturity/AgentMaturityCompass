@@ -58,11 +58,25 @@ export async function boot(options) {
         // Plugin application is deferred, so `ctx.loader` is not available on the
         // next line — everything that needs it composes inside an inject scope.
         let includeFiber;
+        let includeService;
+        /**
+         * Captures the mounted Include so reload() can drive it.
+         *
+         * Cordis keeps no instance reference on the fiber, and Include is not a
+         * named service, so a subclass is the honest way to hold one — cleaner
+         * than reaching through guarded context properties.
+         */
+        class CapturedInclude extends Include {
+            constructor(scope, config) {
+                super(scope, config);
+                includeService = this;
+            }
+        }
         await ctx.inject(["loader"], (scope) => {
             // `group` is a tree carrier: entries opt into it with `group: true`, so
             // it is a loader builtin rather than a root plugin.
             scope.loader.builtins["cordis/group"] = group;
-            includeFiber = scope.plugin(Include, { path: composition.relativePath });
+            includeFiber = scope.plugin(CapturedInclude, { path: composition.relativePath });
         });
         // Include reads and mounts the entry tree asynchronously. Awaiting the
         // inject scope only proves the callback ran, so the audit would otherwise
@@ -83,6 +97,13 @@ export async function boot(options) {
             ctx,
             composition,
             unsettled,
+            async reload() {
+                if (!includeService) {
+                    throw new Error("composition reload is unavailable: Include did not mount");
+                }
+                await includeService.refresh();
+                await ctx.loader.await();
+            },
             async dispose() {
                 await disposeAll();
             }

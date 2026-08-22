@@ -24,3 +24,13 @@ export {
   describeUnsettled,
   type UnsettledFiber
 } from "./bootAudit.ts";
+export {
+  SettingsStore,
+  SettingsConflictError,
+  SettingsPathError,
+  type SettingsSnapshot,
+  type SettingValue,
+  type SettingsWrite,
+  type SettingsLayer,
+  type SettingsStoreOptions
+} from "./settings.ts";

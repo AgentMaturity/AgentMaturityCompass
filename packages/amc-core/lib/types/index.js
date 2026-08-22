@@ -9,4 +9,5 @@ export { boot, BootError } from "./boot.js";
 export { loadComposition, CompositionError, DEFAULT_COMPOSITION_FILE } from "./composition.js";
 export { dumpComposition, renderCompositionDump } from "./dumpConfig.js";
 export { watchFibers, describeUnsettled } from "./bootAudit.js";
+export { SettingsStore, SettingsConflictError, SettingsPathError } from "./settings.js";
 //# sourceMappingURL=index.js.map

@@ -33,6 +33,18 @@ export interface BootResult {
     composition: CompositionSource;
     /** Non-empty only when auditSettled is false. */
     unsettled: UnsettledFiber[];
+    /**
+     * Re-reads the composition file and reconciles the tree by entry id.
+     *
+     * Only entries whose options actually changed are rebuilt; untouched
+     * siblings keep their fibers, and the process is not restarted. That
+     * property is what makes a composed runtime worth having — a policy or
+     * budget can change under a live agent without dropping the run it governs,
+     * or the ledger handles and gateway leases held open around it.
+     *
+     * P1.4 wires a file watcher to call this; until then it is the caller's.
+     */
+    reload(): Promise<void>;
     dispose(): Promise<void>;
 }
 export declare class BootError extends Error {

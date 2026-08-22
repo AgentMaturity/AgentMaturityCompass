@@ -39,6 +39,9 @@ importers:
       '@amc/cordis':
         specifier: workspace:*
         version: link:vendor/cordis
+      '@amc/schemastery':
+        specifier: workspace:*
+        version: link:vendor/schemastery
       '@axe-core/playwright':
         specifier: ^4.11.1
         version: 4.13.0(playwright-core@1.62.1)

@@ -39,6 +39,18 @@ export interface BootResult {
   composition: CompositionSource;
   /** Non-empty only when auditSettled is false. */
   unsettled: UnsettledFiber[];
+  /**
+   * Re-reads the composition file and reconciles the tree by entry id.
+   *
+   * Only entries whose options actually changed are rebuilt; untouched
+   * siblings keep their fibers, and the process is not restarted. That
+   * property is what makes a composed runtime worth having — a policy or
+   * budget can change under a live agent without dropping the run it governs,
+   * or the ledger handles and gateway leases held open around it.
+   *
+   * P1.4 wires a file watcher to call this; until then it is the caller's.
+   */
+  reload(): Promise<void>;
   dispose(): Promise<void>;
 }
 
@@ -91,11 +103,27 @@ export async function boot(options: BootOptions): Promise<BootResult> {
     // Plugin application is deferred, so `ctx.loader` is not available on the
     // next line — everything that needs it composes inside an inject scope.
     let includeFiber: Fiber | undefined;
+    let includeService: Include | undefined;
+
+    /**
+     * Captures the mounted Include so reload() can drive it.
+     *
+     * Cordis keeps no instance reference on the fiber, and Include is not a
+     * named service, so a subclass is the honest way to hold one — cleaner
+     * than reaching through guarded context properties.
+     */
+    class CapturedInclude extends Include {
+      constructor(scope: Context, config: ConstructorParameters<typeof Include>[1]) {
+        super(scope, config);
+        includeService = this;
+      }
+    }
+
     await ctx.inject(["loader"], (scope: Context) => {
       // `group` is a tree carrier: entries opt into it with `group: true`, so
       // it is a loader builtin rather than a root plugin.
       scope.loader.builtins["cordis/group"] = group;
-      includeFiber = scope.plugin(Include, { path: composition.relativePath });
+      includeFiber = scope.plugin(CapturedInclude, { path: composition.relativePath });
     });
 
     // Include reads and mounts the entry tree asynchronously. Awaiting the
@@ -123,6 +151,13 @@ export async function boot(options: BootOptions): Promise<BootResult> {
       ctx,
       composition,
       unsettled,
+      async reload() {
+        if (!includeService) {
+          throw new Error("composition reload is unavailable: Include did not mount");
+        }
+        await includeService.refresh();
+        await ctx.loader.await();
+      },
       async dispose() {
         await disposeAll();
       }

@@ -135,6 +135,7 @@
   },
   "devDependencies": {
     "@amc/cordis": "workspace:*",
+    "@amc/schemastery": "workspace:*",
     "@axe-core/playwright": "^4.11.1",
     "@changesets/cli": "^2.30.0",
     "@fontsource/inter": "5.2.8",
