@@ -23,6 +23,7 @@
   "dependencies": {
     "@amc/cordis": "workspace:^",
     "@amc/cordis-plugin-group": "workspace:^",
+    "@amc/cordis-plugin-hmr": "workspace:^",
     "@amc/cordis-plugin-include": "workspace:^",
     "@amc/cordis-plugin-loader": "workspace:^",
     "@amc/cordis-plugin-timer": "workspace:^",

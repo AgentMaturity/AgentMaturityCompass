@@ -135,6 +135,7 @@
   },
   "devDependencies": {
     "@amc/cordis": "workspace:*",
+    "@amc/cordis-plugin-loader": "workspace:*",
     "@amc/schemastery": "workspace:*",
     "@axe-core/playwright": "^4.11.1",
     "@changesets/cli": "^2.30.0",

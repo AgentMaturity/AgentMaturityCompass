@@ -13,4 +13,6 @@ export { SettingsStore, SettingsConflictError, SettingsPathError } from "./setti
 export { AmcSeam, defineSeam } from "./seam.js";
 export { checkDisposal, describeDisposal } from "./hmrSafety.js";
 export { createAgentScope, emitPlatformEvent } from "./scope.js";
+export { installInvariants, defaultInvariantMode, InvariantError } from "./invariants.js";
+export { checkSessionEnclosure, checkFifo, checkPromptReconstruction, checkApprovalPairing, registerSessionInvariants } from "./invariantCompanions.js";
 //# sourceMappingURL=index.js.map

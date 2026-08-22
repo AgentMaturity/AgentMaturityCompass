@@ -39,6 +39,9 @@ importers:
       '@amc/cordis':
         specifier: workspace:*
         version: link:vendor/cordis
+      '@amc/cordis-plugin-loader':
+        specifier: workspace:*
+        version: link:vendor/loader
       '@amc/schemastery':
         specifier: workspace:*
         version: link:vendor/schemastery
@@ -96,6 +99,9 @@ importers:
       '@amc/cordis-plugin-group':
         specifier: workspace:^
         version: link:../../vendor/group
+      '@amc/cordis-plugin-hmr':
+        specifier: workspace:^
+        version: link:../../vendor/hmr
       '@amc/cordis-plugin-include':
         specifier: workspace:^
         version: link:../../vendor/include

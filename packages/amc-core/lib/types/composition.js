@@ -11,7 +11,7 @@
  * `.amc/amc.config.yaml.sig`, so an operator has one signing story rather than
  * two.
  */
-import { readFileSync, existsSync } from "node:fs";
+import { readFileSync, existsSync, realpathSync } from "node:fs";
 import { createHash } from "node:crypto";
 import { isAbsolute, join, relative as relativePath, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
@@ -61,7 +61,13 @@ function readSignature(configPath, sha256) {
 }
 /** Resolves, hashes and attests the composition file without mounting it. */
 export function loadComposition(options) {
-    const workspace = resolve(options.workspace);
+    // Realpath, not just resolve. The HMR watcher realpaths its base before
+    // comparing a changed file against Node's ESM loadCache, so a workspace
+    // reached through a symlink — /tmp on macOS is /private/tmp — would produce
+    // module URLs that never match the watcher's, and no plugin would ever hot
+    // reload. Nothing reports that; reloads would just silently not happen.
+    const resolved = resolve(options.workspace);
+    const workspace = existsSync(resolved) ? realpathSync(resolved) : resolved;
     const relative = options.configPath ?? DEFAULT_COMPOSITION_FILE;
     const path = isAbsolute(relative) ? relative : join(workspace, relative);
     if (!existsSync(path)) {

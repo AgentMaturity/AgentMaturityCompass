@@ -14,4 +14,6 @@ export { AmcSeam, defineSeam, type SeamDefinition } from "./seam.ts";
 export { checkDisposal, describeDisposal, type DisposalReport, type CheckDisposalOptions, type DisposalProbe } from "./hmrSafety.ts";
 export { createAgentScope, emitPlatformEvent, type AgentScope, type Scoped } from "./scope.ts";
 export type { AmcEventOrigin, AmcAction, AmcGuardDecision, AmcDenyDecision, AmcScopedEnvelope } from "./events.ts";
+export { installInvariants, defaultInvariantMode, InvariantError, type InvariantsService, type InvariantViolation, type InvariantCheck, type InvariantMode } from "./invariants.ts";
+export { checkSessionEnclosure, checkFifo, checkPromptReconstruction, checkApprovalPairing, registerSessionInvariants, type SessionEvent } from "./invariantCompanions.ts";
 //# sourceMappingURL=index.d.ts.map

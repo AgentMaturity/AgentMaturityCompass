@@ -55,3 +55,20 @@ export type {
   AmcDenyDecision,
   AmcScopedEnvelope
 } from "./events.ts";
+export {
+  installInvariants,
+  defaultInvariantMode,
+  InvariantError,
+  type InvariantsService,
+  type InvariantViolation,
+  type InvariantCheck,
+  type InvariantMode
+} from "./invariants.ts";
+export {
+  checkSessionEnclosure,
+  checkFifo,
+  checkPromptReconstruction,
+  checkApprovalPairing,
+  registerSessionInvariants,
+  type SessionEvent
+} from "./invariantCompanions.ts";

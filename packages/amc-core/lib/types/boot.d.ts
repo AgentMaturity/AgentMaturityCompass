@@ -27,6 +27,19 @@ export interface BootOptions {
     requireSignature?: boolean;
     /** Fail when any plugin has not reached ACTIVE. Default true. */
     auditSettled?: boolean;
+    /**
+     * Watch the composition and plugin sources, reloading on change.
+     *
+     * Off by default. A file watcher in production is a liability rather than a
+     * feature: it turns an accidental write — a deploy touching a file, an editor
+     * autosave — into a live reconfiguration of the controls that are enforcing
+     * policy. Development wants it; a governed runtime should have to ask.
+     */
+    watch?: boolean | {
+        root?: string[];
+        debounce?: number;
+        ignored?: string[];
+    };
 }
 export interface BootResult {
     ctx: Context;

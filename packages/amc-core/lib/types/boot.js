@@ -11,6 +11,7 @@
 import { Context } from "@amc/cordis";
 import Loader from "@amc/cordis-plugin-loader";
 import Include from "@amc/cordis-plugin-include";
+import Hmr from "@amc/cordis-plugin-hmr";
 import group from "@amc/cordis-plugin-group";
 import timer from "@amc/cordis-plugin-timer";
 import { watchFibers, describeUnsettled } from "./bootAudit.js";
@@ -39,8 +40,15 @@ export async function boot(options) {
     });
     const ctx = new Context();
     const audit = watchFibers(ctx);
+    let stopWatchingConfig;
     const disposeAll = async () => {
         audit.stop();
+        try {
+            await stopWatchingConfig?.();
+        }
+        catch {
+            // A watcher that will not close must not block teardown.
+        }
         try {
             await ctx.fiber.dispose();
         }
@@ -57,8 +65,20 @@ export async function boot(options) {
         ctx.plugin(Loader, { baseUrl: composition.baseUrl });
         // Plugin application is deferred, so `ctx.loader` is not available on the
         // next line — everything that needs it composes inside an inject scope.
-        let includeFiber;
         let includeService;
+        /**
+         * Re-reads the composition and reconciles by entry id.
+         *
+         * Shared by the public reload() and the file watcher, so a hand-driven
+         * reload and an edit-triggered one cannot diverge.
+         */
+        const reloadComposition = async () => {
+            if (!includeService) {
+                throw new Error("composition reload is unavailable: Include did not mount");
+            }
+            await includeService.refresh();
+            await ctx.loader.await();
+        };
         /**
          * Captures the mounted Include so reload() can drive it.
          *
@@ -72,21 +92,66 @@ export async function boot(options) {
                 includeService = this;
             }
         }
-        await ctx.inject(["loader"], (scope) => {
-            // `group` is a tree carrier: entries opt into it with `group: true`, so
-            // it is a loader builtin rather than a root plugin.
-            scope.loader.builtins["cordis/group"] = group;
-            includeFiber = scope.plugin(CapturedInclude, { path: composition.relativePath });
+        let createEntry;
+        const composed = ctx.inject(["loader"], (scope) => {
+            // Tree carriers are loader builtins: entries opt into them by name
+            // rather than being plugged at the root.
+            scope.loader.builtins["group"] = group;
+            // Builtins are addressed with the `cordis:` prefix — the loader strips it
+            // and looks the rest up here, rather than importing it as a specifier.
+            scope.loader.builtins["amc-composition"] = CapturedInclude;
+            // Mounted as a loader *entry*, not a directly-plugged service.
+            //
+            // EntryTree.entries() recurses into an entry's subtree, but only for
+            // entries in the loader's store — a directly-plugged Include is invisible
+            // to that walk. HMR builds its reload map from exactly that walk, so
+            // every plugin in the composition was unreachable to hot reload: the
+            // module reloaded and `hmr/reload` fired, but nothing was ever
+            // re-applied. A silent no-op, not an error.
+            // Started here, awaited outside: create() resolves only once the entry's
+            // fiber activates, which waits on the very tree this inject scope
+            // belongs to. Awaiting it in place deadlocks the scope against itself.
+            createEntry = scope.loader.root.create({
+                name: "cordis:amc-composition",
+                config: { path: composition.relativePath }
+            });
         });
-        // Include reads and mounts the entry tree asynchronously. Awaiting the
-        // inject scope only proves the callback ran, so the audit would otherwise
-        // observe Include mid-LOADING and report a boot that is merely still
-        // happening as a boot that failed.
-        await includeFiber?.await();
+        await composed.await();
+        // The entry mounts its subtree asynchronously; the settled-tree audit must
+        // not observe it mid-flight.
+        await createEntry;
         // The loader's entry tree settles when no import or lifecycle task is
         // outstanding. It throws the fiber's own failure (or an AggregateError),
         // so a plugin that threw surfaces here rather than as a silent PENDING.
         await ctx.loader.await();
+        if (options.watch) {
+            const watchOptions = typeof options.watch === "object" ? options.watch : {};
+            let hmrFiber;
+            await ctx.inject(["loader", "timer"], (scope) => {
+                hmrFiber = scope.plugin(Hmr, {
+                    base: options.workspace,
+                    root: watchOptions.root ?? ["."],
+                    debounce: watchOptions.debounce ?? 100,
+                    ignored: watchOptions.ignored ?? ["**/node_modules", "**/.*", "cache", "data"]
+                });
+            });
+            // Hmr builds its watcher asynchronously; without awaiting it the audit
+            // sees Hmr mid-LOADING and the config-registration scope PENDING on a
+            // service that is seconds from existing.
+            await hmrFiber?.await();
+            await ctx.loader.await();
+            // Wire the composition file to reconciliation. P1.2 left reload() for a
+            // caller to drive; this is the caller. registerConfig watches the exact
+            // path — including one under a directory that does not exist yet — and
+            // serializes refreshes, so a burst of editor writes reconciles once.
+            const registration = ctx.inject(["hmr"], async (scope) => {
+                stopWatchingConfig = await scope.hmr.registerConfig(composition.path, async () => {
+                    await reloadComposition();
+                });
+            });
+            await registration.await();
+            await ctx.loader.await();
+        }
         const unsettled = audit.settled();
         if (auditSettled && unsettled.length > 0) {
             throw new BootError(`AMC boot did not settle: ${unsettled.length} plugin(s) never became active.\n` +
@@ -98,11 +163,7 @@ export async function boot(options) {
             composition,
             unsettled,
             async reload() {
-                if (!includeService) {
-                    throw new Error("composition reload is unavailable: Include did not mount");
-                }
-                await includeService.refresh();
-                await ctx.loader.await();
+                await reloadComposition();
             },
             async dispose() {
                 await disposeAll();

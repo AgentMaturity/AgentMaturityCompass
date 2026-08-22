@@ -11,6 +11,7 @@
 import { Context, type Fiber } from "@amc/cordis";
 import Loader from "@amc/cordis-plugin-loader";
 import Include from "@amc/cordis-plugin-include";
+import Hmr from "@amc/cordis-plugin-hmr";
 import group from "@amc/cordis-plugin-group";
 import timer from "@amc/cordis-plugin-timer";
 import { watchFibers, describeUnsettled, type UnsettledFiber } from "./bootAudit.ts";
@@ -32,6 +33,15 @@ export interface BootOptions {
   requireSignature?: boolean;
   /** Fail when any plugin has not reached ACTIVE. Default true. */
   auditSettled?: boolean;
+  /**
+   * Watch the composition and plugin sources, reloading on change.
+   *
+   * Off by default. A file watcher in production is a liability rather than a
+   * feature: it turns an accidental write — a deploy touching a file, an editor
+   * autosave — into a live reconfiguration of the controls that are enforcing
+   * policy. Development wants it; a governed runtime should have to ask.
+   */
+  watch?: boolean | { root?: string[]; debounce?: number; ignored?: string[] };
 }
 
 export interface BootResult {
@@ -82,8 +92,15 @@ export async function boot(options: BootOptions): Promise<BootResult> {
   const ctx = new Context();
   const audit = watchFibers(ctx);
 
+  let stopWatchingConfig: (() => Promise<void>) | undefined;
+
   const disposeAll = async (): Promise<void> => {
     audit.stop();
+    try {
+      await stopWatchingConfig?.();
+    } catch {
+      // A watcher that will not close must not block teardown.
+    }
     try {
       await ctx.fiber.dispose();
     } catch {
@@ -102,8 +119,21 @@ export async function boot(options: BootOptions): Promise<BootResult> {
 
     // Plugin application is deferred, so `ctx.loader` is not available on the
     // next line — everything that needs it composes inside an inject scope.
-    let includeFiber: Fiber | undefined;
     let includeService: Include | undefined;
+
+    /**
+     * Re-reads the composition and reconciles by entry id.
+     *
+     * Shared by the public reload() and the file watcher, so a hand-driven
+     * reload and an edit-triggered one cannot diverge.
+     */
+    const reloadComposition = async (): Promise<void> => {
+      if (!includeService) {
+        throw new Error("composition reload is unavailable: Include did not mount");
+      }
+      await includeService.refresh();
+      await ctx.loader.await();
+    };
 
     /**
      * Captures the mounted Include so reload() can drive it.
@@ -119,23 +149,71 @@ export async function boot(options: BootOptions): Promise<BootResult> {
       }
     }
 
-    await ctx.inject(["loader"], (scope: Context) => {
-      // `group` is a tree carrier: entries opt into it with `group: true`, so
-      // it is a loader builtin rather than a root plugin.
-      scope.loader.builtins["cordis/group"] = group;
-      includeFiber = scope.plugin(CapturedInclude, { path: composition.relativePath });
+    let createEntry: Promise<unknown> | undefined;
+    const composed = ctx.inject(["loader"], (scope: Context) => {
+      // Tree carriers are loader builtins: entries opt into them by name
+      // rather than being plugged at the root.
+      scope.loader.builtins["group"] = group;
+      // Builtins are addressed with the `cordis:` prefix — the loader strips it
+      // and looks the rest up here, rather than importing it as a specifier.
+      scope.loader.builtins["amc-composition"] = CapturedInclude;
+
+      // Mounted as a loader *entry*, not a directly-plugged service.
+      //
+      // EntryTree.entries() recurses into an entry's subtree, but only for
+      // entries in the loader's store — a directly-plugged Include is invisible
+      // to that walk. HMR builds its reload map from exactly that walk, so
+      // every plugin in the composition was unreachable to hot reload: the
+      // module reloaded and `hmr/reload` fired, but nothing was ever
+      // re-applied. A silent no-op, not an error.
+      // Started here, awaited outside: create() resolves only once the entry's
+      // fiber activates, which waits on the very tree this inject scope
+      // belongs to. Awaiting it in place deadlocks the scope against itself.
+      createEntry = scope.loader.root.create({
+        name: "cordis:amc-composition",
+        config: { path: composition.relativePath }
+      });
     });
 
-    // Include reads and mounts the entry tree asynchronously. Awaiting the
-    // inject scope only proves the callback ran, so the audit would otherwise
-    // observe Include mid-LOADING and report a boot that is merely still
-    // happening as a boot that failed.
-    await includeFiber?.await();
+    await composed.await();
+    // The entry mounts its subtree asynchronously; the settled-tree audit must
+    // not observe it mid-flight.
+    await createEntry;
 
     // The loader's entry tree settles when no import or lifecycle task is
     // outstanding. It throws the fiber's own failure (or an AggregateError),
     // so a plugin that threw surfaces here rather than as a silent PENDING.
     await ctx.loader.await();
+
+    if (options.watch) {
+      const watchOptions = typeof options.watch === "object" ? options.watch : {};
+      let hmrFiber: Fiber | undefined;
+      await ctx.inject(["loader", "timer"], (scope: Context) => {
+        hmrFiber = scope.plugin(Hmr, {
+          base: options.workspace,
+          root: watchOptions.root ?? ["."],
+          debounce: watchOptions.debounce ?? 100,
+          ignored: watchOptions.ignored ?? ["**/node_modules", "**/.*", "cache", "data"]
+        });
+      });
+      // Hmr builds its watcher asynchronously; without awaiting it the audit
+      // sees Hmr mid-LOADING and the config-registration scope PENDING on a
+      // service that is seconds from existing.
+      await hmrFiber?.await();
+      await ctx.loader.await();
+
+      // Wire the composition file to reconciliation. P1.2 left reload() for a
+      // caller to drive; this is the caller. registerConfig watches the exact
+      // path — including one under a directory that does not exist yet — and
+      // serializes refreshes, so a burst of editor writes reconciles once.
+      const registration = ctx.inject(["hmr"], async (scope: Context) => {
+        stopWatchingConfig = await scope.hmr.registerConfig(composition.path, async () => {
+          await reloadComposition();
+        });
+      });
+      await registration.await();
+      await ctx.loader.await();
+    }
 
     const unsettled = audit.settled();
     if (auditSettled && unsettled.length > 0) {
@@ -152,11 +230,7 @@ export async function boot(options: BootOptions): Promise<BootResult> {
       composition,
       unsettled,
       async reload() {
-        if (!includeService) {
-          throw new Error("composition reload is unavailable: Include did not mount");
-        }
-        await includeService.refresh();
-        await ctx.loader.await();
+        await reloadComposition();
       },
       async dispose() {
         await disposeAll();

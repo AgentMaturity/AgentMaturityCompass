@@ -4,14 +4,33 @@
     "rootDir": "src",
     "outDir": "lib/types"
   },
-  "include": ["src"],
+  "include": [
+    "src"
+  ],
   "references": [
-    { "path": "../../vendor/cordis" },
-    { "path": "../../vendor/loader" },
-    { "path": "../../vendor/include" },
-    { "path": "../../vendor/group" },
-    { "path": "../../vendor/timer" },
-    { "path": "../../vendor/schemastery" },
-    { "path": "../../vendor/cosmokit" }
+    {
+      "path": "../../vendor/cordis"
+    },
+    {
+      "path": "../../vendor/loader"
+    },
+    {
+      "path": "../../vendor/include"
+    },
+    {
+      "path": "../../vendor/group"
+    },
+    {
+      "path": "../../vendor/timer"
+    },
+    {
+      "path": "../../vendor/schemastery"
+    },
+    {
+      "path": "../../vendor/cosmokit"
+    },
+    {
+      "path": "../../vendor/hmr"
+    }
   ]
 }
