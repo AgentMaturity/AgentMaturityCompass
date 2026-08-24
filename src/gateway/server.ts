@@ -14,13 +14,14 @@ import { URL } from "node:url";
 import { hashBinaryOrPath, openLedger } from "../ledger/ledger.js";
 import { getPublicKeyPem } from "../crypto/keys.js";
 import {
-  extractMissingAuthEnvVars,
   loadGatewayConfig,
   resolveGatewayConfigEnv,
   routeBaseUrls,
   verifyGatewayConfigSignature,
   type GatewayConfig
 } from "./config.js";
+import { applyUpstreamAuth, missingUpstreamAuthRefs, upstreamCredentials } from "./upstreamAuth.js";
+import type { CredentialsService } from "../credentials/credentialsService.js";
 import { redactBody, redactHeaders } from "./redaction.js";
 import { monitorPublicKeyFingerprint } from "../receipts/receipt.js";
 import { sha256Hex } from "../utils/hash.js";
@@ -40,6 +41,12 @@ export interface StartGatewayOptions {
   proxyPort?: number;
   allowedCidrs?: string[];
   allowQueryCarrierOverride?: boolean;
+  /**
+   * Credential source for outbound upstream auth. Defaults to the local
+   * layered store; supply one to share a store the caller already owns and
+   * closes (the composed tree, or a test).
+   */
+  credentials?: CredentialsService;
 }
 
 export interface GatewayHandle {
@@ -84,33 +91,6 @@ function joinPath(basePathname: string, forwardedPathname: string): string {
     return left || "/";
   }
   return `${left}${right}`;
-}
-
-function applyAuth(
-  url: URL,
-  headers: Record<string, string>,
-  auth: GatewayConfig["upstreams"][string]["auth"],
-  env: NodeJS.ProcessEnv
-): { ok: boolean; error?: string } {
-  if (auth.type === "none") {
-    return { ok: true };
-  }
-
-  const value = env[auth.env];
-  if (!value) {
-    return { ok: false, error: `missing API key env: ${auth.env}` };
-  }
-
-  if (auth.type === "bearer_env") {
-    headers.authorization = `Bearer ${value}`;
-    return { ok: true };
-  }
-  if (auth.type === "header_env") {
-    headers[auth.header.toLowerCase()] = value;
-    return { ok: true };
-  }
-  url.searchParams.set(auth.param, value);
-  return { ok: true };
 }
 
 async function readAll(stream: IncomingMessage): Promise<Buffer> {
@@ -1145,7 +1125,10 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
   const runtimeListenPort = options.listenPort ?? resolvedConfig.listen.port;
   const runtimeProxyPort = options.proxyPort ?? config.proxy.port;
   const signature = verifyGatewayConfigSignature(options.workspace, options.configPath);
-  const missingEnvs = extractMissingAuthEnvVars(config);
+  // Bound once, resolved per request. The binding is a store; the resolution is
+  // a call, and only the second one happens on the request path.
+  const credentials = upstreamCredentials(options.workspace, options.credentials);
+  const missingEnvs = missingUpstreamAuthRefs(config, credentials.resolve);
   const resilience = gatewayResilienceConfig();
 
   const ledger = openLedger(options.workspace);
@@ -1490,7 +1473,7 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
           }
         });
       }
-      const authResult = applyAuth(targetUrl, outboundHeaders, upstreamResolved.auth, process.env);
+      const authResult = applyUpstreamAuth(targetUrl, outboundHeaders, upstreamResolved.auth, credentials.resolve);
 
       if (!authResult.ok) {
         res.statusCode = 500;
@@ -1787,6 +1770,8 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
       });
       ledger.sealSession(gatewaySessionId);
       ledger.close();
+      // Releases the file watcher, but only on a store this gateway created.
+      await credentials.close();
     }
   };
 }

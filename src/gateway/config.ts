@@ -3,6 +3,7 @@ import { join, resolve } from "node:path";
 import YAML from "yaml";
 import { z } from "zod";
 import { getPrivateKeyPem, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
+import { isCredentialValuePresent } from "../credentials/credentialValue.js";
 import { ensureDir, pathExists, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
@@ -443,6 +444,21 @@ export function initGatewayConfig(workspace: string, config?: GatewayConfig): { 
   return { configPath, sigPath };
 }
 
+/**
+ * The auth references the *inherited environment* does not supply.
+ *
+ * Deliberately environment-only, and deliberately narrower than it looks. Since
+ * P3.0 the gateway resolves these references through the credentials seam —
+ * environment, then the AMC-owned store, then the project and user `.env` files
+ * — so a reference this function reports as missing may well be configured and
+ * about to be used. Callers that have a store must ask it instead
+ * (`missingUpstreamAuthRefs` in ./upstreamAuth.ts); this one exists for callers
+ * that do not, such as workspace status output, which must not construct and
+ * permission-check a credentials store as a side effect of printing a report.
+ *
+ * The empty-is-absent rule is shared with the seam rather than restated, so a
+ * blank `OPENAI_API_KEY=` is missing here exactly as it is everywhere else.
+ */
 export function extractMissingAuthEnvVars(config: GatewayConfig, env: NodeJS.ProcessEnv = process.env): string[] {
   const missing = new Set<string>();
   for (const upstream of Object.values(config.upstreams)) {
@@ -451,9 +467,8 @@ export function extractMissingAuthEnvVars(config: GatewayConfig, env: NodeJS.Pro
       continue;
     }
 
-    const key = auth.env;
-    if (!env[key]) {
-      missing.add(key);
+    if (!isCredentialValuePresent(env[auth.env])) {
+      missing.add(auth.env);
     }
   }
   return [...missing].sort();
