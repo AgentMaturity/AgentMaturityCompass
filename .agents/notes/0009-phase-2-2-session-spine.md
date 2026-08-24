@@ -75,20 +75,44 @@ under `AMC_NO_SIGN`, implying a hole. Reproduced cross-process: verification
 rejects that row ("writer signature invalid"). Accurate code description, no
 security consequence.
 
-## Open — decisions that are the user's, not the code's
+## The three open decisions — RESOLVED 2026-08-24
 
-Surfaced by the review judges and deferred deliberately:
+All three were product commitments, and all three are now decided and
+implemented (commit `e5628b90`).
 
-- **Power-loss durability.** `synchronous=FULL` does not flush the APFS write
-  cache; real durability (`fullfsync=1`) costs ~96x. Is the current
-  process-crash-durable guarantee acceptable, or should the ledger opt into
-  `fullfsync` (with the throughput hit) for evidentiary workspaces?
-- **Blob-index signature format.** Making blob appends fully O(1) requires
-  changing the index signature from a whole-file digest to a tail-hash chain.
-  That is a signature-scheme change; left for an explicit decision.
-- **RuntimeName for a native AMC agent.** The union is
-  claude|gemini|openclaw|unknown|… — none fits a session AMC itself ran.
-  Adding `amc` touches many call sites.
+**1. Power-loss durability: configurable, fast by default.** Measured cost of
+real durability on this platform is 96x per commit (22,354 -> 234 commits/s),
+because macOS/APFS needs `F_FULLFSYNC` and `synchronous=FULL` alone does not
+flush the drive cache. Paying that everywhere was rejected: a power cut is an
+accepted operator risk, and the blast radius is one lost row on a chain that
+detects a truncated tail. So it is a deployment choice —
+`security.durability: "crash" | "power-loss"` in amc.config.yaml, with
+`AMC_LEDGER_FULLFSYNC` overriding in both directions for ops. Default keeps full
+throughput; a mission-critical regulated deployment opts in. Tests assert the
+pragma reaches the database, because a durability setting that does not arrive
+is worse than none.
+
+**2. Blob index: sign the chain head.** Each row already hashes its predecessor,
+so the last row's hash transitively commits to the entire ordered history —
+signing that head is equivalent tamper-evidence at O(1) instead of re-reading
+and re-hashing the whole file per append. This aligns the blob index with the
+construction the evidence ledger already uses on its own chain. Taken as a
+breaking format change (the `digestSha256` field is gone) because no released
+version has users and no tracked index artifact exists to migrate. Truncation,
+edited rows, and appended forgeries are each still caught, by test. With the
+earlier parse fix the session content path went 391 -> 716 ev/s and is now flat
+as the index grows.
+
+**3. Native sessions report `runtime: "amc"`.** The union described how AMC
+observed someone else's agent, or the mechanism it observed through. AMC now
+runs the loop itself, and native sessions were defaulting to `"unknown"` — an
+absence, not a description. Because AMC's purpose is to be the native tool a
+regulated operator runs so that any provider's model adheres to the maturity
+posture assigned to it, the runtime field has to distinguish those two origins.
+`"amc"` is the SessionService default. Verified before changing: no exhaustive
+switch over RuntimeName exists, so nothing fell through silently; the one stale
+mirror (config zod enum) is synced, and the external-spawn path treats `"amc"`
+like gateway/sandbox because AMC is the harness, not a process it spawns.
 
 ## Not done here
 
