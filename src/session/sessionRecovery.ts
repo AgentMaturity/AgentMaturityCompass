@@ -7,7 +7,8 @@
 
 import { createHash, randomUUID } from "node:crypto";
 import type { EvidenceEvent, EvidenceEventType, RuntimeName } from "../types.js";
-import { openLedger, type AppendEvidenceInput, type Ledger } from "../ledger/ledger.js";
+import { openSessionEventStore } from "../persistence/openSessionEventStore.js";
+import type { SessionEventStore, SessionStoreAppendInput } from "../persistence/sessionEventStore.js";
 import { sha256Hex } from "../utils/hash.js";
 import {
   embedEnvelope,
@@ -40,6 +41,14 @@ export interface RecoverSessionParams {
   readonly staleAfterMs?: number; // liveness gate; default 60_000
   readonly force?: boolean; // bypass the liveness gate
   readonly close?: boolean; // also append session/close and seal the row
+  /**
+   * Store to recover through. Absent, the workspace's pinned backend is opened.
+   * Recovery is a SECOND writer taking over after the crashed one is gone, so a
+   * single-writer backend must have released its lock (or the owning process
+   * must be dead) before this succeeds — which is the correct behaviour: a
+   * live writer is not a session to recover.
+   */
+  readonly store?: SessionEventStore;
 }
 
 export interface RecoveryReport {
@@ -88,7 +97,7 @@ class SyntheticAppender {
   private prevHash: string;
 
   constructor(
-    private readonly ledger: Ledger,
+    private readonly store: SessionEventStore,
     private readonly sessionId: string,
     private readonly runtime: RuntimeName,
     seq: number,
@@ -126,20 +135,19 @@ class SyntheticAppender {
       surface: spec.surface,
       synthetic: true
     };
-    const input: AppendEvidenceInput = {
+    // Content is blob-backed, never inline: retention can physically unlink a
+    // blob but cannot touch canonical_payload_inline. The seam makes that the
+    // only expressible option rather than a convention.
+    const input: SessionStoreAppendInput = {
       sessionId: this.sessionId,
       runtime: this.runtime,
       eventType: spec.eventType,
       meta: embedEnvelope(spec.typeMeta, envelope),
       ...(spec.id !== undefined ? { id: spec.id } : {}),
-      // Content is blob-backed, never inline: retention can physically unlink a
-      // blob but cannot touch canonical_payload_inline.
-      ...(spec.payload !== undefined
-        ? { payload: spec.payload, inline: false, payloadExt: "txt" as const }
-        : {})
+      ...(spec.payload !== undefined ? { payload: spec.payload } : {})
     };
 
-    const result = this.ledger.appendEvidenceDetailed(input);
+    const result = this.store.appendSessionEvent(input);
 
     // Advance ONLY after the commit returned; a throw above leaves the head at
     // the last durable event.
@@ -150,8 +158,8 @@ class SyntheticAppender {
   }
 }
 
-function readSessionEvents(ledger: Ledger, sessionId: string): EvidenceEvent[] {
-  return ledger.getAllEvents().filter((event) => event.session_id === sessionId);
+function readSessionEvents(store: SessionEventStore, sessionId: string): EvidenceEvent[] {
+  return [...store.readSessionEvents(sessionId)];
 }
 
 function parseMeta(metaJson: string): Record<string, unknown> | null {
@@ -214,8 +222,8 @@ function seedHead(events: readonly EvidenceEvent[]): { seq: number; prevHash: st
   return { seq: 0, prevHash: SESSION_GENESIS };
 }
 
-function sessionRuntime(ledger: Ledger, sessionId: string, events: readonly EvidenceEvent[]): RuntimeName {
-  const row = ledger.getAllSessions().find((session) => session.session_id === sessionId);
+function sessionRuntime(store: SessionEventStore, sessionId: string, events: readonly EvidenceEvent[]): RuntimeName {
+  const row = store.readSessionRecord(sessionId);
   if (row) {
     return row.runtime;
   }
@@ -377,10 +385,10 @@ export function recoverSession(params: RecoverSessionParams): RecoveryReport {
   const staleAfterMs = params.staleAfterMs ?? DEFAULT_STALE_AFTER_MS;
   const force = params.force ?? false;
   const close = params.close ?? false;
-  const ledger = openLedger(params.workspace);
+  const store = params.store ?? openSessionEventStore(params.workspace);
 
   try {
-    const events = readSessionEvents(ledger, params.sessionId);
+    const events = readSessionEvents(store, params.sessionId);
     if (events.length === 0) {
       return report({
         verdict: "INDETERMINATE",
@@ -447,9 +455,9 @@ export function recoverSession(params: RecoverSessionParams): RecoveryReport {
 
     const seed = seedHead(events);
     const appender = new SyntheticAppender(
-      ledger,
+      store,
       params.sessionId,
-      sessionRuntime(ledger, params.sessionId, events),
+      sessionRuntime(store, params.sessionId, events),
       seed.seq,
       seed.prevHash
     );
@@ -474,7 +482,7 @@ export function recoverSession(params: RecoverSessionParams): RecoveryReport {
       step: null
     });
 
-    const contested = readSessionEvents(ledger, params.sessionId);
+    const contested = readSessionEvents(store, params.sessionId);
     if (firstValidClaim(contested) !== claim.eventId) {
       return report({
         verdict: "INDETERMINATE",
@@ -589,7 +597,7 @@ export function recoverSession(params: RecoverSessionParams): RecoveryReport {
     //    consistent, it does not decide the session is over.
     let closed = false;
     if (close) {
-      closed = closeRecoveredSession(ledger, appender, params.sessionId);
+      closed = closeRecoveredSession(store, appender, params.sessionId);
     }
 
     return report({
@@ -603,7 +611,7 @@ export function recoverSession(params: RecoverSessionParams): RecoveryReport {
       closed
     });
   } finally {
-    ledger.close();
+    store.close();
   }
 }
 
@@ -611,8 +619,8 @@ export function recoverSession(params: RecoverSessionParams): RecoveryReport {
 // synthetic:true (in the envelope, inside the hash), so a recovery-closed
 // session stays distinguishable from a cleanly closed one. sealSession is not
 // idempotent, so this runs exactly once, at the true end of the recovered log.
-function closeRecoveredSession(ledger: Ledger, appender: SyntheticAppender, sessionId: string): boolean {
-  const events = readSessionEvents(ledger, sessionId);
+function closeRecoveredSession(store: SessionEventStore, appender: SyntheticAppender, sessionId: string): boolean {
+  const events = readSessionEvents(store, sessionId);
   const sealHashes = events
     .filter((event) => event.event_type === "turn/seal")
     .map((event) => event.event_hash);
@@ -634,6 +642,6 @@ function closeRecoveredSession(ledger: Ledger, appender: SyntheticAppender, sess
     id: closeId
   });
 
-  ledger.sealSession(sessionId);
+  store.sealSession(sessionId);
   return true;
 }

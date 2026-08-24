@@ -31,6 +31,7 @@ import {
   transparencyEntrySchema,
   transparencySealSchema,
   transparencySealSignatureSchema,
+  type TransparencyArtifactKind,
   type TransparencyEntry
 } from "./logSchema.js";
 
@@ -52,6 +53,31 @@ export function transparencySealSigPath(workspace: string): string {
 
 function appendLine(path: string, line: string): void {
   appendFileSync(path, line + "\n", "utf8");
+}
+
+/**
+ * The hash of the last entry in the log, or "" when the log is empty.
+ *
+ * The append path needs exactly this one value to chain the new entry, and
+ * getting it by materialising and zod-parsing every entry made each append O(n)
+ * — O(n^2) over the life of a log, on top of the two full-log parses the Merkle
+ * rebuild used to add. Only the final line is parsed; the log file is the
+ * authority (not log.seal.json, which is written separately and can lag it
+ * across a crash), so the chosen `prev` is byte-identical to the whole-file read
+ * it replaces. Mirrors `lastBlobIndexHash` in the blob store.
+ */
+function lastTransparencyEntryHash(workspace: string): string {
+  const path = transparencyLogPath(workspace);
+  if (!pathExists(path)) {
+    return "";
+  }
+  const text = readUtf8(path);
+  let end = text.length;
+  while (end > 0 && (text[end - 1] === "\n" || text[end - 1] === "\r")) end -= 1;
+  if (end === 0) return "";
+  const start = text.lastIndexOf("\n", end - 1) + 1;
+  const lastLine = text.slice(start, end);
+  return transparencyEntrySchema.parse(JSON.parse(lastLine) as unknown).hash;
 }
 
 function readEntries(workspace: string): TransparencyEntry[] {
@@ -118,25 +144,15 @@ export function appendTransparencyEntry(params: {
   type: string;
   agentId: string;
   artifact: {
-    kind:
-      | "amccert"
-      | "amcbundle"
-      | "amcbench"
-      | "amcaudit"
-      | "amcpass"
-      | "bom"
-      | "policy"
-      | "approval"
-      | "plugin"
-      | "garak-scan-report"
-      | "vulnerability-scan-report";
+    // Derived from the schema's own enum rather than re-typed here: two copies
+    // of this union is how a kind becomes appendable-but-unparseable.
+    kind: TransparencyArtifactKind;
     sha256: string;
     id?: string;
   };
 }): TransparencyEntry {
   initTransparencyLog(params.workspace);
-  const entries = readEntries(params.workspace);
-  const prev = entries.length > 0 ? entries[entries.length - 1]!.hash : "";
+  const prev = lastTransparencyEntryHash(params.workspace);
   const payload = {
     v: 1 as const,
     ts: Date.now(),
@@ -156,12 +172,18 @@ export function appendTransparencyEntry(params: {
   });
   appendLine(transparencyLogPath(params.workspace), JSON.stringify(entry));
   writeSeal(params.workspace, entry.hash);
-  try {
-    updateTransparencyMerkleAfterAppend(params.workspace);
-  } catch (err) {
-    // Merkle rebuild failed — log warning but don't block append
-    console.error(`[AMC] Warning: Merkle tree rebuild failed after transparency append: ${err instanceof Error ? err.message : String(err)}`);
-  }
+  // Not wrapped in a try/catch. The Merkle root is part of what an append
+  // promises: inclusion proofs are generated from the log, so a root that stops
+  // advancing means the exporter keeps issuing proofs against a root nobody
+  // signed. This used to be caught and console.error'd, which reported an
+  // append as fully successful while the published root silently froze — the
+  // exact failure P2.4 exists to remove. On failure the store records a pending
+  // marker (so the lag survives this process) and throws
+  // TransparencyMerkleLagError, whose message states that the log line landed.
+  updateTransparencyMerkleAfterAppend(params.workspace, {
+    entryHash: entry.hash,
+    prevEntryHash: entry.prev
+  });
   return entry;
 }
 

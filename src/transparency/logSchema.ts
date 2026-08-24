@@ -1,24 +1,41 @@
 import { z } from "zod";
 
+/**
+ * What a transparency entry may anchor.
+ *
+ * Single source of truth: `appendTransparencyEntry` used to repeat this union
+ * inline in its parameter type, so a kind added to one and not the other became
+ * either a type error at every call site or (worse) a value the schema rejected
+ * at append time, after the caller had already been told the kind was allowed.
+ *
+ * `session-root` (P2.4 stage 2) anchors the Merkle root of one closed agent
+ * session, so a session can be proven to a third party who holds nothing but a
+ * proof bundle and the signed transparency root.
+ */
+export const TRANSPARENCY_ARTIFACT_KINDS = [
+  "amccert",
+  "amcbundle",
+  "amcbench",
+  "amcaudit",
+  "amcpass",
+  "bom",
+  "policy",
+  "approval",
+  "plugin",
+  "garak-scan-report",
+  "vulnerability-scan-report",
+  "session-root"
+] as const;
+
+export type TransparencyArtifactKind = (typeof TRANSPARENCY_ARTIFACT_KINDS)[number];
+
 export const transparencyEntrySchema = z.object({
   v: z.literal(1),
   ts: z.number().int(),
   type: z.string().min(1),
   agentId: z.string().min(1),
   artifact: z.object({
-    kind: z.enum([
-      "amccert",
-      "amcbundle",
-      "amcbench",
-      "amcaudit",
-      "amcpass",
-      "bom",
-      "policy",
-      "approval",
-      "plugin",
-      "garak-scan-report",
-      "vulnerability-scan-report"
-    ]),
+    kind: z.enum(TRANSPARENCY_ARTIFACT_KINDS),
     sha256: z.string().length(64),
     id: z.string().min(1).optional()
   }),

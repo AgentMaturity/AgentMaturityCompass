@@ -17,9 +17,18 @@ export function merkleNodeHash(left: string, right: string): string {
   return hashText(`node:${left}:${right}`);
 }
 
+/**
+ * The root of a log with no entries.
+ *
+ * Exported because the incremental writer (merkleFrontier.ts) has to reproduce
+ * the full rebuild byte-for-byte at every leaf count, n = 0 included. Two
+ * copies of `hashText("empty")` would be two places to get that wrong.
+ */
+export const MERKLE_EMPTY_ROOT: string = hashText("empty");
+
 export function buildMerkleRootFromEntryHashes(entryHashes: string[]): string {
   if (entryHashes.length === 0) {
-    return hashText("empty");
+    return MERKLE_EMPTY_ROOT;
   }
   let level = entryHashes.map((hash) => merkleLeafHash(hash));
   while (level.length > 1) {

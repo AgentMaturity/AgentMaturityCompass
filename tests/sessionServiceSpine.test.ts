@@ -87,7 +87,6 @@ describe("SessionService — turn-sealed session spine", () => {
       exitCode: 0,
       timedOut: false,
       denied: false,
-      spilled: null,
       content: "file-a.txt\nfile-b.txt\n"
     });
     service.endStep({

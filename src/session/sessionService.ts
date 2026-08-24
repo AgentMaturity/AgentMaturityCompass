@@ -1,8 +1,10 @@
 import { createHash, randomUUID } from "node:crypto";
-import type { EvidenceEvent, EvidenceEventType, RuntimeName } from "../types.js";
-import { openLedger, type AppendEvidenceInput, type Ledger } from "../ledger/ledger.js";
+import type { EvidenceEventType, RuntimeName } from "../types.js";
+import { openSessionEventStore } from "../persistence/openSessionEventStore.js";
+import type { SessionEventStore, SessionStoreAppendInput } from "../persistence/sessionEventStore.js";
 import { sha256Hex } from "../utils/hash.js";
-import { projectSurface, type ConversationHistory } from "./surfaceProjection.js";
+import type { ConversationHistory } from "./surfaceProjection.js";
+import { createSessionProjections, type SessionProjections } from "./projection/sessionProjections.js";
 import {
   embedEnvelope,
   extractEnvelope,
@@ -12,15 +14,27 @@ import {
   type SurfaceRole
 } from "./sessionTypes.js";
 import { merkleRoot, SESSION_MERKLE_EMPTY } from "./sessionMerkle.js";
+import type { SurfaceKind } from "./sessionTypes.js";
+import { SessionSpillPolicy } from "./spill/spillPolicy.js";
+import { SessionSpillStore } from "./spill/spillStore.js";
+import { SPILL_META_KEY, type SpillPolicyConfig } from "./spill/spillTypes.js";
 import type {
-  ApprovalAnswer,
-  SurfaceKind,
-  TokenUsage,
-  ToolDispatch,
-  ToolOutcome,
-  TurnEndReason,
-  TurnTrigger
-} from "./sessionTypes.js";
+  ApprovalRecord,
+  AssistantBlockInput,
+  RequestHeaderParams,
+  SandboxModeInput,
+  SealRef,
+  SessionCloseParams,
+  SessionEventRef,
+  SessionOpenParams,
+  StepEndParams,
+  StepRef,
+  ToolCallInput,
+  ToolResultInput,
+  TurnEndParams,
+  TurnRef,
+  TurnStartParams
+} from "./sessionApiTypes.js";
 
 
 // A monitor digest is a 64-char lowercase hex sha256. compositionDigest is
@@ -32,135 +46,32 @@ function normalizeSha256(value: string): string {
 
 // SessionService is the SINGLE WRITER for one session's spine. It owns the
 // per-session head (seq + prevSessionEventHash) in memory and the current
-// turn/step counters, appends every session event through the existing signed,
-// hash-chained Ledger append path, and applies the coalescing / step-boundary
-// batching policy. Every method below is synchronous: the underlying ledger is
+// turn/step counters, appends every session event through the signed,
+// hash-chained persistence seam, and applies the coalescing / step-boundary
+// batching policy. Every method below is synchronous: the store contract is
 // synchronous, and the coalescer's back-pressure is expressed by a synchronous
 // call that does not return until its bytes are flushed — the queue bound IS the
 // "model-visible ⊆ logged" bound.
 
-// Reference returned for every appended session event. Superset of the ledger's
-// AppendEvidenceResult, expressed in session terms. For a content-bearing event
-// payloadSha256 equals the SurfacePartRef.sha256 the event contributes.
-export interface SessionEventRef {
-  readonly eventId: string;
-  readonly eventHash: string;
-  readonly seq: number;
-  readonly payloadSha256: string;
-}
-
-export interface TurnRef extends SessionEventRef {
-  readonly turn: number;
-}
-
-export interface StepRef extends SessionEventRef {
-  readonly turn: number;
-  readonly step: number;
-}
-
-// turn/seal carries no payload; its meta commits to the window and the row's own
-// writer_sig IS the seal signature.
-export interface SealRef extends SessionEventRef {
-  readonly turn: number;
-  readonly windowMerkleRoot: string;
-  readonly sealChainIndex: number;
-}
-
-export interface SessionOpenParams {
-  readonly sessionId?: string; // generated when absent
-  /** Defaults to "amc": a session opened through this service is one AMC ran natively. */
-  readonly runtime?: RuntimeName;
-  readonly agentId: string;
-  readonly harnessVersion: string;
-  readonly compositionDigest: string;
-  readonly policyDigest: string;
-}
-
-export interface TurnStartParams {
-  readonly trigger: TurnTrigger;
-}
-
-export interface TurnEndParams {
-  readonly reason: TurnEndReason;
-  readonly interrupted: boolean;
-}
-
-export interface StepEndParams {
-  readonly stopReason: string | null;
-  readonly usage: TokenUsage;
-}
-
-export interface RequestHeaderParams {
-  readonly model: string;
-  readonly providerId: string;
-  readonly params: Record<string, unknown>;
-  readonly systemPromptEventId: string;
-  readonly toolSchemaSha256: string;
-  readonly projectionCutoffEventId: string;
-  readonly projectionDigest: string;
-  readonly sourceEventIds: readonly string[];
-  // The EXACT bytes that will be transmitted to the model. recordRequestHeader
-  // commits requestDigest = sha256(these) inside the signed request/header row
-  // before it hands them back wrapped in a PreparedRequest, so the transmitted
-  // bytes are always pinned by a durable, signed event.
-  readonly requestBytes: string | Buffer;
-}
-
-export interface AssistantBlockInput {
-  readonly blockIndex: number;
-  readonly blockKind: SurfaceKind;
-  readonly stopReason: string | null;
-  readonly content: string | Buffer;
-}
-
-export interface ToolCallInput {
-  readonly toolCallId: string;
-  readonly toolName: string;
-  readonly dispatch: ToolDispatch;
-  readonly parentToken: string | null;
-  readonly args: string | Buffer; // payload; argsSha256 = payload_sha256
-}
-
-export interface SpilledRef {
-  readonly path: string;
-  readonly bytes: number;
-}
-
-export interface ToolResultInput {
-  readonly toolCallId: string;
-  readonly outcome: ToolOutcome;
-  readonly exitCode: number | null;
-  readonly timedOut: boolean;
-  readonly denied: boolean;
-  readonly spilled: SpilledRef | null;
-  readonly content: string | Buffer;
-}
-
-// One method for both approval/request and approval/answer, discriminated on
-// `phase`, so the two halves of an approval share a call surface.
-export type ApprovalRecord =
-  | {
-      readonly phase: "request";
-      readonly approvalId: string;
-      readonly toolCallId: string;
-      readonly question: string;
-    }
-  | {
-      readonly phase: "answer";
-      readonly approvalId: string;
-      readonly answer: ApprovalAnswer;
-      readonly answeredBy: string;
-    };
-
-export interface SandboxModeInput {
-  readonly backend: string;
-  readonly mode: string;
-  readonly policyDigest: string;
-}
-
-export interface SessionCloseParams {
-  readonly reason: string;
-}
+// The parameter and result shapes live in ./sessionApiTypes.js — see its header
+// for why the split exists and why PreparedRequest stayed here.
+export type {
+  AssistantBlockInput,
+  ApprovalRecord,
+  RequestHeaderParams,
+  SandboxModeInput,
+  SealRef,
+  SessionCloseParams,
+  SessionEventRef,
+  SessionOpenParams,
+  StepEndParams,
+  StepRef,
+  ToolCallInput,
+  ToolResultInput,
+  TurnEndParams,
+  TurnRef,
+  TurnStartParams
+} from "./sessionApiTypes.js";
 
 // Module-private brand token. A PreparedRequest can only be minted by code in
 // THIS module — in practice only by recordRequestHeader, after its request/header
@@ -222,9 +133,17 @@ export class PreparedRequest {
 export class SessionService {
   readonly workspace: string;
 
-  // The service owns one Ledger connection for the life of the session — it is
-  // the single writer for its own spine — and releases it at close().
-  private readonly ledger: Ledger;
+  // The service owns one store for the life of the session — it is the single
+  // writer for its own spine — and releases it at close(). Which backend that
+  // is (SQLite ledger or signed JSONL) is the workspace's choice, made in
+  // openSessionEventStore; nothing below this line knows or cares.
+  private readonly store: SessionEventStore;
+
+  // The surface fold runs through the projection registry rather than direct
+  // calls, so repeated projectHistory() resumes from the cached prefix instead
+  // of re-parsing every row's meta_json. Public and per-service: the cache is
+  // keyed to ONE log, and a composed runtime registers its own units here.
+  readonly projections: SessionProjections = createSessionProjections();
 
   private sessionIdValue: string | null = null;
   private runtime: RuntimeName = "amc";
@@ -258,9 +177,21 @@ export class SessionService {
   private lastSealMerkleRoot: string = SESSION_MERKLE_EMPTY;
   private readonly sealEventHashes: string[] = [];
 
-  constructor(workspace: string) {
+  // The post-execute spill policy for this session. Created at open(), because
+  // a spill store is session-scoped and there is no session before then. The
+  // service runs it ITSELF rather than accepting a caller-supplied spill ref:
+  // that is what makes the ref in a signed row a description of bytes actually
+  // written rather than an unchecked claim.
+  private spill: SessionSpillPolicy | null = null;
+  private readonly spillConfig: Partial<SpillPolicyConfig>;
+
+  // `store` is injectable so a caller (a test, a conformance run, a composed
+  // service) can pin a backend without going through workspace configuration.
+  // Left absent, the workspace's own pinned backend is opened.
+  constructor(workspace: string, store?: SessionEventStore, spillConfig: Partial<SpillPolicyConfig> = {}) {
     this.workspace = workspace;
-    this.ledger = openLedger(workspace);
+    this.store = store ?? openSessionEventStore(workspace);
+    this.spillConfig = spillConfig;
   }
 
   // sessionId is assigned by open() (or supplied in SessionOpenParams) and is
@@ -279,6 +210,7 @@ export class SessionService {
     const sessionId = params.sessionId ?? randomUUID();
     this.sessionIdValue = sessionId;
     this.runtime = params.runtime ?? "amc";
+    this.spill = new SessionSpillPolicy(new SessionSpillStore(this.workspace, sessionId), this.spillConfig);
 
     // Seed the per-session head from any rows already carrying this session id. A
     // fresh session has none, leaving seq=0 / prevHash=SESSION_GENESIS; a resumed
@@ -289,7 +221,7 @@ export class SessionService {
     // reports "references missing session". A natively-run agent has no separate
     // binary, so binary_path records the agent id and binary_sha256 the
     // composition it ran under.
-    this.ledger.startSession({
+    this.store.startSession({
       sessionId,
       runtime: params.runtime ?? "amc",
       binaryPath: params.agentId,
@@ -469,10 +401,7 @@ export class SessionService {
   // property recordRequestHeader gives the request path.
   projectHistory(): ConversationHistory {
     this.ensureUsable();
-    const rows = this.ledger.db
-      .prepare("SELECT * FROM evidence_events WHERE session_id = ? ORDER BY rowid ASC")
-      .all(this.sessionId) as unknown as EvidenceEvent[];
-    return projectSurface(rows);
+    return this.projections.surface.evaluate(this.store.readSessionEvents(this.sessionId)).value;
   }
 
   recordSystemPrompt(text: string): SessionEventRef {
@@ -547,12 +476,21 @@ export class SessionService {
     });
   }
 
+  // The post-execute point: the tool has run, and its output is about to become
+  // both model-visible and logged. The spill policy runs HERE, over the full
+  // output, and what it returns is what gets recorded — so an oversized result
+  // cannot reach the model in one form and the evidence in another. The full
+  // bytes' sha256 rides in `spilled` inside meta_json, hence inside event_hash,
+  // hence under writer_sig: spilling relocates the bytes, never the commitment.
   recordToolResult(result: ToolResultInput): SessionEventRef {
+    this.ensureUsable();
     const turn = this.currentTurn;
     const step = this.currentStep;
+    const full = typeof result.content === "string" ? Buffer.from(result.content, "utf8") : result.content;
+    const outcome = this.requireSpill().apply({ nameSeed: result.toolCallId, content: full });
     return this.recordContent({
       eventType: "tool/result",
-      content: result.content,
+      content: outcome.content,
       slot: `tool_result:${result.toolCallId}`,
       role: "tool",
       kind: "tool_result",
@@ -564,7 +502,7 @@ export class SessionService {
         exitCode: result.exitCode,
         timedOut: result.timedOut,
         denied: result.denied,
-        spilled: result.spilled
+        [SPILL_META_KEY]: outcome.ref
       }),
       turn,
       step
@@ -638,13 +576,13 @@ export class SessionService {
       id: closeId
     });
 
-    // sealSession is NOT idempotent — protect_sessions_sealed_immutable raises on
-    // a second call — so it runs exactly once, guarded by `closed`. The row's
-    // session_final_event_hash then equals this close event's hash (it is the
-    // last event), so the row seal and the close event cross-check.
-    this.ledger.sealSession(sessionId);
+    // sealSession is NOT idempotent — the contract makes a second seal throw on
+    // every backend — so it runs exactly once, guarded by `closed`. The sealed
+    // final hash then equals this close event's hash (it is the last event), so
+    // the seal and the close event cross-check.
+    this.store.sealSession(sessionId);
     this.closed = true;
-    this.ledger.close();
+    this.store.close();
     return ref;
   }
 
@@ -709,18 +647,16 @@ export class SessionService {
       synthetic: false
     };
     const meta = embedEnvelope(spec.typeMeta, envelope);
-    const input: AppendEvidenceInput = {
+    const input: SessionStoreAppendInput = {
       sessionId,
       runtime: this.runtime,
       eventType: spec.eventType,
       meta,
       ...(spec.id !== undefined ? { id: spec.id } : {}),
-      ...(spec.payload !== undefined
-        ? { payload: spec.payload, inline: false, payloadExt: "txt" as const }
-        : {})
+      ...(spec.payload !== undefined ? { payload: spec.payload } : {})
     };
 
-    const result = this.ledger.appendEvidenceDetailed(input);
+    const result = this.store.appendSessionEvent(input);
 
     // Advance ONLY after the commit returned. A throw above leaves seq/prevHash
     // untouched, so the head still points at the last durable event.
@@ -746,18 +682,13 @@ export class SessionService {
   }
 
   private seedHead(sessionId: string): void {
-    const rows = this.ledger.db
-      .prepare(
-        "SELECT meta_json AS metaJson, event_hash AS eventHash FROM evidence_events WHERE session_id = ? ORDER BY rowid ASC"
-      )
-      .all(sessionId) as ReadonlyArray<{ metaJson: string; eventHash: string }>;
-    for (const row of rows) {
-      const envelope = extractEnvelope(row.metaJson);
+    for (const row of this.store.readSessionEvents(sessionId)) {
+      const envelope = extractEnvelope(row.meta_json);
       if (envelope === null) {
         continue;
       }
       this.seqCounter = envelope.seq + 1;
-      this.prevHash = row.eventHash;
+      this.prevHash = row.event_hash;
     }
   }
 
@@ -768,6 +699,16 @@ export class SessionService {
     if (this.closed) {
       throw new Error("SessionService used after close()");
     }
+  }
+
+  // ensureUsable() has already proved the session is open, so a null policy here
+  // would mean open() failed to build one — a programming error, not a state a
+  // caller can reach.
+  private requireSpill(): SessionSpillPolicy {
+    if (this.spill === null) {
+      throw new Error("SessionService: spill policy unavailable before open()");
+    }
+    return this.spill;
   }
 
   private requireTurn(): number {

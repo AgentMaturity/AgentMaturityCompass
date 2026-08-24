@@ -32,6 +32,7 @@ import { loadBlobPlaintext } from "../storage/blobs/blobStore.js";
 import { openLedger, targetsDir, canonicalMetadataForHash, type Ledger, type EvidenceLedgerReader } from "./ledger.js";
 import { extractEnvelope } from "../session/sessionTypes.js";
 import { verifySessionChains } from "./sessionVerification.js";
+import { verifyAlternateBackendEvidence } from "./alternateBackendVerification.js";
 import type { EvidenceEvent } from "../types.js";
 
 /**
@@ -744,6 +745,15 @@ export async function verifyLedgerIntegrity(
       );
     }
   }
+
+  // A workspace pinned to the JSONL backend keeps its evidence in
+  // .amc/sessions/*.jsonl, not in the evidence_events table this function
+  // reads. Verifying only the table would find it EMPTY and report success —
+  // demonstrated: a JSONL workspace whose evidence had been openly rewritten
+  // returned chain.ok = true with no errors. A verifier that cannot see the
+  // evidence must never call it verified, so the JSONL rows are verified
+  // through the backend-independent verifier and their failures land here.
+  chainErrors.push(...verifyAlternateBackendEvidence(workspacePath, expectedFingerprint));
 
   try {
     verifyEvents(ledger, workspacePath, chainErrors, options.externallyAuthenticatedPayloads);

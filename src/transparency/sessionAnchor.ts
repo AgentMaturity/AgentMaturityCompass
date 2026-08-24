@@ -1,0 +1,150 @@
+/**
+ * Anchors a closed session's Merkle root into the transparency log (plan P2.4).
+ *
+ * Before this, the transparency log anchored published artifacts — certificates,
+ * bundles, scan reports — and a session was verifiable only by someone holding
+ * the workspace. Anchoring the session root makes the session EXTERNALLY
+ * verifiable: the anchored digest lands in the same append-only, Merkle-indexed,
+ * signed log every other artifact does, so an inclusion proof against a signed
+ * root is proof that this exact session existed at that point in the log.
+ *
+ * What is published is the descriptor's digest, not the session. The descriptor
+ * (sessionRootDescriptor.ts) carries hashes and counts; the conversation stays
+ * in the workspace. A transparency log is public by intent, so anchoring content
+ * would be a disclosure decision disguised as an integrity feature.
+ */
+import { join } from "node:path";
+import { pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
+import { sha256Hex } from "../utils/hash.js";
+import { canonicalize } from "../utils/json.js";
+import { appendTransparencyEntry, readTransparencyEntries } from "./logChain.js";
+import type { TransparencyEntry } from "./logSchema.js";
+import {
+  SESSION_ROOT_ARTIFACT_KIND,
+  SESSION_ROOT_ENTRY_TYPE,
+  sessionRootDescriptorSchema,
+  type SessionRootDescriptor
+} from "./sessionAnchorSchema.js";
+import {
+  readSessionRootDescriptor,
+  type SessionRootDescriptorOptions
+} from "./sessionRootDescriptor.js";
+
+/** Where the anchored descriptor bytes are kept, keyed by session id. */
+export function sessionRootDescriptorPath(workspace: string, sessionId: string): string {
+  return join(workspace, ".amc", "transparency", "session-roots", `${sessionId}.json`);
+}
+
+/**
+ * The canonical bytes that were hashed into the transparency entry.
+ *
+ * `canonicalize` (sorted keys, no whitespace) rather than the stored file's
+ * formatting, so the digest is reproducible by anyone who holds the descriptor
+ * object — including the offline verifier, which never sees this file.
+ */
+export function sessionRootDescriptorBytes(descriptor: SessionRootDescriptor): string {
+  return canonicalize(descriptor);
+}
+
+export function sessionRootDescriptorSha256(descriptor: SessionRootDescriptor): string {
+  return sha256Hex(sessionRootDescriptorBytes(descriptor));
+}
+
+export interface SessionAnchorResult {
+  readonly entry: TransparencyEntry;
+  readonly descriptor: SessionRootDescriptor;
+  readonly descriptorSha256: string;
+  /**
+   * True when an entry for this exact descriptor digest already existed and was
+   * reused. Anchoring is naturally idempotent — the descriptor is derived, so
+   * re-anchoring an unchanged session yields the same digest — and appending a
+   * second identical anchor would grow the log without adding evidence.
+   */
+  readonly alreadyAnchored: boolean;
+}
+
+/** The transparency entries that anchor this session, oldest first. */
+export function findSessionAnchorEntries(workspace: string, sessionId: string): TransparencyEntry[] {
+  return readTransparencyEntries(workspace).filter(
+    (entry) => entry.artifact.kind === SESSION_ROOT_ARTIFACT_KIND && entry.artifact.id === sessionId
+  );
+}
+
+/**
+ * The descriptor bytes stored for a session, verified against the digest the
+ * transparency log committed to.
+ *
+ * The stored file is a convenience copy, so it is never trusted on its own: an
+ * exporter that shipped whatever happened to be in this file would ship whatever
+ * an attacker put there. The digest check makes the file interchangeable with a
+ * rebuild from the ledger, which is why the exporter can prefer it.
+ */
+export function readAnchoredSessionDescriptor(
+  workspace: string,
+  sessionId: string,
+  expectedSha256: string
+): SessionRootDescriptor | null {
+  const path = sessionRootDescriptorPath(workspace, sessionId);
+  if (!pathExists(path)) {
+    return null;
+  }
+  try {
+    const parsed = sessionRootDescriptorSchema.parse(JSON.parse(readUtf8(path)) as unknown);
+    return sessionRootDescriptorSha256(parsed) === expectedSha256 ? parsed : null;
+  } catch {
+    return null;
+  }
+}
+
+export interface SessionAnchorParams {
+  readonly workspace: string;
+  readonly sessionId: string;
+  readonly options?: SessionRootDescriptorOptions;
+}
+
+/**
+ * Describe a closed session, publish its digest to the transparency log, and
+ * keep the descriptor bytes next to the log.
+ *
+ * Throws `SessionAnchorError` when the session does not verify — anchoring a
+ * broken session would be a signed statement that it was intact. Throws
+ * `TransparencyMerkleLagError` when the append lands but the Merkle root cannot
+ * be advanced (stage 1's fail-loud contract); the entry is in the log and the
+ * pending marker records the lag, so a rebuild repairs it and the proof export
+ * below refuses to issue a proof in the meantime.
+ */
+export function anchorSessionRoot(params: SessionAnchorParams): SessionAnchorResult {
+  const descriptor = readSessionRootDescriptor(params.workspace, params.sessionId, params.options ?? {});
+  const descriptorSha256 = sessionRootDescriptorSha256(descriptor);
+
+  // The descriptor lands on disk BEFORE the log entry. If the append throws, a
+  // descriptor with no entry is inert — nothing looks it up without an entry to
+  // supply the digest. The reverse order could leave an anchored digest whose
+  // bytes were never written, which reads as a missing artifact rather than as
+  // a failed anchor.
+  writeFileAtomic(
+    sessionRootDescriptorPath(params.workspace, params.sessionId),
+    `${JSON.stringify(descriptor, null, 2)}\n`,
+    0o644
+  );
+
+  const existing = findSessionAnchorEntries(params.workspace, params.sessionId).find(
+    (entry) => entry.artifact.sha256 === descriptorSha256
+  );
+  if (existing) {
+    return { entry: existing, descriptor, descriptorSha256, alreadyAnchored: true };
+  }
+
+  const entry = appendTransparencyEntry({
+    workspace: params.workspace,
+    type: SESSION_ROOT_ENTRY_TYPE,
+    agentId: descriptor.agentId,
+    artifact: {
+      kind: SESSION_ROOT_ARTIFACT_KIND,
+      sha256: descriptorSha256,
+      id: params.sessionId
+    }
+  });
+
+  return { entry, descriptor, descriptorSha256, alreadyAnchored: false };
+}

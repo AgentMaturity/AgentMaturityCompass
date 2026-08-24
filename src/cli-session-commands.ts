@@ -160,4 +160,82 @@ export function registerSessionCommands(program: Command): void {
       // non-zero exit so an operator or CI treats it as the alarm it is.
       process.exit(report.verdict === "TAMPERED" ? 1 : 0);
     });
+
+  // ── Anchoring: the operator-reachable half of P2.4 ──────────────────────
+  //
+  // Without these, anchorSessionRoot / exportSessionAnchorProof /
+  // verifySessionAnchorProofFile had no non-test caller, so "sessions are
+  // externally verifiable" was true of the library and of nobody's workflow.
+  // A guarantee nobody can invoke is not a guarantee.
+  session
+    .command("anchor")
+    .description("Anchor a closed session's root into the transparency log")
+    .argument("<id>", "session id")
+    .option("--json", "Output as JSON")
+    .action(async (id: string, opts: { json?: boolean }) => {
+      const { anchorSessionRoot } = await import("./transparency/sessionAnchor.js");
+      try {
+        const result = anchorSessionRoot({ workspace: process.cwd(), sessionId: id });
+        if (opts.json) {
+          console.log(JSON.stringify(result, null, 2));
+          return;
+        }
+        console.log(chalk.green(`Anchored session ${id}`));
+        console.log(chalk.gray("  descriptor sha256: "), result.descriptorSha256);
+      } catch (error) {
+        console.error(chalk.red(error instanceof Error ? error.message : String(error)));
+        process.exit(1);
+      }
+    });
+
+  session
+    .command("proof")
+    .description("Export a session's inclusion proof (verifiable offline, without this workspace)")
+    .argument("<id>", "session id")
+    .requiredOption("--out <path>", "file to write the proof bundle to")
+    .action(async (id: string, opts: { out: string }) => {
+      const { exportSessionAnchorProof } = await import("./transparency/sessionAnchorProof.js");
+      try {
+        const exported = exportSessionAnchorProof({
+          workspace: process.cwd(),
+          sessionId: id,
+          outFile: opts.out
+        });
+        console.log(chalk.green(`Wrote ${exported.outFile}`));
+        // The fingerprint must travel out of band, not inside the bundle it
+        // authenticates — a proof that carries its own trust anchor proves only
+        // that it is self-consistent.
+        console.log(chalk.gray("  auditor key fingerprint (share out of band):"));
+        console.log(`    ${exported.auditorKeyFingerprint}`);
+      } catch (error) {
+        console.error(chalk.red(error instanceof Error ? error.message : String(error)));
+        process.exit(1);
+      }
+    });
+
+  session
+    .command("verify-proof")
+    .description("Verify a session inclusion proof offline — needs only the bundle and a pinned fingerprint")
+    .argument("<file>", "proof bundle path")
+    .requiredOption("--expect-auditor-key <sha256>", "auditor public key fingerprint, obtained out of band")
+    .option("--json", "Output as JSON")
+    .action(async (file: string, opts: { expectAuditorKey: string; json?: boolean }) => {
+      const { verifySessionAnchorProofFile } = await import("./transparency/sessionAnchorVerify.js");
+      const verdict = verifySessionAnchorProofFile({
+        file,
+        expectedAuditorKeyFingerprint: opts.expectAuditorKey
+      });
+      if (opts.json) {
+        console.log(JSON.stringify(verdict, null, 2));
+        process.exit(verdict.ok ? 0 : 1);
+        return;
+      }
+      if (verdict.ok) {
+        console.log(chalk.green("Session inclusion proof VERIFIED"));
+      } else {
+        console.log(chalk.red("Session inclusion proof FAILED"));
+        for (const err of verdict.errors) console.log(`  - ${err}`);
+      }
+      process.exit(verdict.ok ? 0 : 1);
+    });
 }
