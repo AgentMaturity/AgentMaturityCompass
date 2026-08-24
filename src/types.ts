@@ -1,4 +1,10 @@
-export type RuntimeName = "claude" | "gemini" | "openclaw" | "unknown" | "mock" | "any" | "gateway" | "sandbox";
+// "amc" is a session AMC ran natively through its own agent loop (SessionService)
+// — as opposed to "claude"/"gemini"/"openclaw", which mean AMC observed an
+// external agent of that kind, or "gateway"/"sandbox", the observation mechanism.
+// A native session labelled anything else would misreport how its evidence was
+// produced, which is exactly the provenance the trust plane exists to keep
+// honest.
+export type RuntimeName = "amc" | "claude" | "gemini" | "openclaw" | "unknown" | "mock" | "any" | "gateway" | "sandbox";
 
 export type EvidenceEventType =
   | "stdin"
@@ -4078,6 +4084,17 @@ export interface AMCConfig {
   };
   security: {
     trustBoundaryMode: "isolated" | "shared";
+    /**
+     * Storage durability for the signed ledger.
+     *
+     * "crash" (default): commits survive a process or OS crash while the drive
+     * stays powered — SQLite's synchronous=FULL. Fast (~22k commits/s here).
+     * "power-loss": also survives power loss / drive-cache loss by forcing
+     * fcntl(F_FULLFSYNC) on macOS (PRAGMA fullfsync=1). Correct for a
+     * mission-critical regulated deployment on real hardware, but ~96x slower
+     * per commit on this platform, so it is opt-in rather than the default.
+     */
+    durability?: "crash" | "power-loss";
   };
   supervise: {
     extraEnv: Record<string, string>;

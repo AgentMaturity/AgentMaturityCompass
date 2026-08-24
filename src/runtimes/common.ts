@@ -84,7 +84,7 @@ export async function runHarnessWithRetries<T>(
 ): Promise<HarnessResult<T>> {
   const maxRetries = opts.maxRetries ?? 2;
   const runtimeKey =
-    runtimeName === "unknown" || runtimeName === "gateway" || runtimeName === "any" || runtimeName === "sandbox"
+    runtimeName === "unknown" || runtimeName === "gateway" || runtimeName === "any" || runtimeName === "sandbox" || runtimeName === "amc"
       ? "mock"
       : runtimeName;
   const runtimeConfig = opts.config.runtimes[runtimeKey];

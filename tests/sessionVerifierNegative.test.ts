@@ -56,7 +56,6 @@ function openRaw(workspace: string): Database.Database {
 function cleanSession(svc: SessionService): void {
   svc.open({
     sessionId: "s",
-    runtime: "generic",
     agentId: "a",
     harnessVersion: "1",
     compositionDigest: "0".repeat(64),
@@ -155,7 +154,6 @@ describe("session lifecycle — the three-way verdict is real in both directions
     const { workspace, cleanup } = buildSession((svc) => {
       svc.open({
         sessionId: "live",
-        runtime: "generic",
         agentId: "a",
         harnessVersion: "1",
         compositionDigest: "0".repeat(64),
@@ -182,7 +180,6 @@ describe("session lifecycle — the three-way verdict is real in both directions
     const { workspace, cleanup } = buildSession((svc) => {
       svc.open({
         sessionId: "crashed",
-        runtime: "generic",
         agentId: "a",
         harnessVersion: "1",
         compositionDigest: "0".repeat(64),
@@ -296,6 +293,34 @@ describe("the per-session chain earns its place against a re-signed forgery", ()
       expect(v.chain.ok, "a re-signed session-chain break must still be caught").toBe(false);
       expect(v.chain.errors.join(" ")).toMatch(/session sequence mismatch/);
       expect(v.chain.errors.join(" "), "and NOT via the event_hash backstop").not.toMatch(/event_hash mismatch/);
+    } finally {
+      cleanup();
+    }
+  });
+});
+
+describe("a native session is labelled honestly", () => {
+  it("defaults its runtime to 'amc', not 'unknown' or a provider name", async () => {
+    // The runtime field records HOW evidence was produced. A session AMC ran
+    // through its own loop is "amc"; calling it "unknown" (or "claude" because
+    // the model happens to be Claude) misreports provenance the trust plane
+    // exists to keep honest.
+    const { workspace, cleanup } = buildSession((svc) => {
+      svc.open({
+        sessionId: "native",
+        agentId: "a",
+        harnessVersion: "1",
+        compositionDigest: "0".repeat(64),
+        policyDigest: "0".repeat(64)
+      });
+      svc.close({ reason: "done" });
+    });
+    try {
+      const ledger = openLedger(workspace);
+      const events = ledger.getAllEvents().filter((e) => e.session_id === "native");
+      ledger.close();
+      expect(events.length).toBeGreaterThan(0);
+      expect(events.every((e) => e.runtime === "amc"), "every native session event is runtime=amc").toBe(true);
     } finally {
       cleanup();
     }

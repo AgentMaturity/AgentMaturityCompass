@@ -57,14 +57,16 @@ function readBlobIndexRows(workspace: string): BlobIndexRow[] {
 }
 
 function writeBlobIndexSig(workspace: string, lastHash: string): void {
-  const indexPath = blobIndexPath(workspace);
-  const digest = sha256Hex(pathExists(indexPath) ? readFileSync(indexPath) : Buffer.alloc(0));
-  const signature = signHexDigest(digest, getPrivateKeyPem(workspace, "auditor"));
+  // Sign the chain head, not a whole-file digest. lastHash is a 64-char hex
+  // sha256 that commits to the full ordered history through the per-row chain,
+  // so this is O(1) per append — the whole-file read that made appends O(n) is
+  // gone. lastHash is always a real row hash here (this is only called after a
+  // row is appended).
+  const signature = signHexDigest(lastHash, getPrivateKeyPem(workspace, "auditor"));
   const payload: BlobIndexSignature = blobIndexSignatureSchema.parse({
     v: 1,
     ts: Date.now(),
     lastHash,
-    digestSha256: digest,
     signature,
     signer: "auditor"
   });
@@ -300,16 +302,16 @@ export function verifyBlobIndexSignature(workspace: string): {
   }
   try {
     const sig = blobIndexSignatureSchema.parse(JSON.parse(readUtf8(sigPath)) as unknown);
-    const rows = readBlobIndexRows(workspace);
-    const lastHash = rows.length > 0 ? rows[rows.length - 1]!.hash : "";
+    // The signed chain head must match the index's actual last-row hash. A
+    // truncation, an excised row, or an appended forgery all move this head, and
+    // the attacker cannot re-sign the new head without the auditor key. The
+    // per-row linkage itself is verified by verifyBlobIndexChain; here we only
+    // need the head, read in O(1).
+    const lastHash = lastBlobIndexHash(workspace);
     if (sig.lastHash !== lastHash) {
       return { valid: false, signatureExists: true, reason: "blob index last hash mismatch", path, sigPath };
     }
-    const digest = sha256Hex(readFileSync(path));
-    if (digest !== sig.digestSha256) {
-      return { valid: false, signatureExists: true, reason: "blob index digest mismatch", path, sigPath };
-    }
-    const valid = verifyHexDigestAny(digest, sig.signature, getPublicKeyHistory(workspace, "auditor"));
+    const valid = verifyHexDigestAny(sig.lastHash, sig.signature, getPublicKeyHistory(workspace, "auditor"));
     return {
       valid,
       signatureExists: true,

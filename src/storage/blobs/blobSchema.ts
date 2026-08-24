@@ -21,8 +21,11 @@ export type BlobIndexRow = z.infer<typeof blobIndexRowSchema>;
 export const blobIndexSignatureSchema = z.object({
   v: z.literal(1),
   ts: z.number().int(),
+  // The signed value. Each index row hashes its predecessor, so this chain head
+  // transitively commits to every row — signing it authenticates the whole
+  // ordered history without reading the whole file, the same way the evidence
+  // ledger signs its chain head rather than re-digesting the database.
   lastHash: z.string(),
-  digestSha256: z.string().length(64),
   signature: z.string().min(1),
   signer: z.literal("auditor")
 });

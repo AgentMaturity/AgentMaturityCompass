@@ -39,7 +39,7 @@ export const amcAgentSchema = z.object({
   /** Human-readable name */
   name: z.string().optional(),
   /** Runtime type */
-  runtime: z.enum(["claude", "gemini", "openclaw", "mock", "any", "gateway", "sandbox"]).default("any"),
+  runtime: z.enum(["amc", "claude", "gemini", "openclaw", "mock", "any", "gateway", "sandbox"]).default("any"),
   /** Agent's role/domain description */
   role: z.string().optional(),
   /** Domain the agent operates in */

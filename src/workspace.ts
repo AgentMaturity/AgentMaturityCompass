@@ -100,7 +100,8 @@ export function defaultAMCConfig(): AMCConfig {
       any: { command: "", argsTemplate: [] }
     },
     security: {
-      trustBoundaryMode: "shared"
+      trustBoundaryMode: "shared",
+      durability: "crash"
     },
     supervise: {
       extraEnv: {},
@@ -165,7 +166,8 @@ export function loadAMCConfig(workspace = process.cwd()): AMCConfig {
       any: { ...base.runtimes.any, ...(raw?.runtimes?.any ?? {}) }
     },
     security: {
-      trustBoundaryMode: raw?.security?.trustBoundaryMode === "isolated" ? "isolated" : base.security.trustBoundaryMode
+      trustBoundaryMode: raw?.security?.trustBoundaryMode === "isolated" ? "isolated" : base.security.trustBoundaryMode,
+      durability: raw?.security?.durability === "power-loss" ? "power-loss" : "crash"
     },
     supervise: {
       extraEnv: raw?.supervise?.extraEnv ?? {},

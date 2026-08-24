@@ -1,6 +1,7 @@
 import Database from "better-sqlite3";
 import { createPrivateKey, randomUUID, type KeyObject } from "node:crypto";
 import { readdirSync, readFileSync } from "node:fs";
+import YAML from "yaml";
 import { join, relative, resolve } from "node:path";
 import type {
   AMCConfig,
@@ -122,15 +123,7 @@ function ledgerPoolSize(): number {
   return parsePoolSize(process.env.AMC_LEDGER_SQLITE_POOL_SIZE ?? process.env.AMC_SQLITE_POOL_SIZE, 4);
 }
 
-type SqliteSyncMode = "OFF" | "NORMAL" | "FULL" | "EXTRA";
-
-function ledgerSynchronousMode(): SqliteSyncMode {
-  const raw = (process.env.AMC_LEDGER_SQLITE_SYNCHRONOUS ?? "FULL").trim().toUpperCase();
-  if (raw === "OFF" || raw === "NORMAL" || raw === "FULL" || raw === "EXTRA") {
-    return raw;
-  }
-  return "FULL";
-}
+import { ledgerSynchronousMode, ledgerFullFsync } from "./ledgerDurability.js";
 
 function ledgerPoolKey(workspace: string): string {
   return `ledger:${resolve(workspace)}:${ledgerPath(workspace)}`;
@@ -251,6 +244,8 @@ export class Ledger {
         db.pragma("foreign_keys = ON");
         db.pragma("busy_timeout = 5000");
         db.pragma(`synchronous = ${ledgerSynchronousMode()}`);
+        // Real (power-loss) durability only when opted in — see ledgerFullFsync.
+        db.pragma(`fullfsync = ${ledgerFullFsync(workspace) ? 1 : 0}`);
       },
       initialize: (db) => {
         runMigrations(db);

@@ -68,7 +68,8 @@ export interface SealRef extends SessionEventRef {
 
 export interface SessionOpenParams {
   readonly sessionId?: string; // generated when absent
-  readonly runtime: RuntimeName;
+  /** Defaults to "amc": a session opened through this service is one AMC ran natively. */
+  readonly runtime?: RuntimeName;
   readonly agentId: string;
   readonly harnessVersion: string;
   readonly compositionDigest: string;
@@ -226,7 +227,7 @@ export class SessionService {
   private readonly ledger: Ledger;
 
   private sessionIdValue: string | null = null;
-  private runtime: RuntimeName = "unknown";
+  private runtime: RuntimeName = "amc";
   private closed = false;
 
   // Per-session chain head, held in memory rather than re-queried per append
@@ -277,7 +278,7 @@ export class SessionService {
     }
     const sessionId = params.sessionId ?? randomUUID();
     this.sessionIdValue = sessionId;
-    this.runtime = params.runtime;
+    this.runtime = params.runtime ?? "amc";
 
     // Seed the per-session head from any rows already carrying this session id. A
     // fresh session has none, leaving seq=0 / prevHash=SESSION_GENESIS; a resumed
@@ -290,7 +291,7 @@ export class SessionService {
     // composition it ran under.
     this.ledger.startSession({
       sessionId,
-      runtime: params.runtime,
+      runtime: params.runtime ?? "amc",
       binaryPath: params.agentId,
       binarySha256: normalizeSha256(params.compositionDigest)
     });
@@ -298,7 +299,7 @@ export class SessionService {
     return this.appendSessionEvent({
       eventType: "session/open",
       typeMeta: {
-        runtime: params.runtime,
+        runtime: params.runtime ?? "amc",
         agentId: params.agentId,
         harnessVersion: params.harnessVersion,
         compositionDigest: params.compositionDigest,

@@ -19,6 +19,7 @@ runtimes:
     argsTemplate: []
 security:
   trustBoundaryMode: isolated
+  durability: crash
 supervise:
   extraEnv: {}
   includeProxyEnv: true

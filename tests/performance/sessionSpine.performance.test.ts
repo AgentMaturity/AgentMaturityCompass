@@ -51,7 +51,6 @@ function openService(workspace: string): SessionService {
   const svc = new SessionService(workspace);
   svc.open({
     sessionId: "perf",
-    runtime: "generic",
     agentId: "a",
     harnessVersion: "1",
     compositionDigest: "0".repeat(64),
