@@ -340,7 +340,7 @@ describe("VERIFY-3 holds for the new encoder too", () => {
       tools: TOOLS
     });
     session.endStep({ stopReason: "end_turn", usage: { inputTokens: 10, outputTokens: 2, cacheRead: 0, cacheWrite: 0 } });
-    session.endTurn({ reason: "complete", interrupted: false });
+    session.endTurn({ reason: "complete" });
     session.sealTurn();
     session.close({ reason: "completed" });
 

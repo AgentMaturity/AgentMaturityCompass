@@ -21,6 +21,7 @@ import type {
   TokenUsage,
   ToolDispatch,
   ToolOutcome,
+  TurnCancelCause,
   TurnEndReason,
   TurnTrigger
 } from "./sessionTypes.js";
@@ -71,14 +72,35 @@ export interface TurnStartParams {
   readonly trigger: TurnTrigger;
 }
 
-export interface TurnEndParams {
-  readonly reason: TurnEndReason;
-  readonly interrupted: boolean;
-}
+/**
+ * How a LIVE turn ends. Two shapes, because two facts:
+ *
+ *   - a cancel MUST name its cause — an unattributed "someone stopped it" is not
+ *     evidence, and the cause is signed with the row (see ./turnLifecycleMeta.ts);
+ *   - every other live ending carries no cause at all (`cause?: never` makes
+ *     attaching one a compile error, not a runtime surprise).
+ *
+ * `"interrupted"` is deliberately NOT reachable from here. It means "this agent
+ * died" and is written only by crash repair; a live loop that could spell it
+ * would be able to disguise a cancellation as a crash. `interrupted` is likewise
+ * no longer a caller-supplied boolean — it is derived from `reason` on write, so
+ * the row cannot contradict itself.
+ */
+export type TurnEndParams =
+  | { readonly reason: "cancelled"; readonly cause: TurnCancelCause }
+  | { readonly reason: Exclude<TurnEndReason, "cancelled" | "interrupted">; readonly cause?: never };
 
 export interface StepEndParams {
   readonly stopReason: string | null;
-  readonly usage: TokenUsage;
+  /**
+   * Token accounting, or null when the step produced none.
+   *
+   * Nullable because a stream that was cancelled or failed reports no usage:
+   * StreamAssembly.usage is null on every abort. A non-nullable field would
+   * force the caller to invent four zeroes and sign them — a measurement nobody
+   * took, recorded as if they had.
+   */
+  readonly usage: TokenUsage | null;
 }
 
 export interface RequestHeaderParams {

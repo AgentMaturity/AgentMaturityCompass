@@ -96,7 +96,7 @@ function runSession(workspace: string): string {
       stopReason: "end_turn",
       usage: { inputTokens: 100, outputTokens: 20, cacheRead: 0, cacheWrite: 0 }
     });
-    service.endTurn({ reason: "complete", interrupted: false });
+    service.endTurn({ reason: "complete" });
     service.sealTurn();
   }
 

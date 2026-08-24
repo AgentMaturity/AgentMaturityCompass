@@ -8,6 +8,7 @@ import { verifyLedgerIntegrity } from "../src/ledger/ledgerVerification.js";
 import { SessionService } from "../src/session/sessionService.js";
 import { recoverSession, type RecoveryClaimant } from "../src/session/sessionRecovery.js";
 import { embedEnvelope, extractEnvelope, type SessionEnvelope } from "../src/session/sessionTypes.js";
+import { readStepBoundary, readTurnEndMeta } from "../src/session/turnLifecycleMeta.js";
 import { sha256Hex } from "../src/utils/hash.js";
 import type { EvidenceEvent } from "../src/types.js";
 
@@ -93,6 +94,9 @@ describe("recoverSession — turn-sealed session crash recovery", () => {
     expect(report.claimEventId).not.toBeNull();
     expect(report.unknownToolOutcomes).toBe(1);
     expect(report.syntheticTurnEnds).toBe(1);
+    // D6: the crash left a step open too, and a recovered log has to be
+    // well-formed at BOTH levels — not just the outermost bracket.
+    expect(report.syntheticStepEnds).toBe(1);
     expect(report.closed).toBe(false);
 
     const events = sessionEvents(sessionId);
@@ -116,6 +120,19 @@ describe("recoverSession — turn-sealed session crash recovery", () => {
     // Blob-backed, never inline — retention must be able to physically unlink it.
     expect(toolResult!.payload_inline).toBeNull();
 
+    // The open STEP is closed before its turn is, with no stop reason and no
+    // usage. Null, not zero: the process died without reporting either, and a
+    // fabricated 0 would put a measurement nobody took into a signed row and
+    // into every cost projection that reads it.
+    const stepEnd = events.find((event) => event.event_type === "step/end");
+    expect(stepEnd, "the open step was synthetically ended").toBeDefined();
+    const seEnvelope = extractEnvelope(stepEnd!.meta_json)!;
+    expect(seEnvelope.synthetic).toBe(true);
+    expect(metaOf(stepEnd!).usage).toBeNull();
+    expect(metaOf(stepEnd!).stopReason).toBeNull();
+    expect(metaOf(stepEnd!).recoveredBy).toBe(report.claimEventId);
+    expect(readStepBoundary(stepEnd!.meta_json)).toEqual({ turn: 1, step: 1 });
+
     // The open turn is closed as interrupted — never laundered into a clean end.
     const turnEnd = events.find((event) => event.event_type === "turn/end");
     expect(turnEnd, "the open turn was synthetically ended").toBeDefined();
@@ -123,6 +140,22 @@ describe("recoverSession — turn-sealed session crash recovery", () => {
     expect(teEnvelope.synthetic).toBe(true);
     expect(metaOf(turnEnd!).interrupted).toBe(true);
     expect(metaOf(turnEnd!).reason).toBe("interrupted");
+    // Crash repair never attributes a cancel: nobody stopped this agent.
+    expect(readTurnEndMeta(turnEnd!.meta_json)!.cancelCause).toBeNull();
+
+    // Ordering is load-bearing: a step/end after its own turn/end would be an
+    // inner bracket closing outside the outer one.
+    expect(events.indexOf(stepEnd!)).toBeLessThan(events.indexOf(turnEnd!));
+
+    // Well-formed at the step level: every step/start now has a step/end.
+    const started = events
+      .filter((event) => event.event_type === "step/start")
+      .map((event) => JSON.stringify(readStepBoundary(event.meta_json)));
+    const ended = events
+      .filter((event) => event.event_type === "step/end")
+      .map((event) => JSON.stringify(readStepBoundary(event.meta_json)));
+    expect(started.length).toBeGreaterThan(0);
+    expect(ended).toEqual(started);
 
     // The recovery itself is fenced, summarised, and sealed.
     expect(events.some((event) => event.event_type === "session/recovery-claim")).toBe(true);
@@ -130,6 +163,21 @@ describe("recoverSession — turn-sealed session crash recovery", () => {
     expect(events.some((event) => event.event_type === "turn/seal")).toBe(true);
     // Distinguishable from a clean close: there is NO session/close here.
     expect(events.some((event) => event.event_type === "session/close")).toBe(false);
+
+    // No bracket is ever closed twice. Two mechanisms would each prevent it —
+    // the synthetic closers are matched exactly like real ones, and the claim
+    // fence is permanent (the first valid claim in chain order keeps winning) —
+    // and the fence is the one that answers first, so a second pass is refused
+    // outright and the closer counts do not move.
+    const closerCount = (): number =>
+      sessionEvents(sessionId).filter(
+        (event) => event.event_type === "turn/end" || event.event_type === "step/end"
+      ).length;
+    const closersAfterRecovery = closerCount();
+    const second = recoverSession({ workspace: dir, sessionId, claimant, force: true });
+    expect(second.verdict).toBe("INDETERMINATE");
+    expect(second.wonClaim).toBe(false);
+    expect(closerCount()).toBe(closersAfterRecovery);
 
     // The whole recovered ledger still verifies: global chain, per-session chain,
     // and payloads all intact after the synthetic appends.
@@ -155,6 +203,77 @@ describe("recoverSession — turn-sealed session crash recovery", () => {
     const verdict = await verifyLedgerIntegrity(dir);
     expect(verdict.chain.ok, verdict.chain.errors.join("; ")).toBe(true);
     expect(verdict.sessions.closed).toContain(sessionId);
+  });
+
+  // The user's P3.2 decision, made checkable: "someone stopped this agent" and
+  // "this agent died" are two different facts, and the log must keep them apart.
+  // One session carries both — a turn a hook cancelled while the process was
+  // alive, and a turn the process died inside — and projecting the two turn/end
+  // rows has to yield two different answers. A design that spelled a live cancel
+  // the way crash repair spells a death would make this test fail at the
+  // `reason` assertion; one that dropped the cause would fail at `cancelCause`.
+  test("(a3) a live cancel and a crash repair are DISTINGUISHABLE by projecting both turn/end rows", async () => {
+    const service = new SessionService(dir);
+    service.open({
+      agentId: "default",
+      harnessVersion: "3.2.0",
+      compositionDigest: sha256Hex("composition"),
+      policyDigest: sha256Hex("policy")
+    });
+    const sessionId = service.sessionId;
+
+    // Turn 1 — stopped by a hook while the agent was very much alive. The step
+    // ends with no usage at all, because the stream was cut off before any
+    // arrived; that is recorded as null rather than as four zeroes.
+    service.startTurn({ trigger: "user" });
+    service.startStep();
+    service.recordUserMessage("do the risky thing");
+    service.endStep({ stopReason: null, usage: null });
+    service.endTurn({ reason: "cancelled", cause: { kind: "hook", reason: "egress-guard" } });
+    service.sealTurn();
+
+    // Turn 2 — the process dies mid-step. No endStep, no endTurn, no close.
+    service.startTurn({ trigger: "user" });
+    service.startStep();
+    service.recordUserMessage("and now the safe thing");
+
+    await delay(25);
+    const report = recoverSession({ workspace: dir, sessionId, claimant, staleAfterMs: 0 });
+    expect(report.verdict).toBe("RECOVERED");
+    // Only the crashed turn and its step are closed synthetically; the cancelled
+    // turn was already closed and is not touched.
+    expect(report.syntheticTurnEnds).toBe(1);
+    expect(report.syntheticStepEnds).toBe(1);
+
+    const events = sessionEvents(sessionId);
+    const turnEnds = events.filter((event) => event.event_type === "turn/end");
+    expect(turnEnds.length).toBe(2);
+
+    const cancelled = readTurnEndMeta(turnEnds[0]!.meta_json)!;
+    expect(cancelled.turn).toBe(1);
+    expect(cancelled.reason).toBe("cancelled");
+    expect(cancelled.interrupted).toBe(false);
+    expect(cancelled.cancelCause).toEqual({ kind: "hook", reason: "egress-guard" });
+    expect(extractEnvelope(turnEnds[0]!.meta_json)!.synthetic).toBe(false);
+
+    const died = readTurnEndMeta(turnEnds[1]!.meta_json)!;
+    expect(died.turn).toBe(2);
+    expect(died.reason).toBe("interrupted");
+    expect(died.interrupted).toBe(true);
+    expect(died.cancelCause).toBeNull();
+    expect(extractEnvelope(turnEnds[1]!.meta_json)!.synthetic).toBe(true);
+
+    // The whole point: no projection of these two rows collapses them.
+    expect(cancelled.reason).not.toBe(died.reason);
+    expect(cancelled.interrupted).not.toBe(died.interrupted);
+
+    // The step the cancel ended reported no usage either — recorded as unknown.
+    const stepEnds = events.filter((event) => event.event_type === "step/end");
+    expect(stepEnds.length).toBe(2);
+    expect(metaOf(stepEnds[0]!).usage).toBeNull();
+
+    const verdict = await verifyLedgerIntegrity(dir);
+    expect(verdict.chain.ok, verdict.chain.errors.join("; ")).toBe(true);
   });
 
   test("(b) a broken per-session chain is TAMPERED and is never appended to", () => {

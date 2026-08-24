@@ -148,7 +148,7 @@ describe("P3.1 — a recorded request reconstructs byte-identically from the ses
       usage: { inputTokens: 360, outputTokens: 20, cacheRead: 320, cacheWrite: 40 }
     });
 
-    service.endTurn({ reason: "complete", interrupted: false });
+    service.endTurn({ reason: "complete" });
     service.sealTurn();
     service.close({ reason: "completed" });
 

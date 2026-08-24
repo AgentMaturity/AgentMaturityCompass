@@ -191,6 +191,7 @@ import { registerCompositionCommands } from "./cli-composition-commands.js";
 import { registerVaultZkCommands } from "./cli-vault-zk-commands.js";
 import { registerEvidenceStoreCommands, renderLedgerVerdict } from "./cli-evidence-store-commands.js";
 import { registerSessionCommands } from "./cli-session-commands.js";
+import { registerAgentCommands } from "./cli-agent-commands.js";
 import { registerCredentialsCommands } from "./cli-credentials-commands.js";
 import { issueCertificate, inspectCertificate, revokeCertificate, verifyCertificate, verifyRevocation } from "./assurance/certificate.js";
 import { generateTrustCertificate } from "./cert/trustCertificate.js";
@@ -411,9 +412,6 @@ import {
   verifyTransparencyBundle,
   verifyTransparencyLog
 } from "./transparency/logCli.js";
-import { registerTransparencyReportCommands } from "./transparency/transparencyReportCli.js";
-import { registerMcpCommands } from "./mcp/mcpCli.js";
-import { registerLintCommands } from "./lint/lintCli.js";
 import {
   transparencyMerkleProofCli,
   transparencyMerkleRebuildCli,
@@ -24570,6 +24568,7 @@ registerLateStageCliCommands({
 registerMirofishCommands(program);
 registerCompositionCommands(program);
 registerSessionCommands(program);
+registerAgentCommands(program);
 registerCredentialsCommands(program);
 
 function isTopLevelHelpRequest(argv: string[]): boolean {

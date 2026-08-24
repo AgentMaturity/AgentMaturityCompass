@@ -13,11 +13,14 @@ import {
   type SurfaceOp,
   type SurfaceRole
 } from "./sessionTypes.js";
-import { merkleRoot, SESSION_MERKLE_EMPTY } from "./sessionMerkle.js";
+import { TurnWindow } from "./turnWindow.js";
 import type { RequestHeaderMeta } from "./requestHeaderMeta.js";
 import { buildRequestOutcomeMeta, requestOutcomeEventType } from "./requestOutcomeMeta.js";
 import type { RequestOutcomeParams } from "./requestOutcomeMeta.js";
 import { assertToolSchemaCommitted } from "./toolSchemaCommitment.js";
+import { buildStepEndMeta, buildTurnEndMeta } from "./turnLifecycleMeta.js";
+import { buildLoopEventRow } from "./loopEventMeta.js";
+import type { LoopEventRecord } from "./loopEventMeta.js";
 import type { SurfaceKind } from "./sessionTypes.js";
 import { SessionSpillPolicy } from "./spill/spillPolicy.js";
 import { SessionSpillStore } from "./spill/spillStore.js";
@@ -58,24 +61,11 @@ function normalizeSha256(value: string): string {
 // "model-visible ⊆ logged" bound.
 
 // The parameter and result shapes live in ./sessionApiTypes.js — see its header
-// for why the split exists and why PreparedRequest stayed here.
-export type {
-  AssistantBlockInput,
-  ApprovalRecord,
-  RequestHeaderParams,
-  SandboxModeInput,
-  SealRef,
-  SessionCloseParams,
-  SessionEventRef,
-  SessionOpenParams,
-  StepEndParams,
-  StepRef,
-  ToolCallInput,
-  ToolResultInput,
-  TurnEndParams,
-  TurnRef,
-  TurnStartParams
-} from "./sessionApiTypes.js";
+// for why the split exists and why PreparedRequest stayed here. Only the result
+// type every caller of this module already handles is re-exported: mirroring the
+// whole list here gave the shapes two import paths and therefore two places to
+// drift, and nothing outside this file used the mirror.
+export type { SessionEventRef } from "./sessionApiTypes.js";
 
 // Module-private brand token. A PreparedRequest can only be minted by code in
 // THIS module — in practice only by recordRequestHeader, after its request/header
@@ -168,18 +158,10 @@ export class SessionService {
   private currentTurn: number | null = null;
   private currentStep: number | null = null;
 
-  // Window accounting for the turn currently in progress: the ordered event
-  // hashes and the id bounds of every event in the turn EXCEPT its own seal.
-  private turnEventHashes: string[] = [];
-  private turnFirstEventId: string | null = null;
-  private turnLastEventId: string | null = null;
-
-  // Seal chain: each turn/seal links to the previous, and the ordered seal event
-  // hashes form the session root committed in session/close.
-  private sealChainIndex = 0;
-  private lastSealEventId: string | null = null;
-  private lastSealMerkleRoot: string = SESSION_MERKLE_EMPTY;
-  private readonly sealEventHashes: string[] = [];
+  // Window and seal-chain accounting — what each turn/seal commits to. Composed
+  // rather than inlined; see ./turnWindow.ts for why the arithmetic lives apart
+  // from the record methods.
+  private readonly window = new TurnWindow();
 
   // The post-execute spill policy for this session. Created at open(), because
   // a spill store is session-scoped and there is no session before then. The
@@ -256,9 +238,7 @@ export class SessionService {
     this.currentTurn = turn;
     this.currentStep = null;
     this.stepNo = 0;
-    this.turnEventHashes = [];
-    this.turnFirstEventId = null;
-    this.turnLastEventId = null;
+    this.window.openTurn();
 
     const ref = this.appendSessionEvent({
       eventType: "turn/start",
@@ -270,11 +250,18 @@ export class SessionService {
     return { ...ref, turn };
   }
 
+  // Closes the turn this service is driving. `origin: "live"` is what makes a
+  // cancellation here spell itself as a cancel WITH a cause and never as the
+  // "interrupted" a crash leaves behind — the loop cannot disguise a stop as a
+  // death, because buildTurnEndMeta refuses to write one.
   endTurn(params: TurnEndParams): TurnRef {
     const turn = this.requireTurn();
     const ref = this.appendSessionEvent({
       eventType: "turn/end",
-      typeMeta: { turn, reason: params.reason, interrupted: params.interrupted },
+      typeMeta: buildTurnEndMeta(
+        { turn, reason: params.reason, cancelCause: params.cause ?? null, recovery: null },
+        "live"
+      ),
       surface: { op: "none" },
       turn,
       step: null
@@ -289,19 +276,19 @@ export class SessionService {
   // root from the stored rows and never trusts the value the seal carries.
   sealTurn(): SealRef {
     const turn = this.requireTurn();
-    const windowMerkleRoot = merkleRoot(this.turnEventHashes);
-    const sealChainIndex = this.sealChainIndex;
+    const sealed = this.window.seal();
+    const { merkleRoot: windowMerkleRoot, sealChainIndex } = sealed;
 
     const ref = this.appendSessionEvent({
       eventType: "turn/seal",
       typeMeta: {
         turn,
-        window_first_event_id: this.turnFirstEventId,
-        window_last_event_id: this.turnLastEventId,
-        window_event_count: this.turnEventHashes.length,
+        window_first_event_id: sealed.firstEventId,
+        window_last_event_id: sealed.lastEventId,
+        window_event_count: sealed.eventCount,
         window_merkle_root: windowMerkleRoot,
-        prev_seal_event_id: this.lastSealEventId,
-        prev_seal_merkle_root: this.lastSealMerkleRoot,
+        prev_seal_event_id: sealed.prevSealEventId,
+        prev_seal_merkle_root: sealed.prevSealMerkleRoot,
         seal_chain_index: sealChainIndex
       },
       surface: { op: "none" },
@@ -309,10 +296,7 @@ export class SessionService {
       step: null
     });
 
-    this.sealEventHashes.push(ref.eventHash);
-    this.lastSealEventId = ref.eventId;
-    this.lastSealMerkleRoot = windowMerkleRoot;
-    this.sealChainIndex = sealChainIndex + 1;
+    this.window.recordSeal(ref.eventId, ref.eventHash, windowMerkleRoot);
     this.currentTurn = null;
     this.currentStep = null;
 
@@ -341,17 +325,15 @@ export class SessionService {
     const step = this.requireStep();
     const ref = this.appendSessionEvent({
       eventType: "step/end",
-      typeMeta: {
+      typeMeta: buildStepEndMeta({
         turn,
         step,
         stopReason: params.stopReason,
-        usage: {
-          inputTokens: params.usage.inputTokens,
-          outputTokens: params.usage.outputTokens,
-          cacheRead: params.usage.cacheRead,
-          cacheWrite: params.usage.cacheWrite
-        }
-      },
+        // Passed straight through, null included: a step that reported no usage
+        // records none rather than a fabricated zero.
+        usage: params.usage,
+        recoveredBy: null
+      }),
       surface: { op: "none" },
       turn,
       step
@@ -597,6 +579,26 @@ export class SessionService {
     });
   }
 
+  // The agent loop's own control rows — its inbox splices, its cancellations,
+  // its pre-step vetoes. One method over a closed union rather than one method
+  // per row, because these are the loop's bookkeeping rather than conversation
+  // content: their shapes live together in ./loopEventMeta.ts, which is also
+  // what keeps their hash pre-image order in one place. Surface op is always
+  // `none` — a queued message becomes model-visible only when a step claims it
+  // and records a `user/message`.
+  recordLoopEvent(record: LoopEventRecord): SessionEventRef {
+    this.ensureUsable();
+    const row = buildLoopEventRow(record);
+    return this.appendSessionEvent({
+      eventType: row.eventType,
+      typeMeta: row.meta,
+      surface: { op: "none" },
+      turn: this.currentTurn,
+      step: this.currentStep,
+      ...(row.payload === null ? {} : { payload: row.payload })
+    });
+  }
+
   recordSandboxMode(input: SandboxModeInput): SessionEventRef {
     this.ensureUsable();
     return this.appendSessionEvent({
@@ -624,8 +626,8 @@ export class SessionService {
       typeMeta: {
         reason: params.reason,
         turnCount: this.turnNo,
-        sealCount: this.sealChainIndex,
-        sessionMerkleRoot: merkleRoot(this.sealEventHashes),
+        sealCount: this.window.sealCount,
+        sessionMerkleRoot: this.window.sessionMerkleRoot(),
         finalEventId: closeId
       },
       surface: { op: "none" },
@@ -724,11 +726,7 @@ export class SessionService {
     // Every event of the current turn — except the turn's own seal — is a leaf of
     // that turn's window root and lies within its id bounds.
     if (this.currentTurn !== null && spec.eventType !== "turn/seal") {
-      if (this.turnFirstEventId === null) {
-        this.turnFirstEventId = result.id;
-      }
-      this.turnLastEventId = result.id;
-      this.turnEventHashes.push(result.eventHash);
+      this.window.observe(result.id, result.eventHash);
     }
 
     return {

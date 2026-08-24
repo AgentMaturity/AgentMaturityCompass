@@ -62,7 +62,7 @@ function runSession(backend: "sqlite" | "jsonl"): string {
   service.startStep();
   service.recordAssistantBlock({ blockIndex: 0, blockKind: "text", stopReason: null, content: "hi" });
   service.endStep({ stopReason: "end_turn", usage: { inputTokens: 1, outputTokens: 1, cacheRead: 0, cacheWrite: 0 } });
-  service.endTurn({ reason: "complete", interrupted: false });
+  service.endTurn({ reason: "complete" });
   service.sealTurn();
   service.close({ reason: "done" });
   return service.sessionId;

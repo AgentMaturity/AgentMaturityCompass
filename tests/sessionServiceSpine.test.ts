@@ -7,6 +7,9 @@ import { openLedger } from "../src/ledger/ledger.js";
 import { verifyLedgerIntegrity } from "../src/ledger/ledgerVerification.js";
 import { extractEnvelope, SESSION_GENESIS } from "../src/session/sessionTypes.js";
 import { SessionService, PreparedRequest } from "../src/session/sessionService.js";
+import type { TurnEndParams } from "../src/session/sessionApiTypes.js";
+import type { TurnCancelCause } from "../src/session/sessionTypes.js";
+import { readTurnEndMeta } from "../src/session/turnLifecycleMeta.js";
 import { sha256Hex } from "../src/utils/hash.js";
 import type { EvidenceEvent } from "../src/types.js";
 
@@ -122,7 +125,7 @@ describe("SessionService — turn-sealed session spine", () => {
       usage: { inputTokens: 360, outputTokens: 20, cacheRead: 320, cacheWrite: 40 }
     });
 
-    service.endTurn({ reason: "complete", interrupted: false });
+    service.endTurn({ reason: "complete" });
     service.sealTurn();
     service.close({ reason: "completed" });
 
@@ -246,5 +249,133 @@ describe("SessionService — turn-sealed session spine", () => {
     // two step/start, request/header ×2, assistant ×2, approval ×2, tool call,
     // tool result, two step/end, plus turn/start and turn/end.
     expect(meta.window_event_count).toBe(15);
+  });
+});
+
+// P3.2 stage 1 — the closer vocabulary.
+//
+// A live cancel records WHO stopped the agent, and it records it inside the
+// hashed meta, so the attribution is signed evidence rather than a note beside
+// the evidence. Each rule below has a case that fails if the rule is deleted:
+// remove the cause requirement and (b) goes green-with-a-lie; remove the
+// origin check and (c) lets a live loop file its cancellation as a crash;
+// reinstate a `usage ?? zeroes` default and (e) sees zeroes.
+describe("turn/end and step/end — the closer vocabulary", () => {
+  let dir: string;
+
+  beforeEach(() => {
+    dir = mkdtempSync(join(tmpdir(), "amc-session-closers-"));
+    initWorkspace({ workspacePath: dir, agentId: "default", trustBoundaryMode: "isolated" });
+  });
+
+  afterEach(() => {
+    rmSync(dir, { recursive: true, force: true });
+  });
+
+  function openSession(): SessionService {
+    const service = new SessionService(dir);
+    service.open({
+      agentId: "default",
+      harnessVersion: "3.2.0",
+      compositionDigest: sha256Hex("composition"),
+      policyDigest: sha256Hex("policy")
+    });
+    return service;
+  }
+
+  function rowsOf(service: SessionService): readonly EvidenceEvent[] {
+    const ledger = openLedger(dir);
+    try {
+      return ledger.getAllEvents().filter((event) => event.session_id === service.sessionId);
+    } finally {
+      ledger.close();
+    }
+  }
+
+  test("(a) a cancelled turn's cause survives into the signed row and is read back from the log", async () => {
+    const service = openSession();
+    service.startTurn({ trigger: "user" });
+    service.startStep();
+    service.recordUserMessage("stop this");
+    service.endStep({ stopReason: null, usage: null });
+    // Deliberately handed in with the keys reversed and one stray field, which
+    // is what a real caller assembling a cause from its own state produces.
+    service.endTurn({
+      reason: "cancelled",
+      cause: { reason: "egress-guard", kind: "hook", note: "ignored" } as unknown as TurnCancelCause
+    });
+    service.sealTurn();
+    service.close({ reason: "cancelled" });
+
+    const turnEnd = rowsOf(service).find((event) => event.event_type === "turn/end")!;
+    // Read back through the same vocabulary a later reader would use — the cause
+    // is recoverable from the log, not just from the object that wrote it.
+    const meta = readTurnEndMeta(turnEnd.meta_json)!;
+    expect(meta.reason).toBe("cancelled");
+    expect(meta.cancelCause).toEqual({ kind: "hook", reason: "egress-guard" });
+    // Inside meta_json means inside event_hash means under writer_sig — and
+    // stored in canonical shape, because meta is hashed in insertion order: the
+    // caller's key order and stray field must not reach the pre-image, or the
+    // same cause would hash two ways.
+    expect(turnEnd.meta_json).toContain('"cancelCause":{"kind":"hook","reason":"egress-guard"}');
+
+    const verdict = await verifyLedgerIntegrity(dir);
+    expect(verdict.chain.ok, verdict.chain.errors.join("; ")).toBe(true);
+  });
+
+  test("(b) an unattributed cancel is refused, and refusing leaves the turn open", () => {
+    const service = openSession();
+    service.startTurn({ trigger: "user" });
+    const before = rowsOf(service).length;
+
+    // The type forbids this; the runtime must too, because a JS host or an `as`
+    // cast is exactly how an unattributed cancel would otherwise get signed.
+    expect(() =>
+      service.endTurn({ reason: "cancelled" } as unknown as TurnEndParams)
+    ).toThrow(/must name who cancelled it/);
+    expect(() =>
+      service.endTurn({ reason: "cancelled", cause: { kind: "hook" } } as unknown as TurnEndParams)
+    ).toThrow(/must name who cancelled it/);
+
+    // Evidence-first: a closer that could not be spelled honestly wrote nothing,
+    // and the turn is still open for recovery to close.
+    expect(rowsOf(service).length).toBe(before);
+    expect(() => service.endTurn({ reason: "complete" })).not.toThrow();
+  });
+
+  test("(c) a live writer cannot file its cancellation as a crash", () => {
+    const service = openSession();
+    service.startTurn({ trigger: "user" });
+    const before = rowsOf(service).length;
+
+    expect(() =>
+      service.endTurn({ reason: "interrupted" } as unknown as TurnEndParams)
+    ).toThrow(/reserved for crash repair/);
+    expect(rowsOf(service).length).toBe(before);
+  });
+
+  test("(d) a cause cannot be attached to a turn that was not cancelled", () => {
+    const service = openSession();
+    service.startTurn({ trigger: "user" });
+    const before = rowsOf(service).length;
+
+    expect(() =>
+      service.endTurn({ reason: "complete", cause: { kind: "user" } } as unknown as TurnEndParams)
+    ).toThrow(/must not carry a cancel cause/);
+    expect(rowsOf(service).length).toBe(before);
+  });
+
+  test("(e) a step that reported no usage records null, never a fabricated zero", () => {
+    const service = openSession();
+    service.startTurn({ trigger: "user" });
+    service.startStep();
+    service.endStep({ stopReason: null, usage: null });
+
+    const stepEnd = rowsOf(service).find((event) => event.event_type === "step/end")!;
+    const meta = JSON.parse(stepEnd.meta_json) as Record<string, unknown>;
+    expect(meta.usage).toBeNull();
+    // Spelled out because this is the failure being guarded against: a zero here
+    // is a token count nobody measured, signed as if somebody had.
+    expect(meta.usage).not.toEqual({ inputTokens: 0, outputTokens: 0, cacheRead: 0, cacheWrite: 0 });
   });
 });

@@ -18,6 +18,13 @@ import {
   type SurfaceOp
 } from "./sessionTypes.js";
 import { merkleRoot, SESSION_MERKLE_EMPTY } from "./sessionMerkle.js";
+import {
+  buildStepEndMeta,
+  buildTurnEndMeta,
+  readStepBoundary,
+  readTurnEndMeta,
+  type StepBoundary
+} from "./turnLifecycleMeta.js";
 
 // RECOVERED   — the session was consistent or was made consistent by appending
 //               synthetic events under a won claim.
@@ -57,6 +64,8 @@ export interface RecoveryReport {
   readonly claimEventId: string | null;
   readonly wonClaim: boolean;
   readonly syntheticTurnEnds: number;
+  /** Steps the crash left open, closed synthetically with no stop reason and no usage. */
+  readonly syntheticStepEnds: number;
   readonly unknownToolOutcomes: number;
   readonly unsealedTailCountBefore: number;
   readonly closed: boolean;
@@ -338,6 +347,40 @@ function unmatchedToolCalls(events: readonly EvidenceEvent[]): UnmatchedToolCall
   return calls;
 }
 
+// step/start events whose (turn, step) has no step/end, in chain order.
+//
+// A crash between a step's first request and its step/end leaves a log that is
+// well-formed at the TURN level once the turn is closed but still dangling at
+// the STEP level — an open bracket no later reader can close. Recovery closes
+// both, so "a recovered log is well-formed" holds at every level the writer
+// opens, not just the outermost one.
+function unmatchedSteps(events: readonly EvidenceEvent[]): StepBoundary[] {
+  const key = (boundary: StepBoundary): string => `${boundary.turn}/${boundary.step}`;
+  const ended = new Set<string>();
+  for (const event of events) {
+    if (event.event_type !== "step/end") {
+      continue;
+    }
+    const boundary = readStepBoundary(event.meta_json);
+    if (boundary !== null) {
+      ended.add(key(boundary));
+    }
+  }
+  const open: StepBoundary[] = [];
+  for (const event of events) {
+    if (event.event_type !== "step/start") {
+      continue;
+    }
+    const boundary = readStepBoundary(event.meta_json);
+    // Matched over ALL step/end rows including synthetic ones, so a second
+    // recovery pass finds every step already closed and appends nothing.
+    if (boundary !== null && !ended.has(key(boundary))) {
+      open.push(boundary);
+    }
+  }
+  return open;
+}
+
 // turn/start events whose turn has no turn/end, in chain order.
 function unmatchedTurns(events: readonly EvidenceEvent[]): number[] {
   const ended = new Set<number>();
@@ -345,9 +388,11 @@ function unmatchedTurns(events: readonly EvidenceEvent[]): number[] {
     if (event.event_type !== "turn/end") {
       continue;
     }
-    const turn = parseMeta(event.meta_json)?.turn;
-    if (typeof turn === "number") {
-      ended.add(turn);
+    // Read through the shared closer vocabulary: a turn is ended by a row that
+    // says HOW it ended. A row that cannot say that does not close a turn.
+    const meta = readTurnEndMeta(event.meta_json);
+    if (meta !== null) {
+      ended.add(meta.turn);
     }
   }
   const started: number[] = [];
@@ -376,10 +421,15 @@ function report(partial: RecoveryReport): RecoveryReport {
  * is refused unless `force` is set (INDETERMINATE). Otherwise it fences with a
  * `session/recovery-claim`, and only if that claim wins the chain-ordered
  * tie-break does it append: synthetic tool/result rows (outcome UNKNOWN) for
- * unanswered tool/call rows, a synthetic turn/end (interrupted:true) for each
- * open turn, a session/recovered summary, and a turn/seal closing the recovery
+ * unanswered tool/call rows, a synthetic step/end (no stop reason, no usage) for
+ * each open step, a synthetic turn/end (reason "interrupted") for each open
+ * turn, a session/recovered summary, and a turn/seal closing the recovery
  * window. With `close`, it also appends session/close and seals the row — a
  * synthetic close that stays DISTINGUISHABLE from a clean one, never laundered.
+ *
+ * `reason: "interrupted"` is this path's alone. A live cancellation is recorded
+ * by the loop as `reason: "cancelled"` with a signed cause; a reader must always
+ * be able to tell "this agent died" from "someone stopped this agent".
  */
 export function recoverSession(params: RecoverSessionParams): RecoveryReport {
   const staleAfterMs = params.staleAfterMs ?? DEFAULT_STALE_AFTER_MS;
@@ -396,6 +446,7 @@ export function recoverSession(params: RecoverSessionParams): RecoveryReport {
         claimEventId: null,
         wonClaim: false,
         syntheticTurnEnds: 0,
+        syntheticStepEnds: 0,
         unknownToolOutcomes: 0,
         unsealedTailCountBefore: 0,
         closed: false,
@@ -412,6 +463,7 @@ export function recoverSession(params: RecoverSessionParams): RecoveryReport {
         claimEventId: null,
         wonClaim: false,
         syntheticTurnEnds: 0,
+        syntheticStepEnds: 0,
         unknownToolOutcomes: 0,
         unsealedTailCountBefore: countUnsealedTail(events),
         closed: false,
@@ -429,6 +481,7 @@ export function recoverSession(params: RecoverSessionParams): RecoveryReport {
         claimEventId: null,
         wonClaim: false,
         syntheticTurnEnds: 0,
+        syntheticStepEnds: 0,
         unknownToolOutcomes: 0,
         unsealedTailCountBefore,
         closed: true,
@@ -446,6 +499,7 @@ export function recoverSession(params: RecoverSessionParams): RecoveryReport {
         claimEventId: null,
         wonClaim: false,
         syntheticTurnEnds: 0,
+        syntheticStepEnds: 0,
         unknownToolOutcomes: 0,
         unsealedTailCountBefore,
         closed: false,
@@ -490,6 +544,7 @@ export function recoverSession(params: RecoverSessionParams): RecoveryReport {
         claimEventId: claim.eventId,
         wonClaim: false,
         syntheticTurnEnds: 0,
+        syntheticStepEnds: 0,
         unknownToolOutcomes: 0,
         unsealedTailCountBefore,
         closed: false,
@@ -534,19 +589,49 @@ export function recoverSession(params: RecoverSessionParams): RecoveryReport {
       unknownToolOutcomes += 1;
     }
 
-    // 6. Then the synthetic close of each open turn — interrupted, never
-    //    laundered into a clean completion.
+    // 6. Then the synthetic close of each open STEP, before its turn closes.
+    //    A recovered log has to be well-formed at both levels: a turn/end over a
+    //    step that never ended leaves an inner bracket nobody can close later,
+    //    and every reader of the step level would have to special-case it.
+    //    stopReason and usage are null because the process died without either —
+    //    a zero here would be a measurement nobody took, signed.
+    let syntheticStepEnds = 0;
+    for (const boundary of unmatchedSteps(contested)) {
+      const ref = appender.append({
+        eventType: "step/end",
+        typeMeta: buildStepEndMeta({
+          turn: boundary.turn,
+          step: boundary.step,
+          stopReason: null,
+          usage: null,
+          recoveredBy: claim.eventId
+        }),
+        surface: { op: "none" },
+        turn: boundary.turn,
+        step: boundary.step
+      });
+      windowHashes.push(ref.eventHash);
+      windowLastId = ref.eventId;
+      syntheticStepEnds += 1;
+    }
+
+    // 7. Then the synthetic close of each open turn — interrupted, never
+    //    laundered into a clean completion, and never spelled as a cancellation:
+    //    "this agent died" and "someone stopped this agent" are different facts,
+    //    and buildTurnEndMeta refuses to let this writer claim the other one.
     let syntheticTurnEnds = 0;
     for (const turn of unmatchedTurns(contested)) {
       const ref = appender.append({
         eventType: "turn/end",
-        typeMeta: {
-          turn,
-          reason: "interrupted",
-          interrupted: true,
-          lastObservedEventId: observedHeadEventId,
-          recoveredBy: claim.eventId
-        },
+        typeMeta: buildTurnEndMeta(
+          {
+            turn,
+            reason: "interrupted",
+            cancelCause: null,
+            recovery: { lastObservedEventId: observedHeadEventId, recoveredBy: claim.eventId }
+          },
+          "recovery"
+        ),
         surface: { op: "none" },
         turn,
         step: null
@@ -556,12 +641,13 @@ export function recoverSession(params: RecoverSessionParams): RecoveryReport {
       syntheticTurnEnds += 1;
     }
 
-    // 7. Summarise the recovery.
+    // 8. Summarise the recovery.
     const recovered = appender.append({
       eventType: "session/recovered",
       typeMeta: {
         claimEventId: claim.eventId,
         syntheticTurnEnds,
+        syntheticStepEnds,
         unknownToolOutcomes,
         unsealedTailCountBefore
       },
@@ -572,7 +658,7 @@ export function recoverSession(params: RecoverSessionParams): RecoveryReport {
     windowHashes.push(recovered.eventHash);
     windowLastId = recovered.eventId;
 
-    // 8. Seal the recovery window so the recovery itself cannot be silently
+    // 9. Seal the recovery window so the recovery itself cannot be silently
     //    rolled back. The row's own writer_sig IS the seal signature.
     const priorSeal = lastPriorSeal(contested);
     const sealTurn = lastTurnNumber(contested);
@@ -593,7 +679,7 @@ export function recoverSession(params: RecoverSessionParams): RecoveryReport {
       step: null
     });
 
-    // 9. Closing the session is the caller's decision — recovery makes a session
+    // 10. Closing the session is the caller's decision — recovery makes a session
     //    consistent, it does not decide the session is over.
     let closed = false;
     if (close) {
@@ -606,6 +692,7 @@ export function recoverSession(params: RecoverSessionParams): RecoveryReport {
       claimEventId: claim.eventId,
       wonClaim: true,
       syntheticTurnEnds,
+      syntheticStepEnds,
       unknownToolOutcomes,
       unsealedTailCountBefore,
       closed

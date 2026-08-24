@@ -7,7 +7,7 @@ import type { EvidenceEventType } from "../types.js";
 // contents (seq, prevSessionEventHash, surface op, synthetic flag) are as
 // tamper-evident as any other hashed field.
 
-// The 21 event types that make up the session spine. These are a strict
+// The 24 event types that make up the session spine. These are a strict
 // superset added to EvidenceEventType; none of them may be added to
 // AUTO_INCIDENT_FALLBACK_EVENT_TYPES (ledger.ts) or every tool call would open
 // an incident.
@@ -32,7 +32,12 @@ export const SESSION_EVENT_TYPES: ReadonlySet<EvidenceEventType> = new Set<Evide
   "approval/answer",
   "sandbox/mode",
   "session/recovery-claim",
-  "session/recovered"
+  "session/recovered",
+  // The agent loop's control rows. Each has surface op `none`: a queued message
+  // is not model-visible until a step claims it and records a `user/message`.
+  "loop/inbox",
+  "loop/cancel",
+  "loop/veto"
 ]);
 
 // Sentinel value of SessionEnvelope.prevSessionEventHash at seq 0. A concrete
@@ -89,15 +94,92 @@ export type ToolDispatch = "native" | "code";
 
 export type TurnTrigger = "user" | "followup" | "steer" | "resume";
 
-export type TurnEndReason = "complete" | "cancelled" | "error" | "interrupted" | "max_steps";
+/**
+ * Why a turn ended.
+ *
+ * Seven facts, deliberately not five:
+ *   - `complete`     — the model finished and asked for nothing more.
+ *   - `cancelled`    — a LIVE cancel; always carries a {@link TurnCancelCause}.
+ *   - `error`        — the turn failed.
+ *   - `interrupted`  — the process DIED; written only by crash repair.
+ *   - `max_steps`    — the loop's own per-turn step cap stopped it.
+ *   - `max_tokens`   — a step hit the model's output ceiling. Sticky across the
+ *     rest of the turn: a later step that completes normally must not downgrade
+ *     the fact that output was truncated somewhere in it.
+ *   - `blocked`      — a pre-step listener vetoed the turn before any model call.
+ *     The vetoing party and the messages the veto consumed are recorded in the
+ *     `loop/veto` row that precedes this one, not squeezed into a reason string.
+ */
+export type TurnEndReason =
+  | "complete"
+  | "cancelled"
+  | "error"
+  | "interrupted"
+  | "max_steps"
+  | "max_tokens"
+  | "blocked";
+
+/**
+ * WHO stopped a live agent turn.
+ *
+ * Carried ONLY by a `reason: "cancelled"` turn/end, and carried INSIDE the
+ * hashed turn/end meta — so "who stopped this agent", the question an auditor of
+ * a regulated deployment actually asks, is signed evidence rather than an
+ * annotation sitting beside the evidence.
+ *
+ * A live cancel and a crash are TWO DIFFERENT FACTS and this vocabulary keeps
+ * them apart. A cancel writes `reason: "cancelled"` with one of these causes;
+ * crash repair (src/session/sessionRecovery.ts) writes `reason: "interrupted"`
+ * and never a cause. "Someone stopped this agent" is not "this agent died", and
+ * a reader of the log must never have to guess which of the two happened —
+ * see ./turnLifecycleMeta.ts, where that separation is enforced on write.
+ */
+export type TurnCancelCause =
+  | { readonly kind: "user" }
+  | { readonly kind: "parent" }
+  | { readonly kind: "hook"; readonly reason: string }
+  | { readonly kind: "disposed" };
+
+/**
+ * Boundary validation for a cause. A cause read back out of a stored row is
+ * untrusted until its shape is checked, and a cause handed in by a caller that
+ * type-checking did not cover (a JS host, an `as` cast) must not reach the log
+ * malformed — a signed row saying `cancelCause: {}` would be worse than none.
+ */
+export function isTurnCancelCause(value: unknown): value is TurnCancelCause {
+  if (typeof value !== "object" || value === null) {
+    return false;
+  }
+  const candidate = value as Record<string, unknown>;
+  switch (candidate.kind) {
+    case "user":
+    case "parent":
+    case "disposed":
+      return true;
+    case "hook":
+      return typeof candidate.reason === "string";
+    default:
+      return false;
+  }
+}
 
 export type ApprovalAnswer = "allow" | "allow_always" | "deny" | "unavailable";
 
+/**
+ * Token accounting for a step.
+ *
+ * The cache counts are NULLABLE, and that is the whole point of the type. A
+ * provider that reports no cache figures has not reported zero — it has
+ * reported nothing, and the two are different facts. Writing 0 would put a
+ * number nobody measured into a signed row and into every cost projection that
+ * later reads it, which is the same fabrication `usage: null` exists to refuse
+ * one level up (see ./turnLifecycleMeta.ts).
+ */
 export interface TokenUsage {
   readonly inputTokens: number;
   readonly outputTokens: number;
-  readonly cacheRead: number;
-  readonly cacheWrite: number;
+  readonly cacheRead: number | null;
+  readonly cacheWrite: number | null;
 }
 
 function isSurfacePartRef(value: unknown): value is SurfacePartRef {

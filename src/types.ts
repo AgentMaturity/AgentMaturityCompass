@@ -50,7 +50,20 @@ export type EvidenceEventType =
   | "approval/answer"
   | "sandbox/mode"
   | "session/recovery-claim"
-  | "session/recovered";
+  | "session/recovered"
+  // The agent loop's own control rows (plan P3.2). Namespaced `loop/`, NOT
+  // `agent/`: `agent_process_started` and friends above already mean "AMC
+  // OBSERVED an external agent", and reusing that prefix would blur the
+  // native/observed boundary the runtime-name decision in ADR-0009 sharpened.
+  // None of these may be added to AUTO_INCIDENT_FALLBACK_EVENT_TYPES.
+  | "loop/inbox"
+  | "loop/cancel"
+  | "loop/veto"
+  // A request-boundary retry decision inside one step (plan P3.2 stage 4). It
+  // is what explains why a single step can hold two `request/header` rows: the
+  // step number does not advance across a retry, so without this row the log
+  // would show two requests for one step and no statement of why.
+  | "loop/retry";
 
 export type RiskTier = "low" | "med" | "high" | "critical";
 

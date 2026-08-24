@@ -284,14 +284,22 @@ export class StreamRecorder {
   private writeDroppedBlock(record: AssembledBlock, reason: string): string {
     const stopReason = `dropped:${reason}`;
     const block = record.block;
-    const text =
-      block !== null && (block.kind === "text" || block.kind === "thinking")
-        ? block.text
-        : (record.partial?.text ?? "");
-    const toolArguments = record.partial?.toolArguments ?? "";
-    // Tool-shaped drops carry their arguments, not prose; keeping them in the
-    // payload is what makes a truncated tool call auditable after the fact.
-    const content = toolArguments.length > 0 ? `${text}${toolArguments}` : text;
+    // `partial` is non-null EXACTLY when `block` is null (AssembledBlock's own
+    // contract), so a CLOSED block that was nonetheless dropped — the
+    // max_tokens_truncated tool call is the live case — has its content in
+    // `block` and nothing in `partial`. Reading only `partial` recorded an
+    // EMPTY payload for exactly those rows, which meant the tool arguments the
+    // model produced and the consumer's stream yielded never reached the signed
+    // log. That was this same side-channel reopening one branch over, so the
+    // content is now taken from whichever of the two actually holds it.
+    const content =
+      block !== null
+        ? block.kind === "text" || block.kind === "thinking"
+          ? block.text
+          : block.kind === "tool_use"
+            ? `${block.name}${block.arguments}`
+            : JSON.stringify(block)
+        : `${record.partial?.text ?? ""}${record.partial?.toolArguments ?? ""}`;
     return this.init.session.recordAssistantBlock({
       blockIndex: record.ordinal,
       blockKind: record.blockKind === "tool_use" ? "tool_use" : record.blockKind,

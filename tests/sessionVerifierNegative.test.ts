@@ -66,9 +66,27 @@ function cleanSession(svc: SessionService): void {
   svc.recordUserMessage("hello");
   svc.recordAssistantBlock({ blockIndex: 0, blockKind: "text", stopReason: "end_turn", content: "hi" });
   svc.endStep({ stopReason: "end_turn", usage: { inputTokens: 1, outputTokens: 1, cacheRead: 0, cacheWrite: 0 } });
-  svc.endTurn({ reason: "complete", interrupted: false });
+  svc.endTurn({ reason: "complete" });
   svc.sealTurn();
   svc.close({ reason: "done" });
+}
+
+/** A one-turn session the operator cancelled mid-flight. */
+function cancelledSession(svc: SessionService): void {
+  svc.open({
+    sessionId: "s",
+    agentId: "a",
+    harnessVersion: "1",
+    compositionDigest: "0".repeat(64),
+    policyDigest: "0".repeat(64)
+  });
+  svc.startTurn({ trigger: "user" });
+  svc.startStep();
+  svc.recordUserMessage("hello");
+  svc.endStep({ stopReason: null, usage: null });
+  svc.endTurn({ reason: "cancelled", cause: { kind: "hook", reason: "egress-guard" } });
+  svc.sealTurn();
+  svc.close({ reason: "cancelled" });
 }
 
 describe("session verifier — each check has a failing case", () => {
@@ -123,6 +141,38 @@ describe("session verifier — each check has a failing case", () => {
       const v = await verifyLedgerIntegrity(workspace);
       expect(v.chain.ok).toBe(false);
       expect(v.chain.errors.join(" ")).toMatch(/session chain mismatch|session sequence|event_hash mismatch/);
+    } finally {
+      cleanup();
+    }
+  });
+
+  it("catches an edited cancel cause — WHO stopped the agent is signed, not annotated", async () => {
+    const { workspace, cleanup } = buildSession(cancelledSession);
+    try {
+      const db = openRaw(workspace);
+      // The cause must be IN the row's hashed meta. If a future refactor moved it
+      // to a side channel — a column, a sibling file, an unhashed key — this
+      // lookup finds nothing and the test fails before it ever tampers.
+      const row = db
+        .prepare("SELECT rowid rid, meta_json FROM evidence_events WHERE event_type='turn/end'")
+        .get() as { rid: number; meta_json: string } | undefined;
+      expect(row, "the cancelled turn/end row exists").toBeDefined();
+      const meta = JSON.parse(row!.meta_json) as Record<string, unknown>;
+      expect(meta.cancelCause, "the cause rides inside the hashed meta").toEqual({
+        kind: "hook",
+        reason: "egress-guard"
+      });
+
+      // Re-attribute the cancellation: the hook becomes the user. Nothing else
+      // about the row changes — this is precisely the edit an operator covering
+      // for a guard trip would make.
+      meta.cancelCause = { kind: "user" };
+      db.prepare("UPDATE evidence_events SET meta_json=? WHERE rowid=?").run(JSON.stringify(meta), row!.rid);
+      db.close();
+
+      const v = await verifyLedgerIntegrity(workspace);
+      expect(v.chain.ok).toBe(false);
+      expect(v.chain.errors.join(" ")).toMatch(/event_hash mismatch|writer signature invalid/);
     } finally {
       cleanup();
     }

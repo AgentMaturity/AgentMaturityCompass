@@ -21,17 +21,13 @@
  * digest mismatch, because conflating a deletion someone was entitled to perform
  * with evidence of alteration turns a compliance feature into a false alarm.
  */
-import { join } from "node:path";
 import type { EvidenceEvent } from "../../types.js";
+import { readEventPayload } from "../../session/eventPayload.js";
 import { foldSurfaceEntries } from "../../session/surfaceProjection.js";
 import type { SurfaceEntry } from "../../session/surfaceProjection.js";
-import { loadBlobPlaintext } from "../../storage/blobs/blobStore.js";
-import { pathExists } from "../../utils/fs.js";
 import { sha256Hex } from "../../utils/hash.js";
 import { canonicalize } from "../../utils/json.js";
 import type { EncodableMessage, EncodablePart, EncodableRequest, ToolSchema } from "./requestSpec.js";
-
-const EMPTY_PAYLOAD_SHA256 = sha256Hex(Buffer.alloc(0));
 
 /** Why an assembly could not be completed. Each kind means something different. */
 export type RequestSourceFailureKind =
@@ -75,44 +71,6 @@ export interface RequestSourceInput {
   readonly toolSchemaSha256: string | null;
   /** Last event included in the projected history. */
   readonly projectionCutoffEventId: string;
-}
-
-type PayloadRead =
-  | { readonly status: "ok"; readonly bytes: Buffer }
-  | { readonly status: "pruned" }
-  | { readonly status: "missing"; readonly detail: string };
-
-/**
- * The bytes of one row's payload.
- *
- * Mirrors the precedence `verifyLedgerIntegrity` uses (`payload_pruned` first,
- * then the canonical path, then the live path) so that a row this function calls
- * pruned is the same row the verifier calls pruned. Two components disagreeing
- * about which rows still have bytes would be worse than either being wrong.
- */
-function readPayload(workspace: string, event: EvidenceEvent): PayloadRead {
-  if (event.payload_pruned === 1) {
-    return { status: "pruned" };
-  }
-  if (event.payload_inline !== null && event.payload_inline !== undefined) {
-    return { status: "ok", bytes: Buffer.from(event.payload_inline, "utf8") };
-  }
-  const payloadPath = event.payload_path ?? event.canonical_payload_path ?? null;
-  if (payloadPath === null) {
-    if (event.payload_sha256 === EMPTY_PAYLOAD_SHA256) {
-      return { status: "ok", bytes: Buffer.alloc(0) };
-    }
-    return { status: "missing", detail: `event ${event.id} names no payload but commits to ${event.payload_sha256}` };
-  }
-  if (!pathExists(join(workspace, payloadPath))) {
-    return { status: "missing", detail: `blob for event ${event.id} is gone (${payloadPath}) with no prune record` };
-  }
-  try {
-    return { status: "ok", bytes: loadBlobPlaintext(workspace, payloadPath).bytes };
-  } catch (error: unknown) {
-    const reason = error instanceof Error ? error.message : String(error);
-    return { status: "missing", detail: `blob for event ${event.id} could not be read: ${reason}` };
-  }
 }
 
 function failure(kind: RequestSourceFailureKind, detail: string, notes: readonly string[]): RequestSourceResolution {
@@ -230,7 +188,7 @@ export function resolveRequestSources(input: RequestSourceInput): RequestSourceR
   const sourceEventIds: string[] = [input.systemPromptEventId];
 
   const readInto = (event: EvidenceEvent): Buffer | RequestSourceResolution => {
-    const read = readPayload(input.workspace, event);
+    const read = readEventPayload(input.workspace, event);
     if (read.status === "pruned") {
       return failure("payload-pruned", `payload of event ${event.id} (${event.event_type}) was pruned by retention`, notes);
     }

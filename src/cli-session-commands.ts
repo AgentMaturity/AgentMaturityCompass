@@ -153,6 +153,7 @@ export function registerSessionCommands(program: Command): void {
       }
       console.log(`  won claim:            ${report.wonClaim ? "yes" : "no"}`);
       console.log(`  synthetic turn ends:  ${report.syntheticTurnEnds}`);
+      console.log(`  synthetic step ends:  ${report.syntheticStepEnds}`);
       console.log(`  unknown tool results: ${report.unknownToolOutcomes}`);
       console.log(`  unsealed tail before: ${report.unsealedTailCountBefore}`);
       console.log(`  closed:               ${report.closed ? "yes" : "no"}`);

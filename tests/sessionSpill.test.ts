@@ -99,7 +99,7 @@ describe("spill — oversized tool output leaves the ledger, its commitment does
       stopReason: "end_turn",
       usage: { inputTokens: 10, outputTokens: 10, cacheRead: 0, cacheWrite: 0 }
     });
-    service.endTurn({ reason: "complete", interrupted: false });
+    service.endTurn({ reason: "complete" });
     service.sealTurn();
     service.close({ reason: "done" });
     return service.sessionId;
