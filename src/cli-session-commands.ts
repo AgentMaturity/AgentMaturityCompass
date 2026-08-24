@@ -213,6 +213,90 @@ export function registerSessionCommands(program: Command): void {
       }
     });
 
+  // The operator-facing half of "requests are reconstructable": rebuild every
+  // request this session sent, from the log alone, and say whether the bytes
+  // still hash to what the signed row committed to. A digest nobody can check is
+  // not evidence, and until this command there was no way to check one.
+  session
+    .command("replay-request")
+    .description("Rebuild each request this session sent from its signed rows and check it against the recorded digest")
+    .argument("<id>", "session id")
+    .option("--json", "Output as JSON")
+    .option("--out <path>", "Write the reconstructed bytes of the first request to a file")
+    .action(async (id: string, opts: { json?: boolean; out?: string }) => {
+      const { deriveSessionRequests } = await import("./llm/request/deriveRequest.js");
+      const { verifyLedgerIntegrity } = await import("./ledger/ledgerVerification.js");
+      const { writeFileSync } = await import("node:fs");
+      const workspace = process.cwd();
+
+      // Verify the log BEFORE pronouncing anything reconstructed. Derivation
+      // folds rows without checking them — deliberately, since integrity is
+      // verifyLedgerIntegrity's job — but this command speaks to an operator,
+      // and "reconstructed" over a log whose rows fail event_hash would tell
+      // them the bytes are trustworthy when nothing established that. Reporting
+      // success over evidence whose integrity was never checked is the same
+      // false green this project has now had to close three times.
+      const integrity = await verifyLedgerIntegrity(workspace);
+      if (!integrity.chain.ok) {
+        console.error(chalk.red("Refusing to replay: this workspace's evidence chain does not verify."));
+        for (const problem of integrity.chain.errors.slice(0, 5)) console.error(`  - ${problem}`);
+        console.error(chalk.gray("  A reconstructed request proves nothing over a log that does not verify."));
+        process.exit(1);
+        return;
+      }
+      if (!integrity.trustRoot.anchored) {
+        // Not fatal — unanchored verification is the documented default — but
+        // the operator must not read the verdict below as proof of authorship.
+        console.error(
+          chalk.yellow(
+            "Note: verification is unanchored (no expected monitor key pinned), so this confirms\n" +
+              "internal consistency, not authorship. Pin AMC_EXPECTED_MONITOR_FINGERPRINT to anchor it."
+          )
+        );
+      }
+
+      const derivations = deriveSessionRequests({ workspace, sessionId: id });
+      if (derivations.length === 0) {
+        console.error(chalk.red(`Session ${id} recorded no request/header events.`));
+        process.exit(1);
+        return;
+      }
+      // A pruned payload is a LAWFUL deletion, so it must not set the failure
+      // exit code — conflating retention with tampering is its own defect.
+      const alarms = derivations.filter(
+        (entry) => entry.status !== "reconstructed" && entry.status !== "payload-pruned"
+      );
+      if (opts.out !== undefined) {
+        const first = derivations.find((entry) => entry.bytes !== null);
+        if (first?.bytes != null) {
+          writeFileSync(opts.out, first.bytes);
+        }
+      }
+      if (opts.json) {
+        console.log(
+          JSON.stringify(
+            {
+              sessionId: id,
+              requests: derivations.map((entry) => ({ ...entry, bytes: entry.bytes === null ? null : entry.bytes.length }))
+            },
+            null,
+            2
+          )
+        );
+        process.exit(alarms.length === 0 ? 0 : 1);
+        return;
+      }
+      console.log(chalk.bold(`Recorded requests in session ${id}`));
+      for (const entry of derivations) {
+        const colour =
+          entry.status === "reconstructed" ? chalk.green : entry.status === "payload-pruned" ? chalk.yellow : chalk.red;
+        console.log(`  ${colour(entry.status.padEnd(22))} ${chalk.gray(entry.headerEventId)}`);
+        if (entry.detail !== null) console.log(`    ${chalk.gray(entry.detail)}`);
+        for (const problem of entry.inconsistencies) console.log(`    ${chalk.yellow(problem)}`);
+      }
+      process.exit(alarms.length === 0 ? 0 : 1);
+    });
+
   session
     .command("verify-proof")
     .description("Verify a session inclusion proof offline — needs only the bundle and a pinned fingerprint")

@@ -24,6 +24,7 @@ import type {
   TurnEndReason,
   TurnTrigger
 } from "./sessionTypes.js";
+import type { ToolSchemaRef } from "./toolSchemaCommitment.js";
 
 /**
  * Reference returned for every appended session event. Superset of the ledger's
@@ -84,8 +85,22 @@ export interface RequestHeaderParams {
   readonly model: string;
   readonly providerId: string;
   readonly params: Record<string, unknown>;
+  /**
+   * Which deterministic encoder produced `requestBytes`, and at which version of
+   * its wire shape. Without this pair the log records bytes nobody can rebuild:
+   * derivation has to run the SAME function the send path ran, and "the same"
+   * has to be a name in a signed row rather than an assumption about what the
+   * tree happened to contain on the day.
+   */
+  readonly encoderId: string;
+  readonly encoderVersion: number;
   readonly systemPromptEventId: string;
-  readonly toolSchemaSha256: string;
+  /**
+   * The `request/tools` row holding the exact tool-schema bytes, or null for a
+   * request with no tools. The service REFUSES a ref that no such row backs —
+   * see ./toolSchemaCommitment.ts for why a bare digest was a defect.
+   */
+  readonly toolSchema: ToolSchemaRef | null;
   readonly projectionCutoffEventId: string;
   readonly projectionDigest: string;
   readonly sourceEventIds: readonly string[];

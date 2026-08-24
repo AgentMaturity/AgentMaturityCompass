@@ -25,6 +25,15 @@ export interface SurfaceEntry {
   readonly slot: string;
   readonly role: SurfaceRole;
   readonly part: SurfacePartRef;
+  // Which row put this part here — the row that appended it, or the row that
+  // last replaced it. `part.sha256` names a payload; a payload can legitimately
+  // repeat (the same user message twice), so the sha alone cannot say WHICH row
+  // a part came from. Request derivation (src/llm/request/) needs the row, not
+  // just the bytes: a tool_use part's call id and tool name live in its row's
+  // meta_json, not in its payload. Carried in fold STATE only — the signed
+  // SurfacePartRef is unchanged, and the ConversationHistory view below does not
+  // expose it, so no consumer of the projection sees a different value.
+  readonly sourceEventId: string;
 }
 
 // The fold state: the ordered live entries. Exported because it is the state
@@ -46,9 +55,7 @@ export function projectSurface(events: readonly EvidenceEvent[]): ConversationHi
   // Expressed through the registered unit rather than duplicating the fold, so
   // "the registry drives the same projection this function returns" is
   // structural: there is one init/apply/view, and no second copy to drift.
-  return surfaceProjection.view(
-    events.reduce<SurfaceProjectionState>(surfaceProjection.apply, surfaceProjection.init())
-  );
+  return surfaceProjection.view(foldSurfaceEntries(events));
 }
 
 // One fold step. Returns the state it was GIVEN when a row carries no envelope,
@@ -66,7 +73,16 @@ function applySurfaceEvent(
     // contributes nothing to the derived conversation.
     return entries;
   }
-  return applySurfaceOp(entries, envelope.surface);
+  return applySurfaceOp(entries, envelope.surface, event.id);
+}
+
+// The fold with no registry and no cache: the ordered live entries as of the
+// end of `events`. Same `apply` the registered unit runs, so there is exactly
+// one definition of what a surface op means and nothing to drift. Exported for
+// request derivation, which needs the entries (with their provenance) rather
+// than the role-grouped view.
+export function foldSurfaceEntries(events: readonly EvidenceEvent[]): SurfaceProjectionState {
+  return events.reduce<SurfaceProjectionState>(surfaceProjection.apply, surfaceProjection.init());
 }
 
 /** Registry key for the surface fold. */
@@ -82,8 +98,10 @@ export const surfaceProjection: ProjectionUnit<SurfaceProjectionState, Conversat
     key: SURFACE_PROJECTION_KEY,
     // Bump when what this fold MEANS changes — a new SurfaceOp variant, a
     // different role-grouping rule, a change to which rows contribute. Cached
-    // state from an older version is discarded, never migrated.
-    stateVersion: 1,
+    // state from an older version is discarded, never migrated. Bumped to 2 when
+    // SurfaceEntry gained `sourceEventId`: a v1 cached state has no such field,
+    // and reading one back would hand derivation `undefined` provenance.
+    stateVersion: 2,
     init: (): SurfaceProjectionState => [],
     apply: applySurfaceEvent,
     view: groupByRole
@@ -94,7 +112,8 @@ export const surfaceProjection: ProjectionUnit<SurfaceProjectionState, Conversat
 // projection stays total over any well-formed op sequence.
 function applySurfaceOp(
   entries: SurfaceProjectionState,
-  op: SurfaceOp
+  op: SurfaceOp,
+  sourceEventId: string
 ): SurfaceProjectionState {
   switch (op.op) {
     case "none":
@@ -105,9 +124,9 @@ function applySurfaceOp(
       // replace/retract targeting — never whether an append collapses into a
       // prior one. That is what keeps a multi-turn conversation from folding all
       // its user messages onto a single slot.
-      return [...entries, { slot: op.slot, role: op.role, part: op.part }];
+      return [...entries, { slot: op.slot, role: op.role, part: op.part, sourceEventId }];
     case "replace":
-      return replaceLastSlot(entries, op.slot, op.part);
+      return replaceLastSlot(entries, op.slot, op.part, sourceEventId);
     case "retract":
       return retractLastSlot(entries, op.slot);
   }
@@ -120,14 +139,17 @@ function applySurfaceOp(
 function replaceLastSlot(
   entries: SurfaceProjectionState,
   slot: string,
-  part: SurfacePartRef
+  part: SurfacePartRef,
+  sourceEventId: string
 ): SurfaceProjectionState {
   const targetIndex = lastIndexOfSlot(entries, slot);
   if (targetIndex === -1) {
     return entries;
   }
+  // Provenance moves with the part: after a replace, the row that supplied the
+  // new bytes is the row a reader must consult for that entry's meta.
   return entries.map((entry, index) =>
-    index === targetIndex ? { slot: entry.slot, role: entry.role, part } : entry
+    index === targetIndex ? { slot: entry.slot, role: entry.role, part, sourceEventId } : entry
   );
 }
 

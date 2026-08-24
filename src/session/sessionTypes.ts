@@ -7,7 +7,7 @@ import type { EvidenceEventType } from "../types.js";
 // contents (seq, prevSessionEventHash, surface op, synthetic flag) are as
 // tamper-evident as any other hashed field.
 
-// The 18 event types that make up the session spine. These are a strict
+// The 21 event types that make up the session spine. These are a strict
 // superset added to EvidenceEventType; none of them may be added to
 // AUTO_INCIDENT_FALLBACK_EVENT_TYPES (ledger.ts) or every tool call would open
 // an incident.
@@ -20,6 +20,9 @@ export const SESSION_EVENT_TYPES: ReadonlySet<EvidenceEventType> = new Set<Evide
   "step/start",
   "step/end",
   "request/header",
+  "request/tools",
+  "request/response",
+  "request/failure",
   "system/prompt",
   "user/message",
   "assistant/block",

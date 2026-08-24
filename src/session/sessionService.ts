@@ -1,5 +1,5 @@
 import { createHash, randomUUID } from "node:crypto";
-import type { EvidenceEventType, RuntimeName } from "../types.js";
+import type { EvidenceEvent, EvidenceEventType, RuntimeName } from "../types.js";
 import { openSessionEventStore } from "../persistence/openSessionEventStore.js";
 import type { SessionEventStore, SessionStoreAppendInput } from "../persistence/sessionEventStore.js";
 import { sha256Hex } from "../utils/hash.js";
@@ -14,6 +14,10 @@ import {
   type SurfaceRole
 } from "./sessionTypes.js";
 import { merkleRoot, SESSION_MERKLE_EMPTY } from "./sessionMerkle.js";
+import type { RequestHeaderMeta } from "./requestHeaderMeta.js";
+import { buildRequestOutcomeMeta, requestOutcomeEventType } from "./requestOutcomeMeta.js";
+import type { RequestOutcomeParams } from "./requestOutcomeMeta.js";
+import { assertToolSchemaCommitted } from "./toolSchemaCommitment.js";
 import type { SurfaceKind } from "./sessionTypes.js";
 import { SessionSpillPolicy } from "./spill/spillPolicy.js";
 import { SessionSpillStore } from "./spill/spillStore.js";
@@ -364,22 +368,33 @@ export class SessionService {
   // structural, not a runtime check that production can turn off.
   recordRequestHeader(params: RequestHeaderParams): PreparedRequest {
     this.ensureUsable();
+    // Checked BEFORE the header is appended: an unbacked tool-schema commitment
+    // must not be able to reach the log at all, not merely be unlikely to.
+    if (params.toolSchema !== null) {
+      assertToolSchemaCommitted(this.readEvents(), params.toolSchema, this.sessionId);
+    }
     const requestBytes =
       typeof params.requestBytes === "string" ? Buffer.from(params.requestBytes, "utf8") : params.requestBytes;
     const requestDigest = sha256Hex(requestBytes);
+    // Annotated, so a field derivation reads cannot go missing here silently.
+    // The LITERAL ORDER below is the hash pre-image order (see requestHeaderMeta).
+    const typeMeta: RequestHeaderMeta = {
+      model: params.model,
+      providerId: params.providerId,
+      params: params.params,
+      encoderId: params.encoderId,
+      encoderVersion: params.encoderVersion,
+      systemPromptEventId: params.systemPromptEventId,
+      toolSchemaEventId: params.toolSchema?.eventId ?? null,
+      toolSchemaSha256: params.toolSchema?.payloadSha256 ?? null,
+      projectionCutoffEventId: params.projectionCutoffEventId,
+      projectionDigest: params.projectionDigest,
+      sourceEventIds: [...params.sourceEventIds],
+      requestDigest
+    };
     const ref = this.appendSessionEvent({
       eventType: "request/header",
-      typeMeta: {
-        model: params.model,
-        providerId: params.providerId,
-        params: params.params,
-        systemPromptEventId: params.systemPromptEventId,
-        toolSchemaSha256: params.toolSchemaSha256,
-        projectionCutoffEventId: params.projectionCutoffEventId,
-        projectionDigest: params.projectionDigest,
-        sourceEventIds: [...params.sourceEventIds],
-        requestDigest
-      },
+      typeMeta: { ...typeMeta },
       surface: { op: "none" },
       turn: this.currentTurn,
       step: this.currentStep
@@ -393,6 +408,22 @@ export class SessionService {
     });
   }
 
+  // The other half of the send path: what came back. One row per dispatch,
+  // recorded AFTER the stream terminated, naming the request/header row it
+  // settles. Without it a session records what a model was asked and never what
+  // it answered — see ./requestOutcomeMeta.ts for the shape and for why the
+  // retry verdict is recorded beside the provider's facts rather than inside
+  // them.
+  recordRequestOutcome(params: RequestOutcomeParams): SessionEventRef {
+    return this.appendSessionEvent({
+      eventType: requestOutcomeEventType(params),
+      typeMeta: { ...buildRequestOutcomeMeta(params, this.currentTurn, this.currentStep) },
+      surface: { op: "none" },
+      turn: this.currentTurn,
+      step: this.currentStep
+    });
+  }
+
   // The projected conversation the model would see, folded ONLY from this
   // session's committed rows (re-read from evidence_events), never from an
   // in-memory buffer. Reading model-visible history therefore cannot outrun the
@@ -402,6 +433,33 @@ export class SessionService {
   projectHistory(): ConversationHistory {
     this.ensureUsable();
     return this.projections.surface.evaluate(this.store.readSessionEvents(this.sessionId)).value;
+  }
+
+  // This session's committed rows, in commit order. Read-only, and re-read from
+  // the store rather than served from a buffer, for the same reason
+  // projectHistory() is: a caller building a request from these rows is building
+  // it from what is durable, not from what this process happens to remember.
+  readEvents(): readonly EvidenceEvent[] {
+    this.ensureUsable();
+    return this.store.readSessionEvents(this.sessionId);
+  }
+
+  // Commit the EXACT tool-schema bytes a request will carry, giving the header's
+  // `toolSchemaSha256` a durable referent. Surface op is `none` because the tool
+  // schema is part of the request envelope, not of the conversation — see
+  // ./toolSchemaCommitment.ts for the full argument and for the alternative
+  // (a spill-style side file) that was rejected.
+  recordToolSchema(schemaBytes: string | Buffer): SessionEventRef {
+    this.ensureUsable();
+    const bytes = typeof schemaBytes === "string" ? Buffer.from(schemaBytes, "utf8") : schemaBytes;
+    return this.appendSessionEvent({
+      eventType: "request/tools",
+      typeMeta: { turn: this.currentTurn, step: this.currentStep, toolSchemaSha256: sha256Hex(bytes) },
+      surface: { op: "none" },
+      turn: this.currentTurn,
+      step: this.currentStep,
+      payload: bytes
+    });
   }
 
   recordSystemPrompt(text: string): SessionEventRef {
