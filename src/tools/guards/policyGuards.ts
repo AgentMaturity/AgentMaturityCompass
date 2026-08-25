@@ -115,31 +115,12 @@ export function toolhubAllowlistGuard(workspace: string): ToolGuard {
       tool: definition,
       args: execution.arguments as Record<string, unknown>
     });
-    if (!verdict.ok) return `tool allowlist: ${verdict.reason ?? "denied"}`;
-
-    // `validateToolRequest` applies argv deny-patterns only to the literal name
-    // "process.spawn" — the same name-keying that left the host allowlist
-    // reachable by one identifier and the path globs by two. A `bash` entry
-    // declaring deny patterns is otherwise DEAD CONFIG that reads as policy.
-    // Applied here to whatever string arguments the tool actually has.
-    const patterns = definition.deny?.argvRegexDenylist ?? [];
-    if (patterns.length > 0) {
-      const text = Object.values(execution.arguments)
-        .flatMap((value) => (Array.isArray(value) ? value : [value]))
-        .filter((value): value is string => typeof value === "string")
-        .join(" ");
-      for (const pattern of patterns) {
-        try {
-          if (new RegExp(pattern, "i").test(text)) {
-            return `tool allowlist: blocked by deny pattern: ${pattern}`;
-          }
-        } catch {
-          // An uncompilable pattern is a broken policy, not a permission.
-          return `tool allowlist: deny pattern is not a valid expression: ${pattern}`;
-        }
-      }
-    }
-    return undefined;
+    // No second implementation here. `validateToolRequest` used to key its
+    // checks on tool NAMES, so this guard carried a patch applying argv deny
+    // patterns that the source would never reach. The source is
+    // declaration-driven now, so the patch is gone: one place decides, and a
+    // policy declared in the signed config is enforced wherever it appears.
+    return verdict.ok ? undefined : `tool allowlist: ${verdict.reason ?? "denied"}`;
   };
 }
 

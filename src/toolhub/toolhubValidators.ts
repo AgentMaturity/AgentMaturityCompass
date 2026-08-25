@@ -1,4 +1,11 @@
 import { readFileSync } from "node:fs";
+import {
+  BINARY_ARGUMENTS,
+  COMMAND_ARGUMENTS,
+  PATH_ARGUMENTS,
+  URL_ARGUMENTS,
+  argumentStrings
+} from "./toolArgumentRoles.js";
 import { isAbsolute, join, normalize, relative, resolve } from "node:path";
 import YAML from "yaml";
 import { getPrivateKeyPem, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
@@ -276,64 +283,129 @@ export function argvAllowed(tool: ToolDefinition, argv: string[]): { ok: boolean
   return { ok: true };
 }
 
+/**
+ * The one pattern a working directory must match, for every tool.
+ *
+ * `./` + globstar is doing more than it looks like, and all of it was measured
+ * rather than assumed:
+ *
+ *   cwd          allow          deny            result
+ *   ../etc       "./"+globstar  none            denied  (outside the workspace)
+ *   .git/hooks   "./"+globstar  none            denied  (leading dot never matches)
+ *   src          "./"+globstar  none            allowed
+ *   ../etc       bare globstar  a .git pattern  ALLOWED (an escape!)
+ *   .git/hooks   bare globstar  a .git pattern  ALLOWED (the deny never fires)
+ *
+ * So there is deliberately NO deny list here. An earlier version carried
+ * patterns for `.amc` and `.git`, and neither ever fired: `.amc` is refused
+ * unconditionally inside `pathAllowedByPatterns`, and a `.git` pattern of the
+ * globstar-slash form needs a segment before `.git` that a workspace-relative
+ * path does not have. A deny list that cannot fire is the same
+ * dead-config-reading-as-policy this rewrite exists to remove — worse here,
+ * because widening the allow pattern to a bare globstar to "make the deny
+ * work" would have opened an escape.
+ */
+const CWD_ALLOW_PATTERNS = ["./**"];
+
+/**
+ * Validate one call against the policy the tool DECLARED.
+ *
+ * Every check here runs because the tool's signed entry declares the
+ * corresponding policy, never because of what the tool is called. That is the
+ * whole point of the rewrite: name-keying made this function a policy about
+ * four identifiers, and a capability under a fifth name went unchecked.
+ *
+ * FAIL CLOSED ON A DECLARED-BUT-UNCHECKABLE POLICY. If an entry declares a
+ * path policy and the call names no path, the call is DENIED rather than
+ * allowed. A declared policy that cannot be evaluated has not been satisfied,
+ * and "we could not tell" is not a reason to proceed — it is the same rule the
+ * egress guard applies to a network call with no parseable host.
+ */
 export function validateToolRequest(input: {
   workspace: string;
   tool: ToolDefinition;
   args: Record<string, unknown>;
 }): { ok: boolean; reason?: string } {
-  const cwd = resolve(input.workspace, String(input.args.cwd ?? input.workspace));
+  // The invariant, first and for every tool. This replaces a branch that
+  // applied a hardcoded glob list to `git.*` alone — protection three tools
+  // happened to get because of how they were named.
+  const cwdValue = input.args.cwd;
+  if (typeof cwdValue === "string" && cwdValue.length > 0) {
+    const cwdResult = pathAllowedByPatterns(
+      input.workspace,
+      resolve(input.workspace, cwdValue),
+      CWD_ALLOW_PATTERNS,
+      []
+    );
+    if (!cwdResult.ok) {
+      return { ok: false, reason: `working directory not allowed: ${cwdResult.reason ?? cwdValue}` };
+    }
+  }
 
-  if (input.tool.name === "fs.read" || input.tool.name === "fs.write") {
-    const pathValue = String(input.args.path ?? "");
-    if (!pathValue) {
+  const allowPaths = input.tool.allow?.paths ?? [];
+  const denyPaths = input.tool.deny?.paths ?? [];
+  if (allowPaths.length > 0 || denyPaths.length > 0) {
+    const paths = argumentStrings(input.args, PATH_ARGUMENTS);
+    if (paths.length === 0) {
       return { ok: false, reason: "path is required" };
     }
-    const pathResult = pathAllowedByPatterns(
-      input.workspace,
-      resolve(input.workspace, pathValue),
-      input.tool.allow?.paths ?? [],
-      input.tool.deny?.paths ?? []
-    );
-    if (!pathResult.ok) {
-      return { ok: false, reason: pathResult.reason };
+    for (const candidate of paths) {
+      const pathResult = pathAllowedByPatterns(
+        input.workspace,
+        resolve(input.workspace, candidate),
+        allowPaths,
+        denyPaths
+      );
+      if (!pathResult.ok) {
+        return { ok: false, reason: pathResult.reason };
+      }
     }
   }
 
-  if (input.tool.name === "http.fetch") {
-    const urlText = String(input.args.url ?? "");
-    if (!urlText) {
+  const hostAllowlist = input.tool.allow?.hostAllowlist ?? [];
+  if (hostAllowlist.length > 0 || input.tool.denyByDefault === true) {
+    const urls = argumentStrings(input.args, URL_ARGUMENTS);
+    if (urls.length === 0) {
       return { ok: false, reason: "url is required" };
     }
-    let host = "";
-    try {
-      host = new URL(urlText).hostname;
-    } catch {
-      return { ok: false, reason: "invalid url" };
-    }
-    if (!hostAllowedForTool(input.tool, host)) {
-      return { ok: false, reason: `host not allowed by tool policy: ${host}` };
+    for (const urlText of urls) {
+      let host = "";
+      try {
+        host = new URL(urlText).hostname;
+      } catch {
+        return { ok: false, reason: "invalid url" };
+      }
+      if (!hostAllowedForTool(input.tool, host)) {
+        return { ok: false, reason: `host not allowed by tool policy: ${host}` };
+      }
     }
   }
 
-  if (input.tool.name === "process.spawn") {
-    const binary = String(input.args.binary ?? "");
-    const argv = Array.isArray(input.args.argv) ? input.args.argv.map(String) : [];
-    if (!binary) {
+  const binaries = input.tool.allow?.binariesAllowlist ?? [];
+  if (binaries.length > 0) {
+    const named = argumentStrings(input.args, BINARY_ARGUMENTS);
+    if (named.length === 0) {
       return { ok: false, reason: "binary is required" };
     }
-    if (!binaryAllowedForTool(input.tool, binary)) {
-      return { ok: false, reason: `binary not allowed: ${binary}` };
-    }
-    const argvCheck = argvAllowed(input.tool, [binary, ...argv]);
-    if (!argvCheck.ok) {
-      return { ok: false, reason: argvCheck.reason };
+    for (const binary of named) {
+      if (!binaryAllowedForTool(input.tool, binary)) {
+        return { ok: false, reason: `binary not allowed: ${binary}` };
+      }
     }
   }
 
-  if (input.tool.name.startsWith("git.")) {
-    const pathResult = pathAllowedByPatterns(input.workspace, cwd, ["./workspace/**", "./**"], ["**/.amc/**"]);
-    if (!pathResult.ok) {
-      return { ok: false, reason: pathResult.reason };
+  const denyPatterns = input.tool.deny?.argvRegexDenylist ?? [];
+  if (denyPatterns.length > 0) {
+    // Every string the call carries under a command-ish role, joined. A deny
+    // pattern cares what the process is being asked to do, not whether the
+    // caller spelled it as `argv: [...]` or `command: "..."`.
+    const commandText = argumentStrings(input.args, COMMAND_ARGUMENTS);
+    if (commandText.length === 0) {
+      return { ok: false, reason: "a command is required" };
+    }
+    const argvCheck = argvAllowed(input.tool, commandText);
+    if (!argvCheck.ok) {
+      return { ok: false, reason: argvCheck.reason };
     }
   }
 
