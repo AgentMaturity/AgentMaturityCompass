@@ -34,12 +34,27 @@ export interface ProcessSpec {
    * provider key to an unvetted binary.
    */
   readonly env: Readonly<Record<string, string>>;
+  /**
+   * `"pipe"` opens a writable the caller feeds; `"ignore"` gives the child no
+   * stdin at all. Defaulting to `"ignore"` is deliberate — a process that
+   * inherits a terminal it was not meant to read from can steal the operator's
+   * keystrokes from AMC itself.
+   */
+  readonly stdin: "ignore" | "pipe";
   readonly stdout: OutputMode;
   readonly stderr: OutputMode;
   /** Bytes retained per stream. Output past this is counted, not kept. */
   readonly maxCaptureBytes: number;
   /** Exact values removed from output before anyone sees it. */
   readonly scrubValues: readonly string[];
+  /**
+   * Called with text that has already been bounded-checked and scrubbed.
+   *
+   * The recording hook. It deliberately sees the SAME text the operator sees
+   * rather than the raw bytes, so there is no arrangement in which the log and
+   * the terminal disagree about what the process said.
+   */
+  readonly onOutput?: (stream: "stdout" | "stderr", text: string) => void;
   /** Milliseconds between SIGTERM and SIGKILL when terminating. */
   readonly graceMs: number;
   /** Wall-clock limit; exceeding it terminates with reason "timeout". */

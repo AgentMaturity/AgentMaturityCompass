@@ -114,3 +114,73 @@ system behaviour. 13 mutations, each breaking a rule and confirming RED. Two
 initially survived, both the same gap: every collector test pushed only one
 chunk past the cap, so the already-full path was never exercised. Fixed with a
 second-chunk test, after which both mutations go red.
+
+---
+
+## Part 2 — the fold
+
+`spawnMonitoredProcess` now runs on the substrate. `wrapRuntime`,
+`wrapAny` and `superviseProcess` were already thin wrappers over it, so
+folding one function folded all three.
+
+**Kept, because things depend on it.** `profileResolver` tells a wrap-style
+session from an adapter-style one by counting `stdin` events against
+`agent_process_started`, so the event vocabulary — `gateway`/`process_start`,
+per-chunk `stdin`/`stdout`/`stderr`, the `runtime_exit_code` metric, the sealed
+session — survives unchanged. A fold that tidied the vocabulary would have
+silently reclassified every historical session.
+
+**Gained.** Termination (there was no kill path at all), an `AbortSignal` on
+every wrapper, bounded ledger writes, output scrubbing, and `terminatedBy` /
+`treeExitProven` recorded beside the exit code. `superviseProcess` now scrubs
+`AMC_LEASE` — it hands the child a bearer credential, and a child that echoed
+it put it in the signed log and on the operator's terminal.
+
+**Bounding without silence.** Output past the 4 MiB-per-stream cap is not
+recorded, and hitting the cap emits a `runtime_output_truncated` metric naming
+how much went unrecorded. An uncapped log was the old behaviour; a capped log
+that says nothing about stopping would be worse than either.
+
+**A spawn failure now seals its session.** Previously the promise rejected
+before `sealSession`, leaving a session open forever with nothing in the chain
+explaining why.
+
+**The adapters fence.** `AMC_EVALUATED_AGENT=1` is the ledger's trusted-writer
+check, and of the three ways AMC launches an agent exactly one — the adapters
+path — left the agent able to write to the evidence about itself. Now set.
+AMC records from the parent process, so fencing the child costs nothing it
+legitimately needed, and the full suite confirms it.
+
+## Two of my own tests were wrong, and the mutations found both
+
+**A test that asserted something the OS cannot report.** I wrote "does not
+record stdin the child never accepted" and had `write()` return false when the
+child closed its end. Measured, it does not:
+
+| child behaviour | parent's write |
+|---|---|
+| exits | `ERR_STREAM_DESTROYED`, refused |
+| destroys its stdin | **succeeds, no error** |
+| ignores stdin | succeeds, no error |
+
+A child that closes or ignores its end is indistinguishable from one reading
+normally — the bytes genuinely reach the pipe. So "delivered" is the strongest
+claim available, and the test demanded a stronger one. It now pins the case the
+OS does report.
+
+The change it prompted is still right: `write()` resolves at the flush
+callback rather than returning synchronously, because a synchronous answer is
+about the parent's buffer rather than the child.
+
+**A test that passed for the wrong reason.** The monitor-level version of the
+same check emitted terminal input after the run had ended. Four separate
+mutations left it green — including "record stdin regardless of delivery" and
+"never detach the handler" — because by that point the ledger is closed and
+nothing could have been recorded either way. It demonstrated nothing beyond
+what `ledgerAndDiagnostic` already covers, so it is deleted rather than kept as
+something that looks like coverage.
+
+The surviving substrate test is honest about its own shape: two independent
+mechanisms enforce the refusal and each is sufficient alone, so mutating either
+leaves it green and removing both turns it red. The redundancy is deliberate
+and no single guard is load-bearing.

@@ -1,7 +1,8 @@
 import { randomUUID } from "node:crypto";
-import { spawn, spawnSync } from "node:child_process";
+import { spawnSync } from "node:child_process";
 import type { AMCConfig, RuntimeName } from "../types.js";
 import { openLedger, hashBinaryOrPath } from "./ledger.js";
+import { runProcess } from "../exec/runProcess.js";
 import { resolveAgentId } from "../fleet/paths.js";
 import { dummyProviderKeyEnv, stripProviderKeys } from "../utils/providerKeys.js";
 
@@ -40,11 +41,25 @@ export function probeBinaryVersion(command: string): string {
   return "unknown";
 }
 
-function isClosedChildStdinError(error: unknown): boolean {
-  const code = typeof error === "object" && error !== null && "code" in error
-    ? String((error as { code?: unknown }).code ?? "")
-    : "";
-  return code === "EPIPE" || code === "ERR_STREAM_DESTROYED" || code === "ERR_STREAM_WRITE_AFTER_END";
+/**
+ * Bytes of child output recorded per stream before the log says so and stops.
+ *
+ * Unbounded was the previous behaviour: a process emitting a gigabyte wrote a
+ * gigabyte of signed evidence. A cap alone would be worse than that, because
+ * the log would quietly stop describing the run — so hitting it emits a
+ * truncation event naming exactly how much went unrecorded.
+ */
+const MAX_RECORDED_OUTPUT_BYTES = 4 * 1024 * 1024;
+
+/** How long the tree gets between SIGTERM and SIGKILL. */
+const TERMINATE_GRACE_MS = 5_000;
+
+function definedEnv(env: NodeJS.ProcessEnv): Record<string, string> {
+  const out: Record<string, string> = {};
+  for (const [key, value] of Object.entries(env)) {
+    if (typeof value === "string") out[key] = value;
+  }
+  return out;
 }
 
 async function spawnMonitoredProcess(params: {
@@ -54,6 +69,8 @@ async function spawnMonitoredProcess(params: {
   args: string[];
   envExtras?: Record<string, string>;
   meta?: Record<string, unknown>;
+  scrubValues?: readonly string[];
+  signal?: AbortSignal;
 }): Promise<string> {
   const ledger = openLedger(params.workspace);
   const sessionId = randomUUID();
@@ -83,115 +100,138 @@ async function spawnMonitoredProcess(params: {
       }
     });
 
-    const child = spawn(params.command, params.args, {
-      stdio: ["pipe", "pipe", "pipe"],
-      env: {
-        ...stripProviderKeys(process.env),
-        ...(params.envExtras ?? {}),
-        AMC_EVALUATED_AGENT: "1"
-      }
-    });
-
-    let stdinForwardError: Error | null = null;
-    const childStdinErrorHandler = (error: Error): void => {
-      if (!isClosedChildStdinError(error) && stdinForwardError === null) {
-        stdinForwardError = error;
-      }
-    };
-    child.stdin.on("error", childStdinErrorHandler);
-
-    const stdinHandler = (chunk: Buffer): void => {
-      if (
-        child.exitCode !== null
-        || child.stdin.destroyed
-        || child.stdin.writableEnded
-        || child.stdin.writableFinished
-        || !child.stdin.writable
-      ) {
+    const recorded = { stdout: 0, stderr: 0 };
+    const truncationAnnounced = { stdout: false, stderr: false };
+    const record = (stream: "stdout" | "stderr", text: string): void => {
+      const bytes = Buffer.byteLength(text, "utf8");
+      if (recorded[stream] >= MAX_RECORDED_OUTPUT_BYTES) {
+        if (!truncationAnnounced[stream]) {
+          truncationAnnounced[stream] = true;
+          ledger.appendEvidence({
+            sessionId,
+            runtime: params.runtime,
+            eventType: "metric",
+            payload: JSON.stringify({ stream, recordedBytes: recorded[stream] }),
+            payloadExt: "json",
+            meta: {
+              metricKey: "runtime_output_truncated",
+              value: recorded[stream],
+              stream,
+              trustTier: "OBSERVED",
+              ...(params.meta ?? {})
+            }
+          });
+        }
         return;
       }
+      recorded[stream] += bytes;
       ledger.appendEvidence({
         sessionId,
         runtime: params.runtime,
-        eventType: "stdin",
-        payload: chunk,
+        eventType: stream,
+        payload: text,
         payloadExt: "txt",
         inline: true,
+        meta: {
+          direction: "runtime_to_user",
+          trustTier: "OBSERVED",
+          ...(params.meta ?? {})
+        }
+      });
+    };
+
+    const running = runProcess({
+      argv: [params.command, ...params.args],
+      cwd: process.cwd(),
+      env: {
+        ...definedEnv(stripProviderKeys(process.env)),
+        ...(params.envExtras ?? {}),
+        AMC_EVALUATED_AGENT: "1"
+      },
+      stdin: "pipe",
+      // Tee AND record: the operator and the log see the same scrubbed text,
+      // so there is no arrangement in which they disagree.
+      stdout: "tee",
+      stderr: "tee",
+      maxCaptureBytes: MAX_RECORDED_OUTPUT_BYTES,
+      scrubValues: params.scrubValues ?? [],
+      graceMs: TERMINATE_GRACE_MS,
+      onOutput: record,
+      ...(params.signal ? { signal: params.signal } : {})
+    });
+
+    const stdinHandler = (chunk: Buffer): void => {
+      // Record only what the child actually RECEIVED, at the flush callback.
+      // Recording at the call would put input in signed evidence that a child
+      // which had already closed its end demonstrably never saw.
+      void running.write(chunk).then((delivered) => {
+        if (!delivered) return;
+        ledger.appendEvidence({
+          sessionId,
+          runtime: params.runtime,
+          eventType: "stdin",
+          payload: chunk,
+          payloadExt: "txt",
+          inline: true,
           meta: {
             direction: "user_to_runtime",
             trustTier: "OBSERVED",
             ...(params.meta ?? {})
           }
         });
-      try {
-        child.stdin.write(chunk);
-      } catch (error) {
-        childStdinErrorHandler(error instanceof Error ? error : new Error(String(error)));
-      }
+      });
     };
-
     process.stdin.on("data", stdinHandler);
 
-    child.stdout.on("data", (chunk: Buffer) => {
-      process.stdout.write(chunk);
+    let outcome;
+    try {
+      outcome = await running.done;
+    } catch (error: unknown) {
+      // A spawn that never started still opened a session. Sealing it here is
+      // the difference between a run that failed and a session that simply
+      // stops mid-chain with no explanation.
+      process.stdin.off("data", stdinHandler);
       ledger.appendEvidence({
         sessionId,
         runtime: params.runtime,
-        eventType: "stdout",
-        payload: chunk,
-        payloadExt: "txt",
-        inline: true,
-          meta: {
-            direction: "runtime_to_user",
-            trustTier: "OBSERVED",
-            ...(params.meta ?? {})
-          }
-        });
-    });
-
-    child.stderr.on("data", (chunk: Buffer) => {
-      process.stderr.write(chunk);
-      ledger.appendEvidence({
-        sessionId,
-        runtime: params.runtime,
-        eventType: "stderr",
-        payload: chunk,
-        payloadExt: "txt",
-        inline: true,
-          meta: {
-            direction: "runtime_to_user",
-            trustTier: "OBSERVED",
-            ...(params.meta ?? {})
-          }
-        });
-    });
-
-    await new Promise<void>((resolve, reject) => {
-      child.on("error", reject);
-      child.on("close", (code) => {
-        process.stdin.off("data", stdinHandler);
-        ledger.appendEvidence({
-          sessionId,
-          runtime: params.runtime,
-          eventType: "metric",
-          payload: JSON.stringify({ exitCode: code ?? 1 }),
-          payloadExt: "json",
-          meta: {
-            metricKey: "runtime_exit_code",
-            value: code ?? 1,
-            trustTier: "OBSERVED",
-            ...(params.meta ?? {})
-          }
-        });
-        resolve();
+        eventType: "metric",
+        payload: JSON.stringify({ error: error instanceof Error ? error.message : String(error) }),
+        payloadExt: "json",
+        meta: {
+          metricKey: "runtime_spawn_failed",
+          value: 1,
+          trustTier: "OBSERVED",
+          ...(params.meta ?? {})
+        }
       });
+      ledger.sealSession(sessionId);
+      throw error;
+    }
+    process.stdin.off("data", stdinHandler);
+
+    ledger.appendEvidence({
+      sessionId,
+      runtime: params.runtime,
+      eventType: "metric",
+      payload: JSON.stringify({
+        exitCode: outcome.exitCode ?? 1,
+        signal: outcome.signal,
+        terminatedBy: outcome.terminatedBy,
+        treeExitProven: outcome.treeExitProven
+      }),
+      payloadExt: "json",
+      meta: {
+        metricKey: "runtime_exit_code",
+        value: outcome.exitCode ?? 1,
+        signal: outcome.signal,
+        terminatedBy: outcome.terminatedBy,
+        treeExitProven: outcome.treeExitProven,
+        trustTier: "OBSERVED",
+        ...(params.meta ?? {})
+      }
     });
 
     ledger.sealSession(sessionId);
-    child.stdin.off("error", childStdinErrorHandler);
-    if (stdinForwardError !== null) {
-      throw stdinForwardError;
-    }
     return sessionId;
   } finally {
     ledger.close();
@@ -201,7 +241,7 @@ async function spawnMonitoredProcess(params: {
 export async function wrapRuntime(
   runtime: RuntimeName,
   args: string[],
-  opts: { workspace: string; config: AMCConfig; commandOverride?: string; agentId?: string }
+  opts: { workspace: string; config: AMCConfig; commandOverride?: string; agentId?: string; signal?: AbortSignal }
 ): Promise<string> {
   const runtimeKey =
     runtime === "claude" || runtime === "gemini" || runtime === "openclaw" || runtime === "mock" || runtime === "any"
@@ -215,6 +255,7 @@ export async function wrapRuntime(
     runtime,
     command,
     args,
+    ...(opts.signal ? { signal: opts.signal } : {}),
     meta: {
       mode: "wrap",
       agentId,
@@ -226,7 +267,7 @@ export async function wrapRuntime(
 export async function wrapAny(
   command: string,
   args: string[],
-  opts: { workspace: string; agentId?: string }
+  opts: { workspace: string; agentId?: string; signal?: AbortSignal }
 ): Promise<string> {
   const agentId = resolveAgentId(opts.workspace, opts.agentId);
   return spawnMonitoredProcess({
@@ -234,6 +275,7 @@ export async function wrapAny(
     runtime: "any",
     command,
     args,
+    ...(opts.signal ? { signal: opts.signal } : {}),
     meta: {
       mode: "wrap-any",
       agentId,
@@ -252,6 +294,7 @@ export async function superviseProcess(
     agentId?: string;
     gatewayProxyUrl?: string;
     providerTemplateId?: string;
+    signal?: AbortSignal;
   }
 ): Promise<string> {
   const providerRoute = opts.providerRoute;
@@ -291,6 +334,10 @@ export async function superviseProcess(
     command,
     args,
     envExtras: extraEnv,
+    // The lease is a bearer credential handed to the child; a child that echoes
+    // it must not put it in the signed log or on the operator's terminal.
+    scrubValues: process.env.AMC_LEASE ? [process.env.AMC_LEASE] : [],
+    ...(opts.signal ? { signal: opts.signal } : {}),
     meta: {
       mode: "supervise",
       providerRoute,

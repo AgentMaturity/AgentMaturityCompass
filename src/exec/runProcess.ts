@@ -20,6 +20,19 @@ export interface RunningProcess {
   readonly pid: number | null;
   /** Stop the tree. Idempotent; the first reason recorded is the one kept. */
   terminate(reason: TerminateReason): void;
+  /**
+   * Write to the child's stdin, resolving once the bytes have been FLUSHED.
+   *
+   * Asynchronous on purpose. A synchronous "accepted" answer is about the
+   * parent's buffer, not the child: writing to a child that has closed its end
+   * succeeds locally and fails later with EPIPE. A caller recording what it
+   * sent would then produce evidence asserting input the process demonstrably
+   * never received. Resolving at the flush callback is the first moment the
+   * answer is about delivery.
+   */
+  write(chunk: Buffer): Promise<boolean>;
+  /** Send EOF. A child blocked on stdin never finishes without it. */
+  endStdin(): void;
   readonly done: Promise<ProcessOutcome>;
 }
 
@@ -40,19 +53,15 @@ export function runProcess(spec: ProcessSpec): RunningProcess {
     // actually reaps a tree. It costs the terminal's foreground group, which
     // `forwardSignals` below buys back.
     detached: usesProcessGroups,
-    stdio: ["ignore", spec.stdout === "ignore" ? "ignore" : "pipe", spec.stderr === "ignore" ? "ignore" : "pipe"]
+    stdio: [spec.stdin, spec.stdout === "ignore" ? "ignore" : "pipe", spec.stderr === "ignore" ? "ignore" : "pipe"]
   });
 
-  const stdout = new OutputCollector(
-    spec.maxCaptureBytes,
-    spec.scrubValues,
-    spec.stdout === "tee" ? (text) => process.stdout.write(text) : undefined
-  );
-  const stderr = new OutputCollector(
-    spec.maxCaptureBytes,
-    spec.scrubValues,
-    spec.stderr === "tee" ? (text) => process.stderr.write(text) : undefined
-  );
+  const sink = (stream: "stdout" | "stderr", tee: boolean) => (text: string): void => {
+    if (tee) (stream === "stdout" ? process.stdout : process.stderr).write(text);
+    spec.onOutput?.(stream, text);
+  };
+  const stdout = new OutputCollector(spec.maxCaptureBytes, spec.scrubValues, sink("stdout", spec.stdout === "tee"));
+  const stderr = new OutputCollector(spec.maxCaptureBytes, spec.scrubValues, sink("stderr", spec.stderr === "tee"));
   child.stdout?.on("data", (chunk: Buffer) => stdout.push(chunk));
   child.stderr?.on("data", (chunk: Buffer) => stderr.push(chunk));
 
@@ -109,5 +118,32 @@ export function runProcess(spec: ProcessSpec): RunningProcess {
     });
   });
 
-  return { pid: child.pid ?? null, terminate, done };
+  const write = async (chunk: Buffer): Promise<boolean> => {
+    const stdin = child.stdin;
+    if (!stdin || stdin.destroyed || stdin.writableEnded || !stdin.writable) return false;
+    if (child.exitCode !== null || child.signalCode !== null) return false;
+    return new Promise<boolean>((resolve) => {
+      try {
+        // The callback carries EPIPE for a child that has closed its end. A
+        // closed pipe is the child's decision, not an error worth throwing at
+        // the operator mid-run.
+        stdin.write(chunk, (error) => resolve(!error));
+      } catch {
+        resolve(false);
+      }
+    });
+  };
+
+  const endStdin = (): void => {
+    try {
+      child.stdin?.end();
+    } catch {
+      // Already closed.
+    }
+  };
+  // A pipe nobody will ever write to must still be closed, or a child that
+  // reads stdin waits forever for an EOF that is not coming.
+  child.stdin?.on("error", () => undefined);
+
+  return { pid: child.pid ?? null, terminate, write, endStdin, done };
 }

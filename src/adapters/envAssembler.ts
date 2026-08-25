@@ -41,6 +41,13 @@ export function assembleAdapterEnv(input: AdapterEnvAssembleInput): NodeJS.Proce
   };
   const env: NodeJS.ProcessEnv = {
     ...base,
+    // The ledger's trusted-writer fence (ledger.ts assertTrustedWriter,
+    // jsonlSessionEventStore). The wrap and supervise paths have always set
+    // it; this one never did, so an adapter-launched agent was the one
+    // observed child that could still write to the log observing it. AMC
+    // itself records from the PARENT process, so fencing the child costs
+    // nothing it legitimately needed.
+    AMC_EVALUATED_AGENT: "1",
     AMC_AGENT_ID: input.agentId,
     AMC_LEASE: input.lease,
     AMC_GATEWAY_URL: `${input.gatewayBase}${input.providerRoute}`,

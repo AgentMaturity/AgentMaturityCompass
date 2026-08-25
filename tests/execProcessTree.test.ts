@@ -39,6 +39,7 @@ function workdir(): string {
 
 const spec = (overrides: Partial<ProcessSpec> & Pick<ProcessSpec, "argv" | "cwd">): ProcessSpec => ({
   env: {},
+  stdin: "ignore",
   stdout: "capture",
   stderr: "capture",
   maxCaptureBytes: 64_000,
@@ -170,6 +171,34 @@ describe("terminating a process tree", () => {
 
     running.terminate("dispose");
     await running.done;
+  });
+});
+
+describe("writing to a child's stdin", () => {
+  it("refuses a write once the child is gone", async () => {
+    // The only stdin fact the OS reports reliably. Measured:
+    //   child exits          -> ERR_STREAM_DESTROYED, refused
+    //   child destroys stdin -> the write SUCCEEDS with no error
+    //   child ignores stdin  -> the write succeeds with no error
+    // So a child that closes or ignores its end is indistinguishable from one
+    // reading normally, and "delivered to the pipe" is the strongest claim
+    // available. Anything recording stdin as evidence must record only what
+    // this returns true for.
+    const dir = workdir();
+    const running = runProcess(spec({ argv: ["/bin/sh", "-c", "exit 0"], cwd: dir, stdin: "pipe" }));
+    await running.done;
+    expect(await running.write(Buffer.from("too late\n"))).toBe(false);
+  });
+
+  it("accepts a write the child can still receive", async () => {
+    const dir = workdir();
+    const running = runProcess(spec({
+      argv: ["/bin/sh", "-c", "read line; echo \"got:$line\""], cwd: dir, stdin: "pipe"
+    }));
+    expect(await running.write(Buffer.from("ping\n")), "a live child accepts input").toBe(true);
+    running.endStdin();
+    const outcome = await running.done;
+    expect(outcome.stdout.text).toContain("got:ping");
   });
 });
 
