@@ -11,6 +11,8 @@
 
 /* ── Types ────────────────────────────────────────────────────────── */
 
+import { matchInjection } from '../injection/injectionMatcher.js';
+
 export interface ValidationResult {
   passed: boolean;
   validatorId: string;
@@ -102,27 +104,25 @@ export function validateSecretLeakage(text: string): ValidationResult {
 
 /* ── Prompt Injection Validator ───────────────────────────────────── */
 
-const INJECTION_PATTERNS: Array<{ type: string; pattern: RegExp; description: string }> = [
-  { type: 'ignore_instructions', pattern: /ignore\s+(all\s+)?(previous|prior|all|above)?\s*(instructions?|prompts?|rules?|constraints?)/gi, description: 'Ignore instructions attempt' },
-  { type: 'role_override', pattern: /(you are now|act as|pretend (you are|to be)|roleplay as|simulate being)\s+/gi, description: 'Role override attempt' },
-  { type: 'system_override', pattern: /\[?(system|user|assistant)\s*\]?\s*:/gi, description: 'System message injection' },
-  { type: 'jailbreak', pattern: /(DAN mode|developer mode|jailbreak|no restrictions|no limits|unrestricted)/gi, description: 'Jailbreak attempt' },
-  { type: 'instruction_injection', pattern: /(new instruction|updated instruction|override|disregard|forget your|bypass your)/gi, description: 'Instruction injection' },
-  { type: 'prompt_leak', pattern: /(reveal your (prompt|instructions|system)|what('s| is) your (system )?prompt|print your instructions)/gi, description: 'Prompt leak attempt' },
-  { type: 'encoded_injection', pattern: /base64|rot13|hex decode|decode the following/gi, description: 'Encoded injection attempt' },
-];
-
+/**
+ * Prompt-injection validation, as an adapter over the one matcher (P5.1).
+ *
+ * The 7-regex table this file owned is gone; the `ValidationResult` shape its
+ * callers depend on is not. Severity now comes from the table rather than from
+ * a hardcoded list of "types that count as critical" kept in step by hand —
+ * which is the class of drift four separate tables produced in the first place.
+ */
 export function validatePromptInjection(text: string): ValidationResult {
-  const violations: ValidationViolation[] = [];
-  for (const { type, pattern, description } of INJECTION_PATTERNS) {
-    const matches = [...text.matchAll(pattern)];
-    for (const match of matches) {
-      violations.push({ type, description, matchedText: match[0], position: match.index });
-    }
-  }
+  const verdict = matchInjection(text);
+  const violations: ValidationViolation[] = verdict.matches.map((match) => ({
+    type: match.category,
+    description: `${match.category} (${match.id})`,
+    matchedText: match.matchedText,
+    position: match.position,
+  }));
   const severity: ValidationResult['severity'] =
-    violations.some(v => ['jailbreak', 'system_override', 'ignore_instructions'].includes(v.type)) ? 'critical'
-    : violations.length > 0 ? 'high' : 'none';
+    verdict.severity === 'critical' ? 'critical'
+    : verdict.detected ? 'high' : 'none';
   return makeResult('prompt_injection', 'Prompt Injection', violations, severity);
 }
 

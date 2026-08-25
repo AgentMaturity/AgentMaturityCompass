@@ -6,6 +6,7 @@ import {
   loadVerifiedToolsConfigSnapshot,
   validateToolRequest
 } from "../../toolhub/toolhubValidators.js";
+import { BLOCK_CONFIDENCE, matchInjection } from "../../shield/injection/injectionMatcher.js";
 import { RUN_CODE_TOOL } from "../toolPipeline.js";
 import type { ToolGuard } from "../toolTypes.js";
 
@@ -172,5 +173,31 @@ export function networkEgressGuard(workspace: string): ToolGuard {
     return hostAllowedForTool(definition, host)
       ? undefined
       : `egress denied: ${host} is not on the allowlist for ${execution.name}`;
+  };
+}
+
+/**
+ * Prompt injection, refused at the TOOL boundary (P5.1).
+ *
+ * The runtime firewall already inspects LLM traffic. This is the other half
+ * that P5.1 asks for: a payload can reach a tool without ever passing through
+ * the firewall — pasted into an argument by the model, read out of a file by
+ * one tool and handed to another, returned by a fetch and reused. The
+ * boundary that matters for a tool call is the tool call.
+ *
+ * BLOCK_CONFIDENCE, not every match. The shared table carries low-confidence
+ * obfuscation hints, and a percent-encoded byte appears in every URL — refusing
+ * on those would deny ordinary work while adding nothing.
+ */
+export function promptInjectionGuard(): ToolGuard {
+  return (execution) => {
+    const verdict = matchInjection(JSON.stringify(execution.arguments), {
+      minConfidence: BLOCK_CONFIDENCE
+    });
+    if (!verdict.detected) return undefined;
+    const first = verdict.matches[0];
+    // The rule id reaches the model, so a denial is actionable rather than
+    // mysterious — and a person reading evidence can find the pattern.
+    return `prompt injection refused at the tool boundary (${first?.id ?? "unknown"}, ${verdict.severity ?? "unknown"})`;
   };
 }

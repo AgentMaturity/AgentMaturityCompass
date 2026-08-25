@@ -23,6 +23,7 @@ import {
   type SignedControlJournalSnapshot
 } from "../lifecycle/signedControlJournal.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
+import { BLOCK_CONFIDENCE, matchInjection } from "../shield/injection/injectionMatcher.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { appendRuntimeRunEvent } from "./runManager.js";
@@ -922,7 +923,7 @@ function collectMatches(content: string, direction: RuntimeFirewallDirection, po
     matches.push(match);
   };
 
-  if (policy.rules.promptInjection && direction === "request" && /(ignore (all )?(previous|prior|system) instructions|reveal (the )?(system|hidden) prompt|jailbreak|developer message|bypass (policy|guardrails)|act as DAN)/i.test(content)) {
+  if (policy.rules.promptInjection && direction === "request" && matchInjection(content, { minConfidence: BLOCK_CONFIDENCE }).detected) {
     add({
       ruleId: "prompt-injection",
       surface: "Shield",
@@ -1058,8 +1059,7 @@ export function evaluateRuntimeFirewall(input: RuntimeFirewallEvaluateInput): Ru
   const resolvedPolicy = resolveEffectiveRuntimeFirewallPolicy(input);
   const loadedPolicy = resolvedPolicy.policy;
   const requirePolicy = input.requirePolicy === true || process.env.AMC_FIREWALL_ENABLED === "1";
-  // Deny by default (ADR-0011): no signed policy blocks; it used to go inert.
-  const policy = loadedPolicy ?? null;
+  const policy = loadedPolicy ?? null; // Deny by default (ADR-0011).
   const decisionId = `fw_${randomUUID()}`;
   const createdAt = new Date().toISOString();
   const agentId = input.agentId && input.agentId.trim().length > 0 ? input.agentId : "default";

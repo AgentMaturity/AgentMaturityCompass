@@ -1,4 +1,6 @@
 import { emitGuardEvent } from '../enforce/evidenceEmitter.js';
+import { matchInjection } from './injection/injectionMatcher.js';
+import { INJECTION_PATTERNS } from './injection/injectionPatterns.js';
 /**
  * Threat intelligence — pattern matching against known threat indicators.
  */
@@ -22,29 +24,23 @@ interface ThreatPattern {
   severity: ThreatMatch['severity'];
 }
 
-const BUILT_IN_PATTERNS: ThreatPattern[] = [
-  { re: /ignore\s+(previous|all|above)\s+(instructions|prompts|rules)/i, category: 'injection', severity: 'critical' },
-  { re: /you\s+are\s+now\s+(DAN|unrestricted|jailbroken)/i, category: 'jailbreak', severity: 'critical' },
-  { re: /\bsystem\s*:\s*you\s+are/i, category: 'injection', severity: 'high' },
-  { re: /\bact\s+as\s+(if|though)\s+you\s+(have\s+no|don't\s+have)/i, category: 'jailbreak', severity: 'high' },
-  { re: /\bexfiltrate\b/i, category: 'exfiltration', severity: 'critical' },
-  { re: /\bbase64\s+(encode|decode)\b.*\b(password|secret|key)\b/i, category: 'exfiltration', severity: 'high' },
-  { re: /\bcurl\b.*\b(password|token|secret)\b/i, category: 'exfiltration', severity: 'high' },
-  { re: /\bdata:text\/html\b/i, category: 'injection', severity: 'medium' },
-  { re: /\bprompt\s*leak/i, category: 'reconnaissance', severity: 'medium' },
-  { re: /\brepeat\s+(the\s+)?(system\s+)?(prompt|instructions)\b/i, category: 'reconnaissance', severity: 'medium' },
-];
-
+/**
+ * Threat matching, as an adapter over the one matcher (P5.1).
+ *
+ * This file owned a 10-regex table, and its flagship pattern was broken: it
+ * read `ignore <one word> instructions`, so "ignore all previous instructions"
+ * — two words — did not match. Measured, not inferred. Consolidating fixed it
+ * as a side effect of there being one table to fix.
+ */
 export function checkThreatIntel(text: string): ThreatIntelResult {
-  const threats: ThreatMatch[] = [];
+  const verdict = matchInjection(text);
+  const threats: ThreatMatch[] = verdict.matches.map((match) => ({
+    pattern: match.id,
+    category: match.category,
+    severity: match.severity,
+  }));
 
-  for (const pat of BUILT_IN_PATTERNS) {
-    if (pat.re.test(text)) {
-      threats.push({ pattern: pat.re.source, category: pat.category, severity: pat.severity });
-    }
-  }
-
-  const result = { matched: threats.length > 0, threats, totalEntries: BUILT_IN_PATTERNS.length };
+  const result = { matched: threats.length > 0, threats, totalEntries: INJECTION_PATTERNS.length };
   emitGuardEvent({
     agentId: 'system', moduleCode: 'S3',
     decision: result.matched ? 'deny' : 'allow',
@@ -57,8 +53,8 @@ export function checkThreatIntel(text: string): ThreatIntelResult {
 
 export function getStats(): { totalEntries: number; byCategory: Record<string, number> } {
   const byCategory: Record<string, number> = {};
-  for (const p of BUILT_IN_PATTERNS) {
-    byCategory[p.category] = (byCategory[p.category] ?? 0) + 1;
+  for (const pattern of INJECTION_PATTERNS) {
+    byCategory[pattern.category] = (byCategory[pattern.category] ?? 0) + 1;
   }
-  return { totalEntries: BUILT_IN_PATTERNS.length, byCategory };
+  return { totalEntries: INJECTION_PATTERNS.length, byCategory };
 }

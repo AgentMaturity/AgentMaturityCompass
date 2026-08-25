@@ -7,7 +7,13 @@ import { bashTool } from "../tools/builtin/bashTool.js";
 import { fsTools } from "../tools/builtin/fsTools.js";
 import { ReadBeforeEditLedger } from "../tools/builtin/readBeforeEdit.js";
 import { searchTools } from "../tools/builtin/searchTools.js";
-import { budgetGuard, networkEgressGuard, runtimeFirewallGuard, toolhubAllowlistGuard } from "../tools/guards/policyGuards.js";
+import {
+  budgetGuard,
+  networkEgressGuard,
+  promptInjectionGuard,
+  runtimeFirewallGuard,
+  toolhubAllowlistGuard
+} from "../tools/guards/policyGuards.js";
 import { ToolPipeline } from "../tools/toolPipeline.js";
 import { ToolRegistry } from "../tools/toolRegistry.js";
 import { pipelineToolSeam } from "./pipelineToolSeam.js";
@@ -136,6 +142,7 @@ export function agentToolset(options: AgentToolsetOptions): AgentToolset {
   // whichever denies first is simply the one named. Policy engines come before
   // the allowlist so a denial reads as "the firewall stopped this" rather than
   // "this tool is not listed", which is the more actionable of two true answers.
+  registry.guard("prompt-injection", promptInjectionGuard());
   registry.guard("runtime-firewall", runtimeFirewallGuard(workspace));
   registry.guard("budgets", budgetGuard(workspace));
   registry.guard("network-egress", networkEgressGuard(workspace));
