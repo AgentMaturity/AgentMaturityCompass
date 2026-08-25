@@ -29,6 +29,12 @@ interface VaultSession {
   payload: VaultPayload | null;
   lastUnlockedTs: number | null;
   passphrase: string | null;
+  /**
+   * Digest of the envelope this session was opened from. Unlocking is skipped
+   * only when the passphrase AND this digest both still match, so a vault
+   * replaced or re-encrypted on disk is never served from memory.
+   */
+  envelopeDigest: string | null;
 }
 
 const sessions = new Map<string, VaultSession>();
@@ -42,6 +48,7 @@ function evictStaleSessions(): void {
       session.passphrase = null;
       session.payload = null;
       session.unlocked = false;
+      session.envelopeDigest = null;
       sessions.delete(key);
     }
   }
@@ -142,12 +149,16 @@ function parseVaultPayload(raw: string): VaultPayload {
   };
 }
 
-function readEnvelope(workspace: string): VaultEnvelope {
+function readEnvelopeRaw(workspace: string): string {
   const paths = vaultPaths(workspace);
   if (!pathExists(paths.vaultFile)) {
     throw new Error(`Vault file not found: ${paths.vaultFile}`);
   }
-  return JSON.parse(readUtf8(paths.vaultFile)) as VaultEnvelope;
+  return readUtf8(paths.vaultFile);
+}
+
+function readEnvelope(workspace: string): VaultEnvelope {
+  return JSON.parse(readEnvelopeRaw(workspace)) as VaultEnvelope;
 }
 
 function writePublicAndHistory(file: string, historyFile: string, publicPem: string): void {
@@ -186,7 +197,8 @@ function sessionFor(workspace: string): VaultSession {
     unlocked: false,
     payload: null,
     lastUnlockedTs: null,
-    passphrase: null
+    passphrase: null,
+    envelopeDigest: null
   };
   sessions.set(workspace, created);
   return created;
@@ -227,6 +239,9 @@ export function createVault(params: {
   };
   const encrypted = encryptVaultPayload(Buffer.from(JSON.stringify(payload), "utf8"), passphrase);
   writeFileAtomic(paths.vaultFile, JSON.stringify(encrypted, null, 2), 0o600);
+  // The envelope on disk just changed, so any session opened from the previous
+  // one must derive again rather than trust its cached digest.
+  sessionFor(params.workspace).envelopeDigest = null;
   try {
     chmodSync(paths.vaultFile, 0o600);
   } catch {
@@ -264,19 +279,28 @@ export function unlockVault(workspace: string, passphrase?: string): void {
   if (!phrase || phrase.length === 0) {
     throw new Error("Vault unlock requires passphrase (set AMC_VAULT_PASSPHRASE or use `amc vault unlock`).");
   }
-  const envelope = readEnvelope(workspace);
+  const session = sessionFor(workspace);
+  const envelopeRaw = readEnvelopeRaw(workspace);
+  const envelopeDigest = sha256Hex(Buffer.from(envelopeRaw, "utf8"));
+  if (session.unlocked && session.passphrase === phrase && session.envelopeDigest === envelopeDigest) {
+    // Already open on this exact envelope. Re-deriving the key costs a full
+    // KDF (~24ms) and cannot reach a different answer — and signArtifactFile
+    // reaches here on every signed artifact AMC writes.
+    session.lastUnlockedTs = Date.now();
+    return;
+  }
   let payload: VaultPayload;
   try {
-    payload = parseVaultPayload(decryptVaultPayload(envelope, phrase).toString("utf8"));
+    payload = parseVaultPayload(decryptVaultPayload(JSON.parse(envelopeRaw) as VaultEnvelope, phrase).toString("utf8"));
   } catch {
     /* decryption or parse failed — rethrow with user-friendly message */
     throw new Error("Vault unlock failed: incorrect passphrase or corrupted vault.");
   }
-  const session = sessionFor(workspace);
   session.unlocked = true;
   session.payload = payload;
   session.lastUnlockedTs = Date.now();
   session.passphrase = phrase;
+  session.envelopeDigest = envelopeDigest;
 
   if (!payload.leasePrivateKeyPem || !payload.sessionPrivateKeyPem) {
     const leasePair = generateKeyPairSync("ed25519");
@@ -308,6 +332,7 @@ export function lockVault(workspace: string): void {
   session.unlocked = false;
   session.payload = null;
   session.passphrase = null;
+  session.envelopeDigest = null;
 }
 
 export function vaultStatus(workspace: string): {

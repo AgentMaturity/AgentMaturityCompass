@@ -1200,21 +1200,21 @@ export function evaluateRuntimeFirewall(input: RuntimeFirewallEvaluateInput): Ru
     ...decision,
     eventPath: path
   };
-  writeFileAtomic(path, `${JSON.stringify(withPath, null, 2)}\n`, 0o644);
-  const signed = trySignArtifactFile({ workspace, path, artifactKind: "runtime-firewall-decision" });
-  if (!signed) {
-    return recordRuntimeRunDecision(input, withPath);
-  }
+  // Sign once, over the bytes that stay on disk. Writing, signing, embedding
+  // the resulting path and signing AGAIN discarded the first signature — and
+  // the .sig path is deterministic, so that pass computed nothing new.
   const signedDecision: RuntimeFirewallDecision = {
     ...withPath,
-    signaturePath: signed.sigPath
+    signaturePath: artifactSigPath(path)
   };
   writeFileAtomic(path, `${JSON.stringify(signedDecision, null, 2)}\n`, 0o644);
-  const refreshed = trySignArtifactFile({ workspace, path, artifactKind: "runtime-firewall-decision" });
-  return recordRuntimeRunDecision(input, {
-    ...signedDecision,
-    signaturePath: refreshed?.sigPath ?? signed.sigPath
-  });
+  const signed = trySignArtifactFile({ workspace, path, artifactKind: "runtime-firewall-decision" });
+  if (!signed) {
+    // Signing failed, so the record must not claim a signature that is absent.
+    writeFileAtomic(path, `${JSON.stringify(withPath, null, 2)}\n`, 0o644);
+    return recordRuntimeRunDecision(input, withPath);
+  }
+  return recordRuntimeRunDecision(input, signedDecision);
 }
 
 export function listRuntimeFirewallDecisions(input: { workspace: string; limit?: number; redacted?: boolean }): RuntimeFirewallDecision[] {
