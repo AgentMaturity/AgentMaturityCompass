@@ -6,6 +6,7 @@ import {
   getApprovalInboxItem,
 } from "./approvalInbox.js";
 import { parseApprovalActivityQuery, searchApprovalActivity } from "./approvalActivity.js";
+import { registerApprovalAskCommand } from "./approvalAskCommand.js";
 import {
   parseApprovalMode,
   parseApprovalReviewerRoles
@@ -21,6 +22,11 @@ interface ApprovalReviewerOptions {
 
 export function registerApprovalCliCommands(program: Command): void {
   const approvals = program.command("approvals").description("Signed approval inbox operations");
+
+  // The ASKING side of the same group. Registered here rather than from cli.ts
+  // because src/cli.ts sits at its line-ratchet baseline, and because a question
+  // and its answer belong under one command group.
+  registerApprovalAskCommand(approvals);
 
   approvals
     .command("list")

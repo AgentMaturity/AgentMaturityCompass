@@ -37,6 +37,7 @@
  */
 import type { Command } from "commander";
 import chalk from "chalk";
+import { readFileSync } from "node:fs";
 import type { LlmRouteConfig } from "./llm/adapter/adapterRegistry.js";
 import { anthropicAdapter } from "./llm/providers/anthropicAdapter.js";
 import { openaiAdapter } from "./llm/providers/openaiAdapter.js";
@@ -50,6 +51,15 @@ import {
 import type { LoopNotification } from "./agent/loopTypes.js";
 import { echoToolSeam } from "./agent/echoTool.js";
 import { readAgentRunSummary, renderRunSummary, renderVerifyReport, verifyAgentRun } from "./agent/runReport.js";
+import { registerPromptCommands } from "./cli-prompt-commands.js";
+import { isActionClass } from "./governor/actionCatalog.js";
+import type { ActionClass } from "./types.js";
+import type { ApprovalAnswerer, ApprovalRiskTier } from "./approvals/seam/approvalSeamTypes.js";
+import {
+  createApprovalExceptionAnswerer,
+  describeApprovalException,
+  parseApprovalExceptionNote
+} from "./approvals/seam/devProfileException.js";
 
 /** The side-effecting edges, injectable so the wiring itself is testable. */
 export interface AgentLoopCliIo {
@@ -86,7 +96,90 @@ interface RunOptions {
   cancelAfter?: string;
   steer?: string;
   steerAfter?: string;
+  persona?: string;
+  approveTools?: string;
+  approveRisk?: string;
+  approvalException?: string;
   json?: boolean;
+}
+
+const RISK_TIERS: readonly ApprovalRiskTier[] = ["low", "medium", "high", "critical"];
+
+/** What the run's tool calls need before they may run, or `null` when nothing does. */
+interface ApprovalGateChoice {
+  readonly actionClass: ActionClass;
+  readonly riskTier: ApprovalRiskTier;
+  readonly answerers: readonly ApprovalAnswerer[];
+}
+
+/**
+ * Build the approval gate the operator asked for.
+ *
+ * Returns `undefined` when they asked for none, and `null` when they asked for
+ * one that cannot be built — the two must not be confused, because "no gate" is
+ * a run that proceeds and "broken gate" is a run that must not.
+ *
+ * THE ADR-5 EXCEPTION IS LOADED FROM A FILE, NOT FROM FLAGS. Turning human
+ * approval off has to be a document somebody wrote, reviewed and can commit —
+ * with a tracked id, a named approver and an expiry — rather than an argument
+ * somebody typed. The banner is printed to stderr because an exception nobody
+ * sees is a default; the durable record is the signed `approval/answer` row,
+ * which names the exception on every call it grants.
+ */
+function approvalGateFor(
+  io: AgentLoopCliIo,
+  opts: RunOptions
+): ApprovalGateChoice | null | undefined {
+  if (opts.approveTools === undefined) {
+    if (opts.approvalException !== undefined) {
+      io.error(
+        chalk.red(
+          "--approval-exception only means something with --approve-tools: it relaxes a gate, " +
+            "and this run has no gate to relax."
+        )
+      );
+      io.fail();
+      return null;
+    }
+    return undefined;
+  }
+  const actionClass = opts.approveTools.trim().toUpperCase();
+  if (!isActionClass(actionClass)) {
+    io.error(chalk.red(`--approve-tools must be an action class, got ${JSON.stringify(opts.approveTools)}`));
+    io.fail();
+    return null;
+  }
+  const riskTier = (opts.approveRisk ?? "high").trim().toLowerCase();
+  if (!(RISK_TIERS as readonly string[]).includes(riskTier)) {
+    io.error(chalk.red(`--approve-risk must be one of ${RISK_TIERS.join(", ")}`));
+    io.fail();
+    return null;
+  }
+  const answerers: ApprovalAnswerer[] = [];
+  if (opts.approvalException !== undefined) {
+    try {
+      const note = parseApprovalExceptionNote(
+        JSON.parse(readFileSync(opts.approvalException, "utf8")) as unknown
+      );
+      answerers.push(
+        createApprovalExceptionAnswerer(note, {
+          onLapsed: () => {
+            io.error(
+              chalk.yellow(
+                `ADR-5 exception ${note.exceptionId} has lapsed; questions now go to the approvals engine.`
+              )
+            );
+          }
+        })
+      );
+      io.error(chalk.yellow(describeApprovalException(note)));
+    } catch (error: unknown) {
+      io.error(chalk.red(error instanceof Error ? error.message : String(error)));
+      io.fail();
+      return null;
+    }
+  }
+  return { actionClass, riskTier: riskTier as ApprovalRiskTier, answerers };
 }
 
 /** Parse a positive-integer option, or report the flag that was wrong. */
@@ -211,6 +304,12 @@ async function importRunner(
 }
 
 export function registerAgentCommands(program: Command, io: AgentLoopCliIo = defaultIo): void {
+  // The system-prompt group is registered from here rather than from cli.ts
+  // because cli.ts sits at its line-ratchet floor, and because the assembled
+  // prompt is the IDENTITY half of the same native-agent surface `agent-loop`
+  // runs — the two answer halves of one question and belong together.
+  registerPromptCommands(program, io);
+
   const group = program
     .command("agent-loop", { hidden: true })
     .description("Run and verify a native agent turn over the signed session spine (internal)");
@@ -233,6 +332,16 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
     .option("--cancel-after <ms>", "cancel the turn after this many milliseconds (Ctrl-C does the same)")
     .option("--steer <text>", "send a steering message mid-turn")
     .option("--steer-after <ms>", "when to send --steer (default 0)")
+    .option("--persona <text>", "deployment persona assembled into the system prompt")
+    .option(
+      "--approve-tools <actionClass>",
+      "require a signed human approval before every tool call, decided under this action class"
+    )
+    .option("--approve-risk <tier>", "risk tier the approval is raised at (default high)")
+    .option(
+      "--approval-exception <file>",
+      "ADR-5 exception note (JSON) that auto-allows the classes it names until it expires"
+    )
     .option("--json", "Output as JSON")
     .action(async (promptParts: string[], opts: RunOptions) => {
       const prompt = promptParts.join(" ").trim();
@@ -260,6 +369,8 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
       }
       const route = routeFor(io, providerId, opts);
       if (route === null) return;
+      const gate = approvalGateFor(io, opts);
+      if (gate === null) return;
       const runner = await importRunner(io);
       if (runner === null) return;
 
@@ -278,7 +389,30 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
         const outcome = await runner.runComposedTurn({
           workspace: process.cwd(),
           agentId: "default",
-          systemPrompt: "You are an AMC-governed agent. Every step you take is recorded as signed evidence.",
+          // No pinned `systemPrompt`: the prompt is ASSEMBLED, which is what
+          // gives the run its identity and pulls the workspace's own AGENTS.md /
+          // CLAUDE.md in as runtime context. A hardcoded string here — what this
+          // command sent before P3.3 — was an agent with no idea where it was.
+          promptProfile: opts.persona === undefined ? {} : { persona: opts.persona },
+          ...(gate === undefined
+            ? {}
+            : {
+                approvalGate: {
+                  actionClass: gate.actionClass,
+                  riskTier: gate.riskTier,
+                  answerers: gate.answerers,
+                  onRaised: (event) => {
+                    // The operator cannot answer a question whose id they do not
+                    // have, and it only exists once the engine has minted it.
+                    io.error(
+                      chalk.yellow(
+                        `awaiting approval ${event.approvalRequestId} — ` +
+                          `answer it with: amc approvals approve --agent default --id ${event.approvalRequestId}`
+                      )
+                    );
+                  }
+                }
+              }),
           prompt,
           route: { providerId, model, params: paramsFor(providerId, maxTokens) },
           routes: [route],

@@ -65,7 +65,15 @@ export interface AgentLoopServiceConfig {
    */
   readonly llm: LoopLlm;
   readonly route: LoopRoute;
-  /** The `system/prompt` row this run's requests cite. P3.3 replaces it with an assembly. */
+  /**
+   * The `system/prompt` row this run's requests cite.
+   *
+   * Still an event ID after P3.3, and deliberately so: the loop cites a row that
+   * is already committed, and handing it an assembly instead would move the
+   * decision of when the prompt becomes evidence inside the loop. What P3.3
+   * changed is who produces the text — `amcPrompt` assembles it, the composer
+   * records it, and the loop is handed the receipt.
+   */
   readonly systemPromptEventId: string;
   readonly tools?: AgentToolSeam;
   readonly hooks?: LoopHooks;

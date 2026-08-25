@@ -1,5 +1,5 @@
 /**
- * One agent turn, run through the COMPOSED tree (plan P3.2 stage 4).
+ * One agent turn, run through the COMPOSED tree (plan P3.2, extended by P3.3).
  *
  * WHY THIS MODULE EXISTS. `amc agent-loop run` has to reach `ctx.amcAgentLoop`,
  * and a CLI module may not import the vendored Cordis packages — the
@@ -13,7 +13,17 @@
  * built an `AgentDriver` directly, the Cordis services would have no caller but
  * their own tests — the exact shape P2.4 shipped and this phase was told not to
  * repeat. There is therefore ONE path from an operator to a turn, and it runs
- * through every seam: `amcCredentials` → `amcLlm` → `amcAgentLoop`.
+ * through every seam: `amcCredentials` → `amcLlm` → `amcPrompt` →
+ * (`amcApproval`) → `amcAgentLoop`.
+ *
+ * WHAT P3.3 ADDED, AND WHERE IT SITS IN THAT ORDER. `amcPrompt` is composed
+ * before the loop because the loop needs the `system/prompt` row's id at
+ * construction, and because rendering the prompt EARLY is what makes an
+ * unresolvable `{{variable}}` cost nothing: it throws with no turn started and
+ * no request sent. `amcApproval` is composed only when the caller asked for a
+ * gate, and its presence is what permits the system prompt to tell the model
+ * that approval exists — see {@link promptProfileFor} for why that is derived
+ * rather than configured.
  *
  * THE COMPOSITION IS SEQUENTIAL ON PURPOSE. Each fiber is awaited before the
  * next is registered, so a service that failed to boot fails here, named, rather
@@ -29,11 +39,18 @@
  */
 import { Context } from "@amc/cordis";
 import { createHash } from "node:crypto";
-import type { AgentLoopConfig, AgentStatus, LoopNotification } from "../agent/loopTypes.js";
+import { gateToolCallsOnApproval, type ToolApprovalGateOptions } from "../agent/approvalGate.js";
+import type { AgentLoopConfig, AgentStatus, LoopHooks, LoopNotification } from "../agent/loopTypes.js";
 import type { LoopRoute } from "../agent/stepRunner.js";
-import type { AgentToolSeam } from "../agent/toolSeam.js";
+import { EMPTY_TOOL_SEAM, type AgentToolSeam } from "../agent/toolSeam.js";
+import type { ApprovalAnswerer } from "../approvals/seam/approvalSeamTypes.js";
 import type { LlmRouteConfig } from "../llm/adapter/adapterRegistry.js";
 import type { HttpTransport } from "../llm/adapter/transport.js";
+import {
+  agentPromptProfile,
+  type AgentPromptProfile,
+  type AgentPromptProfileOptions
+} from "../prompt/agentPromptProfile.js";
 import { SessionService } from "../session/sessionService.js";
 import type { TurnCancelCause } from "../session/sessionTypes.js";
 import { amcVersion } from "../version.js";
@@ -41,8 +58,46 @@ import { credentialsServices, CREDENTIALS_SEAM } from "./services/credentialsSer
 import type { CredentialsSeamService, CredentialsServiceConfig } from "./services/credentialsServices.js";
 import { llmServices, LLM_SEAM } from "./services/llmServices.js";
 import type { LlmSeamService } from "./services/llmServices.js";
+import { promptServices, PROMPT_SEAM } from "./services/promptServices.js";
+import type { PromptSeamService } from "./services/promptServices.js";
+import { approvalServices, APPROVAL_SEAM } from "./services/approvalServices.js";
+import type { ApprovalSeamService } from "./services/approvalServices.js";
 import { agentLoopServices, AGENT_LOOP_SEAM } from "./services/agentLoopServices.js";
 import type { AgentLoopSeamService } from "./services/agentLoopServices.js";
+
+/** The section name a pinned system prompt is registered under. */
+export const PINNED_PROMPT_SECTION = "host:pinned-prompt";
+
+/**
+ * Order of the pinned section.
+ *
+ * It is a `complete` section, so it replaces the section LIST rather than
+ * joining it and the order never decides anything — but a registered section
+ * still needs one, and a value below the harness identity says plainly that this
+ * is the whole prompt and not an addition to the front of it.
+ */
+export const PINNED_PROMPT_ORDER = -1000;
+
+/** Deployment-level prompt choices. The workspace, agent and guardrails are derived. */
+export type ComposedPromptOptions = Omit<
+  AgentPromptProfileOptions,
+  "workspace" | "agentId" | "approvalGated"
+>;
+
+/** How this run gates tool calls on a human. */
+export interface ComposedApprovalGate extends ToolApprovalGateOptions {
+  /**
+   * Answerers consulted AHEAD of the approvals engine, in order.
+   *
+   * The ADR-5 dev-profile exception is composed here and nowhere else — see
+   * src/approvals/seam/devProfileException.ts. It is a parameter rather than a
+   * flag because an exception has to be constructed, and constructing one
+   * requires stating a tracked id, a person and an expiry.
+   */
+  readonly answerers?: readonly ApprovalAnswerer[];
+  /** Reports the engine request id the moment it exists, so a UI can render the prompt. */
+  readonly onRaised?: (event: { readonly approvalId: string; readonly approvalRequestId: string }) => void;
+}
 
 /** What a caller may do to a turn while it runs. */
 export interface ComposedTurnHandle {
@@ -54,8 +109,32 @@ export interface ComposedTurnHandle {
 export interface ComposedTurnOptions {
   readonly workspace: string;
   readonly agentId: string;
-  /** Recorded as the `system/prompt` row every request in this run cites. */
-  readonly systemPrompt: string;
+  /**
+   * Pins the exact `system/prompt` text, bypassing assembly.
+   *
+   * Registered as a `complete` section, so it REPLACES the assembled sections
+   * rather than joining them. Omitted — the ordinary case — the prompt is
+   * assembled from the profile, which is what gives a run its identity.
+   */
+  readonly systemPrompt?: string;
+  /**
+   * Deployment prompt choices: persona, identity override, instruction budgets.
+   *
+   * Omitted alongside a pinned `systemPrompt`, the run carries NO runtime
+   * context: pinning the prompt is a statement about exactly what the model
+   * sees, and quietly appending a snapshot to it would falsify that statement.
+   * Omitted on its own, the default native-agent profile applies.
+   */
+  readonly promptProfile?: ComposedPromptOptions;
+  /**
+   * Compose the approval seam and put it in front of every tool call.
+   *
+   * Its presence is also what lets the system prompt tell the model that
+   * approval exists — see {@link promptProfileFor}. A composition that claimed
+   * the guardrail without installing it would be lying to the model in a signed
+   * row, so the claim is derived from the gate rather than configured beside it.
+   */
+  readonly approvalGate?: ComposedApprovalGate;
   /** The prompt that opens the turn. Enters the durable inbox like any other message. */
   readonly prompt: string;
   readonly route: LoopRoute;
@@ -84,6 +163,16 @@ export interface ComposedTurnOutcome {
   readonly sessionId: string;
   /** The driver's terminal state. `failed` means the spine refused a closer. */
   readonly status: AgentStatus;
+  /**
+   * The `system/prompt` row every request in this run cites.
+   *
+   * Returned so a caller can read the prompt back out of the SIGNED LOG rather
+   * than trusting a copy this function handed it. The two would agree today;
+   * only one of them is evidence.
+   */
+  readonly systemPromptEventId: string;
+  /** The section names in the order they assembled, for an operator summary. */
+  readonly promptSections: readonly string[];
 }
 
 /** Read a composed service off the tree by the name its seam declares. */
@@ -96,16 +185,57 @@ function serviceOn<T>(ctx: Context, name: string): T {
 }
 
 /**
+ * The prompt profile this run assembles from.
+ *
+ * TWO DERIVATIONS HAPPEN HERE AND NEITHER IS CONFIGURABLE, because both are
+ * claims the prompt makes about the run and a claim the run cannot honour must
+ * not be sayable:
+ *
+ *   `approvalGated` follows the presence of the gate. The model is told that
+ *   approval blocks tool calls only when something really is in front of them.
+ *
+ *   A pinned prompt with no profile carries NO context plugins. Pinning says
+ *   "this exact text is what the model sees"; appending a runtime snapshot to it
+ *   would make that false while the log recorded it as true.
+ */
+function promptProfileFor(options: ComposedTurnOptions): AgentPromptProfile {
+  const pinned = options.systemPrompt;
+  const profile = agentPromptProfile({
+    workspace: options.workspace,
+    agentId: options.agentId,
+    approvalGated: options.approvalGate !== undefined,
+    ...(pinned !== undefined && options.promptProfile === undefined ? { contextPlugins: [] } : {}),
+    ...(options.promptProfile ?? {})
+  });
+  if (pinned === undefined) return profile;
+  return {
+    ...profile,
+    sections: [
+      ...profile.sections,
+      { name: PINNED_PROMPT_SECTION, order: PINNED_PROMPT_ORDER, text: pinned, complete: true }
+    ]
+  };
+}
+
+/**
  * What this run was composed from, as a digest.
  *
  * Recorded on the `session/open` row, so "which build of which composition
  * produced this session" is answerable from the log alone. It commits to the
- * plugin names, the routes registered and the model actually addressed — the
- * three things that decide what the agent could do.
+ * plugin names, the routes registered, the model actually addressed, what the
+ * prompt was built out of, and whether a human stood in front of the tools —
+ * the facts that decide what the agent could do and what it was told it could do.
  */
-function compositionDigestOf(options: ComposedTurnOptions): string {
+function compositionDigestOf(options: ComposedTurnOptions, profile: AgentPromptProfile): string {
+  const gate = options.approvalGate;
   const shape = JSON.stringify({
-    plugins: [credentialsServices.name, llmServices.name, agentLoopServices.name],
+    plugins: [
+      credentialsServices.name,
+      llmServices.name,
+      promptServices.name,
+      ...(gate === undefined ? [] : [approvalServices.name]),
+      agentLoopServices.name
+    ],
     providers: options.routes.map((route) => ({
       providerId: route.providerId,
       adapterId: route.adapter.id,
@@ -114,6 +244,24 @@ function compositionDigestOf(options: ComposedTurnOptions): string {
       models: route.models
     })),
     route: { providerId: options.route.providerId, model: options.route.model },
+    prompt: {
+      sections: profile.sections.map((section) => section.name),
+      contexts: profile.contextPlugins.map((plugin) => plugin.name),
+      variables: Object.keys(profile.variables).sort(),
+      pinned: options.systemPrompt !== undefined
+    },
+    // The answerer NAMES are the point: an ADR-5 exception renders its tracked
+    // id, its approver and its expiry into its name, so composing one changes
+    // this digest and the change is attributable.
+    approval:
+      gate === undefined
+        ? null
+        : {
+            actionClass: gate.actionClass,
+            riskTier: gate.riskTier,
+            toolNames: gate.toolNames ?? null,
+            answerers: (gate.answerers ?? []).map((answerer) => answerer.name)
+          },
     version: amcVersion
   });
   return createHash("sha256").update(shape).digest("hex");
@@ -133,11 +281,12 @@ function policyDigestOf(options: ComposedTurnOptions): string {
  * command exit with work still committed to the inbox.
  */
 export async function runComposedTurn(options: ComposedTurnOptions): Promise<ComposedTurnOutcome> {
+  const profile = promptProfileFor(options);
   const session = new SessionService(options.workspace);
   session.open({
     agentId: options.agentId,
     harnessVersion: amcVersion,
-    compositionDigest: compositionDigestOf(options),
+    compositionDigest: compositionDigestOf(options, profile),
     policyDigest: policyDigestOf(options)
   });
   const sessionId = session.sessionId;
@@ -159,24 +308,69 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
     await llmFiber.await();
     fibers.push(llmFiber);
 
+    const promptFiber = ctx.plugin(promptServices, { profile, sessionId });
+    await promptFiber.await();
+    fibers.push(promptFiber);
+    const prompt = serviceOn<PromptSeamService>(ctx, PROMPT_SEAM.name);
+
+    // Rendered BEFORE the loop is composed, so an unknown `{{variable}}` throws
+    // here — with no turn started, no request sent, and a session that closes
+    // cleanly in the `finally`. A prompt with a hole in it never reaches a model.
+    const systemPromptRef = session.recordSystemPrompt(prompt.render());
+
+    const gate = options.approvalGate;
+    let approval: ApprovalSeamService | null = null;
+    if (gate !== undefined) {
+      const approvalFiber = ctx.plugin(approvalServices, {
+        session,
+        workspace: options.workspace,
+        agentId: options.agentId,
+        ...(gate.answerers === undefined ? {} : { answerers: gate.answerers }),
+        ...(gate.onRaised === undefined ? {} : { onRaised: gate.onRaised })
+      });
+      await approvalFiber.await();
+      fibers.push(approvalFiber);
+      approval = serviceOn<ApprovalSeamService>(ctx, APPROVAL_SEAM.name);
+    }
+
+    // The COMPOSED seam gates the COMPOSED tools. A gate built over a seam this
+    // function constructed on the side would be a second approval path, and the
+    // second one is always the one that forgets a rule.
+    //
+    // A gate with no tool seam still wraps EMPTY_TOOL_SEAM rather than being
+    // skipped. That keeps the invariant the system prompt depends on airtight:
+    // when `approvalGate` is set, EVERY call this loop can make goes through an
+    // approval — including the invented call a model makes at a mount that
+    // offers nothing — so the sentence telling the model so is true of the whole
+    // composition and not only of its configured half.
+    const tools: AgentToolSeam | undefined =
+      approval === null || gate === undefined
+        ? options.tools
+        : gateToolCallsOnApproval(options.tools ?? EMPTY_TOOL_SEAM, approval, gate);
+
+    // Always present, so context reaches the model whether or not anyone asked
+    // to watch. `notify` is the live mirror and is optional; `preStep` is how the
+    // workspace's own instructions get in front of the agent, and is not.
+    const hooks: LoopHooks = {
+      preStep: prompt.preStep,
+      turnStopping: () => Promise.resolve(),
+      notify:
+        options.notify ??
+        ((): void => {
+          // A run with no observer is a normal configuration, not an error.
+        })
+    };
+
     const loopFiber = ctx.plugin(agentLoopServices, {
       session,
       // The COMPOSED model seam, not a runtime built beside it: that is what
       // makes this a composition rather than three objects in a function.
       llm: serviceOn<LlmSeamService>(ctx, LLM_SEAM.name),
       route: options.route,
-      systemPromptEventId: session.recordSystemPrompt(options.systemPrompt).eventId,
-      ...(options.tools !== undefined ? { tools: options.tools } : {}),
+      systemPromptEventId: systemPromptRef.eventId,
+      ...(tools !== undefined ? { tools } : {}),
       ...(options.config !== undefined ? { config: options.config } : {}),
-      ...(options.notify !== undefined
-        ? {
-            hooks: {
-              preStep: (_input, next) => next(),
-              turnStopping: () => Promise.resolve(),
-              notify: options.notify
-            }
-          }
-        : {})
+      hooks
     });
     await loopFiber.await();
     fibers.push(loopFiber);
@@ -203,7 +397,15 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
       }, steer.afterMs);
     }
     await loop.whenIdle();
-    return { sessionId, status: loop.status };
+    return {
+      sessionId,
+      status: loop.status,
+      systemPromptEventId: systemPromptRef.eventId,
+      // From the ASSEMBLY, not from `sectionNames()`: a `complete` section
+      // replaces the section list, and reporting the registered names there
+      // would name sections the prompt does not contain.
+      promptSections: prompt.assemble().sections.map((section) => section.name)
+    };
   } finally {
     if (steerTimer !== null) clearTimeout(steerTimer);
     // Reverse order: the loop lets go of the model seam before the model seam

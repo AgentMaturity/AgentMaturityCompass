@@ -19,6 +19,7 @@ import { buildRequestOutcomeMeta, requestOutcomeEventType } from "./requestOutco
 import type { RequestOutcomeParams } from "./requestOutcomeMeta.js";
 import { assertToolSchemaCommitted } from "./toolSchemaCommitment.js";
 import { buildStepEndMeta, buildTurnEndMeta } from "./turnLifecycleMeta.js";
+import { buildApprovalRow } from "./approvalEventMeta.js";
 import { buildLoopEventRow } from "./loopEventMeta.js";
 import type { LoopEventRecord } from "./loopEventMeta.js";
 import type { SurfaceKind } from "./sessionTypes.js";
@@ -549,33 +550,31 @@ export class SessionService {
     });
   }
 
+  // The approval audit pair. BOTH halves are turn-enclosed, and `requireTurn` is
+  // what enforces it rather than a comment asking callers to be careful.
+  //
+  // WHY A TURN IS REQUIRED. The turn is this log's commit and replay boundary:
+  // its `turn/seal` commits to a Merkle root over exactly the events inside its
+  // window. An approval row appended between turns is in no window, so it is
+  // covered by no seal — the one row an auditor most needs sealed would be the
+  // one row that is not. The answer row was additionally being written with
+  // `turn: null, step: null`, so even the pair's own halves could land in
+  // different windows. Both now carry the same open turn and step, so the whole
+  // decision sits inside one sealed window.
+  //
+  // The refusal is deliberately loud. An asker that has no turn open is asking
+  // outside the lifetime of the work the answer would authorize, and the honest
+  // response to that is to fail, never to log it somewhere weaker.
   recordApproval(record: ApprovalRecord): SessionEventRef {
-    this.ensureUsable();
-    if (record.phase === "request") {
-      return this.appendSessionEvent({
-        eventType: "approval/request",
-        typeMeta: {
-          turn: this.currentTurn,
-          step: this.currentStep,
-          approvalId: record.approvalId,
-          toolCallId: record.toolCallId,
-          question: record.question
-        },
-        surface: { op: "none" },
-        turn: this.currentTurn,
-        step: this.currentStep
-      });
-    }
+    const turn = this.requireTurn();
+    const step = this.currentStep;
+    const row = buildApprovalRow(record, turn, step);
     return this.appendSessionEvent({
-      eventType: "approval/answer",
-      typeMeta: {
-        approvalId: record.approvalId,
-        answer: record.answer,
-        answeredBy: record.answeredBy
-      },
+      eventType: row.eventType,
+      typeMeta: row.meta,
       surface: { op: "none" },
-      turn: null,
-      step: null
+      turn,
+      step
     });
   }
 

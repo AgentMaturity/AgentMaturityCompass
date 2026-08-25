@@ -172,6 +172,11 @@ export interface ToolResultInput {
 /**
  * One shape for both approval/request and approval/answer, discriminated on
  * `phase`, so the two halves of an approval share a call surface.
+ *
+ * `approvalId` is what PAIRS them, and it is minted by the asker rather than by
+ * whoever answers: the question has to be logged before anybody may answer it,
+ * so the id cannot come from the answer. See ./approvalEventMeta.ts for the row
+ * shapes and for why the answer names the approvals-engine chain it came from.
  */
 export type ApprovalRecord =
   | {
@@ -179,12 +184,25 @@ export type ApprovalRecord =
       readonly approvalId: string;
       readonly toolCallId: string;
       readonly question: string;
+      /**
+       * The tool and action class the question is about.
+       *
+       * Recorded on the ROW rather than left to the prose in `question`, because
+       * "which tool was this" is the first thing an auditor filters on and a
+       * sentence is not a field. Nullable for an ask that is not about a tool.
+       */
+      readonly toolName?: string | null;
+      readonly actionClass?: string | null;
     }
   | {
       readonly phase: "answer";
       readonly approvalId: string;
       readonly answer: ApprovalAnswer;
       readonly answeredBy: string;
+      /** The approvals-engine request this verdict came from, or null when none was raised. */
+      readonly approvalRequestId?: string | null;
+      /** Why — above all, why `unavailable`, which is otherwise indistinguishable from silence. */
+      readonly reason?: string | null;
     };
 
 export interface SandboxModeInput {
