@@ -141,7 +141,18 @@ export class ToolPipeline {
     };
 
     const outcome = await this.runStages(execution, definition.body);
-    this.init.record?.(execution, outcome);
+    try {
+      this.init.record?.(execution, outcome);
+    } catch {
+      // The guarantee belongs HERE, not to each recorder. A recorder that
+      // threw would turn an evidence problem into a tool failure, and the
+      // model would see a denial that policy never made. The gap shows in the
+      // spine as a missing row rather than as a wrong answer to the caller.
+      //
+      // It was previously the caller's job, which made it untestable: proving
+      // it required a recorder that genuinely failed, and every filesystem
+      // sabotage I tried was survived by SQLite.
+    }
     return outcome;
   }
 

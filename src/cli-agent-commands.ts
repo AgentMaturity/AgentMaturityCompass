@@ -420,6 +420,9 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
           ));
         }
         toolSeam = toolset.seam;
+        // The toolset holds one evidence handle for the run; release it when
+        // the process ends rather than leaking a SQLite handle per agent.
+        process.once("exit", () => toolset.close());
       } else if (toolMode === "echo") {
         toolSeam = echoToolSeam();
       }

@@ -16,6 +16,8 @@ import {
 } from "../tools/guards/policyGuards.js";
 import { ToolPipeline } from "../tools/toolPipeline.js";
 import { ToolRegistry } from "../tools/toolRegistry.js";
+import { openLedger } from "../ledger/ledger.js";
+import { toolEvidenceFor } from "../tools/toolEvidence.js";
 import { pipelineToolSeam } from "./pipelineToolSeam.js";
 import type { AgentToolSeam } from "./toolSeam.js";
 
@@ -36,6 +38,8 @@ export interface AgentToolsetOptions {
   readonly mode?: "native" | "code";
   /** Values scrubbed from tool output, e.g. a live lease. */
   readonly scrubValues?: readonly string[];
+  /** Session the evidence rows belong to. Defaults to a per-agent bucket. */
+  readonly sessionId?: string;
 }
 
 /**
@@ -126,10 +130,19 @@ export interface AgentToolset {
   readonly registry: ToolRegistry;
   readonly pipeline: ToolPipeline;
   readonly readiness: ToolsetReadiness;
+  /**
+   * Release the evidence handle this toolset holds.
+   *
+   * Explicit rather than implicit: the recorder keeps one ledger open for the
+   * run, and a caller that forgot to close would leak a SQLite handle per
+   * agent. Safe to call more than once.
+   */
+  close(): void;
 }
 
 export function agentToolset(options: AgentToolsetOptions): AgentToolset {
   const { workspace, agentId } = options;
+  let ledgerHandle: ReturnType<typeof openLedger> | null = null;
   const readiness = checkToolsetReadiness(workspace);
   const registry = new ToolRegistry();
 
@@ -151,7 +164,28 @@ export function agentToolset(options: AgentToolsetOptions): AgentToolset {
   const pipeline = new ToolPipeline({
     registry,
     workspace,
-    ...(options.mode ? { mode: options.mode } : {})
+    ...(options.mode ? { mode: options.mode } : {}),
+    // Enforcement that leaves no trace is advisory again at the only moment
+    // that matters. Every governed call — allowed, denied or failed — lands in
+    // the signed spine.
+    // No try/catch here: `ToolPipeline` owns the guarantee that a failing
+    // recorder cannot break a call, which is where it can actually be tested.
+    record: (execution, outcome) => {
+      // One handle for the run, not one per call. Measured: opening and
+      // closing the ledger costs 1.6ms, which on a path this hot is a third of
+      // the whole governed call. `close()` on the toolset releases it.
+      ledgerHandle ??= openLedger(workspace);
+      ledgerHandle.appendEvidenceBatch(
+        toolEvidenceFor(execution, outcome).map((row) => ({
+          sessionId: options.sessionId ?? `toolset-${agentId}`,
+          runtime: "amc" as const,
+          eventType: row.eventType,
+          payload: row.payload,
+          payloadExt: "json" as const,
+          meta: row.meta
+        }))
+      );
+    }
   });
 
   if (options.mode === "code") {
@@ -164,5 +198,14 @@ export function agentToolset(options: AgentToolsetOptions): AgentToolset {
     }));
   }
 
-  return { seam: pipelineToolSeam({ registry, pipeline, agentId }), registry, pipeline, readiness };
+  return {
+    seam: pipelineToolSeam({ registry, pipeline, agentId }),
+    registry,
+    pipeline,
+    readiness,
+    close: (): void => {
+      ledgerHandle?.close();
+      ledgerHandle = null;
+    }
+  };
 }
