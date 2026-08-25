@@ -184,3 +184,52 @@ The surviving substrate test is honest about its own shape: two independent
 mechanisms enforce the refusal and each is sufficient alone, so mutating either
 leaves it green and removing both turns it red. The redundancy is deliberate
 and no single guard is load-bearing.
+
+---
+
+## Part 3 — jobs (VERIFY criterion 3)
+
+Both halves of "settles once with an owner-fenced wake" are about identity
+rather than scheduling.
+
+**The fence is authorization, not secrecy.** Ids are `bash-1`, `bash-2`, …
+and guessable on purpose: a scheme whose safety rests on unguessable ids is one
+leak away from having no safety. So `get`/`kill`/`wait` refuse another
+session's job, and `list()` **filters** rather than throwing — a throwing list
+would tell a caller how many jobs someone else has.
+
+For the same reason there is ONE error for "no such job" and for "not yours".
+Distinguishable errors over predictable ids let a session enumerate `bash-1`,
+`bash-2`, … and count another session's work. The test normalises out the id
+the caller itself supplied and asserts everything else is identical.
+
+Settlement listeners are registered per owner, not globally. A registry-wide
+listener would hand every composed plugin another session's labels and
+summaries — the same leak `list()` filters to avoid, reached through a
+different door. My first version had exactly that: the doc comment said
+"only about jobs belonging to `owner`" and the code notified everyone.
+
+**Settle-once keeps the FIRST cause, not the last.** Four paths can end a job —
+it finishes, it is killed, its owner is disposed, its deadline passes — and
+they race. A job killed while finishing was *killed*; taking the later cause
+would report a clean completion for work someone stopped. One flag, checked
+and set before anything observable happens, and JavaScript runs that to
+completion without interleaving.
+
+Killing aborts the work rather than only marking the record. Marking a job
+settled while its promise keeps running leaks exactly the work the kill was
+for.
+
+**Scope stated rather than implied:** these jobs are process-local. They do not
+survive a restart and there is no persisted state to reconcile, so "exactly
+once" means "no two settlement paths both win", not "durable across a crash".
+
+**The wake budget is not in the VERIFY list and is here anyway.** The chain is
+self-exciting by construction: a turn opened by a completion notice can start
+the very job whose completion opens the next one. Unbounded, that is a loop;
+bounded, it is four lines. It does **not** refill automatically — every
+heuristic for "a human spoke" is defeatable by another producer posting to the
+same inbox, and a budget that refills on something an agent can cause is not a
+budget. A host that knows a human spoke calls `acknowledge`.
+
+10 mutations over the registry, all caught.
