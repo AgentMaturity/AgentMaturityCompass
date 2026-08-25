@@ -97,6 +97,18 @@ export function evaluateGate(gate: Gate, events: ParsedEvidenceEvent[]): GateEva
     ? trustFilteredEvents.filter((event) => gate.requiredEvidenceTypes.includes(event.event_type))
     : trustFilteredEvents;
 
+  // Each named type must actually be PRESENT, not merely counted.
+  //
+  // This field used to be a whitelist filter alone: a gate naming
+  // [stdout, audit, metric] was satisfied by three stdout events, with audit
+  // and metric entirely absent. The name promised a requirement the code did
+  // not implement, and the published methodology repeats that promise to users
+  // ("Required evidence types for each level"). Changing the behaviour to
+  // match the name is a methodology change, and is versioned as one.
+  const presentTypes = new Set(typedEvents.map((event) => event.event_type));
+  const missingTypes = gate.requiredEvidenceTypes.filter((type) => !presentTypes.has(type));
+  const evidenceTypesOk = missingTypes.length === 0;
+
   const eventCountOk = typedEvents.length >= gate.minEvents;
   const distinctSessions = new Set(typedEvents.map((event) => event.session_id)).size;
   const sessionsOk = distinctSessions >= gate.minSessions;
@@ -189,14 +201,15 @@ export function evaluateGate(gate: Gate, events: ParsedEvidenceEvent[]): GateEva
 
   const excludeOk = excludeChecks.every(Boolean);
 
-  const pass = eventCountOk && sessionsOk && daysOk && includeOk && excludeOk && requiredTrustTierOk;
+  const pass = evidenceTypesOk && eventCountOk && sessionsOk && daysOk && includeOk && excludeOk && requiredTrustTierOk;
 
   return {
     pass,
     matchedEventIds: typedEvents.map((event) => event.id),
     reason: pass
       ? `gate level ${gate.level} satisfied`
-      : `failed gate ${gate.level}: events=${typedEvents.length}/${gate.minEvents}, sessions=${distinctSessions}/${gate.minSessions}, days=${distinctDays}/${gate.minDistinctDays}`,
+      : `failed gate ${gate.level}: events=${typedEvents.length}/${gate.minEvents}, sessions=${distinctSessions}/${gate.minSessions}, days=${distinctDays}/${gate.minDistinctDays}`
+        + (missingTypes.length > 0 ? `, missing evidence types=${missingTypes.join(",")}` : ""),
     distinctSessions,
     distinctDays
   };

@@ -58,8 +58,8 @@ describe("AMC aggregate maturity taxonomy", () => {
   it("publishes the current methodology release and corrected labels without changing score ranges", () => {
     const manifest = getPublicMethodologyManifest();
 
-    expect(manifest.version).toBe("2026.07.29-r223");
-    expect(manifest.releaseDate).toBe("2026-07-29");
+    expect(manifest.version).toBe("2026.08.25-r224");
+    expect(manifest.releaseDate).toBe("2026-08-25");
     expect(manifest.scoreScale.map(({ level, label }) => [level, label])).toEqual(canonicalRows);
     expect(manifest.scoreScale.map(({ numericRange }) => numericRange)).toEqual([
       [0, 0.99],
@@ -69,12 +69,14 @@ describe("AMC aggregate maturity taxonomy", () => {
       [4, 4.74],
       [4.75, 5],
     ]);
-    expect(manifest.changelog[0]).toMatchObject({ version: "2026.07.29-r223", date: "2026-07-29" });
-    expect(manifest.changelog[0]?.summary).toContain("public badge methodology assurance hash");
-    expect(manifest.changelog[0]?.migration).toContain("2026.07.10-r222");
-    expect(manifest.changelog[1]).toMatchObject({ version: "2026.07.10-r222", date: "2026-07-10" });
-    expect(manifest.changelog[1]?.summary).toContain("canonical L0-L5 maturity taxonomy");
-    expect(manifest.changelog[1]?.migration).toContain("Numerical scores, thresholds, and historical hashes are unchanged");
+    expect(manifest.changelog[0]).toMatchObject({ version: "2026.08.25-r224", date: "2026-08-25" });
+    expect(manifest.changelog[0]?.summary).toContain("requiredEvidenceTypes");
+    expect(manifest.changelog[1]).toMatchObject({ version: "2026.07.29-r223", date: "2026-07-29" });
+    expect(manifest.changelog[1]?.summary).toContain("public badge methodology assurance hash");
+    expect(manifest.changelog[1]?.migration).toContain("2026.07.10-r222");
+    expect(manifest.changelog[2]).toMatchObject({ version: "2026.07.10-r222", date: "2026-07-10" });
+    expect(manifest.changelog[2]?.summary).toContain("canonical L0-L5 maturity taxonomy");
+    expect(manifest.changelog[2]?.migration).toContain("Numerical scores, thresholds, and historical hashes are unchanged");
     expect(manifest.migrationGuidance[0]).toContain("2026.07.10-r222");
     expect(manifest.migrationGuidance[0]).toContain("amc_methodology_assurance");
   });
@@ -256,8 +258,8 @@ describe("AMC aggregate maturity taxonomy", () => {
       "website/docs/methodology.html",
       "website/methodology.html",
     ]) {
-      expect(read(path), `${path} should publish the current methodology version`).toContain("2026.07.29-r223");
-      expect(read(path), `${path} should publish the current methodology release date`).toContain("2026-07-29");
+      expect(read(path), `${path} should publish the current methodology version`).toContain("2026.08.25-r224");
+      expect(read(path), `${path} should publish the current methodology release date`).toContain("2026-08-25");
     }
 
     const methodologyDoc = read("docs/SCORING_METHODOLOGY.md");

@@ -219,7 +219,8 @@ export function applyGlobalCherryPickDefense(level: number, events: ParsedEviden
 }
 
 const STRICT_EVIDENCE_BINDING_FALSY = new Set(["0", "false", "off", "no"]);
-const STRICT_EVIDENCE_BINDING_LEVEL = 3;
+/** Untagged evidence stops counting at this level. 0 = every level; ADR-0023. */
+const STRICT_EVIDENCE_BINDING_LEVEL = 0;
 
 function eventQuestionId(event: ParsedEvidenceEvent): string | null {
   if (typeof event.meta.questionId === "string" && event.meta.questionId.trim().length > 0) {
@@ -1077,9 +1078,8 @@ export async function runDiagnostic(input: RunDiagnosticInput, outputMarkdownPat
       const claimedLevel =
         typeof rawClaimedLevel === "number" && Number.isFinite(rawClaimedLevel)
           ? clamp(rawClaimedLevel, 0, 5)
-          : claimMode === "auto"
-            ? supportedMaxLevel
-            : supportedMaxLevel;
+          // Both arms read `supportedMaxLevel`; see ADR-0023.
+          : supportedMaxLevel;
 
       const finalLevel = Math.min(claimedLevel, supportedMaxLevel);
       const contradictionCount = countAuditFromMap(relevantAuditMap, "CONTRADICTION_FOUND") + countAuditFromMap(relevantAuditMap, "HALLUCINATION_ADMISSION");

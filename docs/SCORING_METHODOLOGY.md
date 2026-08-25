@@ -7,8 +7,8 @@ AMC publishes a machine-readable scoring methodology manifest so reports, badges
 | Field | Current Value |
 |-------|---------------|
 | Methodology ID | `amc-public-scoring-methodology` |
-| Methodology Version | `2026.07.29-r223` |
-| Release Date | `2026-07-29` |
+| Methodology Version | `2026.08.25-r224` |
+| Release Date | `2026-08-25` |
 
 | Manifest Command | `amc methodology --json` |
 | Human-Readable Command | `amc methodology` |
@@ -189,6 +189,7 @@ ChemGraph-style agentic computational chemistry workflow rows are relevant to AM
 
 | Version | Date | Summary | Migration |
 |---------|------|---------|-----------|
+| `2026.08.25-r224` | `2026-08-25` | Corrects two evidence-gating behaviours to match what this document already described. `requiredEvidenceTypes` now requires every named evidence type to be **present**, where it previously only filtered which events were counted — a gate naming stdout, audit, and metric was satisfied by stdout alone. And evidence now counts only toward the question it was tagged to at every level, where levels 0-2 previously fell back to scoring a question against every event in the window, including events tagged to other questions. Both corrections make scores stricter. Scoring ranges, thresholds, maturity labels, and claim-eligibility rules are unchanged. | Reports, badges, methodology receipts, and signed outputs generated under `2026.07.29-r223` remain historical artifacts and must not be rewritten. Re-score under `2026.08.25-r224` before comparing or publishing; a workspace may score **lower** than it did under r223 because evidence that previously counted no longer does. Treat a drop as a correction rather than a regression. Outstanding badges issued under r223 remain verifiable by their embedded version and manifest hash, and should be re-issued before being presented as current. |
 | `2026.07.29-r223` | `2026-07-29` | Aligns the public badge methodology assurance hash with the diagnostic methodology-versioning receipt by centralizing the canonical source-review boundary and gate selection and including the existing OpenAI Simple Evals boundary in both surfaces. Scoring ranges, thresholds, maturity labels, and claim-eligibility rules are unchanged. | Reports, badges, methodology receipts, and signed outputs generated under `2026.07.10-r222` remain historical artifacts and must not be rewritten. Regenerate them under `2026.07.29-r223` before comparing or publishing `amc_methodology_assurance`; r223 uses one canonical assurance hash across public and diagnostic surfaces, while r222 remains verifiable by its embedded version and manifest hash. |
 | `2026.07.10-r222` | `2026-07-10` | Establishes the canonical L0-L5 maturity taxonomy across current aggregate surfaces: Absent, Initial, Developing, Defined, Managed, and Optimizing. | Reports generated under `2026.07.10-r221` remain verifiable under their embedded version and hash. Re-render current displays with r222 labels before comparison. Numerical scores, thresholds, and historical hashes are unchanged. |
 | `2026.07.10-r221` | `2026-07-10` | Separates artifact validity from evidence readiness across Score, lifecycle artifacts, Studio, report sharing, and executive briefs. `VALID` remains an artifact-integrity result; `READY`, `LIMITED`, `INSUFFICIENT_EVIDENCE`, and `UNVERIFIED` govern claim eligibility. | Regenerate reports created under `2026.06.25-r220` or derive readiness from artifact verification, trust boundary, accepted evidence coverage, integrity index, and trust label. Raw `VALID` or signed status no longer authorizes external claims. |
@@ -2070,9 +2071,42 @@ AMC assesses agents across a stable default **244 diagnostic questions** organiz
 
 Each question has:
 - A maturity scale from L0 (absent) to L5 (industry-leading)
-- Required evidence types for each level
+- Required evidence types for each level — **every** named type must be present
+  in the window for the level to be reachable, not merely counted when present
+  (corrected in `2026.08.25-r224`; see below)
 - Scoring rubric with specific pass/fail criteria
 - Question-set metadata that maps expanded questions to AMC surfaces and layers
+
+### 3.1 Evidence gating, corrected in 2026.08.25-r224
+
+Two behaviours changed in this version, and both make scores stricter.
+
+**Required evidence types are now required.** Before r224 the field named
+`requiredEvidenceTypes` acted only as a filter on which events were counted
+toward a level's event, session and day thresholds. A gate declaring
+`[stdout, audit, metric]` was satisfied by stdout events alone, with audit and
+metric entirely absent — while this document told you those types were
+required. They now are: a level is unreachable until at least one event of each
+named type appears in the window, and the failure reason names which are
+missing.
+
+**Evidence counts only toward the question it was gathered for.** Before r224,
+a question with no evidence tagged to it was scored at levels 0–2 against
+*every* event in the window, including events explicitly tagged to other
+questions. Strict binding now applies at every level. A question with no
+evidence of its own scores L0, which is what the L0 rubric already means.
+
+**What this means for an existing score.** A workspace re-scored under r224 may
+score lower than it did under r223. That is a correction, not a regression: the
+earlier figure counted evidence this document said was required, and evidence
+collected for a different question. Scores issued under r223 remain valid *as
+r223 scores* and carry that version; a re-issue under r224 is a re-measurement,
+not a revocation.
+
+Tag evidence with `meta.questionId` to bind it to a question. The
+`STRICT_EVIDENCE_BINDING=false` environment variable restores the pre-r224
+fallback for local diagnosis; it is not intended for scoring a real workspace
+and the resulting score should not be published.
 
 ## 4. Scoring Pipeline
 

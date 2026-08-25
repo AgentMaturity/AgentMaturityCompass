@@ -110,22 +110,30 @@ function seedHighRiskGovernanceEvidence(workspace: string): void {
       binaryPath: "seed-runtime",
       binarySha256: "seed-sha"
     });
-    ledger.appendEvidence({
-      sessionId,
-      runtime: "unknown",
-      eventType: "audit",
-      payload: JSON.stringify({
-        auditType: "ALIGNMENT_CHECK_PASS",
-        note: "seed evidence"
-      }),
-      inline: true,
-      ts: now - (i % 7) * DAY_MS,
-      meta: {
-        questionId: "AMC-1.8",
-        auditType: "ALIGNMENT_CHECK_PASS",
-        trustTier: "OBSERVED"
-      }
-    });
+    // The four types the L4 gate names, so this evidence can reach L4 on its
+    // own and the assurance cap has something to LOWER — the cap only applies
+    // when supportedMaxLevel > 3, and it is the subject of this test.
+    //
+    // The seed used to emit `audit` alone and still reach L4, because
+    // `requiredEvidenceTypes` was a filter rather than a requirement.
+    for (const eventType of ["stdout", "audit", "metric", "artifact"] as const) {
+      ledger.appendEvidence({
+        sessionId,
+        runtime: "unknown",
+        eventType,
+        payload: JSON.stringify({
+          auditType: "ALIGNMENT_CHECK_PASS",
+          note: "seed evidence"
+        }),
+        inline: true,
+        ts: now - (i % 7) * DAY_MS,
+        meta: {
+          questionId: "AMC-1.8",
+          auditType: "ALIGNMENT_CHECK_PASS",
+          trustTier: "OBSERVED"
+        }
+      });
+    }
     ledger.sealSession(sessionId);
   }
 
@@ -157,6 +165,12 @@ describe("score consistency properties", () => {
 
   test("evaluateGate is permutation-invariant for the same evidence set", () => {
     const now = Date.now();
+    // All four evidence types the gate names. They used to be twelve `audit`
+    // events against a gate declaring [stdout, audit, metric, artifact], which
+    // passed only because the field was a filter rather than a requirement.
+    // The property under test is permutation-invariance, not that this gate
+    // passes on one type — so the fixture supplies what the gate asks for.
+    const gateTypes = ["stdout", "audit", "metric", "artifact"] as const;
     const events: ParsedEvidenceEvent[] = [];
     for (let i = 0; i < 12; i += 1) {
       events.push(
@@ -164,7 +178,7 @@ describe("score consistency properties", () => {
           questionId: "AMC-1.8",
           sessionId: `session-${i % 6}`,
           ts: now - (i % 7) * DAY_MS,
-          eventType: "audit",
+          eventType: gateTypes[i % gateTypes.length] as "audit",
           trustTier: "OBSERVED",
           auditType: "ALIGNMENT_CHECK_PASS"
         })

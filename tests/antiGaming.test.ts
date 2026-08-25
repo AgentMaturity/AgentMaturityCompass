@@ -93,15 +93,21 @@ describe("anti-gaming: strict evidence binding", () => {
     expect(warn.mock.calls[0]?.[0]).toContain("STRICT_EVIDENCE_BINDING=true blocked fallback");
   });
 
-  test("L0-L2 selection warns and falls back when strict mode is enabled", () => {
+  test("L0-L2 selection no longer borrows another question's evidence", () => {
+    // This test used to assert the OPPOSITE — that an event explicitly tagged
+    // to AMC-1.2 was returned when scoring AMC-1.1 — in a file called
+    // anti-gaming. The suite was pinning the inflation as expected behaviour.
+    //
+    // Strict binding now applies at every level, so evidence counts toward the
+    // question it was gathered for. A question with none of its own scores 0,
+    // which is what the L0 rubric already means: absent.
     delete process.env.STRICT_EVIDENCE_BINDING;
     const warn = vi.spyOn(console, "warn").mockImplementation(() => undefined);
     const unrelated = makeParsedEvent({ questionId: "AMC-1.2", trustTier: "OBSERVED" });
 
     const selected = selectRelevantEvents("AMC-1.1", [unrelated], 2);
-    expect(selected).toEqual([unrelated]);
-    expect(warn).toHaveBeenCalledTimes(1);
-    expect(warn.mock.calls[0]?.[0]).toContain("Falling back to unbound evidence");
+    expect(selected, "another question's evidence is not this question's evidence").toHaveLength(0);
+    expect(warn.mock.calls[0]?.[0]).toContain("STRICT_EVIDENCE_BINDING=true blocked fallback");
   });
 
   test("L3+ selection warns and falls back when strict mode is disabled", () => {

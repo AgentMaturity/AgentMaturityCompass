@@ -5,6 +5,7 @@ import { afterEach, describe, expect, test } from "vitest";
 import {
   AMC_PUBLIC_METHODOLOGY_ID,
   AMC_PUBLIC_METHODOLOGY_VERSION,
+  AMC_PUBLIC_METHODOLOGY_RELEASE_DATE,
   getPublicMethodologyManifest,
   getPublicMethodologyReference,
   renderPublicMethodologyMarkdown
@@ -54,28 +55,37 @@ describe("public methodology manifest", () => {
     expect(first.status).toBe("public");
     expect(first.questionSet.version).toBe("amc-legacy-240-v1");
     expect(first.questionSet.questionCount).toBe(getAllQuestions().length);
+    // The head entry is a LITERAL in the source, so this compares the published
+    // changelog against the published version instead of a variable against
+    // itself. Bumping the version without writing an entry turns it red.
     expect(first.changelog[0]?.version).toBe(AMC_PUBLIC_METHODOLOGY_VERSION);
-    expect(first.releaseDate).toBe("2026-07-29");
-    expect(first.changelog[0]?.summary).toContain("public badge methodology assurance hash");
-    expect(first.changelog[0]?.migration).toContain("2026.07.10-r222");
-    expect(first.changelog[0]?.migration).toContain("amc_methodology_assurance");
-    expect(first.changelog[1]).toMatchObject({ version: "2026.07.10-r222", date: "2026-07-10" });
-    expect(first.changelog[1]?.summary).toContain("canonical L0-L5 maturity taxonomy");
-    expect(first.changelog[1]?.migration).toContain("Reports generated under 2026.07.10-r221");
-    expect(first.changelog[2]?.summary).toContain("artifact validity from evidence readiness");
-    expect(first.changelog[2]?.migration).toContain("Reports generated under 2026.06.25-r220");
-    expect(first.changelog[3]?.summary).toContain("Cua-style computer-use benchmark public-methodology");
-    expect(first.changelog[3]?.migration).toContain("Reports generated under 2026.06.25-r219");
-    expect(first.changelog[4]?.summary).toContain("Lunary-style public-methodology");
-    expect(first.changelog[4]?.migration).toContain("Reports generated under 2026.06.25-r218");
+    expect(first.changelog[0]?.date).toBe(AMC_PUBLIC_METHODOLOGY_RELEASE_DATE);
+    expect(first.releaseDate).toBe("2026-08-25");
+    expect(first.changelog[0]).toMatchObject({ version: "2026.08.25-r224", date: "2026-08-25" });
+    expect(first.changelog[0]?.summary).toContain("requiredEvidenceTypes");
+    expect(first.changelog[0]?.migration).toContain("2026.07.29-r223");
+    expect(first.changelog[0]?.migration).toContain("may score LOWER");
+    expect(first.changelog[1]).toMatchObject({ version: "2026.07.29-r223", date: "2026-07-29" });
+    expect(first.changelog[1]?.summary).toContain("public badge methodology assurance hash");
+    expect(first.changelog[1]?.migration).toContain("2026.07.10-r222");
+    expect(first.changelog[1]?.migration).toContain("amc_methodology_assurance");
+    expect(first.changelog[2]).toMatchObject({ version: "2026.07.10-r222", date: "2026-07-10" });
+    expect(first.changelog[2]?.summary).toContain("canonical L0-L5 maturity taxonomy");
+    expect(first.changelog[2]?.migration).toContain("Reports generated under 2026.07.10-r221");
+    expect(first.changelog[3]?.summary).toContain("artifact validity from evidence readiness");
+    expect(first.changelog[3]?.migration).toContain("Reports generated under 2026.06.25-r220");
+    expect(first.changelog[4]?.summary).toContain("Cua-style computer-use benchmark public-methodology");
+    expect(first.changelog[4]?.migration).toContain("Reports generated under 2026.06.25-r219");
+    expect(first.changelog[5]?.summary).toContain("Lunary-style public-methodology");
+    expect(first.changelog[5]?.migration).toContain("Reports generated under 2026.06.25-r218");
 
-    expect(first.changelog[5]?.summary).toContain("LangSmith-style public-methodology");
-    expect(first.changelog[6]?.summary).toContain("PocketFlow-style public-methodology source-review boundaries");
-    expect(first.changelog[7]?.summary).toContain("ChemGraph-style agentic computational chemistry workflow");
-    expect(first.changelog[7]?.summary).toContain("LM Evaluation Harness-style metric-validity source-review boundaries");
-    expect(first.changelog[8]?.summary).toContain("OpenAI Evals-style public-methodology source-review boundaries");
-    expect(first.changelog[9]?.summary).toContain("fact-checking and factuality-evaluation review methodology boundaries");
-    expect(first.changelog[9]?.summary).toContain("Google ADK-style agent-toolkit evaluation metric-validity boundaries");
+    expect(first.changelog[6]?.summary).toContain("LangSmith-style public-methodology");
+    expect(first.changelog[7]?.summary).toContain("PocketFlow-style public-methodology source-review boundaries");
+    expect(first.changelog[8]?.summary).toContain("ChemGraph-style agentic computational chemistry workflow");
+    expect(first.changelog[8]?.summary).toContain("LM Evaluation Harness-style metric-validity source-review boundaries");
+    expect(first.changelog[9]?.summary).toContain("OpenAI Evals-style public-methodology source-review boundaries");
+    expect(first.changelog[10]?.summary).toContain("fact-checking and factuality-evaluation review methodology boundaries");
+    expect(first.changelog[10]?.summary).toContain("Google ADK-style agent-toolkit evaluation metric-validity boundaries");
     expect(first.changelog.find((entry) => entry.version === "2026.06.21-r217")?.date).toBe("2026-06-21");
     expect(first.changelog.find((entry) => entry.version === "2026.06.20-r216")?.date).toBe("2026-06-20");
     for (const previousVersion of [

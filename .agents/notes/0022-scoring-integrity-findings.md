@@ -1,6 +1,6 @@
 # ADR-0022 — What P5.2a found in the scorer, and why the feature is blocked on a decision
 
-Status: **findings recorded; P5.2a not implemented** · Date: 2026-08-25 · Follows [ADR-0021](0021-phase-5-1-one-injection-matcher.md)
+Status: **superseded — option 1 chosen, see [ADR-0023](0023-r224-evidence-gating-correction.md)** · Date: 2026-08-25 · Follows [ADR-0021](0021-phase-5-1-one-injection-matcher.md)
 
 ## What was asked
 

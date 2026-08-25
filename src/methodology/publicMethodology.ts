@@ -11,8 +11,23 @@ import { questionBank } from "../diagnostic/questionBank.js";
 import { AMC_MATURITY_LEVELS } from "../score/maturityTaxonomy.js";
 
 export const AMC_PUBLIC_METHODOLOGY_ID = "amc-public-scoring-methodology";
-export const AMC_PUBLIC_METHODOLOGY_VERSION = "2026.07.29-r223";
-export const AMC_PUBLIC_METHODOLOGY_RELEASE_DATE = "2026-07-29";
+/**
+ * Bumped for the evidence-gating correction (ADR-0022).
+ *
+ * `requiredEvidenceTypes` now REQUIRES each named type to be present, where it
+ * previously only filtered which events were counted — a gate naming
+ * [stdout, audit, metric] was satisfied by stdout alone. And evidence now
+ * counts only toward the question it was tagged to, at every level; the old
+ * sub-L3 fallback scored a question against every event in the window,
+ * including events tagged to other questions.
+ *
+ * Both make scores STRICTER. A workspace re-scored under this version may drop
+ * relative to r223, and that drop is a correction rather than a regression:
+ * the earlier number counted evidence the methodology said it required and
+ * evidence gathered for something else.
+ */
+export const AMC_PUBLIC_METHODOLOGY_VERSION = "2026.08.25-r224";
+export const AMC_PUBLIC_METHODOLOGY_RELEASE_DATE = "2026-08-25";
 
 export const AMC_PUBLIC_METHODOLOGY_DOC = "docs/SCORING_METHODOLOGY.md";
 export const AMC_PUBLIC_METHODOLOGY_URL = "https://agentmaturity.co/methodology.html";
@@ -3381,9 +3396,28 @@ export function getPublicMethodologyManifest(questionSet?: DiagnosticQuestionSet
       "Red-team/offensive-security benchmark regression claims require benchmark id/version, question-set hash, reference-answer manifest hash, scoring config hash, scoring modes, provider backend, model config hash, result export hashes, rerun output hash, release gate receipt, question count, pass/refusal/hallucination/semantic scores where claimed, judge rubric for LLM-judge scoring, prompt-optimization config/count where claimed, signed evidence refs, and row hashes; raw prompts, exploit content, reference answers, or final percentage alone is not enough."
     ],
     changelog: [
+      // The head entry is written as LITERALS, not as the live constants.
+      //
+      // It used to read `version: AMC_PUBLIC_METHODOLOGY_VERSION`, and the
+      // normalizer below deliberately exempts entry 0 (`.slice(1)`) so the head
+      // could float with the current release. The effect was that bumping the
+      // version RELABELLED the previous entry rather than adding a new one: the
+      // r223 row silently became the r224 row while still describing r223's
+      // change. A changelog is the artifact that tells a consumer why two
+      // scores differ, so a row that renames itself is worse than no row.
+      //
+      // With literals here, `changelog[0].version === AMC_PUBLIC_METHODOLOGY_VERSION`
+      // stops being a variable compared against itself and becomes a real gate:
+      // bump the constant without writing an entry and the suite goes red.
       {
-        version: AMC_PUBLIC_METHODOLOGY_VERSION,
-        date: AMC_PUBLIC_METHODOLOGY_RELEASE_DATE,
+        version: "2026.08.25-r224",
+        date: "2026-08-25",
+        summary: "Corrects two evidence-gating behaviours to match what docs/SCORING_METHODOLOGY.md already described. `requiredEvidenceTypes` now requires every named evidence type to be PRESENT, where it previously only filtered which events were counted — a gate naming stdout, audit, and metric was satisfied by stdout alone. And evidence now counts only toward the question it was tagged to at every level, where levels 0-2 previously fell back to scoring a question against every event in the window, including events tagged to other questions. Both corrections make scores stricter. Scoring ranges, thresholds, maturity labels, and claim-eligibility rules are unchanged.",
+        migration: "Reports, badges, methodology receipts, and signed outputs generated under 2026.07.29-r223 remain historical artifacts and must not be rewritten. Re-score under 2026.08.25-r224 before comparing or publishing; a workspace may score LOWER than it did under r223 because evidence that previously counted no longer does. Treat a drop as a correction rather than a regression: the r223 number counted evidence toward gates that named types the evidence did not include, and counted evidence gathered for other questions. Outstanding badges issued under r223 remain verifiable by their embedded version and manifest hash, and should be re-issued before being presented as current."
+      },
+      {
+        version: "2026.07.29-r223",
+        date: "2026-07-29",
         summary: "Aligns the public badge methodology assurance hash with the diagnostic methodology-versioning receipt by centralizing the canonical source-review boundary and gate selection and including the existing OpenAI Simple Evals boundary in both surfaces. Scoring ranges, thresholds, maturity labels, and claim-eligibility rules are unchanged.",
         migration: "Reports, badges, methodology receipts, and signed outputs generated under 2026.07.10-r222 remain historical artifacts and must not be rewritten. Regenerate them under 2026.07.29-r223 before comparing or publishing amc_methodology_assurance; r223 uses one canonical assurance hash across public and diagnostic surfaces, while r222 remains verifiable by its embedded version and manifest hash."
       },
