@@ -175,16 +175,27 @@ export function createApprovalForIntent(input: ApprovalRequestInput): {
 } {
   let policySig = verifyApprovalPolicySignature(input.workspace);
   if (!policySig.valid) {
-    const canBootstrap =
-      !policySig.signatureExists &&
-      (policySig.reason?.includes("missing") ?? false);
-    if (canBootstrap) {
+    // Bootstrap ONLY when there is no policy at all. The previous test was
+    // `reason.includes("missing")`, which also matched "approval policy
+    // SIGNATURE missing" — a policy that EXISTS but is unsigned. On that path
+    // initApprovalPolicy overwrites the operator's rules with the default and
+    // signs the default, so deleting a .sig file silently replaced a
+    // deliberate policy with a permissive one and gave it a valid signature.
+    // Deleting a file must never be a way to widen what an agent may do.
+    //
+    // An unsigned-but-present policy is tampering or a broken deployment.
+    // Either way the answer is to refuse and say so, never to repair it.
+    const noPolicyAtAll = !policySig.signatureExists && policySig.reason === "approval policy missing";
+    if (noPolicyAtAll) {
       initApprovalPolicy(input.workspace);
       policySig = verifyApprovalPolicySignature(input.workspace);
     }
   }
   if (!policySig.valid) {
-    throw new Error(`approval policy signature invalid: ${policySig.reason ?? "unknown"}`);
+    throw new Error(
+      `approval policy signature invalid: ${policySig.reason ?? "unknown"}. ` +
+        `AMC refuses to approve anything against a policy it cannot verify — sign it with: amc approvals policy sign`
+    );
   }
   const policy = loadApprovalPolicy(input.workspace);
   const evaluation = evaluateApprovalRequestPolicy({

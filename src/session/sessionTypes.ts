@@ -163,7 +163,17 @@ export function isTurnCancelCause(value: unknown): value is TurnCancelCause {
   }
 }
 
-export type ApprovalAnswer = "allow" | "allow_always" | "deny" | "unavailable";
+/**
+ * What an approver answered.
+ *
+ * `allow_always` was removed before anything could record one. Signed rows are
+ * immutable, so a member that ships is permanent — and a standing grant is a
+ * policy decision belonging in the approval policy (where it is signed,
+ * scoped and revocable), not a per-answer flag that silently widens every
+ * later request. Removed while the union still had zero producers and the
+ * ledger zero rows carrying it.
+ */
+export type ApprovalAnswer = "allow" | "deny" | "unavailable";
 
 /**
  * Token accounting for a step.
