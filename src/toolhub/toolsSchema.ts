@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { ACTION_CLASSES } from "../governor/actionCatalog.js";
+import { protectedPathGlobs } from "./protectedPaths.js";
 
 const toolAllowSchema = z.object({
   paths: z.array(z.string()).optional(),
@@ -65,6 +66,16 @@ export const toolsConfigSchema = z.object({
 export type ToolDefinition = z.infer<typeof toolDefinitionSchema>;
 export type ToolsConfig = z.infer<typeof toolsConfigSchema>;
 
+/**
+ * Deny globs every filesystem entry carries.
+ *
+ * These name the protected paths in the file an operator actually reads.
+ * Deleting them from a signed config changes nothing — `pathAllowedByPatterns`
+ * refuses these locations before any list is consulted — but a policy nobody
+ * can see is a policy nobody can audit, and this is the file they audit.
+ */
+const PROTECTED_DENY_GLOBS = [...protectedPathGlobs(), "**/.git/**"];
+
 export function defaultToolsConfig(): ToolsConfig {
   return toolsConfigSchema.parse({
     tools: {
@@ -75,7 +86,7 @@ export function defaultToolsConfig(): ToolsConfig {
           name: "fs.read",
           actionClass: "READ_ONLY",
           allow: { paths: ["./workspace/**"] },
-          deny: { paths: ["**/.amc/**", "**/.git/**"] },
+          deny: { paths: PROTECTED_DENY_GLOBS },
           maxBytes: 200000,
           requireExecTicket: false
         },
@@ -83,7 +94,7 @@ export function defaultToolsConfig(): ToolsConfig {
           name: "fs.write",
           actionClass: "WRITE_LOW",
           allow: { paths: ["./workspace/output/**"] },
-          deny: { paths: ["**/.amc/**", "**/.git/**"] },
+          deny: { paths: PROTECTED_DENY_GLOBS },
           requireExecTicket: false
         },
         // The P4.3 built-ins. They have to be listed or the allowlist guard
@@ -99,7 +110,7 @@ export function defaultToolsConfig(): ToolsConfig {
           name: "fs.edit",
           actionClass: "WRITE_LOW",
           allow: { paths: ["./workspace/output/**"] },
-          deny: { paths: ["**/.amc/**", "**/.git/**"] },
+          deny: { paths: PROTECTED_DENY_GLOBS },
           requireExecTicket: false
         },
         {

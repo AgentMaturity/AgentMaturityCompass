@@ -1,4 +1,5 @@
 import { initToolsConfig, verifyToolsConfigSignature } from "./toolhubValidators.js";
+import { PROTECTED_WORKSPACE_PATHS } from "./protectedPaths.js";
 import {
   inspectToolhubContext,
   requireTrustedToolhubContext,
@@ -46,6 +47,18 @@ export function formatToolhubContextText(projection: ToolHubContextProjection): 
       lines.push(`- ${tool.name} (${tool.actionClass}) execTicket=${tool.requireExecTicket ? "required" : "no"} id=${tool.toolIdentity}`);
     }
   }
+  // The floor, printed alongside the configured policy.
+  //
+  // These paths are refused before any allow or deny list is consulted, so
+  // they are not visible anywhere in `tools.yaml` as the thing doing the work.
+  // An operator auditing their configuration was previously reading a complete
+  // list of the rules they control and an incomplete list of the rules in
+  // force.
+  lines.push("", "Always denied, whatever the signed config says:");
+  for (const entry of PROTECTED_WORKSPACE_PATHS) {
+    lines.push(`- ${entry.glob} — ${entry.reason}`);
+  }
+
   lines.push("", projection.claimBoundary);
   return lines.join("\n");
 }

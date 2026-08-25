@@ -1,4 +1,5 @@
 import { readFileSync } from "node:fs";
+import { protectedPathReason } from "./protectedPaths.js";
 import {
   BINARY_ARGUMENTS,
   COMMAND_ARGUMENTS,
@@ -12,7 +13,6 @@ import { getPrivateKeyPem, getPublicKeyHistory, signHexDigest, verifyHexDigestAn
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { defaultToolsConfig, toolsConfigSchema, type ToolDefinition, type ToolsConfig } from "./toolsSchema.js";
-import { vaultPaths } from "../vault/vault.js";
 
 interface SignedDigest {
   digestSha256: string;
@@ -205,13 +205,6 @@ export function findToolDefinition(config: ToolsConfig, toolName: string): ToolD
   return config.tools.allowedTools.find((tool) => tool.name === toolName) ?? null;
 }
 
-function isDeniedProtectedPath(workspace: string, candidate: string): boolean {
-  const resolved = resolve(candidate);
-  const amcRoot = resolve(join(workspace, ".amc"));
-  const vaultFile = resolve(vaultPaths(workspace).vaultFile);
-  return resolved.startsWith(amcRoot) || resolved === vaultFile;
-}
-
 function normalizePattern(pattern: string): string {
   return pattern.replaceAll("\\", "/");
 }
@@ -222,8 +215,12 @@ export function pathAllowedByPatterns(workspace: string, candidatePath: string, 
   resolvedPath: string;
 } {
   const resolvedPath = resolve(candidatePath);
-  if (isDeniedProtectedPath(workspace, resolvedPath)) {
-    return { ok: false, reason: "access to .amc/vault paths is always denied", resolvedPath };
+  // The floor, before any allow or deny list is consulted. Named and exported
+  // now (see protectedPaths.ts) so it can be printed and audited, and still
+  // unconditional: a config that omits it does not lower it.
+  const protectedReason = protectedPathReason(workspace, resolvedPath);
+  if (protectedReason !== null) {
+    return { ok: false, reason: protectedReason, resolvedPath };
   }
 
   const relativePath = relative(workspace, resolvedPath);
