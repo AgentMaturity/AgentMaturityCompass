@@ -233,3 +233,75 @@ same inbox, and a budget that refills on something an agent can cause is not a
 budget. A host that knows a human spoke calls `acknowledge`.
 
 10 mutations over the registry, all caught.
+
+---
+
+## Part 4 — the terminal, and VERIFY criterion 2
+
+Built on the pipe backend, per the operator's decision: `node-pty` is native,
+AMC publishes a CLI with eight runtime dependencies, and an install that needs
+a compiler is a worse failure than a missing capability. The backend is a
+**parameter** of the seam, so a PTY backend composes in later without this code
+changing.
+
+**Criterion 2 says "a PTY reaches readiness by evidence ladder". The ladder is
+built and tested; the PTY is not.** That is stated rather than reinterpreted.
+
+### The correction that shaped the type
+
+dsh's ladder ends in a deadline rung, and a deadline always fires. A result
+carrying only `rung` therefore cannot express "this never became ready", and a
+caller reading the output while ignoring the rung would treat a hung shell as a
+completed command — and record it as one. So readiness carries three fields:
+
+| rung | settled | proven | what was observed |
+|---|---|---|---|
+| `exited` | true | true | the shell is gone |
+| `marker` | true | true | this send's own sentinel came back |
+| `idle` | true | **false** | silence, which is not proof |
+| `timeout` | **false** | false | nothing. Not readiness at all. |
+
+`proven: false` on `idle` is the point of calling it an *evidence* ladder. A
+command that pauses between writes is indistinguishable from one that has
+finished, and an evidence product must not record a guess in the same shape as
+an observation.
+
+### The sentinel is per-send, and that is a security property
+
+After the command, the session writes a line printing a nonce and `$?`. A fixed
+sentinel could be produced by the command itself — `echo AMC-DONE` — and the
+session would report a completion that never happened, with an exit code the
+command chose. The nonce is minted per send, so output can only contain it by
+having been generated after the command finished. Tested directly: a command
+that prints a plausible marker does not settle its own send.
+
+### A comment of mine that was simply wrong
+
+I wrote that the sentinel goes on its own line "so `$?` is the user command's
+status rather than the sentinel's own". That is false — `$?` refers to the
+user's command either way, because it is expanded after that command has run.
+The mutation "put the sentinel on the same line" stayed green, which is how I
+found out.
+
+The separate line IS right, for a different reason: it keeps the sentinel out
+of the user's command *text*. `sleep 1 &` joined with `; printf …` is a syntax
+error, and so is anything ending in a pipe or a trailing backslash. The comment
+and a test now say that instead.
+
+### Also found by a surviving mutation
+
+The idle rung requires output to have been seen first. Without that, silence
+before the first byte — ordinary startup latency — reads as completion, and
+every slow-starting command settles almost immediately. No test covered a
+command that produces no output at all; one does now.
+
+### Honest about what a pipe is not
+
+`resize` is **absent** from the pipe backend rather than a no-op. A method that
+accepted the call and did nothing would let a caller believe it had changed
+something; an absent method is a fact code can check, and `canResize` exposes
+it. No TTY also means no job control and no program that insists on a terminal
+— which is the capability the PTY backend would add, and the reason criterion 2
+stays open.
+
+11 mutations, all caught after two survivors were closed.
