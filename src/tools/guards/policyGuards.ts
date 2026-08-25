@@ -2,6 +2,7 @@ import { evaluateBudgetStatus } from "../../budgets/budgets.js";
 import { evaluateRuntimeFirewall } from "../../runtime/firewall.js";
 import {
   findToolDefinition,
+  hostAllowedForTool,
   loadVerifiedToolsConfigSnapshot,
   validateToolRequest
 } from "../../toolhub/toolhubValidators.js";
@@ -106,5 +107,56 @@ export function toolhubAllowlistGuard(workspace: string): ToolGuard {
       args: execution.arguments as Record<string, unknown>
     });
     return verdict.ok ? undefined : `tool allowlist: ${verdict.reason ?? "denied"}`;
+  };
+}
+
+/**
+ * Every outbound network call, governed by what the tool IS rather than by
+ * what it is called.
+ *
+ * The trap this closes: the signed allowlist reaches a tool call through
+ * `validateToolRequest`, which is hard-keyed on the string `"http.fetch"`
+ * (`toolhubValidators.ts`). A second network tool under any other name --
+ * `web_fetch`, `download`, `fetch_url` -- gets no host check from that path at
+ * all. The allowlist looks like a policy about network access and is actually
+ * a policy about one identifier.
+ *
+ * Here the trigger is `actionClass === "NETWORK_EXTERNAL"`, which every
+ * network tool must declare to be metered by the budget guard anyway. A new
+ * network tool is therefore governed by existing, or it is not a network tool.
+ *
+ * A NETWORK_EXTERNAL tool that names no host is denied rather than allowed:
+ * a call whose destination cannot be determined cannot be checked against an
+ * allowlist, and "we could not tell where this was going" is not a reason to
+ * let it go.
+ */
+export function networkEgressGuard(workspace: string): ToolGuard {
+  return (execution) => {
+    if (execution.actionClass !== "NETWORK_EXTERNAL") return undefined;
+
+    const raw = execution.arguments["url"];
+    if (typeof raw !== "string" || raw.length === 0) {
+      return `${execution.name} is a network tool but named no url to check against the allowlist`;
+    }
+    let host: string;
+    try {
+      host = new URL(raw).hostname;
+    } catch {
+      return `${execution.name} was given a url that cannot be parsed: no host to check`;
+    }
+
+    const snapshot = loadVerifiedToolsConfigSnapshot(workspace);
+    if (!snapshot.signatureValid || !snapshot.config) {
+      return `tools config is not verifiable: ${snapshot.reason ?? "unknown reason"}`;
+    }
+    const definition = findToolDefinition(snapshot.config, execution.name);
+    if (!definition) {
+      // Unlisted network tool. The allowlist has nothing to say about it,
+      // which is a denial rather than a blank cheque.
+      return `"${execution.name}" is not in the signed tool allowlist, so its egress is ungoverned`;
+    }
+    return hostAllowedForTool(definition, host)
+      ? undefined
+      : `egress denied: ${host} is not on the allowlist for ${execution.name}`;
   };
 }
