@@ -38,9 +38,27 @@ export type ToolApprovalAnswer = "allow" | "deny" | "unavailable";
 /** Rewrites output after the body. Cannot change whether the call was denied. */
 export type ToolOutputFilter = (output: string, execution: ToolExecution) => string;
 
+/**
+ * The reserved transport for Code Mode.
+ *
+ * Reserved rather than conventional: under `mode: "code"` this is the only
+ * name a turn may call directly, so it cannot be a tool a plugin happens to
+ * register under.
+ */
+export const RUN_CODE_TOOL = "run_code";
+
+/**
+ * `native` is one tool call per turn. `code` collapses every direct call onto
+ * `run_code`, which dispatches the rest as SUB-CALLS through this same
+ * pipeline.
+ */
+export type ToolDispatchMode = "native" | "code";
+
 export interface ToolPipelineInit {
   readonly registry: ToolRegistry;
   readonly workspace: string;
+  /** Defaults to `native`. */
+  readonly mode?: ToolDispatchMode;
   /** Omitted means no tool requires approval in this composition. */
   readonly approve?: ToolApprovalAsker;
   /** Action classes that must be approved before guards are consulted. */
@@ -78,6 +96,22 @@ export class ToolPipeline {
   constructor(private readonly init: ToolPipelineInit) {}
 
   async execute(input: ToolCallInput): Promise<ToolOutcome> {
+    const collapsed = this.collapses(input);
+    if (collapsed) {
+      // Terminates HERE, before pre-execute policy and before guards.
+      //
+      // A collapsed call can only ever fail, and letting the policy pipeline
+      // observe it would mean asking a human to approve — and recording an
+      // approval for — something that was never going to run. It would also
+      // spend budget and produce guard decisions about a call that does not
+      // exist in any meaningful sense.
+      return denialOutcome({
+        stage: "visibility",
+        reason: `"${input.name}" cannot be called directly under code mode; dispatch it from inside ${RUN_CODE_TOOL}`,
+        guardLabel: null
+      });
+    }
+
     const visible = this.init.registry.visible(input.agentId);
     const definition = visible.get(input.name);
     if (!definition) {
@@ -109,6 +143,20 @@ export class ToolPipeline {
     const outcome = await this.runStages(execution, definition.body);
     this.init.record?.(execution, outcome);
     return outcome;
+  }
+
+  /**
+   * Whether this call is denied by the mode itself.
+   *
+   * A SUB-call is never collapsed: it carries a parent token, which means it
+   * came from inside `run_code` and is exactly the dispatch code mode exists
+   * to route. Collapsing those would leave code mode able to call nothing at
+   * all.
+   */
+  private collapses(input: ToolCallInput): boolean {
+    if ((this.init.mode ?? "native") !== "code") return false;
+    if (input.name === RUN_CODE_TOOL) return false;
+    return (input.parentToken ?? null) === null;
   }
 
   private async runStages(execution: ToolExecution, body: ToolBody): Promise<ToolOutcome> {

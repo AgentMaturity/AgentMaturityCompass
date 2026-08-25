@@ -1,3 +1,4 @@
+import { RUN_CODE_TOOL } from "./toolPipeline.js";
 import type {
   LabelledToolGuard,
   ToolDefinition,
@@ -51,6 +52,7 @@ function narrow(names: Set<string>, restriction: ToolRestriction): Set<string> {
 export class ToolRegistry {
   private readonly global = emptyLayer();
   private readonly scopes = new Map<string, ToolLayer>();
+  private transportRegistered = false;
 
   private layerFor(scope: string | undefined): ToolLayer {
     if (scope === undefined) return this.global;
@@ -66,6 +68,16 @@ export class ToolRegistry {
    * registration, so composition can unwind in LIFO order.
    */
   define(tool: ToolDefinition, scope?: string): () => void {
+    if (tool.name === RUN_CODE_TOOL && !this.transportRegistered) {
+      // Reserved unconditionally, global and scoped alike. Under code mode
+      // this is the ONLY name callable directly, so a plugin that could
+      // register or shadow it would become the transport every dispatch flows
+      // through -- and would see, and could rewrite, every sub-call the
+      // program makes. `defineCodeTransport` is the one door in.
+      throw new Error(
+        `tool name "${RUN_CODE_TOOL}" is reserved for the Code Mode transport and cannot be registered or shadowed`
+      );
+    }
     const layer = this.layerFor(scope);
     if (layer.tools.has(tool.name)) {
       throw new Error(
@@ -80,8 +92,37 @@ export class ToolRegistry {
     };
   }
 
+  /**
+   * Register the Code Mode transport. The only way `run_code` enters.
+   *
+   * Separate from `define` so the reservation is not something a caller can
+   * opt out of by passing a flag: reaching this function is the opt-in, and it
+   * is called by the composition that owns code mode.
+   */
+  defineCodeTransport(tool: ToolDefinition, scope?: string): () => void {
+    if (tool.name !== RUN_CODE_TOOL) {
+      throw new Error(`defineCodeTransport is only for "${RUN_CODE_TOOL}"`);
+    }
+    this.transportRegistered = true;
+    try {
+      return this.define(tool, scope);
+    } finally {
+      this.transportRegistered = false;
+    }
+  }
+
   /** Narrow what a scope can see. Never widens. */
   restrict(restriction: ToolRestriction, scope?: string): () => void {
+    if (restriction.allow?.has(RUN_CODE_TOOL) === true || restriction.deny?.has(RUN_CODE_TOOL) === true) {
+      // Restricting the transport is a category error: it is presentation
+      // infrastructure, not a capability. Denying it under code mode would
+      // leave an agent unable to call anything at all, and allowing it says
+      // nothing about what the program may then dispatch -- which is decided
+      // per sub-call by the same guards as any other call.
+      throw new Error(
+        `restrict() cannot name the reserved Code Mode transport "${RUN_CODE_TOOL}"; restrict the tools it dispatches instead`
+      );
+    }
     const layer = this.layerFor(scope);
     layer.restrictions.push(restriction);
     return () => {
