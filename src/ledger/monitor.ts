@@ -5,10 +5,34 @@ import { openLedger, hashBinaryOrPath } from "./ledger.js";
 import { resolveAgentId } from "../fleet/paths.js";
 import { dummyProviderKeyEnv, stripProviderKeys } from "../utils/providerKeys.js";
 
-function versionProbe(command: string): string {
+/** How long any single `--version` attempt may take before it is abandoned. */
+const VERSION_PROBE_TIMEOUT_MS = 3_000;
+
+/**
+ * Ask a binary its version, without trusting it.
+ *
+ * This runs the program AMC has been asked to observe BEFORE it has been
+ * observed at all, so it is the least-trusted spawn in the file and used to be
+ * the least careful one. It passed no `env`, which makes Node hand over the
+ * parent's -- every provider API key AMC holds -- to an unvetted binary, while
+ * the real spawn twenty lines below strips exactly those keys before running
+ * the same program. It also passed no `timeout`, so a binary that blocks on
+ * `--version` blocked AMC across all three attempts.
+ *
+ * Exported so the guarantee can be tested directly rather than inferred from
+ * the behaviour of the whole wrapper.
+ */
+export function probeBinaryVersion(command: string): string {
   const attempts = [["--version"], ["version"], ["-v"]];
   for (const args of attempts) {
-    const out = spawnSync(command, args, { encoding: "utf8" });
+    const out = spawnSync(command, args, {
+      encoding: "utf8",
+      env: stripProviderKeys(process.env),
+      timeout: VERSION_PROBE_TIMEOUT_MS,
+      // A probe has nothing to say to the program and must not inherit a
+      // terminal it could read from.
+      stdio: ["ignore", "pipe", "pipe"]
+    });
     if (out.status === 0) {
       return `${out.stdout ?? ""}${out.stderr ?? ""}`.trim();
     }
@@ -35,7 +59,7 @@ async function spawnMonitoredProcess(params: {
   const sessionId = randomUUID();
 
   try {
-    const version = versionProbe(params.command);
+    const version = probeBinaryVersion(params.command);
     const binaryHash = hashBinaryOrPath(params.command, version);
 
     ledger.startSession({
