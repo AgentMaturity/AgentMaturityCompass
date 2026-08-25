@@ -44,6 +44,12 @@ export interface ToolExecution {
   readonly arguments: Readonly<Record<string, unknown>>;
   /** Token of the enclosing call, or null at the top of a chain. */
   readonly parentToken: string | null;
+  /**
+   * Guard labels composed for this call (P5.2a evidence binding). Optional so
+   * a pipeline built without a registry — every existing test fixture — stays
+   * valid; absent means "unknown", never "none applied".
+   */
+  readonly appliedGuards?: readonly string[];
 }
 
 /**

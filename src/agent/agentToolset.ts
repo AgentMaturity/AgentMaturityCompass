@@ -176,7 +176,14 @@ export function agentToolset(options: AgentToolsetOptions): AgentToolset {
       // the whole governed call. `close()` on the toolset releases it.
       ledgerHandle ??= openLedger(workspace);
       ledgerHandle.appendEvidenceBatch(
-        toolEvidenceFor(execution, outcome).map((row) => ({
+        // The guards COMPOSED for this call, not just the one that denied.
+        // A permitted call is a receipt that the control evaluated it, which
+        // is what the question bank asks for; a denial alone cannot say which
+        // controls were in force.
+        toolEvidenceFor(
+          { ...execution, appliedGuards: registry.guardLabelsFor(execution) },
+          outcome
+        ).map((row) => ({
           sessionId: options.sessionId ?? `toolset-${agentId}`,
           runtime: "amc" as const,
           eventType: row.eventType,

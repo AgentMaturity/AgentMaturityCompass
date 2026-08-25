@@ -175,6 +175,21 @@ export class ToolRegistry {
    * allow, evaluating the rest could only ever produce more denials for a call
    * that is already denied.
    */
+  /**
+   * The guards composed for this call, in evaluation order.
+   *
+   * `guardReason` short-circuits on the first denial, so it cannot tell a
+   * caller which controls APPLIED to a permitted call. Evidence needs that:
+   * "the allowlist evaluated this call and permitted it" is a receipt the
+   * question bank explicitly asks for (AMC-5.29 wants "denied/allowed
+   * tool-call receipts"), and it is not derivable from a denial that never
+   * happened. Pure — it runs no guard.
+   */
+  guardLabelsFor(execution: ToolExecution): string[] {
+    const scopeLayer = this.scopes.get(execution.agentId);
+    return [...this.global.guards, ...(scopeLayer?.guards ?? [])].map((entry) => entry.label);
+  }
+
   guardReason(execution: ToolExecution): GuardDenial | undefined {
     const scopeLayer = this.scopes.get(execution.agentId);
     for (const entry of [...this.global.guards, ...(scopeLayer?.guards ?? [])]) {

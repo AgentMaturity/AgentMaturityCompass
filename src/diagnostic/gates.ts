@@ -115,25 +115,40 @@ export function evaluateGate(gate: Gate, events: ParsedEvidenceEvent[]): GateEva
   const distinctDays = new Set(typedEvents.map((event) => dayKey(event.ts))).size;
   const daysOk = distinctDays >= gate.minDistinctDays;
 
+  /**
+   * Requirements that failed, by name.
+   *
+   * `includeChecks` was an array of anonymous booleans, so a gate could fail
+   * with every printed number satisfied and say nothing about why: a run with
+   * `events=120/8, sessions=12/3, days=30/3` and no missing types still failed,
+   * because an unmet `mustInclude.metaKeys` produced no message at all. A
+   * reason that lies by omission costs more than a missing check.
+   */
+  const unmetRequirements: string[] = [];
   const includeChecks: boolean[] = [];
+  const requireInclude = (label: string, ok: boolean): void => {
+    includeChecks.push(ok);
+    if (!ok) unmetRequirements.push(label);
+  };
 
   if (gate.mustInclude.textRegex && gate.mustInclude.textRegex.length > 0) {
     for (const pattern of gate.mustInclude.textRegex) {
       const re = compileRegex(pattern);
-      includeChecks.push(trustFilteredEvents.some((event) => re.test(event.text)));
+      requireInclude(`text:${pattern}`, trustFilteredEvents.some((event) => re.test(event.text)));
     }
   }
 
   if (gate.mustInclude.metaKeys && gate.mustInclude.metaKeys.length > 0) {
     for (const key of gate.mustInclude.metaKeys) {
-      includeChecks.push(trustFilteredEvents.some((event) => Object.prototype.hasOwnProperty.call(event.meta, key)));
+      requireInclude(`metaKey:${key}`, trustFilteredEvents.some((event) => Object.prototype.hasOwnProperty.call(event.meta, key)));
     }
   }
 
   if (gate.mustInclude.artifactPatterns && gate.mustInclude.artifactPatterns.length > 0) {
     for (const pattern of gate.mustInclude.artifactPatterns) {
       const re = compileRegex(pattern);
-      includeChecks.push(
+      requireInclude(
+        `artifact:${pattern}`,
         trustFilteredEvents.some((event) => (event.payload_path ?? "").length > 0 && re.test(event.payload_path ?? ""))
       );
     }
@@ -141,7 +156,8 @@ export function evaluateGate(gate: Gate, events: ParsedEvidenceEvent[]): GateEva
 
   if (gate.mustInclude.metricKeys && gate.mustInclude.metricKeys.length > 0) {
     for (const metric of gate.mustInclude.metricKeys) {
-      includeChecks.push(
+      requireInclude(
+        `metricKey:${metric}`,
         trustFilteredEvents.some(
           (event) =>
             event.event_type === "metric" &&
@@ -154,7 +170,8 @@ export function evaluateGate(gate: Gate, events: ParsedEvidenceEvent[]): GateEva
 
   if (gate.mustInclude.auditTypes && gate.mustInclude.auditTypes.length > 0) {
     for (const auditType of gate.mustInclude.auditTypes) {
-      includeChecks.push(
+      requireInclude(
+        `auditType:${auditType}`,
         trustFilteredEvents.some(
           (event) =>
             event.event_type === "audit" &&
@@ -188,6 +205,7 @@ export function evaluateGate(gate: Gate, events: ParsedEvidenceEvent[]): GateEva
           typeof event.meta.auditType === "string" &&
           event.meta.auditType.toLowerCase() === auditType.toLowerCase()
       );
+      if (found) unmetRequirements.push(`forbidden auditType:${auditType}`);
       excludeChecks.push(!found);
     }
   }
@@ -209,7 +227,9 @@ export function evaluateGate(gate: Gate, events: ParsedEvidenceEvent[]): GateEva
     reason: pass
       ? `gate level ${gate.level} satisfied`
       : `failed gate ${gate.level}: events=${typedEvents.length}/${gate.minEvents}, sessions=${distinctSessions}/${gate.minSessions}, days=${distinctDays}/${gate.minDistinctDays}`
-        + (missingTypes.length > 0 ? `, missing evidence types=${missingTypes.join(",")}` : ""),
+        + (missingTypes.length > 0 ? `, missing evidence types=${missingTypes.join(",")}` : "")
+        + (requiredTrustTierOk ? "" : `, no evidence at required trust tier ${gate.requiredTrustTier}`)
+        + (unmetRequirements.length > 0 ? `, unmet=${unmetRequirements.join(",")}` : ""),
     distinctSessions,
     distinctDays
   };

@@ -90,7 +90,7 @@ describe("anti-gaming: strict evidence binding", () => {
     const selected = selectRelevantEvents("AMC-1.1", [unrelated], 3);
     expect(selected).toHaveLength(0);
     expect(warn).toHaveBeenCalledTimes(1);
-    expect(warn.mock.calls[0]?.[0]).toContain("STRICT_EVIDENCE_BINDING=true blocked fallback");
+    expect(warn.mock.calls[0]?.[0]).toContain("untagged evidence counts toward no question at any level");
   });
 
   test("L0-L2 selection no longer borrows another question's evidence", () => {
@@ -107,7 +107,7 @@ describe("anti-gaming: strict evidence binding", () => {
 
     const selected = selectRelevantEvents("AMC-1.1", [unrelated], 2);
     expect(selected, "another question's evidence is not this question's evidence").toHaveLength(0);
-    expect(warn.mock.calls[0]?.[0]).toContain("STRICT_EVIDENCE_BINDING=true blocked fallback");
+    expect(warn.mock.calls[0]?.[0]).toContain("untagged evidence counts toward no question at any level");
   });
 
   test("L3+ selection warns and falls back when strict mode is disabled", () => {

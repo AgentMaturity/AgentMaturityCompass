@@ -1,3 +1,9 @@
+import { sha256Hex } from "../utils/hash.js";
+import {
+  LIVE_PROJECTION_VERSION,
+  projectMatchingRuleIds,
+  projectQuestionIds
+} from "../diagnostic/liveEvidenceProjection.js";
 import type { ToolExecution, ToolOutcome } from "./toolTypes.js";
 
 /**
@@ -8,14 +14,24 @@ import type { ToolExecution, ToolOutcome } from "./toolTypes.js";
  * governance product whose enforcement leaves no trace is back to being
  * advisory at the only moment that matters.
  *
- * WHY THE SHAPE IS `audit` AND `metric` RATHER THAN A NEW EVENT TYPE. The
- * scoring gates filter on `requiredEvidenceTypes`, and those are
- * `stdout`/`review`/`audit`/`metric`/`artifact`/`test` — the harness's own
- * `tool_action` and `session/*` types are not among them. A governed run that
- * emitted only its native vocabulary would satisfy no gate at all. Rather than
- * widen the published scoring methodology to fit the harness, the run projects
- * ITS facts into the vocabulary the methodology already scores. That is what
- * the plan means by "as a projection".
+ * WHY THE SHAPE IS `audit` AND `metric`. The scoring gates name evidence types
+ * in `requiredEvidenceTypes`; measured across the 244-question bank, the
+ * distribution is:
+ *
+ *   stdout 1114 · audit 732 · metric 731 · artifact 509 · review 307
+ *   test 289 · llm_response 19 · llm_request 12 · tool_action 10
+ *   tool_result 10 · gateway 2
+ *
+ * An earlier version of this comment claimed `tool_action` was "not among
+ * them". That is false — `tool_action` and `tool_result` are named at L3 by
+ * AMC-5.21, AMC-5.25, AMC-5.29 and AMC-5.30, four of the questions this
+ * harness is best placed to evidence. `session/*` genuinely is absent.
+ *
+ * The conclusion survives the correction but rests on a different fact: EVERY
+ * question's L1 gate requires `stdout` and nothing else, so a run emitting only
+ * its native vocabulary clears no gate at any level. Projection into the
+ * vocabulary the methodology already scores is what the plan means by "as a
+ * projection" — and `stdout` is the type that actually unlocks L1.
  *
  * TRUST TIER. `OBSERVED`, because a machine watched it happen. That is not a
  * label this module gets to choose freely: level 5 gates accept OBSERVED only,
@@ -30,7 +46,7 @@ export type ToolAuditType =
   | "TOOL_CALL_FAILED";
 
 export interface ToolEvidenceRecord {
-  readonly eventType: "audit" | "metric";
+  readonly eventType: "audit" | "metric" | "stdout";
   readonly payload: string;
   readonly meta: Record<string, unknown>;
 }
@@ -48,8 +64,20 @@ export function toolEvidenceFor(execution: ToolExecution, outcome: ToolOutcome):
     ? "TOOL_CALL_DENIED"
     : outcome.ok ? "TOOL_CALL_ALLOWED" : "TOOL_CALL_FAILED";
 
+  // WHAT THIS CALL EVIDENCES (P5.2a). Without it the row is untagged, and
+  // since r224 untagged evidence counts toward NO question — measured, a
+  // governed run writing 18 signed rows scored 0 of 244. The binding is a
+  // methodology claim, so the row records WHICH map made it and which rules
+  // fired, and a call that evidences nothing stays untagged rather than
+  // borrowing a question it did not earn.
+  const questionIds = projectQuestionIds(execution, outcome);
+  const projectionRules = projectMatchingRuleIds(execution, outcome);
+
   const common = {
     trustTier: "OBSERVED" as const,
+    ...(questionIds.length > 0
+      ? { questionIds, projectionVersion: LIVE_PROJECTION_VERSION, projectionRules }
+      : {}),
     agentId: execution.agentId,
     toolName: execution.name,
     actionClass: execution.actionClass,
@@ -98,5 +126,35 @@ export function toolEvidenceFor(execution: ToolExecution, outcome: ToolOutcome):
     }
   };
 
-  return [audit, metric];
+  // L1 REQUIRES `stdout` FOR ALL 244 QUESTIONS, measured across the bank — so
+  // without this row nothing the harness emits clears any gate at any level.
+  //
+  // The payload is a DESCRIPTOR, not the output. Copying tool output into the
+  // ledger would put file contents and command results in a second place with
+  // a second retention and DSAR story — the same reason the audit row does not
+  // copy the arguments. The hash keeps the claim verifiable against the output
+  // the caller already has.
+  const produced = outcome.bytes > 0 || outcome.output.length > 0;
+  if (!produced) {
+    return [audit, metric];
+  }
+
+  const stdout: ToolEvidenceRecord = {
+    eventType: "stdout",
+    payload: JSON.stringify({
+      streamKind: "tool_output",
+      bytes: outcome.bytes,
+      exitCode: outcome.exitCode,
+      timedOut: outcome.timedOut,
+      outputSha256: sha256Hex(outcome.output)
+    }),
+    meta: {
+      ...common,
+      streamKind: "tool_output",
+      bytes: outcome.bytes,
+      outputSha256: sha256Hex(outcome.output)
+    }
+  };
+
+  return [audit, metric, stdout];
 }

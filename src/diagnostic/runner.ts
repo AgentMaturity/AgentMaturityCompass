@@ -222,26 +222,26 @@ const STRICT_EVIDENCE_BINDING_FALSY = new Set(["0", "false", "off", "no"]);
 /** Untagged evidence stops counting at this level. 0 = every level; ADR-0023. */
 const STRICT_EVIDENCE_BINDING_LEVEL = 0;
 
-function eventQuestionId(event: ParsedEvidenceEvent): string | null {
-  if (typeof event.meta.questionId === "string" && event.meta.questionId.trim().length > 0) {
-    return event.meta.questionId.trim();
-  }
-  if (typeof event.meta.question_id === "string" && event.meta.question_id.trim().length > 0) {
-    return event.meta.question_id.trim();
-  }
-  return null;
+/**
+ * The questions one event is tagged to. A list, because one governed fact can
+ * legitimately evidence several questions (P5.2a) — counted ONCE per question,
+ * never duplicated within one, so `minEvents` cannot be inflated by breadth.
+ */
+function eventQuestionIds(event: ParsedEvidenceEvent): string[] {
+  const raw = event.meta.questionIds ?? event.meta.questionId ?? event.meta.question_id;
+  const list = Array.isArray(raw) ? raw : [raw];
+  const ids = list.filter((v): v is string => typeof v === "string" && v.trim().length > 0);
+  return [...new Set(ids.map((v) => v.trim()))];
 }
 
 function buildQuestionEventIndex(events: ParsedEvidenceEvent[]): Map<string, ParsedEvidenceEvent[]> {
   const byQuestion = new Map<string, ParsedEvidenceEvent[]>();
   for (const event of events) {
-    const questionId = eventQuestionId(event);
-    if (!questionId) {
-      continue;
+    for (const questionId of eventQuestionIds(event)) {
+      const rows = byQuestion.get(questionId) ?? [];
+      rows.push(event);
+      byQuestion.set(questionId, rows);
     }
-    const rows = byQuestion.get(questionId) ?? [];
-    rows.push(event);
-    byQuestion.set(questionId, rows);
   }
   return byQuestion;
 }
@@ -262,7 +262,7 @@ export function selectRelevantEvents(
   eventsByQuestionId?: Map<string, ParsedEvidenceEvent[]>
 ): ParsedEvidenceEvent[] {
   const tagged = eventsByQuestionId?.get(questionId)
-    ?? events.filter((event) => eventQuestionId(event) === questionId);
+    ?? events.filter((event) => eventQuestionIds(event).includes(questionId));
   if (tagged.length > 0) {
     return tagged;
   }
@@ -276,7 +276,7 @@ export function selectRelevantEvents(
     const warningKey = "strict-binding";
     if (!warnings.has(warningKey)) {
       console.warn(
-        `[diagnostic] STRICT_EVIDENCE_BINDING=true blocked fallback for untagged evidence at L${level}; meta.questionId is required for L3+ scoring (example question: ${questionId}).`
+        `[diagnostic] untagged evidence counts toward no question at any level; set meta.questionId when writing evidence (example question: ${questionId}, seen at L${level}).`
       );
       warnings.add(warningKey);
     }

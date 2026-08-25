@@ -167,6 +167,47 @@ describe("evidence counts only toward its own question", () => {
   });
 });
 
+describe("a failed gate says what actually failed", () => {
+  it("names an unmet mustInclude requirement instead of failing silently", () => {
+    // Found by adversarial review of the r224 work. `includeChecks` was an
+    // array of anonymous booleans, so a gate could fail with every printed
+    // number satisfied and no explanation: `events=120/8, sessions=8/3,
+    // days=10/3` and nothing missing, yet failing. A reason that lies by
+    // omission costs more than a missing check — every debugging session
+    // starts by disbelieving the message.
+    const gate: Gate = {
+      ...gateFor(["stdout"]),
+      minEvents: 1,
+      minSessions: 1,
+      minDistinctDays: 1,
+      mustInclude: { metaKeys: ["planStepId"], auditTypes: ["ALIGNMENT_CHECK_PASS"] }
+    };
+    const verdict = evaluateGate(gate, [
+      event({ id: "e0", type: "stdout", session: "s1", dayOffset: 0 }),
+      event({ id: "e1", type: "stdout", session: "s1", dayOffset: 0 })
+    ]);
+
+    expect(verdict.pass).toBe(false);
+    expect(verdict.reason, "every count is satisfied").toContain("events=2/1");
+    expect(verdict.reason).toContain("unmet=metaKey:planStepId,auditType:ALIGNMENT_CHECK_PASS");
+  });
+
+  it("says so when no evidence sits at the required trust tier", () => {
+    const gate: Gate = {
+      ...gateFor(["stdout"]),
+      minEvents: 1,
+      minSessions: 1,
+      minDistinctDays: 1,
+      requiredTrustTier: "ATTESTED",
+      acceptedTrustTiers: ["OBSERVED", "ATTESTED"]
+    };
+    const verdict = evaluateGate(gate, [event({ id: "e0", type: "stdout", session: "s1", dayOffset: 0 })]);
+
+    expect(verdict.pass).toBe(false);
+    expect(verdict.reason).toContain("no evidence at required trust tier ATTESTED");
+  });
+});
+
 describe("the methodology version records the change", () => {
   it("is past r223, because scores moved", () => {
     // A published methodology whose behaviour changes without its version
