@@ -105,6 +105,16 @@ export interface ToolDefinition {
   readonly name: string;
   readonly actionClass: ActionClass;
   readonly description: string;
+  /**
+   * JSON Schema for the arguments, as published to the model.
+   *
+   * Optional in the type and NOT optional in practice for anything a model
+   * should be able to call: a tool with no published schema cannot be invoked
+   * correctly, so `agentToolSeam` omits it from the catalogue rather than
+   * offering something the model has no way to call. Omitting it is therefore
+   * a deliberate way to register a tool that only other code dispatches.
+   */
+  readonly parameters?: Record<string, unknown>;
   readonly body: ToolBody;
 }
 

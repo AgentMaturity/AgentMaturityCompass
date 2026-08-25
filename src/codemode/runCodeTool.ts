@@ -41,7 +41,14 @@ export function runCodeTool(deps: RunCodeToolDeps): ToolDefinition {
     // work, and would let the transport be denied for a class no call in the
     // program actually used.
     actionClass: "READ_ONLY",
-    description: "Run a TypeScript-like program that calls tools via `await tools.name(args)`.",
+    description: "Run a program that calls tools via `await tools.name(args)`. Return a value to finish.",
+    parameters: {
+      type: "object",
+      properties: {
+        source: { type: "string", description: "the program body; top-level await and return both work" }
+      },
+      required: ["source"]
+    },
     body: async (execution: ToolExecution) => {
       const args = runCodeArgs.parse(execution.arguments);
 

@@ -86,6 +86,46 @@ export function defaultToolsConfig(): ToolsConfig {
           deny: { paths: ["**/.amc/**", "**/.git/**"] },
           requireExecTicket: false
         },
+        // The P4.3 built-ins. They have to be listed or the allowlist guard
+        // denies them, and an unlisted tool is a tool that does not work.
+        //
+        // `fs.edit` takes `fs.write`'s scope rather than a wider one. Widening
+        // the shipped filesystem posture is a security decision on its own
+        // merits, not something to slip in while wiring — an operator who wants
+        // an agent editing the whole repository widens these deliberately, and
+        // `amc agent-loop run --tools workspace` says what the scope currently
+        // is so they can see what they have.
+        {
+          name: "fs.edit",
+          actionClass: "WRITE_LOW",
+          allow: { paths: ["./workspace/output/**"] },
+          deny: { paths: ["**/.amc/**", "**/.git/**"] },
+          requireExecTicket: false
+        },
+        {
+          name: "glob",
+          actionClass: "READ_ONLY"
+        },
+        {
+          name: "grep",
+          actionClass: "READ_ONLY"
+        },
+        {
+          name: "bash",
+          actionClass: "WRITE_HIGH",
+          allow: {
+            binariesAllowlist: []
+          },
+          deny: {
+            argvRegexDenylist: [
+              "(^|\\s)rm\\s+-rf(\\s|$)",
+              "(^|\\s)sudo(\\s|$)",
+              "(^|\\s)curl(\\s|$)",
+              "(^|\\s)wget(\\s|$)"
+            ]
+          },
+          requireExecTicket: false
+        },
         {
           name: "git.status",
           actionClass: "READ_ONLY"

@@ -50,6 +50,8 @@ import {
 } from "./agent/stubProvider.js";
 import type { LoopNotification } from "./agent/loopTypes.js";
 import { echoToolSeam } from "./agent/echoTool.js";
+import { agentToolset } from "./agent/agentToolset.js";
+import type { AgentToolSeam } from "./agent/toolSeam.js";
 import { readAgentRunSummary, renderRunSummary, renderVerifyReport, verifyAgentRun } from "./agent/runReport.js";
 import { registerPromptCommands } from "./cli-prompt-commands.js";
 import { isActionClass } from "./governor/actionCatalog.js";
@@ -91,6 +93,7 @@ interface RunOptions {
   maxTokens?: string;
   maxSteps?: string;
   tools?: string;
+  toolMode?: string;
   failFirst?: string;
   thinkMs?: string;
   cancelAfter?: string;
@@ -326,7 +329,8 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
     .option("--credentials-file <path>", "explicit credentials file, overriding the home layout")
     .option("--max-tokens <n>", "provider max_tokens for each request")
     .option("--max-steps <n>", "how many model steps one turn may take")
-    .option("--tools <mode>", 'tool seam: "echo" or "none"')
+    .option("--tools <mode>", 'tool seam: "workspace" (the governed built-ins), "echo", or "none"')
+    .option("--tool-mode <mode>", '"native" (one call per step) or "code" (dispatch from a program)')
     .option("--fail-first <n>", "stub provider only: answer the first N dispatches with HTTP 429")
     .option("--think-ms <n>", "stub provider only: delay each answer, so a cancel has something to land in")
     .option("--cancel-after <ms>", "cancel the turn after this many milliseconds (Ctrl-C does the same)")
@@ -381,7 +385,44 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
       // The echo tool is offered by default only on the stub route: handing a
       // real provider a demonstration tool would spend the operator's money on
       // exercising a stub.
-      const wantsTools = (opts.tools ?? (providerId === STUB_PROVIDER_ID ? "echo" : "none")) === "echo";
+      // `echo` stays the stub-route default: spending an operator's tokens to
+      // exercise the real toolset is not a default anyone would choose, and the
+      // echo tool exists precisely to make a multi-step turn observable.
+      const toolMode = opts.tools ?? (providerId === STUB_PROVIDER_ID ? "echo" : "none");
+      const dispatchMode = opts.toolMode === "code" ? "code" as const : "native" as const;
+      let toolSeam: AgentToolSeam | null = null;
+      if (toolMode === "workspace") {
+        const toolset = agentToolset({
+          workspace: process.cwd(),
+          agentId: "default",
+          ...(dispatchMode === "code" ? { mode: dispatchMode } : {})
+        });
+        if (!toolset.readiness.ready) {
+          // Said once, up front, naming the command. Without this the operator
+          // sees every tool denied and reads it as broken tools rather than as
+          // unconfigured policy.
+          io.error(chalk.yellow("the workspace toolset is not ready:"));
+          for (const blocker of toolset.readiness.blockers) io.error(chalk.yellow(`  - ${blocker}`));
+          return;
+        }
+        io.log(chalk.dim(
+          `tool writes are scoped to: ${
+            toolset.readiness.writeScope.length > 0 ? toolset.readiness.writeScope.join(", ") : "(nothing)"
+          }`
+        ));
+        if (!toolset.readiness.confined) {
+          // A warning, not a refusal: an unconfined fs.read is still governed
+          // by the allowlist and the firewall. Code Mode is the part that
+          // genuinely cannot run without a sandbox, and it refuses on its own.
+          io.error(chalk.yellow(
+            `no OS sandbox on this machine (${toolset.readiness.sandboxReason ?? "unknown"}); ` +
+            "tool writes are bounded by policy only"
+          ));
+        }
+        toolSeam = toolset.seam;
+      } else if (toolMode === "echo") {
+        toolSeam = echoToolSeam();
+      }
       const timers: NodeJS.Timeout[] = [];
       let onSigint: (() => void) | null = null;
 
@@ -419,7 +460,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
           ...(providerId === STUB_PROVIDER_ID
             ? { transport: stubProviderTransport({ failFirst, thinkMs, retryAfterSeconds: 1 }) }
             : {}),
-          ...(wantsTools ? { tools: echoToolSeam() } : {}),
+          ...(toolSeam === null ? {} : { tools: toolSeam }),
           config: { maxStepsPerTurn: maxSteps },
           credentials: {
             // Watching is for a long-lived process picking up a rotation; a

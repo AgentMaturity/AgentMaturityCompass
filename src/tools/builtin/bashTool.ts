@@ -47,6 +47,14 @@ export function bashTool(deps: BashToolDeps = {}): ToolDefinition {
     name: "bash",
     actionClass: "WRITE_HIGH",
     description: "Run a shell command in the workspace and return its output.",
+    parameters: {
+      type: "object",
+      properties: {
+        command: { type: "string", description: "the shell command" },
+        timeoutMs: { type: "integer", description: "milliseconds before the process tree is killed" }
+      },
+      required: ["command"]
+    },
     body: async (execution) => {
       const args = bashArgs.parse(execution.arguments);
       if (execution.effectiveMode === "SIMULATE") {

@@ -151,7 +151,11 @@ describe("AMC-1482 fail-closed MCP server and tool context", () => {
       label: "Native tools",
       server: null
     });
-    expect(projection.tools).toHaveLength(7);
+    // 11 since the P4.3 built-ins joined the shipped allowlist: fs.read,
+    // fs.write, fs.edit, glob, grep, bash, git.status/commit/push, http.fetch,
+    // process.spawn. An unlisted tool is denied by the allowlist guard, so a
+    // tool AMC ships and does not list is a tool that does not work.
+    expect(projection.tools).toHaveLength(11);
     expect(projection.tools.every((tool) => tool.kind === "native" && tool.serverIdentity === null)).toBe(true);
     expect(new Set(projection.tools.map((tool) => tool.toolIdentity)).size).toBe(projection.tools.length);
     expect(projection).toMatchObject({

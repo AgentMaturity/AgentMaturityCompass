@@ -110,6 +110,14 @@ export function fsTools(deps: FsToolDeps): readonly ToolDefinition[] {
       name: "fs.read",
       actionClass: "READ_ONLY",
       description: "Read a UTF-8 file from the workspace.",
+      parameters: {
+        type: "object",
+        properties: {
+          path: { type: "string", description: "workspace-relative path" },
+          maxBytes: { type: "integer", description: "bytes to return before truncating" }
+        },
+        required: ["path"]
+      },
       body: (execution) => {
         const args = readArgs.parse(execution.arguments);
         const full = insideWorkspace(execution.workspace, args.path);
@@ -132,7 +140,15 @@ export function fsTools(deps: FsToolDeps): readonly ToolDefinition[] {
     defineTool({
       name: "fs.write",
       actionClass: "WRITE_LOW",
-      description: "Write a UTF-8 file, creating it if absent.",
+      description: "Write a UTF-8 file, creating it if absent. Overwriting an existing file requires reading it first.",
+      parameters: {
+        type: "object",
+        properties: {
+          path: { type: "string", description: "workspace-relative path" },
+          content: { type: "string" }
+        },
+        required: ["path", "content"]
+      },
       body: (execution) => {
         const args = writeArgs.parse(execution.arguments);
         const full = insideWorkspace(execution.workspace, args.path);
@@ -153,7 +169,16 @@ export function fsTools(deps: FsToolDeps): readonly ToolDefinition[] {
     defineTool({
       name: "fs.edit",
       actionClass: "WRITE_LOW",
-      description: "Replace an exact, unique string in a workspace file.",
+      description: "Replace an exact, unique string in a workspace file. Read the file first; the text must appear exactly once.",
+      parameters: {
+        type: "object",
+        properties: {
+          path: { type: "string", description: "workspace-relative path" },
+          find: { type: "string", description: "exact text to replace; must be unique in the file" },
+          replace: { type: "string" }
+        },
+        required: ["path", "find", "replace"]
+      },
       body: (execution) => {
         const args = editArgs.parse(execution.arguments);
         const full = insideWorkspace(execution.workspace, args.path);

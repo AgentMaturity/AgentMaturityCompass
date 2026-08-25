@@ -6,6 +6,7 @@ import {
   loadVerifiedToolsConfigSnapshot,
   validateToolRequest
 } from "../../toolhub/toolhubValidators.js";
+import { RUN_CODE_TOOL } from "../toolPipeline.js";
 import type { ToolGuard } from "../toolTypes.js";
 
 /**
@@ -90,6 +91,14 @@ export function budgetGuard(workspace: string): ToolGuard {
  */
 export function toolhubAllowlistGuard(workspace: string): ToolGuard {
   return (execution) => {
+    // The Code Mode transport is presentation infrastructure, not a
+    // capability, and the allowlist has nothing useful to say about it. What
+    // matters is what a program DISPATCHES, and every one of those calls
+    // re-enters this same guard on its own name. Gating the transport would
+    // mean an operator had to allowlist `run_code` itself, and denying it
+    // would leave code mode unable to call anything at all — the same reason
+    // `restrict()` refuses to name it.
+    if (execution.name === RUN_CODE_TOOL) return undefined;
     const snapshot = loadVerifiedToolsConfigSnapshot(workspace);
     if (!snapshot.signatureValid || !snapshot.config) {
       // An unverifiable allowlist is not an empty allowlist.
@@ -106,7 +115,31 @@ export function toolhubAllowlistGuard(workspace: string): ToolGuard {
       tool: definition,
       args: execution.arguments as Record<string, unknown>
     });
-    return verdict.ok ? undefined : `tool allowlist: ${verdict.reason ?? "denied"}`;
+    if (!verdict.ok) return `tool allowlist: ${verdict.reason ?? "denied"}`;
+
+    // `validateToolRequest` applies argv deny-patterns only to the literal name
+    // "process.spawn" — the same name-keying that left the host allowlist
+    // reachable by one identifier and the path globs by two. A `bash` entry
+    // declaring deny patterns is otherwise DEAD CONFIG that reads as policy.
+    // Applied here to whatever string arguments the tool actually has.
+    const patterns = definition.deny?.argvRegexDenylist ?? [];
+    if (patterns.length > 0) {
+      const text = Object.values(execution.arguments)
+        .flatMap((value) => (Array.isArray(value) ? value : [value]))
+        .filter((value): value is string => typeof value === "string")
+        .join(" ");
+      for (const pattern of patterns) {
+        try {
+          if (new RegExp(pattern, "i").test(text)) {
+            return `tool allowlist: blocked by deny pattern: ${pattern}`;
+          }
+        } catch {
+          // An uncompilable pattern is a broken policy, not a permission.
+          return `tool allowlist: deny pattern is not a valid expression: ${pattern}`;
+        }
+      }
+    }
+    return undefined;
   };
 }
 

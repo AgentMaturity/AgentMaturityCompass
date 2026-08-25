@@ -55,7 +55,15 @@ export function searchTools(): readonly ToolDefinition[] {
     defineTool({
       name: "glob",
       actionClass: "READ_ONLY",
-      description: "List workspace files matching a glob pattern.",
+      description: "List workspace files matching a glob pattern (* within a segment, ** across segments).",
+      parameters: {
+        type: "object",
+        properties: {
+          pattern: { type: "string", description: "e.g. **/*.ts" },
+          maxResults: { type: "integer" }
+        },
+        required: ["pattern"]
+      },
       body: (execution) => {
         const args = globArgs.parse(execution.arguments);
         const matcher = globToRegExp(args.pattern);
@@ -83,7 +91,17 @@ export function searchTools(): readonly ToolDefinition[] {
     defineTool({
       name: "grep",
       actionClass: "READ_ONLY",
-      description: "Search workspace file contents for a regular expression.",
+      description: "Search workspace file contents for a regular expression. Results are capped and say so.",
+      parameters: {
+        type: "object",
+        properties: {
+          pattern: { type: "string", description: "JavaScript regular expression" },
+          include: { type: "string", description: "glob narrowing which files are searched" },
+          maxResults: { type: "integer" },
+          maxBytes: { type: "integer" }
+        },
+        required: ["pattern"]
+      },
       body: (execution) => {
         const args = grepArgs.parse(execution.arguments);
         let pattern: RegExp;
