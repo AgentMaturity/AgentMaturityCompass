@@ -1057,9 +1057,9 @@ export function evaluateRuntimeFirewall(input: RuntimeFirewallEvaluateInput): Ru
   const workspace = resolve(input.workspace);
   const resolvedPolicy = resolveEffectiveRuntimeFirewallPolicy(input);
   const loadedPolicy = resolvedPolicy.policy;
-  const envRequiresPolicy = process.env.AMC_FIREWALL_ENABLED === "1";
-  const requirePolicy = input.requirePolicy === true || envRequiresPolicy;
-  const policy = loadedPolicy ?? (requirePolicy ? null : { ...defaultRuntimeFirewallPolicy("observe"), enabled: false });
+  const requirePolicy = input.requirePolicy === true || process.env.AMC_FIREWALL_ENABLED === "1";
+  // Deny by default (ADR-0011): no signed policy blocks; it used to go inert.
+  const policy = loadedPolicy ?? null;
   const decisionId = `fw_${randomUUID()}`;
   const createdAt = new Date().toISOString();
   const agentId = input.agentId && input.agentId.trim().length > 0 ? input.agentId : "default";
