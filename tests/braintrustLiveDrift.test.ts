@@ -1,4 +1,6 @@
 import { describe, expect, test } from "vitest";
+import { sha256Hex } from "../src/utils/hash.js";
+import { canonicalize } from "../src/utils/json.js";
 import { buildLiveDriftWatchAlerts, verifyLiveDriftReceipt } from "../src/watch/liveDriftAlerts.js";
 import {
   runBraintrustLiveDrift,
@@ -104,6 +106,14 @@ describe("runBraintrustLiveDrift", () => {
     expect(result.braintrustEvidenceCoverage0to1).toBe(1);
     expect(result.missingReasons).toEqual([]);
     expect(result.receipt.failClosed).toBe(false);
+
+    // CHARACTERIZATION PIN (ADR-0025, cluster collapse). The WHOLE result,
+    // canonicalized and hashed. `unique()` returns evidence refs sorted in some
+    // of these files and unsorted in others, and `sortDeep` maps arrays without
+    // sorting them — so array order reaches the receipt hash. Collapsing these
+    // files behind one factory must reproduce this byte for byte, or it has
+    // changed published artifacts while claiming to be a refactor.
+    expect(sha256Hex(canonicalize(result))).toBe("7e10f8402e19fca3007da93d0d4191f1b10cb2263e04370c41969f3ba8f3480f");
     expect(result.receipt.sourceRefs).toContain(sourceProof.llmsTxtHash);
     expect(result.receipt.summary).toContain("braintrust evidence coverage=1");
     expect(result.rowProofs).toHaveLength(6);

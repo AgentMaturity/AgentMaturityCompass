@@ -1,4 +1,6 @@
 import { describe, expect, test } from "vitest";
+import { sha256Hex } from "../src/utils/hash.js";
+import { canonicalize } from "../src/utils/json.js";
 import { buildLiveDriftWatchAlerts, verifyLiveDriftReceipt } from "../src/watch/liveDriftAlerts.js";
 import {
   runPaperReadSkillLiveDrift,
@@ -104,6 +106,14 @@ describe("runPaperReadSkillLiveDrift", () => {
     expect(result.paperReadSkillEvidenceCoverage0to1).toBe(1);
     expect(result.missingReasons).toEqual([]);
     expect(result.receipt.failClosed).toBe(false);
+
+    // CHARACTERIZATION PIN (ADR-0025, cluster collapse). The WHOLE result,
+    // canonicalized and hashed. `unique()` returns evidence refs sorted in some
+    // of these files and unsorted in others, and `sortDeep` maps arrays without
+    // sorting them — so array order reaches the receipt hash. Collapsing these
+    // files behind one factory must reproduce this byte for byte, or it has
+    // changed published artifacts while claiming to be a refactor.
+    expect(sha256Hex(canonicalize(result))).toBe("e7fe4bebf6a6a2317c9b68e630e3c197620e110ed87e9fc6dc52ecffb810ceb9");
     expect(result.receipt.sourceRefs).toContain(sourceProof.sourceRefHash);
     expect(result.receipt.summary).toContain("paper-read-skill");
     expect(result.rowProofs).toHaveLength(6);

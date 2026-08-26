@@ -286,3 +286,94 @@ carries no runtime risk — but it is a navigability change, not a size win.
 The next step is the collapse, on the four measured clusters, largest first, with
 the three forks carried as explicit parameters and receipt hashes pinned by
 characterization tests captured BEFORE the change.
+
+---
+
+# Step 3 — the collapse, cluster 1
+
+Acting on the correction above. The tightest of the four measured clusters:
+**braintrust, decibenchVoice, paperReadSkill, reflexionAgent, skillMatch**,
+internal trigram similarity 0.971–0.991. The same ~320-line program five times,
+differing in field names.
+
+## The safety net came first
+
+Before touching anything, each of the five tests gained a **characterization
+pin**: `sha256Hex(canonicalize(result))` over the WHOLE result — every
+`rowProofHash`, the `receiptHash`, the summary, the alerts, the missing reasons.
+Five golden hashes captured from the pre-collapse code.
+
+This is not belt-and-braces. `canonicalize` maps arrays without sorting them, so
+element order reaches the receipt hash; and a payload key that is `undefined`
+disappears from the canonical JSON while `null` survives. A collapse that got
+either subtly wrong would change published artifacts while reading as a refactor.
+
+**All five hashes are byte-identical after the collapse.**
+
+## What is parameterised, and what deliberately is not
+
+`src/watch/proofDelegatedMonitor.ts` owns the proof-coverage walk, the coverage
+arithmetic, alert construction, receipt enrichment and the rehash — identical
+across all five.
+
+The row payload is supplied as a **callback**, not a field list. A field list
+would have to reproduce each file's exact `?? null` handling to stay
+byte-identical, which means reconstructing the hash-critical part. A callback
+relocates it instead. Less "general", much safer, and the generality would have
+bought nothing.
+
+## Accounting, stated net this time
+
+| file | before | after |
+|---|---|---|
+| braintrustLiveDrift.ts | 323 | 211 |
+| decibenchVoiceLiveDrift.ts | 403 | 246 |
+| paperReadSkillLiveDrift.ts | 314 | 175 |
+| reflexionAgentLiveDrift.ts | 324 | 178 |
+| skillMatchLiveDrift.ts | 351 | 205 |
+| proofDelegatedMonitor.ts | — | 242 |
+| **total** | **1,715** | **1,257** |
+
+**Net −458 lines.** Unlike step 1, this one really is smaller — and the point is
+that the coverage/alert/receipt logic now exists once rather than five times, so
+a fix to it applies five times.
+
+## Two mutations survived, and the reason was my own blind spot
+
+The characterization hashes caught unsorting `unique` (5 tests red) and swapping
+the signed refs (5 red). They did **not** catch:
+
+- changing `round` from 4dp to 6dp
+- discarding the `isPresent` fork with `const isPresent = defaultIsPresent`
+
+Because every fixture has COMPLETE evidence: coverage is exactly 1, and
+`round(1)` is 1 at any precision. And the two presence checks diverge **only on
+`NaN`** — `defaultIsPresent(NaN)` is `true`, `numericAwareIsPresent(NaN)` is
+`false`; they agree on every other value.
+
+So the two forks I had carefully carried were, as tested, indistinguishable from
+dead parameters — the same pattern this line of work has now hit eight times,
+this time in code written to avoid it.
+
+`tests/proofDelegatedMonitor.test.ts` adds the cases that separate them: a
+repeating coverage of 6/9 that reads 0.6667 at 4dp and would read 0.666667 at
+6dp, and a `NaN` proof field that the two presence checks disagree about. Both
+mutations now turn it red.
+
+## Verification
+
+5 characterization hashes byte-identical · 5 new factory tests · 4 mutations
+caught (2 by the hashes, 2 by the new tests after they were written to close the
+gap). Full suite **10,017 / 10,017** across 1,244 files. `lint`, `typecheck`,
+`check:architecture-boundaries`, `check:counts`, `check:docs-drift` pass.
+
+## Remaining
+
+Three clusters, 10 files, ~5,200 lines — and they are NOT the same shape as
+cluster 1. Cluster 3/4 (`garage`, `railScore`, `llmFighter`, `agentReadingTest`,
+and the `aiReputationClaude` group) build their own distributions, use
+`totalVariationDistance`, round to 6dp, and leave `unique` UNSORTED. That last
+one is the hash-affecting fork: collapsing them together requires either
+carrying `roundPlaces` and `sortEvidenceRefs` as parameters, or accepting a
+receipt-hash change with a methodology note. Cluster 1 needed neither, which is
+why it went first.

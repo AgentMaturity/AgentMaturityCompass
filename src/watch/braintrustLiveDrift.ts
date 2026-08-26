@@ -8,21 +8,13 @@
  * from, authenticates to, or verifies anything with that vendor, so a receipt
  * attests only to the data the caller provided.
  */
-import { sha256Hex } from "../utils/hash.js";
-import { canonicalize } from "../utils/json.js";
-import {
-  hasNonBlankEvidenceRef,
-  normalizeEvidenceRefs,
-} from "./evidenceRefs.js";
-import {
-  buildLiveDriftWatchAlerts,
-  runLiveScoreBehaviorDrift,
-  type LiveDriftAlert,
-  type LiveDriftReceipt,
-  type LiveDriftSampleRow,
-  type LiveDriftThresholds,
-  type LiveDriftWatchAlert,
-  type LiveDriftWindow,
+import { createProofDelegatedMonitor } from "./proofDelegatedMonitor.js";
+import type {
+  LiveDriftReceipt,
+  LiveDriftSampleRow,
+  LiveDriftThresholds,
+  LiveDriftWatchAlert,
+  LiveDriftWindow,
 } from "./liveDriftAlerts.js";
 
 export type BraintrustSignalSurface =
@@ -138,22 +130,28 @@ const REQUIRED_ROW_PROOF_FIELDS: Array<keyof BraintrustLiveDriftRow> = [
   "braintrustNoProductPageOnlyProofHash",
 ];
 
-function unique(values: unknown): string[] {
-  return normalizeEvidenceRefs(values).sort();
-}
 
-function isPresent(value: unknown): boolean {
-  if (typeof value === "string") return value.trim().length > 0;
-  if (Array.isArray(value)) return value.length > 0;
-  return value !== null && value !== undefined;
-}
-
-function round(value: number): number {
-  return Math.round(value * 10000) / 10000;
-}
-
-function rowProof(row: BraintrustLiveDriftRow): BraintrustRowProof {
-  const payload = {
+/**
+ * The shared proof-delegated monitor, specialised for Braintrust (P5.2b).
+ *
+ * The coverage walk, alert construction, receipt enrichment and rehash used to
+ * be ~180 lines here and in four sibling files with 0.97+ token similarity.
+ * They now live once in `proofDelegatedMonitor.ts`. What stays is what actually
+ * differs: which fields must be present, which refs go where, and the exact
+ * hashed payload.
+ *
+ * `rowPayload` is spelled out rather than derived from a field list because its
+ * `?? null` handling reaches the published `rowProofHash` — an undefined key
+ * disappears from the canonical JSON while a null key survives. The
+ * characterization test pins the whole result hash, so any drift here is loud.
+ */
+const runMonitor = createProofDelegatedMonitor<BraintrustLiveDriftRow, BraintrustSourceProof>({
+  incompleteSubject: "Braintrust-style live drift",
+  summaryLabel: "braintrust evidence coverage",
+  coverageMetricId: "braintrustEvidenceCoverage0to1",
+  requiredProofFields: REQUIRED_SOURCE_PROOF_FIELDS,
+  requiredRowFields: REQUIRED_ROW_PROOF_FIELDS,
+  rowPayload: (row) => ({
     traceId: row.traceId,
     scenarioId: row.scenarioId,
     score0to1: row.score0to1,
@@ -172,152 +170,41 @@ function rowProof(row: BraintrustLiveDriftRow): BraintrustRowProof {
     braintrustFeedbackReceiptHash: row.braintrustFeedbackReceiptHash ?? null,
     braintrustAlertReceiptHash: row.braintrustAlertReceiptHash ?? null,
     braintrustNoProductPageOnlyProofHash: row.braintrustNoProductPageOnlyProofHash ?? null,
-    evidenceRefs: unique(row.evidenceRefs ?? []),
-    signedEvidenceRefs: unique(row.signedEvidenceRefs ?? []),
-  };
-
-  return {
-    traceId: row.traceId,
-    scenarioId: row.scenarioId,
-    surface: row.braintrustSurface,
-    rowProofHash: sha256Hex(canonicalize(payload)),
-    evidenceRefs: payload.evidenceRefs,
-    signedEvidenceRefs: payload.signedEvidenceRefs,
-  };
-}
-
-function proofStats(proof: BraintrustSourceProof, rows: BraintrustLiveDriftRow[]): {
-  present: number;
-  total: number;
-  missingReasons: string[];
-} {
-  let present = 0;
-  let total = 0;
-  const missingReasons: string[] = [];
-
-  for (const field of REQUIRED_SOURCE_PROOF_FIELDS) {
-    total += 1;
-    if (isPresent(proof[field])) {
-      present += 1;
-    } else {
-      missingReasons.push(field);
-    }
-  }
-
-  for (const row of rows) {
-    for (const field of REQUIRED_ROW_PROOF_FIELDS) {
-      total += 1;
-      if (isPresent(row[field])) {
-        present += 1;
-      } else {
-        missingReasons.push(`${row.traceId}.${String(field)}`);
-      }
-    }
-    total += 2;
-    if (hasNonBlankEvidenceRef(row.evidenceRefs)) {
-      present += 1;
-    } else {
-      missingReasons.push(`${row.traceId}.evidenceRefs`);
-    }
-    if (hasNonBlankEvidenceRef(row.signedEvidenceRefs)) {
-      present += 1;
-    } else {
-      missingReasons.push(`${row.traceId}.signedEvidenceRefs`);
-    }
-  }
-
-  return { present, total, missingReasons };
-}
-
-function rehashReceipt(receipt: Omit<LiveDriftReceipt, "receiptHash">): LiveDriftReceipt {
-  return {
-    ...receipt,
-    receiptHash: sha256Hex(canonicalize(receipt)),
-  };
-}
-
-function withBraintrustReceipt(
-  receipt: LiveDriftReceipt,
-  coverage: number,
-  missingReasons: string[],
-  proof: BraintrustSourceProof,
-): LiveDriftReceipt {
-  const { receiptHash: _oldHash, ...receiptWithoutHash } = receipt;
-  const alertRefs = unique([
+  }),
+  rowDescriptor: (row) => ({ surface: row.braintrustSurface }),
+  alertRefs: (proof) => [
     proof.sourceRefHash,
     proof.productPageMetadataHash,
     proof.llmsTxtHash,
     proof.docsSnapshotHash,
     proof.driftStatisticHash,
     proof.alertReceiptHash,
-  ]);
-  const signedRefs = unique([proof.ciReceiptHash, proof.signedEvidencePolicyHash]);
-  const alerts: LiveDriftAlert[] = [...receipt.alerts];
-
-  if (missingReasons.length > 0) {
-    alerts.push({
-      alertId: `live-drift:${receipt.agentId}:${receipt.baselineWindowId}:${receipt.liveWindowId}:braintrustEvidenceCoverage0to1`,
-      metricId: "braintrustEvidenceCoverage0to1",
-      severity: coverage < 0.75 ? "critical" : "high",
-      message: `Braintrust-style live drift proof is incomplete: ${missingReasons.join(", ")}.`,
-      threshold: 1,
-      observed: round(coverage),
-      evidenceRefs: alertRefs,
-      signedEvidenceRefs: signedRefs,
-    });
-  }
-
-  const recommendation = alerts.length > 0 ? "alert" : receipt.recommendation;
-  return rehashReceipt({
-    ...receiptWithoutHash,
-    alerts,
-    recommendation,
-    failClosed: alerts.length > 0,
-    sourceRefs: unique([
-      ...receipt.sourceRefs,
-      proof.sourceRefHash,
-      proof.productPageMetadataHash,
-      proof.llmsTxtHash,
-      proof.docsSnapshotHash,
-      proof.amcNativeMappingHash,
-      proof.noStandaloneSubsystemProofHash,
-      proof.noCopiedProseProofHash,
-    ]),
-    summary: `${alerts.length} live drift alert(s), recommendation=${recommendation}; braintrust evidence coverage=${round(coverage)}`,
-  });
-}
+  ],
+  signedRefs: (proof) => [proof.ciReceiptHash, proof.signedEvidencePolicyHash],
+  enrichedSourceRefs: (proof) => [
+    proof.sourceRefHash,
+    proof.productPageMetadataHash,
+    proof.llmsTxtHash,
+    proof.docsSnapshotHash,
+    proof.amcNativeMappingHash,
+    proof.noStandaloneSubsystemProofHash,
+    proof.noCopiedProseProofHash,
+  ],
+  delegatedSourceRefs: (proof) => [
+    proof.sourceRefHash,
+    proof.llmsTxtHash,
+    proof.docsSnapshotHash,
+  ],
+});
 
 export function runBraintrustLiveDrift(input: RunBraintrustLiveDriftInput): BraintrustLiveDriftResult {
-  const allRows = [...input.baselineWindow.rows, ...input.liveWindow.rows];
-  const stats = proofStats(input.sourceProof, allRows);
-  const braintrustEvidenceCoverage0to1 = stats.total === 0 ? 0 : round(stats.present / stats.total);
-  const rowProofs = allRows.map(rowProof);
-  const receipt = runLiveScoreBehaviorDrift({
-    agentId: input.agentId,
-    baselineWindow: input.baselineWindow,
-    liveWindow: input.liveWindow,
-    thresholds: input.thresholds,
-    sourceRefs: unique([
-      ...(input.sourceRefs ?? []),
-      input.sourceProof.sourceRefHash,
-      input.sourceProof.llmsTxtHash,
-      input.sourceProof.docsSnapshotHash,
-    ]),
-    now: input.now,
-  });
-  const enrichedReceipt = withBraintrustReceipt(
-    receipt,
-    braintrustEvidenceCoverage0to1,
-    stats.missingReasons,
-    input.sourceProof,
-  );
-
+  const result = runMonitor(input);
   return {
-    receipt: enrichedReceipt,
-    watchAlerts: buildLiveDriftWatchAlerts(enrichedReceipt),
-    sourceProof: input.sourceProof,
-    rowProofs,
-    missingReasons: stats.missingReasons,
-    braintrustEvidenceCoverage0to1,
+    receipt: result.receipt,
+    watchAlerts: result.watchAlerts,
+    sourceProof: result.sourceProof,
+    rowProofs: result.rowProofs as unknown as BraintrustRowProof[],
+    missingReasons: result.missingReasons,
+    braintrustEvidenceCoverage0to1: result.coverage0to1,
   };
 }

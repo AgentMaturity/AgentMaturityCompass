@@ -8,21 +8,13 @@
  * from, authenticates to, or verifies anything with that vendor, so a receipt
  * attests only to the data the caller provided.
  */
-import { sha256Hex } from "../utils/hash.js";
-import { canonicalize } from "../utils/json.js";
-import {
-  hasNonBlankEvidenceRef,
-  normalizeEvidenceRefs,
-} from "./evidenceRefs.js";
-import {
-  buildLiveDriftWatchAlerts,
-  runLiveScoreBehaviorDrift,
-  type LiveDriftAlert,
-  type LiveDriftReceipt,
-  type LiveDriftSampleRow,
-  type LiveDriftThresholds,
-  type LiveDriftWatchAlert,
-  type LiveDriftWindow,
+import { createProofDelegatedMonitor } from "./proofDelegatedMonitor.js";
+import type {
+  LiveDriftReceipt,
+  LiveDriftSampleRow,
+  LiveDriftThresholds,
+  LiveDriftWatchAlert,
+  LiveDriftWindow,
 } from "./liveDriftAlerts.js";
 
 export type DecibenchVoiceTaskType =
@@ -192,211 +184,62 @@ const REQUIRED_ROW_PROOF_FIELDS: Array<keyof DecibenchVoiceLiveDriftRow> = [
   "decibenchNoSourceCopyProofHash",
 ];
 
-function unique(values: unknown): string[] {
-  return normalizeEvidenceRefs(values).sort();
-}
 
-function isPresent(value: unknown): boolean {
-  if (typeof value === "string") return value.trim().length > 0;
-  if (Array.isArray(value)) return value.length > 0;
-  return value !== null && value !== undefined;
-}
-
-function round(value: number): number {
-  return Math.round(value * 10000) / 10000;
-}
-
-function rowProof(row: DecibenchVoiceLiveDriftRow): DecibenchVoiceRowProof {
-  const payload = {
-    traceId: row.traceId,
-    scenarioId: row.scenarioId,
-    decibenchVoiceTaskType: row.decibenchVoiceTaskType,
-    decibenchChannel: row.decibenchChannel,
-    decibenchProviderRouteHash: row.decibenchProviderRouteHash,
-    decibenchScenarioSuiteHash: row.decibenchScenarioSuiteHash,
-    decibenchScenarioHash: row.decibenchScenarioHash,
-    decibenchAudioFixtureHash: row.decibenchAudioFixtureHash,
-    decibenchTranscriptHash: row.decibenchTranscriptHash,
-    decibenchExpectedBehaviorHash: row.decibenchExpectedBehaviorHash,
-    decibenchActualBehaviorHash: row.decibenchActualBehaviorHash,
-    decibenchEvaluatorTraceHash: row.decibenchEvaluatorTraceHash,
-    decibenchRagContextHash: row.decibenchRagContextHash,
-    decibenchToolTraceHash: row.decibenchToolTraceHash,
-    decibenchNoTranscriptCopyProofHash: row.decibenchNoTranscriptCopyProofHash,
-    decibenchNoSourceCopyProofHash: row.decibenchNoSourceCopyProofHash,
-    decibenchWer0to1: row.decibenchWer0to1 ?? null,
-    decibenchLatencyMs: row.decibenchLatencyMs ?? null,
-    decibenchTaskCompletion0to1: row.decibenchTaskCompletion0to1 ?? null,
-    decibenchHallucinationRate0to1: row.decibenchHallucinationRate0to1 ?? null,
-    decibenchRagGrounding0to1: row.decibenchRagGrounding0to1 ?? null,
-    decibenchAudioQuality0to1: row.decibenchAudioQuality0to1 ?? null,
-    evidenceRefs: unique(row.evidenceRefs ?? []),
-    signedEvidenceRefs: unique(row.signedEvidenceRefs ?? []),
-  };
-  return {
-    traceId: row.traceId,
-    scenarioId: row.scenarioId,
-    taskType: row.decibenchVoiceTaskType,
-    channel: row.decibenchChannel,
-    rowProofHash: sha256Hex(canonicalize(payload)),
-    evidenceRefs: payload.evidenceRefs,
-    signedEvidenceRefs: payload.signedEvidenceRefs,
-  };
-}
-
-function proofStats(proof: DecibenchVoiceSourceProof, rows: DecibenchVoiceLiveDriftRow[]): {
-  present: number;
-  total: number;
-  missingReasons: string[];
-} {
-  let present = 0;
-  let total = 0;
-  const missingReasons: string[] = [];
-
-  for (const field of REQUIRED_SOURCE_PROOF_FIELDS) {
-    total += 1;
-    if (isPresent(proof[field])) {
-      present += 1;
-    } else {
-      missingReasons.push(field);
-    }
-  }
-
-  for (const row of rows) {
-    for (const field of REQUIRED_ROW_PROOF_FIELDS) {
-      total += 1;
-      if (isPresent(row[field])) {
-        present += 1;
-      } else {
-        missingReasons.push(`${row.traceId}.${String(field)}`);
-      }
-    }
-    total += 2;
-    if (hasNonBlankEvidenceRef(row.evidenceRefs)) {
-      present += 1;
-    } else {
-      missingReasons.push(`${row.traceId}.evidenceRefs`);
-    }
-    if (hasNonBlankEvidenceRef(row.signedEvidenceRefs)) {
-      present += 1;
-    } else {
-      missingReasons.push(`${row.traceId}.signedEvidenceRefs`);
-    }
-  }
-
-  return { present, total, missingReasons };
-}
-
-function rehashReceipt(receipt: Omit<LiveDriftReceipt, "receiptHash">): LiveDriftReceipt {
-  return {
-    ...receipt,
-    receiptHash: sha256Hex(canonicalize(receipt)),
-  };
-}
-
-function withDecibenchReceipt(
-  receipt: LiveDriftReceipt,
-  coverage: number,
-  missingReasons: string[],
-  proof: DecibenchVoiceSourceProof,
-): LiveDriftReceipt {
-  const { receiptHash: _oldHash, ...receiptWithoutHash } = receipt;
-  const alertRefs = unique([
-    proof.sourceRefHash,
-    proof.repositorySnapshotHash,
-    proof.readmeBlobHash,
-    proof.cliRunHash,
-    proof.mcpToolsRagHash,
-    proof.driftStatisticHash,
-    proof.alertReceiptHash,
-    proof.privacyBoundaryHash,
-  ]);
-  const signedRefs = unique([proof.ciReceiptHash]);
-  const alerts: LiveDriftAlert[] = [...receipt.alerts];
-
-  if (missingReasons.length > 0) {
-    alerts.push({
-      alertId: `live-drift:${receipt.agentId}:${receipt.baselineWindowId}:${receipt.liveWindowId}:decibenchEvidenceCoverage0to1`,
-      metricId: "decibenchEvidenceCoverage0to1",
-      severity: coverage < 0.75 ? "critical" : "high",
-      message: `Decibench voice live drift proof is incomplete: ${missingReasons.join(", ")}.`,
-      threshold: 1,
-      observed: round(coverage),
-      evidenceRefs: alertRefs,
-      signedEvidenceRefs: signedRefs,
-    });
-  }
-
-  const recommendation = alerts.length > 0 ? "alert" : receipt.recommendation;
-  return rehashReceipt({
-    ...receiptWithoutHash,
-    alerts,
-    recommendation,
-    failClosed: alerts.length > 0,
-    sourceRefs: unique([
-      ...receipt.sourceRefs,
-      proof.sourceRefHash,
-      proof.repositorySnapshotHash,
-      proof.licenseReferenceHash,
-      proof.githubLicenseNoAssertionHash,
-      proof.defaultBranchHash,
-      proof.releaseTagHash,
-      proof.readmeBlobHash,
-      proof.pyprojectHash,
-      proof.ciWorkflowHash,
-      proof.cliTreeHash,
-      proof.cliRunHash,
-      proof.cliRagHash,
-      proof.mcpTreeHash,
-      proof.mcpToolsRagHash,
-      proof.ragTreeHash,
-      proof.evaluatorsTreeHash,
-      proof.audioTreeHash,
-      proof.scenariosTreeHash,
-      proof.scenarioSuiteManifestHash,
-      proof.bridgeSidecarTreeHash,
-      proof.dashboardTreeHash,
-      proof.noSourceCopyProofHash,
-      proof.noTranscriptCopyProofHash,
-      proof.privacyBoundaryHash,
-    ]),
-    summary: `${alerts.length} live drift alert(s), recommendation=${recommendation}; Decibench evidence coverage=${round(coverage)}`,
-  });
-}
+/**
+ * The shared proof-delegated monitor, specialised for Decibench voice live drift (P5.2b).
+ *
+ * The coverage walk, alert construction, receipt enrichment and rehash used to
+ * be ~180 lines here and in four sibling files at 0.97+ token similarity. They
+ * now live once in `proofDelegatedMonitor.ts`. What remains is what genuinely
+ * differs: which fields must be present, which refs go where, and the exact
+ * hashed payload — spelled out rather than derived, because its `?? null`
+ * handling reaches the published `rowProofHash`.
+ */
+const runMonitor = createProofDelegatedMonitor<DecibenchVoiceLiveDriftRow, DecibenchVoiceSourceProof>({
+  incompleteSubject: "Decibench voice live drift",
+  summaryLabel: "Decibench evidence coverage",
+  coverageMetricId: "decibenchEvidenceCoverage0to1",
+  requiredProofFields: REQUIRED_SOURCE_PROOF_FIELDS,
+  requiredRowFields: REQUIRED_ROW_PROOF_FIELDS,
+  rowPayload: (row) => ({
+  traceId: row.traceId,
+  scenarioId: row.scenarioId,
+  decibenchVoiceTaskType: row.decibenchVoiceTaskType,
+  decibenchChannel: row.decibenchChannel,
+  decibenchProviderRouteHash: row.decibenchProviderRouteHash,
+  decibenchScenarioSuiteHash: row.decibenchScenarioSuiteHash,
+  decibenchScenarioHash: row.decibenchScenarioHash,
+  decibenchAudioFixtureHash: row.decibenchAudioFixtureHash,
+  decibenchTranscriptHash: row.decibenchTranscriptHash,
+  decibenchExpectedBehaviorHash: row.decibenchExpectedBehaviorHash,
+  decibenchActualBehaviorHash: row.decibenchActualBehaviorHash,
+  decibenchEvaluatorTraceHash: row.decibenchEvaluatorTraceHash,
+  decibenchRagContextHash: row.decibenchRagContextHash,
+  decibenchToolTraceHash: row.decibenchToolTraceHash,
+  decibenchNoTranscriptCopyProofHash: row.decibenchNoTranscriptCopyProofHash,
+  decibenchNoSourceCopyProofHash: row.decibenchNoSourceCopyProofHash,
+  decibenchWer0to1: row.decibenchWer0to1 ?? null,
+  decibenchLatencyMs: row.decibenchLatencyMs ?? null,
+  decibenchTaskCompletion0to1: row.decibenchTaskCompletion0to1 ?? null,
+  decibenchHallucinationRate0to1: row.decibenchHallucinationRate0to1 ?? null,
+  decibenchRagGrounding0to1: row.decibenchRagGrounding0to1 ?? null,
+  decibenchAudioQuality0to1: row.decibenchAudioQuality0to1 ?? null,
+  }),
+  rowDescriptor: (row) => ({ taskType: row.decibenchVoiceTaskType, channel: row.decibenchChannel }),
+  alertRefs: (proof) => [proof.sourceRefHash, proof.repositorySnapshotHash, proof.readmeBlobHash, proof.cliRunHash, proof.mcpToolsRagHash, proof.driftStatisticHash, proof.alertReceiptHash, proof.privacyBoundaryHash],
+  signedRefs: (proof) => [proof.ciReceiptHash],
+  enrichedSourceRefs: (proof) => [proof.sourceRefHash, proof.repositorySnapshotHash, proof.licenseReferenceHash, proof.githubLicenseNoAssertionHash, proof.defaultBranchHash, proof.releaseTagHash, proof.readmeBlobHash, proof.pyprojectHash, proof.ciWorkflowHash, proof.cliTreeHash, proof.cliRunHash, proof.cliRagHash, proof.mcpTreeHash, proof.mcpToolsRagHash, proof.ragTreeHash, proof.evaluatorsTreeHash, proof.audioTreeHash, proof.scenariosTreeHash, proof.scenarioSuiteManifestHash, proof.bridgeSidecarTreeHash, proof.dashboardTreeHash, proof.noSourceCopyProofHash, proof.noTranscriptCopyProofHash, proof.privacyBoundaryHash],
+  delegatedSourceRefs: (proof) => [proof.sourceRefHash, proof.repositorySnapshotHash, proof.licenseReferenceHash, proof.githubLicenseNoAssertionHash, proof.privacyBoundaryHash],
+});
 
 export function runDecibenchVoiceLiveDrift(input: RunDecibenchVoiceLiveDriftInput): DecibenchVoiceLiveDriftResult {
-  const allRows = [...input.baselineWindow.rows, ...input.liveWindow.rows];
-  const stats = proofStats(input.sourceProof, allRows);
-  const decibenchEvidenceCoverage0to1 = stats.total === 0 ? 0 : round(stats.present / stats.total);
-  const rowProofs = allRows.map(rowProof);
-  const receipt = runLiveScoreBehaviorDrift({
-    agentId: input.agentId,
-    baselineWindow: input.baselineWindow,
-    liveWindow: input.liveWindow,
-    thresholds: input.thresholds,
-    sourceRefs: unique([
-      ...(input.sourceRefs ?? []),
-      input.sourceProof.sourceRefHash,
-      input.sourceProof.repositorySnapshotHash,
-      input.sourceProof.licenseReferenceHash,
-      input.sourceProof.githubLicenseNoAssertionHash,
-      input.sourceProof.privacyBoundaryHash,
-    ]),
-    now: input.now,
-  });
-  const enrichedReceipt = withDecibenchReceipt(
-    receipt,
-    decibenchEvidenceCoverage0to1,
-    stats.missingReasons,
-    input.sourceProof,
-  );
-
+  const result = runMonitor(input);
   return {
-    receipt: enrichedReceipt,
-    watchAlerts: buildLiveDriftWatchAlerts(enrichedReceipt),
-    sourceProof: input.sourceProof,
-    rowProofs,
-    missingReasons: stats.missingReasons,
-    decibenchEvidenceCoverage0to1,
+    receipt: result.receipt,
+    watchAlerts: result.watchAlerts,
+    sourceProof: result.sourceProof,
+    rowProofs: result.rowProofs as unknown as DecibenchVoiceRowProof[],
+    missingReasons: result.missingReasons,
+    decibenchEvidenceCoverage0to1: result.coverage0to1,
   };
 }

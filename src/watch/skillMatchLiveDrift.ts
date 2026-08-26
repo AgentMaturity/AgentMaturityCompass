@@ -8,21 +8,13 @@
  * from, authenticates to, or verifies anything with that vendor, so a receipt
  * attests only to the data the caller provided.
  */
-import { sha256Hex } from "../utils/hash.js";
-import { canonicalize } from "../utils/json.js";
-import {
-  hasNonBlankEvidenceRef,
-  normalizeEvidenceRefs,
-} from "./evidenceRefs.js";
-import {
-  buildLiveDriftWatchAlerts,
-  runLiveScoreBehaviorDrift,
-  type LiveDriftAlert,
-  type LiveDriftReceipt,
-  type LiveDriftThresholds,
-  type LiveDriftWatchAlert,
-  type LiveDriftWindow,
-  type LiveDriftSampleRow,
+import { createProofDelegatedMonitor } from "./proofDelegatedMonitor.js";
+import type {
+  LiveDriftReceipt,
+  LiveDriftSampleRow,
+  LiveDriftThresholds,
+  LiveDriftWatchAlert,
+  LiveDriftWindow,
 } from "./liveDriftAlerts.js";
 
 export type SkillMatchResumeTaskType =
@@ -156,195 +148,57 @@ const REQUIRED_ROW_PROOF_FIELDS: Array<keyof SkillMatchResumeLiveDriftRow> = [
   "skillMatchNoSourceCopyProofHash",
 ];
 
-function unique(values: unknown): string[] {
-  return normalizeEvidenceRefs(values).sort();
-}
 
-function isPresent(value: unknown): boolean {
-  if (typeof value === "string") return value.trim().length > 0;
-  if (Array.isArray(value)) return value.length > 0;
-  return value !== null && value !== undefined;
-}
-
-function round(value: number): number {
-  return Math.round(value * 10000) / 10000;
-}
-
-function rowProof(row: SkillMatchResumeLiveDriftRow): SkillMatchResumeRowProof {
-  const payload = {
-    traceId: row.traceId,
-    scenarioId: row.scenarioId,
-    skillMatchTaskType: row.skillMatchTaskType,
-    skillMatchResumeFormat: row.skillMatchResumeFormat,
-    skillMatchProviderRouteHash: row.skillMatchProviderRouteHash,
-    skillMatchPromptPolicyHash: row.skillMatchPromptPolicyHash,
-    skillMatchResumeInputHash: row.skillMatchResumeInputHash,
-    skillMatchJobDescriptionHash: row.skillMatchJobDescriptionHash,
-    skillMatchRagContextHash: row.skillMatchRagContextHash,
-    skillMatchAnalysisOutputHash: row.skillMatchAnalysisOutputHash,
-    skillMatchEvaluatorTraceHash: row.skillMatchEvaluatorTraceHash,
-    skillMatchNoResumeCopyProofHash: row.skillMatchNoResumeCopyProofHash,
-    skillMatchNoSourceCopyProofHash: row.skillMatchNoSourceCopyProofHash,
-    skillMatchParserAccuracy0to1: row.skillMatchParserAccuracy0to1 ?? null,
-    skillMatchGroundingScore0to1: row.skillMatchGroundingScore0to1 ?? null,
-    skillMatchSuggestionQuality0to1: row.skillMatchSuggestionQuality0to1 ?? null,
-    skillMatchPiiRedactionPassed: row.skillMatchPiiRedactionPassed ?? null,
-    evidenceRefs: unique(row.evidenceRefs ?? []),
-    signedEvidenceRefs: unique(row.signedEvidenceRefs ?? []),
-  };
-  return {
-    traceId: row.traceId,
-    scenarioId: row.scenarioId,
-    taskType: row.skillMatchTaskType,
-    resumeFormat: row.skillMatchResumeFormat,
-    rowProofHash: sha256Hex(canonicalize(payload)),
-    evidenceRefs: payload.evidenceRefs,
-    signedEvidenceRefs: payload.signedEvidenceRefs,
-  };
-}
-
-function proofStats(proof: SkillMatchResumeSourceProof, rows: SkillMatchResumeLiveDriftRow[]): {
-  present: number;
-  total: number;
-  missingReasons: string[];
-} {
-  let present = 0;
-  let total = 0;
-  const missingReasons: string[] = [];
-
-  for (const field of REQUIRED_SOURCE_PROOF_FIELDS) {
-    total += 1;
-    if (isPresent(proof[field])) {
-      present += 1;
-    } else {
-      missingReasons.push(field);
-    }
-  }
-
-  for (const row of rows) {
-    for (const field of REQUIRED_ROW_PROOF_FIELDS) {
-      total += 1;
-      if (isPresent(row[field])) {
-        present += 1;
-      } else {
-        missingReasons.push(`${row.traceId}.${String(field)}`);
-      }
-    }
-    total += 2;
-    if (hasNonBlankEvidenceRef(row.evidenceRefs)) {
-      present += 1;
-    } else {
-      missingReasons.push(`${row.traceId}.evidenceRefs`);
-    }
-    if (hasNonBlankEvidenceRef(row.signedEvidenceRefs)) {
-      present += 1;
-    } else {
-      missingReasons.push(`${row.traceId}.signedEvidenceRefs`);
-    }
-  }
-
-  return { present, total, missingReasons };
-}
-
-function rehashReceipt(receipt: Omit<LiveDriftReceipt, "receiptHash">): LiveDriftReceipt {
-  return {
-    ...receipt,
-    receiptHash: sha256Hex(canonicalize(receipt)),
-  };
-}
-
-function withSkillMatchReceipt(
-  receipt: LiveDriftReceipt,
-  coverage: number,
-  missingReasons: string[],
-  proof: SkillMatchResumeSourceProof,
-): LiveDriftReceipt {
-  const { receiptHash: _oldHash, ...receiptWithoutHash } = receipt;
-  const alertRefs = unique([
-    proof.sourceRefHash,
-    proof.repositorySnapshotHash,
-    proof.readmeBlobHash,
-    proof.frontendAnalyzerComponentHash,
-    proof.driftStatisticHash,
-    proof.alertReceiptHash,
-    proof.privacyBoundaryHash,
-  ]);
-  const signedRefs = unique([proof.ciReceiptHash]);
-  const alerts: LiveDriftAlert[] = [...receipt.alerts];
-
-  if (missingReasons.length > 0) {
-    alerts.push({
-      alertId: `live-drift:${receipt.agentId}:${receipt.baselineWindowId}:${receipt.liveWindowId}:skillMatchEvidenceCoverage0to1`,
-      metricId: "skillMatchEvidenceCoverage0to1",
-      severity: coverage < 0.75 ? "critical" : "high",
-      message: `SkillMatch resume live drift proof is incomplete: ${missingReasons.join(", ")}.`,
-      threshold: 1,
-      observed: round(coverage),
-      evidenceRefs: alertRefs,
-      signedEvidenceRefs: signedRefs,
-    });
-  }
-
-  const recommendation = alerts.length > 0 ? "alert" : receipt.recommendation;
-  return rehashReceipt({
-    ...receiptWithoutHash,
-    alerts,
-    recommendation,
-    failClosed: alerts.length > 0,
-    sourceRefs: unique([
-      ...receipt.sourceRefs,
-      proof.sourceRefHash,
-      proof.repositorySnapshotHash,
-      proof.noLicenseBoundaryHash,
-      proof.defaultBranchHash,
-      proof.readmeBlobHash,
-      proof.frontendTreeHash,
-      proof.frontendAnalyzerComponentHash,
-      proof.frontendPdfExtractorHash,
-      proof.oldVersionTreeHash,
-      proof.oldAppHash,
-      proof.oldNotebookHash,
-      proof.requirementsHash,
-      proof.noSourceCopyProofHash,
-      proof.noResumeCopyProofHash,
-      proof.privacyBoundaryHash,
-    ]),
-    summary: `${alerts.length} live drift alert(s), recommendation=${recommendation}; SkillMatch evidence coverage=${round(coverage)}`,
-  });
-}
+/**
+ * The shared proof-delegated monitor, specialised for SkillMatch resume live drift (P5.2b).
+ *
+ * The coverage walk, alert construction, receipt enrichment and rehash used to
+ * be ~180 lines here and in four sibling files at 0.97+ token similarity. They
+ * now live once in `proofDelegatedMonitor.ts`. What remains is what genuinely
+ * differs: which fields must be present, which refs go where, and the exact
+ * hashed payload — spelled out rather than derived, because its `?? null`
+ * handling reaches the published `rowProofHash`.
+ */
+const runMonitor = createProofDelegatedMonitor<SkillMatchResumeLiveDriftRow, SkillMatchResumeSourceProof>({
+  incompleteSubject: "SkillMatch resume live drift",
+  summaryLabel: "SkillMatch evidence coverage",
+  coverageMetricId: "skillMatchEvidenceCoverage0to1",
+  requiredProofFields: REQUIRED_SOURCE_PROOF_FIELDS,
+  requiredRowFields: REQUIRED_ROW_PROOF_FIELDS,
+  rowPayload: (row) => ({
+  traceId: row.traceId,
+  scenarioId: row.scenarioId,
+  skillMatchTaskType: row.skillMatchTaskType,
+  skillMatchResumeFormat: row.skillMatchResumeFormat,
+  skillMatchProviderRouteHash: row.skillMatchProviderRouteHash,
+  skillMatchPromptPolicyHash: row.skillMatchPromptPolicyHash,
+  skillMatchResumeInputHash: row.skillMatchResumeInputHash,
+  skillMatchJobDescriptionHash: row.skillMatchJobDescriptionHash,
+  skillMatchRagContextHash: row.skillMatchRagContextHash,
+  skillMatchAnalysisOutputHash: row.skillMatchAnalysisOutputHash,
+  skillMatchEvaluatorTraceHash: row.skillMatchEvaluatorTraceHash,
+  skillMatchNoResumeCopyProofHash: row.skillMatchNoResumeCopyProofHash,
+  skillMatchNoSourceCopyProofHash: row.skillMatchNoSourceCopyProofHash,
+  skillMatchParserAccuracy0to1: row.skillMatchParserAccuracy0to1 ?? null,
+  skillMatchGroundingScore0to1: row.skillMatchGroundingScore0to1 ?? null,
+  skillMatchSuggestionQuality0to1: row.skillMatchSuggestionQuality0to1 ?? null,
+  skillMatchPiiRedactionPassed: row.skillMatchPiiRedactionPassed ?? null,
+  }),
+  rowDescriptor: (row) => ({ taskType: row.skillMatchTaskType, resumeFormat: row.skillMatchResumeFormat }),
+  alertRefs: (proof) => [proof.sourceRefHash, proof.repositorySnapshotHash, proof.readmeBlobHash, proof.frontendAnalyzerComponentHash, proof.driftStatisticHash, proof.alertReceiptHash, proof.privacyBoundaryHash],
+  signedRefs: (proof) => [proof.ciReceiptHash],
+  enrichedSourceRefs: (proof) => [proof.sourceRefHash, proof.repositorySnapshotHash, proof.noLicenseBoundaryHash, proof.defaultBranchHash, proof.readmeBlobHash, proof.frontendTreeHash, proof.frontendAnalyzerComponentHash, proof.frontendPdfExtractorHash, proof.oldVersionTreeHash, proof.oldAppHash, proof.oldNotebookHash, proof.requirementsHash, proof.noSourceCopyProofHash, proof.noResumeCopyProofHash, proof.privacyBoundaryHash],
+  delegatedSourceRefs: (proof) => [proof.sourceRefHash, proof.repositorySnapshotHash, proof.noLicenseBoundaryHash, proof.privacyBoundaryHash],
+});
 
 export function runSkillMatchResumeLiveDrift(input: RunSkillMatchResumeLiveDriftInput): SkillMatchResumeLiveDriftResult {
-  const allRows = [...input.baselineWindow.rows, ...input.liveWindow.rows];
-  const stats = proofStats(input.sourceProof, allRows);
-  const skillMatchEvidenceCoverage0to1 = stats.total === 0 ? 0 : round(stats.present / stats.total);
-  const rowProofs = allRows.map(rowProof);
-  const receipt = runLiveScoreBehaviorDrift({
-    agentId: input.agentId,
-    baselineWindow: input.baselineWindow,
-    liveWindow: input.liveWindow,
-    thresholds: input.thresholds,
-    sourceRefs: unique([
-      ...(input.sourceRefs ?? []),
-      input.sourceProof.sourceRefHash,
-      input.sourceProof.repositorySnapshotHash,
-      input.sourceProof.noLicenseBoundaryHash,
-      input.sourceProof.privacyBoundaryHash,
-    ]),
-    now: input.now,
-  });
-  const enrichedReceipt = withSkillMatchReceipt(
-    receipt,
-    skillMatchEvidenceCoverage0to1,
-    stats.missingReasons,
-    input.sourceProof,
-  );
-
+  const result = runMonitor(input);
   return {
-    receipt: enrichedReceipt,
-    watchAlerts: buildLiveDriftWatchAlerts(enrichedReceipt),
-    sourceProof: input.sourceProof,
-    rowProofs,
-    missingReasons: stats.missingReasons,
-    skillMatchEvidenceCoverage0to1,
+    receipt: result.receipt,
+    watchAlerts: result.watchAlerts,
+    sourceProof: result.sourceProof,
+    rowProofs: result.rowProofs as unknown as SkillMatchResumeRowProof[],
+    missingReasons: result.missingReasons,
+    skillMatchEvidenceCoverage0to1: result.coverage0to1,
   };
 }
