@@ -1,20 +1,7 @@
+import { redactSecrets } from "../shield/redaction/redactSecrets.js";
 import { createHash } from "node:crypto";
 import { canonicalize } from "../utils/json.js";
 
-const SECRET_PATTERNS: RegExp[] = [
-  /Bearer\s+[A-Za-z0-9._-]{8,}/gi,
-  /\bsk-[A-Za-z0-9]{12,}\b/g,
-  /\bAIza[0-9A-Za-z\-_]{20,}\b/g,
-  /\bxai-[A-Za-z0-9\-_]{12,}\b/g,
-  /BEGIN (?:RSA|EC|OPENSSH|PRIVATE) KEY/gi,
-  /\blease_[a-z0-9]{10,}\b/gi,
-  /\bamc_[a-z0-9]{12,}\b/gi,
-  /AKIA[0-9A-Z]{16}/,          // AWS access key
-  /ghp_[a-zA-Z0-9]{36}/,       // GitHub personal token
-  /gho_[a-zA-Z0-9]{36}/,       // GitHub OAuth token
-  /sk-ant-[a-zA-Z0-9-]{20,}/,  // Anthropic API key
-  /eyJ[a-zA-Z0-9_-]{10,}\.[a-zA-Z0-9_-]{10,}\.[a-zA-Z0-9_-]{10,}/, // JWT token
-];
 
 function clip(value: string, maxChars: number): string {
   if (value.length <= maxChars) {
@@ -23,12 +10,20 @@ function clip(value: string, maxChars: number): string {
   return `${value.slice(0, maxChars)}…`;
 }
 
+/**
+ * Redact secrets from text bound for a durable bridge row.
+ *
+ * Delegates to the shared table (P5.3). This module used to carry its own 13
+ * patterns, one of which — the PEM private-key header — matched only one of the
+ * five real forms, so RSA, EC, OPENSSH and DSA keys crossed the bridge
+ * unredacted. The shared table uses `secretBlind`'s correct spelling.
+ *
+ * The anonymous placeholder is deliberate here: a bridge row is durable and
+ * signed, and naming the KIND of secret that was present is itself a small
+ * disclosure. `blindSecrets` makes the opposite choice for its own reasons.
+ */
 export function redactBridgeText(input: string): string {
-  let out = input;
-  for (const pattern of SECRET_PATTERNS) {
-    out = out.replace(pattern, "<AMC_REDACTED>");
-  }
-  return out;
+  return redactSecrets(input, () => "<AMC_REDACTED>").redacted;
 }
 
 export function bridgeSha256(bytes: Buffer | string): string {

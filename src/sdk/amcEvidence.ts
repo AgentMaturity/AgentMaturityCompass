@@ -1,19 +1,18 @@
 import { createHash } from "node:crypto";
+import { redactSecrets } from "../shield/redaction/redactSecrets.js";
 
-const SECRET_PATTERNS = [
-  /Bearer\s+[A-Za-z0-9._-]{8,}/gi,
-  /\bsk-[A-Za-z0-9]{12,}\b/g,
-  /\bAIza[0-9A-Za-z\-_]{20,}\b/g,
-  /\bxai-[A-Za-z0-9\-_]{12,}\b/g,
-  /BEGIN (?:RSA|EC|OPENSSH|PRIVATE) KEY/gi
-];
-
+/**
+ * Redact secrets from text the SDK is about to persist.
+ *
+ * This module carried its own five patterns — a strict subset of the bridge's,
+ * including the SAME broken PEM header pattern that matched one of the five real
+ * private-key forms. It was the fourth copy of that bug in the tree (P5.3).
+ *
+ * Same anonymous placeholder as the bridge, and now the same table, so an SDK
+ * row and a bridge row redact identically instead of by half-measures.
+ */
 export function redactSdkText(value: string): string {
-  let out = value;
-  for (const pattern of SECRET_PATTERNS) {
-    out = out.replace(pattern, "<AMC_REDACTED>");
-  }
-  return out;
+  return redactSecrets(value, () => "<AMC_REDACTED>").redacted;
 }
 
 export function hashSdkValue(value: string | Buffer): string {

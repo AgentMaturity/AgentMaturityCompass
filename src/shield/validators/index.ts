@@ -85,7 +85,9 @@ const SECRET_PATTERNS: Array<{ type: string; pattern: RegExp; description: strin
   { type: 'aws_key', pattern: /AKIA[A-Z0-9]{16}/g, description: 'AWS access key' },
   { type: 'github_token', pattern: /gh[pousr]_[A-Za-z0-9]{36}/g, description: 'GitHub token' },
   { type: 'jwt', pattern: /eyJ[A-Za-z0-9_-]+\.eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+/g, description: 'JWT token' },
-  { type: 'private_key', pattern: /-----BEGIN (RSA |EC )?PRIVATE KEY-----/g, description: 'Private key' },
+  // Covers all five real PEM header forms. This listed only RSA and EC, so
+  // OPENSSH and DSA private keys scanned clean (P5.3).
+  { type: 'private_key', pattern: /-----BEGIN (RSA |EC |DSA |OPENSSH )?PRIVATE KEY-----/g, description: 'Private key' },
   { type: 'password_field', pattern: /\b(password|passwd|pwd)\s*[:=]\s*\S+/gi, description: 'Password in text' },
   { type: 'bearer_token', pattern: /Bearer\s+[A-Za-z0-9_-]{20,}/gi, description: 'Bearer token' },
 ];
