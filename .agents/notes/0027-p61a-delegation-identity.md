@@ -186,3 +186,94 @@ Full suite **10,081 / 10,081** across 1,250 files. `lint`, `typecheck`,
 - **`appendDagNode`/`createDag` have zero call sites**, and `SESSION_EVENT_TYPES`
   (`sessionTypes.ts:14`) is dead and already stale (omits `loop/retry`). Both
   recorded as debt rather than touched here.
+
+---
+
+# The spawn path — where the identity becomes enforced
+
+## The escape is now a failing test
+
+`spawnSubagent` hands its runner a `toolsetAgentId`, and it is always
+`identity.governedAs`. That single line is the whole governance story, and the
+mutation that changes it to `identity.runAs` turns two tests red — one asserting
+the id directly, one resolving it through the real `budgetForAgent`.
+
+The second is written so it cannot pass vacuously: it also asserts that a
+child-NAMED lookup resolves something **different** from the root's. If the two
+ever stop differing, the escape has closed on its own and the test says so rather
+than passing quietly.
+
+A pointer now sits at `agentToolset.ts`'s `const { workspace, agentId }` naming
+both mechanisms and the file that must not be bypassed. The dangerous failure is
+not a maintainer deliberately choosing `runAs` — it is one adding "the child gets
+its own toolset so it can have a narrower filter" and passing `runAs` because
+that reads more natural.
+
+## Order is the safety property
+
+    refuse → authorise → announce → run → account
+
+- A depth refusal writes **nothing**: no packet, no row.
+- An unsignable packet leaves **no file and no row** — an authorisation that
+  never held must not be discoverable as a record.
+- `delegation-started` is written **before** the child runs, so an unmatched
+  `started` is the honest signature of a parent that died mid-delegation. Crash
+  repair must not synthesise the missing half.
+- `delegation-completed` is written for **every** announced child, including one
+  that failed or threw. The cases that most need an account — a refusal, a token
+  ceiling, a cancellation — are exactly the ones where the child never got to
+  report, so a "do not duplicate when the child already reported" optimisation
+  would drop the account precisely in the failure modes it exists for.
+
+Each of those four is a mutation that turns the suite red.
+
+## The child's words stay the child's
+
+`SubagentOutcome.childText` carries what the child said; the
+`delegation-completed` row carries `settledAs` and a one-phrase `reason` that are
+the RUNTIME's account. A test asserts the runtime's account does not contain the
+child's text. Merging them would credit the child with a summary it never wrote —
+and in a signed log that misattribution is permanent.
+
+## Why the child's executor is injected
+
+Running a real child needs an LLM, a route and a session. Injecting the runner
+keeps every governance property — depth, signing, the toolset id, the evidence
+pair, the ordering — testable without a model, which is what makes them testable
+at all. Wiring a real `AgentDriver` into that seam is the next sub-step, and it
+changes none of the properties above.
+
+## Two delegation rows in the closed union
+
+`LoopEventRecord` gained `delegation-started` and `delegation-completed`, written
+through the same single seam as every other control row, with literal key order
+as the hash pre-image. They use the `agent_delegation_started` /
+`agent_delegation_completed` types that `EvidenceEventType` has declared all
+along and that, until now, **nothing wrote**.
+
+The builder refuses two spellings outright: a delegate at depth 0, and a
+completion with a blank reason — an outcome with no reason is not auditable.
+
+## Verification
+
+10 spawn tests, 5 mutations all caught: the escape itself (2 red), the
+announcement removed (3), the completion removed (4), `maxDepth` ignored (1), and
+the child's words leaking into the runtime's account (2).
+
+Full suite **10,091 / 10,091** across 1,251 files. `lint`, `typecheck`,
+`check:architecture-boundaries`, `check:counts`, `check:docs-drift` pass.
+
+## What P6.1a still owes
+
+- **A real runner.** The seam is injected and unwired; no `AgentDriver` runs
+  behind it yet, so no child has actually executed. Every property above is
+  proven about the governance, not about a running child.
+- **`ctx.subagents`.** There is no `ctx` in the loop. The scouting run corrected
+  my earlier "there is no ctx counterpart" — `ToolExecution` and `StepRunnerInit`
+  ARE the context objects; what `ToolExecution` lacks is service handles, and the
+  established workaround is closure capture at registration, as `agentToolset`
+  already does for the registry, pipeline and ledger. A `delegate` tool bound
+  that way is the shape.
+- **Continuable children.** Nothing resumes a child yet. `LoopInbox` is safe to
+  instantiate per child provided each child gets its own `SessionService`, which
+  is the constraint that sub-step has to respect.

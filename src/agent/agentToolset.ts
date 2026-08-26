@@ -141,6 +141,16 @@ export interface AgentToolset {
 }
 
 export function agentToolset(options: AgentToolsetOptions): AgentToolset {
+  // `agentId` KEYS BUDGETS AND GUARD SCOPES. `budgetForAgent` falls back to the
+  // `default` limits for an unknown id while usage is counted per id, and
+  // `ToolRegistry` resolves guard scopes with `scopes.get(execution.agentId)` —
+  // and scopes are where guards NARROW. So an unfamiliar id here means a full
+  // unspent budget and none of the parent's restrictions.
+  //
+  // For a delegated child this must be `DelegationIdentity.governedAs` — the
+  // ROOT's id — never the child's own `runAs`. See src/agent/subagentSpawn.ts
+  // and src/agent/delegationIdentity.ts. Passing `runAs` reads more natural and
+  // is the escape; tests/subagentSpawn.test.ts turns red if it happens.
   const { workspace, agentId } = options;
   let ledgerHandle: ReturnType<typeof openLedger> | null = null;
   const readiness = checkToolsetReadiness(workspace);

@@ -1,7 +1,7 @@
 /**
  * The wire shape of the agent loop's own control rows (plan P3.2).
  *
- * Four event types, one builder, for the same reason `turnLifecycleMeta.ts`
+ * Six event types, one builder, for the same reason `turnLifecycleMeta.ts`
  * exists: a signed row's meta is a hash pre-image, so the key ORDER is part of
  * what gets signed, and a shape assembled ad hoc at a call site is a shape that
  * drifts. `SessionService` owns the append; this module owns what the append
@@ -165,8 +165,61 @@ export interface LoopRetryRecord {
   readonly attemptsRemaining: number | null;
 }
 
+/**
+ * One delegation announced (P6.1a).
+ *
+ * Written BEFORE the child runs, so an unmatched `started` with no `completed`
+ * is the honest signature of a parent that died mid-delegation. Crash repair
+ * already synthesises step ends; it must not synthesise one of these, because a
+ * delegation whose outcome nobody observed is exactly what a reader needs to see.
+ */
+export interface LoopDelegationStartedRecord {
+  readonly kind: "delegation-started";
+  /** The child's own name. Evidence only — never a governance key. */
+  readonly childRunAs: string;
+  /** The child's OWN session. A child is never a second writer on the parent's. */
+  readonly childSessionId: string;
+  /** What BOTH ends are metered and restricted as: the root's id. */
+  readonly governedAs: string;
+  readonly depth: number;
+  /** The signed packet that authorised this child to exist. */
+  readonly packetId: string;
+}
+
+/**
+ * The runtime's account of how a delegation ended (P6.1a).
+ *
+ * `settledAs` and `reason` are the RUNTIME's words, never the child's. The
+ * child's own output reaches the parent through the inbox as a separate row with
+ * its own provenance; merging the two here would credit the child with a summary
+ * it never wrote.
+ *
+ * Emitted unconditionally, including when the child already reported. The cases
+ * that most need an account — a refusal, a failure, a cancellation — are exactly
+ * the ones where the child never got to report, so a "do not duplicate"
+ * optimisation would drop the account precisely in the failure modes it exists
+ * for.
+ */
+export interface LoopDelegationCompletedRecord {
+  readonly kind: "delegation-completed";
+  readonly childRunAs: string;
+  readonly childSessionId: string;
+  /** Joins this row to its `delegation-started`. */
+  readonly packetId: string;
+  /** How the runtime saw it end. */
+  readonly settledAs: "reported" | "refused" | "failed" | "cancelled";
+  /** One phrase, from the runtime. */
+  readonly reason: string;
+}
+
 /** Every control row the loop may write. Closed: a new one is a deliberate change. */
-export type LoopEventRecord = LoopInboxRecord | LoopCancelRecord | LoopVetoRecord | LoopRetryRecord;
+export type LoopEventRecord =
+  | LoopInboxRecord
+  | LoopCancelRecord
+  | LoopVetoRecord
+  | LoopRetryRecord
+  | LoopDelegationStartedRecord
+  | LoopDelegationCompletedRecord;
 
 /** A built row: what to append, what its meta says, and what its payload is. */
 export interface LoopEventRow {
@@ -190,6 +243,38 @@ export function buildLoopEventRow(record: LoopEventRecord): LoopEventRow {
   switch (record.kind) {
     case "inbox":
       return buildInboxRow(record);
+    case "delegation-started":
+      if (record.depth < 1) {
+        throw new Error("agent_delegation_started: a delegate is at depth 1 or deeper");
+      }
+      return {
+        eventType: "agent_delegation_started",
+        // LITERAL ORDER BELOW IS THE HASH PRE-IMAGE ORDER.
+        meta: {
+          childRunAs: record.childRunAs,
+          childSessionId: record.childSessionId,
+          governedAs: record.governedAs,
+          depth: record.depth,
+          packetId: record.packetId
+        },
+        payload: null
+      };
+    case "delegation-completed":
+      if (record.reason.trim().length === 0) {
+        throw new Error("agent_delegation_completed: an outcome with no reason is not auditable");
+      }
+      return {
+        eventType: "agent_delegation_completed",
+        // LITERAL ORDER BELOW IS THE HASH PRE-IMAGE ORDER.
+        meta: {
+          childRunAs: record.childRunAs,
+          childSessionId: record.childSessionId,
+          packetId: record.packetId,
+          settledAs: record.settledAs,
+          reason: record.reason
+        },
+        payload: null
+      };
     case "cancel":
       return {
         eventType: "loop/cancel",
