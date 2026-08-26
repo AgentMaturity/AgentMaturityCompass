@@ -52,6 +52,7 @@ import type { LoopNotification } from "./agent/loopTypes.js";
 import { echoToolSeam } from "./agent/echoTool.js";
 import { agentToolset } from "./agent/agentToolset.js";
 import { delegateTool } from "./agent/delegateTool.js";
+import { DEFAULT_MAX_DELEGATION_DEPTH } from "./agent/delegationIdentity.js";
 import { listAllowedTools } from "./toolhub/toolhubValidators.js";
 import type { AgentToolSeam } from "./agent/toolSeam.js";
 import type { SubagentCapability } from "./agent/delegateTool.js";
@@ -373,13 +374,23 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
       const thinkMs = integerOption(io, "--think-ms", opts.thinkMs, 0);
       const cancelAfter = integerOption(io, "--cancel-after", opts.cancelAfter, 0);
       const steerAfter = integerOption(io, "--steer-after", opts.steerAfter, 0);
+      // Through the same validating helper as every other numeric flag. An
+      // earlier version used a bare `Number.parseInt`, so `--max-delegation-depth
+      // deep` reached the capability as NaN — every depth comparison against NaN
+      // is false, which silently turns the bound OFF rather than reporting the
+      // typo. A limit that stops limiting when you misspell it is worse than no
+      // limit, because the operator believes it is there.
+      const maxDelegationDepth = integerOption(
+        io, "--max-delegation-depth", opts.maxDelegationDepth, DEFAULT_MAX_DELEGATION_DEPTH
+      );
       if (
         maxTokens === null ||
         maxSteps === null ||
         failFirst === null ||
         thinkMs === null ||
         cancelAfter === null ||
-        steerAfter === null
+        steerAfter === null ||
+        maxDelegationDepth === null
       ) {
         return;
       }
@@ -453,6 +464,11 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
         // re-reads the registry each step.
         if (wantsDelegation) {
           grantDelegation = (capability) => { toolset.registry.define(delegateTool(capability)); };
+          // Beside the write-scope line, and for the same reason: a bound the
+          // operator cannot see is one they cannot check. It is also the only
+          // place the parsed depth becomes observable, so a build that dropped
+          // the operator's value and used the default would say so here.
+          io.log(chalk.dim(`delegation is offered, bounded to depth ${maxDelegationDepth}`));
         }
         // The toolset holds one evidence handle for the run; release it when
         // the process ends rather than leaking a SQLite handle per agent.
@@ -501,12 +517,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
           ...(grantDelegation === null
             ? {}
             : {
-                delegation: {
-                  grant: grantDelegation,
-                  ...(opts.maxDelegationDepth === undefined
-                    ? {}
-                    : { maxDepth: Number.parseInt(opts.maxDelegationDepth, 10) })
-                }
+                delegation: { grant: grantDelegation, maxDepth: maxDelegationDepth }
               }),
           config: { maxStepsPerTurn: maxSteps },
           credentials: {
