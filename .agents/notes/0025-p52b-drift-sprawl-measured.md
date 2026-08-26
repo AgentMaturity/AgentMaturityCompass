@@ -702,3 +702,103 @@ baseline for `liveDriftAlerts.ts` lowered 11,657 → 11,074.
 
 Every published receipt hash byte-identical throughout, verified by eight
 characterization pins.
+
+---
+
+# Step 7 — the registry: measured, and it costs lines
+
+## The pattern already exists in this repo, applied to 1 of 74 domains
+
+`ollamaMetrics` has `normalizeOllamaMetricsReceiptRow` and
+`ollamaMetricsDistributionStats`, spread into `receiptRows` and `distribution`.
+Because of that it occupies **1 line in `receiptRows` and 2 in `distribution`**,
+where an unextracted domain of the same size occupies ~23 and ~10. The slice
+types are `Pick<LiveDriftReceiptRow, "field" | …>`, so the compiler enforces
+that a slice returns exactly its domain's fields.
+
+So "build a registry" is not an architecture to invent. It is: apply the
+existing in-repo pattern to the other 73 domains.
+
+## Measured by doing it, then reverting
+
+Extracted `researchGym` (37 receipt-row fields, the largest clean contiguous
+block) exactly as `ollamaMetrics` is done. Hashes held — the pattern generalises.
+
+**The file grew by 56 lines.** Removing 37 lines from `receiptRows` and adding
+one spread costs a 39-line `Pick` plus a ~48-line function.
+
+Dropping the `Pick` and letting the return type be inferred costs +17 per domain
+instead of +56. Both still catch a wrong field type, verified by injecting one:
+
+    with Pick     error TS2322 at the offending field, one line
+    without Pick  error TS2322 at the call site, quoting a 932-field type
+
+So the trade is diagnosability, not safety.
+
+| approach | per domain | 73 remaining |
+|---|---|---|
+| with `Pick` (precise errors) | +56 | **≈ +4,100** |
+| inferred return type | +17 | ≈ +1,250 |
+
+**The registry is a redistribution that costs lines, not a decomposition that
+saves them.** What it buys is that adding domain 75 becomes a new file instead
+of edits to four shared functions — real, but forward-looking, and priced above.
+
+The `researchGym` extraction was reverted rather than kept: two of seventy-four
+extracted is a worse state than one or seventy-four, and committing 1/74th of a
+4,000-line decision is not mine to make.
+
+## What was kept: `expectedRowHash`, 941 lines to 25
+
+`expectedRowHash` re-selected all 937 receipt-row fields as
+`field: row.field`, with no transformation, purely to rehash them.
+`verifyLiveDriftReceipt` already hashes the RECEIPT by destructuring its hash
+away; doing the same per row makes the two consistent.
+
+    src/watch/liveDriftAlerts.ts   11,074 -> 10,158   (-916)
+
+A first pass comparing the two field lists found 23 `ollamaMetrics*` fields in
+`expectedRowHash` that `receiptRows` appeared never to write, and I nearly
+recorded them as dead. They are not: `receiptRows` supplies them through
+`...normalizeOllamaMetricsReceiptRow(row)`, a spread my literal-property scan
+did not see. 914 literal + 23 spread = 937, exactly matching.
+
+**One deliberate behaviour change, in the strict direction.** Receipts arrive
+over HTTP (`api/shieldRouter.ts`), so a row can carry keys the enumeration never
+listed; the old code ignored them, the destructure hashes them. It cannot turn an
+invalid receipt valid — only add a row-level error to a receipt whose top-level
+hash already fails, since any added row key also changes the receipt payload.
+Legitimate rows round-tripped through JSON are unaffected: `undefined` values are
+dropped by `JSON.stringify` under both spellings. The mutation that leaves
+`rowHash` inside the payload turns 82 tests red.
+
+## What is genuinely left, and its shape
+
+| function | lines | why it stays |
+|---|---|---|
+| `runLiveScoreBehaviorDrift` | 2,717 | ~300 one-line per-domain metrics |
+| `distribution` | 1,596 | 330 properties, no shape repeating more than 3× |
+| `receiptRows` | 935 | 914 fields, each with its own normalizer |
+
+None of these is duplication. They are 74 domains' worth of distinct
+computation, and the only way to make them smaller is to delete domains.
+
+## Verification
+
+Full suite **10,041 / 10,041** across 1,246 files; five gates pass. Ratchet
+baseline lowered 11,074 → 10,158.
+
+## P5.2b, final
+
+| step | net lines |
+|---|---|
+| 1 · type layer extracted | +113 |
+| 3 · cluster 1 factory | −458 |
+| 4 · Family-B arithmetic | −374 |
+| 5 · cluster 4 / `buildAlert` | −525 |
+| 6 · aggregator guards | −583 |
+| 7 · `expectedRowHash` | −916 |
+| **total** | **−2,743** |
+
+`src/watch/liveDriftAlerts.ts`: **15,980 → 10,158**. Every published receipt hash
+byte-identical throughout, verified by eight characterization pins.
