@@ -372,3 +372,90 @@ a running loop yet. The shape is a `delegate` tool bound by closure capture at
 registration, the way `agentToolset` already binds its registry, pipeline and
 ledger — which is also what would give the child's report its route back into the
 parent through `ToolCallOutcome.additionalContext`.
+
+---
+
+# Continuable children
+
+## The evidence decision that shapes everything else
+
+A child that can still be asked something has not finished. So a continuable
+child's `delegation-completed` is **deferred** until the parent releases it —
+writing the completion when its first turn went quiet would close a delegation the
+parent can still talk to, and the log would say it ended while it was running.
+
+A parent that never releases leaves an unmatched `delegation-started`. That is not
+a leak to paper over: it is the honest signature of a delegation nobody ended, and
+a test asserts it survives rather than being tidied away.
+
+The handle's `close` is idempotent, because a parent may release a child on a path
+that also unwinds and two completion rows would make the log say it ended twice.
+The first settlement stands; later ones are dropped.
+
+## The cursor `readAgentRunSummary` forced
+
+`readAgentRunSummary` folds the WHOLE session. Without a cursor, a second
+continuation hands the parent everything the child has ever said — the first
+answer quoted back as if it were the new one. The runner tracks how much has been
+reported and returns only what is fresh. The mutation removing that cursor turns
+the "reports only what the child said THIS time" test red.
+
+## A surviving mutation, resolved by testing one guard and deleting the other
+
+Mutation testing found `released` checked in two places and only one
+distinguishable:
+
+- **`drain`'s guard is real.** `SubagentContinuation` is on the runner's own
+  result, so a caller can hold it without going through the handle. Without the
+  guard that caller gets an opaque failure from a closed session instead of a
+  refusal it can act on. It now has a test that reaches the runner directly, and
+  removing the guard turns it red.
+- **`release`'s early return was decoration.** Measured rather than reasoned
+  about: `SessionService` already refuses a second close with "SessionService used
+  after close()" and writes exactly one `session/close` row. A guard there sat
+  next to a protection that already covered the case. Deleted; the flag stays
+  because `drain` needs it.
+
+That is the rule this codebase keeps re-learning, applied in both directions in
+one change: test it if it is real, delete it if it is not.
+
+## Verification
+
+9 continuation tests, 6 mutations: completion not deferred (7 red), close not
+idempotent (1), the report cursor removed (1), the child torn down despite being
+continuable (3), the drain guard removed (1 — after it was given a test), and the
+release early-return, which survived and was deleted rather than kept.
+
+Full suite **10,104 / 10,104** across 1,253 files. `lint`, `typecheck`,
+`check:architecture-boundaries`, `check:counts`, `check:docs-drift` pass.
+
+## P6.1a's Verify criterion is now met
+
+"A parent delegates to a **continuable** child that reports back; every delegation
+carries a signed handoff packet." All of it, against a real `AgentDriver`:
+
+- the parent delegates, and a depth-bounded child is authorised by a packet that
+  cannot be unsigned;
+- the child runs, governed as its root, in its own session;
+- it reports back in its own words, kept separate from the runtime's account;
+- it can be asked again through the same inbox, in the same session;
+- and the delegation is announced and accounted for in the parent's signed log.
+
+## What remains before P6.1b
+
+**`ctx.subagents` — nothing calls any of this from inside a running loop.** The
+whole path is exercised by tests, not by an agent. The shape is a `delegate` tool
+bound by closure capture at registration, the way `agentToolset` already binds its
+registry, pipeline and ledger; the child's report would then reach the parent
+through `ToolCallOutcome.additionalContext`, which already routes tool text into
+the parent's durable inbox.
+
+Two things that sub-step must not get wrong, both already visible:
+
+- **The report must not be concatenated with the runtime's account.** They are
+  separate provenance and the parent's log would otherwise record a runtime
+  summary as if the child had written it.
+- **`drain()` must stay inside the tool body.** `whenIdle()` is per-driver and
+  nothing links a child's lifetime to its parent's; an "async spawn" convenience
+  would let a child outlive the parent that authorised it, with no lifecycle
+  evidence saying so.

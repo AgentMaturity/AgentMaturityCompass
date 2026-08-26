@@ -85,6 +85,24 @@ export function createDriverRunner(init: DriverRunnerInit): SubagentRunner {
       agentId: ctx.toolsetAgentId
     });
 
+    let keepAlive = false;
+    let released = false;
+    const release = (): void => {
+      // No early return on a second call. `SessionService` already refuses one
+      // ("SessionService used after close()") and writes exactly one
+      // `session/close` row — measured, not assumed — so a guard here would be a
+      // protection sitting next to a protection that already covers the case.
+      // The flag is still set, because `drain` genuinely needs it: without that
+      // one, a caller holding the raw continuation gets an opaque failure from a
+      // closed session instead of a refusal it can act on.
+      released = true;
+      // Both, always. A leaked ledger handle outlives the delegation that opened
+      // it, and an unclosed session leaves a run that verification reads as
+      // still open.
+      try { toolset.close(); } catch { /* already closed */ }
+      try { session.close({ reason: "completed" }); } catch { /* never opened */ }
+    };
+
     try {
       session.open({
         sessionId: ctx.childSessionId,
@@ -103,41 +121,65 @@ export function createDriverRunner(init: DriverRunnerInit): SubagentRunner {
         tools: toolset.seam
       });
 
-      // The only way in.
-      driver.followup(ctx.goal);
-      await driver.whenIdle();
+      /**
+       * How much of the child's assistant text the parent has already been told.
+       *
+       * `readAgentRunSummary` folds the WHOLE session, so without this cursor a
+       * second continuation would hand the parent everything the child has ever
+       * said — the first answer quoted again as if it were the new one.
+       */
+      let reported = 0;
 
-      // The driver's own status goes in beside the log's counts, never instead
-      // of them — `readAgentRunSummary` is built that way on purpose.
-      const status = driver.status;
-      const summary = readAgentRunSummary(init.workspace, ctx.childSessionId, status);
+      const drain = async (text: string): Promise<SubagentRunResult> => {
+        if (released) {
+          return { ok: false, text: "", reason: "child has been released" };
+        }
+        // The only way in.
+        driver.followup(text);
+        await driver.whenIdle();
 
-      // `failed` is terminal: the spine refused a `turn/end` or `turn/seal`, so
-      // the child's log has an open turn nothing may build on. Its text may look
-      // complete; the run it came from is not.
-      if (status === "failed") {
-        return { ok: false, text: "", reason: "child driver failed; its log has an open turn" };
+        // The driver's own status goes in beside the log's counts, never instead
+        // of them — `readAgentRunSummary` is built that way on purpose.
+        const status = driver.status;
+        const summary = readAgentRunSummary(init.workspace, ctx.childSessionId, status);
+
+        // `failed` is terminal: the spine refused a `turn/end` or `turn/seal`, so
+        // the child's log has an open turn nothing may build on. Its text may look
+        // complete; the run it came from is not.
+        if (status === "failed") {
+          return { ok: false, text: "", reason: "child driver failed; its log has an open turn" };
+        }
+
+        // `unsignedRows` documents itself as "zero is the only acceptable value".
+        // A child whose evidence is not signed has produced words with no
+        // provenance, and handing those back to a parent that will quote them
+        // would launder them into the parent's own signed log.
+        if (summary.unsignedRows > 0) {
+          return {
+            ok: false,
+            text: "",
+            reason: `child wrote ${summary.unsignedRows} unsigned row(s); its output has no provenance`
+          };
+        }
+
+        const fresh = summary.assistantText.slice(reported);
+        reported = summary.assistantText.length;
+        return { ok: true, text: fresh.join("\n") };
+      };
+
+      const first = await drain(ctx.goal);
+      if (!ctx.continuable || !first.ok) {
+        return first;
       }
 
-      // `unsignedRows` documents itself as "zero is the only acceptable value".
-      // A child whose evidence is not signed has produced words with no
-      // provenance, and handing those back to a parent that will quote them
-      // would launder them into the parent's own signed log.
-      if (summary.unsignedRows > 0) {
-        return {
-          ok: false,
-          text: "",
-          reason: `child wrote ${summary.unsignedRows} unsigned row(s); its output has no provenance`
-        };
-      }
-
-      return { ok: true, text: summary.assistantText.join("\n") };
+      // The child stays alive, so the `finally` must not tear it down. Its
+      // delegation is not accounted for until the parent releases the handle.
+      keepAlive = true;
+      return { ...first, continuation: { continue: drain, close: release } };
     } finally {
-      // Both, always. A leaked ledger handle outlives the delegation that opened
-      // it, and an unclosed session leaves a run that verification reads as
-      // still open.
-      try { toolset.close(); } catch { /* already closed */ }
-      try { session.close({ reason: "completed" }); } catch { /* never opened, or already closed */ }
+      if (!keepAlive) {
+        release();
+      }
     }
   };
 }

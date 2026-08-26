@@ -39,6 +39,8 @@ import type { LoopEventRecord } from "../session/loopEventMeta.js";
 
 /** What the runtime hands a child executor. */
 export interface SubagentRunContext {
+  /** Whether the runner should keep the child alive after its first turn. */
+  readonly continuable: boolean;
   /**
    * The id the child's toolset, budgets and guard scopes must use.
    *
@@ -51,6 +53,21 @@ export interface SubagentRunContext {
   readonly goal: string;
 }
 
+/**
+ * A child that is still alive and can take more work.
+ *
+ * Present only when the runner was asked to keep the child. Its existence is
+ * what defers `delegation-completed`: a child that can still be asked something
+ * has not finished, and writing its completion when its first turn went quiet
+ * would close a delegation that is still open.
+ */
+export interface SubagentContinuation {
+  /** Post more work into the child's inbox and run it to quiescence. */
+  continue(text: string): Promise<SubagentRunResult>;
+  /** Release the child. Called by the handle, which is idempotent. */
+  close(): void;
+}
+
 /** What the child executor reports back. `text` is the CHILD's own words. */
 export interface SubagentRunResult {
   readonly ok: boolean;
@@ -58,6 +75,8 @@ export interface SubagentRunResult {
   readonly text: string;
   /** Only when `ok` is false. The runtime quotes this in its own account. */
   readonly reason?: string;
+  /** Set when the child is continuable and still holding its session. */
+  readonly continuation?: SubagentContinuation;
 }
 
 export type SubagentRunner = (ctx: SubagentRunContext) => Promise<SubagentRunResult>;
@@ -68,7 +87,36 @@ export interface SubagentRequest {
   readonly goal: string;
   readonly delegationScope?: readonly string[];
   readonly stopConditions?: readonly string[];
+  /**
+   * Keep the child alive after its first turn goes quiet.
+   *
+   * A continuable child holds its session open, so its `delegation-completed`
+   * is deferred until the parent releases it. A parent that never does leaves an
+   * unmatched `delegation-started`, which is the honest signature of a
+   * delegation nobody closed — not something to paper over.
+   */
+  readonly continuable?: boolean;
 }
+
+/**
+ * A live child a parent can keep talking to.
+ *
+ * `close` is idempotent because the parent may release a child on a path that
+ * also unwinds — a second completion row for one delegation would make the log
+ * say it ended twice.
+ */
+export interface SubagentHandle {
+  readonly identity: DelegationIdentity;
+  readonly childSessionId: string;
+  readonly packetId: string;
+  /** More work, through the inbox and nowhere else. */
+  continue(text: string): Promise<SubagentRunResult>;
+  /** Account for the delegation and release the child. Safe to call twice. */
+  close(settledAs: DelegationSettlement, reason: string): void;
+}
+
+/** How the runtime saw a delegation end. */
+export type DelegationSettlement = "reported" | "refused" | "failed" | "cancelled";
 
 /** The minimum this module needs of a session. */
 export interface DelegationRecorder {
@@ -94,6 +142,13 @@ export type SubagentOutcome =
       readonly childSessionId: string;
       /** The CHILD's words. Kept separate from `settledReason` on purpose. */
       readonly childText: string;
+      /**
+       * Present exactly when the child is still alive.
+       *
+       * While it exists the delegation has NOT been accounted for — closing the
+       * handle is what writes `delegation-completed`.
+       */
+      readonly handle?: SubagentHandle;
     }
   | {
       readonly ok: false;
@@ -150,6 +205,7 @@ export async function spawnSubagent(init: SpawnSubagentInit): Promise<SubagentOu
   let result: SubagentRunResult;
   try {
     result = await init.runner({
+      continuable: init.request.continuable === true,
       toolsetAgentId: identity.governedAs,
       identity,
       childSessionId,
@@ -168,16 +224,58 @@ export async function spawnSubagent(init: SpawnSubagentInit): Promise<SubagentOu
     return { ok: false, reason: `child threw: ${String(error)}`, packetId };
   }
 
-  // 5. Account, unconditionally. The cases that most need an account are the
-  //    ones where the child never got to report.
-  init.session.recordLoopEvent({
-    kind: "delegation-completed",
-    childRunAs: identity.runAs,
-    childSessionId,
-    packetId,
-    settledAs: result.ok ? "reported" : "failed",
-    reason: result.ok ? "child reported" : (result.reason ?? "child did not report a reason")
-  });
+  const account = (settledAs: DelegationSettlement, reason: string): void => {
+    init.session.recordLoopEvent({
+      kind: "delegation-completed",
+      childRunAs: identity.runAs,
+      childSessionId,
+      packetId,
+      settledAs,
+      reason
+    });
+  };
+
+  // 5. Account — unless the child is still alive.
+  //
+  // A continuable child has NOT finished just because its first turn went quiet.
+  // Writing its completion here would close a delegation the parent can still
+  // talk to, and the log would say it ended while it was still running. The
+  // handle's `close` writes it instead, and a parent that never closes leaves an
+  // unmatched `delegation-started` — the honest signature of a delegation nobody
+  // ended, which is exactly what a reader needs to see.
+  const continuation = result.continuation;
+  if (result.ok && continuation !== undefined) {
+    let closed = false;
+    const handle: SubagentHandle = {
+      identity,
+      childSessionId,
+      packetId,
+      continue: (text: string) => {
+        if (closed) {
+          return Promise.resolve({ ok: false, text: "", reason: "child has been released" });
+        }
+        return continuation.continue(text);
+      },
+      close: (settledAs: DelegationSettlement, reason: string) => {
+        // Idempotent: a parent may release a child on a path that also unwinds,
+        // and a second completion row would make the log say it ended twice.
+        if (closed) {
+          return;
+        }
+        closed = true;
+        continuation.close();
+        account(settledAs, reason);
+      }
+    };
+    return { ok: true, identity, packetId, childSessionId, childText: result.text, handle };
+  }
+
+  // The cases that most need an account are the ones where the child never got
+  // to report, so this is unconditional for every non-continuable child.
+  account(
+    result.ok ? "reported" : "failed",
+    result.ok ? "child reported" : (result.reason ?? "child did not report a reason")
+  );
 
   return result.ok
     ? { ok: true, identity, packetId, childSessionId, childText: result.text }
