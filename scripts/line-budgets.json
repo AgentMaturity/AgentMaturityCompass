@@ -58,7 +58,7 @@
     "src/studio/openapi.ts": 2213,
     "src/studio/studioServer.ts": 8880,
     "src/toolhub/toolhubServer.ts": 1261,
-    "src/watch/liveDriftAlerts.ts": 11657,
+    "src/watch/liveDriftAlerts.ts": 11074,
     "src/watch/liveDriftTypes.ts": 4436,
     "src/watch/observabilityBridge.ts": 1158,
     "src/workspaces/hostDb.ts": 1248,

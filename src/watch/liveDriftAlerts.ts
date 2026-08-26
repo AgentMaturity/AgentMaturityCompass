@@ -526,6 +526,75 @@ function round(value: number, places = 6): number {
   return Math.round(value * factor) / factor;
 }
 
+/**
+ * A guarded divergence: the distance between two label distributions, or 0 when
+ * the domain contributed no rows to either window.
+ *
+ * This exact shape appeared **100 times** in `runLiveScoreBehaviorDrift`, each
+ * spelled across six lines — 600 lines of a 3,369-line function saying one
+ * thing. In every one of the hundred the baseline and live fields were the same
+ * name, so there was never a case where the two sides could disagree.
+ *
+ * EXPORTED, which widens this module's deliberately narrow surface from three
+ * functions to seven. The trade is worth stating: mutation testing showed the
+ * guard and the clamp were NOT distinguished by any existing fixture — no test
+ * has a domain with zero rows, and none has a negative delta. Spread across 176
+ * inline expressions that was untestable; as four named functions it is
+ * testable, and `tests/liveDriftGuards.test.ts` now does it.
+ */
+export function guardedDivergence(
+  present: boolean,
+  baseline: Record<string, number>,
+  live: Record<string, number>,
+): number {
+  return present ? totalVariationDistance(baseline, live) : 0;
+}
+
+/**
+ * A guarded non-negative delta, 54 occurrences at four lines each.
+ *
+ * Operand order is the caller's: some of these measure a DROP
+ * (baseline - live) and some an INCREASE (live - baseline), and collapsing that
+ * distinction into the helper would silently invert 
+ * half of them.
+ */
+export function guardedDrop(present: boolean, from: number, to: number): number {
+  return present ? round(Math.max(0, from - to)) : 0;
+}
+
+/**
+ * A guarded SIGNED delta — deliberately not the same helper as `guardedDrop`.
+ *
+ * These 17 metrics report a shift that can go either way (a sentiment mean, a
+ * VPIP percentage), so clamping them at zero would erase the direction the
+ * metric exists to convey.
+ */
+export function guardedDelta(present: boolean, from: number, to: number): number {
+  return present ? round(from - to) : 0;
+}
+
+/**
+ * A guarded ratio increase, 5 occurrences.
+ *
+ * PARAMETER ORDER IS `(after, before)`, matching this module's `ratioIncrease`
+ * and every call site, which pass `liveDistribution.X` first.
+ *
+ * NAME COLLISION WORTH KNOWING ABOUT. `driftMath.ts` also exports a
+ * `ratioIncrease`, and it is NOT the same function:
+ *
+ *   liveDriftAlerts  ratioIncrease(after, before)   (after - before) / before, UNCLAMPED
+ *   driftMath        ratioIncrease(baseline, live)  max(0, (live - baseline) / baseline)
+ *
+ * Reversed argument order and different clamping under one name. Importing the
+ * wrong one compiles cleanly and silently inverts every latency and cost ratio
+ * it touches. Both are load-bearing on published receipts, so neither can be
+ * changed to match the other without a methodology note; naming the hazard is
+ * what is available here.
+ */
+export function guardedRatio(present: boolean, after: number, before: number): number {
+  return present ? ratioIncrease(after, before) : 0;
+}
+
 function unique(values: unknown): string[] {
   return normalizeEvidenceRefs(values);
 }
@@ -8341,195 +8410,69 @@ export function runLiveScoreBehaviorDrift(input: RunLiveScoreBehaviorDriftInput)
     controlCorrectabilityDrop0to1: round(baselineDistribution.controlCorrectabilityMean0to1 - liveDistribution.controlCorrectabilityMean0to1),
     controlReversibilityDrop0to1: round(baselineDistribution.controlReversibilityMean0to1 - liveDistribution.controlReversibilityMean0to1),
     authorityHandoffRateDrop0to1: round(baselineDistribution.authorityHandoffRateMean0to1 - liveDistribution.authorityHandoffRateMean0to1),
-    redTeamUnsafeResponseRateIncrease0to1: hasRedTeamEvidence
-      ? round(liveDistribution.redTeamUnsafeResponseRate0to1 - baselineDistribution.redTeamUnsafeResponseRate0to1)
-      : 0,
-    redTeamComplianceDrop0to1: hasRedTeamEvidence
-      ? round(baselineDistribution.redTeamComplianceMean0to1 - liveDistribution.redTeamComplianceMean0to1)
-      : 0,
-    redTeamGuardScoreDrop0to1: hasRedTeamEvidence
-      ? round(baselineDistribution.redTeamGuardScoreMean0to1 - liveDistribution.redTeamGuardScoreMean0to1)
-      : 0,
-    redTeamDatasetCoverageDrop0to1: hasRedTeamEvidence
-      ? round(Math.max(0, baselineDistribution.redTeamDatasetCoverage0to1 - liveDistribution.redTeamDatasetCoverage0to1))
-      : 0,
-    redTeamTaxonomyCoverageDrop0to1: hasRedTeamEvidence
-      ? round(Math.max(0, baselineDistribution.redTeamTaxonomyCoverage0to1 - liveDistribution.redTeamTaxonomyCoverage0to1))
-      : 0,
-    redTeamAttackCoverageDrop0to1: hasRedTeamEvidence
-      ? round(Math.max(0, baselineDistribution.redTeamAttackCoverage0to1 - liveDistribution.redTeamAttackCoverage0to1))
-      : 0,
-    redTeamGuardCoverageDrop0to1: hasRedTeamEvidence
-      ? round(Math.max(0, baselineDistribution.redTeamGuardCoverage0to1 - liveDistribution.redTeamGuardCoverage0to1))
-      : 0,
-    piArenaAttackSuccessRateIncrease0to1: hasPiArenaEvidence
-      ? round(liveDistribution.piArenaAttackSuccessRate0to1 - baselineDistribution.piArenaAttackSuccessRate0to1)
-      : 0,
-    piArenaDefenseBlockRateDrop0to1: hasPiArenaEvidence
-      ? round(baselineDistribution.piArenaDefenseBlockRate0to1 - liveDistribution.piArenaDefenseBlockRate0to1)
-      : 0,
-    piArenaFalsePositiveRateIncrease0to1: hasPiArenaEvidence
-      ? round(liveDistribution.piArenaFalsePositiveRate0to1 - baselineDistribution.piArenaFalsePositiveRate0to1)
-      : 0,
-    piArenaAgentTaskSuccessRateDrop0to1: hasPiArenaEvidence
-      ? round(baselineDistribution.piArenaAgentTaskSuccessRate0to1 - liveDistribution.piArenaAgentTaskSuccessRate0to1)
-      : 0,
-    piArenaToolCallSuccessRateDrop0to1: hasPiArenaEvidence
-      ? round(baselineDistribution.piArenaToolCallSuccessRateMean0to1 - liveDistribution.piArenaToolCallSuccessRateMean0to1)
-      : 0,
-    piArenaEvidenceCoverageDrop0to1: hasPiArenaEvidence
-      ? round(Math.max(0, baselineDistribution.piArenaEvidenceCoverage0to1 - liveDistribution.piArenaEvidenceCoverage0to1))
-      : 0,
-    backdoorAgentAttackSuccessRateIncrease0to1: hasBackdoorAgentEvidence
-      ? round(liveDistribution.backdoorAgentAttackSuccessRate0to1 - baselineDistribution.backdoorAgentAttackSuccessRate0to1)
-      : 0,
-    backdoorAgentCleanAccuracyDrop0to1: hasBackdoorAgentEvidence
-      ? round(baselineDistribution.backdoorAgentCleanAccuracy0to1 - liveDistribution.backdoorAgentCleanAccuracy0to1)
-      : 0,
-    backdoorAgentTriggerPersistenceIncrease0to1: hasBackdoorAgentEvidence
-      ? round(liveDistribution.backdoorAgentTriggerPersistenceRate0to1 - baselineDistribution.backdoorAgentTriggerPersistenceRate0to1)
-      : 0,
-    backdoorAgentTriggerPropagationIncrease0to1: hasBackdoorAgentEvidence
-      ? round(liveDistribution.backdoorAgentTriggerPropagationRate0to1 - baselineDistribution.backdoorAgentTriggerPropagationRate0to1)
-      : 0,
-    backdoorAgentTrajectoryCoverageDrop0to1: hasBackdoorAgentEvidence
-      ? round(Math.max(0, baselineDistribution.backdoorAgentTrajectoryCoverage0to1 - liveDistribution.backdoorAgentTrajectoryCoverage0to1))
-      : 0,
-    backdoorAgentEvidenceCoverageDrop0to1: hasBackdoorAgentEvidence
-      ? round(Math.max(0, baselineDistribution.backdoorAgentEvidenceCoverage0to1 - liveDistribution.backdoorAgentEvidenceCoverage0to1))
-      : 0,
-    agentSecuritySourceOriginCoverageDrop0to1: hasAgentSecurityEvidence
-      ? round(Math.max(0, baselineDistribution.agentSecuritySourceOriginCoverage0to1 - liveDistribution.agentSecuritySourceOriginCoverage0to1))
-      : 0,
-    agentSecurityTaintPropagationCoverageDrop0to1: hasAgentSecurityEvidence
-      ? round(Math.max(0, baselineDistribution.agentSecurityTaintPropagationCoverage0to1 - liveDistribution.agentSecurityTaintPropagationCoverage0to1))
-      : 0,
-    agentSecurityPolicyDecisionAccuracyDrop0to1: hasAgentSecurityEvidence
-      ? round(baselineDistribution.agentSecurityPolicyDecisionAccuracyMean0to1 - liveDistribution.agentSecurityPolicyDecisionAccuracyMean0to1)
-      : 0,
-    agentSecuritySecretScrubRateDrop0to1: hasAgentSecurityEvidence
-      ? round(Math.max(0, baselineDistribution.agentSecuritySecretScrubRate0to1 - liveDistribution.agentSecuritySecretScrubRate0to1))
-      : 0,
-    agentSecurityAuditTrailIntegrityDrop0to1: hasAgentSecurityEvidence
-      ? round(Math.max(0, baselineDistribution.agentSecurityAuditTrailIntegrity0to1 - liveDistribution.agentSecurityAuditTrailIntegrity0to1))
-      : 0,
-    agentSecurityAttackEffectivenessIncrease0to1: hasAgentSecurityEvidence
-      ? round(liveDistribution.agentSecurityAttackEffectivenessRate0to1 - baselineDistribution.agentSecurityAttackEffectivenessRate0to1)
-      : 0,
-    agentSecurityFalsePositiveRateIncrease0to1: hasAgentSecurityEvidence
-      ? round(liveDistribution.agentSecurityFalsePositiveRate0to1 - baselineDistribution.agentSecurityFalsePositiveRate0to1)
-      : 0,
-    agentSecurityEvidenceCoverageDrop0to1: hasAgentSecurityEvidence
-      ? round(Math.max(0, baselineDistribution.agentSecurityEvidenceCoverage0to1 - liveDistribution.agentSecurityEvidenceCoverage0to1))
-      : 0,
-    agentSecurityLatencyP95IncreaseRatio: hasAgentSecurityEvidence
-      ? ratioIncrease(liveDistribution.agentSecurityLatencyP95Ms, baselineDistribution.agentSecurityLatencyP95Ms)
-      : 0,
-    agentTestingMethodologyCoverageDrop0to1: hasAgentTestingEvidence
-      ? round(Math.max(0, baselineDistribution.agentTestingMethodologyCoverage0to1 - liveDistribution.agentTestingMethodologyCoverage0to1))
-      : 0,
-    agentTestingScenarioCoverageDrop0to1: hasAgentTestingEvidence
-      ? round(Math.max(0, baselineDistribution.agentTestingScenarioCoverage0to1 - liveDistribution.agentTestingScenarioCoverage0to1))
-      : 0,
-    agentTestingFaultInjectionCoverageDrop0to1: hasAgentTestingEvidence
-      ? round(Math.max(0, baselineDistribution.agentTestingFaultInjectionCoverage0to1 - liveDistribution.agentTestingFaultInjectionCoverage0to1))
-      : 0,
-    agentTestingResiliencePassRateDrop0to1: hasAgentTestingEvidence
-      ? round(Math.max(0, baselineDistribution.agentTestingResiliencePassRate0to1 - liveDistribution.agentTestingResiliencePassRate0to1))
-      : 0,
-    agentTestingSafetyRegressionRateIncrease0to1: hasAgentTestingEvidence
-      ? round(liveDistribution.agentTestingSafetyRegressionRate0to1 - baselineDistribution.agentTestingSafetyRegressionRate0to1)
-      : 0,
-    agentTestingObservabilitySignalCoverageDrop0to1: hasAgentTestingEvidence
-      ? round(Math.max(0, baselineDistribution.agentTestingObservabilitySignalCoverage0to1 - liveDistribution.agentTestingObservabilitySignalCoverage0to1))
-      : 0,
-    agentTestingEvidenceCoverageDrop0to1: hasAgentTestingEvidence
-      ? round(Math.max(0, baselineDistribution.agentTestingEvidenceCoverage0to1 - liveDistribution.agentTestingEvidenceCoverage0to1))
-      : 0,
-    chaosProductionReliabilityDrop0to1: hasChaosEvidence
-      ? round(Math.max(0, baselineDistribution.chaosProductionReliabilityMean0to1 - liveDistribution.chaosProductionReliabilityMean0to1))
-      : 0,
-    chaosResilienceScoreDrop0to1: hasChaosEvidence
-      ? round(Math.max(0, baselineDistribution.chaosResilienceScoreMean0to1 - liveDistribution.chaosResilienceScoreMean0to1))
-      : 0,
-    chaosDropIncrease0to1: hasChaosEvidence
-      ? round(liveDistribution.chaosDropMean0to1 - baselineDistribution.chaosDropMean0to1)
-      : 0,
-    chaosRecoveryPassRateDrop0to1: hasChaosEvidence
-      ? round(Math.max(0, baselineDistribution.chaosRecoveryPassRate0to1 - liveDistribution.chaosRecoveryPassRate0to1))
-      : 0,
-    chaosFailureTraceCoverageDrop0to1: hasChaosEvidence
-      ? round(Math.max(0, baselineDistribution.chaosFailureTraceCoverage0to1 - liveDistribution.chaosFailureTraceCoverage0to1))
-      : 0,
-    chaosImprovementEvalCoverageDrop0to1: hasChaosEvidence
-      ? round(Math.max(0, baselineDistribution.chaosImprovementEvalCoverage0to1 - liveDistribution.chaosImprovementEvalCoverage0to1))
-      : 0,
-    chaosEvidenceCoverageDrop0to1: hasChaosEvidence
-      ? round(Math.max(0, baselineDistribution.chaosEvidenceCoverage0to1 - liveDistribution.chaosEvidenceCoverage0to1))
-      : 0,
-    recoveryBenchRecoverySuccessRateDrop0to1: hasRecoveryBenchEvidence
-      ? round(Math.max(0, baselineDistribution.recoveryBenchRecoverySuccessRate0to1 - liveDistribution.recoveryBenchRecoverySuccessRate0to1))
-      : 0,
-    recoveryBenchRecoveryRewardDrop0to1: hasRecoveryBenchEvidence
-      ? round(Math.max(0, baselineDistribution.recoveryBenchRecoveryRewardMean0to1 - liveDistribution.recoveryBenchRecoveryRewardMean0to1))
-      : 0,
-    recoveryBenchReplayIntegrityRateDrop0to1: hasRecoveryBenchEvidence
-      ? round(Math.max(0, baselineDistribution.recoveryBenchReplayIntegrityRate0to1 - liveDistribution.recoveryBenchReplayIntegrityRate0to1))
-      : 0,
-    recoveryBenchFailureTraceCoverageDrop0to1: hasRecoveryBenchEvidence
-      ? round(Math.max(0, baselineDistribution.recoveryBenchFailureTraceCoverage0to1 - liveDistribution.recoveryBenchFailureTraceCoverage0to1))
-      : 0,
-    recoveryBenchCorruptedEnvironmentCoverageDrop0to1: hasRecoveryBenchEvidence
-      ? round(Math.max(0, baselineDistribution.recoveryBenchCorruptedEnvironmentCoverage0to1 - liveDistribution.recoveryBenchCorruptedEnvironmentCoverage0to1))
-      : 0,
-    recoveryBenchContextCoverageDrop0to1: hasRecoveryBenchEvidence
-      ? round(Math.max(0, baselineDistribution.recoveryBenchContextCoverage0to1 - liveDistribution.recoveryBenchContextCoverage0to1))
-      : 0,
-    recoveryBenchEvidenceCoverageDrop0to1: hasRecoveryBenchEvidence
-      ? round(Math.max(0, baselineDistribution.recoveryBenchEvidenceCoverage0to1 - liveDistribution.recoveryBenchEvidenceCoverage0to1))
-      : 0,
-    adkEvalPassRateDrop0to1: hasAdkEvidence
-      ? round(Math.max(0, baselineDistribution.adkEvalPassRate0to1 - liveDistribution.adkEvalPassRate0to1))
-      : 0,
-    adkToolCallSuccessRateDrop0to1: hasAdkEvidence
-      ? round(Math.max(0, baselineDistribution.adkToolCallSuccessRate0to1 - liveDistribution.adkToolCallSuccessRate0to1))
-      : 0,
-    adkGraphCoverageDrop0to1: hasAdkEvidence
-      ? round(Math.max(0, baselineDistribution.adkGraphCoverage0to1 - liveDistribution.adkGraphCoverage0to1))
-      : 0,
-    adkStreamingStabilityDrop0to1: hasAdkEvidence
-      ? round(Math.max(0, baselineDistribution.adkStreamingStability0to1 - liveDistribution.adkStreamingStability0to1))
-      : 0,
-    adkDeploymentReadinessDrop0to1: hasAdkEvidence
-      ? round(Math.max(0, baselineDistribution.adkDeploymentReadiness0to1 - liveDistribution.adkDeploymentReadiness0to1))
-      : 0,
-    adkEvidenceCoverageDrop0to1: hasAdkEvidence
-      ? round(Math.max(0, baselineDistribution.adkEvidenceCoverage0to1 - liveDistribution.adkEvidenceCoverage0to1))
-      : 0,
-    physicianBenchTaskSuccessRateDrop0to1: hasPhysicianBenchEvidence
-      ? round(Math.max(0, baselineDistribution.physicianBenchTaskSuccessRate0to1 - liveDistribution.physicianBenchTaskSuccessRate0to1))
-      : 0,
-    physicianBenchCheckpointPassRateDrop0to1: hasPhysicianBenchEvidence
-      ? round(Math.max(0, baselineDistribution.physicianBenchCheckpointPassRate0to1 - liveDistribution.physicianBenchCheckpointPassRate0to1))
-      : 0,
-    physicianBenchFhirDataAccessAccuracyDrop0to1: hasPhysicianBenchEvidence
-      ? round(Math.max(0, baselineDistribution.physicianBenchFhirDataAccessAccuracy0to1 - liveDistribution.physicianBenchFhirDataAccessAccuracy0to1))
-      : 0,
-    physicianBenchClinicalActionSafetyDrop0to1: hasPhysicianBenchEvidence
-      ? round(Math.max(0, baselineDistribution.physicianBenchClinicalActionSafetyRate0to1 - liveDistribution.physicianBenchClinicalActionSafetyRate0to1))
-      : 0,
-    physicianBenchDocumentationQualityDrop0to1: hasPhysicianBenchEvidence
-      ? round(Math.max(0, baselineDistribution.physicianBenchDocumentationQualityMean0to1 - liveDistribution.physicianBenchDocumentationQualityMean0to1))
-      : 0,
-    physicianBenchTrajectoryCoverageDrop0to1: hasPhysicianBenchEvidence
-      ? round(Math.max(0, baselineDistribution.physicianBenchTrajectoryCoverage0to1 - liveDistribution.physicianBenchTrajectoryCoverage0to1))
-      : 0,
-    physicianBenchArtifactCoverageDrop0to1: hasPhysicianBenchEvidence
-      ? round(Math.max(0, baselineDistribution.physicianBenchArtifactCoverage0to1 - liveDistribution.physicianBenchArtifactCoverage0to1))
-      : 0,
-    physicianBenchEvidenceCoverageDrop0to1: hasPhysicianBenchEvidence
-      ? round(Math.max(0, baselineDistribution.physicianBenchEvidenceCoverage0to1 - liveDistribution.physicianBenchEvidenceCoverage0to1))
-      : 0,
+    redTeamUnsafeResponseRateIncrease0to1: guardedDelta(hasRedTeamEvidence, liveDistribution.redTeamUnsafeResponseRate0to1, baselineDistribution.redTeamUnsafeResponseRate0to1),
+    redTeamComplianceDrop0to1: guardedDelta(hasRedTeamEvidence, baselineDistribution.redTeamComplianceMean0to1, liveDistribution.redTeamComplianceMean0to1),
+    redTeamGuardScoreDrop0to1: guardedDelta(hasRedTeamEvidence, baselineDistribution.redTeamGuardScoreMean0to1, liveDistribution.redTeamGuardScoreMean0to1),
+    redTeamDatasetCoverageDrop0to1: guardedDrop(hasRedTeamEvidence, baselineDistribution.redTeamDatasetCoverage0to1, liveDistribution.redTeamDatasetCoverage0to1),
+    redTeamTaxonomyCoverageDrop0to1: guardedDrop(hasRedTeamEvidence, baselineDistribution.redTeamTaxonomyCoverage0to1, liveDistribution.redTeamTaxonomyCoverage0to1),
+    redTeamAttackCoverageDrop0to1: guardedDrop(hasRedTeamEvidence, baselineDistribution.redTeamAttackCoverage0to1, liveDistribution.redTeamAttackCoverage0to1),
+    redTeamGuardCoverageDrop0to1: guardedDrop(hasRedTeamEvidence, baselineDistribution.redTeamGuardCoverage0to1, liveDistribution.redTeamGuardCoverage0to1),
+    piArenaAttackSuccessRateIncrease0to1: guardedDelta(hasPiArenaEvidence, liveDistribution.piArenaAttackSuccessRate0to1, baselineDistribution.piArenaAttackSuccessRate0to1),
+    piArenaDefenseBlockRateDrop0to1: guardedDelta(hasPiArenaEvidence, baselineDistribution.piArenaDefenseBlockRate0to1, liveDistribution.piArenaDefenseBlockRate0to1),
+    piArenaFalsePositiveRateIncrease0to1: guardedDelta(hasPiArenaEvidence, liveDistribution.piArenaFalsePositiveRate0to1, baselineDistribution.piArenaFalsePositiveRate0to1),
+    piArenaAgentTaskSuccessRateDrop0to1: guardedDelta(hasPiArenaEvidence, baselineDistribution.piArenaAgentTaskSuccessRate0to1, liveDistribution.piArenaAgentTaskSuccessRate0to1),
+    piArenaToolCallSuccessRateDrop0to1: guardedDelta(hasPiArenaEvidence, baselineDistribution.piArenaToolCallSuccessRateMean0to1, liveDistribution.piArenaToolCallSuccessRateMean0to1),
+    piArenaEvidenceCoverageDrop0to1: guardedDrop(hasPiArenaEvidence, baselineDistribution.piArenaEvidenceCoverage0to1, liveDistribution.piArenaEvidenceCoverage0to1),
+    backdoorAgentAttackSuccessRateIncrease0to1: guardedDelta(hasBackdoorAgentEvidence, liveDistribution.backdoorAgentAttackSuccessRate0to1, baselineDistribution.backdoorAgentAttackSuccessRate0to1),
+    backdoorAgentCleanAccuracyDrop0to1: guardedDelta(hasBackdoorAgentEvidence, baselineDistribution.backdoorAgentCleanAccuracy0to1, liveDistribution.backdoorAgentCleanAccuracy0to1),
+    backdoorAgentTriggerPersistenceIncrease0to1: guardedDelta(hasBackdoorAgentEvidence, liveDistribution.backdoorAgentTriggerPersistenceRate0to1, baselineDistribution.backdoorAgentTriggerPersistenceRate0to1),
+    backdoorAgentTriggerPropagationIncrease0to1: guardedDelta(hasBackdoorAgentEvidence, liveDistribution.backdoorAgentTriggerPropagationRate0to1, baselineDistribution.backdoorAgentTriggerPropagationRate0to1),
+    backdoorAgentTrajectoryCoverageDrop0to1: guardedDrop(hasBackdoorAgentEvidence, baselineDistribution.backdoorAgentTrajectoryCoverage0to1, liveDistribution.backdoorAgentTrajectoryCoverage0to1),
+    backdoorAgentEvidenceCoverageDrop0to1: guardedDrop(hasBackdoorAgentEvidence, baselineDistribution.backdoorAgentEvidenceCoverage0to1, liveDistribution.backdoorAgentEvidenceCoverage0to1),
+    agentSecuritySourceOriginCoverageDrop0to1: guardedDrop(hasAgentSecurityEvidence, baselineDistribution.agentSecuritySourceOriginCoverage0to1, liveDistribution.agentSecuritySourceOriginCoverage0to1),
+    agentSecurityTaintPropagationCoverageDrop0to1: guardedDrop(hasAgentSecurityEvidence, baselineDistribution.agentSecurityTaintPropagationCoverage0to1, liveDistribution.agentSecurityTaintPropagationCoverage0to1),
+    agentSecurityPolicyDecisionAccuracyDrop0to1: guardedDelta(hasAgentSecurityEvidence, baselineDistribution.agentSecurityPolicyDecisionAccuracyMean0to1, liveDistribution.agentSecurityPolicyDecisionAccuracyMean0to1),
+    agentSecuritySecretScrubRateDrop0to1: guardedDrop(hasAgentSecurityEvidence, baselineDistribution.agentSecuritySecretScrubRate0to1, liveDistribution.agentSecuritySecretScrubRate0to1),
+    agentSecurityAuditTrailIntegrityDrop0to1: guardedDrop(hasAgentSecurityEvidence, baselineDistribution.agentSecurityAuditTrailIntegrity0to1, liveDistribution.agentSecurityAuditTrailIntegrity0to1),
+    agentSecurityAttackEffectivenessIncrease0to1: guardedDelta(hasAgentSecurityEvidence, liveDistribution.agentSecurityAttackEffectivenessRate0to1, baselineDistribution.agentSecurityAttackEffectivenessRate0to1),
+    agentSecurityFalsePositiveRateIncrease0to1: guardedDelta(hasAgentSecurityEvidence, liveDistribution.agentSecurityFalsePositiveRate0to1, baselineDistribution.agentSecurityFalsePositiveRate0to1),
+    agentSecurityEvidenceCoverageDrop0to1: guardedDrop(hasAgentSecurityEvidence, baselineDistribution.agentSecurityEvidenceCoverage0to1, liveDistribution.agentSecurityEvidenceCoverage0to1),
+    agentSecurityLatencyP95IncreaseRatio: guardedRatio(hasAgentSecurityEvidence, liveDistribution.agentSecurityLatencyP95Ms, baselineDistribution.agentSecurityLatencyP95Ms),
+    agentTestingMethodologyCoverageDrop0to1: guardedDrop(hasAgentTestingEvidence, baselineDistribution.agentTestingMethodologyCoverage0to1, liveDistribution.agentTestingMethodologyCoverage0to1),
+    agentTestingScenarioCoverageDrop0to1: guardedDrop(hasAgentTestingEvidence, baselineDistribution.agentTestingScenarioCoverage0to1, liveDistribution.agentTestingScenarioCoverage0to1),
+    agentTestingFaultInjectionCoverageDrop0to1: guardedDrop(hasAgentTestingEvidence, baselineDistribution.agentTestingFaultInjectionCoverage0to1, liveDistribution.agentTestingFaultInjectionCoverage0to1),
+    agentTestingResiliencePassRateDrop0to1: guardedDrop(hasAgentTestingEvidence, baselineDistribution.agentTestingResiliencePassRate0to1, liveDistribution.agentTestingResiliencePassRate0to1),
+    agentTestingSafetyRegressionRateIncrease0to1: guardedDelta(hasAgentTestingEvidence, liveDistribution.agentTestingSafetyRegressionRate0to1, baselineDistribution.agentTestingSafetyRegressionRate0to1),
+    agentTestingObservabilitySignalCoverageDrop0to1: guardedDrop(hasAgentTestingEvidence, baselineDistribution.agentTestingObservabilitySignalCoverage0to1, liveDistribution.agentTestingObservabilitySignalCoverage0to1),
+    agentTestingEvidenceCoverageDrop0to1: guardedDrop(hasAgentTestingEvidence, baselineDistribution.agentTestingEvidenceCoverage0to1, liveDistribution.agentTestingEvidenceCoverage0to1),
+    chaosProductionReliabilityDrop0to1: guardedDrop(hasChaosEvidence, baselineDistribution.chaosProductionReliabilityMean0to1, liveDistribution.chaosProductionReliabilityMean0to1),
+    chaosResilienceScoreDrop0to1: guardedDrop(hasChaosEvidence, baselineDistribution.chaosResilienceScoreMean0to1, liveDistribution.chaosResilienceScoreMean0to1),
+    chaosDropIncrease0to1: guardedDelta(hasChaosEvidence, liveDistribution.chaosDropMean0to1, baselineDistribution.chaosDropMean0to1),
+    chaosRecoveryPassRateDrop0to1: guardedDrop(hasChaosEvidence, baselineDistribution.chaosRecoveryPassRate0to1, liveDistribution.chaosRecoveryPassRate0to1),
+    chaosFailureTraceCoverageDrop0to1: guardedDrop(hasChaosEvidence, baselineDistribution.chaosFailureTraceCoverage0to1, liveDistribution.chaosFailureTraceCoverage0to1),
+    chaosImprovementEvalCoverageDrop0to1: guardedDrop(hasChaosEvidence, baselineDistribution.chaosImprovementEvalCoverage0to1, liveDistribution.chaosImprovementEvalCoverage0to1),
+    chaosEvidenceCoverageDrop0to1: guardedDrop(hasChaosEvidence, baselineDistribution.chaosEvidenceCoverage0to1, liveDistribution.chaosEvidenceCoverage0to1),
+    recoveryBenchRecoverySuccessRateDrop0to1: guardedDrop(hasRecoveryBenchEvidence, baselineDistribution.recoveryBenchRecoverySuccessRate0to1, liveDistribution.recoveryBenchRecoverySuccessRate0to1),
+    recoveryBenchRecoveryRewardDrop0to1: guardedDrop(hasRecoveryBenchEvidence, baselineDistribution.recoveryBenchRecoveryRewardMean0to1, liveDistribution.recoveryBenchRecoveryRewardMean0to1),
+    recoveryBenchReplayIntegrityRateDrop0to1: guardedDrop(hasRecoveryBenchEvidence, baselineDistribution.recoveryBenchReplayIntegrityRate0to1, liveDistribution.recoveryBenchReplayIntegrityRate0to1),
+    recoveryBenchFailureTraceCoverageDrop0to1: guardedDrop(hasRecoveryBenchEvidence, baselineDistribution.recoveryBenchFailureTraceCoverage0to1, liveDistribution.recoveryBenchFailureTraceCoverage0to1),
+    recoveryBenchCorruptedEnvironmentCoverageDrop0to1: guardedDrop(hasRecoveryBenchEvidence, baselineDistribution.recoveryBenchCorruptedEnvironmentCoverage0to1, liveDistribution.recoveryBenchCorruptedEnvironmentCoverage0to1),
+    recoveryBenchContextCoverageDrop0to1: guardedDrop(hasRecoveryBenchEvidence, baselineDistribution.recoveryBenchContextCoverage0to1, liveDistribution.recoveryBenchContextCoverage0to1),
+    recoveryBenchEvidenceCoverageDrop0to1: guardedDrop(hasRecoveryBenchEvidence, baselineDistribution.recoveryBenchEvidenceCoverage0to1, liveDistribution.recoveryBenchEvidenceCoverage0to1),
+    adkEvalPassRateDrop0to1: guardedDrop(hasAdkEvidence, baselineDistribution.adkEvalPassRate0to1, liveDistribution.adkEvalPassRate0to1),
+    adkToolCallSuccessRateDrop0to1: guardedDrop(hasAdkEvidence, baselineDistribution.adkToolCallSuccessRate0to1, liveDistribution.adkToolCallSuccessRate0to1),
+    adkGraphCoverageDrop0to1: guardedDrop(hasAdkEvidence, baselineDistribution.adkGraphCoverage0to1, liveDistribution.adkGraphCoverage0to1),
+    adkStreamingStabilityDrop0to1: guardedDrop(hasAdkEvidence, baselineDistribution.adkStreamingStability0to1, liveDistribution.adkStreamingStability0to1),
+    adkDeploymentReadinessDrop0to1: guardedDrop(hasAdkEvidence, baselineDistribution.adkDeploymentReadiness0to1, liveDistribution.adkDeploymentReadiness0to1),
+    adkEvidenceCoverageDrop0to1: guardedDrop(hasAdkEvidence, baselineDistribution.adkEvidenceCoverage0to1, liveDistribution.adkEvidenceCoverage0to1),
+    physicianBenchTaskSuccessRateDrop0to1: guardedDrop(hasPhysicianBenchEvidence, baselineDistribution.physicianBenchTaskSuccessRate0to1, liveDistribution.physicianBenchTaskSuccessRate0to1),
+    physicianBenchCheckpointPassRateDrop0to1: guardedDrop(hasPhysicianBenchEvidence, baselineDistribution.physicianBenchCheckpointPassRate0to1, liveDistribution.physicianBenchCheckpointPassRate0to1),
+    physicianBenchFhirDataAccessAccuracyDrop0to1: guardedDrop(hasPhysicianBenchEvidence, baselineDistribution.physicianBenchFhirDataAccessAccuracy0to1, liveDistribution.physicianBenchFhirDataAccessAccuracy0to1),
+    physicianBenchClinicalActionSafetyDrop0to1: guardedDrop(hasPhysicianBenchEvidence, baselineDistribution.physicianBenchClinicalActionSafetyRate0to1, liveDistribution.physicianBenchClinicalActionSafetyRate0to1),
+    physicianBenchDocumentationQualityDrop0to1: guardedDrop(hasPhysicianBenchEvidence, baselineDistribution.physicianBenchDocumentationQualityMean0to1, liveDistribution.physicianBenchDocumentationQualityMean0to1),
+    physicianBenchTrajectoryCoverageDrop0to1: guardedDrop(hasPhysicianBenchEvidence, baselineDistribution.physicianBenchTrajectoryCoverage0to1, liveDistribution.physicianBenchTrajectoryCoverage0to1),
+    physicianBenchArtifactCoverageDrop0to1: guardedDrop(hasPhysicianBenchEvidence, baselineDistribution.physicianBenchArtifactCoverage0to1, liveDistribution.physicianBenchArtifactCoverage0to1),
+    physicianBenchEvidenceCoverageDrop0to1: guardedDrop(hasPhysicianBenchEvidence, baselineDistribution.physicianBenchEvidenceCoverage0to1, liveDistribution.physicianBenchEvidenceCoverage0to1),
     ctfFlagSolveRateDrop0to1: hasCtfEvidence ? round(baselineDistribution.ctfFlagSolveRate0to1 - liveDistribution.ctfFlagSolveRate0to1) : 0,
     ctfExternalSearchUseRateIncrease0to1: hasCtfEvidence ? round(liveDistribution.ctfExternalSearchUseRate0to1 - baselineDistribution.ctfExternalSearchUseRate0to1) : 0,
     ctfContaminationRiskIncrease0to1: hasCtfEvidence ? round(liveDistribution.ctfContaminationRiskMean0to1 - baselineDistribution.ctfContaminationRiskMean0to1) : 0,
@@ -8640,45 +8583,19 @@ export function runLiveScoreBehaviorDrift(input: RunLiveScoreBehaviorDriftInput)
     hedraRagMemoryIncreaseRatio: hasHedraRagEvidence ? ratioIncrease(liveDistribution.hedraRagResourceMemoryGbMean, baselineDistribution.hedraRagResourceMemoryGbMean) : 0,
     hedraRagReplayPassRateDrop0to1: hasHedraRagEvidence ? round(Math.max(0, baselineDistribution.hedraRagReplayPassRate0to1 - liveDistribution.hedraRagReplayPassRate0to1)) : 0,
     hedraRagEvidenceCoverageDrop0to1: hasHedraRagEvidence ? round(Math.max(0, baselineDistribution.hedraRagEvidenceCoverage0to1 - liveDistribution.hedraRagEvidenceCoverage0to1)) : 0,
-    agentEvalHarnessToolSuccessDrop0to1: hasAgentEvalHarnessEvidence
-      ? round(Math.max(0, baselineDistribution.agentEvalHarnessToolSuccessRate0to1 - liveDistribution.agentEvalHarnessToolSuccessRate0to1))
-      : 0,
-    agentEvalHarnessHallucinationIncrease0to1: hasAgentEvalHarnessEvidence
-      ? round(Math.max(0, liveDistribution.agentEvalHarnessHallucinationRate0to1 - baselineDistribution.agentEvalHarnessHallucinationRate0to1))
-      : 0,
-    agentEvalHarnessLatencyP95IncreaseRatio: hasAgentEvalHarnessEvidence
-      ? ratioIncrease(liveDistribution.agentEvalHarnessLatencyP95Ms, baselineDistribution.agentEvalHarnessLatencyP95Ms)
-      : 0,
-    agentEvalHarnessCostIncreaseRatio: hasAgentEvalHarnessEvidence
-      ? ratioIncrease(liveDistribution.agentEvalHarnessCostUsdMean, baselineDistribution.agentEvalHarnessCostUsdMean)
-      : 0,
-    agentEvalHarnessTraceCoverageDrop0to1: hasAgentEvalHarnessEvidence
-      ? round(Math.max(0, baselineDistribution.agentEvalHarnessTraceCoverage0to1 - liveDistribution.agentEvalHarnessTraceCoverage0to1))
-      : 0,
-    agentEvalHarnessEvidenceCoverageDrop0to1: hasAgentEvalHarnessEvidence
-      ? round(Math.max(0, baselineDistribution.agentEvalHarnessEvidenceCoverage0to1 - liveDistribution.agentEvalHarnessEvidenceCoverage0to1))
-      : 0,
-    strandsBenchmarkHarnessTaskSuccessDrop0to1: hasStrandsBenchmarkHarnessEvidence
-      ? round(Math.max(0, baselineDistribution.strandsBenchmarkHarnessTaskSuccessRate0to1 - liveDistribution.strandsBenchmarkHarnessTaskSuccessRate0to1))
-      : 0,
-    strandsBenchmarkHarnessPatchApplyRateDrop0to1: hasStrandsBenchmarkHarnessEvidence
-      ? round(Math.max(0, baselineDistribution.strandsBenchmarkHarnessPatchApplyRate0to1 - liveDistribution.strandsBenchmarkHarnessPatchApplyRate0to1))
-      : 0,
-    strandsBenchmarkHarnessTestPassRateDrop0to1: hasStrandsBenchmarkHarnessEvidence
-      ? round(Math.max(0, baselineDistribution.strandsBenchmarkHarnessTestPassRate0to1 - liveDistribution.strandsBenchmarkHarnessTestPassRate0to1))
-      : 0,
-    strandsBenchmarkHarnessTrajectoryCoverageDrop0to1: hasStrandsBenchmarkHarnessEvidence
-      ? round(Math.max(0, baselineDistribution.strandsBenchmarkHarnessTrajectoryCoverage0to1 - liveDistribution.strandsBenchmarkHarnessTrajectoryCoverage0to1))
-      : 0,
-    strandsBenchmarkHarnessEvidenceCoverageDrop0to1: hasStrandsBenchmarkHarnessEvidence
-      ? round(Math.max(0, baselineDistribution.strandsBenchmarkHarnessEvidenceCoverage0to1 - liveDistribution.strandsBenchmarkHarnessEvidenceCoverage0to1))
-      : 0,
-    strandsBenchmarkHarnessLatencyP95IncreaseRatio: hasStrandsBenchmarkHarnessEvidence
-      ? ratioIncrease(liveDistribution.strandsBenchmarkHarnessLatencyP95Ms, baselineDistribution.strandsBenchmarkHarnessLatencyP95Ms)
-      : 0,
-    strandsBenchmarkHarnessCostIncreaseRatio: hasStrandsBenchmarkHarnessEvidence
-      ? ratioIncrease(liveDistribution.strandsBenchmarkHarnessCostUsdMean, baselineDistribution.strandsBenchmarkHarnessCostUsdMean)
-      : 0,
+    agentEvalHarnessToolSuccessDrop0to1: guardedDrop(hasAgentEvalHarnessEvidence, baselineDistribution.agentEvalHarnessToolSuccessRate0to1, liveDistribution.agentEvalHarnessToolSuccessRate0to1),
+    agentEvalHarnessHallucinationIncrease0to1: guardedDrop(hasAgentEvalHarnessEvidence, liveDistribution.agentEvalHarnessHallucinationRate0to1, baselineDistribution.agentEvalHarnessHallucinationRate0to1),
+    agentEvalHarnessLatencyP95IncreaseRatio: guardedRatio(hasAgentEvalHarnessEvidence, liveDistribution.agentEvalHarnessLatencyP95Ms, baselineDistribution.agentEvalHarnessLatencyP95Ms),
+    agentEvalHarnessCostIncreaseRatio: guardedRatio(hasAgentEvalHarnessEvidence, liveDistribution.agentEvalHarnessCostUsdMean, baselineDistribution.agentEvalHarnessCostUsdMean),
+    agentEvalHarnessTraceCoverageDrop0to1: guardedDrop(hasAgentEvalHarnessEvidence, baselineDistribution.agentEvalHarnessTraceCoverage0to1, liveDistribution.agentEvalHarnessTraceCoverage0to1),
+    agentEvalHarnessEvidenceCoverageDrop0to1: guardedDrop(hasAgentEvalHarnessEvidence, baselineDistribution.agentEvalHarnessEvidenceCoverage0to1, liveDistribution.agentEvalHarnessEvidenceCoverage0to1),
+    strandsBenchmarkHarnessTaskSuccessDrop0to1: guardedDrop(hasStrandsBenchmarkHarnessEvidence, baselineDistribution.strandsBenchmarkHarnessTaskSuccessRate0to1, liveDistribution.strandsBenchmarkHarnessTaskSuccessRate0to1),
+    strandsBenchmarkHarnessPatchApplyRateDrop0to1: guardedDrop(hasStrandsBenchmarkHarnessEvidence, baselineDistribution.strandsBenchmarkHarnessPatchApplyRate0to1, liveDistribution.strandsBenchmarkHarnessPatchApplyRate0to1),
+    strandsBenchmarkHarnessTestPassRateDrop0to1: guardedDrop(hasStrandsBenchmarkHarnessEvidence, baselineDistribution.strandsBenchmarkHarnessTestPassRate0to1, liveDistribution.strandsBenchmarkHarnessTestPassRate0to1),
+    strandsBenchmarkHarnessTrajectoryCoverageDrop0to1: guardedDrop(hasStrandsBenchmarkHarnessEvidence, baselineDistribution.strandsBenchmarkHarnessTrajectoryCoverage0to1, liveDistribution.strandsBenchmarkHarnessTrajectoryCoverage0to1),
+    strandsBenchmarkHarnessEvidenceCoverageDrop0to1: guardedDrop(hasStrandsBenchmarkHarnessEvidence, baselineDistribution.strandsBenchmarkHarnessEvidenceCoverage0to1, liveDistribution.strandsBenchmarkHarnessEvidenceCoverage0to1),
+    strandsBenchmarkHarnessLatencyP95IncreaseRatio: guardedRatio(hasStrandsBenchmarkHarnessEvidence, liveDistribution.strandsBenchmarkHarnessLatencyP95Ms, baselineDistribution.strandsBenchmarkHarnessLatencyP95Ms),
+    strandsBenchmarkHarnessCostIncreaseRatio: guardedRatio(hasStrandsBenchmarkHarnessEvidence, liveDistribution.strandsBenchmarkHarnessCostUsdMean, baselineDistribution.strandsBenchmarkHarnessCostUsdMean),
     privacyWebDataMinimizationPassRateDrop0to1: hasPrivacyWebEvidence ? round(baselineDistribution.privacyWebDataMinimizationPassRate0to1 - liveDistribution.privacyWebDataMinimizationPassRate0to1) : 0,
     privacyWebLeakageRateIncrease0to1: hasPrivacyWebEvidence ? round(liveDistribution.privacyWebLeakageRate0to1 - baselineDistribution.privacyWebLeakageRate0to1) : 0,
     privacyWebUnnecessaryDisclosureRateIncrease0to1: hasPrivacyWebEvidence ? round(liveDistribution.privacyWebUnnecessaryDisclosureRate0to1 - baselineDistribution.privacyWebUnnecessaryDisclosureRate0to1) : 0,
@@ -8776,606 +8693,106 @@ export function runLiveScoreBehaviorDrift(input: RunLiveScoreBehaviorDriftInput)
       baselineDistribution.personaDistribution,
       liveDistribution.personaDistribution,
     ),
-    ctfContextDivergence0to1: hasCtfEvidence
-      ? totalVariationDistance(
-          baselineDistribution.ctfContextDistribution,
-          liveDistribution.ctfContextDistribution,
-        )
-      : 0,
-    ctfVmContextDivergence0to1: hasCtfPartialCreditEvidence
-      ? totalVariationDistance(
-          baselineDistribution.ctfVmContextDistribution,
-          liveDistribution.ctfVmContextDistribution,
-        )
-      : 0,
-    ragEvaluationModeDivergence0to1: hasRagEvidence
-      ? totalVariationDistance(
-          baselineDistribution.ragEvaluationModeDistribution,
-          liveDistribution.ragEvaluationModeDistribution,
-        )
-      : 0,
-    ragPipelineContextDivergence0to1: hasRagEvidence
-      ? totalVariationDistance(
-          baselineDistribution.ragPipelineContextDistribution,
-          liveDistribution.ragPipelineContextDistribution,
-        )
-      : 0,
-    ragStrategyDivergence0to1: hasRagStrategyEvidence
-      ? totalVariationDistance(
-          baselineDistribution.ragStrategyDistribution,
-          liveDistribution.ragStrategyDistribution,
-        )
-      : 0,
-    ragDatasetTierDivergence0to1: hasRagDatasetBuilderEvidence
-      ? totalVariationDistance(
-          baselineDistribution.ragDatasetTierDistribution,
-          liveDistribution.ragDatasetTierDistribution,
-        )
-      : 0,
-    ragQuestionTypeDivergence0to1: hasRagDatasetBuilderEvidence
-      ? totalVariationDistance(
-          baselineDistribution.ragQuestionTypeDistribution,
-          liveDistribution.ragQuestionTypeDistribution,
-        )
-      : 0,
-    ragBuilderStageDivergence0to1: hasRagDatasetBuilderEvidence
-      ? totalVariationDistance(
-          baselineDistribution.ragBuilderStageDistribution,
-          liveDistribution.ragBuilderStageDistribution,
-        )
-      : 0,
-    ragDatasetBuilderContextDivergence0to1: hasRagDatasetBuilderEvidence
-      ? totalVariationDistance(
-          baselineDistribution.ragDatasetBuilderContextDistribution,
-          liveDistribution.ragDatasetBuilderContextDistribution,
-        )
-      : 0,
-    kiteDatasetFamilyDivergence0to1: hasKiteEvidence
-      ? totalVariationDistance(
-          baselineDistribution.kiteDatasetFamilyDistribution,
-          liveDistribution.kiteDatasetFamilyDistribution,
-        )
-      : 0,
-    kiteRagConfigurationDivergence0to1: hasKiteEvidence
-      ? totalVariationDistance(
-          baselineDistribution.kiteRagConfigurationDistribution,
-          liveDistribution.kiteRagConfigurationDistribution,
-        )
-      : 0,
-    kiteBenchmarkContextDivergence0to1: hasKiteEvidence
-      ? totalVariationDistance(
-          baselineDistribution.kiteBenchmarkContextDistribution,
-          liveDistribution.kiteBenchmarkContextDistribution,
-        )
-      : 0,
-    pokerEvalGameTypeDivergence0to1: hasPokerEvalEvidence
-      ? totalVariationDistance(
-          baselineDistribution.pokerEvalGameTypeDistribution,
-          liveDistribution.pokerEvalGameTypeDistribution,
-        )
-      : 0,
-    pokerEvalTableContextDivergence0to1: hasPokerEvalEvidence
-      ? totalVariationDistance(
-          baselineDistribution.pokerEvalTableContextDistribution,
-          liveDistribution.pokerEvalTableContextDistribution,
-        )
-      : 0,
-    pokerEvalOpponentPoolDivergence0to1: hasPokerEvalEvidence
-      ? totalVariationDistance(
-          baselineDistribution.pokerEvalOpponentPoolDistribution,
-          liveDistribution.pokerEvalOpponentPoolDistribution,
-        )
-      : 0,
-    llmRagEvalSuiteContextDivergence0to1: hasLlmRagEvalSuiteEvidence
-      ? totalVariationDistance(
-          baselineDistribution.llmRagEvalSuiteContextDistribution,
-          liveDistribution.llmRagEvalSuiteContextDistribution,
-        )
-      : 0,
-    noMiraclLanguageDivergence0to1: hasNoMiraclEvidence
-      ? totalVariationDistance(
-          baselineDistribution.noMiraclLanguageDistribution,
-          liveDistribution.noMiraclLanguageDistribution,
-        )
-      : 0,
-    noMiraclSubsetDivergence0to1: hasNoMiraclEvidence
-      ? totalVariationDistance(
-          baselineDistribution.noMiraclSubsetDistribution,
-          liveDistribution.noMiraclSubsetDistribution,
-        )
-      : 0,
-    noMiraclContextDivergence0to1: hasNoMiraclEvidence
-      ? totalVariationDistance(
-          baselineDistribution.noMiraclContextDistribution,
-          liveDistribution.noMiraclContextDistribution,
-        )
-      : 0,
-    scalingLawTaskTypeDivergence0to1: hasScalingLawDiscoveryEvidence
-      ? totalVariationDistance(
-          baselineDistribution.scalingLawDiscoveryTaskTypeDistribution,
-          liveDistribution.scalingLawDiscoveryTaskTypeDistribution,
-        )
-      : 0,
-    scalingLawContextDivergence0to1: hasScalingLawDiscoveryEvidence
-      ? totalVariationDistance(
-          baselineDistribution.scalingLawDiscoveryContextDistribution,
-          liveDistribution.scalingLawDiscoveryContextDistribution,
-        )
-      : 0,
-    toolRlContextDivergence0to1: hasToolRlEvidence
-      ? totalVariationDistance(
-          baselineDistribution.toolRlContextDistribution,
-          liveDistribution.toolRlContextDistribution,
-        )
-      : 0,
-    credenceEngineContextDivergence0to1: hasCredenceEngineEvidence
-      ? totalVariationDistance(
-          baselineDistribution.credenceEngineContextDistribution,
-          liveDistribution.credenceEngineContextDistribution,
-        )
-      : 0,
-    tradingContextDivergence0to1: hasTradingEvidence
-      ? totalVariationDistance(
-          baselineDistribution.tradingContextDistribution,
-          liveDistribution.tradingContextDistribution,
-        )
-      : 0,
-    redTeamRiskCategoryDivergence0to1: hasRedTeamEvidence
-      ? totalVariationDistance(
-          baselineDistribution.redTeamRiskCategoryDistribution,
-          liveDistribution.redTeamRiskCategoryDistribution,
-        )
-      : 0,
-    redTeamAttackDivergence0to1: hasRedTeamEvidence
-      ? totalVariationDistance(
-          baselineDistribution.redTeamAttackDistribution,
-          liveDistribution.redTeamAttackDistribution,
-        )
-      : 0,
-    redTeamSubsetDivergence0to1: hasRedTeamEvidence
-      ? totalVariationDistance(
-          baselineDistribution.redTeamSubsetDistribution,
-          liveDistribution.redTeamSubsetDistribution,
-        )
-      : 0,
-    redTeamGuardLabelDivergence0to1: hasRedTeamEvidence
-      ? totalVariationDistance(
-          baselineDistribution.redTeamGuardLabelDistribution,
-          liveDistribution.redTeamGuardLabelDistribution,
-        )
-      : 0,
-    piArenaAttackDivergence0to1: hasPiArenaEvidence
-      ? totalVariationDistance(
-          baselineDistribution.piArenaAttackDistribution,
-          liveDistribution.piArenaAttackDistribution,
-        )
-      : 0,
-    piArenaDefenseDivergence0to1: hasPiArenaEvidence
-      ? totalVariationDistance(
-          baselineDistribution.piArenaDefenseDistribution,
-          liveDistribution.piArenaDefenseDistribution,
-        )
-      : 0,
-    piArenaDatasetDivergence0to1: hasPiArenaEvidence
-      ? totalVariationDistance(
-          baselineDistribution.piArenaDatasetDistribution,
-          liveDistribution.piArenaDatasetDistribution,
-        )
-      : 0,
-    piArenaAgentBenchmarkDivergence0to1: hasPiArenaEvidence
-      ? totalVariationDistance(
-          baselineDistribution.piArenaAgentBenchmarkDistribution,
-          liveDistribution.piArenaAgentBenchmarkDistribution,
-        )
-      : 0,
-    backdoorAgentStageDivergence0to1: hasBackdoorAgentEvidence
-      ? totalVariationDistance(
-          baselineDistribution.backdoorAgentStageDistribution,
-          liveDistribution.backdoorAgentStageDistribution,
-        )
-      : 0,
-    backdoorAgentTaskFamilyDivergence0to1: hasBackdoorAgentEvidence
-      ? totalVariationDistance(
-          baselineDistribution.backdoorAgentTaskFamilyDistribution,
-          liveDistribution.backdoorAgentTaskFamilyDistribution,
-        )
-      : 0,
-    backdoorAgentAttackFamilyDivergence0to1: hasBackdoorAgentEvidence
-      ? totalVariationDistance(
-          baselineDistribution.backdoorAgentAttackFamilyDistribution,
-          liveDistribution.backdoorAgentAttackFamilyDistribution,
-        )
-      : 0,
-    agentSecurityContextDivergence0to1: hasAgentSecurityEvidence
-      ? totalVariationDistance(
-          baselineDistribution.agentSecurityContextDistribution,
-          liveDistribution.agentSecurityContextDistribution,
-        )
-      : 0,
-    agentTestingContextDivergence0to1: hasAgentTestingEvidence
-      ? totalVariationDistance(
-          baselineDistribution.agentTestingContextDistribution,
-          liveDistribution.agentTestingContextDistribution,
-        )
-      : 0,
-    chaosContextDivergence0to1: hasChaosEvidence
-      ? totalVariationDistance(
-          baselineDistribution.chaosContextDistribution,
-          liveDistribution.chaosContextDistribution,
-        )
-      : 0,
-    recoveryBenchMessageModeDivergence0to1: hasRecoveryBenchEvidence
-      ? totalVariationDistance(
-          baselineDistribution.recoveryBenchMessageModeDistribution,
-          liveDistribution.recoveryBenchMessageModeDistribution,
-        )
-      : 0,
-    recoveryBenchAgentHarnessDivergence0to1: hasRecoveryBenchEvidence
-      ? totalVariationDistance(
-          baselineDistribution.recoveryBenchAgentHarnessDistribution,
-          liveDistribution.recoveryBenchAgentHarnessDistribution,
-        )
-      : 0,
-    recoveryBenchTaskDivergence0to1: hasRecoveryBenchEvidence
-      ? totalVariationDistance(
-          baselineDistribution.recoveryBenchTaskDistribution,
-          liveDistribution.recoveryBenchTaskDistribution,
-        )
-      : 0,
-    adkRuntimeContextDivergence0to1: hasAdkEvidence
-      ? totalVariationDistance(
-          baselineDistribution.adkRuntimeContextDistribution,
-          liveDistribution.adkRuntimeContextDistribution,
-        )
-      : 0,
-    physicianBenchSpecialtyDivergence0to1: hasPhysicianBenchEvidence
-      ? totalVariationDistance(
-          baselineDistribution.physicianBenchSpecialtyDistribution,
-          liveDistribution.physicianBenchSpecialtyDistribution,
-        )
-      : 0,
-    physicianBenchTaskTypeDivergence0to1: hasPhysicianBenchEvidence
-      ? totalVariationDistance(
-          baselineDistribution.physicianBenchTaskTypeDistribution,
-          liveDistribution.physicianBenchTaskTypeDistribution,
-        )
-      : 0,
-    physicianBenchEhrContextDivergence0to1: hasPhysicianBenchEvidence
-      ? totalVariationDistance(
-          baselineDistribution.physicianBenchEhrContextDistribution,
-          liveDistribution.physicianBenchEhrContextDistribution,
-        )
-      : 0,
-    genomicsStageDivergence0to1: hasGenomicsEvidence
-      ? totalVariationDistance(
-          baselineDistribution.genomicsStageDistribution,
-          liveDistribution.genomicsStageDistribution,
-        )
-      : 0,
-    genomicsContextDivergence0to1: hasGenomicsEvidence
-      ? totalVariationDistance(
-          baselineDistribution.genomicsContextDistribution,
-          liveDistribution.genomicsContextDistribution,
-        )
-      : 0,
-    agenticSearchDatasetFamilyDivergence0to1: hasAgenticSearchEvidence
-      ? totalVariationDistance(
-          baselineDistribution.agenticSearchDatasetFamilyDistribution,
-          liveDistribution.agenticSearchDatasetFamilyDistribution,
-        )
-      : 0,
-    agenticSearchQueryTypeDivergence0to1: hasAgenticSearchEvidence
-      ? totalVariationDistance(
-          baselineDistribution.agenticSearchQueryTypeDistribution,
-          liveDistribution.agenticSearchQueryTypeDistribution,
-        )
-      : 0,
-    agenticSearchToolContextDivergence0to1: hasAgenticSearchEvidence
-      ? totalVariationDistance(
-          baselineDistribution.agenticSearchToolContextDistribution,
-          liveDistribution.agenticSearchToolContextDistribution,
-        )
-      : 0,
-    documentDatasetTaskDivergence0to1: hasDocumentDatasetEvidence
-      ? totalVariationDistance(
-          baselineDistribution.documentDatasetTaskDistribution,
-          liveDistribution.documentDatasetTaskDistribution,
-        )
-      : 0,
-    documentDatasetFormatDivergence0to1: hasDocumentDatasetEvidence
-      ? totalVariationDistance(
-          baselineDistribution.documentDatasetFormatDistribution,
-          liveDistribution.documentDatasetFormatDistribution,
-        )
-      : 0,
-    documentDatasetExportTargetDivergence0to1: hasDocumentDatasetEvidence
-      ? totalVariationDistance(
-          baselineDistribution.documentDatasetExportTargetDistribution,
-          liveDistribution.documentDatasetExportTargetDistribution,
-        )
-      : 0,
-    documentDatasetPipelineContextDivergence0to1: hasDocumentDatasetEvidence
-      ? totalVariationDistance(
-          baselineDistribution.documentDatasetPipelineContextDistribution,
-          liveDistribution.documentDatasetPipelineContextDistribution,
-        )
-      : 0,
-    cpuAgenticWorkloadDivergence0to1: hasCpuAgenticEvidence
-      ? totalVariationDistance(
-          baselineDistribution.cpuAgenticWorkloadDistribution,
-          liveDistribution.cpuAgenticWorkloadDistribution,
-        )
-      : 0,
-    cpuAgenticRuntimeDivergence0to1: hasCpuAgenticEvidence
-      ? totalVariationDistance(
-          baselineDistribution.cpuAgenticRuntimeDistribution,
-          liveDistribution.cpuAgenticRuntimeDistribution,
-        )
-      : 0,
-    cpuAgenticScheduleDivergence0to1: hasCpuAgenticEvidence
-      ? totalVariationDistance(
-          baselineDistribution.cpuAgenticScheduleDistribution,
-          liveDistribution.cpuAgenticScheduleDistribution,
-        )
-      : 0,
-    cpuAgenticContextDivergence0to1: hasCpuAgenticEvidence
-      ? totalVariationDistance(
-          baselineDistribution.cpuAgenticContextDistribution,
-          liveDistribution.cpuAgenticContextDistribution,
-        )
-      : 0,
-    evalTechniqueDivergence0to1: hasEvalTechniqueEvidence
-      ? totalVariationDistance(
-          baselineDistribution.evalTechniqueDistribution,
-          liveDistribution.evalTechniqueDistribution,
-        )
-      : 0,
-    evalTechniqueContextDivergence0to1: hasEvalTechniqueEvidence
-      ? totalVariationDistance(
-          baselineDistribution.evalTechniqueContextDistribution,
-          liveDistribution.evalTechniqueContextDistribution,
-        )
-      : 0,
-    sapAgentEvalObjectiveDivergence0to1: hasSapAgentEvalEvidence
-      ? totalVariationDistance(
-          baselineDistribution.sapAgentEvalObjectiveDistribution,
-          liveDistribution.sapAgentEvalObjectiveDistribution,
-        )
-      : 0,
-    sapAgentEvalProcessDivergence0to1: hasSapAgentEvalEvidence
-      ? totalVariationDistance(
-          baselineDistribution.sapAgentEvalProcessDistribution,
-          liveDistribution.sapAgentEvalProcessDistribution,
-        )
-      : 0,
-    sapAgentEvalEnterpriseContextDivergence0to1: hasSapAgentEvalEvidence
-      ? totalVariationDistance(
-          baselineDistribution.sapAgentEvalEnterpriseContextDistribution,
-          liveDistribution.sapAgentEvalEnterpriseContextDistribution,
-        )
-      : 0,
-    agentEvalObservabilityMetricSetDivergence0to1: hasAgentEvalObservabilityEvidence
-      ? totalVariationDistance(
-          baselineDistribution.agentEvalObservabilityMetricSetDistribution,
-          liveDistribution.agentEvalObservabilityMetricSetDistribution,
-        )
-      : 0,
-    agentEvalObservabilityTelemetryDivergence0to1: hasAgentEvalObservabilityEvidence
-      ? totalVariationDistance(
-          baselineDistribution.agentEvalObservabilityTelemetryDistribution,
-          liveDistribution.agentEvalObservabilityTelemetryDistribution,
-        )
-      : 0,
-    hedraRagWorkflowDivergence0to1: hasHedraRagEvidence
-      ? totalVariationDistance(
-          baselineDistribution.hedraRagWorkflowDistribution,
-          liveDistribution.hedraRagWorkflowDistribution,
-        )
-      : 0,
-    hedraRagBaselineFrameworkDivergence0to1: hasHedraRagEvidence
-      ? totalVariationDistance(
-          baselineDistribution.hedraRagBaselineFrameworkDistribution,
-          liveDistribution.hedraRagBaselineFrameworkDistribution,
-        )
-      : 0,
-    hedraRagRuntimeContextDivergence0to1: hasHedraRagEvidence
-      ? totalVariationDistance(
-          baselineDistribution.hedraRagRuntimeContextDistribution,
-          liveDistribution.hedraRagRuntimeContextDistribution,
-        )
-      : 0,
-    agentEvalHarnessFrameworkDivergence0to1: hasAgentEvalHarnessEvidence
-      ? totalVariationDistance(
-          baselineDistribution.agentEvalHarnessFrameworkDistribution,
-          liveDistribution.agentEvalHarnessFrameworkDistribution,
-        )
-      : 0,
-    agentEvalHarnessTraceModeDivergence0to1: hasAgentEvalHarnessEvidence
-      ? totalVariationDistance(
-          baselineDistribution.agentEvalHarnessTraceModeDistribution,
-          liveDistribution.agentEvalHarnessTraceModeDistribution,
-        )
-      : 0,
-    agentEvalHarnessMetricContextDivergence0to1: hasAgentEvalHarnessEvidence
-      ? totalVariationDistance(
-          baselineDistribution.agentEvalHarnessMetricContextDistribution,
-          liveDistribution.agentEvalHarnessMetricContextDistribution,
-        )
-      : 0,
-    strandsBenchmarkHarnessBenchmarkSuiteDivergence0to1: hasStrandsBenchmarkHarnessEvidence
-      ? totalVariationDistance(
-          baselineDistribution.strandsBenchmarkHarnessBenchmarkSuiteDistribution,
-          liveDistribution.strandsBenchmarkHarnessBenchmarkSuiteDistribution,
-        )
-      : 0,
-    strandsBenchmarkHarnessRuntimeDivergence0to1: hasStrandsBenchmarkHarnessEvidence
-      ? totalVariationDistance(
-          baselineDistribution.strandsBenchmarkHarnessRuntimeDistribution,
-          liveDistribution.strandsBenchmarkHarnessRuntimeDistribution,
-        )
-      : 0,
-    strandsBenchmarkHarnessTaskFamilyDivergence0to1: hasStrandsBenchmarkHarnessEvidence
-      ? totalVariationDistance(
-          baselineDistribution.strandsBenchmarkHarnessTaskFamilyDistribution,
-          liveDistribution.strandsBenchmarkHarnessTaskFamilyDistribution,
-        )
-      : 0,
-    privacyWebEnvironmentDivergence0to1: hasPrivacyWebEvidence
-      ? totalVariationDistance(
-          baselineDistribution.privacyWebEnvironmentDistribution,
-          liveDistribution.privacyWebEnvironmentDistribution,
-        )
-      : 0,
-    privacyWebObservationModeDivergence0to1: hasPrivacyWebEvidence
-      ? totalVariationDistance(
-          baselineDistribution.privacyWebObservationModeDistribution,
-          liveDistribution.privacyWebObservationModeDistribution,
-        )
-      : 0,
-    privacyWebContextDivergence0to1: hasPrivacyWebEvidence
-      ? totalVariationDistance(
-          baselineDistribution.privacyWebContextDistribution,
-          liveDistribution.privacyWebContextDistribution,
-        )
-      : 0,
-    localSystemWorkloadContextDivergence0to1: hasLocalSystemEvidence
-      ? totalVariationDistance(
-          baselineDistribution.localSystemWorkloadContextDistribution,
-          liveDistribution.localSystemWorkloadContextDistribution,
-        )
-      : 0,
-    localSystemHardwareContextDivergence0to1: hasLocalSystemEvidence
-      ? totalVariationDistance(
-          baselineDistribution.localSystemHardwareContextDistribution,
-          liveDistribution.localSystemHardwareContextDistribution,
-        )
-      : 0,
-    observabilityIncidentContextDivergence0to1: hasObservabilityEvidence
-      ? totalVariationDistance(
-          baselineDistribution.observabilityIncidentContextDistribution,
-          liveDistribution.observabilityIncidentContextDistribution,
-        )
-      : 0,
-    observabilityTaskTypeDivergence0to1: hasObservabilityEvidence
-      ? totalVariationDistance(
-          baselineDistribution.observabilityTaskTypeDistribution,
-          liveDistribution.observabilityTaskTypeDistribution,
-        )
-      : 0,
-    observabilityDataSourceDivergence0to1: hasObservabilityEvidence
-      ? totalVariationDistance(
-          baselineDistribution.observabilityDataSourceDistribution,
-          liveDistribution.observabilityDataSourceDistribution,
-        )
-      : 0,
-    observabilityToolModeDivergence0to1: hasObservabilityEvidence
-      ? totalVariationDistance(
-          baselineDistribution.observabilityToolModeDistribution,
-          liveDistribution.observabilityToolModeDistribution,
-        )
-      : 0,
-    ollamaMetricsModelDivergence0to1: hasOllamaMetricsEvidence
-      ? totalVariationDistance(
-          baselineDistribution.ollamaMetricsModelDistribution,
-          liveDistribution.ollamaMetricsModelDistribution,
-        )
-      : 0,
-    ollamaMetricsDeploymentDivergence0to1: hasOllamaMetricsEvidence
-      ? totalVariationDistance(
-          baselineDistribution.ollamaMetricsDeploymentDistribution,
-          liveDistribution.ollamaMetricsDeploymentDistribution,
-        )
-      : 0,
-    ollamaMetricsProxyContextDivergence0to1: hasOllamaMetricsEvidence
-      ? totalVariationDistance(
-          baselineDistribution.ollamaMetricsProxyContextDistribution,
-          liveDistribution.ollamaMetricsProxyContextDistribution,
-        )
-      : 0,
-    webOperatorContextDivergence0to1: hasWebOperatorEvidence
-      ? totalVariationDistance(
-          baselineDistribution.webOperatorContextDistribution,
-          liveDistribution.webOperatorContextDistribution,
-        )
-      : 0,
-    webOperatorProviderDivergence0to1: hasWebOperatorEvidence
-      ? totalVariationDistance(
-          baselineDistribution.webOperatorProviderDistribution,
-          liveDistribution.webOperatorProviderDistribution,
-        )
-      : 0,
-    naviBenchWebsiteDomainDivergence0to1: hasNaviBenchEvidence
-      ? totalVariationDistance(
-          baselineDistribution.naviBenchWebsiteDomainDistribution,
-          liveDistribution.naviBenchWebsiteDomainDistribution,
-        )
-      : 0,
-    naviBenchBrowserModeDivergence0to1: hasNaviBenchEvidence
-      ? totalVariationDistance(
-          baselineDistribution.naviBenchBrowserModeDistribution,
-          liveDistribution.naviBenchBrowserModeDistribution,
-        )
-      : 0,
-    naviBenchEvalContextDivergence0to1: hasNaviBenchEvidence
-      ? totalVariationDistance(
-          baselineDistribution.naviBenchEvalContextDistribution,
-          liveDistribution.naviBenchEvalContextDistribution,
-        )
-      : 0,
-    legalAgentCorpusDivergence0to1: hasLegalAgentEvidence
-      ? totalVariationDistance(
-          baselineDistribution.legalAgentCorpusDistribution,
-          liveDistribution.legalAgentCorpusDistribution,
-        )
-      : 0,
-    legalAgentTaskTypeDivergence0to1: hasLegalAgentEvidence
-      ? totalVariationDistance(
-          baselineDistribution.legalAgentTaskTypeDistribution,
-          liveDistribution.legalAgentTaskTypeDistribution,
-        )
-      : 0,
-    legalAgentDifficultyDivergence0to1: hasLegalAgentEvidence
-      ? totalVariationDistance(
-          baselineDistribution.legalAgentDifficultyDistribution,
-          liveDistribution.legalAgentDifficultyDistribution,
-        )
-      : 0,
-    legalAgentToolContextDivergence0to1: hasLegalAgentEvidence
-      ? totalVariationDistance(
-          baselineDistribution.legalAgentToolContextDistribution,
-          liveDistribution.legalAgentToolContextDistribution,
-        )
-      : 0,
-    researchGymTaskDomainDivergence0to1: hasResearchGymEvidence
-      ? totalVariationDistance(
-          baselineDistribution.researchGymTaskDomainDistribution,
-          liveDistribution.researchGymTaskDomainDistribution,
-        )
-      : 0,
-    researchGymRuntimeContextDivergence0to1: hasResearchGymEvidence
-      ? totalVariationDistance(
-          baselineDistribution.researchGymRuntimeContextDistribution,
-          liveDistribution.researchGymRuntimeContextDistribution,
-        )
-      : 0,
-    osUniverseCategoryDivergence0to1: hasOsUniverseEvidence
-      ? totalVariationDistance(
-          baselineDistribution.osUniverseCategoryDistribution,
-          liveDistribution.osUniverseCategoryDistribution,
-        )
-      : 0,
-    osUniverseLevelDivergence0to1: hasOsUniverseEvidence
-      ? totalVariationDistance(
-          baselineDistribution.osUniverseLevelDistribution,
-          liveDistribution.osUniverseLevelDistribution,
-        )
-      : 0,
-    osUniverseRuntimeContextDivergence0to1: hasOsUniverseEvidence
-      ? totalVariationDistance(
-          baselineDistribution.osUniverseRuntimeContextDistribution,
-          liveDistribution.osUniverseRuntimeContextDistribution,
-        )
-      : 0,
+    ctfContextDivergence0to1: guardedDivergence(hasCtfEvidence, baselineDistribution.ctfContextDistribution, liveDistribution.ctfContextDistribution),
+    ctfVmContextDivergence0to1: guardedDivergence(hasCtfPartialCreditEvidence, baselineDistribution.ctfVmContextDistribution, liveDistribution.ctfVmContextDistribution),
+    ragEvaluationModeDivergence0to1: guardedDivergence(hasRagEvidence, baselineDistribution.ragEvaluationModeDistribution, liveDistribution.ragEvaluationModeDistribution),
+    ragPipelineContextDivergence0to1: guardedDivergence(hasRagEvidence, baselineDistribution.ragPipelineContextDistribution, liveDistribution.ragPipelineContextDistribution),
+    ragStrategyDivergence0to1: guardedDivergence(hasRagStrategyEvidence, baselineDistribution.ragStrategyDistribution, liveDistribution.ragStrategyDistribution),
+    ragDatasetTierDivergence0to1: guardedDivergence(hasRagDatasetBuilderEvidence, baselineDistribution.ragDatasetTierDistribution, liveDistribution.ragDatasetTierDistribution),
+    ragQuestionTypeDivergence0to1: guardedDivergence(hasRagDatasetBuilderEvidence, baselineDistribution.ragQuestionTypeDistribution, liveDistribution.ragQuestionTypeDistribution),
+    ragBuilderStageDivergence0to1: guardedDivergence(hasRagDatasetBuilderEvidence, baselineDistribution.ragBuilderStageDistribution, liveDistribution.ragBuilderStageDistribution),
+    ragDatasetBuilderContextDivergence0to1: guardedDivergence(hasRagDatasetBuilderEvidence, baselineDistribution.ragDatasetBuilderContextDistribution, liveDistribution.ragDatasetBuilderContextDistribution),
+    kiteDatasetFamilyDivergence0to1: guardedDivergence(hasKiteEvidence, baselineDistribution.kiteDatasetFamilyDistribution, liveDistribution.kiteDatasetFamilyDistribution),
+    kiteRagConfigurationDivergence0to1: guardedDivergence(hasKiteEvidence, baselineDistribution.kiteRagConfigurationDistribution, liveDistribution.kiteRagConfigurationDistribution),
+    kiteBenchmarkContextDivergence0to1: guardedDivergence(hasKiteEvidence, baselineDistribution.kiteBenchmarkContextDistribution, liveDistribution.kiteBenchmarkContextDistribution),
+    pokerEvalGameTypeDivergence0to1: guardedDivergence(hasPokerEvalEvidence, baselineDistribution.pokerEvalGameTypeDistribution, liveDistribution.pokerEvalGameTypeDistribution),
+    pokerEvalTableContextDivergence0to1: guardedDivergence(hasPokerEvalEvidence, baselineDistribution.pokerEvalTableContextDistribution, liveDistribution.pokerEvalTableContextDistribution),
+    pokerEvalOpponentPoolDivergence0to1: guardedDivergence(hasPokerEvalEvidence, baselineDistribution.pokerEvalOpponentPoolDistribution, liveDistribution.pokerEvalOpponentPoolDistribution),
+    llmRagEvalSuiteContextDivergence0to1: guardedDivergence(hasLlmRagEvalSuiteEvidence, baselineDistribution.llmRagEvalSuiteContextDistribution, liveDistribution.llmRagEvalSuiteContextDistribution),
+    noMiraclLanguageDivergence0to1: guardedDivergence(hasNoMiraclEvidence, baselineDistribution.noMiraclLanguageDistribution, liveDistribution.noMiraclLanguageDistribution),
+    noMiraclSubsetDivergence0to1: guardedDivergence(hasNoMiraclEvidence, baselineDistribution.noMiraclSubsetDistribution, liveDistribution.noMiraclSubsetDistribution),
+    noMiraclContextDivergence0to1: guardedDivergence(hasNoMiraclEvidence, baselineDistribution.noMiraclContextDistribution, liveDistribution.noMiraclContextDistribution),
+    scalingLawTaskTypeDivergence0to1: guardedDivergence(hasScalingLawDiscoveryEvidence, baselineDistribution.scalingLawDiscoveryTaskTypeDistribution, liveDistribution.scalingLawDiscoveryTaskTypeDistribution),
+    scalingLawContextDivergence0to1: guardedDivergence(hasScalingLawDiscoveryEvidence, baselineDistribution.scalingLawDiscoveryContextDistribution, liveDistribution.scalingLawDiscoveryContextDistribution),
+    toolRlContextDivergence0to1: guardedDivergence(hasToolRlEvidence, baselineDistribution.toolRlContextDistribution, liveDistribution.toolRlContextDistribution),
+    credenceEngineContextDivergence0to1: guardedDivergence(hasCredenceEngineEvidence, baselineDistribution.credenceEngineContextDistribution, liveDistribution.credenceEngineContextDistribution),
+    tradingContextDivergence0to1: guardedDivergence(hasTradingEvidence, baselineDistribution.tradingContextDistribution, liveDistribution.tradingContextDistribution),
+    redTeamRiskCategoryDivergence0to1: guardedDivergence(hasRedTeamEvidence, baselineDistribution.redTeamRiskCategoryDistribution, liveDistribution.redTeamRiskCategoryDistribution),
+    redTeamAttackDivergence0to1: guardedDivergence(hasRedTeamEvidence, baselineDistribution.redTeamAttackDistribution, liveDistribution.redTeamAttackDistribution),
+    redTeamSubsetDivergence0to1: guardedDivergence(hasRedTeamEvidence, baselineDistribution.redTeamSubsetDistribution, liveDistribution.redTeamSubsetDistribution),
+    redTeamGuardLabelDivergence0to1: guardedDivergence(hasRedTeamEvidence, baselineDistribution.redTeamGuardLabelDistribution, liveDistribution.redTeamGuardLabelDistribution),
+    piArenaAttackDivergence0to1: guardedDivergence(hasPiArenaEvidence, baselineDistribution.piArenaAttackDistribution, liveDistribution.piArenaAttackDistribution),
+    piArenaDefenseDivergence0to1: guardedDivergence(hasPiArenaEvidence, baselineDistribution.piArenaDefenseDistribution, liveDistribution.piArenaDefenseDistribution),
+    piArenaDatasetDivergence0to1: guardedDivergence(hasPiArenaEvidence, baselineDistribution.piArenaDatasetDistribution, liveDistribution.piArenaDatasetDistribution),
+    piArenaAgentBenchmarkDivergence0to1: guardedDivergence(hasPiArenaEvidence, baselineDistribution.piArenaAgentBenchmarkDistribution, liveDistribution.piArenaAgentBenchmarkDistribution),
+    backdoorAgentStageDivergence0to1: guardedDivergence(hasBackdoorAgentEvidence, baselineDistribution.backdoorAgentStageDistribution, liveDistribution.backdoorAgentStageDistribution),
+    backdoorAgentTaskFamilyDivergence0to1: guardedDivergence(hasBackdoorAgentEvidence, baselineDistribution.backdoorAgentTaskFamilyDistribution, liveDistribution.backdoorAgentTaskFamilyDistribution),
+    backdoorAgentAttackFamilyDivergence0to1: guardedDivergence(hasBackdoorAgentEvidence, baselineDistribution.backdoorAgentAttackFamilyDistribution, liveDistribution.backdoorAgentAttackFamilyDistribution),
+    agentSecurityContextDivergence0to1: guardedDivergence(hasAgentSecurityEvidence, baselineDistribution.agentSecurityContextDistribution, liveDistribution.agentSecurityContextDistribution),
+    agentTestingContextDivergence0to1: guardedDivergence(hasAgentTestingEvidence, baselineDistribution.agentTestingContextDistribution, liveDistribution.agentTestingContextDistribution),
+    chaosContextDivergence0to1: guardedDivergence(hasChaosEvidence, baselineDistribution.chaosContextDistribution, liveDistribution.chaosContextDistribution),
+    recoveryBenchMessageModeDivergence0to1: guardedDivergence(hasRecoveryBenchEvidence, baselineDistribution.recoveryBenchMessageModeDistribution, liveDistribution.recoveryBenchMessageModeDistribution),
+    recoveryBenchAgentHarnessDivergence0to1: guardedDivergence(hasRecoveryBenchEvidence, baselineDistribution.recoveryBenchAgentHarnessDistribution, liveDistribution.recoveryBenchAgentHarnessDistribution),
+    recoveryBenchTaskDivergence0to1: guardedDivergence(hasRecoveryBenchEvidence, baselineDistribution.recoveryBenchTaskDistribution, liveDistribution.recoveryBenchTaskDistribution),
+    adkRuntimeContextDivergence0to1: guardedDivergence(hasAdkEvidence, baselineDistribution.adkRuntimeContextDistribution, liveDistribution.adkRuntimeContextDistribution),
+    physicianBenchSpecialtyDivergence0to1: guardedDivergence(hasPhysicianBenchEvidence, baselineDistribution.physicianBenchSpecialtyDistribution, liveDistribution.physicianBenchSpecialtyDistribution),
+    physicianBenchTaskTypeDivergence0to1: guardedDivergence(hasPhysicianBenchEvidence, baselineDistribution.physicianBenchTaskTypeDistribution, liveDistribution.physicianBenchTaskTypeDistribution),
+    physicianBenchEhrContextDivergence0to1: guardedDivergence(hasPhysicianBenchEvidence, baselineDistribution.physicianBenchEhrContextDistribution, liveDistribution.physicianBenchEhrContextDistribution),
+    genomicsStageDivergence0to1: guardedDivergence(hasGenomicsEvidence, baselineDistribution.genomicsStageDistribution, liveDistribution.genomicsStageDistribution),
+    genomicsContextDivergence0to1: guardedDivergence(hasGenomicsEvidence, baselineDistribution.genomicsContextDistribution, liveDistribution.genomicsContextDistribution),
+    agenticSearchDatasetFamilyDivergence0to1: guardedDivergence(hasAgenticSearchEvidence, baselineDistribution.agenticSearchDatasetFamilyDistribution, liveDistribution.agenticSearchDatasetFamilyDistribution),
+    agenticSearchQueryTypeDivergence0to1: guardedDivergence(hasAgenticSearchEvidence, baselineDistribution.agenticSearchQueryTypeDistribution, liveDistribution.agenticSearchQueryTypeDistribution),
+    agenticSearchToolContextDivergence0to1: guardedDivergence(hasAgenticSearchEvidence, baselineDistribution.agenticSearchToolContextDistribution, liveDistribution.agenticSearchToolContextDistribution),
+    documentDatasetTaskDivergence0to1: guardedDivergence(hasDocumentDatasetEvidence, baselineDistribution.documentDatasetTaskDistribution, liveDistribution.documentDatasetTaskDistribution),
+    documentDatasetFormatDivergence0to1: guardedDivergence(hasDocumentDatasetEvidence, baselineDistribution.documentDatasetFormatDistribution, liveDistribution.documentDatasetFormatDistribution),
+    documentDatasetExportTargetDivergence0to1: guardedDivergence(hasDocumentDatasetEvidence, baselineDistribution.documentDatasetExportTargetDistribution, liveDistribution.documentDatasetExportTargetDistribution),
+    documentDatasetPipelineContextDivergence0to1: guardedDivergence(hasDocumentDatasetEvidence, baselineDistribution.documentDatasetPipelineContextDistribution, liveDistribution.documentDatasetPipelineContextDistribution),
+    cpuAgenticWorkloadDivergence0to1: guardedDivergence(hasCpuAgenticEvidence, baselineDistribution.cpuAgenticWorkloadDistribution, liveDistribution.cpuAgenticWorkloadDistribution),
+    cpuAgenticRuntimeDivergence0to1: guardedDivergence(hasCpuAgenticEvidence, baselineDistribution.cpuAgenticRuntimeDistribution, liveDistribution.cpuAgenticRuntimeDistribution),
+    cpuAgenticScheduleDivergence0to1: guardedDivergence(hasCpuAgenticEvidence, baselineDistribution.cpuAgenticScheduleDistribution, liveDistribution.cpuAgenticScheduleDistribution),
+    cpuAgenticContextDivergence0to1: guardedDivergence(hasCpuAgenticEvidence, baselineDistribution.cpuAgenticContextDistribution, liveDistribution.cpuAgenticContextDistribution),
+    evalTechniqueDivergence0to1: guardedDivergence(hasEvalTechniqueEvidence, baselineDistribution.evalTechniqueDistribution, liveDistribution.evalTechniqueDistribution),
+    evalTechniqueContextDivergence0to1: guardedDivergence(hasEvalTechniqueEvidence, baselineDistribution.evalTechniqueContextDistribution, liveDistribution.evalTechniqueContextDistribution),
+    sapAgentEvalObjectiveDivergence0to1: guardedDivergence(hasSapAgentEvalEvidence, baselineDistribution.sapAgentEvalObjectiveDistribution, liveDistribution.sapAgentEvalObjectiveDistribution),
+    sapAgentEvalProcessDivergence0to1: guardedDivergence(hasSapAgentEvalEvidence, baselineDistribution.sapAgentEvalProcessDistribution, liveDistribution.sapAgentEvalProcessDistribution),
+    sapAgentEvalEnterpriseContextDivergence0to1: guardedDivergence(hasSapAgentEvalEvidence, baselineDistribution.sapAgentEvalEnterpriseContextDistribution, liveDistribution.sapAgentEvalEnterpriseContextDistribution),
+    agentEvalObservabilityMetricSetDivergence0to1: guardedDivergence(hasAgentEvalObservabilityEvidence, baselineDistribution.agentEvalObservabilityMetricSetDistribution, liveDistribution.agentEvalObservabilityMetricSetDistribution),
+    agentEvalObservabilityTelemetryDivergence0to1: guardedDivergence(hasAgentEvalObservabilityEvidence, baselineDistribution.agentEvalObservabilityTelemetryDistribution, liveDistribution.agentEvalObservabilityTelemetryDistribution),
+    hedraRagWorkflowDivergence0to1: guardedDivergence(hasHedraRagEvidence, baselineDistribution.hedraRagWorkflowDistribution, liveDistribution.hedraRagWorkflowDistribution),
+    hedraRagBaselineFrameworkDivergence0to1: guardedDivergence(hasHedraRagEvidence, baselineDistribution.hedraRagBaselineFrameworkDistribution, liveDistribution.hedraRagBaselineFrameworkDistribution),
+    hedraRagRuntimeContextDivergence0to1: guardedDivergence(hasHedraRagEvidence, baselineDistribution.hedraRagRuntimeContextDistribution, liveDistribution.hedraRagRuntimeContextDistribution),
+    agentEvalHarnessFrameworkDivergence0to1: guardedDivergence(hasAgentEvalHarnessEvidence, baselineDistribution.agentEvalHarnessFrameworkDistribution, liveDistribution.agentEvalHarnessFrameworkDistribution),
+    agentEvalHarnessTraceModeDivergence0to1: guardedDivergence(hasAgentEvalHarnessEvidence, baselineDistribution.agentEvalHarnessTraceModeDistribution, liveDistribution.agentEvalHarnessTraceModeDistribution),
+    agentEvalHarnessMetricContextDivergence0to1: guardedDivergence(hasAgentEvalHarnessEvidence, baselineDistribution.agentEvalHarnessMetricContextDistribution, liveDistribution.agentEvalHarnessMetricContextDistribution),
+    strandsBenchmarkHarnessBenchmarkSuiteDivergence0to1: guardedDivergence(hasStrandsBenchmarkHarnessEvidence, baselineDistribution.strandsBenchmarkHarnessBenchmarkSuiteDistribution, liveDistribution.strandsBenchmarkHarnessBenchmarkSuiteDistribution),
+    strandsBenchmarkHarnessRuntimeDivergence0to1: guardedDivergence(hasStrandsBenchmarkHarnessEvidence, baselineDistribution.strandsBenchmarkHarnessRuntimeDistribution, liveDistribution.strandsBenchmarkHarnessRuntimeDistribution),
+    strandsBenchmarkHarnessTaskFamilyDivergence0to1: guardedDivergence(hasStrandsBenchmarkHarnessEvidence, baselineDistribution.strandsBenchmarkHarnessTaskFamilyDistribution, liveDistribution.strandsBenchmarkHarnessTaskFamilyDistribution),
+    privacyWebEnvironmentDivergence0to1: guardedDivergence(hasPrivacyWebEvidence, baselineDistribution.privacyWebEnvironmentDistribution, liveDistribution.privacyWebEnvironmentDistribution),
+    privacyWebObservationModeDivergence0to1: guardedDivergence(hasPrivacyWebEvidence, baselineDistribution.privacyWebObservationModeDistribution, liveDistribution.privacyWebObservationModeDistribution),
+    privacyWebContextDivergence0to1: guardedDivergence(hasPrivacyWebEvidence, baselineDistribution.privacyWebContextDistribution, liveDistribution.privacyWebContextDistribution),
+    localSystemWorkloadContextDivergence0to1: guardedDivergence(hasLocalSystemEvidence, baselineDistribution.localSystemWorkloadContextDistribution, liveDistribution.localSystemWorkloadContextDistribution),
+    localSystemHardwareContextDivergence0to1: guardedDivergence(hasLocalSystemEvidence, baselineDistribution.localSystemHardwareContextDistribution, liveDistribution.localSystemHardwareContextDistribution),
+    observabilityIncidentContextDivergence0to1: guardedDivergence(hasObservabilityEvidence, baselineDistribution.observabilityIncidentContextDistribution, liveDistribution.observabilityIncidentContextDistribution),
+    observabilityTaskTypeDivergence0to1: guardedDivergence(hasObservabilityEvidence, baselineDistribution.observabilityTaskTypeDistribution, liveDistribution.observabilityTaskTypeDistribution),
+    observabilityDataSourceDivergence0to1: guardedDivergence(hasObservabilityEvidence, baselineDistribution.observabilityDataSourceDistribution, liveDistribution.observabilityDataSourceDistribution),
+    observabilityToolModeDivergence0to1: guardedDivergence(hasObservabilityEvidence, baselineDistribution.observabilityToolModeDistribution, liveDistribution.observabilityToolModeDistribution),
+    ollamaMetricsModelDivergence0to1: guardedDivergence(hasOllamaMetricsEvidence, baselineDistribution.ollamaMetricsModelDistribution, liveDistribution.ollamaMetricsModelDistribution),
+    ollamaMetricsDeploymentDivergence0to1: guardedDivergence(hasOllamaMetricsEvidence, baselineDistribution.ollamaMetricsDeploymentDistribution, liveDistribution.ollamaMetricsDeploymentDistribution),
+    ollamaMetricsProxyContextDivergence0to1: guardedDivergence(hasOllamaMetricsEvidence, baselineDistribution.ollamaMetricsProxyContextDistribution, liveDistribution.ollamaMetricsProxyContextDistribution),
+    webOperatorContextDivergence0to1: guardedDivergence(hasWebOperatorEvidence, baselineDistribution.webOperatorContextDistribution, liveDistribution.webOperatorContextDistribution),
+    webOperatorProviderDivergence0to1: guardedDivergence(hasWebOperatorEvidence, baselineDistribution.webOperatorProviderDistribution, liveDistribution.webOperatorProviderDistribution),
+    naviBenchWebsiteDomainDivergence0to1: guardedDivergence(hasNaviBenchEvidence, baselineDistribution.naviBenchWebsiteDomainDistribution, liveDistribution.naviBenchWebsiteDomainDistribution),
+    naviBenchBrowserModeDivergence0to1: guardedDivergence(hasNaviBenchEvidence, baselineDistribution.naviBenchBrowserModeDistribution, liveDistribution.naviBenchBrowserModeDistribution),
+    naviBenchEvalContextDivergence0to1: guardedDivergence(hasNaviBenchEvidence, baselineDistribution.naviBenchEvalContextDistribution, liveDistribution.naviBenchEvalContextDistribution),
+    legalAgentCorpusDivergence0to1: guardedDivergence(hasLegalAgentEvidence, baselineDistribution.legalAgentCorpusDistribution, liveDistribution.legalAgentCorpusDistribution),
+    legalAgentTaskTypeDivergence0to1: guardedDivergence(hasLegalAgentEvidence, baselineDistribution.legalAgentTaskTypeDistribution, liveDistribution.legalAgentTaskTypeDistribution),
+    legalAgentDifficultyDivergence0to1: guardedDivergence(hasLegalAgentEvidence, baselineDistribution.legalAgentDifficultyDistribution, liveDistribution.legalAgentDifficultyDistribution),
+    legalAgentToolContextDivergence0to1: guardedDivergence(hasLegalAgentEvidence, baselineDistribution.legalAgentToolContextDistribution, liveDistribution.legalAgentToolContextDistribution),
+    researchGymTaskDomainDivergence0to1: guardedDivergence(hasResearchGymEvidence, baselineDistribution.researchGymTaskDomainDistribution, liveDistribution.researchGymTaskDomainDistribution),
+    researchGymRuntimeContextDivergence0to1: guardedDivergence(hasResearchGymEvidence, baselineDistribution.researchGymRuntimeContextDistribution, liveDistribution.researchGymRuntimeContextDistribution),
+    osUniverseCategoryDivergence0to1: guardedDivergence(hasOsUniverseEvidence, baselineDistribution.osUniverseCategoryDistribution, liveDistribution.osUniverseCategoryDistribution),
+    osUniverseLevelDivergence0to1: guardedDivergence(hasOsUniverseEvidence, baselineDistribution.osUniverseLevelDistribution, liveDistribution.osUniverseLevelDistribution),
+    osUniverseRuntimeContextDivergence0to1: guardedDivergence(hasOsUniverseEvidence, baselineDistribution.osUniverseRuntimeContextDistribution, liveDistribution.osUniverseRuntimeContextDistribution),
     robustnessStabilityDrop0to1: (baselineDistribution.robustnessStabilityScoreCount > 0 || liveDistribution.robustnessStabilityScoreCount > 0)
       ? round(baselineDistribution.robustnessStabilityMean0to1 - liveDistribution.robustnessStabilityMean0to1)
       : 0,

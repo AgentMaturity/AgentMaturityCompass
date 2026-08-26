@@ -590,3 +590,115 @@ that each have exactly one caller would be indirection, not deduplication.
 The remaining structural sprawl is the one named in step 1 and still untouched:
 `LiveDriftSampleRow`, a 936-field union across 74 domains, and the ~3,400-line
 aggregator that reads it.
+
+---
+
+# Step 6 — the union type, and the aggregator instead
+
+## The union type is not the problem I assumed
+
+`LiveDriftSampleRow` is 936 fields across 74 domain prefixes. Two measurements
+changed what to do about it:
+
+**It is already grouped.** 74 distinct prefixes produce **81 contiguous runs**,
+so the fields sit in per-domain blocks in source order. A split into per-domain
+interfaces would be a contiguous-block operation — mechanical and safe.
+
+**None of it is dead.** Every one of the 936 fields is referenced somewhere in
+`src/` or `tests/`. Zero unused. Given how often this line of work has found
+decorative code, that was worth testing, and the hypothesis is refuted: the type
+is large because AMC genuinely monitors 74 domains.
+
+So splitting it would ADD roughly 240 lines of interface declarations to make
+domains separable, with no immediate benefit and no dead weight to remove. The
+cost of the union type is real but small: a new domain appends a block at the
+end of a well-ordered file. The **aggregator** is where a new domain actually
+hurts.
+
+## What the aggregator was made of
+
+`runLiveScoreBehaviorDrift`, 3,369 lines. Measured rather than skimmed:
+
+| shape | count | lines |
+|---|---|---|
+| guarded `totalVariationDistance`, multi-line | **100** | 600 |
+| guarded `round(Math.max(0, a - b))` | **54** | 216 |
+| guarded `round(a - b)` (signed) | **17** | 68 |
+| guarded `ratioIncrease` | **5** | 20 |
+
+176 properties, 904 lines, four shapes. Each spelled across four to six lines:
+
+    ctfContextDivergence0to1: hasCtfEvidence
+      ? totalVariationDistance(
+          baselineDistribution.ctfContextDistribution,
+          liveDistribution.ctfContextDistribution,
+        )
+      : 0,
+
+In all 100 divergences the baseline and live field names were identical, so
+there was never a case where the two sides could disagree.
+
+## What was done
+
+Four helpers — `guardedDivergence`, `guardedDrop`, `guardedDelta`,
+`guardedRatio` — and 176 call sites collapsed to one line each.
+
+    src/watch/liveDriftAlerts.ts   11,657 -> 11,074   (-583)
+    the aggregator itself           3,369 -> ~2,730
+
+`guardedDrop` and `guardedDelta` are deliberately separate. 54 metrics clamp at
+zero because a metric that improved has not dropped; 17 keep their sign because
+the direction is what they exist to convey. One helper for both would silently
+erase that on half of them.
+
+Every characterization hash unchanged.
+
+## Three of four mutations survived, and the gap predates the extraction
+
+Removing the `present` guard, un-clamping the drop, and clamping the signed
+delta **all passed the existing suite**. No fixture has a domain with zero rows,
+so the guard never bites; none has a negative delta, so the clamp never bites.
+
+That is not a regression — the hashes prove behaviour is identical. It is that
+the same untested behaviour was previously spread across 176 inline expressions,
+where it could not be tested at all. As four named functions it can be, and
+`tests/liveDriftGuards.test.ts` now does. All four mutations turn it red.
+
+The helpers are exported for this, widening a deliberately narrow surface from
+three functions to seven. That trade is stated in the module rather than made
+quietly.
+
+## A live trap found on the way: two `ratioIncrease` functions
+
+    liveDriftAlerts  ratioIncrease(after, before)   (after - before) / before, UNCLAMPED
+    driftMath        ratioIncrease(baseline, live)  max(0, (live - baseline) / baseline)
+
+**Reversed argument order and different clamping under one name.** Importing the
+wrong one compiles cleanly and silently inverts every latency and cost ratio it
+touches.
+
+Found because my first `guardedRatio` named its parameters `(baseline, live)`
+after driftMath's, and the test asserting a 50% increase returned `-0.333333`.
+The helper forwarded correctly; the parameter names lied. Both functions are
+load-bearing on published receipts, so neither can be changed to match the other
+without a methodology note — naming the hazard in both places and pinning the
+semantics in a test is what is available.
+
+## Verification
+
+Full suite **10,041 / 10,041** across 1,246 files; five gates pass. Ratchet
+baseline for `liveDriftAlerts.ts` lowered 11,657 → 11,074.
+
+## Running total for P5.2b
+
+| step | net lines |
+|---|---|
+| 1 · type layer extracted | +113 |
+| 3 · cluster 1 factory | −458 |
+| 4 · Family-B arithmetic | −374 |
+| 5 · cluster 4 / buildAlert | −525 |
+| 6 · aggregator guards | −583 |
+| **total** | **−1,827** |
+
+Every published receipt hash byte-identical throughout, verified by eight
+characterization pins.
