@@ -277,3 +277,98 @@ Full suite **10,091 / 10,091** across 1,251 files. `lint`, `typecheck`,
 - **Continuable children.** Nothing resumes a child yet. `LoopInbox` is safe to
   instantiate per child provided each child gets its own `SessionService`, which
   is the constraint that sub-step has to respect.
+
+---
+
+# The real runner — a child that actually executes
+
+P6.1a's Verify criterion is "a parent delegates to a continuable child that
+reports back; every delegation carries a signed handoff packet." Everything up to
+here proved properties about the governance with the child's executor stubbed.
+`createDriverRunner` puts a real `AgentDriver` behind that seam.
+
+## Writing the end-to-end test found a bug in my own reasoning
+
+The first version of `subagentRunner.ts` took the parent's `LoopLlm` directly, and
+its module comment explained at length why reusing it was correct.
+
+It was not. `LlmRuntime` captures a session at construction and calls
+`prepareRequest(this.init.session, …)`, so a child sharing the parent's runtime
+writes its `request/header` and `request/response` rows into the **parent's**
+session — two runs interleaved in one hash chain, and the child's provider traffic
+attributed to its parent.
+
+The runner now takes `makeLlm(session)`: the parent supplies the registry,
+credentials and transport it already composed, and the child gets its own runtime
+bound to its own session. The child still cannot pick its provider or route —
+those come from the parent — but its evidence lands where it belongs. The route,
+by contrast, genuinely is a plain value and is passed straight through.
+
+A test asserts the split directly: the child's session has `request/header` rows
+and the parent's has none.
+
+## Three things make the child governed, and all three are now end-to-end
+
+1. **Its session is opened with the root's id.** This is the one that actually
+   closes the budget escape: `budgetUsageSnapshot` counts spend by filtering
+   `meta.agentId`, so what matters is the id on the rows the child really wrote,
+   not merely the id handed to its toolset. Asserted against the ledger.
+2. **Its toolset is built with the same id**, so guard scopes resolve to the
+   parent's narrowing rather than an empty layer.
+3. **Its session id is the one the parent already announced**, supplied rather
+   than generated, so `agent_delegation_started` names the session the child
+   really wrote. The mutation that lets the runner generate its own id turns
+   three tests red.
+
+## Two refusals the runner adds
+
+- **`driverStatus === "failed"`** is terminal: the spine refused a `turn/end` or
+  `turn/seal`, so the child's log has an open turn nothing may build on. The
+  child's text may look complete; the run it came from is not.
+- **`unsignedRows > 0`** — the field documents itself as "zero is the only
+  acceptable value". A child whose evidence is unsigned produced words with no
+  provenance, and handing those to a parent that will quote them would launder
+  them into the parent's own signed log.
+
+## A schema quirk worth recording
+
+The `sessions` table has no `agent_id` column. `SessionService.open` explains
+why: "a natively-run agent has no separate binary, so `binary_path` records the
+agent id and `binary_sha256` the composition it ran under." The first version of
+the ownership assertion guessed `agent_id` and failed on a missing column — the
+second reads `binary_path`, with the reason written next to it.
+
+## A shared helper, exported rather than copied
+
+`scriptedAdapter`, `FixedCredentials` and `silentTransport` were private to
+`tests/helpers/agentLoopHarness.ts`. They are now exported: duplicating a stub
+adapter into a second test file is how two "identical" stubs drift into
+disagreeing about what a provider does.
+
+## Verification
+
+4 end-to-end tests against a real driver, 4 mutations caught with a no-op control
+that correctly stayed green: the child's session owned by `runAs` (1 red), the
+runner generating its own session id instead of the announced one (3), and the
+child's text dropped (1).
+
+Full suite **10,095 / 10,095** across 1,252 files. `lint`, `typecheck`,
+`check:architecture-boundaries`, `check:counts`, `check:docs-drift` pass.
+
+## Where P6.1a now stands
+
+Met: a parent delegates, a real child executes, the child reports back in its own
+words, and the delegation carries a signed packet with a started/completed pair
+in the parent's log.
+
+**Not met: "continuable".** Nothing resumes a child. `whenIdle()` runs it to
+completion inside the tool body and the session closes. A continuable child needs
+its session left open, its driver held, and a resume path that posts into the same
+`LoopInbox` — which the inbox already supports, since it replays from its own
+signed rows. That is the next sub-step.
+
+Also still absent: **`ctx.subagents`.** Nothing calls `spawnSubagent` from inside
+a running loop yet. The shape is a `delegate` tool bound by closure capture at
+registration, the way `agentToolset` already binds its registry, pipeline and
+ledger — which is also what would give the child's report its route back into the
+parent through `ToolCallOutcome.additionalContext`.

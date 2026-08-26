@@ -39,7 +39,7 @@ export const LOOP_PROVIDER = "anthropic";
 export const LOOP_MODEL = "claude-loop-test";
 
 /** A credentials seam with one value and no file behind it. */
-class FixedCredentials implements CredentialsService {
+export class FixedCredentials implements CredentialsService {
   resolve(): string | null {
     return "sk-loop-test-DO-NOT-LOG";
   }
@@ -58,7 +58,7 @@ class FixedCredentials implements CredentialsService {
 }
 
 /** A transport that always answers 200 with an empty body; the adapter ignores it. */
-const silentTransport: HttpTransport = async (): Promise<HttpResponse> => ({
+export const silentTransport: HttpTransport = async (): Promise<HttpResponse> => ({
   status: 200,
   headers: { "content-type": "text/event-stream" },
   body: bodyFromChunks([])
@@ -135,7 +135,7 @@ function usageOf(usage: Partial<StreamUsageInput> | undefined): StreamUsageInput
 }
 
 /** An adapter that replays one scripted chunk list per dispatch. */
-function scriptedAdapter(scripts: readonly StreamChunk[][]): LlmAdapter {
+export function scriptedAdapter(scripts: readonly StreamChunk[][]): LlmAdapter {
   let index = 0;
   return {
     id: "scripted-loop",
