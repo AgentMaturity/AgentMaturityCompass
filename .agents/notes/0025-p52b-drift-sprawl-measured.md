@@ -190,3 +190,99 @@ emitting a signed ref for an unsigned row.
 - **~300 zero-valued metrics per receipt.** A live receipt reports every domain
   metric, almost all 0. That is the union type showing up in the output, and it
   is noise a per-domain registry would remove.
+
+---
+
+# Correction (2026-08-26): "the clones were not clones" was wrong
+
+An adversarial review of this ADR re-measured the satellites and reached the
+opposite conclusion. I verified its claims independently. **It is right and this
+ADR's headline finding was wrong.** Recorded here rather than edited away,
+because the error is in a commit message that is already published.
+
+## The measurement error was circular
+
+My normalisation stripped only the DOMAIN NAME from identifiers — `OpenCompass`,
+`Garage` — and left every other identifier intact. But the remaining identifiers
+are precisely the per-domain field names that a parameterized monitor exists to
+factor out. **The metric measured the thing being abstracted away and concluded
+there was nothing to abstract.**
+
+Re-measured with full identifier normalisation (every identifier → `ID`, string →
+`STR`, number → `NUM`, then trigram Jaccard over the token stream):
+
+| | my original metric | full normalisation |
+|---|---|---|
+| median similarity | 0.080 | **0.286** |
+| pairs ≥ 0.70 | 9 / 171 | **34 / 171** |
+| pairs ≥ 0.90 | **0 / 171** | **21 / 171** |
+| max | 0.895 | **0.991** |
+
+Single-linkage clustering at 0.90 finds **four clusters covering 15 of 19 files
+and 6,920 lines**:
+
+| files | lines | internal similarity |
+|---|---|---|
+| braintrust, decibenchVoice, paperReadSkill, reflexionAgent, skillMatch | 1,716 | min 0.971, median **0.979** |
+| lmnrObservability, openCompass | 922 | median 0.972 |
+| aiReputationClaude, awesomeAgentMemory, ctfAgentBenchmark, darwinGodelMachine | 2,136 | median 0.939 |
+| agentReadingTest, garage, llmFighter, railScore | 2,146 | median 0.928 |
+
+The review partitioned the files by structural features rather than by
+similarity, and arrived at the same first cluster exactly — braintrust,
+decibenchVoice, paperReadSkill, reflexionAgent, skillMatch. Two independent
+methods agreeing on the same five files is stronger evidence than either alone.
+
+**So the plan was right and I was wrong.** There is a genuine clone family. It is
+15 files rather than "~26", and it is four clusters rather than one, but
+"collapse the clone family behind one parameterized monitor" is warranted work.
+
+What survives from the original finding: the satellites do already share types
+and an engine, and 19 of 20 delegate to `runLiveScoreBehaviorDrift`. They are
+adapters — but the adapters are themselves near-identical, which is exactly the
+duplication worth removing.
+
+## Three behavioural forks a collapse must not silently unify
+
+Verified by reading the code, not taken from the review:
+
+- **`round`** — `braintrustLiveDrift.ts:151` takes no `places`; `garageLiveDrift.ts:207`
+  takes `places = 6`.
+- **`unique`** — `braintrustLiveDrift.ts:142` returns `normalizeEvidenceRefs(values).sort()`;
+  `garageLiveDrift.ts:217` returns it **unsorted**. `sortDeep` in `utils/json.ts:6-8`
+  maps arrays without sorting them, so **array order reaches
+  `sha256Hex(canonicalize(...))`**. Unifying `unique` changes every `rowProofHash`
+  and `receiptHash` in the affected files. That is a published-artifact change,
+  not a refactor.
+- **`isPresent`** has three variants; some count `NaN` as present.
+
+A collapse must carry these as parameters until each is deliberately retired with
+its own decision, or it will change signed output while claiming to preserve it.
+
+## The type extraction: net tracked lines went UP
+
+Also correct, and I did not state it:
+
+    src/watch/liveDriftAlerts.ts   15,980 -> 11,657
+    src/watch/liveDriftTypes.ts         0 ->  4,436
+    total tracked                  15,980 -> 16,093   (+113)
+
+The re-export block and the 85-name import list cost ~111 lines. Both numbers
+were in the commit message, so the arithmetic was available — but the ADR said
+"materially smaller and the baseline lowered", which is true of the file and not
+of the total, and I should have said so.
+
+And `liveDriftTypes.ts` did not pass the cap. `architecture-boundaries-check.mjs:83-91`
+fails a new file over 800 lines unless it is recorded as "a deliberate exception
+in scripts/line-budgets.json" — which is what adding it to `budgets` is. Calling
+that "the stricter choice" was true only relative to the `dataRegistries`
+alternative; it is still the exception path. The ceiling was relocated, not met.
+
+The extraction remains worth keeping — it creates the seam the registry needs and
+carries no runtime risk — but it is a navigability change, not a size win.
+
+## What this changes about the next step
+
+The next step is the collapse, on the four measured clusters, largest first, with
+the three forks carried as explicit parameters and receipt hashes pinned by
+characterization tests captured BEFORE the change.
