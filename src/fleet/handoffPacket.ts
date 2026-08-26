@@ -7,7 +7,7 @@
 
 import { randomUUID } from "node:crypto";
 import { join } from "node:path";
-import { readdirSync, readFileSync } from "node:fs";
+import { readdirSync, rmSync, readFileSync } from "node:fs";
 import { z } from "zod";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
@@ -311,6 +311,18 @@ export function loadHandoffPacket(workspace: string, packetId: string): HandoffP
     throw new Error(`Handoff packet not found: ${packetId}`);
   }
   return handoffPacketSchema.parse(JSON.parse(readFileSync(file, "utf8")) as unknown);
+}
+
+/**
+ * Delete one packet file.
+ *
+ * Exported so a caller that must NOT leave an unsigned packet behind can undo
+ * its own write without re-deriving the on-disk layout. A duplicated path is a
+ * latent bug the moment either copy moves — and a stale copy here would leave
+ * exactly the orphan the caller is trying to prevent.
+ */
+export function removeHandoffPacket(workspace: string, packetId: string): void {
+  rmSync(handoffFilePath(workspace, packetId), { force: true });
 }
 
 export function listHandoffPackets(workspace: string): string[] {
