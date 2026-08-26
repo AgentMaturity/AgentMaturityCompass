@@ -52,6 +52,9 @@ import {
   type AgentPromptProfileOptions
 } from "../prompt/agentPromptProfile.js";
 import { SessionService } from "../session/sessionService.js";
+import { rootIdentity } from "../agent/delegationIdentity.js";
+import { createDriverRunner } from "../agent/subagentRunner.js";
+import type { SubagentCapability } from "../agent/delegateTool.js";
 import type { TurnCancelCause } from "../session/sessionTypes.js";
 import { amcVersion } from "../version.js";
 import { credentialsServices, CREDENTIALS_SEAM } from "./services/credentialsServices.js";
@@ -149,6 +152,25 @@ export interface ComposedTurnOptions {
   readonly notify?: (notification: LoopNotification) => void;
   /** Called once the driver exists and before the prompt is sent. */
   readonly onReady?: (handle: ComposedTurnHandle) => void;
+  /**
+   * Let this run delegate to in-process children (P6.1a).
+   *
+   * INVERTED ON PURPOSE. The capability needs three things only this function
+   * has once composition is done — the parent's `SessionService`, so the
+   * delegation rows land in the parent's own log; a way to build an `LlmRuntime`
+   * bound to a CHILD's session, since `LlmRuntime` captures its session at
+   * construction; and the rendered system prompt. None of them exist when a
+   * caller builds its toolset, so the caller cannot construct the capability and
+   * this function cannot know what to do with it. So the kernel builds it and
+   * hands it over; the caller decides where it goes — in practice
+   * `toolset.registry.define(delegateTool(capability))`, which works after
+   * construction because `seam.schemas()` re-reads the registry each step.
+   */
+  readonly delegation?: {
+    readonly maxDepth?: number;
+    /** Receives the composed capability. Called once, before the first turn. */
+    grant(capability: SubagentCapability): void;
+  };
   /**
    * A steering message to send mid-turn.
    *
@@ -360,6 +382,32 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
           // A run with no observer is a normal configuration, not an error.
         })
     };
+
+    // Built here because nowhere else has all three inputs: the parent's own
+    // session for the delegation rows, a child-session-bound LLM factory, and
+    // the prompt this composition rendered.
+    if (options.delegation !== undefined) {
+      const llmSeam = serviceOn<LlmSeamService>(ctx, LLM_SEAM.name);
+      options.delegation.grant({
+        identity: rootIdentity(options.agentId),
+        session,
+        runner: createDriverRunner({
+          workspace: options.workspace,
+          // A child gets its OWN runtime over the parent's routes, because
+          // `LlmRuntime` binds a session at construction and a shared one would
+          // write the child's request rows into the parent's hash chain.
+          makeLlm: (childSession) => llmSeam.runtimeForSession(childSession),
+          route: options.route,
+          systemPrompt: prompt.render(),
+          harnessVersion: amcVersion,
+          compositionDigest: compositionDigestOf(options, profile),
+          policyDigest: policyDigestOf(options)
+        }),
+        ...(options.delegation.maxDepth === undefined
+          ? {}
+          : { maxDepth: options.delegation.maxDepth })
+      });
+    }
 
     const loopFiber = ctx.plugin(agentLoopServices, {
       session,

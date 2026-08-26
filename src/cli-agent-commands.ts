@@ -51,7 +51,10 @@ import {
 import type { LoopNotification } from "./agent/loopTypes.js";
 import { echoToolSeam } from "./agent/echoTool.js";
 import { agentToolset } from "./agent/agentToolset.js";
+import { delegateTool } from "./agent/delegateTool.js";
+import { listAllowedTools } from "./toolhub/toolhubValidators.js";
 import type { AgentToolSeam } from "./agent/toolSeam.js";
+import type { SubagentCapability } from "./agent/delegateTool.js";
 import { readAgentRunSummary, renderRunSummary, renderVerifyReport, verifyAgentRun } from "./agent/runReport.js";
 import { registerPromptCommands } from "./cli-prompt-commands.js";
 import { isActionClass } from "./governor/actionCatalog.js";
@@ -84,6 +87,8 @@ const defaultIo: AgentLoopCliIo = {
 };
 
 interface RunOptions {
+  delegate?: boolean;
+  maxDelegationDepth?: string;
   provider?: string;
   model?: string;
   baseUrl?: string;
@@ -331,6 +336,13 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
     .option("--max-steps <n>", "how many model steps one turn may take")
     .option("--tools <mode>", 'tool seam: "workspace" (the governed built-ins), "echo", or "none"')
     .option("--tool-mode <mode>", '"native" (one call per step) or "code" (dispatch from a program)')
+    .option(
+      "--delegate",
+      "offer the `delegate` tool so this run can hand work to in-process children. "
+      + "Children share this run's budget and permissions and are recorded against it. "
+      + "Requires \"delegate\" in the signed tool allowlist."
+    )
+    .option("--max-delegation-depth <n>", "how deep a delegation chain may go (default 3)")
     .option("--fail-first <n>", "stub provider only: answer the first N dispatches with HTTP 429")
     .option("--think-ms <n>", "stub provider only: delay each answer, so a cancel has something to land in")
     .option("--cancel-after <ms>", "cancel the turn after this many milliseconds (Ctrl-C does the same)")
@@ -389,14 +401,29 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
       // exercise the real toolset is not a default anyone would choose, and the
       // echo tool exists precisely to make a multi-step turn observable.
       const toolMode = opts.tools ?? (providerId === STUB_PROVIDER_ID ? "echo" : "none");
+      const wantsDelegation = opts.delegate === true;
       const dispatchMode = opts.toolMode === "code" ? "code" as const : "native" as const;
       let toolSeam: AgentToolSeam | null = null;
+      let grantDelegation: ((capability: SubagentCapability) => void) | null = null;
       if (toolMode === "workspace") {
         const toolset = agentToolset({
           workspace: process.cwd(),
           agentId: "default",
           ...(dispatchMode === "code" ? { mode: dispatchMode } : {})
         });
+        if (wantsDelegation) {
+          // Said up front, not discovered mid-run. The capability and the signed
+          // allowlist are granted by different parties, so an operator who
+          // passed --delegate without permitting the tool would otherwise watch
+          // the agent call it and be denied, once per turn.
+          const permitted = listAllowedTools(process.cwd()).some((tool) => tool.name === "delegate");
+          if (!permitted) {
+            io.error(chalk.yellow(
+              "--delegate needs \"delegate\" in the signed tool allowlist; add it to .amc/tools.yaml and re-sign: amc tools sign"
+            ));
+            return;
+          }
+        }
         if (!toolset.readiness.ready) {
           // Said once, up front, naming the command. Without this the operator
           // sees every tool denied and reads it as broken tools rather than as
@@ -420,6 +447,13 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
           ));
         }
         toolSeam = toolset.seam;
+        // The kernel builds the delegation capability once it has the parent's
+        // session and a child-session-bound LLM factory; this is where it lands.
+        // Defining after construction is supported by design — `seam.schemas()`
+        // re-reads the registry each step.
+        if (wantsDelegation) {
+          grantDelegation = (capability) => { toolset.registry.define(delegateTool(capability)); };
+        }
         // The toolset holds one evidence handle for the run; release it when
         // the process ends rather than leaking a SQLite handle per agent.
         process.once("exit", () => toolset.close());
@@ -464,6 +498,16 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
             ? { transport: stubProviderTransport({ failFirst, thinkMs, retryAfterSeconds: 1 }) }
             : {}),
           ...(toolSeam === null ? {} : { tools: toolSeam }),
+          ...(grantDelegation === null
+            ? {}
+            : {
+                delegation: {
+                  grant: grantDelegation,
+                  ...(opts.maxDelegationDepth === undefined
+                    ? {}
+                    : { maxDepth: Number.parseInt(opts.maxDelegationDepth, 10) })
+                }
+              }),
           config: { maxStepsPerTurn: maxSteps },
           credentials: {
             // Watching is for a long-lived process picking up a rotation; a

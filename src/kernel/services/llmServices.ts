@@ -67,8 +67,12 @@ export class LlmSeamService extends AmcSeam {
 
   private readonly runtime: LlmRuntime;
 
+  /** Kept so a child runtime can be built over the same routes and credentials. */
+  private readonly config: LlmServiceConfig;
+
   constructor(ctx: Context, config: LlmServiceConfig) {
     super(ctx, LLM_SEAM.name);
+    this.config = config;
     this.registry = new AdapterRegistry();
     for (const route of config.routes ?? []) {
       this.registry.register(route);
@@ -80,6 +84,29 @@ export class LlmSeamService extends AmcSeam {
       ...(config.transport !== undefined ? { transport: config.transport } : {}),
       ...(config.encoders !== undefined ? { encoders: config.encoders } : {}),
       ...(config.now !== undefined ? { now: config.now } : {})
+    });
+  }
+
+  /**
+   * A runtime over the SAME routes and credentials, bound to another session.
+   *
+   * `LlmRuntime` captures its session at construction and calls
+   * `prepareRequest(this.init.session, …)`, so a delegated child sharing this
+   * seam's runtime would write its `request/header` and `request/response` rows
+   * into the PARENT's session — two runs interleaved in one hash chain, and the
+   * child's provider traffic attributed to its parent.
+   *
+   * The registry is shared deliberately: a child must not be able to reach a
+   * provider its parent could not. Only the session differs.
+   */
+  runtimeForSession(session: LlmServiceConfig["session"]): LlmRuntime {
+    return new LlmRuntime({
+      session,
+      credentials: this.config.credentials,
+      registry: this.registry,
+      ...(this.config.transport !== undefined ? { transport: this.config.transport } : {}),
+      ...(this.config.encoders !== undefined ? { encoders: this.config.encoders } : {}),
+      ...(this.config.now !== undefined ? { now: this.config.now } : {})
     });
   }
 

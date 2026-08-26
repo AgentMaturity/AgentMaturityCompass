@@ -551,3 +551,90 @@ Full suite **10,112 / 10,112** across 1,254 files. `lint`, `typecheck`,
 - **The child gets no context from the parent.** Its goal is the whole brief —
   the tool's description says so to the model. Sharing context is a design
   question about what a delegate is allowed to see, not an oversight.
+
+---
+
+# The CLI surface — an operator can turn delegation on
+
+## The composition had to be inverted, and measurement is what showed it
+
+The obvious shape — a `--delegate` flag that builds the capability in the CLI —
+does not work. The capability needs three things that do not exist when a caller
+builds its toolset:
+
+1. **The parent's `SessionService`**, so the delegation rows land in the log of
+   the run that delegated. `ComposedTurnHandle` exposes only `sessionId` and
+   `cancel`, so there was no way to reach it.
+2. **A way to build an `LlmRuntime` bound to a CHILD's session.** `LlmRuntime`
+   captures its session at construction — the bug the end-to-end test found
+   earlier — so a child cannot share the parent's.
+3. **The rendered system prompt**, which the prompt fiber produces during
+   composition.
+
+So `runComposedTurn` builds the capability and hands it over:
+`delegation: { maxDepth?, grant(capability) }`. The kernel supplies what only it
+has; the caller decides where it goes.
+
+**No new method was needed on the toolset.** `AgentToolset` already exposes its
+`registry`, and `seam.schemas()` re-reads it each step by design — "a registry
+change between steps reaches the next request". So the CLI's grant is
+`toolset.registry.define(delegateTool(capability))`, using a seam that was built
+for exactly this.
+
+## One genuinely new seam capability
+
+`LlmSeamService.runtimeForSession(session)` builds a runtime over the SAME
+registry and credentials, bound to another session. The registry is shared
+deliberately: a child must not be able to reach a provider its parent could not.
+Only the session differs.
+
+## The readiness check exists because the grant is two-party
+
+`--delegate` alone is not enough — the operator must also have `delegate` in the
+signed tool allowlist. Rather than let the agent discover that by being denied
+once per turn, the CLI checks up front and names the fix, in the same style
+`checkToolsetReadiness` already uses for the built-ins.
+
+The flag deliberately does NOT add the tool to the allowlist. A command-line
+argument that mutates a signed policy would defeat the point of signing it.
+
+## The capability's lifetime is the run's
+
+`recordLoopEvent` on the granted session throws once the run ends
+("SessionService used after close()"). That is correct and is pinned as a test: a
+delegation announced after the parent's turn ended would have nowhere honest to
+record.
+
+## A vacuous test, removed rather than kept
+
+The first draft included "grants nothing when the caller did not ask" with a
+counter that nothing incremented — with no `delegation` option there is no
+callback to count, so the assertion could never fail. The absence is structural,
+not behavioural. It is gone, with a note in its place saying why, because a test
+that cannot fail is worse than no test.
+
+## Verification
+
+5 kernel-grant tests, 2 mutations caught: the capability governed as something
+other than the run's own agent, and a fresh session in place of the parent's
+(2 red). Full suite **10,117 / 10,117** across 1,255 files. `lint`, `typecheck`,
+`check:architecture-boundaries`, `check:counts`, `check:docs-drift` and
+`check:api-ref` pass.
+
+## P6.1a is now reachable by an operator
+
+    amc agent run --tools workspace --delegate [--max-delegation-depth N]
+
+with `delegate` present in the signed allowlist. What that run gets: a `delegate`
+tool that spawns a depth-bounded child, authorised by a packet that cannot be
+unsigned, governed and metered as the root, running in its own session, reporting
+back in its own words, and announced and accounted for in the parent's log.
+
+## What is still not done
+
+- **No end-to-end CLI test.** The kernel grant and the tool are each tested; the
+  `--delegate` flag path itself is exercised only by `tsc` and lint. The existing
+  `tests/cliAgentLoopCommands.test.ts` is where that belongs.
+- **`drain()` still blocks the parent's step.** Unchanged and deliberate; see
+  above.
+- **The child still gets no context from the parent.**
