@@ -67,6 +67,18 @@ export interface DriverRunnerInit {
   readonly harnessVersion: string;
   readonly compositionDigest: string;
   readonly policyDigest: string;
+  /**
+   * Lets a child delegate further.
+   *
+   * Absent means children are leaves. When present, each child's toolset carries
+   * that child's own identity, which is what makes depth accumulate and
+   * `maxDepth` bite on a grandchild rather than only on the first generation.
+   */
+  readonly grantDelegation?: {
+    readonly runner: SubagentRunner;
+    readonly maxDepth?: number;
+    readonly mintSessionId?: () => string;
+  };
 }
 
 /**
@@ -82,7 +94,26 @@ export function createDriverRunner(init: DriverRunnerInit): SubagentRunner {
     const toolset = agentToolset({
       workspace: init.workspace,
       // The root's id. Never ctx.identity.runAs — see subagentSpawn.ts.
-      agentId: ctx.toolsetAgentId
+      agentId: ctx.toolsetAgentId,
+      // A child that can itself delegate is given ITS OWN identity, so
+      // `delegateTo` sees the real depth. Handing it the parent's would make
+      // every generation look like depth 1 and turn `maxDepth` into a field
+      // nothing enforces.
+      ...(init.grantDelegation === undefined
+        ? {}
+        : {
+            subagents: {
+              identity: ctx.identity,
+              runner: init.grantDelegation.runner,
+              session,
+              ...(init.grantDelegation.maxDepth === undefined
+                ? {}
+                : { maxDepth: init.grantDelegation.maxDepth }),
+              ...(init.grantDelegation.mintSessionId === undefined
+                ? {}
+                : { mintSessionId: init.grantDelegation.mintSessionId })
+            }
+          })
     });
 
     let keepAlive = false;

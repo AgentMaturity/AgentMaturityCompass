@@ -459,3 +459,95 @@ Two things that sub-step must not get wrong, both already visible:
   nothing links a child's lifetime to its parent's; an "async spawn" convenience
   would let a child outlive the parent that authorised it, with no lifecycle
   evidence saying so.
+
+---
+
+# `ctx.subagents` — delegation an agent can actually reach
+
+## Why it is a tool, not a context property
+
+There is no `ctx` object in the agent loop and there cannot be one at that layer:
+only `src/kernel/**` may import Cordis, enforced by
+`scripts/architecture-boundaries-check.mjs`. What AMC has instead is
+`ToolExecution` — ids, strings and frozen arguments, no service handles — and one
+established way to give a tool body a service: **closure capture at
+registration**, which `agentToolset` already uses for its registry, pipeline and
+ledger.
+
+So delegation arrives as a `delegate` tool the caller's toolset closes over. That
+is `ctx.subagents` under AMC's constraints, not a compromise of it.
+
+## Depth comes from an identity, and that is what makes `maxDepth` real
+
+Every run in a chain shares `governedAs` by design, so `agentId` cannot say how
+deep this one is. The capability therefore carries the CALLER's
+`DelegationIdentity`, and `subagentRunner` gives a child that may itself delegate
+a toolset carrying **its own**.
+
+Without that, `delegateTo` would always be handed the root, every generation
+would look like depth 1, and `maxDepth` would be a field nothing enforces — the
+exact shape `src/score/orchestrationDAG.ts:114` already penalises in other
+people's systems. The mutation that reads depth from `agentId` instead turns two
+tests red, one of them a caller already at the limit whose child never runs.
+
+## The two accounts are never concatenated
+
+On success the tool returns the child's OWN words and nothing else; on refusal it
+returns the runtime's account and nothing else. The runtime's account of a
+successful delegation is not withheld — it is in the `agent_delegation_completed`
+row, which is where it belongs. The mutation that prefixes the child's text with
+`[amc] delegate reported:` turns the test red.
+
+`ToolCallOutcome.additionalContext` would let the child's words arrive as their
+own durable inbox row instead. `pipelineToolSeam` does not plumb it today — the
+loop consumes it, the pipeline seam never produces it — so this returns through
+the tool result. The separation holds either way, and plumbing it is an available
+improvement rather than a prerequisite.
+
+## Two parties must agree, and the tests found this by failing
+
+The first run of these tests met `"delegate" is not in the signed tool allowlist`.
+That is correct, and it is now pinned as its own test rather than worked around:
+
+- the **integrator** composes the capability into a toolset (`subagents`, absent
+  by default — an agent that cannot delegate);
+- the **operator** signs a policy that permits the tool.
+
+Delegation spends the operator's budget on agents they did not start, so one
+party enabling it is not enough. `delegate` is deliberately **not** in the default
+allowlist.
+
+## Verification
+
+8 tool tests, 3 mutations caught with a no-op control that stayed green: depth
+read from `agentId` instead of the identity (2 red), the runtime's account
+concatenated onto the child's words (1), and an empty goal accepted (1) — a child
+asked to do nothing still costs a turn and still writes a delegation to the log.
+
+Full suite **10,112 / 10,112** across 1,254 files. `lint`, `typecheck`,
+`check:architecture-boundaries`, `check:counts`, `check:docs-drift` and
+`check:policy-fixtures` pass.
+
+## P6.1a is complete
+
+    ctx.subagents          a `delegate` tool bound by closure capture
+    spawn/fork             spawnSubagent, depth-bounded and packet-authorised
+    continuable children   a handle whose delegation stays open until released
+    inbox is the mailbox   followup() is the only way work reaches a child
+    report channel         the child's own words, alone
+    maxDepth               enforced from the caller's identity, not decoration
+    signed handoff packet  minted or refused; never written unsigned
+
+## What P6.1a still does not do
+
+- **`drain()` stays inside the tool body**, so a delegation blocks its parent's
+  step. That is deliberate: `whenIdle()` is per-driver and nothing links a child's
+  lifetime to its parent's, so an async spawn would let a child outlive the run
+  that authorised it with no lifecycle evidence saying so. Concurrency is a later
+  sub-step with its own evidence, not a convenience to bolt on here.
+- **No CLI surface.** Nothing in `src/cli.ts` composes a toolset with
+  `subagents`, so an operator cannot yet turn this on for a real run. That is the
+  smallest remaining gap and the natural first move of P6.1b.
+- **The child gets no context from the parent.** Its goal is the whole brief —
+  the tool's description says so to the model. Sharing context is a design
+  question about what a delegate is allowed to see, not an oversight.

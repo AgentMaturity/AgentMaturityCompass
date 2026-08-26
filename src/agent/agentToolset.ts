@@ -18,6 +18,7 @@ import { ToolPipeline } from "../tools/toolPipeline.js";
 import { ToolRegistry } from "../tools/toolRegistry.js";
 import { openLedger } from "../ledger/ledger.js";
 import { toolEvidenceFor } from "../tools/toolEvidence.js";
+import { delegateTool, type SubagentCapability } from "./delegateTool.js";
 import { pipelineToolSeam } from "./pipelineToolSeam.js";
 import type { AgentToolSeam } from "./toolSeam.js";
 
@@ -38,6 +39,15 @@ export interface AgentToolsetOptions {
   readonly mode?: "native" | "code";
   /** Values scrubbed from tool output, e.g. a live lease. */
   readonly scrubValues?: readonly string[];
+  /**
+   * Enables the `delegate` tool (P6.1a).
+   *
+   * Absent means an agent that cannot delegate, which is the default: delegation
+   * is a capability a caller grants, not one every toolset has. It carries the
+   * caller's `DelegationIdentity` because depth cannot be read from `agentId` —
+   * every run in a chain shares `governedAs` by design.
+   */
+  readonly subagents?: SubagentCapability;
   /** Session the evidence rows belong to. Defaults to a per-agent bucket. */
   readonly sessionId?: string;
 }
@@ -160,6 +170,9 @@ export function agentToolset(options: AgentToolsetOptions): AgentToolset {
   for (const tool of fsTools({ ledger })) registry.define(tool);
   for (const tool of searchTools()) registry.define(tool);
   registry.define(bashTool(options.scrubValues ? { scrubValues: options.scrubValues } : {}));
+  if (options.subagents !== undefined) {
+    registry.define(delegateTool(options.subagents));
+  }
 
   // Order is a reporting choice, not a semantic one: guards cannot allow, so
   // whichever denies first is simply the one named. Policy engines come before
