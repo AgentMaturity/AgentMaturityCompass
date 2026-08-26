@@ -1,4 +1,6 @@
 import { describe, expect, test } from "vitest";
+import { sha256Hex } from "../src/utils/hash.js";
+import { canonicalize } from "../src/utils/json.js";
 import { buildLiveDriftWatchAlerts, verifyLiveDriftReceipt } from "../src/watch/liveDriftAlerts.js";
 import {
   runRailScoreLiveDrift,
@@ -100,6 +102,9 @@ describe("runRailScoreLiveDrift", () => {
     });
 
     expect(result.receipt.failClosed).toBe(false);
+
+    // CHARACTERIZATION PIN (ADR-0025, cluster 4): the whole result.
+    expect(sha256Hex(canonicalize(result))).toBe("44516d36d79f48babe84be0af637901c3d91cf5c275922528d1ed020ceb20874");
     expect(result.receipt.recommendation).toBe("approve");
     expect(result.receipt.alerts).toEqual([]);
     expect(result.railScoreReceiptHash).toMatch(/^[a-f0-9]{64}$/);

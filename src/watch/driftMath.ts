@@ -1,7 +1,14 @@
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { normalizeEvidenceRefs } from "./evidenceRefs.js";
-import type { LiveDriftAlert, LiveDriftReceipt } from "./liveDriftAlerts.js";
+import type {
+  LiveDriftAlert,
+  LiveDriftMetricId,
+  LiveDriftReceipt,
+  LiveDriftSampleRow,
+  LiveDriftSeverity,
+  LiveDriftWindow,
+} from "./liveDriftAlerts.js";
 
 /**
  * The distribution-monitor arithmetic, shared by the Family-B satellites (P5.2b).
@@ -48,6 +55,30 @@ export function unique(values: unknown): string[] {
   return normalizeEvidenceRefs(values);
 }
 
+export function boolMean(values: boolean[]): number {
+  return values.length === 0 ? 0 : round(values.filter(Boolean).length / values.length);
+}
+
+/** Nearest-rank percentile over the finite values, zero for an empty window. */
+export function percentile(values: number[], p: number): number {
+  const finite = values.filter(Number.isFinite).sort((left, right) => left - right);
+  if (finite.length === 0) return 0;
+  const index = Math.min(finite.length - 1, Math.max(0, Math.ceil((p / 100) * finite.length) - 1));
+  return round(finite[index]!);
+}
+
+/**
+ * Relative increase, floored at zero.
+ *
+ * A non-finite or non-positive baseline cannot express a ratio, so it reports
+ * the boolean fact instead: 1 when live is higher, 0 otherwise. That keeps a
+ * cold-start window from reading as an infinite regression.
+ */
+export function ratioIncrease(baseline: number, live: number): number {
+  if (!Number.isFinite(baseline) || !Number.isFinite(live) || baseline <= 0) return live > baseline ? 1 : 0;
+  return round(Math.max(0, (live - baseline) / baseline));
+}
+
 export function labelDistribution<T>(rows: T[], labelFor: (row: T) => string): Record<string, number> {
   if (rows.length === 0) return {};
   const counts = new Map<string, number>();
@@ -65,6 +96,76 @@ export function totalVariationDistance(left: Record<string, number>, right: Reco
     total += Math.abs((left[label] ?? 0) - (right[label] ?? 0));
   }
   return round(total / 2);
+}
+
+/**
+ * Lift a domain window into the engine's window shape.
+ *
+ * Identical in all eight Family-B satellites apart from the parameter type —
+ * measured at 0.997 normalised similarity — so the row mapper is a callback and
+ * the rest is generic.
+ */
+export function toLiveDriftWindow<T>(
+  window: { windowId: string; startedAt: string; endedAt: string; rows: T[] },
+  toRow: (row: T) => LiveDriftSampleRow,
+): LiveDriftWindow {
+  return {
+    windowId: window.windowId,
+    startedAt: window.startedAt,
+    endedAt: window.endedAt,
+    rows: window.rows.map(toRow),
+  };
+}
+
+/** The window pair every Family-B alert draws its evidence refs from. */
+export interface DriftAlertSource {
+  readonly sourceRefs?: string[];
+  readonly baselineWindow: { readonly rows: ReadonlyArray<{ evidenceRefs?: unknown; signedEvidenceRefs?: unknown }> };
+  readonly liveWindow: { readonly rows: ReadonlyArray<{ evidenceRefs?: unknown; signedEvidenceRefs?: unknown }> };
+}
+
+/**
+ * The Family-B alert builder, closed over the two things that actually vary.
+ *
+ * This function was 236 lines across the eight satellites at 0.988 normalised
+ * similarity — the same body eight times, differing only in the `alertId` slug
+ * and which DEFAULT_* constants seed the evidence refs.
+ *
+ * REF ORDER IS LOAD-BEARING. `unique` here does not sort and `canonicalize`
+ * maps arrays without sorting, so this exact sequence — caller refs, then the
+ * defaults, then baseline rows, then live rows — reaches the receipt hash.
+ * `defaultRefs` must be given in the order the original file listed them.
+ */
+export function createDriftAlertBuilder(alertPrefix: string, defaultRefs: readonly string[]) {
+  return function buildAlert(
+    input: DriftAlertSource,
+    metricId: LiveDriftMetricId,
+    observed: number,
+    threshold: number,
+    message: string,
+    severity: LiveDriftSeverity,
+  ): LiveDriftAlert {
+    const evidenceRefs = unique([
+      ...(input.sourceRefs ?? []),
+      ...defaultRefs,
+      ...input.baselineWindow.rows.flatMap((row) => normalizeEvidenceRefs(row.evidenceRefs)),
+      ...input.liveWindow.rows.flatMap((row) => normalizeEvidenceRefs(row.evidenceRefs)),
+    ]);
+    const signedEvidenceRefs = unique([
+      ...input.baselineWindow.rows.flatMap((row) => normalizeEvidenceRefs(row.signedEvidenceRefs)),
+      ...input.liveWindow.rows.flatMap((row) => normalizeEvidenceRefs(row.signedEvidenceRefs)),
+    ]);
+    return {
+      alertId: `${alertPrefix}:${metricId}:${sha256Hex(canonicalize({ metricId, observed, threshold, message })).slice(0, 12)}`,
+      metricId,
+      severity,
+      message,
+      threshold,
+      observed: round(observed),
+      evidenceRefs,
+      signedEvidenceRefs,
+    };
+  };
 }
 
 export function withAdditionalAlerts(receipt: LiveDriftReceipt, additionalAlerts: LiveDriftAlert[]): LiveDriftReceipt {

@@ -1,4 +1,6 @@
 import { describe, expect, test } from "vitest";
+import { sha256Hex } from "../src/utils/hash.js";
+import { canonicalize } from "../src/utils/json.js";
 import { buildLiveDriftWatchAlerts, verifyLiveDriftReceipt } from "../src/watch/liveDriftAlerts.js";
 import {
   runGarageLiveDrift,
@@ -82,6 +84,9 @@ describe("runGarageLiveDrift", () => {
     });
 
     expect(result.receipt.failClosed).toBe(false);
+
+    // CHARACTERIZATION PIN (ADR-0025, cluster 4): the whole result.
+    expect(sha256Hex(canonicalize(result))).toBe("6752acc4366cfdf140b35241d9623998b99bb545bf26b4659ddcf0811bc8caca");
     expect(result.receipt.recommendation).toBe("approve");
     expect(result.receipt.sourceRefs).toContain("https://github.com/amazon-science/GaRAGe");
     expect(result.garageReceiptHash).toMatch(/^[a-f0-9]{64}$/);

@@ -33,6 +33,11 @@ import {
   totalVariationDistance,
   unique,
   withAdditionalAlerts,
+  boolMean,
+  percentile,
+  ratioIncrease,
+  toLiveDriftWindow,
+  createDriftAlertBuilder,
 } from "./driftMath.js";
 
 export type GarageQuestionType =
@@ -209,22 +214,6 @@ export const defaultGarageLiveDriftThresholds: GarageLiveDriftThresholds = {
   maxCostIncreaseRatio: 0.35,
 };
 
-function boolMean(values: boolean[]): number {
-  return values.length === 0 ? 0 : round(values.filter(Boolean).length / values.length);
-}
-
-function percentile(values: number[], p: number): number {
-  const finite = values.filter(Number.isFinite).sort((left, right) => left - right);
-  if (finite.length === 0) return 0;
-  const index = Math.min(finite.length - 1, Math.max(0, Math.ceil((p / 100) * finite.length) - 1));
-  return round(finite[index]!);
-}
-
-function ratioIncrease(baseline: number, live: number): number {
-  if (!Number.isFinite(baseline) || !Number.isFinite(live) || baseline <= 0) return live > baseline ? 1 : 0;
-  return round(Math.max(0, (live - baseline) / baseline));
-}
-
 function rowScore(row: GarageLiveDriftRow): number {
   return mean([
     clamp01(row.groundingPrecision0to1),
@@ -350,15 +339,6 @@ function toLiveDriftRow(row: GarageLiveDriftRow): LiveDriftSampleRow {
   };
 }
 
-function toLiveDriftWindow(window: GarageWindow): LiveDriftWindow {
-  return {
-    windowId: window.windowId,
-    startedAt: window.startedAt,
-    endedAt: window.endedAt,
-    rows: window.rows.map(toLiveDriftRow),
-  };
-}
-
 function distribution(rows: GarageReceiptRow[]): GarageDistribution {
   return {
     rowCount: rows.length,
@@ -383,36 +363,8 @@ function distribution(rows: GarageReceiptRow[]): GarageDistribution {
   };
 }
 
-function buildAlert(
-  input: RunGarageLiveDriftInput,
-  metricId: LiveDriftMetricId,
-  observed: number,
-  threshold: number,
-  message: string,
-  severity: LiveDriftSeverity,
-): LiveDriftAlert {
-  const evidenceRefs = unique([
-    ...(input.sourceRefs ?? []),
-    DEFAULT_SOURCE_REF,
-    DEFAULT_PAPER_REF,
-    ...input.baselineWindow.rows.flatMap((row) => normalizeEvidenceRefs(row.evidenceRefs)),
-    ...input.liveWindow.rows.flatMap((row) => normalizeEvidenceRefs(row.evidenceRefs)),
-  ]);
-  const signedEvidenceRefs = unique([
-    ...input.baselineWindow.rows.flatMap((row) => normalizeEvidenceRefs(row.signedEvidenceRefs)),
-    ...input.liveWindow.rows.flatMap((row) => normalizeEvidenceRefs(row.signedEvidenceRefs)),
-  ]);
-  return {
-    alertId: `garage:${metricId}:${sha256Hex(canonicalize({ metricId, observed, threshold, message })).slice(0, 12)}`,
-    metricId,
-    severity,
-    message,
-    threshold,
-    observed: round(observed),
-    evidenceRefs,
-    signedEvidenceRefs,
-  };
-}
+/** The shared Family-B alert builder (driftMath), closed over this monitor's slug and refs. */
+const buildAlert = createDriftAlertBuilder("garage", [DEFAULT_SOURCE_REF, DEFAULT_PAPER_REF]);
 
 export function runGarageLiveDrift(input: RunGarageLiveDriftInput): GarageLiveDriftResult {
   const thresholds = {
@@ -487,8 +439,8 @@ export function runGarageLiveDrift(input: RunGarageLiveDriftInput): GarageLiveDr
   const receipt = withAdditionalAlerts(
     runLiveScoreBehaviorDrift({
       agentId: input.agentId,
-      baselineWindow: toLiveDriftWindow(input.baselineWindow),
-      liveWindow: toLiveDriftWindow(input.liveWindow),
+      baselineWindow: toLiveDriftWindow(input.baselineWindow, toLiveDriftRow),
+      liveWindow: toLiveDriftWindow(input.liveWindow, toLiveDriftRow),
       thresholds: input.liveDriftThresholds,
       sourceRefs: unique([...(input.sourceRefs ?? []), DEFAULT_SOURCE_REF, DEFAULT_PAPER_REF]),
       now: input.now,

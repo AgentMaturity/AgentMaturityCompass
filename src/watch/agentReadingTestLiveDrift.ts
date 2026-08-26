@@ -33,6 +33,8 @@ import {
   totalVariationDistance,
   unique,
   withAdditionalAlerts,
+  toLiveDriftWindow,
+  createDriftAlertBuilder,
 } from "./driftMath.js";
 
 export type AgentReadingTestFailureMode =
@@ -269,15 +271,6 @@ function toLiveDriftRow(row: AgentReadingTestLiveDriftRow): LiveDriftSampleRow {
   };
 }
 
-function toLiveDriftWindow(window: AgentReadingTestWindow): LiveDriftWindow {
-  return {
-    windowId: window.windowId,
-    startedAt: window.startedAt,
-    endedAt: window.endedAt,
-    rows: window.rows.map(toLiveDriftRow),
-  };
-}
-
 function distribution(rows: AgentReadingTestReceiptRow[]): AgentReadingTestDistribution {
   return {
     rowCount: rows.length,
@@ -291,36 +284,8 @@ function distribution(rows: AgentReadingTestReceiptRow[]): AgentReadingTestDistr
   };
 }
 
-function buildAlert(
-  input: RunAgentReadingTestLiveDriftInput,
-  metricId: LiveDriftMetricId,
-  observed: number,
-  threshold: number,
-  message: string,
-  severity: LiveDriftSeverity,
-): LiveDriftAlert {
-  const evidenceRefs = unique([
-    ...(input.sourceRefs ?? []),
-    DEFAULT_SOURCE_REF,
-    DEFAULT_SITE_REF,
-    ...input.baselineWindow.rows.flatMap((row) => normalizeEvidenceRefs(row.evidenceRefs)),
-    ...input.liveWindow.rows.flatMap((row) => normalizeEvidenceRefs(row.evidenceRefs)),
-  ]);
-  const signedEvidenceRefs = unique([
-    ...input.baselineWindow.rows.flatMap((row) => normalizeEvidenceRefs(row.signedEvidenceRefs)),
-    ...input.liveWindow.rows.flatMap((row) => normalizeEvidenceRefs(row.signedEvidenceRefs)),
-  ]);
-  return {
-    alertId: `agent-reading-test:${metricId}:${sha256Hex(canonicalize({ metricId, observed, threshold, message })).slice(0, 12)}`,
-    metricId,
-    severity,
-    message,
-    threshold,
-    observed: round(observed),
-    evidenceRefs,
-    signedEvidenceRefs,
-  };
-}
+/** The shared Family-B alert builder (driftMath), closed over this monitor's slug and refs. */
+const buildAlert = createDriftAlertBuilder("agent-reading-test", [DEFAULT_SOURCE_REF, DEFAULT_SITE_REF]);
 
 export function runAgentReadingTestLiveDrift(input: RunAgentReadingTestLiveDriftInput): AgentReadingTestLiveDriftResult {
   const thresholds = {
@@ -367,8 +332,8 @@ export function runAgentReadingTestLiveDrift(input: RunAgentReadingTestLiveDrift
   const receipt = withAdditionalAlerts(
     runLiveScoreBehaviorDrift({
       agentId: input.agentId,
-      baselineWindow: toLiveDriftWindow(input.baselineWindow),
-      liveWindow: toLiveDriftWindow(input.liveWindow),
+      baselineWindow: toLiveDriftWindow(input.baselineWindow, toLiveDriftRow),
+      liveWindow: toLiveDriftWindow(input.liveWindow, toLiveDriftRow),
       thresholds: input.liveDriftThresholds,
       sourceRefs: unique([...(input.sourceRefs ?? []), DEFAULT_SOURCE_REF, DEFAULT_SITE_REF]),
       now: input.now,

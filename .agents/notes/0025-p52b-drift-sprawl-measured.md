@@ -473,3 +473,120 @@ merely relocating them.
 
 Full suite **10,026 / 10,026** across 1,245 files. `lint`, `typecheck`,
 `check:architecture-boundaries`, `check:counts`, `check:docs-drift` pass.
+
+---
+
+# Step 5 — cluster 4, and a measurement bug of my own
+
+## The orchestration factory I proposed is not warranted
+
+Step 4 said the next step was a Family-B orchestration factory, "worth doing
+only if it subsumes the ~80–100 line `run()` bodies rather than merely
+relocating them". Measured, it does not:
+
+- The **alert rules are uniform** — 99 of them across the eight files, every one
+  `if (observed op threshold) push(buildAlert(input, metricId, observed,
+  threshold, message, severity))`. A table would turn ~3 lines into ~1, saving
+  roughly 100 lines across four files.
+- The **score/behaviour drift computations** are one line each either way. A
+  rule table saves nothing; it only moves the expression into a string.
+
+Before concluding, I audited those 99 rules for the copy-paste bug a table would
+prevent: every `if` observed/threshold matching its `buildAlert` arguments, every
+`>` paired with a `max*` threshold and every `<` with a `min*`. **Zero
+anomalies.** So there was no latent correctness win either — only indirection.
+
+## A measurement bug, and what it hid
+
+Step 4 reported `buildAlert` as "2 lines, 8 variants" and used that to argue the
+remaining duplication was thin. That was wrong. My function-extent scanner
+counted `{`/`}` from the declaration line, so any function with a **multi-line
+signature** terminated immediately and measured as 2 lines. `buildAlert` has a
+six-parameter signature across seven lines.
+
+Re-measured with a scanner that finds the body's opening brace first:
+
+| function | files | lines | similarity | verdict |
+|---|---|---|---|---|
+| rowEvidenceCoverage | 8 | 318 | 0.435 | genuinely different |
+| **buildAlert** | 8 | **236** | **0.988** | extract |
+| toLiveDriftRow | 8 | 205 | 0.639 | genuinely different |
+| toReceiptRow | 8 | 173 | 0.485 | genuinely different |
+| distribution | 8 | 151 | 0.264 | genuinely different |
+| contextLabel | 8 | 113 | 0.353 | genuinely different |
+| rowScore | 8 | 84 | 0.335 | genuinely different |
+| **toLiveDriftWindow** | 8 | **64** | **0.997** | extract |
+| **percentile / ratioIncrease / boolMean** | 4 | **52** | **1.000** | extract |
+
+So the honest answer flipped: not "~30 lines left" but **352**, and the largest
+single duplicated function in the family was the one I had measured as trivial.
+
+## What was extracted
+
+Into `driftMath.ts`:
+
+- `boolMean`, `percentile`, `ratioIncrease` — byte-identical in all four files
+  that have them.
+- `toLiveDriftWindow` — identical apart from the parameter type, so the row
+  mapper became a callback and the rest is generic.
+- `createDriftAlertBuilder(alertPrefix, defaultRefs)` — the 236-line
+  duplication, closed over the only two things that vary: the `alertId` slug
+  (`garage`, `rail-score`, `dgm`, …) and which `DEFAULT_*` constants seed the
+  evidence refs. Each satellite keeps a one-line specialisation.
+
+**Ref order is load-bearing** and is now pinned by its own test: `unique` here
+does not sort, and `canonicalize` maps arrays without sorting, so the sequence
+caller-refs → defaults → baseline rows → live rows reaches the receipt hash.
+Sorting it "for tidiness" would change every published Family-B alert.
+
+## Accounting for the whole Family-B effort
+
+| file | before | after |
+|---|---|---|
+| aiReputationClaude | 508 | 426 |
+| awesomeAgentMemory | 441 | 359 |
+| ctfAgentBenchmark | 560 | 475 |
+| darwinGodelMachine | 627 | 532 |
+| agentReadingTest | 447 | 364 |
+| garage | 567 | 471 |
+| llmFighter | 547 | 451 |
+| railScore | 585 | 492 |
+| driftMath.ts | — | 187 |
+| **total** | **4,282** | **3,757** |
+
+**Net −525**, every published receipt hash byte-identical, across all eight
+files — verified by six characterization pins covering all eight.
+
+## One honest edge, pinned rather than fixed
+
+`ratioIncrease(NaN, 5)` returns **0, not 1**: the guard falls through to
+`live > baseline ? 1 : 0`, and every comparison with `NaN` is false. That is
+fail-OPEN on unknown data.
+
+It is pinned as-is rather than corrected, because `mean([])` and
+`percentile([])` both return 0, so every baseline reaching this function is
+finite and the branch cannot be hit. Changing it would alter published receipts
+to fix a case that does not occur.
+
+## Verification
+
+5 mutations on the new helpers, all caught — swapping the ref order (caught by
+exactly the one test written for it), dropping the slug from the alert id (5),
+turning the percentile into a minimum (4), simplifying the cold-start ratio (1),
+and dropping the mapped rows from a lifted window (12).
+
+Full suite **10,033 / 10,033** across 1,245 files; six gates pass.
+
+## What is genuinely left
+
+`rowEvidenceCoverage` (318 lines), `toLiveDriftRow` (205), `toReceiptRow` (173),
+`distribution` (151), `contextLabel` (113), `rowScore` (84) — 1,044 lines at
+0.26–0.64 similarity. These are per-domain predicates and field selections, not
+repeated logic. `garageLiveDrift.ts` derives `refused` from
+`deflectionAccuracy0to1 >= 0.9 && answerFaithfulness0to1 < 0.6`;
+`railScoreLiveDrift.ts` hardcodes it `false`. Collapsing those behind callbacks
+that each have exactly one caller would be indirection, not deduplication.
+
+The remaining structural sprawl is the one named in step 1 and still untouched:
+`LiveDriftSampleRow`, a 936-field union across 74 domains, and the ~3,400-line
+aggregator that reads it.

@@ -33,6 +33,11 @@ import {
   totalVariationDistance,
   unique,
   withAdditionalAlerts,
+  boolMean,
+  percentile,
+  ratioIncrease,
+  toLiveDriftWindow,
+  createDriftAlertBuilder,
 } from "./driftMath.js";
 
 export type DarwinGodelMachineBenchmarkFamily =
@@ -223,22 +228,6 @@ export const defaultDarwinGodelMachineLiveDriftThresholds: DarwinGodelMachineLiv
   maxCostIncreaseRatio: 0.35,
 };
 
-function boolMean(values: boolean[]): number {
-  return values.length === 0 ? 0 : round(values.filter(Boolean).length / values.length);
-}
-
-function percentile(values: number[], p: number): number {
-  const finite = values.filter(Number.isFinite).sort((left, right) => left - right);
-  if (finite.length === 0) return 0;
-  const index = Math.min(finite.length - 1, Math.max(0, Math.ceil((p / 100) * finite.length) - 1));
-  return round(finite[index]!);
-}
-
-function ratioIncrease(baseline: number, live: number): number {
-  if (!Number.isFinite(baseline) || !Number.isFinite(live) || baseline <= 0) return live > baseline ? 1 : 0;
-  return round(Math.max(0, (live - baseline) / baseline));
-}
-
 function scoreMovement(row: DarwinGodelMachineLiveDriftRow): number {
   return round(clamp01(row.candidateScore0to1 - row.parentScore0to1));
 }
@@ -400,15 +389,6 @@ function toLiveDriftRow(row: DarwinGodelMachineLiveDriftRow): LiveDriftSampleRow
   };
 }
 
-function toLiveDriftWindow(window: DarwinGodelMachineWindow): LiveDriftWindow {
-  return {
-    windowId: window.windowId,
-    startedAt: window.startedAt,
-    endedAt: window.endedAt,
-    rows: window.rows.map(toLiveDriftRow),
-  };
-}
-
 function distribution(rows: DarwinGodelMachineReceiptRow[]): DarwinGodelMachineDistribution {
   return {
     rowCount: rows.length,
@@ -434,35 +414,8 @@ function distribution(rows: DarwinGodelMachineReceiptRow[]): DarwinGodelMachineD
   };
 }
 
-function buildAlert(
-  input: RunDarwinGodelMachineLiveDriftInput,
-  metricId: LiveDriftMetricId,
-  observed: number,
-  threshold: number,
-  message: string,
-  severity: LiveDriftSeverity,
-): LiveDriftAlert {
-  const evidenceRefs = unique([
-    ...(input.sourceRefs ?? []),
-    DEFAULT_SOURCE_REF,
-    ...input.baselineWindow.rows.flatMap((row) => normalizeEvidenceRefs(row.evidenceRefs)),
-    ...input.liveWindow.rows.flatMap((row) => normalizeEvidenceRefs(row.evidenceRefs)),
-  ]);
-  const signedEvidenceRefs = unique([
-    ...input.baselineWindow.rows.flatMap((row) => normalizeEvidenceRefs(row.signedEvidenceRefs)),
-    ...input.liveWindow.rows.flatMap((row) => normalizeEvidenceRefs(row.signedEvidenceRefs)),
-  ]);
-  return {
-    alertId: `dgm:${metricId}:${sha256Hex(canonicalize({ metricId, observed, threshold, message })).slice(0, 12)}`,
-    metricId,
-    severity,
-    message,
-    threshold,
-    observed: round(observed),
-    evidenceRefs,
-    signedEvidenceRefs,
-  };
-}
+/** The shared Family-B alert builder (driftMath), closed over this monitor's slug and refs. */
+const buildAlert = createDriftAlertBuilder("dgm", [DEFAULT_SOURCE_REF]);
 
 export function runDarwinGodelMachineLiveDrift(
   input: RunDarwinGodelMachineLiveDriftInput,
@@ -547,8 +500,8 @@ export function runDarwinGodelMachineLiveDrift(
   const receipt = withAdditionalAlerts(
     runLiveScoreBehaviorDrift({
       agentId: input.agentId,
-      baselineWindow: toLiveDriftWindow(input.baselineWindow),
-      liveWindow: toLiveDriftWindow(input.liveWindow),
+      baselineWindow: toLiveDriftWindow(input.baselineWindow, toLiveDriftRow),
+      liveWindow: toLiveDriftWindow(input.liveWindow, toLiveDriftRow),
       thresholds: input.liveDriftThresholds,
       sourceRefs: unique([...(input.sourceRefs ?? []), DEFAULT_SOURCE_REF]),
       now: input.now,

@@ -1,7 +1,12 @@
 import { describe, expect, it } from "vitest";
 import { canonicalize } from "../src/utils/json.js";
 import {
+  boolMean,
   clamp01,
+  createDriftAlertBuilder,
+  percentile,
+  ratioIncrease,
+  toLiveDriftWindow,
   labelDistribution,
   mean,
   nonEmpty,
@@ -106,5 +111,86 @@ describe("adding alerts fails the receipt closed and rehashes it", () => {
     expect(updated.summary).toBe("1 live drift alert(s), recommendation=alert");
     expect(updated.receiptHash, "the pre-alert hash must not survive").not.toBe("stale-hash");
     expect(updated.receiptHash).toMatch(/^[a-f0-9]{64}$/);
+  });
+});
+
+describe("the helpers lifted out of the Family-B satellites", () => {
+  it("means booleans as a rounded pass rate, empty as zero", () => {
+    expect(boolMean([])).toBe(0);
+    expect(boolMean([true, false, true])).toBe(0.666667);
+  });
+
+  it("takes the nearest-rank percentile and ignores non-finite values", () => {
+    expect(percentile([], 95), "an empty window has no p95, not NaN").toBe(0);
+    expect(percentile([1, 2, 3, 4], 50)).toBe(2);
+    expect(percentile([1, 2, 3, 4], 100)).toBe(4);
+    expect(percentile([Number.NaN, 5, Number.POSITIVE_INFINITY], 100),
+      "a NaN latency must not become the p100").toBe(5);
+  });
+
+  it("reports a ratio increase, and degrades honestly at a zero baseline", () => {
+    expect(ratioIncrease(100, 150)).toBe(0.5);
+    expect(ratioIncrease(150, 100), "a decrease is not an increase").toBe(0);
+    // A zero baseline cannot express a ratio, so it reports the boolean fact.
+    // That keeps a cold-start window from reading as an infinite regression,
+    // which would fire every threshold at once.
+    expect(ratioIncrease(0, 5)).toBe(1);
+    expect(ratioIncrease(0, 0)).toBe(0);
+
+    // A NaN baseline reports 0 — NOT 1 — because `live > baseline` is false for
+    // any comparison with NaN, so the guard's own ternary falls through to the
+    // no-increase branch. That is fail-OPEN on unknown data, and it is pinned
+    // here rather than corrected: `mean([])` and `percentile([])` both return 0,
+    // so every baseline reaching this function is finite and the branch cannot
+    // be hit in practice. Changing it would alter published receipts to fix a
+    // case that does not occur.
+    expect(ratioIncrease(Number.NaN, 5)).toBe(0);
+  });
+
+  it("lifts a window and maps its rows through the supplied mapper", () => {
+    const lifted = toLiveDriftWindow(
+      { windowId: "w", startedAt: "s", endedAt: "e", rows: [{ id: 1 }, { id: 2 }] },
+      (r) => ({ traceId: `t${r.id}` }) as never
+    );
+
+    expect(lifted.windowId).toBe("w");
+    expect(lifted.rows.map((r) => r.traceId)).toEqual(["t1", "t2"]);
+  });
+});
+
+describe("alert evidence-ref ORDER is load-bearing", () => {
+  const source = {
+    sourceRefs: ["caller-ref"],
+    baselineWindow: { rows: [{ evidenceRefs: ["base-ref"], signedEvidenceRefs: ["base-signed"] }] },
+    liveWindow: { rows: [{ evidenceRefs: ["live-ref"], signedEvidenceRefs: ["live-signed"] }] }
+  };
+
+  it("emits caller refs, then defaults, then baseline, then live", () => {
+    // `unique` does not sort and `canonicalize` maps arrays without sorting, so
+    // this sequence reaches the receipt hash. Reordering it — or sorting for
+    // tidiness — would change every published Family-B alert.
+    const build = createDriftAlertBuilder("slug", ["default-a", "default-b"]);
+    const alert = build(source, "scoreMean0to1" as never, 0.5, 0.1, "m", "high" as never);
+
+    expect(alert.evidenceRefs).toEqual(["caller-ref", "default-a", "default-b", "base-ref", "live-ref"]);
+    expect(alert.signedEvidenceRefs).toEqual(["base-signed", "live-signed"]);
+  });
+
+  it("puts the slug in the alert id and rounds the observed value", () => {
+    const build = createDriftAlertBuilder("rail-score", []);
+    const alert = build(source, "scoreMean0to1" as never, 2 / 3, 0.1, "m", "high" as never);
+
+    expect(alert.alertId.startsWith("rail-score:scoreMean0to1:")).toBe(true);
+    expect(alert.observed, "six places, the Family-B convention").toBe(0.666667);
+  });
+
+  it("gives different metrics different alert ids", () => {
+    // The id carries a hash of the alert's own content, so two alerts on one
+    // receipt cannot collide and overwrite each other in a map keyed by id.
+    const build = createDriftAlertBuilder("slug", []);
+    const a = build(source, "scoreMean0to1" as never, 0.5, 0.1, "m", "high" as never);
+    const b = build(source, "scoreMean0to1" as never, 0.9, 0.1, "m", "high" as never);
+
+    expect(a.alertId).not.toBe(b.alertId);
   });
 });
