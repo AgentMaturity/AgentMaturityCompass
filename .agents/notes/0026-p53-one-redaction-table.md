@@ -126,10 +126,75 @@ found, which would have passed by not running. It now imports
 Full suite **10,055 / 10,055** across 1,247 files. `lint`, `typecheck`,
 `check:architecture-boundaries`, `check:counts` pass.
 
-## Still open in P5.3
+---
 
-The observation half: `wrap` (`cli.ts:4958`), `supervise` (`cli.ts:5014`) and
-`adapters run` (`cli.ts:4447`) are three generations of the same capability on a
-**shipped** CLI surface. The plan's requirement is one entry point with the three
-kept as deprecation aliases for at least one release cycle, emitting a pointer.
-That is a user-facing surface change and has not been started.
+# The observation half
+
+## Most of it already shipped; the missing piece was that nobody was told
+
+The plan asks for "one observation entry point … keep `wrap`/`supervise`/
+`adapters run` as deprecation aliases for at least one release cycle, emitting a
+pointer to the new command."
+
+Measured, the entry point already exists. `adapters run` describes itself as
+*"Run an agent under full observation: mints a lease, routes through the gateway,
+captures OBSERVED evidence (preferred over 'amc wrap' and 'amc supervise')"*, and
+it already carries the plan's two modes as `--mode SUPERVISE|SANDBOX`. `wrap`
+already said "legacy; prefer 'amc adapters run'".
+
+**All of that lived in `--help` text.** Neither `wrap` nor `supervise` emitted
+anything at runtime — verified by reading both action bodies. A user running
+either from a script or a CI step, which is what these commands are for, was
+never told. The deprecation had been announced to nobody.
+
+## What was added
+
+`src/cli/deprecatedCommand.ts` — one notice per superseded command, announced
+once per process, **on stderr**.
+
+Stderr is not a detail. These commands wrap another process and relay its output;
+a notice on stdout lands inside the wrapped agent's own stream, where a consumer
+parsing that stream reads the deprecation as agent data. A warning that corrupts
+the thing it is attached to is worse than no warning.
+
+Both descriptions now say `DEPRECATED — use 'amc adapters run'` outright rather
+than the softer "legacy"/"otherwise prefer", so the help text and the runtime
+behaviour say the same thing. Neither command's behaviour changed: they are
+aliases, per ADR-2's rule for a shipped surface.
+
+## The invariant, not just the two cases
+
+`wrap` and `supervise` carried their notices in `--help` for some time while
+saying nothing at runtime. A test now makes that state unreachable: any command
+whose description advertises a replacement must call the warning in its action.
+
+It also asserts the negative — that `adapters run` is NOT flagged. A detector
+keyed on the bare word "prefer" would match the successor's own description
+("preferred over 'amc wrap'") and demand the replacement warn about itself,
+which would satisfy the invariant by making the successor apologise for existing.
+
+## The ratchet paid for itself here
+
+The first version put a five-line notice object at each call site, which grew
+`src/cli.ts` past its baseline by 7 lines and turned the ratchet red. Moving the
+notice text into the helper made each call site one line — and `cli.ts` ended at
+**24,614 against a 24,615 baseline**, one line smaller than it started.
+
+## Verification
+
+10 tests, 4 mutations all caught: removing `supervise`'s warning (caught by the
+invariant, by name), moving the notice to stdout (2 red), removing the
+once-per-process guard, and letting an unknown command name announce a
+placeholder notice.
+
+Full suite **10,065 / 10,065** across 1,248 files. `lint`, `typecheck`,
+`check:architecture-boundaries`, `check:counts`, `check:docs-drift` and
+`check:api-ref` pass.
+
+## P5.3 exit criteria
+
+| criterion | state |
+|---|---|
+| one redaction code path (grep) | three redactors delegate to one table; two detectors deliberately separate, per ADR-0021 |
+| aliases still pass their tests while warning | yes — behaviour unchanged, notices on stderr |
+| one documented capture command with two modes | `adapters run --mode SUPERVISE\|SANDBOX` |

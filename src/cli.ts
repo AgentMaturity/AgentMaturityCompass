@@ -90,6 +90,7 @@ import {
   writeEnforceResourceManifest
 } from "./enforce/resourceManifest.js";
 import { exportEpisodeRecord, listEpisodeRecords, loadEpisodeRecord, writeEpisodeRecord } from "./lifecycle/episodeRecord.js";
+import { warnSupersededCommand } from "./cli/deprecatedCommand.js";
 import { listDecisionReceipts, loadDecisionReceipt, observeDecisionOutcomes, writeDecisionReceipts, type DecisionReceipt } from "./lifecycle/decisionReceipt.js";
 import { exportFindingProofs, listFindingProofs, loadFindingProof, writeFindingProofs } from "./lifecycle/findingProof.js";
 import { exportLifecycleChangeReceipts, listLifecycleChangeReceipts, loadLifecycleChangeReceipt, writeLifecycleChangeReceipts } from "./lifecycle/changeReceipt.js";
@@ -4956,7 +4957,7 @@ plugin
 
 program
   .command("wrap")
-  .description("Wrap runtime and capture tamper-evident evidence (legacy; prefer 'amc adapters run', which also mints a lease and routes through the gateway)")
+  .description("DEPRECATED — use 'amc adapters run', which also mints a lease and routes through the gateway. Wraps a runtime and captures tamper-evident evidence.")
   .argument("[runtime]", "claude|gemini|openclaw|any")
   .argument("[args...]", "runtime arguments")
   .option("--agent-token <file>", "lease token file from `amc pair redeem`")
@@ -4965,6 +4966,7 @@ program
   .option("--bridge-url <url>", "bridge base URL")
   .allowUnknownOption(true)
   .action(async (runtime: string | undefined, args: string[], opts: { agentToken?: string; name?: string; provider?: string; bridgeUrl?: string }) => {
+    warnSupersededCommand("amc wrap");
     if (opts.agentToken) {
       const legacyRuntime = runtime && ["claude", "gemini", "openclaw", "any"].includes(runtime);
       const command = legacyRuntime ? args : [runtime ?? "", ...args].filter((value) => value.length > 0);
@@ -5012,13 +5014,14 @@ program
 
 program
   .command("supervise")
-  .description("Supervise any process and inject gateway routing env vars (no lease; for agents no adapter covers — otherwise prefer 'amc adapters run')")
+  .description("DEPRECATED — use 'amc adapters run'. Supervises any process and injects gateway routing env vars, but mints no lease, so its evidence is not OBSERVED.")
   .option("--provider-route <routeBase>", "gateway route base URL (deprecated alias of --route)")
   .option("--route <routeBase>", "gateway route base URL")
   .option("--proxy <proxyUrl>", "gateway proxy URL (HTTP/HTTPS proxy)")
   .argument("[cmd...]", "agent command and args")
   .allowUnknownOption(true)
   .action(async (cmd: string[], opts: { providerRoute?: string; route?: string; proxy?: string }) => {
+    warnSupersededCommand("amc supervise");
     const command = cmd?.[0];
     if (!command) {
       throw new Error("amc supervise requires a command. Example: amc supervise --route http://127.0.0.1:3210/openai -- node agent.js");
