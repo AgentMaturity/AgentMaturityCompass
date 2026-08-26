@@ -116,10 +116,77 @@ nothing from `watch/` — and asserts a wall-clock ratio (`secondHalf <
 firstHalf * 3`), so it is load-sensitive under a 1,242-file parallel run. A
 type-only move cannot affect it. Flagged as flaky rather than explained away.
 
+## Step 2 — liveness: two drift systems that never spoke
+
+The plan asks that "a drift monitor fires on a live behavioural change". It did
+not. AMC had **two disjoint drift systems**:
+
+| | reads the ledger? | statistics |
+|---|---|---|
+| `src/drift/continuousMonitor.ts` | **yes** — `openLedger`, `parseEvidenceEvent`, `EventEmitter`, `runMonitorTick` | a 241-line detector comparing `DiagnosticReport`s |
+| `src/watch/liveDriftAlerts.ts` | **no** | 11.6k lines across 74 domains |
+
+Verified in both directions: `liveDriftAlerts.ts` contains no `openLedger`, and
+nothing under `src/drift/` references it. The rich engine had never seen a real
+event; the live monitor had never used the rich engine.
+
+### Why they never connected, and why it was easy after all
+
+The engine's input is `LiveDriftSampleRow` — 936 fields of benchmark vocabulary,
+which no runtime event can populate. That is the obvious reason to assume a
+bridge is infeasible.
+
+But only **six** of the 936 are mandatory: `traceId`, `scenarioId`, `timestamp`,
+`score0to1`, `behaviorSignature`, `evidenceRefs`. Measured against the real
+engine, rows carrying only those six produce correct score and behaviour drift
+with working alerts, and all ~300 domain metrics degrade cleanly to 0. Nothing
+was blocking liveness but a projection nobody had written.
+
+`src/watch/sessionDriftProjection.ts` is that projection, over exactly the
+governed tool-call evidence P5.2a writes. End-to-end on a real governed run:
+
+    50 evidence events -> 20 drift rows (only TOOL_CALL_* audits project)
+      baseline: mean 1.00, signature TOOL_CALL_ALLOWED:fs.read
+      live:     mean 0.00, signature TOOL_CALL_DENIED:bash:tool-allowlist
+
+    ALERTS: [critical] scoreMean0to1
+            [high]     behaviorSignature
+            [high]     signedEvidenceRefs
+
+The plan's Verify criterion is met: a drift monitor fires on a live behavioural
+change, from signed evidence, with a receipt hash.
+
+### Two things named rather than glossed
+
+**`score0to1` is a compliance rate here, not a quality score.** The engine's
+field means "quality"; for governed tool calls it is the fraction policy
+permitted. A drop means more guard denials — a behavioural change worth
+alerting on, not a judgement that the agent got worse, since a rising denial
+rate can equally mean the guards started biting. The alert text should be read
+as "tool behaviour changed".
+
+**The guard is in the behaviour signature.** Without it, a workspace whose
+denials shifted from the allowlist to the budget guard would look completely
+unchanged — the opposite of what a drift monitor is for.
+
+`tsc` caught that `evidenceRefs` is mandatory too, which turned out to matter:
+the engine raises a HIGH alert on a receipt carrying no evidence refs, and it is
+right to. Every sample now walks back to its ledger row, and to the hash-chain
+entry when the row was signed — **omitted rather than faked when it was not**,
+because a drift receipt claiming signed provenance it lacks is worse than one
+that admits the gap.
+
+12 tests, 5 mutations all caught: accepting any audit type, accepting any event
+type, scoring every call compliant, dropping the guard from the signature, and
+emitting a signed ref for an unsigned row.
+
 ## Still open in P5.2b
 
-- **The per-domain registry** — the actual decomposition.
-- **Liveness.** The plan asks that "a drift monitor fires on a live behavioural
-  change". Not addressed here and not yet verified to exist: the satellites take
-  rows as input, which is what "pure report-builders" means. Whether anything
-  subscribes to a live event stream is the open question for the next step.
+- **The per-domain registry** — the actual decomposition of the remaining 11.6k
+  lines. `LiveDriftSampleRow` is still a 936-field union across 74 domains.
+- **Wiring the projection into `continuousMonitor`.** The bridge exists and is
+  proven end-to-end, but nothing calls it on a tick yet — that is a monitor and
+  CLI change, not a projection change.
+- **~300 zero-valued metrics per receipt.** A live receipt reports every domain
+  metric, almost all 0. That is the union type showing up in the output, and it
+  is noise a per-domain registry would remove.
