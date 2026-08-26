@@ -24,6 +24,16 @@ import {
   hasNonBlankEvidenceRef,
   normalizeEvidenceRefs,
 } from "./evidenceRefs.js";
+import {
+  clamp01,
+  labelDistribution,
+  mean,
+  nonEmpty,
+  round,
+  totalVariationDistance,
+  unique,
+  withAdditionalAlerts,
+} from "./driftMath.js";
 
 export type LlmFighterWinner = "agent" | "opponent" | "draw" | "unknown";
 
@@ -182,49 +192,8 @@ export const defaultLlmFighterLiveDriftThresholds: LlmFighterLiveDriftThresholds
   maxCostIncreaseRatio: 0.35,
 };
 
-function clamp01(value: number): number {
-  if (!Number.isFinite(value)) return 0;
-  return Math.max(0, Math.min(1, value));
-}
-
-function round(value: number, places = 6): number {
-  const factor = 10 ** places;
-  return Math.round(value * factor) / factor;
-}
-
-function nonEmpty(value: string | undefined): boolean {
-  return typeof value === "string" && value.trim().length > 0;
-}
-
-function unique(values: unknown): string[] {
-  return normalizeEvidenceRefs(values);
-}
-
-function mean(values: number[], fallback = 0): number {
-  return values.length === 0 ? fallback : round(values.reduce((sum, value) => sum + value, 0) / values.length);
-}
-
 function boolMean(values: boolean[]): number {
   return values.length === 0 ? 0 : round(values.filter(Boolean).length / values.length);
-}
-
-function labelDistribution<T>(rows: T[], labelFor: (row: T) => string): Record<string, number> {
-  if (rows.length === 0) return {};
-  const counts = new Map<string, number>();
-  for (const row of rows) {
-    const label = labelFor(row);
-    counts.set(label, (counts.get(label) ?? 0) + 1);
-  }
-  return Object.fromEntries([...counts.entries()].map(([label, count]) => [label, round(count / rows.length)]));
-}
-
-function totalVariationDistance(left: Record<string, number>, right: Record<string, number>): number {
-  const labels = new Set([...Object.keys(left), ...Object.keys(right)]);
-  let total = 0;
-  for (const label of labels) {
-    total += Math.abs((left[label] ?? 0) - (right[label] ?? 0));
-  }
-  return round(total / 2);
 }
 
 function percentile(values: number[], p: number): number {
@@ -421,23 +390,6 @@ function buildAlert(
     observed: round(observed),
     evidenceRefs,
     signedEvidenceRefs,
-  };
-}
-
-function withAdditionalAlerts(receipt: LiveDriftReceipt, additionalAlerts: LiveDriftAlert[]): LiveDriftReceipt {
-  if (additionalAlerts.length === 0) return receipt;
-  const { receiptHash: _receiptHash, ...withoutHash } = receipt;
-  const alerts = [...receipt.alerts, ...additionalAlerts];
-  const updatedWithoutHash = {
-    ...withoutHash,
-    alerts,
-    recommendation: "alert" as const,
-    failClosed: true,
-    summary: `${alerts.length} live drift alert(s), recommendation=alert`,
-  };
-  return {
-    ...updatedWithoutHash,
-    receiptHash: sha256Hex(canonicalize(updatedWithoutHash)),
   };
 }
 

@@ -1,4 +1,6 @@
 import { describe, expect, test } from "vitest";
+import { sha256Hex } from "../src/utils/hash.js";
+import { canonicalize } from "../src/utils/json.js";
 import {
   buildLiveDriftWatchAlerts,
   runLiveScoreBehaviorDrift,
@@ -642,6 +644,7 @@ describe("runLiveScoreBehaviorDrift", () => {
     {
       name: "Awesome Agent Memory",
       metricId: "awesomeAgentMemoryEvidenceCoverage0to1",
+      resultHash: "494214c052ab55c7ba905091f8ebbdd7d0bc301c63b17fde3f5ba89b6527767a",
       run: () => runAwesomeAgentMemoryLiveDrift({
         agentId: "awesome-memory-blank-refs",
         baselineWindow: {
@@ -662,6 +665,7 @@ describe("runLiveScoreBehaviorDrift", () => {
     {
       name: "Agent Reading Test",
       metricId: "agentReadingTestEvidenceCoverage0to1",
+      resultHash: "e3a8f38164dcf446ba6657e9df23626854d787af6702101065d28c783c15f711",
       run: () => runAgentReadingTestLiveDrift({
         agentId: "agent-reading-blank-refs",
         baselineWindow: {
@@ -682,6 +686,7 @@ describe("runLiveScoreBehaviorDrift", () => {
     {
       name: "CTF Agent Benchmark",
       metricId: "ctfAgentBenchmarkEvidenceCoverage0to1",
+      resultHash: "f74da51b363636d0d71c0fe13d23dc699345dd9cab18e10086f3e1357009f5e9",
       run: () => runCtfAgentBenchmarkLiveDrift({
         agentId: "ctf-agent-blank-refs",
         baselineWindow: {
@@ -702,6 +707,7 @@ describe("runLiveScoreBehaviorDrift", () => {
     {
       name: "LLM Fighter",
       metricId: "llmFighterEvidenceCoverage0to1",
+      resultHash: "a2f06d706e9de4229e007a06f31b814820014cfc50cc289d33d170dcf4b3c260",
       run: () => runLlmFighterLiveDrift({
         agentId: "llm-fighter-blank-refs",
         baselineWindow: {
@@ -719,8 +725,14 @@ describe("runLiveScoreBehaviorDrift", () => {
         now: new Date("2026-06-19T02:00:00.000Z"),
       }),
     },
-  ])("fails closed when $name evidence references contain only whitespace", ({ metricId, run }) => {
+  ])("fails closed when $name evidence references contain only whitespace", ({ metricId, run, resultHash }) => {
     const result = run();
+
+    // CHARACTERIZATION PIN (ADR-0025, cluster collapse). The whole result,
+    // canonicalized and hashed. This case fails CLOSED, so coverage is
+    // fractional rather than 1 — which makes the 6dp rounding observable, the
+    // gap that let a 4dp/6dp mutation survive the cluster-1 pins.
+    expect(sha256Hex(canonicalize(result))).toBe(resultHash);
 
     expect(result.liveDistribution.evidenceCoverage0to1).toBeLessThan(1);
     expect(result.liveRows[0]?.evidenceCoverage0to1).toBeLessThan(1);

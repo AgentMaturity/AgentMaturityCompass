@@ -377,3 +377,99 @@ one is the hash-affecting fork: collapsing them together requires either
 carrying `roundPlaces` and `sortEvidenceRefs` as parameters, or accepting a
 receipt-hash change with a methodology note. Cluster 1 needed neither, which is
 why it went first.
+
+---
+
+# Step 4 — Family B: what actually collapses, and what does not
+
+## The scouts' "Family B = 8 files" does not survive re-measurement
+
+They reported Family B as one cluster with min 0.781 / median 0.871. Measured
+with my tokenizer it is **two** clusters:
+
+    within cluster 3 (aiReputationClaude, awesomeAgentMemory,
+                      ctfAgentBenchmark, darwinGodelMachine)   median 0.939
+    within cluster 4 (agentReadingTest, garage, llmFighter,
+                      railScore)                               median 0.928
+    CROSS 3 x 4                                                median 0.231
+
+Two tight clusters, not one family. Same for the "A2 group" they named
+(bisheng, lmnr, narrowTask, openCompass, trism): median 0.303, which is really
+two pairs — lmnr+openCompass at 0.972 and narrowTask+trism at 0.891 — plus
+bisheng with no close peer at all.
+
+## The good news about the hash forks
+
+The forks that make a collapse dangerous — 6dp rounding, unsorted `unique` —
+are a **Family A vs Family B** difference, not a within-cluster one. All eight
+Family-B files use `round(value, places = 6)`, unsorted `unique`, their own
+`distribution()` and `totalVariationDistance`. So work inside Family B needs no
+fork carrying and risks no hash change.
+
+## What is genuinely shared, measured rather than assumed
+
+Hashing every function body across the eight files: **eight functions are
+byte-identical in all eight** — `clamp01`, `round`, `mean`, `nonEmpty`,
+`unique`, `labelDistribution`, `totalVariationDistance`, `withAdditionalAlerts`.
+50 lines, copied eight times.
+
+Eight more functions appear in all eight and have **eight variants each**:
+`buildAlert`, `contextLabel`, `distribution`, `rowEvidenceCoverage`, `rowScore`,
+`toLiveDriftRow`, `toLiveDriftWindow`, `toReceiptRow`.
+
+That is the honest shape of this family, and it explains the 0.93 similarity
+without contradicting it: the variants are structurally parallel but touch
+different fields, so token-normalised comparison scores them near-identical
+while their text differs entirely.
+
+## What was done
+
+`src/watch/driftMath.ts` — the eight identical functions, once.
+
+    aiReputationClaude   508 -> 451      agentReadingTest  447 -> 390
+    awesomeAgentMemory   441 -> 384      garage            567 -> 510
+    ctfAgentBenchmark    560 -> 503      llmFighter        547 -> 490
+    darwinGodelMachine   627 -> 570      railScore         585 -> 528
+
+456 lines removed, 82 added. **Net −374**, spanning both clusters, at zero
+runtime risk — the code is identical and merely relocated.
+
+Characterization pins were captured first, as in step 3: two standalone
+(aiReputationClaude, darwinGodelMachine) and four inside `liveDriftAlerts.test.ts`'s
+table, which is better placed than cluster 1's because it exercises the
+**fail-closed** path where coverage is fractional and 6dp rounding is
+observable. All unchanged after the extraction.
+
+## The claim in the module comment is now true
+
+`driftMath.ts` says the two Family-B conventions are pinned so a later tidy-up
+cannot converge them. `tests/driftMath.test.ts` makes that true rather than
+leaving an unbacked assertion in a doc comment: `round(2/3)` is `0.666667` and
+explicitly not `0.6667`; `unique(["z","a"])` stays `["z","a"]` and canonicalizes
+differently from `["a","z"]`.
+
+5 mutations, all caught, and with strong signal — 4dp rounding kills 8 tests,
+un-halving the total variation distance kills 5, removing the empty-alert early
+return kills 7.
+
+## Why no Family-B factory yet
+
+The eight varying functions are not field-list material in the way Family A's
+were. `rowEvidenceCoverage` is 35 lines of per-domain predicates,
+`garageLiveDrift.ts` derives `refused` from
+`deflectionAccuracy0to1 >= 0.9 && answerFaithfulness0to1 < 0.6` while
+`railScoreLiveDrift.ts` hardcodes it to `false`. A factory over these would be
+mostly callbacks, and callbacks that only ever have one caller each are not
+deduplication — they are indirection.
+
+What *is* factory-shaped is the orchestration: every `run()` merges thresholds,
+maps rows, computes distributions, derives N `round(Math.max(0, a - b))` score
+drifts and M `totalVariationDistance` behaviour drifts, then pushes an alert per
+breached threshold. Those alert rules are data. That is the next step, and it is
+worth doing only if it subsumes the ~80–100 line `run()` bodies rather than
+merely relocating them.
+
+## Verification
+
+Full suite **10,026 / 10,026** across 1,245 files. `lint`, `typecheck`,
+`check:architecture-boundaries`, `check:counts`, `check:docs-drift` pass.

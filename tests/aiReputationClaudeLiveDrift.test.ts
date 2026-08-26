@@ -1,4 +1,6 @@
 import { describe, expect, test } from "vitest";
+import { sha256Hex } from "../src/utils/hash.js";
+import { canonicalize } from "../src/utils/json.js";
 import {
   runAiReputationClaudeLiveDrift,
   type AiReputationClaudeLiveDriftRow,
@@ -81,6 +83,9 @@ describe("AI Reputation Claude live drift", () => {
     });
 
     expect(result.receipt.failClosed).toBe(false);
+
+    // CHARACTERIZATION PIN (ADR-0025, cluster collapse): the whole result.
+    expect(sha256Hex(canonicalize(result))).toBe("26745afd3b3d06717177a71a0f825af9c542cab338e1aae3d0b5ee392460daff");
     expect(result.receipt.recommendation).toBe("approve");
     expect(result.receipt.sourceRefs).toContain("https://github.com/zubair-trabzada/ai-reputation-claude");
     expect(result.liveDistribution.evidenceCoverage0to1).toBe(1);
