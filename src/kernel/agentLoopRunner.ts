@@ -53,6 +53,7 @@ import {
 } from "../prompt/agentPromptProfile.js";
 import { SessionService } from "../session/sessionService.js";
 import { rootIdentity } from "../agent/delegationIdentity.js";
+import type { ActionClass } from "../types.js";
 import { createDriverRunner } from "../agent/subagentRunner.js";
 import type { SubagentCapability } from "../agent/delegateTool.js";
 import type { TurnCancelCause } from "../session/sessionTypes.js";
@@ -167,6 +168,15 @@ export interface ComposedTurnOptions {
    * construction because `seam.schemas()` re-reads the registry each step.
    */
   readonly delegation?: {
+    /**
+     * The action classes a delegate may invoke, declared by the OPERATOR.
+     *
+     * Threaded because the kernel's grant is the only call site in the codebase:
+     * without it `delegationScope` is honoured by `spawnSubagent`, enforced by
+     * `createDriverRunner` and projected as evidence, while nothing can ever set
+     * it — three layers gated on a field no caller could populate.
+     */
+    readonly scope?: readonly ActionClass[];
     readonly maxDepth?: number;
     /** Receives the composed capability. Called once, before the first turn. */
     grant(capability: SubagentCapability): void;
@@ -405,7 +415,10 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
         }),
         ...(options.delegation.maxDepth === undefined
           ? {}
-          : { maxDepth: options.delegation.maxDepth })
+          : { maxDepth: options.delegation.maxDepth }),
+        ...(options.delegation.scope === undefined
+          ? {}
+          : { delegationScope: options.delegation.scope })
       });
     }
 

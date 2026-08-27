@@ -226,3 +226,50 @@ describe("amc agent-loop run --delegate", () => {
     expect(captured.failures, "and it is a failure, not a warning").not.toEqual([]);
   });
 });
+
+describe("the operator can scope a delegation", () => {
+  // WHAT THESE DO NOT COVER, measured by mutation: deleting the spread that
+  // hands `delegateScope` to `runComposedTurn` leaves all three green. They
+  // observe the line the CLI PRINTS, and the printed line and the passed value
+  // read from the same variable but nothing here proves the second exists — so
+  // a build could announce a scope it never applied.
+  //
+  // The hop itself is covered one layer down, by "passes a declared scope
+  // through to the grant" in tests/kernelDelegationGrant.test.ts, plus the type
+  // system. Closing it here would need a seam in the CLI purely for the test,
+  // and the stub provider cannot script a `delegate` call to observe the effect
+  // end to end. Named rather than left as implied coverage.
+  it("reports the scope it will bind a delegate to", async () => {
+    process.chdir(dir);
+    permitDelegate();
+    const { program, captured } = programWith();
+
+    await run(program, argvFor(["--delegate", "--delegate-scope", "READ_ONLY", "--json"]));
+
+    expect(captured.failures).toEqual([]);
+    expect(captured.out.join("\n")).toContain("delegates are scoped to: READ_ONLY");
+  });
+
+  it("says so when a delegate is unscoped, rather than staying quiet", async () => {
+    // The default is unrestricted, and an operator who did not think about it
+    // should be told -- the quiet case is the one worth naming.
+    process.chdir(dir);
+    permitDelegate();
+    const { program, captured } = programWith();
+
+    await run(program, argvFor(["--delegate", "--json"]));
+
+    expect(captured.out.join("\n")).toContain("delegates are unscoped");
+  });
+
+  it("refuses an action class that is not one", async () => {
+    process.chdir(dir);
+    permitDelegate();
+    const { program, captured } = programWith();
+
+    await run(program, argvFor(["--delegate", "--delegate-scope", "read_only", "--json"]));
+
+    expect(captured.errors.join("\n")).toContain("read_only");
+    expect(captured.failures, "a bad scope is a failure, not a warning").not.toEqual([]);
+  });
+});

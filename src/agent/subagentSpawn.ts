@@ -1,6 +1,7 @@
 import { mintDelegationPacket, UnsignablePacketError } from "../fleet/delegationPacket.js";
 import { removeHandoffPacket } from "../fleet/handoffPacket.js";
 import { parseDelegationScope } from "./delegationScope.js";
+import { writeDelegationEvidence } from "./delegationEvidenceWriter.js";
 import type { ActionClass } from "../types.js";
 import {
   DEFAULT_MAX_DELEGATION_DEPTH,
@@ -270,6 +271,24 @@ export async function spawnSubagent(init: SpawnSubagentInit): Promise<SubagentOu
       packetId,
       settledAs,
       reason
+    });
+    // Project the settled delegation into the gate vocabulary.
+    //
+    // The `agent_delegation_*` rows above are the control record and no gate
+    // names their event type, so on their own they count toward no question --
+    // which since r224 means the whole delegation scores nothing. These rows are
+    // the scoreable projection of the same fact; see
+    // ../diagnostic/spineEvidenceProjection.ts for which question they bind, why,
+    // and the ceiling that stops the binding inflating anything.
+    writeDelegationEvidence(init.workspace, childSessionId, {
+      settledAs,
+      depth: identity.depth,
+      packetId,
+      childRunAs: identity.runAs,
+      childSessionId,
+      governedAs: identity.governedAs,
+      ...(scopeClasses === undefined ? {} : { scopeDeclared: scopeClasses }),
+      childText: result.ok ? result.text : ""
     });
   };
 

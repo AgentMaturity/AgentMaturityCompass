@@ -178,3 +178,36 @@ describe("the kernel hands over what only it has", () => {
     expect(grants[0]!.maxDepth).toBe(1);
   });
 });
+
+describe("the operator's delegation scope reaches the capability", () => {
+  it("passes a declared scope through to the grant", async () => {
+    // Without this the whole scope chain is unreachable: `delegationScope` is
+    // honoured by spawnSubagent, enforced by createDriverRunner and projected as
+    // evidence for AMC-2.15 -- and nothing ever set it, because the kernel's
+    // grant is the only call site in the codebase and it passed identity,
+    // session, runner and maxDepth only. Three layers of enforcement gated on a
+    // field no caller could populate.
+    const s = setup();
+    const grants: SubagentCapability[] = [];
+
+    await runComposedTurn(
+      turnOptions(s, {
+        delegation: {
+          scope: ["READ_ONLY"],
+          grant: (capability) => { grants.push(capability); }
+        }
+      })
+    );
+
+    expect(grants[0]!.delegationScope).toEqual(["READ_ONLY"]);
+  });
+
+  it("leaves it undefined when the caller declares none", async () => {
+    const s = setup();
+    const grants: SubagentCapability[] = [];
+    await runComposedTurn(
+      turnOptions(s, { delegation: { grant: (capability) => { grants.push(capability); } } })
+    );
+    expect(grants[0]!.delegationScope).toBeUndefined();
+  });
+});

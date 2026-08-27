@@ -53,6 +53,7 @@ import { echoToolSeam } from "./agent/echoTool.js";
 import { agentToolset } from "./agent/agentToolset.js";
 import { delegateTool } from "./agent/delegateTool.js";
 import { DEFAULT_MAX_DELEGATION_DEPTH } from "./agent/delegationIdentity.js";
+import { parseDelegationScope } from "./agent/delegationScope.js";
 import { listAllowedTools } from "./toolhub/toolhubValidators.js";
 import type { AgentToolSeam } from "./agent/toolSeam.js";
 import type { SubagentCapability } from "./agent/delegateTool.js";
@@ -90,6 +91,7 @@ const defaultIo: AgentLoopCliIo = {
 interface RunOptions {
   delegate?: boolean;
   maxDelegationDepth?: string;
+  delegateScope?: string;
   provider?: string;
   model?: string;
   baseUrl?: string;
@@ -344,6 +346,11 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
       + "Requires \"delegate\" in the signed tool allowlist."
     )
     .option("--max-delegation-depth <n>", "how deep a delegation chain may go (default 3)")
+    .option(
+      "--delegate-scope <classes>",
+      "comma-separated action classes a delegate may invoke, e.g. READ_ONLY,WRITE_LOW. "
+      + "Tools outside them are withheld from the child. Default: unrestricted."
+    )
     .option("--fail-first <n>", "stub provider only: answer the first N dispatches with HTTP 429")
     .option("--think-ms <n>", "stub provider only: delay each answer, so a cancel has something to land in")
     .option("--cancel-after <ms>", "cancel the turn after this many milliseconds (Ctrl-C does the same)")
@@ -380,6 +387,21 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
       // is false, which silently turns the bound OFF rather than reporting the
       // typo. A limit that stops limiting when you misspell it is worse than no
       // limit, because the operator believes it is there.
+      // Parsed before anything runs, and refused rather than narrowed to what it
+      // could understand: a scope quietly reduced to its recognised half would
+      // bind a delegate to something the operator never wrote.
+      let delegateScope: readonly ActionClass[] | undefined;
+      if (typeof opts.delegateScope === "string") {
+        const parsed = parseDelegationScope(
+          opts.delegateScope.split(",").map((token) => token.trim()).filter((token) => token.length > 0)
+        );
+        if (!parsed.ok) {
+          io.error(chalk.red(`--delegate-scope: ${parsed.reason}`));
+          io.fail();
+          return;
+        }
+        delegateScope = parsed.classes;
+      }
       const maxDelegationDepth = integerOption(
         io, "--max-delegation-depth", opts.maxDelegationDepth, DEFAULT_MAX_DELEGATION_DEPTH
       );
@@ -481,6 +503,14 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
             `delegation is offered, chains bounded at depth ${maxDelegationDepth}`
             + (maxDelegationDepth > 1 ? " (children cannot delegate yet, so today's ceiling is 1)" : "")
           ));
+          // Named either way. The unscoped case is the one an operator is most
+          // likely not to have thought about, so it gets said out loud rather
+          // than being the silent default.
+          io.log(chalk.dim(
+            delegateScope === undefined
+              ? "delegates are unscoped: a child is offered every tool this run has"
+              : `delegates are scoped to: ${delegateScope.join(", ")}`
+          ));
         }
         // The toolset holds one evidence handle for the run; release it when
         // the process ends rather than leaking a SQLite handle per agent.
@@ -529,7 +559,11 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
           ...(grantDelegation === null
             ? {}
             : {
-                delegation: { grant: grantDelegation, maxDepth: maxDelegationDepth }
+                delegation: {
+                  grant: grantDelegation,
+                  maxDepth: maxDelegationDepth,
+                  ...(delegateScope === undefined ? {} : { scope: delegateScope })
+                }
               }),
           config: { maxStepsPerTurn: maxSteps },
           credentials: {
