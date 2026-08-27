@@ -10,6 +10,7 @@ import {
 } from "../src/audit/binderArtifact.js";
 import { verifyAuditBinderFile } from "../src/audit/binderVerifier.js";
 import { scanBinderForPii } from "../src/audit/binderRedaction.js";
+import type { AuditBinderJson } from "../src/audit/binderSchema.js";
 
 const DOC = "docs/source-reviews/GAP-1063-scale-donovan-audit-binder.md";
 const TITLE = "Donovan: Empowering the Public Sector with AI Agents | Scale AI | Scale AI";
@@ -172,10 +173,11 @@ describe("GAP-1063 Scale Donovan audit-binder boundary", () => {
       "SIGNATURE_INVALID",
     ]));
 
+    // deliberately metadata-only: the scan walks the object generically
     const metadataOnlyScan = scanBinderForPii({
       source: "Scale Donovan",
       reviewerNotes: "Contact auditor@example.com for a copy of the competitor evidence package.",
-    });
+    } as unknown as AuditBinderJson);
     expect(metadataOnlyScan.status).toBe("FAIL");
     expect(metadataOnlyScan.findings.some((finding) => finding.type === "EMAIL")).toBe(true);
   });

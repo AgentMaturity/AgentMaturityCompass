@@ -36,9 +36,10 @@ describe("CORE_SAFETY_PROPERTIES", () => {
     expect(trustFloor).toBeDefined();
     // trustScore < 35 with write scope — should violate (predicate returns false)
     const violating = {
-      agentId: "test", trustScore: 30, maturityLevel: "L1" as never,
-      activeScopes: ["read", "write"], consecutiveFailures: 0,
-      delegationDepth: 0, selfReportedShare: 0.0, staleHours: 0,
+      agentId: "test", trustScore: 30, maturityLevel: "L1" as const,
+      activeScopes: ["read", "write"], pendingActions: [], lastVerifiedAt: 0,
+      evidenceCount: 0, selfReportedShare: 0.0, policyViolations: 0,
+      consecutiveFailures: 0, delegationDepth: 0, isOperational: true,
     };
     expect(trustFloor!.predicate(violating)).toBe(false);
   });
@@ -46,9 +47,10 @@ describe("CORE_SAFETY_PROPERTIES", () => {
   it("trust-floor predicate should allow low trust + read-only", () => {
     const trustFloor = CORE_SAFETY_PROPERTIES.find(p => p.id === "safety-trust-floor");
     const safe = {
-      agentId: "test", trustScore: 20, maturityLevel: "L1" as never,
-      activeScopes: ["read"], consecutiveFailures: 0,
-      delegationDepth: 0, selfReportedShare: 0.0, staleHours: 0,
+      agentId: "test", trustScore: 20, maturityLevel: "L1" as const,
+      activeScopes: ["read"], pendingActions: [], lastVerifiedAt: 0,
+      evidenceCount: 0, selfReportedShare: 0.0, policyViolations: 0,
+      consecutiveFailures: 0, delegationDepth: 0, isOperational: true,
     };
     expect(trustFloor!.predicate(safe)).toBe(true);
   });
