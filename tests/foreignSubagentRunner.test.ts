@@ -173,6 +173,24 @@ describe("a truncated answer is not an answer", () => {
   }, 60_000);
 });
 
+describe("a foreign child stops when its parent gives up", () => {
+  it("kills the process on the signal rather than running to completion", async () => {
+    // The signal is only a channel if something listens. `spawnGovernedChild`
+    // has always accepted one; the runner had to pass `ctx.signal` down for a
+    // cancelled delegation to actually stop a foreign process.
+    const dir = workspace();
+    const controller = new AbortController();
+    const runner = runnerFor(dir, fakeAgent(dir, 'sleep 30; echo "finished"'));
+
+    const started = Date.now();
+    setTimeout(() => controller.abort(), 400);
+    const result = await runner(ctx({ signal: controller.signal }));
+
+    expect(Date.now() - started, "stopped early, not after the sleep").toBeLessThan(15_000);
+    expect(result.ok).toBe(false);
+  }, 30_000);
+});
+
 describe("a foreign child cannot be continued", () => {
   it("refuses a continuable request instead of pretending", async () => {
     // `claude -p` and `codex exec` are one-shot. Handing back a continuation

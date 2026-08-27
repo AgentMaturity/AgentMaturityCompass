@@ -64,6 +64,14 @@ export interface SubagentRunContext {
    * binds it; see ./delegationScope.ts for why the signed packet alone did not.
    */
   readonly delegationScope?: readonly ActionClass[];
+  /**
+   * Aborted when the parent has given up on this delegation.
+   *
+   * A runner that ignores it is not stopped by anything here — the signal is a
+   * request, not a kill. What the spawn guarantees is the ACCOUNTING: the
+   * delegation settles either way, and the reason says which happened.
+   */
+  readonly signal?: AbortSignal;
 }
 
 /**
@@ -145,6 +153,17 @@ export interface SpawnSubagentInit {
   /** Mints the child's session id. Injected so a test can pin it. */
   readonly mintSessionId: () => string;
   readonly maxDepth?: number;
+  /** Aborted when the parent gives up. See `SubagentRunContext.signal`. */
+  readonly signal?: AbortSignal;
+  /**
+   * How long to wait for a cancelled child to return before settling anyway.
+   *
+   * Waiting forever would let a runner that ignores its signal hold the parent
+   * open; settling immediately would make the log claim the child ended when it
+   * may still be running. So: ask, wait a bounded time, and record which of the
+   * two actually happened.
+   */
+  readonly cancelGraceMs?: number;
 }
 
 export type SubagentOutcome =
@@ -177,6 +196,52 @@ export type SubagentOutcome =
  * Refusals before the announcement write nothing at all — no packet, no row —
  * because a record of an authorisation that never held is worse than silence.
  */
+/** How long a cancelled child gets to return before the delegation settles anyway. */
+export const DEFAULT_CANCEL_GRACE_MS = 5_000;
+
+/** Sentinel for "the grace window expired first". Not a result the runner can return. */
+const ABANDONED = Symbol("abandoned") as unknown as SubagentRunResult;
+
+/**
+ * Await a runner, but not past the grace window once the parent has given up.
+ *
+ * The late result is deliberately dropped rather than raced back in: by the time
+ * it arrives the delegation has already been accounted for, and a second
+ * settlement would make the log say it ended twice.
+ */
+async function settleWithin(
+  running: Promise<SubagentRunResult>,
+  signal: AbortSignal | undefined,
+  graceMs: number
+): Promise<SubagentRunResult> {
+  if (signal === undefined) return running;
+  // Swallow a late rejection so an abandoned child cannot crash the process
+  // after nobody is listening.
+  running.catch(() => undefined);
+  return new Promise<SubagentRunResult>((resolve) => {
+    let settled = false;
+    const finish = (value: SubagentRunResult): void => {
+      if (settled) return;
+      settled = true;
+      resolve(value);
+    };
+    let timer: NodeJS.Timeout | null = null;
+    const onAbort = (): void => {
+      timer = setTimeout(() => finish(ABANDONED), graceMs);
+      if (typeof timer.unref === "function") timer.unref();
+    };
+    if (signal.aborted) onAbort();
+    else signal.addEventListener("abort", onAbort, { once: true });
+    void running.then(
+      (value) => { if (timer) clearTimeout(timer); finish(value); },
+      (error: unknown) => {
+        if (timer) clearTimeout(timer);
+        finish({ ok: false, text: "", reason: `child threw: ${String(error)}` });
+      }
+    );
+  });
+}
+
 export async function spawnSubagent(init: SpawnSubagentInit): Promise<SubagentOutcome> {
   const maxDepth = init.maxDepth ?? DEFAULT_MAX_DELEGATION_DEPTH;
 
@@ -186,6 +251,14 @@ export async function spawnSubagent(init: SpawnSubagentInit): Promise<SubagentOu
     return { ok: false, reason: derived.reason, packetId: null };
   }
   const identity = derived.identity;
+
+  // 1a. Already given up? Refuse before authorising, like a depth refusal:
+  //     nothing announced, so nothing to account for. Minting a signed packet
+  //     for a delegation that was abandoned before it began would leave an
+  //     authorisation on disk for work nobody asked for.
+  if (init.signal?.aborted === true) {
+    return { ok: false, reason: "parent gave up before the delegation was authorised", packetId: null };
+  }
 
   // 1b. Read the declared scope BEFORE authorising. The packet is the
   //     authorisation record, and minting one that names a scope the runtime
@@ -241,15 +314,24 @@ export async function spawnSubagent(init: SpawnSubagentInit): Promise<SubagentOu
 
   // 4. Run. THE governance line: the child is toolset-scoped as its root.
   let result: SubagentRunResult;
+  let abandoned = false;
+  let gaveUpDuringRun = false;
+  init.signal?.addEventListener("abort", () => { gaveUpDuringRun = true; }, { once: true });
   try {
-    result = await init.runner({
+    const running = init.runner({
       continuable: init.request.continuable === true,
       toolsetAgentId: identity.governedAs,
       identity,
       childSessionId,
       goal: init.request.goal,
-      ...(scopeClasses === undefined ? {} : { delegationScope: scopeClasses })
+      ...(scopeClasses === undefined ? {} : { delegationScope: scopeClasses }),
+      ...(init.signal === undefined ? {} : { signal: init.signal })
     });
+    result = await settleWithin(running, init.signal, init.cancelGraceMs ?? DEFAULT_CANCEL_GRACE_MS);
+    abandoned = result === ABANDONED;
+    if (abandoned) {
+      result = { ok: false, text: "", reason: "child did not stop within the grace window and was abandoned" };
+    }
   } catch (error) {
     // A throwing child still gets an account. Announced means accounted for.
     init.session.recordLoopEvent({
@@ -346,12 +428,21 @@ export async function spawnSubagent(init: SpawnSubagentInit): Promise<SubagentOu
   // parent would then quote an empty string to its model as the delegate's
   // answer. Checked here so an out-of-process provider cannot ship green and
   // empty.
-  const reported = result.ok && result.text.trim().length > 0;
+  // A delegation the parent gave up on is CANCELLED, whatever the runner said
+  // about why it stopped: the cause was the parent, and "failed" would blame the
+  // child for obeying.
+  //
+  // Read from a flag rather than from `signal.aborted` here. The early return
+  // above narrows the property to `false` for the rest of the function, and the
+  // compiler is right about the type and wrong about the world: `aborted` is
+  // mutable and the whole point is that it flips WHILE the runner is running.
+  const cancelled = abandoned || gaveUpDuringRun;
+  const reported = !cancelled && result.ok && result.text.trim().length > 0;
   const reason = result.ok
     ? (reported ? "child reported" : "child produced no output")
     : (result.reason ?? "child did not report a reason");
 
-  account(reported ? "reported" : "failed", reason);
+  account(reported ? "reported" : cancelled ? "cancelled" : "failed", reason);
 
   return reported
     ? { ok: true, identity, packetId, childSessionId, childText: result.text }

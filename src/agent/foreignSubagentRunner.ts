@@ -142,7 +142,11 @@ export function createForeignRunner(init: ForeignRunnerInit): SubagentRunner {
         // echoes it must not put it in the signed log or on the terminal.
         scrubValues: [governed.lease],
         ...(init.cwd ? { cwd: init.cwd } : {}),
-        ...(init.timeoutMs === undefined ? {} : { timeoutMs: init.timeoutMs })
+        ...(init.timeoutMs === undefined ? {} : { timeoutMs: init.timeoutMs }),
+        // The parent's cancellation reaches the process. Without this the signal
+        // is a channel nobody listens to: the delegation would settle as
+        // cancelled while the foreign agent kept running and kept spending.
+        ...(ctx.signal === undefined ? {} : { signal: ctx.signal })
       });
     } catch (error) {
       return refuse(`foreign child could not be started: ${String(error)}`);
