@@ -13,7 +13,7 @@ function workspace(): string {
 }
 
 function runCli(cwd: string, args: string[]) {
-  const env = { ...process.env };
+  const env: NodeJS.ProcessEnv = { ...process.env };
   delete env.AMC_VAULT_PASSPHRASE;
   delete env.AMC_VAULT_PASSPHRASE_FILE;
   delete env.AMC_NO_SIGN;

@@ -79,7 +79,7 @@ function configureDeployRule(root: string): ActionPolicyRule {
   return loadActionPolicy(root).actions.find((rule) => rule.actionClass === "DEPLOY")!;
 }
 
-function alternativeLogic(): PolicyEvidenceLogic {
+function alternativeLogic(): { all: PolicyEvidenceLogic[] } {
   return {
     all: [
       { gate: "maturity:AMC-1.7" },

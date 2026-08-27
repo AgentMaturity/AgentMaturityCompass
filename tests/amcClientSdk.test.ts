@@ -99,11 +99,11 @@ describe("OpenAI SDK instrumentation", () => {
       }
     } as unknown as AMCClient;
     const rawClient = {
-      chat: { completions: { create: async () => ({ raw: true }) } },
-      responses: { create: async () => ({ raw: true }) },
-      embeddings: { create: async () => ({ raw: true }) },
-      images: { generate: async () => ({ raw: true }) },
-      audio: { speech: { create: async () => ({ raw: true }) } }
+      chat: { completions: { create: async (_body: unknown) => ({ raw: true }) } },
+      responses: { create: async (_body: unknown) => ({ raw: true }) },
+      embeddings: { create: async (_body: unknown) => ({ raw: true }) },
+      images: { generate: async (_body: unknown) => ({ raw: true }) },
+      audio: { speech: { create: async (_body: unknown) => ({ raw: true }) } }
     };
 
     const instrumented = instrumentOpenAIClient(rawClient, amc);

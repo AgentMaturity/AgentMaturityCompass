@@ -70,7 +70,7 @@ describe('E4 — Egress Proxy', () => {
 describe('E5 — Circuit Breaker', () => {
   it('starts closed', () => {
     const cb = new CircuitBreaker({ failureThreshold: 3, resetTimeMs: 1000 });
-    expect(cb.getState()).toBe('closed');
+    expect(cb.getState('session-1')).toBe('closed');
   });
 });
 

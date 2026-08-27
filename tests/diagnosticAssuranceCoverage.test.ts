@@ -42,7 +42,7 @@ describe("diagnostic and assurance coverage expansion", () => {
     const ws = workspace();
     const report = await runDiagnostic({ workspace: ws, agentId: "default", window: "14d", targetName: "default", claimMode: "auto" });
     const reloaded = loadRunReport(ws, report.runId, "default");
-    const markdown = generateReport(reloaded, "md");
+    const markdown = generateReport(reloaded, "md") as string;
     expect(reloaded.runId).toBe(report.runId);
     expect(markdown).toContain("#");
     expect(markdown.toLowerCase()).toContain("trust");
