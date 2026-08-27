@@ -135,11 +135,11 @@ describe('Product — Data Quality', () => {
 describe('Product — Knowledge Graph', () => {
   it('adds entities and finds path', () => {
     const kg = new KnowledgeGraph();
-    const a = kg.addEntity('entity', 'A');
-    const b = kg.addEntity('entity', 'B');
-    const c = kg.addEntity('entity', 'C');
-    kg.addRelationship(a.entityId, b.entityId, 'knows');
-    kg.addRelationship(b.entityId, c.entityId, 'knows');
+    const a = kg.addEntity('generic', 'A');
+    const b = kg.addEntity('generic', 'B');
+    const c = kg.addEntity('generic', 'C');
+    kg.addRelationship(a.entityId, b.entityId, 'relates_to');
+    kg.addRelationship(b.entityId, c.entityId, 'relates_to');
     const path = kg.shortestPath(a.entityId, c.entityId);
     expect(path).toBeDefined();
     expect(path!.nodes.length).toBeGreaterThanOrEqual(2);

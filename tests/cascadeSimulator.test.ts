@@ -59,25 +59,24 @@ function setupAgent(workspace: string, agentId: string): void {
 
 function makeReport(agentId: string, overallLevel: number, integrity: number): DiagnosticReport {
   const layerScores: LayerScore[] = [
-    { layerName: "Strategic Agent Operations", questionCount: 5, answeredCount: 5, avgFinalLevel: overallLevel, avgConfidence: 0.8 },
-    { layerName: "Leadership & Autonomy", questionCount: 5, answeredCount: 5, avgFinalLevel: overallLevel, avgConfidence: 0.8 },
-    { layerName: "Culture & Alignment", questionCount: 5, answeredCount: 5, avgFinalLevel: overallLevel, avgConfidence: 0.8 },
-    { layerName: "Resilience", questionCount: 5, answeredCount: 5, avgFinalLevel: overallLevel, avgConfidence: 0.8 },
-    { layerName: "Skills", questionCount: 5, answeredCount: 5, avgFinalLevel: overallLevel, avgConfidence: 0.8 },
+    { layerName: "Strategic Agent Operations", avgFinalLevel: overallLevel, confidenceWeightedFinalLevel: overallLevel },
+    { layerName: "Leadership & Autonomy", avgFinalLevel: overallLevel, confidenceWeightedFinalLevel: overallLevel },
+    { layerName: "Culture & Alignment", avgFinalLevel: overallLevel, confidenceWeightedFinalLevel: overallLevel },
+    { layerName: "Resilience", avgFinalLevel: overallLevel, confidenceWeightedFinalLevel: overallLevel },
+    { layerName: "Skills", avgFinalLevel: overallLevel, confidenceWeightedFinalLevel: overallLevel },
   ];
 
   const questionScores: QuestionScore[] = [];
   for (let i = 1; i <= 25; i++) {
     questionScores.push({
       questionId: `q${i}`,
-      layerName: layerScores[Math.floor((i - 1) / 5)]!.layerName,
-      rawLevel: overallLevel,
+      claimedLevel: overallLevel,
+      supportedMaxLevel: overallLevel,
       finalLevel: overallLevel,
       confidence: 0.8,
       evidenceEventIds: [`ev-${i}`],
+      flags: [],
       narrative: `Agent ${agentId} question ${i} assessment`,
-      boosts: [],
-      caps: [],
     });
   }
 
@@ -97,7 +96,7 @@ function makeReport(agentId: string, overallLevel: number, integrity: number): D
     evidenceCoverage: 0.8,
     ledgerEventCount: 100,
     status: "VALID",
-  } as DiagnosticReport;
+  } as unknown as DiagnosticReport;
 }
 
 afterEach(() => {

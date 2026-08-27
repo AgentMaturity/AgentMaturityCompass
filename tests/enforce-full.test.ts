@@ -69,7 +69,7 @@ describe('E4 — Egress Proxy', () => {
 
 describe('E5 — Circuit Breaker', () => {
   it('starts closed', () => {
-    const cb = new CircuitBreaker({ failureThreshold: 3, resetTimeMs: 1000 });
+    const cb = new CircuitBreaker({ maxCalls: 3, windowMs: 1000 });
     expect(cb.getState('session-1')).toBe('closed');
   });
 });
@@ -142,8 +142,8 @@ describe('E14 — Webhook Gateway', () => {
 describe('E15 — ABAC', () => {
   it('checks access', () => {
     const r = checkAccess(
-      { subject: { role: 'admin', department: 'eng' }, resource: 'doc-1', action: 'read', context: {} },
-      [{ conditions: [{ attribute: 'role', operator: 'eq', value: 'admin' }], effect: 'allow' as const }]
+      { subject: { role: 'admin', department: 'eng' }, resource: { id: 'doc-1' }, action: 'read' },
+      [{ id: 'admin-read', conditions: [{ attribute: 'role', operator: 'eq', value: 'admin' }], effect: 'allow' as const }]
     );
     expect(r.allowed).toBe(true);
   });
@@ -189,11 +189,11 @@ describe('E19 — Two-Person Auth', () => {
 
 describe('E22 — Schema Gate', () => {
   it('validates against schema', () => {
-    const r = validateSchema({ name: 'test', age: 30 }, { type: 'object', required: ['name'], fields: { name: { type: 'string' }, age: { type: 'number' } } });
+    const r = validateSchema({ name: 'test', age: 30 }, { type: 'object', required: ['name'], properties: { name: { type: 'string' }, age: { type: 'number' } } });
     expect(r.valid).toBe(true);
   });
   it('catches missing required', () => {
-    const r = validateSchema({}, { type: 'object', required: ['name'], fields: {} });
+    const r = validateSchema({}, { type: 'object', required: ['name'], properties: {} });
     expect(r.valid).toBe(false);
   });
 });
@@ -209,7 +209,7 @@ describe('E24 — Evidence Contract', () => {
 
 describe('E27 — Temporal Controls', () => {
   it('checks time access', () => {
-    const r = checkTemporalAccess('deploy', { allowedHours: [9, 17], allowedDays: [1, 2, 3, 4, 5] });
+    const r = checkTemporalAccess('deploy', { allowedHours: { start: 9, end: 17 }, allowedDays: [1, 2, 3, 4, 5] });
     expect(r).toHaveProperty('allowed');
   });
 });
@@ -265,7 +265,7 @@ describe('E33 — Watchdog', () => {
     const w = wm.createWatchdog('test', { timeoutMs: 5000 });
     wm.heartbeat(w.watchdogId);
     const status = wm.check(w.watchdogId);
-    expect(status.alive).toBe(true);
+    expect(status?.alive).toBe(true);
   });
 });
 
