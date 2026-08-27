@@ -250,7 +250,7 @@ describe("GAP-1644 PostgreSQL Ops MCP server risk attestation", () => {
 
     const tamperedReceipt = {
       ...receipt,
-      requiredEvidence: [] as typeof receipt.requiredEvidence
+      requiredEvidence: [] as unknown as typeof receipt.requiredEvidence
     };
 
     expect(receipt.allowed).toBe(false);

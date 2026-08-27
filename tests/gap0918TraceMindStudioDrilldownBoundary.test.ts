@@ -153,7 +153,7 @@ function report(drilldown: QuestionScoreObsStudioDrilldownLensRef = lens()): Dia
       publicUrl: "/docs/SCORING_METHODOLOGY.md",
       hash: hash("f"),
     },
-  } as DiagnosticReport;
+  } as unknown as DiagnosticReport;
 }
 
 describe("GAP-0918 TraceMind Studio evidence drilldown boundary", () => {

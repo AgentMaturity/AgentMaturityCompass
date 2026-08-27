@@ -167,7 +167,7 @@ function report(lens: QuestionScoreObsStudioDrilldownLensRef = obsLens()): Diagn
       publicUrl: "/docs/SCORING_METHODOLOGY.md",
       hash: hash("e"),
     },
-  } as DiagnosticReport;
+  } as unknown as DiagnosticReport;
 }
 
 describe("GAP-0010 Galileo Studio evidence drilldown boundary", () => {

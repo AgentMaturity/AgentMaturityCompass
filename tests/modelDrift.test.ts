@@ -206,7 +206,7 @@ describe('tagEvidenceWithModel', () => {
     const model = parseModelVersion('openai/gpt-4o@2024-11');
     const evidence = makeEvidence('AMC-1.1', 0.9);
     tagEvidenceWithModel(evidence, model);
-    expect((evidence as Record<string, unknown>)['model']).toBeUndefined();
+    expect((evidence as unknown as Record<string, unknown>)['model']).toBeUndefined();
   });
 
   it('preserves original evidence fields', () => {

@@ -59,7 +59,7 @@ function makeReport(agentId: string, questions: QuestionScore[]): DiagnosticRepo
     evidenceCoverage: 0.9,
     ledgerEventCount: 100,
     status: "VALID",
-  } as DiagnosticReport;
+  } as unknown as DiagnosticReport;
 }
 
 // ─── Score decomposition ────────────────────────────

@@ -163,7 +163,7 @@ function report(drilldown: QuestionScoreObsStudioDrilldownLensRef = lens()): Dia
       publicUrl: "/docs/SCORING_METHODOLOGY.md",
       hash: hash("e"),
     },
-  } as DiagnosticReport;
+  } as unknown as DiagnosticReport;
 }
 
 describe("GAP-0979 Helicone Studio drilldown boundary", () => {
