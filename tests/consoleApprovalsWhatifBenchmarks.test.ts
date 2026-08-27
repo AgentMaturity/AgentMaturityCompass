@@ -229,6 +229,7 @@ function ensureDefaultAgent(workspace: string): void {
     domain: "general",
     primaryTasks: ["analysis", "delivery"],
     stakeholders: ["owner", "operator"],
+    environment: "production",
     riskTier: "med",
     provider: {
       templateId: "openai",

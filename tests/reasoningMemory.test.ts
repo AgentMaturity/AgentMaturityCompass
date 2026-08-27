@@ -35,7 +35,7 @@ function diagnosticReport(runId = "memory-run-1", failures = true): DiagnosticRe
     trustBoundaryViolated: false,
     trustBoundaryMessage: null,
     integrityIndex: failures ? 0.62 : 0.91,
-    trustLabel: failures ? "MEDIUM TRUST" : "HIGH TRUST",
+    trustLabel: failures ? "DEVELOPING — some evidence, needs more coverage" : "HIGH TRUST",
     targetProfileId: null,
     layerScores: [{ layerName: "Resilience", avgFinalLevel: failures ? 2 : 4, confidenceWeightedFinalLevel: failures ? 2 : 4 }],
     questionScores: failures

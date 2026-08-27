@@ -207,7 +207,7 @@ describe("GAP-1247 BAML guard decision receipts boundary", () => {
     const publicKeys = getPublicKeyHistory(tempDir!, "monitor");
 
     const tamperedRule: GuardDecisionReceipt = {
-      ...receipt,
+      ...receipt!,
       payload: {
         ...receipt!.payload,
         matchedRule: "rule:changed-after-signing",
@@ -219,7 +219,7 @@ describe("GAP-1247 BAML guard decision receipts boundary", () => {
     });
 
     const tamperedSignature: GuardDecisionReceipt = {
-      ...receipt,
+      ...receipt!,
       signature: `${receipt!.signature.slice(0, -2)}xx`,
     };
     expect(verifyGuardDecisionReceipt(tamperedSignature, { publicKeys })).toMatchObject({

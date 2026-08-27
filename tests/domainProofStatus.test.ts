@@ -49,6 +49,9 @@ describe("Domain Proof Lane proof taxonomy", () => {
     const notice = badgeSourceReviewNotice({
       id: "amc-public-methodology",
       version: "2026.06.21-test",
+      releaseDate: "2026-06-21",
+      methodologyDoc: "docs/methodology.md",
+      publicUrl: "https://agentmaturitycompass.com/methodology",
       hash: "a".repeat(64),
       versioningAssuranceHash: "b".repeat(64),
     });
