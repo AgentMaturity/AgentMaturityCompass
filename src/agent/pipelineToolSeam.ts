@@ -120,7 +120,8 @@ export function pipelineToolSeam(init: PipelineToolSeamInit): AgentToolSeam {
           arguments: args,
           requestedMode: "EXECUTE",
           callId: request.callId,
-          parentToken: request.parentToken
+          parentToken: request.parentToken,
+          signal: request.signal
         });
         return toLoopOutcome(outcome, request.signal.aborted);
       } catch (error: unknown) {

@@ -20,6 +20,7 @@ import { ToolRegistry } from "../tools/toolRegistry.js";
 import { openLedger } from "../ledger/ledger.js";
 import { toolEvidenceFor } from "../tools/toolEvidence.js";
 import { delegateTool, type SubagentCapability } from "./delegateTool.js";
+import { workflowTool } from "../workflow/workflowTool.js";
 import { pipelineToolSeam } from "./pipelineToolSeam.js";
 import type { AgentToolSeam } from "./toolSeam.js";
 
@@ -184,7 +185,12 @@ export function agentToolset(options: AgentToolsetOptions): AgentToolset {
   for (const tool of searchTools()) registry.define(tool);
   registry.define(bashTool(options.scrubValues ? { scrubValues: options.scrubValues } : {}));
   if (options.subagents !== undefined) {
+    // Both tools, from one capability. `delegate` is one child; `workflow` is a
+    // declared plan of them. Each is still gated a second time by the operator's
+    // signed allowlist, and separately -- permitting one does not permit the
+    // other, because their fan-out differs by up to MAX_PLAN_NODES.
     registry.define(delegateTool(options.subagents));
+    registry.define(workflowTool(options.subagents));
   }
 
   // Order is a reporting choice, not a semantic one: guards cannot allow, so

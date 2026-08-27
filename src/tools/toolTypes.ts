@@ -50,6 +50,16 @@ export interface ToolExecution {
    * valid; absent means "unknown", never "none applied".
    */
   readonly appliedGuards?: readonly string[];
+  /**
+   * The turn's cancellation signal, when the caller had one.
+   *
+   * Most tool bodies finish fast enough not to care. `workflow` does: one call
+   * can spawn up to MAX_PLAN_NODES delegations, and without this a cancelled
+   * turn would leave a whole plan running with nothing able to stop it -- which
+   * would make the force-settle cancellation built for exactly that case
+   * unreachable from the only surface that fans out.
+   */
+  readonly signal?: AbortSignal;
 }
 
 /**

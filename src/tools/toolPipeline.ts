@@ -69,6 +69,8 @@ export interface ToolPipelineInit {
 }
 
 export interface ToolCallInput {
+  /** The turn's cancellation signal, for a body long enough to need one. */
+  readonly signal?: AbortSignal;
   readonly name: string;
   readonly agentId: string;
   readonly arguments: Record<string, unknown>;
@@ -137,7 +139,8 @@ export class ToolPipeline {
       requestedMode: input.requestedMode,
       effectiveMode: input.requestedMode,
       arguments: freezeToolArguments(input.arguments),
-      parentToken: input.parentToken ?? null
+      parentToken: input.parentToken ?? null,
+      ...(input.signal === undefined ? {} : { signal: input.signal })
     };
 
     const outcome = await this.runStages(execution, definition.body);
