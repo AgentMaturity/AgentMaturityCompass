@@ -58,7 +58,7 @@ function rewriteAndSign(
   signArtifactFile({ workspace: root, path, artifactKind });
 }
 
-function runCli(root: string, args: string[]): ReturnType<typeof spawnSync> {
+function runCli(root: string, args: string[]) {
   return spawnSync(process.execPath, [resolve(process.cwd(), "dist/cli.js"), ...args], {
     cwd: root,
     encoding: "utf8",

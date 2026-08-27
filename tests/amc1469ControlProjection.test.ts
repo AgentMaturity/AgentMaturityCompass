@@ -59,7 +59,7 @@ function control(projection: ReturnType<typeof buildControlProjection>, controlI
     .find((candidate) => candidate.controlId === controlId)!;
 }
 
-function runCli(cwd: string, args: string[]): ReturnType<typeof spawnSync> {
+function runCli(cwd: string, args: string[]) {
   return spawnSync(process.execPath, [cliPath, ...args], {
     cwd,
     encoding: "utf8",

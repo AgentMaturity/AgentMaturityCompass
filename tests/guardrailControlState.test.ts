@@ -71,7 +71,7 @@ async function callApi(input: {
   };
 }
 
-function runCli(ws: string, args: string[]): ReturnType<typeof spawnSync> {
+function runCli(ws: string, args: string[]) {
   return spawnSync(process.execPath, [resolve(process.cwd(), "dist/cli.js"), ...args], {
     cwd: ws,
     encoding: "utf8",

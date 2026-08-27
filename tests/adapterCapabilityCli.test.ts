@@ -32,7 +32,7 @@ function workspace(): string {
   return root;
 }
 
-function run(cwd: string, args: string[]): ReturnType<typeof spawnSync> {
+function run(cwd: string, args: string[]) {
   return spawnSync(process.execPath, [cliPath, ...args], {
     cwd,
     encoding: "utf8",
