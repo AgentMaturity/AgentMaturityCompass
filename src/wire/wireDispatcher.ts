@@ -76,13 +76,17 @@ export interface WireDispatcher {
  * Refusing at construction turns a per-message mystery into one clear sentence
  * at startup.
  */
-export function createWireDispatcher(init: WireDispatcherInit): WireDispatcher {
+export function assertWireCanServe(): void {
   if (process.env["AMC_EVALUATED_AGENT"] === "1") {
     throw new Error(
       "refusing to serve the wire: AMC_EVALUATED_AGENT=1 makes every ledger append throw, "
       + "so no acceptance could be recorded"
     );
   }
+}
+
+export function createWireDispatcher(init: WireDispatcherInit): WireDispatcher {
+  assertWireCanServe();
 
   const framer = new NdjsonFramer();
 
