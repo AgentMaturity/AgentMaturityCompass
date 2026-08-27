@@ -55,6 +55,7 @@ import { delegateTool } from "./agent/delegateTool.js";
 import { DEFAULT_MAX_DELEGATION_DEPTH } from "./agent/delegationIdentity.js";
 import { parseDelegationScope } from "./agent/delegationScope.js";
 import { prepareSkillTurn } from "./skills/skillTurn.js";
+import { resolvePreset, type AgentPreset } from "./presets/agentPresets.js";
 import { IN_PROCESS_PROVIDER, delegationTurnOptions, resolveForeignRunner } from "./agent/providers/delegationProviders.js";
 import type { SubagentRunner } from "./agent/subagentSpawn.js";
 import { listAllowedTools } from "./toolhub/toolhubValidators.js";
@@ -95,6 +96,7 @@ interface RunOptions {
   delegate?: boolean;
   maxDelegationDepth?: string;
   delegateScope?: string;
+  preset?: string;
   delegateProvider?: string;
   delegateTimeout?: string;
   provider?: string;
@@ -235,7 +237,17 @@ const DEFAULT_CREDENTIAL_REFS: Readonly<Record<string, string>> = Object.freeze(
 });
 
 /** Build the route the operator asked for, or explain why it cannot be built. */
-function routeFor(io: AgentLoopCliIo, providerId: string, options: RunOptions): LlmRouteConfig | null {
+/**
+ * `model` is passed in rather than read from `options`, so a preset can supply
+ * it: the effective value is decided once, at the call site, alongside every
+ * other flag-then-preset-then-default fallback.
+ */
+function routeFor(
+  io: AgentLoopCliIo,
+  providerId: string,
+  options: RunOptions,
+  model: string | undefined
+): LlmRouteConfig | null {
   if (providerId === STUB_PROVIDER_ID) return stubProviderRoute();
   const adapter = providerId === "openai" ? openaiAdapter : providerId === "anthropic" ? anthropicAdapter : null;
   if (adapter === null) {
@@ -248,7 +260,7 @@ function routeFor(io: AgentLoopCliIo, providerId: string, options: RunOptions): 
     io.fail();
     return null;
   }
-  const model = options.model;
+  // `model` is a parameter now; see the note above.
   if (model === undefined) {
     io.error(chalk.red(`--model is required for provider ${providerId}`));
     io.fail();
@@ -359,6 +371,10 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
     )
     .option("--delegate-timeout <ms>", "how long a foreign delegate may run before it is killed")
     .option(
+      "--preset <id>",
+      "compose this run from a signed preset in .amc/agents.yaml. Explicit flags override it."
+    )
+    .option(
       "--delegate-scope <classes>",
       "comma-separated action classes a delegate may invoke, e.g. READ_ONLY,WRITE_LOW. "
       + "Tools outside them are withheld from the child. Default: unrestricted."
@@ -380,6 +396,24 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
     )
     .option("--json", "Output as JSON")
     .action(async (promptParts: string[], opts: RunOptions) => {
+      // Resolved FIRST, so every flag default below can fall back to it. A
+      // preset is signed policy: an unverifiable one composes nothing, for the
+      // same reason an unverifiable schedule runs nothing.
+      let preset: AgentPreset | undefined;
+      if (opts.preset !== undefined) {
+        const resolved = resolvePreset(process.cwd(), opts.preset);
+        if (!resolved.ok) {
+          io.error(chalk.red(resolved.reason));
+          io.fail();
+          return;
+        }
+        preset = resolved.preset;
+        // Said out loud. A run whose model, tool mode or approval gate came from
+        // a file the operator wrote last month should say so, or the behaviour
+        // has no visible cause.
+        io.log(chalk.dim(`composed from preset "${preset.id}": ${preset.description}`));
+      }
+
       const rawPrompt = promptParts.join(" ").trim();
       // `/name` is resolved BEFORE the turn is composed, because
       // `runComposedTurn` assembles the system prompt once at the top and
@@ -401,9 +435,14 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
         io.fail();
         return;
       }
-      const providerId = opts.provider ?? STUB_PROVIDER_ID;
-      const maxTokens = integerOption(io, "--max-tokens", opts.maxTokens, 1024);
-      const maxSteps = integerOption(io, "--max-steps", opts.maxSteps, 8);
+      // PRECEDENCE, uniformly: the flag the operator typed now, then the preset
+      // they wrote earlier, then the built-in default. Both are the operator --
+      // one wrote a signed file, one typed a command -- so this is recency, not
+      // a trust ranking, and the preset line above says which run was composed
+      // from what.
+      const providerId = opts.provider ?? preset?.providerId ?? STUB_PROVIDER_ID;
+      const maxTokens = integerOption(io, "--max-tokens", opts.maxTokens, preset?.maxTokens ?? 1024);
+      const maxSteps = integerOption(io, "--max-steps", opts.maxSteps, preset?.maxSteps ?? 8);
       const failFirst = integerOption(io, "--fail-first", opts.failFirst, 0);
       const thinkMs = integerOption(io, "--think-ms", opts.thinkMs, 0);
       const cancelAfter = integerOption(io, "--cancel-after", opts.cancelAfter, 0);
@@ -445,7 +484,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
       ) {
         return;
       }
-      const route = routeFor(io, providerId, opts);
+      const route = routeFor(io, providerId, opts, opts.model ?? preset?.model);
       if (route === null) return;
       const gate = approvalGateFor(io, opts);
       if (gate === null) return;
@@ -462,7 +501,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
       // `echo` stays the stub-route default: spending an operator's tokens to
       // exercise the real toolset is not a default anyone would choose, and the
       // echo tool exists precisely to make a multi-step turn observable.
-      const toolMode = opts.tools ?? (providerId === STUB_PROVIDER_ID ? "echo" : "none");
+      const toolMode = opts.tools ?? preset?.tools ?? (providerId === STUB_PROVIDER_ID ? "echo" : "none");
       const wantsDelegation = opts.delegate === true;
       if (!wantsDelegation && opts.delegateProvider !== undefined) {
         // A flag configuring a capability nobody asked for does nothing, and the
@@ -471,7 +510,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
         io.fail();
         return;
       }
-      const dispatchMode = opts.toolMode === "code" ? "code" as const : "native" as const;
+      const dispatchMode = (opts.toolMode ?? preset?.toolMode) === "code" ? "code" as const : "native" as const;
       let toolSeam: AgentToolSeam | null = null;
       let grantDelegation: ((capability: SubagentCapability) => void) | null = null;
       let foreignRunner: SubagentRunner | null = null;
@@ -602,7 +641,9 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
           // CLAUDE.md in as runtime context. A hardcoded string here — what this
           // command sent before P3.3 — was an agent with no idea where it was.
           promptProfile: {
-            ...(opts.persona === undefined ? {} : { persona: opts.persona }),
+            ...((opts.persona ?? preset?.persona) === undefined
+              ? {}
+              : { persona: (opts.persona ?? preset?.persona) as string }),
             // EXTRA, not `contextPlugins`. That option REPLACES the defaults,
             // and the default is the AGENTS.md / CLAUDE.md loader -- so passing
             // skills through it would drop the workspace's own instructions

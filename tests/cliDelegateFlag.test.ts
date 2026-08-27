@@ -1,4 +1,4 @@
-import { mkdtempSync, rmSync, realpathSync } from "node:fs";
+import { mkdtempSync, rmSync, realpathSync, writeFileSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { Command } from "commander";
@@ -11,6 +11,8 @@ import { initToolsConfig, loadToolsConfig } from "../src/toolhub/toolhubValidato
 import { registerAgentCommands, type AgentLoopCliIo } from "../src/cli-agent-commands.js";
 import { DEFAULT_MAX_DELEGATION_DEPTH } from "../src/agent/delegationIdentity.js";
 import { delegationTurnOptions } from "../src/agent/providers/delegationProviders.js";
+import { initPresets, presetsPath, savePresets } from "../src/presets/agentPresets.js";
+import { STUB_PROVIDER_ID, STUB_PROVIDER_MODEL } from "../src/agent/stubProvider.js";
 
 /**
  * `amc agent-loop run --delegate`, end to end (P6.1a).
@@ -350,5 +352,92 @@ describe("the delegation options a run is given", () => {
     expect(delegationTurnOptions({ grant, maxDepth: 3, scope: ["READ_ONLY"] }).scope)
       .toEqual(["READ_ONLY"]);
     expect("scope" in delegationTurnOptions({ grant, maxDepth: 3 })).toBe(false);
+  });
+});
+
+describe("a preset composes the run", () => {
+  it("applies the preset's settings and says which preset it used", async () => {
+    process.chdir(dir);
+    initPresets(dir);
+    savePresets(dir, [{
+      id: "reviewer",
+      description: "a read-only reviewer",
+      model: STUB_PROVIDER_MODEL,
+      providerId: STUB_PROVIDER_ID,
+      maxSteps: 3,
+      maxTokens: 512
+    }]);
+    const { program, captured } = programWith();
+
+    await run(program, argvFor(["--preset", "reviewer", "--json"]));
+
+    expect(captured.failures).toEqual([]);
+    expect(captured.out.join("\n"), "names the preset it composed from")
+      .toContain("reviewer");
+
+    // And APPLIED it. Reporting the preset is not the same as composing from
+    // it -- mutation testing showed the difference: removing the preset's own
+    // fallback left every other assertion green, because they only observed the
+    // line the CLI prints.
+    const db = new Database(join(dir, ".amc", "evidence.sqlite"), { readonly: true });
+    const header = db
+      .prepare("SELECT meta_json FROM evidence_events WHERE event_type = 'request/header' AND session_id = ?")
+      .get(sessionIdFrom(captured)) as { meta_json: string };
+    db.close();
+    const meta = JSON.parse(header.meta_json) as Record<string, unknown>;
+    // `maxTokens`, not `model`: the stub route ignores the model entirely
+    // (`stubProviderRoute()` takes none), so asserting on it could not tell an
+    // applied preset from an ignored one. `max_tokens` reaches the request
+    // params verbatim and the default is 1024, so 512 can only have come from
+    // the preset.
+    const params = meta["params"] as Record<string, unknown> | undefined;
+    expect(params?.["max_tokens"], "the preset's maxTokens reached the request").toBe(512);
+  });
+
+  it("lets an explicit flag win over the preset", async () => {
+    // Both are the operator: one wrote the file, one typed the command. The
+    // thing typed now is the more recent instruction, and the run says where
+    // each setting came from so neither is a surprise.
+    process.chdir(dir);
+    initPresets(dir);
+    savePresets(dir, [{
+      id: "reviewer",
+      description: "d",
+      model: "a-model-the-flag-overrides",
+      providerId: STUB_PROVIDER_ID
+    }]);
+    const { program, captured } = programWith();
+
+    await run(program, argvFor(["--preset", "reviewer", "--model", STUB_PROVIDER_MODEL, "--json"]));
+
+    expect(captured.failures).toEqual([]);
+    expect(captured.errors.join("\n")).not.toContain("a-model-the-flag-overrides");
+  });
+
+  it("refuses an unknown preset, naming what exists", async () => {
+    process.chdir(dir);
+    initPresets(dir);
+    savePresets(dir, [{ id: "reviewer", description: "d", model: "m", providerId: "p" }]);
+    const { program, captured } = programWith();
+
+    await run(program, argvFor(["--preset", "auditor", "--json"]));
+
+    expect(captured.errors.join("\n")).toContain("auditor");
+    expect(captured.errors.join("\n")).toContain("reviewer");
+    expect(captured.failures).not.toEqual([]);
+  });
+
+  it("refuses when the preset file does not verify", async () => {
+    process.chdir(dir);
+    initPresets(dir);
+    savePresets(dir, [{ id: "reviewer", description: "d", model: "m", providerId: "p" }]);
+    const path = presetsPath(dir);
+    writeFileSync(path, `${readFileSync(path, "utf8")}\n# tampered\n`, "utf8");
+    const { program, captured } = programWith();
+
+    await run(program, argvFor(["--preset", "reviewer", "--json"]));
+
+    expect(captured.errors.join("\n")).toMatch(/signature/i);
+    expect(captured.failures).not.toEqual([]);
   });
 });
