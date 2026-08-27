@@ -13,7 +13,7 @@
 
 import { readFileSync } from "node:fs";
 import { resolve, extname } from "node:path";
-import { execSync } from "node:child_process";
+import { spawnSync } from "node:child_process";
 
 export type McpSecurityLevel = "L0" | "L1" | "L2" | "L3" | "L4" | "L5";
 export type McpFindingSeverity = "CRITICAL" | "HIGH" | "MEDIUM" | "LOW" | "INFO";
@@ -102,16 +102,40 @@ const RISKY_TOOL_NAMES = [
 function loadContent(pathOrUrl: string): { content: string; isUrl: boolean } {
   // Simple URL detection
   if (pathOrUrl.startsWith("http://") || pathOrUrl.startsWith("https://")) {
-    // Synchronous URL fetch using execSync (child_process is already imported above)
+    // NO SHELL. This built a `curl` command STRING and ran it through
+    // `execSync`, quoting the URL with `JSON.stringify` -- which produces DOUBLE
+    // quotes, and `sh` expands `$(...)` and backticks inside those. The quoting
+    // looked like escaping and was not: a URL of the form
+    // `https://host/$(command)` executed `command`. Demonstrated before fixing,
+    // in tests/mcpAnalyzerUrlInjection.test.ts.
+    //
+    // `spawnSync` with an argv ARRAY and no `shell` option hands the URL to
+    // curl as one argument that no shell ever parses. The parse below rejects
+    // anything that is not http(s) before that, so a caller cannot reach curl
+    // with `file://` or a scheme it would follow somewhere unintended.
+    let parsed: URL;
     try {
-      const result = execSync(
-        `curl -sS --max-time 10 --max-filesize 1048576 -L ${JSON.stringify(pathOrUrl)}`,
-        { encoding: "utf8", timeout: 15_000 }
-      );
-      return { content: result, isUrl: true };
-    } catch (err) {
-      throw new Error(`Cannot fetch MCP config from URL ${pathOrUrl}: ${err instanceof Error ? err.message : String(err)}`);
+      parsed = new URL(pathOrUrl);
+    } catch {
+      throw new Error(`Cannot fetch MCP config: ${pathOrUrl} is not a valid URL`);
     }
+    if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
+      throw new Error(`Cannot fetch MCP config: ${parsed.protocol} is not a supported scheme`);
+    }
+
+    const fetched = spawnSync(
+      "curl",
+      ["-sS", "--max-time", "10", "--max-filesize", "1048576", "-L", parsed.toString()],
+      { encoding: "utf8", timeout: 15_000 }
+    );
+    if (fetched.status !== 0 || fetched.error) {
+      throw new Error(
+        `Cannot fetch MCP config from URL ${parsed.toString()}: ${
+          fetched.error?.message ?? ((fetched.stderr || "").trim() || `curl exited ${String(fetched.status)}`)
+        }`
+      );
+    }
+    return { content: fetched.stdout, isUrl: true };
   }
 
   const resolved = resolve(pathOrUrl);
