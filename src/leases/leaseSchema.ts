@@ -9,7 +9,13 @@ export const leaseScopeSchema = z.enum([
   "hook:control",
   "governor:check",
   "receipt:verify",
-  "diagnostic:self-run"
+  "diagnostic:self-run",
+  // Submitting work over the NDJSON wire (../wire/). Deliberately its own scope:
+  // none of the others names this capability, and reusing one would grant wire
+  // submission to every lease that already holds it. Because it is in no default
+  // grant set (bridgeAuth.ts, studioState.ts, setupWizard.ts), no existing
+  // credential can reach the wire until an operator mints a lease naming it.
+  "wire:submit"
 ]);
 
 export const leasePayloadSchema = z.object({
