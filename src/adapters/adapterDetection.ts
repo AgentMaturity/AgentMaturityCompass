@@ -1,4 +1,5 @@
 import { spawnSync } from "node:child_process";
+import { stripProviderKeys } from "../utils/providerKeys.js";
 import { accessSync, constants as fsConstants } from "node:fs";
 import { delimiter, isAbsolute, join } from "node:path";
 import type { AdapterDefinition } from "./adapterTypes.js";
@@ -22,8 +23,26 @@ interface ProbeResult {
   errorCode: string | null;
 }
 
+/**
+ * Ask an UNVETTED binary its version, without handing it anything.
+ *
+ * The candidates are bare names resolved off PATH (`claude`, `codex`, `sh`), so
+ * whatever answers is whatever PATH says it is. `amc adapters list` probes the
+ * whole builtin catalogue in one command, which makes this the widest
+ * foreign-binary surface in the product.
+ *
+ * The fence is the same one `probeBinaryVersion` in ../ledger/monitor.ts already
+ * documents: strip the provider keys, and give the probe no stdin it could read
+ * from. This function had neither, so a probe leaked every provider key in the
+ * environment to a program AMC had not yet identified.
+ */
 function probeVersion(command: string, args: string[], timeoutMs: number): ProbeResult {
-  const out = spawnSync(command, args, { encoding: "utf8", timeout: timeoutMs });
+  const out = spawnSync(command, args, {
+    encoding: "utf8",
+    env: stripProviderKeys(process.env),
+    timeout: timeoutMs,
+    stdio: ["ignore", "pipe", "pipe"]
+  });
   const merged = `${out.stdout ?? ""}${out.stderr ?? ""}`.trim();
   const error = out.error as NodeJS.ErrnoException | undefined;
   const errorCode = error?.code ?? null;
