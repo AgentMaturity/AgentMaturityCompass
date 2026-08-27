@@ -32,11 +32,18 @@ export const handoffPacketSchema = z.object({
   stopConditions: z.array(z.string()),
   contextHash: z.string(),
   evidenceSnapshot: z.array(z.string()),
-  trustState: z.object({
-    level: z.number(),
-    confidence: z.number(),
-    integrityIndex: z.number(),
-  }),
+  // Nullable, and null is the honest default. Nothing in AMC computes a trust
+  // state for a handoff, and the previous default -- a zero-filled object --
+  // was rendered under a `## Trust State` heading as `- Integrity Index: 0`,
+  // which reads as a measured score of zero rather than as no measurement.
+  // Older packets carrying the zero object still parse.
+  trustState: z
+    .object({
+      level: z.number(),
+      confidence: z.number(),
+      integrityIndex: z.number(),
+    })
+    .nullable(),
   delegationScope: z.array(z.string()),
   ownershipTransfer: z.object({
     fromOwnerAgentId: z.string().min(1),
@@ -267,7 +274,7 @@ export function createHandoffPacket(
     stopConditions: params.stopConditions ?? [],
     contextHash: params.contextHash ?? sha256Hex(Buffer.from(params.goal, "utf8")),
     evidenceSnapshot: params.evidenceSnapshot ?? [],
-    trustState: params.trustState ?? { level: 0, confidence: 0, integrityIndex: 0 },
+    trustState: params.trustState ?? null,
     delegationScope,
     ownershipTransfer,
     dependencyStatuses,
@@ -576,9 +583,13 @@ export function renderHandoffPacketMarkdown(packet: HandoffPacket): string {
     packet.nextAction || "(none)",
     "",
     `## Trust State`,
-    `- Level: ${packet.trustState.level}`,
-    `- Confidence: ${packet.trustState.confidence}`,
-    `- Integrity Index: ${packet.trustState.integrityIndex}`,
+    ...(packet.trustState === null
+      ? ["- not measured (no AMC path computes a trust state for a handoff)"]
+      : [
+          `- Level: ${packet.trustState.level}`,
+          `- Confidence: ${packet.trustState.confidence}`,
+          `- Integrity Index: ${packet.trustState.integrityIndex}`,
+        ]),
     "",
   ];
 

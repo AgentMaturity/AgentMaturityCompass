@@ -19,7 +19,8 @@ import {
   LOOP_PROVIDER,
   scriptedAdapter,
   silentTransport,
-  textStep
+  textStep,
+  toolStep
 } from "./helpers/agentLoopHarness.js";
 import type { LoopEventRecord } from "../src/session/loopEventMeta.js";
 
@@ -218,5 +219,58 @@ describe("the delegation is announced and accounted for, against a real run", ()
       .toBe("child-session-e2e");
     expect(completedMeta["packetId"], "joined to its announcement").toBe(startedMeta["packetId"]);
     expect(completedMeta["settledAs"]).toBe("reported");
+  });
+});
+
+describe("a child is a leaf", () => {
+  it("is not offered `delegate`, so a chain cannot reach depth 2", async () => {
+    // The kernel builds its runner with `createDriverRunner({workspace, makeLlm,
+    // route, systemPrompt, harnessVersion, compositionDigest, policyDigest})`
+    // (src/kernel/agentLoopRunner.ts:394) and passes NO `grantDelegation`. The
+    // option exists and `subagentRunner.ts` honours it, but no production caller
+    // sets it — so every child is a leaf and the effective delegation ceiling is
+    // 1, whatever `--max-delegation-depth` says.
+    //
+    // This test is the coupling. `runnerFor` below mirrors the kernel's call
+    // exactly; the day someone wires onward delegation, this fails and the
+    // operator-facing ceiling in src/cli-agent-commands.ts must be revisited
+    // with it.
+    const dir = workspace();
+    const parentSession = new SessionService(dir);
+    parentSession.open({
+      agentId: "payments-agent", harnessVersion: "3.2.0", compositionDigest: "c", policyDigest: "p"
+    });
+
+    const outcome = await spawnSubagent({
+      workspace: dir,
+      parent: rootIdentity("payments-agent"),
+      request: { runAs: "researcher", goal: "delegate this onward" },
+      session: { recordLoopEvent: (r) => parentSession.recordLoopEvent(r) },
+      runner: runnerFor(dir, [
+        toolStep("call-1", "delegate", JSON.stringify({ runAs: "grandchild", goal: "g" })),
+        textStep("I could not delegate.")
+      ]),
+      mintSessionId: () => "child-leaf"
+    });
+    parentSession.close({ reason: "completed" });
+
+    expect(outcome.ok, outcome.ok ? "" : outcome.reason).toBe(true);
+
+    // The child's own log is the evidence: it asked for `delegate` and the seam
+    // had no such tool to give it.
+    const childRows = sessionRows(dir, "child-leaf");
+    const toolRows = childRows.filter((r) => r.event_type.startsWith("tool/"));
+    expect(toolRows.length, "the child really did try a tool call").toBeGreaterThan(0);
+    const call = toolRows.find((r) => r.event_type === "tool/call");
+    const result = toolRows.find((r) => r.event_type === "tool/result");
+    expect(JSON.parse(call?.meta_json ?? "{}")["toolName"], "the child asked to delegate")
+      .toBe("delegate");
+    expect(JSON.parse(result?.meta_json ?? "{}")["denied"], "and was refused it")
+      .toBe(true);
+
+    // And no second-level delegation was ever announced anywhere.
+    const grandchild = sessionRows(dir, "child-leaf")
+      .filter((r) => r.event_type === "agent_delegation_started");
+    expect(grandchild, "a child cannot start a delegation of its own").toEqual([]);
   });
 });

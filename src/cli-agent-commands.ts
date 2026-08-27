@@ -468,7 +468,19 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
           // operator cannot see is one they cannot check. It is also the only
           // place the parsed depth becomes observable, so a build that dropped
           // the operator's value and used the default would say so here.
-          io.log(chalk.dim(`delegation is offered, bounded to depth ${maxDelegationDepth}`));
+          //
+          // The second clause is not padding. `--max-delegation-depth 3` is
+          // today behaviourally identical to 1: the kernel builds its child
+          // runner without `grantDelegation`, so no child is ever offered
+          // `delegate` and no chain reaches depth 2. Printing the configured
+          // number alone would tell an operator chains may run three deep when
+          // they cannot. Pinned by "a child is a leaf" in
+          // tests/subagentRunnerEndToEnd.test.ts, which fails the day onward
+          // delegation is wired and forces this line to be revisited with it.
+          io.log(chalk.dim(
+            `delegation is offered, chains bounded at depth ${maxDelegationDepth}`
+            + (maxDelegationDepth > 1 ? " (children cannot delegate yet, so today's ceiling is 1)" : "")
+          ));
         }
         // The toolset holds one evidence handle for the run; release it when
         // the process ends rather than leaking a SQLite handle per agent.

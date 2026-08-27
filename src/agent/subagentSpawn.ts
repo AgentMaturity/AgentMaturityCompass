@@ -1,4 +1,5 @@
 import { mintDelegationPacket, UnsignablePacketError } from "../fleet/delegationPacket.js";
+import { removeHandoffPacket } from "../fleet/handoffPacket.js";
 import {
   DEFAULT_MAX_DELEGATION_DEPTH,
   delegateTo,
@@ -192,14 +193,25 @@ export async function spawnSubagent(init: SpawnSubagentInit): Promise<SubagentOu
   // 3. Announce, before the child runs. An unmatched `started` is the honest
   //    signature of a parent that died mid-delegation.
   const childSessionId = init.mintSessionId();
-  init.session.recordLoopEvent({
-    kind: "delegation-started",
-    childRunAs: identity.runAs,
-    childSessionId,
-    governedAs: identity.governedAs,
-    depth: identity.depth,
-    packetId
-  });
+  try {
+    init.session.recordLoopEvent({
+      kind: "delegation-started",
+      childRunAs: identity.runAs,
+      childSessionId,
+      governedAs: identity.governedAs,
+      depth: identity.depth,
+      packetId
+    });
+  } catch (error) {
+    // The packet is minted BEFORE the announcement, so a session that refuses
+    // the row would otherwise leave a signed authorisation on disk for a
+    // delegation the log never mentions — the one case that breaks this
+    // function's promise that an unannounced delegation writes nothing at all.
+    // A parent session closed mid-turn is the realistic cause, and a long-lived
+    // out-of-process child is what makes it likely.
+    removeHandoffPacket(init.workspace, packetId);
+    throw error;
+  }
 
   // 4. Run. THE governance line: the child is toolset-scoped as its root.
   let result: SubagentRunResult;
@@ -244,6 +256,15 @@ export async function spawnSubagent(init: SpawnSubagentInit): Promise<SubagentOu
   // unmatched `delegation-started` — the honest signature of a delegation nobody
   // ended, which is exactly what a reader needs to see.
   const continuation = result.continuation;
+  if (!result.ok && continuation !== undefined) {
+    // A runner may hold a live child and still report a failure — an
+    // out-of-process one reaches this the moment a child starts and then fails.
+    // In-process it is unreachable, because `createDriverRunner` returns early
+    // when its first drain fails and never pairs the two. Without this the
+    // process was dropped, never closed, while the delegation was accounted for
+    // as finished.
+    continuation.close();
+  }
   if (result.ok && continuation !== undefined) {
     let closed = false;
     const handle: SubagentHandle = {
@@ -272,12 +293,22 @@ export async function spawnSubagent(init: SpawnSubagentInit): Promise<SubagentOu
 
   // The cases that most need an account are the ones where the child never got
   // to report, so this is unconditional for every non-continuable child.
-  account(
-    result.ok ? "reported" : "failed",
-    result.ok ? "child reported" : (result.reason ?? "child did not report a reason")
-  );
+  // A child that produced no words did not report, whatever its runner said.
+  //
+  // This is the chokepoint's job rather than any one runner's, because every
+  // runner folds the child's answer out of the log its own way and a fold that
+  // silently yields nothing looks exactly like a well-behaved silent child. The
+  // parent would then quote an empty string to its model as the delegate's
+  // answer. Checked here so an out-of-process provider cannot ship green and
+  // empty.
+  const reported = result.ok && result.text.trim().length > 0;
+  const reason = result.ok
+    ? (reported ? "child reported" : "child produced no output")
+    : (result.reason ?? "child did not report a reason");
 
-  return result.ok
+  account(reported ? "reported" : "failed", reason);
+
+  return reported
     ? { ok: true, identity, packetId, childSessionId, childText: result.text }
-    : { ok: false, reason: result.reason ?? "child did not report a reason", packetId };
+    : { ok: false, reason, packetId };
 }
