@@ -63,7 +63,13 @@ export type EvidenceEventType =
   // is what explains why a single step can hold two `request/header` rows: the
   // step number does not advance across a retry, so without this row the log
   // would show two requests for one step and no statement of why.
-  | "loop/retry";
+  | "loop/retry"
+  // Surface compaction (plan P6.3). A `loop/` row because it is the loop's own
+  // control decision, and the ONLY session row whose surface op is `replace`:
+  // its payload is the shortened text the model reads from then on, which is
+  // what keeps the SurfacePartRef invariant true — every projected part is the
+  // payload of exactly one logged event, including a compacted one.
+  | "loop/compact";
 
 export type RiskTier = "low" | "med" | "high" | "critical";
 

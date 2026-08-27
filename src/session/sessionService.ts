@@ -133,6 +133,16 @@ export class PreparedRequest {
   }
 }
 
+/** A session row's `toolCallId`, when its meta carries one. */
+function metaToolCallId(row: EvidenceEvent): string | null {
+  try {
+    const meta = JSON.parse(row.meta_json) as Record<string, unknown>;
+    return typeof meta["toolCallId"] === "string" ? meta["toolCallId"] : null;
+  } catch {
+    return null;
+  }
+}
+
 export class SessionService {
   readonly workspace: string;
 
@@ -531,6 +541,89 @@ export class SessionService {
   // cannot reach the model in one form and the evidence in another. The full
   // bytes' sha256 rides in `spilled` inside meta_json, hence inside event_hash,
   // hence under writer_sig: spilling relocates the bytes, never the commitment.
+  /**
+   * Shorten a recorded tool result on the SURFACE, leaving the log untouched.
+   *
+   * The only writer of a `replace` surface op. The op has existed since the
+   * vocabulary was written and `surfaceProjection.ts` has always handled it;
+   * nothing emitted one until compaction needed it.
+   *
+   * WHY THIS DOES NOT REWRITE ANYTHING. The chain is append-only, so this is a
+   * NEW row like any other — one whose surface op happens to point the
+   * `tool_result:<id>` slot at different bytes. The original row is still there,
+   * still hashed, still in the chain. An auditor replaying the log sees the full
+   * output; the model, from here on, sees the replacement. That is the whole
+   * difference between compaction and editing history.
+   *
+   * The replacement is this event's OWN payload, because it has to be:
+   * `SurfacePartRef.sha256` equals the row's `payload_sha256` by construction,
+   * so text that existed only in the projection could not be pointed at.
+   */
+  compactToolResult(params: {
+    readonly toolCallId: string;
+    readonly replacement: string;
+    /**
+     * How many bytes the caller measured for what it is replacing.
+     *
+     * Declared rather than read here, because session payloads are blob-backed:
+     * `payload_inline` is null even for a two-byte row, so a size check against
+     * it could never fire. A check that cannot fire is worse than no check, and
+     * the pruner deciding WHAT to compact has already measured this.
+     */
+    readonly replacedBytes: number;
+    readonly reason: string;
+  }): SessionEventRef {
+    this.ensureUsable();
+    const slot = `tool_result:${params.toolCallId}`;
+
+    // `replace` on a slot the projection does not hold is a silent no-op, so
+    // without this a caller would be told a compaction happened while the model
+    // saw no change. Read from this session's own rows rather than the
+    // projection handle, which exposes the rendered conversation and not the
+    // slots replace targets.
+    const rows = this.readEvents();
+    const current = [...rows]
+      .reverse()
+      .find((row) =>
+        (row.event_type === "tool/result" || row.event_type === "loop/compact")
+        && metaToolCallId(row) === params.toolCallId);
+    if (current === undefined) {
+      throw new Error(
+        `cannot compact ${params.toolCallId}: no tool result for it is on this session's surface`
+      );
+    }
+
+    const replacement = Buffer.from(params.replacement, "utf8");
+    if (replacement.byteLength >= params.replacedBytes) {
+      // Compaction that grows the surface is not compaction, and allowing it
+      // would spend a signed row and a slice of the context window making things
+      // worse.
+      throw new Error(
+        `refusing to compact ${params.toolCallId}: the replacement is ${replacement.byteLength} bytes, `
+        + `not smaller than the ${params.replacedBytes} it would replace`
+      );
+    }
+
+    const payloadSha256 = sha256Hex(replacement);
+    const turn = this.currentTurn;
+    const step = this.currentStep;
+    return this.appendSessionEvent({
+      eventType: "loop/compact",
+      typeMeta: {
+        turn,
+        step,
+        toolCallId: params.toolCallId,
+        reason: params.reason,
+        replacedBytes: params.replacedBytes,
+        replacementBytes: replacement.byteLength
+      },
+      surface: { op: "replace", slot, part: { kind: "tool_result", sha256: payloadSha256 } },
+      turn,
+      step,
+      payload: replacement
+    });
+  }
+
   recordToolResult(result: ToolResultInput): SessionEventRef {
     this.ensureUsable();
     const turn = this.currentTurn;

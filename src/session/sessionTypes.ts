@@ -7,7 +7,7 @@ import type { EvidenceEventType } from "../types.js";
 // contents (seq, prevSessionEventHash, surface op, synthetic flag) are as
 // tamper-evident as any other hashed field.
 
-// The 24 event types that make up the session spine. These are a strict
+// The event types that make up the session spine. These are a strict
 // superset added to EvidenceEventType; none of them may be added to
 // AUTO_INCIDENT_FALLBACK_EVENT_TYPES (ledger.ts) or every tool call would open
 // an incident.
@@ -37,7 +37,11 @@ export const SESSION_EVENT_TYPES: ReadonlySet<EvidenceEventType> = new Set<Evide
   // is not model-visible until a step claims it and records a `user/message`.
   "loop/inbox",
   "loop/cancel",
-  "loop/veto"
+  "loop/veto",
+  // The exception to the comment above: `loop/compact` carries surface op
+  // `replace`, because a compaction's whole purpose is to change what the model
+  // sees without changing what the log says.
+  "loop/compact"
 ]);
 
 // Sentinel value of SessionEnvelope.prevSessionEventHash at seq 0. A concrete
