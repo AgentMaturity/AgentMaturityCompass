@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { spawnSync } from "node:child_process";
 import { Readable } from "node:stream";
-import Ajv from "ajv";
+import { Ajv } from "ajv";
 import YAML from "yaml";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
 import { initApprovalPolicy } from "../src/approvals/approvalPolicyEngine.js";

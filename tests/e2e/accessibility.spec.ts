@@ -1,5 +1,5 @@
 import { test, expect } from './fixtures.js';
-import AxeBuilder from '@axe-core/playwright';
+import { AxeBuilder } from '@axe-core/playwright';
 import { INDEX_URL, LITE_URL, PLAYGROUND_URL } from './urls.js';
 
 test.describe('Accessibility', () => {

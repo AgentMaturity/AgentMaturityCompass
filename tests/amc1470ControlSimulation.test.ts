@@ -13,7 +13,7 @@ import type { IncomingMessage, ServerResponse } from "node:http";
 import { tmpdir } from "node:os";
 import { join, relative, resolve } from "node:path";
 import { Readable } from "node:stream";
-import Ajv from "ajv";
+import { Ajv } from "ajv";
 import YAML from "yaml";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
 import {

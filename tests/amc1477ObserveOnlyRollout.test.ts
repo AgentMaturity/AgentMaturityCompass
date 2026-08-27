@@ -4,7 +4,7 @@ import { mkdtempSync, readFileSync, rmSync, unlinkSync, writeFileSync } from "no
 import { tmpdir } from "node:os";
 import { basename, join } from "node:path";
 import { Readable } from "node:stream";
-import Ajv from "ajv";
+import { Ajv } from "ajv";
 import YAML from "yaml";
 import { afterAll, afterEach, describe, expect, test } from "vitest";
 import { handleApiRoute } from "../src/api/index.js";

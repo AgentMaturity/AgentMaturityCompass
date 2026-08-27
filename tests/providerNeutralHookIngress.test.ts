@@ -24,7 +24,7 @@ import {
   observedHookReceiptOpenApiSchema
 } from "../src/setup/integrationScaffold.js";
 import YAML from "yaml";
-import Ajv from "ajv";
+import { Ajv } from "ajv";
 
 const roots: string[] = [];
 
