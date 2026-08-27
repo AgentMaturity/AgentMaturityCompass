@@ -49,10 +49,10 @@ describe("GAP-0024 Cua public methodology versioning", () => {
     const manifest = getPublicMethodologyManifest();
     const receipt = buildDiagnosticMethodologyVersioningReceipt(manifest);
 
-    expect(AMC_PUBLIC_METHODOLOGY_VERSION).toBe("2026.08.25-r224");
-    expect(manifest.changelog[4]?.summary).toContain("Cua-style computer-use benchmark public-methodology");
-    expect(manifest.changelog[4]?.migration).toContain("Reports generated under 2026.06.25-r219");
-    expect(manifest.changelog[5]?.summary).toContain("Lunary-style public-methodology");
+    expect(AMC_PUBLIC_METHODOLOGY_VERSION).toBe("2026.08.27-r225");
+    expect(manifest.changelog[5]?.summary).toContain("Cua-style computer-use benchmark public-methodology");
+    expect(manifest.changelog[5]?.migration).toContain("Reports generated under 2026.06.25-r219");
+    expect(manifest.changelog[6]?.summary).toContain("Lunary-style public-methodology");
     expect(receipt.status).toBe("ready");
     expect(receipt.sourceRef).toContain(CUA_COMPUTER_USE_SOURCE_REVIEW_REF);
     expect(receipt.requiredAuditFields).toEqual(expect.arrayContaining([

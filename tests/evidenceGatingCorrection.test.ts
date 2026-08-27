@@ -5,7 +5,7 @@ import { AMC_PUBLIC_METHODOLOGY_VERSION } from "../src/methodology/publicMethodo
 import type { Gate } from "../src/types.js";
 
 /**
- * The evidence-gating correction (ADR-0022, methodology 2026.08.25-r224).
+ * The evidence-gating correction (ADR-0022, methodology 2026.08.27-r225).
  *
  * Two behaviours the published methodology described and the code did not
  * implement:
@@ -213,6 +213,6 @@ describe("the methodology version records the change", () => {
     // A published methodology whose behaviour changes without its version
     // changing makes two different scores indistinguishable to a consumer.
     expect(AMC_PUBLIC_METHODOLOGY_VERSION).not.toBe("2026.07.29-r223");
-    expect(AMC_PUBLIC_METHODOLOGY_VERSION).toBe("2026.08.25-r224");
+    expect(AMC_PUBLIC_METHODOLOGY_VERSION).toBe("2026.08.27-r225");
   });
 });

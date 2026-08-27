@@ -14,6 +14,14 @@ import {
   type SurfaceRole
 } from "./sessionTypes.js";
 import { TurnWindow } from "./turnWindow.js";
+
+/**
+ * The tier every natively-executed row carries.
+ *
+ * Exported so the claim has one name and one definition; see the note in
+ * `appendSessionEvent` for why it is `OBSERVED` and not `OBSERVED_HARDENED`.
+ */
+export const NATIVE_TRUST_TIER = "OBSERVED" as const;
 import type { RequestHeaderMeta } from "./requestHeaderMeta.js";
 import { buildRequestOutcomeMeta, requestOutcomeEventType } from "./requestOutcomeMeta.js";
 import type { RequestOutcomeParams } from "./requestOutcomeMeta.js";
@@ -705,7 +713,23 @@ export class SessionService {
       surface: spec.surface,
       synthetic: false
     };
-    const meta = embedEnvelope(spec.typeMeta, envelope);
+    // Every native row is evidence AMC captured itself, through its own
+    // instrumented loop and into a signed hash chain. `docs/SCORING_METHODOLOGY.md`
+    // grades tiers by verification method, and on that scale this is `OBSERVED` --
+    // at least as strong as the gateway-proxy interception the tier is named for.
+    //
+    // It is stated here, at the one private chokepoint every public recorder
+    // funnels through, so the claim covers the whole native spine rather than the
+    // call sites someone remembered. Before this, the spine wrote no tier at all
+    // and `trustTierFromMeta` read the absence back as `SELF_REPORTED` -- "the
+    // agent's own claims", 0.4x weight, filtered out of L4 and L5 entirely -- so
+    // AMC scored its own governed runs below a foreign CLI it merely watched.
+    //
+    // NOT `OBSERVED_HARDENED`: that is documented as sandbox execution with
+    // cryptographic attestation. The attestation is real; the sandbox is not
+    // (`SandboxRunner.run()` has no production call site), and awarding ourselves
+    // the top tier would trade one dishonest label for another.
+    const meta = embedEnvelope({ trustTier: NATIVE_TRUST_TIER, ...spec.typeMeta }, envelope);
     const input: SessionStoreAppendInput = {
       sessionId,
       runtime: this.runtime,

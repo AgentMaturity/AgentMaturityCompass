@@ -12,7 +12,46 @@ import { AMC_MATURITY_LEVELS } from "../score/maturityTaxonomy.js";
 
 export const AMC_PUBLIC_METHODOLOGY_ID = "amc-public-scoring-methodology";
 /**
- * Bumped for the evidence-gating correction (ADR-0022).
+ * Bumped for the evidence-tier correction.
+ *
+ * Three changes, and unlike r224 they do not all push one way.
+ *
+ * (1) Evidence AMC executes itself now carries `trustTier: "OBSERVED"`. The
+ * native spine wrote no tier at all, and an absent tier reads back as
+ * `SELF_REPORTED` -- "the agent's own claims", the weakest tier -- so AMC scored
+ * its own governed, hash-chained runs below a foreign CLI it merely watched, the
+ * reverse of what ADR-6 and docs/SCORING_METHODOLOGY.md describe. It is
+ * `OBSERVED` and not `OBSERVED_HARDENED`: the documented meaning of the top tier
+ * is sandbox execution with cryptographic attestation, and AMC has the
+ * attestation but not the sandbox.
+ *
+ * (2) `trustTier` is validated where it is written. It rides in free-form meta
+ * and the reader answers `SELF_REPORTED` for anything unrecognised, so a typo or
+ * a lower-case "observed" silently became the weakest tier at scoring time,
+ * arbitrarily far from the write that caused it.
+ *
+ * (3) Trace correlation now reads the event types `amc adapters run` actually
+ * writes (`agent_stdout`/`agent_stderr`) alongside the `stdout`/`stderr` that
+ * `wrap`/`supervise` write. The supported observation path previously
+ * contributed no traces at all, so its `correlationRatio` was structurally zero.
+ *
+ * (3) is the one that moves published numbers, in EITHER direction. A ratio
+ * below 0.8 caps AMC-1.7 at L2 and AMC-2.3, AMC-2.5 and AMC-3.3.1 at L3. An
+ * adapter-instrumented workspace whose receipts verify moves off zero and those
+ * caps lift, so it may score HIGHER. A workspace whose newly-counted adapter
+ * traces do not verify may cross below 0.8 for the first time and score LOWER.
+ * Both are corrections: the old ratio measured only part of the evidence.
+ *
+ * (1) does not by itself change any maturity number. Untagged evidence counts
+ * toward no question at any level under r224's strict binding, and the native
+ * spine tags none -- so its rows now carry the right tier and still score
+ * nothing. The tier is load-bearing elsewhere: `deriveTrustSummaryFromRun`
+ * derives the governor's trust tier from the observed COVERAGE RATIO, which owes
+ * nothing to question binding, so the three action rules requiring `OBSERVED`
+ * become satisfiable for natively-run agents that also meet their other
+ * conditions.
+ *
+ * Superseded rationale for r224 (the evidence-gating correction, ADR-0022):
  *
  * `requiredEvidenceTypes` now REQUIRES each named type to be present, where it
  * previously only filtered which events were counted — a gate naming
@@ -26,8 +65,8 @@ export const AMC_PUBLIC_METHODOLOGY_ID = "amc-public-scoring-methodology";
  * the earlier number counted evidence the methodology said it required and
  * evidence gathered for something else.
  */
-export const AMC_PUBLIC_METHODOLOGY_VERSION = "2026.08.25-r224";
-export const AMC_PUBLIC_METHODOLOGY_RELEASE_DATE = "2026-08-25";
+export const AMC_PUBLIC_METHODOLOGY_VERSION = "2026.08.27-r225";
+export const AMC_PUBLIC_METHODOLOGY_RELEASE_DATE = "2026-08-27";
 
 export const AMC_PUBLIC_METHODOLOGY_DOC = "docs/SCORING_METHODOLOGY.md";
 export const AMC_PUBLIC_METHODOLOGY_URL = "https://agentmaturity.co/methodology.html";
@@ -183,6 +222,25 @@ const BUILT_IN_PUBLIC_METHODOLOGY_QUESTION_SET_VERSIONS = [
 ] as const;
 
 const HISTORICAL_PUBLIC_METHODOLOGY_HASHES = new Map<string, ReadonlySet<string>>([
+  // r223 was missing here until r225 added it. The r224 bump backfilled nothing,
+  // so for one whole release every artifact issued under r223 verified as
+  // `{ok: false, status: "unknown"}` -- the badge said counterfeit when it was
+  // merely previous. Recovered by building the manifest from the r223 tree
+  // (f419839a) in a worktree rather than by guessing.
+  [
+    "2026.07.29-r223",
+    new Set([
+      "0dccbe4418933f32683b2ee72cb46f660c6d4b5ce2fd1021f73f9a09f87a11c3",
+      "3d0f873991e60496782701af3c17023ab87e88c6a3b45ea9b4f999a6d72819c7",
+    ]),
+  ],
+  [
+    "2026.08.25-r224",
+    new Set([
+      "ce5d0a44f6560663da646e149c036c27acd90b68bf5e8b2542fbcc5b179ec93f",
+      "5f9467a77211333719ff0136ebe774fdd7cfee5c643e8011ab65862e637a24ef",
+    ]),
+  ],
   [
     "2026.07.10-r222",
     new Set([
@@ -3409,6 +3467,12 @@ export function getPublicMethodologyManifest(questionSet?: DiagnosticQuestionSet
       // With literals here, `changelog[0].version === AMC_PUBLIC_METHODOLOGY_VERSION`
       // stops being a variable compared against itself and becomes a real gate:
       // bump the constant without writing an entry and the suite goes red.
+      {
+        version: "2026.08.27-r225",
+        date: "2026-08-27",
+        summary: "Corrects the trust tier of evidence AMC executes itself. The native agent loop wrote no trust tier at all, and an absent tier reads back as SELF_REPORTED, so AMC's own governed, hash-chained runs were graded as unverified agent claims while a foreign CLI observed through the gateway was graded OBSERVED — the reverse of the ordering docs/SCORING_METHODOLOGY.md describes. Native rows now carry OBSERVED; they do not carry OBSERVED_HARDENED, whose documented meaning is sandbox execution with cryptographic attestation. `trustTier` is now validated where it is written, so an unrecognised value fails at the write instead of silently becoming the weakest tier at scoring time. And trace correlation now reads the `agent_stdout`/`agent_stderr` events that `amc adapters run` writes, alongside the `stdout`/`stderr` that `wrap` and `supervise` write; the supported observation path previously contributed no traces and its correlation ratio was structurally zero. Scoring ranges, thresholds, maturity labels, and claim-eligibility rules are unchanged.",
+        migration: "Reports, badges, methodology receipts, and signed outputs generated under 2026.08.25-r224 remain historical artifacts and must not be rewritten. Re-score under 2026.08.27-r225 before comparing or publishing. Scores may move in EITHER direction, unlike r224. A correlation ratio below 0.8 caps AMC-1.7 at L2 and AMC-2.3, AMC-2.5 and AMC-3.3.1 at L3: a workspace observed through `amc adapters run` whose trace receipts verify moves off a structural zero and those caps lift, so it may score HIGHER, while a workspace whose newly-counted adapter traces do not verify may cross below 0.8 for the first time and score LOWER. Both are corrections rather than regressions — the r224 ratio measured only the evidence written by the deprecated wrap/supervise vocabulary. The trust-tier correction alone does not move any maturity number, because untagged evidence counts toward no question under r224's strict binding and the native spine tags none; it does raise observed evidence COVERAGE, which is what the governor derives its trust tier from, so action rules requiring OBSERVED become satisfiable for natively-run agents that also meet their other conditions. Outstanding badges issued under r224 remain verifiable by their embedded version and manifest hash, and should be re-issued before being presented as current."
+      },
       {
         version: "2026.08.25-r224",
         date: "2026-08-25",

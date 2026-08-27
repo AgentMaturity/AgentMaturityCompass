@@ -7,6 +7,7 @@ import {
   AMC_PUBLIC_METHODOLOGY_VERSION,
   AMC_PUBLIC_METHODOLOGY_RELEASE_DATE,
   getPublicMethodologyManifest,
+  verifyPublicMethodologyReference,
   getPublicMethodologyReference,
   renderPublicMethodologyMarkdown
 } from "../src/methodology/publicMethodology.js";
@@ -60,32 +61,40 @@ describe("public methodology manifest", () => {
     // itself. Bumping the version without writing an entry turns it red.
     expect(first.changelog[0]?.version).toBe(AMC_PUBLIC_METHODOLOGY_VERSION);
     expect(first.changelog[0]?.date).toBe(AMC_PUBLIC_METHODOLOGY_RELEASE_DATE);
-    expect(first.releaseDate).toBe("2026-08-25");
-    expect(first.changelog[0]).toMatchObject({ version: "2026.08.25-r224", date: "2026-08-25" });
-    expect(first.changelog[0]?.summary).toContain("requiredEvidenceTypes");
-    expect(first.changelog[0]?.migration).toContain("2026.07.29-r223");
-    expect(first.changelog[0]?.migration).toContain("may score LOWER");
-    expect(first.changelog[1]).toMatchObject({ version: "2026.07.29-r223", date: "2026-07-29" });
-    expect(first.changelog[1]?.summary).toContain("public badge methodology assurance hash");
-    expect(first.changelog[1]?.migration).toContain("2026.07.10-r222");
-    expect(first.changelog[1]?.migration).toContain("amc_methodology_assurance");
-    expect(first.changelog[2]).toMatchObject({ version: "2026.07.10-r222", date: "2026-07-10" });
-    expect(first.changelog[2]?.summary).toContain("canonical L0-L5 maturity taxonomy");
-    expect(first.changelog[2]?.migration).toContain("Reports generated under 2026.07.10-r221");
-    expect(first.changelog[3]?.summary).toContain("artifact validity from evidence readiness");
-    expect(first.changelog[3]?.migration).toContain("Reports generated under 2026.06.25-r220");
-    expect(first.changelog[4]?.summary).toContain("Cua-style computer-use benchmark public-methodology");
-    expect(first.changelog[4]?.migration).toContain("Reports generated under 2026.06.25-r219");
-    expect(first.changelog[5]?.summary).toContain("Lunary-style public-methodology");
-    expect(first.changelog[5]?.migration).toContain("Reports generated under 2026.06.25-r218");
+    expect(first.releaseDate).toBe("2026-08-27");
+    expect(first.changelog[0]).toMatchObject({ version: "2026.08.27-r225", date: "2026-08-27" });
+    expect(first.changelog[0]?.summary).toContain("trust tier");
+    expect(first.changelog[0]?.migration).toContain("2026.08.25-r224");
+    // r225 is the first entry whose corrections do not all push one way, so the
+    // migration text must say so in both directions rather than inheriting
+    // r224's "may score LOWER" framing.
+    expect(first.changelog[0]?.migration).toContain("may score HIGHER");
+    expect(first.changelog[0]?.migration).toContain("score LOWER");
+    expect(first.changelog[1]).toMatchObject({ version: "2026.08.25-r224", date: "2026-08-25" });
+    expect(first.changelog[1]?.summary).toContain("requiredEvidenceTypes");
+    expect(first.changelog[1]?.migration).toContain("2026.07.29-r223");
+    expect(first.changelog[1]?.migration).toContain("may score LOWER");
+    expect(first.changelog[2]).toMatchObject({ version: "2026.07.29-r223", date: "2026-07-29" });
+    expect(first.changelog[2]?.summary).toContain("public badge methodology assurance hash");
+    expect(first.changelog[2]?.migration).toContain("2026.07.10-r222");
+    expect(first.changelog[2]?.migration).toContain("amc_methodology_assurance");
+    expect(first.changelog[3]).toMatchObject({ version: "2026.07.10-r222", date: "2026-07-10" });
+    expect(first.changelog[3]?.summary).toContain("canonical L0-L5 maturity taxonomy");
+    expect(first.changelog[3]?.migration).toContain("Reports generated under 2026.07.10-r221");
+    expect(first.changelog[4]?.summary).toContain("artifact validity from evidence readiness");
+    expect(first.changelog[4]?.migration).toContain("Reports generated under 2026.06.25-r220");
+    expect(first.changelog[5]?.summary).toContain("Cua-style computer-use benchmark public-methodology");
+    expect(first.changelog[5]?.migration).toContain("Reports generated under 2026.06.25-r219");
+    expect(first.changelog[6]?.summary).toContain("Lunary-style public-methodology");
+    expect(first.changelog[6]?.migration).toContain("Reports generated under 2026.06.25-r218");
 
-    expect(first.changelog[6]?.summary).toContain("LangSmith-style public-methodology");
-    expect(first.changelog[7]?.summary).toContain("PocketFlow-style public-methodology source-review boundaries");
-    expect(first.changelog[8]?.summary).toContain("ChemGraph-style agentic computational chemistry workflow");
-    expect(first.changelog[8]?.summary).toContain("LM Evaluation Harness-style metric-validity source-review boundaries");
-    expect(first.changelog[9]?.summary).toContain("OpenAI Evals-style public-methodology source-review boundaries");
-    expect(first.changelog[10]?.summary).toContain("fact-checking and factuality-evaluation review methodology boundaries");
-    expect(first.changelog[10]?.summary).toContain("Google ADK-style agent-toolkit evaluation metric-validity boundaries");
+    expect(first.changelog[7]?.summary).toContain("LangSmith-style public-methodology");
+    expect(first.changelog[8]?.summary).toContain("PocketFlow-style public-methodology source-review boundaries");
+    expect(first.changelog[9]?.summary).toContain("ChemGraph-style agentic computational chemistry workflow");
+    expect(first.changelog[9]?.summary).toContain("LM Evaluation Harness-style metric-validity source-review boundaries");
+    expect(first.changelog[10]?.summary).toContain("OpenAI Evals-style public-methodology source-review boundaries");
+    expect(first.changelog[11]?.summary).toContain("fact-checking and factuality-evaluation review methodology boundaries");
+    expect(first.changelog[11]?.summary).toContain("Google ADK-style agent-toolkit evaluation metric-validity boundaries");
     expect(first.changelog.find((entry) => entry.version === "2026.06.21-r217")?.date).toBe("2026-06-21");
     expect(first.changelog.find((entry) => entry.version === "2026.06.20-r216")?.date).toBe("2026-06-20");
     for (const previousVersion of [
@@ -2045,4 +2054,38 @@ describe("public methodology manifest", () => {
     expect(markdown).toContain("## Metric Validity and Reliability");
     expect(markdown).toContain("| Metric | Owner | Sample | Construct Validity |");
   }, 120_000);
+});
+
+describe("the release a bump supersedes stays verifiable", () => {
+  test("the immediately previous release resolves as historical, not unknown", () => {
+    // The r224 bump added no historical hashes at all, so for a whole release
+    // every artifact issued under r223 verified as `{ok:false,
+    // status:"unknown"}` — a badge reading counterfeit when it was merely
+    // previous. This makes the promise checkable instead of leaving the next
+    // bump to remember.
+    //
+    // SCOPED TO THE PREVIOUS RELEASE ON PURPOSE. Asserting it for every
+    // changelog row fails on 220 of them: `HISTORICAL_PUBLIC_METHODOLOGY_HASHES`
+    // has only ever held the most recent few, and recovering each older hash
+    // means building that release's manifest from its own tree. Anything issued
+    // before r221 is still unverifiable, which is a real and separate gap; this
+    // test pins the part a bump is responsible for, rather than pretending to
+    // cover history it does not.
+    const manifest = getPublicMethodologyManifest();
+    const previous = manifest.changelog[1]?.version;
+    expect(previous, "there is a superseded release to check").toBeTruthy();
+
+    const result = verifyPublicMethodologyReference({
+      id: AMC_PUBLIC_METHODOLOGY_ID,
+      version: previous ?? "",
+      releaseDate: "",
+      methodologyDoc: "",
+      publicUrl: "",
+      hash: "",
+      versioningAssuranceHash: ""
+    });
+
+    expect(result.reason, `${previous} must stay verifiable after being superseded`)
+      .not.toBe("unknown methodology version");
+  });
 });

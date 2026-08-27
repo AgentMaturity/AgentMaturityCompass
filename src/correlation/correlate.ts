@@ -30,8 +30,30 @@ export interface CorrelationMetrics {
   issues: CorrelationIssue[];
 }
 
+/**
+ * The event types that carry an observed process's own output.
+ *
+ * Two vocabularies, because two observation generations write them and P5.3
+ * deliberately kept both: `wrap`/`supervise` emit `stdout`/`stderr`
+ * (../ledger/monitor.ts), while `amc adapters run` — the entry point P5.3 made
+ * the supported one — emits `agent_stdout`/`agent_stderr`
+ * (../adapters/adapterRunner.ts). This filter listed only the first pair, so the
+ * supported path contributed no traces at all and its `correlationRatio` was
+ * structurally zero, which is a precondition for OBSERVED_HARDENED in
+ * `runTrustTier` (../forecast/forecastSignals.ts).
+ *
+ * It stays a whitelist rather than "any row with text": counting every row would
+ * let a payload that merely quotes a trace line inflate the denominator.
+ */
+const TRACE_SOURCE_EVENT_TYPES: ReadonlySet<string> = new Set([
+  "stdout",
+  "stderr",
+  "agent_stdout",
+  "agent_stderr"
+]);
+
 function traceSourceEvents(events: ParsedEvidenceEvent[]): ParsedEvidenceEvent[] {
-  return events.filter((event) => event.event_type === "stdout" || event.event_type === "stderr");
+  return events.filter((event) => TRACE_SOURCE_EVENT_TYPES.has(event.event_type));
 }
 
 export function correlateTracesAgainstEvidence(params: {

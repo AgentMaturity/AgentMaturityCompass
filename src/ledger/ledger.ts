@@ -1,4 +1,5 @@
 import Database from "better-sqlite3";
+import { assertValidTrustTier } from "./trustTierValidation.js";
 import { createPrivateKey, randomUUID, type KeyObject } from "node:crypto";
 import { readdirSync, readFileSync } from "node:fs";
 import YAML from "yaml";
@@ -595,6 +596,7 @@ export class Ledger {
     }
 
     const meta = input.meta ?? {};
+    assertValidTrustTier(meta);
     const metaJson = JSON.stringify(meta);
     const canonicalMetadata = canonicalMetadataForHash({
       id,
@@ -778,6 +780,10 @@ export class Ledger {
         ...(input.meta ?? {}),
         receipt_id: receiptId
       };
+      // Checked here too: this method builds its own row rather than going
+      // through `buildEvidenceInsert`, so validating only there would leave the
+      // receipt-bearing writers -- assurance audits among them -- unguarded.
+      assertValidTrustTier(baseMeta);
       const baseMetaJson = JSON.stringify(baseMeta);
       const prevHash = this.latestEventHash();
       const baseCanonicalMetadata = canonicalMetadataForHash({
