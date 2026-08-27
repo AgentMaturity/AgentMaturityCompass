@@ -59,7 +59,7 @@ function diagnosticReport(runId = "trace-run-opt-1", questions = 2): DiagnosticR
     integrityIndex: 0.63,
     trustLabel: "MEDIUM TRUST",
     targetProfileId: null,
-    layerScores: [{ layerName: "Agent Resilience", avgFinalLevel: 2, confidenceWeightedFinalLevel: 2 }],
+    layerScores: [{ layerName: "Resilience", avgFinalLevel: 2, confidenceWeightedFinalLevel: 2 }],
     questionScores,
     inflationAttempts: [],
     unsupportedClaimCount: 1,

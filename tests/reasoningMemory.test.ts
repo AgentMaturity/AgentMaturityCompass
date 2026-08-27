@@ -37,7 +37,7 @@ function diagnosticReport(runId = "memory-run-1", failures = true): DiagnosticRe
     integrityIndex: failures ? 0.62 : 0.91,
     trustLabel: failures ? "MEDIUM TRUST" : "HIGH TRUST",
     targetProfileId: null,
-    layerScores: [{ layerName: "Agent Resilience", avgFinalLevel: failures ? 2 : 4, confidenceWeightedFinalLevel: failures ? 2 : 4 }],
+    layerScores: [{ layerName: "Resilience", avgFinalLevel: failures ? 2 : 4, confidenceWeightedFinalLevel: failures ? 2 : 4 }],
     questionScores: failures
       ? [
           {

@@ -34,7 +34,7 @@ function report(runId = "trace-run-rca-1"): DiagnosticReport {
     integrityIndex: 0.63,
     trustLabel: "MEDIUM TRUST",
     targetProfileId: null,
-    layerScores: [{ layerName: "Agent Resilience", avgFinalLevel: 2, confidenceWeightedFinalLevel: 2 }],
+    layerScores: [{ layerName: "Resilience", avgFinalLevel: 2, confidenceWeightedFinalLevel: 2 }],
     questionScores: [
       {
         questionId: "AMC-1.1",

@@ -44,7 +44,7 @@ function diagnosticReport(runId: string): DiagnosticReport {
     trustLabel: "MEDIUM TRUST",
     targetProfileId: null,
     layerScores: [
-      { layerName: "Memory Reliability", avgFinalLevel: 2, confidenceWeightedFinalLevel: 2 }
+      { layerName: "Resilience", avgFinalLevel: 2, confidenceWeightedFinalLevel: 2 }
     ],
     questionScores: [
       {
