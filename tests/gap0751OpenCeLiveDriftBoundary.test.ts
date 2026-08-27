@@ -30,7 +30,7 @@ function rows(prefix: "baseline" | "live", score0to1: number, behavior: string):
     behaviorSignature: `${behavior}:closed-loop-context-${index}`,
     taskCategory: "context-engineering-live-drift",
     domain: "agent-evaluation-context-engineering",
-    agentEvaluationDimension: "observed_context_acquisition_processing_evaluator_evolver_drift",
+    agentEvaluationDimension: "custom",
     interactionTurnCount: prefix === "live" ? 12 + index : 5 + index,
     invalidActionRate0to1: prefix === "live" ? 0.12 : 0.02,
     errorAttributionRate0to1: prefix === "live" ? 0.08 : 0.01,

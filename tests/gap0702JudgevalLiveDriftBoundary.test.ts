@@ -29,7 +29,7 @@ function rows(prefix: "baseline" | "live", score0to1: number, behavior: string):
     behaviorSignature: `${behavior}:${index}`,
     taskCategory: "agent-production-monitoring-evaluation",
     domain: "llmops-agent-observability",
-    agentEvaluationDimension: "observed_agent_behavior_drift",
+    agentEvaluationDimension: "custom",
     interactionTurnCount: prefix === "live" ? 23 + index : 11 + index,
     invalidActionRate0to1: prefix === "live" ? 0.14 : 0.02,
     errorAttributionRate0to1: prefix === "live" ? 0.08 : 0.01,

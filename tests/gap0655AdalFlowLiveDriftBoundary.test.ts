@@ -22,7 +22,7 @@ function rows(phase: "baseline" | "live", score0to1: number, behavior: string): 
     behaviorSignature: `${behavior}:${index}`,
     taskCategory: "agent-evaluation-live-drift",
     domain: "llm-application-evaluation",
-    agentEvaluationDimension: "behavioral_regression",
+    agentEvaluationDimension: "custom",
     interactionTurnCount: phase === "live" ? 13 + index : 7 + index,
     invalidActionRate0to1: phase === "live" ? 0.09 : 0.01,
     errorAttributionRate0to1: phase === "live" ? 0.08 : 0.01,

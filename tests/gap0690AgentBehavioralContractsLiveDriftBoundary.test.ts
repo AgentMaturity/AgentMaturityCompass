@@ -30,7 +30,7 @@ function rows(prefix: "baseline" | "live", score0to1: number, behavior: string):
     behaviorSignature: `${behavior}:${index}`,
     taskCategory: "agent-behavioral-contract-runtime-enforcement",
     domain: "autonomous-agent-governance",
-    agentEvaluationDimension: "contract_compliance_behavior_drift",
+    agentEvaluationDimension: "custom",
     interactionTurnCount: prefix === "live" ? 20 + index : 10 + index,
     invalidActionRate0to1: prefix === "live" ? 0.14 : 0.02,
     errorAttributionRate0to1: prefix === "live" ? 0.09 : 0.01,

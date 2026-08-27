@@ -30,7 +30,7 @@ function rows(prefix: "baseline" | "live", score0to1: number, behavior: string):
     behaviorSignature: `${behavior}:zig-flow-agent:${index}`,
     taskCategory: "pocketflow-zig-score-live-drift",
     domain: "agent-evaluation-workflow",
-    agentEvaluationDimension: "observed_zig_flow_agent_score_behavior_drift",
+    agentEvaluationDimension: "custom",
     interactionTurnCount: prefix === "live" ? 18 + index : 8 + index,
     invalidActionRate0to1: prefix === "live" ? 0.13 : 0.02,
     errorAttributionRate0to1: prefix === "live" ? 0.06 : 0.01,

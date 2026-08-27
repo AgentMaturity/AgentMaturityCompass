@@ -30,7 +30,7 @@ function rows(prefix: "baseline" | "live", score0to1: number, behavior: string):
     behaviorSignature: `${behavior}:modular-benchmark-framework-${index}`,
     taskCategory: "modular-agent-benchmark-live-drift",
     domain: "agent-evaluation-benchmarking",
-    agentEvaluationDimension: "observed_modular_agent_benchmark_behavior_drift",
+    agentEvaluationDimension: "custom",
     interactionTurnCount: prefix === "live" ? 14 + index : 6 + index,
     invalidActionRate0to1: prefix === "live" ? 0.1 : 0.01,
     errorAttributionRate0to1: prefix === "live" ? 0.08 : 0.01,

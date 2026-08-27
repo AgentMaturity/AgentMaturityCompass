@@ -31,7 +31,7 @@ function rows(prefix: "baseline" | "live", score0to1: number, behavior: string):
     behaviorSignature: `${behavior}:retrieval-generation-metric-catalog-${index}`,
     taskCategory: "awesome-rag-evaluation-live-drift",
     domain: "agent-evaluation-rag-evaluation-catalog",
-    agentEvaluationDimension: "observed_rag_evaluation_catalog_behavior_drift",
+    agentEvaluationDimension: "custom",
     interactionTurnCount: prefix === "live" ? 12 + index : 6 + index,
     invalidActionRate0to1: prefix === "live" ? 0.1 : 0.01,
     errorAttributionRate0to1: prefix === "live" ? 0.06 : 0.01,

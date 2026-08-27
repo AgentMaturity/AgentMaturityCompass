@@ -31,7 +31,7 @@ function rows(prefix: "baseline" | "live", score0to1: number, behavior: string):
     behaviorSignature: `${behavior}:system-trace-node:${index}`,
     taskCategory: "agentic-clear-multi-level-evaluation",
     domain: "agent-evaluation-and-benchmarks",
-    agentEvaluationDimension: "observed_multi_level_agent_behavior_drift",
+    agentEvaluationDimension: "custom",
     interactionTurnCount: prefix === "live" ? 28 + index : 12 + index,
     invalidActionRate0to1: prefix === "live" ? 0.15 : 0.02,
     errorAttributionRate0to1: prefix === "live" ? 0.1 : 0.01,

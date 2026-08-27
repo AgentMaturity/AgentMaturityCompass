@@ -30,7 +30,7 @@ function rows(prefix: "baseline" | "live", score0to1: number, behavior: string):
     behaviorSignature: `${behavior}:rag-search-rerank-eval-${index}`,
     taskCategory: "rag-experiment-accelerator-live-drift",
     domain: "agent-evaluation-rag-experimentation",
-    agentEvaluationDimension: "observed_rag_search_rerank_evaluation_behavior_drift",
+    agentEvaluationDimension: "custom",
     interactionTurnCount: prefix === "live" ? 10 + index : 5 + index,
     invalidActionRate0to1: prefix === "live" ? 0.11 : 0.01,
     errorAttributionRate0to1: prefix === "live" ? 0.07 : 0.01,

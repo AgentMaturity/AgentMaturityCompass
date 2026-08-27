@@ -24,7 +24,7 @@ function rows(prefix: "baseline" | "live", score0to1: number, behavior: string):
     behaviorSignature: `${behavior}:${index}`,
     taskCategory: "llm-assistant-developer-productivity",
     domain: "software-engineering-assistant",
-    agentEvaluationDimension: "developer_productivity_behavior_regression",
+    agentEvaluationDimension: "custom",
     interactionTurnCount: prefix === "live" ? 16 + index : 8 + index,
     invalidActionRate0to1: prefix === "live" ? 0.1 : 0.01,
     errorAttributionRate0to1: prefix === "live" ? 0.07 : 0.01,

@@ -31,7 +31,7 @@ function rows(prefix: "baseline" | "live", score0to1: number, behavior: string):
     behaviorSignature: `${behavior}:synthora-agent-workflow:${index}`,
     taskCategory: "agent-framework-live-drift",
     domain: "agent-evaluation-framework",
-    agentEvaluationDimension: "observed_agent_workflow_behavior_drift",
+    agentEvaluationDimension: "custom",
     interactionTurnCount: prefix === "live" ? 17 + index : 8 + index,
     invalidActionRate0to1: prefix === "live" ? 0.12 : 0.02,
     errorAttributionRate0to1: prefix === "live" ? 0.09 : 0.01,

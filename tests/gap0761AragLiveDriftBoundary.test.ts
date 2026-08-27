@@ -32,7 +32,7 @@ function rows(prefix: "baseline" | "live", score0to1: number, behavior: string):
     behaviorSignature: `${behavior}:keyword-semantic-chunk-loop-${index}`,
     taskCategory: "agentic-rag-live-drift",
     domain: "agent-evaluation-hierarchical-rag",
-    agentEvaluationDimension: "observed_hierarchical_retrieval_tool_routing_behavior_drift",
+    agentEvaluationDimension: "custom",
     interactionTurnCount: prefix === "live" ? 14 + index : 6 + index,
     invalidActionRate0to1: prefix === "live" ? 0.13 : 0.01,
     errorAttributionRate0to1: prefix === "live" ? 0.08 : 0.01,

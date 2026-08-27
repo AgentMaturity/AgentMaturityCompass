@@ -47,7 +47,7 @@ function rows(prefix: "baseline" | "live", score0to1: number, behavior: string):
     behaviorSignature: `${behavior}:graph-retrieval-generation-${index}`,
     taskCategory: "graphrag-benchmark-live-drift",
     domain: "agent-evaluation-and-benchmarks",
-    agentEvaluationDimension: "graphrag-benchmark-source-context",
+    agentEvaluationDimension: "custom",
     invalidActionRate0to1: prefix === "live" ? 0.16 : 0.01,
     errorAttributionRate0to1: prefix === "live" ? 0.11 : 0.01,
     toolCallCount: prefix === "live" ? 14 : 6,

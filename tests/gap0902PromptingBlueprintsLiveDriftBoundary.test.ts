@@ -30,7 +30,7 @@ function rows(prefix: "baseline" | "live", score0to1: number, behavior: string):
     behaviorSignature: `${behavior}:prompt-playbook-agent:${index}`,
     taskCategory: "prompting-blueprints-score-live-drift",
     domain: "agent-evaluation-prompt-workflow",
-    agentEvaluationDimension: "observed_prompt_blueprint_score_behavior_drift",
+    agentEvaluationDimension: "custom",
     interactionTurnCount: prefix === "live" ? 16 + index : 7 + index,
     invalidActionRate0to1: prefix === "live" ? 0.1 : 0.015,
     errorAttributionRate0to1: prefix === "live" ? 0.07 : 0.01,

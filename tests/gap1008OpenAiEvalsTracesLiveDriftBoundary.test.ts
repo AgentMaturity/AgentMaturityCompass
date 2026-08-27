@@ -33,7 +33,7 @@ function rows(prefix: "baseline" | "live", score0to1: number, behavior: string):
     behaviorSignature: `${behavior}:agent-trace-eval-${index}`,
     taskCategory: "agent-workflow-trace-live-drift",
     domain: "agent-evaluation-and-benchmarks",
-    agentEvaluationDimension: "openai-evals-and-traces",
+    agentEvaluationDimension: "custom",
     invalidActionRate0to1: prefix === "live" ? 0.24 : 0.02,
     errorAttributionRate0to1: prefix === "live" ? 0.18 : 0.01,
     toolCallCount: prefix === "live" ? 14 : 6,
