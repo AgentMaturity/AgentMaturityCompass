@@ -36,7 +36,7 @@ function lens(overrides: Partial<QuestionScoreObsStudioDrilldownLensRef> = {}): 
   return {
     drilldownId: "helicone-llm-observability-studio-drilldown",
     sourceRef: URL,
-    sourceKind: "github_repo",
+    sourceKind: "repository",
     openAlexWorkId: null,
     doi: null,
     publisherRef: TITLE,
@@ -229,7 +229,7 @@ describe("GAP-0979 Helicone Studio drilldown boundary", () => {
     expect(out.obsStudioDrilldownPreview[0]).toMatchObject({
       drilldownId: "helicone-llm-observability-studio-drilldown",
       sourceRef: URL,
-      sourceKind: "github_repo",
+      sourceKind: "repository",
       publisherRef: TITLE,
       titleRef: TITLE,
       uiRoutePath: `/api/v1/score/evidence-drilldown/run-gap0979/${QUESTION_ID}`,

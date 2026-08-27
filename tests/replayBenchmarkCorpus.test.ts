@@ -10718,7 +10718,7 @@ describe("runReplayBenchmarkCorpus", () => {
               aiAgentBenchmarkFamilies: ["swe_bench", "pricing", "user_report", "security_risk"],
               minAiAgentBenchmarkFamilyCount: 4,
               aiAgentBenchmarkSourceCategories: [
-                "github_repo",
+                "repository",
                 "benchmark_dataset",
                 "developer_forum",
                 "pricing_page",
@@ -10765,7 +10765,7 @@ describe("runReplayBenchmarkCorpus", () => {
       aiAgentBenchmarkComparisonRowCount: 1,
       aiAgentBenchmarkFamilies: ["swe_bench", "pricing", "user_report", "security_risk"],
       aiAgentBenchmarkSourceCategories: [
-        "github_repo",
+        "repository",
         "benchmark_dataset",
         "developer_forum",
         "pricing_page",

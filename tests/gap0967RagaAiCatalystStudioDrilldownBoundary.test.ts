@@ -34,7 +34,7 @@ function lens(overrides: Partial<QuestionScoreObsStudioDrilldownLensRef> = {}): 
   return {
     drilldownId: "ragaai-catalyst-agent-observability-studio-drilldown",
     sourceRef: URL,
-    sourceKind: "github_repo",
+    sourceKind: "repository",
     openAlexWorkId: null,
     doi: null,
     publisherRef: "RagaAI",
@@ -224,7 +224,7 @@ describe("GAP-0967 RagaAI Catalyst Studio drilldown boundary", () => {
     expect(out.obsStudioDrilldownPreview[0]).toMatchObject({
       drilldownId: "ragaai-catalyst-agent-observability-studio-drilldown",
       sourceRef: URL,
-      sourceKind: "github_repo",
+      sourceKind: "repository",
       publisherRef: "RagaAI",
       titleRef: TITLE,
       uiRoutePath: `/api/v1/score/evidence-drilldown/run-gap0967/${QUESTION_ID}`,

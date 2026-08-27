@@ -57,7 +57,7 @@ function diagnosticReport(runId = "trace-run-opt-1", questions = 2): DiagnosticR
     trustBoundaryViolated: false,
     trustBoundaryMessage: null,
     integrityIndex: 0.63,
-    trustLabel: "MEDIUM TRUST",
+    trustLabel: "DEVELOPING — some evidence, needs more coverage",
     targetProfileId: null,
     layerScores: [{ layerName: "Resilience", avgFinalLevel: 2, confidenceWeightedFinalLevel: 2 }],
     questionScores,

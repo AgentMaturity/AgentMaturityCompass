@@ -34,7 +34,7 @@ function obsLens(overrides: Partial<QuestionScoreObsStudioDrilldownLensRef> = {}
   return {
     drilldownId: "comet-opik-agent-evaluation-studio-drilldown",
     sourceRef: REPO,
-    sourceKind: "github_repo",
+    sourceKind: "repository",
     openAlexWorkId: null,
     doi: null,
     publisherRef: "Comet",
@@ -240,7 +240,7 @@ describe("GAP-0962 Comet Opik Studio drilldown boundary", () => {
     expect(out.obsStudioDrilldownPreview[0]).toMatchObject({
       drilldownId: "comet-opik-agent-evaluation-studio-drilldown",
       sourceRef: REPO,
-      sourceKind: "github_repo",
+      sourceKind: "repository",
       publisherRef: "Comet",
       titleRef: TITLE,
       venueRef: "GitHub, product page, and docs",

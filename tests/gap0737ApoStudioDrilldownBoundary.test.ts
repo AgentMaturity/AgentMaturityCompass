@@ -32,7 +32,7 @@ function obsLens(overrides: Partial<QuestionScoreObsStudioDrilldownLensRef> = {}
   return {
     drilldownId: "apo-observability-studio-drilldown",
     sourceRef: SOURCE,
-    sourceKind: "github_repo",
+    sourceKind: "repository",
     titleRef: "APO observability source-review drilldown",
     publisherRef: "CloudDetail",
     uiRoutePath: `/api/v1/score/evidence-drilldown/run-gap0737/${QUESTION_ID}`,
@@ -203,7 +203,7 @@ describe("GAP-0737 APO Studio evidence drilldown boundary", () => {
     expect(out.obsStudioDrilldownPreview[0]).toMatchObject({
       drilldownId: "apo-observability-studio-drilldown",
       sourceRef: SOURCE,
-      sourceKind: "github_repo",
+      sourceKind: "repository",
       publisherRef: "CloudDetail",
       titleRef: "APO observability source-review drilldown",
       uiRoutePath: `/api/v1/score/evidence-drilldown/run-gap0737/${QUESTION_ID}`,
