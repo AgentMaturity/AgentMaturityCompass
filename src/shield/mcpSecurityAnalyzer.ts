@@ -99,6 +99,29 @@ const RISKY_TOOL_NAMES = [
   "admin", "root", "sudo", "privilege"
 ];
 
+/** Values that name the ABSENCE of the thing the field is supposed to configure. */
+const DISABLED_MARKERS = new Set(["none", "off", "no", "false", "disabled", "never", "null", ""]);
+
+/**
+ * Does this field configure anything, or does it merely exist?
+ *
+ * A static scan cannot verify that authentication WORKS. What it can refuse to
+ * do is award security points to a field that says it is switched off, or to an
+ * empty object that configures nothing. The credit is kept for a field that
+ * carries actual configuration, because removing it entirely would push honest
+ * manifests toward the same grade as hostile ones -- and the keyword-driven
+ * penalties already push every useful server downward.
+ */
+function configuresSomething(value: unknown): boolean {
+  if (value === undefined || value === null || value === false) return false;
+  if (value === true) return true;
+  if (typeof value === "number") return value > 0;
+  if (typeof value === "string") return !DISABLED_MARKERS.has(value.trim().toLowerCase());
+  if (Array.isArray(value)) return value.length > 0;
+  if (typeof value === "object") return Object.keys(value as Record<string, unknown>).length > 0;
+  return false;
+}
+
 function loadContent(pathOrUrl: string): { content: string; isUrl: boolean } {
   // Simple URL detection
   if (pathOrUrl.startsWith("http://") || pathOrUrl.startsWith("https://")) {
@@ -169,7 +192,8 @@ function extractServerInfo(parsed: unknown, rawContent: string): McpServerInfo {
     hasLogging: false
   };
 
-  if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
+  const parsedStructuredConfig = parsed !== null && typeof parsed === "object" && !Array.isArray(parsed);
+  if (parsedStructuredConfig) {
     const obj = parsed as Record<string, unknown>;
 
     // Extract server name/version
@@ -221,40 +245,54 @@ function extractServerInfo(parsed: unknown, rawContent: string): McpServerInfo {
       }
     }
 
-    // Check auth
-    if (obj["auth"] ?? obj["authentication"] ?? obj["security"]) {
+    // These four grant BONUS points, so the test is whether the field configures
+    // the property -- not whether a field of that name exists.
+    //
+    // It used to be existence alone, and the score was buyable with vocabulary:
+    // measured, an untrusted `npx -y untrusted@latest` server scored 66/100
+    // ACCEPTABLE, and the same server with `auth`, `sandbox`, `rateLimit` and
+    // `logging` all set to the string "none" scored 100/100 SECURE. Four fields
+    // stating the protections were ABSENT bought the top grade.
+    if (configuresSomething(obj["auth"] ?? obj["authentication"] ?? obj["security"])) {
       info.hasAuthConfig = true;
     }
-
-    // Check sandbox
-    if (obj["sandbox"] ?? obj["isolation"] ?? obj["container"]) {
+    if (configuresSomething(obj["sandbox"] ?? obj["isolation"] ?? obj["container"])) {
       info.hasSandboxConfig = true;
     }
-
-    // Check rate limiting
-    if (obj["rateLimit"] ?? obj["rateLimiting"] ?? obj["throttle"] ?? obj["maxRequests"]) {
+    if (configuresSomething(obj["rateLimit"] ?? obj["rateLimiting"] ?? obj["throttle"] ?? obj["maxRequests"])) {
       info.hasRateLimiting = true;
     }
-
-    // Check logging
-    if (obj["logging"] ?? obj["log"] ?? obj["audit"] ?? obj["telemetry"]) {
+    if (configuresSomething(obj["logging"] ?? obj["log"] ?? obj["audit"] ?? obj["telemetry"])) {
       info.hasLogging = true;
     }
   }
 
-  // Source code analysis (when not pure JSON config)
-  const lc = rawContent.toLowerCase();
-  if (!info.hasAuthConfig && (lc.includes("apikey") || lc.includes("auth") || lc.includes("bearer"))) {
-    info.hasAuthConfig = true;
-  }
-  if (!info.hasSandboxConfig && (lc.includes("sandbox") || lc.includes("seccomp") || lc.includes("namespac"))) {
-    info.hasSandboxConfig = true;
-  }
-  if (!info.hasRateLimiting && (lc.includes("ratelimit") || lc.includes("rate_limit") || lc.includes("throttle"))) {
-    info.hasRateLimiting = true;
-  }
-  if (!info.hasLogging && (lc.includes("console.log") || lc.includes("logger") || lc.includes("winston") || lc.includes("pino"))) {
-    info.hasLogging = true;
+  // Substring fallback for SOURCE files only.
+  //
+  // The comment here always said "when not pure JSON config" and the code ran it
+  // unconditionally, so a parsed manifest got both passes -- and the substring
+  // pass sees the whole raw file, so `"auth": "none"` contains "auth" and bought
+  // the bonus the structured check above had just refused. That is how a
+  // manifest declaring it had no auth, no sandbox, no rate limiting and no
+  // logging scored 100/100 SECURE.
+  //
+  // Now it runs only when there was no structured config to read. Even then the
+  // evidence is weak -- a substring in source says the word appears, not that
+  // the property holds -- which is why these grant a bonus rather than a level.
+  if (!parsedStructuredConfig) {
+    const lc = rawContent.toLowerCase();
+    if (!info.hasAuthConfig && (lc.includes("apikey") || lc.includes("auth") || lc.includes("bearer"))) {
+      info.hasAuthConfig = true;
+    }
+    if (!info.hasSandboxConfig && (lc.includes("sandbox") || lc.includes("seccomp") || lc.includes("namespac"))) {
+      info.hasSandboxConfig = true;
+    }
+    if (!info.hasRateLimiting && (lc.includes("ratelimit") || lc.includes("rate_limit") || lc.includes("throttle"))) {
+      info.hasRateLimiting = true;
+    }
+    if (!info.hasLogging && (lc.includes("console.log") || lc.includes("logger") || lc.includes("winston") || lc.includes("pino"))) {
+      info.hasLogging = true;
+    }
   }
 
   return info;
