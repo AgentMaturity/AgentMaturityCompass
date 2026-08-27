@@ -84,7 +84,7 @@ function metadataOnlyEpisode(ws: string): EpisodeRecord {
     workspace: ws,
     source: "cli",
     command: "amc memory-source-metadata",
-    lifecycleStage: "source-review.metadata",
+    lifecycleStage: "score.generated",
     startedAt: new Date(Date.UTC(2026, 5, 25, 10, 0, 0)).toISOString(),
     endedAt: new Date(Date.UTC(2026, 5, 25, 10, 1, 0)).toISOString(),
     rawTraceRefs: [],

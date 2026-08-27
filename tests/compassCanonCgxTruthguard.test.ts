@@ -183,7 +183,7 @@ describe("compass canon + cgx + truthguard", () => {
         agentType: "code-agent",
         modelFamilies: ["gpt"],
         toolFamilies: ["git"],
-        riskTier: "medium",
+        riskTier: "med",
         operatingMode: "interactive",
         capabilities: {
           notaryEnabled: false,

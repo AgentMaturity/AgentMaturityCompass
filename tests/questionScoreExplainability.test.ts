@@ -2260,7 +2260,7 @@ describe("question score explainability receipts", () => {
           criteriaDiagnostics: [
             {
               criterionId: "eval-ai-library-question-score-proof",
-              criterionType: "evaluation_metric",
+              criterionType: "objective_quality",
               status: "satisfied",
               evidenceRefs: ["ev-eval-ai-source", "ev-eval-ai-metric", "ev-eval-ai-ci"],
               rejectedEvidenceRefs: ["ev-eval-ai-readme-only"],
@@ -2415,7 +2415,7 @@ describe("question score explainability receipts", () => {
           criteriaDiagnostics: [
             {
               criterionId: "eval-ai-library-question-score-proof",
-              criterionType: "evaluation_metric",
+              criterionType: "objective_quality",
               status: "satisfied",
               evidenceRefs: ["ev-eval-ai-metadata"],
               rejectedEvidenceRefs: ["ev-eval-ai-missing-question-proof"],
@@ -2713,7 +2713,7 @@ describe("question score explainability receipts", () => {
           criteriaDiagnostics: [
             {
               criterionId: "auto-bench-audit-question-score-proof",
-              criterionType: "evaluation_metric",
+              criterionType: "objective_quality",
               status: "satisfied",
               evidenceRefs: ["ev-auto-bench-pack", "ev-auto-bench-row", "ev-auto-bench-ci"],
               rejectedEvidenceRefs: ["ev-auto-bench-metadata-only"],
@@ -2870,7 +2870,7 @@ describe("question score explainability receipts", () => {
           criteriaDiagnostics: [
             {
               criterionId: "auto-bench-audit-question-score-proof",
-              criterionType: "evaluation_metric",
+              criterionType: "objective_quality",
               status: "satisfied",
               evidenceRefs: ["ev-auto-bench-source-metadata"],
               rejectedEvidenceRefs: ["ev-auto-bench-row-proof-missing"],
@@ -3243,7 +3243,7 @@ describe("question score explainability receipts", () => {
               id: "ev-occubench-verifier",
               event_hash: "b".repeat(64),
               writer_sig: "sig-occubench-verifier",
-              event_type: "verifier",
+              event_type: "output_validated",
               session_id: "session-occubench-verifier",
               ts: 11,
               trustTier: "ATTESTED",
@@ -5250,7 +5250,7 @@ describe("question score explainability receipts", () => {
               id: "ev-code-diff",
               event_hash: "f".repeat(64),
               writer_sig: "sig-code-diff",
-              event_type: "code",
+              event_type: "artifact",
               session_id: "session-ope",
               ts: 12,
               trustTier: "OBSERVED"
@@ -5414,7 +5414,7 @@ describe("question score explainability receipts", () => {
               id: "ev-tool-trace",
               event_hash: "1".repeat(64),
               writer_sig: "sig-tool-trace",
-              event_type: "tool",
+              event_type: "tool_action",
               session_id: "session-tool",
               ts: 22,
               trustTier: "OBSERVED_HARDENED"
@@ -5501,7 +5501,7 @@ describe("question score explainability receipts", () => {
               id: "ev-orchestration",
               event_hash: "2".repeat(64),
               writer_sig: "sig-orchestration",
-              event_type: "trace",
+              event_type: "outcome",
               session_id: "session-runtime",
               ts: 30,
               trustTier: "OBSERVED"
@@ -5626,7 +5626,7 @@ describe("question score explainability receipts", () => {
               id: "ev-tool-feedback",
               event_hash: "6".repeat(64),
               writer_sig: "sig-tool-feedback",
-              event_type: "tool",
+              event_type: "tool_action",
               session_id: "session-tool-risk",
               ts: 40,
               trustTier: "OBSERVED"
@@ -5635,7 +5635,7 @@ describe("question score explainability receipts", () => {
               id: "ev-trust-trajectory",
               event_hash: "7".repeat(64),
               writer_sig: "sig-trust-trajectory",
-              event_type: "trace",
+              event_type: "outcome",
               session_id: "session-tool-risk",
               ts: 41,
               trustTier: "OBSERVED"
@@ -6183,7 +6183,7 @@ describe("question score explainability receipts", () => {
           criteriaDiagnostics: [
             {
               criterionId: "open-model-rag-question-proof",
-              criterionType: "deterministic_check",
+              criterionType: "unit_test",
               status: "satisfied",
               evidenceRefs: ["ev-open-model-rag-pass"],
               rejectedEvidenceRefs: ["ev-open-model-rag-reject"],
@@ -6700,7 +6700,7 @@ describe("question score explainability receipts", () => {
           criteriaDiagnostics: [
             {
               criterionId: "opik-eval-score-explainability-proof",
-              criterionType: "evaluation_metric",
+              criterionType: "objective_quality",
               status: "satisfied",
               evidenceRefs: ["ev-opik-eval-pack", "ev-opik-signed-rows"],
               rejectedEvidenceRefs: ["ev-opik-product-page-only"],

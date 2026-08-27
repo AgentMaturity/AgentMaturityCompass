@@ -244,9 +244,9 @@ describe("GAP-3747 Comet Opik Studio drilldown boundary", () => {
       evidencePreviewHash: null,
       emptyStateHash: null,
       errorStateHash: null,
-      evidencePreviewState: "blocked",
+      evidencePreviewState: "custom",
       evidencePreviewCount: 0,
-      status: "blocked",
+      status: "failed",
     });
 
     const out = buildScoreEvidenceDrilldown(report(metadataOnly), QUESTION_ID);
@@ -254,9 +254,9 @@ describe("GAP-3747 Comet Opik Studio drilldown boundary", () => {
     expect(out.failClosed).toBe(true);
     expect(out.obsStudioDrilldownPreview[0]).toMatchObject({
       sourceRef: REPO,
-      evidencePreviewState: "blocked",
+      evidencePreviewState: "custom",
       evidencePreviewCount: 0,
-      status: "blocked",
+      status: "failed",
     });
   });
 

@@ -5,7 +5,8 @@ import {
   renderPosthocAuditSamplingAuditExport,
   verifyPosthocAuditSamplingReceipt,
   type PosthocAuditSamplingEvidenceLink,
-  type PosthocAuditSamplingSourceCitation
+  type PosthocAuditSamplingSourceCitation,
+  type PosthocAuditSamplingMethod,
 } from "../src/audit/posthocAuditSampling.js";
 
 const DOC = "docs/source-reviews/GAP-1104-agentic-healthcare-posthoc-audit-sampling.md";
@@ -197,7 +198,8 @@ describe("GAP-1104 agentic healthcare post-hoc audit sampling boundary", () => {
           populationId: "",
           populationSize: 0,
           sampleSize: 0,
-          samplingMethod: "",
+          samplingMethod: "" as PosthocAuditSamplingMethod, // deliberately invalid: metadata-only plan
+
           riskTier: "critical",
           plannedAt: "",
           signedEvidenceRef: "",

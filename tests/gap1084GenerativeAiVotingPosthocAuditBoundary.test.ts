@@ -6,6 +6,7 @@ import {
   verifyPosthocAuditSamplingReceipt,
   type PosthocAuditSamplingEvidenceLink,
   type PosthocAuditSamplingSourceCitation,
+  type PosthocAuditSamplingMethod,
 } from "../src/audit/posthocAuditSampling.js";
 
 const DOC = "docs/source-reviews/GAP-1084-generative-ai-voting-posthoc-audit.md";
@@ -227,7 +228,8 @@ describe("GAP-1084 generative AI voting post-hoc audit boundary", () => {
           populationId: "",
           populationSize: 0,
           sampleSize: 0,
-          samplingMethod: "",
+          samplingMethod: "" as PosthocAuditSamplingMethod, // deliberately invalid: metadata-only plan
+
           riskTier: "high",
           plannedAt: "",
           signedEvidenceRef: "",

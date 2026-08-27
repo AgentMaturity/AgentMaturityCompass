@@ -63,7 +63,7 @@ async function pickPort(): Promise<number> {
 
 async function httpCall(params: {
   url: string;
-  method: "GET" | "POST";
+  method: "GET" | "POST" | "PATCH" | "DELETE";
   headers?: Record<string, string>;
   body?: string;
 }): Promise<{ status: number; headers: Record<string, string | string[] | undefined>; body: string }> {
