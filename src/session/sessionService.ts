@@ -510,6 +510,50 @@ export class SessionService {
     });
   }
 
+  /**
+   * Record a file the user attached, addressed by its own content.
+   *
+   * The bytes ARE the address: the row's `payload_sha256` is what the surface
+   * part points at, which is the same invariant every other projected part
+   * obeys. Attaching identical bytes under two names therefore yields one
+   * address, and the row is the only copy.
+   *
+   * Its own event type rather than a `user/message`, because a reader needs to
+   * tell what a person typed from what a person handed over -- and because an
+   * attachment is gated on the way in (see ../attachments/attachmentIngest.ts)
+   * while a typed message is not.
+   */
+  recordUserAttachment(params: {
+    readonly filename: string;
+    readonly content: string | Buffer;
+    readonly kind: "text" | "image";
+    readonly mimeType: string;
+  }): SessionEventRef {
+    const turn = this.currentTurn;
+    const step = this.currentStep;
+    const bytes = typeof params.content === "string"
+      ? Buffer.from(params.content, "utf8")
+      : params.content;
+    return this.recordContent({
+      eventType: "user/attachment",
+      content: bytes,
+      // Names BOTH: the digest makes the slot content-addressed, the filename
+      // keeps it legible to a person reading the log.
+      slot: `attachment:${params.filename}:${sha256Hex(bytes).slice(0, 12)}`,
+      role: "user",
+      kind: params.kind,
+      buildMeta: () => ({
+        turn,
+        step,
+        filename: params.filename,
+        mimeType: params.mimeType,
+        bytes: bytes.byteLength
+      }),
+      turn,
+      step
+    });
+  }
+
   recordToolCall(call: ToolCallInput): SessionEventRef {
     // Recorded (and therefore durably committed) BEFORE the caller performs the
     // tool side effect, so no model-visible dispatch precedes its log entry.

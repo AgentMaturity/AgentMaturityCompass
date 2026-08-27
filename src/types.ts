@@ -43,6 +43,10 @@ export type EvidenceEventType =
   | "request/failure"
   | "system/prompt"
   | "user/message"
+  // A file the user attached. Its own row, not folded into `user/message`: an
+  // attachment is content-addressed and gated, and a reader needs to tell what
+  // a person typed from what a person handed over.
+  | "user/attachment"
   | "assistant/block"
   | "tool/call"
   | "tool/result"
