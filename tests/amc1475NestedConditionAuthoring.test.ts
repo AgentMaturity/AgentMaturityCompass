@@ -43,6 +43,24 @@ import { ControlFileLockError, withControlFileLock } from "../src/lifecycle/cont
 import { openLedger } from "../src/ledger/ledger.js";
 import { applyPolicyPack } from "../src/policyPacks/packApply.js";
 import { generateFullOpenApiSpec } from "../src/studio/openapi.js";
+
+/**
+ * OpenApiSpec types paths and components.schemas as Record<string, unknown>,
+ * so drilling into an operation or a schema node is not expressible without a
+ * view type. This describes only the parts these assertions read.
+ */
+type OpenApiSpecView = {
+  paths: Record<string, Record<string, { responses: Record<string, unknown> }>>;
+  components: {
+    schemas: Record<
+      string,
+      {
+        description?: string;
+        properties: Record<string, { maximum?: number; maxItems?: number }>;
+      } & Record<string, unknown>
+    >;
+  } & Record<string, unknown>;
+};
 import { readTransparencyEntries, transparencyLogPath } from "../src/transparency/logChain.js";
 import { trustConfigPath } from "../src/trust/trustConfig.js";
 import type { DiagnosticReport } from "../src/types.js";
@@ -832,7 +850,7 @@ describe("AMC-1475 bounded nested Action Policy evidence logic", () => {
     expect(simulation.evaluator).toBe("action-policy");
     expect(simulation.conditions).toContainEqual(expect.objectContaining({ conditionId: "evidence-logic" }));
 
-    const openapi = generateFullOpenApiSpec();
+    const openapi = generateFullOpenApiSpec() as unknown as OpenApiSpecView;
     const publishedOpenApiSource = readFileSync("website/openapi.yaml", "utf8");
     const published = YAML.parse(publishedOpenApiSource) as any;
     expect(published.openapi).toBe("3.0.3");
@@ -875,7 +893,7 @@ describe("AMC-1475 bounded nested Action Policy evidence logic", () => {
       ...openapi.components.schemas.ActionEvidenceLogicCompilation,
       components: openapi.components,
     });
-    expect(validatePreview(preview), validatePreview.errors ?? []).toBe(true);
+    expect(validatePreview(preview), JSON.stringify(validatePreview.errors ?? [])).toBe(true);
     const validatePublishedApply = new Ajv({ strict: false, validateFormats: false }).compile({
       ...published.components.schemas.ActionEvidenceLogicApplyResult,
       components: published.components,

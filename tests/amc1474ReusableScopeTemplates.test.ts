@@ -34,6 +34,24 @@ import { withControlFileLock } from "../src/lifecycle/controlFileLock.js";
 import { openLedger } from "../src/ledger/ledger.js";
 import { writeRuntimeFirewallPolicy } from "../src/runtime/firewall.js";
 import { generateFullOpenApiSpec } from "../src/studio/openapi.js";
+
+/**
+ * OpenApiSpec types paths and components.schemas as Record<string, unknown>,
+ * so drilling into an operation or a schema node is not expressible without a
+ * view type. This describes only the parts these assertions read.
+ */
+type OpenApiSpecView = {
+  paths: Record<string, Record<string, { responses: Record<string, unknown> }>>;
+  components: {
+    schemas: Record<
+      string,
+      {
+        description?: string;
+        properties: Record<string, { maximum?: number; maxItems?: number }>;
+      } & Record<string, unknown>
+    >;
+  } & Record<string, unknown>;
+};
 import { readTransparencyEntries } from "../src/transparency/logChain.js";
 import { trustConfigPath } from "../src/trust/trustConfig.js";
 import { lockVault } from "../src/vault/vault.js";
@@ -459,7 +477,7 @@ describe("AMC-1474 reusable action-class scope templates", () => {
   });
 
   test("publishes generated and public OpenAPI contracts for catalog, compile, and apply", () => {
-    const generated = generateFullOpenApiSpec();
+    const generated = generateFullOpenApiSpec() as unknown as OpenApiSpecView;
     const published = YAML.parse(readFileSync("website/openapi.yaml", "utf8")) as any;
     for (const suffix of ["", "/compile", "/apply"]) {
       expect(generated.paths[`/api/v1/policy/scope-templates${suffix}`]).toBeDefined();
@@ -498,7 +516,7 @@ describe("AMC-1474 reusable action-class scope templates", () => {
       ...generated.components.schemas.ScopeTemplateCompilation,
       components: generated.components,
     });
-    expect(validate(preview), validate.errors ?? []).toBe(true);
+    expect(validate(preview), JSON.stringify(validate.errors ?? [])).toBe(true);
   });
 
   test("uses the same preview and exact-confirm contract in Studio without a generic confirm dialog", () => {
