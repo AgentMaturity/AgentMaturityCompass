@@ -10,6 +10,7 @@ import { writeRuntimeFirewallPolicy } from "../src/runtime/firewall.js";
 import { initToolsConfig, loadToolsConfig } from "../src/toolhub/toolhubValidators.js";
 import { registerAgentCommands, type AgentLoopCliIo } from "../src/cli-agent-commands.js";
 import { DEFAULT_MAX_DELEGATION_DEPTH } from "../src/agent/delegationIdentity.js";
+import { delegationTurnOptions } from "../src/agent/providers/delegationProviders.js";
 
 /**
  * `amc agent-loop run --delegate`, end to end (P6.1a).
@@ -228,17 +229,14 @@ describe("amc agent-loop run --delegate", () => {
 });
 
 describe("the operator can scope a delegation", () => {
-  // WHAT THESE DO NOT COVER, measured by mutation: deleting the spread that
-  // hands `delegateScope` to `runComposedTurn` leaves all three green. They
-  // observe the line the CLI PRINTS, and the printed line and the passed value
-  // read from the same variable but nothing here proves the second exists — so
-  // a build could announce a scope it never applied.
+  // These observe the line the CLI PRINTS. That is not the same as observing
+  // what it PASSES, and mutation testing confirmed the difference: deleting the
+  // spread that handed `delegateScope` to `runComposedTurn` once left all of
+  // them green, so a build could announce a scope it never applied.
   //
-  // The hop itself is covered one layer down, by "passes a declared scope
-  // through to the grant" in tests/kernelDelegationGrant.test.ts, plus the type
-  // system. Closing it here would need a seam in the CLI purely for the test,
-  // and the stub provider cannot script a `delegate` call to observe the effect
-  // end to end. Named rather than left as implied coverage.
+  // That hole is now closed by "the delegation options a run is given" at the
+  // bottom of this file, which calls the assembly directly — the CLI cannot
+  // reach that branch itself without a running gateway.
   it("reports the scope it will bind a delegate to", async () => {
     process.chdir(dir);
     permitDelegate();
@@ -271,5 +269,86 @@ describe("the operator can scope a delegation", () => {
 
     expect(captured.errors.join("\n")).toContain("read_only");
     expect(captured.failures, "a bad scope is a failure, not a warning").not.toEqual([]);
+  });
+});
+
+describe("the operator chooses who executes a delegation", () => {
+  it("defaults to the in-process driver and says so", async () => {
+    process.chdir(dir);
+    permitDelegate();
+    const { program, captured } = programWith();
+
+    await run(program, argvFor(["--delegate", "--json"]));
+
+    expect(captured.failures).toEqual([]);
+    expect(captured.out.join("\n")).toContain("delegates run in-process");
+  });
+
+  it("refuses a foreign provider when there is no gateway to route it through", async () => {
+    // ADR-5, at the surface: a foreign child reaches the provider through AMC's
+    // gateway or it does not run. Studio is what serves that gateway, so
+    // selecting a foreign provider without it is refused up front rather than
+    // failing later inside a delegation the model already asked for.
+    process.chdir(dir);
+    permitDelegate();
+    const { program, captured } = programWith();
+
+    await run(program, argvFor(["--delegate", "--delegate-provider", "claude-cli", "--json"]));
+
+    expect(captured.errors.join("\n")).toMatch(/studio|gateway/i);
+    expect(captured.errors.join("\n"), "names the fix").toContain("amc up");
+    expect(captured.failures).not.toEqual([]);
+  });
+
+  it("refuses a provider it does not have", async () => {
+    process.chdir(dir);
+    permitDelegate();
+    const { program, captured } = programWith();
+
+    await run(program, argvFor(["--delegate", "--delegate-provider", "gpt-cli", "--json"]));
+
+    expect(captured.errors.join("\n")).toContain("gpt-cli");
+    expect(captured.errors.join("\n"), "says what it does have").toContain("claude-cli");
+    expect(captured.failures).not.toEqual([]);
+  });
+
+  it("refuses a provider without --delegate, rather than silently ignoring it", async () => {
+    // A flag that configures a capability nobody asked for is a flag that does
+    // nothing, and the operator would have no way to tell.
+    process.chdir(dir);
+    permitDelegate();
+    const { program, captured } = programWith();
+
+    await run(program, argvFor(["--delegate-provider", "claude-cli", "--json"]));
+
+    expect(captured.errors.join("\n")).toContain("--delegate");
+    expect(captured.failures).not.toEqual([]);
+  });
+});
+
+describe("the delegation options a run is given", () => {
+  // Tested here rather than through the CLI because the CLI cannot reach the
+  // branch that populates a foreign runner without a running gateway — every
+  // CLI test lands on a refusal. Mutation testing showed the gap was real:
+  // deleting the spread that hands the runner to the kernel left everything
+  // green.
+  const grant = (): void => {};
+  const runner = async () => ({ ok: true, text: "x" });
+
+  it("carries a foreign runner when one was resolved", () => {
+    const options = delegationTurnOptions({ grant, maxDepth: 3, runner });
+    expect(options.runner, "the kernel is given the executor the operator chose").toBe(runner);
+  });
+
+  it("omits the runner entirely when none was, so the kernel builds its driver", () => {
+    // Omitted, not set to undefined: the kernel reads presence.
+    const options = delegationTurnOptions({ grant, maxDepth: 3, runner: null });
+    expect("runner" in options).toBe(false);
+  });
+
+  it("carries the scope, and omits it when there is none", () => {
+    expect(delegationTurnOptions({ grant, maxDepth: 3, scope: ["READ_ONLY"] }).scope)
+      .toEqual(["READ_ONLY"]);
+    expect("scope" in delegationTurnOptions({ grant, maxDepth: 3 })).toBe(false);
   });
 });

@@ -211,3 +211,33 @@ describe("the operator's delegation scope reaches the capability", () => {
     expect(grants[0]!.delegationScope).toBeUndefined();
   });
 });
+
+describe("a caller can supply its own executor", () => {
+  it("uses a supplied runner instead of the in-process driver", async () => {
+    // The kernel builds `createDriverRunner` because only it can -- that runner
+    // needs the parent's session and a child-session-bound LLM factory. A
+    // FOREIGN runner needs neither: it spawns a separate process. So the kernel
+    // keeps building the in-process one by default, and a caller holding a
+    // self-contained executor hands it over.
+    const s = setup();
+    const grants: SubagentCapability[] = [];
+    const marker = async () => ({ ok: true, text: "from the supplied runner" });
+
+    await runComposedTurn(
+      turnOptions(s, {
+        delegation: { runner: marker, grant: (capability) => { grants.push(capability); } }
+      })
+    );
+
+    expect(grants[0]!.runner, "the caller's executor, not the driver").toBe(marker);
+  });
+
+  it("still builds the in-process driver when none is supplied", async () => {
+    const s = setup();
+    const grants: SubagentCapability[] = [];
+    await runComposedTurn(
+      turnOptions(s, { delegation: { grant: (capability) => { grants.push(capability); } } })
+    );
+    expect(typeof grants[0]!.runner, "a runner is still provided").toBe("function");
+  });
+});

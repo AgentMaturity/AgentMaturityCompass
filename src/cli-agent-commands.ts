@@ -54,6 +54,8 @@ import { agentToolset } from "./agent/agentToolset.js";
 import { delegateTool } from "./agent/delegateTool.js";
 import { DEFAULT_MAX_DELEGATION_DEPTH } from "./agent/delegationIdentity.js";
 import { parseDelegationScope } from "./agent/delegationScope.js";
+import { IN_PROCESS_PROVIDER, delegationTurnOptions, resolveForeignRunner } from "./agent/providers/delegationProviders.js";
+import type { SubagentRunner } from "./agent/subagentSpawn.js";
 import { listAllowedTools } from "./toolhub/toolhubValidators.js";
 import type { AgentToolSeam } from "./agent/toolSeam.js";
 import type { SubagentCapability } from "./agent/delegateTool.js";
@@ -92,6 +94,8 @@ interface RunOptions {
   delegate?: boolean;
   maxDelegationDepth?: string;
   delegateScope?: string;
+  delegateProvider?: string;
+  delegateTimeout?: string;
   provider?: string;
   model?: string;
   baseUrl?: string;
@@ -347,6 +351,13 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
     )
     .option("--max-delegation-depth <n>", "how deep a delegation chain may go (default 3)")
     .option(
+      "--delegate-provider <id>",
+      "who executes a delegation: \"in-process\" (default) or a foreign CLI such as "
+      + "\"claude-cli\". A foreign provider routes the child through AMC's gateway and "
+      + "requires AMC Studio to be running."
+    )
+    .option("--delegate-timeout <ms>", "how long a foreign delegate may run before it is killed")
+    .option(
       "--delegate-scope <classes>",
       "comma-separated action classes a delegate may invoke, e.g. READ_ONLY,WRITE_LOW. "
       + "Tools outside them are withheld from the child. Default: unrestricted."
@@ -402,6 +413,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
         }
         delegateScope = parsed.classes;
       }
+      const delegateTimeout = integerOption(io, "--delegate-timeout", opts.delegateTimeout, 0);
       const maxDelegationDepth = integerOption(
         io, "--max-delegation-depth", opts.maxDelegationDepth, DEFAULT_MAX_DELEGATION_DEPTH
       );
@@ -412,7 +424,8 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
         thinkMs === null ||
         cancelAfter === null ||
         steerAfter === null ||
-        maxDelegationDepth === null
+        maxDelegationDepth === null ||
+        delegateTimeout === null
       ) {
         return;
       }
@@ -435,9 +448,18 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
       // echo tool exists precisely to make a multi-step turn observable.
       const toolMode = opts.tools ?? (providerId === STUB_PROVIDER_ID ? "echo" : "none");
       const wantsDelegation = opts.delegate === true;
+      if (!wantsDelegation && opts.delegateProvider !== undefined) {
+        // A flag configuring a capability nobody asked for does nothing, and the
+        // operator has no way to tell it did nothing.
+        io.error(chalk.red("--delegate-provider needs --delegate; nothing is delegating without it"));
+        io.fail();
+        return;
+      }
       const dispatchMode = opts.toolMode === "code" ? "code" as const : "native" as const;
       let toolSeam: AgentToolSeam | null = null;
       let grantDelegation: ((capability: SubagentCapability) => void) | null = null;
+      let foreignRunner: SubagentRunner | null = null;
+      let foreignRunnerDescription = "";
       if (toolMode === "workspace") {
         const toolset = agentToolset({
           workspace: process.cwd(),
@@ -485,6 +507,32 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
         // Defining after construction is supported by design — `seam.schemas()`
         // re-reads the registry each step.
         if (wantsDelegation) {
+          const providerId = opts.delegateProvider ?? IN_PROCESS_PROVIDER;
+          if (providerId !== IN_PROCESS_PROVIDER) {
+            const resolved = resolveForeignRunner({
+              providerId,
+              workspace: process.cwd(),
+              agentId: "default",
+              ...(delegateTimeout > 0 ? { timeoutMs: delegateTimeout } : {})
+            });
+            if (!resolved.ok) {
+              io.error(chalk.red(resolved.reason));
+              io.fail();
+              return;
+            }
+            foreignRunner = resolved.runner;
+            foreignRunnerDescription = resolved.describedAs;
+          }
+          // Reported FROM the value that gets passed, not beside it. Written as
+          // two statements, a build could announce an out-of-process delegate
+          // and hand the kernel nothing -- mutation testing found exactly that,
+          // because the CLI tests can only reach the refusal paths (they have no
+          // gateway to succeed against).
+          io.log(chalk.dim(
+            foreignRunner === null
+              ? "delegates run in-process, under this run's own driver"
+              : `delegates run out-of-process: ${foreignRunnerDescription}`
+          ));
           grantDelegation = (capability) => { toolset.registry.define(delegateTool(capability)); };
           // Beside the write-scope line, and for the same reason: a bound the
           // operator cannot see is one they cannot check. It is also the only
@@ -559,11 +607,12 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
           ...(grantDelegation === null
             ? {}
             : {
-                delegation: {
+                delegation: delegationTurnOptions({
                   grant: grantDelegation,
                   maxDepth: maxDelegationDepth,
-                  ...(delegateScope === undefined ? {} : { scope: delegateScope })
-                }
+                  scope: delegateScope,
+                  runner: foreignRunner
+                })
               }),
           config: { maxStepsPerTurn: maxSteps },
           credentials: {

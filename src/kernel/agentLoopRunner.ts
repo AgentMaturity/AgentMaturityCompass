@@ -53,6 +53,7 @@ import {
 } from "../prompt/agentPromptProfile.js";
 import { SessionService } from "../session/sessionService.js";
 import { rootIdentity } from "../agent/delegationIdentity.js";
+import type { SubagentRunner } from "../agent/subagentSpawn.js";
 import type { ActionClass } from "../types.js";
 import { createDriverRunner } from "../agent/subagentRunner.js";
 import type { SubagentCapability } from "../agent/delegateTool.js";
@@ -177,6 +178,17 @@ export interface ComposedTurnOptions {
      * it — three layers gated on a field no caller could populate.
      */
     readonly scope?: readonly ActionClass[];
+    /**
+     * Execute children with this instead of the in-process driver.
+     *
+     * The kernel builds `createDriverRunner` because only it can: that runner
+     * needs the parent's session and a factory for a CHILD-session-bound
+     * `LlmRuntime`. A foreign runner needs neither — it spawns a separate
+     * process — so a caller holding a self-contained executor supplies it here
+     * rather than the kernel growing a provider registry it has no business
+     * owning.
+     */
+    readonly runner?: SubagentRunner;
     readonly maxDepth?: number;
     /** Receives the composed capability. Called once, before the first turn. */
     grant(capability: SubagentCapability): void;
@@ -401,7 +413,7 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
       options.delegation.grant({
         identity: rootIdentity(options.agentId),
         session,
-        runner: createDriverRunner({
+        runner: options.delegation.runner ?? createDriverRunner({
           workspace: options.workspace,
           // A child gets its OWN runtime over the parent's routes, because
           // `LlmRuntime` binds a session at construction and a shared one would
