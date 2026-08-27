@@ -3,7 +3,7 @@ import type { Socket } from "node:net";
 import { URL } from "node:url";
 import { join } from "node:path";
 import { readdirSync } from "node:fs";
-import {
+import { CLI_BRIDGE_ROLES,
   execCliCommand as cliBridgeExec,
   execCliBatch as cliBridgeBatch,
   listCliCommands as cliBridgeList,
@@ -8782,18 +8782,16 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       /* ════════════════════════════════════════════════
          CLI BRIDGE — exposes all CLI commands via API
          ════════════════════════════════════════════════ */
-      if (pathname === "/cli/exec" && method === "POST") {
-        const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
-        const parsed = JSON.parse(body);
-        const result = await cliBridgeExec(options.workspace, parsed);
-        json(res, result.ok ? 200 : 422, result);
-        return;
-      }
-
-      if (pathname === "/cli/batch" && method === "POST") {
-        const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
-        const parsed = JSON.parse(body);
-        const result = await cliBridgeBatch(options.workspace, parsed);
+      // One handler for both, so the authorisation check has ONE home: these
+      // grant the same authority and differ only in whether it is applied once
+      // or in a loop. AUTHORISED, not merely authenticated -- see the header of
+      // ./cliBridge.ts for why an AGENT-role principal must never reach here.
+      if ((pathname === "/cli/exec" || pathname === "/cli/batch") && method === "POST") {
+        if (!requireRoles({ auth, res, workspace: options.workspace, roles: [...CLI_BRIDGE_ROLES] })) return;
+        const parsed = JSON.parse(await readBody(req, options.maxRequestBytes ?? 1_048_576));
+        const result = pathname === "/cli/exec"
+          ? await cliBridgeExec(options.workspace, parsed)
+          : await cliBridgeBatch(options.workspace, parsed);
         json(res, result.ok ? 200 : 422, result);
         return;
       }

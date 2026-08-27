@@ -17,6 +17,28 @@
  * - Rate limited per client
  */
 import { spawn } from "node:child_process";
+
+/**
+ * WHO MAY DRIVE THE CLI, and why it is not "anyone authenticated".
+ *
+ * `execCliCommand` spawns `amc <argv>` in the workspace, and the route that
+ * exposes it is banner-titled "exposes all CLI commands via API". Until this
+ * constant existed, `POST /cli/exec` and `/cli/batch` carried NO role or scope
+ * check: the only gate was Studio's global `authenticate()`.
+ *
+ * That gate accepts `x-amc-agent-token` and returns roles `["AGENT"]` — and an
+ * agent token is the credential AMC hands to the very agents it governs, issued
+ * with `toolhub:intent`, `toolhub:execute`, `governor:check` and `receipt:verify`
+ * and nothing else. So an agent could reach the whole CLI: signing configs,
+ * rewriting policy, issuing leases. Worse, `agent-loop` is on neither
+ * `DANGEROUS_PREFIXES` nor `INTERACTIVE_COMMANDS` below, so an agent could START
+ * ANOTHER AGENT here — around the signed handoff packet, the depth ceiling and
+ * the declared scope every in-process delegation must pass.
+ *
+ * `validateCliExec`'s `confirm: true` requirement is not a substitute: the
+ * caller supplies `confirm`.
+ */
+export const CLI_BRIDGE_ROLES = ["OPERATOR", "OWNER"] as const;
 import { resolve } from "node:path";
 
 /* ── Types ────────────────────────────────────────── */
