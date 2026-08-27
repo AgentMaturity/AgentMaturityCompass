@@ -192,6 +192,7 @@ import { registerCompositionCommands } from "./cli-composition-commands.js";
 import { registerVaultZkCommands } from "./cli-vault-zk-commands.js";
 import { registerEvidenceStoreCommands, renderLedgerVerdict } from "./cli-evidence-store-commands.js";
 import { registerSessionCommands } from "./cli-session-commands.js";
+import { registerWireCommands } from "./wire/wireCli.js";
 import { registerAgentCommands } from "./cli-agent-commands.js";
 import { registerCredentialsCommands } from "./cli-credentials-commands.js";
 import { issueCertificate, inspectCertificate, revokeCertificate, verifyCertificate, verifyRevocation } from "./assurance/certificate.js";
@@ -2347,7 +2348,6 @@ program
   });
 
 // quickstart retained as a unified onboarding flow is implemented below
-
 
 registerQuickSetupCommand(program);
 registerFixCommand(program);
@@ -24571,6 +24571,7 @@ registerLateStageCliCommands({
 registerMirofishCommands(program);
 registerCompositionCommands(program);
 registerSessionCommands(program);
+registerWireCommands(program);
 registerAgentCommands(program);
 registerCredentialsCommands(program);
 
