@@ -495,7 +495,7 @@ describe("AMC-1477 signed observe-only rollout counters", () => {
       ...openapi.components.schemas.RuntimeFirewallStatusResponse,
       components: openapi.components,
     });
-    expect(validate({ ok: true, data }), validate.errors ?? []).toBe(true);
+    expect(validate({ ok: true, data }), JSON.stringify(validate.errors ?? [])).toBe(true);
     expect(openapi.paths["/v1/firewall/check"].post.responses["201"].content["application/json"].schema.$ref)
       .toBe("#/components/schemas/RuntimeFirewallDecisionResponse");
     expect(openapi.paths["/v1/firewall/events"].get.responses["200"].content["application/json"].schema.$ref)
@@ -504,7 +504,7 @@ describe("AMC-1477 signed observe-only rollout counters", () => {
       ...openapi.components.schemas.RuntimeFirewallDecisionResponse,
       components: openapi.components,
     });
-    expect(validateDecision({ ok: true, data: decision }), validateDecision.errors ?? []).toBe(true);
+    expect(validateDecision({ ok: true, data: decision }), JSON.stringify(validateDecision.errors ?? [])).toBe(true);
 
     for (const path of [
       "README.md",

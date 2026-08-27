@@ -42,6 +42,17 @@ import {
   writeRuntimeFirewallPolicy,
 } from "../src/runtime/firewall.js";
 import { generateFullOpenApiSpec } from "../src/studio/openapi.js";
+
+/**
+ * OpenApiSpec types components.schemas as Record<string, unknown>, so a schema
+ * node cannot be spread without a view type describing what is read here.
+ */
+type OpenApiSpecView = {
+  paths: Record<string, Record<string, { responses: Record<string, unknown> }>>;
+  components: {
+    schemas: Record<string, Record<string, unknown>>;
+  } & Record<string, unknown>;
+};
 import { initWorkspace } from "../src/workspace.js";
 
 const roots: string[] = [];
@@ -468,7 +479,7 @@ describe("AMC-1470 evaluator-backed control simulation", () => {
       roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"],
     });
     const published = YAML.parse(readFileSync("website/openapi.yaml", "utf8")) as any;
-    const generated = generateFullOpenApiSpec();
+    const generated = generateFullOpenApiSpec() as unknown as OpenApiSpecView;
     expect(published.paths["/v1/policy/simulate"]?.post).toBeDefined();
     expect(published.components.schemas.ControlSimulation).toBeDefined();
     expect(generated.paths["/api/v1/policy/simulate"]?.post).toBeDefined();
@@ -482,7 +493,7 @@ describe("AMC-1470 evaluator-backed control simulation", () => {
     const response = await callSimulationApi(root, {
       controlId: "approval:WRITE_HIGH",
     });
-    expect(validateResponse(response.json), validateResponse.errors ?? []).toBe(true);
+    expect(validateResponse(response.json), JSON.stringify(validateResponse.errors ?? [])).toBe(true);
 
     const source = readFileSync("src/enforce/controlSimulation.ts", "utf8");
     expect(source).toContain("evaluateRuntimeFirewall");

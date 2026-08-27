@@ -25,6 +25,17 @@ import {
 import { initWorkspace } from "../src/workspace.js";
 import { generateFullOpenApiSpec } from "../src/studio/openapi.js";
 
+/**
+ * OpenApiSpec types components.schemas as Record<string, unknown>, so a schema
+ * node cannot be spread without a view type describing what is read here.
+ */
+type OpenApiSpecView = {
+  paths: Record<string, Record<string, { responses: Record<string, unknown> }>>;
+  components: {
+    schemas: Record<string, Record<string, unknown>>;
+  } & Record<string, unknown>;
+};
+
 const roots: string[] = [];
 const cliPath = resolve(process.cwd(), "dist/cli.js");
 let previousPassphrase: string | undefined;
@@ -302,7 +313,7 @@ describe("AMC-1469 verified control projection", () => {
 
   test("publishes the bounded CLI, API, methodology, and competitive closure", () => {
     const published = YAML.parse(readFileSync("website/openapi.yaml", "utf8")) as any;
-    const generated = generateFullOpenApiSpec();
+    const generated = generateFullOpenApiSpec() as unknown as OpenApiSpecView;
     expect(published.paths["/v1/policy/controls"]?.get).toBeDefined();
     expect(published.components.schemas.ControlProjection).toBeDefined();
     expect(generated.paths["/api/v1/policy/controls"]?.get).toBeDefined();
@@ -313,7 +324,7 @@ describe("AMC-1469 verified control projection", () => {
     });
     const schemaRoot = workspace();
     initializeControls(schemaRoot);
-    expect(validateResponse({ ok: true, data: buildControlProjection(schemaRoot) }), validateResponse.errors ?? [])
+    expect(validateResponse({ ok: true, data: buildControlProjection(schemaRoot) }), JSON.stringify(validateResponse.errors ?? []))
       .toBe(true);
 
     for (const path of ["README.md", "docs/CONTROL_PROJECTION.md", "docs/CLI_COMMAND_INVENTORY.md", "docs/API_REFERENCE.md"]) {
