@@ -91,3 +91,65 @@ real export producing no type error, so removing it would be scope creep.
   `new PassThrough() as unknown as IncomingMessage` cast but split out a `reqStream`
   handle so `write`/`end` are called on the real `PassThrough` rather than through the
   `IncomingMessage` view. Net reduction in cast surface.
+
+---
+
+## Batches 3–7 — completion summary
+
+Final state: **`npm run typecheck:tests` exits 0.** 453 → 0 across 239 files.
+Suite unchanged throughout at 1092/1095, with only the three environmental
+worktree failures.
+
+### Further defects found (tests that were green without testing)
+
+- **`apiRouters.test.ts` export-route table** — the first two of seven rows had
+  four elements where the loop destructures five, so `url` received `200` and
+  `expectedStatus` received `undefined` (silently falling back to its default).
+  Every field after the missing `url` slot was shifted.
+- **`newProductModulesBatch2.test.ts`** — `.withPriority(8)` with
+  `expect(spec.priority).toBe(8)`, round-tripping a value outside
+  `TaskSpec['priority']` (`'low'|'medium'|'high'|'critical'`). The builder
+  stores whatever it is handed, so the test agreed with itself and proved
+  nothing. Fixing the input made the assertion fail — a genuine rule-4 catch.
+- **`valuesObservabilityCorrections.test.ts`** — `mockPolicy` had a completely
+  different shape from `transitionClaim`'s parameter, so every gate it checks
+  (`minDistinctSessions`, `minEvidenceEvents`, `requireOwnerCoSign`, …) was
+  read as `undefined`.
+- **`product.test.ts`** — three APIs called against signatures that no longer
+  match, with assertions that are only `toBeDefined()`. `withRetry`'s
+  `maxRetries` was an excess property, so `DEFAULT_CONFIG.maxAttempts` was used
+  and the intended retry counts never applied.
+- **69 invented `LayerName` values** — `"Evaluation and Improvement"` has never
+  existed anywhere in `src/` in the repo's history.
+- **53 bespoke `agentEvaluationDimension` labels** outside the closed union.
+
+### Systemic causes worth remembering
+
+- `Parameters<typeof f>` / `ReturnType<typeof f>` resolve to the **last**
+  overload only. `createServer` last-overloads to `(options)` and `spawnSync`
+  to the `Buffer`-returning form, so two test helpers were typed wrongly and
+  produced 41 errors between them.
+- Zod `z.infer` is the **output** type, with defaults applied. Fixtures written
+  as schema input but annotated with the output type must supply the
+  defaulted fields — or, better, go through `schema.parse` so the defaults stay
+  in one place (done for `GatewayConfig`).
+- Object spread drops string index signatures, which is why
+  `{ ...process.env, NO_COLOR: "1" }` narrowed to `{ NO_COLOR: string }`.
+
+### Casts retained, all deliberate
+
+Partial mock returns in `apiRouters`, tamper fixtures (`gap1637`, `gap1247`,
+`gap1644`), metadata-only binders (four PII-scan tests), the `""` sampling
+method in five posthoc fixtures, and 19 minimal `DiagnosticReport` doubles
+whose `as X` no longer satisfies the overlap rule. Each carries a comment or a
+commit-message rationale. The other 90 files using `as DiagnosticReport` were
+left on the stricter plain cast.
+
+### Two self-corrections during the sweep
+
+Blanket substitution on a **literal value** twice over-applied, because the
+same literal can be valid under one target type and invalid under another
+(`"github_repo"` is legal in `ReplayBenchmarkAiAgentBenchmarkSourceCategory`
+and illegal in `QuestionScoreObsStudioSourceKind`; `as DiagnosticReport` is
+fine in 90 files and not in 19). Both were caught by the gate within one cycle
+and reverted. Group by **target type**, never by literal value.
