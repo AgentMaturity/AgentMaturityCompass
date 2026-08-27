@@ -82,7 +82,19 @@ async function spawnMonitoredProcess(params: {
    */
   sessionId?: string;
   cwd?: string;
-}): Promise<{ sessionId: string; exitCode: number }> {
+  /** Kill the child after this long. Absent means no deadline. */
+  timeoutMs?: number;
+  /**
+   * What the child's stdin is connected to.
+   *
+   * `"forward"` pipes the operator's stdin through, which is the whole point of
+   * `amc wrap`. `"close"` sends EOF immediately: a DELEGATED child has no
+   * operator at its keyboard, its goal arrives in argv, and anything it read
+   * would be AMC's own input stream. Without the EOF a child that reads blocks
+   * forever and nothing here stops it.
+   */
+  stdinMode?: "forward" | "close";
+}): Promise<{ sessionId: string; exitCode: number; terminatedBy: string | null }> {
   const ledger = openLedger(params.workspace);
   const sessionId = params.sessionId ?? randomUUID();
 
@@ -167,6 +179,7 @@ async function spawnMonitoredProcess(params: {
       maxCaptureBytes: MAX_RECORDED_OUTPUT_BYTES,
       scrubValues: params.scrubValues ?? [],
       graceMs: TERMINATE_GRACE_MS,
+      ...(params.timeoutMs === undefined ? {} : { timeoutMs: params.timeoutMs }),
       onOutput: record,
       ...(params.signal ? { signal: params.signal } : {})
     });
@@ -192,7 +205,11 @@ async function spawnMonitoredProcess(params: {
         });
       });
     };
-    process.stdin.on("data", stdinHandler);
+    if (params.stdinMode === "close") {
+      running.endStdin();
+    } else {
+      process.stdin.on("data", stdinHandler);
+    }
 
     let outcome;
     try {
@@ -201,7 +218,9 @@ async function spawnMonitoredProcess(params: {
       // A spawn that never started still opened a session. Sealing it here is
       // the difference between a run that failed and a session that simply
       // stops mid-chain with no explanation.
+      if (params.stdinMode !== "close") {
       process.stdin.off("data", stdinHandler);
+    }
       ledger.appendEvidence({
         sessionId,
         runtime: params.runtime,
@@ -218,7 +237,9 @@ async function spawnMonitoredProcess(params: {
       ledger.sealSession(sessionId);
       throw error;
     }
-    process.stdin.off("data", stdinHandler);
+    if (params.stdinMode !== "close") {
+      process.stdin.off("data", stdinHandler);
+    }
 
     ledger.appendEvidence({
       sessionId,
@@ -247,7 +268,7 @@ async function spawnMonitoredProcess(params: {
     // always recorded as `runtime_exit_code`; discarding it here is why
     // `runAdapterCommand`'s SANDBOX branch could return a hardcoded `exitCode: 0`
     // and report a crashed foreign agent as a success.
-    return { sessionId, exitCode: outcome.exitCode ?? 1 };
+    return { sessionId, exitCode: outcome.exitCode ?? 1, terminatedBy: outcome.terminatedBy ?? null };
   } finally {
     ledger.close();
   }
@@ -329,7 +350,9 @@ export async function spawnGovernedChild(params: {
   scrubValues?: readonly string[];
   cwd?: string;
   signal?: AbortSignal;
-}): Promise<{ sessionId: string; exitCode: number }> {
+  /** Kill the child after this long. A delegate must not hang its parent's turn. */
+  timeoutMs?: number;
+}): Promise<{ sessionId: string; exitCode: number; terminatedBy: string | null }> {
   return spawnMonitoredProcess({
     workspace: params.workspace,
     runtime: "any",
@@ -340,6 +363,9 @@ export async function spawnGovernedChild(params: {
     ...(params.envExtras ? { envExtras: params.envExtras } : {}),
     ...(params.scrubValues ? { scrubValues: params.scrubValues } : {}),
     ...(params.signal ? { signal: params.signal } : {}),
+    ...(params.timeoutMs === undefined ? {} : { timeoutMs: params.timeoutMs }),
+    // Never "forward": see the note on `stdinMode`.
+    stdinMode: "close",
     meta: {
       mode: "delegated-child",
       agentId: params.agentId,

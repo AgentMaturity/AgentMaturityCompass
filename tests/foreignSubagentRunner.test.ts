@@ -142,6 +142,20 @@ describe("a foreign child is governed or it does not run", () => {
   });
 });
 
+describe("a foreign child does not hang its parent", () => {
+  it("refuses on the deadline, and says it was the deadline", async () => {
+    // A timed-out child is killed by signal, so its exit code is 1 -- and
+    // "exited 1" would send an operator hunting a crash rather than a deadline.
+    const dir = workspace();
+    const runner = runnerFor(dir, fakeAgent(dir, "sleep 30"), { timeoutMs: 1_500 });
+
+    const result = await runner(ctx());
+
+    expect(result.ok).toBe(false);
+    expect(result.reason).toContain("timed out");
+  }, 30_000);
+});
+
 describe("a truncated answer is not an answer", () => {
   it("refuses rather than reporting the part that fit", async () => {
     // The monitor caps recorded output at 4 MiB and says so with a

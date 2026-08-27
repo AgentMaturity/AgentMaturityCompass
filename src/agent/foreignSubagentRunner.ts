@@ -45,6 +45,15 @@ export interface ForeignRunnerInit {
    */
   readonly governedEnv: () => { readonly env: Record<string, string>; readonly lease: string };
   readonly cwd?: string;
+  /**
+   * How long a child may run. Absent means no deadline, which is only safe when
+   * the caller supplies its own.
+   *
+   * A foreign agent that waits for input it will never get -- an interactive CLI
+   * invoked without a print flag is the obvious case -- would otherwise hold the
+   * parent's turn open indefinitely.
+   */
+  readonly timeoutMs?: number;
 }
 
 const refuse = (reason: string): SubagentRunResult => ({ ok: false, text: "", reason });
@@ -120,7 +129,7 @@ export function createForeignRunner(init: ForeignRunnerInit): SubagentRunner {
     // over — it does not.
     const { command, args } = init.spawn(ctx.goal);
 
-    let outcome: { sessionId: string; exitCode: number };
+    let outcome: { sessionId: string; exitCode: number; terminatedBy: string | null };
     try {
       outcome = await spawnGovernedChild({
         workspace: init.workspace,
@@ -132,12 +141,20 @@ export function createForeignRunner(init: ForeignRunnerInit): SubagentRunner {
         // The lease is a bearer credential handed to the child; a child that
         // echoes it must not put it in the signed log or on the terminal.
         scrubValues: [governed.lease],
-        ...(init.cwd ? { cwd: init.cwd } : {})
+        ...(init.cwd ? { cwd: init.cwd } : {}),
+        ...(init.timeoutMs === undefined ? {} : { timeoutMs: init.timeoutMs })
       });
     } catch (error) {
       return refuse(`foreign child could not be started: ${String(error)}`);
     }
 
+    if (outcome.terminatedBy === "timeout") {
+      // Named separately because a killed child's exit code is 1, and "exited 1"
+      // would send an operator hunting a crash instead of a deadline.
+      return refuse(
+        `foreign child timed out${init.timeoutMs === undefined ? "" : ` after ${init.timeoutMs}ms`}`
+      );
+    }
     if (outcome.exitCode !== 0) {
       // Deliberately without the partial output. A child that printed something
       // and then crashed has not answered, and handing the fragment back would

@@ -129,3 +129,46 @@ describe("a governed child runs under the session it was announced with", () => 
     }
   });
 });
+
+describe("a delegated child has no operator at its keyboard", () => {
+  it("does not hang on a child that reads stdin", async () => {
+    // `amc wrap` forwards the operator's stdin to the wrapped tool, which is the
+    // point of wrapping. A DELEGATED child has no operator: its goal arrives in
+    // argv, and anything it reads from stdin would be AMC's own input stream.
+    // Without EOF a child that reads blocks forever and nothing in AMC stops it
+    // -- the exact failure mode `claude` without print mode would hit.
+    const dir = workspace();
+    const script = fakeCli(dir, 'cat > /dev/null; echo "saw eof"');
+
+    const result = await spawnGovernedChild({
+      workspace: dir,
+      sessionId: "child-stdin",
+      agentId: "payments-agent",
+      command: script,
+      args: [],
+      timeoutMs: 10_000
+    });
+
+    expect(result.exitCode, "it finished rather than waiting").toBe(0);
+  }, 30_000);
+
+  it("terminates a child that outlives its deadline", async () => {
+    // A foreign child that hangs must not hang the parent's turn. `runProcess`
+    // has always supported `timeoutMs`; the monitor never passed one.
+    const dir = workspace();
+    const script = fakeCli(dir, "sleep 30");
+
+    const started = Date.now();
+    const result = await spawnGovernedChild({
+      workspace: dir,
+      sessionId: "child-slow",
+      agentId: "payments-agent",
+      command: script,
+      args: [],
+      timeoutMs: 1_500
+    });
+
+    expect(Date.now() - started, "killed near the deadline, not at sleep's end").toBeLessThan(15_000);
+    expect(result.exitCode, "a timed-out child did not succeed").not.toBe(0);
+  }, 30_000);
+});
