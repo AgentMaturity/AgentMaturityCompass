@@ -32,7 +32,7 @@
     "copy-assets": "rm -rf dist/console/pages dist/console/assets dist/dashboard/templates && mkdir -p dist/console dist/dashboard && cp -r src/console/pages dist/console/pages && cp -r src/console/assets dist/console/assets && cp -r src/dashboard/templates dist/dashboard/templates",
     "dev": "tsx src/cli.ts",
     "api:start": "tsx api/index.ts",
-    "lint": "npm run typecheck",
+    "lint": "npm run typecheck && npm run typecheck:tests",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "typecheck:tests": "tsc -p tsconfig.tests.json --noEmit",
     "pretest": "npm run build",
