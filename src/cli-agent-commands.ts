@@ -496,9 +496,17 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
           // A warning, not a refusal: an unconfined fs.read is still governed
           // by the allowlist and the firewall. Code Mode is the part that
           // genuinely cannot run without a sandbox, and it refuses on its own.
+          //
+          // The two clauses are different facts and used to be one. Whether the
+          // MACHINE has a backend is what an operator can fix by installing
+          // something; whether THIS PROCESS is confined is what actually bounds
+          // a program, and it is false everywhere today.
           io.error(chalk.yellow(
-            `no OS sandbox on this machine (${toolset.readiness.sandboxReason ?? "unknown"}); ` +
-            "tool writes are bounded by policy only"
+            `this process is not OS-confined (${toolset.readiness.sandboxReason ?? "unknown"}); `
+            + "tool writes are bounded by policy only"
+            + (toolset.readiness.sandboxBackendAvailable
+              ? ""
+              : ", and this machine has no sandbox backend either")
           ));
         }
         toolSeam = toolset.seam;

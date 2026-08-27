@@ -3,6 +3,7 @@ import { runCodeTool } from "../codemode/runCodeTool.js";
 import { runtimeFirewallPolicyPath } from "../runtime/firewall.js";
 import { findToolDefinition, loadVerifiedToolsConfigSnapshot } from "../toolhub/toolhubValidators.js";
 import { SandboxRunner } from "../sandbox/sandboxRunner.js";
+import { processConfinementReason, processIsConfined } from "../sandbox/processConfinement.js";
 import { bashTool } from "../tools/builtin/bashTool.js";
 import { fsTools } from "../tools/builtin/fsTools.js";
 import { ReadBeforeEditLedger } from "../tools/builtin/readBeforeEdit.js";
@@ -66,7 +67,16 @@ export interface ToolsetReadiness {
   readonly ready: boolean;
   /** One line per blocker, each naming the command that fixes it. */
   readonly blockers: readonly string[];
+  /**
+   * Whether THIS PROCESS is OS-confined. Gates Code Mode.
+   *
+   * Not the same question as {@link sandboxBackendAvailable}, and conflating
+   * them is what let model-written code run unconfined on every Mac while the
+   * system reported itself sandboxed.
+   */
   readonly confined: boolean;
+  /** Whether this MACHINE has a sandbox backend at all. Reported to the operator. */
+  readonly sandboxBackendAvailable: boolean;
   readonly sandboxReason: string | null;
   /**
    * Where the signed allowlist currently lets the agent write.
@@ -129,8 +139,11 @@ export function checkToolsetReadiness(workspace: string): ToolsetReadiness {
   return {
     ready: blockers.length === 0,
     blockers,
-    confined: backend !== null,
-    sandboxReason: backend === null ? sandbox.unavailableReasons().join("; ") : null,
+    confined: processIsConfined(),
+    sandboxBackendAvailable: backend !== null,
+    sandboxReason: backend === null
+      ? sandbox.unavailableReasons().join("; ")
+      : processConfinementReason(),
     writeScope
   };
 }
