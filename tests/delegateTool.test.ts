@@ -269,3 +269,50 @@ describe("two parties must agree before an agent can delegate", () => {
     toolset.close();
   });
 });
+
+describe("the operator names the scope, not the model", () => {
+  it("uses the capability's scope and ignores anything the model sends", async () => {
+    // A model that could name its own delegation scope could name WRITE_HIGH,
+    // which is not a control at all -- it is a request form.
+    const dir = workspace();
+    allowDelegate(dir);
+    const spy = spyRunner();
+    const toolset = agentToolset({
+      workspace: dir,
+      agentId: "payments-agent",
+      subagents: {
+        identity: rootIdentity("payments-agent"),
+        runner: spy.runner,
+        session: recorder(),
+        delegationScope: ["READ_ONLY"]
+      }
+    });
+
+    await toolset.seam.execute(call({
+      runAs: "researcher",
+      goal: "g",
+      // The model asking for more than it was granted.
+      delegationScope: ["WRITE_HIGH", "FINANCIAL"]
+    }));
+
+    expect(spy.seen).toHaveLength(1);
+    expect(spy.seen[0]!.delegationScope, "the operator's scope stands").toEqual(["READ_ONLY"]);
+    toolset.close();
+  });
+
+  it("leaves a child unscoped when the capability names no scope", async () => {
+    const dir = workspace();
+    allowDelegate(dir);
+    const spy = spyRunner();
+    const toolset = agentToolset({
+      workspace: dir,
+      agentId: "payments-agent",
+      subagents: { identity: rootIdentity("payments-agent"), runner: spy.runner, session: recorder() }
+    });
+
+    await toolset.seam.execute(call({ runAs: "researcher", goal: "g" }));
+
+    expect(spy.seen[0]!.delegationScope).toBeUndefined();
+    toolset.close();
+  });
+});

@@ -3,6 +3,7 @@ import { defineTool } from "../tools/toolRegistry.js";
 import { spawnSubagent, type DelegationRecorder, type SubagentRunner } from "./subagentSpawn.js";
 import { DEFAULT_MAX_DELEGATION_DEPTH, type DelegationIdentity } from "./delegationIdentity.js";
 import type { ToolDefinition, ToolExecution } from "../tools/toolTypes.js";
+import type { ActionClass } from "../types.js";
 
 /**
  * `ctx.subagents`, in AMC's idiom (P6.1a).
@@ -46,6 +47,17 @@ export interface SubagentCapability {
   /** Where the delegation rows are written: the CALLER's session. */
   readonly session: DelegationRecorder;
   readonly maxDepth?: number;
+  /**
+   * The action classes a delegate may invoke. Set by whoever composes the
+   * toolset, never by the model.
+   *
+   * A model that could name its own scope could name `WRITE_HIGH`, which is not
+   * a delegation control at all -- it is a request form. The model says what the
+   * work is; the operator says what the work is allowed to touch. `readArgs`
+   * therefore reads only `runAs` and `goal`, and nothing merges anything from
+   * `execution.arguments` into this.
+   */
+  readonly delegationScope?: readonly ActionClass[];
   /** Injected so a test can pin the child's session id. */
   readonly mintSessionId?: () => string;
 }
@@ -122,7 +134,14 @@ export function delegateTool(capability: SubagentCapability): ToolDefinition {
       const outcome = await spawnSubagent({
         workspace: execution.workspace,
         parent: capability.identity,
-        request: { runAs: parsed.args.runAs, goal: parsed.args.goal },
+        request: {
+          runAs: parsed.args.runAs,
+          goal: parsed.args.goal,
+          // From the capability, never from `parsed.args`.
+          ...(capability.delegationScope === undefined
+            ? {}
+            : { delegationScope: capability.delegationScope })
+        },
         session: capability.session,
         runner: capability.runner,
         mintSessionId,

@@ -1,5 +1,7 @@
 import { mintDelegationPacket, UnsignablePacketError } from "../fleet/delegationPacket.js";
 import { removeHandoffPacket } from "../fleet/handoffPacket.js";
+import { parseDelegationScope } from "./delegationScope.js";
+import type { ActionClass } from "../types.js";
 import {
   DEFAULT_MAX_DELEGATION_DEPTH,
   delegateTo,
@@ -52,6 +54,15 @@ export interface SubagentRunContext {
   /** The child's own session. A child is never a second writer on the parent's. */
   readonly childSessionId: string;
   readonly goal: string;
+  /**
+   * The action classes this child is authorised for, validated.
+   *
+   * Absent means unrestricted, which is deliberately distinct from an empty
+   * list -- that is refused upstream, because an operator who writes a scope
+   * naming nothing means the opposite of "no restriction". The runner is what
+   * binds it; see ./delegationScope.ts for why the signed packet alone did not.
+   */
+  readonly delegationScope?: readonly ActionClass[];
 }
 
 /**
@@ -175,6 +186,20 @@ export async function spawnSubagent(init: SpawnSubagentInit): Promise<SubagentOu
   }
   const identity = derived.identity;
 
+  // 1b. Read the declared scope BEFORE authorising. The packet is the
+  //     authorisation record, and minting one that names a scope the runtime
+  //     cannot read would be precisely the defect this scope work exists to
+  //     close -- a signature over a constraint nothing enforces. So a bad scope
+  //     is refused like a depth refusal: no packet, no row.
+  let scopeClasses: readonly ActionClass[] | undefined;
+  if (init.request.delegationScope !== undefined) {
+    const parsed = parseDelegationScope(init.request.delegationScope);
+    if (!parsed.ok) {
+      return { ok: false, reason: parsed.reason, packetId: null };
+    }
+    scopeClasses = parsed.classes;
+  }
+
   // 2. Authorise. An unsignable packet leaves no file behind and no row.
   let packetId: string;
   try {
@@ -221,7 +246,8 @@ export async function spawnSubagent(init: SpawnSubagentInit): Promise<SubagentOu
       toolsetAgentId: identity.governedAs,
       identity,
       childSessionId,
-      goal: init.request.goal
+      goal: init.request.goal,
+      ...(scopeClasses === undefined ? {} : { delegationScope: scopeClasses })
     });
   } catch (error) {
     // A throwing child still gets an account. Announced means accounted for.

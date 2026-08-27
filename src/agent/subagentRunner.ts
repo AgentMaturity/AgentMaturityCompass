@@ -1,4 +1,5 @@
 import { SessionService } from "../session/sessionService.js";
+import { deniedToolNamesForScope } from "./delegationScope.js";
 import { agentToolset } from "./agentToolset.js";
 import { AgentDriver } from "./agentDriver.js";
 import { readAgentRunSummary } from "./runReport.js";
@@ -115,6 +116,21 @@ export function createDriverRunner(init: DriverRunnerInit): SubagentRunner {
             }
           })
     });
+
+    // Bind the child to its declared scope, before it is offered anything.
+    //
+    // This is what turns `delegationScope` from a line in a signed packet into a
+    // constraint: it has been recorded in every handoff packet since packets
+    // existed and read back by nothing, so a packet asserting READ_ONLY was a
+    // signature over a rule that did not exist. Applied to the CHILD's own
+    // registry, which `agentToolset` creates per call, so narrowing it cannot
+    // reach the parent -- the two share `governedAs`, and a scope-keyed
+    // restriction would otherwise narrow both.
+    if (ctx.delegationScope !== undefined) {
+      toolset.registry.restrict({
+        deny: new Set(deniedToolNamesForScope(toolset.registry, ctx.delegationScope))
+      });
+    }
 
     let keepAlive = false;
     let released = false;
