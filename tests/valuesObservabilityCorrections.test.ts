@@ -20,7 +20,7 @@ import Database from "better-sqlite3";
 // ── shared test workspace ──────────────────────────────────────────────────
 
 let tmpDir: string;
-let db: Database.Database;
+let db: Database.Database | undefined;
 
 beforeAll(() => {
   tmpDir = mkdtempSync(join(tmpdir(), "amc-val-obs-test-"));
@@ -103,7 +103,6 @@ describe("valueCoherence — computeVCI", () => {
   test("ignores preferences with unknown impliedValue", () => {
     const prefs = [
       pref({ preferenceId: "p1", ts: 1000, impliedValue: "safety" }),
-      // @ts-expect-error intentional invalid value
       { preferenceId: "p2", agentId: "a", context: "c", chosenOption: "x", alternatives: [], impliedValue: "unknown-dim", evidenceRef: "e", ts: 2000, signature: "s" } as RevealedPreference,
     ];
     // Should not throw
@@ -1047,10 +1046,15 @@ function createLifecycleDb(): Database.Database {
 }
 
 const mockPolicy = {
-  minEvidenceCount: 0,
-  requireObservedTier: false,
-  requireSignedEvidence: false,
-  maxAgeMs: Infinity,
+  minDistinctSessions: 0,
+  minDistinctDays: 0,
+  minEvidenceEvents: 0,
+  requireObservedEvidence: false,
+  quarantineTtlMs: Number.MAX_SAFE_INTEGER,
+  provisionalTtlMs: Number.MAX_SAFE_INTEGER,
+  requireOwnerCoSign: false,
+  minConfidenceForPromotion: 0,
+  nonPromotableTags: [],
 };
 
 const mockSignFn = (digest: string) => `mock-sig-${digest.slice(0, 8)}`;
