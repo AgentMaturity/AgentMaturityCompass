@@ -86,14 +86,16 @@ describe("GAP-1835 TradingAgents handoff contracts boundary", () => {
           ownerAgentId: "market-analyst",
           status: "satisfied",
           required: true,
-          evidenceRefs: ["receipt-market-data"]
+          evidenceRefs: ["receipt-market-data"],
+          refusalReason: null
         },
         {
           dependencyId: "portfolio-policy",
           ownerAgentId: "portfolio-manager",
           status: "pending",
           required: true,
-          evidenceRefs: ["policy-ref"]
+          evidenceRefs: ["policy-ref"],
+          refusalReason: null
         }
       ],
       ownershipTransfer: {
@@ -117,7 +119,8 @@ describe("GAP-1835 TradingAgents handoff contracts boundary", () => {
           ownerAgentId: "portfolio-manager",
           status: "satisfied",
           required: true,
-          evidenceRefs: ["receipt-portfolio-policy"]
+          evidenceRefs: ["receipt-portfolio-policy"],
+          refusalReason: null
         }
       ]
     });

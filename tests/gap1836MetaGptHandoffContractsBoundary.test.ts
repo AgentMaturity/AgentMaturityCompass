@@ -86,14 +86,16 @@ describe("GAP-1836 MetaGPT handoff contracts boundary", () => {
           ownerAgentId: "product-manager",
           status: "satisfied",
           required: true,
-          evidenceRefs: ["receipt-requirements-package"]
+          evidenceRefs: ["receipt-requirements-package"],
+          refusalReason: null
         },
         {
           dependencyId: "acceptance-criteria",
           ownerAgentId: "project-manager",
           status: "pending",
           required: true,
-          evidenceRefs: ["criteria-draft"]
+          evidenceRefs: ["criteria-draft"],
+          refusalReason: null
         }
       ],
       ownershipTransfer: {
@@ -114,7 +116,8 @@ describe("GAP-1836 MetaGPT handoff contracts boundary", () => {
           ownerAgentId: "project-manager",
           status: "satisfied",
           required: true,
-          evidenceRefs: ["receipt-acceptance-criteria"]
+          evidenceRefs: ["receipt-acceptance-criteria"],
+          refusalReason: null
         }
       ]
     });

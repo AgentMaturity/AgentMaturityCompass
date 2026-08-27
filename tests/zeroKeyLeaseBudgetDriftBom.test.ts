@@ -4,7 +4,7 @@ import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { afterEach, describe, expect, test, vi } from "vitest";
 import { initWorkspace } from "../src/workspace.js";
-import { initGatewayConfig, type GatewayConfig } from "../src/gateway/config.js";
+import { gatewayConfigSchema, initGatewayConfig, type GatewayConfig } from "../src/gateway/config.js";
 import { startGateway } from "../src/gateway/server.js";
 import { issueLeaseForCli, revokeLeaseForCli, verifyLeaseForCli } from "../src/leases/leaseCli.js";
 import { initBudgets, loadBudgetsConfig, signBudgetsConfig } from "../src/budgets/budgets.js";
@@ -255,7 +255,7 @@ describe("zero-key, leases, budgets, drift, and BOM", () => {
     }
 
     process.env.OPENAI_API_KEY = "vault-only-secret";
-    const config: GatewayConfig = {
+    const config: GatewayConfig = gatewayConfigSchema.parse({
       listen: { host: "127.0.0.1", port: 0 },
       redaction: {
         headerKeysDenylist: ["authorization", "x-api-key", "api-key", "x-openai-key"],
@@ -272,7 +272,7 @@ describe("zero-key, leases, budgets, drift, and BOM", () => {
       },
       routes: [{ prefix: "/openai", upstream: "openai", stripPrefix: true, openaiCompatible: true }],
       proxy: { enabled: false, port: 3211, allowlistHosts: [], denyByDefault: true }
-    };
+    });
     initGatewayConfig(workspace, config);
     const gateway = await startGateway({ workspace });
 
@@ -359,7 +359,7 @@ describe("zero-key, leases, budgets, drift, and BOM", () => {
       throw new Error("upstream bind failed");
     }
 
-    initGatewayConfig(workspace, {
+    initGatewayConfig(workspace, gatewayConfigSchema.parse({
       listen: { host: "127.0.0.1", port: 0 },
       redaction: {
         headerKeysDenylist: ["authorization"],
@@ -376,7 +376,7 @@ describe("zero-key, leases, budgets, drift, and BOM", () => {
       },
       routes: [{ prefix: "/openai", upstream: "openai", stripPrefix: true, openaiCompatible: true }],
       proxy: { enabled: false, port: 3211, allowlistHosts: [], denyByDefault: true }
-    });
+    }));
     const gateway = await startGateway({ workspace });
     const lease = issueLeaseForCli({
       workspace,
@@ -642,7 +642,7 @@ describe("zero-key, leases, budgets, drift, and BOM", () => {
       throw new Error("upstream bind failed");
     }
 
-    initGatewayConfig(workspace, {
+    initGatewayConfig(workspace, gatewayConfigSchema.parse({
       listen: { host: "127.0.0.1", port: 0 },
       redaction: {
         headerKeysDenylist: ["authorization", "x-api-key", "api-key", "x-openai-key"],
@@ -659,7 +659,7 @@ describe("zero-key, leases, budgets, drift, and BOM", () => {
       },
       routes: [{ prefix: "/openai", upstream: "openai", stripPrefix: true, openaiCompatible: true }],
       proxy: { enabled: false, port: 3211, allowlistHosts: [], denyByDefault: true }
-    });
+    }));
     const gateway = await startGateway({ workspace });
     const lease = issueLeaseForCli({
       workspace,
