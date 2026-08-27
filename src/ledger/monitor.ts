@@ -71,9 +71,20 @@ async function spawnMonitoredProcess(params: {
   meta?: Record<string, unknown>;
   scrubValues?: readonly string[];
   signal?: AbortSignal;
-}): Promise<string> {
+  /**
+   * Run under a session id the caller already committed to.
+   *
+   * `amc wrap` has no such commitment and keeps the minted id. A DELEGATED child
+   * does: `spawnSubagent` announces `childSessionId` in the parent's signed log
+   * before the child runs, so that an unmatched `delegation-started` means "a
+   * delegation nobody closed". A child writing under a different id would make
+   * that row point at a session which does not exist.
+   */
+  sessionId?: string;
+  cwd?: string;
+}): Promise<{ sessionId: string; exitCode: number }> {
   const ledger = openLedger(params.workspace);
-  const sessionId = randomUUID();
+  const sessionId = params.sessionId ?? randomUUID();
 
   try {
     const version = probeBinaryVersion(params.command);
@@ -142,7 +153,7 @@ async function spawnMonitoredProcess(params: {
 
     const running = runProcess({
       argv: [params.command, ...params.args],
-      cwd: process.cwd(),
+      cwd: params.cwd ?? process.cwd(),
       env: {
         ...definedEnv(stripProviderKeys(process.env)),
         ...(params.envExtras ?? {}),
@@ -232,7 +243,11 @@ async function spawnMonitoredProcess(params: {
     });
 
     ledger.sealSession(sessionId);
-    return sessionId;
+    // The exit code goes BACK to the caller, not only into the ledger. It was
+    // always recorded as `runtime_exit_code`; discarding it here is why
+    // `runAdapterCommand`'s SANDBOX branch could return a hardcoded `exitCode: 0`
+    // and report a crashed foreign agent as a success.
+    return { sessionId, exitCode: outcome.exitCode ?? 1 };
   } finally {
     ledger.close();
   }
@@ -250,7 +265,7 @@ export async function wrapRuntime(
   const configured = opts.config.runtimes[runtimeKey];
   const command = opts.commandOverride ?? configured.command;
   const agentId = resolveAgentId(opts.workspace, opts.agentId);
-  return spawnMonitoredProcess({
+  return (await spawnMonitoredProcess({
     workspace: opts.workspace,
     runtime,
     command,
@@ -261,7 +276,7 @@ export async function wrapRuntime(
       agentId,
       trustTier: "OBSERVED"
     }
-  });
+  })).sessionId;
 }
 
 export async function wrapAny(
@@ -270,7 +285,7 @@ export async function wrapAny(
   opts: { workspace: string; agentId?: string; signal?: AbortSignal }
 ): Promise<string> {
   const agentId = resolveAgentId(opts.workspace, opts.agentId);
-  return spawnMonitoredProcess({
+  return (await spawnMonitoredProcess({
     workspace: opts.workspace,
     runtime: "any",
     command,
@@ -279,6 +294,55 @@ export async function wrapAny(
     meta: {
       mode: "wrap-any",
       agentId,
+      trustTier: "OBSERVED"
+    }
+  })).sessionId;
+}
+
+/**
+ * Run a foreign process as a DELEGATED child, under an announced session id.
+ *
+ * The narrow entry point P6.1b needs, and deliberately not `runAdapterCommand`:
+ * that requires AMC Studio to be running, mints its own session id, returns only
+ * an exit code with no child text, and hardcodes `exitCode: 0` on its SANDBOX
+ * branch. This composes the same primitives at the level a subagent runner
+ * actually needs.
+ *
+ * Differences from `superviseProcess`, each load-bearing:
+ *   - the session id comes from the caller, because it was already announced;
+ *   - the exit code comes back, so a crashed child cannot report success;
+ *   - `AMC_LEASE` is NOT inherited from AMC's own environment. `superviseProcess`
+ *     passes `process.env.AMC_LEASE` straight through, which would hand a
+ *     delegated child the PARENT's full-scope credential and silently ignore any
+ *     narrower one minted for it. A child here gets exactly the environment its
+ *     caller chose.
+ */
+export async function spawnGovernedChild(params: {
+  workspace: string;
+  sessionId: string;
+  agentId: string;
+  command: string;
+  args: readonly string[];
+  /** Exactly what the child should carry. Nothing is inherited beyond the fence. */
+  envExtras?: Record<string, string>;
+  /** Values to scrub from recorded output — the child's own lease, above all. */
+  scrubValues?: readonly string[];
+  cwd?: string;
+  signal?: AbortSignal;
+}): Promise<{ sessionId: string; exitCode: number }> {
+  return spawnMonitoredProcess({
+    workspace: params.workspace,
+    runtime: "any",
+    command: params.command,
+    args: [...params.args],
+    sessionId: params.sessionId,
+    ...(params.cwd ? { cwd: params.cwd } : {}),
+    ...(params.envExtras ? { envExtras: params.envExtras } : {}),
+    ...(params.scrubValues ? { scrubValues: params.scrubValues } : {}),
+    ...(params.signal ? { signal: params.signal } : {}),
+    meta: {
+      mode: "delegated-child",
+      agentId: params.agentId,
       trustTier: "OBSERVED"
     }
   });
@@ -328,7 +392,7 @@ export async function superviseProcess(
     extraEnv.NO_PROXY = "localhost,127.0.0.1,::1";
   }
 
-  return spawnMonitoredProcess({
+  return (await spawnMonitoredProcess({
     workspace: opts.workspace,
     runtime: "any",
     command,
@@ -346,7 +410,7 @@ export async function superviseProcess(
       gatewayProxyUrl: opts.gatewayProxyUrl ?? null,
       trustTier: "OBSERVED"
     }
-  });
+  })).sessionId;
 }
 
 export async function startMonitor(opts: {
