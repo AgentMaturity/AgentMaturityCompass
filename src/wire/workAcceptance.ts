@@ -77,6 +77,22 @@ export function acceptWork(params: {
   readonly intakeSessionId: string;
   readonly request: WorkRequest;
 }): AcceptedWork {
+  // The intake session must already exist as a row. `appendEvidenceWithReceipt`
+  // will happily write an event naming a session that was never started, and
+  // nothing fails until `verifyLedgerIntegrity` reports "references missing
+  // session" (../ledger/ledgerVerification.ts:530) over the WHOLE ledger --
+  // long after this call returned a signed receipt. Refused here so the failure
+  // lands on the caller that caused it instead of on the next person to verify.
+  const intake = params.ledger.db.prepare(
+    "SELECT 1 AS present FROM sessions WHERE session_id = ? LIMIT 1"
+  ).get(params.intakeSessionId) as { present: number } | undefined;
+  if (!intake) {
+    throw new Error(
+      `intake session ${params.intakeSessionId} was never started; `
+      + "open it before accepting work, or the acceptance row references a missing session"
+    );
+  }
+
   const workSessionId = randomUUID();
   const body = acceptanceBody(workSessionId, params.request);
   const requestSha256 = sha256Hex(Buffer.from(body, "utf8"));

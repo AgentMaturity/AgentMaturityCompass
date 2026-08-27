@@ -32,7 +32,7 @@ function makeWorkspace() {
   initWorkspace({ workspacePath: dir, agentId: "default", trustBoundaryMode: "isolated" });
   const ledger = openLedger(dir);
   ledger.startSession({
-    sessionId: "intake", runtime: "wire", binaryPath: "test", binarySha256: "abc"
+    sessionId: "intake", runtime: "amc", binaryPath: "test", binarySha256: "abc"
   });
   return { dir, ledger, monitorPublicKeys: getPublicKeyHistory(dir, "monitor") };
 }
@@ -68,6 +68,18 @@ describe("work acceptance", () => {
     expect(described.request.prompt).toBe(REQUEST.prompt);
     // Accepted is not started. This is the state the whole design exists to show.
     expect(described.state).toBe("not-started");
+  });
+
+  it("refuses to accept work against an intake session that was never started", () => {
+    const { ledger } = makeWorkspace();
+    // Without this guard the append succeeds and returns a valid signed receipt;
+    // the damage only surfaces later as a whole-ledger verification failure.
+    expect(() => acceptWork({ ledger, intakeSessionId: "never-opened", request: REQUEST }))
+      .toThrow(/never started/);
+    const orphans = ledger.db.prepare(
+      "SELECT COUNT(*) AS n FROM evidence_events WHERE session_id = ?"
+    ).get("never-opened") as { n: number };
+    expect(orphans.n).toBe(0);
   });
 
   it("refuses a receipt minted for a different kind of event", () => {
@@ -139,7 +151,7 @@ describe("work acceptance", () => {
     const { ledger, monitorPublicKeys } = makeWorkspace();
     const body = JSON.stringify({ v: 1, workSessionId: "some-session", request: REQUEST });
     const miswired = ledger.appendEvidenceWithReceipt({
-      sessionId: "intake", runtime: "wire", eventType: WORK_ACCEPTED_EVENT,
+      sessionId: "intake", runtime: "amc", eventType: WORK_ACCEPTED_EVENT,
       payload: body, payloadExt: "json", inline: true,
       meta: { agentId: "default", trustTier: "OBSERVED" },
       receipt: {
