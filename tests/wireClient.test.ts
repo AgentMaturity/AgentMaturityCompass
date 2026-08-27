@@ -302,17 +302,22 @@ describe("against a server that misbehaves", () => {
     // `String()` never fails: an object became the receipt "[object Object]", a
     // missing field became "undefined", and -- worst -- String(["s"]) is "s", so
     // a one-element array impersonated the string it contained.
-    const junk = [
-      { workSessionId: {}, receipt: "r", receiptId: "i", requestSha256: "d" },
-      { workSessionId: ["s"], receipt: "r", receiptId: "i", requestSha256: "d" },
-      { workSessionId: "s", receipt: 12345, receiptId: "i", requestSha256: "d" },
-      { workSessionId: "s", receipt: "r", receiptId: null, requestSha256: "d" },
-      { workSessionId: "s", receipt: "r", receiptId: "i" }
+    const junk: ReadonlyArray<readonly [Record<string, unknown>, RegExp]> = [
+      [{ workSessionId: {}, receipt: "r", receiptId: "i", requestSha256: "d" }, /result workSessionId:/],
+      [{ workSessionId: ["s"], receipt: "r", receiptId: "i", requestSha256: "d" }, /result workSessionId:/],
+      [{ workSessionId: "s", receipt: 12345, receiptId: "i", requestSha256: "d" }, /result receipt:/],
+      [{ workSessionId: "s", receipt: "r", receiptId: null, requestSha256: "d" }, /result receiptId:/],
+      [{ workSessionId: "s", receipt: "r", receiptId: "i" }, /result requestSha256:/],
+      // `.strict()` refuses an extra field too: one the sender believes it set
+      // and the receiver silently drops is a message that lies about itself.
+      [{ workSessionId: "s", receipt: "r", receiptId: "i", requestSha256: "d", extra: 1 }, /result/]
     ];
-    for (const result of junk) {
+    for (const [result, expected] of junk) {
       const client = await clientFor(await replyingWith((id) =>
         JSON.stringify({ jsonrpc: "2.0", id, result })), "lease");
-      await expect(client.acceptWork(work)).rejects.toThrow(/is not a non-empty string/);
+      // The refusal names the field, never its contents.
+      await expect(client.acceptWork(work)).rejects.toThrow(expected);
+      await expect(client.acceptWork(work)).rejects.not.toThrow(/object Object/);
     }
   });
 
@@ -322,7 +327,7 @@ describe("against a server that misbehaves", () => {
     // not one of.
     const client = await clientFor(await replyingWith((id) =>
       JSON.stringify({ jsonrpc: "2.0", id, result: { workSessionId: "s", state: "succeeded" } })), "lease");
-    await expect(client.describeWork("r")).rejects.toThrow(/is not one of not-started, running/);
+    await expect(client.describeWork("r")).rejects.toThrow(/result state:/);
   });
 
   it("latches on a reply larger than the record limit", async () => {

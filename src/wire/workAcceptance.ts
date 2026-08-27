@@ -132,7 +132,9 @@ export function acceptWork(params: {
  * that failed and closed cleanly lands here too. The outcome of the work is in
  * the work session's own rows; this states only that it stopped in an orderly way.
  */
-export type WorkState = "not-started" | "running" | "abandoned" | "finished";
+export const WORK_STATES = ["not-started", "running", "abandoned", "finished"] as const;
+
+export type WorkState = (typeof WORK_STATES)[number];
 
 export type DescribedWork =
   | { readonly ok: false; readonly reason: string }

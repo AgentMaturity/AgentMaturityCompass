@@ -1,7 +1,9 @@
 import { connect, type Socket } from "node:net";
 import { NdjsonFramer } from "./ndjsonFraming.js";
 import { parseWireObject } from "./wireJson.js";
-import { readEnumField, readStringFields, readWireReply } from "./wireReply.js";
+import { decodeResult } from "./wireCodecs.js";
+import { readWireReply } from "./wireReply.js";
+import { WORK_STATES, type WorkState } from "./workAcceptance.js";
 
 /**
  * A TypeScript client for the wire (plan P7.1a).
@@ -89,12 +91,10 @@ export interface AcceptedWorkHandle {
   readonly requestSha256: string;
 }
 
-export const WORK_STATES = ["not-started", "running", "abandoned", "finished"] as const;
-
 export interface DescribedWorkHandle {
   readonly workSessionId: string;
   /** `finished` means the session closed, NOT that the work succeeded. */
-  readonly state: (typeof WORK_STATES)[number];
+  readonly state: WorkState;
 }
 
 /**
@@ -245,21 +245,21 @@ export async function connectWireClient(init: WireClientInit): Promise<WireClien
         providerId: params.providerId,
         ...(params.model === undefined ? {} : { model: params.model })
       });
-      // Read, not coerced. `String()` never fails, so an object came back as the
-      // receipt "[object Object]", a missing field as "undefined", and -- worst --
-      // `String(["s-real"])` as "s-real", an array impersonating its own element.
-      const fields = readStringFields(result, ["workSessionId", "receipt", "receiptId", "requestSha256"]);
-      if (!fields.ok) throw new WireTransportError(fields.reason);
-      return fields.fields;
+      // Decoded against the same declaration the server encodes from, so the
+      // two cannot drift. `String()` never fails, which is why it used to hand
+      // back an object as the receipt "[object Object]", a missing field as
+      // "undefined", and -- worst -- `String(["s-real"])` as "s-real", an array
+      // impersonating the string it contains.
+      const decoded = decodeResult("work/accept", result);
+      if (!decoded.ok) throw new WireTransportError(decoded.reason);
+      return decoded.value;
     },
 
     async describeWork(receipt) {
       const result = await call("work/describe", { receipt });
-      const fields = readStringFields(result, ["workSessionId"]);
-      if (!fields.ok) throw new WireTransportError(fields.reason);
-      const state = readEnumField(result, "state", WORK_STATES);
-      if (!state.ok) throw new WireTransportError(state.reason);
-      return { workSessionId: fields.fields.workSessionId, state: state.value };
+      const decoded = decodeResult("work/describe", result);
+      if (!decoded.ok) throw new WireTransportError(decoded.reason);
+      return decoded.value;
     },
 
     close() {

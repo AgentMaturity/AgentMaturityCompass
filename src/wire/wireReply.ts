@@ -2,21 +2,16 @@
  * Reading a reply, with the same suspicion the server reads a request
  * (plan P7.1a).
  *
- * WHY THIS IS NOT `String(result["receipt"])`. It used to be. Coercion never
- * fails, so a hostile or broken server could hand back an object and the client
- * would resolve with the receipt `"[object Object]"`, or hand back
- * `["s-real"]` and the client would resolve with `"s-real"` -- because
- * `String(["s-real"])` is `"s-real"`, an array that impersonates the string it
- * contains. A missing field became the literal `"undefined"`. Every one of those
- * is a fabricated value the caller then uses as a handle, and none of them
- * throws. A wrong answer that looks right is worse than an error.
+ * THE ENVELOPE ONLY. What a `result` contains is per-method and is decoded from
+ * the shared declaration in ./wireCodecs.ts; this file decides whether the thing
+ * that arrived is a reply at all. The two were briefly one module, which put a
+ * hand-written reader for every field beside the envelope rules and gave the
+ * client its own private idea of each method's shape.
  *
- * So a field is READ, not converted: the wrong type is a refusal.
- *
- * THE ENVELOPE IS CHECKED TOO. The server refuses a request whose `jsonrpc` is
- * missing or which carries a member the protocol does not define; a client that
- * accepted those in the other direction would leave the two halves speaking
- * different languages, with only one of them checking.
+ * The server refuses a request whose `jsonrpc` is missing, or which carries a
+ * member the protocol does not define. A client that accepted those in the other
+ * direction would leave the two halves speaking different languages with only
+ * one of them checking.
  */
 
 /** Members a reply may carry. Anything else is a different protocol. */
@@ -91,46 +86,4 @@ function readError(raw: unknown): WireReplyError | null {
   if (typeof shape.code !== "number" || !Number.isSafeInteger(shape.code)) return null;
   if (typeof shape.message !== "string") return null;
   return { code: shape.code, message: shape.message };
-}
-
-/**
- * Read named string fields, or say which one was wrong.
- *
- * Returns the reason rather than a partial object: a handle assembled from three
- * good fields and one fabricated one is not a handle, and the caller cannot tell
- * by looking.
- */
-export function readStringFields<K extends string>(
-  result: Record<string, unknown>,
-  keys: readonly K[]
-): { readonly ok: true; readonly fields: Record<K, string> } | { readonly ok: false; readonly reason: string } {
-  const fields = {} as Record<K, string>;
-  for (const key of keys) {
-    const value = result[key];
-    if (typeof value !== "string" || value.length === 0) {
-      return { ok: false, reason: `reply field ${JSON.stringify(key)} is not a non-empty string` };
-    }
-    fields[key] = value;
-  }
-  return { ok: true, fields };
-}
-
-/** Read a field constrained to a known set of values. */
-export function readEnumField<T extends string>(
-  result: Record<string, unknown>,
-  key: string,
-  allowed: readonly T[]
-): { readonly ok: true; readonly value: T } | { readonly ok: false; readonly reason: string } {
-  const value = result[key];
-  if (typeof value !== "string" || !allowed.includes(value as T)) {
-    // The declared type used to be an `as` cast, which is a compile-time claim
-    // about a runtime value the far end chose -- so a server could return
-    // "succeeded" and the caller would receive it typed as one of four states it
-    // is not one of.
-    return {
-      ok: false,
-      reason: `reply field ${JSON.stringify(key)} is not one of ${allowed.join(", ")}`
-    };
-  }
-  return { ok: true, value: value as T };
 }

@@ -1,5 +1,6 @@
 import type { LeaseScope } from "../leases/leaseSchema.js";
 import type { Ledger } from "../ledger/ledger.js";
+import { decodeParams } from "./wireCodecs.js";
 import { acceptWork, describeAcceptedWork } from "./workAcceptance.js";
 import { WIRE_ERROR, type WireErrorCode } from "./wireRpc.js";
 
@@ -59,28 +60,16 @@ export interface WireMethod {
   readonly handle: (ctx: WireMethodContext, params: Record<string, unknown>) => WireMethodResult;
 }
 
-function requireString(params: Record<string, unknown>, key: string): string | null {
-  const value = params[key];
-  return typeof value === "string" && value.length > 0 ? value : null;
-}
-
 export const WIRE_METHODS: readonly WireMethod[] = [
   {
     name: "work/accept",
     routePath: "/wire/work/accept",
     scope: "wire:submit",
     handle: (ctx, params) => {
-      const prompt = requireString(params, "prompt");
-      if (prompt === null) {
-        return { ok: false, code: WIRE_ERROR.invalidParams, message: "prompt must be a non-empty string" };
-      }
-      const providerId = requireString(params, "providerId");
-      if (providerId === null) {
-        return { ok: false, code: WIRE_ERROR.invalidParams, message: "providerId must be a non-empty string" };
-      }
-      // `agentId` is not read from params and is not accepted there. A peer that
-      // sends one is refused rather than quietly overridden, so a caller never
-      // believes it attributed work to someone it did not.
+      // Checked before the schema, because `.strict()` would refuse this as an
+      // unrecognised key with a message that says nothing about WHY. A peer that
+      // tried to name the agent needs to be told the lease decides it, not that
+      // it misspelled something.
       if ("agentId" in params) {
         return {
           ok: false,
@@ -88,15 +77,18 @@ export const WIRE_METHODS: readonly WireMethod[] = [
           message: "agentId is taken from the lease and must not be sent"
         };
       }
-      const model = params["model"];
-      if (model !== undefined && model !== null && typeof model !== "string") {
-        return { ok: false, code: WIRE_ERROR.invalidParams, message: "model must be a string or null" };
-      }
+      const decoded = decodeParams("work/accept", params);
+      if (!decoded.ok) return { ok: false, code: WIRE_ERROR.invalidParams, message: decoded.reason };
 
       const accepted = acceptWork({
         ledger: ctx.ledger,
         intakeSessionId: ctx.intakeSessionId,
-        request: { prompt, agentId: ctx.agentId, providerId, model: (model as string | null) ?? null }
+        request: {
+          prompt: decoded.value.prompt,
+          agentId: ctx.agentId,
+          providerId: decoded.value.providerId,
+          model: decoded.value.model ?? null
+        }
       });
       return {
         ok: true,
@@ -114,13 +106,12 @@ export const WIRE_METHODS: readonly WireMethod[] = [
     routePath: "/wire/work/describe",
     scope: "wire:submit",
     handle: (ctx, params) => {
-      const receipt = requireString(params, "receipt");
-      if (receipt === null) {
-        return { ok: false, code: WIRE_ERROR.invalidParams, message: "receipt must be a non-empty string" };
-      }
+      const decoded = decodeParams("work/describe", params);
+      if (!decoded.ok) return { ok: false, code: WIRE_ERROR.invalidParams, message: decoded.reason };
+
       const described = describeAcceptedWork({
         ledger: ctx.ledger,
-        receipt,
+        receipt: decoded.value.receipt,
         monitorPublicKeys: ctx.monitorPublicKeys
       });
       if (!described.ok) {
