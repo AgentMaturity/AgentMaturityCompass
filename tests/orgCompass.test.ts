@@ -211,7 +211,7 @@ async function waitForOrgSseEvent(params: {
             if (!settled) {
               settled = true;
               clearTimeout(timer);
-              req.destroy();
+              req?.destroy();
               resolvePromise({ event, data });
             }
             return;

@@ -1,4 +1,5 @@
 import { describe, expect, test } from "vitest";
+import type { AMCSurfaceName } from "../src/types.js";
 import {
   runReplayBenchmarkCorpus,
   verifyReplayBenchmarkCorpusReceipt,
@@ -156,7 +157,7 @@ function langfuseReplayRow(overrides: Record<string, unknown> = {}) {
       evidenceRefs: ["trace:langfuse-candidate"],
       signedEvidenceRefs: ["ledger:sig-langfuse-candidate"],
     },
-    surfaces: ["Score", "Shield", "Watch"] as const,
+    surfaces: ["Score", "Shield", "Watch"] as AMCSurfaceName[],
     ...overrides,
   };
 }

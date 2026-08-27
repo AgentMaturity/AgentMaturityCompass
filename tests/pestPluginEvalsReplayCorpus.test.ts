@@ -1,5 +1,8 @@
 import { describe, expect, test } from "vitest";
+import type { AMCSurfaceName } from "../src/types.js";
 import {
+  type ReplayBenchmarkLlmEvaluationSystemJudgeFamily,
+  type ReplayBenchmarkLlmEvaluationSystemMode,
   runReplayBenchmarkCorpus,
   verifyReplayBenchmarkCorpusReceipt,
 } from "../src/benchmarks/replayBenchmarkCorpus.js";
@@ -105,9 +108,9 @@ function pestReplayRow(overrides: Record<string, unknown> = {}) {
         llmEvaluationSystemReplayCommandHash: completePestEvalPack.replayCommandHash,
         llmEvaluationSystemCiReceiptHash: completePestEvalPack.ciReceiptHash,
         llmEvaluationSystemNoConfigOnlyBoundaryHash: completePestEvalPack.noConfigOnlyBoundaryHash,
-        llmEvaluationSystemModes: ["dataset_generation", "judge_configuration", "agent_trace", "custom"] as const,
+        llmEvaluationSystemModes: ["dataset_generation", "judge_configuration", "agent_trace", "custom"] as ReplayBenchmarkLlmEvaluationSystemMode[],
         minLlmEvaluationSystemModeCount: 4,
-        llmEvaluationSystemJudgeFamilies: ["openai", "custom"] as const,
+        llmEvaluationSystemJudgeFamilies: ["openai", "custom"] as ReplayBenchmarkLlmEvaluationSystemJudgeFamily[],
         minLlmEvaluationSystemJudgeFamilyCount: 2,
         llmEvaluationSystemDatasetCount: 2,
         minLlmEvaluationSystemDatasetCount: 2,
@@ -151,7 +154,7 @@ function pestReplayRow(overrides: Record<string, unknown> = {}) {
       evidenceRefs: ["trace:pest-plugin-evals-candidate"],
       signedEvidenceRefs: ["ledger:sig-pest-plugin-evals-candidate"],
     },
-    surfaces: ["Score", "Shield", "Watch"] as const,
+    surfaces: ["Score", "Shield", "Watch"] as AMCSurfaceName[],
     ...overrides,
   };
 }
@@ -302,9 +305,9 @@ describe("pest-plugin-evals replay corpus source review", () => {
               llmEvaluationSystemReplayCommandHash: null,
               llmEvaluationSystemCiReceiptHash: null,
               llmEvaluationSystemNoConfigOnlyBoundaryHash: null,
-              llmEvaluationSystemModes: ["custom"] as const,
+              llmEvaluationSystemModes: ["custom"] as ReplayBenchmarkLlmEvaluationSystemMode[],
               minLlmEvaluationSystemModeCount: 4,
-              llmEvaluationSystemJudgeFamilies: ["custom"] as const,
+              llmEvaluationSystemJudgeFamilies: ["custom"] as ReplayBenchmarkLlmEvaluationSystemJudgeFamily[],
               minLlmEvaluationSystemJudgeFamilyCount: 2,
               llmEvaluationSystemDatasetCount: 0,
               minLlmEvaluationSystemDatasetCount: 2,

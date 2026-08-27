@@ -12,9 +12,9 @@ import { analyzeTimeSeries, detectRegressionAlert, type ScoreDataPoint } from ".
 
 function makeQ(id: string, level: number, confidence: number, evidenceCount: number): QuestionScore {
   return {
-    questionId: id, layerName: "Skills", rawLevel: level, finalLevel: level,
+    questionId: id, claimedLevel: level, supportedMaxLevel: level, finalLevel: level,
     confidence, evidenceEventIds: Array.from({ length: evidenceCount }, (_, i) => `ev-${id}-${i}`),
-    narrative: "", boosts: [], caps: [],
+    flags: [], narrative: "",
   };
 }
 

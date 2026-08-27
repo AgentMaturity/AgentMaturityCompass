@@ -131,7 +131,7 @@ describe("GAP-1247 BAML guard decision receipts boundary", () => {
       });
 
       expect(receipt).not.toBeNull();
-      receipts.push(receipt);
+      receipts.push(receipt!);
     }
 
     const publicKeys = getPublicKeyHistory(tempDir!, "monitor");
@@ -209,7 +209,7 @@ describe("GAP-1247 BAML guard decision receipts boundary", () => {
     const tamperedRule: GuardDecisionReceipt = {
       ...receipt,
       payload: {
-        ...receipt.payload,
+        ...receipt!.payload,
         matchedRule: "rule:changed-after-signing",
       },
     };
@@ -220,7 +220,7 @@ describe("GAP-1247 BAML guard decision receipts boundary", () => {
 
     const tamperedSignature: GuardDecisionReceipt = {
       ...receipt,
-      signature: `${receipt.signature.slice(0, -2)}xx`,
+      signature: `${receipt!.signature.slice(0, -2)}xx`,
     };
     expect(verifyGuardDecisionReceipt(tamperedSignature, { publicKeys })).toMatchObject({
       ok: false,

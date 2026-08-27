@@ -118,7 +118,7 @@ describe("GAP-1305 ClawShield guard decision receipts boundary", () => {
       });
 
       expect(receipt).not.toBeNull();
-      receipts.push(receipt);
+      receipts.push(receipt!);
     }
 
     const publicKeys = getPublicKeyHistory(tempDir!, "monitor");

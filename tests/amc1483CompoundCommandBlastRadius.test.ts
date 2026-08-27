@@ -107,8 +107,8 @@ function setApprovals(workspace: string, deployApprovals = 0, writeHighApprovals
     rule.requireDistinctUsers = false;
     rule.requireAssurancePacks = {};
   }
-  policy.approvalPolicy.actionClasses.DEPLOY.requiredApprovals = deployApprovals;
-  policy.approvalPolicy.actionClasses.WRITE_HIGH.requiredApprovals = writeHighApprovals;
+  policy.approvalPolicy.actionClasses.DEPLOY!.requiredApprovals = deployApprovals;
+  policy.approvalPolicy.actionClasses.WRITE_HIGH!.requiredApprovals = writeHighApprovals;
   initApprovalPolicy(workspace, policy);
 }
 

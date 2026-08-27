@@ -453,7 +453,7 @@ describe("AMC-1476 capability-gated provider steer outcome", () => {
     expect(lifecycle).toMatchObject({ status: "requested", valid: true, reasonCodes: [] });
     expect(lifecycle.phases.decision).toBeNull();
 
-    const correlation = request.extensions["x-amc-correlation"].sha256;
+    const correlation = (request.extensions?.["x-amc-correlation"] as { sha256: string }).sha256;
     expect(resolveUnmatchedObservedHookAction({
       workspace,
       authenticatedAgentId: agentId,
