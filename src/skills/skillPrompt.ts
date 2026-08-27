@@ -1,4 +1,4 @@
-import type { PromptAssemblyRegistry } from "../prompt/assembly/promptRegistry.js";
+import type { ContextPlugin } from "../prompt/context/contextTypes.js";
 import type { Skill } from "./skillCatalog.js";
 
 /**
@@ -56,20 +56,22 @@ export function renderSkillContext(skill: Skill): string {
 }
 
 /**
- * Register one loaded skill on a prompt registry.
+ * A loaded skill as a context plugin — the shape the composed loop consumes.
  *
- * Returns the registry's own unregister handle, so a caller that loads a skill
- * for one turn can take it back off for the next.
+ * A plugin rather than a direct `registry.context(...)` call because
+ * `ContextHost.register` already stamps every plugin `literal: true` and
+ * documents why (contextHost.ts:133): a plugin's text is computed from runtime
+ * inputs this process does not control. Registering skills through the same door
+ * as `AGENTS.md` means there is ONE place that decides workspace text is data,
+ * not two that could drift apart.
+ *
+ * `collect` returns the framing synchronously; the async signature is the
+ * plugin contract, not a need of this one.
  */
-export function registerSkillContext(
-  registry: PromptAssemblyRegistry,
-  skill: Skill
-): () => void {
-  return registry.context({
+export function skillContextPlugin(skill: Skill): ContextPlugin {
+  return {
     name: skillContextName(skill),
     order: SKILL_CONTEXT_ORDER,
-    text: renderSkillContext(skill),
-    // See the module note. This is the security boundary, not a convenience.
-    literal: true
-  });
+    collect: async () => renderSkillContext(skill)
+  };
 }

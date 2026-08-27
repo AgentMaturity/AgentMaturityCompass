@@ -54,6 +54,7 @@ import { agentToolset } from "./agent/agentToolset.js";
 import { delegateTool } from "./agent/delegateTool.js";
 import { DEFAULT_MAX_DELEGATION_DEPTH } from "./agent/delegationIdentity.js";
 import { parseDelegationScope } from "./agent/delegationScope.js";
+import { prepareSkillTurn } from "./skills/skillTurn.js";
 import { IN_PROCESS_PROVIDER, delegationTurnOptions, resolveForeignRunner } from "./agent/providers/delegationProviders.js";
 import type { SubagentRunner } from "./agent/subagentSpawn.js";
 import { listAllowedTools } from "./toolhub/toolhubValidators.js";
@@ -379,7 +380,22 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
     )
     .option("--json", "Output as JSON")
     .action(async (promptParts: string[], opts: RunOptions) => {
-      const prompt = promptParts.join(" ").trim();
+      const rawPrompt = promptParts.join(" ").trim();
+      // `/name` is resolved BEFORE the turn is composed, because
+      // `runComposedTurn` assembles the system prompt once at the top and
+      // records it as a signed `system/prompt` row -- a skill discovered after
+      // that would not be in the prompt the row commits to.
+      const skillTurn = prepareSkillTurn({
+        workspace: process.cwd(),
+        prompt: rawPrompt,
+        ...(opts.credentialsHome === undefined ? {} : { amcHome: opts.credentialsHome })
+      });
+      if (!skillTurn.ok) {
+        io.error(chalk.red(skillTurn.reason));
+        io.fail();
+        return;
+      }
+      const prompt = skillTurn.prompt;
       if (prompt.length === 0) {
         io.error(chalk.red("a prompt is required: amc agent-loop run \"...\""));
         io.fail();
@@ -585,7 +601,20 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
           // gives the run its identity and pulls the workspace's own AGENTS.md /
           // CLAUDE.md in as runtime context. A hardcoded string here — what this
           // command sent before P3.3 — was an agent with no idea where it was.
-          promptProfile: opts.persona === undefined ? {} : { persona: opts.persona },
+          promptProfile: {
+            ...(opts.persona === undefined ? {} : { persona: opts.persona }),
+            // EXTRA, not `contextPlugins`. That option REPLACES the defaults,
+            // and the default is the AGENTS.md / CLAUDE.md loader -- so passing
+            // skills through it would drop the workspace's own instructions
+            // every time a skill loaded, silently.
+            //
+            // Contributed as plugins so `ContextPluginHost` stamps them
+            // `literal` exactly as it does for AGENTS.md: one place decides that
+            // workspace text is data, not two that could drift.
+            ...(skillTurn.contextPlugins.length === 0
+              ? {}
+              : { extraContextPlugins: [...skillTurn.contextPlugins] })
+          },
           ...(gate === undefined
             ? {}
             : {

@@ -97,7 +97,21 @@ export interface AgentPromptProfileOptions {
    * An empty array is meaningful and is honoured: it composes a prompt with no
    * runtime context at all, which is what a caller pinning an exact prompt wants.
    */
+  /**
+   * REPLACES the defaults entirely. A caller that wants the workspace's own
+   * `AGENTS.md` loader gone says so with this.
+   */
   readonly contextPlugins?: readonly ContextPlugin[];
+  /**
+   * ADDS to whatever the defaults resolved to, rather than replacing them.
+   *
+   * The distinction is load-bearing. A caller contributing one plugin -- a
+   * loaded skill, say -- almost never means "and drop the workspace's own
+   * instruction files", but `contextPlugins` is the only door and it means
+   * exactly that. Handing skills through it would have removed AGENTS.md every
+   * time a skill loaded, silently.
+   */
+  readonly extraContextPlugins?: readonly ContextPlugin[];
   /** Home directory the user-scope instruction files are looked for under. */
   readonly amcHome?: string;
   readonly env?: NodeJS.ProcessEnv;
@@ -168,7 +182,10 @@ function defaultContextPlugins(options: AgentPromptProfileOptions): readonly Con
  * step of a real turn.
  */
 export function agentPromptProfile(options: AgentPromptProfileOptions): AgentPromptProfile {
-  const contextPlugins = options.contextPlugins ?? defaultContextPlugins(options);
+  const contextPlugins = [
+    ...(options.contextPlugins ?? defaultContextPlugins(options)),
+    ...(options.extraContextPlugins ?? [])
+  ];
   const governance = governanceSection(options.approvalGated === true, contextPlugins.length > 0);
   const workspaceName = basename(options.workspace);
   return {
