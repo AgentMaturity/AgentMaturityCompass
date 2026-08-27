@@ -32,6 +32,10 @@ export type EvidenceEventType =
   | "agent_delegation_completed"
   | "session/open"
   | "session/close"
+  // A request accepted over a wire, naming the session its work will appear in.
+  // Its own row so that acceptance is a fact in the chain rather than a promise
+  // a receipt makes about work nothing has logged yet.
+  | "work/accepted"
   | "turn/start"
   | "turn/end"
   | "turn/seal"

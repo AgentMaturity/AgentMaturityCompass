@@ -2,7 +2,10 @@ import { randomUUID, sign, verify } from "node:crypto";
 import { canonicalize } from "../utils/json.js";
 import { sha256Hex } from "../utils/hash.js";
 
-export type ReceiptKind = "llm_request" | "llm_response" | "tool_action" | "tool_result" | "guard_check";
+export type ReceiptKind =
+  | "llm_request" | "llm_response" | "tool_action" | "tool_result" | "guard_check"
+  /** A request accepted over a wire. Commits to the acceptance row, not to any work. */
+  | "work_accepted";
 
 export interface ReceiptPayloadV1 {
   v: 1;
