@@ -10,7 +10,7 @@ AMC has repo-visible SDK surfaces beyond raw REST calls:
 | Surface | Asset | Current scope |
 |---|---|---|
 | Node/TypeScript | `src/sdk/index.ts` exported through the root package | `AMCClient`, `createAMCClientFromEnv`, provider bridge methods, OpenAI/Anthropic/Gemini/Vercel/LangChain/LangGraph/OpenAI Agents instrumentation, mobile fetch wrapper, telemetry, redaction, and self-scoring guards |
-| Python SDK | `src/sdk/python/` and `amc python-sdk` | `AMCClient`, FastAPI/Flask/LangChain middleware, redaction/hash helpers, typed package marker `py.typed`, and 100% Bridge endpoint coverage via `amc python-sdk --coverage` |
+| Python SDK | `src/sdk/python/` and `amc python-sdk` | `AMCClient`, FastAPI/Flask/LangChain middleware, redaction/hash helpers, and a typed package marker `py.typed`. Covers 7 of the 11 model-proxy routes the Bridge serves (`amc python-sdk --coverage`); `batches`, `embeddings`, `images/generations` and `audio/speech` are not generated |
 | Go SDK | `src/sdk/go/` | `NewClientFromEnv`, provider bridge methods, telemetry/reporting helpers, response metadata, hashing, redaction, and tests |
 | OpenAPI contract | `website/openapi.yaml` | REST/API contract for clients, tools, and generated integrations |
 

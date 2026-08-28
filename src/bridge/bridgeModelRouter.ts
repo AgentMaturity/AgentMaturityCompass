@@ -29,6 +29,34 @@ function stripBridgePrefix(pathname: string, provider: BridgeProvider): string {
   return pathname.slice(prefix.length);
 }
 
+/**
+ * Every model-proxy path this router serves, as a concrete example of each.
+ *
+ * The matcher below is a sequence of regexes, which cannot be enumerated — so a
+ * caller asking "what does the Bridge proxy?" had nowhere to look and answered
+ * by writing its own list. `validatePythonSdkCoverage` did exactly that, twice
+ * in one file, and then compared the two copies: it reported 100% coverage
+ * because it was comparing a list against itself, and published that number.
+ *
+ * These are SAMPLES, not patterns: each must be matched by `matchBridgeRoute`,
+ * which `tests/bridgeModelRouter.test.ts` asserts. That keeps the list honest
+ * about removals and renames. A regex added below without a sample added here is
+ * the residual gap, and a far smaller one than a list that agreed with itself.
+ */
+export const BRIDGE_MODEL_ROUTES: readonly string[] = [
+  "/bridge/openai/v1/chat/completions",
+  "/bridge/openai/v1/responses",
+  "/bridge/openai/v1/batches",
+  "/bridge/openai/v1/embeddings",
+  "/bridge/openai/v1/images/generations",
+  "/bridge/openai/v1/audio/speech",
+  "/bridge/anthropic/v1/messages",
+  "/bridge/gemini/v1beta/models/gemini-1.5-pro:generateContent",
+  "/bridge/openrouter/v1/chat/completions",
+  "/bridge/xai/v1/chat/completions",
+  "/bridge/local/v1/chat/completions"
+];
+
 export function matchBridgeRoute(pathname: string): BridgeRouteMatch | null {
   const openaiChat = /^\/bridge\/openai\/v1\/chat\/completions$/;
   if (openaiChat.test(pathname)) {

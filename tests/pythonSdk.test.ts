@@ -1,4 +1,5 @@
 import { describe, expect, test } from "vitest";
+import { BRIDGE_MODEL_ROUTES } from "../src/bridge/bridgeModelRouter.js";
 import {
   generatePythonSdkPackage,
   listPythonSdkEndpoints,
@@ -144,11 +145,38 @@ describe("Python SDK endpoint coverage", () => {
     }
   });
 
-  test("validates 100% coverage", () => {
+  test("measures coverage against the router, and it is not 100%", () => {
+    // This asserted `coverage === 1` and `missing.length === 0` — which it could
+    // not fail, because the denominator was a copy of the numerator sitting
+    // twenty lines away in the same file. docs/SDK.md published that 1 as
+    // "100% Bridge endpoint coverage".
     const validation = validatePythonSdkCoverage();
-    expect(validation.coverage).toBe(1);
-    expect(validation.missing.length).toBe(0);
-    expect(validation.covered.length).toBe(8);
+
+    expect(validation.covered.length + validation.missing.length).toBe(BRIDGE_MODEL_ROUTES.length);
+    expect(validation.coverage).toBeCloseTo(
+      validation.covered.length / BRIDGE_MODEL_ROUTES.length
+    );
+
+    // The measurement, as it stands. Pinned so that closing one of these gaps is
+    // a deliberate edit here rather than a silent drift, in either direction.
+    expect(validation.missing.sort()).toEqual([
+      "/bridge/openai/v1/audio/speech",
+      "/bridge/openai/v1/batches",
+      "/bridge/openai/v1/embeddings",
+      "/bridge/openai/v1/images/generations"
+    ]);
+    expect(validation.coverage).toBeLessThan(1);
+
+    // Served by bridgeServer, not by the model router. Not a defect — see the
+    // note on `outsideModelRouter`.
+    expect(validation.outsideModelRouter).toEqual(["/bridge/telemetry"]);
+  });
+
+  test("every endpoint the SDK generates is one the model router matches, or telemetry", () => {
+    // The direction that would be a real defect: a generated method whose path
+    // belongs to neither the model router nor the bridge server would 404.
+    const validation = validatePythonSdkCoverage();
+    expect(validation.outsideModelRouter.every((path) => path === "/bridge/telemetry")).toBe(true);
   });
 });
 

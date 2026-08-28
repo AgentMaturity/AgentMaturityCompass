@@ -30,20 +30,25 @@ describe("SDK consolidation documentation", () => {
     expect(nodeExports).toContain("createReactNativeAMCFetch");
 
     expect(existsSync(resolve(workspace, "src/sdk/python/py.typed"))).toBe(true);
-    expect(validatePythonSdkCoverage()).toEqual({
-      covered: [
-        "/bridge/openai/v1/chat/completions",
-        "/bridge/openai/v1/responses",
-        "/bridge/anthropic/v1/messages",
-        "/bridge/gemini/v1beta/models/{model}:generateContent",
-        "/bridge/openrouter/v1/chat/completions",
-        "/bridge/xai/v1/chat/completions",
-        "/bridge/local/v1/chat/completions",
-        "/bridge/telemetry"
-      ],
-      missing: [],
-      coverage: 1
-    });
+    // A SECOND copy of the tautology this doc published. It pinned
+    // `coverage: 1` and `missing: []` against a denominator that was a copy of
+    // the numerator, so it could not fail — and it asserted `/bridge/telemetry`
+    // as "covered" Bridge-endpoint coverage when the model router does not
+    // proxy it at all.
+    //
+    // What this file is actually for is the DOC matching the code, so that is
+    // what it checks now: whatever the measurement says, docs/SDK.md says the
+    // same. Pinning the number in two places was how the doc drifted from
+    // reality and stayed green.
+    const coverage = validatePythonSdkCoverage();
+    expect(coverage.coverage).toBeLessThan(1);
+    expect(sdkDoc).toContain(
+      `Covers ${coverage.covered.length} of the ${coverage.covered.length + coverage.missing.length} model-proxy routes`
+    );
+    for (const absent of coverage.missing) {
+      const leaf = absent.split("/").slice(-1)[0];
+      expect(sdkDoc, `docs/SDK.md should name the uncovered ${leaf}`).toContain(leaf);
+    }
 
     const goClient = read("src/sdk/go/amc_client.go");
     expect(goClient).toContain("func NewClientFromEnv");
