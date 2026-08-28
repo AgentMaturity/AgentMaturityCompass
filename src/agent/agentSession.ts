@@ -5,6 +5,7 @@ import type { AgentStatus } from "./loopTypes.js";
 import { readAgentRunSummary } from "./runReport.js";
 import type { LoopLlm, LoopRoute } from "./stepRunner.js";
 import type { TurnCancelCause } from "../session/sessionTypes.js";
+import type { EvidenceEvent } from "../types.js";
 import { SessionService } from "../session/sessionService.js";
 
 /**
@@ -65,6 +66,14 @@ export interface AgentSession {
   /** Run one prompt to completion. Rejects a second while one is in flight. */
   prompt(text: string): Promise<AgentPromptResult>;
   cancel(cause: TurnCancelCause, by: string): void;
+  /**
+   * This session's committed rows.
+   *
+   * Exposed because the log is the only signed record of what a prompt did, so
+   * a caller that must report progress reads rows rather than being handed a
+   * second, unsigned narration of the same events.
+   */
+  readEvents(): readonly EvidenceEvent[];
   /** Seals the session. Safe to call more than once. */
   close(): void;
 }
@@ -155,6 +164,8 @@ export function openAgentSession(init: AgentSessionInit): AgentSession {
         running = false;
       }
     },
+
+    readEvents: () => session.readEvents(),
 
     cancel(cause: TurnCancelCause, by: string): void {
       // `keepInbox` so a cancelled prompt does not discard anything queued

@@ -1,0 +1,20 @@
+{
+  "name": "@amc/acp-schema",
+  "version": "0.18.0",
+  "description": "Vendored Agent Client Protocol JSON schema. Data only: no runtime code.",
+  "license": "Apache-2.0",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/agentclientprotocol/typescript-sdk.git"
+  },
+  "files": [
+    "schema.json",
+    "LICENSE"
+  ],
+  "amcUpstream": {
+    "name": "@agentclientprotocol/sdk",
+    "repo": "https://github.com/agentclientprotocol/typescript-sdk",
+    "version": "0.18.0"
+  }
+}

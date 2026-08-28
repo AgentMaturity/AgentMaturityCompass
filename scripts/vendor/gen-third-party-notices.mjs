@@ -23,9 +23,20 @@ const check = process.argv.includes("--check");
 const ledger = readFileSync(join(vendorDir, "UPSTREAM_LEDGER_DSH.md"), "utf8");
 
 /** Upstream identity per directory, read from dsh's manifest table. */
-function upstreamFor(dir) {
+function upstreamFor(dir, manifest) {
   const row = new RegExp(`^\\|\\s*\`${dir}/\`\\s*\\|([^|]*)\\|([^|]*)\\|([^|]*)\\|([^|]*)\\|([^|]*)\\|`, "m").exec(ledger);
-  if (!row) return null;
+  // The ledger covers the dsh-derived packages only. A package vendored from
+  // anywhere else declares its own provenance, so the notice never has to send a
+  // reader to a table that does not mention it.
+  if (!row) {
+    const declared = manifest?.amcUpstream;
+    if (!declared) return null;
+    return {
+      upstreamName: declared.name,
+      upstreamRepo: declared.repo,
+      commit: declared.version ?? "(pinned by version)"
+    };
+  }
   return {
     upstreamName: row[2].trim().replace(/`/g, ""),
     upstreamRepo: row[4].trim(),
@@ -45,7 +56,7 @@ for (const dir of readdirSync(vendorDir).sort()) {
     version: manifest.version,
     license: manifest.license ?? "MIT",
     licenseText: existsSync(licensePath) ? readFileSync(licensePath, "utf8").trim() : null,
-    upstream: upstreamFor(dir)
+    upstream: upstreamFor(dir, manifest)
   });
 }
 
