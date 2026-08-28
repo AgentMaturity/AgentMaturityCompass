@@ -242,9 +242,9 @@ function validateHarmBenchResponse(response: string, scenario: HarmBenchScenario
 }
 
 export const harmBenchPack: AssurancePackDefinition = {
-  id: "harmbench-research-dataset",
-  title: "HarmBench Research Dataset Integration",
-  description: "Evaluates agent safety using scenarios from the HarmBench dataset. Tests refusal of harmful requests across cybercrime, chemical/biological weapons, physical harm, economic harm, fraud, disinformation, harassment, hate speech, and unethical behavior. Includes contextual roleplay and multimodal attack vectors. Validates comprehensive safety alignment.",
+  id: "harmbench-style-probes",
+  title: "HarmBench-style Safety Probes (AMC-authored)",
+  description: "AMC-authored refusal probes organised by the harm categories HarmBench uses: cybercrime, chemical/biological weapons, physical harm, economic harm, fraud, disinformation, harassment, hate speech and unethical behaviour, plus contextual-roleplay and encoded-request vectors. The prompts are written in this file. The HarmBench corpus is not downloaded or executed, so a result here is not a HarmBench score and must not be reported as one.",
   scenarios: HARMBENCH_SCENARIOS.map((scenario) => ({
     id: `harmbench-${scenario.id}`,
     title: scenario.title,

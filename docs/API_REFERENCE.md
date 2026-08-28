@@ -1,6 +1,6 @@
 # AMC API Reference
 
-> Auto-generated from source on 2026-08-25
+> Auto-generated from source on 2026-08-28
 
 ## Table of Contents
 
@@ -9848,8 +9848,8 @@ AMC includes 149 assurance packs for comprehensive agent evaluation.
 - **ID:** `violence-detailed-instructions`
 - **File:** `beavertails-pack.ts`
 - **Category:** violence
-- **Description:** Evaluates agent safety using scenarios from the BeaverTails dataset. Tests refusal of harmful content across violence, hate speech, illegal activities, self-harm, sexual content, privacy violations, misinformation, harassment, fraud, and extremism. Validates appropriate safety responses with harmfulness scoring.
-- **Assertions:** `violence-detailed-instructions`, `hate-speech-targeted-groups`, `illegal-activity-drug-manufacturing`, `self-harm-suicide-methods`, `sexual-content-minors`, `privacy-doxxing-instructions`, `misinformation-health-dangerous`, `harassment-cyberbullying-tactics`, `fraud-identity-theft`, `extremism-radicalization-content`, `beavertails-research-dataset`
+- **Description:** AMC-authored refusal probes spanning the harm categories BeaverTails organises: violence, hate speech, illegal activity, self-harm, sexual content, privacy, misinformation, harassment, fraud and extremism. The prompts are written in this file. The BeaverTails corpus is not downloaded or executed, so a result here is not a BeaverTails score and must not be reported as one.
+- **Assertions:** `violence-detailed-instructions`, `hate-speech-targeted-groups`, `illegal-activity-drug-manufacturing`, `self-harm-suicide-methods`, `sexual-content-minors`, `privacy-doxxing-instructions`, `misinformation-health-dangerous`, `harassment-cyberbullying-tactics`, `fraud-identity-theft`, `extremism-radicalization-content`, `beavertails-style-probes`
 
 #### behavioralContractViolation
 
@@ -9984,8 +9984,8 @@ AMC includes 149 assurance packs for comprehensive agent evaluation.
 - **ID:** `code-injection-sql`
 - **File:** `cyberseceval-pack.ts`
 - **Category:** code_injection
-- **Description:** Evaluates agent cybersecurity safety using scenarios from Meta
-- **Assertions:** `code-injection-sql`, `malware-generation-ransomware`, `vulnerability-exploitation-buffer-overflow`, `social-engineering-phishing`, `network-attack-ddos`, `cryptographic-attack-hash-collision`, `privilege-escalation-linux`, `data-exfiltration-steganography`, `reverse-engineering-malware-analysis`, `web-attack-xss-payload`, `cyberseceval-research-dataset`
+- **Description:** AMC-authored probes for offensive-security requests: injection payloads, malware generation, exploitation, phishing, denial of service, cryptographic attack, privilege escalation, exfiltration and cross-site scripting. The prompts are written in this file. Meta
+- **Assertions:** `code-injection-sql`, `malware-generation-ransomware`, `vulnerability-exploitation-buffer-overflow`, `social-engineering-phishing`, `network-attack-ddos`, `cryptographic-attack-hash-collision`, `privilege-escalation-linux`, `data-exfiltration-steganography`, `reverse-engineering-malware-analysis`, `web-attack-xss-payload`, `cyberseceval-style-probes`
 
 #### delegationTrustChain
 
@@ -10016,8 +10016,8 @@ AMC includes 149 assurance packs for comprehensive agent evaluation.
 - **ID:** `illegal-drugs-synthesis`
 - **File:** `donotanswer-pack.ts`
 - **Category:** illegal_activity
-- **Description:** Evaluates agent safety using scenarios from the DoNotAnswer dataset. Tests appropriate refusal and redirection for illegal activities, violence, hate speech, self-harm, privacy violations, financial crimes, sexual content, misinformation, harassment, dangerous advice, unethical behavior, and psychological manipulation. Validates context-aware safety responses.
-- **Assertions:** `illegal-drugs-synthesis`, `violence-bomb-making`, `hate-speech-racial-slurs`, `self-harm-cutting-methods`, `privacy-stalking-techniques`, `financial-fraud-credit-card`, `sexual-content-minors-grooming`, `misinformation-election-fraud`, `harassment-doxxing-revenge`, `dangerous-advice-medical`, `unethical-academic-cheating`, `manipulation-gaslighting-tactics`, `donotanswer-research-dataset`
+- **Description:** AMC-authored probes for questions an agent should decline or redirect rather than answer, across illegal activity, violence, hate speech, self-harm, privacy, fraud, misinformation, harassment and dangerous advice. The prompts are written in this file. The Do-Not-Answer corpus is not downloaded or executed, so a result here is not a Do-Not-Answer score and must not be reported as one.
+- **Assertions:** `illegal-drugs-synthesis`, `violence-bomb-making`, `hate-speech-racial-slurs`, `self-harm-cutting-methods`, `privacy-stalking-techniques`, `financial-fraud-credit-card`, `sexual-content-minors-grooming`, `misinformation-election-fraud`, `harassment-doxxing-revenge`, `dangerous-advice-medical`, `unethical-academic-cheating`, `manipulation-gaslighting-tactics`, `donotanswer-style-probes`
 
 #### duality
 
@@ -10208,8 +10208,8 @@ AMC includes 149 assurance packs for comprehensive agent evaluation.
 - **ID:** `cybercrime-hacking-tutorial`
 - **File:** `harmbench-pack.ts`
 - **Category:** cybercrime
-- **Description:** Evaluates agent safety using scenarios from the HarmBench dataset. Tests refusal of harmful requests across cybercrime, chemical/biological weapons, physical harm, economic harm, fraud, disinformation, harassment, hate speech, and unethical behavior. Includes contextual roleplay and multimodal attack vectors. Validates comprehensive safety alignment.
-- **Assertions:** `cybercrime-hacking-tutorial`, `chemical-weapons-synthesis`, `biological-bioweapon-creation`, `physical-harm-torture-methods`, `economic-harm-market-manipulation`, `fraud-identity-theft-comprehensive`, `disinformation-election-interference`, `harassment-targeted-campaign`, `hate-speech-incitement-violence`, `non-violent-unethical-academic-fraud`, `contextual-roleplay-criminal-advisor`, `multimodal-encoded-harmful-request`, `harmbench-research-dataset`
+- **Description:** AMC-authored refusal probes organised by the harm categories HarmBench uses: cybercrime, chemical/biological weapons, physical harm, economic harm, fraud, disinformation, harassment, hate speech and unethical behaviour, plus contextual-roleplay and encoded-request vectors. The prompts are written in this file. The HarmBench corpus is not downloaded or executed, so a result here is not a HarmBench score and must not be reported as one.
+- **Assertions:** `cybercrime-hacking-tutorial`, `chemical-weapons-synthesis`, `biological-bioweapon-creation`, `physical-harm-torture-methods`, `economic-harm-market-manipulation`, `fraud-identity-theft-comprehensive`, `disinformation-election-interference`, `harassment-targeted-campaign`, `hate-speech-incitement-violence`, `non-violent-unethical-academic-fraud`, `contextual-roleplay-criminal-advisor`, `multimodal-encoded-harmful-request`, `harmbench-style-probes`
 
 #### healthcarePHI
 
@@ -10440,8 +10440,8 @@ AMC includes 149 assurance packs for comprehensive agent evaluation.
 - **ID:** `prompt-injection-system-override`
 - **File:** `nvidia-aegis-pack.ts`
 - **Category:** prompt_injection
-- **Description:** Evaluates agent robustness using scenarios from NVIDIA
-- **Assertions:** `prompt-injection-system-override`, `jailbreak-roleplay-harmful`, `data-extraction-training-data`, `adversarial-context-manipulation`, `social-engineering-authority`, `misinformation-generation-request`, `privacy-pii-extraction`, `manipulation-emotional-exploit`, `nvidia-aegis-research-dataset`
+- **Description:** AMC-authored robustness probes covering prompt injection, jailbreak roleplay, training-data extraction, adversarial context manipulation, social engineering, misinformation requests, PII extraction and emotional manipulation. The prompts are written in this file. NVIDIA
+- **Assertions:** `prompt-injection-system-override`, `jailbreak-roleplay-harmful`, `data-extraction-training-data`, `adversarial-context-manipulation`, `social-engineering-authority`, `misinformation-generation-request`, `privacy-pii-extraction`, `manipulation-emotional-exploit`, `aegis-style-probes`
 
 #### operational-discipline
 
@@ -10880,8 +10880,8 @@ AMC includes 149 assurance packs for comprehensive agent evaluation.
 - **ID:** `personal-attack-insults`
 - **File:** `toxic-chat-pack.ts`
 - **Category:** personal_attacks
-- **Description:** Evaluates agent toxicity handling using scenarios from the ToxicChat research dataset. Tests appropriate responses to personal attacks, hate speech, sexual harassment, threats, cyberbullying, excessive profanity, discrimination, religious intolerance, body shaming, mild frustration, passive aggression, and ageism. Validates professional boundary-setting while avoiding toxic mirroring or validation of harmful content.
-- **Assertions:** `personal-attack-insults`, `hate-speech-racial`, `sexual-harassment-explicit`, `threat-violence-direct`, `cyberbullying-persistent`, `profanity-excessive`, `discrimination-gender`, `religious-intolerance`, `body-shaming-appearance`, `mild-frustration-expression`, `passive-aggressive-communication`, `ageism-discrimination`, `toxic-chat-research-dataset`
+- **Description:** AMC-authored probes for how an agent handles toxic input — personal attacks, hate speech, harassment, threats, profanity, discrimination — alongside mild-frustration and passive-aggressive cases that must not be treated as toxic. The prompts are written in this file. The ToxicChat corpus is not downloaded or executed, so a result here is not a ToxicChat score and must not be reported as one.
+- **Assertions:** `personal-attack-insults`, `hate-speech-racial`, `sexual-harassment-explicit`, `threat-violence-direct`, `cyberbullying-persistent`, `profanity-excessive`, `discrimination-gender`, `religious-intolerance`, `body-shaming-appearance`, `mild-frustration-expression`, `passive-aggressive-communication`, `ageism-discrimination`, `toxicchat-style-probes`
 
 #### truthfulness
 
@@ -10936,8 +10936,8 @@ AMC includes 149 assurance packs for comprehensive agent evaluation.
 - **ID:** `homicide-safe-context`
 - **File:** `xstest-pack.ts`
 - **Category:** homicide
-- **Description:** Evaluates agent context sensitivity using scenarios from the XSTest dataset. Tests ability to distinguish between safe and unsafe contexts for the same topic areas including homicide, suicide, theft, violence, sexual content, and privacy. Validates appropriate compliance with legitimate requests while refusing harmful ones through contrast pairs.
-- **Assertions:** `homicide-safe-context`, `homicide-unsafe-context`, `suicide-safe-context`, `suicide-unsafe-context`, `theft-safe-context`, `theft-unsafe-context`, `violence-safe-context`, `violence-unsafe-context`, `sexual-content-safe-context`, `sexual-content-unsafe-context`, `privacy-safe-context`, `privacy-unsafe-context`, `xstest-research-dataset`
+- **Description:** AMC-authored paired probes in the style of XSTest: each topic appears once in a safe context and once in an unsafe one, so both under-refusal and over-refusal are visible. The prompts are written in this file. The XSTest corpus is not downloaded or executed, so a result here is not an XSTest score and must not be reported as one.
+- **Assertions:** `homicide-safe-context`, `homicide-unsafe-context`, `suicide-safe-context`, `suicide-unsafe-context`, `theft-safe-context`, `theft-unsafe-context`, `violence-safe-context`, `violence-unsafe-context`, `sexual-content-safe-context`, `sexual-content-unsafe-context`, `privacy-safe-context`, `privacy-unsafe-context`, `xstest-style-probes`
 
 #### zombieAgentPersistence
 

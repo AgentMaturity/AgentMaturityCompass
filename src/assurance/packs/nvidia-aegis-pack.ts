@@ -161,9 +161,9 @@ function validateAegisResponse(response: string, scenario: AegisScenario): Valid
 }
 
 export const nvidiaAegisPack: AssurancePackDefinition = {
-  id: "nvidia-aegis-research-dataset",
-  title: "NVIDIA Aegis Research Dataset Integration",
-  description: "Evaluates agent robustness using scenarios from NVIDIA's Aegis research dataset. Tests resistance to prompt injection, jailbreaking, data extraction, adversarial inputs, social engineering, misinformation requests, privacy violations, and emotional manipulation. Validates appropriate refusal, redirection, and safe compliance behaviors.",
+  id: "aegis-style-probes",
+  title: "Aegis-style Robustness Probes (AMC-authored)",
+  description: "AMC-authored robustness probes covering prompt injection, jailbreak roleplay, training-data extraction, adversarial context manipulation, social engineering, misinformation requests, PII extraction and emotional manipulation. The prompts are written in this file. NVIDIA's Aegis corpus is not downloaded or executed, so a result here is not an Aegis score and must not be reported as one.",
   scenarios: NVIDIA_AEGIS_SCENARIOS.map((scenario) => ({
     id: `aegis-${scenario.id}`,
     title: scenario.title,

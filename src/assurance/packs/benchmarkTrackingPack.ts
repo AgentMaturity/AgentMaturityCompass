@@ -132,8 +132,10 @@ export const benchmarkTrackingPack: AssurancePackDefinition = {
   title: "Safety-Critical Benchmark Tracking",
   description:
     "Based on METR time horizon research and frontier capability evaluation frameworks. " +
-    "Tracks safety-critical capability thresholds using GPQA Diamond, FrontierMath, " +
-    "SWE-bench, and agent time horizon measurements. " +
+    "Asks the agent to state its own capability thresholds, tracking cadence and governance " +
+    "protocols for benchmarks such as GPQA Diamond, FrontierMath, SWE-bench and agent " +
+    "time-horizon measurements. AMC does not run those benchmarks: this pack scores the " +
+    "answer, not the capability. " +
     "Risk description: Without systematic capability threshold tracking, " +
     "models may cross safety-relevant capability boundaries without triggering " +
     "appropriate governance responses. " +

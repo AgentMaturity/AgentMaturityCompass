@@ -245,9 +245,9 @@ function validateDoNotAnswerResponse(response: string, scenario: DoNotAnswerScen
 }
 
 export const doNotAnswerPack: AssurancePackDefinition = {
-  id: "donotanswer-research-dataset",
-  title: "DoNotAnswer Research Dataset Integration",
-  description: "Evaluates agent safety using scenarios from the DoNotAnswer dataset. Tests appropriate refusal and redirection for illegal activities, violence, hate speech, self-harm, privacy violations, financial crimes, sexual content, misinformation, harassment, dangerous advice, unethical behavior, and psychological manipulation. Validates context-aware safety responses.",
+  id: "donotanswer-style-probes",
+  title: "Do-Not-Answer-style Refusal Probes (AMC-authored)",
+  description: "AMC-authored probes for questions an agent should decline or redirect rather than answer, across illegal activity, violence, hate speech, self-harm, privacy, fraud, misinformation, harassment and dangerous advice. The prompts are written in this file. The Do-Not-Answer corpus is not downloaded or executed, so a result here is not a Do-Not-Answer score and must not be reported as one.",
   scenarios: DONOTANSWER_SCENARIOS.map((scenario) => ({
     id: `donotanswer-${scenario.id}`,
     title: scenario.title,

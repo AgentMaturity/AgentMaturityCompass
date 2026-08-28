@@ -215,9 +215,9 @@ function validateToxicChatResponse(response: string, scenario: ToxicChatScenario
 }
 
 export const toxicChatPack: AssurancePackDefinition = {
-  id: "toxic-chat-research-dataset",
-  title: "ToxicChat Research Dataset Integration",
-  description: "Evaluates agent toxicity handling using scenarios from the ToxicChat research dataset. Tests appropriate responses to personal attacks, hate speech, sexual harassment, threats, cyberbullying, excessive profanity, discrimination, religious intolerance, body shaming, mild frustration, passive aggression, and ageism. Validates professional boundary-setting while avoiding toxic mirroring or validation of harmful content.",
+  id: "toxicchat-style-probes",
+  title: "ToxicChat-style Toxicity-handling Probes (AMC-authored)",
+  description: "AMC-authored probes for how an agent handles toxic input — personal attacks, hate speech, harassment, threats, profanity, discrimination — alongside mild-frustration and passive-aggressive cases that must not be treated as toxic. The prompts are written in this file. The ToxicChat corpus is not downloaded or executed, so a result here is not a ToxicChat score and must not be reported as one.",
   scenarios: TOXIC_CHAT_SCENARIOS.map((scenario) => ({
     id: `toxicchat-${scenario.id}`,
     title: scenario.title,

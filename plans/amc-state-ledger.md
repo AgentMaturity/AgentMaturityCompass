@@ -58,14 +58,14 @@ A row saying REAL is nearly free to produce and worth correspondingly little. A
 row saying FACADE, with the note explaining what it fakes, is what this document
 is for.
 
-## Summary at `521b2136`
+## Summary of the tree at `0c1d10e2`, plus the pack relabelling committed alongside this line
 
 | status | files | what it means |
 |---|---|---|
-| REAL | 1353 | does what its name and docstring claim |
+| REAL | 1360 | does what its name and docstring claim |
 | PARTIAL | 208 | does part of it; the note says which part is missing |
 | STUB | 3 | placeholder returning a fixed or empty value |
-| FACADE | 133 | fabricated results presented as real |
+| FACADE | 126 | fabricated results presented as real |
 | DEAD | 36 | nothing imports or invokes it |
 
 ---
@@ -122,7 +122,7 @@ read workspace state, because the interface has no way to do it.
 | alignmentFakingPack.ts | Alignment Faking Detection | CLI:`amc assurance run` (packs/index) | PARTIAL | Y | claims to detect behaviour that differs when observed, but one prompt is sent and the grader checks topic keywords; no observed/unobserved comparison happens. |
 | approvalTheaterPack.ts | Approval Theater Resistance | CLI:`amc assurance run` (packs/index) | REAL | Y |  |
 | autonomousLoopGovernancePack.ts | Autonomous Loop Governance | CLI:`amc assurance run` (packs/index) | REAL | Y |  |
-| beavertails-pack.ts | BeaverTails Research Dataset Integration | CLI:`amc assurance run` (packs/index) | FACADE | N | prompts are hand-authored in this file; title/description claim scenarios "from the BeaverTails dataset" and the pack id ends `-research-dataset`. 10 local prompts, no dataset is loaded — the pack reports a BeaverTails result that is not BeaverTails. |
+| beavertails-pack.ts | BeaverTails-style Harm-category Probes (AMC-authored) | CLI:`amc assurance run` (packs/index) | REAL | Y | 10 AMC-authored prompts, run against the agent and validated. Was FACADE: shipped as `beavertails-research-dataset` claiming scenarios "from the BeaverTails dataset" while loading none. Relabelled to `beavertails-style-probes`; the retired id now fails with the reason. `tests/assurancePackProvenance.test.ts` fails if any pack names a benchmark it does not load. |
 | behavioralContractViolationPack.ts | Behavioral Contract Violation | CLI:`amc assurance run` (packs/index) | REAL | N |  |
 | benchmarkTrackingModule.ts | Alias re-export of benchmarkTrackingPack | CLI:`amc assurance run` (packs/index) | REAL | N |  |
 | benchmarkTrackingPack.ts | Safety-Critical Benchmark Tracking | ORPHAN | PARTIAL | Y | no benchmark is executed. Docstring cites GPQA Diamond / FrontierMath / SWE-bench / METR; the scenarios ask the agent to discuss them and the grader greps for those words. |
@@ -140,11 +140,11 @@ read workspace state, because the interface has no way to do it.
 | contextWindowManagementPack.ts | Context Window Management | CLI:`amc assurance run` (packs/index) | REAL | N |  |
 | costEfficiencyPack.ts | Cost Efficiency Scoring | CLI:`amc assurance run` (packs/index) | REAL | N |  |
 | crossAgentCollusionPack.ts | Cross-Agent Collusion Resistance | CLI:`amc assurance run` (packs/index) | REAL | Y |  |
-| cyberseceval-pack.ts | CyberSecEval Research Dataset Integration | CLI:`amc assurance run` (packs/index) | FACADE | N | prompts are hand-authored in this file; title/description claim scenarios "from the CyberSecEval dataset" and the pack id ends `-research-dataset`. 10 local prompts, no dataset is loaded — the pack reports a CyberSecEval result that is not CyberSecEval. |
+| cyberseceval-pack.ts | CyberSecEval-style Cyber-safety Probes (AMC-authored) | CLI:`amc assurance run` (packs/index) | REAL | Y | 10 AMC-authored prompts, run against the agent and validated. Was FACADE: shipped as `cyberseceval-research-dataset` claiming scenarios "from the CyberSecEval dataset" while loading none. Relabelled to `cyberseceval-style-probes`; the retired id now fails with the reason. `tests/assurancePackProvenance.test.ts` fails if any pack names a benchmark it does not load. |
 | delegationTrustChainPack.ts | Delegation Trust Chain | CLI:`amc assurance run` (packs/index) | REAL | N |  |
 | disempowermentPack.ts | Human Empowerment & Autonomy Preservation | CLI:`amc assurance run` (packs/index) | REAL | N |  |
 | dlpExfiltrationPack.ts | DLP & Credential Leakage Prevention | CLI:`amc assurance run` (packs/index) | REAL | Y |  |
-| donotanswer-pack.ts | DoNotAnswer Research Dataset Integration | CLI:`amc assurance run` (packs/index) | FACADE | N | prompts are hand-authored in this file; title/description claim scenarios "from the DoNotAnswer dataset" and the pack id ends `-research-dataset`. 12 local prompts, no dataset is loaded — the pack reports a DoNotAnswer result that is not DoNotAnswer. |
+| donotanswer-pack.ts | Do-Not-Answer-style Refusal Probes (AMC-authored) | CLI:`amc assurance run` (packs/index) | REAL | Y | 12 AMC-authored prompts, run against the agent and validated. Was FACADE: shipped as `do-not-answer-research-dataset` claiming scenarios "from the Do-Not-Answer dataset" while loading none. Relabelled to `donotanswer-style-probes`; the retired id now fails with the reason. `tests/assurancePackProvenance.test.ts` fails if any pack names a benchmark it does not load. |
 | dualityPack.ts | Digital-Physical Duality Safety | CLI:`amc assurance run` (packs/index) | REAL | N |  |
 | dynamicTrustAuthorizationPack.ts | Dynamic Trust Authorization | CLI:`amc assurance run` (packs/index) | REAL | Y |  |
 | economicAmplificationPack.ts | Tool-call amplification analysis helpers | test-only | DEAD | N | not registered, no src importer, test-only. `analyzeEconomicAmplification` also sets `costCapEnforced: true` when nothing was amplified and nothing capped (0 === 0). |
@@ -168,7 +168,7 @@ read workspace state, because the interface has no way to do it.
 | governanceBypassPack.ts | Governance Bypass Resistance | CLI:`amc assurance run` (packs/index) | REAL | Y |  |
 | governanceNISTRMFPack.ts | Governance NIST AI RMF Pack | CLI:`amc assurance run` (packs/index) | REAL | N |  |
 | hallucinationPack.ts | Hallucination and Overclaim Resistance | CLI:`amc assurance run` (packs/index) | REAL | N |  |
-| harmbench-pack.ts | HarmBench Research Dataset Integration | CLI:`amc assurance run` (packs/index) | FACADE | N | prompts are hand-authored in this file; title/description claim scenarios "from the HarmBench dataset" and the pack id ends `-research-dataset`. 12 local prompts, no dataset is loaded — the pack reports a HarmBench result that is not HarmBench. |
+| harmbench-pack.ts | HarmBench-style Safety Probes (AMC-authored) | CLI:`amc assurance run` (packs/index) | REAL | Y | 12 AMC-authored prompts, run against the agent and validated. Was FACADE: shipped as `harmbench-research-dataset` claiming scenarios "from the HarmBench dataset" while loading none. Relabelled to `harmbench-style-probes`; the retired id now fails with the reason. `tests/assurancePackProvenance.test.ts` fails if any pack names a benchmark it does not load. |
 | healthcarePHIPack.ts | Healthcare PHI Protection Pack | CLI:`amc assurance run` (packs/index) | REAL | N |  |
 | hipaaCompliancePack.ts | HIPAA Compliance Assurance Pack | CLI:`amc assurance run` (packs/index) | REAL | N |  |
 | honeytokenDetectionPack.ts | Honeytoken Detection & Avoidance | CLI:`amc assurance run` (packs/index) | REAL | N |  |
@@ -197,7 +197,7 @@ read workspace state, because the interface has no way to do it.
 | multiTurnDeepEvalPack.ts | Deep Multi-Turn Conversation Evaluation | CLI:`amc assurance run` (packs/index) | PARTIAL | Y | single-turn: the "conversation history" is pasted into one prompt. AssuranceScenarioDefinition has one buildPrompt/one validate and the runner sends exactly one message. |
 | multiTurnToolAttackPack.ts | Multi-Turn Tool Attack Taxonomy | CLI:`amc assurance run` (packs/index) | PARTIAL | N | single-turn and tool-free: the turn sequence is prose, and the runner never offers tools nor reads `responder.toolCalls`. |
 | notaryAttestationPack.ts | Legacy Notary Attestation Compatibility Pack | CLI:`amc assurance run` (packs/index) | REAL | Y |  |
-| nvidia-aegis-pack.ts | NVIDIA Aegis Research Dataset Integration | CLI:`amc assurance run` (packs/index) | FACADE | N | prompts are hand-authored in this file; title/description claim scenarios "from the NVIDIA Aegis dataset" and the pack id ends `-research-dataset`. 8 local prompts, no dataset is loaded — the pack reports a NVIDIA Aegis result that is not NVIDIA Aegis. |
+| nvidia-aegis-pack.ts | Aegis-style Robustness Probes (AMC-authored) | CLI:`amc assurance run` (packs/index) | REAL | Y | 8 AMC-authored prompts, run against the agent and validated. Was FACADE: shipped as `aegis-research-dataset` claiming scenarios "from the Aegis dataset" while loading none. Relabelled to `aegis-style-probes`; the retired id now fails with the reason. `tests/assurancePackProvenance.test.ts` fails if any pack names a benchmark it does not load. |
 | operational-discipline.ts | Operational Discipline Patterns | CLI:`amc assurance run` (packs/index) | REAL | Y |  |
 | overCompliancePack.ts | Over-Compliance Resistance (H-Neurons) | CLI:`amc assurance run` (packs/index) | REAL | N |  |
 | overreliancePack.ts | Overreliance (OWASP LLM09) | CLI:`amc assurance run` (packs/index) | REAL | N |  |
@@ -252,14 +252,14 @@ read workspace state, because the interface has no way to do it.
 | tocTouPack.ts | Time-of-Check / Time-of-Use Resistance | CLI:`amc assurance run` (packs/index) | REAL | N |  |
 | toolMisusePack.ts | Legacy Tool Misuse Compatibility Pack | CLI:`amc assurance run` (packs/index) | PARTIAL | Y | same prose-only tool detection as unsafeToolPack; no tool is ever offered to the agent under test. |
 | toolSchemaDriftPack.ts | Tool Schema Drift Detection | CLI:`amc assurance run` (packs/index) | REAL | N |  |
-| toxic-chat-pack.ts | ToxicChat Research Dataset Integration | CLI:`amc assurance run` (packs/index) | FACADE | N | prompts are hand-authored in this file; title/description claim scenarios "from the ToxicChat dataset" and the pack id ends `-research-dataset`. 12 local prompts, no dataset is loaded — the pack reports a ToxicChat result that is not ToxicChat. |
+| toxic-chat-pack.ts | ToxicChat-style Toxicity-handling Probes (AMC-authored) | CLI:`amc assurance run` (packs/index) | REAL | Y | 12 AMC-authored prompts, run against the agent and validated. Was FACADE: shipped as `toxicchat-research-dataset` claiming scenarios "from the ToxicChat dataset" while loading none. Relabelled to `toxicchat-style-probes`; the retired id now fails with the reason. `tests/assurancePackProvenance.test.ts` fails if any pack names a benchmark it does not load. |
 | truthfulnessPack.ts | Legacy Truthfulness Compatibility Pack | CLI:`amc assurance run` (packs/index) | REAL | Y |  |
 | uncertaintyPropagationPack.ts | Uncertainty Propagation | CLI:`amc assurance run` (packs/index) | REAL | N |  |
 | unsafeToolPack.ts | Unsafe Tool Action Resistance | CLI:`amc assurance run` (packs/index) | PARTIAL | N | tool actions are found by regex-extracting {"tool","action"} JSON from prose (validators.extractToolCallRequests). The runner offers no tools and drops `responder.toolCalls`, so a real tool call is invisible to it. |
 | valueCoherencePack.ts | Value Coherence Index (VCI) | CLI:`amc assurance run` (packs/index) | REAL | N |  |
 | wealthManagementMiFIDPack.ts | Wealth Management MiFID Pack | CLI:`amc assurance run` (packs/index) | REAL | N |  |
 | whistleblowerProtectionPack.ts | Whistleblower Protection Assessment | CLI:`amc assurance run` (packs/index) | REAL | Y |  |
-| xstest-pack.ts | XSTest Research Dataset Integration | CLI:`amc assurance run` (packs/index) | FACADE | N | prompts are hand-authored in this file; title/description claim scenarios "from the XSTest dataset" and the pack id ends `-research-dataset`. 12 local prompts, no dataset is loaded — the pack reports a XSTest result that is not XSTest. |
+| xstest-pack.ts | XSTest-style Over-refusal Probes (AMC-authored) | CLI:`amc assurance run` (packs/index) | REAL | Y | 12 AMC-authored prompts, run against the agent and validated. Was FACADE: shipped as `xstest-research-dataset` claiming scenarios "from the XSTest dataset" while loading none. Relabelled to `xstest-style-probes`; the retired id now fails with the reason. `tests/assurancePackProvenance.test.ts` fails if any pack names a benchmark it does not load. |
 | zombieAgentPersistencePack.ts | Memory-injection persistence analysis helpers | test-only | DEAD | N | not registered, no src importer, test-only; the analyze* functions consume caller-supplied results and nothing in src produces them. |
 
 ## score & advisory
@@ -3337,179 +3337,3 @@ Reachability note: every module below is imported by `amc/api/routers/product.py
 |---|---|---|---|---|---|
 | mechanicModel.ts | Type declarations for a mechanic dashboard model | ORPHAN | DEAD | N | Types only, zero importers anywhere in src or tests; the dashboard these describe does not exist |
 | tuningExplainers.ts | `explainTuningKey` — human strings for tuning knob keys | ORPHAN | DEAD | N | No caller anywhere in src or tests |
-
-| file | purpose | wired via | status | tests | note |
-|---|---|---|---|---|---|
-| agentResponder.ts | Resolves + invokes the real agent under test | lib (assuranceRunner, redteam/runner, api/assuranceRouter, api/securityRouter, cli) | REAL | Y | Deliberately has no synthetic fallback; throws AgentResponderUnavailableError instead. Exposes tool-offering and `toolCalls`, which the runner never uses. |
-| assuranceCertificates.ts | Issues + inspects signed .amccert bundles | CLI:`amc assurance cert-issue` / `cert-verify` | REAL | Y | Real Ed25519 signing and real gate enforcement, but unreachable in practice: assuranceRunner persists evidenceGates.correlationRatio/observedShare as hardcoded 0 while the default policy demands 0.9/0.7, so issuance always throws "evidence gates failed". |
-| assuranceCli.ts | Thin CLI wrappers over the control plane | CLI:`amc assurance *` | REAL | Y |  |
-| assuranceControlPlane.ts | API/CLI facade for runs, waivers, certs, readiness | CLI + API:complianceRouter, studioServer | FACADE | Y | `legacyProjectionForReport` returns `evidenceGates: { correlationRatio: 1, observedShare: 1 }` — literals, never measured, and exactly the values that clear the policy gates; every API/CLI listing of a run reports perfect evidence correlation. `findingCountsFromReport` pins `critical: 0` and buckets every failed scenario as `high`, and `findingsProjectionForReport` hardcodes `severity: "HIGH"`, so the policy's `maxCriticalFindings: 0` gate can never trip through this surface. |
-| assuranceFindings.ts | Builds v1 findings docs + severity counts | lib (assuranceScoring) | PARTIAL | N | Only `findingCounts` has a caller. `findingsFromScenarioResults` — the whole scenario→finding conversion — has no consumer anywhere in src or tests; the runner builds findings inline in persistV1Artifacts instead. |
-| assurancePolicySchema.ts | Zod schema + default assurance policy | lib (policy store, control plane, cli) | REAL | N |  |
-| assurancePolicyStore.ts | Reads/writes/signs policy, runs, waivers, scheduler | lib (15 importers) | REAL | Y | `activeAssuranceWaiver` tests `waiver.allowReadyDespiteAssuranceFail`, which the schema declares `z.literal(true)` — that half of the condition can never be false. The expiry check next to it is real. |
-| assuranceRunner.ts | Executes packs against the live agent, writes report + v1 artifacts | CLI:`amc assurance run`, API:assuranceRouter | PARTIAL | Y | Inconclusive-scenario handling and evidence writing are honest. But: `const requestIds: string[] = []` is never filled, so every scenario's `correlatedRequestIds` is empty and `persistV1Artifacts` writes `correlationRatio: 0, observedShare: 0` as literals; and it calls `responder.respond(prompt)` with no tools and keeps only `answer.text`, discarding `answer.toolCalls`, so every tool-governance pack is graded on prose. |
-| assuranceScheduler.ts | Cadence/event-triggered runs + cert issuance | lib (control plane, studioServer) | REAL | N |  |
-| assuranceSchema.ts | Zod schemas for v1 run/finding/cert/waiver artifacts | lib (12 importers) | REAL | Y |  |
-| assuranceScoring.ts | Evidence-gate evaluation + 0-100 risk scoring | lib (assuranceCertificates) | PARTIAL | N | Only `evaluateAssuranceEvidenceGates` is consumed. `scoreAssuranceRun` — the severity-weighted score, the category scores and the INSUFFICIENT_EVIDENCE path — has no caller in src or tests; the runner and control plane each compute their own score instead. |
-| assuranceSse.ts | Emits assurance SSE events to the org hub | lib (studioServer) | REAL | N |  |
-| assuranceStore.ts | Read-side queries over persisted runs/certs/waivers | lib (control plane, binderCollector, passportCollector, valueReports) | REAL | N |  |
-| assuranceVerifier.ts | Verifies cert bundles + whole-workspace signatures | CLI:`amc assurance verify` | REAL | N | Real digest + envelope + inclusion-proof verification, with hardened tar extraction. |
-| certificate.ts | Issues/inspects/verifies/revokes .amccert maturity certs | CLI:`amc cert *`, API:cryptoRouter | REAL | Y | Verification actually re-derives hashes, checks signatures against key history, re-runs the gate policy and re-verifies the ledger. |
-| evidenceArtifactSchema.ts | Enum of evidence artifact ids | lib (4 compliance packs, type-only) + test | REAL | Y |  |
-| evidenceWriters.ts | Writes assurance evidence/receipts to the ledger | lib (assuranceRunner) | REAL | N | `redactedScenarioPayload` genuinely stores only hash+length, matching the policy's storeOnlyHashesAndRefs literal. |
-| falsePositiveTracker.ts | False-positive reports, cost model, tuning loop | CLI:`amc fp-submit` / `fp-list` / `fp-report`, API:assuranceRouter | PARTIAL | Y | CRUD reads the durable store when given a workspace, but `generateTuningRecommendations` iterates the module-level `fpReports` array only and `generateFPTuningReport` calls `computeFPCostSummary()` with no workspace — so in a fresh CLI process the tuning report always prints "No false positive reports filed" and zero recommendations no matter how many reports are on disk. |
-| indices.ts | Failure-risk + autonomy-preservation indices | CLI:`amc indices`, API:metricsRouter, lib (14 importers) | REAL | Y | Uses a 50 fallback for missing packs but discloses it in the emitted evidence strings and raises an INFO alert. |
-| microCanary.ts | Always-on lightweight canary probes + health score | CLI:`amc micro-canary-run` / `-report` / `-alerts`, API:canaryRouter | FACADE | Y | Both production callers build the context as `{recentEventHashes: [], auditCounts: {}, configSignatures: {}, metadata: {}}` (src/cli.ts ~15712, src/api/canaryRouter.ts:116). Against that empty input `mc-injection-markers`, `mc-secret-exposure`, `mc-tool-governance` and `mc-config-drift` all return **PASS** — "No injection attempts detected", "No secret exposures or PII leaks detected", "Tool governance healthy", "No configuration changes detected" — without reading a single ledger event. `computeCanaryHealthScore` returns `score: 100` when there are no executions at all. Separately, `mc-evidence-chain` is described as "Checks that recent evidence events form a valid hash chain" but only checks each hash is 64 chars; it cannot detect a broken chain. |
-| report.ts | Renders the assurance markdown report | lib (assuranceRunner) | REAL | N |  |
-| scorers.ts | Scenario/pack/overall score aggregation | lib (assuranceRunner, redteam/runner) | REAL | Y | Correctly excludes `inconclusive` scenarios from pack aggregates rather than scoring them. |
-| validators.ts | Shared regex graders + pack/scenario interfaces | lib (162 importers — every pack) | REAL | Y | Graders are keyword/regex over the response text; they can and do fail. The hallucination validator carries an explicit comment on why the deterministic detectors are *not* wired in. |
-
-| advancedThreatsPack.ts | Advanced Threat Coverage | CLI:`amc assurance run` (packs/index) | REAL | Y |  |
-| adversarial-robustness.ts | Adversarial Robustness (TAP, PAIR, Best-of-N, AutoAdv) | CLI:`amc assurance run` (packs/index) | REAL | Y |  |
-| adversarialAlignmentProbesPack.ts | Adversarial Alignment Probes | CLI:`amc assurance run` (packs/index) | REAL | Y |  |
-| agentAsProxyPack.ts | Agent-as-proxy composition-attack helpers | test-only | DEAD | N | not in packs/index.ts, so `amc assurance run --pack agent-as-proxy` throws "Unknown assurance pack". No src importer; only its own test. Its sole production mention is the literal path "src/assurance/packs/agentAsProxyPack.ts" in src/score/monitorBypassResistance.ts, which credits "adversarial monitor testing" from the file existing. |
-| agentIdentitySpoofingPack.ts | Agent Identity Spoofing | CLI:`amc assurance run` (packs/index) | REAL | N |  |
-| agenticLoopGovernancePack.ts | Agentic Loop Governance | CLI:`amc assurance run` (packs/index) | REAL | N |  |
-| aiTrustExploitationPack.ts | AI-to-AI Trust Exploitation | CLI:`amc assurance run` (packs/index) | REAL | Y |  |
-| alignmentFakingPack.ts | Alignment Faking Detection | CLI:`amc assurance run` (packs/index) | PARTIAL | Y | claims to detect behaviour that differs when observed, but one prompt is sent and the grader checks topic keywords; no observed/unobserved comparison happens. |
-| approvalTheaterPack.ts | Approval Theater Resistance | CLI:`amc assurance run` (packs/index) | REAL | Y |  |
-| autonomousLoopGovernancePack.ts | Autonomous Loop Governance | CLI:`amc assurance run` (packs/index) | REAL | Y |  |
-| beavertails-pack.ts | BeaverTails Research Dataset Integration | CLI:`amc assurance run` (packs/index) | FACADE | N | prompts are hand-authored in this file; title/description claim scenarios "from the BeaverTails dataset" and the pack id ends `-research-dataset`. 10 local prompts, no dataset is loaded — the pack reports a BeaverTails result that is not BeaverTails. |
-| behavioralContractViolationPack.ts | Behavioral Contract Violation | CLI:`amc assurance run` (packs/index) | REAL | N |  |
-| benchmarkTrackingModule.ts | Alias re-export of benchmarkTrackingPack | CLI:`amc assurance run` (packs/index) | REAL | N |  |
-| benchmarkTrackingPack.ts | Safety-Critical Benchmark Tracking | ORPHAN | PARTIAL | Y | no benchmark is executed. Docstring cites GPQA Diamond / FrontierMath / SWE-bench / METR; the scenarios ask the agent to discuss them and the grader greps for those words. |
-| capabilityElicitationPack.ts | Capability Elicitation & Hidden Capability Detection | CLI:`amc assurance run` (packs/index) | PARTIAL | Y | hidden-capability detection graded from one self-report plus keyword presence. |
-| cbrnCapabilityPack.ts | CBRN Capability Assessment | CLI:`amc assurance run` (packs/index) | REAL | Y |  |
-| chainEscalationPack.ts | Chain-of-Tool Escalation Resistance | CLI:`amc assurance run` (packs/index) | REAL | Y |  |
-| circuitBreakerReliabilityPack.ts | Circuit Breaker & Reliability Controls | CLI:`amc assurance run` (packs/index) | REAL | N |  |
-| codeSabotageDefensePack.ts | Code Sabotage Defense | CLI:`amc assurance run` (packs/index) | REAL | N |  |
-| codingAgentEscapePack.ts | Coding Agent Sandbox Escape | CLI:`amc assurance run` (packs/index) | REAL | N |  |
-| commercialAgentPack.ts | Commercial Agent Archetype | CLI:`amc assurance run` (packs/index) | REAL | Y |  |
-| compoundThreatPack.ts | Compound Threat Detection | CLI:`amc assurance run` (packs/index) | REAL | Y |  |
-| configLintPack.ts | Configuration Linting & Safety | CLI:`amc assurance run` (packs/index) | PARTIAL | N | lints no config — it grades an answer about config. Also pushes the success string "Response includes safe configuration guidance" into the failure-`reasons` array, and `pass` is computed from auditTypes, so reasons never affect it. |
-| contentProvenancePack.ts | Content Provenance & Output Signing | CLI:`amc assurance run` (packs/index) | REAL | Y |  |
-| context-leakage.ts | Context Leakage & EchoLeak Assurance Pack | CLI:`amc assurance run` (packs/index) | FACADE | Y | artifact-echo gate plus a requiredTerms count, and buildPrompt hands the model both the artifact ids and the terms it will be graded on. Restating the brief passes "EchoLeak CVE-2025-32711 resistance evidence". |
-| contextWindowManagementPack.ts | Context Window Management | CLI:`amc assurance run` (packs/index) | REAL | N |  |
-| costEfficiencyPack.ts | Cost Efficiency Scoring | CLI:`amc assurance run` (packs/index) | REAL | N |  |
-| crossAgentCollusionPack.ts | Cross-Agent Collusion Resistance | CLI:`amc assurance run` (packs/index) | REAL | Y |  |
-| cyberseceval-pack.ts | CyberSecEval Research Dataset Integration | CLI:`amc assurance run` (packs/index) | FACADE | N | prompts are hand-authored in this file; title/description claim scenarios "from the CyberSecEval dataset" and the pack id ends `-research-dataset`. 10 local prompts, no dataset is loaded — the pack reports a CyberSecEval result that is not CyberSecEval. |
-| delegationTrustChainPack.ts | Delegation Trust Chain | CLI:`amc assurance run` (packs/index) | REAL | N |  |
-| disempowermentPack.ts | Human Empowerment & Autonomy Preservation | CLI:`amc assurance run` (packs/index) | REAL | N |  |
-| dlpExfiltrationPack.ts | DLP & Credential Leakage Prevention | CLI:`amc assurance run` (packs/index) | REAL | Y |  |
-| donotanswer-pack.ts | DoNotAnswer Research Dataset Integration | CLI:`amc assurance run` (packs/index) | FACADE | N | prompts are hand-authored in this file; title/description claim scenarios "from the DoNotAnswer dataset" and the pack id ends `-research-dataset`. 12 local prompts, no dataset is loaded — the pack reports a DoNotAnswer result that is not DoNotAnswer. |
-| dualityPack.ts | Digital-Physical Duality Safety | CLI:`amc assurance run` (packs/index) | REAL | N |  |
-| dynamicTrustAuthorizationPack.ts | Dynamic Trust Authorization | CLI:`amc assurance run` (packs/index) | REAL | Y |  |
-| economicAmplificationPack.ts | Tool-call amplification analysis helpers | test-only | DEAD | N | not registered, no src importer, test-only. `analyzeEconomicAmplification` also sets `costCapEnforced: true` when nothing was amplified and nothing capped (0 === 0). |
-| educationFERPAPack.ts | Education FERPA/COPPA Pack | CLI:`amc assurance run` (packs/index) | REAL | N |  |
-| emergentCapabilityPack.ts | Emergent Capability Discovery | CLI:`amc assurance run` (packs/index) | PARTIAL | Y | all 10 prompts are essay questions; grades whether the answer contains boundary/transparency/safety/novelty words, not whether a capability emerged. |
-| emergentMultiAgentRiskPack.ts | Emergent Multi-Agent Risk | CLI:`amc assurance run` (packs/index) | REAL | N |  |
-| encodedInjectionPack.ts | Encoded & Obfuscated Injection Resistance | CLI:`amc assurance run` (packs/index) | REAL | Y |  |
-| environmentalInfraPack.ts | Environmental / Critical Infrastructure Pack | CLI:`amc assurance run` (packs/index) | REAL | N |  |
-| euAiActArticlePack.ts | EU AI Act Article-Level Assurance Pack | CLI:`amc assurance run` (packs/index) | FACADE | Y | buildPrompt dictates the exact token to emit (`[artifact:<id>]` / `artifact=<id>`) and validate only checks the reply echoed it. No artifact is opened or proven to exist, yet the pass is reported as a EU AI Act Art. 9/10/13/14/15/17 evidence gate. |
-| evalAwareBehaviorPack.ts | Eval-Aware Behavior Detection | CLI:`amc assurance run` (packs/index) | PARTIAL | Y | no unobserved control condition is run, so eval-awareness is not measurable from what this pack collects. |
-| evaluationFreshnessPack.ts | Evaluation Freshness & Self-Evolution | CLI:`amc assurance run` (packs/index) | REAL | N |  |
-| evaluationReliabilityPack.ts | LLM-as-Judge Evaluation Reliability | CLI:`amc assurance run` (packs/index) | REAL | N |  |
-| excessiveAgencyPack.ts | Excessive Agency (OWASP LLM08) | CLI:`amc assurance run` (packs/index) | REAL | Y |  |
-| exfiltrationPack.ts | Secret Exfiltration Resistance | CLI:`amc assurance run` (packs/index) | REAL | Y |  |
-| factSimulationBoundaryPack.ts | Fact-Simulation Boundary Integrity | CLI:`amc assurance run` (packs/index) | REAL | Y |  |
-| falsePremisePack.ts | False Premise Detection (FalseQA) | CLI:`amc assurance run` (packs/index) | REAL | N |  |
-| financialModelRiskPack.ts | Financial Model Risk Pack | CLI:`amc assurance run` (packs/index) | REAL | N |  |
-| financialSOXPack.ts | Financial Services SOX & Market Integrity Pack | CLI:`amc assurance run` (packs/index) | REAL | N |  |
-| forecastLegitimacyPack.ts | Forecast Legitimacy | CLI:`amc assurance run` (packs/index) | REAL | Y |  |
-| globalAIRegulatoryPack.ts | Global AI Regulatory Compliance | CLI:`amc assurance run` (packs/index) | REAL | N |  |
-| governanceBypassPack.ts | Governance Bypass Resistance | CLI:`amc assurance run` (packs/index) | REAL | Y |  |
-| governanceNISTRMFPack.ts | Governance NIST AI RMF Pack | CLI:`amc assurance run` (packs/index) | REAL | N |  |
-| hallucinationPack.ts | Hallucination and Overclaim Resistance | CLI:`amc assurance run` (packs/index) | REAL | N |  |
-| harmbench-pack.ts | HarmBench Research Dataset Integration | CLI:`amc assurance run` (packs/index) | FACADE | N | prompts are hand-authored in this file; title/description claim scenarios "from the HarmBench dataset" and the pack id ends `-research-dataset`. 12 local prompts, no dataset is loaded — the pack reports a HarmBench result that is not HarmBench. |
-| healthcarePHIPack.ts | Healthcare PHI Protection Pack | CLI:`amc assurance run` (packs/index) | REAL | N |  |
-| hipaaCompliancePack.ts | HIPAA Compliance Assurance Pack | CLI:`amc assurance run` (packs/index) | REAL | N |  |
-| honeytokenDetectionPack.ts | Honeytoken Detection & Avoidance | CLI:`amc assurance run` (packs/index) | REAL | N |  |
-| humanDecisionSabotagePack.ts | Human Decision Sabotage Detection | CLI:`amc assurance run` (packs/index) | REAL | N |  |
-| humanOversightQualityPack.ts | Human Oversight Quality Assessment | CLI:`amc assurance run` (packs/index) | REAL | Y |  |
-| informationExtractionPack.ts | Information Extraction Resistance | CLI:`amc assurance run` (packs/index) | REAL | Y |  |
-| injectionPack.ts | Prompt Injection Resistance | CLI:`amc assurance run` (packs/index) | REAL | Y |  |
-| inputFaultResiliencePack.ts | Input Fault Resilience | CLI:`amc assurance run` (packs/index) | REAL | N |  |
-| instructionCompliancePack.ts | Instruction Compliance & Shutdown Safety | CLI:`amc assurance run` (packs/index) | REAL | N |  |
-| instructionHierarchyPack.ts | Instruction Hierarchy Compliance | CLI:`amc assurance run` (packs/index) | REAL | N |  |
-| instructionalLeakagePack.ts | Instructional Data Leakage | CLI:`amc assurance run` (packs/index) | REAL | N |  |
-| iso42005Pack.ts | ISO/IEC 42005 Impact Assessment Assurance Pack | CLI:`amc assurance run` (packs/index) | FACADE | Y | buildPrompt dictates the exact token to emit (`[artifact:<id>]` / `artifact=<id>`) and validate only checks the reply echoed it. No artifact is opened or proven to exist, yet the pass is reported as a ISO/IEC 42005 Sec. 6.3/6.4/7/8 evidence gate. |
-| legalCompliancePack.ts | Legal & Compliance Boundaries Pack | CLI:`amc assurance run` (packs/index) | REAL | N |  |
-| linuxPrivilegeBoundaryRegressionPack.ts | Linux Privilege Boundary Regression Pack | CLI:`amc assurance run` (packs/index) | REAL | N |  |
-| mcpSecurityResiliencePack.ts | MCP attack taxonomy + resilience math | lib (src/score/mcpCompliance.ts) | PARTIAL | N | not an AssurancePackDefinition and not registered. `analyzeMCPSecurityResilience` and `getMCPSecurityTestCases` have no production caller; only `getMCPAttackTaxonomy` / `computeNetResilientPerformance` are consumed, by src/score/mcpCompliance.ts. |
-| mechanisticTransparencyPack.ts | Mechanistic Transparency & Internal State Monitoring | CLI:`amc assurance run` (packs/index) | PARTIAL | Y | grades an essay about interpretability; no internal state is inspected. |
-| memoryMaturityPack.ts | Memory Maturity Assessment | CLI:`amc assurance run` (packs/index) | REAL | N |  |
-| memoryPoisoningPack.ts | Memory Poisoning Resistance | CLI:`amc assurance run` (packs/index) | REAL | N |  |
-| militaryDualUsePack.ts | Military & Dual-Use AI Governance | CLI:`amc assurance run` (packs/index) | REAL | Y |  |
-| misleadingContextPack.ts | Misleading Context Resistance (FaithEval) | CLI:`amc assurance run` (packs/index) | REAL | N |  |
-| mobilityFunctionalSafetyPack.ts | Mobility Functional Safety Pack | CLI:`amc assurance run` (packs/index) | REAL | N |  |
-| modelRoutePoisoningPack.ts | Model-Route Poisoning Resistance | CLI:`amc assurance run` (packs/index) | REAL | Y |  |
-| modelTheftExfilPack.ts | Model Theft & Weight Exfiltration | CLI:`amc assurance run` (packs/index) | REAL | Y |  |
-| multi-turn-safety.ts | Multi-Turn Safety (Crescendo, TopicAttack, Siren, Skeleton Key) | CLI:`amc assurance run` (packs/index) | PARTIAL | Y | single-turn. The Crescendo/TopicAttack/Siren/Skeleton-Key trajectory is described inside one prompt, and buildPrompt also hands the model the detection patterns, mitigation checklist and evidence requirements it is graded against. |
-| multiAgentOrchestratorPack.ts | Multi-Agent Orchestrator Governance | CLI:`amc assurance run` (packs/index) | REAL | Y |  |
-| multiTurnDeepEvalPack.ts | Deep Multi-Turn Conversation Evaluation | CLI:`amc assurance run` (packs/index) | PARTIAL | Y | single-turn: the "conversation history" is pasted into one prompt. AssuranceScenarioDefinition has one buildPrompt/one validate and the runner sends exactly one message. |
-| multiTurnToolAttackPack.ts | Multi-Turn Tool Attack Taxonomy | CLI:`amc assurance run` (packs/index) | PARTIAL | N | single-turn and tool-free: the turn sequence is prose, and the runner never offers tools nor reads `responder.toolCalls`. |
-| notaryAttestationPack.ts | Legacy Notary Attestation Compatibility Pack | CLI:`amc assurance run` (packs/index) | REAL | Y |  |
-| nvidia-aegis-pack.ts | NVIDIA Aegis Research Dataset Integration | CLI:`amc assurance run` (packs/index) | FACADE | N | prompts are hand-authored in this file; title/description claim scenarios "from the NVIDIA Aegis dataset" and the pack id ends `-research-dataset`. 8 local prompts, no dataset is loaded — the pack reports a NVIDIA Aegis result that is not NVIDIA Aegis. |
-| operational-discipline.ts | Operational Discipline Patterns | CLI:`amc assurance run` (packs/index) | REAL | Y |  |
-| overCompliancePack.ts | Over-Compliance Resistance (H-Neurons) | CLI:`amc assurance run` (packs/index) | REAL | N |  |
-| overreliancePack.ts | Overreliance (OWASP LLM09) | CLI:`amc assurance run` (packs/index) | REAL | N |  |
-| oversightUnderminingPack.ts | Oversight Undermining Detection | CLI:`amc assurance run` (packs/index) | PARTIAL | N | asks the model to introspect about being evaluated; no oversight behaviour is observed. |
-| overthinkingDetectionPack.ts | Reasoning-length vs accuracy analysis helpers | test-only | DEAD | N | not registered, no src importer, test-only. Sole production mention is the path string in src/score/reasoningEfficiency.ts, which credits "overthinking detection" from the file existing. |
-| owaspGenAiPack.ts | OWASP GenAI G01-G10 Assurance Pack | CLI:`amc assurance run` (packs/index) | FACADE | Y | buildPrompt dictates the exact token to emit (`[artifact:<id>]` / `artifact=<id>`) and validate only checks the reply echoed it. No artifact is opened or proven to exist, yet the pass is reported as a OWASP GenAI G01-G10 evidence gate. |
-| persuasionManipulationPack.ts | Persuasion & Manipulation at Scale Detection | CLI:`amc assurance run` (packs/index) | REAL | N |  |
-| pharmaCompliancePack.ts | Pharmaceutical & Clinical Safety Pack | CLI:`amc assurance run` (packs/index) | REAL | N |  |
-| piiDetectionLeakagePack.ts | PII Detection & Leakage Testing | CLI:`amc assurance run` (packs/index) | REAL | Y |  |
-| policyConfusionPack.ts | Policy Confusion & Spec Ambiguity Resistance | CLI:`amc assurance run` (packs/index) | REAL | Y |  |
-| powerSeekingPack.ts | Power-Seeking / Instrumental Convergence Detection | CLI:`amc assurance run` (packs/index) | REAL | N |  |
-| predictiveUXHonestyPack.ts | Predictive UX Honesty | CLI:`amc assurance run` (packs/index) | REAL | Y |  |
-| promptCachePoisoningPack.ts | Prompt Cache Poisoning | CLI:`amc assurance run` (packs/index) | PARTIAL | N | the poisoned cache state is described in prose; no cache is exercised. |
-| ragPoisoningPack.ts | RAG Pipeline Injection Resistance | CLI:`amc assurance run` (packs/index) | REAL | Y |  |
-| realPersonRepresentationPack.ts | Real-Person Representation Controls | CLI:`amc assurance run` (packs/index) | REAL | Y |  |
-| realtimeVoiceSafetyPack.ts | Real-time Voice Safety | CLI:`amc assurance run` (packs/index) | REAL | Y |  |
-| reasoningLockDetectionPack.ts | Reasoning Lock Detection | CLI:`amc assurance run` (packs/index) | REAL | N |  |
-| reasoningObservabilityPack.ts | Reasoning Observability | CLI:`amc assurance run` (packs/index) | REAL | N |  |
-| redTeamCoveragePack.ts | Red Team Coverage Assessment | CLI:`amc assurance run` (packs/index) | PARTIAL | Y | grades an essay about red-team coverage; no coverage data is read. |
-| replicationResistancePack.ts | Replication Resistance | CLI:`amc assurance run` (packs/index) | REAL | Y |  |
-| resourceExhaustionPack.ts | Resource Exhaustion Resistance | CLI:`amc assurance run` (packs/index) | REAL | Y |  |
-| roleDeploySabotagePack.ts | Role-Specific: Deploy Sabotage Resistance | CLI:`amc assurance run` (packs/index) | REAL | Y |  |
-| roleSupportFraudPack.ts | Role-Specific: Support Fraud Resistance | CLI:`amc assurance run` (packs/index) | REAL | Y |  |
-| rspCompliancePack.ts | Responsible Scaling Policy Compliance | CLI:`amc assurance run` (packs/index) | PARTIAL | Y | grades an essay about ASL thresholds; no RSP artifact or threshold is checked. |
-| runtimeTrustGatePack.ts | Runtime Trust Gate | CLI:`amc assurance run` (packs/index) | REAL | N |  |
-| sabotagePack.ts | Sabotage Detection (Bloom) | CLI:`amc assurance run` (packs/index) | REAL | Y |  |
-| safetyCriticalSILPack.ts | Safety-Critical SIL Pack | CLI:`amc assurance run` (packs/index) | REAL | N |  |
-| safetyCulturePack.ts | Safety Culture Assessment | CLI:`amc assurance run` (packs/index) | PARTIAL | Y | assesses an *organization* by asking the model under test to write essays; 7 of 10 prompts are open questions and the grader checks for culture/safety/process/accountability words. |
-| sandbaggingPack.ts | Sandbagging Detection | CLI:`amc assurance run` (packs/index) | PARTIAL | Y | "I will ask you the same question two ways" happens inside a single prompt; the capability differential across framings is never measured. |
-| sandboxBoundaryPack.ts | Legacy Sandbox Boundary Compatibility Pack | CLI:`amc assurance run` (packs/index) | REAL | Y |  |
-| sbomSupplyChainPack.ts | SBOM & Supply Chain Attack Resistance | CLI:`amc assurance run` (packs/index) | REAL | Y |  |
-| scenarioTraceabilityPack.ts | Scenario Traceability & Reproducibility | CLI:`amc assurance run` (packs/index) | REAL | Y |  |
-| schemingDeceptionPack.ts | Scheming & Goal-Directed Deception Auditor | CLI:`amc assurance run` (packs/index) | PARTIAL | N | "over 10 turns" is described, not executed; one response graded on vocabulary. |
-| scienceResearchAgentPack.ts | Science & Research Agent Risk | CLI:`amc assurance run` (packs/index) | REAL | Y |  |
-| securityStarterPack.ts | Security Starter Pack | CLI:`amc assurance run` (packs/index) | REAL | Y |  |
-| selfPreferentialBiasPack.ts | Self-Preferential Bias Detection (Bloom) | CLI:`amc assurance run` (packs/index) | REAL | Y |  |
-| selfPreservationPack.ts | Self-Preservation Resistance (Bloom) | CLI:`amc assurance run` (packs/index) | REAL | Y |  |
-| silentFailurePack.ts | Silent Failure & False Success Resistance | CLI:`amc assurance run` (packs/index) | REAL | Y |  |
-| simulationValidityPack.ts | Simulation Validity | CLI:`amc assurance run` (packs/index) | REAL | Y |  |
-| simulationWritebackGovernancePack.ts | Simulation Writeback Governance | CLI:`amc assurance run` (packs/index) | REAL | Y |  |
-| stepupApprovalBypassPack.ts | Step-Up Approval & Human-in-the-Loop Bypass | CLI:`amc assurance run` (packs/index) | REAL | N |  |
-| supply-chain-integrity.ts | Supply Chain Integrity: CPA-RAG, MCP Tool Poisoning, TombRaider | CLI:`amc assurance run` (packs/index) | PARTIAL | Y | buildPrompt supplies the mitigation checklist and evidence requirements and `requiredSignals` is drawn from that same brief, so restating the prompt satisfies most of the check. |
-| supplyChainAttackPack.ts | Supply Chain Attack Resistance | CLI:`amc assurance run` (packs/index) | REAL | N |  |
-| sycophancyPack.ts | Sycophancy Resistance (Bloom) | CLI:`amc assurance run` (packs/index) | REAL | Y |  |
-| syntheticAgentInteractionPack.ts | Synthetic Agent Interaction Safety | CLI:`amc assurance run` (packs/index) | REAL | Y |  |
-| syntheticPersonaGovernancePack.ts | Synthetic Persona Governance | CLI:`amc assurance run` (packs/index) | REAL | Y |  |
-| taintPropagationPack.ts | Data Taint Propagation Tracking | CLI:`amc assurance run` (packs/index) | REAL | Y |  |
-| technologyGDPRSOCPack.ts | Technology GDPR/SOC2/ISO27001 Pack | CLI:`amc assurance run` (packs/index) | REAL | N |  |
-| temporalConsistencyPack.ts | Temporal Consistency | CLI:`amc assurance run` (packs/index) | PARTIAL | Y | "200 turns into a multi-session task" is asserted in one prompt; no cross-session state is compared. |
-| thoughtSafetyAuditPack.ts | Thought Safety Audit | CLI:`amc assurance run` (packs/index) | REAL | N |  |
-| timingSideChannelPack.ts | Timing & Side-Channel Resistance | CLI:`amc assurance run` (packs/index) | PARTIAL | N | no timing is measured (the runner records timingMs: 0); the grader looks for the words "constant-time"/"uniform" in prose. |
-| tocTouPack.ts | Time-of-Check / Time-of-Use Resistance | CLI:`amc assurance run` (packs/index) | REAL | N |  |
-| toolMisusePack.ts | Legacy Tool Misuse Compatibility Pack | CLI:`amc assurance run` (packs/index) | PARTIAL | Y | same prose-only tool detection as unsafeToolPack; no tool is ever offered to the agent under test. |
-| toolSchemaDriftPack.ts | Tool Schema Drift Detection | CLI:`amc assurance run` (packs/index) | REAL | N |  |
-| toxic-chat-pack.ts | ToxicChat Research Dataset Integration | CLI:`amc assurance run` (packs/index) | FACADE | N | prompts are hand-authored in this file; title/description claim scenarios "from the ToxicChat dataset" and the pack id ends `-research-dataset`. 12 local prompts, no dataset is loaded — the pack reports a ToxicChat result that is not ToxicChat. |
-| truthfulnessPack.ts | Legacy Truthfulness Compatibility Pack | CLI:`amc assurance run` (packs/index) | REAL | Y |  |
-| uncertaintyPropagationPack.ts | Uncertainty Propagation | CLI:`amc assurance run` (packs/index) | REAL | N |  |
-| unsafeToolPack.ts | Unsafe Tool Action Resistance | CLI:`amc assurance run` (packs/index) | PARTIAL | N | tool actions are found by regex-extracting {"tool","action"} JSON from prose (validators.extractToolCallRequests). The runner offers no tools and drops `responder.toolCalls`, so a real tool call is invisible to it. |
-| valueCoherencePack.ts | Value Coherence Index (VCI) | CLI:`amc assurance run` (packs/index) | REAL | N |  |
-| wealthManagementMiFIDPack.ts | Wealth Management MiFID Pack | CLI:`amc assurance run` (packs/index) | REAL | N |  |
-| whistleblowerProtectionPack.ts | Whistleblower Protection Assessment | CLI:`amc assurance run` (packs/index) | REAL | Y |  |
-| xstest-pack.ts | XSTest Research Dataset Integration | CLI:`amc assurance run` (packs/index) | FACADE | N | prompts are hand-authored in this file; title/description claim scenarios "from the XSTest dataset" and the pack id ends `-research-dataset`. 12 local prompts, no dataset is loaded — the pack reports a XSTest result that is not XSTest. |
-| zombieAgentPersistencePack.ts | Memory-injection persistence analysis helpers | test-only | DEAD | N | not registered, no src importer, test-only; the analyze* functions consume caller-supplied results and nothing in src produces them. |

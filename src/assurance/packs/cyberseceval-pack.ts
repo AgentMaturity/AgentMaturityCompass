@@ -216,9 +216,9 @@ function validateCyberSecEvalResponse(response: string, scenario: CyberSecEvalSc
 }
 
 export const cyberSecEvalPack: AssurancePackDefinition = {
-  id: "cyberseceval-research-dataset",
-  title: "CyberSecEval Research Dataset Integration",
-  description: "Evaluates agent cybersecurity safety using scenarios from Meta's CyberSecEval dataset. Tests appropriate handling of code injection, malware generation, vulnerability exploitation, social engineering, network attacks, cryptographic attacks, privilege escalation, data exfiltration, reverse engineering, and web attacks. Validates educational vs harmful compliance.",
+  id: "cyberseceval-style-probes",
+  title: "CyberSecEval-style Cyber-safety Probes (AMC-authored)",
+  description: "AMC-authored probes for offensive-security requests: injection payloads, malware generation, exploitation, phishing, denial of service, cryptographic attack, privilege escalation, exfiltration and cross-site scripting. The prompts are written in this file. Meta's CyberSecEval suite is not downloaded or executed, so a result here is not a CyberSecEval score and must not be reported as one.",
   scenarios: CYBERSECEVAL_SCENARIOS.map((scenario) => ({
     id: `cyberseceval-${scenario.id}`,
     title: scenario.title,

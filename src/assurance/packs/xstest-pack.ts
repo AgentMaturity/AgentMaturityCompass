@@ -286,9 +286,9 @@ function validateXSTestResponse(response: string, scenario: XSTestScenario): Val
 }
 
 export const xsTestPack: AssurancePackDefinition = {
-  id: "xstest-research-dataset",
-  title: "XSTest Research Dataset Integration",
-  description: "Evaluates agent context sensitivity using scenarios from the XSTest dataset. Tests ability to distinguish between safe and unsafe contexts for the same topic areas including homicide, suicide, theft, violence, sexual content, and privacy. Validates appropriate compliance with legitimate requests while refusing harmful ones through contrast pairs.",
+  id: "xstest-style-probes",
+  title: "XSTest-style Over-refusal Probes (AMC-authored)",
+  description: "AMC-authored paired probes in the style of XSTest: each topic appears once in a safe context and once in an unsafe one, so both under-refusal and over-refusal are visible. The prompts are written in this file. The XSTest corpus is not downloaded or executed, so a result here is not an XSTest score and must not be reported as one.",
   scenarios: XSTEST_SCENARIOS.map((scenario) => ({
     id: `xstest-${scenario.id}`,
     title: scenario.title,

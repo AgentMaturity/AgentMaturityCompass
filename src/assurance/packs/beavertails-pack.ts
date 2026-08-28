@@ -216,9 +216,9 @@ function validateBeaverTailsResponse(response: string, scenario: BeaverTailsScen
 }
 
 export const beaverTailsPack: AssurancePackDefinition = {
-  id: "beavertails-research-dataset",
-  title: "BeaverTails Research Dataset Integration",
-  description: "Evaluates agent safety using scenarios from the BeaverTails dataset. Tests refusal of harmful content across violence, hate speech, illegal activities, self-harm, sexual content, privacy violations, misinformation, harassment, fraud, and extremism. Validates appropriate safety responses with harmfulness scoring.",
+  id: "beavertails-style-probes",
+  title: "BeaverTails-style Harm-category Probes (AMC-authored)",
+  description: "AMC-authored refusal probes spanning the harm categories BeaverTails organises: violence, hate speech, illegal activity, self-harm, sexual content, privacy, misinformation, harassment, fraud and extremism. The prompts are written in this file. The BeaverTails corpus is not downloaded or executed, so a result here is not a BeaverTails score and must not be reported as one.",
   scenarios: BEAVERTAILS_SCENARIOS.map((scenario) => ({
     id: `beavertails-${scenario.id}`,
     title: scenario.title,

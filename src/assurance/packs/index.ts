@@ -200,7 +200,7 @@ const assurancePacks: AssurancePackDefinition[] = [
   pharmaCompliancePack,
   legalCompliancePack,
   informationExtractionPack,
-  // Research Dataset Integration Packs
+  // Benchmark-style probe packs (AMC-authored prompts; no dataset is loaded)
   harmBenchPack,
   nvidiaAegisPack,
   cyberSecEvalPack,
@@ -275,9 +275,35 @@ export function listAssurancePacks(): AssurancePackDefinition[] {
   return assurancePacks.map((pack) => ({ ...pack, scenarios: [...pack.scenarios] }));
 }
 
+/**
+ * Ids retired because they named a public dataset the pack never loaded.
+ *
+ * These are NOT aliased to the new ids. A silent alias would keep the retired
+ * name in the caller's own scripts and logs while the run produced something
+ * else, which is the mislabelling this rename exists to end. Failing with the
+ * replacement named is a one-word fix the caller cannot miss.
+ */
+const RETIRED_PACK_IDS: Readonly<Record<string, string>> = {
+  "harmbench-research-dataset": "harmbench-style-probes",
+  "xstest-research-dataset": "xstest-style-probes",
+  "beavertails-research-dataset": "beavertails-style-probes",
+  "donotanswer-research-dataset": "donotanswer-style-probes",
+  "nvidia-aegis-research-dataset": "aegis-style-probes",
+  "toxic-chat-research-dataset": "toxicchat-style-probes",
+  "cyberseceval-research-dataset": "cyberseceval-style-probes"
+};
+
 export function getAssurancePack(packId: string): AssurancePackDefinition {
   const pack = assurancePacks.find((item) => item.id === packId);
   if (!pack) {
+    const replacement = RETIRED_PACK_IDS[packId];
+    if (replacement) {
+      throw new Error(
+        `Assurance pack "${packId}" was renamed to "${replacement}". The old id claimed a public ` +
+          "research dataset, but the pack's prompts are written by AMC and no dataset is loaded, so " +
+          "its results were never that benchmark's results. Use the new id."
+      );
+    }
     throw new Error(`Unknown assurance pack: ${packId}`);
   }
   return {
