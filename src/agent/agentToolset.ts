@@ -51,7 +51,18 @@ export interface AgentToolsetOptions {
    */
   readonly subagents?: SubagentCapability;
   /** Session the evidence rows belong to. Defaults to a per-agent bucket. */
-  readonly sessionId?: string;
+  /**
+   * The session tool evidence belongs to. REQUIRED, and deliberately so.
+   *
+   * This used to default to `toolset-${agentId}`, a session nothing ever
+   * created -- so any run that actually called a tool wrote rows referencing a
+   * session with no row of its own, and `verifyLedgerIntegrity` reported
+   * "references missing session". The default looked reasonable at every call
+   * site and was wrong at all of them, which is why there is no longer one: a
+   * caller that cannot name the session its tools are running for does not know
+   * what it is recording.
+   */
+  readonly sessionId: string;
 }
 
 /**
@@ -226,7 +237,7 @@ export function agentToolset(options: AgentToolsetOptions): AgentToolset {
           { ...execution, appliedGuards: registry.guardLabelsFor(execution) },
           outcome
         ).map((row) => ({
-          sessionId: options.sessionId ?? `toolset-${agentId}`,
+          sessionId: options.sessionId,
           runtime: "amc" as const,
           eventType: row.eventType,
           payload: row.payload,

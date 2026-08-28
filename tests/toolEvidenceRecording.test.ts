@@ -71,7 +71,7 @@ describe("a governed call leaves evidence", () => {
   it("records an ALLOWED call", async () => {
     const workspace = readyWorkspace();
     writeFileSync(join(workspace, "workspace", "n.txt"), "hello");
-    const toolset = agentToolset({ workspace, agentId: "default" });
+    const toolset = agentToolset({ workspace, agentId: "default", sessionId: "toolset-test-session"});
     open.push(toolset);
 
     await toolset.seam.execute(call("fs.read", { path: "workspace/n.txt" }));
@@ -86,7 +86,7 @@ describe("a governed call leaves evidence", () => {
     // The row that matters most. A denial the caller sees and the log does not
     // is enforcement nobody can audit afterwards.
     const workspace = readyWorkspace();
-    const toolset = agentToolset({ workspace, agentId: "default" });
+    const toolset = agentToolset({ workspace, agentId: "default", sessionId: "toolset-test-session"});
     open.push(toolset);
 
     await toolset.seam.execute(call("bash", { command: "sudo rm -rf /tmp/x" }));
@@ -103,7 +103,7 @@ describe("a governed call leaves evidence", () => {
     // count them separately: what policy decided, and what it cost.
     const workspace = readyWorkspace();
     writeFileSync(join(workspace, "workspace", "n.txt"), "hello");
-    const toolset = agentToolset({ workspace, agentId: "default" });
+    const toolset = agentToolset({ workspace, agentId: "default", sessionId: "toolset-test-session"});
     open.push(toolset);
 
     await toolset.seam.execute(call("fs.read", { path: "workspace/n.txt" }));
@@ -115,7 +115,7 @@ describe("a governed call leaves evidence", () => {
 
   it("correlates a call to its token, so a denial can be traced", async () => {
     const workspace = readyWorkspace();
-    const toolset = agentToolset({ workspace, agentId: "default" });
+    const toolset = agentToolset({ workspace, agentId: "default", sessionId: "toolset-test-session"});
     open.push(toolset);
 
     await toolset.seam.execute(call("bash", { command: "sudo ls" }));
@@ -130,7 +130,7 @@ describe("a governed call leaves evidence", () => {
     // would put the same untrusted content in a second place with a second
     // retention and DSAR story.
     const workspace = readyWorkspace();
-    const toolset = agentToolset({ workspace, agentId: "default" });
+    const toolset = agentToolset({ workspace, agentId: "default", sessionId: "toolset-test-session"});
     open.push(toolset);
 
     await toolset.seam.execute(call("fs.read", { path: "workspace/SECRET-MARKER.txt" }));

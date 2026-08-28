@@ -92,7 +92,7 @@ describe("a delegation scope is an action-class budget", () => {
 describe("the scope denies the tools outside it", () => {
   it("denies every write tool to a READ_ONLY child", () => {
     const dir = workspace();
-    const toolset = agentToolset({ workspace: dir, agentId: "payments-agent" });
+    const toolset = agentToolset({ workspace: dir, agentId: "payments-agent", sessionId: "toolset-test-session"});
 
     const denied = deniedToolNamesForScope(toolset.registry, ["READ_ONLY"]);
 
@@ -104,7 +104,7 @@ describe("the scope denies the tools outside it", () => {
 
   it("denies nothing a wider scope permits", () => {
     const dir = workspace();
-    const toolset = agentToolset({ workspace: dir, agentId: "payments-agent" });
+    const toolset = agentToolset({ workspace: dir, agentId: "payments-agent", sessionId: "toolset-test-session"});
 
     const denied = deniedToolNamesForScope(toolset.registry, ["READ_ONLY", "WRITE_LOW", "WRITE_HIGH"]);
 
@@ -116,7 +116,7 @@ describe("the scope denies the tools outside it", () => {
   it("applies as a registry restriction the seam actually honours", () => {
     // The point of the whole exercise: not a list, a refusal.
     const dir = workspace();
-    const toolset = agentToolset({ workspace: dir, agentId: "payments-agent" });
+    const toolset = agentToolset({ workspace: dir, agentId: "payments-agent", sessionId: "toolset-test-session"});
     const before = (toolset.seam.schemas() ?? []).map((s) => s.name);
     expect(before).toContain("fs.write");
 

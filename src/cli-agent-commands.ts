@@ -1,3 +1,4 @@
+import { randomUUID } from "node:crypto";
 /**
  * The operator surface for the agent loop (plan P3.2 stage 4).
  *
@@ -511,6 +512,11 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
         return;
       }
       const dispatchMode = (opts.toolMode ?? preset?.toolMode) === "code" ? "code" as const : "native" as const;
+      // Minted here, not by the turn, because the toolset is built BEFORE the
+      // turn and its tool evidence has to name the session those calls ran in.
+      // It previously named `toolset-default`, a session nothing ever created,
+      // so any run that actually called a tool left the ledger unverifiable.
+      const turnSessionId = randomUUID();
       let toolSeam: AgentToolSeam | null = null;
       let grantDelegation: ((capability: SubagentCapability) => void) | null = null;
       let foreignRunner: SubagentRunner | null = null;
@@ -519,6 +525,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
         const toolset = agentToolset({
           workspace: process.cwd(),
           agentId: "default",
+          sessionId: turnSessionId,
           ...(dispatchMode === "code" ? { mode: dispatchMode } : {})
         });
         if (wantsDelegation) {
@@ -634,6 +641,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
 
       try {
         const outcome = await runner.runComposedTurn({
+          sessionId: turnSessionId,
           workspace: process.cwd(),
           agentId: "default",
           // No pinned `systemPrompt`: the prompt is ASSEMBLED, which is what
