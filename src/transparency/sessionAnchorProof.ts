@@ -89,9 +89,7 @@ function readSignedRoot(workspace: string): { fileText: string; row: SignedMerkl
  * changed, and the newest anchor is the one whose leaf the current tree still
  * contains at a stable index.
  */
-export async function buildSessionAnchorProof(
-  params: SessionAnchorProofParams
-): Promise<SessionAnchorProof> {
+export function buildSessionAnchorProof(params: SessionAnchorProofParams): SessionAnchorProof {
   const entries = findSessionAnchorEntries(params.workspace, params.sessionId);
   const entry = entries[entries.length - 1];
   if (entry === undefined) {
@@ -134,7 +132,7 @@ export async function buildSessionAnchorProof(
   // the ledger around them is intact, so the session's position in it means
   // what it appears to mean. That is why an unrelated broken session refuses
   // this proof — a third party relying on it is relying on the whole record.
-  const ledger = await verifyLedgerIntegrity(params.workspace);
+  const ledger = verifyLedgerIntegrity(params.workspace);
   if (!ledger.ok) {
     throw new SessionAnchorProofError(
       "the evidence ledger does not verify, refusing to issue a proof: "
@@ -206,10 +204,10 @@ export interface SessionAnchorProofExport {
  * ship with, because every test written against the exporter's own objects
  * would still pass.
  */
-export async function exportSessionAnchorProof(
+export function exportSessionAnchorProof(
   params: SessionAnchorProofParams & { outFile: string }
-): Promise<SessionAnchorProofExport> {
-  const proof = await buildSessionAnchorProof(params);
+): SessionAnchorProofExport {
+  const proof = buildSessionAnchorProof(params);
   const outFile = resolve(params.workspace, params.outFile);
   ensureDir(dirname(outFile));
   writeFileAtomic(outFile, `${JSON.stringify(proof, null, 2)}\n`, 0o644);

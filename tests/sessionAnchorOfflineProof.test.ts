@@ -109,15 +109,15 @@ function runSession(workspace: string): string {
  * Anchors a session, exports its proof into a directory OUTSIDE the workspace,
  * and then destroys the workspace. What comes back is what a third party holds.
  */
-async function anchorAndDetach(): Promise<{
+function anchorAndDetach(): {
   proofFile: string;
   fingerprint: string;
   sessionId: string;
-}> {
+} {
   const workspace = newWorkspace();
   const sessionId = runSession(workspace);
   anchorSessionRoot({ workspace, sessionId });
-  const exported = await exportSessionAnchorProof({
+  const exported = exportSessionAnchorProof({
     workspace,
     sessionId,
     outFile: join(workspace, "session.amcproof.json")
@@ -139,11 +139,11 @@ function writeProof(file: string, proof: SessionAnchorProof): void {
 }
 
 /** Mutates the detached proof in place and returns the resulting verdict. */
-async function verifyMutated(
+function verifyMutated(
   mutate: (proof: SessionAnchorProof) => void,
   overrideFingerprint?: string
-): Promise<{ ok: boolean; errors: readonly string[] }> {
-  const { proofFile, fingerprint } = await anchorAndDetach();
+): { ok: boolean; errors: readonly string[] } {
+  const { proofFile, fingerprint } = anchorAndDetach();
   const proof = readProof(proofFile);
   mutate(proof);
   writeProof(proofFile, proof);
@@ -190,7 +190,7 @@ describe("session root anchoring", () => {
     expect(findSessionAnchorEntries(workspace, sessionId)).toHaveLength(1);
   });
 
-  test("the exporter refuses to issue a proof against an unsigned root", async () => {
+  test("the exporter refuses to issue a proof against an unsigned root", () => {
     const workspace = newWorkspace();
     const sessionId = runSession(workspace);
     anchorSessionRoot({ workspace, sessionId });
@@ -202,15 +202,15 @@ describe("session root anchoring", () => {
     const row = JSON.parse(readFileSync(rootPath, "utf8")) as { leafCount: number };
     writeFileSync(rootPath, JSON.stringify({ ...row, leafCount: row.leafCount + 5 }, null, 2), "utf8");
 
-    await expect(
+    expect(() =>
       exportSessionAnchorProof({ workspace, sessionId, outFile: join(workspace, "bad.amcproof.json") })
-    ).rejects.toThrow(SessionAnchorProofError);
+    ).toThrow(SessionAnchorProofError);
   });
 });
 
 describe("session anchor proof — offline verification", () => {
-  test("verifies from a directory with no .amc, after the workspace is deleted", async () => {
-    const { proofFile, fingerprint, sessionId } = await anchorAndDetach();
+  test("verifies from a directory with no .amc, after the workspace is deleted", () => {
+    const { proofFile, fingerprint, sessionId } = anchorAndDetach();
 
     const verdict = verifySessionAnchorProofFile({
       file: proofFile,
@@ -224,8 +224,8 @@ describe("session anchor proof — offline verification", () => {
     expect(verdict.leafCount).toBeGreaterThan(0);
   });
 
-  test("a truncated seal list breaks the session root it claims", async () => {
-    const verdict = await verifyMutated((proof) => {
+  test("a truncated seal list breaks the session root it claims", () => {
+    const verdict = verifyMutated((proof) => {
       proof.descriptor.sealEventHashes = proof.descriptor.sealEventHashes.slice(0, 1);
     });
 
@@ -233,8 +233,8 @@ describe("session anchor proof — offline verification", () => {
     expect(verdict.errors.join("; ")).toContain("session merkle root mismatch");
   });
 
-  test("an edited descriptor no longer matches the digest the log anchored", async () => {
-    const verdict = await verifyMutated((proof) => {
+  test("an edited descriptor no longer matches the digest the log anchored", () => {
+    const verdict = verifyMutated((proof) => {
       proof.descriptor.eventCount += 1;
     });
 
@@ -242,8 +242,8 @@ describe("session anchor proof — offline verification", () => {
     expect(verdict.errors.join("; ")).toContain("transparency entry commits to");
   });
 
-  test("an edited transparency entry fails its own hash recomputation", async () => {
-    const verdict = await verifyMutated((proof) => {
+  test("an edited transparency entry fails its own hash recomputation", () => {
+    const verdict = verifyMutated((proof) => {
       proof.entry.ts += 1000;
     });
 
@@ -251,8 +251,8 @@ describe("session anchor proof — offline verification", () => {
     expect(verdict.errors.join("; ")).toContain("transparency entry hash mismatch");
   });
 
-  test("a tampered proof path no longer resolves to the anchored root", async () => {
-    const verdict = await verifyMutated((proof) => {
+  test("a tampered proof path no longer resolves to the anchored root", () => {
+    const verdict = verifyMutated((proof) => {
       const step = proof.inclusion.proofPath[0];
       expect(step, "the anchored log must be deep enough to carry a proof path").toBeDefined();
       proof.inclusion.proofPath = [{ position: step!.position, hash: "f".repeat(64) }];
@@ -262,8 +262,8 @@ describe("session anchor proof — offline verification", () => {
     expect(verdict.errors.join("; ")).toContain("inclusion proof does not resolve");
   });
 
-  test("a root that was never signed is rejected even when the path is consistent", async () => {
-    const verdict = await verifyMutated((proof) => {
+  test("a root that was never signed is rejected even when the path is consistent", () => {
+    const verdict = verifyMutated((proof) => {
       const row = JSON.parse(proof.signedRoot.fileText) as Record<string, unknown>;
       proof.signedRoot.fileText = JSON.stringify({ ...row, root: "a".repeat(64) }, null, 2);
     });
@@ -274,8 +274,8 @@ describe("session anchor proof — offline verification", () => {
     expect(joined).toContain("signed root digest mismatch");
   });
 
-  test("a leaf index outside the signed tree is rejected", async () => {
-    const verdict = await verifyMutated((proof) => {
+  test("a leaf index outside the signed tree is rejected", () => {
+    const verdict = verifyMutated((proof) => {
       proof.inclusion.leafIndex = 9999;
     });
 
@@ -283,8 +283,8 @@ describe("session anchor proof — offline verification", () => {
     expect(verdict.errors.join("; ")).toContain("outside the signed tree");
   });
 
-  test("verification fails against a fingerprint the holder did not expect", async () => {
-    const verdict = await verifyMutated(() => {
+  test("verification fails against a fingerprint the holder did not expect", () => {
+    const verdict = verifyMutated(() => {
       /* no mutation: the pin itself is wrong */
     }, "b".repeat(64));
 
@@ -292,8 +292,8 @@ describe("session anchor proof — offline verification", () => {
     expect(verdict.errors.join("; ")).toContain("auditor key fingerprint mismatch");
   });
 
-  test("an empty pin is refused rather than treated as no pin", async () => {
-    const verdict = await verifyMutated(() => {}, "");
+  test("an empty pin is refused rather than treated as no pin", () => {
+    const verdict = verifyMutated(() => {}, "");
 
     expect(verdict.ok).toBe(false);
     expect(verdict.errors.join("; ")).toContain("expectedAuditorKeyFingerprint must be a sha256 hex digest");
@@ -309,8 +309,8 @@ describe("session anchor proof — offline verification", () => {
    * test ever goes green with `ok: true`, the offline proof has become a
    * statement that someone signed their own claims.
    */
-  test("a bundle re-signed with an attacker's auditor key fails the pin", async () => {
-    const { proofFile, fingerprint } = await anchorAndDetach();
+  test("a bundle re-signed with an attacker's auditor key fails the pin", () => {
+    const { proofFile, fingerprint } = anchorAndDetach();
     const proof = readProof(proofFile);
 
     const attacker = generateKeyPairSync("ed25519");
@@ -343,8 +343,8 @@ describe("session anchor proof — offline verification", () => {
    * never read. Rejecting is the only verdict that keeps "what you see is what
    * was hashed" true.
    */
-  test("a descriptor carrying an unrecognised field is rejected, not silently ignored", async () => {
-    const verdict = await verifyMutated((proof) => {
+  test("a descriptor carrying an unrecognised field is rejected, not silently ignored", () => {
+    const verdict = verifyMutated((proof) => {
       (proof.descriptor as unknown as Record<string, unknown>).auditorNote = "approved by management";
     });
 
@@ -352,8 +352,8 @@ describe("session anchor proof — offline verification", () => {
     expect(verdict.errors.join("; ")).toContain("invalid session anchor proof");
   });
 
-  test("a fingerprint that disagrees with the bundle's own key is reported", async () => {
-    const verdict = await verifyMutated((proof) => {
+  test("a fingerprint that disagrees with the bundle's own key is reported", () => {
+    const verdict = verifyMutated((proof) => {
       proof.auditorKeyFingerprint = "c".repeat(64);
     });
 
@@ -367,7 +367,7 @@ describe("session anchor proof — offline verification", () => {
    * works there too — and an "it only works on SQLite" regression would be
    * invisible without this, because every other test here runs on the default.
    */
-  test("anchoring and offline verification work on the JSONL backend", async () => {
+  test("anchoring and offline verification work on the JSONL backend", () => {
     const previous = process.env["AMC_SESSION_STORE"];
     process.env["AMC_SESSION_STORE"] = "jsonl";
     try {
@@ -376,7 +376,7 @@ describe("session anchor proof — offline verification", () => {
       const anchored = anchorSessionRoot({ workspace, sessionId });
       expect(anchored.descriptor.sealCount).toBe(2);
 
-      const exported = await exportSessionAnchorProof({
+      const exported = exportSessionAnchorProof({
         workspace,
         sessionId,
         outFile: join(workspace, "jsonl.amcproof.json")
@@ -397,7 +397,7 @@ describe("session anchor proof — offline verification", () => {
     }
   });
 
-  test("refuses a proof when the LEDGER does not verify, not just the log", async () => {
+  test("refuses a proof when the LEDGER does not verify, not just the log", () => {
     const workspace = newWorkspace();
     const sessionId = runSession(workspace);
     // A SECOND, unrelated session, and the one that gets damaged. The session
@@ -423,16 +423,16 @@ describe("session anchor proof — offline verification", () => {
       db.close();
     }
 
-    await expect(
+    expect(() =>
       exportSessionAnchorProof({ workspace, sessionId, outFile: join(workspace, "x.amcproof.json") })
-    ).rejects.toThrow(/evidence ledger does not verify/);
+    ).toThrow(/evidence ledger does not verify/);
   });
 
-  test("auditorKeyFingerprint is the sha256 of the exported PEM", async () => {
+  test("auditorKeyFingerprint is the sha256 of the exported PEM", () => {
     const workspace = newWorkspace();
     const sessionId = runSession(workspace);
     anchorSessionRoot({ workspace, sessionId });
-    const exported = await exportSessionAnchorProof({
+    const exported = exportSessionAnchorProof({
       workspace,
       sessionId,
       outFile: join(workspace, "session.amcproof.json")
@@ -451,10 +451,10 @@ describe("the cryptographic checks fire in the failing direction", () => {
    * rule, so removing that rule turns this file red.
    */
 
-  test("a forged root signature is rejected — the one check that makes this cryptography", async () => {
+  test("a forged root signature is rejected — the one check that makes this cryptography", () => {
     // Without this, the offline proof is a self-consistent document that proves
     // nothing: every hash would still agree with every other hash.
-    const verdict = await verifyMutated((proof) => {
+    const verdict = verifyMutated((proof) => {
       const sig = proof.signedRoot.signature as { signature: string; envelope?: { sigB64?: string } };
       // A structurally valid but wrong ed25519 signature.
       const forged = Buffer.alloc(64, 7).toString("base64");
@@ -465,10 +465,10 @@ describe("the cryptographic checks fire in the failing direction", () => {
     expect(verdict.errors.join(" ")).toMatch(/signed root signature invalid/);
   });
 
-  test("a truncated seal list is rejected by the sealCount cross-check", async () => {
+  test("a truncated seal list is rejected by the sealCount cross-check", () => {
     // sealCount and sealEventHashes.length must agree, or an anchor could be
     // minted over a session whose seals were partly dropped.
-    const verdict = await verifyMutated((proof) => {
+    const verdict = verifyMutated((proof) => {
       const d = proof.descriptor as { sealEventHashes: string[] };
       if (d.sealEventHashes.length > 0) d.sealEventHashes.pop();
     });
@@ -476,16 +476,16 @@ describe("the cryptographic checks fire in the failing direction", () => {
     expect(verdict.errors.length).toBeGreaterThan(0);
   });
 
-  test("a descriptor whose sealCount disagrees with its seal list is rejected", async () => {
-    const verdict = await verifyMutated((proof) => {
+  test("a descriptor whose sealCount disagrees with its seal list is rejected", () => {
+    const verdict = verifyMutated((proof) => {
       const d = proof.descriptor as { sealCount: number };
       d.sealCount += 1;
     });
     expect(verdict.ok, "sealCount must be cross-checked, not carried on trust").toBe(false);
   });
 
-  test("a descriptor whose turnCount is inflated is rejected", async () => {
-    const verdict = await verifyMutated((proof) => {
+  test("a descriptor whose turnCount is inflated is rejected", () => {
+    const verdict = verifyMutated((proof) => {
       const d = proof.descriptor as { turnCount: number };
       d.turnCount += 5;
     });

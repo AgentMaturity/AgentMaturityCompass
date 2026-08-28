@@ -105,7 +105,7 @@ export class LedgerService extends AmcSeam {
    * are different claims, and a consumer deciding whether evidence was
    * tampered with must not be answered with "a gateway config is unsigned".
    */
-  verify(): Promise<VerifyResult> {
+  verify(): VerifyResult {
     return verifyLedgerIntegrity(this.workspace);
   }
 }

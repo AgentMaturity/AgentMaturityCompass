@@ -710,10 +710,24 @@ function verifyFleetAndAgents(workspace: string, errors: string[]): void {
   }
 }
 
-export async function verifyLedgerIntegrity(
+/**
+ * Synchronous, and deliberately so.
+ *
+ * This was declared `async` while its body awaited nothing — every read is a
+ * better-sqlite3 call or a `readFileSync`. The Promise bought no concurrency and
+ * cost callers their own colour: anything wanting to verify a ledger had to
+ * become async too, which is how `exportSessionAnchorProof` acquired an async
+ * signature and ~20 call sites acquired an `await`, for a function that never
+ * yielded.
+ *
+ * Existing `await verifyLedgerIntegrity(...)` call sites keep working unchanged:
+ * awaiting a non-thenable is legal and still queues a microtask, so ordering is
+ * preserved. They are now redundant rather than wrong, and can go one at a time.
+ */
+export function verifyLedgerIntegrity(
   workspacePath: string,
   options: LedgerVerifyOptions = {}
-): Promise<VerifyResult> {
+): VerifyResult {
   const ledger = openLedger(workspacePath);
   const chainErrors: string[] = [];
   const governanceErrors: string[] = [];
