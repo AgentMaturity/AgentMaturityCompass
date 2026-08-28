@@ -46,7 +46,8 @@ function harness(dir: string) {
     base: {
       workspace: dir,
       parent: rootIdentity("payments-agent"),
-      session: { recordLoopEvent: (r: LoopEventRecord) => { rows.push(r); return null; } },
+      session: { recordLoopEvent: (r: LoopEventRecord) => { rows.push(r); return null; },
+    recordProjectedEvidence: () => null },
       mintSessionId: () => `child-${(n += 1)}`,
       runAs: "worker",
       goal: "make the tests pass"

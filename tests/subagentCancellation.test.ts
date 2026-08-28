@@ -41,7 +41,8 @@ function workspace(): string {
 
 const recorder = () => {
   const rows: LoopEventRecord[] = [];
-  return { rows, recordLoopEvent: (r: LoopEventRecord) => { rows.push(r); return null; } };
+  return { rows, recordLoopEvent: (r: LoopEventRecord) => { rows.push(r); return null; },
+    recordProjectedEvidence: () => null };
 };
 
 const settlementOf = (rows: LoopEventRecord[]): string | null => {

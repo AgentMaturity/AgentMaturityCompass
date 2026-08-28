@@ -142,6 +142,23 @@ export type DelegationSettlement = "reported" | "refused" | "failed" | "cancelle
 /** The minimum this module needs of a session. */
 export interface DelegationRecorder {
   recordLoopEvent(record: LoopEventRecord): unknown;
+  /**
+   * Where the settled delegation's scoreable projection is written.
+   *
+   * REQUIRED, not optional. Optional would mean a recorder without it silently
+   * drops the projection, and a caller cannot tell the difference between
+   * "there was nothing to record" and "the evidence went nowhere" -- the same
+   * shape as the `toolset-<agentId>` default this codebase has just finished
+   * deleting. Every production caller already holds a `SessionService`, which
+   * has the method; the cost is confined to the fakes in tests, which is where
+   * an unimplemented contract belongs if it is going to be unimplemented
+   * anywhere.
+   */
+  recordProjectedEvidence(row: {
+    readonly eventType: "audit" | "metric" | "stdout";
+    readonly payload: string;
+    readonly meta: Record<string, unknown>;
+  }): unknown;
 }
 
 export interface SpawnSubagentInit {
@@ -362,7 +379,24 @@ export async function spawnSubagent(init: SpawnSubagentInit): Promise<SubagentOu
     // the scoreable projection of the same fact; see
     // ../diagnostic/spineEvidenceProjection.ts for which question they bind, why,
     // and the ceiling that stops the binding inflating anything.
-    writeDelegationEvidence(init.workspace, childSessionId, {
+    // Written into the PARENT's session, through the parent's own writer.
+    //
+    // These rows were written against the CHILD's session id, and the runner
+    // seals that session in a `finally` before this line is reached -- so the
+    // append landed after the seal and made its committed final hash false,
+    // which `verifyLedgerIntegrity` reports workspace-wide. That is not a hidden
+    // cost: assuranceRunner turns it into `status: "INVALID"` and auditPacket
+    // ships it to a customer as `integrity/ledger-verify.json`. One delegation
+    // flipped every later assurance report.
+    //
+    // The parent is the right home regardless of the seal. `settledAs` is
+    // decided HERE, from `abandoned`, `result.ok` and the child's folded text --
+    // the parent's observations of the delegation, not the child's account of
+    // itself. On the cancelled path the child never returned at all. The
+    // `agent_delegation_*` control rows for the same fact are already in the
+    // parent, and the row carries `childSessionId` in its meta, so nothing about
+    // the child is lost by not living in its log.
+    writeDelegationEvidence(init.session, {
       settledAs,
       depth: identity.depth,
       packetId,

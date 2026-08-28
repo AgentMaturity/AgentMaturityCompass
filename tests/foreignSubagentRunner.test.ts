@@ -222,7 +222,8 @@ describe("a foreign child is governed by the same chokepoint as an in-process on
       workspace: dir,
       parent: rootIdentity("payments-agent"),
       request: { runAs: "researcher", goal: "summarise the ledger" },
-      session: { recordLoopEvent: (r) => { rows.push(r); return null; } },
+      session: { recordLoopEvent: (r) => { rows.push(r); return null; },
+    recordProjectedEvidence: () => null },
       runner: runnerFor(dir, fakeAgent(dir, 'echo "40 rows, two anomalies."')),
       mintSessionId: () => "foreign-governed-1"
     });
@@ -251,7 +252,8 @@ describe("a foreign child is governed by the same chokepoint as an in-process on
       workspace: dir,
       parent: rootIdentity("payments-agent"),
       request: { runAs: "researcher", goal: "g" },
-      session: { recordLoopEvent: (r) => { rows.push(r); return null; } },
+      session: { recordLoopEvent: (r) => { rows.push(r); return null; },
+    recordProjectedEvidence: () => null },
       runner: runnerFor(dir, fakeAgent(dir, 'echo "half"; exit 7')),
       mintSessionId: () => "foreign-crashed-1"
     });

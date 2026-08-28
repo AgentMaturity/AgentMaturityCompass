@@ -55,7 +55,8 @@ function allow(dir: string, name: string): void {
 
 const recorder = () => {
   const rows: LoopEventRecord[] = [];
-  return { rows, recordLoopEvent: (r: LoopEventRecord) => { rows.push(r); return null; } };
+  return { rows, recordLoopEvent: (r: LoopEventRecord) => { rows.push(r); return null; },
+    recordProjectedEvidence: () => null };
 };
 
 function toolsetWith(dir: string, runner: (ctx: SubagentRunContext) => Promise<SubagentRunResult>) {

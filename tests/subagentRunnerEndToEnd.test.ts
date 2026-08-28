@@ -109,8 +109,7 @@ describe("a parent delegates to a child that really runs", () => {
       parent: rootIdentity("payments-agent"),
       request: { runAs: "researcher", goal: "summarise the ledger" },
       session: {
-        recordLoopEvent: (record) => { rows.push(record); return parentSession.recordLoopEvent(record); }
-      },
+        recordLoopEvent: (record) => { rows.push(record); return parentSession.recordLoopEvent(record); }, recordProjectedEvidence: () => null },
       runner: runnerFor(dir, [textStep("I read 40 rows and found two anomalies.")]),
       mintSessionId: () => "child-session-e2e"
     });
@@ -136,7 +135,7 @@ describe("a parent delegates to a child that really runs", () => {
       workspace: dir,
       parent: rootIdentity("payments-agent"),
       request: { runAs: "researcher", goal: "g" },
-      session: { recordLoopEvent: (r) => parentSession.recordLoopEvent(r) },
+      session: { recordLoopEvent: (r) => parentSession.recordLoopEvent(r), recordProjectedEvidence: () => null },
       runner: runnerFor(dir, [textStep("done")]),
       mintSessionId: () => "child-session-e2e"
     });
@@ -166,7 +165,7 @@ describe("a parent delegates to a child that really runs", () => {
       workspace: dir,
       parent: rootIdentity("payments-agent"),
       request: { runAs: "researcher", goal: "g" },
-      session: { recordLoopEvent: (r) => parentSession.recordLoopEvent(r) },
+      session: { recordLoopEvent: (r) => parentSession.recordLoopEvent(r), recordProjectedEvidence: () => null },
       runner: runnerFor(dir, [textStep("done")]),
       mintSessionId: () => "child-session-e2e"
     });
@@ -199,7 +198,7 @@ describe("the delegation is announced and accounted for, against a real run", ()
       workspace: dir,
       parent: rootIdentity("payments-agent"),
       request: { runAs: "researcher", goal: "g" },
-      session: { recordLoopEvent: (r) => parentSession.recordLoopEvent(r) },
+      session: { recordLoopEvent: (r) => parentSession.recordLoopEvent(r), recordProjectedEvidence: () => null },
       runner: runnerFor(dir, [textStep("done")]),
       mintSessionId: () => "child-session-e2e"
     });
@@ -246,7 +245,7 @@ describe("a child is a leaf", () => {
       workspace: dir,
       parent: rootIdentity("payments-agent"),
       request: { runAs: "researcher", goal: "delegate this onward" },
-      session: { recordLoopEvent: (r) => parentSession.recordLoopEvent(r) },
+      session: { recordLoopEvent: (r) => parentSession.recordLoopEvent(r), recordProjectedEvidence: () => null },
       runner: runnerFor(dir, [
         toolStep("call-1", "delegate", JSON.stringify({ runAs: "grandchild", goal: "g" })),
         textStep("I could not delegate.")
@@ -294,7 +293,7 @@ describe("a child's tool evidence belongs to the child's session", () => {
       workspace: dir,
       parent: rootIdentity("payments-agent"),
       request: { runAs: "researcher", goal: "read the ledger note" },
-      session: { recordLoopEvent: (r) => parentSession.recordLoopEvent(r) },
+      session: { recordLoopEvent: (r) => parentSession.recordLoopEvent(r), recordProjectedEvidence: () => null },
       runner: runnerFor(dir, [
         toolStep("call-1", "fs.read", JSON.stringify({ path: "workspace/note.txt" })),
         textStep("I looked.")
@@ -311,15 +310,15 @@ describe("a child's tool evidence belongs to the child's session", () => {
     );
     expect(audits.length, "the child's governed call left evidence of its own").toBeGreaterThan(0);
 
-    // The claim, precisely: no row points at a session that was never started.
-    // NOT `errors).toEqual([])` — a delegation currently also leaves "Session
-    // <child> final hash mismatch", because `writeDelegationEvidence` appends
-    // the settled delegation's projected rows through the ledger AFTER
-    // `release()` has sealed the child's session. That is a different defect
-    // with a different cause (a row after a seal, not a row without a session),
-    // it reproduces with no tool call at all, and asserting zero errors here
-    // would tie this regression to fixing that one.
+    // ZERO errors, not merely no "missing session" ones.
+    //
+    // This was deliberately narrowed while a second defect was open: the
+    // projection was appended to the child's session AFTER the runner had
+    // sealed it, so a delegation also left "Session <child> final hash
+    // mismatch". Both are fixed — the projection now goes through the PARENT's
+    // writer — so the honest assertion is the whole list. Anything narrower
+    // would leave the next regression here invisible.
     const verified = await verifyLedgerIntegrity(dir);
-    expect(verified.chain.errors.filter((error) => error.includes("missing session"))).toEqual([]);
+    expect(verified.chain.errors, verified.chain.errors.join("; ")).toEqual([]);
   });
 });

@@ -38,7 +38,8 @@ function workspace(): string {
 
 function recorder() {
   const rows: LoopEventRecord[] = [];
-  return { rows, recordLoopEvent: (record: LoopEventRecord) => { rows.push(record); return null; } };
+  return { rows, recordLoopEvent: (record: LoopEventRecord) => { rows.push(record); return null; },
+    recordProjectedEvidence: () => null };
 }
 
 const spawn = (dir: string, over: Partial<Parameters<typeof spawnSubagent>[0]>) =>
@@ -121,7 +122,7 @@ describe("an announcement that cannot be written leaves no authorisation behind"
     const before = listHandoffPackets(dir).length;
 
     await expect(spawn(dir, {
-      session: { recordLoopEvent: () => { throw new Error("SessionService used after close()"); } }
+      session: { recordLoopEvent: () => { throw new Error("SessionService used after close()"); }, recordProjectedEvidence: () => null }
     })).rejects.toThrow(/after close/i);
 
     expect(listHandoffPackets(dir).length, "no authorisation for an unannounced delegation")

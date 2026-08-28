@@ -98,7 +98,7 @@ async function spawnContinuable(dir: string, scripts: ReturnType<typeof textStep
     workspace: dir,
     parent: rootIdentity("payments-agent"),
     request: { runAs: "researcher", goal: "first question", continuable: true },
-    session: { recordLoopEvent: (r) => parentSession.recordLoopEvent(r) },
+    session: { recordLoopEvent: (r) => parentSession.recordLoopEvent(r), recordProjectedEvidence: () => null },
     runner: runnerFor(dir, scripts),
     mintSessionId: () => "child-continuable"
   });
@@ -249,7 +249,7 @@ describe("a non-continuable child is unchanged", () => {
       workspace: dir,
       parent: rootIdentity("payments-agent"),
       request: { runAs: "researcher", goal: "one question" },
-      session: { recordLoopEvent: (r) => parentSession.recordLoopEvent(r) },
+      session: { recordLoopEvent: (r) => parentSession.recordLoopEvent(r), recordProjectedEvidence: () => null },
       runner: runnerFor(dir, [textStep("one answer")]),
       mintSessionId: () => "child-oneshot"
     });

@@ -46,7 +46,15 @@ export const SPINE_PROJECTION_VERSION = "2026.08.27-spine-1";
 
 /** One projected evidence row, in the gate vocabulary. */
 export interface SpineEvidenceRecord {
-  readonly eventType: EvidenceEventType;
+  /**
+   * Narrowed to the three projection types, which is all this module emits.
+   *
+   * It was the wide `EvidenceEventType`, which let a caller believe a projection
+   * could be any row -- and a projection is precisely NOT any row: it is the
+   * scoreable shadow of a fact whose control record lives elsewhere.
+   * `../tools/toolEvidence.ts` already narrows its own to the same three.
+   */
+  readonly eventType: "audit" | "metric" | "stdout";
   readonly payload: string;
   readonly meta: Record<string, unknown>;
 }

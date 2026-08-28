@@ -4,6 +4,7 @@ import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 import Database from "better-sqlite3";
 import { initWorkspace } from "../src/workspace.js";
+import { SessionService } from "../src/session/sessionService.js";
 import { rootIdentity } from "../src/agent/delegationIdentity.js";
 import { spawnSubagent } from "../src/agent/subagentSpawn.js";
 import { parseEvidenceEvent } from "../src/diagnostic/gates.js";
@@ -11,7 +12,6 @@ import { selectRelevantEvents } from "../src/diagnostic/runner.js";
 import { questionBank } from "../src/diagnostic/questionBank.js";
 import { evaluateGate } from "../src/diagnostic/gates.js";
 import type { EvidenceEvent } from "../src/types.js";
-import type { LoopEventRecord } from "../src/session/loopEventMeta.js";
 
 /**
  * The payoff: a native run that finally counts toward something.
@@ -40,13 +40,30 @@ function workspace(): string {
   return dir;
 }
 
-const recorder = () => {
-  const rows: LoopEventRecord[] = [];
-  return { rows, recordLoopEvent: (r: LoopEventRecord) => { rows.push(r); return null; } };
-};
+/**
+ * A REAL parent session, not a fake.
+ *
+ * The projection is written through the parent's own writer now, so a fake
+ * recorder would discard exactly the rows these tests score. That is not a
+ * limitation of the test setup: it is the fix. Using the real service is also
+ * what makes this an end-to-end test of scoring rather than of a stub.
+ */
+const parents: SessionService[] = [];
+
+function openParent(dir: string): SessionService {
+  const session = new SessionService(dir);
+  session.open({
+    agentId: "payments-agent", harnessVersion: "3.2.0",
+    compositionDigest: "composition-digest", policyDigest: "policy-digest"
+  });
+  session.startTurn({ trigger: "user" });
+  parents.push(session);
+  return session;
+}
 
 async function delegate(dir: string, sessionId: string, scope?: readonly string[]) {
-  return spawnSubagent({
+  const parent = openParent(dir);
+  const outcome = await spawnSubagent({
     workspace: dir,
     parent: rootIdentity("payments-agent"),
     request: {
@@ -54,10 +71,13 @@ async function delegate(dir: string, sessionId: string, scope?: readonly string[
       goal: "check the ledger",
       ...(scope === undefined ? {} : { delegationScope: scope })
     },
-    session: recorder(),
+    session: parent,
     runner: async () => ({ ok: true, text: "I checked 40 rows." }),
     mintSessionId: () => sessionId
   });
+  parent.endTurn({ reason: "complete" });
+  parent.close({ reason: "completed" });
+  return outcome;
 }
 
 function allEvents(dir: string) {

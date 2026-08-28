@@ -170,7 +170,8 @@ function childRows(dir: string, sessionId: string): Array<{ event_type: string; 
 
 function recorder() {
   const rows: LoopEventRecord[] = [];
-  return { rows, recordLoopEvent: (r: LoopEventRecord) => { rows.push(r); return null; } };
+  return { rows, recordLoopEvent: (r: LoopEventRecord) => { rows.push(r); return null; },
+    recordProjectedEvidence: () => null };
 }
 
 describe("the scope reaches the thing that can enforce it", () => {
@@ -273,7 +274,7 @@ async function runChild(dir: string, sessionId: string, scope?: readonly string[
       goal: "do the thing",
       ...(scope === undefined ? {} : { delegationScope: scope })
     },
-    session: { recordLoopEvent: (r) => parentSession.recordLoopEvent(r) },
+    session: { recordLoopEvent: (r) => parentSession.recordLoopEvent(r), recordProjectedEvidence: () => null },
     runner: runnerFor(dir, [textStep("done")]),
     mintSessionId: () => sessionId
   });

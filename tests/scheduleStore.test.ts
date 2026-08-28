@@ -230,7 +230,7 @@ describe("running what is due", () => {
   const base = (dir: string) => ({
     workspace: dir,
     parent: rootIdentity("payments-agent"),
-    session: { recordLoopEvent: () => null },
+    session: { recordLoopEvent: () => null, recordProjectedEvidence: () => null },
     mintSessionId: (() => { let n = 0; return () => `child-${(n += 1)}`; })()
   });
 

@@ -45,7 +45,8 @@ function workspace(): string {
 
 function recorder() {
   const rows: LoopEventRecord[] = [];
-  return { rows, recordLoopEvent: (record: LoopEventRecord) => { rows.push(record); return null; } };
+  return { rows, recordLoopEvent: (record: LoopEventRecord) => { rows.push(record); return null; },
+    recordProjectedEvidence: () => null };
 }
 
 const okRunner = async (): Promise<SubagentRunResult> => ({ ok: true, text: "the child's own words" });
