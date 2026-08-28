@@ -193,6 +193,7 @@ import { registerVaultZkCommands } from "./cli-vault-zk-commands.js";
 import { registerEvidenceStoreCommands, renderLedgerVerdict } from "./cli-evidence-store-commands.js";
 import { registerSessionCommands } from "./cli-session-commands.js";
 import { registerWireCommands } from "./wire/wireCli.js";
+import { registerAcpCommands } from "./acp/acpCli.js";
 import { registerAgentCommands } from "./cli-agent-commands.js";
 import { registerCredentialsCommands } from "./cli-credentials-commands.js";
 import { issueCertificate, inspectCertificate, revokeCertificate, verifyCertificate, verifyRevocation } from "./assurance/certificate.js";
@@ -6901,7 +6902,6 @@ evidenceLifecycleReceipts
       console.log(chalk.green(`Lifecycle receipts exported: ${result.outputPath}`));
     } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
   });
-
 
 assurance
   .command("toctou")
@@ -20021,7 +20021,6 @@ program.action(async (_opts, command: Command) => {
   }
 });
 
-
 // ============================================================
 // NEW MODULES: Shield, Enforce, Watch, Product, Vault, Score
 // ============================================================
@@ -24572,6 +24571,7 @@ registerMirofishCommands(program);
 registerCompositionCommands(program);
 registerSessionCommands(program);
 registerWireCommands(program);
+registerAcpCommands(program);
 registerAgentCommands(program);
 registerCredentialsCommands(program);
 
