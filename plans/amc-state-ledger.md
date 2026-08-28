@@ -1,8 +1,35 @@
-# AMC State Ledger — where every file stands today
+# AMC State Ledger — where every file stood at `f419839a`
 
 Generated 2026-08-20 by a 26-agent file-level sweep of the full repo at \`f419839a\` (1,775 src files across 134 dirs + tests/docs/python/surfaces/satellites/scripts/state). Status vocabulary: REAL (does what it claims) · PARTIAL · STUB (placeholder) · FACADE (fakes results presented as real) · DEAD (unreferenced). "wired via" shows how a module is reachable; ORPHAN = no importer found.
 
 Companion documents: the gap register (amc-gap-register.md) and the construction plan (amc-superharness.md).
+
+## Reading this document
+
+**It is a snapshot, not an index.** Every row describes the repository as it was
+at `f419839a` on 2026-08-20. Rows go out of date as the repo moves and are NOT
+maintained in place: a row corrected one at a time would leave a document that is
+neither a faithful record of the commit it names nor an accurate picture of now,
+while implying the rows nobody corrected are current. The title said "today",
+which is exactly that mistake, and has been fixed.
+
+To see what has changed since, ask git rather than this file:
+
+```bash
+git diff --stat f419839a..HEAD          # everything
+git log --oneline f419839a..HEAD -- <path>   # one file's history since
+```
+
+Nothing in the codebase reads this document — no test, gate or script — so a
+stale row misleads a person, never a build. If that changes, the reader that
+consumes it should regenerate it rather than trust it.
+
+**Known drift already recorded elsewhere:** `pytest-amc/setup.py` (row under
+B-satellites) was deleted along with the duplicate `pytest11` entry point it
+carried; `sdk/python`'s `core.py`, `assurance.py`, `decorators.py` and `types.py`
+were superseded by the ACP client in P7.1b. These are named because each was
+found to be non-functional rather than merely moved, which is the kind of thing
+a reader of this document is usually looking for.
 
 ---
 
