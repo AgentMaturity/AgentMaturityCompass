@@ -29,6 +29,7 @@ import {
 } from "./merkleIndexStore.js";
 import { merkleCurrentRootPath, merkleCurrentRootSigPath } from "./merklePaths.js";
 import { verifyTransparencyLog } from "./logChain.js";
+import { verifyLedgerIntegrity } from "../ledger/ledgerVerification.js";
 import { merkleProofSignatureSchema } from "./proofSchema.js";
 import {
   findSessionAnchorEntries,
@@ -88,7 +89,9 @@ function readSignedRoot(workspace: string): { fileText: string; row: SignedMerkl
  * changed, and the newest anchor is the one whose leaf the current tree still
  * contains at a stable index.
  */
-export function buildSessionAnchorProof(params: SessionAnchorProofParams): SessionAnchorProof {
+export async function buildSessionAnchorProof(
+  params: SessionAnchorProofParams
+): Promise<SessionAnchorProof> {
   const entries = findSessionAnchorEntries(params.workspace, params.sessionId);
   const entry = entries[entries.length - 1];
   if (entry === undefined) {
@@ -116,6 +119,27 @@ export function buildSessionAnchorProof(params: SessionAnchorProofParams): Sessi
   if (!log.ok) {
     throw new SessionAnchorProofError(
       `transparency log does not verify, refusing to issue a proof: ${log.errors.join("; ")}`
+    );
+  }
+
+  // AND THE LEDGER THE SESSION LIVES IN. The two gates above check the log this
+  // proof is published INTO; neither says anything about the evidence it is
+  // published ABOUT. Without this a proof could be cut from a workspace where
+  // `amc verify` fails — the bundle would verify offline while the ledger behind
+  // it does not, which is the same gap the transparency-log gate above exists to
+  // close, left open on the side that actually holds the evidence.
+  //
+  // The session's own rows are already verified by `readSessionRootDescriptor`
+  // (hashes, signatures, envelope chain, seal). This is the WIDER claim: that
+  // the ledger around them is intact, so the session's position in it means
+  // what it appears to mean. That is why an unrelated broken session refuses
+  // this proof — a third party relying on it is relying on the whole record.
+  const ledger = await verifyLedgerIntegrity(params.workspace);
+  if (!ledger.ok) {
+    throw new SessionAnchorProofError(
+      "the evidence ledger does not verify, refusing to issue a proof: "
+      + ledger.errors.slice(0, 5).join("; ")
+      + (ledger.errors.length > 5 ? ` (and ${ledger.errors.length - 5} more)` : "")
     );
   }
 
@@ -182,8 +206,10 @@ export interface SessionAnchorProofExport {
  * ship with, because every test written against the exporter's own objects
  * would still pass.
  */
-export function exportSessionAnchorProof(params: SessionAnchorProofParams & { outFile: string }): SessionAnchorProofExport {
-  const proof = buildSessionAnchorProof(params);
+export async function exportSessionAnchorProof(
+  params: SessionAnchorProofParams & { outFile: string }
+): Promise<SessionAnchorProofExport> {
+  const proof = await buildSessionAnchorProof(params);
   const outFile = resolve(params.workspace, params.outFile);
   ensureDir(dirname(outFile));
   writeFileAtomic(outFile, `${JSON.stringify(proof, null, 2)}\n`, 0o644);

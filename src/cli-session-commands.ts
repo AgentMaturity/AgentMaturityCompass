@@ -197,7 +197,7 @@ export function registerSessionCommands(program: Command): void {
     .action(async (id: string, opts: { out: string }) => {
       const { exportSessionAnchorProof } = await import("./transparency/sessionAnchorProof.js");
       try {
-        const exported = exportSessionAnchorProof({
+        const exported = await exportSessionAnchorProof({
           workspace: process.cwd(),
           sessionId: id,
           outFile: opts.out
