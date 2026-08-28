@@ -8,7 +8,7 @@ import {
   type AcpErrorObject,
   type AcpId
 } from "./acpEnvelope.js";
-import { ACP_ERROR } from "./acpErrors.js";
+import { ACP_ERROR, AcpFailure } from "./acpErrors.js";
 
 /**
  * A bidirectional ACP peer over a byte stream (plan P7.1a).
@@ -206,7 +206,18 @@ export function createAcpConnection(init: AcpConnectionInit): AcpConnection {
         void init.handlers
           .request(message.method, message.params, entry.controller.signal)
           .then((result) => settle(message.id, { result }))
-          .catch((error: unknown) => settle(message.id, { error: toAcpError(error) }));
+          .catch((error: unknown) => {
+            // Logged HERE because this is the last place the real reason exists:
+            // `toAcpError` deliberately drops an unplanned exception's message
+            // before it reaches the peer, and its note said the detail went to
+            // the log while nothing on this path logged anything. A missing
+            // vault passphrase reached a client as "the method failed" with
+            // zero bytes on stderr, which is undiagnosable from either side.
+            if (!(error instanceof AcpFailure)) {
+              log(`${message.method} failed: ${messageOf(error)}`);
+            }
+            settle(message.id, { error: toAcpError(error) });
+          });
         return;
       }
     }

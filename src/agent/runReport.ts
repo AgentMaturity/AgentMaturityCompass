@@ -33,7 +33,8 @@ import type { EvidenceEvent } from "../types.js";
 import type { AgentStatus } from "./loopTypes.js";
 
 /** The literal a ledger writes in place of a signature under `AMC_NO_SIGN=1`. */
-const UNSIGNED = "unsigned";
+/** The marker a row carries instead of a signature when signing is off. */
+export const UNSIGNED = "unsigned";
 
 /** How one turn ended, as the signed closer says. */
 export interface TurnEndingRow {

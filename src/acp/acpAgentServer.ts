@@ -194,21 +194,29 @@ export function createAcpAgent(init: AcpAgentInit): AcpAgent {
     try {
       const outcome = await entry.session.prompt(text);
 
-      // Content is flushed BEFORE the response, always -- including after a
-      // cancel, and including when the turn failed. `PromptResponse` has no
-      // content field, so anything not sent as a notification is simply lost.
-      flush(entry, request.sessionId);
-
+      // A CANCEL OUTRANKS EVERYTHING, including the `ok: false` a cancelled turn
+      // reports. ACP mandates `cancelled` when a cancel was requested, even when
+      // the abort caused failures underneath, and the true ending is in the log
+      // either way. Content produced before the cancel was still signed, so it
+      // is flushed -- `flush` skips unprovenanced rows on its own.
       if (entry.cancelled || signal.aborted) {
-        // Overrides everything, including a failure underneath. ACP mandates
-        // `cancelled` when a cancel was requested, and the true ending is in the
-        // log either way.
+        flush(entry, request.sessionId);
         return { stopReason: "cancelled" };
       }
+
+      // A FAILED TURN FLUSHES NOTHING. `agentSession.prompt` returns `ok: false`
+      // when the driver failed or when the session wrote rows with no
+      // provenance. This used to flush FIRST and answer second, so a client
+      // rendered the model's words as the agent's own and was told afterwards
+      // that the turn had none. There is no unsend on a notification: the
+      // refusal has to come before the content, not after it.
       if (!outcome.ok) {
-        // A protocol-level failure, not a tidy stop reason over a broken log.
         throw new AcpFailure(ACP_ERROR.internal, "the turn did not complete", { reason: outcome.reason });
       }
+
+      // `PromptResponse` has no content field, so anything not sent as a
+      // notification is simply lost.
+      flush(entry, request.sessionId);
       const reason = turnEndOf(outcome.status);
       return {
         stopReason: acpStopReasonFor(reason),

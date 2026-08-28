@@ -1,3 +1,4 @@
+import { UNSIGNED } from "../agent/runReport.js";
 import { readEventPayload } from "../session/eventPayload.js";
 import type { EvidenceEvent } from "../types.js";
 
@@ -26,8 +27,7 @@ import type { EvidenceEvent } from "../types.js";
  * showing less than happened.
  */
 
-/** Rows whose writer signature is this are unsigned. Mirrors runReport.ts. */
-const UNSIGNED = "UNSIGNED";
+
 
 export interface AcpSessionUpdate {
   readonly sessionUpdate: string;
@@ -57,6 +57,11 @@ export function projectSessionUpdates(
   let unsigned = 0;
 
   for (const event of events.slice(from)) {
+    // `UNSIGNED` is IMPORTED, not restated. This file declared its own
+    // `"UNSIGNED"` while the ledger writes `"unsigned"`, so this comparison
+    // matched nothing and the guard could not fire -- under the docstring above
+    // asserting that unprovenanced rows are never projected. A guard that cannot
+    // fail is worse than no guard, because it reads as protection.
     if (event.writer_sig === UNSIGNED) {
       unsigned += 1;
       continue;
