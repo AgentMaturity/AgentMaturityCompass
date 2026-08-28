@@ -89,7 +89,12 @@ export function openAgentSession(init: AgentSessionInit): AgentSession {
   const toolset = agentToolset({
     workspace: init.workspace,
     agentId: init.agentId,
-    sessionId
+    sessionId,
+    // Handing over the writer is what keeps the session ANCHORABLE. Pointing the
+    // rows at the right session id was only half of it: written through the raw
+    // ledger they carry no envelope, and `sessionRootDescriptor` then refuses to
+    // anchor the session because its root would cover less than the session does.
+    recorder: session
   });
 
   let closed = false;

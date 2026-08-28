@@ -63,6 +63,26 @@ export interface AgentToolsetOptions {
    * what it is recording.
    */
   readonly sessionId: string;
+  /**
+   * The live session writer, when the caller has one.
+   *
+   * Supplied, tool evidence joins the session SPINE and the session stays
+   * anchorable. Omitted, the rows go through the raw ledger as before: they land
+   * in the right session but carry no envelope, and
+   * `sessionRootDescriptor` will refuse to anchor it -- correctly, since the
+   * root would then cover less than the session does.
+   *
+   * Optional rather than required because a toolset is legitimately built
+   * without a session in tests and in the code-mode confinement probes, and a
+   * required parameter there would be a session invented to satisfy a signature.
+   */
+  readonly recorder?: {
+    recordProjectedEvidence(row: {
+      readonly eventType: "audit" | "metric" | "stdout";
+      readonly payload: string;
+      readonly meta: Record<string, unknown>;
+    }): unknown;
+  };
 }
 
 /**
@@ -228,23 +248,37 @@ export function agentToolset(options: AgentToolsetOptions): AgentToolset {
       // closing the ledger costs 1.6ms, which on a path this hot is a third of
       // the whole governed call. `close()` on the toolset releases it.
       ledgerHandle ??= openLedger(workspace);
-      ledgerHandle.appendEvidenceBatch(
-        // The guards COMPOSED for this call, not just the one that denied.
-        // A permitted call is a receipt that the control evaluated it, which
-        // is what the question bank asks for; a denial alone cannot say which
-        // controls were in force.
-        toolEvidenceFor(
-          { ...execution, appliedGuards: registry.guardLabelsFor(execution) },
-          outcome
-        ).map((row) => ({
-          sessionId: options.sessionId,
-          runtime: "amc" as const,
-          eventType: row.eventType,
-          payload: row.payload,
-          payloadExt: "json" as const,
-          meta: row.meta
-        }))
+      // The guards COMPOSED for this call, not just the one that denied.
+      // A permitted call is a receipt that the control evaluated it, which is
+      // what the question bank asks for; a denial alone cannot say which
+      // controls were in force.
+      const evidence = toolEvidenceFor(
+        { ...execution, appliedGuards: registry.guardLabelsFor(execution) },
+        outcome
       );
+      const recorder = options.recorder;
+      if (recorder) {
+        // Through the session's own writer, so the rows carry an envelope and
+        // sit in the spine they describe. See `recordProjectedEvidence`.
+        for (const row of evidence) {
+          recorder.recordProjectedEvidence({
+            eventType: row.eventType,
+            payload: row.payload,
+            meta: row.meta
+          });
+        }
+      } else {
+        ledgerHandle.appendEvidenceBatch(
+          evidence.map((row) => ({
+            sessionId: options.sessionId,
+            runtime: "amc" as const,
+            eventType: row.eventType,
+            payload: row.payload,
+            payloadExt: "json" as const,
+            meta: row.meta
+          }))
+        );
+      }
     }
   });
 

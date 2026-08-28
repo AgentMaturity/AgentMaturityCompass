@@ -743,6 +743,49 @@ export class SessionService {
     });
   }
 
+  /**
+   * Record a scoreable projection row into this session's spine.
+   *
+   * THE RULE THIS EXISTS TO ENFORCE: a projection row belongs to the session
+   * whose turn caused the fact it projects, and it goes through the session's
+   * own writer -- never through `openLedger().appendEvidenceBatch`. Two writers
+   * bypassed that (`agentToolset`'s record callback and
+   * `delegationEvidenceWriter`), which put rows with NO SESSION ENVELOPE inside
+   * sessions that have a spine. Two consequences followed, and only one of them
+   * was obvious:
+   *
+   *   `sessionRootDescriptor` refuses to anchor such a session, because "the
+   *   session root would cover less than the session does" -- a correct refusal,
+   *   so every session that called a tool became unanchorable.
+   *
+   *   And a row written after the session was sealed makes the seal's committed
+   *   final hash false, which `verifyLedgerIntegrity` reports workspace-wide.
+   *   That is not a hidden cost: `assurance/assuranceRunner.ts` turns it into
+   *   `status: "INVALID"`, and `evidence/auditPacket.ts` ships it to a customer
+   *   as `integrity/ledger-verify.json`.
+   *
+   * The union is closed to the three projection types on purpose. This is not a
+   * general escape hatch into the spine: a caller wanting to record conversation
+   * or lifecycle has a named method for it, and widening this one would make
+   * "what may enter the spine" a question with no answer.
+   */
+  recordProjectedEvidence(row: {
+    readonly eventType: "audit" | "metric" | "stdout";
+    readonly payload: string;
+    readonly meta: Record<string, unknown>;
+  }): SessionEventRef {
+    this.ensureUsable();
+    return this.appendSessionEvent({
+      eventType: row.eventType,
+      typeMeta: row.meta,
+      // Projection rows are evidence about the turn, not content the model sees.
+      surface: { op: "none" },
+      turn: this.currentTurn,
+      step: this.currentStep,
+      payload: row.payload
+    });
+  }
+
   recordSandboxMode(input: SandboxModeInput): SessionEventRef {
     this.ensureUsable();
     return this.appendSessionEvent({
