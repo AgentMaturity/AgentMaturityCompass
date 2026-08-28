@@ -71,7 +71,10 @@ vault = [
 ]
 
 [project.scripts]
-amc = "amc.cli:app"
+# NOT `amc`. That name belongs to the npm CLI, and a pip install of this package
+# shadowing it is how a client that spawns `amc` silently drives the wrong
+# binary — the failure surfaces as a protocol error, not as a name clash.
+amc-platform = "amc.cli:app"
 amc-server = "amc.api.main:run"
 
 [tool.ruff]

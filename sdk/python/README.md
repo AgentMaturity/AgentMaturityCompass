@@ -1,153 +1,83 @@
-<p align="center">
-  <img src="https://img.shields.io/badge/🧭_AMC_SDK-Python-blue?style=for-the-badge" alt="AMC Python SDK" />
-</p>
+# `amc-sdk`
 
-# AMC Python SDK
-
-**Trust scoring for AI agents in 3 lines of Python.**
+Drive a governed AMC agent from Python, and prove afterwards that it ran.
 
 ```python
-from amc_sdk import score
+from amc_sdk import AmcAgent, export_proof, verify_proof
 
-result = score("my-agent")
-print(f"Level: {result.level}, Score: {result.score}")  # Level: L3, Score: 72.5
+with AmcAgent(workspace=".", provider="stub") as agent:
+    session = agent.new_session()
+    result = session.prompt("summarise the changelog")
+    print(result.stop_reason)   # "end_turn"
+    print(result.text)
+    for call in result.tool_calls:
+        print(call.title, call.status)
+
+proof = export_proof(session.session_id, "run.amcproof.json")
 ```
 
-## Install
+No pip dependencies — the transport is `subprocess` + `json` + `threading`.
+You need the `amc` CLI on the PATH, or `AMC_BIN` pointing at a build.
+
+## What it does
+
+Spawns `amc acp` and speaks the Agent Client Protocol down the pipe. That is the
+only AMC surface where a message from a client causes a turn to actually execute:
+the NDJSON wire (`amc wire`) accepts work and records the acceptance, but nothing
+there ever runs it.
+
+Each session is a real, ledger-backed AMC session. Several prompts may run on one
+session, in turn, and they share a conversation.
+
+## What a result does not mean
+
+**`stop_reason == "end_turn"` is not "it worked."** ACP has five stop reasons and
+AMC has seven turn endings, so `blocked` — a governance hook vetoed the turn —
+arrives as `end_turn`, as do `error` and `interrupted`. When the mapping loses
+something the real ending is in `result.meta`; authoritatively it is in the
+signed log. Code that treats `end_turn` as success is claiming more than the
+protocol said.
+
+**`result.text` is not a token stream.** AMC records one row per completed block
+of a completed model response, and rows are the only signed artifact — a token
+stream would have to bypass the ledger. Text arrives in block-sized pieces.
+
+**Nothing the client returns is verified.** Text that came over a pipe is bytes
+from a subprocess. The proof below is the part that can be checked.
+
+## Proving a run
+
+```python
+proof = export_proof(session_id, "run.amcproof.json", workspace=".")
+# Send proof.path to whoever needs it. Send proof.auditor_key_fingerprint
+# BY A DIFFERENT ROUTE — a fingerprint that travels inside the bundle it
+# authenticates proves nothing about the bundle.
+
+verify_proof("run.amcproof.json", expect_auditor_key=fingerprint_from_elsewhere)
+```
+
+`verify_proof` needs no workspace: the bundle is self-contained, which is what
+makes it a proof rather than a report. `export_proof` refuses if the workspace's
+evidence ledger does not verify, so a proof cannot be cut from a broken record.
+
+These two shell out to the `amc` CLI. ACP has no method for "prove this session
+happened", and pretending the protocol carried one would be the wrong kind of
+convenience.
+
+## Not supported
+
+`session/load` — AMC has no resume path, and the agent declares
+`loadSession: false` rather than claiming one. MCP servers — `new_session` sends
+an empty list, and the agent refuses a non-empty one rather than accepting
+servers it will never connect.
+
+## Tests
 
 ```bash
-pip install amc-sdk
+AMC_BIN=$(pwd)/dist/cli.js python3 -m pytest sdk/python/tests -q
 ```
 
-## Quick Start
-
-### Score an agent
-
-```python
-from amc_sdk import score, fix
-
-# Get trust score
-result = score("my-agent")
-print(result.level)          # L3
-print(result.score)          # 72.5
-print(result.dimensions)     # {strategic_ops: 68, skills: 75, ...}
-
-# Auto-generate fixes
-fixes = fix("my-agent", target_level="L4")
-print(fixes.guardrails)     # Generated guardrails config
-print(fixes.agents_md)      # Generated AGENTS.md
-```
-
-### Wrap a LangChain agent
-
-```python
-from amc_sdk import with_amc
-from langchain.chat_models import ChatOpenAI
-
-# AMC transparently proxies LLM calls and scores behavior
-with with_amc("my-langchain-agent"):
-    llm = ChatOpenAI()  # automatically routes through AMC gateway
-    response = llm.invoke("Hello!")
-```
-
-### Decorator for tests
-
-```python
-from amc_sdk import amc_guardrails
-import pytest
-
-@amc_guardrails(min_level="L3", packs=["prompt-injection", "exfiltration"])
-def test_my_agent():
-    # Your test code here
-    response = my_agent.run("test input")
-    assert "expected" in response
-    # AMC automatically validates trust level and runs attack packs
-```
-
-### Report generation
-
-```python
-from amc_sdk import report
-
-# Generate compliance report
-r = report("my-agent", framework="eu-ai-act")
-r.save_html("compliance_report.html")
-r.save_json("compliance_report.json")
-```
-
-### Red-team your agent
-
-```python
-from amc_sdk import assurance
-
-# Run all attack packs
-results = assurance.run("my-agent", scope="full")
-print(f"Passed: {results.passed}/{results.total}")
-
-# Run specific packs
-results = assurance.run("my-agent", packs=["adversarial-robustness"])
-for finding in results.findings:
-    print(f"[{finding.severity}] {finding.title}: {finding.details}")
-```
-
-## Context Manager
-
-The `with_amc()` context manager starts an AMC gateway, routes your agent's LLM calls through it, and scores behavior:
-
-```python
-from amc_sdk import with_amc
-
-with with_amc("my-agent", target_level="L3") as amc:
-    # Your agent code here — LLM calls are transparently proxied
-    run_my_agent()
-
-    # Check score mid-run
-    print(amc.current_score())
-
-# Score is finalized when context exits
-print(amc.result.level)  # L3
-```
-
-## API Reference
-
-### `score(agent_id, **kwargs) → ScoreResult`
-
-Run AMC scoring on an agent.
-
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `agent_id` | str | required | Agent identifier |
-| `target_level` | str | None | Target maturity level (L0-L5) |
-| `eu_ai_act` | bool | False | Include EU AI Act classification |
-| `json_output` | bool | False | Return raw JSON |
-
-### `fix(agent_id, **kwargs) → FixResult`
-
-Auto-generate remediation for an agent.
-
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `agent_id` | str | required | Agent identifier |
-| `target_level` | str | "L3" | Target level for fixes |
-| `dry_run` | bool | False | Preview without writing |
-
-### `with_amc(agent_id, **kwargs) → AMCContext`
-
-Context manager that proxies LLM calls through AMC.
-
-### `assurance.run(agent_id, **kwargs) → AssuranceResult`
-
-Run red-team attack packs.
-
-### `report(agent_id, **kwargs) → Report`
-
-Generate compliance reports.
-
-## Requirements
-
-- Python 3.9+
-- AMC CLI installed with the checksum-verified GitHub Release installer (npm is not public yet; see the repository README)
-
-## License
-
-MIT
+They spawn the real CLI and skip when they cannot find one that supports `acp`.
+A bare `amc` on the PATH is probed rather than trusted: an older AMC installed
+system-wide has no `acp` command, and driving it would fail somewhere deep in the
+protocol instead of saying so.
