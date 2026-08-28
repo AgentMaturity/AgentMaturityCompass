@@ -1,5 +1,7 @@
 [build-system]
-requires = ["setuptools>=45", "wheel", "setuptools_scm[toml]>=6.2"]
+# setuptools_scm was declared with no [tool.setuptools_scm] section and a
+# static version, so it was fetched at build time and did nothing.
+requires = ["setuptools>=45", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
