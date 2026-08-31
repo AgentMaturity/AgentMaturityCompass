@@ -27,6 +27,10 @@
 
 ---
 
+**2026-08-28 addendum:** the goal now names a second comparator — pi (earendil-works/pi, 99.6k stars). §5b digests it from a fresh clone at `853a80d2` and re-verifies every AMC-side claim against the working tree, not this plan's `f419839a` baseline. Net: pi leads on execution-plane breadth, ergonomics, cost engineering and shipping discipline (G1–G12); AMC leads on the entire trust plane (A1–A15, most verified-absent in pi). The deciding work items are §5b's verdict list.
+
+---
+
 ## 1. Sources and method
 
 | Source | Coverage |
@@ -341,6 +345,82 @@ Legend — **Sev**: ■■■ foundational (blocks other work) · ■■ major p
 ### Gap totals
 
 Foundational (■■■) domains: D1–D8, D15 — none can be skipped; D1→D3→D5→D6 is the critical path. Major (■■): D9–D14, D16. AMC-ahead items appear in 9 of 16 domains — the moat is real but thin outside the trust plane. Every capability in this matrix maps to a §7 step (the adversarial review's first pass found eight orphans — Code Mode, LSP, credentials, live settings, typert, ACP server, consent-gated telemetry, Windows CI — now closed by steps P4.5, P4.3, P3.0, P1.2, P7.1a, P7.1a, P7.3, and P8.1 respectively); any row a future edit adds must add or cite a step.
+---
+
+## 5b. Pi comparator digest — the second bar, and where it points
+
+### What pi is
+
+Pi ("pi-monorepo", earendil-works/pi, MIT, lead Mario Zechner) is a minimal terminal coding harness: a TypeScript/ESM monorepo shipping a unified multi-provider LLM client (`pi-ai`), an agent runtime (`pi-agent-core`), a coding-agent CLI (`pi-coding-agent`, bin `pi`), a TUI library, a CBOR remote-session protocol stack (experimental), and vendor-neutral telemetry contracts — all at v0.84.4 (2026-08-28). Its philosophy is the inverse of both dsh and AMC: deliberately **no** MCP, sub-agents, permission popups, plan mode, or sandbox (VERIFIED — README Philosophy + SECURITY.md scope prompt injection out entirely; `agent-loop.ts prepareToolCall()` executes tool calls with no gate); safety is delegated to containers (Gondolin micro-VM / Docker / OpenShell docs) and everything else to hot-reloadable in-process TS extensions. Adoption is real: 99.6k stars, 12.4k forks, 5,826 commits, same-day pushes (READ-FROM-PAGE 2026-08-31). Digest source: fresh shallow clone at `/private/tmp/claude-501/-Users-sid-AgentMaturityCompass/c5c61ae5-1f16-447b-bd19-a171b760d0cc/scratchpad/pi-mono`, HEAD `853a80d26c90a14c1886f0ebb8ffaae133ca2185`, 1,410 files.
+
+### The pi subsystems that define its bar
+
+All VERIFIED in the clone unless marked CLAIMED.
+
+1. **LLM abstraction (`pi-ai`)** — ~40 provider factories over 10 wire-protocol adapters (OpenAI completions/responses/codex, Anthropic, Bedrock, Google/Vertex, Mistral, Azure, pi's own `pi-messages` SSE gateway protocol); subscription OAuth for Claude Pro/Max, ChatGPT/Codex, Copilot; unified stream-event protocol where failures are terminal `error` events, never throws; partial-JSON incremental tool-arg parsing; websocket + deferred transports; regex retry classification with abortable backoff. "Stealth mode": with an Anthropic OAuth token, tool names are case-mapped onto Claude Code's canonical set and requests mimic Claude Code v2.1.75 (anthropic-messages.ts:75-106).
+2. **Prompt caching & cost** — one `cacheRetention` knob mapped per protocol (Anthropic `cache_control` incl. 1h TTL at 2x write cost, OpenAI `prompt_cache_key`/retention, Bedrock `cachePoint`); unified `Usage` with cacheRead/cacheWrite/reasoning; client-side cost from a generated, script-hydrated model catalog with tiered pricing. Cost is telemetry only — no cap or refusal path anywhere.
+3. **Sessions** — tree-structured JSONL (v3) under `~/.pi/agent/sessions/`, branch/fork/label, compaction with `retainedTail` checkpoints; persistence on `message_end` only (partial streams lost on crash); malformed lines *silently dropped* on load. Cross-provider replay repair at the LLM boundary (`transformMessages`): drops errored assistants, synthesizes missing toolResults — a crashed session resumes on any provider. A v4 WAL-style "harness" format with an execution journal (operation/step/tool records, atomic temp+rename, torn-tail repair) exists but `AgentHarness` throws `HarnessNotImplemented` — scaffolding, not live.
+4. **Agent loop** — turn = one assistant response + its tool executions; steering messages polled between turns; `prepareNextTurn` hook for compaction/model swap; `stopReason:"length"` fails all tool calls rather than executing truncated args; sequential or parallel tool execution per config.
+5. **Extensions** — single in-process `ExtensionAPI`: tools, slash commands, CLI flags, renderers, *LLM providers*, keybindings; jiti-loaded TS (no compile step), hot-reloaded via `/reload`; discovery from `.pi/extensions/` (trust-gated) + global; `pi install npm:/git:` package manager. Self-extensibility is real plumbing: the system prompt points the model at pi's own extension docs, and an agent-written file in `.pi/extensions/` goes live without restart.
+6. **Security posture** — no permission system, no sandbox, prompt injection out of scope (all by explicit design); only interception point is an opt-in extension `tool_call` block/mutate hook with no shipped policy; project trust is a per-directory boolean that gates resource *loading* only — and the trust decision is itself overridable by an extension. Zero integrity anywhere: no hashing/signing of sessions, extensions, or packages (grep-VERIFIED absent); `/share` uploads plain JSONL to gists.
+7. **Supply chain** (their strongest security story) — exact pins + `min-release-age=2`, shrinkwrap with a 2-entry lifecycle-script allowlist, `--ignore-scripts` everywhere, daily `npm audit` + registry-signature CI, npm publish `--provenance`, 6-platform Bun binaries with SHA256SUMS (checksummed, **not** signed — no gpg/cosign/attest in any workflow).
+8. **Evals** — private `packages/evals` adapts a *real* AgentSession to vitest-evals in isolated temp dirs; maintainer publishes real session corpora to Hugging Face. Model-backed, not synthetic.
+
+### Where pi is ahead of AMC (re-verified against the working tree, not the plan's `f419839a` baseline)
+
+AMC's loop now exists (`src/loop/loop.ts`, `amc agent-loop run`, governed toolset in `src/agent/agentToolset.ts`, 3-adapter LLM seam in `src/llm/`), so each row below survived a check against today's tree.
+
+| # | Capability | pi evidence | AMC evidence (in-tree today) | Sev | Closing work item | Phase |
+|---|---|---|---|---|---|---|
+| G1 | Shipped, adopted product | 99.6k stars, v0.84.4 published 2026-08-28, HF session datasets | npm still 1.1.1 vs local 1.2.0 — the plan's own P0 remains unshipped 10+ days on; zero external adoption | ■■■ | Unstick changesets/NPM_TOKEN, ship 1.2.0, hold cadence; adoption gap closes only via shipping + public benchmarks | P0 |
+| G2 | Interactive agent surface | 17k-line TUI, streaming chat, `/fork` `/tree` `/resume`, themes | Only entry is one-shot `amc agent-loop run` (`src/cli-agent-commands.ts:5` says so itself); no REPL/TTY loop, no session picker | ■■■ | `amc agent` REPL/TUI over the existing loop + spine; resume/fork UX over `sessionSpine` | P7 |
+| G3 | Provider breadth & streaming maturity | ~40 providers / 10 adapters, subscription OAuth, thinking-format zoo, mid-session handoff, truncated-toolcall protection | Exactly three adapters (anthropic/openai/gateway) in `src/llm/providers/`; no OAuth, no Bedrock/Vertex/Google/local | ■■■ | Top ~6 adapters against `streamChunk.ts`, or vendor pi-ai (MIT) behind the AMC seam so evidence capture stays native | P3 |
+| G4 | Prompt caching & cost engineering | Per-protocol cache markers, cache-write costing, generated price catalog | grep `cache_control\|ephemeral` in `anthropicAdapter.ts` → nothing; budgets meter spend with no price catalog. Real workloads cost multiples of pi per token | ■■■ | Cache-marker emission per adapter + generated model/pricing catalog; cacheRead/cacheWrite in ledger usage rows (costs become provable) | P3 |
+| G5 | User code plugins + hot reload + self-extensibility | jiti extensions, `/reload`, `pi install`, agent prompted at its own extension docs | AMC packs are signed but declarative-content-only; no user code loading, no fs-watch | ■■ | Phase 9's signed *code* plugins: user TS plugins into `ToolRegistry`, signature-gated where pi has nothing | P9 |
+| G6 | Release & distribution engineering | 6-platform binaries + SHA256SUMS, `curl\|sh`, `--provenance`, min-release-age, daily audit+signature CI | No binary build in `scripts/`; npm-only and stalled (G1); §3.3 flags (unrotated keys, `AMC_NO_SIGN`, Dockerfile passphrases) still open — brutal irony for a trust product | ■■■ | Bun/SEA binary with checksums **and** Ed25519-signed manifests (pi checksums, never signs); adopt pins/min-release-age/audit-signatures; close §3.3 items | P0, P8 |
+| G7 | Evals against the real agent | pi-evals drives a live AgentSession; real published corpora | Assurance/red-team heritage synthetic; `afb7ad7b` (2 days ago): "stop seven packs reporting benchmark results they never ran" — evidence surfaces shipped fabricated results | ■■■ | Point packs + red-team at `amc agent-loop run` sessions (ADR-7); gate refusing any pack score lacking a session-id provenance link | P10 |
+| G8 | Session tree UX + cross-provider replay repair | Branch/fork/label, `retainedTail`, `transformMessages` repair | Spine has recovery + stronger integrity but no branch/fork, no picker; replay untested beyond 3 adapters | ■■ | Fork/branch on the spine (parent pointers exist); replay-normalization at the LLM boundary; resume conformance across adapters | P2, P3 |
+| G9 | Windows | win-x64/arm64 binaries, dedicated powershell tool | No node-pty, no powershell tool, Linux/mac CI only (D15 unchanged) | ■■ | Windows CI leg (P8.1) + powershell builtin; binaries via G6 | P8 |
+| G10 | Machine-drivable mode maturity | TUI/print/JSON-events/RPC + SDK, 31 docs, dogfooded at scale | ACP + NDJSON wire are new; own memory records a CLI-bridge privilege escalation (P7.1a) and foundations that "overstated what they enforced" (P6.1b) | ■■ | Finish P7.1a remediation; publish conformance/abuse suite for the wire surface | P7 |
+| G11 | Model catalog freshness | Generated + hydrated catalog, offline snapshot | Static signed taxonomy — signed but stale is confidently wrong | ■ | Generation script, then sign the *generated* artifact per release | P3 |
+| G12 | Doc accuracy discipline | Docs spot-checked accurate against code | §3.3.6 number drift keeps recurring (state-ledger regeneration this week) | ■ | Docs-drift gate over every published number; single source emitted from code with `--check` twin | P8 |
+
+### Where AMC is ahead of pi
+
+Confidence: **VA** = verified-absent in pi (grep-backed or docs-explicit); **LA** = likely-absent (digest silent, contradicts pi's stated philosophy); AMC-side caveats included so this list doesn't overstate.
+
+| # | AMC asset | pi status | Conf |
+|---|---|---|---|
+| A1 | Tamper-evident hash-chained ledger + integrity verification | Grep for hmac/sha256/signature across session path: nothing; malformed lines silently dropped — repair-tolerant, the opposite of tamper-evident | VA |
+| A2 | Ed25519 signing plane (policies/configs/leases/plugins, decision receipts) | Only SHA-256 in pi-ai is OAuth PKCE. (Caveat: `AMC_NO_SIGN` escape hatch, unsigned `amc.config.yaml`) | VA |
+| A3 | Merkle windows, transparency log, notary | Derived from A1 — no content hashing exists to build on; `/share` = unsigned gist. (Caveat: zk commands are placeholder crypto, P2.0) | VA |
+| A4 | Dual-control approvals: quorum, hash-chained grant store, replay-protected one-shot consumption | `prepareToolCall()` has no gate; "No permission popups" by design; only an opt-in userland hook with no shipped policy. (Caveat: not yet wired to a model tool-call site — P3.3/P4.1) | VA |
+| A5 | Shield prompt-injection detection + runtime firewall (observe/warn/enforce, fail-closed, signed receipts) | SECURITY.md scopes prompt injection out: "cannot be protected against" | VA |
+| A6 | Egress control: deny-by-default allowlist proxy, revocable signed leases, wire redaction | All containment delegated to containers; nothing in-process | VA |
+| A7 | Signed artifact distribution + registry | "Signing / verification: NONE" in extensions/package-manager; git-package deps run npm lifecycle scripts; trust gate is a boolean an extension can override | VA |
+| A8 | MCP server + MCP security analyzer + trust ledger | "No MCP" — explicitly omitted | VA |
+| A9 | Enterprise auth/multi-tenancy (OIDC/SAML/SCIM, RBAC, workspace isolation) | Trust boundary = the local user account; server package experimental, "may be removed" | VA |
+| A10 | Secret redaction from persisted history (three engines) | Sessions persist full conversations verbatim; only error diagnostics redacted | VA |
+| A11 | Budget/spend *enforcement* | pi tracks cost meticulously, gates nothing | VA |
+| A12 | Maturity scoring (L0–L5, ~100 dims, 246-question bank, evidence tiers) | Nothing across six digest sections; antithetical to "primitives, not features" | LA |
+| A13 | Compliance surfaces (EU AI Act maps, assurance packs, audit packets) | No regulatory artifact anywhere. (Caveat: pack execution was synthetic, partially fixed at `afb7ad7b`) | LA |
+| A14 | Foreign-agent governance (bridge proxy, 15 adapters, CC/Gemini hook emitters with allow/deny) | pi interops *with* competitors (their skills, their OAuth) but governs nothing — points the other way | LA |
+| A15 | Drift monitors + SIEM export; incident/correction lifecycle; governor policy engine; fleet/Passport; auto-remediation with receipts | pi-telemetry is contracts-only ("no exporter" — verified); no policy engine, no sub-agents ("use tmux"), no diagnostic remediation | LA |
+
+Do not oversell: pi's absences are deliberate and documented — in a debate pi reframes them as scope discipline ("run in a container"). AMC's counter is that container delegation produces no *evidence*: nothing in pi can prove, after the fact, what the agent did or that policy was enforced. And AMC's ahead-list is entirely on the trust plane; on the execution plane (loop, streaming, providers, TUI, hot extensions, crash-resume, real evals, supply-chain hygiene) pi is ahead — its npm hygiene is in several respects better than AMC's own §3.3 flags.
+
+### Verdict — what decides "better than pi"
+
+Pi's lead is not architectural; it is breadth, ergonomics, cost engineering, and above all shipping discipline plus adoption. Three gaps kill the claim outright if left open because they attack AMC's thesis directly — a trust product that can't release, and assurance evidence that wasn't real:
+
+1. **Ship (G1/G6, P0+P8)** — unstick the release pipeline, publish 1.2.0, then binaries with signed manifests (beat pi: they checksum, never sign) and their supply-chain hygiene adopted wholesale.
+2. **Honest evidence (G7, P10)** — every pack/red-team score must carry a session-id provenance link to a real run; refuse scores without one. `afb7ad7b` fixed instances; the gate fixes the class.
+3. **Provider breadth + caching (G3/G4, P3)** — 3 cacheless adapters vs pi's 40 cached ones is a per-token cost multiple no governance story survives; vendoring pi-ai (MIT) behind the AMC seam is the fast path.
+4. **Interactive surface (G2, P7)** — a one-shot CLI cannot displace a daily-driver TUI; the loop and spine exist, the REPL does not.
+5. **Signed code plugins (G5, P9)** — the one place AMC can convert pi's biggest strength (extensions) into its own differentiator: pi loads unsigned code with full permissions; AMC ships the same power, signature-gated.
+
+Everything in §"Where AMC is ahead" is defensible only while items 1–2 hold — pi has zero session integrity and no permission system (VERIFIED), but an evidence product with fabricated evidence forfeits the comparison regardless.
+
 ---
 
 ## 6. Architecture decisions (ADRs)
