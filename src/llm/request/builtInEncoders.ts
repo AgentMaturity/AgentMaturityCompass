@@ -11,11 +11,12 @@
  * refuses to replace an existing pair, so two encoders can never race for a
  * slot.
  */
-import { anthropicMessagesEncoder } from "./anthropicMessagesEncoder.js";
+import { anthropicMessagesEncoder, anthropicMessagesEncoderV2 } from "./anthropicMessagesEncoder.js";
 import { openaiChatEncoder } from "./openaiChatEncoder.js";
 import type { RequestEncoder } from "./requestEncoder.js";
 
 export const BUILT_IN_REQUEST_ENCODERS: readonly RequestEncoder[] = [
   anthropicMessagesEncoder,
+  anthropicMessagesEncoderV2,
   openaiChatEncoder
 ];

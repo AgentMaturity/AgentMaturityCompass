@@ -192,3 +192,61 @@ export const anthropicMessagesEncoder: RequestEncoder = {
     return Buffer.from(canonicalize(body), "utf8");
   }
 };
+
+/**
+ * `anthropic-messages@2` — v1's exact wire shape plus prompt-cache breakpoints.
+ *
+ * Three deterministic `cache_control: {type: "ephemeral"}` markers: the system
+ * block, the last tool, and the last content block of the last message. Each
+ * turn's request thereby seeds the cache that the next turn's shared prefix
+ * reads — without a marker no cache entry is ever created, and an agent loop
+ * re-pays the full input price on every step. Three of Anthropic's four
+ * allowed breakpoints, leaving one for a future caller-placed marker.
+ *
+ * A separate VERSION, not a change to v1: v1's bytes are frozen by every
+ * `requestDigest` recorded under `anthropic-messages@1`, and a marker anywhere
+ * would un-reconstruct all of them.
+ */
+export const anthropicMessagesEncoderV2: RequestEncoder = {
+  id: ANTHROPIC_MESSAGES_ENCODER_ID,
+  version: 2,
+  encode(request: EncodableRequest): Buffer {
+    const CACHE_MARK = { type: "ephemeral" } as const;
+    const body: Record<string, JsonValue> = {};
+    for (const [key, value] of Object.entries(request.params)) {
+      if (RESERVED_BODY_KEYS.has(key)) {
+        throw new RequestEncodingError(
+          `request param "${key}" collides with a body field ${ANTHROPIC_MESSAGES_ENCODER_ID} sets itself`
+        );
+      }
+      assertJsonSafe(value, `params.${key}`);
+      body[key] = value;
+    }
+    body.model = request.model;
+    if (request.system !== null) {
+      // The block-array form of `system`, which is where the API accepts a marker.
+      body.system = [{ type: "text", text: request.system, cache_control: CACHE_MARK }];
+    }
+    if (request.tools !== null) {
+      const last = request.tools.length - 1;
+      body.tools = request.tools.map((tool, index) => {
+        assertJsonSafe(tool.parameters, `tools.${tool.name}.parameters`);
+        return {
+          name: tool.name,
+          description: tool.description,
+          input_schema: tool.parameters as JsonValue,
+          // Marking the last tool caches the whole tools-array prefix.
+          ...(index === last ? { cache_control: CACHE_MARK } : {})
+        };
+      });
+    }
+    const messages = encodeMessages(request.messages);
+    const lastMessage = messages[messages.length - 1] as { content: JsonValue[] } | undefined;
+    if (lastMessage !== undefined && lastMessage.content.length > 0) {
+      const lastBlock = lastMessage.content[lastMessage.content.length - 1] as Record<string, JsonValue>;
+      lastMessage.content[lastMessage.content.length - 1] = { ...lastBlock, cache_control: CACHE_MARK };
+    }
+    body.messages = messages;
+    return Buffer.from(canonicalize(body), "utf8");
+  }
+};

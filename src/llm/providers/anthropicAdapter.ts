@@ -317,7 +317,7 @@ export const anthropicAdapter: LlmAdapter = {
   id: ANTHROPIC_ADAPTER_ID,
   version: 1,
   encoderId: ANTHROPIC_MESSAGES_ENCODER_ID,
-  encoderVersion: 1,
+  encoderVersion: 2,
 
   assertParams(params: Record<string, unknown>): void {
     // `anthropic-messages@1` does not own `stream` — bumping the encoder to take
