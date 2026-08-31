@@ -1,4 +1,5 @@
 import { existsSync, readdirSync, readFileSync } from "node:fs";
+import { sealedRunReportVerifies } from "../diagnostic/reportSeal.js";
 import { join } from "node:path";
 import { getAgentPaths, resolveAgentId } from "../fleet/paths.js";
 import type { DiagnosticReport } from "../types.js";
@@ -191,6 +192,11 @@ function loadLatestAgentIntegrity(workspace: string, agentId: string): LatestAge
     const file = join(paths.runsDir, entry.name);
     try {
       const parsed = JSON.parse(readFileSync(file, "utf8")) as Partial<DiagnosticReport>;
+      // A scoring input (the readiness verdict quotes this run's integrity), so
+      // only sealed reports count — G9-05.
+      if (!sealedRunReportVerifies(workspace, parsed as Record<string, unknown>)) {
+        continue;
+      }
       const runId = typeof parsed.runId === "string" && parsed.runId.length > 0
         ? parsed.runId
         : entry.name.slice(0, -5);

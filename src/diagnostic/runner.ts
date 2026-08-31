@@ -42,10 +42,11 @@ import { sha256Hex } from "../utils/hash.js";
 import { parseWindowToMs, dayKey } from "../utils/time.js";
 import { getAgentPaths, resolveAgentId } from "../fleet/paths.js";
 import { loadAssuranceSummary, type AssuranceSummary } from "./assuranceSummary.js";
+import { sealedRunReportVerifies } from "./reportSeal.js";
+export { loadRunReport, resolveRunReport, type ResolvedRunReport } from "./runReportResolution.js";
 import { getPublicKeyHistory } from "../crypto/keys.js";
 import { getPublicMethodologyManifest } from "../methodology/publicMethodology.js";
 import { buildMetricValidationReport } from "../score/metricValidity.js";
-import { resolveRunAlias } from "./runAliases.js";
 import { buildDiagnosticMethodologyVersioningReceipt } from "./methodologyVersioning.js";
 import {
   loadAgentConfig,
@@ -1260,12 +1261,18 @@ export async function runDiagnostic(input: RunDiagnosticInput, outputMarkdownPat
         ? trustLabelFromIntegrity(Math.min(integrityIndex, 0.59))
         : trustLabelFromIntegrity(integrityIndex);
 
+    // Prior runs feed the drift cap and the trend rows, so they are scoring
+    // inputs and only sealed reports count (G9-02): a hand-written "prior run"
+    // with a high score would otherwise neutralise the regression cap. Skipped
+    // quietly rather than as findings — unlike an in-window assurance report,
+    // a stale unsigned run is ordinary history on a noSign workspace.
     const priorRuns = pathExists(agentPaths.runsDir)
       ? readdirSync(agentPaths.runsDir)
         .filter((name) => name.endsWith(".json"))
         .map((name) => {
           try {
-            return JSON.parse(readUtf8(join(agentPaths.runsDir, name))) as DiagnosticReport;
+            const parsed = JSON.parse(readUtf8(join(agentPaths.runsDir, name))) as Record<string, unknown>;
+            return sealedRunReportVerifies(workspace, parsed) ? (parsed as unknown as DiagnosticReport) : null;
           } catch {
             /* unparseable evidence event — skip */
             return null;
@@ -1956,114 +1963,6 @@ export function compareRuns(a: DiagnosticReport, b: DiagnosticReport): {
   };
 }
 
-export function loadRunReport(workspace: string, runId: string, agentId?: string): DiagnosticReport {
-  const agentPaths = getAgentPaths(workspace, agentId);
-  const scopedFile = join(agentPaths.runsDir, `${runId}.json`);
-  if (pathExists(scopedFile)) {
-    return JSON.parse(readUtf8(scopedFile)) as DiagnosticReport;
-  }
-  const legacyFile = join(workspace, ".amc", "runs", `${runId}.json`);
-  return JSON.parse(readUtf8(legacyFile)) as DiagnosticReport;
-}
-
-export interface ResolvedRunReport {
-  requestedRunId: string;
-  resolvedRunId: string;
-  resolvedBy: "exact" | "latest" | "alias" | "prefix";
-  alias?: string;
-  report: DiagnosticReport;
-}
-
-function listRunReportCandidates(workspace: string, agentId?: string): DiagnosticReport[] {
-  const resolvedAgentId = resolveAgentId(workspace, agentId);
-  const agentPaths = getAgentPaths(workspace, resolvedAgentId);
-  const legacyRunsDir = join(workspace, ".amc", "runs");
-  const dirs = Array.from(new Set([agentPaths.runsDir, legacyRunsDir]));
-  const reports: DiagnosticReport[] = [];
-
-  for (const dir of dirs) {
-    if (!pathExists(dir)) {
-      continue;
-    }
-    for (const file of readdirSync(dir)) {
-      if (!file.endsWith(".json")) {
-        continue;
-      }
-      try {
-        const report = JSON.parse(readUtf8(join(dir, file))) as DiagnosticReport;
-        if (report.agentId && report.agentId !== resolvedAgentId) {
-          continue;
-        }
-        reports.push(report);
-      } catch {
-        // Ignore corrupt legacy run files when resolving convenience aliases.
-      }
-    }
-  }
-
-  return reports.sort((a, b) => b.ts - a.ts);
-}
-
-export function resolveRunReport(workspace: string, runId: string, agentId?: string): ResolvedRunReport {
-  const requestedRunId = runId.trim();
-  if (!requestedRunId) {
-    throw new Error("runId is required.");
-  }
-
-  if (requestedRunId.toLowerCase() === "latest") {
-    const reports = listRunReportCandidates(workspace, agentId);
-    const report = reports.find((row) => row.status === "VALID") ?? reports[0];
-    if (!report) {
-      throw new Error(`No diagnostic runs found for agent ${resolveAgentId(workspace, agentId)}.`);
-    }
-    return {
-      requestedRunId,
-      resolvedRunId: report.runId,
-      resolvedBy: "latest",
-      report
-    };
-  }
-
-  try {
-    const report = loadRunReport(workspace, requestedRunId, agentId);
-    return {
-      requestedRunId,
-      resolvedRunId: report.runId,
-      resolvedBy: "exact",
-      report
-    };
-  } catch {
-    const alias = resolveRunAlias(workspace, requestedRunId, agentId);
-    if (alias) {
-      try {
-        const report = loadRunReport(workspace, alias.runId, agentId);
-        return {
-          requestedRunId,
-          resolvedRunId: report.runId,
-          resolvedBy: "alias",
-          alias: alias.alias,
-          report
-        };
-      } catch {
-        throw new Error(`Run alias "${alias.alias}" points to missing run "${alias.runId}".`);
-      }
-    }
-
-    const matches = listRunReportCandidates(workspace, agentId).filter((report) => report.runId.startsWith(requestedRunId));
-    if (matches.length === 1) {
-      return {
-        requestedRunId,
-        resolvedRunId: matches[0]!.runId,
-        resolvedBy: "prefix",
-        report: matches[0]!
-      };
-    }
-    if (matches.length > 1) {
-      throw new Error(`Run ID prefix "${requestedRunId}" is ambiguous; matched ${matches.length} runs.`);
-    }
-    throw new Error(`No runId found matching "${requestedRunId}".`);
-  }
-}
 
 export async function compareModels(
   workspace: string,

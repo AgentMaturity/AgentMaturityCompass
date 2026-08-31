@@ -1,10 +1,8 @@
 import { readdirSync } from "node:fs";
 import { join } from "node:path";
 import { getAgentPaths } from "../fleet/paths.js";
-import { getPublicKeyHistory, verifyHexDigestAny } from "../crypto/keys.js";
-import { canonicalize } from "../utils/json.js";
-import { sha256Hex } from "../utils/hash.js";
 import { pathExists, readUtf8 } from "../utils/fs.js";
+import { sealedRunReportVerifies } from "./reportSeal.js";
 
 /**
  * The assurance evidence a diagnostic run may count, and what it refused.
@@ -41,30 +39,6 @@ interface ParsedReport {
     score0to100?: number;
     scenarioResults?: Array<{ auditEventTypes?: string[] }>;
   }>;
-}
-
-/**
- * A report counts only if it is the exact bytes the runner sealed: the hash
- * must recompute over the canonical report (with the seal fields emptied, as
- * the runner hashed it) and the seal must verify against the workspace auditor
- * key history. "unsigned" fails: an unsigned report may exist for local
- * diagnosis, but scoring cannot tell it from a fabricated one, so it earns
- * nothing.
- */
-function reportVerifies(workspace: string, parsed: ParsedReport): boolean {
-  const claimedHash = parsed.reportJsonSha256;
-  const seal = parsed.runSealSig;
-  if (typeof claimedHash !== "string" || claimedHash.length !== 64) return false;
-  if (typeof seal !== "string" || seal.length === 0 || seal === "unsigned") return false;
-  const recomputed = sha256Hex(
-    canonicalize({ ...parsed, reportJsonSha256: "", runSealSig: "" })
-  );
-  if (recomputed !== claimedHash) return false;
-  try {
-    return verifyHexDigestAny(claimedHash, seal, getPublicKeyHistory(workspace, "auditor"));
-  } catch {
-    return false;
-  }
 }
 
 export function loadAssuranceSummary(
@@ -107,7 +81,7 @@ export function loadAssuranceSummary(
 
     // Verified AFTER the window filter: a stale report is merely absent, but an
     // in-window report that fails verification is a finding worth naming.
-    if (!reportVerifies(workspace, parsed)) {
+    if (!sealedRunReportVerifies(workspace, parsed as Record<string, unknown>)) {
       summary.unverifiableReports.push(file);
       continue;
     }

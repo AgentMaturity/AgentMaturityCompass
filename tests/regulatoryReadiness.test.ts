@@ -1,4 +1,8 @@
 import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
+import { initWorkspace } from "../src/workspace.js";
+import { openLedger } from "../src/ledger/ledger.js";
+import { canonicalize } from "../src/utils/json.js";
+import { sha256Hex } from "../src/utils/hash.js";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { afterEach, describe, expect, test } from "vitest";
@@ -7,10 +11,20 @@ import { markAsAmcCheckout } from "./helpers/amcCheckout.js";
 
 const roots: string[] = [];
 
+/** A bare directory for zero-evidence cases; initWorkspace would scaffold artifacts that satisfy controls. */
+function bareWorkspace(): string {
+  const root = mkdtempSync(join(tmpdir(), "amc-reg-ready-bare-"));
+  roots.push(root);
+  mkdirSync(join(root, ".amc"), { recursive: true });
+  return root;
+}
+
 function newWorkspace(): string {
   const root = mkdtempSync(join(tmpdir(), "amc-reg-ready-test-"));
   roots.push(root);
-  mkdirSync(join(root, ".amc"), { recursive: true });
+  // A real workspace, because writeRun signs with its auditor key.
+  process.env.AMC_VAULT_PASSPHRASE = "reg-ready-test-passphrase";
+  initWorkspace({ workspacePath: root, trustBoundaryMode: "isolated" });
   return root;
 }
 
@@ -23,7 +37,14 @@ function writeArtifact(workspace: string, relPath: string): void {
 function writeRun(workspace: string, agentId: string, runId: string, ts: number, integrityIndex: number): void {
   const runPath = join(workspace, ".amc", "agents", agentId, "runs", `${runId}.json`);
   mkdirSync(dirname(runPath), { recursive: true });
-  writeFileSync(runPath, `${JSON.stringify({ runId, ts, integrityIndex }, null, 2)}\n`);
+  // Sealed the way the diagnostic writer seals: since G9-05, an unsealed run
+  // file is refused as a scoring input, so the fixture must be a real one.
+  const base = { runId, ts, integrityIndex, reportJsonSha256: "", runSealSig: "" };
+  const hash = sha256Hex(canonicalize(base));
+  const ledger = openLedger(workspace);
+  const sig = ledger.signRunHash(hash);
+  ledger.close();
+  writeFileSync(runPath, `${JSON.stringify({ ...base, reportJsonSha256: hash, runSealSig: sig }, null, 2)}\n`);
 }
 
 function populateHighCoverageArtifacts(workspace: string): void {
@@ -82,7 +103,7 @@ afterEach(() => {
 
 describe("scoreISO42001Coverage", () => {
   test("returns zero score when no controls are present", () => {
-    const workspace = newWorkspace();
+    const workspace = bareWorkspace();
     const score = scoreISO42001Coverage(workspace);
     expect(score.score).toBe(0);
     expect(score.passedControls).toBe(0);

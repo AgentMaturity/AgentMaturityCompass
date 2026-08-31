@@ -19,7 +19,7 @@
     "src/benchmarks/providerDriftBenchmark.ts": 4103,
     "src/index.ts": 2505,
     "src/studio/openapi.ts": 2213,
-    "src/diagnostic/runner.ts": 2196,
+    "src/diagnostic/runner.ts": 2095,
     "src/enforce/resourceManifest.ts": 2034,
     "src/eval/evalImporters.ts": 1973,
     "src/adapters/hookIntegration.ts": 1953,

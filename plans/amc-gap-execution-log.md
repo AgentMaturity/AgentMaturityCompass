@@ -198,7 +198,7 @@ The class: a scoring surface reads a file from disk and believes it. Instances f
 | Item | Status | Note |
 |---|---|---|
 | G9-01 assurance reports | ✅ DONE (`c9d646c8`) | `loadAssuranceSummary` believed unsigned JSON — a fabricated file scored as OBSERVED evidence. Now hash+seal verified against auditor keys; refusals are HIGH findings; reports carry `sessionId`. |
-| G9-02 prior diagnostic runs | ⬜ OPEN | `runner.ts:1264` and `:1988` read `runsDir/*.json` as `DiagnosticReport` unverified. Feeds trend/alias resolution, not level gates — lower severity than G9-01, but a fabricated prior run can still fake a trend. Reports are signed (`reportJsonSha256`/`runSealSig` twins exist); the readers just don't check. |
+| G9-02 prior diagnostic runs | ✅ DONE | `priorRuns` (drift cap + trend rows) now admits only reports passing `sealedRunReportVerifies` — a fabricated high-scoring "prior run" could neutralise the regression cap. The ALIAS readers (`runReportResolution.ts`, split out) stay deliberately permissive with the boundary documented: they select what `amc report latest` displays, they do not score. |
 | G9-03 EU AI Act classification | ⬜ OPEN | `euAIActCompliance.ts:63` reads `.amc/eu_ai_act_classification.json` unverified into compliance scoring. |
 | G9-04 behavioral contract cards | ⬜ OPEN | `behavioralContractMaturity.ts:55` reads cards unverified. |
-| G9-05 regulatory readiness | ⬜ OPEN | `regulatoryReadiness.ts:193` reads `DiagnosticReport`s unverified. |
+| G9-05 regulatory readiness | ✅ DONE | `loadLatestAgentIntegrity` admits only sealed reports; the readiness verdict quotes that run's integrity, so it is a scoring input. Consequence: noSign runs no longer feed the modifier. |
