@@ -25,6 +25,12 @@ export interface EUAIActComplianceResult {
   notAssessableCriteria?: number;
   score: number; // 0-100
   level: number; // 0-5
+  /**
+   * SELF-DECLARED, not assessed: read verbatim from the operator's
+   * `.amc/eu_ai_act_classification.json`. AMC cannot determine a system's
+   * legal risk class from code; it records which class the operator claims
+   * and scores the presence of the obligations that class implies.
+   */
   riskClassification: "minimal" | "limited" | "high" | "unacceptable" | "unknown";
   hasRiskManagementSystem: boolean;
   hasDataGovernance: boolean;
