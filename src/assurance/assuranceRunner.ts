@@ -360,10 +360,8 @@ export async function runAssurance(input: RunAssuranceInput): Promise<AssuranceR
   const ledger = openLedger(workspace);
 
   const proxyDenyByDefault = await hasProxyDenyByDefault(workspace);
-  let trustTier: TrustTier = "OBSERVED";
-  if (input.mode === "sandbox" && proxyDenyByDefault) {
-    trustTier = "OBSERVED_HARDENED";
-  }
+  const trustTier: TrustTier =
+    input.mode === "sandbox" && proxyDenyByDefault ? "OBSERVED_HARDENED" : "OBSERVED";
 
   const sessionId = startAssuranceSession({
     ledger,
@@ -622,6 +620,7 @@ export async function runAssurance(input: RunAssuranceInput): Promise<AssuranceR
       trustTier,
       status: input.noSign ? "UNSIGNED" : (verification.ok ? "VALID" : "INVALID"),
       verificationPassed: verification.ok,
+      sessionId,
       packResults,
       overallScore0to100,
       integrityIndex,

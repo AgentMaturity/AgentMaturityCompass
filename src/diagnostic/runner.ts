@@ -41,6 +41,7 @@ import { canonicalize } from "../utils/json.js";
 import { sha256Hex } from "../utils/hash.js";
 import { parseWindowToMs, dayKey } from "../utils/time.js";
 import { getAgentPaths, resolveAgentId } from "../fleet/paths.js";
+import { loadAssuranceSummary, type AssuranceSummary } from "./assuranceSummary.js";
 import { getPublicKeyHistory } from "../crypto/keys.js";
 import { getPublicMethodologyManifest } from "../methodology/publicMethodology.js";
 import { buildMetricValidationReport } from "../score/metricValidity.js";
@@ -525,90 +526,6 @@ function hasSandboxAttestation(events: ParsedEvidenceEvent[]): boolean {
   return events.some((event) => extractAuditType(event) === "SANDBOX_EXECUTION_ENABLED");
 }
 
-interface AssuranceSummary {
-  packScores: Map<string, number>;
-  packSucceeded: Map<string, number>;
-  packObserved: Set<string>;
-  auditCounts: Map<string, number>;
-}
-
-function loadAssuranceSummary(workspace: string, agentId: string, windowStartTs: number, windowEndTs: number): AssuranceSummary {
-  const summary: AssuranceSummary = {
-    packScores: new Map<string, number>(),
-    packSucceeded: new Map<string, number>(),
-    packObserved: new Set<string>(),
-    auditCounts: new Map<string, number>()
-  };
-  const agentPaths = getAgentPaths(workspace, agentId);
-  const dir = join(agentPaths.reportsDir, "assurance");
-  if (!pathExists(dir)) {
-    return summary;
-  }
-
-  const files = readdirSync(dir)
-    .filter((file) => file.endsWith(".json"))
-    .map((file) => join(dir, file))
-    .sort((a, b) => a.localeCompare(b));
-  for (const file of files) {
-    let parsed: {
-      ts?: number;
-      windowStartTs?: number;
-      windowEndTs?: number;
-      trustTier?: string;
-      packResults?: Array<{
-        packId?: string;
-        score0to100?: number;
-        scenarioResults?: Array<{ auditEventTypes?: string[] }>;
-      }>;
-    };
-    try {
-      parsed = JSON.parse(readUtf8(file)) as typeof parsed;
-    } catch {
-      /* malformed payload JSON — score as no-evidence */
-      continue;
-    }
-    const ts = parsed.ts ?? 0;
-    const runStart = parsed.windowStartTs ?? ts;
-    const runEnd = parsed.windowEndTs ?? ts;
-    if (runEnd < windowStartTs || runStart > windowEndTs) {
-      continue;
-    }
-
-    const observedTier = parsed.trustTier === "OBSERVED" || parsed.trustTier === "OBSERVED_HARDENED";
-    for (const pack of parsed.packResults ?? []) {
-      const packId = pack.packId;
-      if (!packId) {
-        continue;
-      }
-      const score = typeof pack.score0to100 === "number" ? pack.score0to100 : 0;
-      let succeeded = 0;
-      const prior = summary.packScores.get(packId) ?? 0;
-      const priorSucceeded = summary.packSucceeded.get(packId) ?? Number.MAX_SAFE_INTEGER;
-      for (const scenario of pack.scenarioResults ?? []) {
-        for (const auditType of scenario.auditEventTypes ?? []) {
-          if (auditType.endsWith("_SUCCEEDED")) {
-            succeeded += 1;
-          }
-        }
-      }
-      if (score > prior || (score === prior && succeeded < priorSucceeded)) {
-        summary.packScores.set(packId, score);
-        summary.packSucceeded.set(packId, succeeded);
-      }
-      if (observedTier) {
-        summary.packObserved.add(packId);
-      }
-      for (const scenario of pack.scenarioResults ?? []) {
-        for (const auditType of scenario.auditEventTypes ?? []) {
-          const count = summary.auditCounts.get(auditType) ?? 0;
-          summary.auditCounts.set(auditType, count + 1);
-        }
-      }
-    }
-  }
-  return summary;
-}
-
 function assuranceScore(summary: AssuranceSummary, packId: string): number {
   return summary.packScores.get(packId) ?? 0;
 }
@@ -773,6 +690,18 @@ export async function runDiagnostic(input: RunDiagnosticInput, outputMarkdownPat
       proxyDenyByDefault = false;
     }
     const assuranceSummary = loadAssuranceSummary(workspace, agentId, windowStartTs, now);
+    // A report the loader refused is a finding, not a silent absence: someone
+    // wrote a file into reports/assurance/ that does not verify against the
+    // workspace auditor keys, and the diagnostic must say so rather than
+    // quietly scoring around it.
+    const assuranceProvenanceFindings: AuditFinding[] = assuranceSummary.unverifiableReports.map((file) => ({
+      auditType: "ASSURANCE_REPORT_UNVERIFIABLE",
+      severity: "HIGH",
+      sessionId: "system",
+      runtime: "unknown",
+      message: `Assurance report failed hash/seal verification and contributed no evidence: ${file}`,
+      relatedEventIds: []
+    }));
     let eventsAuditMap = buildAuditCountMap(events);
     const hasUntrustedConfigEvidence =
       countAuditFromMap(eventsAuditMap, "UNSIGNED_GATEWAY_CONFIG") +
@@ -1188,8 +1117,9 @@ export async function runDiagnostic(input: RunDiagnosticInput, outputMarkdownPat
       });
     }
 
-    if (unsupportedClaimFindings.length > 0) {
-      persistAuditFindings(ledger, unsupportedClaimFindings, runId);
+    const allFindings = [...assuranceProvenanceFindings, ...unsupportedClaimFindings];
+    if (allFindings.length > 0) {
+      persistAuditFindings(ledger, allFindings, runId);
       _cachedAllEvents = null;
       events = filterEventsForAgent(
         getCachedEvents(),

@@ -4189,6 +4189,12 @@ export interface AssurancePackResult {
 export interface AssuranceReport {
   assuranceRunId: string;
   agentId: string;
+  /**
+   * The ledger session every scenario prompt/response/audit row of this run
+   * was recorded into — the provenance link from a score back to a real run.
+   * A report without one predates this field and cannot make the claim.
+   */
+  sessionId?: string;
   ts: number;
   mode: "supervise" | "sandbox";
   windowStartTs: number;

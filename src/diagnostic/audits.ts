@@ -41,7 +41,8 @@ export interface AuditFinding {
     | "DRIFT_REGRESSION_DETECTED"
     | "EXECUTE_FROZEN_ACTIVE"
     | "CONFIG_SIGNATURE_INVALID"
-    | "CONFIG_UNSIGNED";
+    | "CONFIG_UNSIGNED"
+    | "ASSURANCE_REPORT_UNVERIFIABLE";
   severity: "LOW" | "MED" | "HIGH" | "CRITICAL";
   sessionId: string;
   runtime: RuntimeName;
