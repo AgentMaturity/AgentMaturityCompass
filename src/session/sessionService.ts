@@ -1,27 +1,14 @@
 import { createHash, randomUUID } from "node:crypto";
-import type { EvidenceEvent, EvidenceEventType, RuntimeName } from "../types.js";
+import type { EvidenceEvent } from "../types.js";
 import { openSessionEventStore } from "../persistence/openSessionEventStore.js";
-import type { SessionEventStore, SessionStoreAppendInput } from "../persistence/sessionEventStore.js";
+import type { SessionEventStore } from "../persistence/sessionEventStore.js";
 import { sha256Hex } from "../utils/hash.js";
 import type { ConversationHistory } from "./surfaceProjection.js";
 import { createSessionProjections, type SessionProjections } from "./projection/sessionProjections.js";
-import {
-  embedEnvelope,
-  extractEnvelope,
-  SESSION_GENESIS,
-  type SessionEnvelope,
-  type SurfaceOp,
-  type SurfaceRole
-} from "./sessionTypes.js";
-import { TurnWindow } from "./turnWindow.js";
 
-/**
- * The tier every natively-executed row carries.
- *
- * Exported so the claim has one name and one definition; see the note in
- * `appendSessionEvent` for why it is `OBSERVED` and not `OBSERVED_HARDENED`.
- */
-export const NATIVE_TRUST_TIER = "OBSERVED" as const;
+import { SessionEventWriter } from "./sessionSpine.js";
+export { NATIVE_TRUST_TIER } from "./sessionSpine.js";
+
 import type { RequestHeaderMeta } from "./requestHeaderMeta.js";
 import { buildRequestOutcomeMeta, requestOutcomeEventType } from "./requestOutcomeMeta.js";
 import type { RequestOutcomeParams } from "./requestOutcomeMeta.js";
@@ -30,7 +17,6 @@ import { buildStepEndMeta, buildTurnEndMeta } from "./turnLifecycleMeta.js";
 import { buildApprovalRow } from "./approvalEventMeta.js";
 import { buildLoopEventRow } from "./loopEventMeta.js";
 import type { LoopEventRecord } from "./loopEventMeta.js";
-import type { SurfaceKind } from "./sessionTypes.js";
 import { SessionSpillPolicy } from "./spill/spillPolicy.js";
 import { SessionSpillStore } from "./spill/spillStore.js";
 import { SPILL_META_KEY, type SpillPolicyConfig } from "./spill/spillTypes.js";
@@ -143,14 +129,8 @@ function metaToolCallId(row: EvidenceEvent): string | null {
   }
 }
 
-export class SessionService {
+export class SessionService extends SessionEventWriter {
   readonly workspace: string;
-
-  // The service owns one store for the life of the session — it is the single
-  // writer for its own spine — and releases it at close(). Which backend that
-  // is (SQLite ledger or signed JSONL) is the workspace's choice, made in
-  // openSessionEventStore; nothing below this line knows or cares.
-  private readonly store: SessionEventStore;
 
   // The surface fold runs through the projection registry rather than direct
   // calls, so repeated projectHistory() resumes from the cached prefix instead
@@ -158,54 +138,12 @@ export class SessionService {
   // keyed to ONE log, and a composed runtime registers its own units here.
   readonly projections: SessionProjections = createSessionProjections();
 
-  private sessionIdValue: string | null = null;
-  private runtime: RuntimeName = "amc";
-  private closed = false;
-
-  // Per-session chain head, held in memory rather than re-queried per append
-  // because this instance is the only writer for the session. Seeded from the
-  // ledger on open(); advanced ONLY after a durable commit, so a throwing append
-  // leaves seq/prevHash at the last committed values and a retry re-chains from
-  // the true head instead of a phantom one.
-  private seqCounter = 0;
-  private prevHash: string = SESSION_GENESIS;
-
-  // Turn / step labels. `seq` is the cryptographic order; turn and step are the
-  // human-facing counters carried in the envelope for projection and reporting.
-  private turnNo = 0;
-  private stepNo = 0;
-  private currentTurn: number | null = null;
-  private currentStep: number | null = null;
-
-  // Window and seal-chain accounting — what each turn/seal commits to. Composed
-  // rather than inlined; see ./turnWindow.ts for why the arithmetic lives apart
-  // from the record methods.
-  private readonly window = new TurnWindow();
-
-  // The post-execute spill policy for this session. Created at open(), because
-  // a spill store is session-scoped and there is no session before then. The
-  // service runs it ITSELF rather than accepting a caller-supplied spill ref:
-  // that is what makes the ref in a signed row a description of bytes actually
-  // written rather than an unchecked claim.
-  private spill: SessionSpillPolicy | null = null;
-  private readonly spillConfig: Partial<SpillPolicyConfig>;
-
   // `store` is injectable so a caller (a test, a conformance run, a composed
   // service) can pin a backend without going through workspace configuration.
   // Left absent, the workspace's own pinned backend is opened.
   constructor(workspace: string, store?: SessionEventStore, spillConfig: Partial<SpillPolicyConfig> = {}) {
+    super(store ?? openSessionEventStore(workspace), spillConfig);
     this.workspace = workspace;
-    this.store = store ?? openSessionEventStore(workspace);
-    this.spillConfig = spillConfig;
-  }
-
-  // sessionId is assigned by open() (or supplied in SessionOpenParams) and is
-  // stable for the life of the service instance.
-  get sessionId(): string {
-    if (this.sessionIdValue === null) {
-      throw new Error("SessionService.sessionId read before open()");
-    }
-    return this.sessionIdValue;
   }
 
   open(params: SessionOpenParams): SessionEventRef {
@@ -831,157 +769,5 @@ export class SessionService {
     this.closed = true;
     this.store.close();
     return ref;
-  }
-
-  private recordContent(spec: {
-    readonly eventType: EvidenceEventType;
-    readonly content: string | Buffer;
-    readonly slot: string;
-    readonly role: SurfaceRole;
-    readonly kind: SurfaceKind;
-    readonly buildMeta: (payloadSha256: string) => Record<string, unknown>;
-    readonly turn: number | null;
-    readonly step: number | null;
-  }): SessionEventRef {
-    this.ensureUsable();
-    const bytes = typeof spec.content === "string" ? Buffer.from(spec.content, "utf8") : spec.content;
-    // INVARIANT BY CONSTRUCTION: the surface part's sha256 is the payload's, so
-    // every projected part is the payload of exactly one logged event. The append
-    // recomputes payload_sha256 over the same bytes, so the two always agree.
-    const payloadSha256 = sha256Hex(bytes);
-    const surface: SurfaceOp = {
-      op: "append",
-      slot: spec.slot,
-      role: spec.role,
-      part: { kind: spec.kind, sha256: payloadSha256 }
-    };
-    return this.appendSessionEvent({
-      eventType: spec.eventType,
-      typeMeta: spec.buildMeta(payloadSha256),
-      surface,
-      turn: spec.turn,
-      step: spec.step,
-      payload: bytes
-    });
-  }
-
-  // The single append seam. Assigns the envelope, appends through the existing
-  // signed, hash-chained Ledger path, then advances the in-memory head from what
-  // was actually committed. Content is blob-backed, never inline: retention can
-  // physically unlink a blob but cannot touch canonical_payload_inline, so
-  // conversation content — the very material retention exists to delete — must
-  // not live inline.
-  private appendSessionEvent(spec: {
-    readonly eventType: EvidenceEventType;
-    readonly typeMeta: Record<string, unknown>;
-    readonly surface: SurfaceOp;
-    readonly turn: number | null;
-    readonly step: number | null;
-    readonly payload?: string | Buffer;
-    readonly id?: string;
-  }): SessionEventRef {
-    this.ensureUsable();
-    const sessionId = this.sessionId;
-    const seq = this.seqCounter;
-    const envelope: SessionEnvelope = {
-      v: 1,
-      sessionId,
-      seq,
-      prevSessionEventHash: this.prevHash,
-      turn: spec.turn,
-      step: spec.step,
-      surface: spec.surface,
-      synthetic: false
-    };
-    // Every native row is evidence AMC captured itself, through its own
-    // instrumented loop and into a signed hash chain. `docs/SCORING_METHODOLOGY.md`
-    // grades tiers by verification method, and on that scale this is `OBSERVED` --
-    // at least as strong as the gateway-proxy interception the tier is named for.
-    //
-    // It is stated here, at the one private chokepoint every public recorder
-    // funnels through, so the claim covers the whole native spine rather than the
-    // call sites someone remembered. Before this, the spine wrote no tier at all
-    // and `trustTierFromMeta` read the absence back as `SELF_REPORTED` -- "the
-    // agent's own claims", 0.4x weight, filtered out of L4 and L5 entirely -- so
-    // AMC scored its own governed runs below a foreign CLI it merely watched.
-    //
-    // NOT `OBSERVED_HARDENED`: that is documented as sandbox execution with
-    // cryptographic attestation. The attestation is real; the sandbox is not
-    // (`SandboxRunner.run()` has no production call site), and awarding ourselves
-    // the top tier would trade one dishonest label for another.
-    const meta = embedEnvelope({ trustTier: NATIVE_TRUST_TIER, ...spec.typeMeta }, envelope);
-    const input: SessionStoreAppendInput = {
-      sessionId,
-      runtime: this.runtime,
-      eventType: spec.eventType,
-      meta,
-      ...(spec.id !== undefined ? { id: spec.id } : {}),
-      ...(spec.payload !== undefined ? { payload: spec.payload } : {})
-    };
-
-    const result = this.store.appendSessionEvent(input);
-
-    // Advance ONLY after the commit returned. A throw above leaves seq/prevHash
-    // untouched, so the head still points at the last durable event.
-    this.seqCounter = seq + 1;
-    this.prevHash = result.eventHash;
-
-    // Every event of the current turn — except the turn's own seal — is a leaf of
-    // that turn's window root and lies within its id bounds.
-    if (this.currentTurn !== null && spec.eventType !== "turn/seal") {
-      this.window.observe(result.id, result.eventHash);
-    }
-
-    return {
-      eventId: result.id,
-      eventHash: result.eventHash,
-      seq,
-      payloadSha256: result.payloadSha256
-    };
-  }
-
-  private seedHead(sessionId: string): void {
-    for (const row of this.store.readSessionEvents(sessionId)) {
-      const envelope = extractEnvelope(row.meta_json);
-      if (envelope === null) {
-        continue;
-      }
-      this.seqCounter = envelope.seq + 1;
-      this.prevHash = row.event_hash;
-    }
-  }
-
-  private ensureUsable(): void {
-    if (this.sessionIdValue === null) {
-      throw new Error("SessionService used before open()");
-    }
-    if (this.closed) {
-      throw new Error("SessionService used after close()");
-    }
-  }
-
-  // ensureUsable() has already proved the session is open, so a null policy here
-  // would mean open() failed to build one — a programming error, not a state a
-  // caller can reach.
-  private requireSpill(): SessionSpillPolicy {
-    if (this.spill === null) {
-      throw new Error("SessionService: spill policy unavailable before open()");
-    }
-    return this.spill;
-  }
-
-  private requireTurn(): number {
-    this.ensureUsable();
-    if (this.currentTurn === null) {
-      throw new Error("SessionService: no turn is open");
-    }
-    return this.currentTurn;
-  }
-
-  private requireStep(): number {
-    if (this.currentStep === null) {
-      throw new Error("SessionService: no step is open");
-    }
-    return this.currentStep;
   }
 }
