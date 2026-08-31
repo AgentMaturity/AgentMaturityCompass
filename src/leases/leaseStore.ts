@@ -115,10 +115,21 @@ export function revokeLease(workspace: string, leaseId: string, reason: string):
   return next;
 }
 
+/**
+ * The revoked lease ids, from a store whose signature verifies.
+ *
+ * Throws when it does not. This used to answer an unverifiable store with an
+ * EMPTY SET, which reads as "nothing is revoked" -- so tampering with one file
+ * un-revoked every lease ever revoked. A revocation list is a security answer;
+ * when the question cannot be answered, the only safe response is to refuse,
+ * and every caller then refuses every lease until the store is repaired.
+ */
 export function revokedLeaseIdSet(workspace: string): Set<string> {
   const verify = verifyLeaseRevocationsSignature(workspace);
   if (!verify.valid) {
-    return new Set<string>();
+    throw new Error(
+      `lease revocation store unverifiable (${verify.reason ?? "unknown"}); refusing to treat it as empty`
+    );
   }
   const revocations = loadLeaseRevocations(workspace);
   return new Set(revocations.revocations.map((row) => row.leaseId));

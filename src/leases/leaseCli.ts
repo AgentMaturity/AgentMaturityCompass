@@ -1,6 +1,6 @@
 import { issueLeaseToken } from "./leaseSigner.js";
 import { verifyLeaseToken } from "./leaseVerifier.js";
-import { loadLeaseRevocations, revokeLease, signLeaseRevocations, verifyLeaseRevocationsSignature } from "./leaseStore.js";
+import { loadLeaseRevocations, revokeLease, revokedLeaseIdSet, signLeaseRevocations, verifyLeaseRevocationsSignature } from "./leaseStore.js";
 import type { LeaseScope } from "./leaseSchema.js";
 
 export function parseLeaseTtlToMs(ttl: string): number {
@@ -65,10 +65,20 @@ export function verifyLeaseForCli(params: {
   workspace: string;
   token: string;
 }): { ok: boolean; payload: unknown; error?: string } {
+  // The set comes through `revokedLeaseIdSet`, which checks the store's own
+  // signature. Reading the file directly meant `amc lease verify` honoured a
+  // tampered revocation list -- the one caller most likely to be consulted
+  // after a compromise was the one not checking.
+  let revokedLeaseIds: Set<string>;
+  try {
+    revokedLeaseIds = revokedLeaseIdSet(params.workspace);
+  } catch (error) {
+    return { ok: false, payload: null, error: String(error instanceof Error ? error.message : error) };
+  }
   const verify = verifyLeaseToken({
     workspace: params.workspace,
     token: params.token,
-    revokedLeaseIds: new Set(loadLeaseRevocations(params.workspace).revocations.map((row) => row.leaseId))
+    revokedLeaseIds
   });
   return {
     ok: verify.ok,
@@ -89,9 +99,43 @@ export function revokeLeaseForCli(params: {
 }
 
 export function ensureLeaseRevocationStore(workspace: string): { signatureValid: boolean } {
+  // Verify BEFORE signing. The old order signed the store and then verified
+  // the signature it had just written, which certified whatever the file
+  // contained -- tampering included -- and made this result a value that could
+  // not be false. A store that fails verification is left exactly as found:
+  // the stale signature is the evidence of what was altered.
+  const existing = verifyLeaseRevocationsSignature(workspace);
+  if (existing.signatureExists) {
+    return { signatureValid: existing.valid };
+  }
+  if (!existing.valid) {
+    // A store file with no signature at all: refusing to bless it is the
+    // point -- signing here would launder content nobody has vouched for.
+    return { signatureValid: false };
+  }
+  // No store yet: bootstrap an empty one and sign it.
   signLeaseRevocations(workspace);
-  const verify = verifyLeaseRevocationsSignature(workspace);
+  return { signatureValid: verifyLeaseRevocationsSignature(workspace).valid };
+}
+
+/**
+ * Explicitly re-sign the revocation store as the workspace owner.
+ *
+ * This is the ONE deliberate path that signs over a failing signature --
+ * `ensureLeaseRevocationStore` refuses to, precisely so that repair is a
+ * reviewed human action rather than a side effect of issuing a lease. The
+ * result reports what the operator just vouched for.
+ */
+export function resignLeaseRevocationsForCli(workspace: string): {
+  wasValid: boolean;
+  previousReason: string | null;
+  revocationCount: number;
+} {
+  const before = verifyLeaseRevocationsSignature(workspace);
+  signLeaseRevocations(workspace);
   return {
-    signatureValid: verify.valid
+    wasValid: before.valid,
+    previousReason: before.reason,
+    revocationCount: loadLeaseRevocations(workspace).revocations.length
   };
 }
