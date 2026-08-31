@@ -2,6 +2,11 @@
 
 The simplest possible AMC integration. No framework — just Python and the AMC Gateway.
 
+> Named for the `python-amc-sdk` adapter id it registers under. It installs no pip
+> package: not `amc-sdk` (the evidence/ACP SDK in `sdk/python/`) and not
+> `amc-bridge-client` (the Bridge HTTP client in `src/sdk/python/`) — everything
+> here is stdlib.
+
 ## What It Does
 
 - Makes LLM calls directly through the AMC Gateway (OpenAI-compatible API)

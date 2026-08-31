@@ -1,30 +1,30 @@
-# AMC Python SDK
+# AMC Bridge Client (Python)
 
 Python client library for the [Agent Maturity Compass](https://github.com/AgentMaturity/AgentMaturityCompass) Bridge HTTP API.
 
 ## Installation
 
 ```bash
-pip install amc-sdk
+pip install amc-bridge-client
 ```
 
 For optional integrations:
 
 ```bash
 # With httpx async support
-pip install amc-sdk[httpx]
+pip install amc-bridge-client[httpx]
 
 # With LangChain callback handler
-pip install amc-sdk[langchain]
+pip install amc-bridge-client[langchain]
 
 # With FastAPI middleware
-pip install amc-sdk[fastapi]
+pip install amc-bridge-client[fastapi]
 
 # With Flask middleware
-pip install amc-sdk[flask]
+pip install amc-bridge-client[flask]
 
 # Everything
-pip install amc-sdk[all]
+pip install amc-bridge-client[all]
 ```
 
 ## Quick Start

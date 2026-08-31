@@ -15,7 +15,7 @@ describe("SDK consolidation documentation", () => {
     const sdkDoc = read("docs/SDK.md");
     expect(sdkDoc).toContain("## Current SDK Inventory");
     expect(sdkDoc).toContain("Node/TypeScript");
-    expect(sdkDoc).toContain("Python SDK");
+    expect(sdkDoc).toContain("Python bridge client (`amc-bridge-client`)");
     expect(sdkDoc).toContain("Go SDK");
     expect(sdkDoc).toContain("OpenAPI contract");
     expect(sdkDoc).toContain("amc python-sdk --coverage");

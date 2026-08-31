@@ -149,7 +149,7 @@ class AMCClient:
             "Content-Type": "application/json",
             "Authorization": f"Bearer {self.token}",
             "x-amc-correlation-id": correlation_id or str(uuid.uuid4()),
-            "x-amc-sdk-name": "amc-python-sdk",
+            "x-amc-sdk-name": "amc-bridge-client",
             "x-amc-sdk-version": "0.1.0",
         }
         if self.workspace_id:

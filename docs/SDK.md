@@ -10,7 +10,7 @@ AMC has repo-visible SDK surfaces beyond raw REST calls:
 | Surface | Asset | Current scope |
 |---|---|---|
 | Node/TypeScript | `src/sdk/index.ts` exported through the root package | `AMCClient`, `createAMCClientFromEnv`, provider bridge methods, OpenAI/Anthropic/Gemini/Vercel/LangChain/LangGraph/OpenAI Agents instrumentation, mobile fetch wrapper, telemetry, redaction, and self-scoring guards |
-| Python SDK | `src/sdk/python/` and `amc python-sdk` | `AMCClient`, FastAPI/Flask/LangChain middleware, redaction/hash helpers, and a typed package marker `py.typed`. Covers 7 of the 11 model-proxy routes the Bridge serves (`amc python-sdk --coverage`); `batches`, `embeddings`, `images/generations` and `audio/speech` are not generated |
+| Python bridge client (`amc-bridge-client`) | `src/sdk/python/` and `amc python-sdk` | `AMCClient`, FastAPI/Flask/LangChain middleware, redaction/hash helpers, and a typed package marker `py.typed`. Covers 7 of the 11 model-proxy routes the Bridge serves (`amc python-sdk --coverage`); `batches`, `embeddings`, `images/generations` and `audio/speech` are not generated |
 | Go SDK | `src/sdk/go/` | `NewClientFromEnv`, provider bridge methods, telemetry/reporting helpers, response metadata, hashing, redaction, and tests |
 | OpenAPI contract | `website/openapi.yaml` | REST/API contract for clients, tools, and generated integrations |
 
@@ -252,7 +252,7 @@ log.Printf("status=%d request_id=%s correlation_id=%s", resp.Status, resp.Reques
 
 - Versioning model:
   - Node SDK follows the main `agent-maturity-compass` package version.
-  - Python SDK follows `amc-sdk` package SemVer.
+  - The Python bridge client follows `amc-bridge-client` package SemVer; the evidence/ACP SDK in `sdk/python/` owns the `amc-sdk` name.
   - Go SDK follows `github.com/anthropic/amc-go-sdk` SemVer tags.
 - Deprecation policy:
   - Deprecated SDK methods/endpoints receive a `Deprecation: true` response header and warning text.

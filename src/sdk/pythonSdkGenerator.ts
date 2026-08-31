@@ -41,17 +41,23 @@ export function generatePythonSdkPackage(sdkDir?: string): PythonSdkPackage {
   ];
 
   for (const sf of sourceFiles) {
+    // A missing source file fails the generation. The previous fallback emitted
+    // a one-line comment as the file's content, so a broken path produced a
+    // "pip-installable package" of empty stubs and reported success — a package
+    // generator must never fabricate the package it claims to have read.
+    let content: string;
     try {
-      const content = readFileSync(join(baseDir, sf.name), "utf-8");
-      files.push({ path: sf.name, content, description: sf.description });
-    } catch {
-      // File may not exist in test contexts — generate placeholder
-      files.push({ path: sf.name, content: `# ${sf.description}\n`, description: sf.description });
+      content = readFileSync(join(baseDir, sf.name), "utf-8");
+    } catch (error) {
+      throw new Error(
+        `python-sdk generation failed: cannot read ${join(baseDir, sf.name)} (${String(error)})`
+      );
     }
+    files.push({ path: sf.name, content, description: sf.description });
   }
 
   return {
-    packageName: "amc-sdk",
+    packageName: "amc-bridge-client",
     version: "0.1.0",
     files,
     installCommand: "pip install .",

@@ -13,9 +13,17 @@ const SDK_DIR = join(__dirname, "..", "src", "sdk", "python");
 // Python SDK Package Generation
 // ---------------------------------------------------------------------------
 describe("Python SDK package generation", () => {
+  test("a missing source tree fails generation instead of emitting stubs", () => {
+    // The old fallback packaged `# <description>` as each file's content, so a
+    // broken path yielded a "pip-installable package" of comment stubs and a
+    // success report. Regression: generation from a nonexistent dir must throw.
+    expect(() => generatePythonSdkPackage(join(__dirname, "no-such-sdk-dir")))
+      .toThrow(/cannot read/);
+  });
+
   test("generates package with all required files", () => {
     const pkg = generatePythonSdkPackage(SDK_DIR);
-    expect(pkg.packageName).toBe("amc-sdk");
+    expect(pkg.packageName).toBe("amc-bridge-client");
     expect(pkg.version).toBe("0.1.0");
     expect(pkg.files.length).toBeGreaterThanOrEqual(5);
 
@@ -91,7 +99,7 @@ describe("Python SDK package generation", () => {
   test("pyproject.toml has correct metadata", () => {
     const pkg = generatePythonSdkPackage(SDK_DIR);
     const toml = pkg.files.find((f) => f.path === "pyproject.toml")!;
-    expect(toml.content).toContain('name = "amc-sdk"');
+    expect(toml.content).toContain('name = "amc-bridge-client"');
     expect(toml.content).toContain('version = "0.1.0"');
     expect(toml.content).toContain("requires-python");
     expect(toml.content).toContain("[project.optional-dependencies]");

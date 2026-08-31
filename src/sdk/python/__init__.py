@@ -1,12 +1,14 @@
 """
-AMC Python SDK — Agent Maturity Compass
+AMC Bridge Client — Agent Maturity Compass
 
-A Python client library for the AMC Bridge HTTP API.
+A Python client library for the AMC Bridge HTTP API. Distributed as
+`amc-bridge-client`; the evidence/ACP product SDK is the separate `amc-sdk`
+package in sdk/python.
 Provides typed access to all provider endpoints, telemetry reporting,
 evidence hashing, secret redaction, and framework middleware.
 
 Usage:
-    from amc_sdk import AMCClient
+    from amc_client import AMCClient
     client = AMCClient(bridge_url="http://localhost:3212", token="your-token")
 """
 
