@@ -190,3 +190,15 @@ Gate for every gap: `tsc --noEmit` clean + affected tests pass + real behavior v
 
 **G8 COMPLETE — 34 gaps. Persistence audit ran 27 agents: 21 candidate findings, 10 survived adversarial verification, all 10 fixed.**
 
+
+## G9 — score-input provenance (opened 2026-08-28, from the pi comparator's G7)
+
+The class: a scoring surface reads a file from disk and believes it. Instances found by survey; each row is fixed, or open with its blast radius stated.
+
+| Item | Status | Note |
+|---|---|---|
+| G9-01 assurance reports | ✅ DONE (`c9d646c8`) | `loadAssuranceSummary` believed unsigned JSON — a fabricated file scored as OBSERVED evidence. Now hash+seal verified against auditor keys; refusals are HIGH findings; reports carry `sessionId`. |
+| G9-02 prior diagnostic runs | ⬜ OPEN | `runner.ts:1264` and `:1988` read `runsDir/*.json` as `DiagnosticReport` unverified. Feeds trend/alias resolution, not level gates — lower severity than G9-01, but a fabricated prior run can still fake a trend. Reports are signed (`reportJsonSha256`/`runSealSig` twins exist); the readers just don't check. |
+| G9-03 EU AI Act classification | ⬜ OPEN | `euAIActCompliance.ts:63` reads `.amc/eu_ai_act_classification.json` unverified into compliance scoring. |
+| G9-04 behavioral contract cards | ⬜ OPEN | `behavioralContractMaturity.ts:55` reads cards unverified. |
+| G9-05 regulatory readiness | ⬜ OPEN | `regulatoryReadiness.ts:193` reads `DiagnosticReport`s unverified. |
