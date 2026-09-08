@@ -1,4 +1,4 @@
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { packageMeta } from "./releaseManifest.js";
 import { deterministicTimestamp } from "./releaseUtils.js";
@@ -29,6 +29,33 @@ function parseNameFromPath(pathKey: string): string {
   return pathKey.slice(idx + marker.length);
 }
 
+/**
+ * Packages the build inlined into dist/kernel/amcRuntime.js (AMC-1510).
+ *
+ * They are not in any lockfile the consumer sees — that is the point of
+ * bundling them — so an SBOM built from resolved dependencies alone would
+ * omit exactly the code the published runtime ships. Read from the manifest
+ * scripts/bundle-kernel.mjs writes beside the bundle; absent manifest, absent
+ * bundle, nothing to add.
+ */
+function bundledRuntimeComponents(workspace: string): Array<Record<string, unknown>> {
+  const manifestPath = join(workspace, "dist", "kernel", "amcRuntime.bundle.json");
+  if (!existsSync(manifestPath)) return [];
+  const manifest = JSON.parse(readFileSync(manifestPath, "utf8")) as {
+    entry?: string;
+    packages?: Array<{ name: string; version: string | null; license: string | null }>;
+  };
+  return (manifest.packages ?? []).map((entry) => ({
+    type: "library",
+    name: entry.name,
+    version: entry.version ?? "0.0.0",
+    purl: `pkg:npm/${encodeURIComponent(entry.name)}@${entry.version ?? "0.0.0"}`,
+    licenses: [{ license: { id: entry.license ?? "UNKNOWN" } }],
+    hashes: [],
+    properties: [{ name: "amc:bundled-into", value: manifest.entry ?? "dist/kernel/amcRuntime.js" }]
+  }));
+}
+
 export function generateCycloneDxSbom(workspace: string): Record<string, unknown> {
   // Reads whichever lockfile the workspace has. This module parsed
   // package-lock.json directly, so it could not produce an SBOM for AMC's own
@@ -36,7 +63,7 @@ export function generateCycloneDxSbom(workspace: string): Record<string, unknown
   // artifacts it exists to generate.
   const pkg = packageMeta(workspace);
   const components = readResolvedDependencies(workspace)
-    .map((dependency) => {
+    .map((dependency): Record<string, unknown> => {
       const name = dependency.name;
       const version = dependency.version;
       const purlName = encodeURIComponent(name);
@@ -62,6 +89,7 @@ export function generateCycloneDxSbom(workspace: string): Record<string, unknown
           : []
       };
     })
+    .concat(bundledRuntimeComponents(workspace))
     .sort((a, b) => `${a.name}@${a.version}`.localeCompare(`${b.name}@${b.version}`));
 
   return {

@@ -25,8 +25,8 @@
  * published npm tarball does not contain; the architecture-boundaries gate
  * enforces that placement.
  */
-import { AmcSeam, defineSeam } from "@amc/core";
-import type { Context } from "@amc/cordis";
+import { AmcSeam, defineSeam } from "../amcRuntime.js";
+import type { Context } from "../amcRuntime.js";
 import type { CredentialsService } from "../../credentials/credentialsService.js";
 import type { SessionService } from "../../session/sessionService.js";
 import { AdapterRegistry } from "../../llm/adapter/adapterRegistry.js";

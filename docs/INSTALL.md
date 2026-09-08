@@ -56,13 +56,16 @@ protocol the vendored `@amc/*` packages use, so it fails here by design.
 their compiled `lib/` in the tree, so no separate vendor build is needed unless
 you edit them (`npm run build:vendor`).
 
-**Source runtime vs published release.** A source checkout can run the native
-governed agent loop — the hidden `agent-loop` entry point that
-`npm run check:clean-source` exercises — because the composition kernel
-`@amc/core` is a private workspace package. The published
-npm tarball and the release installers do not include it; they ship the
-evidence, scoring and governance surfaces. `npm run check:clean-source` proves
-this whole path on a fresh clone, keyless, in an isolated workspace.
+**Source runtime vs published release.** The native governed agent loop is
+built on the composition kernel `@amc/core` and the vendored `@amc/cordis`
+family, which are private workspace packages. Since the build bundles that
+closure into `dist/kernel/amcRuntime.js` (`scripts/bundle-kernel.mjs`), the
+packed tarball carries the runtime too: `npm run check:packed-install` packs as
+`npm publish` would, installs into a fresh directory with an empty HOME, proves
+`@amc/core` is *not* resolvable there, and still completes a keyless native
+turn over a fully signed session. `npm run check:clean-source` proves the
+source path the same way. Both are local artifact checks; public release
+acceptance stays with the release gates.
 
 Verify:
 

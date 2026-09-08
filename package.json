@@ -12,6 +12,7 @@
     "scripts/run-policy-fixtures-ci.mjs",
     "fixtures/policy/amc-ci-policy-fixtures.yaml",
     "README.md",
+    "THIRD_PARTY_NOTICES",
     "LICENSE"
   ],
   "bin": {
@@ -21,7 +22,7 @@
     "node": ">=20"
   },
   "scripts": {
-    "build": "tsc -p tsconfig.json && chmod +x dist/cli.js && npm run copy-assets",
+    "build": "tsc -p tsconfig.json && chmod +x dist/cli.js && npm run copy-assets && node scripts/bundle-kernel.mjs",
     "build:pages": "node scripts/build-pages-site.mjs",
     "build:sea": "node scripts/build-sea.mjs",
     "brand:render": "node scripts/render-brand-assets.mjs",
@@ -74,7 +75,9 @@
     "check:third-party-notices": "node scripts/vendor/gen-third-party-notices.mjs --check",
     "build:vendor": "tsc -b vendor/cordis vendor/loader vendor/include vendor/group vendor/timer vendor/hmr vendor/logger-console vendor/schemastery",
     "graph:update": "graphify update .",
-    "check:clean-source": "node scripts/clean-source-check.mjs"
+    "check:clean-source": "node scripts/clean-source-check.mjs",
+    "bundle:kernel": "node scripts/bundle-kernel.mjs",
+    "check:packed-install": "node scripts/packed-install-check.mjs"
   },
   "keywords": [
     "ai-agent",
@@ -135,9 +138,9 @@
     "qs": "6.15.2"
   },
   "devDependencies": {
-    "@amc/core": "workspace:*",
     "@amc/cordis": "workspace:*",
     "@amc/cordis-plugin-loader": "workspace:*",
+    "@amc/core": "workspace:*",
     "@amc/schemastery": "workspace:*",
     "@axe-core/playwright": "^4.11.1",
     "@changesets/cli": "^2.30.0",
@@ -150,6 +153,7 @@
     "@vitest/coverage-v8": "^4.1.10",
     "ajv": "8.18.0",
     "date-fns": "^4.1.0",
+    "esbuild": "0.28.2",
     "marked": "18.0.6",
     "tsx": "^4.23.0",
     "typescript": "^6.0.2",

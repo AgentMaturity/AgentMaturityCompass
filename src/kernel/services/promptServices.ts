@@ -28,8 +28,8 @@
  * enforces that placement. The assembly itself deliberately does not — see
  * src/prompt/agentPromptProfile.ts.
  */
-import { AmcSeam, defineSeam } from "@amc/core";
-import type { Context } from "@amc/cordis";
+import { AmcSeam, defineSeam } from "../amcRuntime.js";
+import type { Context } from "../amcRuntime.js";
 import type { PreStepDecision, PreStepInput } from "../../agent/loopTypes.js";
 import type { AgentPromptProfile } from "../../prompt/agentPromptProfile.js";
 import { buildAgentPromptRegistry } from "../../prompt/agentPromptProfile.js";

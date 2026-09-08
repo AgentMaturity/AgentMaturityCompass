@@ -37,7 +37,7 @@
  * which is the right verdict for a process that died and the wrong one for a
  * command that finished.
  */
-import { Context } from "@amc/cordis";
+import { Context } from "./amcRuntime.js";
 import { createHash } from "node:crypto";
 import { gateToolCallsOnApproval, type ToolApprovalGateOptions } from "../agent/approvalGate.js";
 import type { AgentLoopConfig, AgentStatus, LoopHooks, LoopNotification } from "../agent/loopTypes.js";

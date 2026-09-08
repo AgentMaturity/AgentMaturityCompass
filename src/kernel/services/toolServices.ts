@@ -21,8 +21,8 @@
  * the published npm tarball does not contain; the architecture-boundaries gate
  * enforces that placement.
  */
-import { AmcSeam, defineSeam } from "@amc/core";
-import type { Context } from "@amc/cordis";
+import { AmcSeam, defineSeam } from "../amcRuntime.js";
+import type { Context } from "../amcRuntime.js";
 import { ToolRegistry } from "../../tools/toolRegistry.js";
 import { ToolPipeline, type ToolCallInput, type ToolPipelineInit } from "../../tools/toolPipeline.js";
 import type { ToolDefinition, ToolGuard, ToolOutcome, ToolRestriction } from "../../tools/toolTypes.js";

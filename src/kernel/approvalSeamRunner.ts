@@ -26,7 +26,7 @@
  * close is reported by the verifier as INTERRUPTED, which is the right verdict
  * for a process that died and the wrong one for a command that finished.
  */
-import { Context } from "@amc/cordis";
+import { Context } from "./amcRuntime.js";
 import { createHash } from "node:crypto";
 import { SessionService } from "../session/sessionService.js";
 import { amcVersion } from "../version.js";

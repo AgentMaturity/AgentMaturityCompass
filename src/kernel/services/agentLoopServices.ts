@@ -33,8 +33,8 @@
  * published npm tarball does not contain; the architecture-boundaries gate
  * enforces that placement.
  */
-import { AmcSeam, defineSeam } from "@amc/core";
-import type { Context } from "@amc/cordis";
+import { AmcSeam, defineSeam } from "../amcRuntime.js";
+import type { Context } from "../amcRuntime.js";
 import { AgentDriver } from "../../agent/agentDriver.js";
 import type {
   AgentLoopConfig,
