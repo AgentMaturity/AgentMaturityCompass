@@ -28,7 +28,9 @@ MAPS = {
         "src/agent/pipelineToolSeam.ts", "src/agent/subagentRunner.ts",
         "src/tools/toolPipeline.ts", "src/llm/adapter/llmRuntime.ts",
         "src/session/sessionService.ts", "src/session/sessionSpine.ts",
-        "src/session/sessionRecovery.ts", "packages/amc-core/src/composition.ts",
+        "src/session/sessionRecovery.ts", "src/persistence/openSessionEventStore.ts",
+        "src/persistence/sqliteSessionEventStore.ts", "src/persistence/jsonl/jsonlSessionEventStore.ts",
+        "packages/amc-core/src/composition.ts",
     ],
     "evidence-imports": [
         "src/cli-import-commands.ts", "src/importers/neutralImporter.ts",
@@ -40,9 +42,12 @@ MAPS = {
     ],
     "trust-and-publication": [
         "src/crypto/keys.ts", "src/crypto/keyHistoryChain.ts",
+        "src/crypto/keyHistoryEnvelope.ts", "src/crypto/keyRotationReceipt.ts",
         "src/vault/vault.ts", "src/crypto/signing/signer.ts", "src/trust/trustConfig.ts",
         "src/bundles/bundle.ts", "src/assurance/certificate.ts",
-        "src/ledger/ledger.ts", "src/receipts/receipt.ts", "src/verify/verifyAll.ts",
+        "src/ledger/ledger.ts", "src/ledger/ledgerConnection.ts", "src/ledger/ledgerVerification.ts",
+        "src/ledger/alternateBackendVerification.ts", "src/storage/blobs/blobKeys.ts",
+        "src/receipts/receipt.ts", "src/verify/verifyAll.ts",
         "src/lifecycle/artifactSignature.ts", "src/session/sessionSpine.ts",
     ],
 }
