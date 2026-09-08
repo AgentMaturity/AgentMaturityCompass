@@ -36,12 +36,12 @@ describe("release readiness scripts", () => {
     expect(gate.indexOf('step("build"')).toBeLessThan(gate.indexOf('builtStep("full-test-suite"'));
   });
 
-  test("install persona QA emits a readable feedback report", () => {
+  test("install persona QA emits a readable automated contract report", () => {
     const script = readFileSync(join(root, "scripts", "install-persona-qa.mjs"), "utf8");
 
     expect(script).toContain("--report");
     expect(script).toContain("renderMarkdownReport");
-    expect(script).toContain("Ease-of-use feedback");
+    expect(script).toContain("Automated installation contract checks");
     expect(script).toContain("npm install --no-audit --fund=false --package-lock=false");
     expect(script).toContain('const spawnError = result.error instanceof Error');
     expect(script).toContain('stdout: install.status === "passed"');

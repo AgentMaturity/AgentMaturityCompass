@@ -21,7 +21,7 @@ const personas = [
     name: "Solo Developer",
     agentId: "solo-dev-agent",
     fixture: "node-cli",
-    checks: [["history", ["history", "--limit", "5"], "Run history is readable after first score"]]
+    checks: [["history", ["history", "--limit", "5"], "History command must exit successfully after the score command."]]
   },
   {
     id: "platform-engineer",
@@ -35,14 +35,14 @@ const personas = [
     name: "Security Lead",
     agentId: "security-agent",
     fixture: "security-bot",
-    checks: [["assurance-help", ["assurance", "--help"], "Assurance commands are discoverable"]]
+    checks: [["assurance-help", ["assurance", "--help"], "Assurance help command must exit successfully."]]
   },
   {
     id: "compliance-officer",
     name: "Compliance Officer",
     agentId: "compliance-agent",
     fixture: "governance-assistant",
-    checks: [["comply-help", ["comply", "--help"], "Compliance commands are discoverable"]]
+    checks: [["comply-help", ["comply", "--help"], "Compliance help command must exit successfully."]]
   },
   {
     id: "ai-product-manager",
@@ -56,7 +56,7 @@ const personas = [
     name: "QA Engineer",
     agentId: "qa-agent",
     fixture: "test-agent",
-    checks: [["eval-help", ["eval", "--help"], "Eval commands are discoverable"]]
+    checks: [["eval-help", ["eval", "--help"], "Eval help command must exit successfully."]]
   },
   {
     id: "devops-engineer",
@@ -274,31 +274,13 @@ function writePersonaFixture(dir, persona) {
   ].join("\n"));
 }
 
-function personaFeedback(persona, steps, fullScore) {
-  const failed = steps.filter((step) => step.status !== "passed");
-  const install = steps.find((step) => step.id === "package-install");
-  const elapsed = fullScore?.elapsedMs ?? null;
-  if (failed.length > 0) {
-    return `${persona.name}: blocked by ${failed.map((step) => step.id).join(", ")}.`;
-  }
-  const speed = typeof elapsed === "number" && elapsed < 2000 ? "fast first score" : "acceptable first score";
-  const installNote = install?.durationMs && install.durationMs > 45_000 ? "install was slower than ideal" : "install was straightforward";
-  return `${persona.name}: ${installNote}; ${speed}; role-specific command worked.`;
-}
-
 function stepWithDuration(id, step, startedMs) {
-  return preserveRaw(step, {
-    id,
-    ...step,
-    durationMs: Date.now() - startedMs
-  });
+  return preserveRaw(step, { id, ...step, durationMs: Date.now() - startedMs });
 }
 
 function installPackedPackage(dir, tarball, qaEnv, execute) {
   const install = execute("npm", ["install", "--no-audit", "--fund=false", "--package-lock=false", tarball], {
-    cwd: dir,
-    env: qaEnv,
-    timeoutMs: 120_000
+    cwd: dir, env: qaEnv, timeoutMs: 120_000
   });
   return preserveRaw(install, {
     ...install,
@@ -309,187 +291,201 @@ function installPackedPackage(dir, tarball, qaEnv, execute) {
   });
 }
 
+function personaCommands(persona, amc) {
+  return [
+    ["version", [amc, "--version"], "Version command must exit successfully."],
+    ["help", [amc, "--help"], "Help command must exit successfully."],
+    ["full-score", [amc, "--agent", persona.agentId, "--json"], "Full-score command must exit successfully and return its JSON contract."],
+    ["domain-packs", [amc, "domain", "pack", "list", "--json"], "Domain catalog JSON is required."],
+    ["runtime-create", [amc, "runtime", "create", "--run", `${persona.id}-runtime`, "--agent", persona.agentId, "--json"], "Runtime creation command must exit successfully."],
+    ...persona.checks.map(([id, args, remediation]) => [id, [amc, ...args], remediation])
+  ];
+}
+
+function personaAssertions(persona) {
+  return [
+    ["amc-bin", "package-install"],
+    ["full-score-contract", "full-score"],
+    ["domain-pack-count", "domain-packs"],
+    ...persona.checks.flatMap(([id]) => id === "strategy-compare" ? [["strategy-recommendation", id]]
+      : id === "neutral-import" ? [["import-plan-ready", id]] : [])
+  ];
+}
+
+function skippedCheck(id, reason, command) {
+  return { id, status: "skipped", reason,
+    ...(command ? { command, durationMs: null, exitCode: null, startedAt: null, endedAt: null, stdout: "", stderr: "" } : {}) };
+}
+
+function plannedPersona(persona, dir, reason) {
+  const amc = join(dir, "node_modules", ".bin", "amc");
+  return {
+    persona, workspace: dir,
+    steps: [skippedCheck("package-install", reason, "npm install <packed tarball>"),
+      ...personaCommands(persona, amc).map(([id, args]) => skippedCheck(id, reason, args.join(" ")))],
+    assertions: personaAssertions(persona).map(([id]) => skippedCheck(id, reason))
+  };
+}
+
+function checkCounts(checks) {
+  const passed = checks.filter((check) => check.status === "passed").length;
+  const failed = checks.filter((check) => check.status === "failed").length;
+  const skipped = checks.filter((check) => check.status === "skipped").length;
+  return { planned: checks.length, executed: passed + failed, passed, failed, skipped };
+}
+
+function checkSummary(checks) {
+  const counts = checkCounts(checks);
+  const failed = checks.filter((check) => check.status === "failed").map((check) => check.id);
+  const skipped = checks.filter((check) => check.status === "skipped").map((check) => check.id);
+  return `${counts.passed}/${counts.planned} automated checks passed; ${counts.failed} failed; ${counts.skipped} skipped.`
+    + (failed.length ? ` Failed: ${failed.join(", ")}.` : "")
+    + (skipped.length ? ` Skipped: ${skipped.join(", ")}.` : "");
+}
+
+function duration(value) {
+  return typeof value === "number" && Number.isFinite(value) && value >= 0 ? value : null;
+}
+
+function object(value) {
+  return value !== null && typeof value === "object" && !Array.isArray(value);
+}
+
+function validateContract(id, value) {
+  switch (id) {
+    case "full-score-contract": {
+      const sla = value?.firstResultSla;
+      const valid = object(value) && value.ok === true && Number.isInteger(value.questionCount) && value.questionCount >= 240
+        && duration(value.elapsedMs) !== null && object(sla) && duration(sla.elapsedMs) !== null
+        && duration(sla.targetMs) !== null && sla.targetMs > 0 && sla.met === true
+        && sla.elapsedMs === value.elapsedMs && sla.elapsedMs <= sla.targetMs;
+      return { valid, details: valid ? `questions=${value.questionCount}; CLI-reported SLA met=true`
+        : "Required full-score JSON, question count, or coherent CLI-reported elapsed/SLA evidence is missing or invalid." };
+    }
+    case "domain-pack-count": {
+      const valid = object(value) && Array.isArray(value.packs) && value.packs.length >= 40;
+      return { valid, details: Array.isArray(value?.packs) ? `packs=${value.packs.length}` : "Required packs array is missing or invalid." };
+    }
+    case "strategy-recommendation": {
+      const recommended = value?.run?.recommendedStrategyId;
+      const valid = object(value) && typeof recommended === "string" && recommended.trim().length > 0;
+      return { valid, details: valid ? `recommended=${recommended}` : "Required run.recommendedStrategyId is missing or empty." };
+    }
+    case "import-plan-ready": {
+      const valid = object(value) && value.plan?.status === "ready";
+      return { valid, details: valid ? "plan.status=ready" : "Required plan.status=ready evidence is missing or invalid." };
+    }
+    default: throw new Error(`Unknown persona assertion: ${id}`);
+  }
+}
+
+function finalizePersona(result) {
+  const checks = [...result.steps, ...result.assertions];
+  const counts = checkCounts(checks);
+  const install = result.steps.find((step) => step.id === "package-install");
+  const scoreStep = result.steps.find((step) => step.id === "full-score");
+  const packsStep = result.steps.find((step) => step.id === "domain-packs");
+  const score = scoreStep?.status === "passed" ? parseJsonOutput(scoreStep) : null;
+  const packs = packsStep?.status === "passed" ? parseJsonOutput(packsStep) : null;
+  return {
+    ...result,
+    status: counts.executed === 0 ? "skipped" : counts.passed === counts.planned ? "passed" : "failed",
+    checkCounts: counts, summary: checkSummary(checks),
+    measurements: {
+      installWallMs: duration(install?.durationMs), scoreCommandWallMs: duration(scoreStep?.durationMs),
+      cliReportedDiagnosticMs: duration(score?.elapsedMs),
+      cliReportedSla: object(score?.firstResultSla) ? {
+        targetMs: duration(score.firstResultSla.targetMs), elapsedMs: duration(score.firstResultSla.elapsedMs),
+        met: typeof score.firstResultSla.met === "boolean" ? score.firstResultSla.met : null
+      } : null
+    },
+    evidence: {
+      questionCount: Number.isInteger(score?.questionCount) && score.questionCount >= 0 ? score.questionCount : null,
+      domainPackCount: Array.isArray(packs?.packs) ? packs.packs.length : null,
+      artifactStatus: typeof score?.artifactStatus === "string" ? score.artifactStatus : null,
+      evidenceStatus: typeof score?.evidenceStatus === "string" ? score.evidenceStatus : null,
+      claimEligible: typeof score?.claimEligible === "boolean" ? score.claimEligible : null
+    }
+  };
+}
+
 export function runPersona(persona, tarball, tmp, { baseEnv = process.env, execute = run } = {}) {
   const qaEnv = createPersonaEnvironment(baseEnv, tmp);
   const dir = join(tmp, "personas", persona.id);
   mkdirSync(dir, { recursive: true });
   writePersonaFixture(dir, persona);
-  const steps = [];
-
-  let t0 = Date.now();
-  steps.push(stepWithDuration("package-install", requirePassed(
-    installPackedPackage(dir, tarball, qaEnv, execute),
-    "Packed package extraction or dependency linking failed."
-  ), t0));
-
-  // A failed install may still leave a bin. Never execute that partial consumer.
-  if (steps[0].status !== "passed") {
-    return { persona, workspace: dir, steps, rating: 0, feedback: personaFeedback(persona, steps, null) };
-  }
+  const result = plannedPersona(persona, dir, "package-install has not passed");
+  const startedMs = Date.now();
+  result.steps[0] = stepWithDuration("package-install", requirePassed(
+    installPackedPackage(dir, tarball, qaEnv, execute), "Packed package installation failed."
+  ), startedMs);
+  // Even a failed install can leave a bin. Its consumers remain explicitly unrun.
+  if (result.steps[0].status !== "passed") return finalizePersona(result);
 
   const amc = join(dir, "node_modules", ".bin", "amc");
-  if (!existsSync(amc)) {
-    steps.push({
-      id: "amc-bin",
-      command: amc,
-      status: "failed",
-      exitCode: 1,
-      startedAt: new Date().toISOString(),
-      endedAt: new Date().toISOString(),
-      durationMs: 0,
-      stdout: "",
-      stderr: "amc bin missing after install",
-      remediation: "Ensure package.json bin points to a packed executable."
-    });
-    return { persona, workspace: dir, steps, rating: 0, feedback: `${persona.name}: install did not expose amc.` };
+  const binPresent = existsSync(amc);
+  result.assertions[0] = { id: "amc-bin", status: binPresent ? "passed" : "failed",
+    details: binPresent ? "Installed CLI bin is present." : "Installed CLI bin is missing." };
+  if (result.assertions[0].status !== "passed") {
+    result.steps = result.steps.map((step) => step.status === "skipped" ? skippedCheck(step.id, "amc-bin failed", step.command) : step);
+    result.assertions = result.assertions.map((check) => check.status === "skipped" ? skippedCheck(check.id, "amc-bin failed") : check);
+    return finalizePersona(result);
   }
 
-  const commonCommands = [
-    ["version", [amc, "--version"], "Version prints."],
-    ["help", [amc, "--help"], "Help prints."],
-    ["full-score", [amc, "--agent", persona.agentId, "--json"], "One-command full score returns JSON."],
-    ["domain-packs", [amc, "domain", "pack", "list", "--json"], "Domain pack catalog lists 40 packs."],
-    ["runtime-create", [amc, "runtime", "create", "--run", `${persona.id}-runtime`, "--agent", persona.agentId, "--json"], "Runtime run manager works."]
-  ];
-
-  for (const [id, commandArgs, remediation] of commonCommands) {
-    t0 = Date.now();
-    steps.push(stepWithDuration(id, requirePassed(
-      execute(commandArgs[0], commandArgs.slice(1), { cwd: dir, env: qaEnv, timeoutMs: 60_000 }),
-      remediation
-    ), t0));
+  for (const [index, [id, args, remediation]] of personaCommands(persona, amc).entries()) {
+    const started = Date.now();
+    result.steps[index + 1] = stepWithDuration(id, requirePassed(
+      execute(args[0], args.slice(1), { cwd: dir, env: qaEnv, timeoutMs: 60_000 }), remediation
+    ), started);
   }
-
-  for (const [id, commandArgs, remediation] of persona.checks) {
-    t0 = Date.now();
-    steps.push(stepWithDuration(id, requirePassed(
-      execute(amc, commandArgs, { cwd: dir, env: qaEnv, timeoutMs: 60_000 }),
-      remediation
-    ), t0));
+  for (const [index, [id, dependency]] of personaAssertions(persona).entries()) {
+    if (id === "amc-bin") continue;
+    const step = result.steps.find((entry) => entry.id === dependency);
+    if (step?.status !== "passed") {
+      result.assertions[index] = skippedCheck(id, `${dependency} did not pass`);
+    } else {
+      const { valid, details } = validateContract(id, parseJsonOutput(step));
+      result.assertions[index] = { id, status: valid ? "passed" : "failed", details };
+    }
   }
-
-  const fullScore = parseJsonOutput(steps.find((step) => step.id === "full-score") ?? { stdout: "" });
-  const packs = parseJsonOutput(steps.find((step) => step.id === "domain-packs") ?? { stdout: "" });
-  const strategy = parseJsonOutput(steps.find((step) => step.id === "strategy-compare") ?? { stdout: "" });
-  const importPlan = parseJsonOutput(steps.find((step) => step.id === "neutral-import") ?? { stdout: "" });
-
-  const assertions = [];
-  assertions.push({
-    id: "full-score-contract",
-    status: fullScore?.ok === true && fullScore?.questionCount >= 240 && fullScore?.firstResultSla?.met === true ? "passed" : "failed",
-    details: fullScore ? `questions=${fullScore.questionCount}; firstResult=${fullScore.firstResultSla?.met}` : "full score JSON missing"
-  });
-  assertions.push({
-    id: "domain-pack-count",
-    status: Array.isArray(packs?.packs) && packs.packs.length >= 40 ? "passed" : "failed",
-    details: `packs=${packs?.packs?.length ?? 0}`
-  });
-  if (strategy) {
-    assertions.push({
-      id: "strategy-recommendation",
-      status: typeof strategy?.run?.recommendedStrategyId === "string" || typeof strategy?.recommendedStrategyId === "string" ? "passed" : "failed",
-      details: JSON.stringify({ recommended: strategy?.run?.recommendedStrategyId ?? strategy?.recommendedStrategyId ?? null })
-    });
-  }
-  if (importPlan) {
-    assertions.push({
-      id: "import-plan-ready",
-      status: importPlan?.plan?.status === "ready" || importPlan?.status === "ready" ? "passed" : "failed",
-      details: JSON.stringify({ status: importPlan?.plan?.status ?? importPlan?.status ?? null })
-    });
-  }
-
-  const failed = steps.filter((step) => step.status !== "passed").length + assertions.filter((step) => step.status !== "passed").length;
-  const total = steps.length + assertions.length;
-  const rating = Math.round(((total - failed) / total) * 100) / 10;
-  return {
-    persona,
-    workspace: dir,
-    steps,
-    assertions,
-    rating,
-    feedback: personaFeedback(persona, steps, fullScore)
-  };
+  return finalizePersona(result);
 }
 
 function markdownCell(value) {
-  return String(value ?? "").replace(/\|/g, "\\|").replace(/\s+/g, " ").trim();
+  return String(value ?? "n/a").replace(/\|/g, "\\|").replace(/\s+/g, " ").trim();
 }
 
-function extractFirstScore(result) {
-  return parseJsonOutput(result.steps.find((step) => step.id === "full-score") ?? { stdout: "" });
-}
-
-function extractPacks(result) {
-  return parseJsonOutput(result.steps.find((step) => step.id === "domain-packs") ?? { stdout: "" });
-}
-
-function roleWorkflowSummary(result) {
-  const commonIds = new Set(["package-install", "version", "help", "full-score", "domain-packs", "runtime-create"]);
-  const roleSteps = result.steps.filter((step) => !commonIds.has(step.id));
-  return roleSteps.map((step) => `${step.id}:${step.status}`).join(", ") || "none";
-}
-
-function renderMarkdownReport(receipt) {
+export function renderMarkdownReport(receipt) {
   const lines = [
-    "# AMC Install Persona QA Report",
-    "",
-    `Status: ${receipt.status.toUpperCase()}`,
-    `Summary: ${receipt.summary}`,
-    `Started: ${receipt.startedAt}`,
-    `Ended: ${receipt.endedAt}`,
-    `Personas: ${receipt.personaCount}`,
-    `Average rating: ${receipt.averageRating}/10`,
-    "",
-    "## Ease-of-use feedback",
-    "",
-    "| Persona | Rating | Install | First score | Packs | Role workflow | Feedback |",
-    "| --- | ---: | ---: | ---: | ---: | --- | --- |"
+    "# AMC Automated Installation Contract Report", "",
+    `Schema: ${receipt.schemaVersion}`, `Status: ${receipt.status.toUpperCase()}`,
+    `Summary: ${receipt.summary}`, `Started: ${receipt.startedAt}`, `Ended: ${receipt.endedAt}`,
+    `Personas: ${receipt.personaCount}`, "", "## Automated installation contract checks", "",
+    "| Persona | Status | Passed / planned checks | Failed | Skipped | Install wall ms | Score command wall ms | CLI-reported diagnostic ms | Score evidence status |",
+    "| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | --- |"
   ];
-
   for (const result of receipt.results) {
-    const install = result.steps.find((step) => step.id === "package-install");
-    const fullScore = extractFirstScore(result);
-    const packs = extractPacks(result);
-    lines.push([
-      markdownCell(result.persona.name),
-      `${result.rating}/10`,
-      install?.durationMs != null ? `${install.durationMs}ms` : "n/a",
-      fullScore?.elapsedMs != null ? `${fullScore.elapsedMs}ms` : "n/a",
-      Array.isArray(packs?.packs) ? String(packs.packs.length) : "n/a",
-      markdownCell(roleWorkflowSummary(result)),
-      markdownCell(result.feedback)
-    ].join(" | ").replace(/^/, "| ").replace(/$/, " |"));
+    const counts = result.checkCounts;
+    lines.push(`| ${[
+      result.persona.name, result.status, `${counts.passed}/${counts.planned}`, counts.failed, counts.skipped,
+      result.measurements.installWallMs, result.measurements.scoreCommandWallMs, result.measurements.cliReportedDiagnosticMs,
+      result.evidence.evidenceStatus
+    ].map(markdownCell).join(" | ")} |`);
   }
-
-  lines.push(
-    "",
-    "## Failed checks",
-    "",
-    ...receipt.results.flatMap((result) => {
-      const failedSteps = result.steps.filter((step) => step.status !== "passed");
-      const failedAssertions = (result.assertions ?? []).filter((assertion) => assertion.status !== "passed");
-      if (failedSteps.length === 0 && failedAssertions.length === 0) {
-        return [`- ${result.persona.name}: none`];
-      }
-      return [
-        `- ${result.persona.name}: ${[
-          ...failedSteps.map((step) => step.id),
-          ...failedAssertions.map((assertion) => assertion.id)
-        ].join(", ")}`
-      ];
-    }),
-    "",
-    "## Coverage",
-    "",
-    "- Clean npm install of the packed tarball and CLI bin exposure.",
-    "- CLI version and help startup.",
-    "- One-command full score JSON with 240-question contract and first-result SLA.",
-    "- Domain pack catalog count.",
-    "- Runtime run creation for each local persona agent.",
-    "- Role-specific workflow command for each persona."
-  );
-
+  lines.push("", "## Failed and skipped checks", "");
+  const appendChecks = (label, checks) => {
+    for (const check of checks.filter((entry) => entry.status !== "passed")) {
+      lines.push(`- ${markdownCell(label)}: ${check.status} ${markdownCell(check.id)} — ${markdownCell(check.reason ?? check.details ?? check.remediation ?? check.stderr)}`);
+    }
+  };
+  appendChecks("Setup", [...receipt.setupSteps, ...receipt.setupAssertions]);
+  for (const result of receipt.results) appendChecks(result.persona.name, [...result.steps, ...result.assertions]);
+  if ([...receipt.setupSteps, ...receipt.setupAssertions, ...receipt.results.flatMap((result) => [...result.steps, ...result.assertions])]
+    .every((check) => check.status === "passed")) lines.push("- None.");
+  lines.push("", "## Measurement scope", "", receipt.scope,
+    "- Command wall times include the child invocation. CLI-reported diagnostic elapsed excludes later evidence writing and output.",
+    "- Missing measurements are unavailable. CLI-reported SLA target, elapsed and met fields are retained in JSON.",
+    "- A fresh INSUFFICIENT_EVIDENCE score can satisfy the output contract; accepted maturity claims require separate evidence.");
   return `${lines.join("\n")}\n`;
 }
 
@@ -514,38 +510,47 @@ function main() {
   const qaEnv = createPersonaEnvironment(process.env, tmp);
   const startedAt = new Date().toISOString();
   const setupSteps = [];
+  const setupAssertions = [];
   let tarball = null;
 
   try {
-    setupSteps.push(requirePassed(
+    const packStarted = Date.now();
+    setupSteps.push(stepWithDuration("package-pack", requirePassed(
       run("npm", ["pack", "--json", "--ignore-scripts", "--pack-destination", tmp], { cwd: root, env: qaEnv, timeoutMs: 120_000 }),
       "Could not pack the built AMC package."
-    ));
+    ), packStarted));
     if (setupSteps[0].status === "passed") {
       const packed = readdirSync(tmp).find((name) => name.endsWith(".tgz"));
       tarball = packed ? join(tmp, packed) : null;
     }
-    if (!tarball || !existsSync(tarball)) {
-      throw new Error("npm pack did not produce an installable tarball");
-    }
-
-    const results = personas.map((persona) => runPersona(persona, tarball, tmp));
-    const failedPersonas = results.filter((result) => result.rating < 10);
-    const averageRating = Math.round((results.reduce((sum, result) => sum + result.rating, 0) / results.length) * 10) / 10;
+    const ready = setupSteps[0].status === "passed" && tarball !== null && existsSync(tarball);
+    setupAssertions.push(setupSteps[0].status !== "passed"
+      ? skippedCheck("package-tarball", "package-pack did not pass")
+      : { id: "package-tarball", status: ready ? "passed" : "failed",
+        details: ready ? "Packed tarball is present." : "npm pack did not produce an installable tarball." });
+    const results = personas.map((persona) => ready ? runPersona(persona, tarball, tmp)
+      : finalizePersona(plannedPersona(persona, join(tmp, "personas", persona.id), "Package setup did not pass")));
+    const checks = results.flatMap((result) => [...result.steps, ...result.assertions]);
+    const setupCheckCounts = checkCounts([...setupSteps, ...setupAssertions]);
+    const counts = checkCounts(checks);
+    const passed = setupCheckCounts.passed === setupCheckCounts.planned && results.every((result) => result.status === "passed");
     const receipt = {
-      schemaVersion: "2026-05-26",
+      schemaVersion: "2026-09-08",
       receiptType: "install-persona-qa",
+      measurementType: "automated-contract-checks",
       startedAt,
       endedAt: new Date().toISOString(),
-      status: failedPersonas.length === 0 ? "passed" : "failed",
-      summary: failedPersonas.length === 0
-        ? `All ${personas.length} install personas passed.`
-        : `${failedPersonas.length} of ${personas.length} install personas failed.`,
+      status: passed ? "passed" : "failed",
+      summary: `${counts.passed}/${counts.planned} persona checks passed; ${counts.failed} failed; ${counts.skipped} skipped.`
+        + ` Setup: ${setupCheckCounts.passed}/${setupCheckCounts.planned} checks passed; ${setupCheckCounts.failed} failed; ${setupCheckCounts.skipped} skipped.`,
       packageTarball: tarball,
       personaCount: personas.length,
-      averageRating,
+      checkCounts: counts,
+      setupCheckCounts,
+      scope: "Automated command exit and declared JSON contract checks. Human usability, workflow quality and maturity qualification are outside this measurement.",
       reportPath,
       setupSteps,
+      setupAssertions,
       results
     };
     mkdirSync(dirname(outPath), { recursive: true });
@@ -556,11 +561,10 @@ function main() {
       process.stdout.write(`${JSON.stringify(receipt, null, 2)}\n`);
     } else {
       console.log(`${receipt.status.toUpperCase()} ${receipt.summary}`);
-      console.log(`Average rating: ${averageRating}/10`);
       console.log(`Receipt: ${outPath}`);
       console.log(`Report: ${reportPath}`);
       for (const result of results) {
-        console.log(`- ${result.rating === 10 ? "PASS" : "FAIL"} ${result.persona.name}: ${result.rating}/10`);
+        console.log(`- ${result.status.toUpperCase()} ${result.persona.name}: ${result.summary}`);
       }
     }
     if (receipt.status !== "passed") {

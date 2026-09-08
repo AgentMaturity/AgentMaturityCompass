@@ -60,7 +60,7 @@ describe("fresh persona environments", () => {
         expect(command).toBe(join(options.cwd, "node_modules", ".bin", "amc"));
       }
       const payload = args[0] === "--agent"
-        ? { ok: true, questionCount: 244, firstResultSla: { met: true }, elapsedMs: 100 }
+        ? { ok: true, questionCount: 244, firstResultSla: { targetMs: 120000, elapsedMs: 100, met: true }, elapsedMs: 100 }
         : args[0] === "domain" ? { packs: Array.from({ length: 40 }, (_, i) => ({ packId: String(i) })) } : {};
       return { status: "passed", exitCode: 0, stdout: JSON.stringify(payload), stderr: "", startedAt: "fixture", endedAt: "fixture" };
     };
@@ -85,8 +85,10 @@ describe("fresh persona environments", () => {
       }
     });
     expect(calls).toEqual(["npm"]);
-    expect(result.steps).toHaveLength(1);
+    expect(result.steps).toHaveLength(6);
     expect(result.steps[0].status).toBe("failed");
+    expect(result.steps.slice(1).every((step: { status: string }) => step.status === "skipped")).toBe(true);
+    expect(result.checkCounts).toEqual({ planned: 9, executed: 1, passed: 0, failed: 1, skipped: 8 });
   });
 
   it("also isolates the clean-source runtime while retaining its documented source build commands", () => {
