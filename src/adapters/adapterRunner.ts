@@ -60,7 +60,7 @@ export interface AdapterRunResult {
   forcedSimulate: boolean;
   dashboardUrl: string | null;
   exitCode: number;
-  captureCoverage?: ReturnType<typeof deepseekHarnessCoverage> & { stdoutBytes: number; stdoutOmitted: boolean; stderrBytes: number; spawnObserved: boolean };
+  captureCoverage?: ReturnType<typeof deepseekHarnessCoverage> & { stdoutBytes: number; stdoutOmitted: boolean; stderrBytes: number; spawnObserved: boolean; requestedSignal: "SIGINT" | "SIGTERM" | null; childExitCode: number | null; childSignal: NodeJS.Signals | null };
 }
 
 function resolveBudgetLimits(workspace: string, agentId: string): {
@@ -238,6 +238,9 @@ export async function runAdapterCommand(input: AdapterRunInput): Promise<Adapter
   let stderrBytes = 0;
   let stdoutOmitted = false;
   let spawnObserved = false;
+  let requestedSignal: "SIGINT" | "SIGTERM" | null = null;
+  let childExitCode: number | null = null;
+  let childSignal: NodeJS.Signals | null = null;
   try {
     if (isDsh) {
       dshLaunch = prepareDeepseekHarnessLaunch({ launch: profile!.deepseekHarnessLaunch!, task: userCommand, routeUrl, model });
@@ -293,7 +296,8 @@ export async function runAdapterCommand(input: AdapterRunInput): Promise<Adapter
         ...(isDsh ? { cwd: workspace } : {})
       });
       let stopTimer: ReturnType<typeof setTimeout> | undefined;
-      const forwardSignal = (signal: NodeJS.Signals) => {
+      const forwardSignal = (signal: "SIGINT" | "SIGTERM") => {
+        requestedSignal ??= signal;
         child.kill(signal);
         if (!stopTimer) stopTimer = setTimeout(() => child.kill("SIGKILL"), 5_000);
       };
@@ -364,9 +368,12 @@ export async function runAdapterCommand(input: AdapterRunInput): Promise<Adapter
           for (const [eventType, payload] of [
             ["agent_stdout", text],
             ["agent_stderr", JSON.stringify({ bytes: stderrBytes, content: "omitted: may contain private reasoning or credentials" })]
-          ] as const) ledger.appendEvidence({ sessionId, runtime: "any", eventType, payload, payloadExt: "txt", inline: true, meta: { adapterId: adapter.id, agentId, trustTier: "OBSERVED", evidenceBoundary: "process_only", signal, spawnObserved } });
+          ] as const) ledger.appendEvidence({ sessionId, runtime: "any", eventType, payload, payloadExt: "txt", inline: true, meta: { adapterId: adapter.id, agentId, trustTier: "OBSERVED", evidenceBoundary: "process_only", signal, requestedSignal, spawnObserved } });
         }
-        exitCode = code ?? 1;
+        childExitCode = code;
+        childSignal = signal;
+        // A runtime may handle SIGINT/SIGTERM by exiting zero; the wrapper was still interrupted.
+        exitCode = isDsh && requestedSignal ? (requestedSignal === "SIGINT" ? 130 : 143) : (code ?? 1);
         resolvePromise();
       });
     });
@@ -375,13 +382,14 @@ export async function runAdapterCommand(input: AdapterRunInput): Promise<Adapter
       sessionId,
       runtime: "any",
       eventType: "agent_process_exited",
-      payload: JSON.stringify({ exitCode }),
+      payload: JSON.stringify({ exitCode, ...(isDsh ? { requestedSignal, childExitCode, childSignal } : {}) }),
       payloadExt: "json",
       inline: true,
       meta: {
         adapterId: adapter.id,
         agentId,
         exitCode,
+        ...(isDsh ? { requestedSignal, childExitCode, childSignal } : {}),
         trustTier: "OBSERVED"
       }
     });
@@ -402,7 +410,7 @@ export async function runAdapterCommand(input: AdapterRunInput): Promise<Adapter
     forcedSimulate,
     dashboardUrl: status.state ? `http://${status.state.host}:${status.state.dashboardPort}` : null,
     exitCode,
-    ...(isDsh ? { captureCoverage: { ...deepseekHarnessCoverage(), stdoutBytes, stdoutOmitted, stderrBytes, spawnObserved } } : {})
+    ...(isDsh ? { captureCoverage: { ...deepseekHarnessCoverage(), stdoutBytes, stdoutOmitted, stderrBytes, spawnObserved, requestedSignal, childExitCode, childSignal } } : {})
   };
 }
 

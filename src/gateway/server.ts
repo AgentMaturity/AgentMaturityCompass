@@ -23,6 +23,7 @@ import {
 import { applyUpstreamAuth, missingUpstreamAuthRefs, upstreamCredentials } from "./upstreamAuth.js";
 import type { CredentialsService } from "../credentials/credentialsService.js";
 import { redactBody, redactHeaders } from "./redaction.js";
+import { relayGatewayResponse } from "./streamPassthrough.js";
 import { monitorPublicKeyFingerprint } from "../receipts/receipt.js";
 import { sha256Hex } from "../utils/hash.js";
 import { verifyLeaseToken } from "../leases/leaseVerifier.js";
@@ -1581,34 +1582,9 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
       let responseBody: Buffer;
 
       if (streamPassthrough) {
-        res.statusCode = upstreamResponse.statusCode ?? 500;
-        for (const [headerKey, headerValue] of Object.entries(upstreamResponse.headers)) {
-          if (typeof headerValue !== "undefined" && headerKey.toLowerCase() !== "content-length") {
-            res.setHeader(headerKey, headerValue as string | string[]);
-          }
-        }
-        const upstreamTrailer = upstreamResponse.headers["trailer"];
-        const trailerHeader =
-          typeof upstreamTrailer === "string" && upstreamTrailer.trim().length > 0
-            ? `${upstreamTrailer}, x-amc-receipt-trailer`
-            : "x-amc-receipt-trailer";
-        res.setHeader("Trailer", trailerHeader);
-        res.setHeader("x-amc-request-id", requestId);
-        res.setHeader("x-amc-request-receipt", requestEvent.receipt);
-        res.setHeader("x-amc-monitor-pub-fpr", monitorPubFingerprint);
-        res.setHeader("x-amc-receipt-mode", "trailer");
-
-        const chunks: Buffer[] = [];
-        await new Promise<void>((resolvePromise, rejectPromise) => {
-          upstreamResponse.on("data", (chunk: Buffer | string) => {
-            const buffer = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk);
-            chunks.push(buffer);
-            res.write(buffer);
-          });
-          upstreamResponse.once("end", () => resolvePromise());
-          upstreamResponse.once("error", rejectPromise);
+        responseBody = await relayGatewayResponse(upstreamResponse, res, {
+          requestId, requestReceipt: requestEvent.receipt, monitorPubFingerprint
         });
-        responseBody = Buffer.concat(chunks);
       } else {
         responseBody = await readAll(upstreamResponse);
       }
@@ -1703,6 +1679,11 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
           status
         }
       });
+      // A partial stream cannot be replaced by a JSON error or a successful receipt.
+      if (res.headersSent || res.destroyed || res.writableEnded) {
+        if (!res.destroyed && !res.writableEnded) res.destroy();
+        return;
+      }
       res.statusCode = status;
       res.setHeader("content-type", "application/json");
       res.end(JSON.stringify(body));
