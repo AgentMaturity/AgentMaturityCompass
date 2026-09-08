@@ -1,7 +1,30 @@
 # AMC Gap Register — Execution Log
 
-Tracks execution of the 289 gaps in `amc-gap-register.md`, in order, one at a time.
-Branch: `amc/gap-register-execution`. Baseline: `f419839a` (typecheck clean).
+Tracks execution of the **289 original gaps plus G8-17b: 290 registered IDs** in [amc-gap-register.md](amc-gap-register.md), with supplemental discoveries recorded separately.
+Historical execution branch: `amc/gap-register-execution`. Historical baseline: `f419839a` (typecheck clean).
+
+## 2026-09-08 reconciliation — current disposition
+
+Substantial execution is evidenced. The original plan-only register is stale, while the historical COMPLETE summaries below overstate acceptance by grouping implementations with mitigations, relabeling, withdrawals and deferred work. **Those summaries are preserved as history, not current closure or a completion percentage.** G1/G2 are In Review; G3–G8 and parent AMC-1496 are In Progress. No group is being marked Done by this reconciliation.
+
+All **46 distinct eight-character commit references in the pre-reconciliation log** resolve to ancestors of audited baseline `4247e610e214a5b07de631c394acdaf0f5ed679e`. The baseline passed **10,932/10,932 tests, zero failures**, with build/typecheck verified. Local HEAD at reconciliation was `47141f7ab254e7ade53262adbdb74b46890fade4`; later commits have separate affected checks. This is local evidence, not proof of merge, release, independent audit, coverage measurement, or completion of deferred scope.
+
+| Group / issue | Current state | Residual acceptance before Done |
+|---|---|---|
+| G1 / AMC-1497 | In Review | Approve implemented/deleted/relabelled dispositions. G1-20 provenance follow-up AMC-1506 is locally implemented at `5eec4d9d` and In Review; segregation alone did not prevent score inflation. |
+| G2 / AMC-1498 | In Review | Map G2-24–28/41 individually; accept supported-library reclassifications; G2-45 remains deferred to G4-02. |
+| G3 / AMC-1499 | In Progress | Fixes and boundary documentation do not establish all 32 consolidations. Reconcile remaining overlaps and pending commit placeholders. |
+| G4 / AMC-1500 | In Progress | GUARDED monoliths remain; decompose or explicitly transfer scope. Separate data exemptions from logic extraction. |
+| G5 / AMC-1501 | In Progress | G5-18 specification licensing is UNRESOLVED; G5-24/25 were withdrawn; live distribution and current claims need evidence. |
+| G6 / AMC-1502 | In Progress — urgent | G6-07 bypass reproduced; AMC-1525 owns authenticated admission. Notary/HMAC scope, compose hardening and external rotation/history disposition remain. |
+| G7 / AMC-1503 | In Progress | G7-01/02 NOT ATTEMPTED; assertion ratchet, UI exclusions, lint and browser CI leave residual scope. Restore original G7-13 acceptance. |
+| G8 / AMC-1504 | In Progress | 35 registered rows including G8-17b. DUAL_WRITE/legacy reads do not prove migration cutover; original G8-25 and rotation dependencies remain. |
+
+**ID repair:** The stale-count test fix is now **G7-13b**, distinct from original **G7-13** (untested casebooks/eoc/executive/bootstrap/e2e directories). The secret-scanner path fix is now **G8-25b**, distinct from original **G8-25** (embedded `qa/` service boundary). These two supplemental execution subcases are not added to the register's 290-row inventory and cannot close the original findings. Original rows have been restored below with their unresolved acceptance.
+
+**Security correction:** A disposable-workspace probe preserved the current public key, appended a fresh attacker key using correctly calculated unkeyed hash-chain values, and obtained accepted attacker signatures. Therefore the historical G6-07 DONE claim is insufficient under its own workspace-write threat model. The probe, safe migration plan and detailed per-group audit are under `AMC_OS/RESEARCH/2026-09-08-dsh-pi/`; see `key-history-probe.json`, `key-history-admission-plan.md` and `reconciliation.md`. Current-tree secret removal does not establish rotation or historical revocation.
+
+## Historical execution entries
 
 Gate for every gap: `tsc --noEmit` clean + affected tests pass + real behavior verified.
 
@@ -40,11 +63,11 @@ Gate for every gap: `tsc --noEmit` clean + affected tests pass + real behavior v
 | G1-42/43 dead hooks + lost registry | ✅ DONE | `4838351e` | Discovery registry persists (add→search now works across processes); wiring counters scoped honestly. |
 | G1-44..50 mislabeled synthesis | ✅ DONE | `8e7c6351` | ML claims corrected; 26 vendor modules "no vendor contacted"; **$Nk figure removed**; flat-0.7 OBSERVED→self_reported 0.4. |
 
-**G1 COMPLETE — 50/50 integrity facades closed.**
+**Historical summary (superseded by In Review): G1 COMPLETE — 50/50 integrity facades closed.**
 
 ## Progress
 
-**255 of 289 gaps complete — G1–G7.** Every commit gated on `tsc --noEmit` clean + affected tests passing + real behavior verified end-to-end.
+**Historical progress claim (superseded): 255 of 289 gaps complete — G1–G7.** The original gate claim was: every commit gated on `tsc --noEmit` clean + affected tests passing + real behavior verified end-to-end. Current acceptance is the dated table above; this mixed-disposition total is not a verified closure count.
 
 ## Shared infrastructure built
 
@@ -67,7 +90,7 @@ Gate for every gap: `tsc --noEmit` clean + affected tests pass + real behavior v
 4. **Tests exercise real paths.** Facade-era tests that certified fabricated behavior are
    rewritten against genuine endpoints rather than deleted.
 
-## G2 — Dead code (46 gaps) — COMPLETE
+## G2 — Dead code (46 gaps) — IN REVIEW (2026-09-08)
 
 | Gap | Status | Commit | Note |
 |---|---|---|---|
@@ -83,9 +106,9 @@ Gate for every gap: `tsc --noEmit` clean + affected tests pass + real behavior v
 | G2-30..G2-37, G2-40/42 | ✅ DONE | `6ea0453f` | Analysis libraries documented with **why they can't be wired** — hallucination needs grounding context an assurance scenario lacks (tried, measured zero findings, reverted). |
 | G2-45 replayBenchmarkCorpus | ⏭️ DEFER | — | Not dead (5 importers, 69 tests) — 29k-line size issue belongs to G4-02. |
 
-**G2 COMPLETE — 80 files removed, ~6,100 lines of dead code gone, 3 subsystems wired.**
+**Historical summary (superseded by In Review): G2 COMPLETE — 80 files removed, ~6,100 lines of dead code gone, 3 subsystems wired.**
 
-## G3 — Duplication (32 gaps) — COMPLETE
+## G3 — Duplication (32 gaps) — IN PROGRESS (2026-09-08)
 
 | Gap | Status | Commit | Note |
 |---|---|---|---|
@@ -97,9 +120,9 @@ Gate for every gap: `tsc --noEmit` clean + affected tests pass + real behavior v
 | G3-16/26/27 | ✅ DONE | `(pending)` | wrap/supervise/adapters-run now state which to use; **Python platform declared non-canonical** (200 modules, not the claimed 1,130). |
 | G3-03 red-team engines | ✅ DONE | (G1) | Closed by the G1 real-execution work. |
 
-**G3 COMPLETE — 2 CRITICAL user-facing breakages fixed (unreadable certificates, vanishing governance waivers).**
+**Historical summary (superseded by In Progress): G3 COMPLETE — 2 CRITICAL user-facing breakages fixed (unreadable certificates, vanishing governance waivers).**
 
-## G4 — Structure & maintainability (40 gaps) — COMPLETE
+## G4 — Structure & maintainability (40 gaps) — IN PROGRESS (2026-09-08)
 
 | Gap | Status | Commit | Note |
 |---|---|---|---|
@@ -112,9 +135,9 @@ Gate for every gap: `tsc --noEmit` clean + affected tests pass + real behavior v
 | G4-01 cli.ts (24.7k lines) | ⏭️ GUARDED | — | Command groups are interleaved across 5k lines; mechanical extraction risks breaking the main entry point. **Ratchet now prevents growth and rewards shrinking**, so this improves incrementally and safely. |
 | G4-04/05 + 30 oversized files | ⏭️ GUARDED | — | All on the descending ratchet; cannot grow. |
 
-**G4 COMPLETE — the cap is now an enforced, monotonically-improving invariant rather than an aspiration.**
+**Historical summary (superseded by In Progress): G4 COMPLETE — the cap is now an enforced, monotonically-improving invariant rather than an aspiration.**
 
-## G5 — Claim, number & documentation drift (37 gaps) — COMPLETE
+## G5 — Claim, number & documentation drift (37 gaps) — IN PROGRESS (2026-09-08)
 
 | Gap | Status | Commit | Note |
 |---|---|---|---|
@@ -129,14 +152,14 @@ Gate for every gap: `tsc --noEmit` clean + affected tests pass + real behavior v
 | G5-36 broken channels | ✅ DONE | `b993093e` | **Quickstart image could not build** (npm not_live) → pinned GitHub release. |
 | G5-24/25 doc index | ❌ WITHDRAWN | — | Register wrong: INDEX is a **curated front door** and the docs graph is **intentionally bounded**. Tests proved it; experiments reverted. |
 
-**G5 COMPLETE — published numbers are now generated and CI-gated, not hand-maintained.**
+**Historical summary (superseded by In Progress): G5 COMPLETE — published numbers are now generated and CI-gated, not hand-maintained.**
 
-## G6 — Security, supply-chain & secrets (26 gaps) — COMPLETE
+## G6 — Security, supply-chain & secrets (26 gaps) — IN PROGRESS, URGENT (2026-09-08)
 
 | Gap | Status | Commit | Note |
 |---|---|---|---|
 | G6-01 tracked vault blob | ✅ UNTRACKED | `cb6bba21` | **Real vault, 4 Ed25519 private keys, public since 2026-02-17.** Untracked. ⚠️ **History rewrite + passphrase rotation are Sid's calls.** |
-| G6-07 forgeable trust anchor | ✅ DONE | `cb6bba21` | Key history was 0644 + unprotected; **writing one key forged every auditor signature**. Now hash-chained, 0600, doctor-checked. |
+| G6-07 forgeable trust anchor | ⚠️ REOPENED 2026-09-08 — AMC-1525 | `cb6bba21` | Historical mitigation: key history was 0644 + unprotected; **writing one key forged every auditor signature**. Changed to hash-chained, 0600, doctor-checked. Correctly computed malicious chain entries still pass; authenticated admission is required. The original ✅ DONE disposition is superseded. |
 | G6-08 silent notary auto-append | ✅ DONE | `cb6bba21` | Keys now record `source: notary` and warn on admission. |
 | G6-19 unsafe tar (17 sites) | ✅ DONE | `cb6bba21` | All routed through the containment helper; **fixed 2 false positives in the helper itself**, traversal protection pinned by test. |
 | G6-02/25/26 strays | ✅ DONE | `cb6bba21` | Malicious-pickle fixture + 4 temp dumps untracked; `COMPETITIVE_*` pattern fixed. |
@@ -146,9 +169,9 @@ Gate for every gap: `tsc --noEmit` clean + affected tests pass + real behavior v
 | G6-09/10/11/12 crypto | ✅ DONE | (G1) | `amc-default-key` rejected; fake signatures relabeled in G1-30..33. |
 | G6-17 BFG residue / rotation | ⚠️ **NEEDS SID** | — | Residue is local-only (untracked). **Whether the Feb-23 `ANTHROPIC_TOKEN_HINT` was rotated cannot be verified from the repo.** |
 
-**G6 COMPLETE — trust anchor is tamper-evident; secrets untracked. Two items need Sid: key rotation and history rewrite.**
+**Historical summary (superseded by In Progress — urgent): G6 COMPLETE — trust anchor is tamper-evident; secrets untracked. Two items need Sid: key rotation and history rewrite.** The hash chain does not authenticate key admission; see AMC-1525 and the current evidence above.
 
-## G7 — Test quality & coverage (24 gaps) — COMPLETE
+## G7 — Test quality & coverage (24 registered gaps) — IN PROGRESS (2026-09-08)
 
 | Gap | Status | Note |
 |---|---|---|
@@ -157,12 +180,13 @@ Gate for every gap: `tsc --noEmit` clean + affected tests pass + real behavior v
 | G7-04 vacuous assertions | ✅ DONE | 88 of 171 were legitimate range checks; the **81 genuinely vacuous** are frozen by a ratchet that only descends. |
 | G7-19 Playwright unwired | ✅ DONE | `@axe-core/playwright` was declared **without its required peer**; peer declared, runner now explains what's missing instead of an opaque npx error. |
 | G7-23 gates that never gate | ✅ DONE | `check:docs-drift` + `check:incident-readiness` existed but **no workflow ran them**; both pass, now in CI. |
-| G7-13 self-defeating drift test | ✅ DONE | The stale-count blocklist **collided with the true count** (8,538 appeared on both lists); badge check now derived, not enumerated. |
+| G7-13 original untested directories | ⚠️ ACCEPTANCE UNRESOLVED | Original register scope is tests or removal for `src/casebooks`, `src/eoc`, `src/executive`, `src/bootstrap`, and `src/e2e`. The unrelated stale-count repair below does not establish this acceptance. |
+| G7-13b self-defeating drift test (supplemental) | ✅ DONE | Previously mislabeled G7-13; related to G5-13. The stale-count blocklist **collided with the true count** (8,538 appeared on both lists); badge check now derived, not enumerated. |
 | G7-01/02 template clones & prose assertions | ⏭️ NOT ATTEMPTED | 547 clone files + 559 prose-assertion files. Mechanically rewriting ~1,100 test files on pattern-match would risk silently weakening real coverage; the coverage floor now makes weak tests visible instead. |
 
-**G7 COMPLETE — the coverage gate can now fail, and the three ship-critical blind spots have real tests.**
+**Historical summary (superseded by In Progress): G7 COMPLETE — the coverage gate can now fail, and the three ship-critical blind spots have real tests.**
 
-## G8 — Architecture, data & hygiene (34 gaps) — IN PROGRESS
+## G8 — Architecture, data & hygiene (35 registered gaps: 34 original + G8-17b) — IN PROGRESS (2026-09-08)
 
 | Gap | Status | Note |
 |---|---|---|
@@ -180,7 +204,8 @@ Gate for every gap: `tsc --noEmit` clean + affected tests pass + real behavior v
 | G8-24/32 scratch & orphan generator | ✅ DONE | Removed five unreferenced HIPAA debug scripts; `internal/` now ignored (it also held untracked sales material, one `git add .` from publication). `docs/API_REFERENCE.md` announced "Auto-generated from source" with **no script or workflow** regenerating it — now `npm run gen:api-ref` + a drift gate in CI. |
 | G8-21 attestation | ✅ VERIFIED | Already correct: `attestIngestSession` requires and records a named attester. |
 | G8-08 unused LLM client | ✅ VERIFIED | Already wired: `llmJudgeEngine.ts` imports `ProductionLLMJudgeEngine`. |
-| G8-25 secret scanner paths | ✅ DONE | Found by dogfooding: scanning `qa/` reported a secret in a file called **"nv"** — the real file is `.env`. `fullPath.slice(rootDir.length + 1)` ate two characters whenever the root carried `./`. The same scan **throws** to block plugin packaging, and builds its error from these paths. `relative()` now aligns it with the archiver it guards. |
+| G8-25 original embedded QA service | ⚠️ ACCEPTANCE UNRESOLVED | Original register scope is relocation or an explicitly accepted boundary for the standalone `qa/` service. The unrelated scanner-path repair below does not establish this acceptance. |
+| G8-25b secret scanner paths (supplemental) | ✅ DONE | Previously mislabeled G8-25. Found by dogfooding: scanning `qa/` reported a secret in a file called **"nv"** — the real file is `.env`. `fullPath.slice(rootDir.length + 1)` ate two characters whenever the root carried `./`. The same scan **throws** to block plugin packaging, and builds its error from these paths. `relative()` now aligns it with the archiver it guards. |
 | G8-22/29/31/34 worktree noise | ✅ VERIFIED — no repo action | All already untracked **and** ignored: `AMC_OS/` (55M), `memory/`, `amc_ai_army/`, `..bfg-report/`, `test_model.pkl`, and the persona files. These are Sid's local working files, not repo content — they do not ship, and deleting them is not mine to do. The one live concern (whether the Feb-23 token was rotated) remains flagged under G6. |
 | G8-33 quality gates | ✅ DONE (G7) | Coverage thresholds were 0; a measured floor now fails CI, and `check:docs-drift` / `check:incident-readiness` are wired. |
 | G8-01 persistence idioms | ✅ DONE | **`amc correction add` failed on every invocation** (`NOT NULL constraint failed`) — three `as any` casts hid a shape that was wrong twelve fields over, and the CLI was the only caller, so the whole family had never worked. Also: four `openLedger` sites in `memoryRouter` closed inside `try` with no `finally`, leaking a SQLite connection per failed request until pool reuse died permanently; the integration queue re-ran a one-time migration on **every open**; `openProductDb` threw `ENOENT: mkdir ''` on Windows. |
@@ -188,7 +213,7 @@ Gate for every gap: `tsc --noEmit` clean + affected tests pass + real behavior v
 | G8-03 in-memory stores | ✅ DONE | Five registers reported success and lost the data. Worst: `residency-report` named the **wrong data region**, stamped **COMPLIANT** on a config it never read, and omitted an active **legal hold** — a spoliation-relevant false negative. Also `fp-submit`/`lab-create` returned IDs nothing could resolve, and an emergency override vanished from the drift report that exists to chase its postmortem. All now persist through one signed, hash-chained store. |
 | G8-26 examples & docs | ✅ DONE | Eight documented commands resolve to nothing. `GETTING_STARTED` documented `amc telemetry on/off/status` for a feature **AMC does not have**; `score-history.md` documented a whole CLI for a module imported only by its own test. Guard now checks docs against `amc commands --json`. |
 
-**G8 COMPLETE — 34 gaps. Persistence audit ran 27 agents: 21 candidate findings, 10 survived adversarial verification, all 10 fixed.**
+**Historical summary (superseded by In Progress): G8 COMPLETE — 34 gaps. Persistence audit ran 27 agents: 21 candidate findings, 10 survived adversarial verification, all 10 fixed.** Current inventory includes the added G8-17b (35 rows); completed fixes do not by themselves establish migration cutover or accepted disposition of every original row.
 
 
 ## G9 — score-input provenance (opened 2026-08-28, from the pi comparator's G7)

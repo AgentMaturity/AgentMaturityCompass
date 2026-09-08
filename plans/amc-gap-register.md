@@ -1,7 +1,30 @@
 # AMC Gap Register — exhaustive, end-to-end
 
-**Status:** DRAFT v1 · 2026-08-20 · planning only, no changes made · repo at `f419839a`
+**Current status:** In Progress · reconciled 2026-09-08. The historical findings below are retained; they are not a statement that the original defects all remain unchanged.
+**Historical baseline:** DRAFT v1 · 2026-08-20 · planning only, no changes made at that time · repo at `f419839a`
 **Companions:** [amc-state-ledger.md](amc-state-ledger.md) (per-file status of all 1,775 src files) · [amc-superharness.md](amc-superharness.md) (the construction plan) · [amc-state-ledger] research under `plans/research/`
+
+## 2026-09-08 reconciliation — execution occurred; acceptance remains open
+
+This register contains **290 unique table IDs: 289 original gaps plus G8-17b**. G8 has 35 rows; the other seven group counts are unchanged. The two supplemental execution-log fixes now called **G7-13b** (stale-count test) and **G8-25b** (secret-scanner path handling) are outside this register's 290-row inventory. They do not replace original **G7-13** (untested casebooks/eoc/executive/bootstrap/e2e directories) or **G8-25** (the embedded `qa/` service boundary), whose original acceptance remains unresolved.
+
+All 46 distinct eight-character commit references in the pre-reconciliation [execution log](amc-gap-execution-log.md) resolve to ancestors of audited baseline `4247e610e214a5b07de631c394acdaf0f5ed679e`. That baseline passed **10,932/10,932 tests, zero failures**, with build/typecheck verified. Local HEAD at this reconciliation was `47141f7ab254e7ade53262adbdb74b46890fade4`; later changes have their own affected checks. This evidence is local and does not establish merge, release, independent audit, measured coverage, or completion of deferred scope.
+
+| Linear issue | Group | Current state | Remaining acceptance |
+|---|---|---|---|
+| AMC-1496 | Parent | In Progress | Give every row an accepted implementation, deletion, relabeling, withdrawal, mitigation or explicit successor. Historical COMPLETE summaries are not a completion percentage. |
+| AMC-1497 | G1 | In Review | Review changed dispositions; imported-evidence residual AMC-1506 is locally implemented at `5eec4d9d` and In Review. |
+| AMC-1498 | G2 | In Review | Map G2-24–28/41 individually; G2-45 remains deferred to G4-02. |
+| AMC-1499 | G3 | In Progress | Resolve remaining overlaps or accept separate boundaries; replace pending evidence placeholders. |
+| AMC-1500 | G4 | In Progress | Decompose or transfer guarded monoliths; a descending size ratchet is mitigation. |
+| AMC-1501 | G5 | In Progress | Resolve G5-18 licensing, preserve G5-24/25 withdrawals, verify current distribution claims. |
+| AMC-1502 | G6 | In Progress — urgent | AMC-1525: authenticate historical-key admission; resolve notary/HMAC scope, compose hardening and external rotation/history disposition. |
+| AMC-1503 | G7 | In Progress | G7-01/02 unattempted; residual assertions/UI coverage/lint/browser execution and original G7-13 need disposition. |
+| AMC-1504 | G8 | In Progress | Qualify DUAL_WRITE-to-CUTOVER migration, resolve original G8-25, and preserve security/rotation dependencies. |
+
+G6-07's historical hash-chain mitigation is insufficient: a disposable-workspace probe preserved the current public key, appended an attacker key with correctly computed unkeyed hashes, and verified the attacker's signature. AMC-1525 owns the authenticated-admission fix. Current-tree secret cleanup does not prove rotation or historical revocation.
+
+Detailed evidence and the probe are recorded under `AMC_OS/RESEARCH/2026-09-08-dsh-pi/` in `reconciliation.md` and `key-history-probe.json`. The dated note above supersedes the original plan-only and blanket completion language; all historical row evidence, source line numbers and proposed dispositions below remain available for review.
 
 ---
 
@@ -15,7 +38,7 @@ The sweep classified **1,925 module rows: 1,045 REAL · 83 PARTIAL · 5 STUB · 
 
 ## What the register contains
 
-**289 distinct gaps** across 8 classes, each a table row with a stable id (`G1-01`…), a source path, cited evidence, a severity, and a one-verb disposition.
+**290 distinct registered gaps** across 8 classes: 289 original findings plus G8-17b. Each table row has a stable id (`G1-01`…), a source path, cited evidence, a severity, and a disposition. The severity totals immediately below are the **historical 289-gap rollup**, not a recount of current rows or unresolved work.
 
 | Severity | Count | Meaning |
 |---|---:|---|
@@ -33,7 +56,7 @@ The sweep classified **1,925 module rows: 1,045 REAL · 83 PARTIAL · 5 STUB · 
 | **G5 — Claim & number drift** | 37 | Every count that matters has ≥2 live values; overstated capabilities |
 | **G6 — Security & secrets** | 26 | Tracked vault blob, forgeable trust anchor, unpinned installs, secrets in git |
 | **G7 — Test quality** | 24 | ~50% of tests are template clones or prose assertions; coverage gate off |
-| **G8 — Persistence/wiring/methodology/hygiene** | 34 | In-memory stores, dark real subsystems, trust-tier contradictions, repo clutter |
+| **G8 — Persistence/wiring/methodology/hygiene** | 35 | 34 original rows plus G8-17b; in-memory stores, dark real subsystems, trust-tier contradictions, repo clutter |
 
 ## The one finding that matters most
 
@@ -61,7 +84,7 @@ None of this is hidden malice — most facades carry honest inline comments ("in
 
 ## Reading guide
 
-Each section stands alone. Dispositions are advisory and pre-decision — **nothing here has been executed.** Where a gap maps onto the superharness plan, the disposition names the phase. The register is deliberately larger than any one person will action at once; it is the complete surface, so that prioritization is a choice made against full information rather than a sample.
+Each section stands alone. At the original 2026-08-20 drafting, dispositions were advisory and pre-decision and nothing had been executed. **Execution has since occurred; use the dated reconciliation and execution log for current acceptance.** Where a gap maps onto the superharness plan, the historical disposition names the phase. The register is deliberately larger than any one person will action at once; it is the complete surface, so that prioritization is a choice made against full information rather than a sample.
 
 ---
 
@@ -672,7 +695,9 @@ AMC sells itself as an evidence-integrity and agent-trust product: its whole val
 
 ### G8 rollup
 
-**Count: 34 items** — CRITICAL 4 (G8-06 tracked vault blob, G8-08 real LLM client dead while mock ships, G8-15 flat-0.7 path still wired post-"reconcile"), plus the phantom/redaction/schema/attestation integrity cluster; HIGH 15; MEDIUM 11; LOW 4. Sub-class split: Persistence 6, Wiring 8, Methodology 7, Hygiene 13. The methodology and wiring rows carry disproportionate weight because they falsify the product's own thesis inside its own repo.
+**Current inventory: 35 registered items**, including G8-17b; this is not a remaining-work count. Sub-class split: Persistence 6, Wiring 8, Methodology 8, Hygiene 13.
+
+**Historical original rollup (preserved): Count: 34 items** — CRITICAL 4 (G8-06 tracked vault blob, G8-08 real LLM client dead while mock ships, G8-15 flat-0.7 path still wired post-"reconcile"), plus the phantom/redaction/schema/attestation integrity cluster; HIGH 15; MEDIUM 11; LOW 4. Sub-class split: Persistence 6, Wiring 8, Methodology 7, Hygiene 13. The methodology and wiring rows carry disproportionate weight because they falsify the product's own thesis inside its own repo.
 
 **Highest-leverage moves:**
 1. **Kill the methodology contradictions first (G8-15/16/17/18).** Delete the flat-0.7 `collectEvidence` path so only `collectEvidenceFromLedger` remains, collapse the three trust tables into one canonical constant imported everywhere, and rip the `existsSync(src/...)` self-evidence and phantom `enforce/*` imports out of the scorers and `fixGenerator`. Until this lands, AMC scores its own repo and ships fixes that import files that don't exist — the single biggest credibility hole for an evidence-integrity product, and the one f419839a only half-closed.
