@@ -34,6 +34,21 @@ function run(label, cmd, args, opts) {
   return { ok, stdout: result.stdout ?? "", out: `${result.stdout ?? ""}${result.stderr ?? ""}` };
 }
 
+export function isolatedInstallEnvironment(base, home) {
+  const isolated = { ...base, HOME: home, CI: "1" };
+  for (const key of Object.keys(isolated)) {
+    if (key.startsWith("AMC_") || /^npm_config_/i.test(key)) delete isolated[key];
+  }
+  isolated.AMC_VAULT_PASSPHRASE = "packed-install-check";
+  isolated.npm_config_cache = join(home, ".npm");
+  isolated.npm_config_userconfig = join(home, ".npmrc");
+  isolated.npm_config_globalconfig = join(home, ".npmrc-global");
+  isolated.npm_config_global = "false";
+  delete isolated.NODE_PATH;
+  delete isolated.NODE_OPTIONS;
+  return isolated;
+}
+
 export function packedInstallCheck({ root = process.cwd(), build = true, keep = false } = {}) {
   const pkg = JSON.parse(readFileSync(join(root, "package.json"), "utf8"));
   const work = mkdtempSync(join(tmpdir(), "amc-packed-install-"));
@@ -43,15 +58,9 @@ export function packedInstallCheck({ root = process.cwd(), build = true, keep = 
 
   const env = { ...process.env, CI: "1" };
   // Nothing from this machine: no ~/.amc, no ~/.npmrc, no shared npm cache.
-  const isolated = { ...env, HOME: home, npm_config_cache: join(home, ".npm") };
-  for (const key of Object.keys(isolated)) if (key.startsWith("AMC_")) delete isolated[key];
-  isolated.AMC_VAULT_PASSPHRASE = "packed-install-check";
-  isolated.npm_config_userconfig = join(home, ".npmrc");
-  isolated.npm_config_globalconfig = join(home, ".npmrc-global");
+  const isolated = isolatedInstallEnvironment(env, home);
   writeFileSync(isolated.npm_config_userconfig, "");
   writeFileSync(isolated.npm_config_globalconfig, "");
-  delete isolated.NODE_PATH;
-  delete isolated.NODE_OPTIONS;
   const amc = join(consumer, "node_modules", ".bin", "amc");
   const verifyRun = (r, requireTool = true) => {
     if (!r.ok) return false;

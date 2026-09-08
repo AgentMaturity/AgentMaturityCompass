@@ -27,5 +27,7 @@ export function verifyPackedRun({ summary, runCommand, requireTool = true }) {
   return run?.ok === true && run.sessionId === summary.sessionId && run.ledgerOk === true
     && empty(run.ledgerErrors) && empty(run.sessionChainErrors) && empty(run.unsignedRowIds)
     && Array.isArray(run.requests) && run.requests.length === summary.requests
-    && run.requests.every((request) => request?.status === "reconstructed");
+    && run.requests.every((request) => request?.status === "reconstructed"
+      && typeof request.headerEventId === "string" && request.headerEventId.trim().length > 0)
+    && new Set(run.requests.map((request) => request.headerEventId)).size === run.requests.length;
 }
