@@ -43,7 +43,7 @@
     "src/cli-business-commands.ts": 1112,
     "src/redteam/mcpAgentProvider.ts": 1070,
     "src/integrations/integrationDeliveryQueue.ts": 1056,
-    "src/importers/neutralImporter.ts": 1049,
+    "src/importers/neutralImporter.ts": 999,
     "src/ops/governanceSlo.ts": 1047,
     "src/setup/integrationScaffold.ts": 1036,
     "src/archetypes/index.ts": 1011,

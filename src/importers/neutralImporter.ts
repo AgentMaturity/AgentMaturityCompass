@@ -12,6 +12,7 @@ import { appendRuntimeRunEvent } from "../runtime/runManager.js";
 import { writeTraceFailureIndex, type TraceFailureIndexRef } from "../watch/traceFailureIndex.js";
 import type { ProductionTrace } from "../agents/traceIngestion.js";
 import { detectPiSession, parsePiSession, piSessionSummary, piSessionTraces, type PiSessionFormat } from "./piSessionImport.js";
+import { tracesFromCandidate } from "./traceMapping.js";
 import type { DiagnosticReport } from "../types.js";
 import { evaluateDiagnosticEvidenceReadiness } from "../diagnostic/evidenceReadiness.js";
 import { ensureDir, readUtf8, writeFileAtomic } from "../utils/fs.js";
@@ -349,59 +350,6 @@ function detectCategory(path: string, format: "json" | "jsonl" | "yaml", parsed:
   return null;
 }
 
-function traceTimestamp(value: unknown): number {
-  if (typeof value === "number" && Number.isFinite(value)) return value;
-  if (typeof value === "string") {
-    const parsed = Date.parse(value);
-    if (Number.isFinite(parsed)) return parsed;
-  }
-  return Date.now();
-}
-
-function toProductionTrace(row: Record<string, unknown>, fallback: { agentId: string; index: number; source: string }): ProductionTrace {
-  const metadata = isRecord(row.metadata) ? row.metadata : {};
-  const error = Boolean(row.error) || typeof row.errorMessage === "string" || /error|failed|timeout|denied|blocked/i.test(String(row.status ?? row.outcome ?? ""));
-  return {
-    traceId: String(row.traceId ?? row.id ?? row.request_id ?? `${fallback.source}:${fallback.index}`),
-    agentId: String(row.agentId ?? row.agent_id ?? fallback.agentId),
-    agentType: String(row.agentType ?? row.agent_type ?? row.role ?? "imported-agent"),
-    input: row.input ?? row.prompt ?? row.request ?? null,
-    output: row.output ?? row.response ?? row.result ?? null,
-    durationMs: Number(row.durationMs ?? row.duration_ms ?? row.latencyMs ?? 0),
-    timestamp: traceTimestamp(row.timestamp ?? row.ts),
-    spanCount: typeof row.spanCount === "number" ? row.spanCount : undefined,
-    sessionId: typeof row.sessionId === "string" ? row.sessionId : typeof row.session_id === "string" ? row.session_id : undefined,
-    error,
-    errorMessage: String(row.errorMessage ?? row.error ?? row.message ?? (error ? row.status ?? "imported trace reported failure" : "")) || undefined,
-    metadata: {
-      ...metadata,
-      tool: row.tool ?? row.toolName ?? metadata.tool,
-      model: row.model ?? metadata.model,
-      providerId: row.providerId ?? row.provider ?? metadata.providerId
-    }
-  };
-}
-
-function tracesFromCandidate(category: NeutralImportCategory, redacted: unknown, agentId: string, source: string): Array<AMCTraceV1 | ProductionTrace> {
-  if (category !== "trace-jsonl" && category !== "event-log" && category !== "run-directory") {
-    return [];
-  }
-  if (Array.isArray(redacted)) {
-    return redacted
-      .filter(isRecord)
-      .map((row, index) => toProductionTrace(row, { agentId, index, source }));
-  }
-  if (isRecord(redacted)) {
-    const rows = [redacted.traces, redacted.events, redacted.runs, redacted.spans]
-      .find((value): value is unknown[] => Array.isArray(value));
-    if (rows) {
-      return rows
-        .filter(isRecord)
-        .map((row, index) => toProductionTrace(row, { agentId, index, source }));
-    }
-  }
-  return [];
-}
 
 function stringField(row: Record<string, unknown>, keys: string[]): string | null {
   for (const key of keys) {
