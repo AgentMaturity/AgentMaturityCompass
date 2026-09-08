@@ -62,7 +62,7 @@ describe("fresh persona environments", () => {
       const payload = args[0] === "--agent"
         ? { ok: true, questionCount: 244, firstResultSla: { targetMs: 120000, elapsedMs: 100, met: true }, elapsedMs: 100 }
         : args[0] === "domain" ? { packs: Array.from({ length: 40 }, (_, i) => ({ packId: String(i) })) } : {};
-      return { status: "passed", exitCode: 0, stdout: JSON.stringify(payload), stderr: "", startedAt: "fixture", endedAt: "fixture" };
+      return { command: [command, ...args].join(" "), status: "passed", exitCode: 0, stdout: JSON.stringify(payload), stderr: "", startedAt: "fixture", endedAt: "fixture" };
     };
     for (const id of ["first", "second"]) {
       const result = runPersona({ id, name: id, agentId: `${id}-agent`, fixture: "node-cli", checks: [] }, "fixture.tgz", tmp, { baseEnv: hostile, execute });
@@ -81,7 +81,7 @@ describe("fresh persona environments", () => {
         calls.push(command);
         mkdirSync(join(options.cwd, "node_modules", ".bin"), { recursive: true });
         writeFileSync(join(options.cwd, "node_modules", ".bin", "amc"), "partial installation");
-        return { status: "failed", exitCode: 1, stdout: "", stderr: "dependency install failed", startedAt: "fixture", endedAt: "fixture" };
+        return { command: [command, ..._args].join(" "), status: "failed", exitCode: 1, stdout: "", stderr: "dependency install failed", startedAt: "fixture", endedAt: "fixture" };
       }
     });
     expect(calls).toEqual(["npm"]);

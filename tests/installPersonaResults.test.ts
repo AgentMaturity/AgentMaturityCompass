@@ -36,7 +36,7 @@ function fixture(role: keyof typeof roleChecks = "solo", output: Record<string, 
       : id === "strategy-compare" ? { run: { recommendedStrategyId: "local-safe" } }
       : id === "neutral-import" ? { plan: { status: "ready" } } : {};
     const stdout = typeof payload === "string" ? payload : JSON.stringify(payload);
-    const step = { status: failed.includes(id) ? "failed" : "passed", exitCode: failed.includes(id) ? 1 : 0,
+    const step = { command: [command, ...args].join(" "), status: failed.includes(id) ? "failed" : "passed", exitCode: failed.includes(id) ? 1 : 0,
       stdout: raw ? stdout.slice(-2500) : stdout, stderr: "", startedAt: "fixture", endedAt: "fixture" };
     if (raw) Object.defineProperty(step, "rawStdout", { value: stdout, enumerable: false });
     return step;

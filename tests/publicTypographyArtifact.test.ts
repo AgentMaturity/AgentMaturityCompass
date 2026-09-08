@@ -147,7 +147,6 @@ describe("AMC first-party typography artifact", () => {
   });
 
   test("fails closed on package-version drift and keeps font assets network-first", async () => {
-    // @ts-expect-error The Pages builder is intentionally plain ESM for Node and GitHub Actions.
     const { validatePinnedPackageVersion } = await import("../scripts/build-pages-site.mjs") as {
       validatePinnedPackageVersion(name: string, actual: string, expected: string): void;
     };

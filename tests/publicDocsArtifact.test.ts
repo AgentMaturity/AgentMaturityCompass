@@ -121,7 +121,6 @@ describe("public Docs Pages artifact", () => {
   });
 
   test("rejects unsafe, duplicate, internal, and destructive build inputs", async () => {
-    // @ts-expect-error The build script is intentionally plain ESM for Node and GitHub Actions.
     const { validateGuideSets } = await import("../scripts/build-pages-site.mjs") as {
       validateGuideSets(publicDocs: string[], internalDocs: string[]): void;
     };

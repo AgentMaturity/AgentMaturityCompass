@@ -17,7 +17,8 @@ function fixture(fail: string[] = [], writeInventory = true, testReport = "valid
   const tracked = join(root, "docs", "CLI_COMMAND_INVENTORY.md");
   writeFileSync(tracked, "keep tracked inventory unchanged\n");
   const calls: Invocation[] = [];
-  const execute = async (id: string, command: string, args: string[], options: { cwd: string }) => {
+  const execute = async (id: string, command: string, args: string[], options: { cwd?: string } = {}) => {
+    if (typeof options.cwd !== "string") throw new Error("Every release step must receive its isolated working directory");
     calls.push({ id, command, args, cwd: options.cwd });
     if (id === "command-inventory" && writeInventory) {
       const target = args[args.indexOf("--out") + 1]!;
