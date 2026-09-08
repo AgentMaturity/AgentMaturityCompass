@@ -131,7 +131,7 @@ Required request fields (per route family):
 | `POST /api/v1/watch/judge-calibration` | `rubric`, `calibrationSet.rows`, `judgments` | `agentId`, `runId`, `generatedAt`, `mode`, `thresholds`, `stabilityChecks`, `graphProof`, `agentStockBenchmarkProof`, `appeals`, `sourceRefs` |
 | `GET /api/v1/watch/receipts/:agentId` | path `agentId` | `limit` (1..500) |
 | `POST /api/v1/product/batch/create` | `name`, `items` | — |
-| `POST /api/v1/product/portal/submit` | `name`, `type`, `submittedBy` | `payload` |
+| `POST /api/v1/product/portal/submit` | `name`, `type` | `payload` |
 | `GET /api/v1/agents/:id/timeline` | path `id` | `maxRuns` (1..5000), `maxEvidenceEvents` (1..20000) |
 | `GET /api/v1/observe/status` | none | — |
 | `GET /api/v1/observe/timeline` | none | `agentId` (defaults to `default`), `limit`/`maxRuns` (1..5000), `maxEvidenceEvents` (1..20000) |
@@ -142,6 +142,7 @@ Required request fields (per route family):
 Webhook contract notes:
 - Public OpenAPI schemas live in `website/openapi.yaml` under `WebhookSignatureHeaders`, `WebhookEventEnvelope`, `WebhookDeliveryRequest`, `WebhookAttemptReceipt`, `WebhookDeliveryReceipt`, `PortalWebhookPayload`, `OutcomeWebhookPayload`, and `ValueWebhookPayload`.
 - `POST /api/v1/product/portal/submit` accepts `payload` as one of the portal, outcome, value, or generic webhook envelope schemas and includes examples in the OpenAPI file.
+- `POST /api/v1/product/portal/submit` records the submitter from the authenticated caller, never from the request body. A body carrying `submittedBy` is rejected with 400 rather than ignored, and a request with no authenticated caller is rejected with 401. Portal jobs have no receipt or hash chain, so this attribution is the only record of who requested the work.
 - Outbound webhook signatures use `x-amc-webhook-delivery-id`, `x-amc-webhook-attempt`, `x-amc-webhook-timestamp`, and `x-amc-webhook-signature`; the signature is HMAC-SHA256 over `<timestamp>.<body>`.
 - `amc alert send` and `amc alert test` use the simple alert dispatcher and fail fast on non-2xx webhook responses.
 - The integration dispatcher supports channel-level retry policy and dead-letter behavior for deterministic integration events; configure that path when delivery retries are required.

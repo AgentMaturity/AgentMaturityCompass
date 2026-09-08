@@ -943,12 +943,13 @@ function mockRes(): { res: ServerResponse; state: { statusCode: number; headers:
 }
 
 async function callRoute(
-  handler: (pathname: string, method: string, req: IncomingMessage, res: ServerResponse, workspace?: string) => Promise<boolean>,
-  params: { pathname: string; method: string; url?: string; body?: unknown; workspace?: string }
+  handler: (pathname: string, method: string, req: IncomingMessage, res: ServerResponse, extra?: any) => Promise<boolean>,
+  params: { pathname: string; method: string; url?: string; body?: unknown; workspace?: string; context?: unknown }
 ): Promise<{ handled: boolean; status: number; headers: Record<string, string>; body: string; json?: any }> {
   const req = mockReq(params.method, params.url ?? params.pathname, params.body);
   const { res, state } = mockRes();
-  const handled = await handler(params.pathname, params.method, req, res, params.workspace);
+  // Registry-mounted routers receive an ApiRouteContext; the rest take a workspace path.
+  const handled = await handler(params.pathname, params.method, req, res, params.context ?? params.workspace);
   let json: any;
   try {
     json = state.body ? JSON.parse(state.body) : undefined;
@@ -983,7 +984,7 @@ afterEach(() => {
 
 async function assertJsonRoute(
   handler: any,
-  params: { pathname: string; method: string; url?: string; body?: unknown; workspace?: string },
+  params: { pathname: string; method: string; url?: string; body?: unknown; workspace?: string; context?: unknown },
   expectedStatus = 200
 ): Promise<any> {
   const result = await callRoute(handler, params);
@@ -2040,7 +2041,8 @@ describe("AMC API routers", () => {
     await assertJsonRoute(handleProductRoute as any, { pathname: "/api/v1/product/batch/create", method: "POST", body: { name: "batch", items: [1, 2] } }, 201);
     await assertJsonRoute(handleProductRoute as any, { pathname: "/api/v1/product/batch/batch-1/start", method: "POST" });
     await assertJsonRoute(handleProductRoute as any, { pathname: "/api/v1/product/batch/batch-1/progress", method: "GET" });
-    await assertJsonRoute(handleProductRoute as any, { pathname: "/api/v1/product/portal/submit", method: "POST", body: { name: "job", type: "scan", submittedBy: "sid", payload: { x: 1 } } }, 201);
+    await assertJsonRoute(handleProductRoute as any, { pathname: "/api/v1/product/portal/submit", method: "POST", body: { name: "job", type: "scan", payload: { x: 1 } }, context: { workspace: process.cwd(), principal: "sid" } }, 201);
+    expect(m.submitJob).toHaveBeenCalledWith("job", "scan", "sid", { x: 1 });
     await assertJsonRoute(handleProductRoute as any, { pathname: "/api/v1/product/portal/job-1", method: "GET" });
   });
 

@@ -38,6 +38,24 @@ export interface StudioApiDelegationParams {
   setRateLimitHeaders: (res: ServerResponse, decision: StudioApiRateLimitDecision) => void;
 }
 
+/**
+ * The identity a write is attributed to, derived from how the caller
+ * authenticated — never from request input.
+ *
+ * By ROLE rather than `username ?? agentId`: agent-token and lease credentials
+ * carry a synthetic username ("agent-token", "agent-lease") with the real
+ * identity in `agentId`, so the username-first form would record every agent
+ * caller under one constant. The bootstrap admin holds the AGENT role too but
+ * has no agentId, and is attributed by its own name.
+ */
+export function principalFromAuth(auth: StudioApiAuthContext): string | null {
+  if (auth.roles.has("AGENT") && auth.agentId && auth.agentId.trim().length > 0) {
+    return `agent:${auth.agentId.trim()}`;
+  }
+  const username = auth.username?.trim() ?? "";
+  return username.length > 0 ? username : null;
+}
+
 export async function handleStudioApiDelegation(params: StudioApiDelegationParams): Promise<boolean> {
   if (!params.pathname.startsWith("/api/v1/")) {
     return false;
@@ -53,6 +71,7 @@ export async function handleStudioApiDelegation(params: StudioApiDelegationParam
     return true;
   }
 
+  let principal: string | undefined;
   if (!isPublicApiRoute(params.pathname)) {
     const apiAuth = params.authenticate(params.req, params.workspace, params.token);
     if (!apiAuth) {
@@ -74,7 +93,16 @@ export async function handleStudioApiDelegation(params: StudioApiDelegationParam
     ) {
       return true;
     }
+    principal = principalFromAuth(apiAuth) ?? undefined;
   }
 
-  return handleApiRoute(params.pathname, params.method, params.req, params.res, params.workspace, params.token);
+  return handleApiRoute(
+    params.pathname,
+    params.method,
+    params.req,
+    params.res,
+    params.workspace,
+    params.token,
+    principal
+  );
 }
