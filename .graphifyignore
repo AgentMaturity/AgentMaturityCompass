@@ -1,0 +1,30 @@
+# Production-code architecture corpus. Graphify also respects .gitignore.
+# Use --code-only so source never enters an external semantic backend.
+node_modules/
+dist/
+.git/
+.amc/
+.claude/
+.codex/
+.obsidian/
+AMC_OS/
+memory/
+amc_ai_army/
+graphify-out/
+tests/
+test-results/
+coverage/
+tmp/
+vendor/
+platform/python/
+qa/
+internal/
+mirofish-simulation/
+*.min.js
+*.tsbuildinfo
+*.tgz
+*.lock
+sdk/python/build/
+sdk/python/dist/
+packages/*/lib/
+__pycache__/

@@ -22,6 +22,7 @@ Use this page to reach the shortest evidence-backed path for your task. AMC's pu
 - **Interpret `VALID`, readiness, and claim eligibility** → [Evidence Trust](EVIDENCE_TRUST.md)
 - **Check a fresh install or initialized workspace** → [Doctor](DOCTOR.md)
 - **Find a command** → [CLI Command Inventory](CLI_COMMAND_INVENTORY.md)
+- **Navigate the source by structure, not grep** → [Code Graph](CODE_GRAPH.md)
 - **Troubleshoot a blocked workflow** → [Troubleshooting](TROUBLESHOOTING.md)
 
 ## Choose Your Path

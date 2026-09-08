@@ -143,3 +143,6 @@ internal/
 # use the `workspace:` protocol, which npm cannot parse. A stray package-lock
 # would be a second, silently-drifting source of truth.
 package-lock.json
+
+# Graphify code graph — generated, 57 MB; rebuild with `npm run graph:update`
+graphify-out/
