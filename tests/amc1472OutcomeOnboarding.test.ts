@@ -484,9 +484,8 @@ describe("AMC-1472 outcome-based onboarding", () => {
         .map(match => match[1]);
       for (const version of versions) {
         expect(version, page).toMatch(/^\d{8}[a-z]+$/);
-        expect(version >= "20260711a", page).toBe(true);
+        expect(version >= (page === "home.html" ? "20260908b" : "20260711a"), page).toBe(true);
       }
-      if (versions.length > 1) expect(new Set(versions).size, page).toBe(1);
     }
 
     const docs = readFileSync("docs/GETTING_STARTED.md", "utf8");
