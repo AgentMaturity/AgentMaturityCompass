@@ -3,7 +3,7 @@ import { join, resolve } from "node:path";
 import { releaseManifestSchema } from "./releaseSchema.js";
 import { verifyReleaseManifest } from "./releaseSigner.js";
 import { cleanupDir, fileSha256, mkTmp, runTarExtract } from "./releaseUtils.js";
-import { scanDirectoryForSecrets } from "./releaseSecretScan.js";
+import { scanExtractedReleaseForSecrets, secretScanSchema } from "./releaseSecretScan.js";
 
 export interface ReleaseVerifyResult {
   ok: boolean;
@@ -83,15 +83,16 @@ export function verifyReleaseBundle(bundleFile: string, overridePublicKeyPath?: 
       }
     }
 
-    const secretScan = JSON.parse(readFileSync(join(root, "checks", "secret-scan.json"), "utf8")) as {
-      status?: string;
-    };
-    if (secretScan.status !== "PASS") {
-      errors.push("secret scan status is not PASS");
+    const secretScan = secretScanSchema.safeParse(JSON.parse(readFileSync(join(root, "checks", "secret-scan.json"), "utf8")));
+    if (!secretScan.success) {
+      errors.push("secret scan report is invalid");
+    } else if (secretScan.data.status !== "PASS" || secretScan.data.findings.some(finding => finding.severity === "HIGH")) {
+      errors.push("secret scan report does not establish a passing scan");
     }
 
-    // defense-in-depth: re-scan extracted bundle content.
-    const rescan = scanDirectoryForSecrets(root);
+    // Inspect the same extracted bytes whose hashes were verified, including
+    // members of the compressed npm artifact; compressed text is not coverage.
+    const rescan = scanExtractedReleaseForSecrets(root);
     if (rescan.status !== "PASS") {
       errors.push("bundle content secret scan failed");
     }

@@ -20,8 +20,8 @@
  * The row to dwell on is the private key. `bridgeRedaction` carried
  * `/BEGIN (?:RSA|EC|OPENSSH|PRIVATE) KEY/gi`, which requires `" KEY"`
  * immediately after the algorithm word — but a real PEM header reads
- * `BEGIN RSA PRIVATE KEY`. It matched exactly one of the five real header forms
- * (`BEGIN PRIVATE KEY`) and missed RSA, EC, OPENSSH and DSA. A private key
+ * the algorithm followed by the private-key label. It matched only the generic
+ * PKCS#8 header and missed RSA, EC, OPENSSH and DSA. A private key
  * pasted through the bridge was written unredacted. Duplication hid it, because
  * `secretBlind`'s pattern was correct and covered the other path.
  *

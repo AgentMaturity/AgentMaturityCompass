@@ -1,17 +1,16 @@
 import { createPublicKey } from "node:crypto";
-import { copyFileSync, readdirSync, readFileSync, unlinkSync } from "node:fs";
-import { join, resolve } from "node:path";
+import { copyFileSync, readdirSync, readFileSync } from "node:fs";
+import { dirname, join, resolve } from "node:path";
 import { releaseManifestSchema, type ReleaseManifest } from "./releaseSchema.js";
 import { buildReleaseManifest, packageMeta } from "./releaseManifest.js";
 import { loadReleasePrivateKey, releasePublicKeyFingerprint, signReleaseManifest } from "./releaseSigner.js";
 import { cleanupDir, deterministicTimestamp, fileSha256, mkTmp, runChecked, runTarCreate, runTarExtract, writeShaFile } from "./releaseUtils.js";
 import { writeSbom } from "./releaseSbom.js";
 import { writeLicenseInventory } from "./releaseLicenses.js";
-import { scanDirectoryForSecrets, secretScanSchema, writeSecretScanReport } from "./releaseSecretScan.js";
+import { scanExtractedReleaseForSecrets, writeSecretScanReport } from "./releaseSecretScan.js";
 import { readVersionFromPackage, writeProvenanceRecord } from "./releaseProvenance.js";
 import { canonicalize } from "../utils/json.js";
 import { ensureDir, pathExists, writeFileAtomic } from "../utils/fs.js";
-import { sha256Hex } from "../utils/hash.js";
 import { tmpdir } from "node:os";
 
 interface PackOptions {
@@ -19,6 +18,7 @@ interface PackOptions {
   outFile: string;
   privateKeyPath?: string;
   skipInstallBuild?: boolean;
+  /** @deprecated Release scans are mandatory. Passing true is refused. */
   skipSecretScan?: boolean;
 }
 
@@ -107,16 +107,6 @@ function writeDockerMetadata(stageRoot: string): { path: string; sha: string } {
   return { path, sha };
 }
 
-function mergeSecretScans(primary: ReturnType<typeof scanDirectoryForSecrets>, secondary: ReturnType<typeof scanDirectoryForSecrets>) {
-  const findings = [...primary.findings, ...secondary.findings];
-  const status = findings.some((row) => row.severity === "HIGH") ? "FAIL" : "PASS";
-  return secretScanSchema.parse({
-    v: 1,
-    status,
-    findings
-  });
-}
-
 export function createReleaseBundle(options: PackOptions): {
   outFile: string;
   manifest: ReleaseManifest;
@@ -124,6 +114,9 @@ export function createReleaseBundle(options: PackOptions): {
 } {
   const workspace = resolve(options.workspace);
   const outFile = resolve(options.outFile);
+  if (options.skipSecretScan === true) {
+    throw new Error("Release secret scan cannot be skipped.");
+  }
   // The npm cache lives outside the worktree.
   //
   // It used to be .amc/release/working/npm-cache — inside the repository, with
@@ -132,7 +125,6 @@ export function createReleaseBundle(options: PackOptions): {
   // release scripts already cache under the OS temp dir; this matches them, so
   // repeated releases still reuse a warm cache without the repo carrying it.
   const npmCacheDir = join(tmpdir(), "amc-release-npm-cache");
-  const skipSecretScan = options.skipSecretScan ?? true;
   ensureDir(npmCacheDir);
   const npmEnv = {
     npm_config_cache: npmCacheDir,
@@ -140,29 +132,28 @@ export function createReleaseBundle(options: PackOptions): {
   };
 
   if (!options.skipInstallBuild) {
-    runChecked("npm", ["ci", "--ignore-scripts", "--no-audit", "--fund=false"], workspace, npmEnv);
-    runChecked("npm", ["run", "build"], workspace, npmEnv);
+    if (pathExists(join(workspace, "pnpm-lock.yaml"))) {
+      runChecked("pnpm", ["install", "--frozen-lockfile"], workspace, npmEnv);
+      runChecked("pnpm", ["run", "build"], workspace, npmEnv);
+    } else {
+      runChecked("npm", ["ci", "--ignore-scripts", "--no-audit", "--fund=false"], workspace, npmEnv);
+      runChecked("npm", ["run", "build"], workspace, npmEnv);
+    }
   }
 
   const pack = npmPack(workspace, npmEnv);
-  verifyNpmTgzSafety(pack.tgzPath);
-  const privateKey = loadReleasePrivateKey(options.privateKeyPath);
-  const pubPem = createPublicKey(privateKey).export({ format: "pem", type: "spki" }).toString();
-  const pubFingerprint = releasePublicKeyFingerprint(pubPem);
-  const pkg = packageMeta(workspace);
-  const expectedTgz = `agent-maturity-compass-${pkg.version}.tgz`;
-
   const root = mkTmp("amc-release-pack-");
-  const stage = join(root, "amc-release");
-  ensureDir(join(stage, "keys"));
-  ensureDir(join(stage, "checks"));
-  ensureDir(join(stage, "artifacts", "npm"));
-  ensureDir(join(stage, "artifacts", "sbom"));
-  ensureDir(join(stage, "artifacts", "licenses"));
-  ensureDir(join(stage, "artifacts", "provenance"));
-  ensureDir(join(stage, "artifacts", "docker"));
-
   try {
+    verifyNpmTgzSafety(pack.tgzPath);
+    const privateKey = loadReleasePrivateKey(options.privateKeyPath);
+    const pubPem = createPublicKey(privateKey).export({ format: "pem", type: "spki" }).toString();
+    const pubFingerprint = releasePublicKeyFingerprint(pubPem);
+    const pkg = packageMeta(workspace);
+    const expectedTgz = `agent-maturity-compass-${pkg.version}.tgz`;
+    const stage = join(root, "amc-release");
+    for (const directory of ["keys", "checks", "artifacts/npm", "artifacts/sbom", "artifacts/licenses", "artifacts/provenance", "artifacts/docker"]) {
+      ensureDir(join(stage, directory));
+    }
     const npmTarget = join(stage, "artifacts", "npm", expectedTgz);
     copyFileSync(pack.tgzPath, npmTarget);
     const npmSha = writeShaFile(`${npmTarget}.sha256`, readFileSync(npmTarget));
@@ -177,21 +168,8 @@ export function createReleaseBundle(options: PackOptions): {
 
     const docker = writeDockerMetadata(stage);
 
-    const tmpTgzExtract = mkTmp("amc-release-npmscan-");
-    let tgzScan = scanDirectoryForSecrets(stage);
-    try {
-      runTarExtract(npmTarget, tmpTgzExtract);
-      tgzScan = mergeSecretScans(scanDirectoryForSecrets(stage), scanDirectoryForSecrets(tmpTgzExtract));
-    } finally {
-      cleanupDir(tmpTgzExtract);
-    }
+    const tgzScan = scanExtractedReleaseForSecrets(stage);
     const secretScanPath = join(stage, "checks", "secret-scan.json");
-    if (tgzScan.status !== "PASS" && skipSecretScan) {
-      tgzScan = {
-        ...tgzScan,
-        status: "PASS"
-      };
-    }
     if (tgzScan.status !== "PASS") {
       throw new Error("Release secret scan failed with HIGH findings.");
     }
@@ -231,6 +209,11 @@ export function createReleaseBundle(options: PackOptions): {
     writeFileAtomic(join(stage, "manifest.sig"), `${signature}\n`, 0o644);
     writeFileAtomic(join(stage, "keys", "release-signing.pub"), pubPem, 0o644);
 
+    // Provenance and signing metadata are added after the payload scan report
+    // whose hash they reference. They must also pass before an archive exists.
+    if (scanExtractedReleaseForSecrets(stage).status !== "PASS") {
+      throw new Error("Release finalization secret scan failed with HIGH findings.");
+    }
     runTarCreate(root, outFile);
     return {
       outFile,
@@ -239,12 +222,6 @@ export function createReleaseBundle(options: PackOptions): {
     };
   } finally {
     cleanupDir(root);
-    if (pathExists(pack.tgzPath)) {
-      try {
-        unlinkSync(pack.tgzPath);
-      } catch {
-        // keep non-fatal
-      }
-    }
+    cleanupDir(dirname(pack.tgzPath));
   }
 }

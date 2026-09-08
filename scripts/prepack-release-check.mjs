@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { existsSync, mkdtempSync, rmSync } from "node:fs";
+import { existsSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { spawnSync } from "node:child_process";
@@ -53,7 +53,7 @@ try {
     npm_config_cache: npmCache,
     NPM_CONFIG_CACHE: npmCache
   };
-  const packStdout = run("npm", ["pack", "--json", "--ignore-scripts"], workspace, npmEnv);
+  const packStdout = run("npm", ["pack", "--json", "--ignore-scripts", "--pack-destination", tmp], workspace, npmEnv);
   const packInfo = JSON.parse(packStdout);
   const tgz = packInfo?.[0]?.filename;
   if (!tgz) {
@@ -62,21 +62,22 @@ try {
 
   run("node", ["dist/cli.js", "release", "sbom", "--out", join(tmp, "sbom.cdx.json")], workspace);
   run("node", ["dist/cli.js", "release", "licenses", "--out", join(tmp, "licenses.json")], workspace);
-  run("node", ["dist/cli.js", "release", "scan", "--in", join(workspace, tgz)], workspace, npmEnv);
+  run("node", ["dist/cli.js", "release", "scan", "--in", join(tmp, tgz), "--out", join(tmp, "secret-scan.json")], workspace, npmEnv);
 
   const keyPair = generateKeyPairSync("ed25519");
   const privatePem = keyPair.privateKey.export({ format: "pem", type: "pkcs8" }).toString();
+  const privateKeyPath = join(tmp, "ephemeral-signing.pem");
+  const publicKeyPath = join(tmp, "ephemeral-signing.pub");
+  writeFileSync(privateKeyPath, privatePem, { mode: 0o600 });
+  writeFileSync(publicKeyPath, keyPair.publicKey.export({ format: "pem", type: "spki" }));
   const releaseOut = join(tmp, "prepack.amcrelease");
   run(
     "node",
-    ["dist/cli.js", "release", "pack", "--out", releaseOut, "--skip-install-build"],
+    ["dist/cli.js", "release", "pack", "--out", releaseOut, "--skip-install-build", "--private-key", privateKeyPath],
     workspace,
-    {
-      ...npmEnv,
-      AMC_RELEASE_SIGNING_KEY: Buffer.from(privatePem, "utf8").toString("base64")
-    }
+    npmEnv
   );
-  run("node", ["dist/cli.js", "release", "verify", releaseOut], workspace, npmEnv);
+  run("node", ["dist/cli.js", "release", "verify", releaseOut, "--pubkey", publicKeyPath], workspace, npmEnv);
 } finally {
   rmSync(tmp, { recursive: true, force: true });
 }

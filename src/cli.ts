@@ -18544,10 +18544,10 @@ release
 
 release
   .command("pack")
-  .description("Build a signed deterministic .amcrelease bundle")
+  .description("Build a signed .amcrelease bundle")
   .requiredOption("--out <file>", "output .amcrelease file")
   .option("--private-key <path>", "release signing private key path override")
-  .option("--skip-install-build", "use current built artifacts without running npm ci/build", false)
+  .option("--skip-install-build", "use current built artifacts without frozen source install/build", false)
   .action((opts: { out: string; privateKey?: string; skipInstallBuild?: boolean }) => {
     assertOwnerMode(process.cwd(), "release pack");
     const out = releasePackCli({
