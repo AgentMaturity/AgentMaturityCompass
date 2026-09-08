@@ -465,7 +465,9 @@ describe("AMC-1472 outcome-based onboarding", () => {
     expect(studioSource).toContain("Activation path");
     expect(studioSource).toContain("activation?.milestones");
     expect(studioSource).toContain("refresh activation");
-    expect(studioSource).toContain("1,175 CLI paths");
+    const commandCount = [...readFileSync("docs/CLI_COMMAND_INVENTORY.md", "utf8").matchAll(/^\| `amc /gm)].length;
+    expect(commandCount).toBeGreaterThan(0);
+    expect(studioSource).toContain(`${commandCount.toLocaleString("en-US")} CLI paths`);
     const worker = readFileSync("src/console/assets/sw.js", "utf8");
     expect(worker).toContain('const CACHE_NAME = "amc-console-v6"');
     expect(worker).toContain('if (!url.pathname.includes("/assets/"))');

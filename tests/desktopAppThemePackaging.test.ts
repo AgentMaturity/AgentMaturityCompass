@@ -87,7 +87,9 @@ describe("desktop app packaging and visual identity", () => {
     expect(app).toContain("Desktop app");
     expect(app).toContain("native WebKit");
     expect(app).toContain("142 assurance packs");
-    expect(app).toContain("1,175 CLI paths");
+    const commandCount = [...read("docs/CLI_COMMAND_INVENTORY.md").matchAll(/^\| `amc /gm)].length;
+    expect(commandCount).toBeGreaterThan(0);
+    expect(app).toContain(`${commandCount.toLocaleString("en-US")} CLI paths`);
     expect(app).toContain("workspace-authenticated trust boundary");
     expect(app).toContain("mutable local data");
     expect(app).toContain("status.policyCommitted");
