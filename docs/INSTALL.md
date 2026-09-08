@@ -57,8 +57,9 @@ their compiled `lib/` in the tree, so no separate vendor build is needed unless
 you edit them (`npm run build:vendor`).
 
 **Source runtime vs published release.** A source checkout can run the native
-governed agent loop (`amc agent-loop run`, hidden from `--help`) because the
-composition kernel `@amc/core` is a private workspace package. The published
+governed agent loop — the hidden `agent-loop` entry point that
+`npm run check:clean-source` exercises — because the composition kernel
+`@amc/core` is a private workspace package. The published
 npm tarball and the release installers do not include it; they ship the
 evidence, scoring and governance surfaces. `npm run check:clean-source` proves
 this whole path on a fresh clone, keyless, in an isolated workspace.
