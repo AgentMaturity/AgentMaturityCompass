@@ -1326,7 +1326,8 @@ function renderAuthScreen() {
 async function renderHome() {
   const status = await apiGet("/status");
   const agentsResp = await apiGet("/agents");
-  const agentId = status.studio?.currentAgent || "default";
+  // A linked Studio agent selection takes precedence over the host's CLI default.
+  const agentId = qs("agent") || status.studio?.currentAgent || "default";
   const onboarding = await apiGet(`/onboarding/status?agentId=${encodeURIComponent(agentId)}`)
     .catch(() => ({ state: null, activation: null }));
   const benchmarkStats = await apiGet("/benchmarks/stats").catch(() => ({ count: 0, groups: [], scatter: [] }));

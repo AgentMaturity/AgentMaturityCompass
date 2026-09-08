@@ -32,6 +32,7 @@ import {
   deliverApprovalLifecycle
 } from "../src/approvals/approvalDelivery.js";
 import { startStudioApiServer } from "../src/studio/studioServer.js";
+import { NATIVE_INTENT_HEADER, NATIVE_INTENT_VALUE } from "../src/studio/nativeAdmission.js";
 import { issueLeaseForCli } from "../src/leases/leaseCli.js";
 import {
   consumeApprovedExecution,
@@ -1332,7 +1333,8 @@ describe("AMC-1471 privacy-safe approval delivery", () => {
       const unknown = await postJson(
         `${studio.url}/approvals/requests/${encodeURIComponent(unknownRequest.approvalRequestId)}/decide`,
         token,
-        { decision: "APPROVE_EVERYTHING", reason: "must reject" }
+        { decision: "APPROVE_EVERYTHING", reason: "must reject" },
+        { [NATIVE_INTENT_HEADER]: NATIVE_INTENT_VALUE }
       );
       expect(unknown.status).toBe(400);
       expect(getApprovalInboxItem({
@@ -1360,7 +1362,8 @@ describe("AMC-1471 privacy-safe approval delivery", () => {
       const replay = await postJson(
         `${studio.url}/approvals/requests/${encodeURIComponent(cancelledRequest.approvalRequestId)}/decide`,
         token,
-        { decision: "APPROVE_EXECUTE", reason: "too late" }
+        { decision: "APPROVE_EXECUTE", reason: "too late" },
+        { [NATIVE_INTENT_HEADER]: NATIVE_INTENT_VALUE }
       );
       expect(replay.status).toBe(409);
       expect(getApprovalInboxItem({

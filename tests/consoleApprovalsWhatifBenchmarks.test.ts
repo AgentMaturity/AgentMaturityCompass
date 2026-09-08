@@ -37,6 +37,7 @@ import { verifyToolsConfigSignature } from "../src/toolhub/toolhubValidators.js"
 import { verifyBudgetsConfigSignature } from "../src/budgets/budgets.js";
 import { verifyAlertsConfigSignature } from "../src/drift/alerts.js";
 import { verifyApprovalPolicySignature } from "../src/approvals/approvalPolicyEngine.js";
+import { NATIVE_INTENT_HEADER, NATIVE_INTENT_VALUE } from "../src/studio/nativeAdmission.js";
 
 const roots: string[] = [];
 
@@ -76,6 +77,7 @@ async function httpRequestRaw(params: {
   lease?: string;
   cookie?: string;
   body?: unknown;
+  headers?: Record<string, string>;
 }): Promise<{ status: number; body: string; headers: Record<string, string | string[]> }> {
   const body = params.body === undefined ? "" : JSON.stringify(params.body);
   return new Promise((resolvePromise, rejectPromise) => {
@@ -89,7 +91,8 @@ async function httpRequestRaw(params: {
           ...(params.cookie ? { cookie: params.cookie } : {}),
           connection: "close",
           "content-type": "application/json",
-          "content-length": Buffer.byteLength(body)
+          "content-length": Buffer.byteLength(body),
+          ...(params.headers ?? {})
         }
       },
       (res) => {
@@ -119,6 +122,7 @@ async function httpRequestJson(params: {
   lease?: string;
   cookie?: string;
   body?: unknown;
+  headers?: Record<string, string>;
 }): Promise<{ status: number; body: string }> {
   const raw = await httpRequestRaw(params);
   return {
@@ -339,6 +343,7 @@ describe("console + approvals + what-if + benchmarks", () => {
         url: `http://127.0.0.1:${port}/approvals/${encodeURIComponent(intent.approvalId!)}/approve`,
         method: "POST",
         adminToken: token,
+        headers: { [NATIVE_INTENT_HEADER]: NATIVE_INTENT_VALUE },
         body: {
           mode: "EXECUTE",
           reason: "Approved for test"

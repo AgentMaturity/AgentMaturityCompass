@@ -23,6 +23,7 @@ import { startWorkspaceRouter } from "../src/workspaces/workspaceRouter.js";
 import { runStudioForeground } from "../src/studio/studioSupervisor.js";
 import { ToolHubService } from "../src/toolhub/toolhubServer.js";
 import { getApprovalInboxItem } from "../src/approvals/approvalInbox.js";
+import { NATIVE_CSRF_HEADER, NATIVE_INTENT_HEADER, NATIVE_INTENT_VALUE } from "../src/studio/nativeAdmission.js";
 
 const roots: string[] = [];
 
@@ -305,13 +306,28 @@ describe("multi-workspace host mode", () => {
         ? login.headers["set-cookie"][0] ?? ""
         : String(login.headers["set-cookie"] ?? "");
 
+      // Supply valid browser proof so this remains a test of VIEWER role refusal.
+      const me = await httpRaw({
+        url: `http://127.0.0.1:${port}/w/ws-b/auth/me`,
+        method: "GET",
+        cookie: sessionCookie
+      });
+      expect(me.status).toBe(200);
+      const identity = JSON.parse(me.body) as { nativeCsrfToken?: unknown };
+      if (typeof identity.nativeCsrfToken !== "string") throw new Error("authenticated workspace did not return native CSRF proof");
       const decision = await httpRaw({
         url: `http://127.0.0.1:${port}/w/ws-b/approvals/requests/${encodeURIComponent(intent.approvalRequestId)}/decide`,
         method: "POST",
         cookie: sessionCookie,
+        headers: {
+          origin: `http://127.0.0.1:${port}`,
+          [NATIVE_INTENT_HEADER]: NATIVE_INTENT_VALUE,
+          [NATIVE_CSRF_HEADER]: identity.nativeCsrfToken
+        },
         body: { decision: "APPROVE_EXECUTE", reason: "viewer must not approve" }
       });
       expect(decision.status).toBe(403);
+      expect(decision.body).toContain("requires role");
       expect(getApprovalInboxItem({
         workspace: workspaceB,
         agentId: "default",
