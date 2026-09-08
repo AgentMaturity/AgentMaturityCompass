@@ -5,6 +5,7 @@ import { afterEach, beforeEach, describe, expect, test } from "vitest";
 import { initWorkspace } from "../src/workspace.js";
 import { openLedger } from "../src/ledger/ledger.js";
 import { SessionService } from "../src/session/sessionService.js";
+import { readEventPayload } from "../src/session/eventPayload.js";
 import { credentialRef } from "../src/credentials/credentialRef.js";
 import type { CredentialRef } from "../src/credentials/credentialRef.js";
 import type { CredentialsService } from "../src/credentials/credentialsService.js";
@@ -601,12 +602,15 @@ describe("P3.1 — the LLM adapter seam dispatches, records, and fails typed", (
     ]);
     const { runtime } = runtimeFor({ harness: h, transport: upstream.transport });
 
-    await drain(runtime.stream(callSpec(h)));
+    await drain(runtime.stream({ ...callSpec(h), tools: [{ name: "shell", description: "Fixture shell",
+      parameters: { type: "object", properties: { command: { type: "string" } }, required: ["command"] } }] }));
 
     const call = only(h.sessionId, "tool/call");
     const meta = metaOf(call);
     expect(meta.toolCallId).toBe("toolu_01");
     expect(meta.toolName).toBe("shell");
+    expect(meta.providerName).toEqual({ version: 1, wireName: "shell", headerEventId: only(h.sessionId, "request/header").id,
+      encoderId: anthropicAdapter.encoderId, encoderVersion: anthropicAdapter.encoderVersion });
     // Native and parentless by construction: a code-mode sub-call is dispatched
     // from inside a running program, never decoded from a provider stream.
     expect(meta.dispatch).toBe("native");
@@ -653,7 +657,8 @@ describe("P3.1 — the LLM adapter seam dispatches, records, and fails typed", (
     ]);
     const { runtime } = runtimeFor({ harness: h, transport: upstream.transport });
 
-    await drain(runtime.stream(callSpec(h)));
+    await drain(runtime.stream({ ...callSpec(h), tools: [{ name: "shell", description: "Fixture shell",
+      parameters: { type: "object", properties: { command: { type: "string" } }, required: ["command"] } }] }));
 
     // A tool call cut off by the token limit is unsafe to dispatch, so no
     // `tool/call` row exists for it — and the settlement names the drop rather
@@ -684,5 +689,12 @@ describe("P3.1 — the LLM adapter seam dispatches, records, and fails typed", (
     const droppedRow = events(h.sessionId).find((event) => event.id === settled[0]?.eventId);
     expect(droppedRow).toBeDefined();
     expect(metaOf(droppedRow!).stopReason).toBe("dropped:max_tokens_truncated");
+    const payload = readEventPayload(dir, droppedRow!);
+    expect(payload.status).toBe("ok");
+    if (payload.status === "ok") expect(JSON.parse(payload.bytes.toString())).toEqual({
+      type: "amc.provider-tool-drop", version: 1, providerName: { version: 1, wireName: "shell",
+        headerEventId: only(h.sessionId, "request/header").id, encoderId: anthropicAdapter.encoderId,
+        encoderVersion: anthropicAdapter.encoderVersion }, content: 'shell{"command":"rm -rf'
+    });
   });
 });
