@@ -1,12 +1,12 @@
-# NOTE: the ghcr.io images below are unverified — website/publication-status.json
-# reports containerRegistry: unverified, so a pull may 404. Build locally with
-#   docker build -f ../Dockerfile -t ghcr.io/agentmaturity/amc-studio:latest ..
-# until the registry channel is confirmed published.
 version: "3.9"
 
 services:
   amc-studio:
-    image: ghcr.io/agentmaturity/amc-studio:latest
+    build:
+      context: ..
+      dockerfile: Dockerfile
+      target: studio
+    image: amc-studio:local
     container_name: amc-studio
     restart: unless-stopped
     ports:
@@ -20,8 +20,13 @@ services:
     environment:
       - NODE_ENV=production
       - AMC_BIND=0.0.0.0
+      - AMC_ALLOWED_CIDRS=${AMC_ALLOWED_CIDRS:-127.0.0.1/32,::1/128,172.16.0.0/12,10.0.0.0/8,192.168.0.0/16}
+      - AMC_BOOTSTRAP=1
+      - AMC_VAULT_PASSPHRASE_FILE=/run/secrets/amc_vault_passphrase
+      - AMC_BOOTSTRAP_OWNER_USERNAME_FILE=/run/secrets/amc_owner_username
+      - AMC_BOOTSTRAP_OWNER_PASSWORD_FILE=/run/secrets/amc_owner_password
     healthcheck:
-      test: ["CMD", "node", "dist/cli.js", "studio", "healthcheck", "--workspace", "/data/amc"]
+      test: ["CMD", "amc", "studio", "healthcheck"]
       interval: 30s
       timeout: 5s
       retries: 5
@@ -31,7 +36,20 @@ services:
     read_only: true
     tmpfs:
       - /tmp:noexec,nosuid,size=64m
+      - /home/amc:uid=10001,gid=10001,mode=0700
+    secrets:
+      - amc_vault_passphrase
+      - amc_owner_username
+      - amc_owner_password
 
 volumes:
   amc-data:
     driver: local
+
+secrets:
+  amc_vault_passphrase:
+    file: ../deploy/compose/secrets/amc_vault_passphrase.txt
+  amc_owner_username:
+    file: ../deploy/compose/secrets/amc_owner_username.txt
+  amc_owner_password:
+    file: ../deploy/compose/secrets/amc_owner_password.txt

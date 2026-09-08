@@ -1,6 +1,13 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# Explicit commands preserve the image's CLI interface without bootstrapping.
+if [[ "$#" -gt 0 ]]; then
+  exec amc "$@"
+fi
+
+export AMC_BOOTSTRAP="${AMC_BOOTSTRAP:-1}"
+
 require_readable_file() {
   local var_name="$1"
   local file_path="${!var_name:-}"
@@ -42,10 +49,10 @@ if [[ "${AMC_BOOTSTRAP:-0}" == "1" ]]; then
     echo "ERROR: AMC_ENABLE_NOTARY=1 bootstrap requires AMC_NOTARY_AUTH_SECRET_FILE or AMC_NOTARY_AUTH_SECRET." >&2
     exit 1
   fi
-  node /app/dist/cli.js bootstrap --workspace "${AMC_WORKSPACE_DIR}"
+  amc bootstrap --workspace "${AMC_WORKSPACE_DIR}"
 fi
 
-exec node /app/dist/cli.js studio start \
+exec amc studio start \
   --workspace "${AMC_WORKSPACE_DIR}" \
   --bind "${AMC_BIND}" \
   --port "${AMC_STUDIO_PORT}"

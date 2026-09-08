@@ -94,14 +94,17 @@ GHCR visibility must be verified before publishing copy-paste `docker run ghcr.i
 
 ### Local build & test
 ```bash
-docker build -t amc-studio:dev .
-docker run -p 3212:3212 -p 3210:3210 -v $(pwd)/.amc:/data/amc amc-studio:dev
+docker build --target studio -t amc-studio:dev .
+docker run --rm amc-studio:dev --help
 ```
+
+For Studio startup with persistent state and runtime secret files, use the [source container guide](../docker/README.md). Build the CI image with `docker build --target runner -t amc-runner:dev .`. The former `Dockerfile.runner` and `deploy/compose/Dockerfile` are replaced by targets in the root Dockerfile. Linux container qualification and the separate release gate must pass before publication.
 
 ### Docker Compose (full stack)
 ```bash
 cd docker
-docker compose up -d
+# Create the runtime secret files described in ../deploy/compose/README.md first.
+docker compose up -d --build
 # Open dashboard: http://localhost:4173
 # Studio API:     http://localhost:3212
 # Gateway proxy:  http://localhost:3210

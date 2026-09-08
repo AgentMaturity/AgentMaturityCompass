@@ -147,17 +147,48 @@ jobs:
           OWNER=$(printf '%s' "$GITHUB_REPOSITORY_OWNER" | tr '[:upper:]' '[:lower:]')
           echo "repository=ghcr.io/${OWNER}/amc-studio" >> "$GITHUB_OUTPUT"
 
-      - name: Build and push Docker image to GHCR
-        id: docker
+      - name: Build Docker image for qualification
+        id: runtime_image
         uses: docker/build-push-action@v7
         with:
           context: .
           file: ./Dockerfile
-          push: true
+          target: studio
+          load: true
+          push: false
           platforms: linux/amd64
           tags: |
             ${{ steps.image.outputs.repository }}:${{ env.AMC_RELEASE_TAG }}
             ${{ steps.image.outputs.repository }}:latest
+
+      - name: Qualify exact loaded Studio image
+        env:
+          AMC_STUDIO_IMAGE: ${{ steps.runtime_image.outputs.imageid }}
+        run: node scripts/container-smoke.mjs --studio-image "$AMC_STUDIO_IMAGE" --out tmp/container-smoke.json
+
+      - name: Upload container qualification receipt
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: release-container-smoke
+          path: tmp/container-smoke.json
+
+      - name: Push qualified Docker image to GHCR
+        id: docker
+        env:
+          AMC_STUDIO_IMAGE: ${{ steps.runtime_image.outputs.imageid }}
+          AMC_REPOSITORY: ${{ steps.image.outputs.repository }}
+        run: |
+          for tag in "$AMC_REPOSITORY:$AMC_RELEASE_TAG" "$AMC_REPOSITORY:latest"; do
+            [ "$(docker image inspect --format '{{.Id}}' "$tag")" = "$AMC_STUDIO_IMAGE" ]
+            docker push "$tag"
+          done
+          docker image inspect "$AMC_REPOSITORY:$AMC_RELEASE_TAG" | node -e '
+            const image = JSON.parse(require("node:fs").readFileSync(0, "utf8"))[0];
+            const digest = image.RepoDigests.find(value => value.startsWith(process.argv[1] + "@"))?.split("@")[1];
+            if (!/^sha256:[a-f0-9]{64}$/.test(digest ?? "")) throw Error("pushed image digest missing");
+            console.log("digest=" + digest);
+          ' "$AMC_REPOSITORY" >> "$GITHUB_OUTPUT"
 
       - name: Build signed release bundle when signing is configured
         env:

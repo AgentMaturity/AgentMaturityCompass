@@ -42,7 +42,7 @@ describe("AMC-1467 Docker action Node 24 migration", () => {
     const steps = workflow.jobs["build-and-push"].steps as any[];
     const buildx = steps.find((step) => step.name === "Set up Docker Buildx");
     const metadata = steps.find((step) => step.name === "Docker metadata");
-    const publish = steps.find((step) => step.name === "Build and push");
+    const publish = steps.find((step) => step.name === "Build runtime image");
 
     expect(buildx).toMatchObject({ uses: "docker/setup-buildx-action@v4" });
     expect(buildx.with).toBeUndefined();
@@ -59,7 +59,8 @@ describe("AMC-1467 Docker action Node 24 migration", () => {
       uses: "docker/build-push-action@v7",
       with: {
         context: ".",
-        file: "Dockerfile.runner",
+        file: "Dockerfile",
+        target: "runner",
         tags: "${{ steps.meta.outputs.tags }}",
         labels: "${{ steps.meta.outputs.labels }}",
       },

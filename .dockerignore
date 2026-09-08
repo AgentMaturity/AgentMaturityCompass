@@ -8,3 +8,23 @@ website
 .serena
 coverage
 *.tgz
+
+# Never send local credentials, initialized workspaces, or host build output.
+**/node_modules
+.amc
+**/.amc
+.env
+.env.*
+**/.env
+**/.env.*
+.npmrc
+**/.npmrc
+.amc-workspace
+AMC_OS
+.graphify
+.worktrees
+worktrees
+dist
+tmp
+*.log
+deploy/compose/secrets

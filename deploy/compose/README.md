@@ -1,5 +1,7 @@
 # AMC Compose Deployment
 
+Both HTTP and TLS builds use the root Dockerfile `studio` target. The old `deploy/compose/Dockerfile` was removed. See the [source container guide](../../docker/README.md) for build, non-root volume ownership, and Linux qualification requirements.
+
 ## Prerequisites
 
 - Docker + Docker Compose plugin
@@ -23,7 +25,6 @@ Endpoints:
 - Studio API + Console: `http://<host>:3212/console`
 - Gateway: `http://<host>:3210`
 - Proxy: `http://<host>:3211`
-- Notary (internal): `http://amc-notary:4343`
 
 ## TLS Deployment (Caddy, local CA/internal cert)
 
@@ -35,6 +36,11 @@ docker compose -f docker-compose.tls.yml up -d --build
 
 Endpoints:
 - HTTPS console/API: `https://<host>:8443/console`
+- Notary (internal to this TLS stack): `http://amc-notary:4343`
+
+## Notary qualification limit
+
+The source container repair does not qualify TLS/notary operation. The existing fresh notary configuration binds `127.0.0.1`; the peer Studio URL `http://amc-notary:4343` therefore needs an explicit notary network/listen configuration before it is reachable across containers. The shared image smoke runs Studio with notary disabled. Do not treat that receipt as acceptance of the TLS/notary stack.
 
 ## Notary Mode (Fail-Closed Signing Boundary)
 

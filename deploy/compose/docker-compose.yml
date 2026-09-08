@@ -11,7 +11,8 @@ services:
   studio:
     build:
       context: ../..
-      dockerfile: deploy/compose/Dockerfile
+      dockerfile: Dockerfile
+      target: studio
     ports:
       - "3212:3212"
       - "3210:3210"
@@ -31,14 +32,10 @@ services:
       - AMC_BOOTSTRAP_OWNER_USERNAME_FILE=/run/secrets/amc_owner_username
       - AMC_BOOTSTRAP_OWNER_PASSWORD_FILE=/run/secrets/amc_owner_password
       - NODE_ENV=production
-    command: >
-      sh -lc 'if [ "$${AMC_BOOTSTRAP:-1}" = "1" ]; then
-        node dist/cli.js bootstrap --workspace /data/amc;
-      fi;
-      exec node dist/cli.js studio start --workspace /data/amc --bind 0.0.0.0 --port "$${AMC_STUDIO_PORT:-3212}"'
     read_only: true
     tmpfs:
       - /tmp
+      - /home/amc:uid=10001,gid=10001,mode=0700
     cap_drop:
       - ALL
     cap_add:
@@ -46,26 +43,24 @@ services:
     security_opt:
       - no-new-privileges:true
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3212/health"]
+      test: ["CMD", "amc", "studio", "healthcheck"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 10s
     secrets:
-  # These point at the tracked .example templates so the stack starts out of the
-  # box. For anything real, copy each to the same name without .example (those
-  # are gitignored) and update these paths.
+      # Create these untracked runtime secret files before starting the stack.
       - amc_vault_passphrase
       - amc_owner_username
       - amc_owner_password
 
 secrets:
   amc_vault_passphrase:
-    file: ./secrets/amc_vault_passphrase.txt.example
+    file: ./secrets/amc_vault_passphrase.txt
   amc_owner_username:
-    file: ./secrets/amc_owner_username.txt.example
+    file: ./secrets/amc_owner_username.txt
   amc_owner_password:
-    file: ./secrets/amc_owner_password.txt.example
+    file: ./secrets/amc_owner_password.txt
 
 volumes:
   amc_data:

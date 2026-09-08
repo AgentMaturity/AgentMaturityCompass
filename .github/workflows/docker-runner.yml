@@ -5,14 +5,40 @@ on:
     branches: [main]
     tags: ["v*"]
     paths:
-      - "Dockerfile.runner"
+      - "Dockerfile"
       - "src/**"
       - "package.json"
       - "pnpm-lock.yaml"
+      - "pnpm-workspace.yaml"
+      - "tsconfig.json"
+      - "fixtures/policy/**"
+      - "README.md"
+      - "LICENSE"
+      - "THIRD_PARTY_NOTICES"
+      - "scripts/**"
+      - "vendor/**"
+      - "packages/**"
+      - "docker/entrypoint.sh"
+      - ".dockerignore"
       - ".github/workflows/docker-runner.yml"
   pull_request:
     paths:
-      - "Dockerfile.runner"
+      - "Dockerfile"
+      - ".dockerignore"
+      - "src/**"
+      - "scripts/**"
+      - "vendor/**"
+      - "packages/**"
+      - "docker/entrypoint.sh"
+      - "package.json"
+      - "pnpm-lock.yaml"
+      - "pnpm-workspace.yaml"
+      - "tsconfig.json"
+      - "fixtures/policy/**"
+      - "README.md"
+      - "LICENSE"
+      - "THIRD_PARTY_NOTICES"
+      - ".github/workflows/docker-runner.yml"
 
 permissions:
   contents: read
@@ -52,25 +78,45 @@ jobs:
             type=sha,prefix=
             type=raw,value=latest,enable={{is_default_branch}}
 
-      - name: Build and push
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "22"
+
+      - name: Build runtime image
+        id: runtime_image
         uses: docker/build-push-action@v7
         with:
           context: .
-          file: Dockerfile.runner
-          push: ${{ github.event_name != 'pull_request' }}
+          file: Dockerfile
+          target: runner
+          load: true
+          push: false
+          platforms: linux/amd64
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
       - name: Smoke test
+        env:
+          AMC_RUNNER_IMAGE: ${{ steps.runtime_image.outputs.imageid }}
+        run: node scripts/container-smoke.mjs --runner-image "$AMC_RUNNER_IMAGE" --out tmp/runner-container-smoke.json
+
+      - name: Upload smoke receipt
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: amc-runner-smoke
+          path: tmp/runner-container-smoke.json
+
+      - name: Push qualified image
+        if: github.event_name != 'pull_request'
+        env:
+          AMC_RUNNER_IMAGE: ${{ steps.runtime_image.outputs.imageid }}
+          AMC_IMAGE_TAGS: ${{ steps.meta.outputs.tags }}
         run: |
-          docker build -t amc-runner:ci -f Dockerfile.runner .
-          docker run --rm amc-runner:ci --version
-          docker run --rm amc-runner:ci --help
-          # Verify python is available
-          docker run --rm --entrypoint python amc-runner:ci --version
-          # Verify git is available
-          docker run --rm --entrypoint git amc-runner:ci --version
-          # Verify jq is available
-          docker run --rm --entrypoint jq amc-runner:ci --version
+          while IFS= read -r tag; do
+            [ -n "$tag" ] || continue
+            [ "$(docker image inspect --format '{{.Id}}' "$tag")" = "$AMC_RUNNER_IMAGE" ]
+            docker push "$tag"
+          done <<< "$AMC_IMAGE_TAGS"

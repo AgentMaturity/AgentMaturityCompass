@@ -4,6 +4,8 @@ AMC Studio can run as a production service with persistence, TLS, and hardened d
 
 ## Docker (Compose)
 
+Source images use the root Dockerfile with explicit `studio` and `runner` targets. See [container build and qualification](../docker/README.md) for runtime secrets, UID 10001 volume ownership, and the pending Linux acceptance boundary.
+
 1. Create secret files:
    - `deploy/compose/secrets/amc_vault_passphrase.txt`
    - `deploy/compose/secrets/amc_owner_username.txt`

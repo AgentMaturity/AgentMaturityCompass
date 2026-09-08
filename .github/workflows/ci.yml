@@ -209,81 +209,21 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
-
-      - name: Build Docker image
-        run: docker build -t amc-studio:ci .
-
-      - name: Prepare bootstrap secrets
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "22"
+      - name: Build source image targets
         run: |
-          mkdir -p /tmp/amc-secrets
-          printf '%s' "ci-vault-passphrase-123456" > /tmp/amc-secrets/vault.txt
-          printf '%s' "owner" > /tmp/amc-secrets/owner-user.txt
-          printf '%s' "owner-password-123" > /tmp/amc-secrets/owner-pass.txt
-          printf '%s' "ci-notary-auth-secret-123456789012345678901234" > /tmp/amc-secrets/notary-auth.txt
-
-      - name: Run container smoke
-        run: |
-          docker run -d --name amc-ci \
-            -p 3210:3210 -p 3211:3211 -p 3212:3212 \
-            -e AMC_BOOTSTRAP=1 \
-            -e AMC_ENABLE_NOTARY=0 \
-            -e AMC_BIND=0.0.0.0 \
-            -e AMC_LAN_MODE=true \
-            -e AMC_ALLOWED_CIDRS=127.0.0.1/32,::1/128,172.16.0.0/12,10.0.0.0/8 \
-            -e AMC_VAULT_PASSPHRASE_FILE=/run/secrets/vault \
-            -e AMC_BOOTSTRAP_OWNER_USERNAME_FILE=/run/secrets/owner-user \
-            -e AMC_BOOTSTRAP_OWNER_PASSWORD_FILE=/run/secrets/owner-pass \
-            -e AMC_NOTARY_AUTH_SECRET_FILE=/run/secrets/notary-auth \
-            -v /tmp/amc-secrets/vault.txt:/run/secrets/vault:ro \
-            -v /tmp/amc-secrets/owner-user.txt:/run/secrets/owner-user:ro \
-            -v /tmp/amc-secrets/owner-pass.txt:/run/secrets/owner-pass:ro \
-            -v /tmp/amc-secrets/notary-auth.txt:/run/secrets/notary-auth:ro \
-            --entrypoint sh \
-            amc-studio:ci \
-            -c "amc bootstrap && exec amc studio start"
-
-          for i in $(seq 1 90); do
-            if curl -fsS http://127.0.0.1:3212/readyz >/dev/null 2>&1; then
-              break
-            fi
-            # Show container status every 10 iterations
-            if [ $((i % 10)) -eq 0 ]; then
-              echo "Waiting for container... (attempt $i/90)"
-              docker logs --tail 5 amc-ci 2>&1 || true
-            fi
-            sleep 2
-          done
-          # Dump full logs if health check fails
-          if ! curl -fsS http://127.0.0.1:3212/healthz >/dev/null 2>&1; then
-            echo "=== Container logs ==="
-            docker logs amc-ci 2>&1 || true
-            echo "=== Container status ==="
-            docker inspect amc-ci --format '{{.State.Status}} exit={{.State.ExitCode}}' || true
-            exit 1
-          fi
-          curl -fsS http://127.0.0.1:3212/console >/dev/null
-          docker exec -w /data/amc amc-ci amc doctor --json > /tmp/docker-doctor.json
-
-      - name: Secret leak check
-        run: |
-          docker logs amc-ci > /tmp/docker-smoke.log 2>&1 || true
-          if grep -Ei "Bearer\\s+[A-Za-z0-9._-]{10,}|api_key|lease_[A-Za-z0-9]|BEGIN PRIVATE KEY" /tmp/docker-smoke.log; then
-            echo "Potential secret material detected in docker logs"
-            exit 1
-          fi
-
-      - name: Cleanup
-        if: always()
-        run: docker rm -f amc-ci || true
-
+          docker build --target studio -t amc-studio:ci .
+          docker build --target runner -t amc-runner:ci .
+      - name: Qualify installed container runtime
+        run: node scripts/container-smoke.mjs --studio-image amc-studio:ci --runner-image amc-runner:ci --out tmp/container-smoke.json
       - name: Upload docker smoke artifact
         if: always()
         uses: actions/upload-artifact@v7
         with:
           name: docker-smoke
-          path: |
-            /tmp/docker-doctor.json
-            /tmp/docker-smoke.log
+          path: tmp/container-smoke.json
 
   helm-lint-template:
     runs-on: ubuntu-latest
