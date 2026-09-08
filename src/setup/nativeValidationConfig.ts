@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { closeSync, constants, fstatSync, lstatSync, openSync, readSync } from "node:fs";
+import { closeSync, constants, fstatSync, lstatSync, openSync, readSync, type Stats } from "node:fs";
 import { resolve } from "node:path";
 import type { NativeValidationPlan } from "../agent/nativeValidation.js";
 
@@ -12,8 +12,8 @@ export class NativeValidationConfigError extends Error {}
 const refuse = (message: string): never => { throw new NativeValidationConfigError(message); };
 const object = (value: unknown): value is Record<string, unknown> => value !== null && typeof value === "object" && !Array.isArray(value);
 const onlyKeys = (value: Record<string, unknown>, keys: readonly string[]) => Object.keys(value).every(key => keys.includes(key));
-const sameFile = (a: ReturnType<typeof lstatSync>, b: ReturnType<typeof lstatSync>) =>
-  ["dev", "ino", "size", "mtimeMs", "ctimeMs"].every(key => a[key as keyof typeof a] === b[key as keyof typeof b]);
+const sameFile = (a: Stats, b: Stats) =>
+  (["dev", "ino", "size", "mtimeMs", "ctimeMs"] as const).every(key => a[key] === b[key]);
 const LIMIT = 32 * 1024;
 
 /** Explicit operator input, captured once; no discovery, execution or tool grants. */

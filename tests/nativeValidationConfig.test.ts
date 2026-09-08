@@ -34,7 +34,7 @@ describe("operator-owned native validation selection", () => {
     expect(() => resolveNativeValidationSelection({ validationConfigSha256: "a".repeat(64) })).toThrow("explicit validation config");
     expect(resolveNativeValidationSelection({ validationConfig: f.file, validate: ["unit"] })?.checks[0]?.id).toBe("unit");
   });
-  test.each([[], ["unit", "unit"], ["missing"], Array.from({ length: 9 }, (_, i) => `check${i}`)])("refuses an invalid explicit selection %#", ids => {
+  test.each([[], ["unit", "unit"], ["missing"], Array.from({ length: 9 }, (_, i) => `check${i}`)].map(ids => ({ ids })))("refuses an invalid explicit selection %#", ({ ids }) => {
     const f = fixture(); expect(() => selectNativeValidationChecks(loadNativeValidationConfiguration(f.file), ids)).toThrow();
   });
   test.each([
