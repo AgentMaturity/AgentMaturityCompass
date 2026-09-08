@@ -7,8 +7,11 @@ import { AjvJsonSchemaValidator } from "@modelcontextprotocol/sdk/validation/ajv
 import type { AgentToolset } from "../agent/agentToolset.js";
 import type { ActionClass } from "../types.js";
 import { isActionClass } from "../governor/actionCatalog.js";
+import type { Transport } from "@modelcontextprotocol/sdk/shared/transport.js";
+import { NativeMcpHttpTransport, type NativeMcpHttpServer } from "./nativeMcpHttpTransport.js";
 
-export interface NativeMcpServer {
+export interface NativeMcpStdioServer {
+  readonly transport?: "stdio";
   readonly id: string;
   readonly command: string;
   readonly args?: readonly string[];
@@ -16,6 +19,7 @@ export interface NativeMcpServer {
   readonly env?: Readonly<Record<string, string>>;
   readonly timeoutMs?: number;
 }
+export type NativeMcpServer = NativeMcpStdioServer | NativeMcpHttpServer;
 
 export interface NativeMcpCatalogTool {
   readonly name: string;
@@ -63,19 +67,38 @@ function scrubResult(value: unknown, secrets: readonly string[], depth = 0): unk
   return value;
 }
 
-function parameters(server: NativeMcpServer, workspace: string): { transport: StdioClientTransport; client: Client; timeout: number } {
+function serverSecrets(server: NativeMcpServer, transport?: Transport): string[] {
+  const values = Object.values(server.transport === "streamable-http" ? server.headers ?? {} : server.env ?? {}).filter(Boolean);
+  if (server.transport === "streamable-http") {
+    for (const [name, value] of Object.entries(server.headers ?? {})) {
+      if (name.toLowerCase() === "authorization" && /^Bearer\s+/i.test(value)) values.push(value.replace(/^Bearer\s+/i, ""));
+    }
+    if (transport?.sessionId) values.push(transport.sessionId);
+  }
+  return values;
+}
+
+function transportFailure(transport: Transport, fallback: string): string {
+  return transport instanceof NativeMcpHttpTransport ? transport.failureMessage ?? fallback : fallback;
+}
+
+function parameters(server: NativeMcpServer, workspace: string): { transport: Transport; client: Client; timeout: number } {
   if (!/^[a-zA-Z0-9_-]{1,32}$/.test(server.id)) throw new Error("MCP server id must be 1–32 letters, digits, underscores or hyphens");
-  if (!server.command || server.command.includes("\0")) throw new Error("MCP server requires an explicit executable");
   const timeout = server.timeoutMs ?? 30_000;
   if (!Number.isSafeInteger(timeout) || timeout < 1 || timeout > 300_000) throw new Error("MCP timeout must be between 1 and 300000 milliseconds");
-  const transport = new StdioClientTransport({ command: server.command, args: [...(server.args ?? [])],
-    cwd: resolve(workspace), env: { ...getDefaultEnvironment(), ...server.env }, stderr: "pipe", maxBufferSize: 4 * 1024 * 1024 });
-  transport.stderr?.on("data", () => {});
+  let transport: Transport;
+  if (server.transport === "streamable-http") transport = new NativeMcpHttpTransport(server, timeout);
+  else {
+    if (!server.command || server.command.includes("\0")) throw new Error("MCP server requires an explicit executable");
+    const stdio = new StdioClientTransport({ command: server.command, args: [...(server.args ?? [])],
+      cwd: resolve(workspace), env: { ...getDefaultEnvironment(), ...server.env }, stderr: "pipe", maxBufferSize: 4 * 1024 * 1024 });
+    stdio.stderr?.on("data", () => {}); transport = stdio;
+  }
   const client = new Client({ name: "amc-governed-native-tools", version: "1.0.0" }, { capabilities: {} });
   return { transport, client, timeout };
 }
 
-async function catalog(client: Client, server: NativeMcpServer, timeout: number, signal?: AbortSignal): Promise<NativeMcpCatalog> {
+async function catalog(client: Client, server: NativeMcpServer, timeout: number, signal?: AbortSignal, transport?: Transport): Promise<NativeMcpCatalog> {
   const tools: NativeMcpCatalogTool[] = [];
   const cursors = new Set<string>();
   let cursor: string | undefined;
@@ -96,13 +119,13 @@ async function catalog(client: Client, server: NativeMcpServer, timeout: number,
   if (Buffer.byteLength(bytes) > 1024 * 1024) throw new Error("MCP catalog exceeds the accepted size");
   // A server can echo its environment into a description or schema. Reject the
   // whole catalog before publishing it; redacting would change what was reviewed.
-  for (const secret of Object.values(server.env ?? {})) {
+  for (const secret of serverSecrets(server, transport)) {
     if (secret && bytes.includes(JSON.stringify(secret).slice(1,-1))) throw new Error("MCP catalog contains credential material");
   }
   return { serverId: server.id, tools, digest: createHash("sha256").update(bytes).digest("hex") };
 }
 
-/** Explicitly starts a configured local server to inspect its catalog, then disposes the child. */
+/** Connects only to the explicit server to inspect its catalog, then disposes the transport. */
 export async function discoverNativeMcpCatalog(server: NativeMcpServer, workspace: string, signal?: AbortSignal): Promise<NativeMcpCatalog> {
   if (signal?.aborted) throw new Error("MCP discovery cancelled before launch");
   const { transport, client, timeout } = parameters(server, workspace);
@@ -110,8 +133,8 @@ export async function discoverNativeMcpCatalog(server: NativeMcpServer, workspac
   signal?.addEventListener("abort", abort, { once: true });
   try {
     await client.connect(transport, { timeout, signal });
-    return await catalog(client, server, timeout, signal);
-  } catch { throw new Error("MCP catalog discovery failed; no tool grant was created"); }
+    return await catalog(client, server, timeout, signal, transport);
+  } catch { throw new Error(transportFailure(transport, "MCP catalog discovery failed; no tool grant was created")); }
   finally { signal?.removeEventListener("abort", abort); try { await client.close(); } finally { await transport.close(); } }
 }
 
@@ -124,7 +147,7 @@ export interface MountedNativeMcpServer {
 /**
  * Adds pinned tools to an existing governed toolset. Registry guards, approvals,
  * budgets and signed call recording remain on the toolset's execution path.
- * No automatic allowlist edits, reconnect, tenant-global cache or HTTP transport.
+ * No automatic allowlist edits, reconnect or tenant-global cache.
  */
 export async function mountNativeMcpServer(options: {
   readonly server: NativeMcpServer;
@@ -161,8 +184,9 @@ export async function mountNativeMcpServer(options: {
   client.onerror = () => { void close().catch(() => {}); };
   try {
     await client.connect(transport, { timeout, signal: options.signal });
-    const initial = await catalog(client, server, timeout, options.signal);
+    const initial = await catalog(client, server, timeout, options.signal, transport);
     if (!active || initial.digest !== options.expectedCatalogDigest) throw new Error("MCP catalog differs from the reviewed digest");
+    const secrets = serverSecrets(server, transport);
     const names: string[] = [];
     for (const grant of options.grants) {
       const remote = initial.tools.find((tool) => tool.name === grant.name);
@@ -190,7 +214,7 @@ export async function mountNativeMcpServer(options: {
           if (signal?.aborted) throw new Error("MCP call cancelled before dispatch");
           signal?.addEventListener("abort", abort, { once: true });
           try {
-            const current = await catalog(client, server, timeout, signal);
+            const current = await catalog(client, server, timeout, signal, transport);
             if (!active || current.digest !== initial.digest) { await close(); throw new Error("catalog changed"); }
             // listTools() resets the SDK output-validator cache for EACH page.
             // Accept only AMC's pinned per-tool schema, independently of that
@@ -200,12 +224,14 @@ export async function mountNativeMcpServer(options: {
               if (result.structuredContent === undefined && result.isError !== true) throw new Error("MCP structured output is missing");
               if (result.structuredContent !== undefined && !validateOutput(result.structuredContent).valid) throw new Error("MCP structured output does not match the reviewed schema");
             }
-            const output = JSON.stringify(scrubResult(result, Object.values(server.env ?? {}).filter(Boolean)));
+            const output = JSON.stringify(scrubResult(result, secrets));
             return { ok: result.isError !== true, output, bytes: Buffer.byteLength(output), exitCode: result.isError === true ? 1 : 0 };
           } catch (error) {
             await close().catch(() => {});
-            return { ok: false, exitCode: 1, timedOut: error instanceof McpError && error.code === ErrorCode.RequestTimeout,
-              output: signal?.aborted ? "MCP call cancelled; connection and grants disposed" : "MCP call failed or catalog changed; review and mount again" };
+            return { ok: false, exitCode: 1, timedOut: (transport instanceof NativeMcpHttpTransport && transport.failureTimedOut)
+                || (error instanceof McpError && error.code === ErrorCode.RequestTimeout),
+              output: signal?.aborted ? "MCP call cancelled; connection and grants disposed"
+                : transportFailure(transport, "MCP call failed or catalog changed; review and mount again") };
           } finally { signal?.removeEventListener("abort", abort); }
         }
       }, agentId));
@@ -217,6 +243,6 @@ export async function mountNativeMcpServer(options: {
   } catch (error) {
     await close().catch(() => {});
     // Do not expose server diagnostics, command arguments or credential environment on failure.
-    throw new Error("MCP mount refused; review the configured server, catalog digest and tool grants", { cause: error instanceof Error ? error.name : "unknown" });
+    throw new Error(transportFailure(transport, "MCP mount refused; review the configured server, catalog digest and tool grants"), { cause: error instanceof Error ? error.name : "unknown" });
   }
 }

@@ -7,17 +7,31 @@ import { isActionClass } from "../governor/actionCatalog.js";
 import { loadVerifiedToolsConfigSnapshot } from "../toolhub/toolhubValidators.js";
 import { nativeMcpToolName, type NativeMcpGrant, type NativeMcpServer } from "../mcp/nativeMcpClient.js";
 import type { ActionClass } from "../types.js";
+import { nativeMcpHttpEndpoint, nativeMcpNotificationLifetime, validateNativeMcpHeaderNames } from "../mcp/nativeMcpHttpTransport.js";
+
+interface StdioConfiguration {
+  readonly transport?: "stdio";
+  readonly id: string;
+  readonly command: string;
+  readonly args?: readonly string[];
+  /** Child variable name -> AMC credential reference. Literal env is refused. */
+  readonly envRefs?: Readonly<Record<string, string>>;
+  readonly timeoutMs?: number;
+}
+interface HttpConfiguration {
+  readonly transport: "streamable-http";
+  readonly id: string;
+  readonly url: string;
+  readonly origin: string;
+  /** Complete header value, such as a Bearer credential, resolved privately. */
+  readonly headerRefs?: Readonly<Record<string, string>>;
+  readonly timeoutMs?: number;
+  readonly notificationLifetimeMs?: number;
+}
 
 export interface NativeMcpConfiguration {
   readonly schemaVersion: 1;
-  readonly server: {
-    readonly id: string;
-    readonly command: string;
-    readonly args?: readonly string[];
-    /** Child variable name -> AMC credential reference. Literal env is refused. */
-    readonly envRefs?: Readonly<Record<string, string>>;
-    readonly timeoutMs?: number;
-  };
+  readonly server: StdioConfiguration | HttpConfiguration;
   readonly expectedCatalogDigest?: string;
   readonly grants?: readonly NativeMcpGrant[];
 }
@@ -59,25 +73,44 @@ export function loadNativeMcpConfiguration(path: string, expectedSha256?: string
     return refuse("MCP config requires schemaVersion 1 and one explicit server; unsupported fields are refused.");
   }
   const server = value.server;
-  if (!onlyKeys(server, ["id", "command", "args", "envRefs", "timeoutMs"]) ||
-      typeof server.id !== "string" || !/^[a-zA-Z0-9_-]{1,32}$/.test(server.id) ||
-      typeof server.command !== "string" || !server.command.trim() || /[\x00-\x1f\x7f]/.test(server.command)) {
-    return refuse("MCP server requires an id and executable. Use envRefs for credential references; literal env and unsupported server fields are refused.");
-  }
-  if (server.args !== undefined && (!Array.isArray(server.args) || server.args.length > 256 || server.args.some(arg => typeof arg !== "string" || arg.includes("\0")))) {
-    return refuse("MCP server args must be a bounded array of strings without NUL bytes.");
-  }
+  if (typeof server.id !== "string" || !/^[a-zA-Z0-9_-]{1,32}$/.test(server.id)) return refuse("MCP server requires a supported explicit id.");
   if (server.timeoutMs !== undefined && (typeof server.timeoutMs !== "number" || !Number.isSafeInteger(server.timeoutMs) || server.timeoutMs < 1 || server.timeoutMs > 300_000)) {
     return refuse("MCP server timeoutMs must be an integer from 1 through 300000.");
   }
-  if (server.envRefs !== undefined) {
-    if (!object(server.envRefs) || Object.keys(server.envRefs).length > 64) return refuse("MCP envRefs must be a bounded map of environment names to credential references.");
-    for (const [name, ref] of Object.entries(server.envRefs)) {
+  const http = server.transport === "streamable-http";
+  if (http) {
+    if (!onlyKeys(server, ["transport", "id", "url", "origin", "headerRefs", "timeoutMs", "notificationLifetimeMs"]) || typeof server.url !== "string" || typeof server.origin !== "string") {
+      return refuse("MCP HTTP requires explicit url and origin. Use headerRefs; literal headers and stdio fields are refused.");
+    }
+    try { nativeMcpHttpEndpoint(server.url, server.origin); }
+    catch { return refuse("MCP HTTP requires the exact pinned HTTPS origin, or literal loopback HTTP for development, without URL credentials, query or fragment."); }
+    if (server.notificationLifetimeMs !== undefined) {
+      if (typeof server.notificationLifetimeMs !== "number") return refuse("MCP HTTP notificationLifetimeMs must be an integer from 1 through 86400000.");
+      try { nativeMcpNotificationLifetime(server.notificationLifetimeMs); }
+      catch { return refuse("MCP HTTP notificationLifetimeMs must be an integer from 1 through 86400000."); }
+    }
+  } else {
+    if ((server.transport !== undefined && server.transport !== "stdio") || !onlyKeys(server, ["transport", "id", "command", "args", "envRefs", "timeoutMs"])
+      || typeof server.command !== "string" || !server.command.trim() || /[\x00-\x1f\x7f]/.test(server.command)) {
+      return refuse("MCP server requires an id and executable. Use envRefs for credential references; literal env and unsupported server fields are refused.");
+    }
+    if (server.args !== undefined && (!Array.isArray(server.args) || server.args.length > 256 || server.args.some(arg => typeof arg !== "string" || arg.includes("\0")))) {
+      return refuse("MCP server args must be a bounded array of strings without NUL bytes.");
+    }
+  }
+  const references = http ? server.headerRefs : server.envRefs;
+  if (references !== undefined) {
+    if (!object(references) || Object.keys(references).length > (http ? 32 : 64)) return refuse("MCP credential references must be a bounded map.");
+    if (http) {
+      try { validateNativeMcpHeaderNames(Object.keys(references)); }
+      catch { return refuse("MCP headerRefs has duplicate, invalid or transport-controlled names."); }
+    }
+    for (const [name, ref] of Object.entries(references)) {
       try {
-        credentialRef(name);
+        if (!http) credentialRef(name);
         if (typeof ref !== "string") throw new Error("Invalid reference");
         credentialRef(ref);
-      } catch { return refuse("MCP envRefs contains an invalid environment name or credential reference. Values are withheld."); }
+      } catch { return refuse("MCP contains an invalid credential reference. Values are withheld."); }
     }
   }
   if (value.expectedCatalogDigest !== undefined && (typeof value.expectedCatalogDigest !== "string" || !/^[a-f0-9]{64}$/.test(value.expectedCatalogDigest))) {
@@ -121,22 +154,29 @@ export async function resolveNativeMcpServer(config: NativeMcpConfiguration, opt
   readonly credentialsHome?: string;
   readonly credentialsFile?: string;
 }): Promise<NativeMcpServer> {
-  const { envRefs, ...server } = config.server;
-  if (envRefs === undefined || Object.keys(envRefs).length === 0) return server;
+  const source = config.server;
+  const references = source.transport === "streamable-http" ? source.headerRefs : source.envRefs;
+  const server: NativeMcpServer = source.transport === "streamable-http"
+    ? { transport: source.transport, id: source.id, url: source.url, origin: source.origin,
+      ...(source.timeoutMs === undefined ? {} : { timeoutMs: source.timeoutMs }),
+      ...(source.notificationLifetimeMs === undefined ? {} : { notificationLifetimeMs: source.notificationLifetimeMs }) }
+    : { id: source.id, command: source.command, ...(source.transport === undefined ? {} : { transport: source.transport }),
+      ...(source.args === undefined ? {} : { args: source.args }), ...(source.timeoutMs === undefined ? {} : { timeoutMs: source.timeoutMs }) };
+  if (references === undefined || Object.keys(references).length === 0) return server;
   let store: LocalCredentialsService | undefined;
   try {
     store = new LocalCredentialsService({ watch: false, projectDir: options.workspace,
       ...(options.credentialsHome === undefined ? {} : { homeDir: options.credentialsHome }),
       ...(options.credentialsFile === undefined ? {} : { path: options.credentialsFile }) });
-    const env: Record<string, string> = Object.create(null) as Record<string, string>;
-    for (const [name, ref] of Object.entries(envRefs)) {
+    const values: Record<string, string> = Object.create(null) as Record<string, string>;
+    for (const [name, ref] of Object.entries(references)) {
       const value = store.resolve(credentialRef(ref));
-      if (value === null) return refuse("An MCP environment credential reference is not configured. Set it through AMC credentials and retry.");
-      env[name] = value;
+      if (value === null) return refuse("An MCP credential reference is not configured. Set it through AMC credentials and retry.");
+      values[name] = value;
     }
-    return { ...server, env };
+    return server.transport === "streamable-http" ? { ...server, headers: values } : { ...server, env: values };
   } catch (error) {
     if (error instanceof NativeMcpConfigError) throw error;
-    return refuse("Could not resolve the MCP environment references. Inspect credential metadata separately; values and file content are withheld.");
+    return refuse("Could not resolve the MCP credential references. Inspect credential metadata separately; values and file content are withheld.");
   } finally { await store?.close(); }
 }

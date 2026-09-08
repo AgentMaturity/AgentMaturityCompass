@@ -127,7 +127,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
 
   group
     .command("mcp-catalog")
-    .description("Start an explicitly configured stdio MCP server, report its catalog, and dispose it (executes a local program)")
+    .description("Connect to an explicitly configured stdio or Streamable HTTP MCP server, report its catalog, and disconnect")
     .requiredOption("--config <path>", "operator-authored MCP JSON config; envRefs holds references, never literal credentials")
     .option("--credentials-home <dir>", "credential home used to resolve explicit server envRefs")
     .option("--credentials-file <path>", "explicit credential file used to resolve server envRefs")

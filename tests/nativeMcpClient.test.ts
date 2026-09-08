@@ -207,6 +207,7 @@ describe("native MCP configuration admission", () => {
     writeFileSync(path, JSON.stringify(config) + "\n"); expect(() => loadNativeMcpConfiguration(path, digest)).toThrow(/changed/);
     writeFileSync(path, JSON.stringify({ ...config, server: { ...config.server, env: { TOKEN: "must-be-refused" } } }));
     expect(() => loadNativeMcpConfiguration(path)).toThrow(/literal env/);
+    if (loaded.config.server.transport === "streamable-http") throw new Error("Expected the legacy stdio fixture configuration");
     await expect(resolveNativeMcpServer({ ...loaded.config, server: { ...loaded.config.server, envRefs: { AMC_FIXTURE_SECRET: "AMC_ABSENT_MCP_FIXTURE_REFERENCE_9B32" } } },
       { workspace: fixture.workspace, credentialsHome: join(fixture.workspace, "isolated-credentials") })).rejects.toThrow(/not configured/);
   });

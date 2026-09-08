@@ -6,8 +6,8 @@ Sandbox mode executes agent commands in Docker and writes explicit sandbox attes
 
 Native `agentToolset` shell calls on Linux use the Bubblewrap backend. This is
 a separate path from the Docker command below. The constrained Ubuntu backend
-has a dated acceptance receipt; the corrected signed native CLI policy is being
-qualified separately. Binary discovery alone does
+and corrected signed native CLI path have separate dated acceptance receipts.
+The installed CLI at `9d963469` passed on Ubuntu 24.04 ARM64. Binary discovery alone does
 not qualify a machine or establish that a command was confined.
 
 The backend requires a root-owned, non-setuid `/usr/bin/bwrap`, an x64 or arm64
@@ -82,7 +82,8 @@ The final Linux qualification must exercise successful granted writes, outside
 and symlink write denial, TCP and pathname Unix-socket denial, cancellation and
 escaped-descendant cleanup, missing/broken launchers, and signed native receipts.
 The earlier 36-case Ubuntu backend receipt covers that component boundary;
-the installed corrected native CLI path has its own qualification. See the
+the installed corrected native CLI path passed 41 assertions covering six
+actual shell calls, signed confinement outcomes and independent cold verification. See the
 [Ubuntu setup guide](NATIVE_SANDBOX_UBUNTU.md) for the exact profile and scope.
 Bubblewrap's official
 [project](https://github.com/containers/bubblewrap) and

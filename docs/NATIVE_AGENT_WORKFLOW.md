@@ -2,7 +2,7 @@
 
 AMC runs its own model loop with workspace tools, approval gates, sessions, context compaction and MCP connections. It does not need DSH, Pi or another agent runtime. Use this path to request an answer, work with explicitly permitted files, continue a recorded conversation and inspect its evidence. A first score is a baseline; it is not an agent task.
 
-The workflows below are implemented in the current source and await the combined validation pass. They do not establish live-provider success, platform coverage, release readiness or measured usability.
+Installed local exercises cover file editing, terminal chat and extensions, TypeScript/Python session lifecycle, and governed stdio MCP calls with real approvals. They use scripted local providers; live-provider quality, broader platforms and human usability remain separate measurements. The Linux shell-policy correction and Streamable HTTP MCP follow-on have their own qualification boundaries.
 
 ## Inspect and set up
 
@@ -91,7 +91,7 @@ The default operation summarizes a range. `--replace` preserves one entry's role
 
 Use chat's `--preset` option to select an existing signed profile from `.amc/agents.yaml`. Explicit provider/model, persona and bound options take precedence over profile defaults. Without either an explicit provider/model or a signed choice, chat asks for them; it never guesses a live model or falls back to a demo after failure. A changed or unverifiable selected profile requires a new reviewed chat.
 
-`--persona` supplies an explicit native persona. `--delegate` enables in-process child agents only with workspace tools and an independently signed `delegate` tool grant. `--delegate-scope` narrows the child's action classes, and `--max-delegation-depth` bounds actual nesting. Nested children inherit non-widening scopes, signed approval requirements, per-turn limits and parent cancellation; existing budgets and write scopes still apply. Foreign-delegate and code-mode profiles are refused by this chat surface rather than silently changed. This nested integration is source implemented and awaits the combined validation run.
+`--persona` supplies an explicit native persona. `--delegate` enables in-process child agents only with workspace tools and an independently signed `delegate` tool grant. `--delegate-scope` narrows the child's action classes, and `--max-delegation-depth` bounds actual nesting. Nested children inherit non-widening scopes, signed approval requirements, per-turn limits and parent cancellation; existing budgets and write scopes still apply. Foreign-delegate and code-mode profiles are refused by this chat surface rather than silently changed. These controls do not establish the quality of a delegated answer.
 
 For reusable context files and named prompt commands, see [Native Extensions](NATIVE_EXTENSIONS.md). Inspect and explicitly sign the manifest with AMC's existing workspace authority, then select its path with `--extension` or chat `/load`. Loading pins both manifest and content; it cannot load executable hooks, select credentials or grant tools. `/unload` removes future contributions while preserving signed history.
 
@@ -109,16 +109,16 @@ amc approvals login --username reviewer --token-file "$HOME/amc-reviewer.session
 
 The password prompt is masked. Login prints the actual identity, roles, expiry and canonical file path; it never prints the password or session token. Supply that path when chat requests the approval session, then review the exact pending request. The file is created exclusively with private permissions (0600); an existing destination is refused. Each login defaults to 15 minutes and accepts 5–60 minutes, matching the existing session API's minimum. Use `--json` for metadata, or explicitly select `--password-stdin` for redirected input of at most 4096 UTF-8 password bytes; passwords are never command arguments. Input keeps whitespace and removes only one optional final line ending.
 
-Login does not create an account, assign OWNER or grant approval authority. An administrator provisions signed local accounts through the existing `amc user init` first-owner setup and `amc user add` workflow; use `amc user list` to inspect existing accounts before setup. Existing request roles, quorum, policy, revocation and expiry still apply. The new login integration is source implemented and awaits the combined validation run.
+Login does not create an account, assign OWNER or grant approval authority. An administrator provisions signed local accounts through the existing `amc user init` first-owner setup and `amc user add` workflow; use `amc user list` to inspect existing accounts before setup. Existing request roles, quorum, policy, revocation and expiry still apply. The installed stdio MCP acceptance exercised this login and an authenticated decision against the exact pending request before allowing the tool effect.
 
-For a local MCP server, follow [Native MCP](NATIVE_MCP.md):
+For a local or remote MCP server, follow [Native MCP](NATIVE_MCP.md):
 
-1. Create an explicit server JSON configuration with credential **references** in `envRefs`, never literal secrets.
-2. Run `amc agent-loop mcp-catalog --config mcp.json --json`. This starts the configured program and disposes it after discovery; it is not part of the read-only guide.
+1. Create an explicit server JSON configuration. Stdio uses a selected executable and credential references in `envRefs`; Streamable HTTP uses a pinned endpoint/origin and `headerRefs`. Store secrets through the credential service.
+2. Run `amc agent-loop mcp-catalog --config mcp.json --json`. This connects to the configured server and disposes the connection after discovery; it is not part of the read-only guide.
 3. Review the catalog digest and original/generated tool names. Pin `expectedCatalogDigest`, choose each remote tool/action-class grant, and independently add the exact generated names and matching classes to signed tool policy.
 4. Supply `--mcp-config mcp.json`, `--tools workspace` and the matching `--approve-tools ACTION_CLASS` to run/chat. All grants in that invocation must match the approval class. No allowlist is widened automatically.
 
-Changed catalogs/configuration, missing grants or broken connections refuse dispatch. Mounts belong to the selected session and are disposed at exit/cancellation; no old connection grants are reused automatically. The current connector is stdio only.
+Changed catalogs/configuration, missing grants or broken connections refuse dispatch. Mounts belong to the selected session and are disposed at exit/cancellation; no old connection grants are reused automatically. The native client supports stdio and Streamable HTTP; HTTP qualification is tracked separately from the accepted stdio artifact.
 
 ## Embed the native runtime
 
@@ -152,7 +152,7 @@ Use the [Code Graph guide](CODE_GRAPH.md) for extraction and queries. The follow
 | Interactive and single-turn execution | `src/setup/nativeInteractiveSession.ts`; `src/setup/nativeChatProfile.ts`; `src/cli-agent-commands.ts` | `src/kernel/agentLoopRunner.ts`; packaged runtime seam `src/kernel/amcRuntime.ts` |
 | Session ownership and cold verification | `src/session/sessionOwnership.ts`; `src/agent/runReport.ts` | `src/ledger/ledgerSessionTransactions.ts`; `src/session/sessionService.ts` |
 | Native context compaction | `src/cli-session-compaction-commands.ts`; `src/session/sessionCompactionWorkflow.ts` | `src/session/sessionService.ts`; `src/session/surfaceCompaction.ts`; `src/session/surfaceCompactionValidation.ts` |
-| Governed workspace/MCP calls | `src/agent/agentToolset.ts`; `src/setup/nativeMcpConfig.ts` | `src/mcp/nativeMcpClient.ts`; the recorder binder in `src/cli-agent-commands.ts` |
+| Governed workspace/MCP calls | `src/agent/agentToolset.ts`; `src/setup/nativeMcpConfig.ts` | `src/mcp/nativeMcpClient.ts`; `src/mcp/nativeMcpHttpTransport.ts`; the recorder binder in `src/cli-agent-commands.ts` |
 | Application-owned native runtime | `src/sdk/nativeAgentClient.ts` — `AMCNativeClient` | `src/acp/acpCli.ts`; `src/acp/acpStdioMain.ts`; `src/acp/acpAgentServer.ts` |
 | Signed native text/command extensions | `src/cli-native-extension-commands.ts`; `src/extensions/nativeExtensionRuntime.ts` | `src/extensions/nativeExtensionStore.ts`; `src/prompt/context/contextHost.ts` |
 | DSH process capture | `src/adapters/deepseekHarnessLaunch.ts`; `src/adapters/builtins/deepseekHarness.ts` | `src/adapters/adapterRunner.ts`; gateway and ledger capture paths |
