@@ -2,6 +2,8 @@
 
 This is the readable, implementation-backed overview of how AMC is built today.
 
+For a task-oriented reading order through native execution, external imports and signing authority, use [ARCHITECTURE_NAVIGATION.md](ARCHITECTURE_NAVIGATION.md). Its focused Graphify maps link those flows to current source; the larger graph remains a navigation aid, not runtime verification.
+
 If you want the file-by-file appendix, start with [ARCHITECTURE_MAP.md](ARCHITECTURE_MAP.md). If you want capabilities organized by AMC surface, read [SYSTEM_CAPABILITIES.md](SYSTEM_CAPABILITIES.md). If you want a subsystem walk-through, continue into [deep-dive/INDEX.md](deep-dive/INDEX.md).
 
 ## The Short Version
