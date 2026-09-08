@@ -123,3 +123,30 @@ this example. Do not turn this small corpus into an adversarial safety claim.
 Published results must keep observed coding outcomes, usage qualification,
 governance evidence, human usability and wider platform qualification separate.
 No runtime, benchmark or deployment result follows from materialization alone.
+
+## Retained final source
+
+New adapter receipts include `outputSnapshot` for all three targets after their
+native process has exited, before the workspace is cleaned up. It captures only
+`repo/solution.mjs`: a stable, unsymlinked regular file of at most 128 KiB, decoded
+as strict UTF-8 with its BOM preserved. The capture reads the module as data;
+it does not execute it or decide the independent oracle verdict. A failed or
+timed-out process may still leave a captured file. Setup or spawn failure leaves
+`status: "not-captured"`; missing, unsafe, oversized, changed or undecodable
+output has `status: "unavailable"` and a fixed reason, without partial source.
+
+For a captured file, `original.sha256` and `original.bytes` describe the actual
+file bytes. `retained.sourceText`, `retained.sha256` and `retained.bytes` describe
+the text after known synthetic credentials are redacted by the adapter. The
+`fidelity.atAdapterCapture` field distinguishes byte-identical text from that
+redacted text. These hashes describe the stages named in the receipt, **before
+outer publication redaction**. The comparison publisher may redact additional
+secret-like material: recompute the digest of the published text before assuming
+it still matches the retained digest. A mismatch means that exact adapter text
+is no longer available in that published artifact, not that the original file
+digest identifies the redacted content. No encoded backup bypasses redaction.
+
+The original snapshot and the later independent oracle may observe different
+bytes if another process changes the file; compare their digests and retain that
+limitation rather than inferring agreement. Older pilot receipts that retained
+only a source digest do not acquire historical source bytes from this change.

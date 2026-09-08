@@ -2,7 +2,7 @@ import { randomBytes } from "node:crypto";
 import { lstatSync, mkdirSync, mkdtempSync, realpathSync, renameSync, writeFileSync } from "node:fs";
 import { basename, dirname, join, resolve, sep } from "node:path";
 import { pathToFileURL } from "node:url";
-import { VERSION, invoke, putJson, readJson, seedRepository } from "./codingCommon.mjs";
+import { VERSION, captureCodingOutputSnapshot, invoke, putJson, readJson, seedRepository } from "./codingCommon.mjs";
 import { codingGateway } from "./codingGateway.mjs";
 import { verifyInventory } from "./nativeCommon.mjs";
 
@@ -11,6 +11,7 @@ import { verifyInventory } from "./nativeCommon.mjs";
 const [cliArg, workspaceArg, fixturePath, contextPath, inventoryPath] = process.argv.slice(2);
 const receipt = { schemaVersion: VERSION, kind: "local-coding", fixtureId: null, targetId: null,
   setup: [], execution: { started: false, exitCode: null, signal: null, truncated: false, timedOut: false },
+  outputSnapshot: { schemaVersion: 1, path: "repo/solution.mjs", status: "not-captured", reason: "native-process-not-completed" },
   error: null, modelRequests: 0, gateway: { requests: [] }, inventory: { beforeVerified: false, afterVerified: false } };
 const cancellation = new AbortController();
 let requestedSignal = null, gateway, workspace, context, inventory;
@@ -176,6 +177,7 @@ try {
   receipt.setup.push({ label: "native-binding", args, configuration: "private per-launch files; secrets supplied only in child environment" });
   const result = await invoke(cli, [...args, fixture.prompt], { cwd: workspace, env, timeoutMs: remaining(), signal: cancellation.signal });
   receipt.execution = scrub({ started: true, ...result, requestedSignal });
+  receipt.outputSnapshot = captureCodingOutputSnapshot(workspace, { secrets });
   if (failed(result) || requestedSignal) receipt.error = "Native coding task did not finish successfully; independent oracle must inspect actual outputs";
 } catch (error) {
   receipt.error = error instanceof Error ? error.message : "Coding adapter failed";

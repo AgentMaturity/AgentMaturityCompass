@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 import { spawn } from "node:child_process";
-import { lstatSync, mkdirSync, readFileSync, realpathSync, writeFileSync } from "node:fs";
-import { dirname, resolve, sep } from "node:path";
+import { closeSync, constants, fstatSync, lstatSync, mkdirSync, openSync, readFileSync, readSync, realpathSync, writeFileSync } from "node:fs";
+import { dirname, join, resolve, sep } from "node:path";
 
 export const VERSION = "2026-09-08";
 export const sha256 = bytes => createHash("sha256").update(bytes).digest("hex");
@@ -32,6 +32,76 @@ export function seedRepository(workspace, fixture) {
     writeFileSync(file, content, { flag: "wx", mode: 0o600 });
   }
 }
+
+const OUTPUT_SOURCE_LIMIT = 128 * 1024;
+class OutputSnapshotError extends Error {
+  constructor(reason) { super(reason); this.reason = reason; }
+}
+const sameSnapshotStat = (first, second) => ["dev", "ino", "size", "mtimeMs", "ctimeMs"].every(key => first[key] === second[key]);
+
+/** Read bytes only: never import, execute or judge the target's output module. */
+export function captureCodingOutputSnapshot(workspace, { secrets = [] } = {}) {
+  const base = { schemaVersion: 1, path: "repo/solution.mjs", limitBytes: OUTPUT_SOURCE_LIMIT };
+  let original = null, stage = "workspace";
+  try {
+    const root = realpathSync(resolve(workspace)), repo = join(root, "repo");
+    stage = "repository";
+    const directory = lstatSync(repo);
+    if (directory.isSymbolicLink()) throw new OutputSnapshotError("repository-symlink");
+    if (!directory.isDirectory() || realpathSync(repo) !== repo) throw new OutputSnapshotError("repository-not-directory");
+    stage = "file";
+    const path = join(repo, "solution.mjs"), linkedBefore = lstatSync(path);
+    if (linkedBefore.isSymbolicLink()) throw new OutputSnapshotError("file-symlink");
+    if (!linkedBefore.isFile()) throw new OutputSnapshotError("file-not-regular");
+    if (typeof constants.O_NOFOLLOW !== "number") throw new OutputSnapshotError("nofollow-unavailable");
+    const fd = openSync(path, constants.O_RDONLY | constants.O_NOFOLLOW | constants.O_NONBLOCK);
+    let bytes;
+    try {
+      const before = fstatSync(fd);
+      if (!before.isFile()) throw new OutputSnapshotError("file-not-regular");
+      if (!sameSnapshotStat(linkedBefore, before)) throw new OutputSnapshotError("file-changed");
+      if (!Number.isSafeInteger(before.size) || before.size < 0 || before.size > OUTPUT_SOURCE_LIMIT) throw new OutputSnapshotError("file-too-large");
+      const buffer = Buffer.alloc(before.size + 1); let length = 0;
+      while (length < buffer.length) {
+        const count = readSync(fd, buffer, length, buffer.length - length, null);
+        if (!count) break;
+        length += count;
+      }
+      const after = fstatSync(fd), linkedAfter = lstatSync(path);
+      if (length !== before.size || !linkedAfter.isFile() || linkedAfter.isSymbolicLink()
+        || !sameSnapshotStat(before, after) || !sameSnapshotStat(before, linkedAfter)) throw new OutputSnapshotError("file-changed");
+      bytes = buffer.subarray(0, length);
+    } finally { closeSync(fd); }
+    stage = "repository";
+    const directoryAfter = lstatSync(repo);
+    if (!directoryAfter.isDirectory() || directoryAfter.isSymbolicLink() || !sameSnapshotStat(directory, directoryAfter)
+      || realpathSync(repo) !== repo) throw new OutputSnapshotError("repository-changed");
+    original = { sha256: sha256(bytes), bytes: bytes.length };
+    stage = "decode";
+    // ignoreBOM preserves the actual U+FEFF bytes in the returned source text.
+    const source = new TextDecoder("utf-8", { fatal: true, ignoreBOM: true }).decode(bytes);
+    stage = "redaction";
+    if (!Array.isArray(secrets) || secrets.some(secret => typeof secret !== "string")) throw new OutputSnapshotError("invalid-redaction-input");
+    let retained = source;
+    for (const secret of [...new Set(secrets)].filter(Boolean).sort((a, b) => b.length - a.length)) {
+      retained = retained.split(secret).join("[REDACTED]");
+      if (Buffer.byteLength(retained, "utf8") > OUTPUT_SOURCE_LIMIT) throw new OutputSnapshotError("retained-text-too-large");
+    }
+    const retainedBytes = Buffer.from(retained, "utf8");
+    return { ...base, status: "captured", reason: null, original,
+      retained: { sourceText: retained, sha256: sha256(retainedBytes), bytes: retainedBytes.length },
+      fidelity: { atAdapterCapture: retained === source ? "byte-identical" : "synthetic-secrets-redacted",
+        digestScope: "before-outer-publication-redaction", publicationMayRedact: true } };
+  } catch (error) {
+    // File paths and OS errors can themselves carry model-written text. Publish
+    // fixed reasons only, never error messages or a partial/encoded source.
+    const reason = error instanceof OutputSnapshotError ? error.reason : stage === "decode" ? "invalid-utf8"
+      : error?.code === "ENOENT" ? `${stage}-missing` : error?.code === "ELOOP" ? `${stage}-symlink`
+        : stage === "redaction" ? "redaction-failed" : `${stage}-unreadable`;
+    return { ...base, status: "unavailable", reason, original, retained: null, fidelity: null };
+  }
+}
+
 // Children stay in the outer comparison runner's process group. This is a
 // bounded trusted-fixture runner, not an OS sandbox for adversarial code.
 export async function invoke(cli, args, { cwd, env, timeoutMs = 30000, input, signal }) {
